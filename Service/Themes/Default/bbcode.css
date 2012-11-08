@@ -1,0 +1,7 @@
+.quote{border:1px solid #AAF;background:url(icons/quote.png) top right no-repeat #e0e0ff;padding:10px;}
+.quote .quotee{margin:-10px 0 10px -5px;font-weight:bold;background:#FFF;}
+.code{border:1px solid #AAF;background:#e0e0ff;padding:10px;font-family:consolas,fixedsys;font-size:12px;}
+.spoilertext{display:inline-block;background:#FFF;color:#FFF;border:1px solid #AAF;}
+.spoilertext *{visibility:hidden;}
+.spoilertext:hover *{visibility:visible;}
+.spoilertext:hover{background:#FFF;color:#000;}

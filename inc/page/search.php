@@ -1,0 +1,189 @@
+<?
+/* Chat box
+better color >_>
+
+<_<
+we need to be able to search "All" :>
+*/
+
+$PAGE->loadmeta('search');
+
+
+new search;
+class search{
+ 
+ function __constructor(){
+  global $PAGE,$JAX;
+  
+  $this->page="";
+  $this->pagenum=$JAX->b['page'];
+  if(!is_numeric($this->pagenum)||$this->pagenum<0) $this->pagenum=1;
+  else $this->pagenum=$JAX->b['page'];
+  
+  $this->perpage=10;
+  
+  if($JAX->b['searchterm']||$JAX->b['page']) $this->dosearch();
+  else $this->form();
+ }
+ function search(){$this->__constructor();}
+ 
+ function form(){
+  global $PAGE,$JAX,$SESS;
+  if($PAGE->jsupdate) return;
+  
+  $this->page=$PAGE->meta('search-form',$JAX->blockhtml($SESS->vars['searcht']),$this->getForumSelection(),$this->page);
+  $PAGE->JS("update","page",$this->page);
+  $PAGE->append("page",$this->page);
+  
+ }
+ function getForumSelection(){
+  global $DB;
+  $this->getSearchableForums();
+  if(!$this->fids) return "--No forums--";
+  $DB->select("`id`,`title`,`path`","forums","WHERE id IN (".implode(',',$this->fids).") ORDER BY `order` ASC,`title` DESC");
+
+  
+  $tree=Array();
+  $titles=Array();
+  
+  while($f=$DB->row()) {
+   $titles[$f['id']]=$f['title'];
+   $path=trim($f['path'])?explode(" ",$f['path']):Array();
+   $t=&$tree;
+   foreach($path as $v){
+    if(!is_array($t[$v])) $t[$v]=Array();
+    $t=&$t[$v];
+   }
+   if(!$t[$f['id']]) $t[$f['id']]=true;
+  }
+  
+  $r.=$this->rtreeselect($tree,$titles);
+  
+  return $r;
+ }
+ function rtreeselect($tree,$titles,$level=0){
+  $r='';
+  foreach($tree as $k=>$v){
+   if(isset($titles[$k])) $r.='<option value="'.$k.'">'.str_repeat('+-',$level).$titles[$k].'</option>';
+   if(is_array($v)) $r.=$this->rtreeselect($v,$titles,$level+1);
+  }
+  if(!$level) $r='<select size="15" multiple="multiple" name="fids">'.$r."</select>";
+  return $r;
+ }
+ 
+ function pdate($a){
+  $a=explode("/",$a);
+  if(count($a)!=3) return false;
+  for($x=0;$x<3;$x++) if(!is_numeric($a[$x])) return false;
+  if(($a[0]%2)&&$data[1]==31||
+        $data[0]==2&&(!$data[2]%4&&$data[1]>29||$data[2]%4&&$data[1]>28)
+      ) return false;
+  return mktime(0,0,0,$a[0],$a[1],$a[2]);
+ }
+ 
+ function dosearch(){
+  global $JAX,$PAGE,$DB,$SESS;
+  
+  if($PAGE->jsupdate&&empty($JAX->p)) return;
+  
+  $termraw=$JAX->b['searchterm'];
+  
+  if(!$termraw&&$this->pagenum) {$termraw=$SESS->vars['searcht'];}
+  
+  if(empty($JAX->p)&&!$JAX->b['searchterm']) {
+   $ids=$SESS->vars['search'];
+  } else {
+   $this->getSearchableForums();
+   if($JAX->b['fids']) {
+    $fids=Array();
+    foreach($JAX->b['fids'] as $v) if(in_array($v,$this->fids)) $fids[]=$v;
+   } else {
+    $fids=$this->fids;
+   }
+   if($JAX->b['datestart']) $datestart=$this->pdate($JAX->b['datestart']);
+   if($JAX->b['dateend']) $dateend=$this->pdate($JAX->b['dateend']);
+   $fids=implode(",",$fids);
+  
+   $DB->special(
+   'SELECT id,SUM(relevance) relevance FROM (
+    (
+     SELECT p.id,MATCH(p.post) AGAINST(%4$s) relevance FROM %t p LEFT JOIN %t t ON p.tid=t.id WHERE MATCH(post) AGAINST(%4$s IN BOOLEAN MODE) AND t.fid IN (%5$s)%6$s%7$s%8$s ORDER BY relevance DESC LIMIT 100
+    ) UNION (
+     SELECT op,MATCH(title) AGAINST(%4$s) relevance FROM %t p WHERE MATCH(title) AGAINST(%4$s IN BOOLEAN MODE) AND fid IN (%5$s)%6$s%7$s%8$s ORDER BY relevance DESC LIMIT 100
+    )
+    ) dt GROUP BY id ORDER BY relevance DESC',"posts","topics","topics",
+     $DB->evalue($termraw),
+     $fids,
+     is_numeric($JAX->b['mid'])?" AND p.auth_id=".$DB->evalue($JAX->b['mid']):"",
+     $datestart?" AND p.date>".$datestart:'',
+     $dateend?" AND p.date<".$dateend:''
+   );
+    
+   while($id=$DB->row()) {
+    if($id['id']) $ids.=$id['id'].',';
+   }
+   $ids=substr($ids,0,-1);
+   $SESS->addvar('search',$ids);
+   $SESS->addvar('searcht',$termraw);
+   $this->pagenum=1;
+  }
+  
+  
+  if($ids) {
+   $numresults=count(explode(",",$ids));
+   $ids=implode(",",array_slice(explode(",",$ids),($this->pagenum-1)*$this->perpage,$this->perpage));
+   $DB->special("SELECT p.*,t.title FROM %t p LEFT JOIN %t t ON p.tid=t.id WHERE p.id IN (".$ids.") ORDER BY FIELD(p.id,$ids)","posts","topics");
+  } else $numresults=0;
+  
+  $page="";
+  
+  $terms=Array();
+  
+  foreach(preg_split("@\W+@",$termraw) as $v)
+   if(trim($v)) $terms[]=preg_quote($v);
+  
+  while($f=$DB->row()) {
+   $post=$f['post'];
+   $post=$JAX->textonly($post);
+   $post=$JAX->blockhtml($post);
+   $post=nl2br($post);
+   $post=preg_replace("@".implode("|",$terms)."@i",$PAGE->meta('search-highlight','$0'),$post);
+   $title=preg_replace("@".implode("|",$terms)."@i",$PAGE->meta('search-highlight','$0'),$f['title']);
+
+   $page.=$PAGE->meta('search-result',$f['tid'],$title,$f['id'],$post);
+  }
+  
+  if(!$numresults){
+   $e="No results found. Try refining your search, or using longer terms.";
+   
+   $omitted=Array();
+   foreach($terms as $v) if(strlen($v)<3) $omitted[]=$v;
+   if(!empty($omitted)) $e.="<br /><br />The following terms were omitted due to length: ".implode(', ',$omitted);
+   $page=$PAGE->error($e);
+  } else {
+   foreach($JAX->pages(ceil($numresults/$this->perpage),$this->pagenum,10) as $x) $pages.='<a href="?act=search&page='.$x.'">'.$x.'</a> ';
+  }
+  
+  $page=$PAGE->meta('box','','Search Results - '.$pages,$page);
+  
+  
+  if($PAGE->jsaccess&&!$PAGE->jsdirectlink) $PAGE->JS("update","searchresults",$page);
+  else {
+   $this->page.=$page;
+   $this->form();
+  }
+ }
+ 
+ function getSearchableForums(){
+  if($this->fids) return $this->fids;
+  $this->fids=Array();
+  global $DB,$JAX,$USER;
+  $DB->select("id,perms","forums");
+  while($f=$DB->row()){
+   $perms=$JAX->parseperms($f['perms'],$USER?$USER['group_id']:3);
+   if($perms['read']) $this->fids[]=$f['id'];
+  }
+  return $this->fids;
+ }
+}
+?>
