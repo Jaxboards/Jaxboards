@@ -2,8 +2,8 @@
 $CFG=Array(
 "updateinterval"=>5,
 "sql_host"=>"localhost",
-"sql_username"=>"***REMOVED***",
-"sql_password"=>"***REMOVED***",
+"sql_username"=>"SQLUSER",
+"sql_password"=>"SQLPASS",
 "sql_db"=>"jaxboards",
 "dthemepath"=>(defined("INACP")?"../":"")."Service/Themes/Default/",
 "postmaxsize"=>50000,
