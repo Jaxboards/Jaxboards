@@ -36,8 +36,10 @@ class TOPIC{
   global $DB,$PAGE,$JAX,$SESS,$USER,$PERMS;
   $page=$this->page;
   if(!$id) return $PAGE->location("?");
-  $DB->special("SELECT a.title topic_title,a.locked,a.lp_date,b.title forum_title,b.perms fperms,c.id cat_id,c.title cat_title,a.fid,a.poll_q,a.poll_type,a.poll_choices,a.poll_results,a.subtitle FROM %t AS a LEFT JOIN (%t AS b) ON a.fid=b.id LEFT JOIN (%t AS c) ON b.cat_id=c.id WHERE a.id=$id LIMIT 1","topics","forums","categories");
-  $topicdata=$DB->arow();
+  $result = $DB->safespecial("SELECT a.title topic_title,a.locked,a.lp_date,b.title forum_title,b.perms fperms,c.id cat_id,c.title cat_title,a.fid,a.poll_q,a.poll_type,a.poll_choices,a.poll_results,a.subtitle FROM %t AS a LEFT JOIN (%t AS b) ON a.fid=b.id LEFT JOIN (%t AS c) ON b.cat_id=c.id WHERE a.id=$id LIMIT 1",
+	array("topics","forums","categories"));
+  $topicdata=$DB->arow($result);
+  $DB->disposeresult($result);
 
   if(!$topicdata) {
    return $PAGE->location("?"); //put them back on the index, skip these next few lines
@@ -56,9 +58,11 @@ class TOPIC{
    require_once("inc/classes/rssfeed.php");
    $link="http://".$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
    $feed=new rssfeed(Array("title"=>$topicdata['topic_title'],"description"=>$topicdata['subtitle'],"link"=>$link."?act=vt".$id));
-   $DB->special("SELECT p.id,p.post,p.date,m.id,m.display_name FROM %t p LEFT JOIN %t m ON p.auth_id=m.id WHERE p.tid=".$DB->evalue($id),"posts","members");
-   echo $DB->error();
-   while($f=$DB->row()) $feed->additem(Array('title'=>$f['display_name'].':','link'=>$link.'?act=vt'.$id.'&amp;findpost='.$f['id'],'description'=>$JAX->blockhtml($JAX->theworks($f['post'])),'guid'=>$f['id'],'pubDate'=>date('r',$f['date'])));
+   $result = $DB->safespecial("SELECT p.id,p.post,p.date,m.id,m.display_name FROM %t p LEFT JOIN %t m ON p.auth_id=m.id WHERE p.tid=?",
+	array("posts","members"),
+	$DB->basicvalue($id));
+   echo $DB->error(1);
+   while($f=$DB->row($result)) $feed->additem(Array('title'=>$f['display_name'].':','link'=>$link.'?act=vt'.$id.'&amp;findpost='.$f['id'],'description'=>$JAX->blockhtml($JAX->theworks($f['post'])),'guid'=>$f['id'],'pubDate'=>date('r',$f['date'])));
    $feed->publish();
    die();
   }
@@ -68,8 +72,10 @@ class TOPIC{
   $PAGE->path(Array($topicdata['cat_title']=>"?act=vc".$topicdata['cat_id'],$topicdata['forum_title']=>"?act=vf".$topicdata['fid'],$topicdata['topic_title']=>"?act=vt$id"));
 
   /*generate pages*/
-  $DB->select("count(*)","posts","WHERE tid=$id");
-  $posts=array_pop($DB->row());
+  $result = $DB->safeselect("count(*)","posts","WHERE tid=?", $id);
+  $posts=array_pop($DB->row($result));
+  $DB->disposeresult($result);
+
   $totalpages=ceil($posts/$this->numperpage);
   $pagelist='';
   foreach($JAX->pages($totalpages,$this->page+1,10) as $x) $pagelist.=$PAGE->meta("topic-pages-part",$id,$x,($x==($this->page+1)?' class="active"':''),$x);
@@ -102,7 +108,7 @@ class TOPIC{
   $page=$pollshit.$PAGE->meta('topic-pages-top',$pagelist).$PAGE->meta('topic-buttons-top',$buttons).$page.$PAGE->meta('topic-pages-bottom',$pagelist).$PAGE->meta('topic-buttons-bottom',$buttons);
   
   //update view count
-  $DB->update("topics",Array("views"=>Array("views+1")),"WHERE id='$id'");
+  $DB->safequery("UPDATE topics SET views = views + 1 WHERE id=?", $id);
 
   if($PAGE->jsaccess) {
    $PAGE->JS("update","page",$page);
@@ -148,12 +154,17 @@ class TOPIC{
   $prefilled="";
   $PAGE->JS("softurl");
   if($SESS->vars['multiquote']) {
-   $DB->special("SELECT p.*,m.display_name name FROM %t p LEFT JOIN %t m ON p.auth_id=m.id WHERE p.id IN (".$SESS->vars['multiquote'].")","posts","members");
-   while($f=$DB->row()) $prefilled.='[quote='.$f['name'].']'.$f['post']."[/quote]\n\n";
+   $result = $DB->safespecial("SELECT p.*,m.display_name name FROM %t p LEFT JOIN %t m ON p.auth_id=m.id WHERE p.id IN ?;",
+	array("posts","members"),
+	explode(",", $SESS->vars['multiquote']));
+
+   while($f=$DB->row($result)) $prefilled.='[quote='.$f['name'].']'.$f['post']."[/quote]\n\n";
    $SESS->delvar('multiquote');
   }
-  $DB->select("title","topics","WHERE id=".$id);
-  $tdata=$DB->row();
+  $result = $DB->safeselect("title","topics","WHERE id=?", $id);
+  $tdata=$DB->row($result);
+  $DB->disposeresult($result);
+
   $PAGE->JS("window",Array("id"=>"qreply","title"=>$JAX->wordfilter($tdata['title']),"content"=>$PAGE->meta("topic-reply-form",$id,JAX::blockhtml($prefilled)),"resize"=>"textarea"));
   $PAGE->JS("updateqreply",'');
  }
@@ -161,13 +172,34 @@ class TOPIC{
  function postsintooutput($lastpid=0){
   global $DB,$PAGE,$JAX,$SESS,$USER,$PERMS,$CFG;
   $usersonline=$DB->getUsersOnline();
-  $query=$DB->special("SELECT
-  m.*,
-  p.tid,p.id AS pid,p.ip,p.newtopic,p.post,p.showsig,p.showemotes,p.tid,p.date,p.auth_id,p.rating,
-  g.title,g.icon,
-  p.editdate,p.editby,e.display_name ename,e.group_id egroup_id
-  FROM %t AS p LEFT JOIN %t AS m ON p.auth_id=m.id LEFT JOIN %t AS g ON m.group_id=g.id LEFT JOIN %t AS e ON p.editby=e.id WHERE p.tid=".$this->id." ".
-  ($lastpid?"AND p.id>$lastpid ORDER BY pid":"ORDER BY newtopic DESC, pid ASC LIMIT ".(($topic_post_counter=($this->page)*$this->numperpage)).",".$this->numperpage),"posts","members","member_groups","members");
+
+  if ($lastpid) {
+      $query=$DB->safespecial("SELECT
+          m.*,
+          p.tid,p.id AS pid,p.ip,p.newtopic,p.post,p.showsig,p.showemotes,p.tid,p.date,p.auth_id,p.rating,
+          g.title,g.icon,
+          p.editdate,p.editby,e.display_name ename,e.group_id egroup_id
+          FROM %t AS p LEFT JOIN %t AS m ON p.auth_id=m.id LEFT JOIN %t AS g ON m.group_id=g.id LEFT JOIN %t AS e ON p.editby=e.id WHERE p.tid=?
+          AND p.id>? ORDER BY pid",
+	array("posts","members","member_groups","members"),
+        $this->id,
+        $lastpid);
+
+  } else {
+
+      $query=$DB->safespecial("SELECT
+          m.*,
+          p.tid,p.id AS pid,p.ip,p.newtopic,p.post,p.showsig,p.showemotes,p.tid,p.date,p.auth_id,p.rating,
+          g.title,g.icon,
+          p.editdate,p.editby,e.display_name ename,e.group_id egroup_id
+          FROM %t AS p LEFT JOIN %t AS m ON p.auth_id=m.id LEFT JOIN %t AS g ON m.group_id=g.id LEFT JOIN %t AS e ON p.editby=e.id WHERE p.tid=?
+          ORDER BY newtopic DESC, pid ASC LIMIT ?,?",
+	    array("posts","members","member_groups","members"),
+	    $this->id,
+	    (($topic_post_counter=($this->page)*$this->numperpage)),
+	    $this->numperpage);
+  }
+
   $rows='';
   while($post=$DB->arow($query)) {
    if(!$this->firstPostID) $this->firstPostID=$post['pid'];
@@ -250,7 +282,11 @@ class TOPIC{
   $canmod=false;
   if($PERMS['can_moderate']) $canmod=true;
   if($USER['mod']){
-   $mods=$DB->row($DB->special('SELECT mods FROM %t WHERE id=(SELECT fid FROM %t WHERE id='.$DB->evalue($this->id).')','forums','topics'));
+   $result = $DB->safespecial('SELECT mods FROM %t WHERE id=(SELECT fid FROM %t WHERE id=?)',
+	array('forums','topics'),
+	$DB->basicvalue($this->id));
+   $mods=$DB->row($result);
+   $DB->disposeresult($result);
    if(in_array($USER['id'],explode(',',$mods['mods']))) $canmod=true;
   }
   return $this->canmod=$canmod;
@@ -299,8 +335,10 @@ class TOPIC{
   
   if(!$USER) $e='You must be logged in to vote!';
   else {
-   $DB->select("poll_q,poll_results,poll_choices,poll_type","topics","WHERE id=".$this->id);
-   $row=$DB->row();
+   $result = $DB->safeselect("poll_q,poll_results,poll_choices,poll_type","topics","WHERE id=?", $this->id);
+   $row=$DB->row($result);
+   $DB->disposeresult($result);
+
    $choice=$JAX->b['choice'];
    $choices=$JAX->json_decode($row['poll_choices']);
    $numchoices=count($choices);
@@ -339,15 +377,17 @@ class TOPIC{
   
   $PAGE->JS("update","#poll .content",$this->generatePoll($row['poll_q'],$row['poll_type'],$choices,$presults),"1");
   
-  $DB->update("topics",Array("poll_results"=>$presults),"WHERE id=".$this->id);
+  $DB->safeupdate("topics",Array("poll_results"=>$presults),"WHERE id=?", $this->id);
  }
  
  function ratepost($postid,$nibletid){
   global $DB,$USER,$PAGE;
   $PAGE->JS("softurl");
   if(!is_numeric($postid)||!is_numeric($nibletid)) return false;
-  $DB->select("rating","posts","WHERE id=".$DB->evalue($postid));
-  $f=$DB->row();
+  $result = $DB->safeselect("rating","posts","WHERE id=?", $DB->basicvalue($postid));
+  $f=$DB->row($result);
+  $DB->disposeresult($result);
+
   $niblets=$DB->getRatingNiblets();
   if(!$USER['id']) $e="You don't have permission to rate posts.";
   elseif(!$f) $e="That post doesn't exist.";
@@ -368,7 +408,7 @@ class TOPIC{
   if($e) $PAGE->JS("error",$e);
   else {
     $ratings[(int)$nibletid][]=(int)$USER['id'];
-    $DB->update("posts",Array('rating'=>json_encode($ratings)),"WHERE id=".$DB->evalue($postid));
+    $DB->safeupdate("posts",Array('rating'=>json_encode($ratings)),"WHERE id=?", $DB->basicvalue($postid));
     $PAGE->JS("alert",'Rated!');
   }
  }
@@ -378,8 +418,9 @@ class TOPIC{
   if(!is_numeric($id)) return;
   if(!$PAGE->jsaccess) $PAGE->location("?act=post&pid=".$id);
   $PAGE->JS("softurl");
-  $DB->select("*","posts","WHERE id=$id");
-  $post=$DB->row();
+  $result = $DB->safeselect("*","posts","WHERE id=?", $id);
+  $post=$DB->row($result);
+  $DB->disposeresult($result);
  
   $hiddenfields=$JAX->hiddenFormFields(Array("act"=>"post","how"=>"qedit","pid"=>$id));
 
@@ -389,8 +430,10 @@ class TOPIC{
    else {
     if($post['newtopic']) {
      $hiddenfields.=$JAX->hiddenFormFields(Array("tid"=>$post['tid']));
-     $DB->select("*","topics",'WHERE id='.$post['tid']);
-     $topic=$DB->row();
+     $result = $DB->safeselect("*","topics",'WHERE id=?', $post['tid']);
+     $topic=$DB->row($result);
+     $DB->disposeresult($result);
+
      $form=$PAGE->meta('topic-qedit-topic',$hiddenfields,$topic['title'],$topic['subtitle'],$JAX->blockhtml($post['post']));
     } else {
      $form=$PAGE->meta('topic-qedit-post',$hiddenfields,$JAX->blockhtml($post['post']),$id);
@@ -405,8 +448,11 @@ class TOPIC{
   $pid=$JAX->b['quote'];
   $post=false;
   if($pid&&is_numeric($pid)) {
-   $DB->special("SELECT p.post,m.display_name name FROM %t p LEFT JOIN %t m ON p.auth_id=m.id WHERE p.id=$pid","posts","members");
-   $post=$DB->row();
+   $result = $DB->safespecial("SELECT p.post,m.display_name name FROM %t p LEFT JOIN %t m ON p.auth_id=m.id WHERE p.id=?",
+	array("posts","members"),
+	$pid);
+   $post=$DB->row($result);
+   $DB->disposeresult($result);
   }
   if(!$post) {
    $e="That post doesn't exist!";
@@ -429,8 +475,10 @@ class TOPIC{
 
  function getlastpost($tid){
   global $DB,$PAGE;
-  $DB->select("max(id) lastpid,count(*) numposts","posts","WHERE tid=$tid");
-  $f=$DB->row();
+  $result = $DB->safeselect("max(id) lastpid,count(*) numposts","posts","WHERE tid=?", $tid);
+  $f=$DB->row($result);
+  $DB->disposeresult($result);
+
   $PAGE->JS("softurl");
   $PAGE->location("?act=vt$tid&page=".(ceil(($f['numposts']/$this->numperpage)))."&pid=".$f['lastpid']."#pid_".$f['lastpid']);
  }
@@ -439,9 +487,11 @@ class TOPIC{
   global $PAGE,$DB;
   if(!is_numeric($pid)) $couldntfindit=true;
   else {
-   $DB->special("SELECT * FROM %t WHERE tid=(SELECT tid FROM %t WHERE id='".$pid."') ORDER BY id ASC","posts","posts");
+   $result = $DB->safespecial("SELECT * FROM %t WHERE tid=(SELECT tid FROM %t WHERE id=?) ORDER BY id ASC",
+	array("posts","posts"),
+	$pid);
    $num=1;
-   while($f=$DB->row()) {
+   while($f=$DB->row($result)) {
     if($f['id']==$pid) {
      $pid=$f['id'];
      $couldntfindit=false;
@@ -468,17 +518,19 @@ class TOPIC{
   global $DB,$PAGE,$CFG;
   if($CFG['ratings']&2) return;
   $PAGE->JS("softurl");
-  $DB->select("rating","posts","WHERE id=".$DB->evalue($pid));
-  $row=$DB->row();
+  $result = $DB->safeselect("rating","posts","WHERE id=?", $DB->basicvalue($pid));
+  $row=$DB->row($result);
+  $DB->disposeresult($result);
+
   if($row) $ratings=json_decode($row[0],true);
   else $ratings=Array();
   if(empty($ratings)) return;
   else {
    $members=Array();
    foreach($ratings as $v) $members=array_merge($members,$v);
-   $DB->select("id,display_name,group_id","members","WHERE id IN(".implode(',',$members).")");
-   $mdata=Array();
-   while($f=$DB->arow()) $mdata[$f['id']]=Array($f['display_name'],$f['group_id']);
+   $result = $DB->safeselect("id,display_name,group_id","members","WHERE id IN ?", $members);
+   $mdata=Array($result);
+   while($f=$DB->arow($result)) $mdata[$f['id']]=Array($f['display_name'],$f['group_id']);
    unset($members);
    $niblets=$DB->getRatingNiblets();
    foreach($ratings as $k=>$v) {

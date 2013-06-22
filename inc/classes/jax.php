@@ -1,4 +1,4 @@
-<?
+<?php
 class JAX{
  function JAX(){$this->__construct();}
  function __construct(){
@@ -6,6 +6,7 @@ class JAX{
   $this->g=$this->filterInput($_GET);
   $this->p=$this->filterInput($_POST);
   $this->b=array_merge($this->p,$this->g);
+  $this->textRules = NULL;
  }
 
  function between($a,$b,$c){
@@ -109,11 +110,12 @@ function json_decode($a,$aa=true){
   global $DB;
   if(!$DB) return;
   if(!$uid) return $this->userData=false;
-  $DB->select("id,group_id,sound_im,sound_shout,last_visit,display_name,friends,enemies,skin_id,nowordfilter,wysiwyg,avatar,ip,usertitle,concat(dob_month,' ',dob_day) birthday,`mod`,posts","members","WHERE id=".$DB->evalue($uid)." AND pass=".$DB->evalue($pass));
-  if(!$row=$DB->row()) {
+  $result = $DB->safeselect("id,group_id,sound_im,sound_shout,last_visit,display_name,friends,enemies,skin_id,nowordfilter,wysiwyg,avatar,ip,usertitle,concat(dob_month,' ',dob_day) birthday,`mod`,posts","members","WHERE id=? AND pass=?", $DB->basicvalue($uid), $DB->basicvalue($pass));
+  if(!$row=$DB->row($result)) {
    return $this->userData=false;
   } else {
-   $row['buddies']=explode(",",$row['buddies']);
+   $DB->disposeresult($result);
+   // $row['buddies']=explode(",",$row['buddies']); /* Possible bug. */
    $row['birthday']=(date('n j')==$row['birthday']?1:0);
    return $this->userData=$row;
   }
@@ -129,8 +131,10 @@ function json_decode($a,$aa=true){
    if($this->ipbanned()) {
     $this->userData['group_id']=$group_id=4;
    }
-   $DB->select("*","member_groups","WHERE id=".$this->pick($group_id,3));
-   return $this->userPerms=$DB->row();
+   $result = $DB->safeselect("*","member_groups","WHERE id=?", $this->pick($group_id,3));
+   $retval = $this->userPerms=$DB->row($result);
+   $DB->disposeresult($result);
+   return $retval;
   }
  }
 
@@ -141,11 +145,11 @@ function json_decode($a,$aa=true){
  function getTextRules(){
   global $CFG,$DB;
   if($this->textRules) return $this->textRules;
-  $q=$DB->select("*","textrules",'',0);
+  $q=$DB->safeselect("*","textrules",'');
   $textRules=Array('emote'=>Array(),'bbcode'=>Array(),'badword'=>Array());
   while($f=$DB->row($q)) $textRules[$f['type']][$f['needle']]=$f['replacement'];
   //load emoticon pack
-  $emotepack=$CFG['emotepack'];
+  $emotepack=isset($CFG['emotepack']) ? $CFG['emotepack'] : NULL;
   if($emotepack) {
    $emotepack="emoticons/".$emotepack;
    if(substr($emotepack,-1)!="/") $emotepack.="/";
@@ -167,7 +171,7 @@ function json_decode($a,$aa=true){
   //legacy code to update to new system, remove this after 5/1
   if(file_exists(BOARDPATH."emoticons.php")){
    require_once(BOARDPATH."emoticons.php");
-   foreach($emoticons as $k=>$v) $DB->insert("textrules",Array('type'=>'emote','needle'=>$k,'replacement'=>$v));
+   foreach($emoticons as $k=>$v) $DB->safeinsert("textrules",Array('type'=>'emote','needle'=>$k,'replacement'=>$v));
    unlink(BOARDPATH."emoticons.php");
    foreach($emoticons as $k=>$v) $nrules[($escape?preg_quote($k,'@'):$k)]='<img src="'.$v.'" />';
   }
@@ -196,7 +200,7 @@ function json_decode($a,$aa=true){
    if(file_exists(BOARDPATH."wordfilter.php")) {
     require_once(BOARDPATH."wordfilter.php");
     foreach($wordfilter as $k=>$v) {
-     $DB->insert("textrules",Array('type'=>'badword','needle'=>$k,'replacement'=>$v));
+     $DB->safeinsert("textrules",Array('type'=>'badword','needle'=>$k,'replacement'=>$v));
     }
     unlink(BOARDPATH."wordfilter.php");
    }
@@ -328,8 +332,9 @@ function json_decode($a,$aa=true){
   if($this->attachmentdata[$a]) {
    $data=$this->attachmentdata[$a];
   } else {
-   $DB->select("*","files","WHERE id='".$a."'");
-   $data=$DB->row();
+   $result = $DB->safeselect("*","files","WHERE id=?",$a);
+   $data=$DB->row($result);
+   $DB->disposeresult($result);
    if(!$data) return "Attachment doesn't exist";
    else $this->attachmentdata[$a]=$data;
   }
@@ -348,14 +353,14 @@ function json_decode($a,$aa=true){
  }
 
  function theworks($a,$cfg=Array()){
-  if(!$cfg['nobb']&&!$cfg['minimalbb']) $codes=$this->startcodetags($a);
+  if (@!$cfg['nobb'] && @!$cfg['minimalbb']) $codes=$this->startcodetags($a);
   $a=$this->blockhtml($a);
   //$a=$this->wordfilter($a);
   //$a=$this->linkify($a); now linkifies before sendage
-  if(!$cfg['noemotes']) $a=$this->emotes($a);
-  if(!$cfg['nobb']) $a=$this->bbcodes($a,$cfg['minimalbb']);
-  if(!$cfg['nobb']&&!$cfg['minimalbb']) $a=$this->finishcodetags($a,$codes);
-  if(!$cfg['nobb']&&!$cfg['minimalbb']) $a=$this->attachments($a);
+  if(@!$cfg['noemotes']) $a=$this->emotes($a);
+  if(@!$cfg['nobb']) $a=$this->bbcodes($a,@$cfg['minimalbb']);
+  if(@!$cfg['nobb'] && @!$cfg['minimalbb']) $a=$this->finishcodetags($a,$codes);
+  if(@!$cfg['nobb'] && @!$cfg['minimalbb']) $a=$this->attachments($a);
   $a=$this->wordfilter($a);
   $a=nl2br($a);
   return $a;

@@ -1,4 +1,4 @@
-<?
+<?php
 if(!defined(INACP)) die();
 
 new settings;
@@ -93,9 +93,9 @@ class settings{
    }
    if($e) $page.=$PAGE->error($e);
   }
-  $DB->select("*","pages");
+  $result = $DB->safeselect("*","pages");
   $table="";
-  while($f=$DB->row()) $table.='<tr><td>'.$f['act'].'</td><td><a href="../?act='.$f['act'].'">View</a></td><td><a href="?act=settings&do=pages&page='.$f['act'].'">Edit</a></td><td><a onclick="return confirm(\'You sure?\')" href="?act=settings&do=pages&delete='.$f['act'].'">Delete</a></td></tr>';
+  while($f=$DB->row($result)) $table.='<tr><td>'.$f['act'].'</td><td><a href="../?act='.$f['act'].'">View</a></td><td><a href="?act=settings&do=pages&page='.$f['act'].'">Edit</a></td><td><a onclick="return confirm(\'You sure?\')" href="?act=settings&do=pages&delete='.$f['act'].'">Delete</a></td></tr>';
   if($table) $page.="<table class='pages'><tr><th>Act</th><th></th><th></th><th></th></tr>$table</table>";
   $page.="<form method='get'>".
   $JAX->hiddenFormFields(Array("act"=>"settings","do"=>"pages")).
@@ -104,17 +104,18 @@ class settings{
  }
  function pages_delete($page){
   global $DB;
-  return $DB->delete("pages","WHERE act=".$DB->evalue($page));
+  return $DB->safedelete("pages","WHERE act=?", $DB->basicvalue($page));
  }
  function pages_edit($pageurl){
   global $PAGE,$DB,$JAX;
-  $DB->select("*","pages","WHERE act=".$DB->evalue($pageurl));
-  $pageinfo=$DB->row();
+  $result = $DB->safeselect("*","pages","WHERE act=?", $DB->basicvalue($pageurl));
+  $pageinfo=$DB->row($result);
+  $DB->disposeresult($result);
   if($JAX->p['pagecontents']){
    if($pageinfo){
-    $DB->update("pages",Array("page"=>$JAX->p['pagecontents']),"WHERE `act`=".$DB->evalue($pageurl));
+    $DB->safeupdate("pages",Array("page"=>$JAX->p['pagecontents']),"WHERE `act`=?", $DB->basicvalue($pageurl));
    } else {
-    $DB->insert("pages",Array("act"=>$pageurl,"page"=>$JAX->p['pagecontents']));
+    $DB->safeinsert("pages",Array("act"=>$pageurl,"page"=>$JAX->p['pagecontents']));
    }
    $pageinfo['page']=$JAX->p['pagecontents'];
    $page.=$PAGE->success("Page saved. Preview <a href='/?act=$pageurl'>here</a>");
@@ -133,7 +134,7 @@ class settings{
  function shoutbox(){
   global $PAGE,$JAX,$DB;
   if($JAX->p['clearall']){
-   $DB->special("TRUNCATE TABLE %t","shouts");
+   $result = $DB->safespecial("TRUNCATE TABLE %t",array("shouts"));
    $page.=$PAGE->success("Shoutbox cleared!");
   }
   if($JAX->p['submit']){
@@ -160,21 +161,22 @@ class settings{
    if(strlen($JAX->p['domain'])>100) $e="Domain must be less than 100 characters";
    elseif(preg_match('@[^\w.]@',$JAX->p['domain'])) $e="Please enter a valid domain.";
    
-   $DB->query("SELECT * FROM jaxboards_service.domains WHERE domain=".$DB->evalue($JAX->p['domain']));
-   if($DB->row()) $e="That domain has already been claimed";
+   $result = $DB->safequery("SELECT * FROM jaxboards_service.domains WHERE domain=?", $DB->basicvalue($JAX->p['domain']));
+   if($DB->row($result)) $e="That domain has already been claimed";
+   $DB->disposeresult($result);
    if($e) $page.=$PAGE->error($e);
    else {
-    $DB->query('INSERT INTO jaxboards_service.domains(`domain`,`prefix`) VALUES('.$DB->evalue($JAX->p['domain']).','.$DB->evalue($CFG['prefix']).')');
+    $result = $DB->safequery("INSERT INTO jaxboards_service.domains(`domain`,`prefix`) VALUES( ?, ?);", $DB->basicvalue($JAX->p['domain']), $DB->basicvalue($CFG['prefix']));
     $page.=$PAGE->success("Domain added! Test <a href='http://".$JAX->blockhtml($JAX->p['domain'])."'>here.</a>");
    }
-  } elseif($JAX->b['delete']) {
-   $DB->query('DELETE FROM jaxboards_service.domains WHERE domain='.$DB->evalue($JAX->b['delete']).' AND prefix='.$DB->evalue($CFG['prefix']));
-   if($DB->affected_rows()) $page.=$PAGE->success("Domain deleted");
+  } else if($JAX->b['delete']) {
+   $result = $DB->safequery('DELETE FROM jaxboards_service.domains WHERE domain=? AND prefix=?;', $DB->basicvalue($JAX->b['delete']), $DB->basicvalue($CFG['prefix']));
+   if($DB->affected_rows(1)) $page.=$PAGE->success("Domain deleted");
    else $page.=$PAGE->error("Error deleting domain, maybe it doesn't belong to you?");
   }
-  $DB->query("SELECT * FROM jaxboards_service.domains WHERE prefix=".$DB->evalue($CFG['prefix']));
+  $result = $DB->safequery("SELECT * FROM jaxboards_service.domains WHERE prefix=?;", $DB->basicvalue($CFG['prefix']));
   $domains=Array();
-  while($f=$DB->row()) $domains[]=$f['domain'];
+  while($f=$DB->row($result)) $domains[]=$f['domain'];
   if(empty($domains)){
    $table="<tr><td>No domains to show!</td></tr>";
   } else {

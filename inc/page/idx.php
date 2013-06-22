@@ -14,11 +14,12 @@ class IDX{
 	function viewidx(){
 		global $DB,$PAGE,$SESS,$JAX,$USER,$CFG;
 		$SESS->location_verbose="Viewing board index";
-		$DB->special("SELECT f.*,m.display_name lp_name,m.group_id lp_gid FROM %t AS f LEFT JOIN %t AS m ON f.lp_uid=m.id ORDER BY `order`,f.title ASC","forums","members");
+		$result = $DB->safespecial("SELECT f.*,m.display_name lp_name,m.group_id lp_gid FROM %t AS f LEFT JOIN %t AS m ON f.lp_uid=m.id ORDER BY `order`,f.title ASC",
+			array("forums","members"));
 		$data=$this->subforums=$this->subforumids=$this->mods=Array();
         
         //this while loop just grabs all of the data, displaying is done below
-		while($r=$DB->row()) {
+		while($r=$DB->row($result)) {
             $perms=$JAX->parseperms($r['perms'],$USER?$USER['group_id']:3);
             if($r['perms']&&!$perms['view']) continue;
             //store subforum details for later
@@ -38,7 +39,7 @@ class IDX{
             }
 		}
         $this->mods=array_keys($this->mods);
-		$catq=$DB->select("*","categories","ORDER BY `order`,title ASC");
+		$catq=$DB->safeselect("*","categories","ORDER BY `order`,title ASC");
 		while($r=$DB->row($catq)) {
 			if(!empty($data[$r['id']]))
 				$page.=$PAGE->collapsebox($r['title'],$this->buildTable($data[$r['id']]),"cat_".$r['id']);
@@ -68,8 +69,8 @@ class IDX{
      global $DB,$PAGE;
      if(!$this->moderatorinfo) {
       $this->moderatorinfo=Array();
-      $DB->select("id,display_name,group_id","members","WHERE id IN (".implode(',',$this->mods).")");
-      while($f=$DB->row()) $this->moderatorinfo[$f['id']]=$PAGE->meta('user-link',$f['id'],$f['group_id'],$f['display_name']);
+      $result = $DB->safeselect("id,display_name,group_id","members","WHERE id IN ?", $this->mods);
+      while($f=$DB->row($result)) $this->moderatorinfo[$f['id']]=$PAGE->meta('user-link',$f['id'],$f['group_id'],$f['display_name']);
      }
      foreach(explode(',',$modids) as $v) $r.=$this->moderatorinfo[$v].$PAGE->meta('idx-ledby-splitter');
      return substr($r,0,-strlen($PAGE->meta('idx-ledby-splitter')));
@@ -119,20 +120,23 @@ class IDX{
     function getBoardStats(){
         global $DB,$JAX,$PAGE,$PERMS;
         if (!$PERMS['can_view_stats']) return "";
-        $DB->special("SELECT s.*,m.group_id,m.display_name FROM %t s LEFT JOIN %t m ON s.last_register=m.id","stats","members");
-        $stats=$DB->row();
-        $DB->special("SELECT max(s.last_update) last_update,m.id,m.group_id,m.display_name name,concat(m.dob_month,' ',m.dob_day) birthday,hide,readtime FROM %t s LEFT JOIN %t m ON s.uid=m.id WHERE s.uid GROUP BY s.uid ORDER BY name",'session','members');
+        $result = $DB->safespecial("SELECT s.*,m.group_id,m.display_name FROM %t s LEFT JOIN %t m ON s.last_register=m.id", array("stats","members"));
+        $stats=$DB->row($result);
+	$DB->disposeresult($result);
+
+        $result = $DB->safespecial("SELECT max(s.last_update) last_update,m.id,m.group_id,m.display_name name,concat(m.dob_month,' ',m.dob_day) birthday,hide,readtime FROM %t s LEFT JOIN %t m ON s.uid=m.id WHERE s.uid GROUP BY s.uid ORDER BY name",
+		array('session','members'));
         $nuserstoday=0;
         $today=date('n j');
-        while($f=$DB->row()) {
+        while($f=$DB->row($result)) {
             if(!$f['id']) continue;
             $userstoday.='<a href="?act=vu'.$f['id'].'" class="user'.$f['id'].' mgroup'.$f['group_id'].(($f['birthday']==$today&&($CFG['birthdays']&1))?' birthday':'').'" onmouseover="JAX.tooltip(this)" title="Last online: '.$JAX->date(($f['hide']?$f['readtime']:$f['last_update']),false).'">'.$f['name'].'</a>, ';
             $nuserstoday++;
         }
         $userstoday=substr($userstoday,0,-2);
         $usersonline=$this->getusersonlinelist();
-        $DB->select("id,title","member_groups","WHERE legend=1 ORDER BY title");
-        while($row=$DB->row()){
+        $result = $DB->safeselect("id,title","member_groups","WHERE legend=1 ORDER BY title");
+        while($row=$DB->row($result)){
             $legend.='<a href="?" class="mgroup'.$row['id'].'">'.$row['title'].'</a> ';
         }
         $page.=$PAGE->meta('idx-stats',
@@ -192,7 +196,12 @@ class IDX{
 	}
 	function updateLastPosts(){
 		global $DB,$SESS,$PAGE;
-		$DB->special("SELECT f.id,f.lp_tid,f.lp_topic,f.lp_date,f.lp_uid,f.topics,f.posts,m.display_name lp_name,m.group_id lp_gid FROM %t AS f LEFT JOIN %t AS m ON f.lp_uid=m.id WHERE f.lp_date>=".JAX::pick($SESS->last_update,time()),"forums","members");
+		$DB->safespecial("SELECT f.id,f.lp_tid,f.lp_topic,f.lp_date,f.lp_uid,f.topics,f.posts,m.display_name lp_name,m.group_id lp_gid FROM %t AS f LEFT JOIN %t AS m ON f.lp_uid=m.id WHERE f.lp_date>=?",
+			array("forums","members"),
+			JAX::pick($SESS->last_update,time())
+		);
+
+
 		while($f=$DB->row()) {
             $PAGE->JS("addclass","#fid_".$f['id'],"unread");
             $PAGE->JS("update","#fid_".$f['id']."_icon",JAX::pick($PAGE->meta('icon-unread'),$PAGE->meta('idx-icon-unread')));

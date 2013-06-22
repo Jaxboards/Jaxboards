@@ -1,8 +1,9 @@
-<?
+<?php
 
 class PAGE{
+  var $CFG=null;
   var $parts=Array("sidebar"=>"","content"=>"");
-  var $partparts=Array();
+  var $partparts=Array( "nav"=>"", "navdropdowns"=>"");
 
  /*add_nav_menu(
     @title string

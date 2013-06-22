@@ -1,4 +1,4 @@
-<?
+<?php
 if(!defined(INACP)) die();
 
 new themes;
@@ -56,7 +56,7 @@ class themes{
    //update wrappers/hidden status
    if(is_array($JAX->p['wrapper'])) foreach($JAX->p['wrapper'] as $k=>$v) {
     if(!$v||in_array($v,$wrappers))
-     $DB->update("skins",Array("wrapper"=>$v,"hidden"=>$JAX->p['hidden'][$k]?1:0),"WHERE id='".$k."'");
+     $DB->safeupdate("skins",Array("wrapper"=>$v,"hidden"=>$JAX->p['hidden'][$k]?1:0),"WHERE id=?", $k);
    }
    
    if(is_array($JAX->p['renameskin'])) {
@@ -67,7 +67,7 @@ class themes{
         if(preg_match('@[^\w ]@',$v)||strlen($v)>50) $errorskins="Skin name must consist of letters, numbers, spaces, and underscore, and be under 50 characters long.";
         else if(is_dir(BOARDPATH.'Themes/'.$v)) $errorskins="That skin name is already being used.";
         else {
-            $DB->update("skins",Array("title"=>$v),"WHERE title=".$DB->evalue($k)." AND custom=1");
+            $DB->safeupdate("skins",Array("title"=>$v),"WHERE title=? AND custom=1", $DB->basicvalue($k));
             rename(BOARDPATH.'Themes/'.$k,BOARDPATH.'Themes/'.$v);
         }
     }
@@ -81,7 +81,7 @@ class themes{
         if(preg_match('@[^\w ]@',$v)||strlen($v)>50) $errorwrapper="Wrapper name must consist of letters, numbers, spaces, and underscore, and be under 50 characters long.";
         elseif(is_file(BOARDPATH.'Wrappers/'.$v.'.txt')) $errorwrapper="That wrapper name is already being used.";
         else {
-            $DB->update("skins",Array("wrapper"=>$v),"WHERE wrapper=".$DB->evalue($k)." AND custom=1");
+            $DB->safeupdate("skins",Array("wrapper"=>$v),"WHERE wrapper=? AND custom=1", $DB->basicvalue($k));
             rename(BOARDPATH.'Wrappers/'.$k.'.txt',BOARDPATH.'Wrappers/'.$v.'.txt');
         }
         $wrappers=$this->getwrappers();
@@ -90,12 +90,12 @@ class themes{
 
 
    //set default
-   $DB->update("skins",Array("default"=>0));
-   $DB->update("skins",Array("default"=>1),"WHERE id='".$JAX->p['default']."'");
+   $DB->safeupdate("skins",Array("default"=>0));
+   $DB->safeupdate("skins",Array("default"=>1),"WHERE id=?", $JAX->p['default']);
   }
-  $DB->select("*","skins","ORDER BY title ASC");
+  $result = $DB->safeselect("*","skins","ORDER BY title ASC");
   $usedwrappers=Array();
-  while($f=$DB->row()) {
+  while($f=$DB->row($result)) {
    $skins.="<tr><td><span>".$f['title']."</span>".($f['custom']?" <a href='#' onclick='return edit(this,\"skin\")' class='icons edit'></a>":"")."</td><td><a href='?act=themes&editcss=".$f['id']."'>".($f['custom']?"Edit":"View")." CSS</a></td><td>";
     $skins.="<select name='wrapper[".$f['id']."]'>".($f['custom']?"":"<option value=''>Skin Default</option>");
     foreach($wrappers as $v) $skins.="<option value='$v' ".($v==$f['wrapper']?"selected='selected' ":'').">$v</option>";
@@ -129,8 +129,9 @@ heredoc;
 
  function editcss($id){
   global $PAGE,$DB,$JAX;
-  $DB->select("*","skins","WHERE id='$id'");
-  $skin=$DB->row();
+  $result = $DB->safeselect("*","skins","WHERE id=?", $id);
+  $skin=$DB->row($result);
+  $DB->disposeresult($result);
   if($skin&&$skin['custom']&&$JAX->p['newskindata']){
    $o=fopen(BOARDPATH."Themes/".$skin['title']."/css.css","w");
    fwrite($o,$JAX->p['newskindata']);
@@ -172,9 +173,9 @@ heredoc;
    else if(is_dir(BOARDPATH."Themes/".$JAX->p['skinname'])) $e="A skin with that name already exists.";
    else if(!in_array($JAX->p['wrapper'],$this->getwrappers())) $e="Invalid wrapper.";
    else {
-    $DB->insert('skins',Array("title"=>$JAX->p['skinname'],"wrapper"=>$JAX->p['wrapper'],"hidden"=>$JAX->p['hidden']?1:0,"default"=>$JAX->p['default']?1:0,"custom"=>1));
+    $DB->safeinsert('skins',Array("title"=>$JAX->p['skinname'],"wrapper"=>$JAX->p['wrapper'],"hidden"=>$JAX->p['hidden']?1:0,"default"=>$JAX->p['default']?1:0,"custom"=>1));
     if($JAX->p['default']){
-	 $DB->update('skins',Array('default'=>0),"WHERE id!='".$DB->insert_id()."'");
+	 $DB->safeupdate('skins',Array('default'=>0),"WHERE id!=?", $DB->insert_id(1));
 	}
 	mkdir(BOARDPATH."Themes/".$JAX->p['skinname']);
 	$o=fopen(BOARDPATH."Themes/".$JAX->p['skinname']."/css.css","w");
@@ -198,16 +199,17 @@ heredoc;
 
  function deleteskin($id){
   global $PAGE,$DB,$JAX;
-  $DB->select("*","skins","WHERE id='".$id."'");
-  $skin=$DB->row();
+  $result = $DB->safeselect("*","skins","WHERE id=?", $id);
+  $skin=$DB->row($result);
+  $DB->disposeresult($result);
   $skindir=BOARDPATH."Themes/".$skin['title'];
   if(is_dir($skindir)){
    foreach(glob($skindir."/*") as $v) unlink($v);
    $JAX->rmdir($skindir);
   }
-  $DB->delete('skins',"WHERE id='".$id."'");
+  $DB->safedelete('skins',"WHERE id=?", $id);
   //make a random skin default if it's the default
-  if($skin['default']) $DB->update('skins',Array('default'=>1),'LIMIT 1');
+  if($skin['default']) $DB->safeupdate('skins',Array('default'=>1),'LIMIT 1');
   $PAGE->location("?act=themes");
  }
   

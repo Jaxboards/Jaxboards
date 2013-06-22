@@ -37,7 +37,7 @@ $USER=&$JAX->userData;
 $PERMS=$JAX->getPerms();
 
 /*fix ip if necessary*/
-if($USER&&$SESS->ip!=$USER['ip']) $DB->update('members',Array('ip'=>$SESS->ip),'WHERE id='.$USER['id']);
+if($USER&&$SESS->ip!=$USER['ip']) $DB->safeupdate('members',Array('ip'=>$SESS->ip),'WHERE id=?', $USER['id']);
 
 /*load the theme*/
 $PAGE->loadskin($JAX->pick($SESS->vars['skin_id'],$USER['skin_id']));
@@ -125,8 +125,9 @@ if(!$PAGE->jsaccess) {
  $PAGE->append('LOGO',$PAGE->meta("logo",$JAX->pick($CFG['logourl'],'http://jaxboards.com/Themes/Default/img/logo.png')));
  $PAGE->append('NAVIGATION',$PAGE->meta("navigation",$PERMS['can_moderate']?'<li><a href="?act=modcontrols&do=cp">Mod CP</a></li>':'',$PERMS['can_access_acp']?'<li><a href="./acp/" target="_BLANK">ACP</a></li>':'',$CFG['navlinks']?$CFG['navlinks']:''));
  if($USER&&$USER['id']) {
-  $DB->select("count(id)","messages","WHERE `read`=0 AND `to`=".$USER['id']);
-  $nummessages=array_pop($DB->row());
+  $result = $DB->safeselect("count(id)","messages","WHERE `read`=0 AND `to`=?", $USER['id']);
+  $nummessages=array_pop($DB->row($result));
+  $DB->disposeresult($result);
  }
 $PAGE->addvar('inbox',$nummessages);
 if($nummessages) $PAGE->append('FOOTER','<div id="notification" class="newmessage" onclick="RUN.stream.location(\'?act=ucp&what=inbox\');this.style.display=\'none\'">You have '.$nummessages.' new message'.($nummessages==1?'':'s').'</div>');
@@ -176,8 +177,9 @@ if($act=="idx"&&$JAX->b['module']) {
 } elseif($act&&is_file($act="inc/page/".$act.".php")) {
  require $act;
 } elseif(!$PAGE->jsaccess||$PAGE->jsnewlocation) {
- $DB->select("page","pages","WHERE act=".$DB->evalue($actraw));
- if($page=$DB->row()) {
+ $result = $DB->safeselect("page","pages","WHERE act=?", $DB->basicvalue($actraw));
+ if($page=$DB->row($result)) {
+  $DB->disposeresult($result);
   $page['page']=$JAX->bbcodes($page['page']);
   $PAGE->append("PAGE",$page['page']);
   if($PAGE->jsnewlocation) $PAGE->JS("update","page",$page['page']);

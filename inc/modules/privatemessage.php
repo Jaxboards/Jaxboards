@@ -1,4 +1,4 @@
-<?
+<?php
 new IM;
 class IM{
  function IM(){$this->__construct();}
@@ -61,8 +61,13 @@ class IM{
  function sendcmd($cmd,$uid){
   global $DB,$CFG;
   if(!is_numeric($uid)) return;
-  $DB->special("UPDATE %t SET runonce=concat(runonce,%s) WHERE uid=".$uid." AND last_update>".(time()-$CFG['updateinterval']*5),"session",$DB->evalue(json_encode($cmd)."\n"));
-  return ($DB->affected_rows()!=0);
+  /* $DB->special("UPDATE %t SET runonce=concat(runonce,%s) WHERE uid=".$uid." AND last_update>".(time()-$CFG['updateinterval']*5),"session",$DB->evalue(json_encode($cmd)."\n")); */
+  $result = $DB->safespecial("UPDATE %t SET runonce=concat(runonce,?) WHERE uid=? AND last_update> ?;",
+	array("session"),
+	$DB->basicvalue(json_encode($cmd)."\n"),
+	$uid,
+	(time()-$CFG['updateinterval']*5));
+  return ($DB->affected_rows(1)!=0);
  }
  
  //stuff I'm doin
@@ -83,9 +88,10 @@ class IM{
   global $PAGE,$JAX,$USER,$DB;
   if($JAX->b['im_invitemenu']){
    $online=$DB->getUsersOnline();
-   $DB->select("id,display_name name","members","WHERE id IN (".$USER['friends'].") ORDER BY name ASC");
+   $result = $DB->safeselect("id,display_name name","members","WHERE id IN ? ORDER BY name ASC", 
+	explode(",", $USER['friends']));
    $menu="";
-   while($f=$DB->row()) if($online[$f['id']]&&$f['id']!=$id) $menu.=$f['name']."<br />";
+   while($f=$DB->row($result)) if($online[$f['id']]&&$f['id']!=$id) $menu.=$f['name']."<br />";
    if(!$menu){
     if(!$USER['friends']) $menu="You must add users to your contacts list<br />to use this feature.";
     else $menu="None of your friends<br />are currently online";

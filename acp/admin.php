@@ -1,4 +1,4 @@
-<?
+<?php
 define("INACP","true");
 
 require "../inc/classes/mysql.php";
@@ -40,8 +40,9 @@ $PAGE->addNavMenu("Forums","?act=forums",Array("?act=forums&do=order"=>"Manage",
 $PAGE->addNavMenu("Tools","?act=tools",Array("?act=tools&do=files"=>"File Manager","?act=tools&do=backup"=>"Backup Forum"));
 //$PAGE->addNavMenu("Arcade","?act=arcade",Array("?act=arcade&do=index"=>"Under construction!"));
 
-$a=$JAX->g['act'];
-if(file_exists("./pages/$a.php")) require "./pages/$a.php";
+$a=isset($JAX->g['act']) ? $JAX->g['act'] : NULL;
+
+if ($a && file_exists("./pages/$a.php")) require "./pages/$a.php";
 else require "./pages/index.php";
 
 $PAGE->out();

@@ -1,4 +1,4 @@
-<?
+<?php
 $meta=Array(
 'search-form'=>'<div class="box" id="searchform">
 <div class="title">Board Search</div>

@@ -1,4 +1,4 @@
-<?
+<?php
 $rules=Array(
  "8D"=>"awesome.png",
  ":|"=>"blank.png",

@@ -1,4 +1,4 @@
-<?
+<?php
 if(!defined(INACP)) die();
 
 new groups;
@@ -66,7 +66,7 @@ class groups{
   //update this shit
   foreach($perms as $k=>$v) {
    if($k==2) $v['can_access_acp']=1;
-   if($k) $DB->update("member_groups",$v,"WHERE id=$k");
+   if($k) $DB->safeupdate("member_groups",$v,"WHERE id=?", $k);
   }
   
   echo $DB->error();
@@ -82,10 +82,14 @@ class groups{
    return $this->updateperms($JAX->p['perm']);
   }
   if(preg_match("@[^\d,]@",$JAX->b['grouplist'])||strpos($JAX->b['grouplist'],',,')!==false) $JAX->b['grouplist']='';
-  $DB->select("*","member_groups",($JAX->b['grouplist']?"WHERE id IN (".$JAX->b['grouplist'].")":"")."ORDER BY id ASC");
+
+  // $DB->select("*","member_groups",($JAX->b['grouplist']?"WHERE id IN (".$JAX->b['grouplist'].")":"")."ORDER BY id ASC");
+  $result = ($JAX->b['grouplist'] ?
+	$DB->safeselect("*","member_groups","WHERE id IN ? ORDER BY id ASC", explode(",", $JAX->b['grouplist'])) :
+  	$DB->safeselect("*","member_groups","ORDER BY id ASC"));
   $numgroups=0;
   $grouplist='';
-  while($f=$DB->row()) {$numgroups++;$perms[$f['id']]=$f;$grouplist.=$f['id'].",";}
+  while($f=$DB->row($result)) {$numgroups++;$perms[$f['id']]=$f;$grouplist.=$f['id'].",";}
   if(!$numgroups) die("Don't play with my variables!");
   $grouplist=substr($grouplist,0,-1);
   $page="<form action='?act=groups&do=perms' method='post'>
@@ -176,15 +180,16 @@ class groups{
    else {
     $write=Array('title'=>$JAX->p['groupname'],'icon'=>$JAX->p['groupicon']);
     if($gid)
-     $DB->update("member_groups",$write,"WHERE id=".$DB->evalue($gid));
+     $DB->safeupdate("member_groups",$write,"WHERE id=?", $DB->basicvalue($gid));
     else 
-     $DB->insert("member_groups",$write);
+     $DB->safeinsert("member_groups",$write);
     $page.=$PAGE->success("Data saved. <a href='?act=groups'>Back</a>");
    }
   }
   if($gid){
-   $DB->select("title,icon","member_groups","WHERE id=".$DB->evalue($gid));
-   $gdata=$DB->row();
+   $result = $DB->safeselect("title,icon","member_groups","WHERE id=?", $DB->basicvalue($gid));
+   $gdata=$DB->row($result);
+   $DB->disposeresult($result);
   }
    
   $page.='<form method="post"><label for="groupname">Group name:</label><input type="text" id="groupname" name="groupname" value="'.$JAX->blockhtml($gdata['title']).'" /><br />
@@ -197,12 +202,12 @@ class groups{
  function delete(){
   global $PAGE,$DB,$JAX;
   if(is_numeric($JAX->b['delete'])&&$JAX->b['delete']>5){
-   $DB->delete("member_groups","WHERE id=".$DB->evalue($JAX->b['delete']));
-   $DB->update("members",Array("group_id"=>1),"WHERE group_id=".$DB->evalue($JAX->b['delete']));
+   $DB->safedelete("member_groups","WHERE id=?", $DB->basicvalue($JAX->b['delete']));
+   $DB->safeupdate("members",Array("group_id"=>1),"WHERE group_id=?", $DB->basicvalue($JAX->b['delete']));
   }
-  $DB->select("id,title","member_groups","WHERE id>5");
+  $result = $DB->safeselect("id,title","member_groups","WHERE id>5");
   $found=false;
-  while($f=$DB->row()){
+  while($f=$DB->row($result)){
    $found=true;
    $page.='<a class="icons delete" onclick="return confirm(\'You sure?\')" href="?act=groups&do=delete&delete='.$f['id'].'">'.$f['title'].'</a>';
   }

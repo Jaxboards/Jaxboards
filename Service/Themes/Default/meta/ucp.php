@@ -1,4 +1,4 @@
-<?
+<?php
 $meta=Array(
 'ucp-index'=>'
  <form method="post" onsubmit="$(\'npedit\').editor.submit();return RUN.submitForm(this)">%s

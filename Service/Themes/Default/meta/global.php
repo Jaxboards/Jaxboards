@@ -1,4 +1,4 @@
-<?
+<?php
 $meta=Array(
 'path'=>'<ul>%1$s</ul><div class="clear"></div>',
 'path-part'=>'<li><a href="%1$s">%2$s</a></li>',

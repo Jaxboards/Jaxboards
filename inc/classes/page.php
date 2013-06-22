@@ -123,12 +123,14 @@ class PAGE{
  function loadskin($id){
   global $DB,$CFG;
   if($id) {
-   $DB->select("*","skins","WHERE id=".$id." LIMIT 1");
-   $skin=$DB->row();
+   $result = $DB->safeselect("*","skins","WHERE id=? LIMIT 1", $id);
+   $skin=$DB->row($result);
+   $DB->disposeresult($result);
   }
   if(!$skin) {
-   $DB->select("*","skins","WHERE `default`=1 LIMIT 1");
-   $skin=$DB->row();
+   $result = $DB->safeselect("*","skins","WHERE `default`=1 LIMIT 1");
+   $skin=$DB->row($result);
+   $DB->disposeresult($result);
   }
   if(!$skin) {$skin=Array("title"=>"Default","custom"=>0);}
   $t=($skin['custom']?BOARDPATH:"")."Themes/".$skin['title']."/";
@@ -147,8 +149,9 @@ class PAGE{
 
  function includer($m){
   global $DB;
-  $DB->select("page","pages","WHERE act=".$DB->evalue($m[1]));
-  $page=array_shift($DB->row());
+  $result = $DB->safeselect("page","pages","WHERE act=?", $DB->basicvalue($m[1]));
+  $page=array_shift($DB->row($result));
+  $DB->disposeresult($result);
   return $page?$page:'';
  }
  

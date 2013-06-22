@@ -1,4 +1,4 @@
-<?
+<?php
 if(!defined(INACP)) die();
 
 new settings;
@@ -48,12 +48,12 @@ class settings{
   global $PAGE,$JAX,$DB;
   $page="";
   $wordfilter=Array();
-  $DB->select("*","textrules","WHERE type='badword'");
-  while($f=$DB->row()) $wordfilter[$f['needle']]=$f['replacement'];
+  $result = $DB->safeselect("*","textrules","WHERE type='badword'");
+  while($f=$DB->row($result)) $wordfilter[$f['needle']]=$f['replacement'];
   
   //delete
   if($JAX->g['d']) {
-   $DB->delete("textrules","WHERE type='badword' AND needle=".$DB->evalue($JAX->g['d']));
+   $DB->safedelete("textrules","WHERE type='badword' AND needle=?", $DB->basicvalue($JAX->g['d']));
    unset($wordfilter[$JAX->g['d']]);
   }
   
@@ -63,7 +63,7 @@ class settings{
    if(!$JAX->p['badword']||!$JAX->p['replacement']) $page.=$PAGE->error("All fields required.");
    elseif($wordfilter[$JAX->p['badword']]) $page.=$PAGE->error("'".$JAX->p['badword']."' is already used.");
    else {
-    $DB->insert("textrules",Array('type'=>'badword','needle'=>$JAX->p['badword'],'replacement'=>$JAX->p['replacement']));
+    $DB->safeinsert("textrules",Array('type'=>'badword','needle'=>$JAX->p['badword'],'replacement'=>$JAX->p['replacement']));
     $wordfilter[$JAX->p['badword']]=$JAX->p['replacement'];
    }
   }
@@ -89,17 +89,17 @@ class settings{
   $page="";
   $emoticons=Array();
   //delete emoticon
-  if($JAX->g['d']) $DB->delete("textrules","WHERE type='emote' AND needle=".$DB->evalue($_GET['d']));
+  if($JAX->g['d']) $DB->safedelete("textrules","WHERE type='emote' AND needle=?", $DB->basicvalue($_GET['d']));
   //select emoticons
-  $DB->select("*","textrules","WHERE type='emote'");
-  while($f=$DB->row()) $emoticons[$f['needle']]=$f['replacement'];
+  $result = $DB->safeselect("*","textrules","WHERE type='emote'");
+  while($f=$DB->row($result)) $emoticons[$f['needle']]=$f['replacement'];
   
   //insert emoticon
   if($JAX->p['submit']){
    if(!$JAX->p['emoticon']||!$JAX->p['image']) $page.=$PAGE->error("All fields required.");
    else if($emoticons[$JAX->blockhtml($JAX->p['emoticon'])]) $page.=$PAGE->error("That emoticon is already being used.");
    else {
-    $DB->insert('textrules',Array('needle'=>$JAX->blockhtml($JAX->p['emoticon']),'replacement'=>$JAX->p['image'],'enabled'=>1,'type'=>'emote'));
+    $DB->safeinsert('textrules',Array('needle'=>$JAX->blockhtml($JAX->p['emoticon']),'replacement'=>$JAX->p['image'],'enabled'=>1,'type'=>'emote'));
     $emoticons[$JAX->blockhtml($JAX->p['emoticon'])]=$JAX->p['image'];
    }
   }
@@ -162,12 +162,12 @@ class settings{
   global $PAGE,$JAX,$DB;
   $page=$page2="";
   $niblets=Array();
-  $DB->select("*","ratingniblets","ORDER BY id DESC");
-  while($f=$DB->row()) $niblets[$f['id']]=Array('img'=>$f['img'],'title'=>$f['title']);
+  $result = $DB->safeselect("*","ratingniblets","ORDER BY id DESC");
+  while($f=$DB->row($result)) $niblets[$f['id']]=Array('img'=>$f['img'],'title'=>$f['title']);
   
   //delete
   if($JAX->g['d']) {
-   $DB->delete("ratingniblets","WHERE id=".$DB->evalue($JAX->g['d']));
+   $DB->safedelete("ratingniblets","WHERE id=?", $DB->basicvalue($JAX->g['d']));
    unset($niblets[$JAX->g['d']]);
   }
   
@@ -175,8 +175,8 @@ class settings{
   if($JAX->p['submit']){
    if(!$JAX->p['img']||!$JAX->p['title']) $page.=$PAGE->error("All fields required.");
    else {
-    $DB->insert("ratingniblets",Array('img'=>$JAX->p['img'],'title'=>$JAX->p['title']));
-    $niblets[$DB->insert_id()]=Array('img'=>$JAX->p['img'],'title'=>$JAX->p['title']);
+    $DB->safeinsert("ratingniblets",Array('img'=>$JAX->p['img'],'title'=>$JAX->p['title']));
+    $niblets[$DB->insert_id(1)]=Array('img'=>$JAX->p['img'],'title'=>$JAX->p['title']);
    }
   }
   

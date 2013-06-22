@@ -1,4 +1,4 @@
-<?
+<?php
 //IMPORTANT TO DO: fix file uploading so that it checks permissions within the forum
 //I've already hidden the attach files button, but it's possible for people to still upload
 
@@ -39,8 +39,10 @@ class POST{
   //it's fucking flash 10 already and filereference.upload doesn't send cookies
   //using SESSION to get id rather than $USER because no cookies are sent
   global $DB,$JAX;
-  $DB->select("uid","session","WHERE id='".$_GET['sessid']."'");
-  $data=$DB->row();
+  $result = $DB->safeselect("uid","session","WHERE id=?", $_GET['sessid']); /* This was almost certainly a security hole before. */
+  $data=$DB->row($result);
+  $DB->disposeresult($result);
+
   if(!$data['uid']) return "must be logged in";
   $fileobj=$_FILES['Filedata'];
   //flash gets this wrong, this normalizes
@@ -66,11 +68,13 @@ class POST{
   //md5 collisions?
   if (!is_file($file)) {
    move_uploaded_file($fileobj['tmp_name'],$file);
-   $DB->insert("files",Array('hash'=>$md5,'name'=>$fileobj['name'],'uid'=>$uid,'size'=>$size,'ip'=>JAX::ip2int()));
-   $id=$DB->insert_id();
+   $DB->safeinsert("files",Array('hash'=>$md5,'name'=>$fileobj['name'],'uid'=>$uid,'size'=>$size,'ip'=>JAX::ip2int()));
+   $id=$DB->insert_id(1);
   } else {
-   $DB->select("id","files","WHERE hash='".$md5."'");
-   $id=array_pop($DB->row());
+   $result = $DB->safeselect("id","files","WHERE hash=?", $md5);
+   $id=array_pop($DB->row($result));
+   $DB->disposeresult($result);
+
   }
   return (string)$id;  
  }
@@ -95,19 +99,25 @@ class POST{
   $fname=$f['title'];
 
   if($this->how=='edit') {
-   $DB->select('*','topics','WHERE id='.$DB->evalue($this->tid));
-   $tdata=$DB->row();
+   $result = $DB->safeselect('*','topics','WHERE id=?', $DB->basicvalue($this->tid));
+   $tdata=$DB->row($result);
+   $DB->disposeresult($result);
+
    if(!$tdata) $e='The topic you\'re trying to edit does not exist.';
    else {
-    $DB->select('post','posts','WHERE id='.$DB->evalue($tdata['op']));
-    $postdata=$DB->row();
+    $result = $DB->safeselect('post','posts','WHERE id=?', $DB->basicvalue($tdata['op']));
+    $postdata=$DB->row($result);
+    $DB->disposeresult($result);
+
     if($postdata) $postdata=$postdata[0];
    }
    $fid=$tdata['fid'];
   }
   
-  $DB->select("title,perms","forums","WHERE id=".$fid);
-  $fdata=$DB->row();
+  $result = $DB->safeselect("title,perms","forums","WHERE id=?", $fid);
+  $fdata=$DB->row($result);
+  $DB->disposeresult($result);
+
   $fdata['perms']=$JAX->parsePerms($fdata['perms'],$USER?$USER['group_id']:3);
   
   if(!$fdata) $e='This forum doesn\'t exist. Weird.';
@@ -146,8 +156,9 @@ class POST{
   if($PAGE->jsupdate&&$this->how!="qreply") return;
   if($USER&&$this->how=="qreply") $PAGE->JS("closewindow","#qreply");
   if($tid) {
-   $DB->special("SELECT t.title,f.perms FROM %t t LEFT JOIN %t f ON t.fid=f.id WHERE t.id=".$DB->evalue($tid),'topics','forums');
-   $tdata=$DB->row();
+   $result = $DB->safespecial("SELECT t.title,f.perms FROM %t t LEFT JOIN %t f ON t.fid=f.id WHERE t.id=?",array('topics','forums'), $DB->basicvalue($tid));
+   $tdata=$DB->row($result);
+   $DB->disposeresult($result);
    if(!$tdata) $page.=$PAGE->meta('error',"The topic you're attempting to reply in no longer exists.");
    $tdata['title']=$JAX->wordfilter($tdata['title']);
    $tdata['perms']=$JAX->parseperms($tdata['perms'],$USER?$USER['group_id']:3);
@@ -164,8 +175,14 @@ class POST{
 
   if($SESS->vars['multiquote']) {
    $postdata="";
-   $DB->special("SELECT p.*,m.display_name name FROM %t p LEFT JOIN %t m ON p.auth_id=m.id WHERE p.id IN (".$SESS->vars['multiquote'].")","posts","members");
-   while($f=$DB->row()) $postdata.='[quote='.$f['name'].']'.$f['post']."[/quote]\n\n";
+
+   // $result = $DB->special("SELECT p.*,m.display_name name FROM %t p LEFT JOIN %t m ON p.auth_id=m.id WHERE p.id IN (".$SESS->vars['multiquote'].")","posts","members");
+
+   $result = $DB->safespecial("SELECT p.*,m.display_name name FROM %t p LEFT JOIN %t m ON p.auth_id=m.id WHERE p.id IN ?",
+	array("posts","members"),
+	$SESS->vars['multiquote']);
+
+   while($f=$DB->row($result)) $postdata.='[quote='.$f['name'].']'.$f['post']."[/quote]\n\n";
    $SESS->delvar('multiquote');
   }
 
@@ -192,7 +209,11 @@ class POST{
   $canmod=false;
   if($PERMS['can_moderate']) $canmod=true;
   if($USER['mod']){
-   $mods=$DB->row($DB->special('SELECT mods FROM %t WHERE id=(SELECT fid FROM %t WHERE id='.$DB->evalue($tid).')','forums','topics'));
+   $result = $DB->safespecial('SELECT mods FROM %t WHERE id=(SELECT fid FROM %t WHERE id=?)',
+	array('forums','topics'),
+	$DB->basicvalue($tid));
+   $mods=$DB->row($result);
+   $DB->disposeresult($result);
    if(in_array($USER['id'],explode(',',$mods['mods']))) $canmod=true;
   }
   return $this->canmod=$canmod;
@@ -207,8 +228,10 @@ class POST{
    elseif(strlen($this->postdata)>50000) $e="Post must not exceed 50,000 characters.";
   }
   if(!$e) {
-   $DB->select("*","posts","WHERE id=".$pid);
-   $tmp=$DB->row();
+   $result = $DB->safeselect("*","posts","WHERE id=?", $pid);
+   $tmp=$DB->row($result);
+   $DB->disposeresult($result);
+
    if(!$tmp) $e="The post you are trying to edit does not exist.";
    elseif(!$this->canedit($tmp)) $e="You don't have permission to edit that post!";
    elseif(!isset($this->postdata)) {$editpost=true;$this->postdata=$tmp['post'];}
@@ -216,12 +239,14 @@ class POST{
   if($tid&&!$e){
    if(!is_numeric($tid)||!$tid) $e="Stop playing with the variables!";
    else {
-    $DB->select("*","topics","WHERE id=".$tid);
-    $tmp=$DB->row();
+    $result = $DB->safeselect("*","topics","WHERE id=?", $tid);
+    $tmp=$DB->row($result);
+    $DB->disposeresult($result);
+
     if(!$tmp) $e="The topic you are trying to edit doesn't exist.";
     elseif(trim($JAX->p['ttitle'])==="") $e="You must supply a topic title!";
     else {
-     $DB->update("topics",
+     $DB->safeupdate("topics",
      Array(
       "title"=>$JAX->blockhtml($JAX->p['ttitle']),
       "subtitle"=>$JAX->blockhtml($JAX->p['tdesc']),
@@ -234,7 +259,7 @@ class POST{
           )
          )
         )),0,50)
-      ),"WHERE id=".$tid);
+      ),"WHERE id=?", $tid);
     }
    }
   }
@@ -246,7 +271,7 @@ class POST{
    $this->showpostform();
    return false;
   }
-  $DB->update("posts",Array("post"=>$this->postdata,"editdate"=>time(),"editby"=>$USER['id']),"WHERE id=".$DB->evalue($pid));
+  $DB->safeupdate("posts",Array("post"=>$this->postdata,"editdate"=>time(),"editby"=>$USER['id']),"WHERE id=?", $DB->basicvalue($pid));
   $PAGE->JS("update","#pid_$pid .post_content",$JAX->theworks($this->postdata));
   $PAGE->JS("softurl");
 }
@@ -287,8 +312,10 @@ class POST{
 	elseif(empty($pollchoices)) $e="You didn't provide any poll choices!";
    }
    //perms
-   $DB->select('perms','forums','WHERE id='.$fid);
-   $fdata=$DB->row();
+   $result = $DB->safeselect('perms','forums','WHERE id=?', $fid);
+   $fdata=$DB->row($result);
+   $DB->disposeresult($result);
+
    if(!$fdata) $e="The forum you're trying to post in does not exist.";
    else {
     $fdata['perms']=$JAX->parseperms($fdata['perms'],$USER?$USER['group_id']:3);
@@ -297,7 +324,7 @@ class POST{
    }
    
    if(!$e) {
-    $DB->insert("topics",Array(
+    $DB->safeinsert("topics",Array(
      'title'=>$JAX->blockhtml($JAX->p['ttitle']),
      'subtitle'=>$JAX->blockhtml($JAX->p['tdesc']),
      'date'=>$time,
@@ -319,7 +346,7 @@ class POST{
           )
          ),0,50)
     ));
-    $tid=$DB->insert_id();
+    $tid=$DB->insert_id(1);
    }
    $newtopic=true;
   }
@@ -334,8 +361,10 @@ class POST{
   }
 
   if($tid&&is_numeric($tid)) {
-   $DB->special("SELECT t.title topictitle,f.id,f.path,f.perms,f.nocount,t.locked FROM %t AS t LEFT JOIN %t AS f ON t.fid=f.id WHERE t.id=$tid","topics","forums");
-   $fdata=$DB->arow();
+   $result = $DB->safespecial("SELECT t.title topictitle,f.id,f.path,f.perms,f.nocount,t.locked FROM %t AS t LEFT JOIN %t AS f ON t.fid=f.id WHERE t.id=?",
+	array("topics","forums"), $tid);
+   $fdata=$DB->arow($result);
+   $DB->disposeresult($result);
   }
   if(!$fdata){
    $e="The topic you're trying to reply to does not exist.";
@@ -352,7 +381,7 @@ class POST{
   }
 
   //Actually PUT THE POST IN for godsakes
-  $DB->insert("posts",Array(
+  $DB->safeinsert("posts",Array(
    'auth_id'=>$uid,
    'post'=>$postdata,
    'date'=>$time,
@@ -361,12 +390,12 @@ class POST{
    'ip'=>$JAX->ip2int()
    ));
 
-  $pid=$DB->insert_id();
+  $pid=$DB->insert_id(1);
   //set op
-  if($newtopic) $DB->update("topics",Array("op"=>$pid),"WHERE id=".$tid);
+  if($newtopic) $DB->safeupdate("topics",Array("op"=>$pid),"WHERE id=?", $tid);
 
   //update activity history
-  $DB->insert("activity",Array(
+  $DB->safeinsert("activity",Array(
     'uid'=>$uid,
     'type'=>$newtopic?'new_topic':'new_post',
     'tid'=>$tid,
@@ -377,40 +406,54 @@ class POST{
 
   //update last post info
   //for the topic:
-  if(!$newtopic) $DB->update("topics",Array(
-   'lp_uid'=>$uid,
-   'lp_date'=>$time,
-   'replies'=>Array("replies+1")
-  ),"WHERE id='$tid'");
+  if(!$newtopic) $DB->safequery(
+	"UPDATE topics set lp_uid = ?, lp_date = ?, replies = replies + 1 WHERE id=?",
+	$uid, $time, $tid);
 
   //do some magic to update the tree all the way up (for subforums)
     $path=trim($fdata['path'])?explode(" ",$fdata['path']):Array();
     if(!in_array($fdata['id'],$path)) $path[]=$fdata['id'];
-  $DB->update("forums",Array(
-   'lp_uid'=>$uid,
-   'lp_tid'=>$tid,
-   'lp_topic'=>$fdata['topictitle'],
-   'lp_date'=>$time,
-   )+($newtopic?Array(
-    'topics'=>Array('topics+1')
-   ):Array(
-    'posts'=>Array('posts+1')
-   ))
-  ,"WHERE id IN (".implode(",",$path).")");
+
+  // $DB->update("forums",Array(
+   // 'lp_uid'=>$uid,
+   // 'lp_tid'=>$tid,
+   // 'lp_topic'=>$fdata['topictitle'],
+   // 'lp_date'=>$time,
+   // )+($newtopic?Array(
+    // 'topics'=>Array('topics+1')
+   // ):Array(
+    // 'posts'=>Array('posts+1')
+   // ))
+  // ,"WHERE id IN (".implode(",",$path).")");
+
+    if ($newtopic) {
+        $DB->safequery("UPDATE forums SET lp_uid= ?, lp_tid = ?, lp_topic = ?, lp_date = ?, topics = topics + 1 WHERE id IN ?",
+		$uid,
+		$tid,
+		$fdata['topictitle'],
+		$time,
+		$path);
+    } else {
+        $DB->safequery("UPDATE forums SET lp_uid= ?  lp_tid = ?, lp_topic = ?, lp_date = ?, posts = posts + 1 WHERE id IN ?",
+		$uid,
+		$tid,
+		$fdata['topictitle'],
+		$time,
+		$path);
+    }
+
   //$PAGE->JS("alert",print_r($DB->queryList,1));
 
   //update statistics
   if(!$fdata['nocount']) {
-   $DB->update("members",Array(
-    'posts'=>Array("posts+1")
-   ),"WHERE id=".$DB->evalue($JAX->userData['id']));
+   $DB->safequery("UPDATE members SET posts = posts + 1 WHERE id=?", $DB->basicvalue($JAX->userData['id']));
   }
 
-  $DB->update("stats",Array(
-   'posts'=>Array("posts+1")
-   )+($newtopic?Array(
-   'topics'=>Array("topics+1")
-   ):Array()));
+  if ($newtopic) {
+      $DB->safequery("UPDATE stats SET posts = posts + 1, topics = topics + 1;");
+  } else {
+      $DB->safequery("UPDATE stats set posts = posts + 1;");
+  }
 
   if($this->how!="qreply") {
    $PAGE->location("?act=vt".$tid."&getlast=1");

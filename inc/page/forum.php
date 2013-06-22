@@ -1,4 +1,4 @@
-<?
+<?php
 $PAGE->loadmeta("forum");
 
 $IDX=new FORUM;
@@ -28,14 +28,15 @@ class FORUM{
 
   $page=$rows=$table="";
 
-  $DB->special("SELECT f.*,c.title cat FROM %t f LEFT JOIN %t c ON f.cat_id=c.id WHERE f.id=$fid LIMIT 1","forums","categories");
-  $fdata=$DB->row();
+  $result = $DB->safespecial("SELECT f.*,c.title cat FROM %t f LEFT JOIN %t c ON f.cat_id=c.id WHERE f.id=$fid LIMIT 1", array("forums","categories"));
+  $fdata=$DB->row($result);
+  $DB->disposeresult($result);
   
   if(!$fdata) {$PAGE->JS("alert",$DB->error());return $PAGE->location("?");}
   
   if($fdata['redirect']){
    $PAGE->JS("softurl");
-   $DB->update("forums",Array("redirects"=>Array("redirects+1")),"WHERE id=".$DB->evalue($fid));
+   $DB->safequery("UPDATE forums SET redirects = redirects + 1 WHERE id=?", $DB->basicvalue($fid));
    return $PAGE->location($fdata['redirect']);
   }
   
@@ -51,9 +52,10 @@ class FORUM{
   //right now, this loop also fixes the number of pages to show in a forum
   //parent forum - subforum topics = total topics
   //I'm fairly sure this is faster than doing SELECT count(*) FROM topics... but I haven't benchmarked it
-  $DB->special("SELECT f.*,m.display_name lp_name,m.group_id lp_gid FROM %t f LEFT JOIN %t m ON f.lp_uid=m.id WHERE path='$fid' OR path LIKE '%% $fid' ORDER BY `order`","forums","members");
+  $result = $DB->safespecial("SELECT f.*,m.display_name lp_name,m.group_id lp_gid FROM %t f LEFT JOIN %t m ON f.lp_uid=m.id WHERE path='$fid' OR path LIKE '%% $fid' ORDER BY `order`",
+	array("forums","members"));
   $rows="";
-  while($f=$DB->row()) {
+  while($f=$DB->row($result)) {
    $fdata['topics']-=$f['topics'];
    if($this->page) continue;
    $rows.=$PAGE->meta('forum-subforum-row',
@@ -99,9 +101,13 @@ class FORUM{
   }
   
   //topics
-  $DB->special("SELECT t.*,m.display_name lp_name,m.group_id lp_gid,m2.group_id auth_gid,m2.display_name auth_name FROM (SELECT * FROM %t WHERE fid=$fid ORDER BY pinned DESC,".$orderby." LIMIT ".($this->page*$this->numperpage).','.($this->numperpage).') t LEFT JOIN %t m ON t.lp_uid = m.id LEFT JOIN %t m2 ON t.auth_id = m2.id','topics','members','members');
+  $result = $DB->safespecial("SELECT t.*,m.display_name lp_name,m.group_id lp_gid,m2.group_id auth_gid,m2.display_name auth_name FROM (SELECT * FROM %t WHERE fid=$fid ORDER BY pinned DESC,".$orderby." LIMIT ?,?) t LEFT JOIN %t m ON t.lp_uid = m.id LEFT JOIN %t m2 ON t.auth_id = m2.id",
+	array('topics','members','members'),
+	$this->page*$this->numperpage,
+	$this->numperpage);
+
   //$DB->special("SELECT t.*,m.display_name lp_name,m.group_id lp_gid,m2.group_id auth_gid,m2.display_name auth_name FROM %t t LEFT JOIN %t m ON t.lp_uid=m.id LEFT JOIN %t m2 ON t.auth_id=m2.id WHERE fid=$fid ORDER BY t.pinned DESC,t.lp_date DESC LIMIT ".,"topics","members","members");
-  while($f=$DB->row()) {
+  while($f=$DB->row($result)) {
    $pages="";
    if($f['replies']>9) {
     foreach($JAX->pages(ceil(($f['replies']+1)/10),1,10) as $v) $pages.="<a href='?act=vt".$f['id']."&amp;page=$v'>$v</a> ";
@@ -143,8 +149,8 @@ class FORUM{
   if($fdata['path']) {
    $pathids=explode(" ",$fdata['path']);
    $forums=Array();
-   $DB->select("title,id","forums","WHERE id IN(".implode(',',$pathids).")");
-   while($f=$DB->row()) $forums[$f['id']]=Array($f['title'],"?act=vf".$f['id']);
+   $result = $DB->safeselect("title,id","forums","WHERE id IN ?", $pathids);
+   while($f=$DB->row($result)) $forums[$f['id']]=Array($f['title'],"?act=vf".$f['id']);
    foreach($pathids as $v) $path[$forums[$v][0]]=$forums[$v][1];
   }
   $path[$title]="?act=vf$fid";
@@ -153,9 +159,11 @@ class FORUM{
  }
  function getreplysummary($tid){
   global $PAGE,$DB;
-  $DB->special("SELECT m.display_name name,count(*) replies FROM %t p LEFT JOIN %t m ON p.auth_id=m.id WHERE tid=".$tid." GROUP BY p.auth_id ORDER BY replies DESC","posts","members");
+  $result = $DB->safespecial("SELECT m.display_name name,count(*) replies FROM %t p LEFT JOIN %t m ON p.auth_id=m.id WHERE tid=? GROUP BY p.auth_id ORDER BY replies DESC",
+	array("posts","members"),
+	$tid);
   $page="";
-  while($f=$DB->row()) $page.='<tr><td>'.$f['name']."</td><td>".$f['replies'].'</td></tr>';
+  while($f=$DB->row($result)) $page.='<tr><td>'.$f['name']."</td><td>".$f['replies'].'</td></tr>';
   $PAGE->JS("softurl");
   $PAGE->JS("window",Array("title"=>"Post Summary","content"=>'<table>'.$page.'</table>'));
  }

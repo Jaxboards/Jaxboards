@@ -1,4 +1,4 @@
-<?
+<?php
 if(!defined(INACP)) die();
 
 new forums;
@@ -46,11 +46,13 @@ class forums{
    $page.="<div class='success'>Data Saved</div>";
   }
   $forums=Array();
-  $DB->select("*","categories","ORDER BY `order`,id ASC");
-  while($f=$DB->row()) {$forums['c_'.$f['id']]=Array('title'=>$f['title']);$cats[]=$f['id'];}
-  $DB->select("*","forums","ORDER BY `order`,title");
-  $tree=Array();
-  while($f=$DB->row()) {
+  $result = $DB->safeselect("*","categories","ORDER BY `order`,id ASC");
+  while($f=$DB->row($result)) {$forums['c_'.$f['id']]=Array('title'=>$f['title']);$cats[]=$f['id'];}
+  $DB->disposeresult($result);
+
+  $result = $DB->safeselect("*","forums","ORDER BY `order`,title");
+  $tree=Array($result);
+  while($f=$DB->row($result)) {
    $forums[$f['id']]=Array('title'=>$f['title'],'trashcan'=>$f['trashcan'],"mods"=>$f['mods']);
    $treeparts=explode(" ",$f['path']);
    array_unshift($treeparts,'c_'.$f['cat_id']);
@@ -84,8 +86,8 @@ class forums{
 	$f=trim(strstr($p," "));
     if(is_array($v))
 	 self::mysqltree($v,$p2." ",$x);
-	if($k[0]=="c") $DB->update("categories",Array('order'=>$x),"WHERE id=$cat");
-	else $DB->update("forums",Array('path'=>preg_replace("@\s+@"," ",$f),'order'=>$x,'cat_id'=>$cat),"WHERE id='".$k."'");
+	if($k[0]=="c") $DB->safeupdate("categories",Array('order'=>$x),"WHERE id=?",$cat);
+	else $DB->safeupdate("forums",Array('path'=>preg_replace("@\s+@"," ",$f),'order'=>$x,'cat_id'=>$cat),"WHERE id=?",$k);
    }
   }
  }
@@ -114,8 +116,9 @@ class forums{
  function createforum($fid=false){
   global $PAGE,$JAX,$DB;
   if($fid){
-   $DB->select("*","forums","WHERE id=".$DB->evalue($fid));
-   $fdata=$DB->row();
+   $result = $DB->safeselect("*","forums","WHERE id=?", $DB->basicvalue($fid));
+   $fdata=$DB->row($result);
+   $DB->disposeresult($result);
   }
   if(isset($JAX->p['tree'])){
    if($JAX->p['tree']) $this->orderforums();
@@ -127,7 +130,7 @@ class forums{
     $exploded=explode(",",$fdata['mods']);
     unset($exploded[array_search($JAX->b['rmod'],$exploded)]);
     $fdata['mods']=implode(",",$exploded);
-    $DB->update("forums",Array("mods"=>$fdata['mods']),"WHERE id=".$DB->evalue($fid));
+    $DB->safeupdate("forums",Array("mods"=>$fdata['mods']),"WHERE id=?", $DB->basicvalue($fid));
     $this->updateperforummodflag();
     $PAGE->location("?act=forums&edit=".$fid);
    }
@@ -137,14 +140,15 @@ class forums{
    //saves all of the shit
    //really should be its own function, but I don't gaf
    $grouppermsa=Array();$groupperms="";
-   $DB->select("id","member_groups");
-   while($f=$DB->row()) {$v=$JAX->p['groups'][$f['id']];if(!$v['global']) $grouppermsa[$f['id']]=($v['read']?8:0)+($v['start']?4:0)+($v['reply']?2:0)+($v['upload']?1:0)+($v['view']?16:0)+($v['poll']?32:0);}
+   $result = $DB->safeselect("id","member_groups");
+   while($f=$DB->row($result)) {$v=$JAX->p['groups'][$f['id']];if(!$v['global']) $grouppermsa[$f['id']]=($v['read']?8:0)+($v['start']?4:0)+($v['reply']?2:0)+($v['upload']?1:0)+($v['view']?16:0)+($v['poll']?32:0);}
    foreach($grouppermsa as $k=>$v) {$groupperms.=pack("n*",$k,$v);}
    $sub=$JAX->p['showsub'];
    if(is_numeric($JAX->p['orderby'])) $orderby=$JAX->p['orderby'];
+   $result = $DB->safeselect("id","categories");
    $write=Array(
     'title'=>$JAX->p['title'],
-    'cat_id'=>$JAX->pick($fdata['cat_id'],array_pop($DB->row($DB->select("id","categories")))),
+    'cat_id'=>$JAX->pick($fdata['cat_id'],array_pop($DB->row($result))),
     'subtitle'=>$JAX->p['description'],
     'perms'=>$groupperms,
     'redirect'=>$JAX->p['redirect'],
@@ -155,28 +159,31 @@ class forums{
     'show_ledby'=>$JAX->p['show_ledby']?1:0,
     'mods'=>$fdata['mods'] //handling done below
     );
+   $DB->disposeresult($result);
+
    //add per-forum moderator
    if(is_numeric($JAX->p['modid'])) {
-    $DB->select("*","members","WHERE id=".$DB->evalue($JAX->p['modid']));
-    if($DB->row()) {
+    $result = $DB->safeselect("*","members","WHERE id=?", $DB->basicvalue($JAX->p['modid']));
+    if($DB->row($result)) {
      if(array_search($JAX->p['modid'],explode(',',$fdata['mods']))===false) {
      $write['mods']=$fdata['mods']?$fdata['mods'].','.$JAX->p['modid']:$JAX->p['modid'];
      }
     } else $e="You tried to add a moderator that doesn't exist!";
+    $DB->disposeresult($result);
    }
    if(!$write['title']) $e="Forum title is required";
    
    if(!$e) {
     //clear trashcan on other forums
-    if($write['trashcan']||(!$write['trashcan']&&$fdata['trashcan'])) $DB->update('forums',Array('trashcan'=>0));
+    if($write['trashcan']||(!$write['trashcan']&&$fdata['trashcan'])) $DB->safeupdate('forums',Array('trashcan'=>0));
     
     if($fdata) {
-     $DB->update('forums',$write,'WHERE id='.$fid);
+     $DB->safeupdate('forums',$write,'WHERE id=?', $fid);
      if($JAX->p['modid']) $this->updateperforummodflag();
      $page.=$PAGE->success("Data saved.");
     } else {
-     $DB->insert("forums",$write);
-     return $this->orderforums($DB->insert_id());
+     $DB->safeinsert("forums",$write);
+     return $this->orderforums($DB->insert_id(1));
     }
    }
    $fdata=$write;
@@ -188,9 +195,9 @@ class forums{
    $unpack=unpack("n*",$fdata['perms']);
    for($x=1;$x<count($unpack);$x+=2) $perms[$unpack[$x]]=$unpack[$x+1];
   }
-  $DB->select("*","member_groups");
+  $result = $DB->safeselect("*","member_groups");
   $groupperms="";
-  while($f=$DB->row()) {
+  while($f=$DB->row($result)) {
    $global=!isset($perms[$f['id']]);
    $p=$JAX->parseperms($perms[$f['id']]);
    $groupperms.='<tr><td>'.$f['title'].'</td><td>'.checkbox($f['id'],'global',$global).'</td><td>'.checkbox($f['id'],'view',$global?1:$p['view']).'</td><td>'.checkbox($f['id'],'read',$global?1:$p['read']).'</td><td>'.checkbox($f['id'],'start',$global?$f['can_post_topics']:$p['start']).'</td><td>'.checkbox($f['id'],'reply',$global?$f['can_post']:$p['reply']).'</td><td>'.checkbox($f['id'],'upload',$global?$f['can_attach']:$p['upload']).'</td><td>'.checkbox($f['id'],'poll',$global?$f['can_poll']:$p['poll']).'</td></tr>';
@@ -212,8 +219,8 @@ $page.="</select></td></tr>
 $moderators='<table class="settings">
 <tr><td>Moderators:</td><td>';
 if($fdata['mods']) {
- $DB->select("display_name,id","members","WHERE id IN (".$fdata['mods'].")");
- while($f=$DB->row()) $mods.=$f['display_name'].' <a href="?act=forums&edit='.$fid.'&rmod='.$f['id'].'">X</a>, ';
+ $result = $DB->safeselect("display_name,id","members","WHERE id IN ?", $fdata['mods']);
+ while($f=$DB->row($result)) $mods.=$f['display_name'].' <a href="?act=forums&edit='.$fid.'&rmod='.$f['id'].'">X</a>, ';
  $moderators.=substr($mods,0,-2);
 } else $moderators.="No forum-specific moderators added!";
 $moderators.='<br /><input type="text" name="name" onkeyup="$(\'validname\').className=\'bad\';JAX.autoComplete(\'act=searchmembers&term=\'+this.value,this,$(\'modid\'),event);" />
@@ -247,28 +254,34 @@ for(var x=1;x<perms.rows.length;x++){
   if($JAX->p['submit']=="Cancel"){
    $PAGE->location("?act=forums&do=order");
   } else if($JAX->p['submit']) {
-   $DB->delete('forums','WHERE id='.$DB->evalue($id));
+   $DB->safedelete('forums','WHERE id=?', $DB->basicvalue($id));
    if($JAX->p['moveto']) {
-    $DB->update('topics',Array('fid'=>$JAX->p['moveto']),' WHERE fid='.$DB->evalue($id));
-    $topics=$DB->affected_rows();
+    $DB->safeupdate('topics',Array('fid'=>$JAX->p['moveto']),' WHERE fid=?', $DB->basicvalue($id));
+    $topics=$DB->affected_rows(1);
    } else {
-    $DB->special("DELETE FROM %t WHERE tid IN (SELECT id FROM %t WHERE fid=".$DB->evalue($id).')',"posts","topics");
-    $posts=$DB->affected_rows();
-    $DB->delete("topics",'WHERE fid='.$DB->evalue($id));
-    $topics=$DB->affected_rows();
+    $result = $DB->safespecial("DELETE FROM %t WHERE tid IN (SELECT id FROM %t WHERE fid=? )",
+	array("posts","topics"),
+	$DB->basicvalue($id));
+
+    $posts=$DB->affected_rows(1);
+    $DB->safedelete("topics",'WHERE fid=?', $DB->basicvalue($id));
+    $topics=$DB->affected_rows(1);
    }
    $page.=($JAX->p['moveto']?'Moved':'Deleted')." ".$topics." topics".($posts?" and $posts posts":"");
    return $PAGE->addContentBox("Forum Deletion",$PAGE->success($page."<br /><br /><a href='?act=stats'>Statistics recount</a> suggested.<br /><br /><a href='?act=forums&do=order'>Back</a>"));
   }
-  $DB->select("*","forums","WHERE id=".$DB->evalue($id));
-  $fdata=$DB->row();
+  $result = $DB->safeselect("*","forums","WHERE id=?", $DB->basicvalue($id));
+  $fdata=$DB->row($result);
+  $DB->disposeresult($result);
+
   if(!$fdata) $page="Forum doesn't exist.";
   else {
    $page="<form method='post'><input type='submit' name='submit' value='Delete' /></form>";
   }
-  $DB->select('*','forums');
+
+  $result = $DB->safeselect('*','forums');
   $forums.='<option value="">Nowhere! (delete)</option>';
-  while($f=$DB->row()) $forums.='<option value="'.$f['id'].'">'.$f['title'].'</option>';
+  while($f=$DB->row($result)) $forums.='<option value="'.$f['id'].'">'.$f['title'].'</option>';
   $page="<form method='post'>Move all topics to: <select name='moveto'>".$forums."</select><br /><br /><input name='submit' type='submit' value='Confirm Deletion' /><input name='submit' type='submit' value='Cancel' /></form>";
   $PAGE->addContentBox("Deleting Forum: ".$fdata['title'],$page);
  }
@@ -276,16 +289,17 @@ for(var x=1;x<perms.rows.length;x++){
  function createcategory($cid=false){
   global $JAX,$DB,$PAGE;
   if($cid) {
-   $DB->select("*","categories","WHERE id=".$DB->evalue($cid));
-   $cdata=$DB->row();
+   $result = $DB->safeselect("*","categories","WHERE id=".$DB->basicvalue($cid));
+   $cdata=$DB->row($result);
+   $DB->disposeresult($result);
   }
   if($JAX->p['submit']) {
    if(!trim($JAX->p['cat_name'])) $page.=$PAGE->error("All fields required");
    else{
     $stuff=Array("title"=>$JAX->p['cat_name']);
-    if($cdata) $DB->update("categories",$stuff,"WHERE id=".$DB->evalue($cid));
+    if($cdata) $DB->safeupdate("categories",$stuff,"WHERE id=?", $DB->basicvalue($cid));
     else {
-     $DB->insert("categories",$stuff);
+     $DB->safeinsert("categories",$stuff);
     }
     $cdata=$stuff;
     
@@ -302,17 +316,17 @@ for(var x=1;x<perms.rows.length;x++){
  function deletecategory($id){
   global $PAGE,$DB,$JAX;
   $page='';
-  $DB->select("*","categories");
+  $result = $DB->safeselect("*","categories");
   $categories=Array();
   $cattitle=false;
-  while($f=$DB->arow()) if($f['id']!=$id) $categories[$f['id']]=$f['title']; else $cattitle=$f['title'];
+  while($f=$DB->arow($result)) if($f['id']!=$id) $categories[$f['id']]=$f['title']; else $cattitle=$f['title'];
   if($cattitle===false) $e="The category you're trying to delete does not exist.";
   
   if(!$e&&$JAX->p['submit']){
    if(!isset($categories[$JAX->p['moveto']])) $e="Invalid category to move forums to.";
    else {
-    $DB->update('forums',Array('cat_id'=>$JAX->p['moveto']),'WHERE cat_id='.$DB->evalue($id));
-    $DB->delete('categories','WHERE id='.$DB->evalue($id));
+    $DB->safeupdate('forums',Array('cat_id'=>$JAX->p['moveto']),'WHERE cat_id=?', $DB->basicvalue($id));
+    $DB->safedelete('categories','WHERE id=?', $DB->basicvalue($id));
     $page.=$PAGE->success('Category deleted!');
    }
   }
@@ -330,13 +344,13 @@ for(var x=1;x<perms.rows.length;x++){
  //based on the comma delimited list of mods for each forum
  function updateperforummodflag(){
   global $DB;
-  $DB->update("members",Array("mod"=>0));
-  $DB->select("mods","forums");
+  $DB->safeupdate("members",Array("mod"=>0));
+  $result = $DB->safeselect("mods","forums");
   //build an array of mods
   $mods=Array();
-  while($f=$DB->row()) foreach(explode(',',$f['mods']) as $v) if($v) $mods[$v]=1;
+  while($f=$DB->row($result)) foreach(explode(',',$f['mods']) as $v) if($v) $mods[$v]=1;
   //update
-  $DB->update("members",Array("mod"=>1),"WHERE id IN(".implode(',',array_keys($mods)).")");
+  $DB->safeupdate("members",Array("mod"=>1),"WHERE id IN ?", array_keys($mods));
  }
 }
 ?>

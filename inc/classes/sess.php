@@ -21,14 +21,21 @@ class SESS{
    }
   }
   if($sid) {
-   $DB->select('*','session','WHERE id='.$DB->evalue($sid).(!$isbot?' AND ip='.$JAX->ip2int():''));
-   $r=$DB->arow();
+   // $DB->select('*','session','WHERE id='.$DB->evalue($sid).(!$isbot?' AND ip='.$JAX->ip2int():''));
+   $result = (!$isbot) ?
+	$DB->safeselect('*','session','WHERE id=? AND ip=?;',
+		$DB->basicvalue($sid),
+		$JAX->ip2int()) :
+	$DB->safeselect('*','session','WHERE id=?',
+		$DB->basicvalue($sid));
+   $r=$DB->arow($result);
+   $DB->disposeresult($result);
   }
   if($r) return $r;
   else if(!$isbot) $sid=md5(uniqid(true,rand(0,1000)));
   if(!$isbot) setcookie('sid',$sid);
   $sessData=Array('id'=>$sid,'uid'=>0,'runonce'=>'','ip'=>$JAX->ip2int(),'useragent'=>$_SERVER['HTTP_USER_AGENT'],'is_bot'=>$isbot,'last_action'=>time(),'last_update'=>time());
-  $DB->insert("session",$sessData);
+  $DB->safeinsert("session",$sessData);
   return $sessData;
  }
  function __get($a){ return $this->data[$a]; }
@@ -61,16 +68,24 @@ class SESS{
   global $DB,$CFG,$PAGE;
   $timeago=time()-$CFG['timetologout'];
   if($uid){
-   $DB->select("max(last_action)","session","WHERE uid=".$uid." GROUP BY uid");
-   $la=$DB->row();
+   $result = $DB->safeselect("max(last_action)","session","WHERE uid=? GROUP BY uid",
+	$uid);
+   $la=$DB->row($result);
+   $DB->disposeresult($result);
    if($la) $la=$la[0];
-   $DB->delete("session","WHERE uid=".$DB->evalue($uid)." AND last_update<".$timeago);
+   $DB->safedelete("session","WHERE uid=? AND last_update<?", $DB->basicvalue($uid), $timeago);
    $this->__set("readtime",JAX::pick($la,0));
   }
   $yesterday=mktime(0,0,0);
-  $query=$DB->select("uid,max(last_action) last_action","session","WHERE last_update<".$yesterday." GROUP BY uid");
-  while($f=$DB->row($query)) if($f['uid']) $DB->update("members",Array("last_visit"=>$f['last_action']),"WHERE id=".$f['uid']);
-  $DB->special("DELETE FROM %t WHERE last_update<".$yesterday." OR (uid=0 AND last_update<".$timeago.")","session");
+  $query=$DB->safeselect("uid,max(last_action) last_action","session","WHERE last_update<? GROUP BY uid",
+	$yesterday);
+  while($f=$DB->row($query)) {
+	if($f['uid']) $DB->safeupdate("members",Array("last_visit"=>$f['last_action']),"WHERE id=?", $f['uid']);
+  }
+  $DB->safespecial("DELETE FROM %t WHERE last_update<? OR (uid=0 AND last_update< ?)",
+	array("session"),
+	$yesterday,
+	$timeago);
   return true;
  }
  function applyChanges(){
@@ -82,7 +97,7 @@ class SESS{
    $sd['forumsread']=$sd['topicsread']=''; //bots tend to read a lot of shit
   }
   if(!$this->data['last_action']) $sd['last_action']=time();
-  $DB->update('session',$sd,"WHERE id=".$DB->evalue($id));
+  $DB->safeupdate('session',$sd,"WHERE id=?", $DB->basicvalue($id));
  }
  
  function addSessID($html){

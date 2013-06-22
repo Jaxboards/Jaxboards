@@ -1,4 +1,4 @@
-<?
+<?php
 $meta=Array(
 'idx-table'=>'<table class="boardindex">%s</table>',
 'idx-redirect-row'=>'<tr><td class="f_icon">%5$s</td><td class="forum"><a href="?act=vf%1$s">%2$s</a><div class="description">%3$s</div></td><td class="last_post" colspan="2">%4$s</td></tr>',

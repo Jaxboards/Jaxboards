@@ -1,4 +1,4 @@
-<?
+<?php
 $PAGE->metadefs['inbox-messages-listing']='<table class="listing">
 <tr><th class="center" width="5%%"><input type="checkbox" onclick="JAX.checkAll($$(\'.check\'),this.checked)" /></th><th width="5%%">Flag</th><th width="45%%">Title</th><th width="20%%">%s</th><th width="25%%">Date Sent</th></tr>%s</table>';
 
@@ -27,18 +27,21 @@ class INBOX{
  function flag(){
   global $PAGE,$DB,$JAX,$USER;
   $PAGE->JS("softurl");
-  $DB->update("messages",Array("flag"=>$JAX->b['tog']?1:0),"WHERE `id`=".$DB->evalue($JAX->b['flag'])." AND `to`=".$USER['id']);
+  $DB->safeupdate("messages",Array("flag"=>$JAX->b['tog']?1:0),"WHERE `id`=? AND `to`=?", $DB->basicvalue($JAX->b['flag']), $USER['id']);
  }
 
  function viewmessage($messageid){
   global $PAGE,$DB,$JAX,$USER;
   if($PAGE->jsupdate&&!$PAGE->jsdirectlink) return;
-  $DB->special("SELECT a.*,m.group_id,m.display_name name FROM %t a LEFT JOIN %t m ON a.from=m.id WHERE a.id=".$DB->evalue($messageid)." ORDER BY date DESC","messages","members");
-  $message=$DB->row();
+  $result = $DB->safespecial("SELECT a.*,m.group_id,m.display_name name FROM %t a LEFT JOIN %t m ON a.from=m.id WHERE a.id=? ORDER BY date DESC",
+	array("messages","members"),
+	$DB->basicvalue($messageid));
+  $message=$DB->row($result);
+  $DB->disposeresult($result);
   if($message['from']!=$USER['id']&&$message['to']!=$USER['id']) $e="You don't have permission to view this message.";
   if($e) return $this->showwholething($e);
   if(!$message['read']&&$message['to']==$USER['id']) {
-   $DB->update("messages",Array("read"=>1),"WHERE id=".$message['id']);
+   $DB->safeupdate("messages",Array("read"=>1),"WHERE id=?", $message['id']);
    $this->updatenummessages();
   }
   $page="<div class='messageview'>
@@ -83,8 +86,9 @@ class INBOX{
  
  function updatenummessages(){
   global $DB,$PAGE,$USER;
-  $DB->select("count(*)","messages","WHERE `to`=".$USER['id']." AND !`read`");
-  $unread=$DB->row();
+  $result = $DB->safeselect("count(*)","messages","WHERE `to`=? AND !`read`", $USER['id']);
+  $unread=$DB->row($result);
+  $DB->disposeresult($result);
   $unread=array_pop($unread);
   $PAGE->JS("update","num-messages",$unread);
  }
@@ -93,14 +97,23 @@ class INBOX{
   global $PAGE,$DB,$JAX,$USER;
   if($PAGE->jsupdate) return;
   if($view=="sent")
-   $DB->special("SELECT a.*,m.display_name FROM %t a LEFT JOIN %t m ON a.to=m.id WHERE a.from=".$USER['id']." AND !del_sender ORDER BY a.date DESC","messages","members");
+   $result = $DB->safespecial("SELECT a.*,m.display_name FROM %t a LEFT JOIN %t m ON a.to=m.id WHERE a.from=? AND !del_sender ORDER BY a.date DESC",
+	array("messages","members"),
+	$USER['id']
+    );
   else if($view=="flagged") {
-   $DB->special("SELECT a.*,m.display_name FROM %t a LEFT JOIN %t m ON a.from=m.id WHERE a.to=".$USER['id']." AND flag=1 ORDER BY a.date DESC","messages","members");
+   $result = $DB->safespecial("SELECT a.*,m.display_name FROM %t a LEFT JOIN %t m ON a.from=m.id WHERE a.to=? AND flag=1 ORDER BY a.date DESC",
+	array("messages","members"),
+	$USER['id']
+   );
   } else {
-   $DB->special("SELECT a.*,m.display_name FROM %t a LEFT JOIN %t m ON a.from=m.id WHERE a.to=".$USER['id']." AND !del_recipient ORDER BY a.date DESC","messages","members");
+   $result = $DB->safespecial("SELECT a.*,m.display_name FROM %t a LEFT JOIN %t m ON a.from=m.id WHERE a.to=? AND !del_recipient ORDER BY a.date DESC",
+	array("messages","members"),
+	$USER['id']
+   );
   }
   $unread=0;
-  while($f=$DB->row()) {
+  while($f=$DB->row($result)) {
    $hasmessages=1;
    if(!$f['read'])$unread++;$page.='<tr '.(!$f['read']?'class="unread" ':'').'onclick="if(JAX.event(event).srcElement.tagName.toLowerCase()==\'td\') $$(\'input\',this)[0].click()"><td class="center"><input class="check" type="checkbox" /></td><td class="center"><input type="checkbox" '.($f['flag']?'checked="checked" ':'').'class="switch flag" onclick="RUN.stream.location(\'?act=inbox&flag='.$f['id'].'&tog=\'+(this.checked?1:0))" /></td><td><a href="?act=inbox&view='.$f['id'].'">'.$f['title'].'</a></td><td>'.$f['display_name'].'</td><td>'.$JAX->date($f['date']).'</td></tr>';
   }
@@ -128,17 +141,21 @@ class INBOX{
   if($JAX->p['submit']) {
    $mid=$JAX->b['mid'];
    if(!$mid&&$JAX->b['to']) {
-    $DB->select("id","members","WHERE display_name=".$DB->evalue($JAX->b['to']));
-    $mid=$DB->row();
+    $result = $DB->safeselect("id","members","WHERE display_name=?", $DB->basicvalue($JAX->b['to']));
+    $mid=$DB->row($result);
+    $DB->disposeresult($result);
+
     if($mid) $mid=array_pop($mid);
    }
    if(!$mid) $e="Invalid user!";
    else if(!trim($JAX->b['title'])) $e="You must enter a title.";
    if($e) {$PAGE->JS("error",$e);$PAGE->append("PAGE",$PAGE->error($e));}
    else {
-    $DB->insert("messages",Array("to"=>$mid,"from"=>$USER['id'],"title"=>$JAX->blockhtml($JAX->p['title']),"message"=>$JAX->p['message'],"date"=>time(),"del_sender"=>0,"del_recipient"=>0,"read"=>0));
-    $cmd=$JAX->json_encode(Array("newmessage","You have a new message from ".$USER['display_name'],$DB->insert_id()))."\n";
-    $DB->special("UPDATE %t SET runonce=concat(runonce,".$DB->evalue($cmd,1).") WHERE uid=".$mid,"session");
+    $DB->safeinsert("messages",Array("to"=>$mid,"from"=>$USER['id'],"title"=>$JAX->blockhtml($JAX->p['title']),"message"=>$JAX->p['message'],"date"=>time(),"del_sender"=>0,"del_recipient"=>0,"read"=>0));
+    $cmd=$JAX->json_encode(Array("newmessage","You have a new message from ".$USER['display_name'],$DB->insert_id(1)))."\n";
+    $DB->safespecial("UPDATE %t SET runonce=concat(runonce,?) WHERE uid=".$mid,
+	array("session"),
+	$DB->basicvalue($cmd,1));
     $this->showwholething("Message successfully delivered.<br /><br /><a href='?act=inbox'>Back</a>");
     return;
    }
@@ -146,11 +163,18 @@ class INBOX{
   if($PAGE->jsupdate&&!$messageid) return;
   $msg='';
   if($messageid) {
-   $DB->select("*","messages","WHERE (`to`=".$USER['id']." OR `from`=".$USER['id'].") AND `id`=".$DB->evalue($messageid));
-   $message=$DB->row();
+   $result = $DB->safeselect("*","messages","WHERE (`to`=? OR `from`=?) AND `id`=?",
+	$USER['id'],
+	$USER['id'],
+	$DB->basicvalue($messageid));
+   $message=$DB->row($result);
+   $DB->disposeresult($result);
+
    $mid=$message['from'];
-   $DB->select("display_name","members","WHERE id=".$mid);
-   $mname=array_pop($DB->row());
+   $result = $DB->safeselect("display_name","members","WHERE id=?", $mid);
+   $mname=array_pop($DB->row($result));
+   $DB->disposeresult($result);
+
    $msg="\n\n\n".'[quote='.$mname.']'.$message['message'].'[/quote]';
    $mtitle=($todo=="fwd"?"FWD:":"RE:").$message['title'];
    if($todo=="fwd") {
@@ -160,8 +184,10 @@ class INBOX{
   if(is_numeric($JAX->g['mid'])) {
    $showfull=1;
    $mid=$JAX->b['mid'];
-   $DB->select("display_name","members","WHERE id=".$mid);
-   $mname=array_pop($DB->row());
+   $result = $DB->safeselect("display_name","members","WHERE id=?", $mid);
+   $mname=array_pop($DB->row($result));
+   $DB->disposeresult($result);
+
    if(!$mname) {$mid=0;$mname='';}
   }
   $page='<div class="composeform">
@@ -183,12 +209,14 @@ class INBOX{
 
  function delete($id){
   global $PAGE,$JAX,$DB,$USER;
-  $DB->select("*","messages","WHERE `id`=".$DB->evalue($id));
-  $message=$DB->row();
+  $result = $DB->safeselect("*","messages","WHERE `id`=?", $DB->basicvalue($id));
+  $message=$DB->row($result);
+  $DB->disposeresult($result);
+
   $is_recipient=$message['to']==$USER['id'];
   $is_sender=$message['from']==$USER['id'];
-  if($is_recipient) $DB->update("messages",Array("del_recipient"=>1),"WHERE id=".$DB->evalue($id));
-  if($is_sender)    $DB->update("messages",Array("del_sender"=>1),"WHERE id=".$DB->evalue($id));
+  if($is_recipient) $DB->safeupdate("messages",Array("del_recipient"=>1),"WHERE id=?", $DB->basicvalue($id));
+  if($is_sender)    $DB->safeupdate("messages",Array("del_sender"=>1),"WHERE id=?", $DB->basicvalue($id));
   $PAGE->location("?act=inbox".($JAX->b['prevpage']?"&page=".$JAX->b['prevpage']:''));
  }
 }

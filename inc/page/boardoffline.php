@@ -1,4 +1,4 @@
-<?
+<?php
 new offlineboard;
 class offlineboard{
 function __construct(){$this->offlineboard();}

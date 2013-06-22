@@ -1,9 +1,11 @@
-<?
+<?php
 $CFG=Array(
+"boardname"=>"Test board",
 "updateinterval"=>5,
-"sql_host"=>"localhost",
-"sql_username"=>"SQLUSER",
-"sql_password"=>"SQLPASS",
+"sql_host"=>"127.0.0.1",
+"sql_username"=>"jax",
+"sql_password"=>"mitigate.frelling36",
+"sql_prefix"=>"jaxboards_",
 "sql_db"=>"jaxboards",
 "dthemepath"=>(defined("INACP")?"../":"")."Service/Themes/Default/",
 "postmaxsize"=>50000,

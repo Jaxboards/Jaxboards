@@ -1,10 +1,12 @@
-<?
+<?php
 
-$DB->special('SELECT t.title,t.id,p.post FROM support_topics t LEFT JOIN support_posts p ON t.op=p.id WHERE fid=7 ORDER BY t.id DESC LIMIT 1');
+$result = $DB->safequery('SELECT t.title,t.id,p.post FROM jaxboards_topics t LEFT JOIN jaxboards_posts p ON t.op=p.id WHERE fid=7 ORDER BY t.id DESC LIMIT 1');
 
-echo $DB->error();
-$newsdata=$DB->row();
-$news=$JAX->theworks($newsdata['post'],Array('noemotes'=>1))."<br /><br /><a href='http://support.jaxboards.com/?act=vt".$newsdata['id']."'>Comment on this post</a>";
+echo $DB->error(1);
+$newsdata=$DB->row($result);
+$DB->disposeresult($result);
+
+$news=$JAX->theworks($newsdata['post'],Array('noemotes'=>1))."<br /><br /><a href='?act=vt".$newsdata['id']."'>Comment on this post</a>"; // was http://support.jaxboards.com/?act=vt
 $todo=<<<HEREDOC
 A live document of upcoming features to jaxboards can be found <a href="https://docs.google.com/document/d/1Hi3pIDlpP3ORPftdP_L0PhgWEGlXVUc2araHkZmy4uM/edit?hl=en_US">here</a>.
 

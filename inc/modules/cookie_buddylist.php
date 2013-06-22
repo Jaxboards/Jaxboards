@@ -1,4 +1,4 @@
-<?
+<?php
 $PAGE->metadefs['buddylist-contacts']='<div class="contacts"><form method="?" onsubmit="return RUN.submitForm(this)">'.$JAX->hiddenFormFields(Array('module'=>'buddylist')).'<a href="?act=logreg5" onclick="return RUN.stream.location(this.href)" id="status" class="%s"></a><input style="width:100%%;padding-left:20px;" type="text" name="status" onblur="this.form.onsubmit()" value="%s"/>%s</div>';
 $PAGE->metadefs['buddylist-contact']='<div onclick="IMWindow(%1$s,\'%2$s\')" oncontextmenu="RUN.stream.location(\'?act=vu%1$s\');return false;" class="contact %3$s" ><div class="avatar"><img src="%4$s" /></div><div class="name">%2$s</div><div class="status">%5$s</div></div>';
 new buddylist;
@@ -24,8 +24,9 @@ class buddylist{
   $crap="";
   if($USER['friends']) {
    $online=$DB->getUsersOnline();
-   $DB->select("id,avatar,display_name name,usertitle","members","WHERE id IN (".$USER['friends'].") ORDER BY name ASC");
-   while($f=$DB->row()) $crap.=$PAGE->meta('buddylist-contact',
+   $result = $DB->safeselect("id,avatar,display_name name,usertitle","members","WHERE id IN ? ORDER BY name ASC",
+	explode(",", $USER['friends']));
+   while($f=$DB->row($result)) $crap.=$PAGE->meta('buddylist-contact',
     $f['id'],
     $f['name'],
     $online[$f['id']]?"online":"offline",
@@ -34,8 +35,9 @@ class buddylist{
     );
   }
   if($USER['enemies']) {
-   $DB->select("id,avatar,display_name name,usertitle","members","WHERE id IN (".$USER['enemies'].") ORDER BY name ASC");
-   while($f=$DB->row()) $crap.=$PAGE->meta('buddylist-contact',
+   $result = $DB->safeselect("id,avatar,display_name name,usertitle","members","WHERE id IN ? ORDER BY name ASC",
+	explode(",", $USER['enemies']));
+   while($f=$DB->row($result)) $crap.=$PAGE->meta('buddylist-contact',
     $f['id'],
     $f['name'],
     "blocked",
@@ -59,8 +61,9 @@ class buddylist{
 
   $user=false;
   if($uid&&is_numeric($uid)) {
-   $DB->select("*","members","WHERE id=$uid");
-   $user=$DB->row();
+   $result = $DB->safeselect("*","members","WHERE id=?", $uid);
+   $user=$DB->row($result);
+   $DB->disposeresult($result);
   }
 
   if(!$user) $e="This user does not exist, and therefore could not be added to your contacts list.";
@@ -73,8 +76,8 @@ class buddylist{
    if($friends) $friends.=','.$uid;
    else $friends=$uid;
    $USER['friends']=$friends;
-   $DB->update("members",Array("friends"=>$friends)," WHERE id=".$USER['id']);
-   $DB->insert("activity",Array("type"=>"buddy_add","affected_uid"=>$uid,"uid"=>$USER['id']));
+   $DB->safeupdate("members",Array("friends"=>$friends)," WHERE id=?", $USER['id']);
+   $DB->safeinsert("activity",Array("type"=>"buddy_add","affected_uid"=>$uid,"uid"=>$USER['id']));
    $this->displaybuddylist();
   }
  }
@@ -93,7 +96,7 @@ class buddylist{
    $enemies[]=$uid;
    $enemies=implode(',',$enemies);
    $USER['enemies']=$enemies;
-   $DB->update("members",Array("enemies"=>$enemies)," WHERE id=".$USER['id']);
+   $DB->safeupdate("members",Array("enemies"=>$enemies)," WHERE id=?", $USER['id']);
    $this->displaybuddylist();
   }
  }
@@ -106,7 +109,7 @@ class buddylist{
    unset($enemies[$id]);
    $enemies=implode(',',$enemies);
    $USER['enemies']=$enemies;
-   $DB->update("members",Array("enemies"=>$enemies)," WHERE id=".$USER['id']);
+   $DB->safeupdate("members",Array("enemies"=>$enemies)," WHERE id=?", $USER['id']);
   }
   $this->displaybuddylist();
  }
@@ -119,14 +122,14 @@ class buddylist{
    unset($friends[$id]);
    $friends=implode(",",$friends);
    $USER['friends']=$friends;
-   $DB->update("members",Array("friends"=>$friends)," WHERE id=".$USER['id']);
+   $DB->selfupdate("members",Array("friends"=>$friends)," WHERE id=?", $USER['id']);
   }
   if(!$shh) $this->displaybuddylist();
  }
  
  function setstatus($status) {
   global $DB,$USER,$PAGE;
-  if($USER&&$USER['usertitle']!=$status) $DB->update("members",Array("usertitle"=>$status),"WHERE id=".$USER['id']);
+  if($USER&&$USER['usertitle']!=$status) $DB->safeupdate("members",Array("usertitle"=>$status),"WHERE id=?", $USER['id']);
  }
 }
 ?>

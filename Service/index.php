@@ -1,4 +1,4 @@
-<?
+<?php
 
 if(in_array($_SERVER['REMOTE_ADDR'],Array('***REMOVED***'))) header("Location: http://support.jaxboards.com");
 
@@ -10,7 +10,7 @@ $DB=new MySQL;
 
 $DB->connect('localhost','SQLUSERNAME','SQLPASSWORD','jaxboards_service');
 ?>
-<?
+<?php
 if($JAX->p['submit']){
  if($JAX->p['post']) header("Location: http://test.jaxboards.com");
 
@@ -20,16 +20,18 @@ if($JAX->p['submit']){
  elseif($JAX->p['boardurl']=="www") $e="WWW is reserved.";
  elseif(preg_match("@\W@",$JAX->p['boardurl'])) $e="board url needs to consist of letters, numbers, and underscore only";
  
- $DB->select("*","directory","WHERE registrar_ip=".$JAX->ip2int()." AND date>".(time()-7*24*60*60));
- if($DB->num_rows()>3) $e="You may only register one 3 boards per week.";
+ $result = $DB->safeselect("*","directory","WHERE registrar_ip=? AND date>?", $JAX->ip2int(),(time()-7*24*60*60));
+ if($DB->num_rows(1)>3) $e="You may only register one 3 boards per week.";
+ $DB->disposeresult($result);
  
  if(!$JAX->isemail($JAX->p['email'])) $e="invalid email";
 
  if(strlen($JAX->p['username'])>50) $e="username too long";
  elseif(preg_match("@\W@",$JAX->p['username'])) $e="username needs to consist of letters, numbers, and underscore only";
 
- $DB->select("*","directory","WHERE boardname=".$DB->evalue($JAX->p['boardurl']));
- if($DB->row()) $e="that board already exists";
+ $result = $DB->safeselect("*","directory","WHERE boardname=?", $DB->basicvalue($JAX->p['boardurl']));
+ if($DB->row($result)) $e="that board already exists";
+ $DB->disposeresult($result);
 
  //need to do check for valid email
 
@@ -58,26 +60,27 @@ function recurse_copy($src,$dst) {
 function make_forum($prefix,$name,$password,$email){
 global $DB,$JAX;
 
-$DB->query("SHOW TABLES LIKE 'blueprint_%'");
+$DB->safequery("SHOW TABLES LIKE 'blueprint_%'");
 
 while($f=$DB->row()) $tables[]=$f[0];
 
-$DB->insert('directory',Array('boardname'=>$prefix,'registrar_email'=>$email,'registrar_ip'=>$JAX->ip2int(),'date'=>time(),'referral'=>$JAX->b['r']));
+$DB->safeinsert('directory',Array('boardname'=>$prefix,'registrar_email'=>$email,'registrar_ip'=>$JAX->ip2int(),'date'=>time(),'referral'=>$JAX->b['r']));
 
 $DB->select_db('jaxboards');
 
 foreach($tables as $v){
- $DB->query("CREATE TABLE `".str_replace('blueprint',$prefix,$v)."` LIKE jaxboards_service.`$v`");
- $shit=$DB->query("SELECT * FROM jaxboards_service.`$v`");
+ $DB->safequery("CREATE TABLE ? LIKE jaxboards_service.`$v`", str_replace('blueprint',$prefix,$v)),
+);
+ $shit=$DB->safequery("SELECT * FROM jaxboards_service.`$v`");
  while($f=$DB->arow($shit)) {
   unset($f['id']);
-  $DB->insert(str_replace('blueprint',$prefix,$v),$f);
+  $DB->safeinsert(str_replace('blueprint',$prefix,$v),$f);
   echo $DB->error();
  }
 }
 
 //don't forget to create member
-$DB->insert($prefix.'_members',Array(
+$DB->safeinsert($prefix.'_members',Array(
 'name'=>$name,
 'display_name'=>$name,
 'pass'=>md5($password),
@@ -145,7 +148,7 @@ ul{padding-left:20px;}
    <div class='box'>
     <div class='content'>
      <form id="signup" method="post">
-      <? if($e) echo "<div class='error'>$e</div>"; ?>
+      <?php if($e) echo "<div class='error'>$e</div>"; ?>
       <input type="text" name="boardurl" id="boardname" />.jaxboards.com<br />
       <label for="username">Username:</label><input type="text" id="username" name="username" /><br />
       <label for="password">Password:</label><input type="password" id="password" name="password" /><br />
@@ -168,6 +171,6 @@ ul{padding-left:20px;}
     <br clear="all" />
    </div>
 </div>
-   <div id='copyright'>JaxBoards &copy; 2007-<?=date("Y");?>, All Rights Reserved</div>
+   <div id='copyright'>JaxBoards &copy; 2007-<?php date("Y");?>, All Rights Reserved</div>
 </body>
 </html>

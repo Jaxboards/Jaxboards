@@ -1,4 +1,4 @@
-<? ob_start(); ?>
+<?php ob_start(); ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
  <head>
@@ -18,7 +18,7 @@
  </head>
  <body>
   <div id="container">
-  <?
+  <?php
   define("INACP","true");
   
    require "../inc/classes/jax.php";
@@ -31,13 +31,19 @@
    require_once "../domaindefinitions.php";
 
    $JAX=new JAX;
+   $notadmin = false;
 
-   if($JAX->p['submit']){
+   if(isset($JAX->p['submit']) && $JAX->p['submit']){
     $u=$JAX->p['user'];
     $p=md5($JAX->p['pass']);
-    $DB->special('SELECT m.id,g.can_access_acp FROM %t m LEFT JOIN %t g ON m.group_id=g.id WHERE name='.$DB->evalue($u).' AND pass='.$DB->evalue($p),'members','member_groups');
-    $uinfo=$DB->row();
-    if(!$uinfo['can_access_acp']) $notadmin=true;
+    $result = $DB->safespecial('SELECT m.id,g.can_access_acp FROM %t m LEFT JOIN %t g ON m.group_id=g.id WHERE name=? AND pass=?;',
+	array('members','member_groups'),
+	$DB->basicvalue($u),
+	$DB->basicvalue($p));
+    $uinfo=$DB->row($result);
+    $DB->disposeresult($result);
+
+    if(!(isset($uinfo) && $uinfo['can_access_acp'])) $notadmin=true;
     else {
      $JAX->setCookie(Array("auid"=>$uinfo['id'],"apass"=>$p));
      header("Location: admin.php");
@@ -47,8 +53,8 @@
   <div id="login">
    <div id="logo"></div>
    <div id="loginform">
-    <?
-     if($uinfo===false){
+    <?php
+     if(isset($uinfo) && $uinfo===false){
       echo '<div class="error">The username/password supplied was incorrect.</div>';
      } elseif($notadmin) {
       echo '<div class="error">You are not authorized to login to the ACP</div>';
@@ -68,4 +74,4 @@
   </script>
  </body>
 </html>
-<? ob_end_flush(); ?>
+<?php ob_end_flush(); ?>

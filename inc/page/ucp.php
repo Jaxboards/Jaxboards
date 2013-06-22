@@ -1,4 +1,4 @@
-<?
+<?php
 $PAGE->loadmeta('ucp');
 
 new UCP;
@@ -9,8 +9,9 @@ class UCP{
  function __construct(){
   global $PAGE,$JAX,$USER,$DB;
   if(!$USER||$USER['group_id']==4) return $PAGE->location("?");
-  $DB->select("*","members","WHERE id=".$DB->evalue($USER['id']));
-  $GLOBALS['USER']=$DB->arow();
+  $result = $DB->safeselect("*","members","WHERE id=?", $DB->basicvalue($USER['id']));
+  $GLOBALS['USER']=$DB->arow($result);
+  $DB->disposeresult($result);
   
   $PAGE->path(Array("UCP"=>"?act=ucp"));
   $this->what=$JAX->b['what'];
@@ -72,7 +73,7 @@ class UCP{
     $e="The UCP notepad cannot exceed 2000 characters.";
     $PAGE->JS("error",$e);
    } else {
-    $DB->update("members",Array("ucpnotepad"=>$JAX->p['ucpnotepad']),"WHERE id=".$USER['id']);
+    $DB->safeupdate("members",Array("ucpnotepad"=>$JAX->p['ucpnotepad']),"WHERE id=?", $USER['id']);
     $USER['ucpnotepad']=$JAX->p['ucpnotepad'];
    }
   }
@@ -116,7 +117,7 @@ class UCP{
   if($JAX->p['submit']) {
    $update=Array();
    foreach($variables as $v) $update[$v]=$JAX->p[$v]?1:0;
-   $DB->update("members",$update,"WHERE id=".$USER['id']);
+   $DB->safeupdate("members",$update,"WHERE id=?", $USER['id']);
 
    foreach($variables as $v) $PAGE->JS("script","window.globalsettings.$v=".($JAX->p[$v]?1:0));
 
@@ -148,7 +149,7 @@ class UCP{
   $sig=$USER['sig'];
   if(isset($JAX->p['changesig'])) {
    $sig=$JAX->linkify($JAX->p['changesig']);
-   $DB->update("members",Array("sig"=>$sig),"WHERE id=".$USER['id']);
+   $DB->safeupdate("members",Array("sig"=>$sig),"WHERE id=?", $USER['id']);
    $update=true;
   }
   $this->ucppage=$PAGE->meta('ucp-sig-settings',$this->getlocationforform(),$sig!==""?$JAX->theworks($sig):"( none )",$JAX->blockhtml($sig));
@@ -170,7 +171,7 @@ class UCP{
     $PAGE->JS("error",$e);
    } else {
     $hashpass=md5($JAX->p['newpass1']);
-    $DB->update("members",Array("pass"=>$hashpass),"WHERE id=".$USER['id']);
+    $DB->safeupdate("members",Array("pass"=>$hashpass),"WHERE id=?", $USER['id']);
     $JAX->setCookie('pass',$hashpass);
     $this->ucppage='Password changed.<br /><br /><a href="?act=ucp&what=pass">Back</a>';
     return $this->showucp();
@@ -185,7 +186,7 @@ class UCP{
    if($e) {
     $PAGE->JS('alert',$e);
    } else {
-    $DB->update("members",Array("email"=>$JAX->p['email'],"email_settings"=>($JAX->p['notifications']?2:0)+($JAX->p['adminemails']?1:0)),"WHERE id=".$USER['id']);
+    $DB->safeupdate("members",Array("email"=>$JAX->p['email'],"email_settings"=>($JAX->p['notifications']?2:0)+($JAX->p['adminemails']?1:0)),"WHERE id=?", $USER['id']);
     $this->ucppage='Email settings updated.<br /><br /><a href="?act=ucp&what=email">Back</a>';
    }
    return $this->showucp();
@@ -202,7 +203,7 @@ $this->getlocationforform().$JAX->hiddenFormFields(Array('submit'=>'true')),
   if(isset($JAX->p['changedava'])){
    if($JAX->p['changedava']&&!$JAX->isurl($JAX->p['changedava'])) $e="Please enter a valid image URL.";
    else {
-    $DB->update("members",Array("avatar"=>$JAX->p['changedava']),"WHERE id=".$USER['id']);
+    $DB->safeupdate("members",Array("avatar"=>$JAX->p['changedava']),"WHERE id=?", $USER['id']);
     $USER['avatar']=$JAX->p['changedava'];
    }
    $update=true;
@@ -246,7 +247,7 @@ $this->getlocationforform()
    if(""===$data['display_name']) $data['display_name']=$USER['name'];
    if($CFG['badnamechars']&&preg_match($CFG['badnamechars'],$data['display_name'])) $error="Invalid characters in display name!";
    else {
-    $DB->SELECT("*","members","WHERE `display_name`=".$DB->evalue($data['display_name'])." AND id!=".$USER['id']);
+    $DB->safeselect("*","members","WHERE `display_name` = ? AND id!=?", $DB->basicvalue($data['display_name']), $USER['id']);
     if($DB->row()!==false) $error="That display name is already in use.";
    }
    if($data['dob_month']||$data['dob_year']||$data['dob_day']) {
@@ -282,7 +283,7 @@ $this->getlocationforform()
 
    if(!$error){
     if($data['display_name']!=$USER['display_name']) {
-     $DB->insert("activity",Array(
+     $DB->safeinsert("activity",Array(
       'type'=>'profile_name_change',
       'arg1'=>$USER['display_name'],
       'arg2'=>$data['display_name'],
@@ -290,7 +291,7 @@ $this->getlocationforform()
       'date'=>time()
      ));
     }
-    $DB->update("members",$data,"WHERE id=".$USER['id']);
+    $DB->safeupdate("members",$data,"WHERE id=?", $USER['id']);
     $this->ucppage='Profile successfully updated.<br /><br /><a href="?act=ucp&what=profile">Back</a>';
     $this->showucp();
     return;
@@ -337,14 +338,15 @@ $this->getlocationforform()
  function showboardsettings(){
      global $PAGE,$DB,$JAX,$USER;
      if(is_numeric($JAX->b['skin'])) {
-         $DB->select("*","skins","WHERE id='".$JAX->b['skin']."'");
-         if(!$DB->row()) $e="The skin chosen no longer exists.";
+         $result = $DB->safeselect("*","skins","WHERE id=?", $JAX->b['skin']);
+         if(!$DB->row($result)) $e="The skin chosen no longer exists.";
          else {
-             $DB->update("members",Array(
+	     $DB->disposeresult($result);
+             $DB->safeupdate("members",Array(
                 "skin_id"=>$JAX->b['skin'],
                 "nowordfilter"=>$JAX->p['usewordfilter']?0:1,
                 "wysiwyg"=>$JAX->p['wysiwyg']?1:0
-                ),"WHERE id='".$USER['id']."'");
+                ),"WHERE id=?", $USER['id']);
              $USER['skin_id']=$JAX->b['skin'];
          }
          if(!$e) {
@@ -353,9 +355,11 @@ $this->getlocationforform()
          } else $this->ucppage.=$PAGE->meta('error',$e);
          $showthing=true;
      }
-     $DB->select("*","skins",($USER['group_id']!=2?"WHERE hidden!=1 ":"")."ORDER BY `title` ASC");
+     // $DB->select("*","skins",($USER['group_id']!=2?"WHERE hidden!=1 ":"")."ORDER BY `title` ASC");
+     $result = ($USER['group_id']!=2) ? $DB->safeselect("*","skins","WHERE hidden!=1 ORDER BY `title` ASC"):
+     	$DB->safeselect("*","skins", "ORDER BY `title` ASC");
      $select='';
-     while($f=$DB->row()) {
+     while($f=$DB->row($result)) {
         $select.="<option value='".$f['id']."' ".($USER['skin_id']==$f['id']?"selected='selected'":"")."/>".($f['hidden']?"*":"").$f['title']."</option>";$found=true;
      }
      $select='<select name="skin">'.$select.'</select>';
@@ -375,18 +379,21 @@ $this->getlocationforform()
  function flag(){
   global $PAGE,$DB,$JAX,$USER;
   $PAGE->JS("softurl");
-  $DB->update("messages",Array("flag"=>$JAX->b['tog']?1:0),"WHERE `id`=".$DB->evalue($JAX->b['flag'])." AND `to`=".$USER['id']);
+  $DB->safeupdate("messages",Array("flag"=>$JAX->b['tog']?1:0),"WHERE `id`=? AND `to`=?", $DB->basicvalue($JAX->b['flag']), $USER['id']);
  }
 
  function viewmessage($messageid){
   global $PAGE,$DB,$JAX,$USER;
   if($PAGE->jsupdate&&!$PAGE->jsdirectlink) return;
-  $DB->special("SELECT a.*,m.group_id,m.display_name name,m.avatar,m.usertitle FROM %t a LEFT JOIN %t m ON a.from=m.id WHERE a.id=".$DB->evalue($messageid)." ORDER BY date DESC","messages","members");
-  $message=$DB->row();
+  $result = $DB->safespecial("SELECT a.*,m.group_id,m.display_name name,m.avatar,m.usertitle FROM %t a LEFT JOIN %t m ON a.from=m.id WHERE a.id=? ORDER BY date DESC",
+	array("messages","members"),
+	$DB->basicvalue($messageid));
+  $message=$DB->row($result);
+  $DB->disposeresult($row);
   if($message['from']!=$USER['id']&&$message['to']!=$USER['id']) $e="You don't have permission to view this message.";
   if($e) return $this->showucp($e);
   if(!$message['read']&&$message['to']==$USER['id']) {
-   $DB->update("messages",Array("read"=>1),"WHERE id=".$message['id']);
+   $DB->safeupdate("messages",Array("read"=>1),"WHERE id=?", $message['id']);
    $this->updatenummessages();
   }
   
@@ -405,8 +412,10 @@ $this->getlocationforform()
  
  function updatenummessages(){
   global $DB,$PAGE,$USER;
-  $DB->select("count(*)","messages","WHERE `to`=".$USER['id']." AND !`read`");
-  $unread=$DB->row();
+  $result = $DB->safeselect("count(*)","messages","WHERE `to`=? AND !`read`", $USER['id']);
+  $unread=$DB->row($result);
+  $DB->disposeresult($result);
+
   $unread=array_pop($unread);
   $PAGE->JS("update","num-messages",$unread);
  }
@@ -415,15 +424,25 @@ $this->getlocationforform()
   global $PAGE,$DB,$JAX,$USER;
   
   if($PAGE->jsupdate&&empty($JAX->p)) return;
+  $result = null;
   if($view=="sent")
-   $DB->special("SELECT a.*,m.display_name FROM %t a LEFT JOIN %t m ON a.to=m.id WHERE a.from=".$USER['id']." AND !del_sender ORDER BY a.date DESC","messages","members");
+   $result = $DB->safespecial("SELECT a.*,m.display_name FROM %t a LEFT JOIN %t m ON a.to=m.id WHERE a.from=? AND !del_sender ORDER BY a.date DESC",
+	array("messages","members"),
+	$USER['id']);
+
   else if($view=="flagged") {
-   $DB->special("SELECT a.*,m.display_name FROM %t a LEFT JOIN %t m ON a.from=m.id WHERE a.to=".$USER['id']." AND !del_recipient AND flag=1 ORDER BY a.date DESC","messages","members");
+   $result = $DB->safespecial("SELECT a.*,m.display_name FROM %t a LEFT JOIN %t m ON a.from=m.id WHERE a.to=? AND !del_recipient AND flag=1 ORDER BY a.date DESC",
+	array("messages","members"),
+	$USER['id']);
+
   } else {
-   $DB->special("SELECT a.*,m.display_name FROM %t a LEFT JOIN %t m ON a.from=m.id WHERE a.to=".$USER['id']." AND !del_recipient ORDER BY a.date DESC","messages","members");
+   $result = $DB->safespecial("SELECT a.*,m.display_name FROM %t a LEFT JOIN %t m ON a.from=m.id WHERE a.to=? AND !del_recipient ORDER BY a.date DESC",
+	array("messages","members"),
+	$USER['id']);
+
   }
   $unread=0;
-  while($f=$DB->row()) {
+  while($f=$DB->row($result)) {
    $hasmessages=1;
    if(!$f['read'])$unread++;
    $page.=$PAGE->meta('inbox-messages-row',
@@ -456,21 +475,26 @@ $this->getlocationforform()
   if($JAX->p['submit']) {
    $mid=$JAX->b['mid'];
    if(!$mid&&$JAX->b['to']) {
-    $DB->select("id,email,email_settings","members","WHERE display_name=".$DB->evalue($JAX->b['to']));
-    $udata=$DB->row();
+    $result = $DB->safeselect("id,email,email_settings","members","WHERE display_name=?", $DB->basicvalue($JAX->b['to']));
+    $udata=$DB->row($result);
+    $DB->disposeresult($result);
    } else {
-    $DB->select("id,email,email_settings","members","WHERE id=".$DB->evalue($mid));
-    $udata=$DB->row();
+    $result = $DB->safeselect("id,email,email_settings","members","WHERE id=?", $DB->basicvalue($mid));
+    $udata=$DB->row($result);
+    $DB->disposeresult($result);
    }
    if(!$udata) $e="Invalid user!";
    else if(!trim($JAX->b['title'])) $e="You must enter a title.";
    if($e) {$PAGE->JS("error",$e);$PAGE->append("PAGE",$PAGE->error($e));}
    else {
     //put it into the table
-    $DB->insert("messages",Array("to"=>$udata['id'],"from"=>$USER['id'],"title"=>$JAX->blockhtml($JAX->p['title']),"message"=>$JAX->p['message'],"date"=>time(),"del_sender"=>0,"del_recipient"=>0,"read"=>0));
+    $DB->safeinsert("messages",Array("to"=>$udata['id'],"from"=>$USER['id'],"title"=>$JAX->blockhtml($JAX->p['title']),"message"=>$JAX->p['message'],"date"=>time(),"del_sender"=>0,"del_recipient"=>0,"read"=>0));
     //give them a notification
-    $cmd=$JAX->json_encode(Array("newmessage","You have a new message from ".$USER['display_name'],$DB->insert_id()))."\n";
-    $DB->special("UPDATE %t SET runonce=concat(runonce,".$DB->evalue($cmd,1).") WHERE uid=".$udata['id'],"session");
+    $cmd=$JAX->json_encode(Array("newmessage","You have a new message from ".$USER['display_name'],$DB->insert_id(1)))."\n";
+    $result = $DB->safespecial("UPDATE %t SET runonce=concat(runonce,?) WHERE uid=?",
+	array("session"),
+	$DB->basicvalue($cmd,1),
+	$udata['id']);
     //send em an email!
     if($udata['email_settings']&2) {
      $JAX->mail(
@@ -488,11 +512,19 @@ $this->getlocationforform()
   if($PAGE->jsupdate&&!$messageid) return;
   $msg='';
   if($messageid) {
-   $DB->select("*","messages","WHERE (`to`=".$USER['id']." OR `from`=".$USER['id'].") AND `id`=".$DB->evalue($messageid));
-   $message=$DB->row();
+   $result = $DB->safeselect("*","messages","WHERE (`to`=? OR `from`=?) AND `id`=?",
+	$USER['id'],
+	$USER['id'],
+	$DB->basicvalue($messageid));
+
+   $message=$DB->row($result);
+   $DB->disposeresult($result);
+
    $mid=$message['from'];
-   $DB->select("display_name","members","WHERE id=".$mid);
-   $mname=array_pop($DB->row());
+   $result = $DB->safeselect("display_name","members","WHERE id=?", $mid);
+   $mname=array_pop($DB->row($result));
+   $DB->disposeresult($result);
+
    $msg="\n\n\n".'[quote='.$mname.']'.$message['message'].'[/quote]';
    $mtitle=($todo=="fwd"?"FWD:":"RE:").$message['title'];
    if($todo=="fwd") {
@@ -502,8 +534,10 @@ $this->getlocationforform()
   if(is_numeric($JAX->g['mid'])) {
    $showfull=1;
    $mid=$JAX->b['mid'];
-   $DB->select("display_name","members","WHERE id=".$mid);
-   $mname=array_pop($DB->row());
+   $result = $DB->safeselect("display_name","members","WHERE id=?", $mid);
+   $mname=array_pop($DB->row($result));
+   $DB->disposeresult($result);
+
    if(!$mname) {$mid=0;$mname='';}
   }
   
@@ -521,15 +555,19 @@ $this->getlocationforform()
 
  function delete($id,$relocate=true){
   global $PAGE,$JAX,$DB,$USER;
-  $DB->select("*","messages","WHERE `id`=".$DB->evalue($id));
-  $message=$DB->row();
+  $result = $DB->safeselect("*","messages","WHERE `id`=?", $DB->basicvalue($id));
+  $message=$DB->row($result);
+  $DB->disposeresult($result);
+
   $is_recipient=$message['to']==$USER['id'];
   $is_sender=$message['from']==$USER['id'];
-  if($is_recipient) $DB->update("messages",Array("del_recipient"=>1),"WHERE id=".$DB->evalue($id));
-  if($is_sender)    $DB->update("messages",Array("del_sender"=>1),"WHERE id=".$DB->evalue($id));
-  $DB->select("*","messages","WHERE `id`=".$DB->evalue($id));
-  $message=$DB->row();
-  if($message['del_recipient']&&$message['del_sender']) $DB->delete("messages","WHERE id=".$DB->evalue($id));
+  if($is_recipient) $DB->safeupdate("messages",Array("del_recipient"=>1),"WHERE id=?", $DB->basicvalue($id));
+  if($is_sender)    $DB->safeupdate("messages",Array("del_sender"=>1),"WHERE id=?", $DB->basicvalue($id));
+  $result = $DB->safeselect("*","messages","WHERE `id`=?", $DB->basicvalue($id));
+  $message=$DB->row($result);
+  $DB->disposeresult($result);
+
+  if($message['del_recipient']&&$message['del_sender']) $DB->safedelete("messages","WHERE id=?", $DB->basicvalue($id));
   if($relocate) $PAGE->location("?act=ucp&what=inbox".($JAX->b['prevpage']?"&page=".$JAX->b['prevpage']:''));
  }
 }
