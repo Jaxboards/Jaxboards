@@ -407,7 +407,7 @@ class POST{
   //update last post info
   //for the topic:
   if(!$newtopic) $DB->safequery(
-	"UPDATE topics set lp_uid = ?, lp_date = ?, replies = replies + 1 WHERE id=?",
+	"UPDATE ".$DB->ftable("topics")." set lp_uid = ?, lp_date = ?, replies = replies + 1 WHERE id=?",
 	$uid, $time, $tid);
 
   //do some magic to update the tree all the way up (for subforums)
@@ -426,15 +426,18 @@ class POST{
    // ))
   // ,"WHERE id IN (".implode(",",$path).")");
 
+    // syslog(LOG_ERR,"UPDATE: PATH IS ".implode(",", $path)."\n");
+    // syslog(LOG_ERR,"UPDATE: PATH IS ".print_r($path, true)."\n");
+
     if ($newtopic) {
-        $DB->safequery("UPDATE forums SET lp_uid= ?, lp_tid = ?, lp_topic = ?, lp_date = ?, topics = topics + 1 WHERE id IN ?",
+        $DB->safequery("UPDATE ".$DB->ftable("forums")." SET lp_uid= ?, lp_tid = ?, lp_topic = ?, lp_date = ?, topics = topics + 1 WHERE id IN ?",
 		$uid,
 		$tid,
 		$fdata['topictitle'],
 		$time,
 		$path);
     } else {
-        $DB->safequery("UPDATE forums SET lp_uid= ?  lp_tid = ?, lp_topic = ?, lp_date = ?, posts = posts + 1 WHERE id IN ?",
+        $DB->safequery("UPDATE ".$DB->ftable("forums")." SET lp_uid= ?, lp_tid = ?, lp_topic = ?, lp_date = ?, posts = posts + 1 WHERE id IN ?",
 		$uid,
 		$tid,
 		$fdata['topictitle'],
@@ -446,13 +449,13 @@ class POST{
 
   //update statistics
   if(!$fdata['nocount']) {
-   $DB->safequery("UPDATE members SET posts = posts + 1 WHERE id=?", $DB->basicvalue($JAX->userData['id']));
+   $DB->safequery("UPDATE ".$DB->ftable("members")." SET posts = posts + 1 WHERE id=?", $DB->basicvalue($JAX->userData['id']));
   }
 
   if ($newtopic) {
-      $DB->safequery("UPDATE stats SET posts = posts + 1, topics = topics + 1;");
+      $DB->safequery("UPDATE ".$DB->ftable("stats")." SET posts = posts + 1, topics = topics + 1;");
   } else {
-      $DB->safequery("UPDATE stats set posts = posts + 1;");
+      $DB->safequery("UPDATE ".$DB->ftable("stats")." set posts = posts + 1;");
   }
 
   if($this->how!="qreply") {
