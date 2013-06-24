@@ -110,7 +110,7 @@ class PAGE{
    include BOARDPATH."config.php";
    $this->CFG=$CFG;
   }
-  return $this->CFG[$setting];
+  return @$this->CFG[$setting];
  }
 }
 

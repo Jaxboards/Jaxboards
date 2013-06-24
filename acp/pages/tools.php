@@ -20,7 +20,8 @@ class tools{
  }
  function filemanager(){
   global $PAGE,$DB,$JAX,$CFG;
-  if(is_numeric($JAX->b['delete'])){
+  $page = "";
+  if(is_numeric(@$JAX->b['delete'])){
    $result = $DB->safeselect("*","files","WHERE id=?", $DB->basicvalue($JAX->b['delete']));
    $f=$DB->row($result);
    $DB->disposeresult($result);
@@ -31,7 +32,7 @@ class tools{
      $DB->safedelete("files","WHERE id=?", $DB->basicvalue($JAX->b['delete']));
    }
   }
-  if(is_array($JAX->p['dl'])) {
+  if(is_array(@$JAX->p['dl'])) {
    foreach($JAX->p['dl'] as $k=>$v) if(ctype_digit($v)) $DB->safeupdate("files",Array("downloads"=>$v),"WHERE id=?", $DB->basicvalue($k));
    $page.=$PAGE->success('Changes saved.');
   }
@@ -56,7 +57,7 @@ class tools{
  }
  function backup(){
     global $PAGE,$DB;
-    if($_POST['dl']) {
+    if(@$_POST['dl']) {
         header("Content-type:text/plain");
         header("Content-Disposition:attachment;filename=\"".$DB->prefix.date('n.j.Y').'.sql"');
         function outline($line){

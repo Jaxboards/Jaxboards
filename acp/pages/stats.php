@@ -8,7 +8,7 @@ class stats{
 
  function stats(){
   global $PAGE,$JAX;
-  switch($JAX->g['do']) {
+  switch(@$JAX->g['do']) {
    case "recount":$this->recount_statistics();break;
    default:$this->showstats();break;
   }

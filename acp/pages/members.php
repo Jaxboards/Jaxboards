@@ -5,7 +5,7 @@ class members{
  function __construct(){$this->members();}
  function members(){
   global $JAX,$PAGE;
-  switch($JAX->b['do']){
+  switch(@$JAX->b['do']){
    case 'merge':
     $this->merge();
    break;
@@ -57,12 +57,12 @@ class members{
  }
  function editmem(){
   global $PAGE,$JAX,$DB;
-  if($JAX->b['mid']||$JAX->p['submit']){
-   if($JAX->b['mid']&&is_numeric($JAX->b['mid'])) {
+  if(@$JAX->b['mid']||@$JAX->p['submit']){
+   if(@$JAX->b['mid']&&is_numeric(@$JAX->b['mid'])) {
     $result = $DB->safeselect("*","members","WHERE id=?", $DB->basicvalue($JAX->b['mid']));
     $data=$DB->arow($result);
     $DB->disposeresult($result);
-    if($JAX->p['savedata']){
+    if(@$JAX->p['savedata']){
       if($data['group_id']!=2||$JAX->userData['id']==1){
        $write=Array();
        if($JAX->p['password']) $write['pass']=md5($JAX->p['password']);
@@ -154,13 +154,13 @@ class members{
           <input type='submit' name='submit' value='Go' />
          </form>";
   }
-  $PAGE->addContentBox($data['name']?"Editing ".$data['name']."'s details":'Edit Member',$page);
+  $PAGE->addContentBox((@$data['name'])?"Editing ".$data['name']."'s details":'Edit Member',$page);
  }
  
  function preregister(){
   global $PAGE,$JAX,$DB;
   $page="";
-  if ($JAX->p['submit']) {
+  if (@$JAX->p['submit']) {
    if (!$JAX->p['username']||!$JAX->p['displayname']||!$JAX->p['pass']) {
 	$e="All fields required.";
    } else if (strlen($JAX->p['username'])>30||$JAX->p['displayname']>30) {
@@ -264,7 +264,8 @@ class members{
  
  function deletemem(){
   global $PAGE,$JAX,$DB;
-  if($JAX->p['submit']) {
+  $page = "";
+  if(@$JAX->p['submit']) {
    if(!$JAX->p['mid']) $e="All fields are required";
    elseif(!is_numeric($JAX->p['mid'])) $e="An error occurred in processing your request";
    if($e) $page.=$PAGE->error($e);
@@ -317,6 +318,7 @@ class members{
  
  function ipbans(){
   global $PAGE,$JAX;
+  $page = "";
   if(isset($JAX->p['ipbans'])) {
    $data=explode("\n",str_replace("\r","",$JAX->p['ipbans']));
    foreach($data as $k=>$v){
@@ -338,6 +340,7 @@ class members{
    fclose($o);
   } else {
    if(file_exists(BOARDPATH."bannedips.txt")) $data=file_get_contents(BOARDPATH."bannedips.txt");
+   else $data = "";
   }
   $page.='<form method="post">
     <p>List one IP per line.<br />IP Ranges should end in period (ex. 127.0. will ban everything starting with those two octets)<br />Comments should be prepended with hash (#comment).</p>
@@ -351,7 +354,8 @@ class members{
  
  function massmessage(){
   global $PAGE,$JAX,$DB;
-  if($JAX->p['submit']){
+  $page = "";
+  if(@$JAX->p['submit']){
    if(!trim($JAX->p['title'])||!trim($JAX->p['message'])) $page.=$PAGE->error("All fields required!");
    else {
     $q=$DB->safeselect("id","members","WHERE (?-last_visit)<?", time(), (60*60*24*31*6));

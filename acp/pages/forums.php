@@ -14,15 +14,15 @@ class forums{
   foreach($links as $k=>$v) $sidebar.='<li><a href="?act=forums&do='.$k.'">'.$v.'</a></li>';
   $PAGE->sidebar("<ul>".$sidebar."</ul>");
 
-  if($JAX->b['delete']){
+  if(@$JAX->b['delete']){
    if(is_numeric($JAX->b['delete'])) return $this->deleteforum($JAX->b['delete']);
    elseif(preg_match("@c_(\d+)@",$JAX->b['delete'],$m)) return $this->deletecategory($m[1]);
-  } else if($JAX->b['edit']) {
+  } else if(@$JAX->b['edit']) {
    if(is_numeric($JAX->b['edit'])) return $this->createforum($JAX->b['edit']);
    elseif(preg_match("@c_(\d+)@",$JAX->b['edit'],$m)) return $this->createcategory($m[1]);
   }
   
-  switch($JAX->g['do']) {
+  switch(@$JAX->g['do']) {
     case "order":$this->orderforums();break;
     case "create":$this->createforum();break;
     case "createc":$this->createcategory();break;
@@ -39,7 +39,7 @@ class forums{
   global $PAGE,$DB,$JAX;
   $page="";
   if($highlight) $page.="Forum Created. Now, just place it wherever you like!<br />";
-  if($JAX->p['tree']) {
+  if(@$JAX->p['tree']) {
    $JAX->p['tree']=json_decode($JAX->p['tree'],true);
    $data=$this->mysqltree($JAX->p['tree']);
    if($JAX->g['do']=="create") return;
@@ -59,10 +59,10 @@ class forums{
    $intree=&$tree;
    foreach($treeparts as $v){
     if(!trim($v)) continue;
-    if(!is_array($intree[$v])) $intree[$v]=Array();
+    if(!is_array(@$intree[$v])) $intree[$v]=Array(); /* BUGBUGBUG: Why does this sometimes generate warnings without the @? */
     $intree=&$intree[$v];
    }
-   if(!$intree[$f['id']]) $intree[$f['id']]=true;
+   if(!@$intree[$f['id']]) $intree[$f['id']]=true; /* BUGBUGBUG: Why does this sometimes generate warnings without the @? */
   }
   foreach($cats as $v) $sortedtree['c_'.$v]=$tree['c_'.$v];
   $page=$page.$this->printtree($sortedtree,$forums,"tree",$highlight)."<form method='post'><input type='hidden' id='ordered' name='tree' /><input type='submit' value='Save' /></form>";
@@ -92,15 +92,16 @@ class forums{
   }
  }
  function printtree($t,$data,$class=false,$highlight=0){
+  $r = "";
   foreach($t as $k=>$v) {
    $classes=Array();
    if($k[0]=="c") $classes[]="parentlock";
    else $classes[]="nofirstlevel";
    if($highlight&&$k==$highlight) $classes[]="highlight";
    $r.="<li id='forum_$k' ".(!empty($classes)?'class="'.implode(" ",$classes).'"':'').">".
-   ($data[$k]['trashcan']?'<span class="icons trashcan"></span>':'').
+   ((@$data[$k]['trashcan'])?'<span class="icons trashcan"></span>':''). /* BUGBUGBUG: Why does this sometimes generate warnings without the @? */
     $data[$k]['title'].
-   ($data[$k]['mods']?" - <i>".($nummods=count(explode(',',$data[$k]['mods'])))." moderator".($nummods==1?"":"s")."</i>":"").
+   ((@$data[$k]['mods'])?" - <i>".($nummods=count(explode(',',$data[$k]['mods'])))." moderator".($nummods==1?"":"s")."</i>":""). /* BUGBUGBUG: Why does this sometimes generate warnings without the @? */
    " <a href='?act=forums&delete=$k' class='icons delete' title='Delete'></a> <a href='?act=forums&edit=$k' class='icons edit' title='Edit'></a>".
    (is_array($v)?self::printtree($v,$data,'',$highlight):"").
    "</li>";
@@ -115,6 +116,10 @@ class forums{
  //sorry if you have to see this abomination
  function createforum($fid=false){
   global $PAGE,$JAX,$DB;
+  $page = "";
+  $e = "";
+  $forumperms = "";
+  $fdata = array();
   if($fid){
    $result = $DB->safeselect("*","forums","WHERE id=?", $DB->basicvalue($fid));
    $fdata=$DB->row($result);
@@ -124,7 +129,7 @@ class forums{
    if($JAX->p['tree']) $this->orderforums();
    $page.=$PAGE->success("Forum created.");
   }
-  if(is_numeric($JAX->b['rmod'])) {
+  if(is_numeric(@$JAX->b['rmod'])) {
    //remove mod from forum
    if($fdata['mods']) {
     $exploded=explode(",",$fdata['mods']);
@@ -136,7 +141,7 @@ class forums{
    }
   }
   
-  if($JAX->p['submit']){
+  if(@$JAX->p['submit']){
    //saves all of the shit
    //really should be its own function, but I don't gaf
    $grouppermsa=Array();$groupperms="";
@@ -191,7 +196,9 @@ class forums{
   
   //do perms table
   function checkbox($id,$name,$checked){return '<input type="checkbox" class="switch yn" name="groups['.$id.']['.$name.']" '.($checked?'checked="checked" ':'').($name=='global'?' onchange="globaltoggle(this.parentNode.parentNode,this.checked)" ':'').'/>';}
-  if($fdata['perms']) {
+
+  $perms = array();
+  if(@$fdata['perms']) {
    $unpack=unpack("n*",$fdata['perms']);
    for($x=1;$x<count($unpack);$x+=2) $perms[$unpack[$x]]=$unpack[$x+1];
   }
@@ -199,33 +206,33 @@ class forums{
   $groupperms="";
   while($f=$DB->row($result)) {
    $global=!isset($perms[$f['id']]);
-   $p=$JAX->parseperms($perms[$f['id']]);
+   $p=$JAX->parseperms(@$perms[$f['id']]);
    $groupperms.='<tr><td>'.$f['title'].'</td><td>'.checkbox($f['id'],'global',$global).'</td><td>'.checkbox($f['id'],'view',$global?1:$p['view']).'</td><td>'.checkbox($f['id'],'read',$global?1:$p['read']).'</td><td>'.checkbox($f['id'],'start',$global?$f['can_post_topics']:$p['start']).'</td><td>'.checkbox($f['id'],'reply',$global?$f['can_post']:$p['reply']).'</td><td>'.checkbox($f['id'],'upload',$global?$f['can_attach']:$p['upload']).'</td><td>'.checkbox($f['id'],'poll',$global?$f['can_poll']:$p['poll']).'</td></tr>';
   }
   $page.=($e?$PAGE->error($e):"")."<form method='post'><table class='settings'>
-<tr><td>Forum Title:</td><td><input type='text' name='title' value='".$JAX->blockhtml($fdata['title'])."' /></td></tr>
-<tr><td>Description:</td><td><textarea name='description'>".$JAX->blockhtml($fdata['subtitle'])."</textarea></td></tr>
-<tr><td>Redirect URL:</td><td><input type='text' name='redirect' value='".$JAX->blockhtml($fdata['redirect'])."' /></td></tr>
+<tr><td>Forum Title:</td><td><input type='text' name='title' value='".$JAX->blockhtml(@$fdata['title'])."' /></td></tr>
+<tr><td>Description:</td><td><textarea name='description'>".$JAX->blockhtml(@$fdata['subtitle'])."</textarea></td></tr>
+<tr><td>Redirect URL:</td><td><input type='text' name='redirect' value='".$JAX->blockhtml(@$fdata['redirect'])."' /></td></tr>
 <tr><td>Show Subforums:</td><td><select name='showsub'>";
-foreach(Array('Not at all','One level below','All subforums') as $k=>$v) $page.='<option value="'.$k.'"'.($k==$fdata['show_sub']?' selected="selected"':'').'>'.$v.'</option>';
+foreach(Array('Not at all','One level below','All subforums') as $k=>$v) $page.='<option value="'.$k.'"'.(($k==@$fdata['show_sub'])?' selected="selected"':'').'>'.$v.'</option>';
 $page.="</select></td></tr>
 <tr><td>Order Topics By:</td><td><select name='orderby'>";
-foreach(Array("Last Post, Descending","Last Post, Ascending","Topic Creation Time, Descending","Topic Creation Time, Ascending","Topic Title, Descending","Topic Title, Ascending") as $k=>$v) $page.="<option value='".$k."'".($fdata['orderby']==$k?" selected='selected'":"").">".$v."</option>";
+foreach(Array("Last Post, Descending","Last Post, Ascending","Topic Creation Time, Descending","Topic Creation Time, Ascending","Topic Title, Descending","Topic Title, Ascending") as $k=>$v) $page.="<option value='".$k."'".((@$fdata['orderby']==$k)?" selected='selected'":"").">".$v."</option>";
 $page.="</select></td></tr>
-<tr><td>Posts count towards post count?</td><td><input type='checkbox' class='switch yn' name='nocount'".($fdata['nocount']?'':' checked="checked"')." /></td></tr>
-<tr><td>Trashcan?</td><td><input type='checkbox' class='switch yn' name='trashcan'".($fdata['trashcan']?' checked="checked"':'')." /></td></tr>
+<tr><td>Posts count towards post count?</td><td><input type='checkbox' class='switch yn' name='nocount'".((@$fdata['nocount'])?'':' checked="checked"')." /></td></tr>
+<tr><td>Trashcan?</td><td><input type='checkbox' class='switch yn' name='trashcan'".((@$fdata['trashcan'])?' checked="checked"':'')." /></td></tr>
 </table>";
 
 $moderators='<table class="settings">
 <tr><td>Moderators:</td><td>';
-if($fdata['mods']) {
+if(@$fdata['mods']) {
  $result = $DB->safeselect("display_name,id","members","WHERE id IN ?", $fdata['mods']);
  while($f=$DB->row($result)) $mods.=$f['display_name'].' <a href="?act=forums&edit='.$fid.'&rmod='.$f['id'].'">X</a>, ';
  $moderators.=substr($mods,0,-2);
 } else $moderators.="No forum-specific moderators added!";
 $moderators.='<br /><input type="text" name="name" onkeyup="$(\'validname\').className=\'bad\';JAX.autoComplete(\'act=searchmembers&term=\'+this.value,this,$(\'modid\'),event);" />
           <input type="hidden" id="modid" name="modid" onchange="$(\'validname\').className=\'good\'"/><span id="validname"></span><input type="submit" name="submit" value="Add Moderator" /></td></tr>
-<tr><td>Show "Forum Led By":</td><td><input type="checkbox" class="switch yn" name="show_ledby" '.($fdata['show_ledby']?' checked="checked"':'').'/></td></tr>
+<tr><td>Show "Forum Led By":</td><td><input type="checkbox" class="switch yn" name="show_ledby" '.((@$fdata['show_ledby'])?' checked="checked"':'').'/></td></tr>
 </table>';
 
 $forumperms.="<table id='perms'>
@@ -288,12 +295,14 @@ for(var x=1;x<perms.rows.length;x++){
  
  function createcategory($cid=false){
   global $JAX,$DB,$PAGE;
+  $page = "";
+  $cdata = array();
   if($cid) {
    $result = $DB->safeselect("*","categories","WHERE id=".$DB->basicvalue($cid));
    $cdata=$DB->row($result);
    $DB->disposeresult($result);
   }
-  if($JAX->p['submit']) {
+  if(@$JAX->p['submit']) {
    if(!trim($JAX->p['cat_name'])) $page.=$PAGE->error("All fields required");
    else{
     $stuff=Array("title"=>$JAX->p['cat_name']);
@@ -307,7 +316,7 @@ for(var x=1;x<perms.rows.length;x++){
    }
   }
   $page.='<form method="post">
-  <label>Category Title:</label><input type="text" name="cat_name" value="'.$JAX->blockhtml($cdata['title']).'" /><br />
+  <label>Category Title:</label><input type="text" name="cat_name" value="'.$JAX->blockhtml(@$cdata['title']).'" /><br />
   <input type="submit" name="submit" value="'.($cdata?"Edit":"Create").'" />
   </form>';
   

@@ -6,11 +6,12 @@ class groups{
  function __construct(){$this->groups();}
  function groups(){
   global $JAX,$PAGE;
+  $sidebar = "";
   $links=Array("perms"=>"Edit Permissions");
   foreach($links as $k=>$v) $sidebar.="<li><a href='?act=groups&do=".$k."'>$v</a></li>";
   $PAGE->sidebar("<ul>$sidebar</ul>");
-  if($JAX->g['edit']) $JAX->g['do']="edit";
-  switch($JAX->g['do']){
+  if(@$JAX->g['edit']) $JAX->g['do']="edit";
+  switch(@$JAX->g['do']){
    case "perms":$this->showperms();break;
    case "create":$this->create();break;
    case "edit":$this->create($JAX->g['edit']);break;
@@ -77,14 +78,14 @@ class groups{
  function showperms(){
   global $DB,$PAGE,$JAX;
 
-  if($JAX->p['perm']) {
+  if(@$JAX->p['perm']) {
    foreach(explode(",",$JAX->p['grouplist']) as $v) if(!$JAX->p['perm'][$v]) $JAX->p['perm'][$v]=Array();
    return $this->updateperms($JAX->p['perm']);
   }
-  if(preg_match("@[^\d,]@",$JAX->b['grouplist'])||strpos($JAX->b['grouplist'],',,')!==false) $JAX->b['grouplist']='';
+  if(preg_match("@[^\d,]@",@$JAX->b['grouplist'])||strpos(@$JAX->b['grouplist'],',,')!==false) $JAX->b['grouplist']='';
 
   // $DB->select("*","member_groups",($JAX->b['grouplist']?"WHERE id IN (".$JAX->b['grouplist'].")":"")."ORDER BY id ASC");
-  $result = ($JAX->b['grouplist'] ?
+  $result = (@$JAX->b['grouplist'] ?
 	$DB->safeselect("*","member_groups","WHERE id IN ? ORDER BY id ASC", explode(",", $JAX->b['grouplist'])) :
   	$DB->safeselect("*","member_groups","ORDER BY id ASC"));
   $numgroups=0;
@@ -171,8 +172,9 @@ class groups{
  function create($gid=false){
   if($gid&&!is_numeric($gid)) $gid=false;
   global $PAGE,$JAX,$DB;
-  if($JAX->p['submit']) {
-   if(!$JAX->p['groupname']) $e="Group name required!";
+  $page = "";
+  if(@$JAX->p['submit']) {
+   if(!@$JAX->p['groupname']) $e="Group name required!";
    else if(strlen($JAX->p['groupname'])>250) $e="Group name must not exceed 250 characters!";
    else if(strlen($JAX->p['groupicon'])>250) $e="Group icon must not exceed 250 characters!";
    else if($JAX->p['groupicon']&&!$JAX->isurl($JAX->p['groupicon'])) $e="Group icon must be a valid image url";
@@ -192,8 +194,8 @@ class groups{
    $DB->disposeresult($result);
   }
    
-  $page.='<form method="post"><label for="groupname">Group name:</label><input type="text" id="groupname" name="groupname" value="'.$JAX->blockhtml($gdata['title']).'" /><br />
-  <label for="groupicon">Icon: </label><input type="text" id="groupicon" name="groupicon" value="'.$JAX->blockhtml($gdata['icon']).'" /><br />
+  $page.='<form method="post"><label for="groupname">Group name:</label><input type="text" id="groupname" name="groupname" value="'.($gid ? $JAX->blockhtml($gdata['title']): "").'" /><br />
+  <label for="groupicon">Icon: </label><input type="text" id="groupicon" name="groupicon" value="'.($gid ? $JAX->blockhtml($gdata['icon']) : "").'" /><br />
   <input type="submit" name="submit" value="'.($gid?"Edit":"Create").'" />
   </form>';
   $PAGE->addContentBox($gid?"Editing group: ".$gdata['title']:"Create a group!",$page);
@@ -201,7 +203,8 @@ class groups{
  
  function delete(){
   global $PAGE,$DB,$JAX;
-  if(is_numeric($JAX->b['delete'])&&$JAX->b['delete']>5){
+  $page = "";
+  if(is_numeric(@$JAX->b['delete'])&&$JAX->b['delete']>5){
    $DB->safedelete("member_groups","WHERE id=?", $DB->basicvalue($JAX->b['delete']));
    $DB->safeupdate("members",Array("group_id"=>1),"WHERE group_id=?", $DB->basicvalue($JAX->b['delete']));
   }

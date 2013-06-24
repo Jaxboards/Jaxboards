@@ -28,6 +28,7 @@ class settings{
  
  function leftBar(){
   global $PAGE;
+  $sidebar = "";
   foreach(
    Array(
     "?act=posting&do=emoticons"=>"Emoticons",
@@ -52,13 +53,13 @@ class settings{
   while($f=$DB->row($result)) $wordfilter[$f['needle']]=$f['replacement'];
   
   //delete
-  if($JAX->g['d']) {
+  if(@$JAX->g['d']) {
    $DB->safedelete("textrules","WHERE type='badword' AND needle=?", $DB->basicvalue($JAX->g['d']));
    unset($wordfilter[$JAX->g['d']]);
   }
   
   //insert
-  if($JAX->p['submit']){
+  if(@$JAX->p['submit']){
    $JAX->p['badword']=$JAX->blockhtml($JAX->p['badword']);
    if(!$JAX->p['badword']||!$JAX->p['replacement']) $page.=$PAGE->error("All fields required.");
    elseif($wordfilter[$JAX->p['badword']]) $page.=$PAGE->error("'".$JAX->p['badword']."' is already used.");
@@ -89,13 +90,13 @@ class settings{
   $page="";
   $emoticons=Array();
   //delete emoticon
-  if($JAX->g['d']) $DB->safedelete("textrules","WHERE type='emote' AND needle=?", $DB->basicvalue($_GET['d']));
+  if(@$JAX->g['d']) $DB->safedelete("textrules","WHERE type='emote' AND needle=?", $DB->basicvalue($_GET['d']));
   //select emoticons
   $result = $DB->safeselect("*","textrules","WHERE type='emote'");
   while($f=$DB->row($result)) $emoticons[$f['needle']]=$f['replacement'];
   
   //insert emoticon
-  if($JAX->p['submit']){
+  if(@$JAX->p['submit']){
    if(!$JAX->p['emoticon']||!$JAX->p['image']) $page.=$PAGE->error("All fields required.");
    else if($emoticons[$JAX->blockhtml($JAX->p['emoticon'])]) $page.=$PAGE->error("That emoticon is already being used.");
    else {
@@ -166,13 +167,13 @@ class settings{
   while($f=$DB->row($result)) $niblets[$f['id']]=Array('img'=>$f['img'],'title'=>$f['title']);
   
   //delete
-  if($JAX->g['d']) {
+  if(@$JAX->g['d']) {
    $DB->safedelete("ratingniblets","WHERE id=?", $DB->basicvalue($JAX->g['d']));
    unset($niblets[$JAX->g['d']]);
   }
   
   //insert
-  if($JAX->p['submit']){
+  if(@$JAX->p['submit']){
    if(!$JAX->p['img']||!$JAX->p['title']) $page.=$PAGE->error("All fields required.");
    else {
     $DB->safeinsert("ratingniblets",Array('img'=>$JAX->p['img'],'title'=>$JAX->p['title']));
@@ -180,7 +181,7 @@ class settings{
    }
   }
   
-  if($JAX->p['rsubmit']) {
+  if(@$JAX->p['rsubmit']) {
    $cfg=Array('ratings'=>($JAX->p['renabled']?1:0)+($JAX->p['ranon']?2:0));
    $PAGE->writeCFG($cfg);
    $page2.=$PAGE->success("Settings saved!");

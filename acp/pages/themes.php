@@ -10,10 +10,10 @@ class themes{
   $sidebar='';
   foreach(Array('?act=themes&page=create'=>'Create New Skin','?act=themes'=>'Manage Skins') as $k=>$v) $sidebar.='<li><a href="'.$k.'">'.$v.'</a></li>';
   $PAGE->sidebar('<ul>'.$sidebar.'</ul>View Community Skins');
-  if($JAX->g['editcss']) $this->editcss($JAX->g['editcss']);
-  elseif($JAX->g['editwrapper']) $this->editwrapper($JAX->g['editwrapper']);
-  elseif(is_numeric($JAX->g['deleteskin'])) $this->deleteskin($JAX->g['deleteskin']);
-  elseif($JAX->g['page']=="create") $this->createskin();
+  if(@$JAX->g['editcss']) $this->editcss($JAX->g['editcss']);
+  elseif(@$JAX->g['editwrapper']) $this->editwrapper($JAX->g['editwrapper']);
+  elseif(is_numeric(@$JAX->g['deleteskin'])) $this->deleteskin($JAX->g['deleteskin']);
+  elseif(@$JAX->g['page']=="create") $this->createskin();
   else $this->showskinindex();
  }
  function themes(){$this->__construct();}
@@ -28,15 +28,17 @@ class themes{
  
  function showskinindex(){
   global $PAGE,$DB,$JAX,$CFG;
+  $errorskins = "";
+  $errorwrapper = "";
 
-  if($JAX->g['deletewrapper']){
+  if(@$JAX->g['deletewrapper']){
    if(!preg_match("@[^\w ]@",$JAX->g['deletewrapper'])&&file_exists(BOARDPATH."Wrappers/".$JAX->g['deletewrapper'].".txt")) {
     unlink(BOARDPATH."Wrappers/".$JAX->g['deletewrapper'].".txt");
     $PAGE->location("?act=themes");
    } else $errorwrapper="The wrapper you are trying to delete does not exist.";
   }
 
-  if($JAX->p['newwrapper']){
+  if(@$JAX->p['newwrapper']){
    if(preg_match("@[^\w ]@",$JAX->p['newwrapper'])) $errorwrapper='Wrapper name must consist of letters, numbers, spaces, and underscore.';
    else if(strlen($JAX->p['newwrapper'])>50) $errorwrapper='Wrapper name must be less than 50 characters.';
    else if(file_exists(BOARDPATH."Wrappers/".$JAX->p['newwrapper'].".txt")) $errorwrapper="That wrapper already exists.";
@@ -51,7 +53,7 @@ class themes{
   $wrappers=$this->getwrappers();
 
 
-  if($JAX->p['submit']){
+  if(@$JAX->p['submit']){
 
    //update wrappers/hidden status
    if(is_array($JAX->p['wrapper'])) foreach($JAX->p['wrapper'] as $k=>$v) {
@@ -95,6 +97,7 @@ class themes{
   }
   $result = $DB->safeselect("*","skins","ORDER BY title ASC");
   $usedwrappers=Array();
+  $skins = "";
   while($f=$DB->row($result)) {
    $skins.="<tr><td><span>".$f['title']."</span>".($f['custom']?" <a href='#' onclick='return edit(this,\"skin\")' class='icons edit'></a>":"")."</td><td><a href='?act=themes&editcss=".$f['id']."'>".($f['custom']?"Edit":"View")." CSS</a></td><td>";
     $skins.="<select name='wrapper[".$f['id']."]'>".($f['custom']?"":"<option value=''>Skin Default</option>");
@@ -166,8 +169,9 @@ heredoc;
 
  function createskin(){
   global $PAGE,$JAX,$DB,$CFG;
-  if($JAX->p['submit']){
-   if(!$JAX->p['skinname']) $e="No skin name supplied!";
+  $page = "";
+  if(@$JAX->p['submit']){
+   if(!@$JAX->p['skinname']) $e="No skin name supplied!";
    else if(preg_match("@[^\w ]@",$JAX->p['skinname'])) $e="Skinname must only consist of letters, numbers, and spaces.";
    else if(strlen($JAX->p['skinname'])>50) $e="Skin name must be less than 50 characters.";
    else if(is_dir(BOARDPATH."Themes/".$JAX->p['skinname'])) $e="A skin with that name already exists.";

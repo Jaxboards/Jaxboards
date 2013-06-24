@@ -40,6 +40,7 @@ if($prefix){
     // define("STHEMEPATH",(defined("INACP")?"../":"")."Service/Themes/");
     define("BOARDPATH",(defined("INACP")?"../":"./"));
     define("STHEMEPATH",(defined("INACP")?"../":"")."Service/Themes/");
+    define("AVAPATH",(defined("INACP")?"../":"")."Service/Themes/Default/avatars/");
     date_default_timezone_set("America/Los_Angeles");
     $DB->prefix("jaxboards_");
     if (!extendconfig(BOARDPATH."config.php")) { die("Could not read config file.\n"); }

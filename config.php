@@ -1,6 +1,7 @@
 <?php
 $CFG=Array(
 "boardname"=>"Test board",
+"prefix"=>"",
 "updateinterval"=>5,
 "sql_host"=>"127.0.0.1",
 "sql_username"=>"jax",

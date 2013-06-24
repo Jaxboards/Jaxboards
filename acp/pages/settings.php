@@ -9,7 +9,7 @@ class settings{
  function settings(){
   global $JAX;
   $this->leftBar();
-  switch($JAX->b['do']){
+  switch(@$JAX->b['do']){
    case 'pages':
     $this->pages();
    break;
@@ -34,6 +34,7 @@ class settings{
  
  function leftBar(){
   global $PAGE;
+  $sidebar = "";
   foreach(
    Array(
     "?act=settings&do=global"=>"Global Settings",
@@ -54,9 +55,10 @@ class settings{
  
  function boardname(){
   global $PAGE,$JAX;
-  if($JAX->p['submit']){
+  $page = "";
+  if(@$JAX->p['submit']){
    if(trim($JAX->p['boardname'])==="") $e="Board name is required";
-   else if(trim($JAX->p['logourl'])!==""&&!$JAX->isURL($JAX->p['logourl'])) $e="Please enter a valid logo url.";
+   else if(trim(@$JAX->p['logourl'])!==""&&!$JAX->isURL(@$JAX->p['logourl'])) $e="Please enter a valid logo url.";
    if($e) $page.=$PAGE->error($e);
    else {
     $write=Array();
@@ -84,8 +86,9 @@ class settings{
  */
  function pages(){
   global $DB,$PAGE,$JAX;
-  if($JAX->b['delete']) $this->pages_delete($JAX->b['delete']);
-  if($JAX->b['page']){
+  $page = "";
+  if(@$JAX->b['delete']) $this->pages_delete($JAX->b['delete']);
+  if(@$JAX->b['page']){
    if(($newact=preg_replace('@\W@','<span style="font-weight:bold;color:#F00;">$0</span>',$JAX->b['page']))!=$JAX->b['page']) $e="The page URL must contain only letters and numbers. Invalid characters: $newact";
    elseif(strlen($newact)>25) $e="The page URL cannot exceed 25 characters.";
    else{
@@ -133,11 +136,12 @@ class settings{
  */
  function shoutbox(){
   global $PAGE,$JAX,$DB;
-  if($JAX->p['clearall']){
+  $page = "";
+  if(@$JAX->p['clearall']){
    $result = $DB->safespecial("TRUNCATE TABLE %t",array("shouts"));
    $page.=$PAGE->success("Shoutbox cleared!");
   }
-  if($JAX->p['submit']){
+  if(@$JAX->p['submit']){
    $write=Array('shoutbox'=>$JAX->p['sbe']?1:0,'shoutboxava'=>$JAX->p['sbava']?1:0);
    if(is_numeric($JAX->p['sbnum'])&&$JAX->p['sbnum']<=10&&$JAX->p['sbnum']>1) $write['shoutbox_num']=$JAX->p['sbnum'];
    else $e="Shouts to show must be between 1 and 10";
@@ -157,7 +161,7 @@ class settings{
  function domainmanager(){
   global $DB,$CFG,$PAGE,$JAX;
   $page=$table="";
-  if($JAX->p['submit']){
+  if(@$JAX->p['submit']){
    if(strlen($JAX->p['domain'])>100) $e="Domain must be less than 100 characters";
    elseif(preg_match('@[^\w.]@',$JAX->p['domain'])) $e="Please enter a valid domain.";
    
@@ -169,7 +173,7 @@ class settings{
     $result = $DB->safequery("INSERT INTO jaxboards_service.domains(`domain`,`prefix`) VALUES( ?, ?);", $DB->basicvalue($JAX->p['domain']), $DB->basicvalue($CFG['prefix']));
     $page.=$PAGE->success("Domain added! Test <a href='http://".$JAX->blockhtml($JAX->p['domain'])."'>here.</a>");
    }
-  } else if($JAX->b['delete']) {
+  } else if(@$JAX->b['delete']) {
    $result = $DB->safequery('DELETE FROM jaxboards_service.domains WHERE domain=? AND prefix=?;', $DB->basicvalue($JAX->b['delete']), $DB->basicvalue($CFG['prefix']));
    if($DB->affected_rows(1)) $page.=$PAGE->success("Domain deleted");
    else $page.=$PAGE->error("Error deleting domain, maybe it doesn't belong to you?");
@@ -191,7 +195,7 @@ class settings{
  function birthday(){
   global $PAGE,$JAX;
   $birthdays=$PAGE->getCFGSetting('birthdays');
-  if($JAX->p['submit']) {
+  if(@$JAX->p['submit']) {
    $PAGE->writeCFG(Array('birthdays'=>$birthdays=($JAX->p['bicon']?1:0)));
   }
   $page='<form method="post">';
