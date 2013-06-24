@@ -64,7 +64,7 @@ class forums{
    }
    if(!@$intree[$f['id']]) $intree[$f['id']]=true; /* BUGBUGBUG: Why does this sometimes generate warnings without the @? */
   }
-  foreach($cats as $v) $sortedtree['c_'.$v]=$tree['c_'.$v];
+  foreach($cats as $v) $sortedtree['c_'.$v]=@$tree['c_'.$v];
   $page=$page.$this->printtree($sortedtree,$forums,"tree",$highlight)."<form method='post'><input type='hidden' id='ordered' name='tree' /><input type='submit' value='Save' /></form>";
   $page.="<script type='text/javascript'>JAX.sortableTree($$('.tree'),'forum_','ordered')</script>";
   $PAGE->addContentBox("Forums",$page);
@@ -153,16 +153,16 @@ class forums{
    $result = $DB->safeselect("id","categories");
    $write=Array(
     'title'=>$JAX->p['title'],
-    'cat_id'=>$JAX->pick($fdata['cat_id'],array_pop($DB->row($result))),
+    'cat_id'=>$JAX->pick(@$fdata['cat_id'],array_pop($DB->row($result))),
     'subtitle'=>$JAX->p['description'],
     'perms'=>$groupperms,
     'redirect'=>$JAX->p['redirect'],
     'show_sub'=>$sub==1||$sub==2?$sub:0,
     'nocount'=>$JAX->p['nocount']?0:1,
     'orderby'=>($orderby>0&&$orderby<=5)?$orderby:0,
-    'trashcan'=>$JAX->p['trashcan']?1:0,
-    'show_ledby'=>$JAX->p['show_ledby']?1:0,
-    'mods'=>$fdata['mods'] //handling done below
+    'trashcan'=>@$JAX->p['trashcan']?1:0,
+    'show_ledby'=>@$JAX->p['show_ledby']?1:0,
+    'mods'=>@$fdata['mods'] //handling done below
     );
    $DB->disposeresult($result);
 
@@ -180,7 +180,7 @@ class forums{
    
    if(!$e) {
     //clear trashcan on other forums
-    if($write['trashcan']||(!$write['trashcan']&&$fdata['trashcan'])) $DB->safeupdate('forums',Array('trashcan'=>0));
+    if($write['trashcan']||(!$write['trashcan']&&@$fdata['trashcan'])) $DB->safeupdate('forums',Array('trashcan'=>0));
     
     if($fdata) {
      $DB->safeupdate('forums',$write,'WHERE id=?', $fid);
