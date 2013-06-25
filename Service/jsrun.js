@@ -2,6 +2,17 @@ var updatetime=5000;
 var useJSLinks=1;
 var adcounter=0;
 
+/* Returns the path to this script. */
+function getJXBDBaseDir() {
+    var elts = document.getElementsByTagName("script");
+    for (var i=0; i < elts.length; i++) {
+	var elt = elts[i];
+	// console.log("Script at:"+elt.src+"\n");
+	if (elt.src.substr(elt.src.length - 8, 8) == "jsrun.js") return elt.src.substr(0, elt.src.length - 8);
+    }
+    return null;
+}
+
 function IMWindow(uid,uname){
  if(!globalsettings.can_im) return alert("You do not have permission to use this feature.");
  RUN.stream.commands.im([uid,uname,false])
@@ -380,9 +391,12 @@ function RUNF(){
  if(useJSLinks&&document.location.toString().indexOf('?')>0) document.location=(useJSLinks==2?'':'./')+"#"+document.location.search.substr(1)+(document.location.hash?document.location.hash:'');
 
  if(Sound) {
-  Sound.load("sbblip","http://jaxboards.com/Sounds/blip.mp3",false);
-  Sound.load("imbeep","http://jaxboards.com/Sounds/receive.mp3",false);
-  Sound.load("imnewwindow","http://jaxboards.com/Sounds/receive.mp3",false);
+  basedir = getJXBDBaseDir();
+
+  // console.log("BASEDIR: "+basedir+"\n");
+  Sound.load("sbblip",basedir+"Sounds/blip.mp3",false);
+  Sound.load("imbeep",basedir+"Sounds/receive.mp3",false);
+  Sound.load("imnewwindow",basedir+"Sounds/receive.mp3",false);
  }
 
  document.cookie="buddylist=0"

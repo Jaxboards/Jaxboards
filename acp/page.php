@@ -45,10 +45,10 @@ class PAGE{
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
  <head>
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-  <link rel="stylesheet" type="text/css" href="http://jaxboards.com/acp/Theme/css.css" />
-  <link rel="stylesheet" type="text/css" href="http://jaxboards.com/Themes/Default/bbcode.css" />
-  <script type="text/javascript" src="http://jaxboards.com/jsnew.js"></script>
-  <script type="text/javascript" src="http://jaxboards.com/acp/Script/admin.php"></script>
+  <link rel="stylesheet" type="text/css" href="Theme/css.css" />
+  <link rel="stylesheet" type="text/css" href="'.STHEMEPATH.'Default/bbcode.css" />
+  <script type="text/javascript" src="'.STHEMEPATH.'../jsnew.js"></script>
+  <script type="text/javascript" src="Script/admin.php"></script>
   <title><% TITLE %></title>
  </head>
  <body>

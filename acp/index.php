@@ -5,15 +5,15 @@
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
   <style type="text/css">
    html{height:100%;}
-   body{font-family:arial;margin:0;scroll:none;background:url(http://jaxboards.com/acp/Theme/img/loginglow.png) center no-repeat #274463;height:100%;}
+   body{font-family:arial;margin:0;scroll:none;background:url(Theme/img/loginglow.png) center no-repeat #274463;height:100%;}
    #login{border:1px solid #000;text-align:center;font-size:20px;background:#FFF;position:absolute;top:50%;left:50%;width:500px;height:300px;margin:-150px 0 0 -250px;}
    #loginform{;padding:40px 0;}
-   #logo{background:url(http://jaxboards.com/acp/Theme/img/loginlogo.png) center;height:90px;border:1px solid #2d4669;}
+   #logo{background:url(Theme/img/loginlogo.png) center;height:90px;border:1px solid #2d4669;}
    #container{height:100%;position:relative;}
    input[type="submit"]{margin-top:30px;font-size:15px;}
    label{display:inline-block;width:130px;text-align:left;}
    .error{color:#F00;background:#FDD;border:1px solid #F00;padding:5px;margin:-20px 5px 20px 5px;font-size:15px;}
-   input[type=submit]{background:url(http://jaxboards.com/acp/Theme/img/buttonbg.png);color:#FFF;border-radius:9px;border:1px solid #000000;}
+   input[type=submit]{background:url(Theme/img/buttonbg.png);color:#FFF;border-radius:9px;border:1px solid #000000;}
   </style>
  </head>
  <body>

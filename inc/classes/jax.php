@@ -549,7 +549,7 @@ function json_decode($a,$aa=true){
    Array(   $boardname,   $boardurl,   $boardlink),
    $message
   ),
-  "MIME-Version: 1.0\r\nContent-type:text/html;charset=iso-8859-1\r\nFrom:jaxboards.com <no-reply@jaxboards.com>\r\n"
+  "MIME-Version: 1.0\r\nContent-type:text/html;charset=iso-8859-1\r\nFrom: ".$CFG["mail_from"]."\r\n"
   );
  }
 };?>

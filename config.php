@@ -1,6 +1,8 @@
 <?php
 $CFG=Array(
-"boardname"=>"Test board",
+/* "mail_from"=>"jaxboards.com <no-reply@jaxboards.com>", */
+"mail_from"=>"WebScriptedTV.com <no-reply@webscriptedtv.com>",
+"boardname"=>"WebScriptedTV.com Forums",
 "prefix"=>"",
 "updateinterval"=>5,
 "sql_host"=>"127.0.0.1",
@@ -8,7 +10,7 @@ $CFG=Array(
 "sql_password"=>"mitigate.frelling36",
 "sql_prefix"=>"jaxboards_",
 "sql_db"=>"jaxboards",
-"dthemepath"=>(defined("INACP")?"../":"")."Service/Themes/Default/",
+"dthemepath"=>(defined("INACP")?"../":"")."Service/Themes/WSTV/",
 "postmaxsize"=>50000,
 "badnamechars"=>"@[^\w']@",
 "maxfilesize"=>5*1024*1024,

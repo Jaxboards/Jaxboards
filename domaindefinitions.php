@@ -1,6 +1,9 @@
 <?php
 
 if (0) {
+define("SOUNDSURL","http://jaxboards.com/Sounds/");
+define("SCRIPTURL","http://support.jaxboards.com/Script/");
+
 //this file must be required after mysql connecting
 preg_match("@(.*)\.jaxboards\.com@i",$_SERVER['SERVER_NAME'],$m);
 $prefix=($_SERVER['SERVER_NAME']=="127.0.0.1"||$_SERVER['SERVER_NAME']=="***REMOVED***.afraid.org")?"blueprint":$m[1];
@@ -30,6 +33,8 @@ if($prefix){
  if(!extendconfig(BOARDPATH."config.php")) $CFG=Array('noboard'=>1);
 } else $CFG=Array('noboard'=>1);
 
+define("FLAGPATH","http://jaxboards.com/flags/");
+
 } else {
     function extendconfig($configfile){
         if(!@include($configfile)) return false;
@@ -41,6 +46,8 @@ if($prefix){
     define("BOARDPATH",(defined("INACP")?"../":"./"));
     define("STHEMEPATH",(defined("INACP")?"../":"")."Service/Themes/");
     define("AVAPATH",(defined("INACP")?"../":"")."Service/Themes/Default/avatars/");
+    define("SOUNDSURL",(defined("INACP")?"../":"")."Service/Sounds/");
+    define("SCRIPTURL",(defined("INACP")?"../":"")."Script/");
     date_default_timezone_set("America/Los_Angeles");
     $DB->prefix("jaxboards_");
     if (!extendconfig(BOARDPATH."config.php")) { die("Could not read config file.\n"); }
@@ -53,7 +60,7 @@ if($prefix){
         $DB->connect($CFG['sql_host'],$CFG['sql_username'],$CFG['sql_password'],$CFG['sql_db']);
     }
     // $DB->safespecial('SELECT prefix FROM jaxboards_service.domains WHERE domain=?', $DB->basicvalue($_SERVER['SERVER_NAME']));
+    define("FLAGPATH",(defined("INACP")?"../":"Service/flags"));
 }
 
-define("FLAGPATH","http://jaxboards.com/flags/");
 ?>

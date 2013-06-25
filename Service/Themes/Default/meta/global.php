@@ -14,11 +14,11 @@ $meta=Array(
 'modlink'=>'<a href="?act=modcontrols&amp;do=cp">Mod CP</a>',
 'acplink'=>'<a href="./acp/">ACP</a>',
 
-//'icon-unread'=>'<img src="http://jaxboards.com/Themes/Default/icons/unread.png" />',
-//'icon-read'=>'<img src="http://jaxboards.com/Themes/Default/icons/read.png" />',
+//'icon-unread'=>'<img src="'.BOARDPATH.'Service/Themes/Default/icons/unread.png" />',
+//'icon-read'=>'<img src="'.BOARDPATH.'Service/Themes/Default/icons/read.png" />',
 
 
-'default-avatar'=>"http://jaxboards.com/Themes/Default/avatars/default.gif",
+'default-avatar'=>BOARDPATH."Service/Themes/Default/avatars/default.gif",
 
 
 'userbox-logged-out'=>'<form onsubmit="return RUN.submitForm(this,1)" action="?" method="post"><div>Username: <input type="text" name="user" tabindex="1" /><br />Password: <a href="?act=logreg6" class="forgot">Forgot?</a><input type="password" name="pass" tabindex="2" /><br /><input type="hidden" name="act" value="logreg" /><input type="submit" value="Login" /> <a href="?act=logreg1">Register</a></div></form>',

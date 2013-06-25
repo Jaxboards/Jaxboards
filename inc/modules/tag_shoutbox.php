@@ -87,7 +87,7 @@ class SHOUTBOX{
 		"i was frozen today"=>"frozentoday",
 		"lol clinton"=>"clinton_denial"
 	    );
-	   if($USER['sound_shout']&&$sounds[$f['shout']]) $PAGE->JS("playsound","sfx","http://jaxboards.com/Sounds/".$sounds[$f['shout']].".mp3");
+	   if($USER['sound_shout']&&$sounds[$f['shout']]) $PAGE->JS("playsound","sfx",SOUNDSURL.$sounds[$f['shout']].".mp3");
 	   }
 	   $last=$f['id'];
 	}
