@@ -12,7 +12,7 @@ class downloader{
 
   }
   if($data){
-   $DB->safequery("UPDATE files SET downloads = downloads + 1 WHERE id=?", $id);
+   $DB->safequery("UPDATE ".$DB->ftable(files)." SET downloads = downloads + 1 WHERE id=?", $id);
    $ext=explode(".",$data['name']);
    if(count($ext)==1) $ext="";
    else $ext=strtolower(array_pop($ext));

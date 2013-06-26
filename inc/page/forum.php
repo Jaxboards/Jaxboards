@@ -36,7 +36,7 @@ class FORUM{
   
   if($fdata['redirect']){
    $PAGE->JS("softurl");
-   $DB->safequery("UPDATE forums SET redirects = redirects + 1 WHERE id=?", $DB->basicvalue($fid));
+   $DB->safequery("UPDATE ".$DB->ftable(forums)." SET redirects = redirects + 1 WHERE id=?", $DB->basicvalue($fid));
    return $PAGE->location($fdata['redirect']);
   }
   

@@ -240,14 +240,14 @@ class members{
 
     if(!$posts) $posts=0; else $posts=$posts[0];
     // $DB->update("members",Array('posts'=>Array('posts+'.$posts)),'WHERE id='.$mid2); /* @@@ YIKES @@@ */
-    $DB->safequery("UPDATE members SET posts = posts + ? WHERE id=?", $posts, $mid2);
+    $DB->safequery("UPDATE ".$DB->ftable(members)." SET posts = posts + ? WHERE id=?", $posts, $mid2);
     
     //delete the account
     $DB->safedelete("members","WHERE id=?", $mid1);
     
     //update stats
     // $DB->update("stats",Array('members'=>Array('members-1'),'last_register'=>Array('(SELECT max(id) FROM '.$DB->prefix.'members)'))); /* @@@ YIKES @@@ */
-    $DB->safequery("UPDATE stats SET members = members - 1, last_register = (SELECT max(id) FROM ".$DB->prefix."members)");
+    $DB->safequery("UPDATE ".$DB->ftable(stats)." SET members = members - 1, last_register = (SELECT max(id) FROM ".$DB->prefix."members)");
     $page.=$PAGE->success("Successfully merged the two accounts.");
    }
   }
@@ -303,7 +303,7 @@ class members{
     
     //update stats
     // $DB->update("stats",Array('members'=>Array('members-1'),'last_register'=>Array('(SELECT max(id) FROM '.$DB->prefix.'members)'))); /* @@@ YIKES @@@ */
-    $DB->safequery("UPDATE stats SET members = members - 1, last_register = (SELECT max(id) FROM ".$DB->prefix."members)");
+    $DB->safequery("UPDATE ".$DB->ftable(stats)." SET members = members - 1, last_register = (SELECT max(id) FROM ".$DB->prefix."members)");
     $page.=$PAGE->success("Successfully deleted the member account. <a href='?act=stats'>Board Stat Recount</a> suggested.");
    }
   }

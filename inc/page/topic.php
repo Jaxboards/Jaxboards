@@ -108,7 +108,7 @@ class TOPIC{
   $page=$pollshit.$PAGE->meta('topic-pages-top',$pagelist).$PAGE->meta('topic-buttons-top',$buttons).$page.$PAGE->meta('topic-pages-bottom',$pagelist).$PAGE->meta('topic-buttons-bottom',$buttons);
   
   //update view count
-  $DB->safequery("UPDATE topics SET views = views + 1 WHERE id=?", $id);
+  $DB->safequery("UPDATE ".$DB->ftable(topics)." SET views = views + 1 WHERE id=?", $id);
 
   if($PAGE->jsaccess) {
    $PAGE->JS("update","page",$page);

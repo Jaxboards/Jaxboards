@@ -81,7 +81,7 @@ class LOGREG{
      "ip"=>$JAX->ip2int(),
      "wysiwyg"=>1
     ));
-	$DB->safequery("UPDATE stats SET members = members + 1, last_register = ?", $DB->insert_id(1));
+	$DB->safequery("UPDATE ".$DB->ftable(stats)." SET members = members + 1, last_register = ?", $DB->insert_id(1));
     $this->login($name,$pass1);
    }
 
