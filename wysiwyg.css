@@ -1,7 +1,7 @@
 .editorframe{background:#FFF;border:1px solid #000;}
 
-.editbar{display:block;text-align:left;background:url(wysiwygbar.png) bottom right;width:800px;height:24px;overflow:hidden;}
-.editbar a{background:url(wysiwygbar.png);height:24px;display:inline-block;}
+.editbar{display:block;text-align:left;background:url(Service/wysiwygbar.png) bottom right;width:800px;height:24px;overflow:hidden;}
+.editbar a{background:url(Service/wysiwygbar.png);height:24px;display:inline-block;}
 .editbar .bold{width:32px;}
 .editbar .italic{width:33px;background-position:-32px 0;}
 .editbar .underline{width:35px;background-position:-65px 0;}
