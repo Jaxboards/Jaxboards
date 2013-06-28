@@ -14,6 +14,7 @@ $CFG=Array(
 "postmaxsize"=>50000,
 "badnamechars"=>"@[^\w']@",
 "maxfilesize"=>5*1024*1024,
+"timetologout"=>900,
 "images"=>Array("jpg","jpeg","png","gif","bmp")
 );
 ?>
