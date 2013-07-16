@@ -2,9 +2,10 @@
 $PAGE->loadmeta("idx");
 new IDX;
 class IDX{
-	function IDX(){
+	/* Redundant constructor unnecesary in newer PHP versions. */
+	/* function IDX(){
 		$this->__construct();
-	}
+	} */
 	function __construct(){
 		global $PAGE,$CFG,$JAX,$SESS;
         if($JAX->b['markread']) {$PAGE->JS("softurl");$SESS->forumsread=$SESS->topicsread="";$SESS->readtime=time();}

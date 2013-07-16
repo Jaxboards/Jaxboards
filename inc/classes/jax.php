@@ -1,6 +1,7 @@
 <?php
 class JAX{
- function JAX(){$this->__construct();}
+ /* Redundant constructor unnecesary in newer PHP versions. */
+ /* function JAX(){$this->__construct();} */
  function __construct(){
   $this->c=$this->filterInput($_COOKIE);
   $this->g=$this->filterInput($_GET);

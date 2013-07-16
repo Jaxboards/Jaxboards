@@ -3,9 +3,10 @@ class SESS{
  var $data=Array();
  var $bots=Array("google"=>"Googlebot","bingbot"=>"Bing","yahoo! slurp"=>"Yahoo","mj12bot"=>"MJ12bot","baidu"=>"Baidu","discobot"=>"DiscoBot");
  var $changedData=Array();
- function SESS($sid){
+ /* Redundant constructor unnecesary in newer PHP versions. */
+ /* function SESS($sid){
   $this->__construct($sid);
- }
+ } */
  function __construct($sid){
   $this->data=$this->getSess($sid);
   $this->data['vars']=unserialize($this->data['vars']);

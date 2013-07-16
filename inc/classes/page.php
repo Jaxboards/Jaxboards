@@ -1,7 +1,8 @@
 <?php
 class PAGE{
  var $metadefs=Array();
- function PAGE(){$this->__construct();}
+ /* Redundant constructor unnecesary in newer PHP versions. */
+ /* function PAGE(){$this->__construct();} */
  function __construct(){
   $this->JSOutput=Array();
   $this->jsaccess=$_SERVER['HTTP_X_JSACCESS'];

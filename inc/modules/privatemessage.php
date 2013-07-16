@@ -1,7 +1,8 @@
 <?php
 new IM;
 class IM{
- function IM(){$this->__construct();}
+ /* Redundant constructor unnecesary in newer PHP versions. */
+ /* function IM(){$this->__construct();} */
  function __construct(){
   global $JAX,$DB,$PAGE,$SESS;
   $im=$JAX->p['im_im'];
