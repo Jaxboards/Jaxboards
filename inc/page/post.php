@@ -6,9 +6,10 @@ $PAGE->metadefs['post-preview']=$PAGE->meta('box',"","Post Preview","%s");
 
 new POST;
 class POST{
- function POST(){
+ /* Redundant constructor unnecesary in newer PHP versions. */
+ /* function POST(){
   $this->__construct();
- }
+ } */
  function __construct(){
   global $JAX,$PAGE;
   $this->tid=$JAX->b['tid'];

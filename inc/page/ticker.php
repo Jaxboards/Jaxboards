@@ -2,7 +2,8 @@
 $PAGE->loadmeta('ticker');
 new ticker;
 class ticker{
- function ticker(){$this->__construct();}
+ /* Redundant constructor unnecesary in newer PHP versions. */
+ /* function ticker(){$this->__construct();} */
  function __construct(){
   global $PAGE;
   $this->maxticks=60;

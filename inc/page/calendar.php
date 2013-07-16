@@ -2,7 +2,8 @@
 $PAGE->loadmeta('calendar');
 new CALENDAR;
 class CALENDAR{
-    function CALENDAR(){$this->__construct();}
+    /* Redundant constructor unnecesary in newer PHP versions. */
+    /* function CALENDAR(){$this->__construct();} */
     function __construct(){
         global $JAX;
         if(isset($JAX->b['month'])) {

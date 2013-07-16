@@ -3,9 +3,10 @@ $PAGE->loadmeta('ucp');
 
 new UCP;
 class UCP{
- function UCP(){
+ /* Redundant constructor unnecesary in newer PHP versions. */
+ /* function UCP(){
   $this->__construct();
- }
+ } */
  function __construct(){
   global $PAGE,$JAX,$USER,$DB;
   if(!$USER||$USER['group_id']==4) return $PAGE->location("?");

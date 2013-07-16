@@ -2,7 +2,8 @@
 $PAGE->loadmeta('logreg');
 $IDX=new LOGREG;
 class LOGREG{
- function LOGREG(){$this->__construct();}
+ /* Redundant constructor unnecesary in newer PHP versions. */
+ /* function LOGREG(){$this->__construct();} */
  function __construct(){
   global $JAX,$PAGE;
   $this->privatekey="6Lcyub0SAAAAAC6ig1rao67cgoPQ0qaouRDox_7G";

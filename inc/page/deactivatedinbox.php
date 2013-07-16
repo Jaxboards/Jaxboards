@@ -4,7 +4,8 @@ $PAGE->metadefs['inbox-messages-listing']='<table class="listing">
 
 $IDX=new INBOX;
 class INBOX{
- function INBOX(){$this->__construct();}
+ /* Redundant constructor unnecesary in newer PHP versions. */
+ /* function INBOX(){$this->__construct();} */
  function __construct(){
   global $JAX,$PAGE,$USER;
   if(!$USER) return $PAGE->location("?");

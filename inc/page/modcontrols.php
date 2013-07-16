@@ -3,7 +3,8 @@ $PAGE->loadmeta('modcp');
 
 new modcontrols;
  class modcontrols{
-  function modcontrols(){$this->__construct();}
+  /* Redundant constructor unnecesary in newer PHP versions. */
+  /* function modcontrols(){$this->__construct();} */
   function __construct(){
    global $JAX,$PAGE,$USER;
    

@@ -8,9 +8,10 @@ class userprofile{
 
  var $contacturls=Array("skype"=>"skype:%s","msn"=>"msnim:chat?contact=%s","gtalk"=>"gtalk:chat?jid=%s","aim"=>"aim:goaim?screenname=%s","yim"=>"ymsgr:sendim?%s","steam"=>"http://steamcommunity.com/id/%s","twitter"=>"http://twitter.com/%s");
 
- function userprofile(){
+ /* Redundant constructor unnecesary in newer PHP versions. */
+ /* function userprofile(){
   $this->__construct();
- }
+ } */
  function __construct(){
   global $JAX,$PAGE;
   preg_match("@\d+@",$JAX->b['act'],$m);

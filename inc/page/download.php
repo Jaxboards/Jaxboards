@@ -1,7 +1,8 @@
 <?php
 new downloader;
 class downloader{
- function downloader(){$this->__construct();}
+ /* Redundant constructor unnecesary in newer PHP versions. */
+ /* function downloader(){$this->__construct();} */
  function __construct(){
   global $JAX,$DB;
   $id=$JAX->b['id'];

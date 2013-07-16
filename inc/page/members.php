@@ -2,7 +2,8 @@
 $PAGE->loadmeta('members');
 new members;
 class members{
- function members(){$this->__construct();}
+ /* Redundant constructor unnecesary in newer PHP versions. */
+ /* function members(){$this->__construct();} */
  function __construct(){
   global $JAX,$PAGE;
   $this->page=0;

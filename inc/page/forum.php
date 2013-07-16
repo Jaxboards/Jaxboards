@@ -3,7 +3,8 @@ $PAGE->loadmeta("forum");
 
 $IDX=new FORUM;
 class FORUM{
- function FORUM(){$this->__construct();}
+ /* Redundant constructor unnecesary in newer PHP versions. */
+ /* function FORUM(){$this->__construct();} */
  function __construct(){
   global $JAX,$PAGE;
   

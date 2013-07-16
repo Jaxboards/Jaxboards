@@ -25,7 +25,8 @@ class search{
   if($JAX->b['searchterm']||$JAX->b['page']) $this->dosearch();
   else $this->form();
  }
- function search(){$this->__constructor();}
+ /* Redundant constructor unnecesary in newer PHP versions. */
+ /* function search(){$this->__constructor();} */
  
  function form(){
   global $PAGE,$JAX,$SESS;

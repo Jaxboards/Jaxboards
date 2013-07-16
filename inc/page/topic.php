@@ -4,7 +4,8 @@ $PAGE->loadmeta("topic");
 //Topics module
 $IDX=new TOPIC;
 class TOPIC{
- function TOPIC(){ $this->__construct(); }
+ /* Redundant constructor unnecesary in newer PHP versions. */
+ /* function TOPIC(){ $this->__construct(); } */
  function __construct(){
   global $JAX,$PAGE;
 
