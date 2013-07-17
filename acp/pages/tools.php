@@ -72,7 +72,8 @@ class tools{
             $page.=$f[0];
             outline("--".$f[0]);
             $createtable=$DB->safespecial("SHOW CREATE TABLE %t",$f[0]);
-            outline(array_pop($DB->row($createtable)));
+	    $thisrow = $DB->row($createtable);
+            outline(array_pop($thisrow));
 	    $DB->disposeresult($createtable);
 
             $select=$DB->safeselect("*",$f[0]);

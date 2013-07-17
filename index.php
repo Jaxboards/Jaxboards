@@ -126,7 +126,8 @@ if(!$PAGE->jsaccess) {
  $PAGE->append('NAVIGATION',$PAGE->meta("navigation",$PERMS['can_moderate']?'<li><a href="?act=modcontrols&do=cp">Mod CP</a></li>':'',$PERMS['can_access_acp']?'<li><a href="./acp/" target="_BLANK">ACP</a></li>':'',$CFG['navlinks']?$CFG['navlinks']:''));
  if($USER&&$USER['id']) {
   $result = $DB->safeselect("count(id)","messages","WHERE `read`=0 AND `to`=?", $USER['id']);
-  $nummessages=array_pop($DB->row($result));
+  $thisrow = $DB->row($result);
+  $nummessages=array_pop($thisrow);
   $DB->disposeresult($result);
  }
 $PAGE->addvar('inbox',$nummessages);
@@ -140,7 +141,7 @@ if($nummessages) $PAGE->append('FOOTER','<div id="notification" class="newmessag
   $PAGE->append('USERBOX',
    ($USER['id']?$PAGE->meta('userbox-logged-in',$PAGE->meta('user-link',$USER['id'],$USER['group_id'],$USER['display_name']),$JAX->smalldate($USER['last_visit']),$nummessages):$PAGE->meta('userbox-logged-out'))
  );
-} //end if jsaccess only
+} //end if !jsaccess only
  $PAGE->addvar('groupid',$JAX->pick($USER['group_id'],3));
  $PAGE->addvar('userposts',$USER['posts']);
  $PAGE->addvar('grouptitle',$PERMS['title']);

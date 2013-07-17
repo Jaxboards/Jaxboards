@@ -70,7 +70,8 @@ class stats{
 
   //get # of members
   $result = $DB->safeselect("count(id)","members");
-  $stat['members']=array_pop($DB->row($result));
+  $thisrow = $DB->row($result);
+  $stat['members']=array_pop($thisrow);
   $DB->disposeresult($result);
 
   //Update global board stats

@@ -102,7 +102,8 @@ class SHOUTBOX{
   $pagen=0;
   if(is_numeric($JAX->b['page'])&&$JAX->b['page']>1) $pagen=$JAX->b['page']-1;
   $result = $DB->safeselect("count(*)","shouts");
-  $numshouts=array_pop($DB->row($result));
+  $thisrow = $DB->row($result);
+  $numshouts=array_pop($thisrow);
   $DB->disposeresult($result);
   if($numshouts>1000) $numshouts=1000;
   if($numshouts>$perpage) {

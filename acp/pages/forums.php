@@ -151,9 +151,10 @@ class forums{
    $sub=$JAX->p['showsub'];
    if(is_numeric($JAX->p['orderby'])) $orderby=$JAX->p['orderby'];
    $result = $DB->safeselect("id","categories");
+   $thisrow = $DB->row($result);
    $write=Array(
     'title'=>$JAX->p['title'],
-    'cat_id'=>$JAX->pick(@$fdata['cat_id'],array_pop($DB->row($result))),
+    'cat_id'=>$JAX->pick(@$fdata['cat_id'],array_pop($thisrow),
     'subtitle'=>$JAX->p['description'],
     'perms'=>$groupperms,
     'redirect'=>$JAX->p['redirect'],

@@ -73,7 +73,8 @@ class POST{
    $id=$DB->insert_id(1);
   } else {
    $result = $DB->safeselect("id","files","WHERE hash=?", $md5);
-   $id=array_pop($DB->row($result));
+   $thisrow = $DB->row($result);
+   $id=array_pop($thisrow);
    $DB->disposeresult($result);
 
   }

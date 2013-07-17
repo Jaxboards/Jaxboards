@@ -250,7 +250,8 @@ new modcontrols;
 	//make the first post in the topic have newtopic=1
 	 //get the op
 	 $result = $DB->safeselect("min(id)","posts","WHERE tid=?", $DB->basicvalue($JAX->p['ot']));
-	 $op=array_pop($DB->row($result));
+	 $thisrow = $DB->row($result);
+	 $op=array_pop($thisrow);
          $DB->disposeresult($result);
 
 	 $DB->safeupdate("posts",Array("newtopic"=>1),"WHERE id=?", $op);

@@ -74,7 +74,8 @@ class TOPIC{
 
   /*generate pages*/
   $result = $DB->safeselect("count(*)","posts","WHERE tid=?", $id);
-  $posts=array_pop($DB->row($result));
+  $thisrow = $DB->row($result);
+  $posts=array_pop($thisrow);
   $DB->disposeresult($result);
 
   $totalpages=ceil($posts/$this->numperpage);

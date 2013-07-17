@@ -38,7 +38,8 @@ class members{
   }
 
   $nummemberquery = $DB->safequery("SELECT FOUND_ROWS()");
-  $nummembers=array_pop($DB->row($nummemberquery));
+  $thisrow = $DB->row($nummemberquery);
+  $nummembers=array_pop($thisrow);
   // $DB->disposeresult($nummemberquery);
 	// syslog(LOG_EMERG, "Member query failed: ".$DB->error(1)."\n");
 

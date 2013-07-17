@@ -524,7 +524,8 @@ $this->getlocationforform()
 
    $mid=$message['from'];
    $result = $DB->safeselect("display_name","members","WHERE id=?", $mid);
-   $mname=array_pop($DB->row($result));
+   $thisrow = $DB->row($result);
+   $mname=array_pop($thisrow);
    $DB->disposeresult($result);
 
    $msg="\n\n\n".'[quote='.$mname.']'.$message['message'].'[/quote]';
@@ -537,7 +538,8 @@ $this->getlocationforform()
    $showfull=1;
    $mid=$JAX->b['mid'];
    $result = $DB->safeselect("display_name","members","WHERE id=?", $mid);
-   $mname=array_pop($DB->row($result));
+   $thisrow = $DB->row($result);
+   $mname=array_pop($thisrow);
    $DB->disposeresult($result);
 
    if(!$mname) {$mid=0;$mname='';}
