@@ -65,7 +65,8 @@ class UCP{
   if(!$PAGE->jsaccess||$PAGE->jsnewlocation) $this->showucp();
  }
  function getlocationforform(){
-  return JAX::hiddenFormFields(Array('act'=>'ucp','what'=>$this->what));
+  global $JAX;
+  return $JAX->hiddenFormFields(Array('act'=>'ucp','what'=>$this->what));
  }
  function showmain(){
   global $PAGE,$JAX,$USER,$DB;
@@ -209,7 +210,7 @@ $this->getlocationforform().$JAX->hiddenFormFields(Array('submit'=>'true')),
    }
    $update=true;
   }
-  $this->ucppage='Your avatar: <span class="avatar"><img src="'.JAX::pick($USER['avatar'],$PAGE->meta('default-avatar')).'" alt="Unable to load avatar"></span><br /><br />
+  $this->ucppage='Your avatar: <span class="avatar"><img src="'.$JAX->pick($USER['avatar'],$PAGE->meta('default-avatar')).'" alt="Unable to load avatar"></span><br /><br />
 <form onsubmit="return RUN.submitForm(this)" method="post">'.
 $this->getlocationforform()
 .($e?$PAGE->error($e):"").'<input type="text" name="changedava" value="'.$JAX->blockhtml($USER['avatar']).'" />

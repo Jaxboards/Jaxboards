@@ -195,10 +195,10 @@ class FORUM{
  }
  
  function markread($id){
-  global $SESS;
-  $forumsread=JAX::parsereadmarkers($SESS->forumsread);
+  global $SESS,$JAX;
+  $forumsread=$JAX->parsereadmarkers($SESS->forumsread);
   $forumsread[$id]=time();
-  $SESS->forumsread=JAX::base128encode($forumsread,true);
+  $SESS->forumsread=$JAX->base128encode($forumsread,true);
  }
 }
 ?>

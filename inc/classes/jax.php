@@ -32,7 +32,7 @@ class JAX{
   return ($autodate?'<span class="autodate smalldate" title="'.$date.'">':'').date("g:i".($seconds?":s":"")."a, n/j/y",$date).($autodate?'</span>':'');
  }
 
-function json_encode($a,$forceaa=false){
+public static function json_encode($a,$forceaa=false){
  $keys=array_keys($a);
  $r="";
  $replaces=Array("\\"=>"\\\\",'"'=>'\"',"\r\n"=>"\\n","\n"=>"\\n","\r"=>"\\n");
@@ -56,17 +56,17 @@ function json_encode($a,$forceaa=false){
  return $r;
 }
 
-function json_decode($a,$aa=true){
+public static function json_decode($a,$aa=true){
  return json_decode($a,$aa);
 }
 
- function utf8_encode($a){
+ public static function utf8_encode($a){
   if(is_array($a)) foreach($a as $k=>$v) $a[$k]=self::utf8_encode($v);
   else $a=utf8_encode($a);
   return $a;
  }
 
- function is_numerical_array($a){
+ public static function is_numerical_array($a){
   return range(0,count($a)-1)==array_keys($a);
  }
 
@@ -398,7 +398,7 @@ function json_decode($a,$aa=true){
   return '<div class="activity '.$a['type'].'">'.$r.'</div>';
  }
 
- function pick(){
+ public static function pick(){
   $args=func_get_args();
   foreach($args as $v) if($v) break;
   return $v;
@@ -505,7 +505,7 @@ function json_decode($a,$aa=true){
   return !$host?$ip:$host[0]['target'];
  }
  
- function base128encodesingle($int){
+ public static function base128encodesingle($int){
   $int=(int)$int;
   $w=chr($int&127);
   while($int>127) {
@@ -522,7 +522,7 @@ function json_decode($a,$aa=true){
   return $r;
  }
 
- function base128decode($data){
+ public static function base128decode($data){
   $ints=Array();$x=0;
   while(isset($data[$x])){
    $int=0;

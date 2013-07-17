@@ -51,7 +51,7 @@ class POST{
   return $this->upload($fileobj,$data['uid']);
  }
  function upload($fileobj,$uid=false){
-  global $CFG,$DB,$USER;
+  global $CFG,$DB,$USER,$JAX;
   if($uid===false) $uid=$USER['id'];
   if($uid===false&&!$USER) return "must be logged in";
   $size=filesize($fileobj['tmp_name']);
@@ -69,7 +69,7 @@ class POST{
   //md5 collisions?
   if (!is_file($file)) {
    move_uploaded_file($fileobj['tmp_name'],$file);
-   $DB->safeinsert("files",Array('hash'=>$md5,'name'=>$fileobj['name'],'uid'=>$uid,'size'=>$size,'ip'=>JAX::ip2int()));
+   $DB->safeinsert("files",Array('hash'=>$md5,'name'=>$fileobj['name'],'uid'=>$uid,'size'=>$size,'ip'=>$JAX->ip2int()));
    $id=$DB->insert_id(1);
   } else {
    $result = $DB->safeselect("id","files","WHERE hash=?", $md5);

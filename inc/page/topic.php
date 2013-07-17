@@ -166,7 +166,7 @@ class TOPIC{
   $tdata=$DB->row($result);
   $DB->disposeresult($result);
 
-  $PAGE->JS("window",Array("id"=>"qreply","title"=>$JAX->wordfilter($tdata['title']),"content"=>$PAGE->meta("topic-reply-form",$id,JAX::blockhtml($prefilled)),"resize"=>"textarea"));
+  $PAGE->JS("window",Array("id"=>"qreply","title"=>$JAX->wordfilter($tdata['title']),"content"=>$PAGE->meta("topic-reply-form",$id,$JAX->blockhtml($prefilled)),"resize"=>"textarea"));
   $PAGE->JS("updateqreply",'');
  }
 
@@ -295,7 +295,7 @@ class TOPIC{
 
  function generatepoll($q,$type,$choices,$results){
   if(!$choices) $choices=Array();
-  global $PAGE,$USER;
+  global $PAGE,$USER,$JAX;
   if($USER){
    //accomplish three things at once:
    //-determine if the user has voted
@@ -320,7 +320,7 @@ class TOPIC{
    $page.="<tr><td colspan='3' class='totalvotes'>Total Votes: ".$usersvoted."</td></tr>";
    $page.="</table>";
   } else {
-   $page="<form method='post' action='?' onsubmit='return RUN.submitForm(this)'>".JAX::hiddenFormFields(Array("act"=>"vt".$this->id,"votepoll"=>1));
+   $page="<form method='post' action='?' onsubmit='return RUN.submitForm(this)'>".$JAX->hiddenFormFields(Array("act"=>"vt".$this->id,"votepoll"=>1));
    if($type=='multi') {
     foreach($choices as $k=>$v) {$page.="<div class='choice'><input type='checkbox' name='choice[]' value='$k' id='poll_$k' /> <label for='poll_$k'>$v</label></div>";}
    } else {
@@ -510,10 +510,10 @@ class TOPIC{
  }
   
  function markread($id){
-  global $SESS,$PAGE;
-  $topicsread=JAX::parsereadmarkers($SESS->topicsread);
+  global $SESS,$PAGE,$JAX;
+  $topicsread=$JAX->parsereadmarkers($SESS->topicsread);
   $topicsread[$id]=time();
-  $SESS->topicsread=JAX::base128encode($topicsread,true);
+  $SESS->topicsread=$JAX->base128encode($topicsread,true);
  }
  function listrating($pid){
   global $DB,$PAGE,$CFG;

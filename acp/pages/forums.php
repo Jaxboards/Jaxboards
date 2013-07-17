@@ -71,7 +71,7 @@ class forums{
  }
  
  //saves the posted tree to mysql
- function mysqltree($tree,$p='',$x=0){
+ public static function mysqltree($tree,$p='',$x=0){
   global $DB;
   $r=Array();
   if(!is_array($tree)) {
@@ -91,7 +91,7 @@ class forums{
    }
   }
  }
- function printtree($t,$data,$class=false,$highlight=0){
+ public static function printtree($t,$data,$class=false,$highlight=0){
   $r = "";
   foreach($t as $k=>$v) {
    $classes=Array();
@@ -344,7 +344,7 @@ for(var x=1;x<perms.rows.length;x++){
   else {
    $page.='<form method="post"><label>Move all forums to:</label><select name="moveto">';
    foreach($categories as $k=>$v) $page.='<option value="'.$k.'">'.$v.'</option>';
-   $page.='</select><br /><input type="submit" value="Delete \''.JAX::blockhtml($cattitle).'\'" name="submit" /></select></form>';
+   $page.='</select><br /><input type="submit" value="Delete \''.$JAX->blockhtml($cattitle).'\'" name="submit" /></select></form>';
   }
   $PAGE->addContentBox("Category Deletion",$page);
  }

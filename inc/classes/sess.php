@@ -66,7 +66,7 @@ class SESS{
   unset($this->changedData[$a]);
  }
  function clean($uid){
-  global $DB,$CFG,$PAGE;
+  global $DB,$CFG,$PAGE,$JAX;
   $timeago=time()-$CFG['timetologout'];
   if($uid){
    $result = $DB->safeselect("max(last_action)","session","WHERE uid=? GROUP BY uid",
@@ -75,7 +75,7 @@ class SESS{
    $DB->disposeresult($result);
    if($la) $la=$la[0];
    $DB->safedelete("session","WHERE uid=? AND last_update<?", $DB->basicvalue($uid), $timeago);
-   $this->__set("readtime",JAX::pick($la,0));
+   $this->__set("readtime",$JAX->pick($la,0));
   }
   $yesterday=mktime(0,0,0);
   $query=$DB->safeselect("uid,max(last_action) last_action","session","WHERE last_update<? GROUP BY uid",

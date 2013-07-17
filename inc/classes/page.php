@@ -77,7 +77,7 @@ class PAGE{
  }
 
  function out(){
-  global $ads,$SESS;
+  global $ads,$SESS,$JAX;
   if (isset($this->done)) return false;
   $this->done=true;
   $this->parts['path']="<div id='path' class='path'>".$this->buildpath()."</div>";
@@ -86,7 +86,7 @@ class PAGE{
   if ($this->jsaccess) {
    header("Content-type:text/plain");
    foreach($this->JSOutput as $k=>$v) $this->JSOutput[$k]=$SESS->addSessID($v);
-   echo !empty($this->JSOutput)?JAX::json_encode($this->JSOutput):"";
+   echo !empty($this->JSOutput)?$JAX::json_encode($this->JSOutput):"";
   }
   else {
    $autobox=Array("PAGE","COPYRIGHT","USERBOX");

@@ -47,7 +47,7 @@ class ticker{
    LEFT JOIN %t m2 ON t.auth_id=m2.id
    ",
 	array('posts','topics','forums','members','members'),
-	JAX::pick($SESS->vars['tickid'],0),
+	$JAX->pick($SESS->vars['tickid'],0),
 	$this->maxticks);
   $first=false;
   while($f=$DB->row($result)){

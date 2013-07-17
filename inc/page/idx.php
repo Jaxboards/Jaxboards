@@ -196,16 +196,16 @@ class IDX{
 		if(!empty($list)) $PAGE->JS("onlinelist",$list);
 	}
 	function updateLastPosts(){
-		global $DB,$SESS,$PAGE;
+		global $DB,$SESS,$PAGE,$JAX;
 		$DB->safespecial("SELECT f.id,f.lp_tid,f.lp_topic,f.lp_date,f.lp_uid,f.topics,f.posts,m.display_name lp_name,m.group_id lp_gid FROM %t AS f LEFT JOIN %t AS m ON f.lp_uid=m.id WHERE f.lp_date>=?",
 			array("forums","members"),
-			JAX::pick($SESS->last_update,time())
+			$JAX->pick($SESS->last_update,time())
 		);
 
 
 		while($f=$DB->row()) {
             $PAGE->JS("addclass","#fid_".$f['id'],"unread");
-            $PAGE->JS("update","#fid_".$f['id']."_icon",JAX::pick($PAGE->meta('icon-unread'),$PAGE->meta('idx-icon-unread')));
+            $PAGE->JS("update","#fid_".$f['id']."_icon",$JAX->pick($PAGE->meta('icon-unread'),$PAGE->meta('idx-icon-unread')));
 			$PAGE->JS("update","#fid_".$f['id']."_lastpost",$this->formatlastpost($f),"1");
 			$PAGE->JS("update","#fid_".$f['id']."_topics",$PAGE->meta('idx-topics-count',$f['topics']));
 			$PAGE->JS("update","#fid_".$f['id']."_replies",$PAGE->meta('idx-replies-count',$f['posts']));

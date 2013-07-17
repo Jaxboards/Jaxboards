@@ -124,7 +124,7 @@ class settings{
    $page.=$PAGE->success("Page saved. Preview <a href='/?act=$pageurl'>here</a>");
   }
   $page.="<form method='post'>
-  <textarea name='pagecontents' class='editor'>".JAX::blockhtml($pageinfo['page'])."</textarea><br />
+  <textarea name='pagecontents' class='editor'>".$JAX->blockhtml($pageinfo['page'])."</textarea><br />
   <input type='submit' value='Save' />
   </form>";
   $PAGE->addContentBox("Editing Page: $pageurl",$page);

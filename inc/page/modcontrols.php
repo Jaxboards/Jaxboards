@@ -282,7 +282,7 @@ new modcontrols;
    $PAGE->JS("alert","under construction");
   }
   
-  function load(){
+  public static function load(){
    global $PAGE;
    $script=file_get_contents("Script/modcontrols.php");
    if($PAGE&&$PAGE->jsaccess){
