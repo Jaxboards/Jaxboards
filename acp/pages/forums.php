@@ -154,7 +154,7 @@ class forums{
    $thisrow = $DB->row($result);
    $write=Array(
     'title'=>$JAX->p['title'],
-    'cat_id'=>$JAX->pick(@$fdata['cat_id'],array_pop($thisrow),
+    'cat_id'=>$JAX->pick(@$fdata['cat_id'],array_pop($thisrow)),
     'subtitle'=>$JAX->p['description'],
     'perms'=>$groupperms,
     'redirect'=>$JAX->p['redirect'],
