@@ -7,7 +7,6 @@ function getJXBDBaseDir() {
     var elts = document.getElementsByTagName("script");
     for (var i=0; i < elts.length; i++) {
 	var elt = elts[i];
-	// console.log("Script at:"+elt.src+"\n");
 	if (elt.src.substr(elt.src.length - 8, 8) == "jsrun.js") return elt.src.substr(0, elt.src.length - 8);
     }
     return null;
@@ -393,7 +392,6 @@ function RUNF(){
  if(Sound) {
   basedir = getJXBDBaseDir();
 
-  // console.log("BASEDIR: "+basedir+"\n");
   Sound.load("sbblip",basedir+"Sounds/blip.mp3",false);
   Sound.load("imbeep",basedir+"Sounds/receive.mp3",false);
   Sound.load("imnewwindow",basedir+"Sounds/receive.mp3",false);
