@@ -1,13 +1,13 @@
 <?php
 $CFG=Array(
 /* "mail_from"=>"jaxboards.com <no-reply@jaxboards.com>", */
-"mail_from"=>"WebScriptedTV.com <no-reply@webscriptedtv.com>",
-"boardname"=>"WebScriptedTV.com Forums",
+"mail_from"=>"Example Forums <no-reply@example.com>",
+"boardname"=>"Example Forums",
 "prefix"=>"",
 "updateinterval"=>5,
-"sql_host"=>"127.0.0.1",
-"sql_username"=>"jax",
-"sql_password"=>"mitigate.frelling36",
+"sql_host"=>"127.0.0.1", /* localhost uses local UNIX domain socket */
+"sql_username"=>"SQLUSER",
+"sql_password"=>"SQLPASS",
 "sql_prefix"=>"jaxboards_",
 "sql_db"=>"jaxboards",
 "dthemepath"=>(defined("INACP")?"../":"")."Service/Themes/Default/",
