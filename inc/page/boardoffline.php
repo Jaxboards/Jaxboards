@@ -1,7 +1,8 @@
-<?
+<?php
 new offlineboard;
 class offlineboard{
-function __construct(){$this->offlineboard();}
+/* Redundant constructor unnecesary in newer PHP versions. */
+/* function __construct(){$this->offlineboard();} */
 function offlineboard(){
  global $PAGE,$JAX,$CFG;
  if($perms['can_view_board']) {

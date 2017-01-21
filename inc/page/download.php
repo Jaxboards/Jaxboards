@@ -1,16 +1,19 @@
-<?
+<?php
 new downloader;
 class downloader{
- function downloader(){$this->__construct();}
+ /* Redundant constructor unnecesary in newer PHP versions. */
+ /* function downloader(){$this->__construct();} */
  function __construct(){
   global $JAX,$DB;
   $id=$JAX->b['id'];
   if(is_numeric($id)) {
-   $DB->select("*","files","WHERE id='".$id."'");
-   $data=$DB->row();
+   $result = $DB->safeselect("*","files","WHERE id=?", $id);
+   $data=$DB->row($result);
+   $DB->disposeresult($result);
+
   }
   if($data){
-   $DB->update("files",Array("downloads"=>Array("downloads+1")),"WHERE id='".$id."'");
+   $DB->safequery("UPDATE ".$DB->ftable(files)." SET downloads = downloads + 1 WHERE id=?", $id);
    $ext=explode(".",$data['name']);
    if(count($ext)==1) $ext="";
    else $ext=strtolower(array_pop($ext));

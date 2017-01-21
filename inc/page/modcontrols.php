@@ -1,9 +1,10 @@
-<?
+<?php
 $PAGE->loadmeta('modcp');
 
 new modcontrols;
  class modcontrols{
-  function modcontrols(){$this->__construct();}
+  /* Redundant constructor unnecesary in newer PHP versions. */
+  /* function modcontrols(){$this->__construct();} */
   function __construct(){
    global $JAX,$PAGE,$USER;
    
@@ -34,20 +35,25 @@ new modcontrols;
    switch($do){
     case 'move':$PAGE->JS('modcontrols_move',0);break;
     case 'moveto':
-     if(!is_numeric($JAX->p['id'])||!$DB->row($DB->select('*','forums','WHERE id='.$DB->evalue($JAX->p['id'])))) return;
-     $DB->select("fid","topics","WHERE id IN (".$SESS->vars['modtids'].")");
-     while($f=$DB->row()) $fids[$f['fid']]=1;
+     $result = $DB->safeselect('*','forums','WHERE id=?', $DB->basicvalue($JAX->p['id']));
+     $rowfound = $DB->row($result);
+     $DB->disposeresult($result);
+     if(!is_numeric($JAX->p['id'])|| !$rowfound) return;
+
+     $result = $DB->safeselect("fid","topics","WHERE id IN ?", explode(",", $SESS->vars['modtids']));
+     while($f=$DB->row($result)) $fids[$f['fid']]=1;
+
      $fids=array_flip($fids);
-     $DB->update("topics",Array("fid"=>$JAX->p['id']),"WHERE id IN (".$SESS->vars['modtids'].")");
+     $DB->safeupdate("topics",Array("fid"=>$JAX->p['id']),"WHERE id IN ?", explode(",", $SESS->vars['modtids']));
       $this->cancel();
      $fids[]=$JAX->p['id'];
      foreach($fids as $v) $DB->fixForumLastPost($v);
      $PAGE->location("?act=vf".$JAX->p['id']);
     break;
-    case 'pin':$DB->update("topics",Array("pinned"=>1),"WHERE id IN (".$SESS->vars['modtids'].")");$PAGE->JS("alert","topics pinned!");$this->cancel();break;
-    case 'unpin':$DB->update("topics",Array("pinned"=>0),"WHERE id IN (".$SESS->vars['modtids'].")");$PAGE->JS("alert","topics unpinned!");$this->cancel();break;
-    case 'lock':$DB->update("topics",Array("locked"=>1),"WHERE id IN (".$SESS->vars['modtids'].")");$PAGE->JS("alert","topics locked!");$this->cancel();break;
-    case 'unlock':$DB->update("topics",Array("locked"=>0),"WHERE id IN (".$SESS->vars['modtids'].")");$PAGE->JS("alert","topics unlocked!");$this->cancel();break;
+    case 'pin':$DB->safeupdate("topics",Array("pinned"=>1),"WHERE id IN ?", explode(",", $SESS->vars['modtids']));$PAGE->JS("alert","topics pinned!");$this->cancel();break;
+    case 'unpin':$DB->safeupdate("topics",Array("pinned"=>0),"WHERE id IN ?", explode(",", $SESS->vars['modtids']));$PAGE->JS("alert","topics unpinned!");$this->cancel();break;
+    case 'lock':$DB->safeupdate("topics",Array("locked"=>1),"WHERE id IN ?", explode(",", $SESS->vars['modtids']));$PAGE->JS("alert","topics locked!");$this->cancel();break;
+    case 'unlock':$DB->safeupdate("topics",Array("locked"=>0),"WHERE id IN ?", explode(",", $SESS->vars['modtids']));$PAGE->JS("alert","topics unlocked!");$this->cancel();break;
     case 'delete':$this->deletetopics();$this->cancel();break;
     case 'merge':$this->mergetopics();break;
    }
@@ -58,7 +64,7 @@ new modcontrols;
    switch($do){
     case 'move':$PAGE->JS('modcontrols_move',1);break;
     case 'moveto':
-     $DB->update("posts",Array("tid"=>$JAX->p['id']),"WHERE id IN (".$SESS->vars['modpids'].")");
+     $DB->safeupdate("posts",Array("tid"=>$JAX->p['id']),"WHERE id IN ?", explode(",", $SESS->vars['modpids']));
      $this->cancel();
      $PAGE->location("?act=vt".$JAX->p['id']);
     break;
@@ -78,8 +84,9 @@ new modcontrols;
    global $PAGE,$SESS,$DB,$USER;
    if(!is_numeric($pid)) return;
    
-   $DB->select("*","posts","WHERE id=".$DB->evalue($pid));
-   $postdata=$DB->row();
+   $result = $DB->safeselect("*","posts","WHERE id=?", $DB->basicvalue($pid));
+   $postdata=$DB->row($result);
+   $DB->disposeresult($result);
    
    if(!$postdata) return;
    elseif($postdata['newtopic']) return $this->modtopic($postdata['tid']);
@@ -88,8 +95,13 @@ new modcontrols;
    
    //see if they have permission to manipulate this post
    if(!$this->perms['can_moderate']) {
-    $DB->special("SELECT mods FROM %t WHERE id=(SELECT fid FROM %t WHERE id=".$postdata['tid'].")","forums","topics");
-    $mods=$DB->row();
+    $result = $DB->safespecial("SELECT mods FROM %t WHERE id=(SELECT fid FROM %t WHERE id=?)",
+	array("forums","topics"),
+	$postdata['tid']);
+
+    $mods=$DB->row($result);
+    $DB->disposeresult($result);
+
     if(!$mods) return;
     else $mods=explode(',',$mods['mods']);
     if(!in_array($USER['id'],$mods)) return $PAGE->JS("error","You don't have permission to be moderating in this forum");
@@ -115,8 +127,12 @@ new modcontrols;
    $PAGE->JS("softurl");
    if(!is_numeric($tid)) return;
    if(!$PERMS['can_moderate']) {
-    $DB->special("SELECT mods FROM %t WHERE id=(SELECT fid FROM %t WHERE id=".$DB->evalue($tid).")","forums","topics");
-    $mods=$DB->row();
+    $result = $DB->safespecial("SELECT mods FROM %t WHERE id=(SELECT fid FROM %t WHERE id=?)",
+	array("forums","topics"),
+	$DB->basicvalue($tid));
+    $mods=$DB->row($result);
+    $DB->disposeresult($result);
+
     if(!$mods) return $PAGE->JS("error",$DB->error());
     else $mods=explode(',',$mods['mods']);
     if(!in_array($USER['id'],$mods)) return $PAGE->JS("error","You don't have permission to be moderating in this forum");
@@ -140,25 +156,29 @@ new modcontrols;
    if(!$SESS->vars['modpids']) return $PAGE->JS("error","No posts to delete.");
    
    //get trashcan
-   $DB->select("id","forums","WHERE trashcan=1 LIMIT 1");
-   $trashcan=$DB->row();
+   $result = $DB->safeselect("id","forums","WHERE trashcan=1 LIMIT 1");
+   $trashcan=$DB->row($result);
+   $DB->disposeresult($result);
    
-   $DB->select("tid","posts","WHERE id IN(".$SESS->vars['modpids'].")");
+   $result = $DB->safeselect("tid","posts","WHERE id IN ?", explode(",", $SESS->vars['modpids']));
    
    //build list of tids that the posts were in
    $tids=Array();
    $pids=explode(",",$SESS->vars['modpids']);
-   while($f=$DB->row()) $tids[$f[0]]=1;
+   while($f=$DB->row($result)) $tids[$f[0]]=1;
+
    if($trashcan) {
     //get first & last post
     foreach($pids as $v) {
      if(!$op||$v<$op) $op=$v;
      if(!$lp||$v>$lp) $lp=$v;
     }
-    $DB->select("posts","WHERE id=".$DB->evalue($lp));
-    $lp=$DB->row();
+    $result = $DB->safeselect("posts","WHERE id=?", $DB->basicvalue($lp));
+    $lp=$DB->row($result);
+    $DB->disposeresult($result);
+
     //create a new topic
-    $DB->insert("topics",Array(
+    $DB->safeinsert("topics",Array(
      'title'=>'Posts deleted from: '.implode(',',array_keys($tids)),
      'op'=>$op,
      'auth_id'=>$USER['id'],
@@ -167,17 +187,18 @@ new modcontrols;
      'lp_uid'=>$lp['auth_id'],
      'replies'=>0
     ));
-    $tid=$DB->insert_id();
-    $DB->update("posts",Array("tid"=>$tid,"newtopic"=>0),"WHERE id IN (".$SESS->vars['modpids'].")");
-    $DB->update("posts",Array("newtopic"=>1),"WHERE id=".$DB->evalue($op));
+    $tid=$DB->insert_id(1);
+    $DB->safeupdate("posts",Array("tid"=>$tid,"newtopic"=>0),"WHERE id IN ?", explode(",", $SESS->vars['modpids']));
+    $DB->safeupdate("posts",Array("newtopic"=>1),"WHERE id=?", $DB->basicvalue($op));
     $tids[]=$tid;
      
    } else {
-    $DB->delete("posts","WHERE id IN (".$SESS->vars['modpids'].")");
+    $DB->safedelete("posts","WHERE id IN ?", explode(",", $SESS->vars['modpids']));
    }
    foreach($tids as $k=>$v){
     //recount replies
-    $DB->special("UPDATE %t SET replies=(SELECT count(*) FROM %t WHERE tid=$k)-1 WHERE id=$k","topics","posts");
+    $DB->safespecial("UPDATE %t SET replies=(SELECT count(*) FROM %t WHERE tid=?)-1 WHERE id=?",
+	array("topics","posts"), $k, $k);
    }
    //remove them from the page
    foreach($pids as $v) $PAGE->JS("removeel","#pid_".$v);
@@ -189,25 +210,27 @@ new modcontrols;
    $data=Array();
    
    //get trashcan id
-   $DB->select("id","forums","WHERE trashcan=1 LIMIT 1");
-   $trashcan=$DB->row();
+   $result = $DB->safeselect("id","forums","WHERE trashcan=1 LIMIT 1");
+   $trashcan=$DB->row($result);
+   $DB->disposeresult($result);
+
    $trashcan=$trashcan?$trashcan['id']:false;
-   $DB->select("fid,id","topics","WHERE id IN(".$SESS->vars['modtids'].")");
+   $result = $DB->safeselect("fid,id","topics","WHERE id IN ?", explode(",", $SESS->vars['modtids']));
    $delete=Array();
-   while($f=$DB->row()){
+   while($f=$DB->row($result)){
     $data[$f[0]]++;
     if($trashcan&&$trashcan==$f[0]) $delete[]=$f['id'];
    }
    if($trashcan) {
-    $DB->update("topics",Array("fid"=>$trashcan),"WHERE id IN (".$SESS->vars['modtids'].")");
+    $DB->safeupdate("topics",Array("fid"=>$trashcan),"WHERE id IN ?", explode(",", $SESS->vars['modtids']));
     $delete=implode(',',$delete);
     $data[$trashcan]=1;
    } else {
     $delete=$SESS->vars['modtids'];
    }
    if(!empty($delete)){
-    $DB->delete("posts","WHERE tid IN(".$delete.")");
-    $DB->delete("topics","WHERE id IN(".$delete.")");
+    $DB->safedelete("posts","WHERE tid IN ?", explode(",", $delete));
+    $DB->safedelete("topics","WHERE id IN ?", explode(",", $delete));
    }
    foreach($data as $k=>$v){
     $DB->fixForumLastPost($k);
@@ -222,27 +245,30 @@ new modcontrols;
    $exploded=explode(",",$SESS->vars['modtids']);
    if(is_numeric($JAX->p['ot'])&&in_array($JAX->p['ot'],$exploded)){
     //move the posts and set all posts to normal (newtopic=0)
-    $DB->update("posts",Array('tid'=>$JAX->p['ot'],'newtopic'=>'0'),"WHERE tid IN (".$SESS->vars['modtids'].")");
+    $DB->safeupdate("posts",Array('tid'=>$JAX->p['ot'],'newtopic'=>'0'),"WHERE tid IN ?", explode(",", $SESS->vars['modtids']));
 	
 	//make the first post in the topic have newtopic=1
 	 //get the op
-	 $DB->select("min(id)","posts","WHERE tid=".$DB->evalue($JAX->p['ot']));
-	 $op=array_pop($DB->row());
-	 $DB->update("posts",Array("newtopic"=>1),"WHERE id=$op");
+	 $result = $DB->safeselect("min(id)","posts","WHERE tid=?", $DB->basicvalue($JAX->p['ot']));
+	 $thisrow = $DB->row($result);
+	 $op=array_pop($thisrow);
+         $DB->disposeresult($result);
+
+	 $DB->safeupdate("posts",Array("newtopic"=>1),"WHERE id=?", $op);
 	
 	//also fix op
-	$DB->update("topics",Array("op"=>$op),"WHERE tid=".$DB->evalue($JAX->p['ot']));
+	$DB->safeupdate("topics",Array("op"=>$op),"WHERE tid=?", $DB->basicvalue($JAX->p['ot']));
 	unset($exploded[array_search($JAX->p['ot'],$exploded)]);
-	$DB->delete("topics","WHERE id IN (".implode(",",$exploded).")");
+	$DB->safedelete("topics","WHERE id IN ?", $exploded);
 	$PAGE->location("?act=vt".$JAX->p['ot']);
 	$this->cancel();
    }
    $page.='<form method="post" onsubmit="return RUN.submitForm(this)" style="padding:10px;">Which topic should the topics be merged into?<br />';
    $page.=$JAX->hiddenFormFields(Array('act'=>'modcontrols','dot'=>'merge'));
    
-   $DB->select("id,title","topics","WHERE id IN (".$SESS->vars['modtids'].")");
+   $result = $DB->safeselect("id,title","topics","WHERE id IN ?", explode(",", $SESS->vars['modtids']));
    $titles=Array();
-   while($f=$DB->row()) $titles[$f['id']]=$f['title'];
+   while($f=$DB->row($result)) $titles[$f['id']]=$f['title'];
    foreach($exploded as $v) {
     $page.='<input type="radio" name="ot" value="'.$v.'" /> '.$titles[$v].'<br />';
    }
@@ -257,7 +283,7 @@ new modcontrols;
    $PAGE->JS("alert","under construction");
   }
   
-  function load(){
+  public static function load(){
    global $PAGE;
    $script=file_get_contents("Script/modcontrols.php");
    if($PAGE&&$PAGE->jsaccess){
@@ -292,20 +318,21 @@ new modcontrols;
    if($JAX->p['submit']=="save") {
     if(!trim($JAX->p['display_name'])) $page.=$PAGE->meta('error',"Display name is invalid.");
     else {
-     $DB->update("members",Array("sig"=>$JAX->p['signature'],"display_name"=>$JAX->p['display_name'],'about'=>$JAX->p['about'],'avatar'=>$JAX->p['avatar']),"WHERE id=".$DB->evalue($JAX->p['mid']));
-     if($DB->affected_rows()<0) $page.=$PAGE->meta('error',"Error updating profile information.");
+     $DB->safeupdate("members",Array("sig"=>$JAX->p['signature'],"display_name"=>$JAX->p['display_name'],'about'=>$JAX->p['about'],'avatar'=>$JAX->p['avatar']),"WHERE id=?", $DB->basicvalue($JAX->p['mid']));
+     if($DB->affected_rows(1)<0) $page.=$PAGE->meta('error',"Error updating profile information.");
      else $page.=$PAGE->meta('success',"Profile information saved.");
     }
    }
    if($JAX->p['submit']=="showform"||isset($JAX->b['mid'])){
     //get the member data
     if(is_numeric($JAX->b['mid'])) {
-     $DB->select("*","members","WHERE id=".$DB->evalue($JAX->b['mid']));
-     $data=$DB->arow();
+     $result = $DB->safeselect("*","members","WHERE id=?", $DB->basicvalue($JAX->b['mid']));
+     $data=$DB->arow($result);
+     $DB->disposeresult($result);
     } elseif($JAX->p['mname']) {
-     $DB->select("*","members","WHERE display_name LIKE ".$DB->evalue($JAX->p['mname']."%"));
+     $result = $DB->safeselect("*","members","WHERE display_name LIKE ?", $DB->basicvalue($JAX->p['mname']."%"));
      $data=Array();
-     while($f=$DB->arow()) $data[]=$f;
+     while($f=$DB->arow($result)) $data[]=$f;
      if(count($data)>1) $e="Many users found!";
      else $data=array_shift($data);
     } else $e="Member name is a required field.";
@@ -373,19 +400,21 @@ new modcontrols;
       );
     
     $content=Array();
-    $DB->select("group_id,display_name,id","members","WHERE ip=".$DB->evalue($ip));
-    while($f=$DB->row()) $content[]=$PAGE->meta('user-link',$f['id'],$f['group_id'],$f['display_name']);
+    $result = $DB->safeselect("group_id,display_name,id","members","WHERE ip=?", $DB->basicvalue($ip));
+    while($f=$DB->row($result)) $content[]=$PAGE->meta('user-link',$f['id'],$f['group_id'],$f['display_name']);
     $page.=box("Users with this IP:",implode(', ',$content));
     
     if($CFG['shoutbox']){
      $content="";
-     $DB->special("SELECT s.*,m.group_id,m.display_name FROM %t s LEFT JOIN %t m ON m.id=s.uid WHERE s.ip=".$DB->evalue($ip)." ORDER BY id DESC LIMIT 5","shouts","members");
-     while($f=$DB->row()) $content.=$PAGE->meta('user-link',$f['uid'],$f['group_id'],$f['display_name']).' : '.$f['shout']."<br />";
+     $result = $DB->safespecial("SELECT s.*,m.group_id,m.display_name FROM %t s LEFT JOIN %t m ON m.id=s.uid WHERE s.ip=? ORDER BY id DESC LIMIT 5",
+	array("shouts","members"), $DB->basicvalue($ip));
+     while($f=$DB->row($result)) $content.=$PAGE->meta('user-link',$f['uid'],$f['group_id'],$f['display_name']).' : '.$f['shout']."<br />";
      $page.=box("Last 5 shouts:",$content);
     }
     $content="";
-    $DB->select("post","posts","WHERE ip=".$DB->evalue($ip)." ORDER BY id DESC LIMIT 5");
-    while($f=$DB->row()) $content.="<div class='post'>".nl2br($JAX->blockhtml($JAX->textonly($f['post'])))."</div>";
+    $result = $DB->safeselect("post","posts","WHERE ip=? ORDER BY id DESC LIMIT 5",
+	$DB->basicvalue($ip));
+    while($f=$DB->row($result)) $content.="<div class='post'>".nl2br($JAX->blockhtml($JAX->textonly($f['post'])))."</div>";
     $page.=box("Last 5 posts:",$content);
    }
    $this->showmodcp($form.$page);

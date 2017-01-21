@@ -1,8 +1,9 @@
-<?
+<?php
 $PAGE->loadmeta('logreg');
 $IDX=new LOGREG;
 class LOGREG{
- function LOGREG(){$this->__construct();}
+ /* Redundant constructor unnecesary in newer PHP versions. */
+ /* function LOGREG(){$this->__construct();} */
  function __construct(){
   global $JAX,$PAGE;
   $this->privatekey="6Lcyub0SAAAAAC6ig1rao67cgoPQ0qaouRDox_7G";
@@ -52,8 +53,12 @@ class LOGREG{
     $req=recaptcha_check_answer($this->privatekey,$_SERVER['REMOTE_ADDR'],$captcha,$JAX->b['recaptcha_response_field']);
 	if(!$req->is_valid) $e="Captcha failed, please try again.";
     else {
-	 $DB->select("*","members","WHERE name=".$DB->evalue($name)." OR display_name=".$DB->evalue($dispname));
-     $f=$DB->row();	
+	 $result = $DB->safeselect("*","members","WHERE name=? OR display_name=?",
+		$DB->basicvalue($name),
+		$DB->basicvalue($dispname));
+     $f=$DB->row($result);	
+     $DB->disposeresult($result);
+
      if($f!=false) {
       if($f['name']==$name) $e="That username is taken!";
       elseif($f['display_name']==$dispname) $e="That display name is already used by another member.";
@@ -65,7 +70,7 @@ class LOGREG{
     $PAGE->append("page",$PAGE->meta('error',$e));
    } else {
     //all clear!
-    $DB->insert("members",Array(
+    $DB->safeinsert("members",Array(
      "name"=>$name,
      "display_name"=>$dispname,
      "pass"=>md5($pass1),
@@ -77,7 +82,7 @@ class LOGREG{
      "ip"=>$JAX->ip2int(),
      "wysiwyg"=>1
     ));
-	$DB->update("stats",Array('members'=>array('members+1'),'last_register'=>$DB->insert_id()));
+	$DB->safequery("UPDATE ".$DB->ftable(stats)." SET members = members + 1, last_register = ?", $DB->insert_id(1));
     $this->login($name,$pass1);
    }
 
@@ -94,8 +99,13 @@ class LOGREG{
   if($u&&$p){
    if($SESS->is_bot) return;
    $p=md5($p);
-   $q=$DB->select("*","members","WHERE name=".$DB->evalue($u)." AND pass=".$DB->evalue($p));
-   $f=$DB->row();
+   $result=$DB->safeselect("*","members","WHERE name=? AND pass=?",
+	$DB->basicvalue($u),
+	$DB->basicvalue($p));
+
+   $f=$DB->row($result);
+   $DB->disposeresult($result);
+
    if($f) {
     if($JAX->p['popup']) $PAGE->JS("closewindow","#loginform");
     $JAX->setCookie(Array("uid"=>$f['id'],"pass"=>$f['pass']),time()+3600*24*30);
@@ -159,14 +169,16 @@ class LOGREG{
   if($PAGE->jsupdate&&empty($JAX->p)) return;
   
   if(is_numeric($uid)&&$id) {
-   $DB->select("id,name,pass","members","WHERE id=".$DB->evalue($uid));
-   if(!($udata=$DB->row())||md5($udata['pass'])!=$id) $e="This link has expired. Please try again.";
+   $result = $DB->safeselect("id,name,pass","members","WHERE id=?", $DB->basicvalue($uid));
+   if(!($udata=$DB->row($result))||md5($udata['pass'])!=$id) $e="This link has expired. Please try again.";
+   $DB->disposeresult($result);
+
    if($e) $page=$PAGE->meta('error',$e);
    else {
     if($JAX->p['pass1']&&$JAX->p['pass2']) {
      if($JAX->p['pass1']!=$JAX->p['pass2']) $page.=$PAGE->meta('error','The passwords did not match, please try again!');
      else {
-      $DB->update("members",Array("pass"=>md5($JAX->p['pass1'])),"WHERE id=".$DB->evalue($udata['id']));
+      $DB->safeupdate("members",Array("pass"=>md5($JAX->p['pass1'])),"WHERE id=?", $DB->basicvalue($udata['id']));
       //just making use of the way registration redirects to the index
       $this->registering=true;
       return $this->login($udata['name'],$JAX->p['pass1']);
@@ -184,7 +196,11 @@ class LOGREG{
       if($captcha&&$JAX->p['user']) {
         $req=recaptcha_check_answer($this->privatekey,$_SERVER['REMOTE_ADDR'],$captcha,$JAX->b['recaptcha_response_field']);
         if(!$req->is_valid) $e="Recaptcha Invalid! Please try again.";
-        else if(!($udata=$DB->row($DB->select("id,pass,email","members","WHERE name=".$DB->evalue($JAX->p['user']))))) $e="There is no user registered as <strong>".$JAX->b['user']."</strong>, sure this is correct?";
+        else {
+		$result = $DB->safeselect("id,pass,email","members","WHERE name=?", $DB->basicvalue($JAX->p['user']));
+		if(!($udata=$DB->row($result))) $e="There is no user registered as <strong>".$JAX->b['user']."</strong>, sure this is correct?";
+		$DB->disposeresult($result);
+	}
         
         if($e) {
          $page.=$PAGE->meta('error',$e);

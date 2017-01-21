@@ -37,7 +37,7 @@ $USER=&$JAX->userData;
 $PERMS=$JAX->getPerms();
 
 /*fix ip if necessary*/
-if($USER&&$SESS->ip!=$USER['ip']) $DB->update('members',Array('ip'=>$SESS->ip),'WHERE id='.$USER['id']);
+if($USER&&$SESS->ip!=$USER['ip']) $DB->safeupdate('members',Array('ip'=>$SESS->ip),'WHERE id=?', $USER['id']);
 
 /*load the theme*/
 $PAGE->loadskin($JAX->pick($SESS->vars['skin_id'],$USER['skin_id']));
@@ -73,8 +73,8 @@ ch_color_text = "#000000";
 ch_color_bg = "#FFFFFF";
 JAX.adColorize()
 </script>
-<script src="http://scripts.chitika.net/eminimalls/amm.js" type="text/javascript">
-</script>
+<!-- <script src="http://scripts.chitika.net/eminimalls/amm.js" type="text/javascript">
+</script> -->
 </div>
 HEREDOC;
 
@@ -111,8 +111,8 @@ if(!$PAGE->jsaccess) {
  
  $PAGE->append('SCRIPT',' <script type="text/javascript" src="http://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>');
  $PAGE->append('SCRIPT',' <script type="text/javascript">var globalsettings={'.implode(',',$variables).'}</script>'); 
- $PAGE->append('SCRIPT',' <script type="text/javascript" src="'.($local?'Service':'http://jaxboards.com').'/jsnew.js?v=1"></script>');
- $PAGE->append('SCRIPT',' <script type="text/javascript" src="'.($local?'Service':'http://jaxboards.com').'/jsrun.js"></script>');
+ $PAGE->append('SCRIPT',' <script type="text/javascript" src="'.($local?'Service/':BOARDPATH).'jsnew.js?v=1"></script>');
+ $PAGE->append('SCRIPT',' <script type="text/javascript" src="'.($local?'Service/':BOARDPATH).'jsrun.js"></script>');
  $PAGE->append('SCRIPT','<!--[if IE]><style> img {behavior: url(Script/fiximgnatural.htc)}</style><![endif]-->');
  
  if($PERMS['can_moderate']||$USER['mod']) {
@@ -122,11 +122,13 @@ if(!$PAGE->jsaccess) {
 
  $PAGE->append('CSS','<link rel="stylesheet" type="text/css" href="'.THEMEPATH.'css.css" />');
  if($PAGE->meta('favicon')) $PAGE->append('CSS','<link rel="icon" href="'.$PAGE->meta('favicon').'">');
- $PAGE->append('LOGO',$PAGE->meta("logo",$JAX->pick($CFG['logourl'],'http://jaxboards.com/Themes/Default/img/logo.png')));
+ $PAGE->append('LOGO',$PAGE->meta("logo",$JAX->pick($CFG['logourl'],BOARDPATH.'Service/Themes/Default/img/logo.png')));
  $PAGE->append('NAVIGATION',$PAGE->meta("navigation",$PERMS['can_moderate']?'<li><a href="?act=modcontrols&do=cp">Mod CP</a></li>':'',$PERMS['can_access_acp']?'<li><a href="./acp/" target="_BLANK">ACP</a></li>':'',$CFG['navlinks']?$CFG['navlinks']:''));
  if($USER&&$USER['id']) {
-  $DB->select("count(id)","messages","WHERE `read`=0 AND `to`=".$USER['id']);
-  $nummessages=array_pop($DB->row());
+  $result = $DB->safeselect("count(id)","messages","WHERE `read`=0 AND `to`=?", $USER['id']);
+  $thisrow = $DB->row($result);
+  $nummessages=array_pop($thisrow);
+  $DB->disposeresult($result);
  }
 $PAGE->addvar('inbox',$nummessages);
 if($nummessages) $PAGE->append('FOOTER','<div id="notification" class="newmessage" onclick="RUN.stream.location(\'?act=ucp&what=inbox\');this.style.display=\'none\'">You have '.$nummessages.' new message'.($nummessages==1?'':'s').'</div>');
@@ -139,7 +141,7 @@ if($nummessages) $PAGE->append('FOOTER','<div id="notification" class="newmessag
   $PAGE->append('USERBOX',
    ($USER['id']?$PAGE->meta('userbox-logged-in',$PAGE->meta('user-link',$USER['id'],$USER['group_id'],$USER['display_name']),$JAX->smalldate($USER['last_visit']),$nummessages):$PAGE->meta('userbox-logged-out'))
  );
-} //end if jsaccess only
+} //end if !jsaccess only
  $PAGE->addvar('groupid',$JAX->pick($USER['group_id'],3));
  $PAGE->addvar('userposts',$USER['posts']);
  $PAGE->addvar('grouptitle',$PERMS['title']);
@@ -176,8 +178,9 @@ if($act=="idx"&&$JAX->b['module']) {
 } elseif($act&&is_file($act="inc/page/".$act.".php")) {
  require $act;
 } elseif(!$PAGE->jsaccess||$PAGE->jsnewlocation) {
- $DB->select("page","pages","WHERE act=".$DB->evalue($actraw));
- if($page=$DB->row()) {
+ $result = $DB->safeselect("page","pages","WHERE act=?", $DB->basicvalue($actraw));
+ if($page=$DB->row($result)) {
+  $DB->disposeresult($result);
   $page['page']=$JAX->bbcodes($page['page']);
   $PAGE->append("PAGE",$page['page']);
   if($PAGE->jsnewlocation) $PAGE->JS("update","page",$page['page']);

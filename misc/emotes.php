@@ -1,4 +1,4 @@
-<?
+<?php
  if(isset($_GET['json'])){
   chdir("..");
   require("config.php");

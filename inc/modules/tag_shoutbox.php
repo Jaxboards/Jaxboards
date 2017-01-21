@@ -1,4 +1,4 @@
-<?
+<?php
 $PAGE->loadmeta('shoutbox');
 
 
@@ -21,8 +21,8 @@ class SHOUTBOX{
   $candelete=$PERMS['can_delete_shouts'];
   if(!$candelete&&$PERMS['can_delete_own_shouts']) {
    if(!$shoutrow) {
-     $DB->select("uid","shouts","WHERE id='".$id."'");
-     $shoutrow=$DB->row();
+     $result = $DB->safeselect("uid","shouts","WHERE id=?", $id);
+     $shoutrow=$DB->row($result);
    }
    if($shoutrow['uid']==$USER['id']) $candelete=true; 
   }
@@ -41,10 +41,11 @@ class SHOUTBOX{
  }
  function displayshoutbox(){
   global $PAGE,$DB,$SESS,$USER;
-  $DB->special("SELECT s.*, m.display_name, m.group_id, m.avatar FROM %t AS s LEFT JOIN %t AS m ON s.uid=m.id ORDER BY s.id DESC LIMIT ".$this->shoutlimit,"shouts","members");
+  $result = $DB->safespecial("SELECT s.*, m.display_name, m.group_id, m.avatar FROM %t AS s LEFT JOIN %t AS m ON s.uid=m.id ORDER BY s.id DESC LIMIT ?", array("shouts","members"),
+	$this->shoutlimit);
   $shouts='';
   $first=0;
-  while($f=$DB->arow()) {
+  while($f=$DB->arow($result)) {
    if(!$first) $first=$f['id'];
    $shouts.=$this->formatshout($f);
   }
@@ -57,34 +58,40 @@ class SHOUTBOX{
   //this is a bit tricky, we're transversing the shouts in reverse order, since they're shifted onto the list, not pushed
 
   $last=0;
-  if($SESS->vars['sb_id']) {$DB->special("SELECT s.*,m.display_name,m.group_id,m.avatar FROM %t AS s LEFT JOIN %t AS m ON s.uid=m.id WHERE s.id>".$JAX->pick($SESS->vars['sb_id'],0)." ORDER BY s.id ASC LIMIT ".$this->shoutlimit,"shouts","members");
-  while($f=$DB->row()) {
-   $PAGE->JS("addshout",$this->formatshout($f));
-   if($CFG['shoutboxsounds']) {
-   $sounds=Array(
-    "diglettdig"=>"diglettdig1",
-    "gidttelgid"=>"gidttelgid",
-    "triotriotrio"=>"triotriotrio",
-    "ruuun"=>"runfuckingrun",
-    "i'm painis cupcake"=>"i_am_painis_cupcake",
-    "diglett"=>"diglett",
-    "i will eat you"=>"i_will_eat_you",
-    "!"=>"alert",
-    "scatman"=>"scatman",
-    "super meat boy"=>"smb",
-    "warpzone"=>"warpzone",
-    "push the buttons"=>"ptb",
-    "so fluffy"=>"so fluffy",
-    "does this count as annoying"=>"does this count as annoying",
-    "its so fluffy im gonna die"=>"its so fluffy im gonna die",
-    "pew pew"=>"pewpew",
-	"sounds like someone wants to get ***REMOVED***d again"=>"***REMOVED***dagain",
-	"i was frozen today"=>"frozentoday",
-	"lol clinton"=>"clinton_denial"
-    );
-   if($USER['sound_shout']&&$sounds[$f['shout']]) $PAGE->JS("playsound","sfx","http://jaxboards.com/Sounds/".$sounds[$f['shout']].".mp3");
-   }
-   $last=$f['id'];}}
+  if($SESS->vars['sb_id']) {
+	$DB->safespecial("SELECT s.*,m.display_name,m.group_id,m.avatar FROM %t AS s LEFT JOIN %t AS m ON s.uid=m.id WHERE s.id>? ORDER BY s.id ASC LIMIT ?",
+		array("shouts","members"),
+		$JAX->pick($SESS->vars['sb_id'],0),
+		$this->shoutlimit);
+	while($f=$DB->row()) {
+	   $PAGE->JS("addshout",$this->formatshout($f));
+	   if($CFG['shoutboxsounds']) {
+	   $sounds=Array(
+	    "diglettdig"=>"diglettdig1",
+	    "gidttelgid"=>"gidttelgid",
+	    "triotriotrio"=>"triotriotrio",
+	    "ruuun"=>"runfuckingrun",
+	    "i'm painis cupcake"=>"i_am_painis_cupcake",
+	    "diglett"=>"diglett",
+	    "i will eat you"=>"i_will_eat_you",
+	    "!"=>"alert",
+	    "scatman"=>"scatman",
+	    "super meat boy"=>"smb",
+	    "warpzone"=>"warpzone",
+	    "push the buttons"=>"ptb",
+	    "so fluffy"=>"so fluffy",
+	    "does this count as annoying"=>"does this count as annoying",
+	    "its so fluffy im gonna die"=>"its so fluffy im gonna die",
+	    "pew pew"=>"pewpew",
+		"sounds like someone wants to get ***REMOVED***d again"=>"***REMOVED***dagain",
+		"i was frozen today"=>"frozentoday",
+		"lol clinton"=>"clinton_denial"
+	    );
+	   if($USER['sound_shout']&&$sounds[$f['shout']]) $PAGE->JS("playsound","sfx",SOUNDSURL.$sounds[$f['shout']].".mp3");
+	   }
+	   $last=$f['id'];
+	}
+  }
 
   //update the sb_id variable if we selected shouts
   if($last) $SESS->addvar('sb_id',$last);
@@ -94,8 +101,10 @@ class SHOUTBOX{
   $perpage=100;
   $pagen=0;
   if(is_numeric($JAX->b['page'])&&$JAX->b['page']>1) $pagen=$JAX->b['page']-1;
-  $DB->select("count(*)","shouts");
-  $numshouts=array_pop($DB->row());
+  $result = $DB->safeselect("count(*)","shouts");
+  $thisrow = $DB->row($result);
+  $numshouts=array_pop($thisrow);
+  $DB->disposeresult($result);
   if($numshouts>1000) $numshouts=1000;
   if($numshouts>$perpage) {
   $pages.=" &middot; Pages: <span class='pages'>";
@@ -105,7 +114,11 @@ class SHOUTBOX{
   $PAGE->path(Array("Shoutbox History"=>"?module=shoutbox"));
   $PAGE->updatepath();
   if($PAGE->jsupdate) return;
-  $DB->special("SELECT s.*, m.avatar, m.display_name, m.group_id FROM %t AS s LEFT JOIN %t AS m ON s.uid=m.id ORDER BY s.id DESC LIMIT ".($pagen*$perpage).','.$perpage,"shouts","members");
+  $DB->safespecial("SELECT s.*, m.avatar, m.display_name, m.group_id FROM %t AS s LEFT JOIN %t AS m ON s.uid=m.id ORDER BY s.id DESC LIMIT ?,?",
+	array("shouts","members"),
+	($pagen*$perpage),
+	$perpage
+  );
   while($f=$DB->row()) $shouts.=$this->formatshout($f);
   $page=$PAGE->meta('box','','Shoutbox'.$pages,'<div class="sbhistory">'.$shouts.'</div>');
   $PAGE->JS("update","page",$page);
@@ -118,7 +131,7 @@ class SHOUTBOX{
   $candelete=$this->canDelete($delete);
   if(!$candelete) return $PAGE->location("?");
   $PAGE->JS("softurl");
-  $DB->delete("shouts","WHERE id='".$delete."'");
+  $DB->safedelete("shouts","WHERE id=?", $delete);
  }
  function addshout(){
   global $JAX,$DB,$PAGE,$SESS;
@@ -133,7 +146,7 @@ class SHOUTBOX{
    $PAGE->prepend("shoutbox",$PAGE->error($e));
    return;
   }
-  $DB->insert("shouts",Array("uid"=>$JAX->pick($JAX->userData['id'],0),"shout"=>$shout,"timestamp"=>time(),"ip"=>$JAX->ip2int()));
+  $DB->safeinsert("shouts",Array("uid"=>$JAX->pick($JAX->userData['id'],0),"shout"=>$shout,"timestamp"=>time(),"ip"=>$JAX->ip2int()));
  }
 }
 ?>

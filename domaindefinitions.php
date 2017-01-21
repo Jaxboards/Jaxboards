@@ -1,4 +1,8 @@
-<?
+<?php
+
+if (0) {
+define("SOUNDSURL","http://jaxboards.com/Sounds/");
+define("SCRIPTURL","http://support.jaxboards.com/Script/");
 
 //this file must be required after mysql connecting
 preg_match("@(.*)\.jaxboards\.com@i",$_SERVER['SERVER_NAME'],$m);
@@ -9,8 +13,11 @@ if(!$prefix) {
   $DB=new MySQL;
   $DB->connect($CFG['sql_host'],$CFG['sql_username'],$CFG['sql_password'],$CFG['sql_db']);
  }
- $DB->special('SELECT prefix FROM jaxboards_service.domains WHERE domain='.$DB->evalue($_SERVER['SERVER_NAME']));
- $prefix=$DB->row();
+ $result = $DB->safespecial('SELECT prefix FROM jaxboards_service.domains WHERE domain=?', array(),
+	$DB->basicvalue($_SERVER['SERVER_NAME']));
+ $prefix=$DB->row($result);
+ $DB->disposeresult($result);
+
  if($prefix) $prefix=$prefix['prefix'];
 }
 if($prefix){
@@ -27,4 +34,33 @@ if($prefix){
 } else $CFG=Array('noboard'=>1);
 
 define("FLAGPATH","http://jaxboards.com/flags/");
+
+} else {
+    function extendconfig($configfile){
+        if(!@include($configfile)) return false;
+        foreach($CFG as $k=>$v) $GLOBALS['CFG'][$k]=$v;
+        return true;
+    }
+    // define("BOARDPATH",(defined("INACP")?"../":"")."boards/");
+    // define("STHEMEPATH",(defined("INACP")?"../":"")."Service/Themes/");
+    define("BOARDPATH",(defined("INACP")?"../":"./"));
+    define("STHEMEPATH",(defined("INACP")?"../":"")."Service/Themes/");
+    define("AVAPATH",(defined("INACP")?"../":"")."Service/Themes/Default/avatars/");
+    define("SOUNDSURL",(defined("INACP")?"../":"")."Service/Sounds/");
+    define("SCRIPTURL",(defined("INACP")?"../":"")."Script/");
+    date_default_timezone_set("America/Los_Angeles");
+    $DB->prefix("jaxboards_");
+    if (!extendconfig(BOARDPATH."config.php")) { die("Could not read config file.\n"); }
+    // die("USERNAME: ".$CFG['sql_username']."\n");
+    // die("USERNAME: ".$CFG['sql_password']."\n");
+    // die("USERNAME: ".$CFG['sql_db']."\n");
+    if(!$DB) {
+        require_once "inc/classes/mysql.php";
+        $DB=new MySQL;
+        $DB->connect($CFG['sql_host'],$CFG['sql_username'],$CFG['sql_password'],$CFG['sql_db']);
+    }
+    // $DB->safespecial('SELECT prefix FROM jaxboards_service.domains WHERE domain=?', $DB->basicvalue($_SERVER['SERVER_NAME']));
+    define("FLAGPATH",(defined("INACP")?"../":"Service/flags"));
+}
+
 ?>

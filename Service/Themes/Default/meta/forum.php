@@ -1,4 +1,4 @@
-<?
+<?php
 $meta=Array(
 'forum-subforum-row'=>'<tr id="fid_%1$s" class="%7$s"><td class="f_icon" rowspan="2"><a id="fid_%1$s_icon" href="?act=vf%1$s&amp;markread=1">%8$s</a></td><td class="forum" rowspan="2"><a href="?act=vf%1$s">%2$s</a><div class="description">%3$s</div></td><td class="last_post" colspan="2">%4$s</td></tr><tr><td class="item_1">Topics: %5$s</td><td class="item_2">Replies: %6$s</td></tr>',
 'forum-subforum-table'=>'<table class="subindex">%1$s</table>',
@@ -17,7 +17,7 @@ $meta=Array(
 
 'forum-pages-part'=>'<a href="?act=vt%1$s"%2$s>%3$s</a> ',
 
-'subforum-icon-unread'=>'<img src="http://jaxboards.com/Themes/Default/icons/unread.png" />',
-'subforum-icon-read'=>'<img src="http://jaxboards.com/Themes/Default/icons/read.png" />',
+'subforum-icon-unread'=>'<img src="'.BOARDPATH.'Service/Themes/Default/icons/unread.png" />',
+'subforum-icon-read'=>'<img src="'.BOARDPATH.'Service/Themes/Default/icons/read.png" />',
 );
 ?>

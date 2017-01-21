@@ -1,7 +1,8 @@
 <?php
 class PAGE{
  var $metadefs=Array();
- function PAGE(){$this->__construct();}
+ /* Redundant constructor unnecesary in newer PHP versions. */
+ /* function PAGE(){$this->__construct();} */
  function __construct(){
   $this->JSOutput=Array();
   $this->jsaccess=$_SERVER['HTTP_X_JSACCESS'];
@@ -76,7 +77,7 @@ class PAGE{
  }
 
  function out(){
-  global $ads,$SESS;
+  global $ads,$SESS,$JAX;
   if (isset($this->done)) return false;
   $this->done=true;
   $this->parts['path']="<div id='path' class='path'>".$this->buildpath()."</div>";
@@ -85,7 +86,7 @@ class PAGE{
   if ($this->jsaccess) {
    header("Content-type:text/plain");
    foreach($this->JSOutput as $k=>$v) $this->JSOutput[$k]=$SESS->addSessID($v);
-   echo !empty($this->JSOutput)?JAX::json_encode($this->JSOutput):"";
+   echo !empty($this->JSOutput)?$JAX::json_encode($this->JSOutput):"";
   }
   else {
    $autobox=Array("PAGE","COPYRIGHT","USERBOX");
@@ -123,12 +124,14 @@ class PAGE{
  function loadskin($id){
   global $DB,$CFG;
   if($id) {
-   $DB->select("*","skins","WHERE id=".$id." LIMIT 1");
-   $skin=$DB->row();
+   $result = $DB->safeselect("*","skins","WHERE id=? LIMIT 1", $id);
+   $skin=$DB->row($result);
+   $DB->disposeresult($result);
   }
   if(!$skin) {
-   $DB->select("*","skins","WHERE `default`=1 LIMIT 1");
-   $skin=$DB->row();
+   $result = $DB->safeselect("*","skins","WHERE `default`=1 LIMIT 1");
+   $skin=$DB->row($result);
+   $DB->disposeresult($result);
   }
   if(!$skin) {$skin=Array("title"=>"Default","custom"=>0);}
   $t=($skin['custom']?BOARDPATH:"")."Themes/".$skin['title']."/";
@@ -147,8 +150,9 @@ class PAGE{
 
  function includer($m){
   global $DB;
-  $DB->select("page","pages","WHERE act=".$DB->evalue($m[1]));
-  $page=array_shift($DB->row());
+  $result = $DB->safeselect("page","pages","WHERE act=?", $DB->basicvalue($m[1]));
+  $page=array_shift($DB->row($result));
+  $DB->disposeresult($result);
   return $page?$page:'';
  }
  

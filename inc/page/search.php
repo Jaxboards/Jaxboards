@@ -1,4 +1,4 @@
-<?
+<?php
 /* Chat box
 better color >_>
 
@@ -25,7 +25,8 @@ class search{
   if($JAX->b['searchterm']||$JAX->b['page']) $this->dosearch();
   else $this->form();
  }
- function search(){$this->__constructor();}
+ /* Redundant constructor unnecesary in newer PHP versions. */
+ /* function search(){$this->__constructor();} */
  
  function form(){
   global $PAGE,$JAX,$SESS;
@@ -40,13 +41,13 @@ class search{
   global $DB;
   $this->getSearchableForums();
   if(!$this->fids) return "--No forums--";
-  $DB->select("`id`,`title`,`path`","forums","WHERE id IN (".implode(',',$this->fids).") ORDER BY `order` ASC,`title` DESC");
-
+  $result = $DB->safeselect("`id`,`title`,`path`","forums","WHERE id IN ? ORDER BY `order` ASC,`title` DESC",
+	$this->fids);
   
   $tree=Array();
   $titles=Array();
   
-  while($f=$DB->row()) {
+  while($f=$DB->row($result)) {
    $titles[$f['id']]=$f['title'];
    $path=trim($f['path'])?explode(" ",$f['path']):Array();
    $t=&$tree;
@@ -102,24 +103,74 @@ class search{
    }
    if($JAX->b['datestart']) $datestart=$this->pdate($JAX->b['datestart']);
    if($JAX->b['dateend']) $dateend=$this->pdate($JAX->b['dateend']);
-   $fids=implode(",",$fids);
+
+   // $fids=implode(",",$fids);
   
-   $DB->special(
+   /* Note bug: should be is_int, not is_numeric, because that DB field is an integer, not a float. */
+   $arguments = array(
    'SELECT id,SUM(relevance) relevance FROM (
     (
-     SELECT p.id,MATCH(p.post) AGAINST(%4$s) relevance FROM %t p LEFT JOIN %t t ON p.tid=t.id WHERE MATCH(post) AGAINST(%4$s IN BOOLEAN MODE) AND t.fid IN (%5$s)%6$s%7$s%8$s ORDER BY relevance DESC LIMIT 100
+     SELECT p.id,MATCH(p.post) AGAINST(?) relevance FROM %t p LEFT JOIN %t t ON p.tid=t.id WHERE MATCH(post) AGAINST(? IN BOOLEAN MODE) AND t.fid IN ? '.
+
+	(is_int($JAX->b['mid']) ? " AND p.auth_id= ? " : "").
+	($datestart ? " AND p.date>? " : "").
+	($dateend ? " AND p.date<? " : "").
+
+        ' ORDER BY relevance DESC LIMIT 100
     ) UNION (
-     SELECT op,MATCH(title) AGAINST(%4$s) relevance FROM %t p WHERE MATCH(title) AGAINST(%4$s IN BOOLEAN MODE) AND fid IN (%5$s)%6$s%7$s%8$s ORDER BY relevance DESC LIMIT 100
+     SELECT op,MATCH(title) AGAINST(?) relevance FROM %t p WHERE MATCH(title) AGAINST(? IN BOOLEAN MODE) AND fid IN ? '.
+
+	(is_int($JAX->b['mid']) ? " AND p.auth_id= ? " : "").
+	($datestart ? " AND p.date>? " : "").
+	($dateend ? " AND p.date<? " : "").
+
+	' ORDER BY relevance DESC LIMIT 100
     )
-    ) dt GROUP BY id ORDER BY relevance DESC',"posts","topics","topics",
-     $DB->evalue($termraw),
-     $fids,
-     is_numeric($JAX->b['mid'])?" AND p.auth_id=".$DB->evalue($JAX->b['mid']):"",
-     $datestart?" AND p.date>".$datestart:'',
-     $dateend?" AND p.date<".$dateend:''
+    ) dt GROUP BY id ORDER BY relevance DESC',
+	array("posts","topics","topics"),
+     $DB->basicvalue($termraw),
+     $DB->basicvalue($termraw),
+     $fids);
+
+   if (is_int($JAX->b['mid'])) array_push($arguments, (int)$JAX->b['mid']);
+   if ($datestart) array_push($arguments, $datestart);
+   if ($dateend) array_push($arguments, $dateend);
+
+   array_push($arguments, $DB->basicvalue($termraw));
+   array_push($arguments, $DB->basicvalue($termraw));
+   array_push($arguments, $fids);
+
+   if (is_int($JAX->b['mid'])) array_push($arguments, (int)$JAX->b['mid']);
+   if ($datestart) array_push($arguments, $datestart);
+   if ($dateend) array_push($arguments, $dateend);
+
+   // syslog(LOG_EMERG, "ARGS: ".print_r($arguments, true)."\n");
+   $result = call_user_func_array(
+	array($DB, "safespecial"),
+	$arguments
    );
+   // syslog(LOG_EMERG, "RESULT: ".print_r($result, true)."\n");
+   if (!$result) {
+	syslog(LOG_EMERG, "ERROR: ".$DB->error(1)."\n");
+   }
+
+   // $result = $DB->special(
+   // 'SELECT id,SUM(relevance) relevance FROM (
+    // (
+     // SELECT p.id,MATCH(p.post) AGAINST(%4$s) relevance FROM %t p LEFT JOIN %t t ON p.tid=t.id WHERE MATCH(post) AGAINST(%4$s IN BOOLEAN MODE) AND t.fid IN (%5$s)%6$s%7$s%8$s ORDER BY relevance DESC LIMIT 100
+    // ) UNION (
+     // SELECT op,MATCH(title) AGAINST(%4$s) relevance FROM %t p WHERE MATCH(title) AGAINST(%4$s IN BOOLEAN MODE) AND fid IN (%5$s)%6$s%7$s%8$s ORDER BY relevance DESC LIMIT 100
+    // )
+    // ) dt GROUP BY id ORDER BY relevance DESC',"posts","topics","topics",
+     // $DB->evalue($termraw),
+     // $fids,
+     // is_numeric($JAX->b['mid'])?" AND p.auth_id=".$DB->evalue($JAX->b['mid']):"",
+     // $datestart?" AND p.date>".$datestart:'',
+     // $dateend?" AND p.date<".$dateend:''
+   // );
+
     
-   while($id=$DB->row()) {
+   while($id=$DB->row($result)) {
     if($id['id']) $ids.=$id['id'].',';
    }
    $ids=substr($ids,0,-1);
@@ -129,10 +180,15 @@ class search{
   }
   
   
+  $result = null;
   if($ids) {
    $numresults=count(explode(",",$ids));
-   $ids=implode(",",array_slice(explode(",",$ids),($this->pagenum-1)*$this->perpage,$this->perpage));
-   $DB->special("SELECT p.*,t.title FROM %t p LEFT JOIN %t t ON p.tid=t.id WHERE p.id IN (".$ids.") ORDER BY FIELD(p.id,$ids)","posts","topics");
+   $idarray = array_slice(explode(",",$ids),($this->pagenum-1)*$this->perpage,$this->perpage);
+   $ids=implode(",",$idarray);
+
+   // $DB->special("SELECT p.*,t.title FROM %t p LEFT JOIN %t t ON p.tid=t.id WHERE p.id IN (".$ids.") ORDER BY FIELD(p.id,$ids)","posts","topics");
+   $result = $DB->safespecial("SELECT p.*,t.title FROM %t p LEFT JOIN %t t ON p.tid=t.id WHERE p.id IN ? ORDER BY FIELD(p.id,$ids)",
+	array("posts","topics"), $idarray);
   } else $numresults=0;
   
   $page="";
@@ -142,7 +198,7 @@ class search{
   foreach(preg_split("@\W+@",$termraw) as $v)
    if(trim($v)) $terms[]=preg_quote($v);
   
-  while($f=$DB->row()) {
+  while($f=$DB->row($result)) {
    $post=$f['post'];
    $post=$JAX->textonly($post);
    $post=$JAX->blockhtml($post);
@@ -178,8 +234,8 @@ class search{
   if($this->fids) return $this->fids;
   $this->fids=Array();
   global $DB,$JAX,$USER;
-  $DB->select("id,perms","forums");
-  while($f=$DB->row()){
+  $result = $DB->safeselect("id,perms","forums");
+  while($f=$DB->row($result)){
    $perms=$JAX->parseperms($f['perms'],$USER?$USER['group_id']:3);
    if($perms['read']) $this->fids[]=$f['id'];
   }

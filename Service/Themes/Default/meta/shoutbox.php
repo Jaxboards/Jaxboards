@@ -1,4 +1,4 @@
-<?
+<?php
 $meta=Array(
 'shoutbox'=>"<form method='post' action='' onsubmit='return RUN.submitForm(this,1)'><table>
  <tr>

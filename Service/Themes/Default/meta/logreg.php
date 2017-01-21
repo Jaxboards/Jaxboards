@@ -1,4 +1,4 @@
-<?
+<?php
 $meta=Array('login-form'=>'<div class="box login">
  <div class="title">Login</div>
  <div class="content">

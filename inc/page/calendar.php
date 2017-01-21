@@ -2,7 +2,8 @@
 $PAGE->loadmeta('calendar');
 new CALENDAR;
 class CALENDAR{
-    function CALENDAR(){$this->__construct();}
+    /* Redundant constructor unnecesary in newer PHP versions. */
+    /* function CALENDAR(){$this->__construct();} */
     function __construct(){
         global $JAX;
         if(isset($JAX->b['month'])) {
@@ -19,9 +20,9 @@ class CALENDAR{
         list($offset,$daysinmonth,$monthname,$year,$month)=explode(' ',date('w t F Y n',mktime(0,0,0,$monthoffset,1)));
         
         $SESS->location_verbose='Checking out the calendar for '.$monthname.' '.$year;
-        $DB->select('id,display_name name,group_id,dob_day,dob_year','members','WHERE dob_month='.$DB->evalue($month).' AND dob_year<'.$year);
+        $result = $DB->safeselect('id,display_name name,group_id,dob_day,dob_year','members','WHERE dob_month=? AND dob_year<?', $DB->basicvalue($month), $year);
         $birthdays=Array();
-        while($f=$DB->row()) {
+        while($f=$DB->row($result)) {
          $birthdays[$f['dob_day']][]=sprintf('<a href="?act=vu%1$s" class="user%1$s mgroup%2$s" title="%4$s years old!" onmouseover="JAX.tooltip(this)">%3$s</a>',$f['id'],$f['group_id'],$f['name'],$year-$f['dob_year']);
         }
         

@@ -1,8 +1,9 @@
-<?
+<?php
 $PAGE->loadmeta('ticker');
 new ticker;
 class ticker{
- function ticker(){$this->__construct();}
+ /* Redundant constructor unnecesary in newer PHP versions. */
+ /* function ticker(){$this->__construct();} */
  function __construct(){
   global $PAGE;
   $this->maxticks=60;
@@ -12,17 +13,19 @@ class ticker{
  function index(){
   global $PAGE,$DB,$SESS,$JAX,$USER;
   $SESS->location_verbose="Using the ticker!";
-  $DB->special(
+  $result = $DB->safespecial(
    "SELECT p.*,f.perms,f.title ftitle,t.title,t.fid,t.replies,t.auth_id auth_id2,m.group_id,m.display_name,m2.group_id group_id2,m2.display_name display_name2 FROM
-   (SELECT * FROM %t ORDER BY id DESC LIMIT ".$this->maxticks.") p
+   (SELECT * FROM %t ORDER BY id DESC LIMIT ?) p
    LEFT JOIN %t t ON t.id=p.tid
    LEFT JOIN %t f ON f.id=t.fid
    LEFT JOIN %t m ON p.auth_id=m.id
    LEFT JOIN %t m2 ON t.auth_id=m2.id
-   ",'posts','topics','forums','members','members');
+   ",
+	array('posts','topics','forums','members','members'), 
+	$this->maxticks);
   $ticks="";
   $first=0;
-  while($f=$DB->row()){
+  while($f=$DB->row($result)){
    $p=$JAX->parseperms($f['perms'],$USER?$USER['group_id']:3);
    if(!$p['read']) continue;
    if(!$first) $first=$f['id'];
@@ -35,16 +38,19 @@ class ticker{
  }
  function update(){
   global $PAGE,$DB,$SESS,$USER,$JAX;
-  $DB->special(
+  $result = $DB->safespecial(
    "SELECT p.*,f.perms,f.title ftitle,t.title,t.auth_id,t.auth_id auth_id2,t.replies,m.group_id,m.display_name,m2.group_id group_id2,m2.display_name display_name2 FROM
-   (SELECT * FROM %t WHERE id>".JAX::pick($SESS->vars['tickid'],0)." ORDER BY id LIMIT ".$this->maxticks.") p
+   (SELECT * FROM %t WHERE id>? ORDER BY id LIMIT ?) p
    LEFT JOIN %t t ON t.id=p.tid
    LEFT JOIN %t f ON f.id=t.fid
    LEFT JOIN %t m ON p.auth_id=m.id
    LEFT JOIN %t m2 ON t.auth_id=m2.id
-   ",'posts','topics','forums','members','members');
+   ",
+	array('posts','topics','forums','members','members'),
+	$JAX->pick($SESS->vars['tickid'],0),
+	$this->maxticks);
   $first=false;
-  while($f=$DB->row()){
+  while($f=$DB->row($result)){
    $p=$JAX->parseperms($f['perms'],$USER?$USER['group_id']:3);
    if(!$p['read']) continue;
    if(!$first) $first=$f['id'];

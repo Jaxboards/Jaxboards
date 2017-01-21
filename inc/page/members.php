@@ -1,8 +1,9 @@
-<?
+<?php
 $PAGE->loadmeta('members');
 new members;
 class members{
- function members(){$this->__construct();}
+ /* Redundant constructor unnecesary in newer PHP versions. */
+ /* function members(){$this->__construct();} */
  function __construct(){
   global $JAX,$PAGE;
   $this->page=0;
@@ -23,15 +24,32 @@ class members{
   
 
   $pages="";
-  $memberquery=$DB->special("SELECT SQL_CALC_FOUND_ROWS m.*,g.title g_title FROM %t m LEFT JOIN %t g ON g.id=m.group_id $where ORDER BY ".$sortby." ".$sorthow." LIMIT ".($this->page*$this->perpage).','.$this->perpage,"members","member_groups");
-  $nummembers=array_pop($DB->row($DB->query("SELECT FOUND_ROWS()")));
+  // $memberquery=$DB->special("SELECT SQL_CALC_FOUND_ROWS m.*,g.title g_title FROM %t m LEFT JOIN %t g ON g.id=m.group_id $where ORDER BY ".$sortby." ".$sorthow." LIMIT ".($this->page*$this->perpage).','.$this->perpage,"members","member_groups");
+
+  $memberquery=$DB->safespecial("SELECT SQL_CALC_FOUND_ROWS m.*,g.title g_title FROM %t m LEFT JOIN %t g ON g.id=m.group_id $where ORDER BY $sortby $sorthow LIMIT ?, ?;",
+	array( "members", "member_groups" ), 
+	($this->page*$this->perpage),
+	$this->perpage);
+
+  $memberarray = $DB->arows($memberquery);
+
+  if (!$memberquery) {
+	// syslog(LOG_EMERG, "Member query failed: ".$DB->error(1)."\n");
+  }
+
+  $nummemberquery = $DB->safequery("SELECT FOUND_ROWS()");
+  $thisrow = $DB->row($nummemberquery);
+  $nummembers=array_pop($thisrow);
+  // $DB->disposeresult($nummemberquery);
+	// syslog(LOG_EMERG, "Member query failed: ".$DB->error(1)."\n");
+
   foreach($JAX->pages(ceil($nummembers/$this->perpage),$this->page+1,$this->perpage) as $v) $pages.="<a href='?act=members&amp;sortby=$sortby&amp;how=$sorthow&amp;page=$v'".($v-1==$this->page?' class="active"':'').">$v</a> ";
   $url="?act=members".($this->page?"&page=".($this->page+1):'').($JAX->g['filter']?'&filter='.$JAX->g['filter']:'');
   $links=Array();
   foreach($vars as $k=>$v) {
    $links[]="<a href=\"$url&amp;sortby=$k".($sortby==$k?($sorthow=="asc"?'&amp;how=desc':'').'" class="sort'.($sorthow=="desc"?" desc":""):'')."\">$v</a>";
   }
-  while($f=$DB->row($memberquery)) {
+  foreach ($memberarray as $f) {
    $contactdetails="";
    foreach(Array("skype"=>"skype:%s","msn"=>"msnim:chat?contact=%s","gtalk"=>"gtalk:chat?jid=%s","aim"=>"aim:goaim?screenname=%s","yim"=>"ymsgr:sendim?%s","steam"=>"http://steamcommunity.com/id/%s","twitter"=>"http://twitter.com/%s") as $k=>$v)
    if($f['contact_'.$k]) $contactdetails.='<a class="'.$k.' contact" href="'.sprintf($v,$JAX->blockhtml($f['contact_'.$k])).'">&nbsp;</a>';

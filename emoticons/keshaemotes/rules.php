@@ -1,4 +1,4 @@
-<?
+<?php
 $rules=Array(
  "&gt;:("=> "angry.gif",
  ":)"    => "smile.gif",
