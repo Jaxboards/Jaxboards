@@ -14,20 +14,20 @@ class members{
  function showmemberlist(){
   global $PAGE,$DB,$JAX;
   $vars=Array("display_name"=>"Name","g_title"=>"Group","id"=>"ID","posts"=>"Posts");
-  
+
   $sortby="display_name";$sorthow=$JAX->b['how']=="desc"?"desc":"asc";
   if($vars[$JAX->b['sortby']]) $sortby=$JAX->b['sortby'];
   if($JAX->g['filter']=='staff') {
     $sortby='g.can_access_acp DESC ,'.$sortby;
     $where="WHERE g.can_access_acp=1 OR g.can_moderate=1";
   }
-  
+
 
   $pages="";
   // $memberquery=$DB->special("SELECT SQL_CALC_FOUND_ROWS m.*,g.title g_title FROM %t m LEFT JOIN %t g ON g.id=m.group_id $where ORDER BY ".$sortby." ".$sorthow." LIMIT ".($this->page*$this->perpage).','.$this->perpage,"members","member_groups");
 
   $memberquery=$DB->safespecial("SELECT SQL_CALC_FOUND_ROWS m.*,g.title g_title FROM %t m LEFT JOIN %t g ON g.id=m.group_id $where ORDER BY $sortby $sorthow LIMIT ?, ?;",
-	array( "members", "member_groups" ), 
+	array( "members", "member_groups" ),
 	($this->page*$this->perpage),
 	$this->perpage);
 
@@ -51,7 +51,7 @@ class members{
   }
   foreach ($memberarray as $f) {
    $contactdetails="";
-   foreach(Array("skype"=>"skype:%s","msn"=>"msnim:chat?contact=%s","gtalk"=>"gtalk:chat?jid=%s","aim"=>"aim:goaim?screenname=%s","yim"=>"ymsgr:sendim?%s","steam"=>"http://steamcommunity.com/id/%s","twitter"=>"http://twitter.com/%s") as $k=>$v)
+   foreach(Array("skype"=>"skype:%s","msn"=>"msnim:chat?contact=%s","gtalk"=>"gtalk:chat?jid=%s","aim"=>"aim:goaim?screenname=%s","yim"=>"ymsgr:sendim?%s","steam"=>"https://steamcommunity.com/id/%s","twitter"=>"https://twitter.com/%s") as $k=>$v)
    if($f['contact_'.$k]) $contactdetails.='<a class="'.$k.' contact" href="'.sprintf($v,$JAX->blockhtml($f['contact_'.$k])).'">&nbsp;</a>';
    $contactdetails.='<a class="pm contact" href="?act=ucp&amp;what=inbox&amp;page=compose&amp;mid='.$f['id'].'"></a>';
    $page.=$PAGE->meta('members-row',

@@ -1,7 +1,6 @@
 html,body{margin:0;padding:0;font-size:12px;font-family:tahoma,sans-serif;background:#152b49;}
 textarea{width:300px;height:75px;}
 input[type=text],textarea,select{border:1px solid #AAD;}
-/*input[type=submit]{background: url(http://darknight.b1.jcink.com/uploads/darknight/9ea0b194-jaxmt.png) repeat-x;border-radius:8px; color:#FFFFFF;  box-shadow: 0 5px 9px rgba(0, 0, 0, 0.25);border:1px solid #5C5C5C;}*/
 
 a{color:#00F;}
 a:visited{color:#00F;}

@@ -246,7 +246,7 @@ class PAGE{
     $object.='<param name="movie" value="'.$file.'"></param>';
     if($settings['flashvars']) $object.='<param name="flashvars" value="'.http_build_query($settings['flashvars']).'" />';
     $object.='<param name="allowScriptAccess" value="always" />';
-    $embed= '<embed style="display:block" type="application/x-shockwave-flash" pluginspage="http://macromedia.com/go/getflashplayer" src="'.$file.'" width="'.$settings['width'].'" height="'.$settings['height'].'" wmode="opaque" flashvars="'.http_build_query($settings['flashvars']).'" allowScriptAccess="always"></embed>';
+    $embed= '<embed style="display:block" type="application/x-shockwave-flash" pluginspage="https://get.adobe.com/flashplayer/" src="'.$file.'" width="'.$settings['width'].'" height="'.$settings['height'].'" wmode="opaque" flashvars="'.http_build_query($settings['flashvars']).'" allowScriptAccess="always"></embed>';
     return stristr('msie',$_SERVER['HTTP_USER_AGENT'])?$object:$embed;
  }
 }

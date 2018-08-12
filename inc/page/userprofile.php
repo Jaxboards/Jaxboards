@@ -6,7 +6,7 @@ class userprofile{
 
  var $num_activity=30;
 
- var $contacturls=Array("skype"=>"skype:%s","msn"=>"msnim:chat?contact=%s","gtalk"=>"gtalk:chat?jid=%s","aim"=>"aim:goaim?screenname=%s","yim"=>"ymsgr:sendim?%s","steam"=>"http://steamcommunity.com/id/%s","twitter"=>"http://twitter.com/%s");
+ var $contacturls=Array("skype"=>"skype:%s","msn"=>"msnim:chat?contact=%s","gtalk"=>"gtalk:chat?jid=%s","aim"=>"aim:goaim?screenname=%s","yim"=>"ymsgr:sendim?%s","steam"=>"https://steamcommunity.com/id/%s","twitter"=>"https://twitter.com/%s");
 
  /* Redundant constructor unnecesary in newer PHP versions. */
  /* function userprofile(){
@@ -84,10 +84,10 @@ class userprofile{
       $f['name']=$udata['display_name'];
       $f['group_id']=$udata['group_id'];
       $data=$JAX->parse_activity($f,true);
-      $feed->additem(Array('title'=>$data['text'],'pubDate'=>date('r',$f['date']),'description'=>$data['text'],'link'=>'http://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'].$data['link'],'guid'=>$f['id']));}
+      $feed->additem(Array('title'=>$data['text'],'pubDate'=>date('r',$f['date']),'description'=>$data['text'],'link'=>'https://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'].$data['link'],'guid'=>$f['id']));}
      $feed->publish();
      die();
-    } else {    
+    } else {
      while($f=$DB->row($result)) {$f['name']=$udata['display_name'];$f['group_id']=$udata['group_id'];$pfbox.=$JAX->parse_activity($f);}
      if(!$pfbox) $pfbox="This user has yet to do anything note-worthy!";
      else $pfbox="<a href='./?act=vu".$id."&amp;page=activity&amp;fmt=RSS' class='social rss' style='float:right'>RSS</a>".$pfbox;
@@ -187,7 +187,7 @@ class userprofile{
    if($PERMS['can_moderate']) {
     $contactdetails.='<div>IP: <a href="?act=modcontrols&do=iptools&ip='.$udata['ip'].'">'.long2ip($udata['ip']).'</a></div>';
    }
-   
+
    $page=$PAGE->meta("userprofile-full-profile",
     $udata['display_name'],
     $JAX->pick($udata['avatar'],$PAGE->meta('default-avatar')),

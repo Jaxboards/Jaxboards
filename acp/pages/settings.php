@@ -5,7 +5,7 @@ new settings;
 class settings{
 
  function __construct(){$this->settings();}
- 
+
  function settings(){
   global $JAX;
   $this->leftBar();
@@ -30,8 +30,8 @@ class settings{
    break;
   }
  }
- 
- 
+
+
  function leftBar(){
   global $PAGE;
   $sidebar = "";
@@ -52,7 +52,7 @@ class settings{
   global $PAGE;
   $PAGE->addContentBox("Error","This page is under construction!");
  }
- 
+
  function boardname(){
   global $PAGE,$JAX;
   $page = "";
@@ -74,13 +74,13 @@ class settings{
   <label>Logo URL:</label><input type="text" name="logourl" value="'.$PAGE->getCFGSetting('logourl').'" /><br />
   <input type="submit" value="Save" name="submit" />';
   $PAGE->addContentBox('Board Name/Logo',$page);$page="";
-  
+
   $page.="<label>Board Online</label><input type='checkbox' name='boardoffline' class='switch yn'".(!$PAGE->getCFGSetting('boardoffline')?' checked="checked"':'')."'/><br />";
   $page.="<label style='vertical-align:top'>Offline Text:</label><textarea name='offlinetext'>".$JAX->blockhtml($PAGE->getCFGSetting('offlinetext'))."</textarea><br /><input type='submit' name='submit' value='Save' />";
   $page="$page</form>";
   $PAGE->addContentBox("Board Online/Offline",$page);
  }
- 
+
  /*
   Pages
  */
@@ -128,9 +128,9 @@ class settings{
   <input type='submit' value='Save' />
   </form>";
   $PAGE->addContentBox("Editing Page: $pageurl",$page);
-  
+
  }
- 
+
  /*
   Shoutbox
  */
@@ -157,21 +157,21 @@ class settings{
   <input type="submit" name="submit" value="Save" /></form>';
   $PAGE->addContentBox('Shoutbox',$page);
  }
- 
+
  function domainmanager(){
   global $DB,$CFG,$PAGE,$JAX;
   $page=$table="";
   if(@$JAX->p['submit']){
    if(strlen($JAX->p['domain'])>100) $e="Domain must be less than 100 characters";
    elseif(preg_match('@[^\w.]@',$JAX->p['domain'])) $e="Please enter a valid domain.";
-   
+
    $result = $DB->safequery("SELECT * FROM jaxboards_service.domains WHERE domain=?", $DB->basicvalue($JAX->p['domain']));
    if($DB->row($result)) $e="That domain has already been claimed";
    $DB->disposeresult($result);
    if($e) $page.=$PAGE->error($e);
    else {
     $result = $DB->safequery("INSERT INTO jaxboards_service.domains(`domain`,`prefix`) VALUES( ?, ?);", $DB->basicvalue($JAX->p['domain']), $DB->basicvalue($CFG['prefix']));
-    $page.=$PAGE->success("Domain added! Test <a href='http://".$JAX->blockhtml($JAX->p['domain'])."'>here.</a>");
+    $page.=$PAGE->success("Domain added! Test <a href='https://".$JAX->blockhtml($JAX->p['domain'])."'>here.</a>");
    }
   } else if(@$JAX->b['delete']) {
    $result = $DB->safequery('DELETE FROM jaxboards_service.domains WHERE domain=? AND prefix=?;', $DB->basicvalue($JAX->b['delete']), $DB->basicvalue($CFG['prefix']));
@@ -184,14 +184,14 @@ class settings{
   if(empty($domains)){
    $table="<tr><td>No domains to show!</td></tr>";
   } else {
-   foreach($domains as $v) $table.='<tr><td><a href="http://'.$v.'">'.$v.'</a></td><td><a class="icons delete" href="?act=settings&do=domains&delete='.urlencode($v).'"></a></td></tr>';
+   foreach($domains as $v) $table.='<tr><td><a href="https://'.$v.'">'.$v.'</a></td><td><a class="icons delete" href="?act=settings&do=domains&delete='.urlencode($v).'"></a></td></tr>';
   }
-  $page.="When connecting your A address, use the IP <a href='http://{$_SERVER['SERVER_ADDR']}'>".$_SERVER['SERVER_ADDR'].'</a>';
+  $page.="When connecting your A address, use the IP <a href='https://{$_SERVER['SERVER_ADDR']}'>".$_SERVER['SERVER_ADDR'].'</a>';
   $page.="<table>".$table."</table>";
   $page.='<form method="post">Add a domain: <input type="text" name="domain"  /><input type="submit" value="Add" name="submit"/></form>';
   $PAGE->addContentBox("Domain Manager",$page);
  }
- 
+
  function birthday(){
   global $PAGE,$JAX;
   $birthdays=$PAGE->getCFGSetting('birthdays');

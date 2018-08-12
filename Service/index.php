@@ -37,7 +37,7 @@ if($JAX->p['submit']){
 
  if(!$e) {
   make_forum($JAX->p['boardurl'],$JAX->p['username'],$JAX->p['password'],$JAX->p['email']);
-  header("Location:http://".$JAX->p['boardurl'].".jaxboards.com");
+  header("Location: https://".$JAX->p['boardurl'].".jaxboards.com");
  }
 }
 
@@ -97,8 +97,8 @@ recurse_copy("blueprint","../boards/".$prefix);
 }
 ?>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="https://www.w3.org/1999/xhtml/" xml:lang="en" lang="en">
 <head>
 <link media="all" rel="stylesheet" href="./css/main.css" />
 <meta name="description" content="The world's very first instant forum." />

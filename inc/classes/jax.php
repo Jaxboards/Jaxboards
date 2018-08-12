@@ -296,17 +296,17 @@ public static function json_decode($a,$aa=true){
             $m[2]=(($time[1]?substr($time[1],0,-1)*60:0)+substr($time[2],0,-1));
         }
         return '<div class="media youtube">
-        <div class="summary">Watch Youtube Video: <a href="http://www.youtube.com/watch?v='.$m[1].($m[2]?'&t=':'').$m[2].'">http://youtube.com/watch?v='.$m[1].($m[2]?'&t=':'').$m[2].'</a></div>
-        <div class="open"><a href="http://www.youtube.com/watch?v='.$m[1].'" onclick="var w=new JAX.window;w.title=this.href;w.content=$$(\'.movie\',this.parentNode.parentNode).innerHTML;w.create();return false;">Popout</a> &middot; <a href="http://www.youtube.com/watch?v='.$m[1].$m[2].'" onclick="$$(\'.movie\',this.parentNode.parentNode).style.display=\'block\';return false;">Inline</a></div>
-        <div class="movie" style="display:none"><iframe width="560" height="315" frameborder="0" allowfullscreen="" src="http://www.youtube.com/embed/'.$m[1].'?start='.$m[2].'"></iframe></div>
+        <div class="summary">Watch Youtube Video: <a href="https://www.youtube.com/watch?v='.$m[1].($m[2]?'&t=':'').$m[2].'">https://youtube.com/watch?v='.$m[1].($m[2]?'&t=':'').$m[2].'</a></div>
+        <div class="open"><a href="https://www.youtube.com/watch?v='.$m[1].'" onclick="var w=new JAX.window;w.title=this.href;w.content=$$(\'.movie\',this.parentNode.parentNode).innerHTML;w.create();return false;">Popout</a> &middot; <a href="https://www.youtube.com/watch?v='.$m[1].$m[2].'" onclick="$$(\'.movie\',this.parentNode.parentNode).style.display=\'block\';return false;">Inline</a></div>
+        <div class="movie" style="display:none"><iframe width="560" height="315" frameborder="0" allowfullscreen="" src="https://www.youtube.com/embed/'.$m[1].'?start='.$m[2].'"></iframe></div>
         </div>';
     } else if(strpos($m[1],'vimeo')!==false) {
         preg_match('@(?:vimeo.com|video)/(\d+)@',$m[1],$id);
         return '<div class="media vimeo">
-        <div class="summary">Watch Vimeo Video: <a href="http://vimeo.com/'.$id[1].'">http://vimeo.com/'.$id[1].'</a></div>
-        <div class="open"><a href="http://vimeo.com/'.$id[1].'" onclick="var w=new JAX.window;w.title=this.href;w.content=$$(\'.movie\',this.parentNode.parentNode).innerHTML;w.create();return false;">Popout</a> &middot; <a href="http://vimeo.com/'.$id[1].'" onclick="$$(\'.movie\',this.parentNode.parentNode).style.display=\'block\';return false;">Inline</a></div>
+        <div class="summary">Watch Vimeo Video: <a href="https://vimeo.com/'.$id[1].'">https://vimeo.com/'.$id[1].'</a></div>
+        <div class="open"><a href="https://vimeo.com/'.$id[1].'" onclick="var w=new JAX.window;w.title=this.href;w.content=$$(\'.movie\',this.parentNode.parentNode).innerHTML;w.create();return false;">Popout</a> &middot; <a href="https://vimeo.com/'.$id[1].'" onclick="$$(\'.movie\',this.parentNode.parentNode).style.display=\'block\';return false;">Inline</a></div>
         <div class="movie" style="display:none">
-        <iframe src="http://player.vimeo.com/video/'.$id[1].'?title=0&byline=0&portrait=0" width="400" height="300" frameborder="0" webkitAllowFullScreen allowFullScreen></iframe>
+        <iframe src="https://player.vimeo.com/video/'.$id[1].'?title=0&byline=0&portrait=0" width="400" height="300" frameborder="0" webkitAllowFullScreen allowFullScreen></iframe>
         </div>
         </div>';
 
@@ -540,8 +540,8 @@ public static function json_decode($a,$aa=true){
  function mail($email,$topic,$message){
   global $CFG;
   $boardname=$CFG['boardname']?$CFG['boardname']:"JaxBoards";
-  $boardurl="http://".$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
-  $boardlink="<a href='http://".$boardurl."'>".$boardname."</a>";
+  $boardurl="https://".$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
+  $boardlink="<a href='https://".$boardurl."'>".$boardname."</a>";
   return @mail(
   $email,
   $boardname.' - '.$topic,

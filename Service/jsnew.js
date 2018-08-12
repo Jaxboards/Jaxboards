@@ -427,7 +427,7 @@ var JAX=new function(){
   var object,embed,x,s={width:'100%',height:'100%',quality:'high'}
   for(x in settings) s[x]=settings[x];
   object='<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" id="'+name+'" width="'+s.width+'" height="'+s.height+'"><param name="movie" value="'+url+'"></param>';
-  embed='<embed style="display:block" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" src="'+url+'" width="'+s.width+'" height="'+s.height+'" name="'+name+'"';
+  embed='<embed style="display:block" type="application/x-shockwave-flash" pluginspage="https://get.adobe.com/flashplayer/" src="'+url+'" width="'+s.width+'" height="'+s.height+'" name="'+name+'"';
   for(x in s) if(x!='width'&&x!='height') {
    object+='<param name="'+x+'" value="'+s[x]+'"></param>';
    embed+=' '+x+'="'+s[x]+'"'
@@ -697,7 +697,7 @@ var JAX=new function(){
     break;
     case "createlink":
      b=prompt("Link:");if(!b) return;
-     if(!b.match(/^(https?|ftp|mailto):/)) b="http://"+b
+     if(!b.match(/^(https?|ftp|mailto):/)) b="https://"+b
      bbcode="[url="+b+"]"+selection+"[/url]"
     break;
     case "c_email":

@@ -26,7 +26,7 @@ var Sound=new function(){
  }
 
  this.setup=function(){
-  var d=document.createElement('div');d.innerHTML='<embed width="0" hidden="true" height="0" allowscriptaccess="always" quality="high" name="soundLoader" src="/Script/soundLoader.swf" pluginspage="http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash" style="display:block">'
+  var d=document.createElement('div');d.innerHTML='<embed width="0" hidden="true" height="0" allowscriptaccess="always" quality="high" name="soundLoader" src="/Script/soundLoader.swf" pluginspage="https://get.adobe.com/flashplayer/" type="application/x-shockwave-flash" style="display:block">'
   document.body.appendChild(d)
   setTimeout(Sound.ready,2000)
  }

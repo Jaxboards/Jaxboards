@@ -53,11 +53,11 @@ class TOPIC{
 
   $PAGE->append("TITLE"," -> ".$topicdata['topic_title']);
   $SESS->location_verbose="In topic '".$topicdata['topic_title']."'";
-  
+
   /*Output RSS instead*/
   if($JAX->b['fmt']=="RSS") {
    require_once("inc/classes/rssfeed.php");
-   $link="http://".$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
+   $link="https://".$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
    $feed=new rssfeed(Array("title"=>$topicdata['topic_title'],"description"=>$topicdata['subtitle'],"link"=>$link."?act=vt".$id));
    $result = $DB->safespecial("SELECT p.id,p.post,p.date,m.id,m.display_name FROM %t p LEFT JOIN %t m ON p.auth_id=m.id WHERE p.tid=?",
 	array("posts","members"),
@@ -100,7 +100,7 @@ class TOPIC{
   );
 
   //make the users online list
-  foreach($DB->getUsersOnline() as $f) 
+  foreach($DB->getUsersOnline() as $f)
    if($f['uid']&&$f['location']=="vt$id") {
     $usersonline.=$f['is_bot']?'<a class="user'.$f['uid'].'">'.$f['name'].'</a>':$PAGE->meta('user-link',$f['uid'],$f['group_id'].($f['status']=="idle"?" idle":""),$f['name']);
    }
@@ -108,7 +108,7 @@ class TOPIC{
 
   //add in other page elements shiz
   $page=$pollshit.$PAGE->meta('topic-pages-top',$pagelist).$PAGE->meta('topic-buttons-top',$buttons).$page.$PAGE->meta('topic-pages-bottom',$pagelist).$PAGE->meta('topic-buttons-bottom',$buttons);
-  
+
   //update view count
   $DB->safequery("UPDATE ".$DB->ftable(topics)." SET views = views + 1 WHERE id=?", $id);
 
@@ -126,7 +126,7 @@ class TOPIC{
 
   /*check for new posts and append them*/
   if($SESS->location!="vt$id") $SESS->delvar('topic_lastpid');
-  
+
   if(is_numeric($SESS->vars['topic_lastpid'])&&$SESS->vars['topic_lastpage']) {
    $crap=$this->postsintooutput($SESS->vars['topic_lastpid']);
    if($crap){$PAGE->JS("appendrows","#intopic",$crap);}
@@ -150,7 +150,7 @@ class TOPIC{
   if($oldcache) $PAGE->JS("setoffline",$oldcache);
   $SESS->users_online_cache=$newcache;
  }
- 
+
  function qreplyform($id){
   global $PAGE,$SESS,$DB,$JAX;
   $prefilled="";
@@ -208,7 +208,7 @@ class TOPIC{
    $postt=$post['post'];
 
    $postt=$JAX->theworks($postt);
-   
+
    //post rating
    if($CFG['ratings']&1) {
        $postrating=$showrating='';
@@ -231,8 +231,6 @@ class TOPIC{
             );
        }
    }
-   
-   if($post['avatar']=="http://support.jaxboards.com/tardis.gif") $post['avatar']=$post['avatar'].'" onclick="if(!$(\'tardis\'))this.id=\'tardis\';JAX.event(event).cancel().stopBubbling();RUN.stream.location(\'?act=tardis\')';
 
    $rows.=$PAGE->meta("topic-post-row",
      $post['pid'],
@@ -272,12 +270,12 @@ class TOPIC{
   $SESS->addvar('topic_lastpid',$lastpid);
   return $rows;
  }
- 
+
  function canedit($post){
   global $PERMS,$USER;
   return $this->canmoderate()||($post['auth_id']&&($post['newtopic']?$PERMS['can_edit_topics']:$PERMS['can_edit_posts'])&&$post['auth_id']==$USER['id']);
  }
- 
+
  function canmoderate(){
   global $PAGE,$PERMS,$USER,$DB;
   if($this->canmod) return $this->canmod;
@@ -331,10 +329,10 @@ class TOPIC{
   }
   return $page;
  }
- 
+
  function votepoll($tid){
   global $DB,$PAGE,$USER,$JAX;
-  
+
   if(!$USER) $e='You must be logged in to vote!';
   else {
    $result = $DB->safeselect("poll_q,poll_results,poll_choices,poll_type","topics","WHERE id=?", $this->id);
@@ -351,37 +349,37 @@ class TOPIC{
    } else {
     $results=Array();
    }
-  
+
    //results is now an array of arrays, the keys of the parent array correspond to the choices while the arrays within the array correspond
    //to a collection of user IDs that have voted for that choice
    $voted=false;
    foreach($results as $v) foreach($v as $v2) if($v2==$USER['id']) {$voted=true;break;}
-  
+
    if($voted) $e="You have already voted on this poll!";
-   
+
    if($row['poll_type']=="multi") {
     if(is_array($choice)) {foreach($choice as $c) if(!is_numeric($c)||$c>=$numchoices||$c<0) $e="Invalid choices";}
     else $e="Invalid Choice";
    } elseif(!is_numeric($choice)||$c>=$numchoices||$c<0) $e="Invalid choice";
   }
-  
+
   if($e) return $PAGE->JS("error",$e);
-  
+
   if($row['poll_type']=="multi") {
    foreach($choice as $c) $results[$c][]=$USER['id'];
   } else {
    $results[$choice][]=$USER['id'];
   }
-  
-  $presults=Array();  
+
+  $presults=Array();
   for($x=0;$x<$numchoices;$x++) $presults[$x]=($results[$x]?implode(",",$results[$x]):'');
   $presults=implode(";",$presults);
-  
+
   $PAGE->JS("update","#poll .content",$this->generatePoll($row['poll_q'],$row['poll_type'],$choices,$presults),"1");
-  
+
   $DB->safeupdate("topics",Array("poll_results"=>$presults),"WHERE id=?", $this->id);
  }
- 
+
  function ratepost($postid,$nibletid){
   global $DB,$USER,$PAGE;
   $PAGE->JS("softurl");
@@ -423,7 +421,7 @@ class TOPIC{
   $result = $DB->safeselect("*","posts","WHERE id=?", $id);
   $post=$DB->row($result);
   $DB->disposeresult($result);
- 
+
   $hiddenfields=$JAX->hiddenFormFields(Array("act"=>"post","how"=>"qedit","pid"=>$id));
 
   if($PAGE->jsnewlocation){
@@ -509,7 +507,7 @@ class TOPIC{
    $PAGE->location("?act=vt".$this->id."&page=".(ceil($num/$this->numperpage))."&pid=".$pid."#pid_".$pid);
   }
  }
-  
+
  function markread($id){
   global $SESS,$PAGE,$JAX;
   $topicsread=$JAX->parsereadmarkers($SESS->topicsread);

@@ -86,7 +86,7 @@ if(!$PAGE->jsaccess) {
  $variables[]="username:'".addslashes($USER['display_name'])."'";
  $variables[]="userid:".$JAX->pick($USER['id'],0);
 
- $PAGE->append('SCRIPT',' <script type="text/javascript" src="http://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>');
+ $PAGE->append('SCRIPT',' <script type="text/javascript" src="https://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>');
  $PAGE->append('SCRIPT',' <script type="text/javascript">var globalsettings={'.implode(',',$variables).'}</script>');
  $PAGE->append('SCRIPT',' <script type="text/javascript" src="'.BOARDPATH.'Service/jsnew.js?v=1"></script>');
  $PAGE->append('SCRIPT',' <script type="text/javascript" src="'.BOARDPATH.'Service/jsrun.js"></script>');
