@@ -8,7 +8,7 @@ class LOGREG{
   global $JAX,$PAGE;
   $this->privatekey="6Lcyub0SAAAAAC6ig1rao67cgoPQ0qaouRDox_7G";
   $this->publickey="6Lcyub0SAAAAADHCipWYxUxHNxbPxGjn92TlFeNx";
-  
+
   switch(substr($JAX->b['act'],6)){
    case 1:$this->register();break;
    case 2:$this->logout();break;
@@ -23,19 +23,15 @@ class LOGREG{
   $this->registering=true;
   //TODO: Valid email check?
 
-  require_once("inc/recaptcha/recaptchalib.php");
-  
   global $PAGE,$JAX,$DB,$CFG;
-  
+
   if($JAX->p['username']) $PAGE->location("?");
   $name=trim($JAX->p['name']);
   $dispname=trim($JAX->p['display_name']);
   $pass1=$JAX->p['pass1'];
   $pass2=$JAX->p['pass2'];
   $email=$JAX->p['email'];
-  $captcha=$JAX->p['recaptcha_challenge_field'];
 
-  $p=$PAGE->meta('register-form',$PAGE->jsaccess?"<div id='recaptcha'></div>":recaptcha_get_html($this->publickey));
   if($JAX->p['register']){
    if(!$name||!$dispname) $e="Name and display name required.";
    elseif($pass1!=$pass2) $e="The passwords do not match.";
@@ -50,13 +46,12 @@ class LOGREG{
    else {
     $dispname=$JAX->blockhtml($dispname);
     $name=$JAX->blockhtml($name);
-    $req=recaptcha_check_answer($this->privatekey,$_SERVER['REMOTE_ADDR'],$captcha,$JAX->b['recaptcha_response_field']);
 	if(!$req->is_valid) $e="Captcha failed, please try again.";
     else {
 	 $result = $DB->safeselect("*","members","WHERE name=? OR display_name=?",
 		$DB->basicvalue($name),
 		$DB->basicvalue($dispname));
-     $f=$DB->row($result);	
+     $f=$DB->row($result);
      $DB->disposeresult($result);
 
      if($f!=false) {
@@ -89,7 +84,6 @@ class LOGREG{
   } else {
    if($PAGE->jsnewlocation) {
     $PAGE->JS("update","page",$p);
-	$PAGE->JS("makecaptcha","recaptcha",$this->publickey,"red");
    } $PAGE->append("PAGE",$p);
   }
  }
@@ -146,13 +140,13 @@ class LOGREG{
   $PAGE->append("page",$PAGE->meta('success',"Logged out successfully"));
   if(!$PAGE->jsaccess) $this->login();
  }
- 
+
  function loginpopup(){
   global $PAGE;
   $PAGE->JS("softurl");
   $PAGE->JS("window",Array("title"=>"Login","useoverlay"=>1,"id"=>"loginform","content"=>'<form method="post" onsubmit="return RUN.submitForm(this,1)"><input type="hidden" name="act" value="logreg3" /><input type="hidden" name="popup" value="1" /><label for="user">Username:</label><input type="text" name="user" id="user" /><br /><label for="pass">Password (<a href="?act=logreg6" title="Forgot your password?" onmouseover="return JAX.tooltip(this)" onclick="JAX.window.close(this);">?</a>):</label><input type="password" name="pass" id="pass" /><br /><input type="submit" value="Login" /> <a href="?act=logreg1" onclick="JAX.window.close(this)">Register</a></form>'));
  }
- 
+
  function toggleinvisible(){
   global $PAGE,$SESS;
   if($SESS->hide) $SESS->hide=0;
@@ -161,13 +155,13 @@ class LOGREG{
   $PAGE->JS("setstatus",$SESS->hide?"invisible":"online");
   $PAGE->JS("softurl");
  }
- 
+
  function forgotpassword($uid,$id){
   global $PAGE,$JAX,$DB,$CFG;
   $page="";
-  
+
   if($PAGE->jsupdate&&empty($JAX->p)) return;
-  
+
   if(is_numeric($uid)&&$id) {
    $result = $DB->safeselect("id,name,pass","members","WHERE id=?", $DB->basicvalue($uid));
    if(!($udata=$DB->row($result))||md5($udata['pass'])!=$id) $e="This link has expired. Please try again.";
@@ -183,25 +177,19 @@ class LOGREG{
       $this->registering=true;
       return $this->login($udata['name'],$JAX->p['pass1']);
      }
-     
+
     }
     $page.=$PAGE->meta('forgot-password2-form',$JAX->hiddenFormFields(Array('uid'=>$uid,'id'=>$id,'act'=>'logreg6')));
    }
   } else {
-      require_once("inc/recaptcha/recaptchalib.php");
-      
-      $makecaptcha=false;
-      $captcha=$JAX->p['recaptcha_challenge_field'];
-        
+
       if($captcha&&$JAX->p['user']) {
-        $req=recaptcha_check_answer($this->privatekey,$_SERVER['REMOTE_ADDR'],$captcha,$JAX->b['recaptcha_response_field']);
-        if(!$req->is_valid) $e="Recaptcha Invalid! Please try again.";
         else {
 		$result = $DB->safeselect("id,pass,email","members","WHERE name=?", $DB->basicvalue($JAX->p['user']));
 		if(!($udata=$DB->row($result))) $e="There is no user registered as <strong>".$JAX->b['user']."</strong>, sure this is correct?";
 		$DB->disposeresult($result);
 	}
-        
+
         if($e) {
          $page.=$PAGE->meta('error',$e);
         } else {
@@ -218,14 +206,10 @@ class LOGREG{
          else $page.=$PAGE->meta('success',"An email has been sent to the email associated with this account. Please check your email and follow the instructions in order to recover your password.");
         }
       }
-      
-      $makecaptcha=true;
-      $page.=$PAGE->meta('forgot-password-form',$PAGE->jsaccess?"<div id='recaptcha'></div>".$JAX->hiddenFormFields(Array("act"=>"logreg6")):recaptcha_get_html($this->publickey));
   }
-  
+
   $PAGE->append("PAGE",$page);
   $PAGE->JS("update","page",$page);
-  if($makecaptcha) $PAGE->JS("makecaptcha","recaptcha",$this->publickey,"red");
  }
 }
 ?>

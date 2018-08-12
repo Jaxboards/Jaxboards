@@ -29,7 +29,7 @@ IMWindow.menu=function(e,uid){
  d.className="immenu"
  document.body.appendChild(d)
  document.body.onclick=function(e){e=JAX.event(e);if(e.srcElement!=d&&!JAX.el.isChildOf(e.srcElement,d)) d.parentNode.removeChild(d);}
- 
+
  RUN.stream.load("?module=privatemessage&im_menu="+uid);
 }
 
@@ -37,18 +37,18 @@ function RUNF(){
  var me=this,stream=me.stream=new JAX.ajax
 
  if(useJSLinks) JAX.gracefulDegrade(document.body)
- 
+
  this.updateDates=function(){
   var dates=$$('.autodate'),x,parsed
   if(!dates) return
   for(x=0;x<dates.length;x++) {
-   parsed=JAX.el.hasClass(dates[x],'smalldate')?JAX.smalldate(parseInt(dates[x].title)):JAX.date(parseInt(dates[x].title)) 
+   parsed=JAX.el.hasClass(dates[x],'smalldate')?JAX.smalldate(parseInt(dates[x].title)):JAX.date(parseInt(dates[x].title))
    if(parsed!=dates[x].innerHTML) dates[x].innerHTML=parsed
   }
  }
  this.updateDates()
  setInterval(this.updateDates,1000*30)
- 
+
  this.submitForm=function(a,b){
   var names=[],values=[],x,l=a.elements.length,submit,i
    submit=a.submitButton
@@ -161,7 +161,7 @@ function RUNF(){
    var el=$$(a[0])
    if(el) el.parentNode.removeChild(el)
   },
-  overlay:JAX.overlay, 
+  overlay:JAX.overlay,
   back:function(){history.back();},
   goto:function(a){
    a=a[0]
@@ -332,13 +332,6 @@ function RUNF(){
      JAX.scrollTo(pos.y)
    },(a[1]?10:1000));
    },
-   makecaptcha:function(a){
-   Recaptcha.create(a[1], a[0], {
-        theme: a[2]||'red',
-        tabindex: 0,
-        callback: Recaptcha.focus_response_field
-   });
-  },
   updateqreply:function(a){
    if($('qreply')){
     $('qreply').getElementsByTagName('textarea')[0].focus()
@@ -398,7 +391,7 @@ function RUNF(){
  }
 
  document.cookie="buddylist=0"
- 
+
  var foot=$$('.footer'),fs
  while(foot&&foot.tagName!="BODY"&&(fs=JAX.el.getComputedStyle(foot))) if(fs.display=="none"||fs.visibility=="hidden") return alert("WARNING: COPYRIGHT MISSING, THIS IS AGAINST TOS"); else foot=foot.parentNode;
 }
