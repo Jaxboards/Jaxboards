@@ -9,7 +9,6 @@ $rules=Array(
  "&gt;:("=>"mad.png",
  ":O"=>"oh.png",
  ":o"=>"oh.png",
- "***REMOVED***"=>"re***REMOVED***.png",
  ":("=>"sad.png",
  "X("=>"sick.png",
  ":/"=>"slant.png",

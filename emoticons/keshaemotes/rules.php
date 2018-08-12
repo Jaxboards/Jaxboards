@@ -24,11 +24,9 @@ $rules=Array(
  ":wub:" => "love.gif",
  ":lt:"  => "lt.gif",
  ":gt:"  => "gt.gif",
- "***REMOVED***"=> "***REMOVED***.gif",
  "XD"    => "XD.gif",
  "^_^"   => "^_^.gif",
  ":cookie:" =>"cookie.gif"
 );
 
-//>:( :) :( 8D :| B) (!) :D :3 O_o (?) :o X( :P -_- :-. :S x) ;) :wub: :lt: :gt: ***REMOVED*** XD
 ?>

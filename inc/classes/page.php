@@ -15,7 +15,7 @@ class PAGE{
   $this->metadefs=Array();
   $this->userMetaDefs=Array();
   $this->moreFormatting=Array();
-  
+
  }
 
  function get($a){
@@ -30,14 +30,14 @@ class PAGE{
    return $this->parts[$a].=$b;
   }
  }
- 
+
  function addvar($a,$b){
   $this->vars['<%'.$a.'%>']=$b;
  }
  function filtervars($a){
   return str_replace(array_keys($this->vars),array_values($this->vars),$a);
  }
- 
+
  function prepend($a,$b){
   if(!$this->jsaccess){
    $a=strtoupper($a);
@@ -77,12 +77,11 @@ class PAGE{
  }
 
  function out(){
-  global $ads,$SESS,$JAX;
+  global $SESS,$JAX;
   if (isset($this->done)) return false;
   $this->done=true;
   $this->parts['path']="<div id='path' class='path'>".$this->buildpath()."</div>";
-  //ads
-  
+
   if ($this->jsaccess) {
    header("Content-type:text/plain");
    foreach($this->JSOutput as $k=>$v) $this->JSOutput[$k]=$SESS->addSessID($v);
@@ -93,7 +92,7 @@ class PAGE{
    foreach($this->parts as $k=>$v) {
     $k=strtoupper($k);
     if(in_array($k,$autobox)) $v='<div id="'.strtolower($k).'">'.$v.'</div>';
-    if($k=="PATH") $this->template=preg_replace("@<!--PATH-->@",$v.$ads,$this->template,1);
+    if($k=="PATH") $this->template=preg_replace("@<!--PATH-->@",$v,$this->template,1);
     $this->template=str_replace("<!--".$k."-->",$v,$this->template);
    }
    $this->template=$this->filtervars($this->template);
@@ -120,7 +119,7 @@ class PAGE{
   $this->template=preg_replace_callback("@<!--INCLUDE:(\w+)-->@",Array($this,"includer"),$this->template);
   $this->template=preg_replace_callback('@<M name=([\'"])([^\'"]+)\\1>(.*?)</M>@s',Array(&$this,"userMetaParse"),$this->template);
  }
- 
+
  function loadskin($id){
   global $DB,$CFG;
   if($id) {
@@ -155,9 +154,9 @@ class PAGE{
   $DB->disposeresult($result);
   return $page?$page:'';
  }
- 
+
  function loadmeta($a){
-   
+
    if(is_file(THEMEPATH."meta/".$a.".php")) $file=THEMEPATH."meta/".$a.".php";
    else $file=DTHEMEPATH."meta/".$a.".php";
    $this->metaqueue[]=$file;
@@ -203,12 +202,12 @@ class PAGE{
   if($c) return $m[2];
   return '';
  }
-  
+
  function checkextended($meta=null,$data){
   if(strpos($data,'{if ')!==false) if($meta) $this->moreFormatting[$meta]=true; else return true;
   return false;
  }
- 
+
  function metaexists($meta){
   return $this->userMetaDefs[$meta]||$this->metadefs[$meta];
  }
@@ -234,12 +233,12 @@ class PAGE{
   if($a) $this->path($a);
   $this->JS("update","path",$this->buildpath());
  }
- 
+
  function debug($data=""){
   if($data) $this->debuginfo.=$data."<br />";
   else return $this->debuginfo;
  }
- 
+
  function SWF($file,$options=Array()){
     $settings=Array('width'=>'100%','height'=>'100%');
     foreach($options as $k=>$v) $settings[$k]=$v;

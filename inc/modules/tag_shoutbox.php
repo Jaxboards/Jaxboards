@@ -24,7 +24,7 @@ class SHOUTBOX{
      $result = $DB->safeselect("uid","shouts","WHERE id=?", $id);
      $shoutrow=$DB->row($result);
    }
-   if($shoutrow['uid']==$USER['id']) $candelete=true; 
+   if($shoutrow['uid']==$USER['id']) $candelete=true;
   }
   return $candelete;
  }
@@ -66,27 +66,7 @@ class SHOUTBOX{
 	while($f=$DB->row()) {
 	   $PAGE->JS("addshout",$this->formatshout($f));
 	   if($CFG['shoutboxsounds']) {
-	   $sounds=Array(
-	    "diglettdig"=>"diglettdig1",
-	    "gidttelgid"=>"gidttelgid",
-	    "triotriotrio"=>"triotriotrio",
-	    "ruuun"=>"runfuckingrun",
-	    "i'm painis cupcake"=>"i_am_painis_cupcake",
-	    "diglett"=>"diglett",
-	    "i will eat you"=>"i_will_eat_you",
-	    "!"=>"alert",
-	    "scatman"=>"scatman",
-	    "super meat boy"=>"smb",
-	    "warpzone"=>"warpzone",
-	    "push the buttons"=>"ptb",
-	    "so fluffy"=>"so fluffy",
-	    "does this count as annoying"=>"does this count as annoying",
-	    "its so fluffy im gonna die"=>"its so fluffy im gonna die",
-	    "pew pew"=>"pewpew",
-		"sounds like someone wants to get ***REMOVED***d again"=>"***REMOVED***dagain",
-		"i was frozen today"=>"frozentoday",
-		"lol clinton"=>"clinton_denial"
-	    );
+	   $sounds=Array();
 	   if($USER['sound_shout']&&$sounds[$f['shout']]) $PAGE->JS("playsound","sfx",SOUNDSURL.$sounds[$f['shout']].".mp3");
 	   }
 	   $last=$f['id'];

@@ -1,5 +1,5 @@
 /*WYSWYG Editor CSS*/
-@import url("../../../wysiwyg.css");
+@import url("../../wysiwyg.css");
 
 body{background:url(img/bg.jpg);font-family:arial;font-size:16px;color:#004;text-align:center;overflow-y:scroll;word-wrap:break-word;}
 img{border:0;}

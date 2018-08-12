@@ -26,12 +26,12 @@ class PAGE{
  function append($a,$b){
   $this->parts[$a]=$b;
  }
- 
+
  function sidebar($sidebar){
   if ($sidebar) $this->parts['sidebar']="<div class='sidebar'><a href='?' class='icons home'>ACP Home</a>".$sidebar."</div>";
   else $this->parts['sidebar']="";
  }
- 
+
  function title($title){
   $this->parts['title']=$title;
  }
@@ -48,7 +48,7 @@ class PAGE{
   <link rel="stylesheet" type="text/css" href="Theme/css.css" />
   <link rel="stylesheet" type="text/css" href="'.STHEMEPATH.'Default/bbcode.css" />
   <script type="text/javascript" src="'.STHEMEPATH.'../jsnew.js"></script>
-  <script type="text/javascript" src="Script/admin.php"></script>
+  <script type="text/javascript" src="Script/admin.js"></script>
   <title><% TITLE %></title>
  </head>
  <body>
@@ -83,7 +83,7 @@ class PAGE{
  function location($a){
   header("Location: $a");
  }
- 
+
  function writeData($page,$name,$data,$mode="w"){
   $write="<?php\n";
   $write.='$'.$name."=Array(\n";
@@ -97,14 +97,14 @@ class PAGE{
   $o=fopen($page,$mode);fwrite($o,$write);fclose($o);
   return $write;
  }
- 
+
  function writeCFG($data){
   include BOARDPATH."config.php";
   foreach($data as $k=>$v) $CFG[$k]=$v;
   $this->CFG=$CFG;
   return $this->writeData(BOARDPATH."config.php","CFG",$CFG);
  }
- 
+
  function getCFGSetting($setting){
   if(!$this->CFG) {
    include BOARDPATH."config.php";

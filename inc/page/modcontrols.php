@@ -7,17 +7,17 @@ new modcontrols;
   /* function modcontrols(){$this->__construct();} */
   function __construct(){
    global $JAX,$PAGE,$USER;
-   
+
    $this->perms=$JAX->getPerms();
    if(!$this->perms['can_moderate']&&!$USER['mod']) {
     $PAGE->JS("softurl");
     return $PAGE->JS("alert","what the FUCK do you think you're doing, punk?");
    }
    if($JAX->b['cancel']) return $this->cancel();
-   
+
    if($PAGE->jsupdate&&empty($JAX->p)) return false;
-   
-  
+
+
    if($JAX->p['dot']) return $this->dotopics($JAX->p['dot']);
    if($JAX->p['dop']) return $this->doposts($JAX->p['dop']);
    switch($JAX->b['do']){
@@ -29,7 +29,7 @@ new modcontrols;
     case "iptools":$this->iptools();break;
    }
   }
-  
+
   function dotopics($do){
   global $PAGE,$SESS,$JAX,$DB;
    switch($do){
@@ -71,7 +71,7 @@ new modcontrols;
     case 'delete':$this->deleteposts();$this->cancel();break;
    }
   }
-  
+
   function cancel(){
    global $SESS,$PAGE;
    if($SESS->vars['modpids']) $SESS->delvar("modpids");
@@ -79,20 +79,20 @@ new modcontrols;
    $this->sync();
    $PAGE->JS("modcontrols_clearbox");
   }
-  
+
   function modpost($pid){
    global $PAGE,$SESS,$DB,$USER;
    if(!is_numeric($pid)) return;
-   
+
    $result = $DB->safeselect("*","posts","WHERE id=?", $DB->basicvalue($pid));
    $postdata=$DB->row($result);
    $DB->disposeresult($result);
-   
+
    if(!$postdata) return;
    elseif($postdata['newtopic']) return $this->modtopic($postdata['tid']);
-   
+
    $PAGE->JS("softurl");
-   
+
    //see if they have permission to manipulate this post
    if(!$this->perms['can_moderate']) {
     $result = $DB->safespecial("SELECT mods FROM %t WHERE id=(SELECT fid FROM %t WHERE id=?)",
@@ -106,11 +106,11 @@ new modcontrols;
     else $mods=explode(',',$mods['mods']);
     if(!in_array($USER['id'],$mods)) return $PAGE->JS("error","You don't have permission to be moderating in this forum");
    }
-   
-   
+
+
    //push the PID onto the list of PIDs they're workin with
    //I feel sorry for the poor bastard that tries to mod my code, everything looks like this
-   
+
    //LITTLE DID YOU KNOW, PAST SELF, THAT FUTURE SELF WOULD BE WORKING ON IT
    //THANKS ALOT ASSHOLE
    $exploded=explode(',',$SESS->vars['modpids']);
@@ -119,7 +119,7 @@ new modcontrols;
     unset($exploded[$placement]);
     $SESS->addVar("modpids",implode(',',$exploded));
    }
-   
+
    $this->sync();
   }
   function modtopic($tid){
@@ -145,23 +145,23 @@ new modcontrols;
    }
    $this->sync();
   }
-  
+
   function sync(){
    global $SESS,$PAGE;
    $PAGE->JS("modcontrols_postsync",$SESS->vars['modpids'],$SESS->vars['modtids']);
   }
-  
+
   function deleteposts(){
    global $SESS,$PAGE,$DB,$USER;
    if(!$SESS->vars['modpids']) return $PAGE->JS("error","No posts to delete.");
-   
+
    //get trashcan
    $result = $DB->safeselect("id","forums","WHERE trashcan=1 LIMIT 1");
    $trashcan=$DB->row($result);
    $DB->disposeresult($result);
-   
+
    $result = $DB->safeselect("tid","posts","WHERE id IN ?", explode(",", $SESS->vars['modpids']));
-   
+
    //build list of tids that the posts were in
    $tids=Array();
    $pids=explode(",",$SESS->vars['modpids']);
@@ -191,7 +191,7 @@ new modcontrols;
     $DB->safeupdate("posts",Array("tid"=>$tid,"newtopic"=>0),"WHERE id IN ?", explode(",", $SESS->vars['modpids']));
     $DB->safeupdate("posts",Array("newtopic"=>1),"WHERE id=?", $DB->basicvalue($op));
     $tids[]=$tid;
-     
+
    } else {
     $DB->safedelete("posts","WHERE id IN ?", explode(",", $SESS->vars['modpids']));
    }
@@ -203,12 +203,12 @@ new modcontrols;
    //remove them from the page
    foreach($pids as $v) $PAGE->JS("removeel","#pid_".$v);
   }
-  
+
   function deletetopics(){
    global $SESS,$DB,$PAGE;
    if(!$SESS->vars['modtids']) return $PAGE->JS("error","No topics to delete");
    $data=Array();
-   
+
    //get trashcan id
    $result = $DB->safeselect("id","forums","WHERE trashcan=1 LIMIT 1");
    $trashcan=$DB->row($result);
@@ -239,14 +239,14 @@ new modcontrols;
    $PAGE->JS("modcontrols_clearbox");
    $PAGE->JS("alert","topics deleted!");
   }
-  
+
   function mergetopics(){
    global $SESS,$DB,$PAGE,$JAX;
    $exploded=explode(",",$SESS->vars['modtids']);
    if(is_numeric($JAX->p['ot'])&&in_array($JAX->p['ot'],$exploded)){
     //move the posts and set all posts to normal (newtopic=0)
     $DB->safeupdate("posts",Array('tid'=>$JAX->p['ot'],'newtopic'=>'0'),"WHERE tid IN ?", explode(",", $SESS->vars['modtids']));
-	
+
 	//make the first post in the topic have newtopic=1
 	 //get the op
 	 $result = $DB->safeselect("min(id)","posts","WHERE tid=?", $DB->basicvalue($JAX->p['ot']));
@@ -255,7 +255,7 @@ new modcontrols;
          $DB->disposeresult($result);
 
 	 $DB->safeupdate("posts",Array("newtopic"=>1),"WHERE id=?", $op);
-	
+
 	//also fix op
 	$DB->safeupdate("topics",Array("op"=>$op),"WHERE tid=?", $DB->basicvalue($JAX->p['ot']));
 	unset($exploded[array_search($JAX->p['ot'],$exploded)]);
@@ -265,7 +265,7 @@ new modcontrols;
    }
    $page.='<form method="post" onsubmit="return RUN.submitForm(this)" style="padding:10px;">Which topic should the topics be merged into?<br />';
    $page.=$JAX->hiddenFormFields(Array('act'=>'modcontrols','dot'=>'merge'));
-   
+
    $result = $DB->safeselect("id,title","topics","WHERE id IN ?", explode(",", $SESS->vars['modtids']));
    $titles=Array();
    while($f=$DB->row($result)) $titles[$f['id']]=$f['title'];
@@ -277,24 +277,25 @@ new modcontrols;
    $PAGE->JS("update","page",$page);
    $PAGE->append("page",$page);
   }
-  
+
   function banposts(){
    global $PAGE;
    $PAGE->JS("alert","under construction");
   }
-  
+
   public static function load(){
    global $PAGE;
-   $script=file_get_contents("Script/modcontrols.php");
+   $script=file_get_contents("Script/modcontrols.js");
    if($PAGE&&$PAGE->jsaccess){
     $PAGE->JS("softurl");
     $PAGE->JS("script",$script);
    } else {
+    header("Content-Type: application/javascript; charset=utf-8");
     header("Expires: ".gmdate("D, d M Y H:i:s", time() + 2592000)." GMT");
     die($script);
    }
   }
-  
+
   function showmodcp($cppage=''){
    global $PAGE,$PERMS;
    if(!$PERMS['can_moderate']) return;
@@ -303,9 +304,9 @@ new modcontrols;
    $PAGE->append("page",$page);
    $PAGE->JS("update","page",$page);
   }
-  
+
   function editmembers(){
-  
+
    global $PAGE,$JAX,$DB,$USER,$PERMS;
    if(!$PERMS['can_moderate']) return;
    $page='<form method="post" onsubmit="return RUN.submitForm(this)">'.
@@ -336,10 +337,10 @@ new modcontrols;
      if(count($data)>1) $e="Many users found!";
      else $data=array_shift($data);
     } else $e="Member name is a required field.";
-    
+
     if(!$data) $e="No members found that matched the criteria.";
     if($data['can_moderate']&&$USER['group_id']!=2||$data['group_id']==2&&($USER['id']!=1&&$data['id']!=$USER['id'])) $e="You do not have permission to edit this profile.";
-    
+
     if($e) $page.=$PAGE->meta('error',$e);
     else {
      function field($label,$name,$value,$type='input'){
@@ -357,18 +358,18 @@ new modcontrols;
       $page.='</table><input type="submit" value="Save" /></form>';
     }
    }
-    
+
    $this->showmodcp($page);
   }
-  
+
   function iptools(){
    global $PAGE,$DB,$CFG,$JAX,$USER;
    require_once("inc/classes/geoip.php");
-      
+
    $ip=$JAX->b['ip'];
    if(strpos($ip,'.')) $ip=$JAX->ip2int($ip);
    if($ip) $dottedip=long2ip($ip);
-   
+
    if($JAX->p['ban']) {
     if(!$JAX->ipbanned($dottedip)) {
      $changed=true;$JAX->ipbancache[]=$dottedip;
@@ -380,14 +381,14 @@ new modcontrols;
      }
    }
    if($changed) {$o=fopen(BOARDPATH."/bannedips.txt","w");fwrite($o,implode("\n",$JAX->ipbancache));fclose($o);}
-   
+
    function box($title,$content){
     return "<div class='minibox'><div class='title'>$title</div><div class='content'>".($content?:"--No Data--")."</div></div>";
    }
    $form="<form method='post' onsubmit='return RUN.submitForm(this)'>".$JAX->hiddenFormFields(Array('act'=>'modcontrols','do'=>'iptools'))."IP: <input type='text' name='ip' value='".$dottedip."' /><input type='submit' value='Submit' /></form>";
    if($ip){
     $page.="<h3>Data for ".$dottedip.":</h3>";
-    
+
     $g=new GeoIP;
     $cc=$g->country_code($dottedip);
     //$hostname=$JAX->gethostbyaddr($dottedip);
@@ -396,14 +397,14 @@ new modcontrols;
       "IP ban status: ".($JAX->ipbanned($dottedip)?'<span style="color:#900">banned</span> <input type="submit" name="unban" onclick="this.form.submitButton=this" value="Unban" />':'<span style="color:#090">not banned</span> <input type="submit" name="ban" onclick="this.form.submitButton=this" value="Ban" />').'</form>'.
       "StopForumSpam status: ".($JAX->forumspammer($dottedip)?'<span style="color:#900">forum spammer!</span>':'clean.')."<br />".
       "Tor status: ".($JAX->toruser($dottedip)?'<span style="color:#900">Confirmed Tor User</span>':'Not a TOR user')
-      
+
       );
-    
+
     $content=Array();
     $result = $DB->safeselect("group_id,display_name,id","members","WHERE ip=?", $DB->basicvalue($ip));
     while($f=$DB->row($result)) $content[]=$PAGE->meta('user-link',$f['id'],$f['group_id'],$f['display_name']);
     $page.=box("Users with this IP:",implode(', ',$content));
-    
+
     if($CFG['shoutbox']){
      $content="";
      $result = $DB->safespecial("SELECT s.*,m.group_id,m.display_name FROM %t s LEFT JOIN %t m ON m.id=s.uid WHERE s.ip=? ORDER BY id DESC LIMIT 5",

@@ -55,29 +55,6 @@ if($PAGE->jsaccess) $PAGE->JS("script","document.location='?'");
 }
 if($SESS->vars['skin_id']) $PAGE->append('NAVIGATION','<div class="success" style="position:fixed;bottom:0;left:0;width:100%;">Skin UCP setting being overriden. <a href="?skin_id=0">Revert</a></div>');
 
-/*throw ads*/
-$ads='';
-if(false&&!$CFG['noads']) $ads=<<<HEREDOC
-<div style="text-align:center;padding:10px;">
-<script type="text/javascript">
-ch_client = "***REMOVED***";
-ch_width = 728;
-ch_height = 90;
-ch_type = "mpu";
-ch_sid = "Chitika Default";
-ch_backfill = 1;
-ch_color_site_link = "#0000CC";
-ch_color_title = "#0000CC";
-ch_color_border = "#FFFFFF";
-ch_color_text = "#000000";
-ch_color_bg = "#FFFFFF";
-JAX.adColorize()
-</script>
-<!-- <script src="http://scripts.chitika.net/eminimalls/amm.js" type="text/javascript">
-</script> -->
-</div>
-HEREDOC;
-
 // "Login"
 // If they're logged in through cookies, (username & password)
 // but the session variable has changed/been removed/not updated for some reason
@@ -108,13 +85,13 @@ if(!$PAGE->jsaccess) {
  $variables[]="groupid:".($JAX->pick($USER['group_id'],3));
  $variables[]="username:'".addslashes($USER['display_name'])."'";
  $variables[]="userid:".$JAX->pick($USER['id'],0);
- 
+
  $PAGE->append('SCRIPT',' <script type="text/javascript" src="http://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>');
- $PAGE->append('SCRIPT',' <script type="text/javascript">var globalsettings={'.implode(',',$variables).'}</script>'); 
+ $PAGE->append('SCRIPT',' <script type="text/javascript">var globalsettings={'.implode(',',$variables).'}</script>');
  $PAGE->append('SCRIPT',' <script type="text/javascript" src="'.($local?'Service/':BOARDPATH).'jsnew.js?v=1"></script>');
  $PAGE->append('SCRIPT',' <script type="text/javascript" src="'.($local?'Service/':BOARDPATH).'jsrun.js"></script>');
  $PAGE->append('SCRIPT','<!--[if IE]><style> img {behavior: url(Script/fiximgnatural.htc)}</style><![endif]-->');
- 
+
  if($PERMS['can_moderate']||$USER['mod']) {
   $PAGE->append("SCRIPT",'<script type="text/javascript" src="?act=modcontrols&do=load"></script>');
  }

@@ -88,7 +88,7 @@ var JAX=new function(){
  this.isArray=function(a){
   return a.constructor.toString().match("Array")?true:false;
  }
- 
+
  this.date=function(a){
   var old=new Date,now=new Date,fmt,hours,mins,delta,ampm,yday=new Date,dstr,
   months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -108,7 +108,7 @@ var JAX=new function(){
   else                                fmt=months[old.getMonth()]+" "+JAX.ordsuffix(old.getDate())+", "+old.getFullYear()+" @ "+hours+':'+JAX.prepad(mins,2)+' '+ampm;
   return fmt;
  }
- 
+
  this.smalldate=function(a){
   var d=new Date,h,ampm
   d.setTime(a*1000)
@@ -120,7 +120,7 @@ var JAX=new function(){
  }
 
  this.ordsuffix=function(a){return a+(Math.round(a/10)==1?'th':['','st','nd','rd'][a%10]||'th');}
- 
+
  this.prepad=function(st,len,chr){
   st=st.toString()
   if(!chr) chr='0'
@@ -143,12 +143,12 @@ var JAX=new function(){
   else return shit;
   return (ar?"[":"{")+r.substr(0,r.length-1)+(ar?"]":"}")
  }
- 
+
  this.API={
     getMostRecentTopics:function(cb){
     }
  }
- 
+
  this.autoComplete=function(a,el,dummy,e){
   if(e) e=JAX.event(e)
   else e={}
@@ -198,7 +198,7 @@ var JAX=new function(){
    });
   }
  }
- 
+
  this.select=function(a){
   var r
   if (document.selection) {
@@ -211,7 +211,7 @@ var JAX=new function(){
    window.getSelection().addRange(r);
   }
  }
- 
+
  this.flashTitle=function(a){
   if(window.hasFocus) return true;
   this.stopTitleFlashing();
@@ -227,23 +227,10 @@ var JAX=new function(){
   clearInterval(JAX.flashInterval)
  }
 
- this.adColorize=function(){
-  var s=JAX.el.getComputedStyle($('path')),s2=JAX.el.getComputedStyle(document.links[0]),s3=JAX.el.getComputedStyle($('body'))
-  if(s&&s.color) {
-   ch_color_text=JAX.color(s.color).toHex()
-  }
-  if(s3&&s3.backgroundColor||s&&s.backgroundColor) {
-   ch_color_border=ch_color_bg=JAX.color(s3&&s3.backgroundColor?s3.backgroundColor:s.backgroundColor).toHex()
-   ch_color_site_link=ch_color_site_link=JAX.color(ch_color_bg).invert().toHex()
-  } else if(s2&&s2.color){
-   ch_color_site_link=JAX.color(s2.color).toHex()
-  }
- }
-
  this.gracefulDegrade=function(a){
   if(typeof RUN!="undefined") RUN.updateDates();
   var tmp,links=a.getElementsByTagName('a'),l=links.length,x,old
-  
+
   for(x=0;x<l;x++) {
    if(links[x].href){
     if(links[x].getAttribute('href').charAt(0)=="?") {
@@ -255,15 +242,15 @@ var JAX=new function(){
    }
   }
   JAX.convertSwitches($$('.switch',a))
-  
+
   var bbcodeimgs=$$('.bbcodeimg')
   if(bbcodeimgs) JAX.onImagesLoaded(bbcodeimgs,function(){JAX.imageResizer(bbcodeimgs);},2000)
-  
+
   if(tmp=$$('.pages',a)) {
    if(!tmp.length) tmp=[tmp]
    for(x=0;x<tmp.length;x++) JAX.scrollablepagelist(tmp[x])
   }
-  
+
   if(tmp=$$('.date',a)) {
    if(!tmp.length)tmp=[tmp]
    for(var x=0;x<tmp.length;x++) {
@@ -272,7 +259,7 @@ var JAX=new function(){
     tmp[x].onkeydown=function(){JAX.datepicker.hide();}
    }
   }
-  
+
   if(JAX.event.onUpdate) JAX.event.onUpdate(a)
  }
 
@@ -326,7 +313,7 @@ var JAX=new function(){
   el.className="active"
   el.blur()
  }
- 
+
  this.toggle=function(a){
   if(a.style.display=='none') a.style.display=''
   else a.style.display='none'
@@ -389,8 +376,8 @@ var JAX=new function(){
    } while((a=a.offsetParent))
    return {x:x,y:y,yh:y+h,xw:x+w,w:w,h:h};
   },
-  
-  
+
+
   isChildOf:function(a,b){
    while(a=a.parentNode) if(a==b) return true;
    return false;
@@ -567,7 +554,7 @@ var JAX=new function(){
   me.textarea=textarea
   me.window=iframe.contentWindow
   me.doc=iframe.contentWindow.document
-  
+
   var cs=JAX.el.getComputedStyle(me.textarea)
   var body=me.doc.getElementsByTagName('body')[0]
   if(body&&cs) {
@@ -575,7 +562,7 @@ var JAX=new function(){
    body.style.color=cs.color
    body.style.borderColor='#FFF'
   }
-  
+
   me.doc.designMode='on'
 
   me.buildEditBar=function(){
@@ -688,7 +675,7 @@ var JAX=new function(){
   me.hideColors=function(){
    if(me.colorWindow) me.colorWindow.style.display='none'
   }
- 
+
   me.cmd=function(a,b,c){
    a=a.toLowerCase()
    var rng,selection=me.getSelection(),bbcode
@@ -1108,20 +1095,20 @@ var JAX=new function(){
    xmlobj.send(c||null)
    return xmlobj
   }
-  
+
   me.loadJSON=function(url,cb){
      me.load(url,function(x){cb(eval(x.responseText))})
   }
  }
- 
- 
+
+
  this.ajax.prototype.build_query=function(a,b){
     var q=""
 	if(b) for(x=0;x<a.length;x++) q+=encodeURIComponent(a[x])+"="+encodeURIComponent(b[x]||"")+"&";
 	else  for(x in a) q+=encodeURIComponent(x)+"="+encodeURIComponent(a[x]||"")+"&";
     return q.substring(0,q.length-1)
   }
-  
+
 /********************************************************************/
 
  this.tooltip=function(el){
@@ -1158,7 +1145,7 @@ var JAX=new function(){
    $('tooltip_thingy').style.display='none'
   }
  }
- 
+
 /********************************************************************/
 
 this.imageResizer=function(imgs){
@@ -1180,7 +1167,7 @@ this.imageResizer=function(imgs){
    new this.makeResizer(iw,nw,ih,nh,img)
   }
  }
- 
+
 }
 this.makeResizer=function(iw,nw,ih,nh,img){
    img.style.maxWidth=img.style.maxHeight="999999px";
@@ -1338,7 +1325,7 @@ this.makeResizer=function(iw,nw,ih,nh,img){
    win=win.offsetParent
   } while(win)
  }
- 
+
  //scrolling page list functionality
  function scrollpagelist(e){
   e=JAX.event(e).cancel()
@@ -1356,19 +1343,19 @@ this.makeResizer=function(iw,nw,ih,nh,img){
     p[x+1].href=p[x+1].href.replace(/\d+$/,(x+s+d));
     p[x+1].innerHTML=s+x+d;
    }
-  
+
  }
  this.scrollablepagelist=function(pl){
   if(pl.addEventListener) pl.addEventListener('DOMMouseScroll',scrollpagelist,false)
   pl.onmousewheel=scrollpagelist
  }
- 
+
  /********************************************************/
- 
+
  this.datepicker=new function(){
   this.months=["January","February","March","April","May","June","July","August","September","October","November","December"]
   this.daysshort=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"] //I don't think I'll need a dayslong ever
- 
+
   this.init=function(el){
    var dp=$('datepicker'),s,c=JAX.el.getCoordinates(el),x
    if(!dp) {
@@ -1384,11 +1371,11 @@ this.makeResizer=function(iw,nw,ih,nh,img){
    s=el.value.split('/')
    if(s.length==3) {this.selectedDate=[parseInt(s[2]),parseInt(s[0])-1,parseInt(s[1])];}
    else this.selectedDate=undefined;
-   
+
    this.el=el
    this.generate(s[2],s[0]?parseInt(s[0])-1:undefined,s[1])
   }
- 
+
   //month should be 0 for jan, 11 for dec
   this.generate=function(year,month,day){
    var date = new Date,dp=$('datepicker'),row,cell,x,i
@@ -1399,20 +1386,20 @@ this.makeResizer=function(iw,nw,ih,nh,img){
     day=date.getDate()
     this.selectedDate=[year,month,day]
    }
-  
+
    if(month==-1) {year--;month=11;}
    if(month==12) {year++;month=0;}
-  
+
    this.lastDate=[year,month,day]
-  
+
    //this date is used to calculate days in month and the day the first is on
    var numdaysinmonth=(new Date(year,month+1,0)).getDate()
    var first=(new Date(year,month,1)).getDay()
-  
+
    date=new Date(year,month,day)
    //generate the table now
    dp.innerHTML='' //clear
-  
+
    //year
    row=dp.insertRow(0)
    cell=row.insertCell(0);cell.innerHTML="<";cell.className="control";cell.onclick=function(){JAX.datepicker.lastYear();}
@@ -1421,19 +1408,19 @@ this.makeResizer=function(iw,nw,ih,nh,img){
    cell.className='year'
    cell.innerHTML=year
    cell=row.insertCell(2);cell.innerHTML=">";cell.className="control";cell.onclick=function(){JAX.datepicker.nextYear();}
-  
+
    //month title
    row=dp.insertRow(1)
    cell=row.insertCell(0);cell.innerHTML="<";cell.className="control";cell.onclick=function(){JAX.datepicker.lastMonth();}
    cell=row.insertCell(1);
    cell.colSpan='5';cell.innerHTML=this.months[month];cell.className='month'
    cell=row.insertCell(2);cell.innerHTML=">";cell.className="control";cell.onclick=function(){JAX.datepicker.nextMonth();}
-  
+
    //weekdays
    row=dp.insertRow(2)
    row.className="weekdays"
    for(x=0;x<7;x++) row.insertCell(x).innerHTML=this.daysshort[x]
-  
+
    row=dp.insertRow(3)
    //generate numbers
    for(x=0;x<numdaysinmonth;x++){
@@ -1445,7 +1432,7 @@ this.makeResizer=function(iw,nw,ih,nh,img){
     cell.innerHTML=(x+1)
    }
   }
-  
+
   this.lastYear=function(){
    var l=this.lastDate;this.generate(l[0]-1,l[1],l[2]);
   }
@@ -1458,7 +1445,7 @@ this.makeResizer=function(iw,nw,ih,nh,img){
   this.nextMonth=function(){
    var l=this.lastDate;this.generate(l[0],l[1]+1,l[2]);
   }
-  
+
   this.insert=function(cell){
    var l=this.lastDate
    this.el.value=(l[1]+1)+"/"+(cell.innerHTML)+"/"+l[0]
