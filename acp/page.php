@@ -85,16 +85,34 @@ class PAGE{
  }
 
  function writeData($page,$name,$data,$mode="w"){
-  $write="<?php\n";
-  $write.='$'.$name."=Array(\n";
-  foreach($data as $k=>$v) {
-   $quote=is_numeric($v)?'':'"';
-   $write.='"'.str_replace('"','\"',$k).'"=>'.$quote.str_replace(Array('\\','"'),Array('\\\\','\"'),$v).$quote.','."\n";
-  }
-  if(!empty($data)) $write=substr($write,0,-2);
-  $write.="\n);\n";
-  $write.="?>";
-  $o=fopen($page,$mode);fwrite($o,$write);fclose($o);
+  $data_string = json_encode($data, JSON_PRETTY_PRINT);
+  $write = <<<EOT
+<?php
+/**
+ * JaxBoards config file. It's just JSON embedded in PHP- wow!
+ *
+ * PHP Version 5.3.0
+ *
+ * @category Jaxboards
+ * @package  Jaxboards
+ * @author   Sean Johnson <seanjohnson08@gmail.com>
+ * @author   World's Tallest Ladder <wtl420@users.noreply.github.com>
+ * @license  MIT <https://opensource.org/licenses/MIT>
+ * @link     https://github.com/Jaxboards/Jaxboards Jaxboards on Github
+ */
+${$name} = json_decode(
+<<<'EOD'
+{$data_string}
+EOD
+    ,
+    true
+);
+
+EOT;
+  $file = fopen($page, $mode);
+  fwrite($file, $write);
+  fclose($file);
+
   return $write;
  }
 

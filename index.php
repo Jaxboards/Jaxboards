@@ -88,8 +88,8 @@ if(!$PAGE->jsaccess) {
 
  $PAGE->append('SCRIPT',' <script type="text/javascript" src="http://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>');
  $PAGE->append('SCRIPT',' <script type="text/javascript">var globalsettings={'.implode(',',$variables).'}</script>');
- $PAGE->append('SCRIPT',' <script type="text/javascript" src="'.($local?'Service/':BOARDPATH).'jsnew.js?v=1"></script>');
- $PAGE->append('SCRIPT',' <script type="text/javascript" src="'.($local?'Service/':BOARDPATH).'jsrun.js"></script>');
+ $PAGE->append('SCRIPT',' <script type="text/javascript" src="'.BOARDPATH.'Service/jsnew.js?v=1"></script>');
+ $PAGE->append('SCRIPT',' <script type="text/javascript" src="'.BOARDPATH.'Service/jsrun.js"></script>');
  $PAGE->append('SCRIPT','<!--[if IE]><style> img {behavior: url(Script/fiximgnatural.htc)}</style><![endif]-->');
 
  if($PERMS['can_moderate']||$USER['mod']) {
@@ -99,7 +99,7 @@ if(!$PAGE->jsaccess) {
 
  $PAGE->append('CSS','<link rel="stylesheet" type="text/css" href="'.THEMEPATH.'css.css" />');
  if($PAGE->meta('favicon')) $PAGE->append('CSS','<link rel="icon" href="'.$PAGE->meta('favicon').'">');
- $PAGE->append('LOGO',$PAGE->meta("logo",$JAX->pick($CFG['logourl'],BOARDPATH.'Service/Themes/Default/img/logo.png')));
+ $PAGE->append('LOGO',$PAGE->meta("logo",$JAX->pick($CFG['logourl'],BOARDURL.'Service/Themes/Default/img/logo.png')));
  $PAGE->append('NAVIGATION',$PAGE->meta("navigation",$PERMS['can_moderate']?'<li><a href="?act=modcontrols&do=cp">Mod CP</a></li>':'',$PERMS['can_access_acp']?'<li><a href="./acp/" target="_BLANK">ACP</a></li>':'',$CFG['navlinks']?$CFG['navlinks']:''));
  if($USER&&$USER['id']) {
   $result = $DB->safeselect("count(id)","messages","WHERE `read`=0 AND `to`=?", $USER['id']);

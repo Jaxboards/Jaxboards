@@ -19,11 +19,11 @@ if($JAX->p['submit']){
  elseif(strlen($JAX->p['boardurl'])>30) $e="board url too long";
  elseif($JAX->p['boardurl']=="www") $e="WWW is reserved.";
  elseif(preg_match("@\W@",$JAX->p['boardurl'])) $e="board url needs to consist of letters, numbers, and underscore only";
- 
+
  $result = $DB->safeselect("*","directory","WHERE registrar_ip=? AND date>?", $JAX->ip2int(),(time()-7*24*60*60));
  if($DB->num_rows(1)>3) $e="You may only register one 3 boards per week.";
  $DB->disposeresult($result);
- 
+
  if(!$JAX->isemail($JAX->p['email'])) $e="invalid email";
 
  if(strlen($JAX->p['username'])>50) $e="username too long";
@@ -69,8 +69,7 @@ $DB->safeinsert('directory',Array('boardname'=>$prefix,'registrar_email'=>$email
 $DB->select_db('jaxboards');
 
 foreach($tables as $v){
- $DB->safequery("CREATE TABLE ? LIKE jaxboards_service.`$v`", str_replace('blueprint',$prefix,$v)),
-);
+ $DB->safequery("CREATE TABLE ? LIKE jaxboards_service.`$v`", str_replace('blueprint',$prefix,$v));
  $shit=$DB->safequery("SELECT * FROM jaxboards_service.`$v`");
  while($f=$DB->arow($shit)) {
   unset($f['id']);
@@ -101,42 +100,7 @@ recurse_copy("blueprint","../boards/".$prefix);
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-<style type='text/css'>
-/*#1C3B65*/
-body{background:url(Themes/Default/img/bg.jpg);margin:0;padding:0;font-family:tahoma,verdana,arial;}
-#container{width:1024px;margin:auto;border:1px solid #000;margin-top:10px;}
-#logo{background:url(acp/Theme/img/acp-header.png);height:96px;}
-#logo a{display:block;width:100%;height:100%;text-decoration:none;}
-#logo a:focus{outline:none;}
-#bar{margin:0 -10px;background:url(homepagebar.png);height:32px;border-bottom:1px solid #555;}
-#bar a{display:inline-block;height:32px;text-indent:-1000px;}
-#bar a:hover{background:url(homepagebar.png)}
-#bar a:focus{outline:none;}
-#bar a.support{width:118px;}
-#bar a.support:hover{background-position:left bottom;}
-#bar a.test{width:94px;}
-#bar a.test:hover{background-position:-118px bottom;}
-#bar a.resource{width:94px;}
-#bar a.resource:hover{background-position:-212px bottom;}
-#content{background:url(acp/Theme/img/pagebg.png) top repeat-x #152B49;padding-top:10px;}
-.box{margin:10px;border:1px solid #CCF;}
-.box.mini{width:31%;float:left;}
-.box .content{background:#FFF;padding:20px;}
-.box.mini .content{height:200px;}
-.box .title{background:url(Themes/Default/img/boxgrad.png);color:#FFF;padding:5px}
-.box1 .content{background:url(customizable.png) no-repeat 95% 95% #FFF;}
-.box2 .content{background:url(secure.png) no-repeat 95% 95% #FFF;}
-.box3 .content{background:url(norefresh.png) no-repeat 95% 95% #FFF;}
-#signup{float:right;background:url(Themes/Default/img/shade.png) bottom repeat-x;border:2px solid #AAC;padding:30px;margin:30px;}
-label{display:inline-block;width:100px;}
-input[type=text],input[type=password]{width:200px;}
-input[type=submit]{margin-top:10px;padding:5px;}
-#post{position:absolute;top:-1000px;left:-1000px;}
-ul{padding-left:20px;}
-.error{border:1px solid #F00;background:#FDD;font-size:smaller;text-align:center;margin-bottom:10px;}
-#copyright{text-align:center;color:#FFF;margin:10px;}
-.center{text-align:center;}
-</style>
+<link media="all" rel="stylesheet" href="./css/main.css" />
 <meta name="description" content="The world's very first instant forum." />
 <title>Jaxboards - The free AJAX powered forum host</title>
 </head>

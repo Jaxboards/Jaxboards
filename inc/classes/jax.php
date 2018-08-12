@@ -142,7 +142,7 @@ public static function json_decode($a,$aa=true){
  function blockhtml($a){
   return str_replace("{if","&#123;if",htmlspecialchars($a,ENT_QUOTES)); //fix for template conditionals
  }
- 
+
  function getTextRules(){
   global $CFG,$DB;
   if($this->textRules) return $this->textRules;
@@ -192,7 +192,7 @@ public static function json_decode($a,$aa=true){
  function emotecallback($a){
   return $a[1].$this->emoteRules[preg_quote($a[2],'@')];
  }
- 
+
  function getwordfilter(){
   global $CFG,$DB;
   if(!isset($this->textRules)){
@@ -209,7 +209,7 @@ public static function json_decode($a,$aa=true){
   }
   return $this->textRules['badword'];
  }
- 
+
  function wordfilter($a){
   global $USER;
   if($USER&&$USER['nowordfilter']) return $a;
@@ -242,12 +242,12 @@ public static function json_decode($a,$aa=true){
   foreach($a as $k=>$v) $r.='<input type="hidden" name="'.$k.'" value="'.$v.'" />';
   return $r;
  }
- 
+
  function textonly($a){
   while(($t=preg_replace("@\[(\w+)[^\]]*\]([\w\W]*)\[/\\1\]@U",'$2',$a))!=$a) $a=$t;;
   return $a;
  }
- 
+
  function bbcodes($a,$minimal=false){
   $bbcodes=Array(
     '@\[b\](.*)\[/b\]@Usi'=>'<strong>$1</strong>',
@@ -262,7 +262,7 @@ public static function json_decode($a,$aa=true){
     '@\[color=(#?[\s\w\d]+|rgb\([\d, ]+\))\](.*)\[/color\]@Usi'=>'<span style="color:$1">$2</span>',
     '@\[(bg|bgcolor|background)=(#?[\s\w\d]+)\](.*)\[/\\1\]@Usi'=>'<span style="background:$2">$3</span>'
 	);
-	
+
 	if(!$minimal){
      $bbcodes['@\[h([1-5])\](.*)\[/h\\1\]@Usi']='<h$1>$2</h$1>';
      $bbcodes['@\[align=(center|left|right)\](.*)\[/align\]@Usi']='<p style="text-align:$1">$2</p>';
@@ -271,20 +271,20 @@ public static function json_decode($a,$aa=true){
 	}
   $keys=array_keys($bbcodes);$values=array_values($bbcodes);
   while(($tmp=preg_replace($keys,$values,$a))!=$a) $a=$tmp;
-  
+
   if($minimal) return $a;
-  
+
   //ul/li tags
   while($a!=($tmp=preg_replace_callback('@\[(ul|ol)\](.*)\[/\\1\]@Usi',Array($this,"bbcode_licallback"),$a))) $a=$tmp;
   //size code (actually needs a callback simply because of the variability of the arguments)
   while($a!=($tmp=preg_replace_callback('@\[size=([0-4]?\d)(px|pt|em|)\](.*)\[/size\]@Usi',Array($this,"bbcode_sizecallback"),$a))) $a=$tmp;;
-  
+
   //do quote tags
   while(preg_match('@\[quote(?>=([^\]]+))?\](.*?)\[/quote\]\r?\n?@is',$a,$m)&&$x<10) {$x++;$a=str_replace($m[0],'<div class="quote">'.($m[1]?'<div class="quotee">'.$m[1].'</div>':'').$m[2].'</div>',$a);}
 
   return $a;
  }
- 
+
  function bbcode_sizecallback($m){
   return '<span style="font-size:'.$m[1].($m[2]?$m[2]:'px').'">'.$m[3].'</span>';
  }
@@ -309,12 +309,12 @@ public static function json_decode($a,$aa=true){
         <iframe src="http://player.vimeo.com/video/'.$id[1].'?title=0&byline=0&portrait=0" width="400" height="300" frameborder="0" webkitAllowFullScreen allowFullScreen></iframe>
         </div>
         </div>';
-        
+
     } else {
         return '-Invalid Video URL-';
     }
  }
- 
+
  function bbcode_licallback($m){
   $lis="";
   $m[2]=preg_split("@(^|[\r\n])\*@",$m[2]);
@@ -323,7 +323,7 @@ public static function json_decode($a,$aa=true){
     $lis.="<li>".$v." </li>";
   return "<".$m[1].">".$lis."</".$m[1].">";
  }
- 
+
  function attachments($a){
   return $a=preg_replace_callback('@\[attachment\](\d+)\[/attachment\]@',Array($this,'attachment_callback'),$a,20);
  }
@@ -339,15 +339,15 @@ public static function json_decode($a,$aa=true){
    if(!$data) return "Attachment doesn't exist";
    else $this->attachmentdata[$a]=$data;
   }
-  
+
   $ext=explode(".",$data['name']);
   if(count($ext)==1) $ext="";
   else $ext=strtolower(array_pop($ext));
   if(!in_array($ext,$CFG['images'])) $ext="";
   if($ext) $ext=".".$ext;
-  
+
   if($ext) {
-   return '<a href="'.BOARDPATH.'/Uploads/'.$data['hash'].$ext.'"><img src="'.BOARDPATH.'Uploads/'.$data['hash'].$ext.'" class="bbcodeimg" /></a>';
+   return '<a href="'.BOARDPATHURL.'/Uploads/'.$data['hash'].$ext.'"><img src="'.BOARDPATHURL.'Uploads/'.$data['hash'].$ext.'" class="bbcodeimg" /></a>';
   } else {
    return '<div class="attachment"><a href="index.php?act=download&id='.$data['id'].'&name='.urlencode($data['name']).'" class="name">'.$data['name']."</a> Downloads: ".$data['downloads']."</div>";
   }
@@ -403,14 +403,14 @@ public static function json_decode($a,$aa=true){
   foreach($args as $v) if($v) break;
   return $v;
  }
- 
+
  function isurl($url){
   return preg_match("@^https?://[\w\.\-%\&\?\=/]+$@",$url);
  }
  function isemail($email){
   return preg_match("/[\w\+.]+@[\w.]+/",$email);
  }
- 
+
  function ipbanned($ip=false){
   if(!$ip) $ip=$_SERVER['REMOTE_ADDR'];
   global $PAGE;
@@ -428,34 +428,34 @@ public static function json_decode($a,$aa=true){
   }
   return false;
  }
- 
+
  function forumspammer($ip=false){
     if(!$ip) $ip=$_SERVER['REMOTE_ADDR'];
     $name=implode('.',array_reverse(explode('.',$ip))).'.opm.tornevall.org';
     return gethostbyname($name)!=$name;
  }
- 
+
  function toruser($ip=false){
     if(!$ip) $ip=$_SERVER['REMOTE_ADDR'];
     $jax=$_SERVER['SERVER_ADDR'];
     $name=implode(".",array_reverse(explode(".",$jax.".80.".$ip))).".ip-port.exitlist.torproject.org";
     return gethostbyname($name)=="127.0.0.2";
  }
- 
+
  function ip2int($ip=false){
   if(!$ip) $ip=$_SERVER['REMOTE_ADDR'];
   $int=0;
   foreach(explode(".",$ip) as $v) {$int*=256;$int+=$v;}
   return $int;
  }
- 
+
  function parseperms($perms,$uid=false){
   global $PERMS;
   if($uid!==false) {$unpack=unpack("n*",$perms);$perms=Array();for($x=1;$x<count($unpack);$x+=2) $perms[$unpack[$x]]=$unpack[$x+1];$perms=$perms[$uid];}
   if($perms===NULL) return Array('upload'=>$PERMS['can_attach'],'reply'=>$PERMS['can_post'],'start'=>$PERMS['can_post_topics'],'read'=>1,'view'=>1,'poll'=>$PERMS['can_poll']);
   return Array('upload'=>$perms&1,'reply'=>$perms&2,'start'=>$perms&4,'read'=>$perms&8,'view'=>$perms&16,'poll'=>$perms&32);
  }
- 
+
  function parsereadmarkers($readmarkers){
   $r=Array();
   if($readmarkers){
@@ -465,7 +465,7 @@ public static function json_decode($a,$aa=true){
   }
   return $r;
  }
- 
+
  function rmdir($dir){
   if(substr($dir,-1)!="/") $dir.="/";
   foreach(glob($dir."*") as $v) {
@@ -475,7 +475,7 @@ public static function json_decode($a,$aa=true){
   rmdir($dir);
   return true;
  }
- 
+
  function pages($numpages,$active,$tofill){
   $tofill-=2;
   $pages[]=1;
@@ -488,7 +488,7 @@ public static function json_decode($a,$aa=true){
   $pages[]=$numpages;
   return $pages;
  }
- 
+
  function filesize($bs){
   $p=0;
   $sizes=' KMGT';
@@ -498,13 +498,13 @@ public static function json_decode($a,$aa=true){
   }
   return round($bs,2).' '.($p?$sizes[$p]:'').'B';
  }
- 
+
  function gethostbyaddr($ip){
   $ptr= implode(".",array_reverse(explode(".",$ip))).".in-addr.arpa";
   $host = dns_get_record($ptr,DNS_PTR);
   return !$host?$ip:$host[0]['target'];
  }
- 
+
  public static function base128encodesingle($int){
   $int=(int)$int;
   $w=chr($int&127);
@@ -536,7 +536,7 @@ public static function json_decode($a,$aa=true){
   }
   return $ints;
  }
- 
+
  function mail($email,$topic,$message){
   global $CFG;
   $boardname=$CFG['boardname']?$CFG['boardname']:"JaxBoards";

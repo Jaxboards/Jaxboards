@@ -1,66 +1,89 @@
 <?php
+/**
+ * Figures out what board we're talking about if it's a service,
+ * but regardless defines some important paths
+ *
+ * PHP Version 5.4.0
+ *
+ * @category Jaxboards
+ * @package  Jaxboards
+ * @author   Sean Johnson <seanjohnson08@gmail.com>
+ * @author   World's Tallest Ladder <wtl420@users.noreply.github.com>
+ * @license  MIT <https://opensource.org/licenses/MIT>
+ * @link     https://github.com/jaxboards/jaxboards Jaxboards Github Repo
+ */
 
-if (0) {
-define("SOUNDSURL","http://jaxboards.com/Sounds/");
-define("SCRIPTURL","http://support.jaxboards.com/Script/");
+if (!defined('JAXBOARDS_ROOT')) {
+    define('JAXBOARDS_ROOT', __DIR__);
+}
 
 //this file must be required after mysql connecting
-preg_match("@(.*)\.jaxboards\.com@i",$_SERVER['SERVER_NAME'],$m);
-$prefix=($_SERVER['SERVER_NAME']=="127.0.0.1"||$_SERVER['SERVER_NAME']=="***REMOVED***.afraid.org")?"blueprint":$m[1];
-if(!$prefix) {
- if(!$DB) {
-  require_once "inc/classes/mysql.php";
-  $DB=new MySQL;
-  $DB->connect($CFG['sql_host'],$CFG['sql_username'],$CFG['sql_password'],$CFG['sql_db']);
- }
- $result = $DB->safespecial('SELECT prefix FROM jaxboards_service.domains WHERE domain=?', array(),
-	$DB->basicvalue($_SERVER['SERVER_NAME']));
- $prefix=$DB->row($result);
- $DB->disposeresult($result);
-
- if($prefix) $prefix=$prefix['prefix'];
+if (!isset($DB)) {
+    die('This file must be required after mysql connecting');
 }
-if($prefix){
- define("BOARDPATH",(defined("INACP")?"../":"")."boards/".$prefix."/");
- define("STHEMEPATH",(defined("INACP")?"../":"")."Service/Themes/");
- $CFG['prefix']=$prefix;
- if($DB) $DB->prefix($prefix.'_');
- function extendconfig($configfile){
-  if(!@include($configfile)) return false;
-  foreach($CFG as $k=>$v) $GLOBALS['CFG'][$k]=$v;
-  return true;
- }
- if(!extendconfig(BOARDPATH."config.php")) $CFG=Array('noboard'=>1);
-} else $CFG=Array('noboard'=>1);
 
-define("FLAGPATH","http://jaxboards.com/flags/");
+// figure out url
+$host = $_SERVER['SERVER_NAME'];
+// build the url
+$baseURL = (isset($_SERVER['REQUEST_SCHEME'])?
+    $_SERVER['REQUEST_SCHEME']:'https').'://';
+$baseURL .= (isset($_SERVER['SERVER_NAME'])?
+    $_SERVER['SERVER_NAME']:$CFG['domain']);
+if (!($_SERVER['SERVER_PORT'] === '443' && $_SERVER['REQUEST_SCHEME'] === 'https')
+    && !($_SERVER['SERVER_PORT'] === '80' && $_SERVER['REQUEST_SCHEME'] === 'http')
+) {
+    $baseURL .= (isset($_SERVER['SERVER_PORT'])?':'.$_SERVER['SERVER_PORT']:'');
+}
+define('BOARDURL', $baseURL.'/');
 
+define('SOUNDSURL', BOARDURL.'Sounds/');
+define('SCRIPTURL', BOARDURL.'Script/');
+define('FLAGPATH', BOARDURL.'flags/');
+
+$domain_match = str_replace('.', '\\.', $CFG['domain']);
+// get prefix
+if ($CFG['service']) {
+    preg_match('@(.*)\\.'.$domain_match.'@i', $host, $matches);
+    if (isset($matches[1]) && $matches[1]) {
+        $prefix = $matches[1];
+    } else {
+        $prefix = '';
+    }
+
+    // Check for custom domain
+    if (!$prefix) {
+        $result = $DB->safespecial(
+            'SELECT prefix FROM `domains` WHERE domain=?',
+            [],
+            $DB->basicvalue($host)
+        );
+        $prefix = $DB->row($result);
+        $DB->disposeresult($result);
+        if ($prefix) {
+            $prefix = $prefix['prefix'];
+            $CFG['prefix'] = $prefix;
+        }
+    }
 } else {
-    function extendconfig($configfile){
-        if(!@include($configfile)) return false;
-        foreach($CFG as $k=>$v) $GLOBALS['CFG'][$k]=$v;
-        return true;
-    }
-    // define("BOARDPATH",(defined("INACP")?"../":"")."boards/");
-    // define("STHEMEPATH",(defined("INACP")?"../":"")."Service/Themes/");
-    define("BOARDPATH",(defined("INACP")?"../":"./"));
-    define("STHEMEPATH",(defined("INACP")?"../":"")."Service/Themes/");
-    define("AVAPATH",(defined("INACP")?"../":"")."Service/Themes/Default/avatars/");
-    define("SOUNDSURL",(defined("INACP")?"../":"")."Service/Sounds/");
-    define("SCRIPTURL",(defined("INACP")?"../":"")."Script/");
-    date_default_timezone_set("America/Los_Angeles");
-    $DB->prefix("jaxboards_");
-    if (!extendconfig(BOARDPATH."config.php")) { die("Could not read config file.\n"); }
-    // die("USERNAME: ".$CFG['sql_username']."\n");
-    // die("USERNAME: ".$CFG['sql_password']."\n");
-    // die("USERNAME: ".$CFG['sql_db']."\n");
-    if(!$DB) {
-        require_once "inc/classes/mysql.php";
-        $DB=new MySQL;
-        $DB->connect($CFG['sql_host'],$CFG['sql_username'],$CFG['sql_password'],$CFG['sql_db']);
-    }
-    // $DB->safespecial('SELECT prefix FROM jaxboards_service.domains WHERE domain=?', $DB->basicvalue($_SERVER['SERVER_NAME']));
-    define("FLAGPATH",(defined("INACP")?"../":"Service/flags"));
+    $prefix = $CFG['prefix'];
 }
 
-?>
+if ($prefix) {
+    define('BOARDPATH', JAXBOARDS_ROOT.'/boards/'.$prefix.'/');
+    define('BOARDPATHURL', BOARDURL.'boards/'.$prefix.'/');
+    define('STHEMEPATH', SERVICE_ROOT.'/Themes/');
+    define('AVAPATH', JAXBOARDS_ROOT.'/Service/Themes/Default/avatars/');
+    define('BOARDCONFIG', BOARDPATH.'config.php');
+    if ($DB) {
+        $DB->prefix($prefix.'_');
+    }
+    $tempCFG = $CFG;
+    if (@include_once BOARDCONFIG) {
+        $CFG = array_merge($tempCFG, $CFG);
+    } else {
+        $CFG['noboard'] = 1;
+    }
+} else {
+    $CFG['noboard'] = 1;
+}
+

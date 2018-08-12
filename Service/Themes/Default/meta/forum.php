@@ -17,7 +17,7 @@ $meta=Array(
 
 'forum-pages-part'=>'<a href="?act=vt%1$s"%2$s>%3$s</a> ',
 
-'subforum-icon-unread'=>'<img src="'.BOARDPATH.'Service/Themes/Default/icons/unread.png" />',
-'subforum-icon-read'=>'<img src="'.BOARDPATH.'Service/Themes/Default/icons/read.png" />',
+'subforum-icon-unread'=>'<img src="'.BOARDURL.'Service/Themes/Default/icons/unread.png" />',
+'subforum-icon-read'=>'<img src="'.BOARDURL.'Service/Themes/Default/icons/read.png" />',
 );
 ?>

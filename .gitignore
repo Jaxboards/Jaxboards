@@ -6,6 +6,7 @@ Thumbs.db
 # Config files
 Desktop.ini
 config.php
+crossdomain.xml
 # Boards data
 boards
 

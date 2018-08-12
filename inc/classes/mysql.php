@@ -13,21 +13,29 @@ class MySQL{
   if (!$this->mysqli_connection) return false;
   return true;
  }
- 
+
  function debug_mode(){
   $this->debugMode=true;
  }
  function nolog(){
   $this->nolog=true;
  }
- 
+
  function prefix($a){
   $this->prefix=$a;
  }
 
  function ftable($a){return '`'.$this->prefix.$a.'`';}
 
- function error($use_mysqli = 0){return $use_mysqli ? $this->mysqli_connection->error : mysql_error();}
+ function error($use_mysqli = 0){
+     if (function_exists('mysql_error')) {
+         return $use_mysqli ? $this->mysqli_connection->error : mysql_error();
+     } elseif ($this->mysqli_connection) {
+         return $this->mysqli_connection->error;
+     } else {
+         return '';
+     }
+ }
 
  function affected_rows($use_mysqli = 0) {
     if ($use_mysqli) {
@@ -79,7 +87,7 @@ class MySQL{
  function buildInsert($a){
   $r=Array(Array(),Array(Array()));
   if(!isset($a[0])||!is_array($a[0])) $a=Array($a);
-  
+
   foreach($a as $k=>$v) {
    ksort($v);
    foreach($v as $k2=>$v2) {
@@ -205,7 +213,7 @@ class MySQL{
   } else $q=false;
   return $q;
  }
- 
+
  function num_rows($a=null){
   $a=$a?$a:$this->lastQuery;
   if($a && $this->is_sqli_result($a)) {
@@ -354,14 +362,14 @@ function safequery_sub_array($query_string, $placeholder_number, $arrlen)
  }
 
  function refValues($arr)
- { 
+ {
     $refs = array();
 
     foreach ($arr as $key => $value) {
-            $refs[$key] = &$arr[$key]; 
+            $refs[$key] = &$arr[$key];
     }
 
-    return $refs; 
+    return $refs;
  }
 
  function query($a,$over=1){
@@ -416,7 +424,7 @@ function safequery_sub_array($query_string, $placeholder_number, $arrlen)
     if (!$tablenames) {
 		syslog(LOG_ERR, "NO TABLE NAMES\n".print_r(debug_backtrace(), true));
     }
-	
+
     $newformat = vsprintf($tempformat, array_map(array($this, "ftable"), $tablenames));
 
     array_unshift($va_array, $newformat); /* Put the format string back. */
@@ -454,7 +462,7 @@ WHERE last_update>=?
    if($f['uid']) {
     if(!$r[$f['uid']]) $r[$f['uid']]=$f;
    } else $r['guestcount']++;
-   
+
   }
 
   /*since we update the session data at the END of the page, we'll want to include
@@ -476,7 +484,7 @@ WHERE last_update>=?
   }
   return $this->usersOnlineCache;
  }
- 
+
  function fixForumLastPost($fid){
   global $PAGE;
   $result = $this->safeselect("lp_uid,lp_date,id,title","topics","WHERE fid=? ORDER BY lp_date DESC LIMIT 1", $fid);
@@ -484,14 +492,14 @@ WHERE last_update>=?
   $this->disposeresult($result);
   $this->safeupdate("forums",Array("lp_uid"=>$d['lp_uid'],"lp_date"=>$d['lp_date'],"lp_tid"=>$d['id'],"lp_topic"=>$d['title']),"WHERE id=?", $fid);
  }
- 
+
  function fixAllForumLastPosts(){
  	$query=$this->safeselect("id","forums");
  	while($fid=$this->row($query)) {
  		$this->fixForumLastPost($fid);
  	}
  }
- 
+
  function getRatingNiblets(){
   if($this->ratingNiblets) return $this->ratingNiblets;
   $result = $this->safeselect("*","ratingniblets");
@@ -499,7 +507,7 @@ WHERE last_update>=?
   while($f=$this->row($result)) $r[$f['id']]=Array('img'=>$f['img'],'title'=>$f['title']);
   return $this->ratingNiblets=$r;
  }
- 
+
  function debug(){
   return '<div>'.implode("<br />",$this->queryList).'</div>';
   $this->queryList=Array();
