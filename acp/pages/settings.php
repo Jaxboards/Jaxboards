@@ -56,6 +56,7 @@ class settings{
  function boardname(){
   global $PAGE,$JAX;
   $page = "";
+  $e = '';
   if(@$JAX->p['submit']){
    if(trim($JAX->p['boardname'])==="") $e="Board name is required";
    else if(trim(@$JAX->p['logourl'])!==""&&!$JAX->isURL(@$JAX->p['logourl'])) $e="Please enter a valid logo url.";
@@ -111,10 +112,11 @@ class settings{
  }
  function pages_edit($pageurl){
   global $PAGE,$DB,$JAX;
+  $page = '';
   $result = $DB->safeselect("*","pages","WHERE act=?", $DB->basicvalue($pageurl));
   $pageinfo=$DB->row($result);
   $DB->disposeresult($result);
-  if($JAX->p['pagecontents']){
+  if(isset($JAX->p['pagecontents']) && $JAX->p['pagecontents']){
    if($pageinfo){
     $DB->safeupdate("pages",Array("page"=>$JAX->p['pagecontents']),"WHERE `act`=?", $DB->basicvalue($pageurl));
    } else {
@@ -137,13 +139,20 @@ class settings{
  function shoutbox(){
   global $PAGE,$JAX,$DB;
   $page = "";
+  $e = '';
   if(@$JAX->p['clearall']){
    $result = $DB->safespecial("TRUNCATE TABLE %t",array("shouts"));
    $page.=$PAGE->success("Shoutbox cleared!");
   }
   if(@$JAX->p['submit']){
+      if (!isset($JAX->p['sbe'])) {
+        $JAX->p['sbe'] = false;
+      }
+      if (!isset($JAX->p['sbava'])) {
+        $JAX->p['sbava'] = false;
+      }
    $write=Array('shoutbox'=>$JAX->p['sbe']?1:0,'shoutboxava'=>$JAX->p['sbava']?1:0);
-   if(is_numeric($JAX->p['sbnum'])&&$JAX->p['sbnum']<=10&&$JAX->p['sbnum']>1) $write['shoutbox_num']=$JAX->p['sbnum'];
+   if(is_numeric($JAX->p['sbnum'])&&$JAX->p['sbnum']<=10&&$JAX->p['sbnum']>0) $write['shoutbox_num']=$JAX->p['sbnum'];
    else $e="Shouts to show must be between 1 and 10";
    $PAGE->writeCFG($write);
    if($e) $page.=$PAGE->error($e);
@@ -161,6 +170,7 @@ class settings{
  function domainmanager(){
   global $DB,$CFG,$PAGE,$JAX;
   $page=$table="";
+  $e = '';
   if(@$JAX->p['submit']){
    if(strlen($JAX->p['domain'])>100) $e="Domain must be less than 100 characters";
    elseif(preg_match('@[^\w.]@',$JAX->p['domain'])) $e="Please enter a valid domain.";
@@ -196,6 +206,9 @@ class settings{
   global $PAGE,$JAX;
   $birthdays=$PAGE->getCFGSetting('birthdays');
   if(@$JAX->p['submit']) {
+      if (!isset($JAX->p['bicon'])) {
+          $JAX->p['bicon'] = false;
+      }
    $PAGE->writeCFG(Array('birthdays'=>$birthdays=($JAX->p['bicon']?1:0)));
   }
   $page='<form method="post">';

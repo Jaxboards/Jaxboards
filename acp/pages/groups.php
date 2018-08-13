@@ -19,7 +19,7 @@ class groups{
    default:$this->showperms();break;
   }
  }
- 
+
  function showindex(){
   global $PAGE;
   $PAGE->addContentBox("Error","under construction");
@@ -58,7 +58,14 @@ class groups{
     );
 
   //set anything not sent to 0
-  foreach($perms as $k=>$v2) foreach($columns as $v) $perms[$k][$v]=$v2[$v]?1:0;
+  foreach($perms as $k=>$v2) {
+      foreach($columns as $v) {
+          if (!isset($v2[$v])) {
+              $v2[$v] = false;
+          }
+          $perms[$k][$v]=$v2[$v]?1:0;
+      }
+  }
 
   //remove any columns that don't exist silently
   $columns=array_flip($columns);
@@ -69,7 +76,7 @@ class groups{
    if($k==2) $v['can_access_acp']=1;
    if($k) $DB->safeupdate("member_groups",$v,"WHERE id=?", $k);
   }
-  
+
   echo $DB->error();
 
   $PAGE->addContentBox("Success!","<div style='padding:20px'>Changes Saved successfully.<br /><br /><br /><a href='?act=groups'>Home</a></div>");
@@ -79,7 +86,11 @@ class groups{
   global $DB,$PAGE,$JAX;
 
   if(@$JAX->p['perm']) {
-   foreach(explode(",",$JAX->p['grouplist']) as $v) if(!$JAX->p['perm'][$v]) $JAX->p['perm'][$v]=Array();
+      foreach(explode(",",$JAX->p['grouplist']) as $v) {
+          if(!isset($JAX->p['perm'][$v]) || !$JAX->p['perm'][$v]) {
+              $JAX->p['perm'][$v]=Array();
+          }
+      }
    return $this->updateperms($JAX->p['perm']);
   }
   if(preg_match("@[^\d,]@",@$JAX->b['grouplist'])||strpos(@$JAX->b['grouplist'],',,')!==false) $JAX->b['grouplist']='';
@@ -138,7 +149,7 @@ class groups{
     "can_shout"=>"Can Shout",
     "can_delete_shouts"=>"Delete All Shouts",
     "can_delete_own_shouts"=>"Delete Own Shouts",
-    
+
     "breaker8"=>"Statistics",
     "can_view_stats"=>"View Board Stats",
     "legend"=>"Display in Legend",
@@ -165,14 +176,15 @@ class groups{
     $("heading").style.top=((st-c.y)<0?0:st-c.y)+"px"
   }
   </script>';
-   
+
   $PAGE->addContentBox("Perms",$page);
  }
- 
+
  function create($gid=false){
   if($gid&&!is_numeric($gid)) $gid=false;
   global $PAGE,$JAX,$DB;
   $page = "";
+  $e = '';
   if(@$JAX->p['submit']) {
    if(!@$JAX->p['groupname']) $e="Group name required!";
    else if(strlen($JAX->p['groupname'])>250) $e="Group name must not exceed 250 characters!";
@@ -183,7 +195,7 @@ class groups{
     $write=Array('title'=>$JAX->p['groupname'],'icon'=>$JAX->p['groupicon']);
     if($gid)
      $DB->safeupdate("member_groups",$write,"WHERE id=?", $DB->basicvalue($gid));
-    else 
+    else
      $DB->safeinsert("member_groups",$write);
     $page.=$PAGE->success("Data saved. <a href='?act=groups'>Back</a>");
    }
@@ -193,14 +205,14 @@ class groups{
    $gdata=$DB->row($result);
    $DB->disposeresult($result);
   }
-   
+
   $page.='<form method="post"><label for="groupname">Group name:</label><input type="text" id="groupname" name="groupname" value="'.($gid ? $JAX->blockhtml($gdata['title']): "").'" /><br />
   <label for="groupicon">Icon: </label><input type="text" id="groupicon" name="groupicon" value="'.($gid ? $JAX->blockhtml($gdata['icon']) : "").'" /><br />
   <input type="submit" name="submit" value="'.($gid?"Edit":"Create").'" />
   </form>';
   $PAGE->addContentBox($gid?"Editing group: ".$gdata['title']:"Create a group!",$page);
  }
- 
+
  function delete(){
   global $PAGE,$DB,$JAX;
   $page = "";

@@ -2,7 +2,7 @@
 /**
  * Service install file, for installing a new JaxBoards service
  *
- * PHP Version 7.0.0
+ * PHP Version 5.3.0
  *
  * @category Jaxboards
  * @package  Jaxboards
@@ -57,53 +57,53 @@ $JAX = new JAX();
 $DB = new MySQL();
 $PAGE = new PAGE();
 
-$fields = [
-    'domain' => [
+$fields = array(
+    'domain' => array(
         'name' => 'Domain',
         'type' => 'text',
         'placeholder' => 'example.com',
-    ],
-    'sql_host' => [
+    ),
+    'sql_host' => array(
         'name' => 'MySQL Host',
         'type' => 'text',
         'placeholder' => 'localhost',
         'value' => 'localhost',
-    ],
-    'sql_db' => [
+    ),
+    'sql_db' => array(
         'name' => 'MySQL Database',
         'type' => 'text',
         'placeholder' => 'jaxboards',
-    ],
-    'sql_username' => [
+    ),
+    'sql_username' => array(
         'name' => 'MySQL Username',
         'type' => 'text',
         'placeholder' => 'jaxboards',
-    ],
-    'sql_password' => [
+    ),
+    'sql_password' => array(
         'name' => 'MySQL Password',
         'type' => 'password',
-    ],
-    'admin_username' => [
+    ),
+    'admin_username' => array(
         'name' => 'Admin Username',
         'type' => 'text',
         'placeholder' => 'admin',
-    ],
-    'admin_password' => [
+    ),
+    'admin_password' => array(
         'name' => 'Admin Password',
         'type' => 'password',
-    ],
-    'admin_password_2' => [
+    ),
+    'admin_password_2' => array(
         'name' => 'Re-Type Admin Password',
         'type' => 'password',
-    ],
-    'admin_email' => [
+    ),
+    'admin_email' => array(
         'name' => 'Admin Email Address',
         'type' => 'text',
         'placeholder' => 'admin@example.com',
-    ],
-];
+    ),
+);
 
-$errors = [];
+$errors = array();
 
 if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     // Make sure each field is set
@@ -113,10 +113,9 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         }
     }
     if ($JAX->p['domain'] && !parse_url($JAX->p['domain'], PHP_URL_HOST)) {
-        if (!filter_var(
-            $JAX->p['domain'],
-            FILTER_VALIDATE_DOMAIN,
-            FILTER_FLAG_HOSTNAME
+        if (!preg_match(
+            '@[^\w.]@',
+            $JAX->p['domain']
         )
         ) {
             $errors[] = 'Invalid domain';
@@ -201,7 +200,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
 
         if ($service) {
             // Create directory table
-            $queries = [
+            $queries = array(
                 'DROP TABLE IF EXISTS `directory`;',
                 <<<'EOT'
 CREATE TABLE `directory` (
@@ -227,22 +226,22 @@ EOT
 EOT
             ,
                 'TRUNCATE `domains`;'
-            ];
+            );
             foreach ($queries as $query) {
                 $result = $DB->safequery($query);
                 $DB->disposeresult($result);
             }
 
             // create the text and support boards
-            $default_boards = [
+            $default_boards = array(
                 'test' => 'Test forums',
                 'support' => 'Support forums',
-            ];
+            );
         } else {
             // create the board!
-            $default_boards = [
+            $default_boards = array(
                 'jaxboards' => 'Jaxboards',
-            ];
+            );
         }
 
         foreach ($default_boards as $board=>$boardname) {
@@ -254,13 +253,13 @@ EOT
                 // Add board to directory
                 $DB->safeinsert(
                     'directory',
-                    [
+                    array(
                         'boardname' => $board,
                         'registrar_email' => $JAX->p['admin_email'],
                         'registrar_ip' => $JAX->ip2int(),
                         'date' => time(),
                         'referral' => isset($JAX->b['r']) ? $JAX->b['r'] : '',
-                    ]
+                    )
                 );
                 $DB->prefix($boardPrefix);
             }
@@ -298,7 +297,7 @@ EOT
             //don't forget to create the admin
             $DB->safeinsert(
                 'members',
-                [
+                array(
                     'name' => $JAX->p['admin_username'],
                     'display_name' => $JAX->p['admin_username'],
                     'pass' => md5($JAX->p['admin_password']),
@@ -308,7 +307,7 @@ EOT
                     'group_id' => 2,
                     'join_date' => time(),
                     'last_visit' => time(),
-                ]
+                )
             );
 
             echo $DB->error();

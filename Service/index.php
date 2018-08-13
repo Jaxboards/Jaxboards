@@ -55,8 +55,10 @@ $connected = $DB->connect(
 );
 
 $errors = array();
-if($JAX->p['submit']){
- if($JAX->p['post']) header("Location: https://test.".$CFG['domain']);
+if(isset($JAX->p['submit']) && $JAX->p['submit']){
+    if(isset($JAX->p['post']) && $JAX->p['post']) {
+        header("Location: https://test.".$CFG['domain']);
+    }
 
  if (!$connected) {
      $errors[] = 'There was an error connecting to the MySQL database.';
@@ -91,13 +93,13 @@ if($JAX->p['submit']){
      // Add board to directory
      $DB->safeinsert(
          'directory',
-         [
+         array(
              'boardname' => $board,
              'registrar_email' => $JAX->p['email'],
              'registrar_ip' => $JAX->ip2int(),
              'date' => time(),
              'referral' => isset($JAX->b['r']) ? $JAX->b['r'] : '',
-         ]
+         )
      );
      $DB->prefix($boardPrefix);
 
@@ -133,7 +135,7 @@ if($JAX->p['submit']){
      //don't forget to create the admin
      $DB->safeinsert(
          'members',
-         [
+         array(
              'name' => $JAX->p['username'],
              'display_name' => $JAX->p['username'],
              'pass' => md5($JAX->p['password']),
@@ -143,7 +145,7 @@ if($JAX->p['submit']){
              'group_id' => 2,
              'join_date' => time(),
              'last_visit' => time(),
-         ]
+         )
      );
 
      $dbError = $DB->error();

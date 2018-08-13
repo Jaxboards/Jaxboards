@@ -27,15 +27,37 @@ class stats{
   $stat=Array("forum_topics"=>Array(),"topic_posts"=>Array(),"member_posts"=>Array(),"cat_topics"=>Array(),"cat_posts"=>Array(),"forum_posts"=>Array(),"posts"=>0,"topics"=>0);
   while($f=$DB->row($result)) {
    if(!isset($stat['topic_posts'][$f['tid']])) {
+       if (!isset($stat['forum_topics'][$f['fid']])) {
+            $stat['forum_topics'][$f['fid']] = 0;
+       }
     $stat['forum_topics'][$f['fid']]     ++;
     if(!isset($stat['forum_posts'][$f['fid']])) $stat['forum_posts'][$f['fid']]=0;
+       if (!isset($stat['topics'])) {
+           $stat['topics'] = 0;
+       }
     $stat['topics']                      ++;
     $stat['topic_posts'][$f['tid']]      =0;
    } else {
+       if (!isset($stat['topic_posts'][$f['tid']])) {
+           $stat['topic_posts'][$f['tid']] = 0;
+       }
     $stat['topic_posts'][$f['tid']]      ++;
+       if (!isset($stat['forum_posts'][$f['fid']])) {
+           $stat['forum_posts'][$f['fid']] = 0;
+       }
     $stat['forum_posts'][$f['fid']]      ++;
    }
-   if(!$pc[$f['fid']]) $stat['member_posts'] [$f['auth_id']] ++; else if(!$stat['member_posts'][$f['auth_id']]) $stat['member_posts'][$f['auth_id']]=0;
+   if(!$pc[$f['fid']]) {
+       if (!isset($stat['member_posts'][$f['auth_id']])) {
+           $stat['member_posts'][$f['auth_id']] = 0;
+       }
+       $stat['member_posts'][$f['auth_id']] ++;
+   } else if(!$stat['member_posts'][$f['auth_id']]) {
+       $stat['member_posts'][$f['auth_id']]=0;
+   }
+   if (!isset($stat['posts'])) {
+       $stat['posts'] = 0;
+   }
    $stat['posts']                        ++;
   }
 

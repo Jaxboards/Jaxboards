@@ -57,6 +57,7 @@ class members{
  }
  function editmem(){
   global $PAGE,$JAX,$DB;
+  $page = '';
   if(@$JAX->b['mid']||@$JAX->p['submit']){
    if(@$JAX->b['mid']&&is_numeric(@$JAX->b['mid'])) {
     $result = $DB->safeselect("*","members","WHERE id=?", $DB->basicvalue($JAX->b['mid']));
@@ -178,9 +179,15 @@ class members{
 
    if($e) $page.=$PAGE->error($e);
    else {
-    if($DB->safeinsert("members",Array("name"=>$JAX->p['username'],"display_name"=>$JAX->p['displayname'],"pass"=>md5($JAX->p['pass']),"last_visit"=>time(),"group_id"=>1,"posts"=>0))) $page.=$PAGE->success("Member registered.");
-    else $page.=$PAGE->error("An error occurred while processing your request.");
-    echo $DB->error();
+       $result = $DB->safeinsert('members', array('name' => $JAX->p['username'], 'display_name' => $JAX->p['displayname'], 'pass' => md5($JAX->p['pass']), 'last_visit' => time(), 'group_id' => 1, 'posts' => 0));
+       $error = $DB->error();
+       $DB->disposeresult($result);
+       if (!$error) {
+           $page .= $PAGE->success('Member registered.');
+       } else {
+           error_log($error);
+           $page .= $PAGE->error('An error occurred while processing your request.');
+       }
    }
   }
   $page.='<form method="post"><label>Username:</label><input type="text" name="username" /><br /><label>Display name:</label><input type="text" name="displayname" /><br /><label>Password:</label><input type="password" name="pass" /><br /><input type="submit" name="submit" value="Register" /></form>';
@@ -196,6 +203,11 @@ class members{
 
  function merge(){
   global $PAGE,$JAX,$DB;
+  $page = '';
+  $e = '';
+  if (!isset($JAX->p['submit'])) {
+      $JAX->p['submit'] = false;
+  }
   if($JAX->p['submit']) {
    if(!$JAX->p['mid1']||!$JAX->p['mid2']) $e="All fields are required";
    elseif(!is_numeric($JAX->p['mid1'])||!is_numeric($JAX->p['mid2'])) $e="An error occurred in processing your request";
@@ -241,14 +253,14 @@ class members{
 
     if(!$posts) $posts=0; else $posts=$posts[0];
     // $DB->update("members",Array('posts'=>Array('posts+'.$posts)),'WHERE id='.$mid2); /* @@@ YIKES @@@ */
-    $DB->safequery("UPDATE ".$DB->ftable(members)." SET posts = posts + ? WHERE id=?", $posts, $mid2);
+    $DB->safequery("UPDATE ".$DB->ftable('members')." SET posts = posts + ? WHERE id=?", $posts, $mid2);
 
     //delete the account
     $DB->safedelete("members","WHERE id=?", $mid1);
 
     //update stats
     // $DB->update("stats",Array('members'=>Array('members-1'),'last_register'=>Array('(SELECT max(id) FROM '.$DB->prefix.'members)'))); /* @@@ YIKES @@@ */
-    $DB->safequery("UPDATE ".$DB->ftable(stats)." SET members = members - 1, last_register = (SELECT max(id) FROM ".$DB->prefix."members)");
+    $DB->safequery("UPDATE ".$DB->ftable('stats')." SET members = members - 1, last_register = (SELECT max(id) FROM ".$DB->prefix."members)");
     $page.=$PAGE->success("Successfully merged the two accounts.");
    }
   }
@@ -266,6 +278,7 @@ class members{
  function deletemem(){
   global $PAGE,$JAX,$DB;
   $page = "";
+  $e = '';
   if(@$JAX->p['submit']) {
    if(!$JAX->p['mid']) $e="All fields are required";
    elseif(!is_numeric($JAX->p['mid'])) $e="An error occurred in processing your request";
@@ -304,7 +317,7 @@ class members{
 
     //update stats
     // $DB->update("stats",Array('members'=>Array('members-1'),'last_register'=>Array('(SELECT max(id) FROM '.$DB->prefix.'members)'))); /* @@@ YIKES @@@ */
-    $DB->safequery("UPDATE ".$DB->ftable(stats)." SET members = members - 1, last_register = (SELECT max(id) FROM ".$DB->prefix."members)");
+    $DB->safequery("UPDATE ".$DB->ftable('stats')." SET members = members - 1, last_register = (SELECT max(id) FROM ".$DB->prefix."members)");
     $page.=$PAGE->success("Successfully deleted the member account. <a href='?act=stats'>Board Stat Recount</a> suggested.");
    }
   }

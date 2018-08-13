@@ -5,7 +5,7 @@ new settings;
 class settings{
 
  function __construct(){$this->settings();}
- 
+
  function settings(){
   global $JAX;
   $this->leftBar();
@@ -24,8 +24,8 @@ class settings{
    break;
   }
  }
- 
- 
+
+
  function leftBar(){
   global $PAGE;
   $sidebar = "";
@@ -44,20 +44,20 @@ class settings{
   global $PAGE;
   $PAGE->addContentBox("Error","This page is under construction!");
  }
- 
+
  function wordfilter(){
   global $PAGE,$JAX,$DB;
   $page="";
   $wordfilter=Array();
   $result = $DB->safeselect("*","textrules","WHERE type='badword'");
   while($f=$DB->row($result)) $wordfilter[$f['needle']]=$f['replacement'];
-  
+
   //delete
   if(@$JAX->g['d']) {
    $DB->safedelete("textrules","WHERE type='badword' AND needle=?", $DB->basicvalue($JAX->g['d']));
    unset($wordfilter[$JAX->g['d']]);
   }
-  
+
   //insert
   if(@$JAX->p['submit']){
    $JAX->p['badword']=$JAX->blockhtml($JAX->p['badword']);
@@ -75,13 +75,13 @@ class settings{
    foreach(array_reverse($wordfilter,true) as $k=>$v) $table.="<tr><td>".$k."</td><td>".$JAX->blockhtml($v)."</td><td class='x'><a href='?act=posting&do=wordfilter&d=".urlencode($k)."'>X</a></td></tr>";
   }
   $page.="<form method='post' action='?act=posting&do=wordfilter'><table class='badwords'>$table</table></form>";
-  
+
   $PAGE->addContentBox("Word Filter",$page);
  }
- 
+
  function emoticons(){
   global $PAGE,$JAX,$DB;
-  
+
   $basesets=Array(
    "keshaemotes"=>"Kesha's pack",
    "ploadpack"=>"Pload's pack",
@@ -94,17 +94,17 @@ class settings{
   //select emoticons
   $result = $DB->safeselect("*","textrules","WHERE type='emote'");
   while($f=$DB->row($result)) $emoticons[$f['needle']]=$f['replacement'];
-  
+
   //insert emoticon
   if(@$JAX->p['submit']){
    if(!$JAX->p['emoticon']||!$JAX->p['image']) $page.=$PAGE->error("All fields required.");
-   else if($emoticons[$JAX->blockhtml($JAX->p['emoticon'])]) $page.=$PAGE->error("That emoticon is already being used.");
+   else if(isset($emoticons[$JAX->blockhtml($JAX->p['emoticon'])])) $page.=$PAGE->error("That emoticon is already being used.");
    else {
     $DB->safeinsert('textrules',Array('needle'=>$JAX->blockhtml($JAX->p['emoticon']),'replacement'=>$JAX->p['image'],'enabled'=>1,'type'=>'emote'));
     $emoticons[$JAX->blockhtml($JAX->p['emoticon'])]=$JAX->p['image'];
    }
   }
-  
+
   if(isset($JAX->p['baseset'])&&$basesets[$JAX->p['baseset']]){
    $PAGE->writeCFG(Array('emotepack'=>$JAX->p['baseset']));
   }
@@ -116,28 +116,28 @@ class settings{
    foreach($emoticons as $k=>$v) $table.="<tr><td>".$k."</td><td><img alt='[Invalid Image]' src='".$JAX->blockhtml($v)."' /></td><td><input type='checkbox' class='switch yn' /></td><td class='x'><a href='?act=posting&do=emoticons&d=".urlencode($k)."'>X</a></td></tr>";
   }
   $page.="<form method='post' action='?act=posting&do=emoticons'><table class='badwords'>$table</table></form>";
-  
+
   $PAGE->addContentBox("Custom Emoticons",$page);
-  
+
   $emoticonpath=$PAGE->getCFGSetting('emotepack');
   $emoticonsetting=$emoticonpath;
   $page="<form method='post'>Currently using: <select name='baseset' onchange='this.form.submit()'>";
   foreach($basesets as $k=>$v) $page.="<option value='$k'".($emoticonsetting==$k?' selected="selected"':'').">$v</option>";
   $page.="</select> &nbsp; &nbsp; ";
-  
+
   if($emoticonsetting) {
-  if($JAX->b['expanded']) {
+  if(isset($JAX->b['expanded']) && $JAX->b['expanded']) {
    $page.="<a href='?act=posting&do=emoticons'>Collapse</a></form><br /><br /><table class='badwords'><tr><th>Emoticon</th><th>Image</th></tr>";
    require('../emoticons/'.$emoticonpath.'/rules.php');
    foreach($rules as $k=>$v) $page.="<tr><td>$k</td><td><img src='../emoticons/$emoticonpath/$v' /></td></tr>";
    $page.="</table>";
   } else $page.="<a href='?act=posting&do=emoticons&expanded=true'>Expand</a></form>";
   }
-   
-  
+
+
   $PAGE->addContentBox("Base Emoticon Set",$page);
  }
- 
+
  function bbcodes(){
   global $PAGE;
   $table='<tr><th>BBCode</th><th>Rule</th></tr>'.
@@ -145,7 +145,7 @@ class settings{
   $page='<form method="post"><table>'.$table.'</table></form>';
   $PAGE->addContentBox("Custom BBCodes",$page);
  }
- 
+
  function birthday(){
   global $PAGE,$JAX;
   $birthdays=$PAGE->getCFGSetting('birthdays');
@@ -158,20 +158,20 @@ class settings{
   $page.='</form>';
   $PAGE->addContentBox("Birthdays",$page);
  }
- 
+
  function postrating(){
   global $PAGE,$JAX,$DB;
   $page=$page2="";
   $niblets=Array();
   $result = $DB->safeselect("*","ratingniblets","ORDER BY id DESC");
   while($f=$DB->row($result)) $niblets[$f['id']]=Array('img'=>$f['img'],'title'=>$f['title']);
-  
+
   //delete
   if(@$JAX->g['d']) {
    $DB->safedelete("ratingniblets","WHERE id=?", $DB->basicvalue($JAX->g['d']));
    unset($niblets[$JAX->g['d']]);
   }
-  
+
   //insert
   if(@$JAX->p['submit']){
    if(!$JAX->p['img']||!$JAX->p['title']) $page.=$PAGE->error("All fields required.");
@@ -180,16 +180,16 @@ class settings{
     $niblets[$DB->insert_id(1)]=Array('img'=>$JAX->p['img'],'title'=>$JAX->p['title']);
    }
   }
-  
+
   if(@$JAX->p['rsubmit']) {
    $cfg=Array('ratings'=>($JAX->p['renabled']?1:0)+($JAX->p['ranon']?2:0));
    $PAGE->writeCFG($cfg);
    $page2.=$PAGE->success("Settings saved!");
   }
   $ratingsettings=$PAGE->getCFGSetting('ratings');
-  
-  
-  
+
+
+
   $page2.="<form method='post'>
     <label>Ratings Enabled:</label><input type='checkbox' class='switch yn' name='renabled'".($ratingsettings&1?' checked="checked"':'')." /><br />
     <label>Anonymous Ratings:</label><input type='checkbox' class='switch yn' name='ranon'".($ratingsettings&2?' checked="checked"':'')." /><br />

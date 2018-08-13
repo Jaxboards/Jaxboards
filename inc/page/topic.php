@@ -353,7 +353,14 @@ class TOPIC{
    //results is now an array of arrays, the keys of the parent array correspond to the choices while the arrays within the array correspond
    //to a collection of user IDs that have voted for that choice
    $voted=false;
-   foreach($results as $v) foreach($v as $v2) if($v2==$USER['id']) {$voted=true;break;}
+   foreach($results as $v) {
+       foreach($v as $v2) {
+           if($v2==$USER['id']) {
+               $voted=true;
+               break;
+           }
+       }
+   }
 
    if($voted) $e="You have already voted on this poll!";
 

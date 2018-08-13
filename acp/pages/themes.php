@@ -56,12 +56,18 @@ class themes{
   if(@$JAX->p['submit']){
 
    //update wrappers/hidden status
+      if (!isset($JAX->p['hidden'])) {
+          $JAX->p['hidden'] = array();
+      }
    if(is_array($JAX->p['wrapper'])) foreach($JAX->p['wrapper'] as $k=>$v) {
+       if (!isset($JAX->p['hidden'][$k])) {
+           $JAX->p['hidden'][$k] = false;
+       }
     if(!$v||in_array($v,$wrappers))
      $DB->safeupdate("skins",Array("wrapper"=>$v,"hidden"=>$JAX->p['hidden'][$k]?1:0),"WHERE id=?", $k);
    }
 
-   if(is_array($JAX->p['renameskin'])) {
+   if(isset($JAX->p['renameskin']) && is_array($JAX->p['renameskin'])) {
     foreach($JAX->p['renameskin'] as $k=>$v) {
         if($k==$v) continue;
         if(preg_match('@[^\w ]@',$k)) continue;
@@ -75,7 +81,7 @@ class themes{
     }
    }
 
-   if(is_array($JAX->p['renamewrapper'])) {
+   if(isset($JAX->p['renamewrapper']) && is_array($JAX->p['renamewrapper'])) {
        foreach($JAX->p['renamewrapper'] as $k=>$v) {
         if($k==$v) continue;
         if(preg_match('@[^\w ]@',$k)) continue;
@@ -135,6 +141,9 @@ heredoc;
   $result = $DB->safeselect("*","skins","WHERE id=?", $id);
   $skin=$DB->row($result);
   $DB->disposeresult($result);
+  if (!isset($JAX->p['newskindata'])) {
+      $JAX->p['newskindata'] = false;
+  }
   if($skin&&$skin['custom']&&$JAX->p['newskindata']){
    $o=fopen(BOARDPATH."Themes/".$skin['title']."/css.css","w");
    fwrite($o,$JAX->p['newskindata']);
@@ -150,6 +159,7 @@ heredoc;
 
  function editwrapper($wrapper){
   global $PAGE,$JAX;
+  $saved = null;
   $wrapperf=BOARDPATH."Wrappers/".$wrapper.".txt";
   if(preg_match("@[^ \w]@",$wrapper)&&!is_file($wrapperf)) $PAGE->addContentBox("Error","The theme you're trying to edit does not exist.");
   else {

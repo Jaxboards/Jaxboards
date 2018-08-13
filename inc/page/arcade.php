@@ -37,7 +37,12 @@ class arcade{
     if($PAGE->jsupdate) {
         $scores=$this->getScores($id);
         $update=false;
-        foreach($scores as $f) if($SESS->last_update<=$f['date']) {$update=true;break;}
+        foreach($scores as $f) {
+            if($SESS->last_update<=$f['date']) {
+                $update=true;
+                break;
+            }
+        }
         if($update) {
             $PAGE->JS('update','scores',$this->buildMiniScoresTable($scores),1);
         }

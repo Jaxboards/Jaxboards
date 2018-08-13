@@ -1,9 +1,7 @@
 <?php
 new offlineboard;
 class offlineboard{
-/* Redundant constructor unnecesary in newer PHP versions. */
-/* function __construct(){$this->offlineboard();} */
-function offlineboard(){
+function __construct(){
  global $PAGE,$JAX,$CFG;
  if($perms['can_view_board']) {
   $PAGE->JS("alert","should redirect");

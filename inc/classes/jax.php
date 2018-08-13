@@ -400,7 +400,11 @@ public static function json_decode($a,$aa=true){
 
  public static function pick(){
   $args=func_get_args();
-  foreach($args as $v) if($v) break;
+  foreach($args as $v) {
+      if($v) {
+          break;
+      }
+  }
   return $v;
  }
 

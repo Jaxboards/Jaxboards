@@ -11,31 +11,29 @@ $PAGE->loadmeta('search');
 
 new search;
 class search{
- 
- function __constructor(){
+
+ function __construct(){
   global $PAGE,$JAX;
-  
+
   $this->page="";
   $this->pagenum=$JAX->b['page'];
   if(!is_numeric($this->pagenum)||$this->pagenum<0) $this->pagenum=1;
   else $this->pagenum=$JAX->b['page'];
-  
+
   $this->perpage=10;
-  
+
   if($JAX->b['searchterm']||$JAX->b['page']) $this->dosearch();
   else $this->form();
  }
- /* Redundant constructor unnecesary in newer PHP versions. */
- /* function search(){$this->__constructor();} */
- 
+
  function form(){
   global $PAGE,$JAX,$SESS;
   if($PAGE->jsupdate) return;
-  
+
   $this->page=$PAGE->meta('search-form',$JAX->blockhtml($SESS->vars['searcht']),$this->getForumSelection(),$this->page);
   $PAGE->JS("update","page",$this->page);
   $PAGE->append("page",$this->page);
-  
+
  }
  function getForumSelection(){
   global $DB;
@@ -43,10 +41,10 @@ class search{
   if(!$this->fids) return "--No forums--";
   $result = $DB->safeselect("`id`,`title`,`path`","forums","WHERE id IN ? ORDER BY `order` ASC,`title` DESC",
 	$this->fids);
-  
+
   $tree=Array();
   $titles=Array();
-  
+
   while($f=$DB->row($result)) {
    $titles[$f['id']]=$f['title'];
    $path=trim($f['path'])?explode(" ",$f['path']):Array();
@@ -57,9 +55,9 @@ class search{
    }
    if(!$t[$f['id']]) $t[$f['id']]=true;
   }
-  
+
   $r.=$this->rtreeselect($tree,$titles);
-  
+
   return $r;
  }
  function rtreeselect($tree,$titles,$level=0){
@@ -71,7 +69,7 @@ class search{
   if(!$level) $r='<select size="15" multiple="multiple" name="fids">'.$r."</select>";
   return $r;
  }
- 
+
  function pdate($a){
   $a=explode("/",$a);
   if(count($a)!=3) return false;
@@ -81,16 +79,16 @@ class search{
       ) return false;
   return mktime(0,0,0,$a[0],$a[1],$a[2]);
  }
- 
+
  function dosearch(){
   global $JAX,$PAGE,$DB,$SESS;
-  
+
   if($PAGE->jsupdate&&empty($JAX->p)) return;
-  
+
   $termraw=$JAX->b['searchterm'];
-  
+
   if(!$termraw&&$this->pagenum) {$termraw=$SESS->vars['searcht'];}
-  
+
   if(empty($JAX->p)&&!$JAX->b['searchterm']) {
    $ids=$SESS->vars['search'];
   } else {
@@ -105,7 +103,7 @@ class search{
    if($JAX->b['dateend']) $dateend=$this->pdate($JAX->b['dateend']);
 
    // $fids=implode(",",$fids);
-  
+
    /* Note bug: should be is_int, not is_numeric, because that DB field is an integer, not a float. */
    $arguments = array(
    'SELECT id,SUM(relevance) relevance FROM (
@@ -169,7 +167,7 @@ class search{
      // $dateend?" AND p.date<".$dateend:''
    // );
 
-    
+
    while($id=$DB->row($result)) {
     if($id['id']) $ids.=$id['id'].',';
    }
@@ -178,8 +176,8 @@ class search{
    $SESS->addvar('searcht',$termraw);
    $this->pagenum=1;
   }
-  
-  
+
+
   $result = null;
   if($ids) {
    $numresults=count(explode(",",$ids));
@@ -190,14 +188,14 @@ class search{
    $result = $DB->safespecial("SELECT p.*,t.title FROM %t p LEFT JOIN %t t ON p.tid=t.id WHERE p.id IN ? ORDER BY FIELD(p.id,$ids)",
 	array("posts","topics"), $idarray);
   } else $numresults=0;
-  
+
   $page="";
-  
+
   $terms=Array();
-  
+
   foreach(preg_split("@\W+@",$termraw) as $v)
    if(trim($v)) $terms[]=preg_quote($v);
-  
+
   while($f=$DB->row($result)) {
    $post=$f['post'];
    $post=$JAX->textonly($post);
@@ -208,10 +206,10 @@ class search{
 
    $page.=$PAGE->meta('search-result',$f['tid'],$title,$f['id'],$post);
   }
-  
+
   if(!$numresults){
    $e="No results found. Try refining your search, or using longer terms.";
-   
+
    $omitted=Array();
    foreach($terms as $v) if(strlen($v)<3) $omitted[]=$v;
    if(!empty($omitted)) $e.="<br /><br />The following terms were omitted due to length: ".implode(', ',$omitted);
@@ -219,17 +217,17 @@ class search{
   } else {
    foreach($JAX->pages(ceil($numresults/$this->perpage),$this->pagenum,10) as $x) $pages.='<a href="?act=search&page='.$x.'">'.$x.'</a> ';
   }
-  
+
   $page=$PAGE->meta('box','','Search Results - '.$pages,$page);
-  
-  
+
+
   if($PAGE->jsaccess&&!$PAGE->jsdirectlink) $PAGE->JS("update","searchresults",$page);
   else {
    $this->page.=$page;
    $this->form();
   }
  }
- 
+
  function getSearchableForums(){
   if($this->fids) return $this->fids;
   $this->fids=Array();

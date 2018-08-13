@@ -46,6 +46,7 @@ if ($CFG['service']) {
     preg_match('@(.*)\\.'.$domain_match.'@i', $host, $matches);
     if (isset($matches[1]) && $matches[1]) {
         $prefix = $matches[1];
+        $CFG['prefix'] = $prefix;
     } else {
         $prefix = '';
     }
@@ -54,7 +55,7 @@ if ($CFG['service']) {
     if (!$prefix) {
         $result = $DB->safespecial(
             'SELECT prefix FROM `domains` WHERE domain=?',
-            [],
+            array(),
             $DB->basicvalue($host)
         );
         $prefix = $DB->row($result);
