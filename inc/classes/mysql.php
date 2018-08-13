@@ -352,12 +352,14 @@ function safequery_sub_array($query_string, $placeholder_number, $arrlen)
 		syslog(LOG_ERR, "Statement is NULL for $query_string\n");
 	}
 	$retval = $stmt->get_result();
+
 	if (!$retval) {
 		if (!preg_match("/^\s*(UPDATE|DELETE|INSERT)\s/i", $query_string)) {
 			/* This is normal for a non-SELECT query. */
 			syslog(LOG_ERR, "Result is NULL for $query_string\n");
 		}
 	}
+
 	return $retval;
  }
 

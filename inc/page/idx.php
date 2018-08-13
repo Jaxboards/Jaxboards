@@ -18,7 +18,7 @@ class IDX{
 		$result = $DB->safespecial("SELECT f.*,m.display_name lp_name,m.group_id lp_gid FROM %t AS f LEFT JOIN %t AS m ON f.lp_uid=m.id ORDER BY `order`,f.title ASC",
 			array("forums","members"));
 		$data=$this->subforums=$this->subforumids=$this->mods=Array();
-        
+
         //this while loop just grabs all of the data, displaying is done below
 		while($r=$DB->row($result)) {
             $perms=$JAX->parseperms($r['perms'],$USER?$USER['group_id']:3);
@@ -33,7 +33,7 @@ class IDX{
 					if(is_numeric($r['path'])) $subforums[$r['path']].=$PAGE->meta('idx-subforum-link',$r['id'],$r['title']).$PAGE->meta('idx-subforum-splitter');
 				}*/
 			} else $data[$r['cat_id']][]=$r;
-            
+
             //store mod details for later
             if($r['show_ledby']&&$r['mods']) {
              foreach(explode(',',$r['mods']) as $v) if($v) $this->mods[$v]=1;
@@ -162,7 +162,7 @@ class IDX{
 		global $DB,$PAGE,$JAX,$CFG;
 		$r='';
         $guests=0;
-		foreach($DB->getUsersOnline() as $f) 
+		foreach($DB->getUsersOnline() as $f)
 			if($f['uid']||$f['is_bot']) {
 				$title=$JAX->blockhtml($JAX->pick($f['location_verbose'],"Viewing the board."));
 				if($f['is_bot']) $r.='<a class="user'.$f['uid'].'" title="'.$title.'" onmouseover="JAX.tooltip(this)">'.$f['name']."</a>";
@@ -197,13 +197,13 @@ class IDX{
 	}
 	function updateLastPosts(){
 		global $DB,$SESS,$PAGE,$JAX;
-		$DB->safespecial("SELECT f.id,f.lp_tid,f.lp_topic,f.lp_date,f.lp_uid,f.topics,f.posts,m.display_name lp_name,m.group_id lp_gid FROM %t AS f LEFT JOIN %t AS m ON f.lp_uid=m.id WHERE f.lp_date>=?",
+		$result = $DB->safespecial("SELECT f.id,f.lp_tid,f.lp_topic,f.lp_date,f.lp_uid,f.topics,f.posts,m.display_name lp_name,m.group_id lp_gid FROM %t AS f LEFT JOIN %t AS m ON f.lp_uid=m.id WHERE f.lp_date>=?",
 			array("forums","members"),
 			$JAX->pick($SESS->last_update,time())
 		);
 
 
-		while($f=$DB->row()) {
+		while($f=$DB->row($result)) {
             $PAGE->JS("addclass","#fid_".$f['id'],"unread");
             $PAGE->JS("update","#fid_".$f['id']."_icon",$JAX->pick($PAGE->meta('icon-unread'),$PAGE->meta('idx-icon-unread')));
 			$PAGE->JS("update","#fid_".$f['id']."_lastpost",$this->formatlastpost($f),"1");

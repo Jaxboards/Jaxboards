@@ -453,11 +453,15 @@ public static function json_decode($a,$aa=true){
   return $int;
  }
 
- function parseperms($perms,$uid=false){
+ function parseperms($permstoparse,$uid=false){
   global $PERMS;
-  if($uid!==false) {$unpack=unpack("n*",$perms);$perms=Array();for($x=1;$x<count($unpack);$x+=2) $perms[$unpack[$x]]=$unpack[$x+1];$perms=$perms[$uid];}
-  if($perms===NULL) return Array('upload'=>$PERMS['can_attach'],'reply'=>$PERMS['can_post'],'start'=>$PERMS['can_post_topics'],'read'=>1,'view'=>1,'poll'=>$PERMS['can_poll']);
-  return Array('upload'=>$perms&1,'reply'=>$perms&2,'start'=>$perms&4,'read'=>$perms&8,'view'=>$perms&16,'poll'=>$perms&32);
+  if (is_string($permstoparse)) {
+  if($uid!==false) {$unpack=unpack("n*",$permstoparse);$permstoparse=Array();for($x=1;$x<count($unpack);$x+=2) $permstoparse[$unpack[$x]]=$unpack[$x+1];$permstoparse=$permstoparse[$uid];}
+  } else {
+      $permstoparse = null;
+  }
+  if($permstoparse===NULL) return Array('upload'=>$PERMS['can_attach'],'reply'=>$PERMS['can_post'],'start'=>$PERMS['can_post_topics'],'read'=>1,'view'=>1,'poll'=>$PERMS['can_poll']);
+  return Array('upload'=>$permstoparse&1,'reply'=>$permstoparse&2,'start'=>$permstoparse&4,'read'=>$permstoparse&8,'view'=>$permstoparse&16,'poll'=>$permstoparse&32);
  }
 
  function parsereadmarkers($readmarkers){

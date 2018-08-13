@@ -34,8 +34,15 @@ class SESS{
   }
   if($r) return $r;
   else if(!$isbot) $sid=md5(uniqid(true,rand(0,1000)));
+  $uid = 0;
+  if ($JAX->userData && isset($JAX->userData['id']) && 0 < $JAX->userData['id']) {
+      $uid = (int) $JAX->userData['id'];
+  }
   if(!$isbot) setcookie('sid',$sid);
-  $sessData=Array('id'=>$sid,'uid'=>0,'runonce'=>'','ip'=>$JAX->ip2int(),'useragent'=>$_SERVER['HTTP_USER_AGENT'],'is_bot'=>$isbot,'last_action'=>time(),'last_update'=>time());
+  $sessData=Array('id'=>$sid,'uid'=>$uid,'runonce'=>'','ip'=>$JAX->ip2int(),'useragent'=>$_SERVER['HTTP_USER_AGENT'],'is_bot'=>$isbot,'last_action'=>time(),'last_update'=>time());
+  if (1 > $uid) {
+      unset($sessData['uid']);
+  }
   $DB->safeinsert("session",$sessData);
   return $sessData;
  }
@@ -68,7 +75,9 @@ class SESS{
  function clean($uid){
   global $DB,$CFG,$PAGE,$JAX;
   $timeago=time()-$CFG['timetologout'];
-  if($uid){
+  if (!is_int($uid) || 1 > $uid) {
+    $uid = null;
+  }else{
    $result = $DB->safeselect("max(last_action)","session","WHERE uid=? GROUP BY uid",
 	$uid);
    $la=$DB->row($result);
@@ -83,7 +92,7 @@ class SESS{
   while($f=$DB->row($query)) {
 	if($f['uid']) $DB->safeupdate("members",Array("last_visit"=>$f['last_action']),"WHERE id=?", $f['uid']);
   }
-  $DB->safespecial("DELETE FROM %t WHERE last_update<? OR (uid=0 AND last_update< ?)",
+  $DB->safespecial("DELETE FROM %t WHERE last_update<? OR (uid IS NULL AND last_update< ?)",
 	array("session"),
 	$yesterday,
 	$timeago);
@@ -100,7 +109,7 @@ class SESS{
   if(!$this->data['last_action']) $sd['last_action']=time();
   $DB->safeupdate('session',$sd,"WHERE id=?", $DB->basicvalue($id));
  }
- 
+
  function addSessID($html){
   global $JAX;
   if(!empty($JAX->c)) return $html;

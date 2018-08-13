@@ -63,7 +63,7 @@ class tools{
         function outline($line){
             echo $line."\r\n";
         }
-        $tables=$DB->safespecial("SHOW TABLES IN jaxboards_service LIKE 'blueprint_%%' ");
+        $tables=$DB->safespecial("SHOW TABLES LIKE '{$DB->prefix}%%' ");
 	$allrows = $DB->rows($tables);
         $page="";
         //$o=fopen("backup.sql","w");

@@ -22,9 +22,9 @@ class arcade{
         $result = $DB->safeselect("game_id,max(score) maxscore","arcade_scores","WHERE uid=? GROUP BY game_id", $USER['id']);
         while($f=$DB->row($result)) $yourscore[$f['game_id']]=$f['maxscore'];
     }
-    $DB->safespecial("SELECT g.*,m.group_id,m.display_name FROM %t g LEFT JOIN %t m ON g.leader=m.id ORDER BY g.title",
+    $result = $DB->safespecial("SELECT g.*,m.group_id,m.display_name FROM %t g LEFT JOIN %t m ON g.leader=m.id ORDER BY g.title",
 	array("arcade_games","members"));
-    while($f=$DB->row()) {
+    while($f=$DB->row($result)) {
         $page.=$PAGE->meta('arcade-index-row',$f['icon'],$f['id'],$f['title'],$f['description'],$PAGE->meta('user-link',$f['leader'],$f['group_id'],$f['display_name']),$JAX->pick($f['score'],'N/A'),$f['times_played'],$JAX->pick($yourscore[$f['id']],'N/A'));
     }
     $page=$PAGE->meta('arcade-index-wrapper',$page);
@@ -70,14 +70,14 @@ class arcade{
     global $PAGE,$JAX,$USER,$DB;
     $gamedata=$this->getGameData($gameid);
     if(!$gamedata) return $PAGE->location("?act=arcade");
-    
+
     $scores=false;
     if($JAX->b['del']&&$USER['group_id']==2) {
         $DB->safedelete('arcade_scores','WHERE id=?', $DB->basicvalue($JAX->b['del']));
         $scores=$this->getScores($gameid);
         $DB->safeupdate('arcade_games',Array('leader'=>$scores[0]['uid'],'score'=>$scores[0]['score']),'WHERE id=?', $gameid);
     }
-    
+
     if(!$scores) $scores=$this->getScores($gameid);
     if($JAX->p['comment']) {
         foreach($scores as $f) {
@@ -104,18 +104,18 @@ class arcade{
     }
     $page.='</table>';
     $page=$PAGE->meta('box','','Scores - '.$gamedata['title'],$page);
-    
+
     $PAGE->append('PAGE',$page);
     $PAGE->JS('update','page',$page);
  }
  function getScores($gameid,$limit=10){
     global $DB;
     $r=Array();
-    $DB->safespecial("SELECT s.*,m.display_name,m.avatar,m.id uid,m.group_id FROM %t s LEFT JOIN %t m ON s.uid=m.id WHERE game_id=? ORDER BY s.score DESC LIMIT ?",
+    $result = $DB->safespecial("SELECT s.*,m.display_name,m.avatar,m.id uid,m.group_id FROM %t s LEFT JOIN %t m ON s.uid=m.id WHERE game_id=? ORDER BY s.score DESC LIMIT ?",
 	array("arcade_scores","members"),
 	$gameid,
 	$limit);
-    while($f=$DB->row()) $r[]=$f;
+    while($f=$DB->row($result)) $r[]=$f;
     return $r;
  }
  function getGameData($gameid){
@@ -169,7 +169,7 @@ class arcade{
                 $query["uid"]=$USER['id'];
                 $DB->safeinsert("arcade_scores",$query);
             }
-                
+
             if($JAX->b['gscore']>$gamedata['score']) {
                 $DB->safeupdate("arcade_games",Array(
                     "score"=>$score,

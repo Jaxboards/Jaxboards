@@ -165,20 +165,20 @@ class settings{
    if(strlen($JAX->p['domain'])>100) $e="Domain must be less than 100 characters";
    elseif(preg_match('@[^\w.]@',$JAX->p['domain'])) $e="Please enter a valid domain.";
 
-   $result = $DB->safequery("SELECT * FROM jaxboards_service.domains WHERE domain=?", $DB->basicvalue($JAX->p['domain']));
+   $result = $DB->safequery("SELECT * FROM `domains` WHERE domain=?", $DB->basicvalue($JAX->p['domain']));
    if($DB->row($result)) $e="That domain has already been claimed";
    $DB->disposeresult($result);
    if($e) $page.=$PAGE->error($e);
    else {
-    $result = $DB->safequery("INSERT INTO jaxboards_service.domains(`domain`,`prefix`) VALUES( ?, ?);", $DB->basicvalue($JAX->p['domain']), $DB->basicvalue($CFG['prefix']));
+    $result = $DB->safequery("INSERT INTO `domains` (`domain`,`prefix`) VALUES( ?, ?);", $DB->basicvalue($JAX->p['domain']), $DB->basicvalue($CFG['prefix']));
     $page.=$PAGE->success("Domain added! Test <a href='https://".$JAX->blockhtml($JAX->p['domain'])."'>here.</a>");
    }
   } else if(@$JAX->b['delete']) {
-   $result = $DB->safequery('DELETE FROM jaxboards_service.domains WHERE domain=? AND prefix=?;', $DB->basicvalue($JAX->b['delete']), $DB->basicvalue($CFG['prefix']));
+   $result = $DB->safequery('DELETE FROM `domains` WHERE domain=? AND prefix=?;', $DB->basicvalue($JAX->b['delete']), $DB->basicvalue($CFG['prefix']));
    if($DB->affected_rows(1)) $page.=$PAGE->success("Domain deleted");
    else $page.=$PAGE->error("Error deleting domain, maybe it doesn't belong to you?");
   }
-  $result = $DB->safequery("SELECT * FROM jaxboards_service.domains WHERE prefix=?;", $DB->basicvalue($CFG['prefix']));
+  $result = $DB->safequery("SELECT * FROM `domains` WHERE prefix=?;", $DB->basicvalue($CFG['prefix']));
   $domains=Array();
   while($f=$DB->row($result)) $domains[]=$f['domain'];
   if(empty($domains)){

@@ -59,11 +59,11 @@ class SHOUTBOX{
 
   $last=0;
   if($SESS->vars['sb_id']) {
-	$DB->safespecial("SELECT s.*,m.display_name,m.group_id,m.avatar FROM %t AS s LEFT JOIN %t AS m ON s.uid=m.id WHERE s.id>? ORDER BY s.id ASC LIMIT ?",
+	$result = $DB->safespecial("SELECT s.*,m.display_name,m.group_id,m.avatar FROM %t AS s LEFT JOIN %t AS m ON s.uid=m.id WHERE s.id>? ORDER BY s.id ASC LIMIT ?",
 		array("shouts","members"),
 		$JAX->pick($SESS->vars['sb_id'],0),
 		$this->shoutlimit);
-	while($f=$DB->row()) {
+	while($f=$DB->row($result)) {
 	   $PAGE->JS("addshout",$this->formatshout($f));
 	   if($CFG['shoutboxsounds']) {
 	   $sounds=Array();
@@ -94,12 +94,14 @@ class SHOUTBOX{
   $PAGE->path(Array("Shoutbox History"=>"?module=shoutbox"));
   $PAGE->updatepath();
   if($PAGE->jsupdate) return;
-  $DB->safespecial("SELECT s.*, m.avatar, m.display_name, m.group_id FROM %t AS s LEFT JOIN %t AS m ON s.uid=m.id ORDER BY s.id DESC LIMIT ?,?",
+  $result = $DB->safespecial("SELECT s.*, m.avatar, m.display_name, m.group_id FROM %t AS s LEFT JOIN %t AS m ON s.uid=m.id ORDER BY s.id DESC LIMIT ?,?",
 	array("shouts","members"),
 	($pagen*$perpage),
 	$perpage
   );
-  while($f=$DB->row()) $shouts.=$this->formatshout($f);
+  while($f=$DB->row($result)) {
+      $shouts.=$this->formatshout($f);
+  }
   $page=$PAGE->meta('box','','Shoutbox'.$pages,'<div class="sbhistory">'.$shouts.'</div>');
   $PAGE->JS("update","page",$page);
   $PAGE->append("PAGE",$page);

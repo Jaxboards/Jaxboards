@@ -92,7 +92,7 @@ if(!$PAGE->jsaccess) {
  $PAGE->append('SCRIPT','<!--[if IE]><style> img {behavior: url(Script/fiximgnatural.htc)}</style><![endif]-->');
 
  if($PERMS['can_moderate']||$USER['mod']) {
-  //$PAGE->append("SCRIPT",'<script type="text/javascript" src="?act=modcontrols&do=load"></script>');
+  $PAGE->append("SCRIPT",'<script type="text/javascript" src="?act=modcontrols&do=load"></script>');
  }
 
 

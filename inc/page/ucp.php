@@ -13,7 +13,7 @@ class UCP{
   $result = $DB->safeselect("*","members","WHERE id=?", $DB->basicvalue($USER['id']));
   $GLOBALS['USER']=$DB->arow($result);
   $DB->disposeresult($result);
-  
+
   $PAGE->path(Array("UCP"=>"?act=ucp"));
   $this->what=$JAX->b['what'];
   switch($this->what) {
@@ -134,16 +134,16 @@ class UCP{
   $checkboxes=Array($this->getlocationforform().$JAX->hiddenFormFields(Array('submit'=>1)));
 
   foreach($variables as $v) $checkboxes[]='<input type="checkbox" name="'.$v.'" '.($USER[$v]?'checked="checked"':'').'/>';
-  
+
   $this->ucppage=$PAGE->meta('ucp-sound-settings',$checkboxes);
   $this->runscript="if($('dtnotify')&&window.webkitNotifications) $('dtnotify').checked=(webkitNotifications.checkPermission()==0)";
 
   unset($checkboxes);
 
  }
- 
- 
- 
+
+
+
 
  function showsigsettings(){
   global $USER,$JAX,$DB,$PAGE;
@@ -249,8 +249,8 @@ $this->getlocationforform()
    if(""===$data['display_name']) $data['display_name']=$USER['name'];
    if($CFG['badnamechars']&&preg_match($CFG['badnamechars'],$data['display_name'])) $error="Invalid characters in display name!";
    else {
-    $DB->safeselect("*","members","WHERE `display_name` = ? AND id!=?", $DB->basicvalue($data['display_name']), $USER['id']);
-    if($DB->row()!==false) $error="That display name is already in use.";
+    $result = $DB->safeselect("*","members","WHERE `display_name` = ? AND id!=?", $DB->basicvalue($data['display_name']), $USER['id']);
+    if($DB->row($result)!==false) $error="That display name is already in use.";
    }
    if($data['dob_month']||$data['dob_year']||$data['dob_day']) {
     if(!is_numeric($data['dob_month'])||!is_numeric($data['dob_day'])&&!is_numeric($data['dob_year'])) $error="That isn't a valid birth date.";
@@ -306,7 +306,7 @@ $this->getlocationforform()
   $sexselect='<select name="sex">';
   foreach(Array("","male","female") as $v) $sexselect.='<option value="'.$v.'"'.($data['sex']==$v?' selected="selected"':'').'>'.$JAX->pick(ucfirst($v),"Not telling").'</option>';
   $sexselect.='</select>';
-  
+
   $dobselect='<select name="dob_month"><option value="">--</option>';
   foreach(Array("January","February","March","April","May","June","July","August","September","October","November","December") as $k=>$v) $dobselect.='<option value="'.($k+1).'"'.(($k+1)==$data['dob_month']?' selected="selected"':'').'>'.$v.'</option>';
   $dobselect.='</select><select name="dob_day"><option value="">--</option>';
@@ -315,7 +315,7 @@ $this->getlocationforform()
   $thisyear=(int)date("Y");
   for($x=$thisyear;$x>$thisyear-100;$x--) $dobselect.='<option value="'.$x.'"'.($x==$data['dob_year']?' selected="selected"':'').'>'.$x.'</option>';
   $dobselect.='</select>';
-  
+
   $this->ucppage=$PAGE->meta('ucp-profile-settings',
    $this->getlocationforform().$JAX->hiddenFormFields(Array('submit'=>'1')),
    $USER['name'],
@@ -374,10 +374,10 @@ $this->getlocationforform()
      );
      if($showthing) $this->showucp();
  }
- 
+
  /* HERE BE PRIVATE MESSAGING
     ARRRRRRRRRRRRRRRRRRRRRRRR */
- 
+
  function flag(){
   global $PAGE,$DB,$JAX,$USER;
   $PAGE->JS("softurl");
@@ -398,7 +398,7 @@ $this->getlocationforform()
    $DB->safeupdate("messages",Array("read"=>1),"WHERE id=?", $message['id']);
    $this->updatenummessages();
   }
-  
+
   $page=$PAGE->meta('inbox-messageview',
    $message['title'],
    $PAGE->meta('user-link',$message['from'],$message['group_id'],$message['name']),
@@ -411,7 +411,7 @@ $this->getlocationforform()
   $this->showucp($page);
  }
 
- 
+
  function updatenummessages(){
   global $DB,$PAGE,$USER;
   $result = $DB->safeselect("count(*)","messages","WHERE `to`=? AND !`read`", $USER['id']);
@@ -424,7 +424,7 @@ $this->getlocationforform()
 
  function viewmessages($view="inbox"){
   global $PAGE,$DB,$JAX,$USER;
-  
+
   if($PAGE->jsupdate&&empty($JAX->p)) return;
   $result = null;
   if($view=="sent")
@@ -506,7 +506,7 @@ $this->getlocationforform()
      <br />
      Please go to <a href='{BOARDURL}?act=ucp&what=inbox'>{BOARDURL}?act=ucp&what=inbox</a> to view your message.");
     }
-    
+
     $this->showucp("Message successfully delivered.<br /><br /><a href='?act=ucp&what=inbox'>Back</a>");
     return;
    }
@@ -544,8 +544,8 @@ $this->getlocationforform()
 
    if(!$mname) {$mid=0;$mname='';}
   }
-  
-  
+
+
   $page=$PAGE->meta('inbox-composeform',
    $JAX->hiddenFormFields(Array("act"=>"ucp","what"=>"inbox","page"=>"compose","submit"=>"1")),
    $mid,

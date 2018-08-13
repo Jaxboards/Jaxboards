@@ -60,9 +60,9 @@ function recurse_copy($src,$dst) {
 function make_forum($prefix,$name,$password,$email){
 global $DB,$JAX;
 
-$DB->safequery("SHOW TABLES LIKE 'blueprint_%'");
+$result = $DB->safequery("SHOW TABLES LIKE 'blueprint_%'");
 
-while($f=$DB->row()) $tables[]=$f[0];
+while($f=$DB->row($result)) $tables[]=$f[0];
 
 $DB->safeinsert('directory',Array('boardname'=>$prefix,'registrar_email'=>$email,'registrar_ip'=>$JAX->ip2int(),'date'=>time(),'referral'=>$JAX->b['r']));
 
