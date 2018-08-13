@@ -1,5 +1,5 @@
 var updatetime=5000;
-var useJSLinks=1;
+var useJSLinks=2;
 var adcounter=0;
 
 /* Returns the path to this script. */

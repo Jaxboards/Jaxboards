@@ -45,7 +45,6 @@ class LOGREG{
    else {
     $dispname=$JAX->blockhtml($dispname);
     $name=$JAX->blockhtml($name);
-    else {
 	 $result = $DB->safeselect("*","members","WHERE name=? OR display_name=?",
 		$DB->basicvalue($name),
 		$DB->basicvalue($dispname));
@@ -56,7 +55,6 @@ class LOGREG{
       if($f['name']==$name) $e="That username is taken!";
       elseif($f['display_name']==$dispname) $e="That display name is already used by another member.";
      }
-	}
    }
    if($e) {
     $PAGE->JS("alert",$e);
@@ -181,10 +179,10 @@ class LOGREG{
    }
   } else {
 
+      if($JAX->p['user']) {
 		$result = $DB->safeselect("id,pass,email","members","WHERE name=?", $DB->basicvalue($JAX->p['user']));
 		if(!($udata=$DB->row($result))) $e="There is no user registered as <strong>".$JAX->b['user']."</strong>, sure this is correct?";
 		$DB->disposeresult($result);
-	}
 
         if($e) {
          $page.=$PAGE->meta('error',$e);
@@ -202,6 +200,7 @@ class LOGREG{
          else $page.=$PAGE->meta('success',"An email has been sent to the email associated with this account. Please check your email and follow the instructions in order to recover your password.");
         }
       }
+
   }
 
   $PAGE->append("PAGE",$page);
