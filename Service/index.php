@@ -1,103 +1,165 @@
 <?php
 
-if(in_array($_SERVER['REMOTE_ADDR'],Array('***REMOVED***'))) header("Location: http://support.jaxboards.com");
+if (!defined('JAXBOARDS_ROOT')) {
+    define('JAXBOARDS_ROOT', dirname(__DIR__));
+}
+if (!defined('SERVICE_ROOT')) {
+    define('SERVICE_ROOT', __DIR__);
+}
 
-require("../inc/classes/mysql.php");
-require("../inc/classes/jax.php");
+require_once(JAXBOARDS_ROOT.'/inc/classes/mysql.php');
+require_once(JAXBOARDS_ROOT.'/inc/classes/jax.php');
 
 $JAX=new JAX;
 $DB=new MySQL;
 
-$DB->connect('localhost','SQLUSERNAME','SQLPASSWORD','jaxboards_service');
-?>
-<?php
-if($JAX->p['submit']){
- if($JAX->p['post']) header("Location: http://test.jaxboards.com");
+if (!file_exists(JAXBOARDS_ROOT.'/config.php')) {
+    die('Jaxboards not installed!');
+}
+require_once JAXBOARDS_ROOT.'/config.php';
 
- $JAX->p['boardurl']=strtolower($JAX->b['boardurl']);
- if(!$JAX->p['boardurl']||!$JAX->p['username']||!$JAX->p['password']||!$JAX->p['email']) $e="all fields required.";
- elseif(strlen($JAX->p['boardurl'])>30) $e="board url too long";
- elseif($JAX->p['boardurl']=="www") $e="WWW is reserved.";
- elseif(preg_match("@\W@",$JAX->p['boardurl'])) $e="board url needs to consist of letters, numbers, and underscore only";
-
- $result = $DB->safeselect("*","directory","WHERE registrar_ip=? AND date>?", $JAX->ip2int(),(time()-7*24*60*60));
- if($DB->num_rows(1)>3) $e="You may only register one 3 boards per week.";
- $DB->disposeresult($result);
-
- if(!$JAX->isemail($JAX->p['email'])) $e="invalid email";
-
- if(strlen($JAX->p['username'])>50) $e="username too long";
- elseif(preg_match("@\W@",$JAX->p['username'])) $e="username needs to consist of letters, numbers, and underscore only";
-
- $result = $DB->safeselect("*","directory","WHERE boardname=?", $DB->basicvalue($JAX->p['boardurl']));
- if($DB->row($result)) $e="that board already exists";
- $DB->disposeresult($result);
-
- //need to do check for valid email
-
- if(!$e) {
-  make_forum($JAX->p['boardurl'],$JAX->p['username'],$JAX->p['password'],$JAX->p['email']);
-  header("Location: https://".$JAX->p['boardurl'].".jaxboards.com");
- }
+if (!$CFG['service']) {
+    die('Service mode not enabled');
 }
 
-function recurse_copy($src,$dst) {
+/**
+ * Recurisvely copies one directory to another.
+ *
+ * @param string $src The source directory- this must exist already
+ * @param string $dst The destination directory- this is assumed to not exist already
+ *
+ * @return void
+ */
+function recurseCopy($src, $dst)
+{
     $dir = opendir($src);
     @mkdir($dst);
-    while(false !== ( $file = readdir($dir)) ) {
-        if (( $file != '.' ) && ( $file != '..' )) {
-            if ( is_dir($src . '/' . $file) ) {
-                recurse_copy($src . '/' . $file,$dst . '/' . $file);
-            }
-            else {
-                copy($src . '/' . $file,$dst . '/' . $file);
+    while (false !== ($file = readdir($dir))) {
+        if (('.' !== $file) && ('..' !== $file)) {
+            if (is_dir($src.'/'.$file)) {
+                recurseCopy($src.'/'.$file, $dst.'/'.$file);
+            } else {
+                copy($src.'/'.$file, $dst.'/'.$file);
             }
         }
     }
     closedir($dir);
 }
 
-function make_forum($prefix,$name,$password,$email){
-global $DB,$JAX;
 
-$result = $DB->safequery("SHOW TABLES LIKE 'blueprint_%'");
+$connected = $DB->connect(
+    $CFG['sql_host'],
+    $CFG['sql_username'],
+    $CFG['sql_password'],
+    $CFG['sql_db']
+);
 
-while($f=$DB->row($result)) $tables[]=$f[0];
+$errors = array();
+if($JAX->p['submit']){
+ if($JAX->p['post']) header("Location: https://test.".$CFG['domain']);
 
-$DB->safeinsert('directory',Array('boardname'=>$prefix,'registrar_email'=>$email,'registrar_ip'=>$JAX->ip2int(),'date'=>time(),'referral'=>$JAX->b['r']));
+ if (!$connected) {
+     $errors[] = 'There was an error connecting to the MySQL database.';
+ }
 
-$DB->select_db('jaxboards');
+ $JAX->p['boardurl']=strtolower($JAX->b['boardurl']);
+ if(!$JAX->p['boardurl']||!$JAX->p['username']||!$JAX->p['password']||!$JAX->p['email']) $errors[]="all fields required.";
+ elseif(strlen($JAX->p['boardurl'])>30) $errors[]="board url too long";
+ elseif($JAX->p['boardurl']=="www") $errors[]="WWW is reserved.";
+ elseif(preg_match("@\W@",$JAX->p['boardurl'])) $errors[]="board url needs to consist of letters, numbers, and underscore only";
 
-foreach($tables as $v){
- $DB->safequery("CREATE TABLE ? LIKE jaxboards_service.`$v`", str_replace('blueprint',$prefix,$v));
- $shit=$DB->safequery("SELECT * FROM jaxboards_service.`$v`");
- while($f=$DB->arow($shit)) {
-  unset($f['id']);
-  $DB->safeinsert(str_replace('blueprint',$prefix,$v),$f);
-  echo $DB->error();
+ $result = $DB->safeselect("*","directory","WHERE registrar_ip=? AND date>?", $JAX->ip2int(),(time()-7*24*60*60));
+ if($DB->num_rows($result)>3) $errors[]="You may only register one 3 boards per week.";
+ $DB->disposeresult($result);
+
+ if(!$JAX->isemail($JAX->p['email'])) $errors[]="invalid email";
+
+ if(strlen($JAX->p['username'])>50) $errors[]="username too long";
+ elseif(preg_match("@\W@",$JAX->p['username'])) $errors[]="username needs to consist of letters, numbers, and underscore only";
+
+ $result = $DB->safeselect("*","directory","WHERE boardname=?", $DB->basicvalue($JAX->p['boardurl']));
+ if($DB->row($result)) $errors[]="that board already exists";
+ $DB->disposeresult($result);
+
+ //need to do check for valid email
+
+ if(empty($errors)) {
+     $board = $JAX->p['boardurl'];
+     $boardPrefix = $board.'_';
+
+     $DB->prefix('');
+     // Add board to directory
+     $DB->safeinsert(
+         'directory',
+         [
+             'boardname' => $board,
+             'registrar_email' => $JAX->p['email'],
+             'registrar_ip' => $JAX->ip2int(),
+             'date' => time(),
+             'referral' => isset($JAX->b['r']) ? $JAX->b['r'] : '',
+         ]
+     );
+     $DB->prefix($boardPrefix);
+
+     // Create the directory and blueprint tables
+
+     // Import sql file and run it with php from this:
+     // https://stackoverflow.com/a/19752106
+     // It's not pretty or perfect but it'll work for our use case...
+     $query = '';
+     $lines = file(SERVICE_ROOT.'/blueprint.sql');
+     foreach ($lines as $line) {
+         // Skip comments
+         if ('--' == mb_substr($line, 0, 2) || '' == $line) {
+             continue;
+         }
+
+         // replace blueprint_ with board name
+         $line = preg_replace('/blueprint_/', $boardPrefix, $line);
+
+         // Add line to current query
+         $query .= $line;
+
+         // If it has a semicolon at the end, it's the end of the query
+         if (';' == mb_substr(trim($line), -1, 1)) {
+             // Perform the query
+             $result = $DB->safequery($query);
+             $DB->disposeresult($result);
+             // Reset temp variable to empty
+             $query = '';
+         }
+     }
+
+     //don't forget to create the admin
+     $DB->safeinsert(
+         'members',
+         [
+             'name' => $JAX->p['username'],
+             'display_name' => $JAX->p['username'],
+             'pass' => md5($JAX->p['password']),
+             'email' => $JAX->p['email'],
+             'sig' => '',
+             'posts' => 0,
+             'group_id' => 2,
+             'join_date' => time(),
+             'last_visit' => time(),
+         ]
+     );
+
+     $dbError = $DB->error();
+     if ($dbError) {
+         $errors[] = $dbError;
+     } else {
+
+         recurseCopy('blueprint', JAXBOARDS_ROOT.'/boards/'.$board);
+
+         header("Location: https://".$JAX->p['boardurl'].".".$CFG['domain']);
+     }
  }
 }
 
-//don't forget to create member
-$DB->safeinsert($prefix.'_members',Array(
-'name'=>$name,
-'display_name'=>$name,
-'pass'=>md5($password),
-'email'=>$email,
-'sig'=>'',
-'posts'=>0,
-'group_id'=>2,
-'join_date'=>time(),
-'last_visit'=>time()
-));
-
-echo $DB->error();
-
-recurse_copy("blueprint","../boards/".$prefix);
-}
-?>
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"https://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="https://www.w3.org/1999/xhtml/" xml:lang="en" lang="en">
 <head>
 <link media="all" rel="stylesheet" href="./css/main.css" />
@@ -106,14 +168,18 @@ recurse_copy("blueprint","../boards/".$prefix);
 </head>
 <body onload="if(top.location!=self.location) top.location=self.location">
 <div id='container'>
- <div id='logo'><a href="http://jaxboards.com">&nbsp;</a></div>
-  <div id='bar'><a href="http://support.jaxboards.com" class="support">Support Forum</a><a href="http://test.jaxboards.com" class="test">Test Forum</a><a href="http://support.jaxboards.com/?act=vf10" class="resource">Resources</a></div>
+<div id='logo'><a href="https://<?php echo $CFG['domain'];?>">&nbsp;</a></div>
+  <div id='bar'><a href="https://support.<?php echo $CFG['domain'];?>" class="support">Support Forum</a><a href="http://test.<?php echo $CFG['domain'];?>" class="test">Test Forum</a><a href="http://support.<?php echo $CFG['domain'];?>" class="resource">Resources</a></div>
   <div id='content'>
    <div class='box'>
     <div class='content'>
      <form id="signup" method="post">
-      <?php if($e) echo "<div class='error'>$e</div>"; ?>
-      <input type="text" name="boardurl" id="boardname" />.jaxboards.com<br />
+<?php
+foreach ($errors as $error) {
+    echo "<div class='error'>${error}</div>";
+}
+?>
+      <input type="text" name="boardurl" id="boardname" />.<?php echo $CFG['domain'];?><br />
       <label for="username">Username:</label><input type="text" id="username" name="username" /><br />
       <label for="password">Password:</label><input type="password" id="password" name="password" /><br />
       <label for="email">Email:</label><input type="text" name="email" id="email" /><br />

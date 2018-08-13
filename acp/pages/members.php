@@ -49,7 +49,7 @@ class members{
 	array("members","member_groups"));
   $page="<table><tr><th></th><th>Name</th><th>ID</th></tr>";
   while($f=$DB->row($result)) {
-   $page.="<tr><td><img src='".$JAX->pick($f['avatar'],AVAPATH.'default.gif')."' width='50' height='50' /></td><td><a href='?act=members&do=edit&mid=".$f['id']."'>".$f['display_name']."</a><br />".$f['group_title']."</td><td>".$f['id']."</td></tr>";
+   $page.="<tr><td><img src='".$JAX->pick($f['avatar'],AVAURL.'default.gif')."' width='50' height='50' /></td><td><a href='?act=members&do=edit&mid=".$f['id']."'>".$f['display_name']."</a><br />".$f['group_title']."</td><td>".$f['id']."</td></tr>";
   }
   $page.="</table>";
   $PAGE->addContentBox("Member List",$page);
@@ -101,7 +101,7 @@ class members{
    while($f=$DB->arow($result)) $data[]=$f;
    $nummembers=count($data);
    if($nummembers>1) {
-    foreach($data as $v) $page.='<div><img width="100px" height="100px" align="middle" src="'.$JAX->pick($v['avatar'],AVAPATH.'default.gif').'" /> <a href="?act=members&do=edit&mid='.$v['id'].'">'.$v['display_name'].'</a></div>';
+    foreach($data as $v) $page.='<div><img width="100px" height="100px" align="middle" src="'.$JAX->pick($v['avatar'],AVAURL.'default.gif').'" /> <a href="?act=members&do=edit&mid='.$v['id'].'">'.$v['display_name'].'</a></div>';
     return $PAGE->addContentBox("Select Member to Edit",$page);
    } elseif(!$nummembers) {
     return $PAGE->addContentBox("Error",$PAGE->error("This member does not exist. ".$PAGE->back()));

@@ -21,7 +21,7 @@ class forums{
    if(is_numeric($JAX->b['edit'])) return $this->createforum($JAX->b['edit']);
    elseif(preg_match("@c_(\d+)@",$JAX->b['edit'],$m)) return $this->createcategory($m[1]);
   }
-  
+
   switch(@$JAX->g['do']) {
     case "order":$this->orderforums();break;
     case "create":$this->createforum();break;
@@ -69,7 +69,7 @@ class forums{
   $page.="<script type='text/javascript'>JAX.sortableTree($$('.tree'),'forum_','ordered')</script>";
   $PAGE->addContentBox("Forums",$page);
  }
- 
+
  //saves the posted tree to mysql
  public static function mysqltree($tree,$p='',$x=0){
   global $DB;
@@ -140,14 +140,18 @@ class forums{
     $PAGE->location("?act=forums&edit=".$fid);
    }
   }
-  
+
   if(@$JAX->p['submit']){
    //saves all of the shit
    //really should be its own function, but I don't gaf
    $grouppermsa=Array();$groupperms="";
    $result = $DB->safeselect("id","member_groups");
-   while($f=$DB->row($result)) {$v=$JAX->p['groups'][$f['id']];if(!$v['global']) $grouppermsa[$f['id']]=($v['read']?8:0)+($v['start']?4:0)+($v['reply']?2:0)+($v['upload']?1:0)+($v['view']?16:0)+($v['poll']?32:0);}
-   foreach($grouppermsa as $k=>$v) {$groupperms.=pack("n*",$k,$v);}
+   while ($f = $DB->row($result)) {
+       $v = $JAX->p['groups'][$f['id']];
+       if (!$v['global']) {
+           $grouppermsa[$f['id']] = ($v['read'] ? 8 : 0) + ($v['start'] ? 4 : 0) + ($v['reply'] ? 2 : 0) + ($v['upload'] ? 1 : 0) + ($v['view'] ? 16 : 0) + ($v['poll'] ? 32 : 0);
+       }
+   }   foreach($grouppermsa as $k=>$v) {$groupperms.=pack("n*",$k,$v);}
    $sub=$JAX->p['showsub'];
    if(is_numeric($JAX->p['orderby'])) $orderby=$JAX->p['orderby'];
    $result = $DB->safeselect("id","categories");
@@ -178,11 +182,11 @@ class forums{
     $DB->disposeresult($result);
    }
    if(!$write['title']) $e="Forum title is required";
-   
+
    if(!$e) {
     //clear trashcan on other forums
     if($write['trashcan']||(!$write['trashcan']&&@$fdata['trashcan'])) $DB->safeupdate('forums',Array('trashcan'=>0));
-    
+
     if($fdata) {
      $DB->safeupdate('forums',$write,'WHERE id=?', $fid);
      if($JAX->p['modid']) $this->updateperforummodflag();
@@ -194,7 +198,7 @@ class forums{
    }
    $fdata=$write;
   }
-  
+
   //do perms table
   function checkbox($id,$name,$checked){return '<input type="checkbox" class="switch yn" name="groups['.$id.']['.$name.']" '.($checked?'checked="checked" ':'').($name=='global'?' onchange="globaltoggle(this.parentNode.parentNode,this.checked)" ':'').'/>';}
 
@@ -227,7 +231,8 @@ $page.="</select></td></tr>
 $moderators='<table class="settings">
 <tr><td>Moderators:</td><td>';
 if(@$fdata['mods']) {
- $result = $DB->safeselect("display_name,id","members","WHERE id IN ?", $fdata['mods']);
+ $result = $DB->safeselect("display_name,id","members","WHERE id IN ?", explode(',',$fdata['mods']));
+ $mods = '';
  while($f=$DB->row($result)) $mods.=$f['display_name'].' <a href="?act=forums&edit='.$fid.'&rmod='.$f['id'].'">X</a>, ';
  $moderators.=substr($mods,0,-2);
 } else $moderators.="No forum-specific moderators added!";
@@ -256,7 +261,7 @@ for(var x=1;x<perms.rows.length;x++){
   $PAGE->addContentBox("Moderators",$moderators);
   $PAGE->addContentBox("Forum Permissions",$forumperms);
  }
- 
+
  function deleteforum($id){
   global $JAX,$DB,$PAGE;
   if($JAX->p['submit']=="Cancel"){
@@ -293,7 +298,7 @@ for(var x=1;x<perms.rows.length;x++){
   $page="<form method='post'>Move all topics to: <select name='moveto'>".$forums."</select><br /><br /><input name='submit' type='submit' value='Confirm Deletion' /><input name='submit' type='submit' value='Cancel' /></form>";
   $PAGE->addContentBox("Deleting Forum: ".$fdata['title'],$page);
  }
- 
+
  function createcategory($cid=false){
   global $JAX,$DB,$PAGE;
   $page = "";
@@ -312,7 +317,7 @@ for(var x=1;x<perms.rows.length;x++){
      $DB->safeinsert("categories",$stuff);
     }
     $cdata=$stuff;
-    
+
     $page.=$PAGE->success("Category ".($cdata?"edit":"creat")."ed.");
    }
   }
@@ -320,7 +325,7 @@ for(var x=1;x<perms.rows.length;x++){
   <label>Category Title:</label><input type="text" name="cat_name" value="'.$JAX->blockhtml(@$cdata['title']).'" /><br />
   <input type="submit" name="submit" value="'.($cdata?"Edit":"Create").'" />
   </form>';
-  
+
   $PAGE->addContentBox(($cdata?'Edit':'Create').' Category',$page);
  }
  function deletecategory($id){
@@ -331,7 +336,7 @@ for(var x=1;x<perms.rows.length;x++){
   $cattitle=false;
   while($f=$DB->arow($result)) if($f['id']!=$id) $categories[$f['id']]=$f['title']; else $cattitle=$f['title'];
   if($cattitle===false) $e="The category you're trying to delete does not exist.";
-  
+
   if(!$e&&$JAX->p['submit']){
    if(!isset($categories[$JAX->p['moveto']])) $e="Invalid category to move forums to.";
    else {
@@ -349,7 +354,7 @@ for(var x=1;x<perms.rows.length;x++){
   }
   $PAGE->addContentBox("Category Deletion",$page);
  }
- 
+
  //this function updates all of the user->mod flags that specify whether or not a user is a per-forum mod
  //based on the comma delimited list of mods for each forum
  function updateperforummodflag(){

@@ -7,9 +7,11 @@ class MySQL{
  var $mysqli_connection=false;
  var $lastfailedstatement=false;
  var $engine="MySQL";
+ var $prefix='';
 
  function connect($host,$user,$password,$database='',$prefix=''){
   $this->mysqli_connection = new mysqli($host, $user, $password, $database);
+  $this->prefix = $prefix;
   if (!$this->mysqli_connection) return false;
   return true;
  }
@@ -219,7 +221,10 @@ class MySQL{
   if($a && $this->is_sqli_result($a)) {
 	return $a->num_rows;
   }
-  return mysql_num_rows($a);
+  if (function_exists('mysql_num_rows')) {
+      return mysql_num_rows($a);
+  }
+  return 0;
  }
 
  function disposeresult($result)

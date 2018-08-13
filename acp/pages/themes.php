@@ -25,7 +25,7 @@ class themes{
   closedir($o);
   return $wrappers;
  }
- 
+
  function showskinindex(){
   global $PAGE,$DB,$JAX,$CFG;
   $errorskins = "";
@@ -60,7 +60,7 @@ class themes{
     if(!$v||in_array($v,$wrappers))
      $DB->safeupdate("skins",Array("wrapper"=>$v,"hidden"=>$JAX->p['hidden'][$k]?1:0),"WHERE id=?", $k);
    }
-   
+
    if(is_array($JAX->p['renameskin'])) {
     foreach($JAX->p['renameskin'] as $k=>$v) {
         if($k==$v) continue;
@@ -74,7 +74,7 @@ class themes{
         }
     }
    }
-   
+
    if(is_array($JAX->p['renamewrapper'])) {
        foreach($JAX->p['renamewrapper'] as $k=>$v) {
         if($k==$v) continue;
@@ -116,7 +116,7 @@ class themes{
   }
   $wrap="<table class='wrappers'><tr><th>Name</th><th></th><th>Delete</th></tr>$wrap</table><br /><form method='post'><input type='text' name='newwrapper' /><input type='submit' value='Create Wrapper' /></form>";
   $wrap.='<style type="text/css">.wrappers td:first-child a{visibility:hidden;} .wrappers td:first-child:hover a{visibility:visible;}</style>';
-  
+
   $wrap.=<<<heredoc
   <script type="text/javascript">
   function edit(link,suffix){
@@ -164,26 +164,35 @@ heredoc;
    }
    $PAGE->addContentBox("Editing Wrapper: $wrapper","$saved<form method='post'><textarea name='newwrapper' class='editor'>".$JAX->blockhtml(file_get_contents($wrapperf))."</textarea><input type='submit' value='Save Changes' /></form>");
   }
-  
+
  }
 
  function createskin(){
   global $PAGE,$JAX,$DB,$CFG;
   $page = "";
   if(@$JAX->p['submit']){
+   $e = '';
    if(!@$JAX->p['skinname']) $e="No skin name supplied!";
    else if(preg_match("@[^\w ]@",$JAX->p['skinname'])) $e="Skinname must only consist of letters, numbers, and spaces.";
    else if(strlen($JAX->p['skinname'])>50) $e="Skin name must be less than 50 characters.";
    else if(is_dir(BOARDPATH."Themes/".$JAX->p['skinname'])) $e="A skin with that name already exists.";
    else if(!in_array($JAX->p['wrapper'],$this->getwrappers())) $e="Invalid wrapper.";
    else {
+       if (!isset($JAX->p['hidden'])) {
+           $JAX->p['hidden'] = false;
+       }
+       if (!isset($JAX->p['default'])) {
+           $JAX->p['default'] = false;
+       }
+
     $DB->safeinsert('skins',Array("title"=>$JAX->p['skinname'],"wrapper"=>$JAX->p['wrapper'],"hidden"=>$JAX->p['hidden']?1:0,"default"=>$JAX->p['default']?1:0,"custom"=>1));
     if($JAX->p['default']){
 	 $DB->safeupdate('skins',Array('default'=>0),"WHERE id!=?", $DB->insert_id(1));
 	}
+    @mkdir(BOARDPATH.'Themes');
 	mkdir(BOARDPATH."Themes/".$JAX->p['skinname']);
 	$o=fopen(BOARDPATH."Themes/".$JAX->p['skinname']."/css.css","w");
-    fwrite($o,file_get_contents($CFG['dthemepath'].'css.css'));
+    fwrite($o,file_get_contents(JAXBOARDS_ROOT.'/'.$CFG['dthemepath'].'css.css'));
     fclose($o);
 	$PAGE->location("?act=themes");
    }
@@ -216,6 +225,6 @@ heredoc;
   if($skin['default']) $DB->safeupdate('skins',Array('default'=>1),'LIMIT 1');
   $PAGE->location("?act=themes");
  }
-  
+
 }
 ?>

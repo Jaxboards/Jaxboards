@@ -38,7 +38,7 @@ define('BOARDURL', $baseURL.'/');
 
 define('SOUNDSURL', BOARDURL.'Sounds/');
 define('SCRIPTURL', BOARDURL.'Script/');
-define('FLAGPATH', BOARDURL.'flags/');
+define('FLAGURL', BOARDURL.'flags/');
 
 $domain_match = str_replace('.', '\\.', $CFG['domain']);
 // get prefix
@@ -72,7 +72,7 @@ if ($prefix) {
     define('BOARDPATH', JAXBOARDS_ROOT.'/boards/'.$prefix.'/');
     define('BOARDPATHURL', BOARDURL.'boards/'.$prefix.'/');
     define('STHEMEPATH', JAXBOARDS_ROOT.'/Service/Themes/');
-    define('AVAPATH', JAXBOARDS_ROOT.'/Service/Themes/Default/avatars/');
+    define('AVAURL', BOARDURL.'Service/Themes/Default/avatars/');
     define('BOARDCONFIG', BOARDPATH.'config.php');
     if ($DB) {
         $DB->prefix($prefix.'_');

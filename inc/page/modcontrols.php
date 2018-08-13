@@ -392,7 +392,7 @@ new modcontrols;
     $g=new GeoIP;
     $cc=$g->country_code($dottedip);
     //$hostname=$JAX->gethostbyaddr($dottedip);
-    $page.=box("Info","<form method='post' onsubmit='return RUN.submitForm(this)'>".$JAX->hiddenFormFields(Array('ip'=>$ip,'act'=>'modcontrols','do'=>'iptools'))."Country: ".($cc?'<img src="'.FLAGPATH.strtolower($cc).'.gif" /> ':'').$JAX->pick($g->country_name($dottedip),'--None--')."<br />".
+    $page.=box("Info","<form method='post' onsubmit='return RUN.submitForm(this)'>".$JAX->hiddenFormFields(Array('ip'=>$ip,'act'=>'modcontrols','do'=>'iptools'))."Country: ".($cc?'<img src="'.FLAGURL.strtolower($cc).'.gif" /> ':'').$JAX->pick($g->country_name($dottedip),'--None--')."<br />".
     //"Hostname: <a href='https://$hostname'>$hostname</a><br />".
       "IP ban status: ".($JAX->ipbanned($dottedip)?'<span style="color:#900">banned</span> <input type="submit" name="unban" onclick="this.form.submitButton=this" value="Unban" />':'<span style="color:#090">not banned</span> <input type="submit" name="ban" onclick="this.form.submitButton=this" value="Ban" />').'</form>'.
       "StopForumSpam status: ".($JAX->forumspammer($dottedip)?'<span style="color:#900">forum spammer!</span>':'clean.')."<br />".

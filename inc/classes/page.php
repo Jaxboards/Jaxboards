@@ -134,10 +134,15 @@ class PAGE{
   }
   if(!$skin) {$skin=Array("title"=>"Default","custom"=>0);}
   $t=($skin['custom']?BOARDPATH:"")."Themes/".$skin['title']."/";
-  if(is_dir($t)) define("THEMEPATH",$t);
-  else define("THEMEPATH",$CFG['dthemepath']);
+  $turl=($skin['custom']?BOARDPATHURL:"")."Themes/".$skin['title']."/";
+  if(is_dir($t)) {
+      define("THEMEPATH",$t);
+      define("THEMEPATHURL",$turl);
+  } else {
+      define("THEMEPATH",BOARDPATH.$CFG['dthemepath']);
+      define("THEMEPATHURL",BOARDURL.$CFG['dthemepath']);
+  }
   define("DTHEMEPATH",$CFG['dthemepath']);
-  define("IMGPATH",THEMEPATH."img/");
   $this->loadtemplate($skin['wrapper']?BOARDPATH."Wrappers/".$skin['wrapper'].".txt":THEMEPATH."wrappers.txt");
  }
 

@@ -96,7 +96,7 @@ if(!$PAGE->jsaccess) {
  }
 
 
- $PAGE->append('CSS','<link rel="stylesheet" type="text/css" href="'.THEMEPATH.'css.css" />');
+ $PAGE->append('CSS','<link rel="stylesheet" type="text/css" href="'.THEMEPATHURL.'css.css" />');
  if($PAGE->meta('favicon')) $PAGE->append('CSS','<link rel="icon" href="'.$PAGE->meta('favicon').'">');
  $PAGE->append('LOGO',$PAGE->meta("logo",$JAX->pick($CFG['logourl'],BOARDURL.'Service/Themes/Default/img/logo.png')));
  $PAGE->append('NAVIGATION',$PAGE->meta("navigation",$PERMS['can_moderate']?'<li><a href="?act=modcontrols&do=cp">Mod CP</a></li>':'',$PERMS['can_access_acp']?'<li><a href="./acp/" target="_BLANK">ACP</a></li>':'',$CFG['navlinks']?$CFG['navlinks']:''));

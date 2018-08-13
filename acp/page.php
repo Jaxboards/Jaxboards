@@ -100,7 +100,8 @@ class PAGE{
  * @license  MIT <https://opensource.org/licenses/MIT>
  * @link     https://github.com/Jaxboards/Jaxboards Jaxboards on Github
  */
-${$name} = json_decode(
+
+$$name = json_decode(
 <<<'EOD'
 {$data_string}
 EOD
@@ -110,7 +111,7 @@ EOD
 
 EOT;
   $file = fopen($page, $mode);
-  fwrite($file, $write);
+  fwrite($file, $write.PHP_EOL);
   fclose($file);
 
   return $write;

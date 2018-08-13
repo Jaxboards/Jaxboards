@@ -9,7 +9,8 @@ class tools{
   $sidebar='';
   foreach(Array('?act=tools&do=files'=>'File Manager') as $k=>$v) $sidebar.='<li><a href="'.$k.'">'.$v.'</a></li>';
   $PAGE->sidebar('<ul>'.$sidebar.'</ul>');
-  switch($JAX->b['do']){
+  $do = isset($JAX->b['do'])?$JAX->b['do']:'';
+  switch($do){
    case "files":
     $this->filemanager();
    break;
