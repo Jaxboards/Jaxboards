@@ -45,10 +45,10 @@ class PAGE{
 <html xmlns="https://www.w3.org/1999/xhtml/" xml:lang="en" lang="en">
  <head>
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-  <link rel="stylesheet" type="text/css" href="Theme/css.css" />
-  <link rel="stylesheet" type="text/css" href="'.STHEMEPATH.'Default/bbcode.css" />
-  <script type="text/javascript" src="'.STHEMEPATH.'../jsnew.js"></script>
-  <script type="text/javascript" src="Script/admin.js"></script>
+  <link rel="stylesheet" type="text/css" href="'.BOARDURL.'Service/acp/Theme/css.css" />
+  <link rel="stylesheet" type="text/css" href="'.BOARDURL.'Service/Themes/Default/bbcode.css" />
+  <script type="text/javascript" src="'.BOARDURL.'Service/jsnew.js"></script>
+  <script type="text/javascript" src="'.BOARDURL.'Service/acp/Script/admin.js"></script>
   <title><% TITLE %></title>
  </head>
  <body>
