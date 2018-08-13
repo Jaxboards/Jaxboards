@@ -35,7 +35,6 @@ class LOGREG{
   if($JAX->p['register']){
    if(!$name||!$dispname) $e="Name and display name required.";
    elseif($pass1!=$pass2) $e="The passwords do not match.";
-   elseif(!$captcha) $e="Captcha is incorrect!";
    elseif(strlen($dispname)>30||strlen($name)>30) $e="Display name and username must be under 30 characters.";
    elseif(($CFG['badnamechars']&&preg_match($CFG['badnamechars'],$name))||$JAX->blockhtml($name)!=$name) $e="Invalid characters in username!";
    elseif(($CFG['badnamechars']&&preg_match($CFG['badnamechars'],$dispname))) $e="Invalid characters in display name!";
@@ -46,7 +45,6 @@ class LOGREG{
    else {
     $dispname=$JAX->blockhtml($dispname);
     $name=$JAX->blockhtml($name);
-	if(!$req->is_valid) $e="Captcha failed, please try again.";
     else {
 	 $result = $DB->safeselect("*","members","WHERE name=? OR display_name=?",
 		$DB->basicvalue($name),
@@ -183,8 +181,6 @@ class LOGREG{
    }
   } else {
 
-      if($captcha&&$JAX->p['user']) {
-        else {
 		$result = $DB->safeselect("id,pass,email","members","WHERE name=?", $DB->basicvalue($JAX->p['user']));
 		if(!($udata=$DB->row($result))) $e="There is no user registered as <strong>".$JAX->b['user']."</strong>, sure this is correct?";
 		$DB->disposeresult($result);

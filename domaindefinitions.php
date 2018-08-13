@@ -71,7 +71,7 @@ if ($CFG['service']) {
 if ($prefix) {
     define('BOARDPATH', JAXBOARDS_ROOT.'/boards/'.$prefix.'/');
     define('BOARDPATHURL', BOARDURL.'boards/'.$prefix.'/');
-    define('STHEMEPATH', SERVICE_ROOT.'/Themes/');
+    define('STHEMEPATH', JAXBOARDS_ROOT.'/Service/Themes/');
     define('AVAPATH', JAXBOARDS_ROOT.'/Service/Themes/Default/avatars/');
     define('BOARDCONFIG', BOARDPATH.'config.php');
     if ($DB) {

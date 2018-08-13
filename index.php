@@ -87,12 +87,12 @@ if(!$PAGE->jsaccess) {
  $variables[]="userid:".$JAX->pick($USER['id'],0);
 
  $PAGE->append('SCRIPT',' <script type="text/javascript">var globalsettings={'.implode(',',$variables).'}</script>');
- $PAGE->append('SCRIPT',' <script type="text/javascript" src="'.BOARDPATH.'Service/jsnew.js?v=1"></script>');
- $PAGE->append('SCRIPT',' <script type="text/javascript" src="'.BOARDPATH.'Service/jsrun.js"></script>');
+ $PAGE->append('SCRIPT',' <script type="text/javascript" src="'.BOARDURL.'Service/jsnew.js?v=1"></script>');
+ $PAGE->append('SCRIPT',' <script type="text/javascript" src="'.BOARDURL.'Service/jsrun.js"></script>');
  $PAGE->append('SCRIPT','<!--[if IE]><style> img {behavior: url(Script/fiximgnatural.htc)}</style><![endif]-->');
 
  if($PERMS['can_moderate']||$USER['mod']) {
-  $PAGE->append("SCRIPT",'<script type="text/javascript" src="?act=modcontrols&do=load"></script>');
+  //$PAGE->append("SCRIPT",'<script type="text/javascript" src="?act=modcontrols&do=load"></script>');
  }
 
 

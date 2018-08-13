@@ -380,7 +380,14 @@ function RUNF(){
   }
  }
 
- if(useJSLinks&&document.location.toString().indexOf('?')>0) document.location=(useJSLinks==2?'':'./')+"#"+document.location.search.substr(1)+(document.location.hash?document.location.hash:'');
+ if (useJSLinks&&document.location.toString().indexOf('?')>0) {
+   var hash = '#' + document.location.search.substr(1);
+   if (useJSLinks == 2) {
+     history.replaceState({}, '', './' + hash);
+   } else {
+     document.location = hash;
+   }
+ }
 
  if(Sound) {
   basedir = getJXBDBaseDir();

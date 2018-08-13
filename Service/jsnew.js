@@ -244,7 +244,15 @@ var JAX=new function(){
   JAX.convertSwitches($$('.switch',a))
 
   var bbcodeimgs=$$('.bbcodeimg')
-  if(bbcodeimgs) JAX.onImagesLoaded(bbcodeimgs,function(){JAX.imageResizer(bbcodeimgs);},2000)
+  if(bbcodeimgs) JAX.onImagesLoaded(bbcodeimgs,function(){
+        //resizer on large images
+        JAX.imageResizer(bbcodeimgs);
+
+        //handle image galleries
+        var galleries=$$('.image_gallery')
+        if(galleries&&!galleries.length) galleries=[galleries]
+        for(x=0;x<galleries.length;x++) JAX.makeImageGallery(galleries[x])
+  },2000)
 
   if(tmp=$$('.pages',a)) {
    if(!tmp.length) tmp=[tmp]
@@ -684,6 +692,9 @@ var JAX=new function(){
     case "italic":bbcode="[i]"+selection+"[/i]";break;
     case "underline":bbcode="[u]"+selection+"[/u]";break;
     case "strikethrough":bbcode="[s]"+selection+"[/s]";break;
+    case "justifyright":bbcode="[align=right]"+selection+"[/align]";break;
+    case "justifycenter":bbcode="[align=center]"+selection+"[/align]";break;
+    case "justifyleft":bbcode="[align=left]"+selection+"[/align]";break;
     case "insertimage":
      b=prompt("Image URL:");if(!b) return;
      if(!b.match(/^(ht|f)tps?:\/\/[\w\.\-\%&\?=\/]+$/)) return alert("Please enter a valid URL.");
@@ -1349,6 +1360,50 @@ this.makeResizer=function(iw,nw,ih,nh,img){
   if(pl.addEventListener) pl.addEventListener('DOMMouseScroll',scrollpagelist,false)
   pl.onmousewheel=scrollpagelist
  }
+ /********************************************************/
+ this.makeImageGallery=function(gallery){
+    if(gallery.madeGallery) return
+    gallery.madeGallery=true
+    var controls=document.createElement('div'),
+    next=document.createElement('a'),
+    prev=document.createElement('a'),
+    status={
+        index:0,
+        max:$$("img",gallery).length||1,
+        showNext:function(){
+            if(this.index<(this.max-1)) this.index++
+            this.update()
+        },
+        showPrev:function(){
+            if(this.index>0) this.index--
+            this.update()
+        },
+        update:function(){
+            var imgs=$$("img",gallery),x,img
+            for(x=0;x<imgs.length;x++) {
+                img=imgs[x]
+                if(img.madeResized) {
+                    img=img.parentNode;
+                }
+                img.style.display=(x!=this.index)?'none':'block'
+            }
+        }
+    }
+    next.innerHTML='Next &raquo;'
+    next.href='#'
+    next.onclick=function(){status.showNext();return false;}
+
+    prev.innerHTML='Prev &laquo;'
+    prev.href='#'
+    prev.onclick=function(){status.showPrev();return false;}
+
+    status.update()
+    controls.appendChild(prev)
+    controls.appendChild(document.createTextNode(' '))
+    controls.appendChild(next)
+    gallery.appendChild(controls)
+ }
+
 
  /********************************************************/
 

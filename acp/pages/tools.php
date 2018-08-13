@@ -48,7 +48,7 @@ class tools{
   while($file=$DB->row($result)) {
    $filepieces=explode('.',$file['name']);
    if(count($filepieces)>1) $ext=strtolower(array_pop($filepieces));
-   if(in_array($ext,$CFG['images'])) $file['name']='<a href="'.BOARDPATH.'Uploads/'.$file['hash'].'.'.$ext.'">'.$file['name'].'</a>';
+   if(in_array($ext,$CFG['images'])) $file['name']='<a href="'.BOARDPATHURL.'Uploads/'.$file['hash'].'.'.$ext.'">'.$file['name'].'</a>';
    else $file['name']='<a href="../?act=download&id='.$file['id'].'">'.$file['name'].'</a>';
    $table.="<tr><td>".$file['name']."</td><td>".$file['id']."</td><td>".$JAX->filesize($file['size'])."</td><td align='center'><input type='text' style='text-align:center;width:40px' name='dl[".$file['id'].']\' value="'.$file['downloads'].'" /></td><td><a href="../?act=vu'.$file['uid'].'">'.$file['uname']."</a></td><td>".($linkedin[$file['id']]?implode(', ',$linkedin[$file['id']]):'Not linked!')."</td><td align='center'><a onclick='return confirm(\"You sure?\")' href='?act=tools&do=files&delete=".$file['id']."' class='icons delete'></a></td></tr>";
   }

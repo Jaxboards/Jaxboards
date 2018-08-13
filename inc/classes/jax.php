@@ -444,6 +444,10 @@ public static function json_decode($a,$aa=true){
 
  function ip2int($ip=false){
   if(!$ip) $ip=$_SERVER['REMOTE_ADDR'];
+  if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+      // only IPv4 support exists right now
+      return 0;
+  }
   $int=0;
   foreach(explode(".",$ip) as $v) {$int*=256;$int+=$v;}
   return $int;
