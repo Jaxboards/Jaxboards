@@ -147,8 +147,17 @@ class forums{
    $grouppermsa=Array();$groupperms="";
    $result = $DB->safeselect("id","member_groups");
    while ($f = $DB->row($result)) {
+       if (!isset($JAX->p['groups'][$f['id']])) {
+           $JAX->p['groups'][$f['id']] = array();
+       }
+       $options = array('read', 'start', 'reply', 'upload', 'view', 'poll');
        $v = $JAX->p['groups'][$f['id']];
-       if (!$v['global']) {
+       if (!isset($v['global']) || !$v['global']) {
+           foreach ($options as $option) {
+               if (!isset($v[$option])) {
+                   $v[$option] = false;
+               }
+           }
            $grouppermsa[$f['id']] = ($v['read'] ? 8 : 0) + ($v['start'] ? 4 : 0) + ($v['reply'] ? 2 : 0) + ($v['upload'] ? 1 : 0) + ($v['view'] ? 16 : 0) + ($v['poll'] ? 32 : 0);
        }
    }   foreach($grouppermsa as $k=>$v) {$groupperms.=pack("n*",$k,$v);}
@@ -205,13 +214,17 @@ class forums{
   $perms = array();
   if(@$fdata['perms']) {
    $unpack=unpack("n*",$fdata['perms']);
-   for($x=1;$x<count($unpack);$x+=2) $perms[$unpack[$x]]=$unpack[$x+1];
+   for($x=1;$x<count($unpack);$x+=2) {
+       $perms[$unpack[$x]]=$unpack[$x+1];
+   }
   }
   $result = $DB->safeselect("*","member_groups");
   $groupperms="";
   while($f=$DB->row($result)) {
    $global=!isset($perms[$f['id']]);
-   $p=$JAX->parseperms(@$perms[$f['id']]);
+   if (!$global) {
+       $p=$JAX->parseperms(@$perms[$f['id']]);
+   }
    $groupperms.='<tr><td>'.$f['title'].'</td><td>'.checkbox($f['id'],'global',$global).'</td><td>'.checkbox($f['id'],'view',$global?1:$p['view']).'</td><td>'.checkbox($f['id'],'read',$global?1:$p['read']).'</td><td>'.checkbox($f['id'],'start',$global?$f['can_post_topics']:$p['start']).'</td><td>'.checkbox($f['id'],'reply',$global?$f['can_post']:$p['reply']).'</td><td>'.checkbox($f['id'],'upload',$global?$f['can_attach']:$p['upload']).'</td><td>'.checkbox($f['id'],'poll',$global?$f['can_poll']:$p['poll']).'</td></tr>';
   }
   $page.=($e?$PAGE->error($e):"")."<form method='post'><table class='settings'>

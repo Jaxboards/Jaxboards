@@ -459,7 +459,11 @@ public static function json_decode($a,$aa=true){
 
  function parseperms($permstoparse,$uid=false){
   global $PERMS;
-  if (is_string($permstoparse)) {
+  $permstoparse .= '';
+  if (!$permstoparse) {
+      $permstoparse = '0';
+  }
+  if ($permstoparse) {
   if($uid!==false) {$unpack=unpack("n*",$permstoparse);$permstoparse=Array();for($x=1;$x<count($unpack);$x+=2) $permstoparse[$unpack[$x]]=$unpack[$x+1];$permstoparse=$permstoparse[$uid];}
   } else {
       $permstoparse = null;

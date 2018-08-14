@@ -367,8 +367,12 @@ new modcontrols;
    require_once("inc/classes/geoip.php");
 
    $ip=$JAX->b['ip'];
-   if(strpos($ip,'.')) $ip=$JAX->ip2int($ip);
-   if($ip) $dottedip=long2ip($ip);
+   if(strpos($ip,'.')) {
+       $ip=$JAX->ip2int($ip);
+       if($ip) {
+           $dottedip=long2ip($ip);
+       }
+   }
 
    if($JAX->p['ban']) {
     if(!$JAX->ipbanned($dottedip)) {
