@@ -1,5 +1,6 @@
 <?php
-$meta=Array('login-form'=>'<div class="box login">
+
+$meta = array('login-form' => '<div class="box login">
  <div class="title">Login</div>
  <div class="content">
   <form action="?act=logreg3" method="post">
@@ -10,7 +11,7 @@ $meta=Array('login-form'=>'<div class="box login">
  </div>
 </div>',
 
-'register-form'=>'<div class="box register">
+    'register-form' => '<div class="box register">
  <div class="title">Registration</div>
  <div class="content">
   <form method="post" onsubmit="return RUN.submitForm(this)">
@@ -28,7 +29,7 @@ $meta=Array('login-form'=>'<div class="box login">
  </div>
 </div>',
 
- 'forgot-password-form'=>'<div class="box login">
+    'forgot-password-form' => '<div class="box login">
  <div class="title">Forgot Password</div>
  <div class="content">
   <form action="?act=logreg6" method="post" onsubmit="return RUN.submitForm(this)">
@@ -39,7 +40,7 @@ $meta=Array('login-form'=>'<div class="box login">
  </div>
 </div>',
 
- 'forgot-password2-form'=>'<div class="box login">
+    'forgot-password2-form' => '<div class="box login">
  <div class="title">Generate a New Password</div>
  <div class="content">
   <form action="?act=logreg6" method="post" onsubmit="return RUN.submitForm(this)">
@@ -49,7 +50,5 @@ $meta=Array('login-form'=>'<div class="box login">
    <input type="submit" value="Submit" />
   </form>
  </div>
-</div>'
-
+</div>',
 );
-?>

@@ -1,6 +1,7 @@
 <?php
-$meta=Array(
-'ucp-index'=>'
+
+$meta = array(
+    'ucp-index' => '
  <form method="post" onsubmit="$(\'npedit\').editor.submit();return RUN.submitForm(this)">%s
  <div class="username">%s</div>
  <div class="avatar"><img src="%s" /></div>
@@ -8,8 +9,8 @@ $meta=Array(
   <iframe id="npedit" onload="JAX.editor($(\'notepad\'),this)" style="display:none"></iframe>
   <input type="submit" value="Save" />
  </form>',
- 
-'ucp-wrapper'=>'<div class="box" id="ucp"><div class="title">UCP</div><div class="content_top"></div><div class="content">
+
+    'ucp-wrapper' => '<div class="box" id="ucp"><div class="title">UCP</div><div class="content_top"></div><div class="content">
 <div class="leftbar" class="folders">
  <h2>Settings</h2>
   <a href="?act=ucp">Notepad</a>
@@ -29,8 +30,8 @@ $meta=Array(
  <div id="ucppage" class="inbox">%s</div>
  <div class="clear"></div>
  </div><div class="content_bottom"></div></div>',
- 
-'ucp-sound-settings'=>'<h2>Sounds</h2><form onsubmit="return RUN.submitForm(this)" method="post">%s
+
+    'ucp-sound-settings' => '<h2>Sounds</h2><form onsubmit="return RUN.submitForm(this)" method="post">%s
 When someone shouts:<br />
 &nbsp;%s play a sound<br />
 <br />
@@ -53,22 +54,22 @@ When someone posts in a topic I\'m subscribed to:<br />
 <input type="submit" value="Save" />
 </form>',
 
-'ucp-sig-settings'=>'<form onsubmit="$(\'npedit\').editor.submit();return RUN.submitForm(this)" method="post">%s
+    'ucp-sig-settings' => '<form onsubmit="$(\'npedit\').editor.submit();return RUN.submitForm(this)" method="post">%s
   Signature preview:<br />%s<br /><br />
 <textarea name="changesig" id="changesig">%s</textarea>
 <iframe id="npedit" onload="JAX.editor($(\'changesig\'),this)" style="display:none"></iframe><br />
 <input type="submit" value="Change" />
 </form>',
 
-'ucp-pass-settings'=>'<form onsubmit="return RUN.submitForm(this)" method="post">%s
+    'ucp-pass-settings' => '<form onsubmit="return RUN.submitForm(this)" method="post">%s
   <label for="curpass">Current Password:</label><input type="password" name="curpass" id="curpass" /><br />
   <br />
   <label for="newpass1">New Password:</label><input type="password" name="newpass1" id="newpass1" />
    <input name="showpass" type="checkbox" onclick="$(\'newpass1\').type=this.checked?\'text\':\'password\';$(\'confirmpass\').style.display=this.checked?\'none\':\'\'" /> Show<br />
   <div id="confirmpass"><label for="newpass2">Confirm:</label><input type="password" name="newpass2" id="newpass2" /></div><br />
   <input type="Submit" /></form>',
-  
-'ucp-profile-settings'=>'<form method="post" onsubmit="$(\'abouteditor\').editor.submit();return RUN.submitForm(this)">%s
+
+    'ucp-profile-settings' => '<form method="post" onsubmit="$(\'abouteditor\').editor.submit();return RUN.submitForm(this)">%s
 <h2>Name:</h2>
 <div>Your username: <strong>%s</strong></div>
 <div><label for="username">Display Name:</label><input type="text" name="display_name" id="username" value="%s" /></div>
@@ -105,13 +106,13 @@ When someone posts in a topic I\'m subscribed to:<br />
 <div><input type="submit" value="Save Profile Settings" /></div>
 </form>',
 
-'ucp-board-settings'=>'<form method="post" onsubmit="return RUN.submitForm(this)">%s
+    'ucp-board-settings' => '<form method="post" onsubmit="return RUN.submitForm(this)">%s
    Board Skin: %s<br /><br />
    Use word filter: %s<br /><br />
    WYSIWYG Enabled by Default: %s<br /><br />
    <input type="submit" value="Save" /></form>',
-   
-'ucp-email-settings'=>'<form method="post" onsubmit="return RUN.submitForm(this)">%s
+
+    'ucp-email-settings' => '<form method="post" onsubmit="return RUN.submitForm(this)">%s
 Your current email: %s<br /><br />
 %s Receive notifications<br />
 %s Receive email from administrators<br />
@@ -119,7 +120,7 @@ Your current email: %s<br /><br />
 <input type="submit" name="submit" value="Save" />
 </form>',
 
-'inbox-messageview'=>'<div class="messageview">
+    'inbox-messageview' => '<div class="messageview">
 <div class="messageinfo">
 <div class="title">%1$s</div>
 <div>From: %2$s</div>
@@ -133,7 +134,7 @@ Your current email: %s<br /><br />
 </div>
 </div>',
 
-'inbox-composeform'=>'<div class="composeform">
+    'inbox-composeform' => '<div class="composeform">
  <form method="post" onsubmit="$(\'pdedit\').editor.submit();return RUN.submitForm(this)">%1$s
  <div><label for="to">To:</label>
       <input type="hidden" id="mid" name="mid" onchange="$(\'validname\').className=\'good\'" value="%2$s" />
@@ -147,16 +148,12 @@ Your current email: %s<br /><br />
 </form>
 </div>',
 
-'inbox-messages-listing'=>'<form method="post" onsubmit="return RUN.submitForm(this)">%s
+    'inbox-messages-listing' => '<form method="post" onsubmit="return RUN.submitForm(this)">%s
 <table class="listing">
 <tr><th class="center" width="5%%"><input type="checkbox" onclick="JAX.checkAll($$(\'.check\'),this.checked)" /></th><th width="5%%">Flag</th><th width="45%%">Title</th><th width="20%%">%s</th><th width="25%%">Date Sent</th></tr>
 %s
 <tr><td></td><td colspan="4"><input type="submit" value="Delete Messages" /></td></tr>
 </table></form>',
 
-'inbox-messages-row'=>'<tr class="%1$s" onclick="if(JAX.event(event).srcElement.tagName==\'TD\') $$(\'input\',this)[0].click()"><td class="center">%2$s</td><td class="center">%3$s</td><td><a href="?act=ucp&what=inbox&view=%4$s">%5$s</a></td><td>%6$s</td><td>%7$s</td></tr>'
-
-
+    'inbox-messages-row' => '<tr class="%1$s" onclick="if(JAX.event(event).srcElement.tagName==\'TD\') $$(\'input\',this)[0].click()"><td class="center">%2$s</td><td class="center">%3$s</td><td><a href="?act=ucp&what=inbox&view=%4$s">%5$s</a></td><td>%6$s</td><td>%7$s</td></tr>',
 );
-
-?>

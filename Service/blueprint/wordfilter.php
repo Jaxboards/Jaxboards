@@ -1,4 +1,4 @@
 <?php
-$wordfilter=Array(
+
+$wordfilter = array(
 );
-?>

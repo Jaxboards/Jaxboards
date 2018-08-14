@@ -7,11 +7,11 @@ if (!defined('SERVICE_ROOT')) {
     define('SERVICE_ROOT', __DIR__);
 }
 
-require_once(JAXBOARDS_ROOT.'/inc/classes/mysql.php');
-require_once(JAXBOARDS_ROOT.'/inc/classes/jax.php');
+require_once JAXBOARDS_ROOT.'/inc/classes/mysql.php';
+require_once JAXBOARDS_ROOT.'/inc/classes/jax.php';
 
-$JAX=new JAX;
-$DB=new MySQL;
+$JAX = new JAX();
+$DB = new MySQL();
 
 if (!file_exists(JAXBOARDS_ROOT.'/config.php')) {
     die('Jaxboards not installed!');
@@ -27,8 +27,6 @@ if (!$CFG['service']) {
  *
  * @param string $src The source directory- this must exist already
  * @param string $dst The destination directory- this is assumed to not exist already
- *
- * @return void
  */
 function recurseCopy($src, $dst)
 {
@@ -46,7 +44,6 @@ function recurseCopy($src, $dst)
     closedir($dir);
 }
 
-
 $connected = $DB->connect(
     $CFG['sql_host'],
     $CFG['sql_username'],
@@ -55,43 +52,57 @@ $connected = $DB->connect(
 );
 
 $errors = array();
-if(isset($JAX->p['submit']) && $JAX->p['submit']){
-    if(isset($JAX->p['post']) && $JAX->p['post']) {
-        header("Location: https://test.".$CFG['domain']);
+if (isset($JAX->p['submit']) && $JAX->p['submit']) {
+    if (isset($JAX->p['post']) && $JAX->p['post']) {
+        header('Location: https://test.'.$CFG['domain']);
     }
 
- if (!$connected) {
-     $errors[] = 'There was an error connecting to the MySQL database.';
- }
+    if (!$connected) {
+        $errors[] = 'There was an error connecting to the MySQL database.';
+    }
 
- $JAX->p['boardurl']=strtolower($JAX->b['boardurl']);
- if(!$JAX->p['boardurl']||!$JAX->p['username']||!$JAX->p['password']||!$JAX->p['email']) $errors[]="all fields required.";
- elseif(strlen($JAX->p['boardurl'])>30) $errors[]="board url too long";
- elseif($JAX->p['boardurl']=="www") $errors[]="WWW is reserved.";
- elseif(preg_match("@\W@",$JAX->p['boardurl'])) $errors[]="board url needs to consist of letters, numbers, and underscore only";
+    $JAX->p['boardurl'] = strtolower($JAX->b['boardurl']);
+    if (!$JAX->p['boardurl'] || !$JAX->p['username'] || !$JAX->p['password'] || !$JAX->p['email']) {
+        $errors[] = 'all fields required.';
+    } elseif (strlen($JAX->p['boardurl']) > 30) {
+        $errors[] = 'board url too long';
+    } elseif ('www' == $JAX->p['boardurl']) {
+        $errors[] = 'WWW is reserved.';
+    } elseif (preg_match('@\\W@', $JAX->p['boardurl'])) {
+        $errors[] = 'board url needs to consist of letters, numbers, and underscore only';
+    }
 
- $result = $DB->safeselect("*","directory","WHERE registrar_ip=? AND date>?", $JAX->ip2int(),(time()-7*24*60*60));
- if($DB->num_rows($result)>3) $errors[]="You may only register one 3 boards per week.";
- $DB->disposeresult($result);
+    $result = $DB->safeselect('*', 'directory', 'WHERE registrar_ip=? AND date>?', $JAX->ip2int(), (time() - 7 * 24 * 60 * 60));
+    if ($DB->num_rows($result) > 3) {
+        $errors[] = 'You may only register one 3 boards per week.';
+    }
+    $DB->disposeresult($result);
 
- if(!$JAX->isemail($JAX->p['email'])) $errors[]="invalid email";
+    if (!$JAX->isemail($JAX->p['email'])) {
+        $errors[] = 'invalid email';
+    }
 
- if(strlen($JAX->p['username'])>50) $errors[]="username too long";
- elseif(preg_match("@\W@",$JAX->p['username'])) $errors[]="username needs to consist of letters, numbers, and underscore only";
+    if (strlen($JAX->p['username']) > 50) {
+        $errors[] = 'username too long';
+    } elseif (preg_match('@\\W@', $JAX->p['username'])) {
+        $errors[] = 'username needs to consist of letters, numbers, and underscore only';
+    }
 
- $result = $DB->safeselect("*","directory","WHERE boardname=?", $DB->basicvalue($JAX->p['boardurl']));
- if($DB->row($result)) $errors[]="that board already exists";
- $DB->disposeresult($result);
+    $result = $DB->safeselect('*', 'directory', 'WHERE boardname=?', $DB->basicvalue($JAX->p['boardurl']));
+    if ($DB->row($result)) {
+        $errors[] = 'that board already exists';
+    }
+    $DB->disposeresult($result);
 
- //need to do check for valid email
+    //need to do check for valid email
 
- if(empty($errors)) {
-     $board = $JAX->p['boardurl'];
-     $boardPrefix = $board.'_';
+    if (empty($errors)) {
+        $board = $JAX->p['boardurl'];
+        $boardPrefix = $board.'_';
 
-     $DB->prefix('');
-     // Add board to directory
-     $DB->safeinsert(
+        $DB->prefix('');
+        // Add board to directory
+        $DB->safeinsert(
          'directory',
          array(
              'boardname' => $board,
@@ -101,39 +112,39 @@ if(isset($JAX->p['submit']) && $JAX->p['submit']){
              'referral' => isset($JAX->b['r']) ? $JAX->b['r'] : '',
          )
      );
-     $DB->prefix($boardPrefix);
+        $DB->prefix($boardPrefix);
 
-     // Create the directory and blueprint tables
+        // Create the directory and blueprint tables
 
-     // Import sql file and run it with php from this:
-     // https://stackoverflow.com/a/19752106
-     // It's not pretty or perfect but it'll work for our use case...
-     $query = '';
-     $lines = file(SERVICE_ROOT.'/blueprint.sql');
-     foreach ($lines as $line) {
-         // Skip comments
-         if ('--' == mb_substr($line, 0, 2) || '' == $line) {
-             continue;
-         }
+        // Import sql file and run it with php from this:
+        // https://stackoverflow.com/a/19752106
+        // It's not pretty or perfect but it'll work for our use case...
+        $query = '';
+        $lines = file(SERVICE_ROOT.'/blueprint.sql');
+        foreach ($lines as $line) {
+            // Skip comments
+            if ('--' == mb_substr($line, 0, 2) || '' == $line) {
+                continue;
+            }
 
-         // replace blueprint_ with board name
-         $line = preg_replace('/blueprint_/', $boardPrefix, $line);
+            // replace blueprint_ with board name
+            $line = preg_replace('/blueprint_/', $boardPrefix, $line);
 
-         // Add line to current query
-         $query .= $line;
+            // Add line to current query
+            $query .= $line;
 
-         // If it has a semicolon at the end, it's the end of the query
-         if (';' == mb_substr(trim($line), -1, 1)) {
-             // Perform the query
-             $result = $DB->safequery($query);
-             $DB->disposeresult($result);
-             // Reset temp variable to empty
-             $query = '';
-         }
-     }
+            // If it has a semicolon at the end, it's the end of the query
+            if (';' == mb_substr(trim($line), -1, 1)) {
+                // Perform the query
+                $result = $DB->safequery($query);
+                $DB->disposeresult($result);
+                // Reset temp variable to empty
+                $query = '';
+            }
+        }
 
-     //don't forget to create the admin
-     $DB->safeinsert(
+        //don't forget to create the admin
+        $DB->safeinsert(
          'members',
          array(
              'name' => $JAX->p['username'],
@@ -148,16 +159,15 @@ if(isset($JAX->p['submit']) && $JAX->p['submit']){
          )
      );
 
-     $dbError = $DB->error();
-     if ($dbError) {
-         $errors[] = $dbError;
-     } else {
+        $dbError = $DB->error();
+        if ($dbError) {
+            $errors[] = $dbError;
+        } else {
+            recurseCopy('blueprint', JAXBOARDS_ROOT.'/boards/'.$board);
 
-         recurseCopy('blueprint', JAXBOARDS_ROOT.'/boards/'.$board);
-
-         header("Location: https://".$JAX->p['boardurl'].".".$CFG['domain']);
-     }
- }
+            header('Location: https://'.$JAX->p['boardurl'].'.'.$CFG['domain']);
+        }
+    }
 }
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -170,8 +180,8 @@ if(isset($JAX->p['submit']) && $JAX->p['submit']){
 </head>
 <body onload="if(top.location!=self.location) top.location=self.location">
 <div id='container'>
-<div id='logo'><a href="https://<?php echo $CFG['domain'];?>">&nbsp;</a></div>
-  <div id='bar'><a href="https://support.<?php echo $CFG['domain'];?>" class="support">Support Forum</a><a href="http://test.<?php echo $CFG['domain'];?>" class="test">Test Forum</a><a href="http://support.<?php echo $CFG['domain'];?>" class="resource">Resources</a></div>
+<div id='logo'><a href="https://<?php echo $CFG['domain']; ?>">&nbsp;</a></div>
+  <div id='bar'><a href="https://support.<?php echo $CFG['domain']; ?>" class="support">Support Forum</a><a href="http://test.<?php echo $CFG['domain']; ?>" class="test">Test Forum</a><a href="http://support.<?php echo $CFG['domain']; ?>" class="resource">Resources</a></div>
   <div id='content'>
    <div class='box'>
     <div class='content'>
@@ -181,7 +191,7 @@ foreach ($errors as $error) {
     echo "<div class='error'>${error}</div>";
 }
 ?>
-      <input type="text" name="boardurl" id="boardname" />.<?php echo $CFG['domain'];?><br />
+      <input type="text" name="boardurl" id="boardname" />.<?php echo $CFG['domain']; ?><br />
       <label for="username">Username:</label><input type="text" id="username" name="username" /><br />
       <label for="password">Password:</label><input type="password" id="password" name="password" /><br />
       <label for="email">Email:</label><input type="text" name="email" id="email" /><br />
@@ -203,6 +213,6 @@ foreach ($errors as $error) {
     <br clear="all" />
    </div>
 </div>
-   <div id='copyright'>JaxBoards &copy; 2007-<?php date("Y");?>, All Rights Reserved</div>
+   <div id='copyright'>JaxBoards &copy; 2007-<?php date('Y'); ?>, All Rights Reserved</div>
 </body>
 </html>

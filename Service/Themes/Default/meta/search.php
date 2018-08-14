@@ -1,6 +1,7 @@
 <?php
-$meta=Array(
-'search-form'=>'<div class="box" id="searchform">
+
+$meta = array(
+    'search-form' => '<div class="box" id="searchform">
 <div class="title">Board Search</div>
 <div class="content_top"></div>
 <div class="content">
@@ -15,9 +16,8 @@ $meta=Array(
  <div class="content_bottom"></div>
 </div>
 <div id="searchresults">%3$s</div>',
-  
-'search-result'=>'<div class="searchresult"><a class="topic" href="?act=vt%1$s">%2$s</a> <a href="?act=vt%1$s&amp;findpost=%3$s">(Post)</a><br />%4$s</div>',
 
-'search-highlight'=>'<span class="highlight">%s</span>'
+    'search-result' => '<div class="searchresult"><a class="topic" href="?act=vt%1$s">%2$s</a> <a href="?act=vt%1$s&amp;findpost=%3$s">(Post)</a><br />%4$s</div>',
+
+    'search-highlight' => '<span class="highlight">%s</span>',
 );
-?>

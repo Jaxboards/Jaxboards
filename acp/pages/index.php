@@ -1,3 +1,5 @@
 <?php
-if(!defined(INACP)) die();
 
+if (!defined(INACP)) {
+    die();
+}

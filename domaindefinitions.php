@@ -1,18 +1,19 @@
 <?php
 /**
  * Figures out what board we're talking about if it's a service,
- * but regardless defines some important paths
+ * but regardless defines some important paths.
  *
  * PHP Version 5.4.0
  *
  * @category Jaxboards
  * @package  Jaxboards
- * @author   Sean Johnson <seanjohnson08@gmail.com>
- * @author   World's Tallest Ladder <wtl420@users.noreply.github.com>
- * @license  MIT <https://opensource.org/licenses/MIT>
- * @link     https://github.com/jaxboards/jaxboards Jaxboards Github Repo
+ *
+ * @author  Sean Johnson <seanjohnson08@gmail.com>
+ * @author  World's Tallest Ladder <wtl420@users.noreply.github.com>
+ * @license MIT <https://opensource.org/licenses/MIT>
+ *
+ * @link https://github.com/jaxboards/jaxboards Jaxboards Github Repo
  */
-
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', __DIR__);
 }
@@ -25,14 +26,14 @@ if (!isset($DB)) {
 // figure out url
 $host = $_SERVER['SERVER_NAME'];
 // build the url
-$baseURL = (isset($_SERVER['REQUEST_SCHEME'])?
-    $_SERVER['REQUEST_SCHEME']:'https').'://';
-$baseURL .= (isset($_SERVER['SERVER_NAME'])?
-    $_SERVER['SERVER_NAME']:$CFG['domain']);
-if (!($_SERVER['SERVER_PORT'] === '443' && $_SERVER['REQUEST_SCHEME'] === 'https')
-    && !($_SERVER['SERVER_PORT'] === '80' && $_SERVER['REQUEST_SCHEME'] === 'http')
+$baseURL = (isset($_SERVER['REQUEST_SCHEME']) ?
+    $_SERVER['REQUEST_SCHEME'] : 'https').'://';
+$baseURL .= (isset($_SERVER['SERVER_NAME']) ?
+    $_SERVER['SERVER_NAME'] : $CFG['domain']);
+if (!('443' === $_SERVER['SERVER_PORT'] && 'https' === $_SERVER['REQUEST_SCHEME'])
+    && !('80' === $_SERVER['SERVER_PORT'] && 'http' === $_SERVER['REQUEST_SCHEME'])
 ) {
-    $baseURL .= (isset($_SERVER['SERVER_PORT'])?':'.$_SERVER['SERVER_PORT']:'');
+    $baseURL .= (isset($_SERVER['SERVER_PORT']) ? ':'.$_SERVER['SERVER_PORT'] : '');
 }
 define('BOARDURL', $baseURL.'/');
 
@@ -47,6 +48,7 @@ if ($CFG['service']) {
     if (isset($matches[1]) && $matches[1]) {
         $prefix = $matches[1];
         $CFG['prefix'] = $prefix;
+        $CFG['sql_prefix'] = $prefix.'_';
     } else {
         $prefix = '';
     }
@@ -63,6 +65,7 @@ if ($CFG['service']) {
         if ($prefix) {
             $prefix = $prefix['prefix'];
             $CFG['prefix'] = $prefix;
+            $CFG['sql_prefix'] = $prefix.'_';
         }
     }
 } else {
@@ -76,7 +79,7 @@ if ($prefix) {
     define('AVAURL', BOARDURL.'Service/Themes/Default/avatars/');
     define('BOARDCONFIG', BOARDPATH.'config.php');
     if ($DB) {
-        $DB->prefix($prefix.'_');
+        $DB->prefix($CFG['sql_prefix']);
     }
     $tempCFG = $CFG;
     if (@include_once BOARDCONFIG) {
@@ -87,4 +90,3 @@ if ($prefix) {
 } else {
     $CFG['noboard'] = 1;
 }
-

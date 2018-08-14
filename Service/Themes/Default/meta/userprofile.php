@@ -1,6 +1,7 @@
 <?php
-$meta=Array(
-'userprofile-contact-card'=>'<div class="contact-card">
+
+$meta = array(
+    'userprofile-contact-card' => '<div class="contact-card">
 <table>
  <tr>
   <td class="left">
@@ -22,7 +23,7 @@ $meta=Array(
 </table>
 </div>',
 
-'userprofile-full-profile'=>'<div class="userprofile">
+    'userprofile-full-profile' => '<div class="userprofile">
 <div class="leftbar">
 <div class="username">%1$s %22$s</div>
 <div class="avatar"><img src="%2$s" /></div>
@@ -50,7 +51,7 @@ $meta=Array(
 </div>
 <div class="clear"></div>',
 
-'userprofile-comment-form'=>'<div class="comment"><div class="userdata"><div class="username">%s</div><div class="avatar"><img src="%s" /></div></div>
+    'userprofile-comment-form' => '<div class="comment"><div class="userdata"><div class="username">%s</div><div class="avatar"><img src="%s" /></div></div>
 <div class="commenttext"><form onsubmit="return RUN.submitForm(this,1)">
 %s
 <textarea name="comment"></textarea><br />
@@ -58,15 +59,13 @@ $meta=Array(
 </form></div>
 </div>',
 
-'userprofile-friend'=>'<div class="contact" onclick="return RUN.stream.location(\'?act=vu%s\')"><div class="avatar"><img src="%s" /></div><div class="name">%s</div></div>',
+    'userprofile-friend' => '<div class="contact" onclick="return RUN.stream.location(\'?act=vu%s\')"><div class="avatar"><img src="%s" /></div><div class="name">%s</div></div>',
 
-'userprofile-comment'=>'<div class="comment"><div class="userdata"><div class="username">%s</div><div class="avatar"><img src="%s" /></div></div><div class="date">%s</div><div class="commenttext">%s</div></div>',
+    'userprofile-comment' => '<div class="comment"><div class="userdata"><div class="username">%s</div><div class="avatar"><img src="%s" /></div></div><div class="date">%s</div><div class="commenttext">%s</div></div>',
 
-'userprofile-post'=>'<div class="post"><a href="?act=vt%1$s">%2$s</a> <a href="?act=vt%1$s&findpost=%3$s">(Post)</a><div class="postdate">Posted on: %4$s</div>%5$s</div>',
+    'userprofile-post' => '<div class="post"><a href="?act=vt%1$s">%2$s</a> <a href="?act=vt%1$s&findpost=%3$s">(Post)</a><div class="postdate">Posted on: %4$s</div>%5$s</div>',
 
-'userprofile-about'=>'%1$s<div class="signature">%2$s</div>',
+    'userprofile-about' => '%1$s<div class="signature">%2$s</div>',
 
-'userprofile-topic'=>'<div class="post"><a href="?act=vt%1$s">%2$s</a><div class="postdate">Posted on: %3$s</div>%4$s</div>'
+    'userprofile-topic' => '<div class="post"><a href="?act=vt%1$s">%2$s</a><div class="postdate">Posted on: %3$s</div>%4$s</div>',
 );
-
-?>

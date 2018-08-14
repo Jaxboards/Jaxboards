@@ -1,0 +1,14 @@
+# EditorConfig: http://EditorConfig.org
+
+# Some defaults for every file
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+insert_final_newline = false
+trim_trailing_whitespace = true
+indent_size = 2
+
+# PHP makes use of 4 space indentation
+[*.php]
+indent_size = 4

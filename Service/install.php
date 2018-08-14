@@ -1,17 +1,18 @@
 <?php
 /**
- * Service install file, for installing a new JaxBoards service
+ * Service install file, for installing a new JaxBoards service.
  *
  * PHP Version 5.3.0
  *
  * @category Jaxboards
  * @package  Jaxboards
- * @author   Sean Johnson <seanjohnson08@gmail.com>
- * @author   World's Tallest Ladder <wtl420@users.noreply.github.com>
- * @license  MIT <https://opensource.org/licenses/MIT>
- * @link     https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
+ *
+ * @author  Sean Johnson <seanjohnson08@gmail.com>
+ * @author  World's Tallest Ladder <wtl420@users.noreply.github.com>
+ * @license MIT <https://opensource.org/licenses/MIT>
+ *
+ * @link https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
-
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', dirname(__DIR__));
 }
@@ -113,8 +114,8 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         }
     }
     if ($JAX->p['domain'] && !parse_url($JAX->p['domain'], PHP_URL_HOST)) {
-        if (!preg_match(
-            '@[^\w.]@',
+        if (preg_match(
+            '@[^\\w.]@',
             $JAX->p['domain']
         )
         ) {
@@ -152,7 +153,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     }
 
     // are we installing this the service way
-    $service = isset($JAX->p['service']) && (bool)$JAX->p['service'];
+    $service = isset($JAX->p['service']) && (bool) $JAX->p['service'];
 
     $connected = $DB->connect(
         $JAX->p['sql_host'],
@@ -189,8 +190,8 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $CFG['sql_password'] = $JAX->p['sql_password'];
         $CFG['installed'] = true;
         $CFG['service'] = $service;
-        $CFG['prefix'] = $service?'':'jaxboards';
-        $CFG['sql_prefix'] = $CFG['prefix']?$CFG['prefix'].'_':'';
+        $CFG['prefix'] = $service ? '' : 'jaxboards';
+        $CFG['sql_prefix'] = $CFG['prefix'] ? $CFG['prefix'].'_' : '';
 
         $PAGE->writeData(
             JAXBOARDS_ROOT.'/config.php',
@@ -213,7 +214,7 @@ CREATE TABLE `directory` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 EOT
-            ,
+                ,
                 'TRUNCATE `directory`;',
                 'DROP TABLE IF EXISTS `domains`;',
                 <<<'EOT'
@@ -224,8 +225,8 @@ EOT
   KEY `prefix` (`prefix`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 EOT
-            ,
-                'TRUNCATE `domains`;'
+                ,
+                'TRUNCATE `domains`;',
             );
             foreach ($queries as $query) {
                 $result = $DB->safequery($query);
@@ -244,7 +245,7 @@ EOT
             );
         }
 
-        foreach ($default_boards as $board=>$boardname) {
+        foreach ($default_boards as $board => $boardname) {
             $boardPrefix = $board.'_';
             $DB->prefix($boardPrefix);
 
@@ -263,7 +264,6 @@ EOT
                 );
                 $DB->prefix($boardPrefix);
             }
-
 
             // Create the directory and blueprint tables
 
@@ -318,11 +318,9 @@ EOT
 
         // Create lock file
 
-        if (false) {
-            $file = fopen(SERVICE_ROOT.'/install.lock', 'w');
-            fwrite($file, '');
-            fclose($file);
-        }
+        $file = fopen(SERVICE_ROOT.'/install.lock', 'w');
+        fwrite($file, '');
+        fclose($file);
 
         // send us to the service page
         header('Location: '.dirname($_SERVER['REQUEST_URI']));
@@ -362,12 +360,12 @@ foreach ($fields as $field => $attributes) {
         "<input type=\"{$attributes['type']}\"
             name=\"{$field}\" id=\"{$field}\"
             placeholder=\"".
-            (isset($attributes['placeholder'])?$attributes['placeholder']:'').
-            "\"
-            value=\"".
-            (isset($attributes['value'])?$attributes['value']:'').
-            "\"
-        />".
+            (isset($attributes['placeholder']) ? $attributes['placeholder'] : '').
+            '"
+            value="'.
+            (isset($attributes['value']) ? $attributes['value'] : '').
+            '"
+        />'.
         '<br />';
 }
 ?>

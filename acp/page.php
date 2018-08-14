@@ -1,47 +1,59 @@
 <?php
 
-class PAGE{
-  var $CFG=null;
-  var $parts=Array("sidebar"=>"","content"=>"");
-  var $partparts=Array( "nav"=>"", "navdropdowns"=>"");
+class PAGE
+{
+    public $CFG;
+    public $parts = array('sidebar' => '', 'content' => '');
+    public $partparts = array('nav' => '', 'navdropdowns' => '');
 
- /*add_nav_menu(
-    @title string
-    @page string
-    @menu array
-   )
+    /*add_nav_menu(
+       @title string
+       @page string
+       @menu array
+      )
 
-  Title represents the name of the button
-  Page is the link the button links to
-  Menu represents a list of links and associated labels to print out as a drop down list
- */
+     Title represents the name of the button
+     Page is the link the button links to
+     Menu represents a list of links and associated labels to print out as a drop down list
+     */
 
- function addNavmenu($title,$page,$menu){
-  $this->partparts['nav'].='<a href="'.$page.'" class="'.strtolower($title).'">'.$title.'</a>';
-  $this->partparts['navdropdowns'].='<div class="dd_menu" id="menu_'.strtolower($title).'">';
-  foreach($menu as $k=>$v) $this->partparts['navdropdowns'].='<a href="'.$k.'">'.$v.'</a>';
-  $this->partparts['navdropdowns'].='</div>';
- }
+    public function addNavmenu($title, $page, $menu)
+    {
+        $this->partparts['nav'] .= '<a href="'.$page.'" class="'.strtolower($title).'">'.$title.'</a>';
+        $this->partparts['navdropdowns'] .= '<div class="dd_menu" id="menu_'.strtolower($title).'">';
+        foreach ($menu as $k => $v) {
+            $this->partparts['navdropdowns'] .= '<a href="'.$k.'">'.$v.'</a>';
+        }
+        $this->partparts['navdropdowns'] .= '</div>';
+    }
 
- function append($a,$b){
-  $this->parts[$a]=$b;
- }
+    public function append($a, $b)
+    {
+        $this->parts[$a] = $b;
+    }
 
- function sidebar($sidebar){
-  if ($sidebar) $this->parts['sidebar']="<div class='sidebar'><a href='?' class='icons home'>ACP Home</a>".$sidebar."</div>";
-  else $this->parts['sidebar']="";
- }
+    public function sidebar($sidebar)
+    {
+        if ($sidebar) {
+            $this->parts['sidebar'] = "<div class='sidebar'><a href='?' class='icons home'>ACP Home</a>".$sidebar.'</div>';
+        } else {
+            $this->parts['sidebar'] = '';
+        }
+    }
 
- function title($title){
-  $this->parts['title']=$title;
- }
+    public function title($title)
+    {
+        $this->parts['title'] = $title;
+    }
 
- function addContentBox($title,$content){
-  $this->parts['content'].='<div class="box"><div class="header">'.$title.'</div><div class="content">'.$content.'</div></div>';
- }
+    public function addContentBox($title, $content)
+    {
+        $this->parts['content'] .= '<div class="box"><div class="header">'.$title.'</div><div class="content">'.$content.'</div></div>';
+    }
 
- function out(){
-  $template='<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    public function out()
+    {
+        $template = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="https://www.w3.org/1999/xhtml/" xml:lang="en" lang="en">
  <head>
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
@@ -63,30 +75,37 @@ class PAGE{
   </div>
  </body>
 </html>';
-  $this->parts['nav']='<div id="nav" onmouseover="dd_menu(event)">'.$this->partparts['nav'].'</div>'.$this->partparts['navdropdowns'];
-  foreach($this->parts as $k=>$v){
-   $template=str_replace("<% ".strtoupper($k)." %>",$v,$template);
-  }
-  echo $template;
- }
+        $this->parts['nav'] = '<div id="nav" onmouseover="dd_menu(event)">'.$this->partparts['nav'].'</div>'.$this->partparts['navdropdowns'];
+        foreach ($this->parts as $k => $v) {
+            $template = str_replace('<% '.strtoupper($k).' %>', $v, $template);
+        }
+        echo $template;
+    }
 
- function back(){
-  return "<a href='javascript:history.back()'>Back</a>";
- }
- function error($a){
-  return "<div class='error'>$a</div>";
- }
- function success($a){
-  return "<div class='success'>$a</div>";
- }
+    public function back()
+    {
+        return "<a href='javascript:history.back()'>Back</a>";
+    }
 
- function location($a){
-  header("Location: $a");
- }
+    public function error($a)
+    {
+        return "<div class='error'>${a}</div>";
+    }
 
- function writeData($page,$name,$data,$mode="w"){
-  $data_string = json_encode($data);
-  $write = <<<EOT
+    public function success($a)
+    {
+        return "<div class='success'>${a}</div>";
+    }
+
+    public function location($a)
+    {
+        header("Location: ${a}");
+    }
+
+    public function writeData($page, $name, $data, $mode = 'w')
+    {
+        $data_string = json_encode($data);
+        $write = <<<EOT
 <?php
 /**
  * JaxBoards config file. It's just JSON embedded in PHP- wow!
@@ -95,42 +114,46 @@ class PAGE{
  *
  * @category Jaxboards
  * @package  Jaxboards
- * @author   Sean Johnson <seanjohnson08@gmail.com>
- * @author   World's Tallest Ladder <wtl420@users.noreply.github.com>
- * @license  MIT <https://opensource.org/licenses/MIT>
- * @link     https://github.com/Jaxboards/Jaxboards Jaxboards on Github
+ *
+ * @author  Sean Johnson <seanjohnson08@gmail.com>
+ * @author  World's Tallest Ladder <wtl420@users.noreply.github.com>
+ * @license MIT <https://opensource.org/licenses/MIT>
+ *
+ * @link https://github.com/Jaxboards/Jaxboards Jaxboards on Github
  */
-
-$$name = json_decode(
+$${name} = json_decode(
 <<<'EOD'
 {$data_string}
 EOD
     ,
     true
 );
-
 EOT;
-  $file = fopen($page, $mode);
-  fwrite($file, $write.PHP_EOL);
-  fclose($file);
+        $file = fopen($page, $mode);
+        fwrite($file, $write);
+        fclose($file);
 
-  return $write;
- }
+        return $write;
+    }
 
- function writeCFG($data){
-  include BOARDPATH."config.php";
-  foreach($data as $k=>$v) $CFG[$k]=$v;
-  $this->CFG=$CFG;
-  return $this->writeData(BOARDPATH."config.php","CFG",$CFG);
- }
+    public function writeCFG($data)
+    {
+        include BOARDPATH.'config.php';
+        foreach ($data as $k => $v) {
+            $CFG[$k] = $v;
+        }
+        $this->CFG = $CFG;
 
- function getCFGSetting($setting){
-  if(!$this->CFG) {
-   include BOARDPATH."config.php";
-   $this->CFG=$CFG;
-  }
-  return @$this->CFG[$setting];
- }
+        return $this->writeData(BOARDPATH.'config.php', 'CFG', $CFG);
+    }
+
+    public function getCFGSetting($setting)
+    {
+        if (!$this->CFG) {
+            include BOARDPATH.'config.php';
+            $this->CFG = $CFG;
+        }
+
+        return @$this->CFG[$setting];
+    }
 }
-
-?>

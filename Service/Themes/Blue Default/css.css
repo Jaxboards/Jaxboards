@@ -1,26 +1,110 @@
-body{margin:0;padding:0;background:#333;font:12px arial;}
+BODY {
+  margin: 0;
+  padding: 0;
+  background: #333;
+  font: 12px arial;
+}
 /*url(imgs/bggradold.png) repeat-x fixed*/
-a:active,a:link,a:visited{color:#00F;}
-a:hover{color:#55F;}
+A:active,
+A:link,
+A:visited {
+  color: #00f;
+}
+A:hover {
+  color: #55f;
+}
 
-div.placeholder{margin:auto;background:url(imgs/white_bg.png) center repeat-y;}
-div.content{padding-top:30px;max-width:800px;margin:auto;}
-div.title{margin-top:30px;text-indent:30px;background:url(imgs/category_bg.png) center no-repeat;color:#FFF;font-size:14px;padding:10px;}
-div#logo{background:url(imgs/logo_trans.png) center no-repeat;height:50px;}
+DIV.placeholder {
+  margin: auto;
+  background: url(imgs/white_bg.png) center repeat-y;
+}
+DIV.content {
+  padding-top: 30px;
+  max-width: 800px;
+  margin: auto;
+}
+DIV.title {
+  margin-top: 30px;
+  text-indent: 30px;
+  background: url(imgs/category_bg.png) center no-repeat;
+  color: #fff;
+  font-size: 14px;
+  padding: 10px;
+}
+DIV#logo {
+  background: url(imgs/logo_trans.png) center no-repeat;
+  height: 50px;
+}
 
-.index_row .container{padding:0;color:#FFF;height:25px;background:url(imgs/stat_bar.png) repeat-x center;font-size:10px;width:90%;margin:10px auto 0 auto;}
-.index_row .container li{float:right;padding:5px 10px 5px 0;margin-left:5px;list-style-type:none;background:url(imgs/stat_rt.png) right center no-repeat;}
-.index_row .container li.left{float:left;margin-left:0;}
-.index_row .container li span{margin:0;padding:5px 0 5px 10px;background:url(imgs/stat_lt.png) left center no-repeat;}
-.index_row table{margin:0 auto 0 auto;clear:both;border-collapse:collapse;width:90%;}
-.index_row .forum_info h3{margin:0;padding:0;font-size:14px;}
-.index_row .forum_info td{width:50%;padding:0;}
-.index_row .forum_info p{padding:5px 20px 0 20px;}
-.index_row .last_post{background:#F6F6F6;border:1px solid #CCC;padding:15px;width:200px;}
-.index_row .last_post p{margin:0;}
-.index_row .last_post h5{text-align:center;margin:0;}
-.index_row .last_post div{width:100%;text-align:right;}
-.index_row .last_post .time{color:#555;}
+.index_row .container {
+  padding: 0;
+  color: #fff;
+  height: 25px;
+  background: url(imgs/stat_bar.png) repeat-x center;
+  font-size: 10px;
+  width: 90%;
+  margin: 10px auto 0 auto;
+}
+.index_row .container LI {
+  float: right;
+  padding: 5px 10px 5px 0;
+  margin-left: 5px;
+  list-style-type: none;
+  background: url(imgs/stat_rt.png) right center no-repeat;
+}
+.index_row .container LI.left {
+  float: left;
+  margin-left: 0;
+}
+.index_row .container LI SPAN {
+  margin: 0;
+  padding: 5px 0 5px 10px;
+  background: url(imgs/stat_lt.png) left center no-repeat;
+}
+.index_row TABLE {
+  margin: 0 auto 0 auto;
+  clear: both;
+  border-collapse: collapse;
+  width: 90%;
+}
+.index_row .forum_info H3 {
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+}
+.index_row .forum_info TD {
+  width: 50%;
+  padding: 0;
+}
+.index_row .forum_info P {
+  padding: 5px 20px 0 20px;
+}
+.index_row .last_post {
+  background: #f6f6f6;
+  border: 1px solid #ccc;
+  padding: 15px;
+  width: 200px;
+}
+.index_row .last_post P {
+  margin: 0;
+}
+.index_row .last_post H5 {
+  text-align: center;
+  margin: 0;
+}
+.index_row .last_post DIV {
+  width: 100%;
+  text-align: right;
+}
+.index_row .last_post .time {
+  color: #555;
+}
 
-var{font-style:normal;}
-#copyright{margin-top:20px;color:#AAA;text-align:center;}
+VAR {
+  font-style: normal;
+}
+#copyright {
+  margin-top: 20px;
+  color: #aaa;
+  text-align: center;
+}

@@ -1,0 +1,6 @@
+{
+	"devDependencies": {
+		"csscomb": "^4.2.0",
+		"js-beautify": "^1.7.5"
+	}
+}
