@@ -452,7 +452,7 @@ new modcontrols();
      public function iptools()
      {
          global $PAGE,$DB,$CFG,$JAX,$USER;
-         require_once 'inc/classes/geoip.php';
+         require_once 'inc/lib/geoip.php';
 
          $ip = $JAX->b['ip'];
          if (strpos($ip, '.')) {

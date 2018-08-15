@@ -48,6 +48,11 @@ See also the list of [contributors](https://github.com/Jaxboards/Jaxboards/graph
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
+## Third-Party Libraries
+
+* [https://github.com/maxmind/geoip-api-php](GeoIP) class and data file from
+MaxMind; heavily modified by Sean for mod controls
+
 ## Acknowledgments
 
 * Contributors to the original [Jaxboards Service](http://jaxboards.com);

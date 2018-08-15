@@ -39,7 +39,7 @@ define('BOARDURL', $baseURL.'/');
 
 define('SOUNDSURL', BOARDURL.'Sounds/');
 define('SCRIPTURL', BOARDURL.'Script/');
-define('FLAGURL', BOARDURL.'flags/');
+define('FLAGURL', BOARDURL.'Service/flags/');
 
 $domain_match = str_replace('.', '\\.', $CFG['domain']);
 // get prefix
