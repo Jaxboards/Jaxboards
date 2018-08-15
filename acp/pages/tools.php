@@ -7,28 +7,27 @@ if (!defined(INACP)) {
 new tools();
 class tools
 {
-    public function tools()
-    {
-        $this->__construct();
-    }
-
     public function __construct()
     {
         global $JAX,$PAGE;
         $sidebar = '';
-        foreach (array('?act=tools&do=files' => 'File Manager') as $k => $v) {
+        $menu = array(
+            '?act=tools&do=files' => 'File Manager',
+            '?act=tools&do=backup' => 'Backup',
+        );
+        foreach ($menu as $k => $v) {
             $sidebar .= '<li><a href="'.$k.'">'.$v.'</a></li>';
         }
         $PAGE->sidebar('<ul>'.$sidebar.'</ul>');
         $do = isset($JAX->b['do']) ? $JAX->b['do'] : '';
         switch ($do) {
-   case 'files':
-    $this->filemanager();
-   break;
-   case 'backup':
-    $this->backup();
-   break;
-  }
+        case 'files':
+            $this->filemanager();
+            break;
+        case 'backup':
+            $this->backup();
+            break;
+        }
     }
 
     public function filemanager()
@@ -87,37 +86,67 @@ class tools
     {
         global $PAGE,$DB;
         if (@$_POST['dl']) {
-            header('Content-type:text/plain');
-            header('Content-Disposition:attachment;filename="'.$DB->prefix.date('n.j.Y').'.sql"');
-            function outline($line)
-            {
-                echo $line."\r\n";
-            }
-            $tables = $DB->safespecial("SHOW TABLES LIKE '{$DB->prefix}%%' ");
-            $allrows = $DB->rows($tables);
+            header('Content-type: text/plain');
+            header(
+                'Content-Disposition: attachment;filename="'.$DB->prefix.
+                date('Y-m-d_His').'.sql"'
+            );
+            $result = $DB->safequery("SHOW TABLES LIKE '{$DB->prefix}%%';");
+            $tables = $DB->rows($result);
             $page = '';
-            //$o=fopen("backup.sql","w");
-            foreach ($allrows as $f) {
-                $f[0] = substr(strstr($f[0], '_'), 1);
-                $page .= $f[0];
-                outline('--'.$f[0]);
-                $createtable = $DB->safespecial('SHOW CREATE TABLE %t', $f[0]);
-                $thisrow = $DB->row($createtable);
-                outline(array_pop($thisrow));
-                $DB->disposeresult($createtable);
-
-                $select = $DB->safeselect('*', $f[0]);
-                while ($row = $DB->arow($select)) {
-                    $insert = $DB->buildInsert($row);
-                    outline('INSERT INTO '.$f[0].'('.$insert[0].') VALUES '.$insert[1]);
+            if ($tables) {
+                echo PHP_EOL."-- Jaxboards Backup {$DB->prefix} ".
+                    date('Y-m-d H:i:s').PHP_EOL.PHP_EOL;
+                echo 'SET NAMES utf8mb4;'.PHP_EOL;
+                echo "SET time_zone = '+00:00';".PHP_EOL;
+                echo 'SET foreign_key_checks = 0;'.PHP_EOL;
+                echo "SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';".PHP_EOL;
+                echo PHP_EOL;
+                foreach ($tables as $f) {
+                    $f[0] = substr(strstr($f[0], '_'), 1);
+                    $page .= $f[0];
+                    echo PHP_EOL.'-- '.$f[0].PHP_EOL.PHP_EOL;
+                    $createtable = $DB->safespecial(
+                        'SHOW CREATE TABLE %t;',
+                        array($f[0])
+                    );
+                    $thisrow = $DB->row($createtable);
+                    if ($thisrow) {
+                        $table = $DB->ftable($f[0]);
+                        echo "DROP TABLE IF EXISTS {$table};".PHP_EOL;
+                        echo array_pop($thisrow).';'.PHP_EOL;
+                        $DB->disposeresult($createtable);
+                        $select = $DB->safeselect('*', $f[0]);
+                        while ($row = $DB->arow($select)) {
+                            $insert = $DB->buildInsert($row);
+                            $columns = $insert[0];
+                            $values = $insert[1];
+                            echo "INSERT INTO {$table} ({$columns}) ".
+                                "VALUES {$values};".PHP_EOL;
+                        }
+                        echo PHP_EOL;
+                    } else {
+                        error_log($DB->error());
+                    }
                 }
+                echo PHP_EOL;
+                echo 'SET foreign_key_checks = 1;'.PHP_EOL;
+                echo PHP_EOL;
             }
             die();
         }
-        $PAGE->addContentBox('Backup Forum', "This tool will allow you to download and save a backup of your forum in case something happens.<br /><br />
+        $PAGE->addContentBox(
+            'Backup Forum',
+            <<<'EOT'
+This tool will allow you to download and save a backup of your forum in case
+something happens.
+<br /><br />
     <form method='post' onsubmit='this.submit.disabled=true'>
     <input type='hidden' name='dl' value='1' />
-    <input type='submit' name='submit' value='Download Backup' onmouseup='this.value=\"Generating backup...\";' />
-    </form>");
+    <input type='submit' name='submit' value='Download Backup'
+    onmouseup='this.value=\"Generating backup...\";' />
+    </form>
+EOT
+        );
     }
 }
