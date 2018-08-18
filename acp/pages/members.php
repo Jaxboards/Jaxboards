@@ -242,6 +242,7 @@ class members
     public function getGroups($group_id = 0)
     {
         global $DB;
+        $page = '';
         $result = $DB->safeselect('id,title', 'member_groups', 'ORDER BY `title` DESC');
         while ($f = $DB->row($result)) {
             $page .= "<option value='".$f['id']."'".($group_id == $f['id'] ? " selected='selected'" : '').'>'.$f['title'].'</option>';
