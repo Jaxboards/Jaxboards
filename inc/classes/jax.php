@@ -9,6 +9,7 @@ class JAX
         $this->c = $this->filterInput($_COOKIE);
         $this->g = $this->filterInput($_GET);
         $this->p = $this->filterInput($_POST);
+        $this->s = $_SESSION;
         $this->b = array_merge($this->p, $this->g);
         $this->textRules = null;
     }
@@ -117,7 +118,7 @@ class JAX
         }
         foreach ($a as $k => $v) {
             $this->c[$k] = $v;
-            setcookie($k, $v, $c, null, null, false, $htmlonly);
+            setcookie($k, $v, $c, null, null, true, $htmlonly);
         }
     }
 
@@ -174,15 +175,48 @@ class JAX
         if (!$uid) {
             return $this->userData = false;
         }
-        $result = $DB->safeselect("id,group_id,sound_im,sound_shout,last_visit,display_name,friends,enemies,skin_id,nowordfilter,wysiwyg,avatar,ip,usertitle,concat(dob_month,' ',dob_day) birthday,`mod`,posts", 'members', 'WHERE id=? AND pass=?', $DB->basicvalue($uid), $DB->basicvalue($pass));
-        if (!$row = $DB->row($result)) {
+        $result = $DB->safeselect("id,pass,group_id,sound_im,sound_shout,last_visit,display_name,friends,enemies,skin_id,nowordfilter,wysiwyg,avatar,ip,usertitle,concat(dob_month,' ',dob_day) birthday,`mod`,posts", 'members', 'WHERE id=?', $DB->basicvalue($uid));
+        $user = $DB->arow($result);
+        if (!$user || !is_array($user) || empty($user)) {
             return $this->userData = false;
         }
         $DB->disposeresult($result);
         // $row['buddies']=explode(",",$row['buddies']); /* Possible bug. */
-        $row['birthday'] = (date('n j') == $row['birthday'] ? 1 : 0);
+        $user['birthday'] = (date('n j') == $user['birthday'] ? 1 : 0);
 
-        return $this->userData = $row;
+        // password fun
+        if (false !== $pass) {
+            $verified_password = password_verify($pass, $user['pass']);
+            if (!$verified_password) {
+                // check if it's an old md5 hash
+                if (md5($pass) === $user['pass']) {
+                    $verified_password = true;
+                    $needs_rehash = true;
+                }
+            } else {
+                $needs_rehash = password_needs_rehash($user['pass'], PASSWORD_DEFAULT);
+            }
+            if ($verified_password && $needs_rehash) {
+                $new_hash = password_hash($pass, PASSWORD_DEFAULT);
+                // add the new hash
+                $DB->safeupdate(
+                    'members',
+                    array(
+                        'pass' => $new_hash,
+                    ),
+                    'WHERE id = ?',
+                    $user['id']
+                );
+            }
+
+            if ($verified_password) {
+                unset($user['pass']);
+            } else {
+                return $this->userData = false;
+            }
+        }
+
+        return $this->userData = $user;
     }
 
     public function getPerms($group_id = '')

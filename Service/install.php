@@ -300,7 +300,10 @@ EOT
                 array(
                     'name' => $JAX->p['admin_username'],
                     'display_name' => $JAX->p['admin_username'],
-                    'pass' => md5($JAX->p['admin_password']),
+                    'pass' => password_hash(
+                        $JAX->p['admin_password'],
+                        PASSWORD_DEFAULT
+                    ),
                     'email' => $JAX->p['admin_email'],
                     'sig' => '',
                     'posts' => 0,

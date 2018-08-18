@@ -1,4 +1,11 @@
-<?php ob_start(); ?>
+<?php
+ini_set('session.cookie_secure', 1);
+ini_set('session.cookie_httponly', 1);
+ini_set('session.use_cookies', 1);
+ini_set('session.use_only_cookies', 1);
+session_start();
+ob_start();
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="https://www.w3.org/1999/xhtml/" xml:lang="en" lang="en">
  <head>
@@ -19,11 +26,22 @@
  <body>
   <div id="container">
   <?php
+
+if (!defined('JAXBOARDS_ROOT')) {
+    define('JAXBOARDS_ROOT', dirname(__DIR__));
+}
+
+// This is the best place to load the password compatibility library,
+// so do it here:
+if (!function_exists('password_hash')) {
+    include_once JAXBOARDS_ROOT.'/inc/lib/password.php';
+}
+
   define('INACP', 'true');
 
-   require '../inc/classes/jax.php';
-   require '../config.php';
-   require '../inc/classes/mysql.php';
+   require JAXBOARDS_ROOT.'/config.php';
+   require JAXBOARDS_ROOT.'/inc/classes/jax.php';
+   require JAXBOARDS_ROOT.'/inc/classes/mysql.php';
 
    $DB = new MySQL();
    $DB->connect($CFG['sql_host'], $CFG['sql_username'], $CFG['sql_password'], $CFG['sql_db'], $CFG['sql_prefix']);
@@ -31,23 +49,39 @@
    require_once '../domaindefinitions.php';
 
    $JAX = new JAX();
-   $notadmin = false;
-
+   $submitted = false;
    if (isset($JAX->p['submit']) && $JAX->p['submit']) {
+       $submitted = true;
+       // start with least permissions, not admin, no password
+       $notadmin = true;
+
        $u = $JAX->p['user'];
-       $p = md5($JAX->p['pass']);
-       $result = $DB->safespecial('SELECT m.id,g.can_access_acp FROM %t m LEFT JOIN %t g ON m.group_id=g.id WHERE name=? AND pass=?;',
-    array('members', 'member_groups'),
-    $DB->basicvalue($u),
-    $DB->basicvalue($p));
-       $uinfo = $DB->row($result);
+       $p = $JAX->p['pass'];
+       $result = $DB->safespecial(
+           <<<'EOT'
+SELECT m.id as id, g.can_access_acp as can_access_acp
+    FROM %t m
+    LEFT JOIN %t g
+        ON m.group_id = g.id
+    WHERE name=?;
+EOT
+       ,
+           array('members', 'member_groups'),
+           $DB->basicvalue($u)
+       );
+       $uinfo = $DB->arow($result);
        $DB->disposeresult($result);
 
-       if (!(isset($uinfo) && $uinfo['can_access_acp'])) {
-           $notadmin = true;
-       } else {
-           $JAX->setCookie(array('auid' => $uinfo['id'], 'apass' => $p));
-           header('Location: admin.php');
+       // Check password
+       if (is_array($uinfo)) {
+           if ($uinfo['can_access_acp']) {
+               $notadmin = false;
+           }
+           $verified_password = (bool) $JAX->getUser($uinfo['id'], $p);
+           if (!$notadmin && $verified_password) {
+               $_SESSION['auid'] = $uinfo['id'];
+               header('Location: admin.php');
+           }
        }
    }
   ?>
@@ -55,11 +89,13 @@
    <div id="logo"></div>
    <div id="loginform">
     <?php
-     if (isset($uinfo) && false === $uinfo) {
-         echo '<div class="error">The username/password supplied was incorrect.</div>';
-     } elseif ($notadmin) {
-         echo '<div class="error">You are not authorized to login to the ACP</div>';
-     }
+   if ($submitted) {
+       if ((isset($uinfo) && false === $uinfo) || !$verified_password) {
+           echo '<div class="error">The username/password supplied was incorrect.</div>';
+       } elseif (isset($uinfo) && $notadmin) {
+           echo '<div class="error">You are not authorized to login to the ACP</div>';
+       }
+   }
 
     ?>
     <form method="post">

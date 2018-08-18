@@ -91,12 +91,11 @@ class IM
         if (!is_numeric($uid)) {
             return;
         }
-        /* $DB->special("UPDATE %t SET runonce=concat(runonce,%s) WHERE uid=".$uid." AND last_update>".(time()-$CFG['updateinterval']*5),"session",$DB->evalue(json_encode($cmd)."\n")); */
         $result = $DB->safespecial('UPDATE %t SET runonce=concat(runonce,?) WHERE uid=? AND last_update> ?;',
-    array('session'),
-    $DB->basicvalue(json_encode($cmd)."\n"),
-    $uid,
-    (time() - $CFG['updateinterval'] * 5));
+            array('session'),
+            $DB->basicvalue(json_encode($cmd)."\n"),
+            $uid,
+            (time() - $CFG['updateinterval'] * 5));
 
         return 0 != $DB->affected_rows(1);
     }
@@ -109,7 +108,7 @@ class IM
             return;
         }
         if ($otherguy) {
-            $room = md5(uniqid(true, rand(0, 1000)));
+            $room = base64_encode(openssl_random_pseudo_bytes(128));
             //make the window the guy that invited multi
             $PAGE->JS('immakemulti', $otherguy);
             //update other guy

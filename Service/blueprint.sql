@@ -58,12 +58,13 @@ DROP TABLE IF EXISTS `blueprint_files`;
 CREATE TABLE `blueprint_files` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `hash` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `hash` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `uid` int(11) unsigned DEFAULT NULL,
   `size` int(11) unsigned NOT NULL DEFAULT 0,
   `downloads` int(11) unsigned NOT NULL DEFAULT 0,
   `ip` int(11) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
+  KEY `hash` (`hash`),
   KEY `uid` (`uid`),
   KEY `ip` (`ip`),
   CONSTRAINT `blueprint_files_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `blueprint_members` (`id`) ON DELETE SET NULL
@@ -128,7 +129,7 @@ DROP TABLE IF EXISTS `blueprint_members`;
 CREATE TABLE `blueprint_members` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `pass` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `pass` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `email` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `sig` text COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `posts` int(11) unsigned NOT NULL DEFAULT 0,
@@ -320,7 +321,7 @@ TRUNCATE `blueprint_reports`;
 
 DROP TABLE IF EXISTS `blueprint_session`;
 CREATE TABLE `blueprint_session` (
-  `id` char(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `uid` int(11) unsigned DEFAULT NULL,
   `ip` int(11) unsigned NOT NULL DEFAULT 0,
   `vars` text COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
@@ -407,6 +408,19 @@ CREATE TABLE `blueprint_textrules` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 TRUNCATE `blueprint_textrules`;
+
+DROP TABLE IF EXISTS `test_tokens`;
+CREATE TABLE `test_tokens` (
+  `token` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` enum('login','forgotpassword') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'login',
+  `uid` int(11) unsigned NOT NULL,
+  `expires` datetime NOT NULL,
+  PRIMARY KEY (`token`),
+  KEY `uid` (`uid`),
+  KEY `expires` (`expires`),
+  KEY `type` (`type`),
+  CONSTRAINT `test_tokens_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `test_members` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS `blueprint_topics`;
 CREATE TABLE `blueprint_topics` (

@@ -80,7 +80,10 @@ class members
                     if (2 != $data['group_id'] || 1 == $JAX->userData['id']) {
                         $write = array();
                         if ($JAX->p['password']) {
-                            $write['pass'] = md5($JAX->p['password']);
+                            $write['pass'] = password_hash(
+                                $JAX->p['password'],
+                                PASSWORD_DEFAULT
+                            );
                         }
                         foreach (array(
                             'display_name',
@@ -211,7 +214,18 @@ class members
             if ($e) {
                 $page .= $PAGE->error($e);
             } else {
-                $result = $DB->safeinsert('members', array('name' => $JAX->p['username'], 'display_name' => $JAX->p['displayname'], 'pass' => md5($JAX->p['pass']), 'last_visit' => time(), 'group_id' => 1, 'posts' => 0));
+                $member = array(
+                    'name' => $JAX->p['username'],
+                    'display_name' => $JAX->p['displayname'],
+                    'pass' => password_hash(
+                        $JAX->p['pass'],
+                        PASSWORD_DEFAULT
+                    ),
+                    'last_visit' => time(),
+                    'group_id' => 1,
+                    'posts' => 0,
+                );
+                $result = $DB->safeinsert('members', $member);
                 $error = $DB->error();
                 $DB->disposeresult($result);
                 if (!$error) {

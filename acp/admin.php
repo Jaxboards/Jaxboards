@@ -2,6 +2,12 @@
 
 define('INACP', 'true');
 
+ini_set('session.cookie_secure', 1);
+ini_set('session.cookie_httponly', 1);
+ini_set('session.use_cookies', 1);
+ini_set('session.use_only_cookies', 1);
+session_start();
+
 require '../inc/classes/mysql.php';
 require '../config.php';
 require '../inc/classes/jax.php';
@@ -29,7 +35,7 @@ $DB->connect($CFG['sql_host'], $CFG['sql_username'], $CFG['sql_password'], $CFG[
 require_once '../domaindefinitions.php';
 
 $JAX = new JAX();
-$JAX->getUser($JAX->c['auid'], $JAX->c['apass']);
+$JAX->getUser($_SESSION['auid']);
 $PERMS = $JAX->getPerms($JAX->userData['group_id']);
 if (!$PERMS['can_access_acp']) {
     header('Location: ./');

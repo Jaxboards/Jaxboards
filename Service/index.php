@@ -149,7 +149,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
          array(
              'name' => $JAX->p['username'],
              'display_name' => $JAX->p['username'],
-             'pass' => md5($JAX->p['password']),
+             'pass' => password_hash($JAX->p['password'], PASSWORD_DEFAULT),
              'email' => $JAX->p['email'],
              'sig' => '',
              'posts' => 0,

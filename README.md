@@ -11,7 +11,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-Jaxboards should run with PHP 5.3 or above and MySQL 5.5.3 or above.
+Jaxboards should run with PHP 5.3.7 or above and MySQL 5.5.3 or above.
 You'll want a dedicated database just for Jaxboards just to avoid any kind of conflicts with anything else.
 It's only been tested on Apache and Linux as well, but it may work with something else.
 
@@ -50,8 +50,10 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Third-Party Libraries
 
-* [https://github.com/maxmind/geoip-api-php](GeoIP) class and data file from
+* [GeoIP](https://github.com/maxmind/geoip-api-php) class and data file from
 MaxMind; heavily modified by Sean for mod controls
+* [password_compat](https://github.com/ircmaxell/password_compat) library so
+we can make use of PHP's built-in password hashing functions
 
 ## Acknowledgments
 

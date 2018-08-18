@@ -81,7 +81,7 @@ class POST
         }
         $size = filesize($fileobj['tmp_name']);
         //if($size>$CFG['maxupload']) return "too big!";
-        $md5 = md5_file($fileobj['tmp_name']);
+        $hash = hash_file('sha512', $fileobj['tmp_name']);
         $uploadpath = BOARDPATH.'Uploads/';
 
         $ext = explode('.', $fileobj['name']);
@@ -97,14 +97,13 @@ class POST
             $ext = '.'.$ext;
         }
 
-        $file = $uploadpath.$md5.$ext;
-        //md5 collisions?
+        $file = $uploadpath.$hash.$ext;
         if (!is_file($file)) {
             move_uploaded_file($fileobj['tmp_name'], $file);
-            $DB->safeinsert('files', array('hash' => $md5, 'name' => $fileobj['name'], 'uid' => $uid, 'size' => $size, 'ip' => $JAX->ip2int()));
+            $DB->safeinsert('files', array('hash' => $hash, 'name' => $fileobj['name'], 'uid' => $uid, 'size' => $size, 'ip' => $JAX->ip2int()));
             $id = $DB->insert_id(1);
         } else {
-            $result = $DB->safeselect('id', 'files', 'WHERE hash=?', $md5);
+            $result = $DB->safeselect('id', 'files', 'WHERE hash=?', $hash);
             $thisrow = $DB->row($result);
             $id = array_pop($thisrow);
             $DB->disposeresult($result);

@@ -5,7 +5,6 @@ $IDX = new LOGREG();
 class LOGREG
 {
     /* Redundant constructor unnecesary in newer PHP versions. */
-    /* function LOGREG(){$this->__construct();} */
     public function __construct()
     {
         global $JAX,$PAGE;
@@ -13,13 +12,26 @@ class LOGREG
         $this->publickey = '6Lcyub0SAAAAADHCipWYxUxHNxbPxGjn92TlFeNx';
 
         switch (substr($JAX->b['act'], 6)) {
-   case 1:$this->register(); break;
-   case 2:$this->logout(); break;
-   case 4:$this->loginpopup(); break;
-   case 3:default:$this->login($JAX->p['user'], $JAX->p['pass']); break;
-   case 5:$this->toggleinvisible(); break;
-   case 6:$this->forgotpassword($JAX->b['uid'], $JAX->b['id']); break;
-  }
+        case 1:
+            $this->register();
+            break;
+        case 2:
+            $this->logout();
+            break;
+        case 4:
+            $this->loginpopup();
+            break;
+        case 3:
+        default:
+            $this->login($JAX->p['user'], $JAX->p['pass']);
+            break;
+        case 5:
+            $this->toggleinvisible();
+            break;
+        case 6:
+            $this->forgotpassword($JAX->b['uid'], $JAX->b['id']);
+            break;
+        }
     }
 
     public function register()
@@ -38,16 +50,24 @@ class LOGREG
         $pass2 = $JAX->p['pass2'];
         $email = $JAX->p['email'];
 
+        $p = $PAGE->meta('register-form', '');
         if ($JAX->p['register']) {
             if (!$name || !$dispname) {
                 $e = 'Name and display name required.';
             } elseif ($pass1 != $pass2) {
                 $e = 'The passwords do not match.';
-            } elseif (strlen($dispname) > 30 || strlen($name) > 30) {
+            } elseif (strlen($dispname) > 30
+                || strlen($name) > 30
+            ) {
                 $e = 'Display name and username must be under 30 characters.';
-            } elseif (($CFG['badnamechars'] && preg_match($CFG['badnamechars'], $name)) || $JAX->blockhtml($name) != $name) {
+            } elseif (($CFG['badnamechars']
+                && preg_match($CFG['badnamechars'], $name))
+                || $JAX->blockhtml($name) != $name
+            ) {
                 $e = 'Invalid characters in username!';
-            } elseif (($CFG['badnamechars'] && preg_match($CFG['badnamechars'], $dispname))) {
+            } elseif (($CFG['badnamechars']
+                && preg_match($CFG['badnamechars'], $dispname))
+            ) {
                 $e = 'Invalid characters in display name!';
             } elseif (!$JAX->isemail($email)) {
                 $e = "That isn't a valid email!";
@@ -60,9 +80,13 @@ class LOGREG
             } else {
                 $dispname = $JAX->blockhtml($dispname);
                 $name = $JAX->blockhtml($name);
-                $result = $DB->safeselect('*','members','WHERE name=? OR display_name=?',
-        $DB->basicvalue($name),
-        $DB->basicvalue($dispname));
+                $result = $DB->safeselect(
+                    '*',
+                    'members',
+                    'WHERE name=? OR display_name=?',
+                    $DB->basicvalue($name),
+                    $DB->basicvalue($dispname)
+                );
                 $f = $DB->row($result);
                 $DB->disposeresult($result);
 
@@ -79,19 +103,29 @@ class LOGREG
                 $PAGE->append('page', $PAGE->meta('error', $e));
             } else {
                 //all clear!
-                $DB->safeinsert('members', array(
-                    'name' => $name,
-                    'display_name' => $dispname,
-                    'pass' => md5($pass1),
-                    'posts' => 0,
-                    'email' => $email,
-                    'join_date' => time(),
-                    'last_visit' => time(),
-                    'group_id' => $CFG['membervalidation'] ? 5 : 1,
-                    'ip' => $JAX->ip2int(),
-                    'wysiwyg' => 1,
-                ));
-                $DB->safequery('UPDATE '.$DB->ftable(stats).' SET members = members + 1, last_register = ?', $DB->insert_id(1));
+                $DB->safeinsert(
+                    'members',
+                    array(
+                        'name' => $name,
+                        'display_name' => $dispname,
+                        'pass' => password_hash(
+                            $pass1,
+                            PASSWORD_DEFAULT
+                        ),
+                        'posts' => 0,
+                        'email' => $email,
+                        'join_date' => time(),
+                        'last_visit' => time(),
+                        'group_id' => $CFG['membervalidation'] ? 5 : 1,
+                        'ip' => $JAX->ip2int(),
+                        'wysiwyg' => 1,
+                    )
+                );
+                $DB->safequery(
+                    'UPDATE '.$DB->ftable(stats).
+                    ' SET members = members + 1, last_register = ?',
+                    $DB->insert_id(1)
+                );
                 $this->login($name, $pass1);
             }
         } else {
@@ -104,24 +138,42 @@ class LOGREG
 
     public function login($u = false, $p = false)
     {
-        global $PAGE,$JAX,$SESS,$DB,$CFG;
+        global $PAGE,$JAX,$SESS,$DB,$CFG,$_SESSION;
         if ($u && $p) {
             if ($SESS->is_bot) {
                 return;
             }
-            $p = md5($p);
-            $result = $DB->safeselect('*','members','WHERE name=? AND pass=?',
-    $DB->basicvalue($u),
-    $DB->basicvalue($p));
+            $result = $DB->safeselect(
+                'id',
+                'members',
+                'WHERE name=?',
+                $DB->basicvalue($u)
+            );
+            $user = $DB->arow($result);
+            $u = $user['id'];
 
-            $f = $DB->row($result);
-            $DB->disposeresult($result);
+            $f = $JAX->getUser($u, $p);
 
             if ($f) {
                 if ($JAX->p['popup']) {
                     $PAGE->JS('closewindow', '#loginform');
                 }
-                $JAX->setCookie(array('uid' => $f['id'], 'pass' => $f['pass']), time() + 3600 * 24 * 30);
+                $_SESSION['uid'] = $f['id'];
+                $logintoken = base64_encode(openssl_random_pseudo_bytes(128));
+                $DB->safeinsert(
+                    'tokens',
+                    array(
+                        'token' => $logintoken,
+                        'type' => 'login',
+                        'uid' => $f['id'],
+                        'expires' => date('Y-m-d H:i:s', time() + 3600 * 24 * 30),
+                    )
+                );
+
+                $JAX->setCookie(
+                    array('utoken' => $logintoken),
+                    time() + 3600 * 24 * 30
+                );
                 $SESS->clean($f['id']);
                 $SESS->user = $u;
                 $SESS->uid = $f['id'];
@@ -134,13 +186,11 @@ class LOGREG
                 } else {
                     $PAGE->location('?');
                 }
-                /*keep this in case you decide to go back to ajax logins
-                if($perms['can_moderate']) {
-                 include "modcontrols.php";
-                 modcontrols::load();
-                }*/
             } else {
-                $PAGE->append('page', $PAGE->meta('error', 'Incorrect username/password'));
+                $PAGE->append(
+                    'page',
+                    $PAGE->meta('error', 'Incorrect username/password')
+                );
                 $PAGE->JS('error', 'Incorrect username/password');
             }
             $SESS->erase('location');
@@ -150,15 +200,27 @@ class LOGREG
 
     public function logout()
     {
-        global $PAGE,$JAX,$SESS;
-        $JAX->setCookie(array('uid' => false, 'pass' => false));
-        /*if(!$SESS->is_bot) $SESS->user="Guest";
-        $SESS->uid=0;
-        $SESS->erase("location");*/
+        global $DB,$PAGE,$JAX,$SESS;
         //just make a new session rather than fuss with the old one, to maintain users online
+        if (isset($JAX->c['utoken'])) {
+            $DB->safedelete(
+                'tokens',
+                'WHERE token=?',
+                $DB->basicvalue($JAX->c['utoken'])
+            );
+            unset($JAX->c['utoken']);
+            $JAX->setCookie(
+                array(
+                    'utoken' => null,
+                ),
+                -1
+            );
+        }
         $SESS->hide = 1;
         $SESS->applyChanges();
         $SESS->getSess(false);
+        session_unset();
+        session_destroy();
         $PAGE->reset('USERBOX', $PAGE->meta('userbox-logged-out'));
         $PAGE->JS('update', 'userbox', $PAGE->meta('userbox-logged-out'));
         $PAGE->JS('softurl');
@@ -172,7 +234,37 @@ class LOGREG
     {
         global $PAGE;
         $PAGE->JS('softurl');
-        $PAGE->JS('window', array('title' => 'Login', 'useoverlay' => 1, 'id' => 'loginform', 'content' => '<form method="post" onsubmit="return RUN.submitForm(this,1)"><input type="hidden" name="act" value="logreg3" /><input type="hidden" name="popup" value="1" /><label for="user">Username:</label><input type="text" name="user" id="user" /><br /><label for="pass">Password (<a href="?act=logreg6" title="Forgot your password?" onmouseover="return JAX.tooltip(this)" onclick="JAX.window.close(this);">?</a>):</label><input type="password" name="pass" id="pass" /><br /><input type="submit" value="Login" /> <a href="?act=logreg1" onclick="JAX.window.close(this)">Register</a></form>'));
+        $PAGE->JS(
+            'window',
+            array(
+                'title' => 'Login',
+                'useoverlay' => 1,
+                'id' => 'loginform',
+                'content' => <<<'EOT'
+<form method="post" onsubmit="return RUN.submitForm(this,1)">
+    <input type="hidden" name="act" value="logreg3" />
+    <input type="hidden" name="popup" value="1" />
+    <label for="user">Username:</label>
+    <input type="text" name="user" id="user" />
+    <br />
+    <label for="pass">
+        Password
+        (
+        <a href="?act=logreg6" title="Forgot your password?"
+            onmouseover="return JAX.tooltip(this)"
+            onclick="JAX.window.close(this);">
+            ?
+        </a>
+        ):
+    </label>
+    <input type="password" name="pass" id="pass" />
+    <br />
+    <input type="submit" value="Login" />
+    <a href="?act=logreg1" onclick="JAX.window.close(this)">Register</a>
+</form>
+EOT
+            )
+        );
     }
 
     public function toggleinvisible()
@@ -197,9 +289,16 @@ class LOGREG
             return;
         }
 
-        if (is_numeric($uid) && $id) {
-            $result = $DB->safeselect('id,name,pass', 'members', 'WHERE id=?', $DB->basicvalue($uid));
-            if (!($udata = $DB->row($result)) || md5($udata['pass']) != $id) {
+        if ($id) {
+            $result = $DB->safeselect(
+                'uid AS id',
+                'tokens',
+                'WHERE token=?
+                AND expires>=NOW()',
+                $DB->basicvalue($id)
+            );
+            $udata = $DB->arow($result);
+            if (!($udata)) {
                 $e = 'This link has expired. Please try again.';
             }
             $DB->disposeresult($result);
@@ -211,42 +310,125 @@ class LOGREG
                     if ($JAX->p['pass1'] != $JAX->p['pass2']) {
                         $page .= $PAGE->meta('error', 'The passwords did not match, please try again!');
                     } else {
-                        $DB->safeupdate('members', array('pass' => md5($JAX->p['pass1'])), 'WHERE id=?', $DB->basicvalue($udata['id']));
+                        $DB->safeupdate(
+                            'members',
+                            array(
+                                'pass' => password_hash(
+                                    $JAX->p['pass1'],
+                                    PASSWORD_DEFAULT
+                                ),
+                            ),
+                            'WHERE id=?',
+                            $DB->basicvalue($udata['id'])
+                        );
+                        // delete all forgotpassword tokens for this user
+                        $DB->safedelete(
+                            'tokens',
+                            "WHERE uid=? AND type='forgotpassword'",
+                            $DB->basicvalue($udata['id'])
+                        );
+
+                        // get username
+                        $result = $DB->safeselect(
+                            'id, name',
+                            'members',
+                            'WHERE id=?',
+                            $DB->basicvalue($udata['id'])
+                        );
+                        $udata = $DB->arow($result);
+
                         //just making use of the way registration redirects to the index
                         $this->registering = true;
 
                         return $this->login($udata['name'], $JAX->p['pass1']);
                     }
+                } else {
+                    $page .= $PAGE->meta(
+                        'forgot-password2-form',
+                        $JAX->hiddenFormFields(
+                            array(
+                                'uid' => $uid,
+                                'id' => $id,
+                                'act' => 'logreg6',
+                            )
+                        )
+                    );
                 }
-                $page .= $PAGE->meta('forgot-password2-form', $JAX->hiddenFormFields(array('uid' => $uid, 'id' => $id, 'act' => 'logreg6')));
             }
         } else {
             if ($JAX->p['user']) {
-                $result = $DB->safeselect('id,pass,email', 'members', 'WHERE name=?', $DB->basicvalue($JAX->p['user']));
+                $result = $DB->safeselect(
+                    'id,email',
+                    'members',
+                    'WHERE name=?',
+                    $DB->basicvalue($JAX->p['user'])
+                );
                 if (!($udata = $DB->row($result))) {
-                    $e = 'There is no user registered as <strong>'.$JAX->b['user'].'</strong>, sure this is correct?';
+                    $e = 'There is no user registered as <strong>'.
+                        $JAX->b['user'].
+                        '</strong>, sure this is correct?';
                 }
                 $DB->disposeresult($result);
 
                 if ($e) {
                     $page .= $PAGE->meta('error', $e);
                 } else {
-                    $link = '{BOARDURL}?act=logreg6&uid='.$udata['id'].'&id='.md5($udata['pass']);
+                    // generate token
+                    $forgotpasswordtoken = base64_encode(openssl_random_pseudo_bytes(128));
+                    $DB->safeinsert(
+                        'tokens',
+                        array(
+                            'token' => $forgotpasswordtoken,
+                            'type' => 'forgotpassword',
+                            'uid' => $udata['id'],
+                            'expires' => date('Y-m-d H:i:s', time() + 3600 * 24),
+                        )
+                    );
+                    $link = BOARDURL.'?act=logreg6&uid='.
+                        $udata['id'].'&id='.rawurlencode($forgotpasswordtoken);
                     if (!$JAX->mail(
-          $udata['email'],
-          'Recover Your Password!',
-          "You have received this email because a password request was received at {BOARDLINK}<br />
-          <br />
-          If you did not request a password change, simply ignore this email and no actions will be taken. If you would like to change your password, please visit the following page and follow the on-screen instructions: <a href='${link}'>${link}</a><br />
-          <br />
-          Thanks!"
-          )) {
-                        $page .= $PAGE->meta('error', 'There was a problem sending the email. Please contact the administrator.');
+                        $udata['email'],
+                        'Recover Your Password!',
+                        <<<EOT
+You have received this email because a password request was received at {BOARDLINK}
+<br />
+<br />
+If you did not request a password change,
+simply ignore this email and no actions will be taken.
+If you would like to change your password,
+please visit the following page and follow the on-screen instructions:
+<a href='${link}'>${link}</a>
+<br />
+<br />
+Thanks!
+EOT
+                    )
+                    ) {
+                        $page .= $PAGE->meta(
+                                'error',
+                                'There was a problem sending the email. Please contact the administrator.'
+                            );
                     } else {
-                        $page .= $PAGE->meta('success', 'An email has been sent to the email associated with this account. Please check your email and follow the instructions in order to recover your password.');
+                        $page .= $PAGE->meta(
+                            'success',
+                            'An email has been sent to the email associated '.
+                            'with this account. Please check your email and '.
+                            'follow the instructions in order to recover '.
+                            'your password.'
+                        );
                     }
                 }
             }
+
+            $page .= $PAGE->meta(
+                'forgot-password-form',
+                $PAGE->jsaccess ?
+                $JAX->hiddenFormFields(
+                    array(
+                        'act' => 'logreg6',
+                    )
+                ) : ''
+            );
         }
 
         $PAGE->append('PAGE', $page);

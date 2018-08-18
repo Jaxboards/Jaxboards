@@ -4,11 +4,21 @@ Jaxboards. THE ULTIMATE 4UMS WOOOOOOO
 By Sean John's son (2007 @ 4 AM)
  */
 
+if (!defined('JAXBOARDS_ROOT')) {
+    define('JAXBOARDS_ROOT', __DIR__);
+}
+
 header('Cache-Control: no-cache, must-revalidate');
 error_reporting(E_ALL ^ E_NOTICE);
 
 $local = '127.0.0.1' == $_SERVER['REMOTE_ADDR'];
 $microtime = microtime(true);
+
+// This is the best place to load the password compatibility library,
+// so do it here:
+if (!function_exists('password_hash')) {
+    include_once JAXBOARDS_ROOT.'/inc/lib/password.php';
+}
 
 /*get the config*/
 require 'config.php';
@@ -20,6 +30,13 @@ $connected = $DB->connect($CFG['sql_host'], $CFG['sql_username'], $CFG['sql_pass
 if (!$connected) {
     die('Could not connect');
 }
+
+// start a session
+ini_set('session.cookie_secure', 1);
+ini_set('session.cookie_httponly', 1);
+ini_set('session.use_cookies', 1);
+ini_set('session.use_only_cookies', 1);
+session_start();
 
 /*Board Service Stuff, get the board as specified by URL*/
 require_once 'domaindefinitions.php';
@@ -36,10 +53,22 @@ if ($CFG['noboard']) {
 
 $PAGE = new PAGE();
 $JAX = new JAX();
-$SESS = new SESS($JAX->pick($JAX->c['sid'], $JAX->b['sessid']));
+$SESS = new SESS(isset($_SESSION['sid']) ? $_SESSION['sid'] : false);
 
-if (!$SESS->is_bot && $JAX->c['uid']) {
-    $JAX->getUser($JAX->c['uid'], $JAX->c['pass']);
+if (!isset($_SESSION['uid']) && isset($JAX->c['utoken'])) {
+    $result = $DB->safeselect(
+        'uid',
+        'tokens',
+        'WHERE token=?',
+        $JAX->c['utoken']
+    );
+    $token = $DB->arow($result);
+    if ($token) {
+        $_SESSION['uid'] = $token['uid'];
+    }
+}
+if (!$SESS->is_bot && $_SESSION['uid']) {
+    $JAX->getUser($_SESSION['uid']);
 }
 
 $USER = &$JAX->userData;

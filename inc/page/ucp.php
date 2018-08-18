@@ -209,17 +209,34 @@ class UCP
             if (!$JAX->p['newpass1'] || !$JAX->p['showpass'] && !$JAX->p['newpass2'] || !$JAX->p['curpass']) {
                 $e = 'All form fields are required.';
             }
-            if (md5($JAX->p['curpass']) != $USER['pass']) {
+            $verified_password = password_verify($JAX->p['curpass'], $USER['pass']);
+            if (!$verified_password) {
+                // check if it's an old md5 hash
+                if (md5($JAX->p['curpass']) === $USER['pass']) {
+                    $verified_password = true;
+                }
+            }
+            if (!$verified_password) {
                 $e = 'The password you entered is incorrect.';
             }
             if ($e) {
                 $this->ucppage .= $PAGE->meta('error', $e);
                 $PAGE->JS('error', $e);
             } else {
-                $hashpass = md5($JAX->p['newpass1']);
-                $DB->safeupdate('members', array('pass' => $hashpass), 'WHERE id=?', $USER['id']);
-                $JAX->setCookie('pass', $hashpass);
-                $this->ucppage = 'Password changed.<br /><br /><a href="?act=ucp&what=pass">Back</a>';
+                $hashpass = password_hash($JAX->p['newpass1'], PASSWORD_DEFAULT);
+                $DB->safeupdate(
+                    'members',
+                    array(
+                        'pass' => $hashpass,
+                    ),
+                    'WHERE id=?',
+                    $USER['id']
+                );
+                $this->ucppage = <<<'EOT'
+Password changed.
+    <br /><br />
+    <a href="?act=ucp&what=pass">Back</a>
+EOT;
 
                 return $this->showucp();
             }

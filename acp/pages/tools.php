@@ -125,8 +125,6 @@ class tools
                                 "VALUES {$values};".PHP_EOL;
                         }
                         echo PHP_EOL;
-                    } else {
-                        error_log($DB->error());
                     }
                 }
                 echo PHP_EOL;

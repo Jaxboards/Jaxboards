@@ -6,11 +6,7 @@ class SESS
     public $bots = array('google' => 'Googlebot', 'bingbot' => 'Bing', 'yahoo! slurp' => 'Yahoo', 'mj12bot' => 'MJ12bot', 'baidu' => 'Baidu', 'discobot' => 'DiscoBot');
     public $changedData = array();
 
-    /* Redundant constructor unnecesary in newer PHP versions. */
-    /* function SESS($sid){
-     $this->__construct($sid);
-    } */
-    public function __construct($sid)
+    public function __construct($sid = false)
     {
         $this->data = $this->getSess($sid);
         $this->data['vars'] = unserialize($this->data['vars']);
@@ -19,9 +15,9 @@ class SESS
         }
     }
 
-    public function getSess($sid)
+    public function getSess($sid = false)
     {
-        global $DB,$JAX;
+        global $DB,$JAX,$_SESSION;
         $isbot = 0;
         foreach ($this->bots as $k => $v) {
             if (false !== strpos(strtolower($_SERVER['HTTP_USER_AGENT']), $k)) {
@@ -30,13 +26,12 @@ class SESS
             }
         }
         if ($sid) {
-            // $DB->select('*','session','WHERE id='.$DB->evalue($sid).(!$isbot?' AND ip='.$JAX->ip2int():''));
             $result = (!$isbot) ?
-    $DB->safeselect('*','session','WHERE id=? AND ip=?;',
-        $DB->basicvalue($sid),
-        $JAX->ip2int()) :
-    $DB->safeselect('*','session','WHERE id=?',
-        $DB->basicvalue($sid));
+                $DB->safeselect('*','session','WHERE id=? AND ip=?;',
+                    $DB->basicvalue($sid),
+                    $JAX->ip2int()) :
+                    $DB->safeselect('*','session','WHERE id=?',
+                        $DB->basicvalue($sid));
             $r = $DB->arow($result);
             $DB->disposeresult($result);
         }
@@ -44,14 +39,14 @@ class SESS
             return $r;
         }
         if (!$isbot) {
-            $sid = md5(uniqid(true, rand(0, 1000)));
+            $sid = base64_encode(openssl_random_pseudo_bytes(128));
         }
         $uid = 0;
         if ($JAX->userData && isset($JAX->userData['id']) && 0 < $JAX->userData['id']) {
             $uid = (int) $JAX->userData['id'];
         }
         if (!$isbot) {
-            setcookie('sid', $sid);
+            $_SESSION['sid'] = $sid;
         }
         $sessData = array('id' => $sid, 'uid' => $uid, 'runonce' => '', 'ip' => $JAX->ip2int(), 'useragent' => $_SERVER['HTTP_USER_AGENT'], 'is_bot' => $isbot, 'last_action' => time(), 'last_update' => time());
         if (1 > $uid) {
@@ -129,6 +124,12 @@ class SESS
                 $la = $la[0];
             }
             $DB->safedelete('session', 'WHERE uid=? AND last_update<?', $DB->basicvalue($uid), $timeago);
+            // delete all expired tokens as well while we're here...
+            $DB->safedelete(
+                'tokens',
+                'WHERE expires<=?',
+                $DB->basicvalue(date('Y-m-d H:i:s', time()))
+            );
             $this->__set('readtime', $JAX->pick($la, 0));
         }
         $yesterday = mktime(0, 0, 0);

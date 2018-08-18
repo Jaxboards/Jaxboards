@@ -16,7 +16,7 @@ class buddylist
         if (!$USER) {
             $PAGE->JS('softurl');
             if ($JAX->c['buddylist']) {
-                return setcookie('buddylist', false);
+                return setcookie('buddylist', false, -1, null, null, true, false);
             }
 
             return $PAGE->JS('error', 'Sorry, you must be logged in to use this feature.');
@@ -44,7 +44,7 @@ class buddylist
         if (!$USER) {
             return;
         }
-        setcookie('buddylist', 1);
+        setcookie('buddylist', 1, null, null, null, true, false);
         $PAGE->JS('softurl');
         $crap = '';
         if ($USER['friends']) {
