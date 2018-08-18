@@ -409,8 +409,8 @@ CREATE TABLE `blueprint_textrules` (
 
 TRUNCATE `blueprint_textrules`;
 
-DROP TABLE IF EXISTS `test_tokens`;
-CREATE TABLE `test_tokens` (
+DROP TABLE IF EXISTS `blueprint_tokens`;
+CREATE TABLE `blueprint_tokens` (
   `token` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `type` enum('login','forgotpassword') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'login',
   `uid` int(11) unsigned NOT NULL,
@@ -419,7 +419,7 @@ CREATE TABLE `test_tokens` (
   KEY `uid` (`uid`),
   KEY `expires` (`expires`),
   KEY `type` (`type`),
-  CONSTRAINT `test_tokens_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `test_members` (`id`) ON DELETE CASCADE
+  CONSTRAINT `blueprint_tokens_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `blueprint_members` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 DROP TABLE IF EXISTS `blueprint_topics`;
