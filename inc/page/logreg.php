@@ -122,7 +122,7 @@ class LOGREG
                     )
                 );
                 $DB->safequery(
-                    'UPDATE '.$DB->ftable(stats).
+                    'UPDATE '.$DB->ftable('stats').
                     ' SET members = members + 1, last_register = ?',
                     $DB->insert_id(1)
                 );
