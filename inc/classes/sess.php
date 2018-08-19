@@ -97,7 +97,6 @@ class SESS
     public function act($a = false)
     {
         global $JAX;
-        //$JAX->setCookie("la",time(),time()+60*60*24*30);
         $this->__set('last_action', time());
         if ($a) {
             $this->__set('location', $a);
