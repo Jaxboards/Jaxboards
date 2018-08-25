@@ -9,47 +9,42 @@ class settings
 {
     public function __construct()
     {
-        $this->settings();
-    }
-
-    public function settings()
-    {
         global $JAX;
         $this->leftBar();
         switch (@$JAX->b['do']) {
-   case 'pages':
-    $this->pages();
-   break;
-   case 'shoutbox':
-    $this->shoutbox();
-   break;
-   case 'domains':
-    $this->domainmanager();
-   break;
-   case 'global':
-    $this->boardname();
-   break;
-   case 'birthday':
-    $this->birthday();
-   break;
-   default:
-    $this->showmain();
-   break;
-  }
+        case 'pages':
+            $this->pages();
+            break;
+        case 'shoutbox':
+            $this->shoutbox();
+            break;
+        case 'domains':
+            $this->domainmanager();
+            break;
+        case 'global':
+            $this->boardname();
+            break;
+        case 'birthday':
+            $this->birthday();
+            break;
+        default:
+            $this->showmain();
+            break;
+        }
     }
 
     public function leftBar()
     {
         global $PAGE;
         $sidebar = '';
-        foreach (
-   array(
-       '?act=settings&do=global' => 'Global Settings',
-       '?act=settings&do=shoutbox' => 'Shoutbox',
-       '?act=settings&do=pages' => 'Custom Pages',
-       '?act=settings&do=birthday' => 'Birthdays',
-       '?act=settings&do=domains' => 'Domain Setup',
-   ) as $k => $v) {
+        $nav = array(
+            '?act=settings&do=global' => 'Global Settings',
+            '?act=settings&do=shoutbox' => 'Shoutbox',
+            '?act=settings&do=pages' => 'Custom Pages',
+            '?act=settings&do=birthday' => 'Birthdays',
+            '?act=settings&do=domains' => 'Domain Setup',
+        );
+        foreach ($nav as $k => $v) {
             $sidebar .= "<li><a href='${k}'>${v}</a></li>";
         }
         $sidebar = "<ul>${sidebar}</ul>";
@@ -70,7 +65,9 @@ class settings
         if (@$JAX->p['submit']) {
             if ('' === trim($JAX->p['boardname'])) {
                 $e = 'Board name is required';
-            } elseif ('' !== trim(@$JAX->p['logourl']) && !$JAX->isURL(@$JAX->p['logourl'])) {
+            } elseif ('' !== trim(@$JAX->p['logourl'])
+                && !$JAX->isURL(@$JAX->p['logourl'])
+            ) {
                 $e = 'Please enter a valid logo url.';
             }
             if ($e) {
@@ -79,20 +76,53 @@ class settings
                 $write = array();
                 $write['boardname'] = $JAX->p['boardname'];
                 $write['logourl'] = $JAX->p['logourl'];
-                $write['boardoffline'] = $JAX->p['boardoffline'] ? '0' : '1';
+                $write['boardoffline'] = isset($JAX->p['boardoffline']) && $JAX->p['boardoffline'] ? '0' : '1';
                 $write['offlinetext'] = $JAX->p['offlinetext'];
                 $PAGE->writeCFG($write);
                 $page .= $PAGE->success('Settings saved!');
             }
         }
-        $page .= '<form method="post"><label>Board Name:</label><input type="text" name="boardname" value="'.$PAGE->getCFGSetting('boardname').'" /><br />
-  <label>Logo URL:</label><input type="text" name="logourl" value="'.$PAGE->getCFGSetting('logourl').'" /><br />
-  <input type="submit" value="Save" name="submit" />';
+        $boardName = $PAGE->getCFGSetting('boardname');
+        $logoUrl = $PAGE->getCFGSetting('logourl');
+        $page .= <<<EOT
+<form method="post">
+    <label for="boardname">
+        Board Name:
+    </label>
+    <input type="text" name="boardname" value="${boardName}" />
+    <br />
+    <label for="logourl">
+        Logo URL:
+    </label>
+    <input type="text" name="logourl" value="${logoUrl}" />
+    <br />
+    <input type="submit" value="Save" name="submit" />
+EOT;
         $PAGE->addContentBox('Board Name/Logo', $page);
         $page = '';
 
-        $page .= "<label>Board Online</label><input type='checkbox' name='boardoffline' class='switch yn'".(!$PAGE->getCFGSetting('boardoffline') ? ' checked="checked"' : '')."'/><br />";
-        $page .= "<label style='vertical-align:top'>Offline Text:</label><textarea name='offlinetext'>".$JAX->blockhtml($PAGE->getCFGSetting('offlinetext'))."</textarea><br /><input type='submit' name='submit' value='Save' />";
+        $boardOfflineCode = !$PAGE->getCFGSetting('boardoffline') ?
+            ' checked="checked"' : '';
+        $boardOfflineText = $JAX->blockhtml(
+            $PAGE->getCFGSetting('offlinetext')
+        );
+        $page .= <<<EOT
+<label for="boardoffline">
+    Board Online
+</label>
+<input type="checkbox" name="boardoffline" class="switch yn"${boardOfflineCode}/>
+<br />
+EOT;
+
+        $page .= <<<EOT
+<label for="offlinetext" style="vertical-align:top;">
+    Offline Text:
+</label>
+<textarea name="offlinetext">${boardOfflineText}</textarea>
+<br />
+<input type="submit" name="submit" value="Save" />
+EOT;
+
         $page = "${page}</form>";
         $PAGE->addContentBox('Board Online/Offline', $page);
     }
@@ -108,8 +138,14 @@ class settings
             $this->pages_delete($JAX->b['delete']);
         }
         if (@$JAX->b['page']) {
-            if (($newact = preg_replace('@\\W@', '<span style="font-weight:bold;color:#F00;">$0</span>', $JAX->b['page'])) != $JAX->b['page']) {
-                $e = "The page URL must contain only letters and numbers. Invalid characters: ${newact}";
+            $newact = preg_replace(
+                '@\\W@',
+                '<span style="font-weight:bold;color:#F00;">$0</span>',
+                $JAX->b['page']
+            );
+            if ($newact != $JAX->b['page']) {
+                $e = 'The page URL must contain only letters and numbers. '.
+                    "Invalid characters: ${newact}";
             } elseif (strlen($newact) > 25) {
                 $e = 'The page URL cannot exceed 25 characters.';
             } else {
@@ -119,17 +155,72 @@ class settings
                 $page .= $PAGE->error($e);
             }
         }
-        $result = $DB->safeselect('*', 'pages');
+        $result = $DB->safeselect(
+            '`act`,`page`',
+            'pages'
+        );
         $table = '';
-        while ($f = $DB->row($result)) {
-            $table .= '<tr><td>'.$f['act'].'</td><td><a href="../?act='.$f['act'].'">View</a></td><td><a href="?act=settings&do=pages&page='.$f['act'].'">Edit</a></td><td><a onclick="return confirm(\'You sure?\')" href="?act=settings&do=pages&delete='.$f['act'].'">Delete</a></td></tr>';
+        while ($f = $DB->arow($result)) {
+            $fAct = $f['act'];
+            $table .= <<<EOT
+<tr>
+    <td>
+        ${fAct}
+    </td>
+    <td>
+        <a href="../?act=${fAct}">
+            View
+        </a>
+    </td>
+    <td>
+        <a href="?act=settings&do=pages&page=${fAct}">
+            Edit
+        </a>
+    </td>
+    <td>
+        <a onclick="return confirm(\\'You sure?\\')"
+            href="?act=settings&do=pages&delete=${fAct}">
+            Delete
+        </a>
+    </td>
+</tr>'
+EOT;
         }
         if ($table) {
-            $page .= "<table class='pages'><tr><th>Act</th><th></th><th></th><th></th></tr>${table}</table>";
+            $page .= <<<EOT
+<table class="pages">
+    <tr>
+        <th>
+            Act
+        </th>
+        <th>
+            &nbsp;
+        </th>
+        <th>
+            &nbsp;
+        </th>
+        <th>
+            &nbsp;
+        </th>
+    </tr>
+    ${table}
+</table>
+EOT;
         }
-        $page .= "<form method='get'>".
-  $JAX->hiddenFormFields(array('act' => 'settings', 'do' => 'pages')).
-  "<br />Add a new page at ?act=<input type='text' name='page' /><input type='submit' value='Go' /></form>";
+        $hiddenFields = $JAX->hiddenFormFields(
+            array(
+                'act' => 'settings',
+                'do' => 'pages',
+            )
+        );
+        $page .= <<<EOT
+<form method="get">
+    ${hiddenFields}
+    <br />
+    Add a new page at ?act=<input type="text" name="page" />
+    <input type="submit" value="Go" />
+</form>
+EOT;
         $PAGE->addContentBox('Custom Pages', $page);
     }
 
@@ -137,29 +228,57 @@ class settings
     {
         global $DB;
 
-        return $DB->safedelete('pages', 'WHERE act=?', $DB->basicvalue($page));
+        return $DB->safedelete(
+            'pages',
+            'WHERE `act`=?',
+            $DB->basicvalue($page)
+        );
     }
 
     public function pages_edit($pageurl)
     {
         global $PAGE,$DB,$JAX;
         $page = '';
-        $result = $DB->safeselect('*', 'pages', 'WHERE act=?', $DB->basicvalue($pageurl));
-        $pageinfo = $DB->row($result);
+        $result = $DB->safeselect(
+            '`act`,`page`',
+            'pages',
+            'WHERE `act`=?',
+            $DB->basicvalue($pageurl)
+        );
+        $pageinfo = $DB->arow($result);
         $DB->disposeresult($result);
         if (isset($JAX->p['pagecontents']) && $JAX->p['pagecontents']) {
             if ($pageinfo) {
-                $DB->safeupdate('pages', array('page' => $JAX->p['pagecontents']), 'WHERE `act`=?', $DB->basicvalue($pageurl));
+                $DB->safeupdate(
+                    'pages',
+                    array(
+                        'page' => $JAX->p['pagecontents'],
+                    ),
+                    'WHERE `act`=?',
+                    $DB->basicvalue($pageurl)
+                );
             } else {
-                $DB->safeinsert('pages', array('act' => $pageurl, 'page' => $JAX->p['pagecontents']));
+                $DB->safeinsert(
+                    'pages',
+                    array(
+                        'act' => $pageurl,
+                        'page' => $JAX->p['pagecontents'],
+                    )
+                );
             }
             $pageinfo['page'] = $JAX->p['pagecontents'];
-            $page .= $PAGE->success("Page saved. Preview <a href='/?act=${pageurl}'>here</a>");
+            $page .= $PAGE->success(
+                "Page saved. Preview <a href='/?act=${pageurl}'>here</a>"
+            );
         }
-        $page .= "<form method='post'>
-  <textarea name='pagecontents' class='editor'>".$JAX->blockhtml($pageinfo['page'])."</textarea><br />
-  <input type='submit' value='Save' />
-  </form>";
+        $pageCode = $JAX->blockhtml($pageinfo['page']);
+        $page .= <<<EOT
+<form method="post">
+    <textarea name="pagecontents" class="editor">${pageCode}</textarea>
+    <br />
+    <input type="submit" value="Save" />
+</form>
+EOT;
         $PAGE->addContentBox("Editing Page: ${pageurl}", $page);
     }
 
@@ -172,7 +291,10 @@ class settings
         $page = '';
         $e = '';
         if (@$JAX->p['clearall']) {
-            $result = $DB->safespecial('TRUNCATE TABLE %t', array('shouts'));
+            $result = $DB->safespecial(
+                'TRUNCATE TABLE %t',
+                array('shouts')
+            );
             $page .= $PAGE->success('Shoutbox cleared!');
         }
         if (@$JAX->p['submit']) {
@@ -182,8 +304,14 @@ class settings
             if (!isset($JAX->p['sbava'])) {
                 $JAX->p['sbava'] = false;
             }
-            $write = array('shoutbox' => $JAX->p['sbe'] ? 1 : 0, 'shoutboxava' => $JAX->p['sbava'] ? 1 : 0);
-            if (is_numeric($JAX->p['sbnum']) && $JAX->p['sbnum'] <= 10 && $JAX->p['sbnum'] > 0) {
+            $write = array(
+                'shoutbox' => $JAX->p['sbe'] ? 1 : 0,
+                'shoutboxava' => $JAX->p['sbava'] ? 1 : 0,
+            );
+            if (is_numeric($JAX->p['sbnum'])
+                && $JAX->p['sbnum'] <= 10
+                && $JAX->p['sbnum'] > 0
+            ) {
                 $write['shoutbox_num'] = $JAX->p['sbnum'];
             } else {
                 $e = 'Shouts to show must be between 1 and 10';
@@ -195,12 +323,41 @@ class settings
                 $page .= $PAGE->success('Data saved.');
             }
         }
-        $page .= '<form method="post">
-  <label for="sbe">Shoutbox enabled:</label><input id="sbe" type="checkbox" name="sbe" class="switch yn"'.($PAGE->getCFGSetting('shoutbox') ? ' checked="checked"' : '').' /><br />
-  <label for="sbava">Shoutbox avatars:</label><input type="checkbox" name="sbava" class="switch yn" '.($PAGE->getCFGSetting('shoutboxava') ? ' checked="checked"' : '').' /><br />
-  <label for="sbnum">Shouts to show:<br />(Max 10)</label><input type="text" name="sbnum" class="slider" value="'.$PAGE->getCFGSetting('shoutbox_num').'" /><br />
-  <br /><label for="clear">Wipe shoutbox:</label><input type="submit" name="clearall" value="Clear all shouts!" onclick="return confirm(\'Are you sure you want to wipe your shoutbox?\');"><br /><br />
-  <input type="submit" name="submit" value="Save" /></form>';
+        $shoutboxCode = $PAGE->getCFGSetting('shoutbox') ?
+            ' checked="checked"' : '';
+        $shoutboxAvatarCode = $PAGE->getCFGSetting('shoutboxava') ?
+            ' checked="checked"' : '';
+        $shoutboxShouts = $PAGE->getCFGSetting('shoutbox_num');
+        $page .= <<<EOT
+<form method="post">
+    <label for="sbe">
+        Shoutbox enabled:
+    </label>
+    <input id="sbe" type="checkbox" name="sbe" class="switch yn"${shoutboxCode} />
+    <br />
+    <label for="sbava">
+        Shoutbox avatars:
+    </label>
+    <input type="checkbox" name="sbava" class="switch yn" ${shoutboxAvatarCode} />
+    <br />
+    <label for="sbnum">
+        Shouts to show:
+        <br />
+        (Max 10)
+    </label>
+    <input type="text" name="sbnum" class="slider" value="${shoutboxShouts}" />
+    <br />
+    <br />
+    <label for="clear">
+        Wipe shoutbox:
+    </label>
+    <input type="submit" name="clearall" value="Clear all shouts!"
+        onclick="return confirm('Are you sure you want to wipe your shoutbox?');">
+    <br />
+    <br />
+    <input type="submit" name="submit" value="Save" />
+</form>
+EOT;
         $PAGE->addContentBox('Shoutbox', $page);
     }
 
@@ -216,40 +373,82 @@ class settings
                 $e = 'Please enter a valid domain.';
             }
 
-            $result = $DB->safequery('SELECT * FROM `domains` WHERE domain=?', $DB->basicvalue($JAX->p['domain']));
-            if ($DB->row($result)) {
+            $result = $DB->safequery(
+                'SELECT `prefix`,`domain` FROM `domains` WHERE `domain`=?',
+                $DB->basicvalue($JAX->p['domain'])
+            );
+            if ($DB->arow($result)) {
                 $e = 'That domain has already been claimed';
             }
             $DB->disposeresult($result);
             if ($e) {
                 $page .= $PAGE->error($e);
             } else {
-                $result = $DB->safequery('INSERT INTO `domains` (`domain`,`prefix`) VALUES( ?, ?);', $DB->basicvalue($JAX->p['domain']), $DB->basicvalue($CFG['prefix']));
-                $page .= $PAGE->success("Domain added! Test <a href='https://".$JAX->blockhtml($JAX->p['domain'])."'>here.</a>");
+                $result = $DB->safequery(
+                    'INSERT INTO `domains` (`domain`,`prefix`) VALUES(?, ?)',
+                    $DB->basicvalue($JAX->p['domain']),
+                    $DB->basicvalue($CFG['prefix'])
+                );
+                $page .= $PAGE->success(
+                    "Domain added! Test <a href='https://".
+                    $JAX->blockhtml($JAX->p['domain'])."'>here.</a>"
+                );
             }
         } elseif (@$JAX->b['delete']) {
-            $result = $DB->safequery('DELETE FROM `domains` WHERE domain=? AND prefix=?;', $DB->basicvalue($JAX->b['delete']), $DB->basicvalue($CFG['prefix']));
+            $result = $DB->safequery(
+                'DELETE FROM `domains` WHERE `domain`=? AND `prefix`=?',
+                $DB->basicvalue($JAX->b['delete']),
+                $DB->basicvalue($CFG['prefix'])
+            );
             if ($DB->affected_rows(1)) {
                 $page .= $PAGE->success('Domain deleted');
             } else {
-                $page .= $PAGE->error("Error deleting domain, maybe it doesn't belong to you?");
+                $page .= $PAGE->error(
+                    "Error deleting domain, maybe it doesn't belong to you?"
+                );
             }
         }
-        $result = $DB->safequery('SELECT * FROM `domains` WHERE prefix=?;', $DB->basicvalue($CFG['prefix']));
+        $result = $DB->safequery(
+            'SELECT `domain`,`prefix` FROM `domains` WHERE `prefix`=?',
+            $DB->basicvalue($CFG['prefix'])
+        );
         $domains = array();
-        while ($f = $DB->row($result)) {
+        while ($f = $DB->arow($result)) {
             $domains[] = $f['domain'];
         }
         if (empty($domains)) {
             $table = '<tr><td>No domains to show!</td></tr>';
         } else {
-            foreach ($domains as $v) {
-                $table .= '<tr><td><a href="https://'.$v.'">'.$v.'</a></td><td><a class="icons delete" href="?act=settings&do=domains&delete='.urlencode($v).'"></a></td></tr>';
+            foreach ($domains as $domain) {
+                $domainUrlEncoded = rawurlencode($domain);
+                $table .= <<<EOT
+<tr>
+    <td>
+        <a href="https://${domain}">
+            ${domain}
+        </a>
+    </td>
+    <td>
+        <a class="icons delete"
+            href="?act=settings&do=domains&delete=${domainUrlEncoded}">
+        </a>
+    </td>
+</tr>
+EOT;
             }
         }
-        $page .= "When connecting your A address, use the IP <a href='https://{$_SERVER['SERVER_ADDR']}'>".$_SERVER['SERVER_ADDR'].'</a>';
-        $page .= '<table>'.$table.'</table>';
-        $page .= '<form method="post">Add a domain: <input type="text" name="domain"  /><input type="submit" value="Add" name="submit"/></form>';
+        $serverAddress = $_SERVER['SERVER_ADDR'];
+        $page .= <<<EOT
+When connecting your A address, use the IP
+<a href="https://${serverAddress}">${serverAddress}</a>
+EOT;
+        $page .= "<table>${table}</table>";
+        $page .= <<<'EOT'
+<form method="post">
+    Add a domain: <input type="text" name="domain" />
+    <input type="submit" value="Add" name="submit"/>
+</form>
+EOT;
         $PAGE->addContentBox('Domain Manager', $page);
     }
 
@@ -261,10 +460,21 @@ class settings
             if (!isset($JAX->p['bicon'])) {
                 $JAX->p['bicon'] = false;
             }
-            $PAGE->writeCFG(array('birthdays' => $birthdays = ($JAX->p['bicon'] ? 1 : 0)));
+            $PAGE->writeCFG(
+                array(
+                    'birthdays' => $birthdays = ($JAX->p['bicon'] ? 1 : 0),
+                )
+            );
         }
         $page = '<form method="post">';
-        $page .= "<label>Show Birthday Icon</label><input type='checkbox' class='switch yn' name='bicon'".($birthdays & 1 ? " checked='checked'" : '').'><br />';
+        $birthdaysCode = $birthdays & 1 ? ' checked="checked"' : '';
+        $page .= <<<EOT
+<label>
+    Show Birthday Icon
+</label>
+<input type="checkbox" class="switch yn" name="bicon"${birthdaysCode}>
+<br />
+EOT;
         $page .= '<input type="submit" value="Save" name="submit" />';
         $page .= '</form>';
         $PAGE->addContentBox('Birthdays', $page);

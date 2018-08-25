@@ -103,7 +103,7 @@ When someone posts in a topic I\'m subscribed to:<br />
 
 <h2>Website</h2>
 <label for="url">URL:</label><input type="text" name="website" id="url" value="%s" />
-<div><input type="submit" value="Save Profile Settings" /></div>
+<div><input name="submit" type="submit" value="Save Profile Settings" /></div>
 </form>',
 
     'ucp-board-settings' => '<form method="post" onsubmit="return RUN.submitForm(this)">%s

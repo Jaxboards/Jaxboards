@@ -38,9 +38,9 @@ It is not recommended to run this in production.
 
 ## Authors
 
-* [seanjohnson08](https://github.com/seanjohnson08) - Original developer
-* [dgatwood](https://github.com/dgatwood) - Updated the codebase to support PHP's MySQLi interface and work with PHP7
-* [wtl420](https://github.com/wtl420) - Maintainer of this fork.
+- [seanjohnson08](https://github.com/seanjohnson08) - Original developer
+- [dgatwood](https://github.com/dgatwood) - Updated the codebase to support PHP's MySQLi interface and work with PHP7
+- [wtl420](https://github.com/wtl420) - Maintainer of this fork.
 
 See also the list of [contributors](https://github.com/Jaxboards/Jaxboards/graphs/contributors) who participated in this project.
 
@@ -50,13 +50,10 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Third-Party Libraries
 
-* [GeoIP](https://github.com/maxmind/geoip-api-php) class and data file from
-MaxMind; heavily modified by Sean for mod controls
-* [password_compat](https://github.com/ircmaxell/password_compat) library so
-we can make use of PHP's built-in password hashing functions
+- [password_compat](https://github.com/ircmaxell/password_compat) library so
+  we can make use of PHP's built-in password hashing functions
 
 ## Acknowledgments
 
-* Contributors to the original [Jaxboards Service](http://jaxboards.com);
-Jaxboards wouldn't exist without feedback from everyone who's supported it over the years.
-
+- Contributors to the original [Jaxboards Service](http://jaxboards.com);
+  Jaxboards wouldn't exist without feedback from everyone who's supported it over the years.

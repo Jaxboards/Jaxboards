@@ -4,12 +4,11 @@ $PAGE->loadmeta('logreg');
 $IDX = new LOGREG();
 class LOGREG
 {
-    /* Redundant constructor unnecesary in newer PHP versions. */
+    public $registering = false;
+
     public function __construct()
     {
         global $JAX,$PAGE;
-        $this->privatekey = '6Lcyub0SAAAAAC6ig1rao67cgoPQ0qaouRDox_7G';
-        $this->publickey = '6Lcyub0SAAAAADHCipWYxUxHNxbPxGjn92TlFeNx';
 
         switch (substr($JAX->b['act'], 6)) {
         case 1:
@@ -41,17 +40,20 @@ class LOGREG
 
         global $PAGE,$JAX,$DB,$CFG;
 
-        if ($JAX->p['username']) {
+        $e = '';
+
+        if (isset($JAX->p['username']) && $JAX->p['username']) {
             $PAGE->location('?');
         }
-        $name = trim($JAX->p['name']);
-        $dispname = trim($JAX->p['display_name']);
-        $pass1 = $JAX->p['pass1'];
-        $pass2 = $JAX->p['pass2'];
-        $email = $JAX->p['email'];
+        $name = isset($JAX->p['name']) ? trim($JAX->p['name']) : '';
+        $dispname = isset($JAX->p['display_name']) ?
+            trim($JAX->p['display_name']) : '';
+        $pass1 = isset($JAX->p['pass1']) ? $JAX->p['pass1'] : '';
+        $pass2 = isset($JAX->p['pass2']) ? $JAX->p['pass2'] : '';
+        $email = isset($JAX->p['email']) ? $JAX->p['email'] : '';
 
         $p = $PAGE->meta('register-form', '');
-        if ($JAX->p['register']) {
+        if (isset($JAX->p['register']) && $JAX->p['register']) {
             if (!$name || !$dispname) {
                 $e = 'Name and display name required.';
             } elseif ($pass1 != $pass2) {
@@ -73,21 +75,17 @@ class LOGREG
                 $e = "That isn't a valid email!";
             } elseif ($JAX->ipbanned()) {
                 $e = 'You have been banned from registering on this board.';
-            } elseif ($JAX->forumspammer()) {
-                $e = 'Your IP ('.$_SERVER['REMOTE_ADDR'].') has been identified as being a forum spamming address. Please contact the administrator if you believe this to be incorrect';
-            } elseif ($JAX->toruser()) {
-                $e = 'Your IP ('.$_SERVER['REMOTE_ADDR'].') has been identified as being a TOR node. This forum does not currently allow registrations from TOR.';
             } else {
                 $dispname = $JAX->blockhtml($dispname);
                 $name = $JAX->blockhtml($name);
                 $result = $DB->safeselect(
-                    '*',
+                    '`name`,`display_name`',
                     'members',
-                    'WHERE name=? OR display_name=?',
+                    'WHERE `name`=? OR `display_name`=?',
                     $DB->basicvalue($name),
                     $DB->basicvalue($dispname)
                 );
-                $f = $DB->row($result);
+                $f = $DB->arow($result);
                 $DB->disposeresult($result);
 
                 if (false != $f) {
@@ -117,13 +115,17 @@ class LOGREG
                         'join_date' => time(),
                         'last_visit' => time(),
                         'group_id' => $CFG['membervalidation'] ? 5 : 1,
-                        'ip' => $JAX->ip2int(),
+                        'ip' => $JAX->ip2bin(),
                         'wysiwyg' => 1,
                     )
                 );
-                $DB->safequery(
-                    'UPDATE '.$DB->ftable('stats').
-                    ' SET members = members + 1, last_register = ?',
+                $DB->safespecial(
+                    <<<'EOT'
+UPDATE %t
+SET `members` = `members` + 1, `last_register` = ?
+EOT
+                    ,
+                    array('stats'),
                     $DB->insert_id(1)
                 );
                 $this->login($name, $pass1);
@@ -144,9 +146,9 @@ class LOGREG
                 return;
             }
             $result = $DB->safeselect(
-                'id',
+                '`id`',
                 'members',
-                'WHERE name=?',
+                'WHERE `name`=?',
                 $DB->basicvalue($u)
             );
             $user = $DB->arow($result);
@@ -155,7 +157,7 @@ class LOGREG
             $f = $JAX->getUser($u, $p);
 
             if ($f) {
-                if ($JAX->p['popup']) {
+                if (isset($JAX->p['popup']) && $JAX->p['popup']) {
                     $PAGE->JS('closewindow', '#loginform');
                 }
                 $_SESSION['uid'] = $f['id'];
@@ -201,11 +203,12 @@ class LOGREG
     public function logout()
     {
         global $DB,$PAGE,$JAX,$SESS;
-        //just make a new session rather than fuss with the old one, to maintain users online
+        //just make a new session rather than fuss with the old one,
+        //to maintain users online
         if (isset($JAX->c['utoken'])) {
             $DB->safedelete(
                 'tokens',
-                'WHERE token=?',
+                'WHERE `token`=?',
                 $DB->basicvalue($JAX->c['utoken'])
             );
             unset($JAX->c['utoken']);
@@ -293,8 +296,8 @@ EOT
             $result = $DB->safeselect(
                 'uid AS id',
                 'tokens',
-                'WHERE token=?
-                AND expires>=NOW()',
+                'WHERE `token`=?
+                AND `expires`>=NOW()',
                 $DB->basicvalue($id)
             );
             $udata = $DB->arow($result);
@@ -308,7 +311,10 @@ EOT
             } else {
                 if ($JAX->p['pass1'] && $JAX->p['pass2']) {
                     if ($JAX->p['pass1'] != $JAX->p['pass2']) {
-                        $page .= $PAGE->meta('error', 'The passwords did not match, please try again!');
+                        $page .= $PAGE->meta(
+                            'error',
+                            'The passwords did not match, please try again!'
+                        );
                     } else {
                         $DB->safeupdate(
                             'members',
@@ -318,26 +324,27 @@ EOT
                                     PASSWORD_DEFAULT
                                 ),
                             ),
-                            'WHERE id=?',
+                            'WHERE `id`=?',
                             $DB->basicvalue($udata['id'])
                         );
                         // delete all forgotpassword tokens for this user
                         $DB->safedelete(
                             'tokens',
-                            "WHERE uid=? AND type='forgotpassword'",
+                            "WHERE `uid`=? AND `type`='forgotpassword'",
                             $DB->basicvalue($udata['id'])
                         );
 
                         // get username
                         $result = $DB->safeselect(
-                            'id, name',
+                            '`id`,`name`',
                             'members',
-                            'WHERE id=?',
+                            'WHERE `id`=?',
                             $DB->basicvalue($udata['id'])
                         );
                         $udata = $DB->arow($result);
 
-                        //just making use of the way registration redirects to the index
+                        //just making use of the way
+                        //registration redirects to the index
                         $this->registering = true;
 
                         return $this->login($udata['name'], $JAX->p['pass1']);
@@ -358,12 +365,12 @@ EOT
         } else {
             if ($JAX->p['user']) {
                 $result = $DB->safeselect(
-                    'id,email',
+                    '`id`,`email`',
                     'members',
-                    'WHERE name=?',
+                    'WHERE `name`=?',
                     $DB->basicvalue($JAX->p['user'])
                 );
-                if (!($udata = $DB->row($result))) {
+                if (!($udata = $DB->arow($result))) {
                     $e = 'There is no user registered as <strong>'.
                         $JAX->b['user'].
                         '</strong>, sure this is correct?';
@@ -374,7 +381,8 @@ EOT
                     $page .= $PAGE->meta('error', $e);
                 } else {
                     // generate token
-                    $forgotpasswordtoken = base64_encode(openssl_random_pseudo_bytes(128));
+                    $forgotpasswordtoken =
+                        base64_encode(openssl_random_pseudo_bytes(128));
                     $DB->safeinsert(
                         'tokens',
                         array(
@@ -386,7 +394,7 @@ EOT
                     );
                     $link = BOARDURL.'?act=logreg6&uid='.
                         $udata['id'].'&id='.rawurlencode($forgotpasswordtoken);
-                    if (!$JAX->mail(
+                    $mailResult = $JAX->mail(
                         $udata['email'],
                         'Recover Your Password!',
                         <<<EOT
@@ -402,12 +410,14 @@ please visit the following page and follow the on-screen instructions:
 <br />
 Thanks!
 EOT
-                    )
-                    ) {
+                    );
+
+                    if (!$mailResult) {
                         $page .= $PAGE->meta(
-                                'error',
-                                'There was a problem sending the email. Please contact the administrator.'
-                            );
+                            'error',
+                            'There was a problem sending the email. '.
+                            'Please contact the administrator.'
+                        );
                     } else {
                         $page .= $PAGE->meta(
                             'success',

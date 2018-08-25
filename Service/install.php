@@ -2,7 +2,7 @@
 /**
  * Service install file, for installing a new JaxBoards service.
  *
- * PHP Version 5.3.0
+ * PHP Version 5.3.7
  *
  * @category Jaxboards
  * @package  Jaxboards
@@ -207,7 +207,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
 CREATE TABLE `directory` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `registrar_email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `registrar_ip` int(11) unsigned NOT NULL,
+  `registrar_ip` varbinary(16) NOT NULL DEFAULT '',
   `date` int(11) unsigned NOT NULL,
   `boardname` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
   `referral` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -257,7 +257,7 @@ EOT
                     array(
                         'boardname' => $board,
                         'registrar_email' => $JAX->p['admin_email'],
-                        'registrar_ip' => $JAX->ip2int(),
+                        'registrar_ip' => $JAX->ip2bin(),
                         'date' => time(),
                         'referral' => isset($JAX->b['r']) ? $JAX->b['r'] : '',
                     )

@@ -3,13 +3,24 @@
 class PAGE
 {
     public $metadefs = array();
+    public $debuginfo = '';
+    public $JSOutput = array();
+    public $jsaccess = '';
+    public $jsupdate = false;
+    public $jsnewlocation = false;
+    public $jsnewloc = false;
+    public $jsdirectlink = false;
+    public $mobile = false;
+    public $parts = array();
+    public $vars = array();
+    public $userMetaDefs = array();
+    public $moreFormatting = array();
 
-    /* Redundant constructor unnecesary in newer PHP versions. */
-    /* function PAGE(){$this->__construct();} */
     public function __construct()
     {
         $this->JSOutput = array();
-        $this->jsaccess = $_SERVER['HTTP_X_JSACCESS'];
+        $this->jsaccess = isset($_SERVER['HTTP_X_JSACCESS']) ?
+            $_SERVER['HTTP_X_JSACCESS'] : false;
         $this->jsupdate = (1 == $this->jsaccess);
         $this->jsnewlocation = $this->jsnewloc = ($this->jsaccess >= 2);
         $this->jsdirectlink = (3 == $this->jsaccess);
@@ -95,7 +106,7 @@ class PAGE
 
     public function JSRaw($a)
     {
-        foreach (explode("\n", $a) as $a22) {
+        foreach (explode(PHP_EOL, $a) as $a22) {
             $a2 = json_decode($a22);
             if (!is_array($a2)) {
                 continue;
@@ -122,7 +133,8 @@ class PAGE
             return false;
         }
         $this->done = true;
-        $this->parts['path'] = "<div id='path' class='path'>".$this->buildpath().'</div>';
+        $this->parts['path']
+            = "<div id='path' class='path'>".$this->buildpath().'</div>';
 
         if ($this->jsaccess) {
             header('Content-type:text/plain');
@@ -138,7 +150,8 @@ class PAGE
                     $v = '<div id="'.strtolower($k).'">'.$v.'</div>';
                 }
                 if ('PATH' == $k) {
-                    $this->template = preg_replace('@<!--PATH-->@', $v, $this->template, 1);
+                    $this->template
+                        = preg_replace('@<!--PATH-->@', $v, $this->template, 1);
                 }
                 $this->template = str_replace('<!--'.$k.'-->', $v, $this->template);
             }
@@ -169,25 +182,52 @@ class PAGE
     public function loadtemplate($a)
     {
         $this->template = file_get_contents($a);
-        $this->template = preg_replace_callback('@<!--INCLUDE:(\\w+)-->@', array($this, 'includer'), $this->template);
-        $this->template = preg_replace_callback('@<M name=([\'"])([^\'"]+)\\1>(.*?)</M>@s', array(&$this, 'userMetaParse'), $this->template);
+        $this->template = preg_replace_callback(
+            '@<!--INCLUDE:(\\w+)-->@',
+            array(
+                $this,
+                'includer',
+            ),
+            $this->template
+        );
+        $this->template = preg_replace_callback(
+            '@<M name=([\'"])([^\'"]+)\\1>(.*?)</M>@s',
+            array(
+                &$this,
+                'userMetaParse',
+            ), $this->template
+        );
     }
 
     public function loadskin($id)
     {
         global $DB,$CFG;
+        $skin = array();
         if ($id) {
-            $result = $DB->safeselect('*', 'skins', 'WHERE id=? LIMIT 1', $id);
-            $skin = $DB->row($result);
+            $result = $DB->safeselect(
+                'title,custom,wrapper',
+                'skins',
+                'WHERE id=? LIMIT 1',
+                $id
+            );
+            $skin = $DB->arow($result);
+            $DB->disposeresult($result);
+        }
+        if (empty($skin)) {
+            $result = $DB->safeselect(
+                'title,custom,wrapper',
+                'skins',
+                'WHERE `default`=1 LIMIT 1'
+            );
+            $skin = $DB->arow($result);
             $DB->disposeresult($result);
         }
         if (!$skin) {
-            $result = $DB->safeselect('*', 'skins', 'WHERE `default`=1 LIMIT 1');
-            $skin = $DB->row($result);
-            $DB->disposeresult($result);
-        }
-        if (!$skin) {
-            $skin = array('title' => 'Default', 'custom' => 0);
+            $skin = array(
+                'title' => 'Default',
+                'custom' => 0,
+                'wrapper' => false,
+            );
         }
         $t = ($skin['custom'] ? BOARDPATH : '').'Themes/'.$skin['title'].'/';
         $turl = ($skin['custom'] ? BOARDPATHURL : '').'Themes/'.$skin['title'].'/';
@@ -199,7 +239,11 @@ class PAGE
             define('THEMEPATHURL', BOARDURL.$CFG['dthemepath']);
         }
         define('DTHEMEPATH', $CFG['dthemepath']);
-        $this->loadtemplate($skin['wrapper'] ? BOARDPATH.'Wrappers/'.$skin['wrapper'].'.txt' : THEMEPATH.'wrappers.txt');
+        $this->loadtemplate(
+            $skin['wrapper'] ?
+            BOARDPATH.'Wrappers/'.$skin['wrapper'].'.txt' :
+            THEMEPATH.'wrappers.txt'
+        );
     }
 
     public function userMetaParse($m)
@@ -213,8 +257,13 @@ class PAGE
     public function includer($m)
     {
         global $DB;
-        $result = $DB->safeselect('page', 'pages', 'WHERE act=?', $DB->basicvalue($m[1]));
-        $page = array_shift($DB->row($result));
+        $result = $DB->safeselect(
+            'page',
+            'pages',
+            'WHERE `act`=?',
+            $DB->basicvalue($m[1])
+        );
+        $page = array_shift($DB->arow($result));
         $DB->disposeresult($result);
 
         return $page ? $page : '';
@@ -250,11 +299,20 @@ class PAGE
         $args = func_get_args();
         $meta = array_shift($args);
         $this->processqueue($meta);
-        $r = @vsprintf(str_replace(array('<%', '%>'), array('<%%', '%%>'), $this->userMetaDefs[$meta] ?: $this->metadefs[$meta]), is_array($args[0]) ? $args[0] : $args);
+        $r = @vsprintf(
+            str_replace(
+                array('<%', '%>'),
+                array('<%%', '%%>'),
+                $this->userMetaDefs[$meta] ?: $this->metadefs[$meta]
+            ),
+            is_array($args[0]) ? $args[0] : $args
+        );
         if (false === $r) {
             die($meta.' has too many arguments');
         }
-        if ($this->moreFormatting[$meta]) {
+        if (isset($this->moreFormatting[$meta])
+            && $this->moreFormatting[$meta]
+        ) {
             return $this->metaextended($r);
         }
 
@@ -263,7 +321,14 @@ class PAGE
 
     public function metaextended($m)
     {
-        return preg_replace_callback('@{if ([^}]+)}(.*){/if}@Us', array($this, 'metaextendedifcb'), $this->filtervars($m));
+        return preg_replace_callback(
+            '@{if ([^}]+)}(.*){/if}@Us',
+            array(
+                $this,
+                'metaextendedifcb',
+            ),
+            $this->filtervars($m)
+        );
     }
 
     public function metaextendedifcb($m)
@@ -312,12 +377,15 @@ class PAGE
 
     public function metaexists($meta)
     {
-        return $this->userMetaDefs[$meta] || $this->metadefs[$meta];
+        return isset($this->userMetaDefs[$meta])
+            || isset($this->metadefs[$meta]);
     }
 
     public function path($a)
     {
-        if (!is_array($this->parts['path'])) {
+        if (!isset($this->parts['path'])
+            || !is_array($this->parts['path'])
+        ) {
             $this->parts['path'] = array();
         }
         $empty = empty($this->parts['path']);
@@ -331,8 +399,14 @@ class PAGE
     public function buildpath()
     {
         $first = true;
+        $path = '';
         foreach ($this->parts['path'] as $value => $link) {
-            $path .= $this->meta($first && $this->metaexists('path-home') ? 'path-home' : 'path-part', $value, $link);
+            $path .= $this->meta(
+                $first
+                && $this->metaexists('path-home') ? 'path-home' : 'path-part',
+                $value,
+                $link
+            );
             $first = false;
         }
 
@@ -362,13 +436,22 @@ class PAGE
         foreach ($options as $k => $v) {
             $settings[$k] = $v;
         }
-        $object = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="'.$settings['width'].'" height="'.$settings['height'].'">';
+        $object
+            = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" '.
+            'width="'.$settings['width'].'" height="'.$settings['height'].'">';
         $object .= '<param name="movie" value="'.$file.'"></param>';
         if ($settings['flashvars']) {
-            $object .= '<param name="flashvars" value="'.http_build_query($settings['flashvars']).'" />';
+            $object .= '<param name="flashvars" value="'.
+                http_build_query($settings['flashvars']).'" />';
         }
         $object .= '<param name="allowScriptAccess" value="always" />';
-        $embed = '<embed style="display:block" type="application/x-shockwave-flash" pluginspage="https://get.adobe.com/flashplayer/" src="'.$file.'" width="'.$settings['width'].'" height="'.$settings['height'].'" wmode="opaque" flashvars="'.http_build_query($settings['flashvars']).'" allowScriptAccess="always"></embed>';
+        $embed = '<embed style="display:block" '.
+            'type="application/x-shockwave-flash" '.
+            'pluginspage="https://get.adobe.com/flashplayer/" '.
+            'src="'.$file.'" width="'.$settings['width'].'" height="'.
+            $settings['height'].'" wmode="opaque" flashvars="'.
+            http_build_query($settings['flashvars']).
+            '" allowScriptAccess="always"></embed>';
 
         return stristr('msie', $_SERVER['HTTP_USER_AGENT']) ? $object : $embed;
     }

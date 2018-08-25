@@ -11,163 +11,201 @@
   height: 24px;
   overflow: hidden;
 }
-.editbar A {
+
+.editbar a {
   background: url(Service/wysiwygbar.png);
   height: 24px;
   display: inline-block;
 }
+
 .editbar .bold {
   width: 32px;
 }
+
 .editbar .italic {
   width: 33px;
   background-position: -32px 0;
 }
+
 .editbar .underline {
   width: 35px;
   background-position: -65px 0;
 }
+
 .editbar .forecolor {
   width: 31px;
   background-position: -100px 0;
 }
+
 .editbar .backcolor {
   width: 32px;
   background-position: -131px 0;
 }
+
 .editbar .insertimage {
   width: 29px;
   background-position: -163px 0;
 }
+
 .editbar .createlink {
   width: 28px;
   background-position: -192px 0;
 }
+
 .editbar .c_email {
   width: 27px;
   background-position: -220px 0;
 }
+
 .editbar .justifyleft {
   width: 26px;
   background-position: -247px 0;
 }
+
 .editbar .justifycenter {
   width: 27px;
   background-position: -273px 0;
 }
+
 .editbar .justifyright {
   width: 26px;
   background-position: -300px 0;
 }
+
 .editbar .c_youtube {
   width: 28px;
   background-position: -326px 0;
 }
+
 .editbar .c_code {
   width: 26px;
   background-position: -354px 0;
 }
+
 .editbar .c_quote {
   width: 25px;
   background-position: -380px 0;
 }
+
 .editbar .c_spoiler {
   width: 29px;
   background-position: -405px 0;
 }
+
 .editbar .insertorderedlist {
   width: 28px;
   background-position: -434px 0;
 }
+
 .editbar .insertunorderedlist {
   width: 28px;
   background-position: -462px 0;
 }
+
 .editbar .c_smileys {
   width: 29px;
   background-position: -490px 0;
 }
+
 .editbar .c_switcheditmode {
   width: 30px;
   background-position: -519px 0;
 }
 
 /********
-  Get them to move down on hover, fuck firefox and it's non background-position-y support :(
-                                                                                       *********/
-.editbar A:hover.bold {
+  Get them to move down on hover, firefox and it's non background-position-y support :(
+ *********/
+.editbar a:hover.bold {
   width: 32px;
   background-position: 0 -24px;
 }
-.editbar A:hover.italic {
+
+.editbar a:hover.italic {
   width: 33px;
   background-position: -32px -24px;
 }
-.editbar A:hover.underline {
+
+.editbar a:hover.underline {
   width: 35px;
   background-position: -65px -24px;
 }
-.editbar A:hover.forecolor {
+
+.editbar a:hover.forecolor {
   width: 31px;
   background-position: -100px -24px;
 }
-.editbar A:hover.backcolor {
+
+.editbar a:hover.backcolor {
   width: 32px;
   background-position: -131px -24px;
 }
-.editbar A:hover.insertimage {
+
+.editbar a:hover.insertimage {
   width: 29px;
   background-position: -163px -24px;
 }
-.editbar A:hover.createlink {
+
+.editbar a:hover.createlink {
   width: 28px;
   background-position: -192px -24px;
 }
-.editbar A:hover.c_email {
+
+.editbar a:hover.c_email {
   width: 27px;
   background-position: -220px -24px;
 }
-.editbar A:hover.justifyleft {
+
+.editbar a:hover.justifyleft {
   width: 26px;
   background-position: -247px -24px;
 }
-.editbar A:hover.justifycenter {
+
+.editbar a:hover.justifycenter {
   width: 27px;
   background-position: -273px -24px;
 }
-.editbar A:hover.justifyright {
+
+.editbar a:hover.justifyright {
   width: 26px;
   background-position: -300px -24px;
 }
-.editbar A:hover.c_youtube {
+
+.editbar a:hover.c_youtube {
   width: 28px;
   background-position: -326px -24px;
 }
-.editbar A:hover.c_code {
+
+.editbar a:hover.c_code {
   width: 26px;
   background-position: -354px -24px;
 }
-.editbar A:hover.c_quote {
+
+.editbar a:hover.c_quote {
   width: 25px;
   background-position: -380px -24px;
 }
-.editbar A:hover.c_spoiler {
+
+.editbar a:hover.c_spoiler {
   width: 29px;
   background-position: -405px -24px;
 }
-.editbar A:hover.insertorderedlist {
+
+.editbar a:hover.insertorderedlist {
   width: 28px;
   background-position: -434px -24px;
 }
-.editbar A:hover.insertunorderedlist {
+
+.editbar a:hover.insertunorderedlist {
   width: 28px;
   background-position: -462px -24px;
 }
-.editbar A:hover.c_smileys {
+
+.editbar a:hover.c_smileys {
   width: 29px;
   background-position: -490px -24px;
 }
-.editbar A:hover.c_switcheditmode {
+
+.editbar a:hover.c_switcheditmode {
   width: 30px;
   background-position: -519px -24px;
 }
@@ -179,16 +217,19 @@
   background: #eef;
   border: 1px solid #000;
 }
-.emotewin A {
+
+.emotewin a {
   border-bottom: 1px solid #ccf;
   display: block;
   text-decoration: none;
   padding: 10px;
 }
-.emotewin A:hover {
+
+.emotewin a:hover {
   background: #ccf;
 }
-.emotewin A IMG {
+
+.emotewin a img {
   border: 0;
   margin-right: 10px;
 }

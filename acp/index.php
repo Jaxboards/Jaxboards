@@ -1,31 +1,24 @@
 <?php
+/**
+ * Admin login.
+ *
+ * PHP Version 5.3.7
+ *
+ * @category Jaxboards
+ * @package  Jaxboards
+ *
+ * @author  Sean Johnson <seanjohnson08@gmail.com>
+ * @author  World's Tallest Ladder <wtl420@users.noreply.github.com>
+ * @license MIT <https://opensource.org/licenses/MIT>
+ *
+ * @link https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
+ */
 ini_set('session.cookie_secure', 1);
 ini_set('session.cookie_httponly', 1);
 ini_set('session.use_cookies', 1);
 ini_set('session.use_only_cookies', 1);
 session_start();
 ob_start();
-?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="https://www.w3.org/1999/xhtml/" xml:lang="en" lang="en">
- <head>
-  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-  <style type="text/css">
-   html{height:100%;}
-   body{font-family:arial;margin:0;scroll:none;background:url(/Service/acp/Theme/img/loginglow.png) center no-repeat #274463;height:100%;}
-   #login{border:1px solid #000;text-align:center;font-size:20px;background:#FFF;position:absolute;top:50%;left:50%;width:500px;height:300px;margin:-150px 0 0 -250px;}
-   #loginform{;padding:40px 0;}
-   #logo{background:url(/Service/acp/Theme/img/loginlogo.png) center;height:90px;border:1px solid #2d4669;}
-   #container{height:100%;position:relative;}
-   input[type="submit"]{margin-top:30px;font-size:15px;}
-   label{display:inline-block;width:130px;text-align:left;}
-   .error{color:#F00;background:#FDD;border:1px solid #F00;padding:5px;margin:-20px 5px 20px 5px;font-size:15px;}
-   input[type=submit]{background:url(/Service/acp/Theme/img/buttonbg.png);color:#FFF;border-radius:9px;border:1px solid #000000;}
-  </style>
- </head>
- <body>
-  <div id="container">
-  <?php
 
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', dirname(__DIR__));
@@ -37,78 +30,97 @@ if (!function_exists('password_hash')) {
     include_once JAXBOARDS_ROOT.'/inc/lib/password.php';
 }
 
-  define('INACP', 'true');
+define('INACP', 'true');
 
-   require JAXBOARDS_ROOT.'/config.php';
-   require JAXBOARDS_ROOT.'/inc/classes/jax.php';
-   require JAXBOARDS_ROOT.'/inc/classes/mysql.php';
+require JAXBOARDS_ROOT.'/config.php';
+require JAXBOARDS_ROOT.'/inc/classes/jax.php';
+require JAXBOARDS_ROOT.'/inc/classes/mysql.php';
 
-   $DB = new MySQL();
-   $DB->connect($CFG['sql_host'], $CFG['sql_username'], $CFG['sql_password'], $CFG['sql_db'], $CFG['sql_prefix']);
+$DB = new MySQL();
+$DB->connect(
+    $CFG['sql_host'],
+    $CFG['sql_username'],
+    $CFG['sql_password'],
+    $CFG['sql_db'],
+    $CFG['sql_prefix']
+);
 
-   require_once '../domaindefinitions.php';
+require_once JAXBOARDS_ROOT.'/domaindefinitions.php';
 
-   $JAX = new JAX();
-   $submitted = false;
-   if (isset($JAX->p['submit']) && $JAX->p['submit']) {
-       $submitted = true;
-       // start with least permissions, not admin, no password
-       $notadmin = true;
+$JAX = new JAX();
+$submitted = false;
+if (isset($JAX->p['submit']) && $JAX->p['submit']) {
+    $submitted = true;
+    // start with least permissions, not admin, no password
+    $notadmin = true;
 
-       $u = $JAX->p['user'];
-       $p = $JAX->p['pass'];
-       $result = $DB->safespecial(
-           <<<'EOT'
-SELECT m.id as id, g.can_access_acp as can_access_acp
+    $u = $JAX->p['user'];
+    $p = $JAX->p['pass'];
+    $result = $DB->safespecial(
+        <<<'EOT'
+SELECT m.`id` as `id`, g.`can_access_acp` as `can_access_acp`
     FROM %t m
     LEFT JOIN %t g
-        ON m.group_id = g.id
-    WHERE name=?;
+        ON m.`group_id` = g.`id`
+    WHERE m.`name`=?;
 EOT
-       ,
-           array('members', 'member_groups'),
-           $DB->basicvalue($u)
-       );
-       $uinfo = $DB->arow($result);
-       $DB->disposeresult($result);
+        ,
+        array('members', 'member_groups'),
+        $DB->basicvalue($u)
+    );
+    $uinfo = $DB->arow($result);
+    $DB->disposeresult($result);
 
-       // Check password
-       if (is_array($uinfo)) {
-           if ($uinfo['can_access_acp']) {
-               $notadmin = false;
-           }
-           $verified_password = (bool) $JAX->getUser($uinfo['id'], $p);
-           if (!$notadmin && $verified_password) {
-               $_SESSION['auid'] = $uinfo['id'];
-               header('Location: admin.php');
-           }
-       }
-   }
-  ?>
+    // Check password
+    if (is_array($uinfo)) {
+        if ($uinfo['can_access_acp']) {
+            $notadmin = false;
+        }
+        $verified_password = (bool) $JAX->getUser($uinfo['id'], $p);
+        if (!$notadmin && $verified_password) {
+            $_SESSION['auid'] = $uinfo['id'];
+            header('Location: admin.php');
+        }
+    }
+}
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "https://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="https://www.w3.org/1999/xhtml/" xml:lang="en" lang="en">
+ <head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <link rel="stylesheet" type="text/css"
+    href="<?php echo BOARDURL; ?>acp/css/index.css"/>
+ </head>
+ <body>
+  <div id="container">
   <div id="login">
    <div id="logo"></div>
    <div id="loginform">
-    <?php
-   if ($submitted) {
-       if ((isset($uinfo) && false === $uinfo) || !$verified_password) {
-           echo '<div class="error">The username/password supplied was incorrect.</div>';
-       } elseif (isset($uinfo) && $notadmin) {
-           echo '<div class="error">You are not authorized to login to the ACP</div>';
-       }
-   }
+<?php
+if ($submitted) {
+    if ((isset($uinfo) && false === $uinfo) || !$verified_password) {
+        echo '<div class="error">'.
+            'The username/password supplied was incorrect.</div>';
+    } elseif (isset($uinfo) && $notadmin) {
+        echo '<div class="error">You are not authorized to login to the ACP</div>';
+    }
+}
 
-    ?>
+?>
     <form method="post">
-     <label for="user">Username:</label><input type="text" name="user" id="user" /><br />
-     <label for="pass">Password:</label><input type="password" name="pass" id="pass" /><br />
+     <label for="user">Username:</label>
+    <input type="text" name="user" id="user" /><br />
+     <label for="pass">Password:</label>
+    <input type="password" name="pass" id="pass" /><br />
      <input type="submit" value="Login to the ACP" name="submit" />
     </form>
    </div>
   </div>
   </div>
-  <script type='text/javascript'>
-   document.getElementById('user').focus()
-  </script>
+<script type='text/javascript'>
+document.getElementById('user').focus()
+    </script>
  </body>
 </html>
 <?php ob_end_flush(); ?>

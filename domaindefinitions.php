@@ -56,11 +56,11 @@ if ($CFG['service']) {
     // Check for custom domain
     if (!$prefix) {
         $result = $DB->safespecial(
-            'SELECT prefix FROM `domains` WHERE domain=?',
+            'SELECT `prefix` FROM `domains` WHERE `domain`=?',
             array(),
             $DB->basicvalue($host)
         );
-        $prefix = $DB->row($result);
+        $prefix = $DB->arow($result);
         $DB->disposeresult($result);
         if ($prefix) {
             $prefix = $prefix['prefix'];

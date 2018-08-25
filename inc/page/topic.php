@@ -6,8 +6,12 @@ $PAGE->loadmeta('topic');
 $IDX = new TOPIC();
 class TOPIC
 {
-    /* Redundant constructor unnecesary in newer PHP versions. */
-    /* function TOPIC(){ $this->__construct(); } */
+    public $id = 0;
+    public $page = '';
+    public $numperpage = 0;
+    public $canmod = false;
+    public $firstPostID = 0;
+
     public function __construct()
     {
         global $JAX,$PAGE;
@@ -16,34 +20,38 @@ class TOPIC
 
         $this->id = $id = $act[0] ? $act[0] : 0;
 
-        $this->page = $JAX->b['page'];
+        $this->page = isset($JAX->b['page']) ? (int) $JAX->b['page'] : 0;
         if ($this->page <= 0 || !is_numeric($this->page)) {
             $this->page = 1;
         }
         --$this->page;
 
         $this->numperpage = 10;
-        if ($JAX->b['qreply'] && !$PAGE->jsupdate) {
+        if (isset($JAX->b['qreply']) && $JAX->b['qreply'] && !$PAGE->jsupdate) {
             if ($PAGE->jsaccess && !$PAGE->jsdirectlink) {
                 $this->qreplyform($id);
             } else {
                 $PAGE->location('?act=post&tid='.$id);
             }
-        } elseif ($JAX->b['ratepost']) {
+        } elseif (isset($JAX->b['ratepost']) && $JAX->b['ratepost']) {
             $this->ratepost($JAX->b['ratepost'], $JAX->b['niblet']);
-        } elseif ($JAX->b['votepoll']) {
+        } elseif (isset($JAX->b['votepoll']) && $JAX->b['votepoll']) {
             $this->votepoll($id);
-        } elseif ($JAX->b['findpost']) {
+        } elseif (isset($JAX->b['findpost']) && $JAX->b['findpost']) {
             $this->findpost($JAX->b['findpost']);
-        } elseif ($JAX->b['getlast']) {
+        } elseif (isset($JAX->b['getlast']) && $JAX->b['getlast']) {
             $this->getlastpost($id);
-        } elseif ($JAX->b['edit']) {
+        } elseif (isset($JAX->b['edit']) && $JAX->b['edit']) {
             $this->qeditpost($JAX->b['edit']);
-        } elseif ($JAX->b['quote']) {
+        } elseif (isset($JAX->b['quote']) && $JAX->b['quote']) {
             $this->multiquote($id);
-        } elseif ($JAX->b['markread']) {
+        } elseif (isset($JAX->b['markread'])
+            && $JAX->b['markread']
+        ) {
             $this->markread($id);
-        } elseif ($JAX->b['listrating']) {
+        } elseif (isset($JAX->b['listrating'])
+            && $JAX->b['listrating']
+        ) {
             $this->listrating($JAX->b['listrating']);
         } elseif ($PAGE->jsupdate) {
             $this->update($id);
@@ -59,17 +67,39 @@ class TOPIC
         if (!$id) {
             return $PAGE->location('?');
         }
-        $result = $DB->safespecial("SELECT a.title topic_title,a.locked,a.lp_date,b.title forum_title,b.perms fperms,c.id cat_id,c.title cat_title,a.fid,a.poll_q,a.poll_type,a.poll_choices,a.poll_results,a.subtitle FROM %t AS a LEFT JOIN (%t AS b) ON a.fid=b.id LEFT JOIN (%t AS c) ON b.cat_id=c.id WHERE a.id=${id} LIMIT 1",
-    array('topics', 'forums', 'categories'));
+        $result = $DB->safespecial(
+            <<<'EOT'
+SELECT a.`title` AS `topic_title`,a.`locked` AS `locked`,
+    a.`lp_date` AS `lp_date`,b.`title` AS `forum_title`,b.`perms` AS `fperms`,
+    c.`id` AS `cat_id`,c.`title` AS `cat_title`,a.`fid` AS `fid`,
+    a.`poll_q` AS `poll_q`,a.`poll_type` AS `poll_type`,
+    a.`poll_choices` AS `poll_choices`,a.`poll_results` AS `poll_results`,
+    a.`subtitle` AS `subtitle`
+FROM %t a
+LEFT JOIN %t b
+    ON a.`fid`=b.`id`
+LEFT JOIN %t AS c
+    ON b.`cat_id`=c.`id`
+WHERE a.`id`=?
+    LIMIT 1
+EOT
+            ,
+            array('topics', 'forums', 'categories'),
+            $id
+        );
         $topicdata = $DB->arow($result);
         $DB->disposeresult($result);
 
         if (!$topicdata) {
-            return $PAGE->location('?'); //put them back on the index, skip these next few lines
+            //put them back on the index, skip these next few lines
+            return $PAGE->location('?');
         }
         $topicdata['topic_title'] = $JAX->wordfilter($topicdata['topic_title']);
         $topicdata['subtitle'] = $JAX->wordfilter($topicdata['subtitle']);
-        $topicdata['fperms'] = $JAX->parseperms($topicdata['fperms'], $USER ? $USER['group_id'] : 3);
+        $topicdata['fperms'] = $JAX->parseperms(
+            $topicdata['fperms'],
+            $USER ? $USER['group_id'] : 3
+        );
         if ($topicdata['lp_date'] > $USER['last_visit']) {
             $this->markread($id);
         }
@@ -81,34 +111,75 @@ class TOPIC
         $SESS->location_verbose = "In topic '".$topicdata['topic_title']."'";
 
         /*Output RSS instead*/
-        if ('RSS' == $JAX->b['fmt']) {
-            require_once 'inc/classes/rssfeed.php';
+        if (isset($JAX->b['fmt']) && 'RSS' == $JAX->b['fmt']) {
+            include_once 'inc/classes/rssfeed.php';
             $link = 'https://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
-            $feed = new rssfeed(array('title' => $topicdata['topic_title'], 'description' => $topicdata['subtitle'], 'link' => $link.'?act=vt'.$id));
-            $result = $DB->safespecial('SELECT p.id,p.post,p.date,m.id,m.display_name FROM %t p LEFT JOIN %t m ON p.auth_id=m.id WHERE p.tid=?',
-    array('posts', 'members'),
-    $DB->basicvalue($id));
+            $feed = new rssfeed(
+                array(
+                    'title' => $topicdata['topic_title'],
+                    'description' => $topicdata['subtitle'],
+                    'link' => $link.'?act=vt'.$id,
+                )
+            );
+            $result = $DB->safespecial(
+                <<<'EOT'
+SELECT p.`id` AS `id`,p.`post` AS `post`,p.`date` AS `date`,m.`id` AS `id`,
+    m.`display_name` AS `display_name`
+FROM %t p
+LEFT JOIN %t m
+    ON p.`auth_id`=m.`id`
+    WHERE p.`tid`=?
+EOT
+                ,
+                array('posts', 'members'),
+                $DB->basicvalue($id)
+            );
             echo $DB->error(1);
-            while ($f = $DB->row($result)) {
-                $feed->additem(array('title' => $f['display_name'].':', 'link' => $link.'?act=vt'.$id.'&amp;findpost='.$f['id'], 'description' => $JAX->blockhtml($JAX->theworks($f['post'])), 'guid' => $f['id'], 'pubDate' => date('r', $f['date'])));
+            while ($f = $DB->arow($result)) {
+                $feed->additem(
+                    array(
+                        'title' => $f['display_name'].':',
+                        'link' => $link.'?act=vt'.$id.'&amp;findpost='.$f['id'],
+                        'description' => $JAX->blockhtml($JAX->theworks($f['post'])),
+                        'guid' => $f['id'],
+                        'pubDate' => date('r', $f['date']),
+                    )
+                );
             }
             $feed->publish();
             die();
         }
 
         //fix this to work with subforums
-        $PAGE->path(array($topicdata['cat_title'] => '?act=vc'.$topicdata['cat_id'], $topicdata['forum_title'] => '?act=vf'.$topicdata['fid'], $topicdata['topic_title'] => "?act=vt${id}"));
+        $PAGE->path(
+            array(
+                $topicdata['cat_title'] => '?act=vc'.$topicdata['cat_id'],
+                $topicdata['forum_title'] => '?act=vf'.$topicdata['fid'],
+                $topicdata['topic_title'] => "?act=vt${id}",
+            )
+        );
 
         /*generate pages*/
-        $result = $DB->safeselect('count(*)', 'posts', 'WHERE tid=?', $id);
-        $thisrow = $DB->row($result);
+        $result = $DB->safeselect(
+            'COUNT(`id`)',
+            'posts',
+            'WHERE `tid`=?',
+            $id
+        );
+        $thisrow = $DB->arow($result);
         $posts = array_pop($thisrow);
         $DB->disposeresult($result);
 
         $totalpages = ceil($posts / $this->numperpage);
         $pagelist = '';
         foreach ($JAX->pages($totalpages, $this->page + 1, 10) as $x) {
-            $pagelist .= $PAGE->meta('topic-pages-part', $id, $x, ($x == ($this->page + 1) ? ' class="active"' : ''), $x);
+            $pagelist .= $PAGE->meta(
+                'topic-pages-part',
+                $id,
+                $x,
+                ($x == ($this->page + 1) ? ' class="active"' : ''),
+                $x
+            );
         }
 
         //are they on the last page? stores a session variable
@@ -116,40 +187,109 @@ class TOPIC
 
         //if it's a poll, put it in
         if ($topicdata['poll_type']) {
-            $pollshit = $PAGE->meta('box', " id='poll'", $topicdata['poll_q'], $this->generatepoll($topicdata['poll_q'], $topicdata['poll_type'], $JAX->json_decode($topicdata['poll_choices']), $topicdata['poll_results']));
+            $poll = $PAGE->meta(
+                'box',
+                " id='poll'",
+                $topicdata['poll_q'],
+                $this->generatepoll(
+                    $topicdata['poll_q'],
+                    $topicdata['poll_type'],
+                    $JAX->json_decode(
+                        $topicdata['poll_choices']
+                    ),
+                    $topicdata['poll_results']
+                )
+            );
+        } else {
+            $poll = '';
         }
 
         //generate post listing
         $page = $PAGE->meta('topic-table', $this->postsintooutput());
-        $page = $PAGE->meta('topic-wrapper', $topicdata['topic_title'].($topicdata['subtitle'] ? ', '.$topicdata['subtitle'] : ''), $page, '<a href="./?act=vt'.$id.'&amp;fmt=RSS" class="social rss">RSS</a>');
+        $page = $PAGE->meta(
+            'topic-wrapper',
+            $topicdata['topic_title'].
+            ($topicdata['subtitle'] ? ', '.$topicdata['subtitle'] : ''),
+            $page,
+            '<a href="./?act=vt'.$id.'&amp;fmt=RSS" class="social rss">RSS</a>'
+        );
 
         //add buttons
         $buttons = array(
-            $topicdata['fperms']['start'] ? "<a href='?act=post&fid=".$topicdata['fid']."'>".($PAGE->meta($PAGE->metaexists('button-newtopic') ? 'button-newtopic' : 'topic-button-newtopic')).'</a>' : '&nbsp;',
-            $topicdata['fperms']['reply'] && (!$topicdata['locked'] || $PERMS['can_override_locked_topics']) ? "<a href='?act=vt${id}&qreply=1'>".($PAGE->meta($PAGE->metaexists('button-qreply') ? 'button-qreply' : 'topic-button-qreply')) : '',
-            $topicdata['fperms']['reply'] && (!$topicdata['locked'] || $PERMS['can_override_locked_topics']) ? "<a href='?act=post&tid=${id}'>".($PAGE->meta($PAGE->metaexists('button-reply') ? 'button-reply' : 'topic-button-reply')).'</a>' : '',
+            $topicdata['fperms']['start'] ?
+            "<a href='?act=post&fid=".$topicdata['fid']."'>".
+            ($PAGE->meta(
+                $PAGE->metaexists('button-newtopic') ?
+                'button-newtopic' : 'topic-button-newtopic'
+            )).'</a>' :
+            '&nbsp;',
+            $topicdata['fperms']['reply']
+            && (!$topicdata['locked']
+            || $PERMS['can_override_locked_topics']) ?
+            "<a href='?act=vt${id}&qreply=1'>".
+            ($PAGE->meta(
+                $PAGE->metaexists('button-qreply') ?
+                'button-qreply' : 'topic-button-qreply'
+            )) : '',
+            $topicdata['fperms']['reply']
+            && (!$topicdata['locked']
+            || $PERMS['can_override_locked_topics']) ?
+            "<a href='?act=post&tid=${id}'>".
+            ($PAGE->meta(
+                $PAGE->metaexists('button-reply') ?
+                'button-reply' : 'topic-button-reply'
+            )).'</a>' : '',
         );
 
         //make the users online list
+        $usersonline = '';
         foreach ($DB->getUsersOnline() as $f) {
             if ($f['uid'] && $f['location'] == "vt${id}") {
-                $usersonline .= $f['is_bot'] ? '<a class="user'.$f['uid'].'">'.$f['name'].'</a>' : $PAGE->meta('user-link', $f['uid'], $f['group_id'].('idle' == $f['status'] ? ' idle' : ''), $f['name']);
+                $usersonline .= (isset($f['is_bot']) && $f['is_bot']) ?
+                    '<a class="user'.$f['uid'].'">'.$f['name'].'</a>' :
+                    $PAGE->meta(
+                        'user-link',
+                        $f['uid'],
+                        $f['group_id'].('idle' == $f['status'] ? ' idle' : ''),
+                        $f['name']
+                    );
             }
         }
         $page .= $PAGE->meta('topic-users-online', $usersonline);
 
         //add in other page elements shiz
-        $page = $pollshit.$PAGE->meta('topic-pages-top', $pagelist).$PAGE->meta('topic-buttons-top', $buttons).$page.$PAGE->meta('topic-pages-bottom', $pagelist).$PAGE->meta('topic-buttons-bottom', $buttons);
+        $page = $poll.$PAGE->meta(
+            'topic-pages-top',
+            $pagelist
+        ).$PAGE->meta(
+            'topic-buttons-top',
+            $buttons
+        ).$page.$PAGE->meta(
+            'topic-pages-bottom',
+            $pagelist
+        ).$PAGE->meta(
+            'topic-buttons-bottom',
+            $buttons
+        );
 
         //update view count
-        $DB->safequery('UPDATE '.$DB->ftable('topics').' SET views = views + 1 WHERE id=?', $id);
+        $DB->safespecial(
+            <<<'EOT'
+UPDATE %t
+SET `views` = `views` + 1
+WHERE `id`=?
+EOT
+            ,
+            array('topics'),
+            $id
+        );
 
         if ($PAGE->jsaccess) {
             $PAGE->JS('update', 'page', $page);
             $PAGE->updatepath();
-            if ($JAX->b['pid']) {
+            if (isset($JAX->b['pid']) && $JAX->b['pid']) {
                 $PAGE->JS('scrollToPost', $JAX->b['pid']);
-            } elseif ($JAX->b['page']) {
+            } elseif (isset($JAX->b['page']) && $JAX->b['page']) {
                 $PAGE->JS('scrollToPost', $this->firstPostID, 1);
             }
         } else {
@@ -166,10 +306,13 @@ class TOPIC
             $SESS->delvar('topic_lastpid');
         }
 
-        if (is_numeric($SESS->vars['topic_lastpid']) && $SESS->vars['topic_lastpage']) {
-            $crap = $this->postsintooutput($SESS->vars['topic_lastpid']);
-            if ($crap) {
-                $PAGE->JS('appendrows', '#intopic', $crap);
+        if (isset($SESS->vars['topic_lastpid'], $SESS->vars['topic_lastpage'])
+            && is_numeric($SESS->vars['topic_lastpid'])
+            && $SESS->vars['topic_lastpage']
+        ) {
+            $newposts = $this->postsintooutput($SESS->vars['topic_lastpid']);
+            if ($newposts) {
+                $PAGE->JS('appendrows', '#intopic', $newposts);
             }
         }
 
@@ -180,7 +323,12 @@ class TOPIC
         foreach ($DB->getUsersOnline() as $f) {
             if ($f['uid'] && $f['location'] == "vt${id}") {
                 if (!isset($oldcache[$f['uid']])) {
-                    $list[] = array($f['uid'], $f['group_id'], ('active' != $f['status'] ? $f['status'] : ''), $f['name']);
+                    $list[] = array(
+                        $f['uid'],
+                        $f['group_id'],
+                        ('active' != $f['status'] ? $f['status'] : ''),
+                        $f['name'],
+                    );
                 } else {
                     unset($oldcache[$f['uid']]);
                 }
@@ -203,21 +351,51 @@ class TOPIC
         global $PAGE,$SESS,$DB,$JAX;
         $prefilled = '';
         $PAGE->JS('softurl');
-        if ($SESS->vars['multiquote']) {
-            $result = $DB->safespecial('SELECT p.*,m.display_name name FROM %t p LEFT JOIN %t m ON p.auth_id=m.id WHERE p.id IN ?;',
-    array('posts', 'members'),
-    explode(',', $SESS->vars['multiquote']));
+        if (isset($SESS->vars['multiquote']) && $SESS->vars['multiquote']) {
+            $result = $DB->safespecial(
+                <<<'EOT'
+SELECT p.`id` AS `id`,p.`auth_id` AS `auth_id`,p.`post` AS `post`,
+	p.`date` AS `date`,p.`showsig` AS `showsig`,p.`showemotes` AS `showemotes`,
+	p.`tid` AS `tid`,p.`newtopic` AS `newtopic`,INET6_NTOA(p.`ip`) AS `ip`,
+	p.`editdate` AS `editdate`,p.`editby` AS `editby`,p.`rating` AS `rating`,
+    m.`display_name` AS `name`
+FROM %t p
+LEFT JOIN %t m
+    ON p.`auth_id`=m.`id`
+    WHERE p.`id`  IN ?
+EOT
+                ,
+                array('posts', 'members'),
+                explode(',', $SESS->vars['multiquote'])
+            );
 
-            while ($f = $DB->row($result)) {
-                $prefilled .= '[quote='.$f['name'].']'.$f['post']."[/quote]\n\n";
+            while ($f = $DB->arow($result)) {
+                $prefilled .= '[quote='.$f['name'].']'.$f['post'].'[/quote]'.PHP_EOL;
             }
             $SESS->delvar('multiquote');
         }
-        $result = $DB->safeselect('title', 'topics', 'WHERE id=?', $id);
-        $tdata = $DB->row($result);
+        $result = $DB->safeselect(
+            'title',
+            'topics',
+            'WHERE `id`=?',
+            $id
+        );
+        $tdata = $DB->arow($result);
         $DB->disposeresult($result);
 
-        $PAGE->JS('window', array('id' => 'qreply', 'title' => $JAX->wordfilter($tdata['title']), 'content' => $PAGE->meta('topic-reply-form', $id, $JAX->blockhtml($prefilled)), 'resize' => 'textarea'));
+        $PAGE->JS(
+            'window',
+            array(
+                'id' => 'qreply',
+                'title' => $JAX->wordfilter($tdata['title']),
+                'content' => $PAGE->meta(
+                    'topic-reply-form',
+                    $id,
+                    $JAX->blockhtml($prefilled)
+                ),
+                'resize' => 'textarea',
+            )
+        );
         $PAGE->JS('updateqreply', '');
     }
 
@@ -225,30 +403,91 @@ class TOPIC
     {
         global $DB,$PAGE,$JAX,$SESS,$USER,$PERMS,$CFG;
         $usersonline = $DB->getUsersOnline();
+        $postrating = $showrating = '';
+
+        $topic_post_counter = 0;
 
         if ($lastpid) {
-            $query = $DB->safespecial('SELECT
-          m.*,
-          p.tid,p.id AS pid,p.ip,p.newtopic,p.post,p.showsig,p.showemotes,p.tid,p.date,p.auth_id,p.rating,
-          g.title,g.icon,
-          p.editdate,p.editby,e.display_name ename,e.group_id egroup_id
-          FROM %t AS p LEFT JOIN %t AS m ON p.auth_id=m.id LEFT JOIN %t AS g ON m.group_id=g.id LEFT JOIN %t AS e ON p.editby=e.id WHERE p.tid=?
-          AND p.id>? ORDER BY pid',
-    array('posts', 'members', 'member_groups', 'members'),
-        $this->id,
-        $lastpid);
+            $query = $DB->safespecial(
+                <<<'EOT'
+SELECT m.`id` AS `id`,m.`name` AS `name`,m.`group_id` AS `group_id`,
+    m.`sound_im` AS `sound_im`,m.`sound_shout` AS `sound_shout`,
+    m.`last_visit` AS `last_visit`,m.`display_name` AS `display_name`,
+    m.`friends` AS `friends`,m.`enemies` AS `enemies`,m.`skin_id` AS `skin_id`,
+    m.`nowordfilter` AS `nowordfilter`,m.`wysiwyg` AS `wysiwyg`,
+    m.`avatar` AS `avatar`,m.`usertitle` AS `usertitle`,
+    CONCAT(m.`dob_month`,' ',m.`dob_day`) as `birthday`,
+    m.`mod` AS `mod`,m.`posts` AS `posts`,
+    p.`tid` AS `tid`,p.`id` AS `pid`,INET6_NTOA(p.`ip`) AS `ip`,
+    p.`newtopic` AS `newtopic`,p.`post` AS `post`,p.`showsig` AS `showsig`,
+    p.`showemotes` AS `showemotes`,p.`tid` AS `tid`,p.`date` AS `date`,
+    p.`auth_id` AS `auth_id`,p.`rating` AS `rating`,g.`title` AS `title`,
+    g.`icon` AS `icon`,p.`editdate` AS `editdate`,p.`editby` AS `editby`,
+    e.`display_name` AS `ename`,e.`group_id` AS `egroup_id`
+FROM %t AS p
+LEFT JOIN %t m
+    ON p.`auth_id`=m.`id`
+LEFT JOIN %t g
+    ON m.`group_id`=g.`id`
+LEFT JOIN %t e
+ON p.`editby`=e.`id`
+WHERE p.`tid`=?
+  AND p.`id`>?
+ORDER BY `pid`
+EOT
+                ,
+                array('posts', 'members', 'member_groups', 'members'),
+                $this->id,
+                $lastpid
+            );
         } else {
-            $query = $DB->safespecial('SELECT
-          m.*,
-          p.tid,p.id AS pid,p.ip,p.newtopic,p.post,p.showsig,p.showemotes,p.tid,p.date,p.auth_id,p.rating,
-          g.title,g.icon,
-          p.editdate,p.editby,e.display_name ename,e.group_id egroup_id
-          FROM %t AS p LEFT JOIN %t AS m ON p.auth_id=m.id LEFT JOIN %t AS g ON m.group_id=g.id LEFT JOIN %t AS e ON p.editby=e.id WHERE p.tid=?
-          ORDER BY newtopic DESC, pid ASC LIMIT ?,?',
-        array('posts', 'members', 'member_groups', 'members'),
-        $this->id,
-        (($topic_post_counter = ($this->page) * $this->numperpage)),
-        $this->numperpage);
+            $query = $DB->safespecial(
+                <<<'EOT'
+SELECT m.`id` AS `id`,m.`name` AS `name`,m.`email` AS `email`,m.`sig` AS `sig`,
+    m.`posts` AS `posts`,m.`group_id` AS `group_id`,m.`avatar` AS `avatar`,
+    m.`usertitle` AS `usertitle`,m.`join_date` AS `join_date`,
+    m.`last_visit` AS `last_visit`,m.`contact_skype` AS `contact_skype`,
+    m.`contact_yim` AS `contact_yim`,m.`contact_msn` AS `contact_msn`,
+    m.`contact_gtalk` AS `contact_gtalk`,m.`contact_aim` AS `contact_aim`,
+    m.`website` AS `website`,m.`dob_day` AS `dob_day`,
+    m.`dob_month` AS `dob_month`,m.`dob_year` AS `dob_year`,
+    m.`about` AS `about`,m.`display_name` AS `display_name`,
+    m.`full_name` AS `full_name`,m.`contact_steam` AS `contact_steam`,
+    m.`location` AS `location`,m.`gender` AS `gender`,m.`friends` AS `friends`,
+    m.`enemies` AS `enemies`,m.`sound_shout` AS `sound_shout`,
+    m.`sound_im` AS `sound_im`,m.`sound_pm` AS `sound_pm`,
+    m.`sound_postinmytopic` AS `sound_postinmytopic`,
+    m.`sound_postinsubscribedtopic` AS `sound_postinsubscribedtopic`,
+    m.`notify_pm` AS `notify_pm`,
+    m.`notify_postinmytopic` AS `notify_postinmytopic`,
+    m.`notify_postinsubscribedtopic` AS `notify_postinsubscribedtopic`,
+    m.`ucpnotepad` AS `ucpnotepad`,m.`skin_id` AS `skin_id`,
+    m.`contact_twitter` AS `contact_twitter`,
+    m.`email_settings` AS `email_settings`,m.`nowordfilter` AS `nowordfilter`,
+    INET6_NTOA(m.`ip`) AS `ip`,m.`mod` AS `mod`,m.`wysiwyg` AS `wysiwyg`,
+    p.`tid` AS `tid`,p.`id` AS `pid`,INET6_NTOA(p.`ip`) AS `ip`,
+    p.`newtopic` AS `newtopic`,p.`post` AS `post`,p.`showsig` AS `showsig`,
+    p.`showemotes` AS `showemotes`,p.`tid` AS `tid`,p.`date` AS `date`,
+    p.`auth_id` AS `auth_id`,p.`rating` AS `rating`,g.`title` AS `title`,
+    g.`icon` AS `icon`,p.`editdate` AS `editdate`,p.`editby` AS `editby`,
+    e.`display_name` AS `ename`,e.`group_id` AS `egroup_id`
+FROM %t p
+LEFT JOIN %t m
+    ON p.`auth_id`=m.`id`
+LEFT JOIN %t g
+    ON m.`group_id`=g.`id`
+LEFT JOIN %t e
+    ON p.`editby`=e.`id`
+WHERE p.`tid`=?
+ORDER BY `newtopic` DESC, `pid` ASC
+LIMIT ?,?
+EOT
+                ,
+                array('posts', 'members', 'member_groups', 'members'),
+                $this->id,
+                (($topic_post_counter = ($this->page) * $this->numperpage)),
+                $this->numperpage
+            );
         }
 
         $rows = '';
@@ -261,7 +500,7 @@ class TOPIC
             $postt = $JAX->theworks($postt);
 
             //post rating
-            if ($CFG['ratings'] & 1) {
+            if (isset($CFG['ratings']) && $CFG['ratings'] & 1) {
                 $postrating = $showrating = '';
                 $prating = array();
                 if ($post['rating']) {
@@ -270,53 +509,106 @@ class TOPIC
                 $rniblets = $DB->getRatingNiblets();
                 if ($rniblets) {
                     foreach ($rniblets as $k => $v) {
-                        $postrating .= '<a href="?act=topic&amp;ratepost='.$post['pid'].'&amp;niblet='.$k.'">'.$PAGE->meta('rating-niblet', $v['img'], $v['title']).'</a>';
-                        if ($prating[$k]) {
+                        $postrating .= '<a href="?act=topic&amp;ratepost='.
+                            $post['pid'].'&amp;niblet='.$k.'">'.
+                            $PAGE->meta(
+                                'rating-niblet',
+                                $v['img'],
+                                $v['title']
+                            ).'</a>';
+                        if (isset($prating[$k]) && $prating[$k]) {
                             $num = 'x'.count($prating[$k]);
                             $postrating .= $num;
-                            $showrating .= $PAGE->meta('rating-niblet', $v['img'], $v['title']).$num;
+                            $showrating .= $PAGE->meta(
+                                'rating-niblet',
+                                $v['img'],
+                                $v['title']
+                            ).$num;
                         }
                     }
-                    $postrating = $PAGE->meta('rating-wrapper',
-            $postrating,
-            (!($CFG['ratings'] & 2) ? '<a href="?act=vt'.$this->id.'&amp;listrating='.$post['pid'].'">(List)</a>' : ''),
-            $showrating
-            );
+                    $postrating = $PAGE->meta(
+                        'rating-wrapper',
+                        $postrating,
+                        (!($CFG['ratings'] & 2) ?
+                        '<a href="?act=vt'.$this->id.
+                        '&amp;listrating='.$post['pid'].'">(List)</a>' : ''),
+                        $showrating
+                    );
                 }
             }
 
-            $rows .= $PAGE->meta('topic-post-row',
-     $post['pid'],
-     $this->id,
-     $post['auth_id'] ? $PAGE->meta('user-link', $post['auth_id'], $post['group_id'], $post['display_name']) : 'Guest',
-     $JAX->pick($post['avatar'], $PAGE->meta('default-avatar')),
-     $post['usertitle'],
-     $post['posts'],
-     $PAGE->meta('topic-status-'.($usersonline[$post['auth_id']] ? 'online' : 'offline')),
-     $post['title'],
-     $post['auth_id'],
-     ($this->canedit($post) ? "<a href='?act=vt".$this->id.'&amp;edit='.$post['pid']."' class='edit'>".$PAGE->meta('topic-edit-button').'</a>' : '')." <a href='?act=vt".$this->id.'&amp;quote='.$post['pid']."' onclick='RUN.handleQuoting(this);return false;' class='quotepost'>".$PAGE->meta('topic-quote-button').'</a> '.($this->canmoderate() ? "<a href='?act=modcontrols&amp;do=modp&amp;pid=".$post['pid']."' class='modpost' onclick='RUN.modcontrols.togbutton(this)'>".$PAGE->meta('topic-mod-button').'</a>' : ''),
-     $JAX->date($post['date']),
-     '<a href="?act=vt'.$this->id.'&amp;findpost='.$post['pid'].'" onclick="prompt(\'Link to this post:\',this.href)">'.$PAGE->meta('topic-perma-button').'</a>',
-     $postt,
-     $post['sig'] ? $JAX->theworks($post['sig']) : '',
-     $post['auth_id'],
-     $post['editdate'] ? $PAGE->meta('topic-edit-by', $PAGE->meta('user-link', $post['editby'], $post['egroup_id'], $post['ename']), $JAX->date($post['editdate'])) : '',
-     $PERMS['can_moderate'] ? '<a href="?act=modcontrols&amp;do=iptools&amp;ip='.$post['ip'].'">'.$PAGE->meta('topic-mod-ipbutton', long2ip($post['ip'])).'</a>' : '',
-     $post['icon'] ? $PAGE->meta('topic-icon-wrapper', $post['icon']) : '',
-     ++$topic_post_counter,
-     $post['contact_skype'],
-     $post['contact_yim'],
-     $post['contact_msn'],
-     $post['contact_gtalk'],
-     $post['contact_aim'],
-     $post['contact_twitter'],
-     $post['contact_steam'],
-     '',
-     '',
-     '',
-     $postrating
-   );
+            $rows .= $PAGE->meta(
+                'topic-post-row',
+                $post['pid'],
+                $this->id,
+                $post['auth_id'] ? $PAGE->meta(
+                    'user-link',
+                    $post['auth_id'],
+                    $post['group_id'],
+                    $post['display_name']
+                ) : 'Guest',
+                $JAX->pick($post['avatar'], $PAGE->meta('default-avatar')),
+                $post['usertitle'],
+                $post['posts'],
+                $PAGE->meta(
+                    'topic-status-'.
+                    (isset($usersonline[$post['auth_id']])
+                    && $usersonline[$post['auth_id']] ? 'online' : 'offline')
+                ),
+                $post['title'],
+                $post['auth_id'],
+                ($this->canedit($post) ?
+                "<a href='?act=vt".$this->id.'&amp;edit='.$post['pid'].
+                "' class='edit'>".$PAGE->meta('topic-edit-button').
+                '</a>' : '')." <a href='?act=vt".$this->id.'&amp;quote='.
+                $post['pid'].
+                "' onclick='RUN.handleQuoting(this);return false;' ".
+                "class='quotepost'>".$PAGE->meta('topic-quote-button').'</a> '.
+                ($this->canmoderate() ?
+                "<a href='?act=modcontrols&amp;do=modp&amp;pid=".$post['pid'].
+                "' class='modpost' onclick='RUN.modcontrols.togbutton(this)'>".
+                $PAGE->meta('topic-mod-button').'</a>' : ''),
+                $JAX->date($post['date']),
+                '<a href="?act=vt'.$this->id.'&amp;findpost='.$post['pid'].
+                '" onclick="prompt(\'Link to this post:\',this.href)">'.
+                $PAGE->meta('topic-perma-button').'</a>',
+                $postt,
+                isset($post['sig']) && $post['sig'] ?
+                $JAX->theworks($post['sig']) : '',
+                $post['auth_id'],
+                $post['editdate'] ? $PAGE->meta(
+                    'topic-edit-by',
+                    $PAGE->meta(
+                        'user-link',
+                        $post['editby'],
+                        $post['egroup_id'],
+                        $post['ename']
+                    ),
+                    $JAX->date($post['editdate'])
+                ) : '',
+                $PERMS['can_moderate'] ?
+                '<a href="?act=modcontrols&amp;do=iptools&amp;ip='.
+                $post['ip'].'">'.$PAGE->meta(
+                    'topic-mod-ipbutton',
+                    $post['ip']
+                ).'</a>' : '',
+                $post['icon'] ? $PAGE->meta(
+                    'topic-icon-wrapper',
+                    $post['icon']
+                ) : '',
+                ++$topic_post_counter,
+                isset($post['contact_skype']) ? $post['contact_skype'] : '',
+                isset($post['contact_yim']) ? $post['contact_yim'] : '',
+                isset($post['contact_msn']) ? $post['contact_msn'] : '',
+                isset($post['contact_gtalk']) ? $post['contact_gtalk'] : '',
+                isset($post['contact_aim']) ? $post['contact_aim'] : '',
+                isset($post['contact_twitter']) ? $post['contact_twitter'] : '',
+                isset($post['contact_steam']) ? $post['contact_steam'] : '',
+                '',
+                '',
+                '',
+                $postrating
+            );
             $lastpid = $post['pid'];
         }
         $this->lastPostID = $lastpid;
@@ -329,7 +621,12 @@ class TOPIC
     {
         global $PERMS,$USER;
 
-        return $this->canmoderate() || ($post['auth_id'] && ($post['newtopic'] ? $PERMS['can_edit_topics'] : $PERMS['can_edit_posts']) && $post['auth_id'] == $USER['id']);
+        return $this->canmoderate()
+            || ($post['auth_id']
+            && ($post['newtopic'] ?
+            $PERMS['can_edit_topics'] : $PERMS['can_edit_posts'])
+            && $post['auth_id'] == $USER['id']
+        );
     }
 
     public function canmoderate()
@@ -343,10 +640,21 @@ class TOPIC
             $canmod = true;
         }
         if ($USER['mod']) {
-            $result = $DB->safespecial('SELECT mods FROM %t WHERE id=(SELECT fid FROM %t WHERE id=?)',
-    array('forums', 'topics'),
-    $DB->basicvalue($this->id));
-            $mods = $DB->row($result);
+            $result = $DB->safespecial(
+                <<<'EOT'
+SELECT `mods`
+FROM %t
+WHERE `id`=(
+    SELECT `fid`
+    FROM %t
+    WHERE `id`=?
+)
+EOT
+                ,
+                array('forums', 'topics'),
+                $DB->basicvalue($this->id)
+            );
+            $mods = $DB->arow($result);
             $DB->disposeresult($result);
             if (in_array($USER['id'], explode(',', $mods['mods']))) {
                 $canmod = true;
@@ -362,6 +670,7 @@ class TOPIC
             $choices = array();
         }
         global $PAGE,$USER,$JAX;
+        $page = '';
         if ($USER) {
             //accomplish three things at once:
             //-determine if the user has voted
@@ -387,22 +696,40 @@ class TOPIC
         if ($voted) {
             $page .= '<table>';
             foreach ($choices as $k => $v) {
-                $page .= "<tr><td>${v}</td><td class='numvotes'>".$numvotes[$k].' votes ('.round($numvotes[$k] / $totalvotes * 100, 2)."%)</td><td style='width:200px'><div class='bar' style='width:".round($numvotes[$k] / $totalvotes * 100)."%;'></div></td></tr>";
+                $page .= "<tr><td>${v}</td><td class='numvotes'>".
+                    $numvotes[$k].' votes ('.
+                    round($numvotes[$k] / $totalvotes * 100, 2).
+                    "%)</td><td style='width:200px'><div class='bar' style='width:".
+                    round($numvotes[$k] / $totalvotes * 100).
+                    "%;'></div></td></tr>";
             }
-            $page .= "<tr><td colspan='3' class='totalvotes'>Total Votes: ".$usersvoted.'</td></tr>';
+            $page .= "<tr><td colspan='3' class='totalvotes'>Total Votes: ".
+                $usersvoted.'</td></tr>';
             $page .= '</table>';
         } else {
-            $page = "<form method='post' action='?' onsubmit='return RUN.submitForm(this)'>".$JAX->hiddenFormFields(array('act' => 'vt'.$this->id, 'votepoll' => 1));
+            $page = "<form method='post' action='?' ".
+                "onsubmit='return RUN.submitForm(this)'>".
+                $JAX->hiddenFormFields(
+                    array(
+                        'act' => 'vt'.$this->id,
+                        'votepoll' => 1,
+                    )
+                );
             if ('multi' == $type) {
                 foreach ($choices as $k => $v) {
-                    $page .= "<div class='choice'><input type='checkbox' name='choice[]' value='${k}' id='poll_${k}' /> <label for='poll_${k}'>${v}</label></div>";
+                    $page .= "<div class='choice'><input type='checkbox' ".
+                        "name='choice[]' value='${k}' id='poll_${k}' /> ".
+                        "<label for='poll_${k}'>${v}</label></div>";
                 }
             } else {
                 foreach ($choices as $k => $v) {
-                    $page .= "<div class='choice'><input type='radio' name='choice' value='${k}' id='poll_${k}' /> <label for='poll_${k}'>${v}</label></div>";
+                    $page .= "<div class='choice'><input type='radio' ".
+                        "name='choice' value='${k}' id='poll_${k}' /> ".
+                        "<label for='poll_${k}'>${v}</label></div>";
                 }
             }
-            $page .= "<div class='buttons'><input type='submit' value='Vote'></div></form>";
+            $page .= "<div class='buttons'><input type='submit' ".
+                "value='Vote'></div></form>";
         }
 
         return $page;
@@ -412,11 +739,18 @@ class TOPIC
     {
         global $DB,$PAGE,$USER,$JAX;
 
+        $e = '';
+
         if (!$USER) {
             $e = 'You must be logged in to vote!';
         } else {
-            $result = $DB->safeselect('poll_q,poll_results,poll_choices,poll_type', 'topics', 'WHERE id=?', $this->id);
-            $row = $DB->row($result);
+            $result = $DB->safeselect(
+                '`poll_q`,`poll_results`,`poll_choices`,`poll_type`',
+                'topics',
+                'WHERE `id`=?',
+                $this->id
+            );
+            $row = $DB->arow($result);
             $DB->disposeresult($result);
 
             $choice = $JAX->b['choice'];
@@ -432,7 +766,8 @@ class TOPIC
                 $results = array();
             }
 
-            //results is now an array of arrays, the keys of the parent array correspond to the choices while the arrays within the array correspond
+            //results is now an array of arrays, the keys of the parent array
+            //correspond to the choices while the arrays within the array correspond
             //to a collection of user IDs that have voted for that choice
             $voted = false;
             foreach ($results as $v) {
@@ -477,13 +812,31 @@ class TOPIC
 
         $presults = array();
         for ($x = 0; $x < $numchoices; ++$x) {
-            $presults[$x] = ($results[$x] ? implode(',', $results[$x]) : '');
+            $presults[$x] = isset($results[$x]) && $results[$x]
+                ? implode(',', $results[$x]) : '';
         }
         $presults = implode(';', $presults);
 
-        $PAGE->JS('update', '#poll .content', $this->generatePoll($row['poll_q'], $row['poll_type'], $choices, $presults), '1');
+        $PAGE->JS(
+            'update',
+            '#poll .content',
+            $this->generatePoll(
+                $row['poll_q'],
+                $row['poll_type'],
+                $choices,
+                $presults
+            ),
+            '1'
+        );
 
-        $DB->safeupdate('topics', array('poll_results' => $presults), 'WHERE id=?', $this->id);
+        $DB->safeupdate(
+            'topics',
+            array(
+                'poll_results' => $presults,
+            ),
+            'WHERE `id`=?',
+            $this->id
+        );
     }
 
     public function ratepost($postid, $nibletid)
@@ -493,8 +846,13 @@ class TOPIC
         if (!is_numeric($postid) || !is_numeric($nibletid)) {
             return false;
         }
-        $result = $DB->safeselect('rating', 'posts', 'WHERE id=?', $DB->basicvalue($postid));
-        $f = $DB->row($result);
+        $result = $DB->safeselect(
+            '`rating`',
+            'posts',
+            'WHERE `id`=?',
+            $DB->basicvalue($postid)
+        );
+        $f = $DB->arow($result);
         $DB->disposeresult($result);
 
         $niblets = $DB->getRatingNiblets();
@@ -524,7 +882,14 @@ class TOPIC
             $PAGE->JS('error', $e);
         } else {
             $ratings[(int) $nibletid][] = (int) $USER['id'];
-            $DB->safeupdate('posts', array('rating' => json_encode($ratings)), 'WHERE id=?', $DB->basicvalue($postid));
+            $DB->safeupdate(
+                'posts',
+                array(
+                    'rating' => json_encode($ratings),
+                ),
+                'WHERE `id`=?',
+                $DB->basicvalue($postid)
+            );
             $PAGE->JS('alert', 'Rated!');
         }
     }
@@ -539,11 +904,26 @@ class TOPIC
             $PAGE->location('?act=post&pid='.$id);
         }
         $PAGE->JS('softurl');
-        $result = $DB->safeselect('*', 'posts', 'WHERE id=?', $id);
-        $post = $DB->row($result);
+        $result = $DB->safeselect(
+            <<<'EOT'
+`id`,`auth_id`,`post`,`date`,`showsig`,`showemotes`,`tid`,`newtopic`,
+INET6_NTOA(`ip`) AS `ip`,`editdate`,`editby`,`rating`
+EOT
+            ,
+            '`posts`',
+            'WHERE `id`=?',
+            $id
+        );
+        $post = $DB->arow($result);
         $DB->disposeresult($result);
 
-        $hiddenfields = $JAX->hiddenFormFields(array('act' => 'post', 'how' => 'qedit', 'pid' => $id));
+        $hiddenfields = $JAX->hiddenFormFields(
+            array(
+                'act' => 'post',
+                'how' => 'qedit',
+                'pid' => $id,
+            )
+        );
 
         if ($PAGE->jsnewlocation) {
             if (!$post) {
@@ -552,14 +932,39 @@ class TOPIC
                 $PAGE->JS('alert', "You don't have permission to edit this post.");
             } else {
                 if ($post['newtopic']) {
-                    $hiddenfields .= $JAX->hiddenFormFields(array('tid' => $post['tid']));
-                    $result = $DB->safeselect('*', 'topics', 'WHERE id=?', $post['tid']);
-                    $topic = $DB->row($result);
+                    $hiddenfields .= $JAX->hiddenFormFields(
+                        array(
+                            'tid' => $post['tid'],
+                        )
+                    );
+                    $result = $DB->safeselect(
+                        <<<'EOT'
+`id`,`title`,`subtitle`,`lp_uid`,`lp_date`,`fid`,`auth_id`,`replies`,`views`,
+`pinned`,`poll_choices`,`poll_results`,`poll_q`,`poll_type`,`summary`,
+`locked`,`date`,`op`,`cal_event`
+EOT
+                        ,
+                        'topics',
+                        'WHERE `id`=?',
+                        $post['tid']
+                    );
+                    $topic = $DB->arow($result);
                     $DB->disposeresult($result);
 
-                    $form = $PAGE->meta('topic-qedit-topic', $hiddenfields, $topic['title'], $topic['subtitle'], $JAX->blockhtml($post['post']));
+                    $form = $PAGE->meta(
+                        'topic-qedit-topic',
+                        $hiddenfields,
+                        $topic['title'],
+                        $topic['subtitle'],
+                        $JAX->blockhtml($post['post'])
+                    );
                 } else {
-                    $form = $PAGE->meta('topic-qedit-post', $hiddenfields, $JAX->blockhtml($post['post']), $id);
+                    $form = $PAGE->meta(
+                        'topic-qedit-post',
+                        $hiddenfields,
+                        $JAX->blockhtml($post['post']),
+                        $id
+                    );
                 }
                 $PAGE->JS('update', "#pid_${id} .post_content", $form);
             }
@@ -572,10 +977,19 @@ class TOPIC
         $pid = $JAX->b['quote'];
         $post = false;
         if ($pid && is_numeric($pid)) {
-            $result = $DB->safespecial('SELECT p.post,m.display_name name FROM %t p LEFT JOIN %t m ON p.auth_id=m.id WHERE p.id=?',
-    array('posts', 'members'),
-    $pid);
-            $post = $DB->row($result);
+            $result = $DB->safespecial(
+                <<<'EOT'
+SELECT p.`post` AS `post`,m.`display_name` AS `name`
+FROM %t p
+LEFT JOIN %t m
+	ON p.`auth_id`=m.`id`
+WHERE p.`id`=?
+EOT
+                ,
+                array('posts', 'members'),
+                $pid
+            );
+            $post = $DB->arow($result);
             $DB->disposeresult($result);
         }
         if (!$post) {
@@ -586,10 +1000,18 @@ class TOPIC
             return;
         }
         if ($JAX->b['qreply']) {
-            $PAGE->JS('updateqreply', '[quote='.$post['name'].']'.$post['post']."[/quote]\n\n");
+            $PAGE->JS(
+                'updateqreply',
+                '[quote='.$post['name'].']'.$post['post'].'[/quote]'.
+                PHP_EOL.PHP_EOL
+            );
         } else {
             if (!in_array($pid, explode(' ', $SESS->vars['multiquote']))) {
-                $SESS->addvar('multiquote', $SESS->vars['multiquote'] ? $SESS->vars['multiquote'].','.$pid : $pid);
+                $SESS->addvar(
+                    'multiquote',
+                    $SESS->vars['multiquote'] ? $SESS->vars['multiquote'].','.
+                    $pid : $pid
+                );
             }
             //this line toggles whether or not the qreply window should open on quote
             if ($PAGE->jsaccess) {
@@ -605,12 +1027,20 @@ class TOPIC
     public function getlastpost($tid)
     {
         global $DB,$PAGE;
-        $result = $DB->safeselect('max(id) lastpid,count(*) numposts', 'posts', 'WHERE tid=?', $tid);
-        $f = $DB->row($result);
+        $result = $DB->safeselect(
+            'MAX(`id`) AS `lastpid`,COUNT(`id`) AS `numposts`',
+            'posts',
+            'WHERE `tid`=?',
+            $tid
+        );
+        $f = $DB->arow($result);
         $DB->disposeresult($result);
 
         $PAGE->JS('softurl');
-        $PAGE->location("?act=vt${tid}&page=".(ceil(($f['numposts'] / $this->numperpage))).'&pid='.$f['lastpid'].'#pid_'.$f['lastpid']);
+        $PAGE->location(
+            "?act=vt${tid}&page=".(ceil(($f['numposts'] / $this->numperpage))).
+            '&pid='.$f['lastpid'].'#pid_'.$f['lastpid']
+        );
     }
 
     public function findpost($pid)
@@ -619,11 +1049,24 @@ class TOPIC
         if (!is_numeric($pid)) {
             $couldntfindit = true;
         } else {
-            $result = $DB->safespecial('SELECT * FROM %t WHERE tid=(SELECT tid FROM %t WHERE id=?) ORDER BY id ASC',
-    array('posts', 'posts'),
-    $pid);
+            $result = $DB->safespecial(
+                <<<'EOT'
+SELECT `id`,`auth_id`,`post`,`date`,`showsig`,`showemotes`,`tid`,`newtopic`,
+    INET6_NTOA(`ip`) AS `ip`,`editdate`,`editby`,`rating`
+FROM %t
+WHERE tid=(
+    SELECT tid
+    FROM %t
+    WHERE `id`=?
+)
+ORDER BY `id` ASC
+EOT
+                ,
+                array('posts', 'posts'),
+                $pid
+            );
             $num = 1;
-            while ($f = $DB->row($result)) {
+            while ($f = $DB->arow($result)) {
                 if ($f['id'] == $pid) {
                     $pid = $f['id'];
                     $couldntfindit = false;
@@ -636,7 +1079,10 @@ class TOPIC
         if ($couldntfindit) {
             $PAGE->JS('alert', "that post doesn't exist");
         } else {
-            $PAGE->location('?act=vt'.$this->id.'&page='.(ceil($num / $this->numperpage)).'&pid='.$pid.'#pid_'.$pid);
+            $PAGE->location(
+                '?act=vt'.$this->id.'&page='.
+                (ceil($num / $this->numperpage)).'&pid='.$pid.'#pid_'.$pid
+            );
         }
     }
 
@@ -655,8 +1101,13 @@ class TOPIC
             return;
         }
         $PAGE->JS('softurl');
-        $result = $DB->safeselect('rating', 'posts', 'WHERE id=?', $DB->basicvalue($pid));
-        $row = $DB->row($result);
+        $result = $DB->safeselect(
+            '`rating`',
+            'posts',
+            'WHERE `id`=?',
+            $DB->basicvalue($pid)
+        );
+        $row = $DB->arow($result);
         $DB->disposeresult($result);
 
         if ($row) {
@@ -672,7 +1123,12 @@ class TOPIC
         foreach ($ratings as $v) {
             $members = array_merge($members, $v);
         }
-        $result = $DB->safeselect('id,display_name,group_id', 'members', 'WHERE id IN ?', $members);
+        $result = $DB->safeselect(
+            '`id`,`display_name`,`group_id`',
+            'members',
+            'WHERE `id` IN ?',
+            $members
+        );
         $mdata = array($result);
         while ($f = $DB->arow($result)) {
             $mdata[$f['id']] = array($f['display_name'], $f['group_id']);
@@ -681,9 +1137,15 @@ class TOPIC
         $niblets = $DB->getRatingNiblets();
         foreach ($ratings as $k => $v) {
             $page .= '<div class="column">';
-            $page .= '<img src="'.$niblets[$k]['img'].'" /> '.$niblets[$k]['title'].'<ul>';
+            $page .= '<img src="'.$niblets[$k]['img'].'" /> '.
+                $niblets[$k]['title'].'<ul>';
             foreach ($v as $mid) {
-                $page .= '<li>'.$PAGE->meta('user-link', $mid, $mdata[$mid][1], $mdata[$mid][0]).'</li>';
+                $page .= '<li>'.$PAGE->meta(
+                    'user-link',
+                    $mid,
+                    $mdata[$mid][1],
+                    $mdata[$mid][0]
+                ).'</li>';
             }
             $page .= '</ul></div>';
         }

@@ -4,7 +4,7 @@ class rssfeed
 {
     public $feed = array();
 
-    public function rssfeed($settings)
+    public function __construct($settings)
     {
         $this->feed = array_merge($this->feed, $settings);
     }

@@ -3,12 +3,23 @@
 class SESS
 {
     public $data = array();
-    public $bots = array('google' => 'Googlebot', 'bingbot' => 'Bing', 'yahoo! slurp' => 'Yahoo', 'mj12bot' => 'MJ12bot', 'baidu' => 'Baidu', 'discobot' => 'DiscoBot');
+    public $userData = array();
+    public $bots = array(
+        'google' => 'Googlebot',
+        'bingbot' => 'Bing',
+        'yahoo! slurp' => 'Yahoo',
+        'mj12bot' => 'MJ12bot',
+        'baidu' => 'Baidu',
+        'discobot' => 'DiscoBot',
+    );
     public $changedData = array();
 
     public function __construct($sid = false)
     {
         $this->data = $this->getSess($sid);
+        if (!isset($this->data['vars'])) {
+            $this->data['vars'] = serialize(array());
+        }
         $this->data['vars'] = unserialize($this->data['vars']);
         if (!$this->data['vars']) {
             $this->data['vars'] = array();
@@ -19,6 +30,7 @@ class SESS
     {
         global $DB,$JAX,$_SESSION;
         $isbot = 0;
+        $r = array();
         foreach ($this->bots as $k => $v) {
             if (false !== strpos(strtolower($_SERVER['HTTP_USER_AGENT']), $k)) {
                 $sid = $v;
@@ -27,44 +39,79 @@ class SESS
         }
         if ($sid) {
             $result = (!$isbot) ?
-                $DB->safeselect('*','session','WHERE id=? AND ip=?;',
+                $DB->safeselect(
+                    <<<'EOT'
+`id`,`uid`,INET6_NTOA(`ip`) as `ip`,`vars`,`last_update`,`last_action`,
+`runonce`,`location`,`users_online_cache`,`is_bot`,`buddy_list_cache`,
+`location_verbose`,`useragent`,`forumsread`,`topicsread`,`readtime`,`hide`
+EOT
+                    ,
+                    'session',
+                    'WHERE `id`=? AND `ip`=INET6_ATON(?)',
                     $DB->basicvalue($sid),
-                    $JAX->ip2int()) :
-                    $DB->safeselect('*','session','WHERE id=?',
-                        $DB->basicvalue($sid));
+                    $JAX->getIp()
+                ) :
+                    $DB->safeselect(
+                        <<<'EOT'
+`id`,`uid`,INET6_NTOA(`ip`) as `ip`,`vars`,`last_update`,`last_action`,
+`runonce`,`location`,`users_online_cache`,`is_bot`,`buddy_list_cache`,
+`location_verbose`,`useragent`,`forumsread`,`topicsread`,`readtime`,`hide`
+EOT
+                        ,
+                        'session',
+                        'WHERE `id`=?',
+                        $DB->basicvalue($sid)
+                    );
             $r = $DB->arow($result);
             $DB->disposeresult($result);
         }
-        if ($r) {
+        if (!empty($r)) {
             return $r;
         }
         if (!$isbot) {
             $sid = base64_encode(openssl_random_pseudo_bytes(128));
         }
         $uid = 0;
-        if ($JAX->userData && isset($JAX->userData['id']) && 0 < $JAX->userData['id']) {
+        if (!empty($JAX->userData)
+            && isset($JAX->userData['id'])
+            && 0 < $JAX->userData['id']
+        ) {
             $uid = (int) $JAX->userData['id'];
         }
         if (!$isbot) {
             $_SESSION['sid'] = $sid;
         }
-        $sessData = array('id' => $sid, 'uid' => $uid, 'runonce' => '', 'ip' => $JAX->ip2int(), 'useragent' => $_SERVER['HTTP_USER_AGENT'], 'is_bot' => $isbot, 'last_action' => time(), 'last_update' => time());
+        $sessData = array(
+            'id' => $sid,
+            'uid' => $uid,
+            'runonce' => '',
+            'ip' => $JAX->ip2bin(),
+            'useragent' => $_SERVER['HTTP_USER_AGENT'],
+            'is_bot' => $isbot,
+            'last_action' => time(),
+            'last_update' => time(),
+        );
         if (1 > $uid) {
             unset($sessData['uid']);
         }
-        $DB->safeinsert('session', $sessData);
+        $DB->safeinsert(
+            'session',
+            $sessData
+        );
 
         return $sessData;
     }
 
     public function __get($a)
     {
-        return $this->data[$a];
+        if (isset($this->data[$a])) {
+            return $this->data[$a];
+        }
     }
 
     public function __set($a, $b)
     {
-        if ($this->data[$a] == $b) {
+        if (isset($this->data[$a]) && $this->data[$a] == $b) {
             return;
         }
         $this->changedData[$a] = $b;
@@ -80,7 +127,9 @@ class SESS
 
     public function addvar($a, $b)
     {
-        if ($this->data['vars'][$a] != $b) {
+        if (!isset($this->data['vars'][$a])
+            || $this->data['vars'][$a] !== $b
+        ) {
             $this->data['vars'][$a] = $b;
             $this->changedData['vars'] = serialize($this->data['vars']);
         }
@@ -88,7 +137,7 @@ class SESS
 
     public function delvar($a)
     {
-        if ($this->data['vars'][$a]) {
+        if (isset($this->data['vars'][$a])) {
             unset($this->data['vars'][$a]);
             $this->changedData['vars'] = serialize($this->data['vars']);
         }
@@ -112,37 +161,63 @@ class SESS
     {
         global $DB,$CFG,$PAGE,$JAX;
         $timeago = time() - $CFG['timetologout'];
-        if (!is_int($uid) || 1 > $uid) {
+        if (!is_numeric($uid) || 1 > $uid) {
             $uid = null;
         } else {
-            $result = $DB->safeselect('max(last_action)','session','WHERE uid=? GROUP BY uid',
-    $uid);
-            $la = $DB->row($result);
+            $result = $DB->safeselect(
+                'MAX(`last_action`) AS `last_action`',
+                'session',
+                'WHERE `uid`=? GROUP BY `uid`',
+                $uid
+            );
+            $la = $DB->arow($result);
             $DB->disposeresult($result);
             if ($la) {
-                $la = $la[0];
+                $la = $la['last_action'];
             }
-            $DB->safedelete('session', 'WHERE uid=? AND last_update<?', $DB->basicvalue($uid), $timeago);
+            $DB->safedelete(
+                'session',
+                'WHERE `uid`=? AND `last_update`<?',
+                $DB->basicvalue($uid),
+                $timeago
+            );
             // delete all expired tokens as well while we're here...
             $DB->safedelete(
                 'tokens',
-                'WHERE expires<=?',
+                'WHERE `expires`<=?',
                 $DB->basicvalue(date('Y-m-d H:i:s', time()))
             );
             $this->__set('readtime', $JAX->pick($la, 0));
         }
         $yesterday = mktime(0, 0, 0);
-        $query = $DB->safeselect('uid,max(last_action) last_action','session','WHERE last_update<? GROUP BY uid',
-    $yesterday);
-        while ($f = $DB->row($query)) {
+        $query = $DB->safeselect(
+            '`uid`,MAX(`last_action`) AS `last_action`',
+            'session',
+            'WHERE `last_update`<? GROUP BY uid',
+            $yesterday
+        );
+        while ($f = $DB->arow($query)) {
             if ($f['uid']) {
-                $DB->safeupdate('members', array('last_visit' => $f['last_action']), 'WHERE id=?', $f['uid']);
+                $DB->safeupdate(
+                    'members',
+                    array(
+                        'last_visit' => $f['last_action'],
+                    ),
+                    'WHERE `id`=?',
+                    $f['uid']
+                );
             }
         }
-        $DB->safespecial('DELETE FROM %t WHERE last_update<? OR (uid IS NULL AND last_update< ?)',
-    array('session'),
-    $yesterday,
-    $timeago);
+        $DB->safedelete(
+            'session',
+            <<<'EOT'
+WHERE `last_update`<?
+    OR (`uid` IS NULL AND `last_update`<?)
+EOT
+            ,
+            $yesterday,
+            $timeago
+        );
 
         return true;
     }
@@ -154,12 +229,22 @@ class SESS
         $id = $this->data['id'];
         $sd['last_update'] = time();
         if ($this->data['is_bot']) {
-            $sd['forumsread'] = $sd['topicsread'] = ''; //bots tend to read a lot of shit
+            //bots tend to read a lot of content
+            $sd['forumsread'] = $sd['topicsread'] = '';
         }
         if (!$this->data['last_action']) {
             $sd['last_action'] = time();
         }
-        $DB->safeupdate('session', $sd, 'WHERE id=?', $DB->basicvalue($id));
+        if (isset($sd['user'])) {
+            // this doesn't exist
+            unset($sd['user']);
+        }
+        $DB->safeupdate(
+            'session',
+            $sd,
+            'WHERE `id`=?',
+            $DB->basicvalue($id)
+        );
     }
 
     public function addSessID($html)
@@ -169,7 +254,11 @@ class SESS
             return $html;
         }
 
-        return preg_replace_callback("@href=['\"]?([^'\"]+)['\"]?@", array($this, 'addSessIDCB'), $html);
+        return preg_replace_callback(
+            "@href=['\"]?([^'\"]+)['\"]?@",
+            array($this, 'addSessIDCB'),
+            $html
+        );
     }
 
     public function addSessIDCB($m)

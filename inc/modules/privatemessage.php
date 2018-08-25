@@ -3,13 +3,11 @@
 new IM();
 class IM
 {
-    /* Redundant constructor unnecesary in newer PHP versions. */
-    /* function IM(){$this->__construct();} */
     public function __construct()
     {
         global $JAX,$DB,$PAGE,$SESS;
-        $im = $JAX->p['im_im'];
-        $uid = $JAX->p['im_uid'];
+        $im = isset($JAX->p['im_im']) ? $JAX->p['im_im'] : null;
+        $uid = isset($JAX->p['im_uid']) ? $JAX->p['im_uid'] : null;
         if ($SESS->runonce) {
             $this->filter();
         }
@@ -17,7 +15,7 @@ class IM
             $this->message($uid, $im);
         }
 
-        if ($JAX->b['im_menu']) {
+        if (isset($JAX->b['in_menu']) && $JAX->b['im_menu']) {
             $this->immenu($JAX->b['im_menu']);
         }
     }
@@ -29,8 +27,9 @@ class IM
             return;
         }
         $enemies = explode(',', $USER['enemies']);
-        //kinda gross I know, unparses then parses then unparses again later on.. o well
-        $exploded = explode("\n", $SESS->runonce);
+        //kinda gross I know, unparses then parses then
+        //unparses again later on.. o well
+        $exploded = explode(PHP_EOL, $SESS->runonce);
         foreach ($exploded as $k => $v) {
             $v = json_decode($v);
             if ('im' == $v[0]) {
@@ -43,7 +42,7 @@ class IM
                 }
             }
         }
-        $SESS->runonce = implode("\n", $exploded);
+        $SESS->runonce = implode(PHP_EOL, $exploded);
     }
 
     public function message($uid, $im)
@@ -51,8 +50,13 @@ class IM
         global $DB,$JAX,$PAGE,$SESS,$CFG,$USER,$PERMS;
         $SESS->act();
         $ud = $USER;
+        $e = '';
+        $fatal = false;
         if (false && in_array($uid, explode(',', $USER['enemies']))) {
-            return $PAGE->JS('error', "You've blocked this recipient and cannot send messages to them.");
+            return $PAGE->JS(
+                'error',
+                "You've blocked this recipient and cannot send messages to them."
+            );
         }
         if (!$ud) {
             return $PAGE->JS('error', 'You must be logged in to instant message!');
@@ -61,19 +65,32 @@ class IM
             return $PAGE->JS('error', 'You must have a recipient!');
         }
         if (!$PERMS['can_im']) {
-            return $PAGE->JS('error', "You don't have permission to use this feature.");
+            return $PAGE->JS(
+                'error',
+                "You don't have permission to use this feature."
+            );
         }
         $im = $JAX->linkify($im);
         $im = $JAX->theworks($im);
-        $cmd = array('im', $uid, $ud['display_name'], $im, $USER['id'], $JAX->smalldate(time(), 1));
+        $cmd = array(
+            'im',
+            $uid,
+            $ud['display_name'],
+            $im,
+            $USER['id'],
+            $JAX->smalldate(time(), 1),
+        );
         $PAGE->JSRawArray($cmd);
         $cmd[1] = $ud['id'];
         $cmd[4] = 0;
         $onlineusers = $DB->getUsersOnline();
-        if (!$onlineusers[$uid] || ($onlineusers[$uid]['last_update'] < (time() - $CFG['timetologout']))) {
-            $PAGE->JS('imtoggleoffline', $uid);
-        //$fatal=true;
-        } elseif ($onlineusers[$uid]['last_update'] < (time() - $CFG['updateinterval'] * 5)) {
+        $logoutTime = time() - $CFG['timetologout'];
+        $updateTime = time() - $CFG['updateinterval'] * 5;
+        if (!isset($onlineusers[$uid])
+            || !$onlineusers[$uid]
+            || $onlineusers[$uid]['last_update'] < $logoutTime
+            || $onlineusers[$uid]['last_update'] < $updateTime
+        ) {
             $PAGE->JS('imtoggleoffline', $uid);
         }
         if (!$fatal) {
@@ -91,9 +108,15 @@ class IM
         if (!is_numeric($uid)) {
             return;
         }
-        $result = $DB->safespecial('UPDATE %t SET runonce=concat(runonce,?) WHERE uid=? AND last_update> ?;',
+        $result = $DB->safespecial(
+            <<<'EOT'
+UPDATE %t
+SET `runonce`=CONCAT(`runonce`,?)
+WHERE `uid`=? AND `last_update`> ?
+EOT
+            ,
             array('session'),
-            $DB->basicvalue(json_encode($cmd)."\n"),
+            $DB->basicvalue(json_encode($cmd).PHP_EOL),
             $uid,
             (time() - $CFG['updateinterval'] * 5));
 
@@ -122,23 +145,31 @@ class IM
         global $PAGE,$JAX,$USER,$DB;
         if ($JAX->b['im_invitemenu']) {
             $online = $DB->getUsersOnline();
-            $result = $DB->safeselect('id,display_name name','members','WHERE id IN ? ORDER BY name ASC',
-    explode(',', $USER['friends']));
+            $result = $DB->safeselect(
+                '`id`,`display_name` AS `name`',
+                'members',
+                'WHERE `id` IN ? ORDER BY `name` ASC',
+                explode(',', $USER['friends'])
+            );
             $menu = '';
-            while ($f = $DB->row($result)) {
+            while ($f = $DB->arow($result)) {
                 if ($online[$f['id']] && $f['id'] != $id) {
                     $menu .= $f['name'].'<br />';
                 }
             }
             if (!$menu) {
                 if (!$USER['friends']) {
-                    $menu = 'You must add users to your contacts list<br />to use this feature.';
+                    $menu
+                        = 'You must add users to your contacts list<br />'.
+                        'to use this feature.';
                 } else {
                     $menu = 'None of your friends<br />are currently online';
                 }
             }
         } else {
-            $menu = "<a href='?act=vu${id}'>View Profile</a><br /><a href='?module=privatemessage&im_menu=${id}&im_invitemenu=1'>Add User to Chat</a>";
+            $menu = "<a href='?act=vu${id}'>View Profile</a><br />".
+                "<a href='?module=privatemessage&im_menu=${id}".
+                "&im_invitemenu=1'>Add User to Chat</a>";
         }
         $PAGE->JS('update', 'immenu', $menu);
         $PAGE->JS('softurl');
