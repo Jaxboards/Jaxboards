@@ -44,7 +44,7 @@ class themes
         $o = opendir(BOARDPATH.'Wrappers');
         while ($f = readdir($o)) {
             if ('.' != $f && '..' != $f) {
-                $wrappers[] = substr($f, 0, -4);
+                $wrappers[] = mb_substr($f, 0, -4);
             }
         }
         closedir($o);
@@ -78,7 +78,7 @@ class themes
                 $errorwrapper
                     = 'Wrapper name must consist of letters, numbers, '.
                     'spaces, and underscore.';
-            } elseif (strlen($JAX->p['newwrapper']) > 50) {
+            } elseif (mb_strlen($JAX->p['newwrapper']) > 50) {
                 $errorwrapper = 'Wrapper name must be less than 50 characters.';
             } elseif (file_exists($newWrapperPath)) {
                 $errorwrapper = 'That wrapper already exists.';
@@ -133,7 +133,7 @@ class themes
                     if (!is_dir(BOARDPATH.'Themes/'.$k)) {
                         continue;
                     }
-                    if (preg_match('@[^\\w ]@', $v) || strlen($v) > 50) {
+                    if (preg_match('@[^\\w ]@', $v) || mb_strlen($v) > 50) {
                         $errorskins
                             = 'Skin name must consist of letters, numbers, '.
                             'spaces, and underscore, and be under 50 '.
@@ -167,7 +167,7 @@ class themes
                     if (!is_file(BOARDPATH.'Wrappers/'.$k.'.txt')) {
                         continue;
                     }
-                    if (preg_match('@[^\\w ]@', $v) || strlen($v) > 50) {
+                    if (preg_match('@[^\\w ]@', $v) || mb_strlen($v) > 50) {
                         $errorwrapper
                             = 'Wrapper name must consist of letters, '.
                             'numbers, spaces, and underscore, and be under '.
@@ -334,7 +334,7 @@ EOT;
             );
         } else {
             if (isset($JAX->p['newwrapper'])) {
-                if (false === strpos($JAX->p['newwrapper'], '<!--FOOTER-->')) {
+                if (false === mb_strpos($JAX->p['newwrapper'], '<!--FOOTER-->')) {
                     $saved = $PAGE->error(
                         '&lt;!--FOOTER--&gt; must not be removed from the wrapper.'
                     );
@@ -366,7 +366,7 @@ EOT;
                 $e = 'No skin name supplied!';
             } elseif (preg_match('@[^\\w ]@', $JAX->p['skinname'])) {
                 $e = 'Skinname must only consist of letters, numbers, and spaces.';
-            } elseif (strlen($JAX->p['skinname']) > 50) {
+            } elseif (mb_strlen($JAX->p['skinname']) > 50) {
                 $e = 'Skin name must be less than 50 characters.';
             } elseif (is_dir(BOARDPATH.'Themes/'.$JAX->p['skinname'])) {
                 $e = 'A skin with that name already exists.';

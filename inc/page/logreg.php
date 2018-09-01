@@ -10,7 +10,7 @@ class LOGREG
     {
         global $JAX,$PAGE;
 
-        switch (substr($JAX->b['act'], 6)) {
+        switch (mb_substr($JAX->b['act'], 6)) {
         case 1:
             $this->register();
             break;
@@ -58,8 +58,8 @@ class LOGREG
                 $e = 'Name and display name required.';
             } elseif ($pass1 != $pass2) {
                 $e = 'The passwords do not match.';
-            } elseif (strlen($dispname) > 30
-                || strlen($name) > 30
+            } elseif (mb_strlen($dispname) > 30
+                || mb_strlen($name) > 30
             ) {
                 $e = 'Display name and username must be under 30 characters.';
             } elseif (($CFG['badnamechars']

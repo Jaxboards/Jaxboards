@@ -32,7 +32,11 @@ class SESS
         $isbot = 0;
         $r = array();
         foreach ($this->bots as $k => $v) {
-            if (false !== strpos(strtolower($_SERVER['HTTP_USER_AGENT']), $k)) {
+            if (false !== mb_strpos(
+                mb_strtolower($_SERVER['HTTP_USER_AGENT']),
+                $k
+            )
+            ) {
                 $sid = $v;
                 $isbot = 1;
             }

@@ -34,7 +34,7 @@ class INBOX
             return $PAGE->location('?');
         }
         if (is_numeric($JAX->p['messageid'])) {
-            switch (strtolower($JAX->p['page'])) {
+            switch (mb_strtolower($JAX->p['page'])) {
             case 'delete':
                 $this->delete($JAX->p['messageid']);
                 break;

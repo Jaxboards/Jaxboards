@@ -139,7 +139,7 @@ class groups
             return $this->updateperms($JAX->p['perm']);
         }
         if (preg_match('@[^\\d,]@', @$JAX->b['grouplist'])
-            || false !== strpos(@$JAX->b['grouplist'], ',,')
+            || false !== mb_strpos(@$JAX->b['grouplist'], ',,')
         ) {
             $JAX->b['grouplist'] = '';
         }
@@ -184,7 +184,7 @@ EOT
         if (!$numgroups) {
             die("Don't play with my variables!");
         }
-        $grouplist = substr($grouplist, 0, -1);
+        $grouplist = mb_substr($grouplist, 0, -1);
         $page = "<form action='?act=groups&do=perms' method='post'>
 <input type='hidden' name='grouplist' value='${grouplist}' />
 <div class='permcontainer'>* Starred are permissions not functional yet.
@@ -244,7 +244,7 @@ id='heading'>
                 'can_pm' => 'Can PM',
                 'can_im' => 'Can IM',
             ) as $k => $v) {
-            if ('breaker' == substr($k, 0, 7)) {
+            if ('breaker' == mb_substr($k, 0, 7)) {
                 $page .= "<tr><td class='breaker' colspan='".
                     (1 + $numgroups)."'>${v}</td></tr>";
             } else {
@@ -284,9 +284,9 @@ id='heading'>
         if (@$JAX->p['submit']) {
             if (!@$JAX->p['groupname']) {
                 $e = 'Group name required!';
-            } elseif (strlen($JAX->p['groupname']) > 250) {
+            } elseif (mb_strlen($JAX->p['groupname']) > 250) {
                 $e = 'Group name must not exceed 250 characters!';
-            } elseif (strlen($JAX->p['groupicon']) > 250) {
+            } elseif (mb_strlen($JAX->p['groupicon']) > 250) {
                 $e = 'Group icon must not exceed 250 characters!';
             } elseif ($JAX->p['groupicon'] && !$JAX->isurl($JAX->p['groupicon'])) {
                 $e = 'Group icon must be a valid image url';

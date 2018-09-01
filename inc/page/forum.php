@@ -286,7 +286,7 @@ EOT
                 $JAX->date($f['lp_date']), //7
                 $PAGE->meta('user-link', $f['lp_uid'], $f['lp_gid'], $f['lp_name']), //8
                 ($f['pinned'] ? 'pinned' : '').' '.($f['locked'] ? 'locked' : ''), //9
-                $f['summary'] ? $f['summary'].(strlen($f['summary']) > 45 ? '...' : '') : '', //10
+                $f['summary'] ? $f['summary'].(mb_strlen($f['summary']) > 45 ? '...' : '') : '', //10
                 $PERMS['can_moderate'] ? '<a href="?act=modcontrols&do=modt&tid='.$f['id'].'" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>' : '', //11
                 $pages, //12
                 ($read = $this->isTopicRead($f, $fid)) ? 'read' : 'unread', //13

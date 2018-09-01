@@ -17,12 +17,15 @@ class rssfeed
     public function publish()
     {
         $this->feed['pubDate'] = date('r');
-        echo '<?xml version="1.0" encoding="UTF-8" ?>'.
-       '<rss version="2.0">'.
-       '<channel>'.
-       $this->make_xml($this->feed).
-       '</channel>'.
-       '</rss>';
+        $xmlFeed = $this->make_xml($this->feed);
+        echo <<<EOT
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+    <channel>
+        ${xmlFeed}
+    </channel>
+</rss>
+EOT;
     }
 
     public function make_xml($array, $k2 = false)
@@ -35,7 +38,8 @@ class rssfeed
                     $r .= "<${k}>".$this->make_xml($v2)."</${k}>";
                 }
             } else {
-                $r .= "<${k}".('content' == $k ? ' type="html"' : '').'>'.(is_array($v) ? $this->make_xml($v, $k) : $v)."</${k}>";
+                $r .= "<${k}".('content' == $k ? ' type="html"' : '').'>'.
+                    (is_array($v) ? $this->make_xml($v, $k) : $v)."</${k}>";
             }
         }
 

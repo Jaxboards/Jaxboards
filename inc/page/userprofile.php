@@ -478,10 +478,10 @@ EOT
 
             $contactdetails = '';
             foreach ($udata as $k => $v) {
-                if ('contact_' == substr($k, 0, 8) && $v) {
-                    $contactdetails .= '<div class="contact '.substr($k, 8).
+                if ('contact_' == mb_substr($k, 0, 8) && $v) {
+                    $contactdetails .= '<div class="contact '.mb_substr($k, 8).
                         '"><a href="'.
-                        sprintf($this->contacturls[substr($k, 8)], $v).
+                        sprintf($this->contacturls[mb_substr($k, 8)], $v).
                         '">'.$v.'</a></div>';
                 }
             }

@@ -318,7 +318,7 @@ EOT
                 || !$JAX->p['pass']
             ) {
                 $e = 'All fields required.';
-            } elseif (strlen($JAX->p['username']) > 30
+            } elseif (mb_strlen($JAX->p['username']) > 30
                 || $JAX->p['displayname'] > 30
             ) {
                 $e = 'Display name and username must be under 30 characters.';
@@ -699,7 +699,7 @@ EOT
                         }
                         if (count($d) > 4) {
                             $iscomment = true;
-                        } elseif (count($d) < 4 && '.' != substr($v, -1)) {
+                        } elseif (count($d) < 4 && '.' != mb_substr($v, -1)) {
                             $iscomment = true;
                         } else {
                             foreach ($d as $v2) {
@@ -719,7 +719,7 @@ EOT
                             }
                             if (count($d) > 8) {
                                 $iscomment = true;
-                            } elseif (':' !== substr($v, -1)) {
+                            } elseif (':' !== mb_substr($v, -1)) {
                                 $iscomment = true;
                             } else {
                                 foreach ($d as $v2) {
@@ -819,7 +819,8 @@ EOT;
         if (isset($_POST['submit1'])) {
             $PAGE->writeCFG(
                 array(
-                    'membervalidation' => isset($_POST['v_enable']) && $_POST['v_enable'] ? 1 : 0,
+                    'membervalidation' => isset($_POST['v_enable'])
+                    && $_POST['v_enable'] ? 1 : 0,
                 )
             );
         }

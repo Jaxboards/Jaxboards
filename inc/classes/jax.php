@@ -288,7 +288,7 @@ EOT
         $emotepack = isset($CFG['emotepack']) ? $CFG['emotepack'] : null;
         if ($emotepack) {
             $emotepack = 'emoticons/'.$emotepack;
-            if ('/' != substr($emotepack, -1)) {
+            if ('/' != mb_substr($emotepack, -1)) {
                 $emotepack .= '/';
             }
             if (file_exists($emotepack.'rules.php')) {
@@ -360,7 +360,7 @@ EOT
             $emoticonlimit
         );
 
-        return substr($a, 1);
+        return mb_substr($a, 1);
     }
 
     public function emotecallback($a)
@@ -476,15 +476,62 @@ EOT
         $bbcodes = array(
             '@\\[b\\](.*)\\[/b\\]@Usi' => '<strong>$1</strong>',
             '@\\[i\\](.*)\\[/i\\]@Usi' => '<em>$1</em>',
-            '@\\[u\\](.*)\\[/u\\]@Usi' => '<span style="text-decoration:underline">$1</span>',
-            '@\\[s\\](.*)\\[/s\\]@Usi' => '<span style="text-decoration:line-through">$1</span>',
-            '@\\[blink\\](.*)\\[/blink\\]@Usi' => '<span style="text-decoration:blink">$1</span>',
-            '@\\[url=(http|ftp|\\?|mailto:)([^\\]]+)\\](.+?)\\[/url\\]@i' => '<a href="$1$2" rel="nofollow">$3</a>',
-            '@\\[spoiler\\](.*)\\[/spoiler\\]@Usi' => '<span class="spoilertext">$1</span>',
-            '@\\[url\\](http|ftp|\\?)(.*)\\[/url\\]@Ui' => '<a href="$1$2" rel="nofollow">$1$2</a>',
-            '@\\[font=([\\s\\w]+)](.*)\\[/font\\]@Usi' => '<span style="font-family:$1">$2</span>',
-            '@\\[color=(#?[\\s\\w\\d]+|rgb\\([\\d, ]+\\))\\](.*)\\[/color\\]@Usi' => '<span style="color:$1">$2</span>',
-            '@\\[(bg|bgcolor|background)=(#?[\\s\\w\\d]+)\\](.*)\\[/\\1\\]@Usi' => '<span style="background:$2">$3</span>',
+            '@\\[u\\](.*)\\[/u\\]@Usi' => <<<'EOT'
+<span style="text-decoration:underline">
+    $1
+</span>
+EOT
+            ,
+            '@\\[s\\](.*)\\[/s\\]@Usi' => <<<'EOT'
+<span style="text-decoration:line-through">
+    $1
+</span>
+EOT
+            ,
+            '@\\[blink\\](.*)\\[/blink\\]@Usi' => <<<'EOT'
+<span style="text-decoration:blink">
+    $1
+</span>
+EOT
+            ,
+            '@\\[url=(http|ftp|\\?|mailto:)([^\\]]+)\\](.+?)\\[/url\\]@i' => <<<'EOT'
+<a href="$1$2" rel="nofollow">
+    $3
+</a>
+EOT
+            ,
+            '@\\[spoiler\\](.*)\\[/spoiler\\]@Usi' => <<<'EOT'
+<span class="spoilertext">
+    $1
+</span>
+EOT
+            ,
+            '@\\[url\\](http|ftp|\\?)(.*)\\[/url\\]@Ui' => <<<'EOT'
+<a href="$1$2" rel="nofollow">
+    $1$2
+</a>
+EOT
+            ,
+            '@\\[font=([\\s\\w]+)](.*)\\[/font\\]@Usi' => <<<'EOT'
+<span style="font-family:$1">
+    $2
+</span>
+EOT
+            ,
+            '@\\[color=(#?[\\s\\w\\d]+|rgb\\([\\d, ]+\\))\\]'.
+                '(.*)\\[/color\\]@Usi' => <<<'EOT'
+<span style="color:$1">
+    $2
+</span>
+EOT
+            ,
+            '@\\[(bg|bgcolor|background)=(#?[\\s\\w\\d]+)\\]'.
+                '(.*)\\[/\\1\\]@Usi' => <<<'EOT'
+<span style="background:$2">
+    $3
+</span>
+EOT
+            ,
         );
 
         if (!$minimal) {
@@ -555,12 +602,12 @@ EOT
 
     public function bbcode_videocallback($m)
     {
-        if (false !== strpos($m[1], 'youtube')) {
+        if (false !== mb_strpos($m[1], 'youtube')) {
             preg_match('@t=(\\d+m)?(\\d+s)?@', $m[0], $time);
             preg_match('@v=([\\w-]+)@', $m[1], $m);
             if ($time) {
-                $m[2] = (($time[1] ? substr($time[1], 0, -1) * 60 : 0) +
-                    substr($time[2], 0, -1));
+                $m[2] = (($time[1] ? mb_substr($time[1], 0, -1) * 60 : 0) +
+                    mb_substr($time[2], 0, -1));
             }
 
             $youtubeLink = 'https://www.youtube.com/watch?v='.
@@ -602,7 +649,7 @@ EOT
 </div>
 EOT;
         }
-        if (false !== strpos($m[1], 'vimeo')) {
+        if (false !== mb_strpos($m[1], 'vimeo')) {
             preg_match('@(?:vimeo.com|video)/(\\d+)@', $m[1], $id);
 
             $vimeoLink = 'https://vimeo.com/'.$id[1];
@@ -693,7 +740,7 @@ EOT
         if (1 == count($ext)) {
             $ext = '';
         } else {
-            $ext = strtolower(array_pop($ext));
+            $ext = mb_strtolower(array_pop($ext));
         }
         if (!in_array($ext, $CFG['images'])) {
             $ext = '';
@@ -870,7 +917,7 @@ EOT
         }
         foreach ($this->ipbancache as $v) {
             if ((':' === mb_substr($v, -1) || '.' === mb_substr($v, -1))
-                && mb_strtolower(mb_substr($ip, 0, strlen($v))) === $v
+                && mb_strtolower(mb_substr($ip, 0, mb_strlen($v))) === $v
             ) {
                 return $v;
             }
@@ -972,7 +1019,7 @@ EOT
 
     public function rmdir($dir)
     {
-        if ('/' != substr($dir, -1)) {
+        if ('/' != mb_substr($dir, -1)) {
             $dir .= '/';
         }
         foreach (glob($dir.'*') as $v) {

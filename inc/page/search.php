@@ -254,7 +254,7 @@ EOT
                     $ids .= $id['id'].',';
                 }
             }
-            $ids = substr($ids, 0, -1);
+            $ids = mb_substr($ids, 0, -1);
             $SESS->addvar('search', $ids);
             $SESS->addvar('searcht', $termraw);
             $this->pagenum = 1;
@@ -333,7 +333,7 @@ EOT
 
             $omitted = array();
             foreach ($terms as $v) {
-                if (strlen($v) < 3) {
+                if (mb_strlen($v) < 3) {
                     $omitted[] = $v;
                 }
             }

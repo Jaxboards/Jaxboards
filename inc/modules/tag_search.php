@@ -1,7 +1,12 @@
 <?php
 
-$onsubmit = 'return RUN.stream.location('.
-'\'act=search&searchterm=\'+encodeURIComponent(this.searchterm.value),3)';
+$onsubmit = <<<'EOT'
+return RUN.stream.location(
+    'act=search&searchterm='+encodeURIComponent(this.searchterm.value),
+    3
+);
+EOT;
+
 $PAGE->append(
     'search',
     <<<EOT

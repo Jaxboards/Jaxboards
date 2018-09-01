@@ -76,14 +76,14 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $errors[] = 'There was an error connecting to the MySQL database.';
     }
 
-    $JAX->p['boardurl'] = strtolower($JAX->b['boardurl']);
+    $JAX->p['boardurl'] = mb_strtolower($JAX->b['boardurl']);
     if (!$JAX->p['boardurl']
         || !$JAX->p['username']
         || !$JAX->p['password']
         || !$JAX->p['email']
     ) {
         $errors[] = 'all fields required.';
-    } elseif (strlen($JAX->p['boardurl']) > 30) {
+    } elseif (mb_strlen($JAX->p['boardurl']) > 30) {
         $errors[] = 'board url too long';
     } elseif ('www' == $JAX->p['boardurl']) {
         $errors[] = 'WWW is reserved.';
@@ -108,7 +108,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $errors[] = 'invalid email';
     }
 
-    if (strlen($JAX->p['username']) > 50) {
+    if (mb_strlen($JAX->p['username']) > 50) {
         $errors[] = 'username too long';
     } elseif (preg_match('@\\W@', $JAX->p['username'])) {
         $errors[] = 'username needs to consist of letters, '.

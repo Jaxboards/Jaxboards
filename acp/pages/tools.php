@@ -47,7 +47,7 @@ EOT
             $f = $DB->arow($result);
             $DB->disposeresult($result);
             if ($f) {
-                $ext = strtolower(array_pop(explode('.', $f['name'])));
+                $ext = mb_strtolower(array_pop(explode('.', $f['name'])));
                 if (in_array($ext, array('jpg', 'jpeg', 'png', 'gif', 'bmp'))) {
                     $f['hash'] .= '.'.$ext;
                 }
@@ -115,7 +115,7 @@ EOT
         while ($file = $DB->arow($result)) {
             $filepieces = explode('.', $file['name']);
             if (count($filepieces) > 1) {
-                $ext = strtolower(array_pop($filepieces));
+                $ext = mb_strtolower(array_pop($filepieces));
             }
             if (in_array($ext, $CFG['images'])) {
                 $file['name'] = '<a href="'.
@@ -167,7 +167,7 @@ EOT
                 echo "SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';".PHP_EOL;
                 echo PHP_EOL;
                 foreach ($tables as $f) {
-                    $f[0] = substr(strstr($f[0], '_'), 1);
+                    $f[0] = mb_substr(mb_strstr($f[0], '_'), 1);
                     $page .= $f[0];
                     echo PHP_EOL.'-- '.$f[0].PHP_EOL.PHP_EOL;
                     $createtable = $DB->safespecial(

@@ -19,7 +19,11 @@ $PAGE->metadefs['arcade-index-row'] = <<<'EOT'
         </div>
     </td>
     <td class="last_post" colspan="2">
-        Top Score: %s - <strong>%s</strong><br />
+        Top Score: %s -
+        <strong>
+            %s
+        </strong>
+        <br />
         <a href="?act=arcade&amp;scores=%2$s">
             View all scores
         </a>
@@ -37,8 +41,6 @@ EOT;
 new arcade();
 class arcade
 {
-    /* Redundant constructor unnecesary in newer PHP versions. */
-    /* function arcade(){$this->__construct();} */
     public function __construct()
     {
         global $JAX,$SESS;

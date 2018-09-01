@@ -82,7 +82,7 @@ class SHOUTBOX
         if (!$this->canDelete(0, $row)) {
             $deletelink = '';
         }
-        if ('/me ' == substr($shout, 0, 4)) {
+        if ('/me ' == mb_substr($shout, 0, 4)) {
             $shout = $PAGE->meta(
                 'shout-action',
                 $JAX->smalldate(
@@ -90,7 +90,7 @@ class SHOUTBOX
                     1
                 ),
                 $user,
-                substr(
+                mb_substr(
                     $shout,
                     3
                 ),
@@ -309,7 +309,7 @@ EOT
         $perms = $JAX->getPerms();
         if (!$perms['can_shout']) {
             $e = 'You do not have permission to shout!';
-        } elseif (strlen($shout) > 300) {
+        } elseif (mb_strlen($shout) > 300) {
             $e = 'Shout must be less than 300 characters.';
         }
         if ($e) {

@@ -339,7 +339,7 @@ EOT
             $PAGE->JS('onlinelist', $list);
         }
         $oldcache = implode(',', array_flip($oldcache));
-        $newcache = substr($newcache, 0, -1);
+        $newcache = mb_substr($newcache, 0, -1);
         if ($oldcache) {
             $PAGE->JS('setoffline', $oldcache);
         }

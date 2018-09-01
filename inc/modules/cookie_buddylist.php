@@ -1,7 +1,33 @@
 <?php
 
-$PAGE->metadefs['buddylist-contacts'] = '<div class="contacts"><form method="?" onsubmit="return RUN.submitForm(this)">'.$JAX->hiddenFormFields(array('module' => 'buddylist')).'<a href="?act=logreg5" onclick="return RUN.stream.location(this.href)" id="status" class="%s"></a><input style="width:100%%;padding-left:20px;" type="text" name="status" onblur="this.form.onsubmit()" value="%s"/>%s</div>';
-$PAGE->metadefs['buddylist-contact'] = '<div onclick="IMWindow(%1$s,\'%2$s\')" oncontextmenu="RUN.stream.location(\'?act=vu%1$s\');return false;" class="contact %3$s" ><div class="avatar"><img src="%4$s" /></div><div class="name">%2$s</div><div class="status">%5$s</div></div>';
+$buddylist = $JAX->hiddenFormFields(array('module' => 'buddylist'));
+$PAGE->metadefs['buddylist-contacts'] = <<<EOT
+<div class="contacts">
+    <form method="?" onsubmit="return RUN.submitForm(this)">
+        ${buddylist}
+        <a href="?act=logreg5" onclick="return RUN.stream.location(this.href)"
+            id="status" class="%s">
+        </a>
+        <input style="width:100%%;padding-left:20px;" type="text" name="status"
+            onblur="this.form.onsubmit()" value="%s"/>
+        %s
+</div>
+EOT;
+$PAGE->metadefs['buddylist-contact'] = <<<'EOT'
+<div onclick="IMWindow(%1$s,'%2$s')"
+    oncontextmenu="RUN.stream.location('?act=vu%1$s');return false;"
+    class="contact %3$s">
+    <div class="avatar">
+        <img src="%4$s" />
+    </div>
+    <div class="name">
+        %2$s
+    </div>
+    <div class="status">
+        %5$s
+    </div>
+</div>
+EOT;
 new buddylist();
 class buddylist
 {
@@ -28,7 +54,10 @@ class buddylist
                 return;
             }
 
-            return $PAGE->JS('error', 'Sorry, you must be logged in to use this feature.');
+            return $PAGE->JS(
+                'error',
+                'Sorry, you must be logged in to use this feature.'
+            );
         }
         if (isset($JAX->b['add']) && $JAX->b['add']) {
             $this->addbuddy($JAX->b['add']);
@@ -159,7 +188,8 @@ EOT
         }
 
         if (!$user) {
-            $e = 'This user does not exist, and therefore could not be added to your contacts list.';
+            $e = 'This user does not exist, and therefore could '.
+                'not be added to your contacts list.';
         } elseif (in_array($uid, explode(',', $friends))) {
             $e = 'This user is already in your contacts list.';
         }

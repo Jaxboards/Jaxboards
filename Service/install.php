@@ -145,7 +145,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $errors[] = 'invalid email';
     }
 
-    if (strlen($JAX->p['admin_username']) > 50) {
+    if (mb_strlen($JAX->p['admin_username']) > 50) {
         $errors[] = 'Admin username is too long';
     } elseif (preg_match('@\\W@', $JAX->p['admin_username'])) {
         $errors[] = 'Admin username needs to consist of letters,'.

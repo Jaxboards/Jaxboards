@@ -154,12 +154,12 @@ EOT
             return;
         }
         foreach ($tree as $k => $v) {
-            $k = substr($k, 1);
+            $k = mb_substr($k, 1);
             ++$x;
             $p2 = $p.$k.' ';
             sscanf($p2, 'c_%d', $cat);
             //$f=$p;
-            $f = trim(strstr($p, ' '));
+            $f = trim(mb_strstr($p, ' '));
             if (is_array($v)) {
                 self::mysqltree($v, $p2.' ', $x);
             }
@@ -533,7 +533,7 @@ EOT
                     ' <a href="?act=forums&edit='.$fid.'&rmod='.$f['id'].
                     '">X</a>, ';
             }
-            $moderators .= substr($mods, 0, -2);
+            $moderators .= mb_substr($mods, 0, -2);
         } else {
             $moderators .= 'No forum-specific moderators added!';
         }

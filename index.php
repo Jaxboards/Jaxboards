@@ -332,7 +332,7 @@ foreach (glob('inc/modules/*.php') as $v) {
 }
 
 //looks like it's straight out of IPB, doesn't it
-$actraw = isset($JAX->b['act']) ? strtolower($JAX->b['act']) : '';
+$actraw = isset($JAX->b['act']) ? mb_strtolower($JAX->b['act']) : '';
 preg_match('@^[a-zA-Z_]+@', $actraw, $act);
 $act = array_shift($act);
 $actdefs = array(

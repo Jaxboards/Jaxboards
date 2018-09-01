@@ -109,7 +109,7 @@ class POST
         if (1 == count($ext)) {
             $ext = '';
         } else {
-            $ext = strtolower(array_pop($ext));
+            $ext = mb_strtolower(array_pop($ext));
         }
         if (!in_array($ext, $CFG['images'])) {
             $ext = '';
@@ -436,7 +436,7 @@ onclick="this.form.submitButton=this"/></div>
         if ($this->postdata) {
             if (!$this->nopost && '' === trim($this->postdata)) {
                 $e = "You didn't supply a post!";
-            } elseif (strlen($this->postdata) > 65535) {
+            } elseif (mb_strlen($this->postdata) > 65535) {
                 $e = 'Post must not exceed 65,535 bytes.';
             }
         }
@@ -491,7 +491,7 @@ EOT
                         array(
                             'title' => $JAX->blockhtml($JAX->p['ttitle']),
                             'subtitle' => $JAX->blockhtml($JAX->p['tdesc']),
-                            'summary' => substr(
+                            'summary' => mb_substr(
                                 preg_replace(
                                     '@\\s+@',
                                     ' ',
@@ -556,7 +556,7 @@ EOT
 
         if (!$this->nopost && '' === trim($postdata)) {
             $e = "You didn't supply a post!";
-        } elseif (strlen($postdata) > 50000) {
+        } elseif (mb_strlen($postdata) > 50000) {
             $e = 'Post must not exceed 50,000 characters.';
         }
 
@@ -568,11 +568,11 @@ EOT
             ) {
                 $e = "You didn't specify a topic title!";
             } elseif (isset($JAX->p['ttitle'])
-                && strlen($JAX->p['ttitle']) > 255
+                && mb_strlen($JAX->p['ttitle']) > 255
             ) {
                 $e = 'Topic title must not exceed 255 characters';
             } elseif (isset($JAX->p['subtitle'])
-                && strlen($JAX->p['subtitle']) > 255
+                && mb_strlen($JAX->p['subtitle']) > 255
             ) {
                 $e = 'Subtitle must not exceed 255 characters';
             } elseif (isset($JAX->p['poll_type']) && $JAX->p['poll_type']) {
@@ -640,7 +640,7 @@ EOT;
                             $JAX->blockhtml($JAX->p['pollq']) : '',
                         'poll_choices' => isset($pollchoices) && $pollchoices ?
                         $JAX->json_encode($pollchoices) : '',
-                        'summary' => substr(
+                        'summary' => mb_substr(
                             preg_replace(
                                 '@\\s+@',
                                 ' ',

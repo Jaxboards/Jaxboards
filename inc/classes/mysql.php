@@ -175,7 +175,7 @@ class MySQL
             $r .= $this->eKey($k).'='.$this->evalue($v).',';
         }
 
-        return substr($r, 0, -1);
+        return mb_substr($r, 0, -1);
     }
 
     public function safedelete($table, $whereformat /*, ... */)
@@ -323,10 +323,10 @@ class MySQL
                     $query_string = $this->safequery_sub_array(
                         $query_string,
                         $i + $added_placeholders,
-                        strlen($type)
+                        mb_strlen($type)
                     );
 
-                    $added_placeholders += strlen($type) - 1;
+                    $added_placeholders += mb_strlen($type) - 1;
 
                     foreach ($value as $singlevalue) {
                         if (null === $singlevalue) {
@@ -367,7 +367,7 @@ class MySQL
             if (!$method->invokeArgs($stmt, $refvalues)) {
                 syslog(LOG_ERR, 'BIND PARAMETERS FAILED'.PHP_EOL);
                 syslog(LOG_ERR, "QUERYSTRING: ${query_string}".PHP_EOL);
-                syslog(LOG_ERR, 'ELEMENTCOUNT: '.strlen($typestring));
+                syslog(LOG_ERR, 'ELEMENTCOUNT: '.mb_strlen($typestring));
                 syslog(LOG_ERR, 'BINDVARCOUNT: '.(count($refvalues[1])));
                 syslog(LOG_ERR, 'QUERYARGS: '.print_r($out_args, true).PHP_EOL);
                 syslog(LOG_ERR, 'REFVALUES: '.print_r($refvalues, true).PHP_EOL);

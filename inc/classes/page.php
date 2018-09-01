@@ -42,7 +42,7 @@ class PAGE
         if ('SCRIPT' == $a && $this->mobile) {
             return;
         }
-        $a = strtoupper($a);
+        $a = mb_strtoupper($a);
         if (!$this->jsaccess || 'TITLE' == $a) {
             if (!isset($this->parts[$a])) {
                 return $this->reset($a, $b);
@@ -65,7 +65,7 @@ class PAGE
     public function prepend($a, $b)
     {
         if (!$this->jsaccess) {
-            $a = strtoupper($a);
+            $a = mb_strtoupper($a);
             if (!isset($this->parts[$a])) {
                 return $this->reset($a, $b);
             }
@@ -78,7 +78,7 @@ class PAGE
     {
         global $PAGE,$SESS,$JAX;
         if (empty($JAX->c) && '?' == $a[0]) {
-            $a = '?sessid='.$SESS->data['id'].'&'.substr($a, 1);
+            $a = '?sessid='.$SESS->data['id'].'&'.mb_substr($a, 1);
         }
         if ($PAGE->jsaccess) {
             $PAGE->JS('location', $a);
@@ -89,7 +89,7 @@ class PAGE
 
     public function reset($a, $b = '')
     {
-        $a = strtoupper($a);
+        $a = mb_strtoupper($a);
         $this->parts[$a] = $b;
     }
 
@@ -145,9 +145,9 @@ class PAGE
         } else {
             $autobox = array('PAGE', 'COPYRIGHT', 'USERBOX');
             foreach ($this->parts as $k => $v) {
-                $k = strtoupper($k);
+                $k = mb_strtoupper($k);
                 if (in_array($k, $autobox)) {
-                    $v = '<div id="'.strtolower($k).'">'.$v.'</div>';
+                    $v = '<div id="'.mb_strtolower($k).'">'.$v.'</div>';
                 }
                 if ('PATH' == $k) {
                     $this->template
@@ -333,7 +333,7 @@ class PAGE
 
     public function metaextendedifcb($m)
     {
-        if (false !== strpos($m[1], '||')) {
+        if (false !== mb_strpos($m[1], '||')) {
             $s = '||';
         } else {
             $s = '&&';
@@ -364,7 +364,7 @@ class PAGE
 
     public function checkextended($meta = null, $data)
     {
-        if (false !== strpos($data, '{if ')) {
+        if (false !== mb_strpos($data, '{if ')) {
             if ($meta) {
                 $this->moreFormatting[$meta] = true;
             } else {
@@ -453,6 +453,6 @@ class PAGE
             http_build_query($settings['flashvars']).
             '" allowScriptAccess="always"></embed>';
 
-        return stristr('msie', $_SERVER['HTTP_USER_AGENT']) ? $object : $embed;
+        return mb_stristr('msie', $_SERVER['HTTP_USER_AGENT']) ? $object : $embed;
     }
 }

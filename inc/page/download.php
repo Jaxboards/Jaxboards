@@ -35,7 +35,7 @@ EOT
             if (1 == count($ext)) {
                 $ext = '';
             } else {
-                $ext = strtolower(array_pop($ext));
+                $ext = mb_strtolower(array_pop($ext));
             }
             if (in_array($ext, array('jpeg', 'jpg', 'png', 'gif', 'bmp'))) {
                 $data['hash'] .= '.'.$ext;

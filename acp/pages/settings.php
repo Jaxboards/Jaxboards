@@ -76,7 +76,8 @@ class settings
                 $write = array();
                 $write['boardname'] = $JAX->p['boardname'];
                 $write['logourl'] = $JAX->p['logourl'];
-                $write['boardoffline'] = isset($JAX->p['boardoffline']) && $JAX->p['boardoffline'] ? '0' : '1';
+                $write['boardoffline'] = isset($JAX->p['boardoffline'])
+                    && $JAX->p['boardoffline'] ? '0' : '1';
                 $write['offlinetext'] = $JAX->p['offlinetext'];
                 $PAGE->writeCFG($write);
                 $page .= $PAGE->success('Settings saved!');
@@ -146,7 +147,7 @@ EOT;
             if ($newact != $JAX->b['page']) {
                 $e = 'The page URL must contain only letters and numbers. '.
                     "Invalid characters: ${newact}";
-            } elseif (strlen($newact) > 25) {
+            } elseif (mb_strlen($newact) > 25) {
                 $e = 'The page URL cannot exceed 25 characters.';
             } else {
                 return $this->pages_edit($newact);
@@ -367,7 +368,7 @@ EOT;
         $page = $table = '';
         $e = '';
         if (@$JAX->p['submit']) {
-            if (strlen($JAX->p['domain']) > 100) {
+            if (mb_strlen($JAX->p['domain']) > 100) {
                 $e = 'Domain must be less than 100 characters';
             } elseif (preg_match('@[^\\w.]@', $JAX->p['domain'])) {
                 $e = 'Please enter a valid domain.';

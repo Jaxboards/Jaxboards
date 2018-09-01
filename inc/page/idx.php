@@ -148,7 +148,7 @@ EOT
             $r .= $this->moderatorinfo[$v].$PAGE->meta('idx-ledby-splitter');
         }
 
-        return substr($r, 0, -strlen($PAGE->meta('idx-ledby-splitter')));
+        return mb_substr($r, 0, -mb_strlen($PAGE->meta('idx-ledby-splitter')));
     }
 
     public function buildTable($a)
@@ -202,8 +202,8 @@ EOT
                     $sf ?
                     $PAGE->meta(
                         'idx-subforum-wrapper',
-                        substr(
-                            $sf, 0, -1 * strlen(
+                        mb_substr(
+                            $sf, 0, -1 * mb_strlen(
                                 $PAGE->meta('idx-subforum-splitter')
                             )
                         )
@@ -304,7 +304,7 @@ EOT;
             $userstoday .= ', ';
             ++$nuserstoday;
         }
-        $userstoday = substr($userstoday, 0, -2);
+        $userstoday = mb_substr($userstoday, 0, -2);
         $usersonline = $this->getusersonlinelist();
         $result = $DB->safeselect(
             '`id`,`title`',
@@ -411,7 +411,7 @@ EOT;
         if (isset($oldcache) && !empty($oldcache)) {
             $PAGE->JS('setoffline', implode(',', array_flip($oldcache)));
         }
-        $SESS->users_online_cache = substr($useronlinecache, 0, -1);
+        $SESS->users_online_cache = mb_substr($useronlinecache, 0, -1);
         if (!empty($list)) {
             $PAGE->JS('onlinelist', $list);
         }

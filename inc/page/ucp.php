@@ -70,7 +70,7 @@ EOT
             if (isset($JAX->p['messageid'])
                 && is_numeric($JAX->p['messageid'])
             ) {
-                switch (strtolower($JAX->p['page'])) {
+                switch (mb_strtolower($JAX->p['page'])) {
                 case 'delete':
                     $this->delete($JAX->p['messageid']);
                     break;
@@ -128,7 +128,7 @@ EOT
         global $PAGE,$JAX,$USER,$DB;
         $e = '';
         if (isset($JAX->p['ucpnotepad']) && $JAX->p['ucpnotepad']) {
-            if (strlen($JAX->p['ucpnotepad']) > 2000) {
+            if (mb_strlen($JAX->p['ucpnotepad']) > 2000) {
                 $e = 'The UCP notepad cannot exceed 2000 characters.';
                 $PAGE->JS('error', $e);
             } else {
@@ -491,7 +491,7 @@ EOT;
                 'usertitle' => 'User Title',
                 'location' => 'Location',
             ) as $k => $v) {
-                if (false !== strstr($k, 'contact')
+                if (false !== mb_strstr($k, 'contact')
                     && preg_match('/[^\\w.@]/', $data[$k])
                 ) {
                     $error = "Invalid characters in ${v}";
@@ -499,7 +499,7 @@ EOT;
 
                 $data[$k] = $JAX->blockhtml($data[$k]);
                 $length = 'display_name' == $k ? 30 : ('location' == $k ? 100 : 50);
-                if (strlen($data[$k]) > $length) {
+                if (mb_strlen($data[$k]) > $length) {
                     $error = "${v} must be less than ${length} characters.";
                 }
             }
