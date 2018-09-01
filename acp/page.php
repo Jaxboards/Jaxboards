@@ -59,6 +59,8 @@ class PAGE
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
   <link rel="stylesheet" type="text/css" href="'.BOARDURL.'Service/acp/Theme/css.css" />
   <link rel="stylesheet" type="text/css" href="'.BOARDURL.'Service/Themes/Default/bbcode.css" />
+  <link rel="stylesheet" type="text/css"
+    href="'.BOARDURL.'acp/css/themes.css"/>
   <script type="text/javascript" src="'.BOARDURL.'Service/jsnew.js"></script>
   <script type="text/javascript" src="'.BOARDURL.'Service/acp/Script/admin.js"></script>
   <title><% TITLE %></title>

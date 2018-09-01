@@ -1,6 +1,1 @@
-{
-	"devDependencies": {
-		"csscomb": "^4.2.0",
-		"js-beautify": "^1.7.5"
-	}
-}
+{"devDependencies":{"prettier":"^1.14.2","stylelint":"^9.5.0","stylelint-config-standard":"^18.2.0"}}

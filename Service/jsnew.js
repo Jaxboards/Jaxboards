@@ -23,10 +23,10 @@ Math.rand = function(a, b) {
 };
 
 function $() {
-  var x,
-    l,
-    r = [],
-    a = arguments;
+  var x;
+  var l;
+  var r = [];
+  var a = arguments;
   for (x = 0, l = a.length; x < l; x++) {
     if (typeof a[x] == "string") {
       r.push(document.getElementById(arguments[x]));
@@ -57,12 +57,12 @@ function addEvent(obj, att, set) {
 }
 
 function $$(s, base) {
-  var x,
-    y,
-    s = s.split(" "),
-    l = s.length,
-    curel = [],
-    base = base || document;
+  var x;
+  var y;
+  var s = s.split(" ");
+  var l = s.length;
+  var curel = [];
+  var base = base || document;
   for (var y = 0; y < l; y++) {
     s[y].match(/([\#.]?)(.+)/);
     switch (RegExp.$1) {
@@ -72,20 +72,22 @@ function $$(s, base) {
       case ".":
         curel2 = curel;
         curel = [];
-        if (curel2.length)
-          for (x = 0; x < curel2.length; x++)
+        if (curel2.length) {
+          for (x = 0; x < curel2.length; x++) {
             curel = curel.concat(
               JAX.el.getElementsByClassName(curel2[x] || base, RegExp.$2)
             );
-        else curel = JAX.el.getElementsByClassName(base, RegExp.$2);
+          }
+        } else curel = JAX.el.getElementsByClassName(base, RegExp.$2);
         break;
       default:
         curel2 = curel;
         curel = [];
-        if (curel2.length)
-          for (x = 0; x < curel2.length; x++)
+        if (curel2.length) {
+          for (x = 0; x < curel2.length; x++) {
             curel = curel.concat(curel2[x].getElementsByTagName(RegExp.$2));
-        else curel = base.getElementsByTagName(RegExp.$2);
+          }
+        } else curel = base.getElementsByTagName(RegExp.$2);
         break;
     }
     if (!curel[0]) break;
@@ -113,36 +115,36 @@ var JAX = new function() {
     return a;
   });
 
-  var d = document,
-    dE = document.documentElement,
-    JAX = this;
+  var d = document;
+  var dE = document.documentElement;
+  var JAX = this;
 
   this.date = function(a) {
-    var old = new Date(),
-      now = new Date(),
-      fmt,
-      hours,
-      mins,
-      delta,
-      ampm,
-      yday = new Date(),
-      dstr,
-      months = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec"
-      ];
+    var old = new Date();
+    var now = new Date();
+    var fmt;
+    var hours;
+    var mins;
+    var delta;
+    var ampm;
+    var yday = new Date();
+    var dstr;
+    var months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ];
     yday.setTime(yday - 1000 * 60 * 60 * 24);
-    old.setTime(a * 1000); //setTime uses milliseconds, we'll be using UNIX Times as the argument
+    old.setTime(a * 1000); // setTime uses milliseconds, we'll be using UNIX Times as the argument
     hours = old.getHours();
     mins = old.getMinutes();
     ampm = hours >= 12 ? "pm" : "am";
@@ -155,14 +157,14 @@ var JAX = new function() {
     else if (
       now.getDate() + " " + now.getMonth() + " " + now.getFullYear() ==
       dstr
-    )
+    ) {
       fmt = "Today @ " + hours + ":" + JAX.prepad(mins, 2) + " " + ampm;
-    else if (
+    } else if (
       yday.getDate() + " " + yday.getMonth() + " " + yday.getFullYear() ==
       dstr
-    )
+    ) {
       fmt = "Yesterday @ " + hours + ":" + JAX.prepad(mins, 2) + " " + ampm;
-    else
+    } else {
       fmt =
         months[old.getMonth()] +
         " " +
@@ -175,13 +177,14 @@ var JAX = new function() {
         JAX.prepad(mins, 2) +
         " " +
         ampm;
+    }
     return fmt;
   };
 
   this.smalldate = function(a) {
-    var d = new Date(),
-      h,
-      ampm;
+    var d = new Date();
+    var h;
+    var ampm;
     d.setTime(a * 1000);
     h = d.getHours();
     ampm = h >= 12 ? "pm" : "am";
@@ -230,12 +233,12 @@ var JAX = new function() {
         return false;
       }
     };
-    var d = $("autocomplete"),
-      coords = JAX.el.getCoordinates(el),
-      els,
-      sindex,
-      x,
-      l = 0;
+    var d = $("autocomplete");
+    var coords = JAX.el.getCoordinates(el);
+    var els;
+    var sindex;
+    var x;
+    var l = 0;
     if (!d) {
       d = document.createElement("div");
       d.id = "autocomplete";
@@ -246,11 +249,12 @@ var JAX = new function() {
       d.style.display = "";
       els = d.getElementsByTagName("div");
       l = els.length || 0;
-      for (x = 0; x < l; x++)
+      for (x = 0; x < l; x++) {
         if (JAX.el.hasClass(els[x], "selected")) {
           sindex = x;
           break;
         }
+      }
     }
     d.style.top = coords.yh + "px";
     d.style.left = coords.x + "px";
@@ -277,7 +281,8 @@ var JAX = new function() {
           "misc/listloader.php?" +
           a,
         function(xml) {
-          var x, tmp;
+          var x;
+          var tmp;
           xml = eval(xml.responseText);
           d.innerHTML = "";
           for (x = 0; x < xml[0].length; x++) {
@@ -333,19 +338,19 @@ var JAX = new function() {
 
   this.gracefulDegrade = function(a) {
     if (typeof RUN != "undefined") RUN.updateDates();
-    var tmp,
-      links = a.getElementsByTagName("a"),
-      l = links.length,
-      x,
-      old;
-
+    var tmp;
+    var links = a.getElementsByTagName("a");
+    var l = links.length;
+    var x;
+    var old;
     for (x = 0; x < l; x++) {
       if (links[x].href) {
         if (links[x].getAttribute("href").charAt(0) == "?") {
           if (links[x].onclick) links[x].oldclick = links[x].onclick;
           links[x].onclick = function() {
-            if (!this.oldclick || this.oldclick() != false)
+            if (!this.oldclick || this.oldclick() != false) {
               RUN.stream.location(this.getAttribute("href"));
+            }
             return false;
           };
         } else if (links[x].getAttribute("href").substr(0, 4) == "http") {
@@ -356,21 +361,23 @@ var JAX = new function() {
     JAX.convertSwitches($$(".switch", a));
 
     var bbcodeimgs = $$(".bbcodeimg");
-    if (bbcodeimgs)
+    if (bbcodeimgs) {
       JAX.onImagesLoaded(
         bbcodeimgs,
         function() {
-          //resizer on large images
+          // resizer on large images
           JAX.imageResizer(bbcodeimgs);
 
-          //handle image galleries
+          // handle image galleries
           var galleries = $$(".image_gallery");
           if (galleries && !galleries.length) galleries = [galleries];
-          for (x = 0; x < galleries.length; x++)
+          for (x = 0; x < galleries.length; x++) {
             JAX.makeImageGallery(galleries[x]);
+          }
         },
         2000
       );
+    }
 
     if ((tmp = $$(".pages", a))) {
       if (!tmp.length) tmp = [tmp];
@@ -396,10 +403,10 @@ var JAX = new function() {
   this.convertSwitches = function(switches) {
     if (!switches) return;
     if (!Array.isArray(switches)) switches = [switches];
-    var x,
-      l = switches.length,
-      s,
-      t;
+    var x;
+    var l = switches.length;
+    var s;
+    var t;
     for (x = 0; x < l; x++) {
       s = switches[x];
       t = document.createElement("div");
@@ -421,19 +428,23 @@ var JAX = new function() {
   };
 
   this.onImagesLoaded = function(imgs, f, timeout) {
-    var x,
-      dbj = {
-        imgs: [],
-        imgsloaded: 1,
-        called: false,
-        force: function() {
-          if (!dbj.called) f();
-        }
-      };
+    var x;
+    var dbj = {
+      imgs: [],
+      imgsloaded: 1,
+      called: false,
+      force: function() {
+        if (!dbj.called) f();
+      }
+    };
     dbj.callback = function(event) {
-      if (dbj.called) return;
+      if (dbj.called) {
+        return;
+      }
       var x = dbj.imgs.inArray(this.src);
-      if (x === false) return;
+      if (x === false) {
+        return;
+      }
       dbj.imgs.splice(x, 1);
       if (dbj.imgs.length == 0) {
         f();
@@ -454,9 +465,9 @@ var JAX = new function() {
   };
 
   this.handleTabs = function(e, a, f) {
-    var e = e || window.event,
-      el = e.target || e.srcElement,
-      act;
+    var e = e || window.event;
+    var el = e.target || e.srcElement;
+    var act;
     if (el.tagName.toLowerCase() != "a") return;
     if (f) el = f(el);
     act = JAX.el.getElementsByClassName(a, "active")[0];
@@ -471,9 +482,9 @@ var JAX = new function() {
   };
 
   this.collapse = function(a) {
-    var s = a.style,
-      fh = a.getAttribute("fullHeight"),
-      b = a.parentNode;
+    var s = a.style;
+    var fh = a.getAttribute("fullHeight");
+    var b = a.parentNode;
     s.overflow = "hidden";
     if (s.height == "0px") {
       JAX.sfx(a, 5, 10, 0)
@@ -498,9 +509,9 @@ var JAX = new function() {
 
   this.overlay = function(show) {
     show = parseInt(show);
-    var ol = document.getElementById("overlay"),
-      s,
-      op;
+    var ol = document.getElementById("overlay");
+    var s;
+    var op;
     if (ol) {
       s = ol.style;
       s.zIndex = JAX.el.getHighestZIndex();
@@ -519,14 +530,15 @@ var JAX = new function() {
     }
   };
 
-  /********************************************************************/
+  /** ******************************************************************/
 
   this.el = {
     apply: function(a) {
       var func;
       for (var x in JAX.el) {
-        if (x != "apply")
+        if (x != "apply") {
           a[x] = new Function("b", "return JAX.el." + x + "(this,b)");
+        }
       }
       return a;
     },
@@ -537,10 +549,10 @@ var JAX = new function() {
       return false;
     },
     getCoordinates: function(a) {
-      var x = 0,
-        y = 0,
-        h = parseInt(a.offsetHeight) || 0,
-        w = parseInt(a.offsetWidth) || 0;
+      var x = 0;
+      var y = 0;
+      var h = parseInt(a.offsetHeight) || 0;
+      var w = parseInt(a.offsetWidth) || 0;
       do {
         x += parseInt(a.offsetLeft) || 0;
         y += parseInt(a.offsetTop) || 0;
@@ -560,7 +572,7 @@ var JAX = new function() {
       return false;
     },
 
-    //insert a before b, insert a after b, replace a with b
+    // insert a before b, insert a after b, replace a with b
     insertBefore: function(a, b) {
       if (a.parentNode) a.parentNode.removeChild(a);
       b.parentNode.insertBefore(a, b);
@@ -578,14 +590,15 @@ var JAX = new function() {
         classn = parent;
         parent = document;
       }
-      var els = parent.getElementsByTagName("*"),
-        x,
-        r = [],
-        regex = new RegExp(
-          " " + classn + "| " + classn + " |" + classn + " |^" + classn + "$"
-        );
-      for (x = 0; x < els.length; x++)
+      var els = parent.getElementsByTagName("*");
+      var x;
+      var r = [];
+      var regex = new RegExp(
+        " " + classn + "| " + classn + " |" + classn + " |^" + classn + "$"
+      );
+      for (x = 0; x < els.length; x++) {
         if (els[x].className.match(regex)) r.push(els[x]);
+      }
       return !r.length ? [] : r;
     },
 
@@ -602,27 +615,29 @@ var JAX = new function() {
     },
 
     getHighestZIndex: function() {
-      var a = document.getElementsByTagName("*"),
-        l = a.length,
-        x,
-        max = 0;
-      for (x = 0; x < l; x++)
-        if (a[x].style.zIndex && Number(a[x].style.zIndex) > max)
+      var a = document.getElementsByTagName("*");
+      var l = a.length;
+      var x;
+      var max = 0;
+      for (x = 0; x < l; x++) {
+        if (a[x].style.zIndex && Number(a[x].style.zIndex) > max) {
           max = Number(a[x].style.zIndex);
+        }
+      }
       return max + 1;
     }
   };
-  /********************************************************************/
+  /** ******************************************************************/
 
   this.SWF = function(url, name, settings) {
-    var object,
-      embed,
-      x,
-      s = {
-        width: "100%",
-        height: "100%",
-        quality: "high"
-      };
+    var object;
+    var embed;
+    var x;
+    var s = {
+      width: "100%",
+      height: "100%",
+      quality: "high"
+    };
     for (x in settings) s[x] = settings[x];
     object =
       '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" id="' +
@@ -644,11 +659,12 @@ var JAX = new function() {
       '" name="' +
       name +
       '"';
-    for (x in s)
+    for (x in s) {
       if (x != "width" && x != "height") {
         object += '<param name="' + x + '" value="' + s[x] + '"></param>';
         embed += " " + x + '="' + s[x] + '"';
       }
+    }
     embed += "></embed>";
     object += "</object>";
     var tmp = document.createElement("span");
@@ -656,13 +672,14 @@ var JAX = new function() {
     return tmp.getElementsByTagName("*")[0];
   };
 
-  /********************************************************************/
+  /** ******************************************************************/
 
   (this.color = function(a) {
     if (this == JAX) return new JAX.color(a);
-    var tmp, x;
+    var tmp;
+    var x;
     if (a.charAt && a.charAt(0) == "#") a = a.substr(1);
-    //RGB
+    // RGB
     if (typeof a == "object") this.rgb = a;
     else if (a.match && (tmp = a.match(/^rgb\((\d+),\s?(\d+),\s?(\d+)\)/i))) {
       tmp[1] = parseFloat(tmp[1]);
@@ -670,9 +687,9 @@ var JAX = new function() {
       tmp[3] = parseFloat(tmp[3]);
       tmp.shift();
       this.rgb = tmp;
-      //HEX
+      // HEX
     } else if (a.match && !a.match(/[^\da-fA-F]/)) {
-      if (a.length == 3)
+      if (a.length == 3) {
         a =
           a.charAt(0) +
           a.charAt(0) +
@@ -680,6 +697,7 @@ var JAX = new function() {
           a.charAt(1) +
           a.charAt(2) +
           a.charAt(2);
+      }
       if (a.length != 6) this.rgb = [0, 0, 0];
       else {
         this.rgb = [];
@@ -696,10 +714,10 @@ var JAX = new function() {
     };
     this.toHex = function() {
       if (!this.rgb) return false;
-      var tmp2,
-        tmp = "",
-        x,
-        hex = "0123456789ABCDEF";
+      var tmp2;
+      var tmp = "";
+      var x;
+      var hex = "0123456789ABCDEF";
       for (x = 0; x < 3; x++) {
         tmp2 = this.rgb[x];
         tmp +=
@@ -709,13 +727,13 @@ var JAX = new function() {
     };
     return this;
   }),
-    /********************************************************************/
+    /** ******************************************************************/
 
     (this.sfx = function(el, steps, delay, loop) {
-      var tmp,
-        x,
-        y,
-        me = this;
+      var tmp;
+      var x;
+      var y;
+      var me = this;
       if (JAX == me) me = {};
       me.el = el;
       me.steps = steps || 30;
@@ -731,22 +749,24 @@ var JAX = new function() {
         return this;
       };
       me.morph = function(from, percent, to) {
-        var x, r;
+        var x;
+        var r;
         if (Array.isArray(from) && from.length == to.length) {
           r = [];
-          for (x = 0; x < from.length; x++)
+          for (x = 0; x < from.length; x++) {
             r[x] = Math.round(this.morph(from[x], percent, to[x]));
+          }
         } else {
           r = (to - from) * percent + from;
         }
         return r;
       };
       me.step = function() {
-        var curL = me.lineup[me.curLineup],
-          tmp,
-          sc = me.stepCount++,
-          tmp2,
-          x;
+        var curL = me.lineup[me.curLineup];
+        var tmp;
+        var sc = me.stepCount++;
+        var tmp2;
+        var x;
         if (typeof curL[0] == "function") {
           curL[0](me.el);
           sc = me.steps;
@@ -783,8 +803,8 @@ var JAX = new function() {
       };
       me.dehighlight = function() {
         me.el.style.backgroundColor = "";
-        var bg = JAX.el.getComputedStyle(me.el).backgroundColor.toString(),
-          bg2;
+        var bg = JAX.el.getComputedStyle(me.el).backgroundColor.toString();
+        var bg2;
         JAX.el.addClass(me.el, "highlight");
         bg2 = JAX.el.getComputedStyle(me.el).backgroundColor.toString();
         if (bg2 == bg) bg2 = "FF0";
@@ -806,7 +826,7 @@ var JAX = new function() {
       return me;
     });
 
-  /********************************************************************/
+  /** ******************************************************************/
 
   this.editor = function(textarea, iframe) {
     if (!iframe.timedout) {
@@ -822,7 +842,7 @@ var JAX = new function() {
     iframe.editor = me;
     iframe.className = "editorframe";
     me.mode =
-      JAX.browser.mobile || JAX.browser.n3ds ? 0 : globalsettings.wysiwyg; //1 for html editing mode, 0 for textarea mode
+      JAX.browser.mobile || JAX.browser.n3ds ? 0 : globalsettings.wysiwyg; // 1 for html editing mode, 0 for textarea mode
     me.mode = me.mode || 0;
     me.textarea = textarea;
     me.window = iframe.contentWindow;
@@ -841,52 +861,54 @@ var JAX = new function() {
     me.buildEditBar = function() {
       me.editbar.className = "editbar";
       var cmds = [
-          "bold",
-          "italic",
-          "underline",
-          "strikethrough",
-          "forecolor",
-          "backcolor",
-          "insertimage",
-          "createlink",
-          "c_email",
-          "justifyleft",
-          "justifycenter",
-          "justifyright",
-          "c_youtube",
-          "c_code",
-          "c_quote",
-          "c_spoiler",
-          "insertorderedlist",
-          "insertunorderedlist",
-          "c_smileys",
-          "c_switcheditmode"
-        ],
-        cmddesc = [
-          "Bold",
-          "Italic",
-          "Underline",
-          "Strike-Through",
-          "Foreground Color",
-          "Background Color",
-          "Insert Image",
-          "Insert Link",
-          "Insert email",
-          "Align left",
-          "Center",
-          "Align right",
-          "Insert video from any of your favorite video services!",
-          "Insert code",
-          "Insert Quote",
-          "Insert Spoiler",
-          "Create Ordered List",
-          "Create Unordered List",
-          "Insert Emoticon",
-          "Switch editor mode"
-        ],
-        l = cmds.length,
-        a,
-        x;
+        "bold",
+        "italic",
+        "underline",
+        "strikethrough",
+        "forecolor",
+        "backcolor",
+        "insertimage",
+        "createlink",
+        "c_email",
+        "justifyleft",
+        "justifycenter",
+        "justifyright",
+        "c_youtube",
+        "c_code",
+        "c_quote",
+        "c_spoiler",
+        "insertorderedlist",
+        "insertunorderedlist",
+        "c_smileys",
+        "c_switcheditmode"
+      ];
+
+      var cmddesc = [
+        "Bold",
+        "Italic",
+        "Underline",
+        "Strike-Through",
+        "Foreground Color",
+        "Background Color",
+        "Insert Image",
+        "Insert Link",
+        "Insert email",
+        "Align left",
+        "Center",
+        "Align right",
+        "Insert video from any of your favorite video services!",
+        "Insert code",
+        "Insert Quote",
+        "Insert Spoiler",
+        "Create Ordered List",
+        "Create Unordered List",
+        "Insert Emoticon",
+        "Switch editor mode"
+      ];
+
+      var l = cmds.length;
+      var a;
+      var x;
       for (x = 0; x < l; x++) {
         a = document.createElement("a");
         a.className = cmds[x];
@@ -911,9 +933,9 @@ var JAX = new function() {
 
     me.editbarCommand = function(e, cmd) {
       e = JAX.event(e).cancel();
-      if (cmd == "forecolor" || cmd == "backcolor")
+      if (cmd == "forecolor" || cmd == "backcolor") {
         me.showColors(e.pageX, e.pageY, cmd);
-      else if (cmd == "c_smileys") me.showEmotes(e.pageX, e.pageY);
+      } else if (cmd == "c_smileys") me.showEmotes(e.pageX, e.pageY);
       else if (cmd == "c_switcheditmode") me.switchMode(Math.abs(me.mode - 1));
       else this.cmd(cmd);
     };
@@ -940,12 +962,12 @@ var JAX = new function() {
     };
 
     me.createEmoteWindow = function(xml) {
-      var rs = eval(xml.responseText),
-        x,
-        html,
-        emotewin = document.createElement("div"),
-        r,
-        t;
+      var rs = eval(xml.responseText);
+      var x;
+      var html;
+      var emotewin = document.createElement("div");
+      var r;
+      var t;
       emotewin.className = "emotewin";
       for (x = 0; x < rs[0].length; x++) {
         r = document.createElement("a");
@@ -971,25 +993,26 @@ var JAX = new function() {
     };
 
     me.showColors = function(posx, posy, cmd) {
-      if (me.colorWindow && me.colorWindow.style.display != "none")
+      if (me.colorWindow && me.colorWindow.style.display != "none") {
         return me.hideColors();
-      var colorwin = me.colorWindow,
-        colors = [
-          "FFFFFF",
-          "AAAAAA",
-          "000000",
-          "FF0000",
-          "00FF00",
-          "0000FF",
-          "FFFF00",
-          "00FFFF",
-          "FF00FF"
-        ],
-        l = colors.length,
-        sq = Math.ceil(Math.sqrt(l)),
-        r,
-        c,
-        a;
+      }
+      var colorwin = me.colorWindow;
+      var colors = [
+        "FFFFFF",
+        "AAAAAA",
+        "000000",
+        "FF0000",
+        "00FF00",
+        "0000FF",
+        "FFFF00",
+        "00FFFF",
+        "FF00FF"
+      ];
+      var l = colors.length;
+      var sq = Math.ceil(Math.sqrt(l));
+      var r;
+      var c;
+      var a;
       if (!colorwin) {
         colorwin = document.createElement("table");
         colorwin.style.borderCollapse = "collapse";
@@ -1028,9 +1051,9 @@ var JAX = new function() {
 
     me.cmd = function(a, b, c) {
       a = a.toLowerCase();
-      var rng,
-        selection = me.getSelection(),
-        bbcode;
+      var rng;
+      var selection = me.getSelection();
+      var bbcode;
       switch (a) {
         case "bold":
           bbcode = "[b]" + selection + "[/b]";
@@ -1056,19 +1079,22 @@ var JAX = new function() {
         case "insertimage":
           b = prompt("Image URL:");
           if (!b) return;
-          if (!b.match(/^(ht|f)tps?:\/\/[\w\.\-\%&\?=\/]+$/))
+          if (!b.match(/^(ht|f)tps?:\/\/[\w\.\-\%&\?=\/]+$/)) {
             return alert("Please enter a valid URL.");
+          }
           bbcode = "[img]" + b + "[/img]";
           break;
         case "insertorderedlist":
-          if (!me.mode)
+          if (!me.mode) {
             bbcode =
               "[ol]" + selection.replace(/(.+([\r\n]+|$))/gi, "*$1") + "[/ol]";
+          }
           break;
         case "insertunorderedlist":
-          if (!me.mode)
+          if (!me.mode) {
             bbcode =
               "[ul]" + selection.replace(/(.+([\r\n]+|$))/gi, "*$1") + "[/ul]";
+          }
           break;
         case "createlink":
           b = prompt("Link:");
@@ -1085,7 +1111,7 @@ var JAX = new function() {
           break;
         case "backcolor":
           if (JAX.browser.firefox || JAX.browser.safari) a = "hilitecolor";
-          //a="inserthtml";b='<span style="background:'+b+'">'+selection+'</span>'
+          // a="inserthtml";b='<span style="background:'+b+'">'+selection+'</span>'
           bbcode = "[bgcolor=" + b + "]" + selection + "[/bgcolor]";
           break;
         case "forecolor":
@@ -1132,11 +1158,11 @@ var JAX = new function() {
     };
 
     me.getSelection = function() {
-      if (me.mode)
+      if (me.mode) {
         return JAX.browser.ie
           ? me.doc.selection.createRange().text
           : me.window.getSelection();
-      else {
+      } else {
         if (JAX.browser.ie) {
           me.textarea.focus();
           return document.selection.createRange().text;
@@ -1192,12 +1218,13 @@ var JAX = new function() {
         '<span style="text-align:$1">$2</span>'
       );
       a = me.replaceAll(a, /\[(ul|ol)\]([\w\W]*?)\[\/\1\]/gi, function(s) {
-        var tag = RegExp.$1,
-          lis = "",
-          list = RegExp.$2.split(/([\r\n]+|^)\*/),
-          x;
-        for (x = 0; x < list.length; x++)
+        var tag = RegExp.$1;
+        var lis = "";
+        var list = RegExp.$2.split(/([\r\n]+|^)\*/);
+        var x;
+        for (x = 0; x < list.length; x++) {
           if (list[x].match(/\S/)) lis += "<li>" + list[x] + "</li>";
+        }
         return "<" + tag + ">" + lis + "</" + tag + ">";
       });
       a = me.replaceAll(a, /\n/g, "<br />");
@@ -1223,8 +1250,8 @@ var JAX = new function() {
         attributes,
         innerhtml
       ) {
-        var att = {},
-          style = "";
+        var att = {};
+        var style = "";
         attributes.replace(
           /(color|size|style|href|src)=(['"]?)(.*?)\2/gi,
           function(whole, attr, q, value) {
@@ -1236,38 +1263,54 @@ var JAX = new function() {
 
         tag = tag.toLowerCase();
         if (tag == "script" || tag == "style" || tag == "hr") return;
-        if (style.match(/background(\-color)?:[^;]+(rgb\([^\)]+\)|#\s+)/i))
+        if (style.match(/background(\-color)?:[^;]+(rgb\([^\)]+\)|#\s+)/i)) {
           innerhtml =
             "[bgcolor=#" +
             new JAX.color(RegExp.$2).toHex() +
             "]" +
             innerhtml +
             "[/bgcolor]";
-        if (style.match(/text\-align: ?(right|center|left);/i))
+        }
+        if (style.match(/text\-align: ?(right|center|left);/i)) {
           innerhtml = "[align=" + RegExp.$1 + "]" + innerhtml + "[/align]";
-        if (style.match(/font\-style: ?italic;/i) || tag == "i" || tag == "em")
+        }
+        if (
+          style.match(/font\-style: ?italic;/i) ||
+          tag == "i" ||
+          tag == "em"
+        ) {
           innerhtml = "[I]" + innerhtml + "[/I]";
-        if (style.match(/text\-decoration:[^;]*underline;/i) || tag == "u")
+        }
+        if (style.match(/text\-decoration:[^;]*underline;/i) || tag == "u") {
           innerhtml = "[U]" + innerhtml + "[/U]";
-        if (style.match(/text\-decoration:[^;]*line\-through;/i) || tag == "s")
+        }
+        if (
+          style.match(/text\-decoration:[^;]*line\-through;/i) ||
+          tag == "s"
+        ) {
           innerhtml = "[S]" + innerhtml + "[/S]";
+        }
         if (
           style.match(/font\-weight: ?bold;/i) ||
           tag == "strong" ||
           tag == "b"
-        )
+        ) {
           innerhtml = "[B]" + innerhtml + "[/B]";
-        if (att.size || style.match(/font\-size: ?([^;]+)/i))
+        }
+        if (att.size || style.match(/font\-size: ?([^;]+)/i)) {
           innerhtml =
             "[size=" + (att.size || RegExp.$1) + "]" + innerhtml + "[/size]";
-        if (att.color || style.match(/color: ?([^;]+)/i))
+        }
+        if (att.color || style.match(/color: ?([^;]+)/i)) {
           innerhtml =
             "[color=" + (att.color || RegExp.$1) + "]" + innerhtml + "[/color]";
-        if (tag == "a" && att.href)
+        }
+        if (tag == "a" && att.href) {
           innerhtml = "[url=" + att.href + "]" + innerhtml + "[/url]";
+        }
         if (tag == "ol") innerhtml = "[ol]" + innerhtml + "[/ol]";
         if (tag == "ul") innerhtml = "[ul]" + innerhtml + "[/ul]";
-        if (tag.match(/h\d/i))
+        if (tag.match(/h\d/i)) {
           innerhtml =
             "[" +
             tag.toLowerCase() +
@@ -1276,10 +1319,13 @@ var JAX = new function() {
             "[/" +
             tag.toLowerCase() +
             "]";
-        if (tag == "li")
+        }
+        if (tag == "li") {
           innerhtml = "*" + innerhtml.replace(/[\n\r]+/, "") + "\n";
-        if (tag == "p")
+        }
+        if (tag == "p") {
           innerhtml = "\n" + (innerhtml == "&nbsp" ? "" : innerhtml) + "\n";
+        }
         if (tag == "div") innerhtml = "\n" + innerhtml;
         return innerhtml;
       });
@@ -1291,8 +1337,8 @@ var JAX = new function() {
     };
 
     me.switchMode = function(toggle) {
-      var t = me.textarea,
-        f = me.iframe;
+      var t = me.textarea;
+      var f = me.iframe;
       if (!toggle) {
         t.value = me.HTMLtoBB(me.getSource());
         t.style.display = "";
@@ -1323,8 +1369,8 @@ var JAX = new function() {
       t.focus();
       document.selection.createRange().text = stuff;
     } else {
-      var s = t.selectionStart,
-        e = t.selectionEnd;
+      var s = t.selectionStart;
+      var e = t.selectionEnd;
       t.value = t.value.substring(0, s) + stuff + t.value.substr(e);
       t.selectionStart = s + stuff.length;
       t.selectionEnd = s + stuff.length;
@@ -1333,18 +1379,18 @@ var JAX = new function() {
     t.scrollTop = scroll;
   };
 
-  /********************************************************************/
+  /** ******************************************************************/
 
   this.scrollTo = function(pos, el) {
-    //make this animate/not animate later based on preferences
-    var dB = document.body,
-      el = el || (JAX.browser.chrome ? dB : dE),
-      screenrel = parseFloat(dB.clientHeight) - parseFloat(dE.clientHeight),
-      top = parseFloat(el.scrollTop),
-      pos = screenrel < pos ? screenrel : pos,
-      diff = pos - top;
+    // make this animate/not animate later based on preferences
+    var dB = document.body;
+    var el = el || (JAX.browser.chrome ? dB : dE);
+    var screenrel = parseFloat(dB.clientHeight) - parseFloat(dE.clientHeight);
+    var top = parseFloat(el.scrollTop);
+    var pos = screenrel < pos ? screenrel : pos;
+    var diff = pos - top;
     el.scrollTop += diff;
-    /*me={el:el,pos:top,diff:diff,step:1,steps:1} //had this animate once, but now it's just annoying
+    /* me={el:el,pos:top,diff:diff,step:1,steps:1} //had this animate once, but now it's just annoying
     me.interval=setInterval(function(){
       me.step++
       (me.el).scrollTop=(me.pos+me.diff*Math.pow(me.step/me.steps,3));
@@ -1356,16 +1402,16 @@ var JAX = new function() {
     return me*/
   };
 
-  /********************************************************************/
+  /** ******************************************************************/
 
   this.drag = function() {
     var me = this;
     me.priv = {
       start: function(e, t, handle) {
         e = new JAX.event(e).cancel().stopBubbling();
-        var el = t || this,
-          s = JAX.el.getComputedStyle(el),
-          highz = JAX.el.getHighestZIndex();
+        var el = t || this;
+        var s = JAX.el.getComputedStyle(el);
+        var highz = JAX.el.getHighestZIndex();
         if (me._nochild && (e.srcElement || e.target) != (handle || el)) return;
         if (el.getAttribute("draggable") == "false") return;
         me.sess = {
@@ -1378,8 +1424,9 @@ var JAX = new function() {
           bc: JAX.el.getCoordinates(el)
         };
         me.sess.zIndex = el.style.zIndex;
-        if (!me.sess.zIndex || Number(me.sess.zIndex) < highz - 1)
+        if (!me.sess.zIndex || Number(me.sess.zIndex) < highz - 1) {
           el.style.zIndex = highz;
+        }
         if (typeof me.onstart == "function") {
           var sess = me.sess;
           sess.droptarget = me.priv.testdrops(sess.mx, sess.my);
@@ -1391,19 +1438,19 @@ var JAX = new function() {
       },
       drag: function(e) {
         e = new JAX.event(e).cancel();
-        var s = me.sess.el.style,
-          sess,
-          tmp = false,
-          tx,
-          ty,
-          tmp2;
-        var tx,
-          ty,
-          mx = (tx = parseInt(e.pageX)),
-          my = (ty = parseInt(e.pageY)),
-          left = me.sess.ex + mx - me.sess.mx,
-          top = me.sess.ey + my - me.sess.my,
-          b = me.bounds;
+        var s = me.sess.el.style;
+        var sess;
+        var tmp = false;
+        var tx;
+        var ty;
+        var tmp2;
+        var tx;
+        var ty;
+        var mx = (tx = parseInt(e.pageX));
+        var my = (ty = parseInt(e.pageY));
+        var left = me.sess.ex + mx - me.sess.mx;
+        var top = me.sess.ey + my - me.sess.my;
+        var b = me.bounds;
         if (b) {
           if (left < b[0]) {
             mx = mx - left + b[0];
@@ -1441,8 +1488,9 @@ var JAX = new function() {
           typeof me.ondragover == "function" &&
           sess["droptarget"] &&
           tmp != sess["droptarget"]
-        )
+        ) {
           me.ondragover(sess);
+        }
         if (
           typeof me.ondragout == "function" &&
           tmp &&
@@ -1461,15 +1509,16 @@ var JAX = new function() {
         return true;
       },
       testdrops: function(a, b) {
-        var x,
-          d = me.droppables,
-          z,
-          r = false,
-          max = [9999, 9999];
+        var x;
+        var d = me.droppables;
+        var z;
+        var r = false;
+        var max = [9999, 9999];
         if (!d) return r;
         for (x = 0; x < d.length; x++) {
-          if (d[x] == me.sess.el || JAX.el.isChildOf(d[x], me.sess.el))
+          if (d[x] == me.sess.el || JAX.el.isChildOf(d[x], me.sess.el)) {
             continue;
+          }
           z = JAX.el.getCoordinates(d[x]);
           if (
             max[0] > z.w &&
@@ -1542,7 +1591,7 @@ var JAX = new function() {
     };
   };
 
-  /********************************************************************/
+  /** ******************************************************************/
 
   this.sortable = function(a, b) {
     var me = this;
@@ -1560,18 +1609,18 @@ var JAX = new function() {
       if (typeof me.onend == "function") me.onend(a);
     };
     me.ondrag = function(a) {
-      var x,
-        y,
-        d = me.elems,
-        dl = d.length,
-        pos = 0,
-        c,
-        cel = JAX.el.getCoordinates(a.el),
-        c2,
-        ch = false,
-        ov = me.options.vertical || 0,
-        oh = me.options.horizontal || 0,
-        index;
+      var x;
+      var y;
+      var d = me.elems;
+      var dl = d.length;
+      var pos = 0;
+      var c;
+      var cel = JAX.el.getCoordinates(a.el);
+      var c2;
+      var ch = false;
+      var ov = me.options.vertical || 0;
+      var oh = me.options.horizontal || 0;
+      var index;
       if (!me.coords.length) {
         for (x = 0; x < dl; x++) me.coords.push(JAX.el.getCoordinates(d[x]));
       }
@@ -1615,24 +1664,25 @@ var JAX = new function() {
       me.apply(a[x], typeof b.handle == "function" ? b.handle(a[x]) : null);
     }
   };
-  /*******************************************************************/
+  /** *****************************************************************/
   this.sortableTree = function(tree, prefix, formfield) {
-    var tmp = $$("li", tree),
-      x,
-      items = [],
-      seperators = [],
-      all = [],
-      drag;
+    var tmp = $$("li", tree);
+    var x;
+    var items = [];
+    var seperators = [];
+    var all = [];
+    var drag;
     if (formfield) formfield = $(formfield);
-    for (x = 0; x < tmp.length; x++)
+    for (x = 0; x < tmp.length; x++) {
       if (tmp[x].className != "title") items.push(tmp[x]);
+    }
 
     function parsetree(tree) {
       var nodes = tree.getElementsByTagName("li");
-      var order = {},
-        node,
-        sub,
-        gotsomethin = 0;
+      var order = {};
+      var node;
+      var sub;
+      var gotsomethin = 0;
       for (var x = 0; x < nodes.length; x++) {
         node = nodes[x];
         if (node.className != "seperator" && node.parentNode == tree) {
@@ -1661,26 +1711,30 @@ var JAX = new function() {
         a.droptarget.style.border = "none";
       },
       ondrop: function(a) {
-        var next = a.droptarget.nextSibling,
-          tmp,
-          tmp2;
+        var next = a.droptarget.nextSibling;
+        var tmp;
+        var tmp2;
         var parentlock = a.el.className == "parentlock";
         var nofirstlevel = a.el.className == "nofirstlevel";
         if (a.droptarget) a.droptarget.style.border = "none";
         if (a.droptarget.className == "seperator") {
-          if (parentlock && a.droptarget.parentNode != a.el.parentNode)
+          if (parentlock && a.droptarget.parentNode != a.el.parentNode) {
             return drag.reset(a.el, 1);
-          if (nofirstlevel && a.droptarget.parentNode.className == "tree")
+          }
+          if (nofirstlevel && a.droptarget.parentNode.className == "tree") {
             return drag.reset(a.el, 1);
-          if (JAX.el.isChildOf(a.droptarget, a.el) || a.el == next)
+          }
+          if (JAX.el.isChildOf(a.droptarget, a.el) || a.el == next) {
             return drag.reset(a.el, 1);
+          }
           if (next.className == "spacer") {
             next.parentNode.removeChild(next);
           }
-          if (next.className != "spacer")
+          if (next.className != "spacer") {
             JAX.el.insertAfter(a.el.previousSibling, a.droptarget);
-          else
+          } else {
             a.el.previousSibling.parentNode.removeChild(a.el.previousSibling);
+          }
           JAX.el.insertAfter(a.el, a.droptarget);
         } else if (!parentlock && a.droptarget.tagName == "LI") {
           tmp = a.droptarget.getElementsByTagName("ul")[0];
@@ -1704,7 +1758,7 @@ var JAX = new function() {
       drag.apply(items[x]);
     }
   };
-  /*********************************************************************/
+  /** *******************************************************************/
 
   this.event = function(e) {
     e = e || window.event;
@@ -1744,7 +1798,7 @@ var JAX = new function() {
     return e;
   };
 
-  /********************************************************************/
+  /** ******************************************************************/
 
   this.ajax = function(s) {
     var me = this;
@@ -1759,7 +1813,7 @@ var JAX = new function() {
     me.setup = JAX.extend(me.setup, s);
 
     me.load = function(a, b, c, d, e) {
-      //a=URL b=callback c=send_data d=POST e=type(1=update,2=load new)
+      // a=URL b=callback c=send_data d=POST e=type(1=update,2=load new)
       d = d || this.setup.method || "GET";
       if (d) d = "POST";
       if (
@@ -1767,9 +1821,9 @@ var JAX = new function() {
         Array.isArray(c) &&
         Array.isArray(c[0]) &&
         c[0].length == c[1].length
-      )
+      ) {
         c = me.build_query(c[0], c[1]);
-      else if (typeof c != "string") c = me.build_query(c);
+      } else if (typeof c != "string") c = me.build_query(c);
       var xmlobj = new me.xmlobj();
       if (b) me.setup.callback = b;
       xmlobj.onreadystatechange = function(status) {
@@ -1781,11 +1835,12 @@ var JAX = new function() {
       xmlobj.open(d, a, true);
       xmlobj.url = a;
       xmlobj.type = e;
-      if (d)
+      if (d) {
         xmlobj.setRequestHeader(
           "Content-Type",
           "application/x-www-form-urlencoded"
         );
+      }
       xmlobj.setRequestHeader("X-JSACCESS", e || 1);
       xmlobj.send(c || null);
       return xmlobj;
@@ -1800,30 +1855,33 @@ var JAX = new function() {
 
   this.ajax.prototype.build_query = function(a, b) {
     var q = "";
-    if (b)
-      for (x = 0; x < a.length; x++)
+    if (b) {
+      for (x = 0; x < a.length; x++) {
         q +=
           encodeURIComponent(a[x]) + "=" + encodeURIComponent(b[x] || "") + "&";
-    else
-      for (x in a)
+      }
+    } else {
+      for (x in a) {
         q += encodeURIComponent(x) + "=" + encodeURIComponent(a[x] || "") + "&";
+      }
+    }
     return q.substring(0, q.length - 1);
   };
 
-  /********************************************************************/
+  /** ******************************************************************/
 
   this.tooltip = function(el) {
-    var tooltip = document.getElementById("tooltip_thingy"),
-      pos = JAX.el.getCoordinates(el),
-      text = (el.oldtitle = el.title.striphtml());
+    var tooltip = document.getElementById("tooltip_thingy");
+    var pos = JAX.el.getCoordinates(el);
+    var text = (el.oldtitle = el.title.striphtml());
     el.title = "";
     if (!text) return;
     if (!tooltip) {
       tooltip = document.createElement("table");
-      var t = tooltip.insertRow(0),
-        c = tooltip.insertRow(1),
-        b = tooltip.insertRow(2),
-        a;
+      var t = tooltip.insertRow(0);
+      var c = tooltip.insertRow(1);
+      var b = tooltip.insertRow(2);
+      var a;
 
       tooltip.id = "tooltip_thingy";
       tooltip.className = "tooltip";
@@ -1860,10 +1918,19 @@ var JAX = new function() {
     };
   };
 
-  /********************************************************************/
+  /** ******************************************************************/
 
   this.imageResizer = function(imgs) {
-    var img, c, mw, mh, p, p2, ih, iw, x, s;
+    var img;
+    var c;
+    var mw;
+    var mh;
+    var p;
+    var p2;
+    var ih;
+    var iw;
+    var x;
+    var s;
     if (!imgs) return;
     if (!imgs.length) imgs = [imgs];
     for (var x = 0; x < imgs.length; x++) {
@@ -1917,11 +1984,11 @@ var JAX = new function() {
     c.appendChild(img);
   };
 
-  /********************************************************************/
+  /** ******************************************************************/
 
   this.window = function() {
-    var me = this,
-      zindex = JAX.el.getHighestZIndex();
+    var me = this;
+    var zindex = JAX.el.getHighestZIndex();
     me.title = "Title";
     me.wait = true;
     me.content = "Content";
@@ -1933,22 +2000,24 @@ var JAX = new function() {
     me.pos = "center";
     me.create = function() {
       if (me.open) return;
-      var d1 = d.createElement("div"),
-        d2 = d.createElement("div"),
-        d3 = d.createElement("div"),
-        d4 = d.createElement("div"),
-        b1 = d.createElement("div"),
-        b2 = d.createElement("div"),
-        pos = me.pos,
-        x = 0,
-        y = 0,
-        s;
+      var d1 = d.createElement("div");
+      var d2 = d.createElement("div");
+      var d3 = d.createElement("div");
+      var d4 = d.createElement("div");
+      var b1 = d.createElement("div");
+      var b2 = d.createElement("div");
+      var pos = me.pos;
+      var x = 0;
+      var y = 0;
+      var s;
 
       me.open = d1;
       if (me.id) d1.id = me.id;
       me.contentcontainer = d3;
 
-      if (me.useoverlay) var tmp = JAX.overlay(1, zindex);
+      if (me.useoverlay) {
+        var tmp = JAX.overlay(1, zindex);
+      }
       d1.className = "window" + (me.className ? " " + me.className : "");
       d2.className = "title";
       d3.className = "content";
@@ -1982,8 +2051,8 @@ var JAX = new function() {
           .boundingBox(100, 100, Infinity, Infinity)
           .addListener({
             ondrag: function(a) {
-              var w = parseFloat(targ.style.width) + a.dx,
-                h = parseFloat(targ.style.height) + a.dy;
+              var w = parseFloat(targ.style.width) + a.dx;
+              var h = parseFloat(targ.style.height) + a.dy;
               targ.style.width = w + "px";
               if (w < d1.clientWidth - 20) {
                 targ.style.width = d1.clientWidth + "px";
@@ -2004,7 +2073,7 @@ var JAX = new function() {
       s = d1.style;
       s.zIndex = zindex + 5;
 
-      if (me.wait)
+      if (me.wait) {
         JAX.onImagesLoaded(
           d1.getElementsByTagName("img"),
           function() {
@@ -2012,7 +2081,7 @@ var JAX = new function() {
           },
           2000
         );
-      else me.setPosition(pos);
+      } else me.setPosition(pos);
 
       me.drag = new JAX.drag()
         .autoZ()
@@ -2027,7 +2096,7 @@ var JAX = new function() {
       if (!me.open) return;
       var s = me.open.style;
       if (me.animate && false) {
-        //this is broken until further notice
+        // this is broken until further notice
         JAX.sfx(me.open, 10)
           .add("top", s.top, parseFloat(s.top) + 100 + "px")
           .then(function() {
@@ -2043,9 +2112,9 @@ var JAX = new function() {
       if (me.useoverlay) JAX.overlay(0);
     };
     me.minimize = function() {
-      var c = me.open,
-        x,
-        w = 0;
+      var c = me.open;
+      var x;
+      var w = 0;
       if (JAX.el.hasClass(c, "minimized")) {
         JAX.el.removeClass(c, "minimized");
         c.removeAttribute("draggable");
@@ -2054,20 +2123,22 @@ var JAX = new function() {
         c.setAttribute("draggable", "false");
         var wins = $$(".window");
         if (!wins.length) wins = [wins];
-        for (x = 0; x < wins.length; x++)
-          if (JAX.el.hasClass(wins[x], "minimized"))
+        for (x = 0; x < wins.length; x++) {
+          if (JAX.el.hasClass(wins[x], "minimized")) {
             w += parseInt(wins[x].clientWidth);
+          }
+        }
         me.oldpos = me.getPosition();
         JAX.el.addClass(c, "minimized");
         me.setPosition("bl " + w + " 0", 0);
       }
     };
     me.setPosition = function(pos, animate) {
-      var d1 = me.open,
-        x = 0,
-        y = 0,
-        cH = dE.clientHeight,
-        cW = dE.clientWidth;
+      var d1 = me.open;
+      var x = 0;
+      var y = 0;
+      var cH = dE.clientHeight;
+      var cW = dE.clientWidth;
       if ((s = pos.match(/(\d+) (\d+)/))) {
         x = Number(s[1]);
         y = Number(s[2]);
@@ -2114,60 +2185,62 @@ var JAX = new function() {
     } while (win);
   };
 
-  //scrolling page list functionality
+  // scrolling page list functionality
   function scrollpagelist(e) {
     e = JAX.event(e).cancel();
     var d = e.detail || e.wheelDelta;
     d = Math.abs(d) / d;
     if (JAX.browser.chrome) d *= -1;
-    var x,
-      p = $$("a", this),
-      s = parseInt(p[1].innerHTML),
-      e = parseInt(p[p.length - 1].innerHTML),
-      b = p.length - 2;
+    var x;
+    var p = $$("a", this);
+    var s = parseInt(p[1].innerHTML);
+    var e = parseInt(p[p.length - 1].innerHTML);
+    var b = p.length - 2;
     if (JAX.browser.ie) d *= -1;
-    if ((d > 0 && s + b < e) || (d < 0 && s > 2))
+    if ((d > 0 && s + b < e) || (d < 0 && s > 2)) {
       for (x = 0; x < b; x++) {
         p[x + 1].href = p[x + 1].href.replace(/\d+$/, x + s + d);
         p[x + 1].innerHTML = s + x + d;
       }
+    }
   }
   this.scrollablepagelist = function(pl) {
-    if (pl.addEventListener)
+    if (pl.addEventListener) {
       pl.addEventListener("DOMMouseScroll", scrollpagelist, false);
+    }
     pl.onmousewheel = scrollpagelist;
   };
-  /********************************************************/
+  /** ******************************************************/
   this.makeImageGallery = function(gallery) {
     if (gallery.madeGallery) return;
     gallery.madeGallery = true;
-    var controls = document.createElement("div"),
-      next = document.createElement("a"),
-      prev = document.createElement("a"),
-      status = {
-        index: 0,
-        max: $$("img", gallery).length || 1,
-        showNext: function() {
-          if (this.index < this.max - 1) this.index++;
-          this.update();
-        },
-        showPrev: function() {
-          if (this.index > 0) this.index--;
-          this.update();
-        },
-        update: function() {
-          var imgs = $$("img", gallery),
-            x,
-            img;
-          for (x = 0; x < imgs.length; x++) {
-            img = imgs[x];
-            if (img.madeResized) {
-              img = img.parentNode;
-            }
-            img.style.display = x != this.index ? "none" : "block";
+    var controls = document.createElement("div");
+    var next = document.createElement("a");
+    var prev = document.createElement("a");
+    var status = {
+      index: 0,
+      max: $$("img", gallery).length || 1,
+      showNext: function() {
+        if (this.index < this.max - 1) this.index++;
+        this.update();
+      },
+      showPrev: function() {
+        if (this.index > 0) this.index--;
+        this.update();
+      },
+      update: function() {
+        var imgs = $$("img", gallery);
+        var x;
+        var img;
+        for (x = 0; x < imgs.length; x++) {
+          img = imgs[x];
+          if (img.madeResized) {
+            img = img.parentNode;
           }
+          img.style.display = x != this.index ? "none" : "block";
         }
-      };
+      }
+    };
     next.innerHTML = "Next &raquo;";
     next.href = "#";
     next.onclick = function() {
@@ -2189,7 +2262,7 @@ var JAX = new function() {
     gallery.appendChild(controls);
   };
 
-  /********************************************************/
+  /** ******************************************************/
 
   this.datepicker = new function() {
     this.months = [
@@ -2206,13 +2279,13 @@ var JAX = new function() {
       "November",
       "December"
     ];
-    this.daysshort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]; //I don't think I'll need a dayslong ever
+    this.daysshort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]; // I don't think I'll need a dayslong ever
 
     this.init = function(el) {
-      var dp = $("datepicker"),
-        s,
-        c = JAX.el.getCoordinates(el),
-        x;
+      var dp = $("datepicker");
+      var s;
+      var c = JAX.el.getCoordinates(el);
+      var x;
       if (!dp) {
         dp = document.createElement("table");
         dp.id = "datepicker";
@@ -2236,15 +2309,15 @@ var JAX = new function() {
       this.generate(s[2], s[0] ? parseInt(s[0]) - 1 : undefined, s[1]);
     };
 
-    //month should be 0 for jan, 11 for dec
+    // month should be 0 for jan, 11 for dec
     this.generate = function(year, month, day) {
-      var date = new Date(),
-        dp = $("datepicker"),
-        row,
-        cell,
-        x,
-        i;
-      //date here is today
+      var date = new Date();
+      var dp = $("datepicker");
+      var row;
+      var cell;
+      var x;
+      var i;
+      // date here is today
       if (year == undefined) {
         year = date.getFullYear();
         month = date.getMonth();
@@ -2263,15 +2336,15 @@ var JAX = new function() {
 
       this.lastDate = [year, month, day];
 
-      //this date is used to calculate days in month and the day the first is on
+      // this date is used to calculate days in month and the day the first is on
       var numdaysinmonth = new Date(year, month + 1, 0).getDate();
       var first = new Date(year, month, 1).getDay();
 
       date = new Date(year, month, day);
-      //generate the table now
-      dp.innerHTML = ""; //clear
+      // generate the table now
+      dp.innerHTML = ""; // clear
 
-      //year
+      // year
       row = dp.insertRow(0);
       cell = row.insertCell(0);
       cell.innerHTML = "<";
@@ -2290,7 +2363,7 @@ var JAX = new function() {
         JAX.datepicker.nextYear();
       };
 
-      //month title
+      // month title
       row = dp.insertRow(1);
       cell = row.insertCell(0);
       cell.innerHTML = "<";
@@ -2309,13 +2382,13 @@ var JAX = new function() {
         JAX.datepicker.nextMonth();
       };
 
-      //weekdays
+      // weekdays
       row = dp.insertRow(2);
       row.className = "weekdays";
       for (x = 0; x < 7; x++) row.insertCell(x).innerHTML = this.daysshort[x];
 
       row = dp.insertRow(3);
-      //generate numbers
+      // generate numbers
       for (x = 0; x < numdaysinmonth; x++) {
         if (!x) for (i = 0; i < first; i++) row.insertCell(i);
         if ((first + x) % 7 == 0) row = dp.insertRow(dp.rows.length);
@@ -2366,7 +2439,7 @@ var Uploader = new function() {
   this.uploaders = [];
   this.listenerHandler = function(id, action, args) {
     var tmp;
-    //moving arguments around
+    // moving arguments around
     switch (action) {
       case "addfile":
         args[0].id = args[1];
@@ -2391,8 +2464,9 @@ var Uploader = new function() {
         if (!args.length) args = [args];
         break;
     }
-    if (this.uploaders[id] && this.uploaders[id][action])
+    if (this.uploaders[id] && this.uploaders[id][action]) {
       this.uploaders[id][action].apply(this.uploaders[id], args);
+    }
   };
   this.createButton = function() {
     var d = document.createElement("div");
@@ -2403,13 +2477,14 @@ var Uploader = new function() {
   this.create = function(el, w, h, url) {
     var nid = this.uploaders.length;
     var swf = JAX.SWF("Script/uploader.swf", "uploader" + nid, {
-        width: w || "100%",
-        height: h || "100%",
-        allowScriptAccess: "sameDomain",
-        wmode: "transparent",
-        flashvars: "id=" + nid
-      }),
-      s = swf.style;
+      width: w || "100%",
+      height: h || "100%",
+      allowScriptAccess: "sameDomain",
+      wmode: "transparent",
+      flashvars: "id=" + nid
+    });
+
+    var s = swf.style;
     s.position = "absolute";
     s.left = "0px";
     s.top = "0px";
@@ -2430,25 +2505,27 @@ var Sound = new function() {
   this.ready = function() {
     var me = this;
     setTimeout(function() {
-      if (me.isready) return; //page redraws
+      if (me.isready) return; // page redraws
       var q = me.queue;
       me.flashObject =
         window.soundLoader && window.soundLoader.playSound
           ? window.soundLoader
           : document.soundLoader;
-      if (!me.flashObject || !me.flashObject.loadSound) return; //no flash installed
-      if (q.length)
-        for (var x = 0; x < q.length; x++)
+      if (!me.flashObject || !me.flashObject.loadSound) return; // no flash installed
+      if (q.length) {
+        for (var x = 0; x < q.length; x++) {
           me.flashObject.loadSound(q[x][0], q[x][1], q[x][2] || false);
+        }
+      }
       me.queue = [];
       me.isready = true;
     }, 100);
   };
   this.load = function(title, file, autoplay) {
     this.loadedSounds[title] = file;
-    if (this.isready)
+    if (this.isready) {
       this.flashObject.loadSound(title, file, autoplay || false);
-    else this.queue.push([title, file, autoplay || false]);
+    } else this.queue.push([title, file, autoplay || false]);
   };
   this.loadAndPlay = function(title, file) {
     if (this.loadedSounds[title] == file) this.play(title);

@@ -7,11 +7,14 @@ var Sound = new function() {
       window.soundLoader && window.soundLoader.playSound
         ? window.soundLoader
         : document.soundLoader;
-    if (!Sound.flashObject || !Sound.flashObject.loadSound)
+    if (!Sound.flashObject || !Sound.flashObject.loadSound) {
       return alert("Messed up sounds");
-    if (q.length)
-      for (var x = 0; x < q.length; x++)
+    }
+    if (q.length) {
+      for (var x = 0; x < q.length; x++) {
         Sound.load(q[x][0], q[x][1], q[x][2] || false);
+      }
+    }
     Sound.queue = [];
   };
   this.load = function(title, file, autoplay) {

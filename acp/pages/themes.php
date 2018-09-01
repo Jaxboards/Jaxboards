@@ -245,9 +245,6 @@ class themes
             '<th>Wrapper</th><th></th><th>Hidden</th><th>Default</th></tr>'.
             "${skins}</table><input type='submit' value='Save Changes'>".
             '</form>';
-        $skins .= '<style type="text/css">.skins td:first-child '.
-            'a{visibility:hidden;} .skins td:first-child:hover '.
-            'a{visibility:visible;}</style>';
         $PAGE->addContentBox('Themes', $skins);
 
         $wrap = '';
@@ -266,10 +263,6 @@ class themes
             "<th>Delete</th></tr>${wrap}</table><br /><form method='post'>".
             "<input type='text' name='newwrapper' />".
             "<input type='submit' value='Create Wrapper' /></form>";
-        $wrap .= '<style type="text/css">.wrappers td:first-child '.
-            'a{visibility:hidden;} .wrappers td:first-child:hover '.
-            'a{visibility:visible;}</style>';
-
         $wrap .= <<<'EOT'
 <script type="text/javascript">
     function edit(link,suffix){

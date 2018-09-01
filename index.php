@@ -188,8 +188,9 @@ if (!$PAGE->jsaccess) {
     );
     $PAGE->append(
         'SCRIPT',
-        '<!--[if IE]><style> '.
-        'img {behavior: url(Script/fiximgnatural.htc)}</style><![endif]-->'
+        '<!--[if IE]>'.
+        '<link rel="stylesheet" type="text/css" href="'.BOARDURL.
+        'Script/fiximgnatural.css" /><![endif]-->'
     );
 
     if ($PERMS['can_moderate'] || $USER['mod']) {

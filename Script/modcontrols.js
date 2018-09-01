@@ -24,8 +24,8 @@ $(function() {
       );
     },
     getitup: function(html) {
-      var html,
-        modb = $("modbox");
+      var html;
+      var modb = $("modbox");
       if (!modb) {
         modb = document.createElement("div");
         modb.id = "modbox";
@@ -66,8 +66,8 @@ $(function() {
     },
 
     modcontrols_postsync: function(a) {
-      var i = 0,
-        temp = 0;
+      var i = 0;
+      var temp = 0;
       var pids = [];
       if (a[0] && (typeof a[0] === "string" || typeof a[0] === "number")) {
         pids = ("" + a[0]).split(",");
@@ -77,39 +77,39 @@ $(function() {
       if (a[1] && (typeof a[1] === "string" || typeof a[1] === "number")) {
         tids = ("" + a[1]).split(",");
       }
-      var tl = tids ? tids.length : 0,
-        html =
-          "<form method='post' onsubmit='return RUN.submitForm(this)'>" +
-          "<input type='hidden' name='act' value='modcontrols' />" +
-          (tl
-            ? "<select name='dot'>" +
-              "<option value='delete'>Delete</option>" +
-              "<option value='merge'>Merge</option>" +
-              "<option value='move'>Move</option>" +
-              "<option value='pin'>Pin</option>" +
-              "<option value='unpin'>Unpin</option>" +
-              "<option value='lock'>Lock</option>" +
-              "<option value='unlock'>Unlock</option>" +
-              "</select>" +
-              "&nbsp; &nbsp; <strong>" +
-              tl +
-              "</strong> topic" +
-              (tl > 1 ? "s" : "") +
-              (pl ? " and <br />" : "")
-            : "") +
-          (pl
-            ? "<select name='dop'>" +
-              "<option value='delete'>Delete</option>" +
-              "<option value='move'>Move</option>" +
-              "</select> &nbsp; &nbsp; <strong>" +
-              pl +
-              "</strong> post" +
-              (pids.length > 1 ? "s" : "")
-            : "") +
-          (pl && tl ? "<br />" : " &nbsp; &nbsp; ") +
-          "<input type='submit' value='Go' /> " +
-          "<input name='cancel' type='submit' " +
-          "onclick='this.form.submitButton=this;' value='Cancel' /></form>";
+      var tl = tids ? tids.length : 0;
+      var html =
+        "<form method='post' onsubmit='return RUN.submitForm(this)'>" +
+        "<input type='hidden' name='act' value='modcontrols' />" +
+        (tl
+          ? "<select name='dot'>" +
+            "<option value='delete'>Delete</option>" +
+            "<option value='merge'>Merge</option>" +
+            "<option value='move'>Move</option>" +
+            "<option value='pin'>Pin</option>" +
+            "<option value='unpin'>Unpin</option>" +
+            "<option value='lock'>Lock</option>" +
+            "<option value='unlock'>Unlock</option>" +
+            "</select>" +
+            "&nbsp; &nbsp; <strong>" +
+            tl +
+            "</strong> topic" +
+            (tl > 1 ? "s" : "") +
+            (pl ? " and <br />" : "")
+          : "") +
+        (pl
+          ? "<select name='dop'>" +
+            "<option value='delete'>Delete</option>" +
+            "<option value='move'>Move</option>" +
+            "</select> &nbsp; &nbsp; <strong>" +
+            pl +
+            "</strong> post" +
+            (pids.length > 1 ? "s" : "")
+          : "") +
+        (pl && tl ? "<br />" : " &nbsp; &nbsp; ") +
+        "<input type='submit' value='Go' /> " +
+        "<input name='cancel' type='submit' " +
+        "onclick='this.form.submitButton=this;' value='Cancel' /></form>";
       JAX.extend(RUN.modcontrols, {
         tids: tids,
         tidl: tl,

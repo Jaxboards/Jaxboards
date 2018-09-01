@@ -1,97 +1,124 @@
-/*#1C3B65*/
-BODY {
+body {
   background: url(../Themes/Default/img/bg.jpg);
   margin: 0;
   padding: 0;
-  font-family: tahoma,verdana,arial;
+  font-family: Tahoma, Verdana, Arial, sans-serif;
 }
+
 #container {
   width: 1024px;
   margin: auto;
   border: 1px solid #000;
   margin-top: 10px;
 }
+
 #logo {
   background: url(../acp/Theme/img/acp-header.png);
   height: 96px;
 }
-#logo A {
+
+#logo a {
   display: block;
   width: 100%;
   height: 100%;
   text-decoration: none;
 }
-#logo A:focus {
+
+#logo a:focus {
   outline: none;
 }
+
 #bar {
   margin: 0 -10px;
   background: url(../homepagebar.png);
   height: 32px;
   border-bottom: 1px solid #555;
 }
-#bar A {
+
+/* stylelint-disable no-descending-specificity */
+#bar a {
   display: inline-block;
   height: 32px;
   text-indent: -1000px;
 }
-#bar A:hover {
+/* stylelint-enable no-descending-specificity */
+
+#bar a:hover {
   background: url(../homepagebar.png);
 }
-#bar A:focus {
+
+#bar a:focus {
   outline: none;
 }
-#bar A.support {
+
+#bar a.support {
   width: 118px;
 }
-#bar A.support:hover {
+
+#bar a.support:hover {
   background-position: left bottom;
 }
-#bar A.test {
+
+#bar a.test {
   width: 94px;
 }
-#bar A.test:hover {
+
+#bar a.test:hover {
   background-position: -118px bottom;
 }
-#bar A.resource {
+
+#bar a.resource {
   width: 94px;
 }
-#bar A.resource:hover {
+
+#bar a.resource:hover {
   background-position: -212px bottom;
 }
+
 #content {
   background: url(../acp/Theme/img/pagebg.png) top repeat-x #152b49;
   padding-top: 10px;
 }
+
 .box {
   margin: 10px;
   border: 1px solid #ccf;
 }
+
 .box.mini {
   width: 31%;
   float: left;
 }
+
 .box .content {
   background: #fff;
   padding: 20px;
 }
+
 .box.mini .content {
   height: 200px;
 }
+
 .box .title {
   background: url(../Themes/Default/img/boxgrad.png);
   color: #fff;
   padding: 5px;
 }
+
+/* stylelint-disable no-descending-specificity */
 .box1 .content {
   background: url(../customizable.png) no-repeat 95% 95% #fff;
 }
+
 .box2 .content {
   background: url(../secure.png) no-repeat 95% 95% #fff;
 }
+
 .box3 .content {
   background: url(../norefresh.png) no-repeat 95% 95% #fff;
 }
+/* stylelint-enable no-descending-specificity */
+
 #signup {
   float: right;
   background: url(../Themes/Default/img/shade.png) bottom repeat-x;
@@ -99,26 +126,32 @@ BODY {
   padding: 30px;
   margin: 30px;
 }
-LABEL {
+
+label {
   display: inline-block;
   width: 100px;
 }
-INPUT[type=text],
-INPUT[type=password] {
+
+input[type="text"],
+input[type="password"] {
   width: 200px;
 }
-INPUT[type=submit] {
+
+input[type="submit"] {
   margin-top: 10px;
   padding: 5px;
 }
+
 #post {
   position: absolute;
   top: -1000px;
   left: -1000px;
 }
-UL {
+
+ul {
   padding-left: 20px;
 }
+
 .error {
   border: 1px solid #f00;
   background: #fdd;
@@ -126,11 +159,13 @@ UL {
   text-align: center;
   margin-bottom: 10px;
 }
+
 #copyright {
   text-align: center;
   color: #fff;
   margin: 10px;
 }
+
 .center {
   text-align: center;
 }

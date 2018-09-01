@@ -7,15 +7,17 @@ function getJXBDBaseDir() {
   var elts = document.getElementsByTagName("script");
   for (var i = 0; i < elts.length; i++) {
     var elt = elts[i];
-    if (elt.src.substr(elt.src.length - 8, 8) == "jsrun.js")
+    if (elt.src.substr(elt.src.length - 8, 8) == "jsrun.js") {
       return elt.src.substr(0, elt.src.length - 8);
+    }
   }
   return null;
 }
 
 function IMWindow(uid, uname) {
-  if (!globalsettings.can_im)
+  if (!globalsettings.can_im) {
     return alert("You do not have permission to use this feature.");
+  }
   RUN.stream.commands.im([uid, uname, false]);
 }
 
@@ -32,23 +34,24 @@ IMWindow.menu = function(e, uid) {
   document.body.appendChild(d);
   document.body.onclick = function(e) {
     e = JAX.event(e);
-    if (e.srcElement != d && !JAX.el.isChildOf(e.srcElement, d))
+    if (e.srcElement != d && !JAX.el.isChildOf(e.srcElement, d)) {
       d.parentNode.removeChild(d);
+    }
   };
 
   RUN.stream.load("?module=privatemessage&im_menu=" + uid);
 };
 
 function RUNF() {
-  var me = this,
-    stream = (me.stream = new JAX.ajax());
+  var me = this;
+  var stream = (me.stream = new JAX.ajax());
 
   if (useJSLinks) JAX.gracefulDegrade(document.body);
 
   this.updateDates = function() {
-    var dates = $$(".autodate"),
-      x,
-      parsed;
+    var dates = $$(".autodate");
+    var x;
+    var parsed;
     if (!dates) return;
     for (x = 0; x < dates.length; x++) {
       parsed = JAX.el.hasClass(dates[x], "smalldate")
@@ -61,25 +64,27 @@ function RUNF() {
   setInterval(this.updateDates, 1000 * 30);
 
   this.submitForm = function(a, b) {
-    var names = [],
-      values = [],
-      x,
-      l = a.elements.length,
-      submit,
-      i;
+    var names = [];
+    var values = [];
+    var x;
+    var l = a.elements.length;
+    var submit;
+    var i;
     submit = a.submitButton;
     for (x = 0; x < l; x++) {
       if (!a[x].name || a[x].type == "submit") continue;
       if (a[x].type == "select-multiple") {
-        for (i = 0; i < a[x].options.length; i++)
+        for (i = 0; i < a[x].options.length; i++) {
           if (a[x].options[i].selected) {
             names.push(a[x].name + "[]");
             values.push(a[x].options[i].value);
           }
+        }
         continue;
       }
-      if ((a[x].type == "checkbox" || a[x].type == "radio") && !a[x].checked)
+      if ((a[x].type == "checkbox" || a[x].type == "radio") && !a[x].checked) {
         continue;
+      }
       names.push(a[x].name);
       values.push(a[x].value);
     }
@@ -104,27 +109,28 @@ function RUNF() {
     RUN.stream.donext();
   };
 
-  //page change event handler
+  // page change event handler
   // Setup Stream
   stream.donext = function(a) {
     if (a) {
       stream.loader();
     }
     clearTimeout(stream.timeout);
-    if (document.cookie.match("actw=" + window.name))
+    if (document.cookie.match("actw=" + window.name)) {
       stream.timeout = setTimeout(stream.loader, updatetime);
+    }
   };
   stream.setup.callback = function(xmlobj) {
     if (xmlobj.status != 200) return;
     else xmlobj.parsed = true;
-    var xml = xmlobj.responseText,
-      db = $("debug"),
-      softurl = false;
+    var xml = xmlobj.responseText;
+    var db = $("debug");
+    var softurl = false;
     if (typeof xml != "string") xml = "";
     if (db) db.innerHTML = "<xmp>" + xml + "</xmp>";
-    var x,
-      cmd,
-      cmds = [];
+    var x;
+    var cmd;
+    var cmds = [];
     if (xml.length) {
       try {
         cmds = eval("(" + xml + ")");
@@ -137,7 +143,9 @@ function RUNF() {
           softurl = true;
           continue;
         }
-        if (stream.commands[cmd]) var cmd = stream.commands[cmd](cmds[x]);
+        if (stream.commands[cmd]) {
+          cmd = stream.commands[cmd](cmds[x]);
+        }
       }
     }
     if (xmlobj.type >= 2) {
@@ -171,7 +179,8 @@ function RUNF() {
     return true;
   };
   stream.updatePage = function() {
-    //this function makes the back/forward buttons actually do something, using anchors
+    // this function makes the back/forward buttons actually do something,
+    // using anchors
     var l;
     if ((l = document.location.hash.substring(1) || "") != stream.lastURL) {
       stream.location(l, "3");
@@ -198,8 +207,8 @@ function RUNF() {
       document.title = a;
     },
     update: function(a) {
-      var el = a[0],
-        paths;
+      var el = a[0];
+      var paths;
       if (el == "path" && (paths = $$(".path")).length > 1) {
         for (var x = 0; x < paths.length; x++) {
           paths[x].innerHTML = a[1];
@@ -211,10 +220,11 @@ function RUNF() {
       el = $$(el);
       if (!el) return;
       el.innerHTML = a[1];
-      if (a[2])
+      if (a[2]) {
         JAX.sfx(el)
           .dehighlight()
           .play();
+      }
       JAX.gracefulDegrade(el);
     },
     removeel: function(a) {
@@ -239,12 +249,11 @@ function RUNF() {
       if ($("status")) $("status").className = a[0];
     },
     appendrows: function(a) {
-      var table = $$(a[0]),
-        span = document.createElement("span");
+      var table = $$(a[0]);
+      var span = document.createElement("span");
       span.innerHTML = "<table>" + a[1] + "</table>";
-
       var vtbody = span.getElementsByTagName("tbody")[0];
-      //table=table.getElementsByTagName('tbody')[0],
+      // table=table.getElementsByTagName('tbody')[0],
       JAX.gracefulDegrade(vtbody);
       table.appendChild(vtbody);
     },
@@ -257,11 +266,11 @@ function RUNF() {
       if (a) a.disabled = false;
     },
     addshout: function(a) {
-      var a = a[0],
-        ss = $$("#shoutbox .shout"),
-        x,
-        span = document.createElement("span"),
-        div;
+      var a = a[0];
+      var ss = $$("#shoutbox .shout");
+      var x;
+      var span = document.createElement("span");
+      var div;
       span.innerHTML = a;
       if (ss && !ss.length) ss = [ss];
       div = span.firstChild;
@@ -290,8 +299,8 @@ function RUNF() {
       JAX.sfx(tick)
         .add("height", "0px", h)
         .play();
-      var ticks = $$(".tick", ticker),
-        l = ticks.length;
+      var ticks = $$(".tick", ticker);
+      var l = ticks.length;
       tick.style.display = "block";
       if (l > 100) {
         for (var x = 100; x < l; x++) {
@@ -310,8 +319,8 @@ function RUNF() {
       }
     },
     im: function(a) {
-      var sb = $$("#im_" + a[0] + " .ims"),
-        test;
+      var sb = $$("#im_" + a[0] + " .ims");
+      var test;
       JAX.flashTitle("New message from " + a[1] + "!");
       if (
         !window.hasFocus &&
@@ -358,10 +367,10 @@ function RUNF() {
       }
       if (a[2]) {
         a[3] = parseInt(a[3]);
-        var d = document.createElement("div"),
-          l,
-          x,
-          act = a[2].substring(0, 3) == "/me";
+        var d = document.createElement("div");
+        var l;
+        var x;
+        var act = a[2].substring(0, 3) == "/me";
         if (act) {
           d.className = "action";
           a[2] = a[2].substring(3);
@@ -410,8 +419,8 @@ function RUNF() {
     },
     openbuddylist: function(a) {
       a = a[0];
-      var buddylist = $("buddylist"),
-        win;
+      var buddylist = $("buddylist");
+      var win;
       if (!buddylist) {
         win = new JAX.window();
         win.id = "buddylist";
@@ -434,11 +443,11 @@ function RUNF() {
       JAX.window.close(a);
     },
     onlinelist: function(a) {
-      var html = "",
-        tmp,
-        link,
-        statusers = $("statusers"),
-        newlink;
+      var html = "";
+      var tmp;
+      var link;
+      var statusers = $("statusers");
+      var newlink;
       if (!statusers) return;
       for (x = 0; x < a[0].length; x++) {
         tmp = a[0][x];
@@ -456,10 +465,11 @@ function RUNF() {
           tmp[1] +
           " " +
           (tmp[2] ? " " + tmp[2] : "");
-        if (tmp[4])
+        if (tmp[4]) {
           link.onmouseover = function() {
             JAX.tooltip(this, this.title);
           };
+        }
         link.title = tmp[4];
         if (tmp[2] != "idle") {
           if (statusers.firstChild) {
@@ -469,18 +479,18 @@ function RUNF() {
       }
     },
     setoffline: function(a) {
-      var statusers = $("statusers"),
-        ids = a[0].split(","),
-        x,
-        link;
+      var statusers = $("statusers");
+      var ids = a[0].split(",");
+      var x;
+      var link;
       for (x = 0; x < ids.length; x++) {
         link = $$("#statusers .user" + ids[x]);
         if (link) statusers.removeChild(link);
       }
     },
     scrollToPost: function(a) {
-      var el = document.getElementById("pid_" + a[0]),
-        pos;
+      var el = document.getElementById("pid_" + a[0]);
+      var pos;
       if (!el) return false;
       JAX.onImagesLoaded(
         document.getElementById("page").getElementsByTagName("img"),
@@ -500,8 +510,8 @@ function RUNF() {
       }
     },
     newmessage: function(a) {
-      var n = $("notification"),
-        num = $("num-messages");
+      var n = $("notification");
+      var num = $("num-messages");
       if (num) num.innerHTML = parseInt(num.innerHTML) + 1;
       if (!n) {
         n = document.createElement("div");
@@ -570,8 +580,8 @@ function RUNF() {
       };
     },
     listrating: function(a) {
-      var prdiv = $("postrating_" + a[0]),
-        c;
+      var prdiv = $("postrating_" + a[0]);
+      var c;
       if (prdiv) {
         if (prdiv.style.display != "none") {
           new JAX.sfx(prdiv)
@@ -615,12 +625,17 @@ function RUNF() {
 
   document.cookie = "buddylist=0";
 
-  var foot = $$(".footer"),
-    fs;
-  while (foot && foot.tagName != "BODY" && (fs = JAX.el.getComputedStyle(foot)))
-    if (fs.display == "none" || fs.visibility == "hidden")
+  var foot = $$(".footer");
+  var fs;
+  while (
+    foot &&
+    foot.tagName != "BODY" &&
+    (fs = JAX.el.getComputedStyle(foot))
+  ) {
+    if (fs.display == "none" || fs.visibility == "hidden") {
       return alert("WARNING: COPYRIGHT MISSING, THIS IS AGAINST TOS");
-    else foot = foot.parentNode;
+    } else foot = foot.parentNode;
+  }
 }
 
 $(function() {

@@ -3,32 +3,41 @@
   border-collapse: collapse;
   color: #fff;
 }
-.tooltip TD {
+
+.tooltip td {
   background: url(tooltip.png);
 }
+
 .tooltip .top {
   height: 10px;
 }
+
 .tooltip .bottom {
   height: 15px;
 }
+
 .tooltip .top .right {
   background-position: top right;
 }
-.tooltip .content TD {
+
+.tooltip .content td {
   background-position: center center;
 }
+
 .tooltip .content .left {
   background-position: center left;
   width: 10px;
 }
+
 .tooltip .content .right {
   background-position: center right;
   width: 10px;
 }
+
 .tooltip .bottom .left {
   background-position: bottom left;
 }
+
 .tooltip .bottom .right {
   background-position: bottom right;
 }
