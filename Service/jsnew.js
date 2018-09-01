@@ -117,10 +117,6 @@ var JAX = new function() {
     dE = document.documentElement,
     JAX = this;
 
-  this.isArray = function(a) {
-    return a.constructor.toString().match("Array") ? true : false;
-  };
-
   this.date = function(a) {
     var old = new Date(),
       now = new Date(),
@@ -218,24 +214,6 @@ var JAX = new function() {
     var l = st.length;
     for (var x = 0; x < len - l; x++) st = chr + st;
     return st;
-  };
-
-  this.toJSON = function(content) {
-    var x,
-      r = "",
-      ar = JAX.isArray(content);
-    if (ar) {
-      for (x = 0; x < content.length; x++) {
-        r += JAX.toJSON(content[x]) + ",";
-      }
-    } else if (typeof content == "object") {
-      for (x in content) {
-        r += '"' + x + '":' + JAX.toJSON(content[x]) + ",";
-      }
-    } else if (typeof content == "string")
-      return '"' + content.replace(/"/g, '\\"') + '"';
-    else return content;
-    return (ar ? "[" : "{") + r.substr(0, r.length - 1) + (ar ? "]" : "}");
   };
 
   this.API = {
@@ -417,7 +395,7 @@ var JAX = new function() {
 
   this.convertSwitches = function(switches) {
     if (!switches) return;
-    if (!JAX.isArray(switches)) switches = [switches];
+    if (!Array.isArray(switches)) switches = [switches];
     var x,
       l = switches.length,
       s,
@@ -754,7 +732,7 @@ var JAX = new function() {
       };
       me.morph = function(from, percent, to) {
         var x, r;
-        if (JAX.isArray(from) && from.length == to.length) {
+        if (Array.isArray(from) && from.length == to.length) {
           r = [];
           for (x = 0; x < from.length; x++)
             r[x] = Math.round(this.morph(from[x], percent, to[x]));
@@ -1716,7 +1694,7 @@ var JAX = new function() {
         } else {
         }
         drag.reset(a.el, 1);
-        if (formfield) formfield.value = JAX.toJSON(parsetree(tree));
+        if (formfield) formfield.value = JSON.stringify(parsetree(tree));
       }
     });
 
@@ -1786,8 +1764,8 @@ var JAX = new function() {
       if (d) d = "POST";
       if (
         c &&
-        JAX.isArray(c) &&
-        JAX.isArray(c[0]) &&
+        Array.isArray(c) &&
+        Array.isArray(c[0]) &&
         c[0].length == c[1].length
       )
         c = me.build_query(c[0], c[1]);
