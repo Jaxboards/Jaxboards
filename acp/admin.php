@@ -77,7 +77,7 @@ if (!$PERMS['can_access_acp']) {
 
 $PAGE = new PAGE();
 $PAGE->append('username', $JAX->userData['display_name']);
-$PAGE->title($PAGE->getCFGSetting('boardname').' - ACP');
+$PAGE->title($PAGE->getCFGSetting('boardname') . ' - ACP');
 $PAGE->addNavMenu(
     'Settings',
     '?act=settings',

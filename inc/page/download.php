@@ -38,17 +38,17 @@ EOT
                 $ext = mb_strtolower(array_pop($ext));
             }
             if (in_array($ext, array('jpeg', 'jpg', 'png', 'gif', 'bmp'))) {
-                $data['hash'] .= '.'.$ext;
+                $data['hash'] .= '.' . $ext;
             }
-            $file = BOARDPATH.'Uploads/'.$data['hash'];
+            $file = BOARDPATH . 'Uploads/' . $data['hash'];
             if (file_exists($file)) {
                 if (!$data['name']) {
                     $data['name'] = 'unknown';
                 }
                 header('Content-type:application/idk');
                 header(
-                    'Content-disposition:attachment;filename="'.
-                    $data['name'].'"'
+                    'Content-disposition:attachment;filename="' .
+                    $data['name'] . '"'
                 );
                 readfile($file);
             }

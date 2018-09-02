@@ -122,8 +122,8 @@ EOT
 
 EOT
     ,
-    'subforum-icon-unread' => '<img src="'.BOARDURL.
+    'subforum-icon-unread' => '<img src="' . BOARDURL .
     'Service/Themes/Default/icons/unread.png" />',
-    'subforum-icon-read' => '<img src="'.BOARDURL.
+    'subforum-icon-read' => '<img src="' . BOARDURL .
     'Service/Themes/Default/icons/read.png" />',
 );

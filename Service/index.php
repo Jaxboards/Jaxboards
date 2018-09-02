@@ -20,16 +20,16 @@ if (!defined('SERVICE_ROOT')) {
     define('SERVICE_ROOT', __DIR__);
 }
 
-require_once JAXBOARDS_ROOT.'/inc/classes/mysql.php';
-require_once JAXBOARDS_ROOT.'/inc/classes/jax.php';
+require_once JAXBOARDS_ROOT . '/inc/classes/mysql.php';
+require_once JAXBOARDS_ROOT . '/inc/classes/jax.php';
 
 $JAX = new JAX();
 $DB = new MySQL();
 
-if (!file_exists(JAXBOARDS_ROOT.'/config.php')) {
+if (!file_exists(JAXBOARDS_ROOT . '/config.php')) {
     die('Jaxboards not installed!');
 }
-require_once JAXBOARDS_ROOT.'/config.php';
+require_once JAXBOARDS_ROOT . '/config.php';
 
 if (!$CFG['service']) {
     die('Service mode not enabled');
@@ -49,10 +49,10 @@ function recurseCopy($src, $dst)
     @mkdir($dst);
     while (false !== ($file = readdir($dir))) {
         if (('.' !== $file) && ('..' !== $file)) {
-            if (is_dir($src.'/'.$file)) {
-                recurseCopy($src.'/'.$file, $dst.'/'.$file);
+            if (is_dir($src . '/' . $file)) {
+                recurseCopy($src . '/' . $file, $dst . '/' . $file);
             } else {
-                copy($src.'/'.$file, $dst.'/'.$file);
+                copy($src . '/' . $file, $dst . '/' . $file);
             }
         }
     }
@@ -69,7 +69,7 @@ $connected = $DB->connect(
 $errors = array();
 if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     if (isset($JAX->p['post']) && $JAX->p['post']) {
-        header('Location: https://test.'.$CFG['domain']);
+        header('Location: https://test.' . $CFG['domain']);
     }
 
     if (!$connected) {
@@ -88,7 +88,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     } elseif ('www' == $JAX->p['boardurl']) {
         $errors[] = 'WWW is reserved.';
     } elseif (preg_match('@\\W@', $JAX->p['boardurl'])) {
-        $errors[] = 'board url needs to consist of letters, '.
+        $errors[] = 'board url needs to consist of letters, ' .
             'numbers, and underscore only';
     }
 
@@ -111,7 +111,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     if (mb_strlen($JAX->p['username']) > 50) {
         $errors[] = 'username too long';
     } elseif (preg_match('@\\W@', $JAX->p['username'])) {
-        $errors[] = 'username needs to consist of letters, '.
+        $errors[] = 'username needs to consist of letters, ' .
             'numbers, and underscore only';
     }
 
@@ -130,7 +130,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
 
     if (empty($errors)) {
         $board = $JAX->p['boardurl'];
-        $boardPrefix = $board.'_';
+        $boardPrefix = $board . '_';
 
         $DB->prefix('');
         // Add board to directory
@@ -152,7 +152,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         // https://stackoverflow.com/a/19752106
         // It's not pretty or perfect but it'll work for our use case...
         $query = '';
-        $lines = file(SERVICE_ROOT.'/blueprint.sql');
+        $lines = file(SERVICE_ROOT . '/blueprint.sql');
         foreach ($lines as $line) {
             // Skip comments
             if ('--' == mb_substr($line, 0, 2) || '' == $line) {
@@ -195,9 +195,9 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         if ($dbError) {
             $errors[] = $dbError;
         } else {
-            recurseCopy('blueprint', JAXBOARDS_ROOT.'/boards/'.$board);
+            recurseCopy('blueprint', JAXBOARDS_ROOT . '/boards/' . $board);
 
-            header('Location: https://'.$JAX->p['boardurl'].'.'.$CFG['domain']);
+            header('Location: https://' . $JAX->p['boardurl'] . '.' . $CFG['domain']);
         }
     }
 }

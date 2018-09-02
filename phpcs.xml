@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<ruleset name="Jaxboards">
+    <description>Jaxboards PHP coding standards</description>
+
+		<!-- Files and directories to run on -->
+    <file>acp</file>
+    <file>inc</file>
+    <file>emoticons</file>
+    <file>misc</file>
+    <file>Script</file>
+    <file>Service</file>
+    <file>config.default.php</file>
+    <file>domaindefinitions.php</file>
+    <file>index.php</file>
+
+    <!-- inc/lib files are third party, so we shouldn't touch them -->
+    <exclude-pattern>*/inc/lib/*</exclude-pattern>
+    <!-- ignore vendor files -->
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/node_modules/*</exclude-pattern>
+
+		<!-- basepath is where this file is -->
+    <arg name="basepath" value="."/>
+		<!-- show colors -->
+    <arg name="colors" />
+		<!-- process files in parallel -->
+    <arg name="parallel" value="64" />
+    <!-- only check php files -->
+    <arg name="extensions" value="php" />
+
+		<!-- Follow PSR coding style guides -->
+		<!-- PSR1: Basic Coding Standard https://www.php-fig.org/psr/psr-1 -->
+    <rule ref="PSR1" />
+		<!-- PSR2: Coding Style Guide https://www.php-fig.org/psr/psr-2 -->
+    <rule ref="PSR2" />
+		<!-- PSR12 (draft): Extended Coding Style Guide
+			https://github.com/php-fig/fig-standards/blob/master/proposed/extended-coding-style-guide.md -->
+    <rule ref="PSR12" />
+
+    <!-- Ban some functions -->
+    <rule ref="Generic.PHP.ForbiddenFunctions">
+        <properties>
+            <property name="forbiddenFunctions" type="array">
+                <element key="sizeof" value="count"/>
+                <element key="delete" value="unset"/>
+                <element key="print" value="echo"/>
+                <element key="is_null" value="null"/>
+                <element key="create_function" value="null"/>
+                <!-- string to mb_string functions -->
+                <element key="stripos" value="mb_stripos"/>
+                <element key="stristr" value="mb_stristr"/>
+                <element key="strlen" value="mb_strlen"/>
+                <element key="strpos" value="mb_strpos"/>
+                <element key="strrchr" value="mb_strrchr"/>
+                <element key="strrichr" value="mb_strrichr"/>
+                <element key="strripos" value="mb_strripos"/>
+                <element key="strrpos" value="mb_strrpos"/>
+                <element key="strstr" value="mb_strstr"/>
+                <element key="strtolower" value="mb_strtolower"/>
+                <element key="strtoupper" value="mb_strtoupper"/>
+                <element key="substr_count" value="mb_substr_count"/>
+                <element key="substr" value="mb_substr"/>
+                <!-- md5 functions -->
+                <element key="md5" value="hash"/>
+                <element key="md5_file" value="hash_file"/>
+                <!-- mysql functions -->
+                <element key="mysql_affected_rows" value="mysqli_affected_rows"/>
+                <element key="mysql_client_encoding" value="null"/>
+                <element key="mysql_close" value="mysqli_close"/>
+                <element key="mysql_connect" value="mysqli_connect"/>
+                <element key="mysql_create_db" value="null"/>
+                <element key="mysql_data_seek" value="mysqli_data_seek"/>
+                <element key="mysql_db_name" value="null"/>
+                <element key="mysql_db_query" value="null"/>
+                <element key="mysql_drop_db" value="null"/>
+                <element key="mysql_errno" value="mysqli_errno"/>
+                <element key="mysql_error" value="mysqli_error"/>
+                <element key="mysql_escape_string" value="mysqli_escape_string"/>
+                <element key="mysql_fetch_array" value="mysqli_fetch_array"/>
+                <element key="mysql_fetch_assoc" value="mysqli_fetch_assoc"/>
+                <element key="mysql_fetch_field" value="mysqli_fetch_field"/>
+                <element key="mysql_fetch_lengths" value="mysqli_fetch_lengths"/>
+                <element key="mysql_fetch_object" value="mysqli_fetch_object"/>
+                <element key="mysql_fetch_row" value="mysqli_fetch_row"/>
+                <element key="mysql_field_flags" value="null"/>
+                <element key="mysql_field_len" value="null"/>
+                <element key="mysql_field_name" value="null"/>
+                <element key="mysql_field_seek" value="mysqli_field_seek"/>
+                <element key="mysql_field_table" value="null"/>
+                <element key="mysql_field_type" value="null"/>
+                <element key="mysql_free_result" value="mysqli_free_result"/>
+                <element key="mysql_get_client_info" value="mysqli_get_client_info"/>
+                <element key="mysql_get_host_info" value="mysqli_get_host_info"/>
+                <element key="mysql_get_proto_info" value="mysqli_get_proto_info"/>
+                <element key="mysql_get_server_info" value="mysqli_get_server_info"/>
+                <element key="mysql_info" value="mysqli_info"/>
+                <element key="mysql_insert_id" value="mysqli_insert_id"/>
+                <element key="mysql_list_dbs" value="null"/>
+                <element key="mysql_list_fields" value="null"/>
+                <element key="mysql_list_processes" value="null"/>
+                <element key="mysql_list_tables" value="null"/>
+                <element key="mysql_num_fields" value="mysqli_num_fields"/>
+                <element key="mysql_num_rows" value="mysqli_num_rows"/>
+                <element key="mysql_pconnect" value="null"/>
+                <element key="mysql_ping" value="mysqli_ping"/>
+                <element key="mysql_query" value="mysqli_query"/>
+                <element key="mysql_real_escape_string" value="mysqli_real_escape_string"/>
+                <element key="mysql_result" value="null"/>
+                <element key="mysql_select_db" value="mysqli_select_db"/>
+                <element key="mysql_set_charset" value="mysqli_set_charset"/>
+                <element key="mysql_stat" value="mysqli_stat"/>
+                <element key="mysql_tablename" value="null"/>
+                <element key="mysql_thread_id" value="mysqli_thread_id"/>
+                <element key="mysql_unbuffered_query" value="null"/>
+            </property>
+        </properties>
+    </rule>
+
+</ruleset>
+

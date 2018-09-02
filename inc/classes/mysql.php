@@ -41,7 +41,7 @@ class MySQL
 
     public function ftable($a)
     {
-        return '`'.$this->prefix.$a.'`';
+        return '`' . $this->prefix . $a . '`';
     }
 
     public function error($use_mysqli = 0)
@@ -78,8 +78,8 @@ class MySQL
         array_shift($va_array); // table
         array_shift($va_array); // where
 
-        $query = 'SELECT '.$selectors.' FROM '.
-            $this->ftable($table).($where ? ' '.$where : '');
+        $query = 'SELECT ' . $selectors . ' FROM ' .
+            $this->ftable($table) . ($where ? ' ' . $where : '');
         array_unshift($va_array, $query);
 
         return call_user_func_array(array($this, 'safequery'), $va_array);
@@ -97,8 +97,8 @@ class MySQL
     public function safeinsert($a, $b)
     {
         return $this->safequery(
-            'INSERT INTO '.$this->ftable($a).
-            ' (`'.implode('`, `', array_keys($b)).'`) VALUES ?;',
+            'INSERT INTO ' . $this->ftable($a) .
+            ' (`' . implode('`, `', array_keys($b)) . '`) VALUES ?;',
             array_values($b)
         );
     }
@@ -127,7 +127,7 @@ class MySQL
         foreach ($r[1] as $k => $v) {
             $r[1][$k] = implode(',', $v);
         }
-        $r[1] = '('.implode('),(', $r[1]).')';
+        $r[1] = '(' . implode('),(', $r[1]) . ')';
 
         return $r;
     }
@@ -145,10 +145,10 @@ class MySQL
 
         $keynames = $this->safeBuildUpdate($kvarray);
         if (!empty($whereformat)) {
-            $whereformat = ' '.$whereformat;
+            $whereformat = ' ' . $whereformat;
         }
 
-        $query = 'UPDATE '.$this->ftable($table).' SET '.$keynames.$whereformat;
+        $query = 'UPDATE ' . $this->ftable($table) . ' SET ' . $keynames . $whereformat;
 
         array_unshift($va_array, $query);
 
@@ -165,14 +165,14 @@ class MySQL
 
         /* e.g. if array is a => b; c => c; then result is a = ?, b = ?,
           where the first " = ?," comes from the implode. */
-        return '`'.implode('` = ?, `', array_keys($kvarray)).'` = ?';
+        return '`' . implode('` = ?, `', array_keys($kvarray)) . '` = ?';
     }
 
     public function buildUpdate($a)
     {
         $r = '';
         foreach ($a as $k => $v) {
-            $r .= $this->eKey($k).'='.$this->evalue($v).',';
+            $r .= $this->eKey($k) . '=' . $this->evalue($v) . ',';
         }
 
         return mb_substr($r, 0, -1);
@@ -180,8 +180,8 @@ class MySQL
 
     public function safedelete($table, $whereformat /*, ... */)
     {
-        $query = 'DELETE FROM '.$this->ftable($table).
-            ($whereformat ? ' '.$whereformat : '');
+        $query = 'DELETE FROM ' . $this->ftable($table) .
+            ($whereformat ? ' ' . $whereformat : '');
 
         $va_array = func_get_args();
 
@@ -252,7 +252,7 @@ class MySQL
         if (!$result) {
             syslog(
                 LOG_ERR,
-                'NULL RESULT in disposeresult'.PHP_EOL.print_r(
+                'NULL RESULT in disposeresult' . PHP_EOL . print_r(
                     debug_backtrace(),
                     true
                 )
@@ -296,10 +296,10 @@ class MySQL
         $last = array_pop($arr);
 
         if ($arrlen > 0) {
-            $replacement = '('.str_repeat('?, ', ($arrlen) - 1).' ?)';
+            $replacement = '(' . str_repeat('?, ', ($arrlen) - 1) . ' ?)';
         }
 
-        return implode('?', $arr).$replacement.$last;
+        return implode('?', $arr) . $replacement . $last;
     }
 
     public function safequery($query_string /*, ... */)
@@ -347,13 +347,13 @@ class MySQL
             $error = $this->mysqli_connection->error;
             if ($error) {
                 error_log(
-                    "ERROR WITH QUERY: ${query_string}".PHP_EOL."${error}"
+                    "ERROR WITH QUERY: ${query_string}" . PHP_EOL . "${error}"
                 );
             }
             syslog(
                 LOG_ERR,
-                "SAFEQUERY PREPARE FAILED FOR ${query_string}, ".
-                print_r($out_args, true).PHP_EOL
+                "SAFEQUERY PREPARE FAILED FOR ${query_string}, " .
+                print_r($out_args, true) . PHP_EOL
             );
 
             return;
@@ -365,12 +365,12 @@ class MySQL
             $refclass = new ReflectionClass('mysqli_stmt');
             $method = $refclass->getMethod('bind_param');
             if (!$method->invokeArgs($stmt, $refvalues)) {
-                syslog(LOG_ERR, 'BIND PARAMETERS FAILED'.PHP_EOL);
-                syslog(LOG_ERR, "QUERYSTRING: ${query_string}".PHP_EOL);
-                syslog(LOG_ERR, 'ELEMENTCOUNT: '.mb_strlen($typestring));
-                syslog(LOG_ERR, 'BINDVARCOUNT: '.(count($refvalues[1])));
-                syslog(LOG_ERR, 'QUERYARGS: '.print_r($out_args, true).PHP_EOL);
-                syslog(LOG_ERR, 'REFVALUES: '.print_r($refvalues, true).PHP_EOL);
+                syslog(LOG_ERR, 'BIND PARAMETERS FAILED' . PHP_EOL);
+                syslog(LOG_ERR, "QUERYSTRING: ${query_string}" . PHP_EOL);
+                syslog(LOG_ERR, 'ELEMENTCOUNT: ' . mb_strlen($typestring));
+                syslog(LOG_ERR, 'BINDVARCOUNT: ' . (count($refvalues[1])));
+                syslog(LOG_ERR, 'QUERYARGS: ' . print_r($out_args, true) . PHP_EOL);
+                syslog(LOG_ERR, 'REFVALUES: ' . print_r($refvalues, true) . PHP_EOL);
                 syslog(LOG_ERR, print_r(debug_backtrace(), true));
             }
         }
@@ -380,29 +380,29 @@ class MySQL
             $error = $this->mysqli_connection->error;
             if ($error) {
                 error_log(
-                    "ERROR WITH QUERY: ${query_string}".PHP_EOL."${error}"
+                    "ERROR WITH QUERY: ${query_string}" . PHP_EOL . "${error}"
                 );
             }
 
             return;
         }
         if (!$stmt) {
-            syslog(LOG_ERR, "Statement is NULL for ${query_string}".PHP_EOL);
+            syslog(LOG_ERR, "Statement is NULL for ${query_string}" . PHP_EOL);
         }
         $retval = $stmt->get_result();
 
         if (!$retval) {
             if (!preg_match('/^\\s*(UPDATE|DELETE|INSERT)\\s/i', $query_string)) {
                 /* This is normal for a non-SELECT query. */
-                syslog(LOG_ERR, "Result is NULL for ${query_string}".PHP_EOL);
+                syslog(LOG_ERR, "Result is NULL for ${query_string}" . PHP_EOL);
             }
         }
 
         $error = $this->mysqli_connection->error;
         if ($error) {
             error_log(
-                    "ERROR WITH QUERY: ${query_string}".PHP_EOL."${error}"
-                );
+                "ERROR WITH QUERY: ${query_string}" . PHP_EOL . "${error}"
+            );
         }
 
         return $retval;
@@ -421,7 +421,7 @@ class MySQL
 
     public function ekey($key)
     {
-        return '`'.$this->escape($key).'`';
+        return '`' . $this->escape($key) . '`';
     }
 
     /* Like evalue, but does not quote strings.  For use with safequery(). */
@@ -445,9 +445,9 @@ class MySQL
             $value = 'NULL';
         } else {
             $value = is_int($value) ? $value :
-                '\''.$this->escape(
+                '\'' . $this->escape(
                     ($forsprintf ? str_replace('%', '%%', $value) : $value)
-                ).'\'';
+                ) . '\'';
         }
 
         return $value;
@@ -474,7 +474,7 @@ class MySQL
         if (!$tablenames) {
             syslog(
                 LOG_ERR,
-                'NO TABLE NAMES'.PHP_EOL.print_r(
+                'NO TABLE NAMES' . PHP_EOL . print_r(
                     debug_backtrace(),
                     true
                 )
@@ -526,7 +526,7 @@ EOT
                     if (2 != $USER['group_id']) {
                         continue;
                     }
-                    $f['name'] = '* '.$f['name'];
+                    $f['name'] = '* ' . $f['name'];
                 }
                 $f['birthday'] = ($f['dob'] == $today ? 1 : 0);
                 $f['status'] = $f['last_action'] < $idletimeout ?
@@ -553,7 +553,7 @@ EOT
                     'group_id' => $USER['group_id'],
                     'last_action' => $SESS->last_action,
                     'last_update' => $SESS->last_update,
-                    'name' => ($SESS->hide ? '* ' : '').$USER['display_name'],
+                    'name' => ($SESS->hide ? '* ' : '') . $USER['display_name'],
                     'status' => $SESS->last_action < $idletimeout ?
                     'idle' : 'active',
                     'birthday' => $USER['birthday'],
@@ -624,10 +624,10 @@ EOT
 
     public function debug()
     {
-        return '<div>'.implode(
+        return '<div>' . implode(
             '<br />',
             $this->queryList
-        ).'</div>';
+        ) . '</div>';
         $this->queryList = array();
     }
 }

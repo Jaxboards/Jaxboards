@@ -27,28 +27,28 @@ if (!isset($DB)) {
 $host = $_SERVER['SERVER_NAME'];
 // build the url
 $baseURL = (isset($_SERVER['REQUEST_SCHEME']) ?
-    $_SERVER['REQUEST_SCHEME'] : 'https').'://';
+    $_SERVER['REQUEST_SCHEME'] : 'https') . '://';
 $baseURL .= (isset($_SERVER['SERVER_NAME']) ?
     $_SERVER['SERVER_NAME'] : $CFG['domain']);
 if (!('443' === $_SERVER['SERVER_PORT'] && 'https' === $_SERVER['REQUEST_SCHEME'])
     && !('80' === $_SERVER['SERVER_PORT'] && 'http' === $_SERVER['REQUEST_SCHEME'])
 ) {
-    $baseURL .= (isset($_SERVER['SERVER_PORT']) ? ':'.$_SERVER['SERVER_PORT'] : '');
+    $baseURL .= (isset($_SERVER['SERVER_PORT']) ? ':' . $_SERVER['SERVER_PORT'] : '');
 }
-define('BOARDURL', $baseURL.'/');
+define('BOARDURL', $baseURL . '/');
 
-define('SOUNDSURL', BOARDURL.'Sounds/');
-define('SCRIPTURL', BOARDURL.'Script/');
-define('FLAGURL', BOARDURL.'Service/flags/');
+define('SOUNDSURL', BOARDURL . 'Sounds/');
+define('SCRIPTURL', BOARDURL . 'Script/');
+define('FLAGURL', BOARDURL . 'Service/flags/');
 
 $domain_match = str_replace('.', '\\.', $CFG['domain']);
 // get prefix
 if ($CFG['service']) {
-    preg_match('@(.*)\\.'.$domain_match.'@i', $host, $matches);
+    preg_match('@(.*)\\.' . $domain_match . '@i', $host, $matches);
     if (isset($matches[1]) && $matches[1]) {
         $prefix = $matches[1];
         $CFG['prefix'] = $prefix;
-        $CFG['sql_prefix'] = $prefix.'_';
+        $CFG['sql_prefix'] = $prefix . '_';
     } else {
         $prefix = '';
     }
@@ -65,7 +65,7 @@ if ($CFG['service']) {
         if ($prefix) {
             $prefix = $prefix['prefix'];
             $CFG['prefix'] = $prefix;
-            $CFG['sql_prefix'] = $prefix.'_';
+            $CFG['sql_prefix'] = $prefix . '_';
         }
     }
 } else {
@@ -73,11 +73,11 @@ if ($CFG['service']) {
 }
 
 if ($prefix) {
-    define('BOARDPATH', JAXBOARDS_ROOT.'/boards/'.$prefix.'/');
-    define('BOARDPATHURL', BOARDURL.'boards/'.$prefix.'/');
-    define('STHEMEPATH', JAXBOARDS_ROOT.'/Service/Themes/');
-    define('AVAURL', BOARDURL.'Service/Themes/Default/avatars/');
-    define('BOARDCONFIG', BOARDPATH.'config.php');
+    define('BOARDPATH', JAXBOARDS_ROOT . '/boards/' . $prefix . '/');
+    define('BOARDPATHURL', BOARDURL . 'boards/' . $prefix . '/');
+    define('STHEMEPATH', JAXBOARDS_ROOT . '/Service/Themes/');
+    define('AVAURL', BOARDURL . 'Service/Themes/Default/avatars/');
+    define('BOARDCONFIG', BOARDPATH . 'config.php');
     if ($DB) {
         $DB->prefix($CFG['sql_prefix']);
     }

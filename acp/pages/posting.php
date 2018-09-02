@@ -15,18 +15,18 @@ class settings
             $JAX->b['do'] = false;
         }
         switch ($JAX->b['do']) {
-        case 'emoticons':
-            $this->emoticons();
-            break;
-        case 'wordfilter':
-            $this->wordfilter();
-            break;
-        case 'bbcodes':
-            $this->bbcodes();
-            break;
-        case 'postrating':
-            $this->postrating();
-            break;
+            case 'emoticons':
+                $this->emoticons();
+                break;
+            case 'wordfilter':
+                $this->wordfilter();
+                break;
+            case 'bbcodes':
+                $this->bbcodes();
+                break;
+            case 'postrating':
+                $this->postrating();
+                break;
         }
     }
 
@@ -85,7 +85,7 @@ class settings
                 && $wordfilter[$JAX->p['badword']]
             ) {
                 $page .= $PAGE->error(
-                    "'".$JAX->p['badword']."' is already used."
+                    "'" . $JAX->p['badword'] . "' is already used."
                 );
             } else {
                 $DB->safeinsert(
@@ -341,7 +341,7 @@ EOT;
         </th>
     </tr>
 EOT;
-                include JAXBOARDS_ROOT."/emoticons/${emoticonpath}/rules.php";
+                include JAXBOARDS_ROOT . "/emoticons/${emoticonpath}/rules.php";
                 foreach ($rules as $k => $v) {
                     $page .= <<<EOT
 <tr>

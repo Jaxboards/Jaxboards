@@ -143,7 +143,7 @@ EOT
 </a>
 EOT
     ,
-    'default-avatar' => BOARDURL.'Service/Themes/Default/avatars/default.gif',
+    'default-avatar' => BOARDURL . 'Service/Themes/Default/avatars/default.gif',
     'userbox-logged-out' => <<<'EOT'
 <form onsubmit="return RUN.submitForm(this,1)" action="?" method="post">
     <div>

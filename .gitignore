@@ -1,7 +1,6 @@
 # Cache files
 Thumbs.db
 .DS_Store
-.php_cs.cache
 
 # Config files
 Desktop.ini

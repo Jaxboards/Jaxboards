@@ -74,10 +74,10 @@ class SHOUTBOX
             $row['display_name']
         ) : 'Guest';
         $avatar = (isset($CFG['shoutboxava']) && $CFG['shoutboxava']) ?
-            '<img src="'.$JAX->pick(
+            '<img src="' . $JAX->pick(
                 $row['avatar'],
                 $PAGE->meta('default-avatar')
-            ).'" class="avatar" alt="avatar" />' : '';
+            ) . '" class="avatar" alt="avatar" />' : '';
         $deletelink = $PAGE->meta('shout-delete', $row['id']);
         if (!$this->canDelete(0, $row)) {
             $deletelink = '';
@@ -104,7 +104,7 @@ class SHOUTBOX
                     1
                 ),
                 $user,
-                $shout.PHP_EOL,
+                $shout . PHP_EOL,
                 $deletelink,
                 $avatar
             );
@@ -152,9 +152,9 @@ EOT
                     'shoutbox',
                     $shouts
                 )
-            )."<script type='text/javascript'>globalsettings.shoutlimit=".
-            $this->shoutlimit.';globalsettings.sound_shout='.
-            (!$USER || $USER['sound_shout'] ? 1 : 0).
+            ) . "<script type='text/javascript'>globalsettings.shoutlimit=" .
+            $this->shoutlimit . ';globalsettings.sound_shout=' .
+            (!$USER || $USER['sound_shout'] ? 1 : 0) .
             '</script>'
         );
     }
@@ -193,7 +193,7 @@ EOT
                         $PAGE->JS(
                             'playsound',
                             'sfx',
-                            SOUNDSURL.$sounds[$f['shout']].'.mp3'
+                            SOUNDSURL . $sounds[$f['shout']] . '.mp3'
                         );
                     }
                 }
@@ -238,10 +238,10 @@ EOT
                 10
             );
             foreach ($pageArray as $v) {
-                $pages .= '<a href="?module=shoutbox&page='.
-                    $v.'"'.
-                    (($v + 1) == $pagen ? ' class="active"' : '').
-                    '>'.$v.'</a> ';
+                $pages .= '<a href="?module=shoutbox&page=' .
+                    $v . '"' .
+                    (($v + 1) == $pagen ? ' class="active"' : '') .
+                    '>' . $v . '</a> ';
             }
             $pages .= '</span>';
         }
@@ -273,8 +273,8 @@ EOT
         $page = $PAGE->meta(
             'box',
             '',
-            'Shoutbox'.$pages,
-            '<div class="sbhistory">'.$shouts.'</div>'
+            'Shoutbox' . $pages,
+            '<div class="sbhistory">' . $shouts . '</div>'
         );
         $PAGE->JS('update', 'page', $page);
         $PAGE->append('PAGE', $page);

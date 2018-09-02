@@ -38,78 +38,78 @@ EOT
         $PAGE->path(array('UCP' => '?act=ucp'));
         $this->what = isset($JAX->b['what']) ? $JAX->b['what'] : '';
         switch ($this->what) {
-        case 'sounds':
-            $this->showsoundsettings();
-            break;
-        case 'signature':
-            $this->showsigsettings();
-            break;
-        case 'pass':
-            $this->showpasssettings();
-            break;
-        case 'email':
-            $this->showemailsettings();
-            break;
-        case 'avatar':
-            $this->showavatarsettings();
-            break;
-        case 'profile':
-            $this->showprofilesettings();
-            break;
-        case 'board':
-            $this->showboardsettings();
-            break;
-        case 'inbox':
-            if (isset($JAX->p['dmessage'])
+            case 'sounds':
+                $this->showsoundsettings();
+                break;
+            case 'signature':
+                $this->showsigsettings();
+                break;
+            case 'pass':
+                $this->showpasssettings();
+                break;
+            case 'email':
+                $this->showemailsettings();
+                break;
+            case 'avatar':
+                $this->showavatarsettings();
+                break;
+            case 'profile':
+                $this->showprofilesettings();
+                break;
+            case 'board':
+                $this->showboardsettings();
+                break;
+            case 'inbox':
+                if (isset($JAX->p['dmessage'])
                 && is_array($JAX->p['dmessage'])
-            ) {
-                foreach ($JAX->p['dmessage'] as $v) {
-                    $this->delete($v, false);
+                ) {
+                    foreach ($JAX->p['dmessage'] as $v) {
+                        $this->delete($v, false);
+                    }
                 }
-            }
-            if (isset($JAX->p['messageid'])
+                if (isset($JAX->p['messageid'])
                 && is_numeric($JAX->p['messageid'])
-            ) {
-                switch (mb_strtolower($JAX->p['page'])) {
-                case 'delete':
-                    $this->delete($JAX->p['messageid']);
-                    break;
-                case 'forward':
-                    $this->compose($JAX->p['messageid'], 'fwd');
-                    break;
-                case 'reply':
-                    $this->compose($JAX->p['messageid']);
-                    break;
-                }
-            } else {
-                if (!isset($JAX->b['page'])) {
-                    $JAX->b['page'] = false;
-                }
-                if ('compose' == $JAX->b['page']) {
-                    $this->compose();
-                } elseif (isset($JAX->g['view'])
-                    && is_numeric($JAX->g['view'])
                 ) {
-                    $this->viewmessage($JAX->g['view']);
-                } elseif ('sent' == $JAX->b['page']) {
-                    $this->viewmessages('sent');
-                } elseif ('flagged' == $JAX->b['page']) {
-                    $this->viewmessages('flagged');
-                } elseif (isset($JAX->b['flag'])
-                    && is_numeric($JAX->b['flag'])
-                ) {
-                    return $this->flag($JAX->b['flag']);
+                    switch (mb_strtolower($JAX->p['page'])) {
+                        case 'delete':
+                            $this->delete($JAX->p['messageid']);
+                            break;
+                        case 'forward':
+                            $this->compose($JAX->p['messageid'], 'fwd');
+                            break;
+                        case 'reply':
+                            $this->compose($JAX->p['messageid']);
+                            break;
+                    }
                 } else {
-                    $this->viewmessages();
+                    if (!isset($JAX->b['page'])) {
+                        $JAX->b['page'] = false;
+                    }
+                    if ('compose' == $JAX->b['page']) {
+                        $this->compose();
+                    } elseif (isset($JAX->g['view'])
+                    && is_numeric($JAX->g['view'])
+                    ) {
+                        $this->viewmessage($JAX->g['view']);
+                    } elseif ('sent' == $JAX->b['page']) {
+                        $this->viewmessages('sent');
+                    } elseif ('flagged' == $JAX->b['page']) {
+                        $this->viewmessages('flagged');
+                    } elseif (isset($JAX->b['flag'])
+                    && is_numeric($JAX->b['flag'])
+                    ) {
+                        return $this->flag($JAX->b['flag']);
+                    } else {
+                        $this->viewmessages();
+                    }
                 }
-            }
-            break;
-        default:
-            if ($PAGE->jsupdate && empty($JAX->p)) {
-                return;
-            }
-            $this->showmain();
-            break;
+                break;
+            default:
+                if ($PAGE->jsupdate && empty($JAX->p)) {
+                    return;
+                }
+                $this->showmain();
+                break;
         }
         if (!$PAGE->jsaccess || $PAGE->jsnewlocation) {
             $this->showucp();
@@ -143,7 +143,7 @@ EOT
                 $USER['ucpnotepad'] = $JAX->p['ucpnotepad'];
             }
         }
-        $this->ucppage = ($e ? $PAGE->meta('error', $e) : '').$PAGE->meta(
+        $this->ucppage = ($e ? $PAGE->meta('error', $e) : '') . $PAGE->meta(
             'ucp-index',
             $JAX->hiddenFormFields(array('act' => 'ucp')),
             $USER['display_name'],
@@ -207,7 +207,7 @@ EOT
             foreach ($variables as $v) {
                 $PAGE->JS(
                     'script',
-                    "window.globalsettings.${v}=".
+                    "window.globalsettings.${v}=" .
                     ((isset($JAX->p[$v]) && $JAX->p[$v]) ? 1 : 0)
                 );
             }
@@ -220,17 +220,17 @@ EOT
         }
 
         $checkboxes = array(
-            $this->getlocationforform().$JAX->hiddenFormFields(
+            $this->getlocationforform() . $JAX->hiddenFormFields(
                 array('submit' => 1)
             ), );
 
         foreach ($variables as $v) {
-            $checkboxes[] = '<input type="checkbox" name="'.$v.'" '.
-                ($USER[$v] ? 'checked="checked"' : '').'/>';
+            $checkboxes[] = '<input type="checkbox" name="' . $v . '" ' .
+                ($USER[$v] ? 'checked="checked"' : '') . '/>';
         }
 
         $this->ucppage = $PAGE->meta('ucp-sound-settings', $checkboxes);
-        $this->runscript = "if($('dtnotify')&&window.webkitNotifications) ".
+        $this->runscript = "if($('dtnotify')&&window.webkitNotifications) " .
             "$('dtnotify').checked=(webkitNotifications.checkPermission()==0)";
 
         unset($checkboxes);
@@ -255,7 +255,8 @@ EOT
         }
         $this->ucppage = $PAGE->meta(
             'ucp-sig-settings',
-            $this->getlocationforform(), '' !== $sig ?
+            $this->getlocationforform(),
+            '' !== $sig ?
             $JAX->theworks($sig) : '( none )',
             $JAX->blockhtml($sig)
         );
@@ -317,7 +318,7 @@ EOT;
         $this->ucppage .= $PAGE->meta(
             'ucp-pass-settings',
             $this->getlocationforform()
-            .$JAX->hiddenFormFields(array('passchange' => 1))
+            . $JAX->hiddenFormFields(array('passchange' => 1))
         );
     }
 
@@ -342,7 +343,7 @@ EOT;
                     'WHERE `id`=?',
                     $USER['id']
                 );
-                $this->ucppage = 'Email settings updated.'.
+                $this->ucppage = 'Email settings updated.' .
                     '<br /><br /><a href="?act=ucp&what=email">Back</a>';
             }
 
@@ -350,19 +351,19 @@ EOT;
         }
         $this->ucppage .= $PAGE->meta(
             'ucp-email-settings',
-            $this->getlocationforform().$JAX->hiddenFormFields(
+            $this->getlocationforform() . $JAX->hiddenFormFields(
                 array('submit' => 'true')
             ),
             ((isset($JAX->b['change']) && $JAX->b['change']) ?
-            "<input type='text' name='email' value='".$USER['email']."' />" :
-            '<strong>'.$JAX->pick($USER['email'], '--none--').
-            "</strong> <a href='?act=ucp&what=email&change=1'>Change</a>".
-            "<input type='hidden' name='email' value='".($USER['email'])."' />"
+            "<input type='text' name='email' value='" . $USER['email'] . "' />" :
+            '<strong>' . $JAX->pick($USER['email'], '--none--') .
+            "</strong> <a href='?act=ucp&what=email&change=1'>Change</a>" .
+            "<input type='hidden' name='email' value='" . ($USER['email']) . "' />"
             ),
-            '<input type="checkbox" name="notifications"'.
-            ($USER['email_settings'] & 2 ? " checked='checked'" : '').'>',
-            '<input type="checkbox" name="adminemails"'.
-            ($USER['email_settings'] & 1 ? ' checked="checked"' : '').'>'
+            '<input type="checkbox" name="notifications"' .
+            ($USER['email_settings'] & 2 ? " checked='checked'" : '') . '>',
+            '<input type="checkbox" name="adminemails"' .
+            ($USER['email_settings'] & 1 ? ' checked="checked"' : '') . '>'
         );
     }
 
@@ -385,14 +386,14 @@ EOT;
             }
             $update = true;
         }
-        $this->ucppage = 'Your avatar: <span class="avatar"><img src="'.
-            $JAX->pick($USER['avatar'], $PAGE->meta('default-avatar')).
+        $this->ucppage = 'Your avatar: <span class="avatar"><img src="' .
+            $JAX->pick($USER['avatar'], $PAGE->meta('default-avatar')) .
             '" alt="Unable to load avatar"></span><br /><br />
-            <form onsubmit="return RUN.submitForm(this)" method="post">'.
+            <form onsubmit="return RUN.submitForm(this)" method="post">' .
             $this->getlocationforform()
-            .($e ? $PAGE->error($e) : '').
-            '<input type="text" name="changedava" value="'.
-            $JAX->blockhtml($USER['avatar']).'" />
+            . ($e ? $PAGE->error($e) : '') .
+            '<input type="text" name="changedava" value="' .
+            $JAX->blockhtml($USER['avatar']) . '" />
             <input type="submit" value="Edit" />
             </form>';
         if ($update) {
@@ -509,7 +510,8 @@ EOT;
             if (!$error) {
                 if ($data['display_name'] != $USER['display_name']) {
                     $DB->safeinsert(
-                        'activity', array(
+                        'activity',
+                        array(
                             'type' => 'profile_name_change',
                             'arg1' => $USER['display_name'],
                             'arg2' => $data['display_name'],
@@ -524,7 +526,7 @@ EOT;
                     'WHERE `id`=?',
                     $USER['id']
                 );
-                $this->ucppage = 'Profile successfully updated.<br />'.
+                $this->ucppage = 'Profile successfully updated.<br />' .
                     '<br /><a href="?act=ucp&what=profile">Back</a>';
                 $this->showucp();
 
@@ -536,9 +538,9 @@ EOT;
         $data = $USER;
         $genderselect = '<select name="gender">';
         foreach (array('', 'male', 'female', 'other') as $v) {
-            $genderselect .= '<option value="'.$v.'"'.
-                ($data['gender'] == $v ? ' selected="selected"' : '').
-                '>'.$JAX->pick(ucfirst($v), 'Not telling').'</option>';
+            $genderselect .= '<option value="' . $v . '"' .
+                ($data['gender'] == $v ? ' selected="selected"' : '') .
+                '>' . $JAX->pick(ucfirst($v), 'Not telling') . '</option>';
         }
         $genderselect .= '</select>';
 
@@ -558,29 +560,29 @@ EOT;
             'December',
         );
         foreach ($fullMonthNames as $k => $v) {
-            $dobselect .= '<option value="'.($k + 1).'"'.
-                (($k + 1) == $data['dob_month'] ? ' selected="selected"' : '').
-                '>'.$v.'</option>';
+            $dobselect .= '<option value="' . ($k + 1) . '"' .
+                (($k + 1) == $data['dob_month'] ? ' selected="selected"' : '') .
+                '>' . $v . '</option>';
         }
         $dobselect .= '</select><select name="dob_day"><option value="">--</option>';
         for ($x = 1; $x < 32; ++$x) {
-            $dobselect .= '<option value="'.$x.'"'.
-                ($x == $data['dob_day'] ? ' selected="selected"' : '').
-                '>'.$x.'</option>';
+            $dobselect .= '<option value="' . $x . '"' .
+                ($x == $data['dob_day'] ? ' selected="selected"' : '') .
+                '>' . $x . '</option>';
         }
-        $dobselect .= '</select><select name="dob_year">'.
+        $dobselect .= '</select><select name="dob_year">' .
             '<option value="">--</option>';
         $thisyear = (int) date('Y');
         for ($x = $thisyear; $x > $thisyear - 100; --$x) {
-            $dobselect .= '<option value="'.$x.'"'.
-                ($x == $data['dob_year'] ? ' selected="selected"' : '').
-                '>'.$x.'</option>';
+            $dobselect .= '<option value="' . $x . '"' .
+                ($x == $data['dob_year'] ? ' selected="selected"' : '') .
+                '>' . $x . '</option>';
         }
         $dobselect .= '</select>';
 
         $this->ucppage = $PAGE->meta(
             'ucp-profile-settings',
-            $this->getlocationforform().
+            $this->getlocationforform() .
             $JAX->hiddenFormFields(array('submit' => '1')),
             $USER['name'],
             $data['display_name'],
@@ -655,12 +657,12 @@ EOT;
             );
         $select = '';
         while ($f = $DB->arow($result)) {
-            $select .= "<option value='".$f['id']."' ".
-                ($USER['skin_id'] == $f['id'] ? "selected='selected'" : '').
-                '/>'.($f['hidden'] ? '*' : '').$f['title'].'</option>';
+            $select .= "<option value='" . $f['id'] . "' " .
+                ($USER['skin_id'] == $f['id'] ? "selected='selected'" : '') .
+                '/>' . ($f['hidden'] ? '*' : '') . $f['title'] . '</option>';
             $found = true;
         }
-        $select = '<select name="skin">'.$select.'</select>';
+        $select = '<select name="skin">' . $select . '</select>';
         if (!$found) {
             $select = '--No Skins--';
         }
@@ -668,11 +670,11 @@ EOT;
             'ucp-board-settings',
             $this->getlocationforform(),
             $select,
-            '<input type="checkbox" name="usewordfilter"'.
-            (!$USER['nowordfilter'] ? ' checked="checked"' : '').
+            '<input type="checkbox" name="usewordfilter"' .
+            (!$USER['nowordfilter'] ? ' checked="checked"' : '') .
             ' />',
-            '<input type="checkbox" name="wysiwyg"'.
-            ($USER['wysiwyg'] ? ' checked="checked"' : '').
+            '<input type="checkbox" name="wysiwyg"' .
+            ($USER['wysiwyg'] ? ' checked="checked"' : '') .
             ' />'
         );
         if ($showthing) {
@@ -850,17 +852,17 @@ EOT
             if (!$f['read']) {
                 ++$unread;
             }
-            $dmessageOnclick = 'RUN.stream.location(\''.
-                '?act=ucp&what=inbox&flag='.$f['id'].'&tog=\'+'.'
+            $dmessageOnclick = 'RUN.stream.location(\'' .
+                '?act=ucp&what=inbox&flag=' . $f['id'] . '&tog=\'+' . '
                 (this.checked?1:0))';
             $page .= $PAGE->meta(
                 'inbox-messages-row',
                 (!$f['read'] ? 'unread' : 'read'),
-                '<input class="check" type="checkbox" name="dmessage[]" '.
-                'value="'.$f['id'].'" />',
-                '<input type="checkbox" '.
-                ($f['flag'] ? 'checked="checked" ' : '').
-                'class="switch flag" onclick="'.$dmessageOnclick.'" />',
+                '<input class="check" type="checkbox" name="dmessage[]" ' .
+                'value="' . $f['id'] . '" />',
+                '<input type="checkbox" ' .
+                ($f['flag'] ? 'checked="checked" ' : '') .
+                'class="switch flag" onclick="' . $dmessageOnclick . '" />',
                 $f['id'],
                 $f['title'],
                 $f['display_name'],
@@ -874,11 +876,11 @@ EOT
             } elseif ('flagged' == $view) {
                 $msg = 'No flagged messages.';
             } else {
-                $msg = 'No messages. You could always try '.
-                    '<a href="?act=ucp&what=inbox&page=compose">'.
+                $msg = 'No messages. You could always try ' .
+                    '<a href="?act=ucp&what=inbox&page=compose">' .
                     'sending some</a>, though!';
             }
-            $page .= '<tr><td colspan="5" class="error">'.$msg.'</td></tr>';
+            $page .= '<tr><td colspan="5" class="error">' . $msg . '</td></tr>';
         }
 
         $page = $PAGE->meta(
@@ -955,10 +957,10 @@ EOT
                 $cmd = $JAX->json_encode(
                     array(
                         'newmessage',
-                        'You have a new message from '.
+                        'You have a new message from ' .
                         $USER['display_name'], $DB->insert_id(1),
                     )
-                ).PHP_EOL;
+                ) . PHP_EOL;
                 $result = $DB->safespecial(
                     <<<'EOT'
 UPDATE %t
@@ -974,19 +976,19 @@ EOT
                 if ($udata['email_settings'] & 2) {
                     $JAX->mail(
                         $udata['email'],
-                        'PM From '.$USER['display_name'],
-                        "You are receiving this email because you've ".
-                        'received a message from '.$USER['display_name'].
-                        ' on {BOARDLINK}.<br />'.
-                        '<br />Please go to '.
-                        "<a href='{BOARDURL}?act=ucp&what=inbox'>".
-                        '{BOARDURL}?act=ucp&what=inbox</a>'.
+                        'PM From ' . $USER['display_name'],
+                        "You are receiving this email because you've " .
+                        'received a message from ' . $USER['display_name'] .
+                        ' on {BOARDLINK}.<br />' .
+                        '<br />Please go to ' .
+                        "<a href='{BOARDURL}?act=ucp&what=inbox'>" .
+                        '{BOARDURL}?act=ucp&what=inbox</a>' .
                         ' to view your message.'
                     );
                 }
 
                 $this->showucp(
-                    'Message successfully delivered.'.
+                    'Message successfully delivered.' .
                     "<br /><br /><a href='?act=ucp&what=inbox'>Back</a>"
                 );
 
@@ -1025,9 +1027,9 @@ EOT
             $mname = array_pop($thisrow);
             $DB->disposeresult($result);
 
-            $msg = PHP_EOL.PHP_EOL.PHP_EOL.
-                '[quote='.$mname.']'.$message['message'].'[/quote]';
-            $mtitle = ('fwd' == $todo ? 'FWD:' : 'RE:').$message['title'];
+            $msg = PHP_EOL . PHP_EOL . PHP_EOL .
+                '[quote=' . $mname . ']' . $message['message'] . '[/quote]';
+            $mtitle = ('fwd' == $todo ? 'FWD:' : 'RE:') . $message['title'];
             if ('fwd' == $todo) {
                 $mid = $mname = '';
             }
@@ -1130,9 +1132,9 @@ EOT
         }
         if ($relocate) {
             $PAGE->location(
-                '?act=ucp&what=inbox'.
+                '?act=ucp&what=inbox' .
                 (isset($JAX->b['prevpage']) && $JAX->b['prevpage'] ?
-                '&page='.$JAX->b['prevpage'] : '')
+                '&page=' . $JAX->b['prevpage'] : '')
             );
         }
     }

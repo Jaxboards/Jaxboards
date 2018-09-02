@@ -19,11 +19,11 @@ class PAGE
     public function addNavmenu($title, $page, $menu)
     {
         $this->partparts['nav'] .=
-            '<a href="'.$page.'" class="'.mb_strtolower($title).'">'.$title.'</a>';
+            '<a href="' . $page . '" class="' . mb_strtolower($title) . '">' . $title . '</a>';
         $this->partparts['navdropdowns'] .=
-            '<div class="dd_menu" id="menu_'.mb_strtolower($title).'">';
+            '<div class="dd_menu" id="menu_' . mb_strtolower($title) . '">';
         foreach ($menu as $k => $v) {
-            $this->partparts['navdropdowns'] .= '<a href="'.$k.'">'.$v.'</a>';
+            $this->partparts['navdropdowns'] .= '<a href="' . $k . '">' . $v . '</a>';
         }
         $this->partparts['navdropdowns'] .= '</div>';
     }
@@ -37,8 +37,8 @@ class PAGE
     {
         if ($sidebar) {
             $this->parts['sidebar']
-                = "<div class='sidebar'><a href='?' class='icons home'>ACP Home</a>".
-                $sidebar.'</div>';
+                = "<div class='sidebar'><a href='?' class='icons home'>ACP Home</a>" .
+                $sidebar . '</div>';
         } else {
             $this->parts['sidebar'] = '';
         }
@@ -52,8 +52,8 @@ class PAGE
     public function addContentBox($title, $content)
     {
         $this->parts['content'] .=
-            '<div class="box"><div class="header">'.$title.
-            '</div><div class="content">'.$content.'</div></div>';
+            '<div class="box"><div class="header">' . $title .
+            '</div><div class="content">' . $content . '</div></div>';
     }
 
     public function out()
@@ -63,14 +63,14 @@ class PAGE
 <html xmlns="https://www.w3.org/1999/xhtml/" xml:lang="en" lang="en">
  <head>
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-  <link rel="stylesheet" type="text/css" href="'.BOARDURL.
+  <link rel="stylesheet" type="text/css" href="' . BOARDURL .
         'Service/acp/Theme/css.css" />
-  <link rel="stylesheet" type="text/css" href="'.BOARDURL.
+  <link rel="stylesheet" type="text/css" href="' . BOARDURL .
         'Service/Themes/Default/bbcode.css" />
   <link rel="stylesheet" type="text/css"
-    href="'.BOARDURL.'acp/css/themes.css"/>
-  <script type="text/javascript" src="'.BOARDURL.'Service/jsnew.js"></script>
-  <script type="text/javascript" src="'.BOARDURL.
+    href="' . BOARDURL . 'acp/css/themes.css"/>
+  <script type="text/javascript" src="' . BOARDURL . 'Service/jsnew.js"></script>
+  <script type="text/javascript" src="' . BOARDURL .
         'Service/acp/Script/admin.js"></script>
   <title><% TITLE %></title>
  </head>
@@ -87,10 +87,10 @@ class PAGE
   </div>
  </body>
 </html>';
-        $this->parts['nav'] = '<div id="nav" onmouseover="dd_menu(event)">'.
-            $this->partparts['nav'].'</div>'.$this->partparts['navdropdowns'];
+        $this->parts['nav'] = '<div id="nav" onmouseover="dd_menu(event)">' .
+            $this->partparts['nav'] . '</div>' . $this->partparts['navdropdowns'];
         foreach ($this->parts as $k => $v) {
-            $template = str_replace('<% '.mb_strtoupper($k).' %>', $v, $template);
+            $template = str_replace('<% ' . mb_strtoupper($k) . ' %>', $v, $template);
         }
         echo $template;
     }
@@ -151,19 +151,19 @@ EOT;
 
     public function writeCFG($data)
     {
-        include BOARDPATH.'config.php';
+        include BOARDPATH . 'config.php';
         foreach ($data as $k => $v) {
             $CFG[$k] = $v;
         }
         $this->CFG = $CFG;
 
-        return $this->writeData(BOARDPATH.'config.php', 'CFG', $CFG);
+        return $this->writeData(BOARDPATH . 'config.php', 'CFG', $CFG);
     }
 
     public function getCFGSetting($setting)
     {
         if (!$this->CFG) {
-            include BOARDPATH.'config.php';
+            include BOARDPATH . 'config.php';
             $this->CFG = $CFG;
         }
 

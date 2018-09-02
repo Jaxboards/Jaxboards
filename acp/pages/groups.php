@@ -17,28 +17,28 @@ class groups
             'delete' => 'Delete Group',
         );
         foreach ($links as $k => $v) {
-            $sidebar .= "<li><a href='?act=groups&do=".$k."'>${v}</a></li>";
+            $sidebar .= "<li><a href='?act=groups&do=" . $k . "'>${v}</a></li>";
         }
         $PAGE->sidebar("<ul>${sidebar}</ul>");
         if (@$JAX->g['edit']) {
             $JAX->g['do'] = 'edit';
         }
         switch (@$JAX->g['do']) {
-        case 'perms':
-            $this->showperms();
-            break;
-        case 'create':
-            $this->create();
-            break;
-        case 'edit':
-            $this->create($JAX->g['edit']);
-            break;
-        case 'delete':
-            $this->delete();
-            break;
-        default:
-            $this->showperms();
-            break;
+            case 'perms':
+                $this->showperms();
+                break;
+            case 'create':
+                $this->create();
+                break;
+            case 'edit':
+                $this->create($JAX->g['edit']);
+                break;
+            case 'delete':
+                $this->delete();
+                break;
+            default:
+                $this->showperms();
+                break;
         }
     }
 
@@ -120,7 +120,7 @@ class groups
 
         $PAGE->addContentBox(
             'Success!',
-            "<div style='padding:20px'>Changes Saved successfully.<br />".
+            "<div style='padding:20px'>Changes Saved successfully.<br />" .
             "<br /><br /><a href='?act=groups'>Home</a></div>"
         );
     }
@@ -179,7 +179,7 @@ EOT
         while ($f = $DB->arow($result)) {
             ++$numgroups;
             $perms[$f['id']] = $f;
-            $grouplist .= $f['id'].',';
+            $grouplist .= $f['id'] . ',';
         }
         if (!$numgroups) {
             die("Don't play with my variables!");
@@ -192,16 +192,15 @@ EOT
 id='heading'>
     <tr>";
         foreach ($perms as $k => $v) {
-            $page .= "<th style='width:".((1 / $numgroups) * 100)."%'>".
-                "<a class='icons edit' href='?act=groups&edit=${k}'>".
-                $v['title']."</a> (${k})</th>";
+            $page .= "<th style='width:" . ((1 / $numgroups) * 100) . "%'>" .
+                "<a class='icons edit' href='?act=groups&edit=${k}'>" .
+                $v['title'] . "</a> (${k})</th>";
         }
         $page .= "</tr>
   </table>
   <table class='perms'>
   ";
-        foreach (
-            array(
+        foreach (array(
                 'breaker1' => 'Global',
                 'can_view_board' => 'View Online Board',
                 'can_view_offline_board' => 'View Offline Board',
@@ -245,14 +244,14 @@ id='heading'>
                 'can_im' => 'Can IM',
             ) as $k => $v) {
             if ('breaker' == mb_substr($k, 0, 7)) {
-                $page .= "<tr><td class='breaker' colspan='".
-                    (1 + $numgroups)."'>${v}</td></tr>";
+                $page .= "<tr><td class='breaker' colspan='" .
+                    (1 + $numgroups) . "'>${v}</td></tr>";
             } else {
-                $page .= "<tr><td style='width:150px'>".$v.'</td>';
+                $page .= "<tr><td style='width:150px'>" . $v . '</td>';
                 foreach ($perms as $k2 => $v2) {
-                    $page .= '<td class="center"><input name="perm['.$k2.
-                        ']['.$k.']" type="checkbox" '.
-                        ($v2[$k] ? 'checked="checked" ' : '').
+                    $page .= '<td class="center"><input name="perm[' . $k2 .
+                        '][' . $k . ']" type="checkbox" ' .
+                        ($v2[$k] ? 'checked="checked" ' : '') .
                         'class="switch yn" /></td>';
                 }
                 $page .= '</tr>';
@@ -260,7 +259,7 @@ id='heading'>
         }
         $page .= '
   </table>';
-        $page .= "</div><div style='margin-top:20px' class='center'>".
+        $page .= "</div><div style='margin-top:20px' class='center'>" .
             "<input type='submit' value='Save Changes' /></div></form>";
         $page .= '<script type="text/javascript">window.onscroll=function(){
     var c=JAX.el.getCoordinates($("heading"))
@@ -327,18 +326,18 @@ id='heading'>
             $DB->disposeresult($result);
         }
 
-        $page .= '<form method="post"><label for="groupname">'.
-            'Group name:</label><input type="text" id="groupname" '.
-            'name="groupname" value="'.
-            ($gid ? $JAX->blockhtml($gdata['title']) : '').'" /><br />
-            <label for="groupicon">Icon: </label><input type="text" '.
-            'id="groupicon" name="groupicon" value="'.
-            ($gid ? $JAX->blockhtml($gdata['icon']) : '').'" /><br />
-            <input type="submit" name="submit" value="'.
-            ($gid ? 'Edit' : 'Create').'" />
+        $page .= '<form method="post"><label for="groupname">' .
+            'Group name:</label><input type="text" id="groupname" ' .
+            'name="groupname" value="' .
+            ($gid ? $JAX->blockhtml($gdata['title']) : '') . '" /><br />
+            <label for="groupicon">Icon: </label><input type="text" ' .
+            'id="groupicon" name="groupicon" value="' .
+            ($gid ? $JAX->blockhtml($gdata['icon']) : '') . '" /><br />
+            <input type="submit" name="submit" value="' .
+            ($gid ? 'Edit' : 'Create') . '" />
           </form>';
         $PAGE->addContentBox(
-            $gid ? 'Editing group: '.$gdata['title'] : 'Create a group!',
+            $gid ? 'Editing group: ' . $gdata['title'] : 'Create a group!',
             $page
         );
     }
@@ -370,12 +369,12 @@ id='heading'>
         $found = false;
         while ($f = $DB->arow($result)) {
             $found = true;
-            $page .= '<a class="icons delete" onclick="'.
-                'return confirm(\'You sure?\')" href="?act=groups&do=delete'.
-                '&delete='.$f['id'].'">'.$f['title'].'</a>';
+            $page .= '<a class="icons delete" onclick="' .
+                'return confirm(\'You sure?\')" href="?act=groups&do=delete' .
+                '&delete=' . $f['id'] . '">' . $f['title'] . '</a>';
         }
         if (!$found) {
-            $page .= "You haven't created any groups to delete. ".
+            $page .= "You haven't created any groups to delete. " .
                 "(Hint: default groups can't be deleted)";
         }
         $PAGE->addContentBox('Delete Groups', $page);

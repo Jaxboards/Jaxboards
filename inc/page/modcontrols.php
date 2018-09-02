@@ -49,24 +49,24 @@ EOT;
             return $this->doposts($JAX->p['dop']);
         }
         switch ($JAX->b['do']) {
-        case 'modp':
-            $this->modpost($JAX->b['pid']);
-            break;
-        case 'modt':
-            $this->modtopic($JAX->b['tid']);
-            break;
-        case 'load':
-            $this->load();
-            break;
-        case 'cp':
-            $this->showmodcp();
-            break;
-        case 'emem':
-            $this->editmembers();
-            break;
-        case 'iptools':
-            $this->iptools();
-            break;
+            case 'modp':
+                $this->modpost($JAX->b['pid']);
+                break;
+            case 'modt':
+                $this->modtopic($JAX->b['tid']);
+                break;
+            case 'load':
+                $this->load();
+                break;
+            case 'cp':
+                $this->showmodcp();
+                break;
+            case 'emem':
+                $this->editmembers();
+                break;
+            case 'iptools':
+                $this->iptools();
+                break;
         }
     }
 
@@ -74,116 +74,117 @@ EOT;
     {
         global $PAGE,$SESS,$JAX,$DB;
         switch ($do) {
-        case 'move':
-            $PAGE->JS('modcontrols_move', 0);
-            break;
-        case 'moveto':
-            $result = $DB->safeselect(
-                <<<'EOT'
+            case 'move':
+                $PAGE->JS('modcontrols_move', 0);
+                break;
+            case 'moveto':
+                $result = $DB->safeselect(
+                    <<<'EOT'
 `id`,`cat_id`,`title`,`subtitle`,`lp_uid`,`lp_date`,`lp_tid`,`lp_topic`,
 `path`,`show_sub`,`redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,
 `nocount`,`redirects`,`trashcan`,`mods`,`show_ledby`
 EOT
-                ,
-                'forums',
-                'WHERE `id`=?',
-                $DB->basicvalue($JAX->p['id'])
-            );
-            $rowfound = $DB->arow($result);
-            $DB->disposeresult($result);
-            if (!is_numeric($JAX->p['id']) || !$rowfound) {
-                return;
-            }
+                    ,
+                    'forums',
+                    'WHERE `id`=?',
+                    $DB->basicvalue($JAX->p['id'])
+                );
+                $rowfound = $DB->arow($result);
+                $DB->disposeresult($result);
+                if (!is_numeric($JAX->p['id']) || !$rowfound) {
+                    return;
+                }
 
-            $result = $DB->safeselect(
-                '`fid`',
-                'topics',
-                'WHERE `id` IN ?',
-                explode(',', $SESS->vars['modtids'])
-            );
-            while ($f = $DB->arow($result)) {
-                $fids[$f['fid']] = 1;
-            }
+                $result = $DB->safeselect(
+                    '`fid`',
+                    'topics',
+                    'WHERE `id` IN ?',
+                    explode(',', $SESS->vars['modtids'])
+                );
+                while ($f = $DB->arow($result)) {
+                    $fids[$f['fid']] = 1;
+                }
 
-            $fids = array_flip($fids);
-            $DB->safeupdate(
-                'topics',
-                array(
+                $fids = array_flip($fids);
+                $DB->safeupdate(
+                    'topics',
+                    array(
                     'fid' => $JAX->p['id'],
-                ),
-                'WHERE `id` IN ?',
-                explode(',', $SESS->vars['modtids'])
-            );
-            $this->cancel();
-            $fids[] = $JAX->p['id'];
-            foreach ($fids as $v) {
-                $DB->fixForumLastPost($v);
-            }
-            $PAGE->location('?act=vf'.$JAX->p['id']);
-            break;
-        case 'pin':
-            $DB->safeupdate(
-                'topics',
-                array(
+                    ),
+                    'WHERE `id` IN ?',
+                    explode(',', $SESS->vars['modtids'])
+                );
+                $this->cancel();
+                $fids[] = $JAX->p['id'];
+                foreach ($fids as $v) {
+                    $DB->fixForumLastPost($v);
+                }
+                $PAGE->location('?act=vf' . $JAX->p['id']);
+                break;
+            case 'pin':
+                $DB->safeupdate(
+                    'topics',
+                    array(
                     'pinned' => 1,
-                ),
-                'WHERE `id` IN ?',
-                explode(',', $SESS->vars['modtids'])
-            );
-            $PAGE->JS(
-                'alert',
-                'topics pinned!'
-            );
-            $this->cancel();
-            break;
-        case 'unpin':
-            $DB->safeupdate(
-                'topics',
-                array(
+                    ),
+                    'WHERE `id` IN ?',
+                    explode(',', $SESS->vars['modtids'])
+                );
+                $PAGE->JS(
+                    'alert',
+                    'topics pinned!'
+                );
+                $this->cancel();
+                break;
+            case 'unpin':
+                $DB->safeupdate(
+                    'topics',
+                    array(
                     'pinned' => 0,
-                ),
-                'WHERE `id` IN ?',
-                explode(',', $SESS->vars['modtids'])
-            );
-            $PAGE->JS(
-                'alert',
-                'topics unpinned!'
-            );
-            $this->cancel();
-            break;
-        case 'lock':
-            $DB->safeupdate(
-                'topics',
-                array(
+                    ),
+                    'WHERE `id` IN ?',
+                    explode(',', $SESS->vars['modtids'])
+                );
+                $PAGE->JS(
+                    'alert',
+                    'topics unpinned!'
+                );
+                $this->cancel();
+                break;
+            case 'lock':
+                $DB->safeupdate(
+                    'topics',
+                    array(
                     'locked' => 1,
-                ),
-                'WHERE `id` IN ?',
-                explode(',', $SESS->vars['modtids'])
-            );
-            $PAGE->JS(
-                'alert',
-                'topics locked!'
-            );
-            $this->cancel();
-            break;
-        case 'unlock':
-            $DB->safeupdate(
-                'topics',
-                array(
+                    ),
+                    'WHERE `id` IN ?',
+                    explode(',', $SESS->vars['modtids'])
+                );
+                $PAGE->JS(
+                    'alert',
+                    'topics locked!'
+                );
+                $this->cancel();
+                break;
+            case 'unlock':
+                $DB->safeupdate(
+                    'topics',
+                    array(
                     'locked' => 0,
-                ),
-                'WHERE `id` IN ?',
-                explode(',', $SESS->vars['modtids'])
-            );
-            $PAGE->JS('alert', 'topics unlocked!');
-            $this->cancel(); break;
-        case 'delete':
-            $this->deletetopics();
-            $this->cancel();
-            break;
-        case 'merge':
-            $this->mergetopics();
-            break;
+                    ),
+                    'WHERE `id` IN ?',
+                    explode(',', $SESS->vars['modtids'])
+                );
+                $PAGE->JS('alert', 'topics unlocked!');
+                $this->cancel();
+                break;
+            case 'delete':
+                $this->deletetopics();
+                $this->cancel();
+                break;
+            case 'merge':
+                $this->mergetopics();
+                break;
         }
     }
 
@@ -191,25 +192,25 @@ EOT
     {
         global $PAGE,$JAX,$SESS,$DB;
         switch ($do) {
-        case 'move':
-            $PAGE->JS('modcontrols_move', 1);
-            break;
-        case 'moveto':
-            $DB->safeupdate(
-                'posts',
-                array(
+            case 'move':
+                $PAGE->JS('modcontrols_move', 1);
+                break;
+            case 'moveto':
+                $DB->safeupdate(
+                    'posts',
+                    array(
                     'tid' => $JAX->p['id'],
-                ),
-                'WHERE `id` IN ?',
-                explode(',', $SESS->vars['modpids'])
-            );
-            $this->cancel();
-            $PAGE->location('?act=vt'.$JAX->p['id']);
-            break;
-        case 'delete':
-            $this->deleteposts();
-            $this->cancel();
-            break;
+                    ),
+                    'WHERE `id` IN ?',
+                    explode(',', $SESS->vars['modpids'])
+                );
+                $this->cancel();
+                $PAGE->location('?act=vt' . $JAX->p['id']);
+                break;
+            case 'delete':
+                $this->deleteposts();
+                $this->cancel();
+                break;
         }
     }
 
@@ -422,7 +423,7 @@ EOT
             $DB->safeinsert(
                 'topics',
                 array(
-                    'title' => 'Posts deleted from: '.
+                    'title' => 'Posts deleted from: ' .
                         implode(',', $tids),
                     'op' => $op,
                     'auth_id' => $USER['id'],
@@ -500,7 +501,7 @@ EOT
         }
         //remove them from the page
         foreach ($pids as $v) {
-            $PAGE->JS('removeel', '#pid_'.$v);
+            $PAGE->JS('removeel', '#pid_' . $v);
         }
     }
 
@@ -632,10 +633,10 @@ EOT
                 );
             }
             $this->cancel();
-            $PAGE->location('?act=vt'.$JAX->p['ot']);
+            $PAGE->location('?act=vt' . $JAX->p['ot']);
         }
-        $page .= '<form method="post" onsubmit="return RUN.submitForm(this)" '.
-            'style="padding:10px;">'.
+        $page .= '<form method="post" onsubmit="return RUN.submitForm(this)" ' .
+            'style="padding:10px;">' .
             'Which topic should the topics be merged into?<br />';
         $page .= $JAX->hiddenFormFields(
             array(
@@ -657,8 +658,8 @@ EOT
             }
             foreach ($exploded as $v) {
                 if (isset($titles[$v])) {
-                    $page .= '<input type="radio" name="ot" value="'.$v.'" /> '.
-                        $titles[$v].'<br />';
+                    $page .= '<input type="radio" name="ot" value="' . $v . '" /> ' .
+                        $titles[$v] . '<br />';
                 }
             }
         }
@@ -683,7 +684,7 @@ EOT
             $PAGE->JS('script', $script);
         } else {
             header('Content-Type: application/javascript; charset=utf-8');
-            header('Expires: '.gmdate('D, d M Y H:i:s', time() + 2592000).' GMT');
+            header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 2592000) . ' GMT');
             die($script);
         }
     }
@@ -708,21 +709,21 @@ EOT
         }
         $e = '';
         $data = array();
-        $page = '<form method="post" onsubmit="return RUN.submitForm(this)">'.
+        $page = '<form method="post" onsubmit="return RUN.submitForm(this)">' .
             $JAX->hiddenFormFields(
                 array(
                     'submit' => 'showform',
                     'act' => 'modcontrols',
                     'do' => 'emem',
                 )
-            ).
-            'Member name: <input type="text" name="mname" '.
-            'onkeyup="$(\'validname\').className=\'bad\';'.
-            'JAX.autoComplete(\'act=searchmembers&term=\'+this.value,this'.
+            ) .
+            'Member name: <input type="text" name="mname" ' .
+            'onkeyup="$(\'validname\').className=\'bad\';' .
+            'JAX.autoComplete(\'act=searchmembers&term=\'+this.value,this' .
             ',$(\'mid\'),event);" />
             <span id="validname"></span>
-            <input type="hidden" name="mid" id="mid" '.
-            'onchange="$(\'validname\').className=\'good\';'.
+            <input type="hidden" name="mid" id="mid" ' .
+            'onchange="$(\'validname\').className=\'good\';' .
             'this.form.onsubmit();" />
             <input type="submit" value="Go" />
             </form>';
@@ -792,7 +793,7 @@ EOT
                     ,
                     'members',
                     'WHERE `display_name` LIKE ?',
-                    $DB->basicvalue($JAX->p['mname'].'%')
+                    $DB->basicvalue($JAX->p['mname'] . '%')
                 );
                 $data = array();
                 while ($f = $DB->arow($result)) {
@@ -825,14 +826,14 @@ EOT
             } else {
                 function field($label, $name, $value, $type = 'input')
                 {
-                    return '<tr><td><label for="m_'.$name.'">'.$label.
-                        '</label></td><td>'.
-                        ('textarea' == $type ? '<textarea name="'.$name.
-                        '" id="m_'.$name.'">'.$value.'</textarea>' :
-                        '<input type="text" id="m_'.$name.'" name="'.$name.
-                        '" value="'.$value.'" />').'</td></tr>';
+                    return '<tr><td><label for="m_' . $name . '">' . $label .
+                        '</label></td><td>' .
+                        ('textarea' == $type ? '<textarea name="' . $name .
+                        '" id="m_' . $name . '">' . $value . '</textarea>' :
+                        '<input type="text" id="m_' . $name . '" name="' . $name .
+                        '" value="' . $value . '" />') . '</td></tr>';
                 }
-                $page .= '<form method="post" '.
+                $page .= '<form method="post" ' .
                     'onsubmit="return RUN.submitForm(this)"><table>';
                 $page .= $JAX->hiddenFormFields(
                     array(
@@ -846,15 +847,15 @@ EOT
                     'Display Name',
                     'display_name',
                     $data['display_name']
-                ).
-                    field('Avatar', 'avatar', $data['avatar']).
-                    field('Full Name', 'full_name', $data['full_name']).
+                ) .
+                    field('Avatar', 'avatar', $data['avatar']) .
+                    field('Full Name', 'full_name', $data['full_name']) .
                     field(
                         'About',
                         'about',
                         $JAX->blockhtml($data['about']),
                         'textarea'
-                    ).
+                    ) .
                     field(
                         'Signature',
                         'signature',
@@ -892,7 +893,7 @@ EOT
             }
         }
         if ($changed) {
-            $o = fopen(BOARDPATH.'/bannedips.txt', 'w');
+            $o = fopen(BOARDPATH . '/bannedips.txt', 'w');
             fwrite($o, implode(PHP_EOL, $JAX->ipbancache));
             fclose($o);
         }
@@ -1002,7 +1003,7 @@ EOT
                         $f['group_id'],
                         $f['display_name']
                     );
-                    $content .= ' : '.$f['shout'].'<br />';
+                    $content .= ' : ' . $f['shout'] . '<br />';
                 }
                 $page .= $this->_box('Last 5 shouts:', $content);
             }
@@ -1014,12 +1015,12 @@ EOT
                 $DB->basicvalue($ip)
             );
             while ($f = $DB->arow($result)) {
-                $content .= "<div class='post'>".
-                    nl2br($JAX->blockhtml($JAX->textonly($f['post']))).
+                $content .= "<div class='post'>" .
+                    nl2br($JAX->blockhtml($JAX->textonly($f['post']))) .
                     '</div>';
             }
             $page .= $this->_box('Last 5 posts:', $content);
         }
-        $this->showmodcp($form.$page);
+        $this->showmodcp($form . $page);
     }
 }

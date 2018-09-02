@@ -31,7 +31,7 @@ class TOPIC
             if ($PAGE->jsaccess && !$PAGE->jsdirectlink) {
                 $this->qreplyform($id);
             } else {
-                $PAGE->location('?act=post&tid='.$id);
+                $PAGE->location('?act=post&tid=' . $id);
             }
         } elseif (isset($JAX->b['ratepost']) && $JAX->b['ratepost']) {
             $this->ratepost($JAX->b['ratepost'], $JAX->b['niblet']);
@@ -107,18 +107,18 @@ EOT
             return $PAGE->location('?');
         } //no business being here yo
 
-        $PAGE->append('TITLE', ' -> '.$topicdata['topic_title']);
-        $SESS->location_verbose = "In topic '".$topicdata['topic_title']."'";
+        $PAGE->append('TITLE', ' -> ' . $topicdata['topic_title']);
+        $SESS->location_verbose = "In topic '" . $topicdata['topic_title'] . "'";
 
         /*Output RSS instead*/
         if (isset($JAX->b['fmt']) && 'RSS' == $JAX->b['fmt']) {
             include_once 'inc/classes/rssfeed.php';
-            $link = 'https://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
+            $link = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'];
             $feed = new rssfeed(
                 array(
                     'title' => $topicdata['topic_title'],
                     'description' => $topicdata['subtitle'],
-                    'link' => $link.'?act=vt'.$id,
+                    'link' => $link . '?act=vt' . $id,
                 )
             );
             $result = $DB->safespecial(
@@ -138,8 +138,8 @@ EOT
             while ($f = $DB->arow($result)) {
                 $feed->additem(
                     array(
-                        'title' => $f['display_name'].':',
-                        'link' => $link.'?act=vt'.$id.'&amp;findpost='.$f['id'],
+                        'title' => $f['display_name'] . ':',
+                        'link' => $link . '?act=vt' . $id . '&amp;findpost=' . $f['id'],
                         'description' => $JAX->blockhtml($JAX->theworks($f['post'])),
                         'guid' => $f['id'],
                         'pubDate' => date('r', $f['date']),
@@ -153,8 +153,8 @@ EOT
         //fix this to work with subforums
         $PAGE->path(
             array(
-                $topicdata['cat_title'] => '?act=vc'.$topicdata['cat_id'],
-                $topicdata['forum_title'] => '?act=vf'.$topicdata['fid'],
+                $topicdata['cat_title'] => '?act=vc' . $topicdata['cat_id'],
+                $topicdata['forum_title'] => '?act=vf' . $topicdata['fid'],
                 $topicdata['topic_title'] => "?act=vt${id}",
             )
         );
@@ -208,25 +208,25 @@ EOT
         $page = $PAGE->meta('topic-table', $this->postsintooutput());
         $page = $PAGE->meta(
             'topic-wrapper',
-            $topicdata['topic_title'].
-            ($topicdata['subtitle'] ? ', '.$topicdata['subtitle'] : ''),
+            $topicdata['topic_title'] .
+            ($topicdata['subtitle'] ? ', ' . $topicdata['subtitle'] : ''),
             $page,
-            '<a href="./?act=vt'.$id.'&amp;fmt=RSS" class="social rss">RSS</a>'
+            '<a href="./?act=vt' . $id . '&amp;fmt=RSS" class="social rss">RSS</a>'
         );
 
         //add buttons
         $buttons = array(
             $topicdata['fperms']['start'] ?
-            "<a href='?act=post&fid=".$topicdata['fid']."'>".
+            "<a href='?act=post&fid=" . $topicdata['fid'] . "'>" .
             ($PAGE->meta(
                 $PAGE->metaexists('button-newtopic') ?
                 'button-newtopic' : 'topic-button-newtopic'
-            )).'</a>' :
+            )) . '</a>' :
             '&nbsp;',
             $topicdata['fperms']['reply']
             && (!$topicdata['locked']
             || $PERMS['can_override_locked_topics']) ?
-            "<a href='?act=vt${id}&qreply=1'>".
+            "<a href='?act=vt${id}&qreply=1'>" .
             ($PAGE->meta(
                 $PAGE->metaexists('button-qreply') ?
                 'button-qreply' : 'topic-button-qreply'
@@ -234,11 +234,11 @@ EOT
             $topicdata['fperms']['reply']
             && (!$topicdata['locked']
             || $PERMS['can_override_locked_topics']) ?
-            "<a href='?act=post&tid=${id}'>".
+            "<a href='?act=post&tid=${id}'>" .
             ($PAGE->meta(
                 $PAGE->metaexists('button-reply') ?
                 'button-reply' : 'topic-button-reply'
-            )).'</a>' : '',
+            )) . '</a>' : '',
         );
 
         //make the users online list
@@ -246,11 +246,11 @@ EOT
         foreach ($DB->getUsersOnline() as $f) {
             if ($f['uid'] && $f['location'] == "vt${id}") {
                 $usersonline .= (isset($f['is_bot']) && $f['is_bot']) ?
-                    '<a class="user'.$f['uid'].'">'.$f['name'].'</a>' :
+                    '<a class="user' . $f['uid'] . '">' . $f['name'] . '</a>' :
                     $PAGE->meta(
                         'user-link',
                         $f['uid'],
-                        $f['group_id'].('idle' == $f['status'] ? ' idle' : ''),
+                        $f['group_id'] . ('idle' == $f['status'] ? ' idle' : ''),
                         $f['name']
                     );
             }
@@ -258,16 +258,16 @@ EOT
         $page .= $PAGE->meta('topic-users-online', $usersonline);
 
         //add in other page elements shiz
-        $page = $poll.$PAGE->meta(
+        $page = $poll . $PAGE->meta(
             'topic-pages-top',
             $pagelist
-        ).$PAGE->meta(
+        ) . $PAGE->meta(
             'topic-buttons-top',
             $buttons
-        ).$page.$PAGE->meta(
+        ) . $page . $PAGE->meta(
             'topic-pages-bottom',
             $pagelist
-        ).$PAGE->meta(
+        ) . $PAGE->meta(
             'topic-buttons-bottom',
             $buttons
         );
@@ -332,7 +332,7 @@ EOT
                 } else {
                     unset($oldcache[$f['uid']]);
                 }
-                $newcache .= $f['uid'].',';
+                $newcache .= $f['uid'] . ',';
             }
         }
         if (!empty($list)) {
@@ -370,7 +370,7 @@ EOT
             );
 
             while ($f = $DB->arow($result)) {
-                $prefilled .= '[quote='.$f['name'].']'.$f['post'].'[/quote]'.PHP_EOL;
+                $prefilled .= '[quote=' . $f['name'] . ']' . $f['post'] . '[/quote]' . PHP_EOL;
             }
             $SESS->delvar('multiquote');
         }
@@ -509,29 +509,29 @@ EOT
                 $rniblets = $DB->getRatingNiblets();
                 if ($rniblets) {
                     foreach ($rniblets as $k => $v) {
-                        $postrating .= '<a href="?act=topic&amp;ratepost='.
-                            $post['pid'].'&amp;niblet='.$k.'">'.
+                        $postrating .= '<a href="?act=topic&amp;ratepost=' .
+                            $post['pid'] . '&amp;niblet=' . $k . '">' .
                             $PAGE->meta(
                                 'rating-niblet',
                                 $v['img'],
                                 $v['title']
-                            ).'</a>';
+                            ) . '</a>';
                         if (isset($prating[$k]) && $prating[$k]) {
-                            $num = 'x'.count($prating[$k]);
+                            $num = 'x' . count($prating[$k]);
                             $postrating .= $num;
                             $showrating .= $PAGE->meta(
                                 'rating-niblet',
                                 $v['img'],
                                 $v['title']
-                            ).$num;
+                            ) . $num;
                         }
                     }
                     $postrating = $PAGE->meta(
                         'rating-wrapper',
                         $postrating,
                         (!($CFG['ratings'] & 2) ?
-                        '<a href="?act=vt'.$this->id.
-                        '&amp;listrating='.$post['pid'].'">(List)</a>' : ''),
+                        '<a href="?act=vt' . $this->id .
+                        '&amp;listrating=' . $post['pid'] . '">(List)</a>' : ''),
                         $showrating
                     );
                 }
@@ -551,27 +551,27 @@ EOT
                 $post['usertitle'],
                 $post['posts'],
                 $PAGE->meta(
-                    'topic-status-'.
+                    'topic-status-' .
                     (isset($usersonline[$post['auth_id']])
                     && $usersonline[$post['auth_id']] ? 'online' : 'offline')
                 ),
                 $post['title'],
                 $post['auth_id'],
                 ($this->canedit($post) ?
-                "<a href='?act=vt".$this->id.'&amp;edit='.$post['pid'].
-                "' class='edit'>".$PAGE->meta('topic-edit-button').
-                '</a>' : '')." <a href='?act=vt".$this->id.'&amp;quote='.
-                $post['pid'].
-                "' onclick='RUN.handleQuoting(this);return false;' ".
-                "class='quotepost'>".$PAGE->meta('topic-quote-button').'</a> '.
+                "<a href='?act=vt" . $this->id . '&amp;edit=' . $post['pid'] .
+                "' class='edit'>" . $PAGE->meta('topic-edit-button') .
+                '</a>' : '') . " <a href='?act=vt" . $this->id . '&amp;quote=' .
+                $post['pid'] .
+                "' onclick='RUN.handleQuoting(this);return false;' " .
+                "class='quotepost'>" . $PAGE->meta('topic-quote-button') . '</a> ' .
                 ($this->canmoderate() ?
-                "<a href='?act=modcontrols&amp;do=modp&amp;pid=".$post['pid'].
-                "' class='modpost' onclick='RUN.modcontrols.togbutton(this)'>".
-                $PAGE->meta('topic-mod-button').'</a>' : ''),
+                "<a href='?act=modcontrols&amp;do=modp&amp;pid=" . $post['pid'] .
+                "' class='modpost' onclick='RUN.modcontrols.togbutton(this)'>" .
+                $PAGE->meta('topic-mod-button') . '</a>' : ''),
                 $JAX->date($post['date']),
-                '<a href="?act=vt'.$this->id.'&amp;findpost='.$post['pid'].
-                '" onclick="prompt(\'Link to this post:\',this.href)">'.
-                $PAGE->meta('topic-perma-button').'</a>',
+                '<a href="?act=vt' . $this->id . '&amp;findpost=' . $post['pid'] .
+                '" onclick="prompt(\'Link to this post:\',this.href)">' .
+                $PAGE->meta('topic-perma-button') . '</a>',
                 $postt,
                 isset($post['sig']) && $post['sig'] ?
                 $JAX->theworks($post['sig']) : '',
@@ -587,11 +587,11 @@ EOT
                     $JAX->date($post['editdate'])
                 ) : '',
                 $PERMS['can_moderate'] ?
-                '<a href="?act=modcontrols&amp;do=iptools&amp;ip='.
-                $post['ip'].'">'.$PAGE->meta(
+                '<a href="?act=modcontrols&amp;do=iptools&amp;ip=' .
+                $post['ip'] . '">' . $PAGE->meta(
                     'topic-mod-ipbutton',
                     $post['ip']
-                ).'</a>' : '',
+                ) . '</a>' : '',
                 $post['icon'] ? $PAGE->meta(
                     'topic-icon-wrapper',
                     $post['icon']
@@ -696,39 +696,39 @@ EOT
         if ($voted) {
             $page .= '<table>';
             foreach ($choices as $k => $v) {
-                $page .= "<tr><td>${v}</td><td class='numvotes'>".
-                    $numvotes[$k].' votes ('.
-                    round($numvotes[$k] / $totalvotes * 100, 2).
-                    "%)</td><td style='width:200px'><div class='bar' style='width:".
-                    round($numvotes[$k] / $totalvotes * 100).
+                $page .= "<tr><td>${v}</td><td class='numvotes'>" .
+                    $numvotes[$k] . ' votes (' .
+                    round($numvotes[$k] / $totalvotes * 100, 2) .
+                    "%)</td><td style='width:200px'><div class='bar' style='width:" .
+                    round($numvotes[$k] / $totalvotes * 100) .
                     "%;'></div></td></tr>";
             }
-            $page .= "<tr><td colspan='3' class='totalvotes'>Total Votes: ".
-                $usersvoted.'</td></tr>';
+            $page .= "<tr><td colspan='3' class='totalvotes'>Total Votes: " .
+                $usersvoted . '</td></tr>';
             $page .= '</table>';
         } else {
-            $page = "<form method='post' action='?' ".
-                "onsubmit='return RUN.submitForm(this)'>".
+            $page = "<form method='post' action='?' " .
+                "onsubmit='return RUN.submitForm(this)'>" .
                 $JAX->hiddenFormFields(
                     array(
-                        'act' => 'vt'.$this->id,
+                        'act' => 'vt' . $this->id,
                         'votepoll' => 1,
                     )
                 );
             if ('multi' == $type) {
                 foreach ($choices as $k => $v) {
-                    $page .= "<div class='choice'><input type='checkbox' ".
-                        "name='choice[]' value='${k}' id='poll_${k}' /> ".
+                    $page .= "<div class='choice'><input type='checkbox' " .
+                        "name='choice[]' value='${k}' id='poll_${k}' /> " .
                         "<label for='poll_${k}'>${v}</label></div>";
                 }
             } else {
                 foreach ($choices as $k => $v) {
-                    $page .= "<div class='choice'><input type='radio' ".
-                        "name='choice' value='${k}' id='poll_${k}' /> ".
+                    $page .= "<div class='choice'><input type='radio' " .
+                        "name='choice' value='${k}' id='poll_${k}' /> " .
                         "<label for='poll_${k}'>${v}</label></div>";
                 }
             }
-            $page .= "<div class='buttons'><input type='submit' ".
+            $page .= "<div class='buttons'><input type='submit' " .
                 "value='Vote'></div></form>";
         }
 
@@ -901,7 +901,7 @@ EOT
             return;
         }
         if (!$PAGE->jsaccess) {
-            $PAGE->location('?act=post&pid='.$id);
+            $PAGE->location('?act=post&pid=' . $id);
         }
         $PAGE->JS('softurl');
         $result = $DB->safeselect(
@@ -1002,14 +1002,14 @@ EOT
         if ($JAX->b['qreply']) {
             $PAGE->JS(
                 'updateqreply',
-                '[quote='.$post['name'].']'.$post['post'].'[/quote]'.
-                PHP_EOL.PHP_EOL
+                '[quote=' . $post['name'] . ']' . $post['post'] . '[/quote]' .
+                PHP_EOL . PHP_EOL
             );
         } else {
             if (!in_array($pid, explode(' ', $SESS->vars['multiquote']))) {
                 $SESS->addvar(
                     'multiquote',
-                    $SESS->vars['multiquote'] ? $SESS->vars['multiquote'].','.
+                    $SESS->vars['multiquote'] ? $SESS->vars['multiquote'] . ',' .
                     $pid : $pid
                 );
             }
@@ -1017,7 +1017,7 @@ EOT
             if ($PAGE->jsaccess) {
                 $this->qreplyform($tid);
             } else {
-                header('Location:?act=post&tid='.$tid);
+                header('Location:?act=post&tid=' . $tid);
             }
         }
 
@@ -1038,8 +1038,8 @@ EOT
 
         $PAGE->JS('softurl');
         $PAGE->location(
-            "?act=vt${tid}&page=".(ceil(($f['numposts'] / $this->numperpage))).
-            '&pid='.$f['lastpid'].'#pid_'.$f['lastpid']
+            "?act=vt${tid}&page=" . (ceil(($f['numposts'] / $this->numperpage))) .
+            '&pid=' . $f['lastpid'] . '#pid_' . $f['lastpid']
         );
     }
 
@@ -1080,8 +1080,8 @@ EOT
             $PAGE->JS('alert', "that post doesn't exist");
         } else {
             $PAGE->location(
-                '?act=vt'.$this->id.'&page='.
-                (ceil($num / $this->numperpage)).'&pid='.$pid.'#pid_'.$pid
+                '?act=vt' . $this->id . '&page=' .
+                (ceil($num / $this->numperpage)) . '&pid=' . $pid . '#pid_' . $pid
             );
         }
     }
@@ -1137,15 +1137,15 @@ EOT
         $niblets = $DB->getRatingNiblets();
         foreach ($ratings as $k => $v) {
             $page .= '<div class="column">';
-            $page .= '<img src="'.$niblets[$k]['img'].'" /> '.
-                $niblets[$k]['title'].'<ul>';
+            $page .= '<img src="' . $niblets[$k]['img'] . '" /> ' .
+                $niblets[$k]['title'] . '<ul>';
             foreach ($v as $mid) {
-                $page .= '<li>'.$PAGE->meta(
+                $page .= '<li>' . $PAGE->meta(
                     'user-link',
                     $mid,
                     $mdata[$mid][1],
                     $mdata[$mid][0]
-                ).'</li>';
+                ) . '</li>';
             }
             $page .= '</ul></div>';
         }

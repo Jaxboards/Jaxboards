@@ -41,8 +41,8 @@ class POST
         if (isset($_FILES['Filedata'], $_FILES['Filedata']['tmp_name'])
             && $_FILES['Filedata']['tmp_name']
         ) {
-            $JAX->p['postdata'] .= '[attachment]'.
-                $this->upload($_FILES['Filedata']).
+            $JAX->p['postdata'] .= '[attachment]' .
+                $this->upload($_FILES['Filedata']) .
                 '[/attachment]';
         }
         if (isset($JAX->p['submit'])
@@ -103,7 +103,7 @@ class POST
         $size = filesize($fileobj['tmp_name']);
         //if($size>$CFG['maxupload']) return "too big!";
         $hash = hash_file('sha512', $fileobj['tmp_name']);
-        $uploadpath = BOARDPATH.'Uploads/';
+        $uploadpath = BOARDPATH . 'Uploads/';
 
         $ext = explode('.', $fileobj['name']);
         if (1 == count($ext)) {
@@ -115,10 +115,10 @@ class POST
             $ext = '';
         }
         if ($ext) {
-            $ext = '.'.$ext;
+            $ext = '.' . $ext;
         }
 
-        $file = $uploadpath.$hash.$ext;
+        $file = $uploadpath . $hash . $ext;
         if (!is_file($file)) {
             move_uploaded_file($fileobj['tmp_name'], $file);
             $DB->safeinsert(
@@ -171,7 +171,7 @@ class POST
             return;
         }
         $postdata = $this->postdata;
-        $page = '<div id="post-preview">'.$this->postpreview.'</div>';
+        $page = '<div id="post-preview">' . $this->postpreview . '</div>';
         $fid = $this->fid;
 
         if ('edit' == $this->how) {
@@ -236,26 +236,26 @@ EOT
                 );
             }
             $form = '<form method="post"
-                onsubmit="$(\'pdedit\').editor.submit();'.
-                'if(this.submitButton.value.match(/post/i)) '.
-                'this.submitButton.disabled=true;return '.
+                onsubmit="$(\'pdedit\').editor.submit();' .
+                'if(this.submitButton.value.match(/post/i)) ' .
+                'this.submitButton.disabled=true;return ' .
                 'RUN.submitForm(this,0,event);">
  <div class="topicform">
  <input type="hidden" name="act" value="post" />
  <input type="hidden" name="how" value="newtopic" />
- <input type="hidden" name="fid" value="'.$fid.'" />
+ <input type="hidden" name="fid" value="' . $fid . '" />
   <label for="ttitle">Topic title:</label>
-<input type="text" name="ttitle" id="ttitle" value="'.$tdata['title'].'" />
+<input type="text" name="ttitle" id="ttitle" value="' . $tdata['title'] . '" />
 <br />
   <label for="tdesc">Description:</label>
-<input type="text" id="tdesc" name="tdesc" value="'.$tdata['subtitle'].'" />
+<input type="text" id="tdesc" name="tdesc" value="' . $tdata['subtitle'] . '" />
 <br />
-  <textarea name="postdata" id="postdata">'.$JAX->blockhtml($postdata).
+  <textarea name="postdata" id="postdata">' . $JAX->blockhtml($postdata) .
             '</textarea>
   <iframe id="pdedit" onload="JAX.editor($(\'postdata\'),this)"
 style="display:none"></iframe><br /><div class="postoptions">
-  '.($fdata['perms']['poll'] ? '<label class="addpoll" for="addpoll">Add a
-Poll</label> <select name="poll_type" onchange="$(\'polloptions\').'.
+  ' . ($fdata['perms']['poll'] ? '<label class="addpoll" for="addpoll">Add a
+Poll</label> <select name="poll_type" onchange="$(\'polloptions\').' .
             'style.display=this.value?\'block\':\'none\'">
 <option value="">No</option>
 <option value="single">Yes, single-choice</option>
@@ -263,16 +263,16 @@ Poll</label> <select name="poll_type" onchange="$(\'polloptions\').'.
   <div id="polloptions" style="display:none">
    <label for="pollq">Poll Question:</label><input type="text" name="pollq" /><br />
    <label for="pollc">Poll Choices:</label> (one per line)
-<textarea id="pollc" name="pollchoices"></textarea></div>' : '').
+<textarea id="pollc" name="pollchoices"></textarea></div>' : '') .
             ($fdata['perms']['upload'] ? '<div id="attachfiles" class="addfile">
-   Add Files <input type="file" name="Filedata" /></div>' : '').
+   Add Files <input type="file" name="Filedata" /></div>' : '') .
             '<div class="buttons"><input type="submit" name="submit"
    value="Post New Topic" onclick="this.form.submitButton=this;"
 id="submitbutton" /> <input type="submit" name="submit" value="Preview"
 onclick="this.form.submitButton=this" /></div>
  </div>
 </form>';
-            $page .= $PAGE->meta('box', '', $fdata['title'].' > New Topic', $form);
+            $page .= $PAGE->meta('box', '', $fdata['title'] . ' > New Topic', $form);
         }
         $PAGE->append('page', $page);
         $PAGE->JS('update', 'page', $page);
@@ -322,7 +322,7 @@ EOT
                 $USER ? $USER['group_id'] : 3
             );
         }
-        $page .= '<div id="post-preview">'.$this->postpreview.'</div>';
+        $page .= '<div id="post-preview">' . $this->postpreview . '</div>';
         $postdata = $JAX->blockhtml($this->postdata);
         $varsarray = array(
             'act' => 'post',
@@ -335,7 +335,7 @@ EOT
         }
         $vars = '';
         foreach ($varsarray as $k => $v) {
-            $vars .= '<input type="hidden" name="'.$k.'" value="'.$v.'" />';
+            $vars .= '<input type="hidden" name="' . $k . '" value="' . $v . '" />';
         }
 
         if (isset($SESS->vars['multiquote']) && $SESS->vars['multiquote']) {
@@ -359,27 +359,27 @@ EOT
             );
 
             while ($f = $DB->arow($result)) {
-                $postdata .= '[quote='.$f['name'].']'.$f['post'].'[/quote]'.PHP_EOL;
+                $postdata .= '[quote=' . $f['name'] . ']' . $f['post'] . '[/quote]' . PHP_EOL;
             }
             $SESS->delvar('multiquote');
         }
 
         $form = '<div class="postform">
-<form method="post" onsubmit="if(this.submitButton.value.match(/post/i)) '.
-        'this.submitButton.disabled=true;$(\'pdedit\').editor.submit();return '.
+<form method="post" onsubmit="if(this.submitButton.value.match(/post/i)) ' .
+        'this.submitButton.disabled=true;$(\'pdedit\').editor.submit();return ' .
         'RUN.submitForm(this,0,event);" enctype="multipart/form-data">
- '.$vars.'
-  <textarea name="postdata" id="post">'.$postdata.
+ ' . $vars . '
+  <textarea name="postdata" id="post">' . $postdata .
         '</textarea><iframe id="pdedit" onload="JAX.editor($(\'post\'),this)"
-  style="display:none"></iframe><br />'.
+  style="display:none"></iframe><br />' .
         ($tdata['perms']['upload'] ? '<div id="attachfiles">Add Files
-  <input type="file" name="Filedata" /></div>' : '').
+  <input type="file" name="Filedata" /></div>' : '') .
         '<div class="buttons"><input type="submit" name="submit"
   value="Post" onclick="this.form.submitButton=this"
 id="submitbutton"/><input type="submit" name="submit" value="Preview"
 onclick="this.form.submitButton=this"/></div>
 </form></div>';
-        $page .= $PAGE->meta('box', '', $tdata['title'].' &gt; Reply', $form);
+        $page .= $PAGE->meta('box', '', $tdata['title'] . ' &gt; Reply', $form);
         $PAGE->append('page', $page);
         $PAGE->JS('update', 'page', $page);
         if ($tdata['perms']['upload']) {
@@ -839,7 +839,7 @@ EOT
         }
 
         if ('qreply' != $this->how) {
-            $PAGE->location('?act=vt'.$tid.'&getlast=1');
+            $PAGE->location('?act=vt' . $tid . '&getlast=1');
         } else {
             $PAGE->JS('closewindow', '#qreply');
             $PAGE->JS('script', 'RUN.stream.donext(1)');

@@ -35,15 +35,15 @@ class INBOX
         }
         if (is_numeric($JAX->p['messageid'])) {
             switch (mb_strtolower($JAX->p['page'])) {
-            case 'delete':
-                $this->delete($JAX->p['messageid']);
-                break;
-            case 'forward':
-                $this->compose($JAX->p['messageid'], 'fwd');
-                break;
-            case 'reply':
-                $this->compose($JAX->p['messageid']);
-                break;
+                case 'delete':
+                    $this->delete($JAX->p['messageid']);
+                    break;
+                case 'forward':
+                    $this->compose($JAX->p['messageid'], 'fwd');
+                    break;
+                case 'reply':
+                    $this->compose($JAX->p['messageid']);
+                    break;
             }
         } else {
             if (is_numeric($JAX->g['view'])) {
@@ -278,17 +278,17 @@ EOT
             if (!$f['read']) {
                 ++$unread;
             }
-            $page .= '<tr '.(!$f['read'] ? 'class="unread" ' : '').
-                'onclick="if(JAX.event(event).srcElement.tagName.'.
-                'toLowerCase()==\'td\') $$(\'input\',this)[0].click()">'.
-                '<td class="center"><input class="check" type="checkbox" />'.
-                '</td><td class="center"><input type="checkbox" '.
-                ($f['flag'] ? 'checked="checked" ' : '').
-                'class="switch flag" onclick="RUN.stream.location(\''.
-                '?act=inbox&flag='.$f['id'].'&tog=\'+(this.checked?1:0))"/>'.
-                '</td><td><a href="?act=inbox&view='.$f['id'].'">'.
-                $f['title'].'</a></td><td>'.$f['display_name'].
-                '</td><td>'.$JAX->date($f['date']).'</td></tr>';
+            $page .= '<tr ' . (!$f['read'] ? 'class="unread" ' : '') .
+                'onclick="if(JAX.event(event).srcElement.tagName.' .
+                'toLowerCase()==\'td\') $$(\'input\',this)[0].click()">' .
+                '<td class="center"><input class="check" type="checkbox" />' .
+                '</td><td class="center"><input type="checkbox" ' .
+                ($f['flag'] ? 'checked="checked" ' : '') .
+                'class="switch flag" onclick="RUN.stream.location(\'' .
+                '?act=inbox&flag=' . $f['id'] . '&tog=\'+(this.checked?1:0))"/>' .
+                '</td><td><a href="?act=inbox&view=' . $f['id'] . '">' .
+                $f['title'] . '</a></td><td>' . $f['display_name'] .
+                '</td><td>' . $JAX->date($f['date']) . '</td></tr>';
         }
 
         if (!$hasmessages) {
@@ -297,12 +297,12 @@ EOT
             } elseif ('flagged' == $view) {
                 $msg = 'No flagged messages.';
             } else {
-                $msg = 'No messages. You could always try '.
+                $msg = 'No messages. You could always try ' .
                 '<a href="?act=inbox&page=compose">sending some</a>, though!';
             }
-            $page .= '<tr><td colspan="5" class="error">'.$msg.'</td></tr>';
+            $page .= '<tr><td colspan="5" class="error">' . $msg . '</td></tr>';
         } else {
-            $page .= '<tr><td></td><td colspan="4">'.
+            $page .= '<tr><td></td><td colspan="4">' .
                 '<button>This button does nothing</button></td></tr>';
         }
 
@@ -367,9 +367,9 @@ EOT
                 $cmd = $JAX->json_encode(
                     array(
                         'newmessage',
-                        'You have a new message from '.$USER['display_name'],
+                        'You have a new message from ' . $USER['display_name'],
                         $DB->insert_id(1), )
-                ).PHP_EOL;
+                ) . PHP_EOL;
                 $DB->safespecial(
                     <<<'EOT'
 UPDATE %t
@@ -423,9 +423,9 @@ EOT
             $mname = array_pop($thisrow);
             $DB->disposeresult($result);
 
-            $msg = PHP_EOL.PHP_EOL.PHP_EOL.'[quote='.$mname.']'.
-                $message['message'].'[/quote]';
-            $mtitle = ('fwd' == $todo ? 'FWD:' : 'RE:').$message['title'];
+            $msg = PHP_EOL . PHP_EOL . PHP_EOL . '[quote=' . $mname . ']' .
+                $message['message'] . '[/quote]';
+            $mtitle = ('fwd' == $todo ? 'FWD:' : 'RE:') . $message['title'];
             if ('fwd' == $todo) {
                 $mid = $mname = '';
             }
@@ -448,8 +448,8 @@ EOT
                 $mname = '';
             }
         }
-        $toKeyUp = '$(\'validname\').className=\'bad\';'.
-            'JAX.autoComplete(\'act=searchmembers&term=\'+'.
+        $toKeyUp = '$(\'validname\').className=\'bad\';' .
+            'JAX.autoComplete(\'act=searchmembers&term=\'+' .
             'this.value,this,$(\'mid\'),event);';
         $goodClass = ($mname ? ' class="good"' : '');
         $msgClean = htmlspecialchars($msg);
@@ -534,8 +534,8 @@ EOT
             );
         }
         $PAGE->location(
-            '?act=inbox'.
-            ($JAX->b['prevpage'] ? '&page='.$JAX->b['prevpage'] : '')
+            '?act=inbox' .
+            ($JAX->b['prevpage'] ? '&page=' . $JAX->b['prevpage'] : '')
         );
     }
 }

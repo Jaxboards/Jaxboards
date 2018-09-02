@@ -188,7 +188,7 @@ EOT
         }
 
         if (!$user) {
-            $e = 'This user does not exist, and therefore could '.
+            $e = 'This user does not exist, and therefore could ' .
                 'not be added to your contacts list.';
         } elseif (in_array($uid, explode(',', $friends))) {
             $e = 'This user is already in your contacts list.';
@@ -199,7 +199,7 @@ EOT
             $PAGE->JS('error', $e);
         } else {
             if ($friends) {
-                $friends .= ','.$uid;
+                $friends .= ',' . $uid;
             } else {
                 $friends = $uid;
             }

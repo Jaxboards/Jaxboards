@@ -54,7 +54,7 @@ class PAGE
 
     public function addvar($a, $b)
     {
-        $this->vars['<%'.$a.'%>'] = $b;
+        $this->vars['<%' . $a . '%>'] = $b;
     }
 
     public function filtervars($a)
@@ -70,7 +70,7 @@ class PAGE
                 return $this->reset($a, $b);
             }
 
-            return $this->parts[$a] = $b.$this->parts[$a];
+            return $this->parts[$a] = $b . $this->parts[$a];
         }
     }
 
@@ -78,7 +78,7 @@ class PAGE
     {
         global $PAGE,$SESS,$JAX;
         if (empty($JAX->c) && '?' == $a[0]) {
-            $a = '?sessid='.$SESS->data['id'].'&'.mb_substr($a, 1);
+            $a = '?sessid=' . $SESS->data['id'] . '&' . mb_substr($a, 1);
         }
         if ($PAGE->jsaccess) {
             $PAGE->JS('location', $a);
@@ -134,7 +134,7 @@ class PAGE
         }
         $this->done = true;
         $this->parts['path']
-            = "<div id='path' class='path'>".$this->buildpath().'</div>';
+            = "<div id='path' class='path'>" . $this->buildpath() . '</div>';
 
         if ($this->jsaccess) {
             header('Content-type:text/plain');
@@ -147,13 +147,13 @@ class PAGE
             foreach ($this->parts as $k => $v) {
                 $k = mb_strtoupper($k);
                 if (in_array($k, $autobox)) {
-                    $v = '<div id="'.mb_strtolower($k).'">'.$v.'</div>';
+                    $v = '<div id="' . mb_strtolower($k) . '">' . $v . '</div>';
                 }
                 if ('PATH' == $k) {
                     $this->template
                         = preg_replace('@<!--PATH-->@', $v, $this->template, 1);
                 }
-                $this->template = str_replace('<!--'.$k.'-->', $v, $this->template);
+                $this->template = str_replace('<!--' . $k . '-->', $v, $this->template);
             }
             $this->template = $this->filtervars($this->template);
             $this->template = $SESS->addSessId($this->template);
@@ -166,7 +166,7 @@ class PAGE
 
     public function collapsebox($a, $b, $c = false)
     {
-        return $this->meta('collapsebox', ($c ? ' id="'.$c.'"' : ''), $a, $b);
+        return $this->meta('collapsebox', ($c ? ' id="' . $c . '"' : ''), $a, $b);
     }
 
     public function error($a)
@@ -195,7 +195,8 @@ class PAGE
             array(
                 &$this,
                 'userMetaParse',
-            ), $this->template
+            ),
+            $this->template
         );
     }
 
@@ -229,20 +230,20 @@ class PAGE
                 'wrapper' => false,
             );
         }
-        $t = ($skin['custom'] ? BOARDPATH : '').'Themes/'.$skin['title'].'/';
-        $turl = ($skin['custom'] ? BOARDPATHURL : '').'Themes/'.$skin['title'].'/';
+        $t = ($skin['custom'] ? BOARDPATH : '') . 'Themes/' . $skin['title'] . '/';
+        $turl = ($skin['custom'] ? BOARDPATHURL : '') . 'Themes/' . $skin['title'] . '/';
         if (is_dir($t)) {
             define('THEMEPATH', $t);
             define('THEMEPATHURL', $turl);
         } else {
-            define('THEMEPATH', JAXBOARDS_ROOT.'/'.$CFG['dthemepath']);
-            define('THEMEPATHURL', BOARDURL.$CFG['dthemepath']);
+            define('THEMEPATH', JAXBOARDS_ROOT . '/' . $CFG['dthemepath']);
+            define('THEMEPATHURL', BOARDURL . $CFG['dthemepath']);
         }
         define('DTHEMEPATH', $CFG['dthemepath']);
         $this->loadtemplate(
             $skin['wrapper'] ?
-            BOARDPATH.'Wrappers/'.$skin['wrapper'].'.txt' :
-            THEMEPATH.'wrappers.txt'
+            BOARDPATH . 'Wrappers/' . $skin['wrapper'] . '.txt' :
+            THEMEPATH . 'wrappers.txt'
         );
     }
 
@@ -271,10 +272,10 @@ class PAGE
 
     public function loadmeta($a)
     {
-        if (is_file(THEMEPATH.'meta/'.$a.'.php')) {
-            $file = THEMEPATH.'meta/'.$a.'.php';
+        if (is_file(THEMEPATH . 'meta/' . $a . '.php')) {
+            $file = THEMEPATH . 'meta/' . $a . '.php';
         } else {
-            $file = DTHEMEPATH.'meta/'.$a.'.php';
+            $file = DTHEMEPATH . 'meta/' . $a . '.php';
         }
         $this->metaqueue[] = $file;
         $this->debug("Added ${a} to queue");
@@ -308,7 +309,7 @@ class PAGE
             is_array($args[0]) ? $args[0] : $args
         );
         if (false === $r) {
-            die($meta.' has too many arguments');
+            die($meta . ' has too many arguments');
         }
         if (isset($this->moreFormatting[$meta])
             && $this->moreFormatting[$meta]
@@ -341,13 +342,25 @@ class PAGE
         foreach (explode($s, $m[1]) as $piece) {
             preg_match('@(\\S+?)\\s*([!><]?=|[><])\\s*(\\S*)@', $piece, $pp);
             switch ($pp[2]) {
-    case '=': $c = $pp[1] == $pp[3]; break;
-    case '!=':$c = $pp[1] != $pp[3]; break;
-    case '>=':$c = $pp[1] >= $pp[3]; break;
-    case '>':$c = $pp[1] > $pp[3]; break;
-    case '<=':$c = $pp[1] <= $pp[3]; break;
-    case '<':$c = $pp[1] < $pp[3]; break;
-   }
+                case '=':
+                    $c = $pp[1] == $pp[3];
+                    break;
+                case '!=':
+                    $c = $pp[1] != $pp[3];
+                    break;
+                case '>=':
+                    $c = $pp[1] >= $pp[3];
+                    break;
+                case '>':
+                    $c = $pp[1] > $pp[3];
+                    break;
+                case '<=':
+                    $c = $pp[1] <= $pp[3];
+                    break;
+                case '<':
+                    $c = $pp[1] < $pp[3];
+                    break;
+            }
             if ('&&' == $s && !$c) {
                 break;
             }
@@ -424,7 +437,7 @@ class PAGE
     public function debug($data = '')
     {
         if ($data) {
-            $this->debuginfo .= $data.'<br />';
+            $this->debuginfo .= $data . '<br />';
         } else {
             return $this->debuginfo;
         }
@@ -437,20 +450,20 @@ class PAGE
             $settings[$k] = $v;
         }
         $object
-            = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" '.
-            'width="'.$settings['width'].'" height="'.$settings['height'].'">';
-        $object .= '<param name="movie" value="'.$file.'"></param>';
+            = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" ' .
+            'width="' . $settings['width'] . '" height="' . $settings['height'] . '">';
+        $object .= '<param name="movie" value="' . $file . '"></param>';
         if ($settings['flashvars']) {
-            $object .= '<param name="flashvars" value="'.
-                http_build_query($settings['flashvars']).'" />';
+            $object .= '<param name="flashvars" value="' .
+                http_build_query($settings['flashvars']) . '" />';
         }
         $object .= '<param name="allowScriptAccess" value="always" />';
-        $embed = '<embed style="display:block" '.
-            'type="application/x-shockwave-flash" '.
-            'pluginspage="https://get.adobe.com/flashplayer/" '.
-            'src="'.$file.'" width="'.$settings['width'].'" height="'.
-            $settings['height'].'" wmode="opaque" flashvars="'.
-            http_build_query($settings['flashvars']).
+        $embed = '<embed style="display:block" ' .
+            'type="application/x-shockwave-flash" ' .
+            'pluginspage="https://get.adobe.com/flashplayer/" ' .
+            'src="' . $file . '" width="' . $settings['width'] . '" height="' .
+            $settings['height'] . '" wmode="opaque" flashvars="' .
+            http_build_query($settings['flashvars']) .
             '" allowScriptAccess="always"></embed>';
 
         return mb_stristr('msie', $_SERVER['HTTP_USER_AGENT']) ? $object : $embed;

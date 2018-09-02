@@ -12,24 +12,24 @@ class settings
         global $JAX;
         $this->leftBar();
         switch (@$JAX->b['do']) {
-        case 'pages':
-            $this->pages();
-            break;
-        case 'shoutbox':
-            $this->shoutbox();
-            break;
-        case 'domains':
-            $this->domainmanager();
-            break;
-        case 'global':
-            $this->boardname();
-            break;
-        case 'birthday':
-            $this->birthday();
-            break;
-        default:
-            $this->showmain();
-            break;
+            case 'pages':
+                $this->pages();
+                break;
+            case 'shoutbox':
+                $this->shoutbox();
+                break;
+            case 'domains':
+                $this->domainmanager();
+                break;
+            case 'global':
+                $this->boardname();
+                break;
+            case 'birthday':
+                $this->birthday();
+                break;
+            default:
+                $this->showmain();
+                break;
         }
     }
 
@@ -145,7 +145,7 @@ EOT;
                 $JAX->b['page']
             );
             if ($newact != $JAX->b['page']) {
-                $e = 'The page URL must contain only letters and numbers. '.
+                $e = 'The page URL must contain only letters and numbers. ' .
                     "Invalid characters: ${newact}";
             } elseif (mb_strlen($newact) > 25) {
                 $e = 'The page URL cannot exceed 25 characters.';
@@ -391,8 +391,8 @@ EOT;
                     $DB->basicvalue($CFG['prefix'])
                 );
                 $page .= $PAGE->success(
-                    "Domain added! Test <a href='https://".
-                    $JAX->blockhtml($JAX->p['domain'])."'>here.</a>"
+                    "Domain added! Test <a href='https://" .
+                    $JAX->blockhtml($JAX->p['domain']) . "'>here.</a>"
                 );
             }
         } elseif (@$JAX->b['delete']) {

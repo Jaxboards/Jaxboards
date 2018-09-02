@@ -26,7 +26,7 @@ $microtime = microtime(true);
 // This is the best place to load the password compatibility library,
 // so do it here:
 if (!function_exists('password_hash')) {
-    include_once JAXBOARDS_ROOT.'/inc/lib/password.php';
+    include_once JAXBOARDS_ROOT . '/inc/lib/password.php';
 }
 
 /*get the config*/
@@ -124,9 +124,9 @@ if (isset($JAX->b['skin_id'])) {
 if (isset($SESS->vars['skin_id']) && $SESS->vars['skin_id']) {
     $PAGE->append(
         'NAVIGATION',
-        '<div class="success" '.
-        'style="position:fixed;bottom:0;left:0;width:100%;">'.
-        'Skin UCP setting being overriden. '.
+        '<div class="success" ' .
+        'style="position:fixed;bottom:0;left:0;width:100%;">' .
+        'Skin UCP setting being overriden. ' .
         '<a href="?skin_id=0">Revert</a></div>'
     );
 }
@@ -163,53 +163,53 @@ $PAGE->append(
 
 if (!$PAGE->jsaccess) {
     foreach (array('sound_im', 'wysiwyg') as $v) {
-        $variables[] = "${v}:".($USER ? ($USER[$v] ? 1 : 0) : 1);
+        $variables[] = "${v}:" . ($USER ? ($USER[$v] ? 1 : 0) : 1);
     }
-    $variables[] = 'can_im:'.($PERMS['can_im'] ? 1 : 0);
-    $variables[] = 'groupid:'.($JAX->pick($USER['group_id'], 3));
-    $variables[] = "username:'".addslashes($USER['display_name'])."'";
-    $variables[] = 'userid:'.$JAX->pick($USER['id'], 0);
+    $variables[] = 'can_im:' . ($PERMS['can_im'] ? 1 : 0);
+    $variables[] = 'groupid:' . ($JAX->pick($USER['group_id'], 3));
+    $variables[] = "username:'" . addslashes($USER['display_name']) . "'";
+    $variables[] = 'userid:' . $JAX->pick($USER['id'], 0);
 
     $PAGE->append(
         'SCRIPT',
-        ' <script type="text/javascript">var globalsettings={'.
-        implode(',', $variables).
+        ' <script type="text/javascript">var globalsettings={' .
+        implode(',', $variables) .
         '}</script>'
     );
     $PAGE->append(
         'SCRIPT',
-        ' <script type="text/javascript" src="'.BOARDURL.
+        ' <script type="text/javascript" src="' . BOARDURL .
         'Service/jsnew.js?v=1"></script>'
     );
     $PAGE->append(
         'SCRIPT',
-        ' <script type="text/javascript" src="'.BOARDURL.
+        ' <script type="text/javascript" src="' . BOARDURL .
         'Service/jsrun.js"></script>'
     );
     $PAGE->append(
         'SCRIPT',
-        '<!--[if IE]>'.
-        '<link rel="stylesheet" type="text/css" href="'.BOARDURL.
+        '<!--[if IE]>' .
+        '<link rel="stylesheet" type="text/css" href="' . BOARDURL .
         'Script/fiximgnatural.css" /><![endif]-->'
     );
 
     if ($PERMS['can_moderate'] || $USER['mod']) {
         $PAGE->append(
             'SCRIPT',
-            '<script type="text/javascript" '.
+            '<script type="text/javascript" ' .
             'src="?act=modcontrols&do=load"></script>'
         );
     }
 
     $PAGE->append(
         'CSS',
-        '<link rel="stylesheet" type="text/css" href="'.THEMEPATHURL.
+        '<link rel="stylesheet" type="text/css" href="' . THEMEPATHURL .
         'css.css" />'
     );
     if ($PAGE->meta('favicon')) {
         $PAGE->append(
             'CSS',
-            '<link rel="icon" href="'.$PAGE->meta('favicon').'">'
+            '<link rel="icon" href="' . $PAGE->meta('favicon') . '">'
         );
     }
     $PAGE->append(
@@ -218,7 +218,7 @@ if (!$PAGE->jsaccess) {
             'logo',
             $JAX->pick(
                 isset($CFG['logourl']) ? $CFG['logourl'] : false,
-                BOARDURL.'Service/Themes/Default/img/logo.png'
+                BOARDURL . 'Service/Themes/Default/img/logo.png'
             )
         )
     );
@@ -251,18 +251,18 @@ if (!$PAGE->jsaccess) {
     if ($nummessages) {
         $PAGE->append(
             'FOOTER',
-            '<div id="notification" class="newmessage" '.
-            'onclick="RUN.stream.location(\'?act=ucp&what=inbox\');'.
-            'this.style.display=\'none\'">You have '.$nummessages.
-            ' new message'.(1 == $nummessages ? '' : 's').'</div>'
+            '<div id="notification" class="newmessage" ' .
+            'onclick="RUN.stream.location(\'?act=ucp&what=inbox\');' .
+            'this.style.display=\'none\'">You have ' . $nummessages .
+            ' new message' . (1 == $nummessages ? '' : 's') . '</div>'
         );
     }
     if (!isset($CFG['nocopyright']) || !$CFG['nocopyright']) {
         $PAGE->append(
             'FOOTER',
-            '<div class="footer">'.
-            '<a href="http://jaxboards.com">Jaxboards 1.1.0</a> '.
-            '&copy; 2007-'.date('Y').'</div>'
+            '<div class="footer">' .
+            '<a href="http://jaxboards.com">Jaxboards 1.1.0</a> ' .
+            '&copy; 2007-' . date('Y') . '</div>'
         );
     }
     $PAGE->addvar('modlink', $PERMS['can_moderate'] ? $PAGE->meta('modlink') : '');
@@ -346,7 +346,7 @@ if (isset($actdefs[$act]) && $actdefs[$act]) {
 }
 if ('idx' == $act && isset($JAX->b['module']) && $JAX->b['module']) {
     //do nothing
-} elseif ($act && is_file($act = 'inc/page/'.$act.'.php')) {
+} elseif ($act && is_file($act = 'inc/page/' . $act . '.php')) {
     include_once $act;
 } elseif (!$PAGE->jsaccess || $PAGE->jsnewlocation) {
     $result = $DB->safeselect(
@@ -384,10 +384,10 @@ $SESS->applyChanges();
 if (in_array($JAX->getIp(), array('127.0.0.1', '::1'))) {
     $debug = '';
     foreach ($DB->queryRuntime as $k => $v) {
-        $debug .= "<b>${v}</b> ".$DB->queryList[$k].'<br />';
+        $debug .= "<b>${v}</b> " . $DB->queryList[$k] . '<br />';
         $qtime += $v;
     }
-    $debug .= $PAGE->debug().'<br />';
+    $debug .= $PAGE->debug() . '<br />';
     $PAGE->JS('update', '#query .content', $debug);
     $PAGE->append(
         'FOOTER',
@@ -395,19 +395,19 @@ if (in_array($JAX->getIp(), array('127.0.0.1', '::1'))) {
             'Debug',
             $debug,
             'query'
-        )."<div id='debug2'></div><div id='pagegen'></div>"
+        ) . "<div id='debug2'></div><div id='pagegen'></div>"
     );
     $PAGE->JS(
         'update',
         'pagegen',
-        $pagegen = 'Page Generated in '.
-        round(1000 * (microtime(true) - $microtime)).' ms'
+        $pagegen = 'Page Generated in ' .
+        round(1000 * (microtime(true) - $microtime)) . ' ms'
     );
 }
 $PAGE->append(
     'DEBUG',
-    "<div id='pagegen' style='text-align:center'>".
-    $pagegen.
+    "<div id='pagegen' style='text-align:center'>" .
+    $pagegen .
     "</div><div id='debug' style='display:none'></div>"
 );
 

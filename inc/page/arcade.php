@@ -153,7 +153,7 @@ EOT
         if (!$gamedata) {
             $PAGE->location('?act=arcade');
         }
-        $SESS->location_verbose = 'Playing '.$gamedata['title'].' in the arcade';
+        $SESS->location_verbose = 'Playing ' . $gamedata['title'] . ' in the arcade';
 
         $DB->safespecial(
             <<<'EOT'
@@ -171,8 +171,8 @@ EOT
             $frameCode = $PAGE->SWF(
                 $gamedata['swf'],
                 array(
-                    'width' => $gamedata['width'].'px',
-                    'height' => $gamedata['height'].'px',
+                    'width' => $gamedata['width'] . 'px',
+                    'height' => $gamedata['height'] . 'px',
                     'flashvars' => array(
                         'jax_gameid' => $id,
                     ),
@@ -194,19 +194,19 @@ EOT
         }
 
         $page .= '<div class="gameinfo">';
-        $page .= '<h3>'.$gamedata['title'].
-            '</h3><img src="'.$gamedata['icon'].'" /><br />'.
+        $page .= '<h3>' . $gamedata['title'] .
+            '</h3><img src="' . $gamedata['icon'] . '" /><br />' .
             $gamedata['description'];
-        $page .= '<div id="scores">'.
-            $this->buildMiniScoresTable($this->getScores($id)).'</div>';
-        $page .= '<div style="text-align:center">'.
-            '<a href="?act=arcade">Go Back to the Arcade</a><br />'.
-            '<a href="?act=arcade&amp;scores='.$id.'">View All Scores</a>'.
+        $page .= '<div id="scores">' .
+            $this->buildMiniScoresTable($this->getScores($id)) . '</div>';
+        $page .= '<div style="text-align:center">' .
+            '<a href="?act=arcade">Go Back to the Arcade</a><br />' .
+            '<a href="?act=arcade&amp;scores=' . $id . '">View All Scores</a>' .
             '</div>';
         $page .= '</div>';
-        $page .= '<div style="margin-right:220px;text-align:center;">'.
-            '<iframe src="?act=arcade&play='.$id.'&frame=1" width="'.
-            ($gamedata['width']).'" height="'.($gamedata['height']).
+        $page .= '<div style="margin-right:220px;text-align:center;">' .
+            '<iframe src="?act=arcade&play=' . $id . '&frame=1" width="' .
+            ($gamedata['width']) . '" height="' . ($gamedata['height']) .
             'px" frameborder="0" style="margin:10px;"></iframe></div>';
         $page .= '<div style="clear:both"></div>';
 
@@ -264,31 +264,31 @@ EOT
             return;
         }
         $commentform = $JAX->b['comment'] ?
-            '<form method="post" onsubmit="RUN.submitForm(this);'.
-            'this.parentNode.innerHTML=this.comment.value;return false;">'.
+            '<form method="post" onsubmit="RUN.submitForm(this);' .
+            'this.parentNode.innerHTML=this.comment.value;return false;">' .
             $JAX->hiddenFormFields(
                 array(
                     'act' => 'arcade',
                     'scores' => $gameid,
                 )
-            ).'<input type="text" name="comment" />'.
+            ) . '<input type="text" name="comment" />' .
             '<input type="submit" value="Add" /></form>' : '';
         $tenseconds = time() - 10;
         $page = '<table style="width:100%" id="memberlist">';
-        $page .= '<tr><th width="1"></th><th></th><th>Name</th><th>Score</th>'.
-            '<th>Comment</th><th>Date</th>'.
-            (2 == $USER['group_id'] ? '<th>X</th>' : '').'</tr>';
+        $page .= '<tr><th width="1"></th><th></th><th>Name</th><th>Score</th>' .
+            '<th>Comment</th><th>Date</th>' .
+            (2 == $USER['group_id'] ? '<th>X</th>' : '') . '</tr>';
         foreach ($scores as $k => $f) {
-            $page .= '<tr><td>'.($k + 1).'</td><td class="avatar">'.
-                '<img src="'.$JAX->pick(
+            $page .= '<tr><td>' . ($k + 1) . '</td><td class="avatar">' .
+                '<img src="' . $JAX->pick(
                     $f['avatar'],
                     $PAGE->meta('default-avatar')
-                ).'" /></td><td>'.$PAGE->meta(
+                ) . '" /></td><td>' . $PAGE->meta(
                     'user-link',
                     $f['uid'],
                     $f['group_id'],
                     $f['display_name']
-                ).'</td><td>'.$f['score'].'</td><td>';
+                ) . '</td><td>' . $f['score'] . '</td><td>';
             if ($commentform
                 && $f['uid'] == $USER['id']
                 && $f['date'] > $tenseconds
@@ -298,13 +298,13 @@ EOT
             } else {
                 $page .= $JAX->theworks($f['comment'], array('minimalbb' => 1));
             }
-            $page .= '</td><td>'.$JAX->date($f['date']).'</td>'.
+            $page .= '</td><td>' . $JAX->date($f['date']) . '</td>' .
                 (2 == $USER['group_id'] ?
-                '<td><a href="?act=arcade&amp;scores='.$gameid.
-                '&del='.$f['id'].'">[X]</a></td>' : '').'</tr>';
+                '<td><a href="?act=arcade&amp;scores=' . $gameid .
+                '&del=' . $f['id'] . '">[X]</a></td>' : '') . '</tr>';
         }
         $page .= '</table>';
-        $page = $PAGE->meta('box', '', 'Scores - '.$gamedata['title'], $page);
+        $page = $PAGE->meta('box', '', 'Scores - ' . $gamedata['title'], $page);
 
         $PAGE->append('PAGE', $page);
         $PAGE->JS('update', 'page', $page);
@@ -362,22 +362,22 @@ EOT
     {
         global $PAGE;
         $page = '<table style="width:100%">';
-        $page .= '<tr><th colspan="2" style="text-align:center">'.
+        $page .= '<tr><th colspan="2" style="text-align:center">' .
             'Top Scores</th></tr>';
         foreach ($scores as $f) {
-            $page .= '<tr><td style="text-align:right;width:50%;">'.
+            $page .= '<tr><td style="text-align:right;width:50%;">' .
                 $PAGE->meta(
                     'user-link',
                     $f['uid'],
                     $f['group_id'],
                     $f['display_name']
-                ).'</td><td style="text-align:left">'.$f['score'].'</td></tr>';
+                ) . '</td><td style="text-align:left">' . $f['score'] . '</td></tr>';
         }
         if (!$scores[0]) {
             $page .= '<tr><td colspan="2">N/A</td></tr>';
         }
 
-        return $page.'</table>';
+        return $page . '</table>';
     }
 
     public function submitScore()
@@ -465,8 +465,8 @@ EOT
                 }
             }
         }
-        echo '<script type="text/javascript">parent.RUN.stream.location'.
-            '("?act=arcade&scores='.($gameid).'&comment=1")</script>';
+        echo '<script type="text/javascript">parent.RUN.stream.location' .
+            '("?act=arcade&scores=' . ($gameid) . '&comment=1")</script>';
         die();
     }
 }

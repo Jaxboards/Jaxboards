@@ -114,11 +114,11 @@ EOT
 </div>
 EOT
     ,
-    'idx-icon-unread' => '<img src="'.BOARDURL.
+    'idx-icon-unread' => '<img src="' . BOARDURL .
         'Service/Themes/Default/icons/unread.png" alt="unread" />',
-    'idx-icon-read' => '<img src="'.BOARDURL.
+    'idx-icon-read' => '<img src="' . BOARDURL .
         'Service/Themes/Default/icons/read.png" alt="read" />',
-    'idx-icon-redirect' => '<img src="'.BOARDURL.
+    'idx-icon-redirect' => '<img src="' . BOARDURL .
         'Service/Themes/Default/icons/redirect.png" alt="redirect" />',
     'idx-tools' => <<<'EOT'
 <div class="idxtools">

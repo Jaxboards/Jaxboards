@@ -17,9 +17,9 @@ class themes
             '?act=themes' => 'Manage Skins',
         );
         foreach ($nav as $k => $v) {
-            $sidebar .= '<li><a href="'.$k.'">'.$v.'</a></li>';
+            $sidebar .= '<li><a href="' . $k . '">' . $v . '</a></li>';
         }
-        $PAGE->sidebar('<ul>'.$sidebar.'</ul>');
+        $PAGE->sidebar('<ul>' . $sidebar . '</ul>');
         if (@$JAX->g['editcss']) {
             $this->editcss($JAX->g['editcss']);
         } elseif (@$JAX->g['editwrapper']) {
@@ -41,7 +41,7 @@ class themes
     public function getwrappers()
     {
         $wrappers = array();
-        $o = opendir(BOARDPATH.'Wrappers');
+        $o = opendir(BOARDPATH . 'Wrappers');
         while ($f = readdir($o)) {
             if ('.' != $f && '..' != $f) {
                 $wrappers[] = mb_substr($f, 0, -4);
@@ -58,12 +58,12 @@ class themes
         $errorskins = '';
         $errorwrapper = '';
 
-        $wrapperPath = BOARDPATH.'Wrappers/'.@$JAX->g['deletewrapper'].'.txt';
+        $wrapperPath = BOARDPATH . 'Wrappers/' . @$JAX->g['deletewrapper'] . '.txt';
         if (@$JAX->g['deletewrapper']) {
             if (!preg_match('@[^\\w ]@', $JAX->g['deletewrapper'])
                 && file_exists($wrapperPath)
             ) {
-                unlink(BOARDPATH.'Wrappers/'.$JAX->g['deletewrapper'].'.txt');
+                unlink(BOARDPATH . 'Wrappers/' . $JAX->g['deletewrapper'] . '.txt');
                 $PAGE->location('?act=themes');
             } else {
                 $errorwrapper
@@ -73,10 +73,10 @@ class themes
 
         if (@$JAX->p['newwrapper']) {
             $newWrapperPath
-                = BOARDPATH.'Wrappers/'.$JAX->p['newwrapper'].'.txt';
+                = BOARDPATH . 'Wrappers/' . $JAX->p['newwrapper'] . '.txt';
             if (preg_match('@[^\\w ]@', $JAX->p['newwrapper'])) {
                 $errorwrapper
-                    = 'Wrapper name must consist of letters, numbers, '.
+                    = 'Wrapper name must consist of letters, numbers, ' .
                     'spaces, and underscore.';
             } elseif (mb_strlen($JAX->p['newwrapper']) > 50) {
                 $errorwrapper = 'Wrapper name must be less than 50 characters.';
@@ -84,12 +84,12 @@ class themes
                 $errorwrapper = 'That wrapper already exists.';
             } else {
                 $o = fopen(
-                    BOARDPATH.'Wrappers/'.$JAX->p['newwrapper'].'.txt',
+                    BOARDPATH . 'Wrappers/' . $JAX->p['newwrapper'] . '.txt',
                     'w'
                 );
                 fwrite(
                     $o,
-                    file_get_contents($CFG['dthemepath'].'wrappers.txt')
+                    file_get_contents($CFG['dthemepath'] . 'wrappers.txt')
                 );
                 fclose($o);
             }
@@ -130,15 +130,15 @@ class themes
                     if (preg_match('@[^\\w ]@', $k)) {
                         continue;
                     }
-                    if (!is_dir(BOARDPATH.'Themes/'.$k)) {
+                    if (!is_dir(BOARDPATH . 'Themes/' . $k)) {
                         continue;
                     }
                     if (preg_match('@[^\\w ]@', $v) || mb_strlen($v) > 50) {
                         $errorskins
-                            = 'Skin name must consist of letters, numbers, '.
-                            'spaces, and underscore, and be under 50 '.
+                            = 'Skin name must consist of letters, numbers, ' .
+                            'spaces, and underscore, and be under 50 ' .
                             'characters long.';
-                    } elseif (is_dir(BOARDPATH.'Themes/'.$v)) {
+                    } elseif (is_dir(BOARDPATH . 'Themes/' . $v)) {
                         $errorskins = 'That skin name is already being used.';
                     } else {
                         $DB->safeupdate(
@@ -149,7 +149,7 @@ class themes
                             'WHERE `title`=? AND `custom`=1',
                             $DB->basicvalue($k)
                         );
-                        rename(BOARDPATH.'Themes/'.$k, BOARDPATH.'Themes/'.$v);
+                        rename(BOARDPATH . 'Themes/' . $k, BOARDPATH . 'Themes/' . $v);
                     }
                 }
             }
@@ -164,15 +164,15 @@ class themes
                     if (preg_match('@[^\\w ]@', $k)) {
                         continue;
                     }
-                    if (!is_file(BOARDPATH.'Wrappers/'.$k.'.txt')) {
+                    if (!is_file(BOARDPATH . 'Wrappers/' . $k . '.txt')) {
                         continue;
                     }
                     if (preg_match('@[^\\w ]@', $v) || mb_strlen($v) > 50) {
                         $errorwrapper
-                            = 'Wrapper name must consist of letters, '.
-                            'numbers, spaces, and underscore, and be under '.
+                            = 'Wrapper name must consist of letters, ' .
+                            'numbers, spaces, and underscore, and be under ' .
                             '50 characters long.';
-                    } elseif (is_file(BOARDPATH.'Wrappers/'.$v.'.txt')) {
+                    } elseif (is_file(BOARDPATH . 'Wrappers/' . $v . '.txt')) {
                         $errorwrapper = 'That wrapper name is already being used.';
                     } else {
                         $DB->safeupdate(
@@ -184,8 +184,8 @@ class themes
                             $DB->basicvalue($k)
                         );
                         rename(
-                            BOARDPATH.'Wrappers/'.$k.'.txt',
-                            BOARDPATH.'Wrappers/'.$v.'.txt'
+                            BOARDPATH . 'Wrappers/' . $k . '.txt',
+                            BOARDPATH . 'Wrappers/' . $v . '.txt'
                         );
                     }
                     $wrappers = $this->getwrappers();
@@ -216,52 +216,52 @@ class themes
         $usedwrappers = array();
         $skins = '';
         while ($f = $DB->arow($result)) {
-            $skins .= '<tr><td><span>'.$f['title'].'</span>'.
+            $skins .= '<tr><td><span>' . $f['title'] . '</span>' .
                 ($f['custom'] ?
-                " <a href='#' onclick='return edit(this,\"skin\")' ".
-                "class='icons edit'></a>" : '').
-                "</td><td><a href='?act=themes&editcss=".$f['id']."'>".
-                ($f['custom'] ? 'Edit' : 'View').' CSS</a></td><td>';
-            $skins .= "<select name='wrapper[".$f['id']."]'>".
+                " <a href='#' onclick='return edit(this,\"skin\")' " .
+                "class='icons edit'></a>" : '') .
+                "</td><td><a href='?act=themes&editcss=" . $f['id'] . "'>" .
+                ($f['custom'] ? 'Edit' : 'View') . ' CSS</a></td><td>';
+            $skins .= "<select name='wrapper[" . $f['id'] . "]'>" .
                 ($f['custom'] ? '' : "<option value=''>Skin Default</option>");
             foreach ($wrappers as $v) {
-                $skins .= "<option value='${v}' ".
-                    ($v == $f['wrapper'] ? "selected='selected' " : '').
+                $skins .= "<option value='${v}' " .
+                    ($v == $f['wrapper'] ? "selected='selected' " : '') .
                     ">${v}</option>";
             }
-            $skins .= "</select></td><td><a href='?act=themes&deleteskin=".
-                $f['id']."' onclick='return confirm(\"Are you sure?\")'>".
-                "Delete</a></td><td><input type='checkbox' name='hidden[".
-                $f['id']."]' class='switch yn' ".
-                ($f['hidden'] ? 'checked="checked"' : '').
-                " /></td><td><input type='radio' name='default' value='".
-                $f['id']."' ".($f['default'] ? "checked='checked'" : '').'/>';
+            $skins .= "</select></td><td><a href='?act=themes&deleteskin=" .
+                $f['id'] . "' onclick='return confirm(\"Are you sure?\")'>" .
+                "Delete</a></td><td><input type='checkbox' name='hidden[" .
+                $f['id'] . "]' class='switch yn' " .
+                ($f['hidden'] ? 'checked="checked"' : '') .
+                " /></td><td><input type='radio' name='default' value='" .
+                $f['id'] . "' " . ($f['default'] ? "checked='checked'" : '') . '/>';
             $skins .= '</td></tr>';
             $usedwrappers[] = $f['wrapper'];
         }
-        $skins = ($errorskins ? "<div class='error'>".$errorskins.'</div>' :
-            '')."<form method='post'><input type='hidden' name='submit' ".
-            "value='1' /><table class='skins'><tr><th>Name</th><th></th>".
-            '<th>Wrapper</th><th></th><th>Hidden</th><th>Default</th></tr>'.
-            "${skins}</table><input type='submit' value='Save Changes'>".
+        $skins = ($errorskins ? "<div class='error'>" . $errorskins . '</div>' :
+            '') . "<form method='post'><input type='hidden' name='submit' " .
+            "value='1' /><table class='skins'><tr><th>Name</th><th></th>" .
+            '<th>Wrapper</th><th></th><th>Hidden</th><th>Default</th></tr>' .
+            "${skins}</table><input type='submit' value='Save Changes'>" .
             '</form>';
         $PAGE->addContentBox('Themes', $skins);
 
         $wrap = '';
         foreach ($wrappers as $v) {
-            $wrap .= "<tr><td><span>${v}</span> <a href='#' ".
-                "onclick='return edit(this,\"wrapper\")' ".
-                "class='icons edit'></a></td><td><a ".
-                "href='?act=themes&editwrapper=".$v.
-                "'>Edit Wrapper</a></td><td>".
+            $wrap .= "<tr><td><span>${v}</span> <a href='#' " .
+                "onclick='return edit(this,\"wrapper\")' " .
+                "class='icons edit'></a></td><td><a " .
+                "href='?act=themes&editwrapper=" . $v .
+                "'>Edit Wrapper</a></td><td>" .
                 (in_array($v, $usedwrappers) ? 'In use' :
-                "<a href='?act=themes&deletewrapper=${v}' ".
-                "onclick='return confirm(\"Are you sure?\")'>Delete</a>").
+                "<a href='?act=themes&deletewrapper=${v}' " .
+                "onclick='return confirm(\"Are you sure?\")'>Delete</a>") .
                 '</td></tr>';
         }
-        $wrap = "<table class='wrappers'><tr><th>Name</th><th></th>".
-            "<th>Delete</th></tr>${wrap}</table><br /><form method='post'>".
-            "<input type='text' name='newwrapper' />".
+        $wrap = "<table class='wrappers'><tr><th>Name</th><th></th>" .
+            "<th>Delete</th></tr>${wrap}</table><br /><form method='post'>" .
+            "<input type='text' name='newwrapper' />" .
             "<input type='submit' value='Create Wrapper' /></form>";
         $wrap .= <<<'EOT'
 <script type="text/javascript">
@@ -279,7 +279,7 @@ class themes
 EOT;
         $PAGE->addContentBox(
             'Wrappers',
-            ($errorwrapper ? $PAGE->error($errorwrapper) : '').$wrap
+            ($errorwrapper ? $PAGE->error($errorwrapper) : '') . $wrap
         );
     }
 
@@ -298,25 +298,25 @@ EOT;
             $JAX->p['newskindata'] = false;
         }
         if ($skin && $skin['custom'] && $JAX->p['newskindata']) {
-            $o = fopen(BOARDPATH.'Themes/'.$skin['title'].'/css.css', 'w');
+            $o = fopen(BOARDPATH . 'Themes/' . $skin['title'] . '/css.css', 'w');
             fwrite($o, $JAX->p['newskindata']);
             fclose($o);
         }
 
         $PAGE->addContentBox(
-            ($skin['custom'] ? 'Editing' : 'Viewing').' Skin: '.$skin['title'],
+            ($skin['custom'] ? 'Editing' : 'Viewing') . ' Skin: ' . $skin['title'],
             "
   <form method='post' onsubmit='return submitForm(this)'>
-  <textarea name='newskindata' class='editor'>".
+  <textarea name='newskindata' class='editor'>" .
             $JAX->blockhtml(
                 file_get_contents(
-                    (!$skin['custom'] ? STHEMEPATH : BOARDPATH.'Themes/'
-                    ).$skin['title'].'/css.css'
+                    (!$skin['custom'] ? STHEMEPATH : BOARDPATH . 'Themes/'
+                    ) . $skin['title'] . '/css.css'
                 )
-            )."</textarea>
-  <div class='center'>".
+            ) . "</textarea>
+  <div class='center'>" .
             ($skin['custom'] ? "<input type='submit' value='Save Changes' />"
-            : '').
+            : '') .
             '</div>
   </form>'
         );
@@ -326,7 +326,7 @@ EOT;
     {
         global $PAGE,$JAX;
         $saved = null;
-        $wrapperf = BOARDPATH.'Wrappers/'.$wrapper.'.txt';
+        $wrapperf = BOARDPATH . 'Wrappers/' . $wrapper . '.txt';
         if (preg_match('@[^ \\w]@', $wrapper) && !is_file($wrapperf)) {
             $PAGE->addContentBox(
                 'Error',
@@ -347,10 +347,10 @@ EOT;
             }
             $PAGE->addContentBox(
                 "Editing Wrapper: ${wrapper}",
-                "${saved}<form method='post'><textarea name='newwrapper' ".
-                "class='editor'>".
-                $JAX->blockhtml(file_get_contents($wrapperf)).
-                "</textarea><input type='submit' ".
+                "${saved}<form method='post'><textarea name='newwrapper' " .
+                "class='editor'>" .
+                $JAX->blockhtml(file_get_contents($wrapperf)) .
+                "</textarea><input type='submit' " .
                 "value='Save Changes' /></form>"
             );
         }
@@ -368,7 +368,7 @@ EOT;
                 $e = 'Skinname must only consist of letters, numbers, and spaces.';
             } elseif (mb_strlen($JAX->p['skinname']) > 50) {
                 $e = 'Skin name must be less than 50 characters.';
-            } elseif (is_dir(BOARDPATH.'Themes/'.$JAX->p['skinname'])) {
+            } elseif (is_dir(BOARDPATH . 'Themes/' . $JAX->p['skinname'])) {
                 $e = 'A skin with that name already exists.';
             } elseif (!in_array($JAX->p['wrapper'], $this->getwrappers())) {
                 $e = 'Invalid wrapper.';
@@ -400,13 +400,13 @@ EOT;
                         $DB->insert_id(1)
                     );
                 }
-                @mkdir(BOARDPATH.'Themes');
-                mkdir(BOARDPATH.'Themes/'.$JAX->p['skinname']);
-                $o = fopen(BOARDPATH.'Themes/'.$JAX->p['skinname'].'/css.css', 'w');
+                @mkdir(BOARDPATH . 'Themes');
+                mkdir(BOARDPATH . 'Themes/' . $JAX->p['skinname']);
+                $o = fopen(BOARDPATH . 'Themes/' . $JAX->p['skinname'] . '/css.css', 'w');
                 fwrite(
                     $o,
                     file_get_contents(
-                        JAXBOARDS_ROOT.'/'.$CFG['dthemepath'].'css.css'
+                        JAXBOARDS_ROOT . '/' . $CFG['dthemepath'] . 'css.css'
                     )
                 );
                 fclose($o);
@@ -417,16 +417,16 @@ EOT;
             }
         }
         $page .= "<form method='post'>";
-        $page .= '<label>Skin Name:</label> '.
+        $page .= '<label>Skin Name:</label> ' .
             '<input type="text" name="skinname" /><br />';
         $page .= '<label>Wrapper:</label> <select name="wrapper">';
         foreach ($this->getwrappers() as $v) {
-            $page .= '<option value="'.$v.'">'.$v.'</option>';
+            $page .= '<option value="' . $v . '">' . $v . '</option>';
         }
         $page .= '</select><br />';
-        $page .= '<label>Hidden:</label> '.
+        $page .= '<label>Hidden:</label> ' .
             '<input type="checkbox" class="switch yn" name="hidden" /><br />';
-        $page .= '<label>Default:</label> '.
+        $page .= '<label>Default:</label> ' .
             '<input type="checkbox" class="switch yn" name="default" /><br />';
         $page .= '<input type="submit" name="submit" value="Create Skin" />';
         $page .= '</form>';
@@ -444,9 +444,9 @@ EOT;
         );
         $skin = $DB->arow($result);
         $DB->disposeresult($result);
-        $skindir = BOARDPATH.'Themes/'.$skin['title'];
+        $skindir = BOARDPATH . 'Themes/' . $skin['title'];
         if (is_dir($skindir)) {
-            foreach (glob($skindir.'/*') as $v) {
+            foreach (glob($skindir . '/*') as $v) {
                 unlink($v);
             }
             $JAX->rmdir($skindir);

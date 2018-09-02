@@ -18,8 +18,8 @@ class forums
         );
         $sidebar = '';
         foreach ($links as $k => $v) {
-            $sidebar .= '<li><a href="?act=forums&do='.$k.'">'.
-                $v.'</a></li>'.PHP_EOL;
+            $sidebar .= '<li><a href="?act=forums&do=' . $k . '">' .
+                $v . '</a></li>' . PHP_EOL;
         }
         $PAGE->sidebar(
             <<<EOT
@@ -47,18 +47,18 @@ EOT
         }
 
         switch (@$JAX->g['do']) {
-        case 'order':
-            $this->orderforums();
-            break;
-        case 'create':
-            $this->createforum();
-            break;
-        case 'createc':
-            $this->createcategory();
-            break;
-        default:
-            $this->orderforums();
-            break;
+            case 'order':
+                $this->orderforums();
+                break;
+            case 'create':
+                $this->createforum();
+                break;
+            case 'createc':
+                $this->createcategory();
+                break;
+            default:
+                $this->orderforums();
+                break;
         }
     }
 
@@ -90,7 +90,7 @@ EOT
             'ORDER BY `order`,`id` ASC'
         );
         while ($f = $DB->arow($result)) {
-            $forums['c_'.$f['id']] = array('title' => $f['title']);
+            $forums['c_' . $f['id']] = array('title' => $f['title']);
             $cats[] = $f['id'];
         }
         $DB->disposeresult($result);
@@ -113,7 +113,7 @@ EOT
                 'mods' => $f['mods'],
             );
             $treeparts = explode(' ', $f['path']);
-            array_unshift($treeparts, 'c_'.$f['cat_id']);
+            array_unshift($treeparts, 'c_' . $f['cat_id']);
             $intree = &$tree;
             foreach ($treeparts as $v) {
                 if (!trim($v)) {
@@ -131,16 +131,16 @@ EOT
                 warnings without the @? */
         }
         foreach ($cats as $v) {
-            $sortedtree['c_'.$v] = @$tree['c_'.$v];
+            $sortedtree['c_' . $v] = @$tree['c_' . $v];
         }
-        $page = $page.$this->printtree(
+        $page = $page . $this->printtree(
             $sortedtree,
             $forums,
             'tree',
             $highlight
-        )."<form method='post'><input type='hidden' id='ordered' ".
+        ) . "<form method='post'><input type='hidden' id='ordered' " .
         "name='tree' /><input type='submit' value='Save' /></form>";
-        $page .= "<script type='text/javascript'>".
+        $page .= "<script type='text/javascript'>" .
             "JAX.sortableTree($$('.tree'),'forum_','ordered')</script>";
         $PAGE->addContentBox('Forums', $page);
     }
@@ -156,12 +156,12 @@ EOT
         foreach ($tree as $k => $v) {
             $k = mb_substr($k, 1);
             ++$x;
-            $p2 = $p.$k.' ';
+            $p2 = $p . $k . ' ';
             sscanf($p2, 'c_%d', $cat);
             //$f=$p;
             $f = trim(mb_strstr($p, ' '));
             if (is_array($v)) {
-                self::mysqltree($v, $p2.' ', $x);
+                self::mysqltree($v, $p2 . ' ', $x);
             }
             if ('c' == $k[0]) {
                 $DB->safeupdate(
@@ -204,27 +204,27 @@ EOT
             if ($highlight && $k == $highlight) {
                 $classes[] = 'highlight';
             }
-            $r .= "<li id='forum_${k}' ".
-                (!empty($classes) ? 'class="'.implode(' ', $classes).'"' : '').
-                '>'.
+            $r .= "<li id='forum_${k}' " .
+                (!empty($classes) ? 'class="' . implode(' ', $classes) . '"' : '') .
+                '>' .
                 /* BUGBUGBUG: Why does this sometimes generate warnings
                  * without the @? */
                 ((@$data[$k]['trashcan']) ?
-                '<span class="icons trashcan"></span>' : '').
-                $data[$k]['title'].
+                '<span class="icons trashcan"></span>' : '') .
+                $data[$k]['title'] .
                 ((@$data[$k]['mods']) ?
-                ' - <i>'.($nummods = count(explode(',', $data[$k]['mods']))).
+                ' - <i>' . ($nummods = count(explode(',', $data[$k]['mods']))) .
                 /* BUGBUGBUG: Why does this sometimes generate warnings
                  * without the @? */
-                ' moderator'.(1 == $nummods ? '' : 's').'</i>' : '').
-                " <a href='?act=forums&delete=${k}' class='icons delete' ".
-                "title='Delete'></a> <a href='?act=forums&edit=${k}' ".
-                "class='icons edit' title='Edit'></a>".
-                (is_array($v) ? self::printtree($v, $data, '', $highlight) : '').
+                ' moderator' . (1 == $nummods ? '' : 's') . '</i>' : '') .
+                " <a href='?act=forums&delete=${k}' class='icons delete' " .
+                "title='Delete'></a> <a href='?act=forums&edit=${k}' " .
+                "class='icons edit' title='Edit'></a>" .
+                (is_array($v) ? self::printtree($v, $data, '', $highlight) : '') .
                 '</li>';
         }
 
-        return '<ul '.($class ? "class='${class}'" : '').'>'.$r.'</ul>';
+        return '<ul ' . ($class ? "class='${class}'" : '') . '>' . $r . '</ul>';
     }
 
     //also used to edit forum
@@ -274,7 +274,7 @@ EOT
                     $DB->basicvalue($fid)
                 );
                 $this->updateperforummodflag();
-                $PAGE->location('?act=forums&edit='.$fid);
+                $PAGE->location('?act=forums&edit=' . $fid);
             }
         }
 
@@ -362,7 +362,7 @@ EOT
                     ) {
                         $write['mods'] = (isset($fdata['mods'])
                             && $fdata['mods']) ?
-                            $fdata['mods'].','.$JAX->p['modid'] :
+                            $fdata['mods'] . ',' . $JAX->p['modid'] :
                             $JAX->p['modid'];
                     }
                 } else {
@@ -414,12 +414,12 @@ EOT
         //do perms table
         function checkbox($id, $name, $checked)
         {
-            return '<input type="checkbox" class="switch yn" name="groups['.
-                $id.']['.$name.']" '.
-                ($checked ? 'checked="checked" ' : '').
+            return '<input type="checkbox" class="switch yn" name="groups[' .
+                $id . '][' . $name . ']" ' .
+                ($checked ? 'checked="checked" ' : '') .
                 ('global' == $name ?
                 ' onchange="globaltoggle(this.parentNode.parentNode,this.checked)" '
-                : '').'/>';
+                : '') . '/>';
         }
 
         $perms = array();
@@ -448,49 +448,49 @@ EOT
             if (!$global) {
                 $p = $JAX->parseperms(@$perms[$f['id']]);
             }
-            $groupperms .= '<tr><td>'.$f['title'].'</td><td>'.
-                checkbox($f['id'], 'global', $global).'</td><td>'.
-                checkbox($f['id'], 'view', $global ? 1 : $p['view']).
-                '</td><td>'.checkbox(
+            $groupperms .= '<tr><td>' . $f['title'] . '</td><td>' .
+                checkbox($f['id'], 'global', $global) . '</td><td>' .
+                checkbox($f['id'], 'view', $global ? 1 : $p['view']) .
+                '</td><td>' . checkbox(
                     $f['id'],
                     'read',
                     $global ? 1 : $p['read']
-                ).
-                '</td><td>'.checkbox(
+                ) .
+                '</td><td>' . checkbox(
                     $f['id'],
                     'start',
                     $global ? $f['can_post_topics'] :
                     $p['start']
-                ).'</td><td>'.checkbox(
+                ) . '</td><td>' . checkbox(
                     $f['id'],
                     'reply',
                     $global ? $f['can_post'] :
                     $p['reply']
-                ).'</td><td>'.
+                ) . '</td><td>' .
                 checkbox(
                     $f['id'],
                     'upload',
                     $global ? $f['can_attach'] : $p['upload']
-                ).
-                '</td><td>'.
-                checkbox($f['id'], 'poll', $global ? $f['can_poll'] : $p['poll']).
+                ) .
+                '</td><td>' .
+                checkbox($f['id'], 'poll', $global ? $f['can_poll'] : $p['poll']) .
                 '</td></tr>';
         }
-        $page .= ($e ? $PAGE->error($e) : '').
+        $page .= ($e ? $PAGE->error($e) : '') .
             "<form method='post'><table class='settings'>
-            <tr><td>Forum Title:</td><td><input type='text' name='title' value='".
-            $JAX->blockhtml(@$fdata['title'])."' /></td></tr>
-            <tr><td>Description:</td><td><textarea name='description'>".
-            $JAX->blockhtml(@$fdata['subtitle'])."</textarea></td></tr>
-            <tr><td>Redirect URL:</td><td><input type='text' ".
-            "name='redirect' value='".
-            $JAX->blockhtml(@$fdata['redirect'])."' /></td></tr>
+            <tr><td>Forum Title:</td><td><input type='text' name='title' value='" .
+            $JAX->blockhtml(@$fdata['title']) . "' /></td></tr>
+            <tr><td>Description:</td><td><textarea name='description'>" .
+            $JAX->blockhtml(@$fdata['subtitle']) . "</textarea></td></tr>
+            <tr><td>Redirect URL:</td><td><input type='text' " .
+            "name='redirect' value='" .
+            $JAX->blockhtml(@$fdata['redirect']) . "' /></td></tr>
 <tr><td>Show Subforums:</td><td><select name='showsub'>";
         $optionArray = array('Not at all', 'One level below', 'All subforums');
         foreach ($optionArray as $k => $v) {
-            $page .= '<option value="'.$k.'"'.
-                (($k == @$fdata['show_sub']) ? ' selected="selected"' : '').
-                '>'.$v.'</option>';
+            $page .= '<option value="' . $k . '"' .
+                (($k == @$fdata['show_sub']) ? ' selected="selected"' : '') .
+                '>' . $v . '</option>';
         }
         $page .= "</select></td></tr>
 <tr><td>Order Topics By:</td><td><select name='orderby'>";
@@ -503,18 +503,18 @@ EOT
             'Topic Title, Ascending',
         );
         foreach ($optionsArray as $k => $v) {
-            $page .= "<option value='".$k."'".
-                ((@$fdata['orderby'] == $k) ? " selected='selected'" : '').
-                '>'.$v.'</option>';
+            $page .= "<option value='" . $k . "'" .
+                ((@$fdata['orderby'] == $k) ? " selected='selected'" : '') .
+                '>' . $v . '</option>';
         }
         $page .= "</select></td></tr>
-<tr><td>Posts count towards post count?</td><td><input type='checkbox' ".
-        "class='switch yn' name='nocount'".
-        ((@$fdata['nocount']) ? '' : ' checked="checked"').
+<tr><td>Posts count towards post count?</td><td><input type='checkbox' " .
+        "class='switch yn' name='nocount'" .
+        ((@$fdata['nocount']) ? '' : ' checked="checked"') .
         " /></td></tr>
-<tr><td>Trashcan?</td><td><input type='checkbox' class='switch yn' ".
-        "name='trashcan'".
-        ((@$fdata['trashcan']) ? ' checked="checked"' : '').
+<tr><td>Trashcan?</td><td><input type='checkbox' class='switch yn' " .
+        "name='trashcan'" .
+        ((@$fdata['trashcan']) ? ' checked="checked"' : '') .
         ' /></td></tr>
 </table>';
 
@@ -529,36 +529,36 @@ EOT
             );
             $mods = '';
             while ($f = $DB->arow($result)) {
-                $mods .= $f['display_name'].
-                    ' <a href="?act=forums&edit='.$fid.'&rmod='.$f['id'].
+                $mods .= $f['display_name'] .
+                    ' <a href="?act=forums&edit=' . $fid . '&rmod=' . $f['id'] .
                     '">X</a>, ';
             }
             $moderators .= mb_substr($mods, 0, -2);
         } else {
             $moderators .= 'No forum-specific moderators added!';
         }
-        $moderators .= '<br /><input type="text" name="name" '.
-            'onkeyup="$(\'validname\').className=\'bad\';'.
-            'JAX.autoComplete(\'act=searchmembers&term=\'+'.
+        $moderators .= '<br /><input type="text" name="name" ' .
+            'onkeyup="$(\'validname\').className=\'bad\';' .
+            'JAX.autoComplete(\'act=searchmembers&term=\'+' .
             'this.value,this,$(\'modid\'),event);" />
-            <input type="hidden" id="modid" name="modid" '.
-            'onchange="$(\'validname\').className=\'good\'"/>'.
-            '<span id="validname"></span>'.
-            '<input type="submit" name="submit" value="Add Moderator" />'.
+            <input type="hidden" id="modid" name="modid" ' .
+            'onchange="$(\'validname\').className=\'good\'"/>' .
+            '<span id="validname"></span>' .
+            '<input type="submit" name="submit" value="Add Moderator" />' .
             '</td></tr>
-            <tr><td>Show "Forum Led By":</td><td>'.
-            '<input type="checkbox" class="switch yn" name="show_ledby" '.
-            ((@$fdata['show_ledby']) ? ' checked="checked"' : '').
+            <tr><td>Show "Forum Led By":</td><td>' .
+            '<input type="checkbox" class="switch yn" name="show_ledby" ' .
+            ((@$fdata['show_ledby']) ? ' checked="checked"' : '') .
             '/></td></tr>
             </table>';
 
         $forumperms .= "<table id='perms'>
-<tr> <th>Group</th> <th>Use Global?</th> <th>View</th> <th>Read</th> ".
-        '<th>Start</th> <th>Reply</th> <th>Upload</th> <th>Polls</th></tr>'.
-        $groupperms.
+<tr> <th>Group</th> <th>Use Global?</th> <th>View</th> <th>Read</th> " .
+        '<th>Start</th> <th>Reply</th> <th>Upload</th> <th>Polls</th></tr>' .
+        $groupperms .
         "
-</table><br /><div class='center'><input type='submit' value='".
-        ($fid ? 'Save' : 'Next').
+</table><br /><div class='center'><input type='submit' value='" .
+        ($fid ? 'Save' : 'Next') .
         "' name='submit' /></div>
 </form>
 <script type='text/javascript'>
@@ -572,8 +572,8 @@ for(var x=1;x<perms.rows.length;x++){
 </script>";
 
         $PAGE->addContentBox(
-            ($fid ? 'Edit' : 'Create').' Forum'.
-            ($fid ? ' - '.$JAX->blockhtml($fdata['title']) : ''),
+            ($fid ? 'Edit' : 'Create') . ' Forum' .
+            ($fid ? ' - ' . $JAX->blockhtml($fdata['title']) : ''),
             $page
         );
         $PAGE->addContentBox('Moderators', $moderators);
@@ -627,17 +627,17 @@ EOT
             }
             $page = '';
             if ($topics > 0) {
-                $page .= ($JAX->p['moveto'] ? 'Moved' : 'Deleted').
-                    " ${topics} topics".((isset($posts) && $posts) ?
+                $page .= ($JAX->p['moveto'] ? 'Moved' : 'Deleted') .
+                    " ${topics} topics" . ((isset($posts) && $posts) ?
                     " and ${posts} posts" : '');
             }
 
             return $PAGE->addContentBox(
                 'Forum Deletion',
                 $PAGE->success(
-                    $page.'<br /><br />'.
-                    "<a href='?act=stats'>Statistics recount</a>".
-                    ' suggested.<br /><br />'.
+                    $page . '<br /><br />' .
+                    "<a href='?act=stats'>Statistics recount</a>" .
+                    ' suggested.<br /><br />' .
                     "<a href='?act=forums&do=order'>Back</a>"
                 )
             );
@@ -659,7 +659,7 @@ EOT
         if (!$fdata) {
             $page = "Forum doesn't exist.";
         } else {
-            $page = "<form method='post'>".
+            $page = "<form method='post'>" .
                 "<input type='submit' name='submit' value='Delete' /></form>";
         }
 
@@ -674,14 +674,14 @@ EOT
         );
         $forums = '<option value="">Nowhere! (delete)</option>';
         while ($f = $DB->arow($result)) {
-            $forums .= '<option value="'.$f['id'].'">'.$f['title'].'</option>';
+            $forums .= '<option value="' . $f['id'] . '">' . $f['title'] . '</option>';
         }
-        $page = "<form method='post'>Move all topics to: ".
-            "<select name='moveto'>".$forums.
-            "</select><br /><br /><input name='submit' ".
-            "type='submit' value='Confirm Deletion' />".
+        $page = "<form method='post'>Move all topics to: " .
+            "<select name='moveto'>" . $forums .
+            "</select><br /><br /><input name='submit' " .
+            "type='submit' value='Confirm Deletion' />" .
             "<input name='submit' type='submit' value='Cancel' /></form>";
-        $PAGE->addContentBox('Deleting Forum: '.$fdata['title'], $page);
+        $PAGE->addContentBox('Deleting Forum: ' . $fdata['title'], $page);
     }
 
     public function createcategory($cid = false)
@@ -720,18 +720,18 @@ EOT
                 $cdata = $stuff;
 
                 $page .= $PAGE->success(
-                    'Category '.($cdata ? 'edit' : 'creat').'ed.'
+                    'Category ' . ($cdata ? 'edit' : 'creat') . 'ed.'
                 );
             }
         }
         $page .= '<form method="post">
-  <label>Category Title:</label><input type="text" name="cat_name" value="'.
-        $JAX->blockhtml(@$cdata['title']).'" /><br />
-  <input type="submit" name="submit" value="'.($cdata ? 'Edit' : 'Create').
+  <label>Category Title:</label><input type="text" name="cat_name" value="' .
+        $JAX->blockhtml(@$cdata['title']) . '" /><br />
+  <input type="submit" name="submit" value="' . ($cdata ? 'Edit' : 'Create') .
         '" />
   </form>';
 
-        $PAGE->addContentBox(($cdata ? 'Edit' : 'Create').' Category', $page);
+        $PAGE->addContentBox(($cdata ? 'Edit' : 'Create') . ' Category', $page);
     }
 
     public function deletecategory($id)
@@ -782,13 +782,13 @@ EOT
         if ($e) {
             $page .= $PAGE->error($e);
         } else {
-            $page .= '<form method="post"><label>Move all forums to:</label>'.
+            $page .= '<form method="post"><label>Move all forums to:</label>' .
                 '<select name="moveto">';
             foreach ($categories as $k => $v) {
-                $page .= '<option value="'.$k.'">'.$v.'</option>';
+                $page .= '<option value="' . $k . '">' . $v . '</option>';
             }
-            $page .= '</select><br /><input type="submit" value="Delete \''.
-                $JAX->blockhtml($cattitle).'\'" name="submit" /></select></form>';
+            $page .= '</select><br /><input type="submit" value="Delete \'' .
+                $JAX->blockhtml($cattitle) . '\'" name="submit" /></select></form>';
         }
         $PAGE->addContentBox('Category Deletion', $page);
     }

@@ -116,9 +116,10 @@ WHERE `uid`=? AND `last_update`> ?
 EOT
             ,
             array('session'),
-            $DB->basicvalue(json_encode($cmd).PHP_EOL),
+            $DB->basicvalue(json_encode($cmd) . PHP_EOL),
             $uid,
-            (time() - $CFG['updateinterval'] * 5));
+            (time() - $CFG['updateinterval'] * 5)
+        );
 
         return 0 != $DB->affected_rows(1);
     }
@@ -154,21 +155,21 @@ EOT
             $menu = '';
             while ($f = $DB->arow($result)) {
                 if ($online[$f['id']] && $f['id'] != $id) {
-                    $menu .= $f['name'].'<br />';
+                    $menu .= $f['name'] . '<br />';
                 }
             }
             if (!$menu) {
                 if (!$USER['friends']) {
                     $menu
-                        = 'You must add users to your contacts list<br />'.
+                        = 'You must add users to your contacts list<br />' .
                         'to use this feature.';
                 } else {
                     $menu = 'None of your friends<br />are currently online';
                 }
             }
         } else {
-            $menu = "<a href='?act=vu${id}'>View Profile</a><br />".
-                "<a href='?module=privatemessage&im_menu=${id}".
+            $menu = "<a href='?act=vu${id}'>View Profile</a><br />" .
+                "<a href='?module=privatemessage&im_menu=${id}" .
                 "&im_invitemenu=1'>Add User to Chat</a>";
         }
         $PAGE->JS('update', 'immenu', $menu);

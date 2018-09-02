@@ -66,7 +66,7 @@ EOT
                     $r['id'],
                     $r['title'],
                     $JAX->blockhtml($r['subtitle'])
-                ).$PAGE->meta('idx-subforum-splitter');
+                ) . $PAGE->meta('idx-subforum-splitter');
             } else {
                 $data[$r['cat_id']][] = $r;
             }
@@ -93,7 +93,7 @@ EOT
                     $this->buildTable(
                         $data[$r['id']]
                     ),
-                    'cat_'.$r['id']
+                    'cat_' . $r['id']
                 );
             }
         }
@@ -145,7 +145,7 @@ EOT
             }
         }
         foreach (explode(',', $modids) as $v) {
-            $r .= $this->moderatorinfo[$v].$PAGE->meta('idx-ledby-splitter');
+            $r .= $this->moderatorinfo[$v] . $PAGE->meta('idx-ledby-splitter');
         }
 
         return mb_substr($r, 0, -mb_strlen($PAGE->meta('idx-ledby-splitter')));
@@ -175,7 +175,7 @@ EOT
                     $v['id'],
                     $v['title'],
                     nl2br($v['subtitle']),
-                    'Redirects: '.$v['redirects'],
+                    'Redirects: ' . $v['redirects'],
                     $JAX->pick(
                         $PAGE->meta('icon-redirect'),
                         $PAGE->meta('idx-icon-redirect')
@@ -184,7 +184,7 @@ EOT
             } else {
                 $vId = $v['id'];
                 $hrefCode = !$read ?
-                    ' href="?act=vf'.$v['id'].'&amp;markread=1"' :
+                    ' href="?act=vf' . $v['id'] . '&amp;markread=1"' :
                     '';
                 $linkText = $read ?
                     $JAX->pick(
@@ -203,7 +203,9 @@ EOT
                     $PAGE->meta(
                         'idx-subforum-wrapper',
                         mb_substr(
-                            $sf, 0, -1 * mb_strlen(
+                            $sf,
+                            0,
+                            -1 * mb_strlen(
                                 $PAGE->meta('idx-subforum-splitter')
                             )
                         )
@@ -312,8 +314,8 @@ EOT;
             'WHERE `legend`=1 ORDER BY `title`'
         );
         while ($row = $DB->arow($result)) {
-            $legend .= '<a href="?" class="mgroup'.$row['id'].'">'.
-                $row['title'].'</a> ';
+            $legend .= '<a href="?" class="mgroup' . $row['id'] . '">' .
+                $row['title'] . '</a> ';
         }
         $page .= $PAGE->meta(
             'idx-stats',
@@ -349,17 +351,17 @@ EOT;
                     $JAX->pick($f['location_verbose'], 'Viewing the board.')
                 );
                 if (isset($f['is_bot']) && $f['is_bot']) {
-                    $r .= '<a class="user'.$f['uid'].'" '.
-                        'title="'.$title.'" onmouseover="JAX.tooltip(this)">'.
-                        $f['name'].'</a>';
+                    $r .= '<a class="user' . $f['uid'] . '" ' .
+                        'title="' . $title . '" onmouseover="JAX.tooltip(this)">' .
+                        $f['name'] . '</a>';
                 } else {
                     ++$nummembers;
                     $r .= sprintf(
-                        '<a href="?act=vu%1$s" class="user%1$s mgroup%2$s" '.
-                            'title="%4$s" onmouseover="JAX.tooltip(this)">'.
+                        '<a href="?act=vu%1$s" class="user%1$s mgroup%2$s" ' .
+                            'title="%4$s" onmouseover="JAX.tooltip(this)">' .
                             '%3$s</a>',
                         $f['uid'],
-                        $f['group_id'].('idle' == $f['status'] ?
+                        $f['group_id'] . ('idle' == $f['status'] ?
                             ' idle' :
                             ($f['birthday'] && ($CFG['birthdays'] & 1) ?
                             ' birthday' : '')),
@@ -405,7 +407,7 @@ EOT;
                 if (isset($oldcache)) {
                     unset($oldcache[$f['uid']]);
                 }
-                $useronlinecache .= $f['uid'].',';
+                $useronlinecache .= $f['uid'] . ',';
             }
         }
         if (isset($oldcache) && !empty($oldcache)) {
@@ -436,10 +438,10 @@ EOT
         );
 
         while ($f = $DB->arow($result)) {
-            $PAGE->JS('addclass', '#fid_'.$f['id'], 'unread');
+            $PAGE->JS('addclass', '#fid_' . $f['id'], 'unread');
             $PAGE->JS(
                 'update',
-                '#fid_'.$f['id'].'_icon',
+                '#fid_' . $f['id'] . '_icon',
                 $JAX->pick(
                     $PAGE->meta('icon-unread'),
                     $PAGE->meta('idx-icon-unread')
@@ -447,18 +449,18 @@ EOT
             );
             $PAGE->JS(
                 'update',
-                '#fid_'.$f['id'].'_lastpost',
+                '#fid_' . $f['id'] . '_lastpost',
                 $this->formatlastpost($f),
                 '1'
             );
             $PAGE->JS(
                 'update',
-                '#fid_'.$f['id'].'_topics',
+                '#fid_' . $f['id'] . '_topics',
                 $PAGE->meta('idx-topics-count', $f['topics'])
             );
             $PAGE->JS(
                 'update',
-                '#fid_'.$f['id'].'_replies',
+                '#fid_' . $f['id'] . '_replies',
                 $PAGE->meta('idx-replies-count', $f['posts'])
             );
         }

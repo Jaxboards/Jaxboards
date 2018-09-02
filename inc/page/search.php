@@ -101,8 +101,8 @@ class search
         $r = '';
         foreach ($tree as $k => $v) {
             if (isset($titles[$k])) {
-                $r .= '<option value="'.$k.'">'.
-                    str_repeat('+-', $level).$titles[$k].
+                $r .= '<option value="' . $k . '">' .
+                    str_repeat('+-', $level) . $titles[$k] .
                     '</option>';
             }
             if (is_array($v)) {
@@ -110,7 +110,7 @@ class search
             }
         }
         if (!$level) {
-            $r = '<select size="15" multiple="multiple" name="fids">'.$r.'</select>';
+            $r = '<select size="15" multiple="multiple" name="fids">' . $r . '</select>';
         }
 
         return $r;
@@ -190,9 +190,9 @@ FROM (
         WHERE MATCH(p.`post`) AGAINST(? IN BOOLEAN MODE)
             AND t.`fid` IN ?
 EOT
-            .(is_int($JAX->b['mid']) ? ' AND p.`auth_id =? ' : '').
-                 ((isset($datestart) && $datestart) ? ' AND p.`date`>? ' : '').
-                 ((isset($dateend) && $dateend) ? ' AND p.`date`<? ' : '').
+            . (is_int($JAX->b['mid']) ? ' AND p.`auth_id =? ' : '') .
+                 ((isset($datestart) && $datestart) ? ' AND p.`date`>? ' : '') .
+                 ((isset($dateend) && $dateend) ? ' AND p.`date`<? ' : '') .
             <<<'EOT'
     ORDER BY `relevance` DESC LIMIT 100
     ) UNION (
@@ -201,9 +201,9 @@ EOT
         WHERE MATCH(`title`) AGAINST(? IN BOOLEAN MODE)
             AND t.`fid` IN ?
 EOT
-            .(is_int($JAX->b['mid']) ? ' AND t.`auth_id`= ? ' : '').
-                 ((isset($datestart) && $datestart) ? ' AND t.`date`>? ' : '').
-                 ((isset($dateend) && $dateend) ? ' AND t.`date`<? ' : '').
+            . (is_int($JAX->b['mid']) ? ' AND t.`auth_id`= ? ' : '') .
+                 ((isset($datestart) && $datestart) ? ' AND t.`date`>? ' : '') .
+                 ((isset($dateend) && $dateend) ? ' AND t.`date`<? ' : '') .
             <<<'EOT'
     ORDER BY `relevance` DESC LIMIT 100
     )
@@ -245,13 +245,13 @@ EOT
                 $arguments
             );
             if (!$result) {
-                syslog(LOG_EMERG, 'ERROR: '.$DB->error(1).PHP_EOL);
+                syslog(LOG_EMERG, 'ERROR: ' . $DB->error(1) . PHP_EOL);
             }
 
             $ids = '';
             while ($id = $DB->arow($result)) {
                 if ($id['id']) {
-                    $ids .= $id['id'].',';
+                    $ids .= $id['id'] . ',';
                 }
             }
             $ids = mb_substr($ids, 0, -1);
@@ -308,12 +308,12 @@ EOT
             $post = $JAX->blockhtml($post);
             $post = nl2br($post);
             $post = preg_replace(
-                '@'.implode('|', $terms).'@i',
+                '@' . implode('|', $terms) . '@i',
                 $PAGE->meta('search-highlight', '$0'),
                 $post
             );
             $title = preg_replace(
-                '@'.implode('|', $terms).'@i',
+                '@' . implode('|', $terms) . '@i',
                 $PAGE->meta('search-highlight', '$0'),
                 $f['title']
             );
@@ -328,7 +328,7 @@ EOT
         }
 
         if (!$numresults) {
-            $e = 'No results found. '.
+            $e = 'No results found. ' .
                 'Try refining your search, or using longer terms.';
 
             $omitted = array();
@@ -338,8 +338,8 @@ EOT
                 }
             }
             if (!empty($omitted)) {
-                $e .= '<br /><br />'.
-                    'The following terms were omitted due to length: '.
+                $e .= '<br /><br />' .
+                    'The following terms were omitted due to length: ' .
                     implode(', ', $omitted);
             }
             $page = $PAGE->error($e);
@@ -350,11 +350,11 @@ EOT
                 10
             );
             foreach ($resultsArray as $x) {
-                $pages .= '<a href="?act=search&page='.$x.'">'.$x.'</a> ';
+                $pages .= '<a href="?act=search&page=' . $x . '">' . $x . '</a> ';
             }
         }
 
-        $page = $PAGE->meta('box', '', 'Search Results - '.$pages, $page);
+        $page = $PAGE->meta('box', '', 'Search Results - ' . $pages, $page);
 
         if ($PAGE->jsaccess && !$PAGE->jsdirectlink) {
             $PAGE->JS('update', 'searchresults', $page);

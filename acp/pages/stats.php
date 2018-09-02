@@ -11,12 +11,12 @@ class stats
     {
         global $PAGE,$JAX;
         switch (@$JAX->g['do']) {
-        case 'recount':
-            $this->recount_statistics();
-            break;
-        default:
-            $this->showstats();
-            break;
+            case 'recount':
+                $this->recount_statistics();
+                break;
+            default:
+                $this->showstats();
+                break;
         }
     }
 
@@ -185,7 +185,7 @@ EOT
 
         $PAGE->addContentBox(
             'Board Statistics',
-            'Board statistics recounted successfully.<br />'.
+            'Board statistics recounted successfully.<br />' .
             "<br /><br /><br /><a href='?act=stats'>Board Statistics</a>"
         );
     }

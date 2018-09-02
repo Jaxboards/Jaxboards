@@ -38,7 +38,7 @@ class CALENDAR
         );
 
         $SESS->location_verbose
-            = 'Checking out the calendar for '.$monthname.' '.$year;
+            = 'Checking out the calendar for ' . $monthname . ' ' . $year;
         $result = $DB->safeselect(
             '`id`,`display_name` AS `name`,`group_id`,`dob_day`,`dob_year`',
             'members',
@@ -49,8 +49,8 @@ class CALENDAR
         $birthdays = array();
         while ($f = $DB->arow($result)) {
             $birthdays[$f['dob_day']][] = sprintf(
-                '<a href="?act=vu%1$s" class="user%1$s mgroup%2$s" '.
-                'title="%4$s years old!" onmouseover="JAX.tooltip(this)">'.
+                '<a href="?act=vu%1$s" class="user%1$s mgroup%2$s" ' .
+                'title="%4$s years old!" onmouseover="JAX.tooltip(this)">' .
                 '%3$s</a>',
                 $f['id'],
                 $f['group_id'],
@@ -77,7 +77,7 @@ class CALENDAR
             }
             $week .= $PAGE->meta(
                 'calendar-day',
-                ($month.' '.$x.' '.$year) == $today ? 'today' : '',
+                ($month . ' ' . $x . ' ' . $year) == $today ? 'today' : '',
                 $x,
                 (!empty($birthdays[$x]) ? $PAGE->meta(
                     'calendar-birthdays',

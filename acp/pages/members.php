@@ -10,30 +10,30 @@ class members
     {
         global $JAX,$PAGE;
         switch (@$JAX->b['do']) {
-        case 'merge':
-            $this->merge();
-            break;
-        case 'edit':
-            $this->editmem();
-            break;
-        case 'delete':
-            $this->deletemem();
-            break;
-        case 'prereg':
-            $this->preregister();
-            break;
-        case 'massmessage':
-            $this->massmessage();
-            break;
-        case 'ipbans':
-            $this->ipbans();
-            break;
-        case 'validation':
-            $this->validation();
-            break;
-        default:
-            $this->showmain();
-            break;
+            case 'merge':
+                $this->merge();
+                break;
+            case 'edit':
+                $this->editmem();
+                break;
+            case 'delete':
+                $this->deletemem();
+                break;
+            case 'prereg':
+                $this->preregister();
+                break;
+            case 'massmessage':
+                $this->massmessage();
+                break;
+            case 'ipbans':
+                $this->ipbans();
+                break;
+            case 'validation':
+                $this->validation();
+                break;
+            default:
+                $this->showmain();
+                break;
         }
         $sidebar = '';
         foreach (array(
@@ -68,13 +68,13 @@ EOT
         );
         $page = '<table><tr><th></th><th>Name</th><th>ID</th></tr>';
         while ($f = $DB->arow($result)) {
-            $page .= "<tr><td><img src='".$JAX->pick(
+            $page .= "<tr><td><img src='" . $JAX->pick(
                 $f['avatar'],
-                AVAURL.'default.gif'
-            )."' width='50' height='50' /></td><td>".
-            "<a href='?act=members&do=edit&mid=".$f['id']."'>".
-            $f['display_name'].'</a><br />'.$f['group_title'].
-            '</td><td>'.$f['id'].'</td></tr>';
+                AVAURL . 'default.gif'
+            ) . "' width='50' height='50' /></td><td>" .
+            "<a href='?act=members&do=edit&mid=" . $f['id'] . "'>" .
+            $f['display_name'] . '</a><br />' . $f['group_title'] .
+            '</td><td>' . $f['id'] . '</td></tr>';
         }
         $page .= '</table>';
         $PAGE->addContentBox('Member List', $page);
@@ -149,7 +149,7 @@ EOT
                         $page = $PAGE->success('Profile data saved');
                     } else {
                         $page = $PAGE->error(
-                            'You do not have permission to edit this profile.'.
+                            'You do not have permission to edit this profile.' .
                             $PAGE->back()
                         );
                     }
@@ -185,7 +185,7 @@ EOT
                     ,
                     'members',
                     'WHERE `display_name` LIKE ?',
-                    $DB->basicvalue($JAX->p['name'].'%')
+                    $DB->basicvalue($JAX->p['name'] . '%')
                 );
             }
             $data = array();
@@ -195,11 +195,12 @@ EOT
             $nummembers = count($data);
             if ($nummembers > 1) {
                 foreach ($data as $v) {
-                    $page .= '<div><img width="100px" height="100px" '.
-                        'align="middle" src="'.$JAX->pick(
-                            $v['avatar'], AVAURL.'default.gif'
-                        ).'" /> <a href="?act=members&do=edit&mid='.$v['id'].
-                        '">'.$v['display_name'].'</a></div>';
+                    $page .= '<div><img width="100px" height="100px" ' .
+                        'align="middle" src="' . $JAX->pick(
+                            $v['avatar'],
+                            AVAURL . 'default.gif'
+                        ) . '" /> <a href="?act=members&do=edit&mid=' . $v['id'] .
+                        '">' . $v['display_name'] . '</a></div>';
                 }
 
                 return $PAGE->addContentBox('Select Member to Edit', $page);
@@ -207,26 +208,26 @@ EOT
             if (!$nummembers) {
                 return $PAGE->addContentBox(
                     'Error',
-                    $PAGE->error('This member does not exist. '.$PAGE->back())
+                    $PAGE->error('This member does not exist. ' . $PAGE->back())
                 );
             }
             $data = array_pop($data);
             if (2 == $data['group_id'] && 1 != $JAX->userData['id']) {
                 $page = $PAGE->error(
-                    'You do not have permission to edit this profile. '.
+                    'You do not have permission to edit this profile. ' .
                     $PAGE->back()
                 );
             } else {
                 function formfield($label, $name, $value, $which = 'text')
                 {
                     switch ($which) {
-                    case 'text':
-                        return "<label>${label}</label><input type='text' ".
+                        case 'text':
+                            return "<label>${label}</label><input type='text' " .
                             "name='${name}' value='${value}' /><br />";
                         break;
-                    case 'textarea':
-                        return "<label style='vertical-align:top'>${label}".
-                            "</label><textarea name='${name}'>${value}".
+                        case 'textarea':
+                            return "<label style='vertical-align:top'>${label}" .
+                            "</label><textarea name='${name}'>${value}" .
                             '</textarea><br />';
                         break;
                     }
@@ -285,23 +286,23 @@ EOT
                 $page .= formfield('YIM:', 'contact_yim', $data['contact_yim']);
                 $page .= h1('System-Generated Variables');
                 $page .= formfield('Post Count:', 'posts', $data['posts']);
-                $page = "<form method='post'>${page}<input type='submit' ".
+                $page = "<form method='post'>${page}<input type='submit' " .
                     "name='savedata' value='Save' /></form>";
             }
         } else {
             $page = "<form method='post'>
-                Member Name: <input type='text' name='name' ".
-                "onkeyup=\"$('validname').className='bad';".
-                "JAX.autoComplete('act=searchmembers&term='".
+                Member Name: <input type='text' name='name' " .
+                "onkeyup=\"$('validname').className='bad';" .
+                "JAX.autoComplete('act=searchmembers&term='" .
                 "+this.value,this,$('mid'),event);\" />
-                <input type='hidden' id='mid' name='mid' ".
-                "onchange=\"$('validname').className='good'\"/>".
+                <input type='hidden' id='mid' name='mid' " .
+                "onchange=\"$('validname').className='good'\"/>" .
                 "<span id='validname'></span>
                 <input type='submit' name='submit' value='Go' />
                 </form>";
         }
         $PAGE->addContentBox(
-            (@$data['name']) ? 'Editing '.$data['name']."'s details" :
+            (@$data['name']) ? 'Editing ' . $data['name'] . "'s details" :
             'Edit Member',
             $page
         );
@@ -331,8 +332,8 @@ EOT
                     $DB->basicvalue($JAX->p['displayname'])
                 );
                 if ($f = $DB->arow($result)) {
-                    $e = 'That '.($f['name'] == $JAX->p['username'] ?
-                        'username' : 'display name').' is already taken';
+                    $e = 'That ' . ($f['name'] == $JAX->p['username'] ?
+                        'username' : 'display name') . ' is already taken';
                 }
 
                 $DB->disposeresult($result);
@@ -364,12 +365,12 @@ EOT
                 }
             }
         }
-        $page .= '<form method="post"><label>Username:</label>'.
-            '<input type="text" name="username" /><br />'.
-            '<label>Display name:</label>'.
-            '<input type="text" name="displayname" /><br />'.
-            '<label>Password:</label><input type="password" name="pass" />'.
-            '<br /><input type="submit" name="submit" value="Register" />'.
+        $page .= '<form method="post"><label>Username:</label>' .
+            '<input type="text" name="username" /><br />' .
+            '<label>Display name:</label>' .
+            '<input type="text" name="displayname" /><br />' .
+            '<label>Password:</label><input type="password" name="pass" />' .
+            '<br /><input type="submit" name="submit" value="Register" />' .
             '</form>';
         $PAGE->addContentBox('Pre-Register', $page);
     }
@@ -384,9 +385,9 @@ EOT
             'ORDER BY `title` DESC'
         );
         while ($f = $DB->arow($result)) {
-            $page .= "<option value='".$f['id']."'".
-                ($group_id == $f['id'] ? " selected='selected'" : '').
-                '>'.$f['title'].'</option>';
+            $page .= "<option value='" . $f['id'] . "'" .
+                ($group_id == $f['id'] ? " selected='selected'" : '') .
+                '>' . $f['title'] . '</option>';
         }
 
         return "<label>Group:</label><select name='group_id'>${page}</select>";
@@ -572,20 +573,20 @@ EOT
             }
         }
         $page .= '<form method="post">
-            <p>This tool is used for merging duplicate accounts. '.
+            <p>This tool is used for merging duplicate accounts. ' .
             'Merge the duplicate account with the original account.</p>
-            <label>Merge:</label><input type="text" name="name1" '.
-            'onkeyup="$(\'validname\').className=\'bad\';JAX.autoComplete('.
+            <label>Merge:</label><input type="text" name="name1" ' .
+            'onkeyup="$(\'validname\').className=\'bad\';JAX.autoComplete(' .
             '\'act=searchmembers&term=\'+this.value,this,$(\'mid1\'),event);" />
-            <input type="hidden" id="mid1" name="mid1" '.
-            'onchange="$(\'validname\').className=\'good\'"/>'.
+            <input type="hidden" id="mid1" name="mid1" ' .
+            'onchange="$(\'validname\').className=\'good\'"/>' .
             '<span id="validname"></span><br />
-            <label>With:</label><input type="text" name="name2" '.
-            'onkeyup="$(\'validname2\').className=\'bad\';'.
-            'JAX.autoComplete(\'act=searchmembers&term=\'+'.
+            <label>With:</label><input type="text" name="name2" ' .
+            'onkeyup="$(\'validname2\').className=\'bad\';' .
+            'JAX.autoComplete(\'act=searchmembers&term=\'+' .
             'this.value,this,$(\'mid2\'),event);" />
-            <input type="hidden" id="mid2" name="mid2" '.
-            'onchange="$(\'validname2\').className=\'good\'"/>'.
+            <input type="hidden" id="mid2" name="mid2" ' .
+            'onchange="$(\'validname2\').className=\'good\'"/>' .
             '<span id="validname2"></span><br />
             <input type="submit" name="submit" value="Merge Accounts" />
             </form>';
@@ -659,7 +660,7 @@ EOT
                     array('stats', 'members')
                 );
                 $page .= $PAGE->success(
-                    'Successfully deleted the member account. '.
+                    'Successfully deleted the member account. ' .
                     "<a href='?act=stats'>Board Stat Recount</a> suggested."
                 );
             }
@@ -667,12 +668,12 @@ EOT
         $page .= '<form method="post">
             <p>This tool is used for deleting member accounts.
             All traces of the member ever even existing will vanish away!</p>
-            <label>Member Name:</label><input type="text" name="name" '.
-            'onkeyup="$(\'validname\').className=\'bad\';'.
-            'JAX.autoComplete(\'act=searchmembers&term=\'+'.
+            <label>Member Name:</label><input type="text" name="name" ' .
+            'onkeyup="$(\'validname\').className=\'bad\';' .
+            'JAX.autoComplete(\'act=searchmembers&term=\'+' .
             'this.value,this,$(\'mid\'),event);" autocomplete="off" />
-            <input type="hidden" id="mid" name="mid" '.
-            'onchange="$(\'validname\').className=\'good\'"/>'.
+            <input type="hidden" id="mid" name="mid" ' .
+            'onchange="$(\'validname\').className=\'good\'"/>' .
             '<span id="validname"></span><br />
             <input type="submit" name="submit" value="Delete Account" />
             </form>';
@@ -734,16 +735,16 @@ EOT
                     }
                 }
                 if ($iscomment) {
-                    $data[$k] = '#'.$v;
+                    $data[$k] = '#' . $v;
                 }
             }
             $data = implode(PHP_EOL, $data);
-            $o = fopen(BOARDPATH.'bannedips.txt', 'w');
+            $o = fopen(BOARDPATH . 'bannedips.txt', 'w');
             fwrite($o, $data);
             fclose($o);
         } else {
-            if (file_exists(BOARDPATH.'bannedips.txt')) {
-                $data = file_get_contents(BOARDPATH.'bannedips.txt');
+            if (file_exists(BOARDPATH . 'bannedips.txt')) {
+                $data = file_get_contents(BOARDPATH . 'bannedips.txt');
             } else {
                 $data = '';
             }
@@ -779,7 +780,8 @@ EOT;
                     '`id`',
                     'members',
                     'WHERE (?-`last_visit`)<?',
-                    time(), (60 * 60 * 24 * 31 * 6)
+                    time(),
+                    (60 * 60 * 24 * 31 * 6)
                 );
                 $num = 0;
                 while ($f = $DB->arow($q)) {
@@ -802,13 +804,13 @@ EOT;
                 $page .= $PAGE->success("Successfully delivered ${num} messages");
             }
         }
-        $page .= "<form method='post'>Select Groups to message: ".
-            '(all users that have visited in the past 6 months for now, '.
-            'just hacking this in for tj)<br /><label>Title:</label>'.
-            "<input type='text' name='title' /><br />".
-            "<label style='vertical-align:top'>Message:</label>".
-            "<textarea name='message' cols='40' rows='10'></textarea>".
-            "<br /><input type='submit' name='submit' value='Mass Message' />".
+        $page .= "<form method='post'>Select Groups to message: " .
+            '(all users that have visited in the past 6 months for now, ' .
+            'just hacking this in for tj)<br /><label>Title:</label>' .
+            "<input type='text' name='title' /><br />" .
+            "<label style='vertical-align:top'>Message:</label>" .
+            "<textarea name='message' cols='40' rows='10'></textarea>" .
+            "<br /><input type='submit' name='submit' value='Mass Message' />" .
             '</form>';
         $PAGE->addContentBox('Mass Message', $page);
     }
@@ -826,9 +828,9 @@ EOT;
         }
         $page = '<form method="post">
             <label style="width:140px">Require Validation:</label>
-            <input name="v_enable" type="checkbox" class="switch yn" '.
+            <input name="v_enable" type="checkbox" class="switch yn" ' .
             ($PAGE->getCFGSetting('membervalidation') ? 'checked="checked"' :
-            '').' /><br />
+            '') . ' /><br />
             <input type="submit" name="submit1" value="Save" />
             </form>';
         $PAGE->addContentBox('Enable Member Validation', $page);
@@ -852,17 +854,17 @@ EOT;
             'WHERE `group_id`=5'
         );
         while ($f = $DB->arow($result)) {
-            $page .= '<tr><td>'.$f['display_name'].
-                '</td><td>'.$f['ip'].'</td><td>'.$f['email'].
-                '</td><td>'.date('M jS, Y @ g:i A', $f['join_date']).
-                '</td><td><form method="post"><input type="hidden" '.
-                'name="mid" value="'.$f['id'].'" /><input name="action" '.
+            $page .= '<tr><td>' . $f['display_name'] .
+                '</td><td>' . $f['ip'] . '</td><td>' . $f['email'] .
+                '</td><td>' . date('M jS, Y @ g:i A', $f['join_date']) .
+                '</td><td><form method="post"><input type="hidden" ' .
+                'name="mid" value="' . $f['id'] . '" /><input name="action" ' .
                 'type="submit" value="Allow" /></form></td></tr>';
         }
-        $page = $page ? '<table class="wrappers">'.
-            '<tr><th>Name</th><th>IP</th><th>Email</th><th>Registration Date'.
-            '</th><th></th></tr>'.
-            $page.
+        $page = $page ? '<table class="wrappers">' .
+            '<tr><th>Name</th><th>IP</th><th>Email</th><th>Registration Date' .
+            '</th><th></th></tr>' .
+            $page .
             '</table>'
             : 'There are currently no members awaiting validation.';
         $PAGE->addContentBox('Members Awaiting Validation', $page);

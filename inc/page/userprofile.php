@@ -62,11 +62,11 @@ EOT
         }
 
         foreach ($this->contacturls as $k => $v) {
-            if ($ud['contact_'.$k]) {
-                $contactdetails .= '<a class="'.$k.' contact" href="'.sprintf(
+            if ($ud['contact_' . $k]) {
+                $contactdetails .= '<a class="' . $k . ' contact" href="' . sprintf(
                     $v,
-                    $JAX->blockhtml($ud['contact_'.$k])
-                ).'">&nbsp;</a>';
+                    $JAX->blockhtml($ud['contact_' . $k])
+                ) . '">&nbsp;</a>';
             }
         }
         $PAGE->JS('softurl');
@@ -88,15 +88,15 @@ EOT
                     in_array(
                         $ud['uid'],
                         explode(',', $USER['friends'])
-                    ) ? '<a href="?module=buddylist&remove='.$ud['uid'].
-                    '">Remove Contact</a>' : '<a href="?module=buddylist&add='.
-                    $ud['uid'].'">Add Contact</a>',
+                    ) ? '<a href="?module=buddylist&remove=' . $ud['uid'] .
+                    '">Remove Contact</a>' : '<a href="?module=buddylist&add=' .
+                    $ud['uid'] . '">Add Contact</a>',
                     in_array(
                         $ud['uid'],
                         explode(',', $USER['enemies'])
-                    ) ? '<a href="?module=buddylist&unblock='.$ud['uid'].
+                    ) ? '<a href="?module=buddylist&unblock=' . $ud['uid'] .
                     '">Unblock Contact</a>' :
-                    '<a href="?module=buddylist&block='.$ud['uid'].
+                    '<a href="?module=buddylist&block=' . $ud['uid'] .
                     '">Block Contact</>'
                 ),
             )
@@ -163,11 +163,11 @@ EOT
         $pfpageloc = isset($JAX->b['page']) ? $JAX->b['page'] : '';
         $pfbox = '';
         switch ($pfpageloc) {
-        case 'activity':
-        default:
-            $pfpageloc = 'activity';
-            $result = $DB->safespecial(
-                <<<'EOT'
+            case 'activity':
+            default:
+                $pfpageloc = 'activity';
+                $result = $DB->safespecial(
+                    <<<'EOT'
 SELECT a.`id` AS `id`,a.`type` AS `type`,a.`arg1` AS `arg1`,a.`uid` AS `uid`,
 	a.`date` AS `date`,a.`affected_uid` AS `affected_uid`,a.`tid` AS `tid`,
 	a.`pid` AS `pid`,a.`arg2` AS `arg2`,a.`affected_uid` AS `aff_id`,
@@ -179,54 +179,54 @@ WHERE a.`uid`=?
 ORDER BY a.`id` DESC
 LIMIT ?
 EOT
-                ,
-                array('activity', 'members'),
-                $id,
-                $this->num_activity
-            );
-            if (isset($JAX->b['fmt']) && 'RSS' == $JAX->b['fmt']) {
-                include_once 'inc/classes/rssfeed.php';
-                $feed = new rssfeed(
-                    array(
-                        'title' => $udata['display_name']."'s recent activity",
-                        'description' => $udata['usertitle'],
-                    )
+                    ,
+                    array('activity', 'members'),
+                    $id,
+                    $this->num_activity
                 );
+                if (isset($JAX->b['fmt']) && 'RSS' == $JAX->b['fmt']) {
+                    include_once 'inc/classes/rssfeed.php';
+                    $feed = new rssfeed(
+                        array(
+                        'title' => $udata['display_name'] . "'s recent activity",
+                        'description' => $udata['usertitle'],
+                        )
+                    );
+                    while ($f = $DB->arow($result)) {
+                            $f['name'] = $udata['display_name'];
+                            $f['group_id'] = $udata['group_id'];
+                            $data = $JAX->parse_activity($f, true);
+                            $feed->additem(
+                                array(
+                                    'title' => $data['text'],
+                                    'pubDate' => date('r', $f['date']),
+                                    'description' => $data['text'],
+                                    'link' => 'https://' . $_SERVER['SERVER_NAME'] .
+                                    $_SERVER['PHP_SELF'] . $data['link'],
+                                    'guid' => $f['id'],
+                                )
+                            );
+                    }
+                    $feed->publish();
+                    die();
+                }
                 while ($f = $DB->arow($result)) {
                     $f['name'] = $udata['display_name'];
                     $f['group_id'] = $udata['group_id'];
-                    $data = $JAX->parse_activity($f, true);
-                    $feed->additem(
-                        array(
-                            'title' => $data['text'],
-                            'pubDate' => date('r', $f['date']),
-                            'description' => $data['text'],
-                            'link' => 'https://'.$_SERVER['SERVER_NAME'].
-                            $_SERVER['PHP_SELF'].$data['link'],
-                            'guid' => $f['id'],
-                        )
-                    );
+                    $pfbox .= $JAX->parse_activity($f);
                 }
-                $feed->publish();
-                die();
-            }
-            while ($f = $DB->arow($result)) {
-                $f['name'] = $udata['display_name'];
-                $f['group_id'] = $udata['group_id'];
-                $pfbox .= $JAX->parse_activity($f);
-            }
-            if (!$pfbox) {
-                $pfbox = 'This user has yet to do anything note-worthy!';
-            } else {
-                $pfbox = "<a href='./?act=vu".$id.
-                    "&amp;page=activity&amp;fmt=RSS' class='social rss' ".
-                    "style='float:right'>RSS</a>".$pfbox;
-            }
+                if (!$pfbox) {
+                    $pfbox = 'This user has yet to do anything note-worthy!';
+                } else {
+                    $pfbox = "<a href='./?act=vu" . $id .
+                    "&amp;page=activity&amp;fmt=RSS' class='social rss' " .
+                    "style='float:right'>RSS</a>" . $pfbox;
+                }
 
-            break;
-        case 'posts':
-            $result = $DB->safespecial(
-                <<<'EOT'
+                break;
+            case 'posts':
+                $result = $DB->safespecial(
+                    <<<'EOT'
 SELECT p.`post` AS `post`,p.`id` AS `pid`,p.`tid` AS `tid`,
     t.`title` AS `title`,p.`date` AS `date`,f.`perms` AS `perms`
 FROM %t p
@@ -238,28 +238,28 @@ WHERE p.`auth_id`=?
 ORDER BY p.`id` DESC
 LIMIT 10
 EOT
-                ,
-                array('posts', 'topics', 'forums'),
-                $id
-            );
-            while ($f = $DB->arow($result)) {
-                $p = $JAX->parseperms($f['perms'], $USER ? $USER['group_id'] : 3);
-                if (!$p['read']) {
-                    continue;
-                }
-                $pfbox .= $PAGE->meta(
-                    'userprofile-post',
-                    $f['tid'],
-                    $f['title'],
-                    $f['pid'],
-                    $JAX->date($f['date']),
-                    $JAX->theworks($f['post'])
+                    ,
+                    array('posts', 'topics', 'forums'),
+                    $id
                 );
-            }
-            break;
-        case 'topics':
-            $result = $DB->safespecial(
-                <<<'EOT'
+                while ($f = $DB->arow($result)) {
+                    $p = $JAX->parseperms($f['perms'], $USER ? $USER['group_id'] : 3);
+                    if (!$p['read']) {
+                        continue;
+                    }
+                    $pfbox .= $PAGE->meta(
+                        'userprofile-post',
+                        $f['tid'],
+                        $f['title'],
+                        $f['pid'],
+                        $JAX->date($f['date']),
+                        $JAX->theworks($f['post'])
+                    );
+                }
+                break;
+            case 'topics':
+                $result = $DB->safespecial(
+                    <<<'EOT'
 SELECT p.`post` AS `post`,p.`id` AS `pid`,p.`tid` AS `tid`,
     t.`title` AS `title`,p.`date` AS `date`,f.`perms` AS `perms`
 FROM %t p
@@ -272,38 +272,38 @@ WHERE p.`auth_id`=?
 ORDER BY p.`id` DESC
 LIMIT 10
 EOT
-                ,
-                array('posts', 'topics', 'forums'),
-                $id
-            );
-            while ($f = $DB->arow($result)) {
-                $p = $JAX->parseperms($f['perms'], $USER ? $USER['group_id'] : 3);
-                if (!$p['read']) {
-                    continue;
-                }
-                $pfbox .= $PAGE->meta(
-                    'userprofile-topic',
-                    $f['tid'],
-                    $f['title'],
-                    $JAX->date($f['date']),
-                    $JAX->theworks($f['post'])
+                    ,
+                    array('posts', 'topics', 'forums'),
+                    $id
                 );
-            }
-            if (!$pfbox) {
-                $pfbox = 'No topics to show.';
-            }
-            break;
-        case 'about':
-            $pfbox = $PAGE->meta(
-                'userprofile-about',
-                $JAX->theworks($udata['about']),
-                $JAX->theworks($udata['sig'])
-            );
-            break;
-        case 'friends':
-            if ($udata['friends']) {
-                $result = $DB->safespecial(
-                    <<<'EOT'
+                while ($f = $DB->arow($result)) {
+                    $p = $JAX->parseperms($f['perms'], $USER ? $USER['group_id'] : 3);
+                    if (!$p['read']) {
+                        continue;
+                    }
+                    $pfbox .= $PAGE->meta(
+                        'userprofile-topic',
+                        $f['tid'],
+                        $f['title'],
+                        $JAX->date($f['date']),
+                        $JAX->theworks($f['post'])
+                    );
+                }
+                if (!$pfbox) {
+                    $pfbox = 'No topics to show.';
+                }
+                break;
+            case 'about':
+                $pfbox = $PAGE->meta(
+                    'userprofile-about',
+                    $JAX->theworks($udata['about']),
+                    $JAX->theworks($udata['sig'])
+                );
+                break;
+            case 'friends':
+                if ($udata['friends']) {
+                    $result = $DB->safespecial(
+                        <<<'EOT'
 SELECT m.`avatar` AS `avatar`,m.`id` AS `id`,m.`display_name` AS `name`,
     m.`group_id` AS `group_id`,
     m.`usertitle` AS `usertitle`
@@ -313,95 +313,95 @@ LEFT JOIN %t g
 WHERE m.`id` IN ?
 ORDER BY `name`
 EOT
-                    ,
-                    array('members', 'member_groups'),
-                    explode(',', $udata['friends'])
-                );
+                        ,
+                        array('members', 'member_groups'),
+                        explode(',', $udata['friends'])
+                    );
 
-                while ($f = $DB->arow($result)) {
-                    $pfbox .= $PAGE->meta(
-                        'userprofile-friend',
-                        $f['id'],
-                        $JAX->pick(
-                            $f['avatar'],
-                            $PAGE->meta('default-avatar')
-                        ),
-                        $PAGE->meta(
-                            'user-link',
+                    while ($f = $DB->arow($result)) {
+                        $pfbox .= $PAGE->meta(
+                            'userprofile-friend',
                             $f['id'],
-                            $f['group_id'],
-                            $f['name']
-                        )
-                    );
+                            $JAX->pick(
+                                $f['avatar'],
+                                $PAGE->meta('default-avatar')
+                            ),
+                            $PAGE->meta(
+                                'user-link',
+                                $f['id'],
+                                $f['group_id'],
+                                $f['name']
+                            )
+                        );
+                    }
                 }
-            }
-            if (!$pfbox) {
-                $pfbox = "I'm pretty lonely, I have no friends. :(";
-            } else {
-                $pfbox = '<div class="contacts">'.$pfbox.'<br clear="all" /></div>';
-            }
-            break;
-        case 'comments':
-            if (isset($JAX->b['del']) && is_numeric($JAX->b['del'])) {
-                if ($PERMS['can_moderate']) {
-                    $DB->safedelete(
-                        'profile_comments',
-                        'WHERE `id`=?',
-                        $DB->basicvalue($JAX->b['del'])
-                    );
-                } elseif ($PERMS['can_delete_comments']) {
-                    $DB->safedelete(
-                        'profile_comments',
-                        'WHERE `id`=? AND `from`=?',
-                        $DB->basicvalue($JAX->b['del']),
-                        $DB->basicvalue($USER['id'])
-                    );
-                }
-            }
-            if (isset($JAX->p['comment']) && '' !== $JAX->p['comment']) {
-                if (!$USER || !$PERMS['can_add_comments']) {
-                    $e = 'No permission to add comments!';
+                if (!$pfbox) {
+                    $pfbox = "I'm pretty lonely, I have no friends. :(";
                 } else {
-                    $DB->safeinsert(
-                        'activity',
-                        array(
+                    $pfbox = '<div class="contacts">' . $pfbox . '<br clear="all" /></div>';
+                }
+                break;
+            case 'comments':
+                if (isset($JAX->b['del']) && is_numeric($JAX->b['del'])) {
+                    if ($PERMS['can_moderate']) {
+                        $DB->safedelete(
+                            'profile_comments',
+                            'WHERE `id`=?',
+                            $DB->basicvalue($JAX->b['del'])
+                        );
+                    } elseif ($PERMS['can_delete_comments']) {
+                        $DB->safedelete(
+                            'profile_comments',
+                            'WHERE `id`=? AND `from`=?',
+                            $DB->basicvalue($JAX->b['del']),
+                            $DB->basicvalue($USER['id'])
+                        );
+                    }
+                }
+                if (isset($JAX->p['comment']) && '' !== $JAX->p['comment']) {
+                    if (!$USER || !$PERMS['can_add_comments']) {
+                        $e = 'No permission to add comments!';
+                    } else {
+                        $DB->safeinsert(
+                            'activity',
+                            array(
                             'type' => 'profile_comment',
                             'uid' => $USER['id'],
                             'date' => time(),
                             'affected_uid' => $id,
-                        )
-                    );
-                    $DB->safeinsert(
-                        'profile_comments',
-                        array(
+                            )
+                        );
+                        $DB->safeinsert(
+                            'profile_comments',
+                            array(
                             'to' => $id,
                             'from' => $USER['id'],
                             'comment' => $JAX->p['comment'],
                             'date' => time(),
+                            )
+                        );
+                    }
+                    if ($e) {
+                        $PAGE->JS('error', $e);
+                        $pfbox .= $PAGE->meta('error', $e);
+                    }
+                }
+                if ($USER && $PERMS['can_add_comments']) {
+                    $pfbox = $PAGE->meta(
+                        'userprofile-comment-form',
+                        isset($USER['name']) ? $USER['name'] : '',
+                        $JAX->pick($USER['avatar'], $PAGE->meta('default-avatar')),
+                        $JAX->hiddenFormFields(
+                            array(
+                            'act' => 'vu' . $id,
+                            'view' => 'profile',
+                            'page' => 'comments',
+                            )
                         )
                     );
                 }
-                if ($e) {
-                    $PAGE->JS('error', $e);
-                    $pfbox .= $PAGE->meta('error', $e);
-                }
-            }
-            if ($USER && $PERMS['can_add_comments']) {
-                $pfbox = $PAGE->meta(
-                    'userprofile-comment-form',
-                    isset($USER['name']) ? $USER['name'] : '',
-                    $JAX->pick($USER['avatar'], $PAGE->meta('default-avatar')),
-                    $JAX->hiddenFormFields(
-                        array(
-                            'act' => 'vu'.$id,
-                            'view' => 'profile',
-                            'page' => 'comments',
-                        )
-                    )
-                );
-            }
-            $result = $DB->safespecial(
-                <<<'EOT'
+                $result = $DB->safespecial(
+                    <<<'EOT'
 SELECT c.`id` AS `id`,c.`to` AS `to`,c.`from` AS `from`,
     c.`comment` AS `comment`,c.`date` AS `date`,
     m.`display_name` AS `display_name`,m.`group_id` AS `group_id`,
@@ -413,39 +413,39 @@ WHERE c.`to`=?
 ORDER BY c.`id` DESC
 LIMIT 10
 EOT
-                ,
-                array('profile_comments', 'members'),
-                $id
-            );
-            $found = false;
-            while ($f = $DB->arow($result)) {
-                $pfbox .= $PAGE->meta(
-                    'userprofile-comment',
-                    $PAGE->meta(
-                        'user-link',
-                        $f['from'],
-                        $f['group_id'],
-                        $f['display_name']
-                    ),
-                    $JAX->pick(
-                        $f['avatar'],
-                        $PAGE->meta('default-avatar')
-                    ),
-                    $JAX->date($f['date']),
-                    $JAX->theworks($f['comment']).
-                    ($PERMS['can_delete_comments']
-                    && $f['from'] == $USER['id']
-                    || $PERMS['can_moderate'] ?
-                    ' <a href="?act='.$JAX->b['act'].
-                    '&view=profile&page=comments&del='.$f['id'].
-                    '" class="delete">[X]</a>' : '')
+                    ,
+                    array('profile_comments', 'members'),
+                    $id
                 );
-                $found = true;
-            }
-            if (!$found) {
-                $pfbox .= 'No comments to display!';
-            }
-            break;
+                $found = false;
+                while ($f = $DB->arow($result)) {
+                    $pfbox .= $PAGE->meta(
+                        'userprofile-comment',
+                        $PAGE->meta(
+                            'user-link',
+                            $f['from'],
+                            $f['group_id'],
+                            $f['display_name']
+                        ),
+                        $JAX->pick(
+                            $f['avatar'],
+                            $PAGE->meta('default-avatar')
+                        ),
+                        $JAX->date($f['date']),
+                        $JAX->theworks($f['comment']) .
+                        ($PERMS['can_delete_comments']
+                        && $f['from'] == $USER['id']
+                        || $PERMS['can_moderate'] ?
+                        ' <a href="?act=' . $JAX->b['act'] .
+                        '&view=profile&page=comments&del=' . $f['id'] .
+                        '" class="delete">[X]</a>' : '')
+                    );
+                    $found = true;
+                }
+                if (!$found) {
+                    $pfbox .= 'No comments to display!';
+                }
+                break;
         }
         if (isset($JAX->b['page'])
             && $JAX->b['page']
@@ -456,8 +456,8 @@ EOT
         } else {
             $PAGE->path(
                 array(
-                    $udata['display_name'].
-                    "'s profile" => '?act=vu'.$id.'&view=profile',
+                    $udata['display_name'] .
+                    "'s profile" => '?act=vu' . $id . '&view=profile',
                 )
             );
             $PAGE->updatepath();
@@ -471,30 +471,30 @@ EOT
                 'friends',
             );
             foreach ($tabs as $k => $v) {
-                $tabs[$k] = '<a href="?act=vu'.$id.'&view=profile&page='.
-                    $v.'"'.($v == $pfpageloc ? ' class="active"' : '').
-                    '>'.ucwords($v).'</a>';
+                $tabs[$k] = '<a href="?act=vu' . $id . '&view=profile&page=' .
+                    $v . '"' . ($v == $pfpageloc ? ' class="active"' : '') .
+                    '>' . ucwords($v) . '</a>';
             }
 
             $contactdetails = '';
             foreach ($udata as $k => $v) {
                 if ('contact_' == mb_substr($k, 0, 8) && $v) {
-                    $contactdetails .= '<div class="contact '.mb_substr($k, 8).
-                        '"><a href="'.
-                        sprintf($this->contacturls[mb_substr($k, 8)], $v).
-                        '">'.$v.'</a></div>';
+                    $contactdetails .= '<div class="contact ' . mb_substr($k, 8) .
+                        '"><a href="' .
+                        sprintf($this->contacturls[mb_substr($k, 8)], $v) .
+                        '">' . $v . '</a></div>';
                 }
             }
-            $contactdetails .= '<div class="contact im">'.
-                '<a href="javascript:void(0)" onclick="IMWindow(\''.
-                $udata['id'].'\',\''.$udata['display_name'].'\')">IM</a></div>';
-            $contactdetails .= '<div class="contact pm">'.
-                '<a href="?act=ucp&what=inbox&page=compose&mid='.
-                $udata['id'].'">PM</a></div>';
+            $contactdetails .= '<div class="contact im">' .
+                '<a href="javascript:void(0)" onclick="IMWindow(\'' .
+                $udata['id'] . '\',\'' . $udata['display_name'] . '\')">IM</a></div>';
+            $contactdetails .= '<div class="contact pm">' .
+                '<a href="?act=ucp&what=inbox&page=compose&mid=' .
+                $udata['id'] . '">PM</a></div>';
             if ($PERMS['can_moderate']) {
-                $contactdetails .= '<div>IP: <a href="'.
-                    '?act=modcontrols&do=iptools&ip='.$udata['ip'].
-                    '">'.$udata['ip'].'</a></div>';
+                $contactdetails .= '<div>IP: <a href="' .
+                    '?act=modcontrols&do=iptools&ip=' . $udata['ip'] .
+                    '">' . $udata['ip'] . '</a></div>';
             }
 
             $page = $PAGE->meta(
@@ -506,10 +506,10 @@ EOT
                 $JAX->pick($udata['full_name'], 'N/A'),
                 $JAX->pick(ucfirst($udata['gender']), 'N/A'),
                 $udata['location'],
-                ($udata['dob_year'] ? $udata['dob_month'].'/'.
-                $udata['dob_day'].'/'.$udata['dob_year'] : 'N/A'),
-                ($udata['website'] ? '<a href="'.$udata['website'].'">'.
-                $udata['website'].'</a>' : 'N/A'),
+                ($udata['dob_year'] ? $udata['dob_month'] . '/' .
+                $udata['dob_day'] . '/' . $udata['dob_year'] : 'N/A'),
+                ($udata['website'] ? '<a href="' . $udata['website'] . '">' .
+                $udata['website'] . '</a>' : 'N/A'),
                 ($JAX->date($udata['join_date'])),
                 $JAX->date($udata['last_visit']),
                 $udata['id'],
@@ -523,13 +523,13 @@ EOT
                 $tabs[5],
                 $pfbox,
                 ($PERMS['can_moderate'] ?
-                '<a class="moderate" href="?act=modcontrols&do=emem&mid='.
-                $udata['id'].'">Edit</a>' : '')
+                '<a class="moderate" href="?act=modcontrols&do=emem&mid=' .
+                $udata['id'] . '">Edit</a>' : '')
             );
             $PAGE->JS('update', 'page', $page);
             $PAGE->append('page', $page);
 
-            $SESS->location_verbose = 'Viewing '.$udata['display_name']."'s profile";
+            $SESS->location_verbose = 'Viewing ' . $udata['display_name'] . "'s profile";
         }
     }
 }

@@ -11,25 +11,25 @@ class LOGREG
         global $JAX,$PAGE;
 
         switch (mb_substr($JAX->b['act'], 6)) {
-        case 1:
-            $this->register();
-            break;
-        case 2:
-            $this->logout();
-            break;
-        case 4:
-            $this->loginpopup();
-            break;
-        case 3:
-        default:
-            $this->login($JAX->p['user'], $JAX->p['pass']);
-            break;
-        case 5:
-            $this->toggleinvisible();
-            break;
-        case 6:
-            $this->forgotpassword($JAX->b['uid'], $JAX->b['id']);
-            break;
+            case 1:
+                $this->register();
+                break;
+            case 2:
+                $this->logout();
+                break;
+            case 4:
+                $this->loginpopup();
+                break;
+            case 3:
+            default:
+                $this->login($JAX->p['user'], $JAX->p['pass']);
+                break;
+            case 5:
+                $this->toggleinvisible();
+                break;
+            case 6:
+                $this->forgotpassword($JAX->b['uid'], $JAX->b['id']);
+                break;
         }
     }
 
@@ -371,8 +371,8 @@ EOT
                     $DB->basicvalue($JAX->p['user'])
                 );
                 if (!($udata = $DB->arow($result))) {
-                    $e = 'There is no user registered as <strong>'.
-                        $JAX->b['user'].
+                    $e = 'There is no user registered as <strong>' .
+                        $JAX->b['user'] .
                         '</strong>, sure this is correct?';
                 }
                 $DB->disposeresult($result);
@@ -392,8 +392,8 @@ EOT
                             'expires' => date('Y-m-d H:i:s', time() + 3600 * 24),
                         )
                     );
-                    $link = BOARDURL.'?act=logreg6&uid='.
-                        $udata['id'].'&id='.rawurlencode($forgotpasswordtoken);
+                    $link = BOARDURL . '?act=logreg6&uid=' .
+                        $udata['id'] . '&id=' . rawurlencode($forgotpasswordtoken);
                     $mailResult = $JAX->mail(
                         $udata['email'],
                         'Recover Your Password!',
@@ -415,15 +415,15 @@ EOT
                     if (!$mailResult) {
                         $page .= $PAGE->meta(
                             'error',
-                            'There was a problem sending the email. '.
+                            'There was a problem sending the email. ' .
                             'Please contact the administrator.'
                         );
                     } else {
                         $page .= $PAGE->meta(
                             'success',
-                            'An email has been sent to the email associated '.
-                            'with this account. Please check your email and '.
-                            'follow the instructions in order to recover '.
+                            'An email has been sent to the email associated ' .
+                            'with this account. Please check your email and ' .
+                            'follow the instructions in order to recover ' .
                             'your password.'
                         );
                     }

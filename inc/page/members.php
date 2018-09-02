@@ -45,7 +45,7 @@ class members
             $sortby = $JAX->b['sortby'];
         }
         if (isset($JAX->g['filter']) && 'staff' == $JAX->g['filter']) {
-            $sortby = 'g.`can_access_acp` DESC ,'.$sortby;
+            $sortby = 'g.`can_access_acp` DESC ,' . $sortby;
             $where = 'WHERE g.`can_access_acp`=1 OR g.`can_moderate`=1';
         }
 
@@ -112,19 +112,19 @@ EOT
             $this->perpage
         );
         foreach ($pagesArray as $v) {
-            $pages .= "<a href='?act=members&amp;sortby=".
-                "${sortby}&amp;how=${sorthow}&amp;page=${v}'".
-                ($v - 1 == $this->page ? ' class="active"' : '').">${v}</a> ";
+            $pages .= "<a href='?act=members&amp;sortby=" .
+                "${sortby}&amp;how=${sorthow}&amp;page=${v}'" .
+                ($v - 1 == $this->page ? ' class="active"' : '') . ">${v}</a> ";
         }
-        $url = '?act=members'.
-            ($this->page ? '&page='.($this->page + 1) : '').
+        $url = '?act=members' .
+            ($this->page ? '&page=' . ($this->page + 1) : '') .
             ((isset($JAX->g['filter']) && $JAX->g['filter'])
-            ? '&filter='.$JAX->g['filter'] : '');
+            ? '&filter=' . $JAX->g['filter'] : '');
         $links = array();
         foreach ($vars as $k => $v) {
-            $links[] = "<a href=\"${url}&amp;sortby=${k}".
-                ($sortby == $k ? ('asc' == $sorthow ? '&amp;how=desc' : '').
-                '" class="sort'.('desc' == $sorthow ? ' desc' : '') : '').
+            $links[] = "<a href=\"${url}&amp;sortby=${k}" .
+                ($sortby == $k ? ('asc' == $sorthow ? '&amp;how=desc' : '') .
+                '" class="sort' . ('desc' == $sorthow ? ' desc' : '') : '') .
                 "\">${v}</a>";
         }
         foreach ($memberarray as $f) {
@@ -139,15 +139,15 @@ EOT
                 'twitter' => 'https://twitter.com/%s',
             );
             foreach ($contactUrls as $k => $v) {
-                if ($f['contact_'.$k]) {
-                    $contactdetails .= '<a class="'.$k.' contact" href="'.
-                        sprintf($v, $JAX->blockhtml($f['contact_'.$k])).
+                if ($f['contact_' . $k]) {
+                    $contactdetails .= '<a class="' . $k . ' contact" href="' .
+                        sprintf($v, $JAX->blockhtml($f['contact_' . $k])) .
                         '">&nbsp;</a>';
                 }
             }
-            $contactdetails .= '<a class="pm contact" '.
-                'href="?act=ucp&amp;what=inbox&amp;page=compose&amp;mid='.
-                $f['id'].'"></a>';
+            $contactdetails .= '<a class="pm contact" ' .
+                'href="?act=ucp&amp;what=inbox&amp;page=compose&amp;mid=' .
+                $f['id'] . '"></a>';
             $page .= $PAGE->meta(
                 'members-row',
                 $f['id'],
@@ -173,14 +173,14 @@ EOT
             $links[3],
             $page
         );
-        $page = "<div class='pages pages-top'>${pages}</div>".
+        $page = "<div class='pages pages-top'>${pages}</div>" .
             $PAGE->meta(
                 'box',
                 ' id="memberlist"',
                 'Members',
                 $page
-            ).
-            "<div class='pages pages-bottom'>${pages}</div>".
+            ) .
+            "<div class='pages pages-bottom'>${pages}</div>" .
             "<div class='clear'></div>";
         $PAGE->JS('update', 'page', $page);
         $PAGE->append('PAGE', $page);

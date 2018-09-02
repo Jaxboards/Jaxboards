@@ -27,14 +27,14 @@ if (!defined('JAXBOARDS_ROOT')) {
 // This is the best place to load the password compatibility library,
 // so do it here:
 if (!function_exists('password_hash')) {
-    include_once JAXBOARDS_ROOT.'/inc/lib/password.php';
+    include_once JAXBOARDS_ROOT . '/inc/lib/password.php';
 }
 
 define('INACP', 'true');
 
-require JAXBOARDS_ROOT.'/config.php';
-require JAXBOARDS_ROOT.'/inc/classes/jax.php';
-require JAXBOARDS_ROOT.'/inc/classes/mysql.php';
+require JAXBOARDS_ROOT . '/config.php';
+require JAXBOARDS_ROOT . '/inc/classes/jax.php';
+require JAXBOARDS_ROOT . '/inc/classes/mysql.php';
 
 $DB = new MySQL();
 $DB->connect(
@@ -45,7 +45,7 @@ $DB->connect(
     $CFG['sql_prefix']
 );
 
-require_once JAXBOARDS_ROOT.'/domaindefinitions.php';
+require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
 
 $JAX = new JAX();
 $submitted = false;
@@ -100,7 +100,7 @@ EOT
 <?php
 if ($submitted) {
     if ((isset($uinfo) && false === $uinfo) || !$verified_password) {
-        echo '<div class="error">'.
+        echo '<div class="error">' .
             'The username/password supplied was incorrect.</div>';
     } elseif (isset($uinfo) && $notadmin) {
         echo '<div class="error">You are not authorized to login to the ACP</div>';

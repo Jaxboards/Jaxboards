@@ -268,9 +268,9 @@ EOT
     public function addSessIDCB($m)
     {
         if ('?' == $m[1][0]) {
-            $m[1] .= '&amp;sessid='.$this->data['id'];
+            $m[1] .= '&amp;sessid=' . $this->data['id'];
         }
 
-        return 'href="'.$m[1].'"';
+        return 'href="' . $m[1] . '"';
     }
 }

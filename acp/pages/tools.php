@@ -16,17 +16,17 @@ class tools
             '?act=tools&do=backup' => 'Backup',
         );
         foreach ($menu as $k => $v) {
-            $sidebar .= '<li><a href="'.$k.'">'.$v.'</a></li>';
+            $sidebar .= '<li><a href="' . $k . '">' . $v . '</a></li>';
         }
-        $PAGE->sidebar('<ul>'.$sidebar.'</ul>');
+        $PAGE->sidebar('<ul>' . $sidebar . '</ul>');
         $do = isset($JAX->b['do']) ? $JAX->b['do'] : '';
         switch ($do) {
-        case 'files':
-            $this->filemanager();
-            break;
-        case 'backup':
-            $this->backup();
-            break;
+            case 'files':
+                $this->filemanager();
+                break;
+            case 'backup':
+                $this->backup();
+                break;
         }
     }
 
@@ -49,12 +49,12 @@ EOT
             if ($f) {
                 $ext = mb_strtolower(array_pop(explode('.', $f['name'])));
                 if (in_array($ext, array('jpg', 'jpeg', 'png', 'gif', 'bmp'))) {
-                    $f['hash'] .= '.'.$ext;
+                    $f['hash'] .= '.' . $ext;
                 }
-                $page .= @unlink(BOARDPATH.'Uploads/'.$f['hash']) ?
+                $page .= @unlink(BOARDPATH . 'Uploads/' . $f['hash']) ?
                     $PAGE->success('File deleted') :
                     $PAGE->error(
-                        'Error deleting file, maybe it\'s already been '.
+                        'Error deleting file, maybe it\'s already been ' .
                         'deleted? Removed from DB'
                     );
                 $DB->safedelete(
@@ -82,7 +82,7 @@ EOT
         $result = $DB->safeselect(
             '`id`,`tid`,`post`',
             'posts',
-            "WHERE MATCH (`post`) AGAINST ('attachment') ".
+            "WHERE MATCH (`post`) AGAINST ('attachment') " .
             "AND post LIKE '%[attachment]%'"
         );
         $linkedin = array();
@@ -93,8 +93,8 @@ EOT
                 $m
             );
             foreach ($m[1] as $v) {
-                $linkedin[$v][] = '<a href="../?act=vt'.$f['tid'].
-                    '&findpost='.$f['id'].'">'.$f['id'].'</a>';
+                $linkedin[$v][] = '<a href="../?act=vt' . $f['tid'] .
+                    '&findpost=' . $f['id'] . '">' . $f['id'] . '</a>';
             }
         }
         $result = $DB->safespecial(
@@ -118,29 +118,29 @@ EOT
                 $ext = mb_strtolower(array_pop($filepieces));
             }
             if (in_array($ext, $CFG['images'])) {
-                $file['name'] = '<a href="'.
-                    BOARDPATHURL.'Uploads/'.$file['hash'].'.'.$ext.'">'.
-                    $file['name'].'</a>';
+                $file['name'] = '<a href="' .
+                    BOARDPATHURL . 'Uploads/' . $file['hash'] . '.' . $ext . '">' .
+                    $file['name'] . '</a>';
             } else {
-                $file['name'] = '<a href="../?act=download&id='.
-                    $file['id'].'">'.$file['name'].'</a>';
+                $file['name'] = '<a href="../?act=download&id=' .
+                    $file['id'] . '">' . $file['name'] . '</a>';
             }
-            $table .= '<tr><td>'.$file['name'].'</td><td>'.$file['id'].
-                '</td><td>'.$JAX->filesize($file['size']).
-                "</td><td align='center'><input type='text' ".
-                "style='text-align:center;width:40px' name='dl[".$file['id'].
-                ']\' value="'.$file['downloads'].'" /></td><td>'.
-                '<a href="../?act=vu'.$file['uid'].'">'.$file['uname'].
-                '</a></td><td>'.($linkedin[$file['id']] ?
-                implode(', ', $linkedin[$file['id']]) : 'Not linked!').
-                "</td><td align='center'><a onclick='return ".
-                "confirm(\"You sure?\")' href='?act=tools&do=files&delete=".
-                $file['id']."' class='icons delete'></a></td></tr>";
+            $table .= '<tr><td>' . $file['name'] . '</td><td>' . $file['id'] .
+                '</td><td>' . $JAX->filesize($file['size']) .
+                "</td><td align='center'><input type='text' " .
+                "style='text-align:center;width:40px' name='dl[" . $file['id'] .
+                ']\' value="' . $file['downloads'] . '" /></td><td>' .
+                '<a href="../?act=vu' . $file['uid'] . '">' . $file['uname'] .
+                '</a></td><td>' . ($linkedin[$file['id']] ?
+                implode(', ', $linkedin[$file['id']]) : 'Not linked!') .
+                "</td><td align='center'><a onclick='return " .
+                "confirm(\"You sure?\")' href='?act=tools&do=files&delete=" .
+                $file['id'] . "' class='icons delete'></a></td></tr>";
         }
-        $page .= $table ? "<form method='post'><table id='files'><tr><th>".
-            'Filename</th><th>ID</th><th>Size</th><th>Downloads</th><th>'.
-            'Uploader</th><th>Linked in</th><th>Delete</th></tr>'.$table.
-            "<tr><td colspan='3'></td><td><input type='submit' value='Save'".
+        $page .= $table ? "<form method='post'><table id='files'><tr><th>" .
+            'Filename</th><th>ID</th><th>Size</th><th>Downloads</th><th>' .
+            'Uploader</th><th>Linked in</th><th>Delete</th></tr>' . $table .
+            "<tr><td colspan='3'></td><td><input type='submit' value='Save'" .
             " /></td><td colspan='3' /></td></table>" :
             $PAGE->error('No files to show.');
         $PAGE->addContentBox('File Manager', $page);
@@ -152,24 +152,24 @@ EOT
         if (@$_POST['dl']) {
             header('Content-type: text/plain');
             header(
-                'Content-Disposition: attachment;filename="'.$DB->prefix.
-                date('Y-m-d_His').'.sql"'
+                'Content-Disposition: attachment;filename="' . $DB->prefix .
+                date('Y-m-d_His') . '.sql"'
             );
             $result = $DB->safequery("SHOW TABLES LIKE '{$DB->prefix}%%'");
             $tables = $DB->rows($result);
             $page = '';
             if ($tables) {
-                echo PHP_EOL."-- Jaxboards Backup {$DB->prefix} ".
-                    date('Y-m-d H:i:s').PHP_EOL.PHP_EOL;
-                echo 'SET NAMES utf8mb4;'.PHP_EOL;
-                echo "SET time_zone = '+00:00';".PHP_EOL;
-                echo 'SET foreign_key_checks = 0;'.PHP_EOL;
-                echo "SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';".PHP_EOL;
+                echo PHP_EOL . "-- Jaxboards Backup {$DB->prefix} " .
+                    date('Y-m-d H:i:s') . PHP_EOL . PHP_EOL;
+                echo 'SET NAMES utf8mb4;' . PHP_EOL;
+                echo "SET time_zone = '+00:00';" . PHP_EOL;
+                echo 'SET foreign_key_checks = 0;' . PHP_EOL;
+                echo "SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';" . PHP_EOL;
                 echo PHP_EOL;
                 foreach ($tables as $f) {
                     $f[0] = mb_substr(mb_strstr($f[0], '_'), 1);
                     $page .= $f[0];
-                    echo PHP_EOL.'-- '.$f[0].PHP_EOL.PHP_EOL;
+                    echo PHP_EOL . '-- ' . $f[0] . PHP_EOL . PHP_EOL;
                     $createtable = $DB->safespecial(
                         'SHOW CREATE TABLE %t',
                         array($f[0])
@@ -177,8 +177,8 @@ EOT
                     $thisrow = $DB->row($createtable);
                     if ($thisrow) {
                         $table = $DB->ftable($f[0]);
-                        echo "DROP TABLE IF EXISTS {$table};".PHP_EOL;
-                        echo array_pop($thisrow).';'.PHP_EOL;
+                        echo "DROP TABLE IF EXISTS {$table};" . PHP_EOL;
+                        echo array_pop($thisrow) . ';' . PHP_EOL;
                         $DB->disposeresult($createtable);
                         // only time I really want to use *
                         $select = $DB->safeselect('*', $f[0]);
@@ -186,14 +186,14 @@ EOT
                             $insert = $DB->buildInsert($row);
                             $columns = $insert[0];
                             $values = $insert[1];
-                            echo "INSERT INTO {$table} ({$columns}) ".
-                                "VALUES {$values};".PHP_EOL;
+                            echo "INSERT INTO {$table} ({$columns}) " .
+                                "VALUES {$values};" . PHP_EOL;
                         }
                         echo PHP_EOL;
                     }
                 }
                 echo PHP_EOL;
-                echo 'SET foreign_key_checks = 1;'.PHP_EOL;
+                echo 'SET foreign_key_checks = 1;' . PHP_EOL;
                 echo PHP_EOL;
             }
             die();

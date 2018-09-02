@@ -1,4 +1,9 @@
 {
+  "scripts": {
+    "prettier": "prettier --write *.{{t,j}s{,x,on},{c,sa,sc,le}ss,vue,md,y{,a}ml,graphql}",
+    "stylelint": "stylelint \"./**/*.{c,sa,sc,le}ss\"",
+    "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\""
+  },
   "devDependencies": {
     "prettier": "^1.14.2",
     "stylelint": "^9.5.0",

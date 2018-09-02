@@ -20,15 +20,15 @@ if (!defined('SERVICE_ROOT')) {
     define('SERVICE_ROOT', __DIR__);
 }
 
-if (file_exists(SERVICE_ROOT.'/install.lock')) {
+if (file_exists(SERVICE_ROOT . '/install.lock')) {
     die('Install lock file found! Please remove if you wish to install.');
 }
 
-require_once JAXBOARDS_ROOT.'/inc/classes/mysql.php';
-require_once JAXBOARDS_ROOT.'/inc/classes/jax.php';
-require_once JAXBOARDS_ROOT.'/acp/page.php';
+require_once JAXBOARDS_ROOT . '/inc/classes/mysql.php';
+require_once JAXBOARDS_ROOT . '/inc/classes/jax.php';
+require_once JAXBOARDS_ROOT . '/acp/page.php';
 // get default CFG
-require_once JAXBOARDS_ROOT.'/config.default.php';
+require_once JAXBOARDS_ROOT . '/config.default.php';
 
 /**
  * Recurisvely copies one directory to another.
@@ -44,10 +44,10 @@ function recurseCopy($src, $dst)
     @mkdir($dst);
     while (false !== ($file = readdir($dir))) {
         if (('.' !== $file) && ('..' !== $file)) {
-            if (is_dir($src.'/'.$file)) {
-                recurseCopy($src.'/'.$file, $dst.'/'.$file);
+            if (is_dir($src . '/' . $file)) {
+                recurseCopy($src . '/' . $file, $dst . '/' . $file);
             } else {
-                copy($src.'/'.$file, $dst.'/'.$file);
+                copy($src . '/' . $file, $dst . '/' . $file);
             }
         }
     }
@@ -110,7 +110,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     // Make sure each field is set
     foreach ($fields as $field => $attributes) {
         if (!$JAX->p[$field]) {
-            $errors[] = $attributes['name'].' must be filled in.';
+            $errors[] = $attributes['name'] . ' must be filled in.';
         }
     }
     if ($JAX->p['domain'] && !parse_url($JAX->p['domain'], PHP_URL_HOST)) {
@@ -148,7 +148,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     if (mb_strlen($JAX->p['admin_username']) > 50) {
         $errors[] = 'Admin username is too long';
     } elseif (preg_match('@\\W@', $JAX->p['admin_username'])) {
-        $errors[] = 'Admin username needs to consist of letters,'.
+        $errors[] = 'Admin username needs to consist of letters,' .
             'numbers, and underscore only';
     }
 
@@ -168,13 +168,13 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
 
     if (empty($errors)) {
         // write crossdomain.xml file for flash support
-        $crossDomainXML = fopen(JAXBOARDS_ROOT.'/crossdomain.xml', 'w');
+        $crossDomainXML = fopen(JAXBOARDS_ROOT . '/crossdomain.xml', 'w');
         fwrite(
             $crossDomainXML,
             str_replace(
                 '<DOMAIN>',
                 $JAX->p['domain'],
-                file_get_contents(SERVICE_ROOT.'/crossdomain.sample.xml')
+                file_get_contents(SERVICE_ROOT . '/crossdomain.sample.xml')
             )
         );
         fclose($crossDomainXML);
@@ -182,8 +182,8 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         // update with our settings
         $CFG['boardname'] = 'Jaxboards';
         $CFG['domain'] = $JAX->p['domain'];
-        $CFG['mail_from'] = $JAX->p['admin_username'].' <'.
-            $JAX->p['admin_email'].'>';
+        $CFG['mail_from'] = $JAX->p['admin_username'] . ' <' .
+            $JAX->p['admin_email'] . '>';
         $CFG['sql_db'] = $JAX->p['sql_db'];
         $CFG['sql_host'] = $JAX->p['sql_host'];
         $CFG['sql_username'] = $JAX->p['sql_username'];
@@ -191,10 +191,10 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $CFG['installed'] = true;
         $CFG['service'] = $service;
         $CFG['prefix'] = $service ? '' : 'jaxboards';
-        $CFG['sql_prefix'] = $CFG['prefix'] ? $CFG['prefix'].'_' : '';
+        $CFG['sql_prefix'] = $CFG['prefix'] ? $CFG['prefix'] . '_' : '';
 
         $PAGE->writeData(
-            JAXBOARDS_ROOT.'/config.php',
+            JAXBOARDS_ROOT . '/config.php',
             'CFG',
             $CFG
         );
@@ -246,7 +246,7 @@ EOT
         }
 
         foreach ($default_boards as $board => $boardname) {
-            $boardPrefix = $board.'_';
+            $boardPrefix = $board . '_';
             $DB->prefix($boardPrefix);
 
             if ($service) {
@@ -271,7 +271,7 @@ EOT
             // https://stackoverflow.com/a/19752106
             // It's not pretty or perfect but it'll work for our use case...
             $query = '';
-            $lines = file(SERVICE_ROOT.'/blueprint.sql');
+            $lines = file(SERVICE_ROOT . '/blueprint.sql');
             foreach ($lines as $line) {
                 // Skip comments
                 if ('--' == mb_substr($line, 0, 2) || '' == $line) {
@@ -315,18 +315,18 @@ EOT
 
             echo $DB->error();
 
-            @mkdir(JAXBOARDS_ROOT.'/boards');
-            recurseCopy('blueprint', JAXBOARDS_ROOT.'/boards/'.$board);
+            @mkdir(JAXBOARDS_ROOT . '/boards');
+            recurseCopy('blueprint', JAXBOARDS_ROOT . '/boards/' . $board);
         }
 
         // Create lock file
 
-        $file = fopen(SERVICE_ROOT.'/install.lock', 'w');
+        $file = fopen(SERVICE_ROOT . '/install.lock', 'w');
         fwrite($file, '');
         fclose($file);
 
         // send us to the service page
-        header('Location: '.dirname($_SERVER['REQUEST_URI']));
+        header('Location: ' . dirname($_SERVER['REQUEST_URI']));
     }
 }
 
@@ -359,16 +359,16 @@ foreach ($errors as $error) {
 <br/>
 <?php
 foreach ($fields as $field => $attributes) {
-    echo "    <label for=\"{$field}\">{$attributes['name']}:</label>".
+    echo "    <label for=\"{$field}\">{$attributes['name']}:</label>" .
         "<input type=\"{$attributes['type']}\"
             name=\"{$field}\" id=\"{$field}\"
-            placeholder=\"".
-            (isset($attributes['placeholder']) ? $attributes['placeholder'] : '').
+            placeholder=\"" .
+            (isset($attributes['placeholder']) ? $attributes['placeholder'] : '') .
             '"
-            value="'.
-            (isset($attributes['value']) ? $attributes['value'] : '').
+            value="' .
+            (isset($attributes['value']) ? $attributes['value'] : '') .
             '"
-        />'.
+        />' .
         '<br />';
 }
 ?>
