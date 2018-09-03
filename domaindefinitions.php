@@ -18,14 +18,14 @@ if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', __DIR__);
 }
 
-//this file must be required after mysql connecting
+// This file must be required after mysql connecting.
 if (!isset($DB)) {
     die('This file must be required after mysql connecting');
 }
 
-// figure out url
+// Figure out url.
 $host = $_SERVER['SERVER_NAME'];
-// build the url
+// Build the url.
 $baseURL = (isset($_SERVER['REQUEST_SCHEME']) ?
     $_SERVER['REQUEST_SCHEME'] : 'https') . '://';
 $baseURL .= (isset($_SERVER['SERVER_NAME']) ?
@@ -42,7 +42,7 @@ define('SCRIPTURL', BOARDURL . 'Script/');
 define('FLAGURL', BOARDURL . 'Service/flags/');
 
 $domain_match = str_replace('.', '\\.', $CFG['domain']);
-// get prefix
+// Get prefix.
 if ($CFG['service']) {
     preg_match('@(.*)\\.' . $domain_match . '@i', $host, $matches);
     if (isset($matches[1]) && $matches[1]) {
@@ -53,7 +53,7 @@ if ($CFG['service']) {
         $prefix = '';
     }
 
-    // Check for custom domain
+    // Check for custom domain.
     if (!$prefix) {
         $result = $DB->safespecial(
             'SELECT `prefix` FROM `domains` WHERE `domain`=?',

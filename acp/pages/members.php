@@ -136,7 +136,7 @@ EOT
                             'group_id', ) as $v) {
                             $write[$v] = $JAX->p[$v];
                         }
-                        //make it so root admins can't get out of admin
+                        // Make it so root admins can't get out of admin.
                         if (1 == $JAX->b['mid']) {
                             $write['group_id'] = 2;
                         }
@@ -416,7 +416,7 @@ EOT
                 $mid1int = $JAX->p['mid1'];
                 $mid2 = $JAX->p['mid2'];
 
-                //files
+                // Files.
                 $DB->safeupdate(
                     'files',
                     array(
@@ -425,7 +425,7 @@ EOT
                     'WHERE `uid`=?',
                     $mid1
                 );
-                //PMs
+                // PMs.
                 $DB->safeupdate(
                     'messages',
                     array(
@@ -442,7 +442,7 @@ EOT
                     'WHERE `from`=?',
                     $mid1
                 );
-                //posts
+                // Posts.
                 $DB->safeupdate(
                     'posts',
                     array(
@@ -451,7 +451,7 @@ EOT
                     'WHERE `auth_id`=?',
                     $mid1
                 );
-                //profile comments
+                // Profile comments.
                 $DB->safeupdate(
                     'profile_comments',
                     array(
@@ -468,7 +468,7 @@ EOT
                     'WHERE `from`=?',
                     $mid1
                 );
-                //topics
+                // Topics.
                 $DB->safeupdate(
                     'topics',
                     array(
@@ -486,7 +486,7 @@ EOT
                     $mid1
                 );
 
-                //forums
+                // Forums.
                 $DB->safeupdate(
                     'forums',
                     array(
@@ -496,7 +496,7 @@ EOT
                     $mid1
                 );
 
-                //shouts
+                // Shouts.
                 $DB->safeupdate(
                     'shouts',
                     array(
@@ -506,7 +506,7 @@ EOT
                     $mid1
                 );
 
-                //session
+                // Session.
                 $DB->safeupdate(
                     'session',
                     array(
@@ -516,7 +516,7 @@ EOT
                     $mid1
                 );
 
-                //arcade
+                // Arcade.
                 $DB->safeupdate(
                     'arcade_scores',
                     array(
@@ -534,7 +534,7 @@ EOT
                     $mid1
                 );
 
-                //sum post count on account being merged into
+                // Sum post count on account being merged into.
                 $result = $DB->safeselect(
                     '`posts`,`id`',
                     'members',
@@ -556,10 +556,10 @@ EOT
                     $mid2
                 );
 
-                //delete the account
+                // Delete the account.
                 $DB->safedelete('members', 'WHERE `id`=?', $mid1);
 
-                //update stats
+                // Update stats.
                 $DB->safespecial(
                     <<<'EOT'
 UPDATE %t
@@ -609,18 +609,18 @@ EOT
             } else {
                 $mid = $DB->basicvalue($JAX->p['mid']);
 
-                //PMs
+                // PMs.
                 $DB->safedelete('messages', 'WHERE `to`=?', $mid);
                 $DB->safedelete('messages', 'WHERE `from`=?', $mid);
-                //posts
+                // Posts.
                 $DB->safedelete('posts', 'WHERE `auth_id`=?', $mid);
-                //profile comments
+                // Profile comments.
                 $DB->safedelete('profile_comments', 'WHERE `to`=?', $mid);
                 $DB->safedelete('profile_comments', 'WHERE `from`=?', $mid);
-                //topics
+                // Topics.
                 $DB->safedelete('topics', 'WHERE `auth_id`=?', $mid);
 
-                //forums
+                // Forums.
                 $DB->safeupdate(
                     'forums',
                     array(
@@ -633,23 +633,22 @@ EOT
                     $mid
                 );
 
-                //shouts
+                // Shouts.
                 $DB->safedelete('shouts', 'WHERE `uid`=?', $mid);
 
-                //session
+                // Session.
                 $DB->safedelete('session', 'WHERE `uid`=?', $mid);
 
-                //arcade
+                // Arcade.
                 $DB->safedelete('arcade_scores', 'WHERE `uid`=?', $mid);
-                //TODO: Fix arcade game leader of deleted member
-                //if they have high scores
-
-                //delete the account
+                // TODO: Fix arcade game leader of deleted member
+                // if they have high scores
+                // delete the account.
                 $DB->safedelete('members', 'WHERE `id`=?', $mid);
 
                 $DB->fixAllForumLastPosts();
 
-                //update stats
+                // Update stats.
                 $DB->safespecial(
                     <<<'EOT'
 UPDATE %t
@@ -688,12 +687,13 @@ EOT
             $data = explode(PHP_EOL, $JAX->p['ipbans']);
             foreach ($data as $k => $v) {
                 $iscomment = false;
-                //check to see if each line is an ip, if it isn't, add a comment
+                // Check to see if each line is an ip, if it isn't,
+                // add a comment.
                 if ('#' == $v[0]) {
                     $iscomment = true;
                 } elseif (!filter_var($v, FILTER_VALIDATE_IP)) {
                     if (mb_strstr($v, '.')) {
-                        // IPv4 stuff
+                        // IPv4 stuff.
                         $d = explode('.', $v);
                         if (!trim($v)) {
                             continue;
@@ -710,10 +710,10 @@ EOT
                             }
                         }
                     } elseif (mb_strstr($v, ':')) {
-                        // must be IPv6
+                        // Must be IPv6.
                         if (!filter_var($v, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-                            // only need to run these checks if
-                            // it's not a valid IPv6 address
+                            // Only need to run these checks if
+                            // it's not a valid IPv6 address.
                             $d = explode(':', $v);
                             if (!trim($v)) {
                                 continue;

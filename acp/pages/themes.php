@@ -95,11 +95,11 @@ class themes
             }
         }
 
-        //make an array of wrappers
+        // Make an array of wrappers.
         $wrappers = $this->getwrappers();
 
         if (@$JAX->p['submit']) {
-            //update wrappers/hidden status
+            // Update wrappers/hidden status.
             if (!isset($JAX->p['hidden'])) {
                 $JAX->p['hidden'] = array();
             }
@@ -192,7 +192,7 @@ class themes
                 }
             }
 
-            //set default
+            // Set default.
             $DB->safeupdate(
                 'skins',
                 array(
@@ -456,7 +456,7 @@ EOT;
             'WHERE `id`=?',
             $id
         );
-        //make a random skin default if it's the default
+        // Make a random skin default if it's the default.
         if ($skin['default']) {
             $DB->safeupdate(
                 'skins',

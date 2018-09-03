@@ -98,13 +98,14 @@ EOT
             ++$stat['posts'];
         }
 
-        //go through and sum up category posts as well as forums with subforums
+        // Go through and sum up category posts as well
+        // as forums with subforums.
         $result = $DB->safeselect(
             '`id`,`path`,`cat_id`',
             'forums'
         );
         while ($f = $DB->arow($result)) {
-            //I realize I don't use cat stats yet, but I may.
+            // I realize I don't use cat stats yet, but I may.
             if (!isset($stat['cat_posts'][$f['cat_id']])) {
                 $stat['cat_posts'][$f['cat_id']] = 0;
             }
@@ -122,12 +123,11 @@ EOT
             }
         }
 
-        //YEAH, this is bad. A bajillion update statements
-        //however, I have been unable to find a better way to do this.
-        //I have to do a seperate update query for every user,
-        //topic, category, and forum. pretty sick.
-
-        //Update Topic Replies
+        // YEAH, this is bad. A bajillion update statements
+        // however, I have been unable to find a better way to do this.
+        // I have to do a seperate update query for every user,
+        // topic, category, and forum. pretty sick.
+        // Update Topic Replies.
         foreach ($stat['topic_posts'] as $k => $v) {
             $DB->safeupdate(
                 'topics',
@@ -139,7 +139,7 @@ EOT
             );
         }
 
-        //Update member posts
+        // Update member posts.
         foreach ($stat['member_posts'] as $k => $v) {
             $DB->safeupdate(
                 'members',
@@ -151,7 +151,7 @@ EOT
             );
         }
 
-        //Update forum posts
+        // Update forum posts.
         foreach ($stat['forum_posts'] as $k => $v) {
             $DB->safeupdate(
                 'forums',
@@ -164,7 +164,7 @@ EOT
             );
         }
 
-        //get # of members
+        // Get # of members.
         $result = $DB->safeselect(
             'COUNT(`id`)',
             'members'
@@ -173,7 +173,7 @@ EOT
         $stat['members'] = array_pop($thisrow);
         $DB->disposeresult($result);
 
-        //Update global board stats
+        // Update global board stats.
         $DB->safeupdate(
             'stats',
             array(

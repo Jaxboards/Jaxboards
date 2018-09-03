@@ -1,10 +1,9 @@
 <?php
 
-//IMPORTANT TO DO: fix file uploading so that it checks
-//permissions within the forum
-//I've already hidden the attach files button,
-//but it's possible for people to still upload
-
+// IMPORTANT TO DO: fix file uploading so that it checks
+// permissions within the forum
+// I've already hidden the attach files button,
+// but it's possible for people to still upload.
 $PAGE->metadefs['post-preview'] = $PAGE->meta('box', '', 'Post Preview', '%s');
 
 new POST();
@@ -27,12 +26,12 @@ class POST
             $this->postdata = $JAX->p['postdata'];
         }
         if ($this->postdata) {
-            //linkify stuff before sending it
+            // Linkify stuff before sending it.
             $this->postdata = str_replace("\t", '    ', $this->postdata);
             $codes = $JAX->startcodetags($this->postdata);
             $this->postdata = $JAX->linkify($this->postdata);
             $this->postdata = $JAX->finishcodetags($this->postdata, $codes, true);
-            //poor forum martyr
+            // Poor forum martyr.
             $this->postdata = str_replace('youtube]', 'video]', $this->postdata);
         }
         if (isset($JAX->b['uploadflash']) && $JAX->b['uploadflash']) {
@@ -68,10 +67,11 @@ class POST
 
     public function uploadviaflash()
     {
-        //it's flash 10 already and filereference.upload doesn't send cookies
-        //using SESSION to get id rather than $USER because no cookies are sent
+        // It's flash 10 already and filereference.upload doesn't send cookies
+        // using SESSION to get id rather than $USER because no cookies are
+        // sent.
         global $DB,$JAX;
-        /* This was almost certainly a security hole before. */
+        // This was almost certainly a security hole before.
         $result = $DB->safeselect(
             '`uid`',
             'session',
@@ -85,7 +85,7 @@ class POST
             return 'must be logged in';
         }
         $fileobj = $_FILES['Filedata'];
-        //flash gets this wrong, this normalizes
+        // Flash gets this wrong, this normalizes.
         $fileobj['name'] = $JAX->b['Filename'];
 
         return $this->upload($fileobj, $data['uid']);
@@ -101,7 +101,6 @@ class POST
             return 'must be logged in';
         }
         $size = filesize($fileobj['tmp_name']);
-        //if($size>$CFG['maxupload']) return "too big!";
         $hash = hash_file('sha512', $fileobj['tmp_name']);
         $uploadpath = BOARDPATH . 'Uploads/';
 
@@ -591,7 +590,7 @@ EOT
                     $e = "You didn't provide any poll choices!";
                 }
             }
-            //perms
+            // Perms.
             $result = $DB->safeselect(
                 '`perms`',
                 'forums',
@@ -712,7 +711,7 @@ EOT
             return false;
         }
 
-        //Actually PUT THE POST IN for godsakes
+        // Actually PUT THE POST IN for godsakes.
         $DB->safeinsert(
             'posts',
             array(
@@ -726,7 +725,7 @@ EOT
         );
 
         $pid = $DB->insert_id(1);
-        //set op
+        // Set op.
         if ($newtopic) {
             $DB->safeupdate(
                 'topics',
@@ -738,7 +737,7 @@ EOT
             );
         }
 
-        //update activity history
+        // Update activity history.
         $DB->safeinsert(
             'activity',
             array(
@@ -751,8 +750,8 @@ EOT
             )
         );
 
-        //update last post info
-        //for the topic:
+        // Update last post info
+        // for the topic.
         if (!$newtopic) {
             $DB->safespecial(
                 <<<'EOT'
@@ -768,7 +767,7 @@ EOT
             );
         }
 
-        //do some magic to update the tree all the way up (for subforums)
+        // Do some magic to update the tree all the way up (for subforums).
         $path = trim($fdata['path']) ? explode(' ', $fdata['path']) : array();
         if (!in_array($fdata['id'], $path)) {
             $path[] = $fdata['id'];
@@ -808,7 +807,7 @@ EOT
             );
         }
 
-        //update statistics
+        // Update statistics.
         if (!$fdata['nocount']) {
             $DB->safespecial(
                 <<<'EOT'

@@ -124,7 +124,8 @@ EOT
                 $t['display_name']
             ),
             $t['tid'],
-            $t['id'], //pid
+            $t['id'],
+            // Post id.
             $t['title'],
             $t['fid'],
             $t['ftitle'],

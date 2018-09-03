@@ -71,13 +71,15 @@ class MySQL
         return $this->db;
     }
 
-    public function safeselect($selectors, $table, $where = '' /*, ... */)
+    public function safeselect($selectors, $table, $where = '')
     {
         $va_array = func_get_args();
-        array_shift($va_array); // selectors
-        array_shift($va_array); // table
-        array_shift($va_array); // where
-
+        array_shift($va_array);
+        // Selectors.
+        array_shift($va_array);
+        // Table.
+        array_shift($va_array);
+        // Where.
         $query = 'SELECT ' . $selectors . ' FROM ' .
             $this->ftable($table) . ($where ? ' ' . $where : '');
         array_unshift($va_array, $query);
@@ -132,15 +134,16 @@ class MySQL
         return $r;
     }
 
-    public function safeupdate($table, $kvarray, $whereformat = '' /*, ... */)
+    public function safeupdate($table, $kvarray, $whereformat = '')
     {
         $whereparams = func_get_args();
-        array_shift($whereparams); // table
-        array_shift($whereparams); // kvarray
-        array_shift($whereparams); // whereformat
-
-        /* $whereparams now contains the parameters for the "WHERE" clause. */
-
+        array_shift($whereparams);
+        // Table.
+        array_shift($whereparams);
+        // Key-value array.
+        array_shift($whereparams);
+        // Whereformat
+        // $whereparams now contains the parameters for the "WHERE" clause.
         $va_array = array_merge(array_values($kvarray), $whereparams);
 
         $keynames = $this->safeBuildUpdate($kvarray);
@@ -152,8 +155,6 @@ class MySQL
 
         array_unshift($va_array, $query);
 
-        // syslog(LOG_ERR, "ARRAY: ".print_r($va_array, true));
-
         return call_user_func_array(array($this, 'safequery'), $va_array);
     }
 
@@ -163,8 +164,11 @@ class MySQL
             return '';
         }
 
-        /* e.g. if array is a => b; c => c; then result is a = ?, b = ?,
-          where the first " = ?," comes from the implode. */
+        /*
+         * e.g. if array is a => b; c => c; then result is a = ?, b = ?,
+         * where the first " = ?," comes from the implode.
+         */
+
         return '`' . implode('` = ?, `', array_keys($kvarray)) . '` = ?';
     }
 
@@ -178,18 +182,19 @@ class MySQL
         return mb_substr($r, 0, -1);
     }
 
-    public function safedelete($table, $whereformat /*, ... */)
+    public function safedelete($table, $whereformat)
     {
         $query = 'DELETE FROM ' . $this->ftable($table) .
             ($whereformat ? ' ' . $whereformat : '');
 
         $va_array = func_get_args();
 
-        array_shift($va_array); /* table */
-        array_shift($va_array); /* whereformat */
-
-        array_unshift($va_array, $query); /* Put the format string back. */
-
+        array_shift($va_array);
+        // Table.
+        array_shift($va_array);
+        // Whereformat.
+        array_unshift($va_array, $query);
+        // Put the format string back.
         return call_user_func_array(array($this, 'safequery'), $va_array);
     }
 
@@ -202,7 +207,7 @@ class MySQL
         return $ret;
     }
 
-    /* Only new-style mysqli */
+    // Only new-style mysqli.
     public function arows($a = null)
     {
         $a = $a ? $a : $this->lastQuery;
@@ -213,12 +218,13 @@ class MySQL
         return false;
     }
 
-    /* Only new-style mysqli */
+    // Only new-style mysqli.
     public function rows($a = null)
     {
         $a = $a ? $a : $this->lastQuery;
         if ($a) {
-            return $a->fetch_all(MYSQLI_BOTH); // Disturbingly, not MYSQLI_NUM
+            return $a->fetch_all(MYSQLI_BOTH);
+            // Disturbingly, not MYSQLI_NUM.
         }
 
         return false;
@@ -263,7 +269,7 @@ class MySQL
         $result->fetch_all();
     }
 
-    /* Warning: nested arrays are *not* supported. */
+    // Warning: nested arrays are *not* supported.
     public function safequery_array_types($items)
     {
         $ret = '';
@@ -287,9 +293,8 @@ class MySQL
         return $type;
     }
 
-    /* blah ?1 blah ?2 blah ?3 blah */
-
-    /* Note that placeholder_number is indexed from 1. */
+    // Blah ?1 blah ?2 blah ?3 blah
+    // Note that placeholder_number is indexed from 1.
     public function safequery_sub_array($query_string, $placeholder_number, $arrlen)
     {
         $arr = explode('?', $query_string, $placeholder_number + 1);
@@ -302,7 +307,7 @@ class MySQL
         return implode('?', $arr) . $replacement . $last;
     }
 
-    public function safequery($query_string /*, ... */)
+    public function safequery($query_string)
     {
         $my_argc = func_num_args();
         $connection = $this->mysqli_connection;
@@ -393,7 +398,7 @@ class MySQL
 
         if (!$retval) {
             if (!preg_match('/^\\s*(UPDATE|DELETE|INSERT)\\s/i', $query_string)) {
-                /* This is normal for a non-SELECT query. */
+                // This is normal for a non-SELECT query.
                 syslog(LOG_ERR, "Result is NULL for ${query_string}" . PHP_EOL);
             }
         }
@@ -424,7 +429,7 @@ class MySQL
         return '`' . $this->escape($key) . '`';
     }
 
-    /* Like evalue, but does not quote strings.  For use with safequery(). */
+    // Like evalue, but does not quote strings.  For use with safequery().
     public function basicvalue($value, $forsprintf = 0)
     {
         if (is_array($value)) {
@@ -462,13 +467,14 @@ class MySQL
         return addslashes($a);
     }
 
-    public function safespecial(/* $format, $tablenames, ... */)
+    public function safespecial()
     {
         $va_array = func_get_args();
 
-        $format = array_shift($va_array); /* Format */
-        $tablenames = array_shift($va_array); /* Table names */
-
+        $format = array_shift($va_array);
+        // Format.
+        $tablenames = array_shift($va_array);
+        // Table names.
         $tempformat = str_replace('%t', '%s', $format);
 
         if (!$tablenames) {
@@ -492,8 +498,8 @@ class MySQL
             )
         );
 
-        array_unshift($va_array, $newformat); /* Put the format string back. */
-
+        array_unshift($va_array, $newformat);
+// Put the format string back.
         return call_user_func_array(array($this, 'safequery'), $va_array);
     }
 
@@ -545,8 +551,11 @@ EOT
                 }
             }
 
-            /*since we update the session data at the END of the page,
-             we'll want to include the user in the usersonline */
+            /*
+             * since we update the session data at the END of the page,
+             * we'll want to include the user in the usersonline
+             */
+
             if ($USER && isset($r[$USER['id']]) && $r[$USER['id']]) {
                 $r[$USER['id']] = array(
                     'uid' => $USER['id'],

@@ -25,7 +25,7 @@ if (!defined('JAXBOARDS_ROOT')) {
 }
 
 // This is the best place to load the password compatibility library,
-// so do it here:
+// so do it here.
 if (!function_exists('password_hash')) {
     include_once JAXBOARDS_ROOT . '/inc/lib/password.php';
 }
@@ -51,7 +51,7 @@ $JAX = new JAX();
 $submitted = false;
 if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     $submitted = true;
-    // start with least permissions, not admin, no password
+    // Start with least permissions, not admin, no password.
     $notadmin = true;
 
     $u = $JAX->p['user'];
@@ -71,7 +71,7 @@ EOT
     $uinfo = $DB->arow($result);
     $DB->disposeresult($result);
 
-    // Check password
+    // Check password.
     if (is_array($uinfo)) {
         if ($uinfo['can_access_acp']) {
             $notadmin = false;

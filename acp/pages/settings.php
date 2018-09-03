@@ -129,8 +129,9 @@ EOT;
     }
 
     /*
-     Pages
+     * Pages
      */
+
     public function pages()
     {
         global $DB,$PAGE,$JAX;
@@ -284,8 +285,9 @@ EOT;
     }
 
     /*
-     Shoutbox
+     * Shoutbox
      */
+
     public function shoutbox()
     {
         global $PAGE,$JAX,$DB;

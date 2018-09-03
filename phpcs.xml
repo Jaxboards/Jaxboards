@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <ruleset name="Jaxboards">
     <description>Jaxboards PHP coding standards</description>
-
-		<!-- Files and directories to run on -->
+    <!-- Files and directories to run on -->
     <file>acp</file>
     <file>inc</file>
     <file>emoticons</file>
@@ -12,43 +11,41 @@
     <file>config.default.php</file>
     <file>domaindefinitions.php</file>
     <file>index.php</file>
-
     <!-- inc/lib files are third party, so we shouldn't touch them -->
     <exclude-pattern>*/inc/lib/*</exclude-pattern>
     <!-- ignore vendor files -->
     <exclude-pattern>*/vendor/*</exclude-pattern>
     <exclude-pattern>*/node_modules/*</exclude-pattern>
-
-		<!-- basepath is where this file is -->
+    <!-- basepath is where this file is -->
     <arg name="basepath" value="."/>
-		<!-- show colors -->
-    <arg name="colors" />
-		<!-- process files in parallel -->
-    <arg name="parallel" value="64" />
+    <!-- show colors -->
+    <arg name="colors"/>
+    <!-- process files in parallel -->
+    <arg name="parallel" value="64"/>
     <!-- only check php files -->
-    <arg name="extensions" value="php" />
-
-		<!-- Follow PSR coding style guides -->
-		<!-- PSR1: Basic Coding Standard https://www.php-fig.org/psr/psr-1 -->
+    <arg name="extensions" value="php"/>
+    <!-- Follow PSR coding style guides -->
+    <!-- PSR1: Basic Coding Standard https://www.php-fig.org/psr/psr-1 -->
     <rule ref="PSR1">
-      <!-- Disable these rules temporarily as they require big changes to
-        the codebase -->
-      <exclude name="PSR1.Files.SideEffects" />
-      <exclude name="PSR1.Classes.ClassDeclaration" />
-      <exclude name="PSR1.Methods.CamelCapsMethodName" />
+        <!-- Disable these rules temporarily as they require big changes to the codebase -->
+        <exclude name="PSR1.Files.SideEffects"/>
+        <exclude name="PSR1.Classes.ClassDeclaration"/>
+        <exclude name="PSR1.Methods.CamelCapsMethodName"/>
     </rule>
-		<!-- PSR2: Coding Style Guide https://www.php-fig.org/psr/psr-2 -->
-    <rule ref="PSR2" />
-		<!-- PSR12 (draft): Extended Coding Style Guide
-			https://github.com/php-fig/fig-standards/blob/master/proposed/extended-coding-style-guide.md -->
-    <rule ref="PSR12" />
-
-    <!-- Disable some more rules temporarily as they require big changes to
-      the codebase -->
+    <!-- Disable some more rules temporarily as they require big changes to the codebase -->
     <rule ref="Squiz.Classes.ValidClassName">
-      <severity>0</severity>
+        <severity>0</severity>
     </rule>
-
+    <!-- PSR2: Coding Style Guide https://www.php-fig.org/psr/psr-2 -->
+    <rule ref="PSR2"/>
+    <!-- PSR12 (draft): Extended Coding Style Guide https://github.com/php-fig/fig-standards/blob/master/proposed/extended-coding-style-guide.md -->
+    <rule ref="PSR12"/>
+    <!-- Comment rules: we're not ready for this yet -->
+    <!--rule ref="Squiz.Commenting" /-->
+    <!-- Here's some comment rules we can follow though -->
+    <rule ref="Squiz.Commenting.InlineComment" />
+    <rule ref="Squiz.Commenting.PostStatementComment" />
+    <rule ref="Squiz.Commenting.BlockComment" />
     <!-- Ban some functions -->
     <rule ref="Generic.PHP.ForbiddenFunctions">
         <properties>
@@ -127,6 +124,4 @@
             </property>
         </properties>
     </rule>
-
 </ruleset>
-

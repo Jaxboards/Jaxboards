@@ -27,17 +27,17 @@ class IM
             return;
         }
         $enemies = explode(',', $USER['enemies']);
-        //kinda gross I know, unparses then parses then
-        //unparses again later on.. o well
+        // Kinda gross I know, unparses then parses then
+        // unparses again later on.. Oh well.
         $exploded = explode(PHP_EOL, $SESS->runonce);
         foreach ($exploded as $k => $v) {
             $v = json_decode($v);
             if ('im' == $v[0]) {
                 unset($exploded[$k]);
                 if (in_array($v[1], $enemies)) {
-                    //this user's blocked, don't do anything
+                    // This user's blocked, don't do anything.
                 } else {
-                    //send it on up
+                    // Send it on up.
                     $PAGE->JSRawArray($v);
                 }
             }
@@ -124,7 +124,7 @@ EOT
         return 0 != $DB->affected_rows(1);
     }
 
-    //stuff I'm doin
+    // Stuff I'm doing.
     public function invite($room, $uid, $otherguy = false)
     {
         global $USER,$CFG,$DB;
@@ -133,9 +133,9 @@ EOT
         }
         if ($otherguy) {
             $room = base64_encode(openssl_random_pseudo_bytes(128));
-            //make the window the guy that invited multi
+            // Make the window the guy that invited multi.
             $PAGE->JS('immakemulti', $otherguy);
-            //update other guy
+            // Update other guy.
             $this->sendcmd(array('immakemulti', $USER['id']), $otherguy);
         }
         $this->sendcmd(array('iminvite', $room));

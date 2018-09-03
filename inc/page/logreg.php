@@ -36,8 +36,7 @@ class LOGREG
     public function register()
     {
         $this->registering = true;
-        //TODO: Valid email check?
-
+        // TODO: Valid email check?
         global $PAGE,$JAX,$DB,$CFG;
 
         $e = '';
@@ -100,7 +99,7 @@ class LOGREG
                 $PAGE->JS('alert', $e);
                 $PAGE->append('page', $PAGE->meta('error', $e));
             } else {
-                //all clear!
+                // All clear!
                 $DB->safeinsert(
                     'members',
                     array(
@@ -203,8 +202,8 @@ EOT
     public function logout()
     {
         global $DB,$PAGE,$JAX,$SESS;
-        //just make a new session rather than fuss with the old one,
-        //to maintain users online
+        // Just make a new session rather than fuss with the old one,
+        // to maintain users online.
         if (isset($JAX->c['utoken'])) {
             $DB->safedelete(
                 'tokens',
@@ -327,14 +326,14 @@ EOT
                             'WHERE `id`=?',
                             $DB->basicvalue($udata['id'])
                         );
-                        // delete all forgotpassword tokens for this user
+                        // Delete all forgotpassword tokens for this user.
                         $DB->safedelete(
                             'tokens',
                             "WHERE `uid`=? AND `type`='forgotpassword'",
                             $DB->basicvalue($udata['id'])
                         );
 
-                        // get username
+                        // Get username.
                         $result = $DB->safeselect(
                             '`id`,`name`',
                             'members',
@@ -343,8 +342,8 @@ EOT
                         );
                         $udata = $DB->arow($result);
 
-                        //just making use of the way
-                        //registration redirects to the index
+                        // Just making use of the way
+                        // registration redirects to the index.
                         $this->registering = true;
 
                         return $this->login($udata['name'], $JAX->p['pass1']);
@@ -380,7 +379,7 @@ EOT
                 if ($e) {
                     $page .= $PAGE->meta('error', $e);
                 } else {
-                    // generate token
+                    // Generate token.
                     $forgotpasswordtoken =
                         base64_encode(openssl_random_pseudo_bytes(128));
                     $DB->safeinsert(

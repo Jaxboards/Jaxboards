@@ -51,13 +51,13 @@ EOT
         );
         $data = $this->subforums = $this->subforumids = $this->mods = array();
 
-        //this while loop just grabs all of the data, displaying is done below
+        // This while loop just grabs all of the data, displaying is done below.
         while ($r = $DB->arow($result)) {
             $perms = $JAX->parseperms($r['perms'], $USER ? $USER['group_id'] : 3);
             if ($r['perms'] && !$perms['view']) {
                 continue;
             }
-            //store subforum details for later
+            // Store subforum details for later.
             if ($r['path']) {
                 preg_match('@\\d+$@', $r['path'], $m);
                 $this->subforumids[$m[0]][] = $r['id'];
@@ -71,7 +71,7 @@ EOT
                 $data[$r['cat_id']][] = $r;
             }
 
-            //store mod details for later
+            // Store mod details for later.
             if ($r['show_ledby'] && $r['mods']) {
                 foreach (explode(',', $r['mods']) as $v) {
                     if ($v) {

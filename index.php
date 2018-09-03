@@ -24,15 +24,15 @@ $local = '127.0.0.1' == $_SERVER['REMOTE_ADDR'];
 $microtime = microtime(true);
 
 // This is the best place to load the password compatibility library,
-// so do it here:
+// so do it here.
 if (!function_exists('password_hash')) {
     include_once JAXBOARDS_ROOT . '/inc/lib/password.php';
 }
 
-/*get the config*/
+// Get the config.
 require 'config.php';
 
-/*DB connect!*/
+// DB connect!
 require_once 'inc/classes/mysql.php';
 $DB = new MySQL();
 $connected = $DB->connect(
@@ -45,22 +45,22 @@ if (!$connected) {
     die('Could not connect');
 }
 
-// start a session
+// Start a session.
 ini_set('session.cookie_secure', 1);
 ini_set('session.cookie_httponly', 1);
 ini_set('session.use_cookies', 1);
 ini_set('session.use_only_cookies', 1);
 session_start();
 
-/*Board Service Stuff, get the board as specified by URL*/
+// Board Service Stuff, get the board as specified by URL.
 require_once 'domaindefinitions.php';
 
-/*Require the classes*/
-require_once 'inc/classes/page.php';
-require_once 'inc/classes/jax.php';
-require_once 'inc/classes/sess.php';
+// Require the classes.
+require_once JAXBOARDS_ROOT . 'inc/classes/page.php';
+require_once JAXBOARDS_ROOT . 'inc/classes/jax.php';
+require_once JAXBOARDS_ROOT . 'inc/classes/sess.php';
 
-/*Initialize them*/
+// Initialize them.
 if (isset($CFG['noboard']) && $CFG['noboard']) {
     die('board not found');
 }
@@ -88,7 +88,7 @@ if (!$SESS->is_bot && isset($_SESSION['uid']) && $_SESSION['uid']) {
 $USER = &$JAX->userData;
 $PERMS = $JAX->getPerms();
 
-/*fix ip if necessary*/
+// Fix ip if necessary.
 if ($USER && $SESS->ip != $USER['ip']) {
     $DB->safeupdate(
         'members',
@@ -100,7 +100,7 @@ if ($USER && $SESS->ip != $USER['ip']) {
     );
 }
 
-/*load the theme*/
+// Load the theme.
 $PAGE->loadskin(
     $JAX->pick(
         isset($SESS->vars['skin_id']) ? $SESS->vars['skin_id'] : false,
@@ -109,7 +109,7 @@ $PAGE->loadskin(
 );
 $PAGE->loadmeta('global');
 
-/*skin selector*/
+// Skin selector.
 if (isset($JAX->b['skin_id'])) {
     if (!$JAX->b['skin_id']) {
         $SESS->delvar('skin_id');
@@ -135,7 +135,6 @@ if (isset($SESS->vars['skin_id']) && $SESS->vars['skin_id']) {
 // If they're logged in through cookies, (username & password)
 // but the session variable has changed/been removed/not updated for some reason
 // this fixes it.
-
 if ($JAX->userData && !$SESS->is_bot) {
     if ($JAX->userData['id'] != $SESS->uid) {
         $SESS->clean($USER['id']);
@@ -144,13 +143,12 @@ if ($JAX->userData && !$SESS->is_bot) {
     }
 }
 
-// If the user's navigated to a new page, change their action time (they're alive!)
+// If the user's navigated to a new page, change their action time.
 if ($PAGE->jsnewlocation || !$PAGE->jsaccess) {
     $SESS->act(isset($JAX->b['act']) ? $JAX->b['act'] : null);
 }
 
-/*Set Navigation*/
-
+// Set Navigation.
 $PAGE->path(array($JAX->pick($CFG['boardname'], 'Home') => '?'));
 $PAGE->append(
     'TITLE',
@@ -310,7 +308,7 @@ if ('logreg' != $JAX->b['act']
     }
 }
 
-//include modules :3
+// Include modules.
 foreach (glob('inc/modules/*.php') as $v) {
     if (preg_match('/tag_(\\w+)/', $v, $m)) {
         if (isset($m[1]) && ((isset($JAX->b['module'])
@@ -331,7 +329,7 @@ foreach (glob('inc/modules/*.php') as $v) {
     }
 }
 
-//looks like it's straight out of IPB, doesn't it
+// Looks like it's straight out of IPB, doesn't it?
 $actraw = isset($JAX->b['act']) ? mb_strtolower($JAX->b['act']) : '';
 preg_match('@^[a-zA-Z_]+@', $actraw, $act);
 $act = array_shift($act);
@@ -345,7 +343,7 @@ if (isset($actdefs[$act]) && $actdefs[$act]) {
     $act = $actdefs[$act];
 }
 if ('idx' == $act && isset($JAX->b['module']) && $JAX->b['module']) {
-    //do nothing
+    // Do nothing.
 } elseif ($act && is_file($act = 'inc/page/' . $act . '.php')) {
     include_once $act;
 } elseif (!$PAGE->jsaccess || $PAGE->jsnewlocation) {
@@ -367,18 +365,18 @@ if ('idx' == $act && isset($JAX->b['module']) && $JAX->b['module']) {
     }
 }
 
-// Process temporary commands
+// Process temporary commands.
 if ($PAGE->jsaccess && $SESS->runonce) {
     $PAGE->JSRaw($SESS->runonce);
     $SESS->runonce = '';
 }
 
-// keeps people from leaving their windows open all night
+// Keeps people from leaving their windows open all night.
 if (($SESS->last_update - $SESS->last_action) > 1200) {
     $PAGE->JS('script', 'window.name=Math.random()');
 }
-//any changes to the session variables of the
-//current user throughout the script are finally put into query form here
+// Any changes to the session variables of the
+// current user throughout the script are finally put into query form here.
 $SESS->applyChanges();
 
 if (in_array($JAX->getIp(), array('127.0.0.1', '::1'))) {

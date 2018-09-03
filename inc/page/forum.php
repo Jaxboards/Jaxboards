@@ -41,7 +41,7 @@ class FORUM
     {
         global $DB,$PAGE,$JAX,$PERMS,$USER;
 
-        //if no fid supplied, go to the index and halt execution
+        // If no fid supplied, go to the index and halt execution.
         if (!$fid) {
             return $PAGE->location('?');
         }
@@ -104,13 +104,12 @@ EOT
             return $PAGE->location('?');
         }
 
-        /*NOW we can actually start building the page*/
-
-        //subforums
-        //right now, this loop also fixes the number of pages to show in a forum
-        //parent forum - subforum topics = total topics
-        //I'm fairly sure this is faster than doing
-        //`SELECT count(*) FROM topics`... but I haven't benchmarked it
+        // NOW we can actually start building the page
+        // subforums
+        // right now, this loop also fixes the number of pages to show in a forum
+        // parent forum - subforum topics = total topics
+        // I'm fairly sure this is faster than doing
+        // `SELECT count(*) FROM topics`... but I haven't benchmarked it.
         $result = $DB->safespecial(
             <<<'EOT'
 SELECT f.`id` AS `id`,f.`cat_id` AS `cat_id`,f.`title` AS `title`,
@@ -185,7 +184,7 @@ EOT
 
         $rows = $table = '';
 
-        //generate pages
+        // Generate pages.
         $numpages = ceil($fdata['topics'] / $this->numperpage);
         $forumpages = '';
         if ($numpages) {
@@ -196,7 +195,7 @@ EOT
             }
         }
 
-        //buttons
+        // Buttons.
         $forumbuttons = '&nbsp;' .
             ($fdata['perms']['start'] ? '<a href="?act=post&amp;fid=' . $fid . '">' .
             ($PAGE->meta(
@@ -211,7 +210,7 @@ EOT
             $forumbuttons
         );
 
-        //do order by
+        // Do order by.
         $orderby = '`lp_date` DESC';
         if ($fdata['orderby']) {
             $fdata['orderby'] = (int) $fdata['orderby'];
@@ -230,7 +229,7 @@ EOT
             }
         }
 
-        //topics
+        // Topics.
         $result = $DB->safespecial(
             <<<EOT
 SELECT t.`id` AS `id`,t.`title` AS `title`,t.`subtitle` AS `subtitle`,
@@ -277,28 +276,50 @@ EOT
             $unread = false;
             $rows .= $PAGE->meta(
                 'forum-row',
-                $f['id'], //1
-                $JAX->wordfilter($f['title']), //2
-                $JAX->wordfilter($f['subtitle']), //3
-                $PAGE->meta('user-link', $f['auth_id'], $f['auth_gid'], $f['auth_name']), //4
-                $f['replies'], //5
-                number_format($f['views']), //6
-                $JAX->date($f['lp_date']), //7
-                $PAGE->meta('user-link', $f['lp_uid'], $f['lp_gid'], $f['lp_name']), //8
-                ($f['pinned'] ? 'pinned' : '') . ' ' . ($f['locked'] ? 'locked' : ''), //9
-                $f['summary'] ? $f['summary'] . (mb_strlen($f['summary']) > 45 ? '...' : '') : '', //10
-                $PERMS['can_moderate'] ? '<a href="?act=modcontrols&do=modt&tid=' . $f['id'] . '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>' : '', //11
-                $pages, //12
-                ($read = $this->isTopicRead($f, $fid)) ? 'read' : 'unread', //13
-                $read ? $JAX->pick($PAGE->meta('topic-icon-read'), $PAGE->meta('icon-read')) : $JAX->pick($PAGE->meta('topic-icon-unread'), $PAGE->meta('icon-read')) //14
+                $f['id'],
+                // 1
+                $JAX->wordfilter($f['title']),
+                // 2
+                $JAX->wordfilter($f['subtitle']),
+                // 3
+                $PAGE->meta('user-link', $f['auth_id'], $f['auth_gid'], $f['auth_name']),
+                // 4
+                $f['replies'],
+                // 5
+                number_format($f['views']),
+                // 6
+                $JAX->date($f['lp_date']),
+                // 7
+                $PAGE->meta('user-link', $f['lp_uid'], $f['lp_gid'], $f['lp_name']),
+                // 8
+                ($f['pinned'] ? 'pinned' : '') . ' ' . ($f['locked'] ? 'locked' : ''),
+                // 9
+                $f['summary'] ? $f['summary'] . (mb_strlen($f['summary']) > 45 ? '...' : '') : '',
+                // 10
+                $PERMS['can_moderate'] ? '<a href="?act=modcontrols&do=modt&tid=' .
+                $f['id'] . '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>' : '',
+                // 11
+                $pages,
+                // 12
+                ($read = $this->isTopicRead($f, $fid)) ? 'read' : 'unread',
+                // 13
+                $read ? $JAX->pick(
+                    $PAGE->meta('topic-icon-read'),
+                    $PAGE->meta('icon-read')
+                )
+                : $JAX->pick(
+                    $PAGE->meta('topic-icon-unread'),
+                    $PAGE->meta('icon-read')
+                )
+                // 14
             );
             if (!$read) {
                 $unread = true;
             }
         }
-        //if they're on the first page and no topics
+        // If they're on the first page and no topics
         // were marked as unread, mark the whole forum as read
-        //since we don't care about pages past the first one
+        // since we don't care about pages past the first one.
         if (!$this->page && !$unread) {
             $this->markread($fid);
         }
@@ -319,7 +340,7 @@ EOT
         $page .= $PAGE->meta('forum-pages-bottom', $forumpages);
         $page .= $PAGE->meta('forum-buttons-bottom', $forumbuttons);
 
-        //start building the nav path
+        // Start building the nav path.
         $path[$fdata['cat']] = '?act=vc' . $fdata['cat_id'];
         if ($fdata['path']) {
             $pathids = explode(' ', $fdata['path']);
@@ -379,7 +400,7 @@ EOT
 
     public function update()
     {
-        //update the topic listing
+        // Update the topic listing.
     }
 
     public function isTopicRead($topic, $fid)

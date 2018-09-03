@@ -126,14 +126,13 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     }
     $DB->disposeresult($result);
 
-    //need to do check for valid email
-
+    // Need to do check for valid email.
     if (empty($errors)) {
         $board = $JAX->p['boardurl'];
         $boardPrefix = $board . '_';
 
         $DB->prefix('');
-        // Add board to directory
+        // Add board to directory.
         $DB->safeinsert(
             'directory',
             array(
@@ -147,35 +146,34 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $DB->prefix($boardPrefix);
 
         // Create the directory and blueprint tables
-
         // Import sql file and run it with php from this:
         // https://stackoverflow.com/a/19752106
         // It's not pretty or perfect but it'll work for our use case...
         $query = '';
         $lines = file(SERVICE_ROOT . '/blueprint.sql');
         foreach ($lines as $line) {
-            // Skip comments
+            // Skip comments.
             if ('--' == mb_substr($line, 0, 2) || '' == $line) {
                 continue;
             }
 
-            // replace blueprint_ with board name
+            // Replace blueprint_ with board name.
             $line = preg_replace('/blueprint_/', $boardPrefix, $line);
 
-            // Add line to current query
+            // Add line to current query.
             $query .= $line;
 
-            // If it has a semicolon at the end, it's the end of the query
+            // If it has a semicolon at the end, it's the end of the query.
             if (';' == mb_substr(trim($line), -1, 1)) {
-                // Perform the query
+                // Perform the query.
                 $result = $DB->safequery($query);
                 $DB->disposeresult($result);
-                // Reset temp variable to empty
+                // Reset temp variable to empty.
                 $query = '';
             }
         }
 
-        //don't forget to create the admin
+        // Don't forget to create the admin.
         $DB->safeinsert(
             'members',
             array(

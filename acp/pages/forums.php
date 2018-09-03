@@ -119,16 +119,27 @@ EOT
                 if (!trim($v)) {
                     continue;
                 }
+
+                /*
+                 * BUGBUGBUG: Why does this sometimes generate
+                 * warnings without the @?
+                 */
+
                 if (!is_array(@$intree[$v])) {
                     $intree[$v] = array();
-                } /* BUGBUGBUG: Why does this sometimes generate
-                    warnings without the @? */
+                }
+
                 $intree = &$intree[$v];
             }
+
+            /*
+             * BUGBUGBUG: Why does this sometimes generate
+             * warnings without the @?
+             */
+
             if (!@$intree[$f['id']]) {
                 $intree[$f['id']] = true;
-            } /* BUGBUGBUG: Why does this sometimes generate
-                warnings without the @? */
+            }
         }
         foreach ($cats as $v) {
             $sortedtree['c_' . $v] = @$tree['c_' . $v];
@@ -145,7 +156,7 @@ EOT
         $PAGE->addContentBox('Forums', $page);
     }
 
-    //saves the posted tree to mysql
+    // Saves the posted tree to mysql.
     public static function mysqltree($tree, $p = '', $x = 0)
     {
         global $DB;
@@ -158,7 +169,7 @@ EOT
             ++$x;
             $p2 = $p . $k . ' ';
             sscanf($p2, 'c_%d', $cat);
-            //$f=$p;
+            // $f=$p;
             $f = trim(mb_strstr($p, ' '));
             if (is_array($v)) {
                 self::mysqltree($v, $p2 . ' ', $x);
@@ -207,15 +218,23 @@ EOT
             $r .= "<li id='forum_${k}' " .
                 (!empty($classes) ? 'class="' . implode(' ', $classes) . '"' : '') .
                 '>' .
-                /* BUGBUGBUG: Why does this sometimes generate warnings
-                 * without the @? */
+
+                /*
+                 * BUGBUGBUG: Why does this sometimes generate warnings
+                 * without the @?
+                 */
+
                 ((@$data[$k]['trashcan']) ?
                 '<span class="icons trashcan"></span>' : '') .
                 $data[$k]['title'] .
                 ((@$data[$k]['mods']) ?
                 ' - <i>' . ($nummods = count(explode(',', $data[$k]['mods']))) .
-                /* BUGBUGBUG: Why does this sometimes generate warnings
-                 * without the @? */
+
+                /*
+                 * BUGBUGBUG: Why does this sometimes generate warnings
+                 * without the @?
+                 */
+
                 ' moderator' . (1 == $nummods ? '' : 's') . '</i>' : '') .
                 " <a href='?act=forums&delete=${k}' class='icons delete' " .
                 "title='Delete'></a> <a href='?act=forums&edit=${k}' " .
@@ -227,10 +246,10 @@ EOT
         return '<ul ' . ($class ? "class='${class}'" : '') . '>' . $r . '</ul>';
     }
 
-    //also used to edit forum
-    //btw, this function is so super messy right now but I don't care
-    //I'm working 2 jobs and have NO TIME to clean this up
-    //sorry if you have to see this abomination
+    // Also used to edit forum
+    // btw, this function is so super messy right now but I don't care
+    // I'm working 2 jobs and have NO TIME to clean this up
+    // sorry if you have to see this abomination.
     public function createforum($fid = false)
     {
         global $PAGE,$JAX,$DB;
@@ -260,7 +279,7 @@ EOT
             $page .= $PAGE->success('Forum created.');
         }
         if (is_numeric(@$JAX->b['rmod'])) {
-            //remove mod from forum
+            // Remove mod from forum.
             if ($fdata['mods']) {
                 $exploded = explode(',', $fdata['mods']);
                 unset($exploded[array_search($JAX->b['rmod'], $exploded)]);
@@ -279,8 +298,8 @@ EOT
         }
 
         if (@$JAX->p['submit']) {
-            //saves all of the data
-            //really should be its own function, but I don't gaf
+            // Saves all of the data
+            // really should be its own function, but I don't care.
             $grouppermsa = array();
             $groupperms = '';
             $result = $DB->safeselect(
@@ -331,11 +350,12 @@ EOT
                 'orderby' => ($orderby > 0 && $orderby <= 5) ? $orderby : 0,
                 'trashcan' => @$JAX->p['trashcan'] ? 1 : 0,
                 'show_ledby' => @$JAX->p['show_ledby'] ? 1 : 0,
-                'mods' => @$fdata['mods'], //handling done below
+                'mods' => @$fdata['mods'],
+                // Handling done below.
             );
             $DB->disposeresult($result);
 
-            //add per-forum moderator
+            // Add per-forum moderator.
             if (is_numeric($JAX->p['modid'])) {
                 $result = $DB->safeselect(
                     <<<'EOT'
@@ -375,7 +395,7 @@ EOT
             }
 
             if (!$e) {
-                //clear trashcan on other forums
+                // Clear trashcan on other forums.
                 if ($write['trashcan']
                     || (!$write['trashcan']
                     && @$fdata['trashcan'])
@@ -411,7 +431,7 @@ EOT
             $fdata = $write;
         }
 
-        //do perms table
+        // Do perms table.
         function checkbox($id, $name, $checked)
         {
             return '<input type="checkbox" class="switch yn" name="groups[' .
@@ -793,9 +813,9 @@ EOT
         $PAGE->addContentBox('Category Deletion', $page);
     }
 
-    //this function updates all of the user->mod flags
-    //that specify whether or not a user is a per-forum mod
-    //based on the comma delimited list of mods for each forum
+    // This function updates all of the user->mod flags
+    // that specify whether or not a user is a per-forum mod
+    // based on the comma delimited list of mods for each forum.
     public function updateperforummodflag()
     {
         global $DB;
@@ -809,7 +829,7 @@ EOT
             '`mods`',
             'forums'
         );
-        //build an array of mods
+        // Build an array of mods.
         $mods = array();
         while ($f = $DB->arow($result)) {
             foreach (explode(',', $f['mods']) as $v) {
@@ -818,7 +838,7 @@ EOT
                 }
             }
         }
-        //update
+        // Update.
         $DB->safeupdate(
             'members',
             array(

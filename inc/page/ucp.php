@@ -166,7 +166,7 @@ EOT
         }
 
         $page = $PAGE->meta('ucp-wrapper', $page);
-        //$PAGE->JS("window",Array("id"=>"ucpwin","title"=>"Settings","content"=>$page,"animate"=>false));
+        // $PAGE->JS("window",Array("id"=>"ucpwin","title"=>"Settings","content"=>$page,"animate"=>false));
         $PAGE->append('PAGE', $page);
         $PAGE->JS('update', 'page', $page);
         if ($this->runscript) {
@@ -285,7 +285,7 @@ EOT
             }
             $verified_password = password_verify($JAX->p['curpass'], $USER['pass']);
             if (!$verified_password) {
-                // check if it's an old md5 hash
+                // Check if it's an old md5 hash.
                 if (hash('md5', $JAX->p['curpass']) === $USER['pass']) {
                     $verified_password = true;
                 }
@@ -407,7 +407,7 @@ EOT;
         $error = '';
         $genderOptions = array('', 'male', 'female', 'other');
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
-            //insert profile info into the database'
+            // Insert the profile info into the database.
             $data = array(
                 'display_name' => trim($JAX->p['display_name']),
                 'full_name' => $JAX->p['full_name'],
@@ -429,8 +429,7 @@ EOT;
                 $JAX->p['gender'] : '',
             );
 
-            /* BEGIN input checking */
-
+            // Begin input checking.
             if ('' === $data['display_name']) {
                 $data['display_name'] = $USER['name'];
             }
@@ -505,8 +504,7 @@ EOT;
                 }
             }
 
-            /*Handle errors/insert*/
-
+            // Handle errors/insert.
             if (!$error) {
                 if ($data['display_name'] != $USER['display_name']) {
                     $DB->safeinsert(
@@ -682,8 +680,10 @@ EOT;
         }
     }
 
-    /* HERE BE PRIVATE MESSAGING
-    ARRRRRRRRRRRRRRRRRRRRRRRR */
+    /*
+     * HERE BE PRIVATE MESSAGING
+     * ARRRRRRRRRRRRRRRRRRRRRRRR
+     */
 
     public function flag()
     {
@@ -939,7 +939,7 @@ EOT
                 $PAGE->JS('error', $e);
                 $PAGE->append('PAGE', $PAGE->error($e));
             } else {
-                //put it into the table
+                // Put it into the table.
                 $DB->safeinsert(
                     'messages',
                     array(
@@ -953,7 +953,7 @@ EOT
                         'read' => 0,
                     )
                 );
-                //give them a notification
+                // Give them a notification.
                 $cmd = $JAX->json_encode(
                     array(
                         'newmessage',
@@ -972,7 +972,7 @@ EOT
                     $DB->basicvalue($cmd, 1),
                     $udata['id']
                 );
-                //send em an email!
+                // Send em an email!
                 if ($udata['email_settings'] & 2) {
                     $JAX->mail(
                         $udata['email'],

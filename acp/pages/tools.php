@@ -180,7 +180,7 @@ EOT
                         echo "DROP TABLE IF EXISTS {$table};" . PHP_EOL;
                         echo array_pop($thisrow) . ';' . PHP_EOL;
                         $DB->disposeresult($createtable);
-                        // only time I really want to use *
+                        // Only time I really want to use *.
                         $select = $DB->safeselect('*', $f[0]);
                         while ($row = $DB->arow($select)) {
                             $insert = $DB->buildInsert($row);

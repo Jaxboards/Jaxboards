@@ -151,7 +151,8 @@ class JAX
         return stripslashes($a);
     }
 
-    /* the getSess and getUser functions both return the
+    /*
+     * the getSess and getUser functions both return the
      * session/user data respectively
      * if not found in the database, getSess inserts a blank Sess row,
      * while getUser returns false
@@ -185,11 +186,11 @@ EOT
         $DB->disposeresult($result);
         $user['birthday'] = (date('n j') == $user['birthday'] ? 1 : 0);
 
-        // password fun
+        // Password parsing.
         if (false !== $pass) {
             $verified_password = password_verify($pass, $user['pass']);
             if (!$verified_password) {
-                // check if it's an old md5 hash
+                // Check if it's an old md5 hash.
                 if (hash('md5', $pass) === $user['pass']) {
                     $verified_password = true;
                     $needs_rehash = true;
@@ -202,7 +203,7 @@ EOT
             }
             if ($verified_password && $needs_rehash) {
                 $new_hash = password_hash($pass, PASSWORD_DEFAULT);
-                // add the new hash
+                // Add the new hash.
                 $DB->safeupdate(
                     'members',
                     array(
@@ -259,7 +260,8 @@ EOT
 
     public function blockhtml($a)
     {
-        return str_replace('{if', '&#123;if', htmlspecialchars($a, ENT_QUOTES)); //fix for template conditionals
+        // Fix for template conditionals.
+        return str_replace('{if', '&#123;if', htmlspecialchars($a, ENT_QUOTES));
     }
 
     public function getTextRules()
@@ -284,7 +286,7 @@ EOT
         while ($f = $DB->arow($q)) {
             $textRules[$f['type']][$f['needle']] = $f['replacement'];
         }
-        //load emoticon pack
+        // Load emoticon pack.
         $emotepack = isset($CFG['emotepack']) ? $CFG['emotepack'] : null;
         if ($emotepack) {
             $emotepack = 'emoticons/' . $emotepack;
@@ -317,7 +319,7 @@ EOT
     public function getEmoteRules($escape = 1)
     {
         global $CFG,$DB;
-        //legacy code to update to new system, remove this after 5/1
+        // Legacy code to update to new system, remove this after 5/1.
         if (file_exists(BOARDPATH . 'emoticons.php')) {
             require_once BOARDPATH . 'emoticons.php';
             foreach ($emoticons as $k => $v) {
@@ -343,8 +345,8 @@ EOT
 
     public function emotes($a)
     {
-        //believe it or not, adding a space and then removing it later
-        //is 20% faster than doing (^|\s)
+        // Believe it or not, adding a space and then removing it later
+        // is 20% faster than doing (^|\s).
         $emoticonlimit = 15;
         $this->getTextRules();
         if (!$this->emoteRules) {
@@ -373,7 +375,7 @@ EOT
         global $CFG,$DB;
         if (!isset($this->textRules)) {
             $wordfilter = array();
-            //legacy code to update to new system, remove this after 5/1
+            // Legacy code to update to new system, remove this after 5/1.
             if (file_exists(BOARDPATH . 'wordfilter.php')) {
                 include_once BOARDPATH . 'wordfilter.php';
                 foreach ($wordfilter as $k => $v) {
@@ -557,7 +559,7 @@ EOT
             return $a;
         }
 
-        //ul/li tags
+        // UL/LI tags.
         while ($a != ($tmp = preg_replace_callback(
             '@\\[(ul|ol)\\](.*)\\[/\\1\\]@Usi',
             array($this, 'bbcode_licallback'),
@@ -565,8 +567,8 @@ EOT
         ))) {
             $a = $tmp;
         }
-        //size code (actually needs a callback simply because of
-        //the variability of the arguments)
+        // Size code (actually needs a callback simply because of
+        // the variability of the arguments).
         while ($a != ($tmp = preg_replace_callback(
             '@\\[size=([0-4]?\\d)(px|pt|em|)\\](.*)\\[/size\\]@Usi',
             array($this, 'bbcode_sizecallback'),
@@ -575,7 +577,7 @@ EOT
             $a = $tmp;
         }
 
-        //do quote tags
+        // Do quote tags.
         while (preg_match(
             '@\\[quote(?>=([^\\]]+))?\\](.*?)\\[/quote\\]\\r?\\n?@is',
             $a,
@@ -942,16 +944,17 @@ EOT
             $ip = $this->getIp();
         }
         if (!filter_var($ip, FILTER_VALIDATE_IP)) {
-            // not an IP, so don't need to send anything back
+            // Not an IP, so don't need to send anything back.
             return '';
         }
 
         return inet_pton($ip);
     }
 
+    // This comment suggests MySQL's aton is different from php's pton, so
+    // we need to do something for mysql IP addresses:
     // https://secure.php.net/manual/en/function.inet-ntop.php#117398
-    // this comment suggests MySQL's aton is different from php's pton, so
-    // we need to do something for mysql IP addresses
+    // .
     public function bin2ip($ip = false)
     {
         if (!is_string($ip)) {

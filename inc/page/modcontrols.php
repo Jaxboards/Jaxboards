@@ -254,7 +254,7 @@ EOT
 
         $PAGE->JS('softurl');
 
-        //see if they have permission to manipulate this post
+        // See if they have permission to manipulate this post.
         if (!$this->perms['can_moderate']) {
             $result = $DB->safespecial(
                 <<<'EOT'
@@ -375,7 +375,7 @@ EOT
             return $PAGE->JS('error', 'No posts to delete.');
         }
 
-        //get trashcan
+        // Get trashcan.
         $result = $DB->safeselect(
             '`id`',
             'forums',
@@ -392,7 +392,7 @@ EOT
             explode(',', $SESS->vars['modpids'])
         );
 
-        //build list of tids that the posts were in
+        // Build list of topic ids that the posts were in.
         $tids = array();
         $pids = explode(',', $SESS->vars['modpids']);
         while ($f = $DB->arow($result)) {
@@ -401,7 +401,7 @@ EOT
         $tids = array_unique($tids);
 
         if ($trashcan) {
-            //get first & last post
+            // Get first & last post.
             foreach ($pids as $v) {
                 if (!isset($op) || !$op || $v < $op) {
                     $op = $v;
@@ -419,7 +419,7 @@ EOT
             $lp = $DB->arow($result);
             $DB->disposeresult($result);
 
-            //create a new topic
+            // Create a new topic.
             $DB->safeinsert(
                 'topics',
                 array(
@@ -460,7 +460,7 @@ EOT
             );
         }
         foreach ($tids as $tid) {
-            //recount replies
+            // Recount replies.
             $DB->safespecial(
                 <<<'EOT'
 UPDATE %t
@@ -477,9 +477,9 @@ EOT
                 $tid
             );
         }
-        // fix forum last post for all forums topics were in
+        // Fix forum last post for all forums topics were in.
         $fids = array();
-        // add trashcan here too just in case
+        // Add trashcan here too just in case.
         if ($trashcan) {
             $fids[] = $trashcan;
         }
@@ -499,7 +499,7 @@ EOT
         foreach ($fids as $fid) {
             $DB->fixForumLastPost($fid);
         }
-        //remove them from the page
+        // Remove them from the page.
         foreach ($pids as $v) {
             $PAGE->JS('removeel', '#pid_' . $v);
         }
@@ -513,7 +513,7 @@ EOT
         }
         $data = array();
 
-        //get trashcan id
+        // Get trashcan id.
         $result = $DB->safeselect(
             '`id`',
             'forums',
@@ -583,7 +583,7 @@ EOT
             && is_numeric($JAX->p['ot'])
             && in_array($JAX->p['ot'], $exploded)
         ) {
-            //move the posts and set all posts to normal (newtopic=0)
+            // Move the posts and set all posts to normal (newtopic=0).
             $DB->safeupdate(
                 'posts',
                 array(
@@ -594,8 +594,8 @@ EOT
                 explode(',', $SESS->vars['modtids'])
             );
 
-            //make the first post in the topic have newtopic=1
-            //get the op
+            // Make the first post in the topic have newtopic=1.
+            // Get the op.
             $result = $DB->safeselect(
                 'MIN(`id`)',
                 'posts',
@@ -615,7 +615,7 @@ EOT
                 $op
             );
 
-            //also fix op
+            // Also fix op.
             $DB->safeupdate(
                 'topics',
                 array(
@@ -758,7 +758,7 @@ EOT
             && 'showform' == $JAX->p['submit'])
             || isset($JAX->b['mid'])
         ) {
-            //get the member data
+            // Get the member data.
             if (is_numeric($JAX->b['mid'])) {
                 $result = $DB->safeselect(
                     <<<'EOT'

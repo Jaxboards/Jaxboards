@@ -81,7 +81,7 @@ class groups
             'legend',
         );
 
-        //set anything not sent to 0
+        // Set anything not sent to 0.
         foreach ($perms as $k => $v2) {
             foreach ($columns as $v) {
                 if (!isset($v2[$v])) {
@@ -91,7 +91,7 @@ class groups
             }
         }
 
-        //remove any columns that don't exist silently
+        // Remove any columns that don't exist silently.
         $columns = array_flip($columns);
         foreach ($perms as $k => $v) {
             foreach ($v as $k2 => $v2) {
@@ -101,7 +101,7 @@ class groups
             }
         }
 
-        //update this
+        // Update this.
         foreach ($perms as $k => $v) {
             if (2 == $k) {
                 $v['can_access_acp'] = 1;

@@ -163,9 +163,8 @@ EOT
     {
         global $PAGE,$JAX,$DB,$SESS,$USER,$CFG;
 
-        //this is a bit tricky, we're transversing the shouts
-        //in reverse order, since they're shifted onto the list, not pushed
-
+        // This is a bit tricky, we're transversing the shouts
+        // in reverse order, since they're shifted onto the list, not pushed.
         $last = 0;
         if (isset($SESS->vars['sb_id']) && $SESS->vars['sb_id']) {
             $result = $DB->safespecial(
@@ -201,7 +200,7 @@ EOT
             }
         }
 
-        //update the sb_id variable if we selected shouts
+        // Update the sb_id variable if we selected shouts.
         if ($last) {
             $SESS->addvar('sb_id', $last);
         }

@@ -27,7 +27,7 @@ if (file_exists(SERVICE_ROOT . '/install.lock')) {
 require_once JAXBOARDS_ROOT . '/inc/classes/mysql.php';
 require_once JAXBOARDS_ROOT . '/inc/classes/jax.php';
 require_once JAXBOARDS_ROOT . '/acp/page.php';
-// get default CFG
+// Get default CFG.
 require_once JAXBOARDS_ROOT . '/config.default.php';
 
 /**
@@ -107,7 +107,7 @@ $fields = array(
 $errors = array();
 
 if (isset($JAX->p['submit']) && $JAX->p['submit']) {
-    // Make sure each field is set
+    // Make sure each field is set.
     foreach ($fields as $field => $attributes) {
         if (!$JAX->p[$field]) {
             $errors[] = $attributes['name'] . ' must be filled in.';
@@ -121,8 +121,8 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         ) {
             $errors[] = 'Invalid domain';
         } else {
-            // looks like we have a proper hostname,
-            // just remove the leading www. if it exists
+            // Looks like we have a proper hostname,
+            // just remove the leading www. if it exists.
             $JAX->p['domain'] = preg_replace(
                 '/^www./',
                 '',
@@ -130,7 +130,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             );
         }
     } else {
-        // remove www if it exists, also only grab host if url is entered
+        // Remove www if it exists, also only grab host if url is entered.
         $JAX->p['domain'] = preg_replace(
             '/^www./',
             '',
@@ -152,7 +152,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             'numbers, and underscore only';
     }
 
-    // are we installing this the service way
+    // Are we installing this the service way.
     $service = isset($JAX->p['service']) && (bool) $JAX->p['service'];
 
     $connected = $DB->connect(
@@ -167,7 +167,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     }
 
     if (empty($errors)) {
-        // write crossdomain.xml file for flash support
+        // Write crossdomain.xml file for flash support.
         $crossDomainXML = fopen(JAXBOARDS_ROOT . '/crossdomain.xml', 'w');
         fwrite(
             $crossDomainXML,
@@ -179,7 +179,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         );
         fclose($crossDomainXML);
 
-        // update with our settings
+        // Update with our settings.
         $CFG['boardname'] = 'Jaxboards';
         $CFG['domain'] = $JAX->p['domain'];
         $CFG['mail_from'] = $JAX->p['admin_username'] . ' <' .
@@ -200,7 +200,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         );
 
         if ($service) {
-            // Create directory table
+            // Create directory table.
             $queries = array(
                 'DROP TABLE IF EXISTS `directory`;',
                 <<<'EOT'
@@ -233,13 +233,13 @@ EOT
                 $DB->disposeresult($result);
             }
 
-            // create the text and support boards
+            // Create the text and support boards.
             $default_boards = array(
                 'test' => 'Test forums',
                 'support' => 'Support forums',
             );
         } else {
-            // create the board!
+            // Create the board!
             $default_boards = array(
                 'jaxboards' => 'Jaxboards',
             );
@@ -251,7 +251,7 @@ EOT
 
             if ($service) {
                 $DB->prefix('');
-                // Add board to directory
+                // Add board to directory.
                 $DB->safeinsert(
                     'directory',
                     array(
@@ -266,35 +266,34 @@ EOT
             }
 
             // Create the directory and blueprint tables
-
             // Import sql file and run it with php from this:
             // https://stackoverflow.com/a/19752106
             // It's not pretty or perfect but it'll work for our use case...
             $query = '';
             $lines = file(SERVICE_ROOT . '/blueprint.sql');
             foreach ($lines as $line) {
-                // Skip comments
+                // Skip comments.
                 if ('--' == mb_substr($line, 0, 2) || '' == $line) {
                     continue;
                 }
 
-                // replace blueprint_ with board name
+                // Replace blueprint_ with board name.
                 $line = preg_replace('/blueprint_/', $boardPrefix, $line);
 
-                // Add line to current query
+                // Add line to current query.
                 $query .= $line;
 
-                // If it has a semicolon at the end, it's the end of the query
+                // If it has a semicolon at the end, it's the end of the query.
                 if (';' == mb_substr(trim($line), -1, 1)) {
-                    // Perform the query
+                    // Perform the query.
                     $result = $DB->safequery($query);
                     $DB->disposeresult($result);
-                    // Reset temp variable to empty
+                    // Reset temp variable to empty.
                     $query = '';
                 }
             }
 
-            //don't forget to create the admin
+            // Don't forget to create the admin.
             $DB->safeinsert(
                 'members',
                 array(
@@ -319,13 +318,12 @@ EOT
             recurseCopy('blueprint', JAXBOARDS_ROOT . '/boards/' . $board);
         }
 
-        // Create lock file
-
+        // Create lock file.
         $file = fopen(SERVICE_ROOT . '/install.lock', 'w');
         fwrite($file, '');
         fclose($file);
 
-        // send us to the service page
+        // Send us to the service page.
         header('Location: ' . dirname($_SERVER['REQUEST_URI']));
     }
 }

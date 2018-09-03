@@ -185,7 +185,7 @@ EOT
                 $DB->basicvalue($uid),
                 $timeago
             );
-            // delete all expired tokens as well while we're here...
+            // Delete all expired tokens as well while we're here...
             $DB->safedelete(
                 'tokens',
                 'WHERE `expires`<=?',
@@ -233,14 +233,14 @@ EOT
         $id = $this->data['id'];
         $sd['last_update'] = time();
         if ($this->data['is_bot']) {
-            //bots tend to read a lot of content
+            // Bots tend to read a lot of content.
             $sd['forumsread'] = $sd['topicsread'] = '';
         }
         if (!$this->data['last_action']) {
             $sd['last_action'] = time();
         }
         if (isset($sd['user'])) {
-            // this doesn't exist
+            // This doesn't exist.
             unset($sd['user']);
         }
         $DB->safeupdate(

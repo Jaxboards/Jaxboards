@@ -420,7 +420,7 @@ EOT
                     'score' => $score,
                     'date' => time(),
                 );
-                //get highest score
+                // Get highest score.
                 $result = $DB->safeselect(
                     '`score`',
                     'arcade_scores',
@@ -432,8 +432,8 @@ EOT
                 $DB->disposeresult($result);
 
                 if ($yourscore) {
-                    //don't do anything if they've scored
-                    //less than what they had before
+                    // Don't do anything if they've scored
+                    // less than what they had before.
                     if ($yourscore['score'] < $score) {
                         $DB->safeupdate(
                             'arcade_scores',

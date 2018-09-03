@@ -66,7 +66,7 @@ class settings
             $wordfilter[$f['needle']] = $f['replacement'];
         }
 
-        //delete
+        // Delete.
         if (@$JAX->g['d']) {
             $DB->safedelete(
                 'textrules',
@@ -76,7 +76,7 @@ class settings
             unset($wordfilter[$JAX->g['d']]);
         }
 
-        //insert
+        // Insert.
         if (@$JAX->p['submit']) {
             $JAX->p['badword'] = $JAX->blockhtml($JAX->p['badword']);
             if (!$JAX->p['badword'] || !$JAX->p['replacement']) {
@@ -177,7 +177,7 @@ EOT;
         );
         $page = '';
         $emoticons = array();
-        //delete emoticon
+        // Delete emoticon.
         if (@$JAX->g['d']) {
             $DB->safedelete(
                 'textrules',
@@ -185,7 +185,7 @@ EOT;
                 $DB->basicvalue($_GET['d'])
             );
         }
-        //select emoticons
+        // Select emoticons.
         $result = $DB->safeselect(
             '`id`,`type`,`needle`,`replacement`,`enabled`',
             'textrules',
@@ -195,7 +195,7 @@ EOT;
             $emoticons[$f['needle']] = $f['replacement'];
         }
 
-        //insert emoticon
+        // Insert emoticon.
         if (@$JAX->p['submit']) {
             if (!$JAX->p['emoticon'] || !$JAX->p['image']) {
                 $page .= $PAGE->error('All fields required.');
@@ -438,7 +438,7 @@ EOT;
             $niblets[$f['id']] = array('img' => $f['img'], 'title' => $f['title']);
         }
 
-        //delete
+        // Delete.
         if (@$JAX->g['d']) {
             $DB->safedelete(
                 'ratingniblets',
@@ -448,7 +448,7 @@ EOT;
             unset($niblets[$JAX->g['d']]);
         }
 
-        //insert
+        // Insert.
         if (@$JAX->p['submit']) {
             if (!$JAX->p['img'] || !$JAX->p['title']) {
                 $page .= $PAGE->error('All fields required.');

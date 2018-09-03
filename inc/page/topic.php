@@ -2,7 +2,6 @@
 
 $PAGE->loadmeta('topic');
 
-//Topics module
 $IDX = new TOPIC();
 class TOPIC
 {
@@ -91,7 +90,7 @@ EOT
         $DB->disposeresult($result);
 
         if (!$topicdata) {
-            //put them back on the index, skip these next few lines
+            // Put the user back on the index and skip these next few lines.
             return $PAGE->location('?');
         }
         $topicdata['topic_title'] = $JAX->wordfilter($topicdata['topic_title']);
@@ -104,13 +103,14 @@ EOT
             $this->markread($id);
         }
         if (!$topicdata['fperms']['read']) {
+            // No business being here.
             return $PAGE->location('?');
-        } //no business being here yo
+        }
 
         $PAGE->append('TITLE', ' -> ' . $topicdata['topic_title']);
         $SESS->location_verbose = "In topic '" . $topicdata['topic_title'] . "'";
 
-        /*Output RSS instead*/
+        // Output RSS instead.
         if (isset($JAX->b['fmt']) && 'RSS' == $JAX->b['fmt']) {
             include_once 'inc/classes/rssfeed.php';
             $link = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'];
@@ -150,7 +150,7 @@ EOT
             die();
         }
 
-        //fix this to work with subforums
+        // Fix this to work with subforums.
         $PAGE->path(
             array(
                 $topicdata['cat_title'] => '?act=vc' . $topicdata['cat_id'],
@@ -159,7 +159,7 @@ EOT
             )
         );
 
-        /*generate pages*/
+        // Generate pages.
         $result = $DB->safeselect(
             'COUNT(`id`)',
             'posts',
@@ -182,10 +182,10 @@ EOT
             );
         }
 
-        //are they on the last page? stores a session variable
+        // Are they on the last page? This stores a session variable.
         $SESS->addvar('topic_lastpage', ($page + 1) == $totalpages);
 
-        //if it's a poll, put it in
+        // If it's a poll, put it in.
         if ($topicdata['poll_type']) {
             $poll = $PAGE->meta(
                 'box',
@@ -204,7 +204,7 @@ EOT
             $poll = '';
         }
 
-        //generate post listing
+        // Generate post listing.
         $page = $PAGE->meta('topic-table', $this->postsintooutput());
         $page = $PAGE->meta(
             'topic-wrapper',
@@ -214,7 +214,7 @@ EOT
             '<a href="./?act=vt' . $id . '&amp;fmt=RSS" class="social rss">RSS</a>'
         );
 
-        //add buttons
+        // Add buttons.
         $buttons = array(
             $topicdata['fperms']['start'] ?
             "<a href='?act=post&fid=" . $topicdata['fid'] . "'>" .
@@ -241,7 +241,7 @@ EOT
             )) . '</a>' : '',
         );
 
-        //make the users online list
+        // Make the users online list.
         $usersonline = '';
         foreach ($DB->getUsersOnline() as $f) {
             if ($f['uid'] && $f['location'] == "vt${id}") {
@@ -257,7 +257,7 @@ EOT
         }
         $page .= $PAGE->meta('topic-users-online', $usersonline);
 
-        //add in other page elements shiz
+        // Add in other page elements.
         $page = $poll . $PAGE->meta(
             'topic-pages-top',
             $pagelist
@@ -272,7 +272,7 @@ EOT
             $buttons
         );
 
-        //update view count
+        // Update view count.
         $DB->safespecial(
             <<<'EOT'
 UPDATE %t
@@ -301,7 +301,7 @@ EOT
     {
         global $SESS,$PAGE,$DB,$JAX;
 
-        /*check for new posts and append them*/
+        // Check for new posts and append them.
         if ($SESS->location != "vt${id}") {
             $SESS->delvar('topic_lastpid');
         }
@@ -316,7 +316,7 @@ EOT
             }
         }
 
-        /*update users online list*/
+        // Update users online list.
         $list = array();
         $oldcache = array_flip(explode(',', $SESS->users_online_cache));
         $newcache = '';
@@ -499,7 +499,7 @@ EOT
 
             $postt = $JAX->theworks($postt);
 
-            //post rating
+            // Post rating content goes here.
             if (isset($CFG['ratings']) && $CFG['ratings'] & 1) {
                 $postrating = $showrating = '';
                 $prating = array();
@@ -672,10 +672,10 @@ EOT
         global $PAGE,$USER,$JAX;
         $page = '';
         if ($USER) {
-            //accomplish three things at once:
-            //-determine if the user has voted
-            //-count up the number of votes
-            //-parse the result set
+            // Accomplish three things at once:
+            // * Determine if the user has voted.
+            // * Count up the number of votes.
+            // * Parse the result set.
             $presults = array();
             $voted = false;
             $totalvotes = 0;
@@ -766,9 +766,10 @@ EOT
                 $results = array();
             }
 
-            //results is now an array of arrays, the keys of the parent array
-            //correspond to the choices while the arrays within the array correspond
-            //to a collection of user IDs that have voted for that choice
+            // Results is now an array of arrays, the keys of the parent array
+            // correspond to the choices while the arrays within the array
+            // correspond to a collection of user IDs that have voted for that
+            // choice.
             $voted = false;
             foreach ($results as $v) {
                 foreach ($v as $v2) {
@@ -1013,7 +1014,8 @@ EOT
                     $pid : $pid
                 );
             }
-            //this line toggles whether or not the qreply window should open on quote
+            // This line toggles whether or not the qreply window should open
+            // on quote.
             if ($PAGE->jsaccess) {
                 $this->qreplyform($tid);
             } else {
