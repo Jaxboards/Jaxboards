@@ -36,12 +36,11 @@ function dd_menu(e) {
 }
 
 function makestuffcool() {
-  var switches = $$(".switch");
+  var switches = document.querySelectorAll(".switch");
   var x;
   var l;
   var s;
   var t;
-  if (switches && !switches.length) switches = [switches];
   l = switches.length;
   for (x = 0; x < l; x++) {
     s = switches[x];
@@ -63,8 +62,8 @@ function makestuffcool() {
     JAX.el.insertAfter(t, s);
   }
 
-  var editor = $$(".editor");
-  if (editor && !editor.length) {
+  var editor = document.querySelector(".editor");
+  if (!editor.length) {
     editor.onkeydown = function(event) {
       if (event.keyCode == 9) {
         JAX.editor.setSelection(editor, "    ");

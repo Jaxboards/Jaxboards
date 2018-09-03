@@ -401,7 +401,7 @@ EOT
         <tr>
             <th class="center" width="5%%">
                 <input type="checkbox"
-                    onclick="JAX.checkAll($$('.check'),this.checked)" />
+                    onclick="JAX.checkAll(document.querySelectorAll('.check'),this.checked)" />
             </th>
             <th width="5%%">
                 Flag
@@ -432,7 +432,7 @@ EOT
     'inbox-messages-row' => <<<'EOT'
 <tr class="%1$s"
     onclick="if(JAX.event(event).srcElement.tagName=='TD') {
-        $$('input',this)[0].click();
+        this.querySelector('input').click();
     }">
     <td class="center">
         %2$s

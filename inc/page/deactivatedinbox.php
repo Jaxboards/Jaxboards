@@ -5,7 +5,7 @@ $PAGE->metadefs['inbox-messages-listing'] = <<<'EOT'
     <tr>
         <th class="center" width="5%%">
             <input type="checkbox"
-                onclick="JAX.checkAll($$('.check'),this.checked)" />
+                onclick="JAX.checkAll(document.querySelectorAll('.check'),this.checked)" />
         </th>
         <th width="5%%">
             Flag
@@ -280,7 +280,7 @@ EOT
             }
             $page .= '<tr ' . (!$f['read'] ? 'class="unread" ' : '') .
                 'onclick="if(JAX.event(event).srcElement.tagName.' .
-                'toLowerCase()==\'td\') $$(\'input\',this)[0].click()">' .
+                'toLowerCase()==\'td\') this.querySelector(\'input\').click()">' .
                 '<td class="center"><input class="check" type="checkbox" />' .
                 '</td><td class="center"><input type="checkbox" ' .
                 ($f['flag'] ? 'checked="checked" ' : '') .

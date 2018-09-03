@@ -152,7 +152,7 @@ EOT
         ) . "<form method='post'><input type='hidden' id='ordered' " .
         "name='tree' /><input type='submit' value='Save' /></form>";
         $page .= "<script type='text/javascript'>" .
-            "JAX.sortableTree($$('.tree'),'forum_','ordered')</script>";
+            "JAX.sortableTree(document.querySelectorAll('.tree'),'forum_','ordered')</script>";
         $PAGE->addContentBox('Forums', $page);
     }
 

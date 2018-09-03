@@ -266,7 +266,7 @@ class themes
         $wrap .= <<<'EOT'
 <script type="text/javascript">
     function edit(link,suffix){
-        a=$$('span',link.parentNode);
+        a=link.parentNode.querySelector('span');
         link.parentNode.removeChild(link);
         a.innerHTML='<input type="text" name="rename'+suffix+
             '['+a.innerHTML+']" value="'+a.innerHTML+'" />';

@@ -49,7 +49,7 @@ function RUNF() {
   if (useJSLinks) JAX.gracefulDegrade(document.body);
 
   this.updateDates = function() {
-    var dates = $$(".autodate");
+    var dates = document.querySelectorAll(".autodate");
     var x;
     var parsed;
     if (!dates) return;
@@ -201,15 +201,15 @@ function RUNF() {
       alert(a[0]);
     },
     addclass: function(a) {
-      JAX.el.addClass($$(a[0]), a[1]);
+      JAX.el.addClass(document.querySelector(a[0]), a[1]);
     },
     title: function(a) {
       document.title = a;
     },
     update: function(a) {
       var el = a[0];
-      var paths;
-      if (el == "path" && (paths = $$(".path")).length > 1) {
+      var paths = document.querySelectorAll(".path");
+      if (el == "path" && paths.length > 1) {
         for (var x = 0; x < paths.length; x++) {
           paths[x].innerHTML = a[1];
           JAX.gracefulDegrade(paths[x]);
@@ -217,7 +217,7 @@ function RUNF() {
         return;
       }
       if (!el.match(/^\W/)) el = "#" + el;
-      el = $$(el);
+      el = document.querySelector(el);
       if (!el) return;
       el.innerHTML = a[1];
       if (a[2]) {
@@ -228,7 +228,7 @@ function RUNF() {
       JAX.gracefulDegrade(el);
     },
     removeel: function(a) {
-      var el = $$(a[0]);
+      var el = document.querySelector(a[0]);
       if (el) el.parentNode.removeChild(el);
     },
     overlay: JAX.overlay,
@@ -238,7 +238,7 @@ function RUNF() {
     goto: function(a) {
       a = a[0];
       if (!a.match(/^\W/)) a = "#" + a;
-      a = $$(a);
+      a = document.querySelector(a);
       JAX.scrollTo(JAX.el.getCoordinates(a).y);
     },
     setloc: function(a) {
@@ -249,7 +249,7 @@ function RUNF() {
       if ($("status")) $("status").className = a[0];
     },
     appendrows: function(a) {
-      var table = $$(a[0]);
+      var table = document.querySelector(a[0]);
       var span = document.createElement("span");
       span.innerHTML = "<table>" + a[1] + "</table>";
       var vtbody = span.getElementsByTagName("tbody")[0];
@@ -267,12 +267,11 @@ function RUNF() {
     },
     addshout: function(a) {
       var a = a[0];
-      var ss = $$("#shoutbox .shout");
+      var ss = document.querySelectorAll("#shoutbox .shout");
       var x;
       var span = document.createElement("span");
       var div;
       span.innerHTML = a;
-      if (ss && !ss.length) ss = [ss];
       div = span.firstChild;
       ss[0].parentNode.insertBefore(div, ss[0]);
       while (ss.length > globalsettings.shoutlimit - 1) {
@@ -299,7 +298,7 @@ function RUNF() {
       JAX.sfx(tick)
         .add("height", "0px", h)
         .play();
-      var ticks = $$(".tick", ticker);
+      var ticks = ticker.querySelectorAll(".tick");
       var l = ticks.length;
       tick.style.display = "block";
       if (l > 100) {
@@ -319,7 +318,7 @@ function RUNF() {
       }
     },
     im: function(a) {
-      var sb = $$("#im_" + a[0] + " .ims");
+      var sb = document.querySelector("#im_" + a[0] + " .ims");
       var test;
       JAX.flashTitle("New message from " + a[1] + "!");
       if (
@@ -359,7 +358,7 @@ function RUNF() {
           win.getElementsByTagName("form")[0].im_im.focus();
         };
         win.onclick();
-        sb = $$("#im_" + a[0] + " .ims");
+        sb = document.querySelector("#im_" + a[0] + " .ims");
         test = JAX.el.getComputedStyle(sb);
         sb.style.width = test.width;
         sb.style.height = test.height;
@@ -435,11 +434,11 @@ function RUNF() {
         win.resize = ".content";
         win = win.create();
       } else {
-        $$(".content", buddylist).innerHTML = a.content;
+        buddyList.querySelector(".content").innerHTML = a.content;
       }
     },
     closewindow: function(a) {
-      a = $$(a[0]);
+      a = document.querySelector(a[0]);
       JAX.window.close(a);
     },
     onlinelist: function(a) {
@@ -451,7 +450,7 @@ function RUNF() {
       if (!statusers) return;
       for (x = 0; x < a[0].length; x++) {
         tmp = a[0][x];
-        link = $$("#statusers .user" + tmp[0]);
+        link = document.querySelector("#statusers .user" + tmp[0]);
         if (!link) {
           link = document.createElement("a");
           if (!isNaN(parseInt(tmp[0]))) link.href = "?act=vu" + tmp[0];
@@ -484,7 +483,7 @@ function RUNF() {
       var x;
       var link;
       for (x = 0; x < ids.length; x++) {
-        link = $$("#statusers .user" + ids[x]);
+        link = document.querySelector("#statusers .user" + ids[x]);
         if (link) statusers.removeChild(link);
       }
     },
@@ -593,7 +592,7 @@ function RUNF() {
         prdiv = document.createElement("div");
         prdiv.className = "postrating_list";
         prdiv.id = "postrating_" + a[0];
-        c = JAX.el.getCoordinates($$("#pid_" + a[0] + " .postrating"));
+        c = JAX.el.getCoordinates(document.querySelector("#pid_" + a[0] + " .postrating"));
         prdiv.style.top = c.yh + "px";
         prdiv.style.left = c.x + "px";
         $("page").appendChild(prdiv);
@@ -621,18 +620,6 @@ function RUNF() {
   }
 
   document.cookie = "buddylist=0";
-
-  var foot = $$(".footer");
-  var fs;
-  while (
-    foot &&
-    foot.tagName != "BODY" &&
-    (fs = JAX.el.getComputedStyle(foot))
-  ) {
-    if (fs.display == "none" || fs.visibility == "hidden") {
-      return alert("WARNING: COPYRIGHT MISSING, THIS IS AGAINST TOS");
-    } else foot = foot.parentNode;
-  }
 }
 
 $(function() {

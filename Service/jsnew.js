@@ -44,45 +44,6 @@ function addEvent(obj, att, set) {
   return obj[atts].length - 1;
 }
 
-function $$(s, base) {
-  var x;
-  var y;
-  var s = s.split(" ");
-  var l = s.length;
-  var curel = [];
-  var base = base || document;
-  for (var y = 0; y < l; y++) {
-    s[y].match(/([\#.]?)(.+)/);
-    switch (RegExp.$1) {
-      case "#":
-        curel = [$(RegExp.$2)];
-        break;
-      case ".":
-        curel2 = curel;
-        curel = [];
-        if (curel2.length) {
-          for (x = 0; x < curel2.length; x++) {
-            curel = curel.concat(
-              JAX.el.getElementsByClassName(curel2[x] || base, RegExp.$2)
-            );
-          }
-        } else curel = JAX.el.getElementsByClassName(base, RegExp.$2);
-        break;
-      default:
-        curel2 = curel;
-        curel = [];
-        if (curel2.length) {
-          for (x = 0; x < curel2.length; x++) {
-            curel = curel.concat(curel2[x].getElementsByTagName(RegExp.$2));
-          }
-        } else curel = base.getElementsByTagName(RegExp.$2);
-        break;
-    }
-    if (!curel[0]) break;
-  }
-  return curel[1] ? curel : curel[0] ? curel[0] : false;
-}
-
 /*      JAX is the LIBRARY                */
 /* None of this is executed independently */
 
@@ -346,9 +307,9 @@ var JAX = new function() {
         }
       }
     }
-    JAX.convertSwitches($$(".switch", a));
+    JAX.convertSwitches(a.querySelectorAll(".switch"));
 
-    var bbcodeimgs = $$(".bbcodeimg");
+    var bbcodeimgs = document.querySelectorAll(".bbcodeimg");
     if (bbcodeimgs) {
       JAX.onImagesLoaded(
         bbcodeimgs,
@@ -357,8 +318,7 @@ var JAX = new function() {
           JAX.imageResizer(bbcodeimgs);
 
           // handle image galleries
-          var galleries = $$(".image_gallery");
-          if (galleries && !galleries.length) galleries = [galleries];
+          var galleries = document.querySelectorAll(".image_gallery");
           for (x = 0; x < galleries.length; x++) {
             JAX.makeImageGallery(galleries[x]);
           }
@@ -367,13 +327,11 @@ var JAX = new function() {
       );
     }
 
-    if ((tmp = $$(".pages", a))) {
-      if (!tmp.length) tmp = [tmp];
+    if ((tmp = a.querySelectorAll(".pages"))) {
       for (x = 0; x < tmp.length; x++) JAX.scrollablepagelist(tmp[x]);
     }
 
-    if ((tmp = $$(".date", a))) {
-      if (!tmp.length) tmp = [tmp];
+    if ((tmp = a.querySelectorAll(".date"))) {
       for (var x = 0; x < tmp.length; x++) {
         if (tmp[x].tagName != "INPUT") continue;
         tmp[x].onclick = function() {
@@ -389,8 +347,6 @@ var JAX = new function() {
   };
 
   this.convertSwitches = function(switches) {
-    if (!switches) return;
-    if (!Array.isArray(switches)) switches = [switches];
     var x;
     var l = switches.length;
     var s;
@@ -1654,7 +1610,7 @@ var JAX = new function() {
   };
   /** *****************************************************************/
   this.sortableTree = function(tree, prefix, formfield) {
-    var tmp = $$("li", tree);
+    var tmp = tree.querySelectorAll("li");
     var x;
     var items = [];
     var seperators = [];
@@ -2026,7 +1982,7 @@ var JAX = new function() {
       d.body.appendChild(d1);
 
       if (me.resize) {
-        var targ = $$(me.resize, d1);
+        var targ = d1.querySelector(me.resize);
         if (!targ) return alert("Resize target not found");
         targ.style.width = targ.clientWidth + "px";
         targ.style.height = targ.clientHeight + "px";
@@ -2109,8 +2065,7 @@ var JAX = new function() {
         me.setPosition(me.oldpos, 0);
       } else {
         c.setAttribute("draggable", "false");
-        var wins = $$(".window");
-        if (!wins.length) wins = [wins];
+        var wins = document.querySelectorAll(".window");
         for (x = 0; x < wins.length; x++) {
           if (JAX.el.hasClass(wins[x], "minimized")) {
             w += parseInt(wins[x].clientWidth);
@@ -2180,7 +2135,7 @@ var JAX = new function() {
     d = Math.abs(d) / d;
     if (JAX.browser.chrome) d *= -1;
     var x;
-    var p = $$("a", this);
+    var p = this.querySelectorAll("a");
     var s = parseInt(p[1].innerHTML);
     var e = parseInt(p[p.length - 1].innerHTML);
     var b = p.length - 2;
@@ -2207,7 +2162,7 @@ var JAX = new function() {
     var prev = document.createElement("a");
     var status = {
       index: 0,
-      max: $$("img", gallery).length || 1,
+      max: Math.max(gallery.querySelectorAll("img").length, 1),
       showNext: function() {
         if (this.index < this.max - 1) this.index++;
         this.update();
@@ -2217,7 +2172,7 @@ var JAX = new function() {
         this.update();
       },
       update: function() {
-        var imgs = $$("img", gallery);
+        var imgs = gallery.querySelectorAll("img");
         var x;
         var img;
         for (x = 0; x < imgs.length; x++) {

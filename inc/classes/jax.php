@@ -615,9 +615,9 @@ EOT
             $youtubeLink = 'https://www.youtube.com/watch?v=' .
                 $m[1] . ($m[2] ? '&t=' : '') . $m[2];
             $popoutCode = 'var w=new JAX.window;w.title=this.href;' .
-                'w.content=$$(\'.movie\',this.parentNode.parentNode).innerHTML;' .
+                'w.content=this.parentNode.parentNode.querySelector(\'.movie\').innerHTML;' .
                 'w.create();return false;';
-            $inlineCode = '$$(\'.movie\',this.parentNode.parentNode)' .
+            $inlineCode = 'this.parentNode.parentNode.querySelector(\'.movie\')' .
                 '.style.display=\'block\';return false;';
             $youtubeEmbed = 'https://www.youtube.com/embed/' . $m[1] .
                 '?start=' . $m[2];
@@ -656,9 +656,9 @@ EOT;
 
             $vimeoLink = 'https://vimeo.com/' . $id[1];
             $popoutCode = 'var w=new JAX.window;w.title=this.href;' .
-                'w.content=$$(\'.movie\',this.parentNode.parentNode)' .
+                'w.content=this.parentNode.parentNode.querySelector(\'.movie\')' .
                 '.innerHTML;w.create();return false;';
-            $inlineCode = '$$(\'.movie\',this.parentNode.parentNode)' .
+            $inlineCode = 'this.parentNode.parentNode.querySelector(\'.movie\')' .
                 '.style.display=\'block\';return false;';
             $vimeoEmbed = 'https://player.vimeo.com/video/' .
                 $id[1] . '?title=0&byline=0&portrait=0';
