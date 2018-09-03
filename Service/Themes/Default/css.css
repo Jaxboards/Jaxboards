@@ -2214,27 +2214,6 @@ a.mgroup4 {
   background-position: bottom center;
 }
 
-/* Arcade */
-.arcade {
-  width: 100%;
-}
-
-.gameinfo {
-  float: right;
-  width: 200px;
-  text-align: center;
-  height: 100%;
-  margin: 10px 10px 0 0;
-  border: 1px solid #99f;
-  background: #eef;
-}
-
-#scores {
-  margin: 10px;
-  border: 1px solid #99f;
-  background: #fff;
-}
-
 /* stylelint-disable no-descending-specificity */
 #searchform .content {
   padding: 10px;

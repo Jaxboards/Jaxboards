@@ -516,24 +516,6 @@ EOT
                     $mid1
                 );
 
-                // Arcade.
-                $DB->safeupdate(
-                    'arcade_scores',
-                    array(
-                        'uid' => $mid2,
-                    ),
-                    'WHERE `uid`=?',
-                    $mid1
-                );
-                $DB->safeupdate(
-                    'arcade_games',
-                    array(
-                        'leader' => $mid2,
-                    ),
-                    'WHERE `leader`=?',
-                    $mid1
-                );
-
                 // Sum post count on account being merged into.
                 $result = $DB->safeselect(
                     '`posts`,`id`',
@@ -639,10 +621,6 @@ EOT
                 // Session.
                 $DB->safedelete('session', 'WHERE `uid`=?', $mid);
 
-                // Arcade.
-                $DB->safedelete('arcade_scores', 'WHERE `uid`=?', $mid);
-                // TODO: Fix arcade game leader of deleted member
-                // if they have high scores
                 // delete the account.
                 $DB->safedelete('members', 'WHERE `id`=?', $mid);
 

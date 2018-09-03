@@ -33,37 +33,6 @@ CREATE TABLE `blueprint_activity` (
 
 TRUNCATE `blueprint_activity`;
 
-DROP TABLE IF EXISTS `blueprint_arcade_games`;
-CREATE TABLE `blueprint_arcade_games` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `title` varchar(255) COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `description` varchar(255) COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `leader` int(11) unsigned NULL,
-  `score` int(11) unsigned NOT NULL,
-  `times_played` int(11) unsigned NOT NULL,
-  `swf` varchar(255) COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `gname` varchar(255) COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `icon` varchar(255) COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  `width` int(11) unsigned NOT NULL,
-  `height` int(11) unsigned NOT NULL,
-  FOREIGN KEY (`leader`) REFERENCES `blueprint_members` (`id`) ON DELETE CASCADE
-) ENGINE='InnoDB' COLLATE 'utf8mb4_unicode_ci';
-
-TRUNCATE `blueprint_arcade_games`;
-
-DROP TABLE IF EXISTS `blueprint_arcade_scores`;
-CREATE TABLE `blueprint_arcade_scores` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `game_id` int(11) unsigned NOT NULL,
-  `score` int(11) unsigned NOT NULL,
-  `uid` int(11) unsigned NOT NULL,
-  `comment` varchar(255) COLLATE 'utf8mb4_unicode_ci' NOT NULL,
-  FOREIGN KEY (`uid`) REFERENCES `blueprint_members` (`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`game_id`) REFERENCES `blueprint_arcade_games` (`id`) ON DELETE CASCADE
-) ENGINE='InnoDB' COLLATE 'utf8mb4_unicode_ci';
-
-TRUNCATE `blueprint_arcade_scores`;
-
 DROP TABLE IF EXISTS `blueprint_categories`;
 CREATE TABLE `blueprint_categories` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,

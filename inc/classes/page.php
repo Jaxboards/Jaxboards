@@ -442,30 +442,4 @@ class PAGE
             return $this->debuginfo;
         }
     }
-
-    public function SWF($file, $options = array())
-    {
-        $settings = array('width' => '100%', 'height' => '100%');
-        foreach ($options as $k => $v) {
-            $settings[$k] = $v;
-        }
-        $object
-            = '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" ' .
-            'width="' . $settings['width'] . '" height="' . $settings['height'] . '">';
-        $object .= '<param name="movie" value="' . $file . '"></param>';
-        if ($settings['flashvars']) {
-            $object .= '<param name="flashvars" value="' .
-                http_build_query($settings['flashvars']) . '" />';
-        }
-        $object .= '<param name="allowScriptAccess" value="always" />';
-        $embed = '<embed style="display:block" ' .
-            'type="application/x-shockwave-flash" ' .
-            'pluginspage="https://get.adobe.com/flashplayer/" ' .
-            'src="' . $file . '" width="' . $settings['width'] . '" height="' .
-            $settings['height'] . '" wmode="opaque" flashvars="' .
-            http_build_query($settings['flashvars']) .
-            '" allowScriptAccess="always"></embed>';
-
-        return mb_stristr('msie', $_SERVER['HTTP_USER_AGENT']) ? $object : $embed;
-    }
 }
