@@ -54,7 +54,7 @@ function RUNF() {
     var parsed;
     if (!dates) return;
     for (x = 0; x < dates.length; x++) {
-      parsed = JAX.el.hasClass(dates[x], "smalldate")
+      parsed = dates[x].classList.contains("smalldate")
         ? JAX.smalldate(parseInt(dates[x].title))
         : JAX.date(parseInt(dates[x].title));
       if (parsed != dates[x].innerHTML) dates[x].innerHTML = parsed;
@@ -200,7 +200,7 @@ function RUNF() {
       alert(a[0]);
     },
     addclass: function(a) {
-      JAX.el.addClass(document.querySelector(a[0]), a[1]);
+      document.querySelector(a[0]).classList.add(a[1]);
     },
     title: function(a) {
       document.title = a;
@@ -379,8 +379,10 @@ function RUNF() {
           a[2] = a[2].substring(3);
           a[1] = "***" + a[1];
         }
-        JAX.el.addClass(d, a[3] ? "you" : "them");
-        if (!a[3]) JAX.el.removeClass(document.querySelector("#im_" + a[0]), "offline");
+        d.classList.add(a[3] ? "you" : "them");
+        if (!a[3]) {
+          document.querySelector("#im_" + a[0]).classList.remove("offline");
+        }
         d.innerHTML =
           "<a href='?act=vu" +
           (a[3] || parseInt(a[0])) +
@@ -401,7 +403,7 @@ function RUNF() {
       }
     },
     imtoggleoffline: function(a) {
-      JAX.el.addClass(document.querySelector("#im_" + a), "offline");
+      document.querySelector("#im_" + a).classList.add("offline");
     },
     window: function(a) {
       a = a[0];

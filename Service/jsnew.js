@@ -178,7 +178,7 @@ var JAX = new function() {
       els = d.getElementsByTagName("div");
       l = els.length || 0;
       for (x = 0; x < l; x++) {
-        if (JAX.el.hasClass(els[x], "selected")) {
+        if (els[x].classList.contains("selected")) {
           sindex = x;
           break;
         }
@@ -188,18 +188,18 @@ var JAX = new function() {
     d.style.left = coords.x + "px";
     d.style.width = coords.w + "px";
     if (e.UP && l && sindex >= 1 && typeof sindex != "undefined") {
-      JAX.el.removeClass(els[sindex], "selected");
-      JAX.el.addClass(els[sindex - 1], "selected");
+      els[sindex].classList.remove("selected");
+      els[sindex - 1].classList.add("selected");
     } else if (
       e.DOWN &&
       l &&
       (sindex < l - 1 || typeof sindex == "undefined")
     ) {
       if (typeof sindex == "undefined") {
-        JAX.el.addClass(els[0], "selected");
+        els[0].classList.add("selected");
       } else {
-        JAX.el.removeClass(els[sindex], "selected");
-        JAX.el.addClass(els[sindex + 1], "selected");
+        els[sindex].classList.remove("selected");
+        els[sindex + 1].classList.add("selected");
       }
     } else if (e.ENTER && l && typeof sindex != undefined) {
       els[sindex].onclick();
@@ -413,7 +413,7 @@ var JAX = new function() {
       JAX.sfx(a, 5, 10, 0)
         .add("height", "0px", fh)
         .then(function() {
-          JAX.el.removeClass(b, "collapsed");
+          b.classList.remove("collapsed");
         })
         .play();
     } else {
@@ -424,7 +424,7 @@ var JAX = new function() {
       JAX.sfx(a, 5, 10, 0)
         .add("height", fh, "0px")
         .then(function() {
-          JAX.el.addClass(b, "collapsed");
+          b.classList.add("collapsed");
         })
         .play();
     }
@@ -507,18 +507,6 @@ var JAX = new function() {
     replace: function(a, b) {
       JAX.el.insertBefore(b, a);
       if (a.parentNode) a.parentNode.removeChild(a);
-    },
-
-    addClass: function(a, c) {
-      if (!a.className.match(c)) a.className += " " + c;
-    },
-
-    removeClass: function(a, c) {
-      a.className = a.className.replace(" " + c, "");
-    },
-
-    hasClass: function(a, c) {
-      return a.className.match(c);
     },
 
     getHighestZIndex: function() {
@@ -712,10 +700,10 @@ var JAX = new function() {
         me.el.style.backgroundColor = "";
         var bg = JAX.el.getComputedStyle(me.el).backgroundColor.toString();
         var bg2;
-        JAX.el.addClass(me.el, "highlight");
+        me.el.classList.add("highlight");
         bg2 = JAX.el.getComputedStyle(me.el).backgroundColor.toString();
         if (bg2 == bg) bg2 = "FF0";
-        JAX.el.removeClass(me.el, "highlight");
+        me.el.classList.add("highlight");
         return me.add("backgroundColor", bg2, bg).then(function() {
           me.el.style.backgroundColor = bg;
         });
@@ -2027,20 +2015,20 @@ var JAX = new function() {
       var c = me.open;
       var x;
       var w = 0;
-      if (JAX.el.hasClass(c, "minimized")) {
-        JAX.el.removeClass(c, "minimized");
+      var isMinimized = c.classList.contains("minimized");
+      c.classList.toggle("minimized");
+      if (isMinimized) {
         c.removeAttribute("draggable");
         me.setPosition(me.oldpos, 0);
       } else {
         c.setAttribute("draggable", "false");
         var wins = document.querySelectorAll(".window");
         for (x = 0; x < wins.length; x++) {
-          if (JAX.el.hasClass(wins[x], "minimized")) {
+          if (wins[x].classList.contains("minimized")) {
             w += parseInt(wins[x].clientWidth);
           }
         }
         me.oldpos = me.getPosition();
-        JAX.el.addClass(c, "minimized");
         me.setPosition("bl " + w + " 0", 0);
       }
     };

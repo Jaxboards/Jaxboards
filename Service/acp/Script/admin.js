@@ -6,7 +6,7 @@ function dd_menu(e) {
   var s;
   if (el.tagName.toLowerCase() == "a") {
     var menu = document.querySelector("#menu_" + el.className);
-    JAX.el.addClass(el, "active");
+    el.classList.add("active");
     s = menu.style;
     s.display = "block";
     p = JAX.el.getCoordinates(el);
@@ -16,7 +16,7 @@ function dd_menu(e) {
       e = e || window.event;
       if (!e.relatedTarget && e.toElement) e.relatedTarget = e.toElement;
       if (e.relatedTarget != menu && e.relatedTarget.offsetParent != menu) {
-        JAX.el.removeClass(el, "active");
+        el.classList.remove("active");
         menu.style.display = "none";
       }
     };
@@ -28,7 +28,7 @@ function dd_menu(e) {
         e.relatedTarget.offsetParent != menu &&
         e.relatedTarget != menu
       ) {
-        JAX.el.removeClass(el, "active");
+        el.classList.remove("active");
         menu.style.display = "none";
       }
     };

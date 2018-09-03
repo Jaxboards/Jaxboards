@@ -46,11 +46,7 @@ OnDomReady(function() {
       }
     },
     togbutton: function(button) {
-      if (JAX.el.hasClass(button, "selected")) {
-        JAX.el.removeClass(button, "selected");
-      } else {
-        JAX.el.addClass(button, "selected");
-      }
+      button.classList.toggle("selected");
     }
   };
 });
