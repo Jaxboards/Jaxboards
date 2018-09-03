@@ -4,22 +4,10 @@ Array.prototype.swap = function(a, b) {
   this[b] = x;
   return this;
 };
-Array.prototype.inArray = function(a) {
-  for (var x = 0; x < this.length; x++) if (this[x] == a) return x;
-  return false;
-};
 String.prototype.striphtml = function() {
   return this.valueOf()
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
-};
-
-Math.rand = function(a, b) {
-  if (!b) {
-    b = a;
-    a = 0;
-  }
-  return Math.round(Math.random() * b + a);
 };
 
 function $() {
@@ -441,7 +429,7 @@ var JAX = new function() {
       if (dbj.called) {
         return;
       }
-      var x = dbj.imgs.inArray(this.src);
+      var x = dbj.imgs.includes(this.src);
       if (x === false) {
         return;
       }
@@ -452,7 +440,7 @@ var JAX = new function() {
       }
     };
     for (x = 0; x < imgs.length; x++) {
-      if (dbj.imgs.inArray(imgs[x].src) === false && !imgs[x].loaded) {
+      if (dbj.imgs.includes(imgs[x].src) === false && !imgs[x].loaded) {
         dbj.imgs.push(imgs[x].src);
         addEvent(imgs[x], "onload", dbj.callback);
         imgs[x].src = imgs[x].src;

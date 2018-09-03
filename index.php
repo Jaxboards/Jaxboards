@@ -184,12 +184,6 @@ if (!$PAGE->jsaccess) {
         ' <script type="text/javascript" src="' . BOARDURL .
         'Service/jsrun.js"></script>'
     );
-    $PAGE->append(
-        'SCRIPT',
-        '<!--[if IE]>' .
-        '<link rel="stylesheet" type="text/css" href="' . BOARDURL .
-        'Script/fiximgnatural.css" /><![endif]-->'
-    );
 
     if ($PERMS['can_moderate'] || $USER['mod']) {
         $PAGE->append(
