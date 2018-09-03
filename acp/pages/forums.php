@@ -152,7 +152,7 @@ EOT
         ) . "<form method='post'><input type='hidden' id='ordered' " .
         "name='tree' /><input type='submit' value='Save' /></form>";
         $page .= "<script type='text/javascript'>" .
-            "JAX.sortableTree(document.querySelectorAll('.tree'),'forum_','ordered')</script>";
+            "JAX.sortableTree(document.querySelectorAll('.tree'),'forum_',document.querySelector('ordered'))</script>";
         $PAGE->addContentBox('Forums', $page);
     }
 
@@ -558,11 +558,11 @@ EOT
             $moderators .= 'No forum-specific moderators added!';
         }
         $moderators .= '<br /><input type="text" name="name" ' .
-            'onkeyup="$(\'validname\').className=\'bad\';' .
+            'onkeyup="document.querySelector(\'#validname\').className=\'bad\';' .
             'JAX.autoComplete(\'act=searchmembers&term=\'+' .
-            'this.value,this,$(\'modid\'),event);" />
+            'this.value,this,document.querySelector(\'#modid\'),event);" />
             <input type="hidden" id="modid" name="modid" ' .
-            'onchange="$(\'validname\').className=\'good\'"/>' .
+            'onchange="document.querySelector(\'#validname\').className=\'good\'"/>' .
             '<span id="validname"></span>' .
             '<input type="submit" name="submit" value="Add Moderator" />' .
             '</td></tr>
@@ -585,7 +585,7 @@ EOT
 function globaltoggle(a,checked){
 for(var x=0;x<6;x++) a.cells[x+2].style.visibility=checked?'hidden':'visible'
 }
-var perms=$('perms')
+var perms=document.querySelector('#perms')
 for(var x=1;x<perms.rows.length;x++){
  globaltoggle(perms.rows[x],perms.rows[x].getElementsByTagName('input')[0].checked)
 }

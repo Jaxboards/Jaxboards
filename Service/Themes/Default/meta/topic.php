@@ -165,11 +165,11 @@ EOT
     ,
     'topic-qedit-post' => <<<'EOT'
 <form method="post"
-    onsubmit="$('pdedit%3$s').editor.submit();return RUN.submitForm(this)">
+    onsubmit="document.querySelector('#pdedit%3$s').editor.submit();return RUN.submitForm(this)">
     %1$s
     <textarea id="postdata%3$s" name="postdata">%2$s</textarea>
     <iframe id="pdedit%3$s" style="display:none"
-        onload="JAX.editor($('postdata%3$s'),this)">
+        onload="JAX.editor(document.querySelector('#postdata%3$s'),this)">
     </iframe>
     <br />
     <input type="submit" value="Edit" />
@@ -181,7 +181,7 @@ EOT
     ,
     'topic-qedit-topic' => <<<'EOT'
 <form method="post"
-    onsubmit="$('pdedit').editor.submit();return RUN.submitForm(this)">
+    onsubmit="document.querySelector('#pdedit').editor.submit();return RUN.submitForm(this)">
     %s
     Topic Title:
     <input type="text" name="ttitle" value="%s" />
@@ -190,7 +190,7 @@ EOT
     <input type="text" name="tdesc" value="%s" />
     <br />
     <textarea id="postdata" name="postdata">%s</textarea>
-    <iframe id="pdedit" onload="JAX.editor($('postdata'),this)" style="display:none">
+    <iframe id="pdedit" onload="JAX.editor(document.querySelector('#postdata'),this)" style="display:none">
     </iframe>
     <br />
     <input type="submit" value="Edit" />

@@ -230,8 +230,8 @@ EOT
         }
 
         $this->ucppage = $PAGE->meta('ucp-sound-settings', $checkboxes);
-        $this->runscript = "if($('dtnotify')&&window.webkitNotifications) " .
-            "$('dtnotify').checked=(webkitNotifications.checkPermission()==0)";
+        $this->runscript = "if(document.querySelector('#dtnotify')&&window.webkitNotifications) " .
+            "document.querySelector('#dtnotify').checked=(webkitNotifications.checkPermission()==0)";
 
         unset($checkboxes);
     }

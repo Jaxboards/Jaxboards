@@ -99,7 +99,7 @@ function RUNF() {
   };
 
   this.handleQuoting = function(a) {
-    RUN.stream.load(a.href + "&qreply=" + ($("qreply") ? "1" : "0"));
+    RUN.stream.load(a.href + "&qreply=" + (document.querySelector("#qreply") ? "1" : "0"));
   };
 
   this.setWindowActive = function() {
@@ -123,7 +123,7 @@ function RUNF() {
     if (xmlobj.status != 200) return;
     else xmlobj.parsed = true;
     var xml = xmlobj.responseText;
-    var db = $("debug");
+    var db = document.querySelector("#debug");
     var softurl = false;
     if (typeof xml != "string") xml = "";
     if (db) db.innerHTML = "<xmp>" + xml + "</xmp>";
@@ -245,7 +245,10 @@ function RUNF() {
       stream.lastURL = "?" + a;
     },
     setstatus: function(a) {
-      if ($("status")) $("status").className = a[0];
+      var status = document.querySelector("#status");
+      if (status) {
+        status.className = a[0];
+      }
     },
     appendrows: function(a) {
       var table = document.querySelector(a[0]);
@@ -261,8 +264,10 @@ function RUNF() {
       else document.location = a[0];
     },
     enable: function(a) {
-      a = $(a[0]);
-      if (a) a.disabled = false;
+      a = document.querySelector('#' + a[0]);
+      if (a) {
+        a.disabled = false;
+      }
     },
     addshout: function(a) {
       var a = a[0];
@@ -284,7 +289,7 @@ function RUNF() {
       JAX.gracefulDegrade(div);
     },
     tick: function(a) {
-      var ticker = $("ticker");
+      var ticker = document.querySelector("#ticker");
       var tick = document.createElement("div");
       tick.className = "tick";
       tick.innerHTML = a[0];
@@ -375,7 +380,7 @@ function RUNF() {
           a[1] = "***" + a[1];
         }
         JAX.el.addClass(d, a[3] ? "you" : "them");
-        if (!a[3]) JAX.el.removeClass($("im_" + a[0]), "offline");
+        if (!a[3]) JAX.el.removeClass(document.querySelector("#im_" + a[0]), "offline");
         d.innerHTML =
           "<a href='?act=vu" +
           (a[3] || parseInt(a[0])) +
@@ -396,7 +401,7 @@ function RUNF() {
       }
     },
     imtoggleoffline: function(a) {
-      JAX.el.addClass($("im_" + a), "offline");
+      JAX.el.addClass(document.querySelector("#im_" + a), "offline");
     },
     window: function(a) {
       a = a[0];
@@ -417,7 +422,7 @@ function RUNF() {
     },
     openbuddylist: function(a) {
       a = a[0];
-      var buddylist = $("buddylist");
+      var buddylist = document.querySelector("#buddylist");
       var win;
       if (!buddylist) {
         win = new JAX.window();
@@ -444,7 +449,7 @@ function RUNF() {
       var html = "";
       var tmp;
       var link;
-      var statusers = $("statusers");
+      var statusers = document.querySelector("#statusers");
       var newlink;
       if (!statusers) return;
       for (x = 0; x < a[0].length; x++) {
@@ -477,7 +482,7 @@ function RUNF() {
       }
     },
     setoffline: function(a) {
-      var statusers = $("statusers");
+      var statusers = document.querySelector("#statusers");
       var ids = a[0].split(",");
       var x;
       var link;
@@ -500,16 +505,17 @@ function RUNF() {
       );
     },
     updateqreply: function(a) {
-      if ($("qreply")) {
-        $("qreply")
-          .getElementsByTagName("textarea")[0]
+      var qreply = document.querySelector('#qreply');
+      if (qreply) {
+        qreply
+          .querySelector("textarea")
           .focus();
-        $("qreply").getElementsByTagName("textarea")[0].value += a[0];
+        qreply.querySelector("textarea").value += a[0];
       }
     },
     newmessage: function(a) {
-      var n = $("notification");
-      var num = $("num-messages");
+      var n = document.querySelector("#notification");
+      var num = document.querySelector("#num-messages");
       if (num) num.innerHTML = parseInt(num.innerHTML) + 1;
       if (!n) {
         n = document.createElement("div");
@@ -528,7 +534,7 @@ function RUNF() {
       Sound.loadAndPlay(a[0], a[1], a[2] ? true : false);
     },
     attachfiles: function() {
-      var el = $("attachfiles");
+      var el = document.querySelector("#attachfiles");
       var u = Uploader.createButton();
       var d = document.createElement("div");
       d.className = "files";
@@ -564,18 +570,18 @@ function RUNF() {
         w.create();
       };
       u[1].progress = function(file, b, c) {
-        $("progress_" + this.id + "_" + file.id).style.width =
+        document.querySelector("#progress_" + this.id + "_" + file.id).style.width =
           Math.round((b / c) * 100) + "%";
       };
       u[1].response = function(response) {
-        $("pdedit").editor.cmd(
+        document.querySelector("#pdedit").editor.cmd(
           "inserthtml",
           "[attachment]" + response + "[/attachment]"
         );
       };
     },
     listrating: function(a) {
-      var prdiv = $("postrating_" + a[0]);
+      var prdiv = document.querySelector("#postrating_" + a[0]);
       var c;
       if (prdiv) {
         if (prdiv.style.display != "none") {
@@ -594,7 +600,7 @@ function RUNF() {
         c = JAX.el.getCoordinates(document.querySelector("#pid_" + a[0] + " .postrating"));
         prdiv.style.top = c.yh + "px";
         prdiv.style.left = c.x + "px";
-        $("page").appendChild(prdiv);
+        document.querySelector("#page").appendChild(prdiv);
       }
       prdiv.innerHTML = a[1];
       new JAX.sfx(prdiv).add("height", "0px", "200px").play();
@@ -621,11 +627,10 @@ function RUNF() {
   document.cookie = "buddylist=0";
 }
 
-$(function() {
+OnDomReady(function() {
   RUN = new RUNF();
 });
-$(function() {
-  window.loaded = true;
+OnDomReady(function() {
   window.name = Math.random();
   window.addEventListener("onfocus", function() {
     RUN.setWindowActive();

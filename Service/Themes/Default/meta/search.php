@@ -17,7 +17,7 @@ $meta = array(
             <input type="text" id="searchterm" name="searchterm" value="%1$s" />
             <input type="submit" value="Search" />
             &nbsp; &nbsp;
-            <a href="?" onclick="JAX.toggle($('searchadvanced'));return false;">
+            <a href="?" onclick="JAX.toggle(document.querySelector('#searchadvanced'));return false;">
                 Advanced
             </a>
             <table id="searchadvanced" style="display:none">
@@ -54,7 +54,7 @@ $meta = array(
                                 return JAX.autoComplete(
                                     'act=searchmembers&amp;term='+this.value,
                                     this,
-                                    $('mid'),
+                                    document.querySelector('#mid'),
                                     event
                                 );
                              " />

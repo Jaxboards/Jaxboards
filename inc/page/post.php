@@ -235,7 +235,7 @@ EOT
                 );
             }
             $form = '<form method="post"
-                onsubmit="$(\'pdedit\').editor.submit();' .
+                onsubmit="document.querySelector(\'#pdedit\').editor.submit();' .
                 'if(this.submitButton.value.match(/post/i)) ' .
                 'this.submitButton.disabled=true;return ' .
                 'RUN.submitForm(this,0,event);">
@@ -251,10 +251,10 @@ EOT
 <br />
   <textarea name="postdata" id="postdata">' . $JAX->blockhtml($postdata) .
             '</textarea>
-  <iframe id="pdedit" onload="JAX.editor($(\'postdata\'),this)"
+  <iframe id="pdedit" onload="JAX.editor(document.querySelector(\'#postdata\'),this)"
 style="display:none"></iframe><br /><div class="postoptions">
   ' . ($fdata['perms']['poll'] ? '<label class="addpoll" for="addpoll">Add a
-Poll</label> <select name="poll_type" onchange="$(\'polloptions\').' .
+Poll</label> <select name="poll_type" onchange="document.querySelector(\'#polloptions\').' .
             'style.display=this.value?\'block\':\'none\'">
 <option value="">No</option>
 <option value="single">Yes, single-choice</option>
@@ -279,7 +279,7 @@ onclick="this.form.submitButton=this" /></div>
             if ($fdata['perms']['upload']) {
                 $PAGE->JS('attachfiles');
             }
-            $PAGE->JS('SCRIPT', "$('pollchoices').style.display='none'");
+            $PAGE->JS('SCRIPT', "document.querySelector('#pollchoices').style.display='none'");
         }
     }
 
@@ -365,11 +365,11 @@ EOT
 
         $form = '<div class="postform">
 <form method="post" onsubmit="if(this.submitButton.value.match(/post/i)) ' .
-        'this.submitButton.disabled=true;$(\'pdedit\').editor.submit();return ' .
+        'this.submitButton.disabled=true;document.querySelector(\'#pdedit\').editor.submit();return ' .
         'RUN.submitForm(this,0,event);" enctype="multipart/form-data">
  ' . $vars . '
   <textarea name="postdata" id="post">' . $postdata .
-        '</textarea><iframe id="pdedit" onload="JAX.editor($(\'post\'),this)"
+        '</textarea><iframe id="pdedit" onload="JAX.editor(document.querySelector(\'#post\'),this)"
   style="display:none"></iframe><br />' .
         ($tdata['perms']['upload'] ? '<div id="attachfiles">Add Files
   <input type="file" name="Filedata" /></div>' : '') .

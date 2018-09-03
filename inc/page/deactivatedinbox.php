@@ -448,9 +448,9 @@ EOT
                 $mname = '';
             }
         }
-        $toKeyUp = '$(\'validname\').className=\'bad\';' .
+        $toKeyUp = 'document.querySelector(\#'validname\').className=\'bad\';' .
             'JAX.autoComplete(\'act=searchmembers&term=\'+' .
-            'this.value,this,$(\'mid\'),event);';
+            'this.value,this,document.querySelector(\#'mid\'),event);';
         $goodClass = ($mname ? ' class="good"' : '');
         $msgClean = htmlspecialchars($msg);
         $hiddenFields = $JAX->hiddenFormFields(
@@ -463,14 +463,14 @@ EOT
         $page = <<<EOT
 <div class="composeform">
     <form method="post"
-        onsubmit="$('pdedit').editor.submit();return RUN.submitForm(this)">
+        onsubmit="document.querySelector('#pdedit').editor.submit();return RUN.submitForm(this)">
         ${hiddenFields}
         <div>
             <label for="to">
                 To:
             </label>
             <input type="hidden" id="mid" name="mid"
-                onchange="$('validname').className='good'"
+                onchange="document.querySelector('#validname').className='good'"
                 value="${mid}" />
             <input type="text" id="to" name="to" value="${mname}"
                 onkeydown="if(event.keyCode==13) return false;"
@@ -484,7 +484,7 @@ EOT
             <input type="text" id="title" name="title" value="${mtitle}"/>
         </div>
         <div>
-            <iframe onload="JAX.editor($('message'),this)"
+            <iframe onload="JAX.editor(document.querySelector('#message'),this)"
                 style="display:none" id="pdedit"></iframe>
             <textarea id="message" name="message">${msgClean}</textarea>
         </div>

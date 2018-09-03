@@ -1,4 +1,4 @@
-$(function() {
+OnDomReady(function() {
   RUN.modcontrols = {
     checklocation: function() {
       var whichone = RUN.modcontrols.whichone;
@@ -25,7 +25,7 @@ $(function() {
     },
     getitup: function(html) {
       var html;
-      var modb = $("modbox");
+      var modb = document.querySelector("#modbox");
       if (!modb) {
         modb = document.createElement("div");
         modb.id = "modbox";
@@ -35,7 +35,7 @@ $(function() {
       modb.innerHTML = html;
     },
     takeitdown: function() {
-      var modb = $("modbox");
+      var modb = document.querySelector("#modbox");
       if (JAX.event.onPageChangeOld) {
         JAX.event.onPageChange = JAX.event.onPageChangeOld;
         JAX.event.onPageChangeOld = null;
@@ -54,7 +54,7 @@ $(function() {
     }
   };
 });
-$(function() {
+OnDomReady(function() {
   JAX.extend(RUN.stream.commands, {
     modcontrols_sayhi: function(a) {
       alert("this is a test");

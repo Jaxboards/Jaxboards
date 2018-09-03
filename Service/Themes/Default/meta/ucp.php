@@ -3,7 +3,7 @@
 $meta = array(
     'ucp-index' => <<<'EOT'
  <form method="post"
-    onsubmit="$('npedit').editor.submit();return RUN.submitForm(this)">
+    onsubmit="document.querySelector('#npedit').editor.submit();return RUN.submitForm(this)">
     %s
     <div class="username">
         %s
@@ -12,7 +12,7 @@ $meta = array(
         <img src="%s" />
     </div>
     <textarea id="notepad" name="ucpnotepad">%s</textarea>
-    <iframe id="npedit" onload="JAX.editor($('notepad'),this)"
+    <iframe id="npedit" onload="JAX.editor(document.querySelector('#notepad'),this)"
         style="display:none">
     </iframe>
     <input type="submit" value="Save" />
@@ -132,7 +132,7 @@ EOT
 EOT
     ,
     'ucp-sig-settings' => <<<'EOT'
-<form onsubmit="$('npedit').editor.submit();return RUN.submitForm(this)"
+<form onsubmit="document.querySelector('#npedit').editor.submit();return RUN.submitForm(this)"
     method="post">
     %s
     Signature preview:
@@ -141,7 +141,7 @@ EOT
     <br />
     <br />
     <textarea name="changesig" id="changesig">%s</textarea>
-    <iframe id="npedit" onload="JAX.editor($('changesig'),this)"
+    <iframe id="npedit" onload="JAX.editor(document.querySelector('#changesig'),this)"
         style="display:none">
     </iframe>
     <br />
@@ -163,8 +163,8 @@ EOT
     </label>
     <input type="password" name="newpass1" id="newpass1" />
     <input name="showpass" type="checkbox" onclick="
-        $('newpass1').type=this.checked?'text':'password';
-        $('confirmpass').style.display=this.checked?'none':'';
+        document.querySelector('#newpass1').type=this.checked?'text':'password';
+        document.querySelector('#confirmpass').style.display=this.checked?'none':'';
         " />
     Show
     <br />
@@ -181,7 +181,7 @@ EOT
     ,
     'ucp-profile-settings' => <<<'EOT'
 <form method="post"
-    onsubmit="$('abouteditor').editor.submit();return RUN.submitForm(this)">
+    onsubmit="document.querySelector('#abouteditor').editor.submit();return RUN.submitForm(this)">
     %s
     <h2>
         Name:
@@ -215,7 +215,7 @@ EOT
     </h2>
     <div class="description">
         <textarea rows="10" cols="60" name="about" id="about">%s</textarea>
-        <iframe id="abouteditor" onload="JAX.editor($('about'),this)"
+        <iframe id="abouteditor" onload="JAX.editor(document.querySelector('#about'),this)"
             style="display:none">
         </iframe>
         <h2>
@@ -355,20 +355,20 @@ EOT
     'inbox-composeform' => <<<'EOT'
 <div class="composeform">
     <form method="post"
-        onsubmit="$('pdedit').editor.submit();return RUN.submitForm(this)">
+        onsubmit="document.querySelector('#pdedit').editor.submit();return RUN.submitForm(this)">
         %1$s
         <div>
             <label for="to">
                 To:
             </label>
             <input type="hidden" id="mid" name="mid" value="%2$s"
-                onchange="$('validname').className='good'" />
+                onchange="document.querySelector('#validname').className='good'" />
             <input type="text" id="to" name="to" value="%3$s" autocomplete="off"
                 onkeydown="if(event.keyCode==13) return false;"
                 onkeyup="
-                    $('validname').className='bad';
+                    document.querySelector('#validname').className='bad';
                     JAX.autoComplete(
-                        'act=searchmembers&term='+this.value,this,$('mid'),
+                        'act=searchmembers&term='+this.value,this,document.querySelector('#mid'),
                         event
                     );
                 " />
@@ -386,7 +386,7 @@ EOT
                 %6$s
             </textarea>
             <iframe id="pdedit"
-                onload="JAX.editor($('message'),this)" style="display:none">
+                onload="JAX.editor(document.querySelector('#message'),this)" style="display:none">
             </iframe>
         </div>
         <input type="submit" value="Send" />

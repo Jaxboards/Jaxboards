@@ -5,7 +5,7 @@ function dd_menu(e) {
   var p;
   var s;
   if (el.tagName.toLowerCase() == "a") {
-    var menu = $("menu_" + el.className);
+    var menu = document.querySelector("#menu_" + el.className);
     JAX.el.addClass(el, "active");
     s = menu.style;
     s.display = "block";
@@ -72,7 +72,7 @@ function makestuffcool() {
     };
   }
 }
-$(makestuffcool);
+OnDomReady(makestuffcool);
 
 function submitForm(a, b) {
   var names = [];

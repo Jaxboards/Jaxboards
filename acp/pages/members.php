@@ -292,11 +292,11 @@ EOT
         } else {
             $page = "<form method='post'>
                 Member Name: <input type='text' name='name' " .
-                "onkeyup=\"$('validname').className='bad';" .
+                "onkeyup=\"document.querySelector('#validname').className='bad';" .
                 "JAX.autoComplete('act=searchmembers&term='" .
-                "+this.value,this,$('mid'),event);\" />
+                "+this.value,this,document.querySelector('#mid'),event);\" />
                 <input type='hidden' id='mid' name='mid' " .
-                "onchange=\"$('validname').className='good'\"/>" .
+                "onchange=\"document.querySelector('#validname').className='good'\"/>" .
                 "<span id='validname'></span>
                 <input type='submit' name='submit' value='Go' />
                 </form>";
@@ -576,17 +576,17 @@ EOT
             <p>This tool is used for merging duplicate accounts. ' .
             'Merge the duplicate account with the original account.</p>
             <label>Merge:</label><input type="text" name="name1" ' .
-            'onkeyup="$(\'validname\').className=\'bad\';JAX.autoComplete(' .
-            '\'act=searchmembers&term=\'+this.value,this,$(\'mid1\'),event);" />
+            'onkeyup="document.querySelector(\'#validname\').className=\'bad\';JAX.autoComplete(' .
+            '\'act=searchmembers&term=\'+this.value,this,document.querySelector(\'#mid1\'),event);" />
             <input type="hidden" id="mid1" name="mid1" ' .
-            'onchange="$(\'validname\').className=\'good\'"/>' .
+            'onchange="document.querySelector(\'#validname\').className=\'good\'"/>' .
             '<span id="validname"></span><br />
             <label>With:</label><input type="text" name="name2" ' .
-            'onkeyup="$(\'validname2\').className=\'bad\';' .
+            'onkeyup="document.querySelector(\'#validname2\').className=\'bad\';' .
             'JAX.autoComplete(\'act=searchmembers&term=\'+' .
-            'this.value,this,$(\'mid2\'),event);" />
+            'this.value,this,document.querySelector(\'#mid2\'),event);" />
             <input type="hidden" id="mid2" name="mid2" ' .
-            'onchange="$(\'validname2\').className=\'good\'"/>' .
+            'onchange="document.querySelector(\'#validname2\').className=\'good\'"/>' .
             '<span id="validname2"></span><br />
             <input type="submit" name="submit" value="Merge Accounts" />
             </form>';
@@ -668,11 +668,11 @@ EOT
             <p>This tool is used for deleting member accounts.
             All traces of the member ever even existing will vanish away!</p>
             <label>Member Name:</label><input type="text" name="name" ' .
-            'onkeyup="$(\'validname\').className=\'bad\';' .
+            'onkeyup="document.querySelector(\'#validname\').className=\'bad\';' .
             'JAX.autoComplete(\'act=searchmembers&term=\'+' .
-            'this.value,this,$(\'mid\'),event);" autocomplete="off" />
+            'this.value,this,document.querySelector(\'#mid\'),event);" autocomplete="off" />
             <input type="hidden" id="mid" name="mid" ' .
-            'onchange="$(\'validname\').className=\'good\'"/>' .
+            'onchange="document.querySelector(\'#validname\').className=\'good\'"/>' .
             '<span id="validname"></span><br />
             <input type="submit" name="submit" value="Delete Account" />
             </form>';

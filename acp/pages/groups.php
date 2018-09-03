@@ -262,12 +262,13 @@ id='heading'>
         $page .= "</div><div style='margin-top:20px' class='center'>" .
             "<input type='submit' value='Save Changes' /></div></form>";
         $page .= '<script type="text/javascript">window.onscroll=function(){
-    var c=JAX.el.getCoordinates($("heading"))
-    c.y-=parseInt($("heading").style.top)||0
-    var st=document.documentElement.scrollTop||document.body.scrollTop
-    $("heading").style.top=((st-c.y)<0?0:st-c.y)+"px"
-  }
-  </script>';
+            var heading = document.querySelector("#heading");
+            var c=JAX.el.getCoordinates(heading)
+            c.y -= parseInt(heading.style.top) || 0;
+            var st = document.documentElement.scrollTop || document.body.scrollTop
+            heading.style.top=((st-c.y)<0?0:st-c.y)+"px"
+        }
+        </script>';
 
         $PAGE->addContentBox('Perms', $page);
     }

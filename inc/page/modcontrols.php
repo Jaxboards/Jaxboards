@@ -718,12 +718,12 @@ EOT
                 )
             ) .
             'Member name: <input type="text" name="mname" ' .
-            'onkeyup="$(\'validname\').className=\'bad\';' .
+            'onkeyup="document.querySelector(\'#validname\').className=\'bad\';' .
             'JAX.autoComplete(\'act=searchmembers&term=\'+this.value,this' .
-            ',$(\'mid\'),event);" />
+            ',document.querySelector(\'#mid\'),event);" />
             <span id="validname"></span>
             <input type="hidden" name="mid" id="mid" ' .
-            'onchange="$(\'validname\').className=\'good\';' .
+            'onchange="document.querySelector(\'#validname\').className=\'good\';' .
             'this.form.onsubmit();" />
             <input type="submit" value="Go" />
             </form>';

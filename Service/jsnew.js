@@ -10,25 +10,17 @@ String.prototype.striphtml = function() {
     .replace(/>/g, "&gt;");
 };
 
-function $() {
-  var x;
-  var l;
-  var r = [];
-  var a = arguments;
-  for (x = 0, l = a.length; x < l; x++) {
-    if (typeof a[x] == "string") {
-      r.push(document.getElementById(arguments[x]));
-    } else if (typeof a[x] == "function") {
-      if (window.loaded) {
-        window.onload = function() {};
-        window.onloads = null;
-        a[x]();
-      } else {
-        window.addEventListener("onload", a[x]);
-      }
-    }
+/**
+ * Run a callback function either when the DOM is loaded and ready,
+ * or immediately if the document is already loaded.
+ * @param {Function} callback
+ */
+function OnDomReady(callback) {
+  if (document.readyState === 'complete') {
+    callback();
+  } else {
+    document.addEventListener("DOMContentLoaded", callback);
   }
-  return r.length > 1 ? r : r[0];
 }
 
 /*      JAX is the LIBRARY                */
@@ -169,7 +161,7 @@ var JAX = new function() {
         return false;
       }
     };
-    var d = $("autocomplete");
+    var d = document.querySelector("#autocomplete");
     var coords = JAX.el.getCoordinates(el);
     var els;
     var sindex;
@@ -180,7 +172,7 @@ var JAX = new function() {
       d.id = "autocomplete";
       d.style.position = "absolute";
       d.style.zIndex = JAX.el.getHighestZIndex();
-      $("page").appendChild(d);
+      document.querySelector("#page").appendChild(d);
     } else {
       d.style.display = "";
       els = d.getElementsByTagName("div");
@@ -914,7 +906,7 @@ var JAX = new function() {
       emotewin.style.position = "absolute";
       emotewin.style.display = "none";
       me.emoteWindow = emotewin;
-      $("page").appendChild(emotewin);
+      document.querySelector("#page").appendChild(emotewin);
       me.showEmotes(me.createEmoteWindow.x, me.createEmoteWindow.y);
     };
 
@@ -967,7 +959,7 @@ var JAX = new function() {
           }
         }
         me.colorWindow = colorwin;
-        $("page").appendChild(colorwin);
+        document.querySelector("#page").appendChild(colorwin);
       } else {
         colorwin.style.display = "";
       }
@@ -1575,12 +1567,16 @@ var JAX = new function() {
           c = me.coords[x];
           if (ov ? a.my > c.y && a.dy > 0 : a.mx > c.x && a.my > c.y) {
             JAX.el.insertAfter(a.el, d[x]);
-            if (d.swap) me.elems = d.swap(index, x);
+            if (d.swap) {
+              me.elems = d.swap(index, x);
+            }
             ch = 1;
             break;
           }
         }
-      } else if (d.swap) me.elems = d.swap(index, ch);
+      } else if (d.swap) {
+        me.elems = d.swap(index, ch);
+      }
       if (ch !== false) {
         me.coords = [];
         me.change = 1;
@@ -1603,7 +1599,6 @@ var JAX = new function() {
     var seperators = [];
     var all = [];
     var drag;
-    if (formfield) formfield = $(formfield);
     for (x = 0; x < tmp.length; x++) {
       if (tmp[x].className != "title") items.push(tmp[x]);
     }
@@ -1679,7 +1674,9 @@ var JAX = new function() {
         } else {
         }
         drag.reset(a.el, 1);
-        if (formfield) formfield.value = JSON.stringify(parsetree(tree));
+        if (formfield) {
+          formfield.value = JSON.stringify(parsetree(tree));
+        }
       }
     });
 
@@ -1835,7 +1832,7 @@ var JAX = new function() {
       a.colSpan = 2;
       a = b.insertCell(1);
       a.className = "right";
-      $("page").appendChild(tooltip);
+      document.querySelector("#page").appendChild(tooltip);
     }
 
     tooltip.rows[1].cells[1].innerHTML = text;
@@ -1845,7 +1842,7 @@ var JAX = new function() {
     tooltip.style.zIndex = JAX.el.getHighestZIndex();
     el.onmouseout = function() {
       el.title = el.oldtitle;
-      $("tooltip_thingy").style.display = "none";
+      document.querySelector("#tooltip_thingy").style.display = "none";
     };
   };
 
@@ -2212,14 +2209,14 @@ var JAX = new function() {
     this.daysshort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]; // I don't think I'll need a dayslong ever
 
     this.init = function(el) {
-      var dp = $("datepicker");
+      var dp = document.querySelector("#datepicker");
       var s;
       var c = JAX.el.getCoordinates(el);
       var x;
       if (!dp) {
         dp = document.createElement("table");
         dp.id = "datepicker";
-        $("page").appendChild(dp);
+        document.querySelector("#page").appendChild(dp);
       }
       s = dp.style;
       s.display = "table";
@@ -2242,7 +2239,7 @@ var JAX = new function() {
     // month should be 0 for jan, 11 for dec
     this.generate = function(year, month, day) {
       var date = new Date();
-      var dp = $("datepicker");
+      var dp = document.querySelector("#datepicker");
       var row;
       var cell;
       var x;
@@ -2360,7 +2357,7 @@ var JAX = new function() {
       this.hide();
     };
     this.hide = function() {
-      $("datepicker").style.display = "none";
+      document.querySelector("#datepicker").style.display = "none";
     };
   }();
 }();
