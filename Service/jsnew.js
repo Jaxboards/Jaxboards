@@ -393,7 +393,7 @@ var JAX = new function() {
     var act;
     if (el.tagName.toLowerCase() != "a") return;
     if (f) el = f(el);
-    act = JAX.el.getElementsByClassName(a, "active")[0];
+    act = a.querySelector(".active");
     if (act) act.className = "";
     el.className = "active";
     el.blur();
@@ -507,22 +507,6 @@ var JAX = new function() {
     replace: function(a, b) {
       JAX.el.insertBefore(b, a);
       if (a.parentNode) a.parentNode.removeChild(a);
-    },
-    getElementsByClassName: function(parent, classn) {
-      if (!classn) {
-        classn = parent;
-        parent = document;
-      }
-      var els = parent.getElementsByTagName("*");
-      var x;
-      var r = [];
-      var regex = new RegExp(
-        " " + classn + "| " + classn + " |" + classn + " |^" + classn + "$"
-      );
-      for (x = 0; x < els.length; x++) {
-        if (els[x].className.match(regex)) r.push(els[x]);
-      }
-      return !r.length ? [] : r;
     },
 
     addClass: function(a, c) {
