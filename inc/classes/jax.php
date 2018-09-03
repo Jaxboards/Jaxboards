@@ -319,26 +319,9 @@ EOT
     public function getEmoteRules($escape = 1)
     {
         global $CFG,$DB;
-        // Legacy code to update to new system, remove this after 5/1.
-        if (file_exists(BOARDPATH . 'emoticons.php')) {
-            require_once BOARDPATH . 'emoticons.php';
-            foreach ($emoticons as $k => $v) {
-                $DB->safeinsert(
-                    'textrules',
-                    array(
-                        'type' => 'emote',
-                        'needle' => $k,
-                        'replacement' => $v,
-                    )
-                );
-            }
-            unlink(BOARDPATH . 'emoticons.php');
-            foreach ($emoticons as $k => $v) {
-                $nrules[($escape ? preg_quote($k, '@') : $k)]
-                    = '<img src="' . $v . '" />';
-            }
+        if (!isset($this->textRules)) {
+            $this->getTextRules();
         }
-        $this->getTextRules();
 
         return $escape ? $this->emoteRules : $this->textRules['emote'];
     }
@@ -374,22 +357,6 @@ EOT
     {
         global $CFG,$DB;
         if (!isset($this->textRules)) {
-            $wordfilter = array();
-            // Legacy code to update to new system, remove this after 5/1.
-            if (file_exists(BOARDPATH . 'wordfilter.php')) {
-                include_once BOARDPATH . 'wordfilter.php';
-                foreach ($wordfilter as $k => $v) {
-                    $DB->safeinsert(
-                        'textrules',
-                        array(
-                            'type' => 'badword',
-                            'needle' => $k,
-                            'replacement' => $v,
-                        )
-                    );
-                }
-                unlink(BOARDPATH . 'wordfilter.php');
-            }
             $this->getTextRules();
         }
 
