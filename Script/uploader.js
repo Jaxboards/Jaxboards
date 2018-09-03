@@ -1,3 +1,6 @@
+/* eslint-disable */
+// TODO: Remove this file
+
 class Uploader {
   constructor() {
     this.uploaders = [];

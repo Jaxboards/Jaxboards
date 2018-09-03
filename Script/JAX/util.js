@@ -247,3 +247,16 @@ export function select(a) {
     window.getSelection().addRange(r);
   }
 }
+
+/**
+ * Run a callback function either when the DOM is loaded and ready,
+ * or immediately if the document is already loaded.
+ * @param {Function} callback
+ */
+export function onDOMReady(callback) {
+  if (document.readyState === 'complete') {
+    callback();
+  } else {
+    document.addEventListener('DOMContentLoaded', callback);
+  }
+}

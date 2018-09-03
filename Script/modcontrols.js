@@ -1,69 +1,81 @@
-OnDomReady(() => {
-  RUN.modcontrols = {
-    checklocation() {
-      const whichone = RUN.modcontrols.whichone;
-      regex = whichone ? /act=vt(\d+)/ : /act=vf(\d+)/;
-      if (document.location.toString().match(regex)) {
-        RUN.modcontrols.moveto(whichone, RegExp.$1);
-      } else {
-        RUN.stream.commands.modcontrols_move();
-      }
-    },
-    moveto(whichone, id) {
-      RUN.modcontrols.getitup(
-        `<form method="post" onsubmit="return RUN.submitForm(this)">move ${
-          whichone ? 'posts' : 'topics'
-        } here? <input type="hidden" name="act" value="modcontrols" />`
-          + `<input type="hidden" name="${
-            whichone ? 'dop' : 'dot'
-          }" value="moveto" /><input type="hidden" name="id" value="${
-            id
-          }" /><input type="submit" value="Yes" />`
-          + '<input type="submit" name="cancel" value="Cancel" '
-          + 'onclick="this.form.submitButton=this" /></form>',
-      );
-    },
-    getitup(html) {
-      var html;
-      let modb = document.querySelector('#modbox');
-      if (!modb) {
-        modb = document.createElement('div');
-        modb.id = 'modbox';
-        document.body.appendChild(modb);
-      }
-      modb.style.display = 'block';
-      modb.innerHTML = html;
-    },
-    takeitdown() {
-      const modb = document.querySelector('#modbox');
-      if (JAX.event.onPageChangeOld) {
-        JAX.event.onPageChange = JAX.event.onPageChangeOld;
-        JAX.event.onPageChangeOld = null;
-      } else JAX.event.onPageChange = null;
-      if (modb) {
-        modb.innerHTML = '';
-        modb.style.display = 'none';
-      }
-    },
-    togbutton(button) {
-      button.classList.toggle('selected');
-    },
-  };
-});
-OnDomReady(() => {
-  JAX.assign(RUN.stream.commands, {
-    modcontrols_sayhi(a) {
-      alert('this is a test');
-    },
+/* global RUN */
+import {
+  assign,
+  onDOMReady,
+} from './JAX/util';
+import Event from './JAX/event';
 
+// TODO: Find a place for this state
+let onPageChangeOld;
+
+class ModControls {
+  checklocation() {
+    const { whichone } = this;
+    const regex = whichone ? /act=vt(\d+)/ : /act=vf(\d+)/;
+    if (document.location.toString().match(regex)) {
+      this.moveto(RegExp.$1);
+    } else {
+      RUN.stream.commands.modcontrols_move();
+    }
+  }
+
+  moveto(id) {
+    const { whichone } = this;
+    this.getitup(
+      `<form method="post" onsubmit="return RUN.submitForm(this)">move ${
+        whichone ? 'posts' : 'topics'
+      } here? <input type="hidden" name="act" value="modcontrols" />`
+        + `<input type="hidden" name="${
+          whichone ? 'dop' : 'dot'
+        }" value="moveto" /><input type="hidden" name="id" value="${
+          id
+        }" /><input type="submit" value="Yes" />`
+        + '<input type="submit" name="cancel" value="Cancel" '
+        + 'onclick="this.form.submitButton=this" /></form>',
+    );
+  }
+
+  getitup(html) {
+    let modb = this.modb || document.querySelector('#modbox');
+    if (!this.modb) {
+      modb = document.createElement('div');
+      modb.id = 'modbox';
+      document.body.appendChild(modb);
+    }
+    modb.style.display = 'block';
+    modb.innerHTML = html;
+    this.modb = modb;
+  }
+
+  takeitdown() {
+    if (onPageChangeOld) {
+      Event.onPageChange = onPageChangeOld;
+      onPageChangeOld = null;
+    } else Event.onPageChange = null;
+    if (this.modb) {
+      this.modb.innerHTML = '';
+      this.modb.style.display = 'none';
+    }
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  togbutton(button) {
+    button.classList.toggle('selected');
+  }
+}
+
+onDOMReady(() => {
+  RUN.modcontrols = new ModControls();
+});
+
+onDOMReady(() => {
+  assign(RUN.stream.commands, {
     modcontrols_getitup(html) {
       this.busy = true;
       RUN.modcontrols.getitup(html);
     },
 
     modcontrols_postsync(a) {
-      const i = 0;
-      const temp = 0;
       let pids = [];
       if (a[0] && (typeof a[0] === 'string' || typeof a[0] === 'number')) {
         pids = (`${a[0]}`).split(',');
@@ -105,7 +117,7 @@ OnDomReady(() => {
       }<input type='submit' value='Go' /> `
         + '<input name=\'cancel\' type=\'submit\' '
         + 'onclick=\'this.form.submitButton=this;\' value=\'Cancel\' /></form>';
-      JAX.assign(RUN.modcontrols, {
+      assign(RUN.modcontrols, {
         tids,
         tidl: tl,
         pids,
@@ -117,11 +129,11 @@ OnDomReady(() => {
 
     modcontrols_move(a) {
       const whichone = parseInt(a && a[0] ? a[0] : RUN.modcontrols.whichone, 10);
-      if (!this.busy && JAX.event.onPageChangeOld) {
-        JAX.event.onPageChangeOld = JAX.event.onPageChange;
+      if (!this.busy && onPageChangeOld) {
+        onPageChangeOld = Event.onPageChange;
       }
       RUN.modcontrols.whichone = whichone;
-      JAX.event.onPageChange = RUN.modcontrols.checklocation;
+      Event.onPageChange = RUN.modcontrols.checklocation;
       RUN.modcontrols.getitup(
         `Ok, now browse to the ${
           whichone ? 'topic' : 'forum'

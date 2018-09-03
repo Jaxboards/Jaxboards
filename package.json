@@ -3,7 +3,7 @@
     "prettier": "prettier --write *.{{t,j}s{,x,on},{c,sa,sc,le}ss,vue,md,y{,a}ml,graphql}",
     "stylelint": "stylelint \"./**/*.{c,sa,sc,le}ss\"",
     "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\"",
-    "build": "./node_modules/.bin/rollup Script/index.js --format iife --name 'window' --file Service/jsnew.js"
+    "build": "./node_modules/.bin/rollup -c"
   },
   "devDependencies": {
     "eslint": "^5.5.0",

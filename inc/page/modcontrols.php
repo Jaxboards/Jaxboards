@@ -678,7 +678,7 @@ EOT
     public static function load()
     {
         global $PAGE;
-        $script = file_get_contents('Script/modcontrols.js');
+        $script = file_get_contents('dist/modcontrols.js');
         if ($PAGE && $PAGE->jsaccess) {
             $PAGE->JS('softurl');
             $PAGE->JS('script', $script);

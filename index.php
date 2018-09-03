@@ -177,12 +177,12 @@ if (!$PAGE->jsaccess) {
     $PAGE->append(
         'SCRIPT',
         ' <script type="text/javascript" src="' . BOARDURL .
-        'Service/jsnew.js?v=1"></script>'
+        'dist/app.js"></script>'
     );
     $PAGE->append(
         'SCRIPT',
         ' <script type="text/javascript" src="' . BOARDURL .
-        'Service/jsrun.js"></script>'
+        'dist/run.js"></script>'
     );
 
     if ($PERMS['can_moderate'] || $USER['mod']) {
