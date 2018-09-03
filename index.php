@@ -56,9 +56,9 @@ session_start();
 require_once 'domaindefinitions.php';
 
 // Require the classes.
-require_once JAXBOARDS_ROOT . 'inc/classes/page.php';
-require_once JAXBOARDS_ROOT . 'inc/classes/jax.php';
-require_once JAXBOARDS_ROOT . 'inc/classes/sess.php';
+require_once JAXBOARDS_ROOT . '/inc/classes/page.php';
+require_once JAXBOARDS_ROOT . '/inc/classes/jax.php';
+require_once JAXBOARDS_ROOT . '/inc/classes/sess.php';
 
 // Initialize them.
 if (isset($CFG['noboard']) && $CFG['noboard']) {
