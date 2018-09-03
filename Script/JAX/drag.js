@@ -11,23 +11,23 @@ import {
 } from './util';
 
 class Drag {
-  constructor() {
-
-  }
-
   start(event, t, handle) {
-    e = new Event(event).cancel().stopBubbling();
+    const e = new Event(event).cancel().stopBubbling();
     const el = t || this;
     const s = getComputedStyle(el);
     const highz = getHighestZIndex();
-    if (this._nochild && (e.srcElement || e.target) != (handle || el)) return;
-    if (el.getAttribute('draggable') == 'false') return;
+    if (this.noChild && (e.srcElement || e.target) !== (handle || el)) {
+      return;
+    }
+    if (el.getAttribute('draggable') === 'false') {
+      return;
+    }
     this.sess = {
       el,
-      mx: parseInt(e.pageX),
-      my: parseInt(e.pageY),
-      ex: parseInt(s.left) || 0,
-      ey: parseInt(s.top) || 0,
+      mx: parseInt(e.pageX, 10),
+      my: parseInt(e.pageY, 10),
+      ex: parseInt(s.left, 10) || 0,
+      ey: parseInt(s.top, 10) || 0,
       info: {},
       bc: getCoordinates(el),
       zIndex: el.style.zIndex,
@@ -37,42 +37,44 @@ class Drag {
     }
     tryInvoke(this.onstart, {
       ...this.sess,
-      droptarget: this.testDrops(sess.mx, sess.my),
+      droptarget: this.testDrops(this.sess.mx, this.sess.my),
     });
-    document.onmousemove = event => this.drag(event);
-    document.onmouseup = event => this.drop(event);
+    this.boundEvents = {
+      drag: event2 => this.drag(event2),
+      drop: event2 => this.drop(event2),
+    };
+    document.addEventListener('mouseup', this.boundEvents.drag);
+    document.addEventListener('mouseup', this.boundEvents.drop);
     this.drag(e);
   }
 
-  drag(e) {
-    e = new Event(e).cancel();
+  drag(event) {
+    const e = new Event(event).cancel();
     const s = this.sess.el.style;
     let sess;
     let tmp = false;
-    var tx;
-    var ty;
+    const tx = parseInt(e.pageX, 10);
+    const ty = parseInt(e.pageY, 10);
+    let mx = tx;
+    let my = ty;
     let tmp2;
-    var tx;
-    var ty;
-    let mx = (tx = parseInt(e.pageX));
-    let my = (ty = parseInt(e.pageY));
     let left = this.sess.ex + mx - this.sess.mx;
     let top = this.sess.ey + my - this.sess.my;
     const b = this.bounds;
     if (b) {
       if (left < b[0]) {
         mx = mx - left + b[0];
-        left = b[0];
+        [left] = b;
       } else if (left > b[0] + b[2]) left = b[0] + b[2];
       if (top < b[1]) {
         my = my - top + b[1];
-        top = b[1];
+        [top] = b;
       } else if (top > b[1] + b[3]) top = b[1] + b[3];
     }
     s.left = `${left}px`;
     s.top = `${top}px`;
     tmp = (sess = this.sess.info).droptarget;
-    this.sess.info = sess = {
+    sess = {
       left,
       top,
       e,
@@ -82,20 +84,20 @@ class Drag {
       droptarget: this.testDrops(tx, ty),
       dx: mx - (sess.mx || mx),
       dy: my - (sess.my || my),
-      self: me,
       sx: this.sess.ex,
       sy: this.sess.ey,
     };
+    this.sess.info = sess;
     tryInvoke(this.ondrag, sess);
     if (
       sess.droptarget
-      && tmp != sess.droptarget
+      && tmp !== sess.droptarget
     ) {
       tryInvoke(this.ondragover, sess);
     }
     if (
       tmp
-      && sess.droptarget != tmp
+      && sess.droptarget !== tmp
     ) {
       tmp2 = sess.droptarget;
       sess.droptarget = tmp;
@@ -110,24 +112,28 @@ class Drag {
   }
 
   drop() {
-    document.onmousemove = document.onmouseup = function () {};
+    document.removeEventListener('mouseup', this.boundEvents.drag);
+    document.removeEventListener('mousemove', this.boundEvents.drop);
     tryInvoke(this.ondrop, this.sess.info);
-    if (!me._autoz) this.sess.el.style.zIndex = this.sess.zIndex;
+    if (!this.autoZ) {
+      this.sess.el.style.zIndex = this.sess.zIndex;
+    }
     return true;
   }
 
   testDrops(a, b) {
-    let x;
-    const d = me.droppables;
+    const { droppables } = this;
     let z;
     let r = false;
     let max = [9999, 9999];
-    if (!d) return r;
-    for (x = 0; x < d.length; x++) {
-      if (d[x] == this.sess.el || isChildOf(d[x], this.sess.el)) {
-        continue;
+    if (!droppables.length) {
+      return r;
+    }
+    droppables.forEach((droppable) => {
+      if (droppable === this.sess.el || isChildOf(droppable, this.sess.el)) {
+        return;
       }
-      z = getCoordinates(d[x]);
+      z = getCoordinates(droppable);
       if (
         max[0] > z.w
         && max[1] > z.h
@@ -137,9 +143,9 @@ class Drag {
         && b <= z.yh
       ) {
         max = [z.w, z.h];
-        r = d[x];
+        r = droppable;
       }
-    }
+    });
     return r;
   }
 
@@ -162,42 +168,36 @@ class Drag {
   }
 
   apply(el, t) {
-    let x;
-    if (el[0]) {
-      for (x = 0; x < el.length; x++) me.apply(el[x]);
-      return me;
+    if (Array.isArray(el)) {
+      el.forEach(el2 => this.apply(el2));
+      return this;
     }
+
     let pos = getComputedStyle(el, '');
     pos = pos.position;
-    if (!pos || pos == 'static') el.style.position = 'relative';
+    if (!pos || pos === 'static') {
+      el.style.position = 'relative';
+    }
     (t || el).onmousedown = t
-      ? function (e) {
-        me.start(e, el, this);
-      }
-      : me.start;
+      ? e => this.start(e, el, this)
+      : this.start;
     return this;
   }
 
   autoZ() {
-    this._autoz = true;
+    this.autoZ = true;
     return this;
   }
 
   noChildActivation() {
-    this._nochild = true;
+    this.noChild = true;
     return this;
   }
 
-  reset(el, zero) {
-    if (!el) el = this.sess.el;
-    if (zero) {
-      el.style.top = el.style.left = 0;
-    } else {
-      el.style.top = `${this.sess.ey}px`;
-      el.style.left = `${this.sess.ex}px`;
-      el.style.zIndex = this.sess.zIndex;
-    }
-    return me;
+  reset(el = this.sess.el) {
+    el.style.top = 0;
+    el.style.left = 0;
+    return this;
   }
 }
 

@@ -6,9 +6,10 @@ import {
 export default function (el) {
   let tooltip = document.getElementById('tooltip_thingy');
   const pos = getCoordinates(el);
-  const text = (el.oldtitle = el.title.striphtml());
+  const title = el.title.striphtml();
+  // Prevent the browser from showing its own title
   el.title = '';
-  if (!text) return;
+  if (!title) return;
   if (!tooltip) {
     tooltip = document.createElement('table');
     const t = tooltip.insertRow(0);
@@ -40,13 +41,13 @@ export default function (el) {
     document.querySelector('#page').appendChild(tooltip);
   }
 
-  tooltip.rows[1].cells[1].innerHTML = text;
+  tooltip.rows[1].cells[1].innerHTML = title;
   tooltip.style.display = '';
   tooltip.style.top = `${pos.y - tooltip.clientHeight}px`;
   tooltip.style.left = `${pos.x}px`;
   tooltip.style.zIndex = getHighestZIndex();
-  el.onmouseout = function () {
-    el.title = el.oldtitle;
+  el.onmouseout = () => {
+    el.title = title;
     document.querySelector('#tooltip_thingy').style.display = 'none';
   };
 }

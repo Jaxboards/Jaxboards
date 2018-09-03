@@ -1,19 +1,21 @@
-export const getComputedStyle = function (a, b) {
+export function getComputedStyle(a, b) {
   if (!a) return false;
   if (a.currentStyle) return a.currentStyle;
   if (window.getComputedStyle) return window.getComputedStyle(a, b);
   return false;
-};
+}
 
-export const getCoordinates = function (a) {
+export function getCoordinates(a) {
   let x = 0;
   let y = 0;
-  const h = parseInt(a.offsetHeight) || 0;
-  const w = parseInt(a.offsetWidth) || 0;
+  const h = parseInt(a.offsetHeight, 10) || 0;
+  const w = parseInt(a.offsetWidth, 10) || 0;
+  let element = a;
   do {
-    x += parseInt(a.offsetLeft) || 0;
-    y += parseInt(a.offsetTop) || 0;
-  } while ((a = a.offsetParent));
+    x += parseInt(element.offsetLeft, 10) || 0;
+    y += parseInt(element.offsetTop, 10) || 0;
+    element = element.offsetParent;
+  } while (element);
   return {
     x,
     y,
@@ -22,40 +24,43 @@ export const getCoordinates = function (a) {
     w,
     h,
   };
-};
+}
 
-export const isChildOf = function (a, b) {
-  while ((a = a.parentNode)) if (a == b) return true;
-  return false;
-};
-
-export const insertBefore = function (a, b) {
-  if (a.parentNode) a.parentNode.removeChild(a);
-  b.parentNode.insertBefore(a, b);
-};
-
-export const insertAfter = function (a, b) {
-  if (a.parentNode) a.parentNode.removeChild(a);
-  b.parentNode.insertBefore(a, b.nextSibling);
-};
-
-export const replace = function (a, b) {
-  insertBefore(b, a);
-  if (a.parentNode) a.parentNode.removeChild(a);
-};
-
-export const getHighestZIndex = function () {
-  const a = document.getElementsByTagName('*');
-  const l = a.length;
-  let x;
-  let max = 0;
-  for (x = 0; x < l; x++) {
-    if (a[x].style.zIndex && Number(a[x].style.zIndex) > max) {
-      max = Number(a[x].style.zIndex);
+export function isChildOf(a, b) {
+  const parent = a.parentNode;
+  while (parent) {
+    if (parent === b) {
+      return true;
     }
   }
+  return false;
+}
+
+export function insertBefore(a, b) {
+  if (a.parentNode) a.parentNode.removeChild(a);
+  b.parentNode.insertBefore(a, b);
+}
+
+export function insertAfter(a, b) {
+  if (a.parentNode) a.parentNode.removeChild(a);
+  b.parentNode.insertBefore(a, b.nextSibling);
+}
+
+export function replace(a, b) {
+  insertBefore(b, a);
+  if (a.parentNode) a.parentNode.removeChild(a);
+}
+
+export function getHighestZIndex() {
+  const allElements = document.getElementsByTagName('*');
+  const max = allElements.reduce((maxZ, element) => {
+    if (element.style.zIndex && Number(element.style.zIndex) > maxZ) {
+      return Number(element.style.zIndex);
+    }
+    return maxZ;
+  }, 0);
   return max + 1;
-};
+}
 
 export default {
   getComputedStyle,

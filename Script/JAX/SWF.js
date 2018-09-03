@@ -3,37 +3,39 @@ import Browser from './browser';
 export default function (url, name, settings) {
   let object;
   let embed;
-  let x;
-  const s = {
+  const properties = {
     width: '100%',
     height: '100%',
     quality: 'high',
+    ...settings,
   };
-  for (x in settings) s[x] = settings[x];
   object = `<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" id="${
     name
   }" width="${
-    s.width
+    properties.width
   }" height="${
-    s.height
+    properties.height
   }"><param name="movie" value="${
     url
   }"></param>`;
   embed = `<embed style="display:block" type="application/x-shockwave-flash" pluginspage="https://get.adobe.com/flashplayer/" src="${
     url
   }" width="${
-    s.width
+    properties.width
   }" height="${
-    s.height
+    properties.height
   }" name="${
     name
   }"`;
-  for (x in s) {
-    if (x != 'width' && x != 'height') {
-      object += `<param name="${x}" value="${s[x]}"></param>`;
-      embed += ` ${x}="${s[x]}"`;
+
+  Object.keys(properties).forEach((key) => {
+    const value = properties[key];
+    if (key !== 'width' && key !== 'height') {
+      object += `<param name="${key}" value="${value}"></param>`;
+      embed += ` ${key}="${value}"`;
     }
-  }
+  });
+
   embed += '></embed>';
   object += '</object>';
   const tmp = document.createElement('span');

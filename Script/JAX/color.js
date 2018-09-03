@@ -1,32 +1,40 @@
 class Color {
-  constructor(a) {
-    let tmp;
-    let x;
-    if (a.charAt && a.charAt(0) == '#') a = a.substr(1);
+  constructor(colorToParse) {
+    let a = colorToParse;
     // RGB
     if (typeof a === 'object') this.rgb = a;
-    else if (a.match && (tmp = a.match(/^rgb\((\d+),\s?(\d+),\s?(\d+)\)/i))) {
-      tmp[1] = parseFloat(tmp[1]);
-      tmp[2] = parseFloat(tmp[2]);
-      tmp[3] = parseFloat(tmp[3]);
-      tmp.shift();
-      this.rgb = tmp;
-      // HEX
-    } else if (a.match && !a.match(/[^\da-fA-F]/)) {
-      if (a.length == 3) {
-        a = a.charAt(0)
-          + a.charAt(0)
-          + a.charAt(1)
-          + a.charAt(1)
-          + a.charAt(2)
-          + a.charAt(2);
+    else if (typeof a === 'string') {
+      const rgbMatch = a.match(/^rgb\((\d+),\s?(\d+),\s?(\d+)\)/i);
+      const hexMatch = a.match(/#?[^\da-fA-F]/);
+      if (rgbMatch) {
+        rgbMatch[1] = parseFloat(rgbMatch[1]);
+        rgbMatch[2] = parseFloat(rgbMatch[2]);
+        rgbMatch[3] = parseFloat(rgbMatch[3]);
+        rgbMatch.shift();
+        this.rgb = rgbMatch;
+      } else if (hexMatch) {
+        if (a.charAt(0) === '#') {
+          a = a.substr(1);
+        }
+        if (a.length === 3) {
+          a = a.charAt(0)
+            + a.charAt(0)
+            + a.charAt(1)
+            + a.charAt(1)
+            + a.charAt(2)
+            + a.charAt(2);
+        }
+        if (a.length !== 6) this.rgb = [0, 0, 0];
+        else {
+          this.rgb = [];
+          for (let x = 0; x < 3; x += 1) {
+            this.rgb[x] = parseInt(a.substr(x * 2, 2), 16);
+          }
+        }
       }
-      if (a.length != 6) this.rgb = [0, 0, 0];
-      else {
-        this.rgb = [];
-        for (x = 0; x < 3; x++) this.rgb[x] = parseInt(a.substr(x * 2, 2), 16);
-      }
-    } else this.rgb = [0, 0, 0];
+    } else {
+      this.rgb = [0, 0, 0];
+    }
   }
 
   invert() {
@@ -44,7 +52,7 @@ class Color {
     let tmp = '';
     let x;
     const hex = '0123456789ABCDEF';
-    for (x = 0; x < 3; x++) {
+    for (x = 0; x < 3; x += 1) {
       tmp2 = this.rgb[x];
       tmp
         += hex.charAt(Math.floor(tmp2 / 16)) + hex.charAt(Math.floor(tmp2 % 16));

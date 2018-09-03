@@ -21,18 +21,20 @@ export default function (e) {
     case 40:
       e.DOWN = true;
       break;
+    default:
+      break;
   }
   if (typeof e.srcElement === 'undefined') e.srcElement = e.target;
   if (typeof e.pageY === 'undefined') {
-    e.pageY = e.clientY + (parseInt(dE.scrollTop || dB.scrollTop) || 0);
-    e.pageX = e.clientX + (parseInt(dE.scrollLeft || dB.scrollLeft) || 0);
+    e.pageY = e.clientY + (parseInt(dE.scrollTop || dB.scrollTop, 10) || 0);
+    e.pageX = e.clientX + (parseInt(dE.scrollLeft || dB.scrollLeft, 10) || 0);
   }
-  e.cancel = function () {
+  e.cancel = () => {
     e.returnValue = false;
     if (e.preventDefault) e.preventDefault();
     return e;
   };
-  e.stopBubbling = function () {
+  e.stopBubbling = () => {
     if (e.stopPropagation) e.stopPropagation();
     e.cancelBubble = true;
     return e;

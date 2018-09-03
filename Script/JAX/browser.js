@@ -1,4 +1,4 @@
-const userAgent = navigator.userAgent;
+const { userAgent } = navigator;
 
 export default {
   chrome: !!userAgent.match(/chrome/i),

@@ -21,7 +21,6 @@ import window from './window';
 import {
   assign,
   gracefulDegrade,
-  convertSwitches,
   checkAll,
   onImagesLoaded,
   handleTabs,
@@ -29,6 +28,7 @@ import {
   collapse,
   toggleOverlay,
   scrollTo,
+  select,
 } from './util';
 
 export default {
@@ -43,6 +43,7 @@ export default {
   event,
   flashTitle,
   imageResizer,
+  makeImageGallery,
   makeResizer,
   scrollablepagelist,
   smalldate,
@@ -56,7 +57,6 @@ export default {
   // TODO: organize
   assign,
   gracefulDegrade,
-  convertSwitches,
   checkAll,
   onImagesLoaded,
   handleTabs,
@@ -64,4 +64,5 @@ export default {
   collapse,
   overlay: toggleOverlay,
   scrollTo,
+  select,
 };

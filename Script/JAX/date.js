@@ -1,20 +1,15 @@
-const ordsuffix = function (a) {
+function ordsuffix(a) {
   return (
     a
-    + (Math.round(a / 10) == 1 ? 'th' : ['', 'st', 'nd', 'rd'][a % 10] || 'th')
+    + (Math.round(a / 10) === 1 ? 'th' : ['', 'st', 'nd', 'rd'][a % 10] || 'th')
   );
-};
+}
 
-export const date = function (a) {
+export function date(a) {
   const old = new Date();
   const now = new Date();
   let fmt;
-  let hours;
-  let mins;
-  let delta;
-  let ampm;
   const yday = new Date();
-  let dstr;
   const months = [
     'Jan',
     'Feb',
@@ -31,36 +26,35 @@ export const date = function (a) {
   ];
   yday.setTime(yday - 1000 * 60 * 60 * 24);
   old.setTime(a * 1000); // setTime uses milliseconds, we'll be using UNIX Times as the argument
-  hours = old.getHours() % 12;
-  hours = `${hours || 12}`;
-  ampm = hours >= 12 ? 'pm' : 'am';
-  mins = `${old.getMinutes()}`.padStart(2, '0');
-  dstr = `${old.getDate()} ${old.getMonth()} ${old.getFullYear()}`;
-  delta = (now.getTime() - old.getTime()) / 1000;
+  const hours = `${old.getHours() % 12 || 12}`;
+  const ampm = hours >= 12 ? 'pm' : 'am';
+  const mins = `${old.getMinutes()}`.padStart(2, '0');
+  const dstr = `${old.getDate()} ${old.getMonth()} ${old.getFullYear()}`;
+  const delta = (now.getTime() - old.getTime()) / 1000;
   if (delta < 90) {
     fmt = 'a minute ago';
   } else if (delta < 3600) {
     fmt = `${Math.round(delta / 60)} minutes ago`;
   } else if (
     `${now.getDate()} ${now.getMonth()} ${now.getFullYear()}`
-    == dstr
+    === dstr
   ) {
     fmt = `Today @ ${hours}:${mins} ${ampm}`;
   } else if (
     `${yday.getDate()} ${yday.getMonth()} ${yday.getFullYear()}`
-    == dstr
+    === dstr
   ) {
     fmt = `Yesterday @ ${hours}:${mins} ${ampm}`;
   } else {
     fmt = `${months[old.getMonth()]} ${ordsuffix(old.getDate())}, ${old.getFullYear()} @ ${hours}:${mins} ${ampm}`;
   }
   return fmt;
-};
+}
 
-export const smalldate = function (a) {
+export function smalldate(a) {
   const d = new Date();
   d.setTime(a * 1000);
-  const hours = d.getHours();
+  let hours = d.getHours();
   const ampm = hours >= 12 ? 'pm' : 'am';
   hours %= 12;
   hours = hours || 12;
@@ -69,4 +63,4 @@ export const smalldate = function (a) {
   const day = `${d.getDate()}`.padStart(2, '0');
   const year = d.getFullYear();
   return `${hours}:${minutes}${ampm}, ${month}/${day}/${year}`;
-};
+}

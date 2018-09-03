@@ -22,7 +22,6 @@ class DatePicker {
     let dp = document.querySelector('#datepicker');
     let s;
     const c = getCoordinates(el);
-    let x;
     if (!dp) {
       dp = document.createElement('table');
       dp.id = 'datepicker';
@@ -34,40 +33,39 @@ class DatePicker {
     s.top = `${c.yh}px`;
     s.left = `${c.x}px`;
     s = el.value.split('/');
-    if (s.length == 3) {
+    if (s.length === 3) {
       this.selectedDate = [
-        parseInt(s[2]),
-        parseInt(s[0]) - 1,
-        parseInt(s[1]),
+        parseInt(s[2], 10),
+        parseInt(s[0], 10) - 1,
+        parseInt(s[1], 10),
       ];
     } else this.selectedDate = undefined;
 
     this.el = el;
-    this.generate(s[2], s[0] ? parseInt(s[0]) - 1 : undefined, s[1]);
+    this.generate(s[2], s[0] ? parseInt(s[0], 10) - 1 : undefined, s[1]);
   }
 
   // month should be 0 for jan, 11 for dec
-  generate(year, month, day) {
+  generate(iyear, imonth, iday) {
     let date = new Date();
     const dp = document.querySelector('#datepicker');
     let row;
     let cell;
-    let x;
-    let i;
+    let [year, month, day] = [iyear, imonth, iday];
     // date here is today
-    if (year == undefined) {
+    if (year === undefined) {
       year = date.getFullYear();
       month = date.getMonth();
       day = date.getDate();
       this.selectedDate = [year, month, day];
     }
 
-    if (month == -1) {
-      year--;
+    if (month === -1) {
+      year -= 1;
       month = 11;
     }
-    if (month == 12) {
-      year++;
+    if (month === 12) {
+      year += 1;
       month = 0;
     }
 
@@ -86,9 +84,8 @@ class DatePicker {
     cell = row.insertCell(0);
     cell.innerHTML = '<';
     cell.className = 'control';
-    cell.onclick = function () {
-      this.lastYear();
-    };
+    cell.onclick = () => this.lastYear();
+
     cell = row.insertCell(1);
     cell.colSpan = '5';
     cell.className = 'year';
@@ -96,18 +93,15 @@ class DatePicker {
     cell = row.insertCell(2);
     cell.innerHTML = '>';
     cell.className = 'control';
-    cell.onclick = function () {
-      this.nextYear();
-    };
+    cell.onclick = () => this.nextYear();
 
     // month title
     row = dp.insertRow(1);
     cell = row.insertCell(0);
     cell.innerHTML = '<';
     cell.className = 'control';
-    cell.onclick = function () {
-      this.lastMonth();
-    };
+    cell.onclick = () => this.lastMonth();
+
     cell = row.insertCell(1);
     cell.colSpan = '5';
     cell.innerHTML = months[month];
@@ -115,28 +109,33 @@ class DatePicker {
     cell = row.insertCell(2);
     cell.innerHTML = '>';
     cell.className = 'control';
-    cell.onclick = function () {
-      this.nextMonth();
-    };
+    cell.onclick = () => this.nextMonth();
 
     // weekdays
     row = dp.insertRow(2);
     row.className = 'weekdays';
-    for (x = 0; x < 7; x++) row.insertCell(x).innerHTML = daysshort[x];
+    for (let x = 0; x < 7; x += 1) {
+      row.insertCell(x).innerHTML = daysshort[x];
+    }
 
     row = dp.insertRow(3);
     // generate numbers
-    for (x = 0; x < numdaysinmonth; x++) {
-      if (!x) for (i = 0; i < first; i++) row.insertCell(i);
-      if ((first + x) % 7 == 0) row = dp.insertRow(dp.rows.length);
+    for (let x = 0; x < numdaysinmonth; x += 1) {
+      if (!x) {
+        for (let i = 0; i < first; i += 1) {
+          row.insertCell(i);
+        }
+      }
+      if ((first + x) % 7 === 0) {
+        row = dp.insertRow(dp.rows.length);
+      }
       cell = row.insertCell((first + x) % 7);
-      cell.onclick = function () {
-        this.insert(this);
-      };
+      cell.onclick = () => this.insert(this);
+
       cell.className = `day${
-        year == this.selectedDate[0]
-        && month == this.selectedDate[1]
-        && x + 1 == this.selectedDate[2]
+        year === this.selectedDate[0]
+        && month === this.selectedDate[1]
+        && x + 1 === this.selectedDate[2]
           ? ' selected'
           : ''}`;
       cell.innerHTML = x + 1;
@@ -171,10 +170,8 @@ class DatePicker {
 }
 
 // Static methods
-DatePicker.init = function (el) {
-  return new DatePicker(el);
-};
-DatePicker.hide = function () {
+DatePicker.init = el => new DatePicker(el);
+DatePicker.hide = () => {
   document.querySelector('#datepicker').style.display = 'none';
 };
 

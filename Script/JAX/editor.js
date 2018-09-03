@@ -1,26 +1,38 @@
+/* global globalsettings */
+/* eslint-disable no-script-url, no-alert */
+
 import Ajax from './ajax';
 import Browser from './browser';
-import Color from './color';
 import {
   insertBefore,
   getComputedStyle,
 } from './el';
 import Event from './event';
+import { bbcodeToHTML, htmlToBBCode } from './bbcode-utils';
+
+const URL_REGEX = /^(ht|f)tps?:\/\/[\w.\-%&?=/]+$/;
+const isURL = text => URL_REGEX.test(text);
 
 class Editor {
   constructor(textarea, iframe) {
     if (!iframe.timedout) {
       iframe.timedout = true;
       setTimeout(() => {
+        // eslint-disable-next-line no-new
         new Editor(textarea, iframe);
       }, 100);
-      return;
+      return null;
     }
-    if (iframe.editor) return;
+
+    if (iframe.editor) {
+      return null;
+    }
+
     this.iframe = iframe;
     iframe.editor = this;
     iframe.className = 'editorframe';
-    this.mode = Browser.mobile || Browser.n3ds ? 0 : globalsettings.wysiwyg; // 1 for html editing mode, 0 for textarea mode
+    // 1 for html editing mode, 0 for textarea mode
+    this.mode = Browser.mobile || Browser.n3ds ? 0 : globalsettings.wysiwyg;
     this.mode = this.mode || 0;
     this.textarea = textarea;
     this.window = iframe.contentWindow;
@@ -48,11 +60,11 @@ class Editor {
     // Set the source and initialize the editor
     //
     this.setSource('<div></div>');
-    setTimeout(function () {
-      this.setSource(this.BBtoHTML(textarea.value));
+    setTimeout(() => {
+      this.setSource(bbcodeToHTML(textarea.value));
       this.switchMode(this.mode);
     }, 100);
-    return me;
+    return this;
   }
 
   buildEditBar() {
@@ -103,22 +115,19 @@ class Editor {
       'Switch editor mode',
     ];
 
-    const l = cmds.length;
-    let a;
-    let x;
-    for (x = 0; x < l; x++) {
-      a = document.createElement('a');
-      a.className = cmds[x];
-      a.title = cmddesc[x];
+    cmds.forEach((cmd, i) => {
+      const a = document.createElement('a');
+      a.className = cmd;
+      a.title = cmddesc[i];
       a.href = 'javascript:void(0)';
       a.unselectable = 'on';
       a.onclick = event => this.editbarCommand(event, this.className);
       this.editbar.appendChild(a);
-    }
+    });
   }
 
-  editbarCommand(e, cmd) {
-    e = Event(e).cancel();
+  editbarCommand(event, cmd) {
+    const e = Event(event).cancel();
 
     switch (cmd) {
       case 'forecolor':
@@ -145,7 +154,7 @@ class Editor {
       new Ajax().load('/misc/emotes.php?json', this.createEmoteWindow);
       return;
     }
-    if (emotewin.style.display == 'none') {
+    if (emotewin.style.display === 'none') {
       emotewin.style.display = '';
       emotewin.style.top = `${y}px`;
       emotewin.style.left = `${x}px`;
@@ -161,24 +170,22 @@ class Editor {
   }
 
   createEmoteWindow(xml) {
-    const rs = JSON.parse(xml.responseText);
-    let x;
-    let html;
+    const smilies = JSON.parse(xml.responseText);
     const emotewin = document.createElement('div');
-    let r;
-    let t;
     emotewin.className = 'emotewin';
-    for (x = 0; x < rs[0].length; x++) {
-      r = document.createElement('a');
+
+    smilies.forEach((smiley, i) => {
+      const r = document.createElement('a');
       r.href = 'javascript:void(0)';
-      r.emotetext = rs[0][x];
+      r.emotetext = smilies[0][i];
       r.onclick = () => {
         this.cmd('inserthtml', this.emotetext);
         this.hideEmotes();
       };
-      r.innerHTML = `${rs[1][x]} ${rs[0][x]}`;
+      r.innerHTML = `${smilies[1][i]} ${smilies[0][i]}`;
       emotewin.appendChild(r);
-    }
+    });
+
     emotewin.style.position = 'absolute';
     emotewin.style.display = 'none';
     this.emoteWindow = emotewin;
@@ -192,7 +199,7 @@ class Editor {
   }
 
   showColors(posx, posy, cmd) {
-    if (this.colorWindow && this.colorWindow.style.display != 'none') {
+    if (this.colorWindow && this.colorWindow.style.display !== 'none') {
       return this.hideColors();
     }
     let colorwin = this.colorWindow;
@@ -216,11 +223,14 @@ class Editor {
       colorwin = document.createElement('table');
       colorwin.style.borderCollapse = 'collapse';
       colorwin.style.position = 'absolute';
-      for (y = 0; y < sq; y++) {
+      for (let y = 0; y < sq; y += 1) {
         r = colorwin.insertRow(y);
-        for (x = 0; x < sq; x++) {
+        for (let x = 0; x < sq; x += 1) {
           c = r.insertCell(x);
-          if (!colors[x + y * sq]) continue;
+          if (!colors[x + y * sq]) {
+            // eslint-disable-next-line no-continue
+            continue;
+          }
           c.style.border = '1px solid #000';
           c.style.padding = 0;
           a = document.createElement('a');
@@ -230,7 +240,8 @@ class Editor {
           c = a.style;
           c.display = 'block';
           c.backgroundColor = `#${colors[x + y * sq]}`;
-          c.height = c.width = '20px';
+          c.height = '20px';
+          c.width = '20px';
           c.margin = 0;
         }
       }
@@ -241,6 +252,7 @@ class Editor {
     }
     colorwin.style.top = `${posy}px`;
     colorwin.style.left = `${posx}px`;
+    return null;
   }
 
   hideColors() {
@@ -249,12 +261,13 @@ class Editor {
     }
   }
 
-  cmd(a, b, c) {
-    a = a.toLowerCase();
+  cmd(command, arg) {
     let rng;
     const selection = this.getSelection();
     let bbcode;
-    switch (a) {
+    let realCommand = command;
+    let arg1 = arg;
+    switch (command.toLowerCase()) {
       case 'bold':
         bbcode = `[b]${selection}[/b]`;
         break;
@@ -277,12 +290,15 @@ class Editor {
         bbcode = `[align=left]${selection}[/align]`;
         break;
       case 'insertimage':
-        b = prompt('Image URL:');
-        if (!b) return;
-        if (!b.match(/^(ht|f)tps?:\/\/[\w\.\-\%&\?=\/]+$/)) {
-          return alert('Please enter a valid URL.');
+        arg1 = prompt('Image URL:');
+        if (!arg1) {
+          return;
         }
-        bbcode = `[img]${b}[/img]`;
+        if (!isURL(arg1)) {
+          alert('Please enter a valid URL.');
+          return;
+        }
+        bbcode = `[img]${arg1}[/img]`;
         break;
       case 'insertorderedlist':
         if (!this.mode) {
@@ -295,65 +311,74 @@ class Editor {
         }
         break;
       case 'createlink':
-        b = prompt('Link:');
-        if (!b) return;
-        if (!b.match(/^(https?|ftp|mailto):/)) b = `https://${b}`;
-        bbcode = `[url=${b}]${selection}[/url]`;
+        arg1 = prompt('Link:');
+        if (!arg1) return;
+        if (!arg1.match(/^(https?|ftp|mailto):/)) arg1 = `https://${arg1}`;
+        bbcode = `[url=${arg1}]${selection}[/url]`;
         break;
       case 'c_email':
-        b = prompt('Email:');
-        if (!b) return;
-        a = 'createlink';
-        b = `mailto:${b}`;
-        bbcode = `[url=${b}]${selection}[/url]`;
+        arg1 = prompt('Email:');
+        if (!arg1) return;
+        realCommand = 'createlink';
+        arg1 = `mailto:${arg1}`;
+        bbcode = `[url=${arg1}]${selection}[/url]`;
         break;
       case 'backcolor':
-        if (Browser.firefox || Browser.safari) a = 'hilitecolor';
-        // a="inserthtml";b='<span style="background:'+b+'">'+selection+'</span>'
-        bbcode = `[bgcolor=${b}]${selection}[/bgcolor]`;
+        if (Browser.firefox || Browser.safari) {
+          realCommand = 'hilitecolor';
+        }
+        bbcode = `[bgcolor=${arg1}]${selection}[/bgcolor]`;
         break;
       case 'forecolor':
-        bbcode = `[color=${b}]${selection}[/color]`;
+        bbcode = `[color=${arg1}]${selection}[/color]`;
         break;
       case 'c_code':
-        a = 'inserthtml';
-        bbcode = b = `[code]${selection}[/code]`;
+        realCommand = 'inserthtml';
+        arg1 = `[code]${selection}[/code]`;
+        bbcode = arg1;
         break;
       case 'c_quote':
-        a = 'inserthtml';
-        b = prompt('Who said this?');
-        b = bbcode = `[quote${b ? `=${b}` : ''}]${selection}[/quote]`;
+        realCommand = 'inserthtml';
+        arg1 = prompt('Who said this?');
+        arg1 = `[quote${arg1 ? `=${arg1}` : ''}]${selection}[/quote]`;
+        bbcode = arg1;
         break;
       case 'c_spoiler':
-        a = 'inserthtml';
-        b = bbcode = `[spoiler]${selection}[/spoiler]`;
+        realCommand = 'inserthtml';
+        arg1 = `[spoiler]${selection}[/spoiler]`;
+        bbcode = arg1;
         break;
       case 'c_youtube':
-        a = 'inserthtml';
-        b = prompt('Video URL?');
-        if (!b) return;
-        b = bbcode = `[video]${b}[/video]`;
+        realCommand = 'inserthtml';
+        arg1 = prompt('Video URL?');
+        if (!arg1) {
+          return;
+        }
+        arg1 = `[video]${arg1}[/video]`;
+        bbcode = arg1;
         break;
       case 'inserthtml':
-        bbcode = b;
+        bbcode = arg1;
         break;
+      default:
+        throw new Error(`Unsupported editor command ${command}`);
     }
     if (this.mode) {
-      if (a == 'inserthtml' && Browser.ie) {
+      if (realCommand === 'inserthtml' && Browser.ie) {
         rng = this.doc.selection.createRange();
-        if (!rng.text.length) this.doc.body.innerHTML += b;
+        if (!rng.text.length) this.doc.body.innerHTML += arg1;
         else {
-          rng.pasteHTML(b);
+          rng.pasteHTML(arg1);
           rng.collapse(false);
           rng.select();
         }
       } else {
-        this.doc.execCommand(a, false, b || false);
+        this.doc.execCommand(realCommand, false, arg1 || false);
         if (this.iframe.contentWindow.focus) {
           this.iframe.contentWindow.focus();
         }
       }
-    } else editor.setSelection(this.textarea, bbcode);
+    } else Editor.setSelection(this.textarea, bbcode);
   }
 
   getSelection() {
@@ -380,163 +405,15 @@ class Editor {
     if (this.doc && this.doc.body) this.doc.body.innerHTML = a;
   }
 
-  BBtoHTML(a) {
-    a = a
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/(\s) /g, '$1&nbsp;');
-    a = this.replaceAll(a, /\[(b|i|u|s)\]([\w\W]*?)\[\/\1\]/gi, '<$1>$2</$1>');
-    a = this.replaceAll(a, /\[img\]([^'"\[]+)\[\/img\]/gi, '<img src="$1">');
-    a = this.replaceAll(
-      a,
-      /\[color=([^\]]+)\](.*?)\[\/color\]/gi,
-      '<span style="color:$1">$2</span>',
-    );
-    a = this.replaceAll(
-      a,
-      /\[size=([^\]]+)\](.*?)\[\/size\]/gi,
-      '<span style="font-size:$1">$2</span>',
-    );
-    a = this.replaceAll(
-      a,
-      /\[url=([^\]]+)\](.*?)\[\/url\]/gi,
-      '<a href="$1">$2</a>',
-    );
-    a = this.replaceAll(
-      a,
-      /\[bgcolor=([^\]]+)\](.*?)\[\/bgcolor\]/gi,
-      '<span style="backgroun-color:$1">$2</span>',
-    );
-    a = this.replaceAll(a, /\[h(\d)\](.*?)\[\/h\1\]/, '<h$1>$2</h$1>');
-    a = this.replaceAll(
-      a,
-      /\[align=(left|right|center)\](.*?)\[\/align\]/,
-      '<span style="text-align:$1">$2</span>',
-    );
-    a = this.replaceAll(a, /\[(ul|ol)\]([\w\W]*?)\[\/\1\]/gi, (s) => {
-      const tag = RegExp.$1;
-      let lis = '';
-      const list = RegExp.$2.split(/([\r\n]+|^)\*/);
-      let x;
-      for (x = 0; x < list.length; x++) {
-        if (list[x].match(/\S/)) lis += `<li>${list[x]}</li>`;
-      }
-      return `<${tag}>${lis}</${tag}>`;
-    });
-    a = this.replaceAll(a, /\n/g, '<br />');
-    return a;
-  }
-
-  replaceAll(a, b, c) {
-    let tmp = a;
-    do {
-      a = tmp;
-      tmp = a.replace(b, c);
-    } while (a != tmp);
-    return tmp;
-  }
-
-  HTMLtoBB(a) {
-    a = a.replace(/[\r\n]+/g, '');
-    a = a.replace(/<(hr|br|meta)[^>]*>/gi, '\n');
-    a = a.replace(/<img.*?src=["']?([^'"]+)["'][^>]*\/?>/g, '[img]$1[/img]');
-    a = this.replaceAll(a, /<(\w+)([^>]*)>([\w\W]*?)<\/\1>/gi, (
-      whole,
-      tag,
-      attributes,
-      innerhtml,
-    ) => {
-      const att = {};
-      let style = '';
-      attributes.replace(
-        /(color|size|style|href|src)=(['"]?)(.*?)\2/gi,
-        (whole, attr, q, value) => {
-          att[attr] = value;
-        },
-      );
-
-      if (att.style) style = att.style;
-
-      tag = tag.toLowerCase();
-      if (tag == 'script' || tag == 'style' || tag == 'hr') return;
-      if (style.match(/background(\-color)?:[^;]+(rgb\([^\)]+\)|#\s+)/i)) {
-        innerhtml = `[bgcolor=#${
-          new Color(RegExp.$2).toHex()
-        }]${
-          innerhtml
-        }[/bgcolor]`;
-      }
-      if (style.match(/text\-align: ?(right|center|left);/i)) {
-        innerhtml = `[align=${RegExp.$1}]${innerhtml}[/align]`;
-      }
-      if (
-        style.match(/font\-style: ?italic;/i)
-        || tag == 'i'
-        || tag == 'em'
-      ) {
-        innerhtml = `[I]${innerhtml}[/I]`;
-      }
-      if (style.match(/text\-decoration:[^;]*underline;/i) || tag == 'u') {
-        innerhtml = `[U]${innerhtml}[/U]`;
-      }
-      if (
-        style.match(/text\-decoration:[^;]*line\-through;/i)
-        || tag == 's'
-      ) {
-        innerhtml = `[S]${innerhtml}[/S]`;
-      }
-      if (
-        style.match(/font\-weight: ?bold;/i)
-        || tag == 'strong'
-        || tag == 'b'
-      ) {
-        innerhtml = `[B]${innerhtml}[/B]`;
-      }
-      if (att.size || style.match(/font\-size: ?([^;]+)/i)) {
-        innerhtml = `[size=${att.size || RegExp.$1}]${innerhtml}[/size]`;
-      }
-      if (att.color || style.match(/color: ?([^;]+)/i)) {
-        innerhtml = `[color=${att.color || RegExp.$1}]${innerhtml}[/color]`;
-      }
-      if (tag == 'a' && att.href) {
-        innerhtml = `[url=${att.href}]${innerhtml}[/url]`;
-      }
-      if (tag == 'ol') innerhtml = `[ol]${innerhtml}[/ol]`;
-      if (tag == 'ul') innerhtml = `[ul]${innerhtml}[/ul]`;
-      if (tag.match(/h\d/i)) {
-        innerhtml = `[${
-          tag.toLowerCase()
-        }]${
-          innerhtml
-        }[/${
-          tag.toLowerCase()
-        }]`;
-      }
-      if (tag == 'li') {
-        innerhtml = `*${innerhtml.replace(/[\n\r]+/, '')}\n`;
-      }
-      if (tag == 'p') {
-        innerhtml = `\n${innerhtml == '&nbsp' ? '' : innerhtml}\n`;
-      }
-      if (tag == 'div') innerhtml = `\n${innerhtml}`;
-      return innerhtml;
-    });
-    return a
-      .replace(/&gt;/g, '>')
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&nbsp;/g, ' ');
-  }
-
   switchMode(toggle) {
     const t = this.textarea;
     const f = this.iframe;
     if (!toggle) {
-      t.value = this.HTMLtoBB(this.getSource());
+      t.value = htmlToBBCode(this.getSource());
       t.style.display = '';
       f.style.display = 'none';
     } else {
-      this.setSource(this.BBtoHTML(t.value));
+      this.setSource(bbcodeToHTML(t.value));
       t.style.display = 'none';
       f.style.display = '';
     }
@@ -551,7 +428,7 @@ class Editor {
   }
 }
 
-Editor.setSelection = function (t, stuff) {
+Editor.setSelection = function setSelection(t, stuff) {
   const scroll = t.scrollTop;
   if (Browser.ie) {
     t.focus();

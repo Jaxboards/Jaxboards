@@ -3,6 +3,8 @@ import {
   insertBefore,
   insertAfter,
 } from './el';
+import Drag from './drag';
+import { tryInvoke } from './util';
 
 /**
  * Swaps two elements in an array
@@ -28,72 +30,76 @@ class Sortable extends Drag {
       this.bounds = [0, -Infinity, 0, Infinity];
     }
 
-    for (let x = 0; x < elements.length; x++) {
-      me.apply(elements[x], typeof b.handle === 'function' ? b.handle(a[x]) : null);
-    }
+    elements.forEach((element) => {
+      this.apply(element, () => tryInvoke(options.handle, element));
+    });
   }
 
   ondrop(element) {
-    if (me.change) me.coords = [];
-    me.change = 0;
+    if (this.change) {
+      this.coords = [];
+    }
+    this.change = 0;
     const s = element.el.style;
-    s.top = s.left = 0;
-    if (typeof me.onend === 'function') me.onend(element);
+    s.left = 0;
+    s.top = 0;
+    if (typeof this.onend === 'function') {
+      this.onend(element);
+    }
   }
 
   ondrag(a) {
     let x;
-    let y;
-    const d = me.elems;
-    const dl = d.length;
-    const pos = 0;
     let c;
     const cel = getCoordinates(a.el);
     let c2;
     let ch = false;
-    const ov = me.options.vertical || 0;
-    const oh = me.options.horizontal || 0;
+    const ov = this.options.vertical || 0;
     let index;
-    if (!me.coords.length) {
-      for (x = 0; x < dl; x++) me.coords.push(getCoordinates(d[x]));
+    if (!this.coords.length) {
+      this.coords.push(...this.elems);
     }
-    for (x = 0; x < dl; x++) {
-      if (a.el == d[x]) {
+    this.elems.forEach((elem) => {
+      if (a.el === elem) {
         index = x;
-        break;
+        return;
       }
-      c = me.coords[x];
+      c = this.coords[x];
       if (
         ch === false
         && (ov ? a.my < c.yh && a.dy < 0 : a.mx < c.xw && a.my < c.yh)
       ) {
-        insertBefore(a.el, d[x]);
+        insertBefore(a.el, elem);
         ch = x;
       }
-    }
+    });
+
     if (ch === false) {
-      for (x = dl - 1; x >= index; x--) {
-        if (a.el == d[x]) continue;
-        c = me.coords[x];
+      const reversedElements = this.elems.concat().reverse();
+      reversedElements.forEach((elem) => {
+        if (a.el === elem) {
+          return;
+        }
+        c = this.coords[x];
         if (ov ? a.my > c.y && a.dy > 0 : a.mx > c.x && a.my > c.y) {
-          insertAfter(a.el, d[x]);
-          if (d.swap) {
-            me.elems = swap(index, x);
+          insertAfter(a.el, elem);
+          if (this.elems.swap) {
+            this.elems = swap(index, x);
           }
           ch = 1;
-          break;
         }
-      }
-    } else if (d.swap) {
-      me.elems = swap(index, ch);
+      });
+    } else if (this.elems.swap) {
+      this.elems = swap(index, ch);
     }
+
     if (ch !== false) {
-      me.coords = [];
-      me.change = 1;
+      this.coords = [];
+      this.change = 1;
       c2 = getCoordinates(a.el);
-      me.sess.ex -= c2.x - cel.x;
-      me.sess.ey -= c2.y - cel.y;
-      me.priv.drag(a.e);
+      this.sess.ex -= c2.x - cel.x;
+      this.sess.ey -= c2.y - cel.y;
+      this.drag(a.e);
     }
     return false;
   }

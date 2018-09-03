@@ -5,5 +5,5 @@ import Sound from './sound';
 export default {
   JAX,
   Uploader,
-  Sound
+  Sound,
 };

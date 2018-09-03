@@ -4,26 +4,26 @@ class Uploader {
   }
 
   listenerHandler(id, action, args) {
-    var tmp;
+    let tmp;
     // moving arguments around
     switch (action) {
-      case "addfile":
+      case 'addfile':
         args[0].id = args[1];
         args = args[0];
-        args.upload = function(url) {
+        args.upload = function (url) {
           Uploader.upload(id, this, url);
         };
         args = [args];
         break;
-      case "startupload":
+      case 'startupload':
         args[0].id = args[1];
         args = [args[0]];
         break;
-      case "progress":
+      case 'progress':
         args[0].id = args[1];
         args.splice(1, 1);
         break;
-      case "error":
+      case 'error':
         args[2].id = args.pop();
         break;
       default:
@@ -35,28 +35,28 @@ class Uploader {
     }
   }
 
-  createButton () {
-    var d = document.createElement("div");
-    d.className = "uploadbutton";
-    d.innerHTML = "Add File(s)";
+  createButton() {
+    const d = document.createElement('div');
+    d.className = 'uploadbutton';
+    d.innerHTML = 'Add File(s)';
     return [d, this.create(d)];
   }
 
   create(el, w, h, url) {
-    var nid = this.uploaders.length;
-    var swf = JAX.SWF("Script/uploader.swf", "uploader" + nid, {
-      width: w || "100%",
-      height: h || "100%",
-      allowScriptAccess: "sameDomain",
-      wmode: "transparent",
-      flashvars: "id=" + nid
+    const nid = this.uploaders.length;
+    const swf = JAX.SWF('Script/uploader.swf', `uploader${nid}`, {
+      width: w || '100%',
+      height: h || '100%',
+      allowScriptAccess: 'sameDomain',
+      wmode: 'transparent',
+      flashvars: `id=${nid}`,
     });
 
-    var s = swf.style;
-    s.position = "absolute";
-    s.left = "0px";
-    s.top = "0px";
-    el.style.position = "relative";
+    const s = swf.style;
+    s.position = 'absolute';
+    s.left = '0px';
+    s.top = '0px';
+    el.style.position = 'relative';
     el.appendChild(swf);
     this.uploaders.push([]);
     this.uploaders[nid].flashObj = swf;

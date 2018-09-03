@@ -33,13 +33,11 @@ function convertSwitches(switches) {
   switches.forEach((switchElement) => {
     const div = document.createElement('div');
     div.className = switchElement.className.replace('switch', 'switch_converted');
-    // eslint-disable-next-line no-param-reassign
     switchElement.style.display = 'none';
     if (!switchElement.checked) {
       div.style.backgroundPosition = 'bottom';
     }
     div.onclick = () => {
-      // eslint-disable-next-line no-param-reassign
       switchElement.checked = !switchElement.checked;
       this.style.backgroundPosition = switchElement.checked ? 'top' : 'bottom';
       tryInvoke(switchElement.onclick);
@@ -74,7 +72,6 @@ export function onImagesLoaded(imgs, callback, timeout) {
     if (dbj.imgs.includes(img.src) === false && !img.loaded) {
       dbj.imgs.push(img.src);
       img.addEventListener('onload', dbj.callback);
-      // eslint-disable-next-line no-param-reassign
       img.src = img.src;
     }
   });
@@ -93,7 +90,6 @@ export function gracefulDegrade(a) {
     if (link.href) {
       if (link.getAttribute('href').charAt(0) === '?') {
         const oldclick = link.onclick;
-        // eslint-disable-next-line no-param-reassign
         link.onclick = function onclick() {
           if (!oldclick || oldclick() !== false) {
             RUN.stream.location(this.getAttribute('href'));
@@ -101,7 +97,6 @@ export function gracefulDegrade(a) {
           return false;
         };
       } else if (link.getAttribute('href').substr(0, 4) === 'http') {
-        // eslint-disable-next-line no-param-reassign
         link.target = '_BLANK';
       }
     }
@@ -134,9 +129,7 @@ export function gracefulDegrade(a) {
   const dateElements = a.querySelectorAll('input.date');
   if (dateElements.length) {
     dateElements.forEach((inputElement) => {
-      // eslint-disable-next-line no-param-reassign
       inputElement.onclick = () => DatePicker.init(this);
-      // eslint-disable-next-line no-param-reassign
       inputElement.onkeydown = () => DatePicker.hide();
     });
   }
@@ -144,7 +137,6 @@ export function gracefulDegrade(a) {
 
 export function checkAll(checkboxes, value) {
   checkboxes.forEach((checkbox) => {
-    // eslint-disable-next-line no-param-reassign
     checkbox.checked = value;
   });
 }
@@ -171,7 +163,6 @@ export function toggle(a) {
   if (a.style.display === display) {
     display = '';
   }
-  // eslint-disable-next-line no-param-reassign
   a.style.display = display;
 }
 
@@ -231,7 +222,6 @@ export function scrollTo(pos, el = Browser.chrome ? document.body : document.doc
   const top = parseFloat(el.scrollTop);
   const position = screenrel < pos ? screenrel : pos;
   const diff = position - top;
-  // eslint-disable-next-line no-param-reassign
   el.scrollTop += diff;
   /* me={el:el,pos:top,diff:diff,step:1,steps:1} //had this animate once, but now it's just annoying
   me.interval=setInterval(function(){
@@ -243,4 +233,17 @@ export function scrollTo(pos, el = Browser.chrome ? document.body : document.doc
    me.onend=a
   }
   return me */
+}
+
+export function select(a) {
+  let r;
+  if (document.selection) {
+    r = document.body.createTextRange();
+    r.moveToElementText(a);
+    r.select();
+  } else if (window.getSelection) {
+    r = document.createRange();
+    r.selectNode(a);
+    window.getSelection().addRange(r);
+  }
 }
