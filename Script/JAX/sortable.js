@@ -1,7 +1,7 @@
 import {
   getCoordinates,
   insertBefore,
-  insertAfter
+  insertAfter,
 } from './el';
 
 /**
@@ -12,7 +12,7 @@ import {
  * @return {Array}
  */
 function swap(array, fromIndex, toIndex) {
-  var cache = array[fromIndex];
+  const cache = array[fromIndex];
   array[fromIndex] = array[toIndex];
   array[toIndex] = cache;
   return array;
@@ -28,32 +28,32 @@ class Sortable extends Drag {
       this.bounds = [0, -Infinity, 0, Infinity];
     }
 
-    for (var x = 0; x < elements.length; x++) {
-      me.apply(elements[x], typeof b.handle == "function" ? b.handle(a[x]) : null);
+    for (let x = 0; x < elements.length; x++) {
+      me.apply(elements[x], typeof b.handle === 'function' ? b.handle(a[x]) : null);
     }
   }
 
   ondrop(element) {
     if (me.change) me.coords = [];
     me.change = 0;
-    var s = element.el.style;
+    const s = element.el.style;
     s.top = s.left = 0;
-    if (typeof me.onend == "function") me.onend(element);
+    if (typeof me.onend === 'function') me.onend(element);
   }
 
   ondrag(a) {
-    var x;
-    var y;
-    var d = me.elems;
-    var dl = d.length;
-    var pos = 0;
-    var c;
-    var cel = getCoordinates(a.el);
-    var c2;
-    var ch = false;
-    var ov = me.options.vertical || 0;
-    var oh = me.options.horizontal || 0;
-    var index;
+    let x;
+    let y;
+    const d = me.elems;
+    const dl = d.length;
+    const pos = 0;
+    let c;
+    const cel = getCoordinates(a.el);
+    let c2;
+    let ch = false;
+    const ov = me.options.vertical || 0;
+    const oh = me.options.horizontal || 0;
+    let index;
     if (!me.coords.length) {
       for (x = 0; x < dl; x++) me.coords.push(getCoordinates(d[x]));
     }
@@ -64,8 +64,8 @@ class Sortable extends Drag {
       }
       c = me.coords[x];
       if (
-        ch === false &&
-        (ov ? a.my < c.yh && a.dy < 0 : a.mx < c.xw && a.my < c.yh)
+        ch === false
+        && (ov ? a.my < c.yh && a.dy < 0 : a.mx < c.xw && a.my < c.yh)
       ) {
         insertBefore(a.el, d[x]);
         ch = x;

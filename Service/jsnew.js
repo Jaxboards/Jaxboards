@@ -1956,7 +1956,7 @@ var window = (function () {
       this.contentcontainer = contentContainer;
 
       if (this.useOverlay) {
-        toggleOverlay(1, this.zIndex);
+        toggleOverlay(true, this.zIndex);
       }
       windowContainer.className = "window" + (this.className ? " " + this.className : "");
       titleBar.className = "title";
@@ -2050,7 +2050,7 @@ var window = (function () {
         me.open = null;
       }
       if (me.onclose) me.onclose();
-      if (this.useOverlay) toggleOverlay(0);
+      if (this.useOverlay) toggleOverlay(false);
     }
 
     minimize() {

@@ -1,60 +1,72 @@
-export default class ajax {
+/**
+ * For some reason, I designed this method
+ * to accept Objects (key/value pairs)
+ * or 2 arguments:  keys and values
+ * The purpose is to construct data to send over URL or POST data
+ *
+ * @example
+ * buildQueryString({key: 'value', key2: 'value2'}) === 'key=value&key2=value2';
+ *
+ * @example
+ * buildQueryString(['key', 'key2'], ['value, 'value2']) === 'key=value&key2=value2'
+ *
+ * @return {String}
+ */
+function buildQueryString(keys, values) {
+  if (values) {
+    return keys
+      .map((key, index) => `${encodeURIComponent(key)}=${encodeURIComponent(values[index] || '')}`)
+      .join('&');
+  }
+  return Object.keys(keys)
+    .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(keys[key] || '')}`)
+    .join('&');
+}
+
+class Ajax {
   constructor(s) {
-    this.xmlobj = window.XMLHttpRequest
     this.setup = {
       readyState: 4,
-      callback: function() {},
-      method: "POST",
-      ...s
+      callback() {},
+      method: 'POST',
+      ...s,
     };
   }
 
-  load(a, b, c, d, e) {
-    // a=URL b=callback c=send_data d=POST e=type(1=update,2=load new)
-    d = d || this.setup.method || "GET";
-    if (d) d = "POST";
+  load(url, callback, data, method = this.setup.method, requestType = 1) {
+    // requestType is an enum (1=update, 2=load new)
+    let sendData = null;
     if (
-      c &&
-      Array.isArray(c) &&
-      Array.isArray(c[0]) &&
-      c[0].length == c[1].length
+      data
+      && Array.isArray(data)
+      && Array.isArray(data[0])
+      && data[0].length === data[1].length
     ) {
-      c = this.build_query(c[0], c[1]);
-    } else if (typeof c != "string") c = this.build_query(c);
-    var xmlobj = new this.xmlobj();
-    if (b) this.setup.callback = b;
-    xmlobj.onreadystatechange = function(status) {
-      if (xmlobj.readyState == this.setup.readyState) {
-        this.setup.callback(xmlobj);
+      sendData = buildQueryString(data[0], data[1]);
+    } else if (typeof data !== 'string') {
+      sendData = buildQueryString(data);
+    }
+    const request = new XMLHttpRequest();
+    if (callback) this.setup.callback = callback;
+    request.onreadystatechange = () => {
+      if (request.readyState === this.setup.readyState) {
+        this.setup.callback(request);
       }
     };
-    if (!xmlobj) return false;
-    xmlobj.open(d, a, true);
-    xmlobj.url = a;
-    xmlobj.type = e;
-    if (d) {
-      xmlobj.setRequestHeader(
-        "Content-Type",
-        "application/x-www-form-urlencoded"
+    if (!request) return false;
+    request.open(method, url, true);
+    request.url = url;
+    request.type = requestType;
+    if (method) {
+      request.setRequestHeader(
+        'Content-Type',
+        'application/x-www-form-urlencoded',
       );
     }
-    xmlobj.setRequestHeader("X-JSACCESS", e || 1);
-    xmlobj.send(c || null);
-    return xmlobj;
+    request.setRequestHeader('X-JSACCESS', requestType);
+    request.send(sendData);
+    return request;
   }
+}
 
-  build_query(a, b) {
-    var q = "";
-    if (b) {
-      for (x = 0; x < a.length; x++) {
-        q +=
-          encodeURIComponent(a[x]) + "=" + encodeURIComponent(b[x] || "") + "&";
-      }
-    } else {
-      for (x in a) {
-        q += encodeURIComponent(x) + "=" + encodeURIComponent(a[x] || "") + "&";
-      }
-    }
-    return q.substring(0, q.length - 1);
-  }
-};
+export default Ajax;

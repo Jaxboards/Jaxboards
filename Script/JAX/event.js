@@ -2,7 +2,7 @@
  * This method adds some decoration to the default browser event.
  * This can probably be replaced with something more modern.
  */
-export default function(e) {
+export default function (e) {
   const dB = document.body;
   const dE = document.documentElement;
   switch (e.keyCode) {
@@ -22,17 +22,17 @@ export default function(e) {
       e.DOWN = true;
       break;
   }
-  if (typeof e.srcElement == "undefined") e.srcElement = e.target;
-  if (typeof e.pageY == "undefined") {
+  if (typeof e.srcElement === 'undefined') e.srcElement = e.target;
+  if (typeof e.pageY === 'undefined') {
     e.pageY = e.clientY + (parseInt(dE.scrollTop || dB.scrollTop) || 0);
     e.pageX = e.clientX + (parseInt(dE.scrollLeft || dB.scrollLeft) || 0);
   }
-  e.cancel = function() {
+  e.cancel = function () {
     e.returnValue = false;
     if (e.preventDefault) e.preventDefault();
     return e;
   };
-  e.stopBubbling = function() {
+  e.stopBubbling = function () {
     if (e.stopPropagation) e.stopPropagation();
     e.cancelBubble = true;
     return e;

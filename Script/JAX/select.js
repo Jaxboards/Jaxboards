@@ -1,5 +1,5 @@
-export default function(a) {
-  var r;
+export default function (a) {
+  let r;
   if (document.selection) {
     r = document.body.createTextRange();
     r.moveToElementText(a);

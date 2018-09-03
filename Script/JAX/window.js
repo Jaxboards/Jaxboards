@@ -1,39 +1,36 @@
 import Animation from './animation';
 import Drag from './drag';
 import { getHighestZIndex } from './el';
-import { assign, toggleOverlay } from './util';
+import { assign, toggleOverlay, onImagesLoaded } from './util';
 
 class Window {
   constructor() {
     assign(this, {
-      title: "Title",
+      title: 'Title',
       wait: true,
-      content: "Content",
+      content: 'Content',
       open: false,
       useoverlay: false,
       minimizable: true,
       resize: false,
-      className: "",
-      pos: "center",
-      zIndex: getHighestZIndex()
+      className: '',
+      pos: 'center',
+      zIndex: getHighestZIndex(),
     });
   }
 
   create() {
     if (this.windowContainer) {
       // DOM already created
-      return;
+      return null;
     }
-    var windowContainer = document.createElement("div");
-    var titleBar = document.createElement("div");
-    var contentContainer = document.createElement("div");
-    var windowControls = document.createElement("div");
-    var minimizeButton = document.createElement("div");
-    var closeButton = document.createElement("div");
-    var pos = this.pos;
-    var x = 0;
-    var y = 0;
-    var s;
+    const windowContainer = document.createElement('div');
+    const titleBar = document.createElement('div');
+    const contentContainer = document.createElement('div');
+    const windowControls = document.createElement('div');
+    const minimizeButton = document.createElement('div');
+    const closeButton = document.createElement('div');
+    const { pos } = this;
 
     this.windowContainer = windowContainer;
     if (this.id) {
@@ -42,145 +39,142 @@ class Window {
     this.contentcontainer = contentContainer;
 
     if (this.useOverlay) {
-      toggleOverlay(1, this.zIndex);
+      toggleOverlay(true, this.zIndex);
     }
-    windowContainer.className = "window" + (this.className ? " " + this.className : "");
-    titleBar.className = "title";
-    contentContainer.className = "content";
+    windowContainer.className = `window${this.className ? ` ${this.className}` : ''}`;
+    titleBar.className = 'title';
+    contentContainer.className = 'content';
     if (this.minimizable) {
-      minimizeButton.innerHTML = "-";
+      minimizeButton.innerHTML = '-';
       minimizeButton.onclick = () => this.minimize();
     }
-    closeButton.innerHTML = "X";
-    closeButton.onclick = () => me.close();
+    closeButton.innerHTML = 'X';
+    closeButton.onclick = () => this.close();
     windowControls.appendChild(minimizeButton);
     windowControls.appendChild(closeButton);
-    windowControls.className = "controls";
-    titleBar.innerHTML = me.title;
-    contentContainer.innerHTML = me.content;
+    windowControls.className = 'controls';
+    titleBar.innerHTML = this.title;
+    contentContainer.innerHTML = this.content;
     titleBar.appendChild(windowControls);
     windowContainer.appendChild(titleBar);
     windowContainer.appendChild(contentContainer);
     document.body.appendChild(windowContainer);
 
-    if (me.resize) {
-      var targ = windowContainer.querySelector(me.resize);
-      if (!targ) return alert("Resize target not found");
-      targ.style.width = targ.clientWidth + "px";
-      targ.style.height = targ.clientHeight + "px";
-      var rsize = document.createElement("div");
-      rsize.className = "resize";
+    if (this.resize) {
+      const targ = windowContainer.querySelector(this.resize);
+      if (!targ) {
+        throw new Error('Resize target not found');
+      }
+      targ.style.width = `${targ.clientWidth}px`;
+      targ.style.height = `${targ.clientHeight}px`;
+      const rsize = document.createElement('div');
+      rsize.className = 'resize';
       windowContainer.appendChild(rsize);
-      rsize.style.left = windowContainer.clientWidth - 16 + "px";
-      rsize.style.top = windowContainer.clientHeight - 16 + "px";
+      rsize.style.left = `${windowContainer.clientWidth - 16}px`;
+      rsize.style.top = `${windowContainer.clientHeight - 16}px`;
       new Drag()
         .boundingBox(100, 100, Infinity, Infinity)
         .addListener({
-          ondrag: function(a) {
-            var w = parseFloat(targ.style.width) + a.dx;
-            var h = parseFloat(targ.style.height) + a.dy;
-            targ.style.width = w + "px";
+          ondrag(a) {
+            const w = parseFloat(targ.style.width) + a.dx;
+            const h = parseFloat(targ.style.height) + a.dy;
+            targ.style.width = `${w}px`;
             if (w < windowContainer.clientWidth - 20) {
-              targ.style.width = windowContainer.clientWidth + "px";
+              targ.style.width = `${windowContainer.clientWidth}px`;
             } else {
-              rsize.style.left = windowContainer.clientWidth - 16 + "px";
+              rsize.style.left = `${windowContainer.clientWidth - 16}px`;
             }
-            targ.style.height = h + "px";
+            targ.style.height = `${h}px`;
           },
-          ondrop: function(a) {
-            rsize.style.left = windowContainer.clientWidth - 16 + "px";
-          }
+          ondrop() {
+            rsize.style.left = `${windowContainer.clientWidth - 16}px`;
+          },
         })
         .apply(rsize);
-      targ.style.width = windowContainer.clientWidth + "px";
-      rsize.style.left = windowContainer.clientWidth - 16 + "px";
+      targ.style.width = `${windowContainer.clientWidth}px`;
+      rsize.style.left = `${windowContainer.clientWidth - 16}px`;
     }
 
-    s = windowContainer.style;
+    const s = windowContainer.style;
     s.zIndex = this.zIndex + 5;
 
-    if (me.wait) {
-      JAX.onImagesLoaded(
-        windowContainer.getElementsByTagName("img"),
-        function() {
-          me.setPosition(pos);
+    if (this.wait) {
+      onImagesLoaded(
+        windowContainer.getElementsByTagName('img'),
+        () => {
+          this.setPosition(pos);
         },
-        2000
+        2000,
       );
-    } else me.setPosition(pos);
+    } else this.setPosition(pos);
 
-    me.drag = new Drag()
+    this.drag = new Drag()
       .autoZ()
       .noChildActivation()
-      .boundingBox(0, 0, document.documentElement.clientWidth - 50, document.documentElement.clientHeight - 50)
+      .boundingBox(
+        0, 0,
+        document.documentElement.clientWidth - 50,
+        document.documentElement.clientHeight - 50,
+      )
       .apply(windowContainer, titleBar);
-    windowContainer.close = me.close;
+    windowContainer.close = this.close;
     windowContainer.minimize = this.minimize;
     return windowContainer;
   }
 
   close() {
-    if (!me.open) return;
-    var s = me.open.style;
-    if (me.animate && false) {
-      // this is broken until further notice
-      new Animation(me.open, 10)
-        .add("top", s.top, parseFloat(s.top) + 100 + "px")
-        .then(function() {
-          document.body.removeChild(me.open);
-          me.open = null;
-        })
-        .play();
-    } else {
-      document.body.removeChild(me.open);
-      me.open = null;
+    if (!this.windowContainer) {
+      return;
     }
-    if (me.onclose) me.onclose();
-    if (this.useOverlay) toggleOverlay(0);
+    document.body.removeChild(this.windowContainer);
+    this.windowContainer = null;
+    if (this.onclose) this.onclose();
+    if (this.useOverlay) toggleOverlay(false);
   }
 
   minimize() {
-    var c = me.open;
-    var x;
-    var w = 0;
-    var isMinimized = c.classList.contains("minimized");
-    c.classList.toggle("minimized");
+    const c = this.windowContainer;
+    const isMinimized = c.classList.contains('minimized');
+    c.classList.toggle('minimized');
     if (isMinimized) {
-      c.removeAttribute("draggable");
-      me.setPosition(me.oldpos, 0);
+      c.removeAttribute('draggable');
+      this.setPosition(this.oldpos, 0);
     } else {
-      c.setAttribute("draggable", "false");
-      var wins = document.querySelectorAll(".window");
-      for (x = 0; x < wins.length; x++) {
-        if (wins[x].classList.contains("minimized")) {
-          w += parseInt(wins[x].clientWidth);
+      c.setAttribute('draggable', 'false');
+      const wins = document.querySelectorAll('.window');
+      const width = wins.reduce((w, window) => {
+        if (window.classList.contains('minimized')) {
+          return w + Number(window.clientWidth);
         }
-      }
-      me.oldpos = me.getPosition();
-      me.setPosition("bl " + w + " 0", 0);
+        return w;
+      }, 0);
+      this.oldpos = this.getPosition();
+      this.setPosition(`bl ${width} 0`, 0);
     }
   }
 
   setPosition(pos, animate) {
-    var d1 = me.open;
-    var x = 0;
-    var y = 0;
-    var cH = document.documentElement.clientHeight;
-    var cW = document.documentElement.clientWidth;
-    if ((s = pos.match(/(\d+) (\d+)/))) {
-      x = Number(s[1]);
-      y = Number(s[2]);
+    const d1 = this.windowContainer;
+    let x = 0;
+    let y = 0;
+    const cH = document.documentElement.clientHeight;
+    const cW = document.documentElement.clientWidth;
+    const position = pos.match(/(\d+) (\d+)/);
+    if (position) {
+      x = Number(position[1]);
+      y = Number(position[2]);
     }
     x = Math.floor(x);
     y = Math.floor(y);
-    if (pos.charAt(1) == "r") {
+    if (pos.charAt(1) === 'r') {
       x = cW - x - d1.clientWidth;
     }
     switch (pos.charAt(0)) {
-      case "b":
+      case 'b':
         y = cH - y - d1.clientHeight;
         break;
-      case "c":
+      default:
+      case 'c':
         y = (cH - d1.clientHeight) / 2;
         x = (cW - d1.clientWidth) / 2;
         break;
@@ -190,29 +184,30 @@ class Window {
 
     if (x < 0) x = 0;
     if (y < 0) y = 0;
-    d1.style.left = x + "px";
-    if (me.animate && animate !== 0) {
+    d1.style.left = `${x}px`;
+    if (this.animate && animate !== 0) {
       new Animation(d1, 10)
-        .add("top", y - 100 + "px", y + "px")
+        .add('top', `${y - 100}px`, `${y}px`)
         .play();
-    } else d1.style.top = y + "px";
-    me.pos = pos;
+    } else d1.style.top = `${y}px`;
+    this.pos = pos;
   }
 
   getPosition() {
-    var s = this.windowContainer.style;
-    return "tl " + parseFloat(s.left) + " " + parseFloat(s.top);
+    const s = this.windowContainer.style;
+    return `tl ${parseFloat(s.left)} ${parseFloat(s.top)}`;
   }
-};
+}
 
-Window.close = function(win) {
+Window.close = function close(window) {
+  let element = window;
   do {
-    if (win.close) {
-      win.close();
+    if (element.close) {
+      element.close();
       break;
     }
-    win = win.offsetParent;
-  } while (win);
+    element = element.offsetParent;
+  } while (element);
 };
 
 export default Window;

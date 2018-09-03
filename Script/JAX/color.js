@@ -1,10 +1,10 @@
 class Color {
-  constructor (a) {
-    var tmp;
-    var x;
-    if (a.charAt && a.charAt(0) == "#") a = a.substr(1);
+  constructor(a) {
+    let tmp;
+    let x;
+    if (a.charAt && a.charAt(0) == '#') a = a.substr(1);
     // RGB
-    if (typeof a == "object") this.rgb = a;
+    if (typeof a === 'object') this.rgb = a;
     else if (a.match && (tmp = a.match(/^rgb\((\d+),\s?(\d+),\s?(\d+)\)/i))) {
       tmp[1] = parseFloat(tmp[1]);
       tmp[2] = parseFloat(tmp[2]);
@@ -14,13 +14,12 @@ class Color {
       // HEX
     } else if (a.match && !a.match(/[^\da-fA-F]/)) {
       if (a.length == 3) {
-        a =
-          a.charAt(0) +
-          a.charAt(0) +
-          a.charAt(1) +
-          a.charAt(1) +
-          a.charAt(2) +
-          a.charAt(2);
+        a = a.charAt(0)
+          + a.charAt(0)
+          + a.charAt(1)
+          + a.charAt(1)
+          + a.charAt(2)
+          + a.charAt(2);
       }
       if (a.length != 6) this.rgb = [0, 0, 0];
       else {
@@ -41,14 +40,14 @@ class Color {
 
   toHex() {
     if (!this.rgb) return false;
-    var tmp2;
-    var tmp = "";
-    var x;
-    var hex = "0123456789ABCDEF";
+    let tmp2;
+    let tmp = '';
+    let x;
+    const hex = '0123456789ABCDEF';
     for (x = 0; x < 3; x++) {
       tmp2 = this.rgb[x];
-      tmp +=
-        hex.charAt(Math.floor(tmp2 / 16)) + hex.charAt(Math.floor(tmp2 % 16));
+      tmp
+        += hex.charAt(Math.floor(tmp2 / 16)) + hex.charAt(Math.floor(tmp2 % 16));
     }
     return tmp;
   }

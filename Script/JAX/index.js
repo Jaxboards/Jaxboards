@@ -63,5 +63,5 @@ export default {
   toggle,
   collapse,
   overlay: toggleOverlay,
-  scrollTo
+  scrollTo,
 };
