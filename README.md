@@ -53,7 +53,7 @@ Here's how to get the developer tools working and running:
 We use a few tools made with node.js. I've been using
 [pnpm](https://pnpm.js.org/) to manage node.js dependencies, but feel free to
 use `npm` or `yarn` if you're more comfortable with that, just keep in mind the
-`shirnkwrap.yaml` file is incompatable with those.
+`shrinkwrap.yaml` file is incompatable with those.
 
 Install the node.js tools with this command in the Jaxboards directory:
 

@@ -526,9 +526,6 @@ function RUNF() {
       };
       n.innerHTML = a[0];
     },
-    setsound: function(a) {
-      Sound.load(a[0], a[1], false);
-    },
     playsound: function(a) {
       Sound.loadAndPlay(a[0], a[1], a[2] ? true : false);
     },
@@ -641,7 +638,6 @@ function RUNF() {
 $(function() {
   RUN = new RUNF();
 });
-$(Sound.addFlash);
 $(function() {
   window.loaded = true;
   window.name = Math.random();

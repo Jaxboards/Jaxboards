@@ -2488,48 +2488,24 @@ var Uploader = new function() {
   };
 }();
 
-var Sound = new function() {
-  this.queue = this.loadedSounds = [];
-  this.ready = function() {
-    var me = this;
-    setTimeout(function() {
-      if (me.isready) return; // page redraws
-      var q = me.queue;
-      me.flashObject =
-        window.soundLoader && window.soundLoader.playSound
-          ? window.soundLoader
-          : document.soundLoader;
-      if (!me.flashObject || !me.flashObject.loadSound) return; // no flash installed
-      if (q.length) {
-        for (var x = 0; x < q.length; x++) {
-          me.flashObject.loadSound(q[x][0], q[x][1], q[x][2] || false);
-        }
-      }
-      me.queue = [];
-      me.isready = true;
-    }, 100);
-  };
-  this.load = function(title, file, autoplay) {
-    this.loadedSounds[title] = file;
-    if (this.isready) {
-      this.flashObject.loadSound(title, file, autoplay || false);
-    } else this.queue.push([title, file, autoplay || false]);
-  };
-  this.loadAndPlay = function(title, file) {
-    if (this.loadedSounds[title] == file) this.play(title);
-    else this.load(title, file, true);
-  };
-  this.play = function(title) {
-    if (this.flashObject) this.flashObject.playSound(title);
-  };
-  this.addFlash = function() {
-    document.body.appendChild(
-      JAX.SWF("Script/soundLoader.swf", "soundLoader", {
-        hidden: "true",
-        allowScriptAccess: "sameDomain",
-        width: 0,
-        height: 0
-      })
-    );
-  };
+var Sound = function Sound() {
+  var soundCache = {};
+  function load(title, file, autoplay) {
+    var audio = new Audio();
+    soundCache[title] = audio;
+    audio.autoplay = !!autoplay;
+    audio.src = file;
+  }
+  function play(title) {
+    soundCache[title].play();
+  }
+  function loadAndPlay(title, file) {
+    load(title, file, true);
+  }
+
+  return {
+    load: load,
+    loadAndPlay: loadAndPlay,
+    play: play,
+  }
 }();
