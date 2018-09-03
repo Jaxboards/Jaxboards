@@ -24,24 +24,11 @@ function $() {
         window.onloads = null;
         a[x]();
       } else {
-        addEvent(window, "onload", a[x]);
+        window.addEventListener("onload", a[x]);
       }
     }
   }
   return r.length > 1 ? r : r[0];
-}
-
-function addEvent(obj, att, set) {
-  var atts = att + "s";
-  if (!obj[atts]) {
-    obj[atts] = Array();
-    if (obj[att]) obj[atts].push(obj[att]);
-    obj[att] = function(e) {
-      for (var x = 0; x < obj[atts].length; x++) obj[atts][x].call(this, e);
-    };
-  }
-  obj[atts].push(set);
-  return obj[atts].length - 1;
 }
 
 /*      JAX is the LIBRARY                */
@@ -268,7 +255,7 @@ var JAX = new function() {
   };
 
   this.flashTitle = function(a) {
-    if (window.hasFocus) return true;
+    if (document.hasFocus()) return;
     this.stopTitleFlashing();
     if (document.titleorig == "") document.titleorig = document.title;
     document.title2 = a;
@@ -398,7 +385,7 @@ var JAX = new function() {
     for (x = 0; x < imgs.length; x++) {
       if (dbj.imgs.includes(imgs[x].src) === false && !imgs[x].loaded) {
         dbj.imgs.push(imgs[x].src);
-        addEvent(imgs[x], "onload", dbj.callback);
+        imgs[x].addEventListener("onload", dbj.callback);
         imgs[x].src = imgs[x].src;
       }
     }

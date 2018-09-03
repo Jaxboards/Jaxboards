@@ -103,7 +103,6 @@ function RUNF() {
   };
 
   this.setWindowActive = function() {
-    window.hasFocus = true;
     document.cookie = "actw=" + window.name;
     JAX.stopTitleFlashing();
     RUN.stream.donext();
@@ -322,7 +321,7 @@ function RUNF() {
       var test;
       JAX.flashTitle("New message from " + a[1] + "!");
       if (
-        !window.hasFocus &&
+        !document.hasFocus() &&
         window.webkitNotifications &&
         webkitNotifications.checkPermission() == 0
       ) {
@@ -628,11 +627,7 @@ $(function() {
 $(function() {
   window.loaded = true;
   window.name = Math.random();
-  window.hasFocus = true;
-  addEvent(window, "onblur", function() {
-    window.hasFocus = false;
-  });
-  addEvent(window, "onfocus", function() {
+  window.addEventListener("onfocus", function() {
     RUN.setWindowActive();
   });
 });
