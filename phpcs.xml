@@ -46,6 +46,19 @@
     <rule ref="Squiz.Commenting.InlineComment" />
     <rule ref="Squiz.Commenting.PostStatementComment" />
     <rule ref="Squiz.Commenting.BlockComment" />
+    <!-- Make sure this works with PHP 5.3 -->
+    <config name="testVersion" value="5.3-"/>
+    <rule ref="PHPCompatibility">
+      <!-- Exclude polyfilled password_hash related functions from compatibility check -->
+      <exclude name="PHPCompatibility.PHP.NewConstants.password_bcryptFound"/>
+      <exclude name="PHPCompatibility.PHP.NewConstants.password_bcrypt_default_costFound"/>
+      <exclude name="PHPCompatibility.PHP.NewConstants.password_defaultFound"/>
+      <exclude name="PHPCompatibility.PHP.NewFunctions.password_get_infoFound"/>
+      <exclude name="PHPCompatibility.PHP.NewFunctions.password_hashFound"/>
+      <exclude name="PHPCompatibility.PHP.NewFunctions.password_needs_rehashFound"/>
+      <exclude name="PHPCompatibility.PHP.NewFunctions.password_verifyFound"/>
+    </rule>
+
     <!-- Ban some functions -->
     <rule ref="Generic.PHP.ForbiddenFunctions">
         <properties>

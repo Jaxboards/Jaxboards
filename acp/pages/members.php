@@ -621,7 +621,7 @@ EOT
                 // Session.
                 $DB->safedelete('session', 'WHERE `uid`=?', $mid);
 
-                // delete the account.
+                // Delete the account.
                 $DB->safedelete('members', 'WHERE `id`=?', $mid);
 
                 $DB->fixAllForumLastPosts();
