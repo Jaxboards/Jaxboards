@@ -36,7 +36,6 @@ class LOGREG
     public function register()
     {
         $this->registering = true;
-        // TODO: Valid email check?
         global $PAGE,$JAX,$DB,$CFG;
 
         $e = '';

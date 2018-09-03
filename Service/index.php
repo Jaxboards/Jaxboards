@@ -126,7 +126,6 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     }
     $DB->disposeresult($result);
 
-    // Need to do check for valid email.
     if (empty($errors)) {
         $board = $JAX->p['boardurl'];
         $boardPrefix = $board . '_';
