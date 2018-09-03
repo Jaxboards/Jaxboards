@@ -24,7 +24,7 @@ class PAGE
         $this->jsupdate = (1 == $this->jsaccess);
         $this->jsnewlocation = $this->jsnewloc = ($this->jsaccess >= 2);
         $this->jsdirectlink = (3 == $this->jsaccess);
-        $this->mobile = false !== stripos($_SERVER['HTTP_USER_AGENT'], 'mobile');
+        $this->mobile = false !== mb_stripos($_SERVER['HTTP_USER_AGENT'], 'mobile');
         $this->parts = array();
         $this->vars = array();
         $this->metadefs = array();
@@ -157,7 +157,7 @@ class PAGE
             }
             $this->template = $this->filtervars($this->template);
             $this->template = $SESS->addSessId($this->template);
-            if ($this->checkextended(null, $this->template)) {
+            if ($this->checkextended($this->template, null)) {
                 $this->template = $this->metaextended($this->template);
             }
             echo $this->template;
@@ -249,7 +249,7 @@ class PAGE
 
     public function userMetaParse($m)
     {
-        $this->checkextended($m[2], $m[3]);
+        $this->checkextended($m[3], $m[2]);
         $this->userMetaDefs[$m[2]] = $m[3];
 
         return '';
@@ -288,7 +288,7 @@ class PAGE
             $this->debug("${what} triggered ${v} to load");
             if (is_array($meta)) {
                 foreach ($meta as $k => $v) {
-                    $this->checkextended($k, $v);
+                    $this->checkextended($v, $k);
                 }
                 $this->metadefs = $meta + $this->metadefs;
             }
@@ -375,7 +375,7 @@ class PAGE
         return '';
     }
 
-    public function checkextended($meta = null, $data)
+    public function checkextended($data, $meta = null)
     {
         if (false !== mb_strpos($data, '{if ')) {
             if ($meta) {

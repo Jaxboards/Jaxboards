@@ -430,7 +430,7 @@ class MySQL
         if (is_array($value)) {
             return $value[0];
         }
-        if (is_null($value)) {
+        if ($value === null) {
             return 'NULL';
         }
 
@@ -441,7 +441,7 @@ class MySQL
     {
         if (is_array($value)) {
             $value = $value[0];
-        } elseif (is_null($value)) {
+        } elseif ($value === null) {
             $value = 'NULL';
         } else {
             $value = is_int($value) ? $value :

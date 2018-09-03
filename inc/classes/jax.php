@@ -190,7 +190,7 @@ EOT
             $verified_password = password_verify($pass, $user['pass']);
             if (!$verified_password) {
                 // check if it's an old md5 hash
-                if (md5($pass) === $user['pass']) {
+                if (hash('md5', $pass) === $user['pass']) {
                     $verified_password = true;
                     $needs_rehash = true;
                 }
@@ -957,7 +957,7 @@ EOT
         if (!is_string($ip)) {
             return '';
         }
-        $l = strlen($ip);
+        $l = mb_strlen($ip);
         if (4 == $l or 16 == $l) {
             return inet_ntop(pack('A' . $l, $ip));
         }

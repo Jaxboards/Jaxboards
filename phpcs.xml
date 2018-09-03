@@ -30,12 +30,24 @@
 
 		<!-- Follow PSR coding style guides -->
 		<!-- PSR1: Basic Coding Standard https://www.php-fig.org/psr/psr-1 -->
-    <rule ref="PSR1" />
+    <rule ref="PSR1">
+      <!-- Disable these rules temporarily as they require big changes to
+        the codebase -->
+      <exclude name="PSR1.Files.SideEffects" />
+      <exclude name="PSR1.Classes.ClassDeclaration" />
+      <exclude name="PSR1.Methods.CamelCapsMethodName" />
+    </rule>
 		<!-- PSR2: Coding Style Guide https://www.php-fig.org/psr/psr-2 -->
     <rule ref="PSR2" />
 		<!-- PSR12 (draft): Extended Coding Style Guide
 			https://github.com/php-fig/fig-standards/blob/master/proposed/extended-coding-style-guide.md -->
     <rule ref="PSR12" />
+
+    <!-- Disable some more rules temporarily as they require big changes to
+      the codebase -->
+    <rule ref="Squiz.Classes.ValidClassName">
+      <severity>0</severity>
+    </rule>
 
     <!-- Ban some functions -->
     <rule ref="Generic.PHP.ForbiddenFunctions">

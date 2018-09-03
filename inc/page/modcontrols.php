@@ -5,7 +5,7 @@ $PAGE->loadmeta('modcp');
 new modcontrols();
 class modcontrols
 {
-    private function _box($title, $content)
+    private function box($title, $content)
     {
         $content = ($content ?: '--No Data--');
 
@@ -939,7 +939,7 @@ EOT;
 EOT;
             }
             $torDate = date('Y-m-d', strtotime('-2 days'));
-            $page .= $this->_box(
+            $page .= $this->box(
                 'Info',
                 <<<EOT
 <form method='post' onsubmit='return RUN.submitForm(this)'>
@@ -948,10 +948,14 @@ EOT;
 </form>
 IP Lookup Services: <ul>
     <li><a href="https://whois.domaintools.com/${ip}">DomainTools Whois</a></li>
-    <li><a href="https://www.domaintools.com/research/traceroute/?query=${ip}">DomainTools Traceroute</a></li>
+    <li><a href="https://www.domaintools.com/research/traceroute/?query=${ip}">
+        DomainTools Traceroute
+    </a></li>
     <li><a href="https://www.ip2location.com/${ip}">IP2Location Lookup</a></li>
     <li><a href="https://www.dan.me.uk/torcheck?ip=${ip}">IP2Location Lookup</a></li>
-    <li><a href="https://metrics.torproject.org/exonerator.html?ip=${ip}&timestamp=${torDate}">ExoneraTor Lookup</a></li>
+    <li><a href="https://metrics.torproject.org/exonerator.html?ip=${ip}&timestamp=${torDate}">
+        ExoneraTor Lookup
+    </a></li>
     <li><a href="https://www.projecthoneypot.org/ip_${ip}">Project Honeypot Lookup</a></li>
     <li><a href="https://www.stopforumspam.com/ipcheck/${ip}">StopForumSpam Lookup</a></li>
 </ul>
@@ -973,7 +977,7 @@ EOT
                     $f['display_name']
                 );
             }
-            $page .= $this->_box('Users with this IP:', implode(', ', $content));
+            $page .= $this->box('Users with this IP:', implode(', ', $content));
 
             if ($CFG['shoutbox']) {
                 $content = '';
@@ -1005,7 +1009,7 @@ EOT
                     );
                     $content .= ' : ' . $f['shout'] . '<br />';
                 }
-                $page .= $this->_box('Last 5 shouts:', $content);
+                $page .= $this->box('Last 5 shouts:', $content);
             }
             $content = '';
             $result = $DB->safeselect(
@@ -1019,7 +1023,7 @@ EOT
                     nl2br($JAX->blockhtml($JAX->textonly($f['post']))) .
                     '</div>';
             }
-            $page .= $this->_box('Last 5 posts:', $content);
+            $page .= $this->box('Last 5 posts:', $content);
         }
         $this->showmodcp($form . $page);
     }

@@ -286,7 +286,7 @@ EOT
             $verified_password = password_verify($JAX->p['curpass'], $USER['pass']);
             if (!$verified_password) {
                 // check if it's an old md5 hash
-                if (md5($JAX->p['curpass']) === $USER['pass']) {
+                if (hash('md5', $JAX->p['curpass']) === $USER['pass']) {
                     $verified_password = true;
                 }
             }
