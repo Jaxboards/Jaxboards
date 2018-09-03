@@ -109,6 +109,9 @@ EOT
         if ($PAGE->jsupdate && empty($JAX->p)) {
             return false;
         }
+        if (!$PERMS['can_view_fullprofile']) {
+            return $PAGE->location('?');
+        }
         $e = '';
         $nouser = false;
         $udata = null;

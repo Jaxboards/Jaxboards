@@ -211,6 +211,7 @@ CREATE TABLE `blueprint_member_groups` (
   `can_view_shoutbox` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `can_view_stats` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `legend` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `can_view_fullprofile` tinyint(1) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
