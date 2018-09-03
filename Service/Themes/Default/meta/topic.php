@@ -169,7 +169,7 @@ EOT
     %1$s
     <textarea id="postdata%3$s" name="postdata">%2$s</textarea>
     <iframe id="pdedit%3$s" style="display:none"
-        onload="JAX.editor(document.querySelector('#postdata%3$s'),this)">
+        onload="new JAX.Editor(document.querySelector('#postdata%3$s'),this)">
     </iframe>
     <br />
     <input type="submit" value="Edit" />
@@ -190,7 +190,7 @@ EOT
     <input type="text" name="tdesc" value="%s" />
     <br />
     <textarea id="postdata" name="postdata">%s</textarea>
-    <iframe id="pdedit" onload="JAX.editor(document.querySelector('#postdata'),this)" style="display:none">
+    <iframe id="pdedit" onload="new JAX.Editor(document.querySelector('#postdata'),this)" style="display:none">
     </iframe>
     <br />
     <input type="submit" value="Edit" />

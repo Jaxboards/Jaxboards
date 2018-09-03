@@ -63,6 +63,14 @@ pnpm install
 
 The tools have `npm` scripts for them, so you can easily get the tools working.
 
+#### JS Compilation
+
+*EXPERIMENTAL / IN PROGRESS*: All Javascript sourcecode is modularized into ES6 classes, and is bundled together using [rollup](https://www.npmjs.com/package/rollup). To build a bundled source ("jsnew.js") from the modules, run:
+
+```bash
+pnpm run build
+```
+
 #### Prettier
 
 [Prettier](https://github.com/prettier/prettier) automatically formats code to

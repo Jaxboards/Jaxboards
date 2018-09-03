@@ -251,7 +251,7 @@ EOT
 <br />
   <textarea name="postdata" id="postdata">' . $JAX->blockhtml($postdata) .
             '</textarea>
-  <iframe id="pdedit" onload="JAX.editor(document.querySelector(\'#postdata\'),this)"
+  <iframe id="pdedit" onload="new JAX.Editor(document.querySelector(\'#postdata\'),this)"
 style="display:none"></iframe><br /><div class="postoptions">
   ' . ($fdata['perms']['poll'] ? '<label class="addpoll" for="addpoll">Add a
 Poll</label> <select name="poll_type" onchange="document.querySelector(\'#polloptions\').' .
@@ -369,7 +369,7 @@ EOT
         'RUN.submitForm(this,0,event);" enctype="multipart/form-data">
  ' . $vars . '
   <textarea name="postdata" id="post">' . $postdata .
-        '</textarea><iframe id="pdedit" onload="JAX.editor(document.querySelector(\'#post\'),this)"
+        '</textarea><iframe id="pdedit" onload="new JAX.Editor(document.querySelector(\'#post\'),this)"
   style="display:none"></iframe><br />' .
         ($tdata['perms']['upload'] ? '<div id="attachfiles">Add Files
   <input type="file" name="Filedata" /></div>' : '') .

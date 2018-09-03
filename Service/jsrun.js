@@ -220,7 +220,7 @@ function RUNF() {
       if (!el) return;
       el.innerHTML = a[1];
       if (a[2]) {
-        JAX.sfx(el)
+        new JAX.sfx(el)
           .dehighlight()
           .play();
       }
@@ -282,7 +282,7 @@ function RUNF() {
         x = ss.pop();
         x.parentNode.removeChild(x);
       }
-      JAX.sfx(div)
+      new JAX.sfx(div)
         .dehighlight()
         .play();
       if (globalsettings.sound_shout) Sound.play("sbblip");
@@ -299,7 +299,7 @@ function RUNF() {
       var h = JAX.el.getComputedStyle(tick);
       h = h.height;
       tick.style.height = "0px";
-      JAX.sfx(tick)
+      new JAX.sfx(tick)
         .add("height", "0px", h)
         .play();
       var ticks = ticker.querySelectorAll(".tick");
@@ -310,7 +310,7 @@ function RUNF() {
           tick = ticks[x];
           if (!tick.bonked) {
             tick = ticks[x];
-            JAX.sfx(tick, 30, 500)
+            new JAX.sfx(tick, 30, 500)
               .add("opacity", "1", "0")
               .then(function(el) {
                 el.parentNode.removeChild(el);
@@ -395,7 +395,7 @@ function RUNF() {
         test = sb.scrollTop > sb.scrollHeight - sb.clientHeight - 50;
         sb.appendChild(d);
         if (test) sb.scrollTop = sb.scrollHeight;
-        JAX.sfx(d)
+        new JAX.sfx(d)
           .dehighlight()
           .play();
         JAX.gracefulDegrade(d);

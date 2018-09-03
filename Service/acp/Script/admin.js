@@ -66,7 +66,7 @@ function makestuffcool() {
   if (!editor.length) {
     editor.onkeydown = function(event) {
       if (event.keyCode == 9) {
-        JAX.editor.setSelection(editor, "    ");
+        JAX.Editor.setSelection(editor, "    ");
         return false;
       }
     };

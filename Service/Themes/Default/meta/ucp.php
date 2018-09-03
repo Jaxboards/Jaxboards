@@ -12,7 +12,7 @@ $meta = array(
         <img src="%s" />
     </div>
     <textarea id="notepad" name="ucpnotepad">%s</textarea>
-    <iframe id="npedit" onload="JAX.editor(document.querySelector('#notepad'),this)"
+    <iframe id="npedit" onload="new JAX.editor(document.querySelector('#notepad'),this)"
         style="display:none">
     </iframe>
     <input type="submit" value="Save" />
@@ -141,7 +141,7 @@ EOT
     <br />
     <br />
     <textarea name="changesig" id="changesig">%s</textarea>
-    <iframe id="npedit" onload="JAX.editor(document.querySelector('#changesig'),this)"
+    <iframe id="npedit" onload="new JAX.editor(document.querySelector('#changesig'),this)"
         style="display:none">
     </iframe>
     <br />
@@ -215,7 +215,7 @@ EOT
     </h2>
     <div class="description">
         <textarea rows="10" cols="60" name="about" id="about">%s</textarea>
-        <iframe id="abouteditor" onload="JAX.editor(document.querySelector('#about'),this)"
+        <iframe id="abouteditor" onload="new JAX.editor(document.querySelector('#about'),this)"
             style="display:none">
         </iframe>
         <h2>
@@ -386,7 +386,7 @@ EOT
                 %6$s
             </textarea>
             <iframe id="pdedit"
-                onload="JAX.editor(document.querySelector('#message'),this)" style="display:none">
+                onload="new JAX.editor(document.querySelector('#message'),this)" style="display:none">
             </iframe>
         </div>
         <input type="submit" value="Send" />

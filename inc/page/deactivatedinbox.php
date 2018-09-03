@@ -484,7 +484,7 @@ EOT
             <input type="text" id="title" name="title" value="${mtitle}"/>
         </div>
         <div>
-            <iframe onload="JAX.editor(document.querySelector('#message'),this)"
+            <iframe onload="new JAX.Editor(document.querySelector('#message'),this)"
                 style="display:none" id="pdedit"></iframe>
             <textarea id="message" name="message">${msgClean}</textarea>
         </div>

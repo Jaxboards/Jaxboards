@@ -51,7 +51,7 @@ OnDomReady(function() {
   };
 });
 OnDomReady(function() {
-  JAX.extend(RUN.stream.commands, {
+  JAX.assign(RUN.stream.commands, {
     modcontrols_sayhi: function(a) {
       alert("this is a test");
     },
@@ -106,7 +106,7 @@ OnDomReady(function() {
         "<input type='submit' value='Go' /> " +
         "<input name='cancel' type='submit' " +
         "onclick='this.form.submitButton=this;' value='Cancel' /></form>";
-      JAX.extend(RUN.modcontrols, {
+      JAX.assign(RUN.modcontrols, {
         tids: tids,
         tidl: tl,
         pids: pids,
