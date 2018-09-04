@@ -56,6 +56,10 @@ class Stream {
     return false;
   }
 
+  load(...args) {
+    this.request.load(...args);
+  }
+
   loader() {
     this.request.load(`?${this.lastURL}`);
     return true;

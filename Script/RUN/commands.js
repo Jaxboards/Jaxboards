@@ -35,8 +35,11 @@ export default {
   alert(a) {
     alert(a[0]);
   },
-  addclass(a) {
-    document.querySelector(a[0]).classList.add(a[1]);
+  addclass([selector, className]) {
+    const el = document.querySelector(selector);
+    if (el) {
+      el.classList.add(className);
+    }
   },
   title(a) {
     document.title = a;

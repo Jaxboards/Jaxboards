@@ -1556,8 +1556,11 @@ var RUN = (function () {
     alert(a) {
       alert(a[0]);
     },
-    addclass(a) {
-      document.querySelector(a[0]).classList.add(a[1]);
+    addclass([selector, className]) {
+      const el$$1 = document.querySelector(selector);
+      if (el$$1) {
+        el$$1.classList.add(className);
+      }
     },
     title(a) {
       document.title = a;
@@ -2029,6 +2032,10 @@ var RUN = (function () {
       this.request.load(`?${a}`, null, null, null, b || 2);
       this.busy = true;
       return false;
+    }
+
+    load(...args) {
+      this.request.load(...args);
     }
 
     loader() {
