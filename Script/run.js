@@ -4,26 +4,12 @@ import {
   onDOMReady,
 } from './JAX/util';
 import {
-  smalldate,
-} from './JAX/date';
-import {
   stopTitleFlashing,
 } from './JAX/flashing-title';
 import Stream from './RUN/stream';
 import Sound from './sound';
 
 const useJSLinks = 2;
-
-/* Returns the path to this script. */
-function getJXBDBaseDir() {
-  const scripts = Array.from(document.querySelectorAll('script'));
-  const found = scripts
-    .find(script => script.src.substr(script.src.length - 8, 8) === 'run.js');
-  if (found) {
-    return found.src.substr(0, found.src.length - 8);
-  }
-  return null;
-}
 
 class AppState {
   onAppReady() {
@@ -50,9 +36,9 @@ class AppState {
 
 
     // Load sounds
-    Sound.load('sbblip', `./Sounds/blip.mp3`, false);
-    Sound.load('imbeep', `./Sounds/receive.mp3`, false);
-    Sound.load('imnewwindow', `./Sounds/receive.mp3`, false);
+    Sound.load('sbblip', './Sounds/blip.mp3', false);
+    Sound.load('imbeep', './Sounds/receive.mp3', false);
+    Sound.load('imnewwindow', './Sounds/receive.mp3', false);
 
     document.cookie = 'buddylist=0';
   }
@@ -88,7 +74,7 @@ class AppState {
       names.push(submit.name);
       values.push(submit.value);
     }
-    RUN.stream.load('?', 0, [names, values], 1, 1);
+    this.stream.load('?', 0, [names, values], 1, 1);
     if (clearFormOnSubmit) {
       form.reset();
     }
