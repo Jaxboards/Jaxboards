@@ -91,6 +91,7 @@ EOT
         if (!$isbot) {
             $_SESSION['sid'] = $sid;
         }
+        $time = time();
         $sessData = array(
             'id' => $sid,
             'uid' => $uid,
@@ -98,8 +99,8 @@ EOT
             'ip' => $JAX->ip2bin(),
             'useragent' => $_SERVER['HTTP_USER_AGENT'],
             'is_bot' => $isbot,
-            'last_action' => date('Y-m-d H:i:s', time()),
-            'last_update' => date('Y-m-d H:i:s', time()),
+            'last_action' => date('Y-m-d H:i:s', $time),
+            'last_update' => date('Y-m-d H:i:s', $time),
         );
         if (1 > $uid) {
             unset($sessData['uid']);
@@ -237,7 +238,8 @@ EOT
         global $DB,$PAGE;
         $sd = $this->changedData;
         $id = $this->data['id'];
-        $datetimes = array('last_update', 'last_action', 'read_date');
+        $sd['last_update'] = date('Y-m-d H:i:s', time());
+        $datetimes = array('last_action', 'read_date');
         foreach ($datetimes as $datetime) {
             if (isset($sd[$datetime])) {
                 $sd[$datetime] = date('Y-m-d H:i:s', $sd[$datetime]);
