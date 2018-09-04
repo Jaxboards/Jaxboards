@@ -1,14 +1,19 @@
 {
   "scripts": {
+    "eslint": "./node_modules/.bin/eslint Script/**/*.js",
     "prettier": "prettier --write *.{{t,j}s{,x,on},{c,sa,sc,le}ss,vue,md,y{,a}ml,graphql}",
     "stylelint": "stylelint \"./**/*.{c,sa,sc,le}ss\"",
     "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\"",
     "build": "./node_modules/.bin/rollup -c"
   },
+  "pre-commit": [
+    "eslint"
+  ],
   "devDependencies": {
     "eslint": "^5.5.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.14.0",
+    "pre-commit": "^1.2.2",
     "prettier": "^1.14.2",
     "rollup": "^0.65.0",
     "stylelint": "^9.5.0",

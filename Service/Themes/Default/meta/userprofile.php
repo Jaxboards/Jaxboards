@@ -19,7 +19,7 @@ $meta = array(
             <td class="right">
                 <a href="javascript:void(0)"
                     onclick="
-                        IMWindow('%4$s',this.innerHTML.match(/IM (.+)/)[1]);
+                        new IMWindow('%4$s',this.innerHTML.match(/IM (.+)/)[1]);
                         JAX.window.close(this);
                         return false;
                     ">

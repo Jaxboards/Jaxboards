@@ -14,7 +14,7 @@ $PAGE->metadefs['buddylist-contacts'] = <<<EOT
 </div>
 EOT;
 $PAGE->metadefs['buddylist-contact'] = <<<'EOT'
-<div onclick="IMWindow(%1$s,'%2$s')"
+<div onclick="new IMWindow(%1$s,'%2$s')"
     oncontextmenu="RUN.stream.location('?act=vu%1$s');return false;"
     class="contact %3$s">
     <div class="avatar">

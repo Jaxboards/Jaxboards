@@ -491,7 +491,7 @@ EOT
                 }
             }
             $contactdetails .= '<div class="contact im">' .
-                '<a href="javascript:void(0)" onclick="IMWindow(\'' .
+                '<a href="javascript:void(0)" onclick="new IMWindow(\'' .
                 $udata['id'] . '\',\'' . $udata['display_name'] . '\')">IM</a></div>';
             $contactdetails .= '<div class="contact pm">' .
                 '<a href="?act=ucp&what=inbox&page=compose&mid=' .
