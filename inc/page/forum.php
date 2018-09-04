@@ -423,7 +423,7 @@ EOT
         }
         if ($topic['lp_date'] > $JAX->pick(
             max($this->topicsRead[$topic['id']], $this->forumReadTime),
-            $SESS->readtime,
+            $SESS->read_date,
             $USER['last_visit']
         )
         ) {
@@ -441,7 +441,7 @@ EOT
         }
         if ($forum['lp_date'] > $JAX->pick(
             $this->forumsRead[$forum['id']],
-            $SESS->readtime,
+            $SESS->read_date,
             $USER['last_visit']
         )
         ) {

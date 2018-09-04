@@ -197,7 +197,7 @@ EOT
                 'WHERE `expires`<=?',
                 $DB->basicvalue(date('Y-m-d H:i:s', time()))
             );
-            $this->__set('readtime', $JAX->pick($la, 0));
+            $this->__set('read_date', $JAX->pick($la, 0));
         }
         $yesterday = mktime(0, 0, 0);
         $query = $DB->safeselect(
@@ -236,20 +236,19 @@ EOT
     {
         global $DB,$PAGE;
         $sd = $this->changedData;
-        if (isset($sd['readtime'])) {
-            $sd['read_date'] = date('Y-m-d H:i:s', $sd['readtime']);
-            unset($sd['readtime']);
-        }
         $id = $this->data['id'];
-        $sd['last_update'] = date('Y-m-d H:i:s', time());
+        $datetimes = array('last_update', 'last_action', 'read_date');
+        foreach ($datetimes as $datetime) {
+            if (isset($sd[$datetime])) {
+                $sd[$datetime] = date('Y-m-d H:i:s', $sd[$datetime]);
+            }
+        }
         if ($this->data['is_bot']) {
             // Bots tend to read a lot of content.
             $sd['forumsread'] = $sd['topicsread'] = '';
         }
         if (!$this->data['last_action']) {
             $sd['last_action'] = date('Y-m-d H:i:s', time());
-        } elseif (isset($sd['last_action'])) {
-            $sd['last_action'] = date('Y-m-d H:i:s', $sd['last_action']);
         }
         if (isset($sd['user'])) {
             // This doesn't exist.

@@ -12,7 +12,7 @@ class IDX
         if (isset($JAX->b['markread']) && $JAX->b['markread']) {
             $PAGE->JS('softurl');
             $SESS->forumsread = $SESS->topicsread = '';
-            $SESS->readtime = time();
+            $SESS->read_date = time();
         }
         if ($PAGE->jsupdate) {
             $this->update();
@@ -501,7 +501,7 @@ EOT
         }
         if ($forum['lp_date'] > $JAX->pick(
             $this->forumsread[$forum['id']],
-            $SESS->readtime,
+            $SESS->read_date,
             $USER['last_visit']
         )
         ) {
