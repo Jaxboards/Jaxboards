@@ -289,7 +289,7 @@ class PAGE
             foreach (glob($componentDir . '/*.html') as $metaFile) {
                 $metaName = pathinfo($metaFile, PATHINFO_FILENAME);
                 $metaContent = file_get_contents($metaFile);
-                $this->checkextended($metaName, $metaContent);
+                $this->checkextended($metaContent, $metaName);
                 $meta[$metaName] = $metaContent;
             }
             $this->metadefs = $meta + $this->metadefs;
