@@ -245,7 +245,8 @@ EOT
         }
         if ($this->data['is_bot']) {
             // Bots tend to read a lot of content.
-            $sd['forumsread'] = $sd['topicsread'] = '';
+            $sd['forumsread'] = '';
+            $sd['topicsread'] = '';
         }
         if (!$this->data['last_action']) {
             $sd['last_action'] = date('Y-m-d H:i:s', time());
@@ -254,12 +255,15 @@ EOT
             // This doesn't exist.
             unset($sd['user']);
         }
-        $DB->safeupdate(
-            'session',
-            $sd,
-            'WHERE `id`=?',
-            $DB->basicvalue($id)
-        );
+        if (!empty($sd)) {
+            // Only update if there's data to update.
+            $DB->safeupdate(
+                'session',
+                $sd,
+                'WHERE `id`=?',
+                $DB->basicvalue($id)
+            );
+        }
     }
 
     public function addSessID($html)

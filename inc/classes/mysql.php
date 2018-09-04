@@ -73,6 +73,14 @@ class MySQL
 
     public function safeselect($selectors, $table, $where = '')
     {
+        if (is_array($selectors)) {
+            $selectors = implode(',', $selectors);
+        } elseif (!is_string($selectors)) {
+            return;
+        }
+        if (mb_strlen($selectors) < 1) {
+            return;
+        }
         $va_array = func_get_args();
         array_shift($va_array);
         // Selectors.
@@ -96,13 +104,15 @@ class MySQL
         return 0;
     }
 
-    public function safeinsert($a, $b)
+    public function safeinsert($table, $data)
     {
-        return $this->safequery(
-            'INSERT INTO ' . $this->ftable($a) .
-            ' (`' . implode('`, `', array_keys($b)) . '`) VALUES ?;',
-            array_values($b)
-        );
+        if (!empty($data) && count(array_keys($data)) > 0) {
+            return $this->safequery(
+                'INSERT INTO ' . $this->ftable($table) .
+                ' (`' . implode('`, `', array_keys($data)) . '`) VALUES ?;',
+                array_values($data)
+            );
+        }
     }
 
     public function buildInsert($a)
@@ -136,6 +146,10 @@ class MySQL
 
     public function safeupdate($table, $kvarray, $whereformat = '')
     {
+        if (empty($kvarray)) {
+            // Nothing to update.
+            return;
+        }
         $whereparams = func_get_args();
         array_shift($whereparams);
         // Table.
