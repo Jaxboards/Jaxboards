@@ -72,10 +72,10 @@ export function onImagesLoaded(imgs, callback, timeout) {
       }
     },
   };
-  imgs.forEach((img) => {
+  Array.from(imgs).forEach((img) => {
     if (dbj.imgs.includes(img.src) === false && !img.loaded) {
       dbj.imgs.push(img.src);
-      img.addEventListener('onload', dbj.callback);
+      img.addEventListener('load', dbj.callback);
       img.src = img.src;
     }
   });

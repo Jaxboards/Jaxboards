@@ -20,6 +20,7 @@ class Window {
   }
 
   create() {
+    debugger;
     if (this.windowContainer) {
       // DOM already created
       return null;
@@ -100,7 +101,7 @@ class Window {
 
     if (this.wait) {
       onImagesLoaded(
-        windowContainer.getElementsByTagName('img'),
+        windowContainer.querySelectorAll('img'),
         () => {
           this.setPosition(pos);
         },
@@ -149,7 +150,7 @@ class Window {
         return w;
       }, 0);
       this.oldpos = this.getPosition();
-      this.setPosition(`bl ${width} 0`, 0);
+      this.setPosition(`bl ${width} 0`, false);
     }
   }
 
@@ -185,7 +186,7 @@ class Window {
     if (x < 0) x = 0;
     if (y < 0) y = 0;
     d1.style.left = `${x}px`;
-    if (this.animate && animate !== 0) {
+    if (this.animate || animate) {
       new Animation(d1, 10)
         .add('top', `${y - 100}px`, `${y}px`)
         .play();

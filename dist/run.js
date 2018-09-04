@@ -736,10 +736,10 @@ var RUN = (function () {
         }
       },
     };
-    imgs.forEach((img) => {
+    Array.from(imgs).forEach((img) => {
       if (dbj.imgs.includes(img.src) === false && !img.loaded) {
         dbj.imgs.push(img.src);
-        img.addEventListener('onload', dbj.callback);
+        img.addEventListener('load', dbj.callback);
         img.src = img.src;
       }
     });
@@ -1248,6 +1248,7 @@ var RUN = (function () {
     }
 
     create() {
+      debugger;
       if (this.windowContainer) {
         // DOM already created
         return null;
@@ -1328,7 +1329,7 @@ var RUN = (function () {
 
       if (this.wait) {
         onImagesLoaded(
-          windowContainer.getElementsByTagName('img'),
+          windowContainer.querySelectorAll('img'),
           () => {
             this.setPosition(pos);
           },
@@ -1377,7 +1378,7 @@ var RUN = (function () {
           return w;
         }, 0);
         this.oldpos = this.getPosition();
-        this.setPosition(`bl ${width} 0`, 0);
+        this.setPosition(`bl ${width} 0`, false);
       }
     }
 
@@ -1413,7 +1414,7 @@ var RUN = (function () {
       if (x < 0) x = 0;
       if (y < 0) y = 0;
       d1.style.left = `${x}px`;
-      if (this.animate && animate !== 0) {
+      if (this.animate || animate) {
         new Animation(d1, 10)
           .add('top', `${y - 100}px`, `${y}px`)
           .play();
