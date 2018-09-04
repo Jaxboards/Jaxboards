@@ -3008,9 +3008,9 @@
 
 
       // Load sounds
-      Sound$1.load('sbblip', `./Sounds/blip.mp3`, false);
-      Sound$1.load('imbeep', `./Sounds/receive.mp3`, false);
-      Sound$1.load('imnewwindow', `./Sounds/receive.mp3`, false);
+      Sound$1.load('sbblip', './Sounds/blip.mp3', false);
+      Sound$1.load('imbeep', './Sounds/receive.mp3', false);
+      Sound$1.load('imnewwindow', './Sounds/receive.mp3', false);
 
       document.cookie = 'buddylist=0';
     }
@@ -3046,7 +3046,7 @@
         names.push(submit.name);
         values.push(submit.value);
       }
-      RUN$1.stream.load('?', 0, [names, values], 1, 1);
+      this.stream.load('?', 0, [names, values], 1, 1);
       if (clearFormOnSubmit) {
         form.reset();
       }
