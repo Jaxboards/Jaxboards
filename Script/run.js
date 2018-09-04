@@ -12,7 +12,6 @@ import {
 import Stream from './RUN/stream';
 import Sound from './sound';
 
-const updatetime = 5000;
 const useJSLinks = 2;
 
 /* Returns the path to this script. */
@@ -37,7 +36,7 @@ class AppState {
     updateDates();
     setInterval(updateDates, 1000 * 30);
 
-    this.nextDataPoll();
+    this.stream.pollData();
     setInterval(() => this.stream.updatePage, 200);
 
     if (useJSLinks && document.location.toString().indexOf('?') > 0) {
@@ -94,7 +93,7 @@ class AppState {
     if (clearFormOnSubmit) {
       form.reset();
     }
-    this.nextDataPoll();
+    this.stream.pollData();
     return false;
   }
 
@@ -105,18 +104,7 @@ class AppState {
   setWindowActive() {
     document.cookie = `actw=${window.name}`;
     stopTitleFlashing();
-    this.nextDataPoll();
-  }
-
-  nextDataPoll(a) {
-    const { stream } = this;
-    if (a) {
-      stream.loader();
-    }
-    clearTimeout(stream.timeout);
-    if (document.cookie.match(`actw=${window.name}`)) {
-      stream.timeout = setTimeout(stream.loader, updatetime);
-    }
+    this.stream.pollData();
   }
 }
 
@@ -127,6 +115,7 @@ onDOMReady(() => {
 });
 onDOMReady(() => {
   window.name = Math.random();
+  RUN.setWindowActive();
   window.addEventListener('onfocus', () => {
     RUN.setWindowActive();
   });

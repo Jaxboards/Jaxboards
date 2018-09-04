@@ -1,4 +1,4 @@
-var window = (function () {
+(function () {
   'use strict';
 
   /**
@@ -16,6 +16,9 @@ var window = (function () {
    * @return {String}
    */
   function buildQueryString(keys, values) {
+    if (!keys) {
+      return '';
+    }
     if (values) {
       return keys
         .map((key, index) => `${encodeURIComponent(key)}=${encodeURIComponent(values[index] || '')}`)
@@ -50,7 +53,9 @@ var window = (function () {
         sendData = buildQueryString(data);
       }
       const request = new XMLHttpRequest();
-      if (callback) this.setup.callback = callback;
+      if (callback) {
+        this.setup.callback = callback;
+      }
       request.onreadystatechange = () => {
         if (request.readyState === this.setup.readyState) {
           this.setup.callback(request);
@@ -268,7 +273,7 @@ var window = (function () {
   }
 
   function getHighestZIndex() {
-    const allElements = document.getElementsByTagName('*');
+    const allElements = Array.from(document.getElementsByTagName('*'));
     const max = allElements.reduce((maxZ, element) => {
       if (element.style.zIndex && Number(element.style.zIndex) > maxZ) {
         return Number(element.style.zIndex);
@@ -841,7 +846,7 @@ var window = (function () {
     dates.forEach((el$$1) => {
       parsed = el$$1.classList.contains('smalldate')
         ? smalldate(parseInt(el$$1.title, 10))
-        : el$$1(parseInt(el$$1.title, 10));
+        : date(parseInt(el$$1.title, 10));
       if (parsed !== el$$1.innerHTML) {
         el$$1.innerHTML = parsed;
       }
@@ -855,11 +860,12 @@ var window = (function () {
     const links = Array.from(a.querySelectorAll('a'));
     links.forEach((link) => {
       if (link.href) {
-        if (link.getAttribute('href').charAt(0) === '?') {
+        const href = link.getAttribute('href');
+        if (href.charAt(0) === '?') {
           const oldclick = link.onclick;
           link.onclick = function onclick() {
             if (!oldclick || oldclick() !== false) {
-              RUN.stream.location(this.getAttribute('href'));
+              RUN.stream.location(href);
             }
             return false;
           };
@@ -1026,6 +1032,12 @@ var window = (function () {
     } else {
       document.addEventListener('DOMContentLoaded', callback);
     }
+  }
+
+  function stripHTML(html) {
+    return html.valueOf()
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
   }
 
   class Drag {
@@ -2263,6 +2275,55 @@ var window = (function () {
     } while (element);
   };
 
+  function openTooltip (el$$1) {
+    let tooltip = document.getElementById('tooltip_thingy');
+    const pos = getCoordinates(el$$1);
+    const title = stripHTML(el$$1.title);
+    // Prevent the browser from showing its own title
+    el$$1.title = '';
+    if (!title) return;
+    if (!tooltip) {
+      tooltip = document.createElement('table');
+      const t = tooltip.insertRow(0);
+      const c = tooltip.insertRow(1);
+      const b = tooltip.insertRow(2);
+      let a;
+
+      tooltip.id = 'tooltip_thingy';
+      tooltip.className = 'tooltip';
+      t.className = 'top';
+      c.className = 'content';
+      b.className = 'bottom';
+      a = t.insertCell(0);
+      a.className = 'left';
+      a.colSpan = 2;
+      a = t.insertCell(1);
+      a.className = 'right';
+      a = c.insertCell(0);
+      a.className = 'left';
+      a = c.insertCell(1);
+      a.innerHTML = 'default text';
+      a = c.insertCell(2);
+      a.className = 'right';
+      a = b.insertCell(0);
+      a.className = 'left';
+      a.colSpan = 2;
+      a = b.insertCell(1);
+      a.className = 'right';
+      document.querySelector('#page').appendChild(tooltip);
+    }
+
+    tooltip.rows[1].cells[1].innerHTML = title;
+    tooltip.style.display = '';
+    tooltip.style.top = `${pos.y - tooltip.clientHeight}px`;
+    tooltip.style.left = `${pos.x}px`;
+    tooltip.style.zIndex = getHighestZIndex();
+    el$$1.onmouseout = () => {
+      el$$1.title = title;
+      document.querySelector('#tooltip_thingy').style.display = 'none';
+    };
+  }
+
   var JAX$1 = {
     ajax: Ajax,
     browser: Browser,
@@ -2284,6 +2345,7 @@ var window = (function () {
     stopTitleFlashing,
     sfx: Animation,
     SWF,
+    tooltip: openTooltip,
     window: Window,
 
     // TODO: organize
@@ -2399,55 +2461,6 @@ var window = (function () {
   // Sound is a singleton
   var Sound$1 = new Sound();
 
-  function openTooltip (el$$1) {
-    let tooltip = document.getElementById('tooltip_thingy');
-    const pos = getCoordinates(el$$1);
-    const title = el$$1.title.striphtml();
-    // Prevent the browser from showing its own title
-    el$$1.title = '';
-    if (!title) return;
-    if (!tooltip) {
-      tooltip = document.createElement('table');
-      const t = tooltip.insertRow(0);
-      const c = tooltip.insertRow(1);
-      const b = tooltip.insertRow(2);
-      let a;
-
-      tooltip.id = 'tooltip_thingy';
-      tooltip.className = 'tooltip';
-      t.className = 'top';
-      c.className = 'content';
-      b.className = 'bottom';
-      a = t.insertCell(0);
-      a.className = 'left';
-      a.colSpan = 2;
-      a = t.insertCell(1);
-      a.className = 'right';
-      a = c.insertCell(0);
-      a.className = 'left';
-      a = c.insertCell(1);
-      a.innerHTML = 'default text';
-      a = c.insertCell(2);
-      a.className = 'right';
-      a = b.insertCell(0);
-      a.className = 'left';
-      a.colSpan = 2;
-      a = b.insertCell(1);
-      a.className = 'right';
-      document.querySelector('#page').appendChild(tooltip);
-    }
-
-    tooltip.rows[1].cells[1].innerHTML = title;
-    tooltip.style.display = '';
-    tooltip.style.top = `${pos.y - tooltip.clientHeight}px`;
-    tooltip.style.left = `${pos.x}px`;
-    tooltip.style.zIndex = getHighestZIndex();
-    el$$1.onmouseout = () => {
-      el$$1.title = title;
-      document.querySelector('#tooltip_thingy').style.display = 'none';
-    };
-  }
-
   /* global RUN, globalsettings */
 
   /**
@@ -2471,10 +2484,9 @@ var window = (function () {
     title(a) {
       document.title = a;
     },
-    update(a) {
-      let [selector] = a;
-      const [html] = a;
-      const paths = Aray.from(document.querySelectorAll('.path'));
+    update([sel, html, shouldHighlight]) {
+      let selector = sel;
+      const paths = Array.from(document.querySelectorAll('.path'));
       if (selector === 'path' && paths.length > 1) {
         paths.forEach((path) => {
           path.innerHTML = html;
@@ -2488,7 +2500,7 @@ var window = (function () {
       const el$$1 = document.querySelector(selector);
       if (!el$$1) return;
       el$$1.innerHTML = html;
-      if (a[2]) {
+      if (shouldHighlight) {
         new Animation(el$$1)
           .dehighlight()
           .play();
@@ -2886,6 +2898,8 @@ var window = (function () {
     },
   };
 
+  const UPDATE_INTERVAL = 5000;
+
   class Stream {
     constructor() {
       this.request = new Ajax({
@@ -2905,21 +2919,18 @@ var window = (function () {
       if (debug) {
         debug.innerHTML = `<xmp>${responseText}</xmp>`;
       }
-      let x;
       let cmds = [];
       if (responseText.length) {
         try {
-          // TODO: try and remove this eval?
-          // eslint-disable-next-line
-          cmds = eval(`(${responseText})`);
+          cmds = JSON.parse(responseText);
         } catch (e) {
           cmds = [];
         }
-        cmds.forEach((cmd) => {
+        cmds.forEach(([cmd, ...args]) => {
           if (cmd === 'softurl') {
             softurl = true;
           } else if (this.commands[cmd]) {
-            this.commands[cmd](cmds[x]);
+            this.commands[cmd](args);
           }
         });
       }
@@ -2931,20 +2942,30 @@ var window = (function () {
           if (Event.onPageChange) Event.onPageChange();
         } else if (document.location.hash.substring(1) === a) document.location = '#';
       }
-      this.donext();
+      this.pollData();
     }
 
     location(path, b) {
       let a = path.split('?');
       a = a[1] || a[0];
-      this.load(`?${a}`, null, null, null, b || 2);
+      this.request.load(`?${a}`, null, null, null, b || 2);
       this.busy = true;
       return false;
     }
 
     loader() {
-      this.load(`?${this.lastURL}`);
+      this.request.load(`?${this.lastURL}`);
       return true;
+    }
+
+    pollData(isEager) {
+      if (isEager) {
+        this.loader();
+      }
+      clearTimeout(this.timeout);
+      if (document.cookie.match(`actw=${window.name}`)) {
+        this.timeout = setTimeout(() => this.loader(), UPDATE_INTERVAL);
+      }
     }
 
     updatePage() {
@@ -2956,8 +2977,6 @@ var window = (function () {
       }
     }
   }
-
-  const updatetime = 5000;
 
   /* Returns the path to this script. */
   function getJXBDBaseDir() {
@@ -2981,7 +3000,7 @@ var window = (function () {
       updateDates();
       setInterval(updateDates, 1000 * 30);
 
-      this.nextDataPoll();
+      this.stream.pollData();
       setInterval(() => this.stream.updatePage, 200);
 
       if (document.location.toString().indexOf('?') > 0) {
@@ -3036,7 +3055,7 @@ var window = (function () {
       if (clearFormOnSubmit) {
         form.reset();
       }
-      this.nextDataPoll();
+      this.stream.pollData();
       return false;
     }
 
@@ -3047,18 +3066,7 @@ var window = (function () {
     setWindowActive() {
       document.cookie = `actw=${window.name}`;
       stopTitleFlashing();
-      this.nextDataPoll();
-    }
-
-    nextDataPoll(a) {
-      const { stream } = this;
-      if (a) {
-        stream.loader();
-      }
-      clearTimeout(stream.timeout);
-      if (document.cookie.match(`actw=${window.name}`)) {
-        stream.timeout = setTimeout(stream.loader, updatetime);
-      }
+      this.stream.pollData();
     }
   }
 
@@ -3069,6 +3077,7 @@ var window = (function () {
   });
   onDOMReady(() => {
     window.name = Math.random();
+    RUN$1.setWindowActive();
     window.addEventListener('onfocus', () => {
       RUN$1.setWindowActive();
     });
@@ -3107,7 +3116,8 @@ var window = (function () {
     RUN.stream.load(`?module=privatemessage&im_menu=${uid}`);
   };
 
-  var app = {
+  // Kinda hacky - these are all globals
+  assign(window, {
     JAX: JAX$1,
     RUN: RUN$1,
     Uploader: Uploader$1,
@@ -3115,8 +3125,6 @@ var window = (function () {
 
     // TODO: Make this not globally defined
     IMWindow,
-  };
-
-  return app;
+  });
 
 }());

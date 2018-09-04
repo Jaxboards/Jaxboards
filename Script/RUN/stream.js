@@ -1,6 +1,8 @@
 import Ajax from '../JAX/ajax';
 import Commands from './commands';
 
+const UPDATE_INTERVAL = 5000;
+
 class Stream {
   constructor() {
     this.request = new Ajax({
@@ -20,21 +22,18 @@ class Stream {
     if (debug) {
       debug.innerHTML = `<xmp>${responseText}</xmp>`;
     }
-    let x;
     let cmds = [];
     if (responseText.length) {
       try {
-        // TODO: try and remove this eval?
-        // eslint-disable-next-line
-        cmds = eval(`(${responseText})`);
+        cmds = JSON.parse(responseText);
       } catch (e) {
         cmds = [];
       }
-      cmds.forEach((cmd) => {
+      cmds.forEach(([cmd, ...args]) => {
         if (cmd === 'softurl') {
           softurl = true;
         } else if (this.commands[cmd]) {
-          this.commands[cmd](cmds[x]);
+          this.commands[cmd](args);
         }
       });
     }
@@ -46,20 +45,30 @@ class Stream {
         if (Event.onPageChange) Event.onPageChange();
       } else if (document.location.hash.substring(1) === a) document.location = '#';
     }
-    this.donext();
+    this.pollData();
   }
 
   location(path, b) {
     let a = path.split('?');
     a = a[1] || a[0];
-    this.load(`?${a}`, null, null, null, b || 2);
+    this.request.load(`?${a}`, null, null, null, b || 2);
     this.busy = true;
     return false;
   }
 
   loader() {
-    this.load(`?${this.lastURL}`);
+    this.request.load(`?${this.lastURL}`);
     return true;
+  }
+
+  pollData(isEager) {
+    if (isEager) {
+      this.loader();
+    }
+    clearTimeout(this.timeout);
+    if (document.cookie.match(`actw=${window.name}`)) {
+      this.timeout = setTimeout(() => this.loader(), UPDATE_INTERVAL);
+    }
   }
 
   updatePage() {

@@ -3,8 +3,6 @@ export default [
     input: 'Script/app.js',
     output: {
       file: 'dist/app.js',
-      // Kinda hacky - these are all globals
-      name: 'window',
       format: 'iife',
     },
   },

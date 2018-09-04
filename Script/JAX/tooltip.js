@@ -2,11 +2,12 @@ import {
   getCoordinates,
   getHighestZIndex,
 } from './el';
+import { stripHTML } from './util';
 
 export default function (el) {
   let tooltip = document.getElementById('tooltip_thingy');
   const pos = getCoordinates(el);
-  const title = el.title.striphtml();
+  const title = stripHTML(el.title);
   // Prevent the browser from showing its own title
   el.title = '';
   if (!title) return;

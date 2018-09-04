@@ -55,7 +55,7 @@ var RUN = (function () {
   }
 
   function getHighestZIndex() {
-    const allElements = document.getElementsByTagName('*');
+    const allElements = Array.from(document.getElementsByTagName('*'));
     const max = allElements.reduce((maxZ, element) => {
       if (element.style.zIndex && Number(element.style.zIndex) > maxZ) {
         return Number(element.style.zIndex);
@@ -609,6 +609,59 @@ var RUN = (function () {
     gallery.appendChild(controls);
   }
 
+  function ordsuffix(a) {
+    return (
+      a
+      + (Math.round(a / 10) === 1 ? 'th' : ['', 'st', 'nd', 'rd'][a % 10] || 'th')
+    );
+  }
+
+  function date(a) {
+    const old = new Date();
+    const now = new Date();
+    let fmt;
+    const yday = new Date();
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    yday.setTime(yday - 1000 * 60 * 60 * 24);
+    old.setTime(a * 1000); // setTime uses milliseconds, we'll be using UNIX Times as the argument
+    const hours = `${old.getHours() % 12 || 12}`;
+    const ampm = hours >= 12 ? 'pm' : 'am';
+    const mins = `${old.getMinutes()}`.padStart(2, '0');
+    const dstr = `${old.getDate()} ${old.getMonth()} ${old.getFullYear()}`;
+    const delta = (now.getTime() - old.getTime()) / 1000;
+    if (delta < 90) {
+      fmt = 'a minute ago';
+    } else if (delta < 3600) {
+      fmt = `${Math.round(delta / 60)} minutes ago`;
+    } else if (
+      `${now.getDate()} ${now.getMonth()} ${now.getFullYear()}`
+      === dstr
+    ) {
+      fmt = `Today @ ${hours}:${mins} ${ampm}`;
+    } else if (
+      `${yday.getDate()} ${yday.getMonth()} ${yday.getFullYear()}`
+      === dstr
+    ) {
+      fmt = `Yesterday @ ${hours}:${mins} ${ampm}`;
+    } else {
+      fmt = `${months[old.getMonth()]} ${ordsuffix(old.getDate())}, ${old.getFullYear()} @ ${hours}:${mins} ${ampm}`;
+    }
+    return fmt;
+  }
+
   function smalldate(a) {
     const d = new Date();
     d.setTime(a * 1000);
@@ -707,7 +760,7 @@ var RUN = (function () {
     dates.forEach((el$$1) => {
       parsed = el$$1.classList.contains('smalldate')
         ? smalldate(parseInt(el$$1.title, 10))
-        : el$$1(parseInt(el$$1.title, 10));
+        : date(parseInt(el$$1.title, 10));
       if (parsed !== el$$1.innerHTML) {
         el$$1.innerHTML = parsed;
       }
@@ -721,11 +774,12 @@ var RUN = (function () {
     const links = Array.from(a.querySelectorAll('a'));
     links.forEach((link) => {
       if (link.href) {
-        if (link.getAttribute('href').charAt(0) === '?') {
+        const href = link.getAttribute('href');
+        if (href.charAt(0) === '?') {
           const oldclick = link.onclick;
           link.onclick = function onclick() {
             if (!oldclick || oldclick() !== false) {
-              RUN.stream.location(this.getAttribute('href'));
+              RUN.stream.location(href);
             }
             return false;
           };
@@ -824,6 +878,12 @@ var RUN = (function () {
     }
   }
 
+  function stripHTML(html) {
+    return html.valueOf()
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
   // TODO: Create an instance for this state
   // instead of abusing the module
 
@@ -870,6 +930,9 @@ var RUN = (function () {
    * @return {String}
    */
   function buildQueryString(keys, values) {
+    if (!keys) {
+      return '';
+    }
     if (values) {
       return keys
         .map((key, index) => `${encodeURIComponent(key)}=${encodeURIComponent(values[index] || '')}`)
@@ -904,7 +967,9 @@ var RUN = (function () {
         sendData = buildQueryString(data);
       }
       const request = new XMLHttpRequest();
-      if (callback) this.setup.callback = callback;
+      if (callback) {
+        this.setup.callback = callback;
+      }
       request.onreadystatechange = () => {
         if (request.readyState === this.setup.readyState) {
           this.setup.callback(request);
@@ -929,7 +994,7 @@ var RUN = (function () {
   function openTooltip (el$$1) {
     let tooltip = document.getElementById('tooltip_thingy');
     const pos = getCoordinates(el$$1);
-    const title = el$$1.title.striphtml();
+    const title = stripHTML(el$$1.title);
     // Prevent the browser from showing its own title
     el$$1.title = '';
     if (!title) return;
@@ -1496,10 +1561,9 @@ var RUN = (function () {
     title(a) {
       document.title = a;
     },
-    update(a) {
-      let [selector] = a;
-      const [html] = a;
-      const paths = Aray.from(document.querySelectorAll('.path'));
+    update([sel, html, shouldHighlight]) {
+      let selector = sel;
+      const paths = Array.from(document.querySelectorAll('.path'));
       if (selector === 'path' && paths.length > 1) {
         paths.forEach((path) => {
           path.innerHTML = html;
@@ -1513,7 +1577,7 @@ var RUN = (function () {
       const el$$1 = document.querySelector(selector);
       if (!el$$1) return;
       el$$1.innerHTML = html;
-      if (a[2]) {
+      if (shouldHighlight) {
         new Animation(el$$1)
           .dehighlight()
           .play();
@@ -1911,6 +1975,8 @@ var RUN = (function () {
     },
   };
 
+  const UPDATE_INTERVAL = 5000;
+
   class Stream {
     constructor() {
       this.request = new Ajax({
@@ -1930,21 +1996,18 @@ var RUN = (function () {
       if (debug) {
         debug.innerHTML = `<xmp>${responseText}</xmp>`;
       }
-      let x;
       let cmds = [];
       if (responseText.length) {
         try {
-          // TODO: try and remove this eval?
-          // eslint-disable-next-line
-          cmds = eval(`(${responseText})`);
+          cmds = JSON.parse(responseText);
         } catch (e) {
           cmds = [];
         }
-        cmds.forEach((cmd) => {
+        cmds.forEach(([cmd, ...args]) => {
           if (cmd === 'softurl') {
             softurl = true;
           } else if (this.commands[cmd]) {
-            this.commands[cmd](cmds[x]);
+            this.commands[cmd](args);
           }
         });
       }
@@ -1956,20 +2019,30 @@ var RUN = (function () {
           if (Event.onPageChange) Event.onPageChange();
         } else if (document.location.hash.substring(1) === a) document.location = '#';
       }
-      this.donext();
+      this.pollData();
     }
 
     location(path, b) {
       let a = path.split('?');
       a = a[1] || a[0];
-      this.load(`?${a}`, null, null, null, b || 2);
+      this.request.load(`?${a}`, null, null, null, b || 2);
       this.busy = true;
       return false;
     }
 
     loader() {
-      this.load(`?${this.lastURL}`);
+      this.request.load(`?${this.lastURL}`);
       return true;
+    }
+
+    pollData(isEager) {
+      if (isEager) {
+        this.loader();
+      }
+      clearTimeout(this.timeout);
+      if (document.cookie.match(`actw=${window.name}`)) {
+        this.timeout = setTimeout(() => this.loader(), UPDATE_INTERVAL);
+      }
     }
 
     updatePage() {
@@ -1981,8 +2054,6 @@ var RUN = (function () {
       }
     }
   }
-
-  const updatetime = 5000;
 
   /* Returns the path to this script. */
   function getJXBDBaseDir() {
@@ -2006,7 +2077,7 @@ var RUN = (function () {
       updateDates();
       setInterval(updateDates, 1000 * 30);
 
-      this.nextDataPoll();
+      this.stream.pollData();
       setInterval(() => this.stream.updatePage, 200);
 
       if (document.location.toString().indexOf('?') > 0) {
@@ -2061,7 +2132,7 @@ var RUN = (function () {
       if (clearFormOnSubmit) {
         form.reset();
       }
-      this.nextDataPoll();
+      this.stream.pollData();
       return false;
     }
 
@@ -2072,18 +2143,7 @@ var RUN = (function () {
     setWindowActive() {
       document.cookie = `actw=${window.name}`;
       stopTitleFlashing();
-      this.nextDataPoll();
-    }
-
-    nextDataPoll(a) {
-      const { stream } = this;
-      if (a) {
-        stream.loader();
-      }
-      clearTimeout(stream.timeout);
-      if (document.cookie.match(`actw=${window.name}`)) {
-        stream.timeout = setTimeout(stream.loader, updatetime);
-      }
+      this.stream.pollData();
     }
   }
 
@@ -2094,6 +2154,7 @@ var RUN = (function () {
   });
   onDOMReady(() => {
     window.name = Math.random();
+    RUN$1.setWindowActive();
     window.addEventListener('onfocus', () => {
       RUN$1.setWindowActive();
     });

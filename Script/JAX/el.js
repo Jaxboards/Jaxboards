@@ -52,7 +52,7 @@ export function replace(a, b) {
 }
 
 export function getHighestZIndex() {
-  const allElements = document.getElementsByTagName('*');
+  const allElements = Array.from(document.getElementsByTagName('*'));
   const max = allElements.reduce((maxZ, element) => {
     if (element.style.zIndex && Number(element.style.zIndex) > maxZ) {
       return Number(element.style.zIndex);

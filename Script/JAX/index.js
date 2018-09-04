@@ -31,6 +31,8 @@ import {
   select,
 } from './util';
 
+import tooltip from './tooltip';
+
 export default {
   ajax,
   browser,
@@ -52,6 +54,7 @@ export default {
   stopTitleFlashing,
   sfx,
   SWF,
+  tooltip,
   window,
 
   // TODO: organize

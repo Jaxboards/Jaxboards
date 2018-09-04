@@ -10,6 +10,7 @@ import scrollablepagelist from './scrollablepagelist';
 import { imageResizer } from './image-resizer';
 import makeImageGallery from './image-gallery';
 import {
+  date,
   smalldate,
 } from './date';
 
@@ -95,7 +96,7 @@ export function updateDates() {
   dates.forEach((el) => {
     parsed = el.classList.contains('smalldate')
       ? smalldate(parseInt(el.title, 10))
-      : el(parseInt(el.title, 10));
+      : date(parseInt(el.title, 10));
     if (parsed !== el.innerHTML) {
       el.innerHTML = parsed;
     }
@@ -109,11 +110,12 @@ export function gracefulDegrade(a) {
   const links = Array.from(a.querySelectorAll('a'));
   links.forEach((link) => {
     if (link.href) {
-      if (link.getAttribute('href').charAt(0) === '?') {
+      const href = link.getAttribute('href');
+      if (href.charAt(0) === '?') {
         const oldclick = link.onclick;
         link.onclick = function onclick() {
           if (!oldclick || oldclick() !== false) {
-            RUN.stream.location(this.getAttribute('href'));
+            RUN.stream.location(href);
           }
           return false;
         };
@@ -280,4 +282,10 @@ export function onDOMReady(callback) {
   } else {
     document.addEventListener('DOMContentLoaded', callback);
   }
+}
+
+export function stripHTML(html) {
+  return html.valueOf()
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 }

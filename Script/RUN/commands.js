@@ -41,10 +41,9 @@ export default {
   title(a) {
     document.title = a;
   },
-  update(a) {
-    let [selector] = a;
-    const [html] = a;
-    const paths = Aray.from(document.querySelectorAll('.path'));
+  update([sel, html, shouldHighlight]) {
+    let selector = sel;
+    const paths = Array.from(document.querySelectorAll('.path'));
     if (selector === 'path' && paths.length > 1) {
       paths.forEach((path) => {
         path.innerHTML = html;
@@ -58,7 +57,7 @@ export default {
     const el = document.querySelector(selector);
     if (!el) return;
     el.innerHTML = html;
-    if (a[2]) {
+    if (shouldHighlight) {
       new Animation(el)
         .dehighlight()
         .play();

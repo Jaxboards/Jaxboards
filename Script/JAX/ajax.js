@@ -13,6 +13,9 @@
  * @return {String}
  */
 function buildQueryString(keys, values) {
+  if (!keys) {
+    return '';
+  }
   if (values) {
     return keys
       .map((key, index) => `${encodeURIComponent(key)}=${encodeURIComponent(values[index] || '')}`)
@@ -47,7 +50,9 @@ class Ajax {
       sendData = buildQueryString(data);
     }
     const request = new XMLHttpRequest();
-    if (callback) this.setup.callback = callback;
+    if (callback) {
+      this.setup.callback = callback;
+    }
     request.onreadystatechange = () => {
       if (request.readyState === this.setup.readyState) {
         this.setup.callback(request);

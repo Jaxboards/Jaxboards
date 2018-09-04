@@ -85,7 +85,9 @@ Run with this command in the Jaxboards directory to run it on all the files:
 pnpm run prettier
 ```
 
-#### StyleLint
+#### Linters
+
+#### Stylelint
 
 [Stylelint](https://stylelint.io/) adds some additional rules to keep CSS files
 clean and help us avoid trouble in the future with over-complicated CSS rules.
@@ -103,6 +105,14 @@ directory:
 
 ```bash
 pnpm run stylelint-fix
+```
+
+#### ESLint
+
+[ESLint](https://eslint.org/) keeps the javascript clean. Run with:
+
+```bash
+pnpm run eslint
 ```
 
 ### Composer tools
