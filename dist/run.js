@@ -2103,7 +2103,7 @@ var RUN = (function () {
       const values = [];
       const submit = form.submitButton;
 
-      form.elements.forEach((inputField) => {
+      Array.from(form.elements).forEach((inputField) => {
         if (!inputField.name || inputField.type === 'submit') {
           return;
         }
