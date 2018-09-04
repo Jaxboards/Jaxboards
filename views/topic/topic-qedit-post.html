@@ -1,0 +1,13 @@
+<form method="post"
+    onsubmit="document.querySelector('#pdedit%3$s').editor.submit();return RUN.submitForm(this)">
+    %1$s
+    <textarea id="postdata%3$s" name="postdata">%2$s</textarea>
+    <iframe id="pdedit%3$s" style="display:none"
+        onload="new JAX.Editor(document.querySelector('#postdata%3$s'),this)">
+    </iframe>
+    <br />
+    <input type="submit" value="Edit" />
+    <a href="?act=post&amp;pid=%3$s">
+        Full Edit
+    </a>
+</form>

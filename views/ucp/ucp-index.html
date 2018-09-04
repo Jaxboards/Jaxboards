@@ -1,0 +1,15 @@
+ <form method="post"
+    onsubmit="document.querySelector('#npedit').editor.submit();return RUN.submitForm(this)">
+    %s
+    <div class="username">
+        %s
+    </div>
+    <div class="avatar">
+        <img src="%s" />
+    </div>
+    <textarea id="notepad" name="ucpnotepad">%s</textarea>
+    <iframe id="npedit" onload="new JAX.editor(document.querySelector('#notepad'),this)"
+        style="display:none">
+    </iframe>
+    <input type="submit" value="Save" />
+</form>

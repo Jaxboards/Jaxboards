@@ -1,0 +1,42 @@
+<div class="box register">
+    <div class="title">
+        Registration
+    </div>
+    <div class="content">
+        <form method="post" onsubmit="return RUN.submitForm(this)">
+            <input type="hidden" name="act" value="logreg1">
+            <input type="hidden" name="register" value="true" />
+            <div style="display:none">
+                <input type="text" id="username" />
+            </div>
+            <label for="name">
+                Username:
+            </label>
+            <input type="text" name="name" id="name"
+                onkeyup="this.form.display_name.value=this.value" />
+            <br />
+            <label for="display_name">
+                Display Name:
+            </label>
+            <input type="text" name="display_name" id="display_name" />
+            <br />
+            <label for="pass1">
+                Password:
+            </label>
+            <input type="password" name="pass1" id="pass1" />
+            <br />
+            <label for="pass2">
+                Confirm:
+            </label>
+            <input type="password" name="pass2" id="pass2" />
+                <br />
+            <label for="email">
+                Email:
+            </label>
+            <input type="text" name="email" id="email" />
+            <br />
+            %s
+            <input type="submit" value="Register" />
+        </form>
+    </div>
+</div>

@@ -270,28 +270,29 @@ class PAGE
         return $page ? $page : '';
     }
 
-    public function loadmeta($a)
+    public function loadmeta($component)
     {
-        if (is_file(THEMEPATH . 'meta/' . $a . '.php')) {
-            $file = THEMEPATH . 'meta/' . $a . '.php';
-        } else {
-            $file = DTHEMEPATH . 'meta/' . $a . '.php';
+        $component = mb_strtolower($component);
+        $componentDir = JAXBOARDS_ROOT . '/views/' . $component;
+        if (is_dir($componentDir)) {
+            $this->metaqueue[] = $componentDir;
+            $this->debug("Added ${component} to queue");
         }
-        $this->metaqueue[] = $file;
-        $this->debug("Added ${a} to queue");
     }
 
-    public function processqueue($what)
+    public function processqueue($process)
     {
-        while ($v = array_pop($this->metaqueue)) {
-            require_once $v;
-            $this->debug("${what} triggered ${v} to load");
-            if (is_array($meta)) {
-                foreach ($meta as $k => $v) {
-                    $this->checkextended($v, $k);
-                }
-                $this->metadefs = $meta + $this->metadefs;
+        while ($componentDir = array_pop($this->metaqueue)) {
+            $component = pathinfo($componentDir, PATHINFO_BASENAME);
+            $this->debug("${process} triggered ${component} to load");
+            $meta = array();
+            foreach (glob($componentDir . '/*.html') as $metaFile) {
+                $metaName = pathinfo($metaFile, PATHINFO_FILENAME);
+                $metaContent = file_get_contents($metaFile);
+                $this->checkextended($metaName, $metaContent);
+                $meta[$metaName] = $metaContent;
             }
+            $this->metadefs = $meta + $this->metadefs;
         }
     }
 

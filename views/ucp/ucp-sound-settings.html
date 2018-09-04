@@ -1,0 +1,46 @@
+<h2>
+    Sounds
+</h2>
+<form onsubmit="return RUN.submitForm(this)" method="post">
+    %s
+    When someone shouts:
+    <br />
+    &nbsp;%s play a sound
+    <br />
+    <br />
+    When someone IMs me:
+    <br />
+    &nbsp;%s play a sound
+    <br />
+    &nbsp;
+    <input type="checkbox"
+        onclick="if(!window.webkitNotifications) {
+            alert('browser not supported');
+        } webkitNotifications.requestPermission()"
+        id="dtnotify" />
+    display a desktop notification
+    <br />
+    <br />
+    When someone PMs me:
+    <br />
+    &nbsp;%s play a sound
+    <br />
+    &nbsp;%s display a notification
+    <br />
+    <br />
+    When someone posts in a topic I've created:
+    <br />
+    &nbsp;%s play a sound
+    <br />
+    &nbsp;%s display a notification
+    <br />
+    <br />
+    When someone posts in a topic I'm subscribed to:
+    <br />
+    &nbsp;%s play a sound
+    <br />
+    &nbsp;%s display a notification
+    <br />
+    <br />
+    <input type="submit" value="Save" />
+</form>

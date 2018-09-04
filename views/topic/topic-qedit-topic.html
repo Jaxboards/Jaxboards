@@ -1,0 +1,15 @@
+<form method="post"
+    onsubmit="document.querySelector('#pdedit').editor.submit();return RUN.submitForm(this)">
+    %s
+    Topic Title:
+    <input type="text" name="ttitle" value="%s" />
+    <br />
+    Topic Description:
+    <input type="text" name="tdesc" value="%s" />
+    <br />
+    <textarea id="postdata" name="postdata">%s</textarea>
+    <iframe id="pdedit" onload="new JAX.Editor(document.querySelector('#postdata'),this)" style="display:none">
+    </iframe>
+    <br />
+    <input type="submit" value="Edit" />
+</form>

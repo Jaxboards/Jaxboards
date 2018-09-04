@@ -1,0 +1,109 @@
+<form method="post"
+    onsubmit="document.querySelector('#abouteditor').editor.submit();return RUN.submitForm(this)">
+    %s
+    <h2>
+        Name:
+    </h2>
+    <div>
+        Your username:
+        <strong>
+            %s
+        </strong>
+    </div>
+    <div>
+        <label for="username">
+            Display Name:
+        </label>
+        <input type="text" name="display_name" id="username" value="%s" />
+    </div>
+    <div>
+        <label for="realname">
+            Real name:
+        </label>
+        <input type="text" name="full_name" id="realname" value="%s"/>
+    </div>
+    <div>
+        <label for="usertitle">
+            Title:
+        </label>
+        <input type="text" name="usertitle" id="usertitle" value="%s" />
+    </div>
+    <h2>
+        About you:
+    </h2>
+    <div class="description">
+        <textarea rows="10" cols="60" name="about" id="about">%s</textarea>
+        <iframe id="abouteditor" onload="new JAX.editor(document.querySelector('#about'),this)"
+            style="display:none">
+        </iframe>
+        <h2>
+            Location
+        </h2>
+        <input type="text" name="location" value="%s" />
+        <h2>
+            Gender
+        </h2>
+        %s
+        <h2>
+            Date of Birth:
+        </h2>
+        %s
+        <h2>
+            Contact Details (Optional)
+        </h2>
+        <div id="contact_details">
+            <div class="skype">
+                <label for="con_skype">
+                    Skype:
+                </label>
+                <input type="text" name="con_skype" id="con_skype" value="%s" />
+            </div>
+            <div class="yim">
+                <label for="con_yim">
+                    YIM:
+                </label>
+                <input type="text" name="con_yim" id="con_yim" value="%s" />
+            </div>
+            <div class="msn">
+                <label for="con_msn">
+                    MSN:
+                </label>
+                <input type="text" name="con_msn" id="con_msn" value="%s" />
+            </div>
+            <div class="gtalk">
+                <label for="con_gtalk">
+                    Google Talk:
+                </label>
+                <input type="text" name="con_gtalk" id="con_gtalk" value="%s" />
+            </div>
+            <div class="aim">
+                <label for="con_aim">
+                    AIM:
+                </label>
+                <input type="text" name="con_aim" id="con_aim" value="%s" />
+            </div>
+            <div class="steam">
+                <label for="con_steam">
+                    Steam:
+                </label>
+                <input type="text" name="con_steam" id="con_steam" value="%s" />
+            </div>
+            <div class="twitter">
+                <label for="con_twitter">
+                    Twitter:
+                </label>
+                <input type="text" name="con_twitter" id="con_twitter" value="%s" />
+            </div>
+        </div>
+        <h2>
+            Website
+        </h2>
+        <label for="url">
+            URL:
+        </label>
+        <input type="text" name="website" id="url" value="%s" />
+    </div>
+    <div>
+        <input name="submit" type="submit" value="Save Profile Settings" />
+    </div>
+</form>
