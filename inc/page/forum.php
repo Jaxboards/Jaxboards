@@ -51,13 +51,14 @@ class FORUM
         $result = $DB->safespecial(
             <<<'EOT'
 SELECT f.`id` AS `id`,f.`cat_id` AS `cat_id`,f.`title` AS `title`,
-    f.`subtitle` AS `subtitle`,f.`lp_uid` AS `lp_uid`,f.`lp_date` AS `lp_date`,
-    f.`lp_tid` AS `lp_tid`,f.`lp_topic` AS `lp_topic`,f.`path` AS `path`,
-    f.`show_sub` AS `show_sub`,f.`redirect` AS `redirect`,
-    f.`topics` AS `topics`,f.`posts` AS `posts`,f.`order` AS `order`,
-    f.`perms` AS `perms`,f.`orderby` AS `orderby`,f.`nocount` AS `nocount`,
-    f.`redirects` AS `redirects`,f.`trashcan` AS `trashcan`,f.`mods` AS `mods`,
-    f.`show_ledby` AS `show_ledby`,c.`title` AS `cat`
+    f.`subtitle` AS `subtitle`,f.`lp_uid` AS `lp_uid`,
+    UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,f.`lp_tid` AS `lp_tid`,
+    f.`lp_topic` AS `lp_topic`,f.`path` AS `path`,f.`show_sub` AS `show_sub`,
+    f.`redirect` AS `redirect`,f.`topics` AS `topics`,f.`posts` AS `posts`,
+    f.`order` AS `order`,f.`perms` AS `perms`,f.`orderby` AS `orderby`,
+    f.`nocount` AS `nocount`,f.`redirects` AS `redirects`,
+    f.`trashcan` AS `trashcan`,f.`mods` AS `mods`,f.`show_ledby` AS `show_ledby`,
+    c.`title` AS `cat`
 FROM %t f
 LEFT JOIN %t c
     ON f.`cat_id`=c.`id`
@@ -113,14 +114,14 @@ EOT
         $result = $DB->safespecial(
             <<<'EOT'
 SELECT f.`id` AS `id`,f.`cat_id` AS `cat_id`,f.`title` AS `title`,
-    f.`subtitle` AS `subtitle`,f.`lp_uid` AS `lp_uid`,f.`lp_date` AS `lp_date`,
-    f.`lp_tid` AS `lp_tid`,f.`lp_topic` AS `lp_topic`,f.`path` AS `path`,
-    f.`show_sub` AS `show_sub`,f.`redirect` AS `redirect`,
-    f.`topics` AS `topics`,f.`posts` AS `posts`,f.`order` AS `order`,
-    f.`perms` AS `perms`,f.`orderby` AS `orderby`,f.`nocount` AS `nocount`,
-    f.`redirects` AS `redirects`,f.`trashcan` AS `trashcan`,f.`mods` AS `mods`,
-    f.`show_ledby` AS `show_ledby`,m.`display_name` AS `lp_name`,
-    m.`group_id` AS `lp_gid`
+    f.`subtitle` AS `subtitle`,f.`lp_uid` AS `lp_uid`,
+    UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,f.`lp_tid` AS `lp_tid`,
+    f.`lp_topic` AS `lp_topic`,f.`path` AS `path`,f.`show_sub` AS `show_sub`,
+    f.`redirect` AS `redirect`,f.`topics` AS `topics`,f.`posts` AS `posts`,
+    f.`order` AS `order`,f.`perms` AS `perms`,f.`orderby` AS `orderby`,
+    f.`nocount` AS `nocount`,f.`redirects` AS `redirects`,
+    f.`trashcan` AS `trashcan`,f.`mods` AS `mods`,f.`show_ledby` AS `show_ledby`,
+    m.`display_name` AS `lp_name`,m.`group_id` AS `lp_gid`
 FROM %t f
 LEFT JOIN %t m
 ON f.`lp_uid`=m.`id`
@@ -233,19 +234,21 @@ EOT
         $result = $DB->safespecial(
             <<<EOT
 SELECT t.`id` AS `id`,t.`title` AS `title`,t.`subtitle` AS `subtitle`,
-    t.`lp_uid` AS `lp_uid`,t.`lp_date` AS `lp_date`,t.`fid` AS `fid`,
-    t.`auth_id` AS `auth_id`,t.`replies` AS `replies`,t.`views` AS `views`,
-    t.`pinned` AS `pinned`,t.`poll_choices` AS `poll_choices`,
-    t.`poll_results` AS `poll_results`,t.`poll_q` AS `poll_q`,
-    t.`poll_type` AS `poll_type`,t.`summary` AS `summary`,
-    t.`locked` AS `locked`,t.`date` AS `date`,t.`op` AS `op`,
+    t.`lp_uid` AS `lp_uid`,UNIX_TIMESTAMP(t.`lp_date`) AS `lp_date`,
+    t.`fid` AS `fid`,t.`auth_id` AS `auth_id`,t.`replies` AS `replies`,
+    t.`views` AS `views`,t.`pinned` AS `pinned`,
+    t.`poll_choices` AS `poll_choices`,t.`poll_results` AS `poll_results`,
+    t.`poll_q` AS `poll_q`,t.`poll_type` AS `poll_type`,
+    t.`summary` AS `summary`,t.`locked` AS `locked`,
+    UNIX_TIMESTAMP(t.`date`) AS `date`,t.`op` AS `op`,
     t.`cal_event` AS `cal_event`,
     m.`display_name` AS `lp_name`,m.`group_id` AS `lp_gid`,
     m2.`group_id` AS `auth_gid`,m2.`display_name` AS `auth_name`
 FROM (
-    SELECT `id`,`title`,`subtitle`,`lp_uid`,`lp_date`,`fid`,`auth_id`,
-        `replies`,`views`,`pinned`,`poll_choices`,`poll_results`,`poll_q`,
-        `poll_type`,`summary`,`locked`,`date`,`op`,`cal_event`
+    SELECT `id`,`title`,`subtitle`,`lp_uid`,
+    UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`fid`,`auth_id`,`replies`,`views`,
+    `pinned`,`poll_choices`,`poll_results`,`poll_q`,`poll_type`,`summary`,
+    `locked`,UNIX_TIMESTAMP(`date`) AS `date`,`op`,`cal_event`
     FROM %t
     WHERE `fid`=?
     ORDER BY `pinned` DESC,${orderby}

@@ -89,8 +89,11 @@ EOT
                 $result = $DB->safeselect(
                     <<<'EOT'
 `id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
-`join_date`,`last_visit`,`contact_skype`,`contact_yim`,`contact_msn`,
-`contact_gtalk`,`contact_aim`,`website`,`dob_day`,`dob_month`,`dob_year`,
+UNIX_TIMESTAMP(`join_date`) AS `join_date`,
+UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,
+`contact_skype`,`contact_yim`,`contact_msn`,`contact_gtalk`,`contact_aim`,
+`website`,`birthdate`, DAY(`birthdate`) AS `dob_day`,
+MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
 `about`,`display_name`,`full_name`,`contact_steam`,`location`,`gender`,
 `friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
 `sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
@@ -157,8 +160,11 @@ EOT
                 $result = $DB->safeselect(
                     <<<'EOT'
 `id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
-`join_date`,`last_visit`,`contact_skype`,`contact_yim`,`contact_msn`,
-`contact_gtalk`,`contact_aim`,`website`,`dob_day`,`dob_month`,`dob_year`,
+UNIX_TIMESTAMP(`join_date`) AS `join_date`,
+UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,
+`contact_skype`,`contact_yim`,`contact_msn`,`contact_gtalk`,`contact_aim`,
+`website`,`birthdate`, DAY(`birthdate`) AS `dob_day`,
+MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
 `about`,`display_name`,`full_name`,`contact_steam`,`location`,`gender`,
 `friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
 `sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
@@ -174,8 +180,11 @@ EOT
                 $result = $DB->safeselect(
                     <<<'EOT'
 `id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
-`join_date`,`last_visit`,`contact_skype`,`contact_yim`,`contact_msn`,
-`contact_gtalk`,`contact_aim`,`website`,`dob_day`,`dob_month`,`dob_year`,
+UNIX_TIMESTAMP(`join_date`) AS `join_date`,
+UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,
+`contact_skype`,`contact_yim`,`contact_msn`,`contact_gtalk`,`contact_aim`,
+`website`,`birthdate`, DAY(`birthdate`) AS `dob_day`,
+MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
 `about`,`display_name`,`full_name`,`contact_steam`,`location`,`gender`,
 `friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
 `sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
@@ -349,7 +358,7 @@ EOT
                         $JAX->p['pass'],
                         PASSWORD_DEFAULT
                     ),
-                    'last_visit' => time(),
+                    'last_visit' => date('Y-m-d H:i:s', time()),
                     'group_id' => 1,
                     'posts' => 0,
                 );
@@ -607,9 +616,9 @@ EOT
                     'forums',
                     array(
                         'lp_uid' => null,
-                        'lp_date' => 0,
+                        'lp_date' => '0000-00-00 00:00:00',
                         'lp_tid' => null,
-                        'lp_topic' => 0,
+                        'lp_topic' => '',
                     ),
                     'WHERE `lp_uid`=?',
                     $mid
@@ -757,7 +766,7 @@ EOT;
                 $q = $DB->safeselect(
                     '`id`',
                     'members',
-                    'WHERE (?-`last_visit`)<?',
+                    'WHERE (?-UNIX_TIMESTAMP(`last_visit`))<?',
                     time(),
                     (60 * 60 * 24 * 31 * 6)
                 );
@@ -774,7 +783,7 @@ EOT;
                             'del_sender' => 0,
                             'read' => 0,
                             'flag' => 0,
-                            'date' => time(),
+                            'date' => date('Y-m-d H:i:s', time()),
                         )
                     );
                     ++$num;
@@ -827,7 +836,8 @@ EOT;
         }
         $page = '';
         $result = $DB->safeselect(
-            '`id`,`display_name`,INET6_NTOA(`ip`) AS `ip`,`email`,`join_date`',
+            '`id`,`display_name`,INET6_NTOA(`ip`) AS `ip`,`email`,' .
+            'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
             'members',
             'WHERE `group_id`=5'
         );

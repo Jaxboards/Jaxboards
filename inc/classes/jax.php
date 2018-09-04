@@ -169,10 +169,18 @@ class JAX
         }
         $result = $DB->safeselect(
             <<<'EOT'
-`id`,`pass`,`group_id`,`sound_im`,`sound_shout`,`last_visit`,`display_name`,
-`friends`,`enemies`,`skin_id`,`nowordfilter`,`wysiwyg`,`avatar`,
-INET6_NTOA(`ip`) AS `ip`,`usertitle`,
-CONCAT(`dob_month`,' ',`dob_day`) as `birthday`,`mod`,`posts`
+`id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
+UNIX_TIMESTAMP(`join_date`) AS `join_date`,
+UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,
+`contact_skype`,`contact_yim`,`contact_msn`,`contact_gtalk`,`contact_aim`,
+`website`,`birthdate`, DAY(`birthdate`) AS `dob_day`,
+MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
+`about`,`display_name`,`full_name`,`contact_steam`,`location`,`gender`,
+`friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
+`sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
+`notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
+`email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`,
+CONCAT(MONTH(`birthdate`),' ',DAY(`birthdate`)) as `birthday`
 EOT
             ,
             'members',
@@ -949,7 +957,11 @@ EOT
                 for ($x = 1; $x < count($unpack); $x += 2) {
                     $permstoparse[$unpack[$x]] = $unpack[$x + 1];
                 }
-                $permstoparse = $permstoparse[$uid];
+                if (isset($permstoparse[$uid])) {
+                    $permstoparse = $permstoparse[$uid];
+                } else {
+                    $permstoparse = null;
+                }
             }
         } else {
             $permstoparse = null;

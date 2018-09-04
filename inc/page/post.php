@@ -176,9 +176,10 @@ class POST
         if ('edit' == $this->how) {
             $result = $DB->safeselect(
                 <<<'EOT'
-`id`,`title`,`subtitle`,`lp_uid`,`lp_date`,`fid`,`auth_id`,`replies`,`views`,
+`id`,`title`,`subtitle`,`lp_uid`,UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,
+`fid`,`auth_id`,`replies`,`views`,
 `pinned`,`poll_choices`,`poll_results`,`poll_q`,`poll_type`,`summary`,
-`locked`,`date`,`op`,`cal_event`,
+`locked`,UNIX_TIMESTAMP(`date`) AS `date`,`op`,`cal_event`
 EOT
                 ,
                 'topics',
@@ -343,10 +344,11 @@ EOT
             $result = $DB->safespecial(
                 <<<'EOT'
 SELECT p.`id` AS `id`,p.`auth_id` AS `auth_id`,p.`post` AS `post`,
-	p.`date` AS `date`,p.`showsig` AS `showsig`,p.`showemotes` AS `showemotes`,
+    UNIX_TIMESTAMP(p.`date`) AS `date`,p.`showsig` AS `showsig`,
+    p.`showemotes` AS `showemotes`,
 	p.`tid` AS `tid`,p.`newtopic` AS `newtopic`,INET6_NTOA(p.`ip`) AS `ip`,
-	p.`editdate` AS `editdate`,p.`editby` AS `editby`,p.`rating` AS `rating`,
-    m.`display_name` AS `name`
+    UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`,p.`editby` AS `editby`,
+    p.`rating` AS `rating`,m.`display_name` AS `name`
 FROM %t p
 LEFT JOIN %t m
     ON p.`auth_id`=m.`id`
@@ -442,8 +444,9 @@ onclick="this.form.submitButton=this"/></div>
         if (!$e) {
             $result = $DB->safeselect(
                 <<<'EOT'
-`id`,`auth_id`,`post`,`date`,`showsig`,`showemotes`,`tid`,`newtopic`,
-INET6_NTOA(`ip`) AS `ip`,`editdate`,`editby`,`rating`
+`id`,`auth_id`,`post`,UNIX_TIMESTAMP(`date`) AS `date`,`showsig`,`showemotes`,
+    `tid`,`newtopic`,INET6_NTOA(`ip`) AS `ip`,
+    UNIX_TIMESTAMP(`edit_date`) AS `edit_date`,`editby`,`rating`
 EOT
                 ,
                 'posts',
@@ -468,9 +471,10 @@ EOT
             } else {
                 $result = $DB->safeselect(
                     <<<'EOT'
-`id`,`title`,`subtitle`,`lp_uid`,`lp_date`,`fid`,`auth_id`,`replies`,`views`,
+`id`,`title`,`subtitle`,`lp_uid`,UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,
+`fid`,`auth_id`,`replies`,`views`,
 `pinned`,`poll_choices`,`poll_results`,`poll_q`,`poll_type`,`summary`,
-`locked`,`date`,`op`,`cal_event`,
+`locked`,UNIX_TIMESTAMP(`date`) AS `date`,`op`,`cal_event`,
 EOT
                     ,
                     'topics',
@@ -525,7 +529,7 @@ EOT
             'posts',
             array(
                 'post' => $this->postdata,
-                'editdate' => time(),
+                'edit_date' => date('Y-m-d H:i:s', time()),
                 'editby' => $USER['id'],
             ),
             'WHERE `id`=?',
@@ -626,9 +630,9 @@ EOT;
                     array(
                         'title' => $JAX->blockhtml($JAX->p['ttitle']),
                         'subtitle' => $JAX->blockhtml($JAX->p['tdesc']),
-                        'date' => $time,
+                        'date' => date('Y-m-d H:i:s', $time),
                         'lp_uid' => $uid,
-                        'lp_date' => $time,
+                        'lp_date' => date('Y-m-d H:i:s', $time),
                         'fid' => $fid,
                         'auth_id' => $uid,
                         'replies' => 0,
@@ -717,7 +721,7 @@ EOT
             array(
                 'auth_id' => $uid,
                 'post' => $postdata,
-                'date' => $time,
+                'date' => date('Y-m-d H:i:s', $time),
                 'tid' => $tid,
                 'newtopic' => $newtopic ? 1 : 0,
                 'ip' => $JAX->ip2bin(),
@@ -746,7 +750,7 @@ EOT
                 'tid' => $tid,
                 'pid' => $pid,
                 'arg1' => $fdata['topictitle'],
-                'date' => time(),
+                'date' => date('Y-m-d H:i:s', $time),
             )
         );
 
@@ -762,7 +766,7 @@ EOT
                 ,
                 array('topics'),
                 $uid,
-                $time,
+                date('Y-m-d H:i:s', $time),
                 $tid
             );
         }
@@ -786,7 +790,7 @@ EOT
                 $uid,
                 $tid,
                 $fdata['topictitle'],
-                $time,
+                date('Y-m-d H:i:s', $time),
                 $path
             );
         } else {
@@ -802,7 +806,7 @@ EOT
                 $uid,
                 $tid,
                 $fdata['topictitle'],
-                $time,
+                date('Y-m-d H:i:s', $time),
                 $path
             );
         }

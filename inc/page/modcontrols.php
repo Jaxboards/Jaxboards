@@ -80,9 +80,10 @@ EOT;
             case 'moveto':
                 $result = $DB->safeselect(
                     <<<'EOT'
-`id`,`cat_id`,`title`,`subtitle`,`lp_uid`,`lp_date`,`lp_tid`,`lp_topic`,
-`path`,`show_sub`,`redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,
-`nocount`,`redirects`,`trashcan`,`mods`,`show_ledby`
+`id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
+UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,`show_sub`,
+`redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,`redirects`,
+`trashcan`,`mods`,`show_ledby`
 EOT
                     ,
                     'forums',
@@ -234,8 +235,9 @@ EOT
 
         $result = $DB->safeselect(
             <<<'EOT'
-`id`,`auth_id`,`post`,`date`,`showsig`,`showemotes`,`tid`,`newtopic`,
-INET6_NTOA(`ip`) AS `ip`,`editdate`,`editby`,`rating`
+`id`,`auth_id`,`post`,UNIX_TIMESTAMP(`date`) AS `date`,`showsig`,`showemotes`,
+`tid`,`newtopic`,INET6_NTOA(`ip`) AS `ip`,
+UNIX_TIMESTAMP(`edit_date`) AS `edit_date`,`editby`,`rating`
 EOT
             ,
             'posts',
@@ -428,7 +430,7 @@ EOT
                     'op' => $op,
                     'auth_id' => $USER['id'],
                     'fid' => $trashcan,
-                    'lp_date' => time(),
+                    'lp_date' => date('Y-m-d H:i:s', time()),
                     'lp_uid' => $lp['auth_id'],
                     'replies' => 0,
                 )
@@ -763,13 +765,16 @@ EOT
                 $result = $DB->safeselect(
                     <<<'EOT'
 `id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
-`join_date`,`last_visit`,`contact_skype`,`contact_yim`,`contact_msn`,
-`contact_gtalk`,`contact_aim`,`website`,`dob_day`,`dob_month`,`dob_year`,
-`about`,`display_name`,`full_name`,`contact_steam`,`location`,`gender`,
-`friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
-`sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
-`notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
-`email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
+UNIX_TIMESTAMP(`join_date`) AS `join_date`,
+UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,`contact_skype`,`contact_yim`,
+`contact_msn`,`contact_gtalk`,`contact_aim`,`website`,`birthdate`,
+DAY(`birthdate`) AS `dob_day`,MONTH(`birthdate`) AS `dob_month`,
+YEAR(`birthdate) AS `dob_year`,`about`,`display_name`,`full_name`,
+`contact_steam`,`location`,`gender`,`friends`,`enemies`,`sound_shout`,
+`sound_im`,`sound_pm`,`sound_postinmytopic`,`sound_postinsubscribedtopic`,
+`notify_pm`,`notify_postinmytopic`,`notify_postinsubscribedtopic`,`ucpnotepad`,
+`skin_id`,`contact_twitter`,`email_settings`,`nowordfilter`,
+INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
 EOT
                     ,
                     'members',
@@ -782,13 +787,16 @@ EOT
                 $result = $DB->safeselect(
                     <<<'EOT'
 `id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
-`join_date`,`last_visit`,`contact_skype`,`contact_yim`,`contact_msn`,
-`contact_gtalk`,`contact_aim`,`website`,`dob_day`,`dob_month`,`dob_year`,
-`about`,`display_name`,`full_name`,`contact_steam`,`location`,`gender`,
-`friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
-`sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
-`notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
-`email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
+UNIX_TIMESTAMP(`join_date`) AS `join_date`,
+UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,`contact_skype`,`contact_yim`,
+`contact_msn`,`contact_gtalk`,`contact_aim`,`website`,`birthdate`,
+DAY(`birthdate`) AS `dob_day`,MONTH(`birthdate`) AS `dob_month`,
+YEAR(`birthdate) AS `dob_year`,`about`,`display_name`,`full_name`,
+`contact_steam`,`location`,`gender`,`friends`,`enemies`,`sound_shout`,
+`sound_im`,`sound_pm`,`sound_postinmytopic`,`sound_postinsubscribedtopic`,
+`notify_pm`,`notify_postinmytopic`,`notify_postinsubscribedtopic`,`ucpnotepad`,
+`skin_id`,`contact_twitter`,`email_settings`,`nowordfilter`,
+INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
 EOT
                     ,
                     'members',
@@ -984,7 +992,7 @@ EOT
                 $result = $DB->safespecial(
                     <<<'EOT'
 SELECT s.`id` AS `id`,s.`uid` AS `uid`,s.`shout` AS `shout`,
-s.`timestamp` AS `timestamp`,INET6_NTOA(s.`ip`) AS `ip`,
+UNIX_TIMESTAMP(s.`date`) AS `date`,INET6_NTOA(s.`ip`) AS `ip`,
 m.`group_id` AS `group_id`, m.`display_name` AS `display_name`
 FROM %t s
 LEFT JOIN %t m

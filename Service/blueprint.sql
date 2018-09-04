@@ -11,7 +11,7 @@ CREATE TABLE `blueprint_activity` (
     'profile_name_change','profile_comment') COLLATE utf8mb4_unicode_ci NOT NULL,
   `arg1` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `uid` int(11) unsigned NOT NULL,
-  `date` int(11) unsigned NOT NULL DEFAULT 0,
+  `date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `affected_uid` int(11) unsigned DEFAULT NULL,
   `tid` int(11) unsigned DEFAULT NULL,
   `pid` int(11) unsigned DEFAULT NULL,
@@ -79,7 +79,7 @@ CREATE TABLE `blueprint_forums` (
   `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subtitle` text COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `lp_uid` int(11) unsigned DEFAULT NULL,
-  `lp_date` int(11) unsigned NOT NULL DEFAULT 0,
+  `lp_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `lp_tid` int(11) unsigned DEFAULT NULL,
   `lp_topic` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `path` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
@@ -106,7 +106,7 @@ CREATE TABLE `blueprint_forums` (
 
 TRUNCATE `blueprint_forums`;
 INSERT INTO `blueprint_forums` (`id`, `cat_id`, `title`, `subtitle`, `lp_uid`, `lp_date`, `lp_tid`, `lp_topic`, `path`, `show_sub`, `redirect`, `topics`, `posts`, `order`, `perms`, `orderby`, `nocount`, `redirects`, `trashcan`, `mods`, `show_ledby`) VALUES
-(1,	1,	'Forum',	'Your very first forum!',	1,	1286422846,	1,	'Welcome to jaxboards!',	'',	0,	'',	1,	1,	0,	UNHEX(''),	0,	0,	0,	0,	'',	0);
+(1,	1,	'Forum',	'Your very first forum!',	1,	'0000-00-00 00:00:00',	1,	'Welcome to jaxboards!',	'',	0,	'',	1,	1,	0,	UNHEX(''),	0,	0,	0,	0,	'',	0);
 
 DROP TABLE IF EXISTS `blueprint_logs`;
 CREATE TABLE `blueprint_logs` (
@@ -136,17 +136,15 @@ CREATE TABLE `blueprint_members` (
   `group_id` int(11) unsigned DEFAULT NULL,
   `avatar` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `usertitle` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `join_date` int(11) unsigned NOT NULL DEFAULT 0,
-  `last_visit` int(11) unsigned NOT NULL DEFAULT 0,
+  `join_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `last_visit` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `contact_skype` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `contact_yim` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `contact_msn` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `contact_gtalk` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `contact_aim` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `website` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `dob_day` tinyint(4) unsigned NOT NULL DEFAULT 0,
-  `dob_month` tinyint(4) unsigned NOT NULL DEFAULT 0,
-  `dob_year` int(11) unsigned NOT NULL DEFAULT 0,
+  `birthdate` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `about` text COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `display_name` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `full_name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
@@ -231,7 +229,7 @@ CREATE TABLE `blueprint_messages` (
   `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `message` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `read` tinyint(1) unsigned NOT NULL DEFAULT 0,
-  `date` int(11) unsigned NOT NULL DEFAULT 0,
+  `date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `del_recipient` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `del_sender` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `flag` tinyint(1) unsigned NOT NULL DEFAULT 0,
@@ -258,13 +256,13 @@ CREATE TABLE `blueprint_posts` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `auth_id` int(11) unsigned DEFAULT NULL,
   `post` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `date` int(11) unsigned NOT NULL DEFAULT 0,
+  `date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `showsig` tinyint(1) unsigned NOT NULL DEFAULT 1,
   `showemotes` tinyint(1) unsigned NOT NULL DEFAULT 1,
   `tid` int(11) unsigned NOT NULL,
   `newtopic` tinyint(1) unsigned NOT NULL DEFAULT 0,
   `ip` varbinary(16) NOT NULL DEFAULT '',
-  `editdate` int(11) unsigned NOT NULL DEFAULT 0,
+  `edit_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `editby` int(11) unsigned DEFAULT NULL,
   `rating` text CHARACTER SET utf8 NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
@@ -277,8 +275,8 @@ CREATE TABLE `blueprint_posts` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 TRUNCATE `blueprint_posts`;
-INSERT INTO `blueprint_posts` (`id`, `auth_id`, `post`, `date`, `showsig`, `showemotes`, `tid`, `newtopic`, `ip`, `editdate`, `editby`, `rating`) VALUES
-(1,	1,	'Now, it\'s only a matter of time before you have everything set up. You\'ll find everything you need to get started in the ACP (link at the top).\n\n\n\nEnjoy your forum!',	1286422846,	0,	0,	1,	1,	0,	0,	NULL,	'');
+INSERT INTO `blueprint_posts` (`id`, `auth_id`, `post`, `date`, `showsig`, `showemotes`, `tid`, `newtopic`, `ip`, `edit_date`, `editby`, `rating`) VALUES
+(1,	1,	'Now, it\'s only a matter of time before you have everything set up. You\'ll find everything you need to get started in the ACP (link at the top).\n\n\n\nEnjoy your forum!',	'0000-00-00 00:00:00',	0,	0,	1,	1,	0, '0000-00-00 00:00:00',	NULL,	'');
 
 DROP TABLE IF EXISTS `blueprint_profile_comments`;
 CREATE TABLE `blueprint_profile_comments` (
@@ -286,7 +284,7 @@ CREATE TABLE `blueprint_profile_comments` (
   `to` int(11) unsigned NOT NULL,
   `from` int(11) unsigned NOT NULL,
   `comment` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `date` int(11) unsigned NOT NULL DEFAULT 0,
+  `date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
   KEY `to` (`to`),
   KEY `from` (`from`),
@@ -326,8 +324,8 @@ CREATE TABLE `blueprint_session` (
   `uid` int(11) unsigned DEFAULT NULL,
   `ip` varbinary(16) NOT NULL DEFAULT '',
   `vars` text COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `last_update` int(11) unsigned NOT NULL DEFAULT 0,
-  `last_action` int(11) unsigned NOT NULL DEFAULT 0,
+  `last_update` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `last_action` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `runonce` text COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `location` text COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `users_online_cache` text COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
@@ -337,7 +335,7 @@ CREATE TABLE `blueprint_session` (
   `useragent` text COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `forumsread` blob NOT NULL DEFAULT '',
   `topicsread` blob NOT NULL DEFAULT '',
-  `readtime` int(11) unsigned NOT NULL DEFAULT 0,
+  `read_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `hide` tinyint(1) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   KEY `uid` (`uid`),
@@ -345,15 +343,13 @@ CREATE TABLE `blueprint_session` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 TRUNCATE `blueprint_session`;
-INSERT INTO `blueprint_session` (`id`, `uid`, `ip`, `vars`, `last_update`, `last_action`, `runonce`, `location`, `users_online_cache`, `is_bot`, `buddy_list_cache`, `location_verbose`, `useragent`, `forumsread`, `topicsread`, `readtime`, `hide`) VALUES
-('878ac804199f4aa95c06d727632ec869',	1,	0,	'a:2:{s:14:\"topic_lastpage\";b:1;s:13:\"topic_lastpid\";i:4;}',	1533353814,	1533353193,	'',	'vt2',	'1',	0,	'',	'In topic \'Yo it&#039;s me, It&#039;s me, It&#039;s Mario\'',	'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:61.0) Gecko/20100101 Firefox/61.0',	'Û¸[',	'Û¹i',	0,	0);
 
 DROP TABLE IF EXISTS `blueprint_shouts`;
 CREATE TABLE `blueprint_shouts` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `uid` int(11) unsigned DEFAULT NULL,
   `shout` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `timestamp` int(11) unsigned NOT NULL DEFAULT 0,
+  `date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `ip` varbinary(16) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `ip` (`ip`),
@@ -362,8 +358,8 @@ CREATE TABLE `blueprint_shouts` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 TRUNCATE `blueprint_shouts`;
-INSERT INTO `blueprint_shouts` (`id`, `uid`, `shout`, `timestamp`, `ip`) VALUES
-(1,	NULL,	'Welcome to jaxboards!',	0,	0);
+INSERT INTO `blueprint_shouts` (`id`, `uid`, `shout`, `date`, `ip`) VALUES
+(1,	NULL,	'Welcome to jaxboards!',	'0000-00-00 00:00:00',	'');
 
 DROP TABLE IF EXISTS `blueprint_skins`;
 CREATE TABLE `blueprint_skins` (
@@ -429,7 +425,7 @@ CREATE TABLE `blueprint_topics` (
   `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subtitle` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `lp_uid` int(11) unsigned DEFAULT NULL,
-  `lp_date` int(11) unsigned NOT NULL DEFAULT 0,
+  `lp_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `fid` int(11) unsigned DEFAULT NULL,
   `auth_id` int(11) unsigned DEFAULT NULL,
   `replies` int(11) unsigned NOT NULL DEFAULT 0,
@@ -441,7 +437,7 @@ CREATE TABLE `blueprint_topics` (
   `poll_type` enum('','single','multi') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `summary` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `locked` tinyint(1) unsigned NOT NULL DEFAULT 0,
-  `date` int(11) unsigned DEFAULT 0,
+  `date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `op` int(11) unsigned DEFAULT NULL,
   `cal_event` int(11) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
@@ -460,7 +456,7 @@ CREATE TABLE `blueprint_topics` (
 
 TRUNCATE `blueprint_topics`;
 INSERT INTO `blueprint_topics` (`id`, `title`, `subtitle`, `lp_uid`, `lp_date`, `fid`, `auth_id`, `replies`, `views`, `pinned`, `poll_choices`, `poll_results`, `poll_q`, `poll_type`, `summary`, `locked`, `date`, `op`, `cal_event`) VALUES
-(1,	'Welcome to jaxboards!',	'Support appreciated.',	1,	1286422846,	1,	1,	0,	0,	0,	'',	'',	'',	'',	'Now, it\'s only a matter of time before you have',	0,	0,	1,	0);
+(1,	'Welcome to jaxboards!',	'Support appreciated.',	1,	'0000-00-00 00:00:00',	1,	1,	0,	0,	0,	'',	'',	'',	'',	'Now, it\'s only a matter of time before you have',	0,	'0000-00-00 00:00:00',	1,	0);
 
 SET foreign_key_checks = 1;
 

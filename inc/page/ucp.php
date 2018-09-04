@@ -19,13 +19,16 @@ class UCP
         $result = $DB->safeselect(
             <<<'EOT'
 `id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
-`join_date`,`last_visit`,`contact_skype`,`contact_yim`,`contact_msn`,
-`contact_gtalk`,`contact_aim`,`website`,`dob_day`,`dob_month`,`dob_year`,
-`about`,`display_name`,`full_name`,`contact_steam`,`location`,`gender`,
-`friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
-`sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
-`notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
-`email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
+UNIX_TIMESTAMP(`join_date`) AS `join_date`,
+UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,`contact_skype`,`contact_yim`,
+`contact_msn`,`contact_gtalk`,`contact_aim`,`website`,`birthdate`,
+DAY(`birthdate`) AS `dob_day`,MONTH(`birthdate`) AS `dob_month`,
+YEAR(`birthdate`) AS `dob_year`,`about`,`display_name`,`full_name`,
+`contact_steam`,`location`,`gender`,`friends`,`enemies`,`sound_shout`,
+`sound_im`,`sound_pm`,`sound_postinmytopic`,`sound_postinsubscribedtopic`,
+`notify_pm`,`notify_postinmytopic`,`notify_postinsubscribedtopic`,`ucpnotepad`,
+`skin_id`,`contact_twitter`,`email_settings`,`nowordfilter`,
+INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
 EOT
             ,
             'members',
@@ -476,7 +479,18 @@ EOT;
                 ) {
                     $error = "That birth date doesn't exist!";
                 }
+                $birthdate = date('Y-m-d', strtotime(
+                    $data['dob_year'] . '-' .
+                    $data['dob_month'] . '-' .
+                    $data['dob_day']
+                ));
+            } else {
+                $birthdate = '0000-00-00';
             }
+            unset($data['dob_year']);
+            unset($data['dob_month']);
+            unset($data['dob_day']);
+
             foreach (array(
                 'contact_yim' => 'YIM username',
                 'contact_msn' => 'MSN username',
@@ -514,7 +528,7 @@ EOT;
                             'arg1' => $USER['display_name'],
                             'arg2' => $data['display_name'],
                             'uid' => $USER['id'],
-                            'date' => time(),
+                            'date' => date('Y-m-d H:i:s', time()),
                         )
                     );
                 }
@@ -710,9 +724,10 @@ EOT;
         $result = $DB->safespecial(
             <<<'EOT'
 SELECT a.`id` AS `id`,a.`to` AS `to`,a.`from` AS `from`,a.`title` AS `title`,
-	a.`message` AS `message`,a.`read` AS `read`,a.`date` AS `date`,
-	a.`del_recipient` AS `del_recipient`,a.`del_sender` AS `del_sender`,
-	a.`flag` AS `flag`,m.`group_id` AS `group_id`,m.`display_name` AS `name`,
+    a.`message` AS `message`,a.`read` AS `read`,
+    UNIX_TIMESTAMP(a.`date`) AS `date`,a.`del_recipient` AS `del_recipient`,
+    a.`del_sender` AS `del_sender`,a.`flag` AS `flag`,
+    m.`group_id` AS `group_id`,m.`display_name` AS `name`,
     m.`avatar` AS `avatar`,m.`usertitle` AS `usertitle`
 FROM %t a
 LEFT JOIN %t m
@@ -798,7 +813,7 @@ EOT
                 <<<'EOT'
 SELECT a.`id` AS `id`,a.`to` AS `to`,a.`from` AS `from`,
 	a.`title` AS `title`,a.`message` AS `message`,a.`read` AS `read`,
-	a.`date` AS `date`,a.`del_recipient` AS `del_recipient`,
+	UNIX_TIMESTAMP(a.`date`) AS `date`,a.`del_recipient` AS `del_recipient`,
 	a.`del_sender` AS `del_sender`,a.`flag` AS `flag`,
     m.`display_name` AS `display_name`
 FROM %t a
@@ -815,9 +830,10 @@ EOT
             $result = $DB->safespecial(
                 <<<'EOT'
 SELECT a.`id` AS `id`,a.`to` AS `to`,a.`from` AS `from`,a.`title` AS `title`,
-	a.`message` AS `message`,a.`read` AS `read`,a.`date` AS `date`,
-	a.`del_recipient` AS `del_recipient`,a.`del_sender` AS `del_sender`,
-	a.`flag` AS `flag`,m.`display_name` AS `display_name`
+    a.`message` AS `message`,a.`read` AS `read`,
+    UNIX_TIMESTAMP(a.`date`) AS `date`,a.`del_recipient` AS `del_recipient`,
+    a.`del_sender` AS `del_sender`,a.`flag` AS `flag`,
+    m.`display_name` AS `display_name`
 FROM %t a
 LEFT JOIN %t m
     ON a.`from`=m.`id`
@@ -832,9 +848,10 @@ EOT
             $result = $DB->safespecial(
                 <<<'EOT'
 SELECT a.`id` AS `id`,a.`to` AS `to`,a.`from` AS `from`,a.`title` AS `title`,
-	a.`message` AS `message`,a.`read` AS `read`,a.`date` AS `date`,
-    a.`del_recipient` AS `del_recipient`,a.`del_sender` AS `del_sender`,
-    a.`flag` AS `flag`,m.`display_name` AS `display_name`
+    a.`message` AS `message`,a.`read` AS `read`,
+    UNIX_TIMESTAMP(a.`date`) AS `date`,a.`del_recipient` AS `del_recipient`,
+    a.`del_sender` AS `del_sender`,a.`flag` AS `flag`,
+    m.`display_name` AS `display_name`
 FROM %t a
 LEFT JOIN %t m
 ON a.`from`=m.`id`
@@ -947,7 +964,7 @@ EOT
                         'from' => $USER['id'],
                         'title' => $JAX->blockhtml($JAX->p['title']),
                         'message' => $JAX->p['message'],
-                        'date' => time(),
+                        'date' => date('Y-m-d H:i:s', time()),
                         'del_sender' => 0,
                         'del_recipient' => 0,
                         'read' => 0,
@@ -1002,8 +1019,8 @@ EOT
         if ($messageid) {
             $result = $DB->safeselect(
                 <<<'EOT'
-`id`,`to`,`from`,`title`,`message`,`read`,`date`,`del_recipient`,`del_sender`,
-`flag`
+`id`,`to`,`from`,`title`,`message`,`read`,UNIX_TIMESTAMP(`date`) AS `date`,
+`del_recipient`,`del_sender`,`flag`
 EOT
                 ,
                 'messages',
@@ -1112,8 +1129,8 @@ EOT
         }
         $result = $DB->safeselect(
             <<<'EOT'
-`id`,`to`,`from`,`title`,`message`,`read`,`date`,`del_recipient`,`del_sender`,
-`flag`
+`id`,`to`,`from`,`title`,`message`,`read`,UNIX_TIMESTAMP(`date`) AS `date`,
+`del_recipient`,`del_sender`,`flag`
 EOT
             ,
             'messages',

@@ -118,7 +118,7 @@ EOT
             array('session'),
             $DB->basicvalue(json_encode($cmd) . PHP_EOL),
             $uid,
-            (time() - $CFG['updateinterval'] * 5)
+            date('Y-m-d H:i:s', (time() - $CFG['updateinterval'] * 5))
         );
 
         return 0 != $DB->affected_rows(1);

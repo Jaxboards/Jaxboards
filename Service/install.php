@@ -208,7 +208,7 @@ CREATE TABLE `directory` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `registrar_email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `registrar_ip` varbinary(16) NOT NULL DEFAULT '',
-  `date` int(11) unsigned NOT NULL,
+  `date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `boardname` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
   `referral` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
@@ -258,7 +258,7 @@ EOT
                         'boardname' => $board,
                         'registrar_email' => $JAX->p['admin_email'],
                         'registrar_ip' => $JAX->ip2bin(),
-                        'date' => time(),
+                        'date' => date('Y-m-d H:i:s', time()),
                         'referral' => isset($JAX->b['r']) ? $JAX->b['r'] : '',
                     )
                 );
@@ -307,8 +307,8 @@ EOT
                     'sig' => '',
                     'posts' => 0,
                     'group_id' => 2,
-                    'join_date' => time(),
-                    'last_visit' => time(),
+                    'join_date' => date('Y-m-d H:i:s', time()),
+                    'last_visit' => date('Y-m-d H:i:s', time()),
                 )
             );
 

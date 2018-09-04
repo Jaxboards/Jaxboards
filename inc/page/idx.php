@@ -30,12 +30,12 @@ class IDX
             <<<'EOT'
 SELECT f.`id` AS `id`,
     f.`cat_id` AS `cat_id`,f.`title` AS `title`,f.`subtitle` AS `subtitle`,
-    f.`lp_uid` AS `lp_uid`,f.`lp_date` AS `lp_date`,f.`lp_tid` AS `lp_tid`,
-    f.`lp_topic` AS `lp_topic`,f.`path` AS `path`,f.`show_sub` AS `show_sub`,
-    f.`redirect` AS `redirect`,f.`topics` AS `topics`,f.`posts` AS `posts`,
-    f.`order` AS `order`,f.`perms` AS `perms`,f.`orderby` AS `orderby`,
-    f.`nocount` AS `nocount`,f.`redirects` AS `redirects`,
-    f.`trashcan` AS `trashcan`,f.`mods` AS `mods`,
+    f.`lp_uid` AS `lp_uid`,UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,
+    f.`lp_tid` AS `lp_tid`,f.`lp_topic` AS `lp_topic`,f.`path` AS `path`,
+    f.`show_sub` AS `show_sub`,f.`redirect` AS `redirect`,
+    f.`topics` AS `topics`,f.`posts` AS `posts`,f.`order` AS `order`,
+    f.`perms` AS `perms`,f.`orderby` AS `orderby`,f.`nocount` AS `nocount`,
+    f.`redirects` AS `redirects`,f.`trashcan` AS `trashcan`,f.`mods` AS `mods`,
     f.`show_ledby` AS `show_ledby`,m.`display_name` AS `lp_name`,
     m.`group_id` AS `lp_gid`
 FROM %t f
@@ -60,13 +60,15 @@ EOT
             // Store subforum details for later.
             if ($r['path']) {
                 preg_match('@\\d+$@', $r['path'], $m);
-                $this->subforumids[$m[0]][] = $r['id'];
-                $this->subforums[$m[0]] .= $PAGE->meta(
-                    'idx-subforum-link',
-                    $r['id'],
-                    $r['title'],
-                    $JAX->blockhtml($r['subtitle'])
-                ) . $PAGE->meta('idx-subforum-splitter');
+                if (isset($this->subforums[$m[0]])) {
+                    $this->subforumids[$m[0]][] = $r['id'];
+                    $this->subforums[$m[0]] .= $PAGE->meta(
+                        'idx-subforum-link',
+                        $r['id'],
+                        $r['title'],
+                        $JAX->blockhtml($r['subtitle'])
+                    ) . $PAGE->meta('idx-subforum-splitter');
+                }
             } else {
                 $data[$r['cat_id']][] = $r;
             }
@@ -161,7 +163,7 @@ EOT
         $read = false;
         foreach ($a as $v) {
             $sf = '';
-            if ($v['show_sub'] >= 1) {
+            if ($v['show_sub'] >= 1 && isset($this->subforums[$v['id']])) {
                 $sf = $this->subforums[$v['id']];
             }
             if (2 == $v['show_sub']) {
@@ -267,10 +269,10 @@ EOT
 
         $result = $DB->safespecial(
             <<<'EOT'
-SELECT MAX(s.`last_update`) AS `last_update`,m.`id` AS `id`,
+SELECT UNIX_TIMESTAMP(MAX(s.`last_update`)) AS `last_update`,m.`id` AS `id`,
     m.`group_id` AS `group_id`,m.`display_name` AS `name`,
-    CONCAT(m.`dob_month`,' ',m.`dob_day`) AS `birthday`,s.`hide` AS `hide`,
-    s.`readtime` AS `readtime`
+    CONCAT(MONTH(m.`birthdate`),' ',DAY(m.`birthdate`)) AS `birthday`,s.`hide` AS `hide`,
+    UNIX_TIMESTAMP(s.`read_date`) AS `read_date`
 FROM %t s
 LEFT JOIN %t m
     ON s.`uid`=m.`id`
@@ -293,7 +295,7 @@ EOT
             $birthdayCode = ($f['birthday'] == $today
                 && ($CFG['birthdays'] & 1)) ? ' birthday' : '';
             $lastOnlineCode = $JAX->date(
-                $f['hide'] ? $f['readtime'] : $f['last_update'],
+                $f['hide'] ? $f['read_date'] : $f['last_update'],
                 false
             );
             $userstoday .=
@@ -425,8 +427,9 @@ EOT;
         $result = $DB->safespecial(
             <<<'EOT'
 SELECT f.`id` AS `id`,f.`lp_tid` AS `lp_tid`,f.`lp_topic` AS `lp_topic`,
-    f.`lp_date` AS `lp_date`,f.`lp_uid` AS `lp_uid`,f.`topics` AS `topics`,
-    f.`posts` AS `posts`,m.`display_name` AS `lp_name`,m.`group_id` AS `lp_gid`
+    UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,f.`lp_uid` AS `lp_uid`,
+    f.`topics` AS `topics`,f.`posts` AS `posts`,m.`display_name` AS `lp_name`,
+    m.`group_id` AS `lp_gid`
 FROM %t f
 LEFT JOIN %t m
     ON f.`lp_uid`=m.`id`
@@ -434,7 +437,7 @@ WHERE f.`lp_date`>=?
 EOT
             ,
             array('forums', 'members'),
-            $JAX->pick($SESS->last_update, time())
+            date('Y-m-d H:i:s', $JAX->pick($SESS->last_update, time()))
         );
 
         while ($f = $DB->arow($result)) {

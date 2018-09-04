@@ -514,8 +514,10 @@ class MySQL
 SELECT a.`id` as `id`,a.`uid` AS `uid`,a.`location` AS `location`,
     a.`location_verbose` AS `location_verbose`,a.`hide` AS `hide`,
     a.`is_bot` AS `is_bot`,b.`display_name` AS `name`,
-    b.`group_id` AS `group_id`,CONCAT(b.`dob_month`,' ',b.`dob_day`) AS `dob`,
-    a.`last_action` AS `last_action`,a.`last_update` AS `last_update`
+    b.`group_id` AS `group_id`,b.`birthdate` AS `birthdate`,
+    CONCAT(MONTH(b.`birthdate`),' ',DAY(b.`birthdate`)) AS `dob`,
+    UNIX_TIMESTAMP(a.`last_action`) AS `last_action`,
+    UNIX_TIMESTAMP(a.`last_update`) AS `last_update`
 FROM %t a
 LEFT JOIN %t b
     ON a.`uid`=b.`id`
@@ -524,7 +526,7 @@ ORDER BY a.`last_action` DESC
 EOT
                 ,
                 array('session', 'members'),
-                (time() - $CFG['timetologout'])
+                date('Y-m-d H:i:s', (time() - $CFG['timetologout']))
             );
             $today = date('n j');
             while ($f = $this->arow($result)) {
@@ -560,8 +562,8 @@ EOT
                 $r[$USER['id']] = array(
                     'uid' => $USER['id'],
                     'group_id' => $USER['group_id'],
-                    'last_action' => $SESS->last_action,
-                    'last_update' => $SESS->last_update,
+                    'last_action' => date('Y-m-d H:i:s', $SESS->last_action),
+                    'last_update' => date('Y-m-d H:i:s', $SESS->last_update),
                     'name' => ($SESS->hide ? '* ' : '') . $USER['display_name'],
                     'status' => $SESS->last_action < $idletimeout ?
                     'idle' : 'active',
@@ -580,7 +582,7 @@ EOT
     {
         global $PAGE;
         $result = $this->safeselect(
-            '`lp_uid`,`lp_date`,`id`,`title`',
+            '`lp_uid`,UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`id`,`title`',
             'topics',
             'WHERE `fid`=? ORDER BY `lp_date` DESC LIMIT 1',
             $fid
@@ -595,7 +597,8 @@ EOT
                 && $d['lp_uid']) ? (int) $d['lp_uid'] : null,
                 'lp_date' => (isset($d['lp_date'])
                 && is_numeric($d['lp_date'])
-                && $d['lp_date']) ? (int) $d['lp_date'] : 0,
+                && $d['lp_date']) ? date('Y-m-d H:i:s', $d['lp_date']) :
+                '0000-00-00 00:00:00',
                 'lp_tid' => (isset($d['id'])
                 && is_numeric($d['id'])
                 && $d['id']) ? (int) $d['id'] : null,

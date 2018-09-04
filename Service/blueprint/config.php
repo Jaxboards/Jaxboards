@@ -1,7 +1,7 @@
 <?php
 
 $CFG = array(
-    'updateinterval' => '2',
+    'upateinterval' => '2',
     'timetoidle' => '300',
     'timetologout' => '600',
     'emotepack' => 'keshaemotes',

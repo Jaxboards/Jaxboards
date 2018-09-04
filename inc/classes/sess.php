@@ -45,9 +45,12 @@ class SESS
             $result = (!$isbot) ?
                 $DB->safeselect(
                     <<<'EOT'
-`id`,`uid`,INET6_NTOA(`ip`) as `ip`,`vars`,`last_update`,`last_action`,
-`runonce`,`location`,`users_online_cache`,`is_bot`,`buddy_list_cache`,
-`location_verbose`,`useragent`,`forumsread`,`topicsread`,`readtime`,`hide`
+`id`,`uid`,INET6_NTOA(`ip`) as `ip`,`vars`,
+UNIX_TIMESTAMP(`last_update`) AS `last_update`,
+UNIX_TIMESTAMP(`last_action`) AS `last_action`,`runonce`,`location`,
+`users_online_cache`,`is_bot`,`buddy_list_cache`,`location_verbose`,
+`useragent`,`forumsread`,`topicsread`,
+UNIX_TIMESTAMP(`read_date`) AS `read_date`,`hide`
 EOT
                     ,
                     'session',
@@ -57,9 +60,12 @@ EOT
                 ) :
                     $DB->safeselect(
                         <<<'EOT'
-`id`,`uid`,INET6_NTOA(`ip`) as `ip`,`vars`,`last_update`,`last_action`,
-`runonce`,`location`,`users_online_cache`,`is_bot`,`buddy_list_cache`,
-`location_verbose`,`useragent`,`forumsread`,`topicsread`,`readtime`,`hide`
+`id`,`uid`,INET6_NTOA(`ip`) as `ip`,`vars`,
+UNIX_TIMESTAMP(`last_update`) AS `last_update`,
+UNIX_TIMESTAMP(`last_action`) AS `last_action`,`runonce`,`location`,
+`users_online_cache`,`is_bot`,`buddy_list_cache`,`location_verbose`,
+`useragent`,`forumsread`,`topicsread`,
+UNIX_TIMESTAMP(`read_date`) AS `read_date`,`hide`
 EOT
                         ,
                         'session',
@@ -92,8 +98,8 @@ EOT
             'ip' => $JAX->ip2bin(),
             'useragent' => $_SERVER['HTTP_USER_AGENT'],
             'is_bot' => $isbot,
-            'last_action' => time(),
-            'last_update' => time(),
+            'last_action' => date('Y-m-d H:i:s', time()),
+            'last_update' => date('Y-m-d H:i:s', time()),
         );
         if (1 > $uid) {
             unset($sessData['uid']);
@@ -169,7 +175,7 @@ EOT
             $uid = null;
         } else {
             $result = $DB->safeselect(
-                'MAX(`last_action`) AS `last_action`',
+                'UNIX_TIMESTAMP(MAX(`last_action`)) AS `last_action`',
                 'session',
                 'WHERE `uid`=? GROUP BY `uid`',
                 $uid
@@ -183,7 +189,7 @@ EOT
                 'session',
                 'WHERE `uid`=? AND `last_update`<?',
                 $DB->basicvalue($uid),
-                $timeago
+                date('Y-m-d H:i:s', $timeago)
             );
             // Delete all expired tokens as well while we're here...
             $DB->safedelete(
@@ -195,17 +201,17 @@ EOT
         }
         $yesterday = mktime(0, 0, 0);
         $query = $DB->safeselect(
-            '`uid`,MAX(`last_action`) AS `last_action`',
+            '`uid`,UNIX_TIMESTAMP(MAX(`last_action`)) AS `last_action`',
             'session',
             'WHERE `last_update`<? GROUP BY uid',
-            $yesterday
+            date('Y-m-d H:i:s', $yesterday)
         );
         while ($f = $DB->arow($query)) {
             if ($f['uid']) {
                 $DB->safeupdate(
                     'members',
                     array(
-                        'last_visit' => $f['last_action'],
+                        'last_visit' => date('Y-m-d H:i:s', $f['last_action']),
                     ),
                     'WHERE `id`=?',
                     $f['uid']
@@ -219,8 +225,8 @@ WHERE `last_update`<?
     OR (`uid` IS NULL AND `last_update`<?)
 EOT
             ,
-            $yesterday,
-            $timeago
+            date('Y-m-d H:i:s', $yesterday),
+            date('Y-m-d H:i:s', $timeago)
         );
 
         return true;
@@ -230,14 +236,20 @@ EOT
     {
         global $DB,$PAGE;
         $sd = $this->changedData;
+        if (isset($sd['readtime'])) {
+            $sd['read_date'] = date('Y-m-d H:i:s', $sd['readtime']);
+            unset($sd['readtime']);
+        }
         $id = $this->data['id'];
-        $sd['last_update'] = time();
+        $sd['last_update'] = date('Y-m-d H:i:s', time());
         if ($this->data['is_bot']) {
             // Bots tend to read a lot of content.
             $sd['forumsread'] = $sd['topicsread'] = '';
         }
         if (!$this->data['last_action']) {
-            $sd['last_action'] = time();
+            $sd['last_action'] = date('Y-m-d H:i:s', time());
+        } elseif (isset($sd['last_action'])) {
+            $sd['last_action'] = date('Y-m-d H:i:s', $sd['last_action']);
         }
         if (isset($sd['user'])) {
             // This doesn't exist.

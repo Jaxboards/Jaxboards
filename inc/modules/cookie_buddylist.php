@@ -170,8 +170,11 @@ class buddylist
             $result = $DB->safeselect(
                 <<<'EOT'
 `id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
-`join_date`,`last_visit`,`contact_skype`,`contact_yim`,`contact_msn`,
-`contact_gtalk`,`contact_aim`,`website`,`dob_day`,`dob_month`,`dob_year`,
+UNIX_TIMESTAMP(`join_date`) AS `join_date`,
+UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,
+`contact_skype`,`contact_yim`,`contact_msn`, `contact_gtalk`,`contact_aim`,
+`website`,`birthdate`, DAY(`birthdate`) AS `dob_day`,
+MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
 `about`,`display_name`,`full_name`,`contact_steam`,`location`,`gender`,
 `friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
 `sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,

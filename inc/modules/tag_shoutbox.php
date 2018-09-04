@@ -86,7 +86,7 @@ class SHOUTBOX
             $shout = $PAGE->meta(
                 'shout-action',
                 $JAX->smalldate(
-                    $row['timestamp'],
+                    $row['date'],
                     1
                 ),
                 $user,
@@ -100,7 +100,7 @@ class SHOUTBOX
             $shout = $PAGE->meta(
                 'shout',
                 $JAX->smalldate(
-                    $row['timestamp'],
+                    $row['date'],
                     1
                 ),
                 $user,
@@ -119,7 +119,7 @@ class SHOUTBOX
         $result = $DB->safespecial(
             <<<'EOT'
 SELECT s.`id` AS `id`,s.`uid` AS `uid`,s.`shout` AS `shout`,
-    s.`timestamp` AS `timestamp`,INET6_NTOA(s.`ip`) AS `ip`,
+    UNIX_TIMESTAMP(s.`date`) AS `date`,INET6_NTOA(s.`ip`) AS `ip`,
     m.`display_name` AS `display_name`, m.`group_id` AS `group_id`,
     m.`avatar` AS `avatar`
 FROM %t s
@@ -170,7 +170,7 @@ EOT
             $result = $DB->safespecial(
                 <<<'EOT'
 SELECT s.`id` AS `id`,s.`uid` AS `uid`,s.`shout` AS `shout`,
-    s.`timestamp` AS `timestamp`,INET6_NTOA(s.`ip`) AS `ip`,
+    UNIX_TIMESTAMP(s.`date`) AS `date`,INET6_NTOA(s.`ip`) AS `ip`,
     m.`display_name` AS `display_name`, m.`group_id` AS `group_id`,
     m.`avatar` AS `avatar`
 FROM %t s
@@ -252,7 +252,7 @@ EOT
         $result = $DB->safespecial(
             <<<'EOT'
 SELECT s.`id` AS `id`,s.`uid` AS `uid`,s.`shout` AS `shout`,
-    s.`timestamp` AS `timestamp`,INET6_NTOA(s.`ip`) AS `ip`,
+    UNIX_TIMESTAMP(s.`date`) AS `date`,INET6_NTOA(s.`ip`) AS `ip`,
     m.`display_name` AS `display_name`, m.`group_id` AS `group_id`,
     m.`avatar` AS `avatar`
 FROM %t s
@@ -322,7 +322,7 @@ EOT
             array(
                 'uid' => $JAX->pick($JAX->userData['id'], 0),
                 'shout' => $shout,
-                'timestamp' => time(),
+                'date' => date('Y-m-d H:i:s', time()),
                 'ip' => $JAX->ip2bin(),
             )
         );

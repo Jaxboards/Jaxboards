@@ -225,10 +225,10 @@ EOT
                 array_push($arguments, (int) $JAX->b['mid']);
             }
             if (isset($datestart) && $datestart) {
-                array_push($arguments, $datestart);
+                array_push($arguments, date('Y-m-d H:i:s', $datestart));
             }
             if (isset($dateend) && $dateend) {
-                array_push($arguments, $dateend);
+                array_push($arguments, date('Y-m-d H:i:s', $dateend));
             }
 
             array_push($arguments, $DB->basicvalue($termraw));
@@ -239,10 +239,10 @@ EOT
                 array_push($arguments, (int) $JAX->b['mid']);
             }
             if (isset($datestart) && $datestart) {
-                array_push($arguments, $datestart);
+                array_push($arguments, date('Y-m-d H:i:s', $datestart));
             }
             if (isset($dateend) && $dateend) {
-                array_push($arguments, $dateend);
+                array_push($arguments, date('Y-m-d H:i:s', $dateend));
             }
 
             $result = call_user_func_array(
@@ -278,10 +278,10 @@ EOT
             $result = $DB->safespecial(
                 <<<EOT
 SELECT p.`id` AS `id`,p.`auth_id` AS `auth_id`,p.`post` AS `post`,
-	p.`date` AS `date`,p.`showsig` AS `showsig`,p.`showemotes` AS `showemotes`,
-	p.`tid` AS `tid`,p.`newtopic` AS `newtopic`,INET6_NTOA(p.`ip`) AS `ip`,
-	p.`editdate` AS `editdate`,p.`editby` AS `editby`,p.`rating` AS `rating`,
-    t.`title` AS `title`
+UNIX_TIMESTAMP(p.`date`) AS `date`,p.`showsig` AS `showsig`,
+p.`showemotes` AS `showemotes`,p.`tid` AS `tid`,p.`newtopic` AS `newtopic`,
+INET6_NTOA(p.`ip`) AS `ip`,UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`,
+p.`editby` AS `editby`,p.`rating` AS `rating`,t.`title` AS `title`
 FROM %t p
 LEFT JOIN %t t
     ON p.`tid`=t.`id`

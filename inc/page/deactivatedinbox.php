@@ -86,9 +86,10 @@ class INBOX
         $result = $DB->safespecial(
             <<<'EOT'
 SELECT a.`id` AS `id`,a.`to` AS `to`,a.`from` AS `from`,a.`title` AS `title`,
-	a.`message` AS `message`,a.`read` AS `read`,a.`date` AS `date`,
-	a.`del_recipient` AS `del_recipient`,a.`del_sender` AS `del_sender`,
-	a.`flag` AS `flag`,m.`group_id` AS `group_id`,m.`display_name` AS `name`
+    a.`message` AS `message`,a.`read` AS `read`,
+    UNIX_TIMESTAMP(a.`date`) AS `date`,a.`del_recipient` AS `del_recipient`,
+    a.`del_sender` AS `del_sender`,a.`flag` AS `flag`,
+    m.`group_id` AS `group_id`,m.`display_name` AS `name`
 FROM %t a
 LEFT JOIN %t m
     ON a.`from`=m.`id`
@@ -224,9 +225,10 @@ EOT;
             $result = $DB->safespecial(
                 <<<'EOT'
 SELECT a.`id` AS `id`,a.`to` AS `to`,a.`from` AS `from`,a.`title` AS `title`,
-	a.`message` AS `message`,a.`read` AS `read`,a.`date` AS `date`,
-	a.`del_recipient` AS `del_recipient,`a.`del_sender` AS `del_sender`,
-	a.`flag` AS `flag`,m.`display_name` AS `display_name`
+    a.`message` AS `message`,a.`read` AS `read`,
+    UNIX_TIMESTAMP(a.`date`) AS `date`,a.`del_recipient` AS `del_recipient,
+    `a.`del_sender` AS `del_sender`,a.`flag` AS `flag`,
+    m.`display_name` AS `display_name`
 FROM %t a
 LEFT JOIN %t m
     ON a.`to`=m.`id`
@@ -241,9 +243,10 @@ EOT
             $result = $DB->safespecial(
                 <<<'EOT'
 SELECT a.`id` AS `id`,a.`to` AS `to`,a.`from` AS `from`,a.`title` AS `title`,
-	a.`message` AS `message`,a.`read` AS `read`,a.`date` AS `date`,
-	a.`del_recipient` AS `del_recipient`,a.`del_sender` AS `del_sender`,
-	a.`flag` AS `flag`,m.`display_name` AS `display_name`
+    a.`message` AS `message`,a.`read` AS `read`,
+    UNIX_TIMESTAMP(a.`date`) AS `date`,a.`del_recipient` AS `del_recipient`,
+    a.`del_sender` AS `del_sender`,a.`flag` AS `flag`,
+    m.`display_name` AS `display_name`
 FROM %t a
 LEFT JOIN %t m
     ON a.`from`=m.`id`
@@ -258,9 +261,10 @@ EOT
             $result = $DB->safespecial(
                 <<<'EOT'
 SELECT a.`id` AS `id`,a.`to` AS `to`,a.`from` AS `from`,a.`title` AS `title`,
-	a.`message` AS `message`,a.`read` AS `read`,a.`date` AS `date`,
-	a.`del_recipient` AS `del_recipient`,a.`del_sender` AS `del_sender`,
-	a.`flag` AS `flag`,m.`display_name` AS `display_name`
+    a.`message` AS `message`,a.`read` AS `read`,
+    UNIX_TIMESTAMP(a.`date`) AS `date`,a.`del_recipient` AS `del_recipient`,
+    a.`del_sender` AS `del_sender`,a.`flag` AS `flag`,
+    m.`display_name` AS `display_name`
 FROM %t a
 LEFT JOIN %t m
 ON a.`from`=m.`id`
@@ -358,7 +362,7 @@ EOT
                         'from' => $USER['id'],
                         'title' => $JAX->blockhtml($JAX->p['title']),
                         'message' => $JAX->p['message'],
-                        'date' => time(),
+                        'date' => date('Y-m-d H:i:s', time()),
                         'del_sender' => 0,
                         'del_recipient' => 0,
                         'read' => 0,
@@ -399,8 +403,8 @@ EOT
         if ($messageid) {
             $result = $DB->safeselect(
                 <<<'EOT'
-`id`,`to`,`from`,`title`,`message`,`read`,`date`,`del_recipient`,`del_sender`,
-`flag`
+`id`,`to`,`from`,`title`,`message`,`read`,UNIX_TIMESTAMP(`date`) AS `date`,
+`del_recipient`,`del_sender`,`flag`
 EOT
                 ,
                 'messages',
@@ -500,8 +504,8 @@ EOT;
         global $PAGE,$JAX,$DB,$USER;
         $result = $DB->safeselect(
             <<<'EOT'
-`id`,`to`,`from`,`title`,`message`,`read`,`date`,`del_recipient`,`del_sender`,
-`flag`
+`id`,`to`,`from`,`title`,`message`,`read`,UNIX_TIMESTAMP(`date`) AS `date`,
+`del_recipient`,`del_sender`,`flag`
 EOT
             ,
             'messages',

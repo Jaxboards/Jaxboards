@@ -122,12 +122,13 @@ EOT
                 <<<'EOT'
 SELECT m.`id` AS `id`,m.`name` AS `name`,m.`email` AS `email`,m.`sig` AS `sig`,
     m.`posts` AS `posts`,m.`group_id` AS `group_id`,m.`avatar` AS `avatar`,
-    m.`usertitle` AS `usertitle`,m.`join_date` AS `join_date`,
-    m.`last_visit` AS `last_visit`,m.`contact_skype` AS `contact_skype`,
-    m.`contact_yim` AS `contact_yim`,m.`contact_msn` AS `contact_msn`,
-    m.`contact_gtalk` AS `contact_gtalk`,m.`contact_aim` AS `contact_aim`,
-    m.`website` AS `website`,m.`dob_day` AS `dob_day`,
-    m.`dob_month` AS `dob_month`,m.`dob_year` AS `dob_year`,
+    m.`usertitle` AS `usertitle`,UNIX_TIMESTAMP(m.`join_date`) AS `join_date`,
+    UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`,
+    m.`contact_skype` AS `contact_skype`,m.`contact_yim` AS `contact_yim`,
+    m.`contact_msn` AS `contact_msn`,m.`contact_gtalk` AS `contact_gtalk`,
+    m.`contact_aim` AS `contact_aim`,m.`website` AS `website`,
+    m.`birthdate` AS `birthdate`,DAY(m.`birthdate`) AS `dob_day`,
+    MONTH(m.`birthdate`) AS `dob_month`,YEAR(m.`birthdate`) AS `dob_year`,
     m.`about` AS `about`,m.`display_name` AS `display_name`,
     m.`full_name` AS `full_name`,m.`contact_steam` AS `contact_steam`,
     m.`location` AS `location`,m.`gender` AS `gender`,m.`friends` AS `friends`,
@@ -172,9 +173,10 @@ EOT
                 $result = $DB->safespecial(
                     <<<'EOT'
 SELECT a.`id` AS `id`,a.`type` AS `type`,a.`arg1` AS `arg1`,a.`uid` AS `uid`,
-	a.`date` AS `date`,a.`affected_uid` AS `affected_uid`,a.`tid` AS `tid`,
-	a.`pid` AS `pid`,a.`arg2` AS `arg2`,a.`affected_uid` AS `aff_id`,
-    m.`display_name` AS `aff_name`,m.`group_id` AS `aff_group_id`
+    UNIX_TIMESTAMP(a.`date`) AS `date`,a.`affected_uid` AS `affected_uid`,
+    a.`tid` AS `tid`,a.`pid` AS `pid`,a.`arg2` AS `arg2`,
+    a.`affected_uid` AS `aff_id`,m.`display_name` AS `aff_name`,
+    m.`group_id` AS `aff_group_id`
 FROM %t a
 LEFT JOIN %t m
     ON a.`affected_uid`=m.`id`
@@ -231,7 +233,7 @@ EOT
                 $result = $DB->safespecial(
                     <<<'EOT'
 SELECT p.`post` AS `post`,p.`id` AS `pid`,p.`tid` AS `tid`,
-    t.`title` AS `title`,p.`date` AS `date`,f.`perms` AS `perms`
+    t.`title` AS `title`,UNIX_TIMESTAMP(p.`date`) AS `date`,f.`perms` AS `perms`
 FROM %t p
 LEFT JOIN %t t
     ON p.`tid`=t.`id`
@@ -264,7 +266,7 @@ EOT
                 $result = $DB->safespecial(
                     <<<'EOT'
 SELECT p.`post` AS `post`,p.`id` AS `pid`,p.`tid` AS `tid`,
-    t.`title` AS `title`,p.`date` AS `date`,f.`perms` AS `perms`
+    t.`title` AS `title`,UNIX_TIMESTAMP(p.`date`) AS `date`,f.`perms` AS `perms`
 FROM %t p
 LEFT JOIN %t t
     ON p.`tid`=t.`id`
@@ -370,7 +372,7 @@ EOT
                             array(
                             'type' => 'profile_comment',
                             'uid' => $USER['id'],
-                            'date' => time(),
+                            'date' => date('Y-m-d H:i:s', time()),
                             'affected_uid' => $id,
                             )
                         );
@@ -380,7 +382,7 @@ EOT
                             'to' => $id,
                             'from' => $USER['id'],
                             'comment' => $JAX->p['comment'],
-                            'date' => time(),
+                            'date' => date('Y-m-d H:i:s', time()),
                             )
                         );
                     }
@@ -406,7 +408,7 @@ EOT
                 $result = $DB->safespecial(
                     <<<'EOT'
 SELECT c.`id` AS `id`,c.`to` AS `to`,c.`from` AS `from`,
-    c.`comment` AS `comment`,c.`date` AS `date`,
+    c.`comment` AS `comment`,UNIX_TIMESTAMP(c.`date`) AS `date`,
     m.`display_name` AS `display_name`,m.`group_id` AS `group_id`,
     m.`avatar` AS `avatar`
 FROM %t c

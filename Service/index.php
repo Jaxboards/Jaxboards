@@ -97,7 +97,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         'directory',
         'WHERE `registrar_ip`=INET6_ATON(?) AND `date`>?',
         $JAX->getIp(),
-        (time() - 7 * 24 * 60 * 60)
+        date('Y-m-d H:i:s', (time() - 7 * 24 * 60 * 60))
     );
     if ($DB->num_rows($result) > 3) {
         $errors[] = 'You may only register one 3 boards per week.';
@@ -138,7 +138,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                 'boardname' => $board,
                 'registrar_email' => $JAX->p['email'],
                 'registrar_ip' => $JAX->ip2bin(),
-                'date' => time(),
+                'date' => date('Y-m-d H:i:s', time()),
                 'referral' => isset($JAX->b['r']) ? $JAX->b['r'] : '',
             )
         );
@@ -183,8 +183,8 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                 'sig' => '',
                 'posts' => 0,
                 'group_id' => 2,
-                'join_date' => time(),
-                'last_visit' => time(),
+                'join_date' => date('Y-m-d H:i:s', time()),
+                'last_visit' => date('Y-m-d H:i:s', time()),
             )
         );
 

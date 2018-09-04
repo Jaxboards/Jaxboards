@@ -69,7 +69,8 @@ class TOPIC
         $result = $DB->safespecial(
             <<<'EOT'
 SELECT a.`title` AS `topic_title`,a.`locked` AS `locked`,
-    a.`lp_date` AS `lp_date`,b.`title` AS `forum_title`,b.`perms` AS `fperms`,
+    UNIX_TIMESTAMP(a.`lp_date`) AS `lp_date`,
+    b.`title` AS `forum_title`,b.`perms` AS `fperms`,
     c.`id` AS `cat_id`,c.`title` AS `cat_title`,a.`fid` AS `fid`,
     a.`poll_q` AS `poll_q`,a.`poll_type` AS `poll_type`,
     a.`poll_choices` AS `poll_choices`,a.`poll_results` AS `poll_results`,
@@ -123,8 +124,8 @@ EOT
             );
             $result = $DB->safespecial(
                 <<<'EOT'
-SELECT p.`id` AS `id`,p.`post` AS `post`,p.`date` AS `date`,m.`id` AS `id`,
-    m.`display_name` AS `display_name`
+SELECT p.`id` AS `id`,p.`post` AS `post`,UNIX_TIMESTAMP(p.`date`) AS `date`,
+    m.`id` AS `id`,m.`display_name` AS `display_name`
 FROM %t p
 LEFT JOIN %t m
     ON p.`auth_id`=m.`id`
@@ -355,10 +356,10 @@ EOT
             $result = $DB->safespecial(
                 <<<'EOT'
 SELECT p.`id` AS `id`,p.`auth_id` AS `auth_id`,p.`post` AS `post`,
-	p.`date` AS `date`,p.`showsig` AS `showsig`,p.`showemotes` AS `showemotes`,
-	p.`tid` AS `tid`,p.`newtopic` AS `newtopic`,INET6_NTOA(p.`ip`) AS `ip`,
-	p.`editdate` AS `editdate`,p.`editby` AS `editby`,p.`rating` AS `rating`,
-    m.`display_name` AS `name`
+    UNIX_TIMESTAMP(p.`date`) AS `date`,p.`showsig` AS `showsig`,
+    p.`showemotes` AS `showemotes`,p.`tid` AS `tid`,p.`newtopic` AS `newtopic`,
+    INET6_NTOA(p.`ip`) AS `ip`,UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`,
+    p.`editby` AS `editby`,p.`rating` AS `rating`,m.`display_name` AS `name`
 FROM %t p
 LEFT JOIN %t m
     ON p.`auth_id`=m.`id`
@@ -412,17 +413,19 @@ EOT
                 <<<'EOT'
 SELECT m.`id` AS `id`,m.`name` AS `name`,m.`group_id` AS `group_id`,
     m.`sound_im` AS `sound_im`,m.`sound_shout` AS `sound_shout`,
-    m.`last_visit` AS `last_visit`,m.`display_name` AS `display_name`,
+    UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`,
+    m.`display_name` AS `display_name`,
     m.`friends` AS `friends`,m.`enemies` AS `enemies`,m.`skin_id` AS `skin_id`,
     m.`nowordfilter` AS `nowordfilter`,m.`wysiwyg` AS `wysiwyg`,
     m.`avatar` AS `avatar`,m.`usertitle` AS `usertitle`,
-    CONCAT(m.`dob_month`,' ',m.`dob_day`) as `birthday`,
+    CONCAT(MONTH(m.`birthdate`),' ',MONTH(m.`birthdate`)) as `birthday`,
     m.`mod` AS `mod`,m.`posts` AS `posts`,
     p.`tid` AS `tid`,p.`id` AS `pid`,INET6_NTOA(p.`ip`) AS `ip`,
     p.`newtopic` AS `newtopic`,p.`post` AS `post`,p.`showsig` AS `showsig`,
-    p.`showemotes` AS `showemotes`,p.`tid` AS `tid`,p.`date` AS `date`,
-    p.`auth_id` AS `auth_id`,p.`rating` AS `rating`,g.`title` AS `title`,
-    g.`icon` AS `icon`,p.`editdate` AS `editdate`,p.`editby` AS `editby`,
+    p.`showemotes` AS `showemotes`,p.`tid` AS `tid`,
+    UNIX_TIMESTAMP(p.`date`) AS `date`,p.`auth_id` AS `auth_id`,
+    p.`rating` AS `rating`,g.`title` AS `title`,g.`icon` AS `icon`,
+    UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`,p.`editby` AS `editby`,
     e.`display_name` AS `ename`,e.`group_id` AS `egroup_id`
 FROM %t AS p
 LEFT JOIN %t m
@@ -445,15 +448,17 @@ EOT
                 <<<'EOT'
 SELECT m.`id` AS `id`,m.`name` AS `name`,m.`email` AS `email`,m.`sig` AS `sig`,
     m.`posts` AS `posts`,m.`group_id` AS `group_id`,m.`avatar` AS `avatar`,
-    m.`usertitle` AS `usertitle`,m.`join_date` AS `join_date`,
-    m.`last_visit` AS `last_visit`,m.`contact_skype` AS `contact_skype`,
+    m.`usertitle` AS `usertitle`,UNIX_TIMESTAMP(m.`join_date`) AS `join_date`,
+    UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`,
+    m.`contact_skype` AS `contact_skype`,
     m.`contact_yim` AS `contact_yim`,m.`contact_msn` AS `contact_msn`,
     m.`contact_gtalk` AS `contact_gtalk`,m.`contact_aim` AS `contact_aim`,
-    m.`website` AS `website`,m.`dob_day` AS `dob_day`,
-    m.`dob_month` AS `dob_month`,m.`dob_year` AS `dob_year`,
-    m.`about` AS `about`,m.`display_name` AS `display_name`,
-    m.`full_name` AS `full_name`,m.`contact_steam` AS `contact_steam`,
-    m.`location` AS `location`,m.`gender` AS `gender`,m.`friends` AS `friends`,
+    m.`website` AS `website`,m.`birthdate` AS `birthdate`,
+    DAY(m.`birthdate`) AS `dob_day`,MONTH(m.`birthdate`) AS `dob_month`,
+    YEAR(m.`birthdate`) AS `dob_year`,m.`about` AS `about`,
+    m.`display_name` AS `display_name`,m.`full_name` AS `full_name`,
+    m.`contact_steam` AS `contact_steam`,m.`location` AS `location`,
+    m.`gender` AS `gender`,m.`friends` AS `friends`,
     m.`enemies` AS `enemies`,m.`sound_shout` AS `sound_shout`,
     m.`sound_im` AS `sound_im`,m.`sound_pm` AS `sound_pm`,
     m.`sound_postinmytopic` AS `sound_postinmytopic`,
@@ -467,10 +472,12 @@ SELECT m.`id` AS `id`,m.`name` AS `name`,m.`email` AS `email`,m.`sig` AS `sig`,
     INET6_NTOA(m.`ip`) AS `ip`,m.`mod` AS `mod`,m.`wysiwyg` AS `wysiwyg`,
     p.`tid` AS `tid`,p.`id` AS `pid`,INET6_NTOA(p.`ip`) AS `ip`,
     p.`newtopic` AS `newtopic`,p.`post` AS `post`,p.`showsig` AS `showsig`,
-    p.`showemotes` AS `showemotes`,p.`tid` AS `tid`,p.`date` AS `date`,
-    p.`auth_id` AS `auth_id`,p.`rating` AS `rating`,g.`title` AS `title`,
-    g.`icon` AS `icon`,p.`editdate` AS `editdate`,p.`editby` AS `editby`,
-    e.`display_name` AS `ename`,e.`group_id` AS `egroup_id`
+    p.`showemotes` AS `showemotes`,p.`tid` AS `tid`,
+    UNIX_TIMESTAMP(p.`date`) AS `date`,p.`auth_id` AS `auth_id`,
+    p.`rating` AS `rating`,g.`title` AS `title`,
+    g.`icon` AS `icon`,UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`,
+    p.`editby` AS `editby`,e.`display_name` AS `ename`,
+    e.`group_id` AS `egroup_id`
 FROM %t p
 LEFT JOIN %t m
     ON p.`auth_id`=m.`id`
@@ -576,7 +583,7 @@ EOT
                 isset($post['sig']) && $post['sig'] ?
                 $JAX->theworks($post['sig']) : '',
                 $post['auth_id'],
-                $post['editdate'] ? $PAGE->meta(
+                $post['edit_date'] ? $PAGE->meta(
                     'topic-edit-by',
                     $PAGE->meta(
                         'user-link',
@@ -584,7 +591,7 @@ EOT
                         $post['egroup_id'],
                         $post['ename']
                     ),
-                    $JAX->date($post['editdate'])
+                    $JAX->date($post['edit_date'])
                 ) : '',
                 $PERMS['can_moderate'] ?
                 '<a href="?act=modcontrols&amp;do=iptools&amp;ip=' .
@@ -907,8 +914,9 @@ EOT
         $PAGE->JS('softurl');
         $result = $DB->safeselect(
             <<<'EOT'
-`id`,`auth_id`,`post`,`date`,`showsig`,`showemotes`,`tid`,`newtopic`,
-INET6_NTOA(`ip`) AS `ip`,`editdate`,`editby`,`rating`
+`id`,`auth_id`,`post`,UNIX_TIMESTAMP(`date`),`showsig`,`showemotes`,`tid`,
+`newtopic`,INET6_NTOA(`ip`) AS `ip`,UNIX_TIMESTAMP(`edit_date`) AS `edit_date`,
+`editby`,`rating`
 EOT
             ,
             '`posts`',
@@ -940,9 +948,10 @@ EOT
                     );
                     $result = $DB->safeselect(
                         <<<'EOT'
-`id`,`title`,`subtitle`,`lp_uid`,`lp_date`,`fid`,`auth_id`,`replies`,`views`,
+`id`,`title`,`subtitle`,`lp_uid`,UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,
+`fid`,`auth_id`,`replies`,`views`,
 `pinned`,`poll_choices`,`poll_results`,`poll_q`,`poll_type`,`summary`,
-`locked`,`date`,`op`,`cal_event`
+`locked`,UNIX_TIMESTAMP(`date`) AS `date`,`op`,`cal_event`
 EOT
                         ,
                         'topics',
@@ -1053,8 +1062,9 @@ EOT
         } else {
             $result = $DB->safespecial(
                 <<<'EOT'
-SELECT `id`,`auth_id`,`post`,`date`,`showsig`,`showemotes`,`tid`,`newtopic`,
-    INET6_NTOA(`ip`) AS `ip`,`editdate`,`editby`,`rating`
+SELECT `id`,`auth_id`,`post`,UNIX_TIMESTAMP(`date`) AS `date`,
+    `showsig`,`showemotes`,`tid`,`newtopic`,INET6_NTOA(`ip`) AS `ip`,
+    UNIX_TIMESTAMP(`edit_date`) AS `edit_date`,`editby`,`rating`
 FROM %t
 WHERE tid=(
     SELECT tid
