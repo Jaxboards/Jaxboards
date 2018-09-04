@@ -15,7 +15,6 @@ class JAX
         $this->c = $this->filterInput($_COOKIE);
         $this->g = $this->filterInput($_GET);
         $this->p = $this->filterInput($_POST);
-        $this->s = $this->filterInput($_SESSION);
         $this->b = array_merge($this->p, $this->g);
         $this->textRules = null;
     }
