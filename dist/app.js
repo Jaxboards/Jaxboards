@@ -2085,7 +2085,6 @@
     }
 
     create() {
-      debugger;
       if (this.windowContainer) {
         // DOM already created
         return null;
@@ -2986,17 +2985,6 @@
     }
   }
 
-  /* Returns the path to this script. */
-  function getJXBDBaseDir() {
-    const scripts = Array.from(document.querySelectorAll('script'));
-    const found = scripts
-      .find(script => script.src.substr(script.src.length - 8, 8) === 'run.js');
-    if (found) {
-      return found.src.substr(0, found.src.length - 8);
-    }
-    return null;
-  }
-
   class AppState {
     onAppReady() {
       this.stream = new Stream();
@@ -3020,10 +3008,9 @@
 
 
       // Load sounds
-      const basedir = getJXBDBaseDir();
-      Sound$1.load('sbblip', `${basedir}Sounds/blip.mp3`, false);
-      Sound$1.load('imbeep', `${basedir}Sounds/receive.mp3`, false);
-      Sound$1.load('imnewwindow', `${basedir}Sounds/receive.mp3`, false);
+      Sound$1.load('sbblip', `./Sounds/blip.mp3`, false);
+      Sound$1.load('imbeep', `./Sounds/receive.mp3`, false);
+      Sound$1.load('imnewwindow', `./Sounds/receive.mp3`, false);
 
       document.cookie = 'buddylist=0';
     }

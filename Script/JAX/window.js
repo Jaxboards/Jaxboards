@@ -20,7 +20,6 @@ class Window {
   }
 
   create() {
-    debugger;
     if (this.windowContainer) {
       // DOM already created
       return null;
