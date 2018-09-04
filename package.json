@@ -13,6 +13,7 @@
     "eslint": "^5.5.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.14.0",
+    "js-beautify": "^1.8.4",
     "pre-commit": "^1.2.2",
     "prettier": "^1.14.2",
     "rollup": "^0.65.0",

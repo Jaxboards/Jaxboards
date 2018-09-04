@@ -1,27 +1,27 @@
 <div class="messageview">
-    <div class="messageinfo">
-        <div class="title">
-            %1$s
-        </div>
-        <div>
-            From: %2$s
-        </div>
-        <div>
-            Sent: %3$s
-        </div>
+  <div class="messageinfo">
+    <div class="title">
+      %1$s
     </div>
-    <div class="message">
-        %4$s
+    <div>
+      From: %2$s
     </div>
-    <div class="messagebuttons">
-        <form method="post" onsubmit="return RUN.submitForm(this,0,event)">
-        %7$s
-        <input type="submit" name="page" onclick="this.form.submitButton=this;"
-            value="Delete" />
-        <input type="submit" onclick="this.form.submitButton=this;" name="page"
-            value="Forward" />
-        <input type="submit" onclick="this.form.submitButton=this;" name="page"
-            value="Reply" />
-        </form>
+    <div>
+      Sent: %3$s
     </div>
+  </div>
+  <div class="message">
+    %4$s
+  </div>
+  <div class="messagebuttons">
+    <form method="post" onsubmit="return RUN.submitForm(this,0,event)">
+      %7$s
+      <input type="submit" name="page" onclick="this.form.submitButton=this;"
+        value="Delete" />
+      <input type="submit" onclick="this.form.submitButton=this;" name="page"
+        value="Forward" />
+      <input type="submit" onclick="this.form.submitButton=this;" name="page"
+        value="Reply" />
+    </form>
+  </div>
 </div>

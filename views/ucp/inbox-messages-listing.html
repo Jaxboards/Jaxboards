@@ -1,31 +1,30 @@
 <form method="post" onsubmit="return RUN.submitForm(this)">
-    %s
-    <table class="listing">
-        <tr>
-            <th class="center" width="5%%">
-                <input type="checkbox"
-                    onclick="JAX.checkAll(document.querySelectorAll('.check'),this.checked)" />
-            </th>
-            <th width="5%%">
-                Flag
-            </th>
-            <th width="45%%">
-                Title
-            </th>
-            <th width="20%%">
-                %s
-            </th>
-            <th width="25%%">
-                Date Sent
-            </th>
-        </tr>
+  %s
+  <table class="listing">
+    <tr>
+      <th class="center" width="5%%">
+        <input type="checkbox" onclick="JAX.checkAll(document.querySelectorAll('.check'),this.checked)" />
+      </th>
+      <th width="5%%">
+        Flag
+      </th>
+      <th width="45%%">
+        Title
+      </th>
+      <th width="20%%">
         %s
-        <tr>
-            <td>
-            </td>
-            <td colspan="4">
-                <input type="submit" value="Delete Messages" />
-            </td>
-        </tr>
-    </table>
+      </th>
+      <th width="25%%">
+        Date Sent
+      </th>
+    </tr>
+    %s
+    <tr>
+      <td>
+      </td>
+      <td colspan="4">
+        <input type="submit" value="Delete Messages" />
+      </td>
+    </tr>
+  </table>
 </form>

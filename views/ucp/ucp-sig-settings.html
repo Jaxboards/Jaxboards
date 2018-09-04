@@ -1,15 +1,15 @@
 <form onsubmit="document.querySelector('#npedit').editor.submit();return RUN.submitForm(this)"
-    method="post">
-    %s
-    Signature preview:
-    <br />
-    %s
-    <br />
-    <br />
-    <textarea name="changesig" id="changesig">%s</textarea>
-    <iframe id="npedit" onload="new JAX.editor(document.querySelector('#changesig'),this)"
-        style="display:none">
-    </iframe>
-    <br />
-    <input type="submit" value="Change" />
+  method="post">
+  %s
+  Signature preview:
+  <br />
+  %s
+  <br />
+  <br />
+  <textarea name="changesig" id="changesig">%s</textarea>
+  <iframe id="npedit" onload="new JAX.editor(document.querySelector('#changesig'),this)"
+    style="display:none">
+  </iframe>
+  <br />
+  <input type="submit" value="Change" />
 </form>

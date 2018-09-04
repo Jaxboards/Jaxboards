@@ -1,27 +1,27 @@
 <form onsubmit="return RUN.submitForm(this)" method="post">
-    %s
-    <label for="curpass">
-        Current Password:
-    </label>
-    <input type="password" name="curpass" id="curpass" />
-    <br />
-    <br />
-    <label for="newpass1">
-        New Password:
-    </label>
-    <input type="password" name="newpass1" id="newpass1" />
-    <input name="showpass" type="checkbox" onclick="
+  %s
+  <label for="curpass">
+    Current Password:
+  </label>
+  <input type="password" name="curpass" id="curpass" />
+  <br />
+  <br />
+  <label for="newpass1">
+    New Password:
+  </label>
+  <input type="password" name="newpass1" id="newpass1" />
+  <input name="showpass" type="checkbox" onclick="
         document.querySelector('#newpass1').type=this.checked?'text':'password';
         document.querySelector('#confirmpass').style.display=this.checked?'none':'';
         " />
-    Show
-    <br />
-    <div id="confirmpass">
-        <label for="newpass2">
-            Confirm:
-        </label>
-        <input type="password" name="newpass2" id="newpass2" />
-    </div>
-    <br />
-    <input type="Submit" />
+  Show
+  <br />
+  <div id="confirmpass">
+    <label for="newpass2">
+      Confirm:
+    </label>
+    <input type="password" name="newpass2" id="newpass2" />
+  </div>
+  <br />
+  <input type="Submit" />
 </form>
