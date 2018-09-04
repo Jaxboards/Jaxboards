@@ -44,7 +44,7 @@ export default {
   update(a) {
     let [selector] = a;
     const [html] = a;
-    const paths = document.querySelectorAll('.path');
+    const paths = Aray.from(document.querySelectorAll('.path'));
     if (selector === 'path' && paths.length > 1) {
       paths.forEach((path) => {
         path.innerHTML = html;
@@ -113,7 +113,7 @@ export default {
     }
   },
   addshout([message]) {
-    const ss = document.querySelectorAll('#shoutbox .shout');
+    const ss = Array.from(document.querySelectorAll('#shoutbox .shout'));
     let x;
     const span = document.createElement('span');
     const div = span.firstChild;
@@ -143,7 +143,7 @@ export default {
     new Animation(tick)
       .add('height', '0px', h)
       .play();
-    const ticks = ticker.querySelectorAll('.tick');
+    const ticks = Array.from(ticker.querySelectorAll('.tick'));
     const l = ticks.length;
     tick.style.display = 'block';
     if (l > 100) {

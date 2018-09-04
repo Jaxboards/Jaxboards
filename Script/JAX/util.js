@@ -9,6 +9,9 @@ import DatePicker from './date-picker';
 import scrollablepagelist from './scrollablepagelist';
 import { imageResizer } from './image-resizer';
 import makeImageGallery from './image-gallery';
+import {
+  smalldate,
+} from './date';
 
 // This file is just a dumping ground until I can find better homes for these
 
@@ -83,9 +86,27 @@ export function onImagesLoaded(imgs, callback, timeout) {
   }
 }
 
+export function updateDates() {
+  let parsed;
+  const dates = Array.from(document.querySelectorAll('.autodate'));
+  if (!dates) {
+    return;
+  }
+  dates.forEach((el) => {
+    parsed = el.classList.contains('smalldate')
+      ? smalldate(parseInt(el.title, 10))
+      : el(parseInt(el.title, 10));
+    if (parsed !== el.innerHTML) {
+      el.innerHTML = parsed;
+    }
+  });
+}
+
 export function gracefulDegrade(a) {
-  if (typeof RUN !== 'undefined') RUN.updateDates();
-  const links = a.querySelectorAll('a');
+  if (typeof RUN !== 'undefined') {
+    updateDates();
+  }
+  const links = Array.from(a.querySelectorAll('a'));
   links.forEach((link) => {
     if (link.href) {
       if (link.getAttribute('href').charAt(0) === '?') {
@@ -101,9 +122,9 @@ export function gracefulDegrade(a) {
       }
     }
   });
-  convertSwitches(a.querySelectorAll('.switch'));
+  convertSwitches(Array.from(a.querySelectorAll('.switch')));
 
-  const bbcodeimgs = document.querySelectorAll('.bbcodeimg');
+  const bbcodeimgs = Array.from(document.querySelectorAll('.bbcodeimg'));
   if (bbcodeimgs) {
     onImagesLoaded(
       bbcodeimgs,
@@ -112,7 +133,7 @@ export function gracefulDegrade(a) {
         imageResizer(bbcodeimgs);
 
         // handle image galleries
-        const galleries = document.querySelectorAll('.image_gallery');
+        const galleries = Array.from(document.querySelectorAll('.image_gallery'));
         galleries.map(makeImageGallery);
       },
       2000,
@@ -120,13 +141,13 @@ export function gracefulDegrade(a) {
   }
 
   // Initialize page lists that scroll with scroll wheel
-  const pages = a.querySelectorAll('.pages');
+  const pages = Array.from(a.querySelectorAll('.pages'));
   if (pages.length) {
     pages.map(scrollablepagelist);
   }
 
   // Set up date pickers
-  const dateElements = a.querySelectorAll('input.date');
+  const dateElements = Array.from(a.querySelectorAll('input.date'));
   if (dateElements.length) {
     dateElements.forEach((inputElement) => {
       inputElement.onclick = () => DatePicker.init(this);

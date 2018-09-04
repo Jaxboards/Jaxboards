@@ -141,7 +141,7 @@ class Window {
       this.setPosition(this.oldpos, 0);
     } else {
       c.setAttribute('draggable', 'false');
-      const wins = document.querySelectorAll('.window');
+      const wins = Array.from(document.querySelectorAll('.window'));
       const width = wins.reduce((w, window) => {
         if (window.classList.contains('minimized')) {
           return w + Number(window.clientWidth);

@@ -1,5 +1,6 @@
 import {
   gracefulDegrade,
+  updateDates,
   onDOMReady,
 } from './JAX/util';
 import {
@@ -16,29 +17,13 @@ const useJSLinks = 2;
 
 /* Returns the path to this script. */
 function getJXBDBaseDir() {
-  const scripts = document.querySelectorAll('script');
+  const scripts = Array.from(document.querySelectorAll('script'));
   const found = scripts
     .find(script => script.src.substr(script.src.length - 8, 8) === 'run.js');
   if (found) {
     return found.src.substr(0, found.src.length - 8);
   }
   return null;
-}
-
-function updateDates() {
-  let parsed;
-  const dates = document.querySelectorAll('.autodate');
-  if (!dates) {
-    return;
-  }
-  dates.forEach((el) => {
-    parsed = el.classList.contains('smalldate')
-      ? smalldate(parseInt(el.title, 10))
-      : el(parseInt(el.title, 10));
-    if (parsed !== el.innerHTML) {
-      el.innerHTML = parsed;
-    }
-  });
 }
 
 class AppState {
@@ -53,7 +38,7 @@ class AppState {
     setInterval(updateDates, 1000 * 30);
 
     this.nextDataPoll();
-    setInterval(this.stream.updatePage, 200);
+    setInterval(() => this.stream.updatePage, 200);
 
     if (useJSLinks && document.location.toString().indexOf('?') > 0) {
       const hash = `#${document.location.search.substr(1)}`;

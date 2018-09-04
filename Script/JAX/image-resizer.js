@@ -48,10 +48,10 @@ export function imageResizer(imgs) {
   let mw;
   let mh;
   let s;
-  if (!imgs) {
+  if (!imgs || !imgs.length) {
     return;
   }
-  imgs
+  Array.from(imgs)
     .filter(img => !img.madeResized)
     .forEach((img) => {
       let p = 1;

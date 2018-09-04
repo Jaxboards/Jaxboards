@@ -463,7 +463,7 @@ var RUN = (function () {
     if (Browser.chrome) {
       delta *= -1;
     }
-    const p = this.querySelectorAll('a');
+    const p = Array.from(this.querySelectorAll('a'));
     const startPage = parseInt(p[1].innerHTML, 10);
     const lastPage = parseInt(p[p.length - 1].innerHTML, 10);
     const between = p.length - 2;
@@ -527,10 +527,10 @@ var RUN = (function () {
     let mw;
     let mh;
     let s;
-    if (!imgs) {
+    if (!imgs || !imgs.length) {
       return;
     }
-    imgs
+    Array.from(imgs)
       .filter(img => !img.madeResized)
       .forEach((img) => {
         let p = 1;
@@ -609,6 +609,20 @@ var RUN = (function () {
     gallery.appendChild(controls);
   }
 
+  function smalldate(a) {
+    const d = new Date();
+    d.setTime(a * 1000);
+    let hours = d.getHours();
+    const ampm = hours >= 12 ? 'pm' : 'am';
+    hours %= 12;
+    hours = hours || 12;
+    const minutes = `${d.getMinutes()}`.padStart(2, '0');
+    const month = d.getMonth() + 1;
+    const day = `${d.getDate()}`.padStart(2, '0');
+    const year = d.getFullYear();
+    return `${hours}:${minutes}${ampm}, ${month}/${day}/${year}`;
+  }
+
   /* global RUN */
 
   // This file is just a dumping ground until I can find better homes for these
@@ -684,9 +698,27 @@ var RUN = (function () {
     }
   }
 
+  function updateDates() {
+    let parsed;
+    const dates = Array.from(document.querySelectorAll('.autodate'));
+    if (!dates) {
+      return;
+    }
+    dates.forEach((el$$1) => {
+      parsed = el$$1.classList.contains('smalldate')
+        ? smalldate(parseInt(el$$1.title, 10))
+        : el$$1(parseInt(el$$1.title, 10));
+      if (parsed !== el$$1.innerHTML) {
+        el$$1.innerHTML = parsed;
+      }
+    });
+  }
+
   function gracefulDegrade(a) {
-    if (typeof RUN !== 'undefined') RUN.updateDates();
-    const links = a.querySelectorAll('a');
+    if (typeof RUN !== 'undefined') {
+      updateDates();
+    }
+    const links = Array.from(a.querySelectorAll('a'));
     links.forEach((link) => {
       if (link.href) {
         if (link.getAttribute('href').charAt(0) === '?') {
@@ -702,9 +734,9 @@ var RUN = (function () {
         }
       }
     });
-    convertSwitches(a.querySelectorAll('.switch'));
+    convertSwitches(Array.from(a.querySelectorAll('.switch')));
 
-    const bbcodeimgs = document.querySelectorAll('.bbcodeimg');
+    const bbcodeimgs = Array.from(document.querySelectorAll('.bbcodeimg'));
     if (bbcodeimgs) {
       onImagesLoaded(
         bbcodeimgs,
@@ -713,7 +745,7 @@ var RUN = (function () {
           imageResizer(bbcodeimgs);
 
           // handle image galleries
-          const galleries = document.querySelectorAll('.image_gallery');
+          const galleries = Array.from(document.querySelectorAll('.image_gallery'));
           galleries.map(makeImageGallery);
         },
         2000,
@@ -721,13 +753,13 @@ var RUN = (function () {
     }
 
     // Initialize page lists that scroll with scroll wheel
-    const pages = a.querySelectorAll('.pages');
+    const pages = Array.from(a.querySelectorAll('.pages'));
     if (pages.length) {
       pages.map(scrollablepagelist);
     }
 
     // Set up date pickers
-    const dateElements = a.querySelectorAll('input.date');
+    const dateElements = Array.from(a.querySelectorAll('input.date'));
     if (dateElements.length) {
       dateElements.forEach((inputElement) => {
         inputElement.onclick = () => DatePicker.init(this);
@@ -790,20 +822,6 @@ var RUN = (function () {
     } else {
       document.addEventListener('DOMContentLoaded', callback);
     }
-  }
-
-  function smalldate(a) {
-    const d = new Date();
-    d.setTime(a * 1000);
-    let hours = d.getHours();
-    const ampm = hours >= 12 ? 'pm' : 'am';
-    hours %= 12;
-    hours = hours || 12;
-    const minutes = `${d.getMinutes()}`.padStart(2, '0');
-    const month = d.getMonth() + 1;
-    const day = `${d.getDate()}`.padStart(2, '0');
-    const year = d.getFullYear();
-    return `${hours}:${minutes}${ampm}, ${month}/${day}/${year}`;
   }
 
   // TODO: Create an instance for this state
@@ -1286,7 +1304,7 @@ var RUN = (function () {
         this.setPosition(this.oldpos, 0);
       } else {
         c.setAttribute('draggable', 'false');
-        const wins = document.querySelectorAll('.window');
+        const wins = Array.from(document.querySelectorAll('.window'));
         const width = wins.reduce((w, window) => {
           if (window.classList.contains('minimized')) {
             return w + Number(window.clientWidth);
@@ -1481,7 +1499,7 @@ var RUN = (function () {
     update(a) {
       let [selector] = a;
       const [html] = a;
-      const paths = document.querySelectorAll('.path');
+      const paths = Aray.from(document.querySelectorAll('.path'));
       if (selector === 'path' && paths.length > 1) {
         paths.forEach((path) => {
           path.innerHTML = html;
@@ -1550,7 +1568,7 @@ var RUN = (function () {
       }
     },
     addshout([message]) {
-      const ss = document.querySelectorAll('#shoutbox .shout');
+      const ss = Array.from(document.querySelectorAll('#shoutbox .shout'));
       let x;
       const span = document.createElement('span');
       const div = span.firstChild;
@@ -1580,7 +1598,7 @@ var RUN = (function () {
       new Animation(tick)
         .add('height', '0px', h)
         .play();
-      const ticks = ticker.querySelectorAll('.tick');
+      const ticks = Array.from(ticker.querySelectorAll('.tick'));
       const l = ticks.length;
       tick.style.display = 'block';
       if (l > 100) {
@@ -1968,29 +1986,13 @@ var RUN = (function () {
 
   /* Returns the path to this script. */
   function getJXBDBaseDir() {
-    const scripts = document.querySelectorAll('script');
+    const scripts = Array.from(document.querySelectorAll('script'));
     const found = scripts
       .find(script => script.src.substr(script.src.length - 8, 8) === 'run.js');
     if (found) {
       return found.src.substr(0, found.src.length - 8);
     }
     return null;
-  }
-
-  function updateDates() {
-    let parsed;
-    const dates = document.querySelectorAll('.autodate');
-    if (!dates) {
-      return;
-    }
-    dates.forEach((el) => {
-      parsed = el.classList.contains('smalldate')
-        ? smalldate(parseInt(el.title, 10))
-        : el(parseInt(el.title, 10));
-      if (parsed !== el.innerHTML) {
-        el.innerHTML = parsed;
-      }
-    });
   }
 
   class AppState {
@@ -2005,7 +2007,7 @@ var RUN = (function () {
       setInterval(updateDates, 1000 * 30);
 
       this.nextDataPoll();
-      setInterval(this.stream.updatePage, 200);
+      setInterval(() => this.stream.updatePage, 200);
 
       if (document.location.toString().indexOf('?') > 0) {
         const hash = `#${document.location.search.substr(1)}`;

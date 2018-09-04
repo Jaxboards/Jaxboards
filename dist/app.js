@@ -611,7 +611,7 @@ var window = (function () {
     if (Browser.chrome) {
       delta *= -1;
     }
-    const p = this.querySelectorAll('a');
+    const p = Array.from(this.querySelectorAll('a'));
     const startPage = parseInt(p[1].innerHTML, 10);
     const lastPage = parseInt(p[p.length - 1].innerHTML, 10);
     const between = p.length - 2;
@@ -675,10 +675,10 @@ var window = (function () {
     let mw;
     let mh;
     let s;
-    if (!imgs) {
+    if (!imgs || !imgs.length) {
       return;
     }
-    imgs
+    Array.from(imgs)
       .filter(img => !img.madeResized)
       .forEach((img) => {
         let p = 1;
@@ -832,9 +832,27 @@ var window = (function () {
     }
   }
 
+  function updateDates() {
+    let parsed;
+    const dates = Array.from(document.querySelectorAll('.autodate'));
+    if (!dates) {
+      return;
+    }
+    dates.forEach((el$$1) => {
+      parsed = el$$1.classList.contains('smalldate')
+        ? smalldate(parseInt(el$$1.title, 10))
+        : el$$1(parseInt(el$$1.title, 10));
+      if (parsed !== el$$1.innerHTML) {
+        el$$1.innerHTML = parsed;
+      }
+    });
+  }
+
   function gracefulDegrade(a) {
-    if (typeof RUN !== 'undefined') RUN.updateDates();
-    const links = a.querySelectorAll('a');
+    if (typeof RUN !== 'undefined') {
+      updateDates();
+    }
+    const links = Array.from(a.querySelectorAll('a'));
     links.forEach((link) => {
       if (link.href) {
         if (link.getAttribute('href').charAt(0) === '?') {
@@ -850,9 +868,9 @@ var window = (function () {
         }
       }
     });
-    convertSwitches(a.querySelectorAll('.switch'));
+    convertSwitches(Array.from(a.querySelectorAll('.switch')));
 
-    const bbcodeimgs = document.querySelectorAll('.bbcodeimg');
+    const bbcodeimgs = Array.from(document.querySelectorAll('.bbcodeimg'));
     if (bbcodeimgs) {
       onImagesLoaded(
         bbcodeimgs,
@@ -861,7 +879,7 @@ var window = (function () {
           imageResizer(bbcodeimgs);
 
           // handle image galleries
-          const galleries = document.querySelectorAll('.image_gallery');
+          const galleries = Array.from(document.querySelectorAll('.image_gallery'));
           galleries.map(makeImageGallery);
         },
         2000,
@@ -869,13 +887,13 @@ var window = (function () {
     }
 
     // Initialize page lists that scroll with scroll wheel
-    const pages = a.querySelectorAll('.pages');
+    const pages = Array.from(a.querySelectorAll('.pages'));
     if (pages.length) {
       pages.map(scrollablepagelist);
     }
 
     // Set up date pickers
-    const dateElements = a.querySelectorAll('input.date');
+    const dateElements = Array.from(a.querySelectorAll('input.date'));
     if (dateElements.length) {
       dateElements.forEach((inputElement) => {
         inputElement.onclick = () => DatePicker.init(this);
@@ -1912,7 +1930,7 @@ var window = (function () {
   }
 
   function parsetree(tree, prefix) {
-    const nodes = tree.querySelectorAll('li');
+    const nodes = Array.from(tree.querySelectorAll('li'));
     const order = {};
     let gotsomethin = 0;
     nodes.forEach((node) => {
@@ -1926,7 +1944,7 @@ var window = (function () {
   }
 
   function sortableTree (tree, prefix, formfield) {
-    const listItems = tree.querySelectorAll('li');
+    const listItems = Array.from(tree.querySelectorAll('li'));
     const items = [];
     const seperators = [];
 
@@ -2176,7 +2194,7 @@ var window = (function () {
         this.setPosition(this.oldpos, 0);
       } else {
         c.setAttribute('draggable', 'false');
-        const wins = document.querySelectorAll('.window');
+        const wins = Array.from(document.querySelectorAll('.window'));
         const width = wins.reduce((w, window) => {
           if (window.classList.contains('minimized')) {
             return w + Number(window.clientWidth);
@@ -2456,7 +2474,7 @@ var window = (function () {
     update(a) {
       let [selector] = a;
       const [html] = a;
-      const paths = document.querySelectorAll('.path');
+      const paths = Aray.from(document.querySelectorAll('.path'));
       if (selector === 'path' && paths.length > 1) {
         paths.forEach((path) => {
           path.innerHTML = html;
@@ -2525,7 +2543,7 @@ var window = (function () {
       }
     },
     addshout([message]) {
-      const ss = document.querySelectorAll('#shoutbox .shout');
+      const ss = Array.from(document.querySelectorAll('#shoutbox .shout'));
       let x;
       const span = document.createElement('span');
       const div = span.firstChild;
@@ -2555,7 +2573,7 @@ var window = (function () {
       new Animation(tick)
         .add('height', '0px', h)
         .play();
-      const ticks = ticker.querySelectorAll('.tick');
+      const ticks = Array.from(ticker.querySelectorAll('.tick'));
       const l = ticks.length;
       tick.style.display = 'block';
       if (l > 100) {
@@ -2943,29 +2961,13 @@ var window = (function () {
 
   /* Returns the path to this script. */
   function getJXBDBaseDir() {
-    const scripts = document.querySelectorAll('script');
+    const scripts = Array.from(document.querySelectorAll('script'));
     const found = scripts
       .find(script => script.src.substr(script.src.length - 8, 8) === 'run.js');
     if (found) {
       return found.src.substr(0, found.src.length - 8);
     }
     return null;
-  }
-
-  function updateDates() {
-    let parsed;
-    const dates = document.querySelectorAll('.autodate');
-    if (!dates) {
-      return;
-    }
-    dates.forEach((el) => {
-      parsed = el.classList.contains('smalldate')
-        ? smalldate(parseInt(el.title, 10))
-        : el(parseInt(el.title, 10));
-      if (parsed !== el.innerHTML) {
-        el.innerHTML = parsed;
-      }
-    });
   }
 
   class AppState {
@@ -2980,7 +2982,7 @@ var window = (function () {
       setInterval(updateDates, 1000 * 30);
 
       this.nextDataPoll();
-      setInterval(this.stream.updatePage, 200);
+      setInterval(() => this.stream.updatePage, 200);
 
       if (document.location.toString().indexOf('?') > 0) {
         const hash = `#${document.location.search.substr(1)}`;

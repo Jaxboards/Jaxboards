@@ -7,7 +7,7 @@ import {
 
 
 function parsetree(tree, prefix) {
-  const nodes = tree.querySelectorAll('li');
+  const nodes = Array.from(tree.querySelectorAll('li'));
   const order = {};
   let gotsomethin = 0;
   nodes.forEach((node) => {
@@ -21,7 +21,7 @@ function parsetree(tree, prefix) {
 }
 
 export default function (tree, prefix, formfield) {
-  const listItems = tree.querySelectorAll('li');
+  const listItems = Array.from(tree.querySelectorAll('li'));
   const items = [];
   const seperators = [];
 

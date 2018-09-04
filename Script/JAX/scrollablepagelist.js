@@ -9,7 +9,7 @@ function scrollpagelist(event) {
   if (Browser.chrome) {
     delta *= -1;
   }
-  const p = this.querySelectorAll('a');
+  const p = Array.from(this.querySelectorAll('a'));
   const startPage = parseInt(p[1].innerHTML, 10);
   const lastPage = parseInt(p[p.length - 1].innerHTML, 10);
   const between = p.length - 2;
