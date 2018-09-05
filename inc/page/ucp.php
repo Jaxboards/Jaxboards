@@ -453,39 +453,74 @@ EOT;
                     $error = 'That display name is already in use.';
                 }
             }
-            if (!$data['dob_month']) {
-                $data['dob_month'] = 0;
+            if (!$data['dob_month']
+                || !is_numeric($data['dob_month'])
+                || $data['dob_month'] < 1
+                || $data['dob_month'] > 12
+            ) {
+                $data['dob_month'] = false;
+            } else {
+                $data['dob_month'] = date(
+                    'm',
+                    strtotime('2000/' . $data['dob_month'] . '/1')
+                );
             }
-            if (!$data['dob_year']) {
-                $data['dob_year'] = 0;
+            if (!$data['dob_year']
+                || !is_numeric($data['dob_year'])
+                || $data['dob_year'] < 1
+                || $data['dob_year'] > (int) date('Y')
+            ) {
+                $data['dob_year'] = '0000';
+            } else {
+                $data['dob_year'] = date(
+                    'Y',
+                    strtotime($data['dob_year'] . '/1/1')
+                );
             }
-            if (!$data['dob_day']) {
-                $data['dob_day'] = 0;
+            if (!$data['dob_day']
+                || !is_numeric($data['dob_day'])
+                || $data['dob_day'] < 1
+            ) {
+                $data['dob_day'] = false;
+            } else {
+                $data['dob_day'] = date(
+                    'd',
+                    strtotime('2000/1/' . $data['dob_day'])
+                );
             }
-            if ($data['dob_month'] || $data['dob_year'] || $data['dob_day']) {
-                if (!is_numeric($data['dob_month'])
-                    || !is_numeric($data['dob_day'])
-                    && !is_numeric($data['dob_year'])
-                ) {
-                    $error = "That isn't a valid birth date.";
+
+            if ($data['dob_month'] && $data['dob_day']) {
+                if (2 === (int) $data['dob_month']) {
+                    if ($data['dob_year'] > 0
+                        && date('L', strtotime($data['dob_year']))
+                    ) {
+                        $daysInMonth = 29;
+                    } elseif ($data['dob_year'] > 0) {
+                        $daysInMonth = 28;
+                    } else {
+                        // If we don't know the year, we can
+                        // let it be a leap year.
+                        $daysInMonth = 29;
+                    }
+                } else {
+                    $daysInMonth = (int) date(
+                        't',
+                        strtotime($data['dob_month'] . '/1')
+                    );
                 }
-                if (($data['dob_month'] % 2)
-                    && 31 == $data['dob_day']
-                    || 2 == $data['dob_month']
-                    && (!$data['dob_year'] % 4
-                    && $data['dob_day'] > 29
-                    || $data['dob_year'] % 4
-                    && $data['dob_day'] > 28)
-                ) {
+                if ($data['dob_day'] > $daysInMonth) {
                     $error = "That birth date doesn't exist!";
                 }
-                $birthdate = date('Y-m-d', strtotime(
+                $data['birthdate'] =
                     $data['dob_year'] . '-' .
                     $data['dob_month'] . '-' .
                     $data['dob_day']
-                ));
+                ;
+            } elseif ($data['dob_month']) {
+                $data['birthdate'] = $data['dob_year'] . '-' .
+                    $data['dob_month'] . '-00';
             } else {
-                $birthdate = '0000-00-00';
+                $data['birthdate'] = $data['dob_year'] . '-00-00';
             }
             unset($data['dob_year']);
             unset($data['dob_month']);
