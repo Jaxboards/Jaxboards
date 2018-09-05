@@ -118,8 +118,8 @@ export default {
     const ss = Array.from(document.querySelectorAll('#shoutbox .shout'));
     let x;
     const span = document.createElement('span');
-    const div = span.firstChild;
     span.innerHTML = message;
+    const div = span.firstChild;
     ss[0].parentNode.insertBefore(div, ss[0]);
     while (ss.length > globalsettings.shoutlimit - 1) {
       x = ss.pop();
