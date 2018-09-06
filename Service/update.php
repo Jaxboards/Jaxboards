@@ -1695,3 +1695,8 @@ EOT
         }
     }
 }
+
+// Create lock file.
+$file = fopen(SERVICE_ROOT . '/update.lock', 'w');
+fwrite($file, '');
+fclose($file);
