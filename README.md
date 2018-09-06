@@ -29,6 +29,17 @@ For the service setup you'll want your webserver configured like this:
 - The apex domain and www subdomain should point to the `Service` directory.
 - Wildcard subdomain of that apex domain should point to the root directory.
 
+### Update Script
+
+If you're running an old Jaxboards database, you can update it to the latest
+with the update script. It's only meant to run via the CLI, so run it with this:
+
+```bash
+/usr/bin/env php ./Service/update.php
+```
+
+If you're just starting to use this repo, it's not needed.
+
 ### Installing
 
 Once you've met all the requirements, head to: `https://example.com/Service/install.php`,
@@ -65,7 +76,7 @@ The tools have `npm` scripts for them, so you can easily get the tools working.
 
 #### JS Compilation
 
-*EXPERIMENTAL / IN PROGRESS*: All Javascript sourcecode is modularized into ES6 classes, and is bundled together using [rollup](https://www.npmjs.com/package/rollup). To build a bundled source ("jsnew.js") from the modules, run:
+_EXPERIMENTAL / IN PROGRESS_: All Javascript sourcecode is modularized into ES6 classes, and is bundled together using [rollup](https://www.npmjs.com/package/rollup). To build a bundled source ("jsnew.js") from the modules, run:
 
 ```bash
 pnpm run build
