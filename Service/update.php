@@ -49,13 +49,16 @@ if ($CFG['service']) {
     $queries = array();
     // Copy over `directory` and `domains` tables from `jaxboards_service`
     // if it exists.
-    $serviceTable = true;
+    $serviceDB = true;
     try {
         $DB->select_db('jaxboards_service');
     } catch (Exception $e) {
-        $serviceTable = false;
+        $serviceDB = false;
     }
-    if ($serviceTable) {
+    if ('jaxboards_service' !== $DB->db) {
+        $serviceDB = false;
+    }
+    if ($serviceDB) {
         $result = $DB->safequery("SHOW TABLES LIKE '%%'");
         $tables = $DB->rows($result);
         foreach ($tables as $table) {
