@@ -274,14 +274,18 @@ class PAGE
     {
         $component = mb_strtolower($component);
         $themeComponentDir = THEMEPATH . 'views/' . $component;
-        error_log($themeComponentDir);
         if (is_dir($themeComponentDir)) {
             $componentDir = $themeComponentDir;
         } else {
             $componentDir = DTHEMEPATH . 'views/' . $component;
+            if (!is_dir($componentDir)) {
+                $componentDir = false;
+            }
         }
-        $this->metaqueue[] = $componentDir;
-        $this->debug("Added ${component} to queue");
+        if (false !== $componentDir) {
+            $this->metaqueue[] = $componentDir;
+            $this->debug("Added ${component} to queue");
+        }
     }
 
     public function processqueue($process)
