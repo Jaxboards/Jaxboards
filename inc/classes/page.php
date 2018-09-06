@@ -273,11 +273,15 @@ class PAGE
     public function loadmeta($component)
     {
         $component = mb_strtolower($component);
-        $componentDir = JAXBOARDS_ROOT . '/views/' . $component;
-        if (is_dir($componentDir)) {
-            $this->metaqueue[] = $componentDir;
-            $this->debug("Added ${component} to queue");
+        $themeComponentDir = THEMEPATH . 'views/' . $component;
+        error_log($themeComponentDir);
+        if (is_dir($themeComponentDir)) {
+            $componentDir = $themeComponentDir;
+        } else {
+            $componentDir = DTHEMEPATH . 'views/' . $component;
         }
+        $this->metaqueue[] = $componentDir;
+        $this->debug("Added ${component} to queue");
     }
 
     public function processqueue($process)
@@ -291,6 +295,22 @@ class PAGE
                 $metaContent = file_get_contents($metaFile);
                 $this->checkextended($metaContent, $metaName);
                 $meta[$metaName] = $metaContent;
+            }
+            // Check default components for anything missing.
+            $defaultComponentDir = str_replace(
+                THEMEPATH,
+                DTHEMEPATH,
+                $componentDir
+            );
+            if ($defaultComponentDir !== $componentDir) {
+                foreach (glob($componentDir . '/*.html') as $metaFile) {
+                    $metaName = pathinfo($metaFile, PATHINFO_FILENAME);
+                    $metaContent = file_get_contents($metaFile);
+                    $this->checkextended($metaContent, $metaName);
+                    if (!isset($meta[$metaName])) {
+                        $meta[$metaName] = $metaContent;
+                    }
+                }
             }
             $this->metadefs = $meta + $this->metadefs;
         }
