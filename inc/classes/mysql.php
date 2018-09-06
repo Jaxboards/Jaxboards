@@ -12,11 +12,13 @@ class MySQL
     public $prefix = '';
     public $usersOnlineCache = '';
     public $ratingNiblets = array();
+    public $db = '';
 
     public function connect($host, $user, $password, $database = '', $prefix = '')
     {
         $this->mysqli_connection = new mysqli($host, $user, $password, $database);
         $this->prefix = $prefix;
+        $this->db = $database;
         if (!$this->mysqli_connection) {
             return false;
         }

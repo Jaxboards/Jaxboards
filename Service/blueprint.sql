@@ -310,7 +310,7 @@ CREATE TABLE `blueprint_reports` (
   `reporter` int(11) unsigned DEFAULT NULL,
   `status` tinyint(4) unsigned NOT NULL,
   `reason` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `time` int(11) unsigned NOT NULL DEFAULT 0,
+  `date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`),
   KEY `reporter` (`reporter`),
   CONSTRAINT `blueprint_reports_ibfk_1` FOREIGN KEY (`reporter`) REFERENCES `blueprint_members` (`id`) ON DELETE SET NULL
