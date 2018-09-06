@@ -35,7 +35,7 @@ if (!('443' === $_SERVER['SERVER_PORT'] && 'https' === $_SERVER['REQUEST_SCHEME'
 ) {
     $baseURL .= (isset($_SERVER['SERVER_PORT']) ? ':' . $_SERVER['SERVER_PORT'] : '');
 }
-define('BOARDURL', $baseURL . '/Jaxboards/');
+define('BOARDURL', $baseURL . '/');
 
 define('SOUNDSURL', BOARDURL . 'Sounds/');
 define('SCRIPTURL', BOARDURL . 'Script/');
