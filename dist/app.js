@@ -858,7 +858,7 @@
         if (href.charAt(0) === '?') {
           const oldclick = link.onclick;
           link.onclick = function onclick() {
-            if (!oldclick || oldclick() !== false) {
+            if (!oldclick || oldclick.call(link) !== false) {
               RUN.stream.location(href);
             }
             return false;
