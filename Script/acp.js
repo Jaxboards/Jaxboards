@@ -91,6 +91,7 @@ window.submitForm = function submitForm(a) {
     values.push(submit.value);
   }
   new Ajax().load(document.location.search, 0, [names, values], 1, 1);
+  // eslint-disable-next-line no-alert
   alert("Saved. Ajax-submitted so you don't lose your place");
   return false;
 };
