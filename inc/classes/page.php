@@ -307,7 +307,7 @@ class PAGE
                 $componentDir
             );
             if ($defaultComponentDir !== $componentDir) {
-                foreach (glob($componentDir . '/*.html') as $metaFile) {
+                foreach (glob($defaultComponentDir . '/*.html') as $metaFile) {
                     $metaName = pathinfo($metaFile, PATHINFO_FILENAME);
                     $metaContent = file_get_contents($metaFile);
                     $this->checkextended($metaContent, $metaName);
