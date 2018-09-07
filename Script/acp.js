@@ -1,16 +1,12 @@
-import JAX from './JAX/index';
 import { onDOMReady } from './JAX/util';
 import { insertAfter, getCoordinates } from './JAX/el';
 import Ajax from './JAX/ajax';
 import Editor from './JAX/editor';
 import sortableTree from './JAX/sortable-tree';
+import autoComplete from './JAX/autocomplete';
 
-// TODO: Remove all globals from this file
-
-window.JAX = JAX;
-
-window.dropdownMenu = function dropdownMenu(e) {
-  const el = e.srcElement || e.target;
+function dropdownMenu(e) {
+  const el = e.target;
   if (el.tagName.toLowerCase() === 'a') {
     const menu = document.querySelector(`#menu_${el.classList[0]}`);
     el.classList.add('active');
@@ -38,61 +34,23 @@ window.dropdownMenu = function dropdownMenu(e) {
       }
     };
   }
-};
-
-function makestuffcool() {
-  const switches = Array.from(document.querySelectorAll('.switch'));
-  switches.forEach((switchEl) => {
-    const t = document.createElement('div');
-    t.className = switchEl.className.replace('switchEl', 'switchEl_converted');
-    t.s = switchEl;
-    switchEl.t = t;
-    switchEl.style.display = 'none';
-    if (!switchEl.checked) t.style.backgroundPosition = 'bottom';
-    const set = (onoff = switchEl.checked) => {
-      switchEl.checked = onoff;
-      switchEl.t.style.backgroundPosition = switchEl.checked ? 'top' : 'bottom';
-      if (switchEl.onchange) switchEl.onchange();
-    };
-    t.onclick = () => set();
-    insertAfter(t, switchEl);
-  });
-
-  const editor = document.querySelector('.editor');
-  if (editor) {
-    editor.onkeydown = (event) => {
-      if (event.keyCode === 9) {
-        Editor.setSelection(editor, '    ');
-        return false;
-      }
-      return true;
-    };
-  }
-
-  // Orderable forums needs this
-  const tree = document.querySelector('.tree');
-  if (tree) {
-    sortableTree(tree, 'forum_', document.querySelector('#ordered'));
-  }
 }
-onDOMReady(makestuffcool);
 
-window.submitForm = function submitForm(a) {
+function submitForm(form) {
   const names = [];
   const values = [];
-  let x;
-  const elements = Array.from(a.elements);
-  const submit = a.submitButton;
+  const elements = Array.from(form.elements);
+  const submit = form.submitButton;
   elements.forEach((element) => {
     if (!element.name || element.type === 'submit') return;
     if (
-      (element.type === 'checkbox' || a[x].type === 'radio')
-      && !a[x].checked
+      (element.type === 'checkbox' || element.type === 'radio')
+      && !element.checked
     ) {
       return;
     }
-    names.push(a[x].name);
-    values.push(a[x].value);
+    names.push(element.name);
+    values.push(element.value);
   });
 
   if (submit) {
@@ -102,5 +60,58 @@ window.submitForm = function submitForm(a) {
   new Ajax().load(document.location.search, { data: [names, values] });
   // eslint-disable-next-line no-alert
   alert("Saved. Ajax-submitted so you don't lose your place");
-  return false;
+}
+
+// TODO: Remove all globals in this file
+window.ACP = {
+  autoComplete,
+  getCoordinates,
+  dropdownMenu,
 };
+
+function makestuffcool() {
+  // Dropdown menu
+  document.querySelector('#nav').addEventListener('mouseover', dropdownMenu);
+
+  Array.from(document.querySelectorAll('form[data-use-ajax-submit]')).forEach((form) => {
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      submitForm(form);
+    });
+  });
+
+  // Converts all switches (checkboxes) into graphics, to show "X" or "check"
+  const switches = Array.from(document.querySelectorAll('.switch'));
+  switches.forEach((switchEl) => {
+    const toggle = document.createElement('div');
+    toggle.className = switchEl.className.replace('switch', 'switch_converted');
+    switchEl.style.display = 'none';
+    if (!switchEl.checked) {
+      toggle.style.backgroundPosition = 'bottom';
+    }
+    toggle.addEventListener('click', () => {
+      switchEl.checked = !switchEl.checked;
+      toggle.style.backgroundPosition = switchEl.checked ? 'top' : 'bottom';
+      switchEl.dispatchEvent(new Event('change'));
+    });
+    insertAfter(toggle, switchEl);
+  });
+
+  // Makes editors capable of tabbing for indenting
+  const editor = document.querySelector('.editor');
+  if (editor) {
+    editor.addEventListener('keydown', (event) => {
+      if (event.keyCode === 9) {
+        Editor.setSelection(editor, '    ');
+        event.preventDefault();
+      }
+    });
+  }
+
+  // Orderable forums needs this
+  const tree = document.querySelector('.tree');
+  if (tree) {
+    sortableTree(tree, 'forum_', document.querySelector('#ordered'));
+  }
+}
+onDOMReady(makestuffcool);

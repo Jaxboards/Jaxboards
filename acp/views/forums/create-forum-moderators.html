@@ -6,8 +6,8 @@
     <td>
       <% MOD_LIST %>
       <br />
-      <input type="text" name="name" onkeyup="document.querySelector('#validname').className='bad';
-            JAX.autoComplete('act=searchmembers&term='+
+      <input type="text" name="name" autocomplete="off" onkeyup="document.querySelector('#validname').className='bad';
+            ACP.autoComplete('act=searchmembers&term='+
             'this.value,this,document.querySelector('#modid'),event);" />
       <input type="hidden" id="modid" name="modid" onchange="document.querySelector('#validname').className='good'" />
       <span id="validname"></span>

@@ -300,9 +300,9 @@ EOT
             }
         } else {
             $page = "<form method='post'>
-                Member Name: <input type='text' name='name' " .
+                Member Name: <input type='text' name='name' autocomplete='off' " .
                 "onkeyup=\"document.querySelector('#validname').className='bad';" .
-                "JAX.autoComplete('act=searchmembers&term='" .
+                "ACP.autoComplete('act=searchmembers&term='" .
                 "+this.value,this,document.querySelector('#mid'),event);\" />
                 <input type='hidden' id='mid' name='mid' " .
                 "onchange=\"document.querySelector('#validname').className='good'\"/>" .
@@ -566,15 +566,15 @@ EOT
         $page .= '<form method="post">
             <p>This tool is used for merging duplicate accounts. ' .
             'Merge the duplicate account with the original account.</p>
-            <label>Merge:</label><input type="text" name="name1" ' .
-            'onkeyup="document.querySelector(\'#validname\').className=\'bad\';JAX.autoComplete(' .
+            <label>Merge:</label><input type="text" name="name1" autocomplete="off" ' .
+            'onkeyup="document.querySelector(\'#validname\').className=\'bad\';ACP.autoComplete(' .
             '\'act=searchmembers&term=\'+this.value,this,document.querySelector(\'#mid1\'),event);" />
             <input type="hidden" id="mid1" name="mid1" ' .
             'onchange="document.querySelector(\'#validname\').className=\'good\'"/>' .
             '<span id="validname"></span><br />
-            <label>With:</label><input type="text" name="name2" ' .
+            <label>With:</label><input type="text" name="name2" autocomplete="off" ' .
             'onkeyup="document.querySelector(\'#validname2\').className=\'bad\';' .
-            'JAX.autoComplete(\'act=searchmembers&term=\'+' .
+            'ACP.autoComplete(\'act=searchmembers&term=\'+' .
             'this.value,this,document.querySelector(\'#mid2\'),event);" />
             <input type="hidden" id="mid2" name="mid2" ' .
             'onchange="document.querySelector(\'#validname2\').className=\'good\'"/>' .
@@ -656,7 +656,7 @@ EOT
             All traces of the member ever even existing will vanish away!</p>
             <label>Member Name:</label><input type="text" name="name" ' .
             'onkeyup="document.querySelector(\'#validname\').className=\'bad\';' .
-            'JAX.autoComplete(\'act=searchmembers&term=\'+' .
+            'ACP.autoComplete(\'act=searchmembers&term=\'+' .
             'this.value,this,document.querySelector(\'#mid\'),event);" autocomplete="off" />
             <input type="hidden" id="mid" name="mid" ' .
             'onchange="document.querySelector(\'#validname\').className=\'good\'"/>' .

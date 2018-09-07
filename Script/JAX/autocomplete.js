@@ -1,11 +1,11 @@
 import Ajax from './ajax';
-import Event from './event';
+import JaxEvent from './event';
 import { getHighestZIndex, getCoordinates } from './el';
 
 export default function (queryParams, el, dummy, event = {}) {
-  const e = Event(event);
+  const e = JaxEvent(event);
   el.onkeydown = (event2) => {
-    const e2 = Event(event2);
+    const e2 = JaxEvent(event2);
     if (e2.ENTER) {
       e2.cancel();
       return false;
@@ -25,7 +25,7 @@ export default function (queryParams, el, dummy, event = {}) {
     document.querySelector('#page').appendChild(d);
   } else {
     d.style.display = '';
-    els = d.getElementsByTagName('div');
+    els = Array.from(d.querySelectorAll('div'));
     l = els.length;
     sindex = els.findIndex(elmnt => elmnt.classList.contains('selected'));
   }
@@ -50,32 +50,33 @@ export default function (queryParams, el, dummy, event = {}) {
   } else if (e.ENTER && l && sindex >= -1) {
     els[sindex].onclick();
   } else {
+    const relativePath = document.location.toString().match('/acp/') ? '../' : '';
     new Ajax().load(
-      `${document.location.toString().match('/acp/') ? '../' : ''
-      }misc/listloader.php?${
-        queryParams}`,
-      (xml) => {
-        const results = JSON.parse(xml.responseText);
-        d.innerHTML = '';
-        if (!results.length) {
-          d.style.display = 'none';
-        } else {
-          results.forEach((key, i) => {
-            const value = results[1][i];
-            const div = document.createElement('div');
-            div.innerHTML = value;
-            div.key = key;
-            div.onclick = () => {
-              div.parentNode.style.display = 'none';
-              if (dummy) {
-                dummy.value = key;
-                if (dummy.onchange) dummy.onchange();
-              }
-              el.value = this.innerHTML;
-            };
-            d.appendChild(div);
-          });
-        }
+      `${relativePath}misc/listloader.php?${queryParams}`,
+      {
+        callback: (xml) => {
+          const results = JSON.parse(xml.responseText);
+          d.innerHTML = '';
+          if (!results.length) {
+            d.style.display = 'none';
+          } else {
+            const [ids, values] = results;
+            ids.forEach((key, i) => {
+              const value = values[i];
+              const div = document.createElement('div');
+              div.innerHTML = value;
+              div.onclick = () => {
+                div.parentNode.style.display = 'none';
+                if (dummy) {
+                  dummy.value = key;
+                  dummy.dispatchEvent(new Event('change'));
+                }
+                el.value = value;
+              };
+              d.appendChild(div);
+            });
+          }
+        },
       },
     );
   }

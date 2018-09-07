@@ -26,7 +26,7 @@ class forums
 <ul>
     ${sidebar}
     <li><a href="?act=stats">Refresh Statistics</a></li>
-</ul>'
+</ul>
 EOT
         );
 
@@ -560,9 +560,9 @@ EOT
         } else {
             $moderators .= 'No forum-specific moderators added!';
         }
-        $moderators .= '<br /><input type="text" name="name" ' .
+        $moderators .= '<br /><input type="text" name="name" autcomplete="off" ' .
             'onkeyup="document.querySelector(\'#validname\').className=\'bad\';' .
-            'JAX.autoComplete(\'act=searchmembers&term=\'+' .
+            'ACP.autoComplete(\'act=searchmembers&term=\'+' .
             'this.value,this,document.querySelector(\'#modid\'),event);" />
             <input type="hidden" id="modid" name="modid" ' .
             'onchange="document.querySelector(\'#validname\').className=\'good\'"/>' .

@@ -306,7 +306,7 @@ EOT;
         $PAGE->addContentBox(
             ($skin['custom'] ? 'Editing' : 'Viewing') . ' Skin: ' . $skin['title'],
             "
-  <form method='post' onsubmit='return submitForm(this)'>
+  <form method='post' data-use-ajax-submit='true'>
   <textarea name='newskindata' class='editor'>" .
             $JAX->blockhtml(
                 file_get_contents(
@@ -347,7 +347,7 @@ EOT;
             }
             $PAGE->addContentBox(
                 "Editing Wrapper: ${wrapper}",
-                "${saved}<form method='post'><textarea name='newwrapper' " .
+                "${saved}<form method='post' data-use-ajax-submit='true'><textarea name='newwrapper' " .
                 "class='editor'>" .
                 $JAX->blockhtml(file_get_contents($wrapperf)) .
                 "</textarea><input type='submit' " .
