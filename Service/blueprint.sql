@@ -375,8 +375,7 @@ CREATE TABLE `blueprint_skins` (
 
 TRUNCATE `blueprint_skins`;
 INSERT INTO `blueprint_skins` (`id`, `using`, `title`, `custom`, `wrapper`, `default`, `hidden`) VALUES
-(1,	1,	'Default',	0,	'Default',	1,	0),
-(2,	0,	'Blue Default',	0,	'Default',	0,	0);
+(1,	1,	'Default',	0,	'Default',	1,	0);
 
 DROP TABLE IF EXISTS `blueprint_stats`;
 CREATE TABLE `blueprint_stats` (

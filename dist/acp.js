@@ -837,7 +837,7 @@
   window.dropdownMenu = function dropdownMenu(e) {
     const el$$1 = e.srcElement || e.target;
     if (el$$1.tagName.toLowerCase() === 'a') {
-      const menu = document.querySelector(`#menu_${el$$1.className}`);
+      const menu = document.querySelector(`#menu_${el$$1.classList[0]}`);
       el$$1.classList.add('active');
       const s = menu.style;
       s.display = 'block';
@@ -916,6 +916,7 @@
       values.push(submit.value);
     }
     new Ajax().load(document.location.search, 0, [names, values], 1, 1);
+    // eslint-disable-next-line no-alert
     alert("Saved. Ajax-submitted so you don't lose your place");
     return false;
   };

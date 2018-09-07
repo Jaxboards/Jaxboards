@@ -12,7 +12,7 @@ import Editor from './JAX/editor';
 window.dropdownMenu = function dropdownMenu(e) {
   const el = e.srcElement || e.target;
   if (el.tagName.toLowerCase() === 'a') {
-    const menu = document.querySelector(`#menu_${el.className}`);
+    const menu = document.querySelector(`#menu_${el.classList[0]}`);
     el.classList.add('active');
     const s = menu.style;
     s.display = 'block';
