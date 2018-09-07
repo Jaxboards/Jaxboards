@@ -96,9 +96,6 @@
   background-position: -549px 0;
 }
 
-/********
-  Get them to move down on hover, fuck firefox and it's non background-position-y support :(
-                                                                                       *********/
 .editbar a:hover.bold {
   width: 32px;
 }

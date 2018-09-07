@@ -152,7 +152,7 @@ export function gracefulDegrade(a) {
   const dateElements = Array.from(a.querySelectorAll('input.date'));
   if (dateElements.length) {
     dateElements.forEach((inputElement) => {
-      inputElement.onclick = () => DatePicker.init(this);
+      inputElement.onclick = () => DatePicker.init(inputElement);
       inputElement.onkeydown = () => DatePicker.hide();
     });
   }

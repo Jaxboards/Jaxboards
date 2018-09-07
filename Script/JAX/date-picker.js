@@ -130,7 +130,7 @@ class DatePicker {
         row = dp.insertRow(dp.rows.length);
       }
       cell = row.insertCell((first + x) % 7);
-      cell.onclick = () => this.insert(this);
+      cell.onclick = this.insert.bind(this, cell);
 
       cell.className = `day${
         year === this.selectedDate[0]
@@ -165,7 +165,7 @@ class DatePicker {
   insert(cell) {
     const l = this.lastDate;
     this.el.value = `${l[1] + 1}/${cell.innerHTML}/${l[0]}`;
-    this.hide();
+    DatePicker.hide();
   }
 }
 
