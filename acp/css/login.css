@@ -1,20 +1,24 @@
+html,
+body {
+  font-size: 1em;
+}
+
 html {
   height: 100%;
 }
 
 body {
-  background: url(/Service/acp/Theme/img/loginglow.png) center no-repeat #274463;
-  font-family: Arial, sans-serif;
+  background: url(../img/loginglow.png) center no-repeat #274463;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   height: 100%;
   margin: 0;
 }
 
 input[type="submit"] {
-  background: url(/Service/acp/Theme/img/buttonbg.png);
-  border-radius: 9px;
+  background: url(../img/buttonbg.png);
+  border-radius: 0.25em;
   border: 1px solid #000;
   color: #fff;
-  font-size: 15px;
   margin-top: 30px;
 }
 
@@ -32,7 +36,6 @@ label {
 #login {
   background: #fff;
   border: 1px solid #000;
-  font-size: 20px;
   height: 300px;
   left: 50%;
   margin: -150px 0 0 -250px;
@@ -47,7 +50,7 @@ label {
 }
 
 #logo {
-  background: url(/Service/acp/Theme/img/loginlogo.png) center;
+  background: url(../img/loginlogo.png) center;
   border: 1px solid #2d4669;
   height: 90px;
 }
@@ -56,7 +59,15 @@ label {
   background: #fdd;
   border: 1px solid #f00;
   color: #f00;
-  font-size: 15px;
   margin: -20px 5px 20px 5px;
   padding: 5px;
+}
+
+.goBack {
+  margin: 1em auto;
+}
+
+.goBackLink {
+  font-size: 0.75em;
+  padding: 1ch 1em;
 }

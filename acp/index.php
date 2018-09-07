@@ -18,7 +18,6 @@ ini_set('session.cookie_httponly', 1);
 ini_set('session.use_cookies', 1);
 ini_set('session.use_only_cookies', 1);
 session_start();
-ob_start();
 
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', dirname(__DIR__));
@@ -35,6 +34,7 @@ define('INACP', 'true');
 require JAXBOARDS_ROOT . '/config.php';
 require JAXBOARDS_ROOT . '/inc/classes/jax.php';
 require JAXBOARDS_ROOT . '/inc/classes/mysql.php';
+require JAXBOARDS_ROOT . '/acp/page.php';
 
 $DB = new MySQL();
 $DB->connect(
@@ -83,44 +83,31 @@ EOT
         }
     }
 }
-?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "https://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="https://www.w3.org/1999/xhtml/" xml:lang="en" lang="en">
- <head>
-  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-  <link rel="stylesheet" type="text/css"
-    href="<?php echo BOARDURL; ?>acp/css/index.css"/>
- </head>
- <body>
-  <div id="container">
-  <div id="login">
-   <div id="logo"></div>
-   <div id="loginform">
-<?php
+
+$themeElements = array(
+    'board_name' => $CFG['boardname'],
+    'board_url' => BOARDURL,
+    'content' => '',
+    'css_url' => BOARDURL . 'acp/css/login.css',
+    'favicon_url' => BOARDURL . 'favicon.ico',
+);
+
+$PAGE = new PAGE();
+
 if ($submitted) {
     if ((isset($uinfo) && false === $uinfo) || !$verified_password) {
-        echo '<div class="error">' .
-            'The username/password supplied was incorrect.</div>';
+        $themeElements['content'] = $PAGE->error(
+            'The username/password supplied was incorrect'
+        );
     } elseif (isset($uinfo) && $notadmin) {
-        echo '<div class="error">You are not authorized to login to the ACP</div>';
+        $themeElements['content'] = $PAGE->error(
+            'You are not authorized to login to the ACP'
+        );
     }
 }
 
-?>
-    <form method="post">
-     <label for="user">Username:</label>
-    <input type="text" name="user" id="user" /><br />
-     <label for="pass">Password:</label>
-    <input type="password" name="pass" id="pass" /><br />
-     <input type="submit" value="Login to the ACP" name="submit" />
-    </form>
-   </div>
-  </div>
-  </div>
-<script type='text/javascript'>
-document.getElementById('user').focus()
-    </script>
- </body>
-</html>
-<?php ob_end_flush(); ?>
+
+echo $PAGE->parseTemplate(
+    JAXBOARDS_ROOT . '/acp/views/login.html',
+    $themeElements
+);

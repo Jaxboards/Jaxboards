@@ -13,18 +13,22 @@
  *
  * @link https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
-define('INACP', 'true');
-
 ini_set('session.cookie_secure', 1);
 ini_set('session.cookie_httponly', 1);
 ini_set('session.use_cookies', 1);
 ini_set('session.use_only_cookies', 1);
 session_start();
 
-require '../inc/classes/mysql.php';
-require '../config.php';
-require '../inc/classes/jax.php';
-require './page.php';
+if (!defined('JAXBOARDS_ROOT')) {
+    define('JAXBOARDS_ROOT', dirname(__DIR__));
+}
+
+define('INACP', 'true');
+
+require JAXBOARDS_ROOT . '/config.php';
+require JAXBOARDS_ROOT . '/inc/classes/jax.php';
+require JAXBOARDS_ROOT . '/inc/classes/mysql.php';
+require JAXBOARDS_ROOT . '/acp/page.php';
 
 /**
  * Strip slashes from input, recurisvely.

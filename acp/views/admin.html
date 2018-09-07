@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="<% CSS_URL %>" />
+    <link rel="stylesheet" type="text/css" href="<% BBCODE_CSS_URL %>" />
+    <link rel="stylesheet" type="text/css" href="<% THEMES_CSS_URL %>" />
+    <script type="text/javascript" src="<% APP_JS_URL %>"></script>
+    <script type="text/javascript" src="<% ADMIN_JS_URL %>"></script>
+    <title>
+      <% TITLE %>
+    </title>
+  </head>
+
+  <body>
+    <a id="header" href="admin.php"></a>
+    <div id="userbox">Logged in as:
+      <% USERNAME %>
+      <a href="../">Back to Board</a></div>
+    <% NAV %>
+    <div id="page">
+      <% SIDEBAR %>
+      <div class="right">
+        <% CONTENT %>
+      </div>
+    </div>
+  </body>
+
+</html>

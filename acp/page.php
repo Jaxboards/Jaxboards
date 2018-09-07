@@ -2,9 +2,25 @@
 
 class PAGE
 {
-    public $CFG;
-    public $parts = array('sidebar' => '', 'content' => '');
-    public $partparts = array('nav' => '', 'navdropdowns' => '');
+    public $CFG = array();
+    public $parts = array();
+    public $partparts = array();
+
+    /**
+     * Constructor for the PAGE object
+     */
+    public function __construct()
+    {
+        $this->parts = array(
+            'title' => '',
+            'sidebar' => '',
+            'content' => ''
+        );
+        $this->partparts = array(
+            'nav' => '',
+            'navdropdowns' => ''
+        );
+    }
 
     /**
      * Creates a nav menu in the ACP.
@@ -18,14 +34,33 @@ class PAGE
      */
     public function addNavmenu($title, $page, $menu)
     {
-        $this->partparts['nav'] .=
-            '<a href="' . $page . '" class="' . mb_strtolower($title) . '">' . $title . '</a>';
-        $this->partparts['navdropdowns'] .=
-            '<div class="dropdownMenu" id="menu_' . mb_strtolower($title) . '">';
-        foreach ($menu as $k => $v) {
-            $this->partparts['navdropdowns'] .= '<a href="' . $k . '">' . $v . '</a>';
+        $this->partparts['nav'] .= $this->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/nav-link.html',
+            array(
+                'page' => $page,
+                'class' => mb_strtolower($title),
+                'title' => $title,
+            )
+        ) . PHP_EOL;
+
+        $navDropdownLinksTemplate = '';
+        foreach ($menu as $menu_url => $menu_title) {
+            $navDropdownLinksTemplate .= $this->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/nav-dropdown-link.html',
+                array(
+                    'url' => $menu_url,
+                    'title' => $menu_title,
+                )
+            ) . PHP_EOL;
         }
-        $this->partparts['navdropdowns'] .= '</div>';
+
+        $this->partparts['navdropdowns'] .= $this->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/nav-dropdown.html',
+            array(
+                'dropdown_id' => 'menu_' . mb_strtolower($title),
+                'dropdown_links' => $navDropdownLinksTemplate,
+            )
+        ) . PHP_EOL;
     }
 
     public function append($a, $b)
@@ -36,9 +71,12 @@ class PAGE
     public function sidebar($sidebar)
     {
         if ($sidebar) {
-            $this->parts['sidebar']
-                = "<div class='sidebar'><a href='?' class='icons home'>ACP Home</a>" .
-                $sidebar . '</div>';
+            $this->parts['sidebar'] = $this->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/sidebar.html',
+                array(
+                    'content' => $sidebar,
+                )
+            );
         } else {
             $this->parts['sidebar'] = '';
         }
@@ -51,62 +89,71 @@ class PAGE
 
     public function addContentBox($title, $content)
     {
-        $this->parts['content'] .=
-            '<div class="box"><div class="header">' . $title .
-            '</div><div class="content">' . $content . '</div></div>';
+        $this->parts['content'] .= $this->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/content-box.html',
+            array(
+                'title' => $title,
+                'content' => $content,
+            )
+        );
     }
 
     public function out()
     {
-        $template = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "https://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="https://www.w3.org/1999/xhtml/" xml:lang="en" lang="en">
- <head>
-  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-  <link rel="stylesheet" type="text/css" href="' . BOARDURL .
-        'Service/acp/Theme/css.css" />
-  <link rel="stylesheet" type="text/css" href="' . BOARDURL .
-        'Service/Themes/Default/bbcode.css" />
-  <link rel="stylesheet" type="text/css"
-    href="' . BOARDURL . 'acp/css/themes.css"/>
-  <script type="text/javascript" src="' . BOARDURL .
-        'dist/acp.js"></script>
-  <title><% TITLE %></title>
- </head>
- <body>
-  <a id="header" href="admin.php"></a>
-  <div id="userbox">Logged in as: <% USERNAME %>
-    <a href="../">Back to Board</a></div>
-  <% NAV %>
-  <div id="page">
-    <% SIDEBAR %>
-   <div class="right">
-    <% CONTENT %>
-   </div>
-  </div>
- </body>
-</html>';
-        $this->parts['nav'] = '<div id="nav" onmouseover="dropdownMenu(event)">' .
-            $this->partparts['nav'] . '</div>' . $this->partparts['navdropdowns'];
-        foreach ($this->parts as $k => $v) {
-            $template = str_replace('<% ' . mb_strtoupper($k) . ' %>', $v, $template);
+        $data = $this->parts;
+
+        if (!isset($this->partparts['nav'])) {
+            $this->partparts['nav'] = '';
         }
-        echo $template;
+        if (!isset($this->partparts['navdropdowns'])) {
+            $this->partparts['navdropdowns'] = '';
+        }
+
+        $data['nav'] = $this->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/nav.html',
+            array(
+                'nav' => $this->partparts['nav'],
+                'nav_dropdowns' => $this->partparts['navdropdowns'],
+            )
+        );
+        $data['css_url'] = BOARDURL . 'acp/css/css.css';
+        $data['bbcode_css_url'] = BOARDURL . 'Service/Themes/Default/bbcode.css';
+        $data['themes_css_url'] = BOARDURL . 'acp/css/themes.css';
+        $data['app_js_url'] = BOARDURL . 'dist/app.js';
+        $data['admin_js_url'] = BOARDURL . 'dist/acp.js';
+
+        echo $this->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/admin.html',
+            $data
+        );
     }
 
     public function back()
     {
-        return "<a href='javascript:history.back()'>Back</a>";
+        return $this->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/back.html',
+            array()
+        );
     }
 
     public function error($a)
     {
-        return "<div class='error'>${a}</div>";
+        return $this->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/error.html',
+            array(
+                'content' => $a,
+            )
+        );
     }
 
     public function success($a)
     {
-        return "<div class='success'>${a}</div>";
+        return $this->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/success.html',
+            array(
+                'content' => $a,
+            )
+        );
     }
 
     public function location($a)
@@ -156,7 +203,7 @@ EOT;
         }
         $this->CFG = $CFG;
 
-        return $this->writeData(BOARDPATH . 'config.php', 'CFG', $CFG);
+        return $this->writeData(BOARDPATH . 'config.php', 'CFG', $this->CFG);
     }
 
     public function getCFGSetting($setting)
@@ -167,5 +214,36 @@ EOT;
         }
 
         return @$this->CFG[$setting];
+    }
+
+    /**
+     * Parse a template file, replacing <% TAGS %> with the appropriate $data
+     *
+     * @param string $templtaeFile  The path to the template file.
+     * @param array  $data          A key => value array, where <% KEY %>
+     *                              is replaced by value
+     *
+     * @return string Returns the template with the data replaced.
+     */
+    public function parseTemplate($templateFile, $data = null)
+    {
+        try {
+            $template = file_get_contents($templateFile);
+        } catch (Exception $e) {
+            return '';
+        }
+        if (false === $template) {
+            return '';
+        }
+        if (is_array($data)) {
+            foreach ($data as $name => $content) {
+                $template = str_replace(
+                    '<% ' . mb_strtoupper($name) . ' %>',
+                    $content,
+                    $template
+                );
+            }
+        }
+        return $template;
     }
 }

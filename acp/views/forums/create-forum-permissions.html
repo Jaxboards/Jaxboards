@@ -1,0 +1,49 @@
+<table id="perms">
+  <tr>
+    <th>
+      Group
+    </th>
+    <th>
+      Use Global?
+    </th>
+    <th>
+      View
+    </th>
+    <th>
+      Read
+    </th>
+    <th>
+      Start
+    </th>
+    <th>
+      Reply
+    </th>
+    <th>
+      Upload
+    </th>
+    <th>
+      Polls
+    </th>
+  </tr>
+  <% CONTENT %>
+</table>
+<br />
+<div class="center">
+  <input type="submit" value="<% SUBMIT %>" name="submit" />
+</div>
+</form>
+<script type='text/javascript'>
+function globaltoggle(a, checked)
+{
+  for (var x = 0; x < 6; x++) a.cells[x + 2].style.visibility = checked ?
+    "hidden" : "visible"
+}
+var perms = document.querySelector("#perms")
+for (var x = 1; x < perms.rows.length; x++)
+{
+  globaltoggle(perms.rows[x], perms.rows[x].getElementsByTagName(
+    "input"
+  )[0].checked)
+}
+
+</script>
