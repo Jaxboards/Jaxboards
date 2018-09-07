@@ -238,7 +238,7 @@ a:visited {
   background: url(img/acp-box-content.png) top repeat-x #e2e2e2;
 }
 
-.dd_menu {
+.dropdownMenu {
   display: none;
   border: 1px solid #000;
   background: #a3a3a3;
@@ -249,7 +249,7 @@ a:visited {
 }
 
 /* stylelint-disable no-descending-specificity */
-.dd_menu a {
+.dropdownMenu a {
   display: block;
   color: #333;
   padding: 10px;
@@ -260,7 +260,7 @@ a:visited {
 /* stylelint-enable no-descending-specificity */
 
 /* stylelint-disable no-descending-specificity */
-.dd_menu a:hover {
+.dropdownMenu a:hover {
   background: #bbb;
   border: 1px solid #000;
   border-style: solid none;

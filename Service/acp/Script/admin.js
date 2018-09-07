@@ -1,15 +1,11 @@
-function dd_menu(e) {
-  e = e || window.event;
-  var el = e.srcElement || e.target;
-  var menu;
-  var p;
-  var s;
-  if (el.tagName.toLowerCase() == "a") {
-    var menu = document.querySelector("#menu_" + el.className);
+window.dropdownMenu = (e) => {
+  const el = e.srcElement || e.target;
+  if (el.tagName.toLowerCase() === "a") {
+    const menu = document.querySelector("#menu_" + el.className);
     el.classList.add("active");
-    s = menu.style;
+    const s = menu.style;
     s.display = "block";
-    p = JAX.el.getCoordinates(el);
+    const p = JAX.el.getCoordinates(el);
     s.top = p.y + el.clientHeight + "px";
     s.left = p.x + "px";
     el.onmouseout = function(e) {

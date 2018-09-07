@@ -845,7 +845,7 @@ EOT
             $PAGE->location('?act=vt' . $tid . '&getlast=1');
         } else {
             $PAGE->JS('closewindow', '#qreply');
-            $PAGE->JS('script', 'RUN.stream.donext(1)');
+            $PAGE->JS('script', 'RUN.stream.pollData(true)');
         }
     }
 }

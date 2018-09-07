@@ -117,7 +117,7 @@ class Window {
         document.documentElement.clientHeight - 50,
       )
       .apply(windowContainer, titleBar);
-    windowContainer.close = this.close;
+    windowContainer.close = () => this.close();
     windowContainer.minimize = this.minimize;
     return windowContainer;
   }

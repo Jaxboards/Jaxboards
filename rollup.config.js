@@ -22,4 +22,12 @@ export default [
       format: 'iife',
     },
   },
+  {
+    input: 'Script/acp.js',
+    output: {
+      file: 'dist/acp.js',
+      name: 'RUN',
+      format: 'iife',
+    },
+  },
 ];

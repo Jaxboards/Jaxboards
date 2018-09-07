@@ -1041,9 +1041,13 @@
   }
 
   class Drag {
+    constructor() {
+      this.droppables = [];
+    }
+
     start(event, t, handle) {
       const e = new Event$1(event).cancel().stopBubbling();
-      const el$$1 = t || this;
+      const el$$1 = t || event.target;
       const s = getComputedStyle(el$$1);
       const highz = getHighestZIndex();
       if (this.noChild && (e.srcElement || e.target) !== (handle || el$$1)) {
@@ -1073,7 +1077,7 @@
         drag: event2 => this.drag(event2),
         drop: event2 => this.drop(event2),
       };
-      document.addEventListener('mouseup', this.boundEvents.drag);
+      document.addEventListener('mousemove', this.boundEvents.drag);
       document.addEventListener('mouseup', this.boundEvents.drop);
       this.drag(e);
     }
@@ -1142,8 +1146,8 @@
     }
 
     drop() {
-      document.removeEventListener('mouseup', this.boundEvents.drag);
-      document.removeEventListener('mousemove', this.boundEvents.drop);
+      document.removeEventListener('mouseup', this.boundEvents.drop);
+      document.removeEventListener('mousemove', this.boundEvents.drag);
       tryInvoke(this.ondrop, this.sess.info);
       if (!this.autoZ) {
         this.sess.el.style.zIndex = this.sess.zIndex;
@@ -1209,8 +1213,8 @@
         el$$1.style.position = 'relative';
       }
       (t || el$$1).onmousedown = t
-        ? e => this.start(e, el$$1, this)
-        : this.start;
+        ? e => this.start(e, el$$1, t)
+        : e => this.start(e, el$$1);
       return this;
     }
 
@@ -2182,7 +2186,7 @@
           document.documentElement.clientHeight - 50,
         )
         .apply(windowContainer, titleBar);
-      windowContainer.close = this.close;
+      windowContainer.close = () => this.close();
       windowContainer.minimize = this.minimize;
       return windowContainer;
     }

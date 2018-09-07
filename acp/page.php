@@ -21,7 +21,7 @@ class PAGE
         $this->partparts['nav'] .=
             '<a href="' . $page . '" class="' . mb_strtolower($title) . '">' . $title . '</a>';
         $this->partparts['navdropdowns'] .=
-            '<div class="dd_menu" id="menu_' . mb_strtolower($title) . '">';
+            '<div class="dropdownMenu" id="menu_' . mb_strtolower($title) . '">';
         foreach ($menu as $k => $v) {
             $this->partparts['navdropdowns'] .= '<a href="' . $k . '">' . $v . '</a>';
         }
@@ -69,9 +69,8 @@ class PAGE
         'Service/Themes/Default/bbcode.css" />
   <link rel="stylesheet" type="text/css"
     href="' . BOARDURL . 'acp/css/themes.css"/>
-  <script type="text/javascript" src="' . BOARDURL . 'dist/jsnew.js"></script>
   <script type="text/javascript" src="' . BOARDURL .
-        'Service/acp/Script/admin.js"></script>
+        'dist/acp.js"></script>
   <title><% TITLE %></title>
  </head>
  <body>
@@ -87,7 +86,7 @@ class PAGE
   </div>
  </body>
 </html>';
-        $this->parts['nav'] = '<div id="nav" onmouseover="dd_menu(event)">' .
+        $this->parts['nav'] = '<div id="nav" onmouseover="dropdownMenu(event)">' .
             $this->partparts['nav'] . '</div>' . $this->partparts['navdropdowns'];
         foreach ($this->parts as $k => $v) {
             $template = str_replace('<% ' . mb_strtoupper($k) . ' %>', $v, $template);

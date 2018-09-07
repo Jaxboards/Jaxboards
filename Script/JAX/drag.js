@@ -11,9 +11,13 @@ import {
 } from './util';
 
 class Drag {
+  constructor() {
+    this.droppables = [];
+  }
+
   start(event, t, handle) {
     const e = new Event(event).cancel().stopBubbling();
-    const el = t || this;
+    const el = t || event.target;
     const s = getComputedStyle(el);
     const highz = getHighestZIndex();
     if (this.noChild && (e.srcElement || e.target) !== (handle || el)) {
@@ -43,7 +47,7 @@ class Drag {
       drag: event2 => this.drag(event2),
       drop: event2 => this.drop(event2),
     };
-    document.addEventListener('mouseup', this.boundEvents.drag);
+    document.addEventListener('mousemove', this.boundEvents.drag);
     document.addEventListener('mouseup', this.boundEvents.drop);
     this.drag(e);
   }
@@ -112,8 +116,8 @@ class Drag {
   }
 
   drop() {
-    document.removeEventListener('mouseup', this.boundEvents.drag);
-    document.removeEventListener('mousemove', this.boundEvents.drop);
+    document.removeEventListener('mouseup', this.boundEvents.drop);
+    document.removeEventListener('mousemove', this.boundEvents.drag);
     tryInvoke(this.ondrop, this.sess.info);
     if (!this.autoZ) {
       this.sess.el.style.zIndex = this.sess.zIndex;
@@ -179,8 +183,8 @@ class Drag {
       el.style.position = 'relative';
     }
     (t || el).onmousedown = t
-      ? e => this.start(e, el, this)
-      : this.start;
+      ? e => this.start(e, el, t)
+      : e => this.start(e, el);
     return this;
   }
 
