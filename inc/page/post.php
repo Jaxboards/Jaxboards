@@ -474,7 +474,7 @@ EOT
 `id`,`title`,`subtitle`,`lp_uid`,UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,
 `fid`,`auth_id`,`replies`,`views`,
 `pinned`,`poll_choices`,`poll_results`,`poll_q`,`poll_type`,`summary`,
-`locked`,UNIX_TIMESTAMP(`date`) AS `date`,`op`,`cal_event`,
+`locked`,UNIX_TIMESTAMP(`date`) AS `date`,`op`,`cal_event`
 EOT
                     ,
                     'topics',
@@ -482,6 +482,7 @@ EOT
                     $tid
                 );
                 $tmp = $DB->arow($result);
+
                 $DB->disposeresult($result);
 
                 if (!$tmp) {

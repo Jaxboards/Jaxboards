@@ -39,7 +39,12 @@
       };
     }
 
-    load(url, callback, data, method = this.setup.method, requestType = 1) {
+    load(url, {
+      callback,
+      data,
+      method = this.setup.method,
+      requestType = 1,
+    } = {}) {
       // requestType is an enum (1=update, 2=load new)
       let sendData = null;
       if (
@@ -2946,10 +2951,10 @@
       this.pollData();
     }
 
-    location(path, b) {
+    location(path, requestType = 2) {
       let a = path.split('?');
       a = a[1] || a[0];
-      this.request.load(`?${a}`, null, null, null, b || 2);
+      this.request.load(`?${a}`, { requestType });
       this.busy = true;
       return false;
     }
@@ -3044,7 +3049,7 @@
         names.push(submit.name);
         values.push(submit.value);
       }
-      this.stream.load('?', 0, [names, values]);
+      this.stream.load('?', { data: [names, values] });
       if (clearFormOnSubmit) {
         form.reset();
       }

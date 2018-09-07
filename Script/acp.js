@@ -99,7 +99,7 @@ window.submitForm = function submitForm(a) {
     names.push(submit.name);
     values.push(submit.value);
   }
-  new Ajax().load(document.location.search, 0, [names, values], 1, 1);
+  new Ajax().load(document.location.search, { data: [names, values] });
   // eslint-disable-next-line no-alert
   alert("Saved. Ajax-submitted so you don't lose your place");
   return false;

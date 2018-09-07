@@ -39,7 +39,12 @@
       };
     }
 
-    load(url, callback, data, method = this.setup.method, requestType = 1) {
+    load(url, {
+      callback,
+      data,
+      method = this.setup.method,
+      requestType = 1,
+    } = {}) {
       // requestType is an enum (1=update, 2=load new)
       let sendData = null;
       if (
@@ -2453,7 +2458,9 @@
       names.push(submit.name);
       values.push(submit.value);
     }
-    new Ajax().load(document.location.search, 0, [names, values], 1, 1);
+    new Ajax().load(document.location.search, {
+      data: [names, values]
+    });
     // eslint-disable-next-line no-alert
     alert("Saved. Ajax-submitted so you don't lose your place");
     return false;

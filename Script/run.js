@@ -68,7 +68,7 @@ class AppState {
       names.push(submit.name);
       values.push(submit.value);
     }
-    this.stream.load('?', 0, [names, values]);
+    this.stream.load('?', { data: [names, values] });
     if (clearFormOnSubmit) {
       form.reset();
     }

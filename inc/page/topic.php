@@ -919,7 +919,7 @@ EOT
 `editby`,`rating`
 EOT
             ,
-            '`posts`',
+            'posts',
             'WHERE `id`=?',
             $id
         );

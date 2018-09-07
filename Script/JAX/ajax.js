@@ -36,7 +36,12 @@ class Ajax {
     };
   }
 
-  load(url, callback, data, method = this.setup.method, requestType = 1) {
+  load(url, {
+    callback,
+    data,
+    method = this.setup.method,
+    requestType = 1,
+  } = {}) {
     // requestType is an enum (1=update, 2=load new)
     let sendData = null;
     if (

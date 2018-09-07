@@ -48,10 +48,10 @@ class Stream {
     this.pollData();
   }
 
-  location(path, b) {
+  location(path, requestType = 2) {
     let a = path.split('?');
     a = a[1] || a[0];
-    this.request.load(`?${a}`, null, null, null, b || 2);
+    this.request.load(`?${a}`, { requestType });
     this.busy = true;
     return false;
   }
