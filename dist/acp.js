@@ -1486,7 +1486,7 @@
         a.title = cmddesc[i];
         a.href = 'javascript:void(0)';
         a.unselectable = 'on';
-        a.onclick = event => this.editbarCommand(event, this.className);
+        a.onclick = event => this.editbarCommand(event, cmd);
         this.editbar.appendChild(a);
       });
     }
@@ -2329,7 +2329,7 @@
     date,
     datepicker: DatePicker,
     drag: Drag,
-    editor: Editor,
+    Editor,
     el,
     event: Event,
     flashTitle,
@@ -2439,7 +2439,10 @@
     const submit = a.submitButton;
     elements.forEach((element) => {
       if (!element.name || element.type === 'submit') return;
-      if ((element.type === 'checkbox' || a[x].type === 'radio') && !a[x].checked) {
+      if (
+        (element.type === 'checkbox' || a[x].type === 'radio')
+        && !a[x].checked
+      ) {
         return;
       }
       names.push(a[x].name);

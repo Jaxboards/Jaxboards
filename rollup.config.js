@@ -1,33 +1,25 @@
 export default [
   {
-    input: 'Script/app.js',
+    input: "Script/app.js",
     output: {
-      file: 'dist/app.js',
-      format: 'iife',
-    },
+      file: "dist/app.js",
+      format: "iife"
+    }
   },
   {
-    input: 'Script/modcontrols.js',
+    input: "Script/modcontrols.js",
     output: {
-      file: 'dist/modcontrols.js',
-      name: 'modcontrols',
-      format: 'iife',
-    },
+      file: "dist/modcontrols.js",
+      name: "modcontrols",
+      format: "iife"
+    }
   },
   {
-    input: 'Script/run.js',
+    input: "Script/acp.js",
     output: {
-      file: 'dist/run.js',
-      name: 'RUN',
-      format: 'iife',
-    },
-  },
-  {
-    input: 'Script/acp.js',
-    output: {
-      file: 'dist/acp.js',
-      name: 'RUN',
-      format: 'iife',
-    },
-  },
+      file: "dist/acp.js",
+      name: "RUN",
+      format: "iife"
+    }
+  }
 ];

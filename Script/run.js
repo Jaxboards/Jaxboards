@@ -1,11 +1,5 @@
-import {
-  gracefulDegrade,
-  updateDates,
-  onDOMReady,
-} from './JAX/util';
-import {
-  stopTitleFlashing,
-} from './JAX/flashing-title';
+import { gracefulDegrade, updateDates, onDOMReady } from './JAX/util';
+import { stopTitleFlashing } from './JAX/flashing-title';
 import Stream from './RUN/stream';
 import Sound from './sound';
 
@@ -34,7 +28,6 @@ class AppState {
       }
     }
 
-
     // Load sounds
     Sound.load('sbblip', './Sounds/blip.mp3', false);
     Sound.load('imbeep', './Sounds/receive.mp3', false);
@@ -54,16 +47,17 @@ class AppState {
       }
 
       if (inputField.type === 'select-multiple') {
-        inputField.options
-          .filter(option => option.selected)
-          .forEach((option) => {
-            names.push(`${inputField.name}[]`);
-            values.push(option.value);
-          });
+        inputField.options.filter(option => option.selected).forEach((option) => {
+          names.push(`${inputField.name}[]`);
+          values.push(option.value);
+        });
         return;
       }
 
-      if ((inputField.type === 'checkbox' || inputField.type === 'radio') && !inputField.checked) {
+      if (
+        (inputField.type === 'checkbox' || inputField.type === 'radio')
+        && !inputField.checked
+      ) {
         return;
       }
       names.push(inputField.name);
@@ -83,7 +77,9 @@ class AppState {
   }
 
   handleQuoting(a) {
-    this.stream.load(`${a.href}&qreply=${document.querySelector('#qreply') ? '1' : '0'}`);
+    this.stream.load(
+      `${a.href}&qreply=${document.querySelector('#qreply') ? '1' : '0'}`,
+    );
   }
 
   setWindowActive() {

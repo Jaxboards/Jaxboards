@@ -1,11 +1,6 @@
 import JAX from './JAX/index';
-import {
-  onDOMReady,
-} from './JAX/util';
-import {
-  insertAfter,
-  getCoordinates,
-} from './JAX/el';
+import { onDOMReady } from './JAX/util';
+import { insertAfter, getCoordinates } from './JAX/el';
 import Ajax from './JAX/ajax';
 import Editor from './JAX/editor';
 import sortableTree from './JAX/sortable-tree';
@@ -90,7 +85,10 @@ window.submitForm = function submitForm(a) {
   const submit = a.submitButton;
   elements.forEach((element) => {
     if (!element.name || element.type === 'submit') return;
-    if ((element.type === 'checkbox' || a[x].type === 'radio') && !a[x].checked) {
+    if (
+      (element.type === 'checkbox' || a[x].type === 'radio')
+      && !a[x].checked
+    ) {
       return;
     }
     names.push(a[x].name);

@@ -4,7 +4,7 @@ import { date, smalldate } from './date';
 import color from './color';
 import datepicker from './date-picker';
 import drag from './drag';
-import editor from './editor';
+import Editor from './editor';
 import el from './el';
 import event from './event';
 import { flashTitle, stopTitleFlashing } from './flashing-title';
@@ -40,7 +40,7 @@ export default {
   date,
   datepicker,
   drag,
-  editor,
+  Editor,
   el,
   event,
   flashTitle,

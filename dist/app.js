@@ -1486,7 +1486,7 @@
         a.title = cmddesc[i];
         a.href = 'javascript:void(0)';
         a.unselectable = 'on';
-        a.onclick = event => this.editbarCommand(event, this.className);
+        a.onclick = event => this.editbarCommand(event, cmd);
         this.editbar.appendChild(a);
       });
     }
@@ -2329,7 +2329,7 @@
     date,
     datepicker: DatePicker,
     drag: Drag,
-    editor: Editor,
+    Editor,
     el,
     event: Event$1,
     flashTitle,
@@ -2370,23 +2370,23 @@
     listenerHandler(id, action, args) {
       // moving arguments around
       switch (action) {
-        case 'addfile':
+        case "addfile":
           args[0].id = args[1];
           args = args[0];
-          args.upload = function (url) {
+          args.upload = function(url) {
             Uploader.upload(id, this, url);
           };
           args = [args];
           break;
-        case 'startupload':
+        case "startupload":
           args[0].id = args[1];
           args = [args[0]];
           break;
-        case 'progress':
+        case "progress":
           args[0].id = args[1];
           args.splice(1, 1);
           break;
-        case 'error':
+        case "error":
           args[2].id = args.pop();
           break;
         default:
@@ -2399,27 +2399,27 @@
     }
 
     createButton() {
-      const d = document.createElement('div');
-      d.className = 'uploadbutton';
-      d.innerHTML = 'Add File(s)';
+      const d = document.createElement("div");
+      d.className = "uploadbutton";
+      d.innerHTML = "Add File(s)";
       return [d, this.create(d)];
     }
 
     create(el, w, h, url) {
       const nid = this.uploaders.length;
-      const swf = JAX.SWF('Script/uploader.swf', `uploader${nid}`, {
-        width: w || '100%',
-        height: h || '100%',
-        allowScriptAccess: 'sameDomain',
-        wmode: 'transparent',
-        flashvars: `id=${nid}`,
+      const swf = JAX.SWF("Script/uploader.swf", `uploader${nid}`, {
+        width: w || "100%",
+        height: h || "100%",
+        allowScriptAccess: "sameDomain",
+        wmode: "transparent",
+        flashvars: `id=${nid}`
       });
 
       const s = swf.style;
-      s.position = 'absolute';
-      s.left = '0px';
-      s.top = '0px';
-      el.style.position = 'relative';
+      s.position = "absolute";
+      s.left = "0px";
+      s.top = "0px";
+      el.style.position = "relative";
       el.appendChild(swf);
       this.uploaders.push([]);
       this.uploaders[nid].flashObj = swf;
@@ -3004,7 +3004,6 @@
         }
       }
 
-
       // Load sounds
       Sound$1.load('sbblip', './Sounds/blip.mp3', false);
       Sound$1.load('imbeep', './Sounds/receive.mp3', false);
@@ -3024,16 +3023,17 @@
         }
 
         if (inputField.type === 'select-multiple') {
-          inputField.options
-            .filter(option => option.selected)
-            .forEach((option) => {
-              names.push(`${inputField.name}[]`);
-              values.push(option.value);
-            });
+          inputField.options.filter(option => option.selected).forEach((option) => {
+            names.push(`${inputField.name}[]`);
+            values.push(option.value);
+          });
           return;
         }
 
-        if ((inputField.type === 'checkbox' || inputField.type === 'radio') && !inputField.checked) {
+        if (
+          (inputField.type === 'checkbox' || inputField.type === 'radio')
+          && !inputField.checked
+        ) {
           return;
         }
         names.push(inputField.name);
@@ -3053,7 +3053,9 @@
     }
 
     handleQuoting(a) {
-      this.stream.load(`${a.href}&qreply=${document.querySelector('#qreply') ? '1' : '0'}`);
+      this.stream.load(
+        `${a.href}&qreply=${document.querySelector('#qreply') ? '1' : '0'}`,
+      );
     }
 
     setWindowActive() {

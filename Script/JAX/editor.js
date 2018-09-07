@@ -121,7 +121,7 @@ class Editor {
       a.title = cmddesc[i];
       a.href = 'javascript:void(0)';
       a.unselectable = 'on';
-      a.onclick = event => this.editbarCommand(event, this.className);
+      a.onclick = event => this.editbarCommand(event, cmd);
       this.editbar.appendChild(a);
     });
   }

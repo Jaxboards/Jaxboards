@@ -1,10 +1,11 @@
 {
   "scripts": {
-    "eslint": "./node_modules/.bin/eslint Script/{**/*,*}.js",
-    "prettier": "prettier --write *.{{t,j}s{,x,on},{c,sa,sc,le}ss,vue,md,y{,a}ml,graphql}",
+    "eslint": "eslint Script/{**/*,*}.js",
+    "eslint-fix": "eslint Script/{**/*,*}.js --fix",
+    "prettier": "prettier --write **/*.{{t,j}s{,x,on},{c,sa,sc,le}ss,vue,md,y{,a}ml,graphql}",
     "stylelint": "stylelint \"./**/*.{c,sa,sc,le}ss\"",
     "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\"",
-    "build": "./node_modules/.bin/rollup -c"
+    "build": "rollup -c"
   },
   "pre-commit": [
     "eslint"

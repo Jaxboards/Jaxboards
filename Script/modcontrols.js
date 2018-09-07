@@ -1,8 +1,5 @@
 /* global RUN */
-import {
-  assign,
-  onDOMReady,
-} from './JAX/util';
+import { assign, onDOMReady } from './JAX/util';
 import Event from './JAX/event';
 
 // TODO: Find a place for this state
@@ -27,9 +24,7 @@ class ModControls {
       } here? <input type="hidden" name="act" value="modcontrols" />`
         + `<input type="hidden" name="${
           whichone ? 'dop' : 'dot'
-        }" value="moveto" /><input type="hidden" name="id" value="${
-          id
-        }" /><input type="submit" value="Yes" />`
+        }" value="moveto" /><input type="hidden" name="id" value="${id}" /><input type="submit" value="Yes" />`
         + '<input type="submit" name="cancel" value="Cancel" '
         + 'onclick="this.form.submitButton=this" /></form>',
     );
@@ -78,45 +73,44 @@ onDOMReady(() => {
     modcontrols_postsync(a) {
       let pids = [];
       if (a[0] && (typeof a[0] === 'string' || typeof a[0] === 'number')) {
-        pids = (`${a[0]}`).split(',');
+        pids = `${a[0]}`.split(',');
       }
       const pl = pids ? pids.length : 0;
       let tids = [];
       if (a[1] && (typeof a[1] === 'string' || typeof a[1] === 'number')) {
-        tids = (`${a[1]}`).split(',');
+        tids = `${a[1]}`.split(',');
       }
       const tl = tids ? tids.length : 0;
       const html = `${"<form method='post' onsubmit='return RUN.submitForm(this)'>"
-        + "<input type='hidden' name='act' value='modcontrols' />"}${
+          + "<input type='hidden' name='act' value='modcontrols' />"}${
         tl
           ? `${"<select name='dot'>"
-            + "<option value='delete'>Delete</option>"
-            + "<option value='merge'>Merge</option>"
-            + "<option value='move'>Move</option>"
-            + "<option value='pin'>Pin</option>"
-            + "<option value='unpin'>Unpin</option>"
-            + "<option value='lock'>Lock</option>"
-            + "<option value='unlock'>Unlock</option>"
-            + '</select>'
-            + '&nbsp; &nbsp; <strong>'}${
-            tl
-          }</strong> topic${
+                + "<option value='delete'>Delete</option>"
+                + "<option value='merge'>Merge</option>"
+                + "<option value='move'>Move</option>"
+                + "<option value='pin'>Pin</option>"
+                + "<option value='unpin'>Unpin</option>"
+                + "<option value='lock'>Lock</option>"
+                + "<option value='unlock'>Unlock</option>"
+                + '</select>'
+                + '&nbsp; &nbsp; <strong>'}${tl}</strong> topic${
             tl > 1 ? 's' : ''
           }${pl ? ' and <br />' : ''}`
           : ''
-      }${pl
-        ? `${"<select name='dop'>"
-            + "<option value='delete'>Delete</option>"
-            + "<option value='move'>Move</option>"
-            + '</select> &nbsp; &nbsp; <strong>'}${
-          pl
-        }</strong> post${
-          pids.length > 1 ? 's' : ''}`
-        : ''
-      }${pl && tl ? '<br />' : ' &nbsp; &nbsp; '
+      }${
+        pl
+          ? `${"<select name='dop'>"
+                + "<option value='delete'>Delete</option>"
+                + "<option value='move'>Move</option>"
+                + '</select> &nbsp; &nbsp; <strong>'}${pl}</strong> post${
+            pids.length > 1 ? 's' : ''
+          }`
+          : ''
+      }${
+        pl && tl ? '<br />' : ' &nbsp; &nbsp; '
       }<input type='submit' value='Go' /> `
-        + '<input name=\'cancel\' type=\'submit\' '
-        + 'onclick=\'this.form.submitButton=this;\' value=\'Cancel\' /></form>';
+        + "<input name='cancel' type='submit' "
+        + "onclick='this.form.submitButton=this;' value='Cancel' /></form>";
       assign(RUN.modcontrols, {
         tids,
         tidl: tl,
@@ -128,7 +122,10 @@ onDOMReady(() => {
     },
 
     modcontrols_move(a) {
-      const whichone = parseInt(a && a[0] ? a[0] : RUN.modcontrols.whichone, 10);
+      const whichone = parseInt(
+        a && a[0] ? a[0] : RUN.modcontrols.whichone,
+        10,
+      );
       if (!this.busy && onPageChangeOld) {
         onPageChangeOld = Event.onPageChange;
       }

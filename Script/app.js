@@ -5,7 +5,6 @@ import RUN from './run';
 import IMWindow from './JAX/instant-messaging-window';
 import { assign } from './JAX/util';
 
-
 // Kinda hacky - these are all globals
 assign(window, {
   JAX,

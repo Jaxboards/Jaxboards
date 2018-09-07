@@ -179,11 +179,6 @@ if (!$PAGE->jsaccess) {
         ' <script type="text/javascript" src="' . BOARDURL .
         'dist/app.js"></script>'
     );
-    $PAGE->append(
-        'SCRIPT',
-        ' <script type="text/javascript" src="' . BOARDURL .
-        'dist/run.js"></script>'
-    );
 
     if ($PERMS['can_moderate'] || $USER['mod']) {
         $PAGE->append(

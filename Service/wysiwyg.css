@@ -6,208 +6,177 @@
 .editbar {
   display: block;
   text-align: left;
-  background: url(Service/wysiwygbar.png) bottom right;
+  background: url(wysiwygbar.png) bottom right;
   width: 800px;
   height: 24px;
   overflow: hidden;
 }
-
 .editbar a {
-  background: url(Service/wysiwygbar.png);
+  background: url(wysiwygbar.png);
   height: 24px;
   display: inline-block;
 }
-
 .editbar .bold {
   width: 32px;
 }
-
 .editbar .italic {
   width: 33px;
   background-position: -32px 0;
 }
-
 .editbar .underline {
   width: 35px;
   background-position: -65px 0;
 }
-
-.editbar .forecolor {
-  width: 31px;
+.editbar .strikethrough {
+  width: 30px;
   background-position: -100px 0;
 }
-
+.editbar .forecolor {
+  width: 31px;
+  background-position: -130px 0;
+}
 .editbar .backcolor {
   width: 32px;
-  background-position: -131px 0;
+  background-position: -161px 0;
 }
-
 .editbar .insertimage {
   width: 29px;
-  background-position: -163px 0;
+  background-position: -193px 0;
 }
-
 .editbar .createlink {
   width: 28px;
-  background-position: -192px 0;
+  background-position: -222px 0;
 }
-
 .editbar .c_email {
   width: 27px;
-  background-position: -220px 0;
+  background-position: -250px 0;
 }
-
 .editbar .justifyleft {
   width: 26px;
-  background-position: -247px 0;
+  background-position: -277px 0;
 }
-
 .editbar .justifycenter {
   width: 27px;
-  background-position: -273px 0;
+  background-position: -303px 0;
 }
-
 .editbar .justifyright {
   width: 26px;
-  background-position: -300px 0;
+  background-position: -330px 0;
 }
-
 .editbar .c_youtube {
   width: 28px;
-  background-position: -326px 0;
+  background-position: -356px 0;
 }
-
 .editbar .c_code {
   width: 26px;
-  background-position: -354px 0;
+  background-position: -384px 0;
 }
-
 .editbar .c_quote {
   width: 25px;
-  background-position: -380px 0;
+  background-position: -410px 0;
 }
-
 .editbar .c_spoiler {
   width: 29px;
-  background-position: -405px 0;
+  background-position: -435px 0;
 }
-
 .editbar .insertorderedlist {
   width: 28px;
-  background-position: -434px 0;
+  background-position: -464px 0;
 }
-
 .editbar .insertunorderedlist {
   width: 28px;
-  background-position: -462px 0;
+  background-position: -492px 0;
 }
-
 .editbar .c_smileys {
   width: 29px;
-  background-position: -490px 0;
+  background-position: -520px 0;
 }
-
 .editbar .c_switcheditmode {
   width: 30px;
-  background-position: -519px 0;
+  background-position: -549px 0;
 }
 
 /********
-  Get them to move down on hover, firefox and it's non background-position-y support :(
- *********/
+  Get them to move down on hover, fuck firefox and it's non background-position-y support :(
+                                                                                       *********/
 .editbar a:hover.bold {
   width: 32px;
-  background-position: 0 -24px;
 }
-
 .editbar a:hover.italic {
   width: 33px;
   background-position: -32px -24px;
 }
-
 .editbar a:hover.underline {
   width: 35px;
   background-position: -65px -24px;
 }
-
-.editbar a:hover.forecolor {
-  width: 31px;
+.editbar a:hover.strikethrough {
+  width: 30px;
   background-position: -100px -24px;
 }
-
+.editbar a:hover.forecolor {
+  width: 31px;
+  background-position: -130px -24px;
+}
 .editbar a:hover.backcolor {
   width: 32px;
-  background-position: -131px -24px;
+  background-position: -161px -24px;
 }
-
 .editbar a:hover.insertimage {
   width: 29px;
-  background-position: -163px -24px;
+  background-position: -193px -24px;
 }
-
 .editbar a:hover.createlink {
   width: 28px;
-  background-position: -192px -24px;
+  background-position: -222px -24px;
 }
-
 .editbar a:hover.c_email {
   width: 27px;
-  background-position: -220px -24px;
+  background-position: -250px -24px;
 }
-
 .editbar a:hover.justifyleft {
   width: 26px;
-  background-position: -247px -24px;
+  background-position: -277px -24px;
 }
-
 .editbar a:hover.justifycenter {
   width: 27px;
-  background-position: -273px -24px;
+  background-position: -303px -24px;
 }
-
 .editbar a:hover.justifyright {
   width: 26px;
-  background-position: -300px -24px;
+  background-position: -330px -24px;
 }
-
 .editbar a:hover.c_youtube {
   width: 28px;
-  background-position: -326px -24px;
+  background-position: -356px -24px;
 }
-
 .editbar a:hover.c_code {
   width: 26px;
-  background-position: -354px -24px;
+  background-position: -384px -24px;
 }
-
 .editbar a:hover.c_quote {
   width: 25px;
-  background-position: -380px -24px;
+  background-position: -410px -24px;
 }
-
 .editbar a:hover.c_spoiler {
   width: 29px;
-  background-position: -405px -24px;
+  background-position: -435px -24px;
 }
-
 .editbar a:hover.insertorderedlist {
   width: 28px;
-  background-position: -434px -24px;
+  background-position: -464px -24px;
 }
-
 .editbar a:hover.insertunorderedlist {
   width: 28px;
-  background-position: -462px -24px;
+  background-position: -492px -24px;
 }
-
 .editbar a:hover.c_smileys {
   width: 29px;
-  background-position: -490px -24px;
+  background-position: -520px -24px;
 }
-
 .editbar a:hover.c_switcheditmode {
   width: 30px;
-  background-position: -519px -24px;
+  background-position: -549px -24px;
 }
 
 .emotewin {
@@ -217,19 +186,50 @@
   background: #eef;
   border: 1px solid #000;
 }
-
 .emotewin a {
   border-bottom: 1px solid #ccf;
   display: block;
   text-decoration: none;
   padding: 10px;
 }
-
 .emotewin a:hover {
   background: #ccf;
 }
-
 .emotewin a img {
   border: 0;
   margin-right: 10px;
+}
+
+/*datepicker*/
+
+#datepicker {
+  position: absolute;
+  width: 200px;
+  border: 1px solid #000;
+  background: #fff;
+}
+#datepicker td {
+  vertical-align: middle;
+  text-align: center;
+}
+#datepicker .control {
+  cursor: pointer;
+}
+#datepicker .year {
+  font-weight: bold;
+}
+#datepicker .month {
+  font-weight: bold;
+}
+#datepicker .weekdays td {
+  width: 50px;
+  font-weight: bold;
+  font-size: smaller;
+}
+#datepicker .day:hover {
+  background: #eee;
+  cursor: pointer;
+}
+#datepicker .day.selected {
+  background: #ccc;
 }
