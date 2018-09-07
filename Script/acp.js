@@ -1,3 +1,4 @@
+import JAX from './JAX/index';
 import {
   onDOMReady,
 } from './JAX/util';
@@ -7,8 +8,12 @@ import {
 } from './JAX/el';
 import Ajax from './JAX/ajax';
 import Editor from './JAX/editor';
+import sortableTree from './JAX/sortable-tree';
 
-// TODO: make this not global
+// TODO: Remove all globals from this file
+
+window.JAX = JAX;
+
 window.dropdownMenu = function dropdownMenu(e) {
   const el = e.srcElement || e.target;
   if (el.tagName.toLowerCase() === 'a') {
@@ -67,6 +72,12 @@ function makestuffcool() {
       }
       return true;
     };
+  }
+
+  // Orderable forums needs this
+  const tree = document.querySelector('.tree');
+  if (tree) {
+    sortableTree(tree, 'forum_', document.querySelector('#ordered'));
   }
 }
 onDOMReady(makestuffcool);

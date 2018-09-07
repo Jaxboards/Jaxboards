@@ -248,13 +248,7 @@
   }
 
   function isChildOf(a, b) {
-    const parent = a.parentNode;
-    while (parent) {
-      if (parent === b) {
-        return true;
-      }
-    }
-    return false;
+    return b.contains(a);
   }
 
   function insertBefore(a, b) {

@@ -119,7 +119,6 @@ class PAGE
         $data['css_url'] = BOARDURL . 'acp/css/css.css';
         $data['bbcode_css_url'] = BOARDURL . 'Service/Themes/Default/bbcode.css';
         $data['themes_css_url'] = BOARDURL . 'acp/css/themes.css';
-        $data['app_js_url'] = BOARDURL . 'dist/app.js';
         $data['admin_js_url'] = BOARDURL . 'dist/acp.js';
 
         echo $this->parseTemplate(
