@@ -904,9 +904,9 @@ EOT
             if (!$f['read']) {
                 ++$unread;
             }
-            $dmessageOnclick = 'RUN.stream.location(\'' .
+            $dmessageOnchange = 'RUN.stream.location(\'' .
                 '?act=ucp&what=inbox&flag=' . $f['id'] . '&tog=\'+' . '
-                (this.checked?1:0))';
+                (this.checked?1:0), 1)';
             $page .= $PAGE->meta(
                 'inbox-messages-row',
                 (!$f['read'] ? 'unread' : 'read'),
@@ -914,7 +914,7 @@ EOT
                 'value="' . $f['id'] . '" />',
                 '<input type="checkbox" ' .
                 ($f['flag'] ? 'checked="checked" ' : '') .
-                'class="switch flag" onclick="' . $dmessageOnclick . '" />',
+                'class="switch flag" onchange="' . $dmessageOnchange . '" />',
                 $f['id'],
                 $f['title'],
                 $f['display_name'],

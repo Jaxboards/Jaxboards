@@ -17,7 +17,7 @@
    * This method adds some decoration to the default browser event.
    * This can probably be replaced with something more modern.
    */
-  function Event(e) {
+  function Event$1(e) {
     const dB = document.body;
     const dE = document.documentElement;
     switch (e.keyCode) {
@@ -59,7 +59,7 @@
 
   // TODO: There are places in the source that are using this to store a callback
   // Refactor this
-  Event.onPageChange = function onPageChange() {};
+  Event$1.onPageChange = function onPageChange() {};
 
   /**
    * Selects/highlights all contents in an element
@@ -131,9 +131,9 @@
 
     takeitdown() {
       if (onPageChangeOld) {
-        Event.onPageChange = onPageChangeOld;
+        Event$1.onPageChange = onPageChangeOld;
         onPageChangeOld = null;
-      } else Event.onPageChange = null;
+      } else Event$1.onPageChange = null;
       if (this.modb) {
         this.modb.innerHTML = '';
         this.modb.style.display = 'none';
@@ -214,10 +214,10 @@
           10,
         );
         if (!this.busy && onPageChangeOld) {
-          onPageChangeOld = Event.onPageChange;
+          onPageChangeOld = Event$1.onPageChange;
         }
         RUN.modcontrols.whichone = whichone;
-        Event.onPageChange = RUN.modcontrols.checklocation;
+        Event$1.onPageChange = RUN.modcontrols.checklocation;
         RUN.modcontrols.getitup(
           `Ok, now browse to the ${
           whichone ? 'topic' : 'forum'

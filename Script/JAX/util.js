@@ -44,8 +44,8 @@ function convertSwitches(switches) {
     }
     button.addEventListener('click', () => {
       switchElement.checked = !switchElement.checked;
-      this.style.backgroundPosition = switchElement.checked ? 'top' : 'bottom';
-      tryInvoke(switchElement.onclick);
+      button.style.backgroundPosition = switchElement.checked ? 'top' : 'bottom';
+      switchElement.dispatchEvent(new Event('change'));
     });
     insertAfter(button, switchElement);
   });
