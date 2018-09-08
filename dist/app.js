@@ -82,83 +82,190 @@
     }
   }
 
-  const { userAgent } = navigator;
-
-  var Browser = {
-    chrome: !!userAgent.match(/chrome/i),
-    ie: !!userAgent.match(/msie/i),
-    iphone: !!userAgent.match(/iphone/i),
-    mobile: !!userAgent.match(/mobile/i),
-    n3ds: !!userAgent.match(/nintendo 3ds/),
-    firefox: !!userAgent.match(/firefox/i),
-    safari: !!userAgent.match(/safari/i),
-  };
-
-  function ordsuffix(a) {
-    return (
-      a
-      + (Math.round(a / 10) === 1 ? 'th' : ['', 'st', 'nd', 'rd'][a % 10] || 'th')
-    );
-  }
-
-  function date(a) {
-    const old = new Date();
-    const now = new Date();
-    let fmt;
-    const yday = new Date();
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    yday.setTime(yday - 1000 * 60 * 60 * 24);
-    old.setTime(a * 1000); // setTime uses milliseconds, we'll be using UNIX Times as the argument
-    const hours = `${old.getHours() % 12 || 12}`;
-    const ampm = hours >= 12 ? 'pm' : 'am';
-    const mins = `${old.getMinutes()}`.padStart(2, '0');
-    const dstr = `${old.getDate()} ${old.getMonth()} ${old.getFullYear()}`;
-    const delta = (now.getTime() - old.getTime()) / 1000;
-    if (delta < 90) {
-      fmt = 'a minute ago';
-    } else if (delta < 3600) {
-      fmt = `${Math.round(delta / 60)} minutes ago`;
-    } else if (
-      `${now.getDate()} ${now.getMonth()} ${now.getFullYear()}`
-      === dstr
-    ) {
-      fmt = `Today @ ${hours}:${mins} ${ampm}`;
-    } else if (
-      `${yday.getDate()} ${yday.getMonth()} ${yday.getFullYear()}`
-      === dstr
-    ) {
-      fmt = `Yesterday @ ${hours}:${mins} ${ampm}`;
-    } else {
-      fmt = `${months[old.getMonth()]} ${ordsuffix(old.getDate())}, ${old.getFullYear()} @ ${hours}:${mins} ${ampm}`;
+  /**
+   * This method adds some decoration to the default browser event.
+   * This can probably be replaced with something more modern.
+   */
+  function Event$1(e) {
+    const dB = document.body;
+    const dE = document.documentElement;
+    switch (e.keyCode) {
+      case 13:
+        e.ENTER = true;
+        break;
+      case 37:
+        e.LEFT = true;
+        break;
+      case 38:
+        e.UP = true;
+        break;
+      case 0.39:
+        e.RIGHT = true;
+        break;
+      case 40:
+        e.DOWN = true;
+        break;
+      default:
+        break;
     }
-    return fmt;
+    if (typeof e.srcElement === 'undefined') e.srcElement = e.target;
+    if (typeof e.pageY === 'undefined') {
+      e.pageY = e.clientY + (parseInt(dE.scrollTop || dB.scrollTop, 10) || 0);
+      e.pageX = e.clientX + (parseInt(dE.scrollLeft || dB.scrollLeft, 10) || 0);
+    }
+    e.cancel = () => {
+      e.returnValue = false;
+      if (e.preventDefault) e.preventDefault();
+      return e;
+    };
+    e.stopBubbling = () => {
+      if (e.stopPropagation) e.stopPropagation();
+      e.cancelBubble = true;
+      return e;
+    };
+    return e;
   }
 
-  function smalldate(a) {
-    const d = new Date();
-    d.setTime(a * 1000);
-    let hours = d.getHours();
-    const ampm = hours >= 12 ? 'pm' : 'am';
-    hours %= 12;
-    hours = hours || 12;
-    const minutes = `${d.getMinutes()}`.padStart(2, '0');
-    const month = d.getMonth() + 1;
-    const day = `${d.getDate()}`.padStart(2, '0');
-    const year = d.getFullYear();
-    return `${hours}:${minutes}${ampm}, ${month}/${day}/${year}`;
+  // TODO: There are places in the source that are using this to store a callback
+  // Refactor this
+  Event$1.onPageChange = function onPageChange() {};
+
+  function getComputedStyle(a, b) {
+    if (!a) return false;
+    if (a.currentStyle) return a.currentStyle;
+    if (window.getComputedStyle) return window.getComputedStyle(a, b);
+    return false;
+  }
+
+  function getCoordinates(a) {
+    let x = 0;
+    let y = 0;
+    const h = parseInt(a.offsetHeight, 10) || 0;
+    const w = parseInt(a.offsetWidth, 10) || 0;
+    let element = a;
+    do {
+      x += parseInt(element.offsetLeft, 10) || 0;
+      y += parseInt(element.offsetTop, 10) || 0;
+      element = element.offsetParent;
+    } while (element);
+    return {
+      x,
+      y,
+      yh: y + h,
+      xw: x + w,
+      w,
+      h,
+    };
+  }
+
+  function isChildOf(a, b) {
+    return b.contains(a);
+  }
+
+  function insertBefore(a, b) {
+    if (a.parentNode) a.parentNode.removeChild(a);
+    b.parentNode.insertBefore(a, b);
+  }
+
+  function insertAfter(a, b) {
+    if (a.parentNode) a.parentNode.removeChild(a);
+    b.parentNode.insertBefore(a, b.nextSibling);
+  }
+
+  function replace(a, b) {
+    insertBefore(b, a);
+    if (a.parentNode) a.parentNode.removeChild(a);
+  }
+
+  function getHighestZIndex() {
+    const allElements = Array.from(document.getElementsByTagName('*'));
+    const max = allElements.reduce((maxZ, element) => {
+      if (element.style.zIndex && Number(element.style.zIndex) > maxZ) {
+        return Number(element.style.zIndex);
+      }
+      return maxZ;
+    }, 0);
+    return max + 1;
+  }
+
+  function autoComplete (queryParams, el$$1, outputElement, event = {}) {
+    const e = Event$1(event);
+    el$$1.onkeydown = (event2) => {
+      const e2 = Event$1(event2);
+      if (e2.ENTER) {
+        e2.cancel();
+        return false;
+      }
+      return true;
+    };
+    let d = document.querySelector('#autocomplete');
+    const coords = getCoordinates(el$$1);
+    let els;
+    let sindex = -1;
+    let l = 0;
+    if (!d) {
+      d = document.createElement('div');
+      d.id = 'autocomplete';
+      d.style.position = 'absolute';
+      d.style.zIndex = getHighestZIndex();
+      document.querySelector('#page').appendChild(d);
+    } else {
+      d.style.display = '';
+      els = Array.from(d.querySelectorAll('div'));
+      l = els.length;
+      sindex = els.findIndex(elmnt => elmnt.classList.contains('selected'));
+    }
+    d.style.top = `${coords.yh}px`;
+    d.style.left = `${coords.x}px`;
+    d.style.width = `${coords.w}px`;
+
+    if (e.UP && l && sindex >= 1) {
+      els[sindex].classList.remove('selected');
+      els[sindex - 1].classList.add('selected');
+    } else if (
+      e.DOWN
+      && l
+      && (sindex < l - 1 || sindex >= -1)
+    ) {
+      if (sindex >= -1) {
+        els[0].classList.add('selected');
+      } else {
+        els[sindex].classList.remove('selected');
+        els[sindex + 1].classList.add('selected');
+      }
+    } else if (e.ENTER && l && sindex >= -1) {
+      els[sindex].onclick();
+    } else {
+      const relativePath = document.location.toString().match('/acp/') ? '../' : '';
+      new Ajax().load(
+        `${relativePath}misc/listloader.php?${queryParams}`,
+        {
+          callback: (xml) => {
+            const results = JSON.parse(xml.responseText);
+            d.innerHTML = '';
+            if (!results.length) {
+              d.style.display = 'none';
+            } else {
+              const [ids, values] = results;
+              ids.forEach((key, i) => {
+                const value = values[i];
+                const div = document.createElement('div');
+                div.innerHTML = value;
+                div.onclick = () => {
+                  div.parentNode.style.display = 'none';
+                  if (outputElement) {
+                    outputElement.value = key;
+                    outputElement.dispatchEvent(new Event('change'));
+                  }
+                  el$$1.value = value;
+                };
+                d.appendChild(div);
+              });
+            }
+          },
+        },
+      );
+    }
   }
 
   class Color {
@@ -224,72 +331,108 @@
     }
   }
 
-  function getComputedStyle(a, b) {
-    if (!a) return false;
-    if (a.currentStyle) return a.currentStyle;
-    if (window.getComputedStyle) return window.getComputedStyle(a, b);
-    return false;
-  }
+  class Animation {
+    constructor(el$$1, steps, delay, loop) {
+      this.el = el$$1;
+      this.steps = steps || 30;
+      this.delay = delay || 20;
+      this.curLineup = 0;
+      this.stepCount = 0;
+      this.loop = loop || 0;
+      this.lineup = [[]];
+    }
 
-  function getCoordinates(a) {
-    let x = 0;
-    let y = 0;
-    const h = parseInt(a.offsetHeight, 10) || 0;
-    const w = parseInt(a.offsetWidth, 10) || 0;
-    let element = a;
-    do {
-      x += parseInt(element.offsetLeft, 10) || 0;
-      y += parseInt(element.offsetTop, 10) || 0;
-      element = element.offsetParent;
-    } while (element);
-    return {
-      x,
-      y,
-      yh: y + h,
-      xw: x + w,
-      w,
-      h,
-    };
-  }
+    play() {
+      this.interval = setInterval(() => this.step(), this.delay);
+      return this;
+    }
 
-  function isChildOf(a, b) {
-    return b.contains(a);
-  }
-
-  function insertBefore(a, b) {
-    if (a.parentNode) a.parentNode.removeChild(a);
-    b.parentNode.insertBefore(a, b);
-  }
-
-  function insertAfter(a, b) {
-    if (a.parentNode) a.parentNode.removeChild(a);
-    b.parentNode.insertBefore(a, b.nextSibling);
-  }
-
-  function replace(a, b) {
-    insertBefore(b, a);
-    if (a.parentNode) a.parentNode.removeChild(a);
-  }
-
-  function getHighestZIndex() {
-    const allElements = Array.from(document.getElementsByTagName('*'));
-    const max = allElements.reduce((maxZ, element) => {
-      if (element.style.zIndex && Number(element.style.zIndex) > maxZ) {
-        return Number(element.style.zIndex);
+    morph(from, percent, to) {
+      if (Array.isArray(from) && from.length === to.length) {
+        return from
+          .map((value, i) => Math.round(this.morph(value, percent, to[i])));
       }
-      return maxZ;
-    }, 0);
-    return max + 1;
+      return (to - from) * percent + from;
+    }
+
+    step() {
+      const curL = this.lineup[this.curLineup];
+      this.stepCount += 1;
+      let sc = this.stepCount;
+      if (typeof curL[0] === 'function') {
+        curL[0](this.el);
+        sc = this.steps;
+      } else {
+        curL.forEach((keyFrame) => {
+          let toValue = this.morph(keyFrame[1], sc / this.steps, keyFrame[2]);
+          if (keyFrame[0].match(/color/i)) {
+            toValue = `#${(new Color(toValue)).toHex()}`;
+          } else if (keyFrame[0] !== 'opacity') toValue = Math.round(toValue);
+          this.el.style[keyFrame[0]] = keyFrame[3] + toValue + keyFrame[4];
+        });
+      }
+      if (sc === this.steps) {
+        if (this.lineup.length - 1 > this.curLineup) {
+          this.stepCount = 0;
+          this.curLineup += 1;
+        } else if (this.loop === 1) {
+          this.stepCount = 0;
+          this.curLineup = 0;
+        } else clearInterval(this.interval);
+      }
+    }
+
+    add(what, from, to) {
+      let t = ['', '', ''];
+      let fromParsed;
+      if (what.match(/color/i)) {
+        fromParsed = (new Color(from)).toRGB();
+        t[1] = (new Color(to)).toRGB();
+      } else {
+        t = to.match(/(\D*)(-?\d+)(\D*)/);
+        t.shift();
+        fromParsed = parseFloat(from.match(/-?\d+/));
+      }
+      this.lineup[this.lineup.length - 1].push([what, fromParsed, t[1], t[0], t[2]]);
+      return this;
+    }
+
+    dehighlight() {
+      this.el.style.backgroundColor = '';
+      const bg = getComputedStyle(this.el).backgroundColor.toString();
+      let bg2;
+      this.el.classList.add('highlight');
+      bg2 = getComputedStyle(this.el).backgroundColor.toString();
+      if (bg2 === bg) bg2 = 'FF0';
+      this.el.classList.add('highlight');
+      return this.add('backgroundColor', bg2, bg)
+        .then(() => {
+          this.el.style.backgroundColor = bg;
+        });
+    }
+
+    then(what, from, to, steps) {
+      this.lineup.push([]);
+      if (steps) this.steps = steps;
+      if (typeof what === 'function') {
+        this.lineup[this.lineup.length - 1].push(what);
+      } else {
+        this.add(what, from, to);
+      }
+      return this;
+    }
   }
 
-  var el = {
-    getComputedStyle,
-    getCoordinates,
-    isChildOf,
-    insertBefore,
-    insertAfter,
-    replace,
-    getHighestZIndex,
+  const { userAgent } = navigator;
+
+  var Browser = {
+    chrome: !!userAgent.match(/chrome/i),
+    ie: !!userAgent.match(/msie/i),
+    iphone: !!userAgent.match(/iphone/i),
+    mobile: !!userAgent.match(/mobile/i),
+    n3ds: !!userAgent.match(/nintendo 3ds/),
+    firefox: !!userAgent.match(/firefox/i),
+    safari: !!userAgent.match(/safari/i),
   };
 
   const months = [
@@ -467,146 +610,6 @@
     document.querySelector('#datepicker').style.display = 'none';
   };
 
-  /**
-   * This method adds some decoration to the default browser event.
-   * This can probably be replaced with something more modern.
-   */
-  function Event$1(e) {
-    const dB = document.body;
-    const dE = document.documentElement;
-    switch (e.keyCode) {
-      case 13:
-        e.ENTER = true;
-        break;
-      case 37:
-        e.LEFT = true;
-        break;
-      case 38:
-        e.UP = true;
-        break;
-      case 0.39:
-        e.RIGHT = true;
-        break;
-      case 40:
-        e.DOWN = true;
-        break;
-      default:
-        break;
-    }
-    if (typeof e.srcElement === 'undefined') e.srcElement = e.target;
-    if (typeof e.pageY === 'undefined') {
-      e.pageY = e.clientY + (parseInt(dE.scrollTop || dB.scrollTop, 10) || 0);
-      e.pageX = e.clientX + (parseInt(dE.scrollLeft || dB.scrollLeft, 10) || 0);
-    }
-    e.cancel = () => {
-      e.returnValue = false;
-      if (e.preventDefault) e.preventDefault();
-      return e;
-    };
-    e.stopBubbling = () => {
-      if (e.stopPropagation) e.stopPropagation();
-      e.cancelBubble = true;
-      return e;
-    };
-    return e;
-  }
-
-  // TODO: There are places in the source that are using this to store a callback
-  // Refactor this
-  Event$1.onPageChange = function onPageChange() {};
-
-  class Animation {
-    constructor(el$$1, steps, delay, loop) {
-      this.el = el$$1;
-      this.steps = steps || 30;
-      this.delay = delay || 20;
-      this.curLineup = 0;
-      this.stepCount = 0;
-      this.loop = loop || 0;
-      this.lineup = [[]];
-    }
-
-    play() {
-      this.interval = setInterval(() => this.step(), this.delay);
-      return this;
-    }
-
-    morph(from, percent, to) {
-      if (Array.isArray(from) && from.length === to.length) {
-        return from
-          .map((value, i) => Math.round(this.morph(value, percent, to[i])));
-      }
-      return (to - from) * percent + from;
-    }
-
-    step() {
-      const curL = this.lineup[this.curLineup];
-      this.stepCount += 1;
-      let sc = this.stepCount;
-      if (typeof curL[0] === 'function') {
-        curL[0](this.el);
-        sc = this.steps;
-      } else {
-        curL.forEach((keyFrame) => {
-          let toValue = this.morph(keyFrame[1], sc / this.steps, keyFrame[2]);
-          if (keyFrame[0].match(/color/i)) {
-            toValue = `#${(new Color(toValue)).toHex()}`;
-          } else if (keyFrame[0] !== 'opacity') toValue = Math.round(toValue);
-          this.el.style[keyFrame[0]] = keyFrame[3] + toValue + keyFrame[4];
-        });
-      }
-      if (sc === this.steps) {
-        if (this.lineup.length - 1 > this.curLineup) {
-          this.stepCount = 0;
-          this.curLineup += 1;
-        } else if (this.loop === 1) {
-          this.stepCount = 0;
-          this.curLineup = 0;
-        } else clearInterval(this.interval);
-      }
-    }
-
-    add(what, from, to) {
-      let t = ['', '', ''];
-      let fromParsed;
-      if (what.match(/color/i)) {
-        fromParsed = (new Color(from)).toRGB();
-        t[1] = (new Color(to)).toRGB();
-      } else {
-        t = to.match(/(\D*)(-?\d+)(\D*)/);
-        t.shift();
-        fromParsed = parseFloat(from.match(/-?\d+/));
-      }
-      this.lineup[this.lineup.length - 1].push([what, fromParsed, t[1], t[0], t[2]]);
-      return this;
-    }
-
-    dehighlight() {
-      this.el.style.backgroundColor = '';
-      const bg = getComputedStyle(this.el).backgroundColor.toString();
-      let bg2;
-      this.el.classList.add('highlight');
-      bg2 = getComputedStyle(this.el).backgroundColor.toString();
-      if (bg2 === bg) bg2 = 'FF0';
-      this.el.classList.add('highlight');
-      return this.add('backgroundColor', bg2, bg)
-        .then(() => {
-          this.el.style.backgroundColor = bg;
-        });
-    }
-
-    then(what, from, to, steps) {
-      this.lineup.push([]);
-      if (steps) this.steps = steps;
-      if (typeof what === 'function') {
-        this.lineup[this.lineup.length - 1].push(what);
-      } else {
-        this.add(what, from, to);
-      }
-      return this;
-    }
-  }
-
   // scrolling page list functionality
   function scrollpagelist(event) {
     const e = Event$1(event).cancel();
@@ -759,6 +762,73 @@
     controls.appendChild(document.createTextNode(' '));
     controls.appendChild(next);
     gallery.appendChild(controls);
+  }
+
+  function ordsuffix(a) {
+    return (
+      a
+      + (Math.round(a / 10) === 1 ? 'th' : ['', 'st', 'nd', 'rd'][a % 10] || 'th')
+    );
+  }
+
+  function date(a) {
+    const old = new Date();
+    const now = new Date();
+    let fmt;
+    const yday = new Date();
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    yday.setTime(yday - 1000 * 60 * 60 * 24);
+    old.setTime(a * 1000); // setTime uses milliseconds, we'll be using UNIX Times as the argument
+    const hours = `${old.getHours() % 12 || 12}`;
+    const ampm = hours >= 12 ? 'pm' : 'am';
+    const mins = `${old.getMinutes()}`.padStart(2, '0');
+    const dstr = `${old.getDate()} ${old.getMonth()} ${old.getFullYear()}`;
+    const delta = (now.getTime() - old.getTime()) / 1000;
+    if (delta < 90) {
+      fmt = 'a minute ago';
+    } else if (delta < 3600) {
+      fmt = `${Math.round(delta / 60)} minutes ago`;
+    } else if (
+      `${now.getDate()} ${now.getMonth()} ${now.getFullYear()}`
+      === dstr
+    ) {
+      fmt = `Today @ ${hours}:${mins} ${ampm}`;
+    } else if (
+      `${yday.getDate()} ${yday.getMonth()} ${yday.getFullYear()}`
+      === dstr
+    ) {
+      fmt = `Yesterday @ ${hours}:${mins} ${ampm}`;
+    } else {
+      fmt = `${months[old.getMonth()]} ${ordsuffix(old.getDate())}, ${old.getFullYear()} @ ${hours}:${mins} ${ampm}`;
+    }
+    return fmt;
+  }
+
+  function smalldate(a) {
+    const d = new Date();
+    d.setTime(a * 1000);
+    let hours = d.getHours();
+    const ampm = hours >= 12 ? 'pm' : 'am';
+    hours %= 12;
+    hours = hours || 12;
+    const minutes = `${d.getMinutes()}`.padStart(2, '0');
+    const month = d.getMonth() + 1;
+    const day = `${d.getDate()}`.padStart(2, '0');
+    const year = d.getFullYear();
+    return `${hours}:${minutes}${ampm}, ${month}/${day}/${year}`;
   }
 
   function stripHTML(html) {
@@ -1898,220 +1968,6 @@
     }
   }
 
-  // TODO: Create an instance for this state
-  // instead of abusing the module
-
-  let flashInterval;
-  let originalTitle = '';
-  let lastTitle = '';
-
-  function stopTitleFlashing() {
-    if (originalTitle) {
-      document.title = originalTitle;
-    }
-    originalTitle = '';
-    clearInterval(flashInterval);
-  }
-
-  function flashTitle(title) {
-    if (document.hasFocus()) {
-      return;
-    }
-    stopTitleFlashing();
-    if (!originalTitle) {
-      originalTitle = document.title;
-    }
-    lastTitle = title;
-    flashInterval = setInterval(() => {
-      document.title = document.title === originalTitle
-        ? lastTitle
-        : originalTitle;
-    }, 1000);
-  }
-
-  /**
-   * Swaps two elements in an array
-   * @param  {Array} array
-   * @param  {Number} fromIndex
-   * @param  {Number} toIndex
-   * @return {Array}
-   */
-  function swap(array, fromIndex, toIndex) {
-    const cache = array[fromIndex];
-    array[fromIndex] = array[toIndex];
-    array[toIndex] = cache;
-    return array;
-  }
-
-  class Sortable extends Drag {
-    constructor(elements, options = {}) {
-      super();
-      this.options = options;
-      this.coords = [];
-      this.elems = elements;
-      if (options.vertical) {
-        this.bounds = [0, -Infinity, 0, Infinity];
-      }
-
-      elements.forEach((element) => {
-        this.apply(element, () => tryInvoke(options.handle, element));
-      });
-    }
-
-    ondrop(element) {
-      if (this.change) {
-        this.coords = [];
-      }
-      this.change = 0;
-      const s = element.el.style;
-      s.left = 0;
-      s.top = 0;
-      if (typeof this.onend === 'function') {
-        this.onend(element);
-      }
-    }
-
-    ondrag(a) {
-      let x;
-      let c;
-      const cel = getCoordinates(a.el);
-      let c2;
-      let ch = false;
-      const ov = this.options.vertical || 0;
-      let index;
-      if (!this.coords.length) {
-        this.coords.push(...this.elems);
-      }
-      this.elems.forEach((elem) => {
-        if (a.el === elem) {
-          index = x;
-          return;
-        }
-        c = this.coords[x];
-        if (
-          ch === false
-          && (ov ? a.my < c.yh && a.dy < 0 : a.mx < c.xw && a.my < c.yh)
-        ) {
-          insertBefore(a.el, elem);
-          ch = x;
-        }
-      });
-
-      if (ch === false) {
-        const reversedElements = this.elems.concat().reverse();
-        reversedElements.forEach((elem) => {
-          if (a.el === elem) {
-            return;
-          }
-          c = this.coords[x];
-          if (ov ? a.my > c.y && a.dy > 0 : a.mx > c.x && a.my > c.y) {
-            insertAfter(a.el, elem);
-            if (this.elems.swap) {
-              this.elems = swap(index, x);
-            }
-            ch = 1;
-          }
-        });
-      } else if (this.elems.swap) {
-        this.elems = swap(index, ch);
-      }
-
-      if (ch !== false) {
-        this.coords = [];
-        this.change = 1;
-        c2 = getCoordinates(a.el);
-        this.sess.ex -= c2.x - cel.x;
-        this.sess.ey -= c2.y - cel.y;
-        this.drag(a.e);
-      }
-      return false;
-    }
-  }
-
-  function parsetree(tree, prefix) {
-    const nodes = Array.from(tree.querySelectorAll('li'));
-    const order = {};
-    let gotsomethin = 0;
-    nodes.forEach((node) => {
-      if (node.className !== 'seperator' && node.parentNode === tree) {
-        gotsomethin = 1;
-        const [sub] = node.getElementsByTagName('ul');
-        order[`_${node.id.substr(prefix.length)}`] = sub !== undefined ? parsetree(sub, prefix) : 1;
-      }
-    });
-    return gotsomethin ? order : 1;
-  }
-
-  function sortableTree (tree, prefix, formfield) {
-    const listItems = Array.from(tree.querySelectorAll('li'));
-    const items = [];
-    const seperators = [];
-
-    items.push(...listItems.filter(li => li.className !== 'title'));
-
-    items.forEach((item) => {
-      const tmp = document.createElement('li');
-      tmp.className = 'seperator';
-      seperators.push(tmp);
-      insertBefore(tmp, item);
-    });
-
-    const drag = new Drag().noChildActivation();
-    drag.drops(seperators.concat(items)).addListener({
-      ondragover(a) {
-        a.droptarget.style.border = '1px solid #000';
-      },
-      ondragout(a) {
-        a.droptarget.style.border = 'none';
-      },
-      ondrop(a) {
-        const next = a.droptarget.nextSibling;
-        let tmp;
-        const parentlock = a.el.className === 'parentlock';
-        const nofirstlevel = a.el.className === 'nofirstlevel';
-        if (a.droptarget) {
-          a.droptarget.style.border = 'none';
-        }
-        if (a.droptarget.className === 'seperator') {
-          if (parentlock && a.droptarget.parentNode !== a.el.parentNode) {
-            return drag.reset(a.el);
-          }
-          if (nofirstlevel && a.droptarget.parentNode.className === 'tree') {
-            return drag.reset(a.el);
-          }
-          if (isChildOf(a.droptarget, a.el) || a.el === next) {
-            return drag.reset(a.el);
-          }
-          if (next.className === 'spacer') {
-            next.parentNode.removeChild(next);
-          }
-          if (next.className !== 'spacer') {
-            insertAfter(a.el.previousSibling, a.droptarget);
-          } else {
-            a.el.previousSibling.parentNode.removeChild(a.el.previousSibling);
-          }
-          insertAfter(a.el, a.droptarget);
-        } else if (!parentlock && a.droptarget.tagName === 'LI') {
-          [tmp] = a.droptarget.getElementsByTagName('ul');
-          if (!tmp) {
-            tmp = document.createElement('ul');
-            a.droptarget.appendChild(tmp);
-          }
-          tmp.appendChild(a.el.previousSibling);
-          tmp.appendChild(a.el);
-          a.droptarget.appendChild(tmp);
-        }
-        drag.reset(a.el);
-        if (formfield) {
-          formfield.value = JSON.stringify(parsetree(tree, prefix));
-        }
-        return null;
-      },
-    });
-
-    items.forEach(item => drag.apply(item));
-  }
-
   function SWF (url, name, settings) {
     let object;
     let embed;
@@ -2377,39 +2233,15 @@
   };
 
   var JAX$1 = {
-    ajax: Ajax,
-    browser: Browser,
-    color: Color,
-    date,
-    datepicker: DatePicker,
-    drag: Drag,
+    autoComplete,
+    Drag,
     Editor,
-    el,
-    event: Event$1,
-    flashTitle,
-    imageResizer,
-    makeImageGallery,
-    makeResizer,
-    scrollablepagelist,
-    smalldate,
-    sortable: Sortable,
-    sortableTree,
-    stopTitleFlashing,
-    sfx: Animation,
     SWF,
-    tooltip: openTooltip,
     Window,
 
-    // TODO: organize
-    assign,
-    gracefulDegrade,
     checkAll,
-    onImagesLoaded,
     handleTabs,
     toggle,
-    collapse,
-    overlay: toggleOverlay,
-    scrollTo,
   };
 
   /* eslint-disable */
@@ -2511,6 +2343,37 @@
 
   // Sound is a singleton
   var Sound$1 = new Sound();
+
+  // TODO: Create an instance for this state
+  // instead of abusing the module
+
+  let flashInterval;
+  let originalTitle = '';
+  let lastTitle = '';
+
+  function stopTitleFlashing() {
+    if (originalTitle) {
+      document.title = originalTitle;
+    }
+    originalTitle = '';
+    clearInterval(flashInterval);
+  }
+
+  function flashTitle(title) {
+    if (document.hasFocus()) {
+      return;
+    }
+    stopTitleFlashing();
+    if (!originalTitle) {
+      originalTitle = document.title;
+    }
+    lastTitle = title;
+    flashInterval = setInterval(() => {
+      document.title = document.title === originalTitle
+        ? lastTitle
+        : originalTitle;
+    }, 1000);
+  }
 
   /* global RUN, globalsettings */
 

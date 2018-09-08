@@ -283,7 +283,7 @@ EOT
                 ++$unread;
             }
             $page .= '<tr ' . (!$f['read'] ? 'class="unread" ' : '') .
-                'onclick="if(JAX.event(event).srcElement.tagName.' .
+                'onclick="if(event.target.tagName.' .
                 'toLowerCase()==\'td\') this.querySelector(\'input\').click()">' .
                 '<td class="center"><input class="check" type="checkbox" />' .
                 '</td><td class="center"><input type="checkbox" ' .
