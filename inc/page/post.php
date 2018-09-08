@@ -42,9 +42,10 @@ class POST
                 '[/attachment]';
         }
         if (isset($JAX->p['submit'])
-            && ('Preview' == $JAX->p['submit']
-            || 'Full Reply' == $JAX->p['submit'])
+            && ('Preview' === $JAX->p['submit']
+            || 'Full Reply' === $JAX->p['submit'])
         ) {
+            $this->showpostform();
             $this->previewpost();
         } elseif ($this->pid && is_numeric($this->pid)) {
             $this->editpost();
@@ -126,11 +127,11 @@ class POST
             $post = $PAGE->meta('post-preview', $post);
             $this->postpreview = $post;
         }
-        if (!$PAGE->jsaccess || 'qreply' == $this->how) {
+        if (!$PAGE->jsaccess || 'qreply' === $this->how) {
             $this->showpostform();
-        } else {
-            $PAGE->JS('update', 'post-preview', $post);
         }
+
+        $PAGE->JS('update', 'post-preview', $post);
     }
 
     public function showtopicform()

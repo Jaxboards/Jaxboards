@@ -303,7 +303,7 @@ EOT
                 Member Name: <input type="text" name="name" ' .
                 'data-autocomplete-action="searchmembers" ' .
                 'data-autocomplete-output="#mid" ' .
-                'data-autocomplete-indicator="#validname""' .
+                'data-autocomplete-indicator="#validname"' .
                 '/>' .
                 '<input type="hidden" id="mid" name="mid" />' .
                 '<span id="validname"></span>
@@ -569,7 +569,7 @@ EOT
             <label>Merge:</label><input type="text" name="name1" ' .
             'data-autocomplete-action="searchmembers" ' .
             'data-autocomplete-output="#mid1" ' .
-            'data-autocomplete-indicator="#validname""' .
+            'data-autocomplete-indicator="#validname"' .
             ' />' .
             '<input type="hidden" id="mid1" name="mid1" />' .
             '<span id="validname"></span><br />
@@ -659,7 +659,7 @@ EOT
             <label>Member Name:</label><input type="text" name="name" ' .
             'data-autocomplete-action="searchmembers" ' .
             'data-autocomplete-output="#mid" ' .
-            'data-autocomplete-indicator="#validname""' .
+            'data-autocomplete-indicator="#validname"' .
             ' />' .
             '<input type="hidden" id="mid" name="mid" />' .
             '<span id="validname"></span><br />

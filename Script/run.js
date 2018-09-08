@@ -38,7 +38,7 @@ class AppState {
   submitForm(form, resetOnSubmit = false) {
     const names = [];
     const values = [];
-    const submit = form.submitButton;
+    const { submitButton } = form;
 
     Array.from(form.elements).forEach((inputField) => {
       if (!inputField.name || inputField.type === 'submit') {
@@ -65,9 +65,9 @@ class AppState {
       values.push(inputField.value);
     });
 
-    if (submit) {
-      names.push(submit.name);
-      values.push(submit.value);
+    if (submitButton) {
+      names.push(submitButton.name);
+      values.push(submitButton.value);
     }
     this.stream.load('?', { data: [names, values] });
     if (resetOnSubmit) {
