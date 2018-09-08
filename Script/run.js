@@ -47,10 +47,12 @@ class AppState {
       }
 
       if (inputField.type === 'select-multiple') {
-        inputField.options.filter(option => option.selected).forEach((option) => {
-          names.push(`${inputField.name}[]`);
-          values.push(option.value);
-        });
+        Array.from(inputField.options)
+          .filter(option => option.selected)
+          .forEach((option) => {
+            names.push(`${inputField.name}[]`);
+            values.push(option.value);
+          });
         return;
       }
 

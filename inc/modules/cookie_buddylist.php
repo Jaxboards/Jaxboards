@@ -5,8 +5,7 @@ $PAGE->metadefs['buddylist-contacts'] = <<<EOT
 <div class="contacts">
     <form method="?" data-ajax-form="true">
         ${buddylist}
-        <a href="?act=logreg5" onclick="return RUN.stream.location(this.href)"
-            id="status" class="%s">
+        <a href="?act=logreg5" id="status" class="%s">
         </a>
         <input style="width:100%%;padding-left:20px;" type="text" name="status"
             onblur="this.form.onsubmit()" value="%s"/>
@@ -15,17 +14,17 @@ $PAGE->metadefs['buddylist-contacts'] = <<<EOT
 EOT;
 $PAGE->metadefs['buddylist-contact'] = <<<'EOT'
 <div onclick="new IMWindow(%1$s,'%2$s')"
-    oncontextmenu="RUN.stream.location('?act=vu%1$s');return false;"
     class="contact %3$s">
-    <div class="avatar">
-        <img src="%4$s" />
-    </div>
-    <div class="name">
-        %2$s
-    </div>
-    <div class="status">
-        %5$s
-    </div>
+    <a href="?act=vu%1$s">
+        <div class="avatar">
+            <img src="%4$s" />
+        </div>
+        <div class="name">
+            %2$s
+        </div>
+        <div class="status">
+            %5$s
+        </div>
 </div>
 EOT;
 new buddylist();

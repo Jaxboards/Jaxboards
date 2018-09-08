@@ -238,10 +238,9 @@ if (!$PAGE->jsaccess) {
     if ($nummessages) {
         $PAGE->append(
             'FOOTER',
-            '<div id="notification" class="newmessage" ' .
-            'onclick="RUN.stream.location(\'?act=ucp&what=inbox\');' .
-            'this.style.display=\'none\'">You have ' . $nummessages .
-            ' new message' . (1 == $nummessages ? '' : 's') . '</div>'
+            '<a href="?act=ucp&what=inbox"><div id="notification" class="newmessage" ' .
+            'onclick="this.style.display=\'none\'">You have ' . $nummessages .
+            ' new message' . (1 == $nummessages ? '' : 's') . '</div></a>'
         );
     }
     if (!isset($CFG['nocopyright']) || !$CFG['nocopyright']) {

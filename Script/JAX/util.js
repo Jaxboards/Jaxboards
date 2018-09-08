@@ -36,18 +36,18 @@ export function tryInvoke(method, ...args) {
 
 function convertSwitches(switches) {
   switches.forEach((switchElement) => {
-    const div = document.createElement('div');
-    div.className = switchElement.className.replace('switch', 'switch_converted');
+    const button = document.createElement('button');
+    button.className = switchElement.className.replace('switch', 'switch_converted');
     switchElement.style.display = 'none';
     if (!switchElement.checked) {
-      div.style.backgroundPosition = 'bottom';
+      button.style.backgroundPosition = 'bottom';
     }
-    div.onclick = () => {
+    button.addEventListener('click', () => {
       switchElement.checked = !switchElement.checked;
       this.style.backgroundPosition = switchElement.checked ? 'top' : 'bottom';
       tryInvoke(switchElement.onclick);
-    };
-    insertAfter(div, switchElement);
+    });
+    insertAfter(button, switchElement);
   });
 }
 
@@ -89,21 +89,20 @@ export function onImagesLoaded(imgs, callback, timeout) {
 }
 
 export function updateDates() {
-  let parsed;
   const dates = Array.from(document.querySelectorAll('.autodate'));
   if (!dates) {
     return;
   }
   dates.forEach((el) => {
-    parsed = el.classList.contains('smalldate')
-      ? smalldate(parseInt(el.title, 10))
-      : date(parseInt(el.title, 10));
+    const timestamp = parseInt(el.title, 10);
+    const parsed = el.classList.contains('smalldate')
+      ? smalldate(timestamp)
+      : date(timestamp);
     if (parsed !== el.innerHTML) {
       el.innerHTML = parsed;
     }
   });
 }
-
 
 export function collapse(element) {
   const s = element.style;
@@ -130,31 +129,42 @@ export function collapse(element) {
       .play();
   }
 }
+
 export function gracefulDegrade(a) {
   if (typeof RUN !== 'undefined') {
     updateDates();
   }
+
+  // Special rules for all links
   const links = a.querySelectorAll('a');
   links.forEach((link) => {
+    // Hande links with tooltips
     if (link.dataset.useTooltip) {
       link.addEventListener('mouseover', () => tooltip(link));
     }
 
+    // Make all links load through AJAX
     if (link.href) {
       const href = link.getAttribute('href');
       if (href.charAt(0) === '?') {
         const oldclick = link.onclick;
-        link.onclick = function onclick() {
+        link.addEventListener('click', (event) => {
+          // Some links have an onclick that returns true/false based on whether
+          // or not the link should execute.
           if (!oldclick || oldclick.call(link) !== false) {
             RUN.stream.location(href);
           }
-          return false;
-        };
+          event.preventDefault();
+        });
+
+      // Open external links in a new window
       } else if (link.getAttribute('href').substr(0, 4) === 'http') {
         link.target = '_BLANK';
       }
     }
   });
+
+  // Convert checkboxes to icons (checkmark and X)
   convertSwitches(Array.from(a.querySelectorAll('.switch')));
 
   // Handle image hover magnification
@@ -250,21 +260,22 @@ export function toggle(a) {
 export function toggleOverlay(show) {
   const dE = document.documentElement;
   let ol = document.getElementById('overlay');
-  let s;
   if (ol) {
-    s = ol.style;
-    s.zIndex = getHighestZIndex();
-    s.top = 0;
-    s.height = `${dE.clientHeight}px`;
-    s.width = `${dE.clientWidth}px`;
-    s.display = show ? '' : 'none';
+    assign(ol.style, {
+      zIndex: getHighestZIndex(),
+      top: 0,
+      height: `${dE.clientHeight}px`,
+      width: `${dE.clientWidth}px`,
+      display: show ? '' : 'none',
+    });
   } else {
     if (!show) return;
     ol = document.createElement('div');
-    s = ol.style;
     ol.id = 'overlay';
-    s.height = `${dE.clientHeight}0px`;
-    s.width = `${dE.clientWidth}0px`;
+    assign(ol.style, {
+      height: `${dE.clientHeight}0px`,
+      width: `${dE.clientWidth}0px`,
+    });
     dE.appendChild(ol);
   }
 }
