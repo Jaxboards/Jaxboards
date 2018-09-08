@@ -2,7 +2,12 @@ import {
   getCoordinates,
   getHighestZIndex,
 } from './el';
-import { stripHTML } from './util';
+
+function stripHTML(html) {
+  return html.valueOf()
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
 
 export default function (el) {
   let tooltip = document.getElementById('tooltip_thingy');

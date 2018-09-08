@@ -15,7 +15,7 @@ import sortable from './sortable';
 import sortableTree from './sortable-tree';
 import SWF from './SWF';
 import sfx from './animation';
-import window from './window';
+import Window from './window';
 
 // TODO: Organize these better
 import {
@@ -55,7 +55,7 @@ export default {
   sfx,
   SWF,
   tooltip,
-  window,
+  Window,
 
   // TODO: organize
   assign,

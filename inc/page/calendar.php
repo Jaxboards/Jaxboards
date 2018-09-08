@@ -54,7 +54,7 @@ EOT
         while ($f = $DB->arow($result)) {
             $birthdays[$f['dob_day']][] = sprintf(
                 '<a href="?act=vu%1$s" class="user%1$s mgroup%2$s" ' .
-                'title="%4$s years old!" onmouseover="JAX.tooltip(this)">' .
+                'title="%4$s years old!" data-use-tooltip="true">' .
                 '%3$s</a>',
                 $f['id'],
                 $f['group_id'],

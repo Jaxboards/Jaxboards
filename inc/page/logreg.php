@@ -252,8 +252,8 @@ EOT
         Password
         (
         <a href="?act=logreg6" title="Forgot your password?"
-            onmouseover="return JAX.tooltip(this)"
-            onclick="JAX.window.close(this);">
+            data-use-tooltip="true"
+            onclick="JAX.Window.close(this);">
             ?
         </a>
         ):
@@ -261,7 +261,7 @@ EOT
     <input type="password" name="pass" id="pass" />
     <br />
     <input type="submit" value="Login" />
-    <a href="?act=logreg1" onclick="JAX.window.close(this)">Register</a>
+    <a href="?act=logreg1" onclick="JAX.Window.close(this)">Register</a>
 </form>
 EOT
             )

@@ -300,8 +300,7 @@ EOT
             );
             $userstoday .=
                 <<<EOT
-<a href="?act=vu${fId}" class="user${fId} mgroup${fGroupId}${birthdayCode}"
-    onmouseover="JAX.tooltip(this)" title="Last online: ${lastOnlineCode}">
+<a href="?act=vu${fId}" class="user${fId} mgroup${fGroupId}${birthdayCode}" title="Last online: ${lastOnlineCode}" data-use-tooltip="true">
     ${fName}
 </a>
 EOT;
@@ -354,13 +353,13 @@ EOT;
                 );
                 if (isset($f['is_bot']) && $f['is_bot']) {
                     $r .= '<a class="user' . $f['uid'] . '" ' .
-                        'title="' . $title . '" onmouseover="JAX.tooltip(this)">' .
+                        'title="' . $title . '" data-use-tooltip="true">' .
                         $f['name'] . '</a>';
                 } else {
                     ++$nummembers;
                     $r .= sprintf(
                         '<a href="?act=vu%1$s" class="user%1$s mgroup%2$s" ' .
-                            'title="%4$s" onmouseover="JAX.tooltip(this)">' .
+                            'title="%4$s" data-use-tooltip="true">' .
                             '%3$s</a>',
                         $f['uid'],
                         $f['group_id'] . ('idle' == $f['status'] ?

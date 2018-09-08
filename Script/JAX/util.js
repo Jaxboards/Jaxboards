@@ -13,6 +13,7 @@ import {
   date,
   smalldate,
 } from './date';
+import tooltip from './tooltip';
 
 // This file is just a dumping ground until I can find better homes for these
 
@@ -107,8 +108,12 @@ export function gracefulDegrade(a) {
   if (typeof RUN !== 'undefined') {
     updateDates();
   }
-  const links = Array.from(a.querySelectorAll('a'));
+  const links = a.querySelectorAll('a');
   links.forEach((link) => {
+    if (link.dataset.useTooltip) {
+      link.addEventListener('mouseover', () => tooltip(link));
+    }
+
     if (link.href) {
       const href = link.getAttribute('href');
       if (href.charAt(0) === '?') {
@@ -282,10 +287,4 @@ export function onDOMReady(callback) {
   } else {
     document.addEventListener('DOMContentLoaded', callback);
   }
-}
-
-export function stripHTML(html) {
-  return html.valueOf()
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
 }

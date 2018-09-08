@@ -588,7 +588,7 @@ EOT
 
             $youtubeLink = 'https://www.youtube.com/watch?v=' .
                 $m[1] . ($m[2] ? '&t=' : '') . $m[2];
-            $popoutCode = 'var w=new JAX.window;w.title=this.href;' .
+            $popoutCode = 'var w=new JAX.Window;w.title=this.href;' .
                 'w.content=this.parentNode.parentNode.querySelector(\'.movie\').innerHTML;' .
                 'w.create();return false;';
             $inlineCode = 'this.parentNode.parentNode.querySelector(\'.movie\')' .
@@ -629,7 +629,7 @@ EOT;
             preg_match('@(?:vimeo.com|video)/(\\d+)@', $m[1], $id);
 
             $vimeoLink = 'https://vimeo.com/' . $id[1];
-            $popoutCode = 'var w=new JAX.window;w.title=this.href;' .
+            $popoutCode = 'var w=new JAX.Window;w.title=this.href;' .
                 'w.content=this.parentNode.parentNode.querySelector(\'.movie\')' .
                 '.innerHTML;w.create();return false;';
             $inlineCode = 'this.parentNode.parentNode.querySelector(\'.movie\')' .

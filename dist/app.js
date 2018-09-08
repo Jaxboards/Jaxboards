@@ -761,6 +761,61 @@
     gallery.appendChild(controls);
   }
 
+  function stripHTML(html) {
+    return html.valueOf()
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function openTooltip (el$$1) {
+    let tooltip = document.getElementById('tooltip_thingy');
+    const pos = getCoordinates(el$$1);
+    const title = stripHTML(el$$1.title);
+    // Prevent the browser from showing its own title
+    el$$1.title = '';
+    if (!title) return;
+    if (!tooltip) {
+      tooltip = document.createElement('table');
+      const t = tooltip.insertRow(0);
+      const c = tooltip.insertRow(1);
+      const b = tooltip.insertRow(2);
+      let a;
+
+      tooltip.id = 'tooltip_thingy';
+      tooltip.className = 'tooltip';
+      t.className = 'top';
+      c.className = 'content';
+      b.className = 'bottom';
+      a = t.insertCell(0);
+      a.className = 'left';
+      a.colSpan = 2;
+      a = t.insertCell(1);
+      a.className = 'right';
+      a = c.insertCell(0);
+      a.className = 'left';
+      a = c.insertCell(1);
+      a.innerHTML = 'default text';
+      a = c.insertCell(2);
+      a.className = 'right';
+      a = b.insertCell(0);
+      a.className = 'left';
+      a.colSpan = 2;
+      a = b.insertCell(1);
+      a.className = 'right';
+      document.querySelector('#page').appendChild(tooltip);
+    }
+
+    tooltip.rows[1].cells[1].innerHTML = title;
+    tooltip.style.display = '';
+    tooltip.style.top = `${pos.y - tooltip.clientHeight}px`;
+    tooltip.style.left = `${pos.x}px`;
+    tooltip.style.zIndex = getHighestZIndex();
+    el$$1.onmouseout = () => {
+      el$$1.title = title;
+      document.querySelector('#tooltip_thingy').style.display = 'none';
+    };
+  }
+
   /* global RUN */
 
   // This file is just a dumping ground until I can find better homes for these
@@ -856,8 +911,12 @@
     if (typeof RUN !== 'undefined') {
       updateDates();
     }
-    const links = Array.from(a.querySelectorAll('a'));
+    const links = a.querySelectorAll('a');
     links.forEach((link) => {
+      if (link.dataset.useTooltip) {
+        link.addEventListener('mouseover', () => openTooltip(link));
+      }
+
       if (link.href) {
         const href = link.getAttribute('href');
         if (href.charAt(0) === '?') {
@@ -1031,12 +1090,6 @@
     } else {
       document.addEventListener('DOMContentLoaded', callback);
     }
-  }
-
-  function stripHTML(html) {
-    return html.valueOf()
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
   }
 
   class Drag {
@@ -2278,55 +2331,6 @@
     } while (element);
   };
 
-  function openTooltip (el$$1) {
-    let tooltip = document.getElementById('tooltip_thingy');
-    const pos = getCoordinates(el$$1);
-    const title = stripHTML(el$$1.title);
-    // Prevent the browser from showing its own title
-    el$$1.title = '';
-    if (!title) return;
-    if (!tooltip) {
-      tooltip = document.createElement('table');
-      const t = tooltip.insertRow(0);
-      const c = tooltip.insertRow(1);
-      const b = tooltip.insertRow(2);
-      let a;
-
-      tooltip.id = 'tooltip_thingy';
-      tooltip.className = 'tooltip';
-      t.className = 'top';
-      c.className = 'content';
-      b.className = 'bottom';
-      a = t.insertCell(0);
-      a.className = 'left';
-      a.colSpan = 2;
-      a = t.insertCell(1);
-      a.className = 'right';
-      a = c.insertCell(0);
-      a.className = 'left';
-      a = c.insertCell(1);
-      a.innerHTML = 'default text';
-      a = c.insertCell(2);
-      a.className = 'right';
-      a = b.insertCell(0);
-      a.className = 'left';
-      a.colSpan = 2;
-      a = b.insertCell(1);
-      a.className = 'right';
-      document.querySelector('#page').appendChild(tooltip);
-    }
-
-    tooltip.rows[1].cells[1].innerHTML = title;
-    tooltip.style.display = '';
-    tooltip.style.top = `${pos.y - tooltip.clientHeight}px`;
-    tooltip.style.left = `${pos.x}px`;
-    tooltip.style.zIndex = getHighestZIndex();
-    el$$1.onmouseout = () => {
-      el$$1.title = title;
-      document.querySelector('#tooltip_thingy').style.display = 'none';
-    };
-  }
-
   var JAX$1 = {
     ajax: Ajax,
     browser: Browser,
@@ -2349,7 +2353,7 @@
     sfx: Animation,
     SWF,
     tooltip: openTooltip,
-    window: Window,
+    Window,
 
     // TODO: organize
     assign,
