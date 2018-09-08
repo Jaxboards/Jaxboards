@@ -37,13 +37,13 @@ class Stream {
         }
       });
     }
-    if (xmlobj.type >= 2) {
-      const a = xmlobj.url.substring(1);
+    if (xmlobj.type === 2) {
+      const queryParams = xmlobj.url.substring(1);
       if (!softurl) {
-        document.location = `#${a}`;
-        this.lastURL = a;
+        window.history.pushState({ queryParams }, '', `?${queryParams}`);
+        this.lastURL = queryParams;
         if (Event.onPageChange) Event.onPageChange();
-      } else if (document.location.hash.substring(1) === a) document.location = '#';
+      }
     }
     this.pollData();
   }
@@ -75,12 +75,11 @@ class Stream {
     }
   }
 
-  updatePage() {
+  updatePage(queryParams) {
     // this function makes the back/forward buttons actually do something,
     // using anchors
-    const location = document.location.hash.substring(1) || '';
-    if (location !== this.lastURL) {
-      this.location(location, '3');
+    if (queryParams !== this.lastURL) {
+      this.location(queryParams, 3);
     }
   }
 }

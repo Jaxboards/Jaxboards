@@ -17,16 +17,15 @@ class AppState {
     setInterval(updateDates, 1000 * 30);
 
     this.stream.pollData();
-    setInterval(() => this.stream.updatePage, 200);
-
-    if (useJSLinks && document.location.toString().indexOf('?') > 0) {
-      const hash = `#${document.location.search.substr(1)}`;
-      if (useJSLinks === 2) {
-        window.history.replaceState({}, '', `./${hash}`);
+    window.onpopstate = ({ state }) => {
+      if (state) {
+        const { queryParams } = state;
+        this.stream.updatePage(queryParams);
       } else {
-        document.location = hash;
+        const queryParams = document.location.search.replace(/^\?/, '');
+        this.stream.updatePage(queryParams);
       }
-    }
+    };
 
     // Load sounds
     Sound.load('sbblip', './Sounds/blip.mp3', false);

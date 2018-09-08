@@ -1989,49 +1989,6 @@
     }
   }
 
-  function SWF (url, name, settings) {
-    let object;
-    let embed;
-    const properties = {
-      width: '100%',
-      height: '100%',
-      quality: 'high',
-      ...settings,
-    };
-    object = `<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" id="${
-    name
-  }" width="${
-    properties.width
-  }" height="${
-    properties.height
-  }"><param name="movie" value="${
-    url
-  }"></param>`;
-    embed = `<embed style="display:block" type="application/x-shockwave-flash" pluginspage="https://get.adobe.com/flashplayer/" src="${
-    url
-  }" width="${
-    properties.width
-  }" height="${
-    properties.height
-  }" name="${
-    name
-  }"`;
-
-    Object.keys(properties).forEach((key) => {
-      const value = properties[key];
-      if (key !== 'width' && key !== 'height') {
-        object += `<param name="${key}" value="${value}"></param>`;
-        embed += ` ${key}="${value}"`;
-      }
-    });
-
-    embed += '></embed>';
-    object += '</object>';
-    const tmp = document.createElement('span');
-    tmp.innerHTML = Browser.ie ? object : embed;
-    return tmp.getElementsByTagName('*')[0];
-  }
-
   class Window {
     constructor() {
       assign(this, {
@@ -2257,7 +2214,6 @@
     autoComplete,
     Drag,
     Editor,
-    SWF,
     Window,
 
     checkAll,
@@ -2872,13 +2828,13 @@
           }
         });
       }
-      if (xmlobj.type >= 2) {
-        const a = xmlobj.url.substring(1);
+      if (xmlobj.type === 2) {
+        const queryParams = xmlobj.url.substring(1);
         if (!softurl) {
-          document.location = `#${a}`;
-          this.lastURL = a;
+          window.history.pushState({ queryParams }, '', `?${queryParams}`);
+          this.lastURL = queryParams;
           if (Event.onPageChange) Event.onPageChange();
-        } else if (document.location.hash.substring(1) === a) document.location = '#';
+        }
       }
       this.pollData();
     }
@@ -2910,12 +2866,11 @@
       }
     }
 
-    updatePage() {
+    updatePage(queryParams) {
       // this function makes the back/forward buttons actually do something,
       // using anchors
-      const location = document.location.hash.substring(1) || '';
-      if (location !== this.lastURL) {
-        this.location(location, '3');
+      if (queryParams !== this.lastURL) {
+        this.location(queryParams, 3);
       }
     }
   }
@@ -2932,14 +2887,15 @@
       setInterval(updateDates, 1000 * 30);
 
       this.stream.pollData();
-      setInterval(() => this.stream.updatePage, 200);
-
-      if (document.location.toString().indexOf('?') > 0) {
-        const hash = `#${document.location.search.substr(1)}`;
-        {
-          window.history.replaceState({}, '', `./${hash}`);
+      window.onpopstate = ({ state }) => {
+        if (state) {
+          const { queryParams } = state;
+          this.stream.updatePage(queryParams);
+        } else {
+          const queryParams = document.location.search.replace(/^\?/, '');
+          this.stream.updatePage(queryParams);
         }
-      }
+      };
 
       // Load sounds
       Sound$1.load('sbblip', './Sounds/blip.mp3', false);
