@@ -1335,27 +1335,27 @@
         innerhtml
       }[/bgcolor]`;
       }
-      if (style.match(/text-align: ?(right|center|left);/i)) {
+      if (style.match(/text-align: ?(right|center|left)/i)) {
         innerhtml = `[align=${RegExp.$1}]${innerhtml}[/align]`;
       }
       if (
-        style.match(/font-style: ?italic;/i)
+        style.match(/font-style: ?italic/i)
         || lcTag === 'i'
         || lcTag === 'em'
       ) {
         innerhtml = `[I]${innerhtml}[/I]`;
       }
-      if (style.match(/text-decoration:[^;]*underline;/i) || lcTag === 'u') {
+      if (style.match(/text-decoration:[^;]*underline/i) || lcTag === 'u') {
         innerhtml = `[U]${innerhtml}[/U]`;
       }
       if (
-        style.match(/text-decoration:[^;]*line-through;/i)
+        style.match(/text-decoration:[^;]*line-through/i)
         || lcTag === 's' || lcTag === 'strike'
       ) {
         innerhtml = `[S]${innerhtml}[/S]`;
       }
       if (
-        style.match(/font-weight: ?bold;/i)
+        style.match(/font-weight: ?bold/i)
         || lcTag === 'strong'
         || lcTag === 'b'
       ) {
@@ -1429,7 +1429,7 @@
     html = html.replace(/\[h(\d)\](.*?)\[\/h\1\]/g, '<h$1>$2</h$1>');
     html = html.replace(
       /\[align=(left|right|center)\](.*?)\[\/align\]/g,
-      '<span style="text-align:$1">$2</span>',
+      '<div style="text-align:$1">$2</div>',
     );
     html = html.replace(/\[(ul|ol)\]([\w\W]*?)\[\/\1\]/gi, (match) => {
       const tag = match[1];
@@ -1629,71 +1629,69 @@
       this.showEmotes(this.createEmoteWindow.x, this.createEmoteWindow.y);
     }
 
-    colorHandler(cmd) {
-      this.cmd(cmd, this.style.backgroundColor);
+    colorHandler(cmd, color) {
+      this.cmd(cmd, color);
       this.hideColors();
     }
 
     showColors(posx, posy, cmd) {
-      if (this.colorWindow && this.colorWindow.style.display !== 'none') {
-        return this.hideColors();
-      }
-      let colorwin = this.colorWindow;
+      // close the color window if it is already open
+      this.hideColors();
       const colors = [
-        'FFFFFF',
-        'AAAAAA',
-        '000000',
-        'FF0000',
-        '00FF00',
-        '0000FF',
-        'FFFF00',
-        '00FFFF',
-        'FF00FF',
+        '#FFFFFF',
+        '#AAAAAA',
+        '#000000',
+        '#FF0000',
+        '#00FF00',
+        '#0000FF',
+        '#FFFF00',
+        '#00FFFF',
+        '#FF00FF',
       ];
       const l = colors.length;
       const sq = Math.ceil(Math.sqrt(l));
-      let r;
-      let c;
-      let a;
-      if (!colorwin) {
-        colorwin = document.createElement('table');
-        colorwin.style.borderCollapse = 'collapse';
-        colorwin.style.position = 'absolute';
-        for (let y = 0; y < sq; y += 1) {
-          r = colorwin.insertRow(y);
-          for (let x = 0; x < sq; x += 1) {
-            c = r.insertCell(x);
-            if (!colors[x + y * sq]) {
-              // eslint-disable-next-line no-continue
-              continue;
-            }
-            c.style.border = '1px solid #000';
-            c.style.padding = 0;
-            a = document.createElement('a');
-            a.href = 'javascript:void(0)';
-            a.onclick = () => this.colorHandler(cmd);
-            c.appendChild(a);
-            c = a.style;
-            c.display = 'block';
-            c.backgroundColor = `#${colors[x + y * sq]}`;
-            c.height = '20px';
-            c.width = '20px';
-            c.margin = 0;
+
+      const colorwin = document.createElement('table');
+      assign(colorwin.style, {
+        borderCollapse: 'collapse',
+        position: 'absolute',
+        top: `${posy}px`,
+        left: `${posx}px`,
+      });
+
+      for (let y = 0; y < sq; y += 1) {
+        const r = colorwin.insertRow(y);
+        for (let x = 0; x < sq; x += 1) {
+          const c = r.insertCell(x);
+          const color = colors[x + y * sq];
+          if (!color) {
+            // eslint-disable-next-line no-continue
+            continue;
           }
+          c.style.border = '1px solid #000';
+          c.style.padding = 0;
+          const a = document.createElement('a');
+          a.href = 'javascript:void(0)';
+          a.onclick = () => this.colorHandler(cmd, color);
+          c.appendChild(a);
+          assign(a.style, {
+            display: 'block',
+            backgroundColor: color,
+            height: '20px',
+            width: '20px',
+            margin: 0,
+          });
         }
-        this.colorWindow = colorwin;
-        document.querySelector('#page').appendChild(colorwin);
-      } else {
-        colorwin.style.display = '';
       }
-      colorwin.style.top = `${posy}px`;
-      colorwin.style.left = `${posx}px`;
+      this.colorWindow = colorwin;
+      document.querySelector('#page').appendChild(colorwin);
       return null;
     }
 
     hideColors() {
       if (this.colorWindow) {
-        this.colorWindow.style.display = 'none';
+        this.colorWindow.parentNode.removeChild(this.colorWindow);
+        this.colorWindow = undefined;
       }
     }
 
@@ -1841,10 +1839,10 @@
       if (this.doc && this.doc.body) this.doc.body.innerHTML = a;
     }
 
-    switchMode(toggle) {
+    switchMode(toggle$$1) {
       const t = this.textarea;
       const f = this.iframe;
-      if (!toggle) {
+      if (!toggle$$1) {
         t.value = htmlToBBCode(this.getSource());
         t.style.display = '';
         f.style.display = 'none';
@@ -1853,7 +1851,7 @@
         t.style.display = 'none';
         f.style.display = '';
       }
-      this.mode = toggle;
+      this.mode = toggle$$1;
     }
 
     submit() {

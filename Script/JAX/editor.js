@@ -9,6 +9,7 @@ import {
 } from './el';
 import Event from './event';
 import { bbcodeToHTML, htmlToBBCode } from './bbcode-utils';
+import { assign } from './util';
 
 const URL_REGEX = /^(ht|f)tps?:\/\/[\w.\-%&?=/]+$/;
 const isURL = text => URL_REGEX.test(text);
@@ -193,71 +194,69 @@ class Editor {
     this.showEmotes(this.createEmoteWindow.x, this.createEmoteWindow.y);
   }
 
-  colorHandler(cmd) {
-    this.cmd(cmd, this.style.backgroundColor);
+  colorHandler(cmd, color) {
+    this.cmd(cmd, color);
     this.hideColors();
   }
 
   showColors(posx, posy, cmd) {
-    if (this.colorWindow && this.colorWindow.style.display !== 'none') {
-      return this.hideColors();
-    }
-    let colorwin = this.colorWindow;
+    // close the color window if it is already open
+    this.hideColors();
     const colors = [
-      'FFFFFF',
-      'AAAAAA',
-      '000000',
-      'FF0000',
-      '00FF00',
-      '0000FF',
-      'FFFF00',
-      '00FFFF',
-      'FF00FF',
+      '#FFFFFF',
+      '#AAAAAA',
+      '#000000',
+      '#FF0000',
+      '#00FF00',
+      '#0000FF',
+      '#FFFF00',
+      '#00FFFF',
+      '#FF00FF',
     ];
     const l = colors.length;
     const sq = Math.ceil(Math.sqrt(l));
-    let r;
-    let c;
-    let a;
-    if (!colorwin) {
-      colorwin = document.createElement('table');
-      colorwin.style.borderCollapse = 'collapse';
-      colorwin.style.position = 'absolute';
-      for (let y = 0; y < sq; y += 1) {
-        r = colorwin.insertRow(y);
-        for (let x = 0; x < sq; x += 1) {
-          c = r.insertCell(x);
-          if (!colors[x + y * sq]) {
-            // eslint-disable-next-line no-continue
-            continue;
-          }
-          c.style.border = '1px solid #000';
-          c.style.padding = 0;
-          a = document.createElement('a');
-          a.href = 'javascript:void(0)';
-          a.onclick = () => this.colorHandler(cmd);
-          c.appendChild(a);
-          c = a.style;
-          c.display = 'block';
-          c.backgroundColor = `#${colors[x + y * sq]}`;
-          c.height = '20px';
-          c.width = '20px';
-          c.margin = 0;
+
+    const colorwin = document.createElement('table');
+    assign(colorwin.style, {
+      borderCollapse: 'collapse',
+      position: 'absolute',
+      top: `${posy}px`,
+      left: `${posx}px`,
+    });
+
+    for (let y = 0; y < sq; y += 1) {
+      const r = colorwin.insertRow(y);
+      for (let x = 0; x < sq; x += 1) {
+        const c = r.insertCell(x);
+        const color = colors[x + y * sq];
+        if (!color) {
+          // eslint-disable-next-line no-continue
+          continue;
         }
+        c.style.border = '1px solid #000';
+        c.style.padding = 0;
+        const a = document.createElement('a');
+        a.href = 'javascript:void(0)';
+        a.onclick = () => this.colorHandler(cmd, color);
+        c.appendChild(a);
+        assign(a.style, {
+          display: 'block',
+          backgroundColor: color,
+          height: '20px',
+          width: '20px',
+          margin: 0,
+        });
       }
-      this.colorWindow = colorwin;
-      document.querySelector('#page').appendChild(colorwin);
-    } else {
-      colorwin.style.display = '';
     }
-    colorwin.style.top = `${posy}px`;
-    colorwin.style.left = `${posx}px`;
+    this.colorWindow = colorwin;
+    document.querySelector('#page').appendChild(colorwin);
     return null;
   }
 
   hideColors() {
     if (this.colorWindow) {
-      this.colorWindow.style.display = 'none';
+      this.colorWindow.parentNode.removeChild(this.colorWindow);
+      this.colorWindow = undefined;
     }
   }
 

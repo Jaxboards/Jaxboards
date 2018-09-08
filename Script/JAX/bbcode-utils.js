@@ -40,27 +40,27 @@ export function htmlToBBCode(html) {
         innerhtml
       }[/bgcolor]`;
     }
-    if (style.match(/text-align: ?(right|center|left);/i)) {
+    if (style.match(/text-align: ?(right|center|left)/i)) {
       innerhtml = `[align=${RegExp.$1}]${innerhtml}[/align]`;
     }
     if (
-      style.match(/font-style: ?italic;/i)
+      style.match(/font-style: ?italic/i)
       || lcTag === 'i'
       || lcTag === 'em'
     ) {
       innerhtml = `[I]${innerhtml}[/I]`;
     }
-    if (style.match(/text-decoration:[^;]*underline;/i) || lcTag === 'u') {
+    if (style.match(/text-decoration:[^;]*underline/i) || lcTag === 'u') {
       innerhtml = `[U]${innerhtml}[/U]`;
     }
     if (
-      style.match(/text-decoration:[^;]*line-through;/i)
+      style.match(/text-decoration:[^;]*line-through/i)
       || lcTag === 's' || lcTag === 'strike'
     ) {
       innerhtml = `[S]${innerhtml}[/S]`;
     }
     if (
-      style.match(/font-weight: ?bold;/i)
+      style.match(/font-weight: ?bold/i)
       || lcTag === 'strong'
       || lcTag === 'b'
     ) {
@@ -134,7 +134,7 @@ export function bbcodeToHTML(bbcode) {
   html = html.replace(/\[h(\d)\](.*?)\[\/h\1\]/g, '<h$1>$2</h$1>');
   html = html.replace(
     /\[align=(left|right|center)\](.*?)\[\/align\]/g,
-    '<span style="text-align:$1">$2</span>',
+    '<div style="text-align:$1">$2</div>',
   );
   html = html.replace(/\[(ul|ol)\]([\w\W]*?)\[\/\1\]/gi, (match) => {
     const tag = match[1];
