@@ -52,7 +52,7 @@ export default {
       });
       return;
     }
-    if (!selector.match(/^\W/)) {
+    if (!/^\W/.test(selector)) {
       selector = `#${selector}`;
     }
     const el = document.querySelector(selector);
@@ -289,7 +289,9 @@ export default {
   },
   closewindow([windowSelector]) {
     const el = document.querySelector(windowSelector);
-    Window.close(el);
+    if (el) {
+      Window.close(el);
+    }
   },
   onlinelist(a) {
     const statusers = document.querySelector('#statusers');

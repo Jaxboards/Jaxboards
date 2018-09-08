@@ -2307,7 +2307,7 @@
         });
         return;
       }
-      if (!selector.match(/^\W/)) {
+      if (!/^\W/.test(selector)) {
         selector = `#${selector}`;
       }
       const el$$1 = document.querySelector(selector);
@@ -2544,7 +2544,9 @@
     },
     closewindow([windowSelector]) {
       const el$$1 = document.querySelector(windowSelector);
-      Window.close(el$$1);
+      if (el$$1) {
+        Window.close(el$$1);
+      }
     },
     onlinelist(a) {
       const statusers = document.querySelector('#statusers');
@@ -2788,7 +2790,7 @@
     submitForm(form, resetOnSubmit = false) {
       const names = [];
       const values = [];
-      const submit = form.submitButton;
+      const { submitButton } = form;
 
       Array.from(form.elements).forEach((inputField) => {
         if (!inputField.name || inputField.type === 'submit') {
@@ -2815,9 +2817,9 @@
         values.push(inputField.value);
       });
 
-      if (submit) {
-        names.push(submit.name);
-        values.push(submit.value);
+      if (submitButton) {
+        names.push(submitButton.name);
+        values.push(submitButton.value);
       }
       this.stream.load('?', { data: [names, values] });
       if (resetOnSubmit) {
