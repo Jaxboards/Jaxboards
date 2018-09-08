@@ -907,6 +907,20 @@
     });
   }
 
+  function select(element) {
+    if (document.selection) {
+      const range = document.body.createTextRange();
+      range.moveToElementText(element);
+      range.select();
+    } else if (window.getSelection) {
+      const range = document.createRange();
+      range.selectNode(element);
+      const selection = window.getSelection();
+      if (selection.rangeCount) selection.removeAllRanges();
+      selection.addRange(range);
+    }
+  }
+
   function gracefulDegrade(a) {
     if (typeof RUN !== 'undefined') {
       updateDates();
@@ -934,6 +948,7 @@
     });
     convertSwitches(Array.from(a.querySelectorAll('.switch')));
 
+    // Handle image hover magnification
     const bbcodeimgs = Array.from(document.querySelectorAll('.bbcodeimg'));
     if (bbcodeimgs) {
       onImagesLoaded(
@@ -964,6 +979,12 @@
         inputElement.onkeydown = () => DatePicker.hide();
       });
     }
+
+    // Make BBCode code blocks selectable when clicked
+    const codeBlocks = a.querySelectorAll('.bbcode.code');
+    codeBlocks.forEach((codeBlock) => {
+      codeBlock.addEventListener('click', () => select(codeBlock));
+    });
   }
 
   function checkAll(checkboxes, value) {
@@ -1064,19 +1085,6 @@
      me.onend=a
     }
     return me */
-  }
-
-  function select(a) {
-    let r;
-    if (document.selection) {
-      r = document.body.createTextRange();
-      r.moveToElementText(a);
-      r.select();
-    } else if (window.getSelection) {
-      r = document.createRange();
-      r.selectNode(a);
-      window.getSelection().addRange(r);
-    }
   }
 
   /**

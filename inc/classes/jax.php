@@ -413,7 +413,7 @@ EOT
                 '[code]' . $k . '[/code]',
                 $returnbb ?
                 '[code' . $codes[1][$k] . ']' . $codes[2][$k] . '[/code]' :
-                '<div onclick="JAX.select(this)" class="code' .
+                '<div class="bbcode code' .
                 ($codes[1][$k] ? ' ' . $codes[1][$k] : '') . '">' .
                 $codes[2][$k] . '</div>',
                 $a
