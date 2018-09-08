@@ -10,7 +10,6 @@ import Animation from '../JAX/animation';
 import {
   getCoordinates,
   getComputedStyle,
-  replace,
 } from '../JAX/el';
 import {
   flashTitle,
@@ -18,7 +17,6 @@ import {
 import openTooltip from '../JAX/tooltip';
 import Window from '../JAX/window';
 import Sound from '../sound';
-import Uploader from '../uploader';
 
 /**
  * These are all of the possible commands
@@ -388,48 +386,9 @@ export default {
   },
   attachfiles() {
     const el = document.querySelector('#attachfiles');
-    const u = Uploader.createButton();
-    const d = document.createElement('div');
-    d.className = 'files';
-    d.appendChild(u[0]);
-    replace(el, d);
-    u[1].addfile = (file) => {
-      if (file.size > 5242880) {
-        setTimeout(() => {
-          alert("Files can't be over 5MB");
-        }, 1000);
-        return;
-      }
-      const f = document.createElement('div');
-      f.className = 'file';
-      f.innerHTML = `<div class='name'>${
-        file.name
-      }</div><div class='progressbar'><div class='progress' id='progress_${
-        this.id
-      }_${
-        file.id
-      }' style='width:0px'></div></div>`;
-      d.appendChild(f);
-      file.upload(
-        `/index.php?act=post&uploadflash=1&sessid=${
-          document.cookie.match('sid=([^;]+)')[1]}`,
-      );
-    };
-    u[1].error = (error, content) => {
-      const w = new Window();
-      w.title = 'error';
-      w.content = content;
-      w.create();
-    };
-    u[1].progress = (file, b, c) => {
-      document.querySelector(`#progress_${this.id}_${file.id}`).style.width = `${Math.round((b / c) * 100)}%`;
-    };
-    u[1].response = (response) => {
-      document.querySelector('#pdedit').editor.cmd(
-        'inserthtml',
-        `[attachment]${response}[/attachment]`,
-      );
-    };
+    el.addEventListener('click', () => {
+      alert('Attaching files is under construction');
+    });
   },
   listrating([postId, html]) {
     let prdiv = document.querySelector(`#postrating_${postId}`);

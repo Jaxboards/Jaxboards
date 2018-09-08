@@ -34,9 +34,6 @@ class POST
             // Poor forum martyr.
             $this->postdata = str_replace('youtube]', 'video]', $this->postdata);
         }
-        if (isset($JAX->b['uploadflash']) && $JAX->b['uploadflash']) {
-            die($this->uploadviaflash());
-        }
         if (isset($_FILES['Filedata'], $_FILES['Filedata']['tmp_name'])
             && $_FILES['Filedata']['tmp_name']
         ) {
@@ -63,32 +60,6 @@ class POST
         } else {
             $PAGE->location('?');
         }
-    }
-
-    public function uploadviaflash()
-    {
-        // It's flash 10 already and filereference.upload doesn't send cookies
-        // using SESSION to get id rather than $USER because no cookies are
-        // sent.
-        global $DB,$JAX;
-        // This was almost certainly a security hole before.
-        $result = $DB->safeselect(
-            '`uid`',
-            'session',
-            'WHERE `id`=?',
-            $_GET['sessid']
-        );
-        $data = $DB->arow($result);
-        $DB->disposeresult($result);
-
-        if (!$data['uid']) {
-            return 'must be logged in';
-        }
-        $fileobj = $_FILES['Filedata'];
-        // Flash gets this wrong, this normalizes.
-        $fileobj['name'] = $JAX->b['Filename'];
-
-        return $this->upload($fileobj, $data['uid']);
     }
 
     public function upload($fileobj, $uid = false)

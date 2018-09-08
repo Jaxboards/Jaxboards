@@ -172,11 +172,6 @@
     b.parentNode.insertBefore(a, b.nextSibling);
   }
 
-  function replace(a, b) {
-    insertBefore(b, a);
-    if (a.parentNode) a.parentNode.removeChild(a);
-  }
-
   function getHighestZIndex() {
     const allElements = Array.from(document.getElementsByTagName('*'));
     const max = allElements.reduce((maxZ, element) => {
@@ -2210,7 +2205,7 @@
     } while (element);
   };
 
-  var JAX$1 = {
+  var JAX = {
     autoComplete,
     Drag,
     Editor,
@@ -2220,82 +2215,6 @@
     handleTabs,
     toggle,
   };
-
-  /* eslint-disable */
-  // TODO: Remove this file
-
-  class Uploader {
-    constructor() {
-      this.uploaders = [];
-    }
-
-    listenerHandler(id, action, args) {
-      // moving arguments around
-      switch (action) {
-        case "addfile":
-          args[0].id = args[1];
-          args = args[0];
-          args.upload = function(url) {
-            Uploader.upload(id, this, url);
-          };
-          args = [args];
-          break;
-        case "startupload":
-          args[0].id = args[1];
-          args = [args[0]];
-          break;
-        case "progress":
-          args[0].id = args[1];
-          args.splice(1, 1);
-          break;
-        case "error":
-          args[2].id = args.pop();
-          break;
-        default:
-          if (!args.length) args = [args];
-          break;
-      }
-      if (this.uploaders[id] && this.uploaders[id][action]) {
-        this.uploaders[id][action].apply(this.uploaders[id], args);
-      }
-    }
-
-    createButton() {
-      const d = document.createElement("div");
-      d.className = "uploadbutton";
-      d.innerHTML = "Add File(s)";
-      return [d, this.create(d)];
-    }
-
-    create(el, w, h, url) {
-      const nid = this.uploaders.length;
-      const swf = JAX.SWF("Script/uploader.swf", `uploader${nid}`, {
-        width: w || "100%",
-        height: h || "100%",
-        allowScriptAccess: "sameDomain",
-        wmode: "transparent",
-        flashvars: `id=${nid}`
-      });
-
-      const s = swf.style;
-      s.position = "absolute";
-      s.left = "0px";
-      s.top = "0px";
-      el.style.position = "relative";
-      el.appendChild(swf);
-      this.uploaders.push([]);
-      this.uploaders[nid].flashObj = swf;
-      this.uploaders[nid].id = nid;
-      return this.uploaders[nid];
-    }
-
-    upload(nid, fileobj, url) {
-      this.uploaders[nid].flashObj.upload(fileobj.id, url);
-    }
-  }
-
-  // Uploader is a singleton
-  var Uploader$1 = new Uploader();
 
   class Sound {
     constructor() {
@@ -2722,48 +2641,9 @@
     },
     attachfiles() {
       const el$$1 = document.querySelector('#attachfiles');
-      const u = Uploader$1.createButton();
-      const d = document.createElement('div');
-      d.className = 'files';
-      d.appendChild(u[0]);
-      replace(el$$1, d);
-      u[1].addfile = (file) => {
-        if (file.size > 5242880) {
-          setTimeout(() => {
-            alert("Files can't be over 5MB");
-          }, 1000);
-          return;
-        }
-        const f = document.createElement('div');
-        f.className = 'file';
-        f.innerHTML = `<div class='name'>${
-        file.name
-      }</div><div class='progressbar'><div class='progress' id='progress_${
-        this.id
-      }_${
-        file.id
-      }' style='width:0px'></div></div>`;
-        d.appendChild(f);
-        file.upload(
-          `/index.php?act=post&uploadflash=1&sessid=${
-          document.cookie.match('sid=([^;]+)')[1]}`,
-        );
-      };
-      u[1].error = (error, content) => {
-        const w = new Window();
-        w.title = 'error';
-        w.content = content;
-        w.create();
-      };
-      u[1].progress = (file, b, c) => {
-        document.querySelector(`#progress_${this.id}_${file.id}`).style.width = `${Math.round((b / c) * 100)}%`;
-      };
-      u[1].response = (response) => {
-        document.querySelector('#pdedit').editor.cmd(
-          'inserthtml',
-          `[attachment]${response}[/attachment]`,
-        );
-      };
+      el$$1.addEventListener('click', () => {
+        alert('Attaching files is under construction');
+      });
     },
     listrating([postId, html]) {
       let prdiv = document.querySelector(`#postrating_${postId}`);
@@ -3007,9 +2887,8 @@
 
   // Kinda hacky - these are all globals
   assign(window, {
-    JAX: JAX$1,
+    JAX,
     RUN: RUN$1,
-    Uploader: Uploader$1,
     Sound: Sound$1,
 
     // TODO: Make this not globally defined
