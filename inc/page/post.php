@@ -337,7 +337,8 @@ EOT
 
         $form = '<div class="postform">
 <form method="post" data-ajax-form="true" onsubmit="if(this.submitButton.value.match(/post/i)) ' .
-        'this.submitButton.disabled=true;document.querySelector(\'#pdedit\').editor.submit();" enctype="multipart/form-data">
+            'this.submitButton.disabled=true;document.querySelector(\'#pdedit\').editor.submit();" ' .
+            'enctype="multipart/form-data">
  ' . $vars . '
   <textarea name="postdata" id="post">' . $postdata .
         '</textarea><iframe id="pdedit" onload="new JAX.Editor(document.querySelector(\'#post\'),this)"

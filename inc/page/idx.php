@@ -300,7 +300,8 @@ EOT
             );
             $userstoday .=
                 <<<EOT
-<a href="?act=vu${fId}" class="user${fId} mgroup${fGroupId}${birthdayCode}" title="Last online: ${lastOnlineCode}" data-use-tooltip="true">
+<a href="?act=vu${fId}" class="user${fId} mgroup${fGroupId}${birthdayCode}"
+    title="Last online: ${lastOnlineCode}" data-use-tooltip="true">
     ${fName}
 </a>
 EOT;

@@ -301,7 +301,7 @@ EOT
         } else {
             $page = '<form method="post">
                 Member Name: <input type="text" name="name" ' .
-                'data-autocomplete-action="searchmembers" '.
+                'data-autocomplete-action="searchmembers" ' .
                 'data-autocomplete-output="#mid" ' .
                 'data-autocomplete-indicator="#validname""' .
                 '/>' .
@@ -567,14 +567,14 @@ EOT
             <p>This tool is used for merging duplicate accounts. ' .
             'Merge the duplicate account with the original account.</p>
             <label>Merge:</label><input type="text" name="name1" ' .
-            'data-autocomplete-action="searchmembers" '.
+            'data-autocomplete-action="searchmembers" ' .
             'data-autocomplete-output="#mid1" ' .
             'data-autocomplete-indicator="#validname""' .
             ' />' .
             '<input type="hidden" id="mid1" name="mid1" />' .
             '<span id="validname"></span><br />
             <label>With:</label><input type="text" name="name2" ' .
-            'data-autocomplete-action="searchmembers" '.
+            'data-autocomplete-action="searchmembers" ' .
             'data-autocomplete-output="#mid2" ' .
             'data-autocomplete-indicator="#validname2""' .
             ' />' .
@@ -657,7 +657,7 @@ EOT
             All traces of the member ever even existing will vanish away!</p>
 
             <label>Member Name:</label><input type="text" name="name" ' .
-            'data-autocomplete-action="searchmembers" '.
+            'data-autocomplete-action="searchmembers" ' .
             'data-autocomplete-output="#mid" ' .
             'data-autocomplete-indicator="#validname""' .
             ' />' .

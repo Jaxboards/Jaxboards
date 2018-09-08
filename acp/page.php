@@ -226,12 +226,21 @@ EOT;
      */
     public function parseTemplate($templateFile, $data = null)
     {
-        try {
-            $template = file_get_contents($templateFile);
-        } catch (Exception $e) {
-            return '';
+        $fileError = false;
+        if (is_file($templateFile)) {
+            try {
+                $template = file_get_contents($templateFile);
+            } catch (Exception $e) {
+                $fileError = true;
+            }
+            if (false === $template) {
+                $fileError = true;
+            }
+        } else {
+            $fileError = true;
         }
-        if (false === $template) {
+        if ($fileError) {
+            error_log('Could not open file: ' . $templateFile);
             return '';
         }
         if (is_array($data)) {

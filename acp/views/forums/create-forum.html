@@ -1,64 +1,65 @@
-<table class="settings">
-  <tr>
-    <td>
-      Forum Title:
-    </td>
-    <td>
-      <input type="text" name="title" value="<% TITLE %>" />
-    </td>
-  </tr>
-  <tr>
-    <td>
-      Description:
-    </td>
-    <td>
-      <textarea name="description"><% DESCRIPTION %></textarea>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      Redirect URL:
-    </td>
-    <td>
-      <input type="text" name="redirect" value="<% REDIRECT_URL %>" />
-    </td>
-  </tr>
-  <tr>
-    <td>
-      Show Subforums:
-    </td>
-    <td>
-      <select name="showsub">
-        <% SUBFORUM_OPTIONS %>
-      </select>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      Order Topics By:
-    </td>
-    <td>
-      <select name="orderby">
-        <% ORDER_BY_OPTIONS %>
-      </select>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      Posts count towards post count?
-    </td>
-    <td>
-      <input <% NO_COUNT %> type="checkbox" class="switch yn"
-      name="nocount" />
-    </td>
-  </tr>
-  <tr>
-    <td>
-      Trashcan?
-    </td>
-    <td>
-      <input <% TRASHCAN %> type="checkbox" class="switch yn"
-      name="trashcan" />
-    </td>
-  </tr>
-</table>
+<form method="post">
+  <table class="settings">
+    <tr>
+      <td>
+        Forum Title:
+      </td>
+      <td>
+        <input type="text" name="title" value="<% TITLE %>" />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Description:
+      </td>
+      <td>
+        <textarea name="description"><% DESCRIPTION %></textarea>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Redirect URL:
+      </td>
+      <td>
+        <input type="text" name="redirect" value="<% REDIRECT_URL %>" />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Show Subforums:
+      </td>
+      <td>
+        <select name="showsub">
+          <% SUBFORUM_OPTIONS %>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Order Topics By:
+      </td>
+      <td>
+        <select name="orderby">
+          <% ORDER_BY_OPTIONS %>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Posts count towards post count?
+      </td>
+      <td>
+        <input <% NO_COUNT %> type="checkbox" class="switch yn"
+        name="nocount" />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Trashcan?
+      </td>
+      <td>
+        <input <% TRASHCAN %> type="checkbox" class="switch yn"
+        name="trashcan" />
+      </td>
+    </tr>
+  </table>
