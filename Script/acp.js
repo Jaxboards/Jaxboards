@@ -64,9 +64,7 @@ function submitForm(form) {
 
 // TODO: Remove all globals in this file
 window.ACP = {
-  autoComplete,
   getCoordinates,
-  dropdownMenu,
 };
 
 function makestuffcool() {
@@ -107,6 +105,30 @@ function makestuffcool() {
       }
     });
   }
+
+  // Hook up autocomplete form fields
+  const autoCompleteFields = document.querySelectorAll('[data-autocomplete-action]');
+  autoCompleteFields.forEach((field) => {
+    // Disable native autocomplete behavior
+    field.autocomplete = 'off';
+    const action = field.dataset.autocompleteAction;
+    const output = field.dataset.autocompleteOutput;
+    const indicator = field.dataset.autocompleteIndicator;
+    const outputElement = output && document.querySelector(output);
+    const indicatorElement = indicator && document.querySelector(indicator);
+    const searchTerm = field.value;
+
+    if (outputElement) {
+      outputElement.addEventListener('change', () => {
+        indicatorElement.classList.add('good');
+      });
+    }
+    field.addEventListener('keyup', (event) => {
+      indicatorElement.classList.remove('good');
+      indicatorElement.classList.add('bad');
+      autoComplete(`act=${action}&term=${encodeURIComponent(searchTerm)}`, field, outputElement, event);
+    });
+  });
 
   // Orderable forums needs this
   const tree = document.querySelector('.tree');

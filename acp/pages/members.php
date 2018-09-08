@@ -299,16 +299,16 @@ EOT
                     "name='savedata' value='Save' /></form>";
             }
         } else {
-            $page = "<form method='post'>
-                Member Name: <input type='text' name='name' autocomplete='off' " .
-                "onkeyup=\"document.querySelector('#validname').className='bad';" .
-                "ACP.autoComplete('act=searchmembers&term='" .
-                "+this.value,this,document.querySelector('#mid'),event);\" />
-                <input type='hidden' id='mid' name='mid' " .
-                "onchange=\"document.querySelector('#validname').className='good'\"/>" .
-                "<span id='validname'></span>
-                <input type='submit' name='submit' value='Go' />
-                </form>";
+            $page = '<form method="post">
+                Member Name: <input type="text" name="name" ' .
+                'data-autocomplete-action="searchmembers" '.
+                'data-autocomplete-output="#mid" ' .
+                'data-autocomplete-indicator="#validname""' .
+                '/>' .
+                '<input type="hidden" id="mid" name="mid" />' .
+                '<span id="validname"></span>
+                <input type="submit" name="submit" value="Go" />
+                </form>';
         }
         $PAGE->addContentBox(
             (@$data['name']) ? 'Editing ' . $data['name'] . "'s details" :
@@ -566,18 +566,19 @@ EOT
         $page .= '<form method="post">
             <p>This tool is used for merging duplicate accounts. ' .
             'Merge the duplicate account with the original account.</p>
-            <label>Merge:</label><input type="text" name="name1" autocomplete="off" ' .
-            'onkeyup="document.querySelector(\'#validname\').className=\'bad\';ACP.autoComplete(' .
-            '\'act=searchmembers&term=\'+this.value,this,document.querySelector(\'#mid1\'),event);" />
-            <input type="hidden" id="mid1" name="mid1" ' .
-            'onchange="document.querySelector(\'#validname\').className=\'good\'"/>' .
+            <label>Merge:</label><input type="text" name="name1" ' .
+            'data-autocomplete-action="searchmembers" '.
+            'data-autocomplete-output="#mid1" ' .
+            'data-autocomplete-indicator="#validname""' .
+            ' />' .
+            '<input type="hidden" id="mid1" name="mid1" />' .
             '<span id="validname"></span><br />
-            <label>With:</label><input type="text" name="name2" autocomplete="off" ' .
-            'onkeyup="document.querySelector(\'#validname2\').className=\'bad\';' .
-            'ACP.autoComplete(\'act=searchmembers&term=\'+' .
-            'this.value,this,document.querySelector(\'#mid2\'),event);" />
-            <input type="hidden" id="mid2" name="mid2" ' .
-            'onchange="document.querySelector(\'#validname2\').className=\'good\'"/>' .
+            <label>With:</label><input type="text" name="name2" ' .
+            'data-autocomplete-action="searchmembers" '.
+            'data-autocomplete-output="#mid2" ' .
+            'data-autocomplete-indicator="#validname2""' .
+            ' />' .
+            '<input type="hidden" id="mid2" name="mid2" />' .
             '<span id="validname2"></span><br />
             <input type="submit" name="submit" value="Merge Accounts" />
             </form>';
@@ -654,12 +655,13 @@ EOT
         $page .= '<form method="post">
             <p>This tool is used for deleting member accounts.
             All traces of the member ever even existing will vanish away!</p>
+
             <label>Member Name:</label><input type="text" name="name" ' .
-            'onkeyup="document.querySelector(\'#validname\').className=\'bad\';' .
-            'ACP.autoComplete(\'act=searchmembers&term=\'+' .
-            'this.value,this,document.querySelector(\'#mid\'),event);" autocomplete="off" />
-            <input type="hidden" id="mid" name="mid" ' .
-            'onchange="document.querySelector(\'#validname\').className=\'good\'"/>' .
+            'data-autocomplete-action="searchmembers" '.
+            'data-autocomplete-output="#mid" ' .
+            'data-autocomplete-indicator="#validname""' .
+            ' />' .
+            '<input type="hidden" id="mid" name="mid" />' .
             '<span id="validname"></span><br />
             <input type="submit" name="submit" value="Delete Account" />
             </form>';

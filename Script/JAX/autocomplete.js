@@ -2,7 +2,7 @@ import Ajax from './ajax';
 import JaxEvent from './event';
 import { getHighestZIndex, getCoordinates } from './el';
 
-export default function (queryParams, el, dummy, event = {}) {
+export default function (queryParams, el, outputElement, event = {}) {
   const e = JaxEvent(event);
   el.onkeydown = (event2) => {
     const e2 = JaxEvent(event2);
@@ -67,9 +67,9 @@ export default function (queryParams, el, dummy, event = {}) {
               div.innerHTML = value;
               div.onclick = () => {
                 div.parentNode.style.display = 'none';
-                if (dummy) {
-                  dummy.value = key;
-                  dummy.dispatchEvent(new Event('change'));
+                if (outputElement) {
+                  outputElement.value = key;
+                  outputElement.dispatchEvent(new Event('change'));
                 }
                 el.value = value;
               };

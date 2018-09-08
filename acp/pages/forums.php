@@ -560,11 +560,11 @@ EOT
         } else {
             $moderators .= 'No forum-specific moderators added!';
         }
-        $moderators .= '<br /><input type="text" name="name" autocomplete="off" ' .
-            'onkeyup="document.querySelector(\'#validname\').className=\'bad\';' .
-            'ACP.autoComplete(\'act=searchmembers&term=\'+' .
-            'this.value,this,document.querySelector(\'#modid\'),event);" />
-            <input type="hidden" id="modid" name="modid" ' .
+        $moderators .= '<br /><input type="text" name="name" '.
+            'data-autocomplete-action="searchmembers" '.
+            'data-autocomplete-output="#modid" ' .
+            'data-autocomplete-indicator="#validname" /> ' .
+            '<input type="hidden" id="modid" name="modid" ' .
             'onchange="document.querySelector(\'#validname\').className=\'good\'"/>' .
             '<span id="validname"></span>' .
             '<input type="submit" name="submit" value="Add Moderator" />' .

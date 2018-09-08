@@ -1151,7 +1151,7 @@
     items.forEach(item => drag.apply(item));
   }
 
-  function autoComplete (queryParams, el$$1, dummy, event = {}) {
+  function autoComplete (queryParams, el$$1, outputElement, event = {}) {
     const e = Event$1(event);
     el$$1.onkeydown = (event2) => {
       const e2 = Event$1(event2);
@@ -1216,9 +1216,9 @@
                 div.innerHTML = value;
                 div.onclick = () => {
                   div.parentNode.style.display = 'none';
-                  if (dummy) {
-                    dummy.value = key;
-                    dummy.dispatchEvent(new Event('change'));
+                  if (outputElement) {
+                    outputElement.value = key;
+                    outputElement.dispatchEvent(new Event('change'));
                   }
                   el$$1.value = value;
                 };
@@ -1290,9 +1290,7 @@
 
   // TODO: Remove all globals in this file
   window.ACP = {
-    autoComplete,
     getCoordinates,
-    dropdownMenu,
   };
 
   function makestuffcool() {
@@ -1333,6 +1331,30 @@
         }
       });
     }
+
+    // Hook up autocomplete form fields
+    const autoCompleteFields = document.querySelectorAll('[data-autocomplete-action]');
+    autoCompleteFields.forEach((field) => {
+      // Disable native autocomplete behavior
+      field.autocomplete = 'off';
+      const action = field.dataset.autocompleteAction;
+      const output = field.dataset.autocompleteOutput;
+      const indicator = field.dataset.autocompleteIndicator;
+      const outputElement = output && document.querySelector(output);
+      const indicatorElement = indicator && document.querySelector(indicator);
+      const searchTerm = field.value;
+
+      if (outputElement) {
+        outputElement.addEventListener('change', () => {
+          indicatorElement.classList.add('good');
+        });
+      }
+      field.addEventListener('keyup', (event) => {
+        indicatorElement.classList.remove('good');
+        indicatorElement.classList.add('bad');
+        autoComplete(`act=${action}&term=${encodeURIComponent(searchTerm)}`, field, outputElement, event);
+      });
+    });
 
     // Orderable forums needs this
     const tree = document.querySelector('.tree');
