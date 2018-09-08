@@ -300,16 +300,18 @@
 
   function htmlToBBCode(html) {
     let bbcode = html;
+    const nestedTagRegex = /<(\w+)([^>]*)>([\w\W]*?)<\/\1>/gi;
     bbcode = bbcode.replace(/[\r\n]+/g, '');
     bbcode = bbcode.replace(/<(hr|br|meta)[^>]*>/gi, '\n');
     bbcode = bbcode.replace(/<img.*?src=["']?([^'"]+)["'][^>]*\/?>/g, '[img]$1[/img]');
-    bbcode = bbcode.replace(/<(\w+)([^>]*)>([\w\W]*?)<\/\1>/gi, (
+    bbcode = bbcode.replace(nestedTagRegex, (
       whole,
       tag,
       attributes,
       innerHTML,
     ) => {
-      let innerhtml = innerHTML;
+      // Recursively handle nested tags
+      let innerhtml = nestedTagRegex.test(innerHTML) ? htmlToBBCode(innerHTML) : innerHTML;
       const att = {};
       attributes.replace(
         /(color|size|style|href|src)=(['"]?)(.*?)\2/gi,
@@ -345,7 +347,7 @@
       }
       if (
         style.match(/text-decoration:[^;]*line-through;/i)
-        || lcTag === 's'
+        || lcTag === 's' || lcTag === 'strike'
       ) {
         innerhtml = `[S]${innerhtml}[/S]`;
       }
@@ -400,7 +402,10 @@
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/(\s) /g, '$1&nbsp;');
-    html = html.replace(/\[(b|i|u|s)\]([\w\W]*?)\[\/\1\]/gi, '<$1>$2</$1>');
+    html = html.replace(/\[b\]([\w\W]*?)\[\/b\]/gi, '<b>$1</b>');
+    html = html.replace(/\[i\]([\w\W]*?)\[\/i\]/gi, '<i>$1</i>');
+    html = html.replace(/\[u\]([\w\W]*?)\[\/u\]/gi, '<u>$1</u>');
+    html = html.replace(/\[s\]([\w\W]*?)\[\/s\]/gi, '<s>$1</s>');
     html = html.replace(/\[img\]([^'"[]+)\[\/img\]/gi, '<img src="$1">');
     html = html.replace(
       /\[color=([^\]]+)\](.*?)\[\/color\]/gi,
