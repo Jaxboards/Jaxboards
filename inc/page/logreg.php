@@ -242,7 +242,7 @@ EOT
                 'useoverlay' => 1,
                 'id' => 'loginform',
                 'content' => <<<'EOT'
-<form method="post" onsubmit="return RUN.submitForm(this,1)">
+<form method="post" data-ajax-form="resetOnSubmit">
     <input type="hidden" name="act" value="logreg3" />
     <input type="hidden" name="popup" value="1" />
     <label for="user">Username:</label>

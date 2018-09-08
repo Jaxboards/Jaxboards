@@ -204,6 +204,16 @@ export function gracefulDegrade(a) {
       collapse(collapseContent);
     });
   });
+
+  // Wire up AJAX forms
+  const ajaxForms = a.querySelectorAll('form[data-ajax-form]');
+  ajaxForms.forEach((ajaxForm) => {
+    const resetOnSubmit = ajaxForm.dataset.ajaxForm === 'resetOnSubmit';
+    ajaxForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      RUN.submitForm(ajaxForm, resetOnSubmit);
+    });
+  });
 }
 
 export function checkAll(checkboxes, value) {

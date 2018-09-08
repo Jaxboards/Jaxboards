@@ -392,7 +392,7 @@ EOT;
         $this->ucppage = 'Your avatar: <span class="avatar"><img src="' .
             $JAX->pick($USER['avatar'], $PAGE->meta('default-avatar')) .
             '" alt="Unable to load avatar"></span><br /><br />
-            <form onsubmit="return RUN.submitForm(this)" method="post">' .
+            <form data-ajax-form="true" method="post">' .
             $this->getlocationforform()
             . ($e ? $PAGE->error($e) : '') .
             '<input type="text" name="changedava" value="' .

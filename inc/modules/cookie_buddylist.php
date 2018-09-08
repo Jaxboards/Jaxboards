@@ -3,7 +3,7 @@
 $buddylist = $JAX->hiddenFormFields(array('module' => 'buddylist'));
 $PAGE->metadefs['buddylist-contacts'] = <<<EOT
 <div class="contacts">
-    <form method="?" onsubmit="return RUN.submitForm(this)">
+    <form method="?" data-ajax-form="true">
         ${buddylist}
         <a href="?act=logreg5" onclick="return RUN.stream.location(this.href)"
             id="status" class="%s">

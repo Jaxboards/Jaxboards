@@ -235,11 +235,10 @@ EOT
                     'subtitle' => '',
                 );
             }
-            $form = '<form method="post"
+            $form = '<form method="post" data-ajax-form="true"
                 onsubmit="document.querySelector(\'#pdedit\').editor.submit();' .
                 'if(this.submitButton.value.match(/post/i)) ' .
-                'this.submitButton.disabled=true;return ' .
-                'RUN.submitForm(this,0,event);">
+                'this.submitButton.disabled=true;">
  <div class="topicform">
  <input type="hidden" name="act" value="post" />
  <input type="hidden" name="how" value="newtopic" />
@@ -366,9 +365,8 @@ EOT
         }
 
         $form = '<div class="postform">
-<form method="post" onsubmit="if(this.submitButton.value.match(/post/i)) ' .
-        'this.submitButton.disabled=true;document.querySelector(\'#pdedit\').editor.submit();return ' .
-        'RUN.submitForm(this,0,event);" enctype="multipart/form-data">
+<form method="post" data-ajax-form="true" onsubmit="if(this.submitButton.value.match(/post/i)) ' .
+        'this.submitButton.disabled=true;document.querySelector(\'#pdedit\').editor.submit();" enctype="multipart/form-data">
  ' . $vars . '
   <textarea name="postdata" id="post">' . $postdata .
         '</textarea><iframe id="pdedit" onload="new JAX.Editor(document.querySelector(\'#post\'),this)"

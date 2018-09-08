@@ -637,7 +637,7 @@ EOT
             $this->cancel();
             $PAGE->location('?act=vt' . $JAX->p['ot']);
         }
-        $page .= '<form method="post" onsubmit="return RUN.submitForm(this)" ' .
+        $page .= '<form method="post" data-ajax-form="true" ' .
             'style="padding:10px;">' .
             'Which topic should the topics be merged into?<br />';
         $page .= $JAX->hiddenFormFields(
@@ -711,7 +711,7 @@ EOT
         }
         $e = '';
         $data = array();
-        $page = '<form method="post" onsubmit="return RUN.submitForm(this)">' .
+        $page = '<form method="post" data-ajax-form="true">' .
             $JAX->hiddenFormFields(
                 array(
                     'submit' => 'showform',
@@ -842,7 +842,7 @@ EOT
                         '" value="' . $value . '" />') . '</td></tr>';
                 }
                 $page .= '<form method="post" ' .
-                    'onsubmit="return RUN.submitForm(this)"><table>';
+                    'data-ajax-form="true"><table>';
                 $page .= $JAX->hiddenFormFields(
                     array(
                         'act' => 'modcontrols',
@@ -913,7 +913,7 @@ EOT
             )
         );
         $form = <<<EOT
-<form method='post' onsubmit='return RUN.submitForm(this)'>
+<form method='post' data-ajax-form='true'>
     ${hiddenFields}
     IP: <input type='text' name='ip' value='${ip}' />
     <input type='submit' value='Submit' />
@@ -950,7 +950,7 @@ EOT;
             $page .= $this->box(
                 'Info',
                 <<<EOT
-<form method='post' onsubmit='return RUN.submitForm(this)'>
+<form method='post' data-ajax-form='true'>
     ${hiddenFields}
     IP ban status: ${banCode}<br />
 </form>

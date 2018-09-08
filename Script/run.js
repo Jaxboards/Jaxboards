@@ -36,7 +36,7 @@ class AppState {
     document.cookie = 'buddylist=0';
   }
 
-  submitForm(form, clearFormOnSubmit = false) {
+  submitForm(form, resetOnSubmit = false) {
     const names = [];
     const values = [];
     const submit = form.submitButton;
@@ -69,11 +69,10 @@ class AppState {
       values.push(submit.value);
     }
     this.stream.load('?', { data: [names, values] });
-    if (clearFormOnSubmit) {
+    if (resetOnSubmit) {
       form.reset();
     }
     this.stream.pollData();
-    return false;
   }
 
   handleQuoting(a) {

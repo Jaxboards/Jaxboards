@@ -106,7 +106,7 @@
     moveto(id) {
       const { whichone } = this;
       this.getitup(
-        `<form method="post" onsubmit="return RUN.submitForm(this)">move ${
+        `<form method="post" data-ajax-form="true">move ${
         whichone ? 'posts' : 'topics'
       } here? <input type="hidden" name="act" value="modcontrols" />`
           + `<input type="hidden" name="${
@@ -168,7 +168,7 @@
           tids = `${a[1]}`.split(',');
         }
         const tl = tids ? tids.length : 0;
-        const html = `${"<form method='post' onsubmit='return RUN.submitForm(this)'>"
+        const html = `${"<form method='post' data-ajax-form='true'>"
           + "<input type='hidden' name='act' value='modcontrols' />"}${
         tl
           ? `${"<select name='dot'>"

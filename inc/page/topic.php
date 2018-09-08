@@ -715,7 +715,7 @@ EOT
             $page .= '</table>';
         } else {
             $page = "<form method='post' action='?' " .
-                "onsubmit='return RUN.submitForm(this)'>" .
+                "data-ajax-form='true'>" .
                 $JAX->hiddenFormFields(
                     array(
                         'act' => 'vt' . $this->id,

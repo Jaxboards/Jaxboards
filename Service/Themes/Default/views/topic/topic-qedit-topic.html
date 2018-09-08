@@ -1,4 +1,4 @@
-<form method="post" onsubmit="document.querySelector('#pdedit').editor.submit();return RUN.submitForm(this)">
+<form method="post" data-ajax-form="true" onsubmit="document.querySelector('#pdedit').editor.submit();">
   %s
   Topic Title:
   <input type="text" name="ttitle" value="%s" />

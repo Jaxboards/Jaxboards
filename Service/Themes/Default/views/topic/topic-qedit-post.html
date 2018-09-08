@@ -1,4 +1,4 @@
-<form method="post" onsubmit="document.querySelector('#pdedit%3$s').editor.submit();return RUN.submitForm(this)">
+<form method="post" data-ajax-form="true" onsubmit="document.querySelector('#pdedit%3$s').editor.submit();">
   %1$s
   <textarea id="postdata%3$s" name="postdata">%2$s</textarea>
   <iframe id="pdedit%3$s" style="display:none" onload="new JAX.Editor(document.querySelector('#postdata%3$s'),this)">

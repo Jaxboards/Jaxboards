@@ -1116,6 +1116,16 @@
         collapse(collapseContent);
       });
     });
+
+    // Wire up AJAX forms
+    const ajaxForms = a.querySelectorAll('form[data-ajax-form]');
+    ajaxForms.forEach((ajaxForm) => {
+      const resetOnSubmit = ajaxForm.dataset.ajaxForm === 'resetOnSubmit';
+      ajaxForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        RUN.submitForm(ajaxForm, resetOnSubmit);
+      });
+    });
   }
 
   function checkAll(checkboxes, value) {
@@ -2547,7 +2557,7 @@
       } <a href="#" onclick="IMWindow.menu(event,${
         fromId
       });return false;">&rsaquo;</a>`;
-        imWindow.content = "<div class='ims'></div><div class='offline'>This user may be offline</div><div><form onsubmit='return RUN.submitForm(this,1)' method='post'><input type='hidden' name='im_uid' value='%s' /><input type='text' name='im_im' /><input type='hidden' name='act' value='blank' /></form></div>".replace(
+        imWindow.content = "<div class='ims'></div><div class='offline'>This user may be offline</div><div><form data-ajax-form='resetOnSubmit' method='post'><input type='hidden' name='im_uid' value='%s' /><input type='text' name='im_im' /><input type='hidden' name='act' value='blank' /></form></div>".replace(
           /%s/g,
           fromId,
         );
@@ -2928,7 +2938,7 @@
       document.cookie = 'buddylist=0';
     }
 
-    submitForm(form, clearFormOnSubmit = false) {
+    submitForm(form, resetOnSubmit = false) {
       const names = [];
       const values = [];
       const submit = form.submitButton;
@@ -2961,11 +2971,10 @@
         values.push(submit.value);
       }
       this.stream.load('?', { data: [names, values] });
-      if (clearFormOnSubmit) {
+      if (resetOnSubmit) {
         form.reset();
       }
       this.stream.pollData();
-      return false;
     }
 
     handleQuoting(a) {

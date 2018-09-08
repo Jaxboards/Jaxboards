@@ -142,7 +142,7 @@ EOT
     </div>
     <div class="message">${messageCode}</div>
     <div class="messagebuttons">
-        <form method="post" onsubmit="return RUN.submitForm(this,0,event)">
+        <form method="post" data-ajax-form="true">
             <input type="hidden" name="act" value="inbox" />
             <input type="hidden" name="messageid" value="${messageId}" />
             <input type="hidden" name="sender" value="${messageFrom}" />
@@ -467,7 +467,7 @@ EOT
         $page = <<<EOT
 <div class="composeform">
     <form method="post"
-        onsubmit="document.querySelector('#pdedit').editor.submit();return RUN.submitForm(this)">
+        data-ajax-form="true" onsubmit="document.querySelector('#pdedit').editor.submit();">
         ${hiddenFields}
         <div>
             <label for="to">
