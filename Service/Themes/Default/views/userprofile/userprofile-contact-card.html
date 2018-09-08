@@ -13,15 +13,11 @@
         </div>
       </td>
       <td class="right">
-        <a href="javascript:void(0)" onclick="
-                        new IMWindow('%4$s',this.innerHTML.match(/IM (.+)/)[1]);
-                        JAX.window.close(this);
-                        return false;
-                    ">
+        <a href="javascript:void(0)" data-window-close="true" onclick="new IMWindow('%4$s',this.innerHTML.match(/IM (.+)/)[1]);">
           IM %1$s
         </a>
         <br />
-        <a href="?act=ucp&what=inbox&page=compose&mid=%4$s" onclick="JAX.window.close(this)">
+        <a href="?act=ucp&what=inbox&page=compose&mid=%4$s" data-window-close="true">
           PM %1$s
         </a>
         <br />
@@ -31,7 +27,7 @@
         %7$s
         <br />
         <br />
-        <a href="?act=vu%4$s&view=profile" onclick="JAX.window.close(this)">
+        <a href="?act=vu%4$s&view=profile" data-window-close="true">
           Full Profile
         </a>
         <div class="contact_details">

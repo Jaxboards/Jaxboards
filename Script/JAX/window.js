@@ -58,6 +58,14 @@ class Window {
     titleBar.appendChild(windowControls);
     windowContainer.appendChild(titleBar);
     windowContainer.appendChild(contentContainer);
+
+    // add close window functionality
+    const close = () => this.close();
+    windowContainer.querySelectorAll('[data-window-close]').forEach((closeElement) => {
+      closeElement.addEventListener('click', close);
+    });
+
+    // Add the window to the document
     document.body.appendChild(windowContainer);
 
     if (this.resize) {
@@ -199,6 +207,12 @@ class Window {
   }
 }
 
+/**
+ * Given an element, attempt to find the window that the element is contained in and close it.
+ * @static
+ * @param  {Element} windowElementDescendant window element or child element of a window
+ * @return {Void}
+ */
 Window.close = function close(window) {
   let element = window;
   do {
