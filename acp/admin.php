@@ -90,7 +90,6 @@ $PAGE->addNavMenu(
         '?act=settings&do=shoutbox' => 'Shoutbox',
         '?act=settings&do=pages' => 'Custom Pages',
         '?act=settings&do=birthday' => 'Birthdays',
-        '?act=settings&do=domains' => 'Domain Setup',
     )
 );
 $PAGE->addNavMenu(

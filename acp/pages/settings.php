@@ -18,9 +18,6 @@ class settings
             case 'shoutbox':
                 $this->shoutbox();
                 break;
-            case 'domains':
-                $this->domainmanager();
-                break;
             case 'global':
                 $this->boardname();
                 break;
@@ -42,7 +39,6 @@ class settings
             '?act=settings&do=shoutbox' => 'Shoutbox',
             '?act=settings&do=pages' => 'Custom Pages',
             '?act=settings&do=birthday' => 'Birthdays',
-            '?act=settings&do=domains' => 'Domain Setup',
         );
         foreach ($nav as $k => $v) {
             $sidebar .= "<li><a href='${k}'>${v}</a></li>";
@@ -362,97 +358,6 @@ EOT;
 </form>
 EOT;
         $PAGE->addContentBox('Shoutbox', $page);
-    }
-
-    public function domainmanager()
-    {
-        global $DB,$CFG,$PAGE,$JAX;
-        $page = $table = '';
-        $e = '';
-        if (@$JAX->p['submit']) {
-            if (mb_strlen($JAX->p['domain']) > 100) {
-                $e = 'Domain must be less than 100 characters';
-            } elseif (preg_match('@[^\\w.]@', $JAX->p['domain'])) {
-                $e = 'Please enter a valid domain.';
-            }
-
-            $result = $DB->safequery(
-                'SELECT `prefix`,`domain` FROM `domains` WHERE `domain`=?',
-                $DB->basicvalue($JAX->p['domain'])
-            );
-            if ($DB->arow($result)) {
-                $e = 'That domain has already been claimed';
-            }
-            $DB->disposeresult($result);
-            if ($e) {
-                $page .= $PAGE->error($e);
-            } else {
-                $result = $DB->safequery(
-                    'INSERT INTO `domains` (`domain`,`prefix`) VALUES(?, ?)',
-                    $DB->basicvalue($JAX->p['domain']),
-                    $DB->basicvalue($CFG['prefix'])
-                );
-                $page .= $PAGE->success(
-                    "Domain added! Test <a href='https://" .
-                    $JAX->blockhtml($JAX->p['domain']) . "'>here.</a>"
-                );
-            }
-        } elseif (@$JAX->b['delete']) {
-            $result = $DB->safequery(
-                'DELETE FROM `domains` WHERE `domain`=? AND `prefix`=?',
-                $DB->basicvalue($JAX->b['delete']),
-                $DB->basicvalue($CFG['prefix'])
-            );
-            if ($DB->affected_rows(1)) {
-                $page .= $PAGE->success('Domain deleted');
-            } else {
-                $page .= $PAGE->error(
-                    "Error deleting domain, maybe it doesn't belong to you?"
-                );
-            }
-        }
-        $result = $DB->safequery(
-            'SELECT `domain`,`prefix` FROM `domains` WHERE `prefix`=?',
-            $DB->basicvalue($CFG['prefix'])
-        );
-        $domains = array();
-        while ($f = $DB->arow($result)) {
-            $domains[] = $f['domain'];
-        }
-        if (empty($domains)) {
-            $table = '<tr><td>No domains to show!</td></tr>';
-        } else {
-            foreach ($domains as $domain) {
-                $domainUrlEncoded = rawurlencode($domain);
-                $table .= <<<EOT
-<tr>
-    <td>
-        <a href="https://${domain}">
-            ${domain}
-        </a>
-    </td>
-    <td>
-        <a class="icons delete"
-            href="?act=settings&do=domains&delete=${domainUrlEncoded}">
-        </a>
-    </td>
-</tr>
-EOT;
-            }
-        }
-        $serverAddress = $_SERVER['SERVER_ADDR'];
-        $page .= <<<EOT
-When connecting your A address, use the IP
-<a href="https://${serverAddress}">${serverAddress}</a>
-EOT;
-        $page .= "<table>${table}</table>";
-        $page .= <<<'EOT'
-<form method="post">
-    Add a domain: <input type="text" name="domain" />
-    <input type="submit" value="Add" name="submit"/>
-</form>
-EOT;
-        $PAGE->addContentBox('Domain Manager', $page);
     }
 
     public function birthday()

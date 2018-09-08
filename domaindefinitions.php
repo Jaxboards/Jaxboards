@@ -52,22 +52,6 @@ if ($CFG['service']) {
     } else {
         $prefix = '';
     }
-
-    // Check for custom domain.
-    if (!$prefix) {
-        $result = $DB->safespecial(
-            'SELECT `prefix` FROM `domains` WHERE `domain`=?',
-            array(),
-            $DB->basicvalue($host)
-        );
-        $prefix = $DB->arow($result);
-        $DB->disposeresult($result);
-        if ($prefix) {
-            $prefix = $prefix['prefix'];
-            $CFG['prefix'] = $prefix;
-            $CFG['sql_prefix'] = $prefix . '_';
-        }
-    }
 } else {
     $prefix = $CFG['prefix'];
 }

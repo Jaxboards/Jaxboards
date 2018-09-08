@@ -215,18 +215,7 @@ CREATE TABLE `directory` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 EOT
                 ,
-                'TRUNCATE `directory`;',
-                'DROP TABLE IF EXISTS `domains`;',
-                <<<'EOT'
-        CREATE TABLE `domains` (
-  `prefix` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `domain` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
-  UNIQUE KEY `domain` (`domain`),
-  KEY `prefix` (`prefix`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-EOT
-                ,
-                'TRUNCATE `domains`;',
+                'TRUNCATE `directory`;'
             );
             foreach ($queries as $query) {
                 $result = $DB->safequery($query);

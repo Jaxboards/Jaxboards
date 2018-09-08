@@ -47,7 +47,7 @@ $boards = array();
 
 if ($CFG['service']) {
     $queries = array();
-    // Copy over `directory` and `domains` tables from `jaxboards_service`
+    // Copy over `directory` table from `jaxboards_service`
     // if it exists.
     $serviceDB = true;
     try {
@@ -89,10 +89,7 @@ if ($CFG['service']) {
     }
     $DB->select_db($CFG['sql_db']);
 
-    // Queries to update directory/domains tables.
-    $queries[] = <<<'EOT'
-UPDATE `directory` SET `registrar_email` = '' WHERE `registrar_email` IS NULL;
-EOT;
+    // Queries to update directory table.
     $queries[] = <<<'EOT'
 UPDATE `directory` SET `registrar_ip` = 0 WHERE `registrar_ip` IS NULL;
 EOT;
@@ -106,24 +103,12 @@ EOT;
 UPDATE `directory` SET `referral` = '' WHERE `referral` IS NULL;
 EOT;
     $queries[] = <<<'EOT'
-DELETE FROM `domains` WHERE `prefix` IS NULL;
-EOT;
-    $queries[] = <<<'EOT'
-DELETE FROM `domains` WHERE `domain` IS NULL;
-EOT;
-    $queries[] = <<<'EOT'
 ALTER TABLE `directory`
     CHANGE `id` `id` int(11) unsigned NOT NULL AUTO_INCREMENT FIRST,
     CHANGE `registrar_email` `registrar_email` varchar(255) COLLATE 'utf8mb4_unicode_ci' NOT NULL AFTER `id`,
     CHANGE `registrar_ip` `registrar_ip` varbinary(16) NOT NULL DEFAULT '' AFTER `registrar_email`,
     CHANGE `boardname` `boardname` varchar(30) COLLATE 'utf8mb4_unicode_ci' NOT NULL AFTER `date`,
     CHANGE `referral` `referral` varchar(255) COLLATE 'utf8mb4_unicode_ci' NOT NULL AFTER `boardname`,
-    ENGINE='InnoDB' COLLATE 'utf8mb4_unicode_ci';
-EOT;
-    $queries[] = <<<'EOT'
-ALTER TABLE `domains`
-    CHANGE `prefix` `prefix` varchar(30) COLLATE 'utf8mb4_unicode_ci' NOT NULL FIRST,
-    CHANGE `domain` `domain` varchar(191) COLLATE 'utf8mb4_unicode_ci' NOT NULL AFTER `prefix`,
     ENGINE='InnoDB' COLLATE 'utf8mb4_unicode_ci';
 EOT;
     foreach ($queries as $query) {
@@ -198,38 +183,6 @@ EOT
         $result = $DB->safequery(<<<'EOT'
 ALTER TABLE `directory`
     ADD INDEX `boardname` (`boardname`);
-EOT
-        );
-        $DB->disposeresult($result);
-    }
-    $result = $DB->safequery('SHOW CREATE TABLE `domains`;');
-    $createTableStatement = $DB->row($result);
-    $createTableStatement = array_pop($createTableStatement);
-    $DB->disposeresult($result);
-    if (!preg_match("/UNIQUE\s+KEY\s+`domain`/i", $createTableStatement)) {
-        $result = $DB->safequery(<<<'EOT'
-ALTER TABLE `domains`
-    ADD UNIQUE `domain` (`domain`);
-EOT
-        );
-        $DB->disposeresult($result);
-    }
-    if (!preg_match("/KEY\s+`prefix`/i", $createTableStatement)) {
-        $result = $DB->safequery(<<<'EOT'
-ALTER TABLE `domains`
-    ADD INDEX `prefix` (`prefix`);
-EOT
-        );
-        $DB->disposeresult($result);
-    }
-    if (!preg_match(
-        "/FOREIGN\s+KEY\s+\(`prefix`\)\s+REFERENCES\s+`directory`\s+\(`boardname`\)/i",
-        $createTableStatement
-    )
-    ) {
-        $result = $DB->safequery(<<<'EOT'
-ALTER TABLE `domains`
-    ADD FOREIGN KEY (`prefix`) REFERENCES `directory` (`boardname`) ON DELETE CASCADE;
 EOT
         );
         $DB->disposeresult($result);
