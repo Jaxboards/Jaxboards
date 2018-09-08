@@ -61,6 +61,12 @@
   // Refactor this
   Event.onPageChange = function onPageChange() {};
 
+  /**
+   * Selects/highlights all contents in an element
+   * @param  {Element} element
+   * @return {Void}
+   */
+
   /* global RUN */
 
   // This file is just a dumping ground until I can find better homes for these

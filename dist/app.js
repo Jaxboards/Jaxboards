@@ -816,6 +816,46 @@
     };
   }
 
+  /**
+   * Selects/highlights all contents in an element
+   * @param  {Element} element
+   * @return {Void}
+   */
+  function selectAll(element) {
+    if (document.selection) {
+      const range = document.body.createTextRange();
+      range.moveToElementText(element);
+      range.select();
+    } else if (window.getSelection) {
+      const range = document.createRange();
+      range.selectNode(element);
+      const selection = window.getSelection();
+      if (selection.rangeCount) selection.removeAllRanges();
+      selection.addRange(range);
+    }
+  }
+
+  /**
+   * If there's any highlighted text in element, replace it with content
+   * @param {Element]} element
+   * @param {String} content
+   */
+  function replaceSelection(element, content) {
+    const scroll = element.scrollTop;
+    if (document.selection) {
+      element.focus();
+      document.selection.createRange().text = content;
+    } else {
+      const s = element.selectionStart;
+      const e = element.selectionEnd;
+      element.value = element.value.substring(0, s) + content + element.value.substr(e);
+      element.selectionStart = s + content.length;
+      element.selectionEnd = s + content.length;
+    }
+    element.focus();
+    element.scrollTop = scroll;
+  }
+
   /* global RUN */
 
   // This file is just a dumping ground until I can find better homes for these
@@ -907,20 +947,6 @@
     });
   }
 
-  function select(element) {
-    if (document.selection) {
-      const range = document.body.createTextRange();
-      range.moveToElementText(element);
-      range.select();
-    } else if (window.getSelection) {
-      const range = document.createRange();
-      range.selectNode(element);
-      const selection = window.getSelection();
-      if (selection.rangeCount) selection.removeAllRanges();
-      selection.addRange(range);
-    }
-  }
-
   function gracefulDegrade(a) {
     if (typeof RUN !== 'undefined') {
       updateDates();
@@ -983,7 +1009,7 @@
     // Make BBCode code blocks selectable when clicked
     const codeBlocks = a.querySelectorAll('.bbcode.code');
     codeBlocks.forEach((codeBlock) => {
-      codeBlock.addEventListener('click', () => select(codeBlock));
+      codeBlock.addEventListener('click', () => selectAll(codeBlock));
     });
   }
 
@@ -1813,7 +1839,7 @@
             this.iframe.contentWindow.focus();
           }
         }
-      } else Editor.setSelection(this.textarea, bbcode);
+      } else replaceSelection(this.textarea, bbcode);
     }
 
     getSelection() {
@@ -1862,22 +1888,6 @@
       }
     }
   }
-
-  Editor.setSelection = function setSelection(t, stuff) {
-    const scroll = t.scrollTop;
-    if (Browser.ie) {
-      t.focus();
-      document.selection.createRange().text = stuff;
-    } else {
-      const s = t.selectionStart;
-      const e = t.selectionEnd;
-      t.value = t.value.substring(0, s) + stuff + t.value.substr(e);
-      t.selectionStart = s + stuff.length;
-      t.selectionEnd = s + stuff.length;
-    }
-    t.focus();
-    t.scrollTop = scroll;
-  };
 
   // TODO: Create an instance for this state
   // instead of abusing the module
@@ -2391,7 +2401,6 @@
     collapse,
     overlay: toggleOverlay,
     scrollTo,
-    select,
   };
 
   /* eslint-disable */

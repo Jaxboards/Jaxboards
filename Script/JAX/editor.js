@@ -10,6 +10,7 @@ import {
 import Event from './event';
 import { bbcodeToHTML, htmlToBBCode } from './bbcode-utils';
 import { assign } from './util';
+import { replaceSelection } from './selection';
 
 const URL_REGEX = /^(ht|f)tps?:\/\/[\w.\-%&?=/]+$/;
 const isURL = text => URL_REGEX.test(text);
@@ -377,7 +378,7 @@ class Editor {
           this.iframe.contentWindow.focus();
         }
       }
-    } else Editor.setSelection(this.textarea, bbcode);
+    } else replaceSelection(this.textarea, bbcode);
   }
 
   getSelection() {
@@ -426,21 +427,5 @@ class Editor {
     }
   }
 }
-
-Editor.setSelection = function setSelection(t, stuff) {
-  const scroll = t.scrollTop;
-  if (Browser.ie) {
-    t.focus();
-    document.selection.createRange().text = stuff;
-  } else {
-    const s = t.selectionStart;
-    const e = t.selectionEnd;
-    t.value = t.value.substring(0, s) + stuff + t.value.substr(e);
-    t.selectionStart = s + stuff.length;
-    t.selectionEnd = s + stuff.length;
-  }
-  t.focus();
-  t.scrollTop = scroll;
-};
 
 export default Editor;

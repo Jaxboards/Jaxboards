@@ -28,7 +28,6 @@ import {
   collapse,
   toggleOverlay,
   scrollTo,
-  select,
 } from './util';
 
 import tooltip from './tooltip';
@@ -67,5 +66,4 @@ export default {
   collapse,
   overlay: toggleOverlay,
   scrollTo,
-  select,
 };

@@ -14,6 +14,7 @@ import {
   smalldate,
 } from './date';
 import tooltip from './tooltip';
+import { selectAll } from './selection';
 
 // This file is just a dumping ground until I can find better homes for these
 
@@ -104,20 +105,6 @@ export function updateDates() {
   });
 }
 
-export function select(element) {
-  if (document.selection) {
-    const range = document.body.createTextRange();
-    range.moveToElementText(element);
-    range.select();
-  } else if (window.getSelection) {
-    const range = document.createRange();
-    range.selectNode(element);
-    const selection = window.getSelection();
-    if (selection.rangeCount) selection.removeAllRanges();
-    selection.addRange(range);
-  }
-}
-
 export function gracefulDegrade(a) {
   if (typeof RUN !== 'undefined') {
     updateDates();
@@ -180,7 +167,7 @@ export function gracefulDegrade(a) {
   // Make BBCode code blocks selectable when clicked
   const codeBlocks = a.querySelectorAll('.bbcode.code');
   codeBlocks.forEach((codeBlock) => {
-    codeBlock.addEventListener('click', () => select(codeBlock));
+    codeBlock.addEventListener('click', () => selectAll(codeBlock));
   });
 }
 

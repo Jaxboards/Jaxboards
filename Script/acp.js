@@ -1,7 +1,7 @@
 import { onDOMReady } from './JAX/util';
 import { insertAfter, getCoordinates } from './JAX/el';
 import Ajax from './JAX/ajax';
-import Editor from './JAX/editor';
+import { replaceSelection } from './JAX/selection';
 import sortableTree from './JAX/sortable-tree';
 import autoComplete from './JAX/autocomplete';
 
@@ -100,7 +100,7 @@ function makestuffcool() {
   if (editor) {
     editor.addEventListener('keydown', (event) => {
       if (event.keyCode === 9) {
-        Editor.setSelection(editor, '    ');
+        replaceSelection(editor, '    ');
         event.preventDefault();
       }
     });
