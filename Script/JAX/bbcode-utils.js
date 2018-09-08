@@ -11,7 +11,8 @@ export function htmlToBBCode(html) {
   const nestedTagRegex = /<(\w+)([^>]*)>([\w\W]*?)<\/\1>/gi;
   bbcode = bbcode.replace(/[\r\n]+/g, '');
   bbcode = bbcode.replace(/<(hr|br|meta)[^>]*>/gi, '\n');
-  bbcode = bbcode.replace(/<img.*?src=["']?([^'"]+)["'][^>]*\/?>/g, '[img]$1[/img]');
+  // images and emojis
+  bbcode = bbcode.replace(/<img.*?src=["']?([^'"]+)["'](?: alt=["']?([^"']+)["'])?[^>]*\/?>/g, (whole, src, alt) => alt || `[img]${src}[/img]`);
   bbcode = bbcode.replace(nestedTagRegex, (
     whole,
     tag,
@@ -98,8 +99,8 @@ export function htmlToBBCode(html) {
     return innerhtml;
   });
   return bbcode
-    .replace(/&gt;/g, '>')
     .replace(/&amp;/g, '&')
+    .replace(/&gt;/g, '>')
     .replace(/&lt;/g, '<')
     .replace(/&nbsp;/g, ' ');
 }

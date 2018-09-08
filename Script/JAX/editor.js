@@ -150,9 +150,9 @@ class Editor {
   showEmotes(x, y) {
     const emotewin = this.emoteWindow;
     if (!emotewin) {
-      this.createEmoteWindow.x = x;
-      this.createEmoteWindow.y = y;
-      new Ajax().load('/misc/emotes.php?json', this.createEmoteWindow);
+      new Ajax().load('/misc/emotes.php?json', {
+        callback: response => this.createEmoteWindow(response, { x, y }),
+      });
       return;
     }
     if (emotewin.style.display === 'none') {
@@ -170,28 +170,28 @@ class Editor {
     }
   }
 
-  createEmoteWindow(xml) {
-    const smilies = JSON.parse(xml.responseText);
+  createEmoteWindow(xml, position) {
+    const [smileyText, images] = JSON.parse(xml.responseText);
     const emotewin = document.createElement('div');
     emotewin.className = 'emotewin';
 
-    smilies.forEach((smiley, i) => {
-      const r = document.createElement('a');
-      r.href = 'javascript:void(0)';
-      r.emotetext = smilies[0][i];
-      r.onclick = () => {
-        this.cmd('inserthtml', this.emotetext);
+    smileyText.forEach((smiley, i) => {
+      const image = images[i];
+      const link = document.createElement('a');
+      link.href = 'javascript:void(0)';
+      link.onclick = () => {
+        this.cmd('inserthtml', image);
         this.hideEmotes();
       };
-      r.innerHTML = `${smilies[1][i]} ${smilies[0][i]}`;
-      emotewin.appendChild(r);
+      link.innerHTML = `${image} ${smiley}`;
+      emotewin.appendChild(link);
     });
 
     emotewin.style.position = 'absolute';
     emotewin.style.display = 'none';
     this.emoteWindow = emotewin;
     document.querySelector('#page').appendChild(emotewin);
-    this.showEmotes(this.createEmoteWindow.x, this.createEmoteWindow.y);
+    this.showEmotes(position.x, position.y);
   }
 
   colorHandler(cmd, color) {

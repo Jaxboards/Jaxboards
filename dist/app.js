@@ -1306,7 +1306,8 @@
     const nestedTagRegex = /<(\w+)([^>]*)>([\w\W]*?)<\/\1>/gi;
     bbcode = bbcode.replace(/[\r\n]+/g, '');
     bbcode = bbcode.replace(/<(hr|br|meta)[^>]*>/gi, '\n');
-    bbcode = bbcode.replace(/<img.*?src=["']?([^'"]+)["'][^>]*\/?>/g, '[img]$1[/img]');
+    // images and emojis
+    bbcode = bbcode.replace(/<img.*?src=["']?([^'"]+)["'](?: alt=["']?([^"']+)["'])?[^>]*\/?>/g, (whole, src, alt) => alt || `[img]${src}[/img]`);
     bbcode = bbcode.replace(nestedTagRegex, (
       whole,
       tag,
@@ -1393,8 +1394,8 @@
       return innerhtml;
     });
     return bbcode
-      .replace(/&gt;/g, '>')
       .replace(/&amp;/g, '&')
+      .replace(/&gt;/g, '>')
       .replace(/&lt;/g, '<')
       .replace(/&nbsp;/g, ' ');
   }
@@ -1585,9 +1586,9 @@
     showEmotes(x, y) {
       const emotewin = this.emoteWindow;
       if (!emotewin) {
-        this.createEmoteWindow.x = x;
-        this.createEmoteWindow.y = y;
-        new Ajax().load('/misc/emotes.php?json', this.createEmoteWindow);
+        new Ajax().load('/misc/emotes.php?json', {
+          callback: response => this.createEmoteWindow(response, { x, y }),
+        });
         return;
       }
       if (emotewin.style.display === 'none') {
@@ -1605,28 +1606,28 @@
       }
     }
 
-    createEmoteWindow(xml) {
-      const smilies = JSON.parse(xml.responseText);
+    createEmoteWindow(xml, position) {
+      const [smileyText, images] = JSON.parse(xml.responseText);
       const emotewin = document.createElement('div');
       emotewin.className = 'emotewin';
 
-      smilies.forEach((smiley, i) => {
-        const r = document.createElement('a');
-        r.href = 'javascript:void(0)';
-        r.emotetext = smilies[0][i];
-        r.onclick = () => {
-          this.cmd('inserthtml', this.emotetext);
+      smileyText.forEach((smiley, i) => {
+        const image = images[i];
+        const link = document.createElement('a');
+        link.href = 'javascript:void(0)';
+        link.onclick = () => {
+          this.cmd('inserthtml', image);
           this.hideEmotes();
         };
-        r.innerHTML = `${smilies[1][i]} ${smilies[0][i]}`;
-        emotewin.appendChild(r);
+        link.innerHTML = `${image} ${smiley}`;
+        emotewin.appendChild(link);
       });
 
       emotewin.style.position = 'absolute';
       emotewin.style.display = 'none';
       this.emoteWindow = emotewin;
       document.querySelector('#page').appendChild(emotewin);
-      this.showEmotes(this.createEmoteWindow.x, this.createEmoteWindow.y);
+      this.showEmotes(position.x, position.y);
     }
 
     colorHandler(cmd, color) {
