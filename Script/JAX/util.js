@@ -15,7 +15,6 @@ import {
 } from './date';
 import tooltip from './tooltip';
 import { selectAll } from './selection';
-
 // This file is just a dumping ground until I can find better homes for these
 
 export function assign(a, b) {
@@ -105,6 +104,32 @@ export function updateDates() {
   });
 }
 
+
+export function collapse(element) {
+  const s = element.style;
+  let fh = element.dataset.fullHeight;
+  const b = element.parentNode;
+  s.overflow = 'hidden';
+  if (s.height === '0px') {
+    new Animation(element, 5, 10, 0)
+      .add('height', '0px', fh)
+      .then(() => {
+        b.classList.remove('collapsed');
+      })
+      .play();
+  } else {
+    if (!fh) {
+      fh = `${element.clientHeight || element.offsetHeight}px`;
+      element.dataset.fullHeight = fh;
+    }
+    new Animation(element, 5, 10, 0)
+      .add('height', fh, '0px')
+      .then(() => {
+        b.classList.add('collapsed');
+      })
+      .play();
+  }
+}
 export function gracefulDegrade(a) {
   if (typeof RUN !== 'undefined') {
     updateDates();
@@ -169,6 +194,16 @@ export function gracefulDegrade(a) {
   codeBlocks.forEach((codeBlock) => {
     codeBlock.addEventListener('click', () => selectAll(codeBlock));
   });
+
+  // Make collapse boxes collapsible
+  const collapseBoxes = a.querySelectorAll('.collapse-box');
+  collapseBoxes.forEach((collapseBox) => {
+    const collapseButton = collapseBox.querySelector('.collapse-button');
+    const collapseContent = collapseBox.querySelector('.collapse-content');
+    collapseButton.addEventListener('click', () => {
+      collapse(collapseContent);
+    });
+  });
 }
 
 export function checkAll(checkboxes, value) {
@@ -200,32 +235,6 @@ export function toggle(a) {
     display = '';
   }
   a.style.display = display;
-}
-
-export function collapse(a) {
-  const s = a.style;
-  let fh = a.getAttribute('fullHeight');
-  const b = a.parentNode;
-  s.overflow = 'hidden';
-  if (s.height === '0px') {
-    new Animation(a, 5, 10, 0)
-      .add('height', '0px', fh)
-      .then(() => {
-        b.classList.remove('collapsed');
-      })
-      .play();
-  } else {
-    if (!fh) {
-      fh = `${a.clientHeight || a.offsetHeight}px`;
-      a.setAttribute('fullHeight', fh);
-    }
-    new Animation(a, 5, 10, 0)
-      .add('height', fh, '0px')
-      .then(() => {
-        b.classList.add('collapsed');
-      })
-      .play();
-  }
 }
 
 export function toggleOverlay(show) {
