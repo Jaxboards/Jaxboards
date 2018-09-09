@@ -10,7 +10,10 @@ class themes
 {
     public function __construct()
     {
-        global $PAGE,$JAX;
+        global $PAGE,$JAX,$CFG;
+        if (!defined('DTHEMEPATH')) {
+            define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . $CFG['dthemepath']);
+        }
         $links = array(
             'create' => 'Create New Skin',
             'manage' => 'Manage Skins',
@@ -37,20 +40,15 @@ class themes
 
         if (isset($JAX->g['editcss']) && $JAX->g['editcss']) {
             $this->editcss($JAX->g['editcss']);
-        } elseif (isset($JAX->g['editcss']) && $JAX->g['editwrapper']) {
+        } elseif (isset($JAX->g['editwrapper']) && $JAX->g['editwrapper']) {
             $this->editwrapper($JAX->g['editwrapper']);
         } elseif (isset($JAX->g['deleteskin']) && is_numeric($JAX->g['deleteskin'])) {
             $this->deleteskin($JAX->g['deleteskin']);
-        } elseif (isset($JAX->g['page']) && 'create' == $JAX->g['page']) {
+        } elseif (isset($JAX->g['do']) && 'create' === $JAX->g['do']) {
             $this->createskin();
         } else {
             $this->showskinindex();
         }
-    }
-
-    public function themes()
-    {
-        $this->__construct();
     }
 
     public function getwrappers()
@@ -97,16 +95,19 @@ class themes
                 $errorwrapper = 'Wrapper name must be less than 50 characters.';
             } elseif (file_exists($newWrapperPath)) {
                 $errorwrapper = 'That wrapper already exists.';
+            } elseif (!is_writable(dirname($newWrapperPath))) {
+                $errorwrappre = 'Wrapper directory is not writable.';
             } else {
-                $o = fopen(
-                    BOARDPATH . 'Wrappers/' . $JAX->p['newwrapper'] . '.txt',
-                    'w'
-                );
-                fwrite(
-                    $o,
-                    file_get_contents($CFG['dthemepath'] . 'wrappers.txt')
-                );
-                fclose($o);
+                $o = fopen($newWrapperPath, 'w');
+                if ($o !== false) {
+                    fwrite(
+                        $o,
+                        file_get_contents(DTHEMEPATH . 'wrappers.txt')
+                    );
+                    fclose($o);
+                } else {
+                    $errorwrapper = 'Wrapper could not be created.';
+                }
             }
         }
 
@@ -208,20 +209,22 @@ EOT;
             }
 
             // Set default.
-            $DB->safeupdate(
-                'skins',
-                array(
-                    'default' => 0,
-                )
-            );
-            $DB->safeupdate(
-                'skins',
-                array(
-                    'default' => 1,
-                ),
-                'WHERE `id`=?',
-                $JAX->p['default']
-            );
+            if (isset($JAX->p['default'])) {
+                $DB->safeupdate(
+                    'skins',
+                    array(
+                        'default' => 0,
+                    )
+                );
+                $DB->safeupdate(
+                    'skins',
+                    array(
+                        'default' => 1,
+                    ),
+                    'WHERE `id`=?',
+                    $JAX->p['default']
+                );
+            }
         }
         $result = $DB->safeselect(
             '`id`,`using`,`title`,`custom`,`wrapper`,`default`,`hidden`',
@@ -231,67 +234,82 @@ EOT;
         $usedwrappers = array();
         $skins = '';
         while ($f = $DB->arow($result)) {
-            $skins .= '<tr><td><span>' . $f['title'] . '</span>' .
-                ($f['custom'] ?
-                " <a href='#' onclick='return edit(this,\"skin\")' " .
-                "class='icons edit'></a>" : '') .
-                "</td><td><a href='?act=themes&editcss=" . $f['id'] . "'>" .
-                ($f['custom'] ? 'Edit' : 'View') . ' CSS</a></td><td>';
-            $skins .= "<select name='wrapper[" . $f['id'] . "]'>" .
-                ($f['custom'] ? '' : "<option value=''>Skin Default</option>");
-            foreach ($wrappers as $v) {
-                $skins .= "<option value='${v}' " .
-                    ($v == $f['wrapper'] ? "selected='selected' " : '') .
-                    ">${v}</option>";
+            $wrapperOptions = '';
+            foreach ($wrappers as $wrapper) {
+                $wrapperOptions .= $PAGE->parseTemplate(
+                    JAXBOARDS_ROOT . '/acp/views/select-option.html',
+                    array(
+                        'value' => $wrapper,
+                        'selected' => $wrapper == $f['wrapper'] ?
+                        'selected="selected"' : '',
+                        'label' => $wrapper,
+                    )
+                ) . PHP_EOL;
             }
-            $skins .= "</select></td><td><a href='?act=themes&deleteskin=" .
-                $f['id'] . "' onclick='return confirm(\"Are you sure?\")'>" .
-                "Delete</a></td><td><input type='checkbox' name='hidden[" .
-                $f['id'] . "]' class='switch yn' " .
-                ($f['hidden'] ? 'checked="checked"' : '') .
-                " /></td><td><input type='radio' name='default' value='" .
-                $f['id'] . "' " . ($f['default'] ? "checked='checked'" : '') . '/>';
-            $skins .= '</td></tr>';
+            $skins .= $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/themes/show-skin-index-css-row.html',
+                array(
+                    'id' => $f['id'],
+                    'title' => $f['title'],
+                    'custom' => $f['custom'] ?
+                        $PAGE->parseTemplate(
+                            JAXBOARDS_ROOT .
+                            '/acp/views/themes/show-skin-index-css-row-custom.html'
+                        )  : '',
+                    'view_or_edit' => $f['custom'] ? 'Edit' : 'View',
+                    'delete' => $f['custom'] ? $PAGE->parseTemplate(
+                        JAXBOARDS_ROOT . '/acp/views/themes/show-skin-index-css-row-delete.html',
+                        array(
+                            'id' => $f['id'],
+                        )
+                    ) : '',
+                    'default_option' => $f['custom'] ? '' : $PAGE->parseTemplate(
+                        JAXBOARDS_ROOT . '/acp/views/select-option.html',
+                        array(
+                            'value' => '',
+                            'selected' => '',
+                            'label' => 'Skin Default',
+                        )
+                    ),
+                    'wrapper_options' => $wrapperOptions,
+                    'hidden_checked' => $f['hidden'] ? 'checked="checked"' : '',
+                    'default_checked' => $f['default'] ? "checked='checked'" : '',
+                )
+            ) . PHP_EOL;
             $usedwrappers[] = $f['wrapper'];
         }
-        $skins = ($errorskins ? "<div class='error'>" . $errorskins . '</div>' :
-            '') . "<form method='post'><input type='hidden' name='submit' " .
-            "value='1' /><table class='skins'><tr><th>Name</th><th></th>" .
-            '<th>Wrapper</th><th></th><th>Hidden</th><th>Default</th></tr>' .
-            "${skins}</table><input type='submit' value='Save Changes'>" .
-            '</form>';
+        $skins = ($errorskins ? $PAGE->error($errorskins) : '') .
+            $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/themes/show-skin-index-css.html',
+                array(
+                    'content' => $skins,
+                )
+            );
         $PAGE->addContentBox('Themes', $skins);
 
         $wrap = '';
-        foreach ($wrappers as $v) {
-            $wrap .= "<tr><td><span>${v}</span> <a href='#' " .
-                "onclick='return edit(this,\"wrapper\")' " .
-                "class='icons edit'></a></td><td><a " .
-                "href='?act=themes&editwrapper=" . $v .
-                "'>Edit Wrapper</a></td><td>" .
-                (in_array($v, $usedwrappers) ? 'In use' :
-                "<a href='?act=themes&deletewrapper=${v}' " .
-                "onclick='return confirm(\"Are you sure?\")'>Delete</a>") .
-                '</td></tr>';
+        foreach ($wrappers as $wrapper) {
+            $wrap .= $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/themes/show-skin-index-wrapper-row.html',
+                array(
+                    'title' => $wrapper,
+                    'delete' => in_array($wrapper, $usedwrappers) ? 'In use' :
+                    $PAGE->parseTemplate(
+                        JAXBOARDS_ROOT .
+                        '/acp/views/themes/show-skin-index-wrapper-row-delete.html',
+                        array(
+                            'title' => $wrapper,
+                        )
+                    ),
+                )
+            ) . PHP_EOL;
         }
-        $wrap = "<table class='wrappers'><tr><th>Name</th><th></th>" .
-            "<th>Delete</th></tr>${wrap}</table><br /><form method='post'>" .
-            "<input type='text' name='newwrapper' />" .
-            "<input type='submit' value='Create Wrapper' /></form>";
-        $wrap .= <<<'EOT'
-<script type="text/javascript">
-    function edit(link,suffix){
-        a=link.parentNode.querySelector('span');
-        link.parentNode.removeChild(link);
-        a.innerHTML='<input type="text" name="rename'+suffix+
-            '['+a.innerHTML+']" value="'+a.innerHTML+'" />';
-        if(suffix=='wrapper') {
-            a.innerHTML='<form method="post">'+a.innerHTML+
-                '<input type="submit" value="Save" name="submit" /></form>';
-        }
-    }
-</script>
-EOT;
+        $wrap = $PAGE->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/themes/show-skin-index-wrapper.html',
+            array(
+                'content' => $wrap,
+            )
+        );
         $PAGE->addContentBox(
             'Wrappers',
             ($errorwrapper ? $PAGE->error($errorwrapper) : '') . $wrap
@@ -320,27 +338,28 @@ EOT;
 
         $PAGE->addContentBox(
             ($skin['custom'] ? 'Editing' : 'Viewing') . ' Skin: ' . $skin['title'],
-            "
-  <form method='post' data-use-ajax-submit='true'>
-  <textarea name='newskindata' class='editor'>" .
-            $JAX->blockhtml(
-                file_get_contents(
-                    (!$skin['custom'] ? STHEMEPATH : BOARDPATH . 'Themes/'
-                    ) . $skin['title'] . '/css.css'
+            $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/themes/edit-css.html',
+                array(
+                    'content' => $JAX->blockhtml(
+                        file_get_contents(
+                            (!$skin['custom'] ?
+                                STHEMEPATH : BOARDPATH . 'Themes/'
+                            ) . $skin['title'] . '/css.css'
+                        )
+                    ),
+                    'save' => $skin['custom'] ? $PAGE->parseTemplate(
+                        JAXBOARDS_ROOT . '/acp/views/save-changes.html'
+                    ) : '',
                 )
-            ) . "</textarea>
-  <div class='center'>" .
-            ($skin['custom'] ? "<input type='submit' value='Save Changes' />"
-            : '') .
-            '</div>
-  </form>'
+            )
         );
     }
 
     public function editwrapper($wrapper)
     {
         global $PAGE,$JAX;
-        $saved = null;
+        $saved = '';
         $wrapperf = BOARDPATH . 'Wrappers/' . $wrapper . '.txt';
         if (preg_match('@[^ \\w]@', $wrapper) && !is_file($wrapperf)) {
             $PAGE->addContentBox(
@@ -355,18 +374,23 @@ EOT;
                     );
                 } else {
                     $o = fopen($wrapperf, 'w');
-                    fwrite($o, $JAX->p['newwrapper']);
-                    fclose($o);
-                    $saved = $PAGE->success('Wrapper Saved Successfully');
+                    if ($o !== false) {
+                        fwrite($o, $JAX->p['newwrapper']);
+                        fclose($o);
+                        $saved = $PAGE->success('Wrapper saved successfully.');
+                    } else {
+                        $saved = $PAGE->error('Error saving wrapper.');
+                    }
                 }
             }
             $PAGE->addContentBox(
                 "Editing Wrapper: ${wrapper}",
-                "${saved}<form method='post' data-use-ajax-submit='true'><textarea name='newwrapper' " .
-                "class='editor'>" .
-                $JAX->blockhtml(file_get_contents($wrapperf)) .
-                "</textarea><input type='submit' " .
-                "value='Save Changes' /></form>"
+                $saved . $PAGE->parseTemplate(
+                    JAXBOARDS_ROOT . '/acp/views/themes/edit-wrapper.html',
+                    array(
+                        'content' => $JAX->blockhtml(file_get_contents($wrapperf)),
+                    )
+                )
             );
         }
     }
@@ -425,7 +449,7 @@ EOT;
                     fwrite(
                         $o,
                         file_get_contents(
-                            JAXBOARDS_ROOT . '/' . $CFG['dthemepath'] . 'css.css'
+                            DTHEMEPATH . 'css.css'
                         )
                     );
                     fclose($o);
@@ -436,20 +460,23 @@ EOT;
                 $page = $PAGE->error($e);
             }
         }
-        $page .= "<form method='post'>";
-        $page .= '<label>Skin Name:</label> ' .
-            '<input type="text" name="skinname" /><br />';
-        $page .= '<label>Wrapper:</label> <select name="wrapper">';
-        foreach ($this->getwrappers() as $v) {
-            $page .= '<option value="' . $v . '">' . $v . '</option>';
+        $wrapperOptions = '';
+        foreach ($this->getwrappers() as $wrapper) {
+            $wrapperOptions .= $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/select-option.html',
+                array(
+                    'value' => $wrapper,
+                    'label' => $wrapper,
+                    'selected' => '',
+                )
+            ) . PHP_EOL;
         }
-        $page .= '</select><br />';
-        $page .= '<label>Hidden:</label> ' .
-            '<input type="checkbox" class="switch yn" name="hidden" /><br />';
-        $page .= '<label>Default:</label> ' .
-            '<input type="checkbox" class="switch yn" name="default" /><br />';
-        $page .= '<input type="submit" name="submit" value="Create Skin" />';
-        $page .= '</form>';
+        $page .= $PAGE->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/themes/create-skin.html',
+            array(
+                'wrapper_options' => $wrapperOptions,
+            )
+        );
         $PAGE->addContentBox('Create New Skin', $page);
     }
 

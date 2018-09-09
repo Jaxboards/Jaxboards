@@ -1,0 +1,30 @@
+<tr>
+  <td>
+    <span>
+      <% TITLE %>
+    </span>
+    <% CUSTOM %>
+  </td>
+  <td>
+    <a href="?act=themes&editcss=<% ID %>">
+      <% VIEW_OR_EDIT %>
+      CSS
+    </a>
+  </td>
+  <td>
+    <select name='wrapper[<% ID %>]'>
+      <% DEFAULT_OPTION %>
+      <% WRAPPER_OPTIONS %>
+    </select>
+  </td>
+  <td>
+    <% DELETE %>
+  </td>
+  <td>
+    <input <% HIDDEN_CHECKED %> name="hidden[<% ID %>]"
+      type="checkbox" class="switch yn"/>
+  </td>
+  <td>
+    <input <% DEFAULT_CHECKED %> type="radio" name="default" value="<% ID %>" />
+  </td>
+</tr>

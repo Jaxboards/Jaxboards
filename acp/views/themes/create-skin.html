@@ -1,0 +1,25 @@
+<form method='post'>
+  <label>
+    Skin Name:
+  </label>
+  <input type="text" name="skinname" />
+  <br />
+  <label>
+    Wrapper:
+  </label>
+  <select name="wrapper">
+    <% WRAPPER_OPTIONS %>
+  </select>
+  <br />
+  <label>
+    Hidden:
+  </label>
+  <input type="checkbox" class="switch yn" name="hidden" />
+  <br />
+  <label>
+    Default:
+  </label>
+  <input type="checkbox" class="switch yn" name="default" />
+  <br />
+  <input type="submit" name="submit" value="Create Skin" />
+</form>

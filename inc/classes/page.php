@@ -239,7 +239,7 @@ class PAGE
             define('THEMEPATH', JAXBOARDS_ROOT . '/' . $CFG['dthemepath']);
             define('THEMEPATHURL', BOARDURL . $CFG['dthemepath']);
         }
-        define('DTHEMEPATH', $CFG['dthemepath']);
+        define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . $CFG['dthemepath']);
         $this->loadtemplate(
             $skin['wrapper'] ?
             BOARDPATH . 'Wrappers/' . $skin['wrapper'] . '.txt' :

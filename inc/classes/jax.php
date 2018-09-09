@@ -562,7 +562,7 @@ EOT
             );
         }
 
-        // Video tags
+        // Video tags.
         if (!$minimal) {
             $a = preg_replace_callback(
                 '@\\[video\\](.*)\\[/video\\]@Ui',

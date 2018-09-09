@@ -1,28 +1,33 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="https://www.w3.org/1999/xhtml/" xml:lang="en" lang="en">
-<head>
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<!--CSS-->
-<title><!--TITLE--></title>
-<!--SCRIPT-->
-</head>
-<body>
- <div id="container">
-  <div class="head">
-   <!--NAVIGATION-->
-   <!--LOGO-->
-   <!--USERBOX-->
-  </div>
-  <div class="bodyshad">
-   <div id="body">
-    <!--PATH-->
-    <!--SHOUTBOX-->
-    <!--PAGE-->
-    <!--DEBUG-->
-    <!--FOOTER-->
-   </div>
-  </div>
-  <div class="c_bottom"></div>
- </div>
-</body>
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <!--CSS-->
+    <title>
+      <!--TITLE-->
+    </title>
+    <!--SCRIPT-->
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="head">
+        <!--NAVIGATION-->
+        <!--LOGO-->
+        <!--USERBOX-->
+      </div>
+      <div class="bodyshad">
+        <div id="body">
+          <!--PATH-->
+          <!--SHOUTBOX-->
+          <!--PAGE-->
+          <!--DEBUG-->
+          <!--FOOTER-->
+        </div>
+      </div>
+      <div class="c_bottom"></div>
+    </div>
+  </body>
+
 </html>
