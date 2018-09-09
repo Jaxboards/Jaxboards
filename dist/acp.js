@@ -671,12 +671,7 @@
     alert("Saved. Ajax-submitted so you don't lose your place");
   }
 
-  // TODO: Remove all globals in this file
-  window.ACP = {
-    getCoordinates,
-  };
-
-  function makestuffcool() {
+  function gracefulDegrade$1() {
     // Dropdown menu
     document.querySelector('#nav').addEventListener('mouseover', dropdownMenu);
 
@@ -745,6 +740,6 @@
       sortableTree(tree, 'forum_', document.querySelector('#ordered'));
     }
   }
-  onDOMReady(makestuffcool);
+  onDOMReady(gracefulDegrade$1);
 
 }());
