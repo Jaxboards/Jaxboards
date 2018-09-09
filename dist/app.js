@@ -263,6 +263,18 @@
     }
   }
 
+  const { userAgent } = navigator;
+
+  var Browser = {
+    chrome: !!userAgent.match(/chrome/i),
+    ie: !!userAgent.match(/msie/i),
+    iphone: !!userAgent.match(/iphone/i),
+    mobile: !!userAgent.match(/mobile/i),
+    n3ds: !!userAgent.match(/nintendo 3ds/),
+    firefox: !!userAgent.match(/firefox/i),
+    safari: !!userAgent.match(/safari/i),
+  };
+
   class Color {
     constructor(colorToParse) {
       let a = colorToParse;
@@ -324,6 +336,156 @@
       }
       return tmp;
     }
+  }
+
+  const DISALLOWED_TAGS = [
+    'SCRIPT',
+    'STYLE',
+    'HR',
+  ];
+
+  function htmlToBBCode(html) {
+    let bbcode = html;
+    const nestedTagRegex = /<(\w+)([^>]*)>([\w\W]*?)<\/\1>/gi;
+    bbcode = bbcode.replace(/[\r\n]+/g, '');
+    bbcode = bbcode.replace(/<(hr|br|meta)[^>]*>/gi, '\n');
+    // images and emojis
+    bbcode = bbcode.replace(/<img.*?src=["']?([^'"]+)["'](?: alt=["']?([^"']+)["'])?[^>]*\/?>/g, (whole, src, alt) => alt || `[img]${src}[/img]`);
+    bbcode = bbcode.replace(nestedTagRegex, (
+      whole,
+      tag,
+      attributes,
+      innerHTML,
+    ) => {
+      // Recursively handle nested tags
+      let innerhtml = nestedTagRegex.test(innerHTML) ? htmlToBBCode(innerHTML) : innerHTML;
+      const att = {};
+      attributes.replace(
+        /(color|size|style|href|src)=(['"]?)(.*?)\2/gi,
+        (_, attr, q, value) => {
+          att[attr] = value;
+        },
+      );
+      const { style = '' } = att;
+
+      const lcTag = tag.toLowerCase();
+      if (DISALLOWED_TAGS.includes(lcTag)) {
+        return '';
+      }
+      if (style.match(/background(-color)?:[^;]+(rgb\([^)]+\)|#\s+)/i)) {
+        innerhtml = `[bgcolor=#${
+        new Color(RegExp.$2).toHex()
+      }]${
+        innerhtml
+      }[/bgcolor]`;
+      }
+      if (style.match(/text-align: ?(right|center|left)/i)) {
+        innerhtml = `[align=${RegExp.$1}]${innerhtml}[/align]`;
+      }
+      if (
+        style.match(/font-style: ?italic/i)
+        || lcTag === 'i'
+        || lcTag === 'em'
+      ) {
+        innerhtml = `[I]${innerhtml}[/I]`;
+      }
+      if (style.match(/text-decoration:[^;]*underline/i) || lcTag === 'u') {
+        innerhtml = `[U]${innerhtml}[/U]`;
+      }
+      if (
+        style.match(/text-decoration:[^;]*line-through/i)
+        || lcTag === 's' || lcTag === 'strike'
+      ) {
+        innerhtml = `[S]${innerhtml}[/S]`;
+      }
+      if (
+        style.match(/font-weight: ?bold/i)
+        || lcTag === 'strong'
+        || lcTag === 'b'
+      ) {
+        innerhtml = `[B]${innerhtml}[/B]`;
+      }
+      if (att.size || style.match(/font-size: ?([^;]+)/i)) {
+        innerhtml = `[size=${att.size || RegExp.$1}]${innerhtml}[/size]`;
+      }
+      if (att.color || style.match(/color: ?([^;]+)/i)) {
+        innerhtml = `[color=${att.color || RegExp.$1}]${innerhtml}[/color]`;
+      }
+      if (lcTag === 'a' && att.href) {
+        innerhtml = `[url=${att.href}]${innerhtml}[/url]`;
+      }
+      if (lcTag === 'ol') innerhtml = `[ol]${innerhtml}[/ol]`;
+      if (lcTag === 'ul') innerhtml = `[ul]${innerhtml}[/ul]`;
+      if (lcTag.match(/h\d/i)) {
+        innerhtml = `[${
+        lcTag
+      }]${
+        innerhtml
+      }[/${
+        lcTag
+      }]`;
+      }
+      if (lcTag === 'li') {
+        innerhtml = `*${innerhtml.replace(/[\n\r]+/, '')}\n`;
+      }
+      if (lcTag === 'p') {
+        innerhtml = `\n${innerhtml === '&nbsp' ? '' : innerhtml}\n`;
+      }
+      if (lcTag === 'div') {
+        innerhtml = `\n${innerhtml}`;
+      }
+      return innerhtml;
+    });
+    return bbcode
+      .replace(/&amp;/g, '&')
+      .replace(/&gt;/g, '>')
+      .replace(/&lt;/g, '<')
+      .replace(/&nbsp;/g, ' ');
+  }
+
+
+  function bbcodeToHTML(bbcode) {
+    let html = bbcode
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/(\s) /g, '$1&nbsp;');
+    html = html.replace(/\[b\]([\w\W]*?)\[\/b\]/gi, '<b>$1</b>');
+    html = html.replace(/\[i\]([\w\W]*?)\[\/i\]/gi, '<i>$1</i>');
+    html = html.replace(/\[u\]([\w\W]*?)\[\/u\]/gi, '<u>$1</u>');
+    html = html.replace(/\[s\]([\w\W]*?)\[\/s\]/gi, '<s>$1</s>');
+    html = html.replace(/\[img\]([^'"[]+)\[\/img\]/gi, '<img src="$1">');
+    html = html.replace(
+      /\[color=([^\]]+)\](.*?)\[\/color\]/gi,
+      '<span style="color:$1">$2</span>',
+    );
+    html = html.replace(
+      /\[size=([^\]]+)\](.*?)\[\/size\]/gi,
+      '<span style="font-size:$1">$2</span>',
+    );
+    html = html.replace(
+      /\[url=([^\]]+)\](.*?)\[\/url\]/gi,
+      '<a href="$1">$2</a>',
+    );
+    html = html.replace(
+      /\[bgcolor=([^\]]+)\](.*?)\[\/bgcolor\]/gi,
+      '<span style="backgroun-color:$1">$2</span>',
+    );
+    html = html.replace(/\[h(\d)\](.*?)\[\/h\1\]/g, '<h$1>$2</h$1>');
+    html = html.replace(
+      /\[align=(left|right|center)\](.*?)\[\/align\]/g,
+      '<div style="text-align:$1">$2</div>',
+    );
+    html = html.replace(/\[(ul|ol)\]([\w\W]*?)\[\/\1\]/gi, (match) => {
+      const tag = match[1];
+      const listItems = match[2].split(/([\r\n]+|^)\*/);
+      const lis = listItems
+        .filter(text => text.trim())
+        .map(text => `<li>${text}</li>`)
+        .join('');
+      return `<${tag}>${lis}</${tag}>`;
+    });
+    html = html.replace(/\n/g, '<br />');
+    return html;
   }
 
   class Animation {
@@ -417,18 +579,6 @@
       return this;
     }
   }
-
-  const { userAgent } = navigator;
-
-  var Browser = {
-    chrome: !!userAgent.match(/chrome/i),
-    ie: !!userAgent.match(/msie/i),
-    iphone: !!userAgent.match(/iphone/i),
-    mobile: !!userAgent.match(/mobile/i),
-    n3ds: !!userAgent.match(/nintendo 3ds/),
-    firefox: !!userAgent.match(/firefox/i),
-    safari: !!userAgent.match(/safari/i),
-  };
 
   const months = [
     'January',
@@ -1133,12 +1283,6 @@
     });
   }
 
-  function checkAll(checkboxes, value) {
-    checkboxes.forEach((checkbox) => {
-      checkbox.checked = value;
-    });
-  }
-
   function handleTabs(e, a, f) {
     const activeClass = 'active';
     let el$$1 = e.target || e.srcElement;
@@ -1219,351 +1363,6 @@
     } else {
       document.addEventListener('DOMContentLoaded', callback);
     }
-  }
-
-  class Drag {
-    constructor() {
-      this.droppables = [];
-    }
-
-    start(event, t, handle) {
-      const e = new Event$1(event).cancel().stopBubbling();
-      const el$$1 = t || event.target;
-      const s = getComputedStyle(el$$1);
-      const highz = getHighestZIndex();
-      if (this.noChild && (e.srcElement || e.target) !== (handle || el$$1)) {
-        return;
-      }
-      if (el$$1.getAttribute('draggable') === 'false') {
-        return;
-      }
-      this.sess = {
-        el: el$$1,
-        mx: parseInt(e.pageX, 10),
-        my: parseInt(e.pageY, 10),
-        ex: parseInt(s.left, 10) || 0,
-        ey: parseInt(s.top, 10) || 0,
-        info: {},
-        bc: getCoordinates(el$$1),
-        zIndex: el$$1.style.zIndex,
-      };
-      if (!this.sess.zIndex || Number(this.sess.zIndex) < highz - 1) {
-        el$$1.style.zIndex = highz;
-      }
-      tryInvoke(this.onstart, {
-        ...this.sess,
-        droptarget: this.testDrops(this.sess.mx, this.sess.my),
-      });
-      this.boundEvents = {
-        drag: event2 => this.drag(event2),
-        drop: event2 => this.drop(event2),
-      };
-      document.addEventListener('mousemove', this.boundEvents.drag);
-      document.addEventListener('mouseup', this.boundEvents.drop);
-      this.drag(e);
-    }
-
-    drag(event) {
-      const e = new Event$1(event).cancel();
-      const s = this.sess.el.style;
-      let sess;
-      let tmp = false;
-      const tx = parseInt(e.pageX, 10);
-      const ty = parseInt(e.pageY, 10);
-      let mx = tx;
-      let my = ty;
-      let tmp2;
-      let left = this.sess.ex + mx - this.sess.mx;
-      let top = this.sess.ey + my - this.sess.my;
-      const b = this.bounds;
-      if (b) {
-        if (left < b[0]) {
-          mx = mx - left + b[0];
-          [left] = b;
-        } else if (left > b[0] + b[2]) left = b[0] + b[2];
-        if (top < b[1]) {
-          my = my - top + b[1];
-          [top] = b;
-        } else if (top > b[1] + b[3]) top = b[1] + b[3];
-      }
-      s.left = `${left}px`;
-      s.top = `${top}px`;
-      tmp = (sess = this.sess.info).droptarget;
-      sess = {
-        left,
-        top,
-        e,
-        el: this.sess.el,
-        mx,
-        my,
-        droptarget: this.testDrops(tx, ty),
-        dx: mx - (sess.mx || mx),
-        dy: my - (sess.my || my),
-        sx: this.sess.ex,
-        sy: this.sess.ey,
-      };
-      this.sess.info = sess;
-      tryInvoke(this.ondrag, sess);
-      if (
-        sess.droptarget
-        && tmp !== sess.droptarget
-      ) {
-        tryInvoke(this.ondragover, sess);
-      }
-      if (
-        tmp
-        && sess.droptarget !== tmp
-      ) {
-        tmp2 = sess.droptarget;
-        sess.droptarget = tmp;
-        tryInvoke(this.ondragout, sess);
-        sess.droptarget = tmp2;
-      }
-    }
-
-    boundingBox(x, y, w, h) {
-      this.bounds = [x, y, w, h];
-      return this;
-    }
-
-    drop() {
-      document.removeEventListener('mouseup', this.boundEvents.drop);
-      document.removeEventListener('mousemove', this.boundEvents.drag);
-      tryInvoke(this.ondrop, this.sess.info);
-      if (!this.autoZ) {
-        this.sess.el.style.zIndex = this.sess.zIndex;
-      }
-      return true;
-    }
-
-    testDrops(a, b) {
-      const { droppables } = this;
-      let z;
-      let r = false;
-      let max = [9999, 9999];
-      if (!droppables.length) {
-        return r;
-      }
-      droppables.forEach((droppable) => {
-        if (droppable === this.sess.el || isChildOf(droppable, this.sess.el)) {
-          return;
-        }
-        z = getCoordinates(droppable);
-        if (
-          max[0] > z.w
-          && max[1] > z.h
-          && a >= z.x
-          && b >= z.y
-          && a <= z.xw
-          && b <= z.yh
-        ) {
-          max = [z.w, z.h];
-          r = droppable;
-        }
-      });
-      return r;
-    }
-
-    drops(a) {
-      this.droppables = a;
-      return this;
-    }
-
-    addDrops(a) {
-      if (!this.droppables) {
-        return this.drops(a);
-      }
-      this.droppables = this.droppables.concat(a);
-      return this;
-    }
-
-    addListener(a) {
-      assign(this, a);
-      return this;
-    }
-
-    apply(el$$1, t) {
-      if (Array.isArray(el$$1)) {
-        el$$1.forEach(el2 => this.apply(el2));
-        return this;
-      }
-
-      let pos = getComputedStyle(el$$1, '');
-      pos = pos.position;
-      if (!pos || pos === 'static') {
-        el$$1.style.position = 'relative';
-      }
-      (t || el$$1).onmousedown = t
-        ? e => this.start(e, el$$1, t)
-        : e => this.start(e, el$$1);
-      return this;
-    }
-
-    autoZ() {
-      this.autoZ = true;
-      return this;
-    }
-
-    noChildActivation() {
-      this.noChild = true;
-      return this;
-    }
-
-    reset(el$$1 = this.sess.el) {
-      el$$1.style.top = 0;
-      el$$1.style.left = 0;
-      return this;
-    }
-  }
-
-  const DISALLOWED_TAGS = [
-    'SCRIPT',
-    'STYLE',
-    'HR',
-  ];
-
-  function htmlToBBCode(html) {
-    let bbcode = html;
-    const nestedTagRegex = /<(\w+)([^>]*)>([\w\W]*?)<\/\1>/gi;
-    bbcode = bbcode.replace(/[\r\n]+/g, '');
-    bbcode = bbcode.replace(/<(hr|br|meta)[^>]*>/gi, '\n');
-    // images and emojis
-    bbcode = bbcode.replace(/<img.*?src=["']?([^'"]+)["'](?: alt=["']?([^"']+)["'])?[^>]*\/?>/g, (whole, src, alt) => alt || `[img]${src}[/img]`);
-    bbcode = bbcode.replace(nestedTagRegex, (
-      whole,
-      tag,
-      attributes,
-      innerHTML,
-    ) => {
-      // Recursively handle nested tags
-      let innerhtml = nestedTagRegex.test(innerHTML) ? htmlToBBCode(innerHTML) : innerHTML;
-      const att = {};
-      attributes.replace(
-        /(color|size|style|href|src)=(['"]?)(.*?)\2/gi,
-        (_, attr, q, value) => {
-          att[attr] = value;
-        },
-      );
-      const { style = '' } = att;
-
-      const lcTag = tag.toLowerCase();
-      if (DISALLOWED_TAGS.includes(lcTag)) {
-        return '';
-      }
-      if (style.match(/background(-color)?:[^;]+(rgb\([^)]+\)|#\s+)/i)) {
-        innerhtml = `[bgcolor=#${
-        new Color(RegExp.$2).toHex()
-      }]${
-        innerhtml
-      }[/bgcolor]`;
-      }
-      if (style.match(/text-align: ?(right|center|left)/i)) {
-        innerhtml = `[align=${RegExp.$1}]${innerhtml}[/align]`;
-      }
-      if (
-        style.match(/font-style: ?italic/i)
-        || lcTag === 'i'
-        || lcTag === 'em'
-      ) {
-        innerhtml = `[I]${innerhtml}[/I]`;
-      }
-      if (style.match(/text-decoration:[^;]*underline/i) || lcTag === 'u') {
-        innerhtml = `[U]${innerhtml}[/U]`;
-      }
-      if (
-        style.match(/text-decoration:[^;]*line-through/i)
-        || lcTag === 's' || lcTag === 'strike'
-      ) {
-        innerhtml = `[S]${innerhtml}[/S]`;
-      }
-      if (
-        style.match(/font-weight: ?bold/i)
-        || lcTag === 'strong'
-        || lcTag === 'b'
-      ) {
-        innerhtml = `[B]${innerhtml}[/B]`;
-      }
-      if (att.size || style.match(/font-size: ?([^;]+)/i)) {
-        innerhtml = `[size=${att.size || RegExp.$1}]${innerhtml}[/size]`;
-      }
-      if (att.color || style.match(/color: ?([^;]+)/i)) {
-        innerhtml = `[color=${att.color || RegExp.$1}]${innerhtml}[/color]`;
-      }
-      if (lcTag === 'a' && att.href) {
-        innerhtml = `[url=${att.href}]${innerhtml}[/url]`;
-      }
-      if (lcTag === 'ol') innerhtml = `[ol]${innerhtml}[/ol]`;
-      if (lcTag === 'ul') innerhtml = `[ul]${innerhtml}[/ul]`;
-      if (lcTag.match(/h\d/i)) {
-        innerhtml = `[${
-        lcTag
-      }]${
-        innerhtml
-      }[/${
-        lcTag
-      }]`;
-      }
-      if (lcTag === 'li') {
-        innerhtml = `*${innerhtml.replace(/[\n\r]+/, '')}\n`;
-      }
-      if (lcTag === 'p') {
-        innerhtml = `\n${innerhtml === '&nbsp' ? '' : innerhtml}\n`;
-      }
-      if (lcTag === 'div') {
-        innerhtml = `\n${innerhtml}`;
-      }
-      return innerhtml;
-    });
-    return bbcode
-      .replace(/&amp;/g, '&')
-      .replace(/&gt;/g, '>')
-      .replace(/&lt;/g, '<')
-      .replace(/&nbsp;/g, ' ');
-  }
-
-
-  function bbcodeToHTML(bbcode) {
-    let html = bbcode
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/(\s) /g, '$1&nbsp;');
-    html = html.replace(/\[b\]([\w\W]*?)\[\/b\]/gi, '<b>$1</b>');
-    html = html.replace(/\[i\]([\w\W]*?)\[\/i\]/gi, '<i>$1</i>');
-    html = html.replace(/\[u\]([\w\W]*?)\[\/u\]/gi, '<u>$1</u>');
-    html = html.replace(/\[s\]([\w\W]*?)\[\/s\]/gi, '<s>$1</s>');
-    html = html.replace(/\[img\]([^'"[]+)\[\/img\]/gi, '<img src="$1">');
-    html = html.replace(
-      /\[color=([^\]]+)\](.*?)\[\/color\]/gi,
-      '<span style="color:$1">$2</span>',
-    );
-    html = html.replace(
-      /\[size=([^\]]+)\](.*?)\[\/size\]/gi,
-      '<span style="font-size:$1">$2</span>',
-    );
-    html = html.replace(
-      /\[url=([^\]]+)\](.*?)\[\/url\]/gi,
-      '<a href="$1">$2</a>',
-    );
-    html = html.replace(
-      /\[bgcolor=([^\]]+)\](.*?)\[\/bgcolor\]/gi,
-      '<span style="backgroun-color:$1">$2</span>',
-    );
-    html = html.replace(/\[h(\d)\](.*?)\[\/h\1\]/g, '<h$1>$2</h$1>');
-    html = html.replace(
-      /\[align=(left|right|center)\](.*?)\[\/align\]/g,
-      '<div style="text-align:$1">$2</div>',
-    );
-    html = html.replace(/\[(ul|ol)\]([\w\W]*?)\[\/\1\]/gi, (match) => {
-      const tag = match[1];
-      const listItems = match[2].split(/([\r\n]+|^)\*/);
-      const lis = listItems
-        .filter(text => text.trim())
-        .map(text => `<li>${text}</li>`)
-        .join('');
-      return `<${tag}>${lis}</${tag}>`;
-    });
-    html = html.replace(/\n/g, '<br />');
-    return html;
   }
 
   /* global globalsettings */
@@ -1984,6 +1783,201 @@
     }
   }
 
+  class Drag {
+    constructor() {
+      this.droppables = [];
+    }
+
+    start(event, t, handle) {
+      const e = new Event$1(event).cancel().stopBubbling();
+      const el$$1 = t || event.target;
+      const s = getComputedStyle(el$$1);
+      const highz = getHighestZIndex();
+      if (this.noChild && (e.srcElement || e.target) !== (handle || el$$1)) {
+        return;
+      }
+      if (el$$1.getAttribute('draggable') === 'false') {
+        return;
+      }
+      this.sess = {
+        el: el$$1,
+        mx: parseInt(e.pageX, 10),
+        my: parseInt(e.pageY, 10),
+        ex: parseInt(s.left, 10) || 0,
+        ey: parseInt(s.top, 10) || 0,
+        info: {},
+        bc: getCoordinates(el$$1),
+        zIndex: el$$1.style.zIndex,
+      };
+      if (!this.sess.zIndex || Number(this.sess.zIndex) < highz - 1) {
+        el$$1.style.zIndex = highz;
+      }
+      tryInvoke(this.onstart, {
+        ...this.sess,
+        droptarget: this.testDrops(this.sess.mx, this.sess.my),
+      });
+      this.boundEvents = {
+        drag: event2 => this.drag(event2),
+        drop: event2 => this.drop(event2),
+      };
+      document.addEventListener('mousemove', this.boundEvents.drag);
+      document.addEventListener('mouseup', this.boundEvents.drop);
+      this.drag(e);
+    }
+
+    drag(event) {
+      const e = new Event$1(event).cancel();
+      const s = this.sess.el.style;
+      let sess;
+      let tmp = false;
+      const tx = parseInt(e.pageX, 10);
+      const ty = parseInt(e.pageY, 10);
+      let mx = tx;
+      let my = ty;
+      let tmp2;
+      let left = this.sess.ex + mx - this.sess.mx;
+      let top = this.sess.ey + my - this.sess.my;
+      const b = this.bounds;
+      if (b) {
+        if (left < b[0]) {
+          mx = mx - left + b[0];
+          [left] = b;
+        } else if (left > b[0] + b[2]) left = b[0] + b[2];
+        if (top < b[1]) {
+          my = my - top + b[1];
+          [top] = b;
+        } else if (top > b[1] + b[3]) top = b[1] + b[3];
+      }
+      s.left = `${left}px`;
+      s.top = `${top}px`;
+      tmp = (sess = this.sess.info).droptarget;
+      sess = {
+        left,
+        top,
+        e,
+        el: this.sess.el,
+        mx,
+        my,
+        droptarget: this.testDrops(tx, ty),
+        dx: mx - (sess.mx || mx),
+        dy: my - (sess.my || my),
+        sx: this.sess.ex,
+        sy: this.sess.ey,
+      };
+      this.sess.info = sess;
+      tryInvoke(this.ondrag, sess);
+      if (
+        sess.droptarget
+        && tmp !== sess.droptarget
+      ) {
+        tryInvoke(this.ondragover, sess);
+      }
+      if (
+        tmp
+        && sess.droptarget !== tmp
+      ) {
+        tmp2 = sess.droptarget;
+        sess.droptarget = tmp;
+        tryInvoke(this.ondragout, sess);
+        sess.droptarget = tmp2;
+      }
+    }
+
+    boundingBox(x, y, w, h) {
+      this.bounds = [x, y, w, h];
+      return this;
+    }
+
+    drop() {
+      document.removeEventListener('mouseup', this.boundEvents.drop);
+      document.removeEventListener('mousemove', this.boundEvents.drag);
+      tryInvoke(this.ondrop, this.sess.info);
+      if (!this.autoZ) {
+        this.sess.el.style.zIndex = this.sess.zIndex;
+      }
+      return true;
+    }
+
+    testDrops(a, b) {
+      const { droppables } = this;
+      let z;
+      let r = false;
+      let max = [9999, 9999];
+      if (!droppables.length) {
+        return r;
+      }
+      droppables.forEach((droppable) => {
+        if (droppable === this.sess.el || isChildOf(droppable, this.sess.el)) {
+          return;
+        }
+        z = getCoordinates(droppable);
+        if (
+          max[0] > z.w
+          && max[1] > z.h
+          && a >= z.x
+          && b >= z.y
+          && a <= z.xw
+          && b <= z.yh
+        ) {
+          max = [z.w, z.h];
+          r = droppable;
+        }
+      });
+      return r;
+    }
+
+    drops(a) {
+      this.droppables = a;
+      return this;
+    }
+
+    addDrops(a) {
+      if (!this.droppables) {
+        return this.drops(a);
+      }
+      this.droppables = this.droppables.concat(a);
+      return this;
+    }
+
+    addListener(a) {
+      assign(this, a);
+      return this;
+    }
+
+    apply(el$$1, t) {
+      if (Array.isArray(el$$1)) {
+        el$$1.forEach(el2 => this.apply(el2));
+        return this;
+      }
+
+      let pos = getComputedStyle(el$$1, '');
+      pos = pos.position;
+      if (!pos || pos === 'static') {
+        el$$1.style.position = 'relative';
+      }
+      (t || el$$1).onmousedown = t
+        ? e => this.start(e, el$$1, t)
+        : e => this.start(e, el$$1);
+      return this;
+    }
+
+    autoZ() {
+      this.autoZ = true;
+      return this;
+    }
+
+    noChildActivation() {
+      this.noChild = true;
+      return this;
+    }
+
+    reset(el$$1 = this.sess.el) {
+      el$$1.style.top = 0;
+      el$$1.style.left = 0;
+      return this;
+    }
+  }
+
   class Window {
     constructor() {
       assign(this, {
@@ -2207,11 +2201,9 @@
 
   var JAX = {
     autoComplete,
-    Drag,
     Editor,
     Window,
 
-    checkAll,
     handleTabs,
     toggle,
   };

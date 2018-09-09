@@ -3,7 +3,7 @@
   <table class="listing">
     <tr>
       <th class="center" width="5%%">
-        <input type="checkbox" onclick="JAX.checkAll(document.querySelectorAll('.check'),this.checked)" />
+        <input type="checkbox" onclick="document.querySelectorAll('.check').forEach(checkbox => checkbox.checked = this.checked)" />
       </th>
       <th width="5%%">
         Flag

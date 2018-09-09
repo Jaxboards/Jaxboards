@@ -226,12 +226,6 @@ export function gracefulDegrade(a) {
   });
 }
 
-export function checkAll(checkboxes, value) {
-  checkboxes.forEach((checkbox) => {
-    checkbox.checked = value;
-  });
-}
-
 export function handleTabs(e, a, f) {
   const activeClass = 'active';
   let el = e.target || e.srcElement;
