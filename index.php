@@ -351,10 +351,6 @@ if ($PAGE->jsaccess && $SESS->runonce) {
     $SESS->runonce = '';
 }
 
-// Keeps people from leaving their windows open all night.
-if (($SESS->last_update - $SESS->last_action) > 1200) {
-    $PAGE->JS('script', 'window.name=Math.random()');
-}
 // Any changes to the session variables of the
 // current user throughout the script are finally put into query form here.
 $SESS->applyChanges();

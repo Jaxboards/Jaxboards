@@ -809,11 +809,11 @@ EOT
             );
         }
 
-        if ('qreply' != $this->how) {
-            $PAGE->location('?act=vt' . $tid . '&getlast=1');
-        } else {
+        if ('qreply' == $this->how) {
             $PAGE->JS('closewindow', '#qreply');
             $PAGE->JS('script', 'RUN.stream.pollData(true)');
+        } else {
+            $PAGE->location('?act=vt' . $tid . '&getlast=1');
         }
     }
 }

@@ -2738,7 +2738,7 @@
       this.request = new Ajax({
         callback: request => this.handleRequestData(request),
       });
-      this.lastURL = '';
+      this.lastURL = document.location.search.substr(1);
       this.commands = Commands;
     }
 
