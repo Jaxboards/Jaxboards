@@ -10,23 +10,41 @@ class tools
     public function __construct()
     {
         global $JAX,$PAGE;
-        $sidebar = '';
-        $menu = array(
-            '?act=tools&do=files' => 'File Manager',
-            '?act=tools&do=backup' => 'Backup',
+
+        $links = array(
+            'files' => 'File Manager',
+            'backup' => 'Backup',
         );
-        foreach ($menu as $k => $v) {
-            $sidebar .= '<li><a href="' . $k . '">' . $v . '</a></li>';
+        $sidebarLinks = '';
+        foreach ($links as $do => $title) {
+            $sidebarLinks .= $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/sidebar-list-link.html',
+                array(
+                    'url' => '?act=tools&do=' . $do,
+                    'title' => $title,
+                )
+            ) . PHP_EOL;
         }
-        $PAGE->sidebar('<ul>' . $sidebar . '</ul>');
-        $do = isset($JAX->b['do']) ? $JAX->b['do'] : '';
-        switch ($do) {
-            case 'files':
-                $this->filemanager();
-                break;
+
+        $PAGE->sidebar(
+            $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/sidebar-list.html',
+                array(
+                    'content' => $sidebarLinks,
+                )
+            )
+        );
+
+        if (!isset($JAX->b['do'])) {
+            $JAX->b['do'] = null;
+        }
+        switch ($JAX->b['do']) {
             case 'backup':
                 $this->backup();
                 break;
+            case 'files':
+            default:
+                $this->filemanager();
         }
     }
 
@@ -34,7 +52,7 @@ class tools
     {
         global $PAGE,$DB,$JAX,$CFG;
         $page = '';
-        if (is_numeric(@$JAX->b['delete'])) {
+        if (isset($JAX->b['delete']) && is_numeric($JAX->b['delete'])) {
             $result = $DB->safeselect(
                 <<<'EOT'
 `id`,`name`,`hash`,`uid`,`size`,`downloads`,INET6_NTOA(`ip`) AS `ip`
@@ -47,16 +65,18 @@ EOT
             $f = $DB->arow($result);
             $DB->disposeresult($result);
             if ($f) {
-                $ext = mb_strtolower(array_pop(explode('.', $f['name'])));
+                $ext = mb_strtolower(pathinfo($f['name'], PATHINFO_EXTENSION));
                 if (in_array($ext, array('jpg', 'jpeg', 'png', 'gif', 'bmp'))) {
                     $f['hash'] .= '.' . $ext;
                 }
-                $page .= @unlink(BOARDPATH . 'Uploads/' . $f['hash']) ?
-                    $PAGE->success('File deleted') :
-                    $PAGE->error(
-                        'Error deleting file, maybe it\'s already been ' .
-                        'deleted? Removed from DB'
-                    );
+                if (is_writable(BOARDPATH . 'Uploads/' . $f['hash'])) {
+                    $page .= unlink(BOARDPATH . 'Uploads/' . $f['hash']) ?
+                        $PAGE->success('File deleted') :
+                        $PAGE->error(
+                            'Error deleting file, maybe it\'s already been ' .
+                            'deleted? Removed from DB'
+                        );
+                }
                 $DB->safedelete(
                     'files',
                     'WHERE `id`=?',
@@ -64,7 +84,7 @@ EOT
                 );
             }
         }
-        if (is_array(@$JAX->p['dl'])) {
+        if (isset($JAX->p['dl']) && is_array($JAX->p['dl'])) {
             foreach ($JAX->p['dl'] as $k => $v) {
                 if (ctype_digit($v)) {
                     $DB->safeupdate(
@@ -93,8 +113,13 @@ EOT
                 $m
             );
             foreach ($m[1] as $v) {
-                $linkedin[$v][] = '<a href="../?act=vt' . $f['tid'] .
-                    '&findpost=' . $f['id'] . '">' . $f['id'] . '</a>';
+                $linkedin[$v][] = $PAGE->parseTemplate(
+                    JAXBOARDS_ROOT . '/acp/views/tools/attachment-link.html',
+                    array(
+                        'topic_id' => $f['tid'],
+                        'post_id' => $f['id'],
+                    )
+                );
             }
         }
         $result = $DB->safespecial(
@@ -125,31 +150,33 @@ EOT
                 $file['name'] = '<a href="../?act=download&id=' .
                     $file['id'] . '">' . $file['name'] . '</a>';
             }
-            $table .= '<tr><td>' . $file['name'] . '</td><td>' . $file['id'] .
-                '</td><td>' . $JAX->filesize($file['size']) .
-                "</td><td align='center'><input type='text' " .
-                "style='text-align:center;width:40px' name='dl[" . $file['id'] .
-                ']\' value="' . $file['downloads'] . '" /></td><td>' .
-                '<a href="../?act=vu' . $file['uid'] . '">' . $file['uname'] .
-                '</a></td><td>' . ($linkedin[$file['id']] ?
-                implode(', ', $linkedin[$file['id']]) : 'Not linked!') .
-                "</td><td align='center'><a onclick='return " .
-                "confirm(\"You sure?\")' href='?act=tools&do=files&delete=" .
-                $file['id'] . "' class='icons delete'></a></td></tr>";
+            $table .= $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/tools/file-manager-row.html',
+                array(
+                    'id' => $file['id'],
+                    'title' => $file['name'],
+                    'filesize' => $JAX->filesize($file['size']),
+                    'downloads' => $file['downloads'],
+                    'user_id' => $file['uid'],
+                    'username' => $file['uname'],
+                    'linked_in' => isset($linkedin[$file['id']]) && $linkedin[$file['id']] ?
+                        implode(', ', $linkedin[$file['id']]) : 'Not linked!',
+                )
+            ) . PHP_EOL;
         }
-        $page .= $table ? "<form method='post'><table id='files'><tr><th>" .
-            'Filename</th><th>ID</th><th>Size</th><th>Downloads</th><th>' .
-            'Uploader</th><th>Linked in</th><th>Delete</th></tr>' . $table .
-            "<tr><td colspan='3'></td><td><input type='submit' value='Save'" .
-            " /></td><td colspan='3' /></td></table>" :
-            $PAGE->error('No files to show.');
+        $page .= $table ? $PAGE->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/tools/file-manager.html',
+            array(
+                'content' => $table,
+            )
+        ) : $PAGE->error('No files to show.');
         $PAGE->addContentBox('File Manager', $page);
     }
 
     public function backup()
     {
-        global $PAGE,$DB;
-        if (@$_POST['dl']) {
+        global $JAX,$PAGE,$DB;
+        if (isset($JAX->p['dl']) && $JAX->p['dl']) {
             header('Content-type: text/plain');
             header(
                 'Content-Disposition: attachment;filename="' . $DB->prefix .
@@ -200,16 +227,9 @@ EOT
         }
         $PAGE->addContentBox(
             'Backup Forum',
-            <<<'EOT'
-This tool will allow you to download and save a backup of your forum in case
-something happens.
-<br /><br />
-    <form method='post' onsubmit='this.submit.disabled=true'>
-    <input type='hidden' name='dl' value='1' />
-    <input type='submit' name='submit' value='Download Backup'
-    onmouseup='this.value=\"Generating backup...\";' />
-    </form>
-EOT
+            $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/tools/backup.html'
+            )
         );
     }
 }

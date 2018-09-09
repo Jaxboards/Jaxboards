@@ -11,22 +11,37 @@ class themes
     public function __construct()
     {
         global $PAGE,$JAX;
-        $sidebar = '';
-        $nav = array(
-            '?act=themes&page=create' => 'Create New Skin',
-            '?act=themes' => 'Manage Skins',
+        $links = array(
+            'create' => 'Create New Skin',
+            'manage' => 'Manage Skins',
         );
-        foreach ($nav as $k => $v) {
-            $sidebar .= '<li><a href="' . $k . '">' . $v . '</a></li>';
+        $sidebarLinks = '';
+        foreach ($links as $do => $title) {
+            $sidebarLinks .= $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/sidebar-list-link.html',
+                array(
+                    'url' => '?act=themes&do=' . $do,
+                    'title' => $title,
+                )
+            ) . PHP_EOL;
         }
-        $PAGE->sidebar('<ul>' . $sidebar . '</ul>');
-        if (@$JAX->g['editcss']) {
+
+        $PAGE->sidebar(
+            $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/sidebar-list.html',
+                array(
+                    'content' => $sidebarLinks,
+                )
+            )
+        );
+
+        if (isset($JAX->g['editcss']) && $JAX->g['editcss']) {
             $this->editcss($JAX->g['editcss']);
-        } elseif (@$JAX->g['editwrapper']) {
+        } elseif (isset($JAX->g['editcss']) && $JAX->g['editwrapper']) {
             $this->editwrapper($JAX->g['editwrapper']);
-        } elseif (is_numeric(@$JAX->g['deleteskin'])) {
+        } elseif (isset($JAX->g['deleteskin']) && is_numeric($JAX->g['deleteskin'])) {
             $this->deleteskin($JAX->g['deleteskin']);
-        } elseif ('create' == @$JAX->g['page']) {
+        } elseif (isset($JAX->g['page']) && 'create' == $JAX->g['page']) {
             $this->createskin();
         } else {
             $this->showskinindex();
@@ -58,8 +73,8 @@ class themes
         $errorskins = '';
         $errorwrapper = '';
 
-        $wrapperPath = BOARDPATH . 'Wrappers/' . @$JAX->g['deletewrapper'] . '.txt';
-        if (@$JAX->g['deletewrapper']) {
+        if (isset($JAX->g['deletewrapper']) && $JAX->g['deletewrapper']) {
+            $wrapperPath = BOARDPATH . 'Wrappers/' . $JAX->g['deletewrapper'] . '.txt';
             if (!preg_match('@[^\\w ]@', $JAX->g['deletewrapper'])
                 && file_exists($wrapperPath)
             ) {
@@ -71,7 +86,7 @@ class themes
             }
         }
 
-        if (@$JAX->p['newwrapper']) {
+        if (isset($JAX->p['newwrapper']) && $JAX->p['newwrapper']) {
             $newWrapperPath
                 = BOARDPATH . 'Wrappers/' . $JAX->p['newwrapper'] . '.txt';
             if (preg_match('@[^\\w ]@', $JAX->p['newwrapper'])) {
@@ -98,7 +113,7 @@ class themes
         // Make an array of wrappers.
         $wrappers = $this->getwrappers();
 
-        if (@$JAX->p['submit']) {
+        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             // Update wrappers/hidden status.
             if (!isset($JAX->p['hidden'])) {
                 $JAX->p['hidden'] = array();
@@ -134,10 +149,10 @@ class themes
                         continue;
                     }
                     if (preg_match('@[^\\w ]@', $v) || mb_strlen($v) > 50) {
-                        $errorskins
-                            = 'Skin name must consist of letters, numbers, ' .
-                            'spaces, and underscore, and be under 50 ' .
-                            'characters long.';
+                        $errorskins = <<<'EOT'
+Skin name must consist of letters, numbers, spaces, and underscore, and be
+under 50 characters long.
+EOT;
                     } elseif (is_dir(BOARDPATH . 'Themes/' . $v)) {
                         $errorskins = 'That skin name is already being used.';
                     } else {
@@ -168,10 +183,10 @@ class themes
                         continue;
                     }
                     if (preg_match('@[^\\w ]@', $v) || mb_strlen($v) > 50) {
-                        $errorwrapper
-                            = 'Wrapper name must consist of letters, ' .
-                            'numbers, spaces, and underscore, and be under ' .
-                            '50 characters long.';
+                        $errorwrapper = <<<'EOT'
+Wrapper name must consist of letters, numbers, spaces, and underscore, and be
+under 50 characters long.
+EOT;
                     } elseif (is_file(BOARDPATH . 'Wrappers/' . $v . '.txt')) {
                         $errorwrapper = 'That wrapper name is already being used.';
                     } else {
@@ -360,9 +375,9 @@ EOT;
     {
         global $PAGE,$JAX,$DB,$CFG;
         $page = '';
-        if (@$JAX->p['submit']) {
+        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             $e = '';
-            if (!@$JAX->p['skinname']) {
+            if (!isset($JAX->p['skinname']) || !$JAX->p['skinname']) {
                 $e = 'No skin name supplied!';
             } elseif (preg_match('@[^\\w ]@', $JAX->p['skinname'])) {
                 $e = 'Skinname must only consist of letters, numbers, and spaces.';
@@ -400,16 +415,21 @@ EOT;
                         $DB->insert_id(1)
                     );
                 }
-                @mkdir(BOARDPATH . 'Themes');
-                mkdir(BOARDPATH . 'Themes/' . $JAX->p['skinname']);
-                $o = fopen(BOARDPATH . 'Themes/' . $JAX->p['skinname'] . '/css.css', 'w');
-                fwrite(
-                    $o,
-                    file_get_contents(
-                        JAXBOARDS_ROOT . '/' . $CFG['dthemepath'] . 'css.css'
-                    )
-                );
-                fclose($o);
+                if (!is_dir(BOARDPATH . 'Themes') && is_writable(BOARDPATH)) {
+                    mkdir(BOARDPATH . 'Themes');
+                }
+                if (is_dir(BOARDPATH . 'Themes')) {
+                    mkdir(BOARDPATH . 'Themes');
+                    mkdir(BOARDPATH . 'Themes/' . $JAX->p['skinname']);
+                    $o = fopen(BOARDPATH . 'Themes/' . $JAX->p['skinname'] . '/css.css', 'w');
+                    fwrite(
+                        $o,
+                        file_get_contents(
+                            JAXBOARDS_ROOT . '/' . $CFG['dthemepath'] . 'css.css'
+                        )
+                    );
+                    fclose($o);
+                }
                 $PAGE->location('?act=themes');
             }
             if ($e) {

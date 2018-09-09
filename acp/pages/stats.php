@@ -10,7 +10,10 @@ class stats
     public function __construct()
     {
         global $PAGE,$JAX;
-        switch (@$JAX->g['do']) {
+        if (!isset($JAX->g['do'])) {
+            $JAX->g['do'] = null;
+        }
+        switch ($JAX->g['do']) {
             case 'recount':
                 $this->recount_statistics();
                 break;
@@ -25,7 +28,9 @@ class stats
         global $PAGE;
         $PAGE->addContentBox(
             'Board Statistics',
-            "<a href='?act=stats&do=recount'>Recount Statistics</a>"
+            $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/stats/show-stats.html'
+            )
         );
     }
 
@@ -185,8 +190,10 @@ EOT
 
         $PAGE->addContentBox(
             'Board Statistics',
-            'Board statistics recounted successfully.<br />' .
-            "<br /><br /><br /><a href='?act=stats'>Board Statistics</a>"
+            $PAGE->success('Board statistics recounted successfully.') .
+            PHP_EOL . $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/stats/recount-statistics.html'
+            )
         );
     }
 }
