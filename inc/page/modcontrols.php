@@ -720,10 +720,10 @@ EOT
                 )
             ) .
             'Member name: <input type="text" name="mname" ' .
-            'onkeyup="document.querySelector(\'#validname\').className=\'bad\';' .
-            'JAX.autoComplete(\'act=searchmembers&term=\'+this.value,this' .
-            ',document.querySelector(\'#mid\'),event);" />
-            <span id="validname"></span>
+            'data-autocomplete-action="searchmembers" ' .
+            'data-autocomplete-output="#mid" ' .
+            'data-autocomplete-indicator="#validname" />' .
+            '<span id="validname"></span>
             <input type="hidden" name="mid" id="mid" ' .
             'onchange="document.querySelector(\'#validname\').className=\'good\';' .
             'this.form.onsubmit();" />

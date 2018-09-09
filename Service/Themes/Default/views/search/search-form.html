@@ -45,14 +45,10 @@
           </td>
           <td>
             Posted by:
-            <input type="text" onkeyup="
-                                return JAX.autoComplete(
-                                    'act=searchmembers&amp;term='+this.value,
-                                    this,
-                                    document.querySelector('#mid'),
-                                    event
-                                );
-                             " />
+            <input type="text"
+              data-autocomplete-action="searchmembers"
+              data-autocomplete-output="#mid"
+            />
             <input type="hidden" id="mid" name="mid" />
           </td>
         </tr>

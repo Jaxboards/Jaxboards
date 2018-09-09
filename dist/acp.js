@@ -66,84 +66,7 @@
     safari: !!userAgent.match(/safari/i),
   });
 
-  /**
-   * This method adds some decoration to the default browser event.
-   * This can probably be replaced with something more modern.
-   */
-  function Event$1(e) {
-    const dB = document.body;
-    const dE = document.documentElement;
-    switch (e.keyCode) {
-      case 13:
-        e.ENTER = true;
-        break;
-      case 37:
-        e.LEFT = true;
-        break;
-      case 38:
-        e.UP = true;
-        break;
-      case 0.39:
-        e.RIGHT = true;
-        break;
-      case 40:
-        e.DOWN = true;
-        break;
-      default:
-        break;
-    }
-    if (typeof e.srcElement === 'undefined') e.srcElement = e.target;
-    if (typeof e.pageY === 'undefined') {
-      e.pageY = e.clientY + (parseInt(dE.scrollTop || dB.scrollTop, 10) || 0);
-      e.pageX = e.clientX + (parseInt(dE.scrollLeft || dB.scrollLeft, 10) || 0);
-    }
-    e.cancel = () => {
-      e.returnValue = false;
-      if (e.preventDefault) e.preventDefault();
-      return e;
-    };
-    e.stopBubbling = () => {
-      if (e.stopPropagation) e.stopPropagation();
-      e.cancelBubble = true;
-      return e;
-    };
-    return e;
-  }
-
-  // TODO: There are places in the source that are using this to store a callback
-  // Refactor this
-  Event$1.onPageChange = function onPageChange() {};
-
-  /**
-   * Selects/highlights all contents in an element
-   * @param  {Element} element
-   * @return {Void}
-   */
-
-  /**
-   * If there's any highlighted text in element, replace it with content
-   * @param {Element]} element
-   * @param {String} content
-   */
-  function replaceSelection(element, content) {
-    const scroll = element.scrollTop;
-    if (document.selection) {
-      element.focus();
-      document.selection.createRange().text = content;
-    } else {
-      const s = element.selectionStart;
-      const e = element.selectionEnd;
-      element.value = element.value.substring(0, s) + content + element.value.substr(e);
-      element.selectionStart = s + content.length;
-      element.selectionEnd = s + content.length;
-    }
-    element.focus();
-    element.scrollTop = scroll;
-  }
-
-  /* global RUN */
   // This file is just a dumping ground until I can find better homes for these
-
   function assign(a, b) {
     Object.assign(a, b);
   }
@@ -254,6 +177,81 @@
       return request;
     }
   }
+
+  /**
+   * Selects/highlights all contents in an element
+   * @param  {Element} element
+   * @return {Void}
+   */
+
+  /**
+   * If there's any highlighted text in element, replace it with content
+   * @param {Element]} element
+   * @param {String} content
+   */
+  function replaceSelection(element, content) {
+    const scroll = element.scrollTop;
+    if (document.selection) {
+      element.focus();
+      document.selection.createRange().text = content;
+    } else {
+      const s = element.selectionStart;
+      const e = element.selectionEnd;
+      element.value = element.value.substring(0, s) + content + element.value.substr(e);
+      element.selectionStart = s + content.length;
+      element.selectionEnd = s + content.length;
+    }
+    element.focus();
+    element.scrollTop = scroll;
+  }
+
+  /**
+   * This method adds some decoration to the default browser event.
+   * This can probably be replaced with something more modern.
+   */
+  function Event$1(e) {
+    const dB = document.body;
+    const dE = document.documentElement;
+    switch (e.keyCode) {
+      case 13:
+        e.ENTER = true;
+        break;
+      case 37:
+        e.LEFT = true;
+        break;
+      case 38:
+        e.UP = true;
+        break;
+      case 0.39:
+        e.RIGHT = true;
+        break;
+      case 40:
+        e.DOWN = true;
+        break;
+      default:
+        break;
+    }
+    if (typeof e.srcElement === 'undefined') e.srcElement = e.target;
+    if (typeof e.pageY === 'undefined') {
+      e.pageY = e.clientY + (parseInt(dE.scrollTop || dB.scrollTop, 10) || 0);
+      e.pageX = e.clientX + (parseInt(dE.scrollLeft || dB.scrollLeft, 10) || 0);
+    }
+    e.cancel = () => {
+      e.returnValue = false;
+      if (e.preventDefault) e.preventDefault();
+      return e;
+    };
+    e.stopBubbling = () => {
+      if (e.stopPropagation) e.stopPropagation();
+      e.cancelBubble = true;
+      return e;
+    };
+    return e;
+  }
+
+  // TODO: There are places in the source that are using this to store a callback
+  // Refactor this
+  Event$1.onPageChange = function onPageChange() {};
 
   class Drag {
     constructor() {
@@ -534,7 +532,10 @@
     items.forEach(item => drag.apply(item));
   }
 
-  function autoComplete (queryParams, el$$1, outputElement, event = {}) {
+  const VALID_CLASS = 'valid';
+  const INVALID_CLASS = 'invalid';
+
+  function fetchResults(queryParams, el$$1, outputElement, event = {}) {
     const e = Event$1(event);
     el$$1.onkeydown = (event2) => {
       const e2 = Event$1(event2);
@@ -614,6 +615,30 @@
     }
   }
 
+  function decorateElement(element) {
+    // Disable native autocomplete behavior
+    element.autocomplete = 'off';
+    const action = element.dataset.autocompleteAction;
+    const output = element.dataset.autocompleteOutput;
+    const indicator = element.dataset.autocompleteIndicator;
+    const outputElement = output && document.querySelector(output);
+    const indicatorElement = indicator && document.querySelector(indicator);
+
+    if (indicatorElement && outputElement) {
+      outputElement.addEventListener('change', () => {
+        indicatorElement.classList.add(VALID_CLASS);
+      });
+    }
+    element.addEventListener('keyup', (event) => {
+      const searchTerm = encodeURIComponent(element.value);
+      if (indicatorElement) {
+        indicatorElement.classList.remove(VALID_CLASS);
+        indicatorElement.classList.add(INVALID_CLASS);
+      }
+      fetchResults(`act=${action}&term=${searchTerm}`, element, outputElement, event);
+    });
+  }
+
   function dropdownMenu(e) {
     const el$$1 = e.target;
     if (el$$1.tagName.toLowerCase() === 'a') {
@@ -671,7 +696,7 @@
     alert("Saved. Ajax-submitted so you don't lose your place");
   }
 
-  function gracefulDegrade$1() {
+  function gracefulDegrade() {
     // Dropdown menu
     document.querySelector('#nav').addEventListener('mouseover', dropdownMenu);
 
@@ -713,25 +738,7 @@
     // Hook up autocomplete form fields
     const autoCompleteFields = document.querySelectorAll('[data-autocomplete-action]');
     autoCompleteFields.forEach((field) => {
-      // Disable native autocomplete behavior
-      field.autocomplete = 'off';
-      const action = field.dataset.autocompleteAction;
-      const output = field.dataset.autocompleteOutput;
-      const indicator = field.dataset.autocompleteIndicator;
-      const outputElement = output && document.querySelector(output);
-      const indicatorElement = indicator && document.querySelector(indicator);
-      const searchTerm = field.value;
-
-      if (outputElement) {
-        outputElement.addEventListener('change', () => {
-          indicatorElement.classList.add('good');
-        });
-      }
-      field.addEventListener('keyup', (event) => {
-        indicatorElement.classList.remove('good');
-        indicatorElement.classList.add('bad');
-        autoComplete(`act=${action}&term=${encodeURIComponent(searchTerm)}`, field, outputElement, event);
-      });
+      decorateElement(field);
     });
 
     // Orderable forums needs this
@@ -740,6 +747,6 @@
       sortableTree(tree, 'forum_', document.querySelector('#ordered'));
     }
   }
-  onDOMReady(gracefulDegrade$1);
+  onDOMReady(gracefulDegrade);
 
 }());

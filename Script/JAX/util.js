@@ -1,22 +1,15 @@
-/* global RUN */
 import {
   insertAfter,
   getHighestZIndex,
 } from './el';
 import Animation from './animation';
 import Browser from './browser';
-import DatePicker from './date-picker';
-import scrollablepagelist from './scrollablepagelist';
-import { imageResizer } from './image-resizer';
-import makeImageGallery from './image-gallery';
 import {
   date,
   smalldate,
 } from './date';
-import tooltip from './tooltip';
-import { selectAll } from './selection';
-// This file is just a dumping ground until I can find better homes for these
 
+// This file is just a dumping ground until I can find better homes for these
 export function assign(a, b) {
   Object.assign(a, b);
 }
@@ -34,7 +27,7 @@ export function tryInvoke(method, ...args) {
   return null;
 }
 
-function convertSwitches(switches) {
+export function convertSwitches(switches) {
   switches.forEach((switchElement) => {
     const button = document.createElement('button');
     button.className = switchElement.className.replace('switch', 'switch_converted');
@@ -147,109 +140,6 @@ export function handleTabs(event, container, tabSelector) {
   el.blur();
 }
 
-export function gracefulDegrade(a) {
-  if (typeof RUN !== 'undefined') {
-    updateDates();
-  }
-
-  // Special rules for all links
-  const links = a.querySelectorAll('a');
-  links.forEach((link) => {
-    // Hande links with tooltips
-    if (link.dataset.useTooltip) {
-      link.addEventListener('mouseover', () => tooltip(link));
-    }
-
-    // Make all links load through AJAX
-    if (link.href) {
-      const href = link.getAttribute('href');
-      if (href.charAt(0) === '?') {
-        const oldclick = link.onclick;
-        link.addEventListener('click', (event) => {
-          // Some links have an onclick that returns true/false based on whether
-          // or not the link should execute.
-          if (!oldclick || oldclick.call(link) !== false) {
-            RUN.stream.location(href);
-          }
-          event.preventDefault();
-        });
-
-      // Open external links in a new window
-      } else if (link.getAttribute('href').substr(0, 4) === 'http') {
-        link.target = '_BLANK';
-      }
-    }
-  });
-
-  // Convert checkboxes to icons (checkmark and X)
-  convertSwitches(Array.from(a.querySelectorAll('.switch')));
-
-  // Handle image hover magnification
-  const bbcodeimgs = Array.from(document.querySelectorAll('.bbcodeimg'));
-  if (bbcodeimgs) {
-    onImagesLoaded(
-      bbcodeimgs,
-      () => {
-        // resizer on large images
-        imageResizer(bbcodeimgs);
-
-        // handle image galleries
-        const galleries = Array.from(document.querySelectorAll('.image_gallery'));
-        galleries.map(makeImageGallery);
-      },
-      2000,
-    );
-  }
-
-  // Initialize page lists that scroll with scroll wheel
-  const pages = Array.from(a.querySelectorAll('.pages'));
-  if (pages.length) {
-    pages.map(scrollablepagelist);
-  }
-
-  // Set up date pickers
-  const dateElements = Array.from(a.querySelectorAll('input.date'));
-  if (dateElements.length) {
-    dateElements.forEach((inputElement) => {
-      inputElement.onclick = () => DatePicker.init(inputElement);
-      inputElement.onkeydown = () => DatePicker.hide();
-    });
-  }
-
-  // Make BBCode code blocks selectable when clicked
-  const codeBlocks = a.querySelectorAll('.bbcode.code');
-  codeBlocks.forEach((codeBlock) => {
-    codeBlock.addEventListener('click', () => selectAll(codeBlock));
-  });
-
-  // Make collapse boxes collapsible
-  const collapseBoxes = a.querySelectorAll('.collapse-box');
-  collapseBoxes.forEach((collapseBox) => {
-    const collapseButton = collapseBox.querySelector('.collapse-button');
-    const collapseContent = collapseBox.querySelector('.collapse-content');
-    collapseButton.addEventListener('click', () => {
-      collapse(collapseContent);
-    });
-  });
-
-  // Wire up AJAX forms
-  const ajaxForms = a.querySelectorAll('form[data-ajax-form]');
-  ajaxForms.forEach((ajaxForm) => {
-    const resetOnSubmit = ajaxForm.dataset.ajaxForm === 'resetOnSubmit';
-    ajaxForm.addEventListener('submit', (event) => {
-      event.preventDefault();
-      RUN.submitForm(ajaxForm, resetOnSubmit);
-    });
-  });
-
-  // Handle tabs
-  const tabContainers = a.querySelectorAll('.tabs');
-  tabContainers.forEach((tabContainer) => {
-    const { tabSelector } = tabContainer.dataset;
-    tabContainer.addEventListener('click', event => handleTabs(event, tabContainer, tabSelector));
-  });
-}
-
 export function toggleOverlay(show) {
   const dE = document.documentElement;
   let ol = document.getElementById('overlay');
@@ -282,16 +172,6 @@ export function scrollTo(pos, el = Browser.chrome ? document.body : document.doc
   const position = screenrel < pos ? screenrel : pos;
   const diff = position - top;
   el.scrollTop += diff;
-  /* me={el:el,pos:top,diff:diff,step:1,steps:1} //had this animate once, but now it's just annoying
-  me.interval=setInterval(function(){
-    me.step++
-    (me.el).scrollTop=(me.pos+me.diff*Math.pow(me.step/me.steps,3));
-    if(me.step>=me.steps) {clearInterval(me.interval);}
-   },30)
-  me.then=function(a){
-   me.onend=a
-  }
-  return me */
 }
 
 /**

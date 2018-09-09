@@ -1,7 +1,6 @@
 /* global RUN, globalsettings */
 /* eslint-disable no-alert */
 import {
-  gracefulDegrade,
   toggleOverlay,
   scrollTo,
   onImagesLoaded,
@@ -14,6 +13,7 @@ import {
 import {
   flashTitle,
 } from '../JAX/flashing-title';
+import gracefulDegrade from '../JAX/graceful-degrade';
 import openTooltip from '../JAX/tooltip';
 import Window from '../JAX/window';
 import Sound from '../sound';

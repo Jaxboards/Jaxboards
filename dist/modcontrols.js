@@ -13,6 +13,24 @@
     safari: !!userAgent.match(/safari/i),
   });
 
+  // This file is just a dumping ground until I can find better homes for these
+  function assign(a, b) {
+    Object.assign(a, b);
+  }
+
+  /**
+   * Run a callback function either when the DOM is loaded and ready,
+   * or immediately if the document is already loaded.
+   * @param {Function} callback
+   */
+  function onDOMReady(callback) {
+    if (document.readyState === 'complete') {
+      callback();
+    } else {
+      document.addEventListener('DOMContentLoaded', callback);
+    }
+  }
+
   /**
    * This method adds some decoration to the default browser event.
    * This can probably be replaced with something more modern.
@@ -60,32 +78,6 @@
   // TODO: There are places in the source that are using this to store a callback
   // Refactor this
   Event$1.onPageChange = function onPageChange() {};
-
-  /**
-   * Selects/highlights all contents in an element
-   * @param  {Element} element
-   * @return {Void}
-   */
-
-  /* global RUN */
-  // This file is just a dumping ground until I can find better homes for these
-
-  function assign(a, b) {
-    Object.assign(a, b);
-  }
-
-  /**
-   * Run a callback function either when the DOM is loaded and ready,
-   * or immediately if the document is already loaded.
-   * @param {Function} callback
-   */
-  function onDOMReady(callback) {
-    if (document.readyState === 'complete') {
-      callback();
-    } else {
-      document.addEventListener('DOMContentLoaded', callback);
-    }
-  }
 
   /* global RUN */
 

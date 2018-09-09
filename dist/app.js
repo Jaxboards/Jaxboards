@@ -82,53 +82,17 @@
     }
   }
 
-  /**
-   * This method adds some decoration to the default browser event.
-   * This can probably be replaced with something more modern.
-   */
-  function Event$1(e) {
-    const dB = document.body;
-    const dE = document.documentElement;
-    switch (e.keyCode) {
-      case 13:
-        e.ENTER = true;
-        break;
-      case 37:
-        e.LEFT = true;
-        break;
-      case 38:
-        e.UP = true;
-        break;
-      case 0.39:
-        e.RIGHT = true;
-        break;
-      case 40:
-        e.DOWN = true;
-        break;
-      default:
-        break;
-    }
-    if (typeof e.srcElement === 'undefined') e.srcElement = e.target;
-    if (typeof e.pageY === 'undefined') {
-      e.pageY = e.clientY + (parseInt(dE.scrollTop || dB.scrollTop, 10) || 0);
-      e.pageX = e.clientX + (parseInt(dE.scrollLeft || dB.scrollLeft, 10) || 0);
-    }
-    e.cancel = () => {
-      e.returnValue = false;
-      if (e.preventDefault) e.preventDefault();
-      return e;
-    };
-    e.stopBubbling = () => {
-      if (e.stopPropagation) e.stopPropagation();
-      e.cancelBubble = true;
-      return e;
-    };
-    return e;
-  }
+  const { userAgent } = navigator;
 
-  // TODO: There are places in the source that are using this to store a callback
-  // Refactor this
-  Event$1.onPageChange = function onPageChange() {};
+  var Browser = {
+    chrome: !!userAgent.match(/chrome/i),
+    ie: !!userAgent.match(/msie/i),
+    iphone: !!userAgent.match(/iphone/i),
+    mobile: !!userAgent.match(/mobile/i),
+    n3ds: !!userAgent.match(/nintendo 3ds/),
+    firefox: !!userAgent.match(/firefox/i),
+    safari: !!userAgent.match(/safari/i),
+  };
 
   function getComputedStyle(a, b) {
     if (!a) return false;
@@ -183,97 +147,53 @@
     return max + 1;
   }
 
-  function autoComplete (queryParams, el$$1, outputElement, event = {}) {
-    const e = Event$1(event);
-    el$$1.onkeydown = (event2) => {
-      const e2 = Event$1(event2);
-      if (e2.ENTER) {
-        e2.cancel();
-        return false;
-      }
-      return true;
+  /**
+   * This method adds some decoration to the default browser event.
+   * This can probably be replaced with something more modern.
+   */
+  function Event$1(e) {
+    const dB = document.body;
+    const dE = document.documentElement;
+    switch (e.keyCode) {
+      case 13:
+        e.ENTER = true;
+        break;
+      case 37:
+        e.LEFT = true;
+        break;
+      case 38:
+        e.UP = true;
+        break;
+      case 0.39:
+        e.RIGHT = true;
+        break;
+      case 40:
+        e.DOWN = true;
+        break;
+      default:
+        break;
+    }
+    if (typeof e.srcElement === 'undefined') e.srcElement = e.target;
+    if (typeof e.pageY === 'undefined') {
+      e.pageY = e.clientY + (parseInt(dE.scrollTop || dB.scrollTop, 10) || 0);
+      e.pageX = e.clientX + (parseInt(dE.scrollLeft || dB.scrollLeft, 10) || 0);
+    }
+    e.cancel = () => {
+      e.returnValue = false;
+      if (e.preventDefault) e.preventDefault();
+      return e;
     };
-    let d = document.querySelector('#autocomplete');
-    const coords = getCoordinates(el$$1);
-    let els;
-    let sindex = -1;
-    let l = 0;
-    if (!d) {
-      d = document.createElement('div');
-      d.id = 'autocomplete';
-      d.style.position = 'absolute';
-      d.style.zIndex = getHighestZIndex();
-      document.querySelector('#page').appendChild(d);
-    } else {
-      d.style.display = '';
-      els = Array.from(d.querySelectorAll('div'));
-      l = els.length;
-      sindex = els.findIndex(elmnt => elmnt.classList.contains('selected'));
-    }
-    d.style.top = `${coords.yh}px`;
-    d.style.left = `${coords.x}px`;
-    d.style.width = `${coords.w}px`;
-
-    if (e.UP && l && sindex >= 1) {
-      els[sindex].classList.remove('selected');
-      els[sindex - 1].classList.add('selected');
-    } else if (
-      e.DOWN
-      && l
-      && (sindex < l - 1 || sindex >= -1)
-    ) {
-      if (sindex >= -1) {
-        els[0].classList.add('selected');
-      } else {
-        els[sindex].classList.remove('selected');
-        els[sindex + 1].classList.add('selected');
-      }
-    } else if (e.ENTER && l && sindex >= -1) {
-      els[sindex].onclick();
-    } else {
-      const relativePath = document.location.toString().match('/acp/') ? '../' : '';
-      new Ajax().load(
-        `${relativePath}misc/listloader.php?${queryParams}`,
-        {
-          callback: (xml) => {
-            const results = JSON.parse(xml.responseText);
-            d.innerHTML = '';
-            if (!results.length) {
-              d.style.display = 'none';
-            } else {
-              const [ids, values] = results;
-              ids.forEach((key, i) => {
-                const value = values[i];
-                const div = document.createElement('div');
-                div.innerHTML = value;
-                div.onclick = () => {
-                  div.parentNode.style.display = 'none';
-                  if (outputElement) {
-                    outputElement.value = key;
-                    outputElement.dispatchEvent(new Event('change'));
-                  }
-                  el$$1.value = value;
-                };
-                d.appendChild(div);
-              });
-            }
-          },
-        },
-      );
-    }
+    e.stopBubbling = () => {
+      if (e.stopPropagation) e.stopPropagation();
+      e.cancelBubble = true;
+      return e;
+    };
+    return e;
   }
 
-  const { userAgent } = navigator;
-
-  var Browser = {
-    chrome: !!userAgent.match(/chrome/i),
-    ie: !!userAgent.match(/msie/i),
-    iphone: !!userAgent.match(/iphone/i),
-    mobile: !!userAgent.match(/mobile/i),
-    n3ds: !!userAgent.match(/nintendo 3ds/),
-    firefox: !!userAgent.match(/firefox/i),
-    safari: !!userAgent.match(/safari/i),
-  };
+  // TODO: There are places in the source that are using this to store a callback
+  // Refactor this
+  Event$1.onPageChange = function onPageChange() {};
 
   class Color {
     constructor(colorToParse) {
@@ -580,335 +500,6 @@
     }
   }
 
-  const months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
-
-  const daysshort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; // I don't think I'll need a dayslong ever
-
-  class DatePicker {
-    constructor(el$$1) {
-      let dp = document.querySelector('#datepicker');
-      let s;
-      const c = getCoordinates(el$$1);
-      if (!dp) {
-        dp = document.createElement('table');
-        dp.id = 'datepicker';
-        document.querySelector('#page').appendChild(dp);
-      }
-      s = dp.style;
-      s.display = 'table';
-      s.zIndex = getHighestZIndex();
-      s.top = `${c.yh}px`;
-      s.left = `${c.x}px`;
-      s = el$$1.value.split('/');
-      if (s.length === 3) {
-        this.selectedDate = [
-          parseInt(s[2], 10),
-          parseInt(s[0], 10) - 1,
-          parseInt(s[1], 10),
-        ];
-      } else this.selectedDate = undefined;
-
-      this.el = el$$1;
-      this.generate(s[2], s[0] ? parseInt(s[0], 10) - 1 : undefined, s[1]);
-    }
-
-    // month should be 0 for jan, 11 for dec
-    generate(iyear, imonth, iday) {
-      let date = new Date();
-      const dp = document.querySelector('#datepicker');
-      let row;
-      let cell;
-      let [year, month, day] = [iyear, imonth, iday];
-      // date here is today
-      if (year === undefined) {
-        year = date.getFullYear();
-        month = date.getMonth();
-        day = date.getDate();
-        this.selectedDate = [year, month, day];
-      }
-
-      if (month === -1) {
-        year -= 1;
-        month = 11;
-      }
-      if (month === 12) {
-        year += 1;
-        month = 0;
-      }
-
-      this.lastDate = [year, month, day];
-
-      // this date is used to calculate days in month and the day the first is on
-      const numdaysinmonth = new Date(year, month + 1, 0).getDate();
-      const first = new Date(year, month, 1).getDay();
-
-      date = new Date(year, month, day);
-      // generate the table now
-      dp.innerHTML = ''; // clear
-
-      // year
-      row = dp.insertRow(0);
-      cell = row.insertCell(0);
-      cell.innerHTML = '<';
-      cell.className = 'control';
-      cell.onclick = () => this.lastYear();
-
-      cell = row.insertCell(1);
-      cell.colSpan = '5';
-      cell.className = 'year';
-      cell.innerHTML = year;
-      cell = row.insertCell(2);
-      cell.innerHTML = '>';
-      cell.className = 'control';
-      cell.onclick = () => this.nextYear();
-
-      // month title
-      row = dp.insertRow(1);
-      cell = row.insertCell(0);
-      cell.innerHTML = '<';
-      cell.className = 'control';
-      cell.onclick = () => this.lastMonth();
-
-      cell = row.insertCell(1);
-      cell.colSpan = '5';
-      cell.innerHTML = months[month];
-      cell.className = 'month';
-      cell = row.insertCell(2);
-      cell.innerHTML = '>';
-      cell.className = 'control';
-      cell.onclick = () => this.nextMonth();
-
-      // weekdays
-      row = dp.insertRow(2);
-      row.className = 'weekdays';
-      for (let x = 0; x < 7; x += 1) {
-        row.insertCell(x).innerHTML = daysshort[x];
-      }
-
-      row = dp.insertRow(3);
-      // generate numbers
-      for (let x = 0; x < numdaysinmonth; x += 1) {
-        if (!x) {
-          for (let i = 0; i < first; i += 1) {
-            row.insertCell(i);
-          }
-        }
-        if ((first + x) % 7 === 0) {
-          row = dp.insertRow(dp.rows.length);
-        }
-        cell = row.insertCell((first + x) % 7);
-        cell.onclick = this.insert.bind(this, cell);
-
-        cell.className = `day${
-        year === this.selectedDate[0]
-        && month === this.selectedDate[1]
-        && x + 1 === this.selectedDate[2]
-          ? ' selected'
-          : ''}`;
-        cell.innerHTML = x + 1;
-      }
-    }
-
-    lastYear() {
-      const l = this.lastDate;
-      this.generate(l[0] - 1, l[1], l[2]);
-    }
-
-    nextYear() {
-      const l = this.lastDate;
-      this.generate(l[0] + 1, l[1], l[2]);
-    }
-
-    lastMonth() {
-      const l = this.lastDate;
-      this.generate(l[0], l[1] - 1, l[2]);
-    }
-
-    nextMonth() {
-      const l = this.lastDate;
-      this.generate(l[0], l[1] + 1, l[2]);
-    }
-
-    insert(cell) {
-      const l = this.lastDate;
-      this.el.value = `${l[1] + 1}/${cell.innerHTML}/${l[0]}`;
-      DatePicker.hide();
-    }
-  }
-
-  // Static methods
-  DatePicker.init = el$$1 => new DatePicker(el$$1);
-  DatePicker.hide = () => {
-    document.querySelector('#datepicker').style.display = 'none';
-  };
-
-  // scrolling page list functionality
-  function scrollpagelist(event) {
-    const e = Event$1(event).cancel();
-    const wheelDelta = e.detail || e.wheelDelta;
-    let delta = Math.abs(wheelDelta) / wheelDelta;
-    if (Browser.chrome) {
-      delta *= -1;
-    }
-    const p = Array.from(this.querySelectorAll('a'));
-    const startPage = parseInt(p[1].innerHTML, 10);
-    const lastPage = parseInt(p[p.length - 1].innerHTML, 10);
-    const between = p.length - 2;
-    if (Browser.ie) {
-      delta *= -1;
-    }
-    if ((delta > 0 && startPage + between < lastPage) || (delta < 0 && startPage > 2)) {
-      for (let x = 0; x < between; x += 1) {
-        p[x + 1].href = p[x + 1].href.replace(/\d+$/, x + startPage + delta);
-        p[x + 1].innerHTML = startPage + x + delta;
-      }
-    }
-  }
-  function scrollablepagelist (pl) {
-    if (pl.addEventListener) {
-      pl.addEventListener('DOMMouseScroll', scrollpagelist, false);
-    }
-    pl.onmousewheel = scrollpagelist;
-  }
-
-  const maxDimension = '999999px';
-
-  function makeResizer(iw, nw, ih, nh, img) {
-    img.style.maxWidth = maxDimension;
-    img.style.maxHeight = maxDimension;
-    img.madeResized = true;
-    const link = document.createElement('a');
-    link.target = 'newwin';
-    link.href = img.src;
-    link.style.display = 'block';
-    link.style.overflow = 'hidden';
-    link.style.width = `${iw}px`;
-    link.style.height = `${ih}px`;
-    link.nw = nw;
-    link.nh = nh;
-    link.onmousemove = (event) => {
-      const o = getCoordinates(this);
-      const e = Event$1(event);
-      this.scrollLeft = ((e.pageX - o.x) / o.w) * (this.nw - o.w);
-      this.scrollTop = ((e.pageY - o.y) / o.h) * (this.nh - o.h);
-    };
-    link.onmouseover = () => {
-      img.style.width = `${this.nw}px`;
-      img.style.height = `${this.nh}px`;
-    };
-    link.onmouseout = () => {
-      if (this.scrollLeft) {
-        this.scrollLeft = 0;
-        this.scrollTop = 0;
-      }
-      img.style.width = `${iw}px`;
-      img.style.height = `${ih}px`;
-    };
-    link.onmouseout();
-    insertBefore(link, img);
-    link.appendChild(img);
-  }
-
-
-  function imageResizer(imgs) {
-    let mw;
-    let mh;
-    let s;
-    if (!imgs || !imgs.length) {
-      return;
-    }
-    Array.from(imgs)
-      .filter(img => !img.madeResized)
-      .forEach((img) => {
-        let p = 1;
-        let p2 = 1;
-        const { naturalWidth, naturalHeight } = img;
-        let iw = naturalWidth;
-        let ih = naturalHeight;
-        s = getComputedStyle(img);
-        mw = parseInt(s.width, 10) || parseInt(s.maxWidth, 10);
-        mh = parseInt(s.height, 10) || parseInt(s.maxHeight, 10);
-        if (mw && iw > mw) p = mw / iw;
-        if (mh && ih > mh) p2 = mh / ih;
-        p = p && p2 ? Math.min(p, p2) : p2 || p;
-        if (p < 1) {
-          iw *= p;
-          ih *= p;
-          makeResizer(iw, naturalWidth, ih, naturalHeight, img);
-        }
-      });
-  }
-
-  function makeImageGallery (gallery) {
-    if (gallery.madeGallery) {
-      return;
-    }
-    gallery.madeGallery = true;
-    const controls = document.createElement('div');
-    const next = document.createElement('a');
-    const prev = document.createElement('a');
-    const status = {
-      index: 0,
-      max: Math.max(gallery.querySelectorAll('img').length, 1),
-      showNext() {
-        if (this.index < this.max - 1) {
-          this.index += 1;
-        }
-        this.update();
-      },
-      showPrev() {
-        if (this.index > 0) {
-          this.index -= 1;
-        }
-        this.update();
-      },
-      update() {
-        const imgs = gallery.querySelectorAll('img');
-        imgs.forEach((img, i) => {
-          let container;
-          if (img.madeResized) {
-            container = img.parentNode;
-          } else {
-            container = img;
-          }
-          container.style.display = i !== this.index ? 'none' : 'block';
-        });
-      },
-    };
-    next.innerHTML = 'Next &raquo;';
-    next.href = '#';
-    next.onclick = () => {
-      status.showNext();
-      return false;
-    };
-
-    prev.innerHTML = 'Prev &laquo;';
-    prev.href = '#';
-    prev.onclick = () => {
-      status.showPrev();
-      return false;
-    };
-
-    status.update();
-    controls.appendChild(prev);
-    controls.appendChild(document.createTextNode(' '));
-    controls.appendChild(next);
-    gallery.appendChild(controls);
-  }
-
   function ordsuffix(a) {
     return (
       a
@@ -976,104 +567,7 @@
     return `${hours}:${minutes}${ampm}, ${month}/${day}/${year}`;
   }
 
-  function stripHTML(html) {
-    return html.valueOf()
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-  }
-
-  function openTooltip (el$$1) {
-    let tooltip = document.getElementById('tooltip_thingy');
-    const pos = getCoordinates(el$$1);
-    const title = stripHTML(el$$1.title);
-    // Prevent the browser from showing its own title
-    el$$1.title = '';
-    if (!title) return;
-    if (!tooltip) {
-      tooltip = document.createElement('table');
-      const t = tooltip.insertRow(0);
-      const c = tooltip.insertRow(1);
-      const b = tooltip.insertRow(2);
-      let a;
-
-      tooltip.id = 'tooltip_thingy';
-      tooltip.className = 'tooltip';
-      t.className = 'top';
-      c.className = 'content';
-      b.className = 'bottom';
-      a = t.insertCell(0);
-      a.className = 'left';
-      a.colSpan = 2;
-      a = t.insertCell(1);
-      a.className = 'right';
-      a = c.insertCell(0);
-      a.className = 'left';
-      a = c.insertCell(1);
-      a.innerHTML = 'default text';
-      a = c.insertCell(2);
-      a.className = 'right';
-      a = b.insertCell(0);
-      a.className = 'left';
-      a.colSpan = 2;
-      a = b.insertCell(1);
-      a.className = 'right';
-      document.querySelector('#page').appendChild(tooltip);
-    }
-
-    tooltip.rows[1].cells[1].innerHTML = title;
-    tooltip.style.display = '';
-    tooltip.style.top = `${pos.y - tooltip.clientHeight}px`;
-    tooltip.style.left = `${pos.x}px`;
-    tooltip.style.zIndex = getHighestZIndex();
-    el$$1.onmouseout = () => {
-      el$$1.title = title;
-      document.querySelector('#tooltip_thingy').style.display = 'none';
-    };
-  }
-
-  /**
-   * Selects/highlights all contents in an element
-   * @param  {Element} element
-   * @return {Void}
-   */
-  function selectAll(element) {
-    if (document.selection) {
-      const range = document.body.createTextRange();
-      range.moveToElementText(element);
-      range.select();
-    } else if (window.getSelection) {
-      const range = document.createRange();
-      range.selectNode(element);
-      const selection = window.getSelection();
-      if (selection.rangeCount) selection.removeAllRanges();
-      selection.addRange(range);
-    }
-  }
-
-  /**
-   * If there's any highlighted text in element, replace it with content
-   * @param {Element]} element
-   * @param {String} content
-   */
-  function replaceSelection(element, content) {
-    const scroll = element.scrollTop;
-    if (document.selection) {
-      element.focus();
-      document.selection.createRange().text = content;
-    } else {
-      const s = element.selectionStart;
-      const e = element.selectionEnd;
-      element.value = element.value.substring(0, s) + content + element.value.substr(e);
-      element.selectionStart = s + content.length;
-      element.selectionEnd = s + content.length;
-    }
-    element.focus();
-    element.scrollTop = scroll;
-  }
-
-  /* global RUN */
   // This file is just a dumping ground until I can find better homes for these
-
   function assign(a, b) {
     Object.assign(a, b);
   }
@@ -1204,109 +698,6 @@
     el$$1.blur();
   }
 
-  function gracefulDegrade(a) {
-    if (typeof RUN !== 'undefined') {
-      updateDates();
-    }
-
-    // Special rules for all links
-    const links = a.querySelectorAll('a');
-    links.forEach((link) => {
-      // Hande links with tooltips
-      if (link.dataset.useTooltip) {
-        link.addEventListener('mouseover', () => openTooltip(link));
-      }
-
-      // Make all links load through AJAX
-      if (link.href) {
-        const href = link.getAttribute('href');
-        if (href.charAt(0) === '?') {
-          const oldclick = link.onclick;
-          link.addEventListener('click', (event) => {
-            // Some links have an onclick that returns true/false based on whether
-            // or not the link should execute.
-            if (!oldclick || oldclick.call(link) !== false) {
-              RUN.stream.location(href);
-            }
-            event.preventDefault();
-          });
-
-        // Open external links in a new window
-        } else if (link.getAttribute('href').substr(0, 4) === 'http') {
-          link.target = '_BLANK';
-        }
-      }
-    });
-
-    // Convert checkboxes to icons (checkmark and X)
-    convertSwitches(Array.from(a.querySelectorAll('.switch')));
-
-    // Handle image hover magnification
-    const bbcodeimgs = Array.from(document.querySelectorAll('.bbcodeimg'));
-    if (bbcodeimgs) {
-      onImagesLoaded(
-        bbcodeimgs,
-        () => {
-          // resizer on large images
-          imageResizer(bbcodeimgs);
-
-          // handle image galleries
-          const galleries = Array.from(document.querySelectorAll('.image_gallery'));
-          galleries.map(makeImageGallery);
-        },
-        2000,
-      );
-    }
-
-    // Initialize page lists that scroll with scroll wheel
-    const pages = Array.from(a.querySelectorAll('.pages'));
-    if (pages.length) {
-      pages.map(scrollablepagelist);
-    }
-
-    // Set up date pickers
-    const dateElements = Array.from(a.querySelectorAll('input.date'));
-    if (dateElements.length) {
-      dateElements.forEach((inputElement) => {
-        inputElement.onclick = () => DatePicker.init(inputElement);
-        inputElement.onkeydown = () => DatePicker.hide();
-      });
-    }
-
-    // Make BBCode code blocks selectable when clicked
-    const codeBlocks = a.querySelectorAll('.bbcode.code');
-    codeBlocks.forEach((codeBlock) => {
-      codeBlock.addEventListener('click', () => selectAll(codeBlock));
-    });
-
-    // Make collapse boxes collapsible
-    const collapseBoxes = a.querySelectorAll('.collapse-box');
-    collapseBoxes.forEach((collapseBox) => {
-      const collapseButton = collapseBox.querySelector('.collapse-button');
-      const collapseContent = collapseBox.querySelector('.collapse-content');
-      collapseButton.addEventListener('click', () => {
-        collapse(collapseContent);
-      });
-    });
-
-    // Wire up AJAX forms
-    const ajaxForms = a.querySelectorAll('form[data-ajax-form]');
-    ajaxForms.forEach((ajaxForm) => {
-      const resetOnSubmit = ajaxForm.dataset.ajaxForm === 'resetOnSubmit';
-      ajaxForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-        RUN.submitForm(ajaxForm, resetOnSubmit);
-      });
-    });
-
-    // Handle tabs
-    const tabContainers = a.querySelectorAll('.tabs');
-    tabContainers.forEach((tabContainer) => {
-      const { tabSelector } = tabContainer.dataset;
-      tabContainer.addEventListener('click', event => handleTabs(event, tabContainer, tabSelector));
-    });
-  }
-
   function toggleOverlay(show) {
     const dE = document.documentElement;
     let ol = document.getElementById('overlay');
@@ -1339,16 +730,6 @@
     const position = screenrel < pos ? screenrel : pos;
     const diff = position - top;
     el$$1.scrollTop += diff;
-    /* me={el:el,pos:top,diff:diff,step:1,steps:1} //had this animate once, but now it's just annoying
-    me.interval=setInterval(function(){
-      me.step++
-      (me.el).scrollTop=(me.pos+me.diff*Math.pow(me.step/me.steps,3));
-      if(me.step>=me.steps) {clearInterval(me.interval);}
-     },30)
-    me.then=function(a){
-     me.onend=a
-    }
-    return me */
   }
 
   /**
@@ -1362,6 +743,46 @@
     } else {
       document.addEventListener('DOMContentLoaded', callback);
     }
+  }
+
+  /**
+   * Selects/highlights all contents in an element
+   * @param  {Element} element
+   * @return {Void}
+   */
+  function selectAll(element) {
+    if (document.selection) {
+      const range = document.body.createTextRange();
+      range.moveToElementText(element);
+      range.select();
+    } else if (window.getSelection) {
+      const range = document.createRange();
+      range.selectNode(element);
+      const selection = window.getSelection();
+      if (selection.rangeCount) selection.removeAllRanges();
+      selection.addRange(range);
+    }
+  }
+
+  /**
+   * If there's any highlighted text in element, replace it with content
+   * @param {Element]} element
+   * @param {String} content
+   */
+  function replaceSelection(element, content) {
+    const scroll = element.scrollTop;
+    if (document.selection) {
+      element.focus();
+      document.selection.createRange().text = content;
+    } else {
+      const s = element.selectionStart;
+      const e = element.selectionEnd;
+      element.value = element.value.substring(0, s) + content + element.value.substr(e);
+      element.selectionStart = s + content.length;
+      element.selectionEnd = s + content.length;
+    }
+    element.focus();
+    element.scrollTop = scroll;
   }
 
   /* global globalsettings */
@@ -2199,9 +1620,7 @@
   };
 
   // TODO: Make this file completely obsolete by removing references to global JAX object
-
   var JAX = {
-    autoComplete,
     Editor,
     Window,
   };
@@ -2229,6 +1648,608 @@
 
   // Sound is a singleton
   var Sound$1 = new Sound();
+
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  const daysshort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; // I don't think I'll need a dayslong ever
+
+  class DatePicker {
+    constructor(el$$1) {
+      let dp = document.querySelector('#datepicker');
+      let s;
+      const c = getCoordinates(el$$1);
+      if (!dp) {
+        dp = document.createElement('table');
+        dp.id = 'datepicker';
+        document.querySelector('#page').appendChild(dp);
+      }
+      s = dp.style;
+      s.display = 'table';
+      s.zIndex = getHighestZIndex();
+      s.top = `${c.yh}px`;
+      s.left = `${c.x}px`;
+      s = el$$1.value.split('/');
+      if (s.length === 3) {
+        this.selectedDate = [
+          parseInt(s[2], 10),
+          parseInt(s[0], 10) - 1,
+          parseInt(s[1], 10),
+        ];
+      } else this.selectedDate = undefined;
+
+      this.el = el$$1;
+      this.generate(s[2], s[0] ? parseInt(s[0], 10) - 1 : undefined, s[1]);
+    }
+
+    // month should be 0 for jan, 11 for dec
+    generate(iyear, imonth, iday) {
+      let date = new Date();
+      const dp = document.querySelector('#datepicker');
+      let row;
+      let cell;
+      let [year, month, day] = [iyear, imonth, iday];
+      // date here is today
+      if (year === undefined) {
+        year = date.getFullYear();
+        month = date.getMonth();
+        day = date.getDate();
+        this.selectedDate = [year, month, day];
+      }
+
+      if (month === -1) {
+        year -= 1;
+        month = 11;
+      }
+      if (month === 12) {
+        year += 1;
+        month = 0;
+      }
+
+      this.lastDate = [year, month, day];
+
+      // this date is used to calculate days in month and the day the first is on
+      const numdaysinmonth = new Date(year, month + 1, 0).getDate();
+      const first = new Date(year, month, 1).getDay();
+
+      date = new Date(year, month, day);
+      // generate the table now
+      dp.innerHTML = ''; // clear
+
+      // year
+      row = dp.insertRow(0);
+      cell = row.insertCell(0);
+      cell.innerHTML = '<';
+      cell.className = 'control';
+      cell.onclick = () => this.lastYear();
+
+      cell = row.insertCell(1);
+      cell.colSpan = '5';
+      cell.className = 'year';
+      cell.innerHTML = year;
+      cell = row.insertCell(2);
+      cell.innerHTML = '>';
+      cell.className = 'control';
+      cell.onclick = () => this.nextYear();
+
+      // month title
+      row = dp.insertRow(1);
+      cell = row.insertCell(0);
+      cell.innerHTML = '<';
+      cell.className = 'control';
+      cell.onclick = () => this.lastMonth();
+
+      cell = row.insertCell(1);
+      cell.colSpan = '5';
+      cell.innerHTML = months[month];
+      cell.className = 'month';
+      cell = row.insertCell(2);
+      cell.innerHTML = '>';
+      cell.className = 'control';
+      cell.onclick = () => this.nextMonth();
+
+      // weekdays
+      row = dp.insertRow(2);
+      row.className = 'weekdays';
+      for (let x = 0; x < 7; x += 1) {
+        row.insertCell(x).innerHTML = daysshort[x];
+      }
+
+      row = dp.insertRow(3);
+      // generate numbers
+      for (let x = 0; x < numdaysinmonth; x += 1) {
+        if (!x) {
+          for (let i = 0; i < first; i += 1) {
+            row.insertCell(i);
+          }
+        }
+        if ((first + x) % 7 === 0) {
+          row = dp.insertRow(dp.rows.length);
+        }
+        cell = row.insertCell((first + x) % 7);
+        cell.onclick = this.insert.bind(this, cell);
+
+        cell.className = `day${
+        year === this.selectedDate[0]
+        && month === this.selectedDate[1]
+        && x + 1 === this.selectedDate[2]
+          ? ' selected'
+          : ''}`;
+        cell.innerHTML = x + 1;
+      }
+    }
+
+    lastYear() {
+      const l = this.lastDate;
+      this.generate(l[0] - 1, l[1], l[2]);
+    }
+
+    nextYear() {
+      const l = this.lastDate;
+      this.generate(l[0] + 1, l[1], l[2]);
+    }
+
+    lastMonth() {
+      const l = this.lastDate;
+      this.generate(l[0], l[1] - 1, l[2]);
+    }
+
+    nextMonth() {
+      const l = this.lastDate;
+      this.generate(l[0], l[1] + 1, l[2]);
+    }
+
+    insert(cell) {
+      const l = this.lastDate;
+      this.el.value = `${l[1] + 1}/${cell.innerHTML}/${l[0]}`;
+      DatePicker.hide();
+    }
+  }
+
+  // Static methods
+  DatePicker.init = el$$1 => new DatePicker(el$$1);
+  DatePicker.hide = () => {
+    document.querySelector('#datepicker').style.display = 'none';
+  };
+
+  // scrolling page list functionality
+  function scrollpagelist(event) {
+    const e = Event$1(event).cancel();
+    const wheelDelta = e.detail || e.wheelDelta;
+    let delta = Math.abs(wheelDelta) / wheelDelta;
+    if (Browser.chrome) {
+      delta *= -1;
+    }
+    const p = Array.from(this.querySelectorAll('a'));
+    const startPage = parseInt(p[1].innerHTML, 10);
+    const lastPage = parseInt(p[p.length - 1].innerHTML, 10);
+    const between = p.length - 2;
+    if (Browser.ie) {
+      delta *= -1;
+    }
+    if ((delta > 0 && startPage + between < lastPage) || (delta < 0 && startPage > 2)) {
+      for (let x = 0; x < between; x += 1) {
+        p[x + 1].href = p[x + 1].href.replace(/\d+$/, x + startPage + delta);
+        p[x + 1].innerHTML = startPage + x + delta;
+      }
+    }
+  }
+  function scrollablepagelist (pl) {
+    if (pl.addEventListener) {
+      pl.addEventListener('DOMMouseScroll', scrollpagelist, false);
+    }
+    pl.onmousewheel = scrollpagelist;
+  }
+
+  const maxDimension = '999999px';
+
+  function makeResizer(iw, nw, ih, nh, img) {
+    img.style.maxWidth = maxDimension;
+    img.style.maxHeight = maxDimension;
+    img.madeResized = true;
+    const link = document.createElement('a');
+    link.target = 'newwin';
+    link.href = img.src;
+    link.style.display = 'block';
+    link.style.overflow = 'hidden';
+    link.style.width = `${iw}px`;
+    link.style.height = `${ih}px`;
+    link.nw = nw;
+    link.nh = nh;
+    link.onmousemove = (event) => {
+      const o = getCoordinates(this);
+      const e = Event$1(event);
+      this.scrollLeft = ((e.pageX - o.x) / o.w) * (this.nw - o.w);
+      this.scrollTop = ((e.pageY - o.y) / o.h) * (this.nh - o.h);
+    };
+    link.onmouseover = () => {
+      img.style.width = `${this.nw}px`;
+      img.style.height = `${this.nh}px`;
+    };
+    link.onmouseout = () => {
+      if (this.scrollLeft) {
+        this.scrollLeft = 0;
+        this.scrollTop = 0;
+      }
+      img.style.width = `${iw}px`;
+      img.style.height = `${ih}px`;
+    };
+    link.onmouseout();
+    insertBefore(link, img);
+    link.appendChild(img);
+  }
+
+
+  function imageResizer(imgs) {
+    let mw;
+    let mh;
+    let s;
+    if (!imgs || !imgs.length) {
+      return;
+    }
+    Array.from(imgs)
+      .filter(img => !img.madeResized)
+      .forEach((img) => {
+        let p = 1;
+        let p2 = 1;
+        const { naturalWidth, naturalHeight } = img;
+        let iw = naturalWidth;
+        let ih = naturalHeight;
+        s = getComputedStyle(img);
+        mw = parseInt(s.width, 10) || parseInt(s.maxWidth, 10);
+        mh = parseInt(s.height, 10) || parseInt(s.maxHeight, 10);
+        if (mw && iw > mw) p = mw / iw;
+        if (mh && ih > mh) p2 = mh / ih;
+        p = p && p2 ? Math.min(p, p2) : p2 || p;
+        if (p < 1) {
+          iw *= p;
+          ih *= p;
+          makeResizer(iw, naturalWidth, ih, naturalHeight, img);
+        }
+      });
+  }
+
+  function makeImageGallery (gallery) {
+    if (gallery.madeGallery) {
+      return;
+    }
+    gallery.madeGallery = true;
+    const controls = document.createElement('div');
+    const next = document.createElement('a');
+    const prev = document.createElement('a');
+    const status = {
+      index: 0,
+      max: Math.max(gallery.querySelectorAll('img').length, 1),
+      showNext() {
+        if (this.index < this.max - 1) {
+          this.index += 1;
+        }
+        this.update();
+      },
+      showPrev() {
+        if (this.index > 0) {
+          this.index -= 1;
+        }
+        this.update();
+      },
+      update() {
+        const imgs = gallery.querySelectorAll('img');
+        imgs.forEach((img, i) => {
+          let container;
+          if (img.madeResized) {
+            container = img.parentNode;
+          } else {
+            container = img;
+          }
+          container.style.display = i !== this.index ? 'none' : 'block';
+        });
+      },
+    };
+    next.innerHTML = 'Next &raquo;';
+    next.href = '#';
+    next.onclick = () => {
+      status.showNext();
+      return false;
+    };
+
+    prev.innerHTML = 'Prev &laquo;';
+    prev.href = '#';
+    prev.onclick = () => {
+      status.showPrev();
+      return false;
+    };
+
+    status.update();
+    controls.appendChild(prev);
+    controls.appendChild(document.createTextNode(' '));
+    controls.appendChild(next);
+    gallery.appendChild(controls);
+  }
+
+  function stripHTML(html) {
+    return html.valueOf()
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function openTooltip (el$$1) {
+    let tooltip = document.getElementById('tooltip_thingy');
+    const pos = getCoordinates(el$$1);
+    const title = stripHTML(el$$1.title);
+    // Prevent the browser from showing its own title
+    el$$1.title = '';
+    if (!title) return;
+    if (!tooltip) {
+      tooltip = document.createElement('table');
+      const t = tooltip.insertRow(0);
+      const c = tooltip.insertRow(1);
+      const b = tooltip.insertRow(2);
+      let a;
+
+      tooltip.id = 'tooltip_thingy';
+      tooltip.className = 'tooltip';
+      t.className = 'top';
+      c.className = 'content';
+      b.className = 'bottom';
+      a = t.insertCell(0);
+      a.className = 'left';
+      a.colSpan = 2;
+      a = t.insertCell(1);
+      a.className = 'right';
+      a = c.insertCell(0);
+      a.className = 'left';
+      a = c.insertCell(1);
+      a.innerHTML = 'default text';
+      a = c.insertCell(2);
+      a.className = 'right';
+      a = b.insertCell(0);
+      a.className = 'left';
+      a.colSpan = 2;
+      a = b.insertCell(1);
+      a.className = 'right';
+      document.querySelector('#page').appendChild(tooltip);
+    }
+
+    tooltip.rows[1].cells[1].innerHTML = title;
+    tooltip.style.display = '';
+    tooltip.style.top = `${pos.y - tooltip.clientHeight}px`;
+    tooltip.style.left = `${pos.x}px`;
+    tooltip.style.zIndex = getHighestZIndex();
+    el$$1.onmouseout = () => {
+      el$$1.title = title;
+      document.querySelector('#tooltip_thingy').style.display = 'none';
+    };
+  }
+
+  const VALID_CLASS = 'valid';
+  const INVALID_CLASS = 'invalid';
+
+  function fetchResults(queryParams, el$$1, outputElement, event = {}) {
+    const e = Event$1(event);
+    el$$1.onkeydown = (event2) => {
+      const e2 = Event$1(event2);
+      if (e2.ENTER) {
+        e2.cancel();
+        return false;
+      }
+      return true;
+    };
+    let d = document.querySelector('#autocomplete');
+    const coords = getCoordinates(el$$1);
+    let els;
+    let sindex = -1;
+    let l = 0;
+    if (!d) {
+      d = document.createElement('div');
+      d.id = 'autocomplete';
+      d.style.position = 'absolute';
+      d.style.zIndex = getHighestZIndex();
+      document.querySelector('#page').appendChild(d);
+    } else {
+      d.style.display = '';
+      els = Array.from(d.querySelectorAll('div'));
+      l = els.length;
+      sindex = els.findIndex(elmnt => elmnt.classList.contains('selected'));
+    }
+    d.style.top = `${coords.yh}px`;
+    d.style.left = `${coords.x}px`;
+    d.style.width = `${coords.w}px`;
+
+    if (e.UP && l && sindex >= 1) {
+      els[sindex].classList.remove('selected');
+      els[sindex - 1].classList.add('selected');
+    } else if (
+      e.DOWN
+      && l
+      && (sindex < l - 1 || sindex >= -1)
+    ) {
+      if (sindex >= -1) {
+        els[0].classList.add('selected');
+      } else {
+        els[sindex].classList.remove('selected');
+        els[sindex + 1].classList.add('selected');
+      }
+    } else if (e.ENTER && l && sindex >= -1) {
+      els[sindex].onclick();
+    } else {
+      const relativePath = document.location.toString().match('/acp/') ? '../' : '';
+      new Ajax().load(
+        `${relativePath}misc/listloader.php?${queryParams}`,
+        {
+          callback: (xml) => {
+            const results = JSON.parse(xml.responseText);
+            d.innerHTML = '';
+            if (!results.length) {
+              d.style.display = 'none';
+            } else {
+              const [ids, values] = results;
+              ids.forEach((key, i) => {
+                const value = values[i];
+                const div = document.createElement('div');
+                div.innerHTML = value;
+                div.onclick = () => {
+                  div.parentNode.style.display = 'none';
+                  if (outputElement) {
+                    outputElement.value = key;
+                    outputElement.dispatchEvent(new Event('change'));
+                  }
+                  el$$1.value = value;
+                };
+                d.appendChild(div);
+              });
+            }
+          },
+        },
+      );
+    }
+  }
+
+  function decorateElement(element) {
+    // Disable native autocomplete behavior
+    element.autocomplete = 'off';
+    const action = element.dataset.autocompleteAction;
+    const output = element.dataset.autocompleteOutput;
+    const indicator = element.dataset.autocompleteIndicator;
+    const outputElement = output && document.querySelector(output);
+    const indicatorElement = indicator && document.querySelector(indicator);
+
+    if (indicatorElement && outputElement) {
+      outputElement.addEventListener('change', () => {
+        indicatorElement.classList.add(VALID_CLASS);
+      });
+    }
+    element.addEventListener('keyup', (event) => {
+      const searchTerm = encodeURIComponent(element.value);
+      if (indicatorElement) {
+        indicatorElement.classList.remove(VALID_CLASS);
+        indicatorElement.classList.add(INVALID_CLASS);
+      }
+      fetchResults(`act=${action}&term=${searchTerm}`, element, outputElement, event);
+    });
+  }
+
+  /* global RUN */
+
+  function gracefulDegrade(a) {
+    if (typeof RUN !== 'undefined') {
+      updateDates();
+    }
+
+    // Special rules for all links
+    const links = a.querySelectorAll('a');
+    links.forEach((link) => {
+      // Hande links with tooltips
+      if (link.dataset.useTooltip) {
+        link.addEventListener('mouseover', () => openTooltip(link));
+      }
+
+      // Make all links load through AJAX
+      if (link.href) {
+        const href = link.getAttribute('href');
+        if (href.charAt(0) === '?') {
+          const oldclick = link.onclick;
+          link.addEventListener('click', (event) => {
+            // Some links have an onclick that returns true/false based on whether
+            // or not the link should execute.
+            if (!oldclick || oldclick.call(link) !== false) {
+              RUN.stream.location(href);
+            }
+            event.preventDefault();
+          });
+
+        // Open external links in a new window
+        } else if (link.getAttribute('href').substr(0, 4) === 'http') {
+          link.target = '_BLANK';
+        }
+      }
+
+      // Hook up autocomplete form fields
+      const autoCompleteFields = document.querySelectorAll('[data-autocomplete-action]');
+      autoCompleteFields.forEach((field) => {
+        decorateElement(field);
+      });
+    });
+
+    // Convert checkboxes to icons (checkmark and X)
+    convertSwitches(Array.from(a.querySelectorAll('.switch')));
+
+    // Handle image hover magnification
+    const bbcodeimgs = Array.from(document.querySelectorAll('.bbcodeimg'));
+    if (bbcodeimgs) {
+      onImagesLoaded(
+        bbcodeimgs,
+        () => {
+          // resizer on large images
+          imageResizer(bbcodeimgs);
+
+          // handle image galleries
+          const galleries = Array.from(document.querySelectorAll('.image_gallery'));
+          galleries.map(makeImageGallery);
+        },
+        2000,
+      );
+    }
+
+    // Initialize page lists that scroll with scroll wheel
+    const pages = Array.from(a.querySelectorAll('.pages'));
+    if (pages.length) {
+      pages.map(scrollablepagelist);
+    }
+
+    // Set up date pickers
+    const dateElements = Array.from(a.querySelectorAll('input.date'));
+    if (dateElements.length) {
+      dateElements.forEach((inputElement) => {
+        inputElement.onclick = () => DatePicker.init(inputElement);
+        inputElement.onkeydown = () => DatePicker.hide();
+      });
+    }
+
+    // Make BBCode code blocks selectable when clicked
+    const codeBlocks = a.querySelectorAll('.bbcode.code');
+    codeBlocks.forEach((codeBlock) => {
+      codeBlock.addEventListener('click', () => selectAll(codeBlock));
+    });
+
+    // Make collapse boxes collapsible
+    const collapseBoxes = a.querySelectorAll('.collapse-box');
+    collapseBoxes.forEach((collapseBox) => {
+      const collapseButton = collapseBox.querySelector('.collapse-button');
+      const collapseContent = collapseBox.querySelector('.collapse-content');
+      collapseButton.addEventListener('click', () => {
+        collapse(collapseContent);
+      });
+    });
+
+    // Wire up AJAX forms
+    const ajaxForms = a.querySelectorAll('form[data-ajax-form]');
+    ajaxForms.forEach((ajaxForm) => {
+      const resetOnSubmit = ajaxForm.dataset.ajaxForm === 'resetOnSubmit';
+      ajaxForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        RUN.submitForm(ajaxForm, resetOnSubmit);
+      });
+    });
+
+    // Handle tabs
+    const tabContainers = a.querySelectorAll('.tabs');
+    tabContainers.forEach((tabContainer) => {
+      const { tabSelector } = tabContainer.dataset;
+      tabContainer.addEventListener('click', event => handleTabs(event, tabContainer, tabSelector));
+    });
+  }
 
   // TODO: Create an instance for this state
   // instead of abusing the module
