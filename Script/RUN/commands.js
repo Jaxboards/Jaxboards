@@ -33,6 +33,12 @@ export default {
   alert(a) {
     alert(a[0]);
   },
+  reload() {
+    window.location.reload();
+  },
+  refreshdata() {
+    RUN.stream.pollData(true);
+  },
   addclass([selector, className]) {
     const el = document.querySelector(selector);
     if (el) {
@@ -80,10 +86,6 @@ export default {
     }
     const el = document.querySelector(selector);
     scrollTo(getCoordinates(el).y);
-  },
-  setloc(a) {
-    document.location = `#${a}`;
-    RUN.stream.lastURL = `?${a}`;
   },
   setstatus([className]) {
     const status = document.querySelector('#status');

@@ -180,9 +180,9 @@ EOT
                 $SESS->act();
                 $perms = $JAX->getPerms($f['group_id']);
                 if ($this->registering) {
-                    $PAGE->JS('script', "window.location='?'");
+                    $PAGE->JS('location', '?');
                 } elseif ($PAGE->jsaccess) {
-                    $PAGE->JS('script', 'window.location.reload()');
+                    $PAGE->JS('reload');
                 } else {
                     $PAGE->location('?');
                 }

@@ -2359,6 +2359,12 @@
     alert(a) {
       alert(a[0]);
     },
+    reload() {
+      window.location.reload();
+    },
+    refreshdata() {
+      RUN.stream.pollData(true);
+    },
     addclass([selector, className]) {
       const el$$1 = document.querySelector(selector);
       if (el$$1) {
@@ -2406,10 +2412,6 @@
       }
       const el$$1 = document.querySelector(selector);
       scrollTo(getCoordinates(el$$1).y);
-    },
-    setloc(a) {
-      document.location = `#${a}`;
-      RUN.stream.lastURL = `?${a}`;
     },
     setstatus([className]) {
       const status = document.querySelector('#status');

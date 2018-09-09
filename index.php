@@ -113,11 +113,11 @@ $PAGE->loadmeta('global');
 if (isset($JAX->b['skin_id'])) {
     if (!$JAX->b['skin_id']) {
         $SESS->delvar('skin_id');
-        $PAGE->JS('script', "document.location='?'");
+        $PAGE->JS('reload');
     } else {
         $SESS->addvar('skin_id', $JAX->b['skin_id']);
         if ($PAGE->jsaccess) {
-            $PAGE->JS('script', "document.location='?'");
+            $PAGE->JS('reload');
         }
     }
 }

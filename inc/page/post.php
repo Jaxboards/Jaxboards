@@ -811,7 +811,7 @@ EOT
 
         if ('qreply' == $this->how) {
             $PAGE->JS('closewindow', '#qreply');
-            $PAGE->JS('script', 'RUN.stream.pollData(true)');
+            $PAGE->JS('refreshdata');
         } else {
             $PAGE->location('?act=vt' . $tid . '&getlast=1');
         }

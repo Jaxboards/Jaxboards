@@ -682,7 +682,7 @@ EOT;
             }
             if (!$e) {
                 if ($PAGE->jsaccess) {
-                    return $PAGE->JS('script', 'document.location.reload()');
+                    return $PAGE->JS('reload');
                 }
 
                 return header('Location: ?act=ucp&what=board');
