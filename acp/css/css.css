@@ -420,3 +420,11 @@ table.settings td {
   padding: 10px;
 }
 /* stylelint-enable no-descending-specificity */
+
+.permcontainer .sticky-heading {
+  padding-left: 150px;
+  width: 100%;
+  background: #FFF;
+  position: sticky;
+  top: 0;
+}
