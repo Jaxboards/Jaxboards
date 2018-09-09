@@ -517,11 +517,6 @@ EOT
             $bbcodes['@\\[img(?:=([^\\]]+|))?\\]((?:http|ftp)\\S+)\\[/img\\]@i']
                 = '<img src="$2" title="$1" alt="$1" class="bbcodeimg" ' .
                 'align="absmiddle" />';
-            $a = preg_replace_callback(
-                '@\\[video\\](.*)\\[/video\\]@Ui',
-                array($this, 'bbcode_videocallback'),
-                $a
-            );
         }
         $keys = array_keys($bbcodes);
         $values = array_values($bbcodes);
@@ -567,6 +562,15 @@ EOT
             );
         }
 
+        // Video tags
+        if (!$minimal) {
+            $a = preg_replace_callback(
+                '@\\[video\\](.*)\\[/video\\]@Ui',
+                array($this, 'bbcode_videocallback'),
+                $a
+            );
+        }
+
         return $a;
     }
 
@@ -588,11 +592,6 @@ EOT
 
             $youtubeLink = 'https://www.youtube.com/watch?v=' .
                 $m[1] . ($m[2] ? '&t=' : '') . $m[2];
-            $popoutCode = 'var w=new JAX.Window;w.title=this.href;' .
-                'w.content=this.parentNode.parentNode.querySelector(\'.movie\').innerHTML;' .
-                'w.create();return false;';
-            $inlineCode = 'this.parentNode.parentNode.querySelector(\'.movie\')' .
-                '.style.display=\'block\';return false;';
             $youtubeEmbed = 'https://www.youtube.com/embed/' . $m[1] .
                 '?start=' . $m[2];
 
@@ -606,20 +605,16 @@ EOT
         </a>
     </div>
     <div class="open">
-        <a href="${youtubeLink}"
-            onclick="${popoutCode}">
+        <a href="${youtubeLink}" class="popout">
             Popout
         </a>
         &middot;
-        <a href="${youtubeLink}"
-            onclick="${inlineCode}">
+        <a href="${youtubeLink}" class="inline">
             Inline
         </a>
     </div>
     <div class="movie" style="display:none">
-        <iframe width="560" height="315" frameborder="0"
-            allowfullscreen=""
-            src="${youtubeEmbed}">
+        <iframe width="560" height="315" frameborder="0" allowfullscreen="" src="${youtubeEmbed}">
         </iframe>
     </div>
 </div>
@@ -629,11 +624,6 @@ EOT;
             preg_match('@(?:vimeo.com|video)/(\\d+)@', $m[1], $id);
 
             $vimeoLink = 'https://vimeo.com/' . $id[1];
-            $popoutCode = 'var w=new JAX.Window;w.title=this.href;' .
-                'w.content=this.parentNode.parentNode.querySelector(\'.movie\')' .
-                '.innerHTML;w.create();return false;';
-            $inlineCode = 'this.parentNode.parentNode.querySelector(\'.movie\')' .
-                '.style.display=\'block\';return false;';
             $vimeoEmbed = 'https://player.vimeo.com/video/' .
                 $id[1] . '?title=0&byline=0&portrait=0';
 
@@ -646,11 +636,11 @@ EOT;
         </a>
     </div>
     <div class="open">
-        <a href="${vimeoLink}" onclick="${popoutCode}">
+        <a href="${vimeoLink}" class="popout">
             Popout
         </a>
         &middot;
-        <a href="${vimeoLink}" onclick="${inlineCode}">
+        <a href="${vimeoLink}" class="inline">
             Inline
         </a>
     </div>
@@ -743,6 +733,8 @@ EOT
             $codes = $this->startcodetags($a);
         }
         $a = $this->blockhtml($a);
+        $a = nl2br($a);
+
         if (@!$cfg['noemotes']) {
             $a = $this->emotes($a);
         }
@@ -756,8 +748,7 @@ EOT
             $a = $this->attachments($a);
         }
         $a = $this->wordfilter($a);
-
-        return nl2br($a);
+        return $a;
     }
 
     public function parse_activity($a, $rssversion = false)

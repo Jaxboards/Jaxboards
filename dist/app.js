@@ -1,99 +1,6 @@
 (function () {
   'use strict';
 
-  /**
-   * For some reason, I designed this method
-   * to accept Objects (key/value pairs)
-   * or 2 arguments:  keys and values
-   * The purpose is to construct data to send over URL or POST data
-   *
-   * @example
-   * buildQueryString({key: 'value', key2: 'value2'}) === 'key=value&key2=value2';
-   *
-   * @example
-   * buildQueryString(['key', 'key2'], ['value, 'value2']) === 'key=value&key2=value2'
-   *
-   * @return {String}
-   */
-  function buildQueryString(keys, values) {
-    if (!keys) {
-      return '';
-    }
-    if (values) {
-      return keys
-        .map((key, index) => `${encodeURIComponent(key)}=${encodeURIComponent(values[index] || '')}`)
-        .join('&');
-    }
-    return Object.keys(keys)
-      .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(keys[key] || '')}`)
-      .join('&');
-  }
-
-  class Ajax {
-    constructor(s) {
-      this.setup = {
-        readyState: 4,
-        callback() {},
-        method: 'POST',
-        ...s,
-      };
-    }
-
-    load(url, {
-      callback,
-      data,
-      method = this.setup.method,
-      requestType = 1,
-    } = {}) {
-      // requestType is an enum (1=update, 2=load new)
-      let sendData = null;
-      if (
-        data
-        && Array.isArray(data)
-        && Array.isArray(data[0])
-        && data[0].length === data[1].length
-      ) {
-        sendData = buildQueryString(data[0], data[1]);
-      } else if (typeof data !== 'string') {
-        sendData = buildQueryString(data);
-      }
-      const request = new XMLHttpRequest();
-      if (callback) {
-        this.setup.callback = callback;
-      }
-      request.onreadystatechange = () => {
-        if (request.readyState === this.setup.readyState) {
-          this.setup.callback(request);
-        }
-      };
-      if (!request) return false;
-      request.open(method, url, true);
-      request.url = url;
-      request.type = requestType;
-      if (method) {
-        request.setRequestHeader(
-          'Content-Type',
-          'application/x-www-form-urlencoded',
-        );
-      }
-      request.setRequestHeader('X-JSACCESS', requestType);
-      request.send(sendData);
-      return request;
-    }
-  }
-
-  const { userAgent } = navigator;
-
-  var Browser = {
-    chrome: !!userAgent.match(/chrome/i),
-    ie: !!userAgent.match(/msie/i),
-    iphone: !!userAgent.match(/iphone/i),
-    mobile: !!userAgent.match(/mobile/i),
-    n3ds: !!userAgent.match(/nintendo 3ds/),
-    firefox: !!userAgent.match(/firefox/i),
-    safari: !!userAgent.match(/safari/i),
-  };
-
   function getComputedStyle(a, b) {
     if (!a) return false;
     if (a.currentStyle) return a.currentStyle;
@@ -146,54 +53,6 @@
     }, 0);
     return max + 1;
   }
-
-  /**
-   * This method adds some decoration to the default browser event.
-   * This can probably be replaced with something more modern.
-   */
-  function Event$1(e) {
-    const dB = document.body;
-    const dE = document.documentElement;
-    switch (e.keyCode) {
-      case 13:
-        e.ENTER = true;
-        break;
-      case 37:
-        e.LEFT = true;
-        break;
-      case 38:
-        e.UP = true;
-        break;
-      case 0.39:
-        e.RIGHT = true;
-        break;
-      case 40:
-        e.DOWN = true;
-        break;
-      default:
-        break;
-    }
-    if (typeof e.srcElement === 'undefined') e.srcElement = e.target;
-    if (typeof e.pageY === 'undefined') {
-      e.pageY = e.clientY + (parseInt(dE.scrollTop || dB.scrollTop, 10) || 0);
-      e.pageX = e.clientX + (parseInt(dE.scrollLeft || dB.scrollLeft, 10) || 0);
-    }
-    e.cancel = () => {
-      e.returnValue = false;
-      if (e.preventDefault) e.preventDefault();
-      return e;
-    };
-    e.stopBubbling = () => {
-      if (e.stopPropagation) e.stopPropagation();
-      e.cancelBubble = true;
-      return e;
-    };
-    return e;
-  }
-
-  // TODO: There are places in the source that are using this to store a callback
-  // Refactor this
-  Event$1.onPageChange = function onPageChange() {};
 
   class Color {
     constructor(colorToParse) {
@@ -256,156 +115,6 @@
       }
       return tmp;
     }
-  }
-
-  const DISALLOWED_TAGS = [
-    'SCRIPT',
-    'STYLE',
-    'HR',
-  ];
-
-  function htmlToBBCode(html) {
-    let bbcode = html;
-    const nestedTagRegex = /<(\w+)([^>]*)>([\w\W]*?)<\/\1>/gi;
-    bbcode = bbcode.replace(/[\r\n]+/g, '');
-    bbcode = bbcode.replace(/<(hr|br|meta)[^>]*>/gi, '\n');
-    // images and emojis
-    bbcode = bbcode.replace(/<img.*?src=["']?([^'"]+)["'](?: alt=["']?([^"']+)["'])?[^>]*\/?>/g, (whole, src, alt) => alt || `[img]${src}[/img]`);
-    bbcode = bbcode.replace(nestedTagRegex, (
-      whole,
-      tag,
-      attributes,
-      innerHTML,
-    ) => {
-      // Recursively handle nested tags
-      let innerhtml = nestedTagRegex.test(innerHTML) ? htmlToBBCode(innerHTML) : innerHTML;
-      const att = {};
-      attributes.replace(
-        /(color|size|style|href|src)=(['"]?)(.*?)\2/gi,
-        (_, attr, q, value) => {
-          att[attr] = value;
-        },
-      );
-      const { style = '' } = att;
-
-      const lcTag = tag.toLowerCase();
-      if (DISALLOWED_TAGS.includes(lcTag)) {
-        return '';
-      }
-      if (style.match(/background(-color)?:[^;]+(rgb\([^)]+\)|#\s+)/i)) {
-        innerhtml = `[bgcolor=#${
-        new Color(RegExp.$2).toHex()
-      }]${
-        innerhtml
-      }[/bgcolor]`;
-      }
-      if (style.match(/text-align: ?(right|center|left)/i)) {
-        innerhtml = `[align=${RegExp.$1}]${innerhtml}[/align]`;
-      }
-      if (
-        style.match(/font-style: ?italic/i)
-        || lcTag === 'i'
-        || lcTag === 'em'
-      ) {
-        innerhtml = `[I]${innerhtml}[/I]`;
-      }
-      if (style.match(/text-decoration:[^;]*underline/i) || lcTag === 'u') {
-        innerhtml = `[U]${innerhtml}[/U]`;
-      }
-      if (
-        style.match(/text-decoration:[^;]*line-through/i)
-        || lcTag === 's' || lcTag === 'strike'
-      ) {
-        innerhtml = `[S]${innerhtml}[/S]`;
-      }
-      if (
-        style.match(/font-weight: ?bold/i)
-        || lcTag === 'strong'
-        || lcTag === 'b'
-      ) {
-        innerhtml = `[B]${innerhtml}[/B]`;
-      }
-      if (att.size || style.match(/font-size: ?([^;]+)/i)) {
-        innerhtml = `[size=${att.size || RegExp.$1}]${innerhtml}[/size]`;
-      }
-      if (att.color || style.match(/color: ?([^;]+)/i)) {
-        innerhtml = `[color=${att.color || RegExp.$1}]${innerhtml}[/color]`;
-      }
-      if (lcTag === 'a' && att.href) {
-        innerhtml = `[url=${att.href}]${innerhtml}[/url]`;
-      }
-      if (lcTag === 'ol') innerhtml = `[ol]${innerhtml}[/ol]`;
-      if (lcTag === 'ul') innerhtml = `[ul]${innerhtml}[/ul]`;
-      if (lcTag.match(/h\d/i)) {
-        innerhtml = `[${
-        lcTag
-      }]${
-        innerhtml
-      }[/${
-        lcTag
-      }]`;
-      }
-      if (lcTag === 'li') {
-        innerhtml = `*${innerhtml.replace(/[\n\r]+/, '')}\n`;
-      }
-      if (lcTag === 'p') {
-        innerhtml = `\n${innerhtml === '&nbsp' ? '' : innerhtml}\n`;
-      }
-      if (lcTag === 'div') {
-        innerhtml = `\n${innerhtml}`;
-      }
-      return innerhtml;
-    });
-    return bbcode
-      .replace(/&amp;/g, '&')
-      .replace(/&gt;/g, '>')
-      .replace(/&lt;/g, '<')
-      .replace(/&nbsp;/g, ' ');
-  }
-
-
-  function bbcodeToHTML(bbcode) {
-    let html = bbcode
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/(\s) /g, '$1&nbsp;');
-    html = html.replace(/\[b\]([\w\W]*?)\[\/b\]/gi, '<b>$1</b>');
-    html = html.replace(/\[i\]([\w\W]*?)\[\/i\]/gi, '<i>$1</i>');
-    html = html.replace(/\[u\]([\w\W]*?)\[\/u\]/gi, '<u>$1</u>');
-    html = html.replace(/\[s\]([\w\W]*?)\[\/s\]/gi, '<s>$1</s>');
-    html = html.replace(/\[img\]([^'"[]+)\[\/img\]/gi, '<img src="$1">');
-    html = html.replace(
-      /\[color=([^\]]+)\](.*?)\[\/color\]/gi,
-      '<span style="color:$1">$2</span>',
-    );
-    html = html.replace(
-      /\[size=([^\]]+)\](.*?)\[\/size\]/gi,
-      '<span style="font-size:$1">$2</span>',
-    );
-    html = html.replace(
-      /\[url=([^\]]+)\](.*?)\[\/url\]/gi,
-      '<a href="$1">$2</a>',
-    );
-    html = html.replace(
-      /\[bgcolor=([^\]]+)\](.*?)\[\/bgcolor\]/gi,
-      '<span style="backgroun-color:$1">$2</span>',
-    );
-    html = html.replace(/\[h(\d)\](.*?)\[\/h\1\]/g, '<h$1>$2</h$1>');
-    html = html.replace(
-      /\[align=(left|right|center)\](.*?)\[\/align\]/g,
-      '<div style="text-align:$1">$2</div>',
-    );
-    html = html.replace(/\[(ul|ol)\]([\w\W]*?)\[\/\1\]/gi, (match) => {
-      const tag = match[1];
-      const listItems = match[2].split(/([\r\n]+|^)\*/);
-      const lis = listItems
-        .filter(text => text.trim())
-        .map(text => `<li>${text}</li>`)
-        .join('');
-      return `<${tag}>${lis}</${tag}>`;
-    });
-    html = html.replace(/\n/g, '<br />');
-    return html;
   }
 
   class Animation {
@@ -499,6 +208,18 @@
       return this;
     }
   }
+
+  const { userAgent } = navigator;
+
+  var Browser = {
+    chrome: !!userAgent.match(/chrome/i),
+    ie: !!userAgent.match(/msie/i),
+    iphone: !!userAgent.match(/iphone/i),
+    mobile: !!userAgent.match(/mobile/i),
+    n3ds: !!userAgent.match(/nintendo 3ds/),
+    firefox: !!userAgent.match(/firefox/i),
+    safari: !!userAgent.match(/safari/i),
+  };
 
   function ordsuffix(a) {
     return (
@@ -745,6 +466,438 @@
     }
   }
 
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  const daysshort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; // I don't think I'll need a dayslong ever
+
+  class DatePicker {
+    constructor(el$$1) {
+      let dp = document.querySelector('#datepicker');
+      let s;
+      const c = getCoordinates(el$$1);
+      if (!dp) {
+        dp = document.createElement('table');
+        dp.id = 'datepicker';
+        document.querySelector('#page').appendChild(dp);
+      }
+      s = dp.style;
+      s.display = 'table';
+      s.zIndex = getHighestZIndex();
+      s.top = `${c.yh}px`;
+      s.left = `${c.x}px`;
+      s = el$$1.value.split('/');
+      if (s.length === 3) {
+        this.selectedDate = [
+          parseInt(s[2], 10),
+          parseInt(s[0], 10) - 1,
+          parseInt(s[1], 10),
+        ];
+      } else this.selectedDate = undefined;
+
+      this.el = el$$1;
+      this.generate(s[2], s[0] ? parseInt(s[0], 10) - 1 : undefined, s[1]);
+    }
+
+    // month should be 0 for jan, 11 for dec
+    generate(iyear, imonth, iday) {
+      let date = new Date();
+      const dp = document.querySelector('#datepicker');
+      let row;
+      let cell;
+      let [year, month, day] = [iyear, imonth, iday];
+      // date here is today
+      if (year === undefined) {
+        year = date.getFullYear();
+        month = date.getMonth();
+        day = date.getDate();
+        this.selectedDate = [year, month, day];
+      }
+
+      if (month === -1) {
+        year -= 1;
+        month = 11;
+      }
+      if (month === 12) {
+        year += 1;
+        month = 0;
+      }
+
+      this.lastDate = [year, month, day];
+
+      // this date is used to calculate days in month and the day the first is on
+      const numdaysinmonth = new Date(year, month + 1, 0).getDate();
+      const first = new Date(year, month, 1).getDay();
+
+      date = new Date(year, month, day);
+      // generate the table now
+      dp.innerHTML = ''; // clear
+
+      // year
+      row = dp.insertRow(0);
+      cell = row.insertCell(0);
+      cell.innerHTML = '<';
+      cell.className = 'control';
+      cell.onclick = () => this.lastYear();
+
+      cell = row.insertCell(1);
+      cell.colSpan = '5';
+      cell.className = 'year';
+      cell.innerHTML = year;
+      cell = row.insertCell(2);
+      cell.innerHTML = '>';
+      cell.className = 'control';
+      cell.onclick = () => this.nextYear();
+
+      // month title
+      row = dp.insertRow(1);
+      cell = row.insertCell(0);
+      cell.innerHTML = '<';
+      cell.className = 'control';
+      cell.onclick = () => this.lastMonth();
+
+      cell = row.insertCell(1);
+      cell.colSpan = '5';
+      cell.innerHTML = months[month];
+      cell.className = 'month';
+      cell = row.insertCell(2);
+      cell.innerHTML = '>';
+      cell.className = 'control';
+      cell.onclick = () => this.nextMonth();
+
+      // weekdays
+      row = dp.insertRow(2);
+      row.className = 'weekdays';
+      for (let x = 0; x < 7; x += 1) {
+        row.insertCell(x).innerHTML = daysshort[x];
+      }
+
+      row = dp.insertRow(3);
+      // generate numbers
+      for (let x = 0; x < numdaysinmonth; x += 1) {
+        if (!x) {
+          for (let i = 0; i < first; i += 1) {
+            row.insertCell(i);
+          }
+        }
+        if ((first + x) % 7 === 0) {
+          row = dp.insertRow(dp.rows.length);
+        }
+        cell = row.insertCell((first + x) % 7);
+        cell.onclick = this.insert.bind(this, cell);
+
+        cell.className = `day${
+        year === this.selectedDate[0]
+        && month === this.selectedDate[1]
+        && x + 1 === this.selectedDate[2]
+          ? ' selected'
+          : ''}`;
+        cell.innerHTML = x + 1;
+      }
+    }
+
+    lastYear() {
+      const l = this.lastDate;
+      this.generate(l[0] - 1, l[1], l[2]);
+    }
+
+    nextYear() {
+      const l = this.lastDate;
+      this.generate(l[0] + 1, l[1], l[2]);
+    }
+
+    lastMonth() {
+      const l = this.lastDate;
+      this.generate(l[0], l[1] - 1, l[2]);
+    }
+
+    nextMonth() {
+      const l = this.lastDate;
+      this.generate(l[0], l[1] + 1, l[2]);
+    }
+
+    insert(cell) {
+      const l = this.lastDate;
+      this.el.value = `${l[1] + 1}/${cell.innerHTML}/${l[0]}`;
+      DatePicker.hide();
+    }
+  }
+
+  // Static methods
+  DatePicker.init = el$$1 => new DatePicker(el$$1);
+  DatePicker.hide = () => {
+    document.querySelector('#datepicker').style.display = 'none';
+  };
+
+  /**
+   * This method adds some decoration to the default browser event.
+   * This can probably be replaced with something more modern.
+   */
+  function Event$1(e) {
+    const dB = document.body;
+    const dE = document.documentElement;
+    switch (e.keyCode) {
+      case 13:
+        e.ENTER = true;
+        break;
+      case 37:
+        e.LEFT = true;
+        break;
+      case 38:
+        e.UP = true;
+        break;
+      case 0.39:
+        e.RIGHT = true;
+        break;
+      case 40:
+        e.DOWN = true;
+        break;
+      default:
+        break;
+    }
+    if (typeof e.srcElement === 'undefined') e.srcElement = e.target;
+    if (typeof e.pageY === 'undefined') {
+      e.pageY = e.clientY + (parseInt(dE.scrollTop || dB.scrollTop, 10) || 0);
+      e.pageX = e.clientX + (parseInt(dE.scrollLeft || dB.scrollLeft, 10) || 0);
+    }
+    e.cancel = () => {
+      e.returnValue = false;
+      if (e.preventDefault) e.preventDefault();
+      return e;
+    };
+    e.stopBubbling = () => {
+      if (e.stopPropagation) e.stopPropagation();
+      e.cancelBubble = true;
+      return e;
+    };
+    return e;
+  }
+
+  // TODO: There are places in the source that are using this to store a callback
+  // Refactor this
+  Event$1.onPageChange = function onPageChange() {};
+
+  // scrolling page list functionality
+  function scrollpagelist(event) {
+    const e = Event$1(event).cancel();
+    const wheelDelta = e.detail || e.wheelDelta;
+    let delta = Math.abs(wheelDelta) / wheelDelta;
+    if (Browser.chrome) {
+      delta *= -1;
+    }
+    const p = Array.from(this.querySelectorAll('a'));
+    const startPage = parseInt(p[1].innerHTML, 10);
+    const lastPage = parseInt(p[p.length - 1].innerHTML, 10);
+    const between = p.length - 2;
+    if (Browser.ie) {
+      delta *= -1;
+    }
+    if ((delta > 0 && startPage + between < lastPage) || (delta < 0 && startPage > 2)) {
+      for (let x = 0; x < between; x += 1) {
+        p[x + 1].href = p[x + 1].href.replace(/\d+$/, x + startPage + delta);
+        p[x + 1].innerHTML = startPage + x + delta;
+      }
+    }
+  }
+  function scrollablepagelist (pl) {
+    if (pl.addEventListener) {
+      pl.addEventListener('DOMMouseScroll', scrollpagelist, false);
+    }
+    pl.onmousewheel = scrollpagelist;
+  }
+
+  const maxDimension = '999999px';
+
+  function makeResizer(iw, nw, ih, nh, img) {
+    img.style.maxWidth = maxDimension;
+    img.style.maxHeight = maxDimension;
+    img.madeResized = true;
+    const link = document.createElement('a');
+    link.target = 'newwin';
+    link.href = img.src;
+    link.style.display = 'block';
+    link.style.overflow = 'hidden';
+    link.style.width = `${iw}px`;
+    link.style.height = `${ih}px`;
+    link.nw = nw;
+    link.nh = nh;
+    link.onmousemove = (event) => {
+      const o = getCoordinates(this);
+      const e = Event$1(event);
+      this.scrollLeft = ((e.pageX - o.x) / o.w) * (this.nw - o.w);
+      this.scrollTop = ((e.pageY - o.y) / o.h) * (this.nh - o.h);
+    };
+    link.onmouseover = () => {
+      img.style.width = `${this.nw}px`;
+      img.style.height = `${this.nh}px`;
+    };
+    link.onmouseout = () => {
+      if (this.scrollLeft) {
+        this.scrollLeft = 0;
+        this.scrollTop = 0;
+      }
+      img.style.width = `${iw}px`;
+      img.style.height = `${ih}px`;
+    };
+    link.onmouseout();
+    insertBefore(link, img);
+    link.appendChild(img);
+  }
+
+
+  function imageResizer(imgs) {
+    let mw;
+    let mh;
+    let s;
+    if (!imgs || !imgs.length) {
+      return;
+    }
+    Array.from(imgs)
+      .filter(img => !img.madeResized)
+      .forEach((img) => {
+        let p = 1;
+        let p2 = 1;
+        const { naturalWidth, naturalHeight } = img;
+        let iw = naturalWidth;
+        let ih = naturalHeight;
+        s = getComputedStyle(img);
+        mw = parseInt(s.width, 10) || parseInt(s.maxWidth, 10);
+        mh = parseInt(s.height, 10) || parseInt(s.maxHeight, 10);
+        if (mw && iw > mw) p = mw / iw;
+        if (mh && ih > mh) p2 = mh / ih;
+        p = p && p2 ? Math.min(p, p2) : p2 || p;
+        if (p < 1) {
+          iw *= p;
+          ih *= p;
+          makeResizer(iw, naturalWidth, ih, naturalHeight, img);
+        }
+      });
+  }
+
+  function makeImageGallery (gallery) {
+    if (gallery.madeGallery) {
+      return;
+    }
+    gallery.madeGallery = true;
+    const controls = document.createElement('div');
+    const next = document.createElement('a');
+    const prev = document.createElement('a');
+    const status = {
+      index: 0,
+      max: Math.max(gallery.querySelectorAll('img').length, 1),
+      showNext() {
+        if (this.index < this.max - 1) {
+          this.index += 1;
+        }
+        this.update();
+      },
+      showPrev() {
+        if (this.index > 0) {
+          this.index -= 1;
+        }
+        this.update();
+      },
+      update() {
+        const imgs = gallery.querySelectorAll('img');
+        imgs.forEach((img, i) => {
+          let container;
+          if (img.madeResized) {
+            container = img.parentNode;
+          } else {
+            container = img;
+          }
+          container.style.display = i !== this.index ? 'none' : 'block';
+        });
+      },
+    };
+    next.innerHTML = 'Next &raquo;';
+    next.href = '#';
+    next.onclick = () => {
+      status.showNext();
+      return false;
+    };
+
+    prev.innerHTML = 'Prev &laquo;';
+    prev.href = '#';
+    prev.onclick = () => {
+      status.showPrev();
+      return false;
+    };
+
+    status.update();
+    controls.appendChild(prev);
+    controls.appendChild(document.createTextNode(' '));
+    controls.appendChild(next);
+    gallery.appendChild(controls);
+  }
+
+  function stripHTML(html) {
+    return html.valueOf()
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function openTooltip (el$$1) {
+    let tooltip = document.getElementById('tooltip_thingy');
+    const pos = getCoordinates(el$$1);
+    const title = stripHTML(el$$1.title);
+    // Prevent the browser from showing its own title
+    el$$1.title = '';
+    if (!title) return;
+    if (!tooltip) {
+      tooltip = document.createElement('table');
+      const t = tooltip.insertRow(0);
+      const c = tooltip.insertRow(1);
+      const b = tooltip.insertRow(2);
+      let a;
+
+      tooltip.id = 'tooltip_thingy';
+      tooltip.className = 'tooltip';
+      t.className = 'top';
+      c.className = 'content';
+      b.className = 'bottom';
+      a = t.insertCell(0);
+      a.className = 'left';
+      a.colSpan = 2;
+      a = t.insertCell(1);
+      a.className = 'right';
+      a = c.insertCell(0);
+      a.className = 'left';
+      a = c.insertCell(1);
+      a.innerHTML = 'default text';
+      a = c.insertCell(2);
+      a.className = 'right';
+      a = b.insertCell(0);
+      a.className = 'left';
+      a.colSpan = 2;
+      a = b.insertCell(1);
+      a.className = 'right';
+      document.querySelector('#page').appendChild(tooltip);
+    }
+
+    tooltip.rows[1].cells[1].innerHTML = title;
+    tooltip.style.display = '';
+    tooltip.style.top = `${pos.y - tooltip.clientHeight}px`;
+    tooltip.style.left = `${pos.x}px`;
+    tooltip.style.zIndex = getHighestZIndex();
+    el$$1.onmouseout = () => {
+      el$$1.title = title;
+      document.querySelector('#tooltip_thingy').style.display = 'none';
+    };
+  }
+
   /**
    * Selects/highlights all contents in an element
    * @param  {Element} element
@@ -783,6 +936,344 @@
     }
     element.focus();
     element.scrollTop = scroll;
+  }
+
+  /**
+   * For some reason, I designed this method
+   * to accept Objects (key/value pairs)
+   * or 2 arguments:  keys and values
+   * The purpose is to construct data to send over URL or POST data
+   *
+   * @example
+   * buildQueryString({key: 'value', key2: 'value2'}) === 'key=value&key2=value2';
+   *
+   * @example
+   * buildQueryString(['key', 'key2'], ['value, 'value2']) === 'key=value&key2=value2'
+   *
+   * @return {String}
+   */
+  function buildQueryString(keys, values) {
+    if (!keys) {
+      return '';
+    }
+    if (values) {
+      return keys
+        .map((key, index) => `${encodeURIComponent(key)}=${encodeURIComponent(values[index] || '')}`)
+        .join('&');
+    }
+    return Object.keys(keys)
+      .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(keys[key] || '')}`)
+      .join('&');
+  }
+
+  class Ajax {
+    constructor(s) {
+      this.setup = {
+        readyState: 4,
+        callback() {},
+        method: 'POST',
+        ...s,
+      };
+    }
+
+    load(url, {
+      callback,
+      data,
+      method = this.setup.method,
+      requestType = 1,
+    } = {}) {
+      // requestType is an enum (1=update, 2=load new)
+      let sendData = null;
+      if (
+        data
+        && Array.isArray(data)
+        && Array.isArray(data[0])
+        && data[0].length === data[1].length
+      ) {
+        sendData = buildQueryString(data[0], data[1]);
+      } else if (typeof data !== 'string') {
+        sendData = buildQueryString(data);
+      }
+      const request = new XMLHttpRequest();
+      if (callback) {
+        this.setup.callback = callback;
+      }
+      request.onreadystatechange = () => {
+        if (request.readyState === this.setup.readyState) {
+          this.setup.callback(request);
+        }
+      };
+      if (!request) return false;
+      request.open(method, url, true);
+      request.url = url;
+      request.type = requestType;
+      if (method) {
+        request.setRequestHeader(
+          'Content-Type',
+          'application/x-www-form-urlencoded',
+        );
+      }
+      request.setRequestHeader('X-JSACCESS', requestType);
+      request.send(sendData);
+      return request;
+    }
+  }
+
+  const VALID_CLASS = 'valid';
+  const INVALID_CLASS = 'invalid';
+
+  function fetchResults(queryParams, el$$1, outputElement, event = {}) {
+    const e = Event$1(event);
+    el$$1.onkeydown = (event2) => {
+      const e2 = Event$1(event2);
+      if (e2.ENTER) {
+        e2.cancel();
+        return false;
+      }
+      return true;
+    };
+    let d = document.querySelector('#autocomplete');
+    const coords = getCoordinates(el$$1);
+    let els;
+    let sindex = -1;
+    let l = 0;
+    if (!d) {
+      d = document.createElement('div');
+      d.id = 'autocomplete';
+      d.style.position = 'absolute';
+      d.style.zIndex = getHighestZIndex();
+      document.querySelector('#page').appendChild(d);
+    } else {
+      d.style.display = '';
+      els = Array.from(d.querySelectorAll('div'));
+      l = els.length;
+      sindex = els.findIndex(elmnt => elmnt.classList.contains('selected'));
+    }
+    d.style.top = `${coords.yh}px`;
+    d.style.left = `${coords.x}px`;
+    d.style.width = `${coords.w}px`;
+
+    if (e.UP && l && sindex >= 1) {
+      els[sindex].classList.remove('selected');
+      els[sindex - 1].classList.add('selected');
+    } else if (
+      e.DOWN
+      && l
+      && (sindex < l - 1 || sindex >= -1)
+    ) {
+      if (sindex >= -1) {
+        els[0].classList.add('selected');
+      } else {
+        els[sindex].classList.remove('selected');
+        els[sindex + 1].classList.add('selected');
+      }
+    } else if (e.ENTER && l && sindex >= -1) {
+      els[sindex].onclick();
+    } else {
+      const relativePath = document.location.toString().match('/acp/') ? '../' : '';
+      new Ajax().load(
+        `${relativePath}misc/listloader.php?${queryParams}`,
+        {
+          callback: (xml) => {
+            const results = JSON.parse(xml.responseText);
+            d.innerHTML = '';
+            if (!results.length) {
+              d.style.display = 'none';
+            } else {
+              const [ids, values] = results;
+              ids.forEach((key, i) => {
+                const value = values[i];
+                const div = document.createElement('div');
+                div.innerHTML = value;
+                div.onclick = () => {
+                  div.parentNode.style.display = 'none';
+                  if (outputElement) {
+                    outputElement.value = key;
+                    outputElement.dispatchEvent(new Event('change'));
+                  }
+                  el$$1.value = value;
+                };
+                d.appendChild(div);
+              });
+            }
+          },
+        },
+      );
+    }
+  }
+
+  function decorateElement(element) {
+    // Disable native autocomplete behavior
+    element.autocomplete = 'off';
+    const action = element.dataset.autocompleteAction;
+    const output = element.dataset.autocompleteOutput;
+    const indicator = element.dataset.autocompleteIndicator;
+    const outputElement = output && document.querySelector(output);
+    const indicatorElement = indicator && document.querySelector(indicator);
+
+    if (indicatorElement && outputElement) {
+      outputElement.addEventListener('change', () => {
+        indicatorElement.classList.add(VALID_CLASS);
+      });
+    }
+    element.addEventListener('keyup', (event) => {
+      const searchTerm = encodeURIComponent(element.value);
+      if (indicatorElement) {
+        indicatorElement.classList.remove(VALID_CLASS);
+        indicatorElement.classList.add(INVALID_CLASS);
+      }
+      fetchResults(`act=${action}&term=${searchTerm}`, element, outputElement, event);
+    });
+  }
+
+  const DISALLOWED_TAGS = [
+    'SCRIPT',
+    'STYLE',
+    'HR',
+  ];
+
+  function htmlToBBCode(html) {
+    let bbcode = html;
+    const nestedTagRegex = /<(\w+)([^>]*)>([\w\W]*?)<\/\1>/gi;
+    bbcode = bbcode.replace(/[\r\n]+/g, '');
+    bbcode = bbcode.replace(/<(hr|br|meta)[^>]*>/gi, '\n');
+    // images and emojis
+    bbcode = bbcode.replace(/<img.*?src=["']?([^'"]+)["'](?: alt=["']?([^"']+)["'])?[^>]*\/?>/g, (whole, src, alt) => alt || `[img]${src}[/img]`);
+    bbcode = bbcode.replace(nestedTagRegex, (
+      whole,
+      tag,
+      attributes,
+      innerHTML,
+    ) => {
+      // Recursively handle nested tags
+      let innerhtml = nestedTagRegex.test(innerHTML) ? htmlToBBCode(innerHTML) : innerHTML;
+      const att = {};
+      attributes.replace(
+        /(color|size|style|href|src)=(['"]?)(.*?)\2/gi,
+        (_, attr, q, value) => {
+          att[attr] = value;
+        },
+      );
+      const { style = '' } = att;
+
+      const lcTag = tag.toLowerCase();
+      if (DISALLOWED_TAGS.includes(lcTag)) {
+        return '';
+      }
+      if (style.match(/background(-color)?:[^;]+(rgb\([^)]+\)|#\s+)/i)) {
+        innerhtml = `[bgcolor=#${
+        new Color(RegExp.$2).toHex()
+      }]${
+        innerhtml
+      }[/bgcolor]`;
+      }
+      if (style.match(/text-align: ?(right|center|left)/i)) {
+        innerhtml = `[align=${RegExp.$1}]${innerhtml}[/align]`;
+      }
+      if (
+        style.match(/font-style: ?italic/i)
+        || lcTag === 'i'
+        || lcTag === 'em'
+      ) {
+        innerhtml = `[I]${innerhtml}[/I]`;
+      }
+      if (style.match(/text-decoration:[^;]*underline/i) || lcTag === 'u') {
+        innerhtml = `[U]${innerhtml}[/U]`;
+      }
+      if (
+        style.match(/text-decoration:[^;]*line-through/i)
+        || lcTag === 's' || lcTag === 'strike'
+      ) {
+        innerhtml = `[S]${innerhtml}[/S]`;
+      }
+      if (
+        style.match(/font-weight: ?bold/i)
+        || lcTag === 'strong'
+        || lcTag === 'b'
+      ) {
+        innerhtml = `[B]${innerhtml}[/B]`;
+      }
+      if (att.size || style.match(/font-size: ?([^;]+)/i)) {
+        innerhtml = `[size=${att.size || RegExp.$1}]${innerhtml}[/size]`;
+      }
+      if (att.color || style.match(/color: ?([^;]+)/i)) {
+        innerhtml = `[color=${att.color || RegExp.$1}]${innerhtml}[/color]`;
+      }
+      if (lcTag === 'a' && att.href) {
+        innerhtml = `[url=${att.href}]${innerhtml}[/url]`;
+      }
+      if (lcTag === 'ol') innerhtml = `[ol]${innerhtml}[/ol]`;
+      if (lcTag === 'ul') innerhtml = `[ul]${innerhtml}[/ul]`;
+      if (lcTag.match(/h\d/i)) {
+        innerhtml = `[${
+        lcTag
+      }]${
+        innerhtml
+      }[/${
+        lcTag
+      }]`;
+      }
+      if (lcTag === 'li') {
+        innerhtml = `*${innerhtml.replace(/[\n\r]+/, '')}\n`;
+      }
+      if (lcTag === 'p') {
+        innerhtml = `\n${innerhtml === '&nbsp' ? '' : innerhtml}\n`;
+      }
+      if (lcTag === 'div') {
+        innerhtml = `\n${innerhtml}`;
+      }
+      return innerhtml;
+    });
+    return bbcode
+      .replace(/&amp;/g, '&')
+      .replace(/&gt;/g, '>')
+      .replace(/&lt;/g, '<')
+      .replace(/&nbsp;/g, ' ');
+  }
+
+
+  function bbcodeToHTML(bbcode) {
+    let html = bbcode
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/(\s) /g, '$1&nbsp;');
+    html = html.replace(/\[b\]([\w\W]*?)\[\/b\]/gi, '<b>$1</b>');
+    html = html.replace(/\[i\]([\w\W]*?)\[\/i\]/gi, '<i>$1</i>');
+    html = html.replace(/\[u\]([\w\W]*?)\[\/u\]/gi, '<u>$1</u>');
+    html = html.replace(/\[s\]([\w\W]*?)\[\/s\]/gi, '<s>$1</s>');
+    html = html.replace(/\[img\]([^'"[]+)\[\/img\]/gi, '<img src="$1">');
+    html = html.replace(
+      /\[color=([^\]]+)\](.*?)\[\/color\]/gi,
+      '<span style="color:$1">$2</span>',
+    );
+    html = html.replace(
+      /\[size=([^\]]+)\](.*?)\[\/size\]/gi,
+      '<span style="font-size:$1">$2</span>',
+    );
+    html = html.replace(
+      /\[url=([^\]]+)\](.*?)\[\/url\]/gi,
+      '<a href="$1">$2</a>',
+    );
+    html = html.replace(
+      /\[bgcolor=([^\]]+)\](.*?)\[\/bgcolor\]/gi,
+      '<span style="backgroun-color:$1">$2</span>',
+    );
+    html = html.replace(/\[h(\d)\](.*?)\[\/h\1\]/g, '<h$1>$2</h$1>');
+    html = html.replace(
+      /\[align=(left|right|center)\](.*?)\[\/align\]/g,
+      '<div style="text-align:$1">$2</div>',
+    );
+    html = html.replace(/\[(ul|ol)\]([\w\W]*?)\[\/\1\]/gi, (match) => {
+      const tag = match[1];
+      const listItems = match[2].split(/([\r\n]+|^)\*/);
+      const lis = listItems
+        .filter(text => text.trim())
+        .map(text => `<li>${text}</li>`)
+        .join('');
+      return `<${tag}>${lis}</${tag}>`;
+    });
+    html = html.replace(/\n/g, '<br />');
+    return html;
   }
 
   /* global globalsettings */
@@ -1384,7 +1875,7 @@
   }
 
   class Window {
-    constructor() {
+    constructor(options = {}) {
       assign(this, {
         title: 'Title',
         wait: true,
@@ -1396,6 +1887,7 @@
         className: '',
         pos: 'center',
         zIndex: getHighestZIndex(),
+        ...options,
       });
     }
 
@@ -1604,527 +2096,6 @@
     } while (element);
   };
 
-  // TODO: Make this file completely obsolete by removing references to global JAX object
-  var JAX = {
-    Editor,
-    Window,
-  };
-
-  class Sound {
-    constructor() {
-      this.soundCache = {};
-    }
-
-    load(title, file, autoplay) {
-      const audio = new Audio();
-      this.soundCache[title] = audio;
-      audio.autoplay = !!autoplay;
-      audio.src = file;
-    }
-
-    play(title) {
-      this.soundCache[title].play();
-    }
-
-    loadAndPlay(title, file) {
-      this.load(title, file, true);
-    }
-  }
-
-  // Sound is a singleton
-  var Sound$1 = new Sound();
-
-  const months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
-
-  const daysshort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; // I don't think I'll need a dayslong ever
-
-  class DatePicker {
-    constructor(el$$1) {
-      let dp = document.querySelector('#datepicker');
-      let s;
-      const c = getCoordinates(el$$1);
-      if (!dp) {
-        dp = document.createElement('table');
-        dp.id = 'datepicker';
-        document.querySelector('#page').appendChild(dp);
-      }
-      s = dp.style;
-      s.display = 'table';
-      s.zIndex = getHighestZIndex();
-      s.top = `${c.yh}px`;
-      s.left = `${c.x}px`;
-      s = el$$1.value.split('/');
-      if (s.length === 3) {
-        this.selectedDate = [
-          parseInt(s[2], 10),
-          parseInt(s[0], 10) - 1,
-          parseInt(s[1], 10),
-        ];
-      } else this.selectedDate = undefined;
-
-      this.el = el$$1;
-      this.generate(s[2], s[0] ? parseInt(s[0], 10) - 1 : undefined, s[1]);
-    }
-
-    // month should be 0 for jan, 11 for dec
-    generate(iyear, imonth, iday) {
-      let date = new Date();
-      const dp = document.querySelector('#datepicker');
-      let row;
-      let cell;
-      let [year, month, day] = [iyear, imonth, iday];
-      // date here is today
-      if (year === undefined) {
-        year = date.getFullYear();
-        month = date.getMonth();
-        day = date.getDate();
-        this.selectedDate = [year, month, day];
-      }
-
-      if (month === -1) {
-        year -= 1;
-        month = 11;
-      }
-      if (month === 12) {
-        year += 1;
-        month = 0;
-      }
-
-      this.lastDate = [year, month, day];
-
-      // this date is used to calculate days in month and the day the first is on
-      const numdaysinmonth = new Date(year, month + 1, 0).getDate();
-      const first = new Date(year, month, 1).getDay();
-
-      date = new Date(year, month, day);
-      // generate the table now
-      dp.innerHTML = ''; // clear
-
-      // year
-      row = dp.insertRow(0);
-      cell = row.insertCell(0);
-      cell.innerHTML = '<';
-      cell.className = 'control';
-      cell.onclick = () => this.lastYear();
-
-      cell = row.insertCell(1);
-      cell.colSpan = '5';
-      cell.className = 'year';
-      cell.innerHTML = year;
-      cell = row.insertCell(2);
-      cell.innerHTML = '>';
-      cell.className = 'control';
-      cell.onclick = () => this.nextYear();
-
-      // month title
-      row = dp.insertRow(1);
-      cell = row.insertCell(0);
-      cell.innerHTML = '<';
-      cell.className = 'control';
-      cell.onclick = () => this.lastMonth();
-
-      cell = row.insertCell(1);
-      cell.colSpan = '5';
-      cell.innerHTML = months[month];
-      cell.className = 'month';
-      cell = row.insertCell(2);
-      cell.innerHTML = '>';
-      cell.className = 'control';
-      cell.onclick = () => this.nextMonth();
-
-      // weekdays
-      row = dp.insertRow(2);
-      row.className = 'weekdays';
-      for (let x = 0; x < 7; x += 1) {
-        row.insertCell(x).innerHTML = daysshort[x];
-      }
-
-      row = dp.insertRow(3);
-      // generate numbers
-      for (let x = 0; x < numdaysinmonth; x += 1) {
-        if (!x) {
-          for (let i = 0; i < first; i += 1) {
-            row.insertCell(i);
-          }
-        }
-        if ((first + x) % 7 === 0) {
-          row = dp.insertRow(dp.rows.length);
-        }
-        cell = row.insertCell((first + x) % 7);
-        cell.onclick = this.insert.bind(this, cell);
-
-        cell.className = `day${
-        year === this.selectedDate[0]
-        && month === this.selectedDate[1]
-        && x + 1 === this.selectedDate[2]
-          ? ' selected'
-          : ''}`;
-        cell.innerHTML = x + 1;
-      }
-    }
-
-    lastYear() {
-      const l = this.lastDate;
-      this.generate(l[0] - 1, l[1], l[2]);
-    }
-
-    nextYear() {
-      const l = this.lastDate;
-      this.generate(l[0] + 1, l[1], l[2]);
-    }
-
-    lastMonth() {
-      const l = this.lastDate;
-      this.generate(l[0], l[1] - 1, l[2]);
-    }
-
-    nextMonth() {
-      const l = this.lastDate;
-      this.generate(l[0], l[1] + 1, l[2]);
-    }
-
-    insert(cell) {
-      const l = this.lastDate;
-      this.el.value = `${l[1] + 1}/${cell.innerHTML}/${l[0]}`;
-      DatePicker.hide();
-    }
-  }
-
-  // Static methods
-  DatePicker.init = el$$1 => new DatePicker(el$$1);
-  DatePicker.hide = () => {
-    document.querySelector('#datepicker').style.display = 'none';
-  };
-
-  // scrolling page list functionality
-  function scrollpagelist(event) {
-    const e = Event$1(event).cancel();
-    const wheelDelta = e.detail || e.wheelDelta;
-    let delta = Math.abs(wheelDelta) / wheelDelta;
-    if (Browser.chrome) {
-      delta *= -1;
-    }
-    const p = Array.from(this.querySelectorAll('a'));
-    const startPage = parseInt(p[1].innerHTML, 10);
-    const lastPage = parseInt(p[p.length - 1].innerHTML, 10);
-    const between = p.length - 2;
-    if (Browser.ie) {
-      delta *= -1;
-    }
-    if ((delta > 0 && startPage + between < lastPage) || (delta < 0 && startPage > 2)) {
-      for (let x = 0; x < between; x += 1) {
-        p[x + 1].href = p[x + 1].href.replace(/\d+$/, x + startPage + delta);
-        p[x + 1].innerHTML = startPage + x + delta;
-      }
-    }
-  }
-  function scrollablepagelist (pl) {
-    if (pl.addEventListener) {
-      pl.addEventListener('DOMMouseScroll', scrollpagelist, false);
-    }
-    pl.onmousewheel = scrollpagelist;
-  }
-
-  const maxDimension = '999999px';
-
-  function makeResizer(iw, nw, ih, nh, img) {
-    img.style.maxWidth = maxDimension;
-    img.style.maxHeight = maxDimension;
-    img.madeResized = true;
-    const link = document.createElement('a');
-    link.target = 'newwin';
-    link.href = img.src;
-    link.style.display = 'block';
-    link.style.overflow = 'hidden';
-    link.style.width = `${iw}px`;
-    link.style.height = `${ih}px`;
-    link.nw = nw;
-    link.nh = nh;
-    link.onmousemove = (event) => {
-      const o = getCoordinates(this);
-      const e = Event$1(event);
-      this.scrollLeft = ((e.pageX - o.x) / o.w) * (this.nw - o.w);
-      this.scrollTop = ((e.pageY - o.y) / o.h) * (this.nh - o.h);
-    };
-    link.onmouseover = () => {
-      img.style.width = `${this.nw}px`;
-      img.style.height = `${this.nh}px`;
-    };
-    link.onmouseout = () => {
-      if (this.scrollLeft) {
-        this.scrollLeft = 0;
-        this.scrollTop = 0;
-      }
-      img.style.width = `${iw}px`;
-      img.style.height = `${ih}px`;
-    };
-    link.onmouseout();
-    insertBefore(link, img);
-    link.appendChild(img);
-  }
-
-
-  function imageResizer(imgs) {
-    let mw;
-    let mh;
-    let s;
-    if (!imgs || !imgs.length) {
-      return;
-    }
-    Array.from(imgs)
-      .filter(img => !img.madeResized)
-      .forEach((img) => {
-        let p = 1;
-        let p2 = 1;
-        const { naturalWidth, naturalHeight } = img;
-        let iw = naturalWidth;
-        let ih = naturalHeight;
-        s = getComputedStyle(img);
-        mw = parseInt(s.width, 10) || parseInt(s.maxWidth, 10);
-        mh = parseInt(s.height, 10) || parseInt(s.maxHeight, 10);
-        if (mw && iw > mw) p = mw / iw;
-        if (mh && ih > mh) p2 = mh / ih;
-        p = p && p2 ? Math.min(p, p2) : p2 || p;
-        if (p < 1) {
-          iw *= p;
-          ih *= p;
-          makeResizer(iw, naturalWidth, ih, naturalHeight, img);
-        }
-      });
-  }
-
-  function makeImageGallery (gallery) {
-    if (gallery.madeGallery) {
-      return;
-    }
-    gallery.madeGallery = true;
-    const controls = document.createElement('div');
-    const next = document.createElement('a');
-    const prev = document.createElement('a');
-    const status = {
-      index: 0,
-      max: Math.max(gallery.querySelectorAll('img').length, 1),
-      showNext() {
-        if (this.index < this.max - 1) {
-          this.index += 1;
-        }
-        this.update();
-      },
-      showPrev() {
-        if (this.index > 0) {
-          this.index -= 1;
-        }
-        this.update();
-      },
-      update() {
-        const imgs = gallery.querySelectorAll('img');
-        imgs.forEach((img, i) => {
-          let container;
-          if (img.madeResized) {
-            container = img.parentNode;
-          } else {
-            container = img;
-          }
-          container.style.display = i !== this.index ? 'none' : 'block';
-        });
-      },
-    };
-    next.innerHTML = 'Next &raquo;';
-    next.href = '#';
-    next.onclick = () => {
-      status.showNext();
-      return false;
-    };
-
-    prev.innerHTML = 'Prev &laquo;';
-    prev.href = '#';
-    prev.onclick = () => {
-      status.showPrev();
-      return false;
-    };
-
-    status.update();
-    controls.appendChild(prev);
-    controls.appendChild(document.createTextNode(' '));
-    controls.appendChild(next);
-    gallery.appendChild(controls);
-  }
-
-  function stripHTML(html) {
-    return html.valueOf()
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-  }
-
-  function openTooltip (el$$1) {
-    let tooltip = document.getElementById('tooltip_thingy');
-    const pos = getCoordinates(el$$1);
-    const title = stripHTML(el$$1.title);
-    // Prevent the browser from showing its own title
-    el$$1.title = '';
-    if (!title) return;
-    if (!tooltip) {
-      tooltip = document.createElement('table');
-      const t = tooltip.insertRow(0);
-      const c = tooltip.insertRow(1);
-      const b = tooltip.insertRow(2);
-      let a;
-
-      tooltip.id = 'tooltip_thingy';
-      tooltip.className = 'tooltip';
-      t.className = 'top';
-      c.className = 'content';
-      b.className = 'bottom';
-      a = t.insertCell(0);
-      a.className = 'left';
-      a.colSpan = 2;
-      a = t.insertCell(1);
-      a.className = 'right';
-      a = c.insertCell(0);
-      a.className = 'left';
-      a = c.insertCell(1);
-      a.innerHTML = 'default text';
-      a = c.insertCell(2);
-      a.className = 'right';
-      a = b.insertCell(0);
-      a.className = 'left';
-      a.colSpan = 2;
-      a = b.insertCell(1);
-      a.className = 'right';
-      document.querySelector('#page').appendChild(tooltip);
-    }
-
-    tooltip.rows[1].cells[1].innerHTML = title;
-    tooltip.style.display = '';
-    tooltip.style.top = `${pos.y - tooltip.clientHeight}px`;
-    tooltip.style.left = `${pos.x}px`;
-    tooltip.style.zIndex = getHighestZIndex();
-    el$$1.onmouseout = () => {
-      el$$1.title = title;
-      document.querySelector('#tooltip_thingy').style.display = 'none';
-    };
-  }
-
-  const VALID_CLASS = 'valid';
-  const INVALID_CLASS = 'invalid';
-
-  function fetchResults(queryParams, el$$1, outputElement, event = {}) {
-    const e = Event$1(event);
-    el$$1.onkeydown = (event2) => {
-      const e2 = Event$1(event2);
-      if (e2.ENTER) {
-        e2.cancel();
-        return false;
-      }
-      return true;
-    };
-    let d = document.querySelector('#autocomplete');
-    const coords = getCoordinates(el$$1);
-    let els;
-    let sindex = -1;
-    let l = 0;
-    if (!d) {
-      d = document.createElement('div');
-      d.id = 'autocomplete';
-      d.style.position = 'absolute';
-      d.style.zIndex = getHighestZIndex();
-      document.querySelector('#page').appendChild(d);
-    } else {
-      d.style.display = '';
-      els = Array.from(d.querySelectorAll('div'));
-      l = els.length;
-      sindex = els.findIndex(elmnt => elmnt.classList.contains('selected'));
-    }
-    d.style.top = `${coords.yh}px`;
-    d.style.left = `${coords.x}px`;
-    d.style.width = `${coords.w}px`;
-
-    if (e.UP && l && sindex >= 1) {
-      els[sindex].classList.remove('selected');
-      els[sindex - 1].classList.add('selected');
-    } else if (
-      e.DOWN
-      && l
-      && (sindex < l - 1 || sindex >= -1)
-    ) {
-      if (sindex >= -1) {
-        els[0].classList.add('selected');
-      } else {
-        els[sindex].classList.remove('selected');
-        els[sindex + 1].classList.add('selected');
-      }
-    } else if (e.ENTER && l && sindex >= -1) {
-      els[sindex].onclick();
-    } else {
-      const relativePath = document.location.toString().match('/acp/') ? '../' : '';
-      new Ajax().load(
-        `${relativePath}misc/listloader.php?${queryParams}`,
-        {
-          callback: (xml) => {
-            const results = JSON.parse(xml.responseText);
-            d.innerHTML = '';
-            if (!results.length) {
-              d.style.display = 'none';
-            } else {
-              const [ids, values] = results;
-              ids.forEach((key, i) => {
-                const value = values[i];
-                const div = document.createElement('div');
-                div.innerHTML = value;
-                div.onclick = () => {
-                  div.parentNode.style.display = 'none';
-                  if (outputElement) {
-                    outputElement.value = key;
-                    outputElement.dispatchEvent(new Event('change'));
-                  }
-                  el$$1.value = value;
-                };
-                d.appendChild(div);
-              });
-            }
-          },
-        },
-      );
-    }
-  }
-
-  function decorateElement(element) {
-    // Disable native autocomplete behavior
-    element.autocomplete = 'off';
-    const action = element.dataset.autocompleteAction;
-    const output = element.dataset.autocompleteOutput;
-    const indicator = element.dataset.autocompleteIndicator;
-    const outputElement = output && document.querySelector(output);
-    const indicatorElement = indicator && document.querySelector(indicator);
-
-    if (indicatorElement && outputElement) {
-      outputElement.addEventListener('change', () => {
-        indicatorElement.classList.add(VALID_CLASS);
-      });
-    }
-    element.addEventListener('keyup', (event) => {
-      const searchTerm = encodeURIComponent(element.value);
-      if (indicatorElement) {
-        indicatorElement.classList.remove(VALID_CLASS);
-        indicatorElement.classList.add(INVALID_CLASS);
-      }
-      fetchResults(`act=${action}&term=${searchTerm}`, element, outputElement, event);
-    });
-  }
-
   /* global RUN */
 
   function gracefulDegrade(a) {
@@ -2239,6 +2210,28 @@
       });
     });
 
+    // Handle media players
+    const mediaPlayers = a.querySelectorAll('.media');
+    mediaPlayers.forEach((player) => {
+      const popoutLink = player.querySelector('a.popout');
+      const inlineLink = player.querySelector('a.inline');
+      const movie = player.querySelector('.movie');
+
+      popoutLink.addEventListener('click', (event) => {
+        event.preventDefault();
+        const win = new Window({
+          title: popoutLink.href,
+          content: movie.innerHTML,
+        });
+        win.create();
+      });
+
+      inlineLink.addEventListener('click', (event) => {
+        event.preventDefault();
+        movie.style.display = 'block';
+      });
+    });
+
     // Wire up AJAX forms
     // NOTE: This needs to come after editors, since they both hook into form onsubmit
     // and the editor hook needs to fire first
@@ -2282,6 +2275,30 @@
         : originalTitle;
     }, 1000);
   }
+
+  class Sound {
+    constructor() {
+      this.soundCache = {};
+    }
+
+    load(title, file, autoplay) {
+      const audio = new Audio();
+      this.soundCache[title] = audio;
+      audio.autoplay = !!autoplay;
+      audio.src = file;
+    }
+
+    play(title) {
+      this.soundCache[title].play();
+    }
+
+    loadAndPlay(title, file) {
+      this.load(title, file, true);
+    }
+  }
+
+  // Sound is a singleton
+  var Sound$1 = new Sound();
 
   /* global RUN, globalsettings */
 
@@ -2883,13 +2900,9 @@
     RUN.stream.load(`?module=privatemessage&im_menu=${uid}`);
   };
 
-  // Kinda hacky - these are all globals
+  // TODO: Make these not globally defined
   assign(window, {
-    JAX,
     RUN: RUN$1,
-    Sound: Sound$1,
-
-    // TODO: Make this not globally defined
     IMWindow,
   });
 

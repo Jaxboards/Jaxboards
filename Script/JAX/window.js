@@ -4,7 +4,7 @@ import { getHighestZIndex } from './el';
 import { assign, toggleOverlay, onImagesLoaded } from './util';
 
 class Window {
-  constructor() {
+  constructor(options = {}) {
     assign(this, {
       title: 'Title',
       wait: true,
@@ -16,6 +16,7 @@ class Window {
       className: '',
       pos: 'center',
       zIndex: getHighestZIndex(),
+      ...options,
     });
   }
 

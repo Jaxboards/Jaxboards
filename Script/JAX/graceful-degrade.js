@@ -17,6 +17,7 @@ import Editor from './editor';
 import {
   insertAfter,
 } from './el';
+import Window from './window';
 
 export default function gracefulDegrade(a) {
   if (typeof RUN !== 'undefined') {
@@ -127,6 +128,28 @@ export default function gracefulDegrade(a) {
     insertAfter(iframe, editor);
     editor.closest('form').addEventListener('submit', () => {
       iframe.editor.submit();
+    });
+  });
+
+  // Handle media players
+  const mediaPlayers = a.querySelectorAll('.media');
+  mediaPlayers.forEach((player) => {
+    const popoutLink = player.querySelector('a.popout');
+    const inlineLink = player.querySelector('a.inline');
+    const movie = player.querySelector('.movie');
+
+    popoutLink.addEventListener('click', (event) => {
+      event.preventDefault();
+      const win = new Window({
+        title: popoutLink.href,
+        content: movie.innerHTML,
+      });
+      win.create();
+    });
+
+    inlineLink.addEventListener('click', (event) => {
+      event.preventDefault();
+      movie.style.display = 'block';
     });
   });
 
