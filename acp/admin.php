@@ -154,7 +154,5 @@ $a = isset($JAX->g['act']) ? $JAX->g['act'] : null;
 
 if ($a && file_exists("./pages/${a}.php")) {
     include_once "./pages/${a}.php";
-} else {
-    include_once './pages/index.php';
 }
 $PAGE->out();

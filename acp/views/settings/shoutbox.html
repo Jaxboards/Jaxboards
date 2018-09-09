@@ -1,0 +1,30 @@
+<form method="post">
+  <label for="sbe">
+    Shoutbox enabled:
+  </label>
+  <input <% SHOUTBOX_CHECKED %> id="sbe" type="checkbox" name="sbe"
+  class="switch yn" />
+  <br />
+  <label for="sbava">
+    Shoutbox avatars:
+  </label>
+  <input <% SHOUTBOX_AVATAR_CHECKED %> type="checkbox" name="sbava"
+  class="switch yn" />
+  <br />
+  <label for="sbnum">
+    Shouts to show:
+    <br />
+    (Max 10)
+  </label>
+  <input type="text" name="sbnum" class="slider" value="<% SHOW_SHOUTS %>" />
+  <br />
+  <br />
+  <label for="clear">
+    Wipe shoutbox:
+  </label>
+  <input type="submit" name="clearall" value="Clear all shouts!"
+    onclick="return confirm('Are you sure you want to wipe your shoutbox?');">
+  <br />
+  <br />
+  <input type="submit" name="submit" value="Save" />
+</form>

@@ -9,8 +9,34 @@ class settings
 {
     public function __construct()
     {
-        global $JAX;
-        $this->leftBar();
+        global $JAX, $PAGE;
+
+        $links = array(
+            'global' => 'Global Settings',
+            'shoutbox' => 'Shoutbox',
+            'pages' => 'Custom Pages',
+            'birthday' => 'Birthdays',
+        );
+        $sidebarLinks = '';
+        foreach ($links as $do => $title) {
+            $sidebarLinks .= $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/sidebar-list-link.html',
+                array(
+                    'url' => '?act=settings&do=' . $do,
+                    'title' => $title,
+                )
+            ) . PHP_EOL;
+        }
+
+        $PAGE->sidebar(
+            $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/sidebar-list.html',
+                array(
+                    'content' => $sidebarLinks,
+                )
+            )
+        );
+
         if (!isset($JAX->b['do'])) {
             $JAX->b['do'] = null;
         }
@@ -21,39 +47,13 @@ class settings
             case 'shoutbox':
                 $this->shoutbox();
                 break;
-            case 'global':
-                $this->boardname();
-                break;
             case 'birthday':
                 $this->birthday();
                 break;
+            case 'global':
             default:
-                $this->showmain();
-                break;
+                $this->boardname();
         }
-    }
-
-    public function leftBar()
-    {
-        global $PAGE;
-        $sidebar = '';
-        $nav = array(
-            '?act=settings&do=global' => 'Global Settings',
-            '?act=settings&do=shoutbox' => 'Shoutbox',
-            '?act=settings&do=pages' => 'Custom Pages',
-            '?act=settings&do=birthday' => 'Birthdays',
-        );
-        foreach ($nav as $k => $v) {
-            $sidebar .= "<li><a href='${k}'>${v}</a></li>";
-        }
-        $sidebar = "<ul>${sidebar}</ul>";
-        $PAGE->sidebar($sidebar);
-    }
-
-    public function showmain()
-    {
-        global $PAGE;
-        $PAGE->addContentBox('Error', 'This page is under construction!');
     }
 
     public function boardname()
@@ -83,55 +83,40 @@ class settings
                 $page .= $PAGE->success('Settings saved!');
             }
         }
-        $boardName = $PAGE->getCFGSetting('boardname');
-        $logoUrl = $PAGE->getCFGSetting('logourl');
-        $page .= <<<EOT
-<form method="post">
-    <label for="boardname">
-        Board Name:
-    </label>
-    <input type="text" name="boardname" value="${boardName}" />
-    <br />
-    <label for="logourl">
-        Logo URL:
-    </label>
-    <input type="text" name="logourl" value="${logoUrl}" />
-    <br />
-    <input type="submit" value="Save" name="submit" />
-EOT;
+        $page .= $PAGE->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/settings/boardname.html',
+            array(
+                'board_name' => $PAGE->getCFGSetting('boardname'),
+                'logo_url' => $PAGE->getCFGSetting('logourl'),
+            )
+        );
         $PAGE->addContentBox('Board Name/Logo', $page);
-        $page = '';
 
+        $page = '';
         $boardOfflineCode = !$PAGE->getCFGSetting('boardoffline') ?
-            ' checked="checked"' : '';
+            'checked="checked"' : '';
         $boardOfflineText = $JAX->blockhtml(
             $PAGE->getCFGSetting('offlinetext')
         );
-        $page .= <<<EOT
-<label for="boardoffline">
-    Board Online
-</label>
-<input type="checkbox" name="boardoffline" class="switch yn"${boardOfflineCode}/>
-<br />
-EOT;
-
-        $page .= <<<EOT
-<label for="offlinetext" style="vertical-align:top;">
-    Offline Text:
-</label>
-<textarea name="offlinetext">${boardOfflineText}</textarea>
-<br />
-<input type="submit" name="submit" value="Save" />
-EOT;
-
-        $page = "${page}</form>";
+        $page .= $PAGE->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/settings/boardname-board-offline.html',
+            array(
+                'board_offline_checked' => !$PAGE->getCFGSetting('boardoffline') ?
+                    ' checked="checked"' : '',
+                'board_offline_text' => $JAX->blockhtml(
+                    $PAGE->getCFGSetting('offlinetext')
+                ),
+                'content' => $page,
+            )
+        );
         $PAGE->addContentBox('Board Online/Offline', $page);
     }
 
-    /*
-     * Pages
+    /**
+     * Custom pages
+     *
+     * @return void
      */
-
     public function pages()
     {
         global $DB,$PAGE,$JAX;
@@ -163,51 +148,20 @@ EOT;
         );
         $table = '';
         while ($f = $DB->arow($result)) {
-            $fAct = $f['act'];
-            $table .= <<<EOT
-<tr>
-    <td>
-        ${fAct}
-    </td>
-    <td>
-        <a href="../?act=${fAct}">
-            View
-        </a>
-    </td>
-    <td>
-        <a href="?act=settings&do=pages&page=${fAct}">
-            Edit
-        </a>
-    </td>
-    <td>
-        <a onclick="return confirm(\\'You sure?\\')"
-            href="?act=settings&do=pages&delete=${fAct}">
-            Delete
-        </a>
-    </td>
-</tr>'
-EOT;
+            $table .= $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/settings/pages-row.html',
+                array(
+                    'act' => $f['act'],
+                )
+            ) . PHP_EOL;
         }
         if ($table) {
-            $page .= <<<EOT
-<table class="pages">
-    <tr>
-        <th>
-            Act
-        </th>
-        <th>
-            &nbsp;
-        </th>
-        <th>
-            &nbsp;
-        </th>
-        <th>
-            &nbsp;
-        </th>
-    </tr>
-    ${table}
-</table>
-EOT;
+            $page .= $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/settings/pages.html',
+                array(
+                    'content' => $table,
+                )
+            );
         }
         $hiddenFields = $JAX->hiddenFormFields(
             array(
@@ -215,14 +169,12 @@ EOT;
                 'do' => 'pages',
             )
         );
-        $page .= <<<EOT
-<form method="get">
-    ${hiddenFields}
-    <br />
-    Add a new page at ?act=<input type="text" name="page" />
-    <input type="submit" value="Go" />
-</form>
-EOT;
+        $page .= $PAGE->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/settings/pages-new.html',
+            array(
+                'hidden_fields' => $hiddenFields,
+            )
+        );
         $PAGE->addContentBox('Custom Pages', $page);
     }
 
@@ -273,21 +225,20 @@ EOT;
                 "Page saved. Preview <a href='/?act=${pageurl}'>here</a>"
             );
         }
-        $pageCode = $JAX->blockhtml($pageinfo['page']);
-        $page .= <<<EOT
-<form method="post">
-    <textarea name="pagecontents" class="editor">${pageCode}</textarea>
-    <br />
-    <input type="submit" value="Save" />
-</form>
-EOT;
+        $page .= $PAGE->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/settings/pages-edit.html',
+            array(
+                'content' => $JAX->blockhtml($pageinfo['page']),
+            )
+        );
         $PAGE->addContentBox("Editing Page: ${pageurl}", $page);
     }
 
-    /*
+    /**
      * Shoutbox
+     *
+     * @return void
      */
-
     public function shoutbox()
     {
         global $PAGE,$JAX,$DB;
@@ -326,41 +277,16 @@ EOT;
                 $page .= $PAGE->success('Data saved.');
             }
         }
-        $shoutboxCode = $PAGE->getCFGSetting('shoutbox') ?
-            ' checked="checked"' : '';
-        $shoutboxAvatarCode = $PAGE->getCFGSetting('shoutboxava') ?
-            ' checked="checked"' : '';
-        $shoutboxShouts = $PAGE->getCFGSetting('shoutbox_num');
-        $page .= <<<EOT
-<form method="post">
-    <label for="sbe">
-        Shoutbox enabled:
-    </label>
-    <input id="sbe" type="checkbox" name="sbe" class="switch yn"${shoutboxCode} />
-    <br />
-    <label for="sbava">
-        Shoutbox avatars:
-    </label>
-    <input type="checkbox" name="sbava" class="switch yn" ${shoutboxAvatarCode} />
-    <br />
-    <label for="sbnum">
-        Shouts to show:
-        <br />
-        (Max 10)
-    </label>
-    <input type="text" name="sbnum" class="slider" value="${shoutboxShouts}" />
-    <br />
-    <br />
-    <label for="clear">
-        Wipe shoutbox:
-    </label>
-    <input type="submit" name="clearall" value="Clear all shouts!"
-        onclick="return confirm('Are you sure you want to wipe your shoutbox?');">
-    <br />
-    <br />
-    <input type="submit" name="submit" value="Save" />
-</form>
-EOT;
+        $page .= $PAGE->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/settings/shoutbox.html',
+            array(
+                'shoutbox_checked' => $PAGE->getCFGSetting('shoutbox') ?
+                    ' checked="checked"' : '',
+                'shoutbox_avatar_checked' => $PAGE->getCFGSetting('shoutboxava') ?
+                ' checked="checked"' : '',
+                'show_shouts' => $PAGE->getCFGSetting('shoutbox_num'),
+            )
+        );
         $PAGE->addContentBox('Shoutbox', $page);
     }
 
