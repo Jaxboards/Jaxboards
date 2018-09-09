@@ -21,7 +21,7 @@ class themes
         $sidebarLinks = '';
         foreach ($links as $do => $title) {
             $sidebarLinks .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/sidebar-list-link.html',
+                'sidebar-list-link.html',
                 array(
                     'url' => '?act=themes&do=' . $do,
                     'title' => $title,
@@ -31,7 +31,7 @@ class themes
 
         $PAGE->sidebar(
             $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/sidebar-list.html',
+                'sidebar-list.html',
                 array(
                     'content' => $sidebarLinks,
                 )
@@ -237,7 +237,7 @@ EOT;
             $wrapperOptions = '';
             foreach ($wrappers as $wrapper) {
                 $wrapperOptions .= $PAGE->parseTemplate(
-                    JAXBOARDS_ROOT . '/acp/views/select-option.html',
+                    'select-option.html',
                     array(
                         'value' => $wrapper,
                         'selected' => $wrapper == $f['wrapper'] ?
@@ -247,24 +247,23 @@ EOT;
                 ) . PHP_EOL;
             }
             $skins .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/themes/show-skin-index-css-row.html',
+                'themes/show-skin-index-css-row.html',
                 array(
                     'id' => $f['id'],
                     'title' => $f['title'],
                     'custom' => $f['custom'] ?
                         $PAGE->parseTemplate(
-                            JAXBOARDS_ROOT .
-                            '/acp/views/themes/show-skin-index-css-row-custom.html'
+                            'themes/show-skin-index-css-row-custom.html'
                         )  : '',
                     'view_or_edit' => $f['custom'] ? 'Edit' : 'View',
                     'delete' => $f['custom'] ? $PAGE->parseTemplate(
-                        JAXBOARDS_ROOT . '/acp/views/themes/show-skin-index-css-row-delete.html',
+                        'themes/show-skin-index-css-row-delete.html',
                         array(
                             'id' => $f['id'],
                         )
                     ) : '',
                     'default_option' => $f['custom'] ? '' : $PAGE->parseTemplate(
-                        JAXBOARDS_ROOT . '/acp/views/select-option.html',
+                        'select-option.html',
                         array(
                             'value' => '',
                             'selected' => '',
@@ -280,7 +279,7 @@ EOT;
         }
         $skins = ($errorskins ? $PAGE->error($errorskins) : '') .
             $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/themes/show-skin-index-css.html',
+                'themes/show-skin-index-css.html',
                 array(
                     'content' => $skins,
                 )
@@ -290,13 +289,12 @@ EOT;
         $wrap = '';
         foreach ($wrappers as $wrapper) {
             $wrap .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/themes/show-skin-index-wrapper-row.html',
+                'themes/show-skin-index-wrapper-row.html',
                 array(
                     'title' => $wrapper,
                     'delete' => in_array($wrapper, $usedwrappers) ? 'In use' :
                     $PAGE->parseTemplate(
-                        JAXBOARDS_ROOT .
-                        '/acp/views/themes/show-skin-index-wrapper-row-delete.html',
+                        'themes/show-skin-index-wrapper-row-delete.html',
                         array(
                             'title' => $wrapper,
                         )
@@ -305,7 +303,7 @@ EOT;
             ) . PHP_EOL;
         }
         $wrap = $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/themes/show-skin-index-wrapper.html',
+            'themes/show-skin-index-wrapper.html',
             array(
                 'content' => $wrap,
             )
@@ -339,7 +337,7 @@ EOT;
         $PAGE->addContentBox(
             ($skin['custom'] ? 'Editing' : 'Viewing') . ' Skin: ' . $skin['title'],
             $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/themes/edit-css.html',
+                'themes/edit-css.html',
                 array(
                     'content' => $JAX->blockhtml(
                         file_get_contents(
@@ -349,7 +347,7 @@ EOT;
                         )
                     ),
                     'save' => $skin['custom'] ? $PAGE->parseTemplate(
-                        JAXBOARDS_ROOT . '/acp/views/save-changes.html'
+                        'save-changes.html'
                     ) : '',
                 )
             )
@@ -386,7 +384,7 @@ EOT;
             $PAGE->addContentBox(
                 "Editing Wrapper: ${wrapper}",
                 $saved . $PAGE->parseTemplate(
-                    JAXBOARDS_ROOT . '/acp/views/themes/edit-wrapper.html',
+                    'themes/edit-wrapper.html',
                     array(
                         'content' => $JAX->blockhtml(file_get_contents($wrapperf)),
                     )
@@ -463,7 +461,7 @@ EOT;
         $wrapperOptions = '';
         foreach ($this->getwrappers() as $wrapper) {
             $wrapperOptions .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/select-option.html',
+                'select-option.html',
                 array(
                     'value' => $wrapper,
                     'label' => $wrapper,
@@ -472,7 +470,7 @@ EOT;
             ) . PHP_EOL;
         }
         $page .= $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/themes/create-skin.html',
+            'themes/create-skin.html',
             array(
                 'wrapper_options' => $wrapperOptions,
             )

@@ -21,7 +21,7 @@ class groups
         $sidebarLinks = '';
         foreach ($links as $do => $title) {
             $sidebarLinks .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/sidebar-list-link.html',
+                'sidebar-list-link.html',
                 array(
                     'url' => '?act=groups&do=' . $do,
                     'title' => $title,
@@ -30,7 +30,7 @@ class groups
         }
         $PAGE->sidebar(
             $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/sidebar-list.html',
+                'sidebar-list.html',
                 array(
                     'content' => $sidebarLinks,
                 )
@@ -226,7 +226,7 @@ EOT
         $groupHeadings = '';
         foreach ($perms as $groupId => $groupData) {
             $groupHeadings .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/groups/show-permissions-group-heading.html',
+                'groups/show-permissions-group-heading.html',
                 array(
                     'width_percent' => $widthPercent,
                     'id' => $groupId,
@@ -283,7 +283,7 @@ EOT
         foreach ($permissionsChart as $k => $v) {
             if ('breaker' == mb_substr($k, 0, 7)) {
                 $permissionsTable .= $PAGE->parseTemplate(
-                    JAXBOARDS_ROOT . '/acp/views/groups/show-permissions-breaker-row.html',
+                    'groups/show-permissions-breaker-row.html',
                     array(
                         'column_count' => 1 + $numgroups,
                         'title' => $v,
@@ -293,7 +293,7 @@ EOT
                 $groupColumns = '';
                 foreach ($perms as $groupId => $groupData) {
                     $groupColumns .= $PAGE->parseTemplate(
-                        JAXBOARDS_ROOT . '/acp/views/groups/show-permissions-permission-row-group-column.html',
+                        'groups/show-permissions-permission-row-group-column.html',
                         array(
                             'group_id' => $groupId,
                             'permission' => $k,
@@ -303,7 +303,7 @@ EOT
                     ) . PHP_EOL;
                 }
                 $permissionsTable .= $PAGE->parseTemplate(
-                    JAXBOARDS_ROOT . '/acp/views/groups/show-permissions-permission-row.html',
+                    'groups/show-permissions-permission-row.html',
                     array(
                         'title' => $v,
                         'group_columns' => $groupColumns,
@@ -313,7 +313,7 @@ EOT
         }
 
         $page .= $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/groups/show-permissions.html',
+            'groups/show-permissions.html',
             array(
                 'group_list' => $grouplist,
                 'group_headings' => $groupHeadings,
@@ -383,7 +383,7 @@ EOT
         }
 
         $page .= $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/groups/create.html',
+            'groups/create.html',
             array(
                 'title' => $gid ? $JAX->blockhtml($gdata['title']) : '',
                 'icon_url' => $gid ? $JAX->blockhtml($gdata['icon']) : '',
@@ -427,7 +427,7 @@ EOT
         while ($f = $DB->arow($result)) {
             $found = true;
             $page .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/groups/delete.html',
+                'groups/delete.html',
                 array(
                     'id' => $f['id'],
                     'title' => $f['title'],

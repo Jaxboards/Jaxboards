@@ -3,25 +3,25 @@
 
   <head>
     <meta charset="utf-8" />
-    <link rel="stylesheet" type="text/css" href="<% CSS_URL %>" />
-    <link rel="stylesheet" type="text/css" href="<% BBCODE_CSS_URL %>" />
-    <link rel="stylesheet" type="text/css" href="<% THEMES_CSS_URL %>" />
-    <script type="text/javascript" src="<% ADMIN_JS_URL %>"></script>
+    <link rel="stylesheet" type="text/css" href="{{ CSS_URL }}" />
+    <link rel="stylesheet" type="text/css" href="{{ BBCODE_CSS_URL }}" />
+    <link rel="stylesheet" type="text/css" href="{{ THEMES_CSS_URL }}" />
+    <script type="text/javascript" src="{{ ADMIN_JS_URL }}"></script>
     <title>
-      <% TITLE %>
+      {{ TITLE }}
     </title>
   </head>
 
   <body>
     <a id="header" href="admin.php"></a>
     <div id="userbox">Logged in as:
-      <% USERNAME %>
+      {{ USERNAME }}
       <a href="../">Back to Board</a></div>
-    <% NAV %>
+    {{ NAV }}
     <div id="page">
-      <% SIDEBAR %>
+      {{ SIDEBAR }}
       <div class="right">
-        <% CONTENT %>
+        {{ CONTENT }}
       </div>
     </div>
   </body>

@@ -4,7 +4,7 @@
       Moderators:
     </td>
     <td>
-      <% MOD_LIST %>
+      {{ MOD_LIST }}
       <br />
       <input type="text" name="name"
         data-autocomplete-action="searchmembers"
@@ -19,7 +19,7 @@
   <tr>
     <td>Show "Forum Led By":</td>
     <td>
-      <input <% SHOW_LED_BY %> type="checkbox" class="switch yn"
+      <input {{ SHOW_LED_BY }} type="checkbox" class="switch yn"
       name="show_ledby" />
     </td>
   </tr>

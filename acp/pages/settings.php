@@ -20,7 +20,7 @@ class settings
         $sidebarLinks = '';
         foreach ($links as $do => $title) {
             $sidebarLinks .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/sidebar-list-link.html',
+                'sidebar-list-link.html',
                 array(
                     'url' => '?act=settings&do=' . $do,
                     'title' => $title,
@@ -30,7 +30,7 @@ class settings
 
         $PAGE->sidebar(
             $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/sidebar-list.html',
+                'sidebar-list.html',
                 array(
                     'content' => $sidebarLinks,
                 )
@@ -84,7 +84,7 @@ class settings
             }
         }
         $page .= $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/settings/boardname.html',
+            'settings/boardname.html',
             array(
                 'board_name' => $PAGE->getCFGSetting('boardname'),
                 'logo_url' => $PAGE->getCFGSetting('logourl'),
@@ -99,7 +99,7 @@ class settings
             $PAGE->getCFGSetting('offlinetext')
         );
         $page .= $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/settings/boardname-board-offline.html',
+            'settings/boardname-board-offline.html',
             array(
                 'board_offline_checked' => !$PAGE->getCFGSetting('boardoffline') ?
                     ' checked="checked"' : '',
@@ -149,7 +149,7 @@ class settings
         $table = '';
         while ($f = $DB->arow($result)) {
             $table .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/settings/pages-row.html',
+                'settings/pages-row.html',
                 array(
                     'act' => $f['act'],
                 )
@@ -157,7 +157,7 @@ class settings
         }
         if ($table) {
             $page .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/settings/pages.html',
+                'settings/pages.html',
                 array(
                     'content' => $table,
                 )
@@ -170,7 +170,7 @@ class settings
             )
         );
         $page .= $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/settings/pages-new.html',
+            'settings/pages-new.html',
             array(
                 'hidden_fields' => $hiddenFields,
             )
@@ -226,7 +226,7 @@ class settings
             );
         }
         $page .= $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/settings/pages-edit.html',
+            'settings/pages-edit.html',
             array(
                 'content' => $JAX->blockhtml($pageinfo['page']),
             )
@@ -278,7 +278,7 @@ class settings
             }
         }
         $page .= $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/settings/shoutbox.html',
+            'settings/shoutbox.html',
             array(
                 'shoutbox_checked' => $PAGE->getCFGSetting('shoutbox') ?
                     ' checked="checked"' : '',
@@ -305,7 +305,7 @@ class settings
             );
         }
         $page = $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/settings/birthday.html',
+            'settings/birthday.html',
             array(
                 'checked' => $birthdays & 1 ? ' checked="checked"' : '',
             )

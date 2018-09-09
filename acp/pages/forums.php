@@ -19,7 +19,7 @@ class forums
         $sidebarLinks = '';
         foreach ($links as $do => $title) {
             $sidebarLinks .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/sidebar-list-link.html',
+                'sidebar-list-link.html',
                 array(
                     'url' => '?act=forums&do=' . $do,
                     'title' => $title,
@@ -27,7 +27,7 @@ class forums
             ) . PHP_EOL;
         }
         $sidebarLinks .= $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/sidebar-list-link.html',
+            'sidebar-list-link.html',
             array(
                 'url' => '?act=stats',
                 'title' => 'Recount Statistics',
@@ -36,7 +36,7 @@ class forums
 
         $PAGE->sidebar(
             $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/sidebar-list.html',
+                'sidebar-list.html',
                 array(
                     'content' => $sidebarLinks,
                 )
@@ -158,7 +158,7 @@ EOT
             $highlight
         );
         $page .= $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/forums/order-forums.html'
+            'forums/order-forums.html'
         );
         $PAGE->addContentBox('Forums', $page);
     }
@@ -239,7 +239,7 @@ EOT
                 if (isset($data[$id]['trashcan']) && $data[$id]['trashcan']) {
                     $trashcan =
                         $PAGE->parseTemplate(
-                            JAXBOARDS_ROOT . '/acp/views/forums/order-forums-tree-item-trashcan.html'
+                            'forums/order-forums-tree-item-trashcan.html'
                         );
                 } else {
                     $trashcan = '';
@@ -250,7 +250,7 @@ EOT
                 ) {
                     $modCount = count(explode(',', $data[$id]['mods']));
                     $mods = $PAGE->parseTemplate(
-                        JAXBOARDS_ROOT . '/acp/views/forums/order-forums-tree-item-mods.html',
+                        'forums/order-forums-tree-item-mods.html',
                         array(
                             'mod_count' => $modCount,
                             'content' => 'moderator' . (1 == $nummods ? '' : 's'),
@@ -270,7 +270,7 @@ EOT
                 }
                 $title = $data[$id]['title'];
                 $html .= $PAGE->parseTemplate(
-                    JAXBOARDS_ROOT . '/acp/views/forums/order-forums-tree-item.html',
+                    'forums/order-forums-tree-item.html',
                     array(
                         'class' => $classes,
                         'content' => $content,
@@ -283,7 +283,7 @@ EOT
             }
 
             return $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/forums/order-forums-tree.html',
+                'forums/order-forums-tree.html',
                 array(
                     'class' => $class ? : '',
                     'content' => $html,
@@ -524,7 +524,7 @@ EOT
                 }
             }
             $groupperms .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/forums/create-forum-permissions-row.html',
+                'forums/create-forum-permissions-row.html',
                 array(
                     'title' => $f['title'],
                     'global' => $this->checkbox($f['id'], 'global', $global),
@@ -574,7 +574,7 @@ EOT
         $subforumOptions = '';
         foreach ($subforumOptionsArray as $value => $label) {
             $subforumOptions .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/select-option.html',
+                'select-option.html',
                 array(
                     'value' => $value,
                     'label' => $label,
@@ -594,7 +594,7 @@ EOT
         $orderByOptions = '';
         foreach ($orderByOptionsArray as $value => $label) {
             $orderByOptions .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/select-option.html',
+                'select-option.html',
                 array(
                     'value' => $value,
                     'label' => $label,
@@ -606,7 +606,7 @@ EOT
 
 
         $page .= $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/forums/create-forum.html',
+            'forums/create-forum.html',
             array(
                 'title' => isset($fdata['title']) ? $JAX->blockhtml($fdata['title']) : '',
                 'description' => isset($fdata['subtitle']) ? $JAX->blockhtml($fdata['subtitle']) : '',
@@ -630,7 +630,7 @@ EOT
             $modList = '';
             while ($f = $DB->arow($result)) {
                 $modList .= $PAGE->parseTemplate(
-                    JAXBOARDS_ROOT . '/acp/views/forums/create-forum-moderators-mod.html',
+                    'forums/create-forum-moderators-mod.html',
                     array(
                         'username' => $f['display_name'],
                         'delete_link' => '?act=forums&edit=' . $fid . '&rmod=' . $f['id'],
@@ -642,7 +642,7 @@ EOT
         }
 
         $moderators = $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/forums/create-forum-moderators.html',
+            'forums/create-forum-moderators.html',
             array(
                 'mod_list' => $modList,
                 'show_led_by' => isset($fdata['show_ledby']) && $fdata['show_ledby'] ?
@@ -651,7 +651,7 @@ EOT
         );
 
         $forumperms = $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/forums/create-forum-permissions.html',
+            'forums/create-forum-permissions.html',
             array(
                 'content' => $groupperms,
                 'submit' => $fid ? 'Save' : 'Next',
@@ -723,7 +723,7 @@ EOT
                 'Forum Deletion',
                 $PAGE->success(
                     $PAGE->parseTemplate(
-                        JAXBOARDS_ROOT . '/acp/views/forums/delete-forum-deleted.html',
+                        'forums/delete-forum-deleted.html',
                         array(
                             'content' => $page,
                         )
@@ -766,7 +766,7 @@ EOT
         $forums = '';
         while ($f = $DB->arow($result)) {
             $forums .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/select-option.html',
+                'select-option.html',
                 array(
                     'value' => $f['id'],
                     'label' => $f['title'],
@@ -777,7 +777,7 @@ EOT
         $PAGE->addContentBox(
             'Deleting Forum: ' . $fdata['title'],
             $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/forums/delete-forum.html',
+                'forums/delete-forum.html',
                 array(
                     'forum_options' => $forums,
                 )
@@ -839,7 +839,7 @@ EOT
         $PAGE->addContentBox(
             ($cdata ? 'Edit' : 'Create') . ' Category',
             $page . PHP_EOL . $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/forums/create-category.html',
+                'forums/create-category.html',
                 array(
                     'id' => $cdata && isset($cdata['id']) ? $cdata['id'] : 0,
                     'title' => $categoryTitle,
@@ -900,7 +900,7 @@ EOT
             $categoryOptions = '';
             foreach ($categories as $categoryId => $categoryName) {
                 $categoryOptions .= $PAGE->parseTemplate(
-                    JAXBOARDS_ROOT . '/acp/views/select-option.html',
+                    'select-option.html',
                     array(
                         'value' => '' . $categoryId,
                         'label' => $categoryName,
@@ -909,7 +909,7 @@ EOT
                 ) . PHP_EOL;
             }
             $page .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/forums/delete-category.html',
+                'forums/delete-category.html',
                 array(
                     'category_options' => $categoryOptions,
                 )
@@ -963,7 +963,7 @@ EOT
         global $PAGE;
 
         return $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/forums/create-forum-permissions-row-checkbox.html',
+            'forums/create-forum-permissions-row-checkbox.html',
             array(
                 'id' => $id,
                 'name' => $name,

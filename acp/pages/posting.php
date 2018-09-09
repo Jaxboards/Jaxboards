@@ -19,7 +19,7 @@ class settings
         $sidebarLinks = '';
         foreach ($links as $do => $title) {
             $sidebarLinks .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/sidebar-list-link.html',
+                'sidebar-list-link.html',
                 array(
                     'url' => '?act=posting&do=' . $do,
                     'title' => $title,
@@ -29,7 +29,7 @@ class settings
 
         $PAGE->sidebar(
             $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/sidebar-list.html',
+                'sidebar-list.html',
                 array(
                     'content' => $sidebarLinks,
                 )
@@ -101,22 +101,22 @@ class settings
         }
         if (empty($wordfilter)) {
             $table = $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/posting/word-filter-empty.html'
+                'posting/word-filter-empty.html'
             ) . PHP_EOL . $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/posting/word-filter-submit-row.html'
+                'posting/word-filter-submit-row.html'
             );
         } else {
             $table = $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/posting/word-filter-heading.html'
+                'posting/word-filter-heading.html'
             ) . PHP_EOL . $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/posting/word-filter-submit-row.html'
+                'posting/word-filter-submit-row.html'
             );
             $currentFilters = array_reverse($wordfilter, true);
             foreach ($currentFilters as $filter => $result) {
                 $resultCode = $JAX->blockhtml($result);
                 $filterUrlEncoded = rawurlencode($filter);
                 $table .= $PAGE->parseTemplate(
-                    JAXBOARDS_ROOT . '/acp/views/posting/word-filter-row.html',
+                    'posting/word-filter-row.html',
                     array(
                         'filter' => $filter,
                         'result_code' => $resultCode,
@@ -126,7 +126,7 @@ class settings
             }
         }
         $page .= $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/posting/word-filter.html',
+            'posting/word-filter.html',
             array(
                 'content' => $table,
             )
@@ -189,17 +189,17 @@ class settings
         }
         if (empty($emoticons)) {
             $table = $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/posting/emoticon-heading.html'
+                'posting/emoticon-heading.html'
             ) . PHP_EOL . $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/posting/emoticon-submit-row.html'
+                'posting/emoticon-submit-row.html'
             ) . PHP_EOL . $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/posting/emoticon-empty-row.html'
+                'posting/emoticon-empty-row.html'
             );
         } else {
             $table = $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/posting/emoticon-heading.html'
+                'posting/emoticon-heading.html'
             ) . PHP_EOL . $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/posting/emoticon-submit-row.html'
+                'posting/emoticon-submit-row.html'
             );
             $emoticons = array_reverse($emoticons, true);
 
@@ -207,7 +207,7 @@ class settings
                 $smileyFile = $JAX->blockhtml($smileyFile);
                 $emoticonUrlEncoded = rawurlencode($emoticon);
                 $table .= $PAGE->parseTemplate(
-                    JAXBOARDS_ROOT . '/acp/views/posting/emoticon-row.html',
+                    'posting/emoticon-row.html',
                     array(
                         'emoticon' => $emoticon,
                         'smiley_url' => $smileyFile,
@@ -217,7 +217,7 @@ class settings
             }
         }
         $page .= $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/posting/emoticons.html',
+            'posting/emoticons.html',
             array(
                 'content' => $table,
             )
@@ -230,7 +230,7 @@ class settings
         $emoticonPackOptions = '';
         foreach ($basesets as $packId => $packName) {
             $emoticonPackOptions .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/select-option.html',
+                'select-option.html',
                 array(
                     'value' => $packId,
                     'label' => $packName,
@@ -244,7 +244,7 @@ class settings
         $emoticonRows = '';
         foreach ($rules as $emoticon => $smileyFile) {
             $emoticonRows .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/posting/emoticon-packs-row.html',
+                'posting/emoticon-packs-row.html',
                 array(
                     'emoticon' => $emoticon,
                     'smiley_url' => "/emoticons/${emoticonpath}/${smileyFile}",
@@ -252,7 +252,7 @@ class settings
             ) . PHP_EOL;
         }
         $page = $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/posting/emoticon-packs.html',
+            'posting/emoticon-packs.html',
             array(
                 'emoticon_packs' => $emoticonPackOptions,
                 'emoticon_rows' => $emoticonRows,
@@ -316,24 +316,24 @@ class settings
         $ratingsettings = $PAGE->getCFGSetting('ratings');
 
         $page2 .= $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/posting/post-rating-settings.html',
+            'posting/post-rating-settings.html',
             array(
                 'ratings_enabled' => $ratingsettings & 1 ? ' checked="checked"' : '',
                 'ratings_anonymous' => $ratingsettings & 2 ? ' checked="checked"' : '',
             )
         );
         $table = $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/posting/post-rating-heading.html'
+            'posting/post-rating-heading.html'
         );
         if (empty($niblets)) {
             $table .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/posting/post-rating-empty-row.html'
+                'posting/post-rating-empty-row.html'
             );
         } else {
             krsort($niblets);
             foreach ($niblets as $ratingId => $rating) {
                 $table .= $PAGE->parseTemplate(
-                    JAXBOARDS_ROOT . '/acp/views/posting/post-rating-row.html',
+                    'posting/post-rating-row.html',
                     array(
                         'id' => $ratingId,
                         'title' => $JAX->blockhtml($rating['title']),
@@ -343,7 +343,7 @@ class settings
             }
         }
         $page .= $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/posting/post-rating.html',
+            'posting/post-rating.html',
             array(
                 'content' => $table,
             )

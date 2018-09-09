@@ -50,7 +50,7 @@ class members
         $sidebarLinks = '';
         foreach ($links as $do => $title) {
             $sidebarLinks .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/sidebar-list-link.html',
+                'sidebar-list-link.html',
                 array(
                     'url' => '?act=members&do=' . $do,
                     'title' => $title,
@@ -58,7 +58,7 @@ class members
             ) . PHP_EOL;
         }
         $sidebarLinks .= $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/sidebar-list-link.html',
+            'sidebar-list-link.html',
             array(
                 'url' => '?act=stats',
                 'title' => 'Recount Statistics',
@@ -67,7 +67,7 @@ class members
 
         $PAGE->sidebar(
             $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/sidebar-list.html',
+                'sidebar-list.html',
                 array(
                     'content' => $sidebarLinks,
                 )
@@ -94,7 +94,7 @@ EOT
         $rows = '';
         while ($f = $DB->arow($result)) {
             $rows .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/members/show-main-row.html',
+                'members/show-main-row.html',
                 array(
                     'avatar_url' => $JAX->pick(
                         $f['avatar'],
@@ -109,7 +109,7 @@ EOT
         $PAGE->addContentBox(
             'Member List',
             $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/members/show-main.html',
+                'members/show-main.html',
                 array(
                     'rows' => $rows,
                 )
@@ -251,7 +251,7 @@ EOT
             if ($nummembers > 1) {
                 foreach ($data as $v) {
                     $page .= $PAGE->parseTemplate(
-                        JAXBOARDS_ROOT . '/acp/views/members/edit-select-option.html',
+                        'members/edit-select-option.html',
                         array(
                             'avatar_url' => $JAX->pick(
                                 $v['avatar'],
@@ -329,7 +329,7 @@ EOT
                 $page .= $this->heading('System-Generated Variables');
                 $page .= $this->formfield('Post Count:', 'posts', $data['posts']);
                 $page = $PAGE->parseTemplate(
-                    JAXBOARDS_ROOT . '/acp/views/members/edit-form.html',
+                    'members/edit-form.html',
                     array(
                         'content' => $page,
                     )
@@ -337,7 +337,7 @@ EOT
             }
         } else {
             $page = $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/members/edit.html'
+                'members/edit.html'
             );
         }
         $PAGE->addContentBox(
@@ -407,7 +407,7 @@ EOT
             }
         }
         $page .= $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/members/pre-register.html'
+            'members/pre-register.html'
         );
         $PAGE->addContentBox('Pre-Register', $page);
     }
@@ -423,7 +423,7 @@ EOT
         );
         while ($f = $DB->arow($result)) {
             $page .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/select-option.html',
+                'select-option.html',
                 array(
                     'value' => $f['id'],
                     'label' => $f['title'],
@@ -433,7 +433,7 @@ EOT
         }
 
         return $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/members/get-groups.html',
+            'members/get-groups.html',
             array(
                 'content' => $page,
             )
@@ -606,7 +606,7 @@ EOT
             'Account Merge',
             $page . PHP_EOL .
             $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/members/merge.html'
+                'members/merge.html'
             )
         );
     }
@@ -682,7 +682,7 @@ EOT
             'Delete Account',
             $page . PHP_EOL .
             $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/members/delete.html'
+                'members/delete.html'
             )
         );
     }
@@ -760,7 +760,7 @@ EOT
         $PAGE->addContentBox(
             'IP Bans',
             $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/members/ip-bans.html',
+                'members/ip-bans.html',
                 array(
                     'content' => htmlspecialchars($data),
                 )
@@ -808,7 +808,7 @@ EOT
             'Mass Message',
             $page . PHP_EOL .
             $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/members/mass-message.html'
+                'members/mass-message.html'
             )
         );
     }
@@ -825,7 +825,7 @@ EOT
             );
         }
         $page = $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/members/validation.html',
+            'members/validation.html',
             array(
                 'checked' => $PAGE->getCFGSetting('membervalidation')
                 ? 'checked="checked"' : '',
@@ -854,7 +854,7 @@ EOT
         $page = '';
         while ($f = $DB->arow($result)) {
             $page .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/members/validation-list-row.html',
+                'members/validation-list-row.html',
                 array(
                     'id' => $f['id'],
                     'title' => $f['display_name'],
@@ -865,7 +865,7 @@ EOT
             ) . PHP_EOL;
         }
         $page = $page ? $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/members/validation-list.html',
+            'members/validation-list.html',
             array(
                 'content' => $page,
             )
@@ -879,7 +879,7 @@ EOT
 
         if (mb_strtolower($which) === 'textarea') {
             return $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/members/edit-form-field-textarea.html',
+                'members/edit-form-field-textarea.html',
                 array(
                     'label' => $label,
                     'title' => $name,
@@ -888,7 +888,7 @@ EOT
             ) . PHP_EOL;
         } else {
             return $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/members/edit-form-field-text.html',
+                'members/edit-form-field-text.html',
                 array(
                     'label' => $label,
                     'title' => $name,
@@ -903,7 +903,7 @@ EOT
         global $PAGE;
 
         return $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/members/edit-heading.html',
+            'members/edit-heading.html',
             array(
                 'value' => $value,
             )

@@ -1,7 +1,7 @@
 <form method="post">
   Currently using:
   <select name="baseset" onchange="this.form.submit()">
-    <% EMOTICON_PACKS %>
+    {{ EMOTICON_PACKS }}
   </select>
 </form>
 <br />
@@ -15,5 +15,5 @@
       Image
     </th>
   </tr>
-  <% EMOTICON_ROWS %>
+  {{ EMOTICON_ROWS }}
 </table>

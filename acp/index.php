@@ -108,6 +108,6 @@ if ($submitted) {
 
 
 echo $PAGE->parseTemplate(
-    JAXBOARDS_ROOT . '/acp/views/login.html',
+    'login.html',
     $themeElements
 );

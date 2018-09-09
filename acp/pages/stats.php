@@ -29,7 +29,7 @@ class stats
         $PAGE->addContentBox(
             'Board Statistics',
             $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/stats/show-stats.html'
+                'stats/show-stats.html'
             )
         );
     }
@@ -192,7 +192,7 @@ EOT
             'Board Statistics',
             $PAGE->success('Board statistics recounted successfully.') .
             PHP_EOL . $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/stats/recount-statistics.html'
+                'stats/recount-statistics.html'
             )
         );
     }

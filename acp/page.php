@@ -35,7 +35,7 @@ class PAGE
     public function addNavmenu($title, $page, $menu)
     {
         $this->partparts['nav'] .= $this->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/nav-link.html',
+            'nav-link.html',
             array(
                 'page' => $page,
                 'class' => mb_strtolower($title),
@@ -46,7 +46,7 @@ class PAGE
         $navDropdownLinksTemplate = '';
         foreach ($menu as $menu_url => $menu_title) {
             $navDropdownLinksTemplate .= $this->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/nav-dropdown-link.html',
+                'nav-dropdown-link.html',
                 array(
                     'url' => $menu_url,
                     'title' => $menu_title,
@@ -55,7 +55,7 @@ class PAGE
         }
 
         $this->partparts['navdropdowns'] .= $this->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/nav-dropdown.html',
+            'nav-dropdown.html',
             array(
                 'dropdown_id' => 'menu_' . mb_strtolower($title),
                 'dropdown_links' => $navDropdownLinksTemplate,
@@ -72,7 +72,7 @@ class PAGE
     {
         if ($sidebar) {
             $this->parts['sidebar'] = $this->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/sidebar.html',
+                'sidebar.html',
                 array(
                     'content' => $sidebar,
                 )
@@ -90,7 +90,7 @@ class PAGE
     public function addContentBox($title, $content)
     {
         $this->parts['content'] .= $this->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/content-box.html',
+            'content-box.html',
             array(
                 'title' => $title,
                 'content' => $content,
@@ -110,7 +110,7 @@ class PAGE
         }
 
         $data['nav'] = $this->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/nav.html',
+            'nav.html',
             array(
                 'nav' => $this->partparts['nav'],
                 'nav_dropdowns' => $this->partparts['navdropdowns'],
@@ -122,7 +122,7 @@ class PAGE
         $data['admin_js_url'] = BOARDURL . 'dist/acp.js';
 
         echo $this->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/admin.html',
+            'admin.html',
             $data
         );
     }
@@ -130,7 +130,7 @@ class PAGE
     public function back()
     {
         return $this->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/back.html',
+            'back.html',
             array()
         );
     }
@@ -138,7 +138,7 @@ class PAGE
     public function error($a)
     {
         return $this->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/error.html',
+            'error.html',
             array(
                 'content' => $a,
             )
@@ -148,7 +148,7 @@ class PAGE
     public function success($a)
     {
         return $this->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/success.html',
+            'success.html',
             array(
                 'content' => $a,
             )
@@ -218,7 +218,11 @@ EOT;
     /**
      * Parse a template file, replacing <% TAGS %> with the appropriate $data
      *
-     * @param string $templtaeFile  The path to the template file.
+     * @param string $templtaeFile  The path to the template file. Paths
+     *                              that don't start with a '/' character
+     *                              will start searching in the
+     *                              JAXBOARDS_ROOT/acp/views/
+     *                              directory.
      * @param array  $data          A key => value array, where <% KEY %>
      *                              is replaced by value
      *
@@ -226,6 +230,10 @@ EOT;
      */
     public function parseTemplate($templateFile, $data = null)
     {
+        if (mb_substr($templateFile, 0, 1) !== '/') {
+            $templateFile = JAXBOARDS_ROOT . '/acp/views/' . $templateFile;
+        }
+
         $fileError = false;
         if (is_file($templateFile)) {
             try {
@@ -246,7 +254,7 @@ EOT;
         if (is_array($data)) {
             foreach ($data as $name => $content) {
                 $template = str_replace(
-                    '<% ' . mb_strtoupper($name) . ' %>',
+                    '{{ ' . mb_strtoupper($name) . ' }}',
                     $content,
                     $template
                 );

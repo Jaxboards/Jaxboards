@@ -119,7 +119,7 @@ $PAGE->addNavMenu(
     '?act=themes',
     array(
         '?act=themes' => 'Manage Skin(s)',
-        '?act=themes&page=create' => 'Create Skin',
+        '?act=themes&do=create' => 'Create Skin',
     )
 );
 $PAGE->addNavMenu(

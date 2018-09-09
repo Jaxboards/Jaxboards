@@ -1,27 +1,27 @@
 <tr>
   <td>
-    <% TITLE %>
+    {{ TITLE }}
   </td>
   <td>
-    <% ID %>
+    {{ ID }}
   </td>
   <td>
-    <% FILESIZE %>
+    {{ FILESIZE }}
   </td>
   <td align="center">
-    <input type="text" style="text-align:center;width:40px;" name='dl[<% ID %>]'
-      value="<% DOWNLOADS %>" />
+    <input type="text" style="text-align:center;width:40px;" name='dl[{{ ID }}]'
+      value="{{ DOWNLOADS }}" />
   </td>
   <td>
-    <a href="../?act=vu<% USER_ID %>">
-      <% USERNAME %>
+    <a href="../?act=vu{{ USER_ID }}">
+      {{ USERNAME }}
     </a>
   </td>
   <td>
-    <% LINKED_IN %>
+    {{ LINKED_IN }}
   </td>
   <td align="center">
-    <a onclick="return confirm('You sure?')" href="?act=tools&do=files&delete=<% ID %>"
+    <a onclick="return confirm('You sure?')" href="?act=tools&do=files&delete={{ ID }}"
       class="icons delete">
     </a>
   </td>

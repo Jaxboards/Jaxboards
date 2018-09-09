@@ -18,7 +18,7 @@ class tools
         $sidebarLinks = '';
         foreach ($links as $do => $title) {
             $sidebarLinks .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/sidebar-list-link.html',
+                'sidebar-list-link.html',
                 array(
                     'url' => '?act=tools&do=' . $do,
                     'title' => $title,
@@ -28,7 +28,7 @@ class tools
 
         $PAGE->sidebar(
             $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/sidebar-list.html',
+                'sidebar-list.html',
                 array(
                     'content' => $sidebarLinks,
                 )
@@ -114,7 +114,7 @@ EOT
             );
             foreach ($m[1] as $v) {
                 $linkedin[$v][] = $PAGE->parseTemplate(
-                    JAXBOARDS_ROOT . '/acp/views/tools/attachment-link.html',
+                    'tools/attachment-link.html',
                     array(
                         'topic_id' => $f['tid'],
                         'post_id' => $f['id'],
@@ -151,7 +151,7 @@ EOT
                     $file['id'] . '">' . $file['name'] . '</a>';
             }
             $table .= $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/tools/file-manager-row.html',
+                'tools/file-manager-row.html',
                 array(
                     'id' => $file['id'],
                     'title' => $file['name'],
@@ -165,7 +165,7 @@ EOT
             ) . PHP_EOL;
         }
         $page .= $table ? $PAGE->parseTemplate(
-            JAXBOARDS_ROOT . '/acp/views/tools/file-manager.html',
+            'tools/file-manager.html',
             array(
                 'content' => $table,
             )
@@ -228,7 +228,7 @@ EOT
         $PAGE->addContentBox(
             'Backup Forum',
             $PAGE->parseTemplate(
-                JAXBOARDS_ROOT . '/acp/views/tools/backup.html'
+                'tools/backup.html'
             )
         );
     }
