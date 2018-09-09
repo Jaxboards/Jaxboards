@@ -208,9 +208,7 @@ EOT
                 );
             }
             $form = '<form method="post" data-ajax-form="true"
-                onsubmit="document.querySelector(\'#pdedit\').editor.submit();' .
-                'if(this.submitButton.value.match(/post/i)) ' .
-                'this.submitButton.disabled=true;">
+                onsubmit="if(this.submitButton.value.match(/post/i)) this.submitButton.disabled=true;">
  <div class="topicform">
  <input type="hidden" name="act" value="post" />
  <input type="hidden" name="how" value="newtopic" />
@@ -221,10 +219,9 @@ EOT
   <label for="tdesc">Description:</label>
 <input type="text" id="tdesc" name="tdesc" value="' . $tdata['subtitle'] . '" />
 <br />
-  <textarea name="postdata" id="postdata">' . $JAX->blockhtml($postdata) .
+  <textarea name="postdata" id="postdata" class="bbcode-editor">' . $JAX->blockhtml($postdata) .
             '</textarea>
-  <iframe id="pdedit" onload="new JAX.Editor(document.querySelector(\'#postdata\'),this)"
-style="display:none"></iframe><br /><div class="postoptions">
+<br /><div class="postoptions">
   ' . ($fdata['perms']['poll'] ? '<label class="addpoll" for="addpoll">Add a
 Poll</label> <select name="poll_type" onchange="document.querySelector(\'#polloptions\').' .
             'style.display=this.value?\'block\':\'none\'">
@@ -338,12 +335,11 @@ EOT
 
         $form = '<div class="postform">
 <form method="post" data-ajax-form="true" onsubmit="if(this.submitButton.value.match(/post/i)) ' .
-            'this.submitButton.disabled=true;document.querySelector(\'#pdedit\').editor.submit();" ' .
+            'this.submitButton.disabled=true;" ' .
             'enctype="multipart/form-data">
  ' . $vars . '
-  <textarea name="postdata" id="post">' . $postdata .
-        '</textarea><iframe id="pdedit" onload="new JAX.Editor(document.querySelector(\'#post\'),this)"
-  style="display:none"></iframe><br />' .
+  <textarea name="postdata" id="post" class="bbcode-editor">' . $postdata .
+        '</textarea><br />' .
         ($tdata['perms']['upload'] ? '<div id="attachfiles">Add Files
   <input type="file" name="Filedata" /></div>' : '') .
         '<div class="buttons"><input type="submit" name="submit"

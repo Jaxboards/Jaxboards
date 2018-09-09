@@ -1,14 +1,11 @@
-<form method="post" data-ajax-form="true" onsubmit="document.querySelector('#npedit').editor.submit();">
+<form method="post" data-ajax-form="true">
   %s
   Signature preview:
   <br />
   %s
   <br />
   <br />
-  <textarea name="changesig" id="changesig">%s</textarea>
-  <iframe id="npedit" onload="new JAX.Editor(document.querySelector('#changesig'),this)"
-    style="display:none">
-  </iframe>
+  <textarea name="changesig" id="changesig" class="bbcode-editor">%s</textarea>
   <br />
   <input type="submit" value="Change" />
 </form>

@@ -1,4 +1,4 @@
-<form method="post" data-ajax-form="true" onsubmit="document.querySelector('#abouteditor').editor.submit();">
+<form method="post" data-ajax-form="true">
   %s
   <h2>
     Name:
@@ -31,10 +31,7 @@
     About you:
   </h2>
   <div class="description">
-    <textarea rows="10" cols="60" name="about" id="about">%s</textarea>
-    <iframe id="abouteditor" onload="new JAX.Editor(document.querySelector('#about'),this)"
-      style="display:none">
-    </iframe>
+    <textarea rows="10" cols="60" name="about" id="about" class="bbcode-editor">%s</textarea>
     <h2>
       Location
     </h2>

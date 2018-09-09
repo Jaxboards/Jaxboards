@@ -1,4 +1,4 @@
-<form method="post" data-ajax-form="true" onsubmit="document.querySelector('#npedit').editor.submit();">
+<form method="post" data-ajax-form="true">
   %s
   <div class="username">
     %s
@@ -6,9 +6,6 @@
   <div class="avatar">
     <img src="%s" />
   </div>
-  <textarea id="notepad" name="ucpnotepad">%s</textarea>
-  <iframe id="npedit" onload="new JAX.Editor(document.querySelector('#notepad'),this)"
-    style="display:none">
-  </iframe>
+  <textarea id="notepad" name="ucpnotepad" class="bbcode-editor">%s</textarea>
   <input type="submit" value="Save" />
 </form>

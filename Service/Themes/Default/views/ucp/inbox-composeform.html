@@ -1,5 +1,5 @@
 <div class="composeform">
-  <form method="post" data-ajax-form="true" onsubmit="document.querySelector('#pdedit').editor.submit();">
+  <form method="post" data-ajax-form="true">
     %1$s
     <div>
       <label for="to">
@@ -22,10 +22,7 @@
       <input type="text" id="title" name="title" value="%5$s" />
     </div>
     <div>
-      <textarea id="message" name="message">%6$s</textarea>
-      <iframe id="pdedit" onload="new JAX.Editor(document.querySelector('#message'),this)"
-        style="display:none">
-      </iframe>
+      <textarea id="message" name="message" class="bbcode-editor">%6$s</textarea>
     </div>
     <input type="submit" value="Send" />
   </form>

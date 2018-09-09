@@ -13,6 +13,10 @@ import {
   onImagesLoaded,
   updateDates,
 } from './util';
+import Editor from './editor';
+import {
+  insertAfter,
+} from './el';
 
 export default function gracefulDegrade(a) {
   if (typeof RUN !== 'undefined') {
@@ -105,7 +109,30 @@ export default function gracefulDegrade(a) {
     });
   });
 
+  // Handle tabs
+  const tabContainers = a.querySelectorAll('.tabs');
+  tabContainers.forEach((tabContainer) => {
+    const { tabSelector } = tabContainer.dataset;
+    tabContainer.addEventListener('click', event => handleTabs(event, tabContainer, tabSelector));
+  });
+
+  // Handle BBCode editors
+  const editors = a.querySelectorAll('textarea.bbcode-editor');
+  editors.forEach((editor) => {
+    const iframe = document.createElement('iframe');
+    iframe.addEventListener('load', () => {
+      iframe.editor = new Editor(editor, iframe);
+    });
+    iframe.style.display = 'none';
+    insertAfter(iframe, editor);
+    editor.closest('form').addEventListener('submit', () => {
+      iframe.editor.submit();
+    });
+  });
+
   // Wire up AJAX forms
+  // NOTE: This needs to come after editors, since they both hook into form onsubmit
+  // and the editor hook needs to fire first
   const ajaxForms = a.querySelectorAll('form[data-ajax-form]');
   ajaxForms.forEach((ajaxForm) => {
     const resetOnSubmit = ajaxForm.dataset.ajaxForm === 'resetOnSubmit';
@@ -113,12 +140,5 @@ export default function gracefulDegrade(a) {
       event.preventDefault();
       RUN.submitForm(ajaxForm, resetOnSubmit);
     });
-  });
-
-  // Handle tabs
-  const tabContainers = a.querySelectorAll('.tabs');
-  tabContainers.forEach((tabContainer) => {
-    const { tabSelector } = tabContainer.dataset;
-    tabContainer.addEventListener('click', event => handleTabs(event, tabContainer, tabSelector));
   });
 }

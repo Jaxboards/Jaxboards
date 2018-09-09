@@ -17,21 +17,7 @@ const isURL = text => URL_REGEX.test(text);
 
 class Editor {
   constructor(textarea, iframe) {
-    if (!iframe.timedout) {
-      iframe.timedout = true;
-      setTimeout(() => {
-        // eslint-disable-next-line no-new
-        new Editor(textarea, iframe);
-      }, 100);
-      return null;
-    }
-
-    if (iframe.editor) {
-      return null;
-    }
-
     this.iframe = iframe;
-    iframe.editor = this;
     iframe.className = 'editorframe';
     // 1 for html editing mode, 0 for textarea mode
     this.mode = Browser.mobile || Browser.n3ds ? 0 : globalsettings.wysiwyg;
@@ -66,7 +52,6 @@ class Editor {
       this.setSource(bbcodeToHTML(textarea.value));
       this.switchMode(this.mode);
     }, 100);
-    return this;
   }
 
   buildEditBar() {

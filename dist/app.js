@@ -792,21 +792,7 @@
 
   class Editor {
     constructor(textarea, iframe) {
-      if (!iframe.timedout) {
-        iframe.timedout = true;
-        setTimeout(() => {
-          // eslint-disable-next-line no-new
-          new Editor(textarea, iframe);
-        }, 100);
-        return null;
-      }
-
-      if (iframe.editor) {
-        return null;
-      }
-
       this.iframe = iframe;
-      iframe.editor = this;
       iframe.className = 'editorframe';
       // 1 for html editing mode, 0 for textarea mode
       this.mode = Browser.mobile || Browser.n3ds ? 0 : globalsettings.wysiwyg;
@@ -841,7 +827,6 @@
         this.setSource(bbcodeToHTML(textarea.value));
         this.switchMode(this.mode);
       }, 100);
-      return this;
     }
 
     buildEditBar() {
@@ -2233,7 +2218,30 @@
       });
     });
 
+    // Handle tabs
+    const tabContainers = a.querySelectorAll('.tabs');
+    tabContainers.forEach((tabContainer) => {
+      const { tabSelector } = tabContainer.dataset;
+      tabContainer.addEventListener('click', event => handleTabs(event, tabContainer, tabSelector));
+    });
+
+    // Handle BBCode editors
+    const editors = a.querySelectorAll('textarea.bbcode-editor');
+    editors.forEach((editor) => {
+      const iframe = document.createElement('iframe');
+      iframe.addEventListener('load', () => {
+        iframe.editor = new Editor(editor, iframe);
+      });
+      iframe.style.display = 'none';
+      insertAfter(iframe, editor);
+      editor.closest('form').addEventListener('submit', () => {
+        iframe.editor.submit();
+      });
+    });
+
     // Wire up AJAX forms
+    // NOTE: This needs to come after editors, since they both hook into form onsubmit
+    // and the editor hook needs to fire first
     const ajaxForms = a.querySelectorAll('form[data-ajax-form]');
     ajaxForms.forEach((ajaxForm) => {
       const resetOnSubmit = ajaxForm.dataset.ajaxForm === 'resetOnSubmit';
@@ -2241,13 +2249,6 @@
         event.preventDefault();
         RUN.submitForm(ajaxForm, resetOnSubmit);
       });
-    });
-
-    // Handle tabs
-    const tabContainers = a.querySelectorAll('.tabs');
-    tabContainers.forEach((tabContainer) => {
-      const { tabSelector } = tabContainer.dataset;
-      tabContainer.addEventListener('click', event => handleTabs(event, tabContainer, tabSelector));
     });
   }
 
