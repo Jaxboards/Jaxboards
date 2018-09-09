@@ -30,7 +30,7 @@ class forums
             JAXBOARDS_ROOT . '/acp/views/sidebar-list-link.html',
             array(
                 'url' => '?act=stats',
-                'title' => 'Refresh Statistics',
+                'title' => 'Recount Statistics',
             )
         ) . PHP_EOL;
 

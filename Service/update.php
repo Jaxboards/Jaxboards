@@ -1519,7 +1519,7 @@ EOT
         $queries = array(
             <<<EOT
     ALTER TABLE $table
-        ADD `birthdate` date NOT NULL AFTER `dob_year`;
+        ADD `birthdate` date NOT NULL DEFAULT '0000-00-00' AFTER `dob_year`;
 EOT
         ,
             <<<EOT

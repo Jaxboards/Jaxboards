@@ -9,7 +9,10 @@ class members
     public function __construct()
     {
         global $JAX,$PAGE;
-        switch (@$JAX->b['do']) {
+        if (!isset($JAX->b['do'])) {
+            $JAX->b['do'] = null;
+        }
+        switch ($JAX->b['do']) {
             case 'merge':
                 $this->merge();
                 break;
@@ -35,19 +38,41 @@ class members
                 $this->showmain();
                 break;
         }
-        $sidebar = '';
-        foreach (array(
-            '?act=members&do=edit' => 'Edit Members',
-            '?act=members&do=prereg' => 'Pre-Register',
-            '?act=members&do=merge' => 'Account Merge',
-            '?act=members&do=delete' => 'Delete Account',
-            '?act=members&do=massmessage' => 'Mass Message',
-            '?act=members&do=ipbans' => 'IP Bans',
-            '?act=members&do=validation' => 'Validation',
-        ) as $k => $v) {
-            $sidebar .= "<li><a href='${k}'>${v}</a></li>";
+        $links = array(
+            'edit' => 'Edit Members',
+            'prereg' => 'Pre-Register',
+            'merge' => 'Account Merge',
+            'delete' => 'Delete Account',
+            'massmessage' => 'Mass Message',
+            'ipbans' => 'IP Bans',
+            'validation' => 'Validation',
+        );
+        $sidebarLinks = '';
+        foreach ($links as $do => $title) {
+            $sidebarLinks .= $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/sidebar-list-link.html',
+                array(
+                    'url' => '?act=members&do=' . $do,
+                    'title' => $title,
+                )
+            ) . PHP_EOL;
         }
-        $PAGE->sidebar("<ul>${sidebar}</ul>");
+        $sidebarLinks .= $PAGE->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/sidebar-list-link.html',
+            array(
+                'url' => '?act=stats',
+                'title' => 'Recount Statistics',
+            )
+        ) . PHP_EOL;
+
+        $PAGE->sidebar(
+            $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/sidebar-list.html',
+                array(
+                    'content' => $sidebarLinks,
+                )
+            )
+        );
     }
 
     public function showmain()
@@ -66,26 +91,43 @@ EOT
             ,
             array('members', 'member_groups')
         );
-        $page = '<table><tr><th></th><th>Name</th><th>ID</th></tr>';
+        $rows = '';
         while ($f = $DB->arow($result)) {
-            $page .= "<tr><td><img src='" . $JAX->pick(
-                $f['avatar'],
-                AVAURL . 'default.gif'
-            ) . "' width='50' height='50' /></td><td>" .
-            "<a href='?act=members&do=edit&mid=" . $f['id'] . "'>" .
-            $f['display_name'] . '</a><br />' . $f['group_title'] .
-            '</td><td>' . $f['id'] . '</td></tr>';
+            $rows .= $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/members/show-main-row.html',
+                array(
+                    'avatar_url' => $JAX->pick(
+                        $f['avatar'],
+                        AVAURL . 'default.gif'
+                    ),
+                    'id' => $f['id'],
+                    'title' => $f['display_name'],
+                    'group_title' => $f['group_title'],
+                )
+            ) . PHP_EOL;
         }
-        $page .= '</table>';
-        $PAGE->addContentBox('Member List', $page);
+        $PAGE->addContentBox(
+            'Member List',
+            $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/members/show-main.html',
+                array(
+                    'rows' => $rows,
+                )
+            )
+        );
     }
 
     public function editmem()
     {
         global $PAGE,$JAX,$DB;
         $page = '';
-        if (@$JAX->b['mid'] || @$JAX->p['submit']) {
-            if (@$JAX->b['mid'] && is_numeric(@$JAX->b['mid'])) {
+        if ((isset($JAX->b['mid']) && $JAX->b['mid'])
+            || (isset($JAX->p['submit']) && $JAX->p['submit'])
+        ) {
+            if (isset($JAX->b['mid'])
+                && $JAX->b['mid']
+                && is_numeric($JAX->b['mid'])
+            ) {
                 $result = $DB->safeselect(
                     <<<'EOT'
 `id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
@@ -107,7 +149,7 @@ EOT
                 );
                 $data = $DB->arow($result);
                 $DB->disposeresult($result);
-                if (@$JAX->p['savedata']) {
+                if (isset($JAX->p['savedata']) && $JAX->p['savedata']) {
                     if (2 != $data['group_id'] || 1 == $JAX->userData['id']) {
                         $write = array();
                         if ($JAX->p['password']) {
@@ -116,7 +158,7 @@ EOT
                                 PASSWORD_DEFAULT
                             );
                         }
-                        foreach (array(
+                        $fields = array(
                             'display_name',
                             'name',
                             'full_name',
@@ -136,8 +178,12 @@ EOT
                             'contact_yim',
                             'website',
                             'posts',
-                            'group_id', ) as $v) {
-                            $write[$v] = $JAX->p[$v];
+                            'group_id',
+                        );
+                        foreach ($fields as $field) {
+                            if (isset($JAX->p[$field])) {
+                                $write[$field] = $JAX->p[$field];
+                            }
                         }
                         // Make it so root admins can't get out of admin.
                         if (1 == $JAX->b['mid']) {
@@ -204,12 +250,17 @@ EOT
             $nummembers = count($data);
             if ($nummembers > 1) {
                 foreach ($data as $v) {
-                    $page .= '<div><img width="100px" height="100px" ' .
-                        'align="middle" src="' . $JAX->pick(
-                            $v['avatar'],
-                            AVAURL . 'default.gif'
-                        ) . '" /> <a href="?act=members&do=edit&mid=' . $v['id'] .
-                        '">' . $v['display_name'] . '</a></div>';
+                    $page .= $PAGE->parseTemplate(
+                        JAXBOARDS_ROOT . '/acp/views/members/edit-select-option.html',
+                        array(
+                            'avatar_url' => $JAX->pick(
+                                $v['avatar'],
+                                AVAURL . 'default.gif'
+                            ),
+                            'id' => $v['id'],
+                            'title' => $v['display_name'],
+                        )
+                    ) . PHP_EOL;
                 }
 
                 return $PAGE->addContentBox('Select Member to Edit', $page);
@@ -227,92 +278,71 @@ EOT
                     $PAGE->back()
                 );
             } else {
-                function formfield($label, $name, $value, $which = 'text')
-                {
-                    switch ($which) {
-                        case 'text':
-                            return "<label>${label}</label><input type='text' " .
-                            "name='${name}' value='${value}' /><br />";
-                        break;
-                        case 'textarea':
-                            return "<label style='vertical-align:top'>${label}" .
-                            "</label><textarea name='${name}'>${value}" .
-                            '</textarea><br />';
-                        break;
-                    }
-                }
-                function h1($a)
-                {
-                    return "<h2>${a}</h2>";
-                }
                 $page .= $JAX->hiddenFormFields(array('mid' => $data['id']));
-                $page .= formfield(
+                $page .= $this->formfield(
                     'Display Name:',
                     'display_name',
                     $data['display_name']
                 );
-                $page .= formfield('Username:', 'name', $data['name']);
-                $page .= formfield('Real Name:', 'full_name', $data['full_name']);
-                $page .= formfield('Password:', 'password', '');
+                $page .= $this->formfield('Username:', 'name', $data['name']);
+                $page .= $this->formfield('Real Name:', 'full_name', $data['full_name']);
+                $page .= $this->formfield('Password:', 'password', '');
                 $page .= $this->getGroups($data['group_id']);
-                $page .= h1('Profile Fields');
-                $page .= formfield('User Title:', 'usertitle', $data['usertitle']);
-                $page .= formfield('Location:', 'location', $data['location']);
-                $page .= formfield('Website:', 'website', $data['website']);
-                $page .= formfield('Avatar:', 'avatar', $data['avatar']);
-                $page .= formfield('About:', 'about', $data['about'], 'textarea');
-                $page .= formfield('Signature:', 'sig', $data['sig'], 'textarea');
-                $page .= formfield('Email:', 'email', $data['email']);
-                $page .= formfield(
+                $page .= $this->heading('Profile Fields');
+                $page .= $this->formfield('User Title:', 'usertitle', $data['usertitle']);
+                $page .= $this->formfield('Location:', 'location', $data['location']);
+                $page .= $this->formfield('Website:', 'website', $data['website']);
+                $page .= $this->formfield('Avatar:', 'avatar', $data['avatar']);
+                $page .= $this->formfield('About:', 'about', $data['about'], 'textarea');
+                $page .= $this->formfield('Signature:', 'sig', $data['sig'], 'textarea');
+                $page .= $this->formfield('Email:', 'email', $data['email']);
+                $page .= $this->formfield(
                     'UCP Notepad:',
                     'ucpnotepad',
                     $data['ucpnotepad'],
                     'textarea'
                 );
-                $page .= h1('Contact Details');
-                $page .= formfield('AIM:', 'contact_aim', $data['contact_aim']);
-                $page .= formfield('MSN:', 'contact_msn', $data['contact_msn']);
-                $page .= formfield(
+                $page .= $this->heading('Contact Details');
+                $page .= $this->formfield('AIM:', 'contact_aim', $data['contact_aim']);
+                $page .= $this->formfield('MSN:', 'contact_msn', $data['contact_msn']);
+                $page .= $this->formfield(
                     'GTalk:',
                     'contact_gtalk',
                     $data['contact_gtalk']
                 );
-                $page .= formfield(
+                $page .= $this->formfield(
                     'Skype:',
                     'contact_skype',
                     $data['contact_skype']
                 );
-                $page .= formfield(
+                $page .= $this->formfield(
                     'Steam:',
                     'contact_steam',
                     $data['contact_steam']
                 );
-                $page .= formfield(
+                $page .= $this->formfield(
                     'Twitter:',
                     'contact_twitter',
                     $data['contact_twitter']
                 );
-                $page .= formfield('YIM:', 'contact_yim', $data['contact_yim']);
-                $page .= h1('System-Generated Variables');
-                $page .= formfield('Post Count:', 'posts', $data['posts']);
-                $page = "<form method='post'>${page}<input type='submit' " .
-                    "name='savedata' value='Save' /></form>";
+                $page .= $this->formfield('YIM:', 'contact_yim', $data['contact_yim']);
+                $page .= $this->heading('System-Generated Variables');
+                $page .= $this->formfield('Post Count:', 'posts', $data['posts']);
+                $page = $PAGE->parseTemplate(
+                    JAXBOARDS_ROOT . '/acp/views/members/edit-form.html',
+                    array(
+                        'content' => $page,
+                    )
+                );
             }
         } else {
-            $page = '<form method="post">
-                Member Name: <input type="text" name="name" ' .
-                'data-autocomplete-action="searchmembers" ' .
-                'data-autocomplete-output="#mid" ' .
-                'data-autocomplete-indicator="#validname"' .
-                '/>' .
-                '<input type="hidden" id="mid" name="mid" />' .
-                '<span id="validname"></span>
-                <input type="submit" name="submit" value="Go" />
-                </form>';
+            $page = $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/members/edit.html'
+            );
         }
         $PAGE->addContentBox(
-            (@$data['name']) ? 'Editing ' . $data['name'] . "'s details" :
-            'Edit Member',
+            (isset($data['name']) && $data['name']) ?
+            'Editing ' . $data['name'] . "'s details" : 'Edit Member',
             $page
         );
     }
@@ -322,7 +352,7 @@ EOT
         global $PAGE,$JAX,$DB;
         $page = '';
         $e = '';
-        if (@$JAX->p['submit']) {
+        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             if (!$JAX->p['username']
                 || !$JAX->p['displayname']
                 || !$JAX->p['pass']
@@ -359,6 +389,7 @@ EOT
                         PASSWORD_DEFAULT
                     ),
                     'last_visit' => date('Y-m-d H:i:s', time()),
+                    'birthdate' => '0000-00-00',
                     'group_id' => 1,
                     'posts' => 0,
                 );
@@ -369,24 +400,21 @@ EOT
                     $page .= $PAGE->success('Member registered.');
                 } else {
                     $page .= $PAGE->error(
-                        'An error occurred while processing your request.'
+                        'An error occurred while processing your request. ' .
+                        $error
                     );
                 }
             }
         }
-        $page .= '<form method="post"><label>Username:</label>' .
-            '<input type="text" name="username" /><br />' .
-            '<label>Display name:</label>' .
-            '<input type="text" name="displayname" /><br />' .
-            '<label>Password:</label><input type="password" name="pass" />' .
-            '<br /><input type="submit" name="submit" value="Register" />' .
-            '</form>';
+        $page .= $PAGE->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/members/pre-register.html'
+        );
         $PAGE->addContentBox('Pre-Register', $page);
     }
 
     public function getGroups($group_id = 0)
     {
-        global $DB;
+        global $DB, $PAGE;
         $page = '';
         $result = $DB->safeselect(
             '`id`,`title`',
@@ -394,12 +422,22 @@ EOT
             'ORDER BY `title` DESC'
         );
         while ($f = $DB->arow($result)) {
-            $page .= "<option value='" . $f['id'] . "'" .
-                ($group_id == $f['id'] ? " selected='selected'" : '') .
-                '>' . $f['title'] . '</option>';
+            $page .= $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/select-option.html',
+                array(
+                    'value' => $f['id'],
+                    'label' => $f['title'],
+                    'selected' => $group_id == $f['id'] ? ' selected="selected"' : '',
+                )
+            ) . PHP_EOL;
         }
 
-        return "<label>Group:</label><select name='group_id'>${page}</select>";
+        return $PAGE->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/members/get-groups.html',
+            array(
+                'content' => $page,
+            )
+        );
     }
 
     public function merge()
@@ -563,26 +601,14 @@ EOT
                 $page .= $PAGE->success('Successfully merged the two accounts.');
             }
         }
-        $page .= '<form method="post">
-            <p>This tool is used for merging duplicate accounts. ' .
-            'Merge the duplicate account with the original account.</p>
-            <label>Merge:</label><input type="text" name="name1" ' .
-            'data-autocomplete-action="searchmembers" ' .
-            'data-autocomplete-output="#mid1" ' .
-            'data-autocomplete-indicator="#validname"' .
-            ' />' .
-            '<input type="hidden" id="mid1" name="mid1" />' .
-            '<span id="validname"></span><br />
-            <label>With:</label><input type="text" name="name2" ' .
-            'data-autocomplete-action="searchmembers" ' .
-            'data-autocomplete-output="#mid2" ' .
-            'data-autocomplete-indicator="#validname2""' .
-            ' />' .
-            '<input type="hidden" id="mid2" name="mid2" />' .
-            '<span id="validname2"></span><br />
-            <input type="submit" name="submit" value="Merge Accounts" />
-            </form>';
-        $PAGE->addContentBox('Account Merge', $page);
+        $page .= '';
+        $PAGE->addContentBox(
+            'Account Merge',
+            $page . PHP_EOL .
+            $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/members/merge.html'
+            )
+        );
     }
 
     public function deletemem()
@@ -590,7 +616,7 @@ EOT
         global $PAGE,$JAX,$DB;
         $page = '';
         $e = '';
-        if (@$JAX->p['submit']) {
+        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             if (!$JAX->p['mid']) {
                 $e = 'All fields are required';
             } elseif (!is_numeric($JAX->p['mid'])) {
@@ -648,24 +674,17 @@ EOT
                 );
                 $page .= $PAGE->success(
                     'Successfully deleted the member account. ' .
-                    "<a href='?act=stats'>Board Stat Recount</a> suggested."
+                    'Board Stat Recount suggested.'
                 );
             }
         }
-        $page .= '<form method="post">
-            <p>This tool is used for deleting member accounts.
-            All traces of the member ever even existing will vanish away!</p>
-
-            <label>Member Name:</label><input type="text" name="name" ' .
-            'data-autocomplete-action="searchmembers" ' .
-            'data-autocomplete-output="#mid" ' .
-            'data-autocomplete-indicator="#validname"' .
-            ' />' .
-            '<input type="hidden" id="mid" name="mid" />' .
-            '<span id="validname"></span><br />
-            <input type="submit" name="submit" value="Delete Account" />
-            </form>';
-        $PAGE->addContentBox('Account Merge', $page);
+        $PAGE->addContentBox(
+            'Delete Account',
+            $page . PHP_EOL .
+            $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/members/delete.html'
+            )
+        );
     }
 
     public function ipbans()
@@ -738,30 +757,22 @@ EOT
                 $data = '';
             }
         }
-        $page .= <<<'EOT'
-<form method="post">
-    <p>
-        List one IP per line.
-        <br />
-        IP Ranges should end in period or colon (for IPv6)
-        (ex. 127.0. will ban everything starting with those two octets)
-        <br />
-        Comments should be prepended with hash (#comment).
-    </p>
-    <textarea name="ipbans" class="editor">
-EOT;
-        $page .= htmlspecialchars($data);
-        $page .= '</textarea><br />
-            <input type="submit" value="Save" />
-            </form>';
-        $PAGE->addContentBox('IP Bans', $page);
+        $PAGE->addContentBox(
+            'IP Bans',
+            $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/members/ip-bans.html',
+                array(
+                    'content' => htmlspecialchars($data),
+                )
+            )
+        );
     }
 
     public function massmessage()
     {
         global $PAGE,$JAX,$DB;
         $page = '';
-        if (@$JAX->p['submit']) {
+        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             if (!trim($JAX->p['title']) || !trim($JAX->p['message'])) {
                 $page .= $PAGE->error('All fields required!');
             } else {
@@ -793,15 +804,13 @@ EOT;
                 $page .= $PAGE->success("Successfully delivered ${num} messages");
             }
         }
-        $page .= "<form method='post'>Select Groups to message: " .
-            '(all users that have visited in the past 6 months for now, ' .
-            'just hacking this in for tj)<br /><label>Title:</label>' .
-            "<input type='text' name='title' /><br />" .
-            "<label style='vertical-align:top'>Message:</label>" .
-            "<textarea name='message' cols='40' rows='10'></textarea>" .
-            "<br /><input type='submit' name='submit' value='Mass Message' />" .
-            '</form>';
-        $PAGE->addContentBox('Mass Message', $page);
+        $PAGE->addContentBox(
+            'Mass Message',
+            $page . PHP_EOL .
+            $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/members/mass-message.html'
+            )
+        );
     }
 
     public function validation()
@@ -815,13 +824,13 @@ EOT;
                 )
             );
         }
-        $page = '<form method="post">
-            <label style="width:140px">Require Validation:</label>
-            <input name="v_enable" type="checkbox" class="switch yn" ' .
-            ($PAGE->getCFGSetting('membervalidation') ? 'checked="checked"' :
-            '') . ' /><br />
-            <input type="submit" name="submit1" value="Save" />
-            </form>';
+        $page = $PAGE->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/members/validation.html',
+            array(
+                'checked' => $PAGE->getCFGSetting('membervalidation')
+                ? 'checked="checked"' : '',
+            )
+        ) . PHP_EOL;
         $PAGE->addContentBox('Enable Member Validation', $page);
 
         if (isset($_POST['mid'])) {
@@ -836,27 +845,68 @@ EOT;
                 );
             }
         }
-        $page = '';
         $result = $DB->safeselect(
             '`id`,`display_name`,INET6_NTOA(`ip`) AS `ip`,`email`,' .
             'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
             'members',
             'WHERE `group_id`=5'
         );
+        $page = '';
         while ($f = $DB->arow($result)) {
-            $page .= '<tr><td>' . $f['display_name'] .
-                '</td><td>' . $f['ip'] . '</td><td>' . $f['email'] .
-                '</td><td>' . date('M jS, Y @ g:i A', $f['join_date']) .
-                '</td><td><form method="post"><input type="hidden" ' .
-                'name="mid" value="' . $f['id'] . '" /><input name="action" ' .
-                'type="submit" value="Allow" /></form></td></tr>';
+            $page .= $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/members/validation-list-row.html',
+                array(
+                    'id' => $f['id'],
+                    'title' => $f['display_name'],
+                    'ip_address' => $f['ip'],
+                    'email_address' => $f['email'],
+                    'join_date' => date('M jS, Y @ g:i A', $f['join_date']),
+                )
+            ) . PHP_EOL;
         }
-        $page = $page ? '<table class="wrappers">' .
-            '<tr><th>Name</th><th>IP</th><th>Email</th><th>Registration Date' .
-            '</th><th></th></tr>' .
-            $page .
-            '</table>'
-            : 'There are currently no members awaiting validation.';
+        $page = $page ? $PAGE->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/members/validation-list.html',
+            array(
+                'content' => $page,
+            )
+        ) : 'There are currently no members awaiting validation.';
         $PAGE->addContentBox('Members Awaiting Validation', $page);
+    }
+
+    public function formfield($label, $name, $value, $which = false)
+    {
+        global $PAGE;
+
+        if (mb_strtolower($which) === 'textarea') {
+            return $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/members/edit-form-field-textarea.html',
+                array(
+                    'label' => $label,
+                    'title' => $name,
+                    'value' => $value,
+                )
+            ) . PHP_EOL;
+        } else {
+            return $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/members/edit-form-field-text.html',
+                array(
+                    'label' => $label,
+                    'title' => $name,
+                    'value' => $value,
+                )
+            ) . PHP_EOL;
+        }
+    }
+
+    public function heading($value)
+    {
+        global $PAGE;
+
+        return $PAGE->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/members/edit-heading.html',
+            array(
+                'value' => $value,
+            )
+        );
     }
 }
