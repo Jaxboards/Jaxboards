@@ -79,14 +79,6 @@ export default {
   back() {
     window.history.back();
   },
-  goto(args) {
-    let [selector] = args;
-    if (!selector.match(/^\W/)) {
-      selector = `#${selector}`;
-    }
-    const el = document.querySelector(selector);
-    scrollTo(getCoordinates(el).y);
-  },
   setstatus([className]) {
     const status = document.querySelector('#status');
     if (status) {
