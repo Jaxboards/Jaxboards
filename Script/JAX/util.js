@@ -130,6 +130,23 @@ export function collapse(element) {
   }
 }
 
+export function handleTabs(event, container, tabSelector) {
+  const activeClass = 'active';
+  let el = event.target;
+  if (el.tagName.toLowerCase() !== 'a') {
+    return;
+  }
+  if (tabSelector) {
+    el = el.closest(tabSelector);
+  }
+  const activeTab = container.querySelector('.active');
+  if (activeTab) {
+    activeTab.classList.remove(activeClass);
+  }
+  el.className = activeClass;
+  el.blur();
+}
+
 export function gracefulDegrade(a) {
   if (typeof RUN !== 'undefined') {
     updateDates();
@@ -224,31 +241,13 @@ export function gracefulDegrade(a) {
       RUN.submitForm(ajaxForm, resetOnSubmit);
     });
   });
-}
 
-export function handleTabs(e, a, f) {
-  const activeClass = 'active';
-  let el = e.target || e.srcElement;
-  if (el.tagName.toLowerCase() !== 'a') {
-    return;
-  }
-  if (f) {
-    el = f(el);
-  }
-  const activeTab = a.querySelector('.active');
-  if (activeTab) {
-    activeTab.classList.remove(activeClass);
-  }
-  el.className = activeClass;
-  el.blur();
-}
-
-export function toggle(a) {
-  let display = 'none';
-  if (a.style.display === display) {
-    display = '';
-  }
-  a.style.display = display;
+  // Handle tabs
+  const tabContainers = a.querySelectorAll('.tabs');
+  tabContainers.forEach((tabContainer) => {
+    const { tabSelector } = tabContainer.dataset;
+    tabContainer.addEventListener('click', event => handleTabs(event, tabContainer, tabSelector));
+  });
 }
 
 export function toggleOverlay(show) {

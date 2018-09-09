@@ -2224,3 +2224,7 @@ a.mgroup4 {
   margin: 10px;
   display: inline-block;
 }
+
+.display-none {
+  display: none;
+}

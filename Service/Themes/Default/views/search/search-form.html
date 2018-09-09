@@ -13,10 +13,10 @@
       <input type="text" id="searchterm" name="searchterm" value="%1$s" />
       <input type="submit" value="Search" />
       &nbsp; &nbsp;
-      <a href="?" onclick="JAX.toggle(document.querySelector('#searchadvanced'));return false;">
+      <button type="button" onclick="document.querySelector('#searchadvanced').classList.toggle('display-none')">
         Advanced
-      </a>
-      <table id="searchadvanced" style="display:none">
+      </button>
+      <table id="searchadvanced" class="display-none">
         <tr>
           <th>
             In forum(s):

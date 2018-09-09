@@ -1187,6 +1187,23 @@
     }
   }
 
+  function handleTabs(event, container, tabSelector) {
+    const activeClass = 'active';
+    let el$$1 = event.target;
+    if (el$$1.tagName.toLowerCase() !== 'a') {
+      return;
+    }
+    if (tabSelector) {
+      el$$1 = el$$1.closest(tabSelector);
+    }
+    const activeTab = container.querySelector('.active');
+    if (activeTab) {
+      activeTab.classList.remove(activeClass);
+    }
+    el$$1.className = activeClass;
+    el$$1.blur();
+  }
+
   function gracefulDegrade(a) {
     if (typeof RUN !== 'undefined') {
       updateDates();
@@ -1281,31 +1298,13 @@
         RUN.submitForm(ajaxForm, resetOnSubmit);
       });
     });
-  }
 
-  function handleTabs(e, a, f) {
-    const activeClass = 'active';
-    let el$$1 = e.target || e.srcElement;
-    if (el$$1.tagName.toLowerCase() !== 'a') {
-      return;
-    }
-    if (f) {
-      el$$1 = f(el$$1);
-    }
-    const activeTab = a.querySelector('.active');
-    if (activeTab) {
-      activeTab.classList.remove(activeClass);
-    }
-    el$$1.className = activeClass;
-    el$$1.blur();
-  }
-
-  function toggle(a) {
-    let display = 'none';
-    if (a.style.display === display) {
-      display = '';
-    }
-    a.style.display = display;
+    // Handle tabs
+    const tabContainers = a.querySelectorAll('.tabs');
+    tabContainers.forEach((tabContainer) => {
+      const { tabSelector } = tabContainer.dataset;
+      tabContainer.addEventListener('click', event => handleTabs(event, tabContainer, tabSelector));
+    });
   }
 
   function toggleOverlay(show) {
@@ -1760,10 +1759,10 @@
       if (this.doc && this.doc.body) this.doc.body.innerHTML = a;
     }
 
-    switchMode(toggle$$1) {
+    switchMode(toggle) {
       const t = this.textarea;
       const f = this.iframe;
-      if (!toggle$$1) {
+      if (!toggle) {
         t.value = htmlToBBCode(this.getSource());
         t.style.display = '';
         f.style.display = 'none';
@@ -1772,7 +1771,7 @@
         t.style.display = 'none';
         f.style.display = '';
       }
-      this.mode = toggle$$1;
+      this.mode = toggle;
     }
 
     submit() {
@@ -2205,7 +2204,6 @@
     Window,
 
     handleTabs,
-    toggle,
   };
 
   class Sound {

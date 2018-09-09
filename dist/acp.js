@@ -685,18 +685,18 @@
     // Converts all switches (checkboxes) into graphics, to show "X" or "check"
     const switches = Array.from(document.querySelectorAll('.switch'));
     switches.forEach((switchEl) => {
-      const toggle$$1 = document.createElement('div');
-      toggle$$1.className = switchEl.className.replace('switch', 'switch_converted');
+      const toggle = document.createElement('div');
+      toggle.className = switchEl.className.replace('switch', 'switch_converted');
       switchEl.style.display = 'none';
       if (!switchEl.checked) {
-        toggle$$1.style.backgroundPosition = 'bottom';
+        toggle.style.backgroundPosition = 'bottom';
       }
-      toggle$$1.addEventListener('click', () => {
+      toggle.addEventListener('click', () => {
         switchEl.checked = !switchEl.checked;
-        toggle$$1.style.backgroundPosition = switchEl.checked ? 'top' : 'bottom';
+        toggle.style.backgroundPosition = switchEl.checked ? 'top' : 'bottom';
         switchEl.dispatchEvent(new Event('change'));
       });
-      insertAfter(toggle$$1, switchEl);
+      insertAfter(toggle, switchEl);
     });
 
     // Makes editors capable of tabbing for indenting
