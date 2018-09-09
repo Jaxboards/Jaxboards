@@ -13,7 +13,7 @@ $PAGE->metadefs['buddylist-contacts'] = <<<EOT
 </div>
 EOT;
 $PAGE->metadefs['buddylist-contact'] = <<<'EOT'
-<div onclick="new IMWindow(%1$s,'%2$s')"
+<div
     class="contact %3$s">
     <a href="?act=vu%1$s">
         <div class="avatar">
@@ -40,18 +40,6 @@ class buddylist
         global $PAGE,$JAX,$USER;
         if (!$USER) {
             $PAGE->JS('softurl');
-            if ($JAX->c['buddylist']) {
-                $JAX->setCookie(
-                    array(
-                        'buddylist' => false,
-                    ),
-                    -1,
-                    -1,
-                    false
-                );
-
-                return;
-            }
 
             return $PAGE->JS(
                 'error',
@@ -81,14 +69,6 @@ class buddylist
         if (!$USER) {
             return;
         }
-        $JAX->setCookie(
-            array(
-                'buddylist' => 1,
-            ),
-            null,
-            null,
-            false
-        );
         $PAGE->JS('softurl');
         $crap = '';
         if ($USER['friends']) {
@@ -136,7 +116,7 @@ class buddylist
             );
         }
         $PAGE->JS(
-            'openbuddylist',
+            'window',
             array(
                 'title' => 'Buddies',
                 'content' => $PAGE->meta(
@@ -145,6 +125,8 @@ class buddylist
                     $USER['usertitle'],
                     $crap
                 ),
+                'id' => 'buddylist',
+                'pos' => 'tr 20 20'
             )
         );
     }

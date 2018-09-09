@@ -31,8 +31,6 @@ class AppState {
     Sound.load('sbblip', './Sounds/blip.mp3', false);
     Sound.load('imbeep', './Sounds/receive.mp3', false);
     Sound.load('imnewwindow', './Sounds/receive.mp3', false);
-
-    document.cookie = 'buddylist=0';
   }
 
   submitForm(form, resetOnSubmit = false) {

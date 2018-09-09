@@ -268,25 +268,6 @@ export default {
     winElement.id = options.id || '';
     gracefulDegrade(winElement);
   },
-  openbuddylist([options]) {
-    const buddylist = document.querySelector('#buddylist');
-    if (!buddylist) {
-      const win = new Window();
-      win.id = 'buddylist';
-      win.content = options.content;
-      win.title = options.title;
-      win.pos = 'tr 20 20';
-      win.animate = 0;
-      win.wait = false;
-      win.onclose = () => {
-        document.cookie = 'buddylist=0';
-      };
-      win.resize = '.content';
-      win.create();
-    } else {
-      buddylist.querySelector('.content').innerHTML = options.content;
-    }
-  },
   closewindow([windowSelector]) {
     const el = document.querySelector(windowSelector);
     if (el) {

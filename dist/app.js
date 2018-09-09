@@ -2198,12 +2198,12 @@
     } while (element);
   };
 
+  // TODO: Make this file completely obsolete by removing references to global JAX object
+
   var JAX = {
     autoComplete,
     Editor,
     Window,
-
-    handleTabs,
   };
 
   class Sound {
@@ -2513,25 +2513,6 @@
       winElement.id = options.id || '';
       gracefulDegrade(winElement);
     },
-    openbuddylist([options]) {
-      const buddylist = document.querySelector('#buddylist');
-      if (!buddylist) {
-        const win = new Window();
-        win.id = 'buddylist';
-        win.content = options.content;
-        win.title = options.title;
-        win.pos = 'tr 20 20';
-        win.animate = 0;
-        win.wait = false;
-        win.onclose = () => {
-          document.cookie = 'buddylist=0';
-        };
-        win.resize = '.content';
-        win.create();
-      } else {
-        buddylist.querySelector('.content').innerHTML = options.content;
-      }
-    },
     closewindow([windowSelector]) {
       const el$$1 = document.querySelector(windowSelector);
       if (el$$1) {
@@ -2773,8 +2754,6 @@
       Sound$1.load('sbblip', './Sounds/blip.mp3', false);
       Sound$1.load('imbeep', './Sounds/receive.mp3', false);
       Sound$1.load('imnewwindow', './Sounds/receive.mp3', false);
-
-      document.cookie = 'buddylist=0';
     }
 
     submitForm(form, resetOnSubmit = false) {
