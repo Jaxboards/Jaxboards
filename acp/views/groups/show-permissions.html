@@ -1,0 +1,28 @@
+<form action="?act=groups&do=perms" method="post">
+  <input type="hidden" name="grouplist" value="<% GROUP_LIST %>" />
+  <div class="permcontainer">
+    * Starred are permissions not functional yet.
+    <table id="heading" style="padding-left:150px;width:100%;position:relative;background:#FFF;">
+      <tr>
+        <% GROUP_HEADINGS %>
+      </tr>
+    </table>
+    <table class="perms">
+      <% PERMISSIONS_TABLE %>
+    </table>
+  </div>
+  <div style="margin-top:20px" class="center">
+    <input type="submit" value="Save Changes" />
+  </div>
+</form>
+<script type="text/javascript">
+window.onscroll = function()
+{
+  var heading = document.querySelector("#heading");
+  var c = ACP.getCoordinates(heading)
+  c.y -= parseInt(heading.style.top) || 0;
+  var st = document.documentElement.scrollTop || document.body.scrollTop
+  heading.style.top = ((st - c.y) < 0 ? 0 : st - c.y) + "px"
+}
+
+</script>

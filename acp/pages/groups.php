@@ -7,6 +7,8 @@ if (!defined(INACP)) {
 new groups();
 class groups
 {
+    public $updatePermissions = true;
+
     public function __construct()
     {
         global $JAX,$PAGE;
@@ -16,14 +18,31 @@ class groups
             'create' => 'Create Group',
             'delete' => 'Delete Group',
         );
-        foreach ($links as $k => $v) {
-            $sidebar .= "<li><a href='?act=groups&do=" . $k . "'>${v}</a></li>";
+        $sidebarLinks = '';
+        foreach ($links as $do => $title) {
+            $sidebarLinks .= $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/sidebar-list-link.html',
+                array(
+                    'url' => '?act=groups&do=' . $do,
+                    'title' => $title,
+                )
+            ) . PHP_EOL;
         }
-        $PAGE->sidebar("<ul>${sidebar}</ul>");
-        if (@$JAX->g['edit']) {
+        $PAGE->sidebar(
+            $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/sidebar-list.html',
+                array(
+                    'content' => $sidebarLinks,
+                )
+            )
+        );
+        if (isset($JAX->g['edit']) && $JAX->g['edit']) {
             $JAX->g['do'] = 'edit';
         }
-        switch (@$JAX->g['do']) {
+        if (!isset($JAX->g['do'])) {
+            $JAX->g['do'] = null;
+        }
+        switch ($JAX->g['do']) {
             case 'perms':
                 $this->showperms();
                 break;
@@ -40,12 +59,6 @@ class groups
                 $this->showperms();
                 break;
         }
-    }
-
-    public function showindex()
-    {
-        global $PAGE;
-        $PAGE->addContentBox('Error', 'under construction');
     }
 
     public function updateperms($perms)
@@ -79,6 +92,7 @@ class groups
             'can_poll',
             'can_view_stats',
             'legend',
+            'can_view_fullprofile',
         );
 
         // Set anything not sent to 0.
@@ -116,35 +130,53 @@ class groups
             }
         }
 
-        echo $DB->error();
+        $error = $DB->error();
+        if ($error) {
+            $PAGE->addContentBox(
+                'Error',
+                $PAGE->error($error)
+            );
+        } else {
+            $PAGE->addContentBox(
+                'Success!',
+                $PAGE->success(
+                    'Changes Saved successfully.'
+                )
+            );
+        }
 
-        $PAGE->addContentBox(
-            'Success!',
-            "<div style='padding:20px'>Changes Saved successfully.<br />" .
-            "<br /><br /><a href='?act=groups'>Home</a></div>"
-        );
+        $this->updatePermissions = false;
+        return $this->showperms();
     }
 
     public function showperms()
     {
         global $DB,$PAGE,$JAX;
 
-        if (@$JAX->p['perm']) {
+        $page = '';
+
+        if ($this->updatePermissions
+            && isset($JAX->p['perm'])
+            && $JAX->p['perm']
+        ) {
             foreach (explode(',', $JAX->p['grouplist']) as $v) {
-                if (!isset($JAX->p['perm'][$v]) || !$JAX->p['perm'][$v]) {
+                if (!isset($JAX->p['perm'][$v])
+                    || !$JAX->p['perm'][$v]
+                ) {
                     $JAX->p['perm'][$v] = array();
                 }
             }
 
             return $this->updateperms($JAX->p['perm']);
         }
-        if (preg_match('@[^\\d,]@', @$JAX->b['grouplist'])
-            || false !== mb_strpos(@$JAX->b['grouplist'], ',,')
+        if (!isset($JAX->b['grouplist'])
+            || preg_match('@[^\\d,]@', $JAX->b['grouplist'])
+            || false !== mb_strpos($JAX->b['grouplist'], ',,')
         ) {
             $JAX->b['grouplist'] = '';
         }
 
-        $result = @$JAX->b['grouplist'] ?
+        $result = $JAX->b['grouplist'] ?
             $DB->safeselect(
                 <<<'EOT'
 `id`,`title`,`can_post`,`can_edit_posts`,`can_post_topics`,`can_edit_topics`,
@@ -182,93 +214,112 @@ EOT
             $grouplist .= $f['id'] . ',';
         }
         if (!$numgroups) {
-            die("Don't play with my variables!");
+            $PAGE->addContentBox(
+                'Error',
+                $PAGE->error(
+                    "Don't play with my variables!"
+                )
+            );
         }
         $grouplist = mb_substr($grouplist, 0, -1);
-        $page = "<form action='?act=groups&do=perms' method='post'>
-<input type='hidden' name='grouplist' value='${grouplist}' />
-<div class='permcontainer'>* Starred are permissions not functional yet.
-<table style='padding-left:150px;width:100%;position:relative;background:#FFF'
-id='heading'>
-    <tr>";
-        foreach ($perms as $k => $v) {
-            $page .= "<th style='width:" . ((1 / $numgroups) * 100) . "%'>" .
-                "<a class='icons edit' href='?act=groups&edit=${k}'>" .
-                $v['title'] . "</a> (${k})</th>";
+        $widthPercent = (1 / $numgroups) * 100;
+        $groupHeadings = '';
+        foreach ($perms as $groupId => $groupData) {
+            $groupHeadings .= $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/groups/show-permissions-group-heading.html',
+                array(
+                    'width_percent' => $widthPercent,
+                    'id' => $groupId,
+                    'title' => $groupData['title'],
+                )
+            ) . PHP_EOL;
         }
-        $page .= "</tr>
-  </table>
-  <table class='perms'>
-  ";
-        foreach (array(
-                'breaker1' => 'Global',
-                'can_view_board' => 'View Online Board',
-                'can_view_offline_board' => 'View Offline Board',
-                'can_access_acp' => 'Access ACP',
-                'can_moderate' => 'Global Moderator',
 
-                'breaker2' => 'Members',
-                'can_karma' => '*Change Karma',
+        $permissionsChart = array(
+            'breaker1' => 'Global',
+            'can_view_board' => 'View Online Board',
+            'can_view_offline_board' => 'View Offline Board',
+            'can_access_acp' => 'Access ACP',
+            'can_moderate' => 'Global Moderator',
 
-                'breaker3' => 'Posts',
-                'can_post' => 'Create',
-                'can_edit_posts' => 'Edit',
-                'can_delete_own_posts' => '*Delete Own Posts',
-                'can_attach' => 'Attach files',
-                'can_use_sigs' => '*Can have signatures',
+            'breaker2' => 'Members',
+            'can_karma' => '*Change Karma',
 
-                'breaker4' => 'Topics',
-                'can_post_topics' => 'Create',
-                'can_edit_topics' => 'Edit',
-                'can_poll' => 'Add Polls',
-                'can_delete_own_topics' => '*Delete Own Topics',
-                'can_lock_own_topics' => '*Lock Own Topics',
-                'can_override_locked_topics' => 'Post in locked topics',
+            'breaker3' => 'Posts',
+            'can_post' => 'Create',
+            'can_edit_posts' => 'Edit',
+            'can_delete_own_posts' => '*Delete Own Posts',
+            'can_attach' => 'Attach files',
+            'can_use_sigs' => '*Can have signatures',
 
-                'breaker5' => 'Profiles',
-                'can_add_comments' => 'Add Comments',
-                'can_delete_comments' => '*Delete own Comments',
+            'breaker4' => 'Topics',
+            'can_post_topics' => 'Create',
+            'can_edit_topics' => 'Edit',
+            'can_poll' => 'Add Polls',
+            'can_delete_own_topics' => '*Delete Own Topics',
+            'can_lock_own_topics' => '*Lock Own Topics',
+            'can_override_locked_topics' => 'Post in locked topics',
 
-                'breaker6' => 'Shoutbox',
-                'can_view_shoutbox' => 'View Shoutbox',
-                'can_shout' => 'Can Shout',
-                'can_delete_shouts' => 'Delete All Shouts',
-                'can_delete_own_shouts' => 'Delete Own Shouts',
+            'breaker5' => 'Profiles',
+            'can_add_comments' => 'Add Comments',
+            'can_delete_comments' => '*Delete own Comments',
+            'can_view_fullprofile' => 'Can View Full Profile',
 
-                'breaker8' => 'Statistics',
-                'can_view_stats' => 'View Board Stats',
-                'legend' => 'Display in Legend',
+            'breaker6' => 'Shoutbox',
+            'can_view_shoutbox' => 'View Shoutbox',
+            'can_shout' => 'Can Shout',
+            'can_delete_shouts' => 'Delete All Shouts',
+            'can_delete_own_shouts' => 'Delete Own Shouts',
 
-                'breaker7' => 'Private/Instant Messaging',
-                'can_pm' => 'Can PM',
-                'can_im' => 'Can IM',
-            ) as $k => $v) {
+            'breaker8' => 'Statistics',
+            'can_view_stats' => 'View Board Stats',
+            'legend' => 'Display in Legend',
+
+            'breaker7' => 'Private/Instant Messaging',
+            'can_pm' => 'Can PM',
+            'can_im' => 'Can IM',
+        );
+        $permissionsTable = '';
+        foreach ($permissionsChart as $k => $v) {
             if ('breaker' == mb_substr($k, 0, 7)) {
-                $page .= "<tr><td class='breaker' colspan='" .
-                    (1 + $numgroups) . "'>${v}</td></tr>";
+                $permissionsTable .= $PAGE->parseTemplate(
+                    JAXBOARDS_ROOT . '/acp/views/groups/show-permissions-breaker-row.html',
+                    array(
+                        'column_count' => 1 + $numgroups,
+                        'title' => $v,
+                    )
+                ) . PHP_EOL;
             } else {
-                $page .= "<tr><td style='width:150px'>" . $v . '</td>';
-                foreach ($perms as $k2 => $v2) {
-                    $page .= '<td class="center"><input name="perm[' . $k2 .
-                        '][' . $k . ']" type="checkbox" ' .
-                        ($v2[$k] ? 'checked="checked" ' : '') .
-                        'class="switch yn" /></td>';
+                $groupColumns = '';
+                foreach ($perms as $groupId => $groupData) {
+                    $groupColumns .= $PAGE->parseTemplate(
+                        JAXBOARDS_ROOT . '/acp/views/groups/show-permissions-permission-row-group-column.html',
+                        array(
+                            'group_id' => $groupId,
+                            'permission' => $k,
+                            'checked' => $groupData[$k] ?
+                            'checked="checked" ' : '',
+                        )
+                    ) . PHP_EOL;
                 }
-                $page .= '</tr>';
+                $permissionsTable .= $PAGE->parseTemplate(
+                    JAXBOARDS_ROOT . '/acp/views/groups/show-permissions-permission-row.html',
+                    array(
+                        'title' => $v,
+                        'group_columns' => $groupColumns,
+                    )
+                ) . PHP_EOL;
             }
         }
-        $page .= '
-  </table>';
-        $page .= "</div><div style='margin-top:20px' class='center'>" .
-            "<input type='submit' value='Save Changes' /></div></form>";
-        $page .= '<script type="text/javascript">window.onscroll=function(){
-            var heading = document.querySelector("#heading");
-            var c=ACP.getCoordinates(heading)
-            c.y -= parseInt(heading.style.top) || 0;
-            var st = document.documentElement.scrollTop || document.body.scrollTop
-            heading.style.top=((st-c.y)<0?0:st-c.y)+"px"
-        }
-        </script>';
+
+        $page .= $PAGE->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/groups/show-permissions.html',
+            array(
+                'group_list' => $grouplist,
+                'group_headings' => $groupHeadings,
+                'permissions_table' => $permissionsTable,
+            )
+        );
 
         $PAGE->addContentBox('Perms', $page);
     }
@@ -281,8 +332,8 @@ id='heading'>
         global $PAGE,$JAX,$DB;
         $page = '';
         $e = '';
-        if (@$JAX->p['submit']) {
-            if (!@$JAX->p['groupname']) {
+        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
+            if (!isset($JAX->p['groupname']) || !$JAX->p['groupname']) {
                 $e = 'Group name required!';
             } elseif (mb_strlen($JAX->p['groupname']) > 250) {
                 $e = 'Group name must not exceed 250 characters!';
@@ -311,9 +362,13 @@ id='heading'>
                         $write
                     );
                 }
-                $page .= $PAGE->success(
-                    "Data saved. <a href='?act=groups'>Back</a>"
+                $PAGE->addContentBox(
+                    $write['title'] . ' ' . (($gid) ? 'edited' : 'created'),
+                    $PAGE->success(
+                        'Data saved.'
+                    )
                 );
+                return $this->showperms();
             }
         }
         if ($gid) {
@@ -327,16 +382,14 @@ id='heading'>
             $DB->disposeresult($result);
         }
 
-        $page .= '<form method="post"><label for="groupname">' .
-            'Group name:</label><input type="text" id="groupname" ' .
-            'name="groupname" value="' .
-            ($gid ? $JAX->blockhtml($gdata['title']) : '') . '" /><br />
-            <label for="groupicon">Icon: </label><input type="text" ' .
-            'id="groupicon" name="groupicon" value="' .
-            ($gid ? $JAX->blockhtml($gdata['icon']) : '') . '" /><br />
-            <input type="submit" name="submit" value="' .
-            ($gid ? 'Edit' : 'Create') . '" />
-          </form>';
+        $page .= $PAGE->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/groups/create.html',
+            array(
+                'title' => $gid ? $JAX->blockhtml($gdata['title']) : '',
+                'icon_url' => $gid ? $JAX->blockhtml($gdata['icon']) : '',
+                'submit' => $gid ? 'Edit' : 'Create',
+            )
+        );
         $PAGE->addContentBox(
             $gid ? 'Editing group: ' . $gdata['title'] : 'Create a group!',
             $page
@@ -347,7 +400,10 @@ id='heading'>
     {
         global $PAGE,$DB,$JAX;
         $page = '';
-        if (is_numeric(@$JAX->b['delete']) && $JAX->b['delete'] > 5) {
+        if (isset($JAX->b['delete'])
+            && is_numeric($JAX->b['delete'])
+            && $JAX->b['delete'] > 5
+        ) {
             $DB->safedelete(
                 'member_groups',
                 'WHERE `id`=?',
@@ -370,13 +426,19 @@ id='heading'>
         $found = false;
         while ($f = $DB->arow($result)) {
             $found = true;
-            $page .= '<a class="icons delete" onclick="' .
-                'return confirm(\'You sure?\')" href="?act=groups&do=delete' .
-                '&delete=' . $f['id'] . '">' . $f['title'] . '</a>';
+            $page .= $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/groups/delete.html',
+                array(
+                    'id' => $f['id'],
+                    'title' => $f['title'],
+                )
+            );
         }
         if (!$found) {
-            $page .= "You haven't created any groups to delete. " .
-                "(Hint: default groups can't be deleted)";
+            $page .= $PAGE->error(
+                "You haven't created any groups to delete. " .
+                "(Hint: default groups can't be deleted)"
+            );
         }
         $PAGE->addContentBox('Delete Groups', $page);
     }
