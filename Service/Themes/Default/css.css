@@ -424,7 +424,8 @@ textarea {
 }
 /* stylelint-enable no-descending-specificity */
 
-.inbox .switch_converted.flag {
+.inbox .switch.flag {
+  border: none;
   height: 16px;
   background: url(icons/flags.png) no-repeat;
   background-position: center 0;

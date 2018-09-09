@@ -1,48 +1,61 @@
-import { getHighestZIndex, getCoordinates } from './el';
+import Component from '../classes/component';
+import { getHighestZIndex, getCoordinates } from '../JAX/el';
+import { assign } from '../JAX/util';
+import { months, daysShort } from '../JAX/date';
 
-const months = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
+export default class DatePicker extends Component {
+  static get selector() { return 'input.date'; }
 
-const daysshort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; // I don't think I'll need a dayslong ever
+  constructor(element) {
+    super(element);
+    this.picker = this.getPicker();
 
-class DatePicker {
-  constructor(el) {
-    let dp = document.querySelector('#datepicker');
-    let s;
-    const c = getCoordinates(el);
-    if (!dp) {
-      dp = document.createElement('table');
-      dp.id = 'datepicker';
-      document.querySelector('#page').appendChild(dp);
+    // Disable browser autocomplete
+    element.autocomplete = 'off';
+    element.addEventListener('focus', () => this.openPicker());
+    element.addEventListener('keydown', () => this.closePicker());
+  }
+
+  getPicker() {
+    if (this.picker) {
+      return this.picker;
     }
-    s = dp.style;
-    s.display = 'table';
-    s.zIndex = getHighestZIndex();
-    s.top = `${c.yh}px`;
-    s.left = `${c.x}px`;
-    s = el.value.split('/');
-    if (s.length === 3) {
+
+    let picker = document.querySelector('#datepicker');
+    if (!picker) {
+      picker = assign(document.createElement('table'), {
+        id: 'datepicker',
+      });
+      document.body.appendChild(picker);
+    }
+
+    return picker;
+  }
+
+  openPicker() {
+    const c = getCoordinates(this.element);
+    assign(this.picker.style, {
+      display: '',
+      zIndex: getHighestZIndex(),
+      position: 'absolute',
+      top: `${c.yh}px`,
+      left: `${c.x}px`,
+    });
+
+    const [month, day, year] = this.element.value.split('/').map(s => parseInt(s, 10));
+    if (month && day && year) {
       this.selectedDate = [
-        parseInt(s[2], 10),
-        parseInt(s[0], 10) - 1,
-        parseInt(s[1], 10),
+        year,
+        month - 1,
+        day,
       ];
     } else this.selectedDate = undefined;
 
-    this.el = el;
-    this.generate(s[2], s[0] ? parseInt(s[0], 10) - 1 : undefined, s[1]);
+    this.generate(year, month, day);
+  }
+
+  closePicker() {
+    this.picker.style.display = 'none';
   }
 
   // month should be 0 for jan, 11 for dec
@@ -81,15 +94,20 @@ class DatePicker {
 
     // year
     row = dp.insertRow(0);
+
+    // previous year button
     cell = row.insertCell(0);
-    cell.innerHTML = '<';
+    cell.innerHTML = '&lt;';
     cell.className = 'control';
     cell.onclick = () => this.lastYear();
 
+    // current year heading
     cell = row.insertCell(1);
     cell.colSpan = '5';
     cell.className = 'year';
     cell.innerHTML = year;
+
+    // next year button
     cell = row.insertCell(2);
     cell.innerHTML = '>';
     cell.className = 'control';
@@ -115,7 +133,7 @@ class DatePicker {
     row = dp.insertRow(2);
     row.className = 'weekdays';
     for (let x = 0; x < 7; x += 1) {
-      row.insertCell(x).innerHTML = daysshort[x];
+      row.insertCell(x).innerHTML = daysShort[x];
     }
 
     row = dp.insertRow(3);
@@ -132,12 +150,10 @@ class DatePicker {
       cell = row.insertCell((first + x) % 7);
       cell.onclick = this.insert.bind(this, cell);
 
-      cell.className = `day${
-        year === this.selectedDate[0]
+      const isSelected = year === this.selectedDate[0]
         && month === this.selectedDate[1]
-        && x + 1 === this.selectedDate[2]
-          ? ' selected'
-          : ''}`;
+        && x + 1 === this.selectedDate[2];
+      cell.className = `day${isSelected ? ' selected' : ''}`;
       cell.innerHTML = x + 1;
     }
   }
@@ -164,15 +180,7 @@ class DatePicker {
 
   insert(cell) {
     const l = this.lastDate;
-    this.el.value = `${l[1] + 1}/${cell.innerHTML}/${l[0]}`;
-    DatePicker.hide();
+    this.element.value = `${l[1] + 1}/${cell.innerHTML}/${l[0]}`;
+    this.closePicker();
   }
 }
-
-// Static methods
-DatePicker.init = el => new DatePicker(el);
-DatePicker.hide = () => {
-  document.querySelector('#datepicker').style.display = 'none';
-};
-
-export default DatePicker;

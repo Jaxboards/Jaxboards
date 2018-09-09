@@ -1,32 +1,48 @@
 /* global globalsettings */
 /* eslint-disable no-script-url, no-alert */
 
-import Ajax from './ajax';
-import Browser from './browser';
+import Component from '../classes/component';
+import Ajax from '../JAX/ajax';
+import Browser from '../JAX/browser';
 import {
+  insertAfter,
   insertBefore,
   getComputedStyle,
-} from './el';
-import Event from './event';
-import { bbcodeToHTML, htmlToBBCode } from './bbcode-utils';
-import { assign } from './util';
-import { replaceSelection } from './selection';
+} from '../JAX/el';
+import { bbcodeToHTML, htmlToBBCode } from '../JAX/bbcode-utils';
+import { assign } from '../JAX/util';
+import { replaceSelection } from '../JAX/selection';
 
 const URL_REGEX = /^(ht|f)tps?:\/\/[\w.\-%&?=/]+$/;
 const isURL = text => URL_REGEX.test(text);
 
-class Editor {
-  constructor(textarea, iframe) {
-    this.iframe = iframe;
+export default class Editor extends Component {
+  static get selector() { return 'textarea.bbcode-editor'; }
+
+  constructor(element) {
+    super(element);
+
+    this.iframe = document.createElement('iframe');
+    this.iframe.addEventListener('load', () => this.iframeLoaded());
+    this.iframe.style.display = 'none';
+    insertAfter(this.iframe, element);
+
+    element.closest('form').addEventListener('submit', () => {
+      this.submit();
+    });
+  }
+
+  iframeLoaded() {
+    const { iframe, element } = this;
+
     iframe.className = 'editorframe';
     // 1 for html editing mode, 0 for textarea mode
     this.mode = Browser.mobile || Browser.n3ds ? 0 : globalsettings.wysiwyg;
     this.mode = this.mode || 0;
-    this.textarea = textarea;
     this.window = iframe.contentWindow;
     this.doc = iframe.contentWindow.document;
 
-    const cs = getComputedStyle(this.textarea);
+    const cs = getComputedStyle(element);
     const body = this.doc.getElementsByTagName('body')[0];
     if (body && cs) {
       body.style.backgroundColor = cs.backgroundColor;
@@ -39,17 +55,16 @@ class Editor {
     this.editbar = document.createElement('div');
     this.buildEditBar();
 
-    this.editbar.style.width = `${textarea.clientWidth + 2}px`;
-    iframe.style.width = `${textarea.clientWidth}px`;
-    iframe.style.height = `${textarea.clientHeight}px`;
+    this.editbar.style.width = `${element.clientWidth + 2}px`;
+    iframe.style.width = `${element.clientWidth}px`;
+    iframe.style.height = `${element.clientHeight}px`;
 
-    insertBefore(this.editbar, textarea);
+    insertBefore(this.editbar, element);
 
     // Set the source and initialize the editor
-    //
     this.setSource('<div></div>');
     setTimeout(() => {
-      this.setSource(bbcodeToHTML(textarea.value));
+      this.setSource(bbcodeToHTML(element.value));
       this.switchMode(this.mode);
     }, 100);
   }
@@ -114,15 +129,15 @@ class Editor {
   }
 
   editbarCommand(event, cmd) {
-    const e = Event(event).cancel();
+    event.preventDefault();
 
     switch (cmd) {
       case 'forecolor':
       case 'backcolor':
-        this.showColors(e.pageX, e.pageY, cmd);
+        this.showColors(event.pageX, event.pageY, cmd);
         break;
       case 'c_smileys':
-        this.showEmotes(e.pageX, e.pageY);
+        this.showEmotes(event.pageX, event.pageY);
         break;
       case 'c_switcheditmode':
         this.switchMode(Math.abs(this.mode - 1));
@@ -363,7 +378,7 @@ class Editor {
           this.iframe.contentWindow.focus();
         }
       }
-    } else replaceSelection(this.textarea, bbcode);
+    } else replaceSelection(this.element, bbcode);
   }
 
   getSelection() {
@@ -373,12 +388,12 @@ class Editor {
         : this.window.getSelection();
     }
     if (Browser.ie) {
-      this.textarea.focus();
+      this.element.focus();
       return document.selection.createRange().text;
     }
-    return this.textarea.value.substring(
-      this.textarea.selectionStart,
-      this.textarea.selectionEnd,
+    return this.element.value.substring(
+      this.element.selectionStart,
+      this.element.selectionEnd,
     );
   }
 
@@ -391,16 +406,15 @@ class Editor {
   }
 
   switchMode(toggle) {
-    const t = this.textarea;
-    const f = this.iframe;
+    const { element, iframe } = this;
     if (!toggle) {
-      t.value = htmlToBBCode(this.getSource());
-      t.style.display = '';
-      f.style.display = 'none';
+      element.value = htmlToBBCode(this.getSource());
+      element.style.display = '';
+      iframe.style.display = 'none';
     } else {
-      this.setSource(bbcodeToHTML(t.value));
-      t.style.display = 'none';
-      f.style.display = '';
+      this.setSource(bbcodeToHTML(element.value));
+      element.style.display = 'none';
+      iframe.style.display = '';
     }
     this.mode = toggle;
   }
@@ -412,5 +426,3 @@ class Editor {
     }
   }
 }
-
-export default Editor;

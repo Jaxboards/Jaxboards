@@ -5,25 +5,29 @@ function ordsuffix(a) {
   );
 }
 
+export const monthsShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+export const daysShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+export const months = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
+
 export function date(a) {
   const old = new Date();
   const now = new Date();
   let fmt;
   const yday = new Date();
-  const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
   yday.setTime(yday - 1000 * 60 * 60 * 24);
   old.setTime(a * 1000); // setTime uses milliseconds, we'll be using UNIX Times as the argument
   const hours = `${old.getHours() % 12 || 12}`;
@@ -46,7 +50,7 @@ export function date(a) {
   ) {
     fmt = `Yesterday @ ${hours}:${mins} ${ampm}`;
   } else {
-    fmt = `${months[old.getMonth()]} ${ordsuffix(old.getDate())}, ${old.getFullYear()} @ ${hours}:${mins} ${ampm}`;
+    fmt = `${monthsShort[old.getMonth()]} ${ordsuffix(old.getDate())}, ${old.getFullYear()} @ ${hours}:${mins} ${ampm}`;
   }
   return fmt;
 }

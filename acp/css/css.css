@@ -124,14 +124,15 @@ a:visited {
   font-size: 110%;
 }
 
-.switch_converted {
+.switch {
   width: 50px;
   height: 25px;
   cursor: pointer;
   display: inline-block;
+  border: none;
 }
 
-.switch_converted.yn {
+.switch.yn {
   background: url(../img/yesno.png);
 }
 

@@ -54,161 +54,6 @@
     return max + 1;
   }
 
-  class Color {
-    constructor(colorToParse) {
-      let a = colorToParse;
-      // RGB
-      if (typeof a === 'object') this.rgb = a;
-      else if (typeof a === 'string') {
-        const rgbMatch = a.match(/^rgb\((\d+),\s?(\d+),\s?(\d+)\)/i);
-        const hexMatch = a.match(/#?[^\da-fA-F]/);
-        if (rgbMatch) {
-          rgbMatch[1] = parseFloat(rgbMatch[1]);
-          rgbMatch[2] = parseFloat(rgbMatch[2]);
-          rgbMatch[3] = parseFloat(rgbMatch[3]);
-          rgbMatch.shift();
-          this.rgb = rgbMatch;
-        } else if (hexMatch) {
-          if (a.charAt(0) === '#') {
-            a = a.substr(1);
-          }
-          if (a.length === 3) {
-            a = a.charAt(0)
-              + a.charAt(0)
-              + a.charAt(1)
-              + a.charAt(1)
-              + a.charAt(2)
-              + a.charAt(2);
-          }
-          if (a.length !== 6) this.rgb = [0, 0, 0];
-          else {
-            this.rgb = [];
-            for (let x = 0; x < 3; x += 1) {
-              this.rgb[x] = parseInt(a.substr(x * 2, 2), 16);
-            }
-          }
-        }
-      } else {
-        this.rgb = [0, 0, 0];
-      }
-    }
-
-    invert() {
-      this.rgb = [255 - this.rgb[0], 255 - this.rgb[1], 255 - this.rgb[2]];
-      return this;
-    }
-
-    toRGB() {
-      return this.rgb;
-    }
-
-    toHex() {
-      if (!this.rgb) return false;
-      let tmp2;
-      let tmp = '';
-      let x;
-      const hex = '0123456789ABCDEF';
-      for (x = 0; x < 3; x += 1) {
-        tmp2 = this.rgb[x];
-        tmp
-          += hex.charAt(Math.floor(tmp2 / 16)) + hex.charAt(Math.floor(tmp2 % 16));
-      }
-      return tmp;
-    }
-  }
-
-  class Animation {
-    constructor(el$$1, steps, delay, loop) {
-      this.el = el$$1;
-      this.steps = steps || 30;
-      this.delay = delay || 20;
-      this.curLineup = 0;
-      this.stepCount = 0;
-      this.loop = loop || 0;
-      this.lineup = [[]];
-    }
-
-    play() {
-      this.interval = setInterval(() => this.step(), this.delay);
-      return this;
-    }
-
-    morph(from, percent, to) {
-      if (Array.isArray(from) && from.length === to.length) {
-        return from
-          .map((value, i) => Math.round(this.morph(value, percent, to[i])));
-      }
-      return (to - from) * percent + from;
-    }
-
-    step() {
-      const curL = this.lineup[this.curLineup];
-      this.stepCount += 1;
-      let sc = this.stepCount;
-      if (typeof curL[0] === 'function') {
-        curL[0](this.el);
-        sc = this.steps;
-      } else {
-        curL.forEach((keyFrame) => {
-          let toValue = this.morph(keyFrame[1], sc / this.steps, keyFrame[2]);
-          if (keyFrame[0].match(/color/i)) {
-            toValue = `#${(new Color(toValue)).toHex()}`;
-          } else if (keyFrame[0] !== 'opacity') toValue = Math.round(toValue);
-          this.el.style[keyFrame[0]] = keyFrame[3] + toValue + keyFrame[4];
-        });
-      }
-      if (sc === this.steps) {
-        if (this.lineup.length - 1 > this.curLineup) {
-          this.stepCount = 0;
-          this.curLineup += 1;
-        } else if (this.loop === 1) {
-          this.stepCount = 0;
-          this.curLineup = 0;
-        } else clearInterval(this.interval);
-      }
-    }
-
-    add(what, from, to) {
-      let t = ['', '', ''];
-      let fromParsed;
-      if (what.match(/color/i)) {
-        fromParsed = (new Color(from)).toRGB();
-        t[1] = (new Color(to)).toRGB();
-      } else {
-        t = to.match(/(\D*)(-?\d+)(\D*)/);
-        t.shift();
-        fromParsed = parseFloat(from.match(/-?\d+/));
-      }
-      this.lineup[this.lineup.length - 1].push([what, fromParsed, t[1], t[0], t[2]]);
-      return this;
-    }
-
-    dehighlight() {
-      this.el.style.backgroundColor = '';
-      const bg = getComputedStyle(this.el).backgroundColor.toString();
-      let bg2;
-      this.el.classList.add('highlight');
-      bg2 = getComputedStyle(this.el).backgroundColor.toString();
-      if (bg2 === bg) bg2 = 'FF0';
-      this.el.classList.add('highlight');
-      return this.add('backgroundColor', bg2, bg)
-        .then(() => {
-          this.el.style.backgroundColor = bg;
-        });
-    }
-
-    then(what, from, to, steps) {
-      this.lineup.push([]);
-      if (steps) this.steps = steps;
-      if (typeof what === 'function') {
-        this.lineup[this.lineup.length - 1].push(what);
-      } else {
-        this.add(what, from, to);
-      }
-      return this;
-    }
-  }
-
   const { userAgent } = navigator;
 
   var Browser = {
@@ -228,25 +73,29 @@
     );
   }
 
+  const monthsShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const daysShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
   function date(a) {
     const old = new Date();
     const now = new Date();
     let fmt;
     const yday = new Date();
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
     yday.setTime(yday - 1000 * 60 * 60 * 24);
     old.setTime(a * 1000); // setTime uses milliseconds, we'll be using UNIX Times as the argument
     const hours = `${old.getHours() % 12 || 12}`;
@@ -269,7 +118,7 @@
     ) {
       fmt = `Yesterday @ ${hours}:${mins} ${ampm}`;
     } else {
-      fmt = `${months[old.getMonth()]} ${ordsuffix(old.getDate())}, ${old.getFullYear()} @ ${hours}:${mins} ${ampm}`;
+      fmt = `${monthsShort[old.getMonth()]} ${ordsuffix(old.getDate())}, ${old.getFullYear()} @ ${hours}:${mins} ${ampm}`;
     }
     return fmt;
   }
@@ -290,7 +139,7 @@
 
   // This file is just a dumping ground until I can find better homes for these
   function assign(a, b) {
-    Object.assign(a, b);
+    return Object.assign(a, b);
   }
 
   /**
@@ -304,23 +153,6 @@
       return method(...args);
     }
     return null;
-  }
-
-  function convertSwitches(switches) {
-    switches.forEach((switchElement) => {
-      const button = document.createElement('button');
-      button.className = switchElement.className.replace('switch', 'switch_converted');
-      switchElement.style.display = 'none';
-      if (!switchElement.checked) {
-        button.style.backgroundPosition = 'bottom';
-      }
-      button.addEventListener('click', () => {
-        switchElement.checked = !switchElement.checked;
-        button.style.backgroundPosition = switchElement.checked ? 'top' : 'bottom';
-        switchElement.dispatchEvent(new Event('change'));
-      });
-      insertAfter(button, switchElement);
-    });
   }
 
   function onImagesLoaded(imgs, callback, timeout) {
@@ -376,49 +208,6 @@
     });
   }
 
-  function collapse(element) {
-    const s = element.style;
-    let fh = element.dataset.fullHeight;
-    const b = element.parentNode;
-    s.overflow = 'hidden';
-    if (s.height === '0px') {
-      new Animation(element, 5, 10, 0)
-        .add('height', '0px', fh)
-        .then(() => {
-          b.classList.remove('collapsed');
-        })
-        .play();
-    } else {
-      if (!fh) {
-        fh = `${element.clientHeight || element.offsetHeight}px`;
-        element.dataset.fullHeight = fh;
-      }
-      new Animation(element, 5, 10, 0)
-        .add('height', fh, '0px')
-        .then(() => {
-          b.classList.add('collapsed');
-        })
-        .play();
-    }
-  }
-
-  function handleTabs(event, container, tabSelector) {
-    const activeClass = 'active';
-    let el$$1 = event.target;
-    if (el$$1.tagName.toLowerCase() !== 'a') {
-      return;
-    }
-    if (tabSelector) {
-      el$$1 = el$$1.closest(tabSelector);
-    }
-    const activeTab = container.querySelector('.active');
-    if (activeTab) {
-      activeTab.classList.remove(activeClass);
-    }
-    el$$1.className = activeClass;
-    el$$1.blur();
-  }
-
   function toggleOverlay(show) {
     const dE = document.documentElement;
     let ol = document.getElementById('overlay');
@@ -465,181 +254,6 @@
       document.addEventListener('DOMContentLoaded', callback);
     }
   }
-
-  const months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
-
-  const daysshort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; // I don't think I'll need a dayslong ever
-
-  class DatePicker {
-    constructor(el$$1) {
-      let dp = document.querySelector('#datepicker');
-      let s;
-      const c = getCoordinates(el$$1);
-      if (!dp) {
-        dp = document.createElement('table');
-        dp.id = 'datepicker';
-        document.querySelector('#page').appendChild(dp);
-      }
-      s = dp.style;
-      s.display = 'table';
-      s.zIndex = getHighestZIndex();
-      s.top = `${c.yh}px`;
-      s.left = `${c.x}px`;
-      s = el$$1.value.split('/');
-      if (s.length === 3) {
-        this.selectedDate = [
-          parseInt(s[2], 10),
-          parseInt(s[0], 10) - 1,
-          parseInt(s[1], 10),
-        ];
-      } else this.selectedDate = undefined;
-
-      this.el = el$$1;
-      this.generate(s[2], s[0] ? parseInt(s[0], 10) - 1 : undefined, s[1]);
-    }
-
-    // month should be 0 for jan, 11 for dec
-    generate(iyear, imonth, iday) {
-      let date = new Date();
-      const dp = document.querySelector('#datepicker');
-      let row;
-      let cell;
-      let [year, month, day] = [iyear, imonth, iday];
-      // date here is today
-      if (year === undefined) {
-        year = date.getFullYear();
-        month = date.getMonth();
-        day = date.getDate();
-        this.selectedDate = [year, month, day];
-      }
-
-      if (month === -1) {
-        year -= 1;
-        month = 11;
-      }
-      if (month === 12) {
-        year += 1;
-        month = 0;
-      }
-
-      this.lastDate = [year, month, day];
-
-      // this date is used to calculate days in month and the day the first is on
-      const numdaysinmonth = new Date(year, month + 1, 0).getDate();
-      const first = new Date(year, month, 1).getDay();
-
-      date = new Date(year, month, day);
-      // generate the table now
-      dp.innerHTML = ''; // clear
-
-      // year
-      row = dp.insertRow(0);
-      cell = row.insertCell(0);
-      cell.innerHTML = '<';
-      cell.className = 'control';
-      cell.onclick = () => this.lastYear();
-
-      cell = row.insertCell(1);
-      cell.colSpan = '5';
-      cell.className = 'year';
-      cell.innerHTML = year;
-      cell = row.insertCell(2);
-      cell.innerHTML = '>';
-      cell.className = 'control';
-      cell.onclick = () => this.nextYear();
-
-      // month title
-      row = dp.insertRow(1);
-      cell = row.insertCell(0);
-      cell.innerHTML = '<';
-      cell.className = 'control';
-      cell.onclick = () => this.lastMonth();
-
-      cell = row.insertCell(1);
-      cell.colSpan = '5';
-      cell.innerHTML = months[month];
-      cell.className = 'month';
-      cell = row.insertCell(2);
-      cell.innerHTML = '>';
-      cell.className = 'control';
-      cell.onclick = () => this.nextMonth();
-
-      // weekdays
-      row = dp.insertRow(2);
-      row.className = 'weekdays';
-      for (let x = 0; x < 7; x += 1) {
-        row.insertCell(x).innerHTML = daysshort[x];
-      }
-
-      row = dp.insertRow(3);
-      // generate numbers
-      for (let x = 0; x < numdaysinmonth; x += 1) {
-        if (!x) {
-          for (let i = 0; i < first; i += 1) {
-            row.insertCell(i);
-          }
-        }
-        if ((first + x) % 7 === 0) {
-          row = dp.insertRow(dp.rows.length);
-        }
-        cell = row.insertCell((first + x) % 7);
-        cell.onclick = this.insert.bind(this, cell);
-
-        cell.className = `day${
-        year === this.selectedDate[0]
-        && month === this.selectedDate[1]
-        && x + 1 === this.selectedDate[2]
-          ? ' selected'
-          : ''}`;
-        cell.innerHTML = x + 1;
-      }
-    }
-
-    lastYear() {
-      const l = this.lastDate;
-      this.generate(l[0] - 1, l[1], l[2]);
-    }
-
-    nextYear() {
-      const l = this.lastDate;
-      this.generate(l[0] + 1, l[1], l[2]);
-    }
-
-    lastMonth() {
-      const l = this.lastDate;
-      this.generate(l[0], l[1] - 1, l[2]);
-    }
-
-    nextMonth() {
-      const l = this.lastDate;
-      this.generate(l[0], l[1] + 1, l[2]);
-    }
-
-    insert(cell) {
-      const l = this.lastDate;
-      this.el.value = `${l[1] + 1}/${cell.innerHTML}/${l[0]}`;
-      DatePicker.hide();
-    }
-  }
-
-  // Static methods
-  DatePicker.init = el$$1 => new DatePicker(el$$1);
-  DatePicker.hide = () => {
-    document.querySelector('#datepicker').style.display = 'none';
-  };
 
   /**
    * This method adds some decoration to the default browser event.
@@ -688,35 +302,6 @@
   // TODO: There are places in the source that are using this to store a callback
   // Refactor this
   Event$1.onPageChange = function onPageChange() {};
-
-  // scrolling page list functionality
-  function scrollpagelist(event) {
-    const e = Event$1(event).cancel();
-    const wheelDelta = e.detail || e.wheelDelta;
-    let delta = Math.abs(wheelDelta) / wheelDelta;
-    if (Browser.chrome) {
-      delta *= -1;
-    }
-    const p = Array.from(this.querySelectorAll('a'));
-    const startPage = parseInt(p[1].innerHTML, 10);
-    const lastPage = parseInt(p[p.length - 1].innerHTML, 10);
-    const between = p.length - 2;
-    if (Browser.ie) {
-      delta *= -1;
-    }
-    if ((delta > 0 && startPage + between < lastPage) || (delta < 0 && startPage > 2)) {
-      for (let x = 0; x < between; x += 1) {
-        p[x + 1].href = p[x + 1].href.replace(/\d+$/, x + startPage + delta);
-        p[x + 1].innerHTML = startPage + x + delta;
-      }
-    }
-  }
-  function scrollablepagelist (pl) {
-    if (pl.addEventListener) {
-      pl.addEventListener('DOMMouseScroll', scrollpagelist, false);
-    }
-    pl.onmousewheel = scrollpagelist;
-  }
 
   const maxDimension = '999999px';
 
@@ -784,63 +369,6 @@
           makeResizer(iw, naturalWidth, ih, naturalHeight, img);
         }
       });
-  }
-
-  function makeImageGallery (gallery) {
-    if (gallery.madeGallery) {
-      return;
-    }
-    gallery.madeGallery = true;
-    const controls = document.createElement('div');
-    const next = document.createElement('a');
-    const prev = document.createElement('a');
-    const status = {
-      index: 0,
-      max: Math.max(gallery.querySelectorAll('img').length, 1),
-      showNext() {
-        if (this.index < this.max - 1) {
-          this.index += 1;
-        }
-        this.update();
-      },
-      showPrev() {
-        if (this.index > 0) {
-          this.index -= 1;
-        }
-        this.update();
-      },
-      update() {
-        const imgs = gallery.querySelectorAll('img');
-        imgs.forEach((img, i) => {
-          let container;
-          if (img.madeResized) {
-            container = img.parentNode;
-          } else {
-            container = img;
-          }
-          container.style.display = i !== this.index ? 'none' : 'block';
-        });
-      },
-    };
-    next.innerHTML = 'Next &raquo;';
-    next.href = '#';
-    next.onclick = () => {
-      status.showNext();
-      return false;
-    };
-
-    prev.innerHTML = 'Prev &laquo;';
-    prev.href = '#';
-    prev.onclick = () => {
-      status.showPrev();
-      return false;
-    };
-
-    status.update();
-    controls.appendChild(prev);
-    controls.appendChild(document.createTextNode(' '));
-    controls.appendChild(next);
-    gallery.appendChild(controls);
   }
 
   function stripHTML(html) {
@@ -1019,81 +547,135 @@
     }
   }
 
+  class Component {
+    static get selector() { throw new Error('No Selector defined'); }
+
+    constructor(element) {
+      this.element = element;
+      element.hydrated = true;
+    }
+  }
+
   const VALID_CLASS = 'valid';
   const INVALID_CLASS = 'invalid';
 
-  function fetchResults(queryParams, el$$1, outputElement, event = {}) {
-    const e = Event$1(event);
-    el$$1.onkeydown = (event2) => {
-      const e2 = Event$1(event2);
-      if (e2.ENTER) {
-        e2.cancel();
-        return false;
-      }
-      return true;
-    };
-    let d = document.querySelector('#autocomplete');
-    const coords = getCoordinates(el$$1);
-    let els;
-    let sindex = -1;
-    let l = 0;
-    if (!d) {
-      d = document.createElement('div');
-      d.id = 'autocomplete';
-      d.style.position = 'absolute';
-      d.style.zIndex = getHighestZIndex();
-      document.querySelector('#page').appendChild(d);
-    } else {
-      d.style.display = '';
-      els = Array.from(d.querySelectorAll('div'));
-      l = els.length;
-      sindex = els.findIndex(elmnt => elmnt.classList.contains('selected'));
-    }
-    d.style.top = `${coords.yh}px`;
-    d.style.left = `${coords.x}px`;
-    d.style.width = `${coords.w}px`;
+  class AutoComplete extends Component {
+    static get selector() { return 'input[data-autocomplete-action]'; }
 
-    if (e.UP && l && sindex >= 1) {
-      els[sindex].classList.remove('selected');
-      els[sindex - 1].classList.add('selected');
-    } else if (
-      e.DOWN
-      && l
-      && (sindex < l - 1 || sindex >= -1)
-    ) {
-      if (sindex >= -1) {
-        els[0].classList.add('selected');
-      } else {
-        els[sindex].classList.remove('selected');
-        els[sindex + 1].classList.add('selected');
+    constructor(element) {
+      super(element);
+
+      // Disable native autocomplete behavior
+      element.autocomplete = 'off';
+
+      this.action = element.dataset.autocompleteAction;
+      const output = element.dataset.autocompleteOutput;
+      const indicator = element.dataset.autocompleteIndicator;
+
+      this.outputElement = output && document.querySelector(output);
+      this.indicatorElement = indicator && document.querySelector(indicator);
+
+      if (!this.outputElement) {
+        throw new Error('Expected element to have data-autocomplete-output');
       }
-    } else if (e.ENTER && l && sindex >= -1) {
-      els[sindex].onclick();
-    } else {
+
+      element.addEventListener('keyup', event => this.keyUp(event));
+      element.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+        }
+      });
+    }
+
+    getResultsContainer() {
+      const coords = getCoordinates(this.element);
+      let resultsContainer = document.querySelector('#autocomplete');
+      if (!resultsContainer) {
+        resultsContainer = assign(document.createElement('div'), {
+          id: 'autocomplete',
+        });
+        // TODO: move static properties to CSS
+        assign(resultsContainer.style, {
+          position: 'absolute',
+          zIndex: getHighestZIndex(),
+        });
+        document.body.appendChild(resultsContainer);
+      }
+
+      // Position and size the dropdown below the input field
+      assign(resultsContainer.style, {
+        top: `${coords.yh}px`,
+        left: `${coords.x}px`,
+        width: `${coords.w}px`,
+      });
+
+      return resultsContainer;
+    }
+
+    keyUp(event) {
+      const resultsContainer = this.getResultsContainer();
+      const results = Array.from(resultsContainer.querySelectorAll('div'));
+      const selectedIndex = results.findIndex(el$$1 => el$$1.classList.contains('selected'));
+
+      // Handle arrow key selection
+      if (results) {
+        switch (event.key) {
+          case 'ArrowUp':
+            if (selectedIndex >= 0) {
+              results[selectedIndex].classList.remove('selected');
+              results[selectedIndex - 1].classList.add('selected');
+            }
+            return;
+          case 'ArrowDown':
+            if (selectedIndex === -1) {
+              results[0].classList.add('selected');
+            } else if (selectedIndex < (results.length - 1)) {
+              results[selectedIndex].classList.remove('selected');
+              results[selectedIndex + 1].classList.add('selected');
+            }
+            return;
+          case 'Enter':
+            if (selectedIndex >= 0) {
+              results[selectedIndex].onclick();
+            }
+            return;
+          default:
+            if (this.indicatorElement) {
+              this.indicatorElement.classList.remove(VALID_CLASS);
+              this.indicatorElement.classList.add(INVALID_CLASS);
+            }
+            break;
+        }
+      }
+
       const relativePath = document.location.toString().match('/acp/') ? '../' : '';
+      const searchTerm = encodeURIComponent(this.element.value);
+      const queryParams = `act=${this.action}&term=${searchTerm}`;
       new Ajax().load(
         `${relativePath}misc/listloader.php?${queryParams}`,
         {
           callback: (xml) => {
-            const results = JSON.parse(xml.responseText);
-            d.innerHTML = '';
-            if (!results.length) {
-              d.style.display = 'none';
+            const data = JSON.parse(xml.responseText);
+            resultsContainer.innerHTML = '';
+            if (!data.length) {
+              resultsContainer.style.display = 'none';
             } else {
-              const [ids, values] = results;
+              resultsContainer.style.display = '';
+              const [ids, values] = data;
               ids.forEach((key, i) => {
                 const value = values[i];
                 const div = document.createElement('div');
                 div.innerHTML = value;
                 div.onclick = () => {
-                  div.parentNode.style.display = 'none';
-                  if (outputElement) {
-                    outputElement.value = key;
-                    outputElement.dispatchEvent(new Event('change'));
+                  resultsContainer.style.display = 'none';
+                  if (this.indicatorElement) {
+                    this.indicatorElement.classList.add(VALID_CLASS);
                   }
-                  el$$1.value = value;
+                  this.outputElement.value = key;
+                  this.outputElement.dispatchEvent(new Event('change'));
+                  this.element.value = value;
                 };
-                d.appendChild(div);
+                resultsContainer.appendChild(div);
               });
             }
           },
@@ -1102,28 +684,516 @@
     }
   }
 
-  function decorateElement(element) {
-    // Disable native autocomplete behavior
-    element.autocomplete = 'off';
-    const action = element.dataset.autocompleteAction;
-    const output = element.dataset.autocompleteOutput;
-    const indicator = element.dataset.autocompleteIndicator;
-    const outputElement = output && document.querySelector(output);
-    const indicatorElement = indicator && document.querySelector(indicator);
+  class Color {
+    constructor(colorToParse) {
+      let a = colorToParse;
+      // RGB
+      if (typeof a === 'object') this.rgb = a;
+      else if (typeof a === 'string') {
+        const rgbMatch = a.match(/^rgb\((\d+),\s?(\d+),\s?(\d+)\)/i);
+        const hexMatch = a.match(/#?[^\da-fA-F]/);
+        if (rgbMatch) {
+          rgbMatch[1] = parseFloat(rgbMatch[1]);
+          rgbMatch[2] = parseFloat(rgbMatch[2]);
+          rgbMatch[3] = parseFloat(rgbMatch[3]);
+          rgbMatch.shift();
+          this.rgb = rgbMatch;
+        } else if (hexMatch) {
+          if (a.charAt(0) === '#') {
+            a = a.substr(1);
+          }
+          if (a.length === 3) {
+            a = a.charAt(0)
+              + a.charAt(0)
+              + a.charAt(1)
+              + a.charAt(1)
+              + a.charAt(2)
+              + a.charAt(2);
+          }
+          if (a.length !== 6) this.rgb = [0, 0, 0];
+          else {
+            this.rgb = [];
+            for (let x = 0; x < 3; x += 1) {
+              this.rgb[x] = parseInt(a.substr(x * 2, 2), 16);
+            }
+          }
+        }
+      } else {
+        this.rgb = [0, 0, 0];
+      }
+    }
 
-    if (indicatorElement && outputElement) {
-      outputElement.addEventListener('change', () => {
-        indicatorElement.classList.add(VALID_CLASS);
+    invert() {
+      this.rgb = [255 - this.rgb[0], 255 - this.rgb[1], 255 - this.rgb[2]];
+      return this;
+    }
+
+    toRGB() {
+      return this.rgb;
+    }
+
+    toHex() {
+      if (!this.rgb) return false;
+      let tmp2;
+      let tmp = '';
+      let x;
+      const hex = '0123456789ABCDEF';
+      for (x = 0; x < 3; x += 1) {
+        tmp2 = this.rgb[x];
+        tmp
+          += hex.charAt(Math.floor(tmp2 / 16)) + hex.charAt(Math.floor(tmp2 % 16));
+      }
+      return tmp;
+    }
+  }
+
+  class Animation {
+    constructor(el$$1, steps, delay, loop) {
+      this.el = el$$1;
+      this.steps = steps || 30;
+      this.delay = delay || 20;
+      this.curLineup = 0;
+      this.stepCount = 0;
+      this.loop = loop || 0;
+      this.lineup = [[]];
+    }
+
+    play() {
+      this.interval = setInterval(() => this.step(), this.delay);
+      return this;
+    }
+
+    morph(from, percent, to) {
+      if (Array.isArray(from) && from.length === to.length) {
+        return from
+          .map((value, i) => Math.round(this.morph(value, percent, to[i])));
+      }
+      return (to - from) * percent + from;
+    }
+
+    step() {
+      const curL = this.lineup[this.curLineup];
+      this.stepCount += 1;
+      let sc = this.stepCount;
+      if (typeof curL[0] === 'function') {
+        curL[0](this.el);
+        sc = this.steps;
+      } else {
+        curL.forEach((keyFrame) => {
+          let toValue = this.morph(keyFrame[1], sc / this.steps, keyFrame[2]);
+          if (keyFrame[0].match(/color/i)) {
+            toValue = `#${(new Color(toValue)).toHex()}`;
+          } else if (keyFrame[0] !== 'opacity') toValue = Math.round(toValue);
+          this.el.style[keyFrame[0]] = keyFrame[3] + toValue + keyFrame[4];
+        });
+      }
+      if (sc === this.steps) {
+        if (this.lineup.length - 1 > this.curLineup) {
+          this.stepCount = 0;
+          this.curLineup += 1;
+        } else if (this.loop === 1) {
+          this.stepCount = 0;
+          this.curLineup = 0;
+        } else clearInterval(this.interval);
+      }
+    }
+
+    add(what, from, to) {
+      let t = ['', '', ''];
+      let fromParsed;
+      if (what.match(/color/i)) {
+        fromParsed = (new Color(from)).toRGB();
+        t[1] = (new Color(to)).toRGB();
+      } else {
+        t = to.match(/(\D*)(-?\d+)(\D*)/);
+        t.shift();
+        fromParsed = parseFloat(from.match(/-?\d+/));
+      }
+      this.lineup[this.lineup.length - 1].push([what, fromParsed, t[1], t[0], t[2]]);
+      return this;
+    }
+
+    dehighlight() {
+      this.el.style.backgroundColor = '';
+      const bg = getComputedStyle(this.el).backgroundColor.toString();
+      let bg2;
+      this.el.classList.add('highlight');
+      bg2 = getComputedStyle(this.el).backgroundColor.toString();
+      if (bg2 === bg) bg2 = 'FF0';
+      this.el.classList.add('highlight');
+      return this.add('backgroundColor', bg2, bg)
+        .then(() => {
+          this.el.style.backgroundColor = bg;
+        });
+    }
+
+    then(what, from, to, steps) {
+      this.lineup.push([]);
+      if (steps) this.steps = steps;
+      if (typeof what === 'function') {
+        this.lineup[this.lineup.length - 1].push(what);
+      } else {
+        this.add(what, from, to);
+      }
+      return this;
+    }
+  }
+
+  class CollapseBox extends Component {
+    static get selector() { return '.collapse-box'; }
+
+    constructor(element) {
+      super(element);
+
+      element.querySelector('.collapse-button')
+        .addEventListener('click', () => this.click());
+    }
+
+    click() {
+      const collapseContent = this.element.querySelector('.collapse-content');
+
+      const s = collapseContent.style;
+      let fh = collapseContent.dataset.fullHeight;
+      const b = collapseContent.parentNode;
+      s.overflow = 'hidden';
+      if (s.height === '0px') {
+        new Animation(collapseContent, 5, 10, 0)
+          .add('height', '0px', fh)
+          .then(() => {
+            b.classList.remove('collapsed');
+          })
+          .play();
+      } else {
+        if (!fh) {
+          fh = `${collapseContent.clientHeight || collapseContent.offsetHeight}px`;
+          collapseContent.dataset.fullHeight = fh;
+        }
+        new Animation(collapseContent, 5, 10, 0)
+          .add('height', fh, '0px')
+          .then(() => {
+            b.classList.add('collapsed');
+          })
+          .play();
+      }
+    }
+  }
+
+  class DatePicker extends Component {
+    static get selector() { return 'input.date'; }
+
+    constructor(element) {
+      super(element);
+      this.picker = this.getPicker();
+
+      // Disable browser autocomplete
+      element.autocomplete = 'off';
+      element.addEventListener('focus', () => this.openPicker());
+      element.addEventListener('keydown', () => this.closePicker());
+    }
+
+    getPicker() {
+      if (this.picker) {
+        return this.picker;
+      }
+
+      let picker = document.querySelector('#datepicker');
+      if (!picker) {
+        picker = assign(document.createElement('table'), {
+          id: 'datepicker',
+        });
+        document.body.appendChild(picker);
+      }
+
+      return picker;
+    }
+
+    openPicker() {
+      const c = getCoordinates(this.element);
+      assign(this.picker.style, {
+        display: '',
+        zIndex: getHighestZIndex(),
+        position: 'absolute',
+        top: `${c.yh}px`,
+        left: `${c.x}px`,
+      });
+
+      const [month, day, year] = this.element.value.split('/').map(s => parseInt(s, 10));
+      if (month && day && year) {
+        this.selectedDate = [
+          year,
+          month - 1,
+          day,
+        ];
+      } else this.selectedDate = undefined;
+
+      this.generate(year, month, day);
+    }
+
+    closePicker() {
+      this.picker.style.display = 'none';
+    }
+
+    // month should be 0 for jan, 11 for dec
+    generate(iyear, imonth, iday) {
+      let date$$1 = new Date();
+      const dp = document.querySelector('#datepicker');
+      let row;
+      let cell;
+      let [year, month, day] = [iyear, imonth, iday];
+      // date here is today
+      if (year === undefined) {
+        year = date$$1.getFullYear();
+        month = date$$1.getMonth();
+        day = date$$1.getDate();
+        this.selectedDate = [year, month, day];
+      }
+
+      if (month === -1) {
+        year -= 1;
+        month = 11;
+      }
+      if (month === 12) {
+        year += 1;
+        month = 0;
+      }
+
+      this.lastDate = [year, month, day];
+
+      // this date is used to calculate days in month and the day the first is on
+      const numdaysinmonth = new Date(year, month + 1, 0).getDate();
+      const first = new Date(year, month, 1).getDay();
+
+      date$$1 = new Date(year, month, day);
+      // generate the table now
+      dp.innerHTML = ''; // clear
+
+      // year
+      row = dp.insertRow(0);
+
+      // previous year button
+      cell = row.insertCell(0);
+      cell.innerHTML = '&lt;';
+      cell.className = 'control';
+      cell.onclick = () => this.lastYear();
+
+      // current year heading
+      cell = row.insertCell(1);
+      cell.colSpan = '5';
+      cell.className = 'year';
+      cell.innerHTML = year;
+
+      // next year button
+      cell = row.insertCell(2);
+      cell.innerHTML = '>';
+      cell.className = 'control';
+      cell.onclick = () => this.nextYear();
+
+      // month title
+      row = dp.insertRow(1);
+      cell = row.insertCell(0);
+      cell.innerHTML = '<';
+      cell.className = 'control';
+      cell.onclick = () => this.lastMonth();
+
+      cell = row.insertCell(1);
+      cell.colSpan = '5';
+      cell.innerHTML = months[month];
+      cell.className = 'month';
+      cell = row.insertCell(2);
+      cell.innerHTML = '>';
+      cell.className = 'control';
+      cell.onclick = () => this.nextMonth();
+
+      // weekdays
+      row = dp.insertRow(2);
+      row.className = 'weekdays';
+      for (let x = 0; x < 7; x += 1) {
+        row.insertCell(x).innerHTML = daysShort[x];
+      }
+
+      row = dp.insertRow(3);
+      // generate numbers
+      for (let x = 0; x < numdaysinmonth; x += 1) {
+        if (!x) {
+          for (let i = 0; i < first; i += 1) {
+            row.insertCell(i);
+          }
+        }
+        if ((first + x) % 7 === 0) {
+          row = dp.insertRow(dp.rows.length);
+        }
+        cell = row.insertCell((first + x) % 7);
+        cell.onclick = this.insert.bind(this, cell);
+
+        const isSelected = year === this.selectedDate[0]
+          && month === this.selectedDate[1]
+          && x + 1 === this.selectedDate[2];
+        cell.className = `day${isSelected ? ' selected' : ''}`;
+        cell.innerHTML = x + 1;
+      }
+    }
+
+    lastYear() {
+      const l = this.lastDate;
+      this.generate(l[0] - 1, l[1], l[2]);
+    }
+
+    nextYear() {
+      const l = this.lastDate;
+      this.generate(l[0] + 1, l[1], l[2]);
+    }
+
+    lastMonth() {
+      const l = this.lastDate;
+      this.generate(l[0], l[1] - 1, l[2]);
+    }
+
+    nextMonth() {
+      const l = this.lastDate;
+      this.generate(l[0], l[1] + 1, l[2]);
+    }
+
+    insert(cell) {
+      const l = this.lastDate;
+      this.element.value = `${l[1] + 1}/${cell.innerHTML}/${l[0]}`;
+      this.closePicker();
+    }
+  }
+
+  class ImageGallery extends Component {
+    static get selector() { return '.image_gallery'; }
+
+    constructor(element) {
+      super(element);
+      const controls = document.createElement('div');
+      const next = document.createElement('button');
+      const prev = document.createElement('button');
+      this.index = 0;
+      this.images = element.querySelectorAll('img');
+      this.max = Math.max(this.images.length, 1);
+
+      next.innerHTML = 'Next &raquo;';
+      next.addEventListener('click', () => {
+        this.showNext();
+      });
+
+      prev.innerHTML = 'Prev &laquo;';
+      prev.addEventListener('click', () => {
+        this.showPrev();
+      });
+
+      this.update();
+      controls.appendChild(prev);
+      controls.appendChild(document.createTextNode(' '));
+      controls.appendChild(next);
+      element.appendChild(controls);
+    }
+
+    showNext() {
+      if (this.index < this.max - 1) {
+        this.index += 1;
+      }
+      this.update();
+    }
+
+    showPrev() {
+      if (this.index > 0) {
+        this.index -= 1;
+      }
+      this.update();
+    }
+
+    update() {
+      this.images.forEach((img, i) => {
+        let container;
+        if (img.madeResized) {
+          container = img.parentNode;
+        } else {
+          container = img;
+        }
+        container.style.display = i !== this.index ? 'none' : 'block';
       });
     }
-    element.addEventListener('keyup', (event) => {
-      const searchTerm = encodeURIComponent(element.value);
-      if (indicatorElement) {
-        indicatorElement.classList.remove(VALID_CLASS);
-        indicatorElement.classList.add(INVALID_CLASS);
+  }
+
+  class PageList extends Component {
+    static get selector() { return '.pages'; }
+
+    constructor(element) {
+      super(element);
+      element.addEventListener('wheel', event => this.wheel(event));
+    }
+
+    wheel(event) {
+      event.preventDefault();
+      const direction = Math.sign(event.deltaY);
+      const pages = Array.from(this.element.querySelectorAll('a'));
+      const startPage = parseInt(pages[1].innerHTML, 10);
+      const lastPage = parseInt(pages[pages.length - 1].innerHTML, 10);
+      const between = pages.length - 2;
+
+      if ((direction > 0 && startPage + between < lastPage) || (direction < 0 && startPage > 2)) {
+        for (let x = 0; x < between; x += 1) {
+          pages[x + 1].href = pages[x + 1].href.replace(/\d+$/, x + startPage + direction);
+          pages[x + 1].innerHTML = startPage + x + direction;
+        }
       }
-      fetchResults(`act=${action}&term=${searchTerm}`, element, outputElement, event);
-    });
+    }
+  }
+
+  class Switch extends Component {
+    static get selector() { return 'input.switch'; }
+
+    constructor(element) {
+      super(element);
+      // Hide original checkbox
+      element.style.display = 'none';
+
+      const button = assign(document.createElement('button'), {
+        type: 'button',
+        className: element.className,
+      });
+
+      const toggle = () => {
+        button.style.backgroundPosition = element.checked ? 'bottom' : 'top';
+      };
+      toggle();
+      button.addEventListener('click', () => {
+        element.checked = !element.checked;
+        toggle();
+        element.dispatchEvent(new Event('change'));
+      });
+      insertAfter(button, element);
+    }
+  }
+
+  const ACTIVE_CLASS = 'active';
+
+  class Tabs extends Component {
+    static get selector() { return '.tabs'; }
+
+    constructor(element) {
+      super(element);
+      element.addEventListener('click', event => this.click(event));
+    }
+
+    click(event) {
+      const { tabSelector } = this.element.dataset;
+
+      let { target } = event;
+      if (target.tagName.toLowerCase() !== 'a') {
+        return;
+      }
+      if (tabSelector) {
+        target = target.closest(tabSelector);
+      }
+      const activeTab = this.element.querySelector(`.${ACTIVE_CLASS}`);
+      if (activeTab) {
+        activeTab.classList.remove(ACTIVE_CLASS);
+      }
+      target.className = ACTIVE_CLASS;
+      target.blur();
+    }
   }
 
   const DISALLOWED_TAGS = [
@@ -1281,18 +1351,33 @@
   const URL_REGEX = /^(ht|f)tps?:\/\/[\w.\-%&?=/]+$/;
   const isURL = text => URL_REGEX.test(text);
 
-  class Editor {
-    constructor(textarea, iframe) {
-      this.iframe = iframe;
+  class Editor extends Component {
+    static get selector() { return 'textarea.bbcode-editor'; }
+
+    constructor(element) {
+      super(element);
+
+      this.iframe = document.createElement('iframe');
+      this.iframe.addEventListener('load', () => this.iframeLoaded());
+      this.iframe.style.display = 'none';
+      insertAfter(this.iframe, element);
+
+      element.closest('form').addEventListener('submit', () => {
+        this.submit();
+      });
+    }
+
+    iframeLoaded() {
+      const { iframe, element } = this;
+
       iframe.className = 'editorframe';
       // 1 for html editing mode, 0 for textarea mode
       this.mode = Browser.mobile || Browser.n3ds ? 0 : globalsettings.wysiwyg;
       this.mode = this.mode || 0;
-      this.textarea = textarea;
       this.window = iframe.contentWindow;
       this.doc = iframe.contentWindow.document;
 
-      const cs = getComputedStyle(this.textarea);
+      const cs = getComputedStyle(element);
       const body = this.doc.getElementsByTagName('body')[0];
       if (body && cs) {
         body.style.backgroundColor = cs.backgroundColor;
@@ -1305,17 +1390,16 @@
       this.editbar = document.createElement('div');
       this.buildEditBar();
 
-      this.editbar.style.width = `${textarea.clientWidth + 2}px`;
-      iframe.style.width = `${textarea.clientWidth}px`;
-      iframe.style.height = `${textarea.clientHeight}px`;
+      this.editbar.style.width = `${element.clientWidth + 2}px`;
+      iframe.style.width = `${element.clientWidth}px`;
+      iframe.style.height = `${element.clientHeight}px`;
 
-      insertBefore(this.editbar, textarea);
+      insertBefore(this.editbar, element);
 
       // Set the source and initialize the editor
-      //
       this.setSource('<div></div>');
       setTimeout(() => {
-        this.setSource(bbcodeToHTML(textarea.value));
+        this.setSource(bbcodeToHTML(element.value));
         this.switchMode(this.mode);
       }, 100);
     }
@@ -1380,15 +1464,15 @@
     }
 
     editbarCommand(event, cmd) {
-      const e = Event$1(event).cancel();
+      event.preventDefault();
 
       switch (cmd) {
         case 'forecolor':
         case 'backcolor':
-          this.showColors(e.pageX, e.pageY, cmd);
+          this.showColors(event.pageX, event.pageY, cmd);
           break;
         case 'c_smileys':
-          this.showEmotes(e.pageX, e.pageY);
+          this.showEmotes(event.pageX, event.pageY);
           break;
         case 'c_switcheditmode':
           this.switchMode(Math.abs(this.mode - 1));
@@ -1629,7 +1713,7 @@
             this.iframe.contentWindow.focus();
           }
         }
-      } else replaceSelection(this.textarea, bbcode);
+      } else replaceSelection(this.element, bbcode);
     }
 
     getSelection() {
@@ -1639,12 +1723,12 @@
           : this.window.getSelection();
       }
       if (Browser.ie) {
-        this.textarea.focus();
+        this.element.focus();
         return document.selection.createRange().text;
       }
-      return this.textarea.value.substring(
-        this.textarea.selectionStart,
-        this.textarea.selectionEnd,
+      return this.element.value.substring(
+        this.element.selectionStart,
+        this.element.selectionEnd,
       );
     }
 
@@ -1657,16 +1741,15 @@
     }
 
     switchMode(toggle) {
-      const t = this.textarea;
-      const f = this.iframe;
+      const { element, iframe } = this;
       if (!toggle) {
-        t.value = htmlToBBCode(this.getSource());
-        t.style.display = '';
-        f.style.display = 'none';
+        element.value = htmlToBBCode(this.getSource());
+        element.style.display = '';
+        iframe.style.display = 'none';
       } else {
-        this.setSource(bbcodeToHTML(t.value));
-        t.style.display = 'none';
-        f.style.display = '';
+        this.setSource(bbcodeToHTML(element.value));
+        element.style.display = 'none';
+        iframe.style.display = '';
       }
       this.mode = toggle;
     }
@@ -2096,17 +2179,41 @@
     } while (element);
   };
 
+  class MediaPlayer extends Component {
+    static get selector() { return '.media'; }
+
+    constructor(element) {
+      super(element);
+
+      const popoutLink = element.querySelector('a.popout');
+      const inlineLink = element.querySelector('a.inline');
+      const movie = element.querySelector('.movie');
+
+      popoutLink.addEventListener('click', (event) => {
+        event.preventDefault();
+        const win = new Window({
+          title: popoutLink.href,
+          content: movie.innerHTML,
+        });
+        win.create();
+      });
+
+      inlineLink.addEventListener('click', (event) => {
+        event.preventDefault();
+        movie.style.display = 'block';
+      });
+    }
+  }
+
   /* global RUN */
 
-  function gracefulDegrade(a) {
-    if (typeof RUN !== 'undefined') {
-      updateDates();
-    }
+  function gracefulDegrade(container) {
+    updateDates();
 
     // Special rules for all links
-    const links = a.querySelectorAll('a');
+    const links = container.querySelectorAll('a');
     links.forEach((link) => {
-      // Hande links with tooltips
+      // Handle links with tooltips
       if (link.dataset.useTooltip) {
         link.addEventListener('mouseover', () => openTooltip(link));
       }
@@ -2130,112 +2237,47 @@
           link.target = '_BLANK';
         }
       }
-
-      // Hook up autocomplete form fields
-      const autoCompleteFields = document.querySelectorAll('[data-autocomplete-action]');
-      autoCompleteFields.forEach((field) => {
-        decorateElement(field);
-      });
     });
 
-    // Convert checkboxes to icons (checkmark and X)
-    convertSwitches(Array.from(a.querySelectorAll('.switch')));
-
     // Handle image hover magnification
-    const bbcodeimgs = Array.from(document.querySelectorAll('.bbcodeimg'));
+    const bbcodeimgs = Array.from(container.querySelectorAll('.bbcodeimg'));
     if (bbcodeimgs) {
       onImagesLoaded(
         bbcodeimgs,
         () => {
           // resizer on large images
           imageResizer(bbcodeimgs);
-
-          // handle image galleries
-          const galleries = Array.from(document.querySelectorAll('.image_gallery'));
-          galleries.map(makeImageGallery);
         },
         2000,
       );
     }
 
-    // Initialize page lists that scroll with scroll wheel
-    const pages = Array.from(a.querySelectorAll('.pages'));
-    if (pages.length) {
-      pages.map(scrollablepagelist);
-    }
-
-    // Set up date pickers
-    const dateElements = Array.from(a.querySelectorAll('input.date'));
-    if (dateElements.length) {
-      dateElements.forEach((inputElement) => {
-        inputElement.onclick = () => DatePicker.init(inputElement);
-        inputElement.onkeydown = () => DatePicker.hide();
-      });
-    }
-
     // Make BBCode code blocks selectable when clicked
-    const codeBlocks = a.querySelectorAll('.bbcode.code');
-    codeBlocks.forEach((codeBlock) => {
-      codeBlock.addEventListener('click', () => selectAll(codeBlock));
-    });
-
-    // Make collapse boxes collapsible
-    const collapseBoxes = a.querySelectorAll('.collapse-box');
-    collapseBoxes.forEach((collapseBox) => {
-      const collapseButton = collapseBox.querySelector('.collapse-button');
-      const collapseContent = collapseBox.querySelector('.collapse-content');
-      collapseButton.addEventListener('click', () => {
-        collapse(collapseContent);
-      });
-    });
-
-    // Handle tabs
-    const tabContainers = a.querySelectorAll('.tabs');
-    tabContainers.forEach((tabContainer) => {
-      const { tabSelector } = tabContainer.dataset;
-      tabContainer.addEventListener('click', event => handleTabs(event, tabContainer, tabSelector));
-    });
-
-    // Handle BBCode editors
-    const editors = a.querySelectorAll('textarea.bbcode-editor');
-    editors.forEach((editor) => {
-      const iframe = document.createElement('iframe');
-      iframe.addEventListener('load', () => {
-        iframe.editor = new Editor(editor, iframe);
-      });
-      iframe.style.display = 'none';
-      insertAfter(iframe, editor);
-      editor.closest('form').addEventListener('submit', () => {
-        iframe.editor.submit();
-      });
-    });
-
-    // Handle media players
-    const mediaPlayers = a.querySelectorAll('.media');
-    mediaPlayers.forEach((player) => {
-      const popoutLink = player.querySelector('a.popout');
-      const inlineLink = player.querySelector('a.inline');
-      const movie = player.querySelector('.movie');
-
-      popoutLink.addEventListener('click', (event) => {
-        event.preventDefault();
-        const win = new Window({
-          title: popoutLink.href,
-          content: movie.innerHTML,
-        });
-        win.create();
+    container.querySelectorAll('.bbcode.code')
+      .forEach((codeBlock) => {
+        codeBlock.addEventListener('click', () => selectAll(codeBlock));
       });
 
-      inlineLink.addEventListener('click', (event) => {
-        event.preventDefault();
-        movie.style.display = 'block';
-      });
+    // Hydrate all components
+    [
+      AutoComplete,
+      CollapseBox,
+      DatePicker,
+      Editor,
+      ImageGallery,
+      MediaPlayer,
+      PageList,
+      Switch,
+      Tabs,
+    ].forEach((Component) => {
+      container.querySelectorAll(Component.selector)
+        .forEach(element => new Component(element));
     });
 
     // Wire up AJAX forms
     // NOTE: This needs to come after editors, since they both hook into form onsubmit
     // and the editor hook needs to fire first
-    const ajaxForms = a.querySelectorAll('form[data-ajax-form]');
+    const ajaxForms = container.querySelectorAll('form[data-ajax-form]');
     ajaxForms.forEach((ajaxForm) => {
       const resetOnSubmit = ajaxForm.dataset.ajaxForm === 'resetOnSubmit';
       ajaxForm.addEventListener('submit', (event) => {

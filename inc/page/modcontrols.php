@@ -724,9 +724,7 @@ EOT
             'data-autocomplete-output="#mid" ' .
             'data-autocomplete-indicator="#validname" />' .
             '<span id="validname"></span>
-            <input type="hidden" name="mid" id="mid" ' .
-            'onchange="document.querySelector(\'#validname\').className=\'good\';' .
-            'this.form.onsubmit();" />
+            <input type="hidden" name="mid" id="mid" onchange="this.form.onsubmit();" />
             <input type="submit" value="Go" />
             </form>';
         if (isset($JAX->p['submit']) && 'save' == $JAX->p['submit']) {

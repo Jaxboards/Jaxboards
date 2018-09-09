@@ -15,7 +15,7 @@
 
   // This file is just a dumping ground until I can find better homes for these
   function assign(a, b) {
-    Object.assign(a, b);
+    return Object.assign(a, b);
   }
 
   /**
@@ -35,7 +35,7 @@
    * This method adds some decoration to the default browser event.
    * This can probably be replaced with something more modern.
    */
-  function Event$1(e) {
+  function Event(e) {
     const dB = document.body;
     const dE = document.documentElement;
     switch (e.keyCode) {
@@ -77,7 +77,7 @@
 
   // TODO: There are places in the source that are using this to store a callback
   // Refactor this
-  Event$1.onPageChange = function onPageChange() {};
+  Event.onPageChange = function onPageChange() {};
 
   /* global RUN */
 
@@ -123,9 +123,9 @@
 
     takeitdown() {
       if (onPageChangeOld) {
-        Event$1.onPageChange = onPageChangeOld;
+        Event.onPageChange = onPageChangeOld;
         onPageChangeOld = null;
-      } else Event$1.onPageChange = null;
+      } else Event.onPageChange = null;
       if (this.modb) {
         this.modb.innerHTML = '';
         this.modb.style.display = 'none';
@@ -206,10 +206,10 @@
           10,
         );
         if (!this.busy && onPageChangeOld) {
-          onPageChangeOld = Event$1.onPageChange;
+          onPageChangeOld = Event.onPageChange;
         }
         RUN.modcontrols.whichone = whichone;
-        Event$1.onPageChange = RUN.modcontrols.checklocation;
+        Event.onPageChange = RUN.modcontrols.checklocation;
         RUN.modcontrols.getitup(
           `Ok, now browse to the ${
           whichone ? 'topic' : 'forum'

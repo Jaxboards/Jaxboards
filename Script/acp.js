@@ -1,9 +1,10 @@
 import { onDOMReady } from './JAX/util';
-import { insertAfter, getCoordinates } from './JAX/el';
+import { getCoordinates } from './JAX/el';
 import Ajax from './JAX/ajax';
 import { replaceSelection } from './JAX/selection';
 import sortableTree from './JAX/sortable-tree';
-import autocompleteDecorator from './JAX/autocomplete';
+import AutoComplete from './components/auto-complete';
+import Switch from './components/switch';
 
 function dropdownMenu(e) {
   const el = e.target;
@@ -74,21 +75,8 @@ function gracefulDegrade() {
   });
 
   // Converts all switches (checkboxes) into graphics, to show "X" or "check"
-  const switches = Array.from(document.querySelectorAll('.switch'));
-  switches.forEach((switchEl) => {
-    const toggle = document.createElement('div');
-    toggle.className = switchEl.className.replace('switch', 'switch_converted');
-    switchEl.style.display = 'none';
-    if (!switchEl.checked) {
-      toggle.style.backgroundPosition = 'bottom';
-    }
-    toggle.addEventListener('click', () => {
-      switchEl.checked = !switchEl.checked;
-      toggle.style.backgroundPosition = switchEl.checked ? 'top' : 'bottom';
-      switchEl.dispatchEvent(new Event('change'));
-    });
-    insertAfter(toggle, switchEl);
-  });
+  document.querySelectorAll(Switch.selector)
+    .forEach(toggleSwitch => new Switch(toggleSwitch));
 
   // Makes editors capable of tabbing for indenting
   const editor = document.querySelector('.editor');
@@ -102,10 +90,8 @@ function gracefulDegrade() {
   }
 
   // Hook up autocomplete form fields
-  const autoCompleteFields = document.querySelectorAll('[data-autocomplete-action]');
-  autoCompleteFields.forEach((field) => {
-    autocompleteDecorator(field);
-  });
+  const autoCompleteFields = document.querySelectorAll(AutoComplete.selector);
+  autoCompleteFields.forEach(field => new AutoComplete(field));
 
   // Orderable forums needs this
   const tree = document.querySelector('.tree');

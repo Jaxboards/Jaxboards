@@ -68,7 +68,7 @@
 
   // This file is just a dumping ground until I can find better homes for these
   function assign(a, b) {
-    Object.assign(a, b);
+    return Object.assign(a, b);
   }
 
   /**
@@ -532,81 +532,135 @@
     items.forEach(item => drag.apply(item));
   }
 
+  class Component {
+    static get selector() { throw new Error('No Selector defined'); }
+
+    constructor(element) {
+      this.element = element;
+      element.hydrated = true;
+    }
+  }
+
   const VALID_CLASS = 'valid';
   const INVALID_CLASS = 'invalid';
 
-  function fetchResults(queryParams, el$$1, outputElement, event = {}) {
-    const e = Event$1(event);
-    el$$1.onkeydown = (event2) => {
-      const e2 = Event$1(event2);
-      if (e2.ENTER) {
-        e2.cancel();
-        return false;
-      }
-      return true;
-    };
-    let d = document.querySelector('#autocomplete');
-    const coords = getCoordinates(el$$1);
-    let els;
-    let sindex = -1;
-    let l = 0;
-    if (!d) {
-      d = document.createElement('div');
-      d.id = 'autocomplete';
-      d.style.position = 'absolute';
-      d.style.zIndex = getHighestZIndex();
-      document.querySelector('#page').appendChild(d);
-    } else {
-      d.style.display = '';
-      els = Array.from(d.querySelectorAll('div'));
-      l = els.length;
-      sindex = els.findIndex(elmnt => elmnt.classList.contains('selected'));
-    }
-    d.style.top = `${coords.yh}px`;
-    d.style.left = `${coords.x}px`;
-    d.style.width = `${coords.w}px`;
+  class AutoComplete extends Component {
+    static get selector() { return 'input[data-autocomplete-action]'; }
 
-    if (e.UP && l && sindex >= 1) {
-      els[sindex].classList.remove('selected');
-      els[sindex - 1].classList.add('selected');
-    } else if (
-      e.DOWN
-      && l
-      && (sindex < l - 1 || sindex >= -1)
-    ) {
-      if (sindex >= -1) {
-        els[0].classList.add('selected');
-      } else {
-        els[sindex].classList.remove('selected');
-        els[sindex + 1].classList.add('selected');
+    constructor(element) {
+      super(element);
+
+      // Disable native autocomplete behavior
+      element.autocomplete = 'off';
+
+      this.action = element.dataset.autocompleteAction;
+      const output = element.dataset.autocompleteOutput;
+      const indicator = element.dataset.autocompleteIndicator;
+
+      this.outputElement = output && document.querySelector(output);
+      this.indicatorElement = indicator && document.querySelector(indicator);
+
+      if (!this.outputElement) {
+        throw new Error('Expected element to have data-autocomplete-output');
       }
-    } else if (e.ENTER && l && sindex >= -1) {
-      els[sindex].onclick();
-    } else {
+
+      element.addEventListener('keyup', event => this.keyUp(event));
+      element.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+        }
+      });
+    }
+
+    getResultsContainer() {
+      const coords = getCoordinates(this.element);
+      let resultsContainer = document.querySelector('#autocomplete');
+      if (!resultsContainer) {
+        resultsContainer = assign(document.createElement('div'), {
+          id: 'autocomplete',
+        });
+        // TODO: move static properties to CSS
+        assign(resultsContainer.style, {
+          position: 'absolute',
+          zIndex: getHighestZIndex(),
+        });
+        document.body.appendChild(resultsContainer);
+      }
+
+      // Position and size the dropdown below the input field
+      assign(resultsContainer.style, {
+        top: `${coords.yh}px`,
+        left: `${coords.x}px`,
+        width: `${coords.w}px`,
+      });
+
+      return resultsContainer;
+    }
+
+    keyUp(event) {
+      const resultsContainer = this.getResultsContainer();
+      const results = Array.from(resultsContainer.querySelectorAll('div'));
+      const selectedIndex = results.findIndex(el$$1 => el$$1.classList.contains('selected'));
+
+      // Handle arrow key selection
+      if (results) {
+        switch (event.key) {
+          case 'ArrowUp':
+            if (selectedIndex >= 0) {
+              results[selectedIndex].classList.remove('selected');
+              results[selectedIndex - 1].classList.add('selected');
+            }
+            return;
+          case 'ArrowDown':
+            if (selectedIndex === -1) {
+              results[0].classList.add('selected');
+            } else if (selectedIndex < (results.length - 1)) {
+              results[selectedIndex].classList.remove('selected');
+              results[selectedIndex + 1].classList.add('selected');
+            }
+            return;
+          case 'Enter':
+            if (selectedIndex >= 0) {
+              results[selectedIndex].onclick();
+            }
+            return;
+          default:
+            if (this.indicatorElement) {
+              this.indicatorElement.classList.remove(VALID_CLASS);
+              this.indicatorElement.classList.add(INVALID_CLASS);
+            }
+            break;
+        }
+      }
+
       const relativePath = document.location.toString().match('/acp/') ? '../' : '';
+      const searchTerm = encodeURIComponent(this.element.value);
+      const queryParams = `act=${this.action}&term=${searchTerm}`;
       new Ajax().load(
         `${relativePath}misc/listloader.php?${queryParams}`,
         {
           callback: (xml) => {
-            const results = JSON.parse(xml.responseText);
-            d.innerHTML = '';
-            if (!results.length) {
-              d.style.display = 'none';
+            const data = JSON.parse(xml.responseText);
+            resultsContainer.innerHTML = '';
+            if (!data.length) {
+              resultsContainer.style.display = 'none';
             } else {
-              const [ids, values] = results;
+              resultsContainer.style.display = '';
+              const [ids, values] = data;
               ids.forEach((key, i) => {
                 const value = values[i];
                 const div = document.createElement('div');
                 div.innerHTML = value;
                 div.onclick = () => {
-                  div.parentNode.style.display = 'none';
-                  if (outputElement) {
-                    outputElement.value = key;
-                    outputElement.dispatchEvent(new Event('change'));
+                  resultsContainer.style.display = 'none';
+                  if (this.indicatorElement) {
+                    this.indicatorElement.classList.add(VALID_CLASS);
                   }
-                  el$$1.value = value;
+                  this.outputElement.value = key;
+                  this.outputElement.dispatchEvent(new Event('change'));
+                  this.element.value = value;
                 };
-                d.appendChild(div);
+                resultsContainer.appendChild(div);
               });
             }
           },
@@ -615,28 +669,30 @@
     }
   }
 
-  function decorateElement(element) {
-    // Disable native autocomplete behavior
-    element.autocomplete = 'off';
-    const action = element.dataset.autocompleteAction;
-    const output = element.dataset.autocompleteOutput;
-    const indicator = element.dataset.autocompleteIndicator;
-    const outputElement = output && document.querySelector(output);
-    const indicatorElement = indicator && document.querySelector(indicator);
+  class Switch extends Component {
+    static get selector() { return 'input.switch'; }
 
-    if (indicatorElement && outputElement) {
-      outputElement.addEventListener('change', () => {
-        indicatorElement.classList.add(VALID_CLASS);
+    constructor(element) {
+      super(element);
+      // Hide original checkbox
+      element.style.display = 'none';
+
+      const button = assign(document.createElement('button'), {
+        type: 'button',
+        className: element.className,
       });
+
+      const toggle = () => {
+        button.style.backgroundPosition = element.checked ? 'bottom' : 'top';
+      };
+      toggle();
+      button.addEventListener('click', () => {
+        element.checked = !element.checked;
+        toggle();
+        element.dispatchEvent(new Event('change'));
+      });
+      insertAfter(button, element);
     }
-    element.addEventListener('keyup', (event) => {
-      const searchTerm = encodeURIComponent(element.value);
-      if (indicatorElement) {
-        indicatorElement.classList.remove(VALID_CLASS);
-        indicatorElement.classList.add(INVALID_CLASS);
-      }
-      fetchResults(`act=${action}&term=${searchTerm}`, element, outputElement, event);
-    });
   }
 
   function dropdownMenu(e) {
@@ -708,21 +764,8 @@
     });
 
     // Converts all switches (checkboxes) into graphics, to show "X" or "check"
-    const switches = Array.from(document.querySelectorAll('.switch'));
-    switches.forEach((switchEl) => {
-      const toggle = document.createElement('div');
-      toggle.className = switchEl.className.replace('switch', 'switch_converted');
-      switchEl.style.display = 'none';
-      if (!switchEl.checked) {
-        toggle.style.backgroundPosition = 'bottom';
-      }
-      toggle.addEventListener('click', () => {
-        switchEl.checked = !switchEl.checked;
-        toggle.style.backgroundPosition = switchEl.checked ? 'top' : 'bottom';
-        switchEl.dispatchEvent(new Event('change'));
-      });
-      insertAfter(toggle, switchEl);
-    });
+    document.querySelectorAll(Switch.selector)
+      .forEach(toggleSwitch => new Switch(toggleSwitch));
 
     // Makes editors capable of tabbing for indenting
     const editor = document.querySelector('.editor');
@@ -736,10 +779,8 @@
     }
 
     // Hook up autocomplete form fields
-    const autoCompleteFields = document.querySelectorAll('[data-autocomplete-action]');
-    autoCompleteFields.forEach((field) => {
-      decorateElement(field);
-    });
+    const autoCompleteFields = document.querySelectorAll(AutoComplete.selector);
+    autoCompleteFields.forEach(field => new AutoComplete(field));
 
     // Orderable forums needs this
     const tree = document.querySelector('.tree');

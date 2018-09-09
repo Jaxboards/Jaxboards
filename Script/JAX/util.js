@@ -1,8 +1,6 @@
 import {
-  insertAfter,
   getHighestZIndex,
 } from './el';
-import Animation from './animation';
 import Browser from './browser';
 import {
   date,
@@ -11,7 +9,7 @@ import {
 
 // This file is just a dumping ground until I can find better homes for these
 export function assign(a, b) {
-  Object.assign(a, b);
+  return Object.assign(a, b);
 }
 
 /**
@@ -25,23 +23,6 @@ export function tryInvoke(method, ...args) {
     return method(...args);
   }
   return null;
-}
-
-export function convertSwitches(switches) {
-  switches.forEach((switchElement) => {
-    const button = document.createElement('button');
-    button.className = switchElement.className.replace('switch', 'switch_converted');
-    switchElement.style.display = 'none';
-    if (!switchElement.checked) {
-      button.style.backgroundPosition = 'bottom';
-    }
-    button.addEventListener('click', () => {
-      switchElement.checked = !switchElement.checked;
-      button.style.backgroundPosition = switchElement.checked ? 'top' : 'bottom';
-      switchElement.dispatchEvent(new Event('change'));
-    });
-    insertAfter(button, switchElement);
-  });
 }
 
 export function onImagesLoaded(imgs, callback, timeout) {
@@ -95,49 +76,6 @@ export function updateDates() {
       el.innerHTML = parsed;
     }
   });
-}
-
-export function collapse(element) {
-  const s = element.style;
-  let fh = element.dataset.fullHeight;
-  const b = element.parentNode;
-  s.overflow = 'hidden';
-  if (s.height === '0px') {
-    new Animation(element, 5, 10, 0)
-      .add('height', '0px', fh)
-      .then(() => {
-        b.classList.remove('collapsed');
-      })
-      .play();
-  } else {
-    if (!fh) {
-      fh = `${element.clientHeight || element.offsetHeight}px`;
-      element.dataset.fullHeight = fh;
-    }
-    new Animation(element, 5, 10, 0)
-      .add('height', fh, '0px')
-      .then(() => {
-        b.classList.add('collapsed');
-      })
-      .play();
-  }
-}
-
-export function handleTabs(event, container, tabSelector) {
-  const activeClass = 'active';
-  let el = event.target;
-  if (el.tagName.toLowerCase() !== 'a') {
-    return;
-  }
-  if (tabSelector) {
-    el = el.closest(tabSelector);
-  }
-  const activeTab = container.querySelector('.active');
-  if (activeTab) {
-    activeTab.classList.remove(activeClass);
-  }
-  el.className = activeClass;
-  el.blur();
 }
 
 export function toggleOverlay(show) {
