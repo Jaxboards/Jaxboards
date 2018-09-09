@@ -2,13 +2,13 @@
   <label for="sbe">
     Shoutbox enabled:
   </label>
-  <input {{ SHOUTBOX_CHECKED }} id="sbe" type="checkbox" name="sbe"
+  <input {{ shoutbox_checked }} id="sbe" type="checkbox" name="sbe"
   class="switch yn" />
   <br />
   <label for="sbava">
     Shoutbox avatars:
   </label>
-  <input {{ SHOUTBOX_AVATAR_CHECKED }} type="checkbox" name="sbava"
+  <input {{ shoutbox_avatar_checked }} type="checkbox" name="sbava"
   class="switch yn" />
   <br />
   <label for="sbnum">
@@ -16,7 +16,7 @@
     <br />
     (Max 10)
   </label>
-  <input type="text" name="sbnum" class="slider" value="{{ SHOW_SHOUTS }}" />
+  <input type="text" name="sbnum" class="slider" value="{{ show_shouts }}" />
   <br />
   <br />
   <label for="clear">

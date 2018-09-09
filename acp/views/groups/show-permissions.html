@@ -1,14 +1,14 @@
 <form action="?act=groups&do=perms" method="post">
-  <input type="hidden" name="grouplist" value="{{ GROUP_LIST }}" />
+  <input type="hidden" name="grouplist" value="{{ group_list }}" />
   <div class="permcontainer">
     * Starred are permissions not functional yet.
     <table class="sticky-heading">
       <tr>
-        {{ GROUP_HEADINGS }}
+        {{ group_headings }}
       </tr>
     </table>
     <table class="perms">
-      {{ PERMISSIONS_TABLE }}
+      {{ permissions_table }}
     </table>
   </div>
   <div style="margin-top:20px" class="center">

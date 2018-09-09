@@ -5,10 +5,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>
-      {{ BOARD_NAME }} - Admin Control Panel</title>
+      {{ board_name }} - Admin Control Panel</title>
     <meta name="description" content="Staff Only" />
-    <link rel="icon" type="image/x-icon" href="{{ FAVICON_URL }}" />
-    <link rel="stylesheet" type="text/css" href="{{ CSS_URL }}" />
+    <link rel="icon" type="image/x-icon" href="{{ favicon_url }}" />
+    <link rel="stylesheet" type="text/css" href="{{ css_url }}" />
   </head>
 
   <body>
@@ -16,7 +16,7 @@
       <div id="login">
         <div id="logo"></div>
         <div id="loginform">
-          {{ CONTENT }}
+          {{ content }}
           <form method="post">
             <label for="user">
               Username:
@@ -31,7 +31,7 @@
             <input type="submit" value="Login to the ACP" name="submit" />
           </form>
           <div class="goBack">
-            <a class="goBackLink" href="{{ BOARD_URL }}">Back to Board</a>
+            <a class="goBackLink" href="{{ board_url }}">Back to Board</a>
           </div>
         </div>
       </div>

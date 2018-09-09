@@ -254,7 +254,7 @@ EOT;
         if (is_array($data)) {
             foreach ($data as $name => $content) {
                 $template = str_replace(
-                    '{{ ' . mb_strtoupper($name) . ' }}',
+                    '{{ ' . mb_strtolower($name) . ' }}',
                     $content,
                     $template
                 );

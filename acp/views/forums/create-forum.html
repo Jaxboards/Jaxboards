@@ -5,7 +5,7 @@
         Forum Title:
       </td>
       <td>
-        <input type="text" name="title" value="{{ TITLE }}" />
+        <input type="text" name="title" value="{{ title }}" />
       </td>
     </tr>
     <tr>
@@ -13,7 +13,7 @@
         Description:
       </td>
       <td>
-        <textarea name="description">{{ DESCRIPTION }}</textarea>
+        <textarea name="description">{{ description }}</textarea>
       </td>
     </tr>
     <tr>
@@ -21,7 +21,7 @@
         Redirect URL:
       </td>
       <td>
-        <input type="text" name="redirect" value="{{ REDIRECT_URL }}" />
+        <input type="text" name="redirect" value="{{ redirect_url }}" />
       </td>
     </tr>
     <tr>
@@ -30,7 +30,7 @@
       </td>
       <td>
         <select name="showsub">
-          {{ SUBFORUM_OPTIONS }}
+          {{ subforum_options }}
         </select>
       </td>
     </tr>
@@ -40,7 +40,7 @@
       </td>
       <td>
         <select name="orderby">
-          {{ ORDER_BY_OPTIONS }}
+          {{ order_by_options }}
         </select>
       </td>
     </tr>
@@ -49,7 +49,7 @@
         Posts count towards post count?
       </td>
       <td>
-        <input {{ NO_COUNT }} type="checkbox" class="switch yn"
+        <input {{ no_count }} type="checkbox" class="switch yn"
         name="nocount" />
       </td>
     </tr>
@@ -58,7 +58,7 @@
         Trashcan?
       </td>
       <td>
-        <input {{ TRASHCAN }} type="checkbox" class="switch yn"
+        <input {{ trashcan }} type="checkbox" class="switch yn"
         name="trashcan" />
       </td>
     </tr>
