@@ -30,17 +30,13 @@ EOT;
 new buddylist();
 class buddylist
 {
-    public function buddylist()
-    {
-        $this->__construct();
-    }
-
     public function __construct()
     {
         global $PAGE,$JAX,$USER;
-        if (!$USER) {
-            $PAGE->JS('softurl');
 
+        $PAGE->JS('softurl');
+
+        if (!$USER) {
             return $PAGE->JS(
                 'error',
                 'Sorry, you must be logged in to use this feature.'
@@ -56,10 +52,8 @@ class buddylist
             $this->block($JAX->b['block']);
         } elseif (isset($JAX->b['unblock']) && $JAX->b['unblock']) {
             $this->unblock($JAX->b['unblock']);
-        } elseif (isset($JAX->b['module']) && 'buddylist' == $JAX->b['module']) {
-            $this->displaybuddylist();
         } else {
-            $this->update();
+            $this->displaybuddylist();
         }
     }
 
@@ -129,11 +123,6 @@ class buddylist
                 'pos' => 'tr 20 20'
             )
         );
-    }
-
-    public function update()
-    {
-        global $PAGE;
     }
 
     public function addbuddy($uid)

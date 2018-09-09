@@ -2494,7 +2494,12 @@
       document.querySelector(`#im_${a}`).classList.add('offline');
     },
     window([options]) {
-      if (options.id && document.getElementById(options.id)) return;
+      const existingWindow = options.id && options.id && document.getElementById(options.id);
+      if (existingWindow) {
+        existingWindow.querySelector('.title').innerHTML = options.title;
+        existingWindow.querySelector('.content').innerHTML = options.content;
+        return;
+      }
       const win = new Window();
       win.title = options.title;
       win.content = options.content;

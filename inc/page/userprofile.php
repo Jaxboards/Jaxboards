@@ -88,15 +88,15 @@ EOT
                     in_array(
                         $ud['uid'],
                         explode(',', $USER['friends'])
-                    ) ? '<a href="?module=buddylist&remove=' . $ud['uid'] .
-                    '">Remove Contact</a>' : '<a href="?module=buddylist&add=' .
+                    ) ? '<a href="?act=buddylist&remove=' . $ud['uid'] .
+                    '">Remove Contact</a>' : '<a href="?act=buddylist&add=' .
                     $ud['uid'] . '">Add Contact</a>',
                     in_array(
                         $ud['uid'],
                         explode(',', $USER['enemies'])
-                    ) ? '<a href="?module=buddylist&unblock=' . $ud['uid'] .
+                    ) ? '<a href="?act=buddylist&unblock=' . $ud['uid'] .
                     '">Unblock Contact</a>' :
-                    '<a href="?module=buddylist&block=' . $ud['uid'] .
+                    '<a href="?act=buddylist&block=' . $ud['uid'] .
                     '">Block Contact</>'
                 ),
             )

@@ -304,14 +304,6 @@ foreach (glob('inc/modules/*.php') as $v) {
         ) {
             include $v;
         }
-    } elseif (preg_match('/cookie_(\\w+)/', $v, $m)) {
-        if ((isset($JAX->b['module'])
-            && $JAX->b['module'] == $m[1])
-            || (isset($m[1], $JAX->c[$m[1]])
-            && $JAX->c[$m[1]])
-        ) {
-            include $v;
-        }
     } else {
         include $v;
     }
