@@ -2,7 +2,10 @@ import Ajax from './ajax';
 import JaxEvent from './event';
 import { getHighestZIndex, getCoordinates } from './el';
 
-export default function (queryParams, el, outputElement, event = {}) {
+const VALID_CLASS = 'valid';
+const INVALID_CLASS = 'invalid';
+
+function fetchResults(queryParams, el, outputElement, event = {}) {
   const e = JaxEvent(event);
   el.onkeydown = (event2) => {
     const e2 = JaxEvent(event2);
@@ -80,4 +83,28 @@ export default function (queryParams, el, outputElement, event = {}) {
       },
     );
   }
+}
+
+export default function decorateElement(element) {
+  // Disable native autocomplete behavior
+  element.autocomplete = 'off';
+  const action = element.dataset.autocompleteAction;
+  const output = element.dataset.autocompleteOutput;
+  const indicator = element.dataset.autocompleteIndicator;
+  const outputElement = output && document.querySelector(output);
+  const indicatorElement = indicator && document.querySelector(indicator);
+
+  if (indicatorElement && outputElement) {
+    outputElement.addEventListener('change', () => {
+      indicatorElement.classList.add(VALID_CLASS);
+    });
+  }
+  element.addEventListener('keyup', (event) => {
+    const searchTerm = encodeURIComponent(element.value);
+    if (indicatorElement) {
+      indicatorElement.classList.remove(VALID_CLASS);
+      indicatorElement.classList.add(INVALID_CLASS);
+    }
+    fetchResults(`act=${action}&term=${searchTerm}`, element, outputElement, event);
+  });
 }

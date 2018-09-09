@@ -3,7 +3,7 @@ import { insertAfter, getCoordinates } from './JAX/el';
 import Ajax from './JAX/ajax';
 import { replaceSelection } from './JAX/selection';
 import sortableTree from './JAX/sortable-tree';
-import autoComplete from './JAX/autocomplete';
+import autocompleteDecorator from './JAX/autocomplete';
 
 function dropdownMenu(e) {
   const el = e.target;
@@ -104,25 +104,7 @@ function gracefulDegrade() {
   // Hook up autocomplete form fields
   const autoCompleteFields = document.querySelectorAll('[data-autocomplete-action]');
   autoCompleteFields.forEach((field) => {
-    // Disable native autocomplete behavior
-    field.autocomplete = 'off';
-    const action = field.dataset.autocompleteAction;
-    const output = field.dataset.autocompleteOutput;
-    const indicator = field.dataset.autocompleteIndicator;
-    const outputElement = output && document.querySelector(output);
-    const indicatorElement = indicator && document.querySelector(indicator);
-    const searchTerm = field.value;
-
-    if (outputElement) {
-      outputElement.addEventListener('change', () => {
-        indicatorElement.classList.add('good');
-      });
-    }
-    field.addEventListener('keyup', (event) => {
-      indicatorElement.classList.remove('good');
-      indicatorElement.classList.add('bad');
-      autoComplete(`act=${action}&term=${encodeURIComponent(searchTerm)}`, field, outputElement, event);
-    });
+    autocompleteDecorator(field);
   });
 
   // Orderable forums needs this

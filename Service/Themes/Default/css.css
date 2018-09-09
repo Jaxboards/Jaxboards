@@ -2202,15 +2202,15 @@ a.mgroup4 {
   border-style: solid none;
 }
 
-#validname.good,
-#validname.bad {
+#validname.valid,
+#validname.invalid {
   display: inline-block;
   width: 16px;
   height: 16px;
   background: url(icons/check_x.png) top center;
 }
 
-#validname.good {
+#validname.valid {
   background-position: bottom center;
 }
 

@@ -346,10 +346,10 @@ h2 {
   border-style: solid none;
 }
 
-#validname.good,
-#validname.bad,
-#validname2.bad,
-#validname2.good {
+#validname.valid,
+#validname.invalid,
+#validname2.invalid,
+#validname2.valid {
   display: inline-block;
   margin-left: 10px;
   width: 30px;
@@ -357,8 +357,8 @@ h2 {
   background: url(../img/yesno.png) bottom center;
 }
 
-#validname.good,
-#validname2.good {
+#validname.valid,
+#validname2.valid {
   background-position: top center;
 }
 

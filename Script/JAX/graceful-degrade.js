@@ -1,0 +1,124 @@
+/* global RUN */
+import DatePicker from './date-picker';
+import scrollablepagelist from './scrollablepagelist';
+import { imageResizer } from './image-resizer';
+import makeImageGallery from './image-gallery';
+import tooltip from './tooltip';
+import { selectAll } from './selection';
+import autocompleteDecorator from './autocomplete';
+import {
+  collapse,
+  convertSwitches,
+  handleTabs,
+  onImagesLoaded,
+  updateDates,
+} from './util';
+
+export default function gracefulDegrade(a) {
+  if (typeof RUN !== 'undefined') {
+    updateDates();
+  }
+
+  // Special rules for all links
+  const links = a.querySelectorAll('a');
+  links.forEach((link) => {
+    // Hande links with tooltips
+    if (link.dataset.useTooltip) {
+      link.addEventListener('mouseover', () => tooltip(link));
+    }
+
+    // Make all links load through AJAX
+    if (link.href) {
+      const href = link.getAttribute('href');
+      if (href.charAt(0) === '?') {
+        const oldclick = link.onclick;
+        link.addEventListener('click', (event) => {
+          // Some links have an onclick that returns true/false based on whether
+          // or not the link should execute.
+          if (!oldclick || oldclick.call(link) !== false) {
+            RUN.stream.location(href);
+          }
+          event.preventDefault();
+        });
+
+      // Open external links in a new window
+      } else if (link.getAttribute('href').substr(0, 4) === 'http') {
+        link.target = '_BLANK';
+      }
+    }
+
+    // Hook up autocomplete form fields
+    const autoCompleteFields = document.querySelectorAll('[data-autocomplete-action]');
+    autoCompleteFields.forEach((field) => {
+      autocompleteDecorator(field);
+    });
+  });
+
+  // Convert checkboxes to icons (checkmark and X)
+  convertSwitches(Array.from(a.querySelectorAll('.switch')));
+
+  // Handle image hover magnification
+  const bbcodeimgs = Array.from(document.querySelectorAll('.bbcodeimg'));
+  if (bbcodeimgs) {
+    onImagesLoaded(
+      bbcodeimgs,
+      () => {
+        // resizer on large images
+        imageResizer(bbcodeimgs);
+
+        // handle image galleries
+        const galleries = Array.from(document.querySelectorAll('.image_gallery'));
+        galleries.map(makeImageGallery);
+      },
+      2000,
+    );
+  }
+
+  // Initialize page lists that scroll with scroll wheel
+  const pages = Array.from(a.querySelectorAll('.pages'));
+  if (pages.length) {
+    pages.map(scrollablepagelist);
+  }
+
+  // Set up date pickers
+  const dateElements = Array.from(a.querySelectorAll('input.date'));
+  if (dateElements.length) {
+    dateElements.forEach((inputElement) => {
+      inputElement.onclick = () => DatePicker.init(inputElement);
+      inputElement.onkeydown = () => DatePicker.hide();
+    });
+  }
+
+  // Make BBCode code blocks selectable when clicked
+  const codeBlocks = a.querySelectorAll('.bbcode.code');
+  codeBlocks.forEach((codeBlock) => {
+    codeBlock.addEventListener('click', () => selectAll(codeBlock));
+  });
+
+  // Make collapse boxes collapsible
+  const collapseBoxes = a.querySelectorAll('.collapse-box');
+  collapseBoxes.forEach((collapseBox) => {
+    const collapseButton = collapseBox.querySelector('.collapse-button');
+    const collapseContent = collapseBox.querySelector('.collapse-content');
+    collapseButton.addEventListener('click', () => {
+      collapse(collapseContent);
+    });
+  });
+
+  // Wire up AJAX forms
+  const ajaxForms = a.querySelectorAll('form[data-ajax-form]');
+  ajaxForms.forEach((ajaxForm) => {
+    const resetOnSubmit = ajaxForm.dataset.ajaxForm === 'resetOnSubmit';
+    ajaxForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      RUN.submitForm(ajaxForm, resetOnSubmit);
+    });
+  });
+
+  // Handle tabs
+  const tabContainers = a.querySelectorAll('.tabs');
+  tabContainers.forEach((tabContainer) => {
+    const { tabSelector } = tabContainer.dataset;
+    tabContainer.addEventListener('click', event => handleTabs(event, tabContainer, tabSelector));
+  });
+}
