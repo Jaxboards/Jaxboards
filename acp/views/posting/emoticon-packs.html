@@ -1,0 +1,19 @@
+<form method="post">
+  Currently using:
+  <select name="baseset" onchange="this.form.submit()">
+    <% EMOTICON_PACKS %>
+  </select>
+</form>
+<br />
+<br />
+<table class="badwords">
+  <tr>
+    <th>
+      Emoticon
+    </th>
+    <th>
+      Image
+    </th>
+  </tr>
+  <% EMOTICON_ROWS %>
+</table>

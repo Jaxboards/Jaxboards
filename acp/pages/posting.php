@@ -9,8 +9,33 @@ class settings
 {
     public function __construct()
     {
-        global $JAX;
-        $this->leftBar();
+        global $JAX, $PAGE;
+
+        $links = array(
+            'emoticons' => 'Emoticons',
+            'wordfilter' => 'Word Filter',
+            'postrating' => 'Post Rating',
+        );
+        $sidebarLinks = '';
+        foreach ($links as $do => $title) {
+            $sidebarLinks .= $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/sidebar-list-link.html',
+                array(
+                    'url' => '?act=posting&do=' . $do,
+                    'title' => $title,
+                )
+            ) . PHP_EOL;
+        }
+
+        $PAGE->sidebar(
+            $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/sidebar-list.html',
+                array(
+                    'content' => $sidebarLinks,
+                )
+            )
+        );
+
         if (!isset($JAX->b['do'])) {
             $JAX->b['do'] = false;
         }
@@ -21,35 +46,10 @@ class settings
             case 'wordfilter':
                 $this->wordfilter();
                 break;
-            case 'bbcodes':
-                $this->bbcodes();
-                break;
             case 'postrating':
                 $this->postrating();
                 break;
         }
-    }
-
-    public function leftBar()
-    {
-        global $PAGE;
-        $sidebar = '';
-        $nav = array(
-            '?act=posting&do=emoticons' => 'Emoticons',
-            '?act=posting&do=wordfilter' => 'Word Filter',
-            '?act=posting&do=postrating' => 'Post Rating',
-        );
-        foreach ($nav as $k => $v) {
-            $sidebar .= "<li><a href='${k}'>${v}</a></li>";
-        }
-        $sidebar = "<ul>${sidebar}</ul>";
-        $PAGE->sidebar($sidebar);
-    }
-
-    public function showmain()
-    {
-        global $PAGE;
-        $PAGE->addContentBox('Error', 'This page is under construction!');
     }
 
     public function wordfilter()
@@ -67,7 +67,7 @@ class settings
         }
 
         // Delete.
-        if (@$JAX->g['d']) {
+        if (isset($JAX->g['d']) && $JAX->g['d']) {
             $DB->safedelete(
                 'textrules',
                 "WHERE `type`='badword' AND `needle`=?",
@@ -77,7 +77,7 @@ class settings
         }
 
         // Insert.
-        if (@$JAX->p['submit']) {
+        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             $JAX->p['badword'] = $JAX->blockhtml($JAX->p['badword']);
             if (!$JAX->p['badword'] || !$JAX->p['replacement']) {
                 $page .= $PAGE->error('All fields required.');
@@ -99,69 +99,38 @@ class settings
                 $wordfilter[$JAX->p['badword']] = $JAX->p['replacement'];
             }
         }
-        $submit = <<<'EOT'
-<tr>
-    <td>
-        <input type="text" name="badword"/>
-    </td>
-    <td>
-        <input type="text" name="replacement"/>
-    </td>
-    <td>
-        <input type="submit" value="Add" name="submit"/>
-    </td>
-</tr>
-EOT;
         if (empty($wordfilter)) {
-            $table = <<<'EOT'
-<tr>
-    <td colspan="3">
-        Not currently filtering words.
-    </td>
-</tr>
-EOT;
-            $table .= $submit;
+            $table = $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/posting/word-filter-empty.html'
+            ) . PHP_EOL . $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/posting/word-filter-submit-row.html'
+            );
         } else {
-            $table = <<<'EOT'
-<tr>
-    <th>
-        Word
-    </th>
-    <th>
-        Replacement
-    </th>
-    <th>
-    </th>
-</tr>
-EOT;
-            $table .= $submit;
-            foreach (array_reverse($wordfilter, true) as $filter => $result) {
+            $table = $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/posting/word-filter-heading.html'
+            ) . PHP_EOL . $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/posting/word-filter-submit-row.html'
+            );
+            $currentFilters = array_reverse($wordfilter, true);
+            foreach ($currentFilters as $filter => $result) {
                 $resultCode = $JAX->blockhtml($result);
                 $filterUrlEncoded = rawurlencode($filter);
-                $table .= <<<EOT
-<tr>
-    <td>
-        ${filter}
-    </td>
-    <td>
-        ${resultCode}
-    </td>
-    <td class="x">
-        <a href="?act=posting&do=wordfilter&d=${filterUrlEncoded}">
-            X
-        </a>
-    </td>
-</tr>
-EOT;
+                $table .= $PAGE->parseTemplate(
+                    JAXBOARDS_ROOT . '/acp/views/posting/word-filter-row.html',
+                    array(
+                        'filter' => $filter,
+                        'result_code' => $resultCode,
+                        'filter_url_encoded' => $filterUrlEncoded,
+                    )
+                ) . PHP_EOL;
             }
         }
-        $page .= <<<EOT
-<form method="post" action="?act=posting&do=wordfilter">
-    <table class="badwords">
-        ${table}
-    </table>
-</form>
-EOT;
+        $page .= $PAGE->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/posting/word-filter.html',
+            array(
+                'content' => $table,
+            )
+        );
 
         $PAGE->addContentBox('Word Filter', $page);
     }
@@ -178,7 +147,7 @@ EOT;
         $page = '';
         $emoticons = array();
         // Delete emoticon.
-        if (@$JAX->g['d']) {
+        if (isset($JAX->g['d']) && $JAX->g['d']) {
             $DB->safedelete(
                 'textrules',
                 "WHERE `type`='emote' AND `needle`=?",
@@ -196,7 +165,7 @@ EOT;
         }
 
         // Insert emoticon.
-        if (@$JAX->p['submit']) {
+        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             if (!$JAX->p['emoticon'] || !$JAX->p['image']) {
                 $page .= $PAGE->error('All fields required.');
             } elseif (isset($emoticons[$JAX->blockhtml($JAX->p['emoticon'])])) {
@@ -218,210 +187,79 @@ EOT;
         if (isset($JAX->p['baseset']) && $basesets[$JAX->p['baseset']]) {
             $PAGE->writeCFG(array('emotepack' => $JAX->p['baseset']));
         }
-        $inputs = <<<'EOT'
-<tr>
-    <td>
-        <input type="text" name="emoticon"/>
-    </td>
-    <td>
-        <input type="text" name="image"/>
-    </td>
-    <td>
-        <input type="checkbox" class="switch yn"/>
-    </td>
-    <td>
-        <input type="submit" value="Add" name="submit"/>
-    </td>
-</tr>
-EOT;
         if (empty($emoticons)) {
-            $table = <<<'EOT'
-<tr>
-    <td colspan="3">
-        No custom emotes!
-    </td>
-</tr>
-<tr>
-    <th>
-        Emoticon
-    </th>
-    <th>
-        Image
-    </th>
-    <th>
-        In list?
-    </th>
-    <th>
-    </th>
-</tr>
-EOT;
-            $table .= $inputs;
+            $table = $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/posting/emoticon-heading.html'
+            ) . PHP_EOL . $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/posting/emoticon-submit-row.html'
+            ) . PHP_EOL . $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/posting/emoticon-empty-row.html'
+            );
         } else {
+            $table = $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/posting/emoticon-heading.html'
+            ) . PHP_EOL . $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/posting/emoticon-submit-row.html'
+            );
             $emoticons = array_reverse($emoticons, true);
-            $table = <<<'EOT'
-<tr>
-    <th>
-        Emoticon
-    </th>
-    <th>
-        Image
-    </th>
-    <th>
-        In list?
-    </th>
-    <th>
-    </th>
-</tr>
-EOT;
-            $table .= $inputs;
-            foreach ($emoticons as $smiley => $image) {
-                $imageCode = $JAX->blockhtml($image);
-                $smileyUrlEncoded = rawurlencode($smiley);
-                $table .= <<<EOT
-<tr>
-    <td>
-        ${smiley}
-    </td>
-    <td>
-        <img alt="[Invalid Image]" src="${imageCode}"/>
-    </td>
-    <td>
-        <input type="checkbox" class="switch yn"/>
-    </td>
-    <td class="x">
-        <a href="?act=posting&do=emoticons&d=${smileyUrlEncoded}">
-            X
-        </a>
-    </td>
-</tr>
-EOT;
+
+            foreach ($emoticons as $emoticon => $smileyFile) {
+                $smileyFile = $JAX->blockhtml($smileyFile);
+                $emoticonUrlEncoded = rawurlencode($emoticon);
+                $table .= $PAGE->parseTemplate(
+                    JAXBOARDS_ROOT . '/acp/views/posting/emoticon-row.html',
+                    array(
+                        'emoticon' => $emoticon,
+                        'smiley_url' => $smileyFile,
+                        'emoticon_url_encoded' => rawurlencode($emoticon),
+                    )
+                ) . PHP_EOL;
             }
         }
-        $page .= <<<EOT
-<form method="post" action="?act=posting&do=emoticons">
-    <table class="badwords">
-        ${table}
-    </table>
-</form>
-EOT;
+        $page .= $PAGE->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/posting/emoticons.html',
+            array(
+                'content' => $table,
+            )
+        );
 
         $PAGE->addContentBox('Custom Emoticons', $page);
 
         $emoticonpath = $PAGE->getCFGSetting('emotepack');
         $emoticonsetting = $emoticonpath;
-        $page = <<<'EOT'
-<form method="post">
-    Currently using: <select name="baseset" onchange="this.form.submit()">
-EOT;
+        $emoticonPackOptions = '';
         foreach ($basesets as $packId => $packName) {
-            $packCode = $emoticonsetting == $packId ?
-                ' selected="selected"' : '';
-            $page .= <<<EOT
-<option value="${packId}"${packCode}>${packName}</option>
-EOT;
-        }
-        $page .= '</select> &nbsp; &nbsp; ';
-
-        if ($emoticonsetting) {
-            if (isset($JAX->b['expanded']) && $JAX->b['expanded']) {
-                $page .= <<<'EOT'
-    <a href="?act=posting&do=emoticons">
-        Collapse
-    </a>
-</form>
-<br />
-<br />
-<table class="badwords">
-    <tr>
-        <th>
-            Emoticon
-        </th>
-        <th>
-            Image
-        </th>
-    </tr>
-EOT;
-                include JAXBOARDS_ROOT . "/emoticons/${emoticonpath}/rules.php";
-                foreach ($rules as $k => $v) {
-                    $page .= <<<EOT
-<tr>
-    <td>
-        ${k}
-    </td>
-    <td>
-        <img src="/emoticons/${emoticonpath}/${v}"/>
-    </td>
-</tr>
-EOT;
-                }
-                $page .= '</table>';
-            } else {
-                $page .= <<<'EOT'
-    <a href="?act=posting&do=emoticons&expanded=true">
-        Expand
-    </a>
-</form>
-EOT;
-            }
-        }
-
-        $PAGE->addContentBox('Base Emoticon Set', $page);
-    }
-
-    public function bbcodes()
-    {
-        global $PAGE;
-        $table = <<<'EOT'
-<tr>
-    <th>
-        BBCode
-    </th>
-    <th>
-        Rule
-    </th>
-</tr>
-<tr>
-    <th>
-        <input type="text" name="bbcode"/>
-    </th>
-    <th>
-        <input type="text" name="rule"/>
-    </th>
-</tr>
-EOT;
-        $page = <<<EOT
-<form method="post">
-    <table>
-        ${table}
-    </table>
-</form>
-EOT;
-        $PAGE->addContentBox('Custom BBCodes', $page);
-    }
-
-    public function birthday()
-    {
-        global $PAGE,$JAX;
-        $birthdays = $PAGE->getCFGSetting('birthdays');
-        if ($JAX->p['submit']) {
-            $PAGE->writeCFG(
+            $emoticonPackOptions .= $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/select-option.html',
                 array(
-                    'birthdays' => $birthdays = ($JAX->p['bicon'] ? 1 : 0),
+                    'value' => $packId,
+                    'label' => $packName,
+                    'selected' => $emoticonsetting == $packId ?
+                ' selected="selected"' : '',
                 )
             );
         }
-        $birthdaysCode = $birthdays & 1 ? " checked='checked'" : '';
-        $page = <<<EOT
-<form method="post">
-    <label>
-        Show Birthday Icon
-    </label>
-    <input type="checkbox" class="switch yn" name="bicon"${birthdaysCode}>
-    <br />
-    <input type="submit" value="Save" name="submit" />
-</form>
-EOT;
-        $PAGE->addContentBox('Birthdays', $page);
+
+        include JAXBOARDS_ROOT . "/emoticons/${emoticonpath}/rules.php";
+        $emoticonRows = '';
+        foreach ($rules as $emoticon => $smileyFile) {
+            $emoticonRows .= $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/posting/emoticon-packs-row.html',
+                array(
+                    'emoticon' => $emoticon,
+                    'smiley_url' => "/emoticons/${emoticonpath}/${smileyFile}",
+                )
+            ) . PHP_EOL;
+        }
+        $page = $PAGE->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/posting/emoticon-packs.html',
+            array(
+                'emoticon_packs' => $emoticonPackOptions,
+                'emoticon_rows' => $emoticonRows,
+            )
+        );
+
+        $PAGE->addContentBox('Base Emoticon Set', $page);
     }
 
     public function postrating()
@@ -439,7 +277,7 @@ EOT;
         }
 
         // Delete.
-        if (@$JAX->g['d']) {
+        if (isset($JAX->g['d']) && $JAX->g['d']) {
             $DB->safedelete(
                 'ratingniblets',
                 'WHERE `id`=?',
@@ -449,7 +287,7 @@ EOT;
         }
 
         // Insert.
-        if (@$JAX->p['submit']) {
+        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             if (!$JAX->p['img'] || !$JAX->p['title']) {
                 $page .= $PAGE->error('All fields required.');
             } else {
@@ -467,7 +305,7 @@ EOT;
             }
         }
 
-        if (@$JAX->p['rsubmit']) {
+        if (isset($JAX->p['rsubmit']) && $JAX->p['rsubmit']) {
             $cfg = array(
                 'ratings' => ($JAX->p['renabled'] ? 1 : 0) +
                 ($JAX->p['ranon'] ? 2 : 0),
@@ -476,76 +314,40 @@ EOT;
             $page2 .= $PAGE->success('Settings saved!');
         }
         $ratingsettings = $PAGE->getCFGSetting('ratings');
-        $ratingsEnabledCode = $ratingsettings & 1 ? ' checked="checked"' : '';
-        $ratingsAnonymousCode = $ratingsettings & 2 ? ' checked="checked"' : '';
 
-        $page2 .= <<<EOT
-<form method="post">
-    <label>
-        Ratings Enabled:
-    </label>
-    <input type="checkbox" class="switch yn" name="renabled"${ratingsEnabledCode}/>
-    <br />
-    <label>
-        Anonymous Ratings:
-    </label>
-    <input type="checkbox" class="switch yn" name="ranon"${ratingsAnonymousCode}/>
-    <br />
-    <input type="submit" value="Save" name="rsubmit" />
-</form>
-EOT;
-        $table = <<<'EOT'
-<tr>
-    <th>
-        Image
-    </th>
-    <th>
-        Title
-    </th>
-</tr>
-<tr>
-    <td>
-        <input type="text" name="img"/>
-    </td>
-    <td>
-        <input type="text" name="title"/>
-    </td>
-    <td>
-        <input type="submit" value="Add" name="submit"/>
-    </td>
-</tr>
-EOT;
+        $page2 .= $PAGE->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/posting/post-rating-settings.html',
+            array(
+                'ratings_enabled' => $ratingsettings & 1 ? ' checked="checked"' : '',
+                'ratings_anonymous' => $ratingsettings & 2 ? ' checked="checked"' : '',
+            )
+        );
+        $table = $PAGE->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/posting/post-rating-heading.html'
+        );
         if (empty($niblets)) {
-            $table .= '<tr><td colspan="3">No rating niblets set!</td></tr>';
+            $table .= $PAGE->parseTemplate(
+                JAXBOARDS_ROOT . '/acp/views/posting/post-rating-empty-row.html'
+            );
         } else {
             krsort($niblets);
             foreach ($niblets as $ratingId => $rating) {
-                $ratingName = $JAX->blockhtml($rating['title']);
-                $ratingImage = $JAX->blockhtml($rating['img']);
-                $table .= <<<EOT
-<tr>
-    <td>
-        <img src="${ratingImage}"/>
-    </td>
-    <td>
-        ${ratingName}
-    </td>
-    <td class="x">
-        <a href="?act=posting&do=postrating&d=${ratingId}">
-            X
-        </a>
-    </td>
-</tr>
-EOT;
+                $table .= $PAGE->parseTemplate(
+                    JAXBOARDS_ROOT . '/acp/views/posting/post-rating-row.html',
+                    array(
+                        'id' => $ratingId,
+                        'title' => $JAX->blockhtml($rating['title']),
+                        'image_url' => $JAX->blockhtml($rating['img']),
+                    )
+                );
             }
         }
-        $page .= <<<EOT
-<form method="post" action="?act=posting&do=postrating">
-    <table class="badwords">
-        ${table}
-    </table>
-</form>
-EOT;
+        $page .= $PAGE->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/posting/post-rating.html',
+            array(
+                'content' => $table,
+            )
+        );
         $PAGE->addContentBox('Post Rating System', $page2);
         $PAGE->addContentBox('Post Rating Niblets', $page);
     }

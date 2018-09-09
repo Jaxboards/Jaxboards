@@ -11,7 +11,10 @@ class settings
     {
         global $JAX;
         $this->leftBar();
-        switch (@$JAX->b['do']) {
+        if (!isset($JAX->b['do'])) {
+            $JAX->b['do'] = null;
+        }
+        switch ($JAX->b['do']) {
             case 'pages':
                 $this->pages();
                 break;
@@ -58,11 +61,12 @@ class settings
         global $PAGE,$JAX;
         $page = '';
         $e = '';
-        if (@$JAX->p['submit']) {
+        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             if ('' === trim($JAX->p['boardname'])) {
                 $e = 'Board name is required';
-            } elseif ('' !== trim(@$JAX->p['logourl'])
-                && !$JAX->isURL(@$JAX->p['logourl'])
+            } elseif (!isset($JAX->p['logourl'])
+                || ('' !== trim($JAX->p['logourl'])
+                && !$JAX->isURL($JAX->p['logourl']))
             ) {
                 $e = 'Please enter a valid logo url.';
             }
@@ -132,10 +136,10 @@ EOT;
     {
         global $DB,$PAGE,$JAX;
         $page = '';
-        if (@$JAX->b['delete']) {
+        if (isset($JAX->b['delete']) && $JAX->b['delete']) {
             $this->pages_delete($JAX->b['delete']);
         }
-        if (@$JAX->b['page']) {
+        if (isset($JAX->b['page']) && $JAX->b['page']) {
             $newact = preg_replace(
                 '@\\W@',
                 '<span style="font-weight:bold;color:#F00;">$0</span>',
@@ -289,14 +293,14 @@ EOT;
         global $PAGE,$JAX,$DB;
         $page = '';
         $e = '';
-        if (@$JAX->p['clearall']) {
+        if (isset($JAX->p['clearall']) && $JAX->p['clearall']) {
             $result = $DB->safespecial(
                 'TRUNCATE TABLE %t',
                 array('shouts')
             );
             $page .= $PAGE->success('Shoutbox cleared!');
         }
-        if (@$JAX->p['submit']) {
+        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             if (!isset($JAX->p['sbe'])) {
                 $JAX->p['sbe'] = false;
             }
@@ -364,7 +368,7 @@ EOT;
     {
         global $PAGE,$JAX;
         $birthdays = $PAGE->getCFGSetting('birthdays');
-        if (@$JAX->p['submit']) {
+        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             if (!isset($JAX->p['bicon'])) {
                 $JAX->p['bicon'] = false;
             }
@@ -374,17 +378,13 @@ EOT;
                 )
             );
         }
-        $page = '<form method="post">';
-        $birthdaysCode = $birthdays & 1 ? ' checked="checked"' : '';
-        $page .= <<<EOT
-<label>
-    Show Birthday Icon
-</label>
-<input type="checkbox" class="switch yn" name="bicon"${birthdaysCode}>
-<br />
-EOT;
-        $page .= '<input type="submit" value="Save" name="submit" />';
-        $page .= '</form>';
+        $page = $PAGE->parseTemplate(
+            JAXBOARDS_ROOT . '/acp/views/settings/birthday.html',
+            array(
+                'checked' => $birthdays & 1 ? ' checked="checked"' : '',
+            )
+        );
+
         $PAGE->addContentBox('Birthdays', $page);
     }
 }
