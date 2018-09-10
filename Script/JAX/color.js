@@ -17,12 +17,13 @@ class Color {
           a = a.substr(1);
         }
         if (a.length === 3) {
-          a = a.charAt(0)
-            + a.charAt(0)
-            + a.charAt(1)
-            + a.charAt(1)
-            + a.charAt(2)
-            + a.charAt(2);
+          a =
+            a.charAt(0) +
+            a.charAt(0) +
+            a.charAt(1) +
+            a.charAt(1) +
+            a.charAt(2) +
+            a.charAt(2);
         }
         if (a.length !== 6) this.rgb = [0, 0, 0];
         else {
@@ -54,8 +55,8 @@ class Color {
     const hex = '0123456789ABCDEF';
     for (x = 0; x < 3; x += 1) {
       tmp2 = this.rgb[x];
-      tmp
-        += hex.charAt(Math.floor(tmp2 / 16)) + hex.charAt(Math.floor(tmp2 % 16));
+      tmp +=
+        hex.charAt(Math.floor(tmp2 / 16)) + hex.charAt(Math.floor(tmp2 % 16));
     }
     return tmp;
   }

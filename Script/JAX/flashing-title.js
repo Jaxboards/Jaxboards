@@ -23,8 +23,7 @@ export function flashTitle(title) {
   }
   lastTitle = title;
   flashInterval = setInterval(() => {
-    document.title = document.title === originalTitle
-      ? lastTitle
-      : originalTitle;
+    document.title =
+      document.title === originalTitle ? lastTitle : originalTitle;
   }, 1000);
 }

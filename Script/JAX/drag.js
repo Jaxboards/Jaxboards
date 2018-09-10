@@ -2,13 +2,10 @@ import {
   getCoordinates,
   getComputedStyle,
   getHighestZIndex,
-  isChildOf,
+  isChildOf
 } from './el';
 import Event from './event';
-import {
-  assign,
-  tryInvoke,
-} from './util';
+import { assign, tryInvoke } from './util';
 
 class Drag {
   constructor() {
@@ -34,18 +31,18 @@ class Drag {
       ey: parseInt(s.top, 10) || 0,
       info: {},
       bc: getCoordinates(el),
-      zIndex: el.style.zIndex,
+      zIndex: el.style.zIndex
     };
     if (!this.sess.zIndex || Number(this.sess.zIndex) < highz - 1) {
       el.style.zIndex = highz;
     }
     tryInvoke(this.onstart, {
       ...this.sess,
-      droptarget: this.testDrops(this.sess.mx, this.sess.my),
+      droptarget: this.testDrops(this.sess.mx, this.sess.my)
     });
     this.boundEvents = {
       drag: event2 => this.drag(event2),
-      drop: event2 => this.drop(event2),
+      drop: event2 => this.drop(event2)
     };
     document.addEventListener('mousemove', this.boundEvents.drag);
     document.addEventListener('mouseup', this.boundEvents.drop);
@@ -89,20 +86,14 @@ class Drag {
       dx: mx - (sess.mx || mx),
       dy: my - (sess.my || my),
       sx: this.sess.ex,
-      sy: this.sess.ey,
+      sy: this.sess.ey
     };
     this.sess.info = sess;
     tryInvoke(this.ondrag, sess);
-    if (
-      sess.droptarget
-      && tmp !== sess.droptarget
-    ) {
+    if (sess.droptarget && tmp !== sess.droptarget) {
       tryInvoke(this.ondragover, sess);
     }
-    if (
-      tmp
-      && sess.droptarget !== tmp
-    ) {
+    if (tmp && sess.droptarget !== tmp) {
       tmp2 = sess.droptarget;
       sess.droptarget = tmp;
       tryInvoke(this.ondragout, sess);
@@ -133,18 +124,18 @@ class Drag {
     if (!droppables.length) {
       return r;
     }
-    droppables.forEach((droppable) => {
+    droppables.forEach(droppable => {
       if (droppable === this.sess.el || isChildOf(droppable, this.sess.el)) {
         return;
       }
       z = getCoordinates(droppable);
       if (
-        max[0] > z.w
-        && max[1] > z.h
-        && a >= z.x
-        && b >= z.y
-        && a <= z.xw
-        && b <= z.yh
+        max[0] > z.w &&
+        max[1] > z.h &&
+        a >= z.x &&
+        b >= z.y &&
+        a <= z.xw &&
+        b <= z.yh
       ) {
         max = [z.w, z.h];
         r = droppable;

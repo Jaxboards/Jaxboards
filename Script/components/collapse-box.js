@@ -2,12 +2,15 @@ import Animation from '../JAX/animation';
 import Component from '../classes/component';
 
 export default class CollapseBox extends Component {
-  static get selector() { return '.collapse-box'; }
+  static get selector() {
+    return '.collapse-box';
+  }
 
   constructor(element) {
     super(element);
 
-    element.querySelector('.collapse-button')
+    element
+      .querySelector('.collapse-button')
       .addEventListener('click', () => this.click());
   }
 
@@ -27,7 +30,8 @@ export default class CollapseBox extends Component {
         .play();
     } else {
       if (!fh) {
-        fh = `${collapseContent.clientHeight || collapseContent.offsetHeight}px`;
+        fh = `${collapseContent.clientHeight ||
+          collapseContent.offsetHeight}px`;
         collapseContent.dataset.fullHeight = fh;
       }
       new Animation(collapseContent, 5, 10, 0)

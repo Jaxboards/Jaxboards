@@ -18,11 +18,18 @@ function buildQueryString(keys, values) {
   }
   if (values) {
     return keys
-      .map((key, index) => `${encodeURIComponent(key)}=${encodeURIComponent(values[index] || '')}`)
+      .map(
+        (key, index) =>
+          `${encodeURIComponent(key)}=${encodeURIComponent(
+            values[index] || ''
+          )}`
+      )
       .join('&');
   }
   return Object.keys(keys)
-    .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(keys[key] || '')}`)
+    .map(
+      key => `${encodeURIComponent(key)}=${encodeURIComponent(keys[key] || '')}`
+    )
     .join('&');
 }
 
@@ -32,23 +39,21 @@ class Ajax {
       readyState: 4,
       callback() {},
       method: 'POST',
-      ...s,
+      ...s
     };
   }
 
-  load(url, {
-    callback,
-    data,
-    method = this.setup.method,
-    requestType = 1,
-  } = {}) {
+  load(
+    url,
+    { callback, data, method = this.setup.method, requestType = 1 } = {}
+  ) {
     // requestType is an enum (1=update, 2=load new)
     let sendData = null;
     if (
-      data
-      && Array.isArray(data)
-      && Array.isArray(data[0])
-      && data[0].length === data[1].length
+      data &&
+      Array.isArray(data) &&
+      Array.isArray(data[0]) &&
+      data[0].length === data[1].length
     ) {
       sendData = buildQueryString(data[0], data[1]);
     } else if (typeof data !== 'string') {
@@ -70,7 +75,7 @@ class Ajax {
     if (method) {
       request.setRequestHeader(
         'Content-Type',
-        'application/x-www-form-urlencoded',
+        'application/x-www-form-urlencoded'
       );
     }
     request.setRequestHeader('X-JSACCESS', requestType);

@@ -9,10 +9,7 @@ import ImageGallery from '../components/image-gallery';
 import PageList from '../components/page-list';
 import Switch from '../components/switch';
 import Tabs from '../components/tabs';
-import {
-  onImagesLoaded,
-  updateDates,
-} from './util';
+import { onImagesLoaded, updateDates } from './util';
 import Editor from '../components/editor';
 import MediaPlayer from '../components/media-player';
 
@@ -21,7 +18,7 @@ export default function gracefulDegrade(container) {
 
   // Special rules for all links
   const links = container.querySelectorAll('a');
-  links.forEach((link) => {
+  links.forEach(link => {
     // Handle links with tooltips
     if (link.dataset.useTooltip) {
       link.addEventListener('mouseover', () => tooltip(link));
@@ -32,7 +29,7 @@ export default function gracefulDegrade(container) {
       const href = link.getAttribute('href');
       if (href.charAt(0) === '?') {
         const oldclick = link.onclick;
-        link.addEventListener('click', (event) => {
+        link.addEventListener('click', event => {
           // Some links have an onclick that returns true/false based on whether
           // or not the link should execute.
           if (!oldclick || oldclick.call(link) !== false) {
@@ -41,7 +38,7 @@ export default function gracefulDegrade(container) {
           event.preventDefault();
         });
 
-      // Open external links in a new window
+        // Open external links in a new window
       } else if (link.getAttribute('href').substr(0, 4) === 'http') {
         link.target = '_BLANK';
       }
@@ -57,15 +54,14 @@ export default function gracefulDegrade(container) {
         // resizer on large images
         imageResizer(bbcodeimgs);
       },
-      2000,
+      2000
     );
   }
 
   // Make BBCode code blocks selectable when clicked
-  container.querySelectorAll('.bbcode.code')
-    .forEach((codeBlock) => {
-      codeBlock.addEventListener('click', () => selectAll(codeBlock));
-    });
+  container.querySelectorAll('.bbcode.code').forEach(codeBlock => {
+    codeBlock.addEventListener('click', () => selectAll(codeBlock));
+  });
 
   // Hydrate all components
   [
@@ -77,9 +73,10 @@ export default function gracefulDegrade(container) {
     MediaPlayer,
     PageList,
     Switch,
-    Tabs,
-  ].forEach((Component) => {
-    container.querySelectorAll(Component.selector)
+    Tabs
+  ].forEach(Component => {
+    container
+      .querySelectorAll(Component.selector)
       .forEach(element => new Component(element));
   });
 
@@ -87,9 +84,9 @@ export default function gracefulDegrade(container) {
   // NOTE: This needs to come after editors, since they both hook into form onsubmit
   // and the editor hook needs to fire first
   const ajaxForms = container.querySelectorAll('form[data-ajax-form]');
-  ajaxForms.forEach((ajaxForm) => {
+  ajaxForms.forEach(ajaxForm => {
     const resetOnSubmit = ajaxForm.dataset.ajaxForm === 'resetOnSubmit';
-    ajaxForm.addEventListener('submit', (event) => {
+    ajaxForm.addEventListener('submit', event => {
       event.preventDefault();
       RUN.submitForm(ajaxForm, resetOnSubmit);
     });

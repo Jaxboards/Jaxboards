@@ -1,33 +1,29 @@
 import Drag from './drag';
-import {
-  insertBefore,
-  insertAfter,
-  isChildOf,
-} from './el';
-
+import { insertBefore, insertAfter, isChildOf } from './el';
 
 function parsetree(tree, prefix) {
   const nodes = Array.from(tree.querySelectorAll('li'));
   const order = {};
   let gotsomethin = 0;
-  nodes.forEach((node) => {
+  nodes.forEach(node => {
     if (node.className !== 'seperator' && node.parentNode === tree) {
       gotsomethin = 1;
       const [sub] = node.getElementsByTagName('ul');
-      order[`_${node.id.substr(prefix.length)}`] = sub !== undefined ? parsetree(sub, prefix) : 1;
+      order[`_${node.id.substr(prefix.length)}`] =
+        sub !== undefined ? parsetree(sub, prefix) : 1;
     }
   });
   return gotsomethin ? order : 1;
 }
 
-export default function (tree, prefix, formfield) {
+export default function(tree, prefix, formfield) {
   const listItems = Array.from(tree.querySelectorAll('li'));
   const items = [];
   const seperators = [];
 
   items.push(...listItems.filter(li => li.className !== 'title'));
 
-  items.forEach((item) => {
+  items.forEach(item => {
     const tmp = document.createElement('li');
     tmp.className = 'seperator';
     seperators.push(tmp);
@@ -84,7 +80,7 @@ export default function (tree, prefix, formfield) {
         formfield.value = JSON.stringify(parsetree(tree, prefix));
       }
       return null;
-    },
+    }
   });
 
   items.forEach(item => drag.apply(item));

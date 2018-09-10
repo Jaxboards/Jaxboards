@@ -22,7 +22,7 @@ export function getCoordinates(a) {
     yh: y + h,
     xw: x + w,
     w,
-    h,
+    h
   };
 }
 
@@ -63,5 +63,5 @@ export default {
   insertBefore,
   insertAfter,
   replace,
-  getHighestZIndex,
+  getHighestZIndex
 };

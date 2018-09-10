@@ -30,7 +30,8 @@ export function replaceSelection(element, content) {
   } else {
     const s = element.selectionStart;
     const e = element.selectionEnd;
-    element.value = element.value.substring(0, s) + content + element.value.substr(e);
+    element.value =
+      element.value.substring(0, s) + content + element.value.substr(e);
     element.selectionStart = s + content.length;
     element.selectionEnd = s + content.length;
   }
