@@ -1,19 +1,22 @@
 {
   "scripts": {
-    "eslint": "eslint Script/{**/*,*}.js",
-    "eslint-fix": "eslint Script/{**/*,*}.js --fix",
-    "prettier": "prettier --write **/*.{{t,j}s{,x,on},{c,sa,sc,le}ss,vue,md,y{,a}ml,graphql}",
+    "eslint": "eslint 'Script/**/*.js'",
+    "eslint-fix": "eslint 'Script/**/*.js' --fix",
+    "prettier": "prettier --write --single-quote '**/*.{js,json,md}'",
     "stylelint": "stylelint \"./**/*.{c,sa,sc,le}ss\"",
     "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\"",
     "build": "rollup -c"
   },
   "pre-commit": [
+    "prettier",
     "eslint"
   ],
   "devDependencies": {
     "eslint": "^5.5.0",
     "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-config-prettier": "^3.0.1",
     "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-prettier": "^2.6.2",
     "js-beautify": "^1.8.4",
     "pre-commit": "^1.2.2",
     "prettier": "^1.14.2",

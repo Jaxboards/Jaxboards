@@ -16,7 +16,7 @@ class Window {
       className: '',
       pos: 'center',
       zIndex: getHighestZIndex(),
-      ...options,
+      ...options
     });
   }
 
@@ -42,7 +42,9 @@ class Window {
     if (this.useOverlay) {
       toggleOverlay(true, this.zIndex);
     }
-    windowContainer.className = `window${this.className ? ` ${this.className}` : ''}`;
+    windowContainer.className = `window${
+      this.className ? ` ${this.className}` : ''
+    }`;
     titleBar.className = 'title';
     contentContainer.className = 'content';
     if (this.minimizable) {
@@ -62,9 +64,11 @@ class Window {
 
     // add close window functionality
     const close = () => this.close();
-    windowContainer.querySelectorAll('[data-window-close]').forEach((closeElement) => {
-      closeElement.addEventListener('click', close);
-    });
+    windowContainer
+      .querySelectorAll('[data-window-close]')
+      .forEach(closeElement => {
+        closeElement.addEventListener('click', close);
+      });
 
     // Add the window to the document
     document.body.appendChild(windowContainer);
@@ -97,7 +101,7 @@ class Window {
           },
           ondrop() {
             rsize.style.left = `${windowContainer.clientWidth - 16}px`;
-          },
+          }
         })
         .apply(rsize);
       targ.style.width = `${windowContainer.clientWidth}px`;
@@ -113,7 +117,7 @@ class Window {
         () => {
           this.setPosition(pos);
         },
-        2000,
+        2000
       );
     } else this.setPosition(pos);
 
@@ -121,9 +125,10 @@ class Window {
       .autoZ()
       .noChildActivation()
       .boundingBox(
-        0, 0,
+        0,
+        0,
         document.documentElement.clientWidth - 50,
-        document.documentElement.clientHeight - 50,
+        document.documentElement.clientHeight - 50
       )
       .apply(windowContainer, titleBar);
     windowContainer.close = () => this.close();
@@ -195,9 +200,7 @@ class Window {
     if (y < 0) y = 0;
     d1.style.left = `${x}px`;
     if (this.animate || animate) {
-      new Animation(d1, 10)
-        .add('top', `${y - 100}px`, `${y}px`)
-        .play();
+      new Animation(d1, 10).add('top', `${y - 100}px`, `${y}px`).play();
     } else d1.style.top = `${y}px`;
     this.pos = pos;
   }

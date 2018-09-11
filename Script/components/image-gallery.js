@@ -1,7 +1,9 @@
 import Component from '../classes/component';
 
 export default class ImageGallery extends Component {
-  static get selector() { return '.image_gallery'; }
+  static get selector() {
+    return '.image_gallery';
+  }
 
   constructor(element) {
     super(element);

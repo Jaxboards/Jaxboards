@@ -39,7 +39,7 @@ class AppState {
     const values = [];
     const { submitButton } = form;
 
-    Array.from(form.elements).forEach((inputField) => {
+    Array.from(form.elements).forEach(inputField => {
       if (!inputField.name || inputField.type === 'submit') {
         return;
       }
@@ -47,7 +47,7 @@ class AppState {
       if (inputField.type === 'select-multiple') {
         Array.from(inputField.options)
           .filter(option => option.selected)
-          .forEach((option) => {
+          .forEach(option => {
             names.push(`${inputField.name}[]`);
             values.push(option.value);
           });
@@ -55,8 +55,8 @@ class AppState {
       }
 
       if (
-        (inputField.type === 'checkbox' || inputField.type === 'radio')
-        && !inputField.checked
+        (inputField.type === 'checkbox' || inputField.type === 'radio') &&
+        !inputField.checked
       ) {
         return;
       }
@@ -77,7 +77,7 @@ class AppState {
 
   handleQuoting(a) {
     this.stream.load(
-      `${a.href}&qreply=${document.querySelector('#qreply') ? '1' : '0'}`,
+      `${a.href}&qreply=${document.querySelector('#qreply') ? '1' : '0'}`
     );
   }
 

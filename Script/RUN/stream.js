@@ -6,7 +6,7 @@ const UPDATE_INTERVAL = 5000;
 class Stream {
   constructor() {
     this.request = new Ajax({
-      callback: request => this.handleRequestData(request),
+      callback: request => this.handleRequestData(request)
     });
     this.lastURL = document.location.search.substr(1);
     this.commands = Commands;

@@ -1,11 +1,24 @@
 function ordsuffix(a) {
   return (
-    a
-    + (Math.round(a / 10) === 1 ? 'th' : ['', 'st', 'nd', 'rd'][a % 10] || 'th')
+    a +
+    (Math.round(a / 10) === 1 ? 'th' : ['', 'st', 'nd', 'rd'][a % 10] || 'th')
   );
 }
 
-export const monthsShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+export const monthsShort = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec'
+];
 export const daysShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export const months = [
@@ -20,7 +33,7 @@ export const months = [
   'September',
   'October',
   'November',
-  'December',
+  'December'
 ];
 
 export function date(a) {
@@ -40,17 +53,17 @@ export function date(a) {
   } else if (delta < 3600) {
     fmt = `${Math.round(delta / 60)} minutes ago`;
   } else if (
-    `${now.getDate()} ${now.getMonth()} ${now.getFullYear()}`
-    === dstr
+    `${now.getDate()} ${now.getMonth()} ${now.getFullYear()}` === dstr
   ) {
     fmt = `Today @ ${hours}:${mins} ${ampm}`;
   } else if (
-    `${yday.getDate()} ${yday.getMonth()} ${yday.getFullYear()}`
-    === dstr
+    `${yday.getDate()} ${yday.getMonth()} ${yday.getFullYear()}` === dstr
   ) {
     fmt = `Yesterday @ ${hours}:${mins} ${ampm}`;
   } else {
-    fmt = `${monthsShort[old.getMonth()]} ${ordsuffix(old.getDate())}, ${old.getFullYear()} @ ${hours}:${mins} ${ampm}`;
+    fmt = `${monthsShort[old.getMonth()]} ${ordsuffix(
+      old.getDate()
+    )}, ${old.getFullYear()} @ ${hours}:${mins} ${ampm}`;
   }
   return fmt;
 }

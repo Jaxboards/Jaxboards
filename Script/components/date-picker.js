@@ -4,7 +4,9 @@ import { assign } from '../JAX/util';
 import { months, daysShort } from '../JAX/date';
 
 export default class DatePicker extends Component {
-  static get selector() { return 'input.date'; }
+  static get selector() {
+    return 'input.date';
+  }
 
   constructor(element) {
     super(element);
@@ -24,7 +26,7 @@ export default class DatePicker extends Component {
     let picker = document.querySelector('#datepicker');
     if (!picker) {
       picker = assign(document.createElement('table'), {
-        id: 'datepicker',
+        id: 'datepicker'
       });
       document.body.appendChild(picker);
     }
@@ -39,16 +41,14 @@ export default class DatePicker extends Component {
       zIndex: getHighestZIndex(),
       position: 'absolute',
       top: `${c.yh}px`,
-      left: `${c.x}px`,
+      left: `${c.x}px`
     });
 
-    const [month, day, year] = this.element.value.split('/').map(s => parseInt(s, 10));
+    const [month, day, year] = this.element.value
+      .split('/')
+      .map(s => parseInt(s, 10));
     if (month && day && year) {
-      this.selectedDate = [
-        year,
-        month - 1,
-        day,
-      ];
+      this.selectedDate = [year, month - 1, day];
     } else this.selectedDate = undefined;
 
     this.generate(year, month, day);
@@ -150,9 +150,10 @@ export default class DatePicker extends Component {
       cell = row.insertCell((first + x) % 7);
       cell.onclick = this.insert.bind(this, cell);
 
-      const isSelected = year === this.selectedDate[0]
-        && month === this.selectedDate[1]
-        && x + 1 === this.selectedDate[2];
+      const isSelected =
+        year === this.selectedDate[0] &&
+        month === this.selectedDate[1] &&
+        x + 1 === this.selectedDate[2];
       cell.className = `day${isSelected ? ' selected' : ''}`;
       cell.innerHTML = x + 1;
     }

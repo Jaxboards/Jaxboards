@@ -1,18 +1,9 @@
 /* global RUN, globalsettings */
 /* eslint-disable no-alert */
-import {
-  toggleOverlay,
-  scrollTo,
-  onImagesLoaded,
-} from '../JAX/util';
+import { toggleOverlay, scrollTo, onImagesLoaded } from '../JAX/util';
 import Animation from '../JAX/animation';
-import {
-  getCoordinates,
-  getComputedStyle,
-} from '../JAX/el';
-import {
-  flashTitle,
-} from '../JAX/flashing-title';
+import { getCoordinates, getComputedStyle } from '../JAX/el';
+import { flashTitle } from '../JAX/flashing-title';
 import gracefulDegrade from '../JAX/graceful-degrade';
 import openTooltip from '../JAX/tooltip';
 import Window from '../JAX/window';
@@ -52,7 +43,7 @@ export default {
     let selector = sel;
     const paths = Array.from(document.querySelectorAll('.path'));
     if (selector === 'path' && paths.length > 1) {
-      paths.forEach((path) => {
+      paths.forEach(path => {
         path.innerHTML = html;
         gracefulDegrade(path);
       });
@@ -65,9 +56,7 @@ export default {
     if (!el) return;
     el.innerHTML = html;
     if (shouldHighlight) {
-      new Animation(el)
-        .dehighlight()
-        .play();
+      new Animation(el).dehighlight().play();
     }
     gracefulDegrade(el);
   },
@@ -117,9 +106,7 @@ export default {
       x = ss.pop();
       x.parentNode.removeChild(x);
     }
-    new Animation(div)
-      .dehighlight()
-      .play();
+    new Animation(div).dehighlight().play();
     if (globalsettings.sound_shout) Sound.play('sbblip');
     gracefulDegrade(div);
   },
@@ -134,9 +121,7 @@ export default {
     let h = getComputedStyle(tick);
     h = h.height;
     tick.style.height = '0px';
-    new Animation(tick)
-      .add('height', '0px', h)
-      .play();
+    new Animation(tick).add('height', '0px', h).play();
     const ticks = Array.from(ticker.querySelectorAll('.tick'));
     const l = ticks.length;
     tick.style.display = 'block';
@@ -147,7 +132,7 @@ export default {
           tick = ticks[x];
           new Animation(tick, 30, 500)
             .add('opacity', '1', '0')
-            .then((el) => {
+            .then(el => {
               el.parentNode.removeChild(el);
             })
             .play();
@@ -161,14 +146,14 @@ export default {
     flashTitle(`New message from ${fromName}!`);
     const { webkitNotifications } = window;
     if (
-      !document.hasFocus()
-      && webkitNotifications
-      && webkitNotifications.checkPermission() === 0
+      !document.hasFocus() &&
+      webkitNotifications &&
+      webkitNotifications.checkPermission() === 0
     ) {
       const notify = webkitNotifications.createNotification(
         '',
         `${fromName} says:`,
-        message,
+        message
       );
       notify.show();
       notify.onclick = () => {
@@ -178,13 +163,10 @@ export default {
     }
     if (!messagesContainer) {
       const imWindow = new Window();
-      imWindow.title = `${fromName
-      } <a href="#" onclick="IMWindow.menu(event,${
-        fromId
-      });return false;">&rsaquo;</a>`;
+      imWindow.title = `${fromName} <a href="#" onclick="IMWindow.menu(event,${fromId});return false;">&rsaquo;</a>`;
       imWindow.content = "<div class='ims'></div><div class='offline'>This user may be offline</div><div><form data-ajax-form='resetOnSubmit' method='post'><input type='hidden' name='im_uid' value='%s' /><input type='text' name='im_im' /><input type='hidden' name='act' value='blank' /></form></div>".replace(
         /%s/g,
-        fromId,
+        fromId
       );
       imWindow.className = 'im';
       imWindow.resize = '.ims';
@@ -217,24 +199,19 @@ export default {
       if (!fromMe) {
         document.querySelector(`#im_${fromId}`).classList.remove('offline');
       }
-      d.innerHTML = `<a href='?act=vu${
-        fromMe || parseInt(fromId, 10)
-      }' class='name'>${
-        fromName
-      }</a> ${
+      d.innerHTML = `<a href='?act=vu${fromMe ||
+        parseInt(fromId, 10)}' class='name'>${fromName}</a> ${
         !isAction ? ': ' : ''
       }${message}`;
       d.title = title;
-      const test = messagesContainer.scrollTop > (
-        messagesContainer.scrollHeight - messagesContainer.clientHeight - 50
-      );
+      const test =
+        messagesContainer.scrollTop >
+        messagesContainer.scrollHeight - messagesContainer.clientHeight - 50;
       messagesContainer.appendChild(d);
       if (test) {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
       }
-      new Animation(d)
-        .dehighlight()
-        .play();
+      new Animation(d).dehighlight().play();
       gracefulDegrade(d);
       if (!messagesContainer && globalsettings.sound_im) Sound.play('imbeep');
     }
@@ -243,7 +220,8 @@ export default {
     document.querySelector(`#im_${a}`).classList.add('offline');
   },
   window([options]) {
-    const existingWindow = options.id && options.id && document.getElementById(options.id);
+    const existingWindow =
+      options.id && options.id && document.getElementById(options.id);
     if (existingWindow) {
       existingWindow.querySelector('.title').innerHTML = options.title;
       existingWindow.querySelector('.content').innerHTML = options.content;
@@ -290,12 +268,9 @@ export default {
           RUN.location(link.getAttribute('href'));
         };
       }
-      link.className = `user${
-        memberId
-      } mgroup${
-        groupId
-      } ${
-        status ? ` ${status}` : ''}`;
+      link.className = `user${memberId} mgroup${groupId} ${
+        status ? ` ${status}` : ''
+      }`;
       if (tooltip) {
         link.onmouseover = () => {
           openTooltip(this, this.title);
@@ -312,7 +287,7 @@ export default {
   setoffline(a) {
     const statusers = document.querySelector('#statusers');
     const ids = a[0].split(',');
-    ids.forEach((id) => {
+    ids.forEach(id => {
       const link = document.querySelector(`#statusers .user${id}`);
       if (link) {
         statusers.removeChild(link);
@@ -332,16 +307,14 @@ export default {
         pos = getCoordinates(el);
         scrollTo(pos.y);
       },
-      wait ? 10 : 1000,
+      wait ? 10 : 1000
     );
     return true;
   },
   updateqreply(a) {
     const qreply = document.querySelector('#qreply');
     if (qreply) {
-      qreply
-        .querySelector('textarea')
-        .focus();
+      qreply.querySelector('textarea').focus();
       qreply.querySelector('textarea').value += a[0];
     }
   },
@@ -384,7 +357,8 @@ export default {
           })
           .play();
         return;
-      } prdiv.style.display = 'block';
+      }
+      prdiv.style.display = 'block';
     } else {
       prdiv = document.createElement('div');
       prdiv.className = 'postrating_list';
@@ -396,5 +370,5 @@ export default {
     }
     prdiv.innerHTML = html;
     new Animation(prdiv).add('height', '0px', '200px').play();
-  },
+  }
 };

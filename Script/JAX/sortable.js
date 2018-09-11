@@ -1,8 +1,4 @@
-import {
-  getCoordinates,
-  insertBefore,
-  insertAfter,
-} from './el';
+import { getCoordinates, insertBefore, insertAfter } from './el';
 import Drag from './drag';
 import { tryInvoke } from './util';
 
@@ -30,7 +26,7 @@ class Sortable extends Drag {
       this.bounds = [0, -Infinity, 0, Infinity];
     }
 
-    elements.forEach((element) => {
+    elements.forEach(element => {
       this.apply(element, () => tryInvoke(options.handle, element));
     });
   }
@@ -59,15 +55,15 @@ class Sortable extends Drag {
     if (!this.coords.length) {
       this.coords.push(...this.elems);
     }
-    this.elems.forEach((elem) => {
+    this.elems.forEach(elem => {
       if (a.el === elem) {
         index = x;
         return;
       }
       c = this.coords[x];
       if (
-        ch === false
-        && (ov ? a.my < c.yh && a.dy < 0 : a.mx < c.xw && a.my < c.yh)
+        ch === false &&
+        (ov ? a.my < c.yh && a.dy < 0 : a.mx < c.xw && a.my < c.yh)
       ) {
         insertBefore(a.el, elem);
         ch = x;
@@ -76,7 +72,7 @@ class Sortable extends Drag {
 
     if (ch === false) {
       const reversedElements = this.elems.concat().reverse();
-      reversedElements.forEach((elem) => {
+      reversedElements.forEach(elem => {
         if (a.el === elem) {
           return;
         }

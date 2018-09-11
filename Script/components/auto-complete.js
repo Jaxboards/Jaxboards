@@ -7,7 +7,9 @@ const VALID_CLASS = 'valid';
 const INVALID_CLASS = 'invalid';
 
 export default class AutoComplete extends Component {
-  static get selector() { return 'input[data-autocomplete-action]'; }
+  static get selector() {
+    return 'input[data-autocomplete-action]';
+  }
 
   constructor(element) {
     super(element);
@@ -27,7 +29,7 @@ export default class AutoComplete extends Component {
     }
 
     element.addEventListener('keyup', event => this.keyUp(event));
-    element.addEventListener('keydown', (event) => {
+    element.addEventListener('keydown', event => {
       if (event.key === 'Enter') {
         event.preventDefault();
       }
@@ -39,12 +41,12 @@ export default class AutoComplete extends Component {
     let resultsContainer = document.querySelector('#autocomplete');
     if (!resultsContainer) {
       resultsContainer = assign(document.createElement('div'), {
-        id: 'autocomplete',
+        id: 'autocomplete'
       });
       // TODO: move static properties to CSS
       assign(resultsContainer.style, {
         position: 'absolute',
-        zIndex: getHighestZIndex(),
+        zIndex: getHighestZIndex()
       });
       document.body.appendChild(resultsContainer);
     }
@@ -53,7 +55,7 @@ export default class AutoComplete extends Component {
     assign(resultsContainer.style, {
       top: `${coords.yh}px`,
       left: `${coords.x}px`,
-      width: `${coords.w}px`,
+      width: `${coords.w}px`
     });
 
     return resultsContainer;
@@ -62,7 +64,9 @@ export default class AutoComplete extends Component {
   keyUp(event) {
     const resultsContainer = this.getResultsContainer();
     const results = Array.from(resultsContainer.querySelectorAll('div'));
-    const selectedIndex = results.findIndex(el => el.classList.contains('selected'));
+    const selectedIndex = results.findIndex(el =>
+      el.classList.contains('selected')
+    );
 
     // Handle arrow key selection
     if (results) {
@@ -76,7 +80,7 @@ export default class AutoComplete extends Component {
         case 'ArrowDown':
           if (selectedIndex === -1) {
             results[0].classList.add('selected');
-          } else if (selectedIndex < (results.length - 1)) {
+          } else if (selectedIndex < results.length - 1) {
             results[selectedIndex].classList.remove('selected');
             results[selectedIndex + 1].classList.add('selected');
           }
@@ -95,38 +99,37 @@ export default class AutoComplete extends Component {
       }
     }
 
-    const relativePath = document.location.toString().match('/acp/') ? '../' : '';
+    const relativePath = document.location.toString().match('/acp/')
+      ? '../'
+      : '';
     const searchTerm = encodeURIComponent(this.element.value);
     const queryParams = `act=${this.action}&term=${searchTerm}`;
-    new Ajax().load(
-      `${relativePath}misc/listloader.php?${queryParams}`,
-      {
-        callback: (xml) => {
-          const data = JSON.parse(xml.responseText);
-          resultsContainer.innerHTML = '';
-          if (!data.length) {
-            resultsContainer.style.display = 'none';
-          } else {
-            resultsContainer.style.display = '';
-            const [ids, values] = data;
-            ids.forEach((key, i) => {
-              const value = values[i];
-              const div = document.createElement('div');
-              div.innerHTML = value;
-              div.onclick = () => {
-                resultsContainer.style.display = 'none';
-                if (this.indicatorElement) {
-                  this.indicatorElement.classList.add(VALID_CLASS);
-                }
-                this.outputElement.value = key;
-                this.outputElement.dispatchEvent(new Event('change'));
-                this.element.value = value;
-              };
-              resultsContainer.appendChild(div);
-            });
-          }
-        },
-      },
-    );
+    new Ajax().load(`${relativePath}misc/listloader.php?${queryParams}`, {
+      callback: xml => {
+        const data = JSON.parse(xml.responseText);
+        resultsContainer.innerHTML = '';
+        if (!data.length) {
+          resultsContainer.style.display = 'none';
+        } else {
+          resultsContainer.style.display = '';
+          const [ids, values] = data;
+          ids.forEach((key, i) => {
+            const value = values[i];
+            const div = document.createElement('div');
+            div.innerHTML = value;
+            div.onclick = () => {
+              resultsContainer.style.display = 'none';
+              if (this.indicatorElement) {
+                this.indicatorElement.classList.add(VALID_CLASS);
+              }
+              this.outputElement.value = key;
+              this.outputElement.dispatchEvent(new Event('change'));
+              this.element.value = value;
+            };
+            resultsContainer.appendChild(div);
+          });
+        }
+      }
+    });
   }
 }

@@ -3,7 +3,9 @@ import Component from '../classes/component';
 const ACTIVE_CLASS = 'active';
 
 export default class Tabs extends Component {
-  static get selector() { return '.tabs'; }
+  static get selector() {
+    return '.tabs';
+  }
 
   constructor(element) {
     super(element);

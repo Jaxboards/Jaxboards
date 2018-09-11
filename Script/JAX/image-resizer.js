@@ -1,9 +1,5 @@
 import Event from './event';
-import {
-  getCoordinates,
-  getComputedStyle,
-  insertBefore,
-} from './el';
+import { getCoordinates, getComputedStyle, insertBefore } from './el';
 
 const maxDimension = '999999px';
 
@@ -20,7 +16,7 @@ export function makeResizer(iw, nw, ih, nh, img) {
   link.style.height = `${ih}px`;
   link.nw = nw;
   link.nh = nh;
-  link.onmousemove = (event) => {
+  link.onmousemove = event => {
     const o = getCoordinates(this);
     const e = Event(event);
     this.scrollLeft = ((e.pageX - o.x) / o.w) * (this.nw - o.w);
@@ -43,7 +39,6 @@ export function makeResizer(iw, nw, ih, nh, img) {
   link.appendChild(img);
 }
 
-
 export function imageResizer(imgs) {
   let mw;
   let mh;
@@ -53,7 +48,7 @@ export function imageResizer(imgs) {
   }
   Array.from(imgs)
     .filter(img => !img.madeResized)
-    .forEach((img) => {
+    .forEach(img => {
       let p = 1;
       let p2 = 1;
       const { naturalWidth, naturalHeight } = img;

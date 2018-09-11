@@ -7,5 +7,5 @@ export default {
   mobile: !!userAgent.match(/mobile/i),
   n3ds: !!userAgent.match(/nintendo 3ds/),
   firefox: !!userAgent.match(/firefox/i),
-  safari: !!userAgent.match(/safari/i),
+  safari: !!userAgent.match(/safari/i)
 };
