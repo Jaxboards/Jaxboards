@@ -63,7 +63,7 @@ if ($CFG['service']) {
         $tables = $DB->rows($result);
         foreach ($tables as $table) {
             $table = $table[0];
-            if (mb_strpos($table, 'blueprint_') !== false) {
+            if (mb_strpos($table, 'blueprint_') === false) {
                 // Ignore blueprint tables.
                 $result = $DB->safespecial(
                     'SHOW CREATE TABLE %t',
@@ -109,6 +109,13 @@ ALTER TABLE `directory`
     CHANGE `registrar_ip` `registrar_ip` varbinary(16) NOT NULL DEFAULT '' AFTER `registrar_email`,
     CHANGE `boardname` `boardname` varchar(30) COLLATE 'utf8mb4_unicode_ci' NOT NULL AFTER `date`,
     CHANGE `referral` `referral` varchar(255) COLLATE 'utf8mb4_unicode_ci' NOT NULL AFTER `boardname`,
+    CHANGE `show` `show` tinyint(1) unsigned NOT NULL DEFAULT '0' AFTER `referral`,
+    CHANGE `description` `description` varchar(500) COLLATE 'utf8mb4_unicode_ci' NOT NULL AFTER `show`,
+    ENGINE='InnoDB' COLLATE 'utf8mb4_unicode_ci';
+EOT;
+    $queries[] = <<<'EOT'
+ALTER TABLE `banlist`
+    CHANGE `ip` `ip` varbinary(16) NOT NULL FIRST,
     ENGINE='InnoDB' COLLATE 'utf8mb4_unicode_ci';
 EOT;
     foreach ($queries as $query) {
@@ -173,6 +180,35 @@ EOT
         );
         $DB->disposeresult($result);
     }
+    // Check if IP field needs update.
+    $result = $DB->safequery(
+        <<<'EOT'
+SELECT INET6_NTOA(MAX(`ip`)) as `ip_check`
+    FROM `banlist`
+    LIMIT 1;
+EOT
+    );
+    $row = $DB->arow($result);
+    $DB->disposeResult($result);
+    if (null === $row['ip_check']) {
+        $queries = array(
+            <<<'EOT'
+DELETE FROM `banlist`
+WHERE INET6_ATON(`ip`) IS NULL;
+EOT
+            ,
+            <<<'EOT'
+UPDATE `banlist`
+    SET `registrar_ip`=INET6_ATON(`ip`);
+EOT
+        ,
+        );
+        foreach ($queries as $query) {
+            $result = $DB->safequery(
+            );
+            $DB->disposeresult($result);
+        }
+    }
 
     // Check if we need to create indexes/foriegn keys.
     $result = $DB->safequery('SHOW CREATE TABLE `directory`;');
@@ -187,6 +223,19 @@ EOT
         );
         $DB->disposeresult($result);
     }
+    $result = $DB->safequery('SHOW CREATE TABLE `banlist`;');
+    $createTableStatement = $DB->row($result);
+    $createTableStatement = array_pop($createTableStatement);
+    $DB->disposeresult($result);
+    if (!preg_match("/UNIQUE\s+`ip`/i", $createTableStatement)) {
+        $result = $DB->safequery(<<<'EOT'
+ALTER TABLE `banlist`
+    ADD UNIQUE `banlist` (`banlist`);
+EOT
+        );
+        $DB->disposeresult($result);
+    }
+
 
     $result = $DB->safequery('SELECT `boardname` AS `board` FROM `directory`;');
     while ($row = $DB->arow($result)) {

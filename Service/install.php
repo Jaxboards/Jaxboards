@@ -215,7 +215,16 @@ CREATE TABLE `directory` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 EOT
                 ,
-                'TRUNCATE `directory`;'
+                'TRUNCATE `directory`;',
+                'DROP TABLE IF EXISTS `banlist`;',
+                <<<'EOT'
+CREATE TABLE `banlist` (
+  `ip` varbinary(16) NOT NULL,
+  UNIQUE KEY `ip` (`ip`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+EOT
+                ,
+                'TRUNCATE `banlist`;',
             );
             foreach ($queries as $query) {
                 $result = $DB->safequery($query);
