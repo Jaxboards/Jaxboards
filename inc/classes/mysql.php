@@ -1,4 +1,10 @@
 <?php
+// fetch_all not available in some environments
+function fetch_all($result,$resulttype = MYSQLI_NUM) {
+  for ($res = array(); $tmp = mysqli_fetch_array($result);) $res[] = $tmp;
+  return $res;
+}
+
 
 class MySQL
 {
@@ -228,7 +234,7 @@ class MySQL
     {
         $a = $a ? $a : $this->lastQuery;
         if ($a) {
-            return $a->fetch_all(MYSQLI_ASSOC);
+            return fetch_all($a, MYSQLI_ASSOC);
         }
 
         return false;
@@ -239,7 +245,7 @@ class MySQL
     {
         $a = $a ? $a : $this->lastQuery;
         if ($a) {
-            return $a->fetch_all(MYSQLI_BOTH);
+            return fetch_all($a, MYSQLI_BOTH);
             // Disturbingly, not MYSQLI_NUM.
         }
 
@@ -282,7 +288,7 @@ class MySQL
 
             return;
         }
-        $result->fetch_all();
+        fetch_all($result);
     }
 
     // Warning: nested arrays are *not* supported.
