@@ -205,6 +205,7 @@ EOT
         );
         foreach ($queries as $query) {
             $result = $DB->safequery(
+              $query
             );
             $DB->disposeresult($result);
         }

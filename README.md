@@ -176,6 +176,6 @@ This project is licensed under the MIT License - see the
 
 ## Acknowledgments
 
-- Contributors to the original [Jaxboards Service](http://jaxboards.com);
+- Contributors to the original [Jaxboards Service](https://jaxboards.com);
   Jaxboards wouldn't exist without feedback from everyone who's supported it
   over the years.

@@ -214,10 +214,10 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
 <a href="https://support.<?php echo $CFG['domain']; ?>" class="support">
 Support Forum
 </a>
-<a href="http://test.<?php echo $CFG['domain']; ?>" class="test">
+<a href="https://test.<?php echo $CFG['domain']; ?>" class="test">
 Test Forum
 </a>
-<a href="http://support.<?php echo $CFG['domain']; ?>" class="resource">
+<a href="https://support.<?php echo $CFG['domain']; ?>" class="resource">
 Resources
 </a>
 </div>

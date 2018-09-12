@@ -247,7 +247,7 @@ if (!$PAGE->jsaccess) {
         $PAGE->append(
             'FOOTER',
             '<div class="footer">' .
-            '<a href="http://jaxboards.com">Jaxboards 1.1.0</a> ' .
+            '<a href="https://jaxboards.com">Jaxboards 1.1.0</a> ' .
             '&copy; 2007-' . date('Y') . '</div>'
         );
     }
