@@ -10,7 +10,7 @@
     mobile: !!userAgent.match(/mobile/i),
     n3ds: !!userAgent.match(/nintendo 3ds/),
     firefox: !!userAgent.match(/firefox/i),
-    safari: !!userAgent.match(/safari/i),
+    safari: !!userAgent.match(/safari/i)
   });
 
   // This file is just a dumping ground until I can find better homes for these
@@ -100,12 +100,12 @@
       this.getitup(
         `<form method="post" data-ajax-form="true">move ${
         whichone ? 'posts' : 'topics'
-      } here? <input type="hidden" name="act" value="modcontrols" />`
-          + `<input type="hidden" name="${
+      } here? <input type="hidden" name="act" value="modcontrols" />` +
+          `<input type="hidden" name="${
           whichone ? 'dop' : 'dot'
-        }" value="moveto" /><input type="hidden" name="id" value="${id}" /><input type="submit" value="Yes" />`
-          + '<input type="submit" name="cancel" value="Cancel" '
-          + 'onclick="this.form.submitButton=this" /></form>',
+        }" value="moveto" /><input type="hidden" name="id" value="${id}" /><input type="submit" value="Yes" />` +
+          '<input type="submit" name="cancel" value="Cancel" ' +
+          'onclick="this.form.submitButton=this" /></form>'
       );
     }
 
@@ -160,41 +160,42 @@
           tids = `${a[1]}`.split(',');
         }
         const tl = tids ? tids.length : 0;
-        const html = `${"<form method='post' data-ajax-form='true'>"
-          + "<input type='hidden' name='act' value='modcontrols' />"}${
-        tl
-          ? `${"<select name='dot'>"
-                + "<option value='delete'>Delete</option>"
-                + "<option value='merge'>Merge</option>"
-                + "<option value='move'>Move</option>"
-                + "<option value='pin'>Pin</option>"
-                + "<option value='unpin'>Unpin</option>"
-                + "<option value='lock'>Lock</option>"
-                + "<option value='unlock'>Unlock</option>"
-                + '</select>'
-                + '&nbsp; &nbsp; <strong>'}${tl}</strong> topic${
-            tl > 1 ? 's' : ''
-          }${pl ? ' and <br />' : ''}`
-          : ''
-      }${
-        pl
-          ? `${"<select name='dop'>"
-                + "<option value='delete'>Delete</option>"
-                + "<option value='move'>Move</option>"
-                + '</select> &nbsp; &nbsp; <strong>'}${pl}</strong> post${
-            pids.length > 1 ? 's' : ''
-          }`
-          : ''
-      }${
-        pl && tl ? '<br />' : ' &nbsp; &nbsp; '
-      }<input type='submit' value='Go' /> `
-          + "<input name='cancel' type='submit' "
-          + "onclick='this.form.submitButton=this;' value='Cancel' /></form>";
+        const html =
+          `${"<form method='post' data-ajax-form='true'>" +
+          "<input type='hidden' name='act' value='modcontrols' />"}${
+          tl
+            ? `${"<select name='dot'>" +
+                "<option value='delete'>Delete</option>" +
+                "<option value='merge'>Merge</option>" +
+                "<option value='move'>Move</option>" +
+                "<option value='pin'>Pin</option>" +
+                "<option value='unpin'>Unpin</option>" +
+                "<option value='lock'>Lock</option>" +
+                "<option value='unlock'>Unlock</option>" +
+                '</select>' +
+                '&nbsp; &nbsp; <strong>'}${tl}</strong> topic${
+                tl > 1 ? 's' : ''
+              }${pl ? ' and <br />' : ''}`
+            : ''
+        }${
+          pl
+            ? `${"<select name='dop'>" +
+                "<option value='delete'>Delete</option>" +
+                "<option value='move'>Move</option>" +
+                '</select> &nbsp; &nbsp; <strong>'}${pl}</strong> post${
+                pids.length > 1 ? 's' : ''
+              }`
+            : ''
+        }${
+          pl && tl ? '<br />' : ' &nbsp; &nbsp; '
+        }<input type='submit' value='Go' /> ` +
+          "<input name='cancel' type='submit' " +
+          "onclick='this.form.submitButton=this;' value='Cancel' /></form>";
         assign(RUN.modcontrols, {
           tids,
           tidl: tl,
           pids,
-          pidl: pl,
+          pidl: pl
         });
         if (tl || pl) RUN.modcontrols.getitup(html);
         else RUN.modcontrols.takeitdown();
@@ -203,7 +204,7 @@
       modcontrols_move(a) {
         const whichone = parseInt(
           a && a[0] ? a[0] : RUN.modcontrols.whichone,
-          10,
+          10
         );
         if (!this.busy && onPageChangeOld) {
           onPageChangeOld = Event.onPageChange;
@@ -217,14 +218,14 @@
           whichone
             ? `${RUN.modcontrols.pidl} posts`
             : `${RUN.modcontrols.tidl} topics`
-        } to...`,
+        } to...`
         );
       },
 
       modcontrols_clearbox() {
         RUN.modcontrols.takeitdown();
         this.busy = false;
-      },
+      }
     });
   });
 

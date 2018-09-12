@@ -5,6 +5,18 @@ function ordsuffix(a) {
   );
 }
 
+// returns 8:05pm
+function timeAsAMPM(timedate) {
+  const hours = timedate.getHours() || 12;
+  const minutesPadded = `${timedate.getMinutes()}`.padStart(2, '0');
+  return `${hours % 12 || 12}:${minutesPadded}${hours > 12 ? 'pm' : 'am'}`;
+}
+
+// Returns month/day/year
+function asMDY(mdyDate) {
+  return `${mdyDate.getMonth()}/${mdyDate.getDate()}/${mdyDate.getFullYear()}`;
+}
+
 export const monthsShort = [
   'Jan',
   'Feb',
@@ -36,36 +48,38 @@ export const months = [
   'December'
 ];
 
-export function date(a) {
-  const old = new Date();
-  const now = new Date();
-  let fmt;
+export function date(gmtUnixTimestamp) {
+  const localTimeNow = new Date();
+
   const yday = new Date();
   yday.setTime(yday - 1000 * 60 * 60 * 24);
-  old.setTime(a * 1000); // setTime uses milliseconds, we'll be using UNIX Times as the argument
-  const hours = `${old.getHours() % 12 || 12}`;
-  const ampm = hours >= 12 ? 'pm' : 'am';
-  const mins = `${old.getMinutes()}`.padStart(2, '0');
-  const dstr = `${old.getDate()} ${old.getMonth()} ${old.getFullYear()}`;
-  const delta = (now.getTime() - old.getTime()) / 1000;
-  if (delta < 90) {
-    fmt = 'a minute ago';
-  } else if (delta < 3600) {
-    fmt = `${Math.round(delta / 60)} minutes ago`;
-  } else if (
-    `${now.getDate()} ${now.getMonth()} ${now.getFullYear()}` === dstr
-  ) {
-    fmt = `Today @ ${hours}:${mins} ${ampm}`;
-  } else if (
-    `${yday.getDate()} ${yday.getMonth()} ${yday.getFullYear()}` === dstr
-  ) {
-    fmt = `Yesterday @ ${hours}:${mins} ${ampm}`;
-  } else {
-    fmt = `${monthsShort[old.getMonth()]} ${ordsuffix(
-      old.getDate()
-    )}, ${old.getFullYear()} @ ${hours}:${mins} ${ampm}`;
+
+  const serverAsLocalDate = new Date(0);
+  serverAsLocalDate.setUTCSeconds(gmtUnixTimestamp);
+
+  const deltaInSeconds = (localTimeNow - serverAsLocalDate) / 1000;
+
+  if (deltaInSeconds < 90) {
+    return 'a minute ago';
   }
-  return fmt;
+
+  if (deltaInSeconds < 3600) {
+    return `${Math.round(deltaInSeconds / 60)} minutes ago`;
+  }
+
+  // Today
+  if (asMDY(localTimeNow) === asMDY(serverAsLocalDate)) {
+    return `Today @ ${timeAsAMPM(serverAsLocalDate)}`;
+  }
+
+  // Yesterday
+  if (asMDY(yday) === asMDY(serverAsLocalDate)) {
+    return `Yesterday @ ${timeAsAMPM(serverAsLocalDate)}`;
+  }
+
+  return `${monthsShort[serverAsLocalDate.getMonth()]} ${ordsuffix(
+    serverAsLocalDate.getDate()
+  )}, ${serverAsLocalDate.getFullYear()} @ ${timeAsAMPM(serverAsLocalDate)}`;
 }
 
 export function smalldate(a) {

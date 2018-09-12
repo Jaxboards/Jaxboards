@@ -25,7 +25,7 @@
       yh: y + h,
       xw: x + w,
       w,
-      h,
+      h
     };
   }
 
@@ -63,7 +63,7 @@
     mobile: !!userAgent.match(/mobile/i),
     n3ds: !!userAgent.match(/nintendo 3ds/),
     firefox: !!userAgent.match(/firefox/i),
-    safari: !!userAgent.match(/safari/i),
+    safari: !!userAgent.match(/safari/i)
   });
 
   // This file is just a dumping ground until I can find better homes for these
@@ -117,11 +117,18 @@
     }
     if (values) {
       return keys
-        .map((key, index) => `${encodeURIComponent(key)}=${encodeURIComponent(values[index] || '')}`)
+        .map(
+          (key, index) =>
+            `${encodeURIComponent(key)}=${encodeURIComponent(
+            values[index] || ''
+          )}`
+        )
         .join('&');
     }
     return Object.keys(keys)
-      .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(keys[key] || '')}`)
+      .map(
+        key => `${encodeURIComponent(key)}=${encodeURIComponent(keys[key] || '')}`
+      )
       .join('&');
   }
 
@@ -131,23 +138,21 @@
         readyState: 4,
         callback() {},
         method: 'POST',
-        ...s,
+        ...s
       };
     }
 
-    load(url, {
-      callback,
-      data,
-      method = this.setup.method,
-      requestType = 1,
-    } = {}) {
+    load(
+      url,
+      { callback, data, method = this.setup.method, requestType = 1 } = {}
+    ) {
       // requestType is an enum (1=update, 2=load new)
       let sendData = null;
       if (
-        data
-        && Array.isArray(data)
-        && Array.isArray(data[0])
-        && data[0].length === data[1].length
+        data &&
+        Array.isArray(data) &&
+        Array.isArray(data[0]) &&
+        data[0].length === data[1].length
       ) {
         sendData = buildQueryString(data[0], data[1]);
       } else if (typeof data !== 'string') {
@@ -169,7 +174,7 @@
       if (method) {
         request.setRequestHeader(
           'Content-Type',
-          'application/x-www-form-urlencoded',
+          'application/x-www-form-urlencoded'
         );
       }
       request.setRequestHeader('X-JSACCESS', requestType);
@@ -197,7 +202,8 @@
     } else {
       const s = element.selectionStart;
       const e = element.selectionEnd;
-      element.value = element.value.substring(0, s) + content + element.value.substr(e);
+      element.value =
+        element.value.substring(0, s) + content + element.value.substr(e);
       element.selectionStart = s + content.length;
       element.selectionEnd = s + content.length;
     }
@@ -277,18 +283,18 @@
         ey: parseInt(s.top, 10) || 0,
         info: {},
         bc: getCoordinates(el$$1),
-        zIndex: el$$1.style.zIndex,
+        zIndex: el$$1.style.zIndex
       };
       if (!this.sess.zIndex || Number(this.sess.zIndex) < highz - 1) {
         el$$1.style.zIndex = highz;
       }
       tryInvoke(this.onstart, {
         ...this.sess,
-        droptarget: this.testDrops(this.sess.mx, this.sess.my),
+        droptarget: this.testDrops(this.sess.mx, this.sess.my)
       });
       this.boundEvents = {
         drag: event2 => this.drag(event2),
-        drop: event2 => this.drop(event2),
+        drop: event2 => this.drop(event2)
       };
       document.addEventListener('mousemove', this.boundEvents.drag);
       document.addEventListener('mouseup', this.boundEvents.drop);
@@ -332,20 +338,14 @@
         dx: mx - (sess.mx || mx),
         dy: my - (sess.my || my),
         sx: this.sess.ex,
-        sy: this.sess.ey,
+        sy: this.sess.ey
       };
       this.sess.info = sess;
       tryInvoke(this.ondrag, sess);
-      if (
-        sess.droptarget
-        && tmp !== sess.droptarget
-      ) {
+      if (sess.droptarget && tmp !== sess.droptarget) {
         tryInvoke(this.ondragover, sess);
       }
-      if (
-        tmp
-        && sess.droptarget !== tmp
-      ) {
+      if (tmp && sess.droptarget !== tmp) {
         tmp2 = sess.droptarget;
         sess.droptarget = tmp;
         tryInvoke(this.ondragout, sess);
@@ -376,18 +376,18 @@
       if (!droppables.length) {
         return r;
       }
-      droppables.forEach((droppable) => {
+      droppables.forEach(droppable => {
         if (droppable === this.sess.el || isChildOf(droppable, this.sess.el)) {
           return;
         }
         z = getCoordinates(droppable);
         if (
-          max[0] > z.w
-          && max[1] > z.h
-          && a >= z.x
-          && b >= z.y
-          && a <= z.xw
-          && b <= z.yh
+          max[0] > z.w &&
+          max[1] > z.h &&
+          a >= z.x &&
+          b >= z.y &&
+          a <= z.xw &&
+          b <= z.yh
         ) {
           max = [z.w, z.h];
           r = droppable;
@@ -452,24 +452,25 @@
     const nodes = Array.from(tree.querySelectorAll('li'));
     const order = {};
     let gotsomethin = 0;
-    nodes.forEach((node) => {
+    nodes.forEach(node => {
       if (node.className !== 'seperator' && node.parentNode === tree) {
         gotsomethin = 1;
         const [sub] = node.getElementsByTagName('ul');
-        order[`_${node.id.substr(prefix.length)}`] = sub !== undefined ? parsetree(sub, prefix) : 1;
+        order[`_${node.id.substr(prefix.length)}`] =
+          sub !== undefined ? parsetree(sub, prefix) : 1;
       }
     });
     return gotsomethin ? order : 1;
   }
 
-  function sortableTree (tree, prefix, formfield) {
+  function sortableTree(tree, prefix, formfield) {
     const listItems = Array.from(tree.querySelectorAll('li'));
     const items = [];
     const seperators = [];
 
     items.push(...listItems.filter(li => li.className !== 'title'));
 
-    items.forEach((item) => {
+    items.forEach(item => {
       const tmp = document.createElement('li');
       tmp.className = 'seperator';
       seperators.push(tmp);
@@ -526,14 +527,16 @@
           formfield.value = JSON.stringify(parsetree(tree, prefix));
         }
         return null;
-      },
+      }
     });
 
     items.forEach(item => drag.apply(item));
   }
 
   class Component {
-    static get selector() { throw new Error('No Selector defined'); }
+    static get selector() {
+      throw new Error('No Selector defined');
+    }
 
     constructor(element) {
       this.element = element;
@@ -545,7 +548,9 @@
   const INVALID_CLASS = 'invalid';
 
   class AutoComplete extends Component {
-    static get selector() { return 'input[data-autocomplete-action]'; }
+    static get selector() {
+      return 'input[data-autocomplete-action]';
+    }
 
     constructor(element) {
       super(element);
@@ -565,7 +570,7 @@
       }
 
       element.addEventListener('keyup', event => this.keyUp(event));
-      element.addEventListener('keydown', (event) => {
+      element.addEventListener('keydown', event => {
         if (event.key === 'Enter') {
           event.preventDefault();
         }
@@ -577,12 +582,12 @@
       let resultsContainer = document.querySelector('#autocomplete');
       if (!resultsContainer) {
         resultsContainer = assign(document.createElement('div'), {
-          id: 'autocomplete',
+          id: 'autocomplete'
         });
         // TODO: move static properties to CSS
         assign(resultsContainer.style, {
           position: 'absolute',
-          zIndex: getHighestZIndex(),
+          zIndex: getHighestZIndex()
         });
         document.body.appendChild(resultsContainer);
       }
@@ -591,7 +596,7 @@
       assign(resultsContainer.style, {
         top: `${coords.yh}px`,
         left: `${coords.x}px`,
-        width: `${coords.w}px`,
+        width: `${coords.w}px`
       });
 
       return resultsContainer;
@@ -600,7 +605,9 @@
     keyUp(event) {
       const resultsContainer = this.getResultsContainer();
       const results = Array.from(resultsContainer.querySelectorAll('div'));
-      const selectedIndex = results.findIndex(el$$1 => el$$1.classList.contains('selected'));
+      const selectedIndex = results.findIndex(el$$1 =>
+        el$$1.classList.contains('selected')
+      );
 
       // Handle arrow key selection
       if (results) {
@@ -614,7 +621,7 @@
           case 'ArrowDown':
             if (selectedIndex === -1) {
               results[0].classList.add('selected');
-            } else if (selectedIndex < (results.length - 1)) {
+            } else if (selectedIndex < results.length - 1) {
               results[selectedIndex].classList.remove('selected');
               results[selectedIndex + 1].classList.add('selected');
             }
@@ -633,44 +640,45 @@
         }
       }
 
-      const relativePath = document.location.toString().match('/acp/') ? '../' : '';
+      const relativePath = document.location.toString().match('/acp/')
+        ? '../'
+        : '';
       const searchTerm = encodeURIComponent(this.element.value);
       const queryParams = `act=${this.action}&term=${searchTerm}`;
-      new Ajax().load(
-        `${relativePath}misc/listloader.php?${queryParams}`,
-        {
-          callback: (xml) => {
-            const data = JSON.parse(xml.responseText);
-            resultsContainer.innerHTML = '';
-            if (!data.length) {
-              resultsContainer.style.display = 'none';
-            } else {
-              resultsContainer.style.display = '';
-              const [ids, values] = data;
-              ids.forEach((key, i) => {
-                const value = values[i];
-                const div = document.createElement('div');
-                div.innerHTML = value;
-                div.onclick = () => {
-                  resultsContainer.style.display = 'none';
-                  if (this.indicatorElement) {
-                    this.indicatorElement.classList.add(VALID_CLASS);
-                  }
-                  this.outputElement.value = key;
-                  this.outputElement.dispatchEvent(new Event('change'));
-                  this.element.value = value;
-                };
-                resultsContainer.appendChild(div);
-              });
-            }
-          },
-        },
-      );
+      new Ajax().load(`${relativePath}misc/listloader.php?${queryParams}`, {
+        callback: xml => {
+          const data = JSON.parse(xml.responseText);
+          resultsContainer.innerHTML = '';
+          if (!data.length) {
+            resultsContainer.style.display = 'none';
+          } else {
+            resultsContainer.style.display = '';
+            const [ids, values] = data;
+            ids.forEach((key, i) => {
+              const value = values[i];
+              const div = document.createElement('div');
+              div.innerHTML = value;
+              div.onclick = () => {
+                resultsContainer.style.display = 'none';
+                if (this.indicatorElement) {
+                  this.indicatorElement.classList.add(VALID_CLASS);
+                }
+                this.outputElement.value = key;
+                this.outputElement.dispatchEvent(new Event('change'));
+                this.element.value = value;
+              };
+              resultsContainer.appendChild(div);
+            });
+          }
+        }
+      });
     }
   }
 
   class Switch extends Component {
-    static get selector() { return 'input.switch'; }
+    static get selector() {
+      return 'input.switch';
+    }
 
     constructor(element) {
       super(element);
@@ -679,7 +687,7 @@
 
       const button = assign(document.createElement('button'), {
         type: 'button',
-        className: element.className,
+        className: element.className
       });
 
       const toggle = () => {
@@ -705,19 +713,19 @@
       const p = getCoordinates(el$$1);
       s.top = `${p.y + el$$1.clientHeight}px`;
       s.left = `${p.x}px`;
-      el$$1.onmouseout = (e2) => {
+      el$$1.onmouseout = e2 => {
         if (!e2.relatedTarget && e2.toElement) e2.relatedTarget = e2.toElement;
         if (e2.relatedTarget !== menu && e2.relatedTarget.offsetParent !== menu) {
           el$$1.classList.remove('active');
           menu.style.display = 'none';
         }
       };
-      menu.onmouseout = (e2) => {
+      menu.onmouseout = e2 => {
         if (!e2.relatedTarget && e2.toElement) e2.relatedTarget = e2.toElement;
         if (
-          e2.relatedTarget !== el$$1
-          && e2.relatedTarget.offsetParent !== menu
-          && e2.relatedTarget !== menu
+          e2.relatedTarget !== el$$1 &&
+          e2.relatedTarget.offsetParent !== menu &&
+          e2.relatedTarget !== menu
         ) {
           el$$1.classList.remove('active');
           menu.style.display = 'none';
@@ -731,11 +739,11 @@
     const values = [];
     const elements = Array.from(form.elements);
     const submit = form.submitButton;
-    elements.forEach((element) => {
+    elements.forEach(element => {
       if (!element.name || element.type === 'submit') return;
       if (
-        (element.type === 'checkbox' || element.type === 'radio')
-        && !element.checked
+        (element.type === 'checkbox' || element.type === 'radio') &&
+        !element.checked
       ) {
         return;
       }
@@ -756,21 +764,24 @@
     // Dropdown menu
     document.querySelector('#nav').addEventListener('mouseover', dropdownMenu);
 
-    Array.from(document.querySelectorAll('form[data-use-ajax-submit]')).forEach((form) => {
-      form.addEventListener('submit', (event) => {
-        event.preventDefault();
-        submitForm(form);
-      });
-    });
+    Array.from(document.querySelectorAll('form[data-use-ajax-submit]')).forEach(
+      form => {
+        form.addEventListener('submit', event => {
+          event.preventDefault();
+          submitForm(form);
+        });
+      }
+    );
 
     // Converts all switches (checkboxes) into graphics, to show "X" or "check"
-    document.querySelectorAll(Switch.selector)
+    document
+      .querySelectorAll(Switch.selector)
       .forEach(toggleSwitch => new Switch(toggleSwitch));
 
     // Makes editors capable of tabbing for indenting
     const editor = document.querySelector('.editor');
     if (editor) {
-      editor.addEventListener('keydown', (event) => {
+      editor.addEventListener('keydown', event => {
         if (event.keyCode === 9) {
           replaceSelection(editor, '    ');
           event.preventDefault();

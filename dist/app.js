@@ -25,7 +25,7 @@
       yh: y + h,
       xw: x + w,
       w,
-      h,
+      h
     };
   }
 
@@ -63,17 +63,42 @@
     mobile: !!userAgent.match(/mobile/i),
     n3ds: !!userAgent.match(/nintendo 3ds/),
     firefox: !!userAgent.match(/firefox/i),
-    safari: !!userAgent.match(/safari/i),
+    safari: !!userAgent.match(/safari/i)
   };
 
   function ordsuffix(a) {
     return (
-      a
-      + (Math.round(a / 10) === 1 ? 'th' : ['', 'st', 'nd', 'rd'][a % 10] || 'th')
+      a +
+      (Math.round(a / 10) === 1 ? 'th' : ['', 'st', 'nd', 'rd'][a % 10] || 'th')
     );
   }
 
-  const monthsShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  // returns 8:05pm
+  function timeAsAMPM(timedate) {
+    const hours = timedate.getHours() || 12;
+    const minutesPadded = `${timedate.getMinutes()}`.padStart(2, '0');
+    return `${hours % 12 || 12}:${minutesPadded}${hours > 12 ? 'pm' : 'am'}`;
+  }
+
+  // Returns month/day/year
+  function asMDY(mdyDate) {
+    return `${mdyDate.getMonth()}/${mdyDate.getDate()}/${mdyDate.getFullYear()}`;
+  }
+
+  const monthsShort = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
+  ];
   const daysShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   const months = [
@@ -88,39 +113,41 @@
     'September',
     'October',
     'November',
-    'December',
+    'December'
   ];
 
-  function date(a) {
-    const old = new Date();
-    const now = new Date();
-    let fmt;
+  function date(gmtUnixTimestamp) {
+    const localTimeNow = new Date();
+
     const yday = new Date();
     yday.setTime(yday - 1000 * 60 * 60 * 24);
-    old.setTime(a * 1000); // setTime uses milliseconds, we'll be using UNIX Times as the argument
-    const hours = `${old.getHours() % 12 || 12}`;
-    const ampm = hours >= 12 ? 'pm' : 'am';
-    const mins = `${old.getMinutes()}`.padStart(2, '0');
-    const dstr = `${old.getDate()} ${old.getMonth()} ${old.getFullYear()}`;
-    const delta = (now.getTime() - old.getTime()) / 1000;
-    if (delta < 90) {
-      fmt = 'a minute ago';
-    } else if (delta < 3600) {
-      fmt = `${Math.round(delta / 60)} minutes ago`;
-    } else if (
-      `${now.getDate()} ${now.getMonth()} ${now.getFullYear()}`
-      === dstr
-    ) {
-      fmt = `Today @ ${hours}:${mins} ${ampm}`;
-    } else if (
-      `${yday.getDate()} ${yday.getMonth()} ${yday.getFullYear()}`
-      === dstr
-    ) {
-      fmt = `Yesterday @ ${hours}:${mins} ${ampm}`;
-    } else {
-      fmt = `${monthsShort[old.getMonth()]} ${ordsuffix(old.getDate())}, ${old.getFullYear()} @ ${hours}:${mins} ${ampm}`;
+
+    const serverAsLocalDate = new Date(0);
+    serverAsLocalDate.setUTCSeconds(gmtUnixTimestamp);
+
+    const deltaInSeconds = (localTimeNow - serverAsLocalDate) / 1000;
+
+    if (deltaInSeconds < 90) {
+      return 'a minute ago';
     }
-    return fmt;
+
+    if (deltaInSeconds < 3600) {
+      return `${Math.round(deltaInSeconds / 60)} minutes ago`;
+    }
+
+    // Today
+    if (asMDY(localTimeNow) === asMDY(serverAsLocalDate)) {
+      return `Today @ ${timeAsAMPM(serverAsLocalDate)}`;
+    }
+
+    // Yesterday
+    if (asMDY(yday) === asMDY(serverAsLocalDate)) {
+      return `Yesterday @ ${timeAsAMPM(serverAsLocalDate)}`;
+    }
+
+    return `${monthsShort[serverAsLocalDate.getMonth()]} ${ordsuffix(
+    serverAsLocalDate.getDate()
+  )}, ${serverAsLocalDate.getFullYear()} @ ${timeAsAMPM(serverAsLocalDate)}`;
   }
 
   function smalldate(a) {
@@ -175,9 +202,9 @@
           callback();
           dbj.called = true;
         }
-      },
+      }
     };
-    Array.from(imgs).forEach((img) => {
+    Array.from(imgs).forEach(img => {
       if (dbj.imgs.includes(img.src) === false && !img.loaded) {
         dbj.imgs.push(img.src);
         img.addEventListener('load', dbj.callback);
@@ -197,7 +224,7 @@
     if (!dates) {
       return;
     }
-    dates.forEach((el$$1) => {
+    dates.forEach(el$$1 => {
       const timestamp = parseInt(el$$1.title, 10);
       const parsed = el$$1.classList.contains('smalldate')
         ? smalldate(timestamp)
@@ -217,7 +244,7 @@
         top: 0,
         height: `${dE.clientHeight}px`,
         width: `${dE.clientWidth}px`,
-        display: show ? '' : 'none',
+        display: show ? '' : 'none'
       });
     } else {
       if (!show) return;
@@ -225,17 +252,19 @@
       ol.id = 'overlay';
       assign(ol.style, {
         height: `${dE.clientHeight}0px`,
-        width: `${dE.clientWidth}0px`,
+        width: `${dE.clientWidth}0px`
       });
       dE.appendChild(ol);
     }
   }
 
-  function scrollTo(pos, el$$1 = Browser.chrome ? document.body : document.documentElement) {
-    const screenrel = (
-      parseFloat(document.body.clientHeight)
-      - parseFloat(document.documentElement.clientHeight)
-    );
+  function scrollTo(
+    pos,
+    el$$1 = Browser.chrome ? document.body : document.documentElement
+  ) {
+    const screenrel =
+      parseFloat(document.body.clientHeight) -
+      parseFloat(document.documentElement.clientHeight);
     const top = parseFloat(el$$1.scrollTop);
     const position = screenrel < pos ? screenrel : pos;
     const diff = position - top;
@@ -318,7 +347,7 @@
     link.style.height = `${ih}px`;
     link.nw = nw;
     link.nh = nh;
-    link.onmousemove = (event) => {
+    link.onmousemove = event => {
       const o = getCoordinates(this);
       const e = Event$1(event);
       this.scrollLeft = ((e.pageX - o.x) / o.w) * (this.nw - o.w);
@@ -341,7 +370,6 @@
     link.appendChild(img);
   }
 
-
   function imageResizer(imgs) {
     let mw;
     let mh;
@@ -351,7 +379,7 @@
     }
     Array.from(imgs)
       .filter(img => !img.madeResized)
-      .forEach((img) => {
+      .forEach(img => {
         let p = 1;
         let p2 = 1;
         const { naturalWidth, naturalHeight } = img;
@@ -372,12 +400,13 @@
   }
 
   function stripHTML(html) {
-    return html.valueOf()
+    return html
+      .valueOf()
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
   }
 
-  function openTooltip (el$$1) {
+  function openTooltip(el$$1) {
     let tooltip = document.getElementById('tooltip_thingy');
     const pos = getCoordinates(el$$1);
     const title = stripHTML(el$$1.title);
@@ -458,7 +487,8 @@
     } else {
       const s = element.selectionStart;
       const e = element.selectionEnd;
-      element.value = element.value.substring(0, s) + content + element.value.substr(e);
+      element.value =
+        element.value.substring(0, s) + content + element.value.substr(e);
       element.selectionStart = s + content.length;
       element.selectionEnd = s + content.length;
     }
@@ -486,11 +516,18 @@
     }
     if (values) {
       return keys
-        .map((key, index) => `${encodeURIComponent(key)}=${encodeURIComponent(values[index] || '')}`)
+        .map(
+          (key, index) =>
+            `${encodeURIComponent(key)}=${encodeURIComponent(
+            values[index] || ''
+          )}`
+        )
         .join('&');
     }
     return Object.keys(keys)
-      .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(keys[key] || '')}`)
+      .map(
+        key => `${encodeURIComponent(key)}=${encodeURIComponent(keys[key] || '')}`
+      )
       .join('&');
   }
 
@@ -500,23 +537,21 @@
         readyState: 4,
         callback() {},
         method: 'POST',
-        ...s,
+        ...s
       };
     }
 
-    load(url, {
-      callback,
-      data,
-      method = this.setup.method,
-      requestType = 1,
-    } = {}) {
+    load(
+      url,
+      { callback, data, method = this.setup.method, requestType = 1 } = {}
+    ) {
       // requestType is an enum (1=update, 2=load new)
       let sendData = null;
       if (
-        data
-        && Array.isArray(data)
-        && Array.isArray(data[0])
-        && data[0].length === data[1].length
+        data &&
+        Array.isArray(data) &&
+        Array.isArray(data[0]) &&
+        data[0].length === data[1].length
       ) {
         sendData = buildQueryString(data[0], data[1]);
       } else if (typeof data !== 'string') {
@@ -538,7 +573,7 @@
       if (method) {
         request.setRequestHeader(
           'Content-Type',
-          'application/x-www-form-urlencoded',
+          'application/x-www-form-urlencoded'
         );
       }
       request.setRequestHeader('X-JSACCESS', requestType);
@@ -548,7 +583,9 @@
   }
 
   class Component {
-    static get selector() { throw new Error('No Selector defined'); }
+    static get selector() {
+      throw new Error('No Selector defined');
+    }
 
     constructor(element) {
       this.element = element;
@@ -560,7 +597,9 @@
   const INVALID_CLASS = 'invalid';
 
   class AutoComplete extends Component {
-    static get selector() { return 'input[data-autocomplete-action]'; }
+    static get selector() {
+      return 'input[data-autocomplete-action]';
+    }
 
     constructor(element) {
       super(element);
@@ -580,7 +619,7 @@
       }
 
       element.addEventListener('keyup', event => this.keyUp(event));
-      element.addEventListener('keydown', (event) => {
+      element.addEventListener('keydown', event => {
         if (event.key === 'Enter') {
           event.preventDefault();
         }
@@ -592,12 +631,12 @@
       let resultsContainer = document.querySelector('#autocomplete');
       if (!resultsContainer) {
         resultsContainer = assign(document.createElement('div'), {
-          id: 'autocomplete',
+          id: 'autocomplete'
         });
         // TODO: move static properties to CSS
         assign(resultsContainer.style, {
           position: 'absolute',
-          zIndex: getHighestZIndex(),
+          zIndex: getHighestZIndex()
         });
         document.body.appendChild(resultsContainer);
       }
@@ -606,7 +645,7 @@
       assign(resultsContainer.style, {
         top: `${coords.yh}px`,
         left: `${coords.x}px`,
-        width: `${coords.w}px`,
+        width: `${coords.w}px`
       });
 
       return resultsContainer;
@@ -615,7 +654,9 @@
     keyUp(event) {
       const resultsContainer = this.getResultsContainer();
       const results = Array.from(resultsContainer.querySelectorAll('div'));
-      const selectedIndex = results.findIndex(el$$1 => el$$1.classList.contains('selected'));
+      const selectedIndex = results.findIndex(el$$1 =>
+        el$$1.classList.contains('selected')
+      );
 
       // Handle arrow key selection
       if (results) {
@@ -629,7 +670,7 @@
           case 'ArrowDown':
             if (selectedIndex === -1) {
               results[0].classList.add('selected');
-            } else if (selectedIndex < (results.length - 1)) {
+            } else if (selectedIndex < results.length - 1) {
               results[selectedIndex].classList.remove('selected');
               results[selectedIndex + 1].classList.add('selected');
             }
@@ -648,39 +689,38 @@
         }
       }
 
-      const relativePath = document.location.toString().match('/acp/') ? '../' : '';
+      const relativePath = document.location.toString().match('/acp/')
+        ? '../'
+        : '';
       const searchTerm = encodeURIComponent(this.element.value);
       const queryParams = `act=${this.action}&term=${searchTerm}`;
-      new Ajax().load(
-        `${relativePath}misc/listloader.php?${queryParams}`,
-        {
-          callback: (xml) => {
-            const data = JSON.parse(xml.responseText);
-            resultsContainer.innerHTML = '';
-            if (!data.length) {
-              resultsContainer.style.display = 'none';
-            } else {
-              resultsContainer.style.display = '';
-              const [ids, values] = data;
-              ids.forEach((key, i) => {
-                const value = values[i];
-                const div = document.createElement('div');
-                div.innerHTML = value;
-                div.onclick = () => {
-                  resultsContainer.style.display = 'none';
-                  if (this.indicatorElement) {
-                    this.indicatorElement.classList.add(VALID_CLASS);
-                  }
-                  this.outputElement.value = key;
-                  this.outputElement.dispatchEvent(new Event('change'));
-                  this.element.value = value;
-                };
-                resultsContainer.appendChild(div);
-              });
-            }
-          },
-        },
-      );
+      new Ajax().load(`${relativePath}misc/listloader.php?${queryParams}`, {
+        callback: xml => {
+          const data = JSON.parse(xml.responseText);
+          resultsContainer.innerHTML = '';
+          if (!data.length) {
+            resultsContainer.style.display = 'none';
+          } else {
+            resultsContainer.style.display = '';
+            const [ids, values] = data;
+            ids.forEach((key, i) => {
+              const value = values[i];
+              const div = document.createElement('div');
+              div.innerHTML = value;
+              div.onclick = () => {
+                resultsContainer.style.display = 'none';
+                if (this.indicatorElement) {
+                  this.indicatorElement.classList.add(VALID_CLASS);
+                }
+                this.outputElement.value = key;
+                this.outputElement.dispatchEvent(new Event('change'));
+                this.element.value = value;
+              };
+              resultsContainer.appendChild(div);
+            });
+          }
+        }
+      });
     }
   }
 
@@ -703,12 +743,13 @@
             a = a.substr(1);
           }
           if (a.length === 3) {
-            a = a.charAt(0)
-              + a.charAt(0)
-              + a.charAt(1)
-              + a.charAt(1)
-              + a.charAt(2)
-              + a.charAt(2);
+            a =
+              a.charAt(0) +
+              a.charAt(0) +
+              a.charAt(1) +
+              a.charAt(1) +
+              a.charAt(2) +
+              a.charAt(2);
           }
           if (a.length !== 6) this.rgb = [0, 0, 0];
           else {
@@ -740,8 +781,8 @@
       const hex = '0123456789ABCDEF';
       for (x = 0; x < 3; x += 1) {
         tmp2 = this.rgb[x];
-        tmp
-          += hex.charAt(Math.floor(tmp2 / 16)) + hex.charAt(Math.floor(tmp2 % 16));
+        tmp +=
+          hex.charAt(Math.floor(tmp2 / 16)) + hex.charAt(Math.floor(tmp2 % 16));
       }
       return tmp;
     }
@@ -765,8 +806,9 @@
 
     morph(from, percent, to) {
       if (Array.isArray(from) && from.length === to.length) {
-        return from
-          .map((value, i) => Math.round(this.morph(value, percent, to[i])));
+        return from.map((value, i) =>
+          Math.round(this.morph(value, percent, to[i]))
+        );
       }
       return (to - from) * percent + from;
     }
@@ -779,10 +821,10 @@
         curL[0](this.el);
         sc = this.steps;
       } else {
-        curL.forEach((keyFrame) => {
+        curL.forEach(keyFrame => {
           let toValue = this.morph(keyFrame[1], sc / this.steps, keyFrame[2]);
           if (keyFrame[0].match(/color/i)) {
-            toValue = `#${(new Color(toValue)).toHex()}`;
+            toValue = `#${new Color(toValue).toHex()}`;
           } else if (keyFrame[0] !== 'opacity') toValue = Math.round(toValue);
           this.el.style[keyFrame[0]] = keyFrame[3] + toValue + keyFrame[4];
         });
@@ -802,14 +844,20 @@
       let t = ['', '', ''];
       let fromParsed;
       if (what.match(/color/i)) {
-        fromParsed = (new Color(from)).toRGB();
-        t[1] = (new Color(to)).toRGB();
+        fromParsed = new Color(from).toRGB();
+        t[1] = new Color(to).toRGB();
       } else {
         t = to.match(/(\D*)(-?\d+)(\D*)/);
         t.shift();
         fromParsed = parseFloat(from.match(/-?\d+/));
       }
-      this.lineup[this.lineup.length - 1].push([what, fromParsed, t[1], t[0], t[2]]);
+      this.lineup[this.lineup.length - 1].push([
+        what,
+        fromParsed,
+        t[1],
+        t[0],
+        t[2]
+      ]);
       return this;
     }
 
@@ -821,10 +869,9 @@
       bg2 = getComputedStyle(this.el).backgroundColor.toString();
       if (bg2 === bg) bg2 = 'FF0';
       this.el.classList.add('highlight');
-      return this.add('backgroundColor', bg2, bg)
-        .then(() => {
-          this.el.style.backgroundColor = bg;
-        });
+      return this.add('backgroundColor', bg2, bg).then(() => {
+        this.el.style.backgroundColor = bg;
+      });
     }
 
     then(what, from, to, steps) {
@@ -840,12 +887,15 @@
   }
 
   class CollapseBox extends Component {
-    static get selector() { return '.collapse-box'; }
+    static get selector() {
+      return '.collapse-box';
+    }
 
     constructor(element) {
       super(element);
 
-      element.querySelector('.collapse-button')
+      element
+        .querySelector('.collapse-button')
         .addEventListener('click', () => this.click());
     }
 
@@ -865,7 +915,8 @@
           .play();
       } else {
         if (!fh) {
-          fh = `${collapseContent.clientHeight || collapseContent.offsetHeight}px`;
+          fh = `${collapseContent.clientHeight ||
+          collapseContent.offsetHeight}px`;
           collapseContent.dataset.fullHeight = fh;
         }
         new Animation(collapseContent, 5, 10, 0)
@@ -879,7 +930,9 @@
   }
 
   class DatePicker extends Component {
-    static get selector() { return 'input.date'; }
+    static get selector() {
+      return 'input.date';
+    }
 
     constructor(element) {
       super(element);
@@ -899,7 +952,7 @@
       let picker = document.querySelector('#datepicker');
       if (!picker) {
         picker = assign(document.createElement('table'), {
-          id: 'datepicker',
+          id: 'datepicker'
         });
         document.body.appendChild(picker);
       }
@@ -914,16 +967,14 @@
         zIndex: getHighestZIndex(),
         position: 'absolute',
         top: `${c.yh}px`,
-        left: `${c.x}px`,
+        left: `${c.x}px`
       });
 
-      const [month, day, year] = this.element.value.split('/').map(s => parseInt(s, 10));
+      const [month, day, year] = this.element.value
+        .split('/')
+        .map(s => parseInt(s, 10));
       if (month && day && year) {
-        this.selectedDate = [
-          year,
-          month - 1,
-          day,
-        ];
+        this.selectedDate = [year, month - 1, day];
       } else this.selectedDate = undefined;
 
       this.generate(year, month, day);
@@ -1025,9 +1076,10 @@
         cell = row.insertCell((first + x) % 7);
         cell.onclick = this.insert.bind(this, cell);
 
-        const isSelected = year === this.selectedDate[0]
-          && month === this.selectedDate[1]
-          && x + 1 === this.selectedDate[2];
+        const isSelected =
+          year === this.selectedDate[0] &&
+          month === this.selectedDate[1] &&
+          x + 1 === this.selectedDate[2];
         cell.className = `day${isSelected ? ' selected' : ''}`;
         cell.innerHTML = x + 1;
       }
@@ -1061,7 +1113,9 @@
   }
 
   class ImageGallery extends Component {
-    static get selector() { return '.image_gallery'; }
+    static get selector() {
+      return '.image_gallery';
+    }
 
     constructor(element) {
       super(element);
@@ -1117,7 +1171,9 @@
   }
 
   class PageList extends Component {
-    static get selector() { return '.pages'; }
+    static get selector() {
+      return '.pages';
+    }
 
     constructor(element) {
       super(element);
@@ -1132,9 +1188,15 @@
       const lastPage = parseInt(pages[pages.length - 1].innerHTML, 10);
       const between = pages.length - 2;
 
-      if ((direction > 0 && startPage + between < lastPage) || (direction < 0 && startPage > 2)) {
+      if (
+        (direction > 0 && startPage + between < lastPage) ||
+        (direction < 0 && startPage > 2)
+      ) {
         for (let x = 0; x < between; x += 1) {
-          pages[x + 1].href = pages[x + 1].href.replace(/\d+$/, x + startPage + direction);
+          pages[x + 1].href = pages[x + 1].href.replace(
+            /\d+$/,
+            x + startPage + direction
+          );
           pages[x + 1].innerHTML = startPage + x + direction;
         }
       }
@@ -1142,7 +1204,9 @@
   }
 
   class Switch extends Component {
-    static get selector() { return 'input.switch'; }
+    static get selector() {
+      return 'input.switch';
+    }
 
     constructor(element) {
       super(element);
@@ -1151,7 +1215,7 @@
 
       const button = assign(document.createElement('button'), {
         type: 'button',
-        className: element.className,
+        className: element.className
       });
 
       const toggle = () => {
@@ -1170,7 +1234,9 @@
   const ACTIVE_CLASS = 'active';
 
   class Tabs extends Component {
-    static get selector() { return '.tabs'; }
+    static get selector() {
+      return '.tabs';
+    }
 
     constructor(element) {
       super(element);
@@ -1196,11 +1262,7 @@
     }
   }
 
-  const DISALLOWED_TAGS = [
-    'SCRIPT',
-    'STYLE',
-    'HR',
-  ];
+  const DISALLOWED_TAGS = ['SCRIPT', 'STYLE', 'HR'];
 
   function htmlToBBCode(html) {
     let bbcode = html;
@@ -1208,99 +1270,94 @@
     bbcode = bbcode.replace(/[\r\n]+/g, '');
     bbcode = bbcode.replace(/<(hr|br|meta)[^>]*>/gi, '\n');
     // images and emojis
-    bbcode = bbcode.replace(/<img.*?src=["']?([^'"]+)["'](?: alt=["']?([^"']+)["'])?[^>]*\/?>/g, (whole, src, alt) => alt || `[img]${src}[/img]`);
-    bbcode = bbcode.replace(nestedTagRegex, (
-      whole,
-      tag,
-      attributes,
-      innerHTML,
-    ) => {
-      // Recursively handle nested tags
-      let innerhtml = nestedTagRegex.test(innerHTML) ? htmlToBBCode(innerHTML) : innerHTML;
-      const att = {};
-      attributes.replace(
-        /(color|size|style|href|src)=(['"]?)(.*?)\2/gi,
-        (_, attr, q, value) => {
-          att[attr] = value;
-        },
-      );
-      const { style = '' } = att;
+    bbcode = bbcode.replace(
+      /<img.*?src=["']?([^'"]+)["'](?: alt=["']?([^"']+)["'])?[^>]*\/?>/g,
+      (whole, src, alt) => alt || `[img]${src}[/img]`
+    );
+    bbcode = bbcode.replace(
+      nestedTagRegex,
+      (whole, tag, attributes, innerHTML) => {
+        // Recursively handle nested tags
+        let innerhtml = nestedTagRegex.test(innerHTML)
+          ? htmlToBBCode(innerHTML)
+          : innerHTML;
+        const att = {};
+        attributes.replace(
+          /(color|size|style|href|src)=(['"]?)(.*?)\2/gi,
+          (_, attr, q, value) => {
+            att[attr] = value;
+          }
+        );
+        const { style = '' } = att;
 
-      const lcTag = tag.toLowerCase();
-      if (DISALLOWED_TAGS.includes(lcTag)) {
-        return '';
+        const lcTag = tag.toLowerCase();
+        if (DISALLOWED_TAGS.includes(lcTag)) {
+          return '';
+        }
+        if (style.match(/background(-color)?:[^;]+(rgb\([^)]+\)|#\s+)/i)) {
+          innerhtml = `[bgcolor=#${new Color(
+          RegExp.$2
+        ).toHex()}]${innerhtml}[/bgcolor]`;
+        }
+        if (style.match(/text-align: ?(right|center|left)/i)) {
+          innerhtml = `[align=${RegExp.$1}]${innerhtml}[/align]`;
+        }
+        if (
+          style.match(/font-style: ?italic/i) ||
+          lcTag === 'i' ||
+          lcTag === 'em'
+        ) {
+          innerhtml = `[I]${innerhtml}[/I]`;
+        }
+        if (style.match(/text-decoration:[^;]*underline/i) || lcTag === 'u') {
+          innerhtml = `[U]${innerhtml}[/U]`;
+        }
+        if (
+          style.match(/text-decoration:[^;]*line-through/i) ||
+          lcTag === 's' ||
+          lcTag === 'strike'
+        ) {
+          innerhtml = `[S]${innerhtml}[/S]`;
+        }
+        if (
+          style.match(/font-weight: ?bold/i) ||
+          lcTag === 'strong' ||
+          lcTag === 'b'
+        ) {
+          innerhtml = `[B]${innerhtml}[/B]`;
+        }
+        if (att.size || style.match(/font-size: ?([^;]+)/i)) {
+          innerhtml = `[size=${att.size || RegExp.$1}]${innerhtml}[/size]`;
+        }
+        if (att.color || style.match(/color: ?([^;]+)/i)) {
+          innerhtml = `[color=${att.color || RegExp.$1}]${innerhtml}[/color]`;
+        }
+        if (lcTag === 'a' && att.href) {
+          innerhtml = `[url=${att.href}]${innerhtml}[/url]`;
+        }
+        if (lcTag === 'ol') innerhtml = `[ol]${innerhtml}[/ol]`;
+        if (lcTag === 'ul') innerhtml = `[ul]${innerhtml}[/ul]`;
+        if (lcTag.match(/h\d/i)) {
+          innerhtml = `[${lcTag}]${innerhtml}[/${lcTag}]`;
+        }
+        if (lcTag === 'li') {
+          innerhtml = `*${innerhtml.replace(/[\n\r]+/, '')}\n`;
+        }
+        if (lcTag === 'p') {
+          innerhtml = `\n${innerhtml === '&nbsp' ? '' : innerhtml}\n`;
+        }
+        if (lcTag === 'div') {
+          innerhtml = `\n${innerhtml}`;
+        }
+        return innerhtml;
       }
-      if (style.match(/background(-color)?:[^;]+(rgb\([^)]+\)|#\s+)/i)) {
-        innerhtml = `[bgcolor=#${
-        new Color(RegExp.$2).toHex()
-      }]${
-        innerhtml
-      }[/bgcolor]`;
-      }
-      if (style.match(/text-align: ?(right|center|left)/i)) {
-        innerhtml = `[align=${RegExp.$1}]${innerhtml}[/align]`;
-      }
-      if (
-        style.match(/font-style: ?italic/i)
-        || lcTag === 'i'
-        || lcTag === 'em'
-      ) {
-        innerhtml = `[I]${innerhtml}[/I]`;
-      }
-      if (style.match(/text-decoration:[^;]*underline/i) || lcTag === 'u') {
-        innerhtml = `[U]${innerhtml}[/U]`;
-      }
-      if (
-        style.match(/text-decoration:[^;]*line-through/i)
-        || lcTag === 's' || lcTag === 'strike'
-      ) {
-        innerhtml = `[S]${innerhtml}[/S]`;
-      }
-      if (
-        style.match(/font-weight: ?bold/i)
-        || lcTag === 'strong'
-        || lcTag === 'b'
-      ) {
-        innerhtml = `[B]${innerhtml}[/B]`;
-      }
-      if (att.size || style.match(/font-size: ?([^;]+)/i)) {
-        innerhtml = `[size=${att.size || RegExp.$1}]${innerhtml}[/size]`;
-      }
-      if (att.color || style.match(/color: ?([^;]+)/i)) {
-        innerhtml = `[color=${att.color || RegExp.$1}]${innerhtml}[/color]`;
-      }
-      if (lcTag === 'a' && att.href) {
-        innerhtml = `[url=${att.href}]${innerhtml}[/url]`;
-      }
-      if (lcTag === 'ol') innerhtml = `[ol]${innerhtml}[/ol]`;
-      if (lcTag === 'ul') innerhtml = `[ul]${innerhtml}[/ul]`;
-      if (lcTag.match(/h\d/i)) {
-        innerhtml = `[${
-        lcTag
-      }]${
-        innerhtml
-      }[/${
-        lcTag
-      }]`;
-      }
-      if (lcTag === 'li') {
-        innerhtml = `*${innerhtml.replace(/[\n\r]+/, '')}\n`;
-      }
-      if (lcTag === 'p') {
-        innerhtml = `\n${innerhtml === '&nbsp' ? '' : innerhtml}\n`;
-      }
-      if (lcTag === 'div') {
-        innerhtml = `\n${innerhtml}`;
-      }
-      return innerhtml;
-    });
+    );
     return bbcode
       .replace(/&amp;/g, '&')
       .replace(/&gt;/g, '>')
       .replace(/&lt;/g, '<')
       .replace(/&nbsp;/g, ' ');
   }
-
 
   function bbcodeToHTML(bbcode) {
     let html = bbcode
@@ -1314,26 +1371,26 @@
     html = html.replace(/\[img\]([^'"[]+)\[\/img\]/gi, '<img src="$1">');
     html = html.replace(
       /\[color=([^\]]+)\](.*?)\[\/color\]/gi,
-      '<span style="color:$1">$2</span>',
+      '<span style="color:$1">$2</span>'
     );
     html = html.replace(
       /\[size=([^\]]+)\](.*?)\[\/size\]/gi,
-      '<span style="font-size:$1">$2</span>',
+      '<span style="font-size:$1">$2</span>'
     );
     html = html.replace(
       /\[url=([^\]]+)\](.*?)\[\/url\]/gi,
-      '<a href="$1">$2</a>',
+      '<a href="$1">$2</a>'
     );
     html = html.replace(
       /\[bgcolor=([^\]]+)\](.*?)\[\/bgcolor\]/gi,
-      '<span style="backgroun-color:$1">$2</span>',
+      '<span style="backgroun-color:$1">$2</span>'
     );
     html = html.replace(/\[h(\d)\](.*?)\[\/h\1\]/g, '<h$1>$2</h$1>');
     html = html.replace(
       /\[align=(left|right|center)\](.*?)\[\/align\]/g,
-      '<div style="text-align:$1">$2</div>',
+      '<div style="text-align:$1">$2</div>'
     );
-    html = html.replace(/\[(ul|ol)\]([\w\W]*?)\[\/\1\]/gi, (match) => {
+    html = html.replace(/\[(ul|ol)\]([\w\W]*?)\[\/\1\]/gi, match => {
       const tag = match[1];
       const listItems = match[2].split(/([\r\n]+|^)\*/);
       const lis = listItems
@@ -1352,7 +1409,9 @@
   const isURL = text => URL_REGEX.test(text);
 
   class Editor extends Component {
-    static get selector() { return 'textarea.bbcode-editor'; }
+    static get selector() {
+      return 'textarea.bbcode-editor';
+    }
 
     constructor(element) {
       super(element);
@@ -1426,7 +1485,7 @@
         'insertorderedlist',
         'insertunorderedlist',
         'c_smileys',
-        'c_switcheditmode',
+        'c_switcheditmode'
       ];
 
       const cmddesc = [
@@ -1449,7 +1508,7 @@
         'Create Ordered List',
         'Create Unordered List',
         'Insert Emoticon',
-        'Switch editor mode',
+        'Switch editor mode'
       ];
 
       cmds.forEach((cmd, i) => {
@@ -1487,7 +1546,7 @@
       const emotewin = this.emoteWindow;
       if (!emotewin) {
         new Ajax().load('/misc/emotes.php?json', {
-          callback: response => this.createEmoteWindow(response, { x, y }),
+          callback: response => this.createEmoteWindow(response, { x, y })
         });
         return;
       }
@@ -1547,7 +1606,7 @@
         '#0000FF',
         '#FFFF00',
         '#00FFFF',
-        '#FF00FF',
+        '#FF00FF'
       ];
       const l = colors.length;
       const sq = Math.ceil(Math.sqrt(l));
@@ -1557,7 +1616,7 @@
         borderCollapse: 'collapse',
         position: 'absolute',
         top: `${posy}px`,
-        left: `${posx}px`,
+        left: `${posx}px`
       });
 
       for (let y = 0; y < sq; y += 1) {
@@ -1580,7 +1639,7 @@
             backgroundColor: color,
             height: '20px',
             width: '20px',
-            margin: 0,
+            margin: 0
           });
         }
       }
@@ -1728,7 +1787,7 @@
       }
       return this.element.value.substring(
         this.element.selectionStart,
-        this.element.selectionEnd,
+        this.element.selectionEnd
       );
     }
 
@@ -1786,18 +1845,18 @@
         ey: parseInt(s.top, 10) || 0,
         info: {},
         bc: getCoordinates(el$$1),
-        zIndex: el$$1.style.zIndex,
+        zIndex: el$$1.style.zIndex
       };
       if (!this.sess.zIndex || Number(this.sess.zIndex) < highz - 1) {
         el$$1.style.zIndex = highz;
       }
       tryInvoke(this.onstart, {
         ...this.sess,
-        droptarget: this.testDrops(this.sess.mx, this.sess.my),
+        droptarget: this.testDrops(this.sess.mx, this.sess.my)
       });
       this.boundEvents = {
         drag: event2 => this.drag(event2),
-        drop: event2 => this.drop(event2),
+        drop: event2 => this.drop(event2)
       };
       document.addEventListener('mousemove', this.boundEvents.drag);
       document.addEventListener('mouseup', this.boundEvents.drop);
@@ -1841,20 +1900,14 @@
         dx: mx - (sess.mx || mx),
         dy: my - (sess.my || my),
         sx: this.sess.ex,
-        sy: this.sess.ey,
+        sy: this.sess.ey
       };
       this.sess.info = sess;
       tryInvoke(this.ondrag, sess);
-      if (
-        sess.droptarget
-        && tmp !== sess.droptarget
-      ) {
+      if (sess.droptarget && tmp !== sess.droptarget) {
         tryInvoke(this.ondragover, sess);
       }
-      if (
-        tmp
-        && sess.droptarget !== tmp
-      ) {
+      if (tmp && sess.droptarget !== tmp) {
         tmp2 = sess.droptarget;
         sess.droptarget = tmp;
         tryInvoke(this.ondragout, sess);
@@ -1885,18 +1938,18 @@
       if (!droppables.length) {
         return r;
       }
-      droppables.forEach((droppable) => {
+      droppables.forEach(droppable => {
         if (droppable === this.sess.el || isChildOf(droppable, this.sess.el)) {
           return;
         }
         z = getCoordinates(droppable);
         if (
-          max[0] > z.w
-          && max[1] > z.h
-          && a >= z.x
-          && b >= z.y
-          && a <= z.xw
-          && b <= z.yh
+          max[0] > z.w &&
+          max[1] > z.h &&
+          a >= z.x &&
+          b >= z.y &&
+          a <= z.xw &&
+          b <= z.yh
         ) {
           max = [z.w, z.h];
           r = droppable;
@@ -1970,7 +2023,7 @@
         className: '',
         pos: 'center',
         zIndex: getHighestZIndex(),
-        ...options,
+        ...options
       });
     }
 
@@ -1996,7 +2049,9 @@
       if (this.useOverlay) {
         toggleOverlay(true, this.zIndex);
       }
-      windowContainer.className = `window${this.className ? ` ${this.className}` : ''}`;
+      windowContainer.className = `window${
+      this.className ? ` ${this.className}` : ''
+    }`;
       titleBar.className = 'title';
       contentContainer.className = 'content';
       if (this.minimizable) {
@@ -2016,9 +2071,11 @@
 
       // add close window functionality
       const close = () => this.close();
-      windowContainer.querySelectorAll('[data-window-close]').forEach((closeElement) => {
-        closeElement.addEventListener('click', close);
-      });
+      windowContainer
+        .querySelectorAll('[data-window-close]')
+        .forEach(closeElement => {
+          closeElement.addEventListener('click', close);
+        });
 
       // Add the window to the document
       document.body.appendChild(windowContainer);
@@ -2051,7 +2108,7 @@
             },
             ondrop() {
               rsize.style.left = `${windowContainer.clientWidth - 16}px`;
-            },
+            }
           })
           .apply(rsize);
         targ.style.width = `${windowContainer.clientWidth}px`;
@@ -2067,7 +2124,7 @@
           () => {
             this.setPosition(pos);
           },
-          2000,
+          2000
         );
       } else this.setPosition(pos);
 
@@ -2075,9 +2132,10 @@
         .autoZ()
         .noChildActivation()
         .boundingBox(
-          0, 0,
+          0,
+          0,
           document.documentElement.clientWidth - 50,
-          document.documentElement.clientHeight - 50,
+          document.documentElement.clientHeight - 50
         )
         .apply(windowContainer, titleBar);
       windowContainer.close = () => this.close();
@@ -2149,9 +2207,7 @@
       if (y < 0) y = 0;
       d1.style.left = `${x}px`;
       if (this.animate || animate) {
-        new Animation(d1, 10)
-          .add('top', `${y - 100}px`, `${y}px`)
-          .play();
+        new Animation(d1, 10).add('top', `${y - 100}px`, `${y}px`).play();
       } else d1.style.top = `${y}px`;
       this.pos = pos;
     }
@@ -2180,7 +2236,9 @@
   };
 
   class MediaPlayer extends Component {
-    static get selector() { return '.media'; }
+    static get selector() {
+      return '.media';
+    }
 
     constructor(element) {
       super(element);
@@ -2189,16 +2247,16 @@
       const inlineLink = element.querySelector('a.inline');
       const movie = element.querySelector('.movie');
 
-      popoutLink.addEventListener('click', (event) => {
+      popoutLink.addEventListener('click', event => {
         event.preventDefault();
         const win = new Window({
           title: popoutLink.href,
-          content: movie.innerHTML,
+          content: movie.innerHTML
         });
         win.create();
       });
 
-      inlineLink.addEventListener('click', (event) => {
+      inlineLink.addEventListener('click', event => {
         event.preventDefault();
         movie.style.display = 'block';
       });
@@ -2212,7 +2270,7 @@
 
     // Special rules for all links
     const links = container.querySelectorAll('a');
-    links.forEach((link) => {
+    links.forEach(link => {
       // Handle links with tooltips
       if (link.dataset.useTooltip) {
         link.addEventListener('mouseover', () => openTooltip(link));
@@ -2223,7 +2281,7 @@
         const href = link.getAttribute('href');
         if (href.charAt(0) === '?') {
           const oldclick = link.onclick;
-          link.addEventListener('click', (event) => {
+          link.addEventListener('click', event => {
             // Some links have an onclick that returns true/false based on whether
             // or not the link should execute.
             if (!oldclick || oldclick.call(link) !== false) {
@@ -2232,7 +2290,7 @@
             event.preventDefault();
           });
 
-        // Open external links in a new window
+          // Open external links in a new window
         } else if (link.getAttribute('href').substr(0, 4) === 'http') {
           link.target = '_BLANK';
         }
@@ -2248,15 +2306,14 @@
           // resizer on large images
           imageResizer(bbcodeimgs);
         },
-        2000,
+        2000
       );
     }
 
     // Make BBCode code blocks selectable when clicked
-    container.querySelectorAll('.bbcode.code')
-      .forEach((codeBlock) => {
-        codeBlock.addEventListener('click', () => selectAll(codeBlock));
-      });
+    container.querySelectorAll('.bbcode.code').forEach(codeBlock => {
+      codeBlock.addEventListener('click', () => selectAll(codeBlock));
+    });
 
     // Hydrate all components
     [
@@ -2268,9 +2325,10 @@
       MediaPlayer,
       PageList,
       Switch,
-      Tabs,
-    ].forEach((Component) => {
-      container.querySelectorAll(Component.selector)
+      Tabs
+    ].forEach(Component => {
+      container
+        .querySelectorAll(Component.selector)
         .forEach(element => new Component(element));
     });
 
@@ -2278,9 +2336,9 @@
     // NOTE: This needs to come after editors, since they both hook into form onsubmit
     // and the editor hook needs to fire first
     const ajaxForms = container.querySelectorAll('form[data-ajax-form]');
-    ajaxForms.forEach((ajaxForm) => {
+    ajaxForms.forEach(ajaxForm => {
       const resetOnSubmit = ajaxForm.dataset.ajaxForm === 'resetOnSubmit';
-      ajaxForm.addEventListener('submit', (event) => {
+      ajaxForm.addEventListener('submit', event => {
         event.preventDefault();
         RUN.submitForm(ajaxForm, resetOnSubmit);
       });
@@ -2312,9 +2370,8 @@
     }
     lastTitle = title;
     flashInterval = setInterval(() => {
-      document.title = document.title === originalTitle
-        ? lastTitle
-        : originalTitle;
+      document.title =
+        document.title === originalTitle ? lastTitle : originalTitle;
     }, 1000);
   }
 
@@ -2378,7 +2435,7 @@
       let selector = sel;
       const paths = Array.from(document.querySelectorAll('.path'));
       if (selector === 'path' && paths.length > 1) {
-        paths.forEach((path) => {
+        paths.forEach(path => {
           path.innerHTML = html;
           gracefulDegrade(path);
         });
@@ -2391,9 +2448,7 @@
       if (!el$$1) return;
       el$$1.innerHTML = html;
       if (shouldHighlight) {
-        new Animation(el$$1)
-          .dehighlight()
-          .play();
+        new Animation(el$$1).dehighlight().play();
       }
       gracefulDegrade(el$$1);
     },
@@ -2404,14 +2459,6 @@
     overlay: toggleOverlay,
     back() {
       window.history.back();
-    },
-    goto(args) {
-      let [selector] = args;
-      if (!selector.match(/^\W/)) {
-        selector = `#${selector}`;
-      }
-      const el$$1 = document.querySelector(selector);
-      scrollTo(getCoordinates(el$$1).y);
     },
     setstatus([className]) {
       const status = document.querySelector('#status');
@@ -2451,9 +2498,7 @@
         x = ss.pop();
         x.parentNode.removeChild(x);
       }
-      new Animation(div)
-        .dehighlight()
-        .play();
+      new Animation(div).dehighlight().play();
       if (globalsettings.sound_shout) Sound$1.play('sbblip');
       gracefulDegrade(div);
     },
@@ -2468,9 +2513,7 @@
       let h = getComputedStyle(tick);
       h = h.height;
       tick.style.height = '0px';
-      new Animation(tick)
-        .add('height', '0px', h)
-        .play();
+      new Animation(tick).add('height', '0px', h).play();
       const ticks = Array.from(ticker.querySelectorAll('.tick'));
       const l = ticks.length;
       tick.style.display = 'block';
@@ -2481,7 +2524,7 @@
             tick = ticks[x];
             new Animation(tick, 30, 500)
               .add('opacity', '1', '0')
-              .then((el$$1) => {
+              .then(el$$1 => {
                 el$$1.parentNode.removeChild(el$$1);
               })
               .play();
@@ -2495,14 +2538,14 @@
       flashTitle(`New message from ${fromName}!`);
       const { webkitNotifications } = window;
       if (
-        !document.hasFocus()
-        && webkitNotifications
-        && webkitNotifications.checkPermission() === 0
+        !document.hasFocus() &&
+        webkitNotifications &&
+        webkitNotifications.checkPermission() === 0
       ) {
         const notify = webkitNotifications.createNotification(
           '',
           `${fromName} says:`,
-          message,
+          message
         );
         notify.show();
         notify.onclick = () => {
@@ -2512,13 +2555,10 @@
       }
       if (!messagesContainer) {
         const imWindow = new Window();
-        imWindow.title = `${fromName
-      } <a href="#" onclick="IMWindow.menu(event,${
-        fromId
-      });return false;">&rsaquo;</a>`;
+        imWindow.title = `${fromName} <a href="#" onclick="IMWindow.menu(event,${fromId});return false;">&rsaquo;</a>`;
         imWindow.content = "<div class='ims'></div><div class='offline'>This user may be offline</div><div><form data-ajax-form='resetOnSubmit' method='post'><input type='hidden' name='im_uid' value='%s' /><input type='text' name='im_im' /><input type='hidden' name='act' value='blank' /></form></div>".replace(
           /%s/g,
-          fromId,
+          fromId
         );
         imWindow.className = 'im';
         imWindow.resize = '.ims';
@@ -2551,24 +2591,19 @@
         if (!fromMe) {
           document.querySelector(`#im_${fromId}`).classList.remove('offline');
         }
-        d.innerHTML = `<a href='?act=vu${
-        fromMe || parseInt(fromId, 10)
-      }' class='name'>${
-        fromName
-      }</a> ${
+        d.innerHTML = `<a href='?act=vu${fromMe ||
+        parseInt(fromId, 10)}' class='name'>${fromName}</a> ${
         !isAction ? ': ' : ''
       }${message}`;
         d.title = title;
-        const test = messagesContainer.scrollTop > (
-          messagesContainer.scrollHeight - messagesContainer.clientHeight - 50
-        );
+        const test =
+          messagesContainer.scrollTop >
+          messagesContainer.scrollHeight - messagesContainer.clientHeight - 50;
         messagesContainer.appendChild(d);
         if (test) {
           messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
-        new Animation(d)
-          .dehighlight()
-          .play();
+        new Animation(d).dehighlight().play();
         gracefulDegrade(d);
         if (!messagesContainer && globalsettings.sound_im) Sound$1.play('imbeep');
       }
@@ -2577,7 +2612,8 @@
       document.querySelector(`#im_${a}`).classList.add('offline');
     },
     window([options]) {
-      const existingWindow = options.id && options.id && document.getElementById(options.id);
+      const existingWindow =
+        options.id && options.id && document.getElementById(options.id);
       if (existingWindow) {
         existingWindow.querySelector('.title').innerHTML = options.title;
         existingWindow.querySelector('.content').innerHTML = options.content;
@@ -2624,12 +2660,9 @@
             RUN.location(link.getAttribute('href'));
           };
         }
-        link.className = `user${
-        memberId
-      } mgroup${
-        groupId
-      } ${
-        status ? ` ${status}` : ''}`;
+        link.className = `user${memberId} mgroup${groupId} ${
+        status ? ` ${status}` : ''
+      }`;
         if (tooltip) {
           link.onmouseover = () => {
             openTooltip(this, this.title);
@@ -2646,7 +2679,7 @@
     setoffline(a) {
       const statusers = document.querySelector('#statusers');
       const ids = a[0].split(',');
-      ids.forEach((id) => {
+      ids.forEach(id => {
         const link = document.querySelector(`#statusers .user${id}`);
         if (link) {
           statusers.removeChild(link);
@@ -2666,16 +2699,14 @@
           pos = getCoordinates(el$$1);
           scrollTo(pos.y);
         },
-        wait ? 10 : 1000,
+        wait ? 10 : 1000
       );
       return true;
     },
     updateqreply(a) {
       const qreply = document.querySelector('#qreply');
       if (qreply) {
-        qreply
-          .querySelector('textarea')
-          .focus();
+        qreply.querySelector('textarea').focus();
         qreply.querySelector('textarea').value += a[0];
       }
     },
@@ -2718,7 +2749,8 @@
             })
             .play();
           return;
-        } prdiv.style.display = 'block';
+        }
+        prdiv.style.display = 'block';
       } else {
         prdiv = document.createElement('div');
         prdiv.className = 'postrating_list';
@@ -2730,7 +2762,7 @@
       }
       prdiv.innerHTML = html;
       new Animation(prdiv).add('height', '0px', '200px').play();
-    },
+    }
   };
 
   const UPDATE_INTERVAL = 5000;
@@ -2738,7 +2770,7 @@
   class Stream {
     constructor() {
       this.request = new Ajax({
-        callback: request => this.handleRequestData(request),
+        callback: request => this.handleRequestData(request)
       });
       this.lastURL = document.location.search.substr(1);
       this.commands = Commands;
@@ -2849,7 +2881,7 @@
       const values = [];
       const { submitButton } = form;
 
-      Array.from(form.elements).forEach((inputField) => {
+      Array.from(form.elements).forEach(inputField => {
         if (!inputField.name || inputField.type === 'submit') {
           return;
         }
@@ -2857,7 +2889,7 @@
         if (inputField.type === 'select-multiple') {
           Array.from(inputField.options)
             .filter(option => option.selected)
-            .forEach((option) => {
+            .forEach(option => {
               names.push(`${inputField.name}[]`);
               values.push(option.value);
             });
@@ -2865,8 +2897,8 @@
         }
 
         if (
-          (inputField.type === 'checkbox' || inputField.type === 'radio')
-          && !inputField.checked
+          (inputField.type === 'checkbox' || inputField.type === 'radio') &&
+          !inputField.checked
         ) {
           return;
         }
@@ -2887,7 +2919,7 @@
 
     handleQuoting(a) {
       this.stream.load(
-        `${a.href}&qreply=${document.querySelector('#qreply') ? '1' : '0'}`,
+        `${a.href}&qreply=${document.querySelector('#qreply') ? '1' : '0'}`
       );
     }
 
@@ -2934,7 +2966,7 @@
     d.id = 'immenu';
     d.className = 'immenu';
     document.body.appendChild(d);
-    document.body.onclick = (clickEvent) => {
+    document.body.onclick = clickEvent => {
       const ce = Event$1(clickEvent);
       if (ce.srcElement !== d && !isChildOf(ce.srcElement, d)) {
         d.parentNode.removeChild(d);
@@ -2947,7 +2979,7 @@
   // TODO: Make these not globally defined
   assign(window, {
     RUN: RUN$1,
-    IMWindow,
+    IMWindow
   });
 
 }());
