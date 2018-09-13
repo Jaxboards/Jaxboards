@@ -1,10 +1,4 @@
 <?php
-// fetch_all not available in some environments
-function fetch_all($result,$resulttype = MYSQLI_NUM) {
-  for ($res = array(); $tmp = mysqli_fetch_array($result);) $res[] = $tmp;
-  return $res;
-}
-
 
 class MySQL
 {
@@ -30,6 +24,27 @@ class MySQL
         }
 
         return true;
+    }
+
+    /**
+     * A function to deal with the `mysqli_fetch_all` function only exiting
+     * for the `mysqlnd` driver. Fetches all rows from a MySQLi query result.
+     *
+     * @param mysqli_result $result The result you wish to fetch all rows from.
+     * @param int $resultType The result type for each row. Should be either
+     *                        `MYSQLI_ASSOC`, `MYSQLI_NUM`, or `MYSQLI_BOTH`
+     * @return array An array of MySQLi result rows.
+     */
+    protected function fetchAll(mysqli_result $result, $resultType = MYSQLI_ASSOC)
+    {
+        if (function_exists('mysqli_fetch_all')) {
+            return $result->fetch_all($resultType);
+        }
+        $result = array();
+        while ($row = $result->fetch_array($resultType)) {
+            $result[] = $row;
+        }
+        return $result;
     }
 
     public function debug_mode()
@@ -234,7 +249,7 @@ class MySQL
     {
         $a = $a ? $a : $this->lastQuery;
         if ($a) {
-            return fetch_all($a, MYSQLI_ASSOC);
+            return $this->fetchAll($a, MYSQLI_ASSOC);
         }
 
         return false;
@@ -245,7 +260,7 @@ class MySQL
     {
         $a = $a ? $a : $this->lastQuery;
         if ($a) {
-            return fetch_all($a, MYSQLI_BOTH);
+            return $this->fetchAll($a, MYSQLI_BOTH);
             // Disturbingly, not MYSQLI_NUM.
         }
 
@@ -288,7 +303,7 @@ class MySQL
 
             return;
         }
-        fetch_all($result);
+        $this->fetchAll($result);
     }
 
     // Warning: nested arrays are *not* supported.
