@@ -216,14 +216,14 @@ EOT;
     }
 
     /**
-     * Parse a template file, replacing <% TAGS %> with the appropriate $data
+     * Parse a template file, replacing {{ key }} with the value of $data['key']
      *
-     * @param string $templtaeFile  The path to the template file. Paths
+     * @param string $templateFile  The path to the template file. Paths
      *                              that don't start with a '/' character
      *                              will start searching in the
      *                              JAXBOARDS_ROOT/acp/views/
      *                              directory.
-     * @param array  $data          A key => value array, where <% KEY %>
+     * @param array  $data          A key => value array, where {{ key }}
      *                              is replaced by value
      *
      * @return string Returns the template with the data replaced.
@@ -232,6 +232,12 @@ EOT;
     {
         if (mb_substr($templateFile, 0, 1) !== '/') {
             $templateFile = JAXBOARDS_ROOT . '/acp/views/' . $templateFile;
+        }
+        if (pathinfo($templateFile, PATHINFO_EXTENSION) !== 'html') {
+            if (mb_substr($templateFile, -1) !== '.') {
+                $templateFile .= '.';
+            }
+            $templateFile .= 'html';
         }
 
         $fileError = false;
@@ -260,6 +266,10 @@ EOT;
                 );
             }
         }
+
+        // Blank out other template variables.
+        $template = preg_replace('/{{\s+.+\s+}}/', '', $template);
+
         return $template;
     }
 }
