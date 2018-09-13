@@ -17,19 +17,19 @@ export function makeResizer(iw, nw, ih, nh, img) {
   link.nw = nw;
   link.nh = nh;
   link.onmousemove = event => {
-    const o = getCoordinates(this);
+    const o = getCoordinates(link);
     const e = Event(event);
-    this.scrollLeft = ((e.pageX - o.x) / o.w) * (this.nw - o.w);
-    this.scrollTop = ((e.pageY - o.y) / o.h) * (this.nh - o.h);
+    link.scrollLeft = ((e.pageX - o.x) / o.w) * (link.nw - o.w) || 0;
+    link.scrollTop = ((e.pageY - o.y) / o.h) * (link.nh - o.h) || 0;
   };
   link.onmouseover = () => {
-    img.style.width = `${this.nw}px`;
-    img.style.height = `${this.nh}px`;
+    img.style.width = `${link.nw}px`;
+    img.style.height = `${link.nh}px`;
   };
   link.onmouseout = () => {
-    if (this.scrollLeft) {
-      this.scrollLeft = 0;
-      this.scrollTop = 0;
+    if (link.scrollLeft) {
+      link.scrollLeft = 0;
+      link.scrollTop = 0;
     }
     img.style.width = `${iw}px`;
     img.style.height = `${ih}px`;
