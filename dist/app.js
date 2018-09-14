@@ -1226,7 +1226,7 @@
       });
 
       const toggle = () => {
-        button.style.backgroundPosition = element.checked ? 'bottom' : 'top';
+        button.style.backgroundPosition = element.checked ? 'top' : 'bottom';
       };
       toggle();
       button.addEventListener('click', () => {
