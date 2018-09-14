@@ -141,7 +141,7 @@ export default {
       }
     }
   },
-  im([fromId, fromName, message, fromMe, title]) {
+  im([fromId, fromName, message, fromMe, timestamp]) {
     let messagesContainer = document.querySelector(`#im_${fromId} .ims`);
     flashTitle(`New message from ${fromName}!`);
     const { webkitNotifications } = window;
@@ -203,7 +203,7 @@ export default {
         parseInt(fromId, 10)}' class='name'>${fromName}</a> ${
         !isAction ? ': ' : ''
       }${message}`;
-      d.title = title;
+      d.dataset.timestamp = timestamp;
       const test =
         messagesContainer.scrollTop >
         messagesContainer.scrollHeight - messagesContainer.clientHeight - 50;

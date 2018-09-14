@@ -78,7 +78,7 @@ class IM
             $ud['display_name'],
             $im,
             $USER['id'],
-            $JAX->smalldate(time(), 1),
+            time(),
         );
         $PAGE->JSRawArray($cmd);
         $cmd[1] = $ud['id'];
