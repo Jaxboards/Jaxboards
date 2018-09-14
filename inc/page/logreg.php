@@ -56,7 +56,6 @@ class LOGREG
         }
         $p = $PAGE->meta('register-form', $recaptcha);
         if (isset($JAX->p['register']) && $JAX->p['register']) {
-
             if (!$name || !$dispname) {
                 $e = 'Name and display name required.';
             } elseif ($pass1 != $pass2) {
@@ -79,27 +78,27 @@ class LOGREG
             } elseif ($JAX->ipbanned()) {
                 $e = 'You have been banned from registering on this board.';
             } elseif ($CFG['recaptcha']) {
-                // Validate reCAPTCHA
+                // Validate reCAPTCHA.
                 $url = 'https://www.google.com/recaptcha/api/siteverify';
-                $fields = Array(
+                $fields = array(
                     'secret' => $CFG['recaptcha']['private_key'],
                     'response' => $JAX->p['g-recaptcha-response']
                 );
 
-                $fields_string ='';
-                foreach($fields as $k => $v) {
+                $fields_string = '';
+                foreach ($fields as $k => $v) {
                     $fields_string .= $k . '=' . urlencode($v) . '&';
                 }
                 rtrim($fields_string, '&');
 
                 $curl_request = curl_init();
-                //set the url, number of POST vars, POST data
+                // Set the url, number of POST vars, POST data.
                 curl_setopt($curl_request, CURLOPT_URL, $url);
                 curl_setopt($curl_request, CURLOPT_POST, count($fields));
                 curl_setopt($curl_request, CURLOPT_POSTFIELDS, $fields_string);
                 curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, true);
 
-                //execute post
+                // Execute post.
                 $result = json_decode(curl_exec($curl_request), true);
 
                 if (!$result['success']) {
