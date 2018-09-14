@@ -12,6 +12,11 @@ class LOGREG
 
         switch (mb_substr($JAX->b['act'], 6)) {
             case 1:
+                // Registration flow is currently not ajax compatible
+                // due to recaptcha API. Just force a reload.
+                if ($PAGE->jsnewlocation) {
+                    $PAGE->JS('reload');
+                }
                 $this->register();
                 break;
             case 2:
@@ -33,12 +38,44 @@ class LOGREG
         }
     }
 
+    private function isHuman() {
+        if ($CFG['recaptcha']) {
+            // Validate reCAPTCHA
+            $url = 'https://www.google.com/recaptcha/api/siteverify';
+            $fields = Array(
+                'secret' => $CFG['recaptcha']['private_key'],
+                'response' => $JAX->p['g-recaptcha-response']
+            );
+
+            $fields_string ='';
+            foreach($fields as $k => $v) {
+                $fields_string .= $k . '=' . urlencode($v) . '&';
+            }
+            rtrim($fields_string, '&');
+
+            $curl_request = curl_init();
+            //set the url, number of POST vars, POST data
+            curl_setopt($curl_request, CURLOPT_URL, $url);
+            curl_setopt($curl_request, CURLOPT_POST, count($fields));
+            curl_setopt($curl_request, CURLOPT_POSTFIELDS, $fields_string);
+            curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, true);
+
+            //execute post
+            $result = json_decode(curl_exec($curl_request), true);
+
+            return $result['success'];
+
+            curl_close($curl_request);
+        }
+
+        // If recaptcha is not configured, we have to assume that they are in fact human
+        return true;
+    }
+
     public function register()
     {
         $this->registering = true;
         global $PAGE,$JAX,$DB,$CFG;
-
-        $e = '';
 
         if (isset($JAX->p['username']) && $JAX->p['username']) {
             $PAGE->location('?');
@@ -55,57 +92,37 @@ class LOGREG
             $recaptcha = $PAGE->meta('anti-spam', $CFG['recaptcha']['public_key']);
         }
         $p = $PAGE->meta('register-form', $recaptcha);
-        if (isset($JAX->p['register']) && $JAX->p['register']) {
+
+        // Show registration form
+        if (!isset($JAX->p['register'])) {
+            return $PAGE->append('PAGE', $p);
+        }
+
+        // Validate input and actually register the user
+        try {
             if (!$name || !$dispname) {
-                $e = 'Name and display name required.';
+                throw new Exception('Name and display name required.');
             } elseif ($pass1 != $pass2) {
-                $e = 'The passwords do not match.';
+                throw new Exception('The passwords do not match.');
             } elseif (mb_strlen($dispname) > 30
                 || mb_strlen($name) > 30
             ) {
-                $e = 'Display name and username must be under 30 characters.';
+                throw new Exception('Display name and username must be under 30 characters.');
             } elseif (($CFG['badnamechars']
                 && preg_match($CFG['badnamechars'], $name))
                 || $JAX->blockhtml($name) != $name
             ) {
-                $e = 'Invalid characters in username!';
+                throw new Exception('Invalid characters in username!');
             } elseif (($CFG['badnamechars']
                 && preg_match($CFG['badnamechars'], $dispname))
             ) {
-                $e = 'Invalid characters in display name!';
+                throw new Exception('Invalid characters in display name!');
             } elseif (!$JAX->isemail($email)) {
-                $e = "That isn't a valid email!";
+                throw new Exception("That isn't a valid email!");
             } elseif ($JAX->ipbanned()) {
-                $e = 'You have been banned from registering on this board.';
-            } elseif ($CFG['recaptcha']) {
-                // Validate reCAPTCHA.
-                $url = 'https://www.google.com/recaptcha/api/siteverify';
-                $fields = array(
-                    'secret' => $CFG['recaptcha']['private_key'],
-                    'response' => $JAX->p['g-recaptcha-response']
-                );
-
-                $fields_string = '';
-                foreach ($fields as $k => $v) {
-                    $fields_string .= $k . '=' . urlencode($v) . '&';
-                }
-                rtrim($fields_string, '&');
-
-                $curl_request = curl_init();
-                // Set the url, number of POST vars, POST data.
-                curl_setopt($curl_request, CURLOPT_URL, $url);
-                curl_setopt($curl_request, CURLOPT_POST, count($fields));
-                curl_setopt($curl_request, CURLOPT_POSTFIELDS, $fields_string);
-                curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, true);
-
-                // Execute post.
-                $result = json_decode(curl_exec($curl_request), true);
-
-                if (!$result['success']) {
-                    $e = 'reCAPTCHA failed. Are you a bot?';
-                }
-
-                curl_close($curl_request);
+                throw new Exception('You have been banned from registering on this board.');
+            } elseif (!$this->isHuman()) {
+                throw new Exception('reCAPTCHA failed. Are you a bot?');
             } else {
                 $dispname = $JAX->blockhtml($dispname);
                 $name = $JAX->blockhtml($name);
@@ -118,54 +135,48 @@ class LOGREG
                 );
                 $f = $DB->arow($result);
                 $DB->disposeresult($result);
-
                 if (false != $f) {
                     if ($f['name'] == $name) {
-                        $e = 'That username is taken!';
+                        throw new Exception('That username is taken!');
                     } elseif ($f['display_name'] == $dispname) {
-                        $e = 'That display name is already used by another member.';
+                        throw new Exception('That display name is already used by another member.');
                     }
                 }
             }
-            if ($e) {
-                $PAGE->JS('alert', $e);
-                $PAGE->append('page', $PAGE->meta('error', $e));
-            } else {
-                // All clear!
-                $DB->safeinsert(
-                    'members',
-                    array(
-                        'name' => $name,
-                        'display_name' => $dispname,
-                        'pass' => password_hash(
-                            $pass1,
-                            PASSWORD_DEFAULT
-                        ),
-                        'posts' => 0,
-                        'email' => $email,
-                        'join_date' => date('Y-m-d H:i:s', time()),
-                        'last_visit' => date('Y-m-d H:i:s', time()),
-                        'group_id' => $CFG['membervalidation'] ? 5 : 1,
-                        'ip' => $JAX->ip2bin(),
-                        'wysiwyg' => 1,
-                    )
-                );
-                $DB->safespecial(
-                    <<<'EOT'
+
+            // All clear!
+            $DB->safeinsert(
+                'members',
+                array(
+                    'name' => $name,
+                    'display_name' => $dispname,
+                    'pass' => password_hash(
+                        $pass1,
+                        PASSWORD_DEFAULT
+                    ),
+                    'posts' => 0,
+                    'email' => $email,
+                    'join_date' => date('Y-m-d H:i:s', time()),
+                    'last_visit' => date('Y-m-d H:i:s', time()),
+                    'group_id' => $CFG['membervalidation'] ? 5 : 1,
+                    'ip' => $JAX->ip2bin(),
+                    'wysiwyg' => 1,
+                )
+            );
+            $DB->safespecial(
+                <<<'EOT'
 UPDATE %t
 SET `members` = `members` + 1, `last_register` = ?
 EOT
-                    ,
-                    array('stats'),
-                    $DB->insert_id(1)
-                );
-                $this->login($name, $pass1);
-            }
-        } else {
-            if ($PAGE->jsnewlocation) {
-                $PAGE->JS('update', 'page', $p);
-            }
-            $PAGE->append('PAGE', $p);
+                ,
+                array('stats'),
+                $DB->insert_id(1)
+            );
+            $this->login($name, $pass1);
+        } catch (Exception $e) {
+            $e = $e->getMessage();
+            $PAGE->JS('alert', $e);
+            $PAGE->append('page', $PAGE->meta('error', $e));
         }
     }
 
@@ -214,6 +225,7 @@ EOT
                 $perms = $JAX->getPerms($f['group_id']);
                 if ($this->registering) {
                     $PAGE->JS('location', '?');
+                    $PAGE->JS('reload');
                 } elseif ($PAGE->jsaccess) {
                     $PAGE->JS('reload');
                 } else {
