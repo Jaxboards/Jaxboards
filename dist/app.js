@@ -2812,8 +2812,9 @@
         const queryParams = xmlobj.url.substring(1);
         if (!softurl) {
           window.history.pushState({ queryParams }, '', `?${queryParams}`);
+          // pushstate is not a real browser event unfortunately, so I have to trigger it myself
+          window.dispatchEvent(new Event('pushstate'));
           this.lastURL = queryParams;
-          if (Event.onPageChange) Event.onPageChange();
         }
       }
       this.pollData();
@@ -2867,7 +2868,7 @@
       setInterval(updateDates, 1000 * 30);
 
       this.stream.pollData();
-      window.onpopstate = ({ state }) => {
+      window.addEventListener('popstate', ({ state }) => {
         if (state) {
           const { queryParams } = state;
           this.stream.updatePage(queryParams);
@@ -2875,7 +2876,7 @@
           const queryParams = document.location.search.replace(/^\?/, '');
           this.stream.updatePage(queryParams);
         }
-      };
+      });
 
       // Load sounds
       Sound$1.load('sbblip', './Sounds/blip.mp3', false);

@@ -18,7 +18,7 @@ class AppState {
     setInterval(updateDates, 1000 * 30);
 
     this.stream.pollData();
-    window.onpopstate = ({ state }) => {
+    window.addEventListener('popstate', ({ state }) => {
       if (state) {
         const { queryParams } = state;
         this.stream.updatePage(queryParams);
@@ -26,7 +26,7 @@ class AppState {
         const queryParams = document.location.search.replace(/^\?/, '');
         this.stream.updatePage(queryParams);
       }
-    };
+    });
 
     // Load sounds
     Sound.load('sbblip', './Sounds/blip.mp3', false);
