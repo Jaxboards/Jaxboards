@@ -2945,7 +2945,7 @@
   onDOMReady(() => {
     window.name = Math.random();
     RUN$1.setWindowActive();
-    window.addEventListener('onfocus', () => {
+    window.addEventListener('focus', () => {
       RUN$1.setWindowActive();
     });
   });
