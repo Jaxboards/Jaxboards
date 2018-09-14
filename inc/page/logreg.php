@@ -38,29 +38,30 @@ class LOGREG
         }
     }
 
-    private function isHuman() {
+    private function isHuman()
+    {
         if ($CFG['recaptcha']) {
             // Validate reCAPTCHA
             $url = 'https://www.google.com/recaptcha/api/siteverify';
-            $fields = Array(
+            $fields = array(
                 'secret' => $CFG['recaptcha']['private_key'],
                 'response' => $JAX->p['g-recaptcha-response']
             );
 
-            $fields_string ='';
-            foreach($fields as $k => $v) {
+            $fields_string = '';
+            foreach ($fields as $k => $v) {
                 $fields_string .= $k . '=' . urlencode($v) . '&';
             }
             rtrim($fields_string, '&');
 
             $curl_request = curl_init();
-            //set the url, number of POST vars, POST data
+            // set the url, number of POST vars, POST data
             curl_setopt($curl_request, CURLOPT_URL, $url);
             curl_setopt($curl_request, CURLOPT_POST, count($fields));
             curl_setopt($curl_request, CURLOPT_POSTFIELDS, $fields_string);
             curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, true);
 
-            //execute post
+            // execute post
             $result = json_decode(curl_exec($curl_request), true);
 
             return $result['success'];
@@ -224,8 +225,7 @@ EOT
                 $SESS->act();
                 $perms = $JAX->getPerms($f['group_id']);
                 if ($this->registering) {
-                    $PAGE->JS('location', '?');
-                    $PAGE->JS('reload');
+                    $PAGE->JS('location', '/');
                 } elseif ($PAGE->jsaccess) {
                     $PAGE->JS('reload');
                 } else {
