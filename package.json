@@ -1,15 +1,18 @@
 {
   "scripts": {
+    "postinstall": "composer-runner -- install",
     "eslint": "eslint 'Script/**/*.js'",
     "eslint-fix": "eslint 'Script/**/*.js' --fix",
     "prettier": "prettier --write --single-quote '**/*.{js,json,md}'",
     "stylelint": "stylelint \"./**/*.{c,sa,sc,le}ss\"",
     "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\"",
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "php-cleanup": "composer-runner -- run-script phpcbf && composer-runner -- run-script phpcs"
   },
   "pre-commit": [
     "prettier",
-    "eslint"
+    "eslint",
+    "php-cleanup"
   ],
   "devDependencies": {
     "eslint": "^5.5.0",
@@ -18,6 +21,7 @@
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-prettier": "^2.6.2",
     "js-beautify": "^1.8.4",
+    "node-composer-runner": "^0.3.0",
     "pre-commit": "^1.2.2",
     "prettier": "^1.14.2",
     "rollup": "^0.65.0",
