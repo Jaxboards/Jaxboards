@@ -103,7 +103,6 @@ class LOGREG
                 $result = json_decode(curl_exec($curl_request), true);
 
                 if (!$result['success']) {
-                    var_dump($result);
                     $e = 'reCAPTCHA failed. Are you a bot?';
                 }
 
