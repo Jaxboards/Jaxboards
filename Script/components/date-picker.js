@@ -29,6 +29,7 @@ export default class DatePicker extends Component {
         id: 'datepicker'
       });
       document.body.appendChild(picker);
+      picker.style.display = 'none';
     }
 
     return picker;
