@@ -150,17 +150,17 @@
   )}, ${serverAsLocalDate.getFullYear()} @ ${timeAsAMPM(serverAsLocalDate)}`;
   }
 
-  function smalldate(a) {
-    const d = new Date();
-    d.setTime(a * 1000);
-    let hours = d.getHours();
+  function smalldate(serverDate) {
+    const serverAsLocalDate = new Date(0);
+    serverAsLocalDate.setUTCSeconds(serverDate);
+    let hours = serverAsLocalDate.getHours();
     const ampm = hours >= 12 ? 'pm' : 'am';
     hours %= 12;
     hours = hours || 12;
-    const minutes = `${d.getMinutes()}`.padStart(2, '0');
-    const month = d.getMonth() + 1;
-    const day = `${d.getDate()}`.padStart(2, '0');
-    const year = d.getFullYear();
+    const minutes = `${serverAsLocalDate.getMinutes()}`.padStart(2, '0');
+    const month = serverAsLocalDate.getMonth() + 1;
+    const day = `${serverAsLocalDate.getDate()}`.padStart(2, '0');
+    const year = serverAsLocalDate.getFullYear();
     return `${hours}:${minutes}${ampm}, ${month}/${day}/${year}`;
   }
 
@@ -220,7 +220,8 @@
   }
 
   function updateDates() {
-    const dates = Array.from(document.querySelectorAll('.autodate'));
+    const dates = document.querySelectorAll('.autodate');
+    const dateTitles = Array.from(document.querySelectorAll('[data-timestamp]'));
     if (!dates) {
       return;
     }
@@ -231,6 +232,11 @@
         : date(timestamp);
       if (parsed !== el$$1.innerHTML) {
         el$$1.innerHTML = parsed;
+      }
+    });
+    dateTitles.forEach(el$$1 => {
+      if (!el$$1.title) {
+        el$$1.title = smalldate(el$$1.dataset.timestamp);
       }
     });
   }
@@ -2557,7 +2563,7 @@
       if (!messagesContainer) {
         const imWindow = new Window();
         imWindow.title = `${fromName} <a href="#" onclick="IMWindow.menu(event,${fromId});return false;">&rsaquo;</a>`;
-        imWindow.content = "<div class='ims'></div><div class='offline'>This user may be offline</div><div><form data-ajax-form='resetOnSubmit' method='post'><input type='hidden' name='im_uid' value='%s' /><input type='text' name='im_im' /><input type='hidden' name='act' value='blank' /></form></div>".replace(
+        imWindow.content = "<div class='ims'></div><div class='offline'>This user may be offline</div><div><form data-ajax-form='resetOnSubmit' method='post'><input type='hidden' name='im_uid' value='%s' /><input type='text' name='im_im' autocomplete='off' /><input type='hidden' name='act' value='blank' /></form></div>".replace(
           /%s/g,
           fromId
         );
