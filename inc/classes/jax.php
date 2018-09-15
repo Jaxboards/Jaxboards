@@ -120,6 +120,8 @@ class JAX
 
     public function linkify_callback($match)
     {
+        global $_SERVER;
+
         $url = parse_url($match[2]);
         if (!$url['fragment'] && $url['query']) {
             $url['fragment'] = $url['query'];
@@ -866,10 +868,11 @@ EOT
 
     public function ipbanned($ip = false)
     {
+        global $PAGE;
+
         if (!$ip) {
             $ip = $this->getIp();
         }
-        global $PAGE;
         if (!isset($this->ipbancache)) {
             if ($PAGE) {
                 $PAGE->debug('loaded ip ban list');
@@ -898,8 +901,47 @@ EOT
         return false;
     }
 
+    /**
+     * Check if an IP is banned from the service.
+     * Will use the $this->getIp() ipAddress field is left empty.
+     *
+     * @param string $ipAddress The IP Address to check.
+     *
+     * @return boolean If the IP is banned form the service or not.
+     */
+    public function ipServiceBanned($ipAddress = false)
+    {
+        global $DB,$CFG;
+
+        if (!$CFG['service']) {
+            // Can't be service banned if there's no service.
+            return false;
+        }
+
+        if (!$ipAddress) {
+            $ipAddress = $this->getIp();
+        }
+
+        $result = $DB->safespecial(
+            <<<'EOT'
+SELECT COUNT(`ip`) as `banned`
+    FROM `banlist`
+    WHERE ip = INET6_ATON(?)
+EOT
+            ,
+            array(),
+            $DB->basicvalue($ipAddress)
+        );
+        $row = $DB->arow($result);
+        $DB->disposeresult($result);
+
+        return !isset($row['banned']) || 0 < $row['banned'];
+    }
+
     public function getIp()
     {
+        global $_SERVER;
+
         return $_SERVER['REMOTE_ADDR'];
     }
 
@@ -1108,7 +1150,8 @@ EOT
 
     public function mail($email, $topic, $message)
     {
-        global $CFG;
+        global $CFG, $_SERVER;
+
         $boardname = $CFG['boardname'] ? $CFG['boardname'] : 'JaxBoards';
         $boardurl = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'];
         $boardlink = "<a href='https://" . $boardurl . "'>" . $boardname . '</a>';

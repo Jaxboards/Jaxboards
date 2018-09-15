@@ -40,8 +40,10 @@ class LOGREG
 
     private function isHuman()
     {
-        if ($CFG['recaptcha']) {
-            // Validate reCAPTCHA
+        global $CFG,$JAX;
+
+        if (isset($CFG['recaptcha']) && $CFG['recaptcha']) {
+            // Validate reCAPTCHA.
             $url = 'https://www.google.com/recaptcha/api/siteverify';
             $fields = array(
                 'secret' => $CFG['recaptcha']['private_key'],
@@ -55,13 +57,13 @@ class LOGREG
             rtrim($fields_string, '&');
 
             $curl_request = curl_init();
-            // set the url, number of POST vars, POST data
+            // Set the url, number of POST vars, POST data.
             curl_setopt($curl_request, CURLOPT_URL, $url);
             curl_setopt($curl_request, CURLOPT_POST, count($fields));
             curl_setopt($curl_request, CURLOPT_POSTFIELDS, $fields_string);
             curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, true);
 
-            // execute post
+            // Execute post.
             $result = json_decode(curl_exec($curl_request), true);
 
             return $result['success'];
@@ -69,14 +71,14 @@ class LOGREG
             curl_close($curl_request);
         }
 
-        // If recaptcha is not configured, we have to assume that they are in fact human
+        // If recaptcha is not configured, we have to assume that they are in fact human.
         return true;
     }
 
     public function register()
     {
-        $this->registering = true;
         global $PAGE,$JAX,$DB,$CFG;
+        $this->registering = true;
 
         if (isset($JAX->p['username']) && $JAX->p['username']) {
             $PAGE->location('?');
@@ -89,19 +91,25 @@ class LOGREG
         $email = isset($JAX->p['email']) ? $JAX->p['email'] : '';
 
         $recaptcha = '';
-        if ($CFG['recaptcha']) {
+        if (isset($CFG['recaptcha']) && $CFG['recaptcha']) {
             $recaptcha = $PAGE->meta('anti-spam', $CFG['recaptcha']['public_key']);
         }
         $p = $PAGE->meta('register-form', $recaptcha);
 
-        // Show registration form
+        // Show registration form.
         if (!isset($JAX->p['register'])) {
             return $PAGE->append('PAGE', $p);
         }
 
-        // Validate input and actually register the user
+        // Validate input and actually register the user.
         try {
-            if (!$name || !$dispname) {
+            if ($JAX->ipServiceBanned()) {
+                throw new Exception(<<<'EOT'
+You have been banned from registration on all boards. If you feel that this is
+in error, please contact the administrator.
+EOT
+                );
+            } elseif (!$name || !$dispname) {
                 throw new Exception('Name and display name required.');
             } elseif ($pass1 != $pass2) {
                 throw new Exception('The passwords do not match.');
@@ -125,22 +133,7 @@ class LOGREG
             } elseif (!$this->isHuman()) {
                 throw new Exception('reCAPTCHA failed. Are you a bot?');
             } else {
-                // At this point all input has been validated
-                // so we can start checking against the database
-                // are they banned from the service?
-                $result = $DB->safespecial(
-                    'SELECT * FROM banlist WHERE ip = ?',
-                    [],
-                    $DB->basicvalue($_SERVER['REMOTE_ADDR'])
-                );
-                $isBanned = $DB->arow($result);
-                $DB->disposeresult($result);
-
-                if (false != $isBanned) {
-                    throw new Exception('You have been banned from registration. If you feel that this is in error, please contact the administrator.');
-                }
-
-                // are they attempting to use an existing username/display name?
+                // Are they attempting to use an existing username/display name?
                 $dispname = $JAX->blockhtml($dispname);
                 $name = $JAX->blockhtml($name);
                 $result = $DB->safeselect(
