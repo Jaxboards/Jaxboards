@@ -3,27 +3,27 @@
 
   <head>
     <meta charset="utf-8" />
-    <!--CSS-->
+    {{ css }}
     <title>
-      <!--TITLE-->
+      {{ title }}
     </title>
-    <!--SCRIPT-->
+    {{ script }}
   </head>
 
   <body>
     <div id="container">
       <div class="head">
-        <!--NAVIGATION-->
-        <!--LOGO-->
-        <!--USERBOX-->
+        {{ navigation }}
+        {{ logo }}
+        {{ userbox }}
       </div>
       <div class="bodyshad">
         <div id="body">
-          <!--PATH-->
-          <!--SHOUTBOX-->
-          <!--PAGE-->
-          <!--DEBUG-->
-          <!--FOOTER-->
+          {{ path }}
+          {{ shoutbox }}
+          {{ page }}
+          {{ debug }}
+          {{ footer }}
         </div>
       </div>
       <div class="c_bottom"></div>

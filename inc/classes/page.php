@@ -2,34 +2,28 @@
 
 class PAGE
 {
-    public $metadefs = array();
-    public $debuginfo = '';
     public $JSOutput = array();
-    public $jsaccess = '';
-    public $jsupdate = false;
-    public $jsnewlocation = false;
-    public $jsnewloc = false;
+    public $debuginfo = '';
+    public $jsaccess = false;
     public $jsdirectlink = false;
+    public $jsnewloc = false;
+    public $jsnewlocation = false;
+    public $jsupdate = false;
+    public $metadefs = array();
     public $mobile = false;
-    public $parts = array();
-    public $vars = array();
-    public $userMetaDefs = array();
     public $moreFormatting = array();
+    public $parts = array();
+    public $userMetaDefs = array();
+    public $vars = array();
 
     public function __construct()
     {
-        $this->JSOutput = array();
         $this->jsaccess = isset($_SERVER['HTTP_X_JSACCESS']) ?
             $_SERVER['HTTP_X_JSACCESS'] : false;
         $this->jsupdate = (1 == $this->jsaccess);
         $this->jsnewlocation = $this->jsnewloc = ($this->jsaccess >= 2);
         $this->jsdirectlink = (3 == $this->jsaccess);
         $this->mobile = false !== mb_stripos($_SERVER['HTTP_USER_AGENT'], 'mobile');
-        $this->parts = array();
-        $this->vars = array();
-        $this->metadefs = array();
-        $this->userMetaDefs = array();
-        $this->moreFormatting = array();
     }
 
     public function get($a)
@@ -39,11 +33,11 @@ class PAGE
 
     public function append($a, $b)
     {
-        if ('SCRIPT' == $a && $this->mobile) {
+        if ('SCRIPT' === mb_strtoupper($a) && $this->mobile) {
             return;
         }
         $a = mb_strtoupper($a);
-        if (!$this->jsaccess || 'TITLE' == $a) {
+        if (!$this->jsaccess || 'TITLE' === $a) {
             if (!isset($this->parts[$a])) {
                 return $this->reset($a, $b);
             }
@@ -54,12 +48,16 @@ class PAGE
 
     public function addvar($a, $b)
     {
-        $this->vars['<%' . $a . '%>'] = $b;
+        $this->vars['{{ ' . $a . ' }}'] = $b;
     }
 
-    public function filtervars($a)
+    public function filtervars($matches)
     {
-        return str_replace(array_keys($this->vars), array_values($this->vars), $a);
+        return str_replace(
+            array_keys($this->vars),
+            array_values($this->vars),
+            $matches
+        );
     }
 
     public function prepend($a, $b)
@@ -77,8 +75,13 @@ class PAGE
     public function location($a)
     {
         global $PAGE,$SESS,$JAX;
-        if (empty($JAX->c) && '?' == $a[0]) {
-            $a = '?sessid=' . $SESS->data['id'] . '&' . mb_substr($a, 1);
+        if (empty($JAX->c) && '?' === mb_substr($a, 0, 1)) {
+            $query = array();
+            parse_str(mb_substr($a, 1), $query);
+            if (isset($SESS->data['id'])) {
+                $query['sessid'] = $SESS->data['id'];
+            }
+            $a .= '?' . http_build_query($query);
         }
         if ($PAGE->jsaccess) {
             $PAGE->JS('location', $a);
@@ -143,17 +146,17 @@ class PAGE
             }
             echo !empty($this->JSOutput) ? $JAX::json_encode($this->JSOutput) : '';
         } else {
-            $autobox = array('PAGE', 'COPYRIGHT', 'USERBOX');
-            foreach ($this->parts as $k => $v) {
-                $k = mb_strtoupper($k);
-                if (in_array($k, $autobox)) {
-                    $v = '<div id="' . mb_strtolower($k) . '">' . $v . '</div>';
+            $autobox = array('page', 'copyright', 'userbox');
+            foreach ($this->parts as $name => $value) {
+                $name = mb_strtolower($name);
+                if (in_array($name, $autobox)) {
+                    $v = '<div id="' . $name . '">' . $value . '</div>';
                 }
-                if ('PATH' == $k) {
+                if ('path' === $name) {
                     $this->template
-                        = preg_replace('@<!--PATH-->@', $v, $this->template, 1);
+                        = preg_replace('@{{ path }}@', $value, $this->template, 1);
                 }
-                $this->template = str_replace('<!--' . $k . '-->', $v, $this->template);
+                $this->template = str_replace('{{ ' . $name . ' }}', $value, $this->template);
             }
             $this->template = $this->filtervars($this->template);
             $this->template = $SESS->addSessId($this->template);
@@ -176,14 +179,14 @@ class PAGE
 
     public function templatehas($a)
     {
-        return preg_match("/<!--${a}-->/i", $this->template);
+        return preg_match("/{{ ${a} }}/i", $this->template);
     }
 
     public function loadtemplate($a)
     {
         $this->template = file_get_contents($a);
         $this->template = preg_replace_callback(
-            '@<!--INCLUDE:(\\w+)-->@',
+            '/\{\{ [\'"](\w+)[\'"]\|jax_include \}\}/',
             array(
                 $this,
                 'includer',
@@ -191,9 +194,9 @@ class PAGE
             $this->template
         );
         $this->template = preg_replace_callback(
-            '@<M name=([\'"])([^\'"]+)\\1>(.*?)</M>@s',
+            '@{% block [\'"]([\w_]+)[\'"] %}(.*?){% endblock %}@s',
             array(
-                &$this,
+                $this,
                 'userMetaParse',
             ),
             $this->template
@@ -247,27 +250,34 @@ class PAGE
         );
     }
 
-    public function userMetaParse($m)
+    public function userMetaParse($matches)
     {
-        $this->checkextended($m[3], $m[2]);
-        $this->userMetaDefs[$m[2]] = $m[3];
-
-        return '';
+        $this->checkextended($matches[2], $matches[1]);
+        $this->userMetaDefs[$matches[1]] = $matches[2];
     }
 
-    public function includer($m)
+    public function includer($matches)
     {
         global $DB;
-        $result = $DB->safeselect(
-            'page',
-            'pages',
-            'WHERE `act`=?',
-            $DB->basicvalue($m[1])
-        );
-        $page = array_shift($DB->arow($result));
-        $DB->disposeresult($result);
 
-        return $page ? $page : '';
+        if (isset($matches[1])) {
+            $match = $matches[1];
+            $result = $DB->safeselect(
+                'page',
+                'pages',
+                'WHERE `act`=?',
+                $DB->basicvalue($match)
+            );
+            $page = $DB->arow($result);
+            if ($page) {
+                $page = array_shift($page);
+            }
+            $DB->disposeresult($result);
+
+            return $page ? $page : '';
+        }
+
+        return '';
     }
 
     public function loadmeta($component)
@@ -324,77 +334,96 @@ class PAGE
     {
         $args = func_get_args();
         $meta = array_shift($args);
+        $args = isset($args[0]) && is_array($args[0]) ? $args[0] : $args;
+        if (!is_array($args)) {
+            $args = array();
+        }
         $this->processqueue($meta);
-        $r = @vsprintf(
-            str_replace(
-                array('<%', '%>'),
-                array('<%%', '%%>'),
-                $this->userMetaDefs[$meta] ?: $this->metadefs[$meta]
-            ),
-            is_array($args[0]) ? $args[0] : $args
+        $content = '';
+        if (isset($this->userMetaDefs[$meta])) {
+            $content .= $this->userMetaDefs[$meta];
+        } elseif (isset($this->metadefs[$meta])) {
+            $content .= $this->metadefs[$meta];
+        }
+        $content = str_replace(
+            array('{%%', '%%}'),
+            array('{%', '%}'),
+            vsprintf(
+                str_replace(
+                    array('{%', '%}'),
+                    array('{%%', '%%}'),
+                    $content
+                ),
+                $args
+            )
         );
-        if (false === $r) {
+        if (false === $content) {
             die($meta . ' has too many arguments');
         }
         if (isset($this->moreFormatting[$meta])
             && $this->moreFormatting[$meta]
         ) {
-            return $this->metaextended($r);
+            return $this->metaextended($content);
         }
 
-        return $r;
+        return $content;
     }
 
-    public function metaextended($m)
+    public function metaextended($meta)
     {
         return preg_replace_callback(
-            '@{if ([^}]+)}(.*){/if}@Us',
+            '@\{% if (.+) %\}(.*)\{% endif %\}@Us',
             array(
                 $this,
                 'metaextendedifcb',
             ),
-            $this->filtervars($m)
+            $this->filtervars($meta)
         );
     }
 
-    public function metaextendedifcb($m)
+    public function metaextendedifcb($matches)
     {
-        if (false !== mb_strpos($m[1], '||')) {
-            $s = '||';
+        if (false !== mb_strpos($matches[1], '||')) {
+            $separator = '||';
         } else {
-            $s = '&&';
+            $separator = '&&';
         }
-        foreach (explode($s, $m[1]) as $piece) {
-            preg_match('@(\\S+?)\\s*([!><]?=|[><])\\s*(\\S*)@', $piece, $pp);
-            switch ($pp[2]) {
+        $condition = false;
+        foreach (explode($separator, $matches[1]) as $piece) {
+            $pieces = array();
+            preg_match('@(\\S+?)\\s*([!><]?=|[><])\\s*(\\S*)@', $piece, $pieces);
+            if (!isset($pieces[2])) {
+                continue;
+            }
+            switch ($pieces[2]) {
                 case '=':
-                    $c = $pp[1] == $pp[3];
+                    $condition = $pieces[1] == $pieces[3];
                     break;
                 case '!=':
-                    $c = $pp[1] != $pp[3];
+                    $condition = $pieces[1] != $pieces[3];
                     break;
                 case '>=':
-                    $c = $pp[1] >= $pp[3];
+                    $condition = $pieces[1] >= $pieces[3];
                     break;
                 case '>':
-                    $c = $pp[1] > $pp[3];
+                    $condition = $pieces[1] > $pieces[3];
                     break;
                 case '<=':
-                    $c = $pp[1] <= $pp[3];
+                    $condition = $pieces[1] <= $pieces[3];
                     break;
                 case '<':
-                    $c = $pp[1] < $pp[3];
+                    $condition = $pieces[1] < $pieces[3];
                     break;
             }
-            if ('&&' == $s && !$c) {
+            if ('&&' == $separator && !$condition) {
                 break;
             }
-            if ('||' == $s && $c) {
+            if ('||' == $separator && $condition) {
                 break;
             }
         }
-        if ($c) {
-            return $m[2];
+        if ($condition) {
+            return $matches[2];
         }
 
         return '';
@@ -402,7 +431,7 @@ class PAGE
 
     public function checkextended($data, $meta = null)
     {
-        if (false !== mb_strpos($data, '{if ')) {
+        if (false !== mb_strpos($data, '{% if ')) {
             if ($meta) {
                 $this->moreFormatting[$meta] = true;
             } else {
