@@ -28,7 +28,7 @@ require_once JAXBOARDS_ROOT . '/inc/classes/mysql.php';
 $DB = new MySQL();
 
 // Get CFG variable.
-require_once JAXBOARDS_ROOT . '/config.php';
+require_once JAXBOARDS_ROOT . '/private/config.php';
 
 $connected = $DB->connect(
     $CFG['sql_host'],

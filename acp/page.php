@@ -196,19 +196,19 @@ EOT;
 
     public function writeCFG($data)
     {
-        include BOARDPATH . 'config.php';
+        include BOARDCONFIG;
         foreach ($data as $k => $v) {
             $CFG[$k] = $v;
         }
         $this->CFG = $CFG;
 
-        return $this->writeData(BOARDPATH . 'config.php', 'CFG', $this->CFG);
+        return $this->writeData(BOARDCONFIG, 'CFG', $this->CFG);
     }
 
     public function getCFGSetting($setting)
     {
         if (!$this->CFG) {
-            include BOARDPATH . 'config.php';
+            include BOARDCONFIG;
             $this->CFG = $CFG;
         }
 

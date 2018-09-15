@@ -31,7 +31,7 @@ if (!function_exists('password_hash')) {
 
 define('INACP', 'true');
 
-require JAXBOARDS_ROOT . '/config.php';
+require JAXBOARDS_ROOT . '/private/config.php';
 require JAXBOARDS_ROOT . '/inc/classes/jax.php';
 require JAXBOARDS_ROOT . '/inc/classes/mysql.php';
 require JAXBOARDS_ROOT . '/acp/page.php';

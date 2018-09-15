@@ -30,7 +30,7 @@ if (!function_exists('password_hash')) {
 }
 
 // Get the config.
-require 'config.php';
+require JAXBOARDS_ROOT . '/private/config.php';
 
 // DB connect!
 require_once 'inc/classes/mysql.php';

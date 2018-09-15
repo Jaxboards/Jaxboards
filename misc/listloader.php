@@ -1,6 +1,6 @@
 <?php
 
-require '../config.php';
+require '../private/config.php';
 require '../inc/classes/mysql.php';
 $DB = new MySQL();
 $DB->connect(
