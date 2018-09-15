@@ -194,7 +194,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $CFG['sql_prefix'] = $CFG['prefix'] ? $CFG['prefix'] . '_' : '';
 
         $PAGE->writeData(
-            JAXBOARDS_ROOT . '/config.php',
+            JAXBOARDS_ROOT . '/private/config.php',
             'CFG',
             $CFG
         );

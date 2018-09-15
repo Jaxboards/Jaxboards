@@ -26,10 +26,10 @@ require_once JAXBOARDS_ROOT . '/inc/classes/jax.php';
 $JAX = new JAX();
 $DB = new MySQL();
 
-if (!file_exists(JAXBOARDS_ROOT . '/config.php')) {
+if (!file_exists(JAXBOARDS_ROOT . '/private/config.php')) {
     die('Jaxboards not installed!');
 }
-require_once JAXBOARDS_ROOT . '/config.php';
+require_once JAXBOARDS_ROOT . '/private/config.php';
 
 if (!$CFG['service']) {
     die('Service mode not enabled');

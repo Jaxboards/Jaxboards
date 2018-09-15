@@ -6,8 +6,9 @@ Thumbs.db
 Desktop.ini
 config.php
 crossdomain.xml
-# Boards data
-boards
+
+# Private data
+private
 
 # Log files
 *.log
