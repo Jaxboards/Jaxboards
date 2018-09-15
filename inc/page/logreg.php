@@ -125,6 +125,22 @@ class LOGREG
             } elseif (!$this->isHuman()) {
                 throw new Exception('reCAPTCHA failed. Are you a bot?');
             } else {
+                // At this point all input has been validated
+                // so we can start checking against the database
+                // are they banned from the service?
+                $result = $DB->safespecial(
+                    'SELECT * FROM banlist WHERE ip = ?',
+                    [],
+                    $DB->basicvalue($_SERVER['REMOTE_ADDR'])
+                );
+                $isBanned = $DB->arow($result);
+                $DB->disposeresult($result);
+
+                if (false != $isBanned) {
+                    throw new Exception('You have been banned from registration. If you feel that this is in error, please contact the administrator.');
+                }
+
+                // are they attempting to use an existing username/display name?
                 $dispname = $JAX->blockhtml($dispname);
                 $name = $JAX->blockhtml($name);
                 $result = $DB->safeselect(
