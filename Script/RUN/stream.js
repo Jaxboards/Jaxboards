@@ -41,8 +41,9 @@ class Stream {
       const queryParams = xmlobj.url.substring(1);
       if (!softurl) {
         window.history.pushState({ queryParams }, '', `?${queryParams}`);
+        // pushstate is not a real browser event unfortunately, so I have to trigger it myself
+        window.dispatchEvent(new Event('pushstate'));
         this.lastURL = queryParams;
-        if (Event.onPageChange) Event.onPageChange();
       }
     }
     this.pollData();

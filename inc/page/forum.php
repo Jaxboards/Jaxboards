@@ -245,8 +245,7 @@ SELECT t.`id` AS `id`,t.`title` AS `title`,t.`subtitle` AS `subtitle`,
     m.`display_name` AS `lp_name`,m.`group_id` AS `lp_gid`,
     m2.`group_id` AS `auth_gid`,m2.`display_name` AS `auth_name`
 FROM (
-    SELECT `id`,`title`,`subtitle`,`lp_uid`,
-    UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`fid`,`auth_id`,`replies`,`views`,
+    SELECT `id`,`title`,`subtitle`,`lp_uid`,`lp_date`,`fid`,`auth_id`,`replies`,`views`,
     `pinned`,`poll_choices`,`poll_results`,`poll_q`,`poll_type`,`summary`,
     `locked`,UNIX_TIMESTAMP(`date`) AS `date`,`op`,`cal_event`
     FROM %t

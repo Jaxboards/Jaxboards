@@ -141,7 +141,7 @@ export default {
       }
     }
   },
-  im([fromId, fromName, message, fromMe, title]) {
+  im([fromId, fromName, message, fromMe, timestamp]) {
     let messagesContainer = document.querySelector(`#im_${fromId} .ims`);
     flashTitle(`New message from ${fromName}!`);
     const { webkitNotifications } = window;
@@ -164,7 +164,7 @@ export default {
     if (!messagesContainer) {
       const imWindow = new Window();
       imWindow.title = `${fromName} <a href="#" onclick="IMWindow.menu(event,${fromId});return false;">&rsaquo;</a>`;
-      imWindow.content = "<div class='ims'></div><div class='offline'>This user may be offline</div><div><form data-ajax-form='resetOnSubmit' method='post'><input type='hidden' name='im_uid' value='%s' /><input type='text' name='im_im' /><input type='hidden' name='act' value='blank' /></form></div>".replace(
+      imWindow.content = "<div class='ims'></div><div class='offline'>This user may be offline</div><div><form data-ajax-form='resetOnSubmit' method='post'><input type='hidden' name='im_uid' value='%s' /><input type='text' name='im_im' autocomplete='off' /><input type='hidden' name='act' value='blank' /></form></div>".replace(
         /%s/g,
         fromId
       );
@@ -203,7 +203,7 @@ export default {
         parseInt(fromId, 10)}' class='name'>${fromName}</a> ${
         !isAction ? ': ' : ''
       }${message}`;
-      d.title = title;
+      d.dataset.timestamp = timestamp;
       const test =
         messagesContainer.scrollTop >
         messagesContainer.scrollHeight - messagesContainer.clientHeight - 50;

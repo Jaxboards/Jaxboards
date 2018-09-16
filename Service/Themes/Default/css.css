@@ -1946,7 +1946,7 @@ textarea {
 /* stylelint-enable no-descending-specificity */
 
 #statusers .idle {
-  background: url(icons/clock.png) no-repeat 2px 2px;
+  background: url(icons/clock.png) no-repeat 0 0;
   padding-left: 18px;
   font-style: italic;
 }

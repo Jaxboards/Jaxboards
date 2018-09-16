@@ -150,17 +150,17 @@
   )}, ${serverAsLocalDate.getFullYear()} @ ${timeAsAMPM(serverAsLocalDate)}`;
   }
 
-  function smalldate(a) {
-    const d = new Date();
-    d.setTime(a * 1000);
-    let hours = d.getHours();
+  function smalldate(serverDate) {
+    const serverAsLocalDate = new Date(0);
+    serverAsLocalDate.setUTCSeconds(serverDate);
+    let hours = serverAsLocalDate.getHours();
     const ampm = hours >= 12 ? 'pm' : 'am';
     hours %= 12;
     hours = hours || 12;
-    const minutes = `${d.getMinutes()}`.padStart(2, '0');
-    const month = d.getMonth() + 1;
-    const day = `${d.getDate()}`.padStart(2, '0');
-    const year = d.getFullYear();
+    const minutes = `${serverAsLocalDate.getMinutes()}`.padStart(2, '0');
+    const month = serverAsLocalDate.getMonth() + 1;
+    const day = `${serverAsLocalDate.getDate()}`.padStart(2, '0');
+    const year = serverAsLocalDate.getFullYear();
     return `${hours}:${minutes}${ampm}, ${month}/${day}/${year}`;
   }
 
@@ -220,7 +220,8 @@
   }
 
   function updateDates() {
-    const dates = Array.from(document.querySelectorAll('.autodate'));
+    const dates = document.querySelectorAll('.autodate');
+    const dateTitles = Array.from(document.querySelectorAll('[data-timestamp]'));
     if (!dates) {
       return;
     }
@@ -231,6 +232,11 @@
         : date(timestamp);
       if (parsed !== el$$1.innerHTML) {
         el$$1.innerHTML = parsed;
+      }
+    });
+    dateTitles.forEach(el$$1 => {
+      if (!el$$1.title) {
+        el$$1.title = smalldate(el$$1.dataset.timestamp);
       }
     });
   }
@@ -348,19 +354,19 @@
     link.nw = nw;
     link.nh = nh;
     link.onmousemove = event => {
-      const o = getCoordinates(this);
+      const o = getCoordinates(link);
       const e = Event$1(event);
-      this.scrollLeft = ((e.pageX - o.x) / o.w) * (this.nw - o.w);
-      this.scrollTop = ((e.pageY - o.y) / o.h) * (this.nh - o.h);
+      link.scrollLeft = ((e.pageX - o.x) / o.w) * (link.nw - o.w) || 0;
+      link.scrollTop = ((e.pageY - o.y) / o.h) * (link.nh - o.h) || 0;
     };
     link.onmouseover = () => {
-      img.style.width = `${this.nw}px`;
-      img.style.height = `${this.nh}px`;
+      img.style.width = `${link.nw}px`;
+      img.style.height = `${link.nh}px`;
     };
     link.onmouseout = () => {
-      if (this.scrollLeft) {
-        this.scrollLeft = 0;
-        this.scrollTop = 0;
+      if (link.scrollLeft) {
+        link.scrollLeft = 0;
+        link.scrollTop = 0;
       }
       img.style.width = `${iw}px`;
       img.style.height = `${ih}px`;
@@ -955,6 +961,7 @@
           id: 'datepicker'
         });
         document.body.appendChild(picker);
+        picker.style.display = 'none';
       }
 
       return picker;
@@ -1219,7 +1226,7 @@
       });
 
       const toggle = () => {
-        button.style.backgroundPosition = element.checked ? 'bottom' : 'top';
+        button.style.backgroundPosition = element.checked ? 'top' : 'bottom';
       };
       toggle();
       button.addEventListener('click', () => {
@@ -2533,7 +2540,7 @@
         }
       }
     },
-    im([fromId, fromName, message, fromMe, title]) {
+    im([fromId, fromName, message, fromMe, timestamp]) {
       let messagesContainer = document.querySelector(`#im_${fromId} .ims`);
       flashTitle(`New message from ${fromName}!`);
       const { webkitNotifications } = window;
@@ -2556,7 +2563,7 @@
       if (!messagesContainer) {
         const imWindow = new Window();
         imWindow.title = `${fromName} <a href="#" onclick="IMWindow.menu(event,${fromId});return false;">&rsaquo;</a>`;
-        imWindow.content = "<div class='ims'></div><div class='offline'>This user may be offline</div><div><form data-ajax-form='resetOnSubmit' method='post'><input type='hidden' name='im_uid' value='%s' /><input type='text' name='im_im' /><input type='hidden' name='act' value='blank' /></form></div>".replace(
+        imWindow.content = "<div class='ims'></div><div class='offline'>This user may be offline</div><div><form data-ajax-form='resetOnSubmit' method='post'><input type='hidden' name='im_uid' value='%s' /><input type='text' name='im_im' autocomplete='off' /><input type='hidden' name='act' value='blank' /></form></div>".replace(
           /%s/g,
           fromId
         );
@@ -2595,7 +2602,7 @@
         parseInt(fromId, 10)}' class='name'>${fromName}</a> ${
         !isAction ? ': ' : ''
       }${message}`;
-        d.title = title;
+        d.dataset.timestamp = timestamp;
         const test =
           messagesContainer.scrollTop >
           messagesContainer.scrollHeight - messagesContainer.clientHeight - 50;
@@ -2805,8 +2812,9 @@
         const queryParams = xmlobj.url.substring(1);
         if (!softurl) {
           window.history.pushState({ queryParams }, '', `?${queryParams}`);
+          // pushstate is not a real browser event unfortunately, so I have to trigger it myself
+          window.dispatchEvent(new Event('pushstate'));
           this.lastURL = queryParams;
-          if (Event.onPageChange) Event.onPageChange();
         }
       }
       this.pollData();
@@ -2860,7 +2868,7 @@
       setInterval(updateDates, 1000 * 30);
 
       this.stream.pollData();
-      window.onpopstate = ({ state }) => {
+      window.addEventListener('popstate', ({ state }) => {
         if (state) {
           const { queryParams } = state;
           this.stream.updatePage(queryParams);
@@ -2868,7 +2876,7 @@
           const queryParams = document.location.search.replace(/^\?/, '');
           this.stream.updatePage(queryParams);
         }
-      };
+      });
 
       // Load sounds
       Sound$1.load('sbblip', './Sounds/blip.mp3', false);
@@ -2938,7 +2946,7 @@
   onDOMReady(() => {
     window.name = Math.random();
     RUN$1.setWindowActive();
-    window.addEventListener('onfocus', () => {
+    window.addEventListener('focus', () => {
       RUN$1.setWindowActive();
     });
   });

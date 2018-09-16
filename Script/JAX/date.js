@@ -82,16 +82,16 @@ export function date(gmtUnixTimestamp) {
   )}, ${serverAsLocalDate.getFullYear()} @ ${timeAsAMPM(serverAsLocalDate)}`;
 }
 
-export function smalldate(a) {
-  const d = new Date();
-  d.setTime(a * 1000);
-  let hours = d.getHours();
+export function smalldate(serverDate) {
+  const serverAsLocalDate = new Date(0);
+  serverAsLocalDate.setUTCSeconds(serverDate);
+  let hours = serverAsLocalDate.getHours();
   const ampm = hours >= 12 ? 'pm' : 'am';
   hours %= 12;
   hours = hours || 12;
-  const minutes = `${d.getMinutes()}`.padStart(2, '0');
-  const month = d.getMonth() + 1;
-  const day = `${d.getDate()}`.padStart(2, '0');
-  const year = d.getFullYear();
+  const minutes = `${serverAsLocalDate.getMinutes()}`.padStart(2, '0');
+  const month = serverAsLocalDate.getMonth() + 1;
+  const day = `${serverAsLocalDate.getDate()}`.padStart(2, '0');
+  const year = serverAsLocalDate.getFullYear();
   return `${hours}:${minutes}${ampm}, ${month}/${day}/${year}`;
 }

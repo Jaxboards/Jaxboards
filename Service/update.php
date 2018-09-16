@@ -199,7 +199,7 @@ EOT
             ,
             <<<'EOT'
 UPDATE `banlist`
-    SET `registrar_ip`=INET6_ATON(`ip`);
+    SET `ip`=INET6_ATON(`ip`);
 EOT
         ,
         );

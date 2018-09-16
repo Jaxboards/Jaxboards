@@ -99,10 +99,7 @@ class SHOUTBOX
         } else {
             $shout = $PAGE->meta(
                 'shout',
-                $JAX->smalldate(
-                    $row['date'],
-                    1
-                ),
+                $row['date'],
                 $user,
                 $shout . PHP_EOL,
                 $deletelink,

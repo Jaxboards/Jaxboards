@@ -58,7 +58,8 @@ export function onImagesLoaded(imgs, callback, timeout) {
 }
 
 export function updateDates() {
-  const dates = Array.from(document.querySelectorAll('.autodate'));
+  const dates = document.querySelectorAll('.autodate');
+  const dateTitles = Array.from(document.querySelectorAll('[data-timestamp]'));
   if (!dates) {
     return;
   }
@@ -69,6 +70,11 @@ export function updateDates() {
       : date(timestamp);
     if (parsed !== el.innerHTML) {
       el.innerHTML = parsed;
+    }
+  });
+  dateTitles.forEach(el => {
+    if (!el.title) {
+      el.title = smalldate(el.dataset.timestamp);
     }
   });
 }
