@@ -194,7 +194,7 @@ class PAGE
             $this->template
         );
         $this->template = preg_replace_callback(
-            '@{% block [\'"]([\w_]+)[\'"] %}(.*?){% endblock %}@s',
+            '@{% block ([\w_]+) %}(.*?){% endblock %}@s',
             array(
                 $this,
                 'userMetaParse',
