@@ -9,12 +9,12 @@ html {
 
 body {
   background: url(../img/loginglow.png) center no-repeat #274463;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   height: 100%;
   margin: 0;
 }
 
-input[type="submit"] {
+input[type='submit'] {
   background: url(../img/buttonbg.png);
   border-radius: 0.25em;
   border: 1px solid #000;
