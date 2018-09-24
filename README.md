@@ -35,7 +35,7 @@ If you're running an old Jaxboards database, you can update it to the latest
 with the update script. It's only meant to run via the CLI, so run it with this:
 
 ```bash
-/usr/bin/env php ./Service/update.php
+php ./Service/update.php
 ```
 
 If you're just starting to use this repo, it's not needed.
@@ -130,12 +130,10 @@ pnpm run eslint
 
 [Composer](https://getcomposer.org/) is a package manager for PHP and tools
 made in PHP. As Jaxboards is a PHP project, it shouldn't be too surprising we
-make use of some PHP tools. Run this command in the Jaxboards directory to
-install the composer tools:
-
-```bash
-composer install
-```
+make use of some PHP tools. We're using
+[node-composer-runner](https://github.com/garthenweb/node-composer-runner)
+to run composer commands with `pnpm`, so composer packages should be
+installed after you run `pnpm install`.
 
 #### PHP_CodeSniffer
 
@@ -146,13 +144,13 @@ fix fixable issues, which helps keep code looking great.
 Run on all files with the following command in the Jaxboards directory:
 
 ```bash
-composer run-script phpcs
+pnpm run phpcs
 ```
 
 And run this in the Jaxboards directory to run the fixer tool on all files:
 
 ```bash
-composer run-script phpcbf
+pnpm run phpcbf
 ```
 
 ## Authors
