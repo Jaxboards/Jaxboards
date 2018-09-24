@@ -23,11 +23,8 @@ header('Cache-Control: no-cache, must-revalidate');
 $local = '127.0.0.1' == $_SERVER['REMOTE_ADDR'];
 $microtime = microtime(true);
 
-// This is the best place to load the password compatibility library,
-// so do it here.
-if (!function_exists('password_hash')) {
-    include_once JAXBOARDS_ROOT . '/inc/lib/password.php';
-}
+// Load composer dependencies.
+require_once JAXBOARDS_ROOT . '/vendor/autoload.php';
 
 // Get the config.
 require 'config.php';
