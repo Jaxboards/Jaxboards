@@ -12,7 +12,7 @@ textarea {
   height: 75px;
 }
 
-input[type="text"],
+input[type='text'],
 textarea,
 select {
   border: 1px solid #aad;
@@ -314,7 +314,7 @@ label {
   width: 130px;
 }
 
-input[type="text"] {
+input[type='text'] {
   width: 200px;
 }
 
@@ -425,7 +425,7 @@ table.settings td {
 .permcontainer .sticky-heading {
   padding-left: 150px;
   width: 100%;
-  background: #FFF;
+  background: #fff;
   position: sticky;
   top: 0;
 }

@@ -1,5 +1,5 @@
 /* WYSWYG Editor CSS */
-@import url("../../wysiwyg.css");
+@import url('../../wysiwyg.css');
 
 body {
   background: url(img/bg.jpg);
@@ -156,7 +156,7 @@ textarea {
   border-top: 1px solid #555;
 }
 
-.im input[type="text"] {
+.im input[type='text'] {
   padding: 5px;
   width: 95%;
   border: none;
@@ -942,7 +942,7 @@ textarea {
   width: 200px;
 }
 
-#userbox form input[type="submit"] {
+#userbox form input[type='submit'] {
   width: auto;
 }
 
@@ -1525,7 +1525,7 @@ textarea {
   background: #eef;
 }
 
-.topicform input[type="text"] {
+.topicform input[type='text'] {
   width: 500px;
 }
 
@@ -1843,7 +1843,7 @@ textarea {
   left: 0;
   background: #000;
   opacity: 0.5;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+  -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=80)';
 }
 
 #notification,
@@ -1972,11 +1972,11 @@ textarea {
 }
 
 #statusers a::after {
-  content: ",";
+  content: ',';
 }
 
 #statusers a:last-child::after {
-  content: "";
+  content: '';
 }
 
 /* Member List */

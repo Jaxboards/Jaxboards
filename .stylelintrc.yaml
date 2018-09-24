@@ -1,5 +1,5 @@
 extends:
   - stylelint-config-standard
 rules:
-  declaration-colon-newline-after: "always-multi-line"
-  value-list-comma-newline-after: "always-multi-line"
+  declaration-colon-newline-after: 'always-multi-line'
+  value-list-comma-newline-after: 'always-multi-line'

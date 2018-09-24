@@ -1,28 +1,34 @@
 {
+  "private": true,
+  "license": "MIT",
   "scripts": {
-    "postinstall": "composer-runner -- install",
+    "build": "rollup -c",
     "eslint": "eslint 'Script/**/*.js'",
     "eslint-fix": "eslint 'Script/**/*.js' --fix",
-    "prettier": "prettier --write --single-quote '**/*.{js,json,md}'",
+    "php-lint": "composer-runner -- run-script lint",
+    "phpcs": "composer-runner -- run-script phpcs",
+    "phpcbf": "composer-runner -- run-script phpcbf",
+    "postinstall": "composer-runner -- install",
+    "pre-commit": "npm run prettier && npm run eslint-fix && npm run stylelint-fix && npm run eslint && npm run stylelint && npm run php-lint",
+    "prettier": "prettier --write --single-quote \"**/*.{{t,j}s{,x,on},{c,sa,sc,le}ss,vue,md,y{,a}ml,graphql}\"",
     "stylelint": "stylelint \"./**/*.{c,sa,sc,le}ss\"",
-    "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\"",
-    "build": "rollup -c",
-    "php-cleanup": "composer-runner -- run-script phpcbf && composer-runner -- run-script phpcs"
+    "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\""
   },
-  "pre-commit": [
-    "prettier",
-    "eslint",
-    "php-cleanup"
-  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run pre-commit"
+    }
+  },
   "devDependencies": {
     "eslint": "^5.5.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-config-prettier": "^3.0.1",
+    "eslint-import-resolver-node": "^0.3.2",
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-prettier": "^2.6.2",
+    "husky": "^1.0.0-rc.15",
     "js-beautify": "^1.8.4",
     "node-composer-runner": "^0.3.0",
-    "pre-commit": "^1.2.2",
     "prettier": "^1.14.2",
     "rollup": "^0.65.0",
     "stylelint": "^9.5.0",

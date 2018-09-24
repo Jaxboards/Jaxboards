@@ -23,11 +23,8 @@ if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', dirname(__DIR__));
 }
 
-// This is the best place to load the password compatibility library,
-// so do it here.
-if (!function_exists('password_hash')) {
-    include_once JAXBOARDS_ROOT . '/inc/lib/password.php';
-}
+// Load composer dependencies.
+require_once JAXBOARDS_ROOT . '/vendor/autoload.php';
 
 define('INACP', 'true');
 
