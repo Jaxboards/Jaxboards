@@ -2,6 +2,7 @@
   "private": true,
   "license": "MIT",
   "scripts": {
+    "autofix": "npm run prettier && npm run eslint-fix && npm run stylelint-fix && npm run phpcbf",
     "build": "rollup -c",
     "eslint": "eslint 'Script/**/*.js'",
     "eslint-fix": "eslint 'Script/**/*.js' --fix",
@@ -9,7 +10,7 @@
     "phpcs": "composer-runner -- run-script phpcs",
     "phpcbf": "composer-runner -- run-script phpcbf",
     "postinstall": "composer-runner -- install",
-    "pre-commit": "npm run prettier && npm run eslint-fix && npm run stylelint-fix && npm run eslint && npm run stylelint && npm run php-lint",
+    "pre-commit": "npm run eslint && npm run stylelint && npm run php-lint",
     "prettier": "prettier --write --single-quote \"**/*.{{t,j}s{,x,on},{c,sa,sc,le}ss,vue,md,y{,a}ml,graphql}\"",
     "stylelint": "stylelint \"./**/*.{c,sa,sc,le}ss\"",
     "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\""

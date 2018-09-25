@@ -1,9 +1,6 @@
 {
   "scripts": {
-    "lint": [
-      "@phpcbf",
-      "@phpcs"
-    ],
+    "lint": ["@phpcs"],
     "phpcs": "phpcs",
     "phpcbf": "phpcbf"
   },
