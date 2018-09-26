@@ -730,9 +730,9 @@ EOT;
     }
 
     /*
-     * HERE BE PRIVATE MESSAGING
-     * ARRRRRRRRRRRRRRRRRRRRRRRR
-     */
+        HERE BE PRIVATE MESSAGING
+        ARRRRRRRRRRRRRRRRRRRRRRRR
+    */
 
     public function flag()
     {

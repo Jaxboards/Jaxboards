@@ -153,11 +153,11 @@ class JAX
     }
 
     /*
-     * the getSess and getUser functions both return the
-     * session/user data respectively
-     * if not found in the database, getSess inserts a blank Sess row,
-     * while getUser returns false
-     */
+        The getSess and getUser functions both return the
+        session/user data respectively
+        if not found in the database, getSess inserts a blank Sess row,
+        while getUser returns false.
+    */
 
     public function getUser($uid = false, $pass = false)
     {

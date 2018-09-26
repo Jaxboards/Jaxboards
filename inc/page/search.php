@@ -1,12 +1,12 @@
 <?php
 
 /*
- *  Chat box
- *  better color >_>
- *
- *  <_<
- *  we need to be able to search "All" :>
- */
+    Chat box
+    better color >_>
+
+    <_<
+    we need to be able to search "All" :>
+*/
 
 $PAGE->loadmeta('search');
 
@@ -179,9 +179,9 @@ class search
             }
 
             /*
-             * Note bug: should be is_int, not is_numeric,
-             * because that DB field is an integer, not a float.
-             */
+                Note bug: should be is_int, not is_numeric,
+                because that DB field is an integer, not a float.
+            */
 
             $arguments = array(
                 <<<'EOT'

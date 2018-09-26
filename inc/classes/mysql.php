@@ -202,9 +202,9 @@ class MySQL
         }
 
         /*
-         * e.g. if array is a => b; c => c; then result is a = ?, b = ?,
-         * where the first " = ?," comes from the implode.
-         */
+            E.G. if array is a => b; c => c; then result is a = ?, b = ?,
+            where the first " = ?," comes from the implode.
+        */
 
         return '`' . implode('` = ?, `', array_keys($kvarray)) . '` = ?';
     }
@@ -591,9 +591,9 @@ EOT
             }
 
             /*
-             * since we update the session data at the END of the page,
-             * we'll want to include the user in the usersonline
-             */
+                Since we update the session data at the END of the page,
+                we'll want to include the user in the usersonline.
+            */
 
             if ($USER && isset($r[$USER['id']]) && $r[$USER['id']]) {
                 $r[$USER['id']] = array(
