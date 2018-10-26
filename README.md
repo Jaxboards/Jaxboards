@@ -11,25 +11,62 @@ this in production these days.
 These instructions will get you a copy of the project up and running on your
 local machine for development purposes.
 
+## Deployment
+
+Tested on Apache and Linux only.
+
+It is not recommended to run Jaxboards in production.
+
 ### Prerequisites
+- PHP 5.3.7
+- MySQL>=5.5.3
+- TLS certificate (due to hardcoded URLs in codebase)
 
-Jaxboards should run with PHP 5.3.7 or above and MySQL 5.5.3 or above.
 You'll want a dedicated database just for Jaxboards just to avoid any kind of
-conflicts with anything else. It's only been tested on Apache and Linux as
-well, but it may work with something else.
-
-This release of Jaxboards requires HTTPS. There's a lot of hardcoded URLs, and
-defaulting that to HTTPS was the easiest solution.
-
-You'll also want this installed in the root directory of a domain or subdomain.
-You're not going to have a good time trying to get this working in a subdirectory.
+conflicts with anything else.
 
 For the service setup you'll want your webserver configured like this:
 
-- The apex domain and www subdomain should point to the `Service` directory.
+- The apex domain and www subdomain should point to the `Service/` directory.
 - Wildcard subdomain of that apex domain should point to the root directory.
 
-### Update Script
+Jaxboards must be installed in the root directory of a domain or subdomain.
+You're not going to have a good time trying to get this working in a subdirectory.
+
+### Installation
+
+Once you've met all the requirements, head to: `https://$DOMAIN/Service/install.php`,
+replacing `$DOMAIN` with your domain.
+This page gives you the option of installing the service or a standalone
+Jaxboards - pick whatever suits your needs.
+
+The install script at `Service/install.php` handles configuration and setting up a new install. It does the following:
+- Saves configuration settings from the installer. Mainly this is database information, but it also saves the domain you're running the board on. Basically copies `config.default.php` to `config.php` and updates the values. Here's the direct PHP code what values are being set specifically:
+```php
+        // Update with our settings.
+        $CFG['boardname'] = 'Jaxboards';
+        $CFG['domain'] = $JAX->p['domain'];
+        $CFG['mail_from'] = $JAX->p['admin_username'] . ' <' .
+            $JAX->p['admin_email'] . '>';
+        $CFG['sql_db'] = $JAX->p['sql_db'];
+        $CFG['sql_host'] = $JAX->p['sql_host'];
+        $CFG['sql_username'] = $JAX->p['sql_username'];
+        $CFG['sql_password'] = $JAX->p['sql_password'];
+        $CFG['installed'] = true;
+        $CFG['service'] = $service; // boolean if it's a service or not
+        $CFG['prefix'] = $service ? '' : 'jaxboards';
+        $CFG['sql_prefix'] = $CFG['prefix'] ? $CFG['prefix'] . '_' : '';
+```
+- Figures out if you're installing a service (multiple boards like jaxboards.com) or a single-board install.
+- Copies over `Service/crossdomain.sample.xml` to `crossdomain.xml` and updates the URL to match your domain. This is used for flash I believe? So it's probably not necessary these days.
+- If it's a service install, install those special service tables.
+- Copy over the MySQL tables here. Service installs have an additional step of adding each board installed to the directory table. Once the database is imported, the admin user is created as well.
+
+After install the MySQL credentials are saved in `config.php`. This is copied over from `config.default.php` so you can see what the format looks like there.
+
+`Service/blueprint.sql` contains the base tables and base data for the database for a single-board install. Every table is prefixed with `blueprint_` (and should be updated to match what the `sql_prefix` setting is in the `config.php` file before importing). In addition, a service install (multiple boards) has two additional tables, `directory` (containing a list of all the registered boards) and `banlist` (containing a list of IP addresses to ban). These are both described in the `Service/install.php` file.
+
+### Updating
 
 If you're running an old Jaxboards database, you can update it to the latest
 with the update script. It's only meant to run via the CLI, so run it with this:
@@ -39,17 +76,6 @@ php ./Service/update.php
 ```
 
 If you're just starting to use this repo, it's not needed.
-
-### Installing
-
-Once you've met all the requirements, head to: `https://example.com/Service/install.php`,
-replacing `example.com` with your domain.
-This page gives you the option of installing the service or a standalone
-jaxboards- pick whatever suits your needs.
-
-## Deployment
-
-It is not recommended to run this in production.
 
 ## Contributing
 
