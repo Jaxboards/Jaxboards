@@ -58,7 +58,6 @@ The install script at `Service/install.php` handles configuration and setting up
         $CFG['sql_prefix'] = $CFG['prefix'] ? $CFG['prefix'] . '_' : '';
 ```
 - Figures out if you're installing a service (multiple boards like jaxboards.com) or a single-board install.
-- Copies over `Service/crossdomain.sample.xml` to `crossdomain.xml` and updates the URL to match your domain. This is used for flash I believe? So it's probably not necessary these days.
 - If it's a service install, install those special service tables.
 - Copy over the MySQL tables here. Service installs have an additional step of adding each board installed to the directory table. Once the database is imported, the admin user is created as well.
 
