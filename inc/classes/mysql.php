@@ -679,4 +679,12 @@ EOT
         ) . '</div>';
         $this->queryList = array();
     }
+
+    /**
+     * Compat: Fetch resources from local node server
+     */
+    public function fetchResource($path)
+    {
+        return json_decode(file_get_contents("http://localhost:3000/$path"), true);
+    }
 }

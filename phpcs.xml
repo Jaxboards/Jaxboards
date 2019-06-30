@@ -8,7 +8,6 @@
   <file>misc</file>
   <file>Script</file>
   <file>Service</file>
-  <file>config.default.php</file>
   <file>domaindefinitions.php</file>
   <file>index.php</file>
   <!-- inc/lib files are third party, so we shouldn't touch them -->

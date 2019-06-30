@@ -13,7 +13,8 @@
     "pre-commit": "npm run eslint && npm run stylelint && npm run php-lint",
     "prettier": "prettier --write --single-quote \"**/*.{{t,j}s{,x,on},{c,sa,sc,le}ss,vue,md,y{,a}ml,graphql}\"",
     "stylelint": "stylelint \"./**/*.{c,sa,sc,le}ss\"",
-    "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\""
+    "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\"",
+    "start": "node api/serve"
   },
   "husky": {
     "hooks": {
@@ -34,5 +35,11 @@
     "rollup": "^0.65.0",
     "stylelint": "^9.5.0",
     "stylelint-config-standard": "^18.2.0"
+  },
+  "dependencies": {
+    "koa": "^2.7.0",
+    "koa-router": "^7.4.0",
+    "mysql2": "^1.6.5",
+    "sequelize": "^5.9.0"
   }
 }

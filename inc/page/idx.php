@@ -26,33 +26,11 @@ class IDX
         global $DB,$PAGE,$SESS,$JAX,$USER,$CFG;
         $SESS->location_verbose = 'Viewing board index';
         $page = '';
-        $result = $DB->safespecial(
-            <<<'EOT'
-SELECT f.`id` AS `id`,
-    f.`cat_id` AS `cat_id`,f.`title` AS `title`,f.`subtitle` AS `subtitle`,
-    f.`lp_uid` AS `lp_uid`,UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,
-    f.`lp_tid` AS `lp_tid`,f.`lp_topic` AS `lp_topic`,f.`path` AS `path`,
-    f.`show_sub` AS `show_sub`,f.`redirect` AS `redirect`,
-    f.`topics` AS `topics`,f.`posts` AS `posts`,f.`order` AS `order`,
-    f.`perms` AS `perms`,f.`orderby` AS `orderby`,f.`nocount` AS `nocount`,
-    f.`redirects` AS `redirects`,f.`trashcan` AS `trashcan`,f.`mods` AS `mods`,
-    f.`show_ledby` AS `show_ledby`,m.`display_name` AS `lp_name`,
-    m.`group_id` AS `lp_gid`
-FROM %t f
-LEFT JOIN %t m
-    ON f.`lp_uid`=m.`id`
-ORDER BY f.`order`, f.`title` ASC
-EOT
-            ,
-            array(
-                'forums',
-                'members',
-            )
-        );
+        $result = $DB->fetchResource('forums');
         $data = $this->subforums = $this->subforumids = $this->mods = array();
 
         // This while loop just grabs all of the data, displaying is done below.
-        while ($r = $DB->arow($result)) {
+        foreach ($result as $r) {
             $perms = $JAX->parseperms($r['perms'], $USER ? $USER['group_id'] : 3);
             if ($r['perms'] && !$perms['view']) {
                 continue;

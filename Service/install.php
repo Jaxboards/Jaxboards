@@ -28,7 +28,7 @@ require_once JAXBOARDS_ROOT . '/inc/classes/mysql.php';
 require_once JAXBOARDS_ROOT . '/inc/classes/jax.php';
 require_once JAXBOARDS_ROOT . '/acp/page.php';
 // Get default CFG.
-require_once JAXBOARDS_ROOT . '/config.default.php';
+define('CFG', json_decode(file_get_contents(JAXBOARDS_ROOT . '/config.default.json'), true));
 
 /**
  * Recurisvely copies one directory to another.

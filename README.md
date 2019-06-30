@@ -41,7 +41,7 @@ This page gives you the option of installing the service or a standalone
 Jaxboards - pick whatever suits your needs.
 
 The install script at `Service/install.php` handles configuration and setting up a new install. It does the following:
-- Saves configuration settings from the installer. Mainly this is database information, but it also saves the domain you're running the board on. Basically copies `config.default.php` to `config.php` and updates the values. Here's the direct PHP code what values are being set specifically:
+- Saves configuration settings from the installer. Mainly this is database information, but it also saves the domain you're running the board on. Basically copies `config.default.json` to `config.json` and updates the values. Here's the direct PHP code what values are being set specifically:
 ```php
         // Update with our settings.
         $CFG['boardname'] = 'Jaxboards';
@@ -61,7 +61,7 @@ The install script at `Service/install.php` handles configuration and setting up
 - If it's a service install, install those special service tables.
 - Copy over the MySQL tables here. Service installs have an additional step of adding each board installed to the directory table. Once the database is imported, the admin user is created as well.
 
-After install the MySQL credentials are saved in `config.php`. This is copied over from `config.default.php` so you can see what the format looks like there.
+After install the MySQL credentials are saved in `config.php`. This is copied over from `config.default.json` so you can see what the format looks like there.
 
 `Service/blueprint.sql` contains the base tables and base data for the database for a single-board install. Every table is prefixed with `blueprint_` (and should be updated to match what the `sql_prefix` setting is in the `config.php` file before importing). In addition, a service install (multiple boards) has two additional tables, `directory` (containing a list of all the registered boards) and `banlist` (containing a list of IP addresses to ban). These are both described in the `Service/install.php` file.
 
