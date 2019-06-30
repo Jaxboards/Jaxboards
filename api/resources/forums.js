@@ -26,7 +26,7 @@ class ForumResource extends BaseResource {
   addRoutes(router) {
     const self = this;
     router.get('/forums', async ctx => {
-      ctx.body = JSON.stringify(await self.getAll());
+      ctx.body = await self.getAll();
     });
   }
 }

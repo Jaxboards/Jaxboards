@@ -3,8 +3,4 @@ module.exports = class Resource {
     this.sequelize = sequelize;
     this.config = config;
   }
-
-  tableName(name) {
-    return `${this.config.sql_prefix}_${name}`;
-  }
 };
