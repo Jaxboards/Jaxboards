@@ -160,33 +160,9 @@ class PAGE
         header("Location: ${a}");
     }
 
-    public function writeData($page, $name, $data, $mode = 'w')
+    public function writeData($page, $data, $mode = 'w')
     {
         $data_string = json_encode($data);
-        $write = <<<EOT
-<?php
-/**
- * JaxBoards config file. It's just JSON embedded in PHP- wow!
- *
- * PHP Version 5.3.0
- *
- * @category Jaxboards
- * @package  Jaxboards
- *
- * @author  Sean Johnson <seanjohnson08@gmail.com>
- * @author  World's Tallest Ladder <wtl420@users.noreply.github.com>
- * @license MIT <https://opensource.org/licenses/MIT>
- *
- * @link https://github.com/Jaxboards/Jaxboards Jaxboards on Github
- */
-$${name} = json_decode(
-<<<'EOD'
-{$data_string}
-EOD
-    ,
-    true
-);
-EOT;
         $file = fopen($page, $mode);
         fwrite($file, $write);
         fclose($file);
@@ -202,7 +178,7 @@ EOT;
         }
         $this->CFG = $CFG;
 
-        return $this->writeData(BOARDPATH . 'config.php', 'CFG', $this->CFG);
+        return $this->writeData(BOARDPATH . 'config.json', $this->CFG);
     }
 
     public function getCFGSetting($setting)
