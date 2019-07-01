@@ -6,6 +6,10 @@ class CategoryResource extends BaseResource {
     return super.getModel(Category);
   }
 
+  find(id) {
+    return this.getModel().findByPk(id);
+  }
+
   findAll() {
     return this.getModel().findAll({
       order: ['order', 'title']
@@ -13,6 +17,9 @@ class CategoryResource extends BaseResource {
   }
 
   addRoutes(router) {
+    router.get('/category/:id', async ctx => {
+      ctx.body = await this.find(ctx.params.id);
+    });
     router.get('/categories', async ctx => {
       ctx.body = await this.findAll();
     });

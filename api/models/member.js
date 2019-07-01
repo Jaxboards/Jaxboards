@@ -71,9 +71,6 @@ module.exports = {
         timestamps: false
       }
     );
-
-    // TODO: Foreign Keys?
-    // CONSTRAINT `blueprint_members_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `blueprint_member_groups` (`id`) ON DELETE SET NULL
   },
 
   setAssociations({ Member, MemberGroups }) {
