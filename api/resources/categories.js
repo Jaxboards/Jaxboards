@@ -6,7 +6,7 @@ class CategoryResource extends BaseResource {
     return super.getModel(Category);
   }
 
-  getAll() {
+  findAll() {
     return this.getModel().findAll({
       order: ['order', 'title']
     });
@@ -14,7 +14,7 @@ class CategoryResource extends BaseResource {
 
   addRoutes(router) {
     router.get('/categories', async ctx => {
-      ctx.body = await this.getAll();
+      ctx.body = await this.findAll();
     });
   }
 }

@@ -1,7 +1,7 @@
 const BaseResource = require('./resource');
 
 class StatsResource extends BaseResource {
-  getAll() {
+  findAll() {
     const { sequelize } = this;
     const [stats, members] = this.prefixTableNames('stats', 'members');
 
@@ -20,7 +20,7 @@ class StatsResource extends BaseResource {
 
   addRoutes(router) {
     router.get('/stats', async ctx => {
-      ctx.body = await this.getAll();
+      ctx.body = await this.findAll();
     });
   }
 }

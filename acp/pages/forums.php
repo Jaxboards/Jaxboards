@@ -96,12 +96,8 @@ class forums
             $page .= $PAGE->success('Data Saved');
         }
         $forums = array();
-        $result = $DB->safeselect(
-            '`id`,`title`,`order`',
-            'categories',
-            'ORDER BY `order`,`id` ASC'
-        );
-        while ($f = $DB->arow($result)) {
+        $result = $DB->fetchResource('categories');
+        foreach ($result as $f) {
             $forums['c_' . $f['id']] = array('title' => $f['title']);
             $cats[] = $f['id'];
         }
@@ -354,11 +350,8 @@ EOT
             // really should be its own function, but I don't care.
             $grouppermsa = array();
             $groupperms = '';
-            $result = $DB->safeselect(
-                '`id`',
-                'member_groups'
-            );
-            while ($f = $DB->arow($result)) {
+            $result = $DB->fetchResource('member_groups');
+            foreach ($result as $f) {
                 if (!isset($JAX->p['groups'][$f['id']])) {
                     $JAX->p['groups'][$f['id']] = array();
                 }
@@ -386,11 +379,8 @@ EOT
             if (is_numeric($JAX->p['orderby'])) {
                 $orderby = $JAX->p['orderby'];
             }
-            $result = $DB->safeselect(
-                '`id`',
-                'categories'
-            );
-            $thisrow = $DB->arow($result);
+            // TODO: Why is this just randomly picking the first category?
+            $thisrow = $DB->fetchResource('categories')[0];
             $write = array(
                 'title' => $JAX->p['title'],
                 'cat_id' => $JAX->pick(
@@ -410,30 +400,12 @@ EOT
                 'mods' => isset($fdata['mods']) ? $fdata['mods'] : null,
                 // Handling done below.
             );
-            $DB->disposeresult($result);
 
             // Add per-forum moderator.
             if (is_numeric($JAX->p['modid'])) {
-                $result = $DB->safeselect(
-                    <<<'EOT'
-`id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
-UNIX_TIMESTAMP(`join_date`) AS `join_date`,
-UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,`contact_skype`,`contact_yim`,
-`contact_msn`,`contact_gtalk`,`contact_aim`,`website`,
-`birthdate`, DAY(`birthdate`) AS `dob_day`,
-MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
-`about`,`display_name`,`full_name`,`contact_steam`,`location`,`gender`,
-`friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
-`sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
-`notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
-`email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
-EOT
-                    ,
-                    'members',
-                    'WHERE `id`=?',
-                    $DB->basicvalue($JAX->p['modid'])
-                );
-                if ($DB->arow($result)) {
+                $modid = $JAX->p['modid'];
+                $result = $DB->fetchResource("members/modid")[0];
+                if ($result) {
                     if (false === array_search(
                         $JAX->p['modid'],
                         isset($fdata['mods']) ?
@@ -448,7 +420,6 @@ EOT
                 } else {
                     $e = "You tried to add a moderator that doesn't exist!";
                 }
-                $DB->disposeresult($result);
             }
             if (!$write['title']) {
                 $e = 'Forum title is required';
@@ -731,20 +702,8 @@ EOT
                 )
             );
         }
-        $result = $DB->safeselect(
-            <<<'EOT'
-`id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
-UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,
-`show_sub`,`redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,
-`redirects`,`trashcan`,`mods`,`show_ledby`
-EOT
-            ,
-            'forums',
-            'WHERE `id`=?',
-            $DB->basicvalue($id)
-        );
-        $fdata = $DB->arow($result);
-        $DB->disposeresult($result);
+
+        $fdata = $DB->fetchResource("forum/$id")[0];
 
         if (!$fdata) {
             return $PAGE->addContentBox(
@@ -753,18 +712,9 @@ EOT
             );
         }
 
-        $result = $DB->safeselect(
-            <<<'EOT'
-`id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
-UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,
-`show_sub`,`redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,
-`redirects`,`trashcan`,`mods`,`show_ledby`
-EOT
-            ,
-            'forums'
-        );
+        $result = $DB->fetchResource("forums");
         $forums = '';
-        while ($f = $DB->arow($result)) {
+        foreach ($result as $f) {
             $forums .= $PAGE->parseTemplate(
                 'select-option.html',
                 array(
@@ -794,14 +744,7 @@ EOT
             $cid = (int) $JAX->p['cat_id'];
         }
         if ($cid) {
-            $result = $DB->safeselect(
-                '`id`,`title`',
-                'categories',
-                'WHERE `id`=?',
-                $DB->basicvalue($cid)
-            );
-            $cdata = $DB->arow($result);
-            $DB->disposeresult($result);
+            $cdata = $DB->fetchResource("category/$cid")[0];
         }
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             if (!trim($JAX->p['cat_name'])) {
@@ -854,13 +797,10 @@ EOT
         global $PAGE,$DB,$JAX;
         $page = '';
         $e = '';
-        $result = $DB->safeselect(
-            '`id`,`title`',
-            'categories'
-        );
+        $result = $DB->fetchResource("categories");
         $categories = array();
         $cattitle = false;
-        while ($f = $DB->arow($result)) {
+        foreach ($result as $f) {
             if ($f['id'] != $id) {
                 $categories[$f['id']] = $f['title'];
             } else {
@@ -934,13 +874,10 @@ EOT
                 'mod' => 0,
             )
         );
-        $result = $DB->safeselect(
-            '`mods`',
-            'forums'
-        );
+        $result = $DB->fetchResource("forums");
         // Build an array of mods.
         $mods = array();
-        while ($f = $DB->arow($result)) {
+        foreach ($result as $f) {
             foreach (explode(',', $f['mods']) as $v) {
                 if ($v) {
                     $mods[$v] = 1;
