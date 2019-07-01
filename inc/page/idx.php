@@ -409,8 +409,8 @@ EOT;
             $v['lp_uid'] ? $PAGE->meta(
                 'user-link',
                 $v['lp_uid'],
-                $v['lp_gid'],
-                $v['lp_name']
+                $v['last_poster']['group_id'],
+                $v['last_poster']['display_name']
             ) : 'None',
             $JAX->pick($JAX->date($v['lp_date']), '- - - - -')
         );

@@ -1,18 +1,21 @@
 const BaseResource = require('./resource');
+const MemberGroups = require('../models/member_groups').model;
 
 class MemberGroupsResource extends BaseResource {
+  getModel() {
+    return super.getModel(MemberGroups);
+  }
 
   findAll(searchQuery = {}) {
-    const { sequelize } = this;
-    const [member_groups] = this.prefixTableNames('member_groups');
-
     if (searchQuery.legend) {
-      return sequelize.query(`
-        SELECT \`id\`,\`title\` FROM ${member_groups} WHERE \`legend\`=1 ORDER BY \`title\`
-        `,
-        { type: sequelize.QueryTypes.SELECT }
-      );
+      return this.getModel().findAll({
+        attributes: ['id', 'title'],
+        where: {
+          legend: 1
+        }
+      });
     }
+    return [];
   }
 
   addRoutes(router) {

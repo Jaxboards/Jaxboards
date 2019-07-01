@@ -48,11 +48,9 @@ class FORUM
 
         $page = $rows = $table = '';
 
-        $fdata = $DB->fetchResource("forum/$fid")[0];
+        $fdata = $DB->fetchResource("forum/$fid");
 
         if (!$fdata) {
-            $PAGE->JS('alert', $DB->error());
-
             return $PAGE->location('?');
         }
 
@@ -108,11 +106,11 @@ EOT
                     'forum-subforum-lastpost',
                     $f['lp_tid'],
                     $JAX->pick($f['lp_topic'], '- - - - -'),
-                    $f['lp_name'] ? $PAGE->meta(
+                    $f['last_poster']['display_name'] ? $PAGE->meta(
                         'user-link',
                         $f['lp_uid'],
-                        $f['lp_gid'],
-                        $f['lp_name']
+                        $f['last_poster']['group_id'],
+                        $f['last_poster']['display_name']
                     ) : 'None',
                     $JAX->pick($JAX->date($f['lp_date']), '- - - - -')
                 ),
@@ -302,7 +300,7 @@ EOT
         $page .= $PAGE->meta('forum-buttons-bottom', $forumbuttons);
 
         // Start building the nav path.
-        $path[$fdata['cat']] = '?act=vc' . $fdata['cat_id'];
+        $path[$fdata['category']['title']] = '?act=vc' . $fdata['cat_id'];
         if ($fdata['path']) {
             $pathids = explode(' ', $fdata['path']);
             $forums = array();
