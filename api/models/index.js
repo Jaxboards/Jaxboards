@@ -1,10 +1,13 @@
+/* eslint-disable global-require */
+
 const modelModules = {
   Category: require('./category'),
   Forum: require('./forum'),
   Member: require('./member'),
   MemberGroup: require('./member_group'),
-  Topic: require('./topic'),
-  Session: require('./session')
+  Post: require('./post'),
+  Session: require('./session'),
+  Topic: require('./topic')
 };
 
 module.exports = function initModels(sequelize) {

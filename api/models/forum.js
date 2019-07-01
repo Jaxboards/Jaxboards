@@ -1,7 +1,4 @@
 const Sequelize = require('sequelize');
-const Category = require('./category').model;
-const Topic = require('./topic').model;
-const Member = require('./member').model;
 
 class ForumModel extends Sequelize.Model {}
 
@@ -49,7 +46,7 @@ module.exports = {
     );
   },
 
-  setAssociations({ Forum, Category, Topic }) {
+  setAssociations({ Forum, Category, Member, Topic }) {
     Forum.belongsTo(Category, { foreignKey: 'cat_id' });
     Forum.belongsTo(Topic, { foreignKey: 'lp_tid' });
     Forum.belongsTo(Member, { foreignKey: 'lp_uid', as: 'last_poster' });

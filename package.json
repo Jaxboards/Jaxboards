@@ -10,7 +10,6 @@
     "phpcs": "composer-runner -- run-script phpcs",
     "phpcbf": "composer-runner -- run-script phpcbf",
     "postinstall": "composer-runner -- install",
-    "pre-commit": "npm run eslint && npm run stylelint && npm run php-lint",
     "prettier": "prettier --write --single-quote \"**/*.{{t,j}s{,x,on},{c,sa,sc,le}ss,vue,md,y{,a}ml,graphql}\"",
     "stylelint": "stylelint \"./**/*.{c,sa,sc,le}ss\"",
     "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\"",
@@ -18,7 +17,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run pre-commit"
+      "pre-commit": "lint-staged && npm run php-lint"
     }
   },
   "devDependencies": {
@@ -30,6 +29,7 @@
     "eslint-plugin-prettier": "^3.0.0",
     "husky": "^1.0.0",
     "js-beautify": "^1.8.4",
+    "lint-staged": "^8.2.1",
     "node-composer-runner": "^0.3.0",
     "prettier": "^1.14.2",
     "rollup": "^0.65.0",
@@ -41,5 +41,15 @@
     "koa-router": "^7.4.0",
     "mysql2": "^1.6.5",
     "sequelize": "^5.9.0"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ],
+    "*.css": [
+      "stylelint --fix",
+      "git add"
+    ]
   }
 }
