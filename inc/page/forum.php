@@ -90,31 +90,11 @@ EOT
         // parent forum - subforum topics = total topics
         // I'm fairly sure this is faster than doing
         // `SELECT count(*) FROM topics`... but I haven't benchmarked it.
-        $result = $DB->safespecial(
-            <<<'EOT'
-SELECT f.`id` AS `id`,f.`cat_id` AS `cat_id`,f.`title` AS `title`,
-    f.`subtitle` AS `subtitle`,f.`lp_uid` AS `lp_uid`,
-    UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,f.`lp_tid` AS `lp_tid`,
-    f.`lp_topic` AS `lp_topic`,f.`path` AS `path`,f.`show_sub` AS `show_sub`,
-    f.`redirect` AS `redirect`,f.`topics` AS `topics`,f.`posts` AS `posts`,
-    f.`order` AS `order`,f.`perms` AS `perms`,f.`orderby` AS `orderby`,
-    f.`nocount` AS `nocount`,f.`redirects` AS `redirects`,
-    f.`trashcan` AS `trashcan`,f.`mods` AS `mods`,f.`show_ledby` AS `show_ledby`,
-    m.`display_name` AS `lp_name`,m.`group_id` AS `lp_gid`
-FROM %t f
-LEFT JOIN %t m
-ON f.`lp_uid`=m.`id`
-WHERE f.`path`=?
-    OR f.`path` LIKE ?
-ORDER BY f.`order`
-EOT
-            ,
-            array('forums', 'members'),
-            $fid,
-            "% ${fid}"
-        );
+        $result = $DB->fetchResource("forums", [
+            "path" => $fid
+        ]);
         $rows = '';
-        while ($f = $DB->arow($result)) {
+        foreach ($result as $f) {
             $fdata['topics'] -= $f['topics'];
             if ($this->page) {
                 continue;

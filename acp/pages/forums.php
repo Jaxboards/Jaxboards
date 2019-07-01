@@ -101,7 +101,6 @@ class forums
             $forums['c_' . $f['id']] = array('title' => $f['title']);
             $cats[] = $f['id'];
         }
-        $DB->disposeresult($result);
 
         $result = $DB->safeselect(
             <<<'EOT'

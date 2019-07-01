@@ -47,7 +47,12 @@ class ForumResource extends BaseResource {
     const [forums, members] = this.prefixTableNames('forums', 'members');
 
     // TODO: Don't build our own queries
-    const where = query.lp_date ? `WHERE f.\`lp_date\`>=$lp_date` : '';
+    let where = '';
+    if (query.lp_date) {
+      where = `WHERE f.\`lp_date\`>=$lp_date`;
+    } else if (query.path) {
+      where = `WHERE f.\`path\`=$path OR f.\`path\` LIKE $path_like`;
+    }
 
     return sequelize.query(`
         SELECT
@@ -83,7 +88,9 @@ class ForumResource extends BaseResource {
       {
         type: sequelize.QueryTypes.SELECT,
         bind: {
-          lp_date: query.lp_date
+          lp_date: query.lp_date,
+          path: query.path,
+          path_like: query.path ? `% ${query.path}` : ''
         }
       }
     );
