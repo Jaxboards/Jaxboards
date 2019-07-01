@@ -7,25 +7,28 @@ class MembersResource extends BaseResource {
     return super.getModel(Member);
   }
 
-  batchGet(ids) {
-    return this.getModel().findAll({
-      where: {
-        id: {
-          [Op.in]: ids.split(',').map(Number)
-        }
-      }
-    });
-  }
-
   find(id) {
     return this.getModel().findByPk(id);
   }
 
+  findAll({ query }) {
+    if (query.ids) {
+      const ids = query.ids.split(',').map(Number);
+      return this.getModel().findAll({
+        where: {
+          id: {
+            [Op.in]: ids
+          }
+        }
+      });
+    }
+
+    return null;
+  }
+
   addRoutes(router) {
     router.get('/members', async ctx => {
-      if (ctx.query.ids) {
-        ctx.body = await this.batchGet(ctx.query.ids);
-      }
+      ctx.body = await this.findAll(ctx.query);
     });
     router.get('/member/:id', async ctx => {
       ctx.body = await this.find(ctx.params.id);

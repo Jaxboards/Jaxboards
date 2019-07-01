@@ -21,14 +21,26 @@ class ForumResource extends BaseResource {
   }
 
   findAll(query = {}) {
-    // TODO: Don't build our own queries
     let where;
-    if (query.lp_date) {
+
+    // Batch Get
+    if (query.ids) {
+      const ids = query.ids.split(',').map(Number);
+      where = {
+        id: {
+          [Op.in]: ids
+        }
+      };
+
+      // Find by lp_date
+    } else if (query.lp_date) {
       where = {
         lp_date: {
           [Op.gte]: query.lp_date
         }
       };
+
+      // Find by forum path
     } else if (query.path) {
       where = {
         path: {

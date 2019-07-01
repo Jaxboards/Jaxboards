@@ -168,61 +168,14 @@ EOT
             $forumbuttons
         );
 
-        // Do order by.
-        $orderby = '`lp_date` DESC';
-        if ($fdata['orderby']) {
-            $fdata['orderby'] = (int) $fdata['orderby'];
-            if ($fdata['orderby'] & 1) {
-                $orderby = '`lp_date` ASC';
-                --$fdata['orderby'];
-            } else {
-                $orderby = '`lp_date` DESC';
-            }
-            if (2 == $fdata['orderby']) {
-                $orderby = '`id` ' . $orderby;
-            } elseif (4 == $fdata['orderby']) {
-                $orderby = '`title` ' . $orderby;
-            } else {
-                $orderby = '`lp_date` ' . $orderby;
-            }
-        }
-
         // Topics.
-        $result = $DB->safespecial(
-            <<<EOT
-SELECT t.`id` AS `id`,t.`title` AS `title`,t.`subtitle` AS `subtitle`,
-    t.`lp_uid` AS `lp_uid`,UNIX_TIMESTAMP(t.`lp_date`) AS `lp_date`,
-    t.`fid` AS `fid`,t.`auth_id` AS `auth_id`,t.`replies` AS `replies`,
-    t.`views` AS `views`,t.`pinned` AS `pinned`,
-    t.`poll_choices` AS `poll_choices`,t.`poll_results` AS `poll_results`,
-    t.`poll_q` AS `poll_q`,t.`poll_type` AS `poll_type`,
-    t.`summary` AS `summary`,t.`locked` AS `locked`,
-    UNIX_TIMESTAMP(t.`date`) AS `date`,t.`op` AS `op`,
-    t.`cal_event` AS `cal_event`,
-    m.`display_name` AS `lp_name`,m.`group_id` AS `lp_gid`,
-    m2.`group_id` AS `auth_gid`,m2.`display_name` AS `auth_name`
-FROM (
-    SELECT `id`,`title`,`subtitle`,`lp_uid`,`lp_date`,`fid`,`auth_id`,`replies`,`views`,
-    `pinned`,`poll_choices`,`poll_results`,`poll_q`,`poll_type`,`summary`,
-    `locked`,UNIX_TIMESTAMP(`date`) AS `date`,`op`,`cal_event`
-    FROM %t
-    WHERE `fid`=?
-    ORDER BY `pinned` DESC,${orderby}
-    LIMIT ?,?
-) t
-LEFT JOIN %t m
-    ON t.`lp_uid` = m.`id`
-LEFT JOIN %t m2
-ON t.`auth_id` = m2.`id`
-EOT
-            ,
-            array('topics', 'members', 'members'),
-            $fid,
-            $this->page * $this->numperpage,
-            $this->numperpage
-        );
+        $result = $DB->fetchResource("topics", [
+            "fid" => $fid,
+            "page" => $this->page,
+            "orderBy" => $fdata['orderby']
+        ]);
 
-        while ($f = $DB->arow($result)) {
+        foreach ($result as $f) {
             $pages = '';
             if ($f['replies'] > 9) {
                 foreach ($JAX->pages(ceil(($f['replies'] + 1) / 10), 1, 10) as $v) {
@@ -241,7 +194,7 @@ EOT
                 // 2
                 $JAX->wordfilter($f['subtitle']),
                 // 3
-                $PAGE->meta('user-link', $f['auth_id'], $f['auth_gid'], $f['auth_name']),
+                $PAGE->meta('user-link', $f['auth_id'], $f['author']['group_id'], $f['author']['display_name']),
                 // 4
                 $f['replies'],
                 // 5
@@ -249,7 +202,7 @@ EOT
                 // 6
                 $JAX->date($f['lp_date']),
                 // 7
-                $PAGE->meta('user-link', $f['lp_uid'], $f['lp_gid'], $f['lp_name']),
+                $PAGE->meta('user-link', $f['lp_uid'], $f['last_poster']['group_id'], $f['last_poster']['display_name']),
                 // 8
                 ($f['pinned'] ? 'pinned' : '') . ' ' . ($f['locked'] ? 'locked' : ''),
                 // 9
@@ -304,13 +257,10 @@ EOT
         if ($fdata['path']) {
             $pathids = explode(' ', $fdata['path']);
             $forums = array();
-            $result = $DB->safeselect(
-                '`title`,`id`',
-                'forums',
-                'WHERE `id` IN ?',
-                $pathids
-            );
-            while ($f = $DB->arow($result)) {
+            $result = $DB->fetchResource('forums', [
+                'ids' => implode(',', $pathids)
+            ]);
+            foreach ($result as $f) {
                 $forums[$f['id']] = array($f['title'], '?act=vf' . $f['id']);
             }
             foreach ($pathids as $v) {

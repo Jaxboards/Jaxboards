@@ -28,14 +28,12 @@ initResources({
   config
 });
 
-app.use(router.routes()).use(router.allowedMethods());
-
 // Logging
-// app.use(async (ctx, next) => {
-//   await next();
-//   const rt = ctx.response.get('X-Response-Time');
-//   console.log(`${ctx.method} ${ctx.url} - ${rt}`);
-// });
+app.use(async (ctx, next) => {
+  await next();
+  const rt = ctx.response.get('X-Response-Time');
+  console.log(`${ctx.method} ${ctx.url} - ${rt}`);
+});
 
 app.use(async (ctx, next) => {
   const start = Date.now();
@@ -43,5 +41,7 @@ app.use(async (ctx, next) => {
   const ms = Date.now() - start;
   ctx.set('X-Response-Time', `${ms}ms`);
 });
+
+app.use(router.routes()).use(router.allowedMethods());
 
 app.listen(3000);

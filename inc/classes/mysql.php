@@ -687,10 +687,11 @@ EOT
     {
         $qp = '';
         if ($queryParams) {
-            $qp = '?';
+            $qp = [];
             foreach ($queryParams as $k => $v) {
-                $qp .= $k . '=' . $v;
+                $qp[] = $k . '=' . $v;
             }
+            $qp = '?' . implode('&', $qp);
         }
 
         return json_decode(file_get_contents("http://localhost:3000/$path$qp"), true);
