@@ -2,7 +2,7 @@ const modelModules = {
   Category: require('./category'),
   Forum: require('./forum'),
   Member: require('./member'),
-  MemberGroups: require('./member_groups'),
+  MemberGroup: require('./member_group'),
   Topic: require('./topic'),
   Session: require('./session')
 };

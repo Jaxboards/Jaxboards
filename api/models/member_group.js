@@ -41,7 +41,7 @@ module.exports = {
         }
       },
       {
-        modelName: 'member_groups',
+        modelName: 'member_group',
         sequelize,
         timestamps: false
       }

@@ -73,8 +73,8 @@ module.exports = {
     );
   },
 
-  setAssociations({ Member, MemberGroups }) {
-    Member.belongsTo(MemberGroups, { foreignKey: 'group_id' });
+  setAssociations({ Member, MemberGroup }) {
+    Member.belongsTo(MemberGroup, { foreignKey: 'group_id' });
   },
 
   model: MemberModel

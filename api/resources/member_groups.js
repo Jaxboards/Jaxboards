@@ -1,9 +1,9 @@
 const BaseResource = require('./resource');
-const MemberGroups = require('../models/member_groups').model;
+const MemberGroup = require('../models/member_group').model;
 
 class MemberGroupsResource extends BaseResource {
   getModel() {
-    return super.getModel(MemberGroups);
+    return super.getModel(MemberGroup);
   }
 
   findAll(searchQuery = {}) {
