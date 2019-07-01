@@ -13,4 +13,4 @@
  *
  * @link https://github.com/Jaxboards/Jaxboards Jaxboards on Github
  */
-$CFG = json_decode(file_get_contents('config.json'), true);
+$CFG = json_decode(file_get_contents(__DIR__.'/config.json'), true);
