@@ -683,8 +683,16 @@ EOT
     /**
      * Compat: Fetch resources from local node server
      */
-    public function fetchResource($path)
+    public function fetchResource($path, $queryParams = null)
     {
-        return json_decode(file_get_contents("http://localhost:3000/$path"), true);
+        $qp = '';
+        if ($queryParams) {
+            $qp = '?';
+            foreach ($queryParams as $k => $v) {
+                $qp .= $k . '=' . $v;
+            }
+        }
+
+        return json_decode(file_get_contents("http://localhost:3000/$path$qp"), true);
     }
 }

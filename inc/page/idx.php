@@ -61,12 +61,8 @@ class IDX
             }
         }
         $this->mods = array_keys($this->mods);
-        $catq = $DB->safeselect(
-            '`id`,`title`,`order`',
-            'categories',
-            'ORDER BY `order`,`title` ASC'
-        );
-        while ($r = $DB->arow($catq)) {
+        $catq = $DB->fetchResource('categories');
+        foreach ($catq as $r) {
             if (!empty($data[$r['id']])) {
                 $page .= $PAGE->collapsebox(
                     $r['title'],
@@ -109,18 +105,15 @@ class IDX
         global $DB,$PAGE;
         if (!$this->moderatorinfo) {
             $this->moderatorinfo = array();
-            $result = $DB->safeselect(
-                '`id`,`display_name`,`group_id`',
-                '`members`',
-                'WHERE `id` IN ?',
-                $this->mods
-            );
-            while ($f = $DB->arow($result)) {
+            $result = $DB->fetchResource('members', [
+                'ids' => $this->mods
+            ]);
+            foreach ($result as $row) {
                 $this->moderatorinfo[$f['id']] = $PAGE->meta(
                     'user-link',
-                    $f['id'],
-                    $f['group_id'],
-                    $f['display_name']
+                    $row['id'],
+                    $row['group_id'],
+                    $row['display_name']
                 );
             }
         }
@@ -228,42 +221,10 @@ EOT
         $legend = '';
         $page = '';
         $userstoday = '';
-        $result = $DB->safespecial(
-            <<<'EOT'
-SELECT s.`posts` AS `posts`,s.`topics` AS `topics`,s.`members` AS `members`,
-	s.`most_members` AS `most_members`,
-	s.`most_members_day` AS `most_members_day`,
-	s.`last_register` AS `last_register`,m.`group_id` AS `group_id`,
-	m.`display_name` AS `display_name`
-FROM %t s
-LEFT JOIN %t m
-ON s.`last_register`=m.`id`
-EOT
-            ,
-            array('stats', 'members')
-        );
-        $stats = $DB->arow($result);
-        $DB->disposeresult($result);
-
-        $result = $DB->safespecial(
-            <<<'EOT'
-SELECT UNIX_TIMESTAMP(MAX(s.`last_update`)) AS `last_update`,m.`id` AS `id`,
-    m.`group_id` AS `group_id`,m.`display_name` AS `name`,
-    CONCAT(MONTH(m.`birthdate`),' ',DAY(m.`birthdate`)) AS `birthday`,s.`hide` AS `hide`,
-    UNIX_TIMESTAMP(s.`read_date`) AS `read_date`
-FROM %t s
-LEFT JOIN %t m
-    ON s.`uid`=m.`id`
-WHERE s.`uid`
-GROUP BY s.`uid`
-ORDER BY `name`
-EOT
-            ,
-            array('session', 'members')
-        );
+        $result = $DB->fetchResource('stats');
         $nuserstoday = 0;
         $today = date('n j');
-        while ($f = $DB->arow($result)) {
+        foreach ($result as $f) {
             if (!$f['id']) {
                 continue;
             }
@@ -288,12 +249,11 @@ EOT;
         }
         $userstoday = mb_substr($userstoday, 0, -2);
         $usersonline = $this->getusersonlinelist();
-        $result = $DB->safeselect(
-            '`id`,`title`',
-            'member_groups',
-            'WHERE `legend`=1 ORDER BY `title`'
-        );
-        while ($row = $DB->arow($result)) {
+
+        $result = $DB->fetchResource('member_groups', [
+            'legend' => 1
+        ]);
+        foreach ($result as $row) {
             $legend .= '<a href="?" class="mgroup' . $row['id'] . '">' .
                 $row['title'] . '</a> ';
         }
@@ -402,23 +362,11 @@ EOT;
     public function updateLastPosts()
     {
         global $DB,$SESS,$PAGE,$JAX;
-        $result = $DB->safespecial(
-            <<<'EOT'
-SELECT f.`id` AS `id`,f.`lp_tid` AS `lp_tid`,f.`lp_topic` AS `lp_topic`,
-    UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,f.`lp_uid` AS `lp_uid`,
-    f.`topics` AS `topics`,f.`posts` AS `posts`,m.`display_name` AS `lp_name`,
-    m.`group_id` AS `lp_gid`
-FROM %t f
-LEFT JOIN %t m
-    ON f.`lp_uid`=m.`id`
-WHERE f.`lp_date`>=?
-EOT
-            ,
-            array('forums', 'members'),
-            date('Y-m-d H:i:s', $JAX->pick($SESS->last_update, time()))
-        );
+        $result = $DB->fetchResource('forums', [
+            'lp_date' => date('Y-m-d H:i:s', $JAX->pick($SESS->last_update, time()))
+        ]);
 
-        while ($f = $DB->arow($result)) {
+        foreach ($result as $f) {
             $PAGE->JS('addclass', '#fid_' . $f['id'], 'unread');
             $PAGE->JS(
                 'update',

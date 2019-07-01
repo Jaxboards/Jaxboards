@@ -41,7 +41,7 @@
     <exclude name="Squiz.Commenting.BlockComment.InvalidEndChar" />
   </rule>
   <!-- Make sure this works with PHP 5.3 -->
-  <config name="testVersion" value="5.3-" />
+  <config name="testVersion" value="5.4-" />
   <rule ref="PHPCompatibility">
     <!-- Exclude polyfilled password_hash related functions from compatibility check -->
     <exclude name="PHPCompatibility.PHP.NewConstants.password_bcryptFound" />

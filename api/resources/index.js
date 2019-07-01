@@ -1,8 +1,18 @@
+const categories = require('./categories');
 const forums = require('./forums');
+const member_groups = require('./member_groups');
+const members = require('./members');
+const sessions = require('./sessions');
+const stats = require('./stats');
 
 module.exports = function index({ sequelize, router, config }) {
   return [
-    forums
+    categories,
+    forums,
+    members,
+    member_groups,
+    sessions,
+    stats,
   ].map(resource => {
     const instance = new resource({ sequelize, config });
     instance.addRoutes(router);
