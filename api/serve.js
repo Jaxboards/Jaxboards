@@ -4,6 +4,7 @@ const Sequelize = require('sequelize');
 const config = require('../config.json');
 
 const initResources = require('./resources');
+const initModels = require('./models');
 
 // Get a DB connection
 const sequelize = new Sequelize(
@@ -25,11 +26,14 @@ sequelize.prefixTableNames = function prefixTableNames(tableNames) {
   return tableNames.map(name => `${config.sql_prefix}_${name}`);
 }
 
+// Set up Sequelize
+initModels(sequelize);
 initResources({
   sequelize,
   router,
   config
 });
+
 
 app
   .use(router.routes())

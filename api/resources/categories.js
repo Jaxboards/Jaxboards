@@ -1,14 +1,15 @@
 const BaseResource = require('./resource');
+const Category = require('../models/category').model;
 
 class CategoryResource extends BaseResource {
-  getAll() {
-    const { sequelize } = this;
-    const [categories] = sequelize.prefixTableNames(['categories']);
+  getModel() {
+    return super.getModel(Category);
+  }
 
-    return sequelize.query(
-      `SELECT \`id\`,\`title\`,\`order\` FROM ${categories} ORDER BY \`order\`,\`title\` ASC`,
-      { type: sequelize.QueryTypes.SELECT }
-    );
+  getAll() {
+    return this.getModel().findAll({
+      order: ['order', 'title']
+    });
   }
 
   addRoutes(router) {

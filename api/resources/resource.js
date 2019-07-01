@@ -3,4 +3,8 @@ module.exports = class Resource {
     this.sequelize = sequelize;
     this.config = config;
   }
+
+  getModel(model) {
+    return model.schema(this.config.sql_prefix, { schemaDelimiter: '_' });
+  }
 };
