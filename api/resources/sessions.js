@@ -3,7 +3,7 @@ const BaseResource = require('./resource');
 class SessionResource extends BaseResource {
   getAll() {
     const { sequelize } = this;
-    const [session, members] = sequelize.prefixTableNames(['session', 'members']);
+    const [session, members] = this.prefixTableNames('session', 'members');
 
     return sequelize.query(`
       SELECT

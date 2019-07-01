@@ -5,7 +5,7 @@ const members = require('./members');
 const sessions = require('./sessions');
 const stats = require('./stats');
 
-module.exports = function index({ sequelize, router, config }) {
+module.exports = function initResources({ sequelize, router, config }) {
   return [
     categories,
     forums,

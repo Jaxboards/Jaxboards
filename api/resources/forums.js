@@ -3,7 +3,7 @@ const BaseResource = require('./resource');
 class ForumResource extends BaseResource {
   getAll() {
     const { sequelize } = this;
-    const [forums, members] = sequelize.prefixTableNames(['forums', 'members']);
+    const [forums, members] = this.prefixTableNames('forums', 'members');
 
     return sequelize.query(`
       SELECT f.\`id\` AS \`id\`,
@@ -27,7 +27,7 @@ class ForumResource extends BaseResource {
 
   findAll(searchQuery = {}) {
     const { sequelize } = this;
-    const [forums, members] = sequelize.prefixTableNames(['forums', 'members']);
+    const [forums, members] = this.prefixTableNames('forums', 'members');
 
     if (searchQuery.lp_date) {
       return sequelize.query(`

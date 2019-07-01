@@ -3,7 +3,7 @@ const BaseResource = require('./resource');
 class StatsResource extends BaseResource {
   getAll() {
     const { sequelize } = this;
-    const [stats, members] = sequelize.prefixTableNames(['stats', 'members']);
+    const [stats, members] = this.prefixTableNames('stats', 'members');
 
     return sequelize.query(
       `SELECT s.\`posts\` AS \`posts\`,s.\`topics\` AS \`topics\`,s.\`members\` AS \`members\`,

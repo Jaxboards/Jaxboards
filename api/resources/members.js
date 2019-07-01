@@ -3,7 +3,7 @@ const BaseResource = require('./resource');
 class MembersResource extends BaseResource {
   batchGet(ids) {
     const { sequelize } = this;
-    const [members] = sequelize.prefixTableNames(['members']);
+    const [members] = this.prefixTableNames('members');
 
     // TODO: Sanitize ids or figure out how to construct batch get query with sequelize
     return sequelize.query(

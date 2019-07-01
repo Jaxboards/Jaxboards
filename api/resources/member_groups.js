@@ -4,7 +4,7 @@ class MemberGroupsResource extends BaseResource {
 
   findAll(searchQuery = {}) {
     const { sequelize } = this;
-    const [member_groups] = sequelize.prefixTableNames(['member_groups']);
+    const [member_groups] = this.prefixTableNames('member_groups');
 
     if (searchQuery.legend) {
       return sequelize.query(`

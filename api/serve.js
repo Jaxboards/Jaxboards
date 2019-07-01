@@ -6,6 +6,9 @@ const config = require('../config.json');
 const initResources = require('./resources');
 const initModels = require('./models');
 
+const app = new Koa();
+const router = new Router();
+
 // Get a DB connection
 const sequelize = new Sequelize(
   config.sql_db,
@@ -16,15 +19,6 @@ const sequelize = new Sequelize(
     dialect: 'mysql'
   }
 );
-
-const app = new Koa();
-const router = new Router();
-
-// HACK: Add table prefix helper to Sequelize.
-// This can possibly be removed after we convert the MySQL queries to ORM
-sequelize.prefixTableNames = function prefixTableNames(tableNames) {
-  return tableNames.map(name => `${config.sql_prefix}_${name}`);
-}
 
 // Set up Sequelize
 initModels(sequelize);
