@@ -403,7 +403,7 @@ EOT
             // Add per-forum moderator.
             if (is_numeric($JAX->p['modid'])) {
                 $modid = $JAX->p['modid'];
-                $result = $DB->fetchResource("members/modid")[0];
+                $result = $DB->fetchResource("member/$modid");
                 if ($result) {
                     if (false === array_search(
                         $JAX->p['modid'],

@@ -15,16 +15,13 @@ class MemberGroupsResource extends BaseResource {
         }
       });
     }
-    return [];
+
+    return this.getModel().findAll();
   }
 
   addRoutes(router) {
     router.get('/member_groups', async ctx => {
-      if (ctx.query.legend) {
-        ctx.body = await this.findAll({
-          legend: true
-        });
-      }
+        ctx.body = await this.findAll(ctx.query);
     });
   }
 }

@@ -106,10 +106,10 @@ class IDX
         if (!$this->moderatorinfo) {
             $this->moderatorinfo = array();
             $result = $DB->fetchResource('members', [
-                'ids' => $this->mods
+                'ids' => implode(',', $this->mods)
             ]);
             foreach ($result as $row) {
-                $this->moderatorinfo[$f['id']] = $PAGE->meta(
+                $this->moderatorinfo[$row['id']] = $PAGE->meta(
                     'user-link',
                     $row['id'],
                     $row['group_id'],
@@ -117,11 +117,13 @@ class IDX
                 );
             }
         }
+
+        $r = [];
         foreach (explode(',', $modids) as $v) {
-            $r .= $this->moderatorinfo[$v] . $PAGE->meta('idx-ledby-splitter');
+            $r[] = $this->moderatorinfo[$v];
         }
 
-        return mb_substr($r, 0, -mb_strlen($PAGE->meta('idx-ledby-splitter')));
+        return implode($PAGE->meta('idx-ledby-splitter'), $r);
     }
 
     public function buildTable($a)
