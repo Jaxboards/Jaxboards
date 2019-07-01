@@ -38,7 +38,7 @@ module.exports = {
         can_view_fullprofile: {
           type: Sequelize.BOOLEAN,
           defaultValue: true
-        },
+        }
       },
       {
         modelName: 'member_groups',

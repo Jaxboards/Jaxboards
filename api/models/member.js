@@ -49,16 +49,16 @@ module.exports = {
         nowordfilter: Sequelize.BOOLEAN,
         ip: Sequelize.STRING(50),
         mod: Sequelize.BOOLEAN,
-        wysiwyg: Sequelize.BOOLEAN,
+        wysiwyg: Sequelize.BOOLEAN
       },
       {
         indexes: [
           {
-            fields: ['display_name'],
+            fields: ['display_name']
           },
           {
-            fields: ['group_id'],
-          },
+            fields: ['group_id']
+          }
         ],
         defaultScope: {
           // Private fields

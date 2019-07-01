@@ -28,10 +28,7 @@ initResources({
   config
 });
 
-
-app
-  .use(router.routes())
-  .use(router.allowedMethods());
+app.use(router.routes()).use(router.allowedMethods());
 
 // Logging
 // app.use(async (ctx, next) => {

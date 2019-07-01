@@ -28,19 +28,19 @@ module.exports = {
         subtitle: Sequelize.TEXT,
         title: Sequelize.STRING,
         topics: Sequelize.INTEGER,
-        trashcan: Sequelize.BOOLEAN,
+        trashcan: Sequelize.BOOLEAN
       },
       {
         indexes: [
           {
-            fields: ['cat_id'],
+            fields: ['cat_id']
           },
           {
-            fields: ['lp_uid'],
+            fields: ['lp_uid']
           },
           {
-            fields: ['lp_tid'],
-          },
+            fields: ['lp_tid']
+          }
         ],
         modelName: 'forum',
         sequelize,

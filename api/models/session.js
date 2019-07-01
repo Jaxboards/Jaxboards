@@ -1,7 +1,4 @@
 const Sequelize = require('sequelize');
-const Category = require('./category').model;
-const Topic = require('./topic').model;
-const Member = require('./member').model;
 
 class SessionModel extends Sequelize.Model {}
 
@@ -12,7 +9,7 @@ module.exports = {
         id: {
           type: Sequelize.STRING(200),
           allowNull: false,
-          primaryKey: true,
+          primaryKey: true
         },
         uid: Sequelize.INTEGER,
         ip: Sequelize.STRING(50),
@@ -29,14 +26,10 @@ module.exports = {
         forumsread: Sequelize.BLOB,
         topicsread: Sequelize.BLOB,
         read_date: Sequelize.DATE,
-        hide: Sequelize.BOOLEAN,
+        hide: Sequelize.BOOLEAN
       },
       {
-        indexes: [
-          {
-            fields: ['uid'],
-          },
-        ],
+        indexes: [{ fields: ['uid'] }],
         defaultScope: {
           attributes: {
             // Hide IP by default
@@ -52,7 +45,7 @@ module.exports = {
   },
 
   setAssociations({ Session, Member }) {
-    Session.belongsTo(Member, { foreignKey: 'uid', onDelete: 'CASCADE' })
+    Session.belongsTo(Member, { foreignKey: 'uid', onDelete: 'CASCADE' });
   },
 
   model: SessionModel

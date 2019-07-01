@@ -21,7 +21,7 @@ class MemberGroupsResource extends BaseResource {
 
   addRoutes(router) {
     router.get('/member_groups', async ctx => {
-        ctx.body = await this.findAll(ctx.query);
+      ctx.body = await this.findAll(ctx.query);
     });
   }
 }

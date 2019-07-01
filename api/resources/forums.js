@@ -21,7 +21,6 @@ class ForumResource extends BaseResource {
   }
 
   findAll(query = {}) {
-
     // TODO: Don't build our own queries
     let where;
     if (query.lp_date) {

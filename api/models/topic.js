@@ -1,5 +1,4 @@
 const Sequelize = require('sequelize');
-const Forum = require('./forum').model;
 
 class TopicModel extends Sequelize.Model {}
 
@@ -19,7 +18,7 @@ module.exports = {
         poll_choices: Sequelize.TEXT,
         poll_results: Sequelize.TEXT,
         poll_q: Sequelize.STRING,
-        poll_type: Sequelize.ENUM('','single', 'multi'),
+        poll_type: Sequelize.ENUM('', 'single', 'multi'),
         summary: Sequelize.STRING,
         locked: Sequelize.BOOLEAN,
         date: Sequelize.DATE,
@@ -28,24 +27,12 @@ module.exports = {
       },
       {
         indexes: [
-          {
-            fields: ['auth_id'],
-          },
-          {
-            fields: ['lp_date'],
-          },
-          {
-            fields: ['cal_event'],
-          },
-          {
-            fields: ['lp_uid'],
-          },
-          {
-            fields: ['fid'],
-          },
-          {
-            fields: ['op'],
-          },
+          { fields: ['auth_id'] },
+          { fields: ['lp_date'] },
+          { fields: ['cal_event'] },
+          { fields: ['lp_uid'] },
+          { fields: ['fid'] },
+          { fields: ['op'] },
           {
             type: 'FULLTEXT',
             fields: ['title']
@@ -56,18 +43,12 @@ module.exports = {
         timestamps: false
       }
     );
-
-    /**
-     * TODO: Foreign Keys
-  CONSTRAINT `blueprint_topics_ibfk_1` FOREIGN KEY (`lp_uid`) REFERENCES `blueprint_members` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `blueprint_topics_ibfk_2` FOREIGN KEY (`fid`) REFERENCES `blueprint_forums` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `blueprint_topics_ibfk_3` FOREIGN KEY (`auth_id`) REFERENCES `blueprint_members` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `blueprint_topics_ibfk_4` FOREIGN KEY (`op`) REFERENCES `blueprint_posts` (`id`) ON DELETE SET NULL
-     */
   },
 
-  setAssociations({ Forum, Topic }) {
+  setAssociations({ Forum, Topic, Member }) {
     Topic.belongsTo(Forum, { foreignKey: 'fid' });
+    Topic.belongsTo(Member, { foreignKey: 'lp_uid' });
+    Topic.belongsTo(Member, { foreignKey: 'auth_id' });
   },
 
   model: TopicModel

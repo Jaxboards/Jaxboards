@@ -18,6 +18,7 @@ Tested on Apache and Linux only.
 It is not recommended to run Jaxboards in production.
 
 ### Prerequisites
+
 - PHP 5.3.7
 - MySQL>=5.5.3
 - TLS certificate (due to hardcoded URLs in codebase)
@@ -41,7 +42,9 @@ This page gives you the option of installing the service or a standalone
 Jaxboards - pick whatever suits your needs.
 
 The install script at `Service/install.php` handles configuration and setting up a new install. It does the following:
+
 - Saves configuration settings from the installer. Mainly this is database information, but it also saves the domain you're running the board on. Basically copies `config.default.json` to `config.json` and updates the values. Here's the direct PHP code what values are being set specifically:
+
 ```php
         // Update with our settings.
         $CFG['boardname'] = 'Jaxboards';
@@ -57,6 +60,7 @@ The install script at `Service/install.php` handles configuration and setting up
         $CFG['prefix'] = $service ? '' : 'jaxboards';
         $CFG['sql_prefix'] = $CFG['prefix'] ? $CFG['prefix'] . '_' : '';
 ```
+
 - Figures out if you're installing a service (multiple boards like jaxboards.com) or a single-board install.
 - If it's a service install, install those special service tables.
 - Copy over the MySQL tables here. Service installs have an additional step of adding each board installed to the directory table. Once the database is imported, the admin user is created as well.
