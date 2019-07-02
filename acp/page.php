@@ -164,10 +164,10 @@ class PAGE
     {
         $data_string = json_encode($data);
         $file = fopen($page, $mode);
-        fwrite($file, $write);
+        fwrite($file, $data_string);
         fclose($file);
 
-        return $write;
+        return $data_string;
     }
 
     public function writeCFG($data)
