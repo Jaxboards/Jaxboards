@@ -17,12 +17,6 @@ class StatsResource extends BaseResource {
       { type: sequelize.QueryTypes.SELECT }
     );
   }
-
-  addRoutes(router) {
-    router.get('/stats', async ctx => {
-      ctx.body = await this.findAll();
-    });
-  }
 }
 
-module.exports = StatsResource;
+module.exports = new StatsResource();

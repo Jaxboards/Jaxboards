@@ -5,6 +5,7 @@ const config = require('../config.json');
 
 const initResources = require('./resources');
 const initModels = require('./models');
+const routes = require('./routes');
 
 const app = new Koa();
 const router = new Router();
@@ -20,13 +21,15 @@ const sequelize = new Sequelize(
   }
 );
 
-// Set up Sequelize
+// Initialize data layer
 initModels(sequelize);
 initResources({
   sequelize,
-  router,
   config
 });
+
+// Set up Routing
+routes(router);
 
 // Logging
 app.use(async (ctx, next) => {

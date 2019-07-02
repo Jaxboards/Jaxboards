@@ -20,7 +20,7 @@ class ForumResource extends BaseResource {
     });
   }
 
-  findAll(query = {}) {
+  findAll(query) {
     let where;
 
     // Batch Get
@@ -63,16 +63,6 @@ class ForumResource extends BaseResource {
       where
     });
   }
-
-  addRoutes(router) {
-    router.get('/forums', async ctx => {
-      ctx.body = await this.findAll(ctx.query);
-    });
-
-    router.get('/forum/:id', async ctx => {
-      ctx.body = await this.find(ctx.params.id);
-    });
-  }
 }
 
-module.exports = ForumResource;
+module.exports = new ForumResource();

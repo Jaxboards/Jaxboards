@@ -1,6 +1,8 @@
 const BaseResource = require('./resource');
 const Topic = require('../models/topic').model;
 const Member = require('../models/member').model;
+const Forum = require('../models/forum').model;
+const Category = require('../models/category').model;
 
 const NUM_TOPICS_PER_PAGE = 20;
 const ORDER_BY_MAP = [
@@ -17,7 +19,34 @@ class TopicResource extends BaseResource {
     return super.getModel(Topic);
   }
 
-  findAll(query = {}) {
+  find(id) {
+    return this.getModel().findByPk(id, {
+      include: [
+        {
+          model: super.getModel(Member),
+          as: 'last_poster',
+          attributes: ['display_name', 'group_id']
+        },
+        {
+          model: super.getModel(Member),
+          as: 'author',
+          attributes: ['display_name', 'group_id']
+        },
+        {
+          model: super.getModel(Forum),
+          as: 'forum',
+          include: [
+            {
+              model: super.getModel(Category),
+              as: 'category'
+            }
+          ]
+        }
+      ]
+    });
+  }
+
+  findAll(query) {
     const options = {
       limit: NUM_TOPICS_PER_PAGE,
       order: [
@@ -41,15 +70,17 @@ class TopicResource extends BaseResource {
       };
     }
 
+    const memberModel = super.getModel(Member);
+
     return this.getModel().findAll({
       include: [
         {
-          model: super.getModel(Member),
+          model: memberModel,
           as: 'last_poster',
           attributes: ['display_name', 'group_id']
         },
         {
-          model: super.getModel(Member),
+          model: memberModel,
           as: 'author',
           attributes: ['display_name', 'group_id']
         }
@@ -57,16 +88,6 @@ class TopicResource extends BaseResource {
       ...options
     });
   }
-
-  addRoutes(router) {
-    router.get('/topics', async ctx => {
-      ctx.body = await this.findAll(ctx.query);
-    });
-
-    router.get('/topic/:id', async ctx => {
-      ctx.body = await this.find(ctx.params.id);
-    });
-  }
 }
 
-module.exports = TopicResource;
+module.exports = new TopicResource();

@@ -15,15 +15,6 @@ class CategoryResource extends BaseResource {
       order: ['order', 'title']
     });
   }
-
-  addRoutes(router) {
-    router.get('/category/:id', async ctx => {
-      ctx.body = await this.find(ctx.params.id);
-    });
-    router.get('/categories', async ctx => {
-      ctx.body = await this.findAll();
-    });
-  }
 }
 
-module.exports = CategoryResource;
+module.exports = new CategoryResource();

@@ -1,7 +1,8 @@
 module.exports = class Resource {
-  constructor({ sequelize, config }) {
+  init({ sequelize, config }) {
     this.sequelize = sequelize;
     this.config = config;
+    return this;
   }
 
   getModel(model) {

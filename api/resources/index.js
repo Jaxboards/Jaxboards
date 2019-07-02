@@ -6,7 +6,7 @@ const sessions = require('./sessions');
 const stats = require('./stats');
 const topics = require('./topics');
 
-module.exports = function initResources({ sequelize, router, config }) {
+module.exports = function initResources({ sequelize, config }) {
   return [
     categories,
     forums,
@@ -15,9 +15,5 @@ module.exports = function initResources({ sequelize, router, config }) {
     sessions,
     stats,
     topics
-  ].map(Resource => {
-    const instance = new Resource({ sequelize, config });
-    instance.addRoutes(router);
-    return instance;
-  });
+  ].map(resource => resource.init({ sequelize, config }));
 };

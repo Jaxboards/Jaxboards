@@ -9,12 +9,6 @@ class SessionResource extends BaseResource {
   findAll() {
     return this.getModel().findAll();
   }
-
-  addRoutes(router) {
-    router.get('/sessions', async ctx => {
-      ctx.body = await this.findAll();
-    });
-  }
 }
 
-module.exports = SessionResource;
+module.exports = new SessionResource();

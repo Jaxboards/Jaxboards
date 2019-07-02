@@ -66,50 +66,28 @@ class TOPIC
         if (!$id) {
             return $PAGE->location('?');
         }
-        $result = $DB->safespecial(
-            <<<'EOT'
-SELECT a.`title` AS `topic_title`,a.`locked` AS `locked`,
-    UNIX_TIMESTAMP(a.`lp_date`) AS `lp_date`,
-    b.`title` AS `forum_title`,b.`perms` AS `fperms`,
-    c.`id` AS `cat_id`,c.`title` AS `cat_title`,a.`fid` AS `fid`,
-    a.`poll_q` AS `poll_q`,a.`poll_type` AS `poll_type`,
-    a.`poll_choices` AS `poll_choices`,a.`poll_results` AS `poll_results`,
-    a.`subtitle` AS `subtitle`
-FROM %t a
-LEFT JOIN %t b
-    ON a.`fid`=b.`id`
-LEFT JOIN %t AS c
-    ON b.`cat_id`=c.`id`
-WHERE a.`id`=?
-    LIMIT 1
-EOT
-            ,
-            array('topics', 'forums', 'categories'),
-            $id
-        );
-        $topicdata = $DB->arow($result);
-        $DB->disposeresult($result);
+        $topicdata = $DB->fetchResource("topics/$id");
 
         if (!$topicdata) {
             // Put the user back on the index and skip these next few lines.
             return $PAGE->location('?');
         }
-        $topicdata['topic_title'] = $JAX->wordfilter($topicdata['topic_title']);
+        $topicdata['title'] = $JAX->wordfilter($topicdata['title']);
         $topicdata['subtitle'] = $JAX->wordfilter($topicdata['subtitle']);
-        $topicdata['fperms'] = $JAX->parseperms(
-            $topicdata['fperms'],
+        $topicdata['forum']['perms'] = $JAX->parseperms(
+            $topicdata['forum']['perms'],
             $USER ? $USER['group_id'] : 3
         );
         if ($topicdata['lp_date'] > $USER['last_visit']) {
             $this->markread($id);
         }
-        if (!$topicdata['fperms']['read']) {
+        if (!$topicdata['forum']['perms']['read']) {
             // No business being here.
             return $PAGE->location('?');
         }
 
-        $PAGE->append('TITLE', ' -> ' . $topicdata['topic_title']);
-        $SESS->location_verbose = "In topic '" . $topicdata['topic_title'] . "'";
+        $PAGE->append('TITLE', ' -> ' . $topicdata['title']);
+        $SESS->location_verbose = "In topic '" . $topicdata['title'] . "'";
 
         // Output RSS instead.
         if (isset($JAX->b['fmt']) && 'RSS' == $JAX->b['fmt']) {
@@ -117,7 +95,7 @@ EOT
             $link = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'];
             $feed = new rssfeed(
                 array(
-                    'title' => $topicdata['topic_title'],
+                    'title' => $topicdata['title'],
                     'description' => $topicdata['subtitle'],
                     'link' => $link . '?act=vt' . $id,
                 )
@@ -154,9 +132,9 @@ EOT
         // Fix this to work with subforums.
         $PAGE->path(
             array(
-                $topicdata['cat_title'] => '?act=vc' . $topicdata['cat_id'],
-                $topicdata['forum_title'] => '?act=vf' . $topicdata['fid'],
-                $topicdata['topic_title'] => "?act=vt${id}",
+                $topicdata['forum']['category']['title'] => '?act=vc' . $topicdata['forum']['category']['id'],
+                $topicdata['forum']['title'] => '?act=vf' . $topicdata['forum']['id'],
+                $topicdata['title'] => "?act=vt${id}",
             )
         );
 
@@ -209,7 +187,7 @@ EOT
         $page = $PAGE->meta('topic-table', $this->postsintooutput());
         $page = $PAGE->meta(
             'topic-wrapper',
-            $topicdata['topic_title'] .
+            $topicdata['title'] .
             ($topicdata['subtitle'] ? ', ' . $topicdata['subtitle'] : ''),
             $page,
             '<a href="./?act=vt' . $id . '&amp;fmt=RSS" class="social rss">RSS</a>'
@@ -217,14 +195,14 @@ EOT
 
         // Add buttons.
         $buttons = array(
-            $topicdata['fperms']['start'] ?
+            $topicdata['forum']['perms']['start'] ?
             "<a href='?act=post&fid=" . $topicdata['fid'] . "'>" .
             ($PAGE->meta(
                 $PAGE->metaexists('button-newtopic') ?
                 'button-newtopic' : 'topic-button-newtopic'
             )) . '</a>' :
             '&nbsp;',
-            $topicdata['fperms']['reply']
+            $topicdata['forum']['perms']['reply']
             && (!$topicdata['locked']
             || $PERMS['can_override_locked_topics']) ?
             "<a href='?act=vt${id}&qreply=1'>" .
@@ -232,7 +210,7 @@ EOT
                 $PAGE->metaexists('button-qreply') ?
                 'button-qreply' : 'topic-button-qreply'
             )) : '',
-            $topicdata['fperms']['reply']
+            $topicdata['forum']['perms']['reply']
             && (!$topicdata['locked']
             || $PERMS['can_override_locked_topics']) ?
             "<a href='?act=post&tid=${id}'>" .
@@ -375,14 +353,7 @@ EOT
             }
             $SESS->delvar('multiquote');
         }
-        $result = $DB->safeselect(
-            'title',
-            'topics',
-            'WHERE `id`=?',
-            $id
-        );
-        $tdata = $DB->arow($result);
-        $DB->disposeresult($result);
+        $tdata = $DB->fetchResource("topics/$id");
 
         $PAGE->JS(
             'window',
