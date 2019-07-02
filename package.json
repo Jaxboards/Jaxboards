@@ -13,7 +13,7 @@
     "prettier": "prettier --write --single-quote \"**/*.{{t,j}s{,x,on},{c,sa,sc,le}ss,vue,md,y{,a}ml,graphql}\"",
     "stylelint": "stylelint \"./**/*.{c,sa,sc,le}ss\"",
     "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\"",
-    "start": "node api/serve"
+    "start": "node node-server/serve"
   },
   "husky": {
     "hooks": {
@@ -37,6 +37,7 @@
     "stylelint-config-standard": "^18.2.0"
   },
   "dependencies": {
+    "handlebars": "^4.1.2",
     "koa": "^2.7.0",
     "koa-router": "^7.4.0",
     "mysql2": "^1.6.5",

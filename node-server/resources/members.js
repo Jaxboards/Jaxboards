@@ -11,7 +11,7 @@ class MembersResource extends BaseResource {
     return this.getModel().findByPk(id);
   }
 
-  findAll(query) {
+  findAll(query = {}) {
     // Batch get
     if (query.ids) {
       const ids = query.ids.split(',').map(Number);

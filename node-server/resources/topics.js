@@ -46,7 +46,7 @@ class TopicResource extends BaseResource {
     });
   }
 
-  findAll(query) {
+  findAll(query = {}) {
     const options = {
       limit: NUM_TOPICS_PER_PAGE,
       order: [

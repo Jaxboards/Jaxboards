@@ -6,7 +6,7 @@ class MemberGroupsResource extends BaseResource {
     return super.getModel(MemberGroup);
   }
 
-  findAll(query) {
+  findAll(query = {}) {
     if (query.legend) {
       return this.getModel().findAll({
         attributes: ['id', 'title'],

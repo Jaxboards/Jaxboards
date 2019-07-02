@@ -20,5 +20,10 @@ module.exports = {
       }
     );
   },
+
+  setAssociations({ Forum, Category }) {
+    Category.hasMany(Forum, { foreignKey: 'cat_id' });
+  },
+
   model: CategoryModel
 };

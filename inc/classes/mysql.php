@@ -694,6 +694,6 @@ EOT
             $qp = '?' . implode('&', $qp);
         }
 
-        return json_decode(file_get_contents("http://localhost:3000/$path$qp"), true);
+        return json_decode(file_get_contents("http://localhost:3000/api/$path$qp"), true);
     }
 }

@@ -20,7 +20,7 @@ class ForumResource extends BaseResource {
     });
   }
 
-  findAll(query) {
+  findAll(query = {}) {
     let where;
 
     // Batch Get

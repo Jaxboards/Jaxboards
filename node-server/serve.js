@@ -1,5 +1,4 @@
 const Koa = require('koa');
-const Router = require('koa-router');
 const Sequelize = require('sequelize');
 const config = require('../config.json');
 
@@ -8,7 +7,6 @@ const initModels = require('./models');
 const routes = require('./routes');
 
 const app = new Koa();
-const router = new Router();
 
 // Get a DB connection
 const sequelize = new Sequelize(
@@ -29,7 +27,8 @@ initResources({
 });
 
 // Set up Routing
-routes(router);
+const router = routes();
+app.use(router.routes()).use(router.allowedMethods());
 
 // Logging
 app.use(async (ctx, next) => {
@@ -44,7 +43,5 @@ app.use(async (ctx, next) => {
   const ms = Date.now() - start;
   ctx.set('X-Response-Time', `${ms}ms`);
 });
-
-app.use(router.routes()).use(router.allowedMethods());
 
 app.listen(3000);

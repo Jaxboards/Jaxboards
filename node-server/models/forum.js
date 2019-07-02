@@ -48,7 +48,7 @@ module.exports = {
 
   setAssociations({ Forum, Category, Member, Topic }) {
     Forum.belongsTo(Category, { foreignKey: 'cat_id' });
-    Forum.belongsTo(Topic, { foreignKey: 'lp_tid' });
+    Forum.belongsTo(Topic, { foreignKey: 'lp_tid', as: 'last_topic' });
     Forum.belongsTo(Member, { foreignKey: 'lp_uid', as: 'last_poster' });
   },
 
