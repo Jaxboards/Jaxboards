@@ -187,7 +187,8 @@ if (!$PAGE->jsaccess) {
 
     $PAGE->append(
         'CSS',
-        ''
+        '<link rel="stylesheet" type="text/css" href="' . THEMEPATHURL .
+        'css.css" />'
     );
     if ($PAGE->meta('favicon')) {
         $PAGE->append(
