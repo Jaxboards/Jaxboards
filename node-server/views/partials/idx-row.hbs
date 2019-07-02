@@ -1,4 +1,4 @@
-<tr id="fid_{{forum.id}}" class={{if forum.isRead "read" "unread"}}>
+<tr id="fid_{{forum.id}}" class="{{#if forum.isRead}}read{{else}}unread{{/if}}">
   <td class="f_icon" rowspan="2">
       {{!-- TODO: read / unread functionality --}}
       {{#if forum.isRead}}

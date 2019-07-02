@@ -29,7 +29,11 @@ class CategoryResource extends BaseResource {
               model: super.getModel(Member),
               as: 'last_poster'
             }
-          ]
+          ],
+          // Filter out subforums
+          where: {
+            path: ''
+          }
         }
       ];
     }
