@@ -2,14 +2,14 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "autofix": "npm run prettier && npm run eslint-fix && npm run stylelint-fix && npm run phpcbf",
+    "autofix": "yarn prettier && yarn eslint-fix && yarn stylelint-fix && yarn phpcbf",
     "build": "rollup -c",
     "eslint": "eslint 'Script/**/*.js'",
     "eslint-fix": "eslint 'Script/**/*.js' --fix",
     "php-lint": "composer-runner -- run-script lint",
     "phpcs": "composer-runner -- run-script phpcs",
     "phpcbf": "composer-runner -- run-script phpcbf",
-    "postinstall": "composer-runner -- install",
+    "postinstall": "composer-runner -- install && yarn --cwd node-server install",
     "prettier": "prettier --write --single-quote \"**/*.{{t,j}s{,x,on},{c,sa,sc,le}ss,vue,md,y{,a}ml,graphql}\"",
     "stylelint": "stylelint \"./**/*.{c,sa,sc,le}ss\"",
     "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\"",
@@ -17,7 +17,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged && npm run php-lint"
+      "pre-commit": "lint-staged && yarn php-lint"
     }
   },
   "devDependencies": {
@@ -35,13 +35,6 @@
     "rollup": "^0.65.0",
     "stylelint": "^9.5.0",
     "stylelint-config-standard": "^18.2.0"
-  },
-  "dependencies": {
-    "handlebars": "^4.1.2",
-    "koa": "^2.7.0",
-    "koa-router": "^7.4.0",
-    "mysql2": "^1.6.5",
-    "sequelize": "^5.9.0"
   },
   "lint-staged": {
     "*.js": [

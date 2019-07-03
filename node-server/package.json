@@ -1,0 +1,42 @@
+{
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "start": "node serve"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "devDependencies": {
+    "eslint": "^5.5.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-config-prettier": "^3.0.1",
+    "eslint-import-resolver-node": "^0.3.2",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-prettier": "^3.0.0",
+    "husky": "^1.0.0",
+    "lint-staged": "^8.2.1",
+    "prettier": "^1.14.2",
+    "stylelint": "^9.5.0",
+    "stylelint-config-standard": "^18.2.0"
+  },
+  "dependencies": {
+    "handlebars": "^4.1.2",
+    "koa": "^2.7.0",
+    "koa-router": "^7.4.0",
+    "mysql2": "^1.6.5",
+    "sequelize": "^5.9.0"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ],
+    "*.css": [
+      "stylelint --fix",
+      "git add"
+    ]
+  }
+}
