@@ -81,7 +81,7 @@ function loadTemplates() {
 }
 
 function loadControllers() {
-  glob.sync(path.join(CONTROLLERS_PATH_FULL, '*.js')).forEach(file => {
+  glob.sync(path.join(CONTROLLERS_PATH_FULL, '!(*.test.js)')).forEach(file => {
     const fileName = path.basename(file, '.js');
     injections[`${CONTROLLERS_PATH}/${fileName}`] = new LazySingleton(
       require(file)
@@ -90,7 +90,7 @@ function loadControllers() {
 }
 
 function loadResources() {
-  glob.sync(path.join(RESOURCES_PATH_FULL, '*.js')).forEach(file => {
+  glob.sync(path.join(RESOURCES_PATH_FULL, '!(*.test.js)')).forEach(file => {
     const fileName = path.basename(file, '.js');
     injections[`${RESOURCES_PATH}/${fileName}`] = new LazySingleton(
       require(file)

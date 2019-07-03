@@ -2,7 +2,8 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "start": "node serve"
+    "start": "node serve",
+    "test": "jest"
   },
   "husky": {
     "hooks": {
@@ -15,8 +16,11 @@
     "eslint-config-prettier": "^3.0.1",
     "eslint-import-resolver-node": "^0.3.2",
     "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jest": "^22.7.1",
     "eslint-plugin-prettier": "^3.0.0",
     "husky": "^1.0.0",
+    "jest": "^24.8.0",
+    "jest-dom": "^3.5.0",
     "lint-staged": "^8.2.1",
     "prettier": "^1.14.2",
     "stylelint": "^9.5.0",
