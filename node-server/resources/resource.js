@@ -1,4 +1,4 @@
-module.exports = class Resource {
+class Resource {
   init({ sequelize, config }) {
     this.sequelize = sequelize;
     this.config = config;
@@ -12,4 +12,6 @@ module.exports = class Resource {
   prefixTableNames(...tableNames) {
     return tableNames.map(name => `${this.config.sql_prefix}_${name}`);
   }
-};
+}
+
+module.exports = Resource;

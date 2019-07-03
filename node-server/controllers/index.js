@@ -1,10 +1,14 @@
-const ForumsResource = require('../resources/forums');
-const CategoriesResource = require('../resources/categories');
-const StatsResource = require('../resources/stats');
-const MemberGroupsResource = require('../resources/member_groups');
 const Controller = require('./controller');
 
 class IndexController extends Controller {
+  constructor(inject) {
+    super(...arguments);
+    this.ForumsResource = inject('resources/forums');
+    this.MemberGroupsResource = inject('resources/member_groups');
+    this.CategoriesResource = inject('resources/categories');
+    this.StatsResource = inject('resources/stats');
+  }
+
   // eslint-disable-next-line class-methods-use-this
   get template() {
     return 'index';
@@ -14,12 +18,12 @@ class IndexController extends Controller {
   async model() {
     return {
       themePath: '/Themes/Default/css.css',
-      forums: await ForumsResource.findAll(),
-      categories: await CategoriesResource.findAll({
+      forums: await this.ForumsResource.findAll(),
+      categories: await this.CategoriesResource.findAll({
         full: true
       }),
-      stats: await StatsResource.findAll(),
-      memberGroups: await MemberGroupsResource.findAll({
+      stats: await this.StatsResource.findAll(),
+      memberGroups: await this.MemberGroupsResource.findAll({
         legend: true
       })
     };
@@ -31,4 +35,4 @@ class IndexController extends Controller {
   }
 }
 
-module.exports = new IndexController();
+module.exports = IndexController;

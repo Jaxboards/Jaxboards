@@ -11,4 +11,4 @@ class SessionResource extends BaseResource {
   }
 }
 
-module.exports = new SessionResource();
+module.exports = SessionResource;

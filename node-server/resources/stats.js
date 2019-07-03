@@ -19,4 +19,4 @@ class StatsResource extends BaseResource {
   }
 }
 
-module.exports = new StatsResource();
+module.exports = StatsResource;

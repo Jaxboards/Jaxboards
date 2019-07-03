@@ -1,19 +1,13 @@
-const categories = require('./categories');
-const forums = require('./forums');
-const memberGroups = require('./member_groups');
-const members = require('./members');
-const sessions = require('./sessions');
-const stats = require('./stats');
-const topics = require('./topics');
+const { inject } = require('../injections');
 
 module.exports = function initResources({ sequelize, config }) {
   return [
-    categories,
-    forums,
-    members,
-    memberGroups,
-    sessions,
-    stats,
-    topics
+    inject('resources/categories'),
+    inject('resources/forums'),
+    inject('resources/members'),
+    inject('resources/member_groups'),
+    inject('resources/sessions'),
+    inject('resources/stats'),
+    inject('resources/topics')
   ].map(resource => resource.init({ sequelize, config }));
 };

@@ -65,4 +65,4 @@ class ForumResource extends BaseResource {
   }
 }
 
-module.exports = new ForumResource();
+module.exports = ForumResource;

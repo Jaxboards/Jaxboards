@@ -90,4 +90,4 @@ class TopicResource extends BaseResource {
   }
 }
 
-module.exports = new TopicResource();
+module.exports = TopicResource;

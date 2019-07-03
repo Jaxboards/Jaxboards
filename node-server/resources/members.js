@@ -28,4 +28,4 @@ class MembersResource extends BaseResource {
   }
 }
 
-module.exports = new MembersResource();
+module.exports = MembersResource;

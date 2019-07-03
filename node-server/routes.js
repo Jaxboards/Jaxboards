@@ -1,4 +1,5 @@
 const Router = require('koa-router');
+const { inject } = require('./injections');
 const CategoriesResource = require('./resources/categories');
 const ForumsResource = require('./resources/forums');
 const MemberGroupsResource = require('./resources/member_groups');
@@ -6,8 +7,6 @@ const MembersResource = require('./resources/members');
 const SessionsResource = require('./resources/sessions');
 const StatsResource = require('./resources/stats');
 const TopicsResource = require('./resources/topics');
-
-const IndexController = require('./controllers/index');
 
 module.exports = function routes() {
   const router = new Router();
@@ -39,6 +38,6 @@ module.exports = function routes() {
   // Top level routes
   router.use('/api', apiRoutes.routes(), apiRoutes.allowedMethods());
 
-  router.get('/', renderController(IndexController));
+  router.get('/', renderController(inject('controllers/index')));
   return router;
 };

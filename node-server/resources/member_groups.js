@@ -20,4 +20,4 @@ class MemberGroupsResource extends BaseResource {
   }
 }
 
-module.exports = new MemberGroupsResource();
+module.exports = MemberGroupsResource;

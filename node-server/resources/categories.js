@@ -45,4 +45,4 @@ class CategoryResource extends BaseResource {
   }
 }
 
-module.exports = new CategoryResource();
+module.exports = CategoryResource;
