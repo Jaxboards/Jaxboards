@@ -10,6 +10,9 @@
       "pre-commit": "lint-staged"
     }
   },
+  "jest": {
+    "setupFilesAfterEnv": ["jest-dom/extend-expect"]
+  },
   "devDependencies": {
     "eslint": "^5.5.0",
     "eslint-config-airbnb-base": "^13.1.0",

@@ -2,10 +2,6 @@ const IndexController = require('./index');
 const injectionMocker = require('../test-helpers/injection-mocker');
 const { render } = require('../test-helpers/controller-helpers');
 
-// TODO: move this to test environment setup file.
-// Ref: https://jestjs.io/docs/en/configuration.html#setupfilesafterenv-array
-require('jest-dom/extend-expect');
-
 test('It renders', async () => {
   const forumId = 5;
 
