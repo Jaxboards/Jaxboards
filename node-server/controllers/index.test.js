@@ -1,25 +1,15 @@
 const IndexController = require('./index');
+const injectionMocker = require('../test-helpers/injection-mocker');
+const { render } = require('../test-helpers/controller-helpers');
 
 // TODO: move this to test environment setup file.
 // Ref: https://jestjs.io/docs/en/configuration.html#setupfilesafterenv-array
 require('jest-dom/extend-expect');
 
-// const CategoryModel = require('../models/category');
-const { inject: realInject } = require('../injections');
-
-class InjectionMocker {
-  constructor(injections = {}) {
-    this.injections = injections;
-    this.inject = path => this.injections[path] || realInject(path);
-  }
-
-  register(path, injection) {
-    this.injections[path] = injection;
-  }
-}
-
 test('It renders', async () => {
-  const { inject } = new InjectionMocker({
+  const forumId = 5;
+
+  const inject = injectionMocker({
     'resources/forums': { findAll() {} },
     'resources/member_groups': { findAll() {} },
     'resources/categories': {
@@ -31,33 +21,21 @@ test('It renders', async () => {
             title: 'category b',
             forums: [
               {
-                id: 2,
+                id: forumId,
                 lp_date: '2019-07-01T18:39:48.000Z',
-                lp_topic: 'Test',
-                mods: '10',
                 subtitle: 'Forum Description',
                 title: 'Forum Title',
-                topics: 3,
+                topics: 200,
                 last_topic: {
-                  title: 'Test',
-                  subtitle: '',
-                  lp_uid: 1,
-                  lp_date: '2019-07-01T18:39:48.000Z',
-                  fid: 3,
-                  auth_id: 1,
-                  replies: 0,
-                  views: 1,
-                  summary: 'test',
-                  locked: false,
-                  date: '2019-07-01T18:39:48.000Z',
-                  op: 14,
-                  cal_event: 0
+                  id: 1,
+                  title: 'Last topic title',
+                  replies: 300
                 },
                 last_poster: {
                   id: 1,
-                  name: 'sean',
+                  name: 'Last poster',
                   group_id: 2,
-                  display_name: 'Test'
+                  display_name: 'Last poster name'
                 }
               }
             ]
@@ -68,12 +46,8 @@ test('It renders', async () => {
     'resources/stats': { findAll() {} }
   });
 
-  const injectionController = new IndexController(inject);
-
-  // TODO: pull a helper for converting DOM from HBS
-  const template = document.createElement('template');
-  template.innerHTML = await injectionController.render();
-  const dom = template.content;
+  const indexController = new IndexController(inject);
+  const dom = await render(indexController);
 
   expect(dom.querySelector('.box.collapse-box .title')).toHaveTextContent(
     'category b'
@@ -84,4 +58,12 @@ test('It renders', async () => {
   expect(
     dom.querySelector('.box.collapse-box .boardindex .forum .description')
   ).toHaveTextContent('Forum Description');
+  expect(dom.querySelector(`#fid_${forumId}_lastpost a`)).toHaveTextContent(
+    'Last topic title'
+  );
+  expect(
+    dom.querySelector(`#fid_${forumId}_lastpost .user1.mgroup2`)
+  ).toHaveTextContent('Last poster name');
+  expect(dom.querySelector(`#fid_${forumId}_topics`)).toHaveTextContent('200');
+  expect(dom.querySelector(`#fid_${forumId}_replies`)).toHaveTextContent('300');
 });
