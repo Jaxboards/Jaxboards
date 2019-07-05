@@ -3,9 +3,9 @@
     <img src="/Service/Themes/Default/icons/redirect.png" alt="redirect" />
   </td>
   <td class="forum">
-    <a href="?act=vf{{forum.id}}">
+    {{#link "forum" id=forum.id}}
       {{forum.title}}
-    </a>
+    {{/link}}
     <div class="description">
       {{forum.subtitle}}
     </div>

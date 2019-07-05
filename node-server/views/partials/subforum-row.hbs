@@ -12,18 +12,18 @@
     {{/if}}
   </td>
   <td class="forum" rowspan="2">
-    <a href="?act=vf{{forum.id}}">
+    {{#link "forum" id=forum.id}}
       {{forum.title}}
-    </a>
+    {{/link}}
     <div class="description">
       {{forum.subtitle}}
     </div>
   </td>
   <td class="last_post" colspan="2">
     Last Post:
-    <a href="?act=vt{{forum.last_topic.id}}&amp;getlast=1">
+    {{#link "topic" id=forum.last_topic.id}}
       {{forum.last_topic.title}}
-    </a>
+    {{/link}}
     <br />
     By {{> user-link user=forum.last_poster}}, {{date forum.lp_date}}
   </td>
