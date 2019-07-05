@@ -1,0 +1,38 @@
+{{!-- TODO: read / unread functionality --}}
+<tr id="fid_{{forum.id}}" class="{{#if forum.isRead}}read{{else}}unread{{/if}}">
+  <td class="f_icon" rowspan="2">
+    {{#if forum.isRead}}
+      <a id="fid_{{forum.id}}_icon" href="?act=vf{{forum.id}}&markread=1">
+        <img src="/Service/Themes/Default/icons/read.png" alt="read" />
+      </a>
+    {{else}}
+      <a id="fid_{{forum.id}}_icon">
+        <img src="/Service/Themes/Default/icons/unread.png" />
+      </a>
+    {{/if}}
+  </td>
+  <td class="forum" rowspan="2">
+    <a href="?act=vf{{forum.id}}">
+      {{forum.title}}
+    </a>
+    <div class="description">
+      {{forum.subtitle}}
+    </div>
+  </td>
+  <td class="last_post" colspan="2">
+    Last Post:
+    <a href="?act=vt{{forum.last_topic.id}}&amp;getlast=1">
+      {{forum.last_topic.title}}
+    </a>
+    <br />
+    By {{> user-link user=forum.last_poster}}, {{date forum.lp_date}}
+  </td>
+</tr>
+<tr>
+  <td class="item_1">
+    Topics: {{forum.topics}}
+  </td>
+  <td class="item_2">
+    Replies: {{forum.last_topic.replies}}
+  </td>
+</tr>

@@ -10,8 +10,11 @@ module.exports = function routes() {
   const find = resource => async ctx => {
     ctx.body = await resource.find(ctx.params.id);
   };
-  const renderController = controller => async ctx => {
-    ctx.body = await controller.render(ctx.query);
+  const renderControllers = ([
+    parentController,
+    ...childControllers
+  ]) => async ctx => {
+    ctx.body = await parentController.render(ctx, childControllers);
   };
 
   // api
@@ -31,6 +34,20 @@ module.exports = function routes() {
   // Top level routes
   router.use('/api', apiRoutes.routes(), apiRoutes.allowedMethods());
 
-  router.get('/', renderController(inject('controllers/index')));
+  router.get(
+    '/',
+    renderControllers([
+      inject('controllers/application'),
+      inject('controllers/index')
+    ])
+  );
+
+  router.get(
+    '/forum/:id',
+    renderControllers([
+      inject('controllers/application'),
+      inject('controllers/forum')
+    ])
+  );
   return router;
 };

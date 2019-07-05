@@ -14,7 +14,6 @@ class IndexController extends Controller {
     return 'index';
   }
 
-  // eslint-disable-next-line class-methods-use-this
   async model() {
     return {
       themePath: '/Themes/Default/css.css',
@@ -27,11 +26,6 @@ class IndexController extends Controller {
         legend: true
       })
     };
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  async afterModel(model) {
-    return model;
   }
 }
 

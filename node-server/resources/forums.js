@@ -3,6 +3,7 @@ const BaseResource = require('./resource');
 const Forum = require('../models/forum').model;
 const Category = require('../models/category').model;
 const Member = require('../models/member').model;
+const Topic = require('../models/topic').model;
 
 class ForumResource extends BaseResource {
   getModel() {
@@ -58,6 +59,10 @@ class ForumResource extends BaseResource {
           model: super.getModel(Member),
           as: 'last_poster',
           attributes: ['display_name', 'group_id']
+        },
+        {
+          model: super.getModel(Topic),
+          as: 'last_topic'
         }
       ],
       where

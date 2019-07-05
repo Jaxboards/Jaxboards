@@ -1,0 +1,19 @@
+{{!-- Subforums --}}
+{{#if subforums}}
+  {{#> collapse-box title="Subforums"}}
+    <table class="subindex">
+      {{#each subforums as |forum|}}
+        {{> subforum-row forum=forum}}
+      {{/each}}
+    </table>
+  {{/collapse-box}}
+{{/if}}
+
+{{!-- TODO: Page numbers/paging --}}
+{{#> box title=forum.title}}
+  <table class="forumindex">
+    {{#each topics as |topic|}}
+      {{> topic-row topic=topic }}
+    {{/each}}
+  </table>
+{{/box}}
