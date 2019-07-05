@@ -66,7 +66,7 @@ class TOPIC
         if (!$id) {
             return $PAGE->location('?');
         }
-        $topicdata = $DB->fetchResource("topics/$id");
+        $topicdata = $DB->fetchResource("topic/$id");
 
         if (!$topicdata) {
             // Put the user back on the index and skip these next few lines.
