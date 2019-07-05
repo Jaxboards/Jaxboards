@@ -48,14 +48,13 @@ export const months = [
   'December'
 ];
 
-export function date(gmtUnixTimestamp) {
+export function date(serverDate) {
   const localTimeNow = new Date();
 
   const yday = new Date();
   yday.setTime(yday - 1000 * 60 * 60 * 24);
 
-  const serverAsLocalDate = new Date(0);
-  serverAsLocalDate.setUTCSeconds(gmtUnixTimestamp);
+  const serverAsLocalDate = new Date(serverDate);
 
   const deltaInSeconds = (localTimeNow - serverAsLocalDate) / 1000;
 

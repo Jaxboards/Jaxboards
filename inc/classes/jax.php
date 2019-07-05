@@ -56,7 +56,7 @@ class JAX
         }
 
         return ($autodate ?
-            '<span class="autodate smalldate" title="' . $date . '">' :
+            '<span class="autodate smalldate" data-date="' . $date . '">' :
             '') .
             date('g:i' . ($seconds ? ':s' : '') . 'a, n/j/y', $date) .
             ($autodate ? '</span>' : '');

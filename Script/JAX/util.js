@@ -64,10 +64,10 @@ export function updateDates() {
     return;
   }
   dates.forEach(el => {
-    const timestamp = parseInt(el.title, 10);
+    const dateString = el.dataset.date;
     const parsed = el.classList.contains('smalldate')
-      ? smalldate(timestamp)
-      : date(timestamp);
+      ? smalldate(dateString)
+      : date(dateString);
     if (parsed !== el.innerHTML) {
       el.innerHTML = parsed;
     }

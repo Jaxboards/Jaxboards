@@ -9,9 +9,11 @@ const VIEWS_PATH = 'views';
 const PARTIALS_PATH = 'partials';
 const CONTROLLERS_PATH = 'controllers';
 const RESOURCES_PATH = 'resources';
+const HELPERS_PATH = 'helpers';
 
 const VIEWS_PATH_FULL = path.join(__dirname, VIEWS_PATH);
 const PARTIALS_PATH_FULL = path.join(VIEWS_PATH_FULL, PARTIALS_PATH);
+const HELPERS_PATH_FULL = path.join(VIEWS_PATH_FULL, HELPERS_PATH);
 const CONTROLLERS_PATH_FULL = path.join(__dirname, CONTROLLERS_PATH);
 const RESOURCES_PATH_FULL = path.join(__dirname, RESOURCES_PATH);
 
@@ -33,6 +35,8 @@ class LazySingleton {
   }
 }
 
+const isNotTestFile = fileName => !/\.test\.js/i.test(fileName);
+
 // eslint-disable-next-line no-underscore-dangle
 function _inject(injectionPath) {
   const injection = injections[injectionPath];
@@ -50,12 +54,13 @@ function loadTemplates() {
   }
 
   function registerHelpers() {
-    Handlebars.registerHelper(
-      'date',
-      date =>
-        // TODO: Implement full functionality of JAX->date
-        date
-    );
+    glob
+      .sync(path.join(HELPERS_PATH_FULL, '*.js'))
+      .filter(isNotTestFile)
+      .forEach(file => {
+        const fileName = path.basename(file, '.js');
+        Handlebars.registerHelper(fileName, require(file));
+      });
   }
 
   function registerRouteTemplates() {
@@ -81,21 +86,27 @@ function loadTemplates() {
 }
 
 function loadControllers() {
-  glob.sync(path.join(CONTROLLERS_PATH_FULL, '!(*.test.js)')).forEach(file => {
-    const fileName = path.basename(file, '.js');
-    injections[`${CONTROLLERS_PATH}/${fileName}`] = new LazySingleton(
-      require(file)
-    );
-  });
+  glob
+    .sync(path.join(CONTROLLERS_PATH_FULL, '*.js'))
+    .filter(isNotTestFile)
+    .forEach(file => {
+      const fileName = path.basename(file, '.js');
+      injections[`${CONTROLLERS_PATH}/${fileName}`] = new LazySingleton(
+        require(file)
+      );
+    });
 }
 
 function loadResources() {
-  glob.sync(path.join(RESOURCES_PATH_FULL, '!(*.test.js)')).forEach(file => {
-    const fileName = path.basename(file, '.js');
-    injections[`${RESOURCES_PATH}/${fileName}`] = new LazySingleton(
-      require(file)
-    );
-  });
+  glob
+    .sync(path.join(RESOURCES_PATH_FULL, '*.js'))
+    .filter(isNotTestFile)
+    .forEach(file => {
+      const fileName = path.basename(file, '.js');
+      injections[`${RESOURCES_PATH}/${fileName}`] = new LazySingleton(
+        require(file)
+      );
+    });
 }
 
 loadResources();

@@ -425,14 +425,13 @@
     'December'
   ];
 
-  function date(gmtUnixTimestamp) {
+  function date(serverDate) {
     const localTimeNow = new Date();
 
     const yday = new Date();
     yday.setTime(yday - 1000 * 60 * 60 * 24);
 
-    const serverAsLocalDate = new Date(0);
-    serverAsLocalDate.setUTCSeconds(gmtUnixTimestamp);
+    const serverAsLocalDate = new Date(serverDate);
 
     const deltaInSeconds = (localTimeNow - serverAsLocalDate) / 1000;
 
@@ -535,10 +534,10 @@
       return;
     }
     dates.forEach(el$$1 => {
-      const timestamp = parseInt(el$$1.title, 10);
+      const dateString = el$$1.dataset.date;
       const parsed = el$$1.classList.contains('smalldate')
-        ? smalldate(timestamp)
-        : date(timestamp);
+        ? smalldate(dateString)
+        : date(dateString);
       if (parsed !== el$$1.innerHTML) {
         el$$1.innerHTML = parsed;
       }
