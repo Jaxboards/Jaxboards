@@ -58,7 +58,7 @@ class ForumResource extends BaseResource {
         {
           model: super.getModel(Member),
           as: 'last_poster',
-          attributes: ['display_name', 'group_id']
+          attributes: ['id', 'display_name', 'group_id']
         },
         {
           model: super.getModel(Topic),

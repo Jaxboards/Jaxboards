@@ -5,8 +5,12 @@ const config = require('../config.json');
 const initResources = require('./resources');
 const initModels = require('./models');
 const routes = require('./routes');
+const injections = require('./injections');
 
 const app = new Koa();
+
+// Preload all dependencies
+injections.loadAll();
 
 // Get a DB connection
 const sequelize = new Sequelize(

@@ -2,9 +2,9 @@
   <td class="f_icon">
     {{! TODO: topic read/unread }}
     {{#if topic.isRead}}
-      <a id="tid_{{topic.id}}_icon" href="?act=vt{{topic.id}}&markread=1">
+      {{#link "topic" topic.id queryParams=(hash markRead=true) id="tid_{{topic.id}}_icon"}}
         <img src="/Service/Themes/Default/icons/read.png" alt="read" />
-      </a>
+      {{/link}}
     {{else}}
       <a id="tid_{{topic.id}}_icon">
         <img src="/Service/Themes/Default/icons/unread.png" />
@@ -12,9 +12,9 @@
     {{/if}}
   </td>
   <td class="topic">
-    <a href="?act=vt{{topic.id}}" title="{{topic.summary}}" data-use-tooltip="true">
+    {{#link "topic" topic.id title=topic.summary data-use-tooltip="true"}}
       {{topic.title}}
-    </a>
+    {{/link}}
     {{! TODO: Mod controls }}
     {{#if can_moderate}}
       <a href="?act=modcontrols&do=modt&tid={{topic.id}}" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>
@@ -23,20 +23,22 @@
     {{topic.subtitle}} {{! TODO: Insert page links }}
   </td>
   <td class="item_1">
-    {{> user-link user=topic.author}}
+    {{#if topic.author}}
+      {{> user-link user=topic.author}}
+    {{/if}}
   </td>
   <td class="item_2">
-    <a href="?act=forum&amp;replies={{topic.id}}">
-      Replies: {{topic.replies}}
-    </a>
+    Replies: {{topic.replies}}
     <br />
     Views: {{topic.views}}
   </td>
   <td class="last_post">
-    <a href="?act=vt{{topic.id}}&amp;getlast=1">
-      {{date topic.lp_date}}
-    </a>
-    <br />
-    By {{> user-link user=topic.last_poster}}
+    {{#if topic.last_poster}}
+      {{#link "topic" topic.id queryParams=(hash getLast=true)}}
+        {{date topic.lp_date}}
+      {{/link}}
+      <br />
+      By {{> user-link user=topic.last_poster}}
+    {{/if}}
   </td>
 </tr>

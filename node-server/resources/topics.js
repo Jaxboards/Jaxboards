@@ -13,6 +13,7 @@ const ORDER_BY_MAP = [
   ['title', 'DESC'],
   ['title', 'ASC']
 ];
+const MEMBER_PROPS = ['id', 'display_name', 'group_id'];
 
 class TopicResource extends BaseResource {
   getModel() {
@@ -25,12 +26,12 @@ class TopicResource extends BaseResource {
         {
           model: super.getModel(Member),
           as: 'last_poster',
-          attributes: ['display_name', 'group_id']
+          attributes: MEMBER_PROPS
         },
         {
           model: super.getModel(Member),
           as: 'author',
-          attributes: ['display_name', 'group_id']
+          attributes: MEMBER_PROPS
         },
         {
           model: super.getModel(Forum),
@@ -77,12 +78,12 @@ class TopicResource extends BaseResource {
         {
           model: memberModel,
           as: 'last_poster',
-          attributes: ['display_name', 'group_id']
+          attributes: MEMBER_PROPS
         },
         {
           model: memberModel,
           as: 'author',
-          attributes: ['display_name', 'group_id']
+          attributes: MEMBER_PROPS
         }
       ],
       ...options

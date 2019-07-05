@@ -19,17 +19,22 @@ const RESOURCES_PATH_FULL = path.join(__dirname, RESOURCES_PATH);
 
 const injections = {};
 
+function register(p, injection) {
+  injections[p] = injection;
+}
+
 /**
- * This class will initialize a singleton only when it is needed (accessed)
+ * This class will initialize a singleton only when it is injected
  */
 class LazySingleton {
-  constructor(klass) {
-    this.Class = klass;
+  constructor(dependency) {
+    this.dependency = dependency;
   }
 
   get(inject) {
     if (!this.instance) {
-      this.instance = new this.Class(inject);
+      const Klass = require(this.dependency);
+      this.instance = new Klass(inject);
     }
     return this.instance;
   }
@@ -41,7 +46,7 @@ const isNotTestFile = fileName => !/\.test\.js/i.test(fileName);
 function _inject(injectionPath) {
   const injection = injections[injectionPath];
   if (injection instanceof LazySingleton) {
-    injections[injectionPath] = injection.get(_inject);
+    register(injectionPath, injection.get(_inject));
   }
   return injections[injectionPath];
 }
@@ -66,7 +71,7 @@ function loadTemplates() {
   function registerRouteTemplates() {
     glob.sync(path.join(VIEWS_PATH_FULL, '*.hbs')).forEach(file => {
       const fileName = path.basename(file, '.hbs');
-      injections[`${VIEWS_PATH}/${fileName}`] = compileView(fileName);
+      register(`${VIEWS_PATH}/${fileName}`, compileView(fileName));
     });
   }
 
@@ -91,9 +96,7 @@ function loadControllers() {
     .filter(isNotTestFile)
     .forEach(file => {
       const fileName = path.basename(file, '.js');
-      injections[`${CONTROLLERS_PATH}/${fileName}`] = new LazySingleton(
-        require(file)
-      );
+      register(`${CONTROLLERS_PATH}/${fileName}`, new LazySingleton(file));
     });
 }
 
@@ -103,14 +106,14 @@ function loadResources() {
     .filter(isNotTestFile)
     .forEach(file => {
       const fileName = path.basename(file, '.js');
-      injections[`${RESOURCES_PATH}/${fileName}`] = new LazySingleton(
-        require(file)
-      );
+      register(`${RESOURCES_PATH}/${fileName}`, new LazySingleton(file));
     });
 }
 
-loadResources();
-loadControllers();
-loadTemplates();
+function loadAll() {
+  loadResources();
+  loadControllers();
+  loadTemplates();
+}
 
-module.exports = { inject: _inject };
+module.exports = { inject: _inject, register, loadAll };

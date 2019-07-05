@@ -1,14 +1,14 @@
 const Router = require('koa-router');
-const { inject } = require('./injections');
+const { inject, register } = require('./injections');
 
 module.exports = function routes() {
   const router = new Router();
 
   const findAll = resource => async ctx => {
-    ctx.body = await resource.findAll(ctx.query);
+    ctx.body = await inject(resource).findAll(ctx.query);
   };
   const find = resource => async ctx => {
-    ctx.body = await resource.find(ctx.params.id);
+    ctx.body = await inject(resource).find(ctx.params.id);
   };
   const renderControllers = ([
     parentController,
@@ -19,17 +19,17 @@ module.exports = function routes() {
 
   // api
   const apiRoutes = new Router();
-  apiRoutes.get('/categories', findAll(inject('resources/categories')));
-  apiRoutes.get('/category/:id', find(inject('resources/categories')));
-  apiRoutes.get('/forums', findAll(inject('resources/forums')));
-  apiRoutes.get('/forum/:id', find(inject('resources/forums')));
-  apiRoutes.get('/member_groups', findAll(inject('resources/member_groups')));
-  apiRoutes.get('/members', findAll(inject('resources/members')));
-  apiRoutes.get('/member/:id', find(inject('resources/members')));
-  apiRoutes.get('/sessions', findAll(inject('resources/sessions')));
-  apiRoutes.get('/stats', findAll(inject('resources/stats')));
-  apiRoutes.get('/topics', findAll(inject('resources/topics')));
-  apiRoutes.get('/topic/:id', find(inject('resources/topics')));
+  apiRoutes.get('/categories', findAll('resources/categories'));
+  apiRoutes.get('/category/:id', find('resources/categories'));
+  apiRoutes.get('/forums', findAll('resources/forums'));
+  apiRoutes.get('/forum/:id', find('resources/forums'));
+  apiRoutes.get('/member_groups', findAll('resources/member_groups'));
+  apiRoutes.get('/members', findAll('resources/members'));
+  apiRoutes.get('/member/:id', find('resources/members'));
+  apiRoutes.get('/sessions', findAll('resources/sessions'));
+  apiRoutes.get('/stats', findAll('resources/stats'));
+  apiRoutes.get('/topics', findAll('resources/topics'));
+  apiRoutes.get('/topic/:id', find('resources/topics'));
 
   // Top level routes
   router.use('/api', apiRoutes.routes(), apiRoutes.allowedMethods());
@@ -43,11 +43,33 @@ module.exports = function routes() {
   );
 
   router.get(
+    'forum',
     '/forum/:id',
     renderControllers([
       inject('controllers/application'),
       inject('controllers/forum')
     ])
   );
+
+  router.get(
+    'topic',
+    '/topic/:id',
+    renderControllers([
+      inject('controllers/application'),
+      inject('controllers/topic')
+    ])
+  );
+
+  router.get(
+    'user',
+    '/user/:id',
+    renderControllers([
+      inject('controllers/application'),
+      inject('controllers/user')
+    ])
+  );
+
+  register('router', router);
+
   return router;
 };

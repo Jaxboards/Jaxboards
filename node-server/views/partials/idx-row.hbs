@@ -2,9 +2,9 @@
   <td class="f_icon" rowspan="2">
       {{!-- TODO: read / unread functionality --}}
       {{#if forum.isRead}}
-        <a id="fid_{{forum.id}}_icon" href="?act=vf{{forum.id}}&markread=1">
+        {{#link "forum" forum.id queryParams=(hash markRead=true) id="fid_{{forum.id}}_icon"}}
           <img src="/Service/Themes/Default/icons/read.png" alt="read" />
-        </a>
+        {{/link}}
       {{else}}
         <a id="fid_{{forum.id}}_icon">
           <img src="/Service/Themes/Default/icons/unread.png" />
@@ -13,7 +13,7 @@
     </a>
   </td>
   <td class="forum" rowspan="2">
-    {{#link "forum" id=forum.id}}
+    {{#link "forum" forum.id}}
       {{forum.title}}
     {{/link}}
     <div class="description">
@@ -25,8 +25,11 @@
     {{/if}}
   </td>
   <td class="last_post" id="fid_{{forum.id}}_lastpost" colspan="2">
-    Last Post: {{#link "topic" id=forum.last_topic.id getLast=true}}{{forum.last_topic.title}}{{/link}}<br />
-By {{> user-link user=forum.last_poster}}, {{date forum.lp_date}}
+    {{#if forum.last_poster}}
+      Last Post: {{#link "topic" forum.last_topic.id getLast=true}}{{forum.last_topic.title}}{{/link}}
+      <br />
+      By {{> user-link user=forum.last_poster}}, {{date forum.lp_date}}
+    {{/if}}
   </td>
 </tr>
 <tr>

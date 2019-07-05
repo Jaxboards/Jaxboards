@@ -1,20 +1,24 @@
 const Handlebars = require('handlebars');
+const { inject } = require('../../injections');
 
-module.exports = function linkHelper(what, options) {
-  const { id } = options.hash;
-  let path;
-  switch (what) {
-    case 'forum':
-      path = `/forum/${id}`;
-      break;
-    case 'topic':
-      path = `/topic/${id}${options.hash.getLast ? '?getLast=true' : ''}`;
-      break;
-    default:
-      path = '';
+module.exports = function linkHelper(what, id, options) {
+  const { queryParams, ...htmlAttributesObj } = options.hash;
+
+  if (!id) {
+    throw new Error(`Missing id for {{#link "${what}"}}`);
+  }
+
+  const path = inject('router').url(what, { id }, { query: queryParams });
+
+  // Add attributes to the <a> tag
+  let htmlAttributes = '';
+  if (htmlAttributesObj) {
+    htmlAttributes = Object.entries(htmlAttributesObj)
+      .map(([key, value]) => `${key}="${value}"`)
+      .join(' ');
   }
 
   return new Handlebars.SafeString(
-    `<a href="${path}">${options.fn(this).trim()}</a>`
+    `<a href="${path}" ${htmlAttributes}>${options.fn(this).trim()}</a>`
   );
 };
