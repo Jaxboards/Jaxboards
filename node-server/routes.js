@@ -4,12 +4,19 @@ const { inject, register } = require('./injections');
 module.exports = function routes() {
   const router = new Router();
 
-  const findAll = resource => async ctx => {
-    ctx.body = await inject(resource).findAll(ctx.query);
+  const respond = response => async ctx => {
+    try {
+      ctx.body = await response(ctx);
+    } catch (e) {
+      ctx.throw(e.status, e.message);
+    }
   };
-  const find = resource => async ctx => {
-    ctx.body = await inject(resource).find(ctx.params.id);
-  };
+  const findAll = resource =>
+    respond(async ctx => inject(resource).findAll(ctx.query));
+
+  const find = resource =>
+    respond(async ctx => inject(resource).find(ctx.params.id));
+
   const renderControllers = ([
     parentController,
     ...childControllers

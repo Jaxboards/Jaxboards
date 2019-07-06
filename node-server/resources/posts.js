@@ -1,3 +1,5 @@
+const { BadRequest } = require('../http-status');
+
 const BaseResource = require('./resource');
 const Member = require('../models/member').model;
 const MemberGroup = require('../models/member_group').model;
@@ -10,15 +12,8 @@ class PostsResource extends BaseResource {
   }
 
   findAll(query = {}) {
-    let where;
-
-    if (query.tid) {
-      where = {
-        tid: query.tid
-      };
-    } else {
-      // Don't allow fetchAll for now with no finder
-      return {};
+    if (!query.tid) {
+      throw new BadRequest('Missing required query parameter: tid');
     }
 
     return this.getModel().findAll({
@@ -44,7 +39,9 @@ class PostsResource extends BaseResource {
         }
       ],
       order: [['newtopic', 'DESC'], 'id'],
-      where
+      where: {
+        tid: query.tid
+      }
     });
   }
 }

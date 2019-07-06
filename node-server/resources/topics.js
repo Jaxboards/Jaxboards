@@ -1,3 +1,5 @@
+const { BadRequest } = require('../http-status');
+
 const BaseResource = require('./resource');
 const Topic = require('../models/topic').model;
 const Member = require('../models/member').model;
@@ -47,33 +49,19 @@ class TopicResource extends BaseResource {
     });
   }
 
-  findAll(query = {}) {
+  getFindAllOptions(query = {}) {
+    if (!query.fid) {
+      throw new BadRequest('Missing required query parameter: fid');
+    }
+
+    const memberModel = super.getModel(Member);
+
     const options = {
       limit: NUM_TOPICS_PER_PAGE,
       order: [
         ['pinned', 'DESC'],
         ORDER_BY_MAP[query.orderBy] || ORDER_BY_MAP[0]
-      ]
-    };
-
-    // Paging
-    if (query.page) {
-      const page = parseInt(query.page, 10);
-      if (!Number.isNaN(page)) {
-        options.offset = NUM_TOPICS_PER_PAGE * query.page;
-      }
-    }
-
-    // Find by forum ID
-    if (query.fid) {
-      options.where = {
-        fid: query.fid
-      };
-    }
-
-    const memberModel = super.getModel(Member);
-
-    return this.getModel().findAll({
+      ],
       include: [
         {
           model: memberModel,
@@ -85,9 +73,34 @@ class TopicResource extends BaseResource {
           as: 'author',
           attributes: MEMBER_PROPS
         }
-      ],
-      ...options
-    });
+      ]
+    };
+
+    // Paging
+    if (query.page) {
+      const page = parseInt(query.page, 10);
+      if (!Number.isNaN(page)) {
+        options.offset = NUM_TOPICS_PER_PAGE * query.page;
+      }
+    }
+
+    options.where = {
+      fid: query.fid
+    };
+
+    return options;
+  }
+
+  async findAndCountAll(query = {}) {
+    const options = this.getFindAllOptions(query);
+
+    return this.getModel().findAndCountAll(options);
+  }
+
+  async findAll(query = {}) {
+    const options = this.getFindAllOptions(query);
+
+    return this.getModel().findAll(options);
   }
 }
 
