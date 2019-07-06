@@ -1,6 +1,6 @@
 module.exports = {
   extends: ['airbnb-base', 'plugin:prettier/recommended'],
-  plugins: ['prettier'],
+  plugins: ['prettier', 'jest'],
 
   rules: {
     // Disables the rule preventing modifying properties on objects passed in
@@ -10,6 +10,7 @@ module.exports = {
   },
 
   env: {
-    browser: true
+    node: true,
+    "jest/globals": true
   }
 };
