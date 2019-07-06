@@ -5,6 +5,7 @@ module.exports = function linkHelper(what, ...args) {
   let id;
   let options;
 
+  // ID is a positional argument, and is optional.
   if (args.length === 1) {
     id = null;
     [options] = args;
@@ -12,17 +13,11 @@ module.exports = function linkHelper(what, ...args) {
     [id, options] = args;
   }
 
-  // Method overloading
-  if (id instanceof Object) {
-    id = null;
-    options = id;
-  }
-
   const { queryParams, ...htmlAttributesObj } = options.hash;
 
-  let params = {};
+  const params = {};
   if (id) {
-    params = { id };
+    params.id = id;
   }
 
   const path = inject('router').url(what, params, { query: queryParams });
