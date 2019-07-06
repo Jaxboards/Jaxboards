@@ -9,7 +9,20 @@
   {{/collapse-box}}
 {{/if}}
 
-{{!-- TODO: Page numbers/paging --}}
+<div class="pages-top pages">
+  {{#each (pages page=page total=totalPages) as |page|}}
+    {{#link "forum" @root.forum.id queryParams=(hash page=page.number) class=page.class}}
+      {{page.displayedNumber}}
+    {{/link}}
+  {{/each}}
+</div>
+
+<div class="forum-buttons-top">
+  {{#link "post" queryParams=(hash fid=forum.id)}}
+    New Topic
+  {{/link}}
+</div>
+
 {{#> box title=forum.title}}
   <table class="forumindex">
     {{#each topics as |topic|}}
@@ -17,3 +30,11 @@
     {{/each}}
   </table>
 {{/box}}
+
+<div class="pages-bottom pages">
+  {{#each (pages page=page total=totalPages) as |page|}}
+    {{#link "forum" @root.forum.id queryParams=(hash page=page.number) class=page.class}}
+      {{page.displayedNumber}}
+    {{/link}}
+  {{/each}}
+</div>

@@ -1,4 +1,5 @@
 const Controller = require('./controller');
+const { NUM_POSTS_PER_PAGE } = require('../utils/constants');
 
 class TopicController extends Controller {
   constructor(inject) {
@@ -15,14 +16,20 @@ class TopicController extends Controller {
   // eslint-disable-next-line class-methods-use-this
   async model(ctx) {
     const topicId = ctx.params.id;
-    const page = ctx.query.page || 0;
+    let page = parseInt(ctx.query.page, 10);
+    page = Number.isNaN(page) ? 0 : page;
+
+    const { count, rows: posts } = await this.PostsResource.findAndCountAll({
+      tid: topicId,
+      page
+    });
 
     return {
       topic: await this.TopicsResource.find(topicId),
-      posts: await this.PostsResource.findAll({
-        tid: topicId,
-        page
-      })
+      posts,
+      count,
+      page,
+      totalPages: Math.ceil(count / NUM_POSTS_PER_PAGE)
     };
   }
 }

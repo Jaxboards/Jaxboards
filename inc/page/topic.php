@@ -19,11 +19,10 @@ class TOPIC
 
         $this->id = $id = $act[0] ? $act[0] : 0;
 
-        $this->page = isset($JAX->b['page']) ? (int) $JAX->b['page'] : 0;
+        $this->page = isset($JAX->b['page']) ? (int) $JAX->b['page'] - 1 : 0;
         if ($this->page <= 0 || !is_numeric($this->page)) {
-            $this->page = 1;
+            $this->page = 0;
         }
-        --$this->page;
 
         $this->numperpage = 10;
         if (isset($JAX->b['qreply']) && $JAX->b['qreply'] && !$PAGE->jsupdate) {
@@ -353,7 +352,7 @@ EOT
             }
             $SESS->delvar('multiquote');
         }
-        $tdata = $DB->fetchResource("topics/$id");
+        $tdata = $DB->fetchResource("topic/$id");
 
         $PAGE->JS(
             'window',
@@ -504,9 +503,8 @@ EOT
             $lastpid = $post['id'];
             $this->lastPostID = $lastpid;
             $SESS->addvar('topic_lastpid', $lastpid);
-
-            return $rows;
         }
+        return $rows;
     }
 
     public function canedit($post)

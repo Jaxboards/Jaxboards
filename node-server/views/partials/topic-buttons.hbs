@@ -1,0 +1,11 @@
+{{! TODO: Hide buttons for insufficient permissions }}
+{{#link "post" queryParams=(hash fid=topic.fid)}}
+  New Topic
+{{/link}}
+{{! TODO: Quick reply }}
+{{#link "topic" topic.id queryParams=(hash qreply=1)}}
+  Quick Reply
+{{/link}}
+{{#link "post" queryParams=(hash tid=topic.id)}}
+  Reply
+{{/link}}

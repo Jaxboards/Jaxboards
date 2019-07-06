@@ -1,4 +1,5 @@
-const { BadRequest } = require('../http-status');
+const { BadRequest } = require('../utils/http-status');
+const { NUM_TOPICS_PER_PAGE } = require('../utils/constants');
 
 const BaseResource = require('./resource');
 const Topic = require('../models/topic').model;
@@ -6,7 +7,6 @@ const Member = require('../models/member').model;
 const Forum = require('../models/forum').model;
 const Category = require('../models/category').model;
 
-const NUM_TOPICS_PER_PAGE = 20;
 const ORDER_BY_MAP = [
   ['lp_date', 'DESC'],
   ['lp_date', 'ASC'],
@@ -79,8 +79,8 @@ class TopicResource extends BaseResource {
     // Paging
     if (query.page) {
       const page = parseInt(query.page, 10);
-      if (!Number.isNaN(page)) {
-        options.offset = NUM_TOPICS_PER_PAGE * query.page;
+      if (page && !Number.isNaN(page)) {
+        options.offset = NUM_TOPICS_PER_PAGE * page;
       }
     }
 
@@ -91,16 +91,12 @@ class TopicResource extends BaseResource {
     return options;
   }
 
-  async findAndCountAll(query = {}) {
-    const options = this.getFindAllOptions(query);
-
-    return this.getModel().findAndCountAll(options);
+  findAll(query = {}) {
+    return this.getModel().findAll(this.getFindAllOptions(query));
   }
 
-  async findAll(query = {}) {
-    const options = this.getFindAllOptions(query);
-
-    return this.getModel().findAll(options);
+  findAndCountAll(query = {}) {
+    return this.getModel().findAndCountAll(this.getFindAllOptions(query));
   }
 }
 

@@ -1,14 +1,31 @@
 const Handlebars = require('handlebars');
 const { inject } = require('../../injections');
 
-module.exports = function linkHelper(what, id, options) {
-  const { queryParams, ...htmlAttributesObj } = options.hash;
+module.exports = function linkHelper(what, ...args) {
+  let id;
+  let options;
 
-  if (!id) {
-    throw new Error(`Missing id for {{#link "${what}"}}`);
+  if (args.length === 1) {
+    id = null;
+    [options] = args;
+  } else if (args.length === 2) {
+    [id, options] = args;
   }
 
-  const path = inject('router').url(what, { id }, { query: queryParams });
+  // Method overloading
+  if (id instanceof Object) {
+    id = null;
+    options = id;
+  }
+
+  const { queryParams, ...htmlAttributesObj } = options.hash;
+
+  let params = {};
+  if (id) {
+    params = { id };
+  }
+
+  const path = inject('router').url(what, params, { query: queryParams });
 
   // Add attributes to the <a> tag
   let htmlAttributes = '';

@@ -1,4 +1,5 @@
-const { BadRequest } = require('../http-status');
+const { BadRequest } = require('../utils/http-status');
+const { NUM_POSTS_PER_PAGE } = require('../utils/constants');
 
 const BaseResource = require('./resource');
 const Member = require('../models/member').model;
@@ -11,12 +12,12 @@ class PostsResource extends BaseResource {
     return super.getModel(Post);
   }
 
-  findAll(query = {}) {
+  getFindAllOptions(query = {}) {
     if (!query.tid) {
       throw new BadRequest('Missing required query parameter: tid');
     }
 
-    return this.getModel().findAll({
+    const options = {
       include: [
         {
           model: super.getModel(Member),
@@ -38,11 +39,30 @@ class PostsResource extends BaseResource {
           as: 'topic'
         }
       ],
+      limit: NUM_POSTS_PER_PAGE,
       order: [['newtopic', 'DESC'], 'id'],
       where: {
         tid: query.tid
       }
-    });
+    };
+
+    // Paging
+    if (query.page) {
+      const page = parseInt(query.page, 10);
+      if (page && !Number.isNaN(page)) {
+        options.offset = NUM_POSTS_PER_PAGE * page;
+      }
+    }
+
+    return options;
+  }
+
+  findAll(query = {}) {
+    return this.getModel().findAll(this.getFindAllOptions(query));
+  }
+
+  findAndCountAll(query = {}) {
+    return this.getModel().findAndCountAll(this.getFindAllOptions(query));
   }
 }
 

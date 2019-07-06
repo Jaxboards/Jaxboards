@@ -1,3 +1,15 @@
+<div class="pages-top pages">
+  {{#each (pages page=page total=totalPages) as |page|}}
+    {{#link "topic" @root.topic.id queryParams=(hash page=page.number) class=page.class}}
+      {{page.displayedNumber}}
+    {{/link}}
+  {{/each}}
+</div>
+
+<div class="topic-buttons-top">
+  {{> topic-buttons topic=topic}}
+</div>
+
 {{#>box title=topic.title}}
   <table id="intopic">
     {{#each posts as |post|}}
@@ -5,3 +17,16 @@
     {{/each}}
   </table>
 {{/box}}
+
+<div class="pages-bottom pages">
+  {{#each (pages page=page total=totalPages) as |page|}}
+    {{#link "topic" @root.topic.id queryParams=(hash page=page.number) class=page.class}}
+      {{page.displayedNumber}}
+    {{/link}}
+  {{/each}}
+</div>
+
+<div class="topic-buttons-bottom">
+  {{> topic-buttons topic=topic}}
+</div>
+
