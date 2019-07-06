@@ -42,7 +42,8 @@ module.exports = {
   },
 
   setAssociations({ Post, Member, Topic }) {
-    Post.belongsTo(Member, { foreignKey: 'auth_id' });
+    Post.belongsTo(Member, { foreignKey: 'auth_id', as: 'author' });
+    Post.belongsTo(Member, { foreignKey: 'editby', as: 'editor' });
     Post.belongsTo(Topic, { foreignKey: 'tid', onDelete: 'CASCADE' });
   },
 

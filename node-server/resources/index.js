@@ -4,8 +4,9 @@ module.exports = function initResources({ sequelize, config }) {
   return [
     inject('resources/categories'),
     inject('resources/forums'),
-    inject('resources/members'),
     inject('resources/member_groups'),
+    inject('resources/members'),
+    inject('resources/posts'),
     inject('resources/sessions'),
     inject('resources/stats'),
     inject('resources/topics')

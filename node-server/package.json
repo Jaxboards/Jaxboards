@@ -11,7 +11,9 @@
     }
   },
   "jest": {
-    "setupFilesAfterEnv": ["jest-dom/extend-expect"]
+    "setupFilesAfterEnv": [
+      "jest-dom/extend-expect"
+    ]
   },
   "devDependencies": {
     "eslint": "^5.5.0",

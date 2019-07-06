@@ -379,97 +379,11 @@ EOT
 
         $topic_post_counter = 0;
 
-        if ($lastpid) {
-            $query = $DB->safespecial(
-                <<<'EOT'
-SELECT m.`id` AS `id`,m.`name` AS `name`,m.`group_id` AS `group_id`,
-    m.`sound_im` AS `sound_im`,m.`sound_shout` AS `sound_shout`,
-    UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`,
-    m.`display_name` AS `display_name`,
-    m.`friends` AS `friends`,m.`enemies` AS `enemies`,m.`skin_id` AS `skin_id`,
-    m.`nowordfilter` AS `nowordfilter`,m.`wysiwyg` AS `wysiwyg`,
-    m.`avatar` AS `avatar`,m.`usertitle` AS `usertitle`,
-    CONCAT(MONTH(m.`birthdate`),' ',MONTH(m.`birthdate`)) as `birthday`,
-    m.`mod` AS `mod`,m.`posts` AS `posts`,
-    p.`tid` AS `tid`,p.`id` AS `pid`,INET6_NTOA(p.`ip`) AS `ip`,
-    p.`newtopic` AS `newtopic`,p.`post` AS `post`,p.`showsig` AS `showsig`,
-    p.`showemotes` AS `showemotes`,p.`tid` AS `tid`,
-    UNIX_TIMESTAMP(p.`date`) AS `date`,p.`auth_id` AS `auth_id`,
-    p.`rating` AS `rating`,g.`title` AS `title`,g.`icon` AS `icon`,
-    UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`,p.`editby` AS `editby`,
-    e.`display_name` AS `ename`,e.`group_id` AS `egroup_id`
-FROM %t AS p
-LEFT JOIN %t m
-    ON p.`auth_id`=m.`id`
-LEFT JOIN %t g
-    ON m.`group_id`=g.`id`
-LEFT JOIN %t e
-ON p.`editby`=e.`id`
-WHERE p.`tid`=?
-  AND p.`id`>?
-ORDER BY `pid`
-EOT
-                ,
-                array('posts', 'members', 'member_groups', 'members'),
-                $this->id,
-                $lastpid
-            );
-        } else {
-            $query = $DB->safespecial(
-                <<<'EOT'
-SELECT m.`id` AS `id`,m.`name` AS `name`,m.`email` AS `email`,m.`sig` AS `sig`,
-    m.`posts` AS `posts`,m.`group_id` AS `group_id`,m.`avatar` AS `avatar`,
-    m.`usertitle` AS `usertitle`,UNIX_TIMESTAMP(m.`join_date`) AS `join_date`,
-    UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`,
-    m.`contact_skype` AS `contact_skype`,
-    m.`contact_yim` AS `contact_yim`,m.`contact_msn` AS `contact_msn`,
-    m.`contact_gtalk` AS `contact_gtalk`,m.`contact_aim` AS `contact_aim`,
-    m.`website` AS `website`,m.`birthdate` AS `birthdate`,
-    DAY(m.`birthdate`) AS `dob_day`,MONTH(m.`birthdate`) AS `dob_month`,
-    YEAR(m.`birthdate`) AS `dob_year`,m.`about` AS `about`,
-    m.`display_name` AS `display_name`,m.`full_name` AS `full_name`,
-    m.`contact_steam` AS `contact_steam`,m.`location` AS `location`,
-    m.`gender` AS `gender`,m.`friends` AS `friends`,
-    m.`enemies` AS `enemies`,m.`sound_shout` AS `sound_shout`,
-    m.`sound_im` AS `sound_im`,m.`sound_pm` AS `sound_pm`,
-    m.`sound_postinmytopic` AS `sound_postinmytopic`,
-    m.`sound_postinsubscribedtopic` AS `sound_postinsubscribedtopic`,
-    m.`notify_pm` AS `notify_pm`,
-    m.`notify_postinmytopic` AS `notify_postinmytopic`,
-    m.`notify_postinsubscribedtopic` AS `notify_postinsubscribedtopic`,
-    m.`ucpnotepad` AS `ucpnotepad`,m.`skin_id` AS `skin_id`,
-    m.`contact_twitter` AS `contact_twitter`,
-    m.`email_settings` AS `email_settings`,m.`nowordfilter` AS `nowordfilter`,
-    INET6_NTOA(m.`ip`) AS `ip`,m.`mod` AS `mod`,m.`wysiwyg` AS `wysiwyg`,
-    p.`tid` AS `tid`,p.`id` AS `pid`,INET6_NTOA(p.`ip`) AS `ip`,
-    p.`newtopic` AS `newtopic`,p.`post` AS `post`,p.`showsig` AS `showsig`,
-    p.`showemotes` AS `showemotes`,p.`tid` AS `tid`,
-    UNIX_TIMESTAMP(p.`date`) AS `date`,p.`auth_id` AS `auth_id`,
-    p.`rating` AS `rating`,g.`title` AS `title`,
-    g.`icon` AS `icon`,UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`,
-    p.`editby` AS `editby`,e.`display_name` AS `ename`,
-    e.`group_id` AS `egroup_id`
-FROM %t p
-LEFT JOIN %t m
-    ON p.`auth_id`=m.`id`
-LEFT JOIN %t g
-    ON m.`group_id`=g.`id`
-LEFT JOIN %t e
-    ON p.`editby`=e.`id`
-WHERE p.`tid`=?
-ORDER BY `newtopic` DESC, `pid` ASC
-LIMIT ?,?
-EOT
-                ,
-                array('posts', 'members', 'member_groups', 'members'),
-                $this->id,
-                (($topic_post_counter = ($this->page) * $this->numperpage)),
-                $this->numperpage
-            );
-        }
-
-        $rows = '';
-        while ($post = $DB->arow($query)) {
+          $posts = $DB->fetchResource('posts', [
+            'tid' => $this->id,
+            'page' => $this->page
+          ]);
+        foreach ($posts as $post) {
             if (!$this->firstPostID) {
                 $this->firstPostID = $post['pid'];
             }
@@ -488,12 +402,12 @@ EOT
                 if ($rniblets) {
                     foreach ($rniblets as $k => $v) {
                         $postrating .= '<a href="?act=topic&amp;ratepost=' .
-                            $post['pid'] . '&amp;niblet=' . $k . '">' .
-                            $PAGE->meta(
-                                'rating-niblet',
-                                $v['img'],
-                                $v['title']
-                            ) . '</a>';
+                          $post['id'] . '&amp;niblet=' . $k . '">' .
+                          $PAGE->meta(
+                              'rating-niblet',
+                              $v['img'],
+                              $v['title']
+                          ) . '</a>';
                         if (isset($prating[$k]) && $prating[$k]) {
                             $num = 'x' . count($prating[$k]);
                             $postrating .= $num;
@@ -509,7 +423,7 @@ EOT
                         $postrating,
                         (!($CFG['ratings'] & 2) ?
                         '<a href="?act=vt' . $this->id .
-                        '&amp;listrating=' . $post['pid'] . '">(List)</a>' : ''),
+                        '&amp;listrating=' . $post['id'] . '">(List)</a>' : ''),
                         $showrating
                     );
                 }
@@ -522,32 +436,32 @@ EOT
                 $post['auth_id'] ? $PAGE->meta(
                     'user-link',
                     $post['auth_id'],
-                    $post['group_id'],
-                    $post['display_name']
+                    $post['author']['group_id'],
+                    $post['author']['display_name']
                 ) : 'Guest',
-                $JAX->pick($post['avatar'], $PAGE->meta('default-avatar')),
-                $post['usertitle'],
-                $post['posts'],
+                $JAX->pick($post['author']['avatar'], $PAGE->meta('default-avatar')),
+                $post['author']['usertitle'],
+                $post['author']['posts'],
                 $PAGE->meta(
                     'topic-status-' .
                     (isset($usersonline[$post['auth_id']])
                     && $usersonline[$post['auth_id']] ? 'online' : 'offline')
                 ),
-                $post['title'],
+                $post['author']['group']['title'],
                 $post['auth_id'],
                 ($this->canedit($post) ?
-                "<a href='?act=vt" . $this->id . '&amp;edit=' . $post['pid'] .
+                "<a href='?act=vt" . $this->id . '&amp;edit=' . $post['id'] .
                 "' class='edit'>" . $PAGE->meta('topic-edit-button') .
                 '</a>' : '') . " <a href='?act=vt" . $this->id . '&amp;quote=' .
-                $post['pid'] .
+                $post['id'] .
                 "' onclick='RUN.handleQuoting(this);return false;' " .
                 "class='quotepost'>" . $PAGE->meta('topic-quote-button') . '</a> ' .
                 ($this->canmoderate() ?
-                "<a href='?act=modcontrols&amp;do=modp&amp;pid=" . $post['pid'] .
+                "<a href='?act=modcontrols&amp;do=modp&amp;pid=" . $post['id'] .
                 "' class='modpost' onclick='RUN.modcontrols.togbutton(this)'>" .
                 $PAGE->meta('topic-mod-button') . '</a>' : ''),
                 $JAX->date($post['date']),
-                '<a href="?act=vt' . $this->id . '&amp;findpost=' . $post['pid'] .
+                '<a href="?act=vt' . $this->id . '&amp;findpost=' . $post['id'] .
                 '" onclick="prompt(\'Link to this post:\',this.href)">' .
                 $PAGE->meta('topic-perma-button') . '</a>',
                 $postt,
@@ -558,9 +472,9 @@ EOT
                     'topic-edit-by',
                     $PAGE->meta(
                         'user-link',
-                        $post['editby'],
-                        $post['egroup_id'],
-                        $post['ename']
+                        $post['editor']['id'],
+                        $post['editor']['group_id'],
+                        $post['editor']['display_name']
                     ),
                     $JAX->date($post['edit_date'])
                 ) : '',
@@ -572,27 +486,27 @@ EOT
                 ) . '</a>' : '',
                 $post['icon'] ? $PAGE->meta(
                     'topic-icon-wrapper',
-                    $post['icon']
+                    $post['author']['member_group']['icon']
                 ) : '',
                 ++$topic_post_counter,
-                isset($post['contact_skype']) ? $post['contact_skype'] : '',
-                isset($post['contact_yim']) ? $post['contact_yim'] : '',
-                isset($post['contact_msn']) ? $post['contact_msn'] : '',
-                isset($post['contact_gtalk']) ? $post['contact_gtalk'] : '',
-                isset($post['contact_aim']) ? $post['contact_aim'] : '',
-                isset($post['contact_twitter']) ? $post['contact_twitter'] : '',
-                isset($post['contact_steam']) ? $post['contact_steam'] : '',
+                isset($post['author']['contact_skype']) ? $post['author']['contact_skype'] : '',
+                isset($post['author']['contact_yim']) ? $post['author']['contact_yim'] : '',
+                isset($post['author']['contact_msn']) ? $post['author']['contact_msn'] : '',
+                isset($post['author']['contact_gtalk']) ? $post['author']['contact_gtalk'] : '',
+                isset($post['author']['contact_aim']) ? $post['author']['contact_aim'] : '',
+                isset($post['author']['contact_twitter']) ? $post['author']['contact_twitter'] : '',
+                isset($post['author']['contact_steam']) ? $post['author']['contact_steam'] : '',
                 '',
                 '',
                 '',
                 $postrating
             );
-            $lastpid = $post['pid'];
-        }
-        $this->lastPostID = $lastpid;
-        $SESS->addvar('topic_lastpid', $lastpid);
+            $lastpid = $post['id'];
+            $this->lastPostID = $lastpid;
+            $SESS->addvar('topic_lastpid', $lastpid);
 
-        return $rows;
+            return $rows;
+        }
     }
 
     public function canedit($post)

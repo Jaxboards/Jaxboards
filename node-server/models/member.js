@@ -74,7 +74,7 @@ module.exports = {
   },
 
   setAssociations({ Member, MemberGroup }) {
-    Member.belongsTo(MemberGroup, { foreignKey: 'group_id' });
+    Member.belongsTo(MemberGroup, { foreignKey: 'group_id', as: 'group' });
   },
 
   model: MemberModel

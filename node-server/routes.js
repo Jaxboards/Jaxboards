@@ -30,6 +30,7 @@ module.exports = function routes() {
   apiRoutes.get('/stats', findAll('resources/stats'));
   apiRoutes.get('/topics', findAll('resources/topics'));
   apiRoutes.get('/topic/:id', find('resources/topics'));
+  apiRoutes.get('/posts', findAll('resources/posts'));
 
   // Top level routes
   router.use('/api', apiRoutes.routes(), apiRoutes.allowedMethods());
