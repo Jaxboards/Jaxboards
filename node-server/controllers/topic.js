@@ -19,13 +19,16 @@ class TopicController extends Controller {
     let page = parseInt(ctx.query.page, 10);
     page = Number.isNaN(page) ? 0 : page;
 
+    const topic = await this.TopicsResource.find(topicId);
     const { count, rows: posts } = await this.PostsResource.findAndCountAll({
       tid: topicId,
       page
     });
 
+    topic.increment('views');
+
     return {
-      topic: await this.TopicsResource.find(topicId),
+      topic,
       posts,
       count,
       page,

@@ -13,7 +13,7 @@
     "prettier": "prettier --write --single-quote \"**/*.{{t,j}s{,x,on},{c,sa,sc,le}ss,vue,md,y{,a}ml,graphql}\"",
     "stylelint": "stylelint \"./**/*.{c,sa,sc,le}ss\"",
     "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\"",
-    "start": "node node-server/serve"
+    "start": "cd node-server && npm start"
   },
   "husky": {
     "hooks": {
