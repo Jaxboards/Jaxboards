@@ -1,4 +1,4 @@
-const Controller = require('./controller');
+const Controller = require('../utils/controller');
 
 class IndexController extends Controller {
   constructor(inject) {

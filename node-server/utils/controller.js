@@ -1,7 +1,8 @@
 const Handlebars = require('handlebars');
+const { inject } = require('../injections');
 
 module.exports = class Controller {
-  constructor(inject) {
+  constructor() {
     this.compiledTemplate = inject(`views/${this.template}`);
   }
 

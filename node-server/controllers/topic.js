@@ -1,4 +1,4 @@
-const Controller = require('./controller');
+const Controller = require('../utils/controller');
 const { NUM_POSTS_PER_PAGE } = require('../utils/constants');
 
 class TopicController extends Controller {
