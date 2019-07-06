@@ -1,16 +1,16 @@
 class Resource {
-  init({ sequelize, config }) {
+  init({ sequelize, prefix }) {
     this.sequelize = sequelize;
-    this.config = config;
+    this.prefix = prefix;
     return this;
   }
 
   getModel(model) {
-    return model.schema(this.config.sql_prefix, { schemaDelimiter: '_' });
+    return model.schema(this.prefix, { schemaDelimiter: '_' });
   }
 
   prefixTableNames(...tableNames) {
-    return tableNames.map(name => `${this.config.sql_prefix}_${name}`);
+    return tableNames.map(name => `${this.prefix}_${name}`);
   }
 }
 

@@ -5,17 +5,23 @@ const Handlebars = require('handlebars');
 const path = require('path');
 const glob = require('glob');
 
-const VIEWS_PATH = 'views';
-const PARTIALS_PATH = 'partials';
-const CONTROLLERS_PATH = 'controllers';
-const RESOURCES_PATH = 'resources';
-const HELPERS_PATH = 'helpers';
+const TYPE = {
+  VIEW: 'views',
+  PARTIAL: 'partials',
+  CONTROLLER: 'controllers',
+  RESOURCE: 'resources',
+  HELPER: 'helpers',
+  MODEL: 'models'
+};
 
-const VIEWS_PATH_FULL = path.join(__dirname, VIEWS_PATH);
-const PARTIALS_PATH_FULL = path.join(VIEWS_PATH_FULL, PARTIALS_PATH);
-const HELPERS_PATH_FULL = path.join(VIEWS_PATH_FULL, HELPERS_PATH);
-const CONTROLLERS_PATH_FULL = path.join(__dirname, CONTROLLERS_PATH);
-const RESOURCES_PATH_FULL = path.join(__dirname, RESOURCES_PATH);
+const PATHS = {
+  VIEWS: path.join(__dirname, TYPE.VIEW, '*.hbs'),
+  PARTIALS: path.join(__dirname, TYPE.VIEW, TYPE.PARTIAL, '*.hbs'),
+  HELPERS: path.join(__dirname, TYPE.VIEW, TYPE.HELPER, '*.js'),
+  CONTROLLERS: path.join(__dirname, TYPE.CONTROLLER, '*.js'),
+  RESOURCES: path.join(__dirname, TYPE.RESOURCE, '*.js'),
+  MODELS: path.join(__dirname, TYPE.MODEL, '*.js')
+};
 
 const injections = {};
 
@@ -53,14 +59,12 @@ function _inject(injectionPath) {
 
 function loadTemplates() {
   function compileView(file) {
-    return Handlebars.compile(
-      fs.readFileSync(path.join(VIEWS_PATH_FULL, `${file}.hbs`), 'utf8')
-    );
+    return Handlebars.compile(fs.readFileSync(file, 'utf8'));
   }
 
   function registerHelpers() {
     glob
-      .sync(path.join(HELPERS_PATH_FULL, '*.js'))
+      .sync(PATHS.HELPERS)
       .filter(isNotTestFile)
       .forEach(file => {
         const fileName = path.basename(file, '.js');
@@ -69,19 +73,16 @@ function loadTemplates() {
   }
 
   function registerRouteTemplates() {
-    glob.sync(path.join(VIEWS_PATH_FULL, '*.hbs')).forEach(file => {
+    glob.sync(PATHS.VIEWS).forEach(file => {
       const fileName = path.basename(file, '.hbs');
-      register(`${VIEWS_PATH}/${fileName}`, compileView(fileName));
+      register(`${TYPE.VIEW}/${fileName}`, compileView(file));
     });
   }
 
   function registerPartials() {
-    glob.sync(path.join(PARTIALS_PATH_FULL, '*.hbs')).forEach(file => {
+    glob.sync(PATHS.PARTIALS).forEach(file => {
       const fileName = path.basename(file, '.hbs');
-      injections[`${PARTIALS_PATH}/${fileName}`] = Handlebars.registerPartial(
-        fileName,
-        compileView(`${PARTIALS_PATH}/${fileName}`)
-      );
+      Handlebars.registerPartial(fileName, compileView(file));
     });
   }
 
@@ -92,28 +93,51 @@ function loadTemplates() {
 
 function loadControllers() {
   glob
-    .sync(path.join(CONTROLLERS_PATH_FULL, '*.js'))
+    .sync(PATHS.CONTROLLERS)
     .filter(isNotTestFile)
     .forEach(file => {
       const fileName = path.basename(file, '.js');
-      register(`${CONTROLLERS_PATH}/${fileName}`, new LazySingleton(file));
+      register(`${TYPE.CONTROLLER}/${fileName}`, new LazySingleton(file));
+    });
+}
+
+function loadModels() {
+  glob
+    .sync(PATHS.MODELS)
+    .filter(isNotTestFile)
+    .forEach(file => {
+      const fileName = path.basename(file, '.js');
+      register(`${TYPE.MODEL}/${fileName}`, require(file));
     });
 }
 
 function loadResources() {
   glob
-    .sync(path.join(RESOURCES_PATH_FULL, '*.js'))
+    .sync(PATHS.RESOURCES)
     .filter(isNotTestFile)
     .forEach(file => {
       const fileName = path.basename(file, '.js');
-      register(`${RESOURCES_PATH}/${fileName}`, new LazySingleton(file));
+      register(`${TYPE.RESOURCE}/${fileName}`, new LazySingleton(file));
     });
 }
 
+function loadRouter() {
+  const routes = require('./routes');
+  register('router', routes());
+}
+
 function loadAll() {
+  loadModels();
   loadResources();
   loadControllers();
   loadTemplates();
+  loadRouter();
 }
 
-module.exports = { inject: _inject, register, loadAll };
+function queryByType(type) {
+  return Object.keys(injections).filter(injection =>
+    injection.startsWith(type)
+  );
+}
+
+module.exports = { inject: _inject, register, loadAll, queryByType, TYPE };

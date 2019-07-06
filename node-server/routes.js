@@ -1,5 +1,5 @@
 const Router = require('koa-router');
-const { inject, register } = require('./injections');
+const { inject } = require('./injections');
 
 module.exports = function routes() {
   const router = new Router();
@@ -76,8 +76,6 @@ module.exports = function routes() {
       inject('controllers/user')
     ])
   );
-
-  register('router', router);
 
   return router;
 };
