@@ -1,0 +1,7 @@
+{{#>box title=topic.title}}
+  <table id="intopic">
+    {{#each posts as |post|}}
+      {{> topic-post-row post=post}}
+    {{/each}}
+  </table>
+{{/box}}

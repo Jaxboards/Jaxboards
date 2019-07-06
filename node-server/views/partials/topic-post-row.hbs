@@ -1,0 +1,62 @@
+<tbody class="topic-post-row" id="pid_{{post.id}}">
+  <tr>
+    <td class="userdata" rowspan="2">
+      <div class="username">
+        {{> user-link user=post.author}}
+      </div>
+      <div class="avatar">
+        {{#link "user" post.author.id}}
+          <img src="{{post.author.avatar}}" alt="Avatar" />
+        {{/link}}
+      </div>
+      <div class="usertitle">
+        {{post.author.usertitle}}
+      </div>
+      {{#if post.author.member_group.icon}}
+        <div class="group_icon">
+          <img src={{post.member_group.icon}} />
+        </div>
+      {{/if}}
+      <div class="userstats">
+        Posts: {{post.author.posts}}
+        <br />
+        {{!-- TODO: user status --}}
+        Status: TODO
+        <br />
+        Group: {{post.author.group.title}}
+        <br />
+        Member: {{post.author.id}}
+      </div>
+    </td>
+    <td class="post">
+      <div class="post_buttons">
+        {{!-- TODO: post buttons: edit, moderate, quote, etc --}}
+      </div>
+      <div class="post_info">
+        {{date post.date}}
+        {{!-- TODO: permalink --}}
+      </div>
+      <div class="post_content">
+        {{post.post}}
+        {{#if post.editor}}
+          <br />
+          <strong>
+            Edited by:
+          </strong>
+          {{> user-link user=post.editor}}, {{date post.edit_date}}
+        {{/if}}
+      </div>
+      <div class="signature">
+        {{post.author.sig}}
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td class="postbottom">
+      {{!-- TODO: post ratings --}}
+      <a href="javascript:scroll(0,0)">
+        ^ Top
+      </a>
+    </td>
+  </tr>
+</tbody>

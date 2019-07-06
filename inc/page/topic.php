@@ -379,10 +379,10 @@ EOT
 
         $topic_post_counter = 0;
 
-          $posts = $DB->fetchResource('posts', [
+        $posts = $DB->fetchResource('posts', [
             'tid' => $this->id,
             'page' => $this->page
-          ]);
+        ]);
         foreach ($posts as $post) {
             if (!$this->firstPostID) {
                 $this->firstPostID = $post['pid'];
@@ -465,8 +465,8 @@ EOT
                 '" onclick="prompt(\'Link to this post:\',this.href)">' .
                 $PAGE->meta('topic-perma-button') . '</a>',
                 $postt,
-                isset($post['sig']) && $post['sig'] ?
-                $JAX->theworks($post['sig']) : '',
+                isset($post['author']['sig']) && $post['author']['sig'] ?
+                $JAX->theworks($post['author']['sig']) : '',
                 $post['auth_id'],
                 $post['edit_date'] ? $PAGE->meta(
                     'topic-edit-by',

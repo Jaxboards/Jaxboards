@@ -3,26 +3,24 @@ const Controller = require('./controller');
 class TopicController extends Controller {
   constructor(inject) {
     super(...arguments);
-    this.ForumsResource = inject('resources/forums');
-    this.MemberGroupsResource = inject('resources/member_groups');
+    this.PostsResource = inject('resources/posts');
     this.TopicsResource = inject('resources/topics');
   }
 
   // eslint-disable-next-line class-methods-use-this
   get template() {
-    return 'forum';
+    return 'topic';
   }
 
   // eslint-disable-next-line class-methods-use-this
   async model(ctx) {
-    const forumId = ctx.params.id;
+    const topicId = ctx.params.id;
     const page = ctx.query.page || 0;
 
     return {
-      forum: await this.ForumsResource.find(forumId),
-      subforums: await this.ForumsResource.findAll({ path: forumId }),
-      topics: await this.TopicsResource.findAll({
-        fid: forumId,
+      topic: await this.TopicsResource.find(topicId),
+      posts: await this.PostsResource.findAll({
+        tid: topicId,
         page
       })
     };
