@@ -20,13 +20,20 @@ class ForumController extends Controller {
     let page = parseInt(ctx.query.page, 10);
     page = Number.isNaN(page) ? 0 : page;
 
+    const forum = await this.ForumsResource.find(forumId);
+
+    if (forum.redirect) {
+      forum.increment('redirects');
+      return ctx.redirect(forum.redirect);
+    }
+
     const { count, rows: topics } = await this.TopicsResource.findAndCountAll({
       fid: forumId,
       page
     });
 
     return {
-      forum: await this.ForumsResource.find(forumId),
+      forum,
       subforums: await this.ForumsResource.findAll({ path: forumId }),
       topics,
       page,

@@ -2,7 +2,7 @@
   {{#> collapse-box title=category.title}}
     <table class="boardindex">
       {{#each category.forums as |forum|}}
-        {{#if category.redirect}}
+        {{#if forum.redirect}}
           {{> idx-redirect-row forum=forum}}
         {{else}}
           {{> idx-row forum=forum}}
