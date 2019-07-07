@@ -64,6 +64,10 @@ class PostsResource extends BaseResource {
   findAndCountAll(query = {}) {
     return this.getModel().findAndCountAll(this.getFindAllOptions(query));
   }
+
+  create(properties) {
+    return this.getModel().create(properties);
+  }
 }
 
 module.exports = PostsResource;

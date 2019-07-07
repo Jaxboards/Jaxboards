@@ -21,7 +21,10 @@ module.exports = function routes() {
     parentController,
     ...childControllers
   ]) => async ctx => {
-    ctx.body = await parentController.render(ctx, childControllers);
+    ctx.body = await inject(parentController).render(
+      ctx,
+      childControllers.map(inject)
+    );
   };
 
   // api
@@ -44,37 +47,37 @@ module.exports = function routes() {
 
   router.get(
     '/',
-    renderControllers([
-      inject('controllers/application'),
-      inject('controllers/index')
-    ])
+    renderControllers(['controllers/application', 'controllers/index'])
   );
 
   router.get(
     'forum',
     '/forum/:id',
-    renderControllers([
-      inject('controllers/application'),
-      inject('controllers/forum')
-    ])
+    renderControllers(['controllers/application', 'controllers/forum'])
   );
 
   router.get(
     'topic',
     '/topic/:id',
-    renderControllers([
-      inject('controllers/application'),
-      inject('controllers/topic')
-    ])
+    renderControllers(['controllers/application', 'controllers/topic'])
   );
+
+  router
+    .get(
+      'post',
+      '/post',
+      renderControllers(['controllers/application', 'controllers/post'])
+    )
+    .post(
+      'post',
+      '/post',
+      renderControllers(['controllers/application', 'controllers/post'])
+    );
 
   router.get(
     'user',
-    '/user/:id',
-    renderControllers([
-      inject('controllers/application'),
-      inject('controllers/user')
-    ])
+    '/user',
+    renderControllers(['controllers/application', 'controllers/user'])
   );
 
   return router;

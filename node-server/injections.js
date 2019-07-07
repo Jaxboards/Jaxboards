@@ -51,6 +51,9 @@ const isNotTestFile = fileName => !/\.test\.js/i.test(fileName);
 // eslint-disable-next-line no-underscore-dangle
 function _inject(injectionPath) {
   const injection = injections[injectionPath];
+  if (!injection) {
+    throw new Error(`Attempted to inject unknown injection: ${injectionPath}`);
+  }
   if (injection instanceof LazySingleton) {
     register(injectionPath, injection.get(_inject));
   }

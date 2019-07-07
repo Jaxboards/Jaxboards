@@ -14,7 +14,6 @@ class ForumController extends Controller {
     return 'forum';
   }
 
-  // eslint-disable-next-line class-methods-use-this
   async model(ctx) {
     const forumId = ctx.params.id;
     let page = parseInt(ctx.query.page, 10);

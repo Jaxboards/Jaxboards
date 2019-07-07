@@ -15,12 +15,13 @@ module.exports = function linkHelper(what, ...args) {
 
   const { queryParams, ...htmlAttributesObj } = options.hash;
 
-  const params = {};
+  const urlArgs = [what];
   if (id) {
-    params.id = id;
+    urlArgs.push({ id });
   }
+  urlArgs.push({ query: queryParams });
 
-  const path = inject('router').url(what, params, { query: queryParams });
+  const path = inject('router').url(...urlArgs);
 
   // Add attributes to the <a> tag
   let htmlAttributes = '';

@@ -1,0 +1,18 @@
+{{#> box title="Reply"}}
+  <div class="postform">
+    <form method="post" data-ajax-form="true">
+      <textarea name="postdata" id="post" class="bbcode-editor">{{post}}</textarea>
+      <br />
+      <div class="buttons">
+        <input
+          type="submit"
+          id="submitbutton"
+          name="submit"
+          value="Post"
+          onclick="this.form.submitButton=this"
+        >
+        <input type="submit" name="submit" value="Preview" onclick="this.form.submitButton=this">
+     </div>
+    </form>
+  </div>
+{{/box}}

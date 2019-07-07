@@ -1,10 +1,14 @@
 const Koa = require('koa');
+const koaBody = require('koa-body');
 const config = require('../config.json');
 
 const { getDBConnection } = require('./utils/sequelize-helpers');
 const injections = require('./injections');
 
 const app = new Koa();
+
+// Parse POST body
+app.use(koaBody());
 
 // Preload all dependencies
 injections.loadAll();
