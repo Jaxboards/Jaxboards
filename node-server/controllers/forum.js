@@ -9,8 +9,7 @@ class ForumController extends Controller {
     this.TopicsResource = inject('resources/topics');
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  get template() {
+  static get template() {
     return 'forum';
   }
 

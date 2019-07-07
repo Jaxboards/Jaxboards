@@ -10,8 +10,7 @@ class PostController extends Controller {
     this.router = inject('router');
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  get template() {
+  static get template() {
     return 'post';
   }
 

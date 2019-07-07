@@ -8,12 +8,10 @@ class TopicController extends Controller {
     this.TopicsResource = inject('resources/topics');
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  get template() {
+  static get template() {
     return 'topic';
   }
 
-  // eslint-disable-next-line class-methods-use-this
   async model(ctx) {
     const topicId = ctx.params.id;
     let page = parseInt(ctx.query.page, 10);

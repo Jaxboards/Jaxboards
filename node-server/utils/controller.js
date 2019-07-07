@@ -1,9 +1,16 @@
 const Handlebars = require('handlebars');
-const { inject } = require('../injections');
 
 module.exports = class Controller {
-  constructor() {
+  constructor(inject) {
     this.compiledTemplate = inject(`views/${this.template}`);
+  }
+
+  static get template() {
+    return '';
+  }
+
+  get template() {
+    return this.constructor.template;
   }
 
   // eslint-disable-next-line class-methods-use-this

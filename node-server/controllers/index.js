@@ -9,8 +9,7 @@ class IndexController extends Controller {
     this.StatsResource = inject('resources/stats');
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  get template() {
+  static get template() {
     return 'index';
   }
 
