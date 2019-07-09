@@ -66,6 +66,11 @@ module.exports = {
             exclude: ['pass', 'email', 'ip', 'ucpnotepad']
           }
         },
+        scopes: {
+          full: {
+            // no restrictions
+          }
+        },
         modelName: 'member',
         sequelize,
         timestamps: false

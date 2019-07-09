@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const { Op } = require('sequelize');
 const BaseResource = require('./resource');
 const Member = require('../models/member').model;
@@ -25,6 +26,33 @@ class MembersResource extends BaseResource {
     }
 
     return null;
+  }
+
+  getAuthenticatedUserById(id) {
+    return this.getModel()
+      .scope('full')
+      .findByPk(id);
+  }
+
+  async getAuthenticatedUser(name, password) {
+    const PHP_PREFIX = /^\$2y\$/;
+    const NODE_PREFIX = '$2a$';
+    const user = await this.getModel()
+      .scope('full')
+      .findOne({
+        where: {
+          name
+        }
+      });
+
+    if (
+      user &&
+      bcrypt.compareSync(password, user.pass.replace(PHP_PREFIX, NODE_PREFIX))
+    ) {
+      return user;
+    }
+
+    return false;
   }
 }
 

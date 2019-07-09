@@ -1,4 +1,5 @@
 const Router = require('koa-router');
+const passport = require('koa-passport');
 const { inject } = require('./injections');
 
 module.exports = function routes() {
@@ -79,6 +80,29 @@ module.exports = function routes() {
     '/user',
     renderControllers(['controllers/application', 'controllers/user'])
   );
+
+  router
+    .get(
+      'login',
+      '/login',
+      renderControllers([
+        'controllers/application',
+        'controllers/login-register'
+      ])
+    )
+    .post(
+      'login',
+      '/login',
+      passport.authenticate('local', {
+        successRedirect: '/',
+        failureRedirect: '/login'
+      })
+    );
+
+  router.get('logout', '/logout', ctx => {
+    ctx.logout();
+    ctx.redirect('/');
+  });
 
   return router;
 };
