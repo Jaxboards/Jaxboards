@@ -3,7 +3,8 @@
   "license": "MIT",
   "scripts": {
     "start": "node serve",
-    "test": "jest"
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "husky": {
     "hooks": {

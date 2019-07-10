@@ -1,4 +1,10 @@
-module.exports = function mockCTX(properties) {
+module.exports = function mockCTX(properties = {}) {
+  const passportExtensions = {
+    isAuthenticated: () => !!properties.user,
+    state: {
+      user: properties.user
+    }
+  };
   return Object.assign(
     {
       query: {},
@@ -6,6 +12,7 @@ module.exports = function mockCTX(properties) {
       request: {},
       redirect: () => {}
     },
-    properties
+    properties,
+    passportExtensions
   );
 };

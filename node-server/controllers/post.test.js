@@ -25,7 +25,7 @@ test('It creates posts for topics', async () => {
   const mockRedirect = jest.fn();
   await indexController.model(
     mockCTX({
-      isAuthenticated: () => true,
+      user: {},
       query: { tid: topicId },
       request: {
         body: {
@@ -72,7 +72,7 @@ test('It throws errors for missing request parameters', async () => {
   expect(
     indexController.model(
       mockCTX({
-        isAuthenticated: () => true,
+        user: {},
         request: {
           body: {
             postdata: 'Just a post body!'
@@ -108,7 +108,6 @@ test('It does not allow guests to post', async () => {
   expect(
     indexController.model(
       mockCTX({
-        isAuthenticated: () => false,
         request: {
           body: {
             postdata: 'Just a post body!'

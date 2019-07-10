@@ -1,6 +1,7 @@
 const SequelizeMock = require('sequelize-mock');
 const ForumController = require('./forum');
 const injectionMocker = require('../test-helpers/injection-mocker');
+const mockCtx = require('../test-helpers/ctx-mocker');
 
 const DBConnectionMock = new SequelizeMock();
 
@@ -35,13 +36,14 @@ test('Redirect forums work as expected', async () => {
 
   const indexController = new ForumController(inject);
   let redirectedUrl;
-  await indexController.model({
-    query: {},
-    params: { id: forumId },
-    redirect(url) {
-      redirectedUrl = url;
-    }
-  });
+  await indexController.model(
+    mockCtx({
+      params: { id: forumId },
+      redirect(url) {
+        redirectedUrl = url;
+      }
+    })
+  );
 
   expect(mockForumInstance.redirects).toBe(6);
   expect(redirectedUrl).toBe('http://example.com');
