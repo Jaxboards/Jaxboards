@@ -1,5 +1,5 @@
 const Controller = require('../utils/controller');
-const { BadRequest } = require('../utils/http-status');
+const { BadRequest, UnauthorizedRequest } = require('../utils/http-status');
 
 class PostController extends Controller {
   constructor(inject) {
@@ -35,6 +35,9 @@ class PostController extends Controller {
   handlePost(ctx) {
     const { tid, fid } = ctx.query;
     const { postdata } = ctx.request.body;
+    if (!ctx.isAuthenticated()) {
+      throw new UnauthorizedRequest('This forum does not allow guest posts');
+    }
     if (tid) {
       // create the post and redirect back to topic view
       return this.PostsResource.create({

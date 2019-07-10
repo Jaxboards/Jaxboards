@@ -5,6 +5,22 @@ class BadRequest extends Error {
   }
 }
 
+class ForbiddenRequest extends Error {
+  constructor(message = 'Forbidden', ...args) {
+    super(message, ...args);
+    this.status = 401;
+  }
+}
+
+class UnauthorizedRequest extends Error {
+  constructor(message = 'Unauthorized', ...args) {
+    super(message, ...args);
+    this.status = 403;
+  }
+}
+
 module.exports = {
-  BadRequest
+  BadRequest,
+  ForbiddenRequest,
+  UnauthorizedRequest
 };
