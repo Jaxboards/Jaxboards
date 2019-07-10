@@ -77,7 +77,7 @@ module.exports = function routes() {
 
   router.get(
     'user',
-    '/user',
+    '/user/:id',
     renderControllers(['controllers/application', 'controllers/user'])
   );
 
