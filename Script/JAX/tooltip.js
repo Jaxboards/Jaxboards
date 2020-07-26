@@ -19,7 +19,7 @@ export default function tooltip(el) {
     let a;
 
     toolTip.id = 'tooltip_thingy';
-    toolTip.className = 'toolTip';
+    toolTip.className = 'tooltip';
     t.className = 'top';
     c.className = 'content';
     b.className = 'bottom';
