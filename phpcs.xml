@@ -22,9 +22,9 @@
   <!-- Reference https://github.com/squizlabs/PHP_CodeSniffer/wiki/Configuration-Options#setting-the-default-tab-width -->
   <config name="tab_width" value="4"/>
 
-	<!-- Return error codes on exit if there are errros -->
-	<config name="ignore_errors_on_exit" value="0"/>
-	<config name="ignore_warnings_on_exit" value="0"/>
+  <!-- Return error codes on exit if there are errros -->
+  <config name="ignore_errors_on_exit" value="0"/>
+  <config name="ignore_warnings_on_exit" value="0"/>
 
   <!-- Files and directories to run on -->
   <file>acp</file>
