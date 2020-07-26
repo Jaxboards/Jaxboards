@@ -1,9 +1,10 @@
 <?php
+
 /**
  * Jaxboards. THE ULTIMATE 4UMS WOOOOOOO
  * By Sean John's son (2007 @ 4 AM).
  *
- * PHP Version 5.3.7
+ * PHP Version 7.2.32
  *
  * @category Jaxboards
  * @package  Jaxboards

@@ -2,7 +2,7 @@
 /**
  * Service signup file, for users to create their own JaxBoards forum.
  *
- * PHP Version 5.3.7
+ * PHP Version 7.2.32
  *
  * @category Jaxboards
  * @package  Jaxboards

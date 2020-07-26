@@ -168,7 +168,7 @@ class PAGE
 /**
  * JaxBoards config file. It's just JSON embedded in PHP- wow!
  *
- * PHP Version 5.3.0
+ * PHP Version 7.2.32
  *
  * @category Jaxboards
  * @package  Jaxboards

@@ -2,7 +2,7 @@
 /**
  * Service install file, for installing a new JaxBoards service.
  *
- * PHP Version 5.3.7
+ * PHP Version 7.2.32
  *
  * @category Jaxboards
  * @package  Jaxboards

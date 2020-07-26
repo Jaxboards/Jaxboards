@@ -1,6 +1,14 @@
 <?xml version="1.0"?>
 <ruleset name="Jaxboards">
   <description>Jaxboards PHP coding standards</description>
+  <!-- PHP Version -->
+  <!-- Reference https://github.com/squizlabs/PHP_CodeSniffer/wiki/Configuration-Options#setting-the-php-version -->
+  <config name="php_version" value="70232"/>
+
+  <!-- Make sure this works with PHP 7.2+ -->
+  <!-- Reference https://github.com/PHPCompatibility/PHPCompatibility#sniffing-your-code-for-compatibility-with-specific-php-versions -->
+  <config name="testVersion" value="7.2-"/>
+
   <!-- Files and directories to run on -->
   <file>acp</file>
   <file>inc</file>
@@ -40,18 +48,6 @@
   <rule ref="Squiz.Commenting.BlockComment">
     <exclude name="Squiz.Commenting.BlockComment.NotCapital" />
     <exclude name="Squiz.Commenting.BlockComment.InvalidEndChar" />
-  </rule>
-  <!-- Make sure this works with PHP 5.3 -->
-  <config name="testVersion" value="5.3-" />
-  <rule ref="PHPCompatibility">
-    <!-- Exclude polyfilled password_hash related functions from compatibility check -->
-    <exclude name="PHPCompatibility.PHP.NewConstants.password_bcryptFound" />
-    <exclude name="PHPCompatibility.PHP.NewConstants.password_bcrypt_default_costFound" />
-    <exclude name="PHPCompatibility.PHP.NewConstants.password_defaultFound" />
-    <exclude name="PHPCompatibility.PHP.NewFunctions.password_get_infoFound" />
-    <exclude name="PHPCompatibility.PHP.NewFunctions.password_hashFound" />
-    <exclude name="PHPCompatibility.PHP.NewFunctions.password_needs_rehashFound" />
-    <exclude name="PHPCompatibility.PHP.NewFunctions.password_verifyFound" />
   </rule>
 
   <!-- Ban some functions -->

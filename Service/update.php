@@ -2,7 +2,7 @@
 /**
  * Updater to update existing jaxboards to new MySQL standards.
  *
- * PHP Version 5.3.0
+ * PHP Version 7.2.32
  *
  * @category Jaxboards
  * @package  Jaxboards
