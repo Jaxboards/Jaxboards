@@ -12,7 +12,8 @@ class members
         global $JAX,$PAGE;
         $this->page = 0;
         $this->perpage = 20;
-        if (isset($JAX->b['page'])
+        if (
+            isset($JAX->b['page'])
             && is_numeric($JAX->b['page'])
             && $JAX->b['page'] > 0
         ) {
@@ -39,7 +40,8 @@ class members
         $sorthow = (isset($JAX->b['how']) && 'DESC' == $JAX->b['how'])
             ? 'DESC' : 'ASC';
         $where = '';
-        if (isset($JAX->b['sortby'], $vars[$JAX->b['sortby']])
+        if (
+            isset($JAX->b['sortby'], $vars[$JAX->b['sortby']])
             && $vars[$JAX->b['sortby']]
         ) {
             $sortby = $JAX->b['sortby'];

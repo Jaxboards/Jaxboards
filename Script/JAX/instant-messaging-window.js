@@ -23,7 +23,7 @@ IMWindow.menu = function openMenu(event, uid) {
   d.id = 'immenu';
   d.className = 'immenu';
   document.body.appendChild(d);
-  document.body.onclick = clickEvent => {
+  document.body.onclick = (clickEvent) => {
     const ce = Event(clickEvent);
     if (ce.srcElement !== d && !isChildOf(ce.srcElement, d)) {
       d.parentNode.removeChild(d);

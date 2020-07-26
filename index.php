@@ -15,6 +15,7 @@
  *
  * @link https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
+
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', __DIR__);
 }
@@ -281,12 +282,14 @@ $PAGE->addvar('userid', $JAX->pick($USER['id'], 0));
 if (!isset($JAX->b['act'])) {
     $JAX->b['act'] = null;
 }
-if ('logreg' != $JAX->b['act']
+if (
+'logreg' != $JAX->b['act']
     && 'logreg2' != $JAX->b['act']
     && 'logreg4' != $JAX->b['act']
     && 'logreg3' != $JAX->b['act']
 ) {
-    if (!$PERMS['can_view_board']
+    if (
+        !$PERMS['can_view_board']
         || $CFG['boardoffline']
         && !$PERMS['can_view_offline_board']
     ) {
@@ -297,7 +300,8 @@ if ('logreg' != $JAX->b['act']
 // Include modules.
 foreach (glob('inc/modules/*.php') as $v) {
     if (preg_match('/tag_(\\w+)/', $v, $m)) {
-        if (isset($m[1]) && ((isset($JAX->b['module'])
+        if (
+            isset($m[1]) && ((isset($JAX->b['module'])
             && $JAX->b['module'] == $m[1]) || $PAGE->templatehas($m[1]))
         ) {
             include $v;

@@ -1,6 +1,6 @@
-import { getHighestZIndex } from './el';
 import Browser from './browser';
 import { date, smalldate } from './date';
+import { getHighestZIndex } from './el';
 
 // This file is just a dumping ground until I can find better homes for these
 export function assign(a, b) {
@@ -40,13 +40,14 @@ export function onImagesLoaded(imgs, callback, timeout) {
         callback();
         dbj.called = true;
       }
-    }
+    },
   };
-  Array.from(imgs).forEach(img => {
+  Array.from(imgs).forEach((img) => {
     if (dbj.imgs.includes(img.src) === false && !img.loaded) {
       dbj.imgs.push(img.src);
       img.addEventListener('load', dbj.callback);
-      img.src = img.src;
+      const source = img.src;
+      img.src = source;
     }
   });
   if (!imgs.length) {
@@ -63,7 +64,7 @@ export function updateDates() {
   if (!dates) {
     return;
   }
-  dates.forEach(el => {
+  dates.forEach((el) => {
     const timestamp = parseInt(el.title, 10);
     const parsed = el.classList.contains('smalldate')
       ? smalldate(timestamp)
@@ -72,7 +73,7 @@ export function updateDates() {
       el.innerHTML = parsed;
     }
   });
-  dateTitles.forEach(el => {
+  dateTitles.forEach((el) => {
     if (!el.title) {
       el.title = smalldate(el.dataset.timestamp);
     }
@@ -88,7 +89,7 @@ export function toggleOverlay(show) {
       top: 0,
       height: `${dE.clientHeight}px`,
       width: `${dE.clientWidth}px`,
-      display: show ? '' : 'none'
+      display: show ? '' : 'none',
     });
   } else {
     if (!show) return;
@@ -96,7 +97,7 @@ export function toggleOverlay(show) {
     ol.id = 'overlay';
     assign(ol.style, {
       height: `${dE.clientHeight}0px`,
-      width: `${dE.clientWidth}0px`
+      width: `${dE.clientWidth}0px`,
     });
     dE.appendChild(ol);
   }

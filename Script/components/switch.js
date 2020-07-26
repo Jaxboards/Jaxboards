@@ -14,7 +14,7 @@ export default class Switch extends Component {
 
     const button = assign(document.createElement('button'), {
       type: 'button',
-      className: element.className
+      className: element.className,
     });
 
     const toggle = () => {

@@ -1,28 +1,25 @@
 import { getCoordinates, getHighestZIndex } from './el';
 
 function stripHTML(html) {
-  return html
-    .valueOf()
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  return html.valueOf().replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-export default function(el) {
-  let tooltip = document.getElementById('tooltip_thingy');
+export default function tooltip(el) {
+  let toolTip = document.getElementById('tooltip_thingy');
   const pos = getCoordinates(el);
   const title = stripHTML(el.title);
   // Prevent the browser from showing its own title
   el.title = '';
   if (!title) return;
-  if (!tooltip) {
-    tooltip = document.createElement('table');
-    const t = tooltip.insertRow(0);
-    const c = tooltip.insertRow(1);
-    const b = tooltip.insertRow(2);
+  if (!toolTip) {
+    toolTip = document.createElement('table');
+    const t = toolTip.insertRow(0);
+    const c = toolTip.insertRow(1);
+    const b = toolTip.insertRow(2);
     let a;
 
-    tooltip.id = 'tooltip_thingy';
-    tooltip.className = 'tooltip';
+    toolTip.id = 'tooltip_thingy';
+    toolTip.className = 'toolTip';
     t.className = 'top';
     c.className = 'content';
     b.className = 'bottom';
@@ -42,14 +39,14 @@ export default function(el) {
     a.colSpan = 2;
     a = b.insertCell(1);
     a.className = 'right';
-    document.querySelector('#page').appendChild(tooltip);
+    document.querySelector('#page').appendChild(toolTip);
   }
 
-  tooltip.rows[1].cells[1].innerHTML = title;
-  tooltip.style.display = '';
-  tooltip.style.top = `${pos.y - tooltip.clientHeight}px`;
-  tooltip.style.left = `${pos.x}px`;
-  tooltip.style.zIndex = getHighestZIndex();
+  toolTip.rows[1].cells[1].innerHTML = title;
+  toolTip.style.display = '';
+  toolTip.style.top = `${pos.y - toolTip.clientHeight}px`;
+  toolTip.style.left = `${pos.x}px`;
+  toolTip.style.zIndex = getHighestZIndex();
   el.onmouseout = () => {
     el.title = title;
     document.querySelector('#tooltip_thingy').style.display = 'none';

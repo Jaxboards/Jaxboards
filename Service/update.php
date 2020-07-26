@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Updater to update existing jaxboards to new MySQL standards.
  *
@@ -12,6 +13,7 @@
  *
  * @link https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
+
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', dirname(__DIR__));
 }
@@ -217,7 +219,8 @@ EOT
     $createTableStatement = array_pop($createTableStatement);
     $DB->disposeresult($result);
     if (!preg_match("/KEY\s+`boardname`/i", $createTableStatement)) {
-        $result = $DB->safequery(<<<'EOT'
+        $result = $DB->safequery(
+            <<<'EOT'
 ALTER TABLE `directory`
     ADD INDEX `boardname` (`boardname`);
 EOT
@@ -229,7 +232,8 @@ EOT
     $createTableStatement = array_pop($createTableStatement);
     $DB->disposeresult($result);
     if (!preg_match("/UNIQUE\s+`ip`/i", $createTableStatement)) {
-        $result = $DB->safequery(<<<'EOT'
+        $result = $DB->safequery(
+            <<<'EOT'
 ALTER TABLE `banlist`
     ADD UNIQUE `banlist` (`banlist`);
 EOT
@@ -1484,7 +1488,8 @@ EOT;
     $createTableStatement = $DB->row($result);
     $createTableStatement = array_pop($createTableStatement);
     if (!preg_match("/KEY\s+`hash`/i", $createTableStatement)) {
-        $result = $DB->safequery(<<<EOT
+        $result = $DB->safequery(
+            <<<EOT
 ALTER TABLE ${table}
     ADD INDEX `hash` (`hash`);
 EOT
@@ -1561,7 +1566,8 @@ EOT
         }
     }
     $DB->disposeresult($result);
-    if (in_array('dob_year', $columns)
+    if (
+        in_array('dob_year', $columns)
         && in_array('dob_month', $columns)
         && in_array('dob_day', $columns)
         && !in_array('birthdate', $columns)
@@ -1621,7 +1627,8 @@ EOT
         $row = $DB->arow($result);
         $DB->disposeResult($result);
         if (null === $row['ip_check']) {
-            $result = $DB->safequery(<<<EOT
+            $result = $DB->safequery(
+                <<<EOT
 UPDATE ${table} SET `${column}` = COALESCE(
     INET6_ATON(INET_NTOA(`${column}`)),
     INET6_ATON(INET_NTOA(0))
@@ -1684,10 +1691,12 @@ EOT
                 );
                 $DB->disposeresult($result);
             }
-            if (!preg_match(
-                "/FOREIGN\s+KEY\s+\(`${column}`\)\s+REFERENCES\s+${foreign['table']}\s+\(`${foreign['column']}`\)/i",
-                $createTableStatement
-            )
+            if (
+                !preg_match(
+                    "/FOREIGN\s+KEY\s+\(`${column}`\)\s+REFERENCES\s+"
+                    . "${foreign['table']}\s+\(`${foreign['column']}`\)/i",
+                    $createTableStatement
+                )
             ) {
                 $result = $DB->safequery(
                     str_replace(

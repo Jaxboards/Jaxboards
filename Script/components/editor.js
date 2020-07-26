@@ -10,7 +10,7 @@ import { assign } from '../JAX/util';
 import { replaceSelection } from '../JAX/selection';
 
 const URL_REGEX = /^(ht|f)tps?:\/\/[\w.\-%&?=/]+$/;
-const isURL = text => URL_REGEX.test(text);
+const isURL = (text) => URL_REGEX.test(text);
 
 export default class Editor extends Component {
   static get selector() {
@@ -89,7 +89,7 @@ export default class Editor extends Component {
       'insertorderedlist',
       'insertunorderedlist',
       'c_smileys',
-      'c_switcheditmode'
+      'c_switcheditmode',
     ];
 
     const cmddesc = [
@@ -112,7 +112,7 @@ export default class Editor extends Component {
       'Create Ordered List',
       'Create Unordered List',
       'Insert Emoticon',
-      'Switch editor mode'
+      'Switch editor mode',
     ];
 
     cmds.forEach((cmd, i) => {
@@ -121,7 +121,7 @@ export default class Editor extends Component {
       a.title = cmddesc[i];
       a.href = 'javascript:void(0)';
       a.unselectable = 'on';
-      a.onclick = event => this.editbarCommand(event, cmd);
+      a.onclick = (event) => this.editbarCommand(event, cmd);
       this.editbar.appendChild(a);
     });
   }
@@ -150,7 +150,7 @@ export default class Editor extends Component {
     const emotewin = this.emoteWindow;
     if (!emotewin) {
       new Ajax().load('/misc/emotes.php?json', {
-        callback: response => this.createEmoteWindow(response, { x, y })
+        callback: (response) => this.createEmoteWindow(response, { x, y }),
       });
       return;
     }
@@ -210,7 +210,7 @@ export default class Editor extends Component {
       '#0000FF',
       '#FFFF00',
       '#00FFFF',
-      '#FF00FF'
+      '#FF00FF',
     ];
     const l = colors.length;
     const sq = Math.ceil(Math.sqrt(l));
@@ -220,7 +220,7 @@ export default class Editor extends Component {
       borderCollapse: 'collapse',
       position: 'absolute',
       top: `${posy}px`,
-      left: `${posx}px`
+      left: `${posx}px`,
     });
 
     for (let y = 0; y < sq; y += 1) {
@@ -243,7 +243,7 @@ export default class Editor extends Component {
           backgroundColor: color,
           height: '20px',
           width: '20px',
-          margin: 0
+          margin: 0,
         });
       }
     }

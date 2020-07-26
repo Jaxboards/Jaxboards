@@ -9,12 +9,12 @@ let onPageChangeOld;
 class ModControls {
   constructor(commands) {
     assign(commands, {
-      modcontrols_createModControls: html => {
+      modcontrols_createModControls: (html) => {
         this.busy = true;
         this.createModControls(html);
       },
 
-      modcontrols_postsync: a => {
+      modcontrols_postsync: (a) => {
         let pids = [];
         if (a[0] && (typeof a[0] === 'string' || typeof a[0] === 'number')) {
           pids = `${a[0]}`.split(',');
@@ -26,10 +26,13 @@ class ModControls {
         }
         const tl = tids ? tids.length : 0;
         const html =
-          `${"<form method='post' data-ajax-form='true'>" +
-            "<input type='hidden' name='act' value='modcontrols' />"}${
+          `${
+            "<form method='post' data-ajax-form='true'>" +
+            "<input type='hidden' name='act' value='modcontrols' />"
+          }${
             tl
-              ? `${"<select name='dot'>" +
+              ? `${
+                  "<select name='dot'>" +
                   "<option value='delete'>Delete</option>" +
                   "<option value='merge'>Merge</option>" +
                   "<option value='move'>Move</option>" +
@@ -38,18 +41,19 @@ class ModControls {
                   "<option value='lock'>Lock</option>" +
                   "<option value='unlock'>Unlock</option>" +
                   '</select>' +
-                  '&nbsp; &nbsp; <strong>'}${tl}</strong> topic${
-                  tl > 1 ? 's' : ''
-                }${pl ? ' and <br />' : ''}`
+                  '&nbsp; &nbsp; <strong>'
+                }${tl}</strong> topic${tl > 1 ? 's' : ''}${
+                  pl ? ' and <br />' : ''
+                }`
               : ''
           }${
             pl
-              ? `${"<select name='dop'>" +
+              ? `${
+                  "<select name='dop'>" +
                   "<option value='delete'>Delete</option>" +
                   "<option value='move'>Move</option>" +
-                  '</select> &nbsp; &nbsp; <strong>'}${pl}</strong> post${
-                  pids.length > 1 ? 's' : ''
-                }`
+                  '</select> &nbsp; &nbsp; <strong>'
+                }${pl}</strong> post${pids.length > 1 ? 's' : ''}`
               : ''
           }${
             pl && tl ? '<br />' : ' &nbsp; &nbsp; '
@@ -60,13 +64,13 @@ class ModControls {
           tids,
           tidl: tl,
           pids,
-          pidl: pl
+          pidl: pl,
         });
         if (tl || pl) this.createModControls(html);
         else this.destroyModControls();
       },
 
-      modcontrols_move: act => {
+      modcontrols_move: (act) => {
         const whichone = parseInt((act && act[0]) || this.whichone, 10);
         if (!this.busy && onPageChangeOld) {
           onPageChangeOld = Event.onPageChange;
@@ -85,7 +89,7 @@ class ModControls {
       modcontrols_clearbox: () => {
         this.destroyModControls();
         this.busy = false;
-      }
+      },
     });
 
     this.boundCheckLocation = () => this.checkLocation();

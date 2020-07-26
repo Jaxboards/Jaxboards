@@ -16,7 +16,7 @@ class Window {
       className: '',
       pos: 'center',
       zIndex: getHighestZIndex(),
-      ...options
+      ...options,
     });
   }
 
@@ -66,7 +66,7 @@ class Window {
     const close = () => this.close();
     windowContainer
       .querySelectorAll('[data-window-close]')
-      .forEach(closeElement => {
+      .forEach((closeElement) => {
         closeElement.addEventListener('click', close);
       });
 
@@ -101,7 +101,7 @@ class Window {
           },
           ondrop() {
             rsize.style.left = `${windowContainer.clientWidth - 16}px`;
-          }
+          },
         })
         .apply(rsize);
       targ.style.width = `${windowContainer.clientWidth}px`;

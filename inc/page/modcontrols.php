@@ -581,7 +581,8 @@ EOT
         $page = '';
         $exploded = isset($SESS->vars['modtids']) ?
             explode(',', $SESS->vars['modtids']) : array();
-        if (isset($JAX->p['ot'])
+        if (
+            isset($JAX->p['ot'])
             && is_numeric($JAX->p['ot'])
             && in_array($JAX->p['ot'], $exploded)
         ) {
@@ -754,7 +755,8 @@ EOT
                 }
             }
         }
-        if ((isset($JAX->p['submit'])
+        if (
+            (isset($JAX->p['submit'])
             && 'showform' == $JAX->p['submit'])
             || isset($JAX->b['mid'])
         ) {
@@ -817,7 +819,8 @@ EOT
             if (!$data) {
                 $e = 'No members found that matched the criteria.';
             }
-            if ((isset($data['can_moderate'])
+            if (
+                (isset($data['can_moderate'])
                 && $data['can_moderate'])
                 && 2 != $USER['group_id']
                 || 2 == $data['group_id']

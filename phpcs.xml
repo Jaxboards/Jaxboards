@@ -9,6 +9,23 @@
   <!-- Reference https://github.com/PHPCompatibility/PHPCompatibility#sniffing-your-code-for-compatibility-with-specific-php-versions -->
   <config name="testVersion" value="7.2-"/>
 
+  <!-- show colors -->
+  <arg name="colors" />
+
+  <!-- only check php files -->
+  <arg name="extensions" value="php" />
+
+  <!-- Output with rule names - needed for disabling specific rules -->
+  <arg value="s"/>
+
+  <!-- Set tab width to PSR-12 standard -->
+  <!-- Reference https://github.com/squizlabs/PHP_CodeSniffer/wiki/Configuration-Options#setting-the-default-tab-width -->
+  <config name="tab_width" value="4"/>
+
+	<!-- Return error codes on exit if there are errros -->
+	<config name="ignore_errors_on_exit" value="0"/>
+	<config name="ignore_warnings_on_exit" value="0"/>
+
   <!-- Files and directories to run on -->
   <file>acp</file>
   <file>inc</file>
@@ -24,10 +41,7 @@
   <!-- ignore vendor files -->
   <exclude-pattern>*/vendor/*</exclude-pattern>
   <exclude-pattern>*/node_modules/*</exclude-pattern>
-  <!-- show colors -->
-  <arg name="colors" />
-  <!-- only check php files -->
-  <arg name="extensions" value="php" />
+
   <!-- Follow PSR coding style guides -->
   <!-- PSR1: Basic Coding Standard https://www.php-fig.org/psr/psr-1 -->
   <rule ref="PSR1">

@@ -43,7 +43,7 @@ export default {
     let selector = sel;
     const paths = Array.from(document.querySelectorAll('.path'));
     if (selector === 'path' && paths.length > 1) {
-      paths.forEach(path => {
+      paths.forEach((path) => {
         path.innerHTML = html;
         gracefulDegrade(path);
       });
@@ -132,7 +132,7 @@ export default {
           tick = ticks[x];
           new Animation(tick, 30, 500)
             .add('opacity', '1', '0')
-            .then(el => {
+            .then((el) => {
               el.parentNode.removeChild(el);
             })
             .play();
@@ -199,10 +199,9 @@ export default {
       if (!fromMe) {
         document.querySelector(`#im_${fromId}`).classList.remove('offline');
       }
-      d.innerHTML = `<a href='?act=vu${fromMe ||
-        parseInt(fromId, 10)}' class='name'>${fromName}</a> ${
-        !isAction ? ': ' : ''
-      }${message}`;
+      d.innerHTML = `<a href='?act=vu${
+        fromMe || parseInt(fromId, 10)
+      }' class='name'>${fromName}</a> ${!isAction ? ': ' : ''}${message}`;
       d.dataset.timestamp = timestamp;
       const test =
         messagesContainer.scrollTop >
@@ -287,7 +286,7 @@ export default {
   setoffline(a) {
     const statusers = document.querySelector('#statusers');
     const ids = a[0].split(',');
-    ids.forEach(id => {
+    ids.forEach((id) => {
       const link = document.querySelector(`#statusers .user${id}`);
       if (link) {
         statusers.removeChild(link);
@@ -370,5 +369,5 @@ export default {
     }
     prdiv.innerHTML = html;
     new Animation(prdiv).add('height', '0px', '200px').play();
-  }
+  },
 };

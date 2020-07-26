@@ -6,7 +6,9 @@
   },
   "scripts": {
     "post-install-cmd": "phpcs --config-delete installed_paths && phpcs --config-set installed_paths $(pwd)/vendor/phpcompatibility/php-compatibility",
-    "lint": ["@phpcs"],
+    "lint": [
+      "@phpcs"
+    ],
     "phpcs": "phpcs",
     "phpcbf": "phpcbf"
   },

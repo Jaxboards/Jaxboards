@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Service install file, for installing a new JaxBoards service.
  *
@@ -13,6 +14,7 @@
  *
  * @link https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
+
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', dirname(__DIR__));
 }
@@ -114,10 +116,11 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         }
     }
     if ($JAX->p['domain'] && !parse_url($JAX->p['domain'], PHP_URL_HOST)) {
-        if (preg_match(
-            '@[^\\w.]@',
-            $JAX->p['domain']
-        )
+        if (
+            preg_match(
+                '@[^\\w.]@',
+                $JAX->p['domain']
+            )
         ) {
             $errors[] = 'Invalid domain';
         } else {

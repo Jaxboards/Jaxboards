@@ -29,7 +29,7 @@ export const monthsShort = [
   'Sep',
   'Oct',
   'Nov',
-  'Dec'
+  'Dec',
 ];
 export const daysShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -45,7 +45,7 @@ export const months = [
   'September',
   'October',
   'November',
-  'December'
+  'December',
 ];
 
 export function date(gmtUnixTimestamp) {

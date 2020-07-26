@@ -18,16 +18,19 @@ class SHOUTBOX
             return;
         }
         $this->shoutlimit = $CFG['shoutbox_num'];
-        if (isset($JAX->b['shoutbox_delete'])
+        if (
+            isset($JAX->b['shoutbox_delete'])
             && is_numeric($JAX->b['shoutbox_delete'])
         ) {
             $this->deleteshout();
-        } elseif (isset($JAX->b['module'])
+        } elseif (
+            isset($JAX->b['module'])
             && 'shoutbox' == $JAX->b['module']
         ) {
             $this->showallshouts();
         }
-        if (isset($JAX->p['shoutbox_shout'])
+        if (
+            isset($JAX->p['shoutbox_shout'])
             && '' !== trim($JAX->p['shoutbox_shout'])
         ) {
             $this->addshout();
@@ -53,7 +56,8 @@ class SHOUTBOX
                 );
                 $shoutrow = $DB->arow($result);
             }
-            if (isset($shoutrow['uid'])
+            if (
+                isset($shoutrow['uid'])
                 && $shoutrow['uid'] == $USER['id']
             ) {
                 $candelete = true;
@@ -210,7 +214,8 @@ EOT
         $pagen = 0;
         $pages = '';
         $page = '';
-        if (isset($JAX->b['page'])
+        if (
+            isset($JAX->b['page'])
             && is_numeric($JAX->b['page'])
             && $JAX->b['page'] > 1
         ) {

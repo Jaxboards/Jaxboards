@@ -128,12 +128,12 @@ export function bbcodeToHTML(bbcode) {
     /\[align=(left|right|center)\](.*?)\[\/align\]/g,
     '<div style="text-align:$1">$2</div>'
   );
-  html = html.replace(/\[(ul|ol)\]([\w\W]*?)\[\/\1\]/gi, match => {
+  html = html.replace(/\[(ul|ol)\]([\w\W]*?)\[\/\1\]/gi, (match) => {
     const tag = match[1];
     const listItems = match[2].split(/([\r\n]+|^)\*/);
     const lis = listItems
-      .filter(text => text.trim())
-      .map(text => `<li>${text}</li>`)
+      .filter((text) => text.trim())
+      .map((text) => `<li>${text}</li>`)
       .join('');
     return `<${tag}>${lis}</${tag}>`;
   });

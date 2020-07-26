@@ -81,7 +81,8 @@ class settings
             $JAX->p['badword'] = $JAX->blockhtml($JAX->p['badword']);
             if (!$JAX->p['badword'] || !$JAX->p['replacement']) {
                 $page .= $PAGE->error('All fields required.');
-            } elseif (isset($wordfilter[$JAX->p['badword']])
+            } elseif (
+                isset($wordfilter[$JAX->p['badword']])
                 && $wordfilter[$JAX->p['badword']]
             ) {
                 $page .= $PAGE->error(
