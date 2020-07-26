@@ -64,7 +64,7 @@ class MySQL
 
     public function ftable($a)
     {
-        return '`' . $this->prefix . '_' . $a . '`';
+        return '`' . $this->prefix . $a . '`';
     }
 
     public function error($use_mysqli = 0)
