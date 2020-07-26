@@ -1,37 +1,51 @@
 <?php
 
+// TEMPLATE Class is a singleton that can be statically invoked and will
+// store a chache of loaded template files for rendering
 class TEMPLATE
 {
-    public $filename = "";
-    private $templateData = "";
-    private $renderData = "";
+    private static $TEMPLATE_ARR = [];
 
-    public function __construct($_filename)
-    {
+    private $filename="";
+    private $templateData="";
 
-        $file_parts = pathinfo($_filename);
-        if (!$file_parts['extension']) {
-            $_filename = $_filename.".hbs";
-        }
-
+    private function __construct($_filename){
         $this->filename = $_filename;
-
-        $this->loadTemplate();
-    }
-
-    public function loadTemplate()
-    {
         $this->templateData = file_get_contents($this->filename);
     }
 
     // Using the loaded Template String replace with the provided properties
     // set $this->render with the finished rendering of the template
-    public function render($_props)
-    {
-        if (trim($this->templateData) !== '') {
+    public static function render($_filename, $_props){
+        $template = null;
+
+        // normalize the filename
+        $file_parts = pathinfo($_filename);
+        switch($file_parts['extension']){
+            case "":
+                $_filename = $_filename.".hbs";
+            break;
+        }
+
+        // load from cache if already loaded otherwise, create template object
+        if(array_key_exists($_filename, self::$TEMPLATE_ARR)){
+            $template = self::$TEMPLATE_ARR[$_filename];
+        } else {
+            $template = new TEMPLATE($_filename);
+            array_push(self::$TEMPLATE_ARR, [$_filename => $template]);
+        }
+
+        // return if template retrieval fails
+        if($template == null){
+            return null;
+        }
+
+        // If the template is loaded and valid atempt to insert values
+        if(trim($template->templateData) !== ''){
+
             // Set render for template starting point
-            $renderData = $this->templateData;
-            foreach ($_props as $key => $value) {
+            $renderData = $template->templateData;
+            foreach($_props as $key => $value){
                 $pattern = '/{{'.$key.'}}/';
                 $renderData = preg_replace($pattern, $value, $renderData);
             }
@@ -40,3 +54,5 @@ class TEMPLATE
         }
     }
 }
+
+?>
