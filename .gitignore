@@ -12,9 +12,9 @@ boards
 # Log files
 *.log
 
+# Cache files
+*.cache
+
 # Vendor files
 node_modules
 vendor
-
-# Lock files
-*.lock

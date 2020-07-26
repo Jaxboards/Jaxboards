@@ -37,8 +37,8 @@
     <exclude name="PSR1.Methods.CamelCapsMethodName" />
     <exclude name="Squiz.Classes.ValidClassName" />
   </rule>
-  <!-- PSR2: Coding Style Guide https://www.php-fig.org/psr/psr-2 -->
-  <rule ref="PSR2" />
+  <!-- PSR-12: Extended Coding Style https://www.php-fig.org/psr/psr-12 -->
+  <rule ref="PSR12" />
   <!-- Here's some comment rules we can follow -->
   <rule ref="Squiz.Commenting.InlineComment">
     <exclude name="Squiz.Commenting.InlineComment.NotCapital" />
