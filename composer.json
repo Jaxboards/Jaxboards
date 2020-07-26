@@ -1,4 +1,7 @@
 {
+  "name": "jaxboards/jaxboards",
+  "type": "project",
+  "license": "MIT",
   "config": {
     "platform": {
       "php": "7.2.32"
@@ -6,9 +9,8 @@
   },
   "scripts": {
     "post-install-cmd": "phpcs --config-delete installed_paths && phpcs --config-set installed_paths $(pwd)/vendor/phpcompatibility/php-compatibility",
-    "lint": [
-      "@phpcs"
-    ],
+    "post-update-cmd": "phpcs --config-delete installed_paths && phpcs --config-set installed_paths $(pwd)/vendor/phpcompatibility/php-compatibility",
+    "lint": ["@phpcs"],
     "phpcs": "phpcs",
     "phpcbf": "phpcbf"
   },
@@ -19,5 +21,7 @@
   },
   "require": {
     "php": ">=7.2.32"
-  }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
 }
