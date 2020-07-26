@@ -196,11 +196,6 @@ See also the list of [contributors](https://github.com/Jaxboards/Jaxboards/graph
 This project is licensed under the MIT License - see the
 [LICENSE.md](LICENSE.md) file for details
 
-## Third-Party Libraries
-
-- [password_compat](https://github.com/ircmaxell/password_compat) library so
-  we can make use of PHP's built-in password hashing functions
-
 ## Acknowledgments
 
 - Contributors to the original [Jaxboards Service](https://jaxboards.com);
