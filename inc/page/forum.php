@@ -216,10 +216,10 @@ EOT
         if ($fdata['orderby']) {
             $fdata['orderby'] = (int) $fdata['orderby'];
             if ($fdata['orderby'] & 1) {
-                $orderby = '`lp_date` ASC';
+                $orderby = 'ASC';
                 --$fdata['orderby'];
             } else {
-                $orderby = '`lp_date` DESC';
+                $orderby = 'DESC';
             }
             if (2 == $fdata['orderby']) {
                 $orderby = '`id` ' . $orderby;
