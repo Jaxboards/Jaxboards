@@ -1,9 +1,10 @@
 <?php
+
 /**
  * JaxBoards default config file. This is loaded on install, so don't delete
  * this until you've installed Jaxboards!
  *
- * PHP Version 5.3.7
+ * PHP Version 7.2.32
  *
  * @category Jaxboards
  * @package  Jaxboards
@@ -14,8 +15,9 @@
  *
  * @link https://github.com/Jaxboards/Jaxboards Jaxboards on Github
  */
+
 $CFG = json_decode(
-<<<'EOD'
+    <<<'EOD'
 {
     "badnamechars": "@[^\\w']@",
     "boardname": "Example Forums",

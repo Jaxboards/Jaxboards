@@ -390,7 +390,8 @@ EOT;
         foreach ($DB->getUsersOnline() as $f) {
             $lastActionIdle = $SESS->last_update - $CFG['timetoidle'] - 30;
             if ($f['uid'] || $f['is_bot']) {
-                if ($f['last_action'] >= $SESS->last_update
+                if (
+                    $f['last_action'] >= $SESS->last_update
                     || 'idle' == $f['status']
                     && $f['last_action'] > $lastActionIdle
                 ) {
@@ -499,11 +500,12 @@ EOT
         if (!isset($this->forumsread[$forum['id']])) {
             $this->forumsread[$forum['id']] = null;
         }
-        if ($forum['lp_date'] > $JAX->pick(
-            $this->forumsread[$forum['id']],
-            $SESS->read_date,
-            $USER['last_visit']
-        )
+        if (
+            $forum['lp_date'] > $JAX->pick(
+                $this->forumsread[$forum['id']],
+                $SESS->read_date,
+                $USER['last_visit']
+            )
         ) {
             return false;
         }

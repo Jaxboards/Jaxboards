@@ -7,7 +7,7 @@ export default class PageList extends Component {
 
   constructor(element) {
     super(element);
-    element.addEventListener('wheel', event => this.wheel(event));
+    element.addEventListener('wheel', (event) => this.wheel(event));
   }
 
   wheel(event) {

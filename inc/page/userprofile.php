@@ -452,7 +452,8 @@ EOT
                 }
                 break;
         }
-        if (isset($JAX->b['page'])
+        if (
+            isset($JAX->b['page'])
             && $JAX->b['page']
             && $PAGE->jsaccess
             && !$PAGE->jsdirectlink

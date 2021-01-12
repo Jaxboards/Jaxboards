@@ -437,11 +437,13 @@ EOT
 
     public function textonly($a)
     {
-        while (($t = preg_replace(
-            '@\\[(\\w+)[^\\]]*\\]([\\w\\W]*)\\[/\\1\\]@U',
-            '$2',
-            $a
-        )) != $a) {
+        while (
+            ($t = preg_replace(
+                '@\\[(\\w+)[^\\]]*\\]([\\w\\W]*)\\[/\\1\\]@U',
+                '$2',
+                $a
+            )) != $a
+        ) {
             $a = $t;
         }
 
@@ -531,29 +533,35 @@ EOT
         }
 
         // UL/LI tags.
-        while ($a != ($tmp = preg_replace_callback(
-            '@\\[(ul|ol)\\](.*)\\[/\\1\\]@Usi',
-            array($this, 'bbcode_licallback'),
-            $a
-        ))) {
+        while (
+            $a != ($tmp = preg_replace_callback(
+                '@\\[(ul|ol)\\](.*)\\[/\\1\\]@Usi',
+                array($this, 'bbcode_licallback'),
+                $a
+            ))
+        ) {
             $a = $tmp;
         }
         // Size code (actually needs a callback simply because of
         // the variability of the arguments).
-        while ($a != ($tmp = preg_replace_callback(
-            '@\\[size=([0-4]?\\d)(px|pt|em|)\\](.*)\\[/size\\]@Usi',
-            array($this, 'bbcode_sizecallback'),
-            $a
-        ))) {
+        while (
+            $a != ($tmp = preg_replace_callback(
+                '@\\[size=([0-4]?\\d)(px|pt|em|)\\](.*)\\[/size\\]@Usi',
+                array($this, 'bbcode_sizecallback'),
+                $a
+            ))
+        ) {
             $a = $tmp;
         }
 
         // Do quote tags.
-        while (preg_match(
-            '@\\[quote(?>=([^\\]]+))?\\](.*?)\\[/quote\\]\\r?\\n?@is',
-            $a,
-            $m
-        ) && $x < 10) {
+        while (
+            preg_match(
+                '@\\[quote(?>=([^\\]]+))?\\](.*?)\\[/quote\\]\\r?\\n?@is',
+                $a,
+                $m
+            ) && $x < 10
+        ) {
             ++$x;
             $a = str_replace(
                 $m[0],
@@ -888,7 +896,8 @@ EOT
             }
         }
         foreach ($this->ipbancache as $v) {
-            if ((':' === mb_substr($v, -1) || '.' === mb_substr($v, -1))
+            if (
+                (':' === mb_substr($v, -1) || '.' === mb_substr($v, -1))
                 && mb_strtolower(mb_substr($ip, 0, mb_strlen($v))) === $v
             ) {
                 return $v;

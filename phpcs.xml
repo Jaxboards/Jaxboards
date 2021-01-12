@@ -1,6 +1,31 @@
 <?xml version="1.0"?>
 <ruleset name="Jaxboards">
   <description>Jaxboards PHP coding standards</description>
+  <!-- PHP Version -->
+  <!-- Reference https://github.com/squizlabs/PHP_CodeSniffer/wiki/Configuration-Options#setting-the-php-version -->
+  <config name="php_version" value="70232"/>
+
+  <!-- Make sure this works with PHP 7.2+ -->
+  <!-- Reference https://github.com/PHPCompatibility/PHPCompatibility#sniffing-your-code-for-compatibility-with-specific-php-versions -->
+  <config name="testVersion" value="7.2-"/>
+
+  <!-- show colors -->
+  <arg name="colors" />
+
+  <!-- only check php files -->
+  <arg name="extensions" value="php" />
+
+  <!-- Output with rule names - needed for disabling specific rules -->
+  <arg value="s"/>
+
+  <!-- Set tab width to PSR-12 standard -->
+  <!-- Reference https://github.com/squizlabs/PHP_CodeSniffer/wiki/Configuration-Options#setting-the-default-tab-width -->
+  <config name="tab_width" value="4"/>
+
+  <!-- Return error codes on exit if there are errros -->
+  <config name="ignore_errors_on_exit" value="0"/>
+  <config name="ignore_warnings_on_exit" value="0"/>
+
   <!-- Files and directories to run on -->
   <file>acp</file>
   <file>inc</file>
@@ -16,10 +41,7 @@
   <!-- ignore vendor files -->
   <exclude-pattern>*/vendor/*</exclude-pattern>
   <exclude-pattern>*/node_modules/*</exclude-pattern>
-  <!-- show colors -->
-  <arg name="colors" />
-  <!-- only check php files -->
-  <arg name="extensions" value="php" />
+
   <!-- Follow PSR coding style guides -->
   <!-- PSR1: Basic Coding Standard https://www.php-fig.org/psr/psr-1 -->
   <rule ref="PSR1">
@@ -29,8 +51,8 @@
     <exclude name="PSR1.Methods.CamelCapsMethodName" />
     <exclude name="Squiz.Classes.ValidClassName" />
   </rule>
-  <!-- PSR2: Coding Style Guide https://www.php-fig.org/psr/psr-2 -->
-  <rule ref="PSR2" />
+  <!-- PSR-12: Extended Coding Style https://www.php-fig.org/psr/psr-12 -->
+  <rule ref="PSR12" />
   <!-- Here's some comment rules we can follow -->
   <rule ref="Squiz.Commenting.InlineComment">
     <exclude name="Squiz.Commenting.InlineComment.NotCapital" />
@@ -40,18 +62,6 @@
   <rule ref="Squiz.Commenting.BlockComment">
     <exclude name="Squiz.Commenting.BlockComment.NotCapital" />
     <exclude name="Squiz.Commenting.BlockComment.InvalidEndChar" />
-  </rule>
-  <!-- Make sure this works with PHP 5.3 -->
-  <config name="testVersion" value="5.3-" />
-  <rule ref="PHPCompatibility">
-    <!-- Exclude polyfilled password_hash related functions from compatibility check -->
-    <exclude name="PHPCompatibility.PHP.NewConstants.password_bcryptFound" />
-    <exclude name="PHPCompatibility.PHP.NewConstants.password_bcrypt_default_costFound" />
-    <exclude name="PHPCompatibility.PHP.NewConstants.password_defaultFound" />
-    <exclude name="PHPCompatibility.PHP.NewFunctions.password_get_infoFound" />
-    <exclude name="PHPCompatibility.PHP.NewFunctions.password_hashFound" />
-    <exclude name="PHPCompatibility.PHP.NewFunctions.password_needs_rehashFound" />
-    <exclude name="PHPCompatibility.PHP.NewFunctions.password_verifyFound" />
   </rule>
 
   <!-- Ban some functions -->

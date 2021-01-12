@@ -26,7 +26,7 @@ export default class DatePicker extends Component {
     let picker = document.querySelector('#datepicker');
     if (!picker) {
       picker = assign(document.createElement('table'), {
-        id: 'datepicker'
+        id: 'datepicker',
       });
       document.body.appendChild(picker);
       picker.style.display = 'none';
@@ -42,12 +42,12 @@ export default class DatePicker extends Component {
       zIndex: getHighestZIndex(),
       position: 'absolute',
       top: `${c.yh}px`,
-      left: `${c.x}px`
+      left: `${c.x}px`,
     });
 
     const [month, day, year] = this.element.value
       .split('/')
-      .map(s => parseInt(s, 10));
+      .map((s) => parseInt(s, 10));
     if (month && day && year) {
       this.selectedDate = [year, month - 1, day];
     } else this.selectedDate = undefined;

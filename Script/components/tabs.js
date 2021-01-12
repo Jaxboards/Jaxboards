@@ -9,7 +9,7 @@ export default class Tabs extends Component {
 
   constructor(element) {
     super(element);
-    element.addEventListener('click', event => this.click(event));
+    element.addEventListener('click', (event) => this.click(event));
   }
 
   click(event) {

@@ -34,14 +34,16 @@ class POST
             // Poor forum martyr.
             $this->postdata = str_replace('youtube]', 'video]', $this->postdata);
         }
-        if (isset($_FILES['Filedata'], $_FILES['Filedata']['tmp_name'])
+        if (
+            isset($_FILES['Filedata'], $_FILES['Filedata']['tmp_name'])
             && $_FILES['Filedata']['tmp_name']
         ) {
             $JAX->p['postdata'] .= '[attachment]' .
                 $this->upload($_FILES['Filedata']) .
                 '[/attachment]';
         }
-        if (isset($JAX->p['submit'])
+        if (
+            isset($JAX->p['submit'])
             && ('Preview' === $JAX->p['submit']
             || 'Full Reply' === $JAX->p['submit'])
         ) {
@@ -51,7 +53,8 @@ class POST
             $this->editpost();
         } elseif (!$this->nopost) {
             $this->submitpost();
-        } elseif ($this->fid && is_numeric($this->fid)
+        } elseif (
+            $this->fid && is_numeric($this->fid)
             || $this->tid && is_numeric($this->tid)
             && 'edit' == $this->how
         ) {
@@ -534,15 +537,18 @@ EOT
         if (!$e && 'newtopic' == $this->how) {
             if (!$fid || !is_numeric($fid)) {
                 $e = 'No forum specified exists.';
-            } elseif (!isset($JAX->p['ttitle'])
+            } elseif (
+                !isset($JAX->p['ttitle'])
                 || '' === trim($JAX->p['ttitle'])
             ) {
                 $e = "You didn't specify a topic title!";
-            } elseif (isset($JAX->p['ttitle'])
+            } elseif (
+                isset($JAX->p['ttitle'])
                 && mb_strlen($JAX->p['ttitle']) > 255
             ) {
                 $e = 'Topic title must not exceed 255 characters';
-            } elseif (isset($JAX->p['subtitle'])
+            } elseif (
+                isset($JAX->p['subtitle'])
                 && mb_strlen($JAX->p['subtitle']) > 255
             ) {
                 $e = 'Subtitle must not exceed 255 characters';
@@ -584,7 +590,8 @@ EOT
 You don't have permission to post a new topic in that forum.
 EOT;
                 }
-                if (((isset($JAX->p['poll_type']) && $JAX->p['poll_type'])
+                if (
+                    ((isset($JAX->p['poll_type']) && $JAX->p['poll_type'])
                     || (isset($JAX->p['pollq']) && $JAX->p['pollq']))
                     && !$fdata['perms']['poll']
                 ) {
@@ -672,7 +679,8 @@ EOT
             $fdata['perms'],
             $USER ? $USER['group_id'] : 3
         );
-        if (!$fdata['perms']['reply']
+        if (
+            !$fdata['perms']['reply']
             || $fdata['locked']
             && !$PERMS['can_override_locked_topics']
         ) {

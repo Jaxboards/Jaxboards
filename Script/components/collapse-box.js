@@ -30,8 +30,9 @@ export default class CollapseBox extends Component {
         .play();
     } else {
       if (!fh) {
-        fh = `${collapseContent.clientHeight ||
-          collapseContent.offsetHeight}px`;
+        fh = `${
+          collapseContent.clientHeight || collapseContent.offsetHeight
+        }px`;
         collapseContent.dataset.fullHeight = fh;
       }
       new Animation(collapseContent, 5, 10, 0)

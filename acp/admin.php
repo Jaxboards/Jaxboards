@@ -1,8 +1,9 @@
 <?php
+
 /**
  * Admin control panel.
  *
- * PHP Version 5.3.7
+ * PHP Version 7.2.32
  *
  * @category Jaxboards
  * @package  Jaxboards
@@ -13,6 +14,7 @@
  *
  * @link https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
+
 ini_set('session.cookie_secure', 1);
 ini_set('session.cookie_httponly', 1);
 ini_set('session.use_cookies', 1);

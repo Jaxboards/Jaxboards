@@ -28,7 +28,8 @@ function buildQueryString(keys, values) {
   }
   return Object.keys(keys)
     .map(
-      key => `${encodeURIComponent(key)}=${encodeURIComponent(keys[key] || '')}`
+      (key) =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(keys[key] || '')}`
     )
     .join('&');
 }
@@ -39,7 +40,7 @@ class Ajax {
       readyState: 4,
       callback() {},
       method: 'POST',
-      ...s
+      ...s,
     };
   }
 

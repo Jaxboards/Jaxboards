@@ -13,16 +13,16 @@ export default class MediaPlayer extends Component {
     const inlineLink = element.querySelector('a.inline');
     const movie = element.querySelector('.movie');
 
-    popoutLink.addEventListener('click', event => {
+    popoutLink.addEventListener('click', (event) => {
       event.preventDefault();
       const win = new Window({
         title: popoutLink.href,
-        content: movie.innerHTML
+        content: movie.innerHTML,
       });
       win.create();
     });
 
-    inlineLink.addEventListener('click', event => {
+    inlineLink.addEventListener('click', (event) => {
       event.preventDefault();
       movie.style.display = 'block';
     });

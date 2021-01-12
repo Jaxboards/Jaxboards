@@ -2,7 +2,7 @@ import {
   getCoordinates,
   getComputedStyle,
   getHighestZIndex,
-  isChildOf
+  isChildOf,
 } from './el';
 import Event from './event';
 import { assign, tryInvoke } from './util';
@@ -31,18 +31,18 @@ class Drag {
       ey: parseInt(s.top, 10) || 0,
       info: {},
       bc: getCoordinates(el),
-      zIndex: el.style.zIndex
+      zIndex: el.style.zIndex,
     };
     if (!this.sess.zIndex || Number(this.sess.zIndex) < highz - 1) {
       el.style.zIndex = highz;
     }
     tryInvoke(this.onstart, {
       ...this.sess,
-      droptarget: this.testDrops(this.sess.mx, this.sess.my)
+      droptarget: this.testDrops(this.sess.mx, this.sess.my),
     });
     this.boundEvents = {
-      drag: event2 => this.drag(event2),
-      drop: event2 => this.drop(event2)
+      drag: (event2) => this.drag(event2),
+      drop: (event2) => this.drop(event2),
     };
     document.addEventListener('mousemove', this.boundEvents.drag);
     document.addEventListener('mouseup', this.boundEvents.drop);
@@ -86,7 +86,7 @@ class Drag {
       dx: mx - (sess.mx || mx),
       dy: my - (sess.my || my),
       sx: this.sess.ex,
-      sy: this.sess.ey
+      sy: this.sess.ey,
     };
     this.sess.info = sess;
     tryInvoke(this.ondrag, sess);
@@ -124,7 +124,7 @@ class Drag {
     if (!droppables.length) {
       return r;
     }
-    droppables.forEach(droppable => {
+    droppables.forEach((droppable) => {
       if (droppable === this.sess.el || isChildOf(droppable, this.sess.el)) {
         return;
       }
@@ -164,7 +164,7 @@ class Drag {
 
   apply(el, t) {
     if (Array.isArray(el)) {
-      el.forEach(el2 => this.apply(el2));
+      el.forEach((el2) => this.apply(el2));
       return this;
     }
 
@@ -174,8 +174,8 @@ class Drag {
       el.style.position = 'relative';
     }
     (t || el).onmousedown = t
-      ? e => this.start(e, el, t)
-      : e => this.start(e, el);
+      ? (e) => this.start(e, el, t)
+      : (e) => this.start(e, el);
     return this;
   }
 
