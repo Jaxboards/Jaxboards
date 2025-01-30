@@ -124,8 +124,8 @@ EOT
         $links = array();
         foreach ($vars as $k => $v) {
             $links[] = "<a href=\"${url}&amp;sortby=${k}" .
-                ($sortby == $k ? ('asc' == $sorthow ? '&amp;how=desc' : '') .
-                '" class="sort' . ('desc' == $sorthow ? ' desc' : '') : '') .
+                ($sortby == $k ? ('ASC' == $sorthow ? '&amp;how=desc' : '') .
+                '" class="sort' . ('DESC' == $sorthow ? ' desc' : '') : '') .
                 "\">${v}</a>";
         }
         foreach ($memberarray as $f) {
