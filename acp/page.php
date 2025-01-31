@@ -179,7 +179,7 @@ class PAGE
  *
  * @link https://github.com/Jaxboards/Jaxboards Jaxboards on Github
  */
-$${name} = json_decode(
+\${$name} = json_decode(
 <<<'EOD'
 {$data_string}
 EOD
