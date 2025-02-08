@@ -93,6 +93,7 @@ class LOGREG
 
         // Show registration form.
         if (!isset($JAX->p['register'])) {
+            $PAGE->JS('update', 'page', $p);
             return $PAGE->append('PAGE', $p);
         }
 
