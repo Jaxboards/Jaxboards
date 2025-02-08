@@ -457,7 +457,7 @@ If you did not request a password change,
 simply ignore this email and no actions will be taken.
 If you would like to change your password,
 please visit the following page and follow the on-screen instructions:
-<a href='${link}'>${link}</a>
+<a href='{$link}'>{$link}</a>
 <br />
 <br />
 Thanks!
