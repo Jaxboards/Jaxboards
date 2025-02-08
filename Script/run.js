@@ -82,7 +82,7 @@ class AppState {
   }
 
   setWindowActive() {
-    document.cookie = "actw=${window.name}; SameSite:Lax";
+    document.cookie = `actw=${window.name}; SameSite:Lax`;
     stopTitleFlashing();
     this.stream.pollData();
   }
