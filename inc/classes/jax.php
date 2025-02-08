@@ -588,15 +588,16 @@ EOT
         if (false !== mb_strpos($m[1], 'youtube')) {
             preg_match('@t=(\\d+m)?(\\d+s)?@', $m[0], $time);
             preg_match('@v=([\\w-]+)@', $m[1], $m);
+            $seconds='';
             if ($time) {
-                $m[2] = (($time[1] ? mb_substr($time[1], 0, -1) * 60 : 0) +
+                $seconds = (($time[1] ? mb_substr($time[1], 0, -1) * 60 : 0) +
                     mb_substr($time[2], 0, -1));
             }
 
             $youtubeLink = 'https://www.youtube.com/watch?v=' .
-                $m[1] . ($m[2] ? '&t=' : '') . $m[2];
+                $m[1] . ($seconds ? '&t=' : '') . $seconds;
             $youtubeEmbed = 'https://www.youtube.com/embed/' . $m[1] .
-                '?start=' . $m[2];
+                '?start=' . $seconds;
 
             return
                 <<<EOT
