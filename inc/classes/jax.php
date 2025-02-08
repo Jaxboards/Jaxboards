@@ -146,10 +146,6 @@ class JAX
 
     public function filterInput($a)
     {
-        // get_magic_quotes is deprecated in PHP 8.x and shouldn't be used
-	//if (!get_magic_quotes_gpc()) {
-        //    return $a;
-        //}
         if (is_array($a)) {
             return array_map(array($this, 'filterInput'), $a);
         }
