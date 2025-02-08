@@ -12,11 +12,6 @@ class LOGREG
 
         switch (mb_substr($JAX->b['act'], 6)) {
             case 1:
-                // Registration flow is currently not ajax compatible
-                // due to recaptcha API. Just force a reload.
-                if ($PAGE->jsnewlocation) {
-                    $PAGE->JS('reload');
-                }
                 $this->register();
                 break;
             case 2:

@@ -2289,12 +2289,12 @@
         if (href.charAt(0) === '?') {
           const oldclick = link.onclick;
           link.addEventListener('click', event => {
+            event.preventDefault();
             // Some links have an onclick that returns true/false based on whether
             // or not the link should execute.
             if (!oldclick || oldclick.call(link) !== false) {
               RUN.stream.location(href);
             }
-            event.preventDefault();
           });
 
           // Open external links in a new window
