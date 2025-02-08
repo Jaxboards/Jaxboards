@@ -382,7 +382,7 @@ EOT;
                 }
             }
             $PAGE->addContentBox(
-                "Editing Wrapper: ${wrapper}",
+                "Editing Wrapper: {$wrapper}",
                 $saved . $PAGE->parseTemplate(
                     'themes/edit-wrapper.html',
                     array(

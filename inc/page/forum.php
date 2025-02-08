@@ -8,6 +8,8 @@ class FORUM
     public $topicsRead = array();
     public $forumsRead = array();
     public $forumReadTime = 0;
+    public $numperpage;
+    public $page;
 
     public function __construct()
     {
@@ -132,7 +134,7 @@ EOT
             ,
             array('forums', 'members'),
             $fid,
-            "% ${fid}"
+            "% {$fid}"
         );
         $rows = '';
         while ($f = $DB->arow($result)) {
@@ -250,7 +252,7 @@ FROM (
     `locked`,UNIX_TIMESTAMP(`date`) AS `date`,`op`,`cal_event`
     FROM %t
     WHERE `fid`=?
-    ORDER BY `pinned` DESC,${orderby}
+    ORDER BY `pinned` DESC,{$orderby}
     LIMIT ?,?
 ) t
 LEFT JOIN %t m
@@ -270,7 +272,7 @@ EOT
             if ($f['replies'] > 9) {
                 foreach ($JAX->pages(ceil(($f['replies'] + 1) / 10), 1, 10) as $v) {
                     $pages .= "<a href='?act=vt" . $f['id'] .
-                        "&amp;page=${v}'>${v}</a> ";
+                        "&amp;page={$v}'>{$v}</a> ";
                 }
                 $pages = $PAGE->meta('forum-topic-pages', $pages);
             }
@@ -360,7 +362,7 @@ EOT
                 $path[$forums[$v][0]] = $forums[$v][1];
             }
         }
-        $path[$title] = "?act=vf${fid}";
+        $path[$title] = "?act=vf{$fid}";
         $PAGE->updatepath($path);
         if ($PAGE->jsaccess) {
             $PAGE->JS('update', 'page', $page);

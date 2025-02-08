@@ -31,7 +31,7 @@ require_once JAXBOARDS_ROOT . '/acp/page.php';
 require_once JAXBOARDS_ROOT . '/config.default.php';
 
 /**
- * Recurisvely copies one directory to another.
+ * Recursively copies one directory to another.
  *
  * @param string $src The source directory- this must exist already
  * @param string $dst The destination directory- this is assumed to not exist already
@@ -168,7 +168,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
 
     if (empty($errors)) {
         // Write crossdomain.xml file for flash support.
-        $crossDomainXML = fopen(JAXBOARDS_ROOT . '/crossdomain.xml', 'w');
+        /*$crossDomainXML = fopen(JAXBOARDS_ROOT . '/crossdomain.xml', 'w');
         fwrite(
             $crossDomainXML,
             str_replace(
@@ -177,7 +177,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                 file_get_contents(SERVICE_ROOT . '/crossdomain.sample.xml')
             )
         );
-        fclose($crossDomainXML);
+        fclose($crossDomainXML);*/
 
         // Update with our settings.
         $CFG['boardname'] = 'Jaxboards';
@@ -317,9 +317,9 @@ EOT
         }
 
         // Create lock file.
-        $file = fopen(SERVICE_ROOT . '/install.lock', 'w');
-        fwrite($file, '');
-        fclose($file);
+        //$file = fopen(SERVICE_ROOT . '/install.lock', 'w');
+        //fwrite($file, '');
+        //fclose($file);
 
         // Send us to the service page.
         header('Location: ' . dirname($_SERVER['REQUEST_URI']));
@@ -346,7 +346,7 @@ EOT
      <form id="signup" method="post">
 <?php
 foreach ($errors as $error) {
-    echo "<div class='error'>${error}</div>";
+    echo "<div class='error'>{$error}</div>";
 }
 ?>
     <input type="checkbox" name="service" value="1" id="service" checked>

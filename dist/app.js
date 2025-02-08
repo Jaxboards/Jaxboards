@@ -2932,7 +2932,7 @@
     }
 
     setWindowActive() {
-      document.cookie = `actw=${window.name}`;
+      document.cookie = "actw=${window.name}; SameSite=Lax";
       stopTitleFlashing();
       this.stream.pollData();
     }

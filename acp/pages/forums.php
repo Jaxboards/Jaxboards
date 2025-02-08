@@ -715,8 +715,8 @@ EOT
             $page = '';
             if ($topics > 0) {
                 $page .= ($JAX->p['moveto'] ? 'Moved' : 'Deleted') .
-                    " ${topics} topics" . ((isset($posts) && $posts) ?
-                    " and ${posts} posts" : '');
+                    " {$topics} topics" . ((isset($posts) && $posts) ?
+                    " and {$posts} posts" : '');
             }
 
             return $PAGE->addContentBox(

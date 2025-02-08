@@ -10,6 +10,7 @@ class TOPIC
     public $numperpage = 0;
     public $canmod = false;
     public $firstPostID = 0;
+    public $lastPostID;
 
     public function __construct()
     {
@@ -156,7 +157,7 @@ EOT
             array(
                 $topicdata['cat_title'] => '?act=vc' . $topicdata['cat_id'],
                 $topicdata['forum_title'] => '?act=vf' . $topicdata['fid'],
-                $topicdata['topic_title'] => "?act=vt${id}",
+                $topicdata['topic_title'] => "?act=vt{$id}",
             )
         );
 
@@ -227,7 +228,7 @@ EOT
             $topicdata['fperms']['reply']
             && (!$topicdata['locked']
             || $PERMS['can_override_locked_topics']) ?
-            "<a href='?act=vt${id}&qreply=1'>" .
+            "<a href='?act=vt{$id}&qreply=1'>" .
             ($PAGE->meta(
                 $PAGE->metaexists('button-qreply') ?
                 'button-qreply' : 'topic-button-qreply'
@@ -235,7 +236,7 @@ EOT
             $topicdata['fperms']['reply']
             && (!$topicdata['locked']
             || $PERMS['can_override_locked_topics']) ?
-            "<a href='?act=post&tid=${id}'>" .
+            "<a href='?act=post&tid={$id}'>" .
             ($PAGE->meta(
                 $PAGE->metaexists('button-reply') ?
                 'button-reply' : 'topic-button-reply'
@@ -245,7 +246,7 @@ EOT
         // Make the users online list.
         $usersonline = '';
         foreach ($DB->getUsersOnline() as $f) {
-            if ($f['uid'] && $f['location'] == "vt${id}") {
+            if (!empty($f['uid']) && $f['location'] == "vt{$id}") {
                 $usersonline .= (isset($f['is_bot']) && $f['is_bot']) ?
                     '<a class="user' . $f['uid'] . '">' . $f['name'] . '</a>' :
                     $PAGE->meta(
@@ -303,7 +304,7 @@ EOT
         global $SESS,$PAGE,$DB,$JAX;
 
         // Check for new posts and append them.
-        if ($SESS->location != "vt${id}") {
+        if ($SESS->location != "vt{$id}") {
             $SESS->delvar('topic_lastpid');
         }
 
@@ -322,7 +323,7 @@ EOT
         $oldcache = array_flip(explode(',', $SESS->users_online_cache));
         $newcache = '';
         foreach ($DB->getUsersOnline() as $f) {
-            if ($f['uid'] && $f['location'] == "vt${id}") {
+            if ($f['uid'] && $f['location'] == "vt{$id}") {
                 if (!isset($oldcache[$f['uid']])) {
                     $list[] = array(
                         $f['uid'],
@@ -703,7 +704,7 @@ EOT
         if ($voted) {
             $page .= '<table>';
             foreach ($choices as $k => $v) {
-                $page .= "<tr><td>${v}</td><td class='numvotes'>" .
+                $page .= "<tr><td>{$v}</td><td class='numvotes'>" .
                     $numvotes[$k] . ' votes (' .
                     round($numvotes[$k] / $totalvotes * 100, 2) .
                     "%)</td><td style='width:200px'><div class='bar' style='width:" .
@@ -725,14 +726,14 @@ EOT
             if ('multi' == $type) {
                 foreach ($choices as $k => $v) {
                     $page .= "<div class='choice'><input type='checkbox' " .
-                        "name='choice[]' value='${k}' id='poll_${k}' /> " .
-                        "<label for='poll_${k}'>${v}</label></div>";
+                        "name='choice[]' value='{$k}' id='poll_{$k}' /> " .
+                        "<label for='poll_{$k}'>{$v}</label></div>";
                 }
             } else {
                 foreach ($choices as $k => $v) {
                     $page .= "<div class='choice'><input type='radio' " .
-                        "name='choice' value='${k}' id='poll_${k}' /> " .
-                        "<label for='poll_${k}'>${v}</label></div>";
+                        "name='choice' value='{$k}' id='poll_{$k}' /> " .
+                        "<label for='poll_{$k}'>{$v}</label></div>";
                 }
             }
             $page .= "<div class='buttons'><input type='submit' " .
@@ -976,7 +977,7 @@ EOT
                         $id
                     );
                 }
-                $PAGE->JS('update', "#pid_${id} .post_content", $form);
+                $PAGE->JS('update', "#pid_{$id} .post_content", $form);
             }
         }
     }
@@ -1049,7 +1050,7 @@ EOT
 
         $PAGE->JS('softurl');
         $PAGE->location(
-            "?act=vt${tid}&page=" . (ceil(($f['numposts'] / $this->numperpage))) .
+            "?act=vt{$tid}&page=" . (ceil(($f['numposts'] / $this->numperpage))) .
             '&pid=' . $f['lastpid'] . '#pid_' . $f['lastpid']
         );
     }

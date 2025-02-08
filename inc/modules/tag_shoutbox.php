@@ -5,6 +5,8 @@ $PAGE->loadmeta('shoutbox');
 new SHOUTBOX();
 class SHOUTBOX
 {
+    public $shoutlimit;
+    
     public function __construct()
     {
         global $PAGE,$JAX,$CFG,$PERMS;

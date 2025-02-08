@@ -5,6 +5,8 @@ $PAGE->loadmeta('modcp');
 new modcontrols();
 class modcontrols
 {
+    public $perms;
+    
     private function box($title, $content)
     {
         $content = ($content ?: '--No Data--');
@@ -12,10 +14,10 @@ class modcontrols
         return <<<EOT
 <div class='minibox'>
     <div class='title'>
-        ${title}
+        {$title}
     </div>
     <div class='content'>
-        ${content}
+        {$content}
     </div>
 </div>
 EOT;
@@ -789,7 +791,7 @@ UNIX_TIMESTAMP(`join_date`) AS `join_date`,
 UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,`contact_skype`,`contact_yim`,
 `contact_msn`,`contact_gtalk`,`contact_aim`,`website`,`birthdate`,
 DAY(`birthdate`) AS `dob_day`,MONTH(`birthdate`) AS `dob_month`,
-YEAR(`birthdate) AS `dob_year`,`about`,`display_name`,`full_name`,
+YEAR(`birthdate`) AS `dob_year`,`about`,`display_name`,`full_name`,
 `contact_steam`,`location`,`gender`,`friends`,`enemies`,`sound_shout`,
 `sound_im`,`sound_pm`,`sound_postinmytopic`,`sound_postinsubscribedtopic`,
 `notify_pm`,`notify_postinmytopic`,`notify_postinsubscribedtopic`,`ucpnotepad`,
@@ -912,13 +914,13 @@ EOT
         );
         $form = <<<EOT
 <form method='post' data-ajax-form='true'>
-    ${hiddenFields}
-    IP: <input type='text' name='ip' value='${ip}' />
+    {$hiddenFields}
+    IP: <input type='text' name='ip' value='{$ip}' />
     <input type='submit' value='Submit' />
 </form>
 EOT;
         if ($ip) {
-            $page .= "<h3>Data for ${ip}:</h3>";
+            $page .= "<h3>Data for {$ip}:</h3>";
 
             $hiddenFields = $JAX->hiddenFormFields(
                 array(
@@ -949,21 +951,21 @@ EOT;
                 'Info',
                 <<<EOT
 <form method='post' data-ajax-form='true'>
-    ${hiddenFields}
-    IP ban status: ${banCode}<br />
+    {$hiddenFields}
+    IP ban status: {$banCode}<br />
 </form>
 IP Lookup Services: <ul>
-    <li><a href="https://whois.domaintools.com/${ip}">DomainTools Whois</a></li>
-    <li><a href="https://www.domaintools.com/research/traceroute/?query=${ip}">
+    <li><a href="https://whois.domaintools.com/{$ip}">DomainTools Whois</a></li>
+    <li><a href="https://www.domaintools.com/research/traceroute/?query={$ip}">
         DomainTools Traceroute
     </a></li>
-    <li><a href="https://www.ip2location.com/${ip}">IP2Location Lookup</a></li>
-    <li><a href="https://www.dan.me.uk/torcheck?ip=${ip}">IP2Location Lookup</a></li>
-    <li><a href="https://metrics.torproject.org/exonerator.html?ip=${ip}&timestamp=${torDate}">
+    <li><a href="https://www.ip2location.com/{$ip}">IP2Location Lookup</a></li>
+    <li><a href="https://www.dan.me.uk/torcheck?ip={$ip}">IP2Location Lookup</a></li>
+    <li><a href="https://metrics.torproject.org/exonerator.html?ip={$ip}&timestamp={$torDate}">
         ExoneraTor Lookup
     </a></li>
-    <li><a href="https://www.projecthoneypot.org/ip_${ip}">Project Honeypot Lookup</a></li>
-    <li><a href="https://www.stopforumspam.com/ipcheck/${ip}">StopForumSpam Lookup</a></li>
+    <li><a href="https://www.projecthoneypot.org/ip_{$ip}">Project Honeypot Lookup</a></li>
+    <li><a href="https://www.stopforumspam.com/ipcheck/{$ip}">StopForumSpam Lookup</a></li>
 </ul>
 EOT
             );

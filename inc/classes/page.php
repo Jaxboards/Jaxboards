@@ -15,6 +15,9 @@ class PAGE
     public $vars = array();
     public $userMetaDefs = array();
     public $moreFormatting = array();
+    public $template;
+    public $metaqueue;
+    public $done;
 
     public function __construct()
     {
@@ -83,7 +86,7 @@ class PAGE
         if ($PAGE->jsaccess) {
             $PAGE->JS('location', $a);
         } else {
-            header("Location: ${a}");
+            header("Location: {$a}");
         }
     }
 
@@ -176,7 +179,7 @@ class PAGE
 
     public function templatehas($a)
     {
-        return preg_match("/<!--${a}-->/i", $this->template);
+        return preg_match("/<!--{$a}-->/i", $this->template);
     }
 
     public function loadtemplate($a)
@@ -284,7 +287,7 @@ class PAGE
         }
         if (false !== $componentDir) {
             $this->metaqueue[] = $componentDir;
-            $this->debug("Added ${component} to queue");
+            $this->debug("Added {$component} to queue");
         }
     }
 
@@ -292,7 +295,7 @@ class PAGE
     {
         while ($componentDir = array_pop($this->metaqueue)) {
             $component = pathinfo($componentDir, PATHINFO_BASENAME);
-            $this->debug("${process} triggered ${component} to load");
+            $this->debug("{$process} triggered {$component} to load");
             $meta = array();
             foreach (glob($componentDir . '/*.html') as $metaFile) {
                 $metaName = pathinfo($metaFile, PATHINFO_FILENAME);
@@ -325,13 +328,13 @@ class PAGE
         $args = func_get_args();
         $meta = array_shift($args);
         $this->processqueue($meta);
-        $r = @vsprintf(
+        $r = vsprintf(
             str_replace(
                 array('<%', '%>'),
                 array('<%%', '%%>'),
-                $this->userMetaDefs[$meta] ?: $this->metadefs[$meta]
+                isset($this->userMetaDefs[$meta]) ? $this->userMetaDefs[$meta] : (isset($this->metadefs[$meta]) ? $this->metadefs[$meta] : "")
             ),
-            is_array($args[0]) ? $args[0] : $args
+            isset($args[0]) && is_array($args[0]) ? $args[0] : $args
         );
         if (false === $r) {
             die($meta . ' has too many arguments');

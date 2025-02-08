@@ -9,6 +9,10 @@ class JAX
     public $s = array();
     public $b = array();
     public $textRules;
+    
+    public $userData;
+    public $ipbancache;
+    public $emoteRules;
 
     public function __construct()
     {
@@ -46,7 +50,7 @@ class JAX
             return $fmt;
         }
 
-        return "<span class='autodate' title='${date}'>${fmt}</span>";
+        return "<span class='autodate' title='{$date}'>{$fmt}</span>";
     }
 
     public function smalldate($date, $seconds = false, $autodate = false)
@@ -142,9 +146,10 @@ class JAX
 
     public function filterInput($a)
     {
-        if (!get_magic_quotes_gpc()) {
-            return $a;
-        }
+        // get_magic_quotes is deprecated in PHP 8.x and shouldn't be used
+	//if (!get_magic_quotes_gpc()) {
+        //    return $a;
+        //}
         if (is_array($a)) {
             return array_map(array($this, 'filterInput'), $a);
         }
@@ -161,7 +166,7 @@ class JAX
 
     public function getUser($uid = false, $pass = false)
     {
-        global $DB;
+	global $DB;
         if (!$DB) {
             return;
         }
@@ -602,21 +607,21 @@ EOT
 <div class="media youtube">
     <div class="summary">
         Watch Youtube Video:
-        <a href="${youtubeLink}">
-            ${youtubeLink}
+        <a href="{$youtubeLink}">
+            {$youtubeLink}
         </a>
     </div>
     <div class="open">
-        <a href="${youtubeLink}" class="popout">
+        <a href="{$youtubeLink}" class="popout">
             Popout
         </a>
         &middot;
-        <a href="${youtubeLink}" class="inline">
+        <a href="{$youtubeLink}" class="inline">
             Inline
         </a>
     </div>
     <div class="movie" style="display:none">
-        <iframe width="560" height="315" frameborder="0" allowfullscreen="" src="${youtubeEmbed}">
+        <iframe width="560" height="315" frameborder="0" allowfullscreen="" src="{$youtubeEmbed}">
         </iframe>
     </div>
 </div>
@@ -633,21 +638,21 @@ EOT;
 <div class="media vimeo">
     <div class="summary">
         Watch Vimeo Video:
-        <a href="${vimeoLink}">
-            ${vimeoLink}
+        <a href="{$vimeoLink}">
+            {$vimeoLink}
         </a>
     </div>
     <div class="open">
-        <a href="${vimeoLink}" class="popout">
+        <a href="{$vimeoLink}" class="popout">
             Popout
         </a>
         &middot;
-        <a href="${vimeoLink}" class="inline">
+        <a href="{$vimeoLink}" class="inline">
             Inline
         </a>
     </div>
     <div class="movie" style="display:none">
-        <iframe src="${vimeoEmbed}" width="400" height="300" frameborder="0"
+        <iframe src="{$vimeoEmbed}" width="400" height="300" frameborder="0"
             webkitAllowFullScreen allowFullScreen></iframe>
     </div>
 </div>

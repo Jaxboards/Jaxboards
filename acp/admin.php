@@ -34,7 +34,7 @@ require JAXBOARDS_ROOT . '/inc/classes/mysql.php';
 require JAXBOARDS_ROOT . '/acp/page.php';
 
 /**
- * Strip slashes from input, recurisvely.
+ * Strip slashes from input, recursively.
  *
  * @param mixed $input The input to strip slashes from
  *
@@ -42,9 +42,9 @@ require JAXBOARDS_ROOT . '/acp/page.php';
  */
 function recursiveStripSlashes($input)
 {
-    if (!get_magic_quotes_gpc()) {
+    /*if (!get_magic_quotes_gpc()) {
         return $input;
-    }
+    }*/
     foreach ($input as $key => $value) {
         $input[$key] = is_array($value) ?
             recursiveStripSlashes($value) : stripslashes($value);
@@ -155,7 +155,7 @@ $PAGE->addNavMenu(
 
 $a = isset($JAX->g['act']) ? $JAX->g['act'] : null;
 
-if ($a && file_exists("./pages/${a}.php")) {
-    include_once "./pages/${a}.php";
+if ($a && file_exists("./pages/{$a}.php")) {
+    include_once "./pages/{$a}.php";
 }
 $PAGE->out();

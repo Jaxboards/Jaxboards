@@ -1454,7 +1454,7 @@ EOT
         ,
     );
     $table = str_replace('`', "'", $DB->ftable('tokens'));
-    $result = $DB->safequery("SHOW TABLES LIKE ${table};");
+    $result = $DB->safequery("SHOW TABLES LIKE {$table};");
     if ($DB->num_rows($result) < 1) {
         $queries[] = <<<'EOT'
     CREATE TABLE `blueprint_tokens` (
@@ -1480,12 +1480,12 @@ EOT;
 
     // Check if we need to create indexes keys.
     $table = $DB->ftable('files');
-    $result = $DB->safequery("SHOW CREATE TABLE ${table}");
+    $result = $DB->safequery("SHOW CREATE TABLE {$table}");
     $createTableStatement = $DB->row($result);
     $createTableStatement = array_pop($createTableStatement);
     if (!preg_match("/KEY\s+`hash`/i", $createTableStatement)) {
         $result = $DB->safequery(<<<EOT
-ALTER TABLE ${table}
+ALTER TABLE {$table}
     ADD INDEX `hash` (`hash`);
 EOT
         );
@@ -1497,7 +1497,7 @@ EOT
         $table = $DB->ftable($table);
         // Get table columns.
         $tableColumns = array();
-        $result = $DB->safequery("DESCRIBE ${table}");
+        $result = $DB->safequery("DESCRIBE {$table}");
         while ($row = $DB->arow($result)) {
             if (isset($row['Field'])) {
                 $tableColumns[] = mb_strtolower($row['Field']);
@@ -1512,8 +1512,8 @@ EOT
             $result = $DB->safequery(
                 <<<EOT
 SELECT
-    TIMESTAMPDIFF(DAY, DATE(MAX(`${old}`)), DATE(MAX(`${old}`))) as `date_check`
-    FROM ${table}
+    TIMESTAMPDIFF(DAY, DATE(MAX(`{$old}`)), DATE(MAX(`{$old}`))) as `date_check`
+    FROM {$table}
     LIMIT 1;
 EOT
             );
@@ -1529,16 +1529,16 @@ EOT
                 ,
                     <<<EOT
     ALTER TABLE $table
-        CHANGE `$old` `${old}_tmp` int(11) unsigned NOT NULL AFTER `$pos`,
-        ADD `$new` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `${old}_tmp`;
+        CHANGE `$old` `{$old}_tmp` int(11) unsigned NOT NULL AFTER `$pos`,
+        ADD `$new` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `{$old}_tmp`;
 EOT
                 ,
                     <<<EOT
-    UPDATE $table SET `$new`=FROM_UNIXTIME(COALESCE(`${old}_tmp`, 0));
+    UPDATE $table SET `$new`=FROM_UNIXTIME(COALESCE(`{$old}_tmp`, 0));
 EOT
                 ,
                     <<<EOT
-    ALTER TABLE $table DROP `${old}_tmp`;
+    ALTER TABLE $table DROP `{$old}_tmp`;
 EOT
                 ,
                 );
@@ -1554,7 +1554,7 @@ EOT
     $table = $DB->ftable('members');
     // Get member columns.
     $columns = array();
-    $result = $DB->safequery("DESCRIBE ${table}");
+    $result = $DB->safequery("DESCRIBE {$table}");
     while ($row = $DB->arow($result)) {
         if (isset($row['Field'])) {
             $columns[] = mb_strtolower($row['Field']);
@@ -1613,8 +1613,8 @@ EOT
         $table = $DB->ftable($table);
         $result = $DB->safequery(
             <<<EOT
-SELECT INET6_NTOA(MAX(`${column}`)) as `ip_check`
-    FROM ${table}
+SELECT INET6_NTOA(MAX(`{$column}`)) as `ip_check`
+    FROM {$table}
     LIMIT 1;
 EOT
         );
@@ -1622,8 +1622,8 @@ EOT
         $DB->disposeResult($result);
         if (null === $row['ip_check']) {
             $result = $DB->safequery(<<<EOT
-UPDATE ${table} SET `${column}` = COALESCE(
-    INET6_ATON(INET_NTOA(`${column}`)),
+UPDATE {$table} SET `{$column}` = COALESCE(
+    INET6_ATON(INET_NTOA(`{$column}`)),
     INET6_ATON(INET_NTOA(0))
 );
 EOT
@@ -1653,7 +1653,7 @@ EOT
     foreach ($fixForeignKeyRelations as $table => $columns) {
         $table = $DB->ftable($table);
         $result = $DB->safequery(
-            "SHOW CREATE TABLE ${table}"
+            "SHOW CREATE TABLE {$table}"
         );
         $createTableStatement = $DB->row($result);
         $createTableStatement = array_pop($createTableStatement);
@@ -1685,7 +1685,7 @@ EOT
                 $DB->disposeresult($result);
             }
             if (!preg_match(
-                "/FOREIGN\s+KEY\s+\(`${column}`\)\s+REFERENCES\s+${foreign['table']}\s+\(`${foreign['column']}`\)/i",
+                "/FOREIGN\s+KEY\s+\(`{$column}`\)\s+REFERENCES\s+{$foreign['table']}\s+\(`{$foreign['column']}`\)/i",
                 $createTableStatement
             )
             ) {

@@ -158,7 +158,7 @@ $PAGE->append(
 
 if (!$PAGE->jsaccess) {
     foreach (array('sound_im', 'wysiwyg') as $v) {
-        $variables[] = "${v}:" . ($USER ? ($USER[$v] ? 1 : 0) : 1);
+        $variables[] = "{$v}:" . ($USER ? ($USER[$v] ? 1 : 0) : 1);
     }
     $variables[] = 'can_im:' . ($PERMS['can_im'] ? 1 : 0);
     $variables[] = 'groupid:' . ($JAX->pick($USER['group_id'], 3));
@@ -244,7 +244,7 @@ if (!$PAGE->jsaccess) {
         $PAGE->append(
             'FOOTER',
             '<div class="footer">' .
-            '<a href="https://jaxboards.com">Jaxboards 1.1.0</a> ' .
+            'Jaxboards 1.1.0 ' . // Removed the defunct URL
             '&copy; 2007-' . date('Y') . '</div>'
         );
     }
@@ -352,10 +352,12 @@ if ($PAGE->jsaccess && $SESS->runonce) {
 // current user throughout the script are finally put into query form here.
 $SESS->applyChanges();
 
+$pagegen = "";
+
 if (in_array($JAX->getIp(), array('127.0.0.1', '::1'))) {
     $debug = '';
     foreach ($DB->queryRuntime as $k => $v) {
-        $debug .= "<b>${v}</b> " . $DB->queryList[$k] . '<br />';
+        $debug .= "<b>{$v}</b> " . $DB->queryList[$k] . '<br />';
         $qtime += $v;
     }
     $debug .= $PAGE->debug() . '<br />';

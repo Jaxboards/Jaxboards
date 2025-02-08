@@ -11,7 +11,7 @@ class IM
         if ($SESS->runonce) {
             $this->filter();
         }
-        if ('' !== trim($im) && $uid) {
+        if ('' !== trim($im ?? '') && $uid) {
             $this->message($uid, $im);
         }
 
@@ -168,8 +168,8 @@ EOT
                 }
             }
         } else {
-            $menu = "<a href='?act=vu${id}'>View Profile</a><br />" .
-                "<a href='?module=privatemessage&im_menu=${id}" .
+            $menu = "<a href='?act=vu{$id}'>View Profile</a><br />" .
+                "<a href='?module=privatemessage&im_menu={$id}" .
                 "&im_invitemenu=1'>Add User to Chat</a>";
         }
         $PAGE->JS('update', 'immenu', $menu);
