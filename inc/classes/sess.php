@@ -5,12 +5,45 @@ class SESS
     public $data = array();
     public $userData = array();
     public $bots = array(
-        'google' => 'Googlebot',
-        'bingbot' => 'Bing',
-        'yahoo! slurp' => 'Yahoo',
-        'mj12bot' => 'MJ12bot',
-        'baidu' => 'Baidu',
-        'discobot' => 'DiscoBot',
+        'Googlebot' => 'Google',
+        'Bingbot' => 'Bing',
+        'DuckDuckBot' => 'DuckDuckGo',
+        'Teoma' => 'Ask.com',
+        'archive.org_bot' => 'Internet Archive',
+	'ia_archiver' => 'Internet Archive Alexa',
+        'facebookexternalhit' => 'Facebook',
+        'meta-externalagent' => 'Meta', // May be AI-related
+        'WhatsApp' => 'WhatsApp',
+        'Twitterbot' => 'Twitter',
+        'Bytespider' => 'TikTok',
+        'Discordbot' => 'Discord',
+        'Amazonbot' => 'Amazon',
+        'Applebot' => 'Applebot',
+        'ClaudeBot' => 'ClaudeBot', // Anthropic AI bot
+        'GPTBot' => 'GPTBot', // AI developer
+        'OAI-SearchBot' => 'OpenAI', // AI developer
+        'PerplexityBot' => 'Perplexity', // AI answers site
+	'ImagesiftBot' => 'Imagesift', // Hive image search; may be AI-related
+        'MJ12bot' => 'Majestic', // British SEO crawler
+        'SemrushBot' => 'Semrush', // Backlink tracking company
+        'DotBot' => 'DotBot', // Moz SEO crawler
+        'AhrefsBot' => 'Ahrefs', // SEO crawler
+        'ChatGLM-Spider' => 'ChatGLM', // SEO crawler
+        'linkdexbot' => 'Linkdex', // SEO crawler
+        'Barkrowler' => 'Babbar.tech', // SEO graphing services
+        'AwarioBot' => 'Awario', // Social media management company
+        'Friendly_Crawler' => 'FriendlyCrawler', // Machine learning researcher
+        'Baiduspider' => 'Baidu', // Chinese search engine
+        'YandexBot' => 'Yandex', // Russian search engine
+        'PetalBot' => 'PetalBot', // Chinese search crawler (Huawei)
+        'Y!J-WSC' => 'Yahoo Japan',
+        'MojeekBot' => 'Mojeek', // British search engine
+        'Qwantbot-prod' => 'Qwant', // French search engine
+        'Sogou web spider' => 'Sogou', // Chinese search engine
+        'SeznamBot' => 'Seznam', // Czech search engine
+        'Mail.RU_Bot' => 'Mail.RU',
+        'Expanse' => 'Expanse', // Palo Alto Networks security scanning service
+	'CensysInspect' => 'CensysInspect', // Security scanner
     );
     public $changedData = array();
 
@@ -32,7 +65,7 @@ class SESS
         $isbot = 0;
         $r = array();
         foreach ($this->bots as $k => $v) {
-            if (false !== mb_strpos(
+            if (false != mb_stripos(
                 mb_strtolower($_SERVER['HTTP_USER_AGENT']),
                 $k
             )

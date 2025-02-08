@@ -157,7 +157,7 @@ class PAGE
 
     public function location($a)
     {
-        header("Location: ${a}");
+        header("Location: {$a}");
     }
 
     public function writeData($page, $name, $data, $mode = 'w')

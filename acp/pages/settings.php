@@ -132,7 +132,7 @@ class settings
             );
             if ($newact != $JAX->b['page']) {
                 $e = 'The page URL must contain only letters and numbers. ' .
-                    "Invalid characters: ${newact}";
+                    "Invalid characters: {$newact}";
             } elseif (mb_strlen($newact) > 25) {
                 $e = 'The page URL cannot exceed 25 characters.';
             } else {
@@ -222,7 +222,7 @@ class settings
             }
             $pageinfo['page'] = $JAX->p['pagecontents'];
             $page .= $PAGE->success(
-                "Page saved. Preview <a href='/?act=${pageurl}'>here</a>"
+                "Page saved. Preview <a href='/?act={$pageurl}'>here</a>"
             );
         }
         $page .= $PAGE->parseTemplate(
@@ -231,7 +231,7 @@ class settings
                 'content' => $JAX->blockhtml($pageinfo['page']),
             )
         );
-        $PAGE->addContentBox("Editing Page: ${pageurl}", $page);
+        $PAGE->addContentBox("Editing Page: {$pageurl}", $page);
     }
 
     /**

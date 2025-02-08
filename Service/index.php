@@ -1,4 +1,9 @@
 <?php
+     error_reporting(E_ALL);
+     ini_set('display_errors', 1);    
+?>
+
+<?php
 /**
  * Service signup file, for users to create their own JaxBoards forum.
  *
@@ -227,7 +232,7 @@ Resources
      <form id="signup" method="post">
 <?php
 foreach ($errors as $error) {
-    echo "<div class='error'>${error}</div>";
+    echo "<div class='error'>{$error}</div>";
 }
 ?>
       <input type="text" name="boardurl" id="boardname" />.<?php

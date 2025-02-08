@@ -80,8 +80,8 @@ SELECT m.`id` AS `id`,m.`name` AS `name`,m.`email` AS `email`,m.`sig` AS `sig`,
 FROM %t m
 LEFT JOIN %t g
     ON g.id=m.group_id
-${where}
-ORDER BY ${sortby} ${sorthow}
+{$where}
+ORDER BY {$sortby} {$sorthow}
 LIMIT ?, ?
 EOT
             ,
@@ -98,8 +98,8 @@ SELECT COUNT(m.`id`) AS `num_members`
 FROM %t m
 LEFT JOIN %t g
     ON g.id=m.group_id
-${where}
-ORDER BY ${sortby} ${sorthow}
+{$where}
+
 EOT
             ,
             array('members', 'member_groups')
@@ -114,8 +114,8 @@ EOT
         );
         foreach ($pagesArray as $v) {
             $pages .= "<a href='?act=members&amp;sortby=" .
-                "${sortby}&amp;how=${sorthow}&amp;page=${v}'" .
-                ($v - 1 == $this->page ? ' class="active"' : '') . ">${v}</a> ";
+                "{$sortby}&amp;how={$sorthow}&amp;page={$v}'" .
+                ($v - 1 == $this->page ? ' class="active"' : '') . ">{$v}</a> ";
         }
         $url = '?act=members' .
             ($this->page ? '&page=' . ($this->page + 1) : '') .
@@ -123,10 +123,10 @@ EOT
             ? '&filter=' . $JAX->g['filter'] : '');
         $links = array();
         foreach ($vars as $k => $v) {
-            $links[] = "<a href=\"${url}&amp;sortby=${k}" .
-                ($sortby == $k ? ('ASC' == $sorthow ? '&amp;how=DESC' : '') .
+            $links[] = "<a href=\"{$url}&amp;sortby={$k}" .
+		($sortby == $k ? ('ASC' == $sorthow ? '&amp;how=DESC' : '') .
                 '" class="sort' . ('DESC' == $sorthow ? ' desc' : '') : '') .
-                "\">${v}</a>";
+                "\">{$v}</a>";
         }
         foreach ($memberarray as $f) {
             $contactdetails = '';
@@ -174,14 +174,14 @@ EOT
             $links[3],
             $page
         );
-        $page = "<div class='pages pages-top'>${pages}</div>" .
+        $page = "<div class='pages pages-top'>{$pages}</div>" .
             $PAGE->meta(
                 'box',
                 ' id="memberlist"',
                 'Members',
                 $page
             ) .
-            "<div class='pages pages-bottom'>${pages}</div>" .
+            "<div class='pages pages-bottom'>{$pages}</div>" .
             "<div class='clear'></div>";
         $PAGE->JS('update', 'page', $page);
         $PAGE->append('PAGE', $page);

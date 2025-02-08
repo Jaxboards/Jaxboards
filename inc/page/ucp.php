@@ -9,6 +9,7 @@ class UCP
     public $runscript = false;
     public $shownucp = false;
     public $ucppage = '';
+    public $showentirething;
 
     public function __construct()
     {
@@ -210,7 +211,7 @@ EOT
             foreach ($variables as $v) {
                 $PAGE->JS(
                     'script',
-                    "window.globalsettings.${v}=" .
+                    "window.globalsettings.{$v}=" .
                     ((isset($JAX->p[$v]) && $JAX->p[$v]) ? 1 : 0)
                 );
             }
@@ -543,13 +544,13 @@ EOT;
                 if (false !== mb_strstr($k, 'contact')
                     && preg_match('/[^\\w.@]/', $data[$k])
                 ) {
-                    $error = "Invalid characters in ${v}";
+                    $error = "Invalid characters in {$v}";
                 }
 
                 $data[$k] = $JAX->blockhtml($data[$k]);
                 $length = 'display_name' == $k ? 30 : ('location' == $k ? 100 : 50);
                 if (mb_strlen($data[$k]) > $length) {
-                    $error = "${v} must be less than ${length} characters.";
+                    $error = "{$v} must be less than {$length} characters.";
                 }
             }
 

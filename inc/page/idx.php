@@ -5,6 +5,9 @@ new IDX();
 class IDX
 {
     public $forumsread = array();
+    public $mods;
+    public $subforumids;
+    public $subforums;
 
     public function __construct()
     {
@@ -113,7 +116,7 @@ EOT
 
     public function getsubs($id)
     {
-        if (!$this->subforumids[$id]) {
+        if (!isset($this->subforumids[$id]) || !$this->subforumids[$id]) {
             return array();
         }
         $r = $this->subforumids[$id];
@@ -217,8 +220,8 @@ EOT
                     $PAGE->meta('idx-replies-count', $v['posts']),
                     ($read = $this->isForumRead($v)) ? 'read' : 'unread',
                     <<<EOT
- <a id="fid_${vId}_icon"${hrefCode}>
-    ${linkText}
+ <a id="fid_{$vId}_icon"{$hrefCode}>
+    {$linkText}
 </a>
 EOT
                     ,
@@ -253,10 +256,10 @@ EOT
         $result = $DB->safespecial(
             <<<'EOT'
 SELECT s.`posts` AS `posts`,s.`topics` AS `topics`,s.`members` AS `members`,
-	s.`most_members` AS `most_members`,
-	s.`most_members_day` AS `most_members_day`,
-	s.`last_register` AS `last_register`,m.`group_id` AS `group_id`,
-	m.`display_name` AS `display_name`
+    s.`most_members` AS `most_members`,
+    s.`most_members_day` AS `most_members_day`,
+    s.`last_register` AS `last_register`,m.`group_id` AS `group_id`,
+    m.`display_name` AS `display_name`
 FROM %t s
 LEFT JOIN %t m
 ON s.`last_register`=m.`id`
@@ -271,13 +274,13 @@ EOT
             <<<'EOT'
 SELECT UNIX_TIMESTAMP(MAX(s.`last_update`)) AS `last_update`,m.`id` AS `id`,
     m.`group_id` AS `group_id`,m.`display_name` AS `name`,
-    CONCAT(MONTH(m.`birthdate`),' ',DAY(m.`birthdate`)) AS `birthday`,s.`hide` AS `hide`,
-    UNIX_TIMESTAMP(s.`read_date`) AS `read_date`
+    CONCAT(MONTH(m.`birthdate`),' ',DAY(m.`birthdate`)) AS `birthday`,
+    UNIX_TIMESTAMP(MAX(s.`read_date`)) AS `read_date`,s.`hide` AS `hide`
 FROM %t s
 LEFT JOIN %t m
     ON s.`uid`=m.`id`
-WHERE s.`uid`
-GROUP BY s.`uid`
+WHERE s.`uid` AND s.`hide` = 0
+GROUP BY m.`id`
 ORDER BY `name`
 EOT
             ,
@@ -300,10 +303,8 @@ EOT
             );
             $userstoday .=
                 <<<EOT
-<a href="?act=vu${fId}" class="user${fId} mgroup${fGroupId}${birthdayCode}"
-    title="Last online: ${lastOnlineCode}" data-use-tooltip="true">
-    ${fName}
-</a>
+<a href="?act=vu{$fId}" class="user{$fId} mgroup{$fGroupId}{$birthdayCode}"
+    title="Last online: {$lastOnlineCode}" data-use-tooltip="true">{$fName}</a>
 EOT;
             $userstoday .= ', ';
             ++$nuserstoday;
@@ -348,7 +349,7 @@ EOT;
         $guests = 0;
         $nummembers = 0;
         foreach ($DB->getUsersOnline() as $f) {
-            if ($f['uid'] || (isset($f['is_bot']) && $f['is_bot'])) {
+            if (!empty($f['uid']) || (isset($f['is_bot']) && $f['is_bot'])) {
                 $title = $JAX->blockhtml(
                     $JAX->pick($f['location_verbose'], 'Viewing the board.')
                 );

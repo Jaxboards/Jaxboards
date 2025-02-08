@@ -801,7 +801,7 @@ EOT
                     );
                     ++$num;
                 }
-                $page .= $PAGE->success("Successfully delivered ${num} messages");
+                $page .= $PAGE->success("Successfully delivered {$num} messages");
             }
         }
         $PAGE->addContentBox(

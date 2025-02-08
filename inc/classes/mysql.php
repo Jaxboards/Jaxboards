@@ -389,12 +389,12 @@ class MySQL
             $error = $this->mysqli_connection->error;
             if ($error) {
                 error_log(
-                    "ERROR WITH QUERY: ${query_string}" . PHP_EOL . "${error}"
+                    "ERROR WITH QUERY: {$query_string}" . PHP_EOL . "{$error}"
                 );
             }
             syslog(
                 LOG_ERR,
-                "SAFEQUERY PREPARE FAILED FOR ${query_string}, " .
+                "SAFEQUERY PREPARE FAILED FOR {$query_string}, " .
                 print_r($out_args, true) . PHP_EOL
             );
 
@@ -408,7 +408,7 @@ class MySQL
             $method = $refclass->getMethod('bind_param');
             if (!$method->invokeArgs($stmt, $refvalues)) {
                 syslog(LOG_ERR, 'BIND PARAMETERS FAILED' . PHP_EOL);
-                syslog(LOG_ERR, "QUERYSTRING: ${query_string}" . PHP_EOL);
+                syslog(LOG_ERR, "QUERYSTRING: {$query_string}" . PHP_EOL);
                 syslog(LOG_ERR, 'ELEMENTCOUNT: ' . mb_strlen($typestring));
                 syslog(LOG_ERR, 'BINDVARCOUNT: ' . (count($refvalues[1])));
                 syslog(LOG_ERR, 'QUERYARGS: ' . print_r($out_args, true) . PHP_EOL);
@@ -422,28 +422,28 @@ class MySQL
             $error = $this->mysqli_connection->error;
             if ($error) {
                 error_log(
-                    "ERROR WITH QUERY: ${query_string}" . PHP_EOL . "${error}"
+                    "ERROR WITH QUERY: {$query_string}" . PHP_EOL . "{$error}"
                 );
             }
 
             return;
         }
         if (!$stmt) {
-            syslog(LOG_ERR, "Statement is NULL for ${query_string}" . PHP_EOL);
+            syslog(LOG_ERR, "Statement is NULL for {$query_string}" . PHP_EOL);
         }
         $retval = $stmt->get_result();
 
         if (!$retval) {
             if (!preg_match('/^\\s*(UPDATE|DELETE|INSERT)\\s/i', $query_string)) {
                 // This is normal for a non-SELECT query.
-                syslog(LOG_ERR, "Result is NULL for ${query_string}" . PHP_EOL);
+                syslog(LOG_ERR, "Result is NULL for {$query_string}" . PHP_EOL);
             }
         }
 
         $error = $this->mysqli_connection->error;
         if ($error) {
             error_log(
-                "ERROR WITH QUERY: ${query_string}" . PHP_EOL . "${error}"
+                "ERROR WITH QUERY: {$query_string}" . PHP_EOL . "{$error}"
             );
         }
 
@@ -600,7 +600,7 @@ EOT
                     'uid' => $USER['id'],
                     'group_id' => $USER['group_id'],
                     'last_action' => date('Y-m-d H:i:s', $SESS->last_action),
-                    'last_update' => date('Y-m-d H:i:s', $SESS->last_update),
+                    'last_update' => $SESS->last_update,
                     'name' => ($SESS->hide ? '* ' : '') . $USER['display_name'],
                     'status' => $SESS->last_action < $idletimeout ?
                     'idle' : 'active',

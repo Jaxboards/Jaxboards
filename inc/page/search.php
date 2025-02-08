@@ -16,6 +16,7 @@ class search
     public $page = '';
     public $pagenum = 0;
     public $fids = array();
+    public $perpage;
 
     public function __construct()
     {
@@ -85,7 +86,7 @@ class search
                 }
                 $t = &$t[$v];
             }
-            if (!isset($t[$f['id']]) && $t[$f['id']]) {
+            if (!isset($t[$f['id']])) {
                 $t[$f['id']] = true;
             }
         }
@@ -286,7 +287,7 @@ FROM %t p
 LEFT JOIN %t t
     ON p.`tid`=t.`id`
 WHERE p.`id` IN ?
-ORDER BY FIELD(p.`id`,${ids})
+ORDER BY FIELD(p.`id`,{$ids})
 EOT
                 ,
                 array('posts', 'topics'),

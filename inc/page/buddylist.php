@@ -4,7 +4,7 @@ $buddylist = $JAX->hiddenFormFields(array('module' => 'buddylist'));
 $PAGE->metadefs['buddylist-contacts'] = <<<EOT
 <div class="contacts">
     <form method="?" data-ajax-form="true">
-        ${buddylist}
+        {$buddylist}
         <a href="?act=logreg5" id="status" class="%s">
         </a>
         <input style="width:100%%;padding-left:20px;" type="text" name="status"

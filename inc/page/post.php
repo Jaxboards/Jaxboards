@@ -12,6 +12,10 @@ class POST
     public $postdata = '';
     public $postpreview = '';
     public $nopost = true;
+    public $tid;
+    public $fid;
+    public $pid;
+    public $how;
 
     public function __construct()
     {
@@ -505,7 +509,7 @@ EOT
         );
         $PAGE->JS(
             'update',
-            "#pid_${pid} .post_content",
+            "#pid_{$pid} .post_content",
             $JAX->theworks($this->postdata)
         );
         $PAGE->JS('softurl');

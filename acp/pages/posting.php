@@ -240,14 +240,14 @@ class settings
             );
         }
 
-        include JAXBOARDS_ROOT . "/emoticons/${emoticonpath}/rules.php";
+        include JAXBOARDS_ROOT . "/emoticons/{$emoticonpath}/rules.php";
         $emoticonRows = '';
         foreach ($rules as $emoticon => $smileyFile) {
             $emoticonRows .= $PAGE->parseTemplate(
                 'posting/emoticon-packs-row.html',
                 array(
                     'emoticon' => $emoticon,
-                    'smiley_url' => "/emoticons/${emoticonpath}/${smileyFile}",
+                    'smiley_url' => "/emoticons/{$emoticonpath}/{$smileyFile}",
                 )
             ) . PHP_EOL;
         }
