@@ -458,12 +458,12 @@ EOT
             '@\\[u\\](.*)\\[/u\\]@Usi' => '<span style="text-decoration:underline">$1</span>',
             '@\\[s\\](.*)\\[/s\\]@Usi' => '<span style="text-decoration:line-through">$1</span>',
             '@\\[blink\\](.*)\\[/blink\\]@Usi' => '<span style="text-decoration:blink">$1</span>',
-            '@\\[url=(http|ftp|\\?|mailto:)([^\\]]+)\\](.+?)\\[/url\\]@i' => '<a href="$1$2" rel="nofollow">$3</a>'
+            '@\\[url=(http|ftp|\\?|mailto:)([^\\]]+)\\](.+?)\\[/url\\]@i' => '<a href="$1$2" rel="nofollow">$3</a>',
             '@\\[spoiler\\](.*)\\[/spoiler\\]@Usi' => '<span class="spoilertext">$1</span>',
             '@\\[url\\](http|ftp|\\?)(.*)\\[/url\\]@Ui' => '<a href="$1$2" rel="nofollow">$1$2</a>',
             '@\\[font=([\\s\\w]+)](.*)\\[/font\\]@Usi' => '<span style="font-family:$1">$2</span>',
             '@\\[color=(#?[\\s\\w\\d]+|rgb\\([\\d, ]+\\))\\](.*)\\[/color\\]@Usi' => '<span style="color:$1">$2</span>',
-            '@\\[(bg|bgcolor|background)=(#?[\\s\\w\\d]+)\\](.*)\\[/\\1\\]@Usi' => '<span style="background:$2">$3</span>',
+            '@\\[(bg|bgcolor|background)=(#?[\\s\\w\\d]+)\\](.*)\\[/\\1\\]@Usi' => '<span style="background:$2">$3</span>'
         );
 
         if (!$minimal) {
