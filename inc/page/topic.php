@@ -93,6 +93,8 @@ EOT
             $id
         );
         $this->topicdata = $DB->arow($result);
+        $DB->disposeresult($result);
+
         $this->topicdata['topic_title'] = $JAX->wordfilter($this->topicdata['topic_title']);
         $this->topicdata['subtitle'] = $JAX->wordfilter($this->topicdata['subtitle']);
         $this->topicdata['fperms'] = $JAX->parseperms(
@@ -105,7 +107,6 @@ EOT
     {
         global $DB,$PAGE,$JAX,$SESS,$USER,$PERMS;
         $page = $this->page;
-        $DB->disposeresult($result);
         
         if ($this->topicdata['lp_date'] > $USER['last_visit']) {
             $this->markread($id);
