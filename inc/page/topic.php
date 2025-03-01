@@ -11,6 +11,7 @@ class TOPIC
     public $canmod = false;
     public $firstPostID = 0;
     public $lastPostID;
+    public $topicdata;
 
     public function __construct()
     {
