@@ -19,6 +19,15 @@ class TOPIC
         preg_match('@\\d+$@', $JAX->b['act'], $act);
 
         $this->id = $id = $act[0] ? $act[0] : 0;
+        if (!$id) {
+            return $PAGE->location('?');
+        }
+
+        $this->topicdata = $this->getTopicData($id);
+        if (!$this->topicdata) {
+            // Put the user back on the index and skip these next few lines.
+            return $PAGE->location('?');
+        }
 
         $this->page = isset($JAX->b['page']) ? (int) $JAX->b['page'] : 0;
         if ($this->page <= 0 || !is_numeric($this->page)) {
@@ -60,13 +69,8 @@ class TOPIC
         }
     }
 
-    public function viewtopic($id)
-    {
-        global $DB,$PAGE,$JAX,$SESS,$USER,$PERMS;
-        $page = $this->page;
-        if (!$id) {
-            return $PAGE->location('?');
-        }
+    public function getTopicData($id) {
+        global $DB,$JAX,$USER;
         $result = $DB->safespecial(
             <<<'EOT'
 SELECT a.`title` AS `topic_title`,a.`locked` AS `locked`,
@@ -88,29 +92,31 @@ EOT
             array('topics', 'forums', 'categories'),
             $id
         );
-        $topicdata = $DB->arow($result);
-        $DB->disposeresult($result);
-
-        if (!$topicdata) {
-            // Put the user back on the index and skip these next few lines.
-            return $PAGE->location('?');
-        }
-        $topicdata['topic_title'] = $JAX->wordfilter($topicdata['topic_title']);
-        $topicdata['subtitle'] = $JAX->wordfilter($topicdata['subtitle']);
-        $topicdata['fperms'] = $JAX->parseperms(
-            $topicdata['fperms'],
+        $this->topicdata = $DB->arow($result);
+        $this->topicdata['topic_title'] = $JAX->wordfilter($this->topicdata['topic_title']);
+        $this->topicdata['subtitle'] = $JAX->wordfilter($this->topicdata['subtitle']);
+        $this->topicdata['fperms'] = $JAX->parseperms(
+            $this->topicdata['fperms'],
             $USER ? $USER['group_id'] : 3
         );
-        if ($topicdata['lp_date'] > $USER['last_visit']) {
+    }
+
+    public function viewtopic($id)
+    {
+        global $DB,$PAGE,$JAX,$SESS,$USER,$PERMS;
+        $page = $this->page;
+        $DB->disposeresult($result);
+        
+        if ($this->topicdata['lp_date'] > $USER['last_visit']) {
             $this->markread($id);
         }
-        if (!$topicdata['fperms']['read']) {
+        if (!$this->topicdata['fperms']['read']) {
             // No business being here.
             return $PAGE->location('?');
         }
 
-        $PAGE->append('TITLE', ' -> ' . $topicdata['topic_title']);
-        $SESS->location_verbose = "In topic '" . $topicdata['topic_title'] . "'";
+        $PAGE->append('TITLE', ' -> ' . $this->topicdata['topic_title']);
+        $SESS->location_verbose = "In topic '" . $this->topicdata['topic_title'] . "'";
 
         // Output RSS instead.
         if (isset($JAX->b['fmt']) && 'RSS' == $JAX->b['fmt']) {
@@ -118,8 +124,8 @@ EOT
             $link = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'];
             $feed = new rssfeed(
                 array(
-                    'title' => $topicdata['topic_title'],
-                    'description' => $topicdata['subtitle'],
+                    'title' => $this->topicdata['topic_title'],
+                    'description' => $this->topicdata['subtitle'],
                     'link' => $link . '?act=vt' . $id,
                 )
             );
@@ -155,9 +161,9 @@ EOT
         // Fix this to work with subforums.
         $PAGE->path(
             array(
-                $topicdata['cat_title'] => '?act=vc' . $topicdata['cat_id'],
-                $topicdata['forum_title'] => '?act=vf' . $topicdata['fid'],
-                $topicdata['topic_title'] => "?act=vt{$id}",
+                $this->topicdata['cat_title'] => '?act=vc' . $this->topicdata['cat_id'],
+                $this->topicdata['forum_title'] => '?act=vf' . $this->topicdata['fid'],
+                $this->topicdata['topic_title'] => "?act=vt{$id}",
             )
         );
 
@@ -188,18 +194,18 @@ EOT
         $SESS->addvar('topic_lastpage', ($page + 1) == $totalpages);
 
         // If it's a poll, put it in.
-        if ($topicdata['poll_type']) {
+        if ($this->topicdata['poll_type']) {
             $poll = $PAGE->meta(
                 'box',
                 " id='poll'",
-                $topicdata['poll_q'],
+                $this->topicdata['poll_q'],
                 $this->generatepoll(
-                    $topicdata['poll_q'],
-                    $topicdata['poll_type'],
+                    $this->topicdata['poll_q'],
+                    $this->topicdata['poll_type'],
                     $JAX->json_decode(
-                        $topicdata['poll_choices']
+                        $this->topicdata['poll_choices']
                     ),
-                    $topicdata['poll_results']
+                    $this->topicdata['poll_results']
                 )
             );
         } else {
@@ -210,31 +216,31 @@ EOT
         $page = $PAGE->meta('topic-table', $this->postsintooutput());
         $page = $PAGE->meta(
             'topic-wrapper',
-            $topicdata['topic_title'] .
-            ($topicdata['subtitle'] ? ', ' . $topicdata['subtitle'] : ''),
+            $this->topicdata['topic_title'] .
+            ($this->topicdata['subtitle'] ? ', ' . $this->topicdata['subtitle'] : ''),
             $page,
             '<a href="./?act=vt' . $id . '&amp;fmt=RSS" class="social rss">RSS</a>'
         );
 
         // Add buttons.
         $buttons = array(
-            $topicdata['fperms']['start'] ?
-            "<a href='?act=post&fid=" . $topicdata['fid'] . "'>" .
+            $this->topicdata['fperms']['start'] ?
+            "<a href='?act=post&fid=" . $this->topicdata['fid'] . "'>" .
             ($PAGE->meta(
                 $PAGE->metaexists('button-newtopic') ?
                 'button-newtopic' : 'topic-button-newtopic'
             )) . '</a>' :
             '&nbsp;',
-            $topicdata['fperms']['reply']
-            && (!$topicdata['locked']
+            $this->topicdata['fperms']['reply']
+            && (!$this->topicdata['locked']
             || $PERMS['can_override_locked_topics']) ?
             "<a href='?act=vt{$id}&qreply=1'>" .
             ($PAGE->meta(
                 $PAGE->metaexists('button-qreply') ?
                 'button-qreply' : 'topic-button-qreply'
             )) : '',
-            $topicdata['fperms']['reply']
-            && (!$topicdata['locked']
+            $this->topicdata['fperms']['reply']
+            && (!$this->topicdata['locked']
             || $PERMS['can_override_locked_topics']) ?
             "<a href='?act=post&tid={$id}'>" .
             ($PAGE->meta(
