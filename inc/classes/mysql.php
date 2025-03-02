@@ -568,7 +568,7 @@ EOT
             $today = date('n j');
             while ($f = $this->arow($result)) {
                 if ($f['hide']) {
-                    if (2 != $USER['group_id']) {
+                    if ($USER && 2 != $USER['group_id']) {
                         continue;
                     }
                     $f['name'] = '* ' . $f['name'];
