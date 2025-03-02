@@ -1,18 +1,14 @@
 <form data-ajax-form="resetOnSubmit" action="?" method="post">
   <div>
-    Username:
-    <input type="text" name="user" tabindex="1" />
-    <br />
-    Password:
-    <a href="?act=logreg6" class="forgot">
-      Forgot?
-    </a>
-    <input type="password" name="pass" tabindex="2" />
-    <br />
-    <input type="hidden" name="act" value="logreg" />
-    <input type="submit" value="Login" />
-    <a href="?act=logreg1">
-      Register
-    </a>
+    <label for="user">Username:</label><br>
+    <input type="text" title="Username" id="user" name="user">
+    <br>
+    <label for="pass">Password:</label>
+    <a href="?act=logreg6" class="forgot">Forgot?</a>
+    <input type="password" title="Password" id="pass" name="pass">
+    <br>
+    <input type="hidden" name="act" value="logreg">
+    <input type="submit" value="Login">
+    <a href="?act=logreg1">Register</a>
   </div>
 </form>
