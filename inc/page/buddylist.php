@@ -17,7 +17,7 @@ $PAGE->metadefs['buddylist-contact'] = <<<'EOT'
     class="contact %3$s">
     <a href="?act=vu%1$s">
         <div class="avatar">
-            <img src="%4$s" />
+            <img src="%4$s" alt="Avatar"/>
         </div>
         <div class="name">
             %2$s
@@ -149,6 +149,7 @@ MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
 `friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
 `sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
 `notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
+`contact_discord`,`contact_youtube`,`contact_bluesky`,
 `email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
 EOT
                 ,
