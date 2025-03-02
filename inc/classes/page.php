@@ -42,9 +42,6 @@ class PAGE
 
     public function append($a, $b)
     {
-        if ('SCRIPT' == $a && $this->mobile) {
-            return;
-        }
         $a = mb_strtoupper($a);
         if (!$this->jsaccess || 'TITLE' == $a) {
             if (!isset($this->parts[$a])) {
