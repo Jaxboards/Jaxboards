@@ -687,7 +687,8 @@
 
       const button = assign(document.createElement('button'), {
         type: 'button',
-        className: element.className
+        className: element.className,
+	title: 'Yes/No Toggle'
       });
 
       const toggle = () => {
