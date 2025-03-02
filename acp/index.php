@@ -98,7 +98,7 @@ if ($submitted) {
         );
     } elseif (isset($uinfo) && $notadmin) {
         $themeElements['content'] = $PAGE->error(
-            'You are not authorized to login to the ACP'
+            'You are not authorized to log in to the ACP'
         );
     }
 }
