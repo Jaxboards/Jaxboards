@@ -1,8 +1,6 @@
 <form method="post">
-  <label>
-    Member Name:
-  </label>
-  <input type="text" name="name" data-autocomplete-action="searchmembers"
+  <label for="name">Member Name:</label>
+  <input type="text" id="name" name="name" title="Search for member" data-autocomplete-action="searchmembers"
     data-autocomplete-output="#mid" data-autocomplete-indicator="#validname" />
   <input type="hidden" id="mid" name="mid" />
   <span id="validname">
