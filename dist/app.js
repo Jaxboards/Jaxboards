@@ -1221,6 +1221,7 @@
 
       const button = assign(document.createElement('button'), {
         type: 'button',
+	title: 'PM Flag',
         className: element.className
       });
 
@@ -2562,10 +2563,8 @@
       if (!messagesContainer) {
         const imWindow = new Window();
         imWindow.title = `${fromName} <a href="#" onclick="IMWindow.menu(event,${fromId});return false;">&rsaquo;</a>`;
-        imWindow.content = "<div class='ims'></div><div class='offline'>This user may be offline</div><div><form data-ajax-form='resetOnSubmit' method='post'><input type='hidden' name='im_uid' value='%s' /><input type='text' name='im_im' autocomplete='off' /><input type='hidden' name='act' value='blank' /></form></div>".replace(
-          /%s/g,
-          fromId
-        );
+        imWindow.content = "<div class='ims'></div><div class='offline'>This user may be offline</div><div><form data-ajax-form='resetOnSubmit' method='post'><input type='hidden' name='im_uid' value='%s' /><input type='text' name='im_im' title='IM Input' autocomplete='off' /><input type='hidden' name='act' value='blank' /></form></div>".replace(
+/%s/g, fromId);
         imWindow.className = 'im';
         imWindow.resize = '.ims';
         imWindow.animate = true;
@@ -2598,8 +2597,7 @@
           document.querySelector(`#im_${fromId}`).classList.remove('offline');
         }
         d.innerHTML = `<a href='?act=vu${fromMe ||
-        parseInt(fromId, 10)}' class='name'>${fromName}</a> ${
-        !isAction ? ': ' : ''
+        parseInt(fromId, 10)}' class='name'>${fromName}</a>${!isAction ? ': ': ''
       }${message}`;
         d.dataset.timestamp = timestamp;
         const test =
@@ -2931,7 +2929,7 @@
     }
 
     setWindowActive() {
-      document.cookie = `actw=${window.name}; SameSite=Lax`;
+      document.cookie = "actw=${window.name}; SameSite=Lax";
       stopTitleFlashing();
       this.stream.pollData();
     }
