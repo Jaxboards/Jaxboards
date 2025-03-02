@@ -6,6 +6,7 @@ class SESS
     public $userData = array();
     public $bots = array(
         'Googlebot' => 'Google',
+	'GoogleOther' => 'GoogleOther',
         'Bingbot' => 'Bing',
         'DuckDuckBot' => 'DuckDuckGo',
         'Teoma' => 'Ask.com',
@@ -20,11 +21,12 @@ class SESS
         'Amazonbot' => 'Amazon',
         'Applebot' => 'Applebot',
         'ClaudeBot' => 'ClaudeBot', // Anthropic AI bot
+	'ChatGPT-User' => 'ChatGPT', // AI developer
         'GPTBot' => 'GPTBot', // AI developer
         'OAI-SearchBot' => 'OpenAI', // AI developer
         'PerplexityBot' => 'Perplexity', // AI answers site
 	'ImagesiftBot' => 'Imagesift', // Hive image search; may be AI-related
-        'MJ12bot' => 'Majestic', // British SEO crawler
+        'mj12bot' => 'Majestic', // British SEO crawler
         'SemrushBot' => 'Semrush', // Backlink tracking company
         'DotBot' => 'DotBot', // Moz SEO crawler
         'AhrefsBot' => 'Ahrefs', // SEO crawler
@@ -37,11 +39,14 @@ class SESS
         'YandexBot' => 'Yandex', // Russian search engine
         'PetalBot' => 'PetalBot', // Chinese search crawler (Huawei)
         'Y!J-WSC' => 'Yahoo Japan',
+	'yahoo! slurp' => 'Yahoo',
         'MojeekBot' => 'Mojeek', // British search engine
-        'Qwantbot-prod' => 'Qwant', // French search engine
+        'Qwantbot' => 'Qwant', // French search engine
         'Sogou web spider' => 'Sogou', // Chinese search engine
         'SeznamBot' => 'Seznam', // Czech search engine
+	'Centurybot' => 'Century', // a.k.a. RightDao, a search engine
         'Mail.RU_Bot' => 'Mail.RU',
+	'Turnitin' => 'Turnitin', // Plagiarism scanning software
         'Expanse' => 'Expanse', // Palo Alto Networks security scanning service
 	'CensysInspect' => 'CensysInspect', // Security scanner
     );
