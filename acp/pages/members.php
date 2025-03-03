@@ -57,13 +57,13 @@ class members
                 )
             ) . PHP_EOL;
         }
-        $sidebarLinks .= $PAGE->parseTemplate(
+        /*$sidebarLinks .= $PAGE->parseTemplate(
             'sidebar-list-link.html',
             array(
                 'url' => '?act=stats',
                 'title' => 'Recount Statistics',
             )
-        ) . PHP_EOL;
+        ) . PHP_EOL;*/
 
         $PAGE->sidebar(
             $PAGE->parseTemplate(
@@ -140,6 +140,7 @@ MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
 `friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
 `sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
 `notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
+`contact_discord`,`contact_youtube`,`contact_bluesky`,
 `email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
 EOT
                     ,
@@ -170,12 +171,15 @@ EOT
                             'email',
                             'ucpnotepad',
                             'contact_aim',
+			    'contact_bluesky',
+			    'contact_discord',
                             'contact_gtalk',
                             'contact_msn',
                             'contact_skype',
                             'contact_steam',
                             'contact_twitter',
                             'contact_yim',
+			    'contact_youtube',
                             'website',
                             'posts',
                             'group_id',
@@ -215,6 +219,7 @@ MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
 `friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
 `sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
 `notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
+`contact_discord`,`contact_youtube`,`contact_bluesky`,
 `email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
 EOT
                     ,
@@ -235,6 +240,7 @@ MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
 `friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
 `sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
 `notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
+`contact_discord`,`contact_youtube`,`contact_bluesky`,
 `email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
 EOT
                     ,
@@ -279,11 +285,7 @@ EOT
                 );
             } else {
                 $page .= $JAX->hiddenFormFields(array('mid' => $data['id']));
-                $page .= $this->formfield(
-                    'Display Name:',
-                    'display_name',
-                    $data['display_name']
-                );
+                $page .= $this->formfield('Display Name:', 'display_name', $data['display_name']);
                 $page .= $this->formfield('Username:', 'name', $data['name']);
                 $page .= $this->formfield('Real Name:', 'full_name', $data['full_name']);
                 $page .= $this->formfield('Password:', 'password', '');
@@ -296,43 +298,22 @@ EOT
                 $page .= $this->formfield('About:', 'about', $data['about'], 'textarea');
                 $page .= $this->formfield('Signature:', 'sig', $data['sig'], 'textarea');
                 $page .= $this->formfield('Email:', 'email', $data['email']);
-                $page .= $this->formfield(
-                    'UCP Notepad:',
-                    'ucpnotepad',
-                    $data['ucpnotepad'],
-                    'textarea'
-                );
+                $page .= $this->formfield('UCP Notepad:', 'ucpnotepad', $data['ucpnotepad'], 'textarea');
                 $page .= $this->heading('Contact Details');
                 $page .= $this->formfield('AIM:', 'contact_aim', $data['contact_aim']);
-                $page .= $this->formfield('MSN:', 'contact_msn', $data['contact_msn']);
-                $page .= $this->formfield(
-                    'GTalk:',
-                    'contact_gtalk',
-                    $data['contact_gtalk']
-                );
-                $page .= $this->formfield(
-                    'Skype:',
-                    'contact_skype',
-                    $data['contact_skype']
-                );
-                $page .= $this->formfield(
-                    'Steam:',
-                    'contact_steam',
-                    $data['contact_steam']
-                );
-                $page .= $this->formfield(
-                    'Twitter:',
-                    'contact_twitter',
-                    $data['contact_twitter']
-                );
+		$page .= $this->formfield('Bluesky:', 'contact_bluesky', $data['contact_bluesky']);
+                $page .= $this->formfield('Discord:', 'contact_discord', $data['contact_discord']);
+                $page .= $this->formfield('Google Chat:', 'contact_gtalk', $data['contact_gtalk']);
+		$page .= $this->formfield('MSN:', 'contact_msn', $data['contact_msn']);
+                $page .= $this->formfield('Skype:', 'contact_skype', $data['contact_skype']);
+                $page .= $this->formfield('Steam:', 'contact_steam', $data['contact_steam']);
+                $page .= $this->formfield('Twitter:', 'contact_twitter', $data['contact_twitter']);
                 $page .= $this->formfield('YIM:', 'contact_yim', $data['contact_yim']);
+		$page .= $this->formfield('YouTube:', 'contact_youtube', $data['contact_youtube']);
                 $page .= $this->heading('System-Generated Variables');
                 $page .= $this->formfield('Post Count:', 'posts', $data['posts']);
-                $page = $PAGE->parseTemplate(
-                    'members/edit-form.html',
-                    array(
-                        'content' => $page,
-                    )
+                $page = $PAGE->parseTemplate('members/edit-form.html',
+                    array('content' => $page,)
                 );
             }
         } else {
