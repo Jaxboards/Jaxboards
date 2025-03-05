@@ -24,7 +24,7 @@ class TOPIC
             return $PAGE->location('?');
         }
 
-        $this->topicdata = $this->getTopicData($id);
+        $this->getTopicData($id);
         if (!$this->topicdata) {
             // Put the user back on the index and skip these next few lines.
             return $PAGE->location('?');
@@ -109,7 +109,7 @@ EOT
         global $DB,$PAGE,$JAX,$SESS,$USER,$PERMS;
         $page = $this->page;
         
-        if ($this->topicdata['lp_date'] > $USER['last_visit']) {
+        if ($USER && $this->topicdata['lp_date'] > $USER['last_visit']) {
             $this->markread($id);
         }
         if (!$this->topicdata['fperms']['read']) {
@@ -477,6 +477,9 @@ SELECT m.`id` AS `id`,m.`name` AS `name`,m.`email` AS `email`,m.`sig` AS `sig`,
     m.`notify_postinsubscribedtopic` AS `notify_postinsubscribedtopic`,
     m.`ucpnotepad` AS `ucpnotepad`,m.`skin_id` AS `skin_id`,
     m.`contact_twitter` AS `contact_twitter`,
+    m.`contact_discord` AS `contact_discord`,
+    m.`contact_youtube` AS `contact_youtube`,
+    m.`contact_bluesky` AS `contact_bluesky`,
     m.`email_settings` AS `email_settings`,m.`nowordfilter` AS `nowordfilter`,
     INET6_NTOA(m.`ip`) AS `ip`,m.`mod` AS `mod`,m.`wysiwyg` AS `wysiwyg`,
     p.`tid` AS `tid`,p.`id` AS `pid`,INET6_NTOA(p.`ip`) AS `ip`,
@@ -573,13 +576,17 @@ EOT
                 ),
                 $post['title'],
                 $post['auth_id'],
+		// Adds the Edit button
                 ($this->canedit($post) ?
                 "<a href='?act=vt" . $this->id . '&amp;edit=' . $post['pid'] .
                 "' class='edit'>" . $PAGE->meta('topic-edit-button') .
-                '</a>' : '') . " <a href='?act=vt" . $this->id . '&amp;quote=' .
-                $post['pid'] .
+                '</a>' : '') .
+		// Adds the Quote button
+                ($this->topicdata['fperms']['reply'] ?
+                " <a href='?act=vt" . $this->id . '&amp;quote=' . $post['pid'] .
                 "' onclick='RUN.handleQuoting(this);return false;' " .
-                "class='quotepost'>" . $PAGE->meta('topic-quote-button') . '</a> ' .
+                "class='quotepost'>" . $PAGE->meta('topic-quote-button') . '</a> '  : '') .
+		// Adds the Moderate options
                 ($this->canmoderate() ?
                 "<a href='?act=modcontrols&amp;do=modp&amp;pid=" . $post['pid'] .
                 "' class='modpost' onclick='RUN.modcontrols.togbutton(this)'>" .
@@ -614,12 +621,15 @@ EOT
                 ) : '',
                 ++$topic_post_counter,
                 isset($post['contact_skype']) ? $post['contact_skype'] : '',
+		isset($post['contact_discord']) ? $post['contact_discord'] : '',
                 isset($post['contact_yim']) ? $post['contact_yim'] : '',
                 isset($post['contact_msn']) ? $post['contact_msn'] : '',
                 isset($post['contact_gtalk']) ? $post['contact_gtalk'] : '',
                 isset($post['contact_aim']) ? $post['contact_aim'] : '',
+		isset($post['contact_youtube']) ? $post['contact_youtube'] : '',
+		isset($post['contact_steam']) ? $post['contact_steam'] : '',
                 isset($post['contact_twitter']) ? $post['contact_twitter'] : '',
-                isset($post['contact_steam']) ? $post['contact_steam'] : '',
+		isset($post['contact_bluesky']) ? $post['contact_bluesky'] : '',
                 '',
                 '',
                 '',
@@ -655,7 +665,7 @@ EOT
         if ($PERMS['can_moderate']) {
             $canmod = true;
         }
-        if ($USER['mod']) {
+        if ($USER && $USER['mod']) {
             $result = $DB->safespecial(
                 <<<'EOT'
 SELECT `mods`
@@ -1112,7 +1122,7 @@ EOT
         global $SESS,$PAGE,$JAX;
         $topicsread = $JAX->parsereadmarkers($SESS->topicsread);
         $topicsread[$id] = time();
-        $SESS->topicsread = $JAX->base128encode($topicsread, true);
+        $SESS->topicsread = json_encode($topicsread, true);
     }
 
     public function listrating($pid)

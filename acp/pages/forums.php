@@ -426,6 +426,7 @@ MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
 `friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
 `sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
 `notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
+`contact_discord`,`contact_youtube`,`contact_bluesky`,
 `email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
 EOT
                     ,

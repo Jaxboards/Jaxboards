@@ -1,52 +1,38 @@
 <form method="post" data-ajax-form="true">
   %s
-  <h2>
-    Name:
-  </h2>
+  <h2>Name:</h2>
   <div>
     Your username:
-    <strong>
-      %s
-    </strong>
+    <strong>%s</strong>
   </div>
   <div>
     <label for="username">
-      Display Name:
+      Display name:
     </label>
-    <input type="text" name="display_name" id="username" value="%s" />
+    <input type="text" name="display_name" title="Display Name" id="username" value="%s" />
   </div>
   <div>
     <label for="realname">
       Real name:
     </label>
-    <input type="text" name="full_name" id="realname" value="%s" />
+    <input type="text" name="full_name" title="Real Name" id="realname" value="%s" />
   </div>
   <div>
     <label for="usertitle">
       Title:
     </label>
-    <input type="text" name="usertitle" id="usertitle" value="%s" />
+    <input type="text" name="usertitle" title="User Title" id="usertitle" value="%s" />
   </div>
-  <h2>
-    About you:
-  </h2>
+  <h2>About you:</h2>
   <div class="description">
-    <textarea rows="10" cols="60" name="about" id="about" class="bbcode-editor">%s</textarea>
-    <h2>
-      Location
-    </h2>
-    <input type="text" name="location" value="%s" />
-    <h2>
-      Gender
-    </h2>
+    <textarea rows="10" cols="60" name="about" title="About You" id="about" class="bbcode-editor">%s</textarea>
+    <h2>Location</h2>
+    <input type="text" name="location" title="Location" value="%s" />
+    <h2>Gender</h2>
     %s
-    <h2>
-      Date of Birth:
-    </h2>
+    <h2>Date of Birth:</h2>
     %s
-    <h2>
-      Contact Details (Optional)
-    </h2>
+    <h2>Contact Details (Optional)</h2>
     <div id="contact_details">
       <div class="skype">
         <label for="con_skype">
@@ -54,6 +40,12 @@
         </label>
         <input type="text" name="con_skype" id="con_skype" value="%s" />
       </div>
+      <div class="discord">
+        <label for="con_discord">
+          Discord:
+        </label>
+        <input type="text" name="con_discord" id="con_discord" value="%s" />
+      </div>      
       <div class="yim">
         <label for="con_yim">
           YIM:
@@ -68,7 +60,7 @@
       </div>
       <div class="gtalk">
         <label for="con_gtalk">
-          Google Talk:
+          Google Chat:
         </label>
         <input type="text" name="con_gtalk" id="con_gtalk" value="%s" />
       </div>
@@ -77,6 +69,12 @@
           AIM:
         </label>
         <input type="text" name="con_aim" id="con_aim" value="%s" />
+      </div>
+      <div class="youtube">
+        <label for="con_youtube">
+          YouTube:
+        </label>
+        <input type="text" name="con_youtube" id="con_youtube" value="%s" />
       </div>
       <div class="steam">
         <label for="con_steam">
@@ -90,14 +88,18 @@
         </label>
         <input type="text" name="con_twitter" id="con_twitter" value="%s" />
       </div>
+      <div class="bluesky">
+        <label for="con_bluesky">
+          Bluesky:
+        </label>
+        <input type="text" name="con_bluesky" id="con_bluesky" value="%s" />
+      </div>
     </div>
-    <h2>
-      Website
-    </h2>
-    <label for="url">
-      URL:
+    <h2>Website</h2>
+    <label for="website">
+      Your website:
     </label>
-    <input type="text" name="website" id="url" value="%s" />
+    <input type="text" name="website" id="website" value="%s" />
   </div>
   <div>
     <input name="submit" type="submit" value="Save Profile Settings" />

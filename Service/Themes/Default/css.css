@@ -990,7 +990,7 @@ textarea {
 }
 
 #userbox a.num-messages {
-  color: #00a8ff;
+  color: #fff;
 }
 
 /* Breadcrumbs */
@@ -1324,6 +1324,7 @@ textarea {
 #intopic .quotepost {
   margin-left: 10px;
   padding-left: 18px;
+  padding-bottom: 2px;
   background: url(icons/posticons.png) no-repeat top left;
 }
 
@@ -2088,29 +2089,15 @@ a.mgroup4 {
 }
 /* stylelint-enable no-descending-specificity */
 
-.skype {
-  background-position: 0 -32px;
-}
-
-.gtalk {
-  background-position: 0 -64px;
-}
-
-.aim {
-  background-position: 0 -96px;
-}
-
-.yim {
-  background-position: 0 -128px;
-}
-
-.steam {
-  background-position: 0 -160px;
-}
-
-.twitter {
-  background-position: 0 -192px;
-}
+.Skype{background-position:0 -32px;}
+.GoogleChat{background-position:0 -64px;}
+.AIM{background-position:0 -96px;}
+.YIM{background-position:0 -128px;}
+.Steam{background-position:0 -160px;}
+.Twitter{background-position:0 -192px;}
+.Discord{background-position:0 -256px;}
+.YouTube{background-position:0 -298px;}
+.Bluesky{background-position:0 -320px;}
 
 .contact.im,
 .contact.pm {
