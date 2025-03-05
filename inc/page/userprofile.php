@@ -9,12 +9,15 @@ class userprofile
 
     public $contacturls = array(
         'skype' => 'skype:%s',
+	'discord' => 'discord:%s',
+	'yim' => 'ymsgr:sendim?%s',
         'msn' => 'msnim:chat?contact=%s',
-        'gtalk' => 'gtalk:chat?jid=%s',
+        'googlechat' => 'gchat:chat?jid=%s',
         'aim' => 'aim:goaim?screenname=%s',
-        'yim' => 'ymsgr:sendim?%s',
+	'youtube' => 'https://youtube.com/%s',
         'steam' => 'https://steamcommunity.com/id/%s',
         'twitter' => 'https://twitter.com/%s',
+	'bluesky' => 'https://bsky.app/profile/%s.bsky.social'
     );
 
     public function __construct()
@@ -40,17 +43,21 @@ class userprofile
         $contactdetails = '';
         $result = $DB->safespecial(
             <<<'EOT'
-SELECT m.`id` AS `uid`,m.`display_name` AS `uname`,m.`usertitle` AS `usertitle`,
-    g.`title` AS `title`,m.`avatar` AS `avatar`,
-    m.`contact_gtalk` AS `contact_gtalk`,m.`contact_aim` AS `contact_aim`,
-    m.`contact_yim` AS `contact_yim`,m.`contact_msn` AS `contact_msn`,
-    m.`contact_skype` AS `contact_skype`,m.`contact_steam` AS `contact_steam`,
-    m.`contact_twitter` AS `contact_twitter`
-FROM %t m
-LEFT JOIN %t g
-    ON m.`group_id`=g.`id`
-WHERE m.`id`=?
-EOT
+                SELECT m.`id` AS `uid`,m.`display_name` AS `uname`,m.`usertitle` AS `usertitle`,
+                    g.`title` AS `title`,m.`avatar` AS `avatar`,
+                    m.`contact_gtalk` AS `contact_googlechat`,m.`contact_aim` AS `contact_aim`,
+                    m.`website` AS `website`,
+                    m.`contact_yim` AS `contact_yim`,m.`contact_msn` AS `contact_msn`,
+                    m.`contact_skype` AS `contact_skype`,m.`contact_steam` AS `contact_steam`,
+                    m.`contact_twitter` AS `contact_twitter`,
+                    m.`contact_discord` AS `contact_discord`,
+                    m.`contact_youtube` AS `contact_youtube`,
+                    m.`contact_bluesky` AS `contact_bluesky`
+                FROM %t m
+                LEFT JOIN %t g
+                    ON m.`group_id`=g.`id`
+                WHERE m.`id`=?
+                EOT
             ,
             array('members', 'member_groups'),
             $id
@@ -63,7 +70,7 @@ EOT
 
         foreach ($this->contacturls as $k => $v) {
             if ($ud['contact_' . $k]) {
-                $contactdetails .= '<a class="' . $k . ' contact" href="' . sprintf(
+                $contactdetails .= '<a class="' . $k . ' contact" title="' . $k . ' contact" href="' . sprintf(
                     $v,
                     $JAX->blockhtml($ud['contact_' . $k])
                 ) . '">&nbsp;</a>';
@@ -120,36 +127,38 @@ EOT
         } else {
             $result = $DB->safespecial(
                 <<<'EOT'
-SELECT m.`id` AS `id`,m.`name` AS `name`,m.`email` AS `email`,m.`sig` AS `sig`,
-    m.`posts` AS `posts`,m.`group_id` AS `group_id`,m.`avatar` AS `avatar`,
-    m.`usertitle` AS `usertitle`,UNIX_TIMESTAMP(m.`join_date`) AS `join_date`,
-    UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`,
-    m.`contact_skype` AS `contact_skype`,m.`contact_yim` AS `contact_yim`,
-    m.`contact_msn` AS `contact_msn`,m.`contact_gtalk` AS `contact_gtalk`,
-    m.`contact_aim` AS `contact_aim`,m.`website` AS `website`,
-    m.`birthdate` AS `birthdate`,DAY(m.`birthdate`) AS `dob_day`,
-    MONTH(m.`birthdate`) AS `dob_month`,YEAR(m.`birthdate`) AS `dob_year`,
-    m.`about` AS `about`,m.`display_name` AS `display_name`,
-    m.`full_name` AS `full_name`,m.`contact_steam` AS `contact_steam`,
-    m.`location` AS `location`,m.`gender` AS `gender`,m.`friends` AS `friends`,
-    m.`enemies` AS `enemies`,m.`sound_shout` AS `sound_shout`,
-    m.`sound_im` AS `sound_im`,m.`sound_pm` AS `sound_pm`,
-    m.`sound_postinmytopic` AS `sound_postinmytopic`,
-    m.`sound_postinsubscribedtopic` AS `sound_postinsubscribedtopic`,
-    m.`notify_pm` AS `notify_pm`,
-    m.`notify_postinmytopic` AS `notify_postinmytopic`,
-    m.`notify_postinsubscribedtopic` AS `notify_postinsubscribedtopic`,
-    m.`ucpnotepad` AS `ucpnotepad`,m.`skin_id` AS `skin_id`,
-    m.`contact_twitter` AS `contact_twitter`,
-    m.`email_settings` AS `email_settings`,m.`nowordfilter` AS `nowordfilter`,
-    INET6_NTOA(m.`ip`) AS `ip`,m.`mod` AS `mod`,m.`wysiwyg` AS `wysiwyg`,
-    g.`title` AS `group`
-FROM %t m
-LEFT JOIN %t g
-    ON m.`group_id`=g.`id`
-WHERE m.`id`=?
-EOT
-                ,
+                SELECT m.`id` AS `id`,m.`name` AS `name`,m.`email` AS `email`,m.`sig` AS `sig`,
+                    m.`posts` AS `posts`,m.`group_id` AS `group_id`,m.`avatar` AS `avatar`,
+                    m.`usertitle` AS `usertitle`,UNIX_TIMESTAMP(m.`join_date`) AS `join_date`,
+                    UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`,
+                    m.`contact_skype` AS `contact_skype`,m.`contact_yim` AS `contact_yim`,
+                    m.`contact_msn` AS `contact_msn`,m.`contact_gtalk` AS `contact_googlechat`,
+                    m.`contact_aim` AS `contact_aim`,m.`website` AS `website`,
+                    m.`birthdate` AS `birthdate`,DAY(m.`birthdate`) AS `dob_day`,
+                    MONTH(m.`birthdate`) AS `dob_month`,YEAR(m.`birthdate`) AS `dob_year`,
+                    m.`about` AS `about`,m.`display_name` AS `display_name`,
+                    m.`full_name` AS `full_name`,m.`contact_steam` AS `contact_steam`,
+                    m.`location` AS `location`,m.`gender` AS `gender`,m.`friends` AS `friends`,
+                    m.`enemies` AS `enemies`,m.`sound_shout` AS `sound_shout`,
+                    m.`sound_im` AS `sound_im`,m.`sound_pm` AS `sound_pm`,
+                    m.`sound_postinmytopic` AS `sound_postinmytopic`,
+                    m.`sound_postinsubscribedtopic` AS `sound_postinsubscribedtopic`,
+                    m.`notify_pm` AS `notify_pm`,
+                    m.`notify_postinmytopic` AS `notify_postinmytopic`,
+                    m.`notify_postinsubscribedtopic` AS `notify_postinsubscribedtopic`,
+                    m.`ucpnotepad` AS `ucpnotepad`,m.`skin_id` AS `skin_id`,
+                    m.`contact_twitter` AS `contact_twitter`,
+                    m.`contact_bluesky` AS `contact_bluesky`,
+                    m.`contact_youtube` AS `contact_youtube`,
+                    m.`contact_discord` AS `contact_discord`,
+                    m.`email_settings` AS `email_settings`,m.`nowordfilter` AS `nowordfilter`,
+                    INET6_NTOA(m.`ip`) AS `ip`,m.`mod` AS `mod`,m.`wysiwyg` AS `wysiwyg`,
+                    g.`title` AS `group`
+                FROM %t m
+                LEFT JOIN %t g
+                    ON m.`group_id`=g.`id`
+                WHERE m.`id`=?
+                EOT,
                 array('members', 'member_groups'),
                 $id
             );
@@ -172,19 +181,18 @@ EOT
                 $pfpageloc = 'activity';
                 $result = $DB->safespecial(
                     <<<'EOT'
-SELECT a.`id` AS `id`,a.`type` AS `type`,a.`arg1` AS `arg1`,a.`uid` AS `uid`,
-    UNIX_TIMESTAMP(a.`date`) AS `date`,a.`affected_uid` AS `affected_uid`,
-    a.`tid` AS `tid`,a.`pid` AS `pid`,a.`arg2` AS `arg2`,
-    a.`affected_uid` AS `aff_id`,m.`display_name` AS `aff_name`,
-    m.`group_id` AS `aff_group_id`
-FROM %t a
-LEFT JOIN %t m
-    ON a.`affected_uid`=m.`id`
-WHERE a.`uid`=?
-ORDER BY a.`id` DESC
-LIMIT ?
-EOT
-                    ,
+                SELECT a.`id` AS `id`,a.`type` AS `type`,a.`arg1` AS `arg1`,a.`uid` AS `uid`,
+                    UNIX_TIMESTAMP(a.`date`) AS `date`,a.`affected_uid` AS `affected_uid`,
+                    a.`tid` AS `tid`,a.`pid` AS `pid`,a.`arg2` AS `arg2`,
+                    a.`affected_uid` AS `aff_id`,m.`display_name` AS `aff_name`,
+                    m.`group_id` AS `aff_group_id`
+                FROM %t a
+                LEFT JOIN %t m
+                    ON a.`affected_uid`=m.`id`
+                WHERE a.`uid`=?
+                ORDER BY a.`id` DESC
+                LIMIT ?
+                EOT,
                     array('activity', 'members'),
                     $id,
                     $this->num_activity
@@ -221,7 +229,7 @@ EOT
                     $pfbox .= $JAX->parse_activity($f);
                 }
                 if (!$pfbox) {
-                    $pfbox = 'This user has yet to do anything note-worthy!';
+                    $pfbox = 'This user has yet to do anything noteworthy!';
                 } else {
                     $pfbox = "<a href='./?act=vu" . $id .
                     "&amp;page=activity&amp;fmt=RSS' class='social rss' " .
@@ -232,18 +240,17 @@ EOT
             case 'posts':
                 $result = $DB->safespecial(
                     <<<'EOT'
-SELECT p.`post` AS `post`,p.`id` AS `pid`,p.`tid` AS `tid`,
-    t.`title` AS `title`,UNIX_TIMESTAMP(p.`date`) AS `date`,f.`perms` AS `perms`
-FROM %t p
-LEFT JOIN %t t
-    ON p.`tid`=t.`id`
-LEFT JOIN %t f
-    ON f.`id`=t.`fid`
-WHERE p.`auth_id`=?
-ORDER BY p.`id` DESC
-LIMIT 10
-EOT
-                    ,
+                        SELECT p.`post` AS `post`,p.`id` AS `pid`,p.`tid` AS `tid`,
+                            t.`title` AS `title`,UNIX_TIMESTAMP(p.`date`) AS `date`,f.`perms` AS `perms`
+                        FROM %t p
+                        LEFT JOIN %t t
+                            ON p.`tid`=t.`id`
+                        LEFT JOIN %t f
+                            ON f.`id`=t.`fid`
+                        WHERE p.`auth_id`=?
+                        ORDER BY p.`id` DESC
+                        LIMIT 10
+                        EOT,
                     array('posts', 'topics', 'forums'),
                     $id
                 );
@@ -265,19 +272,18 @@ EOT
             case 'topics':
                 $result = $DB->safespecial(
                     <<<'EOT'
-SELECT p.`post` AS `post`,p.`id` AS `pid`,p.`tid` AS `tid`,
-    t.`title` AS `title`,UNIX_TIMESTAMP(p.`date`) AS `date`,f.`perms` AS `perms`
-FROM %t p
-LEFT JOIN %t t
-    ON p.`tid`=t.`id`
-LEFT JOIN %t f
-    ON f.`id`=t.`fid`
-WHERE p.`auth_id`=?
-    AND p.`newtopic`=1
-ORDER BY p.`id` DESC
-LIMIT 10
-EOT
-                    ,
+                        SELECT p.`post` AS `post`,p.`id` AS `pid`,p.`tid` AS `tid`,
+                            t.`title` AS `title`,UNIX_TIMESTAMP(p.`date`) AS `date`,f.`perms` AS `perms`
+                        FROM %t p
+                        LEFT JOIN %t t
+                            ON p.`tid`=t.`id`
+                        LEFT JOIN %t f
+                            ON f.`id`=t.`fid`
+                        WHERE p.`auth_id`=?
+                            AND p.`newtopic`=1
+                        ORDER BY p.`id` DESC
+                        LIMIT 10
+                        EOT,
                     array('posts', 'topics', 'forums'),
                     $id
                 );
@@ -309,16 +315,15 @@ EOT
                 if ($udata['friends']) {
                     $result = $DB->safespecial(
                         <<<'EOT'
-SELECT m.`avatar` AS `avatar`,m.`id` AS `id`,m.`display_name` AS `name`,
-    m.`group_id` AS `group_id`,
-    m.`usertitle` AS `usertitle`
-FROM %t m
-LEFT JOIN %t g
-    ON m.`group_id`=g.`id`
-WHERE m.`id` IN ?
-ORDER BY `name`
-EOT
-                        ,
+                            SELECT m.`avatar` AS `avatar`,m.`id` AS `id`,m.`display_name` AS `name`,
+                                m.`group_id` AS `group_id`,
+                                m.`usertitle` AS `usertitle`
+                            FROM %t m
+                            LEFT JOIN %t g
+                                ON m.`group_id`=g.`id`
+                            WHERE m.`id` IN ?
+                            ORDER BY `name`
+                            EOT,
                         array('members', 'member_groups'),
                         explode(',', $udata['friends'])
                     );
@@ -407,18 +412,17 @@ EOT
                 }
                 $result = $DB->safespecial(
                     <<<'EOT'
-SELECT c.`id` AS `id`,c.`to` AS `to`,c.`from` AS `from`,
-    c.`comment` AS `comment`,UNIX_TIMESTAMP(c.`date`) AS `date`,
-    m.`display_name` AS `display_name`,m.`group_id` AS `group_id`,
-    m.`avatar` AS `avatar`
-FROM %t c
-LEFT JOIN %t m
-    ON c.`from`=m.`id`
-WHERE c.`to`=?
-ORDER BY c.`id` DESC
-LIMIT 10
-EOT
-                    ,
+                        SELECT c.`id` AS `id`,c.`to` AS `to`,c.`from` AS `from`,
+                            c.`comment` AS `comment`,UNIX_TIMESTAMP(c.`date`) AS `date`,
+                            m.`display_name` AS `display_name`,m.`group_id` AS `group_id`,
+                            m.`avatar` AS `avatar`
+                        FROM %t c
+                        LEFT JOIN %t m
+                            ON c.`from`=m.`id`
+                        WHERE c.`to`=?
+                        ORDER BY c.`id` DESC
+                        LIMIT 10
+                        EOT,
                     array('profile_comments', 'members'),
                     $id
                 );
