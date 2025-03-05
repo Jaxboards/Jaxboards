@@ -29,7 +29,8 @@ YEAR(`birthdate`) AS `dob_year`,`about`,`display_name`,`full_name`,
 `sound_im`,`sound_pm`,`sound_postinmytopic`,`sound_postinsubscribedtopic`,
 `notify_pm`,`notify_postinmytopic`,`notify_postinsubscribedtopic`,`ucpnotepad`,
 `skin_id`,`contact_twitter`,`email_settings`,`nowordfilter`,
-INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
+INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`,
+`contact_discord`, `contact_youtube`, `contact_bluesky`
 EOT
             ,
             'members',
@@ -229,7 +230,7 @@ EOT
             ), );
 
         foreach ($variables as $v) {
-            $checkboxes[] = '<input type="checkbox" name="' . $v . '" ' .
+            $checkboxes[] = '<input type="checkbox" title="' . $v . '" name="' . $v . '" ' .
                 ($USER[$v] ? 'checked="checked"' : '') . '/>';
         }
 
@@ -312,7 +313,7 @@ EOT
                 );
                 $this->ucppage = <<<'EOT'
 Password changed.
-    <br /><br />
+    <br><br>
     <a href="?act=ucp&what=pass">Back</a>
 EOT;
 
@@ -348,7 +349,7 @@ EOT;
                     $USER['id']
                 );
                 $this->ucppage = 'Email settings updated.' .
-                    '<br /><br /><a href="?act=ucp&what=email">Back</a>';
+                    '<br><br><a href="?act=ucp&what=email">Back</a>';
             }
 
             return $this->showucp();
@@ -359,14 +360,14 @@ EOT;
                 array('submit' => 'true')
             ),
             ((isset($JAX->b['change']) && $JAX->b['change']) ?
-            "<input type='text' name='email' value='" . $USER['email'] . "' />" :
+            "<input type='text' name='email' aria-label='Email' title='Enter your new email address' value='" . $USER['email'] . "' />" :
             '<strong>' . $JAX->pick($USER['email'], '--none--') .
             "</strong> <a href='?act=ucp&what=email&change=1'>Change</a>" .
             "<input type='hidden' name='email' value='" . ($USER['email']) . "' />"
             ),
-            '<input type="checkbox" name="notifications"' .
+            '<input type="checkbox" title="Notifications" name="notifications"' .
             ($USER['email_settings'] & 2 ? " checked='checked'" : '') . '>',
-            '<input type="checkbox" name="adminemails"' .
+            '<input type="checkbox" title="Admin Emails" name="adminemails"' .
             ($USER['email_settings'] & 1 ? ' checked="checked"' : '') . '>'
         );
     }
@@ -392,11 +393,11 @@ EOT;
         }
         $this->ucppage = 'Your avatar: <span class="avatar"><img src="' .
             $JAX->pick($USER['avatar'], $PAGE->meta('default-avatar')) .
-            '" alt="Unable to load avatar"></span><br /><br />
+            '" alt="Your avatar"></span><br><br>
             <form data-ajax-form="true" method="post">' .
             $this->getlocationforform()
             . ($e ? $PAGE->error($e) : '') .
-            '<input type="text" name="changedava" value="' .
+            '<input type="text" name="changedava" title="Your avatar" value="' .
             $JAX->blockhtml($USER['avatar']) . '" />
             <input type="submit" value="Edit" />
             </form>';
@@ -421,13 +422,16 @@ EOT;
                 'dob_month' => $JAX->pick($JAX->p['dob_month'], null),
                 'dob_day' => $JAX->pick($JAX->p['dob_day'], null),
                 'dob_year' => $JAX->pick($JAX->p['dob_year'], null),
+		'contact_skype' => $JAX->p['con_skype'],
+		'contact_discord' => $JAX->p['con_discord'],
                 'contact_yim' => $JAX->p['con_yim'],
                 'contact_msn' => $JAX->p['con_msn'],
                 'contact_gtalk' => $JAX->p['con_gtalk'],
-                'contact_skype' => $JAX->p['con_skype'],
                 'contact_aim' => $JAX->p['con_aim'],
+		'contact_youtube' => $JAX->p['con_youtube'],
                 'contact_steam' => $JAX->p['con_steam'],
                 'contact_twitter' => $JAX->p['con_twitter'],
+		'contact_bluesky' => $JAX->p['con_bluesky'],
                 'website' => $JAX->p['website'],
                 'gender' => in_array($JAX->p['gender'], $genderOptions) ?
                 $JAX->p['gender'] : '',
@@ -528,13 +532,16 @@ EOT;
             unset($data['dob_day']);
 
             foreach (array(
-                'contact_yim' => 'YIM username',
-                'contact_msn' => 'MSN username',
-                'contact_gtalk' => 'Google Talk username',
-                'contact_steam' => 'Steam username',
-                'contact_twitter' => 'Twitter ID',
-                'contact_aim' => 'AIM username',
                 'contact_skype' => 'Skype username',
+		'contact_discord' => 'Discord username',
+		'contact_yim' => 'YIM username',
+                'contact_msn' => 'MSN username',
+                'contact_gtalk' => 'Google Chat username',
+		'contact_aim' => 'AIM username',
+		'contact_youtube' => 'YouTube username',
+                'contact_steam' => 'Steam username',
+                'contact_twitter' => 'Twitter username',
+		'contact_bluesky' => 'Bluesky username',
                 'full_name' => 'Full name',
                 'display_name' => 'Display name',
                 'website' => 'Website URL',
@@ -574,8 +581,8 @@ EOT;
                     'WHERE `id`=?',
                     $USER['id']
                 );
-                $this->ucppage = 'Profile successfully updated.<br />' .
-                    '<br /><a href="?act=ucp&what=profile">Back</a>';
+                $this->ucppage = 'Profile successfully updated.<br>' .
+                    '<br><a href="?act=ucp&what=profile">Back</a>';
                 $this->showucp();
 
                 return;
@@ -584,7 +591,7 @@ EOT;
             $PAGE->JS('error', $error);
         }
         $data = $USER;
-        $genderselect = '<select name="gender">';
+        $genderselect = '<select name="gender" title="Your gender" aria-label="Gender">';
         foreach (array('', 'male', 'female', 'other') as $v) {
             $genderselect .= '<option value="' . $v . '"' .
                 ($data['gender'] == $v ? ' selected="selected"' : '') .
@@ -592,7 +599,7 @@ EOT;
         }
         $genderselect .= '</select>';
 
-        $dobselect = '<select name="dob_month"><option value="">--</option>';
+        $dobselect = '<select name="dob_month" title="Month"><option value="">--</option>';
         $fullMonthNames = array(
             'January',
             'February',
@@ -612,13 +619,13 @@ EOT;
                 (($k + 1) == $data['dob_month'] ? ' selected="selected"' : '') .
                 '>' . $v . '</option>';
         }
-        $dobselect .= '</select><select name="dob_day"><option value="">--</option>';
+        $dobselect .= '</select><select name="dob_day" title="Day"><option value="">--</option>';
         for ($x = 1; $x < 32; ++$x) {
             $dobselect .= '<option value="' . $x . '"' .
                 ($x == $data['dob_day'] ? ' selected="selected"' : '') .
                 '>' . $x . '</option>';
         }
-        $dobselect .= '</select><select name="dob_year">' .
+        $dobselect .= '</select><select name="dob_year" title="Year">' .
             '<option value="">--</option>';
         $thisyear = (int) date('Y');
         for ($x = $thisyear; $x > $thisyear - 100; --$x) {
@@ -641,12 +648,15 @@ EOT;
             $genderselect,
             $dobselect,
             $data['contact_skype'],
-            $data['contact_yim'],
+            $data['contact_discord'],
+	    $data['contact_yim'],
             $data['contact_msn'],
             $data['contact_gtalk'],
             $data['contact_aim'],
+	    $data['contact_youtube'],
             $data['contact_steam'],
             $data['contact_twitter'],
+	    $data['contact_bluesky'],
             $data['website']
         );
     }
@@ -710,7 +720,7 @@ EOT;
                 '/>' . ($f['hidden'] ? '*' : '') . $f['title'] . '</option>';
             $found = true;
         }
-        $select = '<select name="skin">' . $select . '</select>';
+        $select = '<select name="skin" title="Board Skin">' . $select . '</select>';
         if (!$found) {
             $select = '--No Skins--';
         }
@@ -718,10 +728,10 @@ EOT;
             'ucp-board-settings',
             $this->getlocationforform(),
             $select,
-            '<input type="checkbox" name="usewordfilter"' .
+            '<input type="checkbox" name="usewordfilter" title="Use Word Filter"' .
             (!$USER['nowordfilter'] ? ' checked="checked"' : '') .
             ' />',
-            '<input type="checkbox" name="wysiwyg"' .
+            '<input type="checkbox" name="wysiwyg" title="WYSIWYG Enabled"' .
             ($USER['wysiwyg'] ? ' checked="checked"' : '') .
             ' />'
         );
@@ -911,7 +921,7 @@ EOT
             $page .= $PAGE->meta(
                 'inbox-messages-row',
                 (!$f['read'] ? 'unread' : 'read'),
-                '<input class="check" type="checkbox" name="dmessage[]" ' .
+                '<input class="check" type="checkbox" title="PM Checkbox" name="dmessage[]" ' .
                 'value="' . $f['id'] . '" />',
                 '<input type="checkbox" ' .
                 ($f['flag'] ? 'checked="checked" ' : '') .
@@ -1032,8 +1042,8 @@ EOT
                         'PM From ' . $USER['display_name'],
                         "You are receiving this email because you've " .
                         'received a message from ' . $USER['display_name'] .
-                        ' on {BOARDLINK}.<br />' .
-                        '<br />Please go to ' .
+                        ' on {BOARDLINK}.<br>' .
+                        '<br>Please go to ' .
                         "<a href='{BOARDURL}?act=ucp&what=inbox'>" .
                         '{BOARDURL}?act=ucp&what=inbox</a>' .
                         ' to view your message.'
@@ -1042,7 +1052,7 @@ EOT
 
                 $this->showucp(
                     'Message successfully delivered.' .
-                    "<br /><br /><a href='?act=ucp&what=inbox'>Back</a>"
+                    "<br><br><a href='?act=ucp&what=inbox'>Back</a>"
                 );
 
                 return;
