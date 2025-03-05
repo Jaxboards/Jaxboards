@@ -181,6 +181,7 @@ MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
 `friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
 `sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
 `notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
+`contact_discord`,`contact_youtube`,`contact_bluesky`,
 `email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`,
 CONCAT(MONTH(`birthdate`),' ',DAY(`birthdate`)) as `birthday`
 EOT
@@ -241,7 +242,7 @@ EOT
             return $this->userPerms;
         }
 
-        if ('' === $group_id) {
+        if ('' === $group_id && $this->userData) {
             $group_id = $this->userData['group_id'];
         }
         if ($this->ipbanned()) {
@@ -458,9 +459,11 @@ EOT
             '@\\[u\\](.*)\\[/u\\]@Usi' => '<span style="text-decoration:underline">$1</span>',
             '@\\[s\\](.*)\\[/s\\]@Usi' => '<span style="text-decoration:line-through">$1</span>',
             '@\\[blink\\](.*)\\[/blink\\]@Usi' => '<span style="text-decoration:blink">$1</span>',
-            '@\\[url=(http|ftp|\\?|mailto:)([^\\]]+)\\](.+?)\\[/url\\]@i' => '<a href="$1$2" rel="nofollow">$3</a>',
+	    // I recommend keeping nofollow if admin approval of new accounts is not enabled
+            '@\\[url=(http|ftp|\\?|mailto:)([^\\]]+)\\](.+?)\\[/url\\]@i' => '<a href="$1$2">$3</a>',
             '@\\[spoiler\\](.*)\\[/spoiler\\]@Usi' => '<span class="spoilertext">$1</span>',
-            '@\\[url\\](http|ftp|\\?)(.*)\\[/url\\]@Ui' => '<a href="$1$2" rel="nofollow">$1$2</a>',
+	    // Consider adding nofollow if admin approval is not enabled
+            '@\\[url\\](http|ftp|\\?)(.*)\\[/url\\]@Ui' => '<a href="$1$2">$1$2</a>',
             '@\\[font=([\\s\\w]+)](.*)\\[/font\\]@Usi' => '<span style="font-family:$1">$2</span>',
             '@\\[color=(#?[\\s\\w\\d]+|rgb\\([\\d, ]+\\))\\](.*)\\[/color\\]@Usi' => '<span style="color:$1">$2</span>',
             '@\\[(bg|bgcolor|background)=(#?[\\s\\w\\d]+)\\](.*)\\[/\\1\\]@Usi' => '<span style="background:$2">$3</span>'
@@ -973,19 +976,14 @@ EOT
             'poll' => $permstoparse & 32,
         );
     }
-
+    
     public function parsereadmarkers($readmarkers)
     {
-        $r = array();
         if ($readmarkers) {
-            $unpack = JAX::base128decode($readmarkers);
-            $l = count($unpack);
-            for ($x = 0; $x < $l; $x += 2) {
-                $r[$unpack[$x]] = $unpack[$x + 1];
-            }
+           return json_decode($readmarkers, true);
         }
 
-        return $r;
+        return array();
     }
 
     public function rmdir($dir)
@@ -1058,49 +1056,6 @@ EOT
         }
 
         return gethostbyaddr($ip);
-    }
-
-    public static function base128encodesingle($int)
-    {
-        $int = (int) $int;
-        $w = chr($int & 127);
-        while ($int > 127) {
-            $int >>= 7;
-            $w = chr(($int & 127) | 128) . $w;
-        }
-
-        return $w;
-    }
-
-    public function base128encode($ints, $preservekeys = false)
-    {
-        $r = '';
-        foreach ($ints as $intkey => $int) {
-            $r .= ($preservekeys ? JAX::base128encodesingle($intkey) : '') .
-                JAX::base128encodesingle($int);
-        }
-
-        return $r;
-    }
-
-    public static function base128decode($data)
-    {
-        $ints = array();
-        $x = 0;
-        while (isset($data[$x])) {
-            $int = 0;
-            do {
-                $byte = (int) ord($data[$x]);
-                if ($x) {
-                    $int <<= 7;
-                }
-                $int |= ($byte & 127);
-                ++$x;
-            } while ($byte & 128);
-            $ints[] = $int;
-        }
-
-        return $ints;
     }
 
     public function mail($email, $topic, $message)
