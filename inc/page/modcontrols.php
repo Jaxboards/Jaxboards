@@ -13,12 +13,8 @@ class modcontrols
 
         return <<<EOT
 <div class='minibox'>
-    <div class='title'>
-        {$title}
-    </div>
-    <div class='content'>
-        {$content}
-    </div>
+    <div class='title'>{$title}</div>
+    <div class='content'>{$content}</div>
 </div>
 EOT;
     }
@@ -721,13 +717,13 @@ EOT
                     'do' => 'emem',
                 )
             ) .
-            'Member name: <input type="text" name="mname" ' .
+            'Member name: <input type="text" title="Enter member name" name="mname" ' .
             'data-autocomplete-action="searchmembers" ' .
             'data-autocomplete-output="#mid" ' .
             'data-autocomplete-indicator="#validname" />' .
             '<span id="validname"></span>
             <input type="hidden" name="mid" id="mid" onchange="this.form.onsubmit();" />
-            <input type="submit" value="Go" />
+            <input type="submit" type="View member details" value="Go" />
             </form>';
         if (isset($JAX->p['submit']) && 'save' == $JAX->p['submit']) {
             if (!trim($JAX->p['display_name'])) {
@@ -773,7 +769,8 @@ YEAR(`birthdate`) AS `dob_year`,`about`,`display_name`,`full_name`,
 `contact_steam`,`location`,`gender`,`friends`,`enemies`,`sound_shout`,
 `sound_im`,`sound_pm`,`sound_postinmytopic`,`sound_postinsubscribedtopic`,
 `notify_pm`,`notify_postinmytopic`,`notify_postinsubscribedtopic`,`ucpnotepad`,
-`skin_id`,`contact_twitter`,`email_settings`,`nowordfilter`,
+`skin_id`,`contact_twitter`,`contact_discord`,`contact_youtube`,`contact_bluesky`,
+`email_settings`,`nowordfilter`,
 INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
 EOT
                     ,
@@ -795,7 +792,8 @@ YEAR(`birthdate`) AS `dob_year`,`about`,`display_name`,`full_name`,
 `contact_steam`,`location`,`gender`,`friends`,`enemies`,`sound_shout`,
 `sound_im`,`sound_pm`,`sound_postinmytopic`,`sound_postinsubscribedtopic`,
 `notify_pm`,`notify_postinmytopic`,`notify_postinsubscribedtopic`,`ucpnotepad`,
-`skin_id`,`contact_twitter`,`email_settings`,`nowordfilter`,
+`skin_id`,`contact_twitter`,`contact_discord`,`contact_youtube`,`contact_bluesky`,
+`email_settings`,`nowordfilter`,
 INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
 EOT
                     ,
@@ -915,8 +913,9 @@ EOT
         $form = <<<EOT
 <form method='post' data-ajax-form='true'>
     {$hiddenFields}
-    IP: <input type='text' name='ip' value='{$ip}' />
-    <input type='submit' value='Submit' />
+    <label>IP: 
+    <input type='text' name='ip' title="Enter IP address" value='{$ip}' /></label>
+    <input type='submit' value='Submit' title="Search for IP" />
 </form>
 EOT;
         if ($ip) {
