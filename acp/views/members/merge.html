@@ -1,25 +1,18 @@
 <form method="post">
-  <p>
-    This tool is used for merging duplicate accounts. Merge the duplicate
-    account with the original account.
-  </p>
-  <label>
-    Merge:
-  </label>
-  <input type="text" name="name1" data-autocomplete-action="searchmembers"
+  <p>This tool is used for merging duplicate accounts. Merge the duplicate account with the original account.</p>
+  <label for="name1">Merge:</label>
+  <input type="text" name="name1" id="name1" data-autocomplete-action="searchmembers"
     data-autocomplete-output="#mid1" data-autocomplete-indicator="#validname" />
   <input type="hidden" id="mid1" name="mid1" />
   <span id="validname">
   </span>
-  <br />
-  <label>
-    With:
-  </label>
-  <input type="text" name="name2" data-autocomplete-action="searchmembers"
+  <br>
+  <label for="name2">With:</label>
+  <input type="text" name="name2" id="name2" data-autocomplete-action="searchmembers"
     data-autocomplete-output="#mid2" data-autocomplete-indicator="#validname2" />
   <input type="hidden" id="mid2" name="mid2" />
   <span id="validname2">
   </span>
-  <br />
+  <br>
   <input type="submit" name="submit" value="Merge Accounts" />
 </form>
