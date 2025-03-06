@@ -5,7 +5,7 @@
         Forum Title:
       </td>
       <td>
-        <input type="text" name="title" value="{{ title }}" />
+        <input type="text" name="title" title="Forum Title" value="{{ title }}" />
       </td>
     </tr>
     <tr>
@@ -13,7 +13,7 @@
         Description:
       </td>
       <td>
-        <textarea name="description">{{ description }}</textarea>
+        <textarea name="description" title="Forum Description">{{ description }}</textarea>
       </td>
     </tr>
     <tr>
@@ -21,7 +21,7 @@
         Redirect URL:
       </td>
       <td>
-        <input type="text" name="redirect" value="{{ redirect_url }}" />
+        <input type="text" name="redirect" title="Redirect URL" value="{{ redirect_url }}" />
       </td>
     </tr>
     <tr>
@@ -29,7 +29,7 @@
         Show Subforums:
       </td>
       <td>
-        <select name="showsub">
+        <select name="showsub" title="Show Subforums Toggle">
           {{ subforum_options }}
         </select>
       </td>
@@ -39,7 +39,7 @@
         Order Topics By:
       </td>
       <td>
-        <select name="orderby">
+        <select name="orderby" title="How to Order Topic List">
           {{ order_by_options }}
         </select>
       </td>
@@ -50,7 +50,7 @@
       </td>
       <td>
         <input {{ no_count }} type="checkbox" class="switch yn"
-        name="nocount" />
+        name="nocount" title="Post Count Toggle" />
       </td>
     </tr>
     <tr>
@@ -59,7 +59,7 @@
       </td>
       <td>
         <input {{ trashcan }} type="checkbox" class="switch yn"
-        name="trashcan" />
+        name="trashcan" title="Trashcan Toggle"/>
       </td>
     </tr>
   </table>
