@@ -1,9 +1,7 @@
 <form method="post">
   <input type="hidden" name="cat_id" value="{{ id }}" />
-  <label>
-    Category Title:
-  </label>
-  <input type="text" name="cat_name" value="{{ title }}" />
+  <label for="cat_name">Category Title:</label>
+  <input type="text" id="cat_name" name="cat_name" title="Name for new category" value="{{ title }}" />
   <br />
-  <input type="submit" name="submit" value="{{ submit }}" />
+  <input type="submit" name="submit" title="Create new category" value="{{ submit }}" />
 </form>

@@ -6,13 +6,11 @@
     {{ custom }}
   </td>
   <td>
-    <a href="?act=themes&editcss={{ id }}">
-      {{ view_or_edit }}
-      CSS
-    </a>
+    <a href="?act=themes&editcss={{ id }}">{{ view_or_edit }}
+      CSS</a>
   </td>
   <td>
-    <select name='wrapper[{{ id }}]'>
+    <select name='wrapper[{{ id }}]' title="Choose wrapper for this skin">
       {{ default_option }}
       {{ wrapper_options }}
     </select>
@@ -25,6 +23,6 @@
       type="checkbox" class="switch yn"/>
   </td>
   <td>
-    <input {{ default_checked }} type="radio" name="default" value="{{ id }}" />
+    <input {{ default_checked }} type="radio" name="default" title="Set as default skin" value="{{ id }}" />
   </td>
 </tr>

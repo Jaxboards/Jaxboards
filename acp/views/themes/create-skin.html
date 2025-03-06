@@ -1,25 +1,17 @@
 <form method='post'>
-  <label>
-    Skin Name:
-  </label>
-  <input type="text" name="skinname" />
-  <br />
-  <label>
-    Wrapper:
-  </label>
-  <select name="wrapper">
+  <label for="skinname">Skin Name:</label>
+  <input type="text" id="skinname" name="skinname" />
+  <br>
+  <label for="wrapper">Wrapper:</label>
+  <select name="wrapper" id="wrapper" title="Choose wrapper for this new skin">
     {{ wrapper_options }}
   </select>
-  <br />
-  <label>
-    Hidden:
-  </label>
+  <br>
+  <label>Hidden:</label>
   <input type="checkbox" class="switch yn" name="hidden" />
-  <br />
-  <label>
-    Default:
-  </label>
+  <br>
+  <label>Default:</label>
   <input type="checkbox" class="switch yn" name="default" />
-  <br />
-  <input type="submit" name="submit" value="Create Skin" />
+  <br>
+  <input type="submit" name="submit" title="Create new skin" value="Create Skin" />
 </form>
