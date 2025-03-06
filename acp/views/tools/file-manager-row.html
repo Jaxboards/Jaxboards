@@ -9,20 +9,16 @@
     {{ filesize }}
   </td>
   <td align="center">
-    <input type="text" style="text-align:center;width:40px;" name='dl[{{ id }}]'
+    <input type="text" style="text-align:center;width:40px;" name='dl[{{ id }}]' title="Number of downloads"
       value="{{ downloads }}" />
   </td>
   <td>
-    <a href="../?act=vu{{ user_id }}">
-      {{ username }}
-    </a>
+    <a href="../?act=vu{{ user_id }}">{{ username }}</a>
   </td>
   <td>
     {{ linked_in }}
   </td>
   <td align="center">
-    <a onclick="return confirm('You sure?')" href="?act=tools&do=files&delete={{ id }}"
-      class="icons delete">
-    </a>
+    <a onclick="return confirm('You sure?')" href="?act=tools&do=files&delete={{ id }}" class="icons delete" title="Delete attachment"></a>
   </td>
 </tr>
