@@ -101,9 +101,8 @@ class LOGREG
         try {
             if ($JAX->ipServiceBanned()) {
                 throw new Exception(<<<'EOT'
-You have been banned from registration on all boards. If you feel that this is
-in error, please contact the administrator.
-EOT
+                   You have been banned from registration on all boards. If you feel that this is in error, please contact the administrator.
+                EOT
                 );
             } elseif (!$name || !$dispname) {
                 throw new Exception('Name and display name required.');
@@ -297,7 +296,7 @@ EOT
     <input type="hidden" name="popup" value="1" />
     <label for="user">Username:</label>
     <input type="text" name="user" id="user" />
-    <br />
+    <br>
     <label for="pass">
         Password
         (
@@ -309,7 +308,7 @@ EOT
         ):
     </label>
     <input type="password" name="pass" id="pass" />
-    <br />
+    <br>
     <input type="submit" value="Login" />
     <a href="?act=logreg1" data-window-close="true">Register</a>
 </form>
@@ -447,15 +446,13 @@ EOT
                         'Recover Your Password!',
                         <<<EOT
 You have received this email because a password request was received at {BOARDLINK}
-<br />
-<br />
-If you did not request a password change,
-simply ignore this email and no actions will be taken.
-If you would like to change your password,
-please visit the following page and follow the on-screen instructions:
+<br>
+<br>
+If you did not request a password change, simply ignore this email and no actions will be taken.
+If you would like to change your password, please visit the following page and follow the on-screen instructions:
 <a href='{$link}'>{$link}</a>
-<br />
-<br />
+<br>
+<br>
 Thanks!
 EOT
                     );

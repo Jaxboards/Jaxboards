@@ -1,45 +1,41 @@
-<h2>
-  Sounds
-</h2>
+<h2>Sounds</h2>
 <form data-ajax-form="true" method="post">
   %s
   When someone shouts:
-  <br />
+  <br>
   &nbsp;%s play a sound
-  <br />
-  <br />
+  <br>
+  <br>
   When someone IMs me:
-  <br />
+  <br>
   &nbsp;%s play a sound
-  <br />
-  &nbsp;
-  <input type="checkbox" onclick="if(!window.webkitNotifications) {
-            alert('browser not supported');
+  <br>
+  &nbsp;<input type="checkbox" title="notify_im" onclick="if(!window.webkitNotifications) {alert('browser not supported');
         } webkitNotifications.requestPermission()"
     id="dtnotify" />
   display a desktop notification
-  <br />
-  <br />
+  <br>
+  <br>
   When someone PMs me:
-  <br />
+  <br>
   &nbsp;%s play a sound
-  <br />
+  <br>
   &nbsp;%s display a notification
-  <br />
-  <br />
+  <br>
+  <br>
   When someone posts in a topic I've created:
-  <br />
+  <br>
   &nbsp;%s play a sound
-  <br />
+  <br>
   &nbsp;%s display a notification
-  <br />
-  <br />
+  <br>
+  <br>
   When someone posts in a topic I'm subscribed to:
-  <br />
+  <br>
   &nbsp;%s play a sound
-  <br />
+  <br>
   &nbsp;%s display a notification
-  <br />
-  <br />
-  <input type="submit" value="Save" />
+  <br>
+  <br>
+  <input type="submit" title="Save" value="Save Changes" />
 </form>

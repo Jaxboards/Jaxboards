@@ -53,41 +53,40 @@ class members
 
         $memberquery = $DB->safespecial(
             <<<EOT
-SELECT m.`id` AS `id`,m.`name` AS `name`,m.`email` AS `email`,m.`sig` AS `sig`,
-    m.`posts` AS `posts`,m.`group_id` AS `group_id`,m.`avatar` AS `avatar`,
-    m.`usertitle` AS `usertitle`,UNIX_TIMESTAMP(m.`join_date`) AS `join_date`,
-    UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`,
-    m.`contact_skype` AS `contact_Skype`,m.`contact_yim` AS `contact_YIM`,
-    m.`contact_msn` AS `contact_MSN`,m.`contact_gtalk` AS `contact_GoogleChat`,
-    m.`contact_aim` AS `contact_AIM`,m.`website` AS `website`,
-    m.`birthdate` AS `birthdate`,
-    DAY(m.`birthdate`) AS `dob_day`,MONTH(m.`birthdate`) AS `dob_month`,
-    YEAR(m.`birthdate`) AS `dob_year`,m.`about` AS `about`,
-    m.`display_name` AS `display_name`,m.`full_name` AS `full_name`,
-    m.`contact_steam` AS `contact_Steam`,m.`location` AS `location`,
-    m.`gender` AS `gender`,m.`friends` AS `friends`,m.`enemies` AS `enemies`,
-    m.`sound_shout` AS `sound_shout`,m.`sound_im` AS `sound_im`,
-    m.`sound_pm` AS `sound_pm`,m.`sound_postinmytopic` AS `sound_postinmytopic`,
-    m.`sound_postinsubscribedtopic` AS `sound_postinsubscribedtopic`,
-    m.`notify_pm` AS `notify_pm`,
-    m.`notify_postinmytopic` AS `notify_postinmytopic`,
-    m.`notify_postinsubscribedtopic` AS `notify_postinsubscribedtopic`,
-    m.`ucpnotepad` AS `ucpnotepad`,m.`skin_id` AS `skin_id`,
-    m.`contact_twitter` AS `contact_Twitter`,
-    m.`contact_discord` AS `contact_Discord`,
-    m.`contact_youtube` AS `contact_YouTube`,
-    m.`contact_bluesky` AS `contact_Bluesky`,
-    m.`email_settings` AS `email_settings`,m.`nowordfilter` AS `nowordfilter`,
-    INET6_NTOA(m.`ip`) AS `ip`,m.`mod` AS `mod`,m.`wysiwyg` AS `wysiwyg`,
-    g.`title` AS `g_title`
-FROM %t m
-LEFT JOIN %t g
-    ON g.id=m.group_id
-{$where}
-ORDER BY {$sortby} {$sorthow}
-LIMIT ?, ?
-EOT
-            ,
+               SELECT m.`id` AS `id`,m.`name` AS `name`,m.`email` AS `email`,m.`sig` AS `sig`,
+                   m.`posts` AS `posts`,m.`group_id` AS `group_id`,m.`avatar` AS `avatar`,
+                   m.`usertitle` AS `usertitle`,UNIX_TIMESTAMP(m.`join_date`) AS `join_date`,
+                   UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`,
+                   m.`contact_skype` AS `contact_skype`,m.`contact_yim` AS `contact_yim`,
+                   m.`contact_msn` AS `contact_msn`,m.`contact_gtalk` AS `contact_googlechat`,
+                   m.`contact_aim` AS `contact_AIM`,m.`website` AS `website`,
+                   m.`birthdate` AS `birthdate`,
+                   DAY(m.`birthdate`) AS `dob_day`,MONTH(m.`birthdate`) AS `dob_month`,
+                   YEAR(m.`birthdate`) AS `dob_year`,m.`about` AS `about`,
+                   m.`display_name` AS `display_name`,m.`full_name` AS `full_name`,
+                   m.`contact_steam` AS `contact_Steam`,m.`location` AS `location`,
+                   m.`gender` AS `gender`,m.`friends` AS `friends`,m.`enemies` AS `enemies`,
+                   m.`sound_shout` AS `sound_shout`,m.`sound_im` AS `sound_im`,
+                   m.`sound_pm` AS `sound_pm`,m.`sound_postinmytopic` AS `sound_postinmytopic`,
+                   m.`sound_postinsubscribedtopic` AS `sound_postinsubscribedtopic`,
+                   m.`notify_pm` AS `notify_pm`,
+                   m.`notify_postinmytopic` AS `notify_postinmytopic`,
+                   m.`notify_postinsubscribedtopic` AS `notify_postinsubscribedtopic`,
+                   m.`ucpnotepad` AS `ucpnotepad`,m.`skin_id` AS `skin_id`,
+                   m.`contact_twitter` AS `contact_twitter`,
+                   m.`contact_discord` AS `contact_discord`,
+                   m.`contact_youtube` AS `contact_youTube`,
+                   m.`contact_bluesky` AS `contact_bluesky`,
+                   m.`email_settings` AS `email_settings`,m.`nowordfilter` AS `nowordfilter`,
+                   INET6_NTOA(m.`ip`) AS `ip`,m.`mod` AS `mod`,m.`wysiwyg` AS `wysiwyg`,
+                   g.`title` AS `g_title`
+               FROM %t m
+               LEFT JOIN %t g
+                   ON g.id=m.group_id
+               {$where}
+               ORDER BY {$sortby} {$sorthow}
+               LIMIT ?, ?
+               EOT,
             array('members', 'member_groups'),
             ($this->page * $this->perpage),
             $this->perpage
@@ -97,14 +96,13 @@ EOT
 
         $nummemberquery = $DB->safespecial(
             <<<EOT
-SELECT COUNT(m.`id`) AS `num_members`
-FROM %t m
-LEFT JOIN %t g
-    ON g.id=m.group_id
-{$where}
-
-EOT
-            ,
+               SELECT COUNT(m.`id`) AS `num_members`
+               FROM %t m
+               LEFT JOIN %t g
+                   ON g.id=m.group_id
+               {$where}
+               
+               EOT,
             array('members', 'member_groups')
         );
         $thisrow = $DB->arow($nummemberquery);
@@ -134,16 +132,16 @@ EOT
         foreach ($memberarray as $f) {
             $contactdetails = '';
             $contactUrls = array(
-		'Skype' => 'skype:%s',
-		'Discord' => 'discord:%s',
-		'YIM' => 'ymsgr:sendim?%s',
-		'MSN' => 'msnim:chat?contact=%s',
-		'GoogleChat' => 'gtalk:chat?jid=%s',
-		'AIM' => 'aim:goaim?screenname=%s',
-		'YouTube' => 'https://youtube.com/%s',
-		'Steam' => 'https://steamcommunity.com/id/%s',
-		'Twitter' => 'https://twitter.com/%s',
-		'Bluesky' => 'https://bsky.app/profile/%s.bsky.social'
+		'skype' => 'skype:%s',
+		'discord' => 'discord:%s',
+		'yim' => 'ymsgr:sendim?%s',
+		'msn' => 'msnim:chat?contact=%s',
+		'googlechat' => 'gtalk:chat?jid=%s',
+		'aim' => 'aim:goaim?screenname=%s',
+		'youtube' => 'https://youtube.com/%s',
+		'steam' => 'https://steamcommunity.com/id/%s',
+		'twitter' => 'https://twitter.com/%s',
+		'bluesky' => 'https://bsky.app/profile/%s.bsky.social'
             );
             foreach ($contactUrls as $k => $v) {
                 if ($f['contact_' . $k]) {

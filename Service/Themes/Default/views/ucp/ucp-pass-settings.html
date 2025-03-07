@@ -10,7 +10,7 @@
     New Password:
   </label>
   <input type="password" name="newpass1" id="newpass1" />
-  <input name="showpass" type="checkbox" onclick="
+  <input name="showpass" type="checkbox" title="Show New Password" onclick="
         document.querySelector('#newpass1').type=this.checked?'text':'password';
         document.querySelector('#confirmpass').style.display=this.checked?'none':'';
         " />

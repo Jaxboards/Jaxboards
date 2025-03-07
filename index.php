@@ -1,9 +1,16 @@
 <?php
+  if ($_GET['showerrors']) {
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+}
+?>
+
+<?php
 /**
  * Jaxboards. THE ULTIMATE 4UMS WOOOOOOO
  * By Sean John's son (2007 @ 4 AM).
  *
- * PHP Version 5.3.7
+ * PHP Version 8
  *
  * @category Jaxboards
  * @package  Jaxboards
@@ -161,23 +168,25 @@ if (!$PAGE->jsaccess) {
         $variables[] = "{$v}:" . ($USER ? ($USER[$v] ? 1 : 0) : 1);
     }
     $variables[] = 'can_im:' . ($PERMS['can_im'] ? 1 : 0);
-    $variables[] = 'groupid:' . ($JAX->pick($USER['group_id'], 3));
-    $variables[] = "username:'" . addslashes($USER['display_name']) . "'";
-    $variables[] = 'userid:' . $JAX->pick($USER['id'], 0);
+    if ($USER) {
+      $variables[] = 'groupid:' . ($JAX->pick($USER['group_id'], 3));
+      $variables[] = "username:'" . addslashes($USER['display_name']) . "'";
+      $variables[] = 'userid:' . $JAX->pick($USER['id'], 0);
+    }
 
     $PAGE->append(
         'SCRIPT',
-        ' <script type="text/javascript">var globalsettings={' .
+        ' <script>var globalsettings={' .
         implode(',', $variables) .
         '}</script>'
     );
     $PAGE->append(
         'SCRIPT',
-        ' <script type="text/javascript" src="' . BOARDURL .
+        ' <script src="' . BOARDURL .
         'dist/app.js"></script>'
     );
 
-    if ($PERMS['can_moderate'] || $USER['mod']) {
+    if (($USER) && ($PERMS['can_moderate'] || $USER['mod'])) {
         $PAGE->append(
             'SCRIPT',
             '<script type="text/javascript" ' .
@@ -188,7 +197,7 @@ if (!$PAGE->jsaccess) {
     $PAGE->append(
         'CSS',
         '<link rel="stylesheet" type="text/css" href="' . THEMEPATHURL .
-        'css.css" />'
+        'css.css">'
     );
     if ($PAGE->meta('favicon')) {
         $PAGE->append(
@@ -244,7 +253,7 @@ if (!$PAGE->jsaccess) {
         $PAGE->append(
             'FOOTER',
             '<div class="footer">' .
-            'Jaxboards 1.1.0 ' . // Removed the defunct URL
+            'Jaxboards 2.0.1! ' . // Removed the defunct URL
             '&copy; 2007-' . date('Y') . '</div>'
         );
     }
@@ -255,7 +264,7 @@ if (!$PAGE->jsaccess) {
     $PAGE->addvar('boardname', $CFG['boardname']);
     $PAGE->append(
         'USERBOX',
-        $USER['id'] ? $PAGE->meta(
+        $USER && $USER['id'] ? $PAGE->meta(
             'userbox-logged-in',
             $PAGE->meta(
                 'user-link',
@@ -270,12 +279,14 @@ if (!$PAGE->jsaccess) {
         ) : $PAGE->meta('userbox-logged-out')
     );
 } //end if !jsaccess only
-$PAGE->addvar('groupid', $JAX->pick($USER['group_id'], 3));
-$PAGE->addvar('userposts', $USER['posts']);
-$PAGE->addvar('grouptitle', $PERMS['title']);
-$PAGE->addvar('avatar', $JAX->pick($USER['avatar'], $PAGE->meta('default-avatar')));
-$PAGE->addvar('username', $USER['display_name']);
-$PAGE->addvar('userid', $JAX->pick($USER['id'], 0));
+if ($USER) {
+    $PAGE->addvar('groupid', $JAX->pick($USER['group_id'], 3));
+    $PAGE->addvar('userposts', $USER['posts']);
+    $PAGE->addvar('grouptitle', $PERMS['title']);
+    $PAGE->addvar('avatar', $JAX->pick($USER['avatar'], $PAGE->meta('default-avatar')));
+    $PAGE->addvar('username', $USER['display_name']);
+    $PAGE->addvar('userid', $JAX->pick($USER['id'], 0));
+}
 
 if (!isset($JAX->b['act'])) {
     $JAX->b['act'] = null;
@@ -357,10 +368,10 @@ $pagegen = "";
 if (in_array($JAX->getIp(), array('127.0.0.1', '::1'))) {
     $debug = '';
     foreach ($DB->queryRuntime as $k => $v) {
-        $debug .= "<b>{$v}</b> " . $DB->queryList[$k] . '<br />';
+        $debug .= "<b>{$v}</b> " . $DB->queryList[$k] . '<br>';
         $qtime += $v;
     }
-    $debug .= $PAGE->debug() . '<br />';
+    $debug .= $PAGE->debug() . '<br>';
     $PAGE->JS('update', '#query .content', $debug);
     $PAGE->append(
         'FOOTER',
@@ -373,8 +384,7 @@ if (in_array($JAX->getIp(), array('127.0.0.1', '::1'))) {
     $PAGE->JS(
         'update',
         'pagegen',
-        $pagegen = 'Page Generated in ' .
-        round(1000 * (microtime(true) - $microtime)) . ' ms'
+        $pagegen = 'Page Generated in ' . round(1000 * (microtime(true) - $microtime)) . ' ms'
     );
 }
 $PAGE->append(

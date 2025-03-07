@@ -4,11 +4,11 @@
     <input type="hidden" name="how" value="qreply" />
     <input type="hidden" name="tid" value="%1$s" />
     <div class="replybox">
-      <textarea name="postdata">%2$s</textarea>
+      <textarea name="postdata" title="Post Text">%2$s</textarea>
     </div>
     <div class="submitbutton">
-      <input type="submit" name="submit" value="Post" onclick="this.form.submitButton=this;">
-      <input type="submit" name="submit" value="Full Reply" onclick="this.form.submitButton=this;" />
+      <input type="submit" name="submit" title="Submit your post" value="Post" onclick="this.form.submitButton=this;">
+      <!--<input type="submit" name="submit" title="Open in full editor" value="Full Reply" onclick="this.form.submitButton=this;">-->
     </div>
   </form>
 </div>

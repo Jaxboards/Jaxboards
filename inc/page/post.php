@@ -218,29 +218,29 @@ EOT
  <input type="hidden" name="how" value="newtopic" />
  <input type="hidden" name="fid" value="' . $fid . '" />
   <label for="ttitle">Topic title:</label>
-<input type="text" name="ttitle" id="ttitle" value="' . $tdata['title'] . '" />
-<br />
+<input type="text" name="ttitle" id="ttitle" title="Topic Title" value="' . $tdata['title'] . '" />
+<br>
   <label for="tdesc">Description:</label>
-<input type="text" id="tdesc" name="tdesc" value="' . $tdata['subtitle'] . '" />
-<br />
-  <textarea name="postdata" id="postdata" class="bbcode-editor">' . $JAX->blockhtml($postdata) .
+<input type="text" id="tdesc" name="tdesc" title="Topic Description (extra information about your topic)" value="' . $tdata['subtitle'] . '" />
+<br>
+  <textarea name="postdata" id="postdata" title="Type your post here" class="bbcode-editor">' . $JAX->blockhtml($postdata) .
             '</textarea>
-<br /><div class="postoptions">
+<br><div class="postoptions">
   ' . ($fdata['perms']['poll'] ? '<label class="addpoll" for="addpoll">Add a
-Poll</label> <select name="poll_type" onchange="document.querySelector(\'#polloptions\').' .
+Poll</label> <select name="poll_type" title="Add a poll"  onchange="document.querySelector(\'#polloptions\').' .
             'style.display=this.value?\'block\':\'none\'">
 <option value="">No</option>
 <option value="single">Yes, single-choice</option>
-<option value="multi">Yes, multi-choice</option></select><br />
+<option value="multi">Yes, multi-choice</option></select><br>
   <div id="polloptions" style="display:none">
-   <label for="pollq">Poll Question:</label><input type="text" name="pollq" /><br />
+   <label for="pollq">Poll Question:</label><input type="text" id="pollq" name="pollq" title="Poll Question"/><br>
    <label for="pollc">Poll Choices:</label> (one per line)
-<textarea id="pollc" name="pollchoices"></textarea></div>' : '') .
+<textarea id="pollc" name="pollchoices" title="Poll Choices"></textarea></div>' : '') .
             ($fdata['perms']['upload'] ? '<div id="attachfiles" class="addfile">
-   Add Files <input type="file" name="Filedata" /></div>' : '') .
+   Add Files <input type="file" name="Filedata" title="Browse for file" /></div>' : '') .
             '<div class="buttons"><input type="submit" name="submit"
-   value="Post New Topic" onclick="this.form.submitButton=this;"
-id="submitbutton" /> <input type="submit" name="submit" value="Preview"
+   value="Post New Topic" title="Submit your post" onclick="this.form.submitButton=this;"
+id="submitbutton" /> <input type="submit" name="submit" value="Preview" title="See a preview of your post"
 onclick="this.form.submitButton=this" /></div>
  </div>
 </form>';
@@ -342,13 +342,13 @@ EOT
             'this.submitButton.disabled=true;" ' .
             'enctype="multipart/form-data">
  ' . $vars . '
-  <textarea name="postdata" id="post" class="bbcode-editor">' . $postdata .
-        '</textarea><br />' .
+  <textarea name="postdata" id="post" title="Type your post here" class="bbcode-editor">' . $postdata .
+        '</textarea><br>' .
         ($tdata['perms']['upload'] ? '<div id="attachfiles">Add Files
-  <input type="file" name="Filedata" /></div>' : '') .
+  <input type="file" name="Filedata" title="Browse for file" /></div>' : '') .
         '<div class="buttons"><input type="submit" name="submit"
-  value="Post" onclick="this.form.submitButton=this"
-id="submitbutton"/><input type="submit" name="submit" value="Preview"
+  value="Post" title="Submit your post" onclick="this.form.submitButton=this"
+id="submitbutton"/><input type="submit" name="submit" value="Preview" title="See a preview of your post"
 onclick="this.form.submitButton=this"/></div>
 </form></div>';
         $page .= $PAGE->meta('box', '', $tdata['title'] . ' &gt; Reply', $form);

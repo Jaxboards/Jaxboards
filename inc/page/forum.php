@@ -194,7 +194,7 @@ EOT
             foreach ($JAX->pages($numpages, $this->page + 1, 10) as $v) {
                 $forumpages .= '<a href="?act=vf' . $fid . '&amp;page=' .
                     $v . '"' . (($v - 1) == $this->page ? ' class="active"' : '') .
-                    '>' . $v . '</a> ';
+                    '>' . $v . '</a> · ';
             }
         }
 
@@ -457,6 +457,6 @@ EOT
         global $SESS,$JAX;
         $forumsread = $JAX->parsereadmarkers($SESS->forumsread);
         $forumsread[$id] = time();
-        $SESS->forumsread = $JAX->base128encode($forumsread, true);
+        $SESS->forumsread = json_encode($forumsread, true);
     }
 }

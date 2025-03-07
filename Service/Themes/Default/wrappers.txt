@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
   <head>
     <meta charset="utf-8" />
     <!--CSS-->
@@ -29,5 +28,4 @@
       <div class="c_bottom"></div>
     </div>
   </body>
-
 </html>

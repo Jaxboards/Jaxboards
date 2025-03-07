@@ -1,13 +1,8 @@
 <?php
-     error_reporting(E_ALL);
-     ini_set('display_errors', 1);    
-?>
-
-<?php
 /**
  * Service signup file, for users to create their own JaxBoards forum.
  *
- * PHP Version 5.3.7
+ * PHP Version 8
  *
  * @category Jaxboards
  * @package  Jaxboards
