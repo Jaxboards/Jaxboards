@@ -1,12 +1,12 @@
 <form method="post" data-ajax-form="true">
   %s
-  Topic Title:
-  <input type="text" name="ttitle" value="%s" />
-  <br />
-  Topic Description:
-  <input type="text" name="tdesc" value="%s" />
-  <br />
-  <textarea id="postdata" name="postdata" class="bbcode-editor">%s</textarea>
-  <br />
-  <input type="submit" value="Edit" />
+  <label for="ttitle">Topic Title:</label>
+  <input type="text" id="ttitle" name="ttitle" title="Topic Title" value="%s">
+  <br>
+  <label for="tdesc">Topic Description:</label>
+  <input type="text" id="tdesc" name="tdesc" title="Topic Description (extra information about your topic)" value="%s">
+  <br>
+  <textarea id="postdata" name="postdata" title="Post Text" aria-label="Post Text" class="bbcode-editor">%s</textarea>
+  <br>
+  <input type="submit" title="Submit Edit" value="Edit">
 </form>
