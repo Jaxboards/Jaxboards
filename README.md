@@ -1,10 +1,6 @@
 # Jaxboards
 
-Jaxboards is a PHP/MySQL forum software built sometime between 2007 and Oct
-6th, 2010. It's pretty full featured and offers a unique experience over other
-forum software even today. That being said, it's showing its age, and relies
-on some flash and older technologies to get by. It is not recommended to run
-this in production these days.
+Jaxboards is PHP/MySQL forum software built sometime between 2007 and October 6, 2010. It's pretty full-featured and offers a unique experience over other forum software even today. It delivers outstanding performance, and creating themes is relatively easy. That being said, it's showing its age, and relies on some older technologies to get by. It is not recommended to run this in production these days.
 
 ## Getting Started
 
@@ -18,7 +14,7 @@ Tested on Apache and Linux only.
 It is not recommended to run Jaxboards in production.
 
 ### Prerequisites
-- PHP 5.3.7
+- PHP >=8
 - MySQL>=5.5.3
 - TLS certificate (due to hardcoded URLs in codebase)
 
@@ -65,16 +61,24 @@ After install the MySQL credentials are saved in `config.php`. This is copied ov
 
 `Service/blueprint.sql` contains the base tables and base data for the database for a single-board install. Every table is prefixed with `blueprint_` (and should be updated to match what the `sql_prefix` setting is in the `config.php` file before importing). In addition, a service install (multiple boards) has two additional tables, `directory` (containing a list of all the registered boards) and `banlist` (containing a list of IP addresses to ban). These are both described in the `Service/install.php` file.
 
+### Troubleshooting ###
+
+Permissions issues are a major source of bugs during installation. If you manually created any directories, you may have to assign ownership to your PHP user using a command similar to the following:
+
+```sudo chown www-data:www-data /var/www/html/<your_domain_name>/public_html
+chmod og+rwX -R . && chmod u+rX -R /var/www/html/<your_domain_name>/public_html```
+
+If you plan to reuse any old themes, be prepared to update hardcoded images, especially those that refer to the now-defunct jaxboards.com domain.
+
 ### Updating
 
-If you're running an old Jaxboards database, you can update it to the latest
-with the update script. It's only meant to run via the CLI, so run it with this:
+In the unlikely event that you're restoring from an old (pre-2020) Jaxboards database, you can update it to the latest with the update script. It's only meant to run via the CLI, so run it with this:
 
 ```bash
 php ./Service/update.php
 ```
 
-If you're just starting to use this repo, it's not needed.
+If you're just starting to use this repo, you don't need to run this script.
 
 ## Contributing
 
@@ -184,6 +188,7 @@ pnpm run phpcbf
 - [dgatwood](https://github.com/dgatwood) - Updated the codebase to support
   PHP's MySQLi interface and work with PHP7
 - [wtl420](https://github.com/wtl420) - Maintainer of this fork.
+- [VinnyVideo]https://github.com/VinnyVideo - Updated Jaxboards to run in PHP8
 
 See also the list of [contributors](https://github.com/Jaxboards/Jaxboards/graphs/contributors) who participated in this project.
 
