@@ -6,7 +6,7 @@
         To:
       </label>
       <input type="hidden" id="mid" name="mid" value="%2$s" />
-      <input type="text" id="to" name="to" value="%3$s" autocomplete="off"
+      <input type="text" id="to" name="to" title="To Member" value="%3$s" autocomplete="off"
         data-autocomplete-action="searchmembers"
         data-autocomplete-output="#mid"
         data-autocomplete-indicator="#validname"
@@ -18,10 +18,10 @@
       <label for="title">
         Title:
       </label>
-      <input type="text" id="title" name="title" value="%5$s" />
+      <input type="text" id="title" name="title" title="Message Title" value="%5$s" />
     </div>
     <div>
-      <textarea id="message" name="message" class="bbcode-editor">%6$s</textarea>
+      <textarea id="message" name="message" title="Message Body" class="bbcode-editor">%6$s</textarea>
     </div>
     <input type="submit" value="Send" />
   </form>
