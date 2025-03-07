@@ -113,7 +113,7 @@ class search
             }
         }
         if (!$level) {
-            $r = '<select size="15" multiple="multiple" name="fids">' . $r . '</select>';
+            $r = '<select size="15" title="List of forums" multiple="multiple" name="fids">' . $r . '</select>';
         }
 
         return $r;
