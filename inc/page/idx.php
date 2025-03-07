@@ -163,8 +163,8 @@ EOT
             return;
         }
         $r = '';
-        $read = false;
         foreach ($a as $v) {
+            $read = $this->isForumRead($v);
             $sf = '';
             if ($v['show_sub'] >= 1 && isset($this->subforums[$v['id']])) {
                 $sf = $this->subforums[$v['id']];
@@ -218,7 +218,7 @@ EOT
                     $this->formatlastpost($v),
                     $PAGE->meta('idx-topics-count', $v['topics']),
                     $PAGE->meta('idx-replies-count', $v['posts']),
-                    ($read = $this->isForumRead($v)) ? 'read' : 'unread',
+                    $read ? 'read' : 'unread',
                     <<<EOT
  <a id="fid_{$vId}_icon"{$hrefCode}>
     {$linkText}
@@ -500,15 +500,10 @@ EOT
         if (!isset($this->forumsread[$forum['id']])) {
             $this->forumsread[$forum['id']] = null;
         }
-        if ($forum['lp_date'] > $JAX->pick(
+        return $forum['lp_date'] < max(
             $this->forumsread[$forum['id']],
             $SESS->read_date,
-            $USER['last_visit']
-        )
-        ) {
-            return false;
-        }
-
-        return true;
+            $USER && $USER['last_visit']
+        );
     }
 }
