@@ -306,9 +306,6 @@ $nullToString = array(
         'arg1',
         'arg2',
     ),
-    'chatrooms' => array(
-        'userdata',
-    ),
     'forums' => array(
         'subtitle',
         'lp_topic',
@@ -1030,14 +1027,6 @@ ALTER TABLE `blueprint_categories`
     CHANGE `title` `title` varchar(255)
         COLLATE 'utf8mb4_unicode_ci' NOT NULL AFTER `id`,
     CHANGE `order` `order` int(11) unsigned NOT NULL DEFAULT '0' AFTER `title`,
-    COLLATE 'utf8mb4_unicode_ci';
-EOT
-        ,
-        <<<'EOT'
-ALTER TABLE `blueprint_chatrooms`
-    CHANGE `id` `id` varchar(32) COLLATE 'utf8mb4_unicode_ci' NOT NULL FIRST,
-    CHANGE `userdata` `userdata` text
-        COLLATE 'utf8mb4_unicode_ci' NOT NULL AFTER `id`,
     COLLATE 'utf8mb4_unicode_ci';
 EOT
         ,

@@ -45,15 +45,6 @@ TRUNCATE `blueprint_categories`;
 INSERT INTO `blueprint_categories` (`id`, `title`, `order`) VALUES
 (1,	'Category',	1);
 
-DROP TABLE IF EXISTS `blueprint_chatrooms`;
-CREATE TABLE `blueprint_chatrooms` (
-  `id` varchar(32) CHARACTER SET utf8 NOT NULL,
-  `userdata` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-TRUNCATE `blueprint_chatrooms`;
-
 DROP TABLE IF EXISTS `blueprint_files`;
 CREATE TABLE `blueprint_files` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
