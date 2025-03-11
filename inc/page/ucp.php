@@ -19,18 +19,54 @@ class UCP
         }
         $result = $DB->safeselect(
             <<<'EOT'
-`id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
+`id`,
+`name`,
+`pass`,
+`email`,
+`sig`,
+`posts`,
+`group_id`,
+`avatar`,
+`usertitle`,
 UNIX_TIMESTAMP(`join_date`) AS `join_date`,
-UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,`contact_skype`,`contact_yim`,
-`contact_msn`,`contact_gtalk`,`contact_aim`,`website`,`birthdate`,
-DAY(`birthdate`) AS `dob_day`,MONTH(`birthdate`) AS `dob_month`,
-YEAR(`birthdate`) AS `dob_year`,`about`,`display_name`,`full_name`,
-`contact_steam`,`location`,`gender`,`friends`,`enemies`,`sound_shout`,
-`sound_im`,`sound_pm`,`sound_postinmytopic`,`sound_postinsubscribedtopic`,
-`notify_pm`,`notify_postinmytopic`,`notify_postinsubscribedtopic`,`ucpnotepad`,
-`skin_id`,`contact_twitter`,`email_settings`,`nowordfilter`,
-INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`,
-`contact_discord`, `contact_youtube`, `contact_bluesky`
+UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,
+`contact_aim`,
+`contact_bluesky`,
+`contact_discord`,
+`contact_gtalk`,
+`contact_msn`,
+`contact_skype`,
+`contact_steam`,
+`contact_yim`,
+`contact_youtube`,
+`website`,
+`birthdate`,
+DAY(`birthdate`) AS `dob_day`,
+MONTH(`birthdate`) AS `dob_month`,
+YEAR(`birthdate`) AS `dob_year`,
+`about`,
+`display_name`,
+`full_name`,
+`location`,
+`gender`,
+`friends`,
+`enemies`,
+`sound_shout`,
+`sound_im`,
+`sound_pm`,
+`sound_postinmytopic`,
+`sound_postinsubscribedtopic`,
+`notify_pm`,
+`notify_postinmytopic`,
+`notify_postinsubscribedtopic`,
+`ucpnotepad`,
+`skin_id`,
+`contact_twitter`,
+`email_settings`,
+`nowordfilter`,
+INET6_NTOA(`ip`) AS `ip`,
+`mod`,
+`wysiwyg`
 EOT
             ,
             'members',
@@ -458,6 +494,7 @@ EOT;
                     $error = 'That display name is already in use.';
                 }
             }
+
             if (!$data['dob_month']
                 || !is_numeric($data['dob_month'])
                 || $data['dob_month'] < 1
@@ -470,18 +507,20 @@ EOT;
                     strtotime('2000/' . $data['dob_month'] . '/1')
                 );
             }
+
             if (!$data['dob_year']
                 || !is_numeric($data['dob_year'])
                 || $data['dob_year'] < 1
                 || $data['dob_year'] > (int) date('Y')
             ) {
-                $data['dob_year'] = '0000';
+                $data['dob_year'] = false;
             } else {
                 $data['dob_year'] = date(
                     'Y',
                     strtotime($data['dob_year'] . '/1/1')
                 );
             }
+            
             if (!$data['dob_day']
                 || !is_numeric($data['dob_day'])
                 || $data['dob_day'] < 1
@@ -524,9 +563,13 @@ EOT;
             } elseif ($data['dob_month']) {
                 $data['birthdate'] = $data['dob_year'] . '-' .
                     $data['dob_month'] . '-00';
-            } else {
+            } else if ($data['dob_year']) {
                 $data['birthdate'] = $data['dob_year'] . '-00-00';
+            } else {
+                // User provided no birthdate, just set field to null
+                $data['birthdate'] = null;
             }
+
             unset($data['dob_year']);
             unset($data['dob_month']);
             unset($data['dob_day']);

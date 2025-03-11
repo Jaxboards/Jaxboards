@@ -135,7 +135,7 @@ CREATE TABLE `blueprint_members` (
   `contact_gtalk` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `contact_aim` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `website` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `birthdate` date NOT NULL DEFAULT '0000-00-00',
+  `birthdate` date,
   `about` text COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `display_name` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `full_name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
