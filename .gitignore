@@ -15,6 +15,3 @@ boards
 # Vendor files
 node_modules
 vendor
-
-# Lock files
-*.lock
