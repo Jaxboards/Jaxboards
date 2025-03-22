@@ -70,7 +70,8 @@ class TOPIC
         }
     }
 
-    public function getTopicData($id) {
+    public function getTopicData($id)
+    {
         global $DB,$JAX,$USER;
         $result = $DB->safespecial(
             <<<'EOT'
@@ -230,7 +231,8 @@ class TOPIC
             "<a href='?act=post&fid=" . $this->topicdata['fid'] . "'>" .
             ($PAGE->meta(
                 $PAGE->metaexists('button-newtopic') ?
-                'button-newtopic' : 'topic-button-newtopic')) . '</a>' :
+                'button-newtopic' : 'topic-button-newtopic'
+            )) . '</a>' :
             '&nbsp;',
             $this->topicdata['fperms']['reply']
             && (!$this->topicdata['locked']
@@ -238,7 +240,8 @@ class TOPIC
             "<a href='?act=vt{$id}&qreply=1'>" .
             ($PAGE->meta(
                 $PAGE->metaexists('button-qreply') ?
-                'button-qreply' : 'topic-button-qreply')) : '',
+                'button-qreply' : 'topic-button-qreply'
+            )) : '',
             $this->topicdata['fperms']['reply']
             && (!$this->topicdata['locked']
             || $PERMS['can_override_locked_topics']) ?
@@ -574,17 +577,17 @@ class TOPIC
                 ),
                 $post['title'],
                 $post['auth_id'],
-		// Adds the Edit button
+                // Adds the Edit button
                 ($this->canedit($post) ?
                 "<a href='?act=vt" . $this->id . '&amp;edit=' . $post['pid'] .
                 "' class='edit'>" . $PAGE->meta('topic-edit-button') .
                 '</a>' : '') .
-		// Adds the Quote button
+                // Adds the Quote button
                 ($this->topicdata['fperms']['reply'] ?
                 " <a href='?act=vt" . $this->id . '&amp;quote=' . $post['pid'] .
                 "' onclick='RUN.handleQuoting(this);return false;' " .
                 "class='quotepost'>" . $PAGE->meta('topic-quote-button') . '</a> '  : '') .
-		// Adds the Moderate options
+                // Adds the Moderate options
                 ($this->canmoderate() ?
                 "<a href='?act=modcontrols&amp;do=modp&amp;pid=" . $post['pid'] .
                 "' class='modpost' onclick='RUN.modcontrols.togbutton(this)'>" .
@@ -619,15 +622,15 @@ class TOPIC
                 ) : '',
                 ++$topic_post_counter,
                 isset($post['contact_skype']) ? $post['contact_skype'] : '',
-		isset($post['contact_discord']) ? $post['contact_discord'] : '',
+                isset($post['contact_discord']) ? $post['contact_discord'] : '',
                 isset($post['contact_yim']) ? $post['contact_yim'] : '',
                 isset($post['contact_msn']) ? $post['contact_msn'] : '',
                 isset($post['contact_gtalk']) ? $post['contact_gtalk'] : '',
                 isset($post['contact_aim']) ? $post['contact_aim'] : '',
-		isset($post['contact_youtube']) ? $post['contact_youtube'] : '',
-		isset($post['contact_steam']) ? $post['contact_steam'] : '',
+                isset($post['contact_youtube']) ? $post['contact_youtube'] : '',
+                isset($post['contact_steam']) ? $post['contact_steam'] : '',
                 isset($post['contact_twitter']) ? $post['contact_twitter'] : '',
-		isset($post['contact_bluesky']) ? $post['contact_bluesky'] : '',
+                isset($post['contact_bluesky']) ? $post['contact_bluesky'] : '',
                 '',
                 '',
                 '',

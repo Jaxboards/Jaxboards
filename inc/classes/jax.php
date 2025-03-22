@@ -162,7 +162,7 @@ class JAX
 
     public function getUser($uid = false, $pass = false)
     {
-	global $DB;
+        global $DB;
         if (!$DB) {
             return;
         }
@@ -459,10 +459,10 @@ EOT
             '@\\[u\\](.*)\\[/u\\]@Usi' => '<span style="text-decoration:underline">$1</span>',
             '@\\[s\\](.*)\\[/s\\]@Usi' => '<span style="text-decoration:line-through">$1</span>',
             '@\\[blink\\](.*)\\[/blink\\]@Usi' => '<span style="text-decoration:blink">$1</span>',
-	    // I recommend keeping nofollow if admin approval of new accounts is not enabled
+        // I recommend keeping nofollow if admin approval of new accounts is not enabled
             '@\\[url=(http|ftp|\\?|mailto:)([^\\]]+)\\](.+?)\\[/url\\]@i' => '<a href="$1$2">$3</a>',
             '@\\[spoiler\\](.*)\\[/spoiler\\]@Usi' => '<span class="spoilertext">$1</span>',
-	    // Consider adding nofollow if admin approval is not enabled
+        // Consider adding nofollow if admin approval is not enabled
             '@\\[url\\](http|ftp|\\?)(.*)\\[/url\\]@Ui' => '<a href="$1$2">$1$2</a>',
             '@\\[font=([\\s\\w]+)](.*)\\[/font\\]@Usi' => '<span style="font-family:$1">$2</span>',
             '@\\[color=(#?[\\s\\w\\d]+|rgb\\([\\d, ]+\\))\\](.*)\\[/color\\]@Usi' => '<span style="color:$1">$2</span>',
@@ -980,7 +980,7 @@ EOT
     public function parsereadmarkers($readmarkers)
     {
         if ($readmarkers) {
-           return json_decode($readmarkers, true);
+            return json_decode($readmarkers, true);
         }
 
         return array();

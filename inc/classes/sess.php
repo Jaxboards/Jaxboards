@@ -6,49 +6,76 @@ class SESS
     public $userData = array();
     public $bots = array(
         'Googlebot' => 'Google',
-	'GoogleOther' => 'GoogleOther',
+    'GoogleOther' => 'GoogleOther',
         'Bingbot' => 'Bing',
         'DuckDuckBot' => 'DuckDuckGo',
         'Teoma' => 'Ask.com',
         'archive.org_bot' => 'Internet Archive',
-	'ia_archiver' => 'Internet Archive Alexa',
+    'ia_archiver' => 'Internet Archive Alexa',
         'facebookexternalhit' => 'Facebook',
-        'meta-externalagent' => 'Meta', // May be AI-related
+        'meta-externalagent' => 'Meta',
+// May be AI-related
         'WhatsApp' => 'WhatsApp',
         'Twitterbot' => 'Twitter',
         'Bytespider' => 'TikTok',
         'Discordbot' => 'Discord',
         'Amazonbot' => 'Amazon',
         'Applebot' => 'Applebot',
-        'ClaudeBot' => 'ClaudeBot', // Anthropic AI bot
-	'ChatGPT-User' => 'ChatGPT', // AI developer
-        'GPTBot' => 'GPTBot', // AI developer
-        'OAI-SearchBot' => 'OpenAI', // AI developer
-        'PerplexityBot' => 'Perplexity', // AI answers site
-	'ImagesiftBot' => 'Imagesift', // Hive image search; may be AI-related
-        'mj12bot' => 'Majestic', // British SEO crawler
-        'SemrushBot' => 'Semrush', // Backlink tracking company
-        'DotBot' => 'DotBot', // Moz SEO crawler
-        'AhrefsBot' => 'Ahrefs', // SEO crawler
-        'ChatGLM-Spider' => 'ChatGLM', // SEO crawler
-        'linkdexbot' => 'Linkdex', // SEO crawler
-        'Barkrowler' => 'Babbar.tech', // SEO graphing services
-        'AwarioBot' => 'Awario', // Social media management company
-        'Friendly_Crawler' => 'FriendlyCrawler', // Machine learning researcher
-        'Baiduspider' => 'Baidu', // Chinese search engine
-        'YandexBot' => 'Yandex', // Russian search engine
-        'PetalBot' => 'PetalBot', // Chinese search crawler (Huawei)
+        'ClaudeBot' => 'ClaudeBot',
+// Anthropic AI bot
+    'ChatGPT-User' => 'ChatGPT',
+// AI developer
+        'GPTBot' => 'GPTBot',
+// AI developer
+        'OAI-SearchBot' => 'OpenAI',
+// AI developer
+        'PerplexityBot' => 'Perplexity',
+// AI answers site
+    'ImagesiftBot' => 'Imagesift',
+// Hive image search; may be AI-related
+        'mj12bot' => 'Majestic',
+// British SEO crawler
+        'SemrushBot' => 'Semrush',
+// Backlink tracking company
+        'DotBot' => 'DotBot',
+// Moz SEO crawler
+        'AhrefsBot' => 'Ahrefs',
+// SEO crawler
+        'ChatGLM-Spider' => 'ChatGLM',
+// SEO crawler
+        'linkdexbot' => 'Linkdex',
+// SEO crawler
+        'Barkrowler' => 'Babbar.tech',
+// SEO graphing services
+        'AwarioBot' => 'Awario',
+// Social media management company
+        'Friendly_Crawler' => 'FriendlyCrawler',
+// Machine learning researcher
+        'Baiduspider' => 'Baidu',
+// Chinese search engine
+        'YandexBot' => 'Yandex',
+// Russian search engine
+        'PetalBot' => 'PetalBot',
+// Chinese search crawler (Huawei)
         'Y!J-WSC' => 'Yahoo Japan',
-	'yahoo! slurp' => 'Yahoo',
-        'MojeekBot' => 'Mojeek', // British search engine
-        'Qwantbot' => 'Qwant', // French search engine
-        'Sogou web spider' => 'Sogou', // Chinese search engine
-        'SeznamBot' => 'Seznam', // Czech search engine
-	'Centurybot' => 'Century', // a.k.a. RightDao, a search engine
+    'yahoo! slurp' => 'Yahoo',
+        'MojeekBot' => 'Mojeek',
+// British search engine
+        'Qwantbot' => 'Qwant',
+// French search engine
+        'Sogou web spider' => 'Sogou',
+// Chinese search engine
+        'SeznamBot' => 'Seznam',
+// Czech search engine
+    'Centurybot' => 'Century',
+// a.k.a. RightDao, a search engine
         'Mail.RU_Bot' => 'Mail.RU',
-	'Turnitin' => 'Turnitin', // Plagiarism scanning software
-        'Expanse' => 'Expanse', // Palo Alto Networks security scanning service
-	'CensysInspect' => 'CensysInspect', // Security scanner
+    'Turnitin' => 'Turnitin',
+// Plagiarism scanning software
+        'Expanse' => 'Expanse',
+// Palo Alto Networks security scanning service
+    'CensysInspect' => 'CensysInspect',
+// Security scanner
     );
     public $changedData = array();
 

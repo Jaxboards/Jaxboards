@@ -168,15 +168,16 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
 
     if (empty($errors)) {
         // Write crossdomain.xml file for flash support.
-        /*$crossDomainXML = fopen(JAXBOARDS_ROOT . '/crossdomain.xml', 'w');
-        fwrite(
+        /*
+            $crossDomainXML = fopen(JAXBOARDS_ROOT . '/crossdomain.xml', 'w');
+            fwrite(
             $crossDomainXML,
             str_replace(
                 '<DOMAIN>',
                 $JAX->p['domain'],
                 file_get_contents(SERVICE_ROOT . '/crossdomain.sample.xml')
             )
-        );
+            );
         fclose($crossDomainXML);*/
 
         // Update with our settings.
@@ -317,10 +318,9 @@ EOT
         }
 
         // Create lock file.
-        //$file = fopen(SERVICE_ROOT . '/install.lock', 'w');
-        //fwrite($file, '');
-        //fclose($file);
-
+        // $file = fopen(SERVICE_ROOT . '/install.lock', 'w');
+        // fwrite($file, '');
+        // fclose($file);
         // Send us to the service page.
         header('Location: ' . dirname($_SERVER['REQUEST_URI']));
     }

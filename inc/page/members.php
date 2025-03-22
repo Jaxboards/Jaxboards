@@ -125,23 +125,23 @@ class members
         $links = array();
         foreach ($vars as $k => $v) {
             $links[] = "<a href=\"{$url}&amp;sortby={$k}" .
-		($sortby == $k ? ('ASC' == $sorthow ? '&amp;how=DESC' : '') .
+            ($sortby == $k ? ('ASC' == $sorthow ? '&amp;how=DESC' : '') .
                 '" class="sort' . ('DESC' == $sorthow ? ' desc' : '') : '') .
                 "\">{$v}</a>";
         }
         foreach ($memberarray as $f) {
             $contactdetails = '';
             $contactUrls = array(
-		'skype' => 'skype:%s',
-		'discord' => 'discord:%s',
-		'yim' => 'ymsgr:sendim?%s',
-		'msn' => 'msnim:chat?contact=%s',
-		'googlechat' => 'gtalk:chat?jid=%s',
-		'aim' => 'aim:goaim?screenname=%s',
-		'youtube' => 'https://youtube.com/%s',
-		'steam' => 'https://steamcommunity.com/id/%s',
-		'twitter' => 'https://twitter.com/%s',
-		'bluesky' => 'https://bsky.app/profile/%s.bsky.social'
+            'skype' => 'skype:%s',
+            'discord' => 'discord:%s',
+            'yim' => 'ymsgr:sendim?%s',
+            'msn' => 'msnim:chat?contact=%s',
+            'googlechat' => 'gtalk:chat?jid=%s',
+            'aim' => 'aim:goaim?screenname=%s',
+            'youtube' => 'https://youtube.com/%s',
+            'steam' => 'https://steamcommunity.com/id/%s',
+            'twitter' => 'https://twitter.com/%s',
+            'bluesky' => 'https://bsky.app/profile/%s.bsky.social'
             );
             foreach ($contactUrls as $k => $v) {
                 if ($f['contact_' . $k]) {
