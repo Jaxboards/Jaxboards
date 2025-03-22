@@ -7,8 +7,7 @@
     "roave/security-advisories": "dev-master@dev"
   },
   "require": {
-    "php": "^8.3",
-    "ircmaxell/password-compat": "^1.0"
+    "php": "^8.3"
   },
   "scripts": {
     "lint": [
