@@ -1,0 +1,27 @@
+name: Lint
+
+jobs:
+  run-linters:
+    name: Lint
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          extensions: mbstring
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: npm
+      - uses: ramsey/composer-install@v3
+      - run: npm clean-install
+      - run: npm run-script pre-commit
+
+on:
+  pull_request:
+    types:
+      - opened
+      - ready_for_review
+      - reopened
+      - synchronize
