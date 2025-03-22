@@ -40,16 +40,7 @@
   </rule>
   <!-- Make sure this works with PHP 8.3+ -->
   <config name="testVersion" value="8.3-" />
-  <rule ref="PHPCompatibility">
-    <!-- Exclude polyfilled password_hash related functions from compatibility check -->
-    <exclude name="PHPCompatibility.PHP.NewConstants.password_bcryptFound" />
-    <exclude name="PHPCompatibility.PHP.NewConstants.password_bcrypt_default_costFound" />
-    <exclude name="PHPCompatibility.PHP.NewConstants.password_defaultFound" />
-    <exclude name="PHPCompatibility.PHP.NewFunctions.password_get_infoFound" />
-    <exclude name="PHPCompatibility.PHP.NewFunctions.password_hashFound" />
-    <exclude name="PHPCompatibility.PHP.NewFunctions.password_needs_rehashFound" />
-    <exclude name="PHPCompatibility.PHP.NewFunctions.password_verifyFound" />
-  </rule>
+  <rule ref="PHPCompatibility" />
 
   <!-- Ban some functions -->
   <rule ref="Generic.PHP.ForbiddenFunctions">
