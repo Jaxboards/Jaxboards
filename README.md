@@ -196,7 +196,7 @@ pnpm run phpcbf
 - [dgatwood](https://github.com/dgatwood) - Updated the codebase to support
   PHP's MySQLi interface and work with PHP7
 - [wtl420](https://github.com/wtl420) - Maintainer of this fork.
-- [VinnyVideo]https://github.com/VinnyVideo - Updated Jaxboards to run in PHP8
+- [VinnyVideo](https://github.com/VinnyVideo) - Updated Jaxboards to run in PHP8
 
 See also the list of [contributors](https://github.com/Jaxboards/Jaxboards/graphs/contributors) who participated in this project.
 
