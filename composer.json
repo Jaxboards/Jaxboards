@@ -1,12 +1,5 @@
 {
-  "config": {},
-  "scripts": {
-    "lint": [
-      "@phpcs"
-    ],
-    "phpcs": "phpcs",
-    "phpcbf": "phpcbf"
-  },
+  "prefer-stable": true,
   "require-dev": {
     "squizlabs/php_codesniffer": "^2.9",
     "phpcompatibility/php-compatibility": "^8.2",
@@ -15,5 +8,12 @@
   "require": {
     "php": "^8.3",
     "ircmaxell/password-compat": "^1.0"
+  },
+  "scripts": {
+    "lint": [
+      "@phpcs"
+    ],
+    "phpcs": "phpcs",
+    "phpcbf": "phpcbf"
   }
 }

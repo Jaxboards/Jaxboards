@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6afb36ccde54e2aa59d00fd284d76bdc",
+    "content-hash": "0484a79cafbcfe891b19406d09f0a8a5",
     "packages": [
         {
             "name": "ircmaxell/password-compat",
@@ -1093,7 +1093,7 @@
     "stability-flags": {
         "roave/security-advisories": 20
     },
-    "prefer-stable": false,
+    "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.3"
