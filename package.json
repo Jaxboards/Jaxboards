@@ -1,25 +1,4 @@
 {
-  "private": true,
-  "license": "MIT",
-  "scripts": {
-    "autofix": "npm run prettier && npm run eslint-fix && npm run stylelint-fix && npm run phpcbf",
-    "build": "rollup -c",
-    "eslint": "eslint 'Script/**/*.js'",
-    "eslint-fix": "eslint 'Script/**/*.js' --fix",
-    "php-lint": "composer-runner -- run-script lint",
-    "phpcs": "composer-runner -- run-script phpcs",
-    "phpcbf": "composer-runner -- run-script phpcbf",
-    "postinstall": "composer-runner -- install",
-    "pre-commit": "npm run eslint && npm run stylelint && npm run php-lint",
-    "prettier": "prettier --write --single-quote \"**/*.{{t,j}s{,x,on},{c,sa,sc,le}ss,vue,md,y{,a}ml,graphql}\"",
-    "stylelint": "stylelint \"./**/*.{c,sa,sc,le}ss\"",
-    "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\""
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run pre-commit"
-    }
-  },
   "devDependencies": {
     "eslint": "^5.5.0",
     "eslint-config-airbnb-base": "^13.1.0",
@@ -38,5 +17,26 @@
   "engines": {
     "node": "^22.14",
     "npm": "^10.9"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run pre-commit"
+    }
+  },
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "autofix": "npm run prettier && npm run eslint-fix && npm run stylelint-fix && npm run phpcbf",
+    "build": "rollup -c",
+    "eslint": "eslint 'Script/**/*.js'",
+    "eslint-fix": "eslint 'Script/**/*.js' --fix",
+    "php-lint": "composer-runner -- run-script lint",
+    "phpcbf": "composer-runner -- run-script phpcbf",
+    "phpcs": "composer-runner -- run-script phpcs",
+    "postinstall": "composer-runner -- install",
+    "pre-commit": "npm run eslint && npm run stylelint && npm run php-lint",
+    "prettier": "prettier --write --single-quote \"**/*.{{t,j}s{,x,on},{c,sa,sc,le}ss,vue,md,y{,a}ml,graphql}\"",
+    "stylelint": "stylelint \"./**/*.{c,sa,sc,le}ss\"",
+    "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\""
   }
 }
