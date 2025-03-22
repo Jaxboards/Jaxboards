@@ -25,7 +25,7 @@
       yh: y + h,
       xw: x + w,
       w,
-      h
+      h,
     };
   }
 
@@ -63,7 +63,7 @@
     mobile: !!userAgent.match(/mobile/i),
     n3ds: !!userAgent.match(/nintendo 3ds/),
     firefox: !!userAgent.match(/firefox/i),
-    safari: !!userAgent.match(/safari/i)
+    safari: !!userAgent.match(/safari/i),
   });
 
   // This file is just a dumping ground until I can find better homes for these
@@ -120,14 +120,15 @@
         .map(
           (key, index) =>
             `${encodeURIComponent(key)}=${encodeURIComponent(
-            values[index] || ''
-          )}`
+            values[index] || '',
+          )}`,
         )
         .join('&');
     }
     return Object.keys(keys)
       .map(
-        key => `${encodeURIComponent(key)}=${encodeURIComponent(keys[key] || '')}`
+        (key) =>
+          `${encodeURIComponent(key)}=${encodeURIComponent(keys[key] || '')}`,
       )
       .join('&');
   }
@@ -138,13 +139,13 @@
         readyState: 4,
         callback() {},
         method: 'POST',
-        ...s
+        ...s,
       };
     }
 
     load(
       url,
-      { callback, data, method = this.setup.method, requestType = 1 } = {}
+      { callback, data, method = this.setup.method, requestType = 1 } = {},
     ) {
       // requestType is an enum (1=update, 2=load new)
       let sendData = null;
@@ -174,7 +175,7 @@
       if (method) {
         request.setRequestHeader(
           'Content-Type',
-          'application/x-www-form-urlencoded'
+          'application/x-www-form-urlencoded',
         );
       }
       request.setRequestHeader('X-JSACCESS', requestType);
@@ -234,8 +235,6 @@
       case 40:
         e.DOWN = true;
         break;
-      default:
-        break;
     }
     if (typeof e.srcElement === 'undefined') e.srcElement = e.target;
     if (typeof e.pageY === 'undefined') {
@@ -266,35 +265,35 @@
 
     start(event, t, handle) {
       const e = new Event$1(event).cancel().stopBubbling();
-      const el$$1 = t || event.target;
-      const s = getComputedStyle(el$$1);
+      const el = t || event.target;
+      const s = getComputedStyle(el);
       const highz = getHighestZIndex();
-      if (this.noChild && (e.srcElement || e.target) !== (handle || el$$1)) {
+      if (this.noChild && (e.srcElement || e.target) !== (handle || el)) {
         return;
       }
-      if (el$$1.getAttribute('draggable') === 'false') {
+      if (el.getAttribute('draggable') === 'false') {
         return;
       }
       this.sess = {
-        el: el$$1,
+        el,
         mx: parseInt(e.pageX, 10),
         my: parseInt(e.pageY, 10),
         ex: parseInt(s.left, 10) || 0,
         ey: parseInt(s.top, 10) || 0,
         info: {},
-        bc: getCoordinates(el$$1),
-        zIndex: el$$1.style.zIndex
+        bc: getCoordinates(el),
+        zIndex: el.style.zIndex,
       };
       if (!this.sess.zIndex || Number(this.sess.zIndex) < highz - 1) {
-        el$$1.style.zIndex = highz;
+        el.style.zIndex = highz;
       }
       tryInvoke(this.onstart, {
         ...this.sess,
-        droptarget: this.testDrops(this.sess.mx, this.sess.my)
+        droptarget: this.testDrops(this.sess.mx, this.sess.my),
       });
       this.boundEvents = {
-        drag: event2 => this.drag(event2),
-        drop: event2 => this.drop(event2)
+        drag: (event2) => this.drag(event2),
+        drop: (event2) => this.drop(event2),
       };
       document.addEventListener('mousemove', this.boundEvents.drag);
       document.addEventListener('mouseup', this.boundEvents.drop);
@@ -338,7 +337,7 @@
         dx: mx - (sess.mx || mx),
         dy: my - (sess.my || my),
         sx: this.sess.ex,
-        sy: this.sess.ey
+        sy: this.sess.ey,
       };
       this.sess.info = sess;
       tryInvoke(this.ondrag, sess);
@@ -376,7 +375,7 @@
       if (!droppables.length) {
         return r;
       }
-      droppables.forEach(droppable => {
+      droppables.forEach((droppable) => {
         if (droppable === this.sess.el || isChildOf(droppable, this.sess.el)) {
           return;
         }
@@ -414,20 +413,20 @@
       return this;
     }
 
-    apply(el$$1, t) {
-      if (Array.isArray(el$$1)) {
-        el$$1.forEach(el2 => this.apply(el2));
+    apply(el, t) {
+      if (Array.isArray(el)) {
+        el.forEach((el2) => this.apply(el2));
         return this;
       }
 
-      let pos = getComputedStyle(el$$1, '');
+      let pos = getComputedStyle(el, '');
       pos = pos.position;
       if (!pos || pos === 'static') {
-        el$$1.style.position = 'relative';
+        el.style.position = 'relative';
       }
-      (t || el$$1).onmousedown = t
-        ? e => this.start(e, el$$1, t)
-        : e => this.start(e, el$$1);
+      (t || el).onmousedown = t
+        ? (e) => this.start(e, el, t)
+        : (e) => this.start(e, el);
       return this;
     }
 
@@ -441,9 +440,9 @@
       return this;
     }
 
-    reset(el$$1 = this.sess.el) {
-      el$$1.style.top = 0;
-      el$$1.style.left = 0;
+    reset(el = this.sess.el) {
+      el.style.top = 0;
+      el.style.left = 0;
       return this;
     }
   }
@@ -452,7 +451,7 @@
     const nodes = Array.from(tree.querySelectorAll('li'));
     const order = {};
     let gotsomethin = 0;
-    nodes.forEach(node => {
+    nodes.forEach((node) => {
       if (node.className !== 'seperator' && node.parentNode === tree) {
         gotsomethin = 1;
         const [sub] = node.getElementsByTagName('ul');
@@ -468,9 +467,9 @@
     const items = [];
     const seperators = [];
 
-    items.push(...listItems.filter(li => li.className !== 'title'));
+    items.push(...listItems.filter((li) => li.className !== 'title'));
 
-    items.forEach(item => {
+    items.forEach((item) => {
       const tmp = document.createElement('li');
       tmp.className = 'seperator';
       seperators.push(tmp);
@@ -527,10 +526,10 @@
           formfield.value = JSON.stringify(parsetree(tree, prefix));
         }
         return null;
-      }
+      },
     });
 
-    items.forEach(item => drag.apply(item));
+    items.forEach((item) => drag.apply(item));
   }
 
   class Component {
@@ -569,8 +568,8 @@
         throw new Error('Expected element to have data-autocomplete-output');
       }
 
-      element.addEventListener('keyup', event => this.keyUp(event));
-      element.addEventListener('keydown', event => {
+      element.addEventListener('keyup', (event) => this.keyUp(event));
+      element.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
           event.preventDefault();
         }
@@ -582,12 +581,12 @@
       let resultsContainer = document.querySelector('#autocomplete');
       if (!resultsContainer) {
         resultsContainer = assign(document.createElement('div'), {
-          id: 'autocomplete'
+          id: 'autocomplete',
         });
         // TODO: move static properties to CSS
         assign(resultsContainer.style, {
           position: 'absolute',
-          zIndex: getHighestZIndex()
+          zIndex: getHighestZIndex(),
         });
         document.body.appendChild(resultsContainer);
       }
@@ -596,7 +595,7 @@
       assign(resultsContainer.style, {
         top: `${coords.yh}px`,
         left: `${coords.x}px`,
-        width: `${coords.w}px`
+        width: `${coords.w}px`,
       });
 
       return resultsContainer;
@@ -605,8 +604,8 @@
     keyUp(event) {
       const resultsContainer = this.getResultsContainer();
       const results = Array.from(resultsContainer.querySelectorAll('div'));
-      const selectedIndex = results.findIndex(el$$1 =>
-        el$$1.classList.contains('selected')
+      const selectedIndex = results.findIndex((el) =>
+        el.classList.contains('selected'),
       );
 
       // Handle arrow key selection
@@ -646,7 +645,7 @@
       const searchTerm = encodeURIComponent(this.element.value);
       const queryParams = `act=${this.action}&term=${searchTerm}`;
       new Ajax().load(`${relativePath}misc/listloader.php?${queryParams}`, {
-        callback: xml => {
+        callback: (xml) => {
           const data = JSON.parse(xml.responseText);
           resultsContainer.innerHTML = '';
           if (!data.length) {
@@ -670,7 +669,7 @@
               resultsContainer.appendChild(div);
             });
           }
-        }
+        },
       });
     }
   }
@@ -687,8 +686,8 @@
 
       const button = assign(document.createElement('button'), {
         type: 'button',
+        title: element.className,
         className: element.className,
-	title: 'Yes/No Toggle'
       });
 
       const toggle = () => {
@@ -705,30 +704,30 @@
   }
 
   function dropdownMenu(e) {
-    const el$$1 = e.target;
-    if (el$$1.tagName.toLowerCase() === 'a') {
-      const menu = document.querySelector(`#menu_${el$$1.classList[0]}`);
-      el$$1.classList.add('active');
+    const el = e.target;
+    if (el.tagName.toLowerCase() === 'a') {
+      const menu = document.querySelector(`#menu_${el.classList[0]}`);
+      el.classList.add('active');
       const s = menu.style;
       s.display = 'block';
-      const p = getCoordinates(el$$1);
-      s.top = `${p.y + el$$1.clientHeight}px`;
+      const p = getCoordinates(el);
+      s.top = `${p.y + el.clientHeight}px`;
       s.left = `${p.x}px`;
-      el$$1.onmouseout = e2 => {
+      el.onmouseout = (e2) => {
         if (!e2.relatedTarget && e2.toElement) e2.relatedTarget = e2.toElement;
         if (e2.relatedTarget !== menu && e2.relatedTarget.offsetParent !== menu) {
-          el$$1.classList.remove('active');
+          el.classList.remove('active');
           menu.style.display = 'none';
         }
       };
-      menu.onmouseout = e2 => {
+      menu.onmouseout = (e2) => {
         if (!e2.relatedTarget && e2.toElement) e2.relatedTarget = e2.toElement;
         if (
-          e2.relatedTarget !== el$$1 &&
+          e2.relatedTarget !== el &&
           e2.relatedTarget.offsetParent !== menu &&
           e2.relatedTarget !== menu
         ) {
-          el$$1.classList.remove('active');
+          el.classList.remove('active');
           menu.style.display = 'none';
         }
       };
@@ -740,7 +739,7 @@
     const values = [];
     const elements = Array.from(form.elements);
     const submit = form.submitButton;
-    elements.forEach(element => {
+    elements.forEach((element) => {
       if (!element.name || element.type === 'submit') return;
       if (
         (element.type === 'checkbox' || element.type === 'radio') &&
@@ -766,23 +765,23 @@
     document.querySelector('#nav').addEventListener('mouseover', dropdownMenu);
 
     Array.from(document.querySelectorAll('form[data-use-ajax-submit]')).forEach(
-      form => {
-        form.addEventListener('submit', event => {
+      (form) => {
+        form.addEventListener('submit', (event) => {
           event.preventDefault();
           submitForm(form);
         });
-      }
+      },
     );
 
     // Converts all switches (checkboxes) into graphics, to show "X" or "check"
     document
       .querySelectorAll(Switch.selector)
-      .forEach(toggleSwitch => new Switch(toggleSwitch));
+      .forEach((toggleSwitch) => new Switch(toggleSwitch));
 
     // Makes editors capable of tabbing for indenting
     const editor = document.querySelector('.editor');
     if (editor) {
-      editor.addEventListener('keydown', event => {
+      editor.addEventListener('keydown', (event) => {
         if (event.keyCode === 9) {
           replaceSelection(editor, '    ');
           event.preventDefault();
@@ -792,7 +791,7 @@
 
     // Hook up autocomplete form fields
     const autoCompleteFields = document.querySelectorAll(AutoComplete.selector);
-    autoCompleteFields.forEach(field => new AutoComplete(field));
+    autoCompleteFields.forEach((field) => new AutoComplete(field));
 
     // Orderable forums needs this
     const tree = document.querySelector('.tree');
@@ -802,4 +801,4 @@
   }
   onDOMReady(gracefulDegrade);
 
-}());
+})();

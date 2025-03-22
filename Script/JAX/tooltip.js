@@ -1,13 +1,10 @@
 import { getCoordinates, getHighestZIndex } from './el';
 
 function stripHTML(html) {
-  return html
-    .valueOf()
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  return html.valueOf().replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-export default function(el) {
+export default function toolTip(el) {
   let tooltip = document.getElementById('tooltip_thingy');
   const pos = getCoordinates(el);
   const title = stripHTML(el.title);

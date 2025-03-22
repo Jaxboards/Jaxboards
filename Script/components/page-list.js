@@ -7,7 +7,7 @@ export default class PageList extends Component {
 
   constructor(element) {
     super(element);
-    element.addEventListener('wheel', event => this.wheel(event));
+    element.addEventListener('wheel', (event) => this.wheel(event));
   }
 
   wheel(event) {
@@ -25,7 +25,7 @@ export default class PageList extends Component {
       for (let x = 0; x < between; x += 1) {
         pages[x + 1].href = pages[x + 1].href.replace(
           /\d+$/,
-          x + startPage + direction
+          x + startPage + direction,
         );
         pages[x + 1].innerHTML = startPage + x + direction;
       }

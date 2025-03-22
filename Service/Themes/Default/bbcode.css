@@ -1,6 +1,6 @@
 .quote {
   border: 1px solid #aaf;
-  background: url(icons/quote.png) top right no-repeat #e0e0ff;
+  background: url('icons/quote.png') top right no-repeat #e0e0ff;
   padding: 10px;
 }
 

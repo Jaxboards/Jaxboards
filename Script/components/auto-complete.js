@@ -28,8 +28,8 @@ export default class AutoComplete extends Component {
       throw new Error('Expected element to have data-autocomplete-output');
     }
 
-    element.addEventListener('keyup', event => this.keyUp(event));
-    element.addEventListener('keydown', event => {
+    element.addEventListener('keyup', (event) => this.keyUp(event));
+    element.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') {
         event.preventDefault();
       }
@@ -41,12 +41,12 @@ export default class AutoComplete extends Component {
     let resultsContainer = document.querySelector('#autocomplete');
     if (!resultsContainer) {
       resultsContainer = assign(document.createElement('div'), {
-        id: 'autocomplete'
+        id: 'autocomplete',
       });
       // TODO: move static properties to CSS
       assign(resultsContainer.style, {
         position: 'absolute',
-        zIndex: getHighestZIndex()
+        zIndex: getHighestZIndex(),
       });
       document.body.appendChild(resultsContainer);
     }
@@ -55,7 +55,7 @@ export default class AutoComplete extends Component {
     assign(resultsContainer.style, {
       top: `${coords.yh}px`,
       left: `${coords.x}px`,
-      width: `${coords.w}px`
+      width: `${coords.w}px`,
     });
 
     return resultsContainer;
@@ -64,8 +64,8 @@ export default class AutoComplete extends Component {
   keyUp(event) {
     const resultsContainer = this.getResultsContainer();
     const results = Array.from(resultsContainer.querySelectorAll('div'));
-    const selectedIndex = results.findIndex(el =>
-      el.classList.contains('selected')
+    const selectedIndex = results.findIndex((el) =>
+      el.classList.contains('selected'),
     );
 
     // Handle arrow key selection
@@ -105,7 +105,7 @@ export default class AutoComplete extends Component {
     const searchTerm = encodeURIComponent(this.element.value);
     const queryParams = `act=${this.action}&term=${searchTerm}`;
     new Ajax().load(`${relativePath}misc/listloader.php?${queryParams}`, {
-      callback: xml => {
+      callback: (xml) => {
         const data = JSON.parse(xml.responseText);
         resultsContainer.innerHTML = '';
         if (!data.length) {
@@ -129,7 +129,7 @@ export default class AutoComplete extends Component {
             resultsContainer.appendChild(div);
           });
         }
-      }
+      },
     });
   }
 }

@@ -8,14 +8,14 @@ html {
 }
 
 body {
-  background: url(../img/loginglow.png) center no-repeat #274463;
+  background: url('../img/loginglow.png') center no-repeat #274463;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   height: 100%;
   margin: 0;
 }
 
 input[type='submit'] {
-  background: url(../img/buttonbg.png);
+  background: url('../img/buttonbg.png');
   border-radius: 0.25em;
   border: 1px solid #000;
   color: #fff;
@@ -50,7 +50,7 @@ label {
 }
 
 #logo {
-  background: url(../img/loginlogo.png) center;
+  background: url('../img/loginlogo.png') center;
   border: 1px solid #2d4669;
   height: 90px;
 }
@@ -59,14 +59,16 @@ label {
   background: #fdd;
   border: 1px solid #f00;
   color: #f00;
-  margin: -20px 5px 20px 5px;
+  margin: -20px 5px 20px;
   padding: 5px;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .goBack {
   margin: 1em auto;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .goBackLink {
   font-size: 0.75em;
   padding: 1ch 1em;

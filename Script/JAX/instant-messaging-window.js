@@ -6,9 +6,10 @@ class IMWindow {
   constructor(uid, uname) {
     if (!globalsettings.can_im) {
       // eslint-disable-next-line no-alert
-      return alert('You do not have permission to use this feature.');
+      alert('You do not have permission to use this feature.');
+    } else {
+      RUN.stream.commands.im([uid, uname, false]);
     }
-    RUN.stream.commands.im([uid, uname, false]);
   }
 }
 
@@ -23,7 +24,7 @@ IMWindow.menu = function openMenu(event, uid) {
   d.id = 'immenu';
   d.className = 'immenu';
   document.body.appendChild(d);
-  document.body.onclick = clickEvent => {
+  document.body.onclick = (clickEvent) => {
     const ce = Event(clickEvent);
     if (ce.srcElement !== d && !isChildOf(ce.srcElement, d)) {
       d.parentNode.removeChild(d);

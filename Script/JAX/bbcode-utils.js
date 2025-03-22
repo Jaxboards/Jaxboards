@@ -10,7 +10,7 @@ export function htmlToBBCode(html) {
   // images and emojis
   bbcode = bbcode.replace(
     /<img.*?src=["']?([^'"]+)["'](?: alt=["']?([^"']+)["'])?[^>]*\/?>/g,
-    (whole, src, alt) => alt || `[img]${src}[/img]`
+    (whole, src, alt) => alt || `[img]${src}[/img]`,
   );
   bbcode = bbcode.replace(
     nestedTagRegex,
@@ -24,7 +24,7 @@ export function htmlToBBCode(html) {
         /(color|size|style|href|src)=(['"]?)(.*?)\2/gi,
         (_, attr, q, value) => {
           att[attr] = value;
-        }
+        },
       );
       const { style = '' } = att;
 
@@ -34,7 +34,7 @@ export function htmlToBBCode(html) {
       }
       if (style.match(/background(-color)?:[^;]+(rgb\([^)]+\)|#\s+)/i)) {
         innerhtml = `[bgcolor=#${new Color(
-          RegExp.$2
+          RegExp.$2,
         ).toHex()}]${innerhtml}[/bgcolor]`;
       }
       if (style.match(/text-align: ?(right|center|left)/i)) {
@@ -88,7 +88,7 @@ export function htmlToBBCode(html) {
         innerhtml = `\n${innerhtml}`;
       }
       return innerhtml;
-    }
+    },
   );
   return bbcode
     .replace(/&amp;/g, '&')
@@ -109,31 +109,31 @@ export function bbcodeToHTML(bbcode) {
   html = html.replace(/\[img\]([^'"[]+)\[\/img\]/gi, '<img src="$1">');
   html = html.replace(
     /\[color=([^\]]+)\](.*?)\[\/color\]/gi,
-    '<span style="color:$1">$2</span>'
+    '<span style="color:$1">$2</span>',
   );
   html = html.replace(
     /\[size=([^\]]+)\](.*?)\[\/size\]/gi,
-    '<span style="font-size:$1">$2</span>'
+    '<span style="font-size:$1">$2</span>',
   );
   html = html.replace(
     /\[url=([^\]]+)\](.*?)\[\/url\]/gi,
-    '<a href="$1">$2</a>'
+    '<a href="$1">$2</a>',
   );
   html = html.replace(
     /\[bgcolor=([^\]]+)\](.*?)\[\/bgcolor\]/gi,
-    '<span style="backgroun-color:$1">$2</span>'
+    '<span style="backgroun-color:$1">$2</span>',
   );
   html = html.replace(/\[h(\d)\](.*?)\[\/h\1\]/g, '<h$1>$2</h$1>');
   html = html.replace(
     /\[align=(left|right|center)\](.*?)\[\/align\]/g,
-    '<div style="text-align:$1">$2</div>'
+    '<div style="text-align:$1">$2</div>',
   );
-  html = html.replace(/\[(ul|ol)\]([\w\W]*?)\[\/\1\]/gi, match => {
+  html = html.replace(/\[(ul|ol)\]([\w\W]*?)\[\/\1\]/gi, (match) => {
     const tag = match[1];
     const listItems = match[2].split(/([\r\n]+|^)\*/);
     const lis = listItems
-      .filter(text => text.trim())
-      .map(text => `<li>${text}</li>`)
+      .filter((text) => text.trim())
+      .map((text) => `<li>${text}</li>`)
       .join('');
     return `<${tag}>${lis}</${tag}>`;
   });

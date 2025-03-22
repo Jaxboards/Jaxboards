@@ -28,7 +28,7 @@ a:visited {
 
 #header {
   display: block;
-  background: url(../img/acp-header.png);
+  background: url('../img/acp-header.png');
   height: 96px;
 }
 
@@ -48,11 +48,11 @@ a:visited {
 
 #page {
   border-top: 1px solid #333;
-  background: url(../img/pagebg.png) repeat-x #152b49;
+  background: url('../img/pagebg.png') repeat-x #152b49;
 }
 
 #nav {
-  background: url(../img/acp-nav-icons.png) 0 -33px;
+  background: url('../img/acp-nav-icons.png') 0 -33px;
   height: 33px;
   border: 1px solid #000;
 }
@@ -63,7 +63,7 @@ a:visited {
   display: block;
   float: left;
   text-indent: -1000px;
-  background: url(../img/acp-nav-icons.png);
+  background: url('../img/acp-nav-icons.png');
   height: 33px;
 }
 
@@ -110,12 +110,12 @@ a:visited {
 }
 
 .sidebar {
-  -moz-box-shadow: #124 -5px 5px 5px;
+  box-shadow: #124 -5px 5px 5px;
   line-height: 20px;
   padding: 10px;
   margin: 40px 10px;
   width: 169px;
-  background: url(../img/acp-sidebar.png) right repeat-y #eee;
+  background: url('../img/acp-sidebar.png') right repeat-y #eee;
   float: left;
   border: 1px solid #000;
 }
@@ -133,7 +133,7 @@ a:visited {
 }
 
 .switch.yn {
-  background: url(../img/yesno.png);
+  background: url('../img/yesno.png');
 }
 
 .skins,
@@ -196,7 +196,7 @@ a:visited {
 }
 
 .perms .breaker {
-  background: url(../img/acp-box-header.png);
+  background: url('../img/acp-box-header.png');
   padding: 3px;
   color: #fff;
   border: 1px solid #000;
@@ -224,11 +224,11 @@ a:visited {
 .box {
   margin: 20px 10px 0 0;
   border: 1px solid #000;
-  -moz-box-shadow: #124 -5px 5px 5px;
+  box-shadow: #124 -5px 5px 5px;
 }
 
 .box .header {
-  background: url(../img/acp-box-header.png);
+  background: url('../img/acp-box-header.png');
   padding: 8px 0 8px 10px;
   font-size: 16px;
   color: #fff;
@@ -237,9 +237,10 @@ a:visited {
 .box .content {
   padding: 10px;
   line-height: 20px;
-  background: url(../img/acp-box-content.png) top repeat-x #e2e2e2;
+  background: url('../img/acp-box-content.png') top repeat-x #e2e2e2;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .dropdownMenu {
   display: none;
   border: 1px solid #000;
@@ -251,6 +252,7 @@ a:visited {
 }
 
 /* stylelint-disable no-descending-specificity */
+/* stylelint-disable-next-line selector-class-pattern */
 .dropdownMenu a {
   display: block;
   color: #333;
@@ -262,6 +264,7 @@ a:visited {
 /* stylelint-enable no-descending-specificity */
 
 /* stylelint-disable no-descending-specificity */
+/* stylelint-disable-next-line selector-class-pattern */
 .dropdownMenu a:hover {
   background: #bbb;
   border: 1px solid #000;
@@ -355,7 +358,7 @@ h2 {
   margin-left: 10px;
   width: 30px;
   height: 25px;
-  background: url(../img/yesno.png) bottom center;
+  background: url('../img/yesno.png') bottom center;
 }
 
 #validname.valid,
@@ -364,7 +367,7 @@ h2 {
 }
 
 .icons {
-  background: url(../img/icons.png) no-repeat;
+  background: url('../img/icons.png') no-repeat;
   padding-left: 20px;
   display: inline-block;
   height: 16px;

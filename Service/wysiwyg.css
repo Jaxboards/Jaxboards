@@ -6,14 +6,14 @@
 .editbar {
   display: block;
   text-align: left;
-  background: url(wysiwygbar.png) bottom right;
+  background: url('wysiwygbar.png') bottom right;
   width: 800px;
   height: 24px;
   overflow: hidden;
 }
 
 .editbar a {
-  background: url(wysiwygbar.png);
+  background: url('wysiwygbar.png');
   height: 24px;
   display: inline-block;
 }
@@ -57,6 +57,7 @@
   background-position: -222px 0;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .editbar .c_email {
   width: 27px;
   background-position: -250px 0;
@@ -77,21 +78,25 @@
   background-position: -330px 0;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .editbar .c_youtube {
   width: 28px;
   background-position: -356px 0;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .editbar .c_code {
   width: 26px;
   background-position: -384px 0;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .editbar .c_quote {
   width: 25px;
   background-position: -410px 0;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .editbar .c_spoiler {
   width: 29px;
   background-position: -435px 0;
@@ -107,11 +112,13 @@
   background-position: -492px 0;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .editbar .c_smileys {
   width: 29px;
   background-position: -520px 0;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .editbar .c_switcheditmode {
   width: 30px;
   background-position: -549px 0;
@@ -156,6 +163,7 @@
   background-position: -222px -24px;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .editbar a:hover.c_email {
   width: 27px;
   background-position: -250px -24px;
@@ -176,21 +184,25 @@
   background-position: -330px -24px;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .editbar a:hover.c_youtube {
   width: 28px;
   background-position: -356px -24px;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .editbar a:hover.c_code {
   width: 26px;
   background-position: -384px -24px;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .editbar a:hover.c_quote {
   width: 25px;
   background-position: -410px -24px;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .editbar a:hover.c_spoiler {
   width: 29px;
   background-position: -435px -24px;
@@ -206,11 +218,13 @@
   background-position: -492px -24px;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .editbar a:hover.c_smileys {
   width: 29px;
   background-position: -520px -24px;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .editbar a:hover.c_switcheditmode {
   width: 30px;
   background-position: -549px -24px;

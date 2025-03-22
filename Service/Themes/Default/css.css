@@ -2,7 +2,7 @@
 @import url('../../wysiwyg.css');
 
 body {
-  background: url(img/bg.jpg);
+  background: url('img/bg.jpg');
   font-family: Arial, sans-serif;
   font-size: 16px;
   color: #004;
@@ -63,7 +63,7 @@ textarea {
 
 /* All windows */
 .window {
-  background: url(img/shadowAlpha.png) bottom right;
+  background: url('img/shadowAlpha.png') bottom right;
   position: fixed;
 }
 
@@ -71,7 +71,7 @@ textarea {
   padding-right: 20px;
   cursor: move;
   text-align: center;
-  background: url(img/boxgrad.png) bottom;
+  background: url('img/boxgrad.png') bottom;
   color: #fff;
   border-radius: 10px 10px 0 0;
 }
@@ -105,7 +105,7 @@ textarea {
   cursor: nw-resize;
   width: 10px;
   height: 10px;
-  background: url(icons/cornerdrag.png);
+  background: url('icons/cornerdrag.png');
   position: absolute;
 }
 
@@ -201,7 +201,7 @@ textarea {
 
 /* User Control Panel */
 #ucp .content {
-  background: url(img/shade.png) #ccf bottom repeat-x;
+  background: url('img/shade.png') #ccf bottom repeat-x;
 }
 
 #ucp textarea {
@@ -223,7 +223,7 @@ textarea {
   margin: 10px;
   font-size: 12px;
   padding: 2px 25px;
-  background: url(icons/inboxicons.png) 0 0 no-repeat;
+  background: url('icons/inboxicons.png') 0 0 no-repeat;
 }
 
 #ucp .leftbar h2 {
@@ -250,11 +250,11 @@ textarea {
   background-position: 0 -128px;
 }
 
-/* stylelint-disable block-no-empty */
+/* stylelint-disable block-no-empty,emptyRules */
 #ucp .leftbar,
 .ucp #ucppage {
 }
-/* stylelint-enable block-no-empty */
+/* stylelint-enable block-no-empty,emptyRules */
 
 #ucp .leftbar a {
   display: block;
@@ -270,7 +270,7 @@ textarea {
 
 /* stylelint-disable no-descending-specificity */
 #ucppage {
-  background: url(img/shade.png) repeat-x bottom #fff;
+  background: url('img/shade.png') repeat-x bottom #fff;
   border-left: 1px solid #000;
   margin-left: 170px;
   padding: 20px;
@@ -287,7 +287,7 @@ textarea {
 
 #ucppage .tooltip {
   font-size: 14px;
-  background: url(icons/help.png) no-repeat;
+  background: url('icons/help.png') no-repeat;
   text-indent: -1000px;
   display: inline-block;
   width: 20px;
@@ -349,10 +349,10 @@ textarea {
 }
 
 /* Inbox */
-/* stylelint-disable block-no-empty */
+/* stylelint-disable block-no-empty,emptyRules */
 .inbox {
 }
-/* stylelint-enable block-no-empty */
+/* stylelint-enable block-no-empty,emptyRules */
 
 .inbox .listing {
   border: 1px solid #99c;
@@ -427,7 +427,7 @@ textarea {
 .inbox .switch.flag {
   border: none;
   height: 16px;
-  background: url(icons/flags.png) no-repeat;
+  background: url('icons/flags.png') no-repeat;
   background-position: center 0;
 }
 
@@ -482,12 +482,14 @@ textarea {
   padding: 3px;
   background: #eef;
   border-right: 1px solid #99c;
-  font: 14px Arial, sans-serif;
+  font:
+    14px Arial,
+    sans-serif;
   max-width: 700px;
 }
 
 #shoutbox .shoutform {
-  background: url(img/shade.png) bottom repeat-x #fff;
+  background: url('img/shade.png') bottom repeat-x #fff;
   padding: 20px;
   width: 220px;
   margin-top: 30px;
@@ -611,10 +613,10 @@ textarea {
 }
 
 /* Contact cards */
-/* stylelint-disable no-descending-specificity,block-no-empty */
+/* stylelint-disable no-descending-specificity,block-no-empty,emptyRules */
 .contact-card .content {
 }
-/* stylelint-enable no-descending-specificity,block-no-empty */
+/* stylelint-enable no-descending-specificity,block-no-empty,emptyRules */
 
 /* stylelint-disable no-descending-specificity */
 .contact-card .content a {
@@ -636,12 +638,14 @@ textarea {
   padding: 10px;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .contact-card .contact_details {
   font-size: 12px;
   margin-top: 20px;
 }
 
 /* stylelint-disable no-descending-specificity */
+/* stylelint-disable-next-line selector-class-pattern */
 .contact-card .contact_details a:hover {
   text-decoration: none;
 }
@@ -693,7 +697,7 @@ textarea {
 
 .userprofile .infobox {
   background: #ddd;
-  margin: 20px 5px 10px 5px;
+  margin: 20px 5px 10px;
   border: 1px solid #35485e;
   padding: 5px;
 }
@@ -825,21 +829,25 @@ textarea {
 /* Activity (global) */
 .activity {
   padding: 10px 10px 10px 36px;
-  background: url(icons/activity.png) no-repeat;
+  background: url('icons/activity.png') no-repeat;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .activity.new_post {
   background-position: 0 -64px;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .activity.profile_name_change {
   background-position: 0 -128px;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .activity.profile_comment {
   background-position: 0 -194px;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .activity.buddy_add {
   background-position: 0 -258px;
 }
@@ -855,7 +863,7 @@ textarea {
   height: 200px;
   padding: 10px;
   padding-bottom: 0;
-  background: url(img/jbhead.png) no-repeat;
+  background: url('img/jbhead.png') no-repeat;
   position: relative;
 }
 
@@ -870,11 +878,11 @@ textarea {
   margin: 1px 0 0 1px;
   padding: 11px 20px;
   float: left;
-  background: url(img/seperator.png) no-repeat top right;
+  background: url('img/seperator.png') no-repeat top right;
 }
 
 .navigation ul li.active {
-  background: url(img/nav_blue.png) no-repeat top right;
+  background: url('img/nav_blue.png') no-repeat top right;
 }
 
 /* stylelint-disable no-descending-specificity */
@@ -883,8 +891,9 @@ textarea {
 }
 /* stylelint-enable no-descending-specificity */
 
+/* stylelint-disable-next-line selector-class-pattern */
 .c_bottom {
-  background: url(img/c_shadow_bottom.png);
+  background: url('img/c_shadow_bottom.png');
   height: 9px;
 }
 
@@ -894,7 +903,7 @@ textarea {
 }
 
 .bodyshad {
-  background: url(img/c_shadow.png);
+  background: url('img/c_shadow.png');
   padding: 0 9px;
 }
 
@@ -978,7 +987,7 @@ textarea {
 }
 
 #userbox .settings a {
-  background: url(icons/wrench.png) no-repeat;
+  background: url('icons/wrench.png') no-repeat;
   padding-left: 20px;
   color: #fff;
 }
@@ -995,7 +1004,9 @@ textarea {
 
 /* Breadcrumbs */
 #path {
-  font: 14px Arial, sans-serif;
+  font:
+    14px Arial,
+    sans-serif;
   background: #eef;
   border: 1px solid #99f;
   border-style: solid none;
@@ -1010,7 +1021,7 @@ textarea {
 }
 
 #path ul li {
-  background: url(icons/pathsplitter.png) no-repeat;
+  background: url('icons/pathsplitter.png') no-repeat;
   padding-left: 20px;
   margin-right: 10px;
   float: left;
@@ -1036,35 +1047,41 @@ textarea {
 .boardindex {
   width: 100%;
   border-collapse: collapse;
-  font: 12px Arial, sans-serif;
+  font:
+    12px Arial,
+    sans-serif;
 }
 
 /* stylelint-disable no-descending-specificity */
 .boardindex td {
-  background: url(img/shade.png) bottom repeat-x;
+  background: url('img/shade.png') bottom repeat-x;
   border: 1px solid #99c;
 }
 /* stylelint-enable no-descending-specificity */
 
+/* stylelint-disable-next-line selector-class-pattern */
 .boardindex .last_post {
   background: #e0e0ff;
   padding: 10px;
   border-right: none;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .boardindex .last_post::first-letter {
-  background: url(icons/last.gif) center left no-repeat;
+  background: url('icons/last.gif') center left no-repeat;
   padding-left: 15px;
 }
 
 /* stylelint-disable no-descending-specificity */
+/* stylelint-disable-next-line selector-class-pattern */
 .boardindex .last_post a {
   color: #e77700;
 }
 /* stylelint-enable no-descending-specificity */
 
+/* stylelint-disable-next-line selector-class-pattern */
 .boardindex .f_icon {
-  border-style: solid none solid none;
+  border-style: solid none;
   background-color: #f6f6ff;
   width: 40px;
   vertical-align: middle;
@@ -1086,7 +1103,9 @@ textarea {
 
 /* stylelint-disable no-descending-specificity */
 .boardindex .forum a {
-  font: 14px Arial, sans-serif;
+  font:
+    14px Arial,
+    sans-serif;
 }
 /* stylelint-enable no-descending-specificity */
 
@@ -1100,7 +1119,9 @@ textarea {
 }
 /* stylelint-enable no-descending-specificity */
 
+/* stylelint-disable-next-line selector-class-pattern */
 .boardindex .item_1,
+/* stylelint-disable-next-line selector-class-pattern */
 .boardindex .item_2 {
   font-size: 11px;
   width: 165px;
@@ -1114,17 +1135,20 @@ textarea {
 .forumindex {
   width: 100%;
   border-collapse: collapse;
-  font: 12px Arial, sans-serif;
+  font:
+    12px Arial,
+    sans-serif;
 }
 
 /* stylelint-disable no-descending-specificity */
 .forumindex td {
   padding: 10px;
-  background: url(img/shade.png) bottom repeat-x;
+  background: url('img/shade.png') bottom repeat-x;
   border: 1px solid #99c;
 }
 /* stylelint-enable no-descending-specificity */
 
+/* stylelint-disable-next-line selector-class-pattern */
 .forumindex .f_icon {
   width: 12px;
   padding: 0;
@@ -1143,17 +1167,21 @@ textarea {
 }
 /* stylelint-enable no-descending-specificity */
 
+/* stylelint-disable-next-line selector-class-pattern */
 .forumindex .last_post {
   width: 250px;
   background-color: #e0e0ff;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .forumindex .last_post::first-letter {
-  background: url(icons/last.gif) center left no-repeat;
+  background: url('icons/last.gif') center left no-repeat;
   padding-left: 15px;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .forumindex .item_1,
+/* stylelint-disable-next-line selector-class-pattern */
 .forumindex .item_2 {
   width: 65px;
   text-align: center;
@@ -1162,7 +1190,7 @@ textarea {
 
 /* stylelint-disable no-descending-specificity */
 .forumindex .locked .topic > a:first-child {
-  background: url(icons/lock.png) left no-repeat;
+  background: url('icons/lock.png') left no-repeat;
   padding-left: 18px;
 }
 /* stylelint-enable no-descending-specificity */
@@ -1170,7 +1198,7 @@ textarea {
 /* stylelint-disable no-descending-specificity */
 .forumindex .pinned .topic > a:first-child {
   font-style: italic;
-  background: url(icons/pin.gif) center left no-repeat;
+  background: url('icons/pin.gif') center left no-repeat;
   padding-left: 14px;
 }
 /* stylelint-enable no-descending-specificity */
@@ -1185,9 +1213,9 @@ textarea {
 
 /* stylelint-disable no-descending-specificity */
 .moderate {
-  background: url(icons/posticons.png);
+  background: url('icons/posticons.png');
   text-indent: -1000px;
-  display: inline-block;
+  display: block;
   visibility: hidden;
   width: 16px;
   height: 16px;
@@ -1209,16 +1237,19 @@ textarea {
 .subindex {
   width: 100%;
   border-collapse: collapse;
-  font: 12px Arial, sans-serif;
+  font:
+    12px Arial,
+    sans-serif;
 }
 
 /* stylelint-disable no-descending-specificity */
 .subindex td {
-  background: url(img/shade.png) bottom repeat-x;
+  background: url('img/shade.png') bottom repeat-x;
   border: 1px solid #99c;
 }
 /* stylelint-enable no-descending-specificity */
 
+/* stylelint-disable-next-line selector-class-pattern */
 .subindex .last_post {
   background-color: #e0e0ff;
   padding: 10px;
@@ -1226,18 +1257,21 @@ textarea {
 }
 
 /* stylelint-disable no-descending-specificity */
+/* stylelint-disable-next-line selector-class-pattern */
 .subindex .last_post a {
   color: #e77700;
 }
 /* stylelint-enable no-descending-specificity */
 
+/* stylelint-disable-next-line selector-class-pattern */
 .subindex .last_post::first-letter {
-  background: url(icons/last.gif) center left no-repeat;
+  background: url('icons/last.gif') center left no-repeat;
   padding-left: 15px;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .subindex .f_icon {
-  border-style: solid none solid none;
+  border-style: solid none;
   background-color: #f6f6ff;
   width: 40px;
   vertical-align: middle;
@@ -1253,7 +1287,9 @@ textarea {
 
 /* stylelint-disable no-descending-specificity */
 .subindex .forum a {
-  font: 14px Arial, sans-serif;
+  font:
+    14px Arial,
+    sans-serif;
 }
 /* stylelint-enable no-descending-specificity */
 
@@ -1263,7 +1299,9 @@ textarea {
 }
 /* stylelint-enable no-descending-specificity */
 
+/* stylelint-disable-next-line selector-class-pattern */
 .subindex .item_1,
+/* stylelint-disable-next-line selector-class-pattern */
 .subindex .item_2 {
   font-size: 11px;
   width: 165px;
@@ -1282,7 +1320,7 @@ textarea {
 
 #intopic .topic-post-row {
   clear: both;
-  background: #e0e0ff url(img/shade.png) bottom repeat-x;
+  background: #e0e0ff url('img/shade.png') bottom repeat-x;
 }
 
 #intopic td {
@@ -1325,7 +1363,7 @@ textarea {
   margin-left: 10px;
   padding-left: 18px;
   padding-bottom: 2px;
-  background: url(icons/posticons.png) no-repeat top left;
+  background: url('icons/posticons.png') no-repeat top left;
 }
 
 #intopic textarea {
@@ -1353,10 +1391,12 @@ textarea {
   font-size: smaller;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 #intopic .post .post_content {
   padding: 20px;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 #intopic .post .post_buttons {
   font-size: smaller;
   float: left;
@@ -1364,6 +1404,7 @@ textarea {
   padding: 4px;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 #intopic .post .post_info {
   padding: 4px;
   text-align: right;
@@ -1404,6 +1445,7 @@ textarea {
   opacity: 1;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .postrating_list {
   position: absolute;
   overflow: hidden;
@@ -1412,12 +1454,14 @@ textarea {
   font-size: smaller;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .postrating_list .column {
   width: 90px;
   float: left;
 }
 
 /* stylelint-disable no-descending-specificity */
+/* stylelint-disable-next-line selector-class-pattern */
 .postrating_list ul {
   list-style-type: none;
   padding: 0;
@@ -1503,7 +1547,7 @@ textarea {
 }
 
 #poll .bar {
-  background: url(img/pollbar1.png);
+  background: url('img/pollbar1.png');
   height: 16px;
   display: inline-block;
   border: 1px solid #1234b4;
@@ -1560,7 +1604,7 @@ textarea {
 .postoptions .addpoll {
   padding: 0 20px;
   margin: 10px;
-  background: url(icons/postoptions.png) no-repeat top left;
+  background: url('icons/postoptions.png') no-repeat top left;
 }
 
 .postoptions .uploadbutton {
@@ -1601,11 +1645,11 @@ textarea {
 #polloptions textarea {
   height: 200px;
   width: 100%;
-  background: #fff url(img/shade.png) bottom repeat-x;
+  background: #fff url('img/shade.png') bottom repeat-x;
 }
 
 #qreply textarea {
-  border-style: none none solid none;
+  border-style: none none solid;
 }
 
 /* New Post Form */
@@ -1622,7 +1666,7 @@ textarea {
 /* stylelint-enable no-descending-specificity */
 
 .postform .uploadbutton {
-  background: url(icons/postoptions.png) no-repeat 0 -32px;
+  background: url('icons/postoptions.png') no-repeat 0 -32px;
   padding-left: 16px;
   width: 100px;
   height: 1em;
@@ -1763,7 +1807,7 @@ textarea {
   font-size: smaller;
   position: absolute;
   bottom: 0;
-  background: url(icons/birthday.png) no-repeat;
+  background: url('icons/birthday.png') no-repeat;
   padding-left: 18px;
 }
 
@@ -1774,23 +1818,23 @@ textarea {
  * if you want to remove that border, just remove the background from .box
  * and remove the margin on .box>.title */
 .box {
-  margin: 10px 5px 0 5px;
-  background: url(img/silver_grad.png) repeat-x;
+  margin: 10px 5px 0;
+  background: url('img/silver_grad.png') repeat-x;
   border: 1px solid #000;
 }
 
 /* stylelint-disable no-descending-specificity */
 .box > .title {
   position: relative;
-  margin: 1px 1px 0 1px;
-  background: url(img/boxgrad.png) repeat-x #000;
+  margin: 1px 1px 0;
+  background: url('img/boxgrad.png') repeat-x #000;
   padding: 7px;
   color: #fff;
 }
 /* stylelint-enable no-descending-specificity */
 
 .box > .title .x {
-  background: url(icons/collapse.png);
+  background: url('icons/collapse.png');
   position: absolute;
   top: 0.75em;
   right: 10px;
@@ -1805,6 +1849,7 @@ textarea {
   background-position: 0 -9px;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 .box .content_top {
   display: none;
 }
@@ -1822,6 +1867,7 @@ textarea {
 }
 /* stylelint-enable no-descending-specificity */
 
+/* stylelint-disable-next-line selector-class-pattern */
 .box .content_bottom {
   height: 5px;
   background: #bbd;
@@ -1844,7 +1890,7 @@ textarea {
   left: 0;
   background: #000;
   opacity: 0.5;
-  -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=80)';
+  filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=80)';
 }
 
 #notification,
@@ -1863,7 +1909,7 @@ textarea {
 
 #notification.newmessage {
   padding-left: 60px;
-  background: url(icons/newmessage.png) no-repeat 20px center #fff;
+  background: url('icons/newmessage.png') no-repeat 20px center #fff;
 }
 
 .pages-top .active,
@@ -1883,7 +1929,7 @@ textarea {
 }
 
 .sort {
-  background: url(icons/collapse.png) no-repeat;
+  background: url('icons/collapse.png') no-repeat;
   padding-right: 18px;
   display: inline-block;
   background-position: right -56px;
@@ -1895,7 +1941,7 @@ textarea {
 
 #status {
   display: block;
-  background: url(icons/status.png) top no-repeat;
+  background: url('icons/status.png') top no-repeat;
   width: 16px;
   height: 16px;
   position: absolute;
@@ -1947,7 +1993,7 @@ textarea {
 /* stylelint-enable no-descending-specificity */
 
 #statusers .idle {
-  background: url(icons/clock.png) no-repeat 0 0;
+  background: url('icons/clock.png') no-repeat 0 0;
   padding-left: 18px;
   font-style: italic;
 }
@@ -1955,7 +2001,7 @@ textarea {
 /* stylelint-disable no-descending-specificity */
 #stats .content {
   padding: 20px;
-  background: url(img/shade.png) bottom repeat-x #fff;
+  background: url('img/shade.png') bottom repeat-x #fff;
 }
 /* stylelint-enable no-descending-specificity */
 
@@ -1968,7 +2014,7 @@ textarea {
 #stats .stats {
   margin-top: 10px;
   padding: 10px 25px;
-  background: url(icons/boardstats.png) left center no-repeat;
+  background: url('icons/boardstats.png') left center no-repeat;
   border-top: 1px solid #ccf;
 }
 
@@ -2014,7 +2060,7 @@ textarea {
 
 /* Member/Group Specific */
 a.birthday {
-  background: url(icons/birthday.png) no-repeat 2px 2px;
+  background: url('icons/birthday.png') no-repeat 2px 2px;
   padding-left: 18px;
 }
 
@@ -2030,7 +2076,7 @@ a.mgroup4 {
 /* BBcodes */
 .quote {
   border: 1px solid #aaf;
-  background: url(icons/quote.png) top right no-repeat #e0e0ff;
+  background: url('icons/quote.png') top right no-repeat #e0e0ff;
   padding: 10px;
 }
 
@@ -2077,7 +2123,7 @@ a.mgroup4 {
 /* Contact icons */
 /* stylelint-disable no-descending-specificity */
 .contact {
-  background: url(icons/contact.png) no-repeat;
+  background: url('icons/contact.png') no-repeat;
   padding-left: 20px;
   padding-top: 3px;
 }
@@ -2133,7 +2179,7 @@ a.mgroup4 {
 /* Social icons */
 .social {
   display: inline-block;
-  background: url(icons/social.png) no-repeat;
+  background: url('icons/social.png') no-repeat;
   width: 16px;
   height: 16px;
   overflow: hidden;
@@ -2156,7 +2202,7 @@ a.mgroup4 {
 
 /* stylelint-disable no-descending-specificity */
 .tooltip td {
-  background: url(img/tooltip.png);
+  background: url('img/tooltip.png');
 }
 /* stylelint-enable no-descending-specificity */
 
@@ -2221,7 +2267,7 @@ a.mgroup4 {
   display: inline-block;
   width: 16px;
   height: 16px;
-  background: url(icons/check_x.png) top center;
+  background: url('icons/check_x.png') top center;
 }
 
 #validname.valid {
