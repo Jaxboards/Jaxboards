@@ -1,9 +1,5 @@
 {
-  "config": {
-    "platform": {
-      "php": "5.3.7"
-    }
-  },
+  "config": {},
   "scripts": {
     "lint": [
       "@phpcs"
@@ -14,11 +10,10 @@
   "require-dev": {
     "squizlabs/php_codesniffer": "^2.9",
     "phpcompatibility/php-compatibility": "^8.2",
-    "dealerdirect/phpcodesniffer-composer-installer": "^0.4.4",
     "roave/security-advisories": "dev-master"
   },
   "require": {
-    "php": ">=5.3.7",
+    "php": "^8.3",
     "ircmaxell/password-compat": "^1.0"
   }
 }

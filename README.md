@@ -15,7 +15,7 @@ It is not recommended to run Jaxboards in production.
 
 ### Prerequisites
 
-- PHP >=8
+- PHP 8.3+
 - MySQL>=5.5.3
 - TLS certificate (due to hardcoded URLs in codebase)
 
