@@ -25,6 +25,7 @@ class ModControls {
           tids = `${a[1]}`.split(',');
         }
         const tl = tids ? tids.length : 0;
+        const pluralPosts = pids.length === 1 ? '' : 's';
         const html =
           `${
             "<form method='post' data-ajax-form='true'>" +
@@ -53,7 +54,7 @@ class ModControls {
                   "<option value='delete'>Delete</option>" +
                   "<option value='move'>Move</option>" +
                   '</select> &nbsp; &nbsp; <strong>'
-                }${pl}</strong> post${pids.length > 1 ? 's' : ''}`
+                }${pl}</strong> post${pluralPosts}`
               : ''
           }${
             pl && tl ? '<br />' : ' &nbsp; &nbsp; '
