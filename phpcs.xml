@@ -38,8 +38,8 @@
     <exclude name="Squiz.Commenting.BlockComment.NotCapital" />
     <exclude name="Squiz.Commenting.BlockComment.InvalidEndChar" />
   </rule>
-  <!-- Make sure this works with PHP 5.3 -->
-  <config name="testVersion" value="5.3-" />
+  <!-- Make sure this works with PHP 8.3+ -->
+  <config name="testVersion" value="8.3-" />
   <rule ref="PHPCompatibility">
     <!-- Exclude polyfilled password_hash related functions from compatibility check -->
     <exclude name="PHPCompatibility.PHP.NewConstants.password_bcryptFound" />
