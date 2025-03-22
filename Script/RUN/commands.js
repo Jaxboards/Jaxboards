@@ -43,7 +43,7 @@ export default {
     let selector = sel;
     const paths = Array.from(document.querySelectorAll('.path'));
     if (selector === 'path' && paths.length > 1) {
-      paths.forEach(path => {
+      paths.forEach((path) => {
         path.innerHTML = html;
         gracefulDegrade(path);
       });
@@ -132,7 +132,7 @@ export default {
           tick = ticks[x];
           new Animation(tick, 30, 500)
             .add('opacity', '1', '0')
-            .then(el => {
+            .then((el) => {
               el.parentNode.removeChild(el);
             })
             .play();
@@ -153,7 +153,7 @@ export default {
       const notify = webkitNotifications.createNotification(
         '',
         `${fromName} says:`,
-        message
+        message,
       );
       notify.show();
       notify.onclick = () => {
@@ -164,10 +164,11 @@ export default {
     if (!messagesContainer) {
       const imWindow = new Window();
       imWindow.title = `${fromName} <a href="#" onclick="IMWindow.menu(event,${fromId});return false;">&rsaquo;</a>`;
-      imWindow.content = "<div class='ims'></div><div class='offline'>This user may be offline</div><div><form data-ajax-form='resetOnSubmit' method='post'><input type='hidden' name='im_uid' value='%s' /><input type='text' name='im_im' autocomplete='off' /><input type='hidden' name='act' value='blank' /></form></div>".replace(
-        /%s/g,
-        fromId
-      );
+      imWindow.content =
+        "<div class='ims'></div><div class='offline'>This user may be offline</div><div><form data-ajax-form='resetOnSubmit' method='post'><input type='hidden' name='im_uid' value='%s' /><input type='text' name='im_im' autocomplete='off' /><input type='hidden' name='act' value='blank' /></form></div>".replace(
+          /%s/g,
+          fromId,
+        );
       imWindow.className = 'im';
       imWindow.resize = '.ims';
       imWindow.animate = true;
@@ -199,10 +200,9 @@ export default {
       if (!fromMe) {
         document.querySelector(`#im_${fromId}`).classList.remove('offline');
       }
-      d.innerHTML = `<a href='?act=vu${fromMe ||
-        parseInt(fromId, 10)}' class='name'>${fromName}</a> ${
-        !isAction ? ': ' : ''
-      }${message}`;
+      d.innerHTML = `<a href='?act=vu${
+        fromMe || parseInt(fromId, 10)
+      }' class='name'>${fromName}</a> ${!isAction ? ': ' : ''}${message}`;
       d.dataset.timestamp = timestamp;
       const test =
         messagesContainer.scrollTop >
@@ -287,7 +287,7 @@ export default {
   setoffline(a) {
     const statusers = document.querySelector('#statusers');
     const ids = a[0].split(',');
-    ids.forEach(id => {
+    ids.forEach((id) => {
       const link = document.querySelector(`#statusers .user${id}`);
       if (link) {
         statusers.removeChild(link);
@@ -307,7 +307,7 @@ export default {
         pos = getCoordinates(el);
         scrollTo(pos.y);
       },
-      wait ? 10 : 1000
+      wait ? 10 : 1000,
     );
     return true;
   },
@@ -370,5 +370,5 @@ export default {
     }
     prdiv.innerHTML = html;
     new Animation(prdiv).add('height', '0px', '200px').play();
-  }
+  },
 };

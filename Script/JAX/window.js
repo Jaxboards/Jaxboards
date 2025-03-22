@@ -16,7 +16,7 @@ class Window {
       className: '',
       pos: 'center',
       zIndex: getHighestZIndex(),
-      ...options
+      ...options,
     });
   }
 
@@ -66,7 +66,7 @@ class Window {
     const close = () => this.close();
     windowContainer
       .querySelectorAll('[data-window-close]')
-      .forEach(closeElement => {
+      .forEach((closeElement) => {
         closeElement.addEventListener('click', close);
       });
 
@@ -101,7 +101,7 @@ class Window {
           },
           ondrop() {
             rsize.style.left = `${windowContainer.clientWidth - 16}px`;
-          }
+          },
         })
         .apply(rsize);
       targ.style.width = `${windowContainer.clientWidth}px`;
@@ -117,7 +117,7 @@ class Window {
         () => {
           this.setPosition(pos);
         },
-        2000
+        2000,
       );
     } else this.setPosition(pos);
 
@@ -128,7 +128,7 @@ class Window {
         0,
         0,
         document.documentElement.clientWidth - 50,
-        document.documentElement.clientHeight - 50
+        document.documentElement.clientHeight - 50,
       )
       .apply(windowContainer, titleBar);
     windowContainer.close = () => this.close();
@@ -187,11 +187,11 @@ class Window {
       case 'b':
         y = cH - y - d1.clientHeight;
         break;
-      default:
       case 'c':
         y = (cH - d1.clientHeight) / 2;
         x = (cW - d1.clientWidth) / 2;
         break;
+      default:
     }
     x = Math.floor(x);
     y = Math.floor(y);

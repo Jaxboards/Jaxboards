@@ -29,7 +29,7 @@ export const monthsShort = [
   'Sep',
   'Oct',
   'Nov',
-  'Dec'
+  'Dec',
 ];
 export const daysShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -45,7 +45,7 @@ export const months = [
   'September',
   'October',
   'November',
-  'December'
+  'December',
 ];
 
 export function date(gmtUnixTimestamp) {
@@ -55,7 +55,7 @@ export function date(gmtUnixTimestamp) {
   yday.setTime(yday - 1000 * 60 * 60 * 24);
 
   const serverAsLocalDate = new Date(
-    (gmtUnixTimestamp - localTimeNow.getTimezoneOffset() * 60) * 1000
+    (gmtUnixTimestamp - localTimeNow.getTimezoneOffset() * 60) * 1000,
   );
 
   const deltaInSeconds = (localTimeNow - serverAsLocalDate) / 1000;
@@ -79,7 +79,7 @@ export function date(gmtUnixTimestamp) {
   }
 
   return `${monthsShort[serverAsLocalDate.getMonth()]} ${ordsuffix(
-    serverAsLocalDate.getDate()
+    serverAsLocalDate.getDate(),
   )}, ${serverAsLocalDate.getFullYear()} @ ${timeAsAMPM(serverAsLocalDate)}`;
 }
 

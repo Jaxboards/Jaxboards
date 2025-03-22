@@ -21,14 +21,15 @@ function buildQueryString(keys, values) {
       .map(
         (key, index) =>
           `${encodeURIComponent(key)}=${encodeURIComponent(
-            values[index] || ''
-          )}`
+            values[index] || '',
+          )}`,
       )
       .join('&');
   }
   return Object.keys(keys)
     .map(
-      key => `${encodeURIComponent(key)}=${encodeURIComponent(keys[key] || '')}`
+      (key) =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(keys[key] || '')}`,
     )
     .join('&');
 }
@@ -39,13 +40,13 @@ class Ajax {
       readyState: 4,
       callback() {},
       method: 'POST',
-      ...s
+      ...s,
     };
   }
 
   load(
     url,
-    { callback, data, method = this.setup.method, requestType = 1 } = {}
+    { callback, data, method = this.setup.method, requestType = 1 } = {},
   ) {
     // requestType is an enum (1=update, 2=load new)
     let sendData = null;
@@ -75,7 +76,7 @@ class Ajax {
     if (method) {
       request.setRequestHeader(
         'Content-Type',
-        'application/x-www-form-urlencoded'
+        'application/x-www-form-urlencoded',
       );
     }
     request.setRequestHeader('X-JSACCESS', requestType);

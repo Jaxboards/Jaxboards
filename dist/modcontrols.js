@@ -24,8 +24,6 @@
       case 40:
         e.DOWN = true;
         break;
-      default:
-        break;
     }
     if (typeof e.srcElement === 'undefined') e.srcElement = e.target;
     if (typeof e.pageY === 'undefined') {
@@ -73,7 +71,7 @@
       yh: y + h,
       xw: x + w,
       w,
-      h
+      h,
     };
   }
 
@@ -117,7 +115,7 @@
     link.style.height = `${ih}px`;
     link.nw = nw;
     link.nh = nh;
-    link.onmousemove = event => {
+    link.onmousemove = (event) => {
       const o = getCoordinates(link);
       const e = Event$1(event);
       link.scrollLeft = ((e.pageX - o.x) / o.w) * (link.nw - o.w) || 0;
@@ -148,8 +146,8 @@
       return;
     }
     Array.from(imgs)
-      .filter(img => !img.madeResized)
-      .forEach(img => {
+      .filter((img) => !img.madeResized)
+      .forEach((img) => {
         let p = 1;
         let p2 = 1;
         const { naturalWidth, naturalHeight } = img;
@@ -170,18 +168,15 @@
   }
 
   function stripHTML(html) {
-    return html
-      .valueOf()
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
+    return html.valueOf().replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
-  function tooltip(el$$1) {
+  function toolTip(el) {
     let tooltip = document.getElementById('tooltip_thingy');
-    const pos = getCoordinates(el$$1);
-    const title = stripHTML(el$$1.title);
+    const pos = getCoordinates(el);
+    const title = stripHTML(el.title);
     // Prevent the browser from showing its own title
-    el$$1.title = '';
+    el.title = '';
     if (!title) return;
     if (!tooltip) {
       tooltip = document.createElement('table');
@@ -219,8 +214,8 @@
     tooltip.style.top = `${pos.y - tooltip.clientHeight}px`;
     tooltip.style.left = `${pos.x}px`;
     tooltip.style.zIndex = getHighestZIndex();
-    el$$1.onmouseout = () => {
-      el$$1.title = title;
+    el.onmouseout = () => {
+      el.title = title;
       document.querySelector('#tooltip_thingy').style.display = 'none';
     };
   }
@@ -289,14 +284,15 @@
         .map(
           (key, index) =>
             `${encodeURIComponent(key)}=${encodeURIComponent(
-            values[index] || ''
-          )}`
+            values[index] || '',
+          )}`,
         )
         .join('&');
     }
     return Object.keys(keys)
       .map(
-        key => `${encodeURIComponent(key)}=${encodeURIComponent(keys[key] || '')}`
+        (key) =>
+          `${encodeURIComponent(key)}=${encodeURIComponent(keys[key] || '')}`,
       )
       .join('&');
   }
@@ -307,13 +303,13 @@
         readyState: 4,
         callback() {},
         method: 'POST',
-        ...s
+        ...s,
       };
     }
 
     load(
       url,
-      { callback, data, method = this.setup.method, requestType = 1 } = {}
+      { callback, data, method = this.setup.method, requestType = 1 } = {},
     ) {
       // requestType is an enum (1=update, 2=load new)
       let sendData = null;
@@ -343,7 +339,7 @@
       if (method) {
         request.setRequestHeader(
           'Content-Type',
-          'application/x-www-form-urlencoded'
+          'application/x-www-form-urlencoded',
         );
       }
       request.setRequestHeader('X-JSACCESS', requestType);
@@ -372,7 +368,7 @@
     mobile: !!userAgent.match(/mobile/i),
     n3ds: !!userAgent.match(/nintendo 3ds/),
     firefox: !!userAgent.match(/firefox/i),
-    safari: !!userAgent.match(/safari/i)
+    safari: !!userAgent.match(/safari/i),
   };
 
   function ordsuffix(a) {
@@ -406,7 +402,7 @@
     'Sep',
     'Oct',
     'Nov',
-    'Dec'
+    'Dec',
   ];
   const daysShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -422,7 +418,7 @@
     'September',
     'October',
     'November',
-    'December'
+    'December',
   ];
 
   function date(gmtUnixTimestamp) {
@@ -431,8 +427,9 @@
     const yday = new Date();
     yday.setTime(yday - 1000 * 60 * 60 * 24);
 
-    const serverAsLocalDate = new Date(0);
-    serverAsLocalDate.setUTCSeconds(gmtUnixTimestamp);
+    const serverAsLocalDate = new Date(
+      (gmtUnixTimestamp - localTimeNow.getTimezoneOffset() * 60) * 1000,
+    );
 
     const deltaInSeconds = (localTimeNow - serverAsLocalDate) / 1000;
 
@@ -455,7 +452,7 @@
     }
 
     return `${monthsShort[serverAsLocalDate.getMonth()]} ${ordsuffix(
-    serverAsLocalDate.getDate()
+    serverAsLocalDate.getDate(),
   )}, ${serverAsLocalDate.getFullYear()} @ ${timeAsAMPM(serverAsLocalDate)}`;
   }
 
@@ -494,7 +491,6 @@
   function onImagesLoaded(imgs, callback, timeout) {
     const dbj = {
       imgs: [],
-      imgsloaded: 1,
       called: false,
       force() {
         if (!dbj.called) callback();
@@ -511,19 +507,18 @@
           callback();
           dbj.called = true;
         }
-      }
+      },
     };
-    Array.from(imgs).forEach(img => {
+    Array.from(imgs).forEach((img) => {
       if (dbj.imgs.includes(img.src) === false && !img.loaded) {
         dbj.imgs.push(img.src);
         img.addEventListener('load', dbj.callback);
-        img.src = img.src;
       }
     });
     if (!imgs.length) {
       callback();
       dbj.called = true;
-    } else if (timeout) {
+    } else {
       setTimeout(dbj.force, timeout);
     }
   }
@@ -534,18 +529,18 @@
     if (!dates) {
       return;
     }
-    dates.forEach(el$$1 => {
-      const timestamp = parseInt(el$$1.title, 10);
-      const parsed = el$$1.classList.contains('smalldate')
+    dates.forEach((el) => {
+      const timestamp = parseInt(el.title, 10);
+      const parsed = el.classList.contains('smalldate')
         ? smalldate(timestamp)
         : date(timestamp);
-      if (parsed !== el$$1.innerHTML) {
-        el$$1.innerHTML = parsed;
+      if (parsed !== el.innerHTML) {
+        el.innerHTML = parsed;
       }
     });
-    dateTitles.forEach(el$$1 => {
-      if (!el$$1.title) {
-        el$$1.title = smalldate(el$$1.dataset.timestamp);
+    dateTitles.forEach((el) => {
+      if (!el.title) {
+        el.title = smalldate(el.dataset.timestamp);
       }
     });
   }
@@ -559,7 +554,7 @@
         top: 0,
         height: `${dE.clientHeight}px`,
         width: `${dE.clientWidth}px`,
-        display: show ? '' : 'none'
+        display: show ? '' : 'none',
       });
     } else {
       if (!show) return;
@@ -567,7 +562,7 @@
       ol.id = 'overlay';
       assign(ol.style, {
         height: `${dE.clientHeight}0px`,
-        width: `${dE.clientWidth}0px`
+        width: `${dE.clientWidth}0px`,
       });
       dE.appendChild(ol);
     }
@@ -611,8 +606,8 @@
         throw new Error('Expected element to have data-autocomplete-output');
       }
 
-      element.addEventListener('keyup', event => this.keyUp(event));
-      element.addEventListener('keydown', event => {
+      element.addEventListener('keyup', (event) => this.keyUp(event));
+      element.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
           event.preventDefault();
         }
@@ -624,12 +619,12 @@
       let resultsContainer = document.querySelector('#autocomplete');
       if (!resultsContainer) {
         resultsContainer = assign(document.createElement('div'), {
-          id: 'autocomplete'
+          id: 'autocomplete',
         });
         // TODO: move static properties to CSS
         assign(resultsContainer.style, {
           position: 'absolute',
-          zIndex: getHighestZIndex()
+          zIndex: getHighestZIndex(),
         });
         document.body.appendChild(resultsContainer);
       }
@@ -638,7 +633,7 @@
       assign(resultsContainer.style, {
         top: `${coords.yh}px`,
         left: `${coords.x}px`,
-        width: `${coords.w}px`
+        width: `${coords.w}px`,
       });
 
       return resultsContainer;
@@ -647,8 +642,8 @@
     keyUp(event) {
       const resultsContainer = this.getResultsContainer();
       const results = Array.from(resultsContainer.querySelectorAll('div'));
-      const selectedIndex = results.findIndex(el$$1 =>
-        el$$1.classList.contains('selected')
+      const selectedIndex = results.findIndex((el) =>
+        el.classList.contains('selected'),
       );
 
       // Handle arrow key selection
@@ -688,7 +683,7 @@
       const searchTerm = encodeURIComponent(this.element.value);
       const queryParams = `act=${this.action}&term=${searchTerm}`;
       new Ajax().load(`${relativePath}misc/listloader.php?${queryParams}`, {
-        callback: xml => {
+        callback: (xml) => {
           const data = JSON.parse(xml.responseText);
           resultsContainer.innerHTML = '';
           if (!data.length) {
@@ -712,7 +707,7 @@
               resultsContainer.appendChild(div);
             });
           }
-        }
+        },
       });
     }
   }
@@ -782,8 +777,8 @@
   }
 
   class Animation {
-    constructor(el$$1, steps, delay, loop) {
-      this.el = el$$1;
+    constructor(el, steps, delay, loop) {
+      this.el = el;
       this.steps = steps || 30;
       this.delay = delay || 20;
       this.curLineup = 0;
@@ -800,7 +795,7 @@
     morph(from, percent, to) {
       if (Array.isArray(from) && from.length === to.length) {
         return from.map((value, i) =>
-          Math.round(this.morph(value, percent, to[i]))
+          Math.round(this.morph(value, percent, to[i])),
         );
       }
       return (to - from) * percent + from;
@@ -814,7 +809,7 @@
         curL[0](this.el);
         sc = this.steps;
       } else {
-        curL.forEach(keyFrame => {
+        curL.forEach((keyFrame) => {
           let toValue = this.morph(keyFrame[1], sc / this.steps, keyFrame[2]);
           if (keyFrame[0].match(/color/i)) {
             toValue = `#${new Color(toValue).toHex()}`;
@@ -849,7 +844,7 @@
         fromParsed,
         t[1],
         t[0],
-        t[2]
+        t[2],
       ]);
       return this;
     }
@@ -908,8 +903,9 @@
           .play();
       } else {
         if (!fh) {
-          fh = `${collapseContent.clientHeight ||
-          collapseContent.offsetHeight}px`;
+          fh = `${
+          collapseContent.clientHeight || collapseContent.offsetHeight
+        }px`;
           collapseContent.dataset.fullHeight = fh;
         }
         new Animation(collapseContent, 5, 10, 0)
@@ -945,7 +941,7 @@
       let picker = document.querySelector('#datepicker');
       if (!picker) {
         picker = assign(document.createElement('table'), {
-          id: 'datepicker'
+          id: 'datepicker',
         });
         document.body.appendChild(picker);
         picker.style.display = 'none';
@@ -961,12 +957,12 @@
         zIndex: getHighestZIndex(),
         position: 'absolute',
         top: `${c.yh}px`,
-        left: `${c.x}px`
+        left: `${c.x}px`,
       });
 
       const [month, day, year] = this.element.value
         .split('/')
-        .map(s => parseInt(s, 10));
+        .map((s) => parseInt(s, 10));
       if (month && day && year) {
         this.selectedDate = [year, month - 1, day];
       } else this.selectedDate = undefined;
@@ -980,16 +976,16 @@
 
     // month should be 0 for jan, 11 for dec
     generate(iyear, imonth, iday) {
-      let date$$1 = new Date();
+      let date = new Date();
       const dp = document.querySelector('#datepicker');
       let row;
       let cell;
       let [year, month, day] = [iyear, imonth, iday];
       // date here is today
       if (year === undefined) {
-        year = date$$1.getFullYear();
-        month = date$$1.getMonth();
-        day = date$$1.getDate();
+        year = date.getFullYear();
+        month = date.getMonth();
+        day = date.getDate();
         this.selectedDate = [year, month, day];
       }
 
@@ -1008,7 +1004,7 @@
       const numdaysinmonth = new Date(year, month + 1, 0).getDate();
       const first = new Date(year, month, 1).getDay();
 
-      date$$1 = new Date(year, month, day);
+      date = new Date(year, month, day);
       // generate the table now
       dp.innerHTML = ''; // clear
 
@@ -1171,7 +1167,7 @@
 
     constructor(element) {
       super(element);
-      element.addEventListener('wheel', event => this.wheel(event));
+      element.addEventListener('wheel', (event) => this.wheel(event));
     }
 
     wheel(event) {
@@ -1189,7 +1185,7 @@
         for (let x = 0; x < between; x += 1) {
           pages[x + 1].href = pages[x + 1].href.replace(
             /\d+$/,
-            x + startPage + direction
+            x + startPage + direction,
           );
           pages[x + 1].innerHTML = startPage + x + direction;
         }
@@ -1209,7 +1205,8 @@
 
       const button = assign(document.createElement('button'), {
         type: 'button',
-        className: element.className
+        title: element.className,
+        className: element.className,
       });
 
       const toggle = () => {
@@ -1234,7 +1231,7 @@
 
     constructor(element) {
       super(element);
-      element.addEventListener('click', event => this.click(event));
+      element.addEventListener('click', (event) => this.click(event));
     }
 
     click(event) {
@@ -1266,7 +1263,7 @@
     // images and emojis
     bbcode = bbcode.replace(
       /<img.*?src=["']?([^'"]+)["'](?: alt=["']?([^"']+)["'])?[^>]*\/?>/g,
-      (whole, src, alt) => alt || `[img]${src}[/img]`
+      (whole, src, alt) => alt || `[img]${src}[/img]`,
     );
     bbcode = bbcode.replace(
       nestedTagRegex,
@@ -1280,7 +1277,7 @@
           /(color|size|style|href|src)=(['"]?)(.*?)\2/gi,
           (_, attr, q, value) => {
             att[attr] = value;
-          }
+          },
         );
         const { style = '' } = att;
 
@@ -1290,7 +1287,7 @@
         }
         if (style.match(/background(-color)?:[^;]+(rgb\([^)]+\)|#\s+)/i)) {
           innerhtml = `[bgcolor=#${new Color(
-          RegExp.$2
+          RegExp.$2,
         ).toHex()}]${innerhtml}[/bgcolor]`;
         }
         if (style.match(/text-align: ?(right|center|left)/i)) {
@@ -1344,7 +1341,7 @@
           innerhtml = `\n${innerhtml}`;
         }
         return innerhtml;
-      }
+      },
     );
     return bbcode
       .replace(/&amp;/g, '&')
@@ -1365,31 +1362,31 @@
     html = html.replace(/\[img\]([^'"[]+)\[\/img\]/gi, '<img src="$1">');
     html = html.replace(
       /\[color=([^\]]+)\](.*?)\[\/color\]/gi,
-      '<span style="color:$1">$2</span>'
+      '<span style="color:$1">$2</span>',
     );
     html = html.replace(
       /\[size=([^\]]+)\](.*?)\[\/size\]/gi,
-      '<span style="font-size:$1">$2</span>'
+      '<span style="font-size:$1">$2</span>',
     );
     html = html.replace(
       /\[url=([^\]]+)\](.*?)\[\/url\]/gi,
-      '<a href="$1">$2</a>'
+      '<a href="$1">$2</a>',
     );
     html = html.replace(
       /\[bgcolor=([^\]]+)\](.*?)\[\/bgcolor\]/gi,
-      '<span style="backgroun-color:$1">$2</span>'
+      '<span style="backgroun-color:$1">$2</span>',
     );
     html = html.replace(/\[h(\d)\](.*?)\[\/h\1\]/g, '<h$1>$2</h$1>');
     html = html.replace(
       /\[align=(left|right|center)\](.*?)\[\/align\]/g,
-      '<div style="text-align:$1">$2</div>'
+      '<div style="text-align:$1">$2</div>',
     );
-    html = html.replace(/\[(ul|ol)\]([\w\W]*?)\[\/\1\]/gi, match => {
+    html = html.replace(/\[(ul|ol)\]([\w\W]*?)\[\/\1\]/gi, (match) => {
       const tag = match[1];
       const listItems = match[2].split(/([\r\n]+|^)\*/);
       const lis = listItems
-        .filter(text => text.trim())
-        .map(text => `<li>${text}</li>`)
+        .filter((text) => text.trim())
+        .map((text) => `<li>${text}</li>`)
         .join('');
       return `<${tag}>${lis}</${tag}>`;
     });
@@ -1398,9 +1395,11 @@
   }
 
   /* global globalsettings */
+  /* eslint-disable no-script-url, no-alert */
+
 
   const URL_REGEX = /^(ht|f)tps?:\/\/[\w.\-%&?=/]+$/;
-  const isURL = text => URL_REGEX.test(text);
+  const isURL = (text) => URL_REGEX.test(text);
 
   class Editor extends Component {
     static get selector() {
@@ -1479,7 +1478,7 @@
         'insertorderedlist',
         'insertunorderedlist',
         'c_smileys',
-        'c_switcheditmode'
+        'c_switcheditmode',
       ];
 
       const cmddesc = [
@@ -1502,7 +1501,7 @@
         'Create Ordered List',
         'Create Unordered List',
         'Insert Emoticon',
-        'Switch editor mode'
+        'Switch editor mode',
       ];
 
       cmds.forEach((cmd, i) => {
@@ -1511,7 +1510,7 @@
         a.title = cmddesc[i];
         a.href = 'javascript:void(0)';
         a.unselectable = 'on';
-        a.onclick = event => this.editbarCommand(event, cmd);
+        a.onclick = (event) => this.editbarCommand(event, cmd);
         this.editbar.appendChild(a);
       });
     }
@@ -1540,7 +1539,7 @@
       const emotewin = this.emoteWindow;
       if (!emotewin) {
         new Ajax().load('/misc/emotes.php?json', {
-          callback: response => this.createEmoteWindow(response, { x, y })
+          callback: (response) => this.createEmoteWindow(response, { x, y }),
         });
         return;
       }
@@ -1600,7 +1599,7 @@
         '#0000FF',
         '#FFFF00',
         '#00FFFF',
-        '#FF00FF'
+        '#FF00FF',
       ];
       const l = colors.length;
       const sq = Math.ceil(Math.sqrt(l));
@@ -1610,7 +1609,7 @@
         borderCollapse: 'collapse',
         position: 'absolute',
         top: `${posy}px`,
-        left: `${posx}px`
+        left: `${posx}px`,
       });
 
       for (let y = 0; y < sq; y += 1) {
@@ -1633,7 +1632,7 @@
             backgroundColor: color,
             height: '20px',
             width: '20px',
-            margin: 0
+            margin: 0,
           });
         }
       }
@@ -1781,7 +1780,7 @@
       }
       return this.element.value.substring(
         this.element.selectionStart,
-        this.element.selectionEnd
+        this.element.selectionEnd,
       );
     }
 
@@ -1822,35 +1821,35 @@
 
     start(event, t, handle) {
       const e = new Event$1(event).cancel().stopBubbling();
-      const el$$1 = t || event.target;
-      const s = getComputedStyle(el$$1);
+      const el = t || event.target;
+      const s = getComputedStyle(el);
       const highz = getHighestZIndex();
-      if (this.noChild && (e.srcElement || e.target) !== (handle || el$$1)) {
+      if (this.noChild && (e.srcElement || e.target) !== (handle || el)) {
         return;
       }
-      if (el$$1.getAttribute('draggable') === 'false') {
+      if (el.getAttribute('draggable') === 'false') {
         return;
       }
       this.sess = {
-        el: el$$1,
+        el,
         mx: parseInt(e.pageX, 10),
         my: parseInt(e.pageY, 10),
         ex: parseInt(s.left, 10) || 0,
         ey: parseInt(s.top, 10) || 0,
         info: {},
-        bc: getCoordinates(el$$1),
-        zIndex: el$$1.style.zIndex
+        bc: getCoordinates(el),
+        zIndex: el.style.zIndex,
       };
       if (!this.sess.zIndex || Number(this.sess.zIndex) < highz - 1) {
-        el$$1.style.zIndex = highz;
+        el.style.zIndex = highz;
       }
       tryInvoke(this.onstart, {
         ...this.sess,
-        droptarget: this.testDrops(this.sess.mx, this.sess.my)
+        droptarget: this.testDrops(this.sess.mx, this.sess.my),
       });
       this.boundEvents = {
-        drag: event2 => this.drag(event2),
-        drop: event2 => this.drop(event2)
+        drag: (event2) => this.drag(event2),
+        drop: (event2) => this.drop(event2),
       };
       document.addEventListener('mousemove', this.boundEvents.drag);
       document.addEventListener('mouseup', this.boundEvents.drop);
@@ -1894,7 +1893,7 @@
         dx: mx - (sess.mx || mx),
         dy: my - (sess.my || my),
         sx: this.sess.ex,
-        sy: this.sess.ey
+        sy: this.sess.ey,
       };
       this.sess.info = sess;
       tryInvoke(this.ondrag, sess);
@@ -1932,7 +1931,7 @@
       if (!droppables.length) {
         return r;
       }
-      droppables.forEach(droppable => {
+      droppables.forEach((droppable) => {
         if (droppable === this.sess.el || isChildOf(droppable, this.sess.el)) {
           return;
         }
@@ -1970,20 +1969,20 @@
       return this;
     }
 
-    apply(el$$1, t) {
-      if (Array.isArray(el$$1)) {
-        el$$1.forEach(el2 => this.apply(el2));
+    apply(el, t) {
+      if (Array.isArray(el)) {
+        el.forEach((el2) => this.apply(el2));
         return this;
       }
 
-      let pos = getComputedStyle(el$$1, '');
+      let pos = getComputedStyle(el, '');
       pos = pos.position;
       if (!pos || pos === 'static') {
-        el$$1.style.position = 'relative';
+        el.style.position = 'relative';
       }
-      (t || el$$1).onmousedown = t
-        ? e => this.start(e, el$$1, t)
-        : e => this.start(e, el$$1);
+      (t || el).onmousedown = t
+        ? (e) => this.start(e, el, t)
+        : (e) => this.start(e, el);
       return this;
     }
 
@@ -1997,9 +1996,9 @@
       return this;
     }
 
-    reset(el$$1 = this.sess.el) {
-      el$$1.style.top = 0;
-      el$$1.style.left = 0;
+    reset(el = this.sess.el) {
+      el.style.top = 0;
+      el.style.left = 0;
       return this;
     }
   }
@@ -2017,7 +2016,7 @@
         className: '',
         pos: 'center',
         zIndex: getHighestZIndex(),
-        ...options
+        ...options,
       });
     }
 
@@ -2067,7 +2066,7 @@
       const close = () => this.close();
       windowContainer
         .querySelectorAll('[data-window-close]')
-        .forEach(closeElement => {
+        .forEach((closeElement) => {
           closeElement.addEventListener('click', close);
         });
 
@@ -2102,7 +2101,7 @@
             },
             ondrop() {
               rsize.style.left = `${windowContainer.clientWidth - 16}px`;
-            }
+            },
           })
           .apply(rsize);
         targ.style.width = `${windowContainer.clientWidth}px`;
@@ -2118,7 +2117,7 @@
           () => {
             this.setPosition(pos);
           },
-          2000
+          2000,
         );
       } else this.setPosition(pos);
 
@@ -2129,7 +2128,7 @@
           0,
           0,
           document.documentElement.clientWidth - 50,
-          document.documentElement.clientHeight - 50
+          document.documentElement.clientHeight - 50,
         )
         .apply(windowContainer, titleBar);
       windowContainer.close = () => this.close();
@@ -2188,7 +2187,6 @@
         case 'b':
           y = cH - y - d1.clientHeight;
           break;
-        default:
         case 'c':
           y = (cH - d1.clientHeight) / 2;
           x = (cW - d1.clientWidth) / 2;
@@ -2241,16 +2239,16 @@
       const inlineLink = element.querySelector('a.inline');
       const movie = element.querySelector('.movie');
 
-      popoutLink.addEventListener('click', event => {
+      popoutLink.addEventListener('click', (event) => {
         event.preventDefault();
         const win = new Window({
           title: popoutLink.href,
-          content: movie.innerHTML
+          content: movie.innerHTML,
         });
         win.create();
       });
 
-      inlineLink.addEventListener('click', event => {
+      inlineLink.addEventListener('click', (event) => {
         event.preventDefault();
         movie.style.display = 'block';
       });
@@ -2264,10 +2262,10 @@
 
     // Special rules for all links
     const links = container.querySelectorAll('a');
-    links.forEach(link => {
+    links.forEach((link) => {
       // Handle links with tooltips
       if (link.dataset.useTooltip) {
-        link.addEventListener('mouseover', () => tooltip(link));
+        link.addEventListener('mouseover', () => toolTip(link));
       }
 
       // Make all links load through AJAX
@@ -2275,7 +2273,7 @@
         const href = link.getAttribute('href');
         if (href.charAt(0) === '?') {
           const oldclick = link.onclick;
-          link.addEventListener('click', event => {
+          link.addEventListener('click', (event) => {
             // Some links have an onclick that returns true/false based on whether
             // or not the link should execute.
             if (!oldclick || oldclick.call(link) !== false) {
@@ -2300,12 +2298,12 @@
           // resizer on large images
           imageResizer(bbcodeimgs);
         },
-        2000
+        2000,
       );
     }
 
     // Make BBCode code blocks selectable when clicked
-    container.querySelectorAll('.bbcode.code').forEach(codeBlock => {
+    container.querySelectorAll('.bbcode.code').forEach((codeBlock) => {
       codeBlock.addEventListener('click', () => selectAll(codeBlock));
     });
 
@@ -2319,20 +2317,20 @@
       MediaPlayer,
       PageList,
       Switch,
-      Tabs
-    ].forEach(Component => {
+      Tabs,
+    ].forEach((Component) => {
       container
         .querySelectorAll(Component.selector)
-        .forEach(element => new Component(element));
+        .forEach((element) => new Component(element));
     });
 
     // Wire up AJAX forms
     // NOTE: This needs to come after editors, since they both hook into form onsubmit
     // and the editor hook needs to fire first
     const ajaxForms = container.querySelectorAll('form[data-ajax-form]');
-    ajaxForms.forEach(ajaxForm => {
+    ajaxForms.forEach((ajaxForm) => {
       const resetOnSubmit = ajaxForm.dataset.ajaxForm === 'resetOnSubmit';
-      ajaxForm.addEventListener('submit', event => {
+      ajaxForm.addEventListener('submit', (event) => {
         event.preventDefault();
         RUN.submitForm(ajaxForm, resetOnSubmit);
       });
@@ -2347,12 +2345,12 @@
   class ModControls {
     constructor(commands) {
       assign(commands, {
-        modcontrols_createModControls: html => {
+        modcontrols_createModControls: (html) => {
           this.busy = true;
           this.createModControls(html);
         },
 
-        modcontrols_postsync: a => {
+        modcontrols_postsync: (a) => {
           let pids = [];
           if (a[0] && (typeof a[0] === 'string' || typeof a[0] === 'number')) {
             pids = `${a[0]}`.split(',');
@@ -2364,10 +2362,13 @@
           }
           const tl = tids ? tids.length : 0;
           const html =
-            `${"<form method='post' data-ajax-form='true'>" +
-            "<input type='hidden' name='act' value='modcontrols' />"}${
+            `${
+            "<form method='post' data-ajax-form='true'>" +
+            "<input type='hidden' name='act' value='modcontrols' />"
+          }${
             tl
-              ? `${"<select name='dot'>" +
+              ? `${
+                  "<select name='dot'>" +
                   "<option value='delete'>Delete</option>" +
                   "<option value='merge'>Merge</option>" +
                   "<option value='move'>Move</option>" +
@@ -2376,18 +2377,19 @@
                   "<option value='lock'>Lock</option>" +
                   "<option value='unlock'>Unlock</option>" +
                   '</select>' +
-                  '&nbsp; &nbsp; <strong>'}${tl}</strong> topic${
+                  '&nbsp; &nbsp; <strong>'
+                }${tl}</strong> topic${
                   tl > 1 ? 's' : ''
                 }${pl ? ' and <br />' : ''}`
               : ''
           }${
             pl
-              ? `${"<select name='dop'>" +
+              ? `${
+                  "<select name='dop'>" +
                   "<option value='delete'>Delete</option>" +
                   "<option value='move'>Move</option>" +
-                  '</select> &nbsp; &nbsp; <strong>'}${pl}</strong> post${
-                  pids.length > 1 ? 's' : ''
-                }`
+                  '</select> &nbsp; &nbsp; <strong>'
+                }${pl}</strong> post${pids.length > 1 ? 's' : ''}`
               : ''
           }${
             pl && tl ? '<br />' : ' &nbsp; &nbsp; '
@@ -2398,17 +2400,15 @@
             tids,
             tidl: tl,
             pids,
-            pidl: pl
+            pidl: pl,
           });
           if (tl || pl) this.createModControls(html);
           else this.destroyModControls();
         },
 
-        modcontrols_move: act => {
+        modcontrols_move: (act) => {
           const whichone = parseInt((act && act[0]) || this.whichone, 10);
-          if (!this.busy && onPageChangeOld) {
-            onPageChangeOld = Event$1.onPageChange;
-          }
+          if (!this.busy && onPageChangeOld) ;
           this.whichone = whichone;
           window.addEventListener('pushstate', this.boundCheckLocation);
           this.createModControls(
@@ -2416,14 +2416,14 @@
             whichone ? 'topic' : 'forum'
           } you want to move the ${
             whichone ? `${this.pidl} posts` : `${this.tidl} topics`
-          } to...`
+          } to...`,
           );
         },
 
         modcontrols_clearbox: () => {
           this.destroyModControls();
           this.busy = false;
-        }
+        },
       });
 
       this.boundCheckLocation = () => this.checkLocation();
@@ -2449,7 +2449,7 @@
           whichone ? 'dop' : 'dot'
         }" value="moveto" /><input type="hidden" name="id" value="${id}" /><input type="submit" value="Yes" />` +
           '<input type="submit" name="cancel" value="Cancel" ' +
-          'onclick="this.form.submitButton=this" /></form>'
+          'onclick="this.form.submitButton=this" /></form>',
       );
     }
 
@@ -2468,10 +2468,7 @@
 
     destroyModControls() {
       window.removeEventListener('pushstate', this.boundCheckLocation);
-      if (onPageChangeOld) {
-        Event$1.onPageChange = onPageChangeOld;
-        onPageChangeOld = null;
-      } else Event$1.onPageChange = null;
+      Event$1.onPageChange = null;
       if (this.modb) {
         this.modb.innerHTML = '';
         this.modb.style.display = 'none';
@@ -2488,4 +2485,4 @@
     RUN.modcontrols = new ModControls(RUN.stream.commands);
   });
 
-}());
+})();

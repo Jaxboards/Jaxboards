@@ -20,7 +20,7 @@ class Animation {
   morph(from, percent, to) {
     if (Array.isArray(from) && from.length === to.length) {
       return from.map((value, i) =>
-        Math.round(this.morph(value, percent, to[i]))
+        Math.round(this.morph(value, percent, to[i])),
       );
     }
     return (to - from) * percent + from;
@@ -34,7 +34,7 @@ class Animation {
       curL[0](this.el);
       sc = this.steps;
     } else {
-      curL.forEach(keyFrame => {
+      curL.forEach((keyFrame) => {
         let toValue = this.morph(keyFrame[1], sc / this.steps, keyFrame[2]);
         if (keyFrame[0].match(/color/i)) {
           toValue = `#${new Color(toValue).toHex()}`;
@@ -69,7 +69,7 @@ class Animation {
       fromParsed,
       t[1],
       t[0],
-      t[2]
+      t[2],
     ]);
     return this;
   }

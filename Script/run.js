@@ -39,15 +39,15 @@ class AppState {
     const values = [];
     const { submitButton } = form;
 
-    Array.from(form.elements).forEach(inputField => {
+    Array.from(form.elements).forEach((inputField) => {
       if (!inputField.name || inputField.type === 'submit') {
         return;
       }
 
       if (inputField.type === 'select-multiple') {
         Array.from(inputField.options)
-          .filter(option => option.selected)
-          .forEach(option => {
+          .filter((option) => option.selected)
+          .forEach((option) => {
             names.push(`${inputField.name}[]`);
             values.push(option.value);
           });
@@ -77,7 +77,7 @@ class AppState {
 
   handleQuoting(a) {
     this.stream.load(
-      `${a.href}&qreply=${document.querySelector('#qreply') ? '1' : '0'}`
+      `${a.href}&qreply=${document.querySelector('#qreply') ? '1' : '0'}`,
     );
   }
 

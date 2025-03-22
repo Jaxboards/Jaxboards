@@ -16,7 +16,7 @@ export function makeResizer(iw, nw, ih, nh, img) {
   link.style.height = `${ih}px`;
   link.nw = nw;
   link.nh = nh;
-  link.onmousemove = event => {
+  link.onmousemove = (event) => {
     const o = getCoordinates(link);
     const e = Event(event);
     link.scrollLeft = ((e.pageX - o.x) / o.w) * (link.nw - o.w) || 0;
@@ -47,8 +47,8 @@ export function imageResizer(imgs) {
     return;
   }
   Array.from(imgs)
-    .filter(img => !img.madeResized)
-    .forEach(img => {
+    .filter((img) => !img.madeResized)
+    .forEach((img) => {
       let p = 1;
       let p2 = 1;
       const { naturalWidth, naturalHeight } = img;
