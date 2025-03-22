@@ -18,7 +18,7 @@
     "lint": [
       "@phpcs"
     ],
-    "phpcs": "phpcs",
+    "phpcs": "phpcs -s",
     "phpcbf": "phpcbf"
   }
 }
