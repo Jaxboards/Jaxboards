@@ -98,15 +98,12 @@ Here's how to get the developer tools working and running:
 
 ### node.js Tools
 
-We use a few tools made with node.js. I've been using
-[pnpm](https://pnpm.js.org/) to manage node.js dependencies, but feel free to
-use `npm` or `yarn` if you're more comfortable with that, just keep in mind the
-`shrinkwrap.yaml` file is incompatable with those.
+We use a few tools made with node.js.
 
 Install the node.js tools with this command in the Jaxboards directory:
 
 ```bash
-pnpm install
+npm install
 ```
 
 The tools have `npm` scripts for them, so you can easily get the tools working.
@@ -116,7 +113,7 @@ The tools have `npm` scripts for them, so you can easily get the tools working.
 _EXPERIMENTAL / IN PROGRESS_: All Javascript sourcecode is modularized into ES6 classes, and is bundled together using [rollup](https://www.npmjs.com/package/rollup). To build a bundled source ("jsnew.js") from the modules, run:
 
 ```bash
-pnpm run build
+npm run-script build
 ```
 
 #### Prettier
@@ -130,7 +127,7 @@ However, it does support CSS, JavaScript, YAML, and JSON, which we make use of.
 Run with this command in the Jaxboards directory to run it on all the files:
 
 ```bash
-pnpm run prettier
+npm run-script prettier
 ```
 
 #### Linters
@@ -143,7 +140,7 @@ clean and help us avoid trouble in the future with over-complicated CSS rules.
 Run with this command in the Jaxboards directory to run it on all the files:
 
 ```bash
-pnpm run stylelint
+npm run-script stylelint
 ```
 
 In additon, Stylelint supports automatic code fixing for some rules. This won't
@@ -152,7 +149,7 @@ does not. Run this fixer on all the files with this command in the Jaxboards
 directory:
 
 ```bash
-pnpm run stylelint-fix
+npm run-script stylelint-fix
 ```
 
 #### ESLint
@@ -160,17 +157,17 @@ pnpm run stylelint-fix
 [ESLint](https://eslint.org/) keeps the javascript clean. Run with:
 
 ```bash
-pnpm run eslint
+npm run-script eslint
 ```
 
 ### Composer tools
 
-[Composer](https://getcomposer.org/) is a package manager for PHP and tools
-made in PHP. As Jaxboards is a PHP project, it shouldn't be too surprising we
-make use of some PHP tools. We're using
-[node-composer-runner](https://github.com/garthenweb/node-composer-runner)
-to run composer commands with `pnpm`, so composer packages should be
-installed after you run `pnpm install`.
+[Composer](https://getcomposer.org/) is a package manager for PHP and tools made
+in PHP. As Jaxboards is a PHP project, it shouldn't be too surprising we make
+use of some PHP tools. We're using
+[node-composer-runner](https://github.com/garthenweb/node-composer-runner) to
+run composer commands with `npm`, so composer packages should be installed after
+you run `npm install`.
 
 #### PHP_CodeSniffer
 
@@ -181,13 +178,13 @@ fix fixable issues, which helps keep code looking great.
 Run on all files with the following command in the Jaxboards directory:
 
 ```bash
-pnpm run phpcs
+npm run-script phpcs
 ```
 
 And run this in the Jaxboards directory to run the fixer tool on all files:
 
 ```bash
-pnpm run phpcbf
+npm run-script phpcbf
 ```
 
 ## Authors
