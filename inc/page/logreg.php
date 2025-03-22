@@ -100,9 +100,10 @@ class LOGREG
         // Validate input and actually register the user.
         try {
             if ($JAX->ipServiceBanned()) {
-                throw new Exception(<<<'EOT'
-                   You have been banned from registration on all boards. If you feel that this is in error, please contact the administrator.
-                EOT
+                throw new Exception(
+                    'You have been banned from registration on all boards. If'
+                    . ' you feel that this is in error, please contact the'
+                    . ' administrator.',
                 );
             } elseif (!$name || !$dispname) {
                 throw new Exception('Name and display name required.');

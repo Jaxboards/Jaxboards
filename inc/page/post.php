@@ -221,10 +221,20 @@ EOT
 <input type="text" name="ttitle" id="ttitle" title="Topic Title" value="' . $tdata['title'] . '" />
 <br>
   <label for="tdesc">Description:</label>
-<input type="text" id="tdesc" name="tdesc" title="Topic Description (extra information about your topic)" value="' . $tdata['subtitle'] . '" />
+<input
+    id="tdesc"
+    name="tdesc"
+    title="Topic Description (extra information about your topic)"
+    type="text"
+    value="' . $tdata['subtitle'] . '"
+    />
 <br>
-  <textarea name="postdata" id="postdata" title="Type your post here" class="bbcode-editor">' . $JAX->blockhtml($postdata) .
-            '</textarea>
+  <textarea
+    name="postdata"
+    id="postdata"
+    title="Type your post here"
+    class="bbcode-editor"
+    >' . $JAX->blockhtml($postdata) . '</textarea>
 <br><div class="postoptions">
   ' . ($fdata['perms']['poll'] ? '<label class="addpoll" for="addpoll">Add a
 Poll</label> <select name="poll_type" title="Add a poll"  onchange="document.querySelector(\'#polloptions\').' .

@@ -43,9 +43,12 @@ require JAXBOARDS_ROOT . '/acp/page.php';
 function recursiveStripSlashes($input)
 {
     /*
+     *
         if (!get_magic_quotes_gpc()) {
         return $input;
-    }*/
+        }
+     */
+
     foreach ($input as $key => $value) {
         $input[$key] = is_array($value) ?
             recursiveStripSlashes($value) : stripslashes($value);

@@ -1,5 +1,4 @@
 <?php
-
 /*
     Chat box
     better color >_>

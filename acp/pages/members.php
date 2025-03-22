@@ -57,6 +57,7 @@ class members
                 )
             ) . PHP_EOL;
         }
+
         /*
             $sidebarLinks .= $PAGE->parseTemplate(
             'sidebar-list-link.html',
@@ -64,7 +65,8 @@ class members
                 'url' => '?act=stats',
                 'title' => 'Recount Statistics',
             )
-        ) . PHP_EOL;*/
+            ) . PHP_EOL;
+        */
 
         $PAGE->sidebar(
             $PAGE->parseTemplate(

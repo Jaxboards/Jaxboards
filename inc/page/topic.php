@@ -74,23 +74,29 @@ class TOPIC
     {
         global $DB,$JAX,$USER;
         $result = $DB->safespecial(
-            <<<'EOT'
-		SELECT a.`title` AS `topic_title`,a.`locked` AS `locked`,
-		    UNIX_TIMESTAMP(a.`lp_date`) AS `lp_date`,
-		    b.`title` AS `forum_title`,b.`perms` AS `fperms`,
-		    c.`id` AS `cat_id`,c.`title` AS `cat_title`,a.`fid` AS `fid`,
-		    a.`poll_q` AS `poll_q`,a.`poll_type` AS `poll_type`,
-		    a.`poll_choices` AS `poll_choices`,a.`poll_results` AS `poll_results`,
-		    a.`subtitle` AS `subtitle`
-		FROM %t a
-		LEFT JOIN %t b
-		    ON a.`fid`=b.`id`
-		LEFT JOIN %t AS c
-		    ON b.`cat_id`=c.`id`
-		WHERE a.`id`=?
-		    LIMIT 1
-		EOT
-            ,
+            <<<'MySQL'
+SELECT a.`title` AS `topic_title`
+    , a.`locked` AS `locked`
+    , UNIX_TIMESTAMP(a.`lp_date`) AS `lp_date`
+    , b.`title` AS `forum_title`
+    , b.`perms` AS `fperms`
+    , c.`id` AS `cat_id`
+    , c.`title` AS `cat_title`
+    , a.`fid` AS `fid`
+    , a.`poll_q` AS `poll_q`
+    , a.`poll_type` AS `poll_type`
+    , a.`poll_choices` AS `poll_choices`
+    , a.`poll_results` AS `poll_results`
+    , a.`subtitle` AS `subtitle`
+FROM %t a
+LEFT JOIN %t b
+		ON a.`fid` = b.`id`
+LEFT JOIN %t AS c
+		ON b.`cat_id` = c.`id`
+WHERE a.`id` = ?
+LIMIT 1
+
+MySQL,
             array('topics', 'forums', 'categories'),
             $id
         );
@@ -133,15 +139,18 @@ class TOPIC
                 )
             );
             $result = $DB->safespecial(
-                <<<'EOT'
-		SELECT p.`id` AS `id`,p.`post` AS `post`,UNIX_TIMESTAMP(p.`date`) AS `date`,
-		    m.`id` AS `id`,m.`display_name` AS `display_name`
-		FROM %t p
-		LEFT JOIN %t m
-		    ON p.`auth_id`=m.`id`
-		    WHERE p.`tid`=?
-		EOT
-                ,
+                <<<'MySQL'
+SELECT p.`id` AS `id`
+    , p.`post` AS `post`
+    , UNIX_TIMESTAMP(p.`date`) AS `date`
+    , m.`id` AS `id`
+    , m.`display_name` AS `display_name`
+FROM %t p
+LEFT JOIN %t m
+    ON p.`auth_id` = m.`id`
+    WHERE p.`tid` = ?
+
+MySQL,
                 array('posts', 'members'),
                 $DB->basicvalue($id)
             );
@@ -285,12 +294,12 @@ class TOPIC
 
         // Update view count.
         $DB->safespecial(
-            <<<'EOT'
-		UPDATE %t
-		SET `views` = `views` + 1
-		WHERE `id`=?
-		EOT
-            ,
+            <<<'MySQL'
+UPDATE %t
+SET `views` = `views` + 1
+WHERE `id` = ?
+
+MySQL,
             array('topics'),
             $id
         );
@@ -364,18 +373,26 @@ class TOPIC
         $PAGE->JS('softurl');
         if (isset($SESS->vars['multiquote']) && $SESS->vars['multiquote']) {
             $result = $DB->safespecial(
-                <<<'EOT'
-		SELECT p.`id` AS `id`,p.`auth_id` AS `auth_id`,p.`post` AS `post`,
-		    UNIX_TIMESTAMP(p.`date`) AS `date`,p.`showsig` AS `showsig`,
-		    p.`showemotes` AS `showemotes`,p.`tid` AS `tid`,p.`newtopic` AS `newtopic`,
-		    INET6_NTOA(p.`ip`) AS `ip`,UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`,
-		    p.`editby` AS `editby`,p.`rating` AS `rating`,m.`display_name` AS `name`
-		FROM %t p
-		LEFT JOIN %t m
-		    ON p.`auth_id`=m.`id`
-		    WHERE p.`id`  IN ?
-		EOT
-                ,
+                <<<'MySQL'
+SELECT p.`id` AS `id`
+    , p.`auth_id` AS `auth_id`
+    , p.`post` AS `post`
+    , UNIX_TIMESTAMP(p.`date`) AS `date`
+    , p.`showsig` AS `showsig`
+    , p.`showemotes` AS `showemotes`
+    , p.`tid` AS `tid`
+    , p.`newtopic` AS `newtopic`
+    , INET6_NTOA(p.`ip`) AS `ip`
+    , UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`
+    , p.`editby` AS `editby`
+    , p.`rating` AS `rating`
+    , m.`display_name` AS `name`
+FROM %t p
+LEFT JOIN %t m
+    ON p.`auth_id` = m.`id`
+    WHERE p.`id` IN ?
+
+MySQL,
                 array('posts', 'members'),
                 explode(',', $SESS->vars['multiquote'])
             );
@@ -420,89 +437,139 @@ class TOPIC
 
         if ($lastpid) {
             $query = $DB->safespecial(
-                <<<'EOT'
-		SELECT m.`id` AS `id`,m.`name` AS `name`,m.`group_id` AS `group_id`,
-		    m.`sound_im` AS `sound_im`,m.`sound_shout` AS `sound_shout`,
-		    UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`,
-		    m.`display_name` AS `display_name`,
-		    m.`friends` AS `friends`,m.`enemies` AS `enemies`,m.`skin_id` AS `skin_id`,
-		    m.`nowordfilter` AS `nowordfilter`,m.`wysiwyg` AS `wysiwyg`,
-		    m.`avatar` AS `avatar`,m.`usertitle` AS `usertitle`,
-		    CONCAT(MONTH(m.`birthdate`),' ',MONTH(m.`birthdate`)) as `birthday`,
-		    m.`mod` AS `mod`,m.`posts` AS `posts`,
-		    p.`tid` AS `tid`,p.`id` AS `pid`,INET6_NTOA(p.`ip`) AS `ip`,
-		    p.`newtopic` AS `newtopic`,p.`post` AS `post`,p.`showsig` AS `showsig`,
-		    p.`showemotes` AS `showemotes`,p.`tid` AS `tid`,
-		    UNIX_TIMESTAMP(p.`date`) AS `date`,p.`auth_id` AS `auth_id`,
-		    p.`rating` AS `rating`,g.`title` AS `title`,g.`icon` AS `icon`,
-		    UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`,p.`editby` AS `editby`,
-		    e.`display_name` AS `ename`,e.`group_id` AS `egroup_id`
-		FROM %t AS p
-		LEFT JOIN %t m
-		    ON p.`auth_id`=m.`id`
-		LEFT JOIN %t g
-		    ON m.`group_id`=g.`id`
-		LEFT JOIN %t e
-		ON p.`editby`=e.`id`
-		WHERE p.`tid`=?
-		  AND p.`id`>?
-		ORDER BY `pid`
-		EOT
-                ,
+                <<<'MySQL'
+SELECT m.`id` AS `id`
+    , m.`name` AS `name`
+    , m.`group_id` AS `group_id`
+    , m.`sound_im` AS `sound_im`
+    , m.`sound_shout` AS `sound_shout`
+    , UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`
+    , m.`display_name` AS `display_name`
+    , m.`friends` AS `friends`
+    , m.`enemies` AS `enemies`
+    , m.`skin_id` AS `skin_id`
+    , m.`nowordfilter` AS `nowordfilter`
+    , m.`wysiwyg` AS `wysiwyg`
+    , m.`avatar` AS `avatar`
+    , m.`usertitle` AS `usertitle`
+    , CONCAT(MONTH(m.`birthdate`)
+    , ' '
+    , MONTH(m.`birthdate`)) as `birthday`
+    , m.`mod` AS `mod`
+    , m.`posts` AS `posts`
+    , p.`tid` AS `tid`
+    , p.`id` AS `pid`
+    , INET6_NTOA(p.`ip`) AS `ip`
+    , p.`newtopic` AS `newtopic`
+    , p.`post` AS `post`
+    , p.`showsig` AS `showsig`
+    , p.`showemotes` AS `showemotes`
+    , p.`tid` AS `tid`
+    , UNIX_TIMESTAMP(p.`date`) AS `date`
+    , p.`auth_id` AS `auth_id`
+    , p.`rating` AS `rating`
+    , g.`title` AS `title`
+    , g.`icon` AS `icon`
+    , UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`
+    , p.`editby` AS `editby`
+    , e.`display_name` AS `ename`
+    , e.`group_id` AS `egroup_id`
+FROM %t AS p
+LEFT JOIN %t m
+    ON p.`auth_id` = m.`id`
+LEFT JOIN %t g
+    ON m.`group_id` = g.`id`
+LEFT JOIN %t e
+ON p.`editby` = e.`id`
+WHERE p.`tid` = ?
+  AND p.`id` > ?
+ORDER BY `pid`
+
+MySQL,
                 array('posts', 'members', 'member_groups', 'members'),
                 $this->id,
                 $lastpid
             );
         } else {
             $query = $DB->safespecial(
-                <<<'EOT'
-		SELECT m.`id` AS `id`,m.`name` AS `name`,m.`email` AS `email`,m.`sig` AS `sig`,
-		    m.`posts` AS `posts`,m.`group_id` AS `group_id`,m.`avatar` AS `avatar`,
-		    m.`usertitle` AS `usertitle`,UNIX_TIMESTAMP(m.`join_date`) AS `join_date`,
-		    UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`,
-		    m.`contact_skype` AS `contact_skype`,
-		    m.`contact_yim` AS `contact_yim`,m.`contact_msn` AS `contact_msn`,
-		    m.`contact_gtalk` AS `contact_gtalk`,m.`contact_aim` AS `contact_aim`,
-		    m.`website` AS `website`,m.`birthdate` AS `birthdate`,
-		    DAY(m.`birthdate`) AS `dob_day`,MONTH(m.`birthdate`) AS `dob_month`,
-		    YEAR(m.`birthdate`) AS `dob_year`,m.`about` AS `about`,
-		    m.`display_name` AS `display_name`,m.`full_name` AS `full_name`,
-		    m.`contact_steam` AS `contact_steam`,m.`location` AS `location`,
-		    m.`gender` AS `gender`,m.`friends` AS `friends`,
-		    m.`enemies` AS `enemies`,m.`sound_shout` AS `sound_shout`,
-		    m.`sound_im` AS `sound_im`,m.`sound_pm` AS `sound_pm`,
-		    m.`sound_postinmytopic` AS `sound_postinmytopic`,
-		    m.`sound_postinsubscribedtopic` AS `sound_postinsubscribedtopic`,
-		    m.`notify_pm` AS `notify_pm`,
-		    m.`notify_postinmytopic` AS `notify_postinmytopic`,
-		    m.`notify_postinsubscribedtopic` AS `notify_postinsubscribedtopic`,
-		    m.`ucpnotepad` AS `ucpnotepad`,m.`skin_id` AS `skin_id`,
-		    m.`contact_twitter` AS `contact_twitter`,
-		    m.`contact_discord` AS `contact_discord`,
-		    m.`contact_youtube` AS `contact_youtube`,
-		    m.`contact_bluesky` AS `contact_bluesky`,
-		    m.`email_settings` AS `email_settings`,m.`nowordfilter` AS `nowordfilter`,
-		    INET6_NTOA(m.`ip`) AS `ip`,m.`mod` AS `mod`,m.`wysiwyg` AS `wysiwyg`,
-		    p.`tid` AS `tid`,p.`id` AS `pid`,INET6_NTOA(p.`ip`) AS `ip`,
-		    p.`newtopic` AS `newtopic`,p.`post` AS `post`,p.`showsig` AS `showsig`,
-		    p.`showemotes` AS `showemotes`,p.`tid` AS `tid`,
-		    UNIX_TIMESTAMP(p.`date`) AS `date`,p.`auth_id` AS `auth_id`,
-		    p.`rating` AS `rating`,g.`title` AS `title`,
-		    g.`icon` AS `icon`,UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`,
-		    p.`editby` AS `editby`,e.`display_name` AS `ename`,
-		    e.`group_id` AS `egroup_id`
-		FROM %t p
-		LEFT JOIN %t m
-		    ON p.`auth_id`=m.`id`
-		LEFT JOIN %t g
-		    ON m.`group_id`=g.`id`
-		LEFT JOIN %t e
-		    ON p.`editby`=e.`id`
-		WHERE p.`tid`=?
-		ORDER BY `newtopic` DESC, `pid` ASC
-		LIMIT ?,?
-		EOT
-                ,
+                <<<'MySQL'
+SELECT m.`id` AS `id`
+    , m.`name` AS `name`
+    , m.`email` AS `email`
+    , m.`sig` AS `sig`
+    , m.`posts` AS `posts`
+    , m.`group_id` AS `group_id`
+    , m.`avatar` AS `avatar`
+    , m.`usertitle` AS `usertitle`
+    , UNIX_TIMESTAMP(m.`join_date`) AS `join_date`
+    , UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`
+    , m.`contact_skype` AS `contact_skype`
+    , m.`contact_yim` AS `contact_yim`
+    , m.`contact_msn` AS `contact_msn`
+    , m.`contact_gtalk` AS `contact_gtalk`
+    , m.`contact_aim` AS `contact_aim`
+    , m.`website` AS `website`
+    , m.`birthdate` AS `birthdate`
+    , DAY(m.`birthdate`) AS `dob_day`
+    , MONTH(m.`birthdate`) AS `dob_month`
+    , YEAR(m.`birthdate`) AS `dob_year`
+    , m.`about` AS `about`
+    , m.`display_name` AS `display_name`
+    , m.`full_name` AS `full_name`
+    , m.`contact_steam` AS `contact_steam`
+    , m.`location` AS `location`
+    , m.`gender` AS `gender`
+    , m.`friends` AS `friends`
+    , m.`enemies` AS `enemies`
+    , m.`sound_shout` AS `sound_shout`
+    , m.`sound_im` AS `sound_im`
+    , m.`sound_pm` AS `sound_pm`
+    , m.`sound_postinmytopic` AS `sound_postinmytopic`
+    , m.`sound_postinsubscribedtopic` AS `sound_postinsubscribedtopic`
+    , m.`notify_pm` AS `notify_pm`
+    , m.`notify_postinmytopic` AS `notify_postinmytopic`
+    , m.`notify_postinsubscribedtopic` AS `notify_postinsubscribedtopic`
+    , .`ucpnotepad` AS `ucpnotepad`
+    , m.`skin_id` AS `skin_id`
+    , .`contact_twitter` AS `contact_twitter`
+    , .`contact_discord` AS `contact_discord`
+    , .`contact_youtube` AS `contact_youtube`
+    , .`contact_bluesky` AS `contact_bluesky`
+    , .`email_settings` AS `email_settings`
+    , m.`nowordfilter` AS `nowordfilter`
+    , NET6_NTOA(m.`ip`) AS `ip`
+    , m.`mod` AS `mod`
+    , m.`wysiwyg` AS `wysiwyg`
+    , p.`tid` AS `tid`
+    , p.`id` AS `pid`
+    , INET6_NTOA(p.`ip`) AS `ip`
+    , p.`newtopic` AS `newtopic`
+    , p.`post` AS `post`
+    , p.`showsig` AS `showsig`
+    , p.`showemotes` AS `showemotes`
+    , p.`tid` AS `tid`
+    , UNIX_TIMESTAMP(p.`date`) AS `date`
+    , p.`auth_id` AS `auth_id`
+    , p.`rating` AS `rating`
+    , g.`title` AS `title`
+    , g.`icon` AS `icon`
+    , UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`
+    , p.`editby` AS `editby`
+    , e.`display_name` AS `ename`
+    , e.`group_id` AS `egroup_id`
+FROM %t p
+LEFT JOIN %t m
+    ON p.`auth_id`=m.`id`
+LEFT JOIN %t g
+    ON m.`group_id` = g.`id`
+LEFT JOIN %t e
+    ON p.`editby` = e.`id`
+WHERE p.`tid` = ?
+ORDER BY `newtopic` DESC
+    , `pid` ASC
+LIMIT ?, ?
+
+MySQL,
                 array('posts', 'members', 'member_groups', 'members'),
                 $this->id,
                 (($topic_post_counter = ($this->page) * $this->numperpage)),
@@ -668,16 +735,15 @@ class TOPIC
         }
         if ($USER && $USER['mod']) {
             $result = $DB->safespecial(
-                <<<'EOT'
-		SELECT `mods`
-		FROM %t
-		WHERE `id`=(
-		    SELECT `fid`
-		    FROM %t
-		    WHERE `id`=?
-		)
-		EOT
-                ,
+                <<<'MySQL'
+SELECT `mods`
+FROM %t
+WHERE `id` = (
+    SELECT `fid`
+    FROM %t
+    WHERE `id` = ?
+)
+MySQL,
                 array('forums', 'topics'),
                 $DB->basicvalue($this->id)
             );
@@ -933,12 +999,20 @@ class TOPIC
         }
         $PAGE->JS('softurl');
         $result = $DB->safeselect(
-            <<<'EOT'
-		`id`,`auth_id`,`post`,UNIX_TIMESTAMP(`date`),`showsig`,`showemotes`,`tid`,
-		`newtopic`,INET6_NTOA(`ip`) AS `ip`,UNIX_TIMESTAMP(`edit_date`) AS `edit_date`,
-		`editby`,`rating`
-		EOT
-            ,
+            <<<'MySQL'
+`id`
+, `auth_id`
+, `post`
+, UNIX_TIMESTAMP(`date`)
+, `showsig`
+, `showemotes`
+, `tid`
+, `newtopic`
+, INET6_NTOA(`ip`) AS `ip`
+, UNIX_TIMESTAMP(`edit_date`) AS `edit_date`
+, `editby`
+, `rating`
+MySQL,
             'posts',
             'WHERE `id`=?',
             $id
@@ -967,13 +1041,28 @@ class TOPIC
                         )
                     );
                     $result = $DB->safeselect(
-                        <<<'EOT'
-			`id`,`title`,`subtitle`,`lp_uid`,UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,
-			`fid`,`auth_id`,`replies`,`views`,
-			`pinned`,`poll_choices`,`poll_results`,`poll_q`,`poll_type`,`summary`,
-			`locked`,UNIX_TIMESTAMP(`date`) AS `date`,`op`,`cal_event`
-			EOT
-                        ,
+                        <<<'MySQL'
+`id`
+, `title`
+, `subtitle`
+, `lp_uid`
+, UNIX_TIMESTAMP(`lp_date`) AS `lp_date`
+, `fid`
+, `auth_id`
+, `replies`
+, `views`
+, `pinned`
+, `poll_choices`
+, `poll_results`
+, `poll_q`
+, `poll_type`
+, `summary`
+, `locked`
+, UNIX_TIMESTAMP(`date`) AS `date`
+, `op`
+, `cal_event`
+
+MySQL,
                         'topics',
                         'WHERE `id`=?',
                         $post['tid']
@@ -1008,14 +1097,15 @@ class TOPIC
         $post = false;
         if ($pid && is_numeric($pid)) {
             $result = $DB->safespecial(
-                <<<'EOT'
-		SELECT p.`post` AS `post`,m.`display_name` AS `name`
-		FROM %t p
-		LEFT JOIN %t m
-			ON p.`auth_id`=m.`id`
-		WHERE p.`id`=?
-		EOT
-                ,
+                <<<'MySQL'
+SELECT p.`post` AS `post`
+    , m.`display_name` AS `name`
+FROM %t p
+LEFT JOIN %t m
+  ON p.`auth_id` = m.`id`
+WHERE p.`id` = ?
+
+MySQL,
                 array('posts', 'members'),
                 $pid
             );
@@ -1081,19 +1171,28 @@ class TOPIC
             $couldntfindit = true;
         } else {
             $result = $DB->safespecial(
-                <<<'EOT'
-		SELECT `id`,`auth_id`,`post`,UNIX_TIMESTAMP(`date`) AS `date`,
-		    `showsig`,`showemotes`,`tid`,`newtopic`,INET6_NTOA(`ip`) AS `ip`,
-		    UNIX_TIMESTAMP(`edit_date`) AS `edit_date`,`editby`,`rating`
-		FROM %t
-		WHERE tid=(
-		    SELECT tid
-		    FROM %t
-		    WHERE `id`=?
-		)
-		ORDER BY `id` ASC
-		EOT
-                ,
+                <<<'MySQL'
+SELECT `id`
+    , `auth_id`
+    , `post`
+    , UNIX_TIMESTAMP(`date`) AS `date`
+    , `showsig`
+    , `showemotes`
+    , `tid`
+    , `newtopic`
+    , INET6_NTOA(`ip`) AS `ip`
+    , UNIX_TIMESTAMP(`edit_date`) AS `edit_date`
+    , `editby`
+    , `rating`
+FROM %t
+WHERE tid=(
+    SELECT tid
+    FROM %t
+    WHERE `id` = ?
+)
+ORDER BY `id` ASC
+
+MySQL,
                 array('posts', 'posts'),
                 $pid
             );
