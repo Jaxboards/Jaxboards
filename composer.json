@@ -5,7 +5,9 @@
     }
   },
   "scripts": {
-    "lint": ["@phpcs"],
+    "lint": [
+      "@phpcs"
+    ],
     "phpcs": "phpcs",
     "phpcbf": "phpcbf"
   },

@@ -14,6 +14,7 @@ Tested on Apache and Linux only.
 It is not recommended to run Jaxboards in production.
 
 ### Prerequisites
+
 - PHP >=8
 - MySQL>=5.5.3
 - TLS certificate (due to hardcoded URLs in codebase)
@@ -37,7 +38,9 @@ This page gives you the option of installing the service or a standalone
 Jaxboards - pick whatever suits your needs.
 
 The install script at `Service/install.php` handles configuration and setting up a new install. It does the following:
+
 - Saves configuration settings from the installer. Mainly this is database information, but it also saves the domain you're running the board on. Basically copies `config.default.php` to `config.php` and updates the values. Here's the direct PHP code what values are being set specifically:
+
 ```php
         // Update with our settings.
         $CFG['boardname'] = 'Jaxboards';
@@ -53,6 +56,7 @@ The install script at `Service/install.php` handles configuration and setting up
         $CFG['prefix'] = $service ? '' : 'jaxboards';
         $CFG['sql_prefix'] = $CFG['prefix'] ? $CFG['prefix'] . '_' : '';
 ```
+
 - Figures out if you're installing a service (multiple boards like jaxboards.com) or a single-board install.
 - If it's a service install, install those special service tables.
 - Copy over the MySQL tables here. Service installs have an additional step of adding each board installed to the directory table. Once the database is imported, the admin user is created as well.
@@ -61,11 +65,11 @@ After install the MySQL credentials are saved in `config.php`. This is copied ov
 
 `Service/blueprint.sql` contains the base tables and base data for the database for a single-board install. Every table is prefixed with `blueprint_` (and should be updated to match what the `sql_prefix` setting is in the `config.php` file before importing). In addition, a service install (multiple boards) has two additional tables, `directory` (containing a list of all the registered boards) and `banlist` (containing a list of IP addresses to ban). These are both described in the `Service/install.php` file.
 
-### Troubleshooting ###
+### Troubleshooting
 
 Permissions issues are a major source of bugs during installation. If you manually created any directories, you may have to assign ownership to your PHP user using a command similar to the following:
 
-```sudo chown www-data:www-data /var/www/html/<your_domain_name>/public_html
+````sudo chown www-data:www-data /var/www/html/<your_domain_name>/public_html
 chmod og+rwX -R . && chmod u+rX -R /var/www/html/<your_domain_name>/public_html```
 
 If you plan to reuse any old themes, be prepared to update hardcoded images, especially those that refer to the now-defunct jaxboards.com domain.
@@ -76,7 +80,7 @@ In the unlikely event that you're restoring from an old (pre-2020) Jaxboards dat
 
 ```bash
 php ./Service/update.php
-```
+````
 
 If you're just starting to use this repo, you don't need to run this script.
 
