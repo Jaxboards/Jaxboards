@@ -1,5 +1,5 @@
 <?php
-  if ($_GET['showerrors']) {
+if ($_GET['showerrors']) {
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
 }
@@ -169,9 +169,9 @@ if (!$PAGE->jsaccess) {
     }
     $variables[] = 'can_im:' . ($PERMS['can_im'] ? 1 : 0);
     if ($USER) {
-      $variables[] = 'groupid:' . ($JAX->pick($USER['group_id'], 3));
-      $variables[] = "username:'" . addslashes($USER['display_name']) . "'";
-      $variables[] = 'userid:' . $JAX->pick($USER['id'], 0);
+        $variables[] = 'groupid:' . ($JAX->pick($USER['group_id'], 3));
+        $variables[] = "username:'" . addslashes($USER['display_name']) . "'";
+        $variables[] = 'userid:' . $JAX->pick($USER['id'], 0);
     }
 
     $PAGE->append(
@@ -253,7 +253,8 @@ if (!$PAGE->jsaccess) {
         $PAGE->append(
             'FOOTER',
             '<div class="footer">' .
-            'Jaxboards 2.0.1! ' . // Removed the defunct URL
+            'Jaxboards 2.0.1! ' .
+            // Removed the defunct URL
             '&copy; 2007-' . date('Y') . '</div>'
         );
     }

@@ -9,15 +9,15 @@ class userprofile
 
     public $contacturls = array(
         'skype' => 'skype:%s',
-	'discord' => 'discord:%s',
-	'yim' => 'ymsgr:sendim?%s',
+    'discord' => 'discord:%s',
+    'yim' => 'ymsgr:sendim?%s',
         'msn' => 'msnim:chat?contact=%s',
         'googlechat' => 'gchat:chat?jid=%s',
         'aim' => 'aim:goaim?screenname=%s',
-	'youtube' => 'https://youtube.com/%s',
+    'youtube' => 'https://youtube.com/%s',
         'steam' => 'https://steamcommunity.com/id/%s',
         'twitter' => 'https://twitter.com/%s',
-	'bluesky' => 'https://bsky.app/profile/%s.bsky.social'
+    'bluesky' => 'https://bsky.app/profile/%s.bsky.social'
     );
 
     public function __construct()

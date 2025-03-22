@@ -458,16 +458,16 @@ EOT;
                 'dob_month' => $JAX->pick($JAX->p['dob_month'], null),
                 'dob_day' => $JAX->pick($JAX->p['dob_day'], null),
                 'dob_year' => $JAX->pick($JAX->p['dob_year'], null),
-		'contact_skype' => $JAX->p['con_skype'],
-		'contact_discord' => $JAX->p['con_discord'],
+            'contact_skype' => $JAX->p['con_skype'],
+            'contact_discord' => $JAX->p['con_discord'],
                 'contact_yim' => $JAX->p['con_yim'],
                 'contact_msn' => $JAX->p['con_msn'],
                 'contact_gtalk' => $JAX->p['con_gtalk'],
                 'contact_aim' => $JAX->p['con_aim'],
-		'contact_youtube' => $JAX->p['con_youtube'],
+            'contact_youtube' => $JAX->p['con_youtube'],
                 'contact_steam' => $JAX->p['con_steam'],
                 'contact_twitter' => $JAX->p['con_twitter'],
-		'contact_bluesky' => $JAX->p['con_bluesky'],
+            'contact_bluesky' => $JAX->p['con_bluesky'],
                 'website' => $JAX->p['website'],
                 'gender' => in_array($JAX->p['gender'], $genderOptions) ?
                 $JAX->p['gender'] : '',
@@ -535,7 +535,6 @@ EOT;
 
             // Is the date provided valid?
             if ($data['dob_month'] && $data['dob_day']) {
-
                 // Feb 29th check for leap years
                 if (2 === (int) $data['dob_month']) {
                     if ($data['dob_year'] > 0
@@ -575,15 +574,15 @@ EOT;
 
             foreach (array(
                 'contact_skype' => 'Skype username',
-		'contact_discord' => 'Discord username',
-		'contact_yim' => 'YIM username',
+            'contact_discord' => 'Discord username',
+            'contact_yim' => 'YIM username',
                 'contact_msn' => 'MSN username',
                 'contact_gtalk' => 'Google Chat username',
-		'contact_aim' => 'AIM username',
-		'contact_youtube' => 'YouTube username',
+            'contact_aim' => 'AIM username',
+            'contact_youtube' => 'YouTube username',
                 'contact_steam' => 'Steam username',
                 'contact_twitter' => 'Twitter username',
-		'contact_bluesky' => 'Bluesky username',
+            'contact_bluesky' => 'Bluesky username',
                 'full_name' => 'Full name',
                 'display_name' => 'Display name',
                 'website' => 'Website URL',
@@ -691,14 +690,14 @@ EOT;
             $dobselect,
             $data['contact_skype'],
             $data['contact_discord'],
-	    $data['contact_yim'],
+            $data['contact_yim'],
             $data['contact_msn'],
             $data['contact_gtalk'],
             $data['contact_aim'],
-	    $data['contact_youtube'],
+            $data['contact_youtube'],
             $data['contact_steam'],
             $data['contact_twitter'],
-	    $data['contact_bluesky'],
+            $data['contact_bluesky'],
             $data['website']
         );
     }

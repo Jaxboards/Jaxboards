@@ -42,7 +42,8 @@ require JAXBOARDS_ROOT . '/acp/page.php';
  */
 function recursiveStripSlashes($input)
 {
-    /*if (!get_magic_quotes_gpc()) {
+    /*
+        if (!get_magic_quotes_gpc()) {
         return $input;
     }*/
     foreach ($input as $key => $value) {
