@@ -69,8 +69,12 @@ After install the MySQL credentials are saved in `config.php`. This is copied ov
 
 Permissions issues are a major source of bugs during installation. If you manually created any directories, you may have to assign ownership to your PHP user using a command similar to the following:
 
-````sudo chown www-data:www-data /var/www/html/<your_domain_name>/public_html
-chmod og+rwX -R . && chmod u+rX -R /var/www/html/<your_domain_name>/public_html```
+```bash
+PUBLIC_PATH="/var/www/html/<your_domain_name>/public_html" && \
+  sudo chown www-data:www-data "$PUBLIC_PATH" && \
+  chmod og+rwX -R "$PUBLIC_PATH" && \
+  chmod u+rX -R "$PUBLIC_PATH"
+```
 
 If you plan to reuse any old themes, be prepared to update hardcoded images, especially those that refer to the now-defunct jaxboards.com domain.
 
@@ -80,7 +84,7 @@ In the unlikely event that you're restoring from an old (pre-2020) Jaxboards dat
 
 ```bash
 php ./Service/update.php
-````
+```
 
 If you're just starting to use this repo, you don't need to run this script.
 
