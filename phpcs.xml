@@ -4,15 +4,12 @@
   <!-- Files and directories to run on -->
   <file>acp</file>
   <file>inc</file>
-  <file>emoticons</file>
   <file>misc</file>
   <file>Script</file>
   <file>Service</file>
   <file>config.default.php</file>
   <file>domaindefinitions.php</file>
   <file>index.php</file>
-  <!-- inc/lib files are third party, so we shouldn't touch them -->
-  <exclude-pattern>*/inc/lib/*</exclude-pattern>
   <!-- ignore vendor files -->
   <exclude-pattern>*/vendor/*</exclude-pattern>
   <exclude-pattern>*/node_modules/*</exclude-pattern>
