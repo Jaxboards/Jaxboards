@@ -8,7 +8,7 @@
     "eslint-plugin-prettier": "^3.0.0",
     "husky": "^1.0.0",
     "js-beautify": "^1.8.4",
-    "node-composer-runner": "^0.3.0",
+    "node-composer-runner": "^0.4.0",
     "prettier": "^1.14.2",
     "rollup": "^0.65.0",
     "stylelint": "^9.5.0",
