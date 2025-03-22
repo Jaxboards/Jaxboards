@@ -329,7 +329,7 @@ class PAGE
             str_replace(
                 array('<%', '%>'),
                 array('<%%', '%%>'),
-                isset($this->userMetaDefs[$meta]) ? $this->userMetaDefs[$meta] : (isset($this->metadefs[$meta]) ? $this->metadefs[$meta] : "")
+                $this->userMetaDefs[$meta] ?? $this->metadefs[$meta] ?? '',
             ),
             isset($args[0]) && is_array($args[0]) ? $args[0] : $args
         );

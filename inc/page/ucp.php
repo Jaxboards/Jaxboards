@@ -395,9 +395,14 @@ EOT;
             $this->getlocationforform() . $JAX->hiddenFormFields(
                 array('submit' => 'true')
             ),
-            ((isset($JAX->b['change']) && $JAX->b['change']) ?
-            "<input type='text' name='email' aria-label='Email' title='Enter your new email address' value='" . $USER['email'] . "' />" :
-            '<strong>' . $JAX->pick($USER['email'], '--none--') .
+            ((isset($JAX->b['change']) && $JAX->b['change']) ? <<<HTML
+                <input
+                    type="text"
+                    name="email"
+                    aria-label="Email"
+                    title="Enter your new email address"
+                    value="{$USER['email']}" />
+                HTML : '<strong>' . $JAX->pick($USER['email'], '--none--') .
             "</strong> <a href='?act=ucp&what=email&change=1'>Change</a>" .
             "<input type='hidden' name='email' value='" . ($USER['email']) . "' />"
             ),

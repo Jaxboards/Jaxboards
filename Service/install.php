@@ -167,19 +167,6 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     }
 
     if (empty($errors)) {
-        // Write crossdomain.xml file for flash support.
-        /*
-            $crossDomainXML = fopen(JAXBOARDS_ROOT . '/crossdomain.xml', 'w');
-            fwrite(
-            $crossDomainXML,
-            str_replace(
-                '<DOMAIN>',
-                $JAX->p['domain'],
-                file_get_contents(SERVICE_ROOT . '/crossdomain.sample.xml')
-            )
-            );
-        fclose($crossDomainXML);*/
-
         // Update with our settings.
         $CFG['boardname'] = 'Jaxboards';
         $CFG['domain'] = $JAX->p['domain'];
