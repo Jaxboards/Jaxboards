@@ -1,11 +1,5 @@
 <?php
-if ($_GET['showerrors']) {
-    error_reporting(E_ALL);
-    ini_set('display_errors', 1);
-}
-?>
 
-<?php
 /**
  * Jaxboards. THE ULTIMATE 4UMS WOOOOOOO
  * By Sean John's son (2007 @ 4 AM).
@@ -21,6 +15,12 @@ if ($_GET['showerrors']) {
  *
  * @link https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
+
+if ($_GET['showerrors']) {
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+}
+
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', __DIR__);
 }
@@ -292,12 +292,14 @@ if ($USER) {
 if (!isset($JAX->b['act'])) {
     $JAX->b['act'] = null;
 }
-if ('logreg' != $JAX->b['act']
+if (
+'logreg' != $JAX->b['act']
     && 'logreg2' != $JAX->b['act']
     && 'logreg4' != $JAX->b['act']
     && 'logreg3' != $JAX->b['act']
 ) {
-    if (!$PERMS['can_view_board']
+    if (
+        !$PERMS['can_view_board']
         || $CFG['boardoffline']
         && !$PERMS['can_view_offline_board']
     ) {
@@ -308,7 +310,8 @@ if ('logreg' != $JAX->b['act']
 // Include modules.
 foreach (glob('inc/modules/*.php') as $v) {
     if (preg_match('/tag_(\\w+)/', $v, $m)) {
-        if (isset($m[1]) && ((isset($JAX->b['module'])
+        if (
+            isset($m[1]) && ((isset($JAX->b['module'])
             && $JAX->b['module'] == $m[1]) || $PAGE->templatehas($m[1]))
         ) {
             include $v;

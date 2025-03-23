@@ -5,7 +5,7 @@ new ticker();
 class ticker
 {
     public $maxticks = 60;
-    
+
     public function __construct()
     {
         global $PAGE;

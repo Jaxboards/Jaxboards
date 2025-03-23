@@ -14,9 +14,10 @@
  * ```
  */
 
-/**
+/*
  * Fetch CLI arguments.
  */
+
 $php_codesniffer_report = $argv[1] ?? '';
 
 if ($php_codesniffer_report === '') {
@@ -40,7 +41,7 @@ if ($sonarqube_report === '') {
     exit(1);
 }
 
-/**
+/*
  * Validate CLI arguments are usable
  */
 
@@ -80,7 +81,8 @@ if (
 $data = json_decode(
     file_get_contents($php_codesniffer_report),
     null,
-    512, // default
+    512,
+    // default
     JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
 );
 
