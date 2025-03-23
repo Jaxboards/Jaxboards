@@ -8,12 +8,18 @@ jobs:
   run-linters:
     name: Lint
     runs-on: ubuntu-latest
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the
+      # added or changed files to the repository.
+      contents: write
     if: github.event.pull_request.draft == false
     steps:
       - uses: actions/checkout@v4
         with:
           # disable shallow clones for better SonarQube analysis
           fetch-depth: 0
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.WTL420_PERSONAL_ACCESS_TOKEN }}
       - uses: shivammathur/setup-php@v2
         with:
           extensions: mbstring
@@ -23,6 +29,10 @@ jobs:
           cache: npm
       - uses: ramsey/composer-install@v3
       - run: npm clean-install
+      - run: npm run-script autofix
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
       - run: |
           echo "[]" > eslint-report.json &&
           echo "[]" > stylelint-report.json &&
