@@ -781,7 +781,10 @@ onclick="this.form.submitButton=this"/></div>
         }
 
         // Do some magic to update the tree all the way up (for subforums).
-        $path = trim((string) $fdata['path']) !== '' && trim((string) $fdata['path']) !== '0' ? explode(' ', (string) $fdata['path']) : [];
+        $path = trim((string) $fdata['path']) !== ''
+            && trim((string) $fdata['path']) !== '0'
+            ? explode(' ', (string) $fdata['path'])
+            : [];
         if (!in_array($fdata['id'], $path)) {
             $path[] = $fdata['id'];
         }

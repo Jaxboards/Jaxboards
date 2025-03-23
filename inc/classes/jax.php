@@ -128,7 +128,17 @@ class JAX
 
         foreach ($a as $k => $v) {
             $this->c[$k] = $v;
-            setcookie($k, (string) $v, ['expires' => $c, 'path' => null, 'domain' => null, 'secure' => true, 'httponly' => $htmlonly]);
+            setcookie(
+                $k,
+                (string) $v,
+                [
+                    'expires' => $c,
+                    'path' => null,
+                    'domain' => null,
+                    'secure' => true,
+                    'httponly' => $htmlonly,
+                ],
+            );
         }
     }
 

@@ -83,7 +83,10 @@ class search
 
         while ($f = $DB->arow($result)) {
             $titles[$f['id']] = $f['title'];
-            $path = trim((string) $f['path']) !== '' && trim((string) $f['path']) !== '0' ? explode(' ', (string) $f['path']) : [];
+            $path = trim((string) $f['path']) !== ''
+                && trim((string) $f['path']) !== '0'
+                ? explode(' ', (string) $f['path'])
+                : [];
             $t = &$tree;
             foreach ($path as $v) {
                 if (!isset($t[$v]) || !is_array($t[$v])) {

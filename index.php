@@ -306,7 +306,15 @@ if (!isset($JAX->b['act'])) {
 }
 
 if (
-    $JAX->b['act'] != 'logreg' && $JAX->b['act'] != 'logreg2' && $JAX->b['act'] != 'logreg4' && $JAX->b['act'] != 'logreg3' && (!$PERMS['can_view_board'] || $CFG['boardoffline'] && !$PERMS['can_view_offline_board'])
+    $JAX->b['act'] != 'logreg'
+    && $JAX->b['act'] != 'logreg2'
+    && $JAX->b['act'] != 'logreg4'
+    && $JAX->b['act'] != 'logreg3'
+    && (
+        !$PERMS['can_view_board']
+        || $CFG['boardoffline']
+        && !$PERMS['can_view_offline_board']
+    )
 ) {
     $JAX->b['act'] = 'boardoffline';
 }

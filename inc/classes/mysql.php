@@ -573,7 +573,9 @@ class MySQL
             syslog(
                 LOG_ERR,
                 'NO TABLE NAMES' . PHP_EOL . print_r(
+                    // phpcs:disable PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
                     debug_backtrace(),
+                    // phpcs:enable
                     true,
                 ),
             );
