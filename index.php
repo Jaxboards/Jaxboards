@@ -8,9 +8,10 @@
  *
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
+
 if ($_GET['showerrors'] ?? false) {
     error_reporting(E_ALL);
-    ini_set('display_errors', 1);
+    ini_set('display_errors', '1');
 }
 
 if (!defined('JAXBOARDS_ROOT')) {
