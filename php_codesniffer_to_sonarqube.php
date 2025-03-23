@@ -107,10 +107,6 @@ file_put_contents(
                 &$current_rules,
                 $data,
             ): array {
-                // set this here so we can remove it after, just keeping this
-                // here so this can work when the report importer updates its
-                // format
-                $result['rules'] = [];
                 array_push(
                     $result['rules'],
                     ...array_map(
@@ -145,28 +141,30 @@ file_put_contents(
                     $result['rules'],
                 );
 
-                unset($result['rules']);
-
                 array_push(
                     $result['issues'],
                     ...array_map(
                         static fn(array $message): array => [
                             'ruleId' => $message['source'],
                             'engineId' => 'PHP_CodeSniffer',
-                            // severity and type are fields from the old format
-                            // that we should remove once we have the new format
-                            // working
-                            'severity' => 'MINOR',
-                            'type' => 'CODE_SMELL',
                             'primaryLocation' => [
                                 'message' => $message['message'],
                                 'filePath' => $file,
                                 'textRange' => [
-                                    'startColumn'
+                                    'endColumn' =>
                                         // SonarQube starts at 0 for columns
                                         // while PHP_CodeSniffer starts at 1
-                                        => ((int) $message['column']) - 1,
-                                    'startLine' => (int) $message['line'],
+                                        (string) (
+                                            ((int) $message['column']) - 1
+                                        ),
+                                    'endLine' => (string) $message['line'],
+                                    'startColumn' =>
+                                        // SonarQube starts at 0 for columns
+                                        // while PHP_CodeSniffer starts at 1
+                                        (string) (
+                                            ((int) $message['column']) - 1
+                                        ),
+                                    'startLine' => (string) $message['line'],
                                 ],
                             ],
 
@@ -179,6 +177,7 @@ file_put_contents(
             },
             [
                 'issues' => [],
+                'rules' => [],
             ],
         ),
         JSON_THROW_ON_ERROR,
