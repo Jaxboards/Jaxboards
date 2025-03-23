@@ -3,7 +3,7 @@
 $PAGE->loadmeta('topic');
 
 $IDX = new TOPIC();
-class TOPIC
+final class TOPIC
 {
     public $id = 0;
 
@@ -53,7 +53,11 @@ class TOPIC
         --$this->page;
 
         $this->numperpage = 10;
-        if (isset($JAX->b['qreply']) && $JAX->b['qreply'] && !$PAGE->jsupdate) {
+        if (
+            isset($JAX->b['qreply'])
+            && $JAX->b['qreply']
+            && !$PAGE->jsupdate
+        ) {
             if ($PAGE->jsaccess && !$PAGE->jsdirectlink) {
                 $this->qreplyform($id);
             } else {
@@ -62,7 +66,7 @@ class TOPIC
         } elseif (isset($JAX->b['ratepost']) && $JAX->b['ratepost']) {
             $this->ratepost($JAX->b['ratepost'], $JAX->b['niblet']);
         } elseif (isset($JAX->b['votepoll']) && $JAX->b['votepoll']) {
-            $this->votepoll($id);
+            $this->votepoll();
         } elseif (isset($JAX->b['findpost']) && $JAX->b['findpost']) {
             $this->findpost($JAX->b['findpost']);
         } elseif (isset($JAX->b['getlast']) && $JAX->b['getlast']) {
@@ -71,10 +75,7 @@ class TOPIC
             $this->qeditpost($JAX->b['edit']);
         } elseif (isset($JAX->b['quote']) && $JAX->b['quote']) {
             $this->multiquote($id);
-        } elseif (
-            isset($JAX->b['markread'])
-            && $JAX->b['markread']
-        ) {
+        } elseif (isset($JAX->b['markread']) && $JAX->b['markread']) {
             $this->markread($id);
         } elseif (
             isset($JAX->b['listrating'])
@@ -147,14 +148,14 @@ class TOPIC
         $SESS->location_verbose = "In topic '" . $this->topicdata['topic_title'] . "'";
 
         // Output RSS instead.
-        if (isset($JAX->b['fmt']) && $JAX->b['fmt'] == 'RSS') {
+        if (isset($JAX->b['fmt']) && $JAX->b['fmt'] === 'RSS') {
             include_once __DIR__ . '/inc/classes/rssfeed.php';
             $link = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'];
             $feed = new rssfeed(
                 [
-                    'title' => $this->topicdata['topic_title'],
                     'description' => $this->topicdata['subtitle'],
                     'link' => $link . '?act=vt' . $id,
+                    'title' => $this->topicdata['topic_title'],
                 ],
             );
             $result = $DB->safespecial(
@@ -177,11 +178,11 @@ class TOPIC
             while ($f = $DB->arow($result)) {
                 $feed->additem(
                     [
-                        'title' => $f['display_name'] . ':',
-                        'link' => $link . '?act=vt' . $id . '&amp;findpost=' . $f['id'],
                         'description' => $JAX->blockhtml($JAX->theworks($f['post'])),
                         'guid' => $f['id'],
+                        'link' => $link . '?act=vt' . $id . '&amp;findpost=' . $f['id'],
                         'pubDate' => date('r', $f['date']),
+                        'title' => $f['display_name'] . ':',
                     ],
                 );
             }
@@ -218,32 +219,28 @@ class TOPIC
                 'topic-pages-part',
                 $id,
                 $x,
-                $x == ($this->page + 1) ? ' class="active"' : '',
+                $x === $this->page + 1 ? ' class="active"' : '',
                 $x,
             );
         }
 
         // Are they on the last page? This stores a session variable.
-        $SESS->addvar('topic_lastpage', ($page + 1) == $totalpages);
+        $SESS->addvar('topic_lastpage', $page + 1 === $totalpages);
 
         // If it's a poll, put it in.
-        if ($this->topicdata['poll_type']) {
-            $poll = $PAGE->meta(
-                'box',
-                " id='poll'",
+        $poll = $this->topicdata['poll_type'] ? $PAGE->meta(
+            'box',
+            " id='poll'",
+            $this->topicdata['poll_q'],
+            $this->generatepoll(
                 $this->topicdata['poll_q'],
-                $this->generatepoll(
-                    $this->topicdata['poll_q'],
-                    $this->topicdata['poll_type'],
-                    $JAX->json_decode(
-                        $this->topicdata['poll_choices'],
-                    ),
-                    $this->topicdata['poll_results'],
+                $this->topicdata['poll_type'],
+                $JAX->json_decode(
+                    $this->topicdata['poll_choices'],
                 ),
-            );
-        } else {
-            $poll = '';
-        }
+                $this->topicdata['poll_results'],
+            ),
+        ) : '';
 
         // Generate post listing.
         $page = $PAGE->meta('topic-table', $this->postsintooutput());
@@ -268,10 +265,10 @@ class TOPIC
             && (!$this->topicdata['locked']
             || $PERMS['can_override_locked_topics'])
             ? "<a href='?act=vt{$id}&qreply=1'>"
-            . ($PAGE->meta(
+            . $PAGE->meta(
                 $PAGE->metaexists('button-qreply')
                 ? 'button-qreply' : 'topic-button-qreply',
-            )) : '',
+            ) : '',
             $this->topicdata['fperms']['reply']
             && (!$this->topicdata['locked']
             || $PERMS['can_override_locked_topics'])
@@ -285,16 +282,22 @@ class TOPIC
         // Make the users online list.
         $usersonline = '';
         foreach ($DB->getUsersOnline() as $f) {
-            if (!empty($f['uid']) && $f['location'] == "vt{$id}") {
-                $usersonline .= (isset($f['is_bot']) && $f['is_bot'])
-                    ? '<a class="user' . $f['uid'] . '">' . $f['name'] . '</a>'
-                    : $PAGE->meta(
-                        'user-link',
-                        $f['uid'],
-                        $f['group_id'] . ($f['status'] == 'idle' ? ' idle' : ''),
-                        $f['name'],
-                    );
+            if (empty($f['uid'])) {
+                continue;
             }
+
+            if ($f['location'] !== "vt{$id}") {
+                continue;
+            }
+
+            $usersonline .= isset($f['is_bot']) && $f['is_bot']
+                ? '<a class="user' . $f['uid'] . '">' . $f['name'] . '</a>'
+                : $PAGE->meta(
+                    'user-link',
+                    $f['uid'],
+                    $f['group_id'] . ($f['status'] === 'idle' ? ' idle' : ''),
+                    $f['name'],
+                );
         }
 
         $page .= $PAGE->meta('topic-users-online', $usersonline);
@@ -346,7 +349,7 @@ class TOPIC
         global $SESS,$PAGE,$DB,$JAX;
 
         // Check for new posts and append them.
-        if ($SESS->location != "vt{$id}") {
+        if ($SESS->location !== "vt{$id}") {
             $SESS->delvar('topic_lastpid');
         }
 
@@ -366,20 +369,26 @@ class TOPIC
         $oldcache = array_flip(explode(',', (string) $SESS->users_online_cache));
         $newcache = '';
         foreach ($DB->getUsersOnline() as $f) {
-            if ($f['uid'] && $f['location'] == "vt{$id}") {
-                if (!isset($oldcache[$f['uid']])) {
-                    $list[] = [
-                        $f['uid'],
-                        $f['group_id'],
-                        $f['status'] != 'active' ? $f['status'] : '',
-                        $f['name'],
-                    ];
-                } else {
-                    unset($oldcache[$f['uid']]);
-                }
-
-                $newcache .= $f['uid'] . ',';
+            if (!$f['uid']) {
+                continue;
             }
+
+            if ($f['location'] !== "vt{$id}") {
+                continue;
+            }
+
+            if (!isset($oldcache[$f['uid']])) {
+                $list[] = [
+                    $f['uid'],
+                    $f['group_id'],
+                    $f['status'] !== 'active' ? $f['status'] : '',
+                    $f['name'],
+                ];
+            } else {
+                unset($oldcache[$f['uid']]);
+            }
+
+            $newcache .= $f['uid'] . ',';
         }
 
         if ($list !== []) {
@@ -445,14 +454,14 @@ class TOPIC
         $PAGE->JS(
             'window',
             [
-                'id' => 'qreply',
-                'title' => $JAX->wordfilter($tdata['title']),
                 'content' => $PAGE->meta(
                     'topic-reply-form',
                     $id,
                     $JAX->blockhtml($prefilled),
                 ),
+                'id' => 'qreply',
                 'resize' => 'textarea',
+                'title' => $JAX->wordfilter($tdata['title']),
             ],
         );
         $PAGE->JS('updateqreply', '');
@@ -467,147 +476,143 @@ class TOPIC
 
         $topic_post_counter = 0;
 
-        if ($lastpid) {
-            $query = $DB->safespecial(
-                <<<'MySQL'
-                    SELECT m.`id` AS `id`
-                        , m.`name` AS `name`
-                        , m.`group_id` AS `group_id`
-                        , m.`sound_im` AS `sound_im`
-                        , m.`sound_shout` AS `sound_shout`
-                        , UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`
-                        , m.`display_name` AS `display_name`
-                        , m.`friends` AS `friends`
-                        , m.`enemies` AS `enemies`
-                        , m.`skin_id` AS `skin_id`
-                        , m.`nowordfilter` AS `nowordfilter`
-                        , m.`wysiwyg` AS `wysiwyg`
-                        , m.`avatar` AS `avatar`
-                        , m.`usertitle` AS `usertitle`
-                        , CONCAT(MONTH(m.`birthdate`)
-                        , ' '
-                        , MONTH(m.`birthdate`)) as `birthday`
-                        , m.`mod` AS `mod`
-                        , m.`posts` AS `posts`
-                        , p.`tid` AS `tid`
-                        , p.`id` AS `pid`
-                        , INET6_NTOA(p.`ip`) AS `ip`
-                        , p.`newtopic` AS `newtopic`
-                        , p.`post` AS `post`
-                        , p.`showsig` AS `showsig`
-                        , p.`showemotes` AS `showemotes`
-                        , p.`tid` AS `tid`
-                        , UNIX_TIMESTAMP(p.`date`) AS `date`
-                        , p.`auth_id` AS `auth_id`
-                        , p.`rating` AS `rating`
-                        , g.`title` AS `title`
-                        , g.`icon` AS `icon`
-                        , UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`
-                        , p.`editby` AS `editby`
-                        , e.`display_name` AS `ename`
-                        , e.`group_id` AS `egroup_id`
-                    FROM %t AS p
-                    LEFT JOIN %t m
-                        ON p.`auth_id` = m.`id`
-                    LEFT JOIN %t g
-                        ON m.`group_id` = g.`id`
-                    LEFT JOIN %t e
+        $query = $lastpid ? $DB->safespecial(
+            <<<'MySQL'
+                SELECT m.`id` AS `id`
+                    , m.`name` AS `name`
+                    , m.`group_id` AS `group_id`
+                    , m.`sound_im` AS `sound_im`
+                    , m.`sound_shout` AS `sound_shout`
+                    , UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`
+                    , m.`display_name` AS `display_name`
+                    , m.`friends` AS `friends`
+                    , m.`enemies` AS `enemies`
+                    , m.`skin_id` AS `skin_id`
+                    , m.`nowordfilter` AS `nowordfilter`
+                    , m.`wysiwyg` AS `wysiwyg`
+                    , m.`avatar` AS `avatar`
+                    , m.`usertitle` AS `usertitle`
+                    , CONCAT(MONTH(m.`birthdate`)
+                    , ' '
+                    , MONTH(m.`birthdate`)) as `birthday`
+                    , m.`mod` AS `mod`
+                    , m.`posts` AS `posts`
+                    , p.`tid` AS `tid`
+                    , p.`id` AS `pid`
+                    , INET6_NTOA(p.`ip`) AS `ip`
+                    , p.`newtopic` AS `newtopic`
+                    , p.`post` AS `post`
+                    , p.`showsig` AS `showsig`
+                    , p.`showemotes` AS `showemotes`
+                    , p.`tid` AS `tid`
+                    , UNIX_TIMESTAMP(p.`date`) AS `date`
+                    , p.`auth_id` AS `auth_id`
+                    , p.`rating` AS `rating`
+                    , g.`title` AS `title`
+                    , g.`icon` AS `icon`
+                    , UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`
+                    , p.`editby` AS `editby`
+                    , e.`display_name` AS `ename`
+                    , e.`group_id` AS `egroup_id`
+                FROM %t AS p
+                LEFT JOIN %t m
+                    ON p.`auth_id` = m.`id`
+                LEFT JOIN %t g
+                    ON m.`group_id` = g.`id`
+                LEFT JOIN %t e
+                ON p.`editby` = e.`id`
+                WHERE p.`tid` = ?
+                  AND p.`id` > ?
+                ORDER BY `pid`
+
+                MySQL,
+            ['posts', 'members', 'member_groups', 'members'],
+            $this->id,
+            $lastpid,
+        ) : $DB->safespecial(
+            <<<'MySQL'
+                SELECT m.`id` AS `id`
+                    , m.`name` AS `name`
+                    , m.`email` AS `email`
+                    , m.`sig` AS `sig`
+                    , m.`posts` AS `posts`
+                    , m.`group_id` AS `group_id`
+                    , m.`avatar` AS `avatar`
+                    , m.`usertitle` AS `usertitle`
+                    , UNIX_TIMESTAMP(m.`join_date`) AS `join_date`
+                    , UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`
+                    , m.`contact_skype` AS `contact_skype`
+                    , m.`contact_yim` AS `contact_yim`
+                    , m.`contact_msn` AS `contact_msn`
+                    , m.`contact_gtalk` AS `contact_gtalk`
+                    , m.`contact_aim` AS `contact_aim`
+                    , m.`website` AS `website`
+                    , m.`birthdate` AS `birthdate`
+                    , DAY(m.`birthdate`) AS `dob_day`
+                    , MONTH(m.`birthdate`) AS `dob_month`
+                    , YEAR(m.`birthdate`) AS `dob_year`
+                    , m.`about` AS `about`
+                    , m.`display_name` AS `display_name`
+                    , m.`full_name` AS `full_name`
+                    , m.`contact_steam` AS `contact_steam`
+                    , m.`location` AS `location`
+                    , m.`gender` AS `gender`
+                    , m.`friends` AS `friends`
+                    , m.`enemies` AS `enemies`
+                    , m.`sound_shout` AS `sound_shout`
+                    , m.`sound_im` AS `sound_im`
+                    , m.`sound_pm` AS `sound_pm`
+                    , m.`sound_postinmytopic` AS `sound_postinmytopic`
+                    , m.`sound_postinsubscribedtopic` AS `sound_postinsubscribedtopic`
+                    , m.`notify_pm` AS `notify_pm`
+                    , m.`notify_postinmytopic` AS `notify_postinmytopic`
+                    , m.`notify_postinsubscribedtopic` AS `notify_postinsubscribedtopic`
+                    , .`ucpnotepad` AS `ucpnotepad`
+                    , m.`skin_id` AS `skin_id`
+                    , .`contact_twitter` AS `contact_twitter`
+                    , .`contact_discord` AS `contact_discord`
+                    , .`contact_youtube` AS `contact_youtube`
+                    , .`contact_bluesky` AS `contact_bluesky`
+                    , .`email_settings` AS `email_settings`
+                    , m.`nowordfilter` AS `nowordfilter`
+                    , NET6_NTOA(m.`ip`) AS `ip`
+                    , m.`mod` AS `mod`
+                    , m.`wysiwyg` AS `wysiwyg`
+                    , p.`tid` AS `tid`
+                    , p.`id` AS `pid`
+                    , INET6_NTOA(p.`ip`) AS `ip`
+                    , p.`newtopic` AS `newtopic`
+                    , p.`post` AS `post`
+                    , p.`showsig` AS `showsig`
+                    , p.`showemotes` AS `showemotes`
+                    , p.`tid` AS `tid`
+                    , UNIX_TIMESTAMP(p.`date`) AS `date`
+                    , p.`auth_id` AS `auth_id`
+                    , p.`rating` AS `rating`
+                    , g.`title` AS `title`
+                    , g.`icon` AS `icon`
+                    , UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`
+                    , p.`editby` AS `editby`
+                    , e.`display_name` AS `ename`
+                    , e.`group_id` AS `egroup_id`
+                FROM %t p
+                LEFT JOIN %t m
+                    ON p.`auth_id`=m.`id`
+                LEFT JOIN %t g
+                    ON m.`group_id` = g.`id`
+                LEFT JOIN %t e
                     ON p.`editby` = e.`id`
-                    WHERE p.`tid` = ?
-                      AND p.`id` > ?
-                    ORDER BY `pid`
+                WHERE p.`tid` = ?
+                ORDER BY `newtopic` DESC
+                    , `pid` ASC
+                LIMIT ?, ?
 
-                    MySQL,
-                ['posts', 'members', 'member_groups', 'members'],
-                $this->id,
-                $lastpid,
-            );
-        } else {
-            $query = $DB->safespecial(
-                <<<'MySQL'
-                    SELECT m.`id` AS `id`
-                        , m.`name` AS `name`
-                        , m.`email` AS `email`
-                        , m.`sig` AS `sig`
-                        , m.`posts` AS `posts`
-                        , m.`group_id` AS `group_id`
-                        , m.`avatar` AS `avatar`
-                        , m.`usertitle` AS `usertitle`
-                        , UNIX_TIMESTAMP(m.`join_date`) AS `join_date`
-                        , UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`
-                        , m.`contact_skype` AS `contact_skype`
-                        , m.`contact_yim` AS `contact_yim`
-                        , m.`contact_msn` AS `contact_msn`
-                        , m.`contact_gtalk` AS `contact_gtalk`
-                        , m.`contact_aim` AS `contact_aim`
-                        , m.`website` AS `website`
-                        , m.`birthdate` AS `birthdate`
-                        , DAY(m.`birthdate`) AS `dob_day`
-                        , MONTH(m.`birthdate`) AS `dob_month`
-                        , YEAR(m.`birthdate`) AS `dob_year`
-                        , m.`about` AS `about`
-                        , m.`display_name` AS `display_name`
-                        , m.`full_name` AS `full_name`
-                        , m.`contact_steam` AS `contact_steam`
-                        , m.`location` AS `location`
-                        , m.`gender` AS `gender`
-                        , m.`friends` AS `friends`
-                        , m.`enemies` AS `enemies`
-                        , m.`sound_shout` AS `sound_shout`
-                        , m.`sound_im` AS `sound_im`
-                        , m.`sound_pm` AS `sound_pm`
-                        , m.`sound_postinmytopic` AS `sound_postinmytopic`
-                        , m.`sound_postinsubscribedtopic` AS `sound_postinsubscribedtopic`
-                        , m.`notify_pm` AS `notify_pm`
-                        , m.`notify_postinmytopic` AS `notify_postinmytopic`
-                        , m.`notify_postinsubscribedtopic` AS `notify_postinsubscribedtopic`
-                        , .`ucpnotepad` AS `ucpnotepad`
-                        , m.`skin_id` AS `skin_id`
-                        , .`contact_twitter` AS `contact_twitter`
-                        , .`contact_discord` AS `contact_discord`
-                        , .`contact_youtube` AS `contact_youtube`
-                        , .`contact_bluesky` AS `contact_bluesky`
-                        , .`email_settings` AS `email_settings`
-                        , m.`nowordfilter` AS `nowordfilter`
-                        , NET6_NTOA(m.`ip`) AS `ip`
-                        , m.`mod` AS `mod`
-                        , m.`wysiwyg` AS `wysiwyg`
-                        , p.`tid` AS `tid`
-                        , p.`id` AS `pid`
-                        , INET6_NTOA(p.`ip`) AS `ip`
-                        , p.`newtopic` AS `newtopic`
-                        , p.`post` AS `post`
-                        , p.`showsig` AS `showsig`
-                        , p.`showemotes` AS `showemotes`
-                        , p.`tid` AS `tid`
-                        , UNIX_TIMESTAMP(p.`date`) AS `date`
-                        , p.`auth_id` AS `auth_id`
-                        , p.`rating` AS `rating`
-                        , g.`title` AS `title`
-                        , g.`icon` AS `icon`
-                        , UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`
-                        , p.`editby` AS `editby`
-                        , e.`display_name` AS `ename`
-                        , e.`group_id` AS `egroup_id`
-                    FROM %t p
-                    LEFT JOIN %t m
-                        ON p.`auth_id`=m.`id`
-                    LEFT JOIN %t g
-                        ON m.`group_id` = g.`id`
-                    LEFT JOIN %t e
-                        ON p.`editby` = e.`id`
-                    WHERE p.`tid` = ?
-                    ORDER BY `newtopic` DESC
-                        , `pid` ASC
-                    LIMIT ?, ?
-
-                    MySQL,
-                ['posts', 'members', 'member_groups', 'members'],
-                $this->id,
-                $topic_post_counter = $this->page * $this->numperpage,
-                $this->numperpage,
-            );
-        }
+                MySQL,
+            ['posts', 'members', 'member_groups', 'members'],
+            $this->id,
+            $topic_post_counter = $this->page * $this->numperpage,
+            $this->numperpage,
+        );
 
         $rows = '';
         while ($post = $DB->arow($query)) {
@@ -638,15 +643,21 @@ class TOPIC
                                 $v['img'],
                                 $v['title'],
                             ) . '</a>';
-                        if (isset($prating[$k]) && $prating[$k]) {
-                            $num = 'x' . count($prating[$k]);
-                            $postrating .= $num;
-                            $showrating .= $PAGE->meta(
-                                'rating-niblet',
-                                $v['img'],
-                                $v['title'],
-                            ) . $num;
+                        if (!isset($prating[$k])) {
+                            continue;
                         }
+
+                        if (!$prating[$k]) {
+                            continue;
+                        }
+
+                        $num = 'x' . count($prating[$k]);
+                        $postrating .= $num;
+                        $showrating .= $PAGE->meta(
+                            'rating-niblet',
+                            $v['img'],
+                            $v['title'],
+                        ) . $num;
                     }
 
                     $postrating = $PAGE->meta(
@@ -758,7 +769,7 @@ class TOPIC
         return $post['auth_id']
     && ($post['newtopic']
     ? $PERMS['can_edit_topics'] : $PERMS['can_edit_posts'])
-    && $post['auth_id'] == $USER['id'];
+    && $post['auth_id'] === $USER['id'];
     }
 
     public function canmoderate()
@@ -852,7 +863,7 @@ class TOPIC
                         'votepoll' => 1,
                     ],
                 );
-            if ($type == 'multi') {
+            if ($type === 'multi') {
                 foreach ($choices as $k => $v) {
                     $page .= "<div class='choice'><input type='checkbox' "
                         . "name='choice[]' value='{$k}' id='poll_{$k}' /> "
@@ -873,12 +884,10 @@ class TOPIC
         return $page;
     }
 
-    public function votepoll($tid)
+    public function votepoll()
     {
         global $DB,$PAGE,$USER,$JAX;
-
         $e = '';
-
         if (!$USER) {
             $e = 'You must be logged in to vote!';
         } else {
@@ -898,7 +907,9 @@ class TOPIC
             if ($results) {
                 $results = explode(';', (string) $results);
                 foreach ($results as $k => $v) {
-                    $results[$k] = $v !== '' && $v !== '0' ? explode(',', $v) : [];
+                    $results[$k] = $v !== '' && $v !== '0'
+                        ? explode(',', $v)
+                        : [];
                 }
             } else {
                 $results = [];
@@ -911,7 +922,7 @@ class TOPIC
             $voted = false;
             foreach ($results as $v) {
                 foreach ($v as $v2) {
-                    if ($v2 == $USER['id']) {
+                    if ($v2 === $USER['id']) {
                         $voted = true;
 
                         break;
@@ -923,12 +934,14 @@ class TOPIC
                 $e = 'You have already voted on this poll!';
             }
 
-            if ($row['poll_type'] == 'multi') {
+            if ($row['poll_type'] === 'multi') {
                 if (is_array($choice)) {
                     foreach ($choice as $c) {
-                        if (!is_numeric($c) || $c >= $numchoices || $c < 0) {
-                            $e = 'Invalid choices';
+                        if (is_numeric($c) && $c < $numchoices && $c >= 0) {
+                            continue;
                         }
+
+                        $e = 'Invalid choices';
                     }
                 } else {
                     $e = 'Invalid Choice';
@@ -942,7 +955,7 @@ class TOPIC
             return $PAGE->JS('error', $e);
         }
 
-        if ($row['poll_type'] == 'multi') {
+        if ($row['poll_type'] === 'multi') {
             foreach ($choice as $c) {
                 $results[$c][] = $USER['id'];
             }
@@ -957,7 +970,6 @@ class TOPIC
         }
 
         $presults = implode(';', $presults);
-
         $PAGE->JS(
             'update',
             '#poll .content',
@@ -969,7 +981,6 @@ class TOPIC
             ),
             '1',
         );
-
         $DB->safeupdate(
             'topics',
             [
@@ -1013,12 +1024,16 @@ class TOPIC
             } else {
                 $found = false;
                 foreach ($ratings as $k => $v) {
-                    if (false !== ($pos = array_search($USER['id'], $v, true))) {
-                        unset($ratings[$k][$pos]);
-                        if (empty($ratings[$k])) {
-                            unset($ratings[$k]);
-                        }
+                    if (($pos = array_search($USER['id'], $v, true)) === false) {
+                        continue;
                     }
+
+                    unset($ratings[$k][$pos]);
+                    if (!empty($ratings[$k])) {
+                        continue;
+                    }
+
+                    unset($ratings[$k]);
                 }
             }
         }
@@ -1083,66 +1098,68 @@ class TOPIC
             ],
         );
 
-        if ($PAGE->jsnewlocation) {
-            if (!$post) {
-                $PAGE->JS('alert', 'Post not found!');
-            } elseif (!$this->canedit($post)) {
-                $PAGE->JS('alert', "You don't have permission to edit this post.");
+        if (!$PAGE->jsnewlocation) {
+            return;
+        }
+
+        if (!$post) {
+            $PAGE->JS('alert', 'Post not found!');
+        } elseif (!$this->canedit($post)) {
+            $PAGE->JS('alert', "You don't have permission to edit this post.");
+        } else {
+            if ($post['newtopic']) {
+                $hiddenfields .= $JAX->hiddenFormFields(
+                    [
+                        'tid' => $post['tid'],
+                    ],
+                );
+                $result = $DB->safeselect(
+                    <<<'MySQL'
+                        `id`
+                        , `title`
+                        , `subtitle`
+                        , `lp_uid`
+                        , UNIX_TIMESTAMP(`lp_date`) AS `lp_date`
+                        , `fid`
+                        , `auth_id`
+                        , `replies`
+                        , `views`
+                        , `pinned`
+                        , `poll_choices`
+                        , `poll_results`
+                        , `poll_q`
+                        , `poll_type`
+                        , `summary`
+                        , `locked`
+                        , UNIX_TIMESTAMP(`date`) AS `date`
+                        , `op`
+                        , `cal_event`
+
+                        MySQL,
+                    'topics',
+                    'WHERE `id`=?',
+                    $post['tid'],
+                );
+                $topic = $DB->arow($result);
+                $DB->disposeresult($result);
+
+                $form = $PAGE->meta(
+                    'topic-qedit-topic',
+                    $hiddenfields,
+                    $topic['title'],
+                    $topic['subtitle'],
+                    $JAX->blockhtml($post['post']),
+                );
             } else {
-                if ($post['newtopic']) {
-                    $hiddenfields .= $JAX->hiddenFormFields(
-                        [
-                            'tid' => $post['tid'],
-                        ],
-                    );
-                    $result = $DB->safeselect(
-                        <<<'MySQL'
-                            `id`
-                            , `title`
-                            , `subtitle`
-                            , `lp_uid`
-                            , UNIX_TIMESTAMP(`lp_date`) AS `lp_date`
-                            , `fid`
-                            , `auth_id`
-                            , `replies`
-                            , `views`
-                            , `pinned`
-                            , `poll_choices`
-                            , `poll_results`
-                            , `poll_q`
-                            , `poll_type`
-                            , `summary`
-                            , `locked`
-                            , UNIX_TIMESTAMP(`date`) AS `date`
-                            , `op`
-                            , `cal_event`
-
-                            MySQL,
-                        'topics',
-                        'WHERE `id`=?',
-                        $post['tid'],
-                    );
-                    $topic = $DB->arow($result);
-                    $DB->disposeresult($result);
-
-                    $form = $PAGE->meta(
-                        'topic-qedit-topic',
-                        $hiddenfields,
-                        $topic['title'],
-                        $topic['subtitle'],
-                        $JAX->blockhtml($post['post']),
-                    );
-                } else {
-                    $form = $PAGE->meta(
-                        'topic-qedit-post',
-                        $hiddenfields,
-                        $JAX->blockhtml($post['post']),
-                        $id,
-                    );
-                }
-
-                $PAGE->JS('update', "#pid_{$id} .post_content", $form);
+                $form = $PAGE->meta(
+                    'topic-qedit-post',
+                    $hiddenfields,
+                    $JAX->blockhtml($post['post']),
+                    $id,
+                );
             }
+
+            $PAGE->JS('update', "#pid_{$id} .post_content", $form);
         }
     }
 
@@ -1257,7 +1274,7 @@ class TOPIC
             );
             $num = 1;
             while ($f = $DB->arow($result)) {
-                if ($f['id'] == $pid) {
+                if ($f['id'] === $pid) {
                     $pid = $f['id'];
                     $couldntfindit = false;
 

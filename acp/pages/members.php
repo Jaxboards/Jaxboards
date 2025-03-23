@@ -5,7 +5,7 @@ if (!defined(INACP)) {
 }
 
 new members();
-class members
+final class members
 {
     public function __construct()
     {
@@ -25,12 +25,12 @@ class members
             default => $this->showmain(),
         };
         $links = [
-            'edit' => 'Edit Members',
-            'prereg' => 'Pre-Register',
-            'merge' => 'Account Merge',
             'delete' => 'Delete Account',
-            'massmessage' => 'Mass Message',
+            'edit' => 'Edit Members',
             'ipbans' => 'IP Bans',
+            'massmessage' => 'Mass Message',
+            'merge' => 'Account Merge',
+            'prereg' => 'Pre-Register',
             'validation' => 'Validation',
         ];
         $sidebarLinks = '';
@@ -38,8 +38,8 @@ class members
             $sidebarLinks .= $PAGE->parseTemplate(
                 'sidebar-list-link.html',
                 [
-                    'url' => '?act=members&do=' . $do,
                     'title' => $title,
+                    'url' => '?act=members&do=' . $do,
                 ],
             ) . PHP_EOL;
         }
@@ -89,9 +89,9 @@ class members
                         $f['avatar'],
                         AVAURL . 'default.gif',
                     ),
+                    'group_title' => $f['group_title'],
                     'id' => $f['id'],
                     'title' => $f['display_name'],
-                    'group_title' => $f['group_title'],
                 ],
             ) . PHP_EOL;
         }
@@ -143,7 +143,10 @@ class members
                 $data = $DB->arow($result);
                 $DB->disposeresult($result);
                 if (isset($JAX->p['savedata']) && $JAX->p['savedata']) {
-                    if ($data['group_id'] != 2 || $JAX->userData['id'] == 1) {
+                    if (
+                        $data['group_id'] !== 2
+                        || $JAX->userData['id'] === 1
+                    ) {
                         $write = [];
                         if ($JAX->p['password']) {
                             $write['pass'] = password_hash(
@@ -178,13 +181,15 @@ class members
                             'group_id',
                         ];
                         foreach ($fields as $field) {
-                            if (isset($JAX->p[$field])) {
-                                $write[$field] = $JAX->p[$field];
+                            if (!isset($JAX->p[$field])) {
+                                continue;
                             }
+
+                            $write[$field] = $JAX->p[$field];
                         }
 
                         // Make it so root admins can't get out of admin.
-                        if ($JAX->b['mid'] == 1) {
+                        if ($JAX->b['mid'] === 1) {
                             $write['group_id'] = 2;
                         }
 
@@ -278,7 +283,7 @@ class members
             }
 
             $data = array_pop($data);
-            if ($data['group_id'] == 2 && $JAX->userData['id'] != 1) {
+            if ($data['group_id'] === 2 && $JAX->userData['id'] !== 1) {
                 $page = $PAGE->error(
                     'You do not have permission to edit this profile. '
                     . $PAGE->back(),
@@ -324,7 +329,7 @@ class members
         }
 
         $PAGE->addContentBox(
-            (isset($data['name']) && $data['name'])
+            isset($data['name']) && $data['name']
             ? 'Editing ' . $data['name'] . "'s details" : 'Edit Member',
             $page,
         );
@@ -358,7 +363,7 @@ class members
                     $DB->basicvalue($JAX->p['displayname']),
                 );
                 if ($f = $DB->arow($result)) {
-                    $e = 'That ' . ($f['name'] == $JAX->p['username']
+                    $e = 'That ' . ($f['name'] === $JAX->p['username']
                         ? 'username' : 'display name') . ' is already taken';
                 }
 
@@ -369,15 +374,15 @@ class members
                 $page .= $PAGE->error($e);
             } else {
                 $member = [
-                    'name' => $JAX->p['username'],
+                    'birthdate' => '0000-00-00',
                     'display_name' => $JAX->p['displayname'],
+                    'group_id' => 1,
+                    'last_visit' => date('Y-m-d H:i:s', time()),
+                    'name' => $JAX->p['username'],
                     'pass' => password_hash(
                         (string) $JAX->p['pass'],
                         PASSWORD_DEFAULT,
                     ),
-                    'last_visit' => date('Y-m-d H:i:s', time()),
-                    'birthdate' => '0000-00-00',
-                    'group_id' => 1,
                     'posts' => 0,
                 ];
                 $result = $DB->safeinsert('members', $member);
@@ -413,9 +418,9 @@ class members
             $page .= $PAGE->parseTemplate(
                 'select-option.html',
                 [
-                    'value' => $f['id'],
                     'label' => $f['title'],
-                    'selected' => $group_id == $f['id'] ? ' selected="selected"' : '',
+                    'selected' => $group_id === $f['id'] ? ' selected="selected"' : '',
+                    'value' => $f['id'],
                 ],
             ) . PHP_EOL;
         }
@@ -440,9 +445,12 @@ class members
         if ($JAX->p['submit']) {
             if (!$JAX->p['mid1'] || !$JAX->p['mid2']) {
                 $e = 'All fields are required';
-            } elseif (!is_numeric($JAX->p['mid1']) || !is_numeric($JAX->p['mid2'])) {
+            } elseif (
+                !is_numeric($JAX->p['mid1'])
+                || !is_numeric($JAX->p['mid2'])
+            ) {
                 $e = 'An error occurred in processing your request';
-            } elseif ($JAX->p['mid1'] == $JAX->p['mid2']) {
+            } elseif ($JAX->p['mid1'] === $JAX->p['mid2']) {
                 $e = "Can't merge a member with her/himself";
             }
 
@@ -630,10 +638,10 @@ class members
                 $DB->safeupdate(
                     'forums',
                     [
-                        'lp_uid' => null,
                         'lp_date' => '0000-00-00 00:00:00',
                         'lp_tid' => null,
                         'lp_topic' => '',
+                        'lp_uid' => null,
                     ],
                     'WHERE `lp_uid`=?',
                     $mid,
@@ -706,9 +714,31 @@ class members
                             $iscomment = true;
                         } else {
                             foreach ($d as $v2) {
-                                if ($v2 && (is_numeric($v2) && $v2 > 255)) {
-                                    $iscomment = true;
+                                if ($v2 === '') {
+                                    continue;
                                 }
+
+                                if ($v2 === '0') {
+                                    continue;
+                                }
+
+                                if (!is_numeric($v2)) {
+                                    continue;
+                                }
+
+                                if ($v2 <= 255) {
+                                    continue;
+                                }
+
+                                if (!is_numeric($v2)) {
+                                    continue;
+                                }
+
+                                if ($v2 <= 255) {
+                                    continue;
+                                }
+
+                                $iscomment = true;
                             }
                         }
                     } elseif (mb_strstr($v, ':')) {
@@ -732,20 +762,24 @@ class members
                             } else {
                                 foreach ($d as $v2) {
                                     if (
-                                        !ctype_xdigit($v2)
-                                        || mb_strlen($v2) > 4
+                                        ctype_xdigit($v2)
+                                        && mb_strlen($v2) <= 4
                                     ) {
-                                        $iscomment = true;
+                                        continue;
                                     }
+
+                                    $iscomment = true;
                                 }
                             }
                         }
                     }
                 }
 
-                if ($iscomment) {
-                    $data[$k] = '#' . $v;
+                if (!$iscomment) {
+                    continue;
                 }
+
+                $data[$k] = '#' . $v;
             }
 
             $data = implode(PHP_EOL, $data);
@@ -774,7 +808,10 @@ class members
         global $PAGE,$JAX,$DB;
         $page = '';
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
-            if (!trim((string) $JAX->p['title']) || !trim((string) $JAX->p['message'])) {
+            if (
+                !trim((string) $JAX->p['title'])
+                || !trim((string) $JAX->p['message'])
+            ) {
                 $page .= $PAGE->error('All fields required!');
             } else {
                 $q = $DB->safeselect(
@@ -789,15 +826,15 @@ class members
                     $DB->safeinsert(
                         'messages',
                         [
-                            'to' => $f['id'],
-                            'from' => $JAX->userData['id'],
-                            'message' => $JAX->p['message'],
-                            'title' => $JAX->p['title'],
+                            'date' => date('Y-m-d H:i:s', time()),
                             'del_recipient' => 0,
                             'del_sender' => 0,
-                            'read' => 0,
                             'flag' => 0,
-                            'date' => date('Y-m-d H:i:s', time()),
+                            'from' => $JAX->userData['id'],
+                            'message' => $JAX->p['message'],
+                            'read' => 0,
+                            'title' => $JAX->p['title'],
+                            'to' => $f['id'],
                         ],
                     );
                     ++$num;
@@ -837,7 +874,7 @@ class members
         ) . PHP_EOL;
         $PAGE->addContentBox('Enable Member Validation', $page);
 
-        if (isset($_POST['mid']) && $_POST['action'] == 'Allow') {
+        if (isset($_POST['mid']) && $_POST['action'] === 'Allow') {
             $DB->safeupdate(
                 'members',
                 [
@@ -859,11 +896,11 @@ class members
             $page .= $PAGE->parseTemplate(
                 'members/validation-list-row.html',
                 [
-                    'id' => $f['id'],
-                    'title' => $f['display_name'],
-                    'ip_address' => $f['ip'],
                     'email_address' => $f['email'],
+                    'id' => $f['id'],
+                    'ip_address' => $f['ip'],
                     'join_date' => date('M jS, Y @ g:i A', $f['join_date']),
+                    'title' => $f['display_name'],
                 ],
             ) . PHP_EOL;
         }

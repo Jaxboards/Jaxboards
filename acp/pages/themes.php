@@ -6,7 +6,7 @@ if (!defined(INACP)) {
 
 new themes();
 
-class themes
+final class themes
 {
     public function __construct()
     {
@@ -24,8 +24,8 @@ class themes
             $sidebarLinks .= $PAGE->parseTemplate(
                 'sidebar-list-link.html',
                 [
-                    'url' => '?act=themes&do=' . $do,
                     'title' => $title,
+                    'url' => '?act=themes&do=' . $do,
                 ],
             ) . PHP_EOL;
         }
@@ -43,7 +43,10 @@ class themes
             $this->editcss($JAX->g['editcss']);
         } elseif (isset($JAX->g['editwrapper']) && $JAX->g['editwrapper']) {
             $this->editwrapper($JAX->g['editwrapper']);
-        } elseif (isset($JAX->g['deleteskin']) && is_numeric($JAX->g['deleteskin'])) {
+        } elseif (
+            isset($JAX->g['deleteskin'])
+            && is_numeric($JAX->g['deleteskin'])
+        ) {
             $this->deleteskin($JAX->g['deleteskin']);
         } elseif (isset($JAX->g['do']) && $JAX->g['do'] === 'create') {
             $this->createskin();
@@ -53,16 +56,22 @@ class themes
     }
 
     /**
-     * @return string[]
+     * @return array<string>
      */
     public function getwrappers(): array
     {
         $wrappers = [];
         $o = opendir(BOARDPATH . 'Wrappers');
         while ($f = readdir($o)) {
-            if ($f !== '.' && $f !== '..') {
-                $wrappers[] = mb_substr($f, 0, -4);
+            if ($f === '.') {
+                continue;
             }
+
+            if ($f === '..') {
+                continue;
+            }
+
+            $wrappers[] = mb_substr($f, 0, -4);
         }
 
         closedir($o);
@@ -132,23 +141,28 @@ class themes
                         $JAX->p['hidden'][$k] = false;
                     }
 
-                    if (!$v || in_array($v, $wrappers)) {
-                        $DB->safeupdate(
-                            'skins',
-                            [
-                                'wrapper' => $v,
-                                'hidden' => $JAX->p['hidden'][$k] ? 1 : 0,
-                            ],
-                            'WHERE `id`=?',
-                            $k,
-                        );
+                    if ($v && !in_array($v, $wrappers)) {
+                        continue;
                     }
+
+                    $DB->safeupdate(
+                        'skins',
+                        [
+                            'hidden' => $JAX->p['hidden'][$k] ? 1 : 0,
+                            'wrapper' => $v,
+                        ],
+                        'WHERE `id`=?',
+                        $k,
+                    );
                 }
             }
 
-            if (isset($JAX->p['renameskin']) && is_array($JAX->p['renameskin'])) {
+            if (
+                isset($JAX->p['renameskin'])
+                && is_array($JAX->p['renameskin'])
+            ) {
                 foreach ($JAX->p['renameskin'] as $k => $v) {
-                    if ($k == $v) {
+                    if ($k === $v) {
                         continue;
                     }
 
@@ -160,7 +174,10 @@ class themes
                         continue;
                     }
 
-                    if (preg_match('@[^\w ]@', (string) $v) || mb_strlen((string) $v) > 50) {
+                    if (
+                        preg_match('@[^\w ]@', (string) $v)
+                        || mb_strlen((string) $v) > 50
+                    ) {
                         $errorskins = <<<'EOT'
                             Skin name must consist of letters, numbers, spaces, and underscore, and be
                             under 50 characters long.
@@ -186,7 +203,7 @@ class themes
                 && is_array($JAX->p['renamewrapper'])
             ) {
                 foreach ($JAX->p['renamewrapper'] as $k => $v) {
-                    if ($k == $v) {
+                    if ($k === $v) {
                         continue;
                     }
 
@@ -198,7 +215,10 @@ class themes
                         continue;
                     }
 
-                    if (preg_match('@[^\w ]@', (string) $v) || mb_strlen((string) $v) > 50) {
+                    if (
+                        preg_match('@[^\w ]@', (string) $v)
+                        || mb_strlen((string) $v) > 50
+                    ) {
                         $errorwrapper = <<<'EOT'
                             Wrapper name must consist of letters, numbers, spaces, and underscore, and be
                             under 50 characters long.
@@ -256,10 +276,10 @@ class themes
                 $wrapperOptions .= $PAGE->parseTemplate(
                     'select-option.html',
                     [
-                        'value' => $wrapper,
-                        'selected' => $wrapper == $f['wrapper']
-                        ? 'selected="selected"' : '',
                         'label' => $wrapper,
+                        'selected' => $wrapper === $f['wrapper']
+                        ? 'selected="selected"' : '',
+                        'value' => $wrapper,
                     ],
                 ) . PHP_EOL;
             }
@@ -267,30 +287,30 @@ class themes
             $skins .= $PAGE->parseTemplate(
                 'themes/show-skin-index-css-row.html',
                 [
-                    'id' => $f['id'],
-                    'title' => $f['title'],
                     'custom' => $f['custom']
                         ? $PAGE->parseTemplate(
                             'themes/show-skin-index-css-row-custom.html',
                         ) : '',
-                    'view_or_edit' => $f['custom'] ? 'Edit' : 'View',
+                    'default_checked' => $f['default'] ? "checked='checked'" : '',
+                    'default_option' => $f['custom'] ? '' : $PAGE->parseTemplate(
+                        'select-option.html',
+                        [
+                            'label' => 'Skin Default',
+                            'selected' => '',
+                            'value' => '',
+                        ],
+                    ),
                     'delete' => $f['custom'] ? $PAGE->parseTemplate(
                         'themes/show-skin-index-css-row-delete.html',
                         [
                             'id' => $f['id'],
                         ],
                     ) : '',
-                    'default_option' => $f['custom'] ? '' : $PAGE->parseTemplate(
-                        'select-option.html',
-                        [
-                            'value' => '',
-                            'selected' => '',
-                            'label' => 'Skin Default',
-                        ],
-                    ),
-                    'wrapper_options' => $wrapperOptions,
                     'hidden_checked' => $f['hidden'] ? 'checked="checked"' : '',
-                    'default_checked' => $f['default'] ? "checked='checked'" : '',
+                    'id' => $f['id'],
+                    'title' => $f['title'],
+                    'view_or_edit' => $f['custom'] ? 'Edit' : 'View',
+                    'wrapper_options' => $wrapperOptions,
                 ],
             ) . PHP_EOL;
             $usedwrappers[] = $f['wrapper'];
@@ -310,7 +330,6 @@ class themes
             $wrap .= $PAGE->parseTemplate(
                 'themes/show-skin-index-wrapper-row.html',
                 [
-                    'title' => $wrapper,
                     'delete' => in_array($wrapper, $usedwrappers) ? 'In use'
                     : $PAGE->parseTemplate(
                         'themes/show-skin-index-wrapper-row-delete.html',
@@ -318,6 +337,7 @@ class themes
                             'title' => $wrapper,
                         ],
                     ),
+                    'title' => $wrapper,
                 ],
             ) . PHP_EOL;
         }
@@ -444,11 +464,11 @@ class themes
                 $DB->safeinsert(
                     'skins',
                     [
+                        'custom' => 1,
+                        'default' => $JAX->p['default'] ? 1 : 0,
+                        'hidden' => $JAX->p['hidden'] ? 1 : 0,
                         'title' => $JAX->p['skinname'],
                         'wrapper' => $JAX->p['wrapper'],
-                        'hidden' => $JAX->p['hidden'] ? 1 : 0,
-                        'default' => $JAX->p['default'] ? 1 : 0,
-                        'custom' => 1,
                     ],
                 );
                 if ($JAX->p['default']) {
@@ -492,9 +512,9 @@ class themes
             $wrapperOptions .= $PAGE->parseTemplate(
                 'select-option.html',
                 [
-                    'value' => $wrapper,
                     'label' => $wrapper,
                     'selected' => '',
+                    'value' => $wrapper,
                 ],
             ) . PHP_EOL;
         }

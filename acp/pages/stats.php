@@ -5,7 +5,7 @@ if (!defined(INACP)) {
 }
 
 new stats();
-class stats
+final class stats
 {
     public function __construct()
     {
@@ -54,14 +54,14 @@ class stats
             ['posts', 'topics'],
         );
         $stat = [
-            'forum_topics' => [],
-            'topic_posts' => [],
-            'member_posts' => [],
-            'cat_topics' => [],
             'cat_posts' => [],
+            'cat_topics' => [],
             'forum_posts' => [],
+            'forum_topics' => [],
+            'member_posts' => [],
             'posts' => 0,
             'topics' => 0,
+            'topic_posts' => [],
         ];
         while ($f = $DB->arow($result)) {
             if (!isset($stat['topic_posts'][$f['tid']])) {
@@ -129,11 +129,13 @@ class stats
             $stat['cat_posts'][$f['cat_id']] += $stat['forum_posts'][$f['id']];
             $stat['cat_topics'][$f['cat_id']] += $stat['forum_topics'][$f['id']];
 
-            if ($f['path']) {
-                foreach (explode(' ', (string) $f['path']) as $v) {
-                    $stat['forum_topics'][$v] += $stat['forum_topics'][$f['id']];
-                    $stat['forum_posts'][$v] += $stat['forum_posts'][$f['id']];
-                }
+            if (!$f['path']) {
+                continue;
+            }
+
+            foreach (explode(' ', (string) $f['path']) as $v) {
+                $stat['forum_topics'][$v] += $stat['forum_topics'][$f['id']];
+                $stat['forum_posts'][$v] += $stat['forum_posts'][$f['id']];
             }
         }
 
@@ -191,9 +193,9 @@ class stats
         $DB->safeupdate(
             'stats',
             [
+                'members' => $stat['members'],
                 'posts' => $stat['posts'],
                 'topics' => $stat['topics'],
-                'members' => $stat['members'],
             ],
         );
 

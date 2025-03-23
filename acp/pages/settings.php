@@ -5,25 +5,25 @@ if (!defined(INACP)) {
 }
 
 new settings();
-class settings
+final class settings
 {
     public function __construct()
     {
         global $JAX, $PAGE;
 
         $links = [
-            'global' => 'Global Settings',
-            'shoutbox' => 'Shoutbox',
-            'pages' => 'Custom Pages',
             'birthday' => 'Birthdays',
+            'global' => 'Global Settings',
+            'pages' => 'Custom Pages',
+            'shoutbox' => 'Shoutbox',
         ];
         $sidebarLinks = '';
         foreach ($links as $do => $title) {
             $sidebarLinks .= $PAGE->parseTemplate(
                 'sidebar-list-link.html',
                 [
-                    'url' => '?act=settings&do=' . $do,
                     'title' => $title,
+                    'url' => '?act=settings&do=' . $do,
                 ],
             ) . PHP_EOL;
         }
@@ -126,7 +126,7 @@ class settings
                 '<span style="font-weight:bold;color:#F00;">$0</span>',
                 (string) $JAX->b['page'],
             );
-            if ($newact != $JAX->b['page']) {
+            if ($newact !== $JAX->b['page']) {
                 $e = 'The page URL must contain only letters and numbers. '
                     . "Invalid characters: {$newact}";
             } elseif (mb_strlen((string) $newact) > 25) {
@@ -284,10 +284,10 @@ class settings
         $page .= $PAGE->parseTemplate(
             'settings/shoutbox.html',
             [
-                'shoutbox_checked' => $PAGE->getCFGSetting('shoutbox')
-                    ? ' checked="checked"' : '',
                 'shoutbox_avatar_checked' => $PAGE->getCFGSetting('shoutboxava')
                 ? ' checked="checked"' : '',
+                'shoutbox_checked' => $PAGE->getCFGSetting('shoutbox')
+                    ? ' checked="checked"' : '',
                 'show_shouts' => $PAGE->getCFGSetting('shoutbox_num'),
             ],
         );

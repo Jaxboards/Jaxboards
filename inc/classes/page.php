@@ -1,6 +1,6 @@
 <?php
 
-class PAGE
+final class PAGE
 {
     public $metadefs = [];
 
@@ -52,10 +52,10 @@ class PAGE
     public function __construct()
     {
         $this->jsaccess = $_SERVER['HTTP_X_JSACCESS'] ?? false;
-        $this->jsupdate = ($this->jsaccess == 1);
+        $this->jsupdate = ($this->jsaccess === 1);
         $this->jsnewlocation = $this->jsaccess >= 2;
         $this->jsnewloc = $this->jsaccess >= 2;
-        $this->jsdirectlink = ($this->jsaccess == 3);
+        $this->jsdirectlink = ($this->jsaccess === 3);
         $this->mobile = mb_stripos((string) $_SERVER['HTTP_USER_AGENT'], 'mobile') !== false;
     }
 
@@ -105,7 +105,7 @@ class PAGE
     public function location($a): void
     {
         global $PAGE,$SESS,$JAX;
-        if (empty($JAX->c) && $a[0] == '?') {
+        if (empty($JAX->c) && $a[0] === '?') {
             $a = '?sessid=' . $SESS->data['id'] . '&' . mb_substr((string) $a, 1);
         }
 
@@ -124,13 +124,15 @@ class PAGE
 
     public function JS(...$args): void
     {
-        if ($args[0] == 'softurl') {
+        if ($args[0] === 'softurl') {
             $GLOBALS['SESS']->erase('location');
         }
 
-        if ($this->jsaccess) {
-            $this->JSOutput[] = $args;
+        if (!$this->jsaccess) {
+            return;
         }
+
+        $this->JSOutput[] = $args;
     }
 
     public function JSRaw($a): void
@@ -173,7 +175,9 @@ class PAGE
                 $this->JSOutput[$k] = $SESS->addSessID($v);
             }
 
-            echo empty($this->JSOutput) ? '' : $JAX::json_encode($this->JSOutput);
+            echo empty($this->JSOutput)
+                ? ''
+                : $JAX::json_encode($this->JSOutput);
         } else {
             $autobox = ['PAGE', 'COPYRIGHT', 'USERBOX'];
             foreach ($this->parts as $k => $v) {
@@ -259,8 +263,8 @@ class PAGE
 
         if (!$skin) {
             $skin = [
-                'title' => 'Default',
                 'custom' => 0,
+                'title' => 'Default',
                 'wrapper' => false,
             ];
         }
@@ -319,10 +323,12 @@ class PAGE
             }
         }
 
-        if ($componentDir !== false) {
-            $this->metaqueue[] = $componentDir;
-            $this->debug("Added {$component} to queue");
+        if ($componentDir === false) {
+            return;
         }
+
+        $this->metaqueue[] = $componentDir;
+        $this->debug("Added {$component} to queue");
     }
 
     public function processqueue($process): void
@@ -349,9 +355,11 @@ class PAGE
                     $metaName = pathinfo($metaFile, PATHINFO_FILENAME);
                     $metaContent = file_get_contents($metaFile);
                     $this->checkextended($metaContent, $metaName);
-                    if (!isset($meta[$metaName])) {
-                        $meta[$metaName] = $metaContent;
+                    if (isset($meta[$metaName])) {
+                        continue;
                     }
+
+                    $meta[$metaName] = $metaContent;
                 }
             }
 
@@ -454,11 +462,11 @@ class PAGE
     public function checkextended($data, $meta = null): bool
     {
         if (mb_strpos((string) $data, '{if ') !== false) {
-            if ($meta) {
-                $this->moreFormatting[$meta] = true;
-            } else {
+            if (!$meta) {
                 return true;
             }
+
+            $this->moreFormatting[$meta] = true;
         }
 
         return false;
@@ -514,11 +522,11 @@ class PAGE
 
     public function debug($data = '')
     {
-        if ($data) {
-            $this->debuginfo .= $data . '<br />';
-        } else {
+        if (!$data) {
             return $this->debuginfo;
         }
+
+        $this->debuginfo .= $data . '<br />';
 
         return null;
     }

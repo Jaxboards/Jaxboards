@@ -1,6 +1,6 @@
 <?php
 
-class rssfeed
+final class rssfeed
 {
     public $feed = [];
 
@@ -28,7 +28,7 @@ class rssfeed
             EOT;
     }
 
-    public function make_xml($array, $k2 = false): string
+    public function make_xml($array): string
     {
         $r = '';
         foreach ($array as $k => $v) {
@@ -38,8 +38,8 @@ class rssfeed
                     $r .= "<{$k}>" . $this->make_xml($v2) . "</{$k}>";
                 }
             } else {
-                $r .= "<{$k}" . ($k == 'content' ? ' type="html"' : '') . '>'
-                    . (is_array($v) ? $this->make_xml($v, $k) : $v) . "</{$k}>";
+                $r .= "<{$k}" . ($k === 'content' ? ' type="html"' : '') . '>'
+                    . (is_array($v) ? $this->make_xml($v) : $v) . "</{$k}>";
             }
         }
 

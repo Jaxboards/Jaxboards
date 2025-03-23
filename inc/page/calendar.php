@@ -2,7 +2,7 @@
 
 $PAGE->loadmeta('calendar');
 new CALENDAR();
-class CALENDAR
+final class CALENDAR
 {
     public $month;
 
@@ -77,7 +77,7 @@ class CALENDAR
         $page .= $PAGE->meta('calendar-daynames');
         $week = '';
         for ($x = 1; $x <= $daysinmonth; ++$x) {
-            if ($x == 1 && $offset) {
+            if ($x === 1 && $offset) {
                 $week .= $PAGE->meta(
                     'calendar-padding',
                     $offset,
@@ -93,10 +93,12 @@ class CALENDAR
                     implode(',', $birthdays[$x]),
                 ),
             );
-            if (0 == ($x + $offset) % 7 || $x == $daysinmonth && $week) {
-                $page .= $PAGE->meta('calendar-week', $week);
-                $week = '';
+            if (0 !== ($x + $offset) % 7 && !($x === $daysinmonth && $week)) {
+                continue;
             }
+
+            $page .= $PAGE->meta('calendar-week', $week);
+            $week = '';
         }
 
         $page = $PAGE->meta('calendar', $page);

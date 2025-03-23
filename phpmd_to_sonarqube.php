@@ -51,10 +51,7 @@ if (!is_readable($phpmdReport)) {
     exit(1);
 }
 
-if (
-    file_exists($sonarQubeReport)
-    && !is_writable($sonarQubeReport)
-) {
+if (file_exists($sonarQubeReport) && !is_writable($sonarQubeReport)) {
     fwrite(
         STDERR,
         'SonarQube report file already exists and is not writable',
@@ -252,11 +249,10 @@ $rules = array_reduce(
             }
 
             $rules[$violation['rule']] = [
-                'id' => $violation['rule'],
-                'name' => $violation['rule'],
+                'cleanCodeAttribute' => 'CONVENTIONAL',
                 'description' => $description,
                 'engineId' => 'phpmd',
-                'cleanCodeAttribute' => 'CONVENTIONAL',
+                'id' => $violation['rule'],
                 'impacts' => [
                     [
                         'severity' => match ((int) $violation['priority']) {
@@ -271,6 +267,7 @@ $rules = array_reduce(
                         'softwareQuality' => 'MAINTAINABILITY',
                     ],
                 ],
+                'name' => $violation['rule'],
             ];
 
             return $rules;
@@ -306,11 +303,10 @@ file_put_contents(
                             $column = 0;
 
                             return [
-                                'ruleId' => $violation['rule'],
                                 'engineId' => 'phpmd',
                                 'primaryLocation' => [
-                                    'message' => $violation['description'],
                                     'filePath' => $filename,
+                                    'message' => $violation['description'],
                                     'textRange' => [
                                         // we don't have end column data so just
                                         // add one to make SonarQube happy
@@ -320,6 +316,7 @@ file_put_contents(
                                         'startLine' => (string) $violation['beginLine'],
                                     ],
                                 ],
+                                'ruleId' => $violation['rule'],
                             ];
                         },
                         $file['violations'],

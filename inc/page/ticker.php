@@ -2,7 +2,7 @@
 
 $PAGE->loadmeta('ticker');
 new ticker();
-class ticker
+final class ticker
 {
     public $maxticks = 60;
 
@@ -116,9 +116,11 @@ class ticker
             $PAGE->JS('tick', $this->ftick($f));
         }
 
-        if ($first) {
-            $SESS->addvar('tickid', $first);
+        if (!$first) {
+            return;
         }
+
+        $SESS->addvar('tickid', $first);
     }
 
     public function ftick($t)

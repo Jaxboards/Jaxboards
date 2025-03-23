@@ -10,7 +10,7 @@
 $PAGE->loadmeta('search');
 
 new search();
-class search
+final class search
 {
     public $page = '';
 
@@ -96,9 +96,11 @@ class search
                 $t = &$t[$v];
             }
 
-            if (!isset($t[$f['id']])) {
-                $t[$f['id']] = true;
+            if (isset($t[$f['id']])) {
+                continue;
             }
+
+            $t[$f['id']] = true;
         }
 
         return $r . $this->rtreeselect(
@@ -117,9 +119,11 @@ class search
                     . '</option>';
             }
 
-            if (is_array($v)) {
-                $r .= $this->rtreeselect($v, $titles, $level + 1);
+            if (!is_array($v)) {
+                continue;
             }
+
+            $r .= $this->rtreeselect($v, $titles, $level + 1);
         }
 
         if (!$level) {
@@ -132,7 +136,7 @@ class search
     public function pdate($a): false|int
     {
         $a = explode('/', (string) $a);
-        if (count($a) != 3) {
+        if (count($a) !== 3) {
             return false;
         }
 
@@ -144,8 +148,8 @@ class search
 
         if (
             ($a[0] % 2)
-            && $a[1] == 31
-            || $a[0] == 2
+            && $a[1] === 31
+            || $a[0] === 2
             && (!$a[2] % 4
             && $a[1] > 29
             || $a[2] % 4
@@ -178,9 +182,11 @@ class search
             if (isset($JAX->b['fids']) && $JAX->b['fids']) {
                 $fids = [];
                 foreach ($JAX->b['fids'] as $v) {
-                    if (in_array($v, $this->fids)) {
-                        $fids[] = $v;
+                    if (!in_array($v, $this->fids)) {
+                        continue;
                     }
+
+                    $fids[] = $v;
                 }
             } else {
                 $fids = $this->fids;
@@ -212,8 +218,8 @@ class search
                                 AND t.`fid` IN ?
                     EOT
             . (is_int($JAX->b['mid']) ? ' AND p.`auth_id =? ' : '')
-                 . ((isset($datestart) && $datestart) ? ' AND p.`date`>? ' : '')
-                 . ((isset($dateend) && $dateend) ? ' AND p.`date`<? ' : '')
+                 . (isset($datestart) && $datestart ? ' AND p.`date`>? ' : '')
+                 . (isset($dateend) && $dateend ? ' AND p.`date`<? ' : '')
             . <<<'EOT'
                     ORDER BY `relevance` DESC LIMIT 100
                     ) UNION (
@@ -223,8 +229,8 @@ class search
                             AND t.`fid` IN ?
                 EOT
             . (is_int($JAX->b['mid']) ? ' AND t.`auth_id`= ? ' : '')
-                 . ((isset($datestart) && $datestart) ? ' AND t.`date`>? ' : '')
-                 . ((isset($dateend) && $dateend) ? ' AND t.`date`<? ' : '')
+                 . (isset($datestart) && $datestart ? ' AND t.`date`>? ' : '')
+                 . (isset($dateend) && $dateend ? ' AND t.`date`<? ' : '')
             . <<<'EOT'
                     ORDER BY `relevance` DESC LIMIT 100
                     )
@@ -272,9 +278,11 @@ class search
 
             $ids = '';
             while ($id = $DB->arow($result)) {
-                if ($id['id']) {
-                    $ids .= $id['id'] . ',';
+                if (!$id['id']) {
+                    continue;
                 }
+
+                $ids .= $id['id'] . ',';
             }
 
             $ids = mb_substr($ids, 0, -1);
@@ -320,9 +328,15 @@ class search
         $terms = [];
 
         foreach (preg_split('@\W+@', (string) $termraw) as $v) {
-            if (trim($v) !== '' && trim($v) !== '0') {
-                $terms[] = preg_quote($v);
+            if (trim($v) === '') {
+                continue;
             }
+
+            if (trim($v) === '0') {
+                continue;
+            }
+
+            $terms[] = preg_quote($v);
         }
 
         while ($f = $DB->arow($result)) {
@@ -356,9 +370,11 @@ class search
 
             $omitted = [];
             foreach ($terms as $v) {
-                if (mb_strlen($v) < 3) {
-                    $omitted[] = $v;
+                if (mb_strlen($v) >= 3) {
+                    continue;
                 }
+
+                $omitted[] = $v;
             }
 
             if ($omitted !== []) {
@@ -403,9 +419,11 @@ class search
         );
         while ($f = $DB->arow($result)) {
             $perms = $JAX->parseperms($f['perms'], $USER ? $USER['group_id'] : 3);
-            if ($perms['read']) {
-                $this->fids[] = $f['id'];
+            if (!$perms['read']) {
+                continue;
             }
+
+            $this->fids[] = $f['id'];
         }
 
         return $this->fids;

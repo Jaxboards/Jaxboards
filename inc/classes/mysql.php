@@ -1,6 +1,6 @@
 <?php
 
-class MySQL
+final class MySQL
 {
     /**
      * @var bool
@@ -34,37 +34,18 @@ class MySQL
 
     public $db = '';
 
-    public function connect($host, $user, $password, $database = '', $prefix = ''): bool
-    {
+    public function connect(
+        $host,
+        $user,
+        $password,
+        $database = '',
+        $prefix = '',
+    ): bool {
         $this->mysqli_connection = new mysqli($host, $user, $password, $database);
         $this->prefix = $prefix;
         $this->db = $database;
 
         return (bool) $this->mysqli_connection;
-    }
-
-    /**
-     * A function to deal with the `mysqli_fetch_all` function only exiting
-     * for the `mysqlnd` driver. Fetches all rows from a MySQLi query result.
-     *
-     * @param mysqli_result $result     the result you wish to fetch all rows from
-     * @param int           $resultType The result type for each row. Should be either
-     *                                  `MYSQLI_ASSOC`, `MYSQLI_NUM`, or `MYSQLI_BOTH`
-     *
-     * @return array an array of MySQLi result rows
-     */
-    protected function fetchAll(mysqli_result $result, $resultType = MYSQLI_ASSOC): array
-    {
-        if (function_exists('mysqli_fetch_all')) {
-            return $result->fetch_all($resultType);
-        }
-
-        $result = [];
-        while ($row = $result->fetch_array($resultType)) {
-            $result[] = $row;
-        }
-
-        return $result;
     }
 
     public function debug_mode(): void
@@ -87,7 +68,7 @@ class MySQL
         return '`' . $this->prefix . $a . '`';
     }
 
-    public function error($use_mysqli = 0)
+    public function error()
     {
         if ($this->mysqli_connection) {
             return $this->mysqli_connection->error;
@@ -96,7 +77,7 @@ class MySQL
         return '';
     }
 
-    public function affected_rows($use_mysqli = 0)
+    public function affected_rows()
     {
         if ($this->mysqli_connection) {
             return $this->mysqli_connection->affected_rows;
@@ -145,7 +126,7 @@ class MySQL
         return $this->safequery(...$va_array);
     }
 
-    public function insert_id($use_mysqli = 0)
+    public function insert_id()
     {
         if ($this->mysqli_connection) {
             return $this->mysqli_connection->insert_id;
@@ -177,11 +158,11 @@ class MySQL
         foreach ($a as $k => $v) {
             ksort($v);
             foreach ($v as $k2 => $v2) {
-                if (mb_check_encoding($v2) != 'UTF-8') {
+                if (mb_check_encoding($v2) !== 'UTF-8') {
                     $v2 = mb_convert_encoding((string) $v2, 'UTF-8', 'ISO-8859-1');
                 }
 
-                if ($k == 0) {
+                if ($k === 0) {
                     $r[0][] = $this->ekey($k2);
                 }
 
@@ -371,8 +352,11 @@ class MySQL
 
     // Blah ?1 blah ?2 blah ?3 blah
     // Note that placeholder_number is indexed from 1.
-    public function safequery_sub_array($query_string, $placeholder_number, $arrlen): string
-    {
+    public function safequery_sub_array(
+        $query_string,
+        $placeholder_number,
+        $arrlen,
+    ): string {
         $arr = explode('?', (string) $query_string, $placeholder_number + 1);
         $last = array_pop($arr);
 
@@ -486,7 +470,10 @@ class MySQL
 
         $retval = $stmt->get_result();
 
-        if (!$retval && !preg_match('/^\s*(UPDATE|DELETE|INSERT)\s/i', (string) $query_string)) {
+        if (
+            !$retval
+            && !preg_match('/^\s*(UPDATE|DELETE|INSERT)\s/i', (string) $query_string)
+        ) {
             // This is normal for a non-SELECT query.
             syslog(LOG_ERR, "Result is NULL for {$query_string}" . PHP_EOL);
         }
@@ -504,7 +491,7 @@ class MySQL
     /**
      * @param mixed $arr
      *
-     * @return mixed[]
+     * @return array<mixed>
      */
     public function refValues($arr): array
     {
@@ -523,7 +510,7 @@ class MySQL
     }
 
     // Like evalue, but does not quote strings.  For use with safequery().
-    public function basicvalue($value, $forsprintf = 0)
+    public function basicvalue($value)
     {
         if (is_array($value)) {
             return $value[0];
@@ -623,14 +610,14 @@ class MySQL
             $today = date('n j');
             while ($f = $this->arow($result)) {
                 if ($f['hide']) {
-                    if ($USER && $USER['group_id'] != 2) {
+                    if ($USER && $USER['group_id'] !== 2) {
                         continue;
                     }
 
                     $f['name'] = '* ' . $f['name'];
                 }
 
-                $f['birthday'] = ($f['dob'] == $today ? 1 : 0);
+                $f['birthday'] = ($f['dob'] === $today ? 1 : 0);
                 $f['status'] = $f['last_action'] < $idletimeout
                     ? 'idle' : 'active';
                 if ($f['is_bot']) {
@@ -655,16 +642,16 @@ class MySQL
 
             if ($USER && isset($r[$USER['id']]) && $r[$USER['id']]) {
                 $r[$USER['id']] = [
-                    'uid' => $USER['id'],
+                    'birthday' => $USER['birthday'],
                     'group_id' => $USER['group_id'],
                     'last_action' => date('Y-m-d H:i:s', $SESS->last_action),
                     'last_update' => $SESS->last_update,
+                    'location' => $SESS->location,
+                    'location_verbose' => $SESS->location_verbose,
                     'name' => ($SESS->hide ? '* ' : '') . $USER['display_name'],
                     'status' => $SESS->last_action < $idletimeout
                     ? 'idle' : 'active',
-                    'birthday' => $USER['birthday'],
-                    'location' => $SESS->location,
-                    'location_verbose' => $SESS->location_verbose,
+                    'uid' => $USER['id'],
                 ];
             }
 
@@ -688,17 +675,17 @@ class MySQL
         $this->safeupdate(
             'forums',
             [
-                'lp_uid' => (isset($d['lp_uid'])
-                && is_numeric($d['lp_uid'])
-                && $d['lp_uid']) ? (int) $d['lp_uid'] : null,
-                'lp_date' => (isset($d['lp_date'])
+                'lp_date' => isset($d['lp_date'])
                 && is_numeric($d['lp_date'])
-                && $d['lp_date']) ? date('Y-m-d H:i:s', $d['lp_date'])
+                && $d['lp_date'] ? date('Y-m-d H:i:s', $d['lp_date'])
                 : '0000-00-00 00:00:00',
-                'lp_tid' => (isset($d['id'])
+                'lp_tid' => isset($d['id'])
                 && is_numeric($d['id'])
-                && $d['id']) ? (int) $d['id'] : null,
+                && $d['id'] ? (int) $d['id'] : null,
                 'lp_topic' => $d['title'] ?? '',
+                'lp_uid' => isset($d['lp_uid'])
+                && is_numeric($d['lp_uid'])
+                && $d['lp_uid'] ? (int) $d['lp_uid'] : null,
             ],
             'WHERE id=?',
             $fid,
@@ -737,5 +724,31 @@ class MySQL
             '<br />',
             $this->queryList,
         ) . '</div>';
+    }
+
+    /**
+     * A function to deal with the `mysqli_fetch_all` function only exiting
+     * for the `mysqlnd` driver. Fetches all rows from a MySQLi query result.
+     *
+     * @param mysqli_result $result     the result you wish to fetch all rows from
+     * @param int           $resultType The result type for each row. Should be either
+     *                                  `MYSQLI_ASSOC`, `MYSQLI_NUM`, or `MYSQLI_BOTH`
+     *
+     * @return array an array of MySQLi result rows
+     */
+    private function fetchAll(
+        mysqli_result $result,
+        int $resultType = MYSQLI_ASSOC,
+    ): array {
+        if (function_exists('mysqli_fetch_all')) {
+            return $result->fetch_all($resultType);
+        }
+
+        $result = [];
+        while ($row = $result->fetch_array($resultType)) {
+            $result[] = $row;
+        }
+
+        return $result;
     }
 }

@@ -2,7 +2,7 @@
 
 $PAGE->loadmeta('idx');
 new IDX();
-class IDX
+final class IDX
 {
     public $moderatorinfo;
 
@@ -88,12 +88,24 @@ class IDX
             }
 
             // Store mod details for later.
-            if ($r['show_ledby'] && $r['mods']) {
-                foreach (explode(',', (string) $r['mods']) as $v) {
-                    if ($v !== '' && $v !== '0') {
-                        $this->mods[$v] = 1;
-                    }
+            if (!$r['show_ledby']) {
+                continue;
+            }
+
+            if (!$r['mods']) {
+                continue;
+            }
+
+            foreach (explode(',', (string) $r['mods']) as $v) {
+                if ($v === '') {
+                    continue;
                 }
+
+                if ($v === '0') {
+                    continue;
+                }
+
+                $this->mods[$v] = 1;
             }
         }
 
@@ -104,15 +116,17 @@ class IDX
             'ORDER BY `order`,`title` ASC',
         );
         while ($r = $DB->arow($catq)) {
-            if (!empty($data[$r['id']])) {
-                $page .= $PAGE->collapsebox(
-                    $r['title'],
-                    $this->buildTable(
-                        $data[$r['id']],
-                    ),
-                    'cat_' . $r['id'],
-                );
+            if (empty($data[$r['id']])) {
+                continue;
             }
+
+            $page .= $PAGE->collapsebox(
+                $r['title'],
+                $this->buildTable(
+                    $data[$r['id']],
+                ),
+                'cat_' . $r['id'],
+            );
         }
 
         $page .= $PAGE->meta('idx-tools');
@@ -135,9 +149,11 @@ class IDX
 
         $r = $this->subforumids[$id];
         foreach ($r as $v) {
-            if ($this->subforumids[$v]) {
-                $r = array_merge($r, $this->getsubs($v));
+            if (!$this->subforumids[$v]) {
+                continue;
             }
+
+            $r = array_merge($r, $this->getsubs($v));
         }
 
         return $r;
@@ -186,7 +202,7 @@ class IDX
                 $sf = $this->subforums[$v['id']];
             }
 
-            if ($v['show_sub'] == 2) {
+            if ($v['show_sub'] === 2) {
                 foreach ($this->getsubs($v['id']) as $i) {
                     $sf .= $this->subforums[$i];
                 }
@@ -314,8 +330,8 @@ class IDX
             $fId = $f['id'];
             $fName = $f['name'];
             $fGroupId = $f['group_id'];
-            $birthdayCode = ($f['birthday'] == $today
-                && ($CFG['birthdays'] & 1)) ? ' birthday' : '';
+            $birthdayCode = $f['birthday'] === $today
+                && ($CFG['birthdays'] & 1) ? ' birthday' : '';
             $lastOnlineCode = $JAX->date(
                 $f['hide'] ? $f['read_date'] : $f['last_update'],
                 false,
@@ -383,7 +399,7 @@ class IDX
                             . 'title="%4$s" data-use-tooltip="true">'
                             . '%3$s</a>',
                         $f['uid'],
-                        $f['group_id'] . ($f['status'] == 'idle'
+                        $f['group_id'] . ($f['status'] === 'idle'
                             ? ' idle'
                             : ($f['birthday'] && ($CFG['birthdays'] & 1)
                             ? ' birthday' : '')),
@@ -410,31 +426,33 @@ class IDX
         $useronlinecache = '';
         foreach ($DB->getUsersOnline() as $f) {
             $lastActionIdle = $SESS->last_update - $CFG['timetoidle'] - 30;
-            if ($f['uid'] || $f['is_bot']) {
-                if (
-                    $f['last_action'] >= $SESS->last_update
-                    || $f['status'] == 'idle'
-                    && $f['last_action'] > $lastActionIdle
-                ) {
-                    $list[] = [
-                        $f['uid'],
-                        $f['group_id'],
-
-                        $f['status'] != 'active'
-                        ? $f['status']
-                        : ($f['birthday'] && ($CFG['birthdays'] & 1)
-                        ? ' birthday' : ''),
-                        $f['name'],
-                        $f['location_verbose'],
-                    ];
-                }
-
-                if (isset($oldcache)) {
-                    unset($oldcache[$f['uid']]);
-                }
-
-                $useronlinecache .= $f['uid'] . ',';
+            if (!$f['uid'] && !$f['is_bot']) {
+                continue;
             }
+
+            if (
+                $f['last_action'] >= $SESS->last_update
+                || $f['status'] === 'idle'
+                && $f['last_action'] > $lastActionIdle
+            ) {
+                $list[] = [
+                    $f['uid'],
+                    $f['group_id'],
+
+                    $f['status'] !== 'active'
+                    ? $f['status']
+                    : ($f['birthday'] && ($CFG['birthdays'] & 1)
+                    ? ' birthday' : ''),
+                    $f['name'],
+                    $f['location_verbose'],
+                ];
+            }
+
+            if (isset($oldcache)) {
+                unset($oldcache[$f['uid']]);
+            }
+
+            $useronlinecache .= $f['uid'] . ',';
         }
 
         if (isset($oldcache) && $oldcache !== []) {
@@ -442,9 +460,11 @@ class IDX
         }
 
         $SESS->users_online_cache = mb_substr($useronlinecache, 0, -1);
-        if ($list !== []) {
-            $PAGE->JS('onlinelist', $list);
+        if ($list === []) {
+            return;
         }
+
+        $PAGE->JS('onlinelist', $list);
     }
 
     public function updateLastPosts(): void

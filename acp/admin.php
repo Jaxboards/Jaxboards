@@ -5,12 +5,6 @@
  *
  * PHP Version 5.3.7
  *
- * @category Jaxboards
- *
- * @author  Sean Johnson <seanjohnson08@gmail.com>
- * @author  World's Tallest Ladder <wtl420@users.noreply.github.com>
- * @license MIT <https://opensource.org/licenses/MIT>
- *
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
 ini_set('session.cookie_secure', 1);
@@ -43,7 +37,7 @@ require JAXBOARDS_ROOT . '/acp/page.php';
  *
  * @return mixed The input, without slashes
  */
-function recursiveStripSlashes($input)
+function recursiveStripSlashes($input): mixed
 {
     /*
      *
@@ -98,22 +92,22 @@ $PAGE->addNavMenu(
     'Settings',
     '?act=settings',
     [
-        '?act=settings&do=global' => 'Global Settings',
-        '?act=settings&do=shoutbox' => 'Shoutbox',
-        '?act=settings&do=pages' => 'Custom Pages',
         '?act=settings&do=birthday' => 'Birthdays',
+        '?act=settings&do=global' => 'Global Settings',
+        '?act=settings&do=pages' => 'Custom Pages',
+        '?act=settings&do=shoutbox' => 'Shoutbox',
     ],
 );
 $PAGE->addNavMenu(
     'Members',
     '?act=members',
     [
-        '?act=members&do=edit' => 'Edit',
-        '?act=members&do=prereg' => 'Pre-Register',
-        '?act=members&do=merge' => 'Account Merge',
         '?act=members&do=delete' => 'Delete Account',
-        '?act=members&do=massmessage' => 'Mass Message',
+        '?act=members&do=edit' => 'Edit',
         '?act=members&do=ipbans' => 'IP Bans',
+        '?act=members&do=massmessage' => 'Mass Message',
+        '?act=members&do=merge' => 'Account Merge',
+        '?act=members&do=prereg' => 'Pre-Register',
         '?act=members&do=validation' => 'Validation',
     ],
 );
@@ -121,17 +115,17 @@ $PAGE->addNavMenu(
     'Groups',
     '?act=groups',
     [
-        '?act=groups&do=perms' => 'Edit Permissions',
         '?act=groups&do=create' => 'Create Group',
         '?act=groups&do=delete' => 'Delete Groups',
+        '?act=groups&do=perms' => 'Edit Permissions',
     ],
 );
 $PAGE->addNavMenu(
     'Themes',
     '?act=themes',
     [
-        '?act=themes' => 'Manage Skin(s)',
         '?act=themes&do=create' => 'Create Skin',
+        '?act=themes' => 'Manage Skin(s)',
     ],
 );
 $PAGE->addNavMenu(
@@ -139,17 +133,17 @@ $PAGE->addNavMenu(
     '?act=posting',
     [
         '?act=posting&do=emoticons' => 'Emoticons',
-        '?act=posting&do=wordfilter' => 'Word Filter',
         '?act=posting&do=postrating' => 'Post Rating',
+        '?act=posting&do=wordfilter' => 'Word Filter',
     ],
 );
 $PAGE->addNavMenu(
     'Forums',
     '?act=forums',
     [
-        '?act=forums&do=order' => 'Manage',
         '?act=forums&do=create' => 'Create Forum',
         '?act=forums&do=createc' => 'Create Category',
+        '?act=forums&do=order' => 'Manage',
         '?act=stats' => 'Refresh Statistics',
     ],
 );
@@ -157,8 +151,8 @@ $PAGE->addNavMenu(
     'Tools',
     '?act=tools',
     [
-        '?act=tools&do=files' => 'File Manager',
         '?act=tools&do=backup' => 'Backup Forum',
+        '?act=tools&do=files' => 'File Manager',
     ],
 );
 

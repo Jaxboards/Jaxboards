@@ -2,7 +2,7 @@
 
 $PAGE->loadmeta('members');
 new members();
-class members
+final class members
 {
     /**
      * @var float|int
@@ -22,9 +22,11 @@ class members
             $this->page = $JAX->b['page'] - 1;
         }
 
-        if (!$PAGE->jsupdate) {
-            $this->showmemberlist();
+        if ($PAGE->jsupdate) {
+            return;
         }
+
+        $this->showmemberlist();
     }
 
     public function showmemberlist(): void
@@ -40,7 +42,7 @@ class members
         $page = '';
 
         $sortby = 'm.`display_name`';
-        $sorthow = (isset($JAX->b['how']) && $JAX->b['how'] == 'DESC')
+        $sorthow = isset($JAX->b['how']) && $JAX->b['how'] === 'DESC'
             ? 'DESC' : 'ASC';
         $where = '';
         if (
@@ -50,7 +52,7 @@ class members
             $sortby = $JAX->b['sortby'];
         }
 
-        if (isset($JAX->g['filter']) && $JAX->g['filter'] == 'staff') {
+        if (isset($JAX->g['filter']) && $JAX->g['filter'] === 'staff') {
             $sortby = 'g.`can_access_acp` DESC ,' . $sortby;
             $where = 'WHERE g.`can_access_acp`=1 OR g.`can_moderate`=1';
         }
@@ -122,12 +124,12 @@ class members
         foreach ($pagesArray as $v) {
             $pages .= "<a href='?act=members&amp;sortby="
                 . "{$sortby}&amp;how={$sorthow}&amp;page={$v}'"
-                . ($v - 1 == $this->page ? ' class="active"' : '') . ">{$v}</a> ";
+                . ($v - 1 === $this->page ? ' class="active"' : '') . ">{$v}</a> ";
         }
 
         $url = '?act=members'
             . ($this->page ? '&page=' . ($this->page + 1) : '')
-            . ((isset($JAX->g['filter']) && $JAX->g['filter'])
+            . (isset($JAX->g['filter']) && $JAX->g['filter']
             ? '&filter=' . $JAX->g['filter'] : '');
         $links = [];
         foreach ($vars as $k => $v) {
@@ -140,23 +142,25 @@ class members
         foreach ($memberarray as $f) {
             $contactdetails = '';
             $contactUrls = [
-                'skype' => 'skype:%s',
-                'discord' => 'discord:%s',
-                'yim' => 'ymsgr:sendim?%s',
-                'msn' => 'msnim:chat?contact=%s',
-                'googlechat' => 'gtalk:chat?jid=%s',
                 'aim' => 'aim:goaim?screenname=%s',
-                'youtube' => 'https://youtube.com/%s',
+                'bluesky' => 'https://bsky.app/profile/%s.bsky.social',
+                'discord' => 'discord:%s',
+                'googlechat' => 'gtalk:chat?jid=%s',
+                'msn' => 'msnim:chat?contact=%s',
+                'skype' => 'skype:%s',
                 'steam' => 'https://steamcommunity.com/id/%s',
                 'twitter' => 'https://twitter.com/%s',
-                'bluesky' => 'https://bsky.app/profile/%s.bsky.social',
+                'yim' => 'ymsgr:sendim?%s',
+                'youtube' => 'https://youtube.com/%s',
             ];
             foreach ($contactUrls as $k => $v) {
-                if ($f['contact_' . $k]) {
-                    $contactdetails .= '<a class="' . $k . ' contact" href="'
-                        . sprintf($v, $JAX->blockhtml($f['contact_' . $k]))
-                        . '" title="' . $k . ' contact">&nbsp;</a>';
+                if (!$f['contact_' . $k]) {
+                    continue;
                 }
+
+                $contactdetails .= '<a class="' . $k . ' contact" href="'
+                    . sprintf($v, $JAX->blockhtml($f['contact_' . $k]))
+                    . '" title="' . $k . ' contact">&nbsp;</a>';
             }
 
             $contactdetails .= '<a title="PM this member" class="pm contact" '

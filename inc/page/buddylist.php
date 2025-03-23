@@ -28,7 +28,7 @@ $PAGE->metadefs['buddylist-contact'] = <<<'EOT'
     </div>
     EOT;
 new buddylist();
-class buddylist
+final class buddylist
 {
     public function __construct()
     {
@@ -118,7 +118,6 @@ class buddylist
         $PAGE->JS(
             'window',
             [
-                'title' => 'Buddies',
                 'content' => $PAGE->meta(
                     'buddylist-contacts',
                     $SESS->hide ? 'invisible' : '',
@@ -127,6 +126,7 @@ class buddylist
                 ),
                 'id' => 'buddylist',
                 'pos' => 'tr 20 20',
+                'title' => 'Buddies',
             ],
         );
     }
@@ -137,7 +137,10 @@ class buddylist
         $friends = $USER['friends'];
         $e = '';
 
-        if ($USER['enemies'] && in_array($uid, explode(',', (string) $USER['enemies']))) {
+        if (
+            $USER['enemies']
+            && in_array($uid, explode(',', (string) $USER['enemies']))
+        ) {
             $this->unblock($uid);
         }
 
@@ -196,8 +199,8 @@ class buddylist
             $DB->safeinsert(
                 'activity',
                 [
-                    'type' => 'buddy_add',
                     'affected_uid' => $uid,
+                    'type' => 'buddy_add',
                     'uid' => $USER['id'],
                 ],
             );
@@ -213,8 +216,12 @@ class buddylist
 
         global $DB,$PAGE,$USER;
         $e = '';
-        $enemies = $USER['enemies'] ? explode(',', (string) $USER['enemies']) : [];
-        $friends = $USER['friends'] ? explode(',', (string) $USER['friends']) : [];
+        $enemies = $USER['enemies']
+            ? explode(',', (string) $USER['enemies'])
+            : [];
+        $friends = $USER['friends']
+            ? explode(',', (string) $USER['friends'])
+            : [];
         $isenemy = array_search($uid, $enemies, true);
         $isfriend = array_search($uid, $friends, true);
         if ($isfriend !== false) {
@@ -292,23 +299,27 @@ class buddylist
             );
         }
 
-        if (!$shh) {
-            $this->displaybuddylist();
+        if ($shh) {
+            return;
         }
+
+        $this->displaybuddylist();
     }
 
     public function setstatus($status): void
     {
         global $DB,$USER,$PAGE;
-        if ($USER && $USER['usertitle'] != $status) {
-            $DB->safeupdate(
-                'members',
-                [
-                    'usertitle' => $status,
-                ],
-                'WHERE `id`=?',
-                $USER['id'],
-            );
+        if (!$USER || $USER['usertitle'] === $status) {
+            return;
         }
+
+        $DB->safeupdate(
+            'members',
+            [
+                'usertitle' => $status,
+            ],
+            'WHERE `id`=?',
+            $USER['id'],
+        );
     }
 }

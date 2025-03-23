@@ -6,12 +6,6 @@
  *
  * PHP Version 8
  *
- * @category Jaxboards
- *
- * @author  Sean Johnson <seanjohnson08@gmail.com>
- * @author  World's Tallest Ladder <wtl420@users.noreply.github.com>
- * @license MIT <https://opensource.org/licenses/MIT>
- *
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
 if ($_GET['showerrors']) {
@@ -25,7 +19,7 @@ if (!defined('JAXBOARDS_ROOT')) {
 
 header('Cache-Control: no-cache, must-revalidate');
 
-$local = $_SERVER['REMOTE_ADDR'] == '127.0.0.1';
+$local = $_SERVER['REMOTE_ADDR'] === '127.0.0.1';
 $microtime = microtime(true);
 
 // Load composer dependencies.
@@ -109,7 +103,7 @@ $USER = &$JAX->userData;
 $PERMS = $JAX->getPerms();
 
 // Fix ip if necessary.
-if ($USER && $SESS->ip != $USER['ip']) {
+if ($USER && $SESS->ip !== $USER['ip']) {
     $DB->safeupdate(
         'members',
         [
@@ -156,7 +150,7 @@ if (isset($SESS->vars['skin_id']) && $SESS->vars['skin_id']) {
 // If they're logged in through cookies, (username & password)
 // but the session variable has changed/been removed/not updated for some reason
 // this fixes it.
-if ($JAX->userData && !$SESS->is_bot && $JAX->userData['id'] != $SESS->uid) {
+if ($JAX->userData && !$SESS->is_bot && $JAX->userData['id'] !== $SESS->uid) {
     $SESS->clean($USER['id']);
     $SESS->uid = $USER['id'];
     $SESS->applychanges();
@@ -265,7 +259,7 @@ if (!$PAGE->jsaccess) {
             'FOOTER',
             '<a href="?act=ucp&what=inbox"><div id="notification" class="newmessage" '
             . 'onclick="this.style.display=\'none\'">You have ' . $nummessages
-            . ' new message' . ($nummessages == 1 ? '' : 's') . '</div></a>',
+            . ' new message' . ($nummessages === 1 ? '' : 's') . '</div></a>',
         );
     }
 
@@ -317,10 +311,10 @@ if (!isset($JAX->b['act'])) {
 }
 
 if (
-    $JAX->b['act'] != 'logreg'
-    && $JAX->b['act'] != 'logreg2'
-    && $JAX->b['act'] != 'logreg4'
-    && $JAX->b['act'] != 'logreg3'
+    $JAX->b['act'] !== 'logreg'
+    && $JAX->b['act'] !== 'logreg2'
+    && $JAX->b['act'] !== 'logreg4'
+    && $JAX->b['act'] !== 'logreg3'
     && (
         !$PERMS['can_view_board']
         || $CFG['boardoffline']
@@ -335,7 +329,7 @@ foreach (glob('inc/modules/*.php') as $v) {
     if (preg_match('/tag_(\w+)/', $v, $m)) {
         if (
             isset($m[1]) && ((isset($JAX->b['module'])
-            && $JAX->b['module'] == $m[1]) || $PAGE->templatehas($m[1]))
+            && $JAX->b['module'] === $m[1]) || $PAGE->templatehas($m[1]))
         ) {
             include $v;
         }
@@ -358,7 +352,7 @@ if (isset($actdefs[$act]) && $actdefs[$act]) {
     $act = $actdefs[$act];
 }
 
-if ($act == 'idx' && isset($JAX->b['module']) && $JAX->b['module']) {
+if ($act === 'idx' && isset($JAX->b['module']) && $JAX->b['module']) {
     // Do nothing.
 } elseif ($act && is_file($act = 'inc/page/' . $act . '.php')) {
     include_once $act;

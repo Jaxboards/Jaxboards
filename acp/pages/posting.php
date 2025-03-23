@@ -5,7 +5,7 @@ if (!defined(INACP)) {
 }
 
 new settings();
-class settings
+final class settings
 {
     public function __construct()
     {
@@ -13,16 +13,16 @@ class settings
 
         $links = [
             'emoticons' => 'Emoticons',
-            'wordfilter' => 'Word Filter',
             'postrating' => 'Post Rating',
+            'wordfilter' => 'Word Filter',
         ];
         $sidebarLinks = '';
         foreach ($links as $do => $title) {
             $sidebarLinks .= $PAGE->parseTemplate(
                 'sidebar-list-link.html',
                 [
-                    'url' => '?act=posting&do=' . $do,
                     'title' => $title,
+                    'url' => '?act=posting&do=' . $do,
                 ],
             ) . PHP_EOL;
         }
@@ -98,9 +98,9 @@ class settings
                 $DB->safeinsert(
                     'textrules',
                     [
-                        'type' => 'badword',
                         'needle' => $JAX->p['badword'],
                         'replacement' => $JAX->p['replacement'],
+                        'type' => 'badword',
                     ],
                 );
                 $wordfilter[$JAX->p['badword']] = $JAX->p['replacement'];
@@ -127,8 +127,8 @@ class settings
                     'posting/word-filter-row.html',
                     [
                         'filter' => $filter,
-                        'result_code' => $resultCode,
                         'filter_url_encoded' => $filterUrlEncoded,
+                        'result_code' => $resultCode,
                     ],
                 ) . PHP_EOL;
             }
@@ -149,9 +149,9 @@ class settings
         global $PAGE,$JAX,$DB;
 
         $basesets = [
+            '' => 'None',
             'keshaemotes' => "Kesha's pack",
             'ploadpack' => "Pload's pack",
-            '' => 'None',
         ];
         $page = '';
         $emoticons = [];
@@ -184,9 +184,9 @@ class settings
                 $DB->safeinsert(
                     'textrules',
                     [
+                        'enabled' => 1,
                         'needle' => $JAX->blockhtml($JAX->p['emoticon']),
                         'replacement' => $JAX->p['image'],
-                        'enabled' => 1,
                         'type' => 'emote',
                     ],
                 );
@@ -221,8 +221,8 @@ class settings
                     'posting/emoticon-row.html',
                     [
                         'emoticon' => $emoticon,
-                        'smiley_url' => $smileyFile,
                         'emoticon_url_encoded' => rawurlencode($emoticon),
+                        'smiley_url' => $smileyFile,
                     ],
                 ) . PHP_EOL;
             }
@@ -244,10 +244,10 @@ class settings
             $emoticonPackOptions .= $PAGE->parseTemplate(
                 'select-option.html',
                 [
-                    'value' => $packId,
                     'label' => $packName,
-                    'selected' => $emoticonsetting == $packId
+                    'selected' => $emoticonsetting === $packId
                 ? ' selected="selected"' : '',
+                    'value' => $packId,
                 ],
             );
         }
@@ -333,8 +333,8 @@ class settings
         $page2 .= $PAGE->parseTemplate(
             'posting/post-rating-settings.html',
             [
-                'ratings_enabled' => ($ratingsettings & 1) !== 0 ? ' checked="checked"' : '',
                 'ratings_anonymous' => ($ratingsettings & 2) !== 0 ? ' checked="checked"' : '',
+                'ratings_enabled' => ($ratingsettings & 1) !== 0 ? ' checked="checked"' : '',
             ],
         );
         $table = $PAGE->parseTemplate(
@@ -351,8 +351,8 @@ class settings
                     'posting/post-rating-row.html',
                     [
                         'id' => $ratingId,
-                        'title' => $JAX->blockhtml($rating['title']),
                         'image_url' => $JAX->blockhtml($rating['img']),
+                        'title' => $JAX->blockhtml($rating['title']),
                     ],
                 );
             }

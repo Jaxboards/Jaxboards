@@ -7,7 +7,7 @@
 $PAGE->metadefs['post-preview'] = $PAGE->meta('box', '', 'Post Preview', '%s');
 
 new POST();
-class POST
+final class POST
 {
     public $canmod;
 
@@ -74,7 +74,7 @@ class POST
         } elseif (
             $this->fid && is_numeric($this->fid)
             || $this->tid && is_numeric($this->tid)
-            && $this->how == 'edit'
+            && $this->how === 'edit'
         ) {
             $this->showtopicform();
         } elseif ($this->tid && is_numeric($this->tid)) {
@@ -100,7 +100,7 @@ class POST
         $uploadpath = BOARDPATH . 'Uploads/';
 
         $ext = explode('.', (string) $fileobj['name']);
-        $ext = count($ext) == 1 ? '' : mb_strtolower(array_pop($ext));
+        $ext = count($ext) === 1 ? '' : mb_strtolower(array_pop($ext));
 
         if (!in_array($ext, $CFG['images'])) {
             $ext = '';
@@ -117,10 +117,10 @@ class POST
                 'files',
                 [
                     'hash' => $hash,
-                    'name' => $fileobj['name'],
-                    'uid' => $uid,
-                    'size' => $size,
                     'ip' => $JAX->ip2bin(),
+                    'name' => $fileobj['name'],
+                    'size' => $size,
+                    'uid' => $uid,
                 ],
             );
             $id = $DB->insert_id(1);
@@ -168,7 +168,7 @@ class POST
         $page = '<div id="post-preview">' . $this->postpreview . '</div>';
         $fid = $this->fid;
 
-        if ($this->how == 'edit') {
+        if ($this->how === 'edit') {
             $result = $DB->safeselect(
                 <<<'EOT'
                     `id`,`title`,`subtitle`,`lp_uid`,UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,
@@ -227,8 +227,8 @@ class POST
         } else {
             if (!isset($tdata)) {
                 $tdata = [
-                    'title' => '',
                     'subtitle' => '',
+                    'title' => '',
                 ];
             }
 
@@ -280,13 +280,15 @@ onclick="this.form.submitButton=this" /></div>
 
         $PAGE->append('page', $page);
         $PAGE->JS('update', 'page', $page);
-        if ($e === '' || $e === '0') {
-            if ($fdata['perms']['upload']) {
-                $PAGE->JS('attachfiles');
-            }
-
-            $PAGE->JS('SCRIPT', "document.querySelector('#pollchoices').style.display='none'");
+        if ($e !== '' && $e !== '0') {
+            return;
         }
+
+        if ($fdata['perms']['upload']) {
+            $PAGE->JS('attachfiles');
+        }
+
+        $PAGE->JS('SCRIPT', "document.querySelector('#pollchoices').style.display='none'");
     }
 
     public function showpostform(): void
@@ -294,11 +296,11 @@ onclick="this.form.submitButton=this" /></div>
         global $PAGE,$JAX,$DB,$SESS,$USER;
         $page = '';
         $tid = $this->tid;
-        if ($PAGE->jsupdate && $this->how != 'qreply') {
+        if ($PAGE->jsupdate && $this->how !== 'qreply') {
             return;
         }
 
-        if ($USER && $this->how == 'qreply') {
+        if ($USER && $this->how === 'qreply') {
             $PAGE->JS('closewindow', '#qreply');
         }
 
@@ -393,9 +395,11 @@ onclick="this.form.submitButton=this"/></div>
         $page .= $PAGE->meta('box', '', $tdata['title'] . ' &gt; Reply', $form);
         $PAGE->append('page', $page);
         $PAGE->JS('update', 'page', $page);
-        if ($tdata['perms']['upload']) {
-            $PAGE->JS('attachfiles');
+        if (!$tdata['perms']['upload']) {
+            return;
         }
+
+        $PAGE->JS('attachfiles');
     }
 
     public function canedit($post): bool
@@ -405,7 +409,7 @@ onclick="this.form.submitButton=this"/></div>
         return ($post['auth_id']
             && ($post['newtopic'] ? $PERMS['can_edit_topics']
             : $PERMS['can_edit_posts'])
-            && $post['auth_id'] == $USER['id'])
+            && $post['auth_id'] === $USER['id'])
             || $this->canmoderate($post['tid']);
     }
 
@@ -508,7 +512,6 @@ onclick="this.form.submitButton=this"/></div>
                     $DB->safeupdate(
                         'topics',
                         [
-                            'title' => $JAX->blockhtml($JAX->p['ttitle']),
                             'subtitle' => $JAX->blockhtml($JAX->p['tdesc']),
                             'summary' => mb_substr(
                                 (string) preg_replace(
@@ -525,6 +528,7 @@ onclick="this.form.submitButton=this"/></div>
                                 0,
                                 50,
                             ),
+                            'title' => $JAX->blockhtml($JAX->p['ttitle']),
                         ],
                         'WHERE `id`=?',
                         $tid,
@@ -562,7 +566,7 @@ onclick="this.form.submitButton=this"/></div>
             $e = 'Post must not exceed 50,000 characters.';
         }
 
-        if (!$e && $this->how == 'newtopic') {
+        if (!$e && $this->how === 'newtopic') {
             if (!$fid || !is_numeric($fid)) {
                 $e = 'No forum specified exists.';
             } elseif (
@@ -584,9 +588,15 @@ onclick="this.form.submitButton=this"/></div>
                 $pollchoices = [];
                 $pollChoice = preg_split("@[\r\n]+@", (string) $JAX->p['pollchoices']);
                 foreach ($pollChoice as $v) {
-                    if (trim($v) !== '' && trim($v) !== '0') {
-                        $pollchoices[] = $JAX->blockhtml($v);
+                    if (trim($v) === '') {
+                        continue;
                     }
+
+                    if (trim($v) === '0') {
+                        continue;
+                    }
+
+                    $pollchoices[] = $JAX->blockhtml($v);
                 }
 
                 if (trim((string) $JAX->p['pollq']) === '') {
@@ -634,20 +644,18 @@ onclick="this.form.submitButton=this"/></div>
                 $DB->safeinsert(
                     'topics',
                     [
-                        'title' => $JAX->blockhtml($JAX->p['ttitle']),
-                        'subtitle' => $JAX->blockhtml($JAX->p['tdesc']),
-                        'date' => date('Y-m-d H:i:s', $time),
-                        'lp_uid' => $uid,
-                        'lp_date' => date('Y-m-d H:i:s', $time),
-                        'fid' => $fid,
                         'auth_id' => $uid,
-                        'replies' => 0,
-                        'views' => 0,
-                        'poll_type' => $JAX->p['poll_type'] ?? '',
-                        'poll_q' => isset($JAX->p['pollq'])
-                            ? $JAX->blockhtml($JAX->p['pollq']) : '',
+                        'date' => date('Y-m-d H:i:s', $time),
+                        'fid' => $fid,
+                        'lp_date' => date('Y-m-d H:i:s', $time),
+                        'lp_uid' => $uid,
                         'poll_choices' => isset($pollchoices) && $pollchoices
                         ? $JAX->json_encode($pollchoices) : '',
+                        'poll_q' => isset($JAX->p['pollq'])
+                            ? $JAX->blockhtml($JAX->p['pollq']) : '',
+                        'poll_type' => $JAX->p['poll_type'] ?? '',
+                        'replies' => 0,
+                        'subtitle' => $JAX->blockhtml($JAX->p['tdesc']),
                         'summary' => mb_substr(
                             (string) preg_replace(
                                 '@\s+@',
@@ -661,6 +669,8 @@ onclick="this.form.submitButton=this"/></div>
                             0,
                             50,
                         ),
+                        'title' => $JAX->blockhtml($JAX->p['ttitle']),
+                        'views' => 0,
                     ],
                 );
                 $tid = $DB->insert_id(1);
@@ -673,7 +683,7 @@ onclick="this.form.submitButton=this"/></div>
             $PAGE->append('PAGE', $PAGE->error($e));
             $PAGE->JS('error', $e);
             $PAGE->JS('enable', 'submitbutton');
-            if ($this->how == 'newtopic') {
+            if ($this->how === 'newtopic') {
                 $this->showtopicform();
             } else {
                 $this->showpostform();
@@ -729,11 +739,11 @@ onclick="this.form.submitButton=this"/></div>
             'posts',
             [
                 'auth_id' => $uid,
-                'post' => $postdata,
                 'date' => date('Y-m-d H:i:s', $time),
-                'tid' => $tid,
-                'newtopic' => $newtopic ? 1 : 0,
                 'ip' => $JAX->ip2bin(),
+                'newtopic' => $newtopic ? 1 : 0,
+                'post' => $postdata,
+                'tid' => $tid,
             ],
         );
 
@@ -754,12 +764,12 @@ onclick="this.form.submitButton=this"/></div>
         $DB->safeinsert(
             'activity',
             [
-                'uid' => $uid,
-                'type' => $newtopic ? 'new_topic' : 'new_post',
-                'tid' => $tid,
-                'pid' => $pid,
                 'arg1' => $fdata['topictitle'],
                 'date' => date('Y-m-d H:i:s', $time),
+                'pid' => $pid,
+                'tid' => $tid,
+                'type' => $newtopic ? 'new_topic' : 'new_post',
+                'uid' => $uid,
             ],
         );
 
@@ -853,7 +863,7 @@ onclick="this.form.submitButton=this"/></div>
             );
         }
 
-        if ($this->how == 'qreply') {
+        if ($this->how === 'qreply') {
             $PAGE->JS('closewindow', '#qreply');
             $PAGE->JS('refreshdata');
         } else {

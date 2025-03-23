@@ -5,7 +5,7 @@ if (!defined(INACP)) {
 }
 
 new groups();
-class groups
+final class groups
 {
     public $updatePermissions = true;
 
@@ -13,17 +13,17 @@ class groups
     {
         global $JAX,$PAGE;
         $links = [
-            'perms' => 'Edit Permissions',
             'create' => 'Create Group',
             'delete' => 'Delete Group',
+            'perms' => 'Edit Permissions',
         ];
         $sidebarLinks = '';
         foreach ($links as $do => $title) {
             $sidebarLinks .= $PAGE->parseTemplate(
                 'sidebar-list-link.html',
                 [
-                    'url' => '?act=groups&do=' . $do,
                     'title' => $title,
+                    'url' => '?act=groups&do=' . $do,
                 ],
             ) . PHP_EOL;
         }
@@ -102,26 +102,30 @@ class groups
         $columns = array_flip($columns);
         foreach ($perms as $k => $v) {
             foreach ($v as $k2 => $v2) {
-                if (!isset($columns[$k2])) {
-                    unset($perms[$k][$k2]);
+                if (isset($columns[$k2])) {
+                    continue;
                 }
+
+                unset($perms[$k][$k2]);
             }
         }
 
         // Update this.
         foreach ($perms as $k => $v) {
-            if ($k == 2) {
+            if ($k === 2) {
                 $v['can_access_acp'] = 1;
             }
 
-            if ($k) {
-                $DB->safeupdate(
-                    'member_groups',
-                    $v,
-                    'WHERE `id`=?',
-                    $k,
-                );
+            if (!$k) {
+                continue;
             }
+
+            $DB->safeupdate(
+                'member_groups',
+                $v,
+                'WHERE `id`=?',
+                $k,
+            );
         }
 
         $error = $DB->error();
@@ -156,12 +160,11 @@ class groups
             && $JAX->p['perm']
         ) {
             foreach (explode(',', (string) $JAX->p['grouplist']) as $v) {
-                if (
-                    !isset($JAX->p['perm'][$v])
-                    || !$JAX->p['perm'][$v]
-                ) {
-                    $JAX->p['perm'][$v] = [];
+                if (isset($JAX->p['perm'][$v]) && $JAX->p['perm'][$v]) {
+                    continue;
                 }
+
+                $JAX->p['perm'][$v] = [];
             }
 
             return $this->updateperms($JAX->p['perm']);
@@ -223,62 +226,62 @@ class groups
         }
 
         $grouplist = mb_substr($grouplist, 0, -1);
-        $widthPercent = (1 / $numgroups) * 100;
+        $widthPercent = 1 / $numgroups * 100;
         $groupHeadings = '';
         foreach ($perms as $groupId => $groupData) {
             $groupHeadings .= $PAGE->parseTemplate(
                 'groups/show-permissions-group-heading.html',
                 [
-                    'width_percent' => $widthPercent,
                     'id' => $groupId,
                     'title' => $groupData['title'],
+                    'width_percent' => $widthPercent,
                 ],
             ) . PHP_EOL;
         }
 
         $permissionsChart = [
             'breaker1' => 'Global',
-            'can_view_board' => 'View Online Board',
-            'can_view_offline_board' => 'View Offline Board',
-            'can_access_acp' => 'Access ACP',
-            'can_moderate' => 'Global Moderator',
 
             'breaker2' => 'Members',
-            'can_karma' => '*Change Karma',
 
             'breaker3' => 'Posts',
-            'can_post' => 'Create',
-            'can_edit_posts' => 'Edit',
-            'can_delete_own_posts' => '*Delete Own Posts',
-            'can_attach' => 'Attach files',
-            'can_use_sigs' => '*Can have signatures',
 
             'breaker4' => 'Topics',
-            'can_post_topics' => 'Create',
-            'can_edit_topics' => 'Edit',
-            'can_poll' => 'Add Polls',
-            'can_delete_own_topics' => '*Delete Own Topics',
-            'can_lock_own_topics' => '*Lock Own Topics',
-            'can_override_locked_topics' => 'Post in locked topics',
 
             'breaker5' => 'Profiles',
-            'can_add_comments' => 'Add Comments',
-            'can_delete_comments' => '*Delete own Comments',
-            'can_view_fullprofile' => 'Can View Full Profile',
 
             'breaker6' => 'Shoutbox',
-            'can_view_shoutbox' => 'View Shoutbox',
-            'can_shout' => 'Can Shout',
-            'can_delete_shouts' => 'Delete All Shouts',
-            'can_delete_own_shouts' => 'Delete Own Shouts',
-
-            'breaker8' => 'Statistics',
-            'can_view_stats' => 'View Board Stats',
-            'legend' => 'Display in Legend',
 
             'breaker7' => 'Private/Instant Messaging',
-            'can_pm' => 'Can PM',
+
+            'breaker8' => 'Statistics',
+            'can_access_acp' => 'Access ACP',
+            'can_add_comments' => 'Add Comments',
+            'can_attach' => 'Attach files',
+            'can_delete_comments' => '*Delete own Comments',
+            'can_delete_own_posts' => '*Delete Own Posts',
+            'can_delete_own_shouts' => 'Delete Own Shouts',
+            'can_delete_own_topics' => '*Delete Own Topics',
+            'can_delete_shouts' => 'Delete All Shouts',
+            'can_edit_posts' => 'Edit',
+            'can_edit_topics' => 'Edit',
             'can_im' => 'Can IM',
+            'can_karma' => '*Change Karma',
+            'can_lock_own_topics' => '*Lock Own Topics',
+            'can_moderate' => 'Global Moderator',
+            'can_override_locked_topics' => 'Post in locked topics',
+            'can_pm' => 'Can PM',
+            'can_poll' => 'Add Polls',
+            'can_post' => 'Create',
+            'can_post_topics' => 'Create',
+            'can_shout' => 'Can Shout',
+            'can_use_sigs' => '*Can have signatures',
+            'can_view_board' => 'View Online Board',
+            'can_view_fullprofile' => 'Can View Full Profile',
+            'can_view_offline_board' => 'View Offline Board',
+            'can_view_shoutbox' => 'View Shoutbox',
+            'can_view_stats' => 'View Board Stats',
+            'legend' => 'Display in Legend',
         ];
         $permissionsTable = '';
         foreach ($permissionsChart as $k => $v) {
@@ -296,10 +299,10 @@ class groups
                     $groupColumns .= $PAGE->parseTemplate(
                         'groups/show-permissions-permission-row-group-column.html',
                         [
-                            'group_id' => $groupId,
-                            'permission' => $k,
                             'checked' => $groupData[$k]
                             ? 'checked="checked" ' : '',
+                            'group_id' => $groupId,
+                            'permission' => $k,
                         ],
                     ) . PHP_EOL;
                 }
@@ -307,8 +310,8 @@ class groups
                 $permissionsTable .= $PAGE->parseTemplate(
                     'groups/show-permissions-permission-row.html',
                     [
-                        'title' => $v,
                         'group_columns' => $groupColumns,
+                        'title' => $v,
                     ],
                 ) . PHP_EOL;
             }
@@ -317,8 +320,8 @@ class groups
         $page .= $PAGE->parseTemplate(
             'groups/show-permissions.html',
             [
-                'group_list' => $grouplist,
                 'group_headings' => $groupHeadings,
+                'group_list' => $grouplist,
                 'permissions_table' => $permissionsTable,
             ],
         );
@@ -344,7 +347,10 @@ class groups
                 $e = 'Group name must not exceed 250 characters!';
             } elseif (mb_strlen((string) $JAX->p['groupicon']) > 250) {
                 $e = 'Group icon must not exceed 250 characters!';
-            } elseif ($JAX->p['groupicon'] && !$JAX->isurl($JAX->p['groupicon'])) {
+            } elseif (
+                $JAX->p['groupicon']
+                && !$JAX->isurl($JAX->p['groupicon'])
+            ) {
                 $e = 'Group icon must be a valid image url';
             }
 
@@ -352,8 +358,8 @@ class groups
                 $page .= $PAGE->error($e);
             } else {
                 $write = [
-                    'title' => $JAX->p['groupname'],
                     'icon' => $JAX->p['groupicon'],
+                    'title' => $JAX->p['groupname'],
                 ];
                 if ($gid) {
                     $DB->safeupdate(
@@ -370,7 +376,7 @@ class groups
                 }
 
                 $PAGE->addContentBox(
-                    $write['title'] . ' ' . (($gid) ? 'edited' : 'created'),
+                    $write['title'] . ' ' . ($gid ? 'edited' : 'created'),
                     $PAGE->success(
                         'Data saved.',
                     ),
@@ -394,9 +400,9 @@ class groups
         $page .= $PAGE->parseTemplate(
             'groups/create.html',
             [
-                'title' => $gid ? $JAX->blockhtml($gdata['title']) : '',
                 'icon_url' => $gid ? $JAX->blockhtml($gdata['icon']) : '',
                 'submit' => $gid ? 'Edit' : 'Create',
+                'title' => $gid ? $JAX->blockhtml($gdata['title']) : '',
             ],
         );
         $PAGE->addContentBox(

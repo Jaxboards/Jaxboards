@@ -1,82 +1,82 @@
 <?php
 
-class SESS
+final class SESS
 {
     public $data = [];
 
     public $userData = [];
 
     public $bots = [
-        'Googlebot' => 'Google',
-        'GoogleOther' => 'GoogleOther',
-        'Bingbot' => 'Bing',
-        'DuckDuckBot' => 'DuckDuckGo',
-        'Teoma' => 'Ask.com',
-        'archive.org_bot' => 'Internet Archive',
-        'ia_archiver' => 'Internet Archive Alexa',
-        'facebookexternalhit' => 'Facebook',
-        'meta-externalagent' => 'Meta',
-        // May be AI-related
-        'WhatsApp' => 'WhatsApp',
-        'Twitterbot' => 'Twitter',
-        'Bytespider' => 'TikTok',
-        'Discordbot' => 'Discord',
+        // Moz SEO crawler
+        'AhrefsBot' => 'Ahrefs',
         'Amazonbot' => 'Amazon',
         'Applebot' => 'Applebot',
-        'ClaudeBot' => 'ClaudeBot',
+        'archive.org_bot' => 'Internet Archive',
+        // SEO graphing services
+        'AwarioBot' => 'Awario',
+        // Machine learning researcher
+        'Baiduspider' => 'Baidu',
+        // SEO crawler
+        'Barkrowler' => 'Babbar.tech',
+        'Bingbot' => 'Bing',
+        'Bytespider' => 'TikTok',
+        // Palo Alto Networks security scanning service
+        'CensysInspect' => 'CensysInspect',
+        // Czech search engine
+        'Centurybot' => 'Century',
+        // SEO crawler
+        'ChatGLM-Spider' => 'ChatGLM',
         // Anthropic AI bot
         'ChatGPT-User' => 'ChatGPT',
+        'ClaudeBot' => 'ClaudeBot',
+        'Discordbot' => 'Discord',
+        // Backlink tracking company
+        'DotBot' => 'DotBot',
+        'DuckDuckBot' => 'DuckDuckGo',
+        // Plagiarism scanning software
+        'Expanse' => 'Expanse',
+        'facebookexternalhit' => 'Facebook',
+        // Social media management company
+        'Friendly_Crawler' => 'FriendlyCrawler',
+        'Googlebot' => 'Google',
+        'GoogleOther' => 'GoogleOther',
         // AI developer
         'GPTBot' => 'GPTBot',
+        'ia_archiver' => 'Internet Archive Alexa',
+        // AI answers site
+        'ImagesiftBot' => 'Imagesift',
+        // SEO crawler
+        'linkdexbot' => 'Linkdex',
+        // a.k.a. RightDao, a search engine
+        'Mail.RU_Bot' => 'Mail.RU',
+        'meta-externalagent' => 'Meta',
+        // Hive image search; may be AI-related
+        'mj12bot' => 'Majestic',
+        'MojeekBot' => 'Mojeek',
         // AI developer
         'OAI-SearchBot' => 'OpenAI',
         // AI developer
         'PerplexityBot' => 'Perplexity',
-        // AI answers site
-        'ImagesiftBot' => 'Imagesift',
-        // Hive image search; may be AI-related
-        'mj12bot' => 'Majestic',
-        // British SEO crawler
-        'SemrushBot' => 'Semrush',
-        // Backlink tracking company
-        'DotBot' => 'DotBot',
-        // Moz SEO crawler
-        'AhrefsBot' => 'Ahrefs',
-        // SEO crawler
-        'ChatGLM-Spider' => 'ChatGLM',
-        // SEO crawler
-        'linkdexbot' => 'Linkdex',
-        // SEO crawler
-        'Barkrowler' => 'Babbar.tech',
-        // SEO graphing services
-        'AwarioBot' => 'Awario',
-        // Social media management company
-        'Friendly_Crawler' => 'FriendlyCrawler',
-        // Machine learning researcher
-        'Baiduspider' => 'Baidu',
-        // Chinese search engine
-        'YandexBot' => 'Yandex',
         // Russian search engine
         'PetalBot' => 'PetalBot',
+        // British search engine
+        'Qwantbot' => 'Qwant',
+        // British SEO crawler
+        'SemrushBot' => 'Semrush',
+        // Chinese search engine
+        'SeznamBot' => 'Seznam',
+        // French search engine
+        'Sogou web spider' => 'Sogou',
+        'Teoma' => 'Ask.com',
+        'Turnitin' => 'Turnitin',
+        'Twitterbot' => 'Twitter',
+        // May be AI-related
+        'WhatsApp' => 'WhatsApp',
         // Chinese search crawler (Huawei)
         'Y!J-WSC' => 'Yahoo Japan',
         'yahoo! slurp' => 'Yahoo',
-        'MojeekBot' => 'Mojeek',
-        // British search engine
-        'Qwantbot' => 'Qwant',
-        // French search engine
-        'Sogou web spider' => 'Sogou',
         // Chinese search engine
-        'SeznamBot' => 'Seznam',
-        // Czech search engine
-        'Centurybot' => 'Century',
-        // a.k.a. RightDao, a search engine
-        'Mail.RU_Bot' => 'Mail.RU',
-        'Turnitin' => 'Turnitin',
-        // Plagiarism scanning software
-        'Expanse' => 'Expanse',
-        // Palo Alto Networks security scanning service
-        'CensysInspect' => 'CensysInspect',
+        'YandexBot' => 'Yandex',
         // Security scanner
     ];
 
@@ -90,9 +90,26 @@ class SESS
         }
 
         $this->data['vars'] = unserialize($this->data['vars']);
-        if (!$this->data['vars']) {
-            $this->data['vars'] = [];
+        if ($this->data['vars']) {
+            return;
         }
+
+        $this->data['vars'] = [];
+    }
+
+    public function __get($a)
+    {
+        return $this->data[$a] ?? null;
+    }
+
+    public function __set($a, $b): void
+    {
+        if (isset($this->data[$a]) && $this->data[$a] === $b) {
+            return;
+        }
+
+        $this->changedData[$a] = $b;
+        $this->data[$a] = $b;
     }
 
     public function getSess($sid = false)
@@ -101,19 +118,16 @@ class SESS
         $isbot = 0;
         $r = [];
         foreach ($this->bots as $k => $v) {
-            if (
-                mb_stripos(
-                    mb_strtolower((string) $_SERVER['HTTP_USER_AGENT']),
-                    (string) $k,
-                ) != false
-            ) {
-                $sid = $v;
-                $isbot = 1;
+            if (mb_stripos(mb_strtolower((string) $_SERVER['HTTP_USER_AGENT']), (string) $k) === false) {
+                continue;
             }
+
+            $sid = $v;
+            $isbot = 1;
         }
 
         if ($sid) {
-            $result = ($isbot === 0)
+            $result = $isbot === 0
                 ? $DB->safeselect(
                     <<<'EOT'
                         `id`,`uid`,INET6_NTOA(`ip`) as `ip`,`vars`,
@@ -171,13 +185,13 @@ class SESS
         $time = time();
         $sessData = [
             'id' => $sid,
-            'uid' => $uid,
-            'runonce' => '',
             'ip' => $JAX->ip2bin(),
-            'useragent' => $_SERVER['HTTP_USER_AGENT'],
             'is_bot' => $isbot,
             'last_action' => date('Y-m-d H:i:s', $time),
             'last_update' => date('Y-m-d H:i:s', $time),
+            'runonce' => '',
+            'uid' => $uid,
+            'useragent' => $_SERVER['HTTP_USER_AGENT'],
         ];
         if ($uid < 1) {
             unset($sessData['uid']);
@@ -191,21 +205,6 @@ class SESS
         return $sessData;
     }
 
-    public function __get($a)
-    {
-        return $this->data[$a] ?? null;
-    }
-
-    public function __set($a, $b): void
-    {
-        if (isset($this->data[$a]) && $this->data[$a] == $b) {
-            return;
-        }
-
-        $this->changedData[$a] = $b;
-        $this->data[$a] = $b;
-    }
-
     public function set($a): void
     {
         foreach ($a as $k => $v) {
@@ -216,29 +215,35 @@ class SESS
     public function addvar($a, $b): void
     {
         if (
-            !isset($this->data['vars'][$a])
-            || $this->data['vars'][$a] !== $b
+            isset($this->data['vars'][$a])
+            && $this->data['vars'][$a] === $b
         ) {
-            $this->data['vars'][$a] = $b;
-            $this->changedData['vars'] = serialize($this->data['vars']);
+            return;
         }
+
+        $this->data['vars'][$a] = $b;
+        $this->changedData['vars'] = serialize($this->data['vars']);
     }
 
     public function delvar($a): void
     {
-        if (isset($this->data['vars'][$a])) {
-            unset($this->data['vars'][$a]);
-            $this->changedData['vars'] = serialize($this->data['vars']);
+        if (!isset($this->data['vars'][$a])) {
+            return;
         }
+
+        unset($this->data['vars'][$a]);
+        $this->changedData['vars'] = serialize($this->data['vars']);
     }
 
     public function act($a = false): void
     {
         global $JAX;
         $this->__set('last_action', time());
-        if ($a) {
-            $this->__set('location', $a);
+        if (!$a) {
+            return;
         }
+
+        $this->__set('location', $a);
     }
 
     public function erase($a): void
@@ -288,16 +293,18 @@ class SESS
             date('Y-m-d H:i:s', $yesterday),
         );
         while ($f = $DB->arow($query)) {
-            if ($f['uid']) {
-                $DB->safeupdate(
-                    'members',
-                    [
-                        'last_visit' => date('Y-m-d H:i:s', $f['last_action']),
-                    ],
-                    'WHERE `id`=?',
-                    $f['uid'],
-                );
+            if (!$f['uid']) {
+                continue;
             }
+
+            $DB->safeupdate(
+                'members',
+                [
+                    'last_visit' => date('Y-m-d H:i:s', $f['last_action']),
+                ],
+                'WHERE `id`=?',
+                $f['uid'],
+            );
         }
 
         $DB->safedelete(
@@ -322,9 +329,11 @@ class SESS
         $sd['last_update'] = date('Y-m-d H:i:s', time());
         $datetimes = ['last_action', 'read_date'];
         foreach ($datetimes as $datetime) {
-            if (isset($sd[$datetime])) {
-                $sd[$datetime] = date('Y-m-d H:i:s', $sd[$datetime]);
+            if (!isset($sd[$datetime])) {
+                continue;
             }
+
+            $sd[$datetime] = date('Y-m-d H:i:s', $sd[$datetime]);
         }
 
         if ($this->data['is_bot']) {
@@ -342,15 +351,17 @@ class SESS
             unset($sd['user']);
         }
 
-        if (!empty($sd)) {
-            // Only update if there's data to update.
-            $DB->safeupdate(
-                'session',
-                $sd,
-                'WHERE `id`=?',
-                $DB->basicvalue($id),
-            );
+        if (empty($sd)) {
+            return;
         }
+
+        // Only update if there's data to update.
+        $DB->safeupdate(
+            'session',
+            $sd,
+            'WHERE `id`=?',
+            $DB->basicvalue($id),
+        );
     }
 
     public function addSessID($html)
@@ -369,7 +380,7 @@ class SESS
 
     public function addSessIDCB($m): string
     {
-        if ($m[1][0] == '?') {
+        if ($m[1][0] === '?') {
             $m[1] .= '&amp;sessid=' . $this->data['id'];
         }
 

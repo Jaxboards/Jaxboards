@@ -5,12 +5,6 @@
  *
  * PHP Version 8
  *
- * @category Jaxboards
- *
- * @author  Sean Johnson <seanjohnson08@gmail.com>
- * @author  World's Tallest Ladder <wtl420@users.noreply.github.com>
- * @license MIT <https://opensource.org/licenses/MIT>
- *
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
 if (!defined('JAXBOARDS_ROOT')) {
@@ -51,13 +45,17 @@ function recurseCopy($src, $dst): void
 {
     $dir = opendir($src);
     @mkdir($dst);
-    while (false !== ($file = readdir($dir))) {
-        if (($file !== '.') && ($file !== '..')) {
-            if (is_dir($src . '/' . $file)) {
-                recurseCopy($src . '/' . $file, $dst . '/' . $file);
-            } else {
-                copy($src . '/' . $file, $dst . '/' . $file);
-            }
+    while (($file = readdir($dir)) !== false) {
+        if ($file === '.') {
+            continue;
+        }
+        if ($file === '..') {
+            continue;
+        }
+        if (is_dir($src . '/' . $file)) {
+            recurseCopy($src . '/' . $file, $dst . '/' . $file);
+        } else {
+            copy($src . '/' . $file, $dst . '/' . $file);
         }
     }
     closedir($dir);
@@ -141,10 +139,10 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             'directory',
             [
                 'boardname' => $board,
-                'registrar_email' => $JAX->p['email'],
-                'registrar_ip' => $JAX->ip2bin(),
                 'date' => date('Y-m-d H:i:s', time()),
                 'referral' => $JAX->b['r'] ?? '',
+                'registrar_email' => $JAX->p['email'],
+                'registrar_ip' => $JAX->ip2bin(),
             ],
         );
         $DB->prefix($boardPrefix);
@@ -170,28 +168,30 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             $query .= $line;
 
             // If it has a semicolon at the end, it's the end of the query.
-            if (mb_substr(trim((string) $line), -1, 1) === ';') {
-                // Perform the query.
-                $result = $DB->safequery($query);
-                $DB->disposeresult($result);
-                // Reset temp variable to empty.
-                $query = '';
+            if (mb_substr(trim((string) $line), -1, 1) !== ';') {
+                continue;
             }
+
+            // Perform the query.
+            $result = $DB->safequery($query);
+            $DB->disposeresult($result);
+            // Reset temp variable to empty.
+            $query = '';
         }
 
         // Don't forget to create the admin.
         $DB->safeinsert(
             'members',
             [
-                'name' => $JAX->p['username'],
                 'display_name' => $JAX->p['username'],
-                'pass' => password_hash((string) $JAX->p['password'], PASSWORD_DEFAULT),
                 'email' => $JAX->p['email'],
-                'sig' => '',
-                'posts' => 0,
                 'group_id' => 2,
                 'join_date' => date('Y-m-d H:i:s', time()),
                 'last_visit' => date('Y-m-d H:i:s', time()),
+                'name' => $JAX->p['username'],
+                'pass' => password_hash((string) $JAX->p['password'], PASSWORD_DEFAULT),
+                'posts' => 0,
+                'sig' => '',
             ],
         );
 

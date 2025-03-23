@@ -3,21 +3,26 @@
 $PAGE->loadmeta('modcp');
 
 new modcontrols();
-class modcontrols
+final class modcontrols
 {
-    public $perms;
-
-    private function box(string $title, string $content): string
+    public static function load(): void
     {
-        $content = ($content ?: '--No Data--');
+        global $PAGE;
+        $script = file_get_contents('dist/modcontrols.js');
+        if (!$PAGE || !$PAGE->jsaccess) {
+            header('Content-Type: application/javascript; charset=utf-8');
+            header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 2592000) . ' GMT');
 
-        return <<<EOT
-            <div class='minibox'>
-                <div class='title'>{$title}</div>
-                <div class='content'>{$content}</div>
-            </div>
-            EOT;
+            echo $script;
+
+            exit(0);
+        }
+
+        $PAGE->JS('softurl');
+        $PAGE->JS('script', $script);
     }
+
+    public $perms;
 
     public function __construct()
     {
@@ -68,7 +73,7 @@ class modcontrols
                 break;
 
             case 'load':
-                static::load();
+                self::load();
 
                 break;
 
@@ -336,9 +341,11 @@ class modcontrols
             ? explode(',', $SESS->vars['modpids']) : [];
         $pids = [];
         foreach ($currentPids as $currentPid) {
-            if (is_numeric($currentPid)) {
-                $pids[] = (int) $currentPid;
+            if (!is_numeric($currentPid)) {
+                continue;
             }
+
+            $pids[] = (int) $currentPid;
         }
 
         if (in_array($pid, $pids, true)) {
@@ -398,9 +405,11 @@ class modcontrols
             ? explode(',', $SESS->vars['modtids']) : [];
         $tids = [];
         foreach ($currentTids as $currentTid) {
-            if (is_numeric($currentTid)) {
-                $tids[] = (int) $currentTid;
+            if (!is_numeric($currentTid)) {
+                continue;
             }
+
+            $tids[] = (int) $currentTid;
         }
 
         if (in_array($tid, $tids, true)) {
@@ -467,9 +476,11 @@ class modcontrols
                     $op = $v;
                 }
 
-                if (!isset($lp) || !$lp || $v > $lp) {
-                    $lp = $v;
+                if (isset($lp) && $lp && $v <= $lp) {
+                    continue;
                 }
+
+                $lp = $v;
             }
 
             $result = $DB->safeselect(
@@ -485,22 +496,22 @@ class modcontrols
             $DB->safeinsert(
                 'topics',
                 [
-                    'title' => 'Posts deleted from: '
-                        . implode(',', $tids),
-                    'op' => $op,
                     'auth_id' => $USER['id'],
                     'fid' => $trashcan,
                     'lp_date' => date('Y-m-d H:i:s', time()),
                     'lp_uid' => $lp['auth_id'],
+                    'op' => $op,
                     'replies' => 0,
+                    'title' => 'Posts deleted from: '
+                        . implode(',', $tids),
                 ],
             );
             $tid = $DB->insert_id(1);
             $DB->safeupdate(
                 'posts',
                 [
-                    'tid' => $tid,
                     'newtopic' => 0,
+                    'tid' => $tid,
                 ],
                 'WHERE `id` IN ?',
                 explode(',', (string) $SESS->vars['modpids']),
@@ -555,9 +566,15 @@ class modcontrols
             $tids,
         );
         while ($f = $DB->arow($result)) {
-            if (is_numeric($f['fid']) && $f['fid'] > 0) {
-                $fids[] = (int) $f['fid'];
+            if (!is_numeric($f['fid'])) {
+                continue;
             }
+
+            if ($f['fid'] <= 0) {
+                continue;
+            }
+
+            $fids[] = (int) $f['fid'];
         }
 
         $DB->disposeresult($result);
@@ -606,9 +623,15 @@ class modcontrols
             }
 
             ++$data[$f['fid']];
-            if ($trashcan && $trashcan == $f['fid']) {
-                $delete[] = $f['id'];
+            if (!$trashcan) {
+                continue;
             }
+
+            if ($trashcan !== $f['fid']) {
+                continue;
+            }
+
+            $delete[] = $f['id'];
         }
 
         if ($trashcan) {
@@ -665,8 +688,8 @@ class modcontrols
             $DB->safeupdate(
                 'posts',
                 [
-                    'tid' => $JAX->p['ot'],
                     'newtopic' => '0',
+                    'tid' => $JAX->p['ot'],
                 ],
                 'WHERE `tid` IN ?',
                 explode(',', (string) $SESS->vars['modtids']),
@@ -738,10 +761,12 @@ class modcontrols
             }
 
             foreach ($exploded as $v) {
-                if (isset($titles[$v])) {
-                    $page .= '<input type="radio" name="ot" value="' . $v . '" /> '
-                        . $titles[$v] . '<br />';
+                if (!isset($titles[$v])) {
+                    continue;
                 }
+
+                $page .= '<input type="radio" name="ot" value="' . $v . '" /> '
+                    . $titles[$v] . '<br />';
             }
         }
 
@@ -755,23 +780,6 @@ class modcontrols
     {
         global $PAGE;
         $PAGE->JS('alert', 'under construction');
-    }
-
-    public static function load(): void
-    {
-        global $PAGE;
-        $script = file_get_contents('dist/modcontrols.js');
-        if ($PAGE && $PAGE->jsaccess) {
-            $PAGE->JS('softurl');
-            $PAGE->JS('script', $script);
-        } else {
-            header('Content-Type: application/javascript; charset=utf-8');
-            header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 2592000) . ' GMT');
-
-            echo $script;
-
-            exit(0);
-        }
     }
 
     public function showmodcp($cppage = ''): void
@@ -800,9 +808,9 @@ class modcontrols
         $page = '<form method="post" data-ajax-form="true">'
             . $JAX->hiddenFormFields(
                 [
-                    'submit' => 'showform',
                     'act' => 'modcontrols',
                     'do' => 'emem',
+                    'submit' => 'showform',
                 ],
             )
             . 'Member name: <input type="text" title="Enter member name" name="mname" '
@@ -813,18 +821,21 @@ class modcontrols
             <input type="hidden" name="mid" id="mid" onchange="this.form.onsubmit();" />
             <input type="submit" type="View member details" value="Go" />
             </form>';
-        if (isset($JAX->p['submit']) && $JAX->p['submit'] == 'save') {
-            if (trim((string) $JAX->p['display_name']) === '' || trim((string) $JAX->p['display_name']) === '0') {
+        if (isset($JAX->p['submit']) && $JAX->p['submit'] === 'save') {
+            if (
+                trim((string) $JAX->p['display_name']) === ''
+                || trim((string) $JAX->p['display_name']) === '0'
+            ) {
                 $page .= $PAGE->meta('error', 'Display name is invalid.');
             } else {
                 $DB->safeupdate(
                     'members',
                     [
-                        'sig' => $JAX->p['signature'],
-                        'display_name' => $JAX->p['display_name'],
-                        'full_name' => $JAX->p['full_name'],
                         'about' => $JAX->p['about'],
                         'avatar' => $JAX->p['avatar'],
+                        'display_name' => $JAX->p['display_name'],
+                        'full_name' => $JAX->p['full_name'],
+                        'sig' => $JAX->p['signature'],
                     ],
                     'WHERE `id`=?',
                     $DB->basicvalue($JAX->p['mid']),
@@ -843,7 +854,7 @@ class modcontrols
 
         if (
             (isset($JAX->p['submit'])
-            && $JAX->p['submit'] == 'showform')
+            && $JAX->p['submit'] === 'showform')
             || isset($JAX->b['mid'])
         ) {
             // Get the member data.
@@ -912,10 +923,10 @@ class modcontrols
             if (
                 (isset($data['can_moderate'])
                 && $data['can_moderate'])
-                && $USER['group_id'] != 2
-                || $data['group_id'] == 2
-                && ($USER['id'] != 1
-                && $data['id'] != $USER['id'])
+                && $USER['group_id'] !== 2
+                || $data['group_id'] === 2
+                && ($USER['id'] !== 1
+                && $data['id'] !== $USER['id'])
             ) {
                 $e = 'You do not have permission to edit this profile.';
             }
@@ -927,7 +938,7 @@ class modcontrols
                 {
                     return '<tr><td><label for="m_' . $name . '">' . $label
                         . '</label></td><td>'
-                        . ($type == 'textarea' ? '<textarea name="' . $name
+                        . ($type === 'textarea' ? '<textarea name="' . $name
                         . '" id="m_' . $name . '">' . $value . '</textarea>'
                         : '<input type="text" id="m_' . $name . '" name="' . $name
                         . '" value="' . $value . '" />') . '</td></tr>';
@@ -1018,28 +1029,24 @@ class modcontrols
 
             $hiddenFields = $JAX->hiddenFormFields(
                 [
-                    'ip' => $ip,
                     'act' => 'modcontrols',
                     'do' => 'iptools',
+                    'ip' => $ip,
                 ],
             );
-            if ($JAX->ipbanned($ip)) {
-                $banCode = <<<'EOT'
-                    <span style="color:#900">
-                        banned
-                    </span>
-                    <input type="submit" name="unban"
-                        onclick="this.form.submitButton=this" value="Unban" />
-                    EOT;
-            } else {
-                $banCode = <<<'EOT'
-                    <span style="color:#090">
-                        not banned
-                    </span>
-                    <input type="submit" name="ban"
-                        onclick="this.form.submitButton=this" value="Ban" />
-                    EOT;
-            }
+            $banCode = $JAX->ipbanned($ip) ? <<<'EOT'
+                <span style="color:#900">
+                    banned
+                </span>
+                <input type="submit" name="unban"
+                    onclick="this.form.submitButton=this" value="Unban" />
+                EOT : <<<'EOT'
+                <span style="color:#090">
+                    not banned
+                </span>
+                <input type="submit" name="ban"
+                    onclick="this.form.submitButton=this" value="Ban" />
+                EOT;
 
             $torDate = date('Y-m-d', strtotime('-2 days'));
             $page .= $this->box(
@@ -1134,5 +1141,17 @@ class modcontrols
         }
 
         $this->showmodcp($form . $page);
+    }
+
+    private function box(string $title, string $content): string
+    {
+        $content = ($content ?: '--No Data--');
+
+        return <<<EOT
+            <div class='minibox'>
+                <div class='title'>{$title}</div>
+                <div class='content'>{$content}</div>
+            </div>
+            EOT;
     }
 }

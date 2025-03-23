@@ -5,23 +5,23 @@ if (!defined(INACP)) {
 }
 
 new tools();
-class tools
+final class tools
 {
     public function __construct()
     {
         global $JAX,$PAGE;
 
         $links = [
-            'files' => 'File Manager',
             'backup' => 'Backup',
+            'files' => 'File Manager',
         ];
         $sidebarLinks = '';
         foreach ($links as $do => $title) {
             $sidebarLinks .= $PAGE->parseTemplate(
                 'sidebar-list-link.html',
                 [
-                    'url' => '?act=tools&do=' . $do,
                     'title' => $title,
+                    'url' => '?act=tools&do=' . $do,
                 ],
             ) . PHP_EOL;
         }
@@ -86,16 +86,18 @@ class tools
 
         if (isset($JAX->p['dl']) && is_array($JAX->p['dl'])) {
             foreach ($JAX->p['dl'] as $k => $v) {
-                if (ctype_digit((string) $v)) {
-                    $DB->safeupdate(
-                        'files',
-                        [
-                            'downloads' => $v,
-                        ],
-                        'WHERE `id`=?',
-                        $DB->basicvalue($k),
-                    );
+                if (!ctype_digit((string) $v)) {
+                    continue;
                 }
+
+                $DB->safeupdate(
+                    'files',
+                    [
+                        'downloads' => $v,
+                    ],
+                    'WHERE `id`=?',
+                    $DB->basicvalue($k),
+                );
             }
 
             $page .= $PAGE->success('Changes saved.');
@@ -118,8 +120,8 @@ class tools
                 $linkedin[$v][] = $PAGE->parseTemplate(
                     'tools/attachment-link.html',
                     [
-                        'topic_id' => $f['tid'],
                         'post_id' => $f['id'],
+                        'topic_id' => $f['tid'],
                     ],
                 );
             }
@@ -146,26 +148,22 @@ class tools
                 $ext = mb_strtolower(array_pop($filepieces));
             }
 
-            if (in_array($ext, $CFG['images'])) {
-                $file['name'] = '<a href="'
+            $file['name'] = in_array($ext, $CFG['images']) ? '<a href="'
                     . BOARDPATHURL . 'Uploads/' . $file['hash'] . '.' . $ext . '">'
-                    . $file['name'] . '</a>';
-            } else {
-                $file['name'] = '<a href="../?act=download&id='
+                    . $file['name'] . '</a>' : '<a href="../?act=download&id='
                     . $file['id'] . '">' . $file['name'] . '</a>';
-            }
 
             $table .= $PAGE->parseTemplate(
                 'tools/file-manager-row.html',
                 [
-                    'id' => $file['id'],
-                    'title' => $file['name'],
-                    'filesize' => $JAX->filesize($file['size']),
                     'downloads' => $file['downloads'],
-                    'user_id' => $file['uid'],
-                    'username' => $file['uname'],
+                    'filesize' => $JAX->filesize($file['size']),
+                    'id' => $file['id'],
                     'linked_in' => isset($linkedin[$file['id']]) && $linkedin[$file['id']]
                         ? implode(', ', $linkedin[$file['id']]) : 'Not linked!',
+                    'title' => $file['name'],
+                    'username' => $file['uname'],
+                    'user_id' => $file['uid'],
                 ],
             ) . PHP_EOL;
         }
@@ -208,23 +206,25 @@ class tools
                         [$f[0]],
                     );
                     $thisrow = $DB->row($createtable);
-                    if ($thisrow) {
-                        $table = $DB->ftable($f[0]);
-                        echo "DROP TABLE IF EXISTS {$table};" . PHP_EOL;
-                        echo array_pop($thisrow) . ';' . PHP_EOL;
-                        $DB->disposeresult($createtable);
-                        // Only time I really want to use *.
-                        $select = $DB->safeselect('*', $f[0]);
-                        while ($row = $DB->arow($select)) {
-                            $insert = $DB->buildInsert($row);
-                            $columns = $insert[0];
-                            $values = $insert[1];
-                            echo "INSERT INTO {$table} ({$columns}) "
-                                . "VALUES {$values};" . PHP_EOL;
-                        }
-
-                        echo PHP_EOL;
+                    if (!$thisrow) {
+                        continue;
                     }
+
+                    $table = $DB->ftable($f[0]);
+                    echo "DROP TABLE IF EXISTS {$table};" . PHP_EOL;
+                    echo array_pop($thisrow) . ';' . PHP_EOL;
+                    $DB->disposeresult($createtable);
+                    // Only time I really want to use *.
+                    $select = $DB->safeselect('*', $f[0]);
+                    while ($row = $DB->arow($select)) {
+                        $insert = $DB->buildInsert($row);
+                        $columns = $insert[0];
+                        $values = $insert[1];
+                        echo "INSERT INTO {$table} ({$columns}) "
+                            . "VALUES {$values};" . PHP_EOL;
+                    }
+
+                    echo PHP_EOL;
                 }
 
                 echo PHP_EOL;

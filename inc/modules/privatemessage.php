@@ -1,7 +1,7 @@
 <?php
 
 new IM();
-class IM
+final class IM
 {
     public function __construct()
     {
@@ -16,9 +16,11 @@ class IM
             $this->message($uid, $im);
         }
 
-        if (isset($JAX->b['in_menu']) && $JAX->b['im_menu']) {
-            $this->immenu($JAX->b['im_menu']);
+        if (!isset($JAX->b['in_menu']) || !$JAX->b['im_menu']) {
+            return;
         }
+
+        $this->immenu($JAX->b['im_menu']);
     }
 
     public function filter(): void
@@ -34,14 +36,16 @@ class IM
         $exploded = explode(PHP_EOL, (string) $SESS->runonce);
         foreach ($exploded as $k => $v) {
             $v = json_decode($v);
-            if ($v[0] == 'im') {
-                unset($exploded[$k]);
-                if (in_array($v[1], $enemies)) {
-                    // This user's blocked, don't do anything.
-                } else {
-                    // Send it on up.
-                    $PAGE->JSRawArray($v);
-                }
+            if ($v[0] !== 'im') {
+                continue;
+            }
+
+            unset($exploded[$k]);
+            if (in_array($v[1], $enemies)) {
+                // This user's blocked, don't do anything.
+            } else {
+                // Send it on up.
+                $PAGE->JSRawArray($v);
             }
         }
 
@@ -130,7 +134,7 @@ class IM
             date('Y-m-d H:i:s', time() - $CFG['updateinterval'] * 5),
         );
 
-        return $DB->affected_rows(1) != 0;
+        return $DB->affected_rows(1) !== 0;
     }
 
     // Stuff I'm doing.
@@ -165,19 +169,22 @@ class IM
             );
             $menu = '';
             while ($f = $DB->arow($result)) {
-                if ($online[$f['id']] && $f['id'] != $id) {
-                    $menu .= $f['name'] . '<br />';
+                if (!$online[$f['id']]) {
+                    continue;
                 }
+
+                if ($f['id'] === $id) {
+                    continue;
+                }
+
+                $menu .= $f['name'] . '<br />';
             }
 
             if ($menu === '' || $menu === '0') {
-                if (!$USER['friends']) {
-                    $menu
-                        = 'You must add users to your contacts list<br />'
-                        . 'to use this feature.';
-                } else {
-                    $menu = 'None of your friends<br />are currently online';
-                }
+                $menu = $USER['friends']
+                    ? 'None of your friends<br />are currently online'
+                    : 'You must add users to your contacts list<br />'
+                                . 'to use this feature.';
             }
         } else {
             $menu = "<a href='?act=vu{$id}'>View Profile</a><br />"

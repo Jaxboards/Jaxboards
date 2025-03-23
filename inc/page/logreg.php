@@ -2,7 +2,7 @@
 
 $PAGE->loadmeta('logreg');
 $IDX = new LOGREG();
-class LOGREG
+final class LOGREG
 {
     public $registering = false;
 
@@ -18,42 +18,6 @@ class LOGREG
             6 => $this->forgotpassword($JAX->b['uid'], $JAX->b['id']),
             default => $this->login($JAX->p['user'], $JAX->p['pass']),
         };
-    }
-
-    private function isHuman()
-    {
-        global $CFG,$JAX;
-
-        if (isset($CFG['recaptcha']) && $CFG['recaptcha']) {
-            // Validate reCAPTCHA.
-            $url = 'https://www.google.com/recaptcha/api/siteverify';
-            $fields = [
-                'secret' => $CFG['recaptcha']['private_key'],
-                'response' => $JAX->p['g-recaptcha-response'],
-            ];
-
-            $fields_string = '';
-            foreach ($fields as $k => $v) {
-                $fields_string .= $k . '=' . urlencode((string) $v) . '&';
-            }
-
-            rtrim($fields_string, '&');
-
-            $curl_request = curl_init();
-            // Set the url, number of POST vars, POST data.
-            curl_setopt($curl_request, CURLOPT_URL, $url);
-            curl_setopt($curl_request, CURLOPT_POST, count($fields));
-            curl_setopt($curl_request, CURLOPT_POSTFIELDS, $fields_string);
-            curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, true);
-
-            // Execute post.
-            $result = json_decode(curl_exec($curl_request), true);
-
-            return $result['success'];
-        }
-
-        // If recaptcha is not configured, we have to assume that they are in fact human.
-        return true;
     }
 
     public function register()
@@ -100,21 +64,18 @@ class LOGREG
                 throw new Exception('Name and display name required.');
             }
 
-            if ($pass1 != $pass2) {
+            if ($pass1 !== $pass2) {
                 throw new Exception('The passwords do not match.');
             }
 
-            if (
-                mb_strlen($dispname) > 30
-                || mb_strlen($name) > 30
-            ) {
+            if (mb_strlen($dispname) > 30 || mb_strlen($name) > 30) {
                 throw new Exception('Display name and username must be under 30 characters.');
             }
 
             if (
                 ($CFG['badnamechars']
                 && preg_match($CFG['badnamechars'], $name))
-                || $JAX->blockhtml($name) != $name
+                || $JAX->blockhtml($name) !== $name
             ) {
                 throw new Exception('Invalid characters in username!');
             }
@@ -150,12 +111,12 @@ class LOGREG
             );
             $f = $DB->arow($result);
             $DB->disposeresult($result);
-            if ($f != false) {
-                if ($f['name'] == $name) {
+            if ($f !== false) {
+                if ($f['name'] === $name) {
                     throw new Exception('That username is taken!');
                 }
 
-                if ($f['display_name'] == $dispname) {
+                if ($f['display_name'] === $dispname) {
                     throw new Exception('That display name is already used by another member.');
                 }
             }
@@ -165,18 +126,18 @@ class LOGREG
             $DB->safeinsert(
                 'members',
                 [
-                    'name' => $name,
                     'display_name' => $dispname,
+                    'email' => $email,
+                    'group_id' => $CFG['membervalidation'] ? 5 : 1,
+                    'ip' => $JAX->ip2bin(),
+                    'join_date' => date('Y-m-d H:i:s', time()),
+                    'last_visit' => date('Y-m-d H:i:s', time()),
+                    'name' => $name,
                     'pass' => password_hash(
                         $pass1,
                         PASSWORD_DEFAULT,
                     ),
                     'posts' => 0,
-                    'email' => $email,
-                    'join_date' => date('Y-m-d H:i:s', time()),
-                    'last_visit' => date('Y-m-d H:i:s', time()),
-                    'group_id' => $CFG['membervalidation'] ? 5 : 1,
-                    'ip' => $JAX->ip2bin(),
                     'wysiwyg' => 1,
                 ],
             );
@@ -228,10 +189,10 @@ class LOGREG
                 $DB->safeinsert(
                     'tokens',
                     [
+                        'expires' => date('Y-m-d H:i:s', time() + 3600 * 24 * 30),
                         'token' => $logintoken,
                         'type' => 'login',
                         'uid' => $f['id'],
-                        'expires' => date('Y-m-d H:i:s', time() + 3600 * 24 * 30),
                     ],
                 );
 
@@ -294,9 +255,11 @@ class LOGREG
         $PAGE->JS('update', 'userbox', $PAGE->meta('userbox-logged-out'));
         $PAGE->JS('softurl');
         $PAGE->append('page', $PAGE->meta('success', 'Logged out successfully'));
-        if (!$PAGE->jsaccess) {
-            $this->login();
+        if ($PAGE->jsaccess) {
+            return;
         }
+
+        $this->login();
     }
 
     public function loginpopup(): void
@@ -306,9 +269,6 @@ class LOGREG
         $PAGE->JS(
             'window',
             [
-                'title' => 'Login',
-                'useoverlay' => 1,
-                'id' => 'loginform',
                 'content' => <<<'EOT'
                     <form method="post" data-ajax-form="resetOnSubmit">
                         <input type="hidden" name="act" value="logreg3" />
@@ -332,6 +292,9 @@ class LOGREG
                         <a href="?act=logreg1" data-window-close="true">Register</a>
                     </form>
                     EOT,
+                'id' => 'loginform',
+                'title' => 'Login',
+                'useoverlay' => 1,
             ],
         );
     }
@@ -347,7 +310,7 @@ class LOGREG
         $PAGE->JS('softurl');
     }
 
-    public function forgotpassword($uid, $id)
+    public function forgotpassword($uid, $id): void
     {
         global $PAGE,$JAX,$DB,$CFG;
         $page = '';
@@ -374,12 +337,7 @@ class LOGREG
             if ($e !== '') {
                 $page = $PAGE->meta('error', $e);
             } elseif ($JAX->p['pass1'] && $JAX->p['pass2']) {
-                if ($JAX->p['pass1'] != $JAX->p['pass2']) {
-                    $page .= $PAGE->meta(
-                        'error',
-                        'The passwords did not match, please try again!',
-                    );
-                } else {
+                if ($JAX->p['pass1'] === $JAX->p['pass2']) {
                     $DB->safeupdate(
                         'members',
                         [
@@ -413,14 +371,19 @@ class LOGREG
 
                     return $this->login($udata['name'], $JAX->p['pass1']);
                 }
+
+                $page .= $PAGE->meta(
+                    'error',
+                    'The passwords did not match, please try again!',
+                );
             } else {
                 $page .= $PAGE->meta(
                     'forgot-password2-form',
                     $JAX->hiddenFormFields(
                         [
-                            'uid' => $uid,
-                            'id' => $id,
                             'act' => 'logreg6',
+                            'id' => $id,
+                            'uid' => $uid,
                         ],
                     ),
                 );
@@ -450,10 +413,10 @@ class LOGREG
                     $DB->safeinsert(
                         'tokens',
                         [
+                            'expires' => date('Y-m-d H:i:s', time() + 3600 * 24),
                             'token' => $forgotpasswordtoken,
                             'type' => 'forgotpassword',
                             'uid' => $udata['id'],
-                            'expires' => date('Y-m-d H:i:s', time() + 3600 * 24),
                         ],
                     );
                     $link = BOARDURL . '?act=logreg6&uid='
@@ -509,5 +472,41 @@ class LOGREG
 
         $PAGE->append('PAGE', $page);
         $PAGE->JS('update', 'page', $page);
+    }
+
+    private function isHuman()
+    {
+        global $CFG,$JAX;
+
+        if (isset($CFG['recaptcha']) && $CFG['recaptcha']) {
+            // Validate reCAPTCHA.
+            $url = 'https://www.google.com/recaptcha/api/siteverify';
+            $fields = [
+                'response' => $JAX->p['g-recaptcha-response'],
+                'secret' => $CFG['recaptcha']['private_key'],
+            ];
+
+            $fields_string = '';
+            foreach ($fields as $k => $v) {
+                $fields_string .= $k . '=' . urlencode((string) $v) . '&';
+            }
+
+            rtrim($fields_string, '&');
+
+            $curl_request = curl_init();
+            // Set the url, number of POST vars, POST data.
+            curl_setopt($curl_request, CURLOPT_URL, $url);
+            curl_setopt($curl_request, CURLOPT_POST, count($fields));
+            curl_setopt($curl_request, CURLOPT_POSTFIELDS, $fields_string);
+            curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, true);
+
+            // Execute post.
+            $result = json_decode(curl_exec($curl_request), true);
+
+            return $result['success'];
+        }
+
+        // If recaptcha is not configured, we have to assume that they are in fact human.
+        return true;
     }
 }

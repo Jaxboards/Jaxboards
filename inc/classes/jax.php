@@ -1,7 +1,50 @@
 <?php
 
-class JAX
+final class JAX
 {
+    public static function json_encode($a, $forceaa = false)
+    {
+        if ($forceaa) {
+            return json_encode(json_decode(json_encode($a), true));
+        }
+
+        return json_encode($a);
+    }
+
+    public static function json_decode($a, $aa = true): mixed
+    {
+        return json_decode((string) $a, $aa);
+    }
+
+    public static function utf8_encode($a): array|string
+    {
+        if (is_array($a)) {
+            foreach ($a as $k => $v) {
+                $a[$k] = self::utf8_encode($v);
+            }
+        } else {
+            $a = mb_convert_encoding((string) $a, 'UTF-8', 'ISO-8859-1');
+        }
+
+        return $a;
+    }
+
+    public static function is_numerical_array($a): bool
+    {
+        return range(0, count($a) - 1) === array_keys($a);
+    }
+
+    public static function pick(...$args)
+    {
+        foreach ($args as $v) {
+            if ($v) {
+                break;
+            }
+        }
+
+        return $v;
+    }
+
     public $attachmentdata;
 
     public $userPerms = '';
@@ -9,19 +52,19 @@ class JAX
     public $c = [];
 
     /**
-     * @var mixed[]|string
+     * @var array<mixed>|string
      */
     public $g = [];
 
     /**
-     * @var mixed[]|string
+     * @var array<mixed>|string
      */
     public $p = [];
 
     public $s = [];
 
     /**
-     * @var mixed[]
+     * @var array<mixed>
      */
     public $b = [];
 
@@ -73,8 +116,11 @@ class JAX
         return "<span class='autodate' title='{$date}'>{$fmt}</span>";
     }
 
-    public function smalldate($date, $seconds = false, $autodate = false): false|string
-    {
+    public function smalldate(
+        $date,
+        $seconds = false,
+        $autodate = false,
+    ): false|string {
         if (!$date) {
             return false;
         }
@@ -86,43 +132,15 @@ class JAX
             . ($autodate ? '</span>' : '');
     }
 
-    public static function json_encode($a, $forceaa = false)
-    {
-        if ($forceaa) {
-            return json_encode(json_decode(json_encode($a), true));
-        }
-
-        return json_encode($a);
-    }
-
-    public static function json_decode($a, $aa = true): mixed
-    {
-        return json_decode((string) $a, $aa);
-    }
-
-    public static function utf8_encode($a): array|string
-    {
-        if (is_array($a)) {
-            foreach ($a as $k => $v) {
-                $a[$k] = self::utf8_encode($v);
-            }
-        } else {
-            $a = mb_convert_encoding((string) $a, 'UTF-8', 'ISO-8859-1');
-        }
-
-        return $a;
-    }
-
-    public static function is_numerical_array($a): bool
-    {
-        return range(0, count($a) - 1) == array_keys($a);
-    }
-
-    public function setCookie($a, $b = 'false', $c = false, $htmlonly = true): void
-    {
+    public function setCookie(
+        $a,
+        $b = 'false',
+        $c = false,
+        $htmlonly = true,
+    ): void {
         if (!is_array($a)) {
             $a = [$a => $b];
-        } elseif ($b != 'false') {
+        } elseif ($b !== 'false') {
             $c = $b;
         }
 
@@ -132,11 +150,11 @@ class JAX
                 $k,
                 (string) $v,
                 [
-                    'expires' => $c,
-                    'path' => null,
                     'domain' => null,
-                    'secure' => true,
+                    'expires' => $c,
                     'httponly' => $htmlonly,
+                    'path' => null,
+                    'secure' => true,
                 ],
             );
         }
@@ -162,9 +180,11 @@ class JAX
             $url['fragment'] = $url['query'];
         }
 
-        if ($url['host'] == $_SERVER['HTTP_HOST'] && $url['fragment']) {
+        if ($url['host'] === $_SERVER['HTTP_HOST'] && $url['fragment']) {
             if (preg_match('@act=vt(\d+)@', $url['fragment'], $m)) {
-                $nice = preg_match('@pid=(\d+)@', $url['fragment'], $m2) ? 'Post #' . $m2[1] : 'Topic #' . $m[1];
+                $nice = preg_match('@pid=(\d+)@', $url['fragment'], $m2)
+                    ? 'Post #' . $m2[1]
+                    : 'Topic #' . $m[1];
             }
 
             $match[2] = '?' . $url['fragment'];
@@ -227,7 +247,7 @@ class JAX
         }
 
         $DB->disposeresult($result);
-        $user['birthday'] = (date('n j') == $user['birthday'] ? 1 : 0);
+        $user['birthday'] = (date('n j') === $user['birthday'] ? 1 : 0);
 
         // Password parsing.
         if ($pass !== false) {
@@ -258,11 +278,11 @@ class JAX
                 );
             }
 
-            if ($verified_password) {
-                unset($user['pass']);
-            } else {
+            if (!$verified_password) {
                 return $this->userData = false;
             }
+
+            unset($user['pass']);
         }
 
         return $this->userData = $user;
@@ -296,7 +316,7 @@ class JAX
             ,
             'member_groups',
             'WHERE `id`=?',
-            static::pick($group_id, 3),
+            self::pick($group_id, 3),
         );
         $retval = $DB->arow($result);
         $this->userPerms = $retval;
@@ -327,9 +347,9 @@ class JAX
             '',
         );
         $textRules = [
-            'emote' => [],
-            'bbcode' => [],
             'badword' => [],
+            'bbcode' => [],
+            'emote' => [],
         ];
         while ($f = $DB->arow($q)) {
             $textRules[$f['type']][$f['needle']] = $f['replacement'];
@@ -352,9 +372,11 @@ class JAX
                 }
 
                 foreach ($rules as $k => $v) {
-                    if (!isset($textRules['emote'][$k])) {
-                        $textRules['emote'][$k] = $emotepack . $v;
+                    if (isset($textRules['emote'][$k])) {
+                        continue;
                     }
+
+                    $textRules['emote'][$k] = $emotepack . $v;
                 }
             }
         }
@@ -446,15 +468,11 @@ class JAX
     {
         foreach ($codes[0] as $k => $v) {
             if (!$returnbb) {
-                if ($codes[1][$k] == '=php') {
-                    $codes[2][$k] = highlight_string($codes[2][$k], 1);
-                } else {
-                    $codes[2][$k] = preg_replace(
-                        "@([ \r\n]|^) @m",
-                        '$1&nbsp;',
-                        $this->blockhtml($codes[2][$k]),
-                    );
-                }
+                $codes[2][$k] = $codes[1][$k] === '=php' ? highlight_string($codes[2][$k], 1) : preg_replace(
+                    "@([ \r\n]|^) @m",
+                    '$1&nbsp;',
+                    $this->blockhtml($codes[2][$k]),
+                );
             }
 
             $a = str_replace(
@@ -481,38 +499,32 @@ class JAX
         return $r;
     }
 
-    public function textonly($a)
+    public function textonly($a): ?string
     {
-        while (
-            ($t = preg_replace(
-                '@\[(\w+)[^\]]*\]([\w\W]*)\[/\1\]@U',
-                '$2',
-                (string) $a,
-            )) != $a
-        ) {
+        while (($t = preg_replace('@\[(\w+)[^\]]*\]([\w\W]*)\[/\1\]@U', '$2', (string) $a)) !== $a) {
             $a = $t;
         }
 
         return $a;
     }
 
-    public function bbcodes($a, $minimal = false)
+    public function bbcodes($a, $minimal = false): ?string
     {
         $x = 0;
         $bbcodes = [
-            '@\[b\](.*)\[/b\]@Usi' => '<strong>$1</strong>',
-            '@\[i\](.*)\[/i\]@Usi' => '<em>$1</em>',
-            '@\[u\](.*)\[/u\]@Usi' => '<span style="text-decoration:underline">$1</span>',
-            '@\[s\](.*)\[/s\]@Usi' => '<span style="text-decoration:line-through">$1</span>',
+            '@\[(bg|bgcolor|background)=(#?[\s\w\d]+)\](.*)\[/\1\]@Usi' => '<span style="background:$2">$3</span>',
             '@\[blink\](.*)\[/blink\]@Usi' => '<span style="text-decoration:blink">$1</span>',
+            '@\[b\](.*)\[/b\]@Usi' => '<strong>$1</strong>',
+            '@\[color=(#?[\s\w\d]+|rgb\([\d, ]+\))\](.*)\[/color\]@Usi' => '<span style="color:$1">$2</span>',
+            '@\[font=([\s\w]+)](.*)\[/font\]@Usi' => '<span style="font-family:$1">$2</span>',
+            '@\[i\](.*)\[/i\]@Usi' => '<em>$1</em>',
+            '@\[spoiler\](.*)\[/spoiler\]@Usi' => '<span class="spoilertext">$1</span>',
+            '@\[s\](.*)\[/s\]@Usi' => '<span style="text-decoration:line-through">$1</span>',
             // I recommend keeping nofollow if admin approval of new accounts is not enabled
             '@\[url=(http|ftp|\?|mailto:)([^\]]+)\](.+?)\[/url\]@i' => '<a href="$1$2">$3</a>',
-            '@\[spoiler\](.*)\[/spoiler\]@Usi' => '<span class="spoilertext">$1</span>',
             // Consider adding nofollow if admin approval is not enabled
             '@\[url\](http|ftp|\?)(.*)\[/url\]@Ui' => '<a href="$1$2">$1$2</a>',
-            '@\[font=([\s\w]+)](.*)\[/font\]@Usi' => '<span style="font-family:$1">$2</span>',
-            '@\[color=(#?[\s\w\d]+|rgb\([\d, ]+\))\](.*)\[/color\]@Usi' => '<span style="color:$1">$2</span>',
-            '@\[(bg|bgcolor|background)=(#?[\s\w\d]+)\](.*)\[/\1\]@Usi' => '<span style="background:$2">$3</span>',
+            '@\[u\](.*)\[/u\]@Usi' => '<span style="text-decoration:underline">$1</span>',
         ];
 
         if (!$minimal) {
@@ -526,7 +538,7 @@ class JAX
 
         $keys = array_keys($bbcodes);
         $values = array_values($bbcodes);
-        while (($tmp = preg_replace($keys, $values, (string) $a)) != $a) {
+        while (($tmp = preg_replace($keys, $values, (string) $a)) !== $a) {
             $a = $tmp;
         }
 
@@ -535,25 +547,13 @@ class JAX
         }
 
         // UL/LI tags.
-        while (
-            $a != ($tmp = preg_replace_callback(
-                '@\[(ul|ol)\](.*)\[/\1\]@Usi',
-                $this->bbcode_licallback(...),
-                (string) $a,
-            ))
-        ) {
+        while ($a !== ($tmp = preg_replace_callback('@\[(ul|ol)\](.*)\[/\1\]@Usi', $this->bbcode_licallback(...), (string) $a))) {
             $a = $tmp;
         }
 
         // Size code (actually needs a callback simply because of
         // the variability of the arguments).
-        while (
-            $a != ($tmp = preg_replace_callback(
-                '@\[size=([0-4]?\d)(px|pt|em|)\](.*)\[/size\]@Usi',
-                $this->bbcode_sizecallback(...),
-                (string) $a,
-            ))
-        ) {
+        while ($a !== ($tmp = preg_replace_callback('@\[size=([0-4]?\d)(px|pt|em|)\](.*)\[/size\]@Usi', $this->bbcode_sizecallback(...), (string) $a))) {
             $a = $tmp;
         }
 
@@ -595,8 +595,8 @@ class JAX
             preg_match('@v=([\w-]+)@', (string) $m[1], $m);
             $seconds = '';
             if ($time !== []) {
-                $seconds = (($time[1] !== '' && $time[1] !== '0' ? mb_substr($time[1], 0, -1) * 60 : 0)
-                    + mb_substr($time[2], 0, -1));
+                $seconds = ($time[1] !== '' && $time[1] !== '0' ? mb_substr($time[1], 0, -1) * 60 : 0)
+                    + mb_substr($time[2], 0, -1);
             }
 
             $youtubeLink = 'https://www.youtube.com/watch?v='
@@ -670,9 +670,15 @@ class JAX
         $lis = '';
         $m[2] = preg_split("@(^|[\r\n])\\*@", (string) $m[2]);
         foreach ($m[2] as $v) {
-            if (trim($v) !== '' && trim($v) !== '0') {
-                $lis .= '<li>' . $v . ' </li>';
+            if (trim($v) === '') {
+                continue;
             }
+
+            if (trim($v) === '0') {
+                continue;
+            }
+
+            $lis .= '<li>' . $v . ' </li>';
         }
 
         return '<' . $m[1] . '>' . $lis . '</' . $m[1] . '>';
@@ -714,7 +720,7 @@ class JAX
         }
 
         $ext = explode('.', (string) $data['name']);
-        $ext = count($ext) == 1 ? '' : mb_strtolower(array_pop($ext));
+        $ext = count($ext) === 1 ? '' : mb_strtolower(array_pop($ext));
 
         if (!in_array($ext, $CFG['images'])) {
             $ext = '';
@@ -771,7 +777,7 @@ class JAX
             'user-link',
             $a['uid'],
             $a['group_id'],
-            $USER['id'] == $a['uid'] ? 'You' : $a['name'],
+            $USER['id'] === $a['uid'] ? 'You' : $a['name'],
         );
         $otherguy = $PAGE->meta(
             'user-link',
@@ -783,76 +789,56 @@ class JAX
 
         switch ($a['type']) {
             case 'profile_comment':
-                if ($rssversion) {
-                    $r = [
-                        'text' => $a['name'] . ' commented on '
-                        . $a['aff_name'] . "'s profile",
-                        'link' => '?act=vu' . $a['aff_id'],
-                    ];
-                } else {
-                    $r = $user . ' commented on ' . $otherguy . "'s profile";
-                }
+                $r = $rssversion ? [
+                    'link' => '?act=vu' . $a['aff_id'],
+                    'text' => $a['name'] . ' commented on '
+                    . $a['aff_name'] . "'s profile",
+                ] : $user . ' commented on ' . $otherguy . "'s profile";
 
                 break;
 
             case 'new_post':
-                if ($rssversion) {
-                    $r = [
-                        'text' => $a['name'] . ' posted in topic ' . $a['arg1'],
-                        'link' => '?act=vt' . $a['tid'] . '&findpost=' . $a['pid'],
-                    ];
-                } else {
-                    $r = $user . ' posted in topic <a href="?act=vt' . $a['tid']
+                $r = $rssversion ? [
+                    'link' => '?act=vt' . $a['tid'] . '&findpost=' . $a['pid'],
+                    'text' => $a['name'] . ' posted in topic ' . $a['arg1'],
+                ] : $user . ' posted in topic <a href="?act=vt' . $a['tid']
                     . '&findpost=' . $a['pid'] . '">' . $a['arg1'] . '</a>, '
                     . $this->smalldate($a['date']);
-                }
 
                 break;
 
             case 'new_topic':
-                if ($rssversion) {
-                    $r = [
-                        'text' => $a['name'] . ' created new topic ' . $a['arg1'],
-                        'link' => '?act=vt' . $a['tid'],
-                    ];
-                } else {
-                    $r = $user . ' created new topic <a href="?act=vt' . $a['tid']
+                $r = $rssversion ? [
+                    'link' => '?act=vt' . $a['tid'],
+                    'text' => $a['name'] . ' created new topic ' . $a['arg1'],
+                ] : $user . ' created new topic <a href="?act=vt' . $a['tid']
                     . '">' . $a['arg1'] . '</a>, ' . $this->smalldate($a['date']);
-                }
 
                 break;
 
             case 'profile_name_change':
-                if ($rssversion) {
-                    $r = [
-                        'text' => $a['arg1'] . ' is now known as ' . $a['arg2'],
-                        'link' => '?act=vu' . $a['uid'],
-                    ];
-                } else {
-                    $r = $PAGE->meta(
-                        'user-link',
-                        $a['uid'],
-                        $a['group_id'],
-                        $a['arg1'],
-                    ) . ' is now known as ' . $PAGE->meta(
-                        'user-link',
-                        $a['uid'],
-                        $a['group_id'],
-                        $a['arg2'],
-                    ) . ', ' . $this->smalldate($a['date']);
-                }
+                $r = $rssversion ? [
+                    'link' => '?act=vu' . $a['uid'],
+                    'text' => $a['arg1'] . ' is now known as ' . $a['arg2'],
+                ] : $PAGE->meta(
+                    'user-link',
+                    $a['uid'],
+                    $a['group_id'],
+                    $a['arg1'],
+                ) . ' is now known as ' . $PAGE->meta(
+                    'user-link',
+                    $a['uid'],
+                    $a['group_id'],
+                    $a['arg2'],
+                ) . ', ' . $this->smalldate($a['date']);
 
                 break;
 
             case 'buddy_add':
-                if ($rssversion) {
-                    $r = [
-                        'text' => $a['name'] . ' made friends with ' . $a['aff_name'],
-                        'link' => '?act=vu' . $a['uid'],
-                    ];
-                } else {
-                    $r = $user . ' made friends with ' . $otherguy;
-                }
+                $r = $rssversion ? [
+                    'link' => '?act=vu' . $a['uid'],
+                    'text' => $a['name'] . ' made friends with ' . $a['aff_name'],
+                ] : $user . ' made friends with ' . $otherguy;
 
                 break;
         }
@@ -864,17 +850,6 @@ class JAX
         }
 
         return '<div class="activity ' . $a['type'] . '">' . $r . '</div>';
-    }
-
-    public static function pick(...$args)
-    {
-        foreach ($args as $v) {
-            if ($v) {
-                break;
-            }
-        }
-
-        return $v;
     }
 
     public function isurl($url): false|int
@@ -904,9 +879,19 @@ class JAX
             if (file_exists(BOARDPATH . '/bannedips.txt')) {
                 foreach (file(BOARDPATH . '/bannedips.txt') as $v) {
                     $v = trim($v);
-                    if ($v && $v[0] !== '#') {
-                        $this->ipbancache[] = $v;
+                    if ($v === '') {
+                        continue;
                     }
+
+                    if ($v === '0') {
+                        continue;
+                    }
+
+                    if ($v[0] === '#') {
+                        continue;
+                    }
+
+                    $this->ipbancache[] = $v;
                 }
             }
         }
@@ -919,7 +904,7 @@ class JAX
                 return $v;
             }
 
-            if ($v == $ip) {
+            if ($v === $ip) {
                 return $v;
             }
         }
@@ -935,7 +920,7 @@ class JAX
      *
      * @return bool if the IP is banned form the service or not
      */
-    public function ipServiceBanned($ipAddress = false)
+    public function ipServiceBanned($ipAddress = false): bool
     {
         global $DB,$CFG;
 
@@ -996,7 +981,7 @@ class JAX
         }
 
         $l = mb_strlen($ip);
-        if ($l == 4 || $l == 16) {
+        if ($l === 4 || $l === 16) {
             return inet_ntop(pack('A' . $l, $ip));
         }
 
@@ -1028,22 +1013,22 @@ class JAX
 
         if ($permstoparse === null) {
             return [
-                'upload' => $PERMS['can_attach'],
+                'poll' => $PERMS['can_poll'],
+                'read' => 1,
                 'reply' => $PERMS['can_post'],
                 'start' => $PERMS['can_post_topics'],
-                'read' => 1,
+                'upload' => $PERMS['can_attach'],
                 'view' => 1,
-                'poll' => $PERMS['can_poll'],
             ];
         }
 
         return [
-            'upload' => $permstoparse & 1,
+            'poll' => $permstoparse & 32,
+            'read' => $permstoparse & 8,
             'reply' => $permstoparse & 2,
             'start' => $permstoparse & 4,
-            'read' => $permstoparse & 8,
+            'upload' => $permstoparse & 1,
             'view' => $permstoparse & 16,
-            'poll' => $permstoparse & 32,
         ];
     }
 
@@ -1079,13 +1064,13 @@ class JAX
     {
         $tofill -= 2;
         $pages[] = 1;
-        if ($numpages == 1) {
+        if ($numpages === 1) {
             return $pages;
         }
 
         $start = $active - floor($tofill / 2);
-        if (($numpages - $start) < $tofill) {
-            $start -= ($tofill - ($numpages - $start));
+        if ($numpages - $start < $tofill) {
+            $start -= $tofill - ($numpages - $start);
         }
 
         if ($start <= 1) {

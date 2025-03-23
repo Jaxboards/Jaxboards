@@ -1,13 +1,13 @@
 <?php
 
-class PAGE
+final class PAGE
 {
     public $CFG = [];
 
     public $parts = [
-        'title' => '',
-        'sidebar' => '',
         'content' => '',
+        'sidebar' => '',
+        'title' => '',
     ];
 
     public $partparts = [
@@ -28,8 +28,8 @@ class PAGE
         $this->partparts['nav'] .= $this->parseTemplate(
             'nav-link.html',
             [
-                'page' => $page,
                 'class' => mb_strtolower($title),
+                'page' => $page,
                 'title' => $title,
             ],
         ) . PHP_EOL;
@@ -39,8 +39,8 @@ class PAGE
             $navDropdownLinksTemplate .= $this->parseTemplate(
                 'nav-dropdown-link.html',
                 [
-                    'url' => $menu_url,
                     'title' => $menu_title,
+                    'url' => $menu_url,
                 ],
             ) . PHP_EOL;
         }
@@ -79,8 +79,8 @@ class PAGE
         $this->parts['content'] .= $this->parseTemplate(
             'content-box.html',
             [
-                'title' => $title,
                 'content' => $content,
+                'title' => $title,
             ],
         );
     }

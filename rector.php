@@ -23,11 +23,11 @@ use Rector\Strict\Rector\If_\BooleanInIfConditionRuleFixerRector;
 use Rector\Strict\Rector\Ternary\BooleanInTernaryOperatorRuleFixerRector;
 use Rector\Strict\Rector\Ternary\DisallowedShortTernaryRuleFixerRector;
 use Rector\TypeDeclaration\Rector\BooleanAnd\BinaryOpNullableToInstanceofRector;
+use Rector\TypeDeclaration\Rector\Class_\PropertyTypeFromStrictSetterGetterRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeFromPropertyTypeRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ParamTypeByMethodCallTypeRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\StrictArrayParamDimFetchRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\StrictStringParamConcatRector;
-use Rector\TypeDeclaration\Rector\Class_\PropertyTypeFromStrictSetterGetterRector;
 use Rector\TypeDeclaration\Rector\Empty_\EmptyOnNullableObjectToInstanceOfRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictSetUpRector;
@@ -51,7 +51,6 @@ return RectorConfig::configure()
         symfony: false,
     )
     ->withConfiguredRule(RenameFunctionRector::class, [
-        '_' => 'gettext',
         'chop' => 'rtrim',
         'chr' => 'mb_chr',
         'close' => 'closedir',
@@ -103,8 +102,8 @@ return RectorConfig::configure()
         'mysql_connect' => 'mysqli_connect',
         'mysql_createdb' => 'mysql_create_db',
         'mysql_data_seek' => 'mysqli_data_seek',
-        'mysql_db_name' => 'mysql_result',
         'mysql_dbname' => 'mysql_result',
+        'mysql_db_name' => 'mysql_result',
         'mysql_dropdb' => 'mysql_drop_db',
         'mysql_errno' => 'mysqli_errno',
         'mysql_error' => 'mysqli_error',
@@ -115,14 +114,14 @@ return RectorConfig::configure()
         'mysql_fetch_lengths' => 'mysqli_fetch_lengths',
         'mysql_fetch_object' => 'mysqli_fetch_object',
         'mysql_fetch_row' => 'mysqli_fetch_row',
-        'mysql_field_seek' => 'mysqli_field_seek',
         'mysql_fieldflags' => 'mysql_field_flags',
         'mysql_fieldlen' => 'mysql_field_len',
         'mysql_fieldname' => 'mysql_field_name',
         'mysql_fieldtable' => 'mysql_field_table',
         'mysql_fieldtype' => 'mysql_field_type',
-        'mysql_free_result' => 'mysqli_free_result',
+        'mysql_field_seek' => 'mysqli_field_seek',
         'mysql_freeresult' => 'mysql_free_result',
+        'mysql_free_result' => 'mysqli_free_result',
         'mysql_get_client_info' => 'mysqli_get_client_info',
         'mysql_get_host_info' => 'mysqli_get_host_info',
         'mysql_get_proto_info' => 'mysqli_get_proto_info',
@@ -132,15 +131,15 @@ return RectorConfig::configure()
         'mysql_listdbs' => 'mysql_list_dbs',
         'mysql_listfields' => 'mysql_list_fields',
         'mysql_listtables' => 'mysql_list_tables',
-        'mysql_num_fields' => 'mysqli_num_fields',
-        'mysql_num_rows' => 'mysqli_num_rows',
         'mysql_numfields' => 'mysql_num_fields',
         'mysql_numrows' => 'mysql_num_rows',
+        'mysql_num_fields' => 'mysqli_num_fields',
+        'mysql_num_rows' => 'mysqli_num_rows',
         'mysql_ping' => 'mysqli_ping',
         'mysql_query' => 'mysqli_query',
         'mysql_real_escape_string' => 'mysqli_real_escape_string',
-        'mysql_select_db' => 'mysqli_select_db',
         'mysql_selectdb' => 'mysql_select_db',
+        'mysql_select_db' => 'mysqli_select_db',
         'mysql_set_charset' => 'mysqli_set_charset',
         'mysql_stat' => 'mysqli_stat',
         'mysql_tablename' => 'mysql_result',
@@ -203,6 +202,7 @@ return RectorConfig::configure()
         'strtoupper' => 'mb_strtoupper',
         'substr' => 'mb_substr',
         'substr_count' => 'mb_substr_count',
+        '_' => 'gettext',
     ])
     ->withImportNames(
         importNames: true,

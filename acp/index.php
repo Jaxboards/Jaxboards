@@ -5,12 +5,6 @@
  *
  * PHP Version 5.3.7
  *
- * @category Jaxboards
- *
- * @author  Sean Johnson <seanjohnson08@gmail.com>
- * @author  World's Tallest Ladder <wtl420@users.noreply.github.com>
- * @license MIT <https://opensource.org/licenses/MIT>
- *
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
 ini_set('session.cookie_secure', 1);

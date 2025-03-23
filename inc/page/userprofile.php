@@ -3,21 +3,21 @@
 $PAGE->loadmeta('userprofile');
 
 $IDX = new userprofile();
-class userprofile
+final class userprofile
 {
     public $num_activity = 30;
 
     public $contacturls = [
-        'skype' => 'skype:%s',
-        'discord' => 'discord:%s',
-        'yim' => 'ymsgr:sendim?%s',
-        'msn' => 'msnim:chat?contact=%s',
-        'googlechat' => 'gchat:chat?jid=%s',
         'aim' => 'aim:goaim?screenname=%s',
-        'youtube' => 'https://youtube.com/%s',
+        'bluesky' => 'https://bsky.app/profile/%s.bsky.social',
+        'discord' => 'discord:%s',
+        'googlechat' => 'gchat:chat?jid=%s',
+        'msn' => 'msnim:chat?contact=%s',
+        'skype' => 'skype:%s',
         'steam' => 'https://steamcommunity.com/id/%s',
         'twitter' => 'https://twitter.com/%s',
-        'bluesky' => 'https://bsky.app/profile/%s.bsky.social',
+        'yim' => 'ymsgr:sendim?%s',
+        'youtube' => 'https://youtube.com/%s',
     ];
 
     public function __construct()
@@ -31,7 +31,11 @@ class userprofile
 
         if ($id === '' || $id === '0') {
             $PAGE->location('?');
-        } elseif ($PAGE->jsnewloc && !$PAGE->jsdirectlink && !$JAX->b['view']) {
+        } elseif (
+            $PAGE->jsnewloc
+            && !$PAGE->jsdirectlink
+            && !$JAX->b['view']
+        ) {
             $this->showcontactcard($id);
         } else {
             $this->showfullprofile($id);
@@ -70,22 +74,21 @@ class userprofile
         }
 
         foreach ($this->contacturls as $k => $v) {
-            if ($ud['contact_' . $k]) {
-                $contactdetails .= '<a class="' . $k . ' contact" title="' . $k . ' contact" href="' . sprintf(
-                    $v,
-                    $JAX->blockhtml($ud['contact_' . $k]),
-                ) . '">&nbsp;</a>';
+            if (!$ud['contact_' . $k]) {
+                continue;
             }
+
+            $contactdetails .= '<a class="' . $k . ' contact" title="' . $k . ' contact" href="' . sprintf(
+                $v,
+                $JAX->blockhtml($ud['contact_' . $k]),
+            ) . '">&nbsp;</a>';
         }
 
         $PAGE->JS('softurl');
         $PAGE->JS(
             'window',
             [
-                'useoverlay' => 1,
-                'minimizable' => false,
                 'animate' => false,
-                'title' => 'Contact Card',
                 'className' => 'contact-card',
                 'content' => $PAGE->meta(
                     'userprofile-contact-card',
@@ -108,6 +111,9 @@ class userprofile
                     : '<a href="?act=buddylist&block=' . $ud['uid']
                     . '">Block Contact</>',
                 ),
+                'minimizable' => false,
+                'title' => 'Contact Card',
+                'useoverlay' => 1,
             ],
         );
     }
@@ -204,12 +210,12 @@ class userprofile
                     $id,
                     $this->num_activity,
                 );
-                if (isset($JAX->b['fmt']) && $JAX->b['fmt'] == 'RSS') {
+                if (isset($JAX->b['fmt']) && $JAX->b['fmt'] === 'RSS') {
                     include_once __DIR__ . '/inc/classes/rssfeed.php';
                     $feed = new rssfeed(
                         [
-                            'title' => $udata['display_name'] . "'s recent activity",
                             'description' => $udata['usertitle'],
+                            'title' => $udata['display_name'] . "'s recent activity",
                         ],
                     );
                     while ($f = $DB->arow($result)) {
@@ -218,12 +224,12 @@ class userprofile
                         $data = $JAX->parse_activity($f, true);
                         $feed->additem(
                             [
-                                'title' => $data['text'],
-                                'pubDate' => date('r', $f['date']),
                                 'description' => $data['text'],
+                                'guid' => $f['id'],
                                 'link' => 'https://' . $_SERVER['SERVER_NAME']
                                 . $_SERVER['PHP_SELF'] . $data['link'],
-                                'guid' => $f['id'],
+                                'pubDate' => date('r', $f['date']),
+                                'title' => $data['text'],
                             ],
                         );
                     }
@@ -239,13 +245,11 @@ class userprofile
                     $pfbox .= $JAX->parse_activity($f);
                 }
 
-                if ($pfbox === '' || $pfbox === '0') {
-                    $pfbox = 'This user has yet to do anything noteworthy!';
-                } else {
-                    $pfbox = "<a href='./?act=vu" . $id
+                $pfbox = $pfbox === '' || $pfbox === '0'
+                    ? 'This user has yet to do anything noteworthy!'
+                    : "<a href='./?act=vu" . $id
                     . "&amp;page=activity&amp;fmt=RSS' class='social rss' "
                     . "style='float:right'>RSS</a>" . $pfbox;
-                }
 
                 break;
 
@@ -367,11 +371,9 @@ class userprofile
                     }
                 }
 
-                if ($pfbox === '' || $pfbox === '0') {
-                    $pfbox = "I'm pretty lonely, I have no friends. :(";
-                } else {
-                    $pfbox = '<div class="contacts">' . $pfbox . '<br clear="all" /></div>';
-                }
+                $pfbox = $pfbox === '' || $pfbox === '0'
+                    ? "I'm pretty lonely, I have no friends. :("
+                    : '<div class="contacts">' . $pfbox . '<br clear="all" /></div>';
 
                 break;
 
@@ -400,19 +402,19 @@ class userprofile
                         $DB->safeinsert(
                             'activity',
                             [
+                                'affected_uid' => $id,
+                                'date' => date('Y-m-d H:i:s', time()),
                                 'type' => 'profile_comment',
                                 'uid' => $USER['id'],
-                                'date' => date('Y-m-d H:i:s', time()),
-                                'affected_uid' => $id,
                             ],
                         );
                         $DB->safeinsert(
                             'profile_comments',
                             [
-                                'to' => $id,
-                                'from' => $USER['id'],
                                 'comment' => $JAX->p['comment'],
                                 'date' => date('Y-m-d H:i:s', time()),
+                                'from' => $USER['id'],
+                                'to' => $id,
                             ],
                         );
                     }
@@ -431,8 +433,8 @@ class userprofile
                         $JAX->hiddenFormFields(
                             [
                                 'act' => 'vu' . $id,
-                                'view' => 'profile',
                                 'page' => 'comments',
+                                'view' => 'profile',
                             ],
                         ),
                     );
@@ -471,7 +473,7 @@ class userprofile
                         $JAX->date($f['date']),
                         $JAX->theworks($f['comment'])
                         . ($PERMS['can_delete_comments']
-                        && $f['from'] == $USER['id']
+                        && $f['from'] === $USER['id']
                         || $PERMS['can_moderate']
                         ? ' <a href="?act=' . $JAX->b['act']
                         . '&view=profile&page=comments&del=' . $f['id']
@@ -513,18 +515,24 @@ class userprofile
             ];
             foreach ($tabs as $k => $v) {
                 $tabs[$k] = '<a href="?act=vu' . $id . '&view=profile&page='
-                    . $v . '"' . ($v == $pfpageloc ? ' class="active"' : '')
+                    . $v . '"' . ($v === $pfpageloc ? ' class="active"' : '')
                     . '>' . ucwords($v) . '</a>';
             }
 
             $contactdetails = '';
             foreach ($udata as $k => $v) {
-                if (mb_substr((string) $k, 0, 8) === 'contact_' && $v) {
-                    $contactdetails .= '<div class="contact ' . mb_substr((string) $k, 8)
-                        . '"><a href="'
-                        . sprintf($this->contacturls[mb_substr((string) $k, 8)], $v)
-                        . '">' . $v . '</a></div>';
+                if (mb_substr((string) $k, 0, 8) !== 'contact_') {
+                    continue;
                 }
+
+                if (!$v) {
+                    continue;
+                }
+
+                $contactdetails .= '<div class="contact ' . mb_substr((string) $k, 8)
+                    . '"><a href="'
+                    . sprintf($this->contacturls[mb_substr((string) $k, 8)], $v)
+                    . '">' . $v . '</a></div>';
             }
 
             $contactdetails .= '<div class="contact im">'

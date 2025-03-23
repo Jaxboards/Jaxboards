@@ -3,7 +3,7 @@
 $PAGE->loadmeta('forum');
 
 $IDX = new FORUM();
-class FORUM
+final class FORUM
 {
     public $topicsRead = [];
 
@@ -39,7 +39,10 @@ class FORUM
 
         if ($PAGE->jsupdate) {
             $this->update();
-        } elseif (isset($JAX->b['replies']) && is_numeric($JAX->b['replies'])) {
+        } elseif (
+            isset($JAX->b['replies'])
+            && is_numeric($JAX->b['replies'])
+        ) {
             $this->getreplysummary($JAX->b['replies']);
         } else {
             $this->viewforum($act[2]);
@@ -184,9 +187,11 @@ class FORUM
                     $PAGE->meta('icon-unread'),
                 ),
             );
-            if (!$read) {
-                $unread = true;
+            if ($read) {
+                continue;
             }
+
+            $unread = true;
         }
 
         if ($rows !== '' && $rows !== '0') {
@@ -205,7 +210,7 @@ class FORUM
         if ($numpages !== 0.0) {
             foreach ($JAX->pages($numpages, $this->page + 1, 10) as $v) {
                 $forumpages .= '<a href="?act=vf' . $fid . '&amp;page='
-                    . $v . '"' . (($v - 1) == $this->page ? ' class="active"' : '')
+                    . $v . '"' . ($v - 1 === $this->page ? ' class="active"' : '')
                     . '>' . $v . '</a> · ';
             }
         }
@@ -236,9 +241,9 @@ class FORUM
                 $orderby = 'DESC';
             }
 
-            if ($fdata['orderby'] == 2) {
+            if ($fdata['orderby'] === 2) {
                 $orderby = '`id` ' . $orderby;
-            } elseif ($fdata['orderby'] == 4) {
+            } elseif ($fdata['orderby'] === 4) {
                 $orderby = '`title` ' . $orderby;
             } else {
                 $orderby = '`lp_date` ' . $orderby;
@@ -332,9 +337,11 @@ class FORUM
                 ),
                 // 14
             );
-            if (!$read) {
-                $unread = true;
+            if ($read) {
+                continue;
             }
+
+            $unread = true;
         }
 
         // If they're on the first page and no topics
@@ -420,8 +427,8 @@ class FORUM
         $PAGE->JS(
             'window',
             [
-                'title' => 'Post Summary',
                 'content' => '<table>' . $page . '</table>',
+                'title' => 'Post Summary',
             ],
         );
     }

@@ -3,7 +3,7 @@
 $PAGE->loadmeta('ucp');
 
 new UCP();
-class UCP
+final class UCP
 {
     public $what = '';
 
@@ -18,7 +18,7 @@ class UCP
     public function __construct()
     {
         global $PAGE,$JAX,$USER,$DB;
-        if (!$USER || $USER['group_id'] == 4) {
+        if (!$USER || $USER['group_id'] === 4) {
             $PAGE->location('?');
 
             return;
@@ -157,16 +157,16 @@ class UCP
                         $JAX->b['page'] = false;
                     }
 
-                    if ($JAX->b['page'] == 'compose') {
+                    if ($JAX->b['page'] === 'compose') {
                         $this->compose();
                     } elseif (
                         isset($JAX->g['view'])
                         && is_numeric($JAX->g['view'])
                     ) {
                         $this->viewmessage($JAX->g['view']);
-                    } elseif ($JAX->b['page'] == 'sent') {
+                    } elseif ($JAX->b['page'] === 'sent') {
                         $this->viewmessages('sent');
-                    } elseif ($JAX->b['page'] == 'flagged') {
+                    } elseif ($JAX->b['page'] === 'flagged') {
                         $this->viewmessages('flagged');
                     } elseif (
                         isset($JAX->b['flag'])
@@ -192,9 +192,11 @@ class UCP
                 break;
         }
 
-        if (!$PAGE->jsaccess || $PAGE->jsnewlocation) {
-            $this->showucp();
+        if ($PAGE->jsaccess && !$PAGE->jsnewlocation) {
+            return;
         }
+
+        $this->showucp();
     }
 
     public function getlocationforform()
@@ -279,7 +281,7 @@ class UCP
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             $update = [];
             foreach ($variables as $v) {
-                $update[$v] = (isset($JAX->p[$v]) && $JAX->p[$v]) ? 1 : 0;
+                $update[$v] = isset($JAX->p[$v]) && $JAX->p[$v] ? 1 : 0;
             }
 
             $DB->safeupdate(
@@ -293,7 +295,7 @@ class UCP
                 $PAGE->JS(
                     'script',
                     "window.globalsettings.{$v}="
-                    . ((isset($JAX->p[$v]) && $JAX->p[$v]) ? 1 : 0),
+                    . (isset($JAX->p[$v]) && $JAX->p[$v] ? 1 : 0),
                 );
             }
 
@@ -349,9 +351,11 @@ class UCP
             ? $JAX->theworks($sig) : '( none )',
             $JAX->blockhtml($sig),
         );
-        if ($update) {
-            $this->showucp();
+        if (!$update) {
+            return;
         }
+
+        $this->showucp();
     }
 
     public function showpasssettings()
@@ -363,7 +367,10 @@ class UCP
                 $JAX->p['showpass'] = false;
             }
 
-            if (!$JAX->p['showpass'] && $JAX->p['newpass1'] != $JAX->p['newpass2']) {
+            if (
+                !$JAX->p['showpass']
+                && $JAX->p['newpass1'] !== $JAX->p['newpass2']
+            ) {
                 $e = 'Those passwords do not match.';
             }
 
@@ -378,7 +385,10 @@ class UCP
 
             $verified_password = password_verify((string) $JAX->p['curpass'], (string) $USER['pass']);
             // Check if it's an old md5 hash.
-            if (!$verified_password && hash('md5', (string) $JAX->p['curpass']) === $USER['pass']) {
+            if (
+                !$verified_password
+                && hash('md5', (string) $JAX->p['curpass']) === $USER['pass']
+            ) {
                 $verified_password = true;
             }
 
@@ -386,10 +396,7 @@ class UCP
                 $e = 'The password you entered is incorrect.';
             }
 
-            if ($e !== '' && $e !== '0') {
-                $this->ucppage .= $PAGE->meta('error', $e);
-                $PAGE->JS('error', $e);
-            } else {
+            if ($e === '' || $e === '0') {
                 $hashpass = password_hash((string) $JAX->p['newpass1'], PASSWORD_DEFAULT);
                 $DB->safeupdate(
                     'members',
@@ -407,6 +414,9 @@ class UCP
 
                 return $this->showucp();
             }
+
+            $this->ucppage .= $PAGE->meta('error', $e);
+            $PAGE->JS('error', $e);
         }
 
         $this->ucppage .= $PAGE->meta(
@@ -450,7 +460,7 @@ class UCP
             $this->getlocationforform() . $JAX->hiddenFormFields(
                 ['submit' => 'true'],
             ),
-            (isset($JAX->b['change']) && $JAX->b['change']) ? <<<HTML
+            isset($JAX->b['change']) && $JAX->b['change'] ? <<<HTML
                 <input
                     type="text"
                     name="email"
@@ -498,9 +508,11 @@ class UCP
             . $JAX->blockhtml($USER['avatar']) . '" />
             <input type="submit" value="Edit" />
             </form>';
-        if ($update) {
-            $this->showucp();
+        if (!$update) {
+            return;
         }
+
+        $this->showucp();
     }
 
     public function showprofilesettings(): void
@@ -511,27 +523,27 @@ class UCP
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             // Insert the profile info into the database.
             $data = [
-                'display_name' => trim((string) $JAX->p['display_name']),
-                'full_name' => $JAX->p['full_name'],
-                'usertitle' => $JAX->p['usertitle'],
                 'about' => $JAX->p['about'],
-                'location' => $JAX->p['location'],
-                'dob_month' => $JAX->pick($JAX->p['dob_month'], null),
-                'dob_day' => $JAX->pick($JAX->p['dob_day'], null),
-                'dob_year' => $JAX->pick($JAX->p['dob_year'], null),
-                'contact_skype' => $JAX->p['con_skype'],
-                'contact_discord' => $JAX->p['con_discord'],
-                'contact_yim' => $JAX->p['con_yim'],
-                'contact_msn' => $JAX->p['con_msn'],
-                'contact_gtalk' => $JAX->p['con_gtalk'],
                 'contact_aim' => $JAX->p['con_aim'],
-                'contact_youtube' => $JAX->p['con_youtube'],
+                'contact_bluesky' => $JAX->p['con_bluesky'],
+                'contact_discord' => $JAX->p['con_discord'],
+                'contact_gtalk' => $JAX->p['con_gtalk'],
+                'contact_msn' => $JAX->p['con_msn'],
+                'contact_skype' => $JAX->p['con_skype'],
                 'contact_steam' => $JAX->p['con_steam'],
                 'contact_twitter' => $JAX->p['con_twitter'],
-                'contact_bluesky' => $JAX->p['con_bluesky'],
-                'website' => $JAX->p['website'],
+                'contact_yim' => $JAX->p['con_yim'],
+                'contact_youtube' => $JAX->p['con_youtube'],
+                'display_name' => trim((string) $JAX->p['display_name']),
+                'dob_day' => $JAX->pick($JAX->p['dob_day'], null),
+                'dob_month' => $JAX->pick($JAX->p['dob_month'], null),
+                'dob_year' => $JAX->pick($JAX->p['dob_year'], null),
+                'full_name' => $JAX->p['full_name'],
                 'gender' => in_array($JAX->p['gender'], $genderOptions)
                 ? $JAX->p['gender'] : '',
+                'location' => $JAX->p['location'],
+                'usertitle' => $JAX->p['usertitle'],
+                'website' => $JAX->p['website'],
             ];
 
             // Begin input checking.
@@ -558,46 +570,34 @@ class UCP
                 }
             }
 
-            if (
-                !$data['dob_year']
+            $data['dob_year']
+                = !$data['dob_year']
                 || !is_numeric($data['dob_year'])
                 || $data['dob_year'] < 1
                 || $data['dob_year'] > (int) date('Y')
-            ) {
-                $data['dob_year'] = null;
-            } else {
-                $data['dob_year'] = date(
-                    'Y',
-                    strtotime($data['dob_year'] . '/1/1'),
-                );
-            }
+             ? null : date(
+                 'Y',
+                 strtotime($data['dob_year'] . '/1/1'),
+             );
 
-            if (
-                !$data['dob_month']
+            $data['dob_month']
+                = !$data['dob_month']
                 || !is_numeric($data['dob_month'])
                 || $data['dob_month'] < 1
                 || $data['dob_month'] > 12
-            ) {
-                $data['dob_month'] = null;
-            } else {
-                $data['dob_month'] = date(
-                    'm',
-                    strtotime('2000/' . $data['dob_month'] . '/1'),
-                );
-            }
+             ? null : date(
+                 'm',
+                 strtotime('2000/' . $data['dob_month'] . '/1'),
+             );
 
-            if (
-                !$data['dob_day']
+            $data['dob_day']
+                = !$data['dob_day']
                 || !is_numeric($data['dob_day'])
                 || $data['dob_day'] < 1
-            ) {
-                $data['dob_day'] = null;
-            } else {
-                $data['dob_day'] = date(
-                    'd',
-                    strtotime('2000/1/' . $data['dob_day']),
-                );
-            }
+             ? null : date(
+                 'd',
+                 strtotime('2000/1/' . $data['dob_day']),
+             );
 
             // Is the date provided valid?
             if ($data['dob_month'] && $data['dob_day']) {
@@ -627,7 +627,11 @@ class UCP
                 }
             }
 
-            if (!$data['dob_year'] && !$data['dob_month'] && !$data['dob_year']) {
+            if (
+                !$data['dob_year']
+                && !$data['dob_month']
+                && !$data['dob_year']
+            ) {
                 // User provided no birthdate, just set field to null
                 $data['birthdate'] = null;
             } else {
@@ -642,21 +646,21 @@ class UCP
 
             foreach (
                 [
-                    'contact_skype' => 'Skype username',
-                    'contact_discord' => 'Discord username',
-                    'contact_yim' => 'YIM username',
-                    'contact_msn' => 'MSN username',
-                    'contact_gtalk' => 'Google Chat username',
                     'contact_aim' => 'AIM username',
-                    'contact_youtube' => 'YouTube username',
+                    'contact_bluesky' => 'Bluesky username',
+                    'contact_discord' => 'Discord username',
+                    'contact_gtalk' => 'Google Chat username',
+                    'contact_msn' => 'MSN username',
+                    'contact_skype' => 'Skype username',
                     'contact_steam' => 'Steam username',
                     'contact_twitter' => 'Twitter username',
-                    'contact_bluesky' => 'Bluesky username',
-                    'full_name' => 'Full name',
+                    'contact_yim' => 'YIM username',
+                    'contact_youtube' => 'YouTube username',
                     'display_name' => 'Display name',
-                    'website' => 'Website URL',
-                    'usertitle' => 'User Title',
+                    'full_name' => 'Full name',
                     'location' => 'Location',
+                    'usertitle' => 'User Title',
+                    'website' => 'Website URL',
                 ] as $k => $v
             ) {
                 if (
@@ -667,23 +671,27 @@ class UCP
                 }
 
                 $data[$k] = $JAX->blockhtml($data[$k]);
-                $length = $k === 'display_name' ? 30 : ($k === 'location' ? 100 : 50);
-                if (mb_strlen((string) $data[$k]) > $length) {
-                    $error = "{$v} must be less than {$length} characters.";
+                $length = $k === 'display_name'
+                    ? 30
+                    : ($k === 'location' ? 100 : 50);
+                if (mb_strlen((string) $data[$k]) <= $length) {
+                    continue;
                 }
+
+                $error = "{$v} must be less than {$length} characters.";
             }
 
             // Handle errors/insert.
             if ($error === '' || $error === '0') {
-                if ($data['display_name'] != $USER['display_name']) {
+                if ($data['display_name'] !== $USER['display_name']) {
                     $DB->safeinsert(
                         'activity',
                         [
-                            'type' => 'profile_name_change',
                             'arg1' => $USER['display_name'],
                             'arg2' => $data['display_name'],
-                            'uid' => $USER['id'],
                             'date' => date('Y-m-d H:i:s', time()),
+                            'type' => 'profile_name_change',
+                            'uid' => $USER['id'],
                         ],
                     );
                 }
@@ -709,7 +717,7 @@ class UCP
         $genderselect = '<select name="gender" title="Your gender" aria-label="Gender">';
         foreach (['', 'male', 'female', 'other'] as $v) {
             $genderselect .= '<option value="' . $v . '"'
-                . ($data['gender'] == $v ? ' selected="selected"' : '')
+                . ($data['gender'] === $v ? ' selected="selected"' : '')
                 . '>' . $JAX->pick(ucfirst($v), 'Not telling') . '</option>';
         }
 
@@ -732,14 +740,14 @@ class UCP
         ];
         foreach ($fullMonthNames as $k => $v) {
             $dobselect .= '<option value="' . ($k + 1) . '"'
-                . (($k + 1) == $data['dob_month'] ? ' selected="selected"' : '')
+                . ($k + 1 === $data['dob_month'] ? ' selected="selected"' : '')
                 . '>' . $v . '</option>';
         }
 
         $dobselect .= '</select><select name="dob_day" title="Day"><option value="">--</option>';
         for ($x = 1; $x < 32; ++$x) {
             $dobselect .= '<option value="' . $x . '"'
-                . ($x == $data['dob_day'] ? ' selected="selected"' : '')
+                . ($x === $data['dob_day'] ? ' selected="selected"' : '')
                 . '>' . $x . '</option>';
         }
 
@@ -748,7 +756,7 @@ class UCP
         $thisyear = (int) date('Y');
         for ($x = $thisyear; $x > $thisyear - 100; --$x) {
             $dobselect .= '<option value="' . $x . '"'
-                . ($x == $data['dob_year'] ? ' selected="selected"' : '')
+                . ($x === $data['dob_year'] ? ' selected="selected"' : '')
                 . '>' . $x . '</option>';
         }
 
@@ -799,11 +807,11 @@ class UCP
                 $DB->safeupdate(
                     'members',
                     [
+                        'nowordfilter' => isset($JAX->p['usewordfilter'])
+                        && $JAX->p['usewordfilter'] ? 0 : 1,
                         'skin_id' => $JAX->b['skin'],
-                        'nowordfilter' => (isset($JAX->p['usewordfilter'])
-                        && $JAX->p['usewordfilter']) ? 0 : 1,
-                        'wysiwyg' => (isset($JAX->p['wysiwyg'])
-                        && $JAX->p['wysiwyg']) ? 1 : 0,
+                        'wysiwyg' => isset($JAX->p['wysiwyg'])
+                        && $JAX->p['wysiwyg'] ? 1 : 0,
                     ],
                     'WHERE `id`=?',
                     $USER['id'],
@@ -824,7 +832,7 @@ class UCP
             $showthing = true;
         }
 
-        $result = ($USER['group_id'] != 2)
+        $result = $USER['group_id'] !== 2
             ? $DB->safeselect(
                 '`id`,`using`,`title`,`custom`,`wrapper`,`default`,`hidden`',
                 'skins',
@@ -838,7 +846,7 @@ class UCP
         $select = '';
         while ($f = $DB->arow($result)) {
             $select .= "<option value='" . $f['id'] . "' "
-                . ($USER['skin_id'] == $f['id'] ? "selected='selected'" : '')
+                . ($USER['skin_id'] === $f['id'] ? "selected='selected'" : '')
                 . '/>' . ($f['hidden'] ? '*' : '') . $f['title'] . '</option>';
             $found = true;
         }
@@ -886,7 +894,7 @@ class UCP
         );
     }
 
-    public function viewmessage($messageid)
+    public function viewmessage($messageid): void
     {
         global $PAGE,$DB,$JAX,$USER;
         if ($PAGE->jsupdate && !$PAGE->jsdirectlink) {
@@ -914,7 +922,10 @@ class UCP
         );
         $message = $DB->arow($result);
         $DB->disposeresult($result);
-        if ($message['from'] != $USER['id'] && $message['to'] != $USER['id']) {
+        if (
+            $message['from'] !== $USER['id']
+            && $message['to'] !== $USER['id']
+        ) {
             $e = "You don't have permission to view this message.";
         }
 
@@ -922,7 +933,7 @@ class UCP
             return $this->showucp($e);
         }
 
-        if (!$message['read'] && $message['to'] == $USER['id']) {
+        if (!$message['read'] && $message['to'] === $USER['id']) {
             $DB->safeupdate(
                 'messages',
                 ['read' => 1],
@@ -948,9 +959,9 @@ class UCP
             $JAX->hiddenFormFields(
                 [
                     'act' => 'ucp',
-                    'what' => 'inbox',
                     'messageid' => $message['id'],
                     'sender' => $message['from'],
+                    'what' => 'inbox',
                 ],
             ),
         );
@@ -984,7 +995,7 @@ class UCP
         $page = '';
         $result = null;
         $hasmessages = false;
-        if ($view == 'sent') {
+        if ($view === 'sent') {
             $result = $DB->safespecial(
                 <<<'MySQL'
                     SELECT a.`id` AS `id`
@@ -1008,7 +1019,7 @@ class UCP
                 ['messages', 'members'],
                 $USER['id'],
             );
-        } elseif ($view == 'flagged') {
+        } elseif ($view === 'flagged') {
             $result = $DB->safespecial(
                 <<<'EOT'
                     SELECT a.`id` AS `id`,a.`to` AS `to`,a.`from` AS `from`,a.`title` AS `title`,
@@ -1072,9 +1083,9 @@ class UCP
         }
 
         if (!$hasmessages) {
-            if ($view == 'sent') {
+            if ($view === 'sent') {
                 $msg = 'No sent messages.';
-            } elseif ($view == 'flagged') {
+            } elseif ($view === 'flagged') {
                 $msg = 'No flagged messages.';
             } else {
                 $msg = 'No messages. You could always try '
@@ -1093,11 +1104,11 @@ class UCP
                     'what' => 'inbox',
                 ],
             ),
-            $view == 'sent' ? 'Recipient' : 'Sender',
+            $view === 'sent' ? 'Recipient' : 'Sender',
             $page,
         );
 
-        if ($view == 'inbox') {
+        if ($view === 'inbox') {
             $PAGE->JS('update', 'num-messages', $unread);
         }
 
@@ -1136,7 +1147,10 @@ class UCP
 
             if (!$udata) {
                 $e = 'Invalid user!';
-            } elseif (trim((string) $JAX->b['title']) === '' || trim((string) $JAX->b['title']) === '0') {
+            } elseif (
+                trim((string) $JAX->b['title']) === ''
+                || trim((string) $JAX->b['title']) === '0'
+            ) {
                 $e = 'You must enter a title.';
             }
 
@@ -1148,14 +1162,14 @@ class UCP
                 $DB->safeinsert(
                     'messages',
                     [
-                        'to' => $udata['id'],
-                        'from' => $USER['id'],
-                        'title' => $JAX->blockhtml($JAX->p['title']),
-                        'message' => $JAX->p['message'],
                         'date' => date('Y-m-d H:i:s', time()),
-                        'del_sender' => 0,
                         'del_recipient' => 0,
+                        'del_sender' => 0,
+                        'from' => $USER['id'],
+                        'message' => $JAX->p['message'],
                         'read' => 0,
+                        'title' => $JAX->blockhtml($JAX->p['title']),
+                        'to' => $udata['id'],
                     ],
                 );
                 // Give them a notification.
@@ -1236,8 +1250,8 @@ class UCP
 
             $msg = PHP_EOL . PHP_EOL . PHP_EOL
                 . '[quote=' . $mname . ']' . $message['message'] . '[/quote]';
-            $mtitle = ($todo == 'fwd' ? 'FWD:' : 'RE:') . $message['title'];
-            if ($todo == 'fwd') {
+            $mtitle = ($todo === 'fwd' ? 'FWD:' : 'RE:') . $message['title'];
+            if ($todo === 'fwd') {
                 $mid = '';
                 $mname = '';
             }
@@ -1267,9 +1281,9 @@ class UCP
             $JAX->hiddenFormFields(
                 [
                     'act' => 'ucp',
-                    'what' => 'inbox',
                     'page' => 'compose',
                     'submit' => '1',
+                    'what' => 'inbox',
                 ],
             ),
             $mid,
@@ -1297,8 +1311,8 @@ class UCP
         $message = $DB->arow($result);
         $DB->disposeresult($result);
 
-        $is_recipient = $message['to'] == $USER['id'];
-        $is_sender = $message['from'] == $USER['id'];
+        $is_recipient = $message['to'] === $USER['id'];
+        $is_sender = $message['from'] === $USER['id'];
         if ($is_recipient) {
             $DB->safeupdate(
                 'messages',
@@ -1342,12 +1356,14 @@ class UCP
             );
         }
 
-        if ($relocate) {
-            $PAGE->location(
-                '?act=ucp&what=inbox'
-                . (isset($JAX->b['prevpage']) && $JAX->b['prevpage']
-                ? '&page=' . $JAX->b['prevpage'] : ''),
-            );
+        if (!$relocate) {
+            return;
         }
+
+        $PAGE->location(
+            '?act=ucp&what=inbox'
+            . (isset($JAX->b['prevpage']) && $JAX->b['prevpage']
+            ? '&page=' . $JAX->b['prevpage'] : ''),
+        );
     }
 }

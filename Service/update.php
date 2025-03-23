@@ -5,11 +5,6 @@
  *
  * PHP Version 5.3.0
  *
- * @category Jaxboards
- *
- * @author  World's Tallest Ladder <wtl420@users.noreply.github.com>
- * @license MIT <https://opensource.org/licenses/MIT>
- *
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
 if (!defined('JAXBOARDS_ROOT')) {
@@ -74,29 +69,31 @@ if ($CFG['service']) {
         $tables = $DB->rows($result);
         foreach ($tables as $table) {
             $table = $table[0];
-            if (mb_strpos((string) $table, 'blueprint_') === false) {
-                // Ignore blueprint tables.
-                $result = $DB->safespecial(
-                    'SHOW CREATE TABLE %t',
-                    [$table],
-                );
-                $createTableStatement = $DB->row($result);
-                if ($createTableStatement) {
-                    $queries[] = "DROP TABLE IF EXISTS `{$table}`;";
-                    $queries[] = array_pop($createTableStatement) . ';';
-                    $DB->disposeresult($result);
-                    $select = $DB->safeselect('*', $table);
-                    while ($row = $DB->arow($select)) {
-                        $insert = $DB->buildInsert($row);
-                        $columns = $insert[0];
-                        $values = $insert[1];
-                        $queries[] = "INSERT INTO `{$table}` ({$columns}) "
-                            . "VALUES {$values};";
-                    }
-                }
-
-                $DB->disposeresult($result);
+            if (mb_strpos((string) $table, 'blueprint_') !== false) {
+                continue;
             }
+
+            // Ignore blueprint tables.
+            $result = $DB->safespecial(
+                'SHOW CREATE TABLE %t',
+                [$table],
+            );
+            $createTableStatement = $DB->row($result);
+            if ($createTableStatement) {
+                $queries[] = "DROP TABLE IF EXISTS `{$table}`;";
+                $queries[] = array_pop($createTableStatement) . ';';
+                $DB->disposeresult($result);
+                $select = $DB->safeselect('*', $table);
+                while ($row = $DB->arow($select)) {
+                    $insert = $DB->buildInsert($row);
+                    $columns = $insert[0];
+                    $values = $insert[1];
+                    $queries[] = "INSERT INTO `{$table}` ({$columns}) "
+                        . "VALUES {$values};";
+                }
+            }
+
+            $DB->disposeresult($result);
         }
     }
 
@@ -547,266 +544,266 @@ $intToNull = [
 ];
 // Order matters here, don't re-arrange unless you know what you're doing.
 $fixForeignKeyRelations = [
-    'members' => [
-        'group_id' => [
-            'table' => 'member_groups',
-            'column' => 'id',
-            'type' => 'null',
-            'query' => <<<'EOT'
-                ALTER TABLE `blueprint_members`
-                ADD FOREIGN KEY (`group_id`) REFERENCES `blueprint_member_groups` (`id`)
-                    ON DELETE SET NULL;
-                EOT,
-        ],
-        'skin_id' => [
-            'table' => 'skins',
-            'column' => 'id',
-            'type' => 'null',
-            'query' => <<<'EOT'
-                ALTER TABLE `blueprint_members`
-                ADD FOREIGN KEY (`skin_id`) REFERENCES `blueprint_skins` (`id`)
-                    ON DELETE SET NULL;
-                EOT,
-        ],
-    ],
-    'forums' => [
-        'cat_id' => [
-            'table' => 'categories',
-            'column' => 'id',
-            'type' => 'null',
-            'query' => <<<'EOT'
-                ALTER TABLE `blueprint_forums`
-                ADD FOREIGN KEY (`cat_id`) REFERENCES `blueprint_categories` (`id`)
-                    ON DELETE SET NULL;
-                EOT,
-        ],
-        'lp_uid' => [
-            'table' => 'members',
-            'column' => 'id',
-            'type' => 'null',
-            'query' => <<<'EOT'
-                ALTER TABLE `blueprint_forums`
-                ADD FOREIGN KEY (`lp_uid`) REFERENCES `blueprint_members` (`id`)
-                     ON DELETE SET NULL;
-                EOT,
-        ],
-        'lp_tid' => [
-            'table' => 'topics',
-            'column' => 'id',
-            'type' => 'null',
-            'query' => <<<'EOT'
-                ALTER TABLE `blueprint_forums`
-                ADD FOREIGN KEY (`lp_tid`) REFERENCES `blueprint_topics` (`id`)
-                    ON DELETE SET NULL;
-                EOT,
-        ],
-    ],
-    'topics' => [
-        'auth_id' => [
-            'table' => 'members',
-            'column' => 'id',
-            'type' => 'null',
-            'query' => <<<'EOT'
-                ALTER TABLE `blueprint_topics`
-                ADD FOREIGN KEY (`auth_id`) REFERENCES `blueprint_members` (`id`)
-                    ON DELETE SET NULL;
-                EOT,
-        ],
-        'fid' => [
-            'table' => 'forums',
-            'column' => 'id',
-            'type' => 'delete',
-            'query' => <<<'EOT'
-                ALTER TABLE `blueprint_topics`
-                ADD FOREIGN KEY (`fid`) REFERENCES `blueprint_forums` (`id`) ON DELETE CASCADE;
-                EOT,
-        ],
-        'lp_uid' => [
-            'table' => 'members',
-            'column' => 'id',
-            'type' => 'null',
-            'query' => <<<'EOT'
-                ALTER TABLE `blueprint_topics`
-                ADD FOREIGN KEY (`lp_uid`) REFERENCES `blueprint_members` (`id`)
-                    ON DELETE SET NULL;
-                EOT,
-        ],
-        'op' => [
-            'table' => 'posts',
-            'column' => 'id',
-            'type' => 'null',
-            'query' => <<<'EOT'
-                ALTER TABLE `blueprint_topics`
-                ADD FOREIGN KEY (`op`) REFERENCES `blueprint_posts` (`id`) ON DELETE SET NULL;
-                EOT,
-        ],
-    ],
-    'posts' => [
-        'auth_id' => [
-            'table' => 'members',
-            'column' => 'id',
-            'type' => 'null',
-            'query' => <<<'EOT'
-                ALTER TABLE `blueprint_posts`
-                ADD FOREIGN KEY (`auth_id`) REFERENCES `blueprint_members` (`id`)
-                    ON DELETE SET NULL;
-                EOT,
-        ],
-        'tid' => [
-            'table' => 'topics',
-            'column' => 'id',
-            'type' => 'delete',
-            'query' => <<<'EOT'
-                ALTER TABLE `blueprint_posts`
-                ADD FOREIGN KEY (`tid`) REFERENCES `blueprint_topics` (`id`) ON DELETE CASCADE;
-                EOT,
-        ],
-    ],
-    'logs' => [
-        'uid' => [
-            'table' => 'members',
-            'column' => 'id',
-            'type' => 'null',
-            'query' => <<<'EOT'
-                ALTER TABLE `blueprint_logs`
-                ADD FOREIGN KEY (`uid`) REFERENCES `blueprint_members` (`id`) ON DELETE SET NULL;
-                EOT,
-        ],
-    ],
-    'messages' => [
-        'from' => [
-            'table' => 'members',
-            'column' => 'id',
-            'type' => 'null',
-            'query' => <<<'EOT'
-                ALTER TABLE `blueprint_messages`
-                ADD FOREIGN KEY (`from`) REFERENCES `blueprint_members` (`id`) ON DELETE SET NULL;
-                EOT,
-        ],
-        'to' => [
-            'table' => 'members',
-            'column' => 'id',
-            'type' => 'null',
-            'query' => <<<'EOT'
-                ALTER TABLE `blueprint_messages`
-                ADD FOREIGN KEY (`to`) REFERENCES `blueprint_members` (`id`) ON DELETE SET NULL;
-                EOT,
-        ],
-    ],
-    'profile_comments' => [
-        'from' => [
-            'table' => 'members',
-            'column' => 'id',
-            'type' => 'delete',
-            'query' => <<<'EOT'
-                ALTER TABLE `blueprint_profile_comments`
-                ADD FOREIGN KEY (`from`) REFERENCES `blueprint_members` (`id`) ON DELETE CASCADE;
-                EOT,
-        ],
-        'to' => [
-            'table' => 'members',
-            'column' => 'id',
-            'type' => 'delete',
-            'query' => <<<'EOT'
-                ALTER TABLE `blueprint_profile_comments`
-                ADD FOREIGN KEY (`to`) REFERENCES `blueprint_members` (`id`) ON DELETE CASCADE;
-                EOT,
-        ],
-    ],
-    'reports' => [
-        'reporter' => [
-            'table' => 'members',
-            'column' => 'id',
-            'type' => 'null',
-            'query' => <<<'EOT'
-                ALTER TABLE `blueprint_reports`
-                ADD FOREIGN KEY (`reporter`) REFERENCES `blueprint_members` (`id`)
-                    ON DELETE SET NULL;
-                EOT,
-        ],
-    ],
-    'session' => [
-        'uid' => [
-            'table' => 'members',
-            'column' => 'id',
-            'type' => 'delete',
-            'query' => <<<'EOT'
-                ALTER TABLE `blueprint_session`
-                ADD FOREIGN KEY (`uid`) REFERENCES `blueprint_members` (`id`) ON DELETE CASCADE;
-                EOT,
-        ],
-    ],
-    'shouts' => [
-        'uid' => [
-            'table' => 'members',
-            'column' => 'id',
-            'type' => 'null',
-            'query' => <<<'EOT'
-                ALTER TABLE `blueprint_shouts`
-                ADD FOREIGN KEY (`uid`) REFERENCES `blueprint_members` (`id`) ON DELETE CASCADE;
-                EOT,
-        ],
-    ],
-    'stats' => [
-        'last_register' => [
-            'table' => 'members',
-            'column' => 'id',
-            'type' => 'null',
-            'query' => <<<'EOT'
-                ALTER TABLE `blueprint_stats`
-                ADD FOREIGN KEY (`last_register`) REFERENCES `blueprint_members` (`id`)
-                    ON DELETE SET NULL;
-                EOT,
-        ],
-    ],
-    'files' => [
-        'uid' => [
-            'table' => 'members',
-            'column' => 'id',
-            'type' => 'null',
-            'query' => <<<'EOT'
-                ALTER TABLE `blueprint_files`
-                ADD FOREIGN KEY (`uid`) REFERENCES `blueprint_members` (`id`) ON DELETE SET NULL;
-                EOT,
-        ],
-    ],
     'activity' => [
         'affected_uid' => [
-            'table' => 'members',
             'column' => 'id',
-            'type' => 'delete',
             'query' => <<<'EOT'
                 ALTER TABLE `blueprint_activity`
                 ADD FOREIGN KEY (`affected_uid`) REFERENCES `blueprint_members` (`id`)
                     ON DELETE CASCADE;
                 EOT,
+            'table' => 'members',
+            'type' => 'delete',
         ],
         'pid' => [
-            'table' => 'posts',
             'column' => 'id',
-            'type' => 'delete',
             'query' => <<<'EOT'
                 ALTER TABLE `blueprint_activity`
                 ADD FOREIGN KEY (`pid`) REFERENCES `blueprint_posts` (`id`) ON DELETE CASCADE;
                 EOT,
+            'table' => 'posts',
+            'type' => 'delete',
         ],
         'tid' => [
-            'table' => 'topics',
             'column' => 'id',
-            'type' => 'delete',
             'query' => <<<'EOT'
                 ALTER TABLE `blueprint_activity`
                 ADD FOREIGN KEY (`tid`) REFERENCES `blueprint_topics` (`id`) ON DELETE CASCADE;
                 EOT,
+            'table' => 'topics',
+            'type' => 'delete',
         ],
         'uid' => [
-            'table' => 'members',
             'column' => 'id',
-            'type' => 'delete',
             'query' => <<<'EOT'
                 ALTER TABLE `blueprint_activity`
                 ADD FOREIGN KEY (`uid`) REFERENCES `blueprint_members` (`id`) ON DELETE CASCADE;
                 EOT,
+            'table' => 'members',
+            'type' => 'delete',
+        ],
+    ],
+    'files' => [
+        'uid' => [
+            'column' => 'id',
+            'query' => <<<'EOT'
+                ALTER TABLE `blueprint_files`
+                ADD FOREIGN KEY (`uid`) REFERENCES `blueprint_members` (`id`) ON DELETE SET NULL;
+                EOT,
+            'table' => 'members',
+            'type' => 'null',
+        ],
+    ],
+    'forums' => [
+        'cat_id' => [
+            'column' => 'id',
+            'query' => <<<'EOT'
+                ALTER TABLE `blueprint_forums`
+                ADD FOREIGN KEY (`cat_id`) REFERENCES `blueprint_categories` (`id`)
+                    ON DELETE SET NULL;
+                EOT,
+            'table' => 'categories',
+            'type' => 'null',
+        ],
+        'lp_tid' => [
+            'column' => 'id',
+            'query' => <<<'EOT'
+                ALTER TABLE `blueprint_forums`
+                ADD FOREIGN KEY (`lp_tid`) REFERENCES `blueprint_topics` (`id`)
+                    ON DELETE SET NULL;
+                EOT,
+            'table' => 'topics',
+            'type' => 'null',
+        ],
+        'lp_uid' => [
+            'column' => 'id',
+            'query' => <<<'EOT'
+                ALTER TABLE `blueprint_forums`
+                ADD FOREIGN KEY (`lp_uid`) REFERENCES `blueprint_members` (`id`)
+                     ON DELETE SET NULL;
+                EOT,
+            'table' => 'members',
+            'type' => 'null',
+        ],
+    ],
+    'logs' => [
+        'uid' => [
+            'column' => 'id',
+            'query' => <<<'EOT'
+                ALTER TABLE `blueprint_logs`
+                ADD FOREIGN KEY (`uid`) REFERENCES `blueprint_members` (`id`) ON DELETE SET NULL;
+                EOT,
+            'table' => 'members',
+            'type' => 'null',
+        ],
+    ],
+    'members' => [
+        'group_id' => [
+            'column' => 'id',
+            'query' => <<<'EOT'
+                ALTER TABLE `blueprint_members`
+                ADD FOREIGN KEY (`group_id`) REFERENCES `blueprint_member_groups` (`id`)
+                    ON DELETE SET NULL;
+                EOT,
+            'table' => 'member_groups',
+            'type' => 'null',
+        ],
+        'skin_id' => [
+            'column' => 'id',
+            'query' => <<<'EOT'
+                ALTER TABLE `blueprint_members`
+                ADD FOREIGN KEY (`skin_id`) REFERENCES `blueprint_skins` (`id`)
+                    ON DELETE SET NULL;
+                EOT,
+            'table' => 'skins',
+            'type' => 'null',
+        ],
+    ],
+    'messages' => [
+        'from' => [
+            'column' => 'id',
+            'query' => <<<'EOT'
+                ALTER TABLE `blueprint_messages`
+                ADD FOREIGN KEY (`from`) REFERENCES `blueprint_members` (`id`) ON DELETE SET NULL;
+                EOT,
+            'table' => 'members',
+            'type' => 'null',
+        ],
+        'to' => [
+            'column' => 'id',
+            'query' => <<<'EOT'
+                ALTER TABLE `blueprint_messages`
+                ADD FOREIGN KEY (`to`) REFERENCES `blueprint_members` (`id`) ON DELETE SET NULL;
+                EOT,
+            'table' => 'members',
+            'type' => 'null',
+        ],
+    ],
+    'posts' => [
+        'auth_id' => [
+            'column' => 'id',
+            'query' => <<<'EOT'
+                ALTER TABLE `blueprint_posts`
+                ADD FOREIGN KEY (`auth_id`) REFERENCES `blueprint_members` (`id`)
+                    ON DELETE SET NULL;
+                EOT,
+            'table' => 'members',
+            'type' => 'null',
+        ],
+        'tid' => [
+            'column' => 'id',
+            'query' => <<<'EOT'
+                ALTER TABLE `blueprint_posts`
+                ADD FOREIGN KEY (`tid`) REFERENCES `blueprint_topics` (`id`) ON DELETE CASCADE;
+                EOT,
+            'table' => 'topics',
+            'type' => 'delete',
+        ],
+    ],
+    'profile_comments' => [
+        'from' => [
+            'column' => 'id',
+            'query' => <<<'EOT'
+                ALTER TABLE `blueprint_profile_comments`
+                ADD FOREIGN KEY (`from`) REFERENCES `blueprint_members` (`id`) ON DELETE CASCADE;
+                EOT,
+            'table' => 'members',
+            'type' => 'delete',
+        ],
+        'to' => [
+            'column' => 'id',
+            'query' => <<<'EOT'
+                ALTER TABLE `blueprint_profile_comments`
+                ADD FOREIGN KEY (`to`) REFERENCES `blueprint_members` (`id`) ON DELETE CASCADE;
+                EOT,
+            'table' => 'members',
+            'type' => 'delete',
+        ],
+    ],
+    'reports' => [
+        'reporter' => [
+            'column' => 'id',
+            'query' => <<<'EOT'
+                ALTER TABLE `blueprint_reports`
+                ADD FOREIGN KEY (`reporter`) REFERENCES `blueprint_members` (`id`)
+                    ON DELETE SET NULL;
+                EOT,
+            'table' => 'members',
+            'type' => 'null',
+        ],
+    ],
+    'session' => [
+        'uid' => [
+            'column' => 'id',
+            'query' => <<<'EOT'
+                ALTER TABLE `blueprint_session`
+                ADD FOREIGN KEY (`uid`) REFERENCES `blueprint_members` (`id`) ON DELETE CASCADE;
+                EOT,
+            'table' => 'members',
+            'type' => 'delete',
+        ],
+    ],
+    'shouts' => [
+        'uid' => [
+            'column' => 'id',
+            'query' => <<<'EOT'
+                ALTER TABLE `blueprint_shouts`
+                ADD FOREIGN KEY (`uid`) REFERENCES `blueprint_members` (`id`) ON DELETE CASCADE;
+                EOT,
+            'table' => 'members',
+            'type' => 'null',
+        ],
+    ],
+    'stats' => [
+        'last_register' => [
+            'column' => 'id',
+            'query' => <<<'EOT'
+                ALTER TABLE `blueprint_stats`
+                ADD FOREIGN KEY (`last_register`) REFERENCES `blueprint_members` (`id`)
+                    ON DELETE SET NULL;
+                EOT,
+            'table' => 'members',
+            'type' => 'null',
+        ],
+    ],
+    'topics' => [
+        'auth_id' => [
+            'column' => 'id',
+            'query' => <<<'EOT'
+                ALTER TABLE `blueprint_topics`
+                ADD FOREIGN KEY (`auth_id`) REFERENCES `blueprint_members` (`id`)
+                    ON DELETE SET NULL;
+                EOT,
+            'table' => 'members',
+            'type' => 'null',
+        ],
+        'fid' => [
+            'column' => 'id',
+            'query' => <<<'EOT'
+                ALTER TABLE `blueprint_topics`
+                ADD FOREIGN KEY (`fid`) REFERENCES `blueprint_forums` (`id`) ON DELETE CASCADE;
+                EOT,
+            'table' => 'forums',
+            'type' => 'delete',
+        ],
+        'lp_uid' => [
+            'column' => 'id',
+            'query' => <<<'EOT'
+                ALTER TABLE `blueprint_topics`
+                ADD FOREIGN KEY (`lp_uid`) REFERENCES `blueprint_members` (`id`)
+                    ON DELETE SET NULL;
+                EOT,
+            'table' => 'members',
+            'type' => 'null',
+        ],
+        'op' => [
+            'column' => 'id',
+            'query' => <<<'EOT'
+                ALTER TABLE `blueprint_topics`
+                ADD FOREIGN KEY (`op`) REFERENCES `blueprint_posts` (`id`) ON DELETE SET NULL;
+                EOT,
+            'table' => 'posts',
+            'type' => 'null',
         ],
     ],
 ];
@@ -862,13 +859,13 @@ $dateFixes = [
         ],
     ],
     'session' => [
-        'last_update' => [
-            'new' => 'last_update',
-            'pos' => 'vars',
-        ],
         'last_action' => [
             'new' => 'last_action',
             'pos' => 'last_update',
+        ],
+        'last_update' => [
+            'new' => 'last_update',
+            'pos' => 'vars',
         ],
         'readtime' => [
             'new' => 'read_date',
@@ -1455,9 +1452,11 @@ foreach ($boards as $board) {
         $tableColumns = [];
         $result = $DB->safequery("DESCRIBE {$table}");
         while ($row = $DB->arow($result)) {
-            if (isset($row['Field'])) {
-                $tableColumns[] = mb_strtolower($row['Field']);
+            if (!isset($row['Field'])) {
+                continue;
             }
+
+            $tableColumns[] = mb_strtolower($row['Field']);
         }
 
         foreach ($columns as $old => $info) {
@@ -1477,29 +1476,31 @@ foreach ($boards as $board) {
             );
             $row = $DB->arow($result);
             $DB->disposeresult($result);
-            if ($row['date_check'] === null) {
-                $new = $info['new'];
-                $pos = $info['pos'];
-                $queries = [
-                    <<<EOT
-                            UPDATE {$table} SET `{$old}` = 0 WHERE `{$old}` IS NULL;
-                        EOT,
-                    <<<EOT
-                            ALTER TABLE {$table}
-                                CHANGE `{$old}` `{$old}_tmp` int(11) unsigned NOT NULL AFTER `{$pos}`,
-                                ADD `{$new}` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `{$old}_tmp`;
-                        EOT,
-                    <<<EOT
-                            UPDATE {$table} SET `{$new}`=FROM_UNIXTIME(COALESCE(`{$old}_tmp`, 0));
-                        EOT,
-                    <<<EOT
-                            ALTER TABLE {$table} DROP `{$old}_tmp`;
-                        EOT,
-                ];
-                foreach ($queries as $query) {
-                    $result = $DB->safequery($query);
-                    $DB->disposeresult($result);
-                }
+            if ($row['date_check'] !== null) {
+                continue;
+            }
+
+            $new = $info['new'];
+            $pos = $info['pos'];
+            $queries = [
+                <<<EOT
+                        UPDATE {$table} SET `{$old}` = 0 WHERE `{$old}` IS NULL;
+                    EOT,
+                <<<EOT
+                        ALTER TABLE {$table}
+                            CHANGE `{$old}` `{$old}_tmp` int(11) unsigned NOT NULL AFTER `{$pos}`,
+                            ADD `{$new}` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `{$old}_tmp`;
+                    EOT,
+                <<<EOT
+                        UPDATE {$table} SET `{$new}`=FROM_UNIXTIME(COALESCE(`{$old}_tmp`, 0));
+                    EOT,
+                <<<EOT
+                        ALTER TABLE {$table} DROP `{$old}_tmp`;
+                    EOT,
+            ];
+            foreach ($queries as $query) {
+                $result = $DB->safequery($query);
+                $DB->disposeresult($result);
             }
         }
     }
@@ -1510,9 +1511,11 @@ foreach ($boards as $board) {
     $columns = [];
     $result = $DB->safequery("DESCRIBE {$table}");
     while ($row = $DB->arow($result)) {
-        if (isset($row['Field'])) {
-            $columns[] = mb_strtolower($row['Field']);
+        if (!isset($row['Field'])) {
+            continue;
         }
+
+        $columns[] = mb_strtolower($row['Field']);
     }
 
     $DB->disposeresult($result);
@@ -1570,17 +1573,19 @@ foreach ($boards as $board) {
         );
         $row = $DB->arow($result);
         $DB->disposeResult($result);
-        if ($row['ip_check'] === null) {
-            $result = $DB->safequery(
-                <<<EOT
-                    UPDATE {$table} SET `{$column}` = COALESCE(
-                        INET6_ATON(INET_NTOA(`{$column}`)),
-                        INET6_ATON(INET_NTOA(0))
-                    );
-                    EOT,
-            );
-            $DB->disposeresult($result);
+        if ($row['ip_check'] !== null) {
+            continue;
         }
+
+        $result = $DB->safequery(
+            <<<EOT
+                UPDATE {$table} SET `{$column}` = COALESCE(
+                    INET6_ATON(INET_NTOA(`{$column}`)),
+                    INET6_ATON(INET_NTOA(0))
+                );
+                EOT,
+        );
+        $DB->disposeresult($result);
     }
 
     // Run int to null.
@@ -1636,22 +1641,18 @@ foreach ($boards as $board) {
                 $DB->disposeresult($result);
             }
 
-            if (
-                !preg_match(
-                    "/FOREIGN\\s+KEY\\s+\\(`{$column}`\\)\\s+REFERENCES\\s+"
-                    . "{$foreign['table']}\\s+\\(`{$foreign['column']}`\\)/i",
-                    (string) $createTableStatement,
-                )
-            ) {
-                $result = $DB->safequery(
-                    str_replace(
-                        'blueprint_',
-                        $board . '_',
-                        $foreign['query'],
-                    ),
-                );
-                $DB->disposeresult($result);
+            if (preg_match("/FOREIGN\\s+KEY\\s+\\(`{$column}`\\)\\s+REFERENCES\\s+{$foreign['table']}\\s+\\(`{$foreign['column']}`\\)/i", (string) $createTableStatement)) {
+                continue;
             }
+
+            $result = $DB->safequery(
+                str_replace(
+                    'blueprint_',
+                    $board . '_',
+                    $foreign['query'],
+                ),
+            );
+            $DB->disposeresult($result);
         }
     }
 }

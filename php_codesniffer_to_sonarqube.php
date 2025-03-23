@@ -51,10 +51,7 @@ if (!is_readable($phpCodeSnifferReport)) {
     exit(1);
 }
 
-if (
-    file_exists($sonarQubeReport)
-    && !is_writable($sonarQubeReport)
-) {
+if (file_exists($sonarQubeReport) && !is_writable($sonarQubeReport)) {
     fwrite(
         STDERR,
         'SonarQube report file already exists and is not writable',
@@ -114,16 +111,16 @@ file_put_contents(
                     $result['rules'],
                     ...array_map(
                         static fn(array $message): array => [
-                            'id' => $message['source'],
-                            'name' => $message['message'],
-                            'engineId' => 'PHP_CodeSniffer',
                             'cleanCodeAttribute' => 'FORMATTED',
+                            'engineId' => 'PHP_CodeSniffer',
+                            'id' => $message['source'],
                             'impacts' => [
                                 [
                                     'severity' => 'LOW',
                                     'softwareQuality' => 'MAINTAINABILITY',
                                 ],
                             ],
+                            'name' => $message['message'],
                         ],
                         array_filter(
                             $data['files'][$file]['messages'],
@@ -148,19 +145,11 @@ file_put_contents(
                     $result['issues'],
                     ...array_map(
                         static fn(array $message): array => [
-                            'ruleId' => $message['source'],
                             'engineId' => 'PHP_CodeSniffer',
                             'primaryLocation' => [
-                                'message' => $message['message'],
                                 'filePath' => $file,
+                                'message' => $message['message'],
                                 'textRange' => [
-                                    'startColumn'
-                                        // SonarQube starts at 0 for columns
-                                        // while PHP_CodeSniffer starts at 1
-                                        => (string) (
-                                            ((int) $message['column']) - 1
-                                        ),
-                                    'startLine' => (string) $message['line'],
                                     // we don't know when this ends due to lack
                                     // of information from PHP_CodeSniffer so we
                                     // just add 1 to the starting positions
@@ -169,8 +158,16 @@ file_put_contents(
                                     'endLine' => (string) (
                                         (int) $message['line'] + 1
                                     ),
+                                    'startColumn'
+                                        // SonarQube starts at 0 for columns
+                                        // while PHP_CodeSniffer starts at 1
+                                        => (string) (
+                                            ((int) $message['column']) - 1
+                                        ),
+                                    'startLine' => (string) $message['line'],
                                 ],
                             ],
+                            'ruleId' => $message['source'],
 
                         ],
                         $data['files'][$file]['messages'],

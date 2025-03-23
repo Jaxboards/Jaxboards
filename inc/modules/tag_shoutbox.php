@@ -3,7 +3,7 @@
 $PAGE->loadmeta('shoutbox');
 
 new SHOUTBOX();
-class SHOUTBOX
+final class SHOUTBOX
 {
     public $shoutlimit;
 
@@ -30,7 +30,7 @@ class SHOUTBOX
             $this->deleteshout();
         } elseif (
             isset($JAX->b['module'])
-            && $JAX->b['module'] == 'shoutbox'
+            && $JAX->b['module'] === 'shoutbox'
         ) {
             $this->showallshouts();
         }
@@ -66,7 +66,7 @@ class SHOUTBOX
 
             if (
                 isset($shoutrow['uid'])
-                && $shoutrow['uid'] == $USER['id']
+                && $shoutrow['uid'] === $USER['id']
             ) {
                 $candelete = true;
             }
@@ -85,7 +85,7 @@ class SHOUTBOX
             $row['group_id'],
             $row['display_name'],
         ) : 'Guest';
-        $avatar = (isset($CFG['shoutboxava']) && $CFG['shoutboxava'])
+        $avatar = isset($CFG['shoutboxava']) && $CFG['shoutboxava']
             ? '<img src="' . $JAX->pick(
                 $row['avatar'],
                 $PAGE->meta('default-avatar'),
@@ -212,9 +212,11 @@ class SHOUTBOX
         }
 
         // Update the sb_id variable if we selected shouts.
-        if ($last) {
-            $SESS->addvar('sb_id', $last);
+        if (!$last) {
+            return;
         }
+
+        $SESS->addvar('sb_id', $last);
     }
 
     public function showallshouts(): void
@@ -253,7 +255,7 @@ class SHOUTBOX
             foreach ($pageArray as $v) {
                 $pages .= '<a href="?module=shoutbox&page='
                     . $v . '"'
-                    . (($v + 1) == $pagen ? ' class="active"' : '')
+                    . ($v + 1 === $pagen ? ' class="active"' : '')
                     . '>' . $v . '</a> ';
             }
 
@@ -345,10 +347,10 @@ class SHOUTBOX
         $DB->safeinsert(
             'shouts',
             [
-                'uid' => $JAX->pick($JAX->userData['id'], 0),
-                'shout' => $shout,
                 'date' => date('Y-m-d H:i:s', time()),
                 'ip' => $JAX->ip2bin(),
+                'shout' => $shout,
+                'uid' => $JAX->pick($JAX->userData['id'], 0),
             ],
         );
     }
