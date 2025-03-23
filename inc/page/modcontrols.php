@@ -722,6 +722,7 @@ class modcontrols
             header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 2592000) . ' GMT');
 
             echo $script;
+
             exit(0);
         }
     }

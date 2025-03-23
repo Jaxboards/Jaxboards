@@ -44,6 +44,7 @@ $connected = $DB->connect(
 
 if (!$connected) {
     fwrite(STDERR, 'There was an error connecting to the MySQL database.');
+
     exit(1);
 }
 
@@ -218,7 +219,7 @@ if ($CFG['service']) {
     $createTableStatement = $DB->row($result);
     $createTableStatement = array_pop($createTableStatement);
     $DB->disposeresult($result);
-    if (!preg_match('/KEY\\s+`boardname`/i', $createTableStatement)) {
+    if (!preg_match('/KEY\s+`boardname`/i', $createTableStatement)) {
         $result = $DB->safequery(
             <<<'EOT'
                 ALTER TABLE `directory`
@@ -231,7 +232,7 @@ if ($CFG['service']) {
     $createTableStatement = $DB->row($result);
     $createTableStatement = array_pop($createTableStatement);
     $DB->disposeresult($result);
-    if (!preg_match('/UNIQUE\\s+`ip`/i', $createTableStatement)) {
+    if (!preg_match('/UNIQUE\s+`ip`/i', $createTableStatement)) {
         $result = $DB->safequery(
             <<<'EOT'
                 ALTER TABLE `banlist`
@@ -1432,7 +1433,7 @@ foreach ($boards as $board) {
     $result = $DB->safequery("SHOW CREATE TABLE {$table}");
     $createTableStatement = $DB->row($result);
     $createTableStatement = array_pop($createTableStatement);
-    if (!preg_match('/KEY\\s+`hash`/i', $createTableStatement)) {
+    if (!preg_match('/KEY\s+`hash`/i', $createTableStatement)) {
         $result = $DB->safequery(
             <<<EOT
                 ALTER TABLE {$table}
