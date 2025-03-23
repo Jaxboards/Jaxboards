@@ -310,9 +310,8 @@ file_put_contents(
                                     'filePath' => $filename,
                                     'textRange' => [
                                         // we don't have end column data so just
-                                        // repeat the input to make SonarQube
-                                        // happy
-                                        'endColumn' => (string) $column,
+                                        // add one to make SonarQube happy
+                                        'endColumn' => (string) ($column + 1),
                                         'endLine' => (string) $violation['endLine'],
                                         'startColumn' => (string) $column,
                                         'startLine' => (string) $violation['beginLine'],
