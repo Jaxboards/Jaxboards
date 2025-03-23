@@ -17,7 +17,7 @@
  */
 
 $CFG = json_decode(
-<<<'EOD'
+    <<<'EOD'
 {
     "badnamechars": "@[^\\w']@",
     "boardname": "Example Forums",

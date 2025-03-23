@@ -219,7 +219,8 @@ EOT
     $createTableStatement = array_pop($createTableStatement);
     $DB->disposeresult($result);
     if (!preg_match("/KEY\s+`boardname`/i", $createTableStatement)) {
-        $result = $DB->safequery(<<<'EOT'
+        $result = $DB->safequery(
+            <<<'EOT'
 ALTER TABLE `directory`
     ADD INDEX `boardname` (`boardname`);
 EOT
@@ -231,7 +232,8 @@ EOT
     $createTableStatement = array_pop($createTableStatement);
     $DB->disposeresult($result);
     if (!preg_match("/UNIQUE\s+`ip`/i", $createTableStatement)) {
-        $result = $DB->safequery(<<<'EOT'
+        $result = $DB->safequery(
+            <<<'EOT'
 ALTER TABLE `banlist`
     ADD UNIQUE `banlist` (`banlist`);
 EOT
@@ -1475,7 +1477,8 @@ EOT;
     $createTableStatement = $DB->row($result);
     $createTableStatement = array_pop($createTableStatement);
     if (!preg_match("/KEY\s+`hash`/i", $createTableStatement)) {
-        $result = $DB->safequery(<<<EOT
+        $result = $DB->safequery(
+            <<<EOT
 ALTER TABLE {$table}
     ADD INDEX `hash` (`hash`);
 EOT
@@ -1613,7 +1616,8 @@ EOT
         $row = $DB->arow($result);
         $DB->disposeResult($result);
         if (null === $row['ip_check']) {
-            $result = $DB->safequery(<<<EOT
+            $result = $DB->safequery(
+                <<<EOT
 UPDATE {$table} SET `{$column}` = COALESCE(
     INET6_ATON(INET_NTOA(`{$column}`)),
     INET6_ATON(INET_NTOA(0))

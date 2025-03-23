@@ -319,7 +319,7 @@ EOT
                 $page .= $this->formfield('Post Count:', 'posts', $data['posts']);
                 $page = $PAGE->parseTemplate(
                     'members/edit-form.html',
-                    array('content' => $page,)
+                    array('content' => $page, )
                 );
             }
         } else {

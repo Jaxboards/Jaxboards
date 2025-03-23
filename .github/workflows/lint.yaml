@@ -36,13 +36,13 @@ jobs:
       - run: |
           echo "[]" > eslint-report.json &&
           echo "[]" > stylelint-report.json &&
-          echo '{"issues": [], "rules": []}' > phpcs-report-sonarqube.json
+          echo '{"issues": [], "rules": []}' > ecs-report-sonarqube.json
         shell: bash
       - run: npm run-script ci-lint
       - run: >
-          php php_codesniffer_to_sonarqube.php
-          phpcs-report.json
-          phpcs-report-sonarqube.json
+          php ecs_to_sonarqube.php
+          ecs-report.json
+          ecs-report-sonarqube.json
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
         env:

@@ -399,7 +399,8 @@ EOT;
                     $list[] = array(
                         $f['uid'],
                         $f['group_id'],
-                        ('active' != $f['status'] ?
+                        (
+                            'active' != $f['status'] ?
                             $f['status'] :
                             ($f['birthday'] && ($CFG['birthdays'] & 1) ?
                             ' birthday' : '')

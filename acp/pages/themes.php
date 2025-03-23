@@ -256,7 +256,7 @@ EOT;
                     'custom' => $f['custom'] ?
                         $PAGE->parseTemplate(
                             'themes/show-skin-index-css-row-custom.html'
-                        )  : '',
+                        ) : '',
                     'view_or_edit' => $f['custom'] ? 'Edit' : 'View',
                     'delete' => $f['custom'] ? $PAGE->parseTemplate(
                         'themes/show-skin-index-css-row-delete.html',
@@ -343,7 +343,8 @@ EOT;
                 array(
                     'content' => $JAX->blockhtml(
                         file_get_contents(
-                            (!$skin['custom'] ?
+                            (
+                                !$skin['custom'] ?
                                 STHEMEPATH : BOARDPATH . 'Themes/'
                             ) . $skin['title'] . '/css.css'
                         )

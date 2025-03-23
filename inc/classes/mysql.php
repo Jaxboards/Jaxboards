@@ -107,9 +107,7 @@ class MySQL
         if (mb_strlen($selectors) < 1) {
             return;
         }
-        // phpcs:disable PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
         $va_array = func_get_args();
-        // phpcs:enable
         array_shift($va_array);
         // Selectors.
         array_shift($va_array);
@@ -178,9 +176,7 @@ class MySQL
             // Nothing to update.
             return;
         }
-        // phpcs:disable PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
         $whereparams = func_get_args();
-        // phpcs:enable
         array_shift($whereparams);
         // Table.
         array_shift($whereparams);
@@ -231,9 +227,7 @@ class MySQL
         $query = 'DELETE FROM ' . $this->ftable($table) .
             ($whereformat ? ' ' . $whereformat : '');
 
-        // phpcs:disable PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
         $va_array = func_get_args();
-        // phpcs:enable
 
         array_shift($va_array);
         // Table.
@@ -305,9 +299,7 @@ class MySQL
             syslog(
                 LOG_ERR,
                 'NULL RESULT in disposeresult' . PHP_EOL . print_r(
-                    // phpcs:disable PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
                     debug_backtrace(),
-                    // phpcs:enable
                     true
                 )
             );
@@ -370,9 +362,7 @@ class MySQL
         $added_placeholders = 0;
         if ($my_argc > 1) {
             for ($i = 1; $i < $my_argc; ++$i) {
-                // phpcs:disable PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
                 $value = func_get_arg($i);
-                // phpcs:enable
 
                 $type = $this->safequery_typeforvalue($value);
 
@@ -430,9 +420,7 @@ class MySQL
                 syslog(LOG_ERR, 'BINDVARCOUNT: ' . (count($refvalues[1])));
                 syslog(LOG_ERR, 'QUERYARGS: ' . print_r($out_args, true) . PHP_EOL);
                 syslog(LOG_ERR, 'REFVALUES: ' . print_r($refvalues, true) . PHP_EOL);
-                // phpcs:disable PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
                 syslog(LOG_ERR, print_r(debug_backtrace(), true));
-                // phpcs:enable
             }
         }
 
@@ -555,7 +543,7 @@ class MySQL
         );
 
         array_unshift($va_array, $newformat);
-// Put the format string back.
+        // Put the format string back.
         return call_user_func_array(array($this, 'safequery'), $va_array);
     }
 
