@@ -24,8 +24,7 @@
   },
   "require": {
     "composer": "2.8.6",
-    "php": "^8.3.16",
-    "nesbot/carbon": "^3.8"
+    "php": "^8.3.16"
   },
   "scripts": {
     "lint": [
