@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Admin control panel.
  *
@@ -14,7 +13,6 @@
  *
  * @link https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
-
 ini_set('session.cookie_secure', 1);
 ini_set('session.cookie_httponly', 1);
 ini_set('session.use_cookies', 1);

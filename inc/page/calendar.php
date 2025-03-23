@@ -5,7 +5,7 @@ new CALENDAR();
 class CALENDAR
 {
     public $month;
-
+    
     public function __construct()
     {
         global $JAX;

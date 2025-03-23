@@ -97,11 +97,10 @@ class SESS
         $isbot = 0;
         $r = array();
         foreach ($this->bots as $k => $v) {
-            if (
-                false != mb_stripos(
-                    mb_strtolower($_SERVER['HTTP_USER_AGENT']),
-                    $k
-                )
+            if (false != mb_stripos(
+                mb_strtolower($_SERVER['HTTP_USER_AGENT']),
+                $k
+            )
             ) {
                 $sid = $v;
                 $isbot = 1;
@@ -148,8 +147,7 @@ EOT
             $sid = base64_encode(openssl_random_pseudo_bytes(128));
         }
         $uid = 0;
-        if (
-            !empty($JAX->userData)
+        if (!empty($JAX->userData)
             && isset($JAX->userData['id'])
             && 0 < $JAX->userData['id']
         ) {
@@ -205,8 +203,7 @@ EOT
 
     public function addvar($a, $b)
     {
-        if (
-            !isset($this->data['vars'][$a])
+        if (!isset($this->data['vars'][$a])
             || $this->data['vars'][$a] !== $b
         ) {
             $this->data['vars'][$a] = $b;

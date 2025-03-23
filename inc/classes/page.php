@@ -336,8 +336,7 @@ class PAGE
         if (false === $r) {
             die($meta . ' has too many arguments');
         }
-        if (
-            isset($this->moreFormatting[$meta])
+        if (isset($this->moreFormatting[$meta])
             && $this->moreFormatting[$meta]
         ) {
             return $this->metaextended($r);
@@ -422,8 +421,7 @@ class PAGE
 
     public function path($a)
     {
-        if (
-            !isset($this->parts['path'])
+        if (!isset($this->parts['path'])
             || !is_array($this->parts['path'])
         ) {
             $this->parts['path'] = array();

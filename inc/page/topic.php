@@ -55,13 +55,11 @@ class TOPIC
             $this->qeditpost($JAX->b['edit']);
         } elseif (isset($JAX->b['quote']) && $JAX->b['quote']) {
             $this->multiquote($id);
-        } elseif (
-            isset($JAX->b['markread'])
+        } elseif (isset($JAX->b['markread'])
             && $JAX->b['markread']
         ) {
             $this->markread($id);
-        } elseif (
-            isset($JAX->b['listrating'])
+        } elseif (isset($JAX->b['listrating'])
             && $JAX->b['listrating']
         ) {
             $this->listrating($JAX->b['listrating']);
@@ -117,7 +115,7 @@ MySQL,
     {
         global $DB,$PAGE,$JAX,$SESS,$USER,$PERMS;
         $page = $this->page;
-
+        
         if ($USER && $this->topicdata['lp_date'] > $USER['last_visit']) {
             $this->markread($id);
         }
@@ -328,8 +326,7 @@ MySQL,
             $SESS->delvar('topic_lastpid');
         }
 
-        if (
-            isset($SESS->vars['topic_lastpid'], $SESS->vars['topic_lastpage'])
+        if (isset($SESS->vars['topic_lastpid'], $SESS->vars['topic_lastpage'])
             && is_numeric($SESS->vars['topic_lastpid'])
             && $SESS->vars['topic_lastpage']
         ) {

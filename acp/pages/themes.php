@@ -73,8 +73,7 @@ class themes
 
         if (isset($JAX->g['deletewrapper']) && $JAX->g['deletewrapper']) {
             $wrapperPath = BOARDPATH . 'Wrappers/' . $JAX->g['deletewrapper'] . '.txt';
-            if (
-                !preg_match('@[^\\w ]@', $JAX->g['deletewrapper'])
+            if (!preg_match('@[^\\w ]@', $JAX->g['deletewrapper'])
                 && file_exists($wrapperPath)
             ) {
                 unlink(BOARDPATH . 'Wrappers/' . $JAX->g['deletewrapper'] . '.txt');
@@ -171,8 +170,7 @@ EOT;
                 }
             }
 
-            if (
-                isset($JAX->p['renamewrapper'])
+            if (isset($JAX->p['renamewrapper'])
                 && is_array($JAX->p['renamewrapper'])
             ) {
                 foreach ($JAX->p['renamewrapper'] as $k => $v) {

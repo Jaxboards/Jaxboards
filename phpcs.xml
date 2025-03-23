@@ -19,14 +19,16 @@
   <!-- only check php files -->
   <arg name="extensions" value="php" />
   <!-- Follow PSR coding style guides -->
-  <!-- PSR12: Extended Coding Style https://www.php-fig.org/psr/psr-12 -->
-  <rule ref="PSR12">
+  <!-- PSR1: Basic Coding Standard https://www.php-fig.org/psr/psr-1 -->
+  <rule ref="PSR1">
     <!-- Disable these rules as they require big changes to the codebase -->
     <exclude name="PSR1.Files.SideEffects" />
     <exclude name="PSR1.Classes.ClassDeclaration" />
     <exclude name="PSR1.Methods.CamelCapsMethodName" />
     <exclude name="Squiz.Classes.ValidClassName" />
   </rule>
+  <!-- PSR2: Coding Style Guide https://www.php-fig.org/psr/psr-2 -->
+  <rule ref="PSR2" />
   <!-- Here's some comment rules we can follow -->
   <rule ref="Squiz.Commenting.InlineComment">
     <exclude name="Squiz.Commenting.InlineComment.NotCapital" />

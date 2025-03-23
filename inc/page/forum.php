@@ -17,8 +17,7 @@ class FORUM
 
         $this->numperpage = 20;
         $this->page = 0;
-        if (
-            isset($JAX->b['page'])
+        if (isset($JAX->b['page'])
             && is_numeric($JAX->b['page'])
             && $JAX->b['page'] > 0
         ) {
@@ -423,12 +422,11 @@ EOT
         if (!isset($this->topicsRead[$topic['id']])) {
             $this->topicsRead[$topic['id']] = 0;
         }
-        if (
-            $topic['lp_date'] > $JAX->pick(
-                max($this->topicsRead[$topic['id']], $this->forumReadTime),
-                $SESS->read_date,
-                $USER['last_visit']
-            )
+        if ($topic['lp_date'] > $JAX->pick(
+            max($this->topicsRead[$topic['id']], $this->forumReadTime),
+            $SESS->read_date,
+            $USER['last_visit']
+        )
         ) {
             return false;
         }
@@ -442,12 +440,11 @@ EOT
         if (!$this->forumsRead) {
             $this->forumsRead = $JAX->parsereadmarkers($SESS->forumsread);
         }
-        if (
-            $forum['lp_date'] > $JAX->pick(
-                $this->forumsRead[$forum['id']],
-                $SESS->read_date,
-                $USER['last_visit']
-            )
+        if ($forum['lp_date'] > $JAX->pick(
+            $this->forumsRead[$forum['id']],
+            $SESS->read_date,
+            $USER['last_visit']
+        )
         ) {
             return false;
         }

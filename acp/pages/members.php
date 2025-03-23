@@ -124,12 +124,10 @@ EOT
     {
         global $PAGE,$JAX,$DB;
         $page = '';
-        if (
-            (isset($JAX->b['mid']) && $JAX->b['mid'])
+        if ((isset($JAX->b['mid']) && $JAX->b['mid'])
             || (isset($JAX->p['submit']) && $JAX->p['submit'])
         ) {
-            if (
-                isset($JAX->b['mid'])
+            if (isset($JAX->b['mid'])
                 && $JAX->b['mid']
                 && is_numeric($JAX->b['mid'])
             ) {
@@ -340,14 +338,12 @@ EOT
         $page = '';
         $e = '';
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
-            if (
-                !$JAX->p['username']
+            if (!$JAX->p['username']
                 || !$JAX->p['displayname']
                 || !$JAX->p['pass']
             ) {
                 $e = 'All fields required.';
-            } elseif (
-                mb_strlen($JAX->p['username']) > 30
+            } elseif (mb_strlen($JAX->p['username']) > 30
                 || $JAX->p['displayname'] > 30
             ) {
                 $e = 'Display name and username must be under 30 characters.';
@@ -721,8 +717,7 @@ EOT
                                 $iscomment = true;
                             } else {
                                 foreach ($d as $v2) {
-                                    if (
-                                        !ctype_xdigit($v2)
+                                    if (!ctype_xdigit($v2)
                                         || mb_strlen($v2) > 4
                                     ) {
                                         $iscomment = true;
