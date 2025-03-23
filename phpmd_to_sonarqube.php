@@ -301,6 +301,10 @@ file_put_contents(
                                 $matches,
                             );
                             $column = (int) ($matches['column'] ?? 0);
+                            // although we have column data, we can't use it
+                            // because SonarQube interprets columns differently
+                            // and bugs out :(
+                            $column = 0;
 
                             return [
                                 'ruleId' => $violation['rule'],
