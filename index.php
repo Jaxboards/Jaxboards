@@ -32,7 +32,18 @@ $microtime = microtime(true);
 require_once JAXBOARDS_ROOT . '/vendor/autoload.php';
 
 // Get the config.
-require __DIR__ . '/config.php';
+const CONFIG_FILE = __DIR__ . '/config.php';
+if (is_readable(CONFIG_FILE)) {
+    require CONFIG_FILE;
+}
+
+if (!empty($CFG)) {
+    fwrite(STDERR, 'missing configuration');
+
+    http_response_code(500);
+
+    exit(1);
+}
 
 // DB connect!
 require_once __DIR__ . '/inc/classes/mysql.php';
