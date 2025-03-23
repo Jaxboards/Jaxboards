@@ -291,33 +291,32 @@ file_put_contents(
                     $result['issues'],
                     ...array_map(
                         static function (array $violation) use ($filename): array {
+                            $issue = [
+                                'engineId' => 'phpmd',
+                                'primaryLocation' => [
+                                    'filePath' => $filename,
+                                    'message' => $violation['description'],
+                                    'textRange' => [
+                                        'endLine' => (string) $violation['endLine'],
+                                        'startLine' => (string) $violation['beginLine'],
+                                    ],
+                                ],
+                                'ruleId' => $violation['rule'],
+                            ];
+
                             $matches = [];
                             preg_match(
                                 '/ \(line \'\d+\', column \'(?P<column>\d+)\'\)/',
                                 (string) $violation['description'],
                                 $matches,
                             );
-                            // although we have column data, we can't use it
-                            // because SonarQube interprets columns differently
-                            // and bugs out :(
-                            $column = 0;
+                            $column = $matches['column'] ?? '';
 
-                            return [
-                                'engineId' => 'phpmd',
-                                'primaryLocation' => [
-                                    'filePath' => $filename,
-                                    'message' => $violation['description'],
-                                    'textRange' => [
-                                        // we don't have end column data so just
-                                        // add one to make SonarQube happy
-                                        'endColumn' => (string) 1,
-                                        'endLine' => (string) $violation['endLine'],
-                                        'startColumn' => (string) $column,
-                                        'startLine' => (string) $violation['beginLine'],
-                                    ],
-                                ],
-                                'ruleId' => $violation['rule'],
-                            ];
+                            if ($column !== '') {
+                                $issue['primaryLocation']['textRange']['startColumn'] = $column;
+                            }
+
+                            return $issue;
                         },
                         $file['violations'],
                     ),

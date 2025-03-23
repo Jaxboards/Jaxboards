@@ -147,16 +147,6 @@ $rules = array_reduce(
                 'description' => $description,
                 'engineId' => 'PHP_CodeSniffer',
                 'id' => $message['source'],
-                'impacts' => [
-                    [
-                        // we don't have a way to guage this easily so we
-                        // always set it to low
-                        'severity' => 'LOW',
-                        // we don't have a way to guage this easily so we
-                        // always set it to mainability
-                        'softwareQuality' => 'MAINTAINABILITY',
-                    ],
-                ],
                 'name' => $message['source'],
             ];
 
@@ -185,14 +175,6 @@ file_put_contents(
                                 'filePath' => $file,
                                 'message' => $message['message'],
                                 'textRange' => [
-                                    // we don't know when this ends due to lack
-                                    // of information from PHP_CodeSniffer so we
-                                    // just add 1 to the starting positions
-                                    // (otherwise SonarQube crashes)
-                                    'endColumn' => (string) $message['column'],
-                                    'endLine' => (string) (
-                                        (int) $message['line'] + 1
-                                    ),
                                     'startColumn'
                                         // SonarQube starts at 0 for columns
                                         // while PHP_CodeSniffer starts at 1
