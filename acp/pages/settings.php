@@ -29,8 +29,8 @@ class settings
         }
 
         $PAGE->sidebar($PAGE->parseTemplate('sidebar-list.html', [
-            'content' => $sidebarLinks,
-        ]));
+                    'content' => $sidebarLinks,
+                ]));
 
         if (! isset($JAX->b['do'])) {
             $JAX->b['do'] = null;
@@ -136,21 +136,21 @@ class settings
         $table = '';
         while ($f = $DB->arow($result)) {
             $table .= $PAGE->parseTemplate('settings/pages-row.html', [
-                'act' => $f['act'],
-            ]).PHP_EOL;
+                    'act' => $f['act'],
+                ]).PHP_EOL;
         }
         if ($table) {
             $page .= $PAGE->parseTemplate('settings/pages.html', [
-                'content' => $table,
-            ]);
+                    'content' => $table,
+                ]);
         }
         $hiddenFields = $JAX->hiddenFormFields([
-            'act' => 'settings',
-            'do' => 'pages',
-        ]);
+                'act' => 'settings',
+                'do' => 'pages',
+            ]);
         $page .= $PAGE->parseTemplate('settings/pages-new.html', [
-            'hidden_fields' => $hiddenFields,
-        ]);
+                'hidden_fields' => $hiddenFields,
+            ]);
         $PAGE->addContentBox('Custom Pages', $page);
     }
 
@@ -180,9 +180,9 @@ class settings
                 );
             } else {
                 $DB->safeinsert('pages', [
-                    'act' => $pageurl,
-                    'page' => $JAX->p['pagecontents'],
-                ]);
+                        'act' => $pageurl,
+                        'page' => $JAX->p['pagecontents'],
+                    ]);
             }
             $pageinfo['page'] = $JAX->p['pagecontents'];
             $page .= $PAGE->success("Page saved. Preview <a href='/?act={$pageurl}'>here</a>");
@@ -257,8 +257,8 @@ class settings
                 $JAX->p['bicon'] = false;
             }
             $PAGE->writeCFG([
-                'birthdays' => $birthdays = ($JAX->p['bicon'] ? 1 : 0),
-            ]);
+                    'birthdays' => $birthdays = ($JAX->p['bicon'] ? 1 : 0),
+                ]);
         }
         $page = $PAGE->parseTemplate(
             'settings/birthday.html',

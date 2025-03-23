@@ -124,15 +124,15 @@ EOT
         // Update Topic Replies.
         foreach ($stat['topic_posts'] as $k => $v) {
             $DB->safeupdate('topics', [
-                'replies' => $v,
-            ], 'WHERE `id`=?', $k);
+                    'replies' => $v,
+                ], 'WHERE `id`=?', $k);
         }
 
         // Update member posts.
         foreach ($stat['member_posts'] as $k => $v) {
             $DB->safeupdate('members', [
-                'posts' => $v,
-            ], 'WHERE `id`=?', $k);
+                    'posts' => $v,
+                ], 'WHERE `id`=?', $k);
         }
 
         // Update forum posts.

@@ -27,8 +27,8 @@ class tools
         }
 
         $PAGE->sidebar($PAGE->parseTemplate('sidebar-list.html', [
-            'content' => $sidebarLinks,
-        ]));
+                    'content' => $sidebarLinks,
+                ]));
 
         if (! isset($JAX->b['do'])) {
             $JAX->b['do'] = null;
@@ -76,8 +76,8 @@ EOT
             foreach ($JAX->p['dl'] as $k => $v) {
                 if (ctype_digit($v)) {
                     $DB->safeupdate('files', [
-                        'downloads' => $v,
-                    ], 'WHERE `id`=?', $DB->basicvalue($k));
+                            'downloads' => $v,
+                        ], 'WHERE `id`=?', $DB->basicvalue($k));
                 }
             }
             $page .= $PAGE->success('Changes saved.');

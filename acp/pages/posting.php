@@ -28,8 +28,8 @@ class settings
         }
 
         $PAGE->sidebar($PAGE->parseTemplate('sidebar-list.html', [
-            'content' => $sidebarLinks,
-        ]));
+                    'content' => $sidebarLinks,
+                ]));
 
         if (! isset($JAX->b['do'])) {
             $JAX->b['do'] = false;
@@ -112,8 +112,8 @@ class settings
             }
         }
         $page .= $PAGE->parseTemplate('posting/word-filter.html', [
-            'content' => $table,
-        ]);
+                'content' => $table,
+            ]);
 
         $PAGE->addContentBox('Word Filter', $page);
     }
@@ -192,8 +192,8 @@ class settings
             }
         }
         $page .= $PAGE->parseTemplate('posting/emoticons.html', [
-            'content' => $table,
-        ]);
+                'content' => $table,
+            ]);
 
         $PAGE->addContentBox('Custom Emoticons', $page);
 
@@ -259,9 +259,9 @@ class settings
                 $page .= $PAGE->error('All fields required.');
             } else {
                 $DB->safeinsert('ratingniblets', [
-                    'img' => $JAX->p['img'],
-                    'title' => $JAX->p['title'],
-                ]);
+                        'img' => $JAX->p['img'],
+                        'title' => $JAX->p['title'],
+                    ]);
                 $niblets[$DB->insert_id(1)] = [
                     'img' => $JAX->p['img'],
                     'title' => $JAX->p['title'],
@@ -303,8 +303,8 @@ class settings
             }
         }
         $page .= $PAGE->parseTemplate('posting/post-rating.html', [
-            'content' => $table,
-        ]);
+                'content' => $table,
+            ]);
         $PAGE->addContentBox('Post Rating System', $page2);
         $PAGE->addContentBox('Post Rating Niblets', $page);
     }

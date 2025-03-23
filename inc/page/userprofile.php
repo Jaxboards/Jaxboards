@@ -395,10 +395,10 @@ class userprofile
                         isset($USER['name']) ? $USER['name'] : '',
                         $JAX->pick($USER['avatar'], $PAGE->meta('default-avatar')),
                         $JAX->hiddenFormFields([
-                            'act' => 'vu'.$id,
-                            'view' => 'profile',
-                            'page' => 'comments',
-                        ])
+                                'act' => 'vu'.$id,
+                                'view' => 'profile',
+                                'page' => 'comments',
+                            ])
                     );
                 }
                 $result = $DB->safespecial(
@@ -449,9 +449,9 @@ class userprofile
             $PAGE->JS('update', 'pfbox', $pfbox);
         } else {
             $PAGE->path([
-                $udata['display_name'].
-                "'s profile" => '?act=vu'.$id.'&view=profile',
-            ]);
+                    $udata['display_name'].
+                    "'s profile" => '?act=vu'.$id.'&view=profile',
+                ]);
             $PAGE->updatepath();
 
             $tabs = ['about', 'activity', 'posts', 'topics', 'comments', 'friends'];

@@ -219,8 +219,8 @@ EOT
                 $new_hash = password_hash($pass, PASSWORD_DEFAULT);
                 // Add the new hash.
                 $DB->safeupdate('members', [
-                    'pass' => $new_hash,
-                ], 'WHERE `id` = ?', $user['id']);
+                        'pass' => $new_hash,
+                    ], 'WHERE `id` = ?', $user['id']);
             }
 
             if ($verified_password) {

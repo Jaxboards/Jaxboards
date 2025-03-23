@@ -763,9 +763,9 @@ MySQL
             $page = "<form method='post' action='?' ".
                 "data-ajax-form='true'>".
                 $JAX->hiddenFormFields([
-                    'act' => 'vt'.$this->id,
-                    'votepoll' => 1,
-                ]);
+                        'act' => 'vt'.$this->id,
+                        'votepoll' => 1,
+                    ]);
             if ($type == 'multi') {
                 foreach ($choices as $k => $v) {
                     $page .= "<div class='choice'><input type='checkbox' ".
@@ -877,8 +877,8 @@ MySQL
         );
 
         $DB->safeupdate('topics', [
-            'poll_results' => $presults,
-        ], 'WHERE `id`=?', $this->id);
+                'poll_results' => $presults,
+            ], 'WHERE `id`=?', $this->id);
     }
 
     public function ratepost($postid, $nibletid)
@@ -965,10 +965,10 @@ MySQL
         $DB->disposeresult($result);
 
         $hiddenfields = $JAX->hiddenFormFields([
-            'act' => 'post',
-            'how' => 'qedit',
-            'pid' => $id,
-        ]);
+                'act' => 'post',
+                'how' => 'qedit',
+                'pid' => $id,
+            ]);
 
         if ($PAGE->jsnewlocation) {
             if (! $post) {
@@ -978,8 +978,8 @@ MySQL
             } else {
                 if ($post['newtopic']) {
                     $hiddenfields .= $JAX->hiddenFormFields([
-                        'tid' => $post['tid'],
-                    ]);
+                            'tid' => $post['tid'],
+                        ]);
                     $result = $DB->safeselect(
                         <<<'MySQL'
 `id`
@@ -1064,7 +1064,11 @@ MySQL
             );
         } else {
             if (! in_array($pid, explode(' ', $SESS->vars['multiquote']))) {
-                $SESS->addvar('multiquote', $SESS->vars['multiquote'] ? $SESS->vars['multiquote'].','.$pid : $pid);
+                $SESS->addvar(
+                    'multiquote',
+                    $SESS->vars['multiquote'] ? $SESS->vars['multiquote'].','.
+                    $pid : $pid
+                );
             }
             // This line toggles whether or not the qreply window should open
             // on quote.

@@ -79,8 +79,8 @@ $PERMS = $JAX->getPerms();
 // Fix ip if necessary.
 if ($USER && $SESS->ip != $USER['ip']) {
     $DB->safeupdate('members', [
-        'ip' => $SESS->ip,
-    ], 'WHERE id=?', $USER['id']);
+            'ip' => $SESS->ip,
+        ], 'WHERE id=?', $USER['id']);
 }
 
 // Load the theme.

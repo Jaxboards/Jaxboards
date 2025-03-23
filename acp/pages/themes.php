@@ -30,8 +30,8 @@ class themes
         }
 
         $PAGE->sidebar($PAGE->parseTemplate('sidebar-list.html', [
-            'content' => $sidebarLinks,
-        ]));
+                    'content' => $sidebarLinks,
+                ]));
 
         if (isset($JAX->g['editcss']) && $JAX->g['editcss']) {
             $this->editcss($JAX->g['editcss']);
@@ -202,11 +202,11 @@ EOT;
             // Set default.
             if (isset($JAX->p['default'])) {
                 $DB->safeupdate('skins', [
-                    'default' => 0,
-                ]);
+                        'default' => 0,
+                    ]);
                 $DB->safeupdate('skins', [
-                    'default' => 1,
-                ], 'WHERE `id`=?', $JAX->p['default']);
+                        'default' => 1,
+                    ], 'WHERE `id`=?', $JAX->p['default']);
             }
         }
         $result = $DB->safeselect(
@@ -260,8 +260,8 @@ EOT;
         }
         $skins = ($errorskins ? $PAGE->error($errorskins) : '').
             $PAGE->parseTemplate('themes/show-skin-index-css.html', [
-                'content' => $skins,
-            ]);
+                    'content' => $skins,
+                ]);
         $PAGE->addContentBox('Themes', $skins);
 
         $wrap = '';
@@ -281,8 +281,8 @@ EOT;
             ).PHP_EOL;
         }
         $wrap = $PAGE->parseTemplate('themes/show-skin-index-wrapper.html', [
-            'content' => $wrap,
-        ]);
+                'content' => $wrap,
+            ]);
         $PAGE->addContentBox('Wrappers', ($errorwrapper ? $PAGE->error($errorwrapper) : '').$wrap);
     }
 
@@ -395,8 +395,8 @@ EOT;
                 );
                 if ($JAX->p['default']) {
                     $DB->safeupdate('skins', [
-                        'default' => 0,
-                    ], 'WHERE `id`!=?', $DB->insert_id(1));
+                            'default' => 0,
+                        ], 'WHERE `id`!=?', $DB->insert_id(1));
                 }
                 if (! is_dir(BOARDPATH.'Themes') && is_writable(BOARDPATH)) {
                     mkdir(BOARDPATH.'Themes');
@@ -426,8 +426,8 @@ EOT;
             ).PHP_EOL;
         }
         $page .= $PAGE->parseTemplate('themes/create-skin.html', [
-            'wrapper_options' => $wrapperOptions,
-        ]);
+                'wrapper_options' => $wrapperOptions,
+            ]);
         $PAGE->addContentBox('Create New Skin', $page);
     }
 
@@ -453,8 +453,8 @@ EOT;
         // Make a random skin default if it's the default.
         if ($skin['default']) {
             $DB->safeupdate('skins', [
-                'default' => 1,
-            ], 'LIMIT 1');
+                    'default' => 1,
+                ], 'LIMIT 1');
         }
         $PAGE->location('?act=themes');
     }

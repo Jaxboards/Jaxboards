@@ -86,7 +86,7 @@ file_put_contents(
     json_encode(
         array_reduce(
             array_keys($data['files']),
-            static function (array $result, string $file) use (&$current_rules, $data): array {
+            static function (array $result, string $file,) use (&$current_rules, $data,): array {
                 array_push(
                     $result['rules'],
                     ...array_map(

@@ -178,13 +178,13 @@ EOT
             }
             $USER['friends'] = $friends;
             $DB->safeupdate('members', [
-                'friends' => $friends,
-            ], ' WHERE `id`=?', $USER['id']);
+                    'friends' => $friends,
+                ], ' WHERE `id`=?', $USER['id']);
             $DB->safeinsert('activity', [
-                'type' => 'buddy_add',
-                'affected_uid' => $uid,
-                'uid' => $USER['id'],
-            ]);
+                    'type' => 'buddy_add',
+                    'affected_uid' => $uid,
+                    'uid' => $USER['id'],
+                ]);
             $this->displaybuddylist();
         }
     }
@@ -213,8 +213,8 @@ EOT
             $enemies = implode(',', $enemies);
             $USER['enemies'] = $enemies;
             $DB->safeupdate('members', [
-                'enemies' => $enemies,
-            ], ' WHERE `id`=?', $USER['id']);
+                    'enemies' => $enemies,
+                ], ' WHERE `id`=?', $USER['id']);
             $this->displaybuddylist();
         }
     }
@@ -232,8 +232,8 @@ EOT
             $enemies = implode(',', $enemies);
             $USER['enemies'] = $enemies;
             $DB->safeupdate('members', [
-                'enemies' => $enemies,
-            ], ' WHERE `id`=?', $USER['id']);
+                    'enemies' => $enemies,
+                ], ' WHERE `id`=?', $USER['id']);
         }
         $this->displaybuddylist();
     }
@@ -251,8 +251,8 @@ EOT
             $friends = implode(',', $friends);
             $USER['friends'] = $friends;
             $DB->safeupdate('members', [
-                'friends' => $friends,
-            ], ' WHERE `id`=?', $USER['id']);
+                    'friends' => $friends,
+                ], ' WHERE `id`=?', $USER['id']);
         }
         if (! $shh) {
             $this->displaybuddylist();
@@ -264,8 +264,8 @@ EOT
         global $DB,$USER,$PAGE;
         if ($USER && $USER['usertitle'] != $status) {
             $DB->safeupdate('members', [
-                'usertitle' => $status,
-            ], 'WHERE `id`=?', $USER['id']);
+                    'usertitle' => $status,
+                ], 'WHERE `id`=?', $USER['id']);
         }
     }
 }

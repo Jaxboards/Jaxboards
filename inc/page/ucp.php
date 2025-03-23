@@ -187,8 +187,8 @@ EOT
                 $PAGE->JS('error', $e);
             } else {
                 $DB->safeupdate('members', [
-                    'ucpnotepad' => $JAX->p['ucpnotepad'],
-                ], 'WHERE `id`=?', $USER['id']);
+                        'ucpnotepad' => $JAX->p['ucpnotepad'],
+                    ], 'WHERE `id`=?', $USER['id']);
                 $USER['ucpnotepad'] = $JAX->p['ucpnotepad'];
             }
         }
@@ -267,8 +267,8 @@ EOT
 
         $checkboxes = [
             $this->getlocationforform().$JAX->hiddenFormFields([
-                'submit' => 1,
-            ],),
+                    'submit' => 1,
+                ],),
         ];
 
         foreach ($variables as $v) {
@@ -291,8 +291,8 @@ EOT
         if (isset($JAX->p['changesig'])) {
             $sig = $JAX->linkify($JAX->p['changesig']);
             $DB->safeupdate('members', [
-                'sig' => $sig,
-            ], 'WHERE `id`=?', $USER['id']);
+                    'sig' => $sig,
+                ], 'WHERE `id`=?', $USER['id']);
             $update = true;
         }
         $this->ucppage = $PAGE->meta(
@@ -342,8 +342,8 @@ EOT
             } else {
                 $hashpass = password_hash($JAX->p['newpass1'], PASSWORD_DEFAULT);
                 $DB->safeupdate('members', [
-                    'pass' => $hashpass,
-                ], 'WHERE `id`=?', $USER['id']);
+                        'pass' => $hashpass,
+                    ], 'WHERE `id`=?', $USER['id']);
                 $this->ucppage = <<<'EOT'
 Password changed.
     <br><br>
@@ -392,8 +392,8 @@ EOT;
         $this->ucppage .= $PAGE->meta(
             'ucp-email-settings',
             $this->getlocationforform().$JAX->hiddenFormFields([
-                'submit' => 'true',
-            ]),
+                    'submit' => 'true',
+                ]),
             (
                 (isset($JAX->b['change']) && $JAX->b['change']) ? <<<HTML
                 <input
@@ -423,8 +423,8 @@ EOT;
                 $e = 'Please enter a valid image URL.';
             } else {
                 $DB->safeupdate('members', [
-                    'avatar' => $JAX->p['changedava'],
-                ], 'WHERE `id`=?', $USER['id']);
+                        'avatar' => $JAX->p['changedava'],
+                    ], 'WHERE `id`=?', $USER['id']);
                 $USER['avatar'] = $JAX->p['changedava'];
             }
             $update = true;
@@ -831,8 +831,8 @@ EOT
         }
         if (! $message['read'] && $message['to'] == $USER['id']) {
             $DB->safeupdate('messages', [
-                'read' => 1,
-            ], 'WHERE `id`=?', $message['id']);
+                    'read' => 1,
+                ], 'WHERE `id`=?', $message['id']);
             $this->updatenummessages();
         }
 
@@ -979,9 +979,9 @@ EOT
         $page = $PAGE->meta(
             'inbox-messages-listing',
             $JAX->hiddenFormFields([
-                'act' => 'ucp',
-                'what' => 'inbox',
-            ]),
+                    'act' => 'ucp',
+                    'what' => 'inbox',
+                ]),
             $view == 'sent' ? 'Recipient' : 'Sender',
             $page
         );
@@ -1133,11 +1133,11 @@ EOT
         $page = $PAGE->meta(
             'inbox-composeform',
             $JAX->hiddenFormFields([
-                'act' => 'ucp',
-                'what' => 'inbox',
-                'page' => 'compose',
-                'submit' => '1',
-            ]),
+                    'act' => 'ucp',
+                    'what' => 'inbox',
+                    'page' => 'compose',
+                    'submit' => '1',
+                ]),
             $mid,
             $mname,
             ($mname ? 'good' : ''),
@@ -1167,13 +1167,13 @@ EOT
         $is_sender = $message['from'] == $USER['id'];
         if ($is_recipient) {
             $DB->safeupdate('messages', [
-                'del_recipient' => 1,
-            ], 'WHERE `id`=?', $DB->basicvalue($id));
+                    'del_recipient' => 1,
+                ], 'WHERE `id`=?', $DB->basicvalue($id));
         }
         if ($is_sender) {
             $DB->safeupdate('messages', [
-                'del_sender' => 1,
-            ], 'WHERE `id`=?', $DB->basicvalue($id));
+                    'del_sender' => 1,
+                ], 'WHERE `id`=?', $DB->basicvalue($id));
         }
         $result = $DB->safeselect(
             <<<'EOT'

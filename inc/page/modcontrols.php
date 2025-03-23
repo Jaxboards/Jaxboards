@@ -418,8 +418,8 @@ EOT
                 explode(',', $SESS->vars['modpids'])
             );
             $DB->safeupdate('posts', [
-                'newtopic' => 1,
-            ], 'WHERE `id`=?', $DB->basicvalue($op));
+                    'newtopic' => 1,
+                ], 'WHERE `id`=?', $DB->basicvalue($op));
             $tids[] = $tid;
         } else {
             $DB->safedelete('posts', 'WHERE `id` IN ?', explode(',', $SESS->vars['modpids']));
@@ -546,13 +546,13 @@ EOT
             $DB->disposeresult($result);
 
             $DB->safeupdate('posts', [
-                'newtopic' => 1,
-            ], 'WHERE `id`=?', $op);
+                    'newtopic' => 1,
+                ], 'WHERE `id`=?', $op);
 
             // Also fix op.
             $DB->safeupdate('topics', [
-                'op' => $op,
-            ], 'WHERE `id`=?', $DB->basicvalue($JAX->p['ot']));
+                    'op' => $op,
+                ], 'WHERE `id`=?', $DB->basicvalue($JAX->p['ot']));
             unset($exploded[array_search($JAX->p['ot'], $exploded)]);
             if (! empty($exploded)) {
                 $DB->safedelete('topics', 'WHERE `id` IN ?', $exploded);
@@ -564,9 +564,9 @@ EOT
             'style="padding:10px;">'.
             'Which topic should the topics be merged into?<br />';
         $page .= $JAX->hiddenFormFields([
-            'act' => 'modcontrols',
-            'dot' => 'merge',
-        ]);
+                'act' => 'modcontrols',
+                'dot' => 'merge',
+            ]);
 
         if (isset($SESS->vars['modtids'])) {
             $result = $DB->safeselect(
@@ -634,10 +634,10 @@ EOT
         $data = [];
         $page = '<form method="post" data-ajax-form="true">'.
             $JAX->hiddenFormFields([
-                'submit' => 'showform',
-                'act' => 'modcontrols',
-                'do' => 'emem',
-            ]).
+                    'submit' => 'showform',
+                    'act' => 'modcontrols',
+                    'do' => 'emem',
+                ]).
             'Member name: <input type="text" title="Enter member name" name="mname" '.
             'data-autocomplete-action="searchmembers" '.
             'data-autocomplete-output="#mid" '.
@@ -811,9 +811,9 @@ EOT
         }
 
         $hiddenFields = $JAX->hiddenFormFields([
-            'act' => 'modcontrols',
-            'do' => 'iptools',
-        ]);
+                'act' => 'modcontrols',
+                'do' => 'iptools',
+            ]);
         $form = <<<EOT
 <form method='post' data-ajax-form='true'>
     {$hiddenFields}
@@ -826,10 +826,10 @@ EOT;
             $page .= "<h3>Data for {$ip}:</h3>";
 
             $hiddenFields = $JAX->hiddenFormFields([
-                'ip' => $ip,
-                'act' => 'modcontrols',
-                'do' => 'iptools',
-            ]);
+                    'ip' => $ip,
+                    'act' => 'modcontrols',
+                    'do' => 'iptools',
+                ]);
             if ($JAX->ipbanned($ip)) {
                 $banCode = <<<'EOT'
 <span style="color:#900">
