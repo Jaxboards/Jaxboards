@@ -8,7 +8,7 @@
  *
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
-if ($_GET['showerrors']) {
+if ($_GET['showerrors'] ?? false) {
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
 }
@@ -31,7 +31,7 @@ if (is_readable(CONFIG_FILE)) {
     require CONFIG_FILE;
 }
 
-if (!empty($CFG)) {
+if (empty($CFG)) {
     fwrite(STDERR, 'missing configuration');
 
     http_response_code(500);
