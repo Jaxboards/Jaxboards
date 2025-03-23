@@ -147,7 +147,21 @@ $rules = array_reduce(
                 'description' => $description,
                 'engineId' => 'PHP_CodeSniffer',
                 'id' => $message['source'],
+                'impacts' => [
+                    [
+                        // we don't have a way to guage this easily so we
+                        // always set it to low
+                        'severity' => 'LOW',
+                        // we don't have a way to guage this easily so we
+                        // always set it to mainability
+                        'softwareQuality' => 'MAINTAINABILITY',
+                    ],
+                ],
                 'name' => $message['source'],
+                // we don't have a way to guage this easily so we
+                // always set it to minor
+                'severity' => 'MINOR',
+                'type' => 'CODE_SMELL',
             ];
 
             return $rules;

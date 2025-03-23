@@ -268,6 +268,14 @@ $rules = array_reduce(
                     ],
                 ],
                 'name' => $violation['rule'],
+                'severity' => match ((int) $violation['priority']) {
+                    1 => 'BLOCKER',
+                    2 => 'CRITICAL',
+                    3 => 'MAJOR',
+                    4 => 'MINOR',
+                    default => 'INFO',
+                },
+                'type' => 'CODE_SMELL',
             ];
 
             return $rules;
