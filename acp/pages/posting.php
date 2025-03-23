@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 if (! defined(INACP)) {
-    exit();
+    exit;
 }
 
 new settings();
@@ -24,7 +26,7 @@ class settings
                     'url' => '?act=posting&do='.$do,
                     'title' => $title,
                 ]
-            ).PHP_EOL;
+            ).\PHP_EOL;
         }
 
         $PAGE->sidebar($PAGE->parseTemplate('sidebar-list.html', [
@@ -47,7 +49,7 @@ class settings
         }
     }
 
-    public function wordfilter()
+    public function wordfilter(): void
     {
         global $PAGE,$JAX,$DB;
         $page = '';
@@ -92,11 +94,11 @@ class settings
         if (empty($wordfilter)) {
             $table = $PAGE->parseTemplate(
                 'posting/word-filter-empty.html'
-            ).PHP_EOL.$PAGE->parseTemplate('posting/word-filter-submit-row.html');
+            ).\PHP_EOL.$PAGE->parseTemplate('posting/word-filter-submit-row.html');
         } else {
             $table = $PAGE->parseTemplate(
                 'posting/word-filter-heading.html'
-            ).PHP_EOL.$PAGE->parseTemplate('posting/word-filter-submit-row.html');
+            ).\PHP_EOL.$PAGE->parseTemplate('posting/word-filter-submit-row.html');
             $currentFilters = array_reverse($wordfilter, true);
             foreach ($currentFilters as $filter => $result) {
                 $resultCode = $JAX->blockhtml($result);
@@ -108,7 +110,7 @@ class settings
                         'result_code' => $resultCode,
                         'filter_url_encoded' => $filterUrlEncoded,
                     ]
-                ).PHP_EOL;
+                ).\PHP_EOL;
             }
         }
         $page .= $PAGE->parseTemplate('posting/word-filter.html', [
@@ -118,7 +120,7 @@ class settings
         $PAGE->addContentBox('Word Filter', $page);
     }
 
-    public function emoticons()
+    public function emoticons(): void
     {
         global $PAGE,$JAX,$DB;
 
@@ -169,13 +171,13 @@ class settings
             ]);
         }
         if (empty($emoticons)) {
-            $table = $PAGE->parseTemplate('posting/emoticon-heading.html').PHP_EOL.$PAGE->parseTemplate(
+            $table = $PAGE->parseTemplate('posting/emoticon-heading.html').\PHP_EOL.$PAGE->parseTemplate(
                 'posting/emoticon-submit-row.html'
-            ).PHP_EOL.$PAGE->parseTemplate('posting/emoticon-empty-row.html');
+            ).\PHP_EOL.$PAGE->parseTemplate('posting/emoticon-empty-row.html');
         } else {
             $table = $PAGE->parseTemplate(
                 'posting/emoticon-heading.html'
-            ).PHP_EOL.$PAGE->parseTemplate('posting/emoticon-submit-row.html');
+            ).\PHP_EOL.$PAGE->parseTemplate('posting/emoticon-submit-row.html');
             $emoticons = array_reverse($emoticons, true);
 
             foreach ($emoticons as $emoticon => $smileyFile) {
@@ -188,7 +190,7 @@ class settings
                         'smiley_url' => $smileyFile,
                         'emoticon_url_encoded' => rawurlencode($emoticon),
                     ]
-                ).PHP_EOL;
+                ).\PHP_EOL;
             }
         }
         $page .= $PAGE->parseTemplate('posting/emoticons.html', [
@@ -206,7 +208,7 @@ class settings
                 [
                     'value' => $packId,
                     'label' => $packName,
-                    'selected' => $emoticonsetting == $packId ?
+                    'selected' => $emoticonsetting === $packId ?
                 ' selected="selected"' : '',
                 ]
             );
@@ -221,7 +223,7 @@ class settings
                     'emoticon' => $emoticon,
                     'smiley_url' => "/emoticons/{$emoticonpath}/{$smileyFile}",
                 ]
-            ).PHP_EOL;
+            ).\PHP_EOL;
         }
         $page = $PAGE->parseTemplate(
             'posting/emoticon-packs.html',
@@ -234,7 +236,7 @@ class settings
         $PAGE->addContentBox('Base Emoticon Set', $page);
     }
 
-    public function postrating()
+    public function postrating(): void
     {
         global $PAGE,$JAX,$DB;
         $page = $page2 = '';

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 class PAGE
 {
     public $CFG = [];
@@ -32,7 +34,7 @@ class PAGE
      * @param array  $menu  A list of links and associated labels to print
      *                      out as a drop down list
      */
-    public function addNavmenu($title, $page, $menu)
+    public function addNavmenu($title, $page, $menu): void
     {
         $this->partparts['nav'] .= $this->parseTemplate(
             'nav-link.html',
@@ -41,7 +43,7 @@ class PAGE
                 'class' => mb_strtolower($title),
                 'title' => $title,
             ]
-        ).PHP_EOL;
+        ).\PHP_EOL;
 
         $navDropdownLinksTemplate = '';
         foreach ($menu as $menu_url => $menu_title) {
@@ -51,7 +53,7 @@ class PAGE
                     'url' => $menu_url,
                     'title' => $menu_title,
                 ]
-            ).PHP_EOL;
+            ).\PHP_EOL;
         }
 
         $this->partparts['navdropdowns'] .= $this->parseTemplate(
@@ -60,15 +62,15 @@ class PAGE
                 'dropdown_id' => 'menu_'.mb_strtolower($title),
                 'dropdown_links' => $navDropdownLinksTemplate,
             ]
-        ).PHP_EOL;
+        ).\PHP_EOL;
     }
 
-    public function append($a, $b)
+    public function append($a, $b): void
     {
         $this->parts[$a] = $b;
     }
 
-    public function sidebar($sidebar)
+    public function sidebar($sidebar): void
     {
         if ($sidebar) {
             $this->parts['sidebar'] = $this->parseTemplate('sidebar.html', [
@@ -79,12 +81,12 @@ class PAGE
         }
     }
 
-    public function title($title)
+    public function title($title): void
     {
         $this->parts['title'] = $title;
     }
 
-    public function addContentBox($title, $content)
+    public function addContentBox($title, $content): void
     {
         $this->parts['content'] .= $this->parseTemplate(
             'content-box.html',
@@ -95,7 +97,7 @@ class PAGE
         );
     }
 
-    public function out()
+    public function out(): void
     {
         $data = $this->parts;
 
@@ -140,7 +142,7 @@ class PAGE
         ]);
     }
 
-    public function location($a)
+    public function location($a): void
     {
         header("Location: {$a}");
     }
@@ -149,29 +151,29 @@ class PAGE
     {
         $data_string = json_encode($data);
         $write = <<<EOT
-<?php
-/**
- * JaxBoards config file. It's just JSON embedded in PHP- wow!
- *
- * PHP Version 5.3.0
- *
- * @category Jaxboards
- * @package  Jaxboards
- *
- * @author  Sean Johnson <seanjohnson08@gmail.com>
- * @author  World's Tallest Ladder <wtl420@users.noreply.github.com>
- * @license MIT <https://opensource.org/licenses/MIT>
- *
- * @link https://github.com/Jaxboards/Jaxboards Jaxboards on Github
- */
-\${$name} = json_decode(
-<<<'EOD'
-{$data_string}
-EOD
-    ,
-    true
-);
-EOT;
+            <?php
+            /**
+             * JaxBoards config file. It's just JSON embedded in PHP- wow!
+             *
+             * PHP Version 5.3.0
+             *
+             * @category Jaxboards
+             * @package  Jaxboards
+             *
+             * @author  Sean Johnson <seanjohnson08@gmail.com>
+             * @author  World's Tallest Ladder <wtl420@users.noreply.github.com>
+             * @license MIT <https://opensource.org/licenses/MIT>
+             *
+             * @link https://github.com/Jaxboards/Jaxboards Jaxboards on Github
+             */
+            \${$name} = json_decode(
+            <<<'EOD'
+            {$data_string}
+            EOD
+                ,
+                true
+            );
+            EOT;
         $file = fopen($page, $mode);
         fwrite($file, $write);
         fclose($file);
@@ -203,21 +205,22 @@ EOT;
     /**
      * Parse a template file, replacing {{ key }} with the value of $data['key']
      *
-     * @param string $templateFile  The path to the template file. Paths
-     *                              that don't start with a '/' character
-     *                              will start searching in the
-     *                              JAXBOARDS_ROOT/acp/views/
-     *                              directory.
-     * @param array  $data          A key => value array, where {{ key }}
-     *                              is replaced by value
-     * @return string Returns the template with the data replaced.
+     * @param string $templateFile The path to the template file. Paths
+     *                             that don't start with a '/' character
+     *                             will start searching in the
+     *                             JAXBOARDS_ROOT/acp/views/
+     *                             directory.
+     * @param array  $data         A key => value array, where {{ key }}
+     *                             is replaced by value
+     *
+     * @return string returns the template with the data replaced
      */
     public function parseTemplate($templateFile, $data = null)
     {
         if (mb_substr($templateFile, 0, 1) !== '/') {
             $templateFile = JAXBOARDS_ROOT.'/acp/views/'.$templateFile;
         }
-        if (pathinfo($templateFile, PATHINFO_EXTENSION) !== 'html') {
+        if (pathinfo($templateFile, \PATHINFO_EXTENSION) !== 'html') {
             if (mb_substr($templateFile, -1) !== '.') {
                 $templateFile .= '.';
             }
@@ -249,8 +252,6 @@ EOT;
         }
 
         // Blank out other template variables.
-        $template = preg_replace('/{{\s+.+\s+}}/', '', $template);
-
-        return $template;
+        return preg_replace('/{{\s+.+\s+}}/', '', $template);
     }
 }

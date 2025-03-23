@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 if (! defined(INACP)) {
-    exit();
+    exit;
 }
 
 new forums();
@@ -24,7 +26,7 @@ class forums
                     'url' => '?act=forums&do='.$do,
                     'title' => $title,
                 ]
-            ).PHP_EOL;
+            ).\PHP_EOL;
         }
         $sidebarLinks .= $PAGE->parseTemplate(
             'sidebar-list-link.html',
@@ -32,7 +34,7 @@ class forums
                 'url' => '?act=stats',
                 'title' => 'Recount Statistics',
             ]
-        ).PHP_EOL;
+        ).\PHP_EOL;
 
         $PAGE->sidebar($PAGE->parseTemplate('sidebar-list.html', [
             'content' => $sidebarLinks,
@@ -42,14 +44,14 @@ class forums
             if (is_numeric($JAX->b['delete'])) {
                 return $this->deleteforum($JAX->b['delete']);
             }
-            if (preg_match('@c_(\\d+)@', $JAX->b['delete'], $m)) {
+            if (preg_match('@c_(\d+)@', $JAX->b['delete'], $m)) {
                 return $this->deletecategory($m[1]);
             }
         } elseif (isset($JAX->b['edit']) && $JAX->b['edit']) {
             if (is_numeric($JAX->b['edit'])) {
                 return $this->createforum($JAX->b['edit']);
             }
-            if (preg_match('@c_(\\d+)@', $JAX->b['edit'], $m)) {
+            if (preg_match('@c_(\d+)@', $JAX->b['edit'], $m)) {
                 return $this->createcategory($m[1]);
             }
         }
@@ -73,7 +75,7 @@ class forums
         }
     }
 
-    public function orderforums($highlight = 0)
+    public function orderforums($highlight = 0): void
     {
         global $PAGE,$DB,$JAX;
         $page = '';
@@ -83,7 +85,7 @@ class forums
         if (isset($JAX->p['tree']) && $JAX->p['tree']) {
             $JAX->p['tree'] = json_decode($JAX->p['tree'], true);
             $data = $this->mysqltree($JAX->p['tree']);
-            if ($JAX->g['do'] == 'create') {
+            if ($JAX->g['do'] === 'create') {
                 return;
             }
             $page .= $PAGE->success('Data Saved');
@@ -100,11 +102,11 @@ class forums
 
         $result = $DB->safeselect(
             <<<'EOT'
-`id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
-UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,`show_sub`,
-`redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,`redirects`,
-`trashcan`,`mods`,`show_ledby`
-EOT
+                `id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
+                UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,`show_sub`,
+                `redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,`redirects`,
+                `trashcan`,`mods`,`show_ledby`
+                EOT
             ,
             'forums',
             'ORDER BY `order`,`title`'
@@ -150,11 +152,11 @@ EOT
     /**
      * Saves the posted tree to mysql.
      *
-     * @param array $tree The tree to save
-     * @param string $path The path in the tree
-     * @param int $order Where the tree is place n the database.
+     * @param array  $tree  The tree to save
+     * @param string $path  The path in the tree
+     * @param int    $order where the tree is place n the database
      */
-    public static function mysqltree($tree, $path = '', $order = 0)
+    public static function mysqltree($tree, $path = '', $order = 0): void
     {
         global $DB;
         $r = [];
@@ -170,7 +172,7 @@ EOT
             if (is_array($v)) {
                 self::mysqltree($v, $childPath.' ', $order);
             }
-            if ($k[0] == 'c') {
+            if ($k[0] === 'c') {
                 $DB->safeupdate('categories', [
                     'order' => $order,
                 ], 'WHERE `id`=?', $cat);
@@ -178,7 +180,7 @@ EOT
                 $DB->safeupdate(
                     'forums',
                     [
-                        'path' => preg_replace('@\\s+@', ' ', $formattedPath),
+                        'path' => preg_replace('@\s+@', ' ', $formattedPath),
                         'order' => $order,
                         'cat_id' => $cat,
                     ],
@@ -200,12 +202,12 @@ EOT
                     continue;
                 }
                 $classes = [];
-                if ($id[0] == 'c') {
+                if ($id[0] === 'c') {
                     $classes[] = 'parentlock';
                 } else {
                     $classes[] = 'nofirstlevel';
                 }
-                if ($highlight && $id == $highlight) {
+                if ($highlight && $id === $highlight) {
                     $classes[] = 'highlight';
                 }
                 $classes = implode(' ', $classes);
@@ -225,7 +227,7 @@ EOT
                         'forums/order-forums-tree-item-mods.html',
                         [
                             'mod_count' => $modCount,
-                            'content' => 'moderator'.($nummods == 1 ? '' : 's'),
+                            'content' => 'moderator'.($nummods === 1 ? '' : 's'),
                         ]
                     );
                 } else {
@@ -277,11 +279,11 @@ EOT
         if ($fid) {
             $result = $DB->safeselect(
                 <<<'EOT'
-`id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
-UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,`show_sub`,
-`redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,`redirects`,
-`trashcan`,`mods`,`show_ledby`
-EOT
+                    `id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
+                    UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,`show_sub`,
+                    `redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,`redirects`,
+                    `trashcan`,`mods`,`show_ledby`
+                    EOT
                 ,
                 'forums',
                 'WHERE `id`=?',
@@ -300,7 +302,7 @@ EOT
             // Remove mod from forum.
             if ($fdata['mods']) {
                 $exploded = explode(',', $fdata['mods']);
-                unset($exploded[array_search($JAX->b['rmod'], $exploded)]);
+                unset($exploded[array_search($JAX->b['rmod'], $exploded, true)]);
                 $fdata['mods'] = implode(',', $exploded);
                 $DB->safeupdate('forums', [
                     'mods' => $fdata['mods'],
@@ -348,16 +350,16 @@ EOT
             $thisrow = $DB->arow($result);
             $write = [
                 'title' => $JAX->p['title'],
-                'cat_id' => $JAX->pick(isset($fdata['cat_id']) ? $fdata['cat_id'] : null, array_pop($thisrow)),
+                'cat_id' => $JAX->pick($fdata['cat_id'] ?? null, array_pop($thisrow)),
                 'subtitle' => $JAX->p['description'],
                 'perms' => $groupperms,
                 'redirect' => $JAX->p['redirect'],
-                'show_sub' => $sub == 1 || $sub == 2 ? $sub : 0,
+                'show_sub' => $sub === 1 || $sub === 2 ? $sub : 0,
                 'nocount' => $JAX->p['nocount'] ? 0 : 1,
                 'orderby' => ($orderby > 0 && $orderby <= 5) ? $orderby : 0,
                 'trashcan' => (int) (isset($JAX->p['trashcan']) && $JAX->p['trashcan']),
                 'show_ledby' => (int) (isset($JAX->p['show_ledby']) && $JAX->p['show_ledby']),
-                'mods' => isset($fdata['mods']) ? $fdata['mods'] : null,
+                'mods' => $fdata['mods'] ?? null,
                 // Handling done below.
             ];
             $DB->disposeresult($result);
@@ -366,19 +368,19 @@ EOT
             if (is_numeric($JAX->p['modid'])) {
                 $result = $DB->safeselect(
                     <<<'EOT'
-`id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
-UNIX_TIMESTAMP(`join_date`) AS `join_date`,
-UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,`contact_skype`,`contact_yim`,
-`contact_msn`,`contact_gtalk`,`contact_aim`,`website`,
-`birthdate`, DAY(`birthdate`) AS `dob_day`,
-MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
-`about`,`display_name`,`full_name`,`contact_steam`,`location`,`gender`,
-`friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
-`sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
-`notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
-`contact_discord`,`contact_youtube`,`contact_bluesky`,
-`email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
-EOT
+                        `id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
+                        UNIX_TIMESTAMP(`join_date`) AS `join_date`,
+                        UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,`contact_skype`,`contact_yim`,
+                        `contact_msn`,`contact_gtalk`,`contact_aim`,`website`,
+                        `birthdate`, DAY(`birthdate`) AS `dob_day`,
+                        MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
+                        `about`,`display_name`,`full_name`,`contact_steam`,`location`,`gender`,
+                        `friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
+                        `sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
+                        `notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
+                        `contact_discord`,`contact_youtube`,`contact_bluesky`,
+                        `email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
+                        EOT
                     ,
                     'members',
                     'WHERE `id`=?',
@@ -389,7 +391,7 @@ EOT
                         array_search(
                             $JAX->p['modid'],
                             isset($fdata['mods']) ?
-                            explode(',', $fdata['mods']) : []
+                            explode(',', $fdata['mods']) : [], true
                         ) === false
                     ) {
                         $write['mods'] = (isset($fdata['mods'])
@@ -443,14 +445,14 @@ EOT
         }
         $result = $DB->safeselect(
             <<<'EOT'
-`id`,`title`,`can_post`,`can_edit_posts`,`can_post_topics`,`can_edit_topics`,
-`can_add_comments`,`can_delete_comments`,`can_view_board`,
-`can_view_offline_board`,`flood_control`,`can_override_locked_topics`,
-`icon`,`can_shout`,`can_moderate`,`can_delete_shouts`,`can_delete_own_shouts`,
-`can_karma`,`can_im`,`can_pm`,`can_lock_own_topics`,`can_delete_own_topics`,
-`can_use_sigs`,`can_attach`,`can_delete_own_posts`,`can_poll`,`can_access_acp`,
-`can_view_shoutbox`,`can_view_stats`,`legend`,`can_view_fullprofile`
-EOT
+                `id`,`title`,`can_post`,`can_edit_posts`,`can_post_topics`,`can_edit_topics`,
+                `can_add_comments`,`can_delete_comments`,`can_view_board`,
+                `can_view_offline_board`,`flood_control`,`can_override_locked_topics`,
+                `icon`,`can_shout`,`can_moderate`,`can_delete_shouts`,`can_delete_own_shouts`,
+                `can_karma`,`can_im`,`can_pm`,`can_lock_own_topics`,`can_delete_own_topics`,
+                `can_use_sigs`,`can_attach`,`can_delete_own_posts`,`can_poll`,`can_access_acp`,
+                `can_view_shoutbox`,`can_view_stats`,`legend`,`can_view_fullprofile`
+                EOT
             ,
             'member_groups'
         );
@@ -477,7 +479,7 @@ EOT
                     'upload' => $this->checkbox($f['id'], 'upload', $global ? $f['can_attach'] : $p['upload']),
                     'poll' => $this->checkbox($f['id'], 'poll', $global ? $f['can_poll'] : $p['poll']),
                 ]
-            ).PHP_EOL;
+            ).\PHP_EOL;
         }
         if ($e) {
             $page .= $PAGE->error($e);
@@ -494,10 +496,10 @@ EOT
                 [
                     'value' => $value,
                     'label' => $label,
-                    'selected' => isset($fdata['show_sub']) && $k == $fdata['show_sub'] ?
+                    'selected' => isset($fdata['show_sub']) && $k === $fdata['show_sub'] ?
                     'selected="selected"' : '',
                 ]
-            ).PHP_EOL;
+            ).\PHP_EOL;
         }
         $orderByOptionsArray = [
             0 => 'Last Post, Descending',
@@ -514,10 +516,10 @@ EOT
                 [
                     'value' => $value,
                     'label' => $label,
-                    'selected' => isset($fdata['show_sub']) && $k == $fdata['show_sub'] ?
+                    'selected' => isset($fdata['show_sub']) && $k === $fdata['show_sub'] ?
                     'selected="selected"' : '',
                 ]
-            ).PHP_EOL;
+            ).\PHP_EOL;
         }
 
         $page .= $PAGE->parseTemplate(
@@ -533,7 +535,7 @@ EOT
                 'trashcan' => isset($fdata['trashcan']) && $fdata['trashcan'] ?
                 ' checked="checked"' : '',
             ]
-        ).PHP_EOL;
+        ).\PHP_EOL;
 
         if (isset($fdata['mods']) && $fdata['mods']) {
             $result = $DB->safeselect(
@@ -550,7 +552,7 @@ EOT
                         'username' => $f['display_name'],
                         'delete_link' => '?act=forums&edit='.$fid.'&rmod='.$f['id'],
                     ]
-                ).PHP_EOL;
+                ).\PHP_EOL;
             }
         } else {
             $modList = 'No forum-specific moderators added!';
@@ -585,7 +587,7 @@ EOT
     public function deleteforum($id)
     {
         global $JAX,$DB,$PAGE;
-        if (isset($JAX->p['submit']) && $JAX->p['submit'] == 'Cancel') {
+        if (isset($JAX->p['submit']) && $JAX->p['submit'] === 'Cancel') {
             $PAGE->location('?act=forums&do=order');
         } elseif (isset($JAX->p['submit']) && $JAX->p['submit']) {
             $DB->safedelete('forums', 'WHERE `id`=?', $DB->basicvalue($id));
@@ -597,14 +599,14 @@ EOT
             } else {
                 $result = $DB->safespecial(
                     <<<'EOT'
-DELETE
-FROM %t
-WHERE `tid` IN (
-    SELECT `id`
-    FROM %t
-    WHERE `fid`=?
-)
-EOT
+                        DELETE
+                        FROM %t
+                        WHERE `tid` IN (
+                            SELECT `id`
+                            FROM %t
+                            WHERE `fid`=?
+                        )
+                        EOT
                     ,
                     ['posts', 'topics'],
                     $DB->basicvalue($id)
@@ -630,11 +632,11 @@ EOT
         }
         $result = $DB->safeselect(
             <<<'EOT'
-`id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
-UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,
-`show_sub`,`redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,
-`redirects`,`trashcan`,`mods`,`show_ledby`
-EOT
+                `id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
+                UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,
+                `show_sub`,`redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,
+                `redirects`,`trashcan`,`mods`,`show_ledby`
+                EOT
             ,
             'forums',
             'WHERE `id`=?',
@@ -649,11 +651,11 @@ EOT
 
         $result = $DB->safeselect(
             <<<'EOT'
-`id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
-UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,
-`show_sub`,`redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,
-`redirects`,`trashcan`,`mods`,`show_ledby`
-EOT
+                `id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
+                UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,
+                `show_sub`,`redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,
+                `redirects`,`trashcan`,`mods`,`show_ledby`
+                EOT
             ,
             'forums'
         );
@@ -666,7 +668,7 @@ EOT
                     'label' => $f['title'],
                     'selected' => '',
                 ]
-            ).PHP_EOL;
+            ).\PHP_EOL;
         }
         $PAGE->addContentBox(
             'Deleting Forum: '.$fdata['title'],
@@ -676,7 +678,7 @@ EOT
         );
     }
 
-    public function createcategory($cid = false)
+    public function createcategory($cid = false): void
     {
         global $JAX,$DB,$PAGE;
         $page = '';
@@ -714,7 +716,7 @@ EOT
 
         $PAGE->addContentBox(
             ($cdata ? 'Edit' : 'Create').' Category',
-            $page.PHP_EOL.$PAGE->parseTemplate(
+            $page.\PHP_EOL.$PAGE->parseTemplate(
                 'forums/create-category.html',
                 [
                     'id' => $cdata && isset($cdata['id']) ? $cdata['id'] : 0,
@@ -725,7 +727,7 @@ EOT
         );
     }
 
-    public function deletecategory($id)
+    public function deletecategory($id): void
     {
         global $PAGE,$DB,$JAX;
         $page = '';
@@ -734,7 +736,7 @@ EOT
         $categories = [];
         $cattitle = false;
         while ($f = $DB->arow($result)) {
-            if ($f['id'] != $id) {
+            if ($f['id'] !== $id) {
                 $categories[$f['id']] = $f['title'];
             } else {
                 $cattitle = $f['title'];
@@ -775,7 +777,7 @@ EOT
                         'label' => $categoryName,
                         'selected' => '',
                     ]
-                ).PHP_EOL;
+                ).\PHP_EOL;
             }
             $page .= $PAGE->parseTemplate(
                 'forums/delete-category.html',
@@ -792,7 +794,7 @@ EOT
      * that specify whether or not a user is a per-forum mod
      * based on the comma delimited list of mods for each forum.
      */
-    public function updateperforummodflag()
+    public function updateperforummodflag(): void
     {
         global $DB;
         $DB->safeupdate('members', [

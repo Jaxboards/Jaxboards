@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 $CFG = [
     'upateinterval' => '2',
     'timetoidle' => '300',

@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 if (! defined(INACP)) {
-    exit();
+    exit;
 }
 
 new settings();
@@ -25,7 +27,7 @@ class settings
                     'url' => '?act=settings&do='.$do,
                     'title' => $title,
                 ]
-            ).PHP_EOL;
+            ).\PHP_EOL;
         }
 
         $PAGE->sidebar($PAGE->parseTemplate('sidebar-list.html', [
@@ -51,7 +53,7 @@ class settings
         }
     }
 
-    public function boardname()
+    public function boardname(): void
     {
         global $PAGE,$JAX;
         $page = '';
@@ -115,12 +117,8 @@ class settings
             $this->pages_delete($JAX->b['delete']);
         }
         if (isset($JAX->b['page']) && $JAX->b['page']) {
-            $newact = preg_replace(
-                '@\\W@',
-                '<span style="font-weight:bold;color:#F00;">$0</span>',
-                $JAX->b['page']
-            );
-            if ($newact != $JAX->b['page']) {
+            $newact = preg_replace('@\W@', '<span style="font-weight:bold;color:#F00;">$0</span>', $JAX->b['page']);
+            if ($newact !== $JAX->b['page']) {
                 $e = 'The page URL must contain only letters and numbers. '.
                     "Invalid characters: {$newact}";
             } elseif (mb_strlen($newact) > 25) {
@@ -137,7 +135,7 @@ class settings
         while ($f = $DB->arow($result)) {
             $table .= $PAGE->parseTemplate('settings/pages-row.html', [
                 'act' => $f['act'],
-            ]).PHP_EOL;
+            ]).\PHP_EOL;
         }
         if ($table) {
             $page .= $PAGE->parseTemplate('settings/pages.html', [
@@ -161,7 +159,7 @@ class settings
         return $DB->safedelete('pages', 'WHERE `act`=?', $DB->basicvalue($page));
     }
 
-    public function pages_edit($pageurl)
+    public function pages_edit($pageurl): void
     {
         global $PAGE,$DB,$JAX;
         $page = '';
@@ -199,7 +197,7 @@ class settings
     /**
      * Shoutbox
      */
-    public function shoutbox()
+    public function shoutbox(): void
     {
         global $PAGE,$JAX,$DB;
         $page = '';
@@ -248,7 +246,7 @@ class settings
         $PAGE->addContentBox('Shoutbox', $page);
     }
 
-    public function birthday()
+    public function birthday(): void
     {
         global $PAGE,$JAX;
         $birthdays = $PAGE->getCFGSetting('birthdays');

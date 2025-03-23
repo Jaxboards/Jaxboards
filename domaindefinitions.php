@@ -1,6 +1,8 @@
 <?php
 
-/**
+declare(strict_types=1);
+
+/*
  * Figures out what board we're talking about if it's a service,
  * but regardless defines some important paths.
  *
@@ -8,7 +10,7 @@
  *
  * @license MIT <https://opensource.org/licenses/MIT>
  *
- * @link https://github.com/jaxboards/jaxboards Jaxboards Github Repo
+ * @see https://github.com/jaxboards/jaxboards Jaxboards Github Repo
  */
 if (! defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', __DIR__);
@@ -22,10 +24,8 @@ if (! isset($DB)) {
 // Figure out url.
 $host = $_SERVER['SERVER_NAME'];
 // Build the url.
-$baseURL = (isset($_SERVER['REQUEST_SCHEME']) ?
-    $_SERVER['REQUEST_SCHEME'] : 'https').'://';
-$baseURL .= (isset($_SERVER['SERVER_NAME']) ?
-    $_SERVER['SERVER_NAME'] : $CFG['domain']);
+$baseURL = ($_SERVER['REQUEST_SCHEME'] ?? 'https').'://';
+$baseURL .= ($_SERVER['SERVER_NAME'] ?? $CFG['domain']);
 if (
     ! ($_SERVER['SERVER_PORT'] === '443' && $_SERVER['REQUEST_SCHEME'] === 'https')
     && ! ($_SERVER['SERVER_PORT'] === '80' && $_SERVER['REQUEST_SCHEME'] === 'http')
@@ -38,10 +38,10 @@ define('SOUNDSURL', BOARDURL.'Sounds/');
 define('SCRIPTURL', BOARDURL.'Script/');
 define('FLAGURL', BOARDURL.'Service/flags/');
 
-$domain_match = str_replace('.', '\\.', $CFG['domain']);
+$domain_match = str_replace('.', '\.', $CFG['domain']);
 // Get prefix.
 if ($CFG['service']) {
-    preg_match('@(.*)\\.'.$domain_match.'@i', $host, $matches);
+    preg_match('@(.*)\.'.$domain_match.'@i', $host, $matches);
     if (isset($matches[1]) && $matches[1]) {
         $prefix = $matches[1];
         $CFG['prefix'] = $prefix;

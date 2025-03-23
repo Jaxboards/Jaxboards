@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 class SESS
 {
     public $data = [];
@@ -101,9 +103,9 @@ class SESS
         }
     }
 
-    public function __set($a, $b)
+    public function __set($a, $b): void
     {
-        if (isset($this->data[$a]) && $this->data[$a] == $b) {
+        if (isset($this->data[$a]) && $this->data[$a] === $b) {
             return;
         }
         $this->changedData[$a] = $b;
@@ -117,7 +119,7 @@ class SESS
         $r = [];
         foreach ($this->bots as $k => $v) {
             if (
-                mb_stripos(mb_strtolower($_SERVER['HTTP_USER_AGENT']), $k) != false
+                mb_stripos(mb_strtolower($_SERVER['HTTP_USER_AGENT']), $k) !== false
             ) {
                 $sid = $v;
                 $isbot = 1;
@@ -127,13 +129,13 @@ class SESS
             $result = (! $isbot) ?
                 $DB->safeselect(
                     <<<'EOT'
-`id`,`uid`,INET6_NTOA(`ip`) as `ip`,`vars`,
-UNIX_TIMESTAMP(`last_update`) AS `last_update`,
-UNIX_TIMESTAMP(`last_action`) AS `last_action`,`runonce`,`location`,
-`users_online_cache`,`is_bot`,`buddy_list_cache`,`location_verbose`,
-`useragent`,`forumsread`,`topicsread`,
-UNIX_TIMESTAMP(`read_date`) AS `read_date`,`hide`
-EOT
+                        `id`,`uid`,INET6_NTOA(`ip`) as `ip`,`vars`,
+                        UNIX_TIMESTAMP(`last_update`) AS `last_update`,
+                        UNIX_TIMESTAMP(`last_action`) AS `last_action`,`runonce`,`location`,
+                        `users_online_cache`,`is_bot`,`buddy_list_cache`,`location_verbose`,
+                        `useragent`,`forumsread`,`topicsread`,
+                        UNIX_TIMESTAMP(`read_date`) AS `read_date`,`hide`
+                        EOT
                     ,
                     'session',
                     'WHERE `id`=? AND `ip`=INET6_ATON(?)',
@@ -142,13 +144,13 @@ EOT
                 ) :
                     $DB->safeselect(
                         <<<'EOT'
-`id`,`uid`,INET6_NTOA(`ip`) as `ip`,`vars`,
-UNIX_TIMESTAMP(`last_update`) AS `last_update`,
-UNIX_TIMESTAMP(`last_action`) AS `last_action`,`runonce`,`location`,
-`users_online_cache`,`is_bot`,`buddy_list_cache`,`location_verbose`,
-`useragent`,`forumsread`,`topicsread`,
-UNIX_TIMESTAMP(`read_date`) AS `read_date`,`hide`
-EOT
+                            `id`,`uid`,INET6_NTOA(`ip`) as `ip`,`vars`,
+                            UNIX_TIMESTAMP(`last_update`) AS `last_update`,
+                            UNIX_TIMESTAMP(`last_action`) AS `last_action`,`runonce`,`location`,
+                            `users_online_cache`,`is_bot`,`buddy_list_cache`,`location_verbose`,
+                            `useragent`,`forumsread`,`topicsread`,
+                            UNIX_TIMESTAMP(`read_date`) AS `read_date`,`hide`
+                            EOT
                         ,
                         'session',
                         'WHERE `id`=?',
@@ -193,14 +195,14 @@ EOT
         return $sessData;
     }
 
-    public function set($a)
+    public function set($a): void
     {
         foreach ($a as $k => $v) {
             $this->__set($k, $v);
         }
     }
 
-    public function addvar($a, $b)
+    public function addvar($a, $b): void
     {
         if (
             ! isset($this->data['vars'][$a])
@@ -211,7 +213,7 @@ EOT
         }
     }
 
-    public function delvar($a)
+    public function delvar($a): void
     {
         if (isset($this->data['vars'][$a])) {
             unset($this->data['vars'][$a]);
@@ -219,7 +221,7 @@ EOT
         }
     }
 
-    public function act($a = false)
+    public function act($a = false): void
     {
         global $JAX;
         $this->__set('last_action', time());
@@ -228,7 +230,7 @@ EOT
         }
     }
 
-    public function erase($a)
+    public function erase($a): void
     {
         unset($this->changedData[$a]);
     }
@@ -283,9 +285,9 @@ EOT
         $DB->safedelete(
             'session',
             <<<'EOT'
-WHERE `last_update`<?
-    OR (`uid` IS NULL AND `last_update`<?)
-EOT
+                WHERE `last_update`<?
+                    OR (`uid` IS NULL AND `last_update`<?)
+                EOT
             ,
             date('Y-m-d H:i:s', $yesterday),
             date('Y-m-d H:i:s', $timeago)
@@ -294,7 +296,7 @@ EOT
         return true;
     }
 
-    public function applyChanges()
+    public function applyChanges(): void
     {
         global $DB,$PAGE;
         $sd = $this->changedData;
@@ -336,7 +338,7 @@ EOT
 
     public function addSessIDCB($m)
     {
-        if ($m[1][0] == '?') {
+        if ($m[1][0] === '?') {
             $m[1] .= '&amp;sessid='.$this->data['id'];
         }
 

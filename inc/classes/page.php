@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 class PAGE
 {
     public $metadefs = [];
@@ -37,11 +39,10 @@ class PAGE
     public function __construct()
     {
         $this->JSOutput = [];
-        $this->jsaccess = isset($_SERVER['HTTP_X_JSACCESS']) ?
-            $_SERVER['HTTP_X_JSACCESS'] : false;
-        $this->jsupdate = ($this->jsaccess == 1);
+        $this->jsaccess = $_SERVER['HTTP_X_JSACCESS'] ?? false;
+        $this->jsupdate = ($this->jsaccess === 1);
         $this->jsnewlocation = $this->jsnewloc = ($this->jsaccess >= 2);
-        $this->jsdirectlink = ($this->jsaccess == 3);
+        $this->jsdirectlink = ($this->jsaccess === 3);
         $this->mobile = mb_stripos($_SERVER['HTTP_USER_AGENT'], 'mobile') !== false;
         $this->parts = [];
         $this->vars = [];
@@ -58,7 +59,7 @@ class PAGE
     public function append($a, $b)
     {
         $a = mb_strtoupper($a);
-        if (! $this->jsaccess || $a == 'TITLE') {
+        if (! $this->jsaccess || $a === 'TITLE') {
             if (! isset($this->parts[$a])) {
                 return $this->reset($a, $b);
             }
@@ -67,7 +68,7 @@ class PAGE
         }
     }
 
-    public function addvar($a, $b)
+    public function addvar($a, $b): void
     {
         $this->vars['<%'.$a.'%>'] = $b;
     }
@@ -89,10 +90,10 @@ class PAGE
         }
     }
 
-    public function location($a)
+    public function location($a): void
     {
         global $PAGE,$SESS,$JAX;
-        if (empty($JAX->c) && $a[0] == '?') {
+        if (empty($JAX->c) && $a[0] === '?') {
             $a = '?sessid='.$SESS->data['id'].'&'.mb_substr($a, 1);
         }
         if ($PAGE->jsaccess) {
@@ -102,16 +103,16 @@ class PAGE
         }
     }
 
-    public function reset($a, $b = '')
+    public function reset($a, $b = ''): void
     {
         $a = mb_strtoupper($a);
         $this->parts[$a] = $b;
     }
 
-    public function JS()
+    public function JS(): void
     {
         $args = func_get_args();
-        if ($args[0] == 'softurl') {
+        if ($args[0] === 'softurl') {
             $GLOBALS['SESS']->erase('location');
         }
         if ($this->jsaccess) {
@@ -119,9 +120,9 @@ class PAGE
         }
     }
 
-    public function JSRaw($a)
+    public function JSRaw($a): void
     {
-        foreach (explode(PHP_EOL, $a) as $a22) {
+        foreach (explode(\PHP_EOL, $a) as $a22) {
             $a2 = json_decode($a22);
             if (! is_array($a2)) {
                 continue;
@@ -136,7 +137,7 @@ class PAGE
         }
     }
 
-    public function JSRawArray($a)
+    public function JSRawArray($a): void
     {
         $this->JSOutput[] = $a;
     }
@@ -161,10 +162,10 @@ class PAGE
             $autobox = ['PAGE', 'COPYRIGHT', 'USERBOX'];
             foreach ($this->parts as $k => $v) {
                 $k = mb_strtoupper($k);
-                if (in_array($k, $autobox)) {
+                if (in_array($k, $autobox, true)) {
                     $v = '<div id="'.mb_strtolower($k).'">'.$v.'</div>';
                 }
-                if ($k == 'PATH') {
+                if ($k === 'PATH') {
                     $this->template
                         = preg_replace('@<!--PATH-->@', $v, $this->template, 1);
                 }
@@ -181,7 +182,7 @@ class PAGE
 
     public function collapsebox($a, $b, $c = false)
     {
-        return $this->meta('collapsebox', ($c ? ' id="'.$c.'"' : ''), $a, $b);
+        return $this->meta('collapsebox', $c ? ' id="'.$c.'"' : '', $a, $b);
     }
 
     public function error($a)
@@ -194,18 +195,18 @@ class PAGE
         return preg_match("/<!--{$a}-->/i", $this->template);
     }
 
-    public function loadtemplate($a)
+    public function loadtemplate($a): void
     {
         $this->template = file_get_contents($a);
-        $this->template = preg_replace_callback('@<!--INCLUDE:(\\w+)-->@', [$this, 'includer'], $this->template);
+        $this->template = preg_replace_callback('@<!--INCLUDE:(\w+)-->@', [$this, 'includer'], $this->template);
         $this->template = preg_replace_callback(
-            '@<M name=([\'"])([^\'"]+)\\1>(.*?)</M>@s',
+            '@<M name=([\'"])([^\'"]+)\1>(.*?)</M>@s',
             [&$this, 'userMetaParse'],
             $this->template
         );
     }
 
-    public function loadskin($id)
+    public function loadskin($id): void
     {
         global $DB,$CFG;
         $skin = [];
@@ -261,7 +262,7 @@ class PAGE
         return $page ? $page : '';
     }
 
-    public function loadmeta($component)
+    public function loadmeta($component): void
     {
         $component = mb_strtolower($component);
         $themeComponentDir = THEMEPATH.'views/'.$component;
@@ -279,14 +280,14 @@ class PAGE
         }
     }
 
-    public function processqueue($process)
+    public function processqueue($process): void
     {
         while ($componentDir = array_pop($this->metaqueue)) {
-            $component = pathinfo($componentDir, PATHINFO_BASENAME);
+            $component = pathinfo($componentDir, \PATHINFO_BASENAME);
             $this->debug("{$process} triggered {$component} to load");
             $meta = [];
             foreach (glob($componentDir.'/*.html') as $metaFile) {
-                $metaName = pathinfo($metaFile, PATHINFO_FILENAME);
+                $metaName = pathinfo($metaFile, \PATHINFO_FILENAME);
                 $metaContent = file_get_contents($metaFile);
                 $this->checkextended($metaContent, $metaName);
                 $meta[$metaName] = $metaContent;
@@ -295,7 +296,7 @@ class PAGE
             $defaultComponentDir = str_replace(THEMEPATH, DTHEMEPATH, $componentDir);
             if ($defaultComponentDir !== $componentDir) {
                 foreach (glob($defaultComponentDir.'/*.html') as $metaFile) {
-                    $metaName = pathinfo($metaFile, PATHINFO_FILENAME);
+                    $metaName = pathinfo($metaFile, \PATHINFO_FILENAME);
                     $metaContent = file_get_contents($metaFile);
                     $this->checkextended($metaContent, $metaName);
                     if (! isset($meta[$metaName])) {
@@ -346,13 +347,13 @@ class PAGE
             $s = '&&';
         }
         foreach (explode($s, $m[1]) as $piece) {
-            preg_match('@(\\S+?)\\s*([!><]?=|[><])\\s*(\\S*)@', $piece, $pp);
+            preg_match('@(\S+?)\s*([!><]?=|[><])\s*(\S*)@', $piece, $pp);
             switch ($pp[2]) {
                 case '=':
-                    $c = $pp[1] == $pp[3];
+                    $c = $pp[1] === $pp[3];
                     break;
                 case '!=':
-                    $c = $pp[1] != $pp[3];
+                    $c = $pp[1] !== $pp[3];
                     break;
                 case '>=':
                     $c = $pp[1] >= $pp[3];
@@ -367,10 +368,10 @@ class PAGE
                     $c = $pp[1] < $pp[3];
                     break;
             }
-            if ($s == '&&' && ! $c) {
+            if ($s === '&&' && ! $c) {
                 break;
             }
-            if ($s == '||' && $c) {
+            if ($s === '||' && $c) {
                 break;
             }
         }
@@ -433,7 +434,7 @@ class PAGE
         return $this->meta('path', $path);
     }
 
-    public function updatepath($a = false)
+    public function updatepath($a = false): void
     {
         if ($a) {
             $this->path($a);
