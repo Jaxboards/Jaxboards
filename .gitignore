@@ -17,6 +17,7 @@ boards
 eslint-report.json
 phpcs-report-sonarqube.json
 phpcs-report.json
+phpstan-report.json
 stylelint-report.json
 
 # Vendor files

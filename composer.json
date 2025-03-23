@@ -17,7 +17,8 @@
     "friendsofphp/php-cs-fixer": "^3.73",
     "phpcompatibility/php-compatibility": "^9.3",
     "roave/security-advisories": "dev-master@dev",
-    "squizlabs/php_codesniffer": "^3.12"
+    "squizlabs/php_codesniffer": "^3.12",
+    "phpstan/phpstan": "^2.1"
   },
   "require": {
     "composer": "2.8.6",
@@ -33,6 +34,8 @@
     "phpcs-report": [
       "phpcs -s --report-file=phpcs-report.json --report=json --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1",
       "php php_codesniffer_to_sonarqube.php phpcs-report.json phpcs-report-sonarqube.json"
-    ]
+    ],
+    "phpstan": "phpstan analyse --memory-limit=1G",
+    "phpstan-report": "phpstan analyse --memory-limit=1G --error-format=json > phpstan-report.json"
   }
 }
