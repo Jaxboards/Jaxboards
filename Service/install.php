@@ -21,7 +21,9 @@ if (!defined('SERVICE_ROOT')) {
 }
 
 if (file_exists(SERVICE_ROOT . '/install.lock')) {
-    exit('Install lock file found! Please remove if you wish to install.');
+    echo 'Install lock file found! Please remove if you wish to install.';
+
+    exit(1);
 }
 
 require_once JAXBOARDS_ROOT . '/inc/classes/mysql.php';

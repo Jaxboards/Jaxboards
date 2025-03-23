@@ -28,13 +28,17 @@ $JAX = new JAX();
 $DB = new MySQL();
 
 if (!file_exists(JAXBOARDS_ROOT . '/config.php')) {
-    exit('Jaxboards not installed!');
+    echo 'Jaxboards not installed!';
+
+    exit(1);
 }
 
 require_once JAXBOARDS_ROOT . '/config.php';
 
 if (!$CFG['service']) {
-    exit('Service mode not enabled');
+    echo 'Service mode not enabled';
+
+    exit(1);
 }
 
 /**

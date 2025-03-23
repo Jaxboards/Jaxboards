@@ -20,7 +20,9 @@ if (!defined('JAXBOARDS_ROOT')) {
 
 // This file must be required after mysql connecting.
 if (!isset($DB)) {
-    exit('This file must be required after mysql connecting');
+    echo 'This file must be required after mysql connecting';
+
+    exit(1);
 }
 
 // Figure out url.

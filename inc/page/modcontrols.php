@@ -721,7 +721,8 @@ class modcontrols
             header('Content-Type: application/javascript; charset=utf-8');
             header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 2592000) . ' GMT');
 
-            exit($script);
+            echo $script;
+            exit(0);
         }
     }
 

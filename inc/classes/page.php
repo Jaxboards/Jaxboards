@@ -333,7 +333,9 @@ class PAGE
             isset($args[0]) && is_array($args[0]) ? $args[0] : $args,
         );
         if ($r === false) {
-            exit($meta . ' has too many arguments');
+            echo $meta . ' has too many arguments';
+
+            exit(1);
         }
         if (
             isset($this->moreFormatting[$meta])

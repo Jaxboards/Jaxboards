@@ -44,7 +44,9 @@ $connected = $DB->connect(
     $CFG['sql_db'],
 );
 if (!$connected) {
-    exit('Could not connect');
+    echo 'Could not connect';
+
+    exit(1);
 }
 
 // Start a session.
@@ -66,7 +68,9 @@ require_once JAXBOARDS_ROOT . '/inc/classes/sess.php';
 
 // Initialize them.
 if (isset($CFG['noboard']) && $CFG['noboard']) {
-    exit('board not found');
+    echo 'board not found';
+
+    exit(1);
 }
 
 $PAGE = new PAGE();

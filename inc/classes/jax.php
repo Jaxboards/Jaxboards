@@ -307,7 +307,9 @@ class JAX
             if (file_exists($emotepack . 'rules.php')) {
                 require_once $emotepack . 'rules.php';
                 if (!$rules) {
-                    exit('Emoticon ruleset corrupted!');
+                    echo 'Emoticon ruleset corrupted!';
+
+                    exit(1);
                 }
                 foreach ($rules as $k => $v) {
                     if (!isset($textRules['emote'][$k])) {

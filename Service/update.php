@@ -20,7 +20,12 @@ if (!defined('SERVICE_ROOT')) {
 }
 
 if (file_exists(SERVICE_ROOT . '/update.lock')) {
-    exit('Update lock file found! Please remove if you wish to install.');
+    fwrite(
+        STDERR,
+        'Update lock file found! Please remove if you wish to install.',
+    );
+
+    exit(1);
 }
 
 // Load mysql classes.
@@ -38,7 +43,8 @@ $connected = $DB->connect(
 );
 
 if (!$connected) {
-    exit('There was an error connecting to the MySQL database.');
+    fwrite(STDERR, 'There was an error connecting to the MySQL database.');
+    exit(1);
 }
 
 $DB->safequery('SET foreign_key_checks = 0;');
