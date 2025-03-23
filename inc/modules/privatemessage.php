@@ -11,7 +11,7 @@ class IM
         if ($SESS->runonce) {
             $this->filter();
         }
-        if (trim($im ?? '') !== '' && $uid) {
+        if ('' !== trim($im ?? '') && $uid) {
             $this->message($uid, $im);
         }
 
@@ -23,7 +23,7 @@ class IM
     public function filter()
     {
         global $SESS,$USER,$PAGE;
-        if (! $USER['enemies']) {
+        if (!$USER['enemies']) {
             return;
         }
         $enemies = explode(',', $USER['enemies']);
@@ -32,7 +32,7 @@ class IM
         $exploded = explode(PHP_EOL, $SESS->runonce);
         foreach ($exploded as $k => $v) {
             $v = json_decode($v);
-            if ($v[0] == 'im') {
+            if ('im' == $v[0]) {
                 unset($exploded[$k]);
                 if (in_array($v[1], $enemies)) {
                     // This user's blocked, don't do anything.
@@ -58,13 +58,13 @@ class IM
                 "You've blocked this recipient and cannot send messages to them."
             );
         }
-        if (! $ud) {
+        if (!$ud) {
             return $PAGE->JS('error', 'You must be logged in to instant message!');
         }
-        if (! $uid) {
+        if (!$uid) {
             return $PAGE->JS('error', 'You must have a recipient!');
         }
-        if (! $PERMS['can_im']) {
+        if (!$PERMS['can_im']) {
             return $PAGE->JS(
                 'error',
                 "You don't have permission to use this feature."
@@ -72,7 +72,14 @@ class IM
         }
         $im = $JAX->linkify($im);
         $im = $JAX->theworks($im);
-        $cmd = ['im', $uid, $ud['display_name'], $im, $USER['id'], time()];
+        $cmd = array(
+            'im',
+            $uid,
+            $ud['display_name'],
+            $im,
+            $USER['id'],
+            time(),
+        );
         $PAGE->JSRawArray($cmd);
         $cmd[1] = $ud['id'];
         $cmd[4] = 0;
@@ -80,26 +87,26 @@ class IM
         $logoutTime = time() - $CFG['timetologout'];
         $updateTime = time() - $CFG['updateinterval'] * 5;
         if (
-            ! isset($onlineusers[$uid])
-            || ! $onlineusers[$uid]
+            !isset($onlineusers[$uid])
+            || !$onlineusers[$uid]
             || $onlineusers[$uid]['last_update'] < $logoutTime
             || $onlineusers[$uid]['last_update'] < $updateTime
         ) {
             $PAGE->JS('imtoggleoffline', $uid);
         }
-        if (! $fatal) {
-            if (! $this->sendcmd($cmd, $uid)) {
+        if (!$fatal) {
+            if (!$this->sendcmd($cmd, $uid)) {
                 $PAGE->JS('imtoggleoffline', $uid);
             }
         }
 
-        return ! ($e || $fatal);
+        return !($e || $fatal);
     }
 
     public function sendcmd($cmd, $uid)
     {
         global $DB,$CFG;
-        if (! is_numeric($uid)) {
+        if (!is_numeric($uid)) {
             return;
         }
         $result = $DB->safespecial(
@@ -109,20 +116,20 @@ SET `runonce`=CONCAT(`runonce`,?)
 WHERE `uid`=? AND `last_update`> ?
 EOT
             ,
-            ['session'],
-            $DB->basicvalue(json_encode($cmd).PHP_EOL),
+            array('session'),
+            $DB->basicvalue(json_encode($cmd) . PHP_EOL),
             $uid,
             date('Y-m-d H:i:s', (time() - $CFG['updateinterval'] * 5))
         );
 
-        return $DB->affected_rows(1) != 0;
+        return 0 != $DB->affected_rows(1);
     }
 
     // Stuff I'm doing.
     public function invite($room, $uid, $otherguy = false)
     {
         global $USER,$CFG,$DB;
-        if (! $USER['id']) {
+        if (!$USER['id']) {
             return;
         }
         if ($otherguy) {
@@ -130,9 +137,9 @@ EOT
             // Make the window the guy that invited multi.
             $PAGE->JS('immakemulti', $otherguy);
             // Update other guy.
-            $this->sendcmd(['immakemulti', $USER['id']], $otherguy);
+            $this->sendcmd(array('immakemulti', $USER['id']), $otherguy);
         }
-        $this->sendcmd(['iminvite', $room]);
+        $this->sendcmd(array('iminvite', $room));
     }
 
     public function immenu($id)
@@ -149,21 +156,21 @@ EOT
             $menu = '';
             while ($f = $DB->arow($result)) {
                 if ($online[$f['id']] && $f['id'] != $id) {
-                    $menu .= $f['name'].'<br />';
+                    $menu .= $f['name'] . '<br />';
                 }
             }
-            if (! $menu) {
-                if (! $USER['friends']) {
+            if (!$menu) {
+                if (!$USER['friends']) {
                     $menu
-                        = 'You must add users to your contacts list<br />'.
+                        = 'You must add users to your contacts list<br />' .
                         'to use this feature.';
                 } else {
                     $menu = 'None of your friends<br />are currently online';
                 }
             }
         } else {
-            $menu = "<a href='?act=vu{$id}'>View Profile</a><br />".
-                "<a href='?module=privatemessage&im_menu={$id}".
+            $menu = "<a href='?act=vu{$id}'>View Profile</a><br />" .
+                "<a href='?module=privatemessage&im_menu={$id}" .
                 "&im_invitemenu=1'>Add User to Chat</a>";
         }
         $PAGE->JS('update', 'immenu', $menu);

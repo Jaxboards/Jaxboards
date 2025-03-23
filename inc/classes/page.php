@@ -2,52 +2,37 @@
 
 class PAGE
 {
-    public $metadefs = [];
-
+    public $metadefs = array();
     public $debuginfo = '';
-
-    public $JSOutput = [];
-
+    public $JSOutput = array();
     public $jsaccess = '';
-
     public $jsupdate = false;
-
     public $jsnewlocation = false;
-
     public $jsnewloc = false;
-
     public $jsdirectlink = false;
-
     public $mobile = false;
-
-    public $parts = [];
-
-    public $vars = [];
-
-    public $userMetaDefs = [];
-
-    public $moreFormatting = [];
-
+    public $parts = array();
+    public $vars = array();
+    public $userMetaDefs = array();
+    public $moreFormatting = array();
     public $template;
-
     public $metaqueue;
-
     public $done;
 
     public function __construct()
     {
-        $this->JSOutput = [];
+        $this->JSOutput = array();
         $this->jsaccess = isset($_SERVER['HTTP_X_JSACCESS']) ?
             $_SERVER['HTTP_X_JSACCESS'] : false;
-        $this->jsupdate = ($this->jsaccess == 1);
+        $this->jsupdate = (1 == $this->jsaccess);
         $this->jsnewlocation = $this->jsnewloc = ($this->jsaccess >= 2);
-        $this->jsdirectlink = ($this->jsaccess == 3);
-        $this->mobile = mb_stripos($_SERVER['HTTP_USER_AGENT'], 'mobile') !== false;
-        $this->parts = [];
-        $this->vars = [];
-        $this->metadefs = [];
-        $this->userMetaDefs = [];
-        $this->moreFormatting = [];
+        $this->jsdirectlink = (3 == $this->jsaccess);
+        $this->mobile = false !== mb_stripos($_SERVER['HTTP_USER_AGENT'], 'mobile');
+        $this->parts = array();
+        $this->vars = array();
+        $this->metadefs = array();
+        $this->userMetaDefs = array();
+        $this->moreFormatting = array();
     }
 
     public function get($a)
@@ -58,8 +43,8 @@ class PAGE
     public function append($a, $b)
     {
         $a = mb_strtoupper($a);
-        if (! $this->jsaccess || $a == 'TITLE') {
-            if (! isset($this->parts[$a])) {
+        if (!$this->jsaccess || 'TITLE' == $a) {
+            if (!isset($this->parts[$a])) {
                 return $this->reset($a, $b);
             }
 
@@ -69,7 +54,7 @@ class PAGE
 
     public function addvar($a, $b)
     {
-        $this->vars['<%'.$a.'%>'] = $b;
+        $this->vars['<%' . $a . '%>'] = $b;
     }
 
     public function filtervars($a)
@@ -79,21 +64,21 @@ class PAGE
 
     public function prepend($a, $b)
     {
-        if (! $this->jsaccess) {
+        if (!$this->jsaccess) {
             $a = mb_strtoupper($a);
-            if (! isset($this->parts[$a])) {
+            if (!isset($this->parts[$a])) {
                 return $this->reset($a, $b);
             }
 
-            return $this->parts[$a] = $b.$this->parts[$a];
+            return $this->parts[$a] = $b . $this->parts[$a];
         }
     }
 
     public function location($a)
     {
         global $PAGE,$SESS,$JAX;
-        if (empty($JAX->c) && $a[0] == '?') {
-            $a = '?sessid='.$SESS->data['id'].'&'.mb_substr($a, 1);
+        if (empty($JAX->c) && '?' == $a[0]) {
+            $a = '?sessid=' . $SESS->data['id'] . '&' . mb_substr($a, 1);
         }
         if ($PAGE->jsaccess) {
             $PAGE->JS('location', $a);
@@ -111,7 +96,7 @@ class PAGE
     public function JS()
     {
         $args = func_get_args();
-        if ($args[0] == 'softurl') {
+        if ('softurl' == $args[0]) {
             $GLOBALS['SESS']->erase('location');
         }
         if ($this->jsaccess) {
@@ -123,7 +108,7 @@ class PAGE
     {
         foreach (explode(PHP_EOL, $a) as $a22) {
             $a2 = json_decode($a22);
-            if (! is_array($a2)) {
+            if (!is_array($a2)) {
                 continue;
             }
             if (is_array($a2[0])) {
@@ -149,26 +134,26 @@ class PAGE
         }
         $this->done = true;
         $this->parts['path']
-            = "<div id='path' class='path'>".$this->buildpath().'</div>';
+            = "<div id='path' class='path'>" . $this->buildpath() . '</div>';
 
         if ($this->jsaccess) {
             header('Content-type:text/plain');
             foreach ($this->JSOutput as $k => $v) {
                 $this->JSOutput[$k] = $SESS->addSessID($v);
             }
-            echo ! empty($this->JSOutput) ? $JAX::json_encode($this->JSOutput) : '';
+            echo !empty($this->JSOutput) ? $JAX::json_encode($this->JSOutput) : '';
         } else {
-            $autobox = ['PAGE', 'COPYRIGHT', 'USERBOX'];
+            $autobox = array('PAGE', 'COPYRIGHT', 'USERBOX');
             foreach ($this->parts as $k => $v) {
                 $k = mb_strtoupper($k);
                 if (in_array($k, $autobox)) {
-                    $v = '<div id="'.mb_strtolower($k).'">'.$v.'</div>';
+                    $v = '<div id="' . mb_strtolower($k) . '">' . $v . '</div>';
                 }
-                if ($k == 'PATH') {
+                if ('PATH' == $k) {
                     $this->template
                         = preg_replace('@<!--PATH-->@', $v, $this->template, 1);
                 }
-                $this->template = str_replace('<!--'.$k.'-->', $v, $this->template);
+                $this->template = str_replace('<!--' . $k . '-->', $v, $this->template);
             }
             $this->template = $this->filtervars($this->template);
             $this->template = $SESS->addSessId($this->template);
@@ -181,7 +166,7 @@ class PAGE
 
     public function collapsebox($a, $b, $c = false)
     {
-        return $this->meta('collapsebox', ($c ? ' id="'.$c.'"' : ''), $a, $b);
+        return $this->meta('collapsebox', ($c ? ' id="' . $c . '"' : ''), $a, $b);
     }
 
     public function error($a)
@@ -197,10 +182,20 @@ class PAGE
     public function loadtemplate($a)
     {
         $this->template = file_get_contents($a);
-        $this->template = preg_replace_callback('@<!--INCLUDE:(\\w+)-->@', [$this, 'includer'], $this->template);
+        $this->template = preg_replace_callback(
+            '@<!--INCLUDE:(\\w+)-->@',
+            array(
+                $this,
+                'includer',
+            ),
+            $this->template
+        );
         $this->template = preg_replace_callback(
             '@<M name=([\'"])([^\'"]+)\\1>(.*?)</M>@s',
-            [&$this, 'userMetaParse'],
+            array(
+                &$this,
+                'userMetaParse',
+            ),
             $this->template
         );
     }
@@ -208,38 +203,47 @@ class PAGE
     public function loadskin($id)
     {
         global $DB,$CFG;
-        $skin = [];
+        $skin = array();
         if ($id) {
-            $result = $DB->safeselect('title,custom,wrapper', 'skins', 'WHERE id=? LIMIT 1', $id);
+            $result = $DB->safeselect(
+                'title,custom,wrapper',
+                'skins',
+                'WHERE id=? LIMIT 1',
+                $id
+            );
             $skin = $DB->arow($result);
             $DB->disposeresult($result);
         }
         if (empty($skin)) {
-            $result = $DB->safeselect('title,custom,wrapper', 'skins', 'WHERE `default`=1 LIMIT 1');
+            $result = $DB->safeselect(
+                'title,custom,wrapper',
+                'skins',
+                'WHERE `default`=1 LIMIT 1'
+            );
             $skin = $DB->arow($result);
             $DB->disposeresult($result);
         }
-        if (! $skin) {
-            $skin = [
+        if (!$skin) {
+            $skin = array(
                 'title' => 'Default',
                 'custom' => 0,
                 'wrapper' => false,
-            ];
+            );
         }
-        $t = ($skin['custom'] ? BOARDPATH : '').'Themes/'.$skin['title'].'/';
-        $turl = ($skin['custom'] ? BOARDPATHURL : '').'Themes/'.$skin['title'].'/';
+        $t = ($skin['custom'] ? BOARDPATH : '') . 'Themes/' . $skin['title'] . '/';
+        $turl = ($skin['custom'] ? BOARDPATHURL : '') . 'Themes/' . $skin['title'] . '/';
         if (is_dir($t)) {
             define('THEMEPATH', $t);
             define('THEMEPATHURL', $turl);
         } else {
-            define('THEMEPATH', JAXBOARDS_ROOT.'/'.$CFG['dthemepath']);
-            define('THEMEPATHURL', BOARDURL.$CFG['dthemepath']);
+            define('THEMEPATH', JAXBOARDS_ROOT . '/' . $CFG['dthemepath']);
+            define('THEMEPATHURL', BOARDURL . $CFG['dthemepath']);
         }
-        define('DTHEMEPATH', JAXBOARDS_ROOT.'/'.$CFG['dthemepath']);
+        define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . $CFG['dthemepath']);
         $this->loadtemplate(
             $skin['wrapper'] ?
-            BOARDPATH.'Wrappers/'.$skin['wrapper'].'.txt' :
-            THEMEPATH.'wrappers.txt'
+            BOARDPATH . 'Wrappers/' . $skin['wrapper'] . '.txt' :
+            THEMEPATH . 'wrappers.txt'
         );
     }
 
@@ -254,7 +258,12 @@ class PAGE
     public function includer($m)
     {
         global $DB;
-        $result = $DB->safeselect('page', 'pages', 'WHERE `act`=?', $DB->basicvalue($m[1]));
+        $result = $DB->safeselect(
+            'page',
+            'pages',
+            'WHERE `act`=?',
+            $DB->basicvalue($m[1])
+        );
         $page = array_shift($DB->arow($result));
         $DB->disposeresult($result);
 
@@ -264,16 +273,16 @@ class PAGE
     public function loadmeta($component)
     {
         $component = mb_strtolower($component);
-        $themeComponentDir = THEMEPATH.'views/'.$component;
+        $themeComponentDir = THEMEPATH . 'views/' . $component;
         if (is_dir($themeComponentDir)) {
             $componentDir = $themeComponentDir;
         } else {
-            $componentDir = DTHEMEPATH.'views/'.$component;
-            if (! is_dir($componentDir)) {
+            $componentDir = DTHEMEPATH . 'views/' . $component;
+            if (!is_dir($componentDir)) {
                 $componentDir = false;
             }
         }
-        if ($componentDir !== false) {
+        if (false !== $componentDir) {
             $this->metaqueue[] = $componentDir;
             $this->debug("Added {$component} to queue");
         }
@@ -284,21 +293,25 @@ class PAGE
         while ($componentDir = array_pop($this->metaqueue)) {
             $component = pathinfo($componentDir, PATHINFO_BASENAME);
             $this->debug("{$process} triggered {$component} to load");
-            $meta = [];
-            foreach (glob($componentDir.'/*.html') as $metaFile) {
+            $meta = array();
+            foreach (glob($componentDir . '/*.html') as $metaFile) {
                 $metaName = pathinfo($metaFile, PATHINFO_FILENAME);
                 $metaContent = file_get_contents($metaFile);
                 $this->checkextended($metaContent, $metaName);
                 $meta[$metaName] = $metaContent;
             }
             // Check default components for anything missing.
-            $defaultComponentDir = str_replace(THEMEPATH, DTHEMEPATH, $componentDir);
+            $defaultComponentDir = str_replace(
+                THEMEPATH,
+                DTHEMEPATH,
+                $componentDir
+            );
             if ($defaultComponentDir !== $componentDir) {
-                foreach (glob($defaultComponentDir.'/*.html') as $metaFile) {
+                foreach (glob($defaultComponentDir . '/*.html') as $metaFile) {
                     $metaName = pathinfo($metaFile, PATHINFO_FILENAME);
                     $metaContent = file_get_contents($metaFile);
                     $this->checkextended($metaContent, $metaName);
-                    if (! isset($meta[$metaName])) {
+                    if (!isset($meta[$metaName])) {
                         $meta[$metaName] = $metaContent;
                     }
                 }
@@ -313,11 +326,15 @@ class PAGE
         $meta = array_shift($args);
         $this->processqueue($meta);
         $r = vsprintf(
-            str_replace(['<%', '%>'], ['<%%', '%%>'], $this->userMetaDefs[$meta] ?? $this->metadefs[$meta] ?? ''),
+            str_replace(
+                array('<%', '%>'),
+                array('<%%', '%%>'),
+                $this->userMetaDefs[$meta] ?? $this->metadefs[$meta] ?? '',
+            ),
             isset($args[0]) && is_array($args[0]) ? $args[0] : $args
         );
-        if ($r === false) {
-            exit($meta.' has too many arguments');
+        if (false === $r) {
+            die($meta . ' has too many arguments');
         }
         if (
             isset($this->moreFormatting[$meta])
@@ -333,14 +350,17 @@ class PAGE
     {
         return preg_replace_callback(
             '@{if ([^}]+)}(.*){/if}@Us',
-            [$this, 'metaextendedifcb'],
+            array(
+                $this,
+                'metaextendedifcb',
+            ),
             $this->filtervars($m)
         );
     }
 
     public function metaextendedifcb($m)
     {
-        if (mb_strpos($m[1], '||') !== false) {
+        if (false !== mb_strpos($m[1], '||')) {
             $s = '||';
         } else {
             $s = '&&';
@@ -367,10 +387,10 @@ class PAGE
                     $c = $pp[1] < $pp[3];
                     break;
             }
-            if ($s == '&&' && ! $c) {
+            if ('&&' == $s && !$c) {
                 break;
             }
-            if ($s == '||' && $c) {
+            if ('||' == $s && $c) {
                 break;
             }
         }
@@ -383,7 +403,7 @@ class PAGE
 
     public function checkextended($data, $meta = null)
     {
-        if (mb_strpos($data, '{if ') !== false) {
+        if (false !== mb_strpos($data, '{if ')) {
             if ($meta) {
                 $this->moreFormatting[$meta] = true;
             } else {
@@ -403,10 +423,10 @@ class PAGE
     public function path($a)
     {
         if (
-            ! isset($this->parts['path'])
-            || ! is_array($this->parts['path'])
+            !isset($this->parts['path'])
+            || !is_array($this->parts['path'])
         ) {
-            $this->parts['path'] = [];
+            $this->parts['path'] = array();
         }
         $empty = empty($this->parts['path']);
         foreach ($a as $value => $link) {
@@ -444,7 +464,7 @@ class PAGE
     public function debug($data = '')
     {
         if ($data) {
-            $this->debuginfo .= $data.'<br />';
+            $this->debuginfo .= $data . '<br />';
         } else {
             return $this->debuginfo;
         }

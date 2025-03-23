@@ -2,26 +2,24 @@
 
 class PAGE
 {
-    public $CFG = [];
-
-    public $parts = [];
-
-    public $partparts = [];
+    public $CFG = array();
+    public $parts = array();
+    public $partparts = array();
 
     /**
      * Constructor for the PAGE object
      */
     public function __construct()
     {
-        $this->parts = [
+        $this->parts = array(
             'title' => '',
             'sidebar' => '',
-            'content' => '',
-        ];
-        $this->partparts = [
+            'content' => ''
+        );
+        $this->partparts = array(
             'nav' => '',
-            'navdropdowns' => '',
-        ];
+            'navdropdowns' => ''
+        );
     }
 
     /**
@@ -31,36 +29,38 @@ class PAGE
      * @param string $page  The URL the button links to
      * @param array  $menu  A list of links and associated labels to print
      *                      out as a drop down list
+     *
+     * @return void
      */
     public function addNavmenu($title, $page, $menu)
     {
         $this->partparts['nav'] .= $this->parseTemplate(
             'nav-link.html',
-            [
+            array(
                 'page' => $page,
                 'class' => mb_strtolower($title),
                 'title' => $title,
-            ]
-        ).PHP_EOL;
+            )
+        ) . PHP_EOL;
 
         $navDropdownLinksTemplate = '';
         foreach ($menu as $menu_url => $menu_title) {
             $navDropdownLinksTemplate .= $this->parseTemplate(
                 'nav-dropdown-link.html',
-                [
+                array(
                     'url' => $menu_url,
                     'title' => $menu_title,
-                ]
-            ).PHP_EOL;
+                )
+            ) . PHP_EOL;
         }
 
         $this->partparts['navdropdowns'] .= $this->parseTemplate(
             'nav-dropdown.html',
-            [
-                'dropdown_id' => 'menu_'.mb_strtolower($title),
+            array(
+                'dropdown_id' => 'menu_' . mb_strtolower($title),
                 'dropdown_links' => $navDropdownLinksTemplate,
-            ]
-        ).PHP_EOL;
+            )
+        ) . PHP_EOL;
     }
 
     public function append($a, $b)
@@ -71,9 +71,12 @@ class PAGE
     public function sidebar($sidebar)
     {
         if ($sidebar) {
-            $this->parts['sidebar'] = $this->parseTemplate('sidebar.html', [
+            $this->parts['sidebar'] = $this->parseTemplate(
+                'sidebar.html',
+                array(
                     'content' => $sidebar,
-                ]);
+                )
+            );
         } else {
             $this->parts['sidebar'] = '';
         }
@@ -88,10 +91,10 @@ class PAGE
     {
         $this->parts['content'] .= $this->parseTemplate(
             'content-box.html',
-            [
+            array(
                 'title' => $title,
                 'content' => $content,
-            ]
+            )
         );
     }
 
@@ -99,45 +102,57 @@ class PAGE
     {
         $data = $this->parts;
 
-        if (! isset($this->partparts['nav'])) {
+        if (!isset($this->partparts['nav'])) {
             $this->partparts['nav'] = '';
         }
-        if (! isset($this->partparts['navdropdowns'])) {
+        if (!isset($this->partparts['navdropdowns'])) {
             $this->partparts['navdropdowns'] = '';
         }
 
         $data['nav'] = $this->parseTemplate(
             'nav.html',
-            [
+            array(
                 'nav' => $this->partparts['nav'],
                 'nav_dropdowns' => $this->partparts['navdropdowns'],
-            ]
+            )
         );
-        $data['css_url'] = BOARDURL.'acp/css/css.css';
-        $data['bbcode_css_url'] = BOARDURL.'Service/Themes/Default/bbcode.css';
-        $data['themes_css_url'] = BOARDURL.'acp/css/themes.css';
-        $data['admin_js_url'] = BOARDURL.'dist/acp.js';
+        $data['css_url'] = BOARDURL . 'acp/css/css.css';
+        $data['bbcode_css_url'] = BOARDURL . 'Service/Themes/Default/bbcode.css';
+        $data['themes_css_url'] = BOARDURL . 'acp/css/themes.css';
+        $data['admin_js_url'] = BOARDURL . 'dist/acp.js';
 
-        echo $this->parseTemplate('admin.html', $data);
+        echo $this->parseTemplate(
+            'admin.html',
+            $data
+        );
     }
 
     public function back()
     {
-        return $this->parseTemplate('back.html', []);
+        return $this->parseTemplate(
+            'back.html',
+            array()
+        );
     }
 
     public function error($a)
     {
-        return $this->parseTemplate('error.html', [
+        return $this->parseTemplate(
+            'error.html',
+            array(
                 'content' => $a,
-            ]);
+            )
+        );
     }
 
     public function success($a)
     {
-        return $this->parseTemplate('success.html', [
+        return $this->parseTemplate(
+            'success.html',
+            array(
                 'content' => $a,
-            ]);
+            )
+        );
     }
 
     public function location($a)
@@ -181,19 +196,19 @@ EOT;
 
     public function writeCFG($data)
     {
-        include BOARDPATH.'config.php';
+        include BOARDPATH . 'config.php';
         foreach ($data as $k => $v) {
             $CFG[$k] = $v;
         }
         $this->CFG = $CFG;
 
-        return $this->writeData(BOARDPATH.'config.php', 'CFG', $this->CFG);
+        return $this->writeData(BOARDPATH . 'config.php', 'CFG', $this->CFG);
     }
 
     public function getCFGSetting($setting)
     {
-        if (! $this->CFG) {
-            include BOARDPATH.'config.php';
+        if (!$this->CFG) {
+            include BOARDPATH . 'config.php';
             $this->CFG = $CFG;
         }
 
@@ -210,12 +225,13 @@ EOT;
      *                              directory.
      * @param array  $data          A key => value array, where {{ key }}
      *                              is replaced by value
+     *
      * @return string Returns the template with the data replaced.
      */
     public function parseTemplate($templateFile, $data = null)
     {
         if (mb_substr($templateFile, 0, 1) !== '/') {
-            $templateFile = JAXBOARDS_ROOT.'/acp/views/'.$templateFile;
+            $templateFile = JAXBOARDS_ROOT . '/acp/views/' . $templateFile;
         }
         if (pathinfo($templateFile, PATHINFO_EXTENSION) !== 'html') {
             if (mb_substr($templateFile, -1) !== '.') {
@@ -231,20 +247,23 @@ EOT;
             } catch (Exception $e) {
                 $fileError = true;
             }
-            if ($template === false) {
+            if (false === $template) {
                 $fileError = true;
             }
         } else {
             $fileError = true;
         }
         if ($fileError) {
-            error_log('Could not open file: '.$templateFile);
-
+            error_log('Could not open file: ' . $templateFile);
             return '';
         }
         if (is_array($data)) {
             foreach ($data as $name => $content) {
-                $template = str_replace('{{ '.mb_strtolower($name).' }}', $content, $template);
+                $template = str_replace(
+                    '{{ ' . mb_strtolower($name) . ' }}',
+                    $content,
+                    $template
+                );
             }
         }
 

@@ -5,7 +5,6 @@ new members();
 class members
 {
     public $page = 0;
-
     public $perpage = 0;
 
     public function __construct()
@@ -20,7 +19,7 @@ class members
         ) {
             $this->page = $JAX->b['page'] - 1;
         }
-        if (! $PAGE->jsupdate) {
+        if (!$PAGE->jsupdate) {
             $this->showmemberlist();
         }
     }
@@ -28,17 +27,17 @@ class members
     public function showmemberlist()
     {
         global $PAGE,$DB,$JAX;
-        $vars = [
+        $vars = array(
             'display_name' => 'Name',
             'g_title' => 'Group',
             'id' => 'ID',
             'posts' => 'Posts',
-        ];
+        );
 
         $page = '';
 
         $sortby = 'm.`display_name`';
-        $sorthow = (isset($JAX->b['how']) && $JAX->b['how'] == 'DESC')
+        $sorthow = (isset($JAX->b['how']) && 'DESC' == $JAX->b['how'])
             ? 'DESC' : 'ASC';
         $where = '';
         if (
@@ -47,8 +46,8 @@ class members
         ) {
             $sortby = $JAX->b['sortby'];
         }
-        if (isset($JAX->g['filter']) && $JAX->g['filter'] == 'staff') {
-            $sortby = 'g.`can_access_acp` DESC ,'.$sortby;
+        if (isset($JAX->g['filter']) && 'staff' == $JAX->g['filter']) {
+            $sortby = 'g.`can_access_acp` DESC ,' . $sortby;
             $where = 'WHERE g.`can_access_acp`=1 OR g.`can_moderate`=1';
         }
 
@@ -89,9 +88,8 @@ class members
                {$where}
                ORDER BY {$sortby} {$sorthow}
                LIMIT ?, ?
-               EOT
-,
-            ['members', 'member_groups'],
+               EOT,
+            array('members', 'member_groups'),
             ($this->page * $this->perpage),
             $this->perpage
         );
@@ -106,59 +104,67 @@ class members
                    ON g.id=m.group_id
                {$where}
                
-               EOT
-,
-            ['members', 'member_groups']
+               EOT,
+            array('members', 'member_groups')
         );
         $thisrow = $DB->arow($nummemberquery);
         $nummembers = $thisrow['num_members'];
 
-        $pagesArray = $JAX->pages(ceil($nummembers / $this->perpage), $this->page + 1, $this->perpage);
+        $pagesArray = $JAX->pages(
+            ceil($nummembers / $this->perpage),
+            $this->page + 1,
+            $this->perpage
+        );
         foreach ($pagesArray as $v) {
-            $pages .= "<a href='?act=members&amp;sortby=".
-                "{$sortby}&amp;how={$sorthow}&amp;page={$v}'".
-                ($v - 1 == $this->page ? ' class="active"' : '').">{$v}</a> ";
+            $pages .= "<a href='?act=members&amp;sortby=" .
+                "{$sortby}&amp;how={$sorthow}&amp;page={$v}'" .
+                ($v - 1 == $this->page ? ' class="active"' : '') . ">{$v}</a> ";
         }
-        $url = '?act=members'.
-            ($this->page ? '&page='.($this->page + 1) : '').
+        $url = '?act=members' .
+            ($this->page ? '&page=' . ($this->page + 1) : '') .
             ((isset($JAX->g['filter']) && $JAX->g['filter'])
-            ? '&filter='.$JAX->g['filter'] : '');
-        $links = [];
+            ? '&filter=' . $JAX->g['filter'] : '');
+        $links = array();
         foreach ($vars as $k => $v) {
-            $links[] = "<a href=\"{$url}&amp;sortby={$k}".
-            ($sortby == $k ? ($sorthow == 'ASC' ? '&amp;how=DESC' : '').
-                '" class="sort'.($sorthow == 'DESC' ? ' desc' : '') : '').
+            $links[] = "<a href=\"{$url}&amp;sortby={$k}" .
+            ($sortby == $k ? ('ASC' == $sorthow ? '&amp;how=DESC' : '') .
+                '" class="sort' . ('DESC' == $sorthow ? ' desc' : '') : '') .
                 "\">{$v}</a>";
         }
         foreach ($memberarray as $f) {
             $contactdetails = '';
-            $contactUrls = [
-                'skype' => 'skype:%s',
-                'discord' => 'discord:%s',
-                'yim' => 'ymsgr:sendim?%s',
-                'msn' => 'msnim:chat?contact=%s',
-                'googlechat' => 'gtalk:chat?jid=%s',
-                'aim' => 'aim:goaim?screenname=%s',
-                'youtube' => 'https://youtube.com/%s',
-                'steam' => 'https://steamcommunity.com/id/%s',
-                'twitter' => 'https://twitter.com/%s',
-                'bluesky' => 'https://bsky.app/profile/%s.bsky.social',
-            ];
+            $contactUrls = array(
+            'skype' => 'skype:%s',
+            'discord' => 'discord:%s',
+            'yim' => 'ymsgr:sendim?%s',
+            'msn' => 'msnim:chat?contact=%s',
+            'googlechat' => 'gtalk:chat?jid=%s',
+            'aim' => 'aim:goaim?screenname=%s',
+            'youtube' => 'https://youtube.com/%s',
+            'steam' => 'https://steamcommunity.com/id/%s',
+            'twitter' => 'https://twitter.com/%s',
+            'bluesky' => 'https://bsky.app/profile/%s.bsky.social'
+            );
             foreach ($contactUrls as $k => $v) {
-                if ($f['contact_'.$k]) {
-                    $contactdetails .= '<a class="'.$k.' contact" href="'.
-                        sprintf($v, $JAX->blockhtml($f['contact_'.$k])).
-                        '" title="'.$k.' contact">&nbsp;</a>';
+                if ($f['contact_' . $k]) {
+                    $contactdetails .= '<a class="' . $k . ' contact" href="' .
+                        sprintf($v, $JAX->blockhtml($f['contact_' . $k])) .
+                        '" title="' . $k . ' contact">&nbsp;</a>';
                 }
             }
-            $contactdetails .= '<a title="PM this member" class="pm contact" '.
-                'href="?act=ucp&amp;what=inbox&amp;page=compose&amp;mid='.
-                $f['id'].'"></a>';
+            $contactdetails .= '<a title="PM this member" class="pm contact" ' .
+                'href="?act=ucp&amp;what=inbox&amp;page=compose&amp;mid=' .
+                $f['id'] . '"></a>';
             $page .= $PAGE->meta(
                 'members-row',
                 $f['id'],
                 $JAX->pick($f['avatar'], $PAGE->meta('default-avatar')),
-                $PAGE->meta('user-link', $f['id'], $f['group_id'], $f['display_name']),
+                $PAGE->meta(
+                    'user-link',
+                    $f['id'],
+                    $f['group_id'],
+                    $f['display_name']
+                ),
                 $f['g_title'],
                 $f['id'],
                 $f['posts'],
@@ -166,10 +172,22 @@ class members
                 $contactdetails
             );
         }
-        $page = $PAGE->meta('members-table', $links[0], $links[1], $links[2], $links[3], $page);
-        $page = "<div class='pages pages-top'>{$pages}</div>".
-            $PAGE->meta('box', ' id="memberlist"', 'Members', $page).
-            "<div class='pages pages-bottom'>{$pages}</div>".
+        $page = $PAGE->meta(
+            'members-table',
+            $links[0],
+            $links[1],
+            $links[2],
+            $links[3],
+            $page
+        );
+        $page = "<div class='pages pages-top'>{$pages}</div>" .
+            $PAGE->meta(
+                'box',
+                ' id="memberlist"',
+                'Members',
+                $page
+            ) .
+            "<div class='pages pages-bottom'>{$pages}</div>" .
             "<div class='clear'></div>";
         $PAGE->JS('update', 'page', $page);
         $PAGE->append('PAGE', $page);

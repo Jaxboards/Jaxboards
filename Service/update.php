@@ -5,40 +5,50 @@
  *
  * PHP Version 5.3.0
  *
+ * @category Jaxboards
+ * @package  Jaxboards
+ *
+ * @author  World's Tallest Ladder <wtl420@users.noreply.github.com>
  * @license MIT <https://opensource.org/licenses/MIT>
  *
  * @link https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
-if (! defined('JAXBOARDS_ROOT')) {
+
+if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', dirname(__DIR__));
 }
-if (! defined('SERVICE_ROOT')) {
+if (!defined('SERVICE_ROOT')) {
     define('SERVICE_ROOT', __DIR__);
 }
 
-if (file_exists(SERVICE_ROOT.'/update.lock')) {
-    exit('Update lock file found! Please remove if you wish to install.');
+if (file_exists(SERVICE_ROOT . '/update.lock')) {
+    die('Update lock file found! Please remove if you wish to install.');
 }
 
 // Load mysql classes.
-require_once JAXBOARDS_ROOT.'/inc/classes/mysql.php';
+require_once JAXBOARDS_ROOT . '/inc/classes/mysql.php';
 $DB = new MySQL();
 
 // Get CFG variable.
-require_once JAXBOARDS_ROOT.'/config.php';
+require_once JAXBOARDS_ROOT . '/config.php';
 
-$connected = $DB->connect($CFG['sql_host'], $CFG['sql_username'], $CFG['sql_password'], $CFG['sql_db']);
+$connected = $DB->connect(
+    $CFG['sql_host'],
+    $CFG['sql_username'],
+    $CFG['sql_password'],
+    $CFG['sql_db']
+);
 
-if (! $connected) {
-    exit('There was an error connecting to the MySQL database.');
+if (!$connected) {
+    die('There was an error connecting to the MySQL database.');
 }
 
 $DB->safequery('SET foreign_key_checks = 0;');
 
-$boards = [];
+$boards = array();
 
 if ($CFG['service']) {
-    $queries = [];
+    $queries = array();
     // Copy over `directory` table from `jaxboards_service`
     // if it exists.
     $serviceDB = true;
@@ -47,7 +57,7 @@ if ($CFG['service']) {
     } catch (Exception $e) {
         $serviceDB = false;
     }
-    if ($DB->db !== 'jaxboards_service') {
+    if ('jaxboards_service' !== $DB->db) {
         $serviceDB = false;
     }
     if ($serviceDB) {
@@ -57,18 +67,21 @@ if ($CFG['service']) {
             $table = $table[0];
             if (mb_strpos($table, 'blueprint_') === false) {
                 // Ignore blueprint tables.
-                $result = $DB->safespecial('SHOW CREATE TABLE %t', [$table]);
+                $result = $DB->safespecial(
+                    'SHOW CREATE TABLE %t',
+                    array($table)
+                );
                 $createTableStatement = $DB->row($result);
                 if ($createTableStatement) {
                     $queries[] = "DROP TABLE IF EXISTS `{$table}`;";
-                    $queries[] = array_pop($createTableStatement).';';
+                    $queries[] = array_pop($createTableStatement) . ';';
                     $DB->disposeresult($result);
                     $select = $DB->safeselect('*', $table);
                     while ($row = $DB->arow($select)) {
                         $insert = $DB->buildInsert($row);
                         $columns = $insert[0];
                         $values = $insert[1];
-                        $queries[] = "INSERT INTO `{$table}` ({$columns}) ".
+                        $queries[] = "INSERT INTO `{$table}` ({$columns}) " .
                             "VALUES {$values};";
                     }
                 }
@@ -123,8 +136,8 @@ EOT
     );
     $row = $DB->arow($result);
     $DB->disposeresult($result);
-    if ($row['date_check'] === null) {
-        $queries = [
+    if (null === $row['date_check']) {
+        $queries = array(
             <<<'EOT'
 ALTER TABLE `directory`
     CHANGE `date` `date_tmp` int(11) unsigned NOT NULL AFTER `registrar_ip`,
@@ -140,7 +153,7 @@ EOT
 ALTER TABLE `directory` DROP `date_tmp`;
 EOT
             ,
-        ];
+        );
         foreach ($queries as $query) {
             $result = $DB->safequery($query);
             $DB->disposeresult($DB);
@@ -157,7 +170,7 @@ EOT
     );
     $row = $DB->arow($result);
     $DB->disposeResult($result);
-    if ($row['ip_check'] === null) {
+    if (null === $row['ip_check']) {
         $result = $DB->safequery(
             <<<'EOT'
 UPDATE `directory`
@@ -179,8 +192,8 @@ EOT
     );
     $row = $DB->arow($result);
     $DB->disposeResult($result);
-    if ($row['ip_check'] === null) {
-        $queries = [
+    if (null === $row['ip_check']) {
+        $queries = array(
             <<<'EOT'
 DELETE FROM `banlist`
 WHERE INET6_ATON(`ip`) IS NULL;
@@ -190,10 +203,12 @@ EOT
 UPDATE `banlist`
     SET `ip`=INET6_ATON(`ip`);
 EOT
-            ,
-        ];
+        ,
+        );
         foreach ($queries as $query) {
-            $result = $DB->safequery($query);
+            $result = $DB->safequery(
+                $query
+            );
             $DB->disposeresult($result);
         }
     }
@@ -203,8 +218,9 @@ EOT
     $createTableStatement = $DB->row($result);
     $createTableStatement = array_pop($createTableStatement);
     $DB->disposeresult($result);
-    if (! preg_match("/KEY\s+`boardname`/i", $createTableStatement)) {
-        $result = $DB->safequery(<<<'EOT'
+    if (!preg_match("/KEY\s+`boardname`/i", $createTableStatement)) {
+        $result = $DB->safequery(
+            <<<'EOT'
 ALTER TABLE `directory`
     ADD INDEX `boardname` (`boardname`);
 EOT
@@ -215,14 +231,16 @@ EOT
     $createTableStatement = $DB->row($result);
     $createTableStatement = array_pop($createTableStatement);
     $DB->disposeresult($result);
-    if (! preg_match("/UNIQUE\s+`ip`/i", $createTableStatement)) {
-        $result = $DB->safequery(<<<'EOT'
+    if (!preg_match("/UNIQUE\s+`ip`/i", $createTableStatement)) {
+        $result = $DB->safequery(
+            <<<'EOT'
 ALTER TABLE `banlist`
     ADD UNIQUE `banlist` (`banlist`);
 EOT
         );
         $DB->disposeresult($result);
     }
+
 
     $result = $DB->safequery('SELECT `boardname` AS `board` FROM `directory`;');
     while ($row = $DB->arow($result)) {
@@ -234,27 +252,76 @@ EOT
 }
 
 // Data to fix.
-$deleteIfFalse = [
-    'activity' => ['uid'],
-    'files' => ['name', 'hash'],
-    'members' => ['name'],
-    'member_groups' => ['title'],
-    'messages' => ['title', 'message'],
-    'pages' => ['act'],
-    'posts' => ['post', 'tid'],
-    'profile_comments' => ['to', 'from', 'comment'],
-    'ratingniblets' => ['img', 'title'],
-    'reports' => ['reason', 'status'],
-    'shouts' => ['shout'],
-    'skins' => ['title'],
-    'textrules' => ['type', 'needle', 'replacement'],
-    'topics' => ['title'],
-];
-$nullToString = [
-    'activity' => ['arg1', 'arg2'],
-    'forums' => ['subtitle', 'lp_topic', 'path', 'redirect', 'perms', 'mods'],
-    'logs' => ['data'],
-    'members' => [
+$deleteIfFalse = array(
+    'activity' => array(
+        'uid',
+    ),
+    'files' => array(
+        'name',
+        'hash',
+    ),
+    'members' => array(
+        'name',
+    ),
+    'member_groups' => array(
+        'title',
+    ),
+    'messages' => array(
+        'title',
+        'message',
+    ),
+    'pages' => array(
+        'act',
+    ),
+    'posts' => array(
+        'post',
+        'tid',
+    ),
+    'profile_comments' => array(
+        'to',
+        'from',
+        'comment',
+    ),
+    'ratingniblets' => array(
+        'img',
+        'title',
+    ),
+    'reports' => array(
+        'reason',
+        'status',
+    ),
+    'shouts' => array(
+        'shout',
+    ),
+    'skins' => array(
+        'title',
+    ),
+    'textrules' => array(
+        'type',
+        'needle',
+        'replacement',
+    ),
+    'topics' => array(
+        'title',
+    ),
+);
+$nullToString = array(
+    'activity' => array(
+        'arg1',
+        'arg2',
+    ),
+    'forums' => array(
+        'subtitle',
+        'lp_topic',
+        'path',
+        'redirect',
+        'perms',
+        'mods',
+    ),
+    'logs' => array(
+        'data',
+    ),
+    'members' => array(
         'pass',
         'email',
         'sig',
@@ -275,11 +342,17 @@ $nullToString = [
         'enemies',
         'ucpnotepad',
         'contact_twitter',
-    ],
-    'member_groups' => ['icon'],
-    'pages' => ['page'],
-    'posts' => ['rating'],
-    'session' => [
+    ),
+    'member_groups' => array(
+        'icon',
+    ),
+    'pages' => array(
+        'page',
+    ),
+    'posts' => array(
+        'rating',
+    ),
+    'session' => array(
         'vars',
         'runonce',
         'location',
@@ -289,14 +362,28 @@ $nullToString = [
         'useragent',
         'forumsread',
         'topicsread',
-    ],
-    'skins' => ['wrapper'],
-    'topics' => ['subtitle', 'poll_choices', 'poll_results', 'poll_q', 'polL_type', 'summary'],
-];
-$nullToInt = [
-    'categories' => ['order'],
-    'files' => ['size', 'ip'],
-    'forums' => [
+    ),
+    'skins' => array(
+        'wrapper',
+    ),
+    'topics' => array(
+        'subtitle',
+        'poll_choices',
+        'poll_results',
+        'poll_q',
+        'polL_type',
+        'summary',
+    ),
+);
+$nullToInt = array(
+    'categories' => array(
+        'order',
+    ),
+    'files' => array(
+        'size',
+        'ip',
+    ),
+    'forums' => array(
         'show_sub',
         'topics',
         'posts',
@@ -306,9 +393,13 @@ $nullToInt = [
         'redirects',
         'trashcan',
         'show_ledby',
-    ],
-    'logs' => ['code', 'ip', 'action'],
-    'members' => [
+    ),
+    'logs' => array(
+        'code',
+        'ip',
+        'action',
+    ),
+    'members' => array(
         'posts',
         'sound_shout',
         'sound_im',
@@ -323,8 +414,8 @@ $nullToInt = [
         'ip',
         'mod',
         'wysiwyg',
-    ],
-    'member_groups' => [
+    ),
+    'member_groups' => array(
         'can_post',
         'can_edit_posts',
         'can_post_topics',
@@ -352,34 +443,103 @@ $nullToInt = [
         'can_view_shoutbox',
         'can_view_stats',
         'legend',
-    ],
-    'messages' => ['read', 'del_recipient', 'del_sender', 'flag'],
-    'posts' => ['showsig', 'showemotes', 'newtopic', 'ip'],
-    'session' => ['ip', 'is_bot', 'hide'],
-    'shouts' => ['ip'],
-    'skins' => ['using', 'custom', 'default', 'hidden'],
-    'stats' => ['posts', 'topics', 'members', 'most_members', 'most_members_day'],
-    'textrules' => ['enabled'],
-    'topics' => ['replies', 'views', 'pinned', 'locked', 'cal_event'],
-];
-$intToNull = [
-    'activity' => ['affected_uid', 'tid', 'pid'],
-    'files' => ['uid'],
-    'forums' => ['cat_id', 'lp_uid', 'lp_tid'],
-    'logs' => ['uid'],
-    'members' => ['group_id', 'skin_id'],
-    'messages' => ['to', 'from'],
-    'posts' => ['auth_id', 'editby'],
-    'reports' => ['reporter'],
-    'session' => ['uid'],
-    'shouts' => ['uid'],
-    'stats' => ['last_register'],
-    'topics' => ['lp_uid', 'fid', 'auth_id', 'op'],
-];
+    ),
+    'messages' => array(
+        'read',
+        'del_recipient',
+        'del_sender',
+        'flag',
+    ),
+    'posts' => array(
+        'showsig',
+        'showemotes',
+        'newtopic',
+        'ip',
+    ),
+    'session' => array(
+        'ip',
+        'is_bot',
+        'hide',
+    ),
+    'shouts' => array(
+        'ip',
+    ),
+    'skins' => array(
+        'using',
+        'custom',
+        'default',
+        'hidden',
+    ),
+    'stats' => array(
+        'posts',
+        'topics',
+        'members',
+        'most_members',
+        'most_members_day',
+    ),
+    'textrules' => array(
+        'enabled',
+    ),
+    'topics' => array(
+        'replies',
+        'views',
+        'pinned',
+        'locked',
+        'cal_event',
+    ),
+);
+$intToNull = array(
+    'activity' => array(
+        'affected_uid',
+        'tid',
+        'pid',
+    ),
+    'files' => array(
+        'uid',
+    ),
+    'forums' => array(
+        'cat_id',
+        'lp_uid',
+        'lp_tid',
+    ),
+    'logs' => array(
+        'uid',
+    ),
+    'members' => array(
+        'group_id',
+        'skin_id',
+    ),
+    'messages' => array(
+        'to',
+        'from',
+    ),
+    'posts' => array(
+        'auth_id',
+        'editby',
+    ),
+    'reports' => array(
+        'reporter',
+    ),
+    'session' => array(
+        'uid',
+    ),
+    'shouts' => array(
+        'uid',
+    ),
+    'stats' => array(
+        'last_register',
+    ),
+    'topics' => array(
+        'lp_uid',
+        'fid',
+        'auth_id',
+        'op',
+    ),
+);
 // Order matters here, don't re-arrange unless you know what you're doing.
-$fixForeignKeyRelations = [
-    'members' => [
-        'group_id' => [
+$fixForeignKeyRelations = array(
+    'members' => array(
+        'group_id' => array(
             'table' => 'member_groups',
             'column' => 'id',
             'type' => 'null',
@@ -389,8 +549,8 @@ ADD FOREIGN KEY (`group_id`) REFERENCES `blueprint_member_groups` (`id`)
     ON DELETE SET NULL;
 EOT
             ,
-        ],
-        'skin_id' => [
+        ),
+        'skin_id' => array(
             'table' => 'skins',
             'column' => 'id',
             'type' => 'null',
@@ -400,10 +560,10 @@ ADD FOREIGN KEY (`skin_id`) REFERENCES `blueprint_skins` (`id`)
     ON DELETE SET NULL;
 EOT
             ,
-        ],
-    ],
-    'forums' => [
-        'cat_id' => [
+        ),
+    ),
+    'forums' => array(
+        'cat_id' => array(
             'table' => 'categories',
             'column' => 'id',
             'type' => 'null',
@@ -413,8 +573,8 @@ ADD FOREIGN KEY (`cat_id`) REFERENCES `blueprint_categories` (`id`)
     ON DELETE SET NULL;
 EOT
             ,
-        ],
-        'lp_uid' => [
+        ),
+        'lp_uid' => array(
             'table' => 'members',
             'column' => 'id',
             'type' => 'null',
@@ -424,8 +584,8 @@ ADD FOREIGN KEY (`lp_uid`) REFERENCES `blueprint_members` (`id`)
      ON DELETE SET NULL;
 EOT
             ,
-        ],
-        'lp_tid' => [
+        ),
+        'lp_tid' => array(
             'table' => 'topics',
             'column' => 'id',
             'type' => 'null',
@@ -435,10 +595,10 @@ ADD FOREIGN KEY (`lp_tid`) REFERENCES `blueprint_topics` (`id`)
     ON DELETE SET NULL;
 EOT
             ,
-        ],
-    ],
-    'topics' => [
-        'auth_id' => [
+        ),
+    ),
+    'topics' => array(
+        'auth_id' => array(
             'table' => 'members',
             'column' => 'id',
             'type' => 'null',
@@ -448,8 +608,8 @@ ADD FOREIGN KEY (`auth_id`) REFERENCES `blueprint_members` (`id`)
     ON DELETE SET NULL;
 EOT
             ,
-        ],
-        'fid' => [
+        ),
+        'fid' => array(
             'table' => 'forums',
             'column' => 'id',
             'type' => 'delete',
@@ -458,8 +618,8 @@ ALTER TABLE `blueprint_topics`
 ADD FOREIGN KEY (`fid`) REFERENCES `blueprint_forums` (`id`) ON DELETE CASCADE;
 EOT
             ,
-        ],
-        'lp_uid' => [
+        ),
+        'lp_uid' => array(
             'table' => 'members',
             'column' => 'id',
             'type' => 'null',
@@ -469,8 +629,8 @@ ADD FOREIGN KEY (`lp_uid`) REFERENCES `blueprint_members` (`id`)
     ON DELETE SET NULL;
 EOT
             ,
-        ],
-        'op' => [
+        ),
+        'op' => array(
             'table' => 'posts',
             'column' => 'id',
             'type' => 'null',
@@ -479,10 +639,10 @@ ALTER TABLE `blueprint_topics`
 ADD FOREIGN KEY (`op`) REFERENCES `blueprint_posts` (`id`) ON DELETE SET NULL;
 EOT
             ,
-        ],
-    ],
-    'posts' => [
-        'auth_id' => [
+        ),
+    ),
+    'posts' => array(
+        'auth_id' => array(
             'table' => 'members',
             'column' => 'id',
             'type' => 'null',
@@ -492,8 +652,8 @@ ADD FOREIGN KEY (`auth_id`) REFERENCES `blueprint_members` (`id`)
     ON DELETE SET NULL;
 EOT
             ,
-        ],
-        'tid' => [
+        ),
+        'tid' => array(
             'table' => 'topics',
             'column' => 'id',
             'type' => 'delete',
@@ -502,10 +662,10 @@ ALTER TABLE `blueprint_posts`
 ADD FOREIGN KEY (`tid`) REFERENCES `blueprint_topics` (`id`) ON DELETE CASCADE;
 EOT
             ,
-        ],
-    ],
-    'logs' => [
-        'uid' => [
+        ),
+    ),
+    'logs' => array(
+        'uid' => array(
             'table' => 'members',
             'column' => 'id',
             'type' => 'null',
@@ -514,10 +674,10 @@ ALTER TABLE `blueprint_logs`
 ADD FOREIGN KEY (`uid`) REFERENCES `blueprint_members` (`id`) ON DELETE SET NULL;
 EOT
             ,
-        ],
-    ],
-    'messages' => [
-        'from' => [
+        ),
+    ),
+    'messages' => array(
+        'from' => array(
             'table' => 'members',
             'column' => 'id',
             'type' => 'null',
@@ -526,8 +686,8 @@ ALTER TABLE `blueprint_messages`
 ADD FOREIGN KEY (`from`) REFERENCES `blueprint_members` (`id`) ON DELETE SET NULL;
 EOT
             ,
-        ],
-        'to' => [
+        ),
+        'to' => array(
             'table' => 'members',
             'column' => 'id',
             'type' => 'null',
@@ -536,10 +696,10 @@ ALTER TABLE `blueprint_messages`
 ADD FOREIGN KEY (`to`) REFERENCES `blueprint_members` (`id`) ON DELETE SET NULL;
 EOT
             ,
-        ],
-    ],
-    'profile_comments' => [
-        'from' => [
+        ),
+    ),
+    'profile_comments' => array(
+        'from' => array(
             'table' => 'members',
             'column' => 'id',
             'type' => 'delete',
@@ -548,8 +708,8 @@ ALTER TABLE `blueprint_profile_comments`
 ADD FOREIGN KEY (`from`) REFERENCES `blueprint_members` (`id`) ON DELETE CASCADE;
 EOT
             ,
-        ],
-        'to' => [
+        ),
+        'to' => array(
             'table' => 'members',
             'column' => 'id',
             'type' => 'delete',
@@ -558,10 +718,10 @@ ALTER TABLE `blueprint_profile_comments`
 ADD FOREIGN KEY (`to`) REFERENCES `blueprint_members` (`id`) ON DELETE CASCADE;
 EOT
             ,
-        ],
-    ],
-    'reports' => [
-        'reporter' => [
+        ),
+    ),
+    'reports' => array(
+        'reporter' => array(
             'table' => 'members',
             'column' => 'id',
             'type' => 'null',
@@ -571,10 +731,10 @@ ADD FOREIGN KEY (`reporter`) REFERENCES `blueprint_members` (`id`)
     ON DELETE SET NULL;
 EOT
             ,
-        ],
-    ],
-    'session' => [
-        'uid' => [
+        ),
+    ),
+    'session' => array(
+        'uid' => array(
             'table' => 'members',
             'column' => 'id',
             'type' => 'delete',
@@ -583,10 +743,10 @@ ALTER TABLE `blueprint_session`
 ADD FOREIGN KEY (`uid`) REFERENCES `blueprint_members` (`id`) ON DELETE CASCADE;
 EOT
             ,
-        ],
-    ],
-    'shouts' => [
-        'uid' => [
+        ),
+    ),
+    'shouts' => array(
+        'uid' => array(
             'table' => 'members',
             'column' => 'id',
             'type' => 'null',
@@ -595,10 +755,10 @@ ALTER TABLE `blueprint_shouts`
 ADD FOREIGN KEY (`uid`) REFERENCES `blueprint_members` (`id`) ON DELETE CASCADE;
 EOT
             ,
-        ],
-    ],
-    'stats' => [
-        'last_register' => [
+        ),
+    ),
+    'stats' => array(
+        'last_register' => array(
             'table' => 'members',
             'column' => 'id',
             'type' => 'null',
@@ -608,10 +768,10 @@ ADD FOREIGN KEY (`last_register`) REFERENCES `blueprint_members` (`id`)
     ON DELETE SET NULL;
 EOT
             ,
-        ],
-    ],
-    'files' => [
-        'uid' => [
+        ),
+    ),
+    'files' => array(
+        'uid' => array(
             'table' => 'members',
             'column' => 'id',
             'type' => 'null',
@@ -620,10 +780,10 @@ ALTER TABLE `blueprint_files`
 ADD FOREIGN KEY (`uid`) REFERENCES `blueprint_members` (`id`) ON DELETE SET NULL;
 EOT
             ,
-        ],
-    ],
-    'activity' => [
-        'affected_uid' => [
+        ),
+    ),
+    'activity' => array(
+        'affected_uid' => array(
             'table' => 'members',
             'column' => 'id',
             'type' => 'delete',
@@ -633,8 +793,8 @@ ADD FOREIGN KEY (`affected_uid`) REFERENCES `blueprint_members` (`id`)
     ON DELETE CASCADE;
 EOT
             ,
-        ],
-        'pid' => [
+        ),
+        'pid' => array(
             'table' => 'posts',
             'column' => 'id',
             'type' => 'delete',
@@ -643,8 +803,8 @@ ALTER TABLE `blueprint_activity`
 ADD FOREIGN KEY (`pid`) REFERENCES `blueprint_posts` (`id`) ON DELETE CASCADE;
 EOT
             ,
-        ],
-        'tid' => [
+        ),
+        'tid' => array(
             'table' => 'topics',
             'column' => 'id',
             'type' => 'delete',
@@ -653,8 +813,8 @@ ALTER TABLE `blueprint_activity`
 ADD FOREIGN KEY (`tid`) REFERENCES `blueprint_topics` (`id`) ON DELETE CASCADE;
 EOT
             ,
-        ],
-        'uid' => [
+        ),
+        'uid' => array(
             'table' => 'members',
             'column' => 'id',
             'type' => 'delete',
@@ -663,110 +823,111 @@ ALTER TABLE `blueprint_activity`
 ADD FOREIGN KEY (`uid`) REFERENCES `blueprint_members` (`id`) ON DELETE CASCADE;
 EOT
             ,
-        ],
-    ],
-];
-$dateFixes = [
-    'activity' => [
-        'date' => [
+        ),
+    ),
+);
+$dateFixes = array(
+    'activity' => array(
+        'date' => array(
             'new' => 'date',
             'pos' => 'uid',
-        ],
-    ],
-    'forums' => [
-        'lp_date' => [
+        ),
+    ),
+    'forums' => array(
+        'lp_date' => array(
             'new' => 'lp_date',
             'pos' => 'lp_uid',
-        ],
-    ],
-    'members' => [
-        'join_date' => [
+        ),
+    ),
+    'members' => array(
+        'join_date' => array(
             'new' => 'join_date',
             'pos' => 'usertitle',
-        ],
-        'last_visit' => [
+        ),
+        'last_visit' => array(
             'new' => 'last_visit',
             'pos' => 'join_date',
-        ],
-    ],
-    'messages' => [
-        'date' => [
+        ),
+    ),
+    'messages' => array(
+        'date' => array(
             'new' => 'date',
             'pos' => 'read',
-        ],
-    ],
-    'posts' => [
-        'date' => [
+        ),
+    ),
+    'posts' => array(
+        'date' => array(
             'new' => 'date',
             'pos' => 'post',
-        ],
-        'editdate' => [
+        ),
+        'editdate' => array(
             'new' => 'edit_date',
             'pos' => 'ip',
-        ],
-    ],
-    'profile_comments' => [
-        'date' => [
+        ),
+    ),
+    'profile_comments' => array(
+        'date' => array(
             'new' => 'date',
             'pos' => 'comment',
-        ],
-    ],
-    'reports' => [
-        'time' => [
+        ),
+    ),
+    'reports' => array(
+        'time' => array(
             'new' => 'date',
             'pos' => 'reason',
-        ],
-    ],
-    'reports' => [
-        'time' => [
+        ),
+    ),
+    'reports' => array(
+        'time' => array(
             'new' => 'date',
             'pos' => 'reason',
-        ],
-    ],
-    'session' => [
-        'last_update' => [
+        ),
+    ),
+    'session' => array(
+        'last_update' => array(
             'new' => 'last_update',
             'pos' => 'vars',
-        ],
-        'last_action' => [
+        ),
+        'last_action' => array(
             'new' => 'last_action',
             'pos' => 'last_update',
-        ],
-        'readtime' => [
+        ),
+        'readtime' => array(
             'new' => 'read_date',
             'pos' => 'topicsread',
-        ],
-    ],
-    'shouts' => [
-        'timestamp' => [
+        ),
+    ),
+    'shouts' => array(
+        'timestamp' => array(
             'new' => 'date',
             'pos' => 'shout',
-        ],
-    ],
-    'topics' => [
-        'date' => [
+        ),
+    ),
+    'topics' => array(
+        'date' => array(
             'new' => 'date',
             'pos' => 'locked',
-        ],
-        'lp_date' => [
+        ),
+        'lp_date' => array(
             'new' => 'lp_date',
             'pos' => 'lp_uid',
-        ],
-    ],
-];
+        ),
+    ),
+);
 
-$ipFixes = [
+$ipFixes = array(
     'files' => 'ip',
     'logs' => 'ip',
     'members' => 'ip',
     'posts' => 'ip',
     'session' => 'ip',
     'shouts' => 'ip',
-];
+);
+
 
 // Update fields.
 foreach ($boards as $board) {
-    $DB->prefix($board.'_');
+    $DB->prefix($board . '_');
     foreach ($deleteIfFalse as $table => $columns) {
         $table = $DB->ftable($table);
         foreach ($columns as $column) {
@@ -785,7 +946,8 @@ EOT
     foreach ($nullToString as $table => $columns) {
         $table = $DB->ftable($table);
         foreach ($columns as $column) {
-            $result = $DB->safequery(<<<EOT
+            $result = $DB->safequery(
+                <<<EOT
 UPDATE {$table}
 SET `{$column}` = ''
 WHERE `{$column}` IS NULL;
@@ -797,7 +959,8 @@ EOT
     foreach ($nullToInt as $table => $columns) {
         $table = $DB->ftable($table);
         foreach ($columns as $column) {
-            $result = $DB->safequery(<<<EOT
+            $result = $DB->safequery(
+                <<<EOT
 UPDATE {$table}
 SET `{$column}` = '0'
 WHERE `{$column}` IS NULL;
@@ -823,7 +986,8 @@ EOT
         );
         $DB->disposeresult($fixresult);
         // Remove all null values.
-        $result = $DB->safequery(<<<EOT
+        $result = $DB->safequery(
+            <<<EOT
 UPDATE {$table}
 SET `sex` = ''
 WHERE `sex` IS NULL;
@@ -843,7 +1007,7 @@ EOT
     }
     $DB->disposeresult($result);
 
-    $queries = [
+    $queries = array(
         <<<'EOT'
 ALTER TABLE `blueprint_activity`
     CHANGE `id` `id` int(11) unsigned NOT NULL AUTO_INCREMENT FIRST,
@@ -1281,7 +1445,7 @@ ALTER TABLE `blueprint_topics`
     ENGINE='InnoDB' COLLATE 'utf8mb4_unicode_ci';
 EOT
         ,
-    ];
+    );
     $table = str_replace('`', "'", $DB->ftable('tokens'));
     $result = $DB->safequery("SHOW TABLES LIKE {$table};");
     if ($DB->num_rows($result) < 1) {
@@ -1302,7 +1466,7 @@ EOT
 EOT;
     }
     foreach ($queries as $query) {
-        $query = str_replace('blueprint_', $board.'_', $query);
+        $query = str_replace('blueprint_', $board . '_', $query);
         $result = $DB->safequery($query);
         $DB->disposeresult($result);
     }
@@ -1312,8 +1476,9 @@ EOT;
     $result = $DB->safequery("SHOW CREATE TABLE {$table}");
     $createTableStatement = $DB->row($result);
     $createTableStatement = array_pop($createTableStatement);
-    if (! preg_match("/KEY\s+`hash`/i", $createTableStatement)) {
-        $result = $DB->safequery(<<<EOT
+    if (!preg_match("/KEY\s+`hash`/i", $createTableStatement)) {
+        $result = $DB->safequery(
+            <<<EOT
 ALTER TABLE {$table}
     ADD INDEX `hash` (`hash`);
 EOT
@@ -1325,7 +1490,7 @@ EOT
     foreach ($dateFixes as $table => $columns) {
         $table = $DB->ftable($table);
         // Get table columns.
-        $tableColumns = [];
+        $tableColumns = array();
         $result = $DB->safequery("DESCRIBE {$table}");
         while ($row = $DB->arow($result)) {
             if (isset($row['Field'])) {
@@ -1333,7 +1498,7 @@ EOT
             }
         }
         foreach ($columns as $old => $info) {
-            if (! in_array($old, $tableColumns)) {
+            if (!in_array($old, $tableColumns)) {
                 // Can't run if table doesn't exist.
                 continue;
             }
@@ -1348,29 +1513,29 @@ EOT
             );
             $row = $DB->arow($result);
             $DB->disposeresult($result);
-            if ($row['date_check'] === null) {
+            if (null === $row['date_check']) {
                 $new = $info['new'];
                 $pos = $info['pos'];
-                $queries = [
+                $queries = array(
                     <<<EOT
-    UPDATE {$table} SET `{$old}` = 0 WHERE `{$old}` IS NULL;
+    UPDATE $table SET `$old` = 0 WHERE `$old` IS NULL;
 EOT
-                    ,
+                ,
                     <<<EOT
-    ALTER TABLE {$table}
-        CHANGE `{$old}` `{$old}_tmp` int(11) unsigned NOT NULL AFTER `{$pos}`,
-        ADD `{$new}` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `{$old}_tmp`;
+    ALTER TABLE $table
+        CHANGE `$old` `{$old}_tmp` int(11) unsigned NOT NULL AFTER `$pos`,
+        ADD `$new` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `{$old}_tmp`;
 EOT
-                    ,
+                ,
                     <<<EOT
-    UPDATE {$table} SET `{$new}`=FROM_UNIXTIME(COALESCE(`{$old}_tmp`, 0));
+    UPDATE $table SET `$new`=FROM_UNIXTIME(COALESCE(`{$old}_tmp`, 0));
 EOT
-                    ,
+                ,
                     <<<EOT
-    ALTER TABLE {$table} DROP `{$old}_tmp`;
+    ALTER TABLE $table DROP `{$old}_tmp`;
 EOT
-                    ,
-                ];
+                ,
+                );
                 foreach ($queries as $query) {
                     $result = $DB->safequery($query);
                     $DB->disposeresult($result);
@@ -1382,7 +1547,7 @@ EOT
     // Birthday field.
     $table = $DB->ftable('members');
     // Get member columns.
-    $columns = [];
+    $columns = array();
     $result = $DB->safequery("DESCRIBE {$table}");
     while ($row = $DB->arow($result)) {
         if (isset($row['Field'])) {
@@ -1394,28 +1559,28 @@ EOT
         in_array('dob_year', $columns)
         && in_array('dob_month', $columns)
         && in_array('dob_day', $columns)
-        && ! in_array('birthdate', $columns)
+        && !in_array('birthdate', $columns)
     ) {
-        $queries = [
+        $queries = array(
             <<<EOT
-    ALTER TABLE {$table}
+    ALTER TABLE $table
         ADD `birthdate` date NOT NULL DEFAULT '0000-00-00' AFTER `dob_year`;
 EOT
-            ,
+        ,
             <<<EOT
-UPDATE {$table} SET `dob_year` = 0 WHERE `dob_year` IS NULL;
+UPDATE $table SET `dob_year` = 0 WHERE `dob_year` IS NULL;
 EOT
-            ,
+        ,
             <<<EOT
-UPDATE {$table} SET `dob_month` = 0 WHERE `dob_month` IS NULL;
+UPDATE $table SET `dob_month` = 0 WHERE `dob_month` IS NULL;
 EOT
-            ,
+        ,
             <<<EOT
-UPDATE {$table} SET `dob_day` = 0 WHERE `dob_day` IS NULL;
+UPDATE $table SET `dob_day` = 0 WHERE `dob_day` IS NULL;
 EOT
-            ,
+        ,
             <<<EOT
-    UPDATE {$table} SET `birthdate`=COALESCE(CONCAT(
+    UPDATE $table SET `birthdate`=COALESCE(CONCAT(
         `dob_year`,
         '-',
         `dob_month`,
@@ -1423,15 +1588,15 @@ EOT
         `dob_day`
     ),FROM_UNIXTIME(0));
 EOT
-            ,
+        ,
             <<<EOT
-    ALTER TABLE {$table}
+    ALTER TABLE $table
         DROP `dob_day`,
         DROP `dob_month`,
         DROP `dob_year`;
 EOT
-            ,
-        ];
+        ,
+        );
         foreach ($queries as $query) {
             $result = $DB->safequery($query);
             $DB->disposeresult($result);
@@ -1450,7 +1615,7 @@ EOT
         );
         $row = $DB->arow($result);
         $DB->disposeResult($result);
-        if ($row['ip_check'] === null) {
+        if (null === $row['ip_check']) {
             $result = $DB->safequery(
                 <<<EOT
 UPDATE {$table} SET `{$column}` = COALESCE(
@@ -1467,7 +1632,8 @@ EOT
     foreach ($intToNull as $table => $columns) {
         $table = $DB->ftable($table);
         foreach ($columns as $column) {
-            $result = $DB->safequery(<<<EOT
+            $result = $DB->safequery(
+                <<<EOT
 UPDATE {$table}
 SET `{$column}` = NULL
 WHERE `{$column}` <= 0;
@@ -1482,13 +1648,15 @@ EOT
     // Fix foreign keys.
     foreach ($fixForeignKeyRelations as $table => $columns) {
         $table = $DB->ftable($table);
-        $result = $DB->safequery("SHOW CREATE TABLE {$table}");
+        $result = $DB->safequery(
+            "SHOW CREATE TABLE {$table}"
+        );
         $createTableStatement = $DB->row($result);
         $createTableStatement = array_pop($createTableStatement);
         $DB->disposeresult($result);
         foreach ($columns as $column => $foreign) {
             $foreign['table'] = $DB->ftable($foreign['table']);
-            if ($foreign['type'] === 'delete') {
+            if ('delete' === $foreign['type']) {
                 $result = $DB->safequery(
                     <<<EOT
 DELETE FROM {$table}
@@ -1499,7 +1667,7 @@ WHERE `{$column}` NOT IN (
 EOT
                 );
                 $DB->disposeresult($result);
-            } elseif ($foreign['type'] === 'null') {
+            } elseif ('null' === $foreign['type']) {
                 $result = $DB->safequery(
                     <<<EOT
 UPDATE {$table}
@@ -1513,13 +1681,19 @@ EOT
                 $DB->disposeresult($result);
             }
             if (
-                ! preg_match(
+                !preg_match(
                     "/FOREIGN\s+KEY\s+\(`{$column}`\)\s+REFERENCES\s+"
-                    ."{$foreign['table']}\s+\(`{$foreign['column']}`\)/i",
+                    . "{$foreign['table']}\s+\(`{$foreign['column']}`\)/i",
                     $createTableStatement
                 )
             ) {
-                $result = $DB->safequery(str_replace('blueprint_', $board.'_', $foreign['query']));
+                $result = $DB->safequery(
+                    str_replace(
+                        'blueprint_',
+                        $board . '_',
+                        $foreign['query']
+                    )
+                );
                 $DB->disposeresult($result);
             }
         }
@@ -1527,6 +1701,6 @@ EOT
 }
 
 // Create lock file.
-$file = fopen(SERVICE_ROOT.'/update.lock', 'w');
+$file = fopen(SERVICE_ROOT . '/update.lock', 'w');
 fwrite($file, '');
 fclose($file);

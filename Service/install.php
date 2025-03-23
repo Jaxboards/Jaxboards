@@ -5,43 +5,51 @@
  *
  * PHP Version 5.3.7
  *
+ * @category Jaxboards
+ * @package  Jaxboards
+ *
+ * @author  Sean Johnson <seanjohnson08@gmail.com>
+ * @author  World's Tallest Ladder <wtl420@users.noreply.github.com>
  * @license MIT <https://opensource.org/licenses/MIT>
  *
  * @link https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
-if (! defined('JAXBOARDS_ROOT')) {
+
+if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', dirname(__DIR__));
 }
-if (! defined('SERVICE_ROOT')) {
+if (!defined('SERVICE_ROOT')) {
     define('SERVICE_ROOT', __DIR__);
 }
 
-if (file_exists(SERVICE_ROOT.'/install.lock')) {
-    exit('Install lock file found! Please remove if you wish to install.');
+if (file_exists(SERVICE_ROOT . '/install.lock')) {
+    die('Install lock file found! Please remove if you wish to install.');
 }
 
-require_once JAXBOARDS_ROOT.'/inc/classes/mysql.php';
-require_once JAXBOARDS_ROOT.'/inc/classes/jax.php';
-require_once JAXBOARDS_ROOT.'/acp/page.php';
+require_once JAXBOARDS_ROOT . '/inc/classes/mysql.php';
+require_once JAXBOARDS_ROOT . '/inc/classes/jax.php';
+require_once JAXBOARDS_ROOT . '/acp/page.php';
 // Get default CFG.
-require_once JAXBOARDS_ROOT.'/config.default.php';
+require_once JAXBOARDS_ROOT . '/config.default.php';
 
 /**
  * Recursively copies one directory to another.
  *
  * @param string $src The source directory- this must exist already
  * @param string $dst The destination directory- this is assumed to not exist already
+ *
+ * @return void
  */
 function recurseCopy($src, $dst)
 {
     $dir = opendir($src);
     @mkdir($dst);
     while (false !== ($file = readdir($dir))) {
-        if (($file !== '.') && ($file !== '..')) {
-            if (is_dir($src.'/'.$file)) {
-                recurseCopy($src.'/'.$file, $dst.'/'.$file);
+        if (('.' !== $file) && ('..' !== $file)) {
+            if (is_dir($src . '/' . $file)) {
+                recurseCopy($src . '/' . $file, $dst . '/' . $file);
             } else {
-                copy($src.'/'.$file, $dst.'/'.$file);
+                copy($src . '/' . $file, $dst . '/' . $file);
             }
         }
     }
@@ -52,87 +60,98 @@ $JAX = new JAX();
 $DB = new MySQL();
 $PAGE = new PAGE();
 
-$fields = [
-    'domain' => [
+$fields = array(
+    'domain' => array(
         'name' => 'Domain',
         'type' => 'text',
         'placeholder' => 'example.com',
-    ],
-    'sql_host' => [
+    ),
+    'sql_host' => array(
         'name' => 'MySQL Host',
         'type' => 'text',
         'placeholder' => 'localhost',
         'value' => 'localhost',
-    ],
-    'sql_db' => [
+    ),
+    'sql_db' => array(
         'name' => 'MySQL Database',
         'type' => 'text',
         'placeholder' => 'jaxboards',
-    ],
-    'sql_username' => [
+    ),
+    'sql_username' => array(
         'name' => 'MySQL Username',
         'type' => 'text',
         'placeholder' => 'jaxboards',
-    ],
-    'sql_password' => [
+    ),
+    'sql_password' => array(
         'name' => 'MySQL Password',
         'type' => 'password',
-    ],
-    'admin_username' => [
+    ),
+    'admin_username' => array(
         'name' => 'Admin Username',
         'type' => 'text',
         'placeholder' => 'admin',
-    ],
-    'admin_password' => [
+    ),
+    'admin_password' => array(
         'name' => 'Admin Password',
         'type' => 'password',
-    ],
-    'admin_password_2' => [
+    ),
+    'admin_password_2' => array(
         'name' => 'Re-Type Admin Password',
         'type' => 'password',
-    ],
-    'admin_email' => [
+    ),
+    'admin_email' => array(
         'name' => 'Admin Email Address',
         'type' => 'text',
         'placeholder' => 'admin@example.com',
-    ],
-];
+    ),
+);
 
-$errors = [];
+$errors = array();
 
 if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     // Make sure each field is set.
     foreach ($fields as $field => $attributes) {
-        if (! $JAX->p[$field]) {
-            $errors[] = $attributes['name'].' must be filled in.';
+        if (!$JAX->p[$field]) {
+            $errors[] = $attributes['name'] . ' must be filled in.';
         }
     }
-    if ($JAX->p['domain'] && ! parse_url($JAX->p['domain'], PHP_URL_HOST)) {
+    if ($JAX->p['domain'] && !parse_url($JAX->p['domain'], PHP_URL_HOST)) {
         if (
-            preg_match('@[^\\w.]@', $JAX->p['domain'])
+            preg_match(
+                '@[^\\w.]@',
+                $JAX->p['domain']
+            )
         ) {
             $errors[] = 'Invalid domain';
         } else {
             // Looks like we have a proper hostname,
             // just remove the leading www. if it exists.
-            $JAX->p['domain'] = preg_replace('/^www./', '', $JAX->p['domain']);
+            $JAX->p['domain'] = preg_replace(
+                '/^www./',
+                '',
+                $JAX->p['domain']
+            );
         }
     } else {
         // Remove www if it exists, also only grab host if url is entered.
-        $JAX->p['domain'] = preg_replace('/^www./', '', parse_url($JAX->p['domain'], PHP_URL_HOST));
+        $JAX->p['domain'] = preg_replace(
+            '/^www./',
+            '',
+            parse_url($JAX->p['domain'], PHP_URL_HOST)
+        );
     }
     if ($JAX->p['admin_password'] !== $JAX->p['admin_password_2']) {
         $errors[] = 'Admin passwords do not match';
     }
 
-    if (! $JAX->isemail($JAX->p['admin_email'])) {
+    if (!$JAX->isemail($JAX->p['admin_email'])) {
         $errors[] = 'invalid email';
     }
 
     if (mb_strlen($JAX->p['admin_username']) > 50) {
         $errors[] = 'Admin username is too long';
     } elseif (preg_match('@\\W@', $JAX->p['admin_username'])) {
-        $errors[] = 'Admin username needs to consist of letters,'.
+        $errors[] = 'Admin username needs to consist of letters,' .
             'numbers, and underscore only';
     }
 
@@ -146,7 +165,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $JAX->p['sql_db']
     );
 
-    if (! $connected) {
+    if (!$connected) {
         $errors[] = 'There was an error connecting to the MySQL database.';
     }
 
@@ -154,8 +173,8 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         // Update with our settings.
         $CFG['boardname'] = 'Jaxboards';
         $CFG['domain'] = $JAX->p['domain'];
-        $CFG['mail_from'] = $JAX->p['admin_username'].' <'.
-            $JAX->p['admin_email'].'>';
+        $CFG['mail_from'] = $JAX->p['admin_username'] . ' <' .
+            $JAX->p['admin_email'] . '>';
         $CFG['sql_db'] = $JAX->p['sql_db'];
         $CFG['sql_host'] = $JAX->p['sql_host'];
         $CFG['sql_username'] = $JAX->p['sql_username'];
@@ -163,13 +182,17 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $CFG['installed'] = true;
         $CFG['service'] = $service;
         $CFG['prefix'] = $service ? '' : 'jaxboards';
-        $CFG['sql_prefix'] = $CFG['prefix'] ? $CFG['prefix'].'_' : '';
+        $CFG['sql_prefix'] = $CFG['prefix'] ? $CFG['prefix'] . '_' : '';
 
-        $PAGE->writeData(JAXBOARDS_ROOT.'/config.php', 'CFG', $CFG);
+        $PAGE->writeData(
+            JAXBOARDS_ROOT . '/config.php',
+            'CFG',
+            $CFG
+        );
 
         if ($service) {
             // Create directory table.
-            $queries = [
+            $queries = array(
                 'DROP TABLE IF EXISTS `directory`;',
                 <<<'EOT'
 CREATE TABLE `directory` (
@@ -193,26 +216,26 @@ CREATE TABLE `banlist` (
 EOT
                 ,
                 'TRUNCATE `banlist`;',
-            ];
+            );
             foreach ($queries as $query) {
                 $result = $DB->safequery($query);
                 $DB->disposeresult($result);
             }
 
             // Create the text and support boards.
-            $default_boards = [
+            $default_boards = array(
                 'test' => 'Test forums',
                 'support' => 'Support forums',
-            ];
+            );
         } else {
             // Create the board!
-            $default_boards = [
+            $default_boards = array(
                 'jaxboards' => 'Jaxboards',
-            ];
+            );
         }
 
         foreach ($default_boards as $board => $boardname) {
-            $boardPrefix = $board.'_';
+            $boardPrefix = $board . '_';
             $DB->prefix($boardPrefix);
 
             if ($service) {
@@ -220,13 +243,13 @@ EOT
                 // Add board to directory.
                 $DB->safeinsert(
                     'directory',
-                    [
+                    array(
                         'boardname' => $board,
                         'registrar_email' => $JAX->p['admin_email'],
                         'registrar_ip' => $JAX->ip2bin(),
                         'date' => date('Y-m-d H:i:s', time()),
                         'referral' => isset($JAX->b['r']) ? $JAX->b['r'] : '',
-                    ]
+                    )
                 );
                 $DB->prefix($boardPrefix);
             }
@@ -236,10 +259,10 @@ EOT
             // https://stackoverflow.com/a/19752106
             // It's not pretty or perfect but it'll work for our use case...
             $query = '';
-            $lines = file(SERVICE_ROOT.'/blueprint.sql');
+            $lines = file(SERVICE_ROOT . '/blueprint.sql');
             foreach ($lines as $line) {
                 // Skip comments.
-                if (mb_substr($line, 0, 2) == '--' || $line == '') {
+                if ('--' == mb_substr($line, 0, 2) || '' == $line) {
                     continue;
                 }
 
@@ -250,7 +273,7 @@ EOT
                 $query .= $line;
 
                 // If it has a semicolon at the end, it's the end of the query.
-                if (mb_substr(trim($line), -1, 1) == ';') {
+                if (';' == mb_substr(trim($line), -1, 1)) {
                     // Perform the query.
                     $result = $DB->safequery($query);
                     $DB->disposeresult($result);
@@ -262,23 +285,26 @@ EOT
             // Don't forget to create the admin.
             $DB->safeinsert(
                 'members',
-                [
+                array(
                     'name' => $JAX->p['admin_username'],
                     'display_name' => $JAX->p['admin_username'],
-                    'pass' => password_hash($JAX->p['admin_password'], PASSWORD_DEFAULT),
+                    'pass' => password_hash(
+                        $JAX->p['admin_password'],
+                        PASSWORD_DEFAULT
+                    ),
                     'email' => $JAX->p['admin_email'],
                     'sig' => '',
                     'posts' => 0,
                     'group_id' => 2,
                     'join_date' => date('Y-m-d H:i:s', time()),
                     'last_visit' => date('Y-m-d H:i:s', time()),
-                ]
+                )
             );
 
             echo $DB->error();
 
-            @mkdir(JAXBOARDS_ROOT.'/boards');
-            recurseCopy('blueprint', JAXBOARDS_ROOT.'/boards/'.$board);
+            @mkdir(JAXBOARDS_ROOT . '/boards');
+            recurseCopy('blueprint', JAXBOARDS_ROOT . '/boards/' . $board);
         }
 
         // Create lock file.
@@ -286,7 +312,7 @@ EOT
         // fwrite($file, '');
         // fclose($file);
         // Send us to the service page.
-        header('Location: '.dirname($_SERVER['REQUEST_URI']));
+        header('Location: ' . dirname($_SERVER['REQUEST_URI']));
     }
 }
 
@@ -319,16 +345,16 @@ foreach ($errors as $error) {
 <br/>
 <?php
 foreach ($fields as $field => $attributes) {
-    echo "    <label for=\"{$field}\">{$attributes['name']}:</label>".
+    echo "    <label for=\"{$field}\">{$attributes['name']}:</label>" .
         "<input type=\"{$attributes['type']}\"
             name=\"{$field}\" id=\"{$field}\"
-            placeholder=\"".
-            (isset($attributes['placeholder']) ? $attributes['placeholder'] : '').
+            placeholder=\"" .
+            (isset($attributes['placeholder']) ? $attributes['placeholder'] : '') .
             '"
-            value="'.
-            (isset($attributes['value']) ? $attributes['value'] : '').
+            value="' .
+            (isset($attributes['value']) ? $attributes['value'] : '') .
             '"
-        />'.
+        />' .
         '<br />';
 }
 ?>

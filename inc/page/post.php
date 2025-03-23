@@ -10,17 +10,11 @@ new POST();
 class POST
 {
     public $postdata = '';
-
     public $postpreview = '';
-
     public $nopost = true;
-
     public $tid;
-
     public $fid;
-
     public $pid;
-
     public $how;
 
     public function __construct()
@@ -48,25 +42,25 @@ class POST
             isset($_FILES['Filedata'], $_FILES['Filedata']['tmp_name'])
             && $_FILES['Filedata']['tmp_name']
         ) {
-            $JAX->p['postdata'] .= '[attachment]'.
-                $this->upload($_FILES['Filedata']).
+            $JAX->p['postdata'] .= '[attachment]' .
+                $this->upload($_FILES['Filedata']) .
                 '[/attachment]';
         }
         if (
             isset($JAX->p['submit'])
-            && ($JAX->p['submit'] === 'Preview'
-            || $JAX->p['submit'] === 'Full Reply')
+            && ('Preview' === $JAX->p['submit']
+            || 'Full Reply' === $JAX->p['submit'])
         ) {
             $this->showpostform();
             $this->previewpost();
         } elseif ($this->pid && is_numeric($this->pid)) {
             $this->editpost();
-        } elseif (! $this->nopost) {
+        } elseif (!$this->nopost) {
             $this->submitpost();
         } elseif (
             $this->fid && is_numeric($this->fid)
             || $this->tid && is_numeric($this->tid)
-            && $this->how == 'edit'
+            && 'edit' == $this->how
         ) {
             $this->showtopicform();
         } elseif ($this->tid && is_numeric($this->tid)) {
@@ -79,45 +73,50 @@ class POST
     public function upload($fileobj, $uid = false)
     {
         global $CFG,$DB,$USER,$JAX;
-        if ($uid === false) {
+        if (false === $uid) {
             $uid = $USER['id'];
         }
-        if ($uid === false && ! $USER) {
+        if (false === $uid && !$USER) {
             return 'must be logged in';
         }
         $size = filesize($fileobj['tmp_name']);
         $hash = hash_file('sha512', $fileobj['tmp_name']);
-        $uploadpath = BOARDPATH.'Uploads/';
+        $uploadpath = BOARDPATH . 'Uploads/';
 
         $ext = explode('.', $fileobj['name']);
-        if (count($ext) == 1) {
+        if (1 == count($ext)) {
             $ext = '';
         } else {
             $ext = mb_strtolower(array_pop($ext));
         }
-        if (! in_array($ext, $CFG['images'])) {
+        if (!in_array($ext, $CFG['images'])) {
             $ext = '';
         }
         if ($ext) {
-            $ext = '.'.$ext;
+            $ext = '.' . $ext;
         }
 
-        $file = $uploadpath.$hash.$ext;
-        if (! is_file($file)) {
+        $file = $uploadpath . $hash . $ext;
+        if (!is_file($file)) {
             move_uploaded_file($fileobj['tmp_name'], $file);
             $DB->safeinsert(
                 'files',
-                [
+                array(
                     'hash' => $hash,
                     'name' => $fileobj['name'],
                     'uid' => $uid,
                     'size' => $size,
                     'ip' => $JAX->ip2bin(),
-                ]
+                )
             );
             $id = $DB->insert_id(1);
         } else {
-            $result = $DB->safeselect('`id`', 'files', 'WHERE `hash`=?', $hash);
+            $result = $DB->safeselect(
+                '`id`',
+                'files',
+                'WHERE `hash`=?',
+                $hash
+            );
             $thisrow = $DB->arow($result);
             $id = array_pop($thisrow);
             $DB->disposeresult($result);
@@ -135,7 +134,7 @@ class POST
             $post = $PAGE->meta('post-preview', $post);
             $this->postpreview = $post;
         }
-        if (! $PAGE->jsaccess || $this->how === 'qreply') {
+        if (!$PAGE->jsaccess || 'qreply' === $this->how) {
             $this->showpostform();
         }
 
@@ -150,10 +149,10 @@ class POST
             return;
         }
         $postdata = $this->postdata;
-        $page = '<div id="post-preview">'.$this->postpreview.'</div>';
+        $page = '<div id="post-preview">' . $this->postpreview . '</div>';
         $fid = $this->fid;
 
-        if ($this->how == 'edit') {
+        if ('edit' == $this->how) {
             $result = $DB->safeselect(
                 <<<'EOT'
 `id`,`title`,`subtitle`,`lp_uid`,UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,
@@ -169,10 +168,15 @@ EOT
             $tdata = $DB->arow($result);
             $DB->disposeresult($result);
 
-            if (! $tdata) {
+            if (!$tdata) {
                 $e = 'The topic you\'re trying to edit does not exist.';
             } else {
-                $result = $DB->safeselect('`post`', 'posts', 'WHERE `id`=?', $DB->basicvalue($tdata['op']));
+                $result = $DB->safeselect(
+                    '`post`',
+                    'posts',
+                    'WHERE `id`=?',
+                    $DB->basicvalue($tdata['op'])
+                );
                 $postdata = $DB->arow($result);
                 $DB->disposeresult($result);
 
@@ -183,33 +187,41 @@ EOT
             $fid = $tdata['fid'];
         }
 
-        $result = $DB->safeselect('`title`,`perms`', 'forums', 'WHERE `id`=?', $fid);
+        $result = $DB->safeselect(
+            '`title`,`perms`',
+            'forums',
+            'WHERE `id`=?',
+            $fid
+        );
         $fdata = $DB->arow($result);
         $DB->disposeresult($result);
 
-        $fdata['perms'] = $JAX->parsePerms($fdata['perms'], $USER ? $USER['group_id'] : 3);
+        $fdata['perms'] = $JAX->parsePerms(
+            $fdata['perms'],
+            $USER ? $USER['group_id'] : 3
+        );
 
-        if (! $fdata) {
+        if (!$fdata) {
             $e = 'This forum doesn\'t exist. Weird.';
         }
 
         if ($e) {
             $page .= $PAGE->meta('error', $e);
         } else {
-            if (! isset($tdata)) {
-                $tdata = [
+            if (!isset($tdata)) {
+                $tdata = array(
                     'title' => '',
                     'subtitle' => '',
-                ];
+                );
             }
             $form = '<form method="post" data-ajax-form="true"
                 onsubmit="if(this.submitButton.value.match(/post/i)) this.submitButton.disabled=true;">
  <div class="topicform">
  <input type="hidden" name="act" value="post" />
  <input type="hidden" name="how" value="newtopic" />
- <input type="hidden" name="fid" value="'.$fid.'" />
+ <input type="hidden" name="fid" value="' . $fid . '" />
   <label for="ttitle">Topic title:</label>
-<input type="text" name="ttitle" id="ttitle" title="Topic Title" value="'.$tdata['title'].'" />
+<input type="text" name="ttitle" id="ttitle" title="Topic Title" value="' . $tdata['title'] . '" />
 <br>
   <label for="tdesc">Description:</label>
 <input
@@ -217,7 +229,7 @@ EOT
     name="tdesc"
     title="Topic Description (extra information about your topic)"
     type="text"
-    value="'.$tdata['subtitle'].'"
+    value="' . $tdata['subtitle'] . '"
     />
 <br>
   <textarea
@@ -225,10 +237,10 @@ EOT
     id="postdata"
     title="Type your post here"
     class="bbcode-editor"
-    >'.$JAX->blockhtml($postdata).'</textarea>
+    >' . $JAX->blockhtml($postdata) . '</textarea>
 <br><div class="postoptions">
-  '.($fdata['perms']['poll'] ? '<label class="addpoll" for="addpoll">Add a
-Poll</label> <select name="poll_type" title="Add a poll"  onchange="document.querySelector(\'#polloptions\').'.
+  ' . ($fdata['perms']['poll'] ? '<label class="addpoll" for="addpoll">Add a
+Poll</label> <select name="poll_type" title="Add a poll"  onchange="document.querySelector(\'#polloptions\').' .
             'style.display=this.value?\'block\':\'none\'">
 <option value="">No</option>
 <option value="single">Yes, single-choice</option>
@@ -236,20 +248,20 @@ Poll</label> <select name="poll_type" title="Add a poll"  onchange="document.que
   <div id="polloptions" style="display:none">
    <label for="pollq">Poll Question:</label><input type="text" id="pollq" name="pollq" title="Poll Question"/><br>
    <label for="pollc">Poll Choices:</label> (one per line)
-<textarea id="pollc" name="pollchoices" title="Poll Choices"></textarea></div>' : '').
+<textarea id="pollc" name="pollchoices" title="Poll Choices"></textarea></div>' : '') .
             ($fdata['perms']['upload'] ? '<div id="attachfiles" class="addfile">
-   Add Files <input type="file" name="Filedata" title="Browse for file" /></div>' : '').
+   Add Files <input type="file" name="Filedata" title="Browse for file" /></div>' : '') .
             '<div class="buttons"><input type="submit" name="submit"
    value="Post New Topic" title="Submit your post" onclick="this.form.submitButton=this;"
 id="submitbutton" /> <input type="submit" name="submit" value="Preview" title="See a preview of your post"
 onclick="this.form.submitButton=this" /></div>
  </div>
 </form>';
-            $page .= $PAGE->meta('box', '', $fdata['title'].' > New Topic', $form);
+            $page .= $PAGE->meta('box', '', $fdata['title'] . ' > New Topic', $form);
         }
         $PAGE->append('page', $page);
         $PAGE->JS('update', 'page', $page);
-        if (! $e) {
+        if (!$e) {
             if ($fdata['perms']['upload']) {
                 $PAGE->JS('attachfiles');
             }
@@ -262,10 +274,10 @@ onclick="this.form.submitButton=this" /></div>
         global $PAGE,$JAX,$DB,$SESS,$USER;
         $page = '';
         $tid = $this->tid;
-        if ($PAGE->jsupdate && $this->how != 'qreply') {
+        if ($PAGE->jsupdate && 'qreply' != $this->how) {
             return;
         }
-        if ($USER && $this->how == 'qreply') {
+        if ($USER && 'qreply' == $this->how) {
             $PAGE->JS('closewindow', '#qreply');
         }
         if ($tid) {
@@ -278,23 +290,29 @@ LEFT JOIN %t f
 WHERE t.`id`=?
 EOT
                 ,
-                ['topics', 'forums'],
+                array('topics', 'forums'),
                 $DB->basicvalue($tid)
             );
             $tdata = $DB->arow($result);
             $DB->disposeresult($result);
-            if (! $tdata) {
-                $page .= $PAGE->meta('error', "The topic you're attempting to reply in no longer exists.");
+            if (!$tdata) {
+                $page .= $PAGE->meta(
+                    'error',
+                    "The topic you're attempting to reply in no longer exists."
+                );
             }
             $tdata['title'] = $JAX->wordfilter($tdata['title']);
-            $tdata['perms'] = $JAX->parseperms($tdata['perms'], $USER ? $USER['group_id'] : 3);
+            $tdata['perms'] = $JAX->parseperms(
+                $tdata['perms'],
+                $USER ? $USER['group_id'] : 3
+            );
         }
-        $page .= '<div id="post-preview">'.$this->postpreview.'</div>';
+        $page .= '<div id="post-preview">' . $this->postpreview . '</div>';
         $postdata = $JAX->blockhtml($this->postdata);
-        $varsarray = [
+        $varsarray = array(
             'act' => 'post',
             'how' => 'fullpost',
-        ];
+        );
         if ($this->pid) {
             $varsarray['pid'] = $this->pid;
         } else {
@@ -302,7 +320,7 @@ EOT
         }
         $vars = '';
         foreach ($varsarray as $k => $v) {
-            $vars .= '<input type="hidden" name="'.$k.'" value="'.$v.'" />';
+            $vars .= '<input type="hidden" name="' . $k . '" value="' . $v . '" />';
         }
 
         if (isset($SESS->vars['multiquote']) && $SESS->vars['multiquote']) {
@@ -322,31 +340,31 @@ LEFT JOIN %t m
 WHERE p.`id` IN ?
 EOT
                 ,
-                ['posts', 'members'],
+                array('posts', 'members'),
                 $SESS->vars['multiquote']
             );
 
             while ($f = $DB->arow($result)) {
-                $postdata .= '[quote='.$f['name'].']'.$f['post'].'[/quote]'.PHP_EOL;
+                $postdata .= '[quote=' . $f['name'] . ']' . $f['post'] . '[/quote]' . PHP_EOL;
             }
             $SESS->delvar('multiquote');
         }
 
         $form = '<div class="postform">
-<form method="post" data-ajax-form="true" onsubmit="if(this.submitButton.value.match(/post/i)) '.
-            'this.submitButton.disabled=true;" '.
+<form method="post" data-ajax-form="true" onsubmit="if(this.submitButton.value.match(/post/i)) ' .
+            'this.submitButton.disabled=true;" ' .
             'enctype="multipart/form-data">
- '.$vars.'
-  <textarea name="postdata" id="post" title="Type your post here" class="bbcode-editor">'.$postdata.
-        '</textarea><br>'.
+ ' . $vars . '
+  <textarea name="postdata" id="post" title="Type your post here" class="bbcode-editor">' . $postdata .
+        '</textarea><br>' .
         ($tdata['perms']['upload'] ? '<div id="attachfiles">Add Files
-  <input type="file" name="Filedata" title="Browse for file" /></div>' : '').
+  <input type="file" name="Filedata" title="Browse for file" /></div>' : '') .
         '<div class="buttons"><input type="submit" name="submit"
   value="Post" title="Submit your post" onclick="this.form.submitButton=this"
 id="submitbutton"/><input type="submit" name="submit" value="Preview" title="See a preview of your post"
 onclick="this.form.submitButton=this"/></div>
 </form></div>';
-        $page .= $PAGE->meta('box', '', $tdata['title'].' &gt; Reply', $form);
+        $page .= $PAGE->meta('box', '', $tdata['title'] . ' &gt; Reply', $form);
         $PAGE->append('page', $page);
         $PAGE->JS('update', 'page', $page);
         if ($tdata['perms']['upload']) {
@@ -378,7 +396,7 @@ onclick="this.form.submitButton=this"/></div>
         if ($USER['mod']) {
             $result = $DB->safespecial(
                 'SELECT mods FROM %t WHERE id=(SELECT fid FROM %t WHERE id=?)',
-                ['forums', 'topics'],
+                array('forums', 'topics'),
                 $DB->basicvalue($tid)
             );
             $mods = $DB->arow($result);
@@ -397,17 +415,17 @@ onclick="this.form.submitButton=this"/></div>
         $pid = $this->pid;
         $tid = $this->tid;
         $e = '';
-        if (! $pid || ! is_numeric($pid)) {
+        if (!$pid || !is_numeric($pid)) {
             $e = 'Invalid post to edit.';
         }
         if ($this->postdata) {
-            if (! $this->nopost && trim($this->postdata) === '') {
+            if (!$this->nopost && '' === trim($this->postdata)) {
                 $e = "You didn't supply a post!";
             } elseif (mb_strlen($this->postdata) > 65535) {
                 $e = 'Post must not exceed 65,535 bytes.';
             }
         }
-        if (! $e) {
+        if (!$e) {
             $result = $DB->safeselect(
                 <<<'EOT'
 `id`,`auth_id`,`post`,UNIX_TIMESTAMP(`date`) AS `date`,`showsig`,`showemotes`,
@@ -422,17 +440,17 @@ EOT
             $tmp = $DB->arow($result);
             $DB->disposeresult($result);
 
-            if (! $tmp) {
+            if (!$tmp) {
                 $e = 'The post you are trying to edit does not exist.';
-            } elseif (! $this->canedit($tmp)) {
+            } elseif (!$this->canedit($tmp)) {
                 $e = "You don't have permission to edit that post!";
-            } elseif (! isset($this->postdata)) {
+            } elseif (!isset($this->postdata)) {
                 $editpost = true;
                 $this->postdata = $tmp['post'];
             }
         }
-        if ($tid && ! $e) {
-            if (! is_numeric($tid) || ! $tid) {
+        if ($tid && !$e) {
+            if (!is_numeric($tid) || !$tid) {
                 $e = 'Invalid post to edit.';
             } else {
                 $result = $DB->safeselect(
@@ -451,26 +469,32 @@ EOT
 
                 $DB->disposeresult($result);
 
-                if (! $tmp) {
+                if (!$tmp) {
                     $e = "The topic you are trying to edit doesn't exist.";
-                } elseif (trim($JAX->p['ttitle']) === '') {
+                } elseif ('' === trim($JAX->p['ttitle'])) {
                     $e = 'You must supply a topic title!';
                 } else {
                     $DB->safeupdate(
                         'topics',
-                        [
+                        array(
                             'title' => $JAX->blockhtml($JAX->p['ttitle']),
                             'subtitle' => $JAX->blockhtml($JAX->p['tdesc']),
                             'summary' => mb_substr(
                                 preg_replace(
                                     '@\\s+@',
                                     ' ',
-                                    $JAX->wordfilter($JAX->blockhtml($JAX->textonly($this->postdata)))
+                                    $JAX->wordfilter(
+                                        $JAX->blockhtml(
+                                            $JAX->textonly(
+                                                $this->postdata
+                                            )
+                                        )
+                                    )
                                 ),
                                 0,
                                 50
                             ),
-                        ],
+                        ),
                         'WHERE `id`=?',
                         $tid
                     );
@@ -488,11 +512,11 @@ EOT
         }
         $DB->safeupdate(
             'posts',
-            [
+            array(
                 'post' => $this->postdata,
                 'edit_date' => date('Y-m-d H:i:s', time()),
                 'editby' => $USER['id'],
-            ],
+            ),
             'WHERE `id`=?',
             $DB->basicvalue($pid)
         );
@@ -518,18 +542,18 @@ EOT
         $uname = isset($USER['name']) ? $USER['name'] : '';
         $e = '';
 
-        if (! $this->nopost && trim($postdata) === '') {
+        if (!$this->nopost && '' === trim($postdata)) {
             $e = "You didn't supply a post!";
         } elseif (mb_strlen($postdata) > 50000) {
             $e = 'Post must not exceed 50,000 characters.';
         }
 
-        if (! $e && $this->how == 'newtopic') {
-            if (! $fid || ! is_numeric($fid)) {
+        if (!$e && 'newtopic' == $this->how) {
+            if (!$fid || !is_numeric($fid)) {
                 $e = 'No forum specified exists.';
             } elseif (
-                ! isset($JAX->p['ttitle'])
-                || trim($JAX->p['ttitle']) === ''
+                !isset($JAX->p['ttitle'])
+                || '' === trim($JAX->p['ttitle'])
             ) {
                 $e = "You didn't specify a topic title!";
             } elseif (
@@ -543,14 +567,14 @@ EOT
             ) {
                 $e = 'Subtitle must not exceed 255 characters';
             } elseif (isset($JAX->p['poll_type']) && $JAX->p['poll_type']) {
-                $pollchoices = [];
+                $pollchoices = array();
                 $pollChoice = preg_split("@[\r\n]+@", $JAX->p['pollchoices']);
                 foreach ($pollChoice as $k => $v) {
                     if (trim($v)) {
                         $pollchoices[] = $JAX->blockhtml($v);
                     }
                 }
-                if (trim($JAX->p['pollq']) === '') {
+                if ('' === trim($JAX->p['pollq'])) {
                     $e = "You didn't specify a poll question!";
                 } elseif (count($pollchoices) > 10) {
                     $e = 'Poll choices must not exceed 10.';
@@ -559,15 +583,23 @@ EOT
                 }
             }
             // Perms.
-            $result = $DB->safeselect('`perms`', 'forums', 'WHERE `id`=?', $fid);
+            $result = $DB->safeselect(
+                '`perms`',
+                'forums',
+                'WHERE `id`=?',
+                $fid
+            );
             $fdata = $DB->arow($result);
             $DB->disposeresult($result);
 
-            if (! $fdata) {
+            if (!$fdata) {
                 $e = "The forum you're trying to post in does not exist.";
             } else {
-                $fdata['perms'] = $JAX->parseperms($fdata['perms'], $USER ? $USER['group_id'] : 3);
-                if (! $fdata['perms']['start']) {
+                $fdata['perms'] = $JAX->parseperms(
+                    $fdata['perms'],
+                    $USER ? $USER['group_id'] : 3
+                );
+                if (!$fdata['perms']['start']) {
                     $e = <<<'EOT'
 You don't have permission to post a new topic in that forum.
 EOT;
@@ -575,16 +607,16 @@ EOT;
                 if (
                     ((isset($JAX->p['poll_type']) && $JAX->p['poll_type'])
                     || (isset($JAX->p['pollq']) && $JAX->p['pollq']))
-                    && ! $fdata['perms']['poll']
+                    && !$fdata['perms']['poll']
                 ) {
                     $e = "You don't have permission to post a poll in that forum";
                 }
             }
 
-            if (! $e) {
+            if (!$e) {
                 $DB->safeinsert(
                     'topics',
-                    [
+                    array(
                         'title' => $JAX->blockhtml($JAX->p['ttitle']),
                         'subtitle' => $JAX->blockhtml($JAX->p['tdesc']),
                         'date' => date('Y-m-d H:i:s', $time),
@@ -601,11 +633,19 @@ EOT;
                         'poll_choices' => isset($pollchoices) && $pollchoices ?
                         $JAX->json_encode($pollchoices) : '',
                         'summary' => mb_substr(
-                            preg_replace('@\\s+@', ' ', $JAX->blockhtml($JAX->textonly($this->postdata))),
+                            preg_replace(
+                                '@\\s+@',
+                                ' ',
+                                $JAX->blockhtml(
+                                    $JAX->textonly(
+                                        $this->postdata
+                                    )
+                                )
+                            ),
                             0,
                             50
                         ),
-                    ]
+                    )
                 );
                 $tid = $DB->insert_id(1);
             }
@@ -616,7 +656,7 @@ EOT;
             $PAGE->append('PAGE', $PAGE->error($e));
             $PAGE->JS('error', $e);
             $PAGE->JS('enable', 'submitbutton');
-            if ($this->how == 'newtopic') {
+            if ('newtopic' == $this->how) {
                 $this->showtopicform();
             } else {
                 $this->showpostform();
@@ -636,24 +676,27 @@ LEFT JOIN %t f
     WHERE t.`id`=?
 EOT
                 ,
-                ['topics', 'forums'],
+                array('topics', 'forums'),
                 $tid
             );
             $fdata = $DB->arow($result);
             $DB->disposeresult($result);
         }
-        if (! $fdata) {
+        if (!$fdata) {
             $e = "The topic you're trying to reply to does not exist.";
             $PAGE->append('PAGE', $PAGE->error($e));
             $PAGE->JS('error', $e);
 
             return false;
         }
-        $fdata['perms'] = $JAX->parseperms($fdata['perms'], $USER ? $USER['group_id'] : 3);
+        $fdata['perms'] = $JAX->parseperms(
+            $fdata['perms'],
+            $USER ? $USER['group_id'] : 3
+        );
         if (
-            ! $fdata['perms']['reply']
+            !$fdata['perms']['reply']
             || $fdata['locked']
-            && ! $PERMS['can_override_locked_topics']
+            && !$PERMS['can_override_locked_topics']
         ) {
             $e = "You don't have permission to post here.";
             $PAGE->append('PAGE', $PAGE->error($e));
@@ -665,40 +708,45 @@ EOT
         // Actually PUT THE POST IN for godsakes.
         $DB->safeinsert(
             'posts',
-            [
+            array(
                 'auth_id' => $uid,
                 'post' => $postdata,
                 'date' => date('Y-m-d H:i:s', $time),
                 'tid' => $tid,
                 'newtopic' => $newtopic ? 1 : 0,
                 'ip' => $JAX->ip2bin(),
-            ]
+            )
         );
 
         $pid = $DB->insert_id(1);
         // Set op.
         if ($newtopic) {
-            $DB->safeupdate('topics', [
+            $DB->safeupdate(
+                'topics',
+                array(
                     'op' => $pid,
-                ], 'WHERE `id`=?', $tid);
+                ),
+                'WHERE `id`=?',
+                $tid
+            );
         }
 
         // Update activity history.
         $DB->safeinsert(
             'activity',
-            [
+            array(
                 'uid' => $uid,
                 'type' => $newtopic ? 'new_topic' : 'new_post',
                 'tid' => $tid,
                 'pid' => $pid,
                 'arg1' => $fdata['topictitle'],
                 'date' => date('Y-m-d H:i:s', $time),
-            ]
+            )
         );
 
         // Update last post info
         // for the topic.
-        if (! $newtopic) {
+        if (!$newtopic) {
             $DB->safespecial(
                 <<<'EOT'
 UPDATE %t
@@ -706,7 +754,7 @@ SET `lp_uid` = ?, `lp_date` = ?, `replies` = `replies` + 1
 WHERE `id`=?
 EOT
                 ,
-                ['topics'],
+                array('topics'),
                 $uid,
                 date('Y-m-d H:i:s', $time),
                 $tid
@@ -714,8 +762,8 @@ EOT
         }
 
         // Do some magic to update the tree all the way up (for subforums).
-        $path = trim($fdata['path']) ? explode(' ', $fdata['path']) : [];
-        if (! in_array($fdata['id'], $path)) {
+        $path = trim($fdata['path']) ? explode(' ', $fdata['path']) : array();
+        if (!in_array($fdata['id'], $path)) {
             $path[] = $fdata['id'];
         }
 
@@ -728,7 +776,7 @@ SET `lp_uid`= ?, `lp_tid` = ?, `lp_topic` = ?, `lp_date` = ?,
 WHERE `id` IN ?
 EOT
                 ,
-                ['forums'],
+                array('forums'),
                 $uid,
                 $tid,
                 $fdata['topictitle'],
@@ -744,7 +792,7 @@ SET `lp_uid`= ?, `lp_tid` = ?, `lp_topic` = ?, `lp_date` = ?,
 WHERE `id` IN ?
 EOT
                 ,
-                ['forums'],
+                array('forums'),
                 $uid,
                 $tid,
                 $fdata['topictitle'],
@@ -754,7 +802,7 @@ EOT
         }
 
         // Update statistics.
-        if (! $fdata['nocount']) {
+        if (!$fdata['nocount']) {
             $DB->safespecial(
                 <<<'EOT'
 UPDATE %t
@@ -762,26 +810,32 @@ SET `posts` = `posts` + 1
 WHERE `id`=?
 EOT
                 ,
-                ['members'],
+                array('members'),
                 $DB->basicvalue($JAX->userData['id'])
             );
         }
 
         if ($newtopic) {
-            $DB->safespecial(<<<'EOT'
+            $DB->safespecial(
+                <<<'EOT'
 UPDATE %t
 SET `posts` = `posts` + 1, `topics` = `topics` + 1
 EOT
-                , ['stats']);
+                ,
+                array('stats')
+            );
         } else {
-            $DB->safespecial('UPDATE %t SET `posts` = `posts` + 1', ['stats']);
+            $DB->safespecial(
+                'UPDATE %t SET `posts` = `posts` + 1',
+                array('stats')
+            );
         }
 
-        if ($this->how == 'qreply') {
+        if ('qreply' == $this->how) {
             $PAGE->JS('closewindow', '#qreply');
             $PAGE->JS('refreshdata');
         } else {
-            $PAGE->location('?act=vt'.$tid.'&getlast=1');
+            $PAGE->location('?act=vt' . $tid . '&getlast=1');
         }
     }
 }

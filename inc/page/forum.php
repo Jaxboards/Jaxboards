@@ -5,14 +5,10 @@ $PAGE->loadmeta('forum');
 $IDX = new FORUM();
 class FORUM
 {
-    public $topicsRead = [];
-
-    public $forumsRead = [];
-
+    public $topicsRead = array();
+    public $forumsRead = array();
     public $forumReadTime = 0;
-
     public $numperpage;
-
     public $page;
 
     public function __construct()
@@ -49,7 +45,7 @@ class FORUM
         global $DB,$PAGE,$JAX,$PERMS,$USER;
 
         // If no fid supplied, go to the index and halt execution.
-        if (! $fid) {
+        if (!$fid) {
             return $PAGE->location('?');
         }
 
@@ -72,13 +68,13 @@ LEFT JOIN %t c
 WHERE f.`id`=? LIMIT 1
 EOT
             ,
-            ['forums', 'categories'],
+            array('forums', 'categories'),
             $fid
         );
         $fdata = $DB->arow($result);
         $DB->disposeresult($result);
 
-        if (! $fdata) {
+        if (!$fdata) {
             $PAGE->JS('alert', $DB->error());
 
             return $PAGE->location('?');
@@ -93,7 +89,7 @@ SET `redirects` = `redirects` + 1
 WHERE `id`=?
 EOT
                 ,
-                ['forums'],
+                array('forums'),
                 $DB->basicvalue($fid)
             );
 
@@ -102,8 +98,11 @@ EOT
 
         $title = &$fdata['title'];
 
-        $fdata['perms'] = $JAX->parseperms($fdata['perms'], $USER ? $USER['group_id'] : 3);
-        if (! $fdata['perms']['read']) {
+        $fdata['perms'] = $JAX->parseperms(
+            $fdata['perms'],
+            $USER ? $USER['group_id'] : 3
+        );
+        if (!$fdata['perms']['read']) {
             $PAGE->JS('alert', 'no permission');
 
             return $PAGE->location('?');
@@ -134,7 +133,7 @@ WHERE f.`path`=?
 ORDER BY f.`order`
 EOT
             ,
-            ['forums', 'members'],
+            array('forums', 'members'),
             $fid,
             "% {$fid}"
         );
@@ -153,23 +152,38 @@ EOT
                     'forum-subforum-lastpost',
                     $f['lp_tid'],
                     $JAX->pick($f['lp_topic'], '- - - - -'),
-                    $f['lp_name'] ? $PAGE->meta('user-link', $f['lp_uid'], $f['lp_gid'], $f['lp_name']) : 'None',
+                    $f['lp_name'] ? $PAGE->meta(
+                        'user-link',
+                        $f['lp_uid'],
+                        $f['lp_gid'],
+                        $f['lp_name']
+                    ) : 'None',
                     $JAX->pick($JAX->date($f['lp_date']), '- - - - -')
                 ),
                 $f['topics'],
                 $f['posts'],
                 ($read = $this->isForumRead($f)) ? 'read' : 'unread',
                 $read ? $JAX->pick(
-                    $PAGE->meta('subforum-icon-read'),
-                    $PAGE->meta('icon-read')
-                ) : $JAX->pick($PAGE->meta('subforum-icon-unread'), $PAGE->meta('icon-unread'))
+                    $PAGE->meta(
+                        'subforum-icon-read'
+                    ),
+                    $PAGE->meta(
+                        'icon-read'
+                    )
+                ) : $JAX->pick(
+                    $PAGE->meta('subforum-icon-unread'),
+                    $PAGE->meta('icon-unread')
+                )
             );
-            if (! $read) {
+            if (!$read) {
                 $unread = true;
             }
         }
         if ($rows) {
-            $page .= $PAGE->collapsebox('Subforums', $PAGE->meta('forum-subforum-table', $rows));
+            $page .= $PAGE->collapsebox(
+                'Subforums',
+                $PAGE->meta('forum-subforum-table', $rows)
+            );
         }
 
         $rows = $table = '';
@@ -179,20 +193,26 @@ EOT
         $forumpages = '';
         if ($numpages) {
             foreach ($JAX->pages($numpages, $this->page + 1, 10) as $v) {
-                $forumpages .= '<a href="?act=vf'.$fid.'&amp;page='.
-                    $v.'"'.(($v - 1) == $this->page ? ' class="active"' : '').
-                    '>'.$v.'</a> · ';
+                $forumpages .= '<a href="?act=vf' . $fid . '&amp;page=' .
+                    $v . '"' . (($v - 1) == $this->page ? ' class="active"' : '') .
+                    '>' . $v . '</a> · ';
             }
         }
 
         // Buttons.
-        $forumbuttons = '&nbsp;'.
-            ($fdata['perms']['start'] ? '<a href="?act=post&amp;fid='.$fid.'">'.
+        $forumbuttons = '&nbsp;' .
+            ($fdata['perms']['start'] ? '<a href="?act=post&amp;fid=' . $fid . '">' .
             ($PAGE->meta(
                 $PAGE->metaexists('button-newtopic') ?
                 'button-newtopic' : 'forum-button-newtopic'
-            )).'</a>' : '');
-        $page .= $PAGE->meta('forum-pages-top', $forumpages).$PAGE->meta('forum-buttons-top', $forumbuttons);
+            )) . '</a>' : '');
+        $page .= $PAGE->meta(
+            'forum-pages-top',
+            $forumpages
+        ) . $PAGE->meta(
+            'forum-buttons-top',
+            $forumbuttons
+        );
 
         // Do order by.
         $orderby = '`lp_date` DESC';
@@ -200,16 +220,16 @@ EOT
             $fdata['orderby'] = (int) $fdata['orderby'];
             if ($fdata['orderby'] & 1) {
                 $orderby = 'ASC';
-                $fdata['orderby']--;
+                --$fdata['orderby'];
             } else {
                 $orderby = 'DESC';
             }
-            if ($fdata['orderby'] == 2) {
-                $orderby = '`id` '.$orderby;
-            } elseif ($fdata['orderby'] == 4) {
-                $orderby = '`title` '.$orderby;
+            if (2 == $fdata['orderby']) {
+                $orderby = '`id` ' . $orderby;
+            } elseif (4 == $fdata['orderby']) {
+                $orderby = '`title` ' . $orderby;
             } else {
-                $orderby = '`lp_date` '.$orderby;
+                $orderby = '`lp_date` ' . $orderby;
             }
         }
 
@@ -242,7 +262,7 @@ LEFT JOIN %t m2
 ON t.`auth_id` = m2.`id`
 EOT
             ,
-            ['topics', 'members', 'members'],
+            array('topics', 'members', 'members'),
             $fid,
             $this->page * $this->numperpage,
             $this->numperpage
@@ -252,7 +272,7 @@ EOT
             $pages = '';
             if ($f['replies'] > 9) {
                 foreach ($JAX->pages(ceil(($f['replies'] + 1) / 10), 1, 10) as $v) {
-                    $pages .= "<a href='?act=vt".$f['id'].
+                    $pages .= "<a href='?act=vt" . $f['id'] .
                         "&amp;page={$v}'>{$v}</a> ";
                 }
                 $pages = $PAGE->meta('forum-topic-pages', $pages);
@@ -277,56 +297,67 @@ EOT
                 // 7
                 $PAGE->meta('user-link', $f['lp_uid'], $f['lp_gid'], $f['lp_name']),
                 // 8
-                ($f['pinned'] ? 'pinned' : '').' '.($f['locked'] ? 'locked' : ''),
+                ($f['pinned'] ? 'pinned' : '') . ' ' . ($f['locked'] ? 'locked' : ''),
                 // 9
-                $f['summary'] ? $f['summary'].(mb_strlen($f['summary']) > 45 ? '...' : '') : '',
+                $f['summary'] ? $f['summary'] . (mb_strlen($f['summary']) > 45 ? '...' : '') : '',
                 // 10
-                $PERMS['can_moderate'] ? '<a href="?act=modcontrols&do=modt&tid='.
-                $f['id'].'" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>' : '',
+                $PERMS['can_moderate'] ? '<a href="?act=modcontrols&do=modt&tid=' .
+                $f['id'] . '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>' : '',
                 // 11
                 $pages,
                 // 12
                 ($read = $this->isTopicRead($f, $fid)) ? 'read' : 'unread',
                 // 13
-                $read ? $JAX->pick($PAGE->meta('topic-icon-read'), $PAGE->meta('icon-read'))
-                : $JAX->pick($PAGE->meta('topic-icon-unread'), $PAGE->meta('icon-read'))
+                $read ? $JAX->pick(
+                    $PAGE->meta('topic-icon-read'),
+                    $PAGE->meta('icon-read')
+                )
+                : $JAX->pick(
+                    $PAGE->meta('topic-icon-unread'),
+                    $PAGE->meta('icon-read')
+                )
                 // 14
             );
-            if (! $read) {
+            if (!$read) {
                 $unread = true;
             }
         }
         // If they're on the first page and no topics
         // were marked as unread, mark the whole forum as read
         // since we don't care about pages past the first one.
-        if (! $this->page && ! $unread) {
+        if (!$this->page && !$unread) {
             $this->markread($fid);
         }
         if ($rows) {
             $table = $PAGE->meta('forum-table', $rows);
         } else {
             if ($this->page > 0) {
-                return $PAGE->location('?act=vf'.$fid);
+                return $PAGE->location('?act=vf' . $fid);
             }
             if ($fdata['perms']['start']) {
                 $table = $PAGE->error(
-                    "This forum is empty! Don't like it? ".
-                    "<a href='?act=post&amp;fid=".$fid."'>Create a topic!</a>"
+                    "This forum is empty! Don't like it? " .
+                    "<a href='?act=post&amp;fid=" . $fid . "'>Create a topic!</a>"
                 );
             }
         }
-        $page .= $PAGE->meta('box', ' id="fid_'.$fid.'_listing"', $title, $table);
+        $page .= $PAGE->meta('box', ' id="fid_' . $fid . '_listing"', $title, $table);
         $page .= $PAGE->meta('forum-pages-bottom', $forumpages);
         $page .= $PAGE->meta('forum-buttons-bottom', $forumbuttons);
 
         // Start building the nav path.
-        $path[$fdata['cat']] = '?act=vc'.$fdata['cat_id'];
+        $path[$fdata['cat']] = '?act=vc' . $fdata['cat_id'];
         if ($fdata['path']) {
             $pathids = explode(' ', $fdata['path']);
-            $forums = [];
-            $result = $DB->safeselect('`title`,`id`', 'forums', 'WHERE `id` IN ?', $pathids);
+            $forums = array();
+            $result = $DB->safeselect(
+                '`title`,`id`',
+                'forums',
+                'WHERE `id` IN ?',
+                $pathids
+            );
             while ($f = $DB->arow($result)) {
-                $forums[$f['id']] = [$f['title'], '?act=vf'.$f['id']];
+                $forums[$f['id']] = array($f['title'], '?act=vf' . $f['id']);
             }
             foreach ($pathids as $v) {
                 $path[$forums[$v][0]] = $forums[$v][1];
@@ -355,20 +386,20 @@ GROUP BY p.`auth_id`
 ORDER BY `replies` DESC
 EOT
             ,
-            ['posts', 'members'],
+            array('posts', 'members'),
             $tid
         );
         $page = '';
         while ($f = $DB->arow($result)) {
-            $page .= '<tr><td>'.$f['name'].'</td><td>'.$f['replies'].'</td></tr>';
+            $page .= '<tr><td>' . $f['name'] . '</td><td>' . $f['replies'] . '</td></tr>';
         }
         $PAGE->JS('softurl');
         $PAGE->JS(
             'window',
-            [
+            array(
                 'title' => 'Post Summary',
-                'content' => '<table>'.$page.'</table>',
-            ]
+                'content' => '<table>' . $page . '</table>',
+            )
         );
     }
 
@@ -389,7 +420,7 @@ EOT
                 $this->forumReadTime = $fr[$fid];
             }
         }
-        if (! isset($this->topicsRead[$topic['id']])) {
+        if (!isset($this->topicsRead[$topic['id']])) {
             $this->topicsRead[$topic['id']] = 0;
         }
         if (
@@ -408,11 +439,15 @@ EOT
     public function isForumRead($forum)
     {
         global $SESS,$USER,$JAX;
-        if (! $this->forumsRead) {
+        if (!$this->forumsRead) {
             $this->forumsRead = $JAX->parsereadmarkers($SESS->forumsread);
         }
         if (
-            $forum['lp_date'] > $JAX->pick($this->forumsRead[$forum['id']], $SESS->read_date, $USER['last_visit'])
+            $forum['lp_date'] > $JAX->pick(
+                $this->forumsRead[$forum['id']],
+                $SESS->read_date,
+                $USER['last_visit']
+            )
         ) {
             return false;
         }

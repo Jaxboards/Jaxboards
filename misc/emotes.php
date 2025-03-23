@@ -11,7 +11,7 @@ if (isset($_GET['json'])) {
     $JAX = new JAX();
     $rules = $JAX->getEmoteRules(0);
     foreach ($rules as $k => $v) {
-        $rules[$k] = '<img src="'.$v.'" alt="'.$JAX->blockhtml($k).'" />';
+        $rules[$k] = '<img src="' . $v . '" alt="' . $JAX->blockhtml($k) . '" />';
     }
-    echo json_encode([array_keys($rules), array_values($rules)]);
+    echo json_encode(array(array_keys($rules), array_values($rules)));
 }

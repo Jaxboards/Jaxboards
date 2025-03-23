@@ -33,6 +33,43 @@ class LOGREG
         }
     }
 
+    private function isHuman()
+    {
+        global $CFG,$JAX;
+
+        if (isset($CFG['recaptcha']) && $CFG['recaptcha']) {
+            // Validate reCAPTCHA.
+            $url = 'https://www.google.com/recaptcha/api/siteverify';
+            $fields = array(
+                'secret' => $CFG['recaptcha']['private_key'],
+                'response' => $JAX->p['g-recaptcha-response']
+            );
+
+            $fields_string = '';
+            foreach ($fields as $k => $v) {
+                $fields_string .= $k . '=' . urlencode($v) . '&';
+            }
+            rtrim($fields_string, '&');
+
+            $curl_request = curl_init();
+            // Set the url, number of POST vars, POST data.
+            curl_setopt($curl_request, CURLOPT_URL, $url);
+            curl_setopt($curl_request, CURLOPT_POST, count($fields));
+            curl_setopt($curl_request, CURLOPT_POSTFIELDS, $fields_string);
+            curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, true);
+
+            // Execute post.
+            $result = json_decode(curl_exec($curl_request), true);
+
+            return $result['success'];
+
+            curl_close($curl_request);
+        }
+
+        // If recaptcha is not configured, we have to assume that they are in fact human.
+        return true;
+    }
+
     public function register()
     {
         global $PAGE,$JAX,$DB,$CFG;
@@ -55,9 +92,8 @@ class LOGREG
         $p = $PAGE->meta('register-form', $recaptcha);
 
         // Show registration form.
-        if (! isset($JAX->p['register'])) {
+        if (!isset($JAX->p['register'])) {
             $PAGE->JS('update', 'page', $p);
-
             return $PAGE->append('PAGE', $p);
         }
 
@@ -66,10 +102,10 @@ class LOGREG
             if ($JAX->ipServiceBanned()) {
                 throw new Exception(
                     'You have been banned from registration on all boards. If'
-                    .' you feel that this is in error, please contact the'
-                    .' administrator.',
+                    . ' you feel that this is in error, please contact the'
+                    . ' administrator.',
                 );
-            } elseif (! $name || ! $dispname) {
+            } elseif (!$name || !$dispname) {
                 throw new Exception('Name and display name required.');
             } elseif ($pass1 != $pass2) {
                 throw new Exception('The passwords do not match.');
@@ -89,13 +125,13 @@ class LOGREG
                 && preg_match($CFG['badnamechars'], $dispname))
             ) {
                 throw new Exception('Invalid characters in display name!');
-            } elseif (! $JAX->isemail($email)) {
+            } elseif (!$JAX->isemail($email)) {
                 throw new Exception("That isn't a valid email!");
             } elseif ($JAX->ipbanned()) {
                 throw new Exception('You have been banned from registering on this board.');
-            } elseif (! $this->isHuman()) {
+            } elseif (!$this->isHuman()) {
                 throw new Exception('reCAPTCHA failed. Are you a bot?');
-            }
+            } else {
                 // Are they attempting to use an existing username/display name?
                 $dispname = $JAX->blockhtml($dispname);
                 $name = $JAX->blockhtml($name);
@@ -108,21 +144,25 @@ class LOGREG
                 );
                 $f = $DB->arow($result);
                 $DB->disposeresult($result);
-                if ($f != false) {
+                if (false != $f) {
                     if ($f['name'] == $name) {
                         throw new Exception('That username is taken!');
                     } elseif ($f['display_name'] == $dispname) {
                         throw new Exception('That display name is already used by another member.');
                     }
                 }
+            }
 
             // All clear!
             $DB->safeinsert(
                 'members',
-                [
+                array(
                     'name' => $name,
                     'display_name' => $dispname,
-                    'pass' => password_hash($pass1, PASSWORD_DEFAULT),
+                    'pass' => password_hash(
+                        $pass1,
+                        PASSWORD_DEFAULT
+                    ),
                     'posts' => 0,
                     'email' => $email,
                     'join_date' => date('Y-m-d H:i:s', time()),
@@ -130,7 +170,7 @@ class LOGREG
                     'group_id' => $CFG['membervalidation'] ? 5 : 1,
                     'ip' => $JAX->ip2bin(),
                     'wysiwyg' => 1,
-                ]
+                )
             );
             $DB->safespecial(
                 <<<'EOT'
@@ -138,7 +178,7 @@ UPDATE %t
 SET `members` = `members` + 1, `last_register` = ?
 EOT
                 ,
-                ['stats'],
+                array('stats'),
                 $DB->insert_id(1)
             );
             $this->login($name, $pass1);
@@ -156,7 +196,12 @@ EOT
             if ($SESS->is_bot) {
                 return;
             }
-            $result = $DB->safeselect('`id`', 'members', 'WHERE `name`=?', $DB->basicvalue($u));
+            $result = $DB->safeselect(
+                '`id`',
+                'members',
+                'WHERE `name`=?',
+                $DB->basicvalue($u)
+            );
             $user = $DB->arow($result);
             $u = $user['id'];
 
@@ -170,17 +215,18 @@ EOT
                 $logintoken = base64_encode(openssl_random_pseudo_bytes(128));
                 $DB->safeinsert(
                     'tokens',
-                    [
+                    array(
                         'token' => $logintoken,
                         'type' => 'login',
                         'uid' => $f['id'],
                         'expires' => date('Y-m-d H:i:s', time() + 3600 * 24 * 30),
-                    ]
+                    )
                 );
 
-                $JAX->setCookie([
-                        'utoken' => $logintoken,
-                    ], time() + 3600 * 24 * 30);
+                $JAX->setCookie(
+                    array('utoken' => $logintoken),
+                    time() + 3600 * 24 * 30
+                );
                 $SESS->clean($f['id']);
                 $SESS->user = $u;
                 $SESS->uid = $f['id'];
@@ -194,7 +240,10 @@ EOT
                     $PAGE->location('?');
                 }
             } else {
-                $PAGE->append('page', $PAGE->meta('error', 'Incorrect username/password'));
+                $PAGE->append(
+                    'page',
+                    $PAGE->meta('error', 'Incorrect username/password')
+                );
                 $PAGE->JS('error', 'Incorrect username/password');
             }
             $SESS->erase('location');
@@ -208,11 +257,18 @@ EOT
         // Just make a new session rather than fuss with the old one,
         // to maintain users online.
         if (isset($JAX->c['utoken'])) {
-            $DB->safedelete('tokens', 'WHERE `token`=?', $DB->basicvalue($JAX->c['utoken']));
+            $DB->safedelete(
+                'tokens',
+                'WHERE `token`=?',
+                $DB->basicvalue($JAX->c['utoken'])
+            );
             unset($JAX->c['utoken']);
-            $JAX->setCookie([
+            $JAX->setCookie(
+                array(
                     'utoken' => null,
-                ], -1);
+                ),
+                -1
+            );
         }
         $SESS->hide = 1;
         $SESS->applyChanges();
@@ -223,7 +279,7 @@ EOT
         $PAGE->JS('update', 'userbox', $PAGE->meta('userbox-logged-out'));
         $PAGE->JS('softurl');
         $PAGE->append('page', $PAGE->meta('success', 'Logged out successfully'));
-        if (! $PAGE->jsaccess) {
+        if (!$PAGE->jsaccess) {
             $this->login();
         }
     }
@@ -234,7 +290,7 @@ EOT
         $PAGE->JS('softurl');
         $PAGE->JS(
             'window',
-            [
+            array(
                 'title' => 'Login',
                 'useoverlay' => 1,
                 'id' => 'loginform',
@@ -261,7 +317,7 @@ EOT
     <a href="?act=logreg1" data-window-close="true">Register</a>
 </form>
 EOT
-            ]
+            )
         );
     }
 
@@ -296,7 +352,7 @@ EOT
                 $DB->basicvalue($id)
             );
             $udata = $DB->arow($result);
-            if (! ($udata)) {
+            if (!($udata)) {
                 $e = 'This link has expired. Please try again.';
             }
             $DB->disposeresult($result);
@@ -306,13 +362,19 @@ EOT
             } else {
                 if ($JAX->p['pass1'] && $JAX->p['pass2']) {
                     if ($JAX->p['pass1'] != $JAX->p['pass2']) {
-                        $page .= $PAGE->meta('error', 'The passwords did not match, please try again!');
+                        $page .= $PAGE->meta(
+                            'error',
+                            'The passwords did not match, please try again!'
+                        );
                     } else {
                         $DB->safeupdate(
                             'members',
-                            [
-                                'pass' => password_hash($JAX->p['pass1'], PASSWORD_DEFAULT),
-                            ],
+                            array(
+                                'pass' => password_hash(
+                                    $JAX->p['pass1'],
+                                    PASSWORD_DEFAULT
+                                ),
+                            ),
                             'WHERE `id`=?',
                             $DB->basicvalue($udata['id'])
                         );
@@ -341,11 +403,13 @@ EOT
                 } else {
                     $page .= $PAGE->meta(
                         'forgot-password2-form',
-                        $JAX->hiddenFormFields([
+                        $JAX->hiddenFormFields(
+                            array(
                                 'uid' => $uid,
                                 'id' => $id,
                                 'act' => 'logreg6',
-                            ])
+                            )
+                        )
                     );
                 }
             }
@@ -357,9 +421,9 @@ EOT
                     'WHERE `name`=?',
                     $DB->basicvalue($JAX->p['user'])
                 );
-                if (! ($udata = $DB->arow($result))) {
-                    $e = 'There is no user registered as <strong>'.
-                        $JAX->b['user'].
+                if (!($udata = $DB->arow($result))) {
+                    $e = 'There is no user registered as <strong>' .
+                        $JAX->b['user'] .
                         '</strong>, sure this is correct?';
                 }
                 $DB->disposeresult($result);
@@ -372,15 +436,15 @@ EOT
                         base64_encode(openssl_random_pseudo_bytes(128));
                     $DB->safeinsert(
                         'tokens',
-                        [
+                        array(
                             'token' => $forgotpasswordtoken,
                             'type' => 'forgotpassword',
                             'uid' => $udata['id'],
                             'expires' => date('Y-m-d H:i:s', time() + 3600 * 24),
-                        ]
+                        )
                     );
-                    $link = BOARDURL.'?act=logreg6&uid='.
-                        $udata['id'].'&id='.rawurlencode($forgotpasswordtoken);
+                    $link = BOARDURL . '?act=logreg6&uid=' .
+                        $udata['id'] . '&id=' . rawurlencode($forgotpasswordtoken);
                     $mailResult = $JAX->mail(
                         $udata['email'],
                         'Recover Your Password!',
@@ -397,18 +461,18 @@ Thanks!
 EOT
                     );
 
-                    if (! $mailResult) {
+                    if (!$mailResult) {
                         $page .= $PAGE->meta(
                             'error',
-                            'There was a problem sending the email. '.
+                            'There was a problem sending the email. ' .
                             'Please contact the administrator.'
                         );
                     } else {
                         $page .= $PAGE->meta(
                             'success',
-                            'An email has been sent to the email associated '.
-                            'with this account. Please check your email and '.
-                            'follow the instructions in order to recover '.
+                            'An email has been sent to the email associated ' .
+                            'with this account. Please check your email and ' .
+                            'follow the instructions in order to recover ' .
                             'your password.'
                         );
                     }
@@ -418,50 +482,15 @@ EOT
             $page .= $PAGE->meta(
                 'forgot-password-form',
                 $PAGE->jsaccess ?
-                $JAX->hiddenFormFields([
+                $JAX->hiddenFormFields(
+                    array(
                         'act' => 'logreg6',
-                    ]) : ''
+                    )
+                ) : ''
             );
         }
 
         $PAGE->append('PAGE', $page);
         $PAGE->JS('update', 'page', $page);
-    }
-
-    private function isHuman()
-    {
-        global $CFG,$JAX;
-
-        if (isset($CFG['recaptcha']) && $CFG['recaptcha']) {
-            // Validate reCAPTCHA.
-            $url = 'https://www.google.com/recaptcha/api/siteverify';
-            $fields = [
-                'secret' => $CFG['recaptcha']['private_key'],
-                'response' => $JAX->p['g-recaptcha-response'],
-            ];
-
-            $fields_string = '';
-            foreach ($fields as $k => $v) {
-                $fields_string .= $k.'='.urlencode($v).'&';
-            }
-            rtrim($fields_string, '&');
-
-            $curl_request = curl_init();
-            // Set the url, number of POST vars, POST data.
-            curl_setopt($curl_request, CURLOPT_URL, $url);
-            curl_setopt($curl_request, CURLOPT_POST, count($fields));
-            curl_setopt($curl_request, CURLOPT_POSTFIELDS, $fields_string);
-            curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, true);
-
-            // Execute post.
-            $result = json_decode(curl_exec($curl_request), true);
-
-            return $result['success'];
-
-            curl_close($curl_request);
-        }
-
-        // If recaptcha is not configured, we have to assume that they are in fact human.
-        return true;
     }
 }
