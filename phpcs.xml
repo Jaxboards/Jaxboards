@@ -2,16 +2,9 @@
 <ruleset name="Jaxboards">
   <description>Jaxboards PHP coding standards</description>
   <!-- Files and directories to run on -->
-  <file>Script</file>
-  <file>Service</file>
-  <file>acp</file>
-  <file>config.default.php</file>
-  <file>domaindefinitions.php</file>
-  <file>emoticons</file>
-  <file>inc</file>
-  <file>index.php</file>
-  <file>misc</file>
-  <file>php_codesniffer_to_sonarqube.php</file>
+  <file>.</file>
+  <!-- ignore .git directory -->
+  <exclude-pattern>*/.git/*</exclude-pattern>
   <!-- ignore vendor files -->
   <exclude-pattern>*/vendor/*</exclude-pattern>
   <exclude-pattern>*/node_modules/*</exclude-pattern>
