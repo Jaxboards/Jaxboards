@@ -1,7 +1,7 @@
 <?php
 
 if (!defined(INACP)) {
-    die();
+    exit;
 }
 
 new stats();
@@ -13,58 +13,62 @@ class stats
         if (!isset($JAX->g['do'])) {
             $JAX->g['do'] = null;
         }
+
         switch ($JAX->g['do']) {
             case 'recount':
                 $this->recount_statistics();
+
                 break;
+
             default:
                 $this->showstats();
+
                 break;
         }
     }
 
-    public function showstats()
+    public function showstats(): void
     {
         global $PAGE;
         $PAGE->addContentBox(
             'Board Statistics',
             $PAGE->parseTemplate(
-                'stats/show-stats.html'
-            )
+                'stats/show-stats.html',
+            ),
         );
     }
 
-    public function recount_statistics()
+    public function recount_statistics(): void
     {
         global $DB,$PAGE;
         $result = $DB->safeselect(
             '`id`,`nocount`',
-            'forums'
+            'forums',
         );
         while ($f = $DB->arow($result)) {
             $pc[$f['id']] = $f['nocount'];
         }
         $result = $DB->safespecial(
             <<<'EOT'
-SELECT p.`id` AS `id`,
-    p.`auth_id` AS `auth_id`,p.`tid` AS `tid`,t.`fid` AS `fid`
-FROM %t p
-LEFT JOIN %t t
-    ON p.`tid`=t.`id`
-EOT
+                SELECT p.`id` AS `id`,
+                    p.`auth_id` AS `auth_id`,p.`tid` AS `tid`,t.`fid` AS `fid`
+                FROM %t p
+                LEFT JOIN %t t
+                    ON p.`tid`=t.`id`
+                EOT
             ,
-            array('posts', 'topics')
+            ['posts', 'topics'],
         );
-        $stat = array(
-            'forum_topics' => array(),
-            'topic_posts' => array(),
-            'member_posts' => array(),
-            'cat_topics' => array(),
-            'cat_posts' => array(),
-            'forum_posts' => array(),
+        $stat = [
+            'forum_topics' => [],
+            'topic_posts' => [],
+            'member_posts' => [],
+            'cat_topics' => [],
+            'cat_posts' => [],
+            'forum_posts' => [],
             'posts' => 0,
             'topics' => 0,
-        );
+        ];
         while ($f = $DB->arow($result)) {
             if (!isset($stat['topic_posts'][$f['tid']])) {
                 if (!isset($stat['forum_topics'][$f['fid']])) {
@@ -107,7 +111,7 @@ EOT
         // as forums with subforums.
         $result = $DB->safeselect(
             '`id`,`path`,`cat_id`',
-            'forums'
+            'forums',
         );
         while ($f = $DB->arow($result)) {
             // I realize I don't use cat stats yet, but I may.
@@ -136,11 +140,11 @@ EOT
         foreach ($stat['topic_posts'] as $k => $v) {
             $DB->safeupdate(
                 'topics',
-                array(
+                [
                     'replies' => $v,
-                ),
+                ],
                 'WHERE `id`=?',
-                $k
+                $k,
             );
         }
 
@@ -148,11 +152,11 @@ EOT
         foreach ($stat['member_posts'] as $k => $v) {
             $DB->safeupdate(
                 'members',
-                array(
+                [
                     'posts' => $v,
-                ),
+                ],
                 'WHERE `id`=?',
-                $k
+                $k,
             );
         }
 
@@ -160,19 +164,19 @@ EOT
         foreach ($stat['forum_posts'] as $k => $v) {
             $DB->safeupdate(
                 'forums',
-                array(
+                [
                     'posts' => $v,
                     'topics' => $stat['forum_topics'][$k],
-                ),
+                ],
                 'WHERE `id`=?',
-                $k
+                $k,
             );
         }
 
         // Get # of members.
         $result = $DB->safeselect(
             'COUNT(`id`)',
-            'members'
+            'members',
         );
         $thisrow = $DB->arow($result);
         $stat['members'] = array_pop($thisrow);
@@ -181,19 +185,19 @@ EOT
         // Update global board stats.
         $DB->safeupdate(
             'stats',
-            array(
+            [
                 'posts' => $stat['posts'],
                 'topics' => $stat['topics'],
                 'members' => $stat['members'],
-            )
+            ],
         );
 
         $PAGE->addContentBox(
             'Board Statistics',
-            $PAGE->success('Board statistics recounted successfully.') .
-            PHP_EOL . $PAGE->parseTemplate(
-                'stats/recount-statistics.html'
-            )
+            $PAGE->success('Board statistics recounted successfully.')
+            . PHP_EOL . $PAGE->parseTemplate(
+                'stats/recount-statistics.html',
+            ),
         );
     }
 }

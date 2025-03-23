@@ -1,7 +1,7 @@
 <?php
 
 if (!defined(INACP)) {
-    die();
+    exit;
 }
 new members();
 class members
@@ -12,33 +12,49 @@ class members
         if (!isset($JAX->b['do'])) {
             $JAX->b['do'] = null;
         }
+
         switch ($JAX->b['do']) {
             case 'merge':
                 $this->merge();
+
                 break;
+
             case 'edit':
                 $this->editmem();
+
                 break;
+
             case 'delete':
                 $this->deletemem();
+
                 break;
+
             case 'prereg':
                 $this->preregister();
+
                 break;
+
             case 'massmessage':
                 $this->massmessage();
+
                 break;
+
             case 'ipbans':
                 $this->ipbans();
+
                 break;
+
             case 'validation':
                 $this->validation();
+
                 break;
+
             default:
                 $this->showmain();
+
                 break;
         }
-        $links = array(
+        $links = [
             'edit' => 'Edit Members',
             'prereg' => 'Pre-Register',
             'merge' => 'Account Merge',
@@ -46,15 +62,15 @@ class members
             'massmessage' => 'Mass Message',
             'ipbans' => 'IP Bans',
             'validation' => 'Validation',
-        );
+        ];
         $sidebarLinks = '';
         foreach ($links as $do => $title) {
             $sidebarLinks .= $PAGE->parseTemplate(
                 'sidebar-list-link.html',
-                array(
+                [
                     'url' => '?act=members&do=' . $do,
                     'title' => $title,
-                )
+                ],
             ) . PHP_EOL;
         }
 
@@ -66,57 +82,57 @@ class members
                 'title' => 'Recount Statistics',
             )
             ) . PHP_EOL;
-        */
+         */
 
         $PAGE->sidebar(
             $PAGE->parseTemplate(
                 'sidebar-list.html',
-                array(
+                [
                     'content' => $sidebarLinks,
-                )
-            )
+                ],
+            ),
         );
     }
 
-    public function showmain()
+    public function showmain(): void
     {
         global $PAGE,$DB,$JAX;
         $result = $DB->safespecial(
             <<<'EOT'
-SELECT m.`id` AS `id`,m.`avatar` AS `avatar`,
-    m.`display_name` AS `display_name`,m.`group_id` AS `group_id`,
-    g.`title` AS `group_title`
-FROM %t m
-LEFT JOIN %t g
-    ON m.`group_id`=g.`id`
-ORDER BY m.`display_name` ASC
-EOT
+                SELECT m.`id` AS `id`,m.`avatar` AS `avatar`,
+                    m.`display_name` AS `display_name`,m.`group_id` AS `group_id`,
+                    g.`title` AS `group_title`
+                FROM %t m
+                LEFT JOIN %t g
+                    ON m.`group_id`=g.`id`
+                ORDER BY m.`display_name` ASC
+                EOT
             ,
-            array('members', 'member_groups')
+            ['members', 'member_groups'],
         );
         $rows = '';
         while ($f = $DB->arow($result)) {
             $rows .= $PAGE->parseTemplate(
                 'members/show-main-row.html',
-                array(
+                [
                     'avatar_url' => $JAX->pick(
                         $f['avatar'],
-                        AVAURL . 'default.gif'
+                        AVAURL . 'default.gif',
                     ),
                     'id' => $f['id'],
                     'title' => $f['display_name'],
                     'group_title' => $f['group_title'],
-                )
+                ],
             ) . PHP_EOL;
         }
         $PAGE->addContentBox(
             'Member List',
             $PAGE->parseTemplate(
                 'members/show-main.html',
-                array(
+                [
                     'rows' => $rows,
-                )
-            )
+                ],
+            ),
         );
     }
 
@@ -135,36 +151,36 @@ EOT
             ) {
                 $result = $DB->safeselect(
                     <<<'EOT'
-`id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
-UNIX_TIMESTAMP(`join_date`) AS `join_date`,
-UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,
-`contact_skype`,`contact_yim`,`contact_msn`,`contact_gtalk`,`contact_aim`,
-`website`,`birthdate`, DAY(`birthdate`) AS `dob_day`,
-MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
-`about`,`display_name`,`full_name`,`contact_steam`,`location`,`gender`,
-`friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
-`sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
-`notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
-`contact_discord`,`contact_youtube`,`contact_bluesky`,
-`email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
-EOT
+                        `id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
+                        UNIX_TIMESTAMP(`join_date`) AS `join_date`,
+                        UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,
+                        `contact_skype`,`contact_yim`,`contact_msn`,`contact_gtalk`,`contact_aim`,
+                        `website`,`birthdate`, DAY(`birthdate`) AS `dob_day`,
+                        MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
+                        `about`,`display_name`,`full_name`,`contact_steam`,`location`,`gender`,
+                        `friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
+                        `sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
+                        `notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
+                        `contact_discord`,`contact_youtube`,`contact_bluesky`,
+                        `email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
+                        EOT
                     ,
                     'members',
                     'WHERE `id`=?',
-                    $DB->basicvalue($JAX->b['mid'])
+                    $DB->basicvalue($JAX->b['mid']),
                 );
                 $data = $DB->arow($result);
                 $DB->disposeresult($result);
                 if (isset($JAX->p['savedata']) && $JAX->p['savedata']) {
-                    if (2 != $data['group_id'] || 1 == $JAX->userData['id']) {
-                        $write = array();
+                    if ($data['group_id'] != 2 || $JAX->userData['id'] == 1) {
+                        $write = [];
                         if ($JAX->p['password']) {
                             $write['pass'] = password_hash(
                                 $JAX->p['password'],
-                                PASSWORD_DEFAULT
+                                PASSWORD_DEFAULT,
                             );
                         }
-                        $fields = array(
+                        $fields = [
                             'display_name',
                             'name',
                             'full_name',
@@ -176,85 +192,85 @@ EOT
                             'email',
                             'ucpnotepad',
                             'contact_aim',
-                        'contact_bluesky',
-                        'contact_discord',
+                            'contact_bluesky',
+                            'contact_discord',
                             'contact_gtalk',
                             'contact_msn',
                             'contact_skype',
                             'contact_steam',
                             'contact_twitter',
                             'contact_yim',
-                        'contact_youtube',
+                            'contact_youtube',
                             'website',
                             'posts',
                             'group_id',
-                        );
+                        ];
                         foreach ($fields as $field) {
                             if (isset($JAX->p[$field])) {
                                 $write[$field] = $JAX->p[$field];
                             }
                         }
                         // Make it so root admins can't get out of admin.
-                        if (1 == $JAX->b['mid']) {
+                        if ($JAX->b['mid'] == 1) {
                             $write['group_id'] = 2;
                         }
                         $DB->safeupdate(
                             'members',
                             $write,
                             'WHERE `id`=?',
-                            $DB->basicvalue($JAX->b['mid'])
+                            $DB->basicvalue($JAX->b['mid']),
                         );
                         $page = $PAGE->success('Profile data saved');
                     } else {
                         $page = $PAGE->error(
-                            'You do not have permission to edit this profile.' .
-                            $PAGE->back()
+                            'You do not have permission to edit this profile.'
+                            . $PAGE->back(),
                         );
                     }
                 }
                 $result = $DB->safeselect(
                     <<<'EOT'
-`id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
-UNIX_TIMESTAMP(`join_date`) AS `join_date`,
-UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,
-`contact_skype`,`contact_yim`,`contact_msn`,`contact_gtalk`,`contact_aim`,
-`website`,`birthdate`, DAY(`birthdate`) AS `dob_day`,
-MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
-`about`,`display_name`,`full_name`,`contact_steam`,`location`,`gender`,
-`friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
-`sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
-`notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
-`contact_discord`,`contact_youtube`,`contact_bluesky`,
-`email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
-EOT
+                        `id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
+                        UNIX_TIMESTAMP(`join_date`) AS `join_date`,
+                        UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,
+                        `contact_skype`,`contact_yim`,`contact_msn`,`contact_gtalk`,`contact_aim`,
+                        `website`,`birthdate`, DAY(`birthdate`) AS `dob_day`,
+                        MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
+                        `about`,`display_name`,`full_name`,`contact_steam`,`location`,`gender`,
+                        `friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
+                        `sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
+                        `notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
+                        `contact_discord`,`contact_youtube`,`contact_bluesky`,
+                        `email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
+                        EOT
                     ,
                     'members',
                     'WHERE `id`=?',
-                    $DB->basicvalue($JAX->b['mid'])
+                    $DB->basicvalue($JAX->b['mid']),
                 );
             } else {
                 $result = $DB->safeselect(
                     <<<'EOT'
-`id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
-UNIX_TIMESTAMP(`join_date`) AS `join_date`,
-UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,
-`contact_skype`,`contact_yim`,`contact_msn`,`contact_gtalk`,`contact_aim`,
-`website`,`birthdate`, DAY(`birthdate`) AS `dob_day`,
-MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
-`about`,`display_name`,`full_name`,`contact_steam`,`location`,`gender`,
-`friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
-`sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
-`notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
-`contact_discord`,`contact_youtube`,`contact_bluesky`,
-`email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
-EOT
+                        `id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
+                        UNIX_TIMESTAMP(`join_date`) AS `join_date`,
+                        UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,
+                        `contact_skype`,`contact_yim`,`contact_msn`,`contact_gtalk`,`contact_aim`,
+                        `website`,`birthdate`, DAY(`birthdate`) AS `dob_day`,
+                        MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
+                        `about`,`display_name`,`full_name`,`contact_steam`,`location`,`gender`,
+                        `friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
+                        `sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
+                        `notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
+                        `contact_discord`,`contact_youtube`,`contact_bluesky`,
+                        `email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
+                        EOT
                     ,
                     'members',
                     'WHERE `display_name` LIKE ?',
-                    $DB->basicvalue($JAX->p['name'] . '%')
+                    $DB->basicvalue($JAX->p['name'] . '%'),
                 );
             }
-            $data = array();
+            $data = [];
             while ($f = $DB->arow($result)) {
                 $data[] = $f;
             }
@@ -263,14 +279,14 @@ EOT
                 foreach ($data as $v) {
                     $page .= $PAGE->parseTemplate(
                         'members/edit-select-option.html',
-                        array(
+                        [
                             'avatar_url' => $JAX->pick(
                                 $v['avatar'],
-                                AVAURL . 'default.gif'
+                                AVAURL . 'default.gif',
                             ),
                             'id' => $v['id'],
                             'title' => $v['display_name'],
-                        )
+                        ],
                     ) . PHP_EOL;
                 }
 
@@ -279,17 +295,17 @@ EOT
             if (!$nummembers) {
                 return $PAGE->addContentBox(
                     'Error',
-                    $PAGE->error('This member does not exist. ' . $PAGE->back())
+                    $PAGE->error('This member does not exist. ' . $PAGE->back()),
                 );
             }
             $data = array_pop($data);
-            if (2 == $data['group_id'] && 1 != $JAX->userData['id']) {
+            if ($data['group_id'] == 2 && $JAX->userData['id'] != 1) {
                 $page = $PAGE->error(
-                    'You do not have permission to edit this profile. ' .
-                    $PAGE->back()
+                    'You do not have permission to edit this profile. '
+                    . $PAGE->back(),
                 );
             } else {
-                $page .= $JAX->hiddenFormFields(array('mid' => $data['id']));
+                $page .= $JAX->hiddenFormFields(['mid' => $data['id']]);
                 $page .= $this->formfield('Display Name:', 'display_name', $data['display_name']);
                 $page .= $this->formfield('Username:', 'name', $data['name']);
                 $page .= $this->formfield('Real Name:', 'full_name', $data['full_name']);
@@ -319,22 +335,22 @@ EOT
                 $page .= $this->formfield('Post Count:', 'posts', $data['posts']);
                 $page = $PAGE->parseTemplate(
                     'members/edit-form.html',
-                    array('content' => $page,)
+                    ['content' => $page],
                 );
             }
         } else {
             $page = $PAGE->parseTemplate(
-                'members/edit.html'
+                'members/edit.html',
             );
         }
         $PAGE->addContentBox(
-            (isset($data['name']) && $data['name']) ?
-            'Editing ' . $data['name'] . "'s details" : 'Edit Member',
-            $page
+            (isset($data['name']) && $data['name'])
+            ? 'Editing ' . $data['name'] . "'s details" : 'Edit Member',
+            $page,
         );
     }
 
-    public function preregister()
+    public function preregister(): void
     {
         global $PAGE,$JAX,$DB;
         $page = '';
@@ -357,11 +373,11 @@ EOT
                     'members',
                     'WHERE `name`=? OR `display_name`=?',
                     $DB->basicvalue($JAX->p['username']),
-                    $DB->basicvalue($JAX->p['displayname'])
+                    $DB->basicvalue($JAX->p['displayname']),
                 );
                 if ($f = $DB->arow($result)) {
-                    $e = 'That ' . ($f['name'] == $JAX->p['username'] ?
-                        'username' : 'display name') . ' is already taken';
+                    $e = 'That ' . ($f['name'] == $JAX->p['username']
+                        ? 'username' : 'display name') . ' is already taken';
                 }
 
                 $DB->disposeresult($result);
@@ -370,18 +386,18 @@ EOT
             if ($e) {
                 $page .= $PAGE->error($e);
             } else {
-                $member = array(
+                $member = [
                     'name' => $JAX->p['username'],
                     'display_name' => $JAX->p['displayname'],
                     'pass' => password_hash(
                         $JAX->p['pass'],
-                        PASSWORD_DEFAULT
+                        PASSWORD_DEFAULT,
                     ),
                     'last_visit' => date('Y-m-d H:i:s', time()),
                     'birthdate' => '0000-00-00',
                     'group_id' => 1,
                     'posts' => 0,
-                );
+                ];
                 $result = $DB->safeinsert('members', $member);
                 $error = $DB->error();
                 $DB->disposeresult($result);
@@ -389,14 +405,14 @@ EOT
                     $page .= $PAGE->success('Member registered.');
                 } else {
                     $page .= $PAGE->error(
-                        'An error occurred while processing your request. ' .
-                        $error
+                        'An error occurred while processing your request. '
+                        . $error,
                     );
                 }
             }
         }
         $page .= $PAGE->parseTemplate(
-            'members/pre-register.html'
+            'members/pre-register.html',
         );
         $PAGE->addContentBox('Pre-Register', $page);
     }
@@ -408,28 +424,28 @@ EOT
         $result = $DB->safeselect(
             '`id`,`title`',
             'member_groups',
-            'ORDER BY `title` DESC'
+            'ORDER BY `title` DESC',
         );
         while ($f = $DB->arow($result)) {
             $page .= $PAGE->parseTemplate(
                 'select-option.html',
-                array(
+                [
                     'value' => $f['id'],
                     'label' => $f['title'],
                     'selected' => $group_id == $f['id'] ? ' selected="selected"' : '',
-                )
+                ],
             ) . PHP_EOL;
         }
 
         return $PAGE->parseTemplate(
             'members/get-groups.html',
-            array(
+            [
                 'content' => $page,
-            )
+            ],
         );
     }
 
-    public function merge()
+    public function merge(): void
     {
         global $PAGE,$JAX,$DB;
         $page = '';
@@ -455,101 +471,101 @@ EOT
                 // Files.
                 $DB->safeupdate(
                     'files',
-                    array(
+                    [
                         'uid' => $mid2,
-                    ),
+                    ],
                     'WHERE `uid`=?',
-                    $mid1
+                    $mid1,
                 );
                 // PMs.
                 $DB->safeupdate(
                     'messages',
-                    array(
+                    [
                         'to' => $mid2,
-                    ),
+                    ],
                     'WHERE `to`=?',
-                    $mid1
+                    $mid1,
                 );
                 $DB->safeupdate(
                     'messages',
-                    array(
+                    [
                         'from' => $mid2,
-                    ),
+                    ],
                     'WHERE `from`=?',
-                    $mid1
+                    $mid1,
                 );
                 // Posts.
                 $DB->safeupdate(
                     'posts',
-                    array(
+                    [
                         'auth_id' => $mid2,
-                    ),
+                    ],
                     'WHERE `auth_id`=?',
-                    $mid1
+                    $mid1,
                 );
                 // Profile comments.
                 $DB->safeupdate(
                     'profile_comments',
-                    array(
+                    [
                         'to' => $mid2,
-                    ),
+                    ],
                     'WHERE `to`=?',
-                    $mid1
+                    $mid1,
                 );
                 $DB->safeupdate(
                     'profile_comments',
-                    array(
+                    [
                         'from' => $mid2,
-                    ),
+                    ],
                     'WHERE `from`=?',
-                    $mid1
+                    $mid1,
                 );
                 // Topics.
                 $DB->safeupdate(
                     'topics',
-                    array(
+                    [
                         'auth_id' => $mid2,
-                    ),
+                    ],
                     'WHERE `auth_id`=?',
-                    $mid1
+                    $mid1,
                 );
                 $DB->safeupdate(
                     'topics',
-                    array(
+                    [
                         'lp_uid' => $mid2,
-                    ),
+                    ],
                     'WHERE `lp_uid`=?',
-                    $mid1
+                    $mid1,
                 );
 
                 // Forums.
                 $DB->safeupdate(
                     'forums',
-                    array(
+                    [
                         'lp_uid' => $mid2,
-                    ),
+                    ],
                     'WHERE `lp_uid`=?',
-                    $mid1
+                    $mid1,
                 );
 
                 // Shouts.
                 $DB->safeupdate(
                     'shouts',
-                    array(
+                    [
                         'uid' => $mid2,
-                    ),
+                    ],
                     'WHERE `uid`=?',
-                    $mid1
+                    $mid1,
                 );
 
                 // Session.
                 $DB->safeupdate(
                     'session',
-                    array(
+                    [
                         'uid' => $mid2,
-                    ),
+                    ],
                     'WHERE `uid`=?',
-                    $mid1
+                    $mid1,
                 );
 
                 // Sum post count on account being merged into.
@@ -557,7 +573,7 @@ EOT
                     '`posts`,`id`',
                     'members',
                     'WHERE `id`=?',
-                    $mid1
+                    $mid1,
                 );
                 $posts = $DB->arow($result);
                 $DB->disposeresult($result);
@@ -569,9 +585,9 @@ EOT
                 }
                 $DB->safespecial(
                     'UPDATE %t SET `posts` = `posts` + ? WHERE `id`=?',
-                    array('members'),
+                    ['members'],
                     $posts,
-                    $mid2
+                    $mid2,
                 );
 
                 // Delete the account.
@@ -580,12 +596,12 @@ EOT
                 // Update stats.
                 $DB->safespecial(
                     <<<'EOT'
-UPDATE %t
-SET `members` = `members` - 1,
-    `last_register` = (SELECT MAX(`id`) FROM %t)
-EOT
+                        UPDATE %t
+                        SET `members` = `members` - 1,
+                            `last_register` = (SELECT MAX(`id`) FROM %t)
+                        EOT
                     ,
-                    array('stats', 'members')
+                    ['stats', 'members'],
                 );
                 $page .= $PAGE->success('Successfully merged the two accounts.');
             }
@@ -593,14 +609,14 @@ EOT
         $page .= '';
         $PAGE->addContentBox(
             'Account Merge',
-            $page . PHP_EOL .
-            $PAGE->parseTemplate(
-                'members/merge.html'
-            )
+            $page . PHP_EOL
+            . $PAGE->parseTemplate(
+                'members/merge.html',
+            ),
         );
     }
 
-    public function deletemem()
+    public function deletemem(): void
     {
         global $PAGE,$JAX,$DB;
         $page = '';
@@ -630,14 +646,14 @@ EOT
                 // Forums.
                 $DB->safeupdate(
                     'forums',
-                    array(
+                    [
                         'lp_uid' => null,
                         'lp_date' => '0000-00-00 00:00:00',
                         'lp_tid' => null,
                         'lp_topic' => '',
-                    ),
+                    ],
                     'WHERE `lp_uid`=?',
-                    $mid
+                    $mid,
                 );
 
                 // Shouts.
@@ -654,29 +670,29 @@ EOT
                 // Update stats.
                 $DB->safespecial(
                     <<<'EOT'
-UPDATE %t
-SET `members` = `members` - 1,
-    `last_register` = (SELECT MAX(`id`) FROM %t)
-EOT
+                        UPDATE %t
+                        SET `members` = `members` - 1,
+                            `last_register` = (SELECT MAX(`id`) FROM %t)
+                        EOT
                     ,
-                    array('stats', 'members')
+                    ['stats', 'members'],
                 );
                 $page .= $PAGE->success(
-                    'Successfully deleted the member account. ' .
-                    'Board Stat Recount suggested.'
+                    'Successfully deleted the member account. '
+                    . 'Board Stat Recount suggested.',
                 );
             }
         }
         $PAGE->addContentBox(
             'Delete Account',
-            $page . PHP_EOL .
-            $PAGE->parseTemplate(
-                'members/delete.html'
-            )
+            $page . PHP_EOL
+            . $PAGE->parseTemplate(
+                'members/delete.html',
+            ),
         );
     }
 
-    public function ipbans()
+    public function ipbans(): void
     {
         global $PAGE,$JAX;
         $page = '';
@@ -686,7 +702,7 @@ EOT
                 $iscomment = false;
                 // Check to see if each line is an ip, if it isn't,
                 // add a comment.
-                if ('#' == $v[0]) {
+                if ($v[0] == '#') {
                     $iscomment = true;
                 } elseif (!filter_var($v, FILTER_VALIDATE_IP)) {
                     if (mb_strstr($v, '.')) {
@@ -697,7 +713,7 @@ EOT
                         }
                         if (count($d) > 4) {
                             $iscomment = true;
-                        } elseif (count($d) < 4 && '.' != mb_substr($v, -1)) {
+                        } elseif (count($d) < 4 && mb_substr($v, -1) != '.') {
                             $iscomment = true;
                         } else {
                             foreach ($d as $v2) {
@@ -717,7 +733,7 @@ EOT
                             }
                             if (count($d) > 8) {
                                 $iscomment = true;
-                            } elseif (':' !== mb_substr($v, -1)) {
+                            } elseif (mb_substr($v, -1) !== ':') {
                                 $iscomment = true;
                             } else {
                                 foreach ($d as $v2) {
@@ -751,14 +767,14 @@ EOT
             'IP Bans',
             $PAGE->parseTemplate(
                 'members/ip-bans.html',
-                array(
+                [
                     'content' => htmlspecialchars($data),
-                )
-            )
+                ],
+            ),
         );
     }
 
-    public function massmessage()
+    public function massmessage(): void
     {
         global $PAGE,$JAX,$DB;
         $page = '';
@@ -771,13 +787,13 @@ EOT
                     'members',
                     'WHERE (?-UNIX_TIMESTAMP(`last_visit`))<?',
                     time(),
-                    (60 * 60 * 24 * 31 * 6)
+                    60 * 60 * 24 * 31 * 6,
                 );
                 $num = 0;
                 while ($f = $DB->arow($q)) {
                     $DB->safeinsert(
                         'messages',
-                        array(
+                        [
                             'to' => $f['id'],
                             'from' => $JAX->userData['id'],
                             'message' => $JAX->p['message'],
@@ -787,7 +803,7 @@ EOT
                             'read' => 0,
                             'flag' => 0,
                             'date' => date('Y-m-d H:i:s', time()),
-                        )
+                        ],
                     );
                     ++$num;
                 }
@@ -796,69 +812,69 @@ EOT
         }
         $PAGE->addContentBox(
             'Mass Message',
-            $page . PHP_EOL .
-            $PAGE->parseTemplate(
-                'members/mass-message.html'
-            )
+            $page . PHP_EOL
+            . $PAGE->parseTemplate(
+                'members/mass-message.html',
+            ),
         );
     }
 
-    public function validation()
+    public function validation(): void
     {
         global $PAGE,$DB;
         if (isset($_POST['submit1'])) {
             $PAGE->writeCFG(
-                array(
+                [
                     'membervalidation' => isset($_POST['v_enable'])
                     && $_POST['v_enable'] ? 1 : 0,
-                )
+                ],
             );
         }
         $page = $PAGE->parseTemplate(
             'members/validation.html',
-            array(
+            [
                 'checked' => $PAGE->getCFGSetting('membervalidation')
                 ? 'checked="checked"' : '',
-            )
+            ],
         ) . PHP_EOL;
         $PAGE->addContentBox('Enable Member Validation', $page);
 
         if (isset($_POST['mid'])) {
-            if ('Allow' == $_POST['action']) {
+            if ($_POST['action'] == 'Allow') {
                 $DB->safeupdate(
                     'members',
-                    array(
+                    [
                         'group_id' => 1,
-                    ),
+                    ],
                     'WHERE `id`=?',
-                    $DB->basicvalue($_POST['mid'])
+                    $DB->basicvalue($_POST['mid']),
                 );
             }
         }
         $result = $DB->safeselect(
-            '`id`,`display_name`,INET6_NTOA(`ip`) AS `ip`,`email`,' .
-            'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
+            '`id`,`display_name`,INET6_NTOA(`ip`) AS `ip`,`email`,'
+            . 'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
             'members',
-            'WHERE `group_id`=5'
+            'WHERE `group_id`=5',
         );
         $page = '';
         while ($f = $DB->arow($result)) {
             $page .= $PAGE->parseTemplate(
                 'members/validation-list-row.html',
-                array(
+                [
                     'id' => $f['id'],
                     'title' => $f['display_name'],
                     'ip_address' => $f['ip'],
                     'email_address' => $f['email'],
                     'join_date' => date('M jS, Y @ g:i A', $f['join_date']),
-                )
+                ],
             ) . PHP_EOL;
         }
         $page = $page ? $PAGE->parseTemplate(
             'members/validation-list.html',
-            array(
+            [
                 'content' => $page,
-            )
+            ],
         ) : 'There are currently no members awaiting validation.';
         $PAGE->addContentBox('Members Awaiting Validation', $page);
     }
@@ -870,22 +886,22 @@ EOT
         if (mb_strtolower($which) === 'textarea') {
             return $PAGE->parseTemplate(
                 'members/edit-form-field-textarea.html',
-                array(
+                [
                     'label' => $label,
                     'title' => $name,
                     'value' => $value,
-                )
-            ) . PHP_EOL;
-        } else {
-            return $PAGE->parseTemplate(
-                'members/edit-form-field-text.html',
-                array(
-                    'label' => $label,
-                    'title' => $name,
-                    'value' => $value,
-                )
+                ],
             ) . PHP_EOL;
         }
+
+        return $PAGE->parseTemplate(
+            'members/edit-form-field-text.html',
+            [
+                'label' => $label,
+                'title' => $name,
+                'value' => $value,
+            ],
+        ) . PHP_EOL;
     }
 
     public function heading($value)
@@ -894,9 +910,9 @@ EOT
 
         return $PAGE->parseTemplate(
             'members/edit-heading.html',
-            array(
+            [
                 'value' => $value,
-            )
+            ],
         );
     }
 }

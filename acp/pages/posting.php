@@ -1,7 +1,7 @@
 <?php
 
 if (!defined(INACP)) {
-    die();
+    exit;
 }
 
 new settings();
@@ -11,56 +11,62 @@ class settings
     {
         global $JAX, $PAGE;
 
-        $links = array(
+        $links = [
             'emoticons' => 'Emoticons',
             'wordfilter' => 'Word Filter',
             'postrating' => 'Post Rating',
-        );
+        ];
         $sidebarLinks = '';
         foreach ($links as $do => $title) {
             $sidebarLinks .= $PAGE->parseTemplate(
                 'sidebar-list-link.html',
-                array(
+                [
                     'url' => '?act=posting&do=' . $do,
                     'title' => $title,
-                )
+                ],
             ) . PHP_EOL;
         }
 
         $PAGE->sidebar(
             $PAGE->parseTemplate(
                 'sidebar-list.html',
-                array(
+                [
                     'content' => $sidebarLinks,
-                )
-            )
+                ],
+            ),
         );
 
         if (!isset($JAX->b['do'])) {
             $JAX->b['do'] = false;
         }
+
         switch ($JAX->b['do']) {
             case 'emoticons':
                 $this->emoticons();
+
                 break;
+
             case 'wordfilter':
                 $this->wordfilter();
+
                 break;
+
             case 'postrating':
                 $this->postrating();
+
                 break;
         }
     }
 
-    public function wordfilter()
+    public function wordfilter(): void
     {
         global $PAGE,$JAX,$DB;
         $page = '';
-        $wordfilter = array();
+        $wordfilter = [];
         $result = $DB->safeselect(
             '`id`,`type`,`needle`,`replacement`,`enabled`',
             'textrules',
-            "WHERE `type`='badword'"
+            "WHERE `type`='badword'",
         );
         while ($f = $DB->arow($result)) {
             $wordfilter[$f['needle']] = $f['replacement'];
@@ -71,7 +77,7 @@ class settings
             $DB->safedelete(
                 'textrules',
                 "WHERE `type`='badword' AND `needle`=?",
-                $DB->basicvalue($JAX->g['d'])
+                $DB->basicvalue($JAX->g['d']),
             );
             unset($wordfilter[$JAX->g['d']]);
         }
@@ -86,31 +92,31 @@ class settings
                 && $wordfilter[$JAX->p['badword']]
             ) {
                 $page .= $PAGE->error(
-                    "'" . $JAX->p['badword'] . "' is already used."
+                    "'" . $JAX->p['badword'] . "' is already used.",
                 );
             } else {
                 $DB->safeinsert(
                     'textrules',
-                    array(
+                    [
                         'type' => 'badword',
                         'needle' => $JAX->p['badword'],
                         'replacement' => $JAX->p['replacement'],
-                    )
+                    ],
                 );
                 $wordfilter[$JAX->p['badword']] = $JAX->p['replacement'];
             }
         }
         if (empty($wordfilter)) {
             $table = $PAGE->parseTemplate(
-                'posting/word-filter-empty.html'
+                'posting/word-filter-empty.html',
             ) . PHP_EOL . $PAGE->parseTemplate(
-                'posting/word-filter-submit-row.html'
+                'posting/word-filter-submit-row.html',
             );
         } else {
             $table = $PAGE->parseTemplate(
-                'posting/word-filter-heading.html'
+                'posting/word-filter-heading.html',
             ) . PHP_EOL . $PAGE->parseTemplate(
-                'posting/word-filter-submit-row.html'
+                'posting/word-filter-submit-row.html',
             );
             $currentFilters = array_reverse($wordfilter, true);
             foreach ($currentFilters as $filter => $result) {
@@ -118,48 +124,48 @@ class settings
                 $filterUrlEncoded = rawurlencode($filter);
                 $table .= $PAGE->parseTemplate(
                     'posting/word-filter-row.html',
-                    array(
+                    [
                         'filter' => $filter,
                         'result_code' => $resultCode,
                         'filter_url_encoded' => $filterUrlEncoded,
-                    )
+                    ],
                 ) . PHP_EOL;
             }
         }
         $page .= $PAGE->parseTemplate(
             'posting/word-filter.html',
-            array(
+            [
                 'content' => $table,
-            )
+            ],
         );
 
         $PAGE->addContentBox('Word Filter', $page);
     }
 
-    public function emoticons()
+    public function emoticons(): void
     {
         global $PAGE,$JAX,$DB;
 
-        $basesets = array(
+        $basesets = [
             'keshaemotes' => "Kesha's pack",
             'ploadpack' => "Pload's pack",
             '' => 'None',
-        );
+        ];
         $page = '';
-        $emoticons = array();
+        $emoticons = [];
         // Delete emoticon.
         if (isset($JAX->g['d']) && $JAX->g['d']) {
             $DB->safedelete(
                 'textrules',
                 "WHERE `type`='emote' AND `needle`=?",
-                $DB->basicvalue($_GET['d'])
+                $DB->basicvalue($_GET['d']),
             );
         }
         // Select emoticons.
         $result = $DB->safeselect(
             '`id`,`type`,`needle`,`replacement`,`enabled`',
             'textrules',
-            "WHERE `type`='emote'"
+            "WHERE `type`='emote'",
         );
         while ($f = $DB->arow($result)) {
             $emoticons[$f['needle']] = $f['replacement'];
@@ -174,33 +180,33 @@ class settings
             } else {
                 $DB->safeinsert(
                     'textrules',
-                    array(
+                    [
                         'needle' => $JAX->blockhtml($JAX->p['emoticon']),
                         'replacement' => $JAX->p['image'],
                         'enabled' => 1,
                         'type' => 'emote',
-                    )
+                    ],
                 );
                 $emoticons[$JAX->blockhtml($JAX->p['emoticon'])] = $JAX->p['image'];
             }
         }
 
         if (isset($JAX->p['baseset']) && $basesets[$JAX->p['baseset']]) {
-            $PAGE->writeCFG(array('emotepack' => $JAX->p['baseset']));
+            $PAGE->writeCFG(['emotepack' => $JAX->p['baseset']]);
         }
         if (empty($emoticons)) {
             $table = $PAGE->parseTemplate(
-                'posting/emoticon-heading.html'
+                'posting/emoticon-heading.html',
             ) . PHP_EOL . $PAGE->parseTemplate(
-                'posting/emoticon-submit-row.html'
+                'posting/emoticon-submit-row.html',
             ) . PHP_EOL . $PAGE->parseTemplate(
-                'posting/emoticon-empty-row.html'
+                'posting/emoticon-empty-row.html',
             );
         } else {
             $table = $PAGE->parseTemplate(
-                'posting/emoticon-heading.html'
+                'posting/emoticon-heading.html',
             ) . PHP_EOL . $PAGE->parseTemplate(
-                'posting/emoticon-submit-row.html'
+                'posting/emoticon-submit-row.html',
             );
             $emoticons = array_reverse($emoticons, true);
 
@@ -209,19 +215,19 @@ class settings
                 $emoticonUrlEncoded = rawurlencode($emoticon);
                 $table .= $PAGE->parseTemplate(
                     'posting/emoticon-row.html',
-                    array(
+                    [
                         'emoticon' => $emoticon,
                         'smiley_url' => $smileyFile,
                         'emoticon_url_encoded' => rawurlencode($emoticon),
-                    )
+                    ],
                 ) . PHP_EOL;
             }
         }
         $page .= $PAGE->parseTemplate(
             'posting/emoticons.html',
-            array(
+            [
                 'content' => $table,
-            )
+            ],
         );
 
         $PAGE->addContentBox('Custom Emoticons', $page);
@@ -232,12 +238,12 @@ class settings
         foreach ($basesets as $packId => $packName) {
             $emoticonPackOptions .= $PAGE->parseTemplate(
                 'select-option.html',
-                array(
+                [
                     'value' => $packId,
                     'label' => $packName,
-                    'selected' => $emoticonsetting == $packId ?
-                ' selected="selected"' : '',
-                )
+                    'selected' => $emoticonsetting == $packId
+                ? ' selected="selected"' : '',
+                ],
             );
         }
 
@@ -246,35 +252,35 @@ class settings
         foreach ($rules as $emoticon => $smileyFile) {
             $emoticonRows .= $PAGE->parseTemplate(
                 'posting/emoticon-packs-row.html',
-                array(
+                [
                     'emoticon' => $emoticon,
                     'smiley_url' => "/emoticons/{$emoticonpath}/{$smileyFile}",
-                )
+                ],
             ) . PHP_EOL;
         }
         $page = $PAGE->parseTemplate(
             'posting/emoticon-packs.html',
-            array(
+            [
                 'emoticon_packs' => $emoticonPackOptions,
                 'emoticon_rows' => $emoticonRows,
-            )
+            ],
         );
 
         $PAGE->addContentBox('Base Emoticon Set', $page);
     }
 
-    public function postrating()
+    public function postrating(): void
     {
         global $PAGE,$JAX,$DB;
         $page = $page2 = '';
-        $niblets = array();
+        $niblets = [];
         $result = $DB->safeselect(
             '`id`,`img`,`title`',
             'ratingniblets',
-            'ORDER BY `id` DESC'
+            'ORDER BY `id` DESC',
         );
         while ($f = $DB->arow($result)) {
-            $niblets[$f['id']] = array('img' => $f['img'], 'title' => $f['title']);
+            $niblets[$f['id']] = ['img' => $f['img'], 'title' => $f['title']];
         }
 
         // Delete.
@@ -282,7 +288,7 @@ class settings
             $DB->safedelete(
                 'ratingniblets',
                 'WHERE `id`=?',
-                $DB->basicvalue($JAX->g['d'])
+                $DB->basicvalue($JAX->g['d']),
             );
             unset($niblets[$JAX->g['d']]);
         }
@@ -294,23 +300,23 @@ class settings
             } else {
                 $DB->safeinsert(
                     'ratingniblets',
-                    array(
+                    [
                         'img' => $JAX->p['img'],
                         'title' => $JAX->p['title'],
-                    )
+                    ],
                 );
-                $niblets[$DB->insert_id(1)] = array(
+                $niblets[$DB->insert_id(1)] = [
                     'img' => $JAX->p['img'],
                     'title' => $JAX->p['title'],
-                );
+                ];
             }
         }
 
         if (isset($JAX->p['rsubmit']) && $JAX->p['rsubmit']) {
-            $cfg = array(
-                'ratings' => ($JAX->p['renabled'] ? 1 : 0) +
-                ($JAX->p['ranon'] ? 2 : 0),
-            );
+            $cfg = [
+                'ratings' => ($JAX->p['renabled'] ? 1 : 0)
+                + ($JAX->p['ranon'] ? 2 : 0),
+            ];
             $PAGE->writeCFG($cfg);
             $page2 .= $PAGE->success('Settings saved!');
         }
@@ -318,36 +324,36 @@ class settings
 
         $page2 .= $PAGE->parseTemplate(
             'posting/post-rating-settings.html',
-            array(
+            [
                 'ratings_enabled' => $ratingsettings & 1 ? ' checked="checked"' : '',
                 'ratings_anonymous' => $ratingsettings & 2 ? ' checked="checked"' : '',
-            )
+            ],
         );
         $table = $PAGE->parseTemplate(
-            'posting/post-rating-heading.html'
+            'posting/post-rating-heading.html',
         );
         if (empty($niblets)) {
             $table .= $PAGE->parseTemplate(
-                'posting/post-rating-empty-row.html'
+                'posting/post-rating-empty-row.html',
             );
         } else {
             krsort($niblets);
             foreach ($niblets as $ratingId => $rating) {
                 $table .= $PAGE->parseTemplate(
                     'posting/post-rating-row.html',
-                    array(
+                    [
                         'id' => $ratingId,
                         'title' => $JAX->blockhtml($rating['title']),
                         'image_url' => $JAX->blockhtml($rating['img']),
-                    )
+                    ],
                 );
             }
         }
         $page .= $PAGE->parseTemplate(
             'posting/post-rating.html',
-            array(
+            [
                 'content' => $table,
-            )
+            ],
         );
         $PAGE->addContentBox('Post Rating System', $page2);
         $PAGE->addContentBox('Post Rating Niblets', $page);

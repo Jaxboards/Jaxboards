@@ -1,7 +1,7 @@
 <?php
 
 if (!defined(INACP)) {
-    die();
+    exit;
 }
 
 new forums();
@@ -11,50 +11,50 @@ class forums
     {
         global $JAX,$PAGE;
 
-        $links = array(
+        $links = [
             'order' => 'Manage',
             'create' => 'Create Forum',
             'createc' => 'Create Category',
-        );
+        ];
         $sidebarLinks = '';
         foreach ($links as $do => $title) {
             $sidebarLinks .= $PAGE->parseTemplate(
                 'sidebar-list-link.html',
-                array(
+                [
                     'url' => '?act=forums&do=' . $do,
                     'title' => $title,
-                )
+                ],
             ) . PHP_EOL;
         }
         $sidebarLinks .= $PAGE->parseTemplate(
             'sidebar-list-link.html',
-            array(
+            [
                 'url' => '?act=stats',
                 'title' => 'Recount Statistics',
-            )
+            ],
         ) . PHP_EOL;
 
         $PAGE->sidebar(
             $PAGE->parseTemplate(
                 'sidebar-list.html',
-                array(
+                [
                     'content' => $sidebarLinks,
-                )
-            )
+                ],
+            ),
         );
 
         if (isset($JAX->b['delete']) && $JAX->b['delete']) {
             if (is_numeric($JAX->b['delete'])) {
                 return $this->deleteforum($JAX->b['delete']);
             }
-            if (preg_match('@c_(\\d+)@', $JAX->b['delete'], $m)) {
+            if (preg_match('@c_(\d+)@', $JAX->b['delete'], $m)) {
                 return $this->deletecategory($m[1]);
             }
         } elseif (isset($JAX->b['edit']) && $JAX->b['edit']) {
             if (is_numeric($JAX->b['edit'])) {
                 return $this->createforum($JAX->b['edit']);
             }
-            if (preg_match('@c_(\\d+)@', $JAX->b['edit'], $m)) {
+            if (preg_match('@c_(\d+)@', $JAX->b['edit'], $m)) {
                 return $this->createcategory($m[1]);
             }
         }
@@ -62,69 +62,77 @@ class forums
         if (!isset($JAX->g['do'])) {
             $JAX->g['do'] = null;
         }
+
         switch ($JAX->g['do']) {
             case 'order':
                 $this->orderforums();
+
                 break;
+
             case 'create':
                 $this->createforum();
+
                 break;
+
             case 'createc':
                 $this->createcategory();
+
                 break;
+
             default:
                 $this->orderforums();
+
                 break;
         }
     }
 
-    public function orderforums($highlight = 0)
+    public function orderforums($highlight = 0): void
     {
         global $PAGE,$DB,$JAX;
         $page = '';
         if ($highlight) {
             $page .= $PAGE->success(
-                'Forum Created. Now, just place it wherever you like!'
+                'Forum Created. Now, just place it wherever you like!',
             );
         }
         if (isset($JAX->p['tree']) && $JAX->p['tree']) {
             $JAX->p['tree'] = json_decode($JAX->p['tree'], true);
             $data = $this->mysqltree($JAX->p['tree']);
-            if ('create' == $JAX->g['do']) {
+            if ($JAX->g['do'] == 'create') {
                 return;
             }
             $page .= $PAGE->success('Data Saved');
         }
-        $forums = array();
+        $forums = [];
         $result = $DB->safeselect(
             '`id`,`title`,`order`',
             'categories',
-            'ORDER BY `order`,`id` ASC'
+            'ORDER BY `order`,`id` ASC',
         );
         while ($f = $DB->arow($result)) {
-            $forums['c_' . $f['id']] = array('title' => $f['title']);
+            $forums['c_' . $f['id']] = ['title' => $f['title']];
             $cats[] = $f['id'];
         }
         $DB->disposeresult($result);
 
         $result = $DB->safeselect(
             <<<'EOT'
-`id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
-UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,`show_sub`,
-`redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,`redirects`,
-`trashcan`,`mods`,`show_ledby`
-EOT
+                `id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
+                UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,`show_sub`,
+                `redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,`redirects`,
+                `trashcan`,`mods`,`show_ledby`
+                EOT
             ,
             'forums',
-            'ORDER BY `order`,`title`'
+            'ORDER BY `order`,`title`',
         );
-        $tree = array($result);
+        $tree = [$result];
         while ($f = $DB->arow($result)) {
-            $forums[$f['id']] = array(
+            $forums[$f['id']] = [
                 'title' => $f['title'],
                 'trashcan' => $f['trashcan'],
                 'mods' => $f['mods'],
-            );
+            ];
             $treeparts = explode(' ', $f['path']);
             array_unshift($treeparts, 'c_' . $f['cat_id']);
             $intree = &$tree;
@@ -134,7 +142,7 @@ EOT
                 }
 
                 if (!isset($intree[$v]) || !is_array($intree[$v])) {
-                    $intree[$v] = array();
+                    $intree[$v] = [];
                 }
 
                 $intree = &$intree[$v];
@@ -155,10 +163,10 @@ EOT
             $sortedtree,
             $forums,
             'tree',
-            $highlight
+            $highlight,
         );
         $page .= $PAGE->parseTemplate(
-            'forums/order-forums.html'
+            'forums/order-forums.html',
         );
         $PAGE->addContentBox('Forums', $page);
     }
@@ -166,16 +174,14 @@ EOT
     /**
      * Saves the posted tree to mysql.
      *
-     * @param array $tree The tree to save
-     * @param string $path The path in the tree
-     * @param int $order Where the tree is place n the database.
-     *
-     * @return void
+     * @param array  $tree  The tree to save
+     * @param string $path  The path in the tree
+     * @param int    $order where the tree is place n the database
      */
-    public static function mysqltree($tree, $path = '', $order = 0)
+    public static function mysqltree($tree, $path = '', $order = 0): void
     {
         global $DB;
-        $r = array();
+        $r = [];
         if (!is_array($tree)) {
             return;
         }
@@ -188,29 +194,29 @@ EOT
             if (is_array($v)) {
                 self::mysqltree($v, $childPath . ' ', $order);
             }
-            if ('c' == $k[0]) {
+            if ($k[0] == 'c') {
                 $DB->safeupdate(
                     'categories',
-                    array(
+                    [
                         'order' => $order,
-                    ),
+                    ],
                     'WHERE `id`=?',
-                    $cat
+                    $cat,
                 );
             } else {
                 $DB->safeupdate(
                     'forums',
-                    array(
+                    [
                         'path' => preg_replace(
-                            '@\\s+@',
+                            '@\s+@',
                             ' ',
-                            $formattedPath
+                            $formattedPath,
                         ),
                         'order' => $order,
                         'cat_id' => $cat,
-                    ),
+                    ],
                     'WHERE `id`=?',
-                    $k
+                    $k,
                 );
             }
         }
@@ -221,13 +227,13 @@ EOT
         global $PAGE;
 
         $html = '';
-        if (0 < count($tree)) {
+        if (count($tree) > 0) {
             foreach ($tree as $id => $children) {
                 if (!isset($data[$id]) || !is_array($data[$id])) {
                     continue;
                 }
-                $classes = array();
-                if ('c' == $id[0]) {
+                $classes = [];
+                if ($id[0] == 'c') {
                     $classes[] = 'parentlock';
                 } else {
                     $classes[] = 'nofirstlevel';
@@ -237,9 +243,9 @@ EOT
                 }
                 $classes = implode(' ', $classes);
                 if (isset($data[$id]['trashcan']) && $data[$id]['trashcan']) {
-                    $trashcan =
-                        $PAGE->parseTemplate(
-                            'forums/order-forums-tree-item-trashcan.html'
+                    $trashcan
+                        = $PAGE->parseTemplate(
+                            'forums/order-forums-tree-item-trashcan.html',
                         );
                 } else {
                     $trashcan = '';
@@ -252,10 +258,10 @@ EOT
                     $modCount = count(explode(',', $data[$id]['mods']));
                     $mods = $PAGE->parseTemplate(
                         'forums/order-forums-tree-item-mods.html',
-                        array(
+                        [
                             'mod_count' => $modCount,
-                            'content' => 'moderator' . (1 == $nummods ? '' : 's'),
-                        )
+                            'content' => 'moderator' . ($nummods == 1 ? '' : 's'),
+                        ],
                     );
                 } else {
                     $mods = '';
@@ -266,41 +272,40 @@ EOT
                         $children,
                         $data,
                         '',
-                        $highlight
+                        $highlight,
                     );
                 }
                 $title = $data[$id]['title'];
                 $html .= $PAGE->parseTemplate(
                     'forums/order-forums-tree-item.html',
-                    array(
+                    [
                         'class' => $classes,
                         'content' => $content,
                         'id' => $id,
                         'mods' => $mods,
                         'title' => $title,
                         'trashcan' => $trashcan,
-                    )
+                    ],
                 );
             }
 
             return $PAGE->parseTemplate(
                 'forums/order-forums-tree.html',
-                array(
-                    'class' => $class ? : '',
+                [
+                    'class' => $class ?: '',
                     'content' => $html,
-                )
+                ],
             );
         }
+
         return '';
     }
 
     /**
-     * Create & Edit forum
+     * Create & Edit forum.
      *
      * @param int $fid The forum ID. If set, this edits a forum,
      *                 otherwise it creates one.
-     *
-     * @return void
      */
     public function createforum($fid = 0)
     {
@@ -308,19 +313,19 @@ EOT
         $page = '';
         $e = '';
         $forumperms = '';
-        $fdata = array();
+        $fdata = [];
         if ($fid) {
             $result = $DB->safeselect(
                 <<<'EOT'
-`id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
-UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,`show_sub`,
-`redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,`redirects`,
-`trashcan`,`mods`,`show_ledby`
-EOT
+                    `id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
+                    UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,`show_sub`,
+                    `redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,`redirects`,
+                    `trashcan`,`mods`,`show_ledby`
+                    EOT
                 ,
                 'forums',
                 'WHERE `id`=?',
-                $DB->basicvalue($fid)
+                $DB->basicvalue($fid),
             );
             $fdata = $DB->arow($result);
             $DB->disposeresult($result);
@@ -339,11 +344,11 @@ EOT
                 $fdata['mods'] = implode(',', $exploded);
                 $DB->safeupdate(
                     'forums',
-                    array(
+                    [
                         'mods' => $fdata['mods'],
-                    ),
+                    ],
                     'WHERE `id`=?',
-                    $DB->basicvalue($fid)
+                    $DB->basicvalue($fid),
                 );
                 $this->updateperforummodflag();
                 $PAGE->location('?act=forums&edit=' . $fid);
@@ -353,17 +358,17 @@ EOT
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             // Saves all of the data
             // really should be its own function, but I don't care.
-            $grouppermsa = array();
+            $grouppermsa = [];
             $groupperms = '';
             $result = $DB->safeselect(
                 '`id`',
-                'member_groups'
+                'member_groups',
             );
             while ($f = $DB->arow($result)) {
                 if (!isset($JAX->p['groups'][$f['id']])) {
-                    $JAX->p['groups'][$f['id']] = array();
+                    $JAX->p['groups'][$f['id']] = [];
                 }
-                $options = array('read', 'start', 'reply', 'upload', 'view', 'poll');
+                $options = ['read', 'start', 'reply', 'upload', 'view', 'poll'];
                 $v = $JAX->p['groups'][$f['id']];
                 if (!isset($v['global']) || !$v['global']) {
                     foreach ($options as $option) {
@@ -372,12 +377,12 @@ EOT
                         }
                     }
                     $grouppermsa[$f['id']]
-                        = ($v['read'] ? 8 : 0) +
-                        ($v['start'] ? 4 : 0) +
-                        ($v['reply'] ? 2 : 0) +
-                        ($v['upload'] ? 1 : 0) +
-                        ($v['view'] ? 16 : 0) +
-                        ($v['poll'] ? 32 : 0);
+                        = ($v['read'] ? 8 : 0)
+                        + ($v['start'] ? 4 : 0)
+                        + ($v['reply'] ? 2 : 0)
+                        + ($v['upload'] ? 1 : 0)
+                        + ($v['view'] ? 16 : 0)
+                        + ($v['poll'] ? 32 : 0);
                 }
             }
             foreach ($grouppermsa as $k => $v) {
@@ -389,64 +394,62 @@ EOT
             }
             $result = $DB->safeselect(
                 '`id`',
-                'categories'
+                'categories',
             );
             $thisrow = $DB->arow($result);
-            $write = array(
+            $write = [
                 'title' => $JAX->p['title'],
                 'cat_id' => $JAX->pick(
-                    isset($fdata['cat_id']) ? $fdata['cat_id'] : null,
-                    array_pop($thisrow)
+                    $fdata['cat_id'] ?? null,
+                    array_pop($thisrow),
                 ),
                 'subtitle' => $JAX->p['description'],
                 'perms' => $groupperms,
                 'redirect' => $JAX->p['redirect'],
-                'show_sub' => 1 == $sub || 2 == $sub ? $sub : 0,
+                'show_sub' => $sub == 1 || $sub == 2 ? $sub : 0,
                 'nocount' => $JAX->p['nocount'] ? 0 : 1,
                 'orderby' => ($orderby > 0 && $orderby <= 5) ? $orderby : 0,
-                'trashcan' =>
-                    (int) (isset($JAX->p['trashcan']) && $JAX->p['trashcan']),
-                'show_ledby' =>
-                    (int) (isset($JAX->p['show_ledby']) && $JAX->p['show_ledby']),
-                'mods' => isset($fdata['mods']) ? $fdata['mods'] : null,
+                'trashcan' => (int) (isset($JAX->p['trashcan']) && $JAX->p['trashcan']),
+                'show_ledby' => (int) (isset($JAX->p['show_ledby']) && $JAX->p['show_ledby']),
+                'mods' => $fdata['mods'] ?? null,
                 // Handling done below.
-            );
+            ];
             $DB->disposeresult($result);
 
             // Add per-forum moderator.
             if (is_numeric($JAX->p['modid'])) {
                 $result = $DB->safeselect(
                     <<<'EOT'
-`id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
-UNIX_TIMESTAMP(`join_date`) AS `join_date`,
-UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,`contact_skype`,`contact_yim`,
-`contact_msn`,`contact_gtalk`,`contact_aim`,`website`,
-`birthdate`, DAY(`birthdate`) AS `dob_day`,
-MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
-`about`,`display_name`,`full_name`,`contact_steam`,`location`,`gender`,
-`friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
-`sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
-`notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
-`contact_discord`,`contact_youtube`,`contact_bluesky`,
-`email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
-EOT
+                        `id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
+                        UNIX_TIMESTAMP(`join_date`) AS `join_date`,
+                        UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,`contact_skype`,`contact_yim`,
+                        `contact_msn`,`contact_gtalk`,`contact_aim`,`website`,
+                        `birthdate`, DAY(`birthdate`) AS `dob_day`,
+                        MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
+                        `about`,`display_name`,`full_name`,`contact_steam`,`location`,`gender`,
+                        `friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
+                        `sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
+                        `notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
+                        `contact_discord`,`contact_youtube`,`contact_bluesky`,
+                        `email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
+                        EOT
                     ,
                     'members',
                     'WHERE `id`=?',
-                    $DB->basicvalue($JAX->p['modid'])
+                    $DB->basicvalue($JAX->p['modid']),
                 );
                 if ($DB->arow($result)) {
                     if (
-                        false === array_search(
+                        array_search(
                             $JAX->p['modid'],
-                            isset($fdata['mods']) ?
-                            explode(',', $fdata['mods']) : array()
-                        )
+                            isset($fdata['mods'])
+                            ? explode(',', $fdata['mods']) : [],
+                        ) === false
                     ) {
                         $write['mods'] = (isset($fdata['mods'])
-                            && $fdata['mods']) ?
-                            $fdata['mods'] . ',' . $JAX->p['modid'] :
-                            $JAX->p['modid'];
+                            && $fdata['mods'])
+                            ? $fdata['mods'] . ',' . $JAX->p['modid']
+                            : $JAX->p['modid'];
                     }
                 } else {
                     $e = "You tried to add a moderator that doesn't exist!";
@@ -467,9 +470,9 @@ EOT
                 ) {
                     $DB->safeupdate(
                         'forums',
-                        array(
+                        [
                             'trashcan' => 0,
-                        )
+                        ],
                     );
                 }
 
@@ -478,7 +481,7 @@ EOT
                         'forums',
                         $write,
                         'WHERE `id`=?',
-                        $fid
+                        $fid,
                     );
                     if ($JAX->p['modid']) {
                         $this->updateperforummodflag();
@@ -487,7 +490,7 @@ EOT
                 } else {
                     $DB->safeinsert(
                         'forums',
-                        $write
+                        $write,
                     );
 
                     return $this->orderforums($DB->insert_id(1));
@@ -496,7 +499,7 @@ EOT
             $fdata = $write;
         }
 
-        $perms = array();
+        $perms = [];
         if (isset($fdata['perms']) && $fdata['perms']) {
             $unpack = unpack('n*', $fdata['perms']);
             for ($x = 1; $x < count($unpack); $x += 2) {
@@ -505,16 +508,16 @@ EOT
         }
         $result = $DB->safeselect(
             <<<'EOT'
-`id`,`title`,`can_post`,`can_edit_posts`,`can_post_topics`,`can_edit_topics`,
-`can_add_comments`,`can_delete_comments`,`can_view_board`,
-`can_view_offline_board`,`flood_control`,`can_override_locked_topics`,
-`icon`,`can_shout`,`can_moderate`,`can_delete_shouts`,`can_delete_own_shouts`,
-`can_karma`,`can_im`,`can_pm`,`can_lock_own_topics`,`can_delete_own_topics`,
-`can_use_sigs`,`can_attach`,`can_delete_own_posts`,`can_poll`,`can_access_acp`,
-`can_view_shoutbox`,`can_view_stats`,`legend`,`can_view_fullprofile`
-EOT
+                `id`,`title`,`can_post`,`can_edit_posts`,`can_post_topics`,`can_edit_topics`,
+                `can_add_comments`,`can_delete_comments`,`can_view_board`,
+                `can_view_offline_board`,`flood_control`,`can_override_locked_topics`,
+                `icon`,`can_shout`,`can_moderate`,`can_delete_shouts`,`can_delete_own_shouts`,
+                `can_karma`,`can_im`,`can_pm`,`can_lock_own_topics`,`can_delete_own_topics`,
+                `can_use_sigs`,`can_attach`,`can_delete_own_posts`,`can_poll`,`can_access_acp`,
+                `can_view_shoutbox`,`can_view_stats`,`legend`,`can_view_fullprofile`
+                EOT
             ,
-            'member_groups'
+            'member_groups',
         );
 
         $groupperms = '';
@@ -529,99 +532,99 @@ EOT
             }
             $groupperms .= $PAGE->parseTemplate(
                 'forums/create-forum-permissions-row.html',
-                array(
+                [
                     'title' => $f['title'],
                     'global' => $this->checkbox($f['id'], 'global', $global),
                     'view' => $this->checkbox(
                         $f['id'],
                         'view',
-                        $global ? 1 : $p['view']
+                        $global ? 1 : $p['view'],
                     ),
                     'read' => $this->checkbox(
                         $f['id'],
                         'read',
-                        $global ? 1 : $p['read']
+                        $global ? 1 : $p['read'],
                     ),
                     'start' => $this->checkbox(
                         $f['id'],
                         'start',
-                        $global ? $f['can_post_topics'] :
-                        $p['start']
+                        $global ? $f['can_post_topics']
+                        : $p['start'],
                     ),
                     'reply' => $this->checkbox(
                         $f['id'],
                         'reply',
-                        $global ? $f['can_post'] :
-                        $p['reply']
+                        $global ? $f['can_post']
+                        : $p['reply'],
                     ),
                     'upload' => $this->checkbox(
                         $f['id'],
                         'upload',
-                        $global ? $f['can_attach'] : $p['upload']
+                        $global ? $f['can_attach'] : $p['upload'],
                     ),
                     'poll' => $this->checkbox(
                         $f['id'],
                         'poll',
-                        $global ? $f['can_poll'] : $p['poll']
+                        $global ? $f['can_poll'] : $p['poll'],
                     ),
-                )
+                ],
             ) . PHP_EOL;
         }
         if ($e) {
             $page .= $PAGE->error($e);
         }
-        $subforumOptionsArray = array(
+        $subforumOptionsArray = [
             0 => 'Not at all',
             1 => 'One level below',
             2 => 'All subforums',
-        );
+        ];
         $subforumOptions = '';
         foreach ($subforumOptionsArray as $value => $label) {
             $subforumOptions .= $PAGE->parseTemplate(
                 'select-option.html',
-                array(
+                [
                     'value' => $value,
                     'label' => $label,
-                    'selected' => isset($fdata['show_sub']) && $k == $fdata['show_sub'] ?
-                    'selected="selected"' : '',
-                )
+                    'selected' => isset($fdata['show_sub']) && $k == $fdata['show_sub']
+                    ? 'selected="selected"' : '',
+                ],
             ) . PHP_EOL;
         }
-        $orderByOptionsArray = array(
+        $orderByOptionsArray = [
             0 => 'Last Post, Descending',
             1 => 'Last Post, Ascending',
             2 => 'Topic Creation Time, Descending',
             3 => 'Topic Creation Time, Ascending',
             4 => 'Topic Title, Descending',
             5 => 'Topic Title, Ascending',
-        );
+        ];
         $orderByOptions = '';
         foreach ($orderByOptionsArray as $value => $label) {
             $orderByOptions .= $PAGE->parseTemplate(
                 'select-option.html',
-                array(
+                [
                     'value' => $value,
                     'label' => $label,
-                    'selected' => isset($fdata['show_sub']) && $k == $fdata['show_sub'] ?
-                    'selected="selected"' : '',
-                )
+                    'selected' => isset($fdata['show_sub']) && $k == $fdata['show_sub']
+                    ? 'selected="selected"' : '',
+                ],
             ) . PHP_EOL;
         }
 
 
         $page .= $PAGE->parseTemplate(
             'forums/create-forum.html',
-            array(
+            [
                 'title' => isset($fdata['title']) ? $JAX->blockhtml($fdata['title']) : '',
                 'description' => isset($fdata['subtitle']) ? $JAX->blockhtml($fdata['subtitle']) : '',
                 'redirect_url' => isset($fdata['redirect']) ? $JAX->blockhtml($fdata['redirect']) : '',
                 'subforum_options' => $subforumOptions,
                 'order_by_options' => $orderByOptions,
-                'no_count' => isset($fdata['nocount']) && $fdata['nocount'] ?
-                '' : ' checked="checked"',
-                'trashcan' => isset($fdata['trashcan']) && $fdata['trashcan']  ?
-                ' checked="checked"' : '',
-            )
+                'no_count' => isset($fdata['nocount']) && $fdata['nocount']
+                ? '' : ' checked="checked"',
+                'trashcan' => isset($fdata['trashcan']) && $fdata['trashcan']
+                ? ' checked="checked"' : '',
+            ],
         ) . PHP_EOL;
 
         if (isset($fdata['mods']) && $fdata['mods']) {
@@ -629,16 +632,16 @@ EOT
                 '`display_name`,`id`',
                 'members',
                 'WHERE `id` IN ?',
-                explode(',', $fdata['mods'])
+                explode(',', $fdata['mods']),
             );
             $modList = '';
             while ($f = $DB->arow($result)) {
                 $modList .= $PAGE->parseTemplate(
                     'forums/create-forum-moderators-mod.html',
-                    array(
+                    [
                         'username' => $f['display_name'],
                         'delete_link' => '?act=forums&edit=' . $fid . '&rmod=' . $f['id'],
-                    )
+                    ],
                 ) . PHP_EOL;
             }
         } else {
@@ -647,25 +650,25 @@ EOT
 
         $moderators = $PAGE->parseTemplate(
             'forums/create-forum-moderators.html',
-            array(
+            [
                 'mod_list' => $modList,
-                'show_led_by' => isset($fdata['show_ledby']) && $fdata['show_ledby'] ?
-                     'checked="checked"' : '',
-            )
+                'show_led_by' => isset($fdata['show_ledby']) && $fdata['show_ledby']
+                     ? 'checked="checked"' : '',
+            ],
         );
 
         $forumperms = $PAGE->parseTemplate(
             'forums/create-forum-permissions.html',
-            array(
+            [
                 'content' => $groupperms,
                 'submit' => $fid ? 'Save' : 'Next',
-            )
+            ],
         );
 
         $PAGE->addContentBox(
-            ($fid ? 'Edit' : 'Create') . ' Forum' .
-            ($fid ? ' - ' . $JAX->blockhtml($fdata['title']) : ''),
-            $page
+            ($fid ? 'Edit' : 'Create') . ' Forum'
+            . ($fid ? ' - ' . $JAX->blockhtml($fdata['title']) : ''),
+            $page,
         );
         $PAGE->addContentBox('Moderators', $moderators);
         $PAGE->addContentBox('Forum Permissions', $forumperms);
@@ -674,53 +677,53 @@ EOT
     public function deleteforum($id)
     {
         global $JAX,$DB,$PAGE;
-        if (isset($JAX->p['submit']) && 'Cancel' == $JAX->p['submit']) {
+        if (isset($JAX->p['submit']) && $JAX->p['submit'] == 'Cancel') {
             $PAGE->location('?act=forums&do=order');
         } elseif (isset($JAX->p['submit']) && $JAX->p['submit']) {
             $DB->safedelete(
                 'forums',
                 'WHERE `id`=?',
-                $DB->basicvalue($id)
+                $DB->basicvalue($id),
             );
             if ($JAX->p['moveto']) {
                 $DB->safeupdate(
                     'topics',
-                    array(
+                    [
                         'fid' => $JAX->p['moveto'],
-                    ),
+                    ],
                     ' WHERE `fid`=?',
-                    $DB->basicvalue($id)
+                    $DB->basicvalue($id),
                 );
                 $topics = $DB->affected_rows(1);
             } else {
                 $result = $DB->safespecial(
                     <<<'EOT'
-DELETE
-FROM %t
-WHERE `tid` IN (
-    SELECT `id`
-    FROM %t
-    WHERE `fid`=?
-)
-EOT
+                        DELETE
+                        FROM %t
+                        WHERE `tid` IN (
+                            SELECT `id`
+                            FROM %t
+                            WHERE `fid`=?
+                        )
+                        EOT
                     ,
-                    array('posts', 'topics'),
-                    $DB->basicvalue($id)
+                    ['posts', 'topics'],
+                    $DB->basicvalue($id),
                 );
 
                 $posts = $DB->affected_rows(1);
                 $DB->safedelete(
                     'topics',
                     'WHERE `fid`=?',
-                    $DB->basicvalue($id)
+                    $DB->basicvalue($id),
                 );
                 $topics = $DB->affected_rows(1);
             }
             $page = '';
             if ($topics > 0) {
-                $page .= ($JAX->p['moveto'] ? 'Moved' : 'Deleted') .
-                    " {$topics} topics" . ((isset($posts) && $posts) ?
-                    " and {$posts} posts" : '');
+                $page .= ($JAX->p['moveto'] ? 'Moved' : 'Deleted')
+                    . " {$topics} topics" . ((isset($posts) && $posts)
+                    ? " and {$posts} posts" : '');
             }
 
             return $PAGE->addContentBox(
@@ -728,24 +731,24 @@ EOT
                 $PAGE->success(
                     $PAGE->parseTemplate(
                         'forums/delete-forum-deleted.html',
-                        array(
+                        [
                             'content' => $page,
-                        )
-                    )
-                )
+                        ],
+                    ),
+                ),
             );
         }
         $result = $DB->safeselect(
             <<<'EOT'
-`id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
-UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,
-`show_sub`,`redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,
-`redirects`,`trashcan`,`mods`,`show_ledby`
-EOT
+                `id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
+                UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,
+                `show_sub`,`redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,
+                `redirects`,`trashcan`,`mods`,`show_ledby`
+                EOT
             ,
             'forums',
             'WHERE `id`=?',
-            $DB->basicvalue($id)
+            $DB->basicvalue($id),
         );
         $fdata = $DB->arow($result);
         $DB->disposeresult($result);
@@ -753,47 +756,47 @@ EOT
         if (!$fdata) {
             return $PAGE->addContentBox(
                 'Deleting Forum: ' . $id,
-                $PAGE->error("Forum doesn't exist.")
+                $PAGE->error("Forum doesn't exist."),
             );
         }
 
         $result = $DB->safeselect(
             <<<'EOT'
-`id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
-UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,
-`show_sub`,`redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,
-`redirects`,`trashcan`,`mods`,`show_ledby`
-EOT
+                `id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
+                UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,
+                `show_sub`,`redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,
+                `redirects`,`trashcan`,`mods`,`show_ledby`
+                EOT
             ,
-            'forums'
+            'forums',
         );
         $forums = '';
         while ($f = $DB->arow($result)) {
             $forums .= $PAGE->parseTemplate(
                 'select-option.html',
-                array(
+                [
                     'value' => $f['id'],
                     'label' => $f['title'],
                     'selected' => '',
-                )
+                ],
             ) . PHP_EOL;
         }
         $PAGE->addContentBox(
             'Deleting Forum: ' . $fdata['title'],
             $PAGE->parseTemplate(
                 'forums/delete-forum.html',
-                array(
+                [
                     'forum_options' => $forums,
-                )
-            )
+                ],
+            ),
         );
     }
 
-    public function createcategory($cid = false)
+    public function createcategory($cid = false): void
     {
         global $JAX,$DB,$PAGE;
         $page = '';
-        $cdata = array();
+        $cdata = [];
         if (!$cid && isset($JAX->p['cat_id'])) {
             $cid = (int) $JAX->p['cat_id'];
         }
@@ -802,7 +805,7 @@ EOT
                 '`id`,`title`',
                 'categories',
                 'WHERE `id`=?',
-                $DB->basicvalue($cid)
+                $DB->basicvalue($cid),
             );
             $cdata = $DB->arow($result);
             $DB->disposeresult($result);
@@ -811,24 +814,24 @@ EOT
             if (!trim($JAX->p['cat_name'])) {
                 $page .= $PAGE->error('All fields required');
             } else {
-                $data = array('title' => $JAX->p['cat_name']);
+                $data = ['title' => $JAX->p['cat_name']];
                 if (!empty($cdata)) {
                     $DB->safeupdate(
                         'categories',
                         $data,
                         'WHERE `id`=?',
-                        $DB->basicvalue($cid)
+                        $DB->basicvalue($cid),
                     );
                     $page .= $PAGE->success(
-                        'Category edited.'
+                        'Category edited.',
                     );
                 } else {
                     $DB->safeinsert(
                         'categories',
-                        $data
+                        $data,
                     );
                     $page .= $PAGE->success(
-                        'Category created.'
+                        'Category created.',
                     );
                     $data['id'] = (int) $DB->insert_id();
                 }
@@ -844,25 +847,25 @@ EOT
             ($cdata ? 'Edit' : 'Create') . ' Category',
             $page . PHP_EOL . $PAGE->parseTemplate(
                 'forums/create-category.html',
-                array(
+                [
                     'id' => $cdata && isset($cdata['id']) ? $cdata['id'] : 0,
                     'title' => $categoryTitle,
                     'submit' => isset($cdata) && $cdata ? 'Edit' : 'Create',
-                )
-            )
+                ],
+            ),
         );
     }
 
-    public function deletecategory($id)
+    public function deletecategory($id): void
     {
         global $PAGE,$DB,$JAX;
         $page = '';
         $e = '';
         $result = $DB->safeselect(
             '`id`,`title`',
-            'categories'
+            'categories',
         );
-        $categories = array();
+        $categories = [];
         $cattitle = false;
         while ($f = $DB->arow($result)) {
             if ($f['id'] != $id) {
@@ -871,7 +874,7 @@ EOT
                 $cattitle = $f['title'];
             }
         }
-        if (false === $cattitle) {
+        if ($cattitle === false) {
             $e = "The category you're trying to delete does not exist.";
         }
 
@@ -881,16 +884,16 @@ EOT
             } else {
                 $DB->safeupdate(
                     'forums',
-                    array(
+                    [
                         'cat_id' => $JAX->p['moveto'],
-                    ),
+                    ],
                     'WHERE `cat_id`=?',
-                    $DB->basicvalue($id)
+                    $DB->basicvalue($id),
                 );
                 $DB->safedelete(
                     'categories',
                     'WHERE `id`=?',
-                    $DB->basicvalue($id)
+                    $DB->basicvalue($id),
                 );
                 $page .= $PAGE->success('Category deleted!');
             }
@@ -905,18 +908,18 @@ EOT
             foreach ($categories as $categoryId => $categoryName) {
                 $categoryOptions .= $PAGE->parseTemplate(
                     'select-option.html',
-                    array(
+                    [
                         'value' => '' . $categoryId,
                         'label' => $categoryName,
                         'selected' => '',
-                    )
+                    ],
                 ) . PHP_EOL;
             }
             $page .= $PAGE->parseTemplate(
                 'forums/delete-category.html',
-                array(
+                [
                     'category_options' => $categoryOptions,
-                )
+                ],
             );
         }
         $PAGE->addContentBox('Category Deletion', $page);
@@ -926,24 +929,22 @@ EOT
      * This function updates all of the user->mod flags
      * that specify whether or not a user is a per-forum mod
      * based on the comma delimited list of mods for each forum.
-     *
-     * @return void
      */
-    public function updateperforummodflag()
+    public function updateperforummodflag(): void
     {
         global $DB;
         $DB->safeupdate(
             'members',
-            array(
+            [
                 'mod' => 0,
-            )
+            ],
         );
         $result = $DB->safeselect(
             '`mods`',
-            'forums'
+            'forums',
         );
         // Build an array of mods.
-        $mods = array();
+        $mods = [];
         while ($f = $DB->arow($result)) {
             foreach (explode(',', $f['mods']) as $v) {
                 if ($v) {
@@ -954,11 +955,11 @@ EOT
         // Update.
         $DB->safeupdate(
             'members',
-            array(
+            [
                 'mod' => 1,
-            ),
+            ],
             'WHERE `id` IN ?',
-            array_keys($mods)
+            array_keys($mods),
         );
     }
 
@@ -968,14 +969,14 @@ EOT
 
         return $PAGE->parseTemplate(
             'forums/create-forum-permissions-row-checkbox.html',
-            array(
+            [
                 'id' => $id,
                 'name' => $name,
                 'checked' => $checked ? 'checked="checked" ' : '',
-                'global' => 'global' === $name
+                'global' => $name === 'global'
                     ? 'onchange="globaltoggle(this.parentNode.parentNode,this.checked);"'
                     : '',
-            )
+            ],
         );
     }
 }

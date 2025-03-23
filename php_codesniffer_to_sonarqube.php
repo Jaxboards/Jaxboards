@@ -10,14 +10,11 @@
  *
  * USAGE:
  * ```sh
- * phpcs_to_sonarqube.php <input.json> <output.json>
+ * php_codesniffer_to_sonarqube.php <input.json> <output.json>
  * ```
  */
 
-/*
- * Fetch CLI arguments.
- */
-
+// Fetch CLI arguments.
 $php_codesniffer_report = $argv[1] ?? '';
 
 if ($php_codesniffer_report === '') {
@@ -41,10 +38,7 @@ if ($sonarqube_report === '') {
     exit(1);
 }
 
-/*
- * Validate CLI arguments are usable
- */
-
+// Validate CLI arguments are usable
 if (!file_exists($php_codesniffer_report)) {
     fwrite(STDERR, 'Provided PHP_CodeSniffer report json file does not exist');
 
@@ -128,7 +122,7 @@ file_put_contents(
                             $data['files'][$file]['messages'],
                             // phpcs:disable Generic.WhiteSpace.ScopeIndent.IncorrectExact
                             static fn(
-                            // phpcs:enable Generic.WhiteSpace.ScopeIndent.IncorrectExact
+                                // phpcs:enable Generic.WhiteSpace.ScopeIndent.IncorrectExact
                                 array $message,
                             ): bool => !in_array(
                                 $message['source'],
@@ -153,10 +147,10 @@ file_put_contents(
                                 'message' => $message['message'],
                                 'filePath' => $file,
                                 'textRange' => [
-                                    'startColumn' =>
+                                    'startColumn'
                                         // SonarQube starts at 0 for columns
                                         // while PHP_CodeSniffer starts at 1
-                                        (string) (
+                                        => (string) (
                                             ((int) $message['column']) - 1
                                         ),
                                     'startLine' => (string) $message['line'],

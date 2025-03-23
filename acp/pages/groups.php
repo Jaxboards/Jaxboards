@@ -1,7 +1,7 @@
 <?php
 
 if (!defined(INACP)) {
-    die();
+    exit;
 }
 
 new groups();
@@ -13,28 +13,28 @@ class groups
     {
         global $JAX,$PAGE;
         $sidebar = '';
-        $links = array(
+        $links = [
             'perms' => 'Edit Permissions',
             'create' => 'Create Group',
             'delete' => 'Delete Group',
-        );
+        ];
         $sidebarLinks = '';
         foreach ($links as $do => $title) {
             $sidebarLinks .= $PAGE->parseTemplate(
                 'sidebar-list-link.html',
-                array(
+                [
                     'url' => '?act=groups&do=' . $do,
                     'title' => $title,
-                )
+                ],
             ) . PHP_EOL;
         }
         $PAGE->sidebar(
             $PAGE->parseTemplate(
                 'sidebar-list.html',
-                array(
+                [
                     'content' => $sidebarLinks,
-                )
-            )
+                ],
+            ),
         );
         if (isset($JAX->g['edit']) && $JAX->g['edit']) {
             $JAX->g['do'] = 'edit';
@@ -42,21 +42,31 @@ class groups
         if (!isset($JAX->g['do'])) {
             $JAX->g['do'] = null;
         }
+
         switch ($JAX->g['do']) {
             case 'perms':
                 $this->showperms();
+
                 break;
+
             case 'create':
                 $this->create();
+
                 break;
+
             case 'edit':
                 $this->create($JAX->g['edit']);
+
                 break;
+
             case 'delete':
                 $this->delete();
+
                 break;
+
             default:
                 $this->showperms();
+
                 break;
         }
     }
@@ -64,7 +74,7 @@ class groups
     public function updateperms($perms)
     {
         global $PAGE,$DB;
-        $columns = array(
+        $columns = [
             'can_access_acp',
             'can_post',
             'can_edit_posts',
@@ -93,7 +103,7 @@ class groups
             'can_view_stats',
             'legend',
             'can_view_fullprofile',
-        );
+        ];
 
         // Set anything not sent to 0.
         foreach ($perms as $k => $v2) {
@@ -117,7 +127,7 @@ class groups
 
         // Update this.
         foreach ($perms as $k => $v) {
-            if (2 == $k) {
+            if ($k == 2) {
                 $v['can_access_acp'] = 1;
             }
             if ($k) {
@@ -125,7 +135,7 @@ class groups
                     'member_groups',
                     $v,
                     'WHERE `id`=?',
-                    $k
+                    $k,
                 );
             }
         }
@@ -134,18 +144,19 @@ class groups
         if ($error) {
             $PAGE->addContentBox(
                 'Error',
-                $PAGE->error($error)
+                $PAGE->error($error),
             );
         } else {
             $PAGE->addContentBox(
                 'Success!',
                 $PAGE->success(
-                    'Changes Saved successfully.'
-                )
+                    'Changes Saved successfully.',
+                ),
             );
         }
 
         $this->updatePermissions = false;
+
         return $this->showperms();
     }
 
@@ -165,7 +176,7 @@ class groups
                     !isset($JAX->p['perm'][$v])
                     || !$JAX->p['perm'][$v]
                 ) {
-                    $JAX->p['perm'][$v] = array();
+                    $JAX->p['perm'][$v] = [];
                 }
             }
 
@@ -173,41 +184,41 @@ class groups
         }
         if (
             !isset($JAX->b['grouplist'])
-            || preg_match('@[^\\d,]@', $JAX->b['grouplist'])
-            || false !== mb_strpos($JAX->b['grouplist'], ',,')
+            || preg_match('@[^\d,]@', $JAX->b['grouplist'])
+            || mb_strpos($JAX->b['grouplist'], ',,') !== false
         ) {
             $JAX->b['grouplist'] = '';
         }
 
-        $result = $JAX->b['grouplist'] ?
-            $DB->safeselect(
+        $result = $JAX->b['grouplist']
+            ? $DB->safeselect(
                 <<<'EOT'
-`id`,`title`,`can_post`,`can_edit_posts`,`can_post_topics`,`can_edit_topics`,
-`can_add_comments`,`can_delete_comments`,`can_view_board`,
-`can_view_offline_board`,`flood_control`,`can_override_locked_topics`,
-`icon`,`can_shout`,`can_moderate`,`can_delete_shouts`,`can_delete_own_shouts`,
-`can_karma`,`can_im`,`can_pm`,`can_lock_own_topics`,`can_delete_own_topics`,
-`can_use_sigs`,`can_attach`,`can_delete_own_posts`,`can_poll`,`can_access_acp`,
-`can_view_shoutbox`,`can_view_stats`,`legend`,`can_view_fullprofile`
-EOT
+                    `id`,`title`,`can_post`,`can_edit_posts`,`can_post_topics`,`can_edit_topics`,
+                    `can_add_comments`,`can_delete_comments`,`can_view_board`,
+                    `can_view_offline_board`,`flood_control`,`can_override_locked_topics`,
+                    `icon`,`can_shout`,`can_moderate`,`can_delete_shouts`,`can_delete_own_shouts`,
+                    `can_karma`,`can_im`,`can_pm`,`can_lock_own_topics`,`can_delete_own_topics`,
+                    `can_use_sigs`,`can_attach`,`can_delete_own_posts`,`can_poll`,`can_access_acp`,
+                    `can_view_shoutbox`,`can_view_stats`,`legend`,`can_view_fullprofile`
+                    EOT
                 ,
                 'member_groups',
                 'WHERE `id` IN ? ORDER BY `id` ASC',
-                explode(',', $JAX->b['grouplist'])
-            ) :
-            $DB->safeselect(
+                explode(',', $JAX->b['grouplist']),
+            )
+            : $DB->safeselect(
                 <<<'EOT'
-`id`,`title`,`can_post`,`can_edit_posts`,`can_post_topics`,`can_edit_topics`,
-`can_add_comments`,`can_delete_comments`,`can_view_board`,
-`can_view_offline_board`,`flood_control`,`can_override_locked_topics`,
-`icon`,`can_shout`,`can_moderate`,`can_delete_shouts`,`can_delete_own_shouts`,
-`can_karma`,`can_im`,`can_pm`,`can_lock_own_topics`,`can_delete_own_topics`,
-`can_use_sigs`,`can_attach`,`can_delete_own_posts`,`can_poll`,`can_access_acp`,
-`can_view_shoutbox`,`can_view_stats`,`legend`,`can_view_fullprofile`
-EOT
+                    `id`,`title`,`can_post`,`can_edit_posts`,`can_post_topics`,`can_edit_topics`,
+                    `can_add_comments`,`can_delete_comments`,`can_view_board`,
+                    `can_view_offline_board`,`flood_control`,`can_override_locked_topics`,
+                    `icon`,`can_shout`,`can_moderate`,`can_delete_shouts`,`can_delete_own_shouts`,
+                    `can_karma`,`can_im`,`can_pm`,`can_lock_own_topics`,`can_delete_own_topics`,
+                    `can_use_sigs`,`can_attach`,`can_delete_own_posts`,`can_poll`,`can_access_acp`,
+                    `can_view_shoutbox`,`can_view_stats`,`legend`,`can_view_fullprofile`
+                    EOT
                 ,
                 'member_groups',
-                'ORDER BY id ASC'
+                'ORDER BY id ASC',
             );
         $numgroups = 0;
         $grouplist = '';
@@ -220,8 +231,8 @@ EOT
             $PAGE->addContentBox(
                 'Error',
                 $PAGE->error(
-                    "Don't play with my variables!"
-                )
+                    "Don't play with my variables!",
+                ),
             );
         }
         $grouplist = mb_substr($grouplist, 0, -1);
@@ -230,15 +241,15 @@ EOT
         foreach ($perms as $groupId => $groupData) {
             $groupHeadings .= $PAGE->parseTemplate(
                 'groups/show-permissions-group-heading.html',
-                array(
+                [
                     'width_percent' => $widthPercent,
                     'id' => $groupId,
                     'title' => $groupData['title'],
-                )
+                ],
             ) . PHP_EOL;
         }
 
-        $permissionsChart = array(
+        $permissionsChart = [
             'breaker1' => 'Global',
             'can_view_board' => 'View Online Board',
             'can_view_offline_board' => 'View Offline Board',
@@ -281,47 +292,47 @@ EOT
             'breaker7' => 'Private/Instant Messaging',
             'can_pm' => 'Can PM',
             'can_im' => 'Can IM',
-        );
+        ];
         $permissionsTable = '';
         foreach ($permissionsChart as $k => $v) {
-            if ('breaker' == mb_substr($k, 0, 7)) {
+            if (mb_substr($k, 0, 7) == 'breaker') {
                 $permissionsTable .= $PAGE->parseTemplate(
                     'groups/show-permissions-breaker-row.html',
-                    array(
+                    [
                         'column_count' => 1 + $numgroups,
                         'title' => $v,
-                    )
+                    ],
                 ) . PHP_EOL;
             } else {
                 $groupColumns = '';
                 foreach ($perms as $groupId => $groupData) {
                     $groupColumns .= $PAGE->parseTemplate(
                         'groups/show-permissions-permission-row-group-column.html',
-                        array(
+                        [
                             'group_id' => $groupId,
                             'permission' => $k,
-                            'checked' => $groupData[$k] ?
-                            'checked="checked" ' : '',
-                        )
+                            'checked' => $groupData[$k]
+                            ? 'checked="checked" ' : '',
+                        ],
                     ) . PHP_EOL;
                 }
                 $permissionsTable .= $PAGE->parseTemplate(
                     'groups/show-permissions-permission-row.html',
-                    array(
+                    [
                         'title' => $v,
                         'group_columns' => $groupColumns,
-                    )
+                    ],
                 ) . PHP_EOL;
             }
         }
 
         $page .= $PAGE->parseTemplate(
             'groups/show-permissions.html',
-            array(
+            [
                 'group_list' => $grouplist,
                 'group_headings' => $groupHeadings,
                 'permissions_table' => $permissionsTable,
-            )
+            ],
         );
 
         $PAGE->addContentBox('Perms', $page);
@@ -348,29 +359,30 @@ EOT
             if ($e) {
                 $page .= $PAGE->error($e);
             } else {
-                $write = array(
+                $write = [
                     'title' => $JAX->p['groupname'],
                     'icon' => $JAX->p['groupicon'],
-                );
+                ];
                 if ($gid) {
                     $DB->safeupdate(
                         'member_groups',
                         $write,
                         'WHERE `id`=?',
-                        $DB->basicvalue($gid)
+                        $DB->basicvalue($gid),
                     );
                 } else {
                     $DB->safeinsert(
                         'member_groups',
-                        $write
+                        $write,
                     );
                 }
                 $PAGE->addContentBox(
                     $write['title'] . ' ' . (($gid) ? 'edited' : 'created'),
                     $PAGE->success(
-                        'Data saved.'
-                    )
+                        'Data saved.',
+                    ),
                 );
+
                 return $this->showperms();
             }
         }
@@ -379,7 +391,7 @@ EOT
                 '`title`,`icon`',
                 'member_groups',
                 'WHERE `id`=?',
-                $DB->basicvalue($gid)
+                $DB->basicvalue($gid),
             );
             $gdata = $DB->arow($result);
             $DB->disposeresult($result);
@@ -387,19 +399,19 @@ EOT
 
         $page .= $PAGE->parseTemplate(
             'groups/create.html',
-            array(
+            [
                 'title' => $gid ? $JAX->blockhtml($gdata['title']) : '',
                 'icon_url' => $gid ? $JAX->blockhtml($gdata['icon']) : '',
                 'submit' => $gid ? 'Edit' : 'Create',
-            )
+            ],
         );
         $PAGE->addContentBox(
             $gid ? 'Editing group: ' . $gdata['title'] : 'Create a group!',
-            $page
+            $page,
         );
     }
 
-    public function delete()
+    public function delete(): void
     {
         global $PAGE,$DB,$JAX;
         $page = '';
@@ -411,37 +423,37 @@ EOT
             $DB->safedelete(
                 'member_groups',
                 'WHERE `id`=?',
-                $DB->basicvalue($JAX->b['delete'])
+                $DB->basicvalue($JAX->b['delete']),
             );
             $DB->safeupdate(
                 'members',
-                array(
+                [
                     'group_id' => 1,
-                ),
+                ],
                 'WHERE `group_id`=?',
-                $DB->basicvalue($JAX->b['delete'])
+                $DB->basicvalue($JAX->b['delete']),
             );
         }
         $result = $DB->safeselect(
             '`id`,`title`',
             'member_groups',
-            'WHERE `id`>5'
+            'WHERE `id`>5',
         );
         $found = false;
         while ($f = $DB->arow($result)) {
             $found = true;
             $page .= $PAGE->parseTemplate(
                 'groups/delete.html',
-                array(
+                [
                     'id' => $f['id'],
                     'title' => $f['title'],
-                )
+                ],
             );
         }
         if (!$found) {
             $page .= $PAGE->error(
-                "You haven't created any groups to delete. " .
-                "(Hint: default groups can't be deleted)"
+                "You haven't created any groups to delete. "
+                . "(Hint: default groups can't be deleted)",
             );
         }
         $PAGE->addContentBox('Delete Groups', $page);

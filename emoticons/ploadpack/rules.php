@@ -1,6 +1,6 @@
 <?php
 
-$rules = array(
+$rules = [
     '8D' => 'awesome.png',
     ':|' => 'blank.png',
     'B)' => 'cool.png',
@@ -15,4 +15,4 @@ $rules = array(
     ':/' => 'slant.png',
     ':P' => 'tongue.png',
     ':p' => 'tongue.png',
-);
+];

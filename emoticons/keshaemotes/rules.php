@@ -1,6 +1,6 @@
 <?php
 
-$rules = array(
+$rules = [
     '&gt;:(' => 'angry.gif',
     ':)' => 'smile.gif',
     ':(' => 'frown.gif',
@@ -28,4 +28,4 @@ $rules = array(
     'XD' => 'XD.gif',
     '^_^' => '^_^.gif',
     ':cookie:' => 'cookie.gif',
-);
+];

@@ -6,15 +6,13 @@
  * PHP Version 8
  *
  * @category Jaxboards
- * @package  Jaxboards
  *
  * @author  Sean Johnson <seanjohnson08@gmail.com>
  * @author  World's Tallest Ladder <wtl420@users.noreply.github.com>
  * @license MIT <https://opensource.org/licenses/MIT>
  *
- * @link https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
+ * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
-
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', dirname(__DIR__));
 }
@@ -23,18 +21,20 @@ if (!defined('SERVICE_ROOT')) {
 }
 
 require_once JAXBOARDS_ROOT . '/inc/classes/mysql.php';
+
 require_once JAXBOARDS_ROOT . '/inc/classes/jax.php';
 
 $JAX = new JAX();
 $DB = new MySQL();
 
 if (!file_exists(JAXBOARDS_ROOT . '/config.php')) {
-    die('Jaxboards not installed!');
+    exit('Jaxboards not installed!');
 }
+
 require_once JAXBOARDS_ROOT . '/config.php';
 
 if (!$CFG['service']) {
-    die('Service mode not enabled');
+    exit('Service mode not enabled');
 }
 
 /**
@@ -42,15 +42,13 @@ if (!$CFG['service']) {
  *
  * @param string $src The source directory- this must exist already
  * @param string $dst The destination directory- this is assumed to not exist already
- *
- * @return void
  */
-function recurseCopy($src, $dst)
+function recurseCopy($src, $dst): void
 {
     $dir = opendir($src);
     @mkdir($dst);
     while (false !== ($file = readdir($dir))) {
-        if (('.' !== $file) && ('..' !== $file)) {
+        if (($file !== '.') && ($file !== '..')) {
             if (is_dir($src . '/' . $file)) {
                 recurseCopy($src . '/' . $file, $dst . '/' . $file);
             } else {
@@ -65,10 +63,10 @@ $connected = $DB->connect(
     $CFG['sql_host'],
     $CFG['sql_username'],
     $CFG['sql_password'],
-    $CFG['sql_db']
+    $CFG['sql_db'],
 );
 
-$errors = array();
+$errors = [];
 if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     if (isset($JAX->p['post']) && $JAX->p['post']) {
         header('Location: https://test.' . $CFG['domain']);
@@ -88,11 +86,11 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $errors[] = 'all fields required.';
     } elseif (mb_strlen($JAX->p['boardurl']) > 30) {
         $errors[] = 'board url too long';
-    } elseif ('www' == $JAX->p['boardurl']) {
+    } elseif ($JAX->p['boardurl'] == 'www') {
         $errors[] = 'WWW is reserved.';
-    } elseif (preg_match('@\\W@', $JAX->p['boardurl'])) {
-        $errors[] = 'board url needs to consist of letters, ' .
-            'numbers, and underscore only';
+    } elseif (preg_match('@\W@', $JAX->p['boardurl'])) {
+        $errors[] = 'board url needs to consist of letters, '
+            . 'numbers, and underscore only';
     }
 
     $result = $DB->safeselect(
@@ -100,7 +98,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         'directory',
         'WHERE `registrar_ip`=INET6_ATON(?) AND `date`>?',
         $JAX->getIp(),
-        date('Y-m-d H:i:s', (time() - 7 * 24 * 60 * 60))
+        date('Y-m-d H:i:s', time() - 7 * 24 * 60 * 60),
     );
     if ($DB->num_rows($result) > 3) {
         $errors[] = 'You may only register one 3 boards per week.';
@@ -113,16 +111,16 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
 
     if (mb_strlen($JAX->p['username']) > 50) {
         $errors[] = 'username too long';
-    } elseif (preg_match('@\\W@', $JAX->p['username'])) {
-        $errors[] = 'username needs to consist of letters, ' .
-            'numbers, and underscore only';
+    } elseif (preg_match('@\W@', $JAX->p['username'])) {
+        $errors[] = 'username needs to consist of letters, '
+            . 'numbers, and underscore only';
     }
 
     $result = $DB->safeselect(
         '`id`',
         'directory',
         'WHERE `boardname`=?',
-        $DB->basicvalue($JAX->p['boardurl'])
+        $DB->basicvalue($JAX->p['boardurl']),
     );
     if ($DB->arow($result)) {
         $errors[] = 'that board already exists';
@@ -137,13 +135,13 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         // Add board to directory.
         $DB->safeinsert(
             'directory',
-            array(
+            [
                 'boardname' => $board,
                 'registrar_email' => $JAX->p['email'],
                 'registrar_ip' => $JAX->ip2bin(),
                 'date' => date('Y-m-d H:i:s', time()),
-                'referral' => isset($JAX->b['r']) ? $JAX->b['r'] : '',
-            )
+                'referral' => $JAX->b['r'] ?? '',
+            ],
         );
         $DB->prefix($boardPrefix);
 
@@ -155,7 +153,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $lines = file(SERVICE_ROOT . '/blueprint.sql');
         foreach ($lines as $line) {
             // Skip comments.
-            if ('--' == mb_substr($line, 0, 2) || '' == $line) {
+            if (mb_substr($line, 0, 2) == '--' || $line == '') {
                 continue;
             }
 
@@ -166,7 +164,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             $query .= $line;
 
             // If it has a semicolon at the end, it's the end of the query.
-            if (';' == mb_substr(trim($line), -1, 1)) {
+            if (mb_substr(trim($line), -1, 1) == ';') {
                 // Perform the query.
                 $result = $DB->safequery($query);
                 $DB->disposeresult($result);
@@ -178,7 +176,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         // Don't forget to create the admin.
         $DB->safeinsert(
             'members',
-            array(
+            [
                 'name' => $JAX->p['username'],
                 'display_name' => $JAX->p['username'],
                 'pass' => password_hash($JAX->p['password'], PASSWORD_DEFAULT),
@@ -188,7 +186,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                 'group_id' => 2,
                 'join_date' => date('Y-m-d H:i:s', time()),
                 'last_visit' => date('Y-m-d H:i:s', time()),
-            )
+            ],
         );
 
         $dbError = $DB->error();

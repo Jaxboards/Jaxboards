@@ -7,15 +7,13 @@
  * PHP Version 8
  *
  * @category Jaxboards
- * @package  Jaxboards
  *
  * @author  Sean Johnson <seanjohnson08@gmail.com>
  * @author  World's Tallest Ladder <wtl420@users.noreply.github.com>
  * @license MIT <https://opensource.org/licenses/MIT>
  *
- * @link https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
+ * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
-
 if ($_GET['showerrors']) {
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
@@ -27,7 +25,7 @@ if (!defined('JAXBOARDS_ROOT')) {
 
 header('Cache-Control: no-cache, must-revalidate');
 
-$local = '127.0.0.1' == $_SERVER['REMOTE_ADDR'];
+$local = $_SERVER['REMOTE_ADDR'] == '127.0.0.1';
 $microtime = microtime(true);
 
 // Load composer dependencies.
@@ -43,10 +41,10 @@ $connected = $DB->connect(
     $CFG['sql_host'],
     $CFG['sql_username'],
     $CFG['sql_password'],
-    $CFG['sql_db']
+    $CFG['sql_db'],
 );
 if (!$connected) {
-    die('Could not connect');
+    exit('Could not connect');
 }
 
 // Start a session.
@@ -61,24 +59,26 @@ require_once 'domaindefinitions.php';
 
 // Require the classes.
 require_once JAXBOARDS_ROOT . '/inc/classes/page.php';
+
 require_once JAXBOARDS_ROOT . '/inc/classes/jax.php';
+
 require_once JAXBOARDS_ROOT . '/inc/classes/sess.php';
 
 // Initialize them.
 if (isset($CFG['noboard']) && $CFG['noboard']) {
-    die('board not found');
+    exit('board not found');
 }
 
 $PAGE = new PAGE();
 $JAX = new JAX();
-$SESS = new SESS(isset($_SESSION['sid']) ? $_SESSION['sid'] : false);
+$SESS = new SESS($_SESSION['sid'] ?? false);
 
 if (!isset($_SESSION['uid']) && isset($JAX->c['utoken'])) {
     $result = $DB->safeselect(
         '`uid`',
         'tokens',
         'WHERE `token`=?',
-        $JAX->c['utoken']
+        $JAX->c['utoken'],
     );
     $token = $DB->arow($result);
     if ($token) {
@@ -96,20 +96,20 @@ $PERMS = $JAX->getPerms();
 if ($USER && $SESS->ip != $USER['ip']) {
     $DB->safeupdate(
         'members',
-        array(
+        [
             'ip' => $SESS->ip,
-        ),
+        ],
         'WHERE id=?',
-        $USER['id']
+        $USER['id'],
     );
 }
 
 // Load the theme.
 $PAGE->loadskin(
     $JAX->pick(
-        isset($SESS->vars['skin_id']) ? $SESS->vars['skin_id'] : false,
-        isset($USER['skin_id']) ? $USER['skin_id'] : false
-    )
+        $SESS->vars['skin_id'] ?? false,
+        $USER['skin_id'] ?? false,
+    ),
 );
 $PAGE->loadmeta('global');
 
@@ -128,10 +128,10 @@ if (isset($JAX->b['skin_id'])) {
 if (isset($SESS->vars['skin_id']) && $SESS->vars['skin_id']) {
     $PAGE->append(
         'NAVIGATION',
-        '<div class="success" ' .
-        'style="position:fixed;bottom:0;left:0;width:100%;">' .
-        'Skin UCP setting being overriden. ' .
-        '<a href="?skin_id=0">Revert</a></div>'
+        '<div class="success" '
+        . 'style="position:fixed;bottom:0;left:0;width:100%;">'
+        . 'Skin UCP setting being overriden. '
+        . '<a href="?skin_id=0">Revert</a></div>',
     );
 }
 
@@ -149,60 +149,60 @@ if ($JAX->userData && !$SESS->is_bot) {
 
 // If the user's navigated to a new page, change their action time.
 if ($PAGE->jsnewlocation || !$PAGE->jsaccess) {
-    $SESS->act(isset($JAX->b['act']) ? $JAX->b['act'] : null);
+    $SESS->act($JAX->b['act'] ?? null);
 }
 
 // Set Navigation.
-$PAGE->path(array($JAX->pick($CFG['boardname'], 'Home') => '?'));
+$PAGE->path([$JAX->pick($CFG['boardname'], 'Home') => '?']);
 $PAGE->append(
     'TITLE',
     $JAX->pick(
         $PAGE->meta('title'),
         $CFG['boardname'],
-        'JaxBoards'
-    )
+        'JaxBoards',
+    ),
 );
 
 if (!$PAGE->jsaccess) {
-    foreach (array('sound_im', 'wysiwyg') as $v) {
+    foreach (['sound_im', 'wysiwyg'] as $v) {
         $variables[] = "{$v}:" . ($USER ? ($USER[$v] ? 1 : 0) : 1);
     }
     $variables[] = 'can_im:' . ($PERMS['can_im'] ? 1 : 0);
     if ($USER) {
-        $variables[] = 'groupid:' . ($JAX->pick($USER['group_id'], 3));
+        $variables[] = 'groupid:' . $JAX->pick($USER['group_id'], 3);
         $variables[] = "username:'" . addslashes($USER['display_name']) . "'";
         $variables[] = 'userid:' . $JAX->pick($USER['id'], 0);
     }
 
     $PAGE->append(
         'SCRIPT',
-        ' <script>var globalsettings={' .
-        implode(',', $variables) .
-        '}</script>'
+        ' <script>var globalsettings={'
+        . implode(',', $variables)
+        . '}</script>',
     );
     $PAGE->append(
         'SCRIPT',
-        ' <script src="' . BOARDURL .
-        'dist/app.js"></script>'
+        ' <script src="' . BOARDURL
+        . 'dist/app.js"></script>',
     );
 
-    if (($USER) && ($PERMS['can_moderate'] || $USER['mod'])) {
+    if ($USER && ($PERMS['can_moderate'] || $USER['mod'])) {
         $PAGE->append(
             'SCRIPT',
-            '<script type="text/javascript" ' .
-            'src="?act=modcontrols&do=load"></script>'
+            '<script type="text/javascript" '
+            . 'src="?act=modcontrols&do=load"></script>',
         );
     }
 
     $PAGE->append(
         'CSS',
-        '<link rel="stylesheet" type="text/css" href="' . THEMEPATHURL .
-        'css.css">'
+        '<link rel="stylesheet" type="text/css" href="' . THEMEPATHURL
+        . 'css.css">',
     );
     if ($PAGE->meta('favicon')) {
         $PAGE->append(
             'CSS',
-            '<link rel="icon" href="' . $PAGE->meta('favicon') . '">'
+            '<link rel="icon" href="' . $PAGE->meta('favicon') . '">',
         );
     }
     $PAGE->append(
@@ -210,28 +210,28 @@ if (!$PAGE->jsaccess) {
         $PAGE->meta(
             'logo',
             $JAX->pick(
-                isset($CFG['logourl']) ? $CFG['logourl'] : false,
-                BOARDURL . 'Service/Themes/Default/img/logo.png'
-            )
-        )
+                $CFG['logourl'] ?? false,
+                BOARDURL . 'Service/Themes/Default/img/logo.png',
+            ),
+        ),
     );
     $PAGE->append(
         'NAVIGATION',
         $PAGE->meta(
             'navigation',
-            $PERMS['can_moderate'] ?
-            '<li><a href="?act=modcontrols&do=cp">Mod CP</a></li>' : '',
-            $PERMS['can_access_acp'] ?
-            '<li><a href="./acp/" target="_BLANK">ACP</a></li>' : '',
-            isset($CFG['navlinks']) && $CFG['navlinks'] ? $CFG['navlinks'] : ''
-        )
+            $PERMS['can_moderate']
+            ? '<li><a href="?act=modcontrols&do=cp">Mod CP</a></li>' : '',
+            $PERMS['can_access_acp']
+            ? '<li><a href="./acp/" target="_BLANK">ACP</a></li>' : '',
+            isset($CFG['navlinks']) && $CFG['navlinks'] ? $CFG['navlinks'] : '',
+        ),
     );
     if ($USER && $USER['id']) {
         $result = $DB->safeselect(
             'COUNT(`id`)',
             'messages',
             'WHERE `read`=0 AND `to`=?',
-            $USER['id']
+            $USER['id'],
         );
         $thisrow = $DB->arow($result);
         $nummessages = array_pop($thisrow);
@@ -244,18 +244,18 @@ if (!$PAGE->jsaccess) {
     if ($nummessages) {
         $PAGE->append(
             'FOOTER',
-            '<a href="?act=ucp&what=inbox"><div id="notification" class="newmessage" ' .
-            'onclick="this.style.display=\'none\'">You have ' . $nummessages .
-            ' new message' . (1 == $nummessages ? '' : 's') . '</div></a>'
+            '<a href="?act=ucp&what=inbox"><div id="notification" class="newmessage" '
+            . 'onclick="this.style.display=\'none\'">You have ' . $nummessages
+            . ' new message' . ($nummessages == 1 ? '' : 's') . '</div></a>',
         );
     }
     if (!isset($CFG['nocopyright']) || !$CFG['nocopyright']) {
         $PAGE->append(
             'FOOTER',
-            '<div class="footer">' .
-            'Jaxboards 2.0.1! ' .
+            '<div class="footer">'
+            . 'Jaxboards 2.0.1! '
             // Removed the defunct URL
-            '&copy; 2007-' . date('Y') . '</div>'
+            . '&copy; 2007-' . date('Y') . '</div>',
         );
     }
     $PAGE->addvar('modlink', $PERMS['can_moderate'] ? $PAGE->meta('modlink') : '');
@@ -271,15 +271,15 @@ if (!$PAGE->jsaccess) {
                 'user-link',
                 $USER['id'],
                 $USER['group_id'],
-                $USER['display_name']
+                $USER['display_name'],
             ),
             $JAX->smalldate(
-                $USER['last_visit']
+                $USER['last_visit'],
             ),
-            $nummessages
-        ) : $PAGE->meta('userbox-logged-out')
+            $nummessages,
+        ) : $PAGE->meta('userbox-logged-out'),
     );
-} //end if !jsaccess only
+} // end if !jsaccess only
 if ($USER) {
     $PAGE->addvar('groupid', $JAX->pick($USER['group_id'], 3));
     $PAGE->addvar('userposts', $USER['posts']);
@@ -293,10 +293,10 @@ if (!isset($JAX->b['act'])) {
     $JAX->b['act'] = null;
 }
 if (
-'logreg' != $JAX->b['act']
-    && 'logreg2' != $JAX->b['act']
-    && 'logreg4' != $JAX->b['act']
-    && 'logreg3' != $JAX->b['act']
+    $JAX->b['act'] != 'logreg'
+        && $JAX->b['act'] != 'logreg2'
+        && $JAX->b['act'] != 'logreg4'
+        && $JAX->b['act'] != 'logreg3'
 ) {
     if (
         !$PERMS['can_view_board']
@@ -309,7 +309,7 @@ if (
 
 // Include modules.
 foreach (glob('inc/modules/*.php') as $v) {
-    if (preg_match('/tag_(\\w+)/', $v, $m)) {
+    if (preg_match('/tag_(\w+)/', $v, $m)) {
         if (
             isset($m[1]) && ((isset($JAX->b['module'])
             && $JAX->b['module'] == $m[1]) || $PAGE->templatehas($m[1]))
@@ -325,16 +325,16 @@ foreach (glob('inc/modules/*.php') as $v) {
 $actraw = isset($JAX->b['act']) ? mb_strtolower($JAX->b['act']) : '';
 preg_match('@^[a-zA-Z_]+@', $actraw, $act);
 $act = array_shift($act);
-$actdefs = array(
+$actdefs = [
     '' => 'idx',
     'vf' => 'forum',
     'vt' => 'topic',
     'vu' => 'userprofile',
-);
+];
 if (isset($actdefs[$act]) && $actdefs[$act]) {
     $act = $actdefs[$act];
 }
-if ('idx' == $act && isset($JAX->b['module']) && $JAX->b['module']) {
+if ($act == 'idx' && isset($JAX->b['module']) && $JAX->b['module']) {
     // Do nothing.
 } elseif ($act && is_file($act = 'inc/page/' . $act . '.php')) {
     include_once $act;
@@ -343,7 +343,7 @@ if ('idx' == $act && isset($JAX->b['module']) && $JAX->b['module']) {
         '`page`',
         'pages',
         'WHERE `act`=?',
-        $DB->basicvalue($actraw)
+        $DB->basicvalue($actraw),
     );
     if ($page = $DB->arow($result)) {
         $DB->disposeresult($result);
@@ -367,9 +367,9 @@ if ($PAGE->jsaccess && $SESS->runonce) {
 // current user throughout the script are finally put into query form here.
 $SESS->applyChanges();
 
-$pagegen = "";
+$pagegen = '';
 
-if (in_array($JAX->getIp(), array('127.0.0.1', '::1'))) {
+if (in_array($JAX->getIp(), ['127.0.0.1', '::1'])) {
     $debug = '';
     foreach ($DB->queryRuntime as $k => $v) {
         $debug .= "<b>{$v}</b> " . $DB->queryList[$k] . '<br>';
@@ -382,20 +382,20 @@ if (in_array($JAX->getIp(), array('127.0.0.1', '::1'))) {
         $PAGE->collapsebox(
             'Debug',
             $debug,
-            'query'
-        ) . "<div id='debug2'></div><div id='pagegen'></div>"
+            'query',
+        ) . "<div id='debug2'></div><div id='pagegen'></div>",
     );
     $PAGE->JS(
         'update',
         'pagegen',
-        $pagegen = 'Page Generated in ' . round(1000 * (microtime(true) - $microtime)) . ' ms'
+        $pagegen = 'Page Generated in ' . round(1000 * (microtime(true) - $microtime)) . ' ms',
     );
 }
 $PAGE->append(
     'DEBUG',
-    "<div id='pagegen' style='text-align:center'>" .
-    $pagegen .
-    "</div><div id='debug' style='display:none'></div>"
+    "<div id='pagegen' style='text-align:center'>"
+    . $pagegen
+    . "</div><div id='debug' style='display:none'></div>",
 );
 
 if ($PAGE->jsnewlocation) {

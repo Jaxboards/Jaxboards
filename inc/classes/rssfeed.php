@@ -2,30 +2,30 @@
 
 class rssfeed
 {
-    public $feed = array();
+    public $feed = [];
 
     public function __construct($settings)
     {
         $this->feed = array_merge($this->feed, $settings);
     }
 
-    public function additem($settings)
+    public function additem($settings): void
     {
         $this->feed['item'][] = $settings;
     }
 
-    public function publish()
+    public function publish(): void
     {
         $this->feed['pubDate'] = date('r');
         $xmlFeed = $this->make_xml($this->feed);
         echo <<<EOT
-<?xml version="1.0" encoding="UTF-8" ?>
-<rss version="2.0">
-    <channel>
-        {$xmlFeed}
-    </channel>
-</rss>
-EOT;
+            <?xml version="1.0" encoding="UTF-8" ?>
+            <rss version="2.0">
+                <channel>
+                    {$xmlFeed}
+                </channel>
+            </rss>
+            EOT;
     }
 
     public function make_xml($array, $k2 = false)
@@ -38,8 +38,8 @@ EOT;
                     $r .= "<{$k}>" . $this->make_xml($v2) . "</{$k}>";
                 }
             } else {
-                $r .= "<{$k}" . ('content' == $k ? ' type="html"' : '') . '>' .
-                    (is_array($v) ? $this->make_xml($v, $k) : $v) . "</{$k}>";
+                $r .= "<{$k}" . ($k == 'content' ? ' type="html"' : '') . '>'
+                    . (is_array($v) ? $this->make_xml($v, $k) : $v) . "</{$k}>";
             }
         }
 

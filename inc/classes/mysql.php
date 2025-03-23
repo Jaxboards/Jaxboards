@@ -3,15 +3,15 @@
 class MySQL
 {
     public $lastQuery;
-    public $queryList = array();
-    public $queryRuntime = array();
+    public $queryList = [];
+    public $queryRuntime = [];
     public $connected = false;
     public $mysqli_connection = false;
     public $lastfailedstatement = false;
     public $engine = 'MySQL';
     public $prefix = '';
     public $usersOnlineCache = '';
-    public $ratingNiblets = array();
+    public $ratingNiblets = [];
     public $db = '';
 
     public function connect($host, $user, $password, $database = '', $prefix = '')
@@ -19,45 +19,44 @@ class MySQL
         $this->mysqli_connection = new mysqli($host, $user, $password, $database);
         $this->prefix = $prefix;
         $this->db = $database;
-        if (!$this->mysqli_connection) {
-            return false;
-        }
 
-        return true;
+        return ! (!$this->mysqli_connection);
     }
 
     /**
      * A function to deal with the `mysqli_fetch_all` function only exiting
      * for the `mysqlnd` driver. Fetches all rows from a MySQLi query result.
      *
-     * @param mysqli_result $result The result you wish to fetch all rows from.
-     * @param int $resultType The result type for each row. Should be either
-     *                        `MYSQLI_ASSOC`, `MYSQLI_NUM`, or `MYSQLI_BOTH`
-     * @return array An array of MySQLi result rows.
+     * @param mysqli_result $result     the result you wish to fetch all rows from
+     * @param int           $resultType The result type for each row. Should be either
+     *                                  `MYSQLI_ASSOC`, `MYSQLI_NUM`, or `MYSQLI_BOTH`
+     *
+     * @return array an array of MySQLi result rows
      */
     protected function fetchAll(mysqli_result $result, $resultType = MYSQLI_ASSOC)
     {
         if (function_exists('mysqli_fetch_all')) {
             return $result->fetch_all($resultType);
         }
-        $result = array();
+        $result = [];
         while ($row = $result->fetch_array($resultType)) {
             $result[] = $row;
         }
+
         return $result;
     }
 
-    public function debug_mode()
+    public function debug_mode(): void
     {
         $this->debugMode = true;
     }
 
-    public function nolog()
+    public function nolog(): void
     {
         $this->nolog = true;
     }
 
-    public function prefix($a)
+    public function prefix($a): void
     {
         $this->prefix = $a;
     }
@@ -116,11 +115,11 @@ class MySQL
         // Table.
         array_shift($va_array);
         // Where.
-        $query = 'SELECT ' . $selectors . ' FROM ' .
-            $this->ftable($table) . ($where ? ' ' . $where : '');
+        $query = 'SELECT ' . $selectors . ' FROM '
+            . $this->ftable($table) . ($where ? ' ' . $where : '');
         array_unshift($va_array, $query);
 
-        return call_user_func_array(array($this, 'safequery'), $va_array);
+        return call_user_func_array([$this, 'safequery'], $va_array);
     }
 
     public function insert_id($use_mysqli = 0)
@@ -136,27 +135,27 @@ class MySQL
     {
         if (!empty($data) && count(array_keys($data)) > 0) {
             return $this->safequery(
-                'INSERT INTO ' . $this->ftable($table) .
-                ' (`' . implode('`, `', array_keys($data)) . '`) VALUES ?;',
-                array_values($data)
+                'INSERT INTO ' . $this->ftable($table)
+                . ' (`' . implode('`, `', array_keys($data)) . '`) VALUES ?;',
+                array_values($data),
             );
         }
     }
 
     public function buildInsert($a)
     {
-        $r = array(array(), array(array()));
+        $r = [[], [[]]];
         if (!isset($a[0]) || !is_array($a[0])) {
-            $a = array($a);
+            $a = [$a];
         }
 
         foreach ($a as $k => $v) {
             ksort($v);
             foreach ($v as $k2 => $v2) {
-                if ('UTF-8' != mb_check_encoding($v2)) {
+                if (mb_check_encoding($v2) != 'UTF-8') {
                     $v2 = utf8_encode($v2);
                 }
-                if (0 == $k) {
+                if ($k == 0) {
                     $r[0][] = $this->ekey($k2);
                 }
                 $r[1][$k][] = $this->evalue($v2);
@@ -199,7 +198,7 @@ class MySQL
 
         array_unshift($va_array, $query);
 
-        return call_user_func_array(array($this, 'safequery'), $va_array);
+        return call_user_func_array([$this, 'safequery'], $va_array);
     }
 
     public function safeBuildUpdate($kvarray)
@@ -211,7 +210,7 @@ class MySQL
         /*
             E.G. if array is a => b; c => c; then result is a = ?, b = ?,
             where the first " = ?," comes from the implode.
-        */
+         */
 
         return '`' . implode('` = ?, `', array_keys($kvarray)) . '` = ?';
     }
@@ -228,8 +227,8 @@ class MySQL
 
     public function safedelete($table, $whereformat)
     {
-        $query = 'DELETE FROM ' . $this->ftable($table) .
-            ($whereformat ? ' ' . $whereformat : '');
+        $query = 'DELETE FROM ' . $this->ftable($table)
+            . ($whereformat ? ' ' . $whereformat : '');
 
         // phpcs:disable PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
         $va_array = func_get_args();
@@ -240,14 +239,15 @@ class MySQL
         array_shift($va_array);
         // Whereformat.
         array_unshift($va_array, $query);
+
         // Put the format string back.
-        return call_user_func_array(array($this, 'safequery'), $va_array);
+        return call_user_func_array([$this, 'safequery'], $va_array);
     }
 
     public function row($a = null)
     {
         global $PAGE;
-        $a = $a ? $a : $this->lastQuery;
+        $a = $a ?: $this->lastQuery;
         $ret = $a ? mysqli_fetch_array($a) : false;
 
         return $ret;
@@ -256,7 +256,7 @@ class MySQL
     // Only new-style mysqli.
     public function arows($a = null)
     {
-        $a = $a ? $a : $this->lastQuery;
+        $a = $a ?: $this->lastQuery;
         if ($a) {
             return $this->fetchAll($a, MYSQLI_ASSOC);
         }
@@ -267,7 +267,7 @@ class MySQL
     // Only new-style mysqli.
     public function rows($a = null)
     {
-        $a = $a ? $a : $this->lastQuery;
+        $a = $a ?: $this->lastQuery;
         if ($a) {
             return $this->fetchAll($a, MYSQLI_BOTH);
             // Disturbingly, not MYSQLI_NUM.
@@ -279,7 +279,7 @@ class MySQL
     public function arow($a = null)
     {
         global $PAGE;
-        $a = $a ? $a : $this->lastQuery;
+        $a = $a ?: $this->lastQuery;
         if ($a) {
             $q = @mysqli_fetch_assoc($a);
         } else {
@@ -291,7 +291,7 @@ class MySQL
 
     public function num_rows($a = null)
     {
-        $a = $a ? $a : $this->lastQuery;
+        $a = $a ?: $this->lastQuery;
         if ($a) {
             return $a->num_rows;
         }
@@ -299,7 +299,7 @@ class MySQL
         return 0;
     }
 
-    public function disposeresult($result)
+    public function disposeresult($result): void
     {
         if (!$result) {
             syslog(
@@ -308,8 +308,8 @@ class MySQL
                     // phpcs:disable PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
                     debug_backtrace(),
                     // phpcs:enable
-                    true
-                )
+                    true,
+                ),
             );
 
             return;
@@ -349,7 +349,7 @@ class MySQL
         $last = array_pop($arr);
 
         if ($arrlen > 0) {
-            $replacement = '(' . str_repeat('?, ', ($arrlen) - 1) . ' ?)';
+            $replacement = '(' . str_repeat('?, ', $arrlen - 1) . ' ?)';
         }
 
         return implode('?', $arr) . $replacement . $last;
@@ -365,7 +365,7 @@ class MySQL
         $connection = $this->mysqli_connection;
 
         $typestring = '';
-        $out_args = array();
+        $out_args = [];
 
         $added_placeholders = 0;
         if ($my_argc > 1) {
@@ -376,19 +376,19 @@ class MySQL
 
                 $type = $this->safequery_typeforvalue($value);
 
-                if ('a' == $type) {
+                if ($type == 'a') {
                     $type = $this->safequery_array_types($value);
 
                     $query_string = $this->safequery_sub_array(
                         $query_string,
                         $i + $added_placeholders,
-                        mb_strlen($type)
+                        mb_strlen($type),
                     );
 
                     $added_placeholders += mb_strlen($type) - 1;
 
                     foreach ($value as $singlevalue) {
-                        if (null === $singlevalue) {
+                        if ($singlevalue === null) {
                             $singlevalue = '';
                         }
                         array_push($out_args, $singlevalue);
@@ -406,13 +406,13 @@ class MySQL
             $error = $this->mysqli_connection->error;
             if ($error) {
                 error_log(
-                    "ERROR WITH QUERY: {$query_string}" . PHP_EOL . "{$error}"
+                    "ERROR WITH QUERY: {$query_string}" . PHP_EOL . "{$error}",
                 );
             }
             syslog(
                 LOG_ERR,
-                "SAFEQUERY PREPARE FAILED FOR {$query_string}, " .
-                print_r($out_args, true) . PHP_EOL
+                "SAFEQUERY PREPARE FAILED FOR {$query_string}, "
+                . print_r($out_args, true) . PHP_EOL,
             );
 
             return;
@@ -427,7 +427,7 @@ class MySQL
                 syslog(LOG_ERR, 'BIND PARAMETERS FAILED' . PHP_EOL);
                 syslog(LOG_ERR, "QUERYSTRING: {$query_string}" . PHP_EOL);
                 syslog(LOG_ERR, 'ELEMENTCOUNT: ' . mb_strlen($typestring));
-                syslog(LOG_ERR, 'BINDVARCOUNT: ' . (count($refvalues[1])));
+                syslog(LOG_ERR, 'BINDVARCOUNT: ' . count($refvalues[1]));
                 syslog(LOG_ERR, 'QUERYARGS: ' . print_r($out_args, true) . PHP_EOL);
                 syslog(LOG_ERR, 'REFVALUES: ' . print_r($refvalues, true) . PHP_EOL);
                 // phpcs:disable PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
@@ -441,7 +441,7 @@ class MySQL
             $error = $this->mysqli_connection->error;
             if ($error) {
                 error_log(
-                    "ERROR WITH QUERY: {$query_string}" . PHP_EOL . "{$error}"
+                    "ERROR WITH QUERY: {$query_string}" . PHP_EOL . "{$error}",
                 );
             }
 
@@ -453,7 +453,7 @@ class MySQL
         $retval = $stmt->get_result();
 
         if (!$retval) {
-            if (!preg_match('/^\\s*(UPDATE|DELETE|INSERT)\\s/i', $query_string)) {
+            if (!preg_match('/^\s*(UPDATE|DELETE|INSERT)\s/i', $query_string)) {
                 // This is normal for a non-SELECT query.
                 syslog(LOG_ERR, "Result is NULL for {$query_string}" . PHP_EOL);
             }
@@ -462,7 +462,7 @@ class MySQL
         $error = $this->mysqli_connection->error;
         if ($error) {
             error_log(
-                "ERROR WITH QUERY: {$query_string}" . PHP_EOL . "{$error}"
+                "ERROR WITH QUERY: {$query_string}" . PHP_EOL . "{$error}",
             );
         }
 
@@ -471,7 +471,7 @@ class MySQL
 
     public function refValues($arr)
     {
-        $refs = array();
+        $refs = [];
 
         foreach ($arr as $key => $value) {
             $refs[$key] = &$arr[$key];
@@ -505,9 +505,9 @@ class MySQL
         } elseif ($value === null) {
             $value = 'NULL';
         } else {
-            $value = is_int($value) ? $value :
-                '\'' . $this->escape(
-                    ($forsprintf ? str_replace('%', '%%', $value) : $value)
+            $value = is_int($value) ? $value
+                : '\'' . $this->escape(
+                    $forsprintf ? str_replace('%', '%%', $value) : $value,
                 ) . '\'';
         }
 
@@ -538,63 +538,64 @@ class MySQL
                 LOG_ERR,
                 'NO TABLE NAMES' . PHP_EOL . print_r(
                     debug_backtrace(),
-                    true
-                )
+                    true,
+                ),
             );
         }
 
         $newformat = vsprintf(
             $tempformat,
             array_map(
-                array(
+                [
                     $this,
                     'ftable',
-                ),
-                $tablenames
-            )
+                ],
+                $tablenames,
+            ),
         );
 
         array_unshift($va_array, $newformat);
-// Put the format string back.
-        return call_user_func_array(array($this, 'safequery'), $va_array);
+
+        // Put the format string back.
+        return call_user_func_array([$this, 'safequery'], $va_array);
     }
 
     public function getUsersOnline()
     {
         global $CFG,$USER,$SESS;
         $idletimeout = time() - $CFG['timetoidle'];
-        $r = array('guestcount' => 0);
+        $r = ['guestcount' => 0];
         if (!$this->usersOnlineCache) {
             $result = $this->safespecial(
                 <<<'EOT'
-SELECT a.`id` as `id`,a.`uid` AS `uid`,a.`location` AS `location`,
-    a.`location_verbose` AS `location_verbose`,a.`hide` AS `hide`,
-    a.`is_bot` AS `is_bot`,b.`display_name` AS `name`,
-    b.`group_id` AS `group_id`,b.`birthdate` AS `birthdate`,
-    CONCAT(MONTH(b.`birthdate`),' ',DAY(b.`birthdate`)) AS `dob`,
-    UNIX_TIMESTAMP(a.`last_action`) AS `last_action`,
-    UNIX_TIMESTAMP(a.`last_update`) AS `last_update`
-FROM %t a
-LEFT JOIN %t b
-    ON a.`uid`=b.`id`
-WHERE a.`last_update`>=?
-ORDER BY a.`last_action` DESC
-EOT
+                    SELECT a.`id` as `id`,a.`uid` AS `uid`,a.`location` AS `location`,
+                        a.`location_verbose` AS `location_verbose`,a.`hide` AS `hide`,
+                        a.`is_bot` AS `is_bot`,b.`display_name` AS `name`,
+                        b.`group_id` AS `group_id`,b.`birthdate` AS `birthdate`,
+                        CONCAT(MONTH(b.`birthdate`),' ',DAY(b.`birthdate`)) AS `dob`,
+                        UNIX_TIMESTAMP(a.`last_action`) AS `last_action`,
+                        UNIX_TIMESTAMP(a.`last_update`) AS `last_update`
+                    FROM %t a
+                    LEFT JOIN %t b
+                        ON a.`uid`=b.`id`
+                    WHERE a.`last_update`>=?
+                    ORDER BY a.`last_action` DESC
+                    EOT
                 ,
-                array('session', 'members'),
-                date('Y-m-d H:i:s', (time() - $CFG['timetologout']))
+                ['session', 'members'],
+                date('Y-m-d H:i:s', time() - $CFG['timetologout']),
             );
             $today = date('n j');
             while ($f = $this->arow($result)) {
                 if ($f['hide']) {
-                    if ($USER && 2 != $USER['group_id']) {
+                    if ($USER && $USER['group_id'] != 2) {
                         continue;
                     }
                     $f['name'] = '* ' . $f['name'];
                 }
                 $f['birthday'] = ($f['dob'] == $today ? 1 : 0);
-                $f['status'] = $f['last_action'] < $idletimeout ?
-                    'idle' : 'active';
+                $f['status'] = $f['last_action'] < $idletimeout
+                    ? 'idle' : 'active';
                 if ($f['is_bot']) {
                     $f['name'] = $f['id'];
                     $f['uid'] = $f['id'];
@@ -612,21 +613,21 @@ EOT
             /*
                 Since we update the session data at the END of the page,
                 we'll want to include the user in the usersonline.
-            */
+             */
 
             if ($USER && isset($r[$USER['id']]) && $r[$USER['id']]) {
-                $r[$USER['id']] = array(
+                $r[$USER['id']] = [
                     'uid' => $USER['id'],
                     'group_id' => $USER['group_id'],
                     'last_action' => date('Y-m-d H:i:s', $SESS->last_action),
                     'last_update' => $SESS->last_update,
                     'name' => ($SESS->hide ? '* ' : '') . $USER['display_name'],
-                    'status' => $SESS->last_action < $idletimeout ?
-                    'idle' : 'active',
+                    'status' => $SESS->last_action < $idletimeout
+                    ? 'idle' : 'active',
                     'birthday' => $USER['birthday'],
                     'location' => $SESS->location,
                     'location_verbose' => $SESS->location_verbose,
-                );
+                ];
             }
             $this->usersOnlineCache = $r;
         }
@@ -634,38 +635,38 @@ EOT
         return $this->usersOnlineCache;
     }
 
-    public function fixForumLastPost($fid)
+    public function fixForumLastPost($fid): void
     {
         global $PAGE;
         $result = $this->safeselect(
             '`lp_uid`,UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`id`,`title`',
             'topics',
             'WHERE `fid`=? ORDER BY `lp_date` DESC LIMIT 1',
-            $fid
+            $fid,
         );
         $d = $this->arow($result);
         $this->disposeresult($result);
         $this->safeupdate(
             'forums',
-            array(
+            [
                 'lp_uid' => (isset($d['lp_uid'])
                 && is_numeric($d['lp_uid'])
                 && $d['lp_uid']) ? (int) $d['lp_uid'] : null,
                 'lp_date' => (isset($d['lp_date'])
                 && is_numeric($d['lp_date'])
-                && $d['lp_date']) ? date('Y-m-d H:i:s', $d['lp_date']) :
-                '0000-00-00 00:00:00',
+                && $d['lp_date']) ? date('Y-m-d H:i:s', $d['lp_date'])
+                : '0000-00-00 00:00:00',
                 'lp_tid' => (isset($d['id'])
                 && is_numeric($d['id'])
                 && $d['id']) ? (int) $d['id'] : null,
-                'lp_topic' => isset($d['title']) ? $d['title'] : '',
-            ),
+                'lp_topic' => $d['title'] ?? '',
+            ],
             'WHERE id=?',
-            $fid
+            $fid,
         );
     }
 
-    public function fixAllForumLastPosts()
+    public function fixAllForumLastPosts(): void
     {
         $query = $this->safeselect('`id`', 'forums');
         while ($fid = $this->arow($query)) {
@@ -680,11 +681,11 @@ EOT
         }
         $result = $this->safeselect(
             '`id`,`img`,`title`',
-            'ratingniblets'
+            'ratingniblets',
         );
-        $r = array();
+        $r = [];
         while ($f = $this->arow($result)) {
-            $r[$f['id']] = array('img' => $f['img'], 'title' => $f['title']);
+            $r[$f['id']] = ['img' => $f['img'], 'title' => $f['title']];
         }
 
         return $this->ratingNiblets = $r;
@@ -694,8 +695,8 @@ EOT
     {
         return '<div>' . implode(
             '<br />',
-            $this->queryList
+            $this->queryList,
         ) . '</div>';
-        $this->queryList = array();
+        $this->queryList = [];
     }
 }

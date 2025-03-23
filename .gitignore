@@ -1,6 +1,7 @@
 # Cache files
-Thumbs.db
 .DS_Store
+.php-cs-fixer.cache
+Thumbs.db
 
 # Config files
 Desktop.ini

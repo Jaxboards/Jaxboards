@@ -27,13 +27,13 @@ class SHOUTBOX
             $this->deleteshout();
         } elseif (
             isset($JAX->b['module'])
-            && 'shoutbox' == $JAX->b['module']
+            && $JAX->b['module'] == 'shoutbox'
         ) {
             $this->showallshouts();
         }
         if (
             isset($JAX->p['shoutbox_shout'])
-            && '' !== trim($JAX->p['shoutbox_shout'])
+            && trim($JAX->p['shoutbox_shout']) !== ''
         ) {
             $this->addshout();
         }
@@ -54,7 +54,7 @@ class SHOUTBOX
                     '`uid`',
                     'shouts',
                     'WHERE `id`=?',
-                    $id
+                    $id,
                 );
                 $shoutrow = $DB->arow($result);
             }
@@ -72,35 +72,35 @@ class SHOUTBOX
     public function formatshout($row)
     {
         global $PAGE,$JAX,$CFG;
-        $shout = $JAX->theworks($row['shout'], array('minimalbb' => true));
+        $shout = $JAX->theworks($row['shout'], ['minimalbb' => true]);
         $user = $row['uid'] ? $PAGE->meta(
             'user-link',
             $row['uid'],
             $row['group_id'],
-            $row['display_name']
+            $row['display_name'],
         ) : 'Guest';
-        $avatar = (isset($CFG['shoutboxava']) && $CFG['shoutboxava']) ?
-            '<img src="' . $JAX->pick(
+        $avatar = (isset($CFG['shoutboxava']) && $CFG['shoutboxava'])
+            ? '<img src="' . $JAX->pick(
                 $row['avatar'],
-                $PAGE->meta('default-avatar')
+                $PAGE->meta('default-avatar'),
             ) . '" class="avatar" alt="avatar" />' : '';
         $deletelink = $PAGE->meta('shout-delete', $row['id']);
         if (!$this->canDelete(0, $row)) {
             $deletelink = '';
         }
-        if ('/me ' == mb_substr($shout, 0, 4)) {
+        if (mb_substr($shout, 0, 4) == '/me ') {
             $shout = $PAGE->meta(
                 'shout-action',
                 $JAX->smalldate(
                     $row['date'],
-                    1
+                    1,
                 ),
                 $user,
                 mb_substr(
                     $shout,
-                    3
+                    3,
                 ),
-                $deletelink
+                $deletelink,
             );
         } else {
             $shout = $PAGE->meta(
@@ -109,30 +109,30 @@ class SHOUTBOX
                 $user,
                 $shout . PHP_EOL,
                 $deletelink,
-                $avatar
+                $avatar,
             );
         }
 
         return $shout;
     }
 
-    public function displayshoutbox()
+    public function displayshoutbox(): void
     {
         global $PAGE,$DB,$SESS,$USER;
         $result = $DB->safespecial(
             <<<'EOT'
-SELECT s.`id` AS `id`,s.`uid` AS `uid`,s.`shout` AS `shout`,
-    UNIX_TIMESTAMP(s.`date`) AS `date`,INET6_NTOA(s.`ip`) AS `ip`,
-    m.`display_name` AS `display_name`, m.`group_id` AS `group_id`,
-    m.`avatar` AS `avatar`
-FROM %t s
-LEFT JOIN %t m
-    ON s.`uid`=m.`id`
-ORDER BY s.`id` DESC LIMIT ?
-EOT
+                SELECT s.`id` AS `id`,s.`uid` AS `uid`,s.`shout` AS `shout`,
+                    UNIX_TIMESTAMP(s.`date`) AS `date`,INET6_NTOA(s.`ip`) AS `ip`,
+                    m.`display_name` AS `display_name`, m.`group_id` AS `group_id`,
+                    m.`avatar` AS `avatar`
+                FROM %t s
+                LEFT JOIN %t m
+                    ON s.`uid`=m.`id`
+                ORDER BY s.`id` DESC LIMIT ?
+                EOT
             ,
-            array('shouts', 'members'),
-            $this->shoutlimit
+            ['shouts', 'members'],
+            $this->shoutlimit,
         );
         $shouts = '';
         $first = 0;
@@ -149,20 +149,20 @@ EOT
                 'collapsebox',
                 " id='shoutbox'",
                 $PAGE->meta(
-                    'shoutbox-title'
+                    'shoutbox-title',
                 ),
                 $PAGE->meta(
                     'shoutbox',
-                    $shouts
-                )
-            ) . "<script type='text/javascript'>globalsettings.shoutlimit=" .
-            $this->shoutlimit . ';globalsettings.sound_shout=' .
-            (!$USER || $USER['sound_shout'] ? 1 : 0) .
-            '</script>'
+                    $shouts,
+                ),
+            ) . "<script type='text/javascript'>globalsettings.shoutlimit="
+            . $this->shoutlimit . ';globalsettings.sound_shout='
+            . (!$USER || $USER['sound_shout'] ? 1 : 0)
+            . '</script>',
         );
     }
 
-    public function updateshoutbox()
+    public function updateshoutbox(): void
     {
         global $PAGE,$JAX,$DB,$SESS,$USER,$CFG;
 
@@ -172,30 +172,30 @@ EOT
         if (isset($SESS->vars['sb_id']) && $SESS->vars['sb_id']) {
             $result = $DB->safespecial(
                 <<<'EOT'
-SELECT s.`id` AS `id`,s.`uid` AS `uid`,s.`shout` AS `shout`,
-    UNIX_TIMESTAMP(s.`date`) AS `date`,INET6_NTOA(s.`ip`) AS `ip`,
-    m.`display_name` AS `display_name`, m.`group_id` AS `group_id`,
-    m.`avatar` AS `avatar`
-FROM %t s
-LEFT JOIN %t m
-    ON s.`uid`=m.`id`
-WHERE s.`id`>?
-ORDER BY s.`id` ASC LIMIT ?
-EOT
+                    SELECT s.`id` AS `id`,s.`uid` AS `uid`,s.`shout` AS `shout`,
+                        UNIX_TIMESTAMP(s.`date`) AS `date`,INET6_NTOA(s.`ip`) AS `ip`,
+                        m.`display_name` AS `display_name`, m.`group_id` AS `group_id`,
+                        m.`avatar` AS `avatar`
+                    FROM %t s
+                    LEFT JOIN %t m
+                        ON s.`uid`=m.`id`
+                    WHERE s.`id`>?
+                    ORDER BY s.`id` ASC LIMIT ?
+                    EOT
                 ,
-                array('shouts', 'members'),
+                ['shouts', 'members'],
                 $JAX->pick($SESS->vars['sb_id'], 0),
-                $this->shoutlimit
+                $this->shoutlimit,
             );
             while ($f = $DB->arow($result)) {
                 $PAGE->JS('addshout', $this->formatshout($f));
                 if (isset($CFG['shoutboxsounds']) && $CFG['shoutboxsounds']) {
-                    $sounds = array();
+                    $sounds = [];
                     if ($USER['sound_shout'] && $sounds[$f['shout']]) {
                         $PAGE->JS(
                             'playsound',
                             'sfx',
-                            SOUNDSURL . $sounds[$f['shout']] . '.mp3'
+                            SOUNDSURL . $sounds[$f['shout']] . '.mp3',
                         );
                     }
                 }
@@ -209,7 +209,7 @@ EOT
         }
     }
 
-    public function showallshouts()
+    public function showallshouts(): void
     {
         global $PAGE,$DB,$JAX;
         $perpage = 100;
@@ -225,7 +225,7 @@ EOT
         }
         $result = $DB->safeselect(
             'COUNT(`id`)',
-            'shouts'
+            'shouts',
         );
         $thisrow = $DB->arow($result);
         $numshouts = array_pop($thisrow);
@@ -238,36 +238,36 @@ EOT
             $pageArray = $JAX->pages(
                 ceil($numshouts / $perpage),
                 $pagen + 1,
-                10
+                10,
             );
             foreach ($pageArray as $v) {
-                $pages .= '<a href="?module=shoutbox&page=' .
-                    $v . '"' .
-                    (($v + 1) == $pagen ? ' class="active"' : '') .
-                    '>' . $v . '</a> ';
+                $pages .= '<a href="?module=shoutbox&page='
+                    . $v . '"'
+                    . (($v + 1) == $pagen ? ' class="active"' : '')
+                    . '>' . $v . '</a> ';
             }
             $pages .= '</span>';
         }
-        $PAGE->path(array('Shoutbox History' => '?module=shoutbox'));
+        $PAGE->path(['Shoutbox History' => '?module=shoutbox']);
         $PAGE->updatepath();
         if ($PAGE->jsupdate) {
             return;
         }
         $result = $DB->safespecial(
             <<<'EOT'
-SELECT s.`id` AS `id`,s.`uid` AS `uid`,s.`shout` AS `shout`,
-    UNIX_TIMESTAMP(s.`date`) AS `date`,INET6_NTOA(s.`ip`) AS `ip`,
-    m.`display_name` AS `display_name`, m.`group_id` AS `group_id`,
-    m.`avatar` AS `avatar`
-FROM %t s
-LEFT JOIN %t m
-ON s.`uid`=m.`id`
-ORDER BY s.`id` DESC LIMIT ?,?
-EOT
+                SELECT s.`id` AS `id`,s.`uid` AS `uid`,s.`shout` AS `shout`,
+                    UNIX_TIMESTAMP(s.`date`) AS `date`,INET6_NTOA(s.`ip`) AS `ip`,
+                    m.`display_name` AS `display_name`, m.`group_id` AS `group_id`,
+                    m.`avatar` AS `avatar`
+                FROM %t s
+                LEFT JOIN %t m
+                ON s.`uid`=m.`id`
+                ORDER BY s.`id` DESC LIMIT ?,?
+                EOT
             ,
-            array('shouts', 'members'),
-            ($pagen * $perpage),
-            $perpage
+            ['shouts', 'members'],
+            $pagen * $perpage,
+            $perpage,
         );
         $shouts = '';
         while ($f = $DB->arow($result)) {
@@ -277,7 +277,7 @@ EOT
             'box',
             '',
             'Shoutbox' . $pages,
-            '<div class="sbhistory">' . $shouts . '</div>'
+            '<div class="sbhistory">' . $shouts . '</div>',
         );
         $PAGE->JS('update', 'page', $page);
         $PAGE->append('PAGE', $page);
@@ -289,7 +289,7 @@ EOT
         if (!$USER) {
             return $PAGE->location('?');
         }
-        $delete = isset($JAX->b['shoutbox_delete']) ? $JAX->b['shoutbox_delete'] : 0;
+        $delete = $JAX->b['shoutbox_delete'] ?? 0;
         $candelete = $this->canDelete($delete);
         if (!$candelete) {
             return $PAGE->location('?');
@@ -298,11 +298,11 @@ EOT
         $DB->safedelete(
             'shouts',
             'WHERE `id`=?',
-            $delete
+            $delete,
         );
     }
 
-    public function addshout()
+    public function addshout(): void
     {
         global $JAX,$DB,$PAGE,$SESS;
         $SESS->act();
@@ -323,12 +323,12 @@ EOT
         }
         $DB->safeinsert(
             'shouts',
-            array(
+            [
                 'uid' => $JAX->pick($JAX->userData['id'], 0),
                 'shout' => $shout,
                 'date' => date('Y-m-d H:i:s', time()),
                 'ip' => $JAX->ip2bin(),
-            )
+            ],
         );
     }
 }

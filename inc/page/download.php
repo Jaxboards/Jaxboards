@@ -10,12 +10,12 @@ class downloader
         if (is_numeric($id)) {
             $result = $DB->safeselect(
                 <<<'EOT'
-`id`,`name`,`hash`,`uid`,`size`,`downloads`,INET6_NTOA(`ip`) AS `ip`
-EOT
+                    `id`,`name`,`hash`,`uid`,`size`,`downloads`,INET6_NTOA(`ip`) AS `ip`
+                    EOT
                 ,
                 'files',
                 'WHERE `id`=?',
-                $id
+                $id,
             );
             $data = $DB->arow($result);
             $DB->disposeresult($result);
@@ -23,21 +23,21 @@ EOT
         if ($data) {
             $DB->safespecial(
                 <<<'EOT'
-UPDATE %t
-SET `downloads` = `downloads` + 1
-WHERE `id`=?
-EOT
+                    UPDATE %t
+                    SET `downloads` = `downloads` + 1
+                    WHERE `id`=?
+                    EOT
                 ,
-                array('files'),
-                $id
+                ['files'],
+                $id,
             );
             $ext = explode('.', $data['name']);
-            if (1 == count($ext)) {
+            if (count($ext) == 1) {
                 $ext = '';
             } else {
                 $ext = mb_strtolower(array_pop($ext));
             }
-            if (in_array($ext, array('jpeg', 'jpg', 'png', 'gif', 'bmp'))) {
+            if (in_array($ext, ['jpeg', 'jpg', 'png', 'gif', 'bmp'])) {
                 $data['hash'] .= '.' . $ext;
             }
             $file = BOARDPATH . 'Uploads/' . $data['hash'];
@@ -47,12 +47,13 @@ EOT
                 }
                 header('Content-type:application/idk');
                 header(
-                    'Content-disposition:attachment;filename="' .
-                    $data['name'] . '"'
+                    'Content-disposition:attachment;filename="'
+                    . $data['name'] . '"',
                 );
                 readfile($file);
             }
-            die();
+
+            exit;
         }
     }
 }

@@ -17,9 +17,9 @@ class TOPIC
     {
         global $JAX,$PAGE;
 
-        preg_match('@\\d+$@', $JAX->b['act'], $act);
+        preg_match('@\d+$@', $JAX->b['act'], $act);
 
-        $this->id = $id = $act[0] ? $act[0] : 0;
+        $this->id = $id = $act[0] ?: 0;
         if (!$id) {
             return $PAGE->location('?');
         }
@@ -72,35 +72,35 @@ class TOPIC
         }
     }
 
-    public function getTopicData($id)
+    public function getTopicData($id): void
     {
         global $DB,$JAX,$USER;
         $result = $DB->safespecial(
             <<<'MySQL'
-SELECT a.`title` AS `topic_title`
-    , a.`locked` AS `locked`
-    , UNIX_TIMESTAMP(a.`lp_date`) AS `lp_date`
-    , b.`title` AS `forum_title`
-    , b.`perms` AS `fperms`
-    , c.`id` AS `cat_id`
-    , c.`title` AS `cat_title`
-    , a.`fid` AS `fid`
-    , a.`poll_q` AS `poll_q`
-    , a.`poll_type` AS `poll_type`
-    , a.`poll_choices` AS `poll_choices`
-    , a.`poll_results` AS `poll_results`
-    , a.`subtitle` AS `subtitle`
-FROM %t a
-LEFT JOIN %t b
-		ON a.`fid` = b.`id`
-LEFT JOIN %t AS c
-		ON b.`cat_id` = c.`id`
-WHERE a.`id` = ?
-LIMIT 1
+                SELECT a.`title` AS `topic_title`
+                    , a.`locked` AS `locked`
+                    , UNIX_TIMESTAMP(a.`lp_date`) AS `lp_date`
+                    , b.`title` AS `forum_title`
+                    , b.`perms` AS `fperms`
+                    , c.`id` AS `cat_id`
+                    , c.`title` AS `cat_title`
+                    , a.`fid` AS `fid`
+                    , a.`poll_q` AS `poll_q`
+                    , a.`poll_type` AS `poll_type`
+                    , a.`poll_choices` AS `poll_choices`
+                    , a.`poll_results` AS `poll_results`
+                    , a.`subtitle` AS `subtitle`
+                FROM %t a
+                LEFT JOIN %t b
+                		ON a.`fid` = b.`id`
+                LEFT JOIN %t AS c
+                		ON b.`cat_id` = c.`id`
+                WHERE a.`id` = ?
+                LIMIT 1
 
-MySQL,
-            array('topics', 'forums', 'categories'),
-            $id
+                MySQL,
+            ['topics', 'forums', 'categories'],
+            $id,
         );
         $this->topicdata = $DB->arow($result);
         $DB->disposeresult($result);
@@ -109,7 +109,7 @@ MySQL,
         $this->topicdata['subtitle'] = $JAX->wordfilter($this->topicdata['subtitle']);
         $this->topicdata['fperms'] = $JAX->parseperms(
             $this->topicdata['fperms'],
-            $USER ? $USER['group_id'] : 3
+            $USER ? $USER['group_id'] : 3,
         );
     }
 
@@ -130,55 +130,56 @@ MySQL,
         $SESS->location_verbose = "In topic '" . $this->topicdata['topic_title'] . "'";
 
         // Output RSS instead.
-        if (isset($JAX->b['fmt']) && 'RSS' == $JAX->b['fmt']) {
+        if (isset($JAX->b['fmt']) && $JAX->b['fmt'] == 'RSS') {
             include_once 'inc/classes/rssfeed.php';
             $link = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'];
             $feed = new rssfeed(
-                array(
+                [
                     'title' => $this->topicdata['topic_title'],
                     'description' => $this->topicdata['subtitle'],
                     'link' => $link . '?act=vt' . $id,
-                )
+                ],
             );
             $result = $DB->safespecial(
                 <<<'MySQL'
-SELECT p.`id` AS `id`
-    , p.`post` AS `post`
-    , UNIX_TIMESTAMP(p.`date`) AS `date`
-    , m.`id` AS `id`
-    , m.`display_name` AS `display_name`
-FROM %t p
-LEFT JOIN %t m
-    ON p.`auth_id` = m.`id`
-    WHERE p.`tid` = ?
+                    SELECT p.`id` AS `id`
+                        , p.`post` AS `post`
+                        , UNIX_TIMESTAMP(p.`date`) AS `date`
+                        , m.`id` AS `id`
+                        , m.`display_name` AS `display_name`
+                    FROM %t p
+                    LEFT JOIN %t m
+                        ON p.`auth_id` = m.`id`
+                        WHERE p.`tid` = ?
 
-MySQL,
-                array('posts', 'members'),
-                $DB->basicvalue($id)
+                    MySQL,
+                ['posts', 'members'],
+                $DB->basicvalue($id),
             );
             echo $DB->error(1);
             while ($f = $DB->arow($result)) {
                 $feed->additem(
-                    array(
+                    [
                         'title' => $f['display_name'] . ':',
                         'link' => $link . '?act=vt' . $id . '&amp;findpost=' . $f['id'],
                         'description' => $JAX->blockhtml($JAX->theworks($f['post'])),
                         'guid' => $f['id'],
                         'pubDate' => date('r', $f['date']),
-                    )
+                    ],
                 );
             }
             $feed->publish();
-            die();
+
+            exit;
         }
 
         // Fix this to work with subforums.
         $PAGE->path(
-            array(
+            [
                 $this->topicdata['cat_title'] => '?act=vc' . $this->topicdata['cat_id'],
                 $this->topicdata['forum_title'] => '?act=vf' . $this->topicdata['fid'],
                 $this->topicdata['topic_title'] => "?act=vt{$id}",
-            )
+            ],
         );
 
         // Generate pages.
@@ -186,7 +187,7 @@ MySQL,
             'COUNT(`id`)',
             'posts',
             'WHERE `tid`=?',
-            $id
+            $id,
         );
         $thisrow = $DB->arow($result);
         $posts = array_pop($thisrow);
@@ -199,8 +200,8 @@ MySQL,
                 'topic-pages-part',
                 $id,
                 $x,
-                ($x == ($this->page + 1) ? ' class="active"' : ''),
-                $x
+                $x == ($this->page + 1) ? ' class="active"' : '',
+                $x,
             );
         }
 
@@ -217,10 +218,10 @@ MySQL,
                     $this->topicdata['poll_q'],
                     $this->topicdata['poll_type'],
                     $JAX->json_decode(
-                        $this->topicdata['poll_choices']
+                        $this->topicdata['poll_choices'],
                     ),
-                    $this->topicdata['poll_results']
-                )
+                    $this->topicdata['poll_results'],
+                ),
             );
         } else {
             $poll = '';
@@ -230,50 +231,50 @@ MySQL,
         $page = $PAGE->meta('topic-table', $this->postsintooutput());
         $page = $PAGE->meta(
             'topic-wrapper',
-            $this->topicdata['topic_title'] .
-            ($this->topicdata['subtitle'] ? ', ' . $this->topicdata['subtitle'] : ''),
+            $this->topicdata['topic_title']
+            . ($this->topicdata['subtitle'] ? ', ' . $this->topicdata['subtitle'] : ''),
             $page,
-            '<a href="./?act=vt' . $id . '&amp;fmt=RSS" class="social rss" title="RSS Feed for this Topic">RSS</a>'
+            '<a href="./?act=vt' . $id . '&amp;fmt=RSS" class="social rss" title="RSS Feed for this Topic">RSS</a>',
         );
 
         // Add buttons.
-        $buttons = array(
-            $this->topicdata['fperms']['start'] ?
-            "<a href='?act=post&fid=" . $this->topicdata['fid'] . "'>" .
-            ($PAGE->meta(
-                $PAGE->metaexists('button-newtopic') ?
-                'button-newtopic' : 'topic-button-newtopic'
-            )) . '</a>' :
-            '&nbsp;',
+        $buttons = [
+            $this->topicdata['fperms']['start']
+            ? "<a href='?act=post&fid=" . $this->topicdata['fid'] . "'>"
+            . $PAGE->meta(
+                $PAGE->metaexists('button-newtopic')
+                ? 'button-newtopic' : 'topic-button-newtopic',
+            ) . '</a>'
+            : '&nbsp;',
             $this->topicdata['fperms']['reply']
             && (!$this->topicdata['locked']
-            || $PERMS['can_override_locked_topics']) ?
-            "<a href='?act=vt{$id}&qreply=1'>" .
-            ($PAGE->meta(
-                $PAGE->metaexists('button-qreply') ?
-                'button-qreply' : 'topic-button-qreply'
+            || $PERMS['can_override_locked_topics'])
+            ? "<a href='?act=vt{$id}&qreply=1'>"
+            . ($PAGE->meta(
+                $PAGE->metaexists('button-qreply')
+                ? 'button-qreply' : 'topic-button-qreply',
             )) : '',
             $this->topicdata['fperms']['reply']
             && (!$this->topicdata['locked']
-            || $PERMS['can_override_locked_topics']) ?
-            "<a href='?act=post&tid={$id}'>" .
-            ($PAGE->meta(
-                $PAGE->metaexists('button-reply') ?
-                'button-reply' : 'topic-button-reply'
-            )) . '</a>' : '',
-        );
+            || $PERMS['can_override_locked_topics'])
+            ? "<a href='?act=post&tid={$id}'>"
+            . $PAGE->meta(
+                $PAGE->metaexists('button-reply')
+                ? 'button-reply' : 'topic-button-reply',
+            ) . '</a>' : '',
+        ];
 
         // Make the users online list.
         $usersonline = '';
         foreach ($DB->getUsersOnline() as $f) {
             if (!empty($f['uid']) && $f['location'] == "vt{$id}") {
-                $usersonline .= (isset($f['is_bot']) && $f['is_bot']) ?
-                    '<a class="user' . $f['uid'] . '">' . $f['name'] . '</a>' :
-                    $PAGE->meta(
+                $usersonline .= (isset($f['is_bot']) && $f['is_bot'])
+                    ? '<a class="user' . $f['uid'] . '">' . $f['name'] . '</a>'
+                    : $PAGE->meta(
                         'user-link',
                         $f['uid'],
-                        $f['group_id'] . ('idle' == $f['status'] ? ' idle' : ''),
-                        $f['name']
+                        $f['group_id'] . ($f['status'] == 'idle' ? ' idle' : ''),
+                        $f['name'],
                     );
             }
         }
@@ -282,28 +283,28 @@ MySQL,
         // Add in other page elements.
         $page = $poll . $PAGE->meta(
             'topic-pages-top',
-            $pagelist
+            $pagelist,
         ) . $PAGE->meta(
             'topic-buttons-top',
-            $buttons
+            $buttons,
         ) . $page . $PAGE->meta(
             'topic-pages-bottom',
-            $pagelist
+            $pagelist,
         ) . $PAGE->meta(
             'topic-buttons-bottom',
-            $buttons
+            $buttons,
         );
 
         // Update view count.
         $DB->safespecial(
             <<<'MySQL'
-UPDATE %t
-SET `views` = `views` + 1
-WHERE `id` = ?
+                UPDATE %t
+                SET `views` = `views` + 1
+                WHERE `id` = ?
 
-MySQL,
-            array('topics'),
-            $id
+                MySQL,
+            ['topics'],
+            $id,
         );
 
         if ($PAGE->jsaccess) {
@@ -319,7 +320,7 @@ MySQL,
         }
     }
 
-    public function update($id)
+    public function update($id): void
     {
         global $SESS,$PAGE,$DB,$JAX;
 
@@ -340,18 +341,18 @@ MySQL,
         }
 
         // Update users online list.
-        $list = array();
+        $list = [];
         $oldcache = array_flip(explode(',', $SESS->users_online_cache));
         $newcache = '';
         foreach ($DB->getUsersOnline() as $f) {
             if ($f['uid'] && $f['location'] == "vt{$id}") {
                 if (!isset($oldcache[$f['uid']])) {
-                    $list[] = array(
+                    $list[] = [
                         $f['uid'],
                         $f['group_id'],
-                        ('active' != $f['status'] ? $f['status'] : ''),
+                        $f['status'] != 'active' ? $f['status'] : '',
                         $f['name'],
-                    );
+                    ];
                 } else {
                     unset($oldcache[$f['uid']]);
                 }
@@ -369,7 +370,7 @@ MySQL,
         $SESS->users_online_cache = $newcache;
     }
 
-    public function qreplyform($id)
+    public function qreplyform($id): void
     {
         global $PAGE,$SESS,$DB,$JAX;
         $prefilled = '';
@@ -377,27 +378,27 @@ MySQL,
         if (isset($SESS->vars['multiquote']) && $SESS->vars['multiquote']) {
             $result = $DB->safespecial(
                 <<<'MySQL'
-SELECT p.`id` AS `id`
-    , p.`auth_id` AS `auth_id`
-    , p.`post` AS `post`
-    , UNIX_TIMESTAMP(p.`date`) AS `date`
-    , p.`showsig` AS `showsig`
-    , p.`showemotes` AS `showemotes`
-    , p.`tid` AS `tid`
-    , p.`newtopic` AS `newtopic`
-    , INET6_NTOA(p.`ip`) AS `ip`
-    , UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`
-    , p.`editby` AS `editby`
-    , p.`rating` AS `rating`
-    , m.`display_name` AS `name`
-FROM %t p
-LEFT JOIN %t m
-    ON p.`auth_id` = m.`id`
-    WHERE p.`id` IN ?
+                    SELECT p.`id` AS `id`
+                        , p.`auth_id` AS `auth_id`
+                        , p.`post` AS `post`
+                        , UNIX_TIMESTAMP(p.`date`) AS `date`
+                        , p.`showsig` AS `showsig`
+                        , p.`showemotes` AS `showemotes`
+                        , p.`tid` AS `tid`
+                        , p.`newtopic` AS `newtopic`
+                        , INET6_NTOA(p.`ip`) AS `ip`
+                        , UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`
+                        , p.`editby` AS `editby`
+                        , p.`rating` AS `rating`
+                        , m.`display_name` AS `name`
+                    FROM %t p
+                    LEFT JOIN %t m
+                        ON p.`auth_id` = m.`id`
+                        WHERE p.`id` IN ?
 
-MySQL,
-                array('posts', 'members'),
-                explode(',', $SESS->vars['multiquote'])
+                    MySQL,
+                ['posts', 'members'],
+                explode(',', $SESS->vars['multiquote']),
             );
 
             while ($f = $DB->arow($result)) {
@@ -409,23 +410,23 @@ MySQL,
             'title',
             'topics',
             'WHERE `id`=?',
-            $id
+            $id,
         );
         $tdata = $DB->arow($result);
         $DB->disposeresult($result);
 
         $PAGE->JS(
             'window',
-            array(
+            [
                 'id' => 'qreply',
                 'title' => $JAX->wordfilter($tdata['title']),
                 'content' => $PAGE->meta(
                     'topic-reply-form',
                     $id,
-                    $JAX->blockhtml($prefilled)
+                    $JAX->blockhtml($prefilled),
                 ),
                 'resize' => 'textarea',
-            )
+            ],
         );
         $PAGE->JS('updateqreply', '');
     }
@@ -441,142 +442,142 @@ MySQL,
         if ($lastpid) {
             $query = $DB->safespecial(
                 <<<'MySQL'
-SELECT m.`id` AS `id`
-    , m.`name` AS `name`
-    , m.`group_id` AS `group_id`
-    , m.`sound_im` AS `sound_im`
-    , m.`sound_shout` AS `sound_shout`
-    , UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`
-    , m.`display_name` AS `display_name`
-    , m.`friends` AS `friends`
-    , m.`enemies` AS `enemies`
-    , m.`skin_id` AS `skin_id`
-    , m.`nowordfilter` AS `nowordfilter`
-    , m.`wysiwyg` AS `wysiwyg`
-    , m.`avatar` AS `avatar`
-    , m.`usertitle` AS `usertitle`
-    , CONCAT(MONTH(m.`birthdate`)
-    , ' '
-    , MONTH(m.`birthdate`)) as `birthday`
-    , m.`mod` AS `mod`
-    , m.`posts` AS `posts`
-    , p.`tid` AS `tid`
-    , p.`id` AS `pid`
-    , INET6_NTOA(p.`ip`) AS `ip`
-    , p.`newtopic` AS `newtopic`
-    , p.`post` AS `post`
-    , p.`showsig` AS `showsig`
-    , p.`showemotes` AS `showemotes`
-    , p.`tid` AS `tid`
-    , UNIX_TIMESTAMP(p.`date`) AS `date`
-    , p.`auth_id` AS `auth_id`
-    , p.`rating` AS `rating`
-    , g.`title` AS `title`
-    , g.`icon` AS `icon`
-    , UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`
-    , p.`editby` AS `editby`
-    , e.`display_name` AS `ename`
-    , e.`group_id` AS `egroup_id`
-FROM %t AS p
-LEFT JOIN %t m
-    ON p.`auth_id` = m.`id`
-LEFT JOIN %t g
-    ON m.`group_id` = g.`id`
-LEFT JOIN %t e
-ON p.`editby` = e.`id`
-WHERE p.`tid` = ?
-  AND p.`id` > ?
-ORDER BY `pid`
+                    SELECT m.`id` AS `id`
+                        , m.`name` AS `name`
+                        , m.`group_id` AS `group_id`
+                        , m.`sound_im` AS `sound_im`
+                        , m.`sound_shout` AS `sound_shout`
+                        , UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`
+                        , m.`display_name` AS `display_name`
+                        , m.`friends` AS `friends`
+                        , m.`enemies` AS `enemies`
+                        , m.`skin_id` AS `skin_id`
+                        , m.`nowordfilter` AS `nowordfilter`
+                        , m.`wysiwyg` AS `wysiwyg`
+                        , m.`avatar` AS `avatar`
+                        , m.`usertitle` AS `usertitle`
+                        , CONCAT(MONTH(m.`birthdate`)
+                        , ' '
+                        , MONTH(m.`birthdate`)) as `birthday`
+                        , m.`mod` AS `mod`
+                        , m.`posts` AS `posts`
+                        , p.`tid` AS `tid`
+                        , p.`id` AS `pid`
+                        , INET6_NTOA(p.`ip`) AS `ip`
+                        , p.`newtopic` AS `newtopic`
+                        , p.`post` AS `post`
+                        , p.`showsig` AS `showsig`
+                        , p.`showemotes` AS `showemotes`
+                        , p.`tid` AS `tid`
+                        , UNIX_TIMESTAMP(p.`date`) AS `date`
+                        , p.`auth_id` AS `auth_id`
+                        , p.`rating` AS `rating`
+                        , g.`title` AS `title`
+                        , g.`icon` AS `icon`
+                        , UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`
+                        , p.`editby` AS `editby`
+                        , e.`display_name` AS `ename`
+                        , e.`group_id` AS `egroup_id`
+                    FROM %t AS p
+                    LEFT JOIN %t m
+                        ON p.`auth_id` = m.`id`
+                    LEFT JOIN %t g
+                        ON m.`group_id` = g.`id`
+                    LEFT JOIN %t e
+                    ON p.`editby` = e.`id`
+                    WHERE p.`tid` = ?
+                      AND p.`id` > ?
+                    ORDER BY `pid`
 
-MySQL,
-                array('posts', 'members', 'member_groups', 'members'),
+                    MySQL,
+                ['posts', 'members', 'member_groups', 'members'],
                 $this->id,
-                $lastpid
+                $lastpid,
             );
         } else {
             $query = $DB->safespecial(
                 <<<'MySQL'
-SELECT m.`id` AS `id`
-    , m.`name` AS `name`
-    , m.`email` AS `email`
-    , m.`sig` AS `sig`
-    , m.`posts` AS `posts`
-    , m.`group_id` AS `group_id`
-    , m.`avatar` AS `avatar`
-    , m.`usertitle` AS `usertitle`
-    , UNIX_TIMESTAMP(m.`join_date`) AS `join_date`
-    , UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`
-    , m.`contact_skype` AS `contact_skype`
-    , m.`contact_yim` AS `contact_yim`
-    , m.`contact_msn` AS `contact_msn`
-    , m.`contact_gtalk` AS `contact_gtalk`
-    , m.`contact_aim` AS `contact_aim`
-    , m.`website` AS `website`
-    , m.`birthdate` AS `birthdate`
-    , DAY(m.`birthdate`) AS `dob_day`
-    , MONTH(m.`birthdate`) AS `dob_month`
-    , YEAR(m.`birthdate`) AS `dob_year`
-    , m.`about` AS `about`
-    , m.`display_name` AS `display_name`
-    , m.`full_name` AS `full_name`
-    , m.`contact_steam` AS `contact_steam`
-    , m.`location` AS `location`
-    , m.`gender` AS `gender`
-    , m.`friends` AS `friends`
-    , m.`enemies` AS `enemies`
-    , m.`sound_shout` AS `sound_shout`
-    , m.`sound_im` AS `sound_im`
-    , m.`sound_pm` AS `sound_pm`
-    , m.`sound_postinmytopic` AS `sound_postinmytopic`
-    , m.`sound_postinsubscribedtopic` AS `sound_postinsubscribedtopic`
-    , m.`notify_pm` AS `notify_pm`
-    , m.`notify_postinmytopic` AS `notify_postinmytopic`
-    , m.`notify_postinsubscribedtopic` AS `notify_postinsubscribedtopic`
-    , .`ucpnotepad` AS `ucpnotepad`
-    , m.`skin_id` AS `skin_id`
-    , .`contact_twitter` AS `contact_twitter`
-    , .`contact_discord` AS `contact_discord`
-    , .`contact_youtube` AS `contact_youtube`
-    , .`contact_bluesky` AS `contact_bluesky`
-    , .`email_settings` AS `email_settings`
-    , m.`nowordfilter` AS `nowordfilter`
-    , NET6_NTOA(m.`ip`) AS `ip`
-    , m.`mod` AS `mod`
-    , m.`wysiwyg` AS `wysiwyg`
-    , p.`tid` AS `tid`
-    , p.`id` AS `pid`
-    , INET6_NTOA(p.`ip`) AS `ip`
-    , p.`newtopic` AS `newtopic`
-    , p.`post` AS `post`
-    , p.`showsig` AS `showsig`
-    , p.`showemotes` AS `showemotes`
-    , p.`tid` AS `tid`
-    , UNIX_TIMESTAMP(p.`date`) AS `date`
-    , p.`auth_id` AS `auth_id`
-    , p.`rating` AS `rating`
-    , g.`title` AS `title`
-    , g.`icon` AS `icon`
-    , UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`
-    , p.`editby` AS `editby`
-    , e.`display_name` AS `ename`
-    , e.`group_id` AS `egroup_id`
-FROM %t p
-LEFT JOIN %t m
-    ON p.`auth_id`=m.`id`
-LEFT JOIN %t g
-    ON m.`group_id` = g.`id`
-LEFT JOIN %t e
-    ON p.`editby` = e.`id`
-WHERE p.`tid` = ?
-ORDER BY `newtopic` DESC
-    , `pid` ASC
-LIMIT ?, ?
+                    SELECT m.`id` AS `id`
+                        , m.`name` AS `name`
+                        , m.`email` AS `email`
+                        , m.`sig` AS `sig`
+                        , m.`posts` AS `posts`
+                        , m.`group_id` AS `group_id`
+                        , m.`avatar` AS `avatar`
+                        , m.`usertitle` AS `usertitle`
+                        , UNIX_TIMESTAMP(m.`join_date`) AS `join_date`
+                        , UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`
+                        , m.`contact_skype` AS `contact_skype`
+                        , m.`contact_yim` AS `contact_yim`
+                        , m.`contact_msn` AS `contact_msn`
+                        , m.`contact_gtalk` AS `contact_gtalk`
+                        , m.`contact_aim` AS `contact_aim`
+                        , m.`website` AS `website`
+                        , m.`birthdate` AS `birthdate`
+                        , DAY(m.`birthdate`) AS `dob_day`
+                        , MONTH(m.`birthdate`) AS `dob_month`
+                        , YEAR(m.`birthdate`) AS `dob_year`
+                        , m.`about` AS `about`
+                        , m.`display_name` AS `display_name`
+                        , m.`full_name` AS `full_name`
+                        , m.`contact_steam` AS `contact_steam`
+                        , m.`location` AS `location`
+                        , m.`gender` AS `gender`
+                        , m.`friends` AS `friends`
+                        , m.`enemies` AS `enemies`
+                        , m.`sound_shout` AS `sound_shout`
+                        , m.`sound_im` AS `sound_im`
+                        , m.`sound_pm` AS `sound_pm`
+                        , m.`sound_postinmytopic` AS `sound_postinmytopic`
+                        , m.`sound_postinsubscribedtopic` AS `sound_postinsubscribedtopic`
+                        , m.`notify_pm` AS `notify_pm`
+                        , m.`notify_postinmytopic` AS `notify_postinmytopic`
+                        , m.`notify_postinsubscribedtopic` AS `notify_postinsubscribedtopic`
+                        , .`ucpnotepad` AS `ucpnotepad`
+                        , m.`skin_id` AS `skin_id`
+                        , .`contact_twitter` AS `contact_twitter`
+                        , .`contact_discord` AS `contact_discord`
+                        , .`contact_youtube` AS `contact_youtube`
+                        , .`contact_bluesky` AS `contact_bluesky`
+                        , .`email_settings` AS `email_settings`
+                        , m.`nowordfilter` AS `nowordfilter`
+                        , NET6_NTOA(m.`ip`) AS `ip`
+                        , m.`mod` AS `mod`
+                        , m.`wysiwyg` AS `wysiwyg`
+                        , p.`tid` AS `tid`
+                        , p.`id` AS `pid`
+                        , INET6_NTOA(p.`ip`) AS `ip`
+                        , p.`newtopic` AS `newtopic`
+                        , p.`post` AS `post`
+                        , p.`showsig` AS `showsig`
+                        , p.`showemotes` AS `showemotes`
+                        , p.`tid` AS `tid`
+                        , UNIX_TIMESTAMP(p.`date`) AS `date`
+                        , p.`auth_id` AS `auth_id`
+                        , p.`rating` AS `rating`
+                        , g.`title` AS `title`
+                        , g.`icon` AS `icon`
+                        , UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`
+                        , p.`editby` AS `editby`
+                        , e.`display_name` AS `ename`
+                        , e.`group_id` AS `egroup_id`
+                    FROM %t p
+                    LEFT JOIN %t m
+                        ON p.`auth_id`=m.`id`
+                    LEFT JOIN %t g
+                        ON m.`group_id` = g.`id`
+                    LEFT JOIN %t e
+                        ON p.`editby` = e.`id`
+                    WHERE p.`tid` = ?
+                    ORDER BY `newtopic` DESC
+                        , `pid` ASC
+                    LIMIT ?, ?
 
-MySQL,
-                array('posts', 'members', 'member_groups', 'members'),
+                    MySQL,
+                ['posts', 'members', 'member_groups', 'members'],
                 $this->id,
-                (($topic_post_counter = ($this->page) * $this->numperpage)),
-                $this->numperpage
+                $topic_post_counter = $this->page * $this->numperpage,
+                $this->numperpage,
             );
         }
 
@@ -592,19 +593,19 @@ MySQL,
             // Post rating content goes here.
             if (isset($CFG['ratings']) && $CFG['ratings'] & 1) {
                 $postrating = $showrating = '';
-                $prating = array();
+                $prating = [];
                 if ($post['rating']) {
                     $prating = json_decode($post['rating'], true);
                 }
                 $rniblets = $DB->getRatingNiblets();
                 if ($rniblets) {
                     foreach ($rniblets as $k => $v) {
-                        $postrating .= '<a href="?act=topic&amp;ratepost=' .
-                            $post['pid'] . '&amp;niblet=' . $k . '">' .
-                            $PAGE->meta(
+                        $postrating .= '<a href="?act=topic&amp;ratepost='
+                            . $post['pid'] . '&amp;niblet=' . $k . '">'
+                            . $PAGE->meta(
                                 'rating-niblet',
                                 $v['img'],
-                                $v['title']
+                                $v['title'],
                             ) . '</a>';
                         if (isset($prating[$k]) && $prating[$k]) {
                             $num = 'x' . count($prating[$k]);
@@ -612,17 +613,17 @@ MySQL,
                             $showrating .= $PAGE->meta(
                                 'rating-niblet',
                                 $v['img'],
-                                $v['title']
+                                $v['title'],
                             ) . $num;
                         }
                     }
                     $postrating = $PAGE->meta(
                         'rating-wrapper',
                         $postrating,
-                        (!($CFG['ratings'] & 2) ?
-                        '<a href="?act=vt' . $this->id .
-                        '&amp;listrating=' . $post['pid'] . '">(List)</a>' : ''),
-                        $showrating
+                        !($CFG['ratings'] & 2)
+                        ? '<a href="?act=vt' . $this->id
+                        . '&amp;listrating=' . $post['pid'] . '">(List)</a>' : '',
+                        $showrating,
                     );
                 }
             }
@@ -635,40 +636,40 @@ MySQL,
                     'user-link',
                     $post['auth_id'],
                     $post['group_id'],
-                    $post['display_name']
+                    $post['display_name'],
                 ) : 'Guest',
                 $JAX->pick($post['avatar'], $PAGE->meta('default-avatar')),
                 $post['usertitle'],
                 $post['posts'],
                 $PAGE->meta(
-                    'topic-status-' .
-                    (isset($usersonline[$post['auth_id']])
-                    && $usersonline[$post['auth_id']] ? 'online' : 'offline')
+                    'topic-status-'
+                    . (isset($usersonline[$post['auth_id']])
+                    && $usersonline[$post['auth_id']] ? 'online' : 'offline'),
                 ),
                 $post['title'],
                 $post['auth_id'],
                 // Adds the Edit button
-                ($this->canedit($post) ?
-                "<a href='?act=vt" . $this->id . '&amp;edit=' . $post['pid'] .
-                "' class='edit'>" . $PAGE->meta('topic-edit-button') .
-                '</a>' : '') .
+                ($this->canedit($post)
+                ? "<a href='?act=vt" . $this->id . '&amp;edit=' . $post['pid']
+                . "' class='edit'>" . $PAGE->meta('topic-edit-button')
+                . '</a>' : '')
                 // Adds the Quote button
-                ($this->topicdata['fperms']['reply'] ?
-                " <a href='?act=vt" . $this->id . '&amp;quote=' . $post['pid'] .
-                "' onclick='RUN.handleQuoting(this);return false;' " .
-                "class='quotepost'>" . $PAGE->meta('topic-quote-button') . '</a> '  : '') .
+                . ($this->topicdata['fperms']['reply']
+                ? " <a href='?act=vt" . $this->id . '&amp;quote=' . $post['pid']
+                . "' onclick='RUN.handleQuoting(this);return false;' "
+                . "class='quotepost'>" . $PAGE->meta('topic-quote-button') . '</a> ' : '')
                 // Adds the Moderate options
-                ($this->canmoderate() ?
-                "<a href='?act=modcontrols&amp;do=modp&amp;pid=" . $post['pid'] .
-                "' class='modpost' onclick='RUN.modcontrols.togbutton(this)'>" .
-                $PAGE->meta('topic-mod-button') . '</a>' : ''),
+                . ($this->canmoderate()
+                ? "<a href='?act=modcontrols&amp;do=modp&amp;pid=" . $post['pid']
+                . "' class='modpost' onclick='RUN.modcontrols.togbutton(this)'>"
+                . $PAGE->meta('topic-mod-button') . '</a>' : ''),
                 $JAX->date($post['date']),
-                '<a href="?act=vt' . $this->id . '&amp;findpost=' . $post['pid'] .
-                '" onclick="prompt(\'Link to this post:\',this.href)">' .
-                $PAGE->meta('topic-perma-button') . '</a>',
+                '<a href="?act=vt' . $this->id . '&amp;findpost=' . $post['pid']
+                . '" onclick="prompt(\'Link to this post:\',this.href)">'
+                . $PAGE->meta('topic-perma-button') . '</a>',
                 $postt,
-                isset($post['sig']) && $post['sig'] ?
-                $JAX->theworks($post['sig']) : '',
+                isset($post['sig']) && $post['sig']
+                ? $JAX->theworks($post['sig']) : '',
                 $post['auth_id'],
                 $post['edit_date'] ? $PAGE->meta(
                     'topic-edit-by',
@@ -676,35 +677,35 @@ MySQL,
                         'user-link',
                         $post['editby'],
                         $post['egroup_id'],
-                        $post['ename']
+                        $post['ename'],
                     ),
-                    $JAX->date($post['edit_date'])
+                    $JAX->date($post['edit_date']),
                 ) : '',
-                $PERMS['can_moderate'] ?
-                '<a href="?act=modcontrols&amp;do=iptools&amp;ip=' .
-                $post['ip'] . '">' . $PAGE->meta(
+                $PERMS['can_moderate']
+                ? '<a href="?act=modcontrols&amp;do=iptools&amp;ip='
+                . $post['ip'] . '">' . $PAGE->meta(
                     'topic-mod-ipbutton',
-                    $post['ip']
+                    $post['ip'],
                 ) . '</a>' : '',
                 $post['icon'] ? $PAGE->meta(
                     'topic-icon-wrapper',
-                    $post['icon']
+                    $post['icon'],
                 ) : '',
                 ++$topic_post_counter,
-                isset($post['contact_skype']) ? $post['contact_skype'] : '',
-                isset($post['contact_discord']) ? $post['contact_discord'] : '',
-                isset($post['contact_yim']) ? $post['contact_yim'] : '',
-                isset($post['contact_msn']) ? $post['contact_msn'] : '',
-                isset($post['contact_gtalk']) ? $post['contact_gtalk'] : '',
-                isset($post['contact_aim']) ? $post['contact_aim'] : '',
-                isset($post['contact_youtube']) ? $post['contact_youtube'] : '',
-                isset($post['contact_steam']) ? $post['contact_steam'] : '',
-                isset($post['contact_twitter']) ? $post['contact_twitter'] : '',
-                isset($post['contact_bluesky']) ? $post['contact_bluesky'] : '',
+                $post['contact_skype'] ?? '',
+                $post['contact_discord'] ?? '',
+                $post['contact_yim'] ?? '',
+                $post['contact_msn'] ?? '',
+                $post['contact_gtalk'] ?? '',
+                $post['contact_aim'] ?? '',
+                $post['contact_youtube'] ?? '',
+                $post['contact_steam'] ?? '',
+                $post['contact_twitter'] ?? '',
+                $post['contact_bluesky'] ?? '',
                 '',
                 '',
                 '',
-                $postrating
+                $postrating,
             );
             $lastpid = $post['pid'];
         }
@@ -719,11 +720,12 @@ MySQL,
         global $PERMS,$USER;
 
         return $this->canmoderate()
-            || ($post['auth_id']
-            && ($post['newtopic'] ?
-            $PERMS['can_edit_topics'] : $PERMS['can_edit_posts'])
+            || (
+                $post['auth_id']
+            && ($post['newtopic']
+            ? $PERMS['can_edit_topics'] : $PERMS['can_edit_posts'])
             && $post['auth_id'] == $USER['id']
-        );
+            );
     }
 
     public function canmoderate()
@@ -739,16 +741,16 @@ MySQL,
         if ($USER && $USER['mod']) {
             $result = $DB->safespecial(
                 <<<'MySQL'
-SELECT `mods`
-FROM %t
-WHERE `id` = (
-    SELECT `fid`
-    FROM %t
-    WHERE `id` = ?
-)
-MySQL,
-                array('forums', 'topics'),
-                $DB->basicvalue($this->id)
+                    SELECT `mods`
+                    FROM %t
+                    WHERE `id` = (
+                        SELECT `fid`
+                        FROM %t
+                        WHERE `id` = ?
+                    )
+                    MySQL,
+                ['forums', 'topics'],
+                $DB->basicvalue($this->id),
             );
             $mods = $DB->arow($result);
             $DB->disposeresult($result);
@@ -763,7 +765,7 @@ MySQL,
     public function generatepoll($q, $type, $choices, $results)
     {
         if (!$choices) {
-            $choices = array();
+            $choices = [];
         }
         global $PAGE,$USER,$JAX;
         $page = '';
@@ -772,13 +774,13 @@ MySQL,
             // * Determine if the user has voted.
             // * Count up the number of votes.
             // * Parse the result set.
-            $presults = array();
+            $presults = [];
             $voted = false;
             $totalvotes = 0;
-            $usersvoted = array();
-            $numvotes = array();
+            $usersvoted = [];
+            $numvotes = [];
             foreach (explode(';', $results) as $k => $v) {
-                $presults[$k] = $v ? explode(',', $v) : array();
+                $presults[$k] = $v ? explode(',', $v) : [];
                 $totalvotes += ($numvotes[$k] = count($presults[$k]));
                 if (in_array($USER['id'], $presults[$k])) {
                     $voted = true;
@@ -792,40 +794,40 @@ MySQL,
         if ($voted) {
             $page .= '<table>';
             foreach ($choices as $k => $v) {
-                $page .= "<tr><td>{$v}</td><td class='numvotes'>" .
-                    $numvotes[$k] . ' votes (' .
-                    round($numvotes[$k] / $totalvotes * 100, 2) .
-                    "%)</td><td style='width:200px'><div class='bar' style='width:" .
-                    round($numvotes[$k] / $totalvotes * 100) .
-                    "%;'></div></td></tr>";
+                $page .= "<tr><td>{$v}</td><td class='numvotes'>"
+                    . $numvotes[$k] . ' votes ('
+                    . round($numvotes[$k] / $totalvotes * 100, 2)
+                    . "%)</td><td style='width:200px'><div class='bar' style='width:"
+                    . round($numvotes[$k] / $totalvotes * 100)
+                    . "%;'></div></td></tr>";
             }
-            $page .= "<tr><td colspan='3' class='totalvotes'>Total Votes: " .
-                $usersvoted . '</td></tr>';
+            $page .= "<tr><td colspan='3' class='totalvotes'>Total Votes: "
+                . $usersvoted . '</td></tr>';
             $page .= '</table>';
         } else {
-            $page = "<form method='post' action='?' " .
-                "data-ajax-form='true'>" .
-                $JAX->hiddenFormFields(
-                    array(
+            $page = "<form method='post' action='?' "
+                . "data-ajax-form='true'>"
+                . $JAX->hiddenFormFields(
+                    [
                         'act' => 'vt' . $this->id,
                         'votepoll' => 1,
-                    )
+                    ],
                 );
-            if ('multi' == $type) {
+            if ($type == 'multi') {
                 foreach ($choices as $k => $v) {
-                    $page .= "<div class='choice'><input type='checkbox' " .
-                        "name='choice[]' value='{$k}' id='poll_{$k}' /> " .
-                        "<label for='poll_{$k}'>{$v}</label></div>";
+                    $page .= "<div class='choice'><input type='checkbox' "
+                        . "name='choice[]' value='{$k}' id='poll_{$k}' /> "
+                        . "<label for='poll_{$k}'>{$v}</label></div>";
                 }
             } else {
                 foreach ($choices as $k => $v) {
-                    $page .= "<div class='choice'><input type='radio' " .
-                        "name='choice' value='{$k}' id='poll_{$k}' /> " .
-                        "<label for='poll_{$k}'>{$v}</label></div>";
+                    $page .= "<div class='choice'><input type='radio' "
+                        . "name='choice' value='{$k}' id='poll_{$k}' /> "
+                        . "<label for='poll_{$k}'>{$v}</label></div>";
                 }
             }
-            $page .= "<div class='buttons'><input type='submit' " .
-                "value='Vote'></div></form>";
+            $page .= "<div class='buttons'><input type='submit' "
+                . "value='Vote'></div></form>";
         }
 
         return $page;
@@ -844,7 +846,7 @@ MySQL,
                 '`poll_q`,`poll_results`,`poll_choices`,`poll_type`',
                 'topics',
                 'WHERE `id`=?',
-                $this->id
+                $this->id,
             );
             $row = $DB->arow($result);
             $DB->disposeresult($result);
@@ -856,10 +858,10 @@ MySQL,
             if ($results) {
                 $results = explode(';', $results);
                 foreach ($results as $k => $v) {
-                    $results[$k] = $v ? explode(',', $v) : array();
+                    $results[$k] = $v ? explode(',', $v) : [];
                 }
             } else {
-                $results = array();
+                $results = [];
             }
 
             // Results is now an array of arrays, the keys of the parent array
@@ -871,6 +873,7 @@ MySQL,
                 foreach ($v as $v2) {
                     if ($v2 == $USER['id']) {
                         $voted = true;
+
                         break;
                     }
                 }
@@ -880,7 +883,7 @@ MySQL,
                 $e = 'You have already voted on this poll!';
             }
 
-            if ('multi' == $row['poll_type']) {
+            if ($row['poll_type'] == 'multi') {
                 if (is_array($choice)) {
                     foreach ($choice as $c) {
                         if (!is_numeric($c) || $c >= $numchoices || $c < 0) {
@@ -899,7 +902,7 @@ MySQL,
             return $PAGE->JS('error', $e);
         }
 
-        if ('multi' == $row['poll_type']) {
+        if ($row['poll_type'] == 'multi') {
             foreach ($choice as $c) {
                 $results[$c][] = $USER['id'];
             }
@@ -907,7 +910,7 @@ MySQL,
             $results[$choice][] = $USER['id'];
         }
 
-        $presults = array();
+        $presults = [];
         for ($x = 0; $x < $numchoices; ++$x) {
             $presults[$x] = isset($results[$x]) && $results[$x]
                 ? implode(',', $results[$x]) : '';
@@ -921,18 +924,18 @@ MySQL,
                 $row['poll_q'],
                 $row['poll_type'],
                 $choices,
-                $presults
+                $presults,
             ),
-            '1'
+            '1',
         );
 
         $DB->safeupdate(
             'topics',
-            array(
+            [
                 'poll_results' => $presults,
-            ),
+            ],
             'WHERE `id`=?',
-            $this->id
+            $this->id,
         );
     }
 
@@ -947,7 +950,7 @@ MySQL,
             '`rating`',
             'posts',
             'WHERE `id`=?',
-            $DB->basicvalue($postid)
+            $DB->basicvalue($postid),
         );
         $f = $DB->arow($result);
         $DB->disposeresult($result);
@@ -962,7 +965,7 @@ MySQL,
         } else {
             $ratings = json_decode($f['rating'], true);
             if (!$ratings) {
-                $ratings = array();
+                $ratings = [];
             } else {
                 $found = false;
                 foreach ($ratings as $k => $v) {
@@ -981,17 +984,17 @@ MySQL,
             $ratings[(int) $nibletid][] = (int) $USER['id'];
             $DB->safeupdate(
                 'posts',
-                array(
+                [
                     'rating' => json_encode($ratings),
-                ),
+                ],
                 'WHERE `id`=?',
-                $DB->basicvalue($postid)
+                $DB->basicvalue($postid),
             );
             $PAGE->JS('alert', 'Rated!');
         }
     }
 
-    public function qeditpost($id)
+    public function qeditpost($id): void
     {
         global $DB,$JAX,$PAGE,$USER,$PERMS;
         if (!is_numeric($id)) {
@@ -1003,32 +1006,32 @@ MySQL,
         $PAGE->JS('softurl');
         $result = $DB->safeselect(
             <<<'MySQL'
-`id`
-, `auth_id`
-, `post`
-, UNIX_TIMESTAMP(`date`)
-, `showsig`
-, `showemotes`
-, `tid`
-, `newtopic`
-, INET6_NTOA(`ip`) AS `ip`
-, UNIX_TIMESTAMP(`edit_date`) AS `edit_date`
-, `editby`
-, `rating`
-MySQL,
+                `id`
+                , `auth_id`
+                , `post`
+                , UNIX_TIMESTAMP(`date`)
+                , `showsig`
+                , `showemotes`
+                , `tid`
+                , `newtopic`
+                , INET6_NTOA(`ip`) AS `ip`
+                , UNIX_TIMESTAMP(`edit_date`) AS `edit_date`
+                , `editby`
+                , `rating`
+                MySQL,
             'posts',
             'WHERE `id`=?',
-            $id
+            $id,
         );
         $post = $DB->arow($result);
         $DB->disposeresult($result);
 
         $hiddenfields = $JAX->hiddenFormFields(
-            array(
+            [
                 'act' => 'post',
                 'how' => 'qedit',
                 'pid' => $id,
-            )
+            ],
         );
 
         if ($PAGE->jsnewlocation) {
@@ -1039,36 +1042,36 @@ MySQL,
             } else {
                 if ($post['newtopic']) {
                     $hiddenfields .= $JAX->hiddenFormFields(
-                        array(
+                        [
                             'tid' => $post['tid'],
-                        )
+                        ],
                     );
                     $result = $DB->safeselect(
                         <<<'MySQL'
-`id`
-, `title`
-, `subtitle`
-, `lp_uid`
-, UNIX_TIMESTAMP(`lp_date`) AS `lp_date`
-, `fid`
-, `auth_id`
-, `replies`
-, `views`
-, `pinned`
-, `poll_choices`
-, `poll_results`
-, `poll_q`
-, `poll_type`
-, `summary`
-, `locked`
-, UNIX_TIMESTAMP(`date`) AS `date`
-, `op`
-, `cal_event`
+                            `id`
+                            , `title`
+                            , `subtitle`
+                            , `lp_uid`
+                            , UNIX_TIMESTAMP(`lp_date`) AS `lp_date`
+                            , `fid`
+                            , `auth_id`
+                            , `replies`
+                            , `views`
+                            , `pinned`
+                            , `poll_choices`
+                            , `poll_results`
+                            , `poll_q`
+                            , `poll_type`
+                            , `summary`
+                            , `locked`
+                            , UNIX_TIMESTAMP(`date`) AS `date`
+                            , `op`
+                            , `cal_event`
 
-MySQL,
+                            MySQL,
                         'topics',
                         'WHERE `id`=?',
-                        $post['tid']
+                        $post['tid'],
                     );
                     $topic = $DB->arow($result);
                     $DB->disposeresult($result);
@@ -1078,14 +1081,14 @@ MySQL,
                         $hiddenfields,
                         $topic['title'],
                         $topic['subtitle'],
-                        $JAX->blockhtml($post['post'])
+                        $JAX->blockhtml($post['post']),
                     );
                 } else {
                     $form = $PAGE->meta(
                         'topic-qedit-post',
                         $hiddenfields,
                         $JAX->blockhtml($post['post']),
-                        $id
+                        $id,
                     );
                 }
                 $PAGE->JS('update', "#pid_{$id} .post_content", $form);
@@ -1093,7 +1096,7 @@ MySQL,
         }
     }
 
-    public function multiquote($tid)
+    public function multiquote($tid): void
     {
         global $PAGE,$JAX,$DB,$SESS;
         $pid = $JAX->b['quote'];
@@ -1101,16 +1104,16 @@ MySQL,
         if ($pid && is_numeric($pid)) {
             $result = $DB->safespecial(
                 <<<'MySQL'
-SELECT p.`post` AS `post`
-    , m.`display_name` AS `name`
-FROM %t p
-LEFT JOIN %t m
-  ON p.`auth_id` = m.`id`
-WHERE p.`id` = ?
+                    SELECT p.`post` AS `post`
+                        , m.`display_name` AS `name`
+                    FROM %t p
+                    LEFT JOIN %t m
+                      ON p.`auth_id` = m.`id`
+                    WHERE p.`id` = ?
 
-MySQL,
-                array('posts', 'members'),
-                $pid
+                    MySQL,
+                ['posts', 'members'],
+                $pid,
             );
             $post = $DB->arow($result);
             $DB->disposeresult($result);
@@ -1125,15 +1128,15 @@ MySQL,
         if ($JAX->b['qreply']) {
             $PAGE->JS(
                 'updateqreply',
-                '[quote=' . $post['name'] . ']' . $post['post'] . '[/quote]' .
-                PHP_EOL . PHP_EOL
+                '[quote=' . $post['name'] . ']' . $post['post'] . '[/quote]'
+                . PHP_EOL . PHP_EOL,
             );
         } else {
             if (!in_array($pid, explode(' ', $SESS->vars['multiquote']))) {
                 $SESS->addvar(
                     'multiquote',
-                    $SESS->vars['multiquote'] ? $SESS->vars['multiquote'] . ',' .
-                    $pid : $pid
+                    $SESS->vars['multiquote'] ? $SESS->vars['multiquote'] . ','
+                    . $pid : $pid,
                 );
             }
             // This line toggles whether or not the qreply window should open
@@ -1148,26 +1151,26 @@ MySQL,
         $PAGE->JS('softurl');
     }
 
-    public function getlastpost($tid)
+    public function getlastpost($tid): void
     {
         global $DB,$PAGE;
         $result = $DB->safeselect(
             'MAX(`id`) AS `lastpid`,COUNT(`id`) AS `numposts`',
             'posts',
             'WHERE `tid`=?',
-            $tid
+            $tid,
         );
         $f = $DB->arow($result);
         $DB->disposeresult($result);
 
         $PAGE->JS('softurl');
         $PAGE->location(
-            "?act=vt{$tid}&page=" . (ceil(($f['numposts'] / $this->numperpage))) .
-            '&pid=' . $f['lastpid'] . '#pid_' . $f['lastpid']
+            "?act=vt{$tid}&page=" . ceil($f['numposts'] / $this->numperpage)
+            . '&pid=' . $f['lastpid'] . '#pid_' . $f['lastpid'],
         );
     }
 
-    public function findpost($pid)
+    public function findpost($pid): void
     {
         global $PAGE,$DB;
         if (!is_numeric($pid)) {
@@ -1175,35 +1178,36 @@ MySQL,
         } else {
             $result = $DB->safespecial(
                 <<<'MySQL'
-SELECT `id`
-    , `auth_id`
-    , `post`
-    , UNIX_TIMESTAMP(`date`) AS `date`
-    , `showsig`
-    , `showemotes`
-    , `tid`
-    , `newtopic`
-    , INET6_NTOA(`ip`) AS `ip`
-    , UNIX_TIMESTAMP(`edit_date`) AS `edit_date`
-    , `editby`
-    , `rating`
-FROM %t
-WHERE tid=(
-    SELECT tid
-    FROM %t
-    WHERE `id` = ?
-)
-ORDER BY `id` ASC
+                    SELECT `id`
+                        , `auth_id`
+                        , `post`
+                        , UNIX_TIMESTAMP(`date`) AS `date`
+                        , `showsig`
+                        , `showemotes`
+                        , `tid`
+                        , `newtopic`
+                        , INET6_NTOA(`ip`) AS `ip`
+                        , UNIX_TIMESTAMP(`edit_date`) AS `edit_date`
+                        , `editby`
+                        , `rating`
+                    FROM %t
+                    WHERE tid=(
+                        SELECT tid
+                        FROM %t
+                        WHERE `id` = ?
+                    )
+                    ORDER BY `id` ASC
 
-MySQL,
-                array('posts', 'posts'),
-                $pid
+                    MySQL,
+                ['posts', 'posts'],
+                $pid,
             );
             $num = 1;
             while ($f = $DB->arow($result)) {
                 if ($f['id'] == $pid) {
                     $pid = $f['id'];
                     $couldntfindit = false;
+
                     break;
                 }
                 ++$num;
@@ -1214,13 +1218,13 @@ MySQL,
             $PAGE->JS('alert', "that post doesn't exist");
         } else {
             $PAGE->location(
-                '?act=vt' . $this->id . '&page=' .
-                (ceil($num / $this->numperpage)) . '&pid=' . $pid . '#pid_' . $pid
+                '?act=vt' . $this->id . '&page='
+                . ceil($num / $this->numperpage) . '&pid=' . $pid . '#pid_' . $pid,
             );
         }
     }
 
-    public function markread($id)
+    public function markread($id): void
     {
         global $SESS,$PAGE,$JAX;
         $topicsread = $JAX->parsereadmarkers($SESS->topicsread);
@@ -1228,7 +1232,7 @@ MySQL,
         $SESS->topicsread = json_encode($topicsread, true);
     }
 
-    public function listrating($pid)
+    public function listrating($pid): void
     {
         global $DB,$PAGE,$CFG;
         if ($CFG['ratings'] & 2) {
@@ -1239,7 +1243,7 @@ MySQL,
             '`rating`',
             'posts',
             'WHERE `id`=?',
-            $DB->basicvalue($pid)
+            $DB->basicvalue($pid),
         );
         $row = $DB->arow($result);
         $DB->disposeresult($result);
@@ -1247,13 +1251,13 @@ MySQL,
         if ($row) {
             $ratings = json_decode($row[0], true);
         } else {
-            $ratings = array();
+            $ratings = [];
         }
         if (empty($ratings)) {
             return;
         }
 
-        $members = array();
+        $members = [];
         foreach ($ratings as $v) {
             $members = array_merge($members, $v);
         }
@@ -1261,24 +1265,24 @@ MySQL,
             '`id`,`display_name`,`group_id`',
             'members',
             'WHERE `id` IN ?',
-            $members
+            $members,
         );
-        $mdata = array($result);
+        $mdata = [$result];
         while ($f = $DB->arow($result)) {
-            $mdata[$f['id']] = array($f['display_name'], $f['group_id']);
+            $mdata[$f['id']] = [$f['display_name'], $f['group_id']];
         }
         unset($members);
         $niblets = $DB->getRatingNiblets();
         foreach ($ratings as $k => $v) {
             $page .= '<div class="column">';
-            $page .= '<img src="' . $niblets[$k]['img'] . '" /> ' .
-                $niblets[$k]['title'] . '<ul>';
+            $page .= '<img src="' . $niblets[$k]['img'] . '" /> '
+                . $niblets[$k]['title'] . '<ul>';
             foreach ($v as $mid) {
                 $page .= '<li>' . $PAGE->meta(
                     'user-link',
                     $mid,
                     $mdata[$mid][1],
-                    $mdata[$mid][0]
+                    $mdata[$mid][0],
                 ) . '</li>';
             }
             $page .= '</ul></div>';

@@ -1,17 +1,19 @@
 <?php
 
 require '../config.php';
+
 require '../inc/classes/mysql.php';
 $DB = new MySQL();
 $DB->connect(
     $CFG['sql_host'],
     $CFG['sql_username'],
     $CFG['sql_password'],
-    $CFG['sql_db']
+    $CFG['sql_db'],
 );
 
 require '../domaindefinitions.php';
-$list = array(array(), array());
+$list = [[], []];
+
 switch ($_GET['act']) {
     case 'searchmembers':
         $result = $DB->safeselect(
@@ -20,16 +22,18 @@ switch ($_GET['act']) {
             'WHERE `display_name` LIKE ? ORDER BY `display_name` LIMIT 10',
             $DB->basicvalue(
                 htmlspecialchars(
-                    str_replace('_', '\\_', $_GET['term']),
-                    ENT_QUOTES
-                ) . '%'
-            )
+                    str_replace('_', '\_', $_GET['term']),
+                    ENT_QUOTES,
+                ) . '%',
+            ),
         );
         while ($f = $DB->arow($result)) {
             $list[0][] = $f['id'];
             $list[1][] = $f['name'];
         }
+
         break;
+
     case '':
         break;
 }

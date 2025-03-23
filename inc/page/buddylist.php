@@ -1,32 +1,32 @@
 <?php
 
-$buddylist = $JAX->hiddenFormFields(array('module' => 'buddylist'));
+$buddylist = $JAX->hiddenFormFields(['module' => 'buddylist']);
 $PAGE->metadefs['buddylist-contacts'] = <<<EOT
-<div class="contacts">
-    <form method="?" data-ajax-form="true">
-        {$buddylist}
-        <a href="?act=logreg5" id="status" class="%s">
-        </a>
-        <input style="width:100%%;padding-left:20px;" type="text" name="status"
-            onblur="this.form.onsubmit()" value="%s"/>
-        %s
-</div>
-EOT;
+    <div class="contacts">
+        <form method="?" data-ajax-form="true">
+            {$buddylist}
+            <a href="?act=logreg5" id="status" class="%s">
+            </a>
+            <input style="width:100%%;padding-left:20px;" type="text" name="status"
+                onblur="this.form.onsubmit()" value="%s"/>
+            %s
+    </div>
+    EOT;
 $PAGE->metadefs['buddylist-contact'] = <<<'EOT'
-<div
-    class="contact %3$s">
-    <a href="?act=vu%1$s">
-        <div class="avatar">
-            <img src="%4$s" alt="Avatar"/>
-        </div>
-        <div class="name">
-            %2$s
-        </div>
-        <div class="status">
-            %5$s
-        </div>
-</div>
-EOT;
+    <div
+        class="contact %3$s">
+        <a href="?act=vu%1$s">
+            <div class="avatar">
+                <img src="%4$s" alt="Avatar"/>
+            </div>
+            <div class="name">
+                %2$s
+            </div>
+            <div class="status">
+                %5$s
+            </div>
+    </div>
+    EOT;
 new buddylist();
 class buddylist
 {
@@ -39,7 +39,7 @@ class buddylist
         if (!$USER) {
             return $PAGE->JS(
                 'error',
-                'Sorry, you must be logged in to use this feature.'
+                'Sorry, you must be logged in to use this feature.',
             );
         }
         if (isset($JAX->b['add']) && $JAX->b['add']) {
@@ -57,7 +57,7 @@ class buddylist
         }
     }
 
-    public function displaybuddylist()
+    public function displaybuddylist(): void
     {
         global $JAX,$PAGE,$USER,$DB,$SESS;
         if (!$USER) {
@@ -71,7 +71,7 @@ class buddylist
                 '`id`,`avatar`,`display_name` AS `name`,`usertitle`',
                 'members',
                 'WHERE `id` IN ? ORDER BY `name` ASC',
-                explode(',', $USER['friends'])
+                explode(',', $USER['friends']),
             );
             while ($f = $DB->arow($result)) {
                 $crap .= $PAGE->meta(
@@ -81,7 +81,7 @@ class buddylist
                     isset($online[$f['id']]) && $online[$f['id']]
                     ? 'online' : 'offline',
                     $JAX->pick($f['avatar'], $PAGE->meta('default-avatar')),
-                    $f['usertitle']
+                    $f['usertitle'],
                 );
             }
         }
@@ -90,7 +90,7 @@ class buddylist
                 '`id`,`avatar`,`display_name` AS `name`,`usertitle`',
                 'members',
                 'WHERE `id` IN ? ORDER BY `name` ASC',
-                explode(',', $USER['enemies'])
+                explode(',', $USER['enemies']),
             );
             while ($f = $DB->arow($result)) {
                 $crap .= $PAGE->meta(
@@ -99,33 +99,33 @@ class buddylist
                     $f['name'],
                     'blocked',
                     $JAX->pick($f['avatar'], $PAGE->meta('default-avatar')),
-                    $f['usertitle']
+                    $f['usertitle'],
                 );
             }
         }
         if (!$crap) {
             $crap = $PAGE->meta(
                 'error',
-                "You don't have any contacts added to your buddy list!"
+                "You don't have any contacts added to your buddy list!",
             );
         }
         $PAGE->JS(
             'window',
-            array(
+            [
                 'title' => 'Buddies',
                 'content' => $PAGE->meta(
                     'buddylist-contacts',
                     $SESS->hide ? 'invisible' : '',
                     $USER['usertitle'],
-                    $crap
+                    $crap,
                 ),
                 'id' => 'buddylist',
-                'pos' => 'tr 20 20'
-            )
+                'pos' => 'tr 20 20',
+            ],
         );
     }
 
-    public function addbuddy($uid)
+    public function addbuddy($uid): void
     {
         global $DB,$PAGE,$USER;
         $friends = $USER['friends'];
@@ -139,31 +139,31 @@ class buddylist
         if ($uid && is_numeric($uid)) {
             $result = $DB->safeselect(
                 <<<'EOT'
-`id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
-UNIX_TIMESTAMP(`join_date`) AS `join_date`,
-UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,
-`contact_skype`,`contact_yim`,`contact_msn`, `contact_gtalk`,`contact_aim`,
-`website`,`birthdate`, DAY(`birthdate`) AS `dob_day`,
-MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
-`about`,`display_name`,`full_name`,`contact_steam`,`location`,`gender`,
-`friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
-`sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
-`notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
-`contact_discord`,`contact_youtube`,`contact_bluesky`,
-`email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
-EOT
+                    `id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
+                    UNIX_TIMESTAMP(`join_date`) AS `join_date`,
+                    UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,
+                    `contact_skype`,`contact_yim`,`contact_msn`, `contact_gtalk`,`contact_aim`,
+                    `website`,`birthdate`, DAY(`birthdate`) AS `dob_day`,
+                    MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
+                    `about`,`display_name`,`full_name`,`contact_steam`,`location`,`gender`,
+                    `friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
+                    `sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
+                    `notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
+                    `contact_discord`,`contact_youtube`,`contact_bluesky`,
+                    `email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
+                    EOT
                 ,
                 'members',
                 'WHERE `id`=?',
-                $uid
+                $uid,
             );
             $user = $DB->arow($result);
             $DB->disposeresult($result);
         }
 
         if (!$user) {
-            $e = 'This user does not exist, and therefore could ' .
-                'not be added to your contacts list.';
+            $e = 'This user does not exist, and therefore could '
+                . 'not be added to your contacts list.';
         } elseif (in_array($uid, explode(',', $friends))) {
             $e = 'This user is already in your contacts list.';
         }
@@ -180,39 +180,39 @@ EOT
             $USER['friends'] = $friends;
             $DB->safeupdate(
                 'members',
-                array(
+                [
                     'friends' => $friends,
-                ),
+                ],
                 ' WHERE `id`=?',
-                $USER['id']
+                $USER['id'],
             );
             $DB->safeinsert(
                 'activity',
-                array(
+                [
                     'type' => 'buddy_add',
                     'affected_uid' => $uid,
                     'uid' => $USER['id'],
-                )
+                ],
             );
             $this->displaybuddylist();
         }
     }
 
-    public function block($uid)
+    public function block($uid): void
     {
         if (!is_numeric($uid)) {
             return;
         }
         global $DB,$PAGE,$USER;
         $e = '';
-        $enemies = $USER['enemies'] ? explode(',', $USER['enemies']) : array();
-        $friends = $USER['friends'] ? explode(',', $USER['friends']) : array();
+        $enemies = $USER['enemies'] ? explode(',', $USER['enemies']) : [];
+        $friends = $USER['friends'] ? explode(',', $USER['friends']) : [];
         $isenemy = array_search($uid, $enemies);
         $isfriend = array_search($uid, $friends);
-        if (false !== $isfriend) {
+        if ($isfriend !== false) {
             $this->dropbuddy($uid, 1);
         }
-        if (false !== $isenemy) {
+        if ($isenemy !== false) {
             $e = 'This user is already blocked.';
         }
         if ($e) {
@@ -223,23 +223,23 @@ EOT
             $USER['enemies'] = $enemies;
             $DB->safeupdate(
                 'members',
-                array(
+                [
                     'enemies' => $enemies,
-                ),
+                ],
                 ' WHERE `id`=?',
-                $USER['id']
+                $USER['id'],
             );
             $this->displaybuddylist();
         }
     }
 
-    public function unblock($uid)
+    public function unblock($uid): void
     {
         global $DB,$USER,$PAGE;
         if ($uid && is_numeric($uid)) {
             $enemies = explode(',', $USER['enemies']);
             $id = array_search($uid, $enemies);
-            if (false === $id) {
+            if ($id === false) {
                 return;
             }
             unset($enemies[$id]);
@@ -247,23 +247,23 @@ EOT
             $USER['enemies'] = $enemies;
             $DB->safeupdate(
                 'members',
-                array(
+                [
                     'enemies' => $enemies,
-                ),
+                ],
                 ' WHERE `id`=?',
-                $USER['id']
+                $USER['id'],
             );
         }
         $this->displaybuddylist();
     }
 
-    public function dropbuddy($uid, $shh = 0)
+    public function dropbuddy($uid, $shh = 0): void
     {
         global $DB,$USER,$PAGE;
         if ($uid && is_numeric($uid)) {
             $friends = explode(',', $USER['friends']);
             $id = array_search($uid, $friends);
-            if (false === $id) {
+            if ($id === false) {
                 return;
             }
             unset($friends[$id]);
@@ -271,11 +271,11 @@ EOT
             $USER['friends'] = $friends;
             $DB->safeupdate(
                 'members',
-                array(
+                [
                     'friends' => $friends,
-                ),
+                ],
                 ' WHERE `id`=?',
-                $USER['id']
+                $USER['id'],
             );
         }
         if (!$shh) {
@@ -283,17 +283,17 @@ EOT
         }
     }
 
-    public function setstatus($status)
+    public function setstatus($status): void
     {
         global $DB,$USER,$PAGE;
         if ($USER && $USER['usertitle'] != $status) {
             $DB->safeupdate(
                 'members',
-                array(
+                [
                     'usertitle' => $status,
-                ),
+                ],
                 'WHERE `id`=?',
-                $USER['id']
+                $USER['id'],
             );
         }
     }

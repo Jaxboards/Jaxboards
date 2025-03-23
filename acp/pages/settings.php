@@ -1,7 +1,7 @@
 <?php
 
 if (!defined(INACP)) {
-    die();
+    exit;
 }
 
 new settings();
@@ -11,62 +11,69 @@ class settings
     {
         global $JAX, $PAGE;
 
-        $links = array(
+        $links = [
             'global' => 'Global Settings',
             'shoutbox' => 'Shoutbox',
             'pages' => 'Custom Pages',
             'birthday' => 'Birthdays',
-        );
+        ];
         $sidebarLinks = '';
         foreach ($links as $do => $title) {
             $sidebarLinks .= $PAGE->parseTemplate(
                 'sidebar-list-link.html',
-                array(
+                [
                     'url' => '?act=settings&do=' . $do,
                     'title' => $title,
-                )
+                ],
             ) . PHP_EOL;
         }
 
         $PAGE->sidebar(
             $PAGE->parseTemplate(
                 'sidebar-list.html',
-                array(
+                [
                     'content' => $sidebarLinks,
-                )
-            )
+                ],
+            ),
         );
 
         if (!isset($JAX->b['do'])) {
             $JAX->b['do'] = null;
         }
+
         switch ($JAX->b['do']) {
             case 'pages':
                 $this->pages();
+
                 break;
+
             case 'shoutbox':
                 $this->shoutbox();
+
                 break;
+
             case 'birthday':
                 $this->birthday();
+
                 break;
+
             case 'global':
             default:
                 $this->boardname();
         }
     }
 
-    public function boardname()
+    public function boardname(): void
     {
         global $PAGE,$JAX;
         $page = '';
         $e = '';
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
-            if ('' === trim($JAX->p['boardname'])) {
+            if (trim($JAX->p['boardname']) === '') {
                 $e = 'Board name is required';
             } elseif (
                 !isset($JAX->p['logourl'])
-                || ('' !== trim($JAX->p['logourl'])
+                || (trim($JAX->p['logourl']) !== ''
                 && !$JAX->isURL($JAX->p['logourl']))
             ) {
                 $e = 'Please enter a valid logo url.';
@@ -74,7 +81,7 @@ class settings
             if ($e) {
                 $page .= $PAGE->error($e);
             } else {
-                $write = array();
+                $write = [];
                 $write['boardname'] = $JAX->p['boardname'];
                 $write['logourl'] = $JAX->p['logourl'];
                 $write['boardoffline'] = isset($JAX->p['boardoffline'])
@@ -86,37 +93,35 @@ class settings
         }
         $page .= $PAGE->parseTemplate(
             'settings/boardname.html',
-            array(
+            [
                 'board_name' => $PAGE->getCFGSetting('boardname'),
                 'logo_url' => $PAGE->getCFGSetting('logourl'),
-            )
+            ],
         );
         $PAGE->addContentBox('Board Name/Logo', $page);
 
         $page = '';
-        $boardOfflineCode = !$PAGE->getCFGSetting('boardoffline') ?
-            'checked="checked"' : '';
+        $boardOfflineCode = !$PAGE->getCFGSetting('boardoffline')
+            ? 'checked="checked"' : '';
         $boardOfflineText = $JAX->blockhtml(
-            $PAGE->getCFGSetting('offlinetext')
+            $PAGE->getCFGSetting('offlinetext'),
         );
         $page .= $PAGE->parseTemplate(
             'settings/boardname-board-offline.html',
-            array(
-                'board_offline_checked' => !$PAGE->getCFGSetting('boardoffline') ?
-                    ' checked="checked"' : '',
+            [
+                'board_offline_checked' => !$PAGE->getCFGSetting('boardoffline')
+                    ? ' checked="checked"' : '',
                 'board_offline_text' => $JAX->blockhtml(
-                    $PAGE->getCFGSetting('offlinetext')
+                    $PAGE->getCFGSetting('offlinetext'),
                 ),
                 'content' => $page,
-            )
+            ],
         );
         $PAGE->addContentBox('Board Online/Offline', $page);
     }
 
     /**
-     * Custom pages
-     *
-     * @return void
+     * Custom pages.
      */
     public function pages()
     {
@@ -127,13 +132,13 @@ class settings
         }
         if (isset($JAX->b['page']) && $JAX->b['page']) {
             $newact = preg_replace(
-                '@\\W@',
+                '@\W@',
                 '<span style="font-weight:bold;color:#F00;">$0</span>',
-                $JAX->b['page']
+                $JAX->b['page'],
             );
             if ($newact != $JAX->b['page']) {
-                $e = 'The page URL must contain only letters and numbers. ' .
-                    "Invalid characters: {$newact}";
+                $e = 'The page URL must contain only letters and numbers. '
+                    . "Invalid characters: {$newact}";
             } elseif (mb_strlen($newact) > 25) {
                 $e = 'The page URL cannot exceed 25 characters.';
             } else {
@@ -145,36 +150,36 @@ class settings
         }
         $result = $DB->safeselect(
             '`act`,`page`',
-            'pages'
+            'pages',
         );
         $table = '';
         while ($f = $DB->arow($result)) {
             $table .= $PAGE->parseTemplate(
                 'settings/pages-row.html',
-                array(
+                [
                     'act' => $f['act'],
-                )
+                ],
             ) . PHP_EOL;
         }
         if ($table) {
             $page .= $PAGE->parseTemplate(
                 'settings/pages.html',
-                array(
+                [
                     'content' => $table,
-                )
+                ],
             );
         }
         $hiddenFields = $JAX->hiddenFormFields(
-            array(
+            [
                 'act' => 'settings',
                 'do' => 'pages',
-            )
+            ],
         );
         $page .= $PAGE->parseTemplate(
             'settings/pages-new.html',
-            array(
+            [
                 'hidden_fields' => $hiddenFields,
-            )
+            ],
         );
         $PAGE->addContentBox('Custom Pages', $page);
     }
@@ -186,11 +191,11 @@ class settings
         return $DB->safedelete(
             'pages',
             'WHERE `act`=?',
-            $DB->basicvalue($page)
+            $DB->basicvalue($page),
         );
     }
 
-    public function pages_edit($pageurl)
+    public function pages_edit($pageurl): void
     {
         global $PAGE,$DB,$JAX;
         $page = '';
@@ -198,7 +203,7 @@ class settings
             '`act`,`page`',
             'pages',
             'WHERE `act`=?',
-            $DB->basicvalue($pageurl)
+            $DB->basicvalue($pageurl),
         );
         $pageinfo = $DB->arow($result);
         $DB->disposeresult($result);
@@ -206,41 +211,39 @@ class settings
             if ($pageinfo) {
                 $DB->safeupdate(
                     'pages',
-                    array(
+                    [
                         'page' => $JAX->p['pagecontents'],
-                    ),
+                    ],
                     'WHERE `act`=?',
-                    $DB->basicvalue($pageurl)
+                    $DB->basicvalue($pageurl),
                 );
             } else {
                 $DB->safeinsert(
                     'pages',
-                    array(
+                    [
                         'act' => $pageurl,
                         'page' => $JAX->p['pagecontents'],
-                    )
+                    ],
                 );
             }
             $pageinfo['page'] = $JAX->p['pagecontents'];
             $page .= $PAGE->success(
-                "Page saved. Preview <a href='/?act={$pageurl}'>here</a>"
+                "Page saved. Preview <a href='/?act={$pageurl}'>here</a>",
             );
         }
         $page .= $PAGE->parseTemplate(
             'settings/pages-edit.html',
-            array(
+            [
                 'content' => $JAX->blockhtml($pageinfo['page']),
-            )
+            ],
         );
         $PAGE->addContentBox("Editing Page: {$pageurl}", $page);
     }
 
     /**
-     * Shoutbox
-     *
-     * @return void
+     * Shoutbox.
      */
-    public function shoutbox()
+    public function shoutbox(): void
     {
         global $PAGE,$JAX,$DB;
         $page = '';
@@ -248,7 +251,7 @@ class settings
         if (isset($JAX->p['clearall']) && $JAX->p['clearall']) {
             $result = $DB->safespecial(
                 'TRUNCATE TABLE %t',
-                array('shouts')
+                ['shouts'],
             );
             $page .= $PAGE->success('Shoutbox cleared!');
         }
@@ -259,10 +262,10 @@ class settings
             if (!isset($JAX->p['sbava'])) {
                 $JAX->p['sbava'] = false;
             }
-            $write = array(
+            $write = [
                 'shoutbox' => $JAX->p['sbe'] ? 1 : 0,
                 'shoutboxava' => $JAX->p['sbava'] ? 1 : 0,
-            );
+            ];
             if (
                 is_numeric($JAX->p['sbnum'])
                 && $JAX->p['sbnum'] <= 10
@@ -281,18 +284,18 @@ class settings
         }
         $page .= $PAGE->parseTemplate(
             'settings/shoutbox.html',
-            array(
-                'shoutbox_checked' => $PAGE->getCFGSetting('shoutbox') ?
-                    ' checked="checked"' : '',
-                'shoutbox_avatar_checked' => $PAGE->getCFGSetting('shoutboxava') ?
-                ' checked="checked"' : '',
+            [
+                'shoutbox_checked' => $PAGE->getCFGSetting('shoutbox')
+                    ? ' checked="checked"' : '',
+                'shoutbox_avatar_checked' => $PAGE->getCFGSetting('shoutboxava')
+                ? ' checked="checked"' : '',
                 'show_shouts' => $PAGE->getCFGSetting('shoutbox_num'),
-            )
+            ],
         );
         $PAGE->addContentBox('Shoutbox', $page);
     }
 
-    public function birthday()
+    public function birthday(): void
     {
         global $PAGE,$JAX;
         $birthdays = $PAGE->getCFGSetting('birthdays');
@@ -301,16 +304,16 @@ class settings
                 $JAX->p['bicon'] = false;
             }
             $PAGE->writeCFG(
-                array(
+                [
                     'birthdays' => $birthdays = ($JAX->p['bicon'] ? 1 : 0),
-                )
+                ],
             );
         }
         $page = $PAGE->parseTemplate(
             'settings/birthday.html',
-            array(
+            [
                 'checked' => $birthdays & 1 ? ' checked="checked"' : '',
-            )
+            ],
         );
 
         $PAGE->addContentBox('Birthdays', $page);

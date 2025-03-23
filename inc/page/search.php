@@ -1,13 +1,12 @@
 <?php
 
 /**
-    Chat box
-    better color >_>
-
-    <_<
-    we need to be able to search "All" :>
-*/
-
+ * Chat box
+ * better color >_>.
+ *
+ * <_<
+ * we need to be able to search "All" :>
+ */
 $PAGE->loadmeta('search');
 
 new search();
@@ -15,7 +14,7 @@ class search
 {
     public $page = '';
     public $pagenum = 0;
-    public $fids = array();
+    public $fids = [];
     public $perpage;
 
     public function __construct()
@@ -23,7 +22,7 @@ class search
         global $PAGE,$JAX;
 
         $this->page = '';
-        $this->pagenum = isset($JAX->b['page']) ? $JAX->b['page'] : 0;
+        $this->pagenum = $JAX->b['page'] ?? 0;
         if (!is_numeric($this->pagenum) || $this->pagenum < 0) {
             $this->pagenum = 1;
         }
@@ -40,7 +39,7 @@ class search
         }
     }
 
-    public function form()
+    public function form(): void
     {
         global $PAGE,$JAX,$SESS;
         if ($PAGE->jsupdate) {
@@ -50,10 +49,10 @@ class search
         $this->page = $PAGE->meta(
             'search-form',
             $JAX->blockhtml(
-                isset($SESS->vars['searcht']) ? $SESS->vars['searcht'] : ''
+                $SESS->vars['searcht'] ?? '',
             ),
             $this->getForumSelection(),
-            $this->page
+            $this->page,
         );
         $PAGE->JS('update', 'page', $this->page);
         $PAGE->append('page', $this->page);
@@ -71,19 +70,19 @@ class search
             '`id`,`title`,`path`',
             'forums',
             'WHERE `id` IN ? ORDER BY `order` ASC,`title` DESC',
-            $this->fids
+            $this->fids,
         );
 
-        $tree = array();
-        $titles = array();
+        $tree = [];
+        $titles = [];
 
         while ($f = $DB->arow($result)) {
             $titles[$f['id']] = $f['title'];
-            $path = trim($f['path']) ? explode(' ', $f['path']) : array();
+            $path = trim($f['path']) ? explode(' ', $f['path']) : [];
             $t = &$tree;
             foreach ($path as $v) {
                 if (!isset($t[$v]) || !is_array($t[$v])) {
-                    $t[$v] = array();
+                    $t[$v] = [];
                 }
                 $t = &$t[$v];
             }
@@ -94,7 +93,7 @@ class search
 
         $r .= $this->rtreeselect(
             $tree,
-            $titles
+            $titles,
         );
 
         return $r;
@@ -105,9 +104,9 @@ class search
         $r = '';
         foreach ($tree as $k => $v) {
             if (isset($titles[$k])) {
-                $r .= '<option value="' . $k . '">' .
-                    str_repeat('+-', $level) . $titles[$k] .
-                    '</option>';
+                $r .= '<option value="' . $k . '">'
+                    . str_repeat('+-', $level) . $titles[$k]
+                    . '</option>';
             }
             if (is_array($v)) {
                 $r .= $this->rtreeselect($v, $titles, $level + 1);
@@ -123,7 +122,7 @@ class search
     public function pdate($a)
     {
         $a = explode('/', $a);
-        if (3 != count($a)) {
+        if (count($a) != 3) {
             return false;
         }
         for ($x = 0; $x < 3; ++$x) {
@@ -133,8 +132,8 @@ class search
         }
         if (
             ($a[0] % 2)
-            && 31 == $a[1]
-            || 2 == $a[0]
+            && $a[1] == 31
+            || $a[0] == 2
             && (!$a[2] % 4
             && $a[1] > 29
             || $a[2] % 4
@@ -146,7 +145,7 @@ class search
         return mktime(0, 0, 0, $a[0], $a[1], $a[2]);
     }
 
-    public function dosearch()
+    public function dosearch(): void
     {
         global $JAX,$PAGE,$DB,$SESS;
 
@@ -165,7 +164,7 @@ class search
         } else {
             $this->getSearchableForums();
             if (isset($JAX->b['fids']) && $JAX->b['fids']) {
-                $fids = array();
+                $fids = [];
                 foreach ($JAX->b['fids'] as $v) {
                     if (in_array($v, $this->fids)) {
                         $fids[] = $v;
@@ -184,45 +183,44 @@ class search
             /*
                 Note bug: should be is_int, not is_numeric,
                 because that DB field is an integer, not a float.
-            */
+             */
 
-            $arguments = array(
+            $arguments = [
                 <<<'EOT'
-SELECT `id`,SUM(`relevance`) AS `relevance`
-FROM (
-    (
-        SELECT p.`id` AS `id`,MATCH(p.`post`) AGAINST(?) AS `relevance`
-        FROM %t p
-        LEFT JOIN %t t
-            ON p.`tid`=t.`id`
-        WHERE MATCH(p.`post`) AGAINST(? IN BOOLEAN MODE)
-            AND t.`fid` IN ?
-EOT
-            . (is_int($JAX->b['mid']) ? ' AND p.`auth_id =? ' : '') .
-                 ((isset($datestart) && $datestart) ? ' AND p.`date`>? ' : '') .
-                 ((isset($dateend) && $dateend) ? ' AND p.`date`<? ' : '') .
-            <<<'EOT'
-    ORDER BY `relevance` DESC LIMIT 100
-    ) UNION (
-        SELECT t.`op` AS `op`,MATCH(t.`title`) AGAINST(?) AS `relevance`
-        FROM %t t
-        WHERE MATCH(`title`) AGAINST(? IN BOOLEAN MODE)
-            AND t.`fid` IN ?
-EOT
-            . (is_int($JAX->b['mid']) ? ' AND t.`auth_id`= ? ' : '') .
-                 ((isset($datestart) && $datestart) ? ' AND t.`date`>? ' : '') .
-                 ((isset($dateend) && $dateend) ? ' AND t.`date`<? ' : '') .
-            <<<'EOT'
-    ORDER BY `relevance` DESC LIMIT 100
-    )
-) dt GROUP BY `id` ORDER BY `relevance` DESC
-EOT
-                ,
-                array('posts', 'topics', 'topics'),
+                    SELECT `id`,SUM(`relevance`) AS `relevance`
+                    FROM (
+                        (
+                            SELECT p.`id` AS `id`,MATCH(p.`post`) AGAINST(?) AS `relevance`
+                            FROM %t p
+                            LEFT JOIN %t t
+                                ON p.`tid`=t.`id`
+                            WHERE MATCH(p.`post`) AGAINST(? IN BOOLEAN MODE)
+                                AND t.`fid` IN ?
+                    EOT
+            . (is_int($JAX->b['mid']) ? ' AND p.`auth_id =? ' : '')
+                 . ((isset($datestart) && $datestart) ? ' AND p.`date`>? ' : '')
+                 . ((isset($dateend) && $dateend) ? ' AND p.`date`<? ' : '')
+            . <<<'EOT'
+                    ORDER BY `relevance` DESC LIMIT 100
+                    ) UNION (
+                        SELECT t.`op` AS `op`,MATCH(t.`title`) AGAINST(?) AS `relevance`
+                        FROM %t t
+                        WHERE MATCH(`title`) AGAINST(? IN BOOLEAN MODE)
+                            AND t.`fid` IN ?
+                EOT
+            . (is_int($JAX->b['mid']) ? ' AND t.`auth_id`= ? ' : '')
+                 . ((isset($datestart) && $datestart) ? ' AND t.`date`>? ' : '')
+                 . ((isset($dateend) && $dateend) ? ' AND t.`date`<? ' : '')
+            . <<<'EOT'
+                    ORDER BY `relevance` DESC LIMIT 100
+                    )
+                ) dt GROUP BY `id` ORDER BY `relevance` DESC
+                EOT,
+                ['posts', 'topics', 'topics'],
                 $DB->basicvalue($termraw),
                 $DB->basicvalue($termraw),
                 $fids,
-            );
+            ];
 
             if (is_int($JAX->b['mid'])) {
                 array_push($arguments, (int) $JAX->b['mid']);
@@ -249,8 +247,8 @@ EOT
             }
 
             $result = call_user_func_array(
-                array($DB, 'safespecial'),
-                $arguments
+                [$DB, 'safespecial'],
+                $arguments,
             );
             if (!$result) {
                 syslog(LOG_EMERG, 'ERROR: ' . $DB->error(1) . PHP_EOL);
@@ -274,26 +272,26 @@ EOT
             $idarray = array_slice(
                 explode(',', $ids),
                 ($this->pagenum - 1) * $this->perpage,
-                $this->perpage
+                $this->perpage,
             );
             $ids = implode(',', $idarray);
 
             $result = $DB->safespecial(
                 <<<EOT
-SELECT p.`id` AS `id`,p.`auth_id` AS `auth_id`,p.`post` AS `post`,
-UNIX_TIMESTAMP(p.`date`) AS `date`,p.`showsig` AS `showsig`,
-p.`showemotes` AS `showemotes`,p.`tid` AS `tid`,p.`newtopic` AS `newtopic`,
-INET6_NTOA(p.`ip`) AS `ip`,UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`,
-p.`editby` AS `editby`,p.`rating` AS `rating`,t.`title` AS `title`
-FROM %t p
-LEFT JOIN %t t
-    ON p.`tid`=t.`id`
-WHERE p.`id` IN ?
-ORDER BY FIELD(p.`id`,{$ids})
-EOT
+                    SELECT p.`id` AS `id`,p.`auth_id` AS `auth_id`,p.`post` AS `post`,
+                    UNIX_TIMESTAMP(p.`date`) AS `date`,p.`showsig` AS `showsig`,
+                    p.`showemotes` AS `showemotes`,p.`tid` AS `tid`,p.`newtopic` AS `newtopic`,
+                    INET6_NTOA(p.`ip`) AS `ip`,UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`,
+                    p.`editby` AS `editby`,p.`rating` AS `rating`,t.`title` AS `title`
+                    FROM %t p
+                    LEFT JOIN %t t
+                        ON p.`tid`=t.`id`
+                    WHERE p.`id` IN ?
+                    ORDER BY FIELD(p.`id`,{$ids})
+                    EOT
                 ,
-                array('posts', 'topics'),
-                $idarray
+                ['posts', 'topics'],
+                $idarray,
             );
         } else {
             $numresults = 0;
@@ -302,9 +300,9 @@ EOT
         $page = '';
         $pages = '';
 
-        $terms = array();
+        $terms = [];
 
-        foreach (preg_split('@\\W+@', $termraw) as $v) {
+        foreach (preg_split('@\W+@', $termraw) as $v) {
             if (trim($v)) {
                 $terms[] = preg_quote($v);
             }
@@ -318,12 +316,12 @@ EOT
             $post = preg_replace(
                 '@' . implode('|', $terms) . '@i',
                 $PAGE->meta('search-highlight', '$0'),
-                $post
+                $post,
             );
             $title = preg_replace(
                 '@' . implode('|', $terms) . '@i',
                 $PAGE->meta('search-highlight', '$0'),
-                $f['title']
+                $f['title'],
             );
 
             $page .= $PAGE->meta(
@@ -331,31 +329,31 @@ EOT
                 $f['tid'],
                 $title,
                 $f['id'],
-                $post
+                $post,
             );
         }
 
         if (!$numresults) {
-            $e = 'No results found. ' .
-                'Try refining your search, or using longer terms.';
+            $e = 'No results found. '
+                . 'Try refining your search, or using longer terms.';
 
-            $omitted = array();
+            $omitted = [];
             foreach ($terms as $v) {
                 if (mb_strlen($v) < 3) {
                     $omitted[] = $v;
                 }
             }
             if (!empty($omitted)) {
-                $e .= '<br /><br />' .
-                    'The following terms were omitted due to length: ' .
-                    implode(', ', $omitted);
+                $e .= '<br /><br />'
+                    . 'The following terms were omitted due to length: '
+                    . implode(', ', $omitted);
             }
             $page = $PAGE->error($e);
         } else {
             $resultsArray = $JAX->pages(
                 ceil($numresults / $this->perpage),
                 $this->pagenum,
-                10
+                10,
             );
             foreach ($resultsArray as $x) {
                 $pages .= '<a href="?act=search&page=' . $x . '">' . $x . '</a> ';
@@ -377,11 +375,11 @@ EOT
         if ($this->fids) {
             return $this->fids;
         }
-        $this->fids = array();
+        $this->fids = [];
         global $DB,$JAX,$USER;
         $result = $DB->safeselect(
             '`id`,`perms`',
-            'forums'
+            'forums',
         );
         while ($f = $DB->arow($result)) {
             $perms = $JAX->parseperms($f['perms'], $USER ? $USER['group_id'] : 3);
