@@ -930,7 +930,9 @@ final class UCP
         }
 
         if ($e !== '' && $e !== '0') {
-            return $this->showucp($e);
+            $this->showucp($e);
+
+            return;
         }
 
         if (!$message['read'] && $message['to'] === $USER['id']) {

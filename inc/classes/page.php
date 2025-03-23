@@ -170,7 +170,9 @@ final class PAGE
             = "<div id='path' class='path'>" . $this->buildpath() . '</div>';
 
         if ($this->jsaccess) {
-            header('Content-type:text/plain');
+            if (!headers_sent()) {
+                header('Content-type:text/plain');
+            }
             foreach ($this->JSOutput as $k => $v) {
                 $this->JSOutput[$k] = $SESS->addSessID($v);
             }

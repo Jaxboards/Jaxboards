@@ -304,6 +304,12 @@ onclick="this.form.submitButton=this" /></div>
             $PAGE->JS('closewindow', '#qreply');
         }
 
+        $tdata = [
+            'title' => '',
+            'perms' => [
+                'upload' => false,
+            ],
+        ];
         if ($tid) {
             $result = $DB->safespecial(
                 <<<'EOT'
