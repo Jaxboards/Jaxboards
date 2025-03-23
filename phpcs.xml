@@ -155,7 +155,8 @@
   <rule ref="SlevomatCodingStandard.Commenting.DisallowOneLinePropertyDocComment"/>
   <rule ref="SlevomatCodingStandard.Commenting.UselessFunctionDocComment"/>
   <rule ref="SlevomatCodingStandard.Commenting.UselessInheritDocComment"/>
-  <rule ref="SlevomatCodingStandard.Complexity.Cognitive"/>
+  <!-- disable this rule because it breakse the sonarqube reports -->
+  <!-- rule ref="SlevomatCodingStandard.Complexity.Cognitive"/ -->
   <rule ref="SlevomatCodingStandard.ControlStructures.AssignmentInCondition"/>
   <rule ref="SlevomatCodingStandard.ControlStructures.EarlyExit"/>
   <rule ref="SlevomatCodingStandard.ControlStructures.DisallowContinueWithoutIntegerOperandInSwitch"/>
