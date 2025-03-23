@@ -266,8 +266,9 @@ EOT
 
         $checkboxes = array(
             $this->getlocationforform() . $JAX->hiddenFormFields(
-                array('submit' => 1)
-            ), );
+                array('submit' => 1),
+            ),
+        );
 
         foreach ($variables as $v) {
             $checkboxes[] = '<input type="checkbox" title="' . $v . '" name="' . $v . '" ' .
@@ -915,19 +916,25 @@ EOT
         $hasmessages = false;
         if ('sent' == $view) {
             $result = $DB->safespecial(
-                <<<'EOT'
-SELECT a.`id` AS `id`,a.`to` AS `to`,a.`from` AS `from`,
-	a.`title` AS `title`,a.`message` AS `message`,a.`read` AS `read`,
-	UNIX_TIMESTAMP(a.`date`) AS `date`,a.`del_recipient` AS `del_recipient`,
-	a.`del_sender` AS `del_sender`,a.`flag` AS `flag`,
-    m.`display_name` AS `display_name`
+                <<<'MySQL'
+SELECT a.`id` AS `id`
+, a.`to` AS `to`
+, a.`from` AS `from`
+, a.`title` AS `title`
+, a.`message` AS `message`
+, a.`read` AS `read`
+, UNIX_TIMESTAMP(a.`date`) AS `date`
+, a.`del_recipient` AS `del_recipient`
+, a.`del_sender` AS `del_sender`
+, a.`flag` AS `flag`
+, m.`display_name` AS `display_name`
 FROM %t a
 LEFT JOIN %t m
     ON a.`to`=m.`id`
 WHERE a.`from`=? AND !a.`del_sender`
 ORDER BY a.`date` DESC
-EOT
-                ,
+
+MySQL,
                 array('messages', 'members'),
                 $USER['id']
             );
