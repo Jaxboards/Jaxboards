@@ -286,7 +286,7 @@ EOT
             return $PAGE->parseTemplate(
                 'forums/order-forums-tree.html',
                 array(
-                    'class' => $class ?: '',
+                    'class' => $class ? : '',
                     'content' => $html,
                 )
             );
@@ -619,7 +619,7 @@ EOT
                 'order_by_options' => $orderByOptions,
                 'no_count' => isset($fdata['nocount']) && $fdata['nocount'] ?
                 '' : ' checked="checked"',
-                'trashcan' => isset($fdata['trashcan']) && $fdata['trashcan'] ?
+                'trashcan' => isset($fdata['trashcan']) && $fdata['trashcan']  ?
                 ' checked="checked"' : '',
             )
         ) . PHP_EOL;

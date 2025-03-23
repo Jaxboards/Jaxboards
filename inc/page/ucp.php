@@ -401,8 +401,7 @@ EOT;
             $this->getlocationforform() . $JAX->hiddenFormFields(
                 array('submit' => 'true')
             ),
-            (
-                (isset($JAX->b['change']) && $JAX->b['change']) ? <<<HTML
+            ((isset($JAX->b['change']) && $JAX->b['change']) ? <<<HTML
                 <input
                     type="text"
                     name="email"

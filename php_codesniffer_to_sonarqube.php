@@ -2,7 +2,7 @@
 <?php
 
 /**
- * Tool to convert EasyCodingStandard output into something SonarQube can read.
+ * Tool to convert PHP_CodeSniffer output into something SonarQube can read.
  *
  * @see https://docs.sonarsource.com/sonarqube-cloud/enriching/generic-issue-data/
  * @see https://community.sonarsource.com/t/how-can-i-include-php-codesniffer-and-mess-detector-ruleset-or-report/47776/4
@@ -10,7 +10,7 @@
  *
  * USAGE:
  * ```sh
- * ecs_to_sonarqube.php <input.json> <output.json>
+ * phpcs_to_sonarqube.php <input.json> <output.json>
  * ```
  */
 
@@ -18,12 +18,12 @@
  * Fetch CLI arguments.
  */
 
-$ecs_report = $argv[1] ?? '';
+$php_codesniffer_report = $argv[1] ?? '';
 
-if ($ecs_report === '') {
+if ($php_codesniffer_report === '') {
     fwrite(
         STDERR,
-        'Please enter the path to your EasyCodingStandard report json file',
+        'Please enter the path to your PHP_CodeSniffer report json file',
     );
 
     exit(1);
@@ -45,20 +45,14 @@ if ($sonarqube_report === '') {
  * Validate CLI arguments are usable
  */
 
-if (!file_exists($ecs_report)) {
-    fwrite(
-        STDERR,
-        'Provided EasyCodingStandard report json file does not exist',
-    );
+if (!file_exists($php_codesniffer_report)) {
+    fwrite(STDERR, 'Provided PHP_CodeSniffer report json file does not exist');
 
     exit(1);
 }
 
-if (!is_readable($ecs_report)) {
-    fwrite(
-        STDERR,
-        'Provided EasyCodingStandard report json file is not readable',
-    );
+if (!is_readable($php_codesniffer_report)) {
+    fwrite(STDERR, 'Provided PHP_CodeSniffer report json file is not readable');
 
     exit(1);
 }
@@ -85,7 +79,7 @@ if (
 }
 
 $data = json_decode(
-    file_get_contents($ecs_report),
+    file_get_contents($php_codesniffer_report),
     null,
     512,
     // default
@@ -95,8 +89,7 @@ $data = json_decode(
 if (!is_array($data['files'])) {
     fwrite(
         STDERR,
-        'Provided EasyCodingStandard report json file does not have `files`'
-        . ' array',
+        'Provided PHP_CodeSniffer report json file does not have `files` array',
     );
 
     exit(1);
@@ -119,10 +112,10 @@ file_put_contents(
                 array_push(
                     $result['rules'],
                     ...array_map(
-                        static fn (array $error): array => [
-                            'id' => $error['source_class'],
-                            'name' => $error['source_class'],
-                            'engineId' => 'EasyCodingStandard',
+                        static fn(array $message): array => [
+                            'id' => $message['source'],
+                            'name' => $message['message'],
+                            'engineId' => 'PHP_CodeSniffer',
                             'cleanCodeAttribute' => 'FORMATTED',
                             'impacts' => [
                                 [
@@ -132,11 +125,13 @@ file_put_contents(
                             ],
                         ],
                         array_filter(
-                            $data['files'][$file]['errors'],
-                            static fn (
-                                array $error,
+                            $data['files'][$file]['messages'],
+                            // phpcs:disable Generic.WhiteSpace.ScopeIndent.IncorrectExact
+                            static fn(
+                            // phpcs:enable Generic.WhiteSpace.ScopeIndent.IncorrectExact
+                                array $message,
                             ): bool => !in_array(
-                                $error['source_class'],
+                                $message['source'],
                                 $current_rules,
                             ),
                         ),
@@ -144,37 +139,40 @@ file_put_contents(
                 );
 
                 $current_rules = array_map(
-                    static fn (array $rule): string => $rule['id'],
+                    static fn(array $rule): string => $rule['id'],
                     $result['rules'],
                 );
 
                 array_push(
                     $result['issues'],
                     ...array_map(
-                        static fn (array $error): array => [
-                            'ruleId' => $error['source_class'],
-                            'engineId' => 'EasyCodingStandard',
+                        static fn(array $message): array => [
+                            'ruleId' => $message['source'],
+                            'engineId' => 'PHP_CodeSniffer',
                             'primaryLocation' => [
-                                'message' => $error['message'],
-                                'filePath' => $error['file_path'],
+                                'message' => $message['message'],
+                                'filePath' => $file,
                                 'textRange' => [
-                                    // we don't have column information from
-                                    // EasyCodingStandard
-                                    'startColumn' => (string) 0,
-                                    'startLine' => (string) $error['line'],
+                                    'startColumn' =>
+                                        // SonarQube starts at 0 for columns
+                                        // while PHP_CodeSniffer starts at 1
+                                        (string) (
+                                            ((int) $message['column']) - 1
+                                        ),
+                                    'startLine' => (string) $message['line'],
                                     // we don't know when this ends due to lack
-                                    // of information from EasyCodingStandard so
-                                    // we just add 1 to the starting positions
+                                    // of information from PHP_CodeSniffer so we
+                                    // just add 1 to the starting positions
                                     // (otherwise SonarQube crashes)
-                                    'endColumn' => (string) 1,
+                                    'endColumn' => (string) $message['column'],
                                     'endLine' => (string) (
-                                        (int) $error['line'] + 1
+                                        (int) $message['line'] + 1
                                     ),
                                 ],
                             ],
 
                         ],
-                        $data['files'][$file]['errors'],
+                        $data['files'][$file]['messages'],
                     ),
                 );
 

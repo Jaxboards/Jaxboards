@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<ruleset name="Jaxboards">
+  <description>Jaxboards PHP coding standards</description>
+  <!-- Files and directories to run on -->
+  <file>Script</file>
+  <file>Service</file>
+  <file>acp</file>
+  <file>config.default.php</file>
+  <file>domaindefinitions.php</file>
+  <file>inc</file>
+  <file>index.php</file>
+  <file>misc</file>
+  <file>php_codesniffer_to_sonarqube.php</file>
+  <!-- ignore vendor files -->
+  <exclude-pattern>*/vendor/*</exclude-pattern>
+  <exclude-pattern>*/node_modules/*</exclude-pattern>
+  <!-- show colors -->
+  <arg name="colors" />
+  <!-- only check php files -->
+  <arg name="extensions" value="php" />
+  <!-- Follow PSR coding style guides -->
+  <!-- PSR12: Extended Coding Style https://www.php-fig.org/psr/psr-12 -->
+  <rule ref="PSR12">
+    <!-- Disable these rules as they require big changes to the codebase -->
+    <exclude name="PSR1.Files.SideEffects" />
+    <exclude name="PSR1.Classes.ClassDeclaration" />
+    <exclude name="PSR1.Methods.CamelCapsMethodName" />
+    <exclude name="Squiz.Classes.ValidClassName" />
+  </rule>
+  <!-- Here's some comment rules we can follow -->
+  <rule ref="Squiz.Commenting.InlineComment">
+    <exclude name="Squiz.Commenting.InlineComment.NotCapital" />
+    <exclude name="Squiz.Commenting.InlineComment.InvalidEndChar" />
+  </rule>
+  <rule ref="Squiz.Commenting.PostStatementComment" />
+  <rule ref="Squiz.Commenting.BlockComment">
+    <exclude name="Squiz.Commenting.BlockComment.NotCapital" />
+    <exclude name="Squiz.Commenting.BlockComment.InvalidEndChar" />
+  </rule>
+  <!-- Make sure this works with PHP 8.3+ -->
+  <config name="testVersion" value="8.3-" />
+  <rule ref="PHPCompatibility" />
+
+  <!-- Ban some functions -->
+  <rule ref="Generic.PHP.ForbiddenFunctions">
+    <properties>
+      <property name="forbiddenFunctions" type="array" value="sizeof=>count,delete=>unset,print=>echo,is_null=>null,create_function=>null,stripos=>mb_stripos,stristr=>mb_stristr,strlen=>mb_strlen,strpos=>mb_strpos,strrchr=>mb_strrchr,strrichr=>mb_strrichr,strripos=>mb_strripos,strrpos=>mb_strrpos,strstr=>mb_strstr,strtolower=>mb_strtolower,strtoupper=>mb_strtoupper,substr_count=>mb_substr_count,substr=>mb_substr,md5=>hash,md5_file=>hash_file,mysql_affected_rows=>mysqli_affected_rows,mysql_client_encoding=>null,mysql_close=>mysqli_close,mysql_connect=>mysqli_connect,mysql_create_db=>null,mysql_data_seek=>mysqli_data_seek,mysql_db_name=>null,mysql_db_query=>null,mysql_drop_db=>null,mysql_errno=>mysqli_errno,mysql_error=>mysqli_error,mysql_escape_string=>mysqli_escape_string,mysql_fetch_array=>mysqli_fetch_array,mysql_fetch_assoc=>mysqli_fetch_assoc,mysql_fetch_field=>mysqli_fetch_field,mysql_fetch_lengths=>mysqli_fetch_lengths,mysql_fetch_object=>mysqli_fetch_object,mysql_fetch_row=>mysqli_fetch_row,mysql_field_flags=>null,mysql_field_len=>null,mysql_field_name=>null,mysql_field_seek=>mysqli_field_seek,mysql_field_table=>null,mysql_field_type=>null,mysql_free_result=>mysqli_free_result,mysql_get_client_info=>mysqli_get_client_info,mysql_get_host_info=>mysqli_get_host_info,mysql_get_proto_info=>mysqli_get_proto_info,mysql_get_server_info=>mysqli_get_server_info,mysql_info=>mysqli_info,mysql_insert_id=>mysqli_insert_id,mysql_list_dbs=>null,mysql_list_fields=>null,mysql_list_processes=>null,mysql_list_tables=>null,mysql_num_fields=>mysqli_num_fields,mysql_num_rows=>mysqli_num_rows,mysql_pconnect=>null,mysql_ping=>mysqli_ping,mysql_query=>mysqli_query,mysql_real_escape_string=>mysqli_real_escape_string,mysql_result=>null,mysql_select_db=>mysqli_select_db,mysql_set_charset=>mysqli_set_charset,mysql_stat=>mysqli_stat,mysql_tablename=>null,mysql_thread_id=>mysqli_thread_id,mysql_unbuffered_query=>null" />
+    </properties>
+  </rule>
+</ruleset>

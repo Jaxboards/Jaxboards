@@ -13,9 +13,9 @@ boards
 *.log
 
 # Scan Results
-ecs-report-sonarqube.json
-ecs-report.json
 eslint-report.json
+phpcs-report-sonarqube.json
+phpcs-report.json
 stylelint-report.json
 
 # Vendor files

@@ -656,7 +656,7 @@ MySQL,
                 ($this->topicdata['fperms']['reply'] ?
                 " <a href='?act=vt" . $this->id . '&amp;quote=' . $post['pid'] .
                 "' onclick='RUN.handleQuoting(this);return false;' " .
-                "class='quotepost'>" . $PAGE->meta('topic-quote-button') . '</a> ' : '') .
+                "class='quotepost'>" . $PAGE->meta('topic-quote-button') . '</a> '  : '') .
                 // Adds the Moderate options
                 ($this->canmoderate() ?
                 "<a href='?act=modcontrols&amp;do=modp&amp;pid=" . $post['pid'] .
@@ -719,12 +719,11 @@ MySQL,
         global $PERMS,$USER;
 
         return $this->canmoderate()
-            || (
-                $post['auth_id']
+            || ($post['auth_id']
             && ($post['newtopic'] ?
             $PERMS['can_edit_topics'] : $PERMS['can_edit_posts'])
             && $post['auth_id'] == $USER['id']
-            );
+        );
     }
 
     public function canmoderate()

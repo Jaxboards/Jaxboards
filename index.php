@@ -293,10 +293,10 @@ if (!isset($JAX->b['act'])) {
     $JAX->b['act'] = null;
 }
 if (
-    'logreg' != $JAX->b['act']
-        && 'logreg2' != $JAX->b['act']
-        && 'logreg4' != $JAX->b['act']
-        && 'logreg3' != $JAX->b['act']
+'logreg' != $JAX->b['act']
+    && 'logreg2' != $JAX->b['act']
+    && 'logreg4' != $JAX->b['act']
+    && 'logreg3' != $JAX->b['act']
 ) {
     if (
         !$PERMS['can_view_board']

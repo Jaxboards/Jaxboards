@@ -206,19 +206,19 @@ class userprofile
                         )
                     );
                     while ($f = $DB->arow($result)) {
-                        $f['name'] = $udata['display_name'];
-                        $f['group_id'] = $udata['group_id'];
-                        $data = $JAX->parse_activity($f, true);
-                        $feed->additem(
-                            array(
-                                'title' => $data['text'],
-                                'pubDate' => date('r', $f['date']),
-                                'description' => $data['text'],
-                                'link' => 'https://' . $_SERVER['SERVER_NAME'] .
-                                $_SERVER['PHP_SELF'] . $data['link'],
-                                'guid' => $f['id'],
-                            )
-                        );
+                            $f['name'] = $udata['display_name'];
+                            $f['group_id'] = $udata['group_id'];
+                            $data = $JAX->parse_activity($f, true);
+                            $feed->additem(
+                                array(
+                                    'title' => $data['text'],
+                                    'pubDate' => date('r', $f['date']),
+                                    'description' => $data['text'],
+                                    'link' => 'https://' . $_SERVER['SERVER_NAME'] .
+                                    $_SERVER['PHP_SELF'] . $data['link'],
+                                    'guid' => $f['id'],
+                                )
+                            );
                     }
                     $feed->publish();
                     die();
