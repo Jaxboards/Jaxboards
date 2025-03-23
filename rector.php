@@ -36,6 +36,9 @@ use Rector\TypeDeclaration\Rector\While_\WhileNullableToInstanceofRector;
 
 return RectorConfig::configure()
     ->withAttributesSets()
+    ->withBootstrapFiles([
+        __DIR__ . '/phpstan-bootstrap.php',
+    ])
     ->withCache(
         // ensure file system caching is used instead of in-memory
         cacheClass: FileCacheStorage::class,
