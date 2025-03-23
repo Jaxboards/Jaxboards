@@ -63,7 +63,6 @@ label {
   padding: 5px;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .goBack {
   margin: 1em auto;
 }

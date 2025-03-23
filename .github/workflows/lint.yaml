@@ -7,6 +7,9 @@ jobs:
     if: github.event.pull_request.draft == false
     steps:
       - uses: actions/checkout@v4
+        with:
+          # disable shallow clones for better SonarQube analysis
+          fetch-depth: 0
       - uses: shivammathur/setup-php@v2
         with:
           extensions: mbstring
@@ -16,9 +19,25 @@ jobs:
           cache: npm
       - uses: ramsey/composer-install@v3
       - run: npm clean-install
-      - run: npm run-script pre-commit
+      - run: |
+          echo "[]" > eslint-report.json &&
+          echo "[]" > stylelint-report.json &&
+          echo '{"issues": [], "rules": []}' > phpcs-report-sonarqube.json
+        shell: bash
+      - run: npm run-script lint
+      - run: >
+            php php_codesniffer_to_sonarqube.php
+            phpcs-report.json
+            phpcs-report-sonarqube.json
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
     types:
       - opened

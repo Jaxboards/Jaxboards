@@ -1,5 +1,17 @@
 # Jaxboards
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Jaxboards_Jaxboards&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Jaxboards_Jaxboards)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Jaxboards_Jaxboards&metric=bugs)](https://sonarcloud.io/summary/new_code?id=Jaxboards_Jaxboards)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=Jaxboards_Jaxboards&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=Jaxboards_Jaxboards)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Jaxboards_Jaxboards&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Jaxboards_Jaxboards)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=Jaxboards_Jaxboards&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=Jaxboards_Jaxboards)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=Jaxboards_Jaxboards&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=Jaxboards_Jaxboards)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=Jaxboards_Jaxboards&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=Jaxboards_Jaxboards)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Jaxboards_Jaxboards&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=Jaxboards_Jaxboards)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=Jaxboards_Jaxboards&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=Jaxboards_Jaxboards)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Jaxboards_Jaxboards&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=Jaxboards_Jaxboards)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Jaxboards_Jaxboards&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=Jaxboards_Jaxboards)
+
 Jaxboards is PHP/MySQL forum software built sometime between 2007 and October 6,
 2010\. It's pretty full-featured and offers a unique experience over other forum
 software even today. It delivers outstanding performance, and creating themes is
@@ -235,3 +247,5 @@ This project is licensed under the MIT License - see the
 - Contributors to the original [Jaxboards Service](https://jaxboards.com);
   Jaxboards wouldn't exist without feedback from everyone who's supported it
   over the years.
+
+[![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-dark.svg)](https://sonarcloud.io/summary/new_code?id=Jaxboards_Jaxboards)
