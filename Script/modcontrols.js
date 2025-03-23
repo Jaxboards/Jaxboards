@@ -6,6 +6,26 @@ import { assign, onDOMReady } from './JAX/util';
 // TODO: Find a place for this state
 let onPageChangeOld;
 
+const postIDs = function fetchPIDs(a) {
+  let pids = [];
+  if (a[0] && (typeof a[0] === 'string' || typeof a[0] === 'number')) {
+    pids = `${a[0]}`.split(',');
+  }
+  const pl = pids ? pids.length : 0;
+  const pluralPosts = pids.length === 1 ? '' : 's';
+  return [pids, pl, pluralPosts];
+};
+
+const threadIDs = function fetchTIDs(a) {
+  let tids = [];
+  if (a[1] && (typeof a[1] === 'string' || typeof a[1] === 'number')) {
+    tids = `${a[1]}`.split(',');
+  }
+  const tl = tids ? tids.length : 0;
+  const pluralThreads = tl === 1 ? '' : 's';
+  return [tids, tl, pluralThreads];
+};
+
 class ModControls {
   constructor(commands) {
     assign(commands, {
@@ -15,17 +35,8 @@ class ModControls {
       },
 
       modcontrols_postsync: (a) => {
-        let pids = [];
-        if (a[0] && (typeof a[0] === 'string' || typeof a[0] === 'number')) {
-          pids = `${a[0]}`.split(',');
-        }
-        const pl = pids ? pids.length : 0;
-        let tids = [];
-        if (a[1] && (typeof a[1] === 'string' || typeof a[1] === 'number')) {
-          tids = `${a[1]}`.split(',');
-        }
-        const tl = tids ? tids.length : 0;
-        const pluralPosts = pids.length === 1 ? '' : 's';
+        const [pids, pl, pluralPosts] = postIDs(a);
+        const [tids, tl, pluralThreads] = threadIDs(a);
         const html =
           `${
             "<form method='post' data-ajax-form='true'>" +
@@ -43,9 +54,7 @@ class ModControls {
                   "<option value='unlock'>Unlock</option>" +
                   '</select>' +
                   '&nbsp; &nbsp; <strong>'
-                }${tl}</strong> topic${
-                  tl > 1 ? 's' : ''
-                }${pl ? ' and <br />' : ''}`
+                }${tl}</strong> topic${pluralThreads}${pl ? ' and <br />' : ''}`
               : ''
           }${
             pl
