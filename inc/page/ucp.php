@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 $PAGE->loadmeta('ucp');
 
 new UCP();
@@ -20,60 +18,60 @@ class UCP
     public function __construct()
     {
         global $PAGE,$JAX,$USER,$DB;
-        if (! $USER || $USER['group_id'] === 4) {
+        if (! $USER || $USER['group_id'] == 4) {
             return $PAGE->location('?');
         }
         $result = $DB->safeselect(
             <<<'EOT'
-                `id`,
-                `name`,
-                `pass`,
-                `email`,
-                `sig`,
-                `posts`,
-                `group_id`,
-                `avatar`,
-                `usertitle`,
-                UNIX_TIMESTAMP(`join_date`) AS `join_date`,
-                UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,
-                `contact_aim`,
-                `contact_bluesky`,
-                `contact_discord`,
-                `contact_gtalk`,
-                `contact_msn`,
-                `contact_skype`,
-                `contact_steam`,
-                `contact_yim`,
-                `contact_youtube`,
-                `website`,
-                `birthdate`,
-                DAY(`birthdate`) AS `dob_day`,
-                MONTH(`birthdate`) AS `dob_month`,
-                YEAR(`birthdate`) AS `dob_year`,
-                `about`,
-                `display_name`,
-                `full_name`,
-                `location`,
-                `gender`,
-                `friends`,
-                `enemies`,
-                `sound_shout`,
-                `sound_im`,
-                `sound_pm`,
-                `sound_postinmytopic`,
-                `sound_postinsubscribedtopic`,
-                `notify_pm`,
-                `notify_postinmytopic`,
-                `notify_postinsubscribedtopic`,
-                `ucpnotepad`,
-                `skin_id`,
-                `contact_twitter`,
-                `email_settings`,
-                `nowordfilter`,
-                INET6_NTOA(`ip`) AS `ip`,
-                `mod`,
-                `wysiwyg`
-                EOT
+`id`,
+`name`,
+`pass`,
+`email`,
+`sig`,
+`posts`,
+`group_id`,
+`avatar`,
+`usertitle`,
+UNIX_TIMESTAMP(`join_date`) AS `join_date`,
+UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,
+`contact_aim`,
+`contact_bluesky`,
+`contact_discord`,
+`contact_gtalk`,
+`contact_msn`,
+`contact_skype`,
+`contact_steam`,
+`contact_yim`,
+`contact_youtube`,
+`website`,
+`birthdate`,
+DAY(`birthdate`) AS `dob_day`,
+MONTH(`birthdate`) AS `dob_month`,
+YEAR(`birthdate`) AS `dob_year`,
+`about`,
+`display_name`,
+`full_name`,
+`location`,
+`gender`,
+`friends`,
+`enemies`,
+`sound_shout`,
+`sound_im`,
+`sound_pm`,
+`sound_postinmytopic`,
+`sound_postinsubscribedtopic`,
+`notify_pm`,
+`notify_postinmytopic`,
+`notify_postinsubscribedtopic`,
+`ucpnotepad`,
+`skin_id`,
+`contact_twitter`,
+`email_settings`,
+`nowordfilter`,
+INET6_NTOA(`ip`) AS `ip`,
+`mod`,
+`wysiwyg`
+EOT
             ,
             'members',
             'WHERE `id`=?',
@@ -85,7 +83,7 @@ class UCP
         $PAGE->path([
             'UCP' => '?act=ucp',
         ]);
-        $this->what = $JAX->b['what'] ?? '';
+        $this->what = isset($JAX->b['what']) ? $JAX->b['what'] : '';
         switch ($this->what) {
             case 'sounds':
                 $this->showsoundsettings();
@@ -136,16 +134,16 @@ class UCP
                     if (! isset($JAX->b['page'])) {
                         $JAX->b['page'] = false;
                     }
-                    if ($JAX->b['page'] === 'compose') {
+                    if ($JAX->b['page'] == 'compose') {
                         $this->compose();
                     } elseif (
                         isset($JAX->g['view'])
                         && is_numeric($JAX->g['view'])
                     ) {
                         $this->viewmessage($JAX->g['view']);
-                    } elseif ($JAX->b['page'] === 'sent') {
+                    } elseif ($JAX->b['page'] == 'sent') {
                         $this->viewmessages('sent');
-                    } elseif ($JAX->b['page'] === 'flagged') {
+                    } elseif ($JAX->b['page'] == 'flagged') {
                         $this->viewmessages('flagged');
                     } elseif (
                         isset($JAX->b['flag'])
@@ -179,7 +177,7 @@ class UCP
         ]);
     }
 
-    public function showmain(): void
+    public function showmain()
     {
         global $PAGE,$JAX,$USER,$DB;
         $e = '';
@@ -208,7 +206,7 @@ class UCP
         $this->showucp();
     }
 
-    public function showucp($page = false): void
+    public function showucp($page = false)
     {
         global $PAGE;
         if ($this->shownucp) {
@@ -285,7 +283,7 @@ class UCP
         unset($checkboxes);
     }
 
-    public function showsigsettings(): void
+    public function showsigsettings()
     {
         global $USER,$JAX,$DB,$PAGE;
         $update = false;
@@ -317,7 +315,7 @@ class UCP
             if (! isset($JAX->p['showpass'])) {
                 $JAX->p['showpass'] = false;
             }
-            if (! $JAX->p['showpass'] && $JAX->p['newpass1'] !== $JAX->p['newpass2']) {
+            if (! $JAX->p['showpass'] && $JAX->p['newpass1'] != $JAX->p['newpass2']) {
                 $e = 'Those passwords do not match.';
             }
             if (
@@ -342,15 +340,15 @@ class UCP
                 $this->ucppage .= $PAGE->meta('error', $e);
                 $PAGE->JS('error', $e);
             } else {
-                $hashpass = password_hash($JAX->p['newpass1'], \PASSWORD_DEFAULT);
+                $hashpass = password_hash($JAX->p['newpass1'], PASSWORD_DEFAULT);
                 $DB->safeupdate('members', [
                     'pass' => $hashpass,
                 ], 'WHERE `id`=?', $USER['id']);
                 $this->ucppage = <<<'EOT'
-                    Password changed.
-                        <br><br>
-                        <a href="?act=ucp&what=pass">Back</a>
-                    EOT;
+Password changed.
+    <br><br>
+    <a href="?act=ucp&what=pass">Back</a>
+EOT;
 
                 return $this->showucp();
             }
@@ -396,17 +394,18 @@ class UCP
             $this->getlocationforform().$JAX->hiddenFormFields([
                 'submit' => 'true',
             ]),
-
+            (
                 (isset($JAX->b['change']) && $JAX->b['change']) ? <<<HTML
-                    <input
-                        type="text"
-                        name="email"
-                        aria-label="Email"
-                        title="Enter your new email address"
-                        value="{$USER['email']}" />
-                    HTML : '<strong>'.$JAX->pick($USER['email'], '--none--').
+                <input
+                    type="text"
+                    name="email"
+                    aria-label="Email"
+                    title="Enter your new email address"
+                    value="{$USER['email']}" />
+                HTML : '<strong>'.$JAX->pick($USER['email'], '--none--').
             "</strong> <a href='?act=ucp&what=email&change=1'>Change</a>".
-            "<input type='hidden' name='email' value='".$USER['email']."' />",
+            "<input type='hidden' name='email' value='".($USER['email'])."' />"
+            ),
             '<input type="checkbox" title="Notifications" name="notifications"'.
             ($USER['email_settings'] & 2 ? " checked='checked'" : '').'>',
             '<input type="checkbox" title="Admin Emails" name="adminemails"'.
@@ -414,7 +413,7 @@ class UCP
         );
     }
 
-    public function showavatarsettings(): void
+    public function showavatarsettings()
     {
         global $USER,$PAGE,$JAX,$DB;
         $e = '';
@@ -445,7 +444,7 @@ class UCP
         }
     }
 
-    public function showprofilesettings(): void
+    public function showprofilesettings()
     {
         global $USER,$JAX,$PAGE,$DB,$CFG;
         $error = '';
@@ -472,7 +471,7 @@ class UCP
                 'contact_twitter' => $JAX->p['con_twitter'],
                 'contact_bluesky' => $JAX->p['con_bluesky'],
                 'website' => $JAX->p['website'],
-                'gender' => in_array($JAX->p['gender'], $genderOptions, true) ?
+                'gender' => in_array($JAX->p['gender'], $genderOptions) ?
                 $JAX->p['gender'] : '',
             ];
 
@@ -564,7 +563,9 @@ class UCP
                     ($data['dob_day'] ?? '00');
             }
 
-            unset($data['dob_year'], $data['dob_month'], $data['dob_day']);
+            unset($data['dob_year']);
+            unset($data['dob_month']);
+            unset($data['dob_day']);
 
             foreach (
                 [
@@ -587,13 +588,13 @@ class UCP
             ) {
                 if (
                     mb_strstr($k, 'contact') !== false
-                    && preg_match('/[^\w.@]/', $data[$k])
+                    && preg_match('/[^\\w.@]/', $data[$k])
                 ) {
                     $error = "Invalid characters in {$v}";
                 }
 
                 $data[$k] = $JAX->blockhtml($data[$k]);
-                $length = $k === 'display_name' ? 30 : ($k === 'location' ? 100 : 50);
+                $length = $k == 'display_name' ? 30 : ($k == 'location' ? 100 : 50);
                 if (mb_strlen($data[$k]) > $length) {
                     $error = "{$v} must be less than {$length} characters.";
                 }
@@ -601,7 +602,7 @@ class UCP
 
             // Handle errors/insert.
             if (! $error) {
-                if ($data['display_name'] !== $USER['display_name']) {
+                if ($data['display_name'] != $USER['display_name']) {
                     $DB->safeinsert(
                         'activity',
                         [
@@ -627,7 +628,7 @@ class UCP
         $genderselect = '<select name="gender" title="Your gender" aria-label="Gender">';
         foreach (['', 'male', 'female', 'other'] as $v) {
             $genderselect .= '<option value="'.$v.'"'.
-                ($data['gender'] === $v ? ' selected="selected"' : '').
+                ($data['gender'] == $v ? ' selected="selected"' : '').
                 '>'.$JAX->pick(ucfirst($v), 'Not telling').'</option>';
         }
         $genderselect .= '</select>';
@@ -649,13 +650,13 @@ class UCP
         ];
         foreach ($fullMonthNames as $k => $v) {
             $dobselect .= '<option value="'.($k + 1).'"'.
-                (($k + 1) === $data['dob_month'] ? ' selected="selected"' : '').
+                (($k + 1) == $data['dob_month'] ? ' selected="selected"' : '').
                 '>'.$v.'</option>';
         }
         $dobselect .= '</select><select name="dob_day" title="Day"><option value="">--</option>';
         for ($x = 1; $x < 32; $x++) {
             $dobselect .= '<option value="'.$x.'"'.
-                ($x === $data['dob_day'] ? ' selected="selected"' : '').
+                ($x == $data['dob_day'] ? ' selected="selected"' : '').
                 '>'.$x.'</option>';
         }
         $dobselect .= '</select><select name="dob_year" title="Year">'.
@@ -663,7 +664,7 @@ class UCP
         $thisyear = (int) date('Y');
         for ($x = $thisyear; $x > $thisyear - 100; $x--) {
             $dobselect .= '<option value="'.$x.'"'.
-                ($x === $data['dob_year'] ? ' selected="selected"' : '').
+                ($x == $data['dob_year'] ? ' selected="selected"' : '').
                 '>'.$x.'</option>';
         }
         $dobselect .= '</select>';
@@ -737,7 +738,7 @@ class UCP
 
             $showthing = true;
         }
-        $result = ($USER['group_id'] !== 2) ?
+        $result = ($USER['group_id'] != 2) ?
             $DB->safeselect(
                 '`id`,`using`,`title`,`custom`,`wrapper`,`default`,`hidden`',
                 'skins',
@@ -751,7 +752,7 @@ class UCP
         $select = '';
         while ($f = $DB->arow($result)) {
             $select .= "<option value='".$f['id']."' ".
-                ($USER['skin_id'] === $f['id'] ? "selected='selected'" : '').
+                ($USER['skin_id'] == $f['id'] ? "selected='selected'" : '').
                 '/>'.($f['hidden'] ? '*' : '').$f['title'].'</option>';
             $found = true;
         }
@@ -780,7 +781,7 @@ class UCP
         ARRRRRRRRRRRRRRRRRRRRRRRR
     */
 
-    public function flag(): void
+    public function flag()
     {
         global $PAGE,$DB,$JAX,$USER;
         $PAGE->JS('softurl');
@@ -804,31 +805,31 @@ class UCP
         $e = '';
         $result = $DB->safespecial(
             <<<'EOT'
-                SELECT a.`id` AS `id`,a.`to` AS `to`,a.`from` AS `from`,a.`title` AS `title`,
-                    a.`message` AS `message`,a.`read` AS `read`,
-                    UNIX_TIMESTAMP(a.`date`) AS `date`,a.`del_recipient` AS `del_recipient`,
-                    a.`del_sender` AS `del_sender`,a.`flag` AS `flag`,
-                    m.`group_id` AS `group_id`,m.`display_name` AS `name`,
-                    m.`avatar` AS `avatar`,m.`usertitle` AS `usertitle`
-                FROM %t a
-                LEFT JOIN %t m
-                    ON a.`from`=m.`id`
-                WHERE a.`id`=?
-                ORDER BY a.`date` DESC
-                EOT
+SELECT a.`id` AS `id`,a.`to` AS `to`,a.`from` AS `from`,a.`title` AS `title`,
+    a.`message` AS `message`,a.`read` AS `read`,
+    UNIX_TIMESTAMP(a.`date`) AS `date`,a.`del_recipient` AS `del_recipient`,
+    a.`del_sender` AS `del_sender`,a.`flag` AS `flag`,
+    m.`group_id` AS `group_id`,m.`display_name` AS `name`,
+    m.`avatar` AS `avatar`,m.`usertitle` AS `usertitle`
+FROM %t a
+LEFT JOIN %t m
+    ON a.`from`=m.`id`
+WHERE a.`id`=?
+ORDER BY a.`date` DESC
+EOT
             ,
             ['messages', 'members'],
             $DB->basicvalue($messageid)
         );
         $message = $DB->arow($result);
         $DB->disposeresult($result);
-        if ($message['from'] !== $USER['id'] && $message['to'] !== $USER['id']) {
+        if ($message['from'] != $USER['id'] && $message['to'] != $USER['id']) {
             $e = "You don't have permission to view this message.";
         }
         if ($e) {
             return $this->showucp($e);
         }
-        if (! $message['read'] && $message['to'] === $USER['id']) {
+        if (! $message['read'] && $message['to'] == $USER['id']) {
             $DB->safeupdate('messages', [
                 'read' => 1,
             ], 'WHERE `id`=?', $message['id']);
@@ -855,7 +856,7 @@ class UCP
         $this->showucp($page);
     }
 
-    public function updatenummessages(): void
+    public function updatenummessages()
     {
         global $DB,$PAGE,$USER;
         $result = $DB->safeselect('COUNT(`id`)', 'messages', 'WHERE `to`=? AND !`read`', $USER['id']);
@@ -866,7 +867,7 @@ class UCP
         $PAGE->JS('update', 'num-messages', $unread);
     }
 
-    public function viewmessages($view = 'inbox'): void
+    public function viewmessages($view = 'inbox')
     {
         global $PAGE,$DB,$JAX,$USER;
 
@@ -876,45 +877,45 @@ class UCP
         $page = '';
         $result = null;
         $hasmessages = false;
-        if ($view === 'sent') {
+        if ($view == 'sent') {
             $result = $DB->safespecial(
                 <<<'MySQL'
-                    SELECT a.`id` AS `id`
-                    , a.`to` AS `to`
-                    , a.`from` AS `from`
-                    , a.`title` AS `title`
-                    , a.`message` AS `message`
-                    , a.`read` AS `read`
-                    , UNIX_TIMESTAMP(a.`date`) AS `date`
-                    , a.`del_recipient` AS `del_recipient`
-                    , a.`del_sender` AS `del_sender`
-                    , a.`flag` AS `flag`
-                    , m.`display_name` AS `display_name`
-                    FROM %t a
-                    LEFT JOIN %t m
-                        ON a.`to`=m.`id`
-                    WHERE a.`from`=? AND !a.`del_sender`
-                    ORDER BY a.`date` DESC
+SELECT a.`id` AS `id`
+, a.`to` AS `to`
+, a.`from` AS `from`
+, a.`title` AS `title`
+, a.`message` AS `message`
+, a.`read` AS `read`
+, UNIX_TIMESTAMP(a.`date`) AS `date`
+, a.`del_recipient` AS `del_recipient`
+, a.`del_sender` AS `del_sender`
+, a.`flag` AS `flag`
+, m.`display_name` AS `display_name`
+FROM %t a
+LEFT JOIN %t m
+    ON a.`to`=m.`id`
+WHERE a.`from`=? AND !a.`del_sender`
+ORDER BY a.`date` DESC
 
-                    MySQL
+MySQL
 ,
                 ['messages', 'members'],
                 $USER['id']
             );
-        } elseif ($view === 'flagged') {
+        } elseif ($view == 'flagged') {
             $result = $DB->safespecial(
                 <<<'EOT'
-                    SELECT a.`id` AS `id`,a.`to` AS `to`,a.`from` AS `from`,a.`title` AS `title`,
-                        a.`message` AS `message`,a.`read` AS `read`,
-                        UNIX_TIMESTAMP(a.`date`) AS `date`,a.`del_recipient` AS `del_recipient`,
-                        a.`del_sender` AS `del_sender`,a.`flag` AS `flag`,
-                        m.`display_name` AS `display_name`
-                    FROM %t a
-                    LEFT JOIN %t m
-                        ON a.`from`=m.`id`
-                    WHERE a.`to`=? AND a.`flag`=1
-                    ORDER BY a.`date` DESC
-                    EOT
+SELECT a.`id` AS `id`,a.`to` AS `to`,a.`from` AS `from`,a.`title` AS `title`,
+    a.`message` AS `message`,a.`read` AS `read`,
+    UNIX_TIMESTAMP(a.`date`) AS `date`,a.`del_recipient` AS `del_recipient`,
+    a.`del_sender` AS `del_sender`,a.`flag` AS `flag`,
+    m.`display_name` AS `display_name`
+FROM %t a
+LEFT JOIN %t m
+    ON a.`from`=m.`id`
+WHERE a.`to`=? AND a.`flag`=1
+ORDER BY a.`date` DESC
+EOT
                 ,
                 ['messages', 'members'],
                 $USER['id']
@@ -922,17 +923,17 @@ class UCP
         } else {
             $result = $DB->safespecial(
                 <<<'EOT'
-                    SELECT a.`id` AS `id`,a.`to` AS `to`,a.`from` AS `from`,a.`title` AS `title`,
-                        a.`message` AS `message`,a.`read` AS `read`,
-                        UNIX_TIMESTAMP(a.`date`) AS `date`,a.`del_recipient` AS `del_recipient`,
-                        a.`del_sender` AS `del_sender`,a.`flag` AS `flag`,
-                        m.`display_name` AS `display_name`
-                    FROM %t a
-                    LEFT JOIN %t m
-                    ON a.`from`=m.`id`
-                    WHERE a.`to`=? AND !a.`del_recipient`
-                    ORDER BY a.`date` DESC
-                    EOT
+SELECT a.`id` AS `id`,a.`to` AS `to`,a.`from` AS `from`,a.`title` AS `title`,
+    a.`message` AS `message`,a.`read` AS `read`,
+    UNIX_TIMESTAMP(a.`date`) AS `date`,a.`del_recipient` AS `del_recipient`,
+    a.`del_sender` AS `del_sender`,a.`flag` AS `flag`,
+    m.`display_name` AS `display_name`
+FROM %t a
+LEFT JOIN %t m
+ON a.`from`=m.`id`
+WHERE a.`to`=? AND !a.`del_recipient`
+ORDER BY a.`date` DESC
+EOT
                 ,
                 ['messages', 'members'],
                 $USER['id']
@@ -949,7 +950,7 @@ class UCP
                 (this.checked?1:0), 1)';
             $page .= $PAGE->meta(
                 'inbox-messages-row',
-                ! $f['read'] ? 'unread' : 'read',
+                (! $f['read'] ? 'unread' : 'read'),
                 '<input class="check" type="checkbox" title="PM Checkbox" name="dmessage[]" '.
                 'value="'.$f['id'].'" />',
                 '<input type="checkbox" '.
@@ -963,9 +964,9 @@ class UCP
         }
 
         if (! $hasmessages) {
-            if ($view === 'sent') {
+            if ($view == 'sent') {
                 $msg = 'No sent messages.';
-            } elseif ($view === 'flagged') {
+            } elseif ($view == 'flagged') {
                 $msg = 'No flagged messages.';
             } else {
                 $msg = 'No messages. You could always try '.
@@ -981,17 +982,17 @@ class UCP
                 'act' => 'ucp',
                 'what' => 'inbox',
             ]),
-            $view === 'sent' ? 'Recipient' : 'Sender',
+            $view == 'sent' ? 'Recipient' : 'Sender',
             $page
         );
 
-        if ($view === 'inbox') {
+        if ($view == 'inbox') {
             $PAGE->JS('update', 'num-messages', $unread);
         }
         $this->showucp($page);
     }
 
-    public function compose($messageid = '', $todo = ''): void
+    public function compose($messageid = '', $todo = '')
     {
         global $PAGE,$JAX,$USER,$DB,$CFG;
         $showfull = 0;
@@ -1046,13 +1047,13 @@ class UCP
                 // Give them a notification.
                 $cmd = $JAX->json_encode(
                     ['newmessage', 'You have a new message from '.$USER['display_name'], $DB->insert_id(1)]
-                ).\PHP_EOL;
+                ).PHP_EOL;
                 $result = $DB->safespecial(
                     <<<'EOT'
-                        UPDATE %t
-                        SET `runonce`=concat(`runonce`,?)
-                        WHERE `uid`=?
-                        EOT
+UPDATE %t
+SET `runonce`=concat(`runonce`,?)
+WHERE `uid`=?
+EOT
                     ,
                     ['session'],
                     $DB->basicvalue($cmd, 1),
@@ -1088,9 +1089,9 @@ class UCP
         if ($messageid) {
             $result = $DB->safeselect(
                 <<<'EOT'
-                    `id`,`to`,`from`,`title`,`message`,`read`,UNIX_TIMESTAMP(`date`) AS `date`,
-                    `del_recipient`,`del_sender`,`flag`
-                    EOT
+`id`,`to`,`from`,`title`,`message`,`read`,UNIX_TIMESTAMP(`date`) AS `date`,
+`del_recipient`,`del_sender`,`flag`
+EOT
                 ,
                 'messages',
                 'WHERE (`to`=? OR `from`=?) AND `id`=?',
@@ -1108,10 +1109,10 @@ class UCP
             $mname = array_pop($thisrow);
             $DB->disposeresult($result);
 
-            $msg = \PHP_EOL.\PHP_EOL.\PHP_EOL.
+            $msg = PHP_EOL.PHP_EOL.PHP_EOL.
                 '[quote='.$mname.']'.$message['message'].'[/quote]';
-            $mtitle = ($todo === 'fwd' ? 'FWD:' : 'RE:').$message['title'];
-            if ($todo === 'fwd') {
+            $mtitle = ($todo == 'fwd' ? 'FWD:' : 'RE:').$message['title'];
+            if ($todo == 'fwd') {
                 $mid = $mname = '';
             }
         }
@@ -1139,21 +1140,21 @@ class UCP
             ]),
             $mid,
             $mname,
-            $mname ? 'good' : '',
+            ($mname ? 'good' : ''),
             $mtitle,
             htmlspecialchars($msg)
         );
         $this->showucp($page);
     }
 
-    public function delete($id, $relocate = true): void
+    public function delete($id, $relocate = true)
     {
         global $PAGE,$JAX,$DB,$USER;
         $result = $DB->safeselect(
             <<<'EOT'
-                `id`,`to`,`from`,`title`,`message`,`read`,`date`,`del_recipient`,`del_sender`,
-                `flag`
-                EOT
+`id`,`to`,`from`,`title`,`message`,`read`,`date`,`del_recipient`,`del_sender`,
+`flag`
+EOT
             ,
             'messages',
             'WHERE `id`=?',
@@ -1162,8 +1163,8 @@ class UCP
         $message = $DB->arow($result);
         $DB->disposeresult($result);
 
-        $is_recipient = $message['to'] === $USER['id'];
-        $is_sender = $message['from'] === $USER['id'];
+        $is_recipient = $message['to'] == $USER['id'];
+        $is_sender = $message['from'] == $USER['id'];
         if ($is_recipient) {
             $DB->safeupdate('messages', [
                 'del_recipient' => 1,
@@ -1176,9 +1177,9 @@ class UCP
         }
         $result = $DB->safeselect(
             <<<'EOT'
-                `id`,`to`,`from`,`title`,`message`,`read`,UNIX_TIMESTAMP(`date`) AS `date`,
-                `del_recipient`,`del_sender`,`flag`
-                EOT
+`id`,`to`,`from`,`title`,`message`,`read`,UNIX_TIMESTAMP(`date`) AS `date`,
+`del_recipient`,`del_sender`,`flag`
+EOT
             ,
             'messages',
             'WHERE `id`=?',

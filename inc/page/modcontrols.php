@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 $PAGE->loadmeta('modcp');
 
 new modcontrols();
@@ -58,7 +56,7 @@ class modcontrols
         }
     }
 
-    public function dotopics($do): void
+    public function dotopics($do)
     {
         global $PAGE,$SESS,$JAX,$DB;
         switch ($do) {
@@ -68,11 +66,11 @@ class modcontrols
             case 'moveto':
                 $result = $DB->safeselect(
                     <<<'EOT'
-                        `id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
-                        UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,`show_sub`,
-                        `redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,`redirects`,
-                        `trashcan`,`mods`,`show_ledby`
-                        EOT
+`id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
+UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,`show_sub`,
+`redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,`redirects`,
+`trashcan`,`mods`,`show_ledby`
+EOT
                     ,
                     'forums',
                     'WHERE `id`=?',
@@ -177,7 +175,7 @@ class modcontrols
         }
     }
 
-    public function doposts($do): void
+    public function doposts($do)
     {
         global $PAGE,$JAX,$SESS,$DB;
         switch ($do) {
@@ -203,7 +201,7 @@ class modcontrols
         }
     }
 
-    public function cancel(): void
+    public function cancel()
     {
         global $SESS,$PAGE;
         $SESS->delvar('modpids');
@@ -223,10 +221,10 @@ class modcontrols
 
         $result = $DB->safeselect(
             <<<'EOT'
-                `id`,`auth_id`,`post`,UNIX_TIMESTAMP(`date`) AS `date`,`showsig`,`showemotes`,
-                `tid`,`newtopic`,INET6_NTOA(`ip`) AS `ip`,
-                UNIX_TIMESTAMP(`edit_date`) AS `edit_date`,`editby`,`rating`
-                EOT
+`id`,`auth_id`,`post`,UNIX_TIMESTAMP(`date`) AS `date`,`showsig`,`showemotes`,
+`tid`,`newtopic`,INET6_NTOA(`ip`) AS `ip`,
+UNIX_TIMESTAMP(`edit_date`) AS `edit_date`,`editby`,`rating`
+EOT
             ,
             'posts',
             'WHERE id=?',
@@ -248,14 +246,14 @@ class modcontrols
         if (! $this->perms['can_moderate']) {
             $result = $DB->safespecial(
                 <<<'EOT'
-                    SELECT `mods`
-                    FROM %t
-                    WHERE `id`=(
-                        SELECT `fid`
-                        FROM %t
-                        WHERE `id`=?
-                    )
-                    EOT
+SELECT `mods`
+FROM %t
+WHERE `id`=(
+    SELECT `fid`
+    FROM %t
+    WHERE `id`=?
+)
+EOT
                 ,
                 ['forums', 'topics'],
                 $postdata['tid']
@@ -268,7 +266,7 @@ class modcontrols
                 return;
             }
             $mods = explode(',', $mods['mods']);
-            if (! in_array($USER['id'], $mods, true)) {
+            if (! in_array($USER['id'], $mods)) {
                 return $PAGE->JS(
                     'error',
                     "You don't have permission to be moderating in this forum"
@@ -304,14 +302,14 @@ class modcontrols
         if (! $PERMS['can_moderate']) {
             $result = $DB->safespecial(
                 <<<'EOT'
-                    SELECT `mods`
-                    FROM %t
-                    WHERE `id`=(
-                        SELECT `fid`
-                        FROM %t
-                        WHERE `id`=?
-                    )
-                    EOT
+SELECT `mods`
+FROM %t
+WHERE `id`=(
+    SELECT `fid`
+    FROM %t
+    WHERE `id`=?
+)
+EOT
                 ,
                 ['forums', 'topics'],
                 $DB->basicvalue($tid)
@@ -323,7 +321,7 @@ class modcontrols
                 return $PAGE->JS('error', $DB->error());
             }
             $mods = explode(',', $mods['mods']);
-            if (! in_array($USER['id'], $mods, true)) {
+            if (! in_array($USER['id'], $mods)) {
                 return $PAGE->JS(
                     'error',
                     "You don't have permission to be moderating in this forum"
@@ -348,13 +346,13 @@ class modcontrols
         $this->sync();
     }
 
-    public function sync(): void
+    public function sync()
     {
         global $SESS,$PAGE;
         $PAGE->JS(
             'modcontrols_postsync',
-            $SESS->vars['modpids'] ?? '',
-            $SESS->vars['modtids'] ?? ''
+            isset($SESS->vars['modpids']) ? $SESS->vars['modpids'] : '',
+            isset($SESS->vars['modtids']) ? $SESS->vars['modtids'] : ''
         );
     }
 
@@ -430,14 +428,14 @@ class modcontrols
             // Recount replies.
             $DB->safespecial(
                 <<<'EOT'
-                    UPDATE %t
-                    SET `replies`=(
-                        SELECT COUNT(`id`)
-                        FROM %t
-                        WHERE `tid`=?
-                    )-1
-                    WHERE `id`=?
-                    EOT
+UPDATE %t
+SET `replies`=(
+    SELECT COUNT(`id`)
+    FROM %t
+    WHERE `tid`=?
+)-1
+WHERE `id`=?
+EOT
                 ,
                 ['topics', 'posts'],
                 $tid,
@@ -480,7 +478,7 @@ class modcontrols
         $trashcan = $DB->arow($result);
         $DB->disposeresult($result);
 
-        $trashcan = $trashcan['id'] ?? false;
+        $trashcan = isset($trashcan['id']) ? $trashcan['id'] : false;
         $result = $DB->safeselect('`fid`,`id`', 'topics', 'WHERE `id` IN ?', explode(',', $SESS->vars['modtids']));
         $delete = [];
         while ($f = $DB->arow($result)) {
@@ -488,7 +486,7 @@ class modcontrols
                 $data[$f['fid']] = 0;
             }
             $data[$f['fid']]++;
-            if ($trashcan && $trashcan === $f['fid']) {
+            if ($trashcan && $trashcan == $f['fid']) {
                 $delete[] = $f['id'];
             }
         }
@@ -518,7 +516,7 @@ class modcontrols
         $PAGE->JS('alert', 'topics deleted!');
     }
 
-    public function mergetopics(): void
+    public function mergetopics()
     {
         global $SESS,$DB,$PAGE,$JAX;
         $page = '';
@@ -527,7 +525,7 @@ class modcontrols
         if (
             isset($JAX->p['ot'])
             && is_numeric($JAX->p['ot'])
-            && in_array($JAX->p['ot'], $exploded, true)
+            && in_array($JAX->p['ot'], $exploded)
         ) {
             // Move the posts and set all posts to normal (newtopic=0).
             $DB->safeupdate(
@@ -555,7 +553,7 @@ class modcontrols
             $DB->safeupdate('topics', [
                 'op' => $op,
             ], 'WHERE `id`=?', $DB->basicvalue($JAX->p['ot']));
-            unset($exploded[array_search($JAX->p['ot'], $exploded, true)]);
+            unset($exploded[array_search($JAX->p['ot'], $exploded)]);
             if (! empty($exploded)) {
                 $DB->safedelete('topics', 'WHERE `id` IN ?', $exploded);
             }
@@ -594,13 +592,13 @@ class modcontrols
         $PAGE->append('page', $page);
     }
 
-    public function banposts(): void
+    public function banposts()
     {
         global $PAGE;
         $PAGE->JS('alert', 'under construction');
     }
 
-    public static function load(): void
+    public static function load()
     {
         global $PAGE;
         $script = file_get_contents('dist/modcontrols.js');
@@ -614,7 +612,7 @@ class modcontrols
         }
     }
 
-    public function showmodcp($cppage = ''): void
+    public function showmodcp($cppage = '')
     {
         global $PAGE,$PERMS;
         if (! $PERMS['can_moderate']) {
@@ -648,7 +646,7 @@ class modcontrols
             <input type="hidden" name="mid" id="mid" onchange="this.form.onsubmit();" />
             <input type="submit" type="View member details" value="Go" />
             </form>';
-        if (isset($JAX->p['submit']) && $JAX->p['submit'] === 'save') {
+        if (isset($JAX->p['submit']) && $JAX->p['submit'] == 'save') {
             if (! trim($JAX->p['display_name'])) {
                 $page .= $PAGE->meta('error', 'Display name is invalid.');
             } else {
@@ -674,26 +672,26 @@ class modcontrols
         }
         if (
             (isset($JAX->p['submit'])
-            && $JAX->p['submit'] === 'showform')
+            && $JAX->p['submit'] == 'showform')
             || isset($JAX->b['mid'])
         ) {
             // Get the member data.
             if (is_numeric($JAX->b['mid'])) {
                 $result = $DB->safeselect(
                     <<<'EOT'
-                        `id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
-                        UNIX_TIMESTAMP(`join_date`) AS `join_date`,
-                        UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,`contact_skype`,`contact_yim`,
-                        `contact_msn`,`contact_gtalk`,`contact_aim`,`website`,`birthdate`,
-                        DAY(`birthdate`) AS `dob_day`,MONTH(`birthdate`) AS `dob_month`,
-                        YEAR(`birthdate`) AS `dob_year`,`about`,`display_name`,`full_name`,
-                        `contact_steam`,`location`,`gender`,`friends`,`enemies`,`sound_shout`,
-                        `sound_im`,`sound_pm`,`sound_postinmytopic`,`sound_postinsubscribedtopic`,
-                        `notify_pm`,`notify_postinmytopic`,`notify_postinsubscribedtopic`,`ucpnotepad`,
-                        `skin_id`,`contact_twitter`,`contact_discord`,`contact_youtube`,`contact_bluesky`,
-                        `email_settings`,`nowordfilter`,
-                        INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
-                        EOT
+`id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
+UNIX_TIMESTAMP(`join_date`) AS `join_date`,
+UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,`contact_skype`,`contact_yim`,
+`contact_msn`,`contact_gtalk`,`contact_aim`,`website`,`birthdate`,
+DAY(`birthdate`) AS `dob_day`,MONTH(`birthdate`) AS `dob_month`,
+YEAR(`birthdate`) AS `dob_year`,`about`,`display_name`,`full_name`,
+`contact_steam`,`location`,`gender`,`friends`,`enemies`,`sound_shout`,
+`sound_im`,`sound_pm`,`sound_postinmytopic`,`sound_postinsubscribedtopic`,
+`notify_pm`,`notify_postinmytopic`,`notify_postinsubscribedtopic`,`ucpnotepad`,
+`skin_id`,`contact_twitter`,`contact_discord`,`contact_youtube`,`contact_bluesky`,
+`email_settings`,`nowordfilter`,
+INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
+EOT
                     ,
                     'members',
                     'WHERE `id`=?',
@@ -704,19 +702,19 @@ class modcontrols
             } elseif ($JAX->p['mname']) {
                 $result = $DB->safeselect(
                     <<<'EOT'
-                        `id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
-                        UNIX_TIMESTAMP(`join_date`) AS `join_date`,
-                        UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,`contact_skype`,`contact_yim`,
-                        `contact_msn`,`contact_gtalk`,`contact_aim`,`website`,`birthdate`,
-                        DAY(`birthdate`) AS `dob_day`,MONTH(`birthdate`) AS `dob_month`,
-                        YEAR(`birthdate`) AS `dob_year`,`about`,`display_name`,`full_name`,
-                        `contact_steam`,`location`,`gender`,`friends`,`enemies`,`sound_shout`,
-                        `sound_im`,`sound_pm`,`sound_postinmytopic`,`sound_postinsubscribedtopic`,
-                        `notify_pm`,`notify_postinmytopic`,`notify_postinsubscribedtopic`,`ucpnotepad`,
-                        `skin_id`,`contact_twitter`,`contact_discord`,`contact_youtube`,`contact_bluesky`,
-                        `email_settings`,`nowordfilter`,
-                        INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
-                        EOT
+`id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
+UNIX_TIMESTAMP(`join_date`) AS `join_date`,
+UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,`contact_skype`,`contact_yim`,
+`contact_msn`,`contact_gtalk`,`contact_aim`,`website`,`birthdate`,
+DAY(`birthdate`) AS `dob_day`,MONTH(`birthdate`) AS `dob_month`,
+YEAR(`birthdate`) AS `dob_year`,`about`,`display_name`,`full_name`,
+`contact_steam`,`location`,`gender`,`friends`,`enemies`,`sound_shout`,
+`sound_im`,`sound_pm`,`sound_postinmytopic`,`sound_postinsubscribedtopic`,
+`notify_pm`,`notify_postinmytopic`,`notify_postinsubscribedtopic`,`ucpnotepad`,
+`skin_id`,`contact_twitter`,`contact_discord`,`contact_youtube`,`contact_bluesky`,
+`email_settings`,`nowordfilter`,
+INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
+EOT
                     ,
                     'members',
                     'WHERE `display_name` LIKE ?',
@@ -741,10 +739,10 @@ class modcontrols
             if (
                 (isset($data['can_moderate'])
                 && $data['can_moderate'])
-                && $USER['group_id'] !== 2
-                || $data['group_id'] === 2
-                && ($USER['id'] !== 1
-                && $data['id'] !== $USER['id'])
+                && $USER['group_id'] != 2
+                || $data['group_id'] == 2
+                && ($USER['id'] != 1
+                && $data['id'] != $USER['id'])
             ) {
                 $e = 'You do not have permission to edit this profile.';
             }
@@ -756,7 +754,7 @@ class modcontrols
                 {
                     return '<tr><td><label for="m_'.$name.'">'.$label.
                         '</label></td><td>'.
-                        ($type === 'textarea' ? '<textarea name="'.$name.
+                        ($type == 'textarea' ? '<textarea name="'.$name.
                         '" id="m_'.$name.'">'.$value.'</textarea>' :
                         '<input type="text" id="m_'.$name.'" name="'.$name.
                         '" value="'.$value.'" />').'</td></tr>';
@@ -783,13 +781,13 @@ class modcontrols
         $this->showmodcp($page);
     }
 
-    public function iptools(): void
+    public function iptools()
     {
         global $PAGE,$DB,$CFG,$JAX,$USER;
         $page = '';
 
-        $ip = $JAX->b['ip'] ?? '';
-        if (! filter_var($ip, \FILTER_VALIDATE_IP)) {
+        $ip = isset($JAX->b['ip']) ? $JAX->b['ip'] : '';
+        if (! filter_var($ip, FILTER_VALIDATE_IP)) {
             $ip = '';
         }
 
@@ -803,12 +801,12 @@ class modcontrols
         } elseif (isset($JAX->p['unban']) && $JAX->p['unban']) {
             if ($entry = $JAX->ipbanned($ip)) {
                 $changed = true;
-                unset($JAX->ipbancache[array_search($entry, $JAX->ipbancache, true)]);
+                unset($JAX->ipbancache[array_search($entry, $JAX->ipbancache)]);
             }
         }
         if ($changed) {
             $o = fopen(BOARDPATH.'/bannedips.txt', 'w');
-            fwrite($o, implode(\PHP_EOL, $JAX->ipbancache));
+            fwrite($o, implode(PHP_EOL, $JAX->ipbancache));
             fclose($o);
         }
 
@@ -817,13 +815,13 @@ class modcontrols
             'do' => 'iptools',
         ]);
         $form = <<<EOT
-            <form method='post' data-ajax-form='true'>
-                {$hiddenFields}
-                <label>IP:
-                <input type='text' name='ip' title="Enter IP address" value='{$ip}' /></label>
-                <input type='submit' value='Submit' title="Search for IP" />
-            </form>
-            EOT;
+<form method='post' data-ajax-form='true'>
+    {$hiddenFields}
+    <label>IP: 
+    <input type='text' name='ip' title="Enter IP address" value='{$ip}' /></label>
+    <input type='submit' value='Submit' title="Search for IP" />
+</form>
+EOT;
         if ($ip) {
             $page .= "<h3>Data for {$ip}:</h3>";
 
@@ -834,43 +832,43 @@ class modcontrols
             ]);
             if ($JAX->ipbanned($ip)) {
                 $banCode = <<<'EOT'
-                    <span style="color:#900">
-                        banned
-                    </span>
-                    <input type="submit" name="unban"
-                        onclick="this.form.submitButton=this" value="Unban" />
-                    EOT;
+<span style="color:#900">
+    banned
+</span>
+<input type="submit" name="unban"
+    onclick="this.form.submitButton=this" value="Unban" />
+EOT;
             } else {
                 $banCode = <<<'EOT'
-                    <span style="color:#090">
-                        not banned
-                    </span>
-                    <input type="submit" name="ban"
-                        onclick="this.form.submitButton=this" value="Ban" />
-                    EOT;
+<span style="color:#090">
+    not banned
+</span>
+<input type="submit" name="ban"
+    onclick="this.form.submitButton=this" value="Ban" />
+EOT;
             }
             $torDate = date('Y-m-d', strtotime('-2 days'));
             $page .= $this->box(
                 'Info',
                 <<<EOT
-                    <form method='post' data-ajax-form='true'>
-                        {$hiddenFields}
-                        IP ban status: {$banCode}<br />
-                    </form>
-                    IP Lookup Services: <ul>
-                        <li><a href="https://whois.domaintools.com/{$ip}">DomainTools Whois</a></li>
-                        <li><a href="https://www.domaintools.com/research/traceroute/?query={$ip}">
-                            DomainTools Traceroute
-                        </a></li>
-                        <li><a href="https://www.ip2location.com/{$ip}">IP2Location Lookup</a></li>
-                        <li><a href="https://www.dan.me.uk/torcheck?ip={$ip}">IP2Location Lookup</a></li>
-                        <li><a href="https://metrics.torproject.org/exonerator.html?ip={$ip}&timestamp={$torDate}">
-                            ExoneraTor Lookup
-                        </a></li>
-                        <li><a href="https://www.projecthoneypot.org/ip_{$ip}">Project Honeypot Lookup</a></li>
-                        <li><a href="https://www.stopforumspam.com/ipcheck/{$ip}">StopForumSpam Lookup</a></li>
-                    </ul>
-                    EOT
+<form method='post' data-ajax-form='true'>
+    {$hiddenFields}
+    IP ban status: {$banCode}<br />
+</form>
+IP Lookup Services: <ul>
+    <li><a href="https://whois.domaintools.com/{$ip}">DomainTools Whois</a></li>
+    <li><a href="https://www.domaintools.com/research/traceroute/?query={$ip}">
+        DomainTools Traceroute
+    </a></li>
+    <li><a href="https://www.ip2location.com/{$ip}">IP2Location Lookup</a></li>
+    <li><a href="https://www.dan.me.uk/torcheck?ip={$ip}">IP2Location Lookup</a></li>
+    <li><a href="https://metrics.torproject.org/exonerator.html?ip={$ip}&timestamp={$torDate}">
+        ExoneraTor Lookup
+    </a></li>
+    <li><a href="https://www.projecthoneypot.org/ip_{$ip}">Project Honeypot Lookup</a></li>
+    <li><a href="https://www.stopforumspam.com/ipcheck/{$ip}">StopForumSpam Lookup</a></li>
+</ul>
+EOT
             );
 
             $content = [];
@@ -889,16 +887,16 @@ class modcontrols
                 $content = '';
                 $result = $DB->safespecial(
                     <<<'EOT'
-                        SELECT s.`id` AS `id`,s.`uid` AS `uid`,s.`shout` AS `shout`,
-                        UNIX_TIMESTAMP(s.`date`) AS `date`,INET6_NTOA(s.`ip`) AS `ip`,
-                        m.`group_id` AS `group_id`, m.`display_name` AS `display_name`
-                        FROM %t s
-                        LEFT JOIN %t m
-                            ON m.`id`=s.`uid`
-                        WHERE s.`ip`=INET6_ATON(?)
-                        ORDER BY `id`
-                        DESC LIMIT 5
-                        EOT
+SELECT s.`id` AS `id`,s.`uid` AS `uid`,s.`shout` AS `shout`,
+UNIX_TIMESTAMP(s.`date`) AS `date`,INET6_NTOA(s.`ip`) AS `ip`,
+m.`group_id` AS `group_id`, m.`display_name` AS `display_name`
+FROM %t s
+LEFT JOIN %t m
+    ON m.`id`=s.`uid`
+WHERE s.`ip`=INET6_ATON(?)
+ORDER BY `id`
+DESC LIMIT 5
+EOT
                     ,
                     ['shouts', 'members'],
                     $DB->basicvalue($ip)
@@ -931,10 +929,10 @@ class modcontrols
         $content = ($content ?: '--No Data--');
 
         return <<<EOT
-            <div class='minibox'>
-                <div class='title'>{$title}</div>
-                <div class='content'>{$content}</div>
-            </div>
-            EOT;
+<div class='minibox'>
+    <div class='title'>{$title}</div>
+    <div class='content'>{$content}</div>
+</div>
+EOT;
     }
 }

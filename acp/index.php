@@ -1,15 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
-/*
+/**
  * Admin login.
  *
  * PHP Version 5.3.7
  *
  * @license MIT <https://opensource.org/licenses/MIT>
  *
- * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
+ * @link https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
 ini_set('session.cookie_secure', 1);
 ini_set('session.cookie_httponly', 1);
@@ -47,12 +45,12 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     $p = $JAX->p['pass'];
     $result = $DB->safespecial(
         <<<'EOT'
-            SELECT m.`id` as `id`, g.`can_access_acp` as `can_access_acp`
-                FROM %t m
-                LEFT JOIN %t g
-                    ON m.`group_id` = g.`id`
-                WHERE m.`name`=?;
-            EOT
+SELECT m.`id` as `id`, g.`can_access_acp` as `can_access_acp`
+    FROM %t m
+    LEFT JOIN %t g
+        ON m.`group_id` = g.`id`
+    WHERE m.`name`=?;
+EOT
         ,
         ['members', 'member_groups'],
         $DB->basicvalue($u)

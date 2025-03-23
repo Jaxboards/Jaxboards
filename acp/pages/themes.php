@@ -1,9 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
 if (! defined(INACP)) {
-    exit;
+    exit();
 }
 
 new themes();
@@ -28,7 +26,7 @@ class themes
                     'url' => '?act=themes&do='.$do,
                     'title' => $title,
                 ]
-            ).\PHP_EOL;
+            ).PHP_EOL;
         }
 
         $PAGE->sidebar($PAGE->parseTemplate('sidebar-list.html', [
@@ -53,7 +51,7 @@ class themes
         $wrappers = [];
         $o = opendir(BOARDPATH.'Wrappers');
         while ($f = readdir($o)) {
-            if ($f !== '.' && $f !== '..') {
+            if ($f != '.' && $f != '..') {
                 $wrappers[] = mb_substr($f, 0, -4);
             }
         }
@@ -62,7 +60,7 @@ class themes
         return $wrappers;
     }
 
-    public function showskinindex(): void
+    public function showskinindex()
     {
         global $PAGE,$DB,$JAX,$CFG;
         $errorskins = '';
@@ -71,7 +69,7 @@ class themes
         if (isset($JAX->g['deletewrapper']) && $JAX->g['deletewrapper']) {
             $wrapperPath = BOARDPATH.'Wrappers/'.$JAX->g['deletewrapper'].'.txt';
             if (
-                ! preg_match('@[^\w ]@', $JAX->g['deletewrapper'])
+                ! preg_match('@[^\\w ]@', $JAX->g['deletewrapper'])
                 && file_exists($wrapperPath)
             ) {
                 unlink(BOARDPATH.'Wrappers/'.$JAX->g['deletewrapper'].'.txt');
@@ -85,7 +83,7 @@ class themes
         if (isset($JAX->p['newwrapper']) && $JAX->p['newwrapper']) {
             $newWrapperPath
                 = BOARDPATH.'Wrappers/'.$JAX->p['newwrapper'].'.txt';
-            if (preg_match('@[^\w ]@', $JAX->p['newwrapper'])) {
+            if (preg_match('@[^\\w ]@', $JAX->p['newwrapper'])) {
                 $errorwrapper
                     = 'Wrapper name must consist of letters, numbers, '.
                     'spaces, and underscore.';
@@ -119,7 +117,7 @@ class themes
                     if (! isset($JAX->p['hidden'][$k])) {
                         $JAX->p['hidden'][$k] = false;
                     }
-                    if (! $v || in_array($v, $wrappers, true)) {
+                    if (! $v || in_array($v, $wrappers)) {
                         $DB->safeupdate(
                             'skins',
                             [
@@ -135,20 +133,20 @@ class themes
 
             if (isset($JAX->p['renameskin']) && is_array($JAX->p['renameskin'])) {
                 foreach ($JAX->p['renameskin'] as $k => $v) {
-                    if ($k === $v) {
+                    if ($k == $v) {
                         continue;
                     }
-                    if (preg_match('@[^\w ]@', $k)) {
+                    if (preg_match('@[^\\w ]@', $k)) {
                         continue;
                     }
                     if (! is_dir(BOARDPATH.'Themes/'.$k)) {
                         continue;
                     }
-                    if (preg_match('@[^\w ]@', $v) || mb_strlen($v) > 50) {
+                    if (preg_match('@[^\\w ]@', $v) || mb_strlen($v) > 50) {
                         $errorskins = <<<'EOT'
-                            Skin name must consist of letters, numbers, spaces, and underscore, and be
-                            under 50 characters long.
-                            EOT;
+Skin name must consist of letters, numbers, spaces, and underscore, and be
+under 50 characters long.
+EOT;
                     } elseif (is_dir(BOARDPATH.'Themes/'.$v)) {
                         $errorskins = 'That skin name is already being used.';
                     } else {
@@ -170,20 +168,20 @@ class themes
                 && is_array($JAX->p['renamewrapper'])
             ) {
                 foreach ($JAX->p['renamewrapper'] as $k => $v) {
-                    if ($k === $v) {
+                    if ($k == $v) {
                         continue;
                     }
-                    if (preg_match('@[^\w ]@', $k)) {
+                    if (preg_match('@[^\\w ]@', $k)) {
                         continue;
                     }
                     if (! is_file(BOARDPATH.'Wrappers/'.$k.'.txt')) {
                         continue;
                     }
-                    if (preg_match('@[^\w ]@', $v) || mb_strlen($v) > 50) {
+                    if (preg_match('@[^\\w ]@', $v) || mb_strlen($v) > 50) {
                         $errorwrapper = <<<'EOT'
-                            Wrapper name must consist of letters, numbers, spaces, and underscore, and be
-                            under 50 characters long.
-                            EOT;
+Wrapper name must consist of letters, numbers, spaces, and underscore, and be
+under 50 characters long.
+EOT;
                     } elseif (is_file(BOARDPATH.'Wrappers/'.$v.'.txt')) {
                         $errorwrapper = 'That wrapper name is already being used.';
                     } else {
@@ -225,11 +223,11 @@ class themes
                     'select-option.html',
                     [
                         'value' => $wrapper,
-                        'selected' => $wrapper === $f['wrapper'] ?
+                        'selected' => $wrapper == $f['wrapper'] ?
                         'selected="selected"' : '',
                         'label' => $wrapper,
                     ]
-                ).\PHP_EOL;
+                ).PHP_EOL;
             }
             $skins .= $PAGE->parseTemplate(
                 'themes/show-skin-index-css-row.html',
@@ -257,7 +255,7 @@ class themes
                     'hidden_checked' => $f['hidden'] ? 'checked="checked"' : '',
                     'default_checked' => $f['default'] ? "checked='checked'" : '',
                 ]
-            ).\PHP_EOL;
+            ).PHP_EOL;
             $usedwrappers[] = $f['wrapper'];
         }
         $skins = ($errorskins ? $PAGE->error($errorskins) : '').
@@ -272,7 +270,7 @@ class themes
                 'themes/show-skin-index-wrapper-row.html',
                 [
                     'title' => $wrapper,
-                    'delete' => in_array($wrapper, $usedwrappers, true) ? 'In use' :
+                    'delete' => in_array($wrapper, $usedwrappers) ? 'In use' :
                     $PAGE->parseTemplate(
                         'themes/show-skin-index-wrapper-row-delete.html',
                         [
@@ -280,7 +278,7 @@ class themes
                         ]
                     ),
                 ]
-            ).\PHP_EOL;
+            ).PHP_EOL;
         }
         $wrap = $PAGE->parseTemplate('themes/show-skin-index-wrapper.html', [
             'content' => $wrap,
@@ -288,7 +286,7 @@ class themes
         $PAGE->addContentBox('Wrappers', ($errorwrapper ? $PAGE->error($errorwrapper) : '').$wrap);
     }
 
-    public function editcss($id): void
+    public function editcss($id)
     {
         global $PAGE,$DB,$JAX;
         $result = $DB->safeselect(
@@ -327,12 +325,12 @@ class themes
         );
     }
 
-    public function editwrapper($wrapper): void
+    public function editwrapper($wrapper)
     {
         global $PAGE,$JAX;
         $saved = '';
         $wrapperf = BOARDPATH.'Wrappers/'.$wrapper.'.txt';
-        if (preg_match('@[^ \w]@', $wrapper) && ! is_file($wrapperf)) {
+        if (preg_match('@[^ \\w]@', $wrapper) && ! is_file($wrapperf)) {
             $PAGE->addContentBox('Error', "The theme you're trying to edit does not exist.");
         } else {
             if (isset($JAX->p['newwrapper'])) {
@@ -361,7 +359,7 @@ class themes
         }
     }
 
-    public function createskin(): void
+    public function createskin()
     {
         global $PAGE,$JAX,$DB,$CFG;
         $page = '';
@@ -369,13 +367,13 @@ class themes
             $e = '';
             if (! isset($JAX->p['skinname']) || ! $JAX->p['skinname']) {
                 $e = 'No skin name supplied!';
-            } elseif (preg_match('@[^\w ]@', $JAX->p['skinname'])) {
+            } elseif (preg_match('@[^\\w ]@', $JAX->p['skinname'])) {
                 $e = 'Skinname must only consist of letters, numbers, and spaces.';
             } elseif (mb_strlen($JAX->p['skinname']) > 50) {
                 $e = 'Skin name must be less than 50 characters.';
             } elseif (is_dir(BOARDPATH.'Themes/'.$JAX->p['skinname'])) {
                 $e = 'A skin with that name already exists.';
-            } elseif (! in_array($JAX->p['wrapper'], $this->getwrappers(), true)) {
+            } elseif (! in_array($JAX->p['wrapper'], $this->getwrappers())) {
                 $e = 'Invalid wrapper.';
             } else {
                 if (! isset($JAX->p['hidden'])) {
@@ -425,7 +423,7 @@ class themes
                     'label' => $wrapper,
                     'selected' => '',
                 ]
-            ).\PHP_EOL;
+            ).PHP_EOL;
         }
         $page .= $PAGE->parseTemplate('themes/create-skin.html', [
             'wrapper_options' => $wrapperOptions,
@@ -433,7 +431,7 @@ class themes
         $PAGE->addContentBox('Create New Skin', $page);
     }
 
-    public function deleteskin($id): void
+    public function deleteskin($id)
     {
         global $PAGE,$DB,$JAX;
         $result = $DB->safeselect(

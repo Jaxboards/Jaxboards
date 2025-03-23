@@ -7,7 +7,7 @@
  *
  * @license MIT <https://opensource.org/licenses/MIT>
  *
- * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
+ * @link https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
 if (! defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', dirname(__DIR__));
@@ -32,7 +32,7 @@ require_once JAXBOARDS_ROOT.'/config.default.php';
  * @param string $src The source directory- this must exist already
  * @param string $dst The destination directory- this is assumed to not exist already
  */
-function recurseCopy($src, $dst): void
+function recurseCopy($src, $dst)
 {
     $dir = opendir($src);
     @mkdir($dst);
@@ -107,9 +107,9 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             $errors[] = $attributes['name'].' must be filled in.';
         }
     }
-    if ($JAX->p['domain'] && ! parse_url($JAX->p['domain'], \PHP_URL_HOST)) {
+    if ($JAX->p['domain'] && ! parse_url($JAX->p['domain'], PHP_URL_HOST)) {
         if (
-            preg_match('@[^\w.]@', $JAX->p['domain'])
+            preg_match('@[^\\w.]@', $JAX->p['domain'])
         ) {
             $errors[] = 'Invalid domain';
         } else {
@@ -119,7 +119,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         }
     } else {
         // Remove www if it exists, also only grab host if url is entered.
-        $JAX->p['domain'] = preg_replace('/^www./', '', parse_url($JAX->p['domain'], \PHP_URL_HOST));
+        $JAX->p['domain'] = preg_replace('/^www./', '', parse_url($JAX->p['domain'], PHP_URL_HOST));
     }
     if ($JAX->p['admin_password'] !== $JAX->p['admin_password_2']) {
         $errors[] = 'Admin passwords do not match';
@@ -131,7 +131,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
 
     if (mb_strlen($JAX->p['admin_username']) > 50) {
         $errors[] = 'Admin username is too long';
-    } elseif (preg_match('@\W@', $JAX->p['admin_username'])) {
+    } elseif (preg_match('@\\W@', $JAX->p['admin_username'])) {
         $errors[] = 'Admin username needs to consist of letters,'.
             'numbers, and underscore only';
     }
@@ -172,25 +172,25 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             $queries = [
                 'DROP TABLE IF EXISTS `directory`;',
                 <<<'EOT'
-                    CREATE TABLE `directory` (
-                      `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-                      `registrar_email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-                      `registrar_ip` varbinary(16) NOT NULL DEFAULT '',
-                      `date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-                      `boardname` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
-                      `referral` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-                      PRIMARY KEY (`id`)
-                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-                    EOT
+CREATE TABLE `directory` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `registrar_email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `registrar_ip` varbinary(16) NOT NULL DEFAULT '',
+  `date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `boardname` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `referral` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+EOT
                 ,
                 'TRUNCATE `directory`;',
                 'DROP TABLE IF EXISTS `banlist`;',
                 <<<'EOT'
-                    CREATE TABLE `banlist` (
-                      `ip` varbinary(16) NOT NULL,
-                      UNIQUE KEY `ip` (`ip`)
-                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-                    EOT
+CREATE TABLE `banlist` (
+  `ip` varbinary(16) NOT NULL,
+  UNIQUE KEY `ip` (`ip`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+EOT
                 ,
                 'TRUNCATE `banlist`;',
             ];
@@ -225,7 +225,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                         'registrar_email' => $JAX->p['admin_email'],
                         'registrar_ip' => $JAX->ip2bin(),
                         'date' => date('Y-m-d H:i:s', time()),
-                        'referral' => $JAX->b['r'] ?? '',
+                        'referral' => isset($JAX->b['r']) ? $JAX->b['r'] : '',
                     ]
                 );
                 $DB->prefix($boardPrefix);
@@ -239,7 +239,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             $lines = file(SERVICE_ROOT.'/blueprint.sql');
             foreach ($lines as $line) {
                 // Skip comments.
-                if (mb_substr($line, 0, 2) === '--' || $line === '') {
+                if (mb_substr($line, 0, 2) == '--' || $line == '') {
                     continue;
                 }
 
@@ -250,7 +250,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                 $query .= $line;
 
                 // If it has a semicolon at the end, it's the end of the query.
-                if (mb_substr(trim($line), -1, 1) === ';') {
+                if (mb_substr(trim($line), -1, 1) == ';') {
                     // Perform the query.
                     $result = $DB->safequery($query);
                     $DB->disposeresult($result);
@@ -265,7 +265,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                 [
                     'name' => $JAX->p['admin_username'],
                     'display_name' => $JAX->p['admin_username'],
-                    'pass' => password_hash($JAX->p['admin_password'], \PASSWORD_DEFAULT),
+                    'pass' => password_hash($JAX->p['admin_password'], PASSWORD_DEFAULT),
                     'email' => $JAX->p['admin_email'],
                     'sig' => '',
                     'posts' => 0,
@@ -323,10 +323,10 @@ foreach ($fields as $field => $attributes) {
         "<input type=\"{$attributes['type']}\"
             name=\"{$field}\" id=\"{$field}\"
             placeholder=\"".
-            ($attributes['placeholder'] ?? '').
+            (isset($attributes['placeholder']) ? $attributes['placeholder'] : '').
             '"
             value="'.
-            ($attributes['value'] ?? '').
+            (isset($attributes['value']) ? $attributes['value'] : '').
             '"
         />'.
         '<br />';

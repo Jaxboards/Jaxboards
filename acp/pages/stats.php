@@ -1,9 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
 if (! defined(INACP)) {
-    exit;
+    exit();
 }
 
 new stats();
@@ -25,13 +23,13 @@ class stats
         }
     }
 
-    public function showstats(): void
+    public function showstats()
     {
         global $PAGE;
         $PAGE->addContentBox('Board Statistics', $PAGE->parseTemplate('stats/show-stats.html'));
     }
 
-    public function recount_statistics(): void
+    public function recount_statistics()
     {
         global $DB,$PAGE;
         $result = $DB->safeselect('`id`,`nocount`', 'forums');
@@ -40,12 +38,12 @@ class stats
         }
         $result = $DB->safespecial(
             <<<'EOT'
-                SELECT p.`id` AS `id`,
-                    p.`auth_id` AS `auth_id`,p.`tid` AS `tid`,t.`fid` AS `fid`
-                FROM %t p
-                LEFT JOIN %t t
-                    ON p.`tid`=t.`id`
-                EOT
+SELECT p.`id` AS `id`,
+    p.`auth_id` AS `auth_id`,p.`tid` AS `tid`,t.`fid` AS `fid`
+FROM %t p
+LEFT JOIN %t t
+    ON p.`tid`=t.`id`
+EOT
             ,
             ['posts', 'topics']
         );
@@ -169,7 +167,7 @@ class stats
         $PAGE->addContentBox(
             'Board Statistics',
             $PAGE->success('Board statistics recounted successfully.').
-            \PHP_EOL.$PAGE->parseTemplate('stats/recount-statistics.html')
+            PHP_EOL.$PAGE->parseTemplate('stats/recount-statistics.html')
         );
     }
 }

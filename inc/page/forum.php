@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 $PAGE->loadmeta('forum');
 
 $IDX = new FORUM();
@@ -31,7 +29,7 @@ class FORUM
             $this->page = $JAX->b['page'] - 1;
         }
 
-        preg_match('@^([a-zA-Z_]+)(\d+)$@', $JAX->g['act'], $act);
+        preg_match('@^([a-zA-Z_]+)(\\d+)$@', $JAX->g['act'], $act);
         if (isset($JAX->b['markread']) && $JAX->b['markread']) {
             $this->markread($act[2]);
 
@@ -59,20 +57,20 @@ class FORUM
 
         $result = $DB->safespecial(
             <<<'EOT'
-                SELECT f.`id` AS `id`,f.`cat_id` AS `cat_id`,f.`title` AS `title`,
-                    f.`subtitle` AS `subtitle`,f.`lp_uid` AS `lp_uid`,
-                    UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,f.`lp_tid` AS `lp_tid`,
-                    f.`lp_topic` AS `lp_topic`,f.`path` AS `path`,f.`show_sub` AS `show_sub`,
-                    f.`redirect` AS `redirect`,f.`topics` AS `topics`,f.`posts` AS `posts`,
-                    f.`order` AS `order`,f.`perms` AS `perms`,f.`orderby` AS `orderby`,
-                    f.`nocount` AS `nocount`,f.`redirects` AS `redirects`,
-                    f.`trashcan` AS `trashcan`,f.`mods` AS `mods`,f.`show_ledby` AS `show_ledby`,
-                    c.`title` AS `cat`
-                FROM %t f
-                LEFT JOIN %t c
-                    ON f.`cat_id`=c.`id`
-                WHERE f.`id`=? LIMIT 1
-                EOT
+SELECT f.`id` AS `id`,f.`cat_id` AS `cat_id`,f.`title` AS `title`,
+    f.`subtitle` AS `subtitle`,f.`lp_uid` AS `lp_uid`,
+    UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,f.`lp_tid` AS `lp_tid`,
+    f.`lp_topic` AS `lp_topic`,f.`path` AS `path`,f.`show_sub` AS `show_sub`,
+    f.`redirect` AS `redirect`,f.`topics` AS `topics`,f.`posts` AS `posts`,
+    f.`order` AS `order`,f.`perms` AS `perms`,f.`orderby` AS `orderby`,
+    f.`nocount` AS `nocount`,f.`redirects` AS `redirects`,
+    f.`trashcan` AS `trashcan`,f.`mods` AS `mods`,f.`show_ledby` AS `show_ledby`,
+    c.`title` AS `cat`
+FROM %t f
+LEFT JOIN %t c
+    ON f.`cat_id`=c.`id`
+WHERE f.`id`=? LIMIT 1
+EOT
             ,
             ['forums', 'categories'],
             $fid
@@ -90,10 +88,10 @@ class FORUM
             $PAGE->JS('softurl');
             $DB->safespecial(
                 <<<'EOT'
-                    UPDATE %t
-                    SET `redirects` = `redirects` + 1
-                    WHERE `id`=?
-                    EOT
+UPDATE %t
+SET `redirects` = `redirects` + 1
+WHERE `id`=?
+EOT
                 ,
                 ['forums'],
                 $DB->basicvalue($fid)
@@ -119,22 +117,22 @@ class FORUM
         // `SELECT count(*) FROM topics`... but I haven't benchmarked it.
         $result = $DB->safespecial(
             <<<'EOT'
-                SELECT f.`id` AS `id`,f.`cat_id` AS `cat_id`,f.`title` AS `title`,
-                    f.`subtitle` AS `subtitle`,f.`lp_uid` AS `lp_uid`,
-                    UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,f.`lp_tid` AS `lp_tid`,
-                    f.`lp_topic` AS `lp_topic`,f.`path` AS `path`,f.`show_sub` AS `show_sub`,
-                    f.`redirect` AS `redirect`,f.`topics` AS `topics`,f.`posts` AS `posts`,
-                    f.`order` AS `order`,f.`perms` AS `perms`,f.`orderby` AS `orderby`,
-                    f.`nocount` AS `nocount`,f.`redirects` AS `redirects`,
-                    f.`trashcan` AS `trashcan`,f.`mods` AS `mods`,f.`show_ledby` AS `show_ledby`,
-                    m.`display_name` AS `lp_name`,m.`group_id` AS `lp_gid`
-                FROM %t f
-                LEFT JOIN %t m
-                ON f.`lp_uid`=m.`id`
-                WHERE f.`path`=?
-                    OR f.`path` LIKE ?
-                ORDER BY f.`order`
-                EOT
+SELECT f.`id` AS `id`,f.`cat_id` AS `cat_id`,f.`title` AS `title`,
+    f.`subtitle` AS `subtitle`,f.`lp_uid` AS `lp_uid`,
+    UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,f.`lp_tid` AS `lp_tid`,
+    f.`lp_topic` AS `lp_topic`,f.`path` AS `path`,f.`show_sub` AS `show_sub`,
+    f.`redirect` AS `redirect`,f.`topics` AS `topics`,f.`posts` AS `posts`,
+    f.`order` AS `order`,f.`perms` AS `perms`,f.`orderby` AS `orderby`,
+    f.`nocount` AS `nocount`,f.`redirects` AS `redirects`,
+    f.`trashcan` AS `trashcan`,f.`mods` AS `mods`,f.`show_ledby` AS `show_ledby`,
+    m.`display_name` AS `lp_name`,m.`group_id` AS `lp_gid`
+FROM %t f
+LEFT JOIN %t m
+ON f.`lp_uid`=m.`id`
+WHERE f.`path`=?
+    OR f.`path` LIKE ?
+ORDER BY f.`order`
+EOT
             ,
             ['forums', 'members'],
             $fid,
@@ -182,7 +180,7 @@ class FORUM
         if ($numpages) {
             foreach ($JAX->pages($numpages, $this->page + 1, 10) as $v) {
                 $forumpages .= '<a href="?act=vf'.$fid.'&amp;page='.
-                    $v.'"'.(($v - 1) === $this->page ? ' class="active"' : '').
+                    $v.'"'.(($v - 1) == $this->page ? ' class="active"' : '').
                     '>'.$v.'</a> · ';
             }
         }
@@ -190,10 +188,10 @@ class FORUM
         // Buttons.
         $forumbuttons = '&nbsp;'.
             ($fdata['perms']['start'] ? '<a href="?act=post&amp;fid='.$fid.'">'.
-            $PAGE->meta(
+            ($PAGE->meta(
                 $PAGE->metaexists('button-newtopic') ?
                 'button-newtopic' : 'forum-button-newtopic'
-            ).'</a>' : '');
+            )).'</a>' : '');
         $page .= $PAGE->meta('forum-pages-top', $forumpages).$PAGE->meta('forum-buttons-top', $forumbuttons);
 
         // Do order by.
@@ -206,9 +204,9 @@ class FORUM
             } else {
                 $orderby = 'DESC';
             }
-            if ($fdata['orderby'] === 2) {
+            if ($fdata['orderby'] == 2) {
                 $orderby = '`id` '.$orderby;
-            } elseif ($fdata['orderby'] === 4) {
+            } elseif ($fdata['orderby'] == 4) {
                 $orderby = '`title` '.$orderby;
             } else {
                 $orderby = '`lp_date` '.$orderby;
@@ -218,31 +216,31 @@ class FORUM
         // Topics.
         $result = $DB->safespecial(
             <<<EOT
-                SELECT t.`id` AS `id`,t.`title` AS `title`,t.`subtitle` AS `subtitle`,
-                    t.`lp_uid` AS `lp_uid`,UNIX_TIMESTAMP(t.`lp_date`) AS `lp_date`,
-                    t.`fid` AS `fid`,t.`auth_id` AS `auth_id`,t.`replies` AS `replies`,
-                    t.`views` AS `views`,t.`pinned` AS `pinned`,
-                    t.`poll_choices` AS `poll_choices`,t.`poll_results` AS `poll_results`,
-                    t.`poll_q` AS `poll_q`,t.`poll_type` AS `poll_type`,
-                    t.`summary` AS `summary`,t.`locked` AS `locked`,
-                    UNIX_TIMESTAMP(t.`date`) AS `date`,t.`op` AS `op`,
-                    t.`cal_event` AS `cal_event`,
-                    m.`display_name` AS `lp_name`,m.`group_id` AS `lp_gid`,
-                    m2.`group_id` AS `auth_gid`,m2.`display_name` AS `auth_name`
-                FROM (
-                    SELECT `id`,`title`,`subtitle`,`lp_uid`,`lp_date`,`fid`,`auth_id`,`replies`,`views`,
-                    `pinned`,`poll_choices`,`poll_results`,`poll_q`,`poll_type`,`summary`,
-                    `locked`,UNIX_TIMESTAMP(`date`) AS `date`,`op`,`cal_event`
-                    FROM %t
-                    WHERE `fid`=?
-                    ORDER BY `pinned` DESC,{$orderby}
-                    LIMIT ?,?
-                ) t
-                LEFT JOIN %t m
-                    ON t.`lp_uid` = m.`id`
-                LEFT JOIN %t m2
-                ON t.`auth_id` = m2.`id`
-                EOT
+SELECT t.`id` AS `id`,t.`title` AS `title`,t.`subtitle` AS `subtitle`,
+    t.`lp_uid` AS `lp_uid`,UNIX_TIMESTAMP(t.`lp_date`) AS `lp_date`,
+    t.`fid` AS `fid`,t.`auth_id` AS `auth_id`,t.`replies` AS `replies`,
+    t.`views` AS `views`,t.`pinned` AS `pinned`,
+    t.`poll_choices` AS `poll_choices`,t.`poll_results` AS `poll_results`,
+    t.`poll_q` AS `poll_q`,t.`poll_type` AS `poll_type`,
+    t.`summary` AS `summary`,t.`locked` AS `locked`,
+    UNIX_TIMESTAMP(t.`date`) AS `date`,t.`op` AS `op`,
+    t.`cal_event` AS `cal_event`,
+    m.`display_name` AS `lp_name`,m.`group_id` AS `lp_gid`,
+    m2.`group_id` AS `auth_gid`,m2.`display_name` AS `auth_name`
+FROM (
+    SELECT `id`,`title`,`subtitle`,`lp_uid`,`lp_date`,`fid`,`auth_id`,`replies`,`views`,
+    `pinned`,`poll_choices`,`poll_results`,`poll_q`,`poll_type`,`summary`,
+    `locked`,UNIX_TIMESTAMP(`date`) AS `date`,`op`,`cal_event`
+    FROM %t
+    WHERE `fid`=?
+    ORDER BY `pinned` DESC,{$orderby}
+    LIMIT ?,?
+) t
+LEFT JOIN %t m
+    ON t.`lp_uid` = m.`id`
+LEFT JOIN %t m2
+ON t.`auth_id` = m2.`id`
+EOT
             ,
             ['topics', 'members', 'members'],
             $fid,
@@ -343,19 +341,19 @@ class FORUM
         }
     }
 
-    public function getreplysummary($tid): void
+    public function getreplysummary($tid)
     {
         global $PAGE,$DB;
         $result = $DB->safespecial(
             <<<'EOT'
-                SELECT m.`display_name` AS `name`,COUNT(p.`id`) AS `replies`
-                FROM %t p
-                LEFT JOIN %t m
-                    ON p.`auth_id`=m.`id`
-                WHERE `tid`=?
-                GROUP BY p.`auth_id`
-                ORDER BY `replies` DESC
-                EOT
+SELECT m.`display_name` AS `name`,COUNT(p.`id`) AS `replies`
+FROM %t p
+LEFT JOIN %t m
+    ON p.`auth_id`=m.`id`
+WHERE `tid`=?
+GROUP BY p.`auth_id`
+ORDER BY `replies` DESC
+EOT
             ,
             ['posts', 'members'],
             $tid
@@ -374,7 +372,7 @@ class FORUM
         );
     }
 
-    public function update(): void
+    public function update()
     {
         // Update the topic listing.
     }
@@ -422,7 +420,7 @@ class FORUM
         return true;
     }
 
-    public function markread($id): void
+    public function markread($id)
     {
         global $SESS,$JAX;
         $forumsread = $JAX->parsereadmarkers($SESS->forumsread);

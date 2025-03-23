@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 use PHP_CodeSniffer\Standards\Generic\Sniffs\PHP\ForbiddenFunctionsSniff;
 use PHP_CodeSniffer\Standards\PSR1\Sniffs\Files\SideEffectsSniff;
 use PHP_CodeSniffer\Standards\PSR1\Sniffs\Methods\CamelCapsMethodNameSniff;
@@ -213,16 +211,6 @@ return ECSConfig::configure()
         __DIR__.'/ecs_to_sonarqube.php',
     ])
     ->withPreparedSets(psr12: true, common: true, symplify: true, laravel: true)
-    ->withPhpCsFixerSets(
-        perCS: true,
-        perCSRisky: true,
-        php80MigrationRisky: true,
-        php84Migration: true,
-        phpCsFixer: true,
-        phpCsFixerRisky: true,
-        symfony: true,
-        symfonyRisky: true,
-    )
     ->withRules([BlockCommentSniff::class, InlineCommentSniff::class, PostStatementCommentSniff::class])
     ->withSkip([
         BlockCommentSniff::class.'.InvalidEndChar',
@@ -233,5 +221,4 @@ return ECSConfig::configure()
         InlineCommentSniff::class.'.NotCapital',
         SideEffectsSniff::class,
         ValidClassNameSniff::class,
-    ])
-;
+    ]);

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 $PAGE->loadmeta('userprofile');
 
 $IDX = new userprofile();
@@ -25,7 +23,7 @@ class userprofile
     public function __construct()
     {
         global $JAX,$PAGE;
-        preg_match('@\d+@', $JAX->b['act'], $m);
+        preg_match('@\\d+@', $JAX->b['act'], $m);
         $id = $m[0];
         if (! isset($JAX->b['view'])) {
             $JAX->b['view'] = false;
@@ -39,7 +37,7 @@ class userprofile
         }
     }
 
-    public function showcontactcard($id): void
+    public function showcontactcard($id)
     {
         global $PAGE,$DB,$JAX,$SESS,$USER;
         $contactdetails = '';
@@ -96,13 +94,13 @@ class userprofile
                     $contactdetails,
                     in_array(
                         $ud['uid'],
-                        explode(',', $USER['friends']), true
+                        explode(',', $USER['friends'])
                     ) ? '<a href="?act=buddylist&remove='.$ud['uid'].
                     '">Remove Contact</a>' : '<a href="?act=buddylist&add='.
                     $ud['uid'].'">Add Contact</a>',
                     in_array(
                         $ud['uid'],
-                        explode(',', $USER['enemies']), true
+                        explode(',', $USER['enemies'])
                     ) ? '<a href="?act=buddylist&unblock='.$ud['uid'].
                     '">Unblock Contact</a>' :
                     '<a href="?act=buddylist&block='.$ud['uid'].
@@ -129,38 +127,38 @@ class userprofile
         } else {
             $result = $DB->safespecial(
                 <<<'EOT'
-                    SELECT m.`id` AS `id`,m.`name` AS `name`,m.`email` AS `email`,m.`sig` AS `sig`,
-                        m.`posts` AS `posts`,m.`group_id` AS `group_id`,m.`avatar` AS `avatar`,
-                        m.`usertitle` AS `usertitle`,UNIX_TIMESTAMP(m.`join_date`) AS `join_date`,
-                        UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`,
-                        m.`contact_skype` AS `contact_skype`,m.`contact_yim` AS `contact_yim`,
-                        m.`contact_msn` AS `contact_msn`,m.`contact_gtalk` AS `contact_googlechat`,
-                        m.`contact_aim` AS `contact_aim`,m.`website` AS `website`,
-                        m.`birthdate` AS `birthdate`,DAY(m.`birthdate`) AS `dob_day`,
-                        MONTH(m.`birthdate`) AS `dob_month`,YEAR(m.`birthdate`) AS `dob_year`,
-                        m.`about` AS `about`,m.`display_name` AS `display_name`,
-                        m.`full_name` AS `full_name`,m.`contact_steam` AS `contact_steam`,
-                        m.`location` AS `location`,m.`gender` AS `gender`,m.`friends` AS `friends`,
-                        m.`enemies` AS `enemies`,m.`sound_shout` AS `sound_shout`,
-                        m.`sound_im` AS `sound_im`,m.`sound_pm` AS `sound_pm`,
-                        m.`sound_postinmytopic` AS `sound_postinmytopic`,
-                        m.`sound_postinsubscribedtopic` AS `sound_postinsubscribedtopic`,
-                        m.`notify_pm` AS `notify_pm`,
-                        m.`notify_postinmytopic` AS `notify_postinmytopic`,
-                        m.`notify_postinsubscribedtopic` AS `notify_postinsubscribedtopic`,
-                        m.`ucpnotepad` AS `ucpnotepad`,m.`skin_id` AS `skin_id`,
-                        m.`contact_twitter` AS `contact_twitter`,
-                        m.`contact_bluesky` AS `contact_bluesky`,
-                        m.`contact_youtube` AS `contact_youtube`,
-                        m.`contact_discord` AS `contact_discord`,
-                        m.`email_settings` AS `email_settings`,m.`nowordfilter` AS `nowordfilter`,
-                        INET6_NTOA(m.`ip`) AS `ip`,m.`mod` AS `mod`,m.`wysiwyg` AS `wysiwyg`,
-                        g.`title` AS `group`
-                    FROM %t m
-                    LEFT JOIN %t g
-                        ON m.`group_id`=g.`id`
-                    WHERE m.`id`=?
-                    EOT
+                SELECT m.`id` AS `id`,m.`name` AS `name`,m.`email` AS `email`,m.`sig` AS `sig`,
+                    m.`posts` AS `posts`,m.`group_id` AS `group_id`,m.`avatar` AS `avatar`,
+                    m.`usertitle` AS `usertitle`,UNIX_TIMESTAMP(m.`join_date`) AS `join_date`,
+                    UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`,
+                    m.`contact_skype` AS `contact_skype`,m.`contact_yim` AS `contact_yim`,
+                    m.`contact_msn` AS `contact_msn`,m.`contact_gtalk` AS `contact_googlechat`,
+                    m.`contact_aim` AS `contact_aim`,m.`website` AS `website`,
+                    m.`birthdate` AS `birthdate`,DAY(m.`birthdate`) AS `dob_day`,
+                    MONTH(m.`birthdate`) AS `dob_month`,YEAR(m.`birthdate`) AS `dob_year`,
+                    m.`about` AS `about`,m.`display_name` AS `display_name`,
+                    m.`full_name` AS `full_name`,m.`contact_steam` AS `contact_steam`,
+                    m.`location` AS `location`,m.`gender` AS `gender`,m.`friends` AS `friends`,
+                    m.`enemies` AS `enemies`,m.`sound_shout` AS `sound_shout`,
+                    m.`sound_im` AS `sound_im`,m.`sound_pm` AS `sound_pm`,
+                    m.`sound_postinmytopic` AS `sound_postinmytopic`,
+                    m.`sound_postinsubscribedtopic` AS `sound_postinsubscribedtopic`,
+                    m.`notify_pm` AS `notify_pm`,
+                    m.`notify_postinmytopic` AS `notify_postinmytopic`,
+                    m.`notify_postinsubscribedtopic` AS `notify_postinsubscribedtopic`,
+                    m.`ucpnotepad` AS `ucpnotepad`,m.`skin_id` AS `skin_id`,
+                    m.`contact_twitter` AS `contact_twitter`,
+                    m.`contact_bluesky` AS `contact_bluesky`,
+                    m.`contact_youtube` AS `contact_youtube`,
+                    m.`contact_discord` AS `contact_discord`,
+                    m.`email_settings` AS `email_settings`,m.`nowordfilter` AS `nowordfilter`,
+                    INET6_NTOA(m.`ip`) AS `ip`,m.`mod` AS `mod`,m.`wysiwyg` AS `wysiwyg`,
+                    g.`title` AS `group`
+                FROM %t m
+                LEFT JOIN %t g
+                    ON m.`group_id`=g.`id`
+                WHERE m.`id`=?
+                EOT
 ,
                 ['members', 'member_groups'],
                 $id
@@ -176,7 +174,7 @@ class userprofile
 
             return;
         }
-        $pfpageloc = $JAX->b['page'] ?? '';
+        $pfpageloc = isset($JAX->b['page']) ? $JAX->b['page'] : '';
         $pfbox = '';
         switch ($pfpageloc) {
             case 'activity':
@@ -184,24 +182,24 @@ class userprofile
                 $pfpageloc = 'activity';
                 $result = $DB->safespecial(
                     <<<'EOT'
-                        SELECT a.`id` AS `id`,a.`type` AS `type`,a.`arg1` AS `arg1`,a.`uid` AS `uid`,
-                            UNIX_TIMESTAMP(a.`date`) AS `date`,a.`affected_uid` AS `affected_uid`,
-                            a.`tid` AS `tid`,a.`pid` AS `pid`,a.`arg2` AS `arg2`,
-                            a.`affected_uid` AS `aff_id`,m.`display_name` AS `aff_name`,
-                            m.`group_id` AS `aff_group_id`
-                        FROM %t a
-                        LEFT JOIN %t m
-                            ON a.`affected_uid`=m.`id`
-                        WHERE a.`uid`=?
-                        ORDER BY a.`id` DESC
-                        LIMIT ?
-                        EOT
+                SELECT a.`id` AS `id`,a.`type` AS `type`,a.`arg1` AS `arg1`,a.`uid` AS `uid`,
+                    UNIX_TIMESTAMP(a.`date`) AS `date`,a.`affected_uid` AS `affected_uid`,
+                    a.`tid` AS `tid`,a.`pid` AS `pid`,a.`arg2` AS `arg2`,
+                    a.`affected_uid` AS `aff_id`,m.`display_name` AS `aff_name`,
+                    m.`group_id` AS `aff_group_id`
+                FROM %t a
+                LEFT JOIN %t m
+                    ON a.`affected_uid`=m.`id`
+                WHERE a.`uid`=?
+                ORDER BY a.`id` DESC
+                LIMIT ?
+                EOT
 ,
                     ['activity', 'members'],
                     $id,
                     $this->num_activity
                 );
-                if (isset($JAX->b['fmt']) && $JAX->b['fmt'] === 'RSS') {
+                if (isset($JAX->b['fmt']) && $JAX->b['fmt'] == 'RSS') {
                     include_once 'inc/classes/rssfeed.php';
                     $feed = new rssfeed(
                         [
@@ -225,7 +223,7 @@ class userprofile
                         );
                     }
                     $feed->publish();
-                    exit;
+                    exit();
                 }
                 while ($f = $DB->arow($result)) {
                     $f['name'] = $udata['display_name'];
@@ -394,7 +392,7 @@ class userprofile
                 if ($USER && $PERMS['can_add_comments']) {
                     $pfbox = $PAGE->meta(
                         'userprofile-comment-form',
-                        $USER['name'] ?? '',
+                        isset($USER['name']) ? $USER['name'] : '',
                         $JAX->pick($USER['avatar'], $PAGE->meta('default-avatar')),
                         $JAX->hiddenFormFields([
                             'act' => 'vu'.$id,
@@ -429,7 +427,7 @@ class userprofile
                         $JAX->date($f['date']),
                         $JAX->theworks($f['comment']).
                         ($PERMS['can_delete_comments']
-                        && $f['from'] === $USER['id']
+                        && $f['from'] == $USER['id']
                         || $PERMS['can_moderate'] ?
                         ' <a href="?act='.$JAX->b['act'].
                         '&view=profile&page=comments&del='.$f['id'].
@@ -459,13 +457,13 @@ class userprofile
             $tabs = ['about', 'activity', 'posts', 'topics', 'comments', 'friends'];
             foreach ($tabs as $k => $v) {
                 $tabs[$k] = '<a href="?act=vu'.$id.'&view=profile&page='.
-                    $v.'"'.($v === $pfpageloc ? ' class="active"' : '').
+                    $v.'"'.($v == $pfpageloc ? ' class="active"' : '').
                     '>'.ucwords($v).'</a>';
             }
 
             $contactdetails = '';
             foreach ($udata as $k => $v) {
-                if (mb_substr($k, 0, 8) === 'contact_' && $v) {
+                if (mb_substr($k, 0, 8) == 'contact_' && $v) {
                     $contactdetails .= '<div class="contact '.mb_substr($k, 8).
                         '"><a href="'.
                         sprintf($this->contacturls[mb_substr($k, 8)], $v).
@@ -493,11 +491,11 @@ class userprofile
                 $JAX->pick($udata['full_name'], 'N/A'),
                 $JAX->pick(ucfirst($udata['gender']), 'N/A'),
                 $udata['location'],
-                $udata['dob_year'] ? $udata['dob_month'].'/'.
-                $udata['dob_day'].'/'.$udata['dob_year'] : 'N/A',
-                $udata['website'] ? '<a href="'.$udata['website'].'">'.
-                $udata['website'].'</a>' : 'N/A',
-                $JAX->date($udata['join_date']),
+                ($udata['dob_year'] ? $udata['dob_month'].'/'.
+                $udata['dob_day'].'/'.$udata['dob_year'] : 'N/A'),
+                ($udata['website'] ? '<a href="'.$udata['website'].'">'.
+                $udata['website'].'</a>' : 'N/A'),
+                ($JAX->date($udata['join_date'])),
                 $JAX->date($udata['last_visit']),
                 $udata['id'],
                 $udata['posts'],
@@ -509,9 +507,9 @@ class userprofile
                 $tabs[4],
                 $tabs[5],
                 $pfbox,
-                $PERMS['can_moderate'] ?
+                ($PERMS['can_moderate'] ?
                 '<a class="moderate" href="?act=modcontrols&do=emem&mid='.
-                $udata['id'].'">Edit</a>' : ''
+                $udata['id'].'">Edit</a>' : '')
             );
             $PAGE->JS('update', 'page', $page);
             $PAGE->append('page', $page);

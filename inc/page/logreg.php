@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 $PAGE->loadmeta('logreg');
 $IDX = new LOGREG();
 class LOGREG
@@ -46,9 +44,9 @@ class LOGREG
         $name = isset($JAX->p['name']) ? trim($JAX->p['name']) : '';
         $dispname = isset($JAX->p['display_name']) ?
             trim($JAX->p['display_name']) : '';
-        $pass1 = $JAX->p['pass1'] ?? '';
-        $pass2 = $JAX->p['pass2'] ?? '';
-        $email = $JAX->p['email'] ?? '';
+        $pass1 = isset($JAX->p['pass1']) ? $JAX->p['pass1'] : '';
+        $pass2 = isset($JAX->p['pass2']) ? $JAX->p['pass2'] : '';
+        $email = isset($JAX->p['email']) ? $JAX->p['email'] : '';
 
         $recaptcha = '';
         if (isset($CFG['recaptcha']) && $CFG['recaptcha']) {
@@ -67,41 +65,35 @@ class LOGREG
         try {
             if ($JAX->ipServiceBanned()) {
                 throw new Exception(
-                    'You have been banned from registration on all boards. If you feel that this is in error, please contact the administrator.',
+                    'You have been banned from registration on all boards. If'
+                    .' you feel that this is in error, please contact the'
+                    .' administrator.',
                 );
-            }
-            if (! $name || ! $dispname) {
+            } elseif (! $name || ! $dispname) {
                 throw new Exception('Name and display name required.');
-            }
-            if ($pass1 !== $pass2) {
+            } elseif ($pass1 != $pass2) {
                 throw new Exception('The passwords do not match.');
-            }
-            if (
+            } elseif (
                 mb_strlen($dispname) > 30
                 || mb_strlen($name) > 30
             ) {
                 throw new Exception('Display name and username must be under 30 characters.');
-            }
-            if (
+            } elseif (
                 ($CFG['badnamechars']
                 && preg_match($CFG['badnamechars'], $name))
-                || $JAX->blockhtml($name) !== $name
+                || $JAX->blockhtml($name) != $name
             ) {
                 throw new Exception('Invalid characters in username!');
-            }
-            if (
-                $CFG['badnamechars']
-                && preg_match($CFG['badnamechars'], $dispname)
+            } elseif (
+                ($CFG['badnamechars']
+                && preg_match($CFG['badnamechars'], $dispname))
             ) {
                 throw new Exception('Invalid characters in display name!');
-            }
-            if (! $JAX->isemail($email)) {
+            } elseif (! $JAX->isemail($email)) {
                 throw new Exception("That isn't a valid email!");
-            }
-            if ($JAX->ipbanned()) {
+            } elseif ($JAX->ipbanned()) {
                 throw new Exception('You have been banned from registering on this board.');
-            }
-            if (! $this->isHuman()) {
+            } elseif (! $this->isHuman()) {
                 throw new Exception('reCAPTCHA failed. Are you a bot?');
             }
                 // Are they attempting to use an existing username/display name?
@@ -116,11 +108,10 @@ class LOGREG
                 );
                 $f = $DB->arow($result);
                 $DB->disposeresult($result);
-                if ($f !== false) {
-                    if ($f['name'] === $name) {
+                if ($f != false) {
+                    if ($f['name'] == $name) {
                         throw new Exception('That username is taken!');
-                    }
-                    if ($f['display_name'] === $dispname) {
+                    } elseif ($f['display_name'] == $dispname) {
                         throw new Exception('That display name is already used by another member.');
                     }
                 }
@@ -131,7 +122,7 @@ class LOGREG
                 [
                     'name' => $name,
                     'display_name' => $dispname,
-                    'pass' => password_hash($pass1, \PASSWORD_DEFAULT),
+                    'pass' => password_hash($pass1, PASSWORD_DEFAULT),
                     'posts' => 0,
                     'email' => $email,
                     'join_date' => date('Y-m-d H:i:s', time()),
@@ -143,9 +134,9 @@ class LOGREG
             );
             $DB->safespecial(
                 <<<'EOT'
-                    UPDATE %t
-                    SET `members` = `members` + 1, `last_register` = ?
-                    EOT
+UPDATE %t
+SET `members` = `members` + 1, `last_register` = ?
+EOT
                 ,
                 ['stats'],
                 $DB->insert_id(1)
@@ -158,7 +149,7 @@ class LOGREG
         }
     }
 
-    public function login($u = false, $p = false): void
+    public function login($u = false, $p = false)
     {
         global $PAGE,$JAX,$SESS,$DB,$CFG,$_SESSION;
         if ($u && $p) {
@@ -211,7 +202,7 @@ class LOGREG
         $PAGE->append('page', $PAGE->meta('login-form'));
     }
 
-    public function logout(): void
+    public function logout()
     {
         global $DB,$PAGE,$JAX,$SESS;
         // Just make a new session rather than fuss with the old one,
@@ -237,7 +228,7 @@ class LOGREG
         }
     }
 
-    public function loginpopup(): void
+    public function loginpopup()
     {
         global $PAGE;
         $PAGE->JS('softurl');
@@ -248,34 +239,33 @@ class LOGREG
                 'useoverlay' => 1,
                 'id' => 'loginform',
                 'content' => <<<'EOT'
-                    <form method="post" data-ajax-form="resetOnSubmit">
-                        <input type="hidden" name="act" value="logreg3" />
-                        <input type="hidden" name="popup" value="1" />
-                        <label for="user">Username:</label>
-                        <input type="text" name="user" id="user" />
-                        <br>
-                        <label for="pass">
-                            Password
-                            (
-                            <a href="?act=logreg6" title="Forgot your password?"
-                                data-use-tooltip="true"
-                                data-window-close="true">
-                                ?
-                            </a>
-                            ):
-                        </label>
-                        <input type="password" name="pass" id="pass" />
-                        <br>
-                        <input type="submit" value="Login" />
-                        <a href="?act=logreg1" data-window-close="true">Register</a>
-                    </form>
-                    EOT
-                ,
+<form method="post" data-ajax-form="resetOnSubmit">
+    <input type="hidden" name="act" value="logreg3" />
+    <input type="hidden" name="popup" value="1" />
+    <label for="user">Username:</label>
+    <input type="text" name="user" id="user" />
+    <br>
+    <label for="pass">
+        Password
+        (
+        <a href="?act=logreg6" title="Forgot your password?"
+            data-use-tooltip="true"
+            data-window-close="true">
+            ?
+        </a>
+        ):
+    </label>
+    <input type="password" name="pass" id="pass" />
+    <br>
+    <input type="submit" value="Login" />
+    <a href="?act=logreg1" data-window-close="true">Register</a>
+</form>
+EOT
             ]
         );
     }
 
-    public function toggleinvisible(): void
+    public function toggleinvisible()
     {
         global $PAGE,$SESS;
         if ($SESS->hide) {
@@ -306,7 +296,7 @@ class LOGREG
                 $DB->basicvalue($id)
             );
             $udata = $DB->arow($result);
-            if (! $udata) {
+            if (! ($udata)) {
                 $e = 'This link has expired. Please try again.';
             }
             $DB->disposeresult($result);
@@ -315,13 +305,13 @@ class LOGREG
                 $page = $PAGE->meta('error', $e);
             } else {
                 if ($JAX->p['pass1'] && $JAX->p['pass2']) {
-                    if ($JAX->p['pass1'] !== $JAX->p['pass2']) {
+                    if ($JAX->p['pass1'] != $JAX->p['pass2']) {
                         $page .= $PAGE->meta('error', 'The passwords did not match, please try again!');
                     } else {
                         $DB->safeupdate(
                             'members',
                             [
-                                'pass' => password_hash($JAX->p['pass1'], \PASSWORD_DEFAULT),
+                                'pass' => password_hash($JAX->p['pass1'], PASSWORD_DEFAULT),
                             ],
                             'WHERE `id`=?',
                             $DB->basicvalue($udata['id'])
@@ -395,16 +385,16 @@ class LOGREG
                         $udata['email'],
                         'Recover Your Password!',
                         <<<EOT
-                            You have received this email because a password request was received at {BOARDLINK}
-                            <br>
-                            <br>
-                            If you did not request a password change, simply ignore this email and no actions will be taken.
-                            If you would like to change your password, please visit the following page and follow the on-screen instructions:
-                            <a href='{$link}'>{$link}</a>
-                            <br>
-                            <br>
-                            Thanks!
-                            EOT
+You have received this email because a password request was received at {BOARDLINK}
+<br>
+<br>
+If you did not request a password change, simply ignore this email and no actions will be taken.
+If you would like to change your password, please visit the following page and follow the on-screen instructions:
+<a href='{$link}'>{$link}</a>
+<br>
+<br>
+Thanks!
+EOT
                     );
 
                     if (! $mailResult) {
@@ -458,10 +448,10 @@ class LOGREG
 
             $curl_request = curl_init();
             // Set the url, number of POST vars, POST data.
-            curl_setopt($curl_request, \CURLOPT_URL, $url);
-            curl_setopt($curl_request, \CURLOPT_POST, count($fields));
-            curl_setopt($curl_request, \CURLOPT_POSTFIELDS, $fields_string);
-            curl_setopt($curl_request, \CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl_request, CURLOPT_URL, $url);
+            curl_setopt($curl_request, CURLOPT_POST, count($fields));
+            curl_setopt($curl_request, CURLOPT_POSTFIELDS, $fields_string);
+            curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, true);
 
             // Execute post.
             $result = json_decode(curl_exec($curl_request), true);

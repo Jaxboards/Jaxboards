@@ -1,9 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
 if (! defined(INACP)) {
-    exit;
+    exit();
 }
 
 new groups();
@@ -28,7 +26,7 @@ class groups
                     'url' => '?act=groups&do='.$do,
                     'title' => $title,
                 ]
-            ).\PHP_EOL;
+            ).PHP_EOL;
         }
         $PAGE->sidebar($PAGE->parseTemplate('sidebar-list.html', [
             'content' => $sidebarLinks,
@@ -114,7 +112,7 @@ class groups
 
         // Update this.
         foreach ($perms as $k => $v) {
-            if ($k === 2) {
+            if ($k == 2) {
                 $v['can_access_acp'] = 1;
             }
             if ($k) {
@@ -158,7 +156,7 @@ class groups
         }
         if (
             ! isset($JAX->b['grouplist'])
-            || preg_match('@[^\d,]@', $JAX->b['grouplist'])
+            || preg_match('@[^\\d,]@', $JAX->b['grouplist'])
             || mb_strpos($JAX->b['grouplist'], ',,') !== false
         ) {
             $JAX->b['grouplist'] = '';
@@ -167,14 +165,14 @@ class groups
         $result = $JAX->b['grouplist'] ?
             $DB->safeselect(
                 <<<'EOT'
-                    `id`,`title`,`can_post`,`can_edit_posts`,`can_post_topics`,`can_edit_topics`,
-                    `can_add_comments`,`can_delete_comments`,`can_view_board`,
-                    `can_view_offline_board`,`flood_control`,`can_override_locked_topics`,
-                    `icon`,`can_shout`,`can_moderate`,`can_delete_shouts`,`can_delete_own_shouts`,
-                    `can_karma`,`can_im`,`can_pm`,`can_lock_own_topics`,`can_delete_own_topics`,
-                    `can_use_sigs`,`can_attach`,`can_delete_own_posts`,`can_poll`,`can_access_acp`,
-                    `can_view_shoutbox`,`can_view_stats`,`legend`,`can_view_fullprofile`
-                    EOT
+`id`,`title`,`can_post`,`can_edit_posts`,`can_post_topics`,`can_edit_topics`,
+`can_add_comments`,`can_delete_comments`,`can_view_board`,
+`can_view_offline_board`,`flood_control`,`can_override_locked_topics`,
+`icon`,`can_shout`,`can_moderate`,`can_delete_shouts`,`can_delete_own_shouts`,
+`can_karma`,`can_im`,`can_pm`,`can_lock_own_topics`,`can_delete_own_topics`,
+`can_use_sigs`,`can_attach`,`can_delete_own_posts`,`can_poll`,`can_access_acp`,
+`can_view_shoutbox`,`can_view_stats`,`legend`,`can_view_fullprofile`
+EOT
                 ,
                 'member_groups',
                 'WHERE `id` IN ? ORDER BY `id` ASC',
@@ -182,14 +180,14 @@ class groups
             ) :
             $DB->safeselect(
                 <<<'EOT'
-                    `id`,`title`,`can_post`,`can_edit_posts`,`can_post_topics`,`can_edit_topics`,
-                    `can_add_comments`,`can_delete_comments`,`can_view_board`,
-                    `can_view_offline_board`,`flood_control`,`can_override_locked_topics`,
-                    `icon`,`can_shout`,`can_moderate`,`can_delete_shouts`,`can_delete_own_shouts`,
-                    `can_karma`,`can_im`,`can_pm`,`can_lock_own_topics`,`can_delete_own_topics`,
-                    `can_use_sigs`,`can_attach`,`can_delete_own_posts`,`can_poll`,`can_access_acp`,
-                    `can_view_shoutbox`,`can_view_stats`,`legend`,`can_view_fullprofile`
-                    EOT
+`id`,`title`,`can_post`,`can_edit_posts`,`can_post_topics`,`can_edit_topics`,
+`can_add_comments`,`can_delete_comments`,`can_view_board`,
+`can_view_offline_board`,`flood_control`,`can_override_locked_topics`,
+`icon`,`can_shout`,`can_moderate`,`can_delete_shouts`,`can_delete_own_shouts`,
+`can_karma`,`can_im`,`can_pm`,`can_lock_own_topics`,`can_delete_own_topics`,
+`can_use_sigs`,`can_attach`,`can_delete_own_posts`,`can_poll`,`can_access_acp`,
+`can_view_shoutbox`,`can_view_stats`,`legend`,`can_view_fullprofile`
+EOT
                 ,
                 'member_groups',
                 'ORDER BY id ASC'
@@ -215,7 +213,7 @@ class groups
                     'id' => $groupId,
                     'title' => $groupData['title'],
                 ]
-            ).\PHP_EOL;
+            ).PHP_EOL;
         }
 
         $permissionsChart = [
@@ -264,14 +262,14 @@ class groups
         ];
         $permissionsTable = '';
         foreach ($permissionsChart as $k => $v) {
-            if (mb_substr($k, 0, 7) === 'breaker') {
+            if (mb_substr($k, 0, 7) == 'breaker') {
                 $permissionsTable .= $PAGE->parseTemplate(
                     'groups/show-permissions-breaker-row.html',
                     [
                         'column_count' => 1 + $numgroups,
                         'title' => $v,
                     ]
-                ).\PHP_EOL;
+                ).PHP_EOL;
             } else {
                 $groupColumns = '';
                 foreach ($perms as $groupId => $groupData) {
@@ -283,7 +281,7 @@ class groups
                             'checked' => $groupData[$k] ?
                             'checked="checked" ' : '',
                         ]
-                    ).\PHP_EOL;
+                    ).PHP_EOL;
                 }
                 $permissionsTable .= $PAGE->parseTemplate(
                     'groups/show-permissions-permission-row.html',
@@ -291,7 +289,7 @@ class groups
                         'title' => $v,
                         'group_columns' => $groupColumns,
                     ]
-                ).\PHP_EOL;
+                ).PHP_EOL;
             }
         }
 
@@ -362,7 +360,7 @@ class groups
         $PAGE->addContentBox($gid ? 'Editing group: '.$gdata['title'] : 'Create a group!', $page);
     }
 
-    public function delete(): void
+    public function delete()
     {
         global $PAGE,$DB,$JAX;
         $page = '';

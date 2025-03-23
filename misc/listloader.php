@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 require '../config.php';
 require '../inc/classes/mysql.php';
 $DB = new MySQL();
@@ -15,7 +13,7 @@ switch ($_GET['act']) {
             '`id`,`display_name` AS `name`',
             'members',
             'WHERE `display_name` LIKE ? ORDER BY `display_name` LIMIT 10',
-            $DB->basicvalue(htmlspecialchars(str_replace('_', '\_', $_GET['term']), \ENT_QUOTES).'%')
+            $DB->basicvalue(htmlspecialchars(str_replace('_', '\\_', $_GET['term']), ENT_QUOTES).'%')
         );
         while ($f = $DB->arow($result)) {
             $list[0][] = $f['id'];

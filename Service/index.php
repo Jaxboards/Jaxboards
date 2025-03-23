@@ -7,7 +7,7 @@
  *
  * @license MIT <https://opensource.org/licenses/MIT>
  *
- * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
+ * @link https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
 if (! defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', dirname(__DIR__));
@@ -37,7 +37,7 @@ if (! $CFG['service']) {
  * @param string $src The source directory- this must exist already
  * @param string $dst The destination directory- this is assumed to not exist already
  */
-function recurseCopy($src, $dst): void
+function recurseCopy($src, $dst)
 {
     $dir = opendir($src);
     @mkdir($dst);
@@ -75,9 +75,9 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $errors[] = 'all fields required.';
     } elseif (mb_strlen($JAX->p['boardurl']) > 30) {
         $errors[] = 'board url too long';
-    } elseif ($JAX->p['boardurl'] === 'www') {
+    } elseif ($JAX->p['boardurl'] == 'www') {
         $errors[] = 'WWW is reserved.';
-    } elseif (preg_match('@\W@', $JAX->p['boardurl'])) {
+    } elseif (preg_match('@\\W@', $JAX->p['boardurl'])) {
         $errors[] = 'board url needs to consist of letters, '.
             'numbers, and underscore only';
     }
@@ -87,7 +87,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         'directory',
         'WHERE `registrar_ip`=INET6_ATON(?) AND `date`>?',
         $JAX->getIp(),
-        date('Y-m-d H:i:s', time() - 7 * 24 * 60 * 60)
+        date('Y-m-d H:i:s', (time() - 7 * 24 * 60 * 60))
     );
     if ($DB->num_rows($result) > 3) {
         $errors[] = 'You may only register one 3 boards per week.';
@@ -100,7 +100,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
 
     if (mb_strlen($JAX->p['username']) > 50) {
         $errors[] = 'username too long';
-    } elseif (preg_match('@\W@', $JAX->p['username'])) {
+    } elseif (preg_match('@\\W@', $JAX->p['username'])) {
         $errors[] = 'username needs to consist of letters, '.
             'numbers, and underscore only';
     }
@@ -124,7 +124,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                 'registrar_email' => $JAX->p['email'],
                 'registrar_ip' => $JAX->ip2bin(),
                 'date' => date('Y-m-d H:i:s', time()),
-                'referral' => $JAX->b['r'] ?? '',
+                'referral' => isset($JAX->b['r']) ? $JAX->b['r'] : '',
             ]
         );
         $DB->prefix($boardPrefix);
@@ -137,7 +137,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $lines = file(SERVICE_ROOT.'/blueprint.sql');
         foreach ($lines as $line) {
             // Skip comments.
-            if (mb_substr($line, 0, 2) === '--' || $line === '') {
+            if (mb_substr($line, 0, 2) == '--' || $line == '') {
                 continue;
             }
 
@@ -148,7 +148,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             $query .= $line;
 
             // If it has a semicolon at the end, it's the end of the query.
-            if (mb_substr(trim($line), -1, 1) === ';') {
+            if (mb_substr(trim($line), -1, 1) == ';') {
                 // Perform the query.
                 $result = $DB->safequery($query);
                 $DB->disposeresult($result);
@@ -163,7 +163,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             [
                 'name' => $JAX->p['username'],
                 'display_name' => $JAX->p['username'],
-                'pass' => password_hash($JAX->p['password'], \PASSWORD_DEFAULT),
+                'pass' => password_hash($JAX->p['password'], PASSWORD_DEFAULT),
                 'email' => $JAX->p['email'],
                 'sig' => '',
                 'posts' => 0,

@@ -1,9 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-declare(strict_types=1);
-
-/*
+/**
  * Tool to convert EasyCodingStandard output into something SonarQube can read.
  *
  * @see https://docs.sonarsource.com/sonarqube-cloud/enriching/generic-issue-data/
@@ -23,7 +21,7 @@ declare(strict_types=1);
 $ecs_report = $argv[1] ?? '';
 
 if ($ecs_report === '') {
-    fwrite(\STDERR, 'Please enter the path to your EasyCodingStandard report json file');
+    fwrite(STDERR, 'Please enter the path to your EasyCodingStandard report json file');
 
     exit(1);
 }
@@ -31,7 +29,7 @@ if ($ecs_report === '') {
 $sonarqube_report = $argv[2] ?? '';
 
 if ($sonarqube_report === '') {
-    fwrite(\STDERR, 'Please enter the path to where to save your SonarQube report json file');
+    fwrite(STDERR, 'Please enter the path to where to save your SonarQube report json '.'file');
 
     exit(1);
 }
@@ -41,19 +39,19 @@ if ($sonarqube_report === '') {
  */
 
 if (! file_exists($ecs_report)) {
-    fwrite(\STDERR, 'Provided EasyCodingStandard report json file does not exist');
+    fwrite(STDERR, 'Provided EasyCodingStandard report json file does not exist');
 
     exit(1);
 }
 
 if (! is_readable($ecs_report)) {
-    fwrite(\STDERR, 'Provided EasyCodingStandard report json file is not readable');
+    fwrite(STDERR, 'Provided EasyCodingStandard report json file is not readable');
 
     exit(1);
 }
 
 if (file_exists($sonarqube_report) && ! is_writable($sonarqube_report)) {
-    fwrite(\STDERR, 'SonarQube report file already exists and is not writable');
+    fwrite(STDERR, 'SonarQube report file already exists and is not writable');
 
     exit(1);
 }
@@ -62,7 +60,7 @@ if (
     ! file_exists($sonarqube_report)
     && ! is_writable(dirname($sonarqube_report))
 ) {
-    fwrite(\STDERR, 'SonarQube report file directory is not writable');
+    fwrite(STDERR, 'SonarQube report file directory is not writable');
 
     exit(1);
 }
@@ -72,11 +70,11 @@ $data = json_decode(
     null,
     512,
     // default
-    \JSON_OBJECT_AS_ARRAY | \JSON_THROW_ON_ERROR,
+    JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
 );
 
 if (! is_array($data['files'])) {
-    fwrite(\STDERR, 'Provided EasyCodingStandard report json file does not have `files` array');
+    fwrite(STDERR, 'Provided EasyCodingStandard report json file does not have `files`'.' array');
 
     exit(1);
 }
@@ -108,7 +106,7 @@ file_put_contents(
                             $data['files'][$file]['errors'],
                             static fn (
                                 array $error,
-                            ): bool => ! in_array($error['source_class'], $current_rules, true),
+                            ): bool => ! in_array($error['source_class'], $current_rules),
                         ),
                     ),
                 );
@@ -139,6 +137,7 @@ file_put_contents(
                                     ),
                                 ],
                             ],
+
                         ],
                         $data['files'][$file]['errors'],
                     ),
@@ -151,7 +150,7 @@ file_put_contents(
                 'rules' => [],
             ],
         ),
-        \JSON_THROW_ON_ERROR,
+        JSON_THROW_ON_ERROR,
     ),
-    \LOCK_EX,
+    LOCK_EX,
 );

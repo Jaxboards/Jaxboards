@@ -1,12 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
-/*
- * Chat box
- * better color >_>
- * <_<
- * we need to be able to search "All" :>
+/**
+    Chat box
+    better color >_>
+    <_<
+    we need to be able to search "All" :>
  */
 $PAGE->loadmeta('search');
 
@@ -26,7 +24,7 @@ class search
         global $PAGE,$JAX;
 
         $this->page = '';
-        $this->pagenum = $JAX->b['page'] ?? 0;
+        $this->pagenum = isset($JAX->b['page']) ? $JAX->b['page'] : 0;
         if (! is_numeric($this->pagenum) || $this->pagenum < 0) {
             $this->pagenum = 1;
         }
@@ -43,7 +41,7 @@ class search
         }
     }
 
-    public function form(): void
+    public function form()
     {
         global $PAGE,$JAX,$SESS;
         if ($PAGE->jsupdate) {
@@ -52,7 +50,7 @@ class search
 
         $this->page = $PAGE->meta(
             'search-form',
-            $JAX->blockhtml($SESS->vars['searcht'] ?? ''),
+            $JAX->blockhtml(isset($SESS->vars['searcht']) ? $SESS->vars['searcht'] : ''),
             $this->getForumSelection(),
             $this->page
         );
@@ -121,7 +119,7 @@ class search
     public function pdate($a)
     {
         $a = explode('/', $a);
-        if (count($a) !== 3) {
+        if (count($a) != 3) {
             return false;
         }
         for ($x = 0; $x < 3; $x++) {
@@ -131,8 +129,8 @@ class search
         }
         if (
             ($a[0] % 2)
-            && $a[1] === 31
-            || $a[0] === 2
+            && $a[1] == 31
+            || $a[0] == 2
             && (! $a[2] % 4
             && $a[1] > 29
             || $a[2] % 4
@@ -144,7 +142,7 @@ class search
         return mktime(0, 0, 0, $a[0], $a[1], $a[2]);
     }
 
-    public function dosearch(): void
+    public function dosearch()
     {
         global $JAX,$PAGE,$DB,$SESS;
 
@@ -165,7 +163,7 @@ class search
             if (isset($JAX->b['fids']) && $JAX->b['fids']) {
                 $fids = [];
                 foreach ($JAX->b['fids'] as $v) {
-                    if (in_array($v, $this->fids, true)) {
+                    if (in_array($v, $this->fids)) {
                         $fids[] = $v;
                     }
                 }
@@ -186,35 +184,35 @@ class search
 
             $arguments = [
                 <<<'EOT'
-                    SELECT `id`,SUM(`relevance`) AS `relevance`
-                    FROM (
-                        (
-                            SELECT p.`id` AS `id`,MATCH(p.`post`) AGAINST(?) AS `relevance`
-                            FROM %t p
-                            LEFT JOIN %t t
-                                ON p.`tid`=t.`id`
-                            WHERE MATCH(p.`post`) AGAINST(? IN BOOLEAN MODE)
-                                AND t.`fid` IN ?
-                    EOT
+SELECT `id`,SUM(`relevance`) AS `relevance`
+FROM (
+    (
+        SELECT p.`id` AS `id`,MATCH(p.`post`) AGAINST(?) AS `relevance`
+        FROM %t p
+        LEFT JOIN %t t
+            ON p.`tid`=t.`id`
+        WHERE MATCH(p.`post`) AGAINST(? IN BOOLEAN MODE)
+            AND t.`fid` IN ?
+EOT
             .(is_int($JAX->b['mid']) ? ' AND p.`auth_id =? ' : '').
                  ((isset($datestart) && $datestart) ? ' AND p.`date`>? ' : '').
                  ((isset($dateend) && $dateend) ? ' AND p.`date`<? ' : '').
             <<<'EOT'
-                    ORDER BY `relevance` DESC LIMIT 100
-                    ) UNION (
-                        SELECT t.`op` AS `op`,MATCH(t.`title`) AGAINST(?) AS `relevance`
-                        FROM %t t
-                        WHERE MATCH(`title`) AGAINST(? IN BOOLEAN MODE)
-                            AND t.`fid` IN ?
-                EOT
+    ORDER BY `relevance` DESC LIMIT 100
+    ) UNION (
+        SELECT t.`op` AS `op`,MATCH(t.`title`) AGAINST(?) AS `relevance`
+        FROM %t t
+        WHERE MATCH(`title`) AGAINST(? IN BOOLEAN MODE)
+            AND t.`fid` IN ?
+EOT
             .(is_int($JAX->b['mid']) ? ' AND t.`auth_id`= ? ' : '').
                  ((isset($datestart) && $datestart) ? ' AND t.`date`>? ' : '').
                  ((isset($dateend) && $dateend) ? ' AND t.`date`<? ' : '').
             <<<'EOT'
-                    ORDER BY `relevance` DESC LIMIT 100
-                    )
-                ) dt GROUP BY `id` ORDER BY `relevance` DESC
-                EOT
+    ORDER BY `relevance` DESC LIMIT 100
+    )
+) dt GROUP BY `id` ORDER BY `relevance` DESC
+EOT
                 ,
                 ['posts', 'topics', 'topics'],
                 $DB->basicvalue($termraw),
@@ -223,32 +221,32 @@ class search
             ];
 
             if (is_int($JAX->b['mid'])) {
-                $arguments[] = (int) $JAX->b['mid'];
+                array_push($arguments, (int) $JAX->b['mid']);
             }
             if (isset($datestart) && $datestart) {
-                $arguments[] = date('Y-m-d H:i:s', $datestart);
+                array_push($arguments, date('Y-m-d H:i:s', $datestart));
             }
             if (isset($dateend) && $dateend) {
-                $arguments[] = date('Y-m-d H:i:s', $dateend);
+                array_push($arguments, date('Y-m-d H:i:s', $dateend));
             }
 
-            $arguments[] = $DB->basicvalue($termraw);
-            $arguments[] = $DB->basicvalue($termraw);
-            $arguments[] = $fids;
+            array_push($arguments, $DB->basicvalue($termraw));
+            array_push($arguments, $DB->basicvalue($termraw));
+            array_push($arguments, $fids);
 
             if (is_int($JAX->b['mid'])) {
-                $arguments[] = (int) $JAX->b['mid'];
+                array_push($arguments, (int) $JAX->b['mid']);
             }
             if (isset($datestart) && $datestart) {
-                $arguments[] = date('Y-m-d H:i:s', $datestart);
+                array_push($arguments, date('Y-m-d H:i:s', $datestart));
             }
             if (isset($dateend) && $dateend) {
-                $arguments[] = date('Y-m-d H:i:s', $dateend);
+                array_push($arguments, date('Y-m-d H:i:s', $dateend));
             }
 
             $result = call_user_func_array([$DB, 'safespecial'], $arguments);
             if (! $result) {
-                syslog(\LOG_EMERG, 'ERROR: '.$DB->error(1).\PHP_EOL);
+                syslog(LOG_EMERG, 'ERROR: '.$DB->error(1).PHP_EOL);
             }
 
             $ids = '';
@@ -271,17 +269,17 @@ class search
 
             $result = $DB->safespecial(
                 <<<EOT
-                    SELECT p.`id` AS `id`,p.`auth_id` AS `auth_id`,p.`post` AS `post`,
-                    UNIX_TIMESTAMP(p.`date`) AS `date`,p.`showsig` AS `showsig`,
-                    p.`showemotes` AS `showemotes`,p.`tid` AS `tid`,p.`newtopic` AS `newtopic`,
-                    INET6_NTOA(p.`ip`) AS `ip`,UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`,
-                    p.`editby` AS `editby`,p.`rating` AS `rating`,t.`title` AS `title`
-                    FROM %t p
-                    LEFT JOIN %t t
-                        ON p.`tid`=t.`id`
-                    WHERE p.`id` IN ?
-                    ORDER BY FIELD(p.`id`,{$ids})
-                    EOT
+SELECT p.`id` AS `id`,p.`auth_id` AS `auth_id`,p.`post` AS `post`,
+UNIX_TIMESTAMP(p.`date`) AS `date`,p.`showsig` AS `showsig`,
+p.`showemotes` AS `showemotes`,p.`tid` AS `tid`,p.`newtopic` AS `newtopic`,
+INET6_NTOA(p.`ip`) AS `ip`,UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`,
+p.`editby` AS `editby`,p.`rating` AS `rating`,t.`title` AS `title`
+FROM %t p
+LEFT JOIN %t t
+    ON p.`tid`=t.`id`
+WHERE p.`id` IN ?
+ORDER BY FIELD(p.`id`,{$ids})
+EOT
                 ,
                 ['posts', 'topics'],
                 $idarray
@@ -295,7 +293,7 @@ class search
 
         $terms = [];
 
-        foreach (preg_split('@\W+@', $termraw) as $v) {
+        foreach (preg_split('@\\W+@', $termraw) as $v) {
             if (trim($v)) {
                 $terms[] = preg_quote($v);
             }

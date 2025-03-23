@@ -1,15 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
-/*
+/**
  * Admin control panel.
  *
  * PHP Version 5.3.7
  *
  * @license MIT <https://opensource.org/licenses/MIT>
  *
- * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
+ * @link https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
 ini_set('session.cookie_secure', 1);
 ini_set('session.cookie_httponly', 1);
@@ -35,7 +33,6 @@ require JAXBOARDS_ROOT.'/acp/page.php';
  * Strip slashes from input, recursively.
  *
  * @param mixed $input The input to strip slashes from
- *
  * @return mixed The input, without slashes
  */
 function recursiveStripSlashes($input)
@@ -75,7 +72,7 @@ if (isset($_SESSION['auid'])) {
 }
 if (! $PERMS['can_access_acp']) {
     header('Location: ./');
-    exit;
+    exit();
 }
 
 $PAGE = new PAGE();
@@ -149,7 +146,7 @@ $PAGE->addNavMenu(
     ]
 );
 
-$a = $JAX->g['act'] ?? null;
+$a = isset($JAX->g['act']) ? $JAX->g['act'] : null;
 
 if ($a && file_exists("./pages/{$a}.php")) {
     include_once "./pages/{$a}.php";

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 $PAGE->loadmeta('members');
 new members();
 class members
@@ -27,7 +25,7 @@ class members
         }
     }
 
-    public function showmemberlist(): void
+    public function showmemberlist()
     {
         global $PAGE,$DB,$JAX;
         $vars = [
@@ -40,7 +38,7 @@ class members
         $page = '';
 
         $sortby = 'm.`display_name`';
-        $sorthow = (isset($JAX->b['how']) && $JAX->b['how'] === 'DESC')
+        $sorthow = (isset($JAX->b['how']) && $JAX->b['how'] == 'DESC')
             ? 'DESC' : 'ASC';
         $where = '';
         if (
@@ -49,7 +47,7 @@ class members
         ) {
             $sortby = $JAX->b['sortby'];
         }
-        if (isset($JAX->g['filter']) && $JAX->g['filter'] === 'staff') {
+        if (isset($JAX->g['filter']) && $JAX->g['filter'] == 'staff') {
             $sortby = 'g.`can_access_acp` DESC ,'.$sortby;
             $where = 'WHERE g.`can_access_acp`=1 OR g.`can_moderate`=1';
         }
@@ -58,43 +56,43 @@ class members
 
         $memberquery = $DB->safespecial(
             <<<EOT
-                SELECT m.`id` AS `id`,m.`name` AS `name`,m.`email` AS `email`,m.`sig` AS `sig`,
-                    m.`posts` AS `posts`,m.`group_id` AS `group_id`,m.`avatar` AS `avatar`,
-                    m.`usertitle` AS `usertitle`,UNIX_TIMESTAMP(m.`join_date`) AS `join_date`,
-                    UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`,
-                    m.`contact_skype` AS `contact_skype`,m.`contact_yim` AS `contact_yim`,
-                    m.`contact_msn` AS `contact_msn`,m.`contact_gtalk` AS `contact_googlechat`,
-                    m.`contact_aim` AS `contact_AIM`,m.`website` AS `website`,
-                    m.`birthdate` AS `birthdate`,
-                    DAY(m.`birthdate`) AS `dob_day`,MONTH(m.`birthdate`) AS `dob_month`,
-                    YEAR(m.`birthdate`) AS `dob_year`,m.`about` AS `about`,
-                    m.`display_name` AS `display_name`,m.`full_name` AS `full_name`,
-                    m.`contact_steam` AS `contact_Steam`,m.`location` AS `location`,
-                    m.`gender` AS `gender`,m.`friends` AS `friends`,m.`enemies` AS `enemies`,
-                    m.`sound_shout` AS `sound_shout`,m.`sound_im` AS `sound_im`,
-                    m.`sound_pm` AS `sound_pm`,m.`sound_postinmytopic` AS `sound_postinmytopic`,
-                    m.`sound_postinsubscribedtopic` AS `sound_postinsubscribedtopic`,
-                    m.`notify_pm` AS `notify_pm`,
-                    m.`notify_postinmytopic` AS `notify_postinmytopic`,
-                    m.`notify_postinsubscribedtopic` AS `notify_postinsubscribedtopic`,
-                    m.`ucpnotepad` AS `ucpnotepad`,m.`skin_id` AS `skin_id`,
-                    m.`contact_twitter` AS `contact_twitter`,
-                    m.`contact_discord` AS `contact_discord`,
-                    m.`contact_youtube` AS `contact_youTube`,
-                    m.`contact_bluesky` AS `contact_bluesky`,
-                    m.`email_settings` AS `email_settings`,m.`nowordfilter` AS `nowordfilter`,
-                    INET6_NTOA(m.`ip`) AS `ip`,m.`mod` AS `mod`,m.`wysiwyg` AS `wysiwyg`,
-                    g.`title` AS `g_title`
-                FROM %t m
-                LEFT JOIN %t g
-                    ON g.id=m.group_id
-                {$where}
-                ORDER BY {$sortby} {$sorthow}
-                LIMIT ?, ?
-                EOT
+               SELECT m.`id` AS `id`,m.`name` AS `name`,m.`email` AS `email`,m.`sig` AS `sig`,
+                   m.`posts` AS `posts`,m.`group_id` AS `group_id`,m.`avatar` AS `avatar`,
+                   m.`usertitle` AS `usertitle`,UNIX_TIMESTAMP(m.`join_date`) AS `join_date`,
+                   UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`,
+                   m.`contact_skype` AS `contact_skype`,m.`contact_yim` AS `contact_yim`,
+                   m.`contact_msn` AS `contact_msn`,m.`contact_gtalk` AS `contact_googlechat`,
+                   m.`contact_aim` AS `contact_AIM`,m.`website` AS `website`,
+                   m.`birthdate` AS `birthdate`,
+                   DAY(m.`birthdate`) AS `dob_day`,MONTH(m.`birthdate`) AS `dob_month`,
+                   YEAR(m.`birthdate`) AS `dob_year`,m.`about` AS `about`,
+                   m.`display_name` AS `display_name`,m.`full_name` AS `full_name`,
+                   m.`contact_steam` AS `contact_Steam`,m.`location` AS `location`,
+                   m.`gender` AS `gender`,m.`friends` AS `friends`,m.`enemies` AS `enemies`,
+                   m.`sound_shout` AS `sound_shout`,m.`sound_im` AS `sound_im`,
+                   m.`sound_pm` AS `sound_pm`,m.`sound_postinmytopic` AS `sound_postinmytopic`,
+                   m.`sound_postinsubscribedtopic` AS `sound_postinsubscribedtopic`,
+                   m.`notify_pm` AS `notify_pm`,
+                   m.`notify_postinmytopic` AS `notify_postinmytopic`,
+                   m.`notify_postinsubscribedtopic` AS `notify_postinsubscribedtopic`,
+                   m.`ucpnotepad` AS `ucpnotepad`,m.`skin_id` AS `skin_id`,
+                   m.`contact_twitter` AS `contact_twitter`,
+                   m.`contact_discord` AS `contact_discord`,
+                   m.`contact_youtube` AS `contact_youTube`,
+                   m.`contact_bluesky` AS `contact_bluesky`,
+                   m.`email_settings` AS `email_settings`,m.`nowordfilter` AS `nowordfilter`,
+                   INET6_NTOA(m.`ip`) AS `ip`,m.`mod` AS `mod`,m.`wysiwyg` AS `wysiwyg`,
+                   g.`title` AS `g_title`
+               FROM %t m
+               LEFT JOIN %t g
+                   ON g.id=m.group_id
+               {$where}
+               ORDER BY {$sortby} {$sorthow}
+               LIMIT ?, ?
+               EOT
 ,
             ['members', 'member_groups'],
-            $this->page * $this->perpage,
+            ($this->page * $this->perpage),
             $this->perpage
         );
 
@@ -102,13 +100,13 @@ class members
 
         $nummemberquery = $DB->safespecial(
             <<<EOT
-                SELECT COUNT(m.`id`) AS `num_members`
-                FROM %t m
-                LEFT JOIN %t g
-                    ON g.id=m.group_id
-                {$where}
-
-                EOT
+               SELECT COUNT(m.`id`) AS `num_members`
+               FROM %t m
+               LEFT JOIN %t g
+                   ON g.id=m.group_id
+               {$where}
+               
+               EOT
 ,
             ['members', 'member_groups']
         );
@@ -119,7 +117,7 @@ class members
         foreach ($pagesArray as $v) {
             $pages .= "<a href='?act=members&amp;sortby=".
                 "{$sortby}&amp;how={$sorthow}&amp;page={$v}'".
-                ($v - 1 === $this->page ? ' class="active"' : '').">{$v}</a> ";
+                ($v - 1 == $this->page ? ' class="active"' : '').">{$v}</a> ";
         }
         $url = '?act=members'.
             ($this->page ? '&page='.($this->page + 1) : '').
@@ -128,8 +126,8 @@ class members
         $links = [];
         foreach ($vars as $k => $v) {
             $links[] = "<a href=\"{$url}&amp;sortby={$k}".
-            ($sortby === $k ? ($sorthow === 'ASC' ? '&amp;how=DESC' : '').
-                '" class="sort'.($sorthow === 'DESC' ? ' desc' : '') : '').
+            ($sortby == $k ? ($sorthow == 'ASC' ? '&amp;how=DESC' : '').
+                '" class="sort'.($sorthow == 'DESC' ? ' desc' : '') : '').
                 "\">{$v}</a>";
         }
         foreach ($memberarray as $f) {

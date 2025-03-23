@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 // IMPORTANT TO DO: fix file uploading so that it checks
 // permissions within the forum
 // I've already hidden the attach files button,
@@ -28,10 +26,10 @@ class POST
     public function __construct()
     {
         global $JAX,$PAGE;
-        $this->tid = $JAX->b['tid'] ?? 0;
-        $this->fid = $JAX->b['fid'] ?? 0;
-        $this->pid = $JAX->b['pid'] ?? 0;
-        $this->how = $JAX->b['how'] ?? '';
+        $this->tid = isset($JAX->b['tid']) ? $JAX->b['tid'] : 0;
+        $this->fid = isset($JAX->b['fid']) ? $JAX->b['fid'] : 0;
+        $this->pid = isset($JAX->b['pid']) ? $JAX->b['pid'] : 0;
+        $this->how = isset($JAX->b['how']) ? $JAX->b['how'] : '';
 
         if (isset($JAX->p['postdata']) && $JAX->p['postdata']) {
             $this->nopost = false;
@@ -68,7 +66,7 @@ class POST
         } elseif (
             $this->fid && is_numeric($this->fid)
             || $this->tid && is_numeric($this->tid)
-            && $this->how === 'edit'
+            && $this->how == 'edit'
         ) {
             $this->showtopicform();
         } elseif ($this->tid && is_numeric($this->tid)) {
@@ -92,12 +90,12 @@ class POST
         $uploadpath = BOARDPATH.'Uploads/';
 
         $ext = explode('.', $fileobj['name']);
-        if (count($ext) === 1) {
+        if (count($ext) == 1) {
             $ext = '';
         } else {
             $ext = mb_strtolower(array_pop($ext));
         }
-        if (! in_array($ext, $CFG['images'], true)) {
+        if (! in_array($ext, $CFG['images'])) {
             $ext = '';
         }
         if ($ext) {
@@ -128,7 +126,7 @@ class POST
         return (string) $id;
     }
 
-    public function previewpost(): void
+    public function previewpost()
     {
         global $JAX,$PAGE;
         $post = $this->postdata;
@@ -144,7 +142,7 @@ class POST
         $PAGE->JS('update', 'post-preview', $post);
     }
 
-    public function showtopicform(): void
+    public function showtopicform()
     {
         global $JAX,$PAGE,$DB,$PERMS,$USER;
         $e = '';
@@ -155,14 +153,14 @@ class POST
         $page = '<div id="post-preview">'.$this->postpreview.'</div>';
         $fid = $this->fid;
 
-        if ($this->how === 'edit') {
+        if ($this->how == 'edit') {
             $result = $DB->safeselect(
                 <<<'EOT'
-                    `id`,`title`,`subtitle`,`lp_uid`,UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,
-                    `fid`,`auth_id`,`replies`,`views`,
-                    `pinned`,`poll_choices`,`poll_results`,`poll_q`,`poll_type`,`summary`,
-                    `locked`,UNIX_TIMESTAMP(`date`) AS `date`,`op`,`cal_event`
-                    EOT
+`id`,`title`,`subtitle`,`lp_uid`,UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,
+`fid`,`auth_id`,`replies`,`views`,
+`pinned`,`poll_choices`,`poll_results`,`poll_q`,`poll_type`,`summary`,
+`locked`,UNIX_TIMESTAMP(`date`) AS `date`,`op`,`cal_event`
+EOT
                 ,
                 'topics',
                 'WHERE `id`=?',
@@ -259,26 +257,26 @@ onclick="this.form.submitButton=this" /></div>
         }
     }
 
-    public function showpostform(): void
+    public function showpostform()
     {
         global $PAGE,$JAX,$DB,$SESS,$USER;
         $page = '';
         $tid = $this->tid;
-        if ($PAGE->jsupdate && $this->how !== 'qreply') {
+        if ($PAGE->jsupdate && $this->how != 'qreply') {
             return;
         }
-        if ($USER && $this->how === 'qreply') {
+        if ($USER && $this->how == 'qreply') {
             $PAGE->JS('closewindow', '#qreply');
         }
         if ($tid) {
             $result = $DB->safespecial(
                 <<<'EOT'
-                    SELECT t.`title` AS `title`,f.`perms` AS `perms`
-                    FROM %t t
-                    LEFT JOIN %t f
-                        ON t.`fid`=f.`id`
-                    WHERE t.`id`=?
-                    EOT
+SELECT t.`title` AS `title`,f.`perms` AS `perms`
+FROM %t t
+LEFT JOIN %t f
+    ON t.`fid`=f.`id`
+WHERE t.`id`=?
+EOT
                 ,
                 ['topics', 'forums'],
                 $DB->basicvalue($tid)
@@ -312,24 +310,24 @@ onclick="this.form.submitButton=this" /></div>
 
             $result = $DB->safespecial(
                 <<<'EOT'
-                    SELECT p.`id` AS `id`,p.`auth_id` AS `auth_id`,p.`post` AS `post`,
-                        UNIX_TIMESTAMP(p.`date`) AS `date`,p.`showsig` AS `showsig`,
-                        p.`showemotes` AS `showemotes`,
-                    	p.`tid` AS `tid`,p.`newtopic` AS `newtopic`,INET6_NTOA(p.`ip`) AS `ip`,
-                        UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`,p.`editby` AS `editby`,
-                        p.`rating` AS `rating`,m.`display_name` AS `name`
-                    FROM %t p
-                    LEFT JOIN %t m
-                        ON p.`auth_id`=m.`id`
-                    WHERE p.`id` IN ?
-                    EOT
+SELECT p.`id` AS `id`,p.`auth_id` AS `auth_id`,p.`post` AS `post`,
+    UNIX_TIMESTAMP(p.`date`) AS `date`,p.`showsig` AS `showsig`,
+    p.`showemotes` AS `showemotes`,
+	p.`tid` AS `tid`,p.`newtopic` AS `newtopic`,INET6_NTOA(p.`ip`) AS `ip`,
+    UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`,p.`editby` AS `editby`,
+    p.`rating` AS `rating`,m.`display_name` AS `name`
+FROM %t p
+LEFT JOIN %t m
+    ON p.`auth_id`=m.`id`
+WHERE p.`id` IN ?
+EOT
                 ,
                 ['posts', 'members'],
                 $SESS->vars['multiquote']
             );
 
             while ($f = $DB->arow($result)) {
-                $postdata .= '[quote='.$f['name'].']'.$f['post'].'[/quote]'.\PHP_EOL;
+                $postdata .= '[quote='.$f['name'].']'.$f['post'].'[/quote]'.PHP_EOL;
             }
             $SESS->delvar('multiquote');
         }
@@ -363,7 +361,7 @@ onclick="this.form.submitButton=this"/></div>
         return ($post['auth_id']
             && ($post['newtopic'] ? $PERMS['can_edit_topics'] :
             $PERMS['can_edit_posts'])
-            && $post['auth_id'] === $USER['id'])
+            && $post['auth_id'] == $USER['id'])
             || $this->canmoderate($post['tid']);
     }
 
@@ -385,7 +383,7 @@ onclick="this.form.submitButton=this"/></div>
             );
             $mods = $DB->arow($result);
             $DB->disposeresult($result);
-            if (in_array($USER['id'], explode(',', $mods['mods']), true)) {
+            if (in_array($USER['id'], explode(',', $mods['mods']))) {
                 $canmod = true;
             }
         }
@@ -412,10 +410,10 @@ onclick="this.form.submitButton=this"/></div>
         if (! $e) {
             $result = $DB->safeselect(
                 <<<'EOT'
-                    `id`,`auth_id`,`post`,UNIX_TIMESTAMP(`date`) AS `date`,`showsig`,`showemotes`,
-                        `tid`,`newtopic`,INET6_NTOA(`ip`) AS `ip`,
-                        UNIX_TIMESTAMP(`edit_date`) AS `edit_date`,`editby`,`rating`
-                    EOT
+`id`,`auth_id`,`post`,UNIX_TIMESTAMP(`date`) AS `date`,`showsig`,`showemotes`,
+    `tid`,`newtopic`,INET6_NTOA(`ip`) AS `ip`,
+    UNIX_TIMESTAMP(`edit_date`) AS `edit_date`,`editby`,`rating`
+EOT
                 ,
                 'posts',
                 'WHERE `id`=?',
@@ -439,11 +437,11 @@ onclick="this.form.submitButton=this"/></div>
             } else {
                 $result = $DB->safeselect(
                     <<<'EOT'
-                        `id`,`title`,`subtitle`,`lp_uid`,UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,
-                        `fid`,`auth_id`,`replies`,`views`,
-                        `pinned`,`poll_choices`,`poll_results`,`poll_q`,`poll_type`,`summary`,
-                        `locked`,UNIX_TIMESTAMP(`date`) AS `date`,`op`,`cal_event`
-                        EOT
+`id`,`title`,`subtitle`,`lp_uid`,UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,
+`fid`,`auth_id`,`replies`,`views`,
+`pinned`,`poll_choices`,`poll_results`,`poll_q`,`poll_type`,`summary`,
+`locked`,UNIX_TIMESTAMP(`date`) AS `date`,`op`,`cal_event`
+EOT
                     ,
                     'topics',
                     'WHERE `id`=?',
@@ -465,7 +463,7 @@ onclick="this.form.submitButton=this"/></div>
                             'subtitle' => $JAX->blockhtml($JAX->p['tdesc']),
                             'summary' => mb_substr(
                                 preg_replace(
-                                    '@\s+@',
+                                    '@\\s+@',
                                     ' ',
                                     $JAX->wordfilter($JAX->blockhtml($JAX->textonly($this->postdata)))
                                 ),
@@ -517,7 +515,7 @@ onclick="this.form.submitButton=this"/></div>
         $newtopic = false;
         $time = time();
         $uid = $USER['id'];
-        $uname = $USER['name'] ?? '';
+        $uname = isset($USER['name']) ? $USER['name'] : '';
         $e = '';
 
         if (! $this->nopost && trim($postdata) === '') {
@@ -526,7 +524,7 @@ onclick="this.form.submitButton=this"/></div>
             $e = 'Post must not exceed 50,000 characters.';
         }
 
-        if (! $e && $this->how === 'newtopic') {
+        if (! $e && $this->how == 'newtopic') {
             if (! $fid || ! is_numeric($fid)) {
                 $e = 'No forum specified exists.';
             } elseif (
@@ -571,8 +569,8 @@ onclick="this.form.submitButton=this"/></div>
                 $fdata['perms'] = $JAX->parseperms($fdata['perms'], $USER ? $USER['group_id'] : 3);
                 if (! $fdata['perms']['start']) {
                     $e = <<<'EOT'
-                        You don't have permission to post a new topic in that forum.
-                        EOT;
+You don't have permission to post a new topic in that forum.
+EOT;
                 }
                 if (
                     ((isset($JAX->p['poll_type']) && $JAX->p['poll_type'])
@@ -596,13 +594,14 @@ onclick="this.form.submitButton=this"/></div>
                         'auth_id' => $uid,
                         'replies' => 0,
                         'views' => 0,
-                        'poll_type' => $JAX->p['poll_type'] ?? '',
+                        'poll_type' => isset($JAX->p['poll_type']) ?
+                            $JAX->p['poll_type'] : '',
                         'poll_q' => isset($JAX->p['pollq']) ?
                             $JAX->blockhtml($JAX->p['pollq']) : '',
                         'poll_choices' => isset($pollchoices) && $pollchoices ?
                         $JAX->json_encode($pollchoices) : '',
                         'summary' => mb_substr(
-                            preg_replace('@\s+@', ' ', $JAX->blockhtml($JAX->textonly($this->postdata))),
+                            preg_replace('@\\s+@', ' ', $JAX->blockhtml($JAX->textonly($this->postdata))),
                             0,
                             50
                         ),
@@ -617,7 +616,7 @@ onclick="this.form.submitButton=this"/></div>
             $PAGE->append('PAGE', $PAGE->error($e));
             $PAGE->JS('error', $e);
             $PAGE->JS('enable', 'submitbutton');
-            if ($this->how === 'newtopic') {
+            if ($this->how == 'newtopic') {
                 $this->showtopicform();
             } else {
                 $this->showpostform();
@@ -629,13 +628,13 @@ onclick="this.form.submitButton=this"/></div>
         if ($tid && is_numeric($tid)) {
             $result = $DB->safespecial(
                 <<<'EOT'
-                    SELECT t.`title` AS `topictitle`,f.`id` AS `id`,f.`path` AS `path`,
-                        f.`perms` AS `perms`,f.`nocount` AS `nocount`,t.`locked` AS `locked`
-                    FROM %t t
-                    LEFT JOIN %t f
-                        ON t.`fid`=f.`id`
-                        WHERE t.`id`=?
-                    EOT
+SELECT t.`title` AS `topictitle`,f.`id` AS `id`,f.`path` AS `path`,
+    f.`perms` AS `perms`,f.`nocount` AS `nocount`,t.`locked` AS `locked`
+FROM %t t
+LEFT JOIN %t f
+    ON t.`fid`=f.`id`
+    WHERE t.`id`=?
+EOT
                 ,
                 ['topics', 'forums'],
                 $tid
@@ -702,10 +701,10 @@ onclick="this.form.submitButton=this"/></div>
         if (! $newtopic) {
             $DB->safespecial(
                 <<<'EOT'
-                    UPDATE %t
-                    SET `lp_uid` = ?, `lp_date` = ?, `replies` = `replies` + 1
-                    WHERE `id`=?
-                    EOT
+UPDATE %t
+SET `lp_uid` = ?, `lp_date` = ?, `replies` = `replies` + 1
+WHERE `id`=?
+EOT
                 ,
                 ['topics'],
                 $uid,
@@ -716,18 +715,18 @@ onclick="this.form.submitButton=this"/></div>
 
         // Do some magic to update the tree all the way up (for subforums).
         $path = trim($fdata['path']) ? explode(' ', $fdata['path']) : [];
-        if (! in_array($fdata['id'], $path, true)) {
+        if (! in_array($fdata['id'], $path)) {
             $path[] = $fdata['id'];
         }
 
         if ($newtopic) {
             $DB->safespecial(
                 <<<'EOT'
-                    UPDATE %t
-                    SET `lp_uid`= ?, `lp_tid` = ?, `lp_topic` = ?, `lp_date` = ?,
-                        `topics` = `topics` + 1
-                    WHERE `id` IN ?
-                    EOT
+UPDATE %t
+SET `lp_uid`= ?, `lp_tid` = ?, `lp_topic` = ?, `lp_date` = ?,
+    `topics` = `topics` + 1
+WHERE `id` IN ?
+EOT
                 ,
                 ['forums'],
                 $uid,
@@ -739,11 +738,11 @@ onclick="this.form.submitButton=this"/></div>
         } else {
             $DB->safespecial(
                 <<<'EOT'
-                    UPDATE %t
-                    SET `lp_uid`= ?, `lp_tid` = ?, `lp_topic` = ?, `lp_date` = ?,
-                        `posts` = `posts` + 1
-                    WHERE `id` IN ?
-                    EOT
+UPDATE %t
+SET `lp_uid`= ?, `lp_tid` = ?, `lp_topic` = ?, `lp_date` = ?,
+    `posts` = `posts` + 1
+WHERE `id` IN ?
+EOT
                 ,
                 ['forums'],
                 $uid,
@@ -758,10 +757,10 @@ onclick="this.form.submitButton=this"/></div>
         if (! $fdata['nocount']) {
             $DB->safespecial(
                 <<<'EOT'
-                    UPDATE %t
-                    SET `posts` = `posts` + 1
-                    WHERE `id`=?
-                    EOT
+UPDATE %t
+SET `posts` = `posts` + 1
+WHERE `id`=?
+EOT
                 ,
                 ['members'],
                 $DB->basicvalue($JAX->userData['id'])
@@ -770,15 +769,15 @@ onclick="this.form.submitButton=this"/></div>
 
         if ($newtopic) {
             $DB->safespecial(<<<'EOT'
-                UPDATE %t
-                SET `posts` = `posts` + 1, `topics` = `topics` + 1
-                EOT
+UPDATE %t
+SET `posts` = `posts` + 1, `topics` = `topics` + 1
+EOT
                 , ['stats']);
         } else {
             $DB->safespecial('UPDATE %t SET `posts` = `posts` + 1', ['stats']);
         }
 
-        if ($this->how === 'qreply') {
+        if ($this->how == 'qreply') {
             $PAGE->JS('closewindow', '#qreply');
             $PAGE->JS('refreshdata');
         } else {

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 if (isset($_GET['json'])) {
     chdir('..');
     require 'config.php';

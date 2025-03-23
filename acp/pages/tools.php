@@ -1,9 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
 if (! defined(INACP)) {
-    exit;
+    exit();
 }
 
 new tools();
@@ -25,7 +23,7 @@ class tools
                     'url' => '?act=tools&do='.$do,
                     'title' => $title,
                 ]
-            ).\PHP_EOL;
+            ).PHP_EOL;
         }
 
         $PAGE->sidebar($PAGE->parseTemplate('sidebar-list.html', [
@@ -45,15 +43,15 @@ class tools
         }
     }
 
-    public function filemanager(): void
+    public function filemanager()
     {
         global $PAGE,$DB,$JAX,$CFG;
         $page = '';
         if (isset($JAX->b['delete']) && is_numeric($JAX->b['delete'])) {
             $result = $DB->safeselect(
                 <<<'EOT'
-                    `id`,`name`,`hash`,`uid`,`size`,`downloads`,INET6_NTOA(`ip`) AS `ip`
-                    EOT
+`id`,`name`,`hash`,`uid`,`size`,`downloads`,INET6_NTOA(`ip`) AS `ip`
+EOT
                 ,
                 'files',
                 'WHERE `id`=?',
@@ -62,14 +60,14 @@ class tools
             $f = $DB->arow($result);
             $DB->disposeresult($result);
             if ($f) {
-                $ext = mb_strtolower(pathinfo($f['name'], \PATHINFO_EXTENSION));
-                if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp'], true)) {
+                $ext = mb_strtolower(pathinfo($f['name'], PATHINFO_EXTENSION));
+                if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp'])) {
                     $f['hash'] .= '.'.$ext;
                 }
                 if (is_writable(BOARDPATH.'Uploads/'.$f['hash'])) {
                     $page .= unlink(BOARDPATH.'Uploads/'.$f['hash']) ?
                         $PAGE->success('File deleted') :
-                        $PAGE->error('Error deleting file, maybe it\'s already been deleted? Removed from DB');
+                        $PAGE->error('Error deleting file, maybe it\'s already been '.'deleted? Removed from DB');
                 }
                 $DB->safedelete('files', 'WHERE `id`=?', $DB->basicvalue($JAX->b['delete']));
             }
@@ -92,7 +90,7 @@ class tools
         );
         $linkedin = [];
         while ($f = $DB->arow($result)) {
-            preg_match_all('@\[attachment\](\d+)\[/attachment\]@', $f['post'], $m);
+            preg_match_all('@\\[attachment\\](\\d+)\\[/attachment\\]@', $f['post'], $m);
             foreach ($m[1] as $v) {
                 $linkedin[$v][] = $PAGE->parseTemplate(
                     'tools/attachment-link.html',
@@ -105,14 +103,14 @@ class tools
         }
         $result = $DB->safespecial(
             <<<'EOT'
-                SELECT f.`id` AS `id`,f.`name` AS `name`,f.`hash` AS `hash`,f.`uid` AS `uid`,
-                    f.`size` AS `size`,f.`downloads` AS `downloads`,INET6_NTOA(f.`ip`) AS `ip`,
-                    m.`display_name` AS `uname`
-                FROM %t f
-                LEFT JOIN %t m
-                    ON f.`uid`=m.`id`
-                ORDER BY f.`size` DESC
-                EOT
+SELECT f.`id` AS `id`,f.`name` AS `name`,f.`hash` AS `hash`,f.`uid` AS `uid`,
+    f.`size` AS `size`,f.`downloads` AS `downloads`,INET6_NTOA(f.`ip`) AS `ip`,
+    m.`display_name` AS `uname`
+FROM %t f
+LEFT JOIN %t m
+    ON f.`uid`=m.`id`
+ORDER BY f.`size` DESC
+EOT
             ,
             ['files', 'members']
         );
@@ -123,7 +121,7 @@ class tools
             if (count($filepieces) > 1) {
                 $ext = mb_strtolower(array_pop($filepieces));
             }
-            if (in_array($ext, $CFG['images'], true)) {
+            if (in_array($ext, $CFG['images'])) {
                 $file['name'] = '<a href="'.
                     BOARDPATHURL.'Uploads/'.$file['hash'].'.'.$ext.'">'.
                     $file['name'].'</a>';
@@ -143,7 +141,7 @@ class tools
                     'linked_in' => isset($linkedin[$file['id']]) && $linkedin[$file['id']] ?
                         implode(', ', $linkedin[$file['id']]) : 'Not linked!',
                 ]
-            ).\PHP_EOL;
+            ).PHP_EOL;
         }
         $page .= $table ? $PAGE->parseTemplate(
             'tools/file-manager.html',
@@ -154,7 +152,7 @@ class tools
         $PAGE->addContentBox('File Manager', $page);
     }
 
-    public function backup(): void
+    public function backup()
     {
         global $JAX,$PAGE,$DB;
         if (isset($JAX->p['dl']) && $JAX->p['dl']) {
@@ -164,23 +162,23 @@ class tools
             $tables = $DB->rows($result);
             $page = '';
             if ($tables) {
-                echo \PHP_EOL."-- Jaxboards Backup {$DB->prefix} ".
-                    date('Y-m-d H:i:s').\PHP_EOL.\PHP_EOL;
-                echo 'SET NAMES utf8mb4;'.\PHP_EOL;
-                echo "SET time_zone = '+00:00';".\PHP_EOL;
-                echo 'SET foreign_key_checks = 0;'.\PHP_EOL;
-                echo "SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';".\PHP_EOL;
-                echo \PHP_EOL;
+                echo PHP_EOL."-- Jaxboards Backup {$DB->prefix} ".
+                    date('Y-m-d H:i:s').PHP_EOL.PHP_EOL;
+                echo 'SET NAMES utf8mb4;'.PHP_EOL;
+                echo "SET time_zone = '+00:00';".PHP_EOL;
+                echo 'SET foreign_key_checks = 0;'.PHP_EOL;
+                echo "SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';".PHP_EOL;
+                echo PHP_EOL;
                 foreach ($tables as $f) {
                     $f[0] = mb_substr(mb_strstr($f[0], '_'), 1);
                     $page .= $f[0];
-                    echo \PHP_EOL.'-- '.$f[0].\PHP_EOL.\PHP_EOL;
+                    echo PHP_EOL.'-- '.$f[0].PHP_EOL.PHP_EOL;
                     $createtable = $DB->safespecial('SHOW CREATE TABLE %t', [$f[0]]);
                     $thisrow = $DB->row($createtable);
                     if ($thisrow) {
                         $table = $DB->ftable($f[0]);
-                        echo "DROP TABLE IF EXISTS {$table};".\PHP_EOL;
-                        echo array_pop($thisrow).';'.\PHP_EOL;
+                        echo "DROP TABLE IF EXISTS {$table};".PHP_EOL;
+                        echo array_pop($thisrow).';'.PHP_EOL;
                         $DB->disposeresult($createtable);
                         // Only time I really want to use *.
                         $select = $DB->safeselect('*', $f[0]);
@@ -189,16 +187,16 @@ class tools
                             $columns = $insert[0];
                             $values = $insert[1];
                             echo "INSERT INTO {$table} ({$columns}) ".
-                                "VALUES {$values};".\PHP_EOL;
+                                "VALUES {$values};".PHP_EOL;
                         }
-                        echo \PHP_EOL;
+                        echo PHP_EOL;
                     }
                 }
-                echo \PHP_EOL;
-                echo 'SET foreign_key_checks = 1;'.\PHP_EOL;
-                echo \PHP_EOL;
+                echo PHP_EOL;
+                echo 'SET foreign_key_checks = 1;'.PHP_EOL;
+                echo PHP_EOL;
             }
-            exit;
+            exit();
         }
         $PAGE->addContentBox('Backup Forum', $PAGE->parseTemplate('tools/backup.html'));
     }

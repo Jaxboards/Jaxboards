@@ -1,15 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
 new IM();
 class IM
 {
     public function __construct()
     {
         global $JAX,$DB,$PAGE,$SESS;
-        $im = $JAX->p['im_im'] ?? null;
-        $uid = $JAX->p['im_uid'] ?? null;
+        $im = isset($JAX->p['im_im']) ? $JAX->p['im_im'] : null;
+        $uid = isset($JAX->p['im_uid']) ? $JAX->p['im_uid'] : null;
         if ($SESS->runonce) {
             $this->filter();
         }
@@ -22,7 +20,7 @@ class IM
         }
     }
 
-    public function filter(): void
+    public function filter()
     {
         global $SESS,$USER,$PAGE;
         if (! $USER['enemies']) {
@@ -31,12 +29,12 @@ class IM
         $enemies = explode(',', $USER['enemies']);
         // Kinda gross I know, unparses then parses then
         // unparses again later on.. Oh well.
-        $exploded = explode(\PHP_EOL, $SESS->runonce);
+        $exploded = explode(PHP_EOL, $SESS->runonce);
         foreach ($exploded as $k => $v) {
             $v = json_decode($v);
-            if ($v[0] === 'im') {
+            if ($v[0] == 'im') {
                 unset($exploded[$k]);
-                if (in_array($v[1], $enemies, true)) {
+                if (in_array($v[1], $enemies)) {
                     // This user's blocked, don't do anything.
                 } else {
                     // Send it on up.
@@ -44,7 +42,7 @@ class IM
                 }
             }
         }
-        $SESS->runonce = implode(\PHP_EOL, $exploded);
+        $SESS->runonce = implode(PHP_EOL, $exploded);
     }
 
     public function message($uid, $im)
@@ -54,7 +52,7 @@ class IM
         $ud = $USER;
         $e = '';
         $fatal = false;
-        if (false && in_array($uid, explode(',', $USER['enemies']), true)) {
+        if (false && in_array($uid, explode(',', $USER['enemies']))) {
             return $PAGE->JS(
                 'error',
                 "You've blocked this recipient and cannot send messages to them."
@@ -106,22 +104,22 @@ class IM
         }
         $result = $DB->safespecial(
             <<<'EOT'
-                UPDATE %t
-                SET `runonce`=CONCAT(`runonce`,?)
-                WHERE `uid`=? AND `last_update`> ?
-                EOT
+UPDATE %t
+SET `runonce`=CONCAT(`runonce`,?)
+WHERE `uid`=? AND `last_update`> ?
+EOT
             ,
             ['session'],
-            $DB->basicvalue(json_encode($cmd).\PHP_EOL),
+            $DB->basicvalue(json_encode($cmd).PHP_EOL),
             $uid,
-            date('Y-m-d H:i:s', time() - $CFG['updateinterval'] * 5)
+            date('Y-m-d H:i:s', (time() - $CFG['updateinterval'] * 5))
         );
 
-        return $DB->affected_rows(1) !== 0;
+        return $DB->affected_rows(1) != 0;
     }
 
     // Stuff I'm doing.
-    public function invite($room, $uid, $otherguy = false): void
+    public function invite($room, $uid, $otherguy = false)
     {
         global $USER,$CFG,$DB;
         if (! $USER['id']) {
@@ -137,7 +135,7 @@ class IM
         $this->sendcmd(['iminvite', $room]);
     }
 
-    public function immenu($id): void
+    public function immenu($id)
     {
         global $PAGE,$JAX,$USER,$DB;
         if ($JAX->b['im_invitemenu']) {
@@ -150,7 +148,7 @@ class IM
             );
             $menu = '';
             while ($f = $DB->arow($result)) {
-                if ($online[$f['id']] && $f['id'] !== $id) {
+                if ($online[$f['id']] && $f['id'] != $id) {
                     $menu .= $f['name'].'<br />';
                 }
             }

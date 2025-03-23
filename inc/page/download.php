@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 new downloader();
 class downloader
 {
@@ -12,8 +10,8 @@ class downloader
         if (is_numeric($id)) {
             $result = $DB->safeselect(
                 <<<'EOT'
-                    `id`,`name`,`hash`,`uid`,`size`,`downloads`,INET6_NTOA(`ip`) AS `ip`
-                    EOT
+`id`,`name`,`hash`,`uid`,`size`,`downloads`,INET6_NTOA(`ip`) AS `ip`
+EOT
                 ,
                 'files',
                 'WHERE `id`=?',
@@ -25,21 +23,21 @@ class downloader
         if ($data) {
             $DB->safespecial(
                 <<<'EOT'
-                    UPDATE %t
-                    SET `downloads` = `downloads` + 1
-                    WHERE `id`=?
-                    EOT
+UPDATE %t
+SET `downloads` = `downloads` + 1
+WHERE `id`=?
+EOT
                 ,
                 ['files'],
                 $id
             );
             $ext = explode('.', $data['name']);
-            if (count($ext) === 1) {
+            if (count($ext) == 1) {
                 $ext = '';
             } else {
                 $ext = mb_strtolower(array_pop($ext));
             }
-            if (in_array($ext, ['jpeg', 'jpg', 'png', 'gif', 'bmp'], true)) {
+            if (in_array($ext, ['jpeg', 'jpg', 'png', 'gif', 'bmp'])) {
                 $data['hash'] .= '.'.$ext;
             }
             $file = BOARDPATH.'Uploads/'.$data['hash'];
@@ -51,7 +49,7 @@ class downloader
                 header('Content-disposition:attachment;filename="'.$data['name'].'"');
                 readfile($file);
             }
-            exit;
+            exit();
         }
     }
 }
