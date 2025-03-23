@@ -26,9 +26,9 @@ jobs:
         shell: bash
       - run: npm run-script lint
       - run: >
-            php php_codesniffer_to_sonarqube.php
-            phpcs-report.json
-            phpcs-report-sonarqube.json
+          php php_codesniffer_to_sonarqube.php
+          phpcs-report.json
+          phpcs-report-sonarqube.json
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
         env:
