@@ -15,6 +15,7 @@
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', dirname(__DIR__));
 }
+
 if (!defined('SERVICE_ROOT')) {
     define('SERVICE_ROOT', __DIR__);
 }
@@ -60,18 +61,20 @@ if ($CFG['service']) {
 
     try {
         $DB->select_db('jaxboards_service');
-    } catch (Exception $e) {
+    } catch (Exception) {
         $serviceDB = false;
     }
+
     if ($DB->db !== 'jaxboards_service') {
         $serviceDB = false;
     }
+
     if ($serviceDB) {
         $result = $DB->safequery("SHOW TABLES LIKE '%%'");
         $tables = $DB->rows($result);
         foreach ($tables as $table) {
             $table = $table[0];
-            if (mb_strpos($table, 'blueprint_') === false) {
+            if (mb_strpos((string) $table, 'blueprint_') === false) {
                 // Ignore blueprint tables.
                 $result = $DB->safespecial(
                     'SHOW CREATE TABLE %t',
@@ -91,10 +94,12 @@ if ($CFG['service']) {
                             . "VALUES {$values};";
                     }
                 }
+
                 $DB->disposeresult($result);
             }
         }
     }
+
     $DB->select_db($CFG['sql_db']);
 
     // Queries to update directory table.
@@ -185,6 +190,7 @@ if ($CFG['service']) {
         );
         $DB->disposeresult($result);
     }
+
     // Check if IP field needs update.
     $result = $DB->safequery(
         <<<'EOT'
@@ -219,7 +225,7 @@ if ($CFG['service']) {
     $createTableStatement = $DB->row($result);
     $createTableStatement = array_pop($createTableStatement);
     $DB->disposeresult($result);
-    if (!preg_match('/KEY\s+`boardname`/i', $createTableStatement)) {
+    if (!preg_match('/KEY\s+`boardname`/i', (string) $createTableStatement)) {
         $result = $DB->safequery(
             <<<'EOT'
                 ALTER TABLE `directory`
@@ -228,11 +234,12 @@ if ($CFG['service']) {
         );
         $DB->disposeresult($result);
     }
+
     $result = $DB->safequery('SHOW CREATE TABLE `banlist`;');
     $createTableStatement = $DB->row($result);
     $createTableStatement = array_pop($createTableStatement);
     $DB->disposeresult($result);
-    if (!preg_match('/UNIQUE\s+`ip`/i', $createTableStatement)) {
+    if (!preg_match('/UNIQUE\s+`ip`/i', (string) $createTableStatement)) {
         $result = $DB->safequery(
             <<<'EOT'
                 ALTER TABLE `banlist`
@@ -247,6 +254,7 @@ if ($CFG['service']) {
     while ($row = $DB->arow($result)) {
         $boards[] = $row['board'];
     }
+
     $DB->disposeresult($result);
 } else {
     $boards[] = $CFG['prefix'];
@@ -853,12 +861,6 @@ $dateFixes = [
             'pos' => 'reason',
         ],
     ],
-    'reports' => [
-        'time' => [
-            'new' => 'date',
-            'pos' => 'reason',
-        ],
-    ],
     'session' => [
         'last_update' => [
             'new' => 'last_update',
@@ -932,6 +934,7 @@ foreach ($boards as $board) {
             $DB->disposeresult($result);
         }
     }
+
     foreach ($nullToInt as $table => $columns) {
         $table = $DB->ftable($table);
         foreach ($columns as $column) {
@@ -981,6 +984,7 @@ foreach ($boards as $board) {
         );
         $DB->disposeresult($fixresult);
     }
+
     $DB->disposeresult($result);
 
     $queries = [
@@ -1422,6 +1426,7 @@ foreach ($boards as $board) {
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
             EOT;
     }
+
     foreach ($queries as $query) {
         $query = str_replace('blueprint_', $board . '_', $query);
         $result = $DB->safequery($query);
@@ -1433,7 +1438,7 @@ foreach ($boards as $board) {
     $result = $DB->safequery("SHOW CREATE TABLE {$table}");
     $createTableStatement = $DB->row($result);
     $createTableStatement = array_pop($createTableStatement);
-    if (!preg_match('/KEY\s+`hash`/i', $createTableStatement)) {
+    if (!preg_match('/KEY\s+`hash`/i', (string) $createTableStatement)) {
         $result = $DB->safequery(
             <<<EOT
                 ALTER TABLE {$table}
@@ -1454,11 +1459,13 @@ foreach ($boards as $board) {
                 $tableColumns[] = mb_strtolower($row['Field']);
             }
         }
+
         foreach ($columns as $old => $info) {
             if (!in_array($old, $tableColumns)) {
                 // Can't run if table doesn't exist.
                 continue;
             }
+
             // Check if update is necessary.
             $result = $DB->safequery(
                 <<<EOT
@@ -1507,6 +1514,7 @@ foreach ($boards as $board) {
             $columns[] = mb_strtolower($row['Field']);
         }
     }
+
     $DB->disposeresult($result);
     if (
         in_array('dob_year', $columns)
@@ -1627,11 +1635,12 @@ foreach ($boards as $board) {
                 );
                 $DB->disposeresult($result);
             }
+
             if (
                 !preg_match(
                     "/FOREIGN\\s+KEY\\s+\\(`{$column}`\\)\\s+REFERENCES\\s+"
                     . "{$foreign['table']}\\s+\\(`{$foreign['column']}`\\)/i",
-                    $createTableStatement,
+                    (string) $createTableStatement,
                 )
             ) {
                 $result = $DB->safequery(

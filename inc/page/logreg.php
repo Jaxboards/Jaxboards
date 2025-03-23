@@ -10,38 +10,14 @@ class LOGREG
     {
         global $JAX,$PAGE;
 
-        switch (mb_substr($JAX->b['act'], 6)) {
-            case 1:
-                $this->register();
-
-                break;
-
-            case 2:
-                $this->logout();
-
-                break;
-
-            case 4:
-                $this->loginpopup();
-
-                break;
-
-            case 3:
-            default:
-                $this->login($JAX->p['user'], $JAX->p['pass']);
-
-                break;
-
-            case 5:
-                $this->toggleinvisible();
-
-                break;
-
-            case 6:
-                $this->forgotpassword($JAX->b['uid'], $JAX->b['id']);
-
-                break;
-        }
+        match ((int) mb_substr((string) $JAX->b['act'], 6)) {
+            1 => $this->register(),
+            2 => $this->logout(),
+            4 => $this->loginpopup(),
+            5 => $this->toggleinvisible(),
+            6 => $this->forgotpassword($JAX->b['uid'], $JAX->b['id']),
+            default => $this->login($JAX->p['user'], $JAX->p['pass']),
+        };
     }
 
     private function isHuman()
@@ -58,8 +34,9 @@ class LOGREG
 
             $fields_string = '';
             foreach ($fields as $k => $v) {
-                $fields_string .= $k . '=' . urlencode($v) . '&';
+                $fields_string .= $k . '=' . urlencode((string) $v) . '&';
             }
+
             rtrim($fields_string, '&');
 
             $curl_request = curl_init();
@@ -73,8 +50,6 @@ class LOGREG
             $result = json_decode(curl_exec($curl_request), true);
 
             return $result['success'];
-
-            curl_close($curl_request);
         }
 
         // If recaptcha is not configured, we have to assume that they are in fact human.
@@ -89,6 +64,7 @@ class LOGREG
         if (isset($JAX->p['username']) && $JAX->p['username']) {
             $PAGE->location('?');
         }
+
         $name = isset($JAX->p['name']) ? trim($JAX->p['name']) : '';
         $dispname = isset($JAX->p['display_name'])
             ? trim($JAX->p['display_name']) : '';
@@ -100,6 +76,7 @@ class LOGREG
         if (isset($CFG['recaptcha']) && $CFG['recaptcha']) {
             $recaptcha = $PAGE->meta('anti-spam', $CFG['recaptcha']['public_key']);
         }
+
         $p = $PAGE->meta('register-form', $recaptcha);
 
         // Show registration form.
@@ -118,18 +95,22 @@ class LOGREG
                     . ' administrator.',
                 );
             }
+
             if (!$name || !$dispname) {
                 throw new Exception('Name and display name required.');
             }
+
             if ($pass1 != $pass2) {
                 throw new Exception('The passwords do not match.');
             }
+
             if (
                 mb_strlen($dispname) > 30
                 || mb_strlen($name) > 30
             ) {
                 throw new Exception('Display name and username must be under 30 characters.');
             }
+
             if (
                 ($CFG['badnamechars']
                 && preg_match($CFG['badnamechars'], $name))
@@ -137,21 +118,26 @@ class LOGREG
             ) {
                 throw new Exception('Invalid characters in username!');
             }
+
             if (
                 $CFG['badnamechars']
                 && preg_match($CFG['badnamechars'], $dispname)
             ) {
                 throw new Exception('Invalid characters in display name!');
             }
+
             if (!$JAX->isemail($email)) {
                 throw new Exception("That isn't a valid email!");
             }
+
             if ($JAX->ipbanned()) {
                 throw new Exception('You have been banned from registering on this board.');
             }
+
             if (!$this->isHuman()) {
                 throw new Exception('reCAPTCHA failed. Are you a bot?');
             }
+
             // Are they attempting to use an existing username/display name?
             $dispname = $JAX->blockhtml($dispname);
             $name = $JAX->blockhtml($name);
@@ -168,6 +154,7 @@ class LOGREG
                 if ($f['name'] == $name) {
                     throw new Exception('That username is taken!');
                 }
+
                 if ($f['display_name'] == $dispname) {
                     throw new Exception('That display name is already used by another member.');
                 }
@@ -208,6 +195,8 @@ class LOGREG
             $PAGE->JS('alert', $e);
             $PAGE->append('page', $PAGE->meta('error', $e));
         }
+
+        return null;
     }
 
     public function login($u = false, $p = false): void
@@ -217,6 +206,7 @@ class LOGREG
             if ($SESS->is_bot) {
                 return;
             }
+
             $result = $DB->safeselect(
                 '`id`',
                 'members',
@@ -232,6 +222,7 @@ class LOGREG
                 if (isset($JAX->p['popup']) && $JAX->p['popup']) {
                     $PAGE->JS('closewindow', '#loginform');
                 }
+
                 $_SESSION['uid'] = $f['id'];
                 $logintoken = base64_encode(openssl_random_pseudo_bytes(128));
                 $DB->safeinsert(
@@ -267,8 +258,10 @@ class LOGREG
                 );
                 $PAGE->JS('error', 'Incorrect username/password');
             }
+
             $SESS->erase('location');
         }
+
         $PAGE->append('page', $PAGE->meta('login-form'));
     }
 
@@ -291,6 +284,7 @@ class LOGREG
                 -1,
             );
         }
+
         $SESS->hide = 1;
         $SESS->applyChanges();
         $SESS->getSess(false);
@@ -345,13 +339,11 @@ class LOGREG
     public function toggleinvisible(): void
     {
         global $PAGE,$SESS;
-        if ($SESS->hide) {
-            $SESS->hide = 0;
-        } else {
-            $SESS->hide = 1;
-        }
+        $SESS->hide = $SESS->hide ? 0 : 1;
+
         $SESS->applyChanges();
-        $PAGE->JS('setstatus', $SESS->hide ? 'invisible' : 'online');
+
+        $PAGE->JS('setstatus', $SESS->hide !== 0 ? 'invisible' : 'online');
         $PAGE->JS('softurl');
     }
 
@@ -376,63 +368,62 @@ class LOGREG
             if (!$udata) {
                 $e = 'This link has expired. Please try again.';
             }
+
             $DB->disposeresult($result);
 
-            if ($e) {
+            if ($e !== '') {
                 $page = $PAGE->meta('error', $e);
-            } else {
-                if ($JAX->p['pass1'] && $JAX->p['pass2']) {
-                    if ($JAX->p['pass1'] != $JAX->p['pass2']) {
-                        $page .= $PAGE->meta(
-                            'error',
-                            'The passwords did not match, please try again!',
-                        );
-                    } else {
-                        $DB->safeupdate(
-                            'members',
-                            [
-                                'pass' => password_hash(
-                                    $JAX->p['pass1'],
-                                    PASSWORD_DEFAULT,
-                                ),
-                            ],
-                            'WHERE `id`=?',
-                            $DB->basicvalue($udata['id']),
-                        );
-                        // Delete all forgotpassword tokens for this user.
-                        $DB->safedelete(
-                            'tokens',
-                            "WHERE `uid`=? AND `type`='forgotpassword'",
-                            $DB->basicvalue($udata['id']),
-                        );
-
-                        // Get username.
-                        $result = $DB->safeselect(
-                            '`id`,`name`',
-                            'members',
-                            'WHERE `id`=?',
-                            $DB->basicvalue($udata['id']),
-                        );
-                        $udata = $DB->arow($result);
-
-                        // Just making use of the way
-                        // registration redirects to the index.
-                        $this->registering = true;
-
-                        return $this->login($udata['name'], $JAX->p['pass1']);
-                    }
-                } else {
+            } elseif ($JAX->p['pass1'] && $JAX->p['pass2']) {
+                if ($JAX->p['pass1'] != $JAX->p['pass2']) {
                     $page .= $PAGE->meta(
-                        'forgot-password2-form',
-                        $JAX->hiddenFormFields(
-                            [
-                                'uid' => $uid,
-                                'id' => $id,
-                                'act' => 'logreg6',
-                            ],
-                        ),
+                        'error',
+                        'The passwords did not match, please try again!',
                     );
+                } else {
+                    $DB->safeupdate(
+                        'members',
+                        [
+                            'pass' => password_hash(
+                                (string) $JAX->p['pass1'],
+                                PASSWORD_DEFAULT,
+                            ),
+                        ],
+                        'WHERE `id`=?',
+                        $DB->basicvalue($udata['id']),
+                    );
+                    // Delete all forgotpassword tokens for this user.
+                    $DB->safedelete(
+                        'tokens',
+                        "WHERE `uid`=? AND `type`='forgotpassword'",
+                        $DB->basicvalue($udata['id']),
+                    );
+
+                    // Get username.
+                    $result = $DB->safeselect(
+                        '`id`,`name`',
+                        'members',
+                        'WHERE `id`=?',
+                        $DB->basicvalue($udata['id']),
+                    );
+                    $udata = $DB->arow($result);
+
+                    // Just making use of the way
+                    // registration redirects to the index.
+                    $this->registering = true;
+
+                    return $this->login($udata['name'], $JAX->p['pass1']);
                 }
+            } else {
+                $page .= $PAGE->meta(
+                    'forgot-password2-form',
+                    $JAX->hiddenFormFields(
+                        [
+                            'uid' => $uid,
+                            'id' => $id,
+                            'act' => 'logreg6',
+                        ],
+                    ),
+                );
             }
         } else {
             if ($JAX->p['user']) {
@@ -447,9 +438,10 @@ class LOGREG
                         . $JAX->b['user']
                         . '</strong>, sure this is correct?';
                 }
+
                 $DB->disposeresult($result);
 
-                if ($e) {
+                if ($e !== '0') {
                     $page .= $PAGE->meta('error', $e);
                 } else {
                     // Generate token.

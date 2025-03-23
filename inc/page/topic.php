@@ -6,34 +6,50 @@ $IDX = new TOPIC();
 class TOPIC
 {
     public $id = 0;
+
+    /**
+     * @var int
+     */
     public $page = '';
+
+    /**
+     * @var int
+     */
     public $numperpage = 0;
+
     public $canmod = false;
+
     public $firstPostID = 0;
+
     public $lastPostID;
+
     public $topicdata;
 
     public function __construct()
     {
         global $JAX,$PAGE;
 
-        preg_match('@\d+$@', $JAX->b['act'], $act);
-
-        $this->id = $id = $act[0] ?: 0;
+        preg_match('@\d+$@', (string) $JAX->b['act'], $act);
+        $this->id = $act[0] ?: 0;
+        $id = $act[0] ?: 0;
         if (!$id) {
-            return $PAGE->location('?');
+            $PAGE->location('?');
+
+            return;
         }
 
         $this->getTopicData($id);
         if (!$this->topicdata) {
-            // Put the user back on the index and skip these next few lines.
-            return $PAGE->location('?');
+            $PAGE->location('?');
+
+            return;
         }
 
         $this->page = isset($JAX->b['page']) ? (int) $JAX->b['page'] : 0;
         if ($this->page <= 0 || !is_numeric($this->page)) {
             $this->page = 1;
         }
+
         --$this->page;
 
         $this->numperpage = 10;
@@ -121,6 +137,7 @@ class TOPIC
         if ($USER && $this->topicdata['lp_date'] > $USER['last_visit']) {
             $this->markread($id);
         }
+
         if (!$this->topicdata['fperms']['read']) {
             // No business being here.
             return $PAGE->location('?');
@@ -131,7 +148,7 @@ class TOPIC
 
         // Output RSS instead.
         if (isset($JAX->b['fmt']) && $JAX->b['fmt'] == 'RSS') {
-            include_once 'inc/classes/rssfeed.php';
+            include_once __DIR__ . '/inc/classes/rssfeed.php';
             $link = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'];
             $feed = new rssfeed(
                 [
@@ -168,6 +185,7 @@ class TOPIC
                     ],
                 );
             }
+
             $feed->publish();
 
             exit;
@@ -278,6 +296,7 @@ class TOPIC
                     );
             }
         }
+
         $page .= $PAGE->meta('topic-users-online', $usersonline);
 
         // Add in other page elements.
@@ -318,6 +337,8 @@ class TOPIC
         } else {
             $PAGE->append('page', $page);
         }
+
+        return null;
     }
 
     public function update($id): void
@@ -335,14 +356,14 @@ class TOPIC
             && $SESS->vars['topic_lastpage']
         ) {
             $newposts = $this->postsintooutput($SESS->vars['topic_lastpid']);
-            if ($newposts) {
+            if ($newposts !== '' && $newposts !== '0') {
                 $PAGE->JS('appendrows', '#intopic', $newposts);
             }
         }
 
         // Update users online list.
         $list = [];
-        $oldcache = array_flip(explode(',', $SESS->users_online_cache));
+        $oldcache = array_flip(explode(',', (string) $SESS->users_online_cache));
         $newcache = '';
         foreach ($DB->getUsersOnline() as $f) {
             if ($f['uid'] && $f['location'] == "vt{$id}") {
@@ -356,17 +377,21 @@ class TOPIC
                 } else {
                     unset($oldcache[$f['uid']]);
                 }
+
                 $newcache .= $f['uid'] . ',';
             }
         }
-        if (!empty($list)) {
+
+        if ($list !== []) {
             $PAGE->JS('onlinelist', $list);
         }
+
         $oldcache = implode(',', array_flip($oldcache));
         $newcache = mb_substr($newcache, 0, -1);
-        if ($oldcache) {
+        if ($oldcache !== '' && $oldcache !== '0') {
             $PAGE->JS('setoffline', $oldcache);
         }
+
         $SESS->users_online_cache = $newcache;
     }
 
@@ -398,14 +423,16 @@ class TOPIC
 
                     MySQL,
                 ['posts', 'members'],
-                explode(',', $SESS->vars['multiquote']),
+                explode(',', (string) $SESS->vars['multiquote']),
             );
 
             while ($f = $DB->arow($result)) {
                 $prefilled .= '[quote=' . $f['name'] . ']' . $f['post'] . '[/quote]' . PHP_EOL;
             }
+
             $SESS->delvar('multiquote');
         }
+
         $result = $DB->safeselect(
             'title',
             'topics',
@@ -431,11 +458,12 @@ class TOPIC
         $PAGE->JS('updateqreply', '');
     }
 
-    public function postsintooutput($lastpid = 0)
+    public function postsintooutput($lastpid = 0): string
     {
         global $DB,$PAGE,$JAX,$SESS,$USER,$PERMS,$CFG;
         $usersonline = $DB->getUsersOnline();
-        $postrating = $showrating = '';
+        $postrating = '';
+        $showrating = '';
 
         $topic_post_counter = 0;
 
@@ -586,17 +614,20 @@ class TOPIC
             if (!$this->firstPostID) {
                 $this->firstPostID = $post['pid'];
             }
+
             $postt = $post['post'];
 
             $postt = $JAX->theworks($postt);
 
             // Post rating content goes here.
             if (isset($CFG['ratings']) && $CFG['ratings'] & 1) {
-                $postrating = $showrating = '';
+                $postrating = '';
+                $showrating = '';
                 $prating = [];
                 if ($post['rating']) {
-                    $prating = json_decode($post['rating'], true);
+                    $prating = json_decode((string) $post['rating'], true);
                 }
+
                 $rniblets = $DB->getRatingNiblets();
                 if ($rniblets) {
                     foreach ($rniblets as $k => $v) {
@@ -617,10 +648,11 @@ class TOPIC
                             ) . $num;
                         }
                     }
+
                     $postrating = $PAGE->meta(
                         'rating-wrapper',
                         $postrating,
-                        !($CFG['ratings'] & 2)
+                        ($CFG['ratings'] & 2) === 0
                         ? '<a href="?act=vt' . $this->id
                         . '&amp;listrating=' . $post['pid'] . '">(List)</a>' : '',
                         $showrating,
@@ -709,23 +741,24 @@ class TOPIC
             );
             $lastpid = $post['pid'];
         }
+
         $this->lastPostID = $lastpid;
         $SESS->addvar('topic_lastpid', $lastpid);
 
         return $rows;
     }
 
-    public function canedit($post)
+    public function canedit($post): bool
     {
         global $PERMS,$USER;
+        if ($this->canmoderate()) {
+            return true;
+        }
 
-        return $this->canmoderate()
-            || (
-                $post['auth_id']
-            && ($post['newtopic']
-            ? $PERMS['can_edit_topics'] : $PERMS['can_edit_posts'])
-            && $post['auth_id'] == $USER['id']
-            );
+        return $post['auth_id']
+    && ($post['newtopic']
+    ? $PERMS['can_edit_topics'] : $PERMS['can_edit_posts'])
+    && $post['auth_id'] == $USER['id'];
     }
 
     public function canmoderate()
@@ -734,10 +767,12 @@ class TOPIC
         if ($this->canmod) {
             return $this->canmod;
         }
+
         $canmod = false;
         if ($PERMS['can_moderate']) {
             $canmod = true;
         }
+
         if ($USER && $USER['mod']) {
             $result = $DB->safespecial(
                 <<<'MySQL'
@@ -754,7 +789,7 @@ class TOPIC
             );
             $mods = $DB->arow($result);
             $DB->disposeresult($result);
-            if (in_array($USER['id'], explode(',', $mods['mods']))) {
+            if (in_array($USER['id'], explode(',', (string) $mods['mods']))) {
                 $canmod = true;
             }
         }
@@ -762,11 +797,12 @@ class TOPIC
         return $this->canmod = $canmod;
     }
 
-    public function generatepoll($q, $type, $choices, $results)
+    public function generatepoll($q, $type, $choices, $results): string
     {
         if (!$choices) {
             $choices = [];
         }
+
         global $PAGE,$USER,$JAX;
         $page = '';
         if ($USER) {
@@ -779,17 +815,19 @@ class TOPIC
             $totalvotes = 0;
             $usersvoted = [];
             $numvotes = [];
-            foreach (explode(';', $results) as $k => $v) {
-                $presults[$k] = $v ? explode(',', $v) : [];
+            foreach (explode(';', (string) $results) as $k => $v) {
+                $presults[$k] = $v !== '' && $v !== '0' ? explode(',', $v) : [];
                 $totalvotes += ($numvotes[$k] = count($presults[$k]));
                 if (in_array($USER['id'], $presults[$k])) {
                     $voted = true;
                 }
+
                 foreach ($presults[$k] as $user) {
                     $usersvoted[$user] = 1;
                 }
             }
         }
+
         $usersvoted = count($usersvoted);
         if ($voted) {
             $page .= '<table>';
@@ -801,6 +839,7 @@ class TOPIC
                     . round($numvotes[$k] / $totalvotes * 100)
                     . "%;'></div></td></tr>";
             }
+
             $page .= "<tr><td colspan='3' class='totalvotes'>Total Votes: "
                 . $usersvoted . '</td></tr>';
             $page .= '</table>';
@@ -826,6 +865,7 @@ class TOPIC
                         . "<label for='poll_{$k}'>{$v}</label></div>";
                 }
             }
+
             $page .= "<div class='buttons'><input type='submit' "
                 . "value='Vote'></div></form>";
         }
@@ -856,9 +896,9 @@ class TOPIC
             $numchoices = count($choices);
             $results = $row['poll_results'];
             if ($results) {
-                $results = explode(';', $results);
+                $results = explode(';', (string) $results);
                 foreach ($results as $k => $v) {
-                    $results[$k] = $v ? explode(',', $v) : [];
+                    $results[$k] = $v !== '' && $v !== '0' ? explode(',', $v) : [];
                 }
             } else {
                 $results = [];
@@ -898,7 +938,7 @@ class TOPIC
             }
         }
 
-        if ($e) {
+        if ($e !== '' && $e !== '0') {
             return $PAGE->JS('error', $e);
         }
 
@@ -915,6 +955,7 @@ class TOPIC
             $presults[$x] = isset($results[$x]) && $results[$x]
                 ? implode(',', $results[$x]) : '';
         }
+
         $presults = implode(';', $presults);
 
         $PAGE->JS(
@@ -937,15 +978,18 @@ class TOPIC
             'WHERE `id`=?',
             $this->id,
         );
+
+        return null;
     }
 
-    public function ratepost($postid, $nibletid)
+    public function ratepost($postid, $nibletid): ?bool
     {
         global $DB,$USER,$PAGE;
         $PAGE->JS('softurl');
         if (!is_numeric($postid) || !is_numeric($nibletid)) {
             return false;
         }
+
         $result = $DB->safeselect(
             '`rating`',
             'posts',
@@ -963,13 +1007,13 @@ class TOPIC
         } elseif (!$niblets[$nibletid]) {
             $e = 'Invalid rating';
         } else {
-            $ratings = json_decode($f['rating'], true);
+            $ratings = json_decode((string) $f['rating'], true);
             if (!$ratings) {
                 $ratings = [];
             } else {
                 $found = false;
                 foreach ($ratings as $k => $v) {
-                    if (false !== ($pos = array_search($USER['id'], $v))) {
+                    if (false !== ($pos = array_search($USER['id'], $v, true))) {
                         unset($ratings[$k][$pos]);
                         if (empty($ratings[$k])) {
                             unset($ratings[$k]);
@@ -978,7 +1022,8 @@ class TOPIC
                 }
             }
         }
-        if ($e) {
+
+        if ($e !== '0') {
             $PAGE->JS('error', $e);
         } else {
             $ratings[(int) $nibletid][] = (int) $USER['id'];
@@ -992,6 +1037,8 @@ class TOPIC
             );
             $PAGE->JS('alert', 'Rated!');
         }
+
+        return null;
     }
 
     public function qeditpost($id): void
@@ -1000,9 +1047,11 @@ class TOPIC
         if (!is_numeric($id)) {
             return;
         }
+
         if (!$PAGE->jsaccess) {
             $PAGE->location('?act=post&pid=' . $id);
         }
+
         $PAGE->JS('softurl');
         $result = $DB->safeselect(
             <<<'MySQL'
@@ -1091,6 +1140,7 @@ class TOPIC
                         $id,
                     );
                 }
+
                 $PAGE->JS('update', "#pid_{$id} .post_content", $form);
             }
         }
@@ -1118,6 +1168,7 @@ class TOPIC
             $post = $DB->arow($result);
             $DB->disposeresult($result);
         }
+
         if (!$post) {
             $e = "That post doesn't exist!";
             $PAGE->JS('alert', $e);
@@ -1125,6 +1176,7 @@ class TOPIC
 
             return;
         }
+
         if ($JAX->b['qreply']) {
             $PAGE->JS(
                 'updateqreply',
@@ -1132,13 +1184,14 @@ class TOPIC
                 . PHP_EOL . PHP_EOL,
             );
         } else {
-            if (!in_array($pid, explode(' ', $SESS->vars['multiquote']))) {
+            if (!in_array($pid, explode(' ', (string) $SESS->vars['multiquote']))) {
                 $SESS->addvar(
                     'multiquote',
                     $SESS->vars['multiquote'] ? $SESS->vars['multiquote'] . ','
                     . $pid : $pid,
                 );
             }
+
             // This line toggles whether or not the qreply window should open
             // on quote.
             if ($PAGE->jsaccess) {
@@ -1210,9 +1263,11 @@ class TOPIC
 
                     break;
                 }
+
                 ++$num;
             }
         }
+
         $PAGE->JS('softurl');
         if ($couldntfindit) {
             $PAGE->JS('alert', "that post doesn't exist");
@@ -1235,9 +1290,10 @@ class TOPIC
     public function listrating($pid): void
     {
         global $DB,$PAGE,$CFG;
-        if ($CFG['ratings'] & 2) {
+        if (($CFG['ratings'] & 2) !== 0) {
             return;
         }
+
         $PAGE->JS('softurl');
         $result = $DB->safeselect(
             '`rating`',
@@ -1247,12 +1303,8 @@ class TOPIC
         );
         $row = $DB->arow($result);
         $DB->disposeresult($result);
+        $ratings = $row ? json_decode((string) $row[0], true) : [];
 
-        if ($row) {
-            $ratings = json_decode($row[0], true);
-        } else {
-            $ratings = [];
-        }
         if (empty($ratings)) {
             return;
         }
@@ -1261,6 +1313,7 @@ class TOPIC
         foreach ($ratings as $v) {
             $members = array_merge($members, $v);
         }
+
         $result = $DB->safeselect(
             '`id`,`display_name`,`group_id`',
             'members',
@@ -1271,6 +1324,7 @@ class TOPIC
         while ($f = $DB->arow($result)) {
             $mdata[$f['id']] = [$f['display_name'], $f['group_id']];
         }
+
         unset($members);
         $niblets = $DB->getRatingNiblets();
         foreach ($ratings as $k => $v) {
@@ -1285,6 +1339,7 @@ class TOPIC
                     $mdata[$mid][0],
                 ) . '</li>';
             }
+
             $page .= '</ul></div>';
         }
 

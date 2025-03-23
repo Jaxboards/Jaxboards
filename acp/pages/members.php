@@ -3,6 +3,7 @@
 if (!defined(INACP)) {
     exit;
 }
+
 new members();
 class members
 {
@@ -13,47 +14,16 @@ class members
             $JAX->b['do'] = null;
         }
 
-        switch ($JAX->b['do']) {
-            case 'merge':
-                $this->merge();
-
-                break;
-
-            case 'edit':
-                $this->editmem();
-
-                break;
-
-            case 'delete':
-                $this->deletemem();
-
-                break;
-
-            case 'prereg':
-                $this->preregister();
-
-                break;
-
-            case 'massmessage':
-                $this->massmessage();
-
-                break;
-
-            case 'ipbans':
-                $this->ipbans();
-
-                break;
-
-            case 'validation':
-                $this->validation();
-
-                break;
-
-            default:
-                $this->showmain();
-
-                break;
-        }
+        match ($JAX->b['do']) {
+            'merge' => $this->merge(),
+            'edit' => $this->editmem(),
+            'delete' => $this->deletemem(),
+            'prereg' => $this->preregister(),
+            'massmessage' => $this->massmessage(),
+            'ipbans' => $this->ipbans(),
+            'validation' => $this->validation(),
+            default => $this->showmain(),
+        };
         $links = [
             'edit' => 'Edit Members',
             'prereg' => 'Pre-Register',
@@ -125,6 +95,7 @@ class members
                 ],
             ) . PHP_EOL;
         }
+
         $PAGE->addContentBox(
             'Member List',
             $PAGE->parseTemplate(
@@ -176,10 +147,11 @@ class members
                         $write = [];
                         if ($JAX->p['password']) {
                             $write['pass'] = password_hash(
-                                $JAX->p['password'],
+                                (string) $JAX->p['password'],
                                 PASSWORD_DEFAULT,
                             );
                         }
+
                         $fields = [
                             'display_name',
                             'name',
@@ -210,10 +182,12 @@ class members
                                 $write[$field] = $JAX->p[$field];
                             }
                         }
+
                         // Make it so root admins can't get out of admin.
                         if ($JAX->b['mid'] == 1) {
                             $write['group_id'] = 2;
                         }
+
                         $DB->safeupdate(
                             'members',
                             $write,
@@ -228,6 +202,7 @@ class members
                         );
                     }
                 }
+
                 $result = $DB->safeselect(
                     <<<'EOT'
                         `id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
@@ -270,10 +245,12 @@ class members
                     $DB->basicvalue($JAX->p['name'] . '%'),
                 );
             }
+
             $data = [];
             while ($f = $DB->arow($result)) {
                 $data[] = $f;
             }
+
             $nummembers = count($data);
             if ($nummembers > 1) {
                 foreach ($data as $v) {
@@ -292,12 +269,14 @@ class members
 
                 return $PAGE->addContentBox('Select Member to Edit', $page);
             }
-            if (!$nummembers) {
+
+            if ($nummembers === 0) {
                 return $PAGE->addContentBox(
                     'Error',
                     $PAGE->error('This member does not exist. ' . $PAGE->back()),
                 );
             }
+
             $data = array_pop($data);
             if ($data['group_id'] == 2 && $JAX->userData['id'] != 1) {
                 $page = $PAGE->error(
@@ -343,11 +322,14 @@ class members
                 'members/edit.html',
             );
         }
+
         $PAGE->addContentBox(
             (isset($data['name']) && $data['name'])
             ? 'Editing ' . $data['name'] . "'s details" : 'Edit Member',
             $page,
         );
+
+        return null;
     }
 
     public function preregister(): void
@@ -363,7 +345,7 @@ class members
             ) {
                 $e = 'All fields required.';
             } elseif (
-                mb_strlen($JAX->p['username']) > 30
+                mb_strlen((string) $JAX->p['username']) > 30
                 || $JAX->p['displayname'] > 30
             ) {
                 $e = 'Display name and username must be under 30 characters.';
@@ -383,14 +365,14 @@ class members
                 $DB->disposeresult($result);
             }
 
-            if ($e) {
+            if ($e !== '' && $e !== '0') {
                 $page .= $PAGE->error($e);
             } else {
                 $member = [
                     'name' => $JAX->p['username'],
                     'display_name' => $JAX->p['displayname'],
                     'pass' => password_hash(
-                        $JAX->p['pass'],
+                        (string) $JAX->p['pass'],
                         PASSWORD_DEFAULT,
                     ),
                     'last_visit' => date('Y-m-d H:i:s', time()),
@@ -411,6 +393,7 @@ class members
                 }
             }
         }
+
         $page .= $PAGE->parseTemplate(
             'members/pre-register.html',
         );
@@ -453,6 +436,7 @@ class members
         if (!isset($JAX->p['submit'])) {
             $JAX->p['submit'] = false;
         }
+
         if ($JAX->p['submit']) {
             if (!$JAX->p['mid1'] || !$JAX->p['mid2']) {
                 $e = 'All fields are required';
@@ -461,7 +445,8 @@ class members
             } elseif ($JAX->p['mid1'] == $JAX->p['mid2']) {
                 $e = "Can't merge a member with her/himself";
             }
-            if ($e) {
+
+            if ($e !== '' && $e !== '0') {
                 $page .= $PAGE->error($e);
             } else {
                 $mid1 = $DB->basicvalue($JAX->p['mid1']);
@@ -577,12 +562,8 @@ class members
                 );
                 $posts = $DB->arow($result);
                 $DB->disposeresult($result);
+                $posts = $posts ? $posts['posts'] : 0;
 
-                if (!$posts) {
-                    $posts = 0;
-                } else {
-                    $posts = $posts['posts'];
-                }
                 $DB->safespecial(
                     'UPDATE %t SET `posts` = `posts` + ? WHERE `id`=?',
                     ['members'],
@@ -606,6 +587,7 @@ class members
                 $page .= $PAGE->success('Successfully merged the two accounts.');
             }
         }
+
         $page .= '';
         $PAGE->addContentBox(
             'Account Merge',
@@ -627,7 +609,8 @@ class members
             } elseif (!is_numeric($JAX->p['mid'])) {
                 $e = 'An error occurred in processing your request';
             }
-            if ($e) {
+
+            if ($e !== '' && $e !== '0') {
                 $page .= $PAGE->error($e);
             } else {
                 $mid = $DB->basicvalue($JAX->p['mid']);
@@ -683,6 +666,7 @@ class members
                 );
             }
         }
+
         $PAGE->addContentBox(
             'Delete Account',
             $page . PHP_EOL
@@ -702,18 +686,23 @@ class members
                 $iscomment = false;
                 // Check to see if each line is an ip, if it isn't,
                 // add a comment.
-                if ($v[0] == '#') {
+                if ($v[0] === '#') {
                     $iscomment = true;
                 } elseif (!filter_var($v, FILTER_VALIDATE_IP)) {
                     if (mb_strstr($v, '.')) {
                         // IPv4 stuff.
                         $d = explode('.', $v);
-                        if (!trim($v)) {
+                        if (trim($v) === '') {
                             continue;
                         }
+
+                        if (trim($v) === '0') {
+                            continue;
+                        }
+
                         if (count($d) > 4) {
                             $iscomment = true;
-                        } elseif (count($d) < 4 && mb_substr($v, -1) != '.') {
+                        } elseif (count($d) < 4 && mb_substr($v, -1) !== '.') {
                             $iscomment = true;
                         } else {
                             foreach ($d as $v2) {
@@ -728,9 +717,14 @@ class members
                             // Only need to run these checks if
                             // it's not a valid IPv6 address.
                             $d = explode(':', $v);
-                            if (!trim($v)) {
+                            if (trim($v) === '') {
                                 continue;
                             }
+
+                            if (trim($v) === '0') {
+                                continue;
+                            }
+
                             if (count($d) > 8) {
                                 $iscomment = true;
                             } elseif (mb_substr($v, -1) !== ':') {
@@ -748,21 +742,22 @@ class members
                         }
                     }
                 }
+
                 if ($iscomment) {
                     $data[$k] = '#' . $v;
                 }
             }
+
             $data = implode(PHP_EOL, $data);
             $o = fopen(BOARDPATH . 'bannedips.txt', 'w');
             fwrite($o, $data);
             fclose($o);
+        } elseif (file_exists(BOARDPATH . 'bannedips.txt')) {
+            $data = file_get_contents(BOARDPATH . 'bannedips.txt');
         } else {
-            if (file_exists(BOARDPATH . 'bannedips.txt')) {
-                $data = file_get_contents(BOARDPATH . 'bannedips.txt');
-            } else {
-                $data = '';
-            }
+            $data = '';
         }
+
         $PAGE->addContentBox(
             'IP Bans',
             $PAGE->parseTemplate(
@@ -779,7 +774,7 @@ class members
         global $PAGE,$JAX,$DB;
         $page = '';
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
-            if (!trim($JAX->p['title']) || !trim($JAX->p['message'])) {
+            if (!trim((string) $JAX->p['title']) || !trim((string) $JAX->p['message'])) {
                 $page .= $PAGE->error('All fields required!');
             } else {
                 $q = $DB->safeselect(
@@ -807,9 +802,11 @@ class members
                     );
                     ++$num;
                 }
+
                 $page .= $PAGE->success("Successfully delivered {$num} messages");
             }
         }
+
         $PAGE->addContentBox(
             'Mass Message',
             $page . PHP_EOL
@@ -830,6 +827,7 @@ class members
                 ],
             );
         }
+
         $page = $PAGE->parseTemplate(
             'members/validation.html',
             [
@@ -839,18 +837,17 @@ class members
         ) . PHP_EOL;
         $PAGE->addContentBox('Enable Member Validation', $page);
 
-        if (isset($_POST['mid'])) {
-            if ($_POST['action'] == 'Allow') {
-                $DB->safeupdate(
-                    'members',
-                    [
-                        'group_id' => 1,
-                    ],
-                    'WHERE `id`=?',
-                    $DB->basicvalue($_POST['mid']),
-                );
-            }
+        if (isset($_POST['mid']) && $_POST['action'] == 'Allow') {
+            $DB->safeupdate(
+                'members',
+                [
+                    'group_id' => 1,
+                ],
+                'WHERE `id`=?',
+                $DB->basicvalue($_POST['mid']),
+            );
         }
+
         $result = $DB->safeselect(
             '`id`,`display_name`,INET6_NTOA(`ip`) AS `ip`,`email`,'
             . 'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
@@ -870,7 +867,8 @@ class members
                 ],
             ) . PHP_EOL;
         }
-        $page = $page ? $PAGE->parseTemplate(
+
+        $page = $page !== '' && $page !== '0' ? $PAGE->parseTemplate(
             'members/validation-list.html',
             [
                 'content' => $page,
@@ -879,11 +877,11 @@ class members
         $PAGE->addContentBox('Members Awaiting Validation', $page);
     }
 
-    public function formfield($label, $name, $value, $which = false)
+    public function formfield($label, $name, $value, $which = false): string
     {
         global $PAGE;
 
-        if (mb_strtolower($which) === 'textarea') {
+        if (mb_strtolower((string) $which) === 'textarea') {
             return $PAGE->parseTemplate(
                 'members/edit-form-field-textarea.html',
                 [

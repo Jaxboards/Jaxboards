@@ -54,7 +54,7 @@ function recursiveStripSlashes($input)
 
     foreach ($input as $key => $value) {
         $input[$key] = is_array($value)
-            ? recursiveStripSlashes($value) : stripslashes($value);
+            ? recursiveStripSlashes($value) : stripslashes((string) $value);
     }
 
     return $input;
@@ -73,7 +73,7 @@ $DB->connect(
     $CFG['sql_prefix'],
 );
 
-require_once '../domaindefinitions.php';
+require_once __DIR__ . '/../domaindefinitions.php';
 
 $JAX = new JAX();
 if (isset($_SESSION['auid'])) {
@@ -84,6 +84,7 @@ if (isset($_SESSION['auid'])) {
         'can_access_acp' => false,
     ];
 }
+
 if (!$PERMS['can_access_acp']) {
     header('Location: ./');
 
@@ -166,4 +167,5 @@ $a = $JAX->g['act'] ?? null;
 if ($a && file_exists("./pages/{$a}.php")) {
     include_once "./pages/{$a}.php";
 }
+
 $PAGE->out();

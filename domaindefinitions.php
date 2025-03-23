@@ -36,6 +36,7 @@ if (
 ) {
     $baseURL .= (isset($_SERVER['SERVER_PORT']) ? ':' . $_SERVER['SERVER_PORT'] : '');
 }
+
 define('BOARDURL', $baseURL . '/');
 
 define('SOUNDSURL', BOARDURL . 'Sounds/');
@@ -45,7 +46,7 @@ define('FLAGURL', BOARDURL . 'Service/flags/');
 $domain_match = str_replace('.', '\.', $CFG['domain']);
 // Get prefix.
 if ($CFG['service']) {
-    preg_match('@(.*)\.' . $domain_match . '@i', $host, $matches);
+    preg_match('@(.*)\.' . $domain_match . '@i', (string) $host, $matches);
     if (isset($matches[1]) && $matches[1]) {
         $prefix = $matches[1];
         $CFG['prefix'] = $prefix;
@@ -66,6 +67,7 @@ if ($prefix) {
     if ($DB) {
         $DB->prefix($CFG['sql_prefix']);
     }
+
     $tempCFG = $CFG;
     if (@include_once BOARDCONFIG) {
         $CFG = array_merge($tempCFG, $CFG);

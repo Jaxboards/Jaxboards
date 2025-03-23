@@ -76,6 +76,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         if ($uinfo['can_access_acp']) {
             $notadmin = false;
         }
+
         $verified_password = (bool) $JAX->getUser($uinfo['id'], $p);
         if (!$notadmin && $verified_password) {
             $_SESSION['auid'] = $uinfo['id'];

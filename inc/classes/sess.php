@@ -3,7 +3,9 @@
 class SESS
 {
     public $data = [];
+
     public $userData = [];
+
     public $bots = [
         'Googlebot' => 'Google',
         'GoogleOther' => 'GoogleOther',
@@ -77,6 +79,7 @@ class SESS
         'CensysInspect' => 'CensysInspect',
         // Security scanner
     ];
+
     public $changedData = [];
 
     public function __construct($sid = false)
@@ -85,6 +88,7 @@ class SESS
         if (!isset($this->data['vars'])) {
             $this->data['vars'] = serialize([]);
         }
+
         $this->data['vars'] = unserialize($this->data['vars']);
         if (!$this->data['vars']) {
             $this->data['vars'] = [];
@@ -99,16 +103,17 @@ class SESS
         foreach ($this->bots as $k => $v) {
             if (
                 mb_stripos(
-                    mb_strtolower($_SERVER['HTTP_USER_AGENT']),
-                    $k,
+                    mb_strtolower((string) $_SERVER['HTTP_USER_AGENT']),
+                    (string) $k,
                 ) != false
             ) {
                 $sid = $v;
                 $isbot = 1;
             }
         }
+
         if ($sid) {
-            $result = (!$isbot)
+            $result = ($isbot === 0)
                 ? $DB->safeselect(
                     <<<'EOT'
                         `id`,`uid`,INET6_NTOA(`ip`) as `ip`,`vars`,
@@ -141,12 +146,15 @@ class SESS
             $r = $DB->arow($result);
             $DB->disposeresult($result);
         }
+
         if (!empty($r)) {
             return $r;
         }
-        if (!$isbot) {
+
+        if ($isbot === 0) {
             $sid = base64_encode(openssl_random_pseudo_bytes(128));
         }
+
         $uid = 0;
         if (
             !empty($JAX->userData)
@@ -155,9 +163,11 @@ class SESS
         ) {
             $uid = (int) $JAX->userData['id'];
         }
-        if (!$isbot) {
+
+        if ($isbot === 0) {
             $_SESSION['sid'] = $sid;
         }
+
         $time = time();
         $sessData = [
             'id' => $sid,
@@ -172,6 +182,7 @@ class SESS
         if ($uid < 1) {
             unset($sessData['uid']);
         }
+
         $DB->safeinsert(
             'session',
             $sessData,
@@ -182,9 +193,7 @@ class SESS
 
     public function __get($a)
     {
-        if (isset($this->data[$a])) {
-            return $this->data[$a];
-        }
+        return $this->data[$a] ?? null;
     }
 
     public function __set($a, $b): void
@@ -192,6 +201,7 @@ class SESS
         if (isset($this->data[$a]) && $this->data[$a] == $b) {
             return;
         }
+
         $this->changedData[$a] = $b;
         $this->data[$a] = $b;
     }
@@ -236,7 +246,7 @@ class SESS
         unset($this->changedData[$a]);
     }
 
-    public function clean($uid)
+    public function clean($uid): bool
     {
         global $DB,$CFG,$PAGE,$JAX;
         $timeago = time() - $CFG['timetologout'];
@@ -254,6 +264,7 @@ class SESS
             if ($la) {
                 $la = $la['last_action'];
             }
+
             $DB->safedelete(
                 'session',
                 'WHERE `uid`=? AND `last_update`<?',
@@ -268,6 +279,7 @@ class SESS
             );
             $this->__set('read_date', $JAX->pick($la, 0));
         }
+
         $yesterday = mktime(0, 0, 0);
         $query = $DB->safeselect(
             '`uid`,UNIX_TIMESTAMP(MAX(`last_action`)) AS `last_action`',
@@ -287,6 +299,7 @@ class SESS
                 );
             }
         }
+
         $DB->safedelete(
             'session',
             <<<'EOT'
@@ -313,18 +326,22 @@ class SESS
                 $sd[$datetime] = date('Y-m-d H:i:s', $sd[$datetime]);
             }
         }
+
         if ($this->data['is_bot']) {
             // Bots tend to read a lot of content.
             $sd['forumsread'] = '';
             $sd['topicsread'] = '';
         }
+
         if (!$this->data['last_action']) {
             $sd['last_action'] = date('Y-m-d H:i:s', time());
         }
+
         if (isset($sd['user'])) {
             // This doesn't exist.
             unset($sd['user']);
         }
+
         if (!empty($sd)) {
             // Only update if there's data to update.
             $DB->safeupdate(
@@ -345,12 +362,12 @@ class SESS
 
         return preg_replace_callback(
             "@href=['\"]?([^'\"]+)['\"]?@",
-            [$this, 'addSessIDCB'],
-            $html,
+            $this->addSessIDCB(...),
+            (string) $html,
         );
     }
 
-    public function addSessIDCB($m)
+    public function addSessIDCB($m): string
     {
         if ($m[1][0] == '?') {
             $m[1] .= '&amp;sessid=' . $this->data['id'];

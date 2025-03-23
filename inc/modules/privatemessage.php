@@ -11,6 +11,7 @@ class IM
         if ($SESS->runonce) {
             $this->filter();
         }
+
         if (trim($im ?? '') !== '' && $uid) {
             $this->message($uid, $im);
         }
@@ -26,10 +27,11 @@ class IM
         if (!$USER['enemies']) {
             return;
         }
-        $enemies = explode(',', $USER['enemies']);
+
+        $enemies = explode(',', (string) $USER['enemies']);
         // Kinda gross I know, unparses then parses then
         // unparses again later on.. Oh well.
-        $exploded = explode(PHP_EOL, $SESS->runonce);
+        $exploded = explode(PHP_EOL, (string) $SESS->runonce);
         foreach ($exploded as $k => $v) {
             $v = json_decode($v);
             if ($v[0] == 'im') {
@@ -42,6 +44,7 @@ class IM
                 }
             }
         }
+
         $SESS->runonce = implode(PHP_EOL, $exploded);
     }
 
@@ -52,26 +55,31 @@ class IM
         $ud = $USER;
         $e = '';
         $fatal = false;
-        if (false && in_array($uid, explode(',', $USER['enemies']))) {
+        if (false && in_array($uid, explode(',', (string) $USER['enemies']))) {
             return $PAGE->JS(
                 'error',
                 "You've blocked this recipient and cannot send messages to them.",
             );
         }
+
         if (!$ud) {
             return $PAGE->JS('error', 'You must be logged in to instant message!');
         }
+
         if (!$uid) {
             return $PAGE->JS('error', 'You must have a recipient!');
         }
+
         if (!$PERMS['can_im']) {
             return $PAGE->JS(
                 'error',
                 "You don't have permission to use this feature.",
             );
         }
+
         $im = $JAX->linkify($im);
         $im = $JAX->theworks($im);
+
         $cmd = [
             'im',
             $uid,
@@ -94,22 +102,22 @@ class IM
         ) {
             $PAGE->JS('imtoggleoffline', $uid);
         }
-        if (!$fatal) {
-            if (!$this->sendcmd($cmd, $uid)) {
-                $PAGE->JS('imtoggleoffline', $uid);
-            }
+
+        if (!$this->sendcmd($cmd, $uid)) {
+            $PAGE->JS('imtoggleoffline', $uid);
         }
 
-        return !($e || $fatal);
+        return !$e && !$fatal;
     }
 
-    public function sendcmd($cmd, $uid)
+    public function sendcmd($cmd, $uid): ?bool
     {
         global $DB,$CFG;
         if (!is_numeric($uid)) {
-            return;
+            return null;
         }
-        $result = $DB->safespecial(
+
+        $DB->safespecial(
             <<<'EOT'
                 UPDATE %t
                 SET `runonce`=CONCAT(`runonce`,?)
@@ -132,6 +140,7 @@ class IM
         if (!$USER['id']) {
             return;
         }
+
         if ($otherguy) {
             $room = base64_encode(openssl_random_pseudo_bytes(128));
             // Make the window the guy that invited multi.
@@ -139,6 +148,7 @@ class IM
             // Update other guy.
             $this->sendcmd(['immakemulti', $USER['id']], $otherguy);
         }
+
         $this->sendcmd(['iminvite', $room]);
     }
 
@@ -151,7 +161,7 @@ class IM
                 '`id`,`display_name` AS `name`',
                 'members',
                 'WHERE `id` IN ? ORDER BY `name` ASC',
-                explode(',', $USER['friends']),
+                explode(',', (string) $USER['friends']),
             );
             $menu = '';
             while ($f = $DB->arow($result)) {
@@ -159,7 +169,8 @@ class IM
                     $menu .= $f['name'] . '<br />';
                 }
             }
-            if (!$menu) {
+
+            if ($menu === '' || $menu === '0') {
                 if (!$USER['friends']) {
                     $menu
                         = 'You must add users to your contacts list<br />'
@@ -173,6 +184,7 @@ class IM
                 . "<a href='?module=privatemessage&im_menu={$id}"
                 . "&im_invitemenu=1'>Add User to Chat</a>";
         }
+
         $PAGE->JS('update', 'immenu', $menu);
         $PAGE->JS('softurl');
     }

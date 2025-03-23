@@ -28,7 +28,7 @@ class rssfeed
             EOT;
     }
 
-    public function make_xml($array, $k2 = false)
+    public function make_xml($array, $k2 = false): string
     {
         $r = '';
         foreach ($array as $k => $v) {

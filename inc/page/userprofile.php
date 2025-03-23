@@ -23,12 +23,13 @@ class userprofile
     public function __construct()
     {
         global $JAX,$PAGE;
-        preg_match('@\d+@', $JAX->b['act'], $m);
+        preg_match('@\d+@', (string) $JAX->b['act'], $m);
         $id = $m[0];
         if (!isset($JAX->b['view'])) {
             $JAX->b['view'] = false;
         }
-        if (!$id) {
+
+        if ($id === '' || $id === '0') {
             $PAGE->location('?');
         } elseif ($PAGE->jsnewloc && !$PAGE->jsdirectlink && !$JAX->b['view']) {
             $this->showcontactcard($id);
@@ -76,6 +77,7 @@ class userprofile
                 ) . '">&nbsp;</a>';
             }
         }
+
         $PAGE->JS('softurl');
         $PAGE->JS(
             'window',
@@ -94,13 +96,13 @@ class userprofile
                     $contactdetails,
                     in_array(
                         $ud['uid'],
-                        explode(',', $USER['friends']),
+                        explode(',', (string) $USER['friends']),
                     ) ? '<a href="?act=buddylist&remove=' . $ud['uid']
                     . '">Remove Contact</a>' : '<a href="?act=buddylist&add='
                     . $ud['uid'] . '">Add Contact</a>',
                     in_array(
                         $ud['uid'],
-                        explode(',', $USER['enemies']),
+                        explode(',', (string) $USER['enemies']),
                     ) ? '<a href="?act=buddylist&unblock=' . $ud['uid']
                     . '">Unblock Contact</a>'
                     : '<a href="?act=buddylist&block=' . $ud['uid']
@@ -116,9 +118,11 @@ class userprofile
         if ($PAGE->jsupdate && empty($JAX->p)) {
             return false;
         }
+
         if (!$PERMS['can_view_fullprofile']) {
             return $PAGE->location('?');
         }
+
         $e = '';
         $nouser = false;
         $udata = null;
@@ -166,13 +170,15 @@ class userprofile
             $udata = $DB->arow($result);
             $DB->disposeresult($result);
         }
+
         if (!$udata || $nouser) {
             $e = $PAGE->meta('error', "Sorry, This user doesn't exist.");
             $PAGE->JS('update', 'page', $e);
             $PAGE->append('page', $e);
 
-            return;
+            return null;
         }
+
         $pfpageloc = $JAX->b['page'] ?? '';
         $pfbox = '';
 
@@ -199,7 +205,7 @@ class userprofile
                     $this->num_activity,
                 );
                 if (isset($JAX->b['fmt']) && $JAX->b['fmt'] == 'RSS') {
-                    include_once 'inc/classes/rssfeed.php';
+                    include_once __DIR__ . '/inc/classes/rssfeed.php';
                     $feed = new rssfeed(
                         [
                             'title' => $udata['display_name'] . "'s recent activity",
@@ -221,16 +227,19 @@ class userprofile
                             ],
                         );
                     }
+
                     $feed->publish();
 
                     exit;
                 }
+
                 while ($f = $DB->arow($result)) {
                     $f['name'] = $udata['display_name'];
                     $f['group_id'] = $udata['group_id'];
                     $pfbox .= $JAX->parse_activity($f);
                 }
-                if (!$pfbox) {
+
+                if ($pfbox === '' || $pfbox === '0') {
                     $pfbox = 'This user has yet to do anything noteworthy!';
                 } else {
                     $pfbox = "<a href='./?act=vu" . $id
@@ -262,6 +271,7 @@ class userprofile
                     if (!$p['read']) {
                         continue;
                     }
+
                     $pfbox .= $PAGE->meta(
                         'userprofile-post',
                         $f['tid'],
@@ -297,6 +307,7 @@ class userprofile
                     if (!$p['read']) {
                         continue;
                     }
+
                     $pfbox .= $PAGE->meta(
                         'userprofile-topic',
                         $f['tid'],
@@ -305,7 +316,8 @@ class userprofile
                         $JAX->theworks($f['post']),
                     );
                 }
-                if (!$pfbox) {
+
+                if ($pfbox === '' || $pfbox === '0') {
                     $pfbox = 'No topics to show.';
                 }
 
@@ -334,7 +346,7 @@ class userprofile
                             ORDER BY `name`
                             EOT,
                         ['members', 'member_groups'],
-                        explode(',', $udata['friends']),
+                        explode(',', (string) $udata['friends']),
                     );
 
                     while ($f = $DB->arow($result)) {
@@ -354,7 +366,8 @@ class userprofile
                         );
                     }
                 }
-                if (!$pfbox) {
+
+                if ($pfbox === '' || $pfbox === '0') {
                     $pfbox = "I'm pretty lonely, I have no friends. :(";
                 } else {
                     $pfbox = '<div class="contacts">' . $pfbox . '<br clear="all" /></div>';
@@ -379,6 +392,7 @@ class userprofile
                         );
                     }
                 }
+
                 if (isset($JAX->p['comment']) && $JAX->p['comment'] !== '') {
                     if (!$USER || !$PERMS['can_add_comments']) {
                         $e = 'No permission to add comments!';
@@ -402,11 +416,13 @@ class userprofile
                             ],
                         );
                     }
-                    if ($e) {
+
+                    if ($e !== '' && $e !== '0') {
                         $PAGE->JS('error', $e);
                         $pfbox .= $PAGE->meta('error', $e);
                     }
                 }
+
                 if ($USER && $PERMS['can_add_comments']) {
                     $pfbox = $PAGE->meta(
                         'userprofile-comment-form',
@@ -421,6 +437,7 @@ class userprofile
                         ),
                     );
                 }
+
                 $result = $DB->safespecial(
                     <<<'EOT'
                         SELECT c.`id` AS `id`,c.`to` AS `to`,c.`from` AS `from`,
@@ -462,12 +479,14 @@ class userprofile
                     );
                     $found = true;
                 }
+
                 if (!$found) {
                     $pfbox .= 'No comments to display!';
                 }
 
                 break;
         }
+
         if (
             isset($JAX->b['page'])
             && $JAX->b['page']
@@ -500,16 +519,17 @@ class userprofile
 
             $contactdetails = '';
             foreach ($udata as $k => $v) {
-                if (mb_substr($k, 0, 8) == 'contact_' && $v) {
-                    $contactdetails .= '<div class="contact ' . mb_substr($k, 8)
+                if (mb_substr((string) $k, 0, 8) === 'contact_' && $v) {
+                    $contactdetails .= '<div class="contact ' . mb_substr((string) $k, 8)
                         . '"><a href="'
-                        . sprintf($this->contacturls[mb_substr($k, 8)], $v)
+                        . sprintf($this->contacturls[mb_substr((string) $k, 8)], $v)
                         . '">' . $v . '</a></div>';
                 }
             }
+
             $contactdetails .= '<div class="contact im">'
                 . '<a href="javascript:void(0)" onclick="new IMWindow(\''
-                . $udata['id'] . '\',\'' . $udata['display_name'] . '\')">IM</a></div>';
+                . $udata['id'] . "','" . $udata['display_name'] . '\')">IM</a></div>';
             $contactdetails .= '<div class="contact pm">'
                 . '<a href="?act=ucp&what=inbox&page=compose&mid='
                 . $udata['id'] . '">PM</a></div>';
@@ -526,7 +546,7 @@ class userprofile
                 $udata['usertitle'],
                 $contactdetails,
                 $JAX->pick($udata['full_name'], 'N/A'),
-                $JAX->pick(ucfirst($udata['gender']), 'N/A'),
+                $JAX->pick(ucfirst((string) $udata['gender']), 'N/A'),
                 $udata['location'],
                 $udata['dob_year'] ? $udata['dob_month'] . '/'
                 . $udata['dob_day'] . '/' . $udata['dob_year'] : 'N/A',
@@ -553,5 +573,7 @@ class userprofile
 
             $SESS->location_verbose = 'Viewing ' . $udata['display_name'] . "'s profile";
         }
+
+        return null;
     }
 }

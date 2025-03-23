@@ -106,7 +106,8 @@ class settings
                 $wordfilter[$JAX->p['badword']] = $JAX->p['replacement'];
             }
         }
-        if (empty($wordfilter)) {
+
+        if ($wordfilter === []) {
             $table = $PAGE->parseTemplate(
                 'posting/word-filter-empty.html',
             ) . PHP_EOL . $PAGE->parseTemplate(
@@ -132,6 +133,7 @@ class settings
                 ) . PHP_EOL;
             }
         }
+
         $page .= $PAGE->parseTemplate(
             'posting/word-filter.html',
             [
@@ -161,6 +163,7 @@ class settings
                 $DB->basicvalue($_GET['d']),
             );
         }
+
         // Select emoticons.
         $result = $DB->safeselect(
             '`id`,`type`,`needle`,`replacement`,`enabled`',
@@ -194,7 +197,8 @@ class settings
         if (isset($JAX->p['baseset']) && $basesets[$JAX->p['baseset']]) {
             $PAGE->writeCFG(['emotepack' => $JAX->p['baseset']]);
         }
-        if (empty($emoticons)) {
+
+        if ($emoticons === []) {
             $table = $PAGE->parseTemplate(
                 'posting/emoticon-heading.html',
             ) . PHP_EOL . $PAGE->parseTemplate(
@@ -223,6 +227,7 @@ class settings
                 ) . PHP_EOL;
             }
         }
+
         $page .= $PAGE->parseTemplate(
             'posting/emoticons.html',
             [
@@ -258,6 +263,7 @@ class settings
                 ],
             ) . PHP_EOL;
         }
+
         $page = $PAGE->parseTemplate(
             'posting/emoticon-packs.html',
             [
@@ -272,7 +278,8 @@ class settings
     public function postrating(): void
     {
         global $PAGE,$JAX,$DB;
-        $page = $page2 = '';
+        $page = '';
+        $page2 = '';
         $niblets = [];
         $result = $DB->safeselect(
             '`id`,`img`,`title`',
@@ -320,19 +327,20 @@ class settings
             $PAGE->writeCFG($cfg);
             $page2 .= $PAGE->success('Settings saved!');
         }
+
         $ratingsettings = $PAGE->getCFGSetting('ratings');
 
         $page2 .= $PAGE->parseTemplate(
             'posting/post-rating-settings.html',
             [
-                'ratings_enabled' => $ratingsettings & 1 ? ' checked="checked"' : '',
-                'ratings_anonymous' => $ratingsettings & 2 ? ' checked="checked"' : '',
+                'ratings_enabled' => ($ratingsettings & 1) !== 0 ? ' checked="checked"' : '',
+                'ratings_anonymous' => ($ratingsettings & 2) !== 0 ? ' checked="checked"' : '',
             ],
         );
         $table = $PAGE->parseTemplate(
             'posting/post-rating-heading.html',
         );
-        if (empty($niblets)) {
+        if ($niblets === []) {
             $table .= $PAGE->parseTemplate(
                 'posting/post-rating-empty-row.html',
             );
@@ -349,6 +357,7 @@ class settings
                 );
             }
         }
+
         $page .= $PAGE->parseTemplate(
             'posting/post-rating.html',
             [

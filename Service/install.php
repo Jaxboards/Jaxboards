@@ -116,11 +116,11 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             $errors[] = $attributes['name'] . ' must be filled in.';
         }
     }
-    if ($JAX->p['domain'] && !parse_url($JAX->p['domain'], PHP_URL_HOST)) {
+    if ($JAX->p['domain'] && !parse_url((string) $JAX->p['domain'], PHP_URL_HOST)) {
         if (
             preg_match(
                 '@[^\w.]@',
-                $JAX->p['domain'],
+                (string) $JAX->p['domain'],
             )
         ) {
             $errors[] = 'Invalid domain';
@@ -130,7 +130,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             $JAX->p['domain'] = preg_replace(
                 '/^www./',
                 '',
-                $JAX->p['domain'],
+                (string) $JAX->p['domain'],
             );
         }
     } else {
@@ -138,7 +138,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $JAX->p['domain'] = preg_replace(
             '/^www./',
             '',
-            parse_url($JAX->p['domain'], PHP_URL_HOST),
+            parse_url((string) $JAX->p['domain'], PHP_URL_HOST),
         );
     }
     if ($JAX->p['admin_password'] !== $JAX->p['admin_password_2']) {
@@ -149,9 +149,9 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $errors[] = 'invalid email';
     }
 
-    if (mb_strlen($JAX->p['admin_username']) > 50) {
+    if (mb_strlen((string) $JAX->p['admin_username']) > 50) {
         $errors[] = 'Admin username is too long';
-    } elseif (preg_match('@\W@', $JAX->p['admin_username'])) {
+    } elseif (preg_match('@\W@', (string) $JAX->p['admin_username'])) {
         $errors[] = 'Admin username needs to consist of letters,'
             . 'numbers, and underscore only';
     }
@@ -170,7 +170,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $errors[] = 'There was an error connecting to the MySQL database.';
     }
 
-    if (empty($errors)) {
+    if ($errors === []) {
         // Update with our settings.
         $CFG['boardname'] = 'Jaxboards';
         $CFG['domain'] = $JAX->p['domain'];
@@ -183,7 +183,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $CFG['installed'] = true;
         $CFG['service'] = $service;
         $CFG['prefix'] = $service ? '' : 'jaxboards';
-        $CFG['sql_prefix'] = $CFG['prefix'] ? $CFG['prefix'] . '_' : '';
+        $CFG['sql_prefix'] = $CFG['prefix'] !== '' && $CFG['prefix'] !== '0' ? $CFG['prefix'] . '_' : '';
 
         $PAGE->writeData(
             JAXBOARDS_ROOT . '/config.php',
@@ -233,7 +233,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             ];
         }
 
-        foreach ($default_boards as $board => $boardname) {
+        foreach (array_keys($default_boards) as $board) {
             $boardPrefix = $board . '_';
             $DB->prefix($boardPrefix);
 
@@ -261,10 +261,12 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             $lines = file(SERVICE_ROOT . '/blueprint.sql');
             foreach ($lines as $line) {
                 // Skip comments.
-                if (mb_substr($line, 0, 2) == '--' || $line == '') {
+                if (mb_substr($line, 0, 2) === '--') {
                     continue;
                 }
-
+                if ($line === '') {
+                    continue;
+                }
                 // Replace blueprint_ with board name.
                 $line = preg_replace('/blueprint_/', $boardPrefix, $line);
 
@@ -272,7 +274,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                 $query .= $line;
 
                 // If it has a semicolon at the end, it's the end of the query.
-                if (mb_substr(trim($line), -1, 1) == ';') {
+                if (mb_substr(trim((string) $line), -1, 1) === ';') {
                     // Perform the query.
                     $result = $DB->safequery($query);
                     $DB->disposeresult($result);
@@ -288,7 +290,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                     'name' => $JAX->p['admin_username'],
                     'display_name' => $JAX->p['admin_username'],
                     'pass' => password_hash(
-                        $JAX->p['admin_password'],
+                        (string) $JAX->p['admin_password'],
                         PASSWORD_DEFAULT,
                     ),
                     'email' => $JAX->p['admin_email'],
@@ -311,7 +313,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         // fwrite($file, '');
         // fclose($file);
         // Send us to the service page.
-        header('Location: ' . dirname($_SERVER['REQUEST_URI']));
+        header('Location: ' . dirname((string) $_SERVER['REQUEST_URI']));
     }
 }
 

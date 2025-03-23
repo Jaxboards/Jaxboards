@@ -19,7 +19,7 @@ class offlineboard
                         . 'If you have an account that has permission, '
                         . 'please log in.'
                         . ($CFG['boardoffline'] && $CFG['offlinetext']
-                        ? '<br /><br />Note:<br />' . nl2br($CFG['offlinetext'])
+                        ? '<br /><br />Note:<br />' . nl2br((string) $CFG['offlinetext'])
                         : ''),
                     ),
                 ),

@@ -3,24 +3,17 @@
 class PAGE
 {
     public $CFG = [];
-    public $parts = [];
-    public $partparts = [];
 
-    /**
-     * Constructor for the PAGE object.
-     */
-    public function __construct()
-    {
-        $this->parts = [
-            'title' => '',
-            'sidebar' => '',
-            'content' => '',
-        ];
-        $this->partparts = [
-            'nav' => '',
-            'navdropdowns' => '',
-        ];
-    }
+    public $parts = [
+        'title' => '',
+        'sidebar' => '',
+        'content' => '',
+    ];
+
+    public $partparts = [
+        'nav' => '',
+        'navdropdowns' => '',
+    ];
 
     /**
      * Creates a nav menu in the ACP.
@@ -68,16 +61,12 @@ class PAGE
 
     public function sidebar($sidebar): void
     {
-        if ($sidebar) {
-            $this->parts['sidebar'] = $this->parseTemplate(
-                'sidebar.html',
-                [
-                    'content' => $sidebar,
-                ],
-            );
-        } else {
-            $this->parts['sidebar'] = '';
-        }
+        $this->parts['sidebar'] = $sidebar ? $this->parseTemplate(
+            'sidebar.html',
+            [
+                'content' => $sidebar,
+            ],
+        ) : '';
     }
 
     public function title($title): void
@@ -103,6 +92,7 @@ class PAGE
         if (!isset($this->partparts['nav'])) {
             $this->partparts['nav'] = '';
         }
+
         if (!isset($this->partparts['navdropdowns'])) {
             $this->partparts['navdropdowns'] = '';
         }
@@ -125,7 +115,7 @@ class PAGE
         );
     }
 
-    public function back()
+    public function back(): ?string
     {
         return $this->parseTemplate(
             'back.html',
@@ -133,7 +123,7 @@ class PAGE
         );
     }
 
-    public function error($a)
+    public function error($a): ?string
     {
         return $this->parseTemplate(
             'error.html',
@@ -143,7 +133,7 @@ class PAGE
         );
     }
 
-    public function success($a)
+    public function success($a): ?string
     {
         return $this->parseTemplate(
             'success.html',
@@ -158,7 +148,7 @@ class PAGE
         header("Location: {$a}");
     }
 
-    public function writeData($page, $name, $data, $mode = 'w')
+    public function writeData($page, $name, $data, $mode = 'w'): string
     {
         $data_string = json_encode($data);
         $write = <<<EOT
@@ -192,12 +182,13 @@ class PAGE
         return $write;
     }
 
-    public function writeCFG($data)
+    public function writeCFG($data): string
     {
         include BOARDPATH . 'config.php';
         foreach ($data as $k => $v) {
             $CFG[$k] = $v;
         }
+
         $this->CFG = $CFG;
 
         return $this->writeData(BOARDPATH . 'config.php', 'CFG', $this->CFG);
@@ -226,15 +217,17 @@ class PAGE
      *
      * @return string returns the template with the data replaced
      */
-    public function parseTemplate($templateFile, $data = null)
+    public function parseTemplate($templateFile, $data = null): ?string
     {
         if (mb_substr($templateFile, 0, 1) !== '/') {
             $templateFile = JAXBOARDS_ROOT . '/acp/views/' . $templateFile;
         }
+
         if (pathinfo($templateFile, PATHINFO_EXTENSION) !== 'html') {
             if (mb_substr($templateFile, -1) !== '.') {
                 $templateFile .= '.';
             }
+
             $templateFile .= 'html';
         }
 
@@ -242,20 +235,23 @@ class PAGE
         if (is_file($templateFile)) {
             try {
                 $template = file_get_contents($templateFile);
-            } catch (Exception $e) {
+            } catch (Exception) {
                 $fileError = true;
             }
+
             if ($template === false) {
                 $fileError = true;
             }
         } else {
             $fileError = true;
         }
+
         if ($fileError) {
             error_log('Could not open file: ' . $templateFile);
 
             return '';
         }
+
         if (is_array($data)) {
             foreach ($data as $name => $content) {
                 $template = str_replace(

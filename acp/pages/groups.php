@@ -12,7 +12,6 @@ class groups
     public function __construct()
     {
         global $JAX,$PAGE;
-        $sidebar = '';
         $links = [
             'perms' => 'Edit Permissions',
             'create' => 'Create Group',
@@ -28,6 +27,7 @@ class groups
                 ],
             ) . PHP_EOL;
         }
+
         $PAGE->sidebar(
             $PAGE->parseTemplate(
                 'sidebar-list.html',
@@ -39,36 +39,18 @@ class groups
         if (isset($JAX->g['edit']) && $JAX->g['edit']) {
             $JAX->g['do'] = 'edit';
         }
+
         if (!isset($JAX->g['do'])) {
             $JAX->g['do'] = null;
         }
 
-        switch ($JAX->g['do']) {
-            case 'perms':
-                $this->showperms();
-
-                break;
-
-            case 'create':
-                $this->create();
-
-                break;
-
-            case 'edit':
-                $this->create($JAX->g['edit']);
-
-                break;
-
-            case 'delete':
-                $this->delete();
-
-                break;
-
-            default:
-                $this->showperms();
-
-                break;
-        }
+        match ($JAX->g['do']) {
+            'perms' => $this->showperms(),
+            'create' => $this->create(),
+            'edit' => $this->create($JAX->g['edit']),
+            'delete' => $this->delete(),
+            default => $this->showperms(),
+        };
     }
 
     public function updateperms($perms)
@@ -111,6 +93,7 @@ class groups
                 if (!isset($v2[$v])) {
                     $v2[$v] = false;
                 }
+
                 $perms[$k][$v] = $v2[$v] ? 1 : 0;
             }
         }
@@ -130,6 +113,7 @@ class groups
             if ($k == 2) {
                 $v['can_access_acp'] = 1;
             }
+
             if ($k) {
                 $DB->safeupdate(
                     'member_groups',
@@ -171,7 +155,7 @@ class groups
             && isset($JAX->p['perm'])
             && $JAX->p['perm']
         ) {
-            foreach (explode(',', $JAX->p['grouplist']) as $v) {
+            foreach (explode(',', (string) $JAX->p['grouplist']) as $v) {
                 if (
                     !isset($JAX->p['perm'][$v])
                     || !$JAX->p['perm'][$v]
@@ -182,6 +166,7 @@ class groups
 
             return $this->updateperms($JAX->p['perm']);
         }
+
         if (
             !isset($JAX->b['grouplist'])
             || preg_match('@[^\d,]@', $JAX->b['grouplist'])
@@ -204,7 +189,7 @@ class groups
                 ,
                 'member_groups',
                 'WHERE `id` IN ? ORDER BY `id` ASC',
-                explode(',', $JAX->b['grouplist']),
+                explode(',', (string) $JAX->b['grouplist']),
             )
             : $DB->safeselect(
                 <<<'EOT'
@@ -227,7 +212,8 @@ class groups
             $perms[$f['id']] = $f;
             $grouplist .= $f['id'] . ',';
         }
-        if (!$numgroups) {
+
+        if ($numgroups === 0) {
             $PAGE->addContentBox(
                 'Error',
                 $PAGE->error(
@@ -235,6 +221,7 @@ class groups
                 ),
             );
         }
+
         $grouplist = mb_substr($grouplist, 0, -1);
         $widthPercent = (1 / $numgroups) * 100;
         $groupHeadings = '';
@@ -295,7 +282,7 @@ class groups
         ];
         $permissionsTable = '';
         foreach ($permissionsChart as $k => $v) {
-            if (mb_substr($k, 0, 7) == 'breaker') {
+            if (mb_substr($k, 0, 7) === 'breaker') {
                 $permissionsTable .= $PAGE->parseTemplate(
                     'groups/show-permissions-breaker-row.html',
                     [
@@ -316,6 +303,7 @@ class groups
                         ],
                     ) . PHP_EOL;
                 }
+
                 $permissionsTable .= $PAGE->parseTemplate(
                     'groups/show-permissions-permission-row.html',
                     [
@@ -336,6 +324,8 @@ class groups
         );
 
         $PAGE->addContentBox('Perms', $page);
+
+        return null;
     }
 
     public function create($gid = false)
@@ -343,20 +333,22 @@ class groups
         if ($gid && !is_numeric($gid)) {
             $gid = false;
         }
+
         global $PAGE,$JAX,$DB;
         $page = '';
         $e = '';
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             if (!isset($JAX->p['groupname']) || !$JAX->p['groupname']) {
                 $e = 'Group name required!';
-            } elseif (mb_strlen($JAX->p['groupname']) > 250) {
+            } elseif (mb_strlen((string) $JAX->p['groupname']) > 250) {
                 $e = 'Group name must not exceed 250 characters!';
-            } elseif (mb_strlen($JAX->p['groupicon']) > 250) {
+            } elseif (mb_strlen((string) $JAX->p['groupicon']) > 250) {
                 $e = 'Group icon must not exceed 250 characters!';
             } elseif ($JAX->p['groupicon'] && !$JAX->isurl($JAX->p['groupicon'])) {
                 $e = 'Group icon must be a valid image url';
             }
-            if ($e) {
+
+            if ($e !== '' && $e !== '0') {
                 $page .= $PAGE->error($e);
             } else {
                 $write = [
@@ -376,6 +368,7 @@ class groups
                         $write,
                     );
                 }
+
                 $PAGE->addContentBox(
                     $write['title'] . ' ' . (($gid) ? 'edited' : 'created'),
                     $PAGE->success(
@@ -386,6 +379,7 @@ class groups
                 return $this->showperms();
             }
         }
+
         if ($gid) {
             $result = $DB->safeselect(
                 '`title`,`icon`',
@@ -409,6 +403,8 @@ class groups
             $gid ? 'Editing group: ' . $gdata['title'] : 'Create a group!',
             $page,
         );
+
+        return null;
     }
 
     public function delete(): void
@@ -434,6 +430,7 @@ class groups
                 $DB->basicvalue($JAX->b['delete']),
             );
         }
+
         $result = $DB->safeselect(
             '`id`,`title`',
             'member_groups',
@@ -450,12 +447,14 @@ class groups
                 ],
             );
         }
+
         if (!$found) {
             $page .= $PAGE->error(
                 "You haven't created any groups to delete. "
                 . "(Hint: default groups can't be deleted)",
             );
         }
+
         $PAGE->addContentBox('Delete Groups', $page);
     }
 }

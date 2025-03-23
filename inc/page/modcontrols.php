@@ -7,7 +7,7 @@ class modcontrols
 {
     public $perms;
 
-    private function box($title, $content)
+    private function box(string $title, string $content): string
     {
         $content = ($content ?: '--No Data--');
 
@@ -26,25 +26,34 @@ class modcontrols
         $this->perms = $JAX->getPerms();
         if (!$this->perms['can_moderate'] && !$USER['mod']) {
             $PAGE->JS('softurl');
-
-            return $PAGE->JS(
+            $PAGE->JS(
                 'alert',
                 'Your account does not have moderator permissions.',
             );
+
+            return;
         }
+
         if (isset($JAX->b['cancel']) && $JAX->b['cancel']) {
-            return $this->cancel();
+            $this->cancel();
+
+            return;
         }
 
         if ($PAGE->jsupdate && empty($JAX->p)) {
-            return false;
+            return;
         }
 
         if (isset($JAX->p['dot']) && $JAX->p['dot']) {
-            return $this->dotopics($JAX->p['dot']);
+            $this->dotopics($JAX->p['dot']);
+
+            return;
         }
+
         if (isset($JAX->p['dop']) && $JAX->p['dop']) {
-            return $this->doposts($JAX->p['dop']);
+            $this->doposts($JAX->p['dop']);
+
+            return;
         }
 
         switch ($JAX->b['do']) {
@@ -59,7 +68,7 @@ class modcontrols
                 break;
 
             case 'load':
-                $this->load();
+                static::load();
 
                 break;
 
@@ -113,7 +122,7 @@ class modcontrols
                     '`fid`',
                     'topics',
                     'WHERE `id` IN ?',
-                    explode(',', $SESS->vars['modtids']),
+                    explode(',', (string) $SESS->vars['modtids']),
                 );
                 while ($f = $DB->arow($result)) {
                     $fids[$f['fid']] = 1;
@@ -126,13 +135,14 @@ class modcontrols
                         'fid' => $JAX->p['id'],
                     ],
                     'WHERE `id` IN ?',
-                    explode(',', $SESS->vars['modtids']),
+                    explode(',', (string) $SESS->vars['modtids']),
                 );
                 $this->cancel();
                 $fids[] = $JAX->p['id'];
                 foreach ($fids as $v) {
                     $DB->fixForumLastPost($v);
                 }
+
                 $PAGE->location('?act=vf' . $JAX->p['id']);
 
                 break;
@@ -144,7 +154,7 @@ class modcontrols
                         'pinned' => 1,
                     ],
                     'WHERE `id` IN ?',
-                    explode(',', $SESS->vars['modtids']),
+                    explode(',', (string) $SESS->vars['modtids']),
                 );
                 $PAGE->JS(
                     'alert',
@@ -161,7 +171,7 @@ class modcontrols
                         'pinned' => 0,
                     ],
                     'WHERE `id` IN ?',
-                    explode(',', $SESS->vars['modtids']),
+                    explode(',', (string) $SESS->vars['modtids']),
                 );
                 $PAGE->JS(
                     'alert',
@@ -178,7 +188,7 @@ class modcontrols
                         'locked' => 1,
                     ],
                     'WHERE `id` IN ?',
-                    explode(',', $SESS->vars['modtids']),
+                    explode(',', (string) $SESS->vars['modtids']),
                 );
                 $PAGE->JS(
                     'alert',
@@ -195,7 +205,7 @@ class modcontrols
                         'locked' => 0,
                     ],
                     'WHERE `id` IN ?',
-                    explode(',', $SESS->vars['modtids']),
+                    explode(',', (string) $SESS->vars['modtids']),
                 );
                 $PAGE->JS('alert', 'topics unlocked!');
                 $this->cancel();
@@ -232,7 +242,7 @@ class modcontrols
                         'tid' => $JAX->p['id'],
                     ],
                     'WHERE `id` IN ?',
-                    explode(',', $SESS->vars['modpids']),
+                    explode(',', (string) $SESS->vars['modpids']),
                 );
                 $this->cancel();
                 $PAGE->location('?act=vt' . $JAX->p['id']);
@@ -260,7 +270,7 @@ class modcontrols
     {
         global $PAGE,$SESS,$DB,$USER;
         if (!is_numeric($pid)) {
-            return;
+            return null;
         }
 
         $pid = (int) $pid;
@@ -280,8 +290,9 @@ class modcontrols
         $DB->disposeresult($result);
 
         if (!$postdata) {
-            return;
+            return null;
         }
+
         if ($postdata['newtopic']) {
             return $this->modtopic($postdata['tid']);
         }
@@ -309,9 +320,10 @@ class modcontrols
             $DB->disposeresult($result);
 
             if (!$mods) {
-                return;
+                return null;
             }
-            $mods = explode(',', $mods['mods']);
+
+            $mods = explode(',', (string) $mods['mods']);
             if (!in_array($USER['id'], $mods)) {
                 return $PAGE->JS(
                     'error',
@@ -319,6 +331,7 @@ class modcontrols
                 );
             }
         }
+
         $currentPids = isset($SESS->vars['modpids'])
             ? explode(',', $SESS->vars['modpids']) : [];
         $pids = [];
@@ -327,14 +340,18 @@ class modcontrols
                 $pids[] = (int) $currentPid;
             }
         }
+
         if (in_array($pid, $pids, true)) {
             $pids = array_diff($pids, [$pid]);
         } else {
             $pids[] = $pid;
         }
+
         $SESS->addvar('modpids', implode(',', $pids));
 
         $this->sync();
+
+        return null;
     }
 
     public function modtopic($tid)
@@ -342,8 +359,9 @@ class modcontrols
         global $PAGE,$SESS,$DB,$USER,$PERMS;
         $PAGE->JS('softurl');
         if (!is_numeric($tid)) {
-            return;
+            return null;
         }
+
         $tid = (int) $tid;
         if (!$PERMS['can_moderate']) {
             $result = $DB->safespecial(
@@ -366,7 +384,8 @@ class modcontrols
             if (!$mods) {
                 return $PAGE->JS('error', $DB->error());
             }
-            $mods = explode(',', $mods['mods']);
+
+            $mods = explode(',', (string) $mods['mods']);
             if (!in_array($USER['id'], $mods)) {
                 return $PAGE->JS(
                     'error',
@@ -374,6 +393,7 @@ class modcontrols
                 );
             }
         }
+
         $currentTids = isset($SESS->vars['modtids'])
             ? explode(',', $SESS->vars['modtids']) : [];
         $tids = [];
@@ -382,14 +402,18 @@ class modcontrols
                 $tids[] = (int) $currentTid;
             }
         }
+
         if (in_array($tid, $tids, true)) {
             $tids = array_diff($tids, [$tid]);
         } else {
             $tids[] = $tid;
         }
+
         $SESS->addvar('modtids', implode(',', $tids));
 
         $this->sync();
+
+        return null;
     }
 
     public function sync(): void
@@ -417,33 +441,37 @@ class modcontrols
         );
         $trashcan = $DB->arow($result);
         $trashcan = isset($trashcan['id']) ? (int) $trashcan['id'] : 0;
+
         $DB->disposeresult($result);
 
         $result = $DB->safeselect(
             '`tid`',
             'posts',
             'WHERE `id` IN ?',
-            explode(',', $SESS->vars['modpids']),
+            explode(',', (string) $SESS->vars['modpids']),
         );
 
         // Build list of topic ids that the posts were in.
         $tids = [];
-        $pids = explode(',', $SESS->vars['modpids']);
+        $pids = explode(',', (string) $SESS->vars['modpids']);
         while ($f = $DB->arow($result)) {
             $tids[] = (int) $f['tid'];
         }
+
         $tids = array_unique($tids);
 
-        if ($trashcan) {
+        if ($trashcan !== 0) {
             // Get first & last post.
             foreach ($pids as $v) {
                 if (!isset($op) || !$op || $v < $op) {
                     $op = $v;
                 }
+
                 if (!isset($lp) || !$lp || $v > $lp) {
                     $lp = $v;
                 }
             }
+
             $result = $DB->safeselect(
                 '`auth_id`',
                 'posts',
@@ -475,7 +503,7 @@ class modcontrols
                     'newtopic' => 0,
                 ],
                 'WHERE `id` IN ?',
-                explode(',', $SESS->vars['modpids']),
+                explode(',', (string) $SESS->vars['modpids']),
             );
             $DB->safeupdate(
                 'posts',
@@ -490,9 +518,10 @@ class modcontrols
             $DB->safedelete(
                 'posts',
                 'WHERE `id` IN ?',
-                explode(',', $SESS->vars['modpids']),
+                explode(',', (string) $SESS->vars['modpids']),
             );
         }
+
         foreach ($tids as $tid) {
             // Recount replies.
             $DB->safespecial(
@@ -511,12 +540,14 @@ class modcontrols
                 $tid,
             );
         }
+
         // Fix forum last post for all forums topics were in.
         $fids = [];
         // Add trashcan here too just in case.
-        if ($trashcan) {
+        if ($trashcan !== 0) {
             $fids[] = $trashcan;
         }
+
         $result = $DB->safeselect(
             '`fid`',
             'topics',
@@ -528,15 +559,19 @@ class modcontrols
                 $fids[] = (int) $f['fid'];
             }
         }
+
         $DB->disposeresult($result);
         $fids = array_unique($fids);
         foreach ($fids as $fid) {
             $DB->fixForumLastPost($fid);
         }
+
         // Remove them from the page.
         foreach ($pids as $v) {
             $PAGE->JS('removeel', '#pid_' . $v);
         }
+
+        return null;
     }
 
     public function deletetopics()
@@ -545,6 +580,7 @@ class modcontrols
         if (!$SESS->vars['modtids']) {
             return $PAGE->JS('error', 'No topics to delete');
         }
+
         $data = [];
 
         // Get trashcan id.
@@ -561,18 +597,20 @@ class modcontrols
             '`fid`,`id`',
             'topics',
             'WHERE `id` IN ?',
-            explode(',', $SESS->vars['modtids']),
+            explode(',', (string) $SESS->vars['modtids']),
         );
         $delete = [];
         while ($f = $DB->arow($result)) {
             if (!isset($data[$f['fid']])) {
                 $data[$f['fid']] = 0;
             }
+
             ++$data[$f['fid']];
             if ($trashcan && $trashcan == $f['fid']) {
                 $delete[] = $f['id'];
             }
         }
+
         if ($trashcan) {
             $DB->safeupdate(
                 'topics',
@@ -580,31 +618,36 @@ class modcontrols
                     'fid' => $trashcan,
                 ],
                 'WHERE `id` IN ?',
-                explode(',', $SESS->vars['modtids']),
+                explode(',', (string) $SESS->vars['modtids']),
             );
             $delete = implode(',', $delete);
             $data[$trashcan] = 1;
         } else {
             $delete = $SESS->vars['modtids'];
         }
+
         if (!empty($delete)) {
             $DB->safedelete(
                 'posts',
                 'WHERE `tid` IN ?',
-                explode(',', $delete),
+                explode(',', (string) $delete),
             );
             $DB->safedelete(
                 'topics',
                 'WHERE `id` IN ?',
-                explode(',', $delete),
+                explode(',', (string) $delete),
             );
         }
-        foreach ($data as $k => $v) {
+
+        foreach (array_keys($data) as $k) {
             $DB->fixForumLastPost($k);
         }
+
         $SESS->delvar('modtids');
         $PAGE->JS('modcontrols_clearbox');
         $PAGE->JS('alert', 'topics deleted!');
+
+        return null;
     }
 
     public function mergetopics(): void
@@ -626,7 +669,7 @@ class modcontrols
                     'newtopic' => '0',
                 ],
                 'WHERE `tid` IN ?',
-                explode(',', $SESS->vars['modtids']),
+                explode(',', (string) $SESS->vars['modtids']),
             );
 
             // Make the first post in the topic have newtopic=1.
@@ -659,17 +702,19 @@ class modcontrols
                 'WHERE `id`=?',
                 $DB->basicvalue($JAX->p['ot']),
             );
-            unset($exploded[array_search($JAX->p['ot'], $exploded)]);
-            if (!empty($exploded)) {
+            unset($exploded[array_search($JAX->p['ot'], $exploded, true)]);
+            if ($exploded !== []) {
                 $DB->safedelete(
                     'topics',
                     'WHERE `id` IN ?',
                     $exploded,
                 );
             }
+
             $this->cancel();
             $PAGE->location('?act=vt' . $JAX->p['ot']);
         }
+
         $page .= '<form method="post" data-ajax-form="true" '
             . 'style="padding:10px;">'
             . 'Which topic should the topics be merged into?<br />';
@@ -691,6 +736,7 @@ class modcontrols
             while ($f = $DB->arow($result)) {
                 $titles[$f['id']] = $f['title'];
             }
+
             foreach ($exploded as $v) {
                 if (isset($titles[$v])) {
                     $page .= '<input type="radio" name="ot" value="' . $v . '" /> '
@@ -698,6 +744,7 @@ class modcontrols
                 }
             }
         }
+
         $page .= '<input type="submit" value="Merge" /></form>';
         $page = $PAGE->collapsebox('Merging Topics', $page);
         $PAGE->JS('update', 'page', $page);
@@ -733,18 +780,21 @@ class modcontrols
         if (!$PERMS['can_moderate']) {
             return;
         }
+
         $page = $PAGE->meta('modcp-index', $cppage);
         $page = $PAGE->meta('box', ' id="modcp"', 'Mod CP', $page);
+
         $PAGE->append('page', $page);
         $PAGE->JS('update', 'page', $page);
     }
 
-    public function editmembers()
+    public function editmembers(): void
     {
         global $PAGE,$JAX,$DB,$USER,$PERMS;
         if (!$PERMS['can_moderate']) {
             return;
         }
+
         $e = '';
         $data = [];
         $page = '<form method="post" data-ajax-form="true">'
@@ -764,7 +814,7 @@ class modcontrols
             <input type="submit" type="View member details" value="Go" />
             </form>';
         if (isset($JAX->p['submit']) && $JAX->p['submit'] == 'save') {
-            if (!trim($JAX->p['display_name'])) {
+            if (trim((string) $JAX->p['display_name']) === '' || trim((string) $JAX->p['display_name']) === '0') {
                 $page .= $PAGE->meta('error', 'Display name is invalid.');
             } else {
                 $DB->safeupdate(
@@ -790,6 +840,7 @@ class modcontrols
                 }
             }
         }
+
         if (
             (isset($JAX->p['submit'])
             && $JAX->p['submit'] == 'showform')
@@ -844,6 +895,7 @@ class modcontrols
                 while ($f = $DB->arow($result)) {
                     $data[] = $f;
                 }
+
                 if (count($data) > 1) {
                     $e = 'Many users found!';
                 } else {
@@ -856,6 +908,7 @@ class modcontrols
             if (!$data) {
                 $e = 'No members found that matched the criteria.';
             }
+
             if (
                 (isset($data['can_moderate'])
                 && $data['can_moderate'])
@@ -867,10 +920,10 @@ class modcontrols
                 $e = 'You do not have permission to edit this profile.';
             }
 
-            if ($e) {
+            if ($e !== '' && $e !== '0') {
                 $page .= $PAGE->meta('error', $e);
             } else {
-                function field($label, $name, $value, $type = 'input')
+                function field($label, $name, $value, $type = 'input'): string
                 {
                     return '<tr><td><label for="m_' . $name . '">' . $label
                         . '</label></td><td>'
@@ -879,6 +932,7 @@ class modcontrols
                         : '<input type="text" id="m_' . $name . '" name="' . $name
                         . '" value="' . $value . '" />') . '</td></tr>';
                 }
+
                 $page .= '<form method="post" '
                     . 'data-ajax-form="true"><table>';
                 $page .= $JAX->hiddenFormFields(
@@ -935,9 +989,10 @@ class modcontrols
         } elseif (isset($JAX->p['unban']) && $JAX->p['unban']) {
             if ($entry = $JAX->ipbanned($ip)) {
                 $changed = true;
-                unset($JAX->ipbancache[array_search($entry, $JAX->ipbancache)]);
+                unset($JAX->ipbancache[array_search($entry, $JAX->ipbancache, true)]);
             }
         }
+
         if ($changed) {
             $o = fopen(BOARDPATH . '/bannedips.txt', 'w');
             fwrite($o, implode(PHP_EOL, $JAX->ipbancache));
@@ -985,6 +1040,7 @@ class modcontrols
                         onclick="this.form.submitButton=this" value="Ban" />
                     EOT;
             }
+
             $torDate = date('Y-m-d', strtotime('-2 days'));
             $page .= $this->box(
                 'Info',
@@ -1024,6 +1080,7 @@ class modcontrols
                     $f['display_name'],
                 );
             }
+
             $page .= $this->box('Users with this IP:', implode(', ', $content));
 
             if ($CFG['shoutbox']) {
@@ -1056,8 +1113,10 @@ class modcontrols
                     );
                     $content .= ' : ' . $f['shout'] . '<br />';
                 }
+
                 $page .= $this->box('Last 5 shouts:', $content);
             }
+
             $content = '';
             $result = $DB->safeselect(
                 '`post`',
@@ -1067,11 +1126,13 @@ class modcontrols
             );
             while ($f = $DB->arow($result)) {
                 $content .= "<div class='post'>"
-                    . nl2br($JAX->blockhtml($JAX->textonly($f['post'])))
+                    . nl2br((string) $JAX->blockhtml($JAX->textonly($f['post'])))
                     . '</div>';
             }
+
             $page .= $this->box('Last 5 posts:', $content);
         }
+
         $this->showmodcp($form . $page);
     }
 }

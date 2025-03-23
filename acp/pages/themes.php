@@ -14,6 +14,7 @@ class themes
         if (!defined('DTHEMEPATH')) {
             define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . $CFG['dthemepath']);
         }
+
         $links = [
             'create' => 'Create New Skin',
             'manage' => 'Manage Skins',
@@ -51,15 +52,19 @@ class themes
         }
     }
 
-    public function getwrappers()
+    /**
+     * @return string[]
+     */
+    public function getwrappers(): array
     {
         $wrappers = [];
         $o = opendir(BOARDPATH . 'Wrappers');
         while ($f = readdir($o)) {
-            if ($f != '.' && $f != '..') {
+            if ($f !== '.' && $f !== '..') {
                 $wrappers[] = mb_substr($f, 0, -4);
             }
         }
+
         closedir($o);
 
         return $wrappers;
@@ -74,7 +79,7 @@ class themes
         if (isset($JAX->g['deletewrapper']) && $JAX->g['deletewrapper']) {
             $wrapperPath = BOARDPATH . 'Wrappers/' . $JAX->g['deletewrapper'] . '.txt';
             if (
-                !preg_match('@[^\w ]@', $JAX->g['deletewrapper'])
+                !preg_match('@[^\w ]@', (string) $JAX->g['deletewrapper'])
                 && file_exists($wrapperPath)
             ) {
                 unlink(BOARDPATH . 'Wrappers/' . $JAX->g['deletewrapper'] . '.txt');
@@ -88,11 +93,11 @@ class themes
         if (isset($JAX->p['newwrapper']) && $JAX->p['newwrapper']) {
             $newWrapperPath
                 = BOARDPATH . 'Wrappers/' . $JAX->p['newwrapper'] . '.txt';
-            if (preg_match('@[^\w ]@', $JAX->p['newwrapper'])) {
+            if (preg_match('@[^\w ]@', (string) $JAX->p['newwrapper'])) {
                 $errorwrapper
                     = 'Wrapper name must consist of letters, numbers, '
                     . 'spaces, and underscore.';
-            } elseif (mb_strlen($JAX->p['newwrapper']) > 50) {
+            } elseif (mb_strlen((string) $JAX->p['newwrapper']) > 50) {
                 $errorwrapper = 'Wrapper name must be less than 50 characters.';
             } elseif (file_exists($newWrapperPath)) {
                 $errorwrapper = 'That wrapper already exists.';
@@ -120,11 +125,13 @@ class themes
             if (!isset($JAX->p['hidden'])) {
                 $JAX->p['hidden'] = [];
             }
+
             if (is_array($JAX->p['wrapper'])) {
                 foreach ($JAX->p['wrapper'] as $k => $v) {
                     if (!isset($JAX->p['hidden'][$k])) {
                         $JAX->p['hidden'][$k] = false;
                     }
+
                     if (!$v || in_array($v, $wrappers)) {
                         $DB->safeupdate(
                             'skins',
@@ -144,13 +151,16 @@ class themes
                     if ($k == $v) {
                         continue;
                     }
+
                     if (preg_match('@[^\w ]@', $k)) {
                         continue;
                     }
+
                     if (!is_dir(BOARDPATH . 'Themes/' . $k)) {
                         continue;
                     }
-                    if (preg_match('@[^\w ]@', $v) || mb_strlen($v) > 50) {
+
+                    if (preg_match('@[^\w ]@', (string) $v) || mb_strlen((string) $v) > 50) {
                         $errorskins = <<<'EOT'
                             Skin name must consist of letters, numbers, spaces, and underscore, and be
                             under 50 characters long.
@@ -179,13 +189,16 @@ class themes
                     if ($k == $v) {
                         continue;
                     }
+
                     if (preg_match('@[^\w ]@', $k)) {
                         continue;
                     }
+
                     if (!is_file(BOARDPATH . 'Wrappers/' . $k . '.txt')) {
                         continue;
                     }
-                    if (preg_match('@[^\w ]@', $v) || mb_strlen($v) > 50) {
+
+                    if (preg_match('@[^\w ]@', (string) $v) || mb_strlen((string) $v) > 50) {
                         $errorwrapper = <<<'EOT'
                             Wrapper name must consist of letters, numbers, spaces, and underscore, and be
                             under 50 characters long.
@@ -206,6 +219,7 @@ class themes
                             BOARDPATH . 'Wrappers/' . $v . '.txt',
                         );
                     }
+
                     $wrappers = $this->getwrappers();
                 }
             }
@@ -228,6 +242,7 @@ class themes
                 );
             }
         }
+
         $result = $DB->safeselect(
             '`id`,`using`,`title`,`custom`,`wrapper`,`default`,`hidden`',
             'skins',
@@ -248,6 +263,7 @@ class themes
                     ],
                 ) . PHP_EOL;
             }
+
             $skins .= $PAGE->parseTemplate(
                 'themes/show-skin-index-css-row.html',
                 [
@@ -279,7 +295,8 @@ class themes
             ) . PHP_EOL;
             $usedwrappers[] = $f['wrapper'];
         }
-        $skins = ($errorskins ? $PAGE->error($errorskins) : '')
+
+        $skins = ($errorskins !== '' && $errorskins !== '0' ? $PAGE->error($errorskins) : '')
             . $PAGE->parseTemplate(
                 'themes/show-skin-index-css.html',
                 [
@@ -304,6 +321,7 @@ class themes
                 ],
             ) . PHP_EOL;
         }
+
         $wrap = $PAGE->parseTemplate(
             'themes/show-skin-index-wrapper.html',
             [
@@ -312,7 +330,7 @@ class themes
         );
         $PAGE->addContentBox(
             'Wrappers',
-            ($errorwrapper ? $PAGE->error($errorwrapper) : '') . $wrap,
+            ($errorwrapper !== '' && $errorwrapper !== '0' ? $PAGE->error($errorwrapper) : '') . $wrap,
         );
     }
 
@@ -330,9 +348,10 @@ class themes
         if (!isset($JAX->p['newskindata'])) {
             $JAX->p['newskindata'] = false;
         }
+
         if ($skin && $skin['custom'] && $JAX->p['newskindata']) {
             $o = fopen(BOARDPATH . 'Themes/' . $skin['title'] . '/css.css', 'w');
-            fwrite($o, $JAX->p['newskindata']);
+            fwrite($o, (string) $JAX->p['newskindata']);
             fclose($o);
         }
 
@@ -344,8 +363,8 @@ class themes
                     'content' => $JAX->blockhtml(
                         file_get_contents(
                             (
-                                !$skin['custom']
-                                ? STHEMEPATH : BOARDPATH . 'Themes/'
+                                $skin['custom']
+                                ? BOARDPATH . 'Themes/' : STHEMEPATH
                             ) . $skin['title'] . '/css.css',
                         ),
                     ),
@@ -362,7 +381,7 @@ class themes
         global $PAGE,$JAX;
         $saved = '';
         $wrapperf = BOARDPATH . 'Wrappers/' . $wrapper . '.txt';
-        if (preg_match('@[^ \w]@', $wrapper) && !is_file($wrapperf)) {
+        if (preg_match('@[^ \w]@', (string) $wrapper) && !is_file($wrapperf)) {
             $PAGE->addContentBox(
                 'Error',
                 "The theme you're trying to edit does not exist.",
@@ -384,6 +403,7 @@ class themes
                     }
                 }
             }
+
             $PAGE->addContentBox(
                 "Editing Wrapper: {$wrapper}",
                 $saved . $PAGE->parseTemplate(
@@ -404,9 +424,9 @@ class themes
             $e = '';
             if (!isset($JAX->p['skinname']) || !$JAX->p['skinname']) {
                 $e = 'No skin name supplied!';
-            } elseif (preg_match('@[^\w ]@', $JAX->p['skinname'])) {
+            } elseif (preg_match('@[^\w ]@', (string) $JAX->p['skinname'])) {
                 $e = 'Skinname must only consist of letters, numbers, and spaces.';
-            } elseif (mb_strlen($JAX->p['skinname']) > 50) {
+            } elseif (mb_strlen((string) $JAX->p['skinname']) > 50) {
                 $e = 'Skin name must be less than 50 characters.';
             } elseif (is_dir(BOARDPATH . 'Themes/' . $JAX->p['skinname'])) {
                 $e = 'A skin with that name already exists.';
@@ -416,6 +436,7 @@ class themes
                 if (!isset($JAX->p['hidden'])) {
                     $JAX->p['hidden'] = false;
                 }
+
                 if (!isset($JAX->p['default'])) {
                     $JAX->p['default'] = false;
                 }
@@ -440,9 +461,11 @@ class themes
                         $DB->insert_id(1),
                     );
                 }
+
                 if (!is_dir(BOARDPATH . 'Themes') && is_writable(BOARDPATH)) {
                     mkdir(BOARDPATH . 'Themes');
                 }
+
                 if (is_dir(BOARDPATH . 'Themes')) {
                     mkdir(BOARDPATH . 'Themes');
                     mkdir(BOARDPATH . 'Themes/' . $JAX->p['skinname']);
@@ -455,12 +478,15 @@ class themes
                     );
                     fclose($o);
                 }
+
                 $PAGE->location('?act=themes');
             }
-            if ($e) {
+
+            if ($e !== '' && $e !== '0') {
                 $page = $PAGE->error($e);
             }
         }
+
         $wrapperOptions = '';
         foreach ($this->getwrappers() as $wrapper) {
             $wrapperOptions .= $PAGE->parseTemplate(
@@ -472,6 +498,7 @@ class themes
                 ],
             ) . PHP_EOL;
         }
+
         $page .= $PAGE->parseTemplate(
             'themes/create-skin.html',
             [
@@ -497,8 +524,10 @@ class themes
             foreach (glob($skindir . '/*') as $v) {
                 unlink($v);
             }
+
             $JAX->rmdir($skindir);
         }
+
         $DB->safedelete(
             'skins',
             'WHERE `id`=?',
@@ -514,6 +543,7 @@ class themes
                 'LIMIT 1',
             );
         }
+
         $PAGE->location('?act=themes');
     }
 }

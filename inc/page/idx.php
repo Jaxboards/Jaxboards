@@ -4,9 +4,14 @@ $PAGE->loadmeta('idx');
 new IDX();
 class IDX
 {
+    public $moderatorinfo;
+
     public $forumsread = [];
+
     public $mods;
+
     public $subforumids;
+
     public $subforums;
 
     public function __construct()
@@ -14,9 +19,11 @@ class IDX
         global $PAGE,$CFG,$JAX,$SESS;
         if (isset($JAX->b['markread']) && $JAX->b['markread']) {
             $PAGE->JS('softurl');
-            $SESS->forumsread = $SESS->topicsread = '';
+            $SESS->forumsread = '';
+            $SESS->topicsread = '';
             $SESS->read_date = time();
         }
+
         if ($PAGE->jsupdate) {
             $this->update();
         } else {
@@ -52,7 +59,10 @@ class IDX
                 'members',
             ],
         );
-        $data = $this->subforums = $this->subforumids = $this->mods = [];
+        $data = [];
+        $this->subforums = [];
+        $this->subforumids = [];
+        $this->mods = [];
 
         // This while loop just grabs all of the data, displaying is done below.
         while ($r = $DB->arow($result)) {
@@ -60,9 +70,10 @@ class IDX
             if ($r['perms'] && !$perms['view']) {
                 continue;
             }
+
             // Store subforum details for later.
             if ($r['path']) {
-                preg_match('@\d+$@', $r['path'], $m);
+                preg_match('@\d+$@', (string) $r['path'], $m);
                 if (isset($this->subforums[$m[0]])) {
                     $this->subforumids[$m[0]][] = $r['id'];
                     $this->subforums[$m[0]] .= $PAGE->meta(
@@ -78,13 +89,14 @@ class IDX
 
             // Store mod details for later.
             if ($r['show_ledby'] && $r['mods']) {
-                foreach (explode(',', $r['mods']) as $v) {
-                    if ($v) {
+                foreach (explode(',', (string) $r['mods']) as $v) {
+                    if ($v !== '' && $v !== '0') {
                         $this->mods[$v] = 1;
                     }
                 }
             }
         }
+
         $this->mods = array_keys($this->mods);
         $catq = $DB->safeselect(
             '`id`,`title`,`order`',
@@ -102,6 +114,7 @@ class IDX
                 );
             }
         }
+
         $page .= $PAGE->meta('idx-tools');
 
         $page .= $this->getBoardStats();
@@ -119,6 +132,7 @@ class IDX
         if (!isset($this->subforumids[$id]) || !$this->subforumids[$id]) {
             return [];
         }
+
         $r = $this->subforumids[$id];
         foreach ($r as $v) {
             if ($this->subforumids[$v]) {
@@ -129,7 +143,7 @@ class IDX
         return $r;
     }
 
-    public function getmods($modids)
+    public function getmods($modids): string
     {
         global $DB,$PAGE;
         if (!$this->moderatorinfo) {
@@ -149,19 +163,21 @@ class IDX
                 );
             }
         }
-        foreach (explode(',', $modids) as $v) {
+
+        foreach (explode(',', (string) $modids) as $v) {
             $r .= $this->moderatorinfo[$v] . $PAGE->meta('idx-ledby-splitter');
         }
 
-        return mb_substr($r, 0, -mb_strlen($PAGE->meta('idx-ledby-splitter')));
+        return mb_substr($r, 0, -mb_strlen((string) $PAGE->meta('idx-ledby-splitter')));
     }
 
     public function buildTable($a)
     {
         global $PAGE,$JAX;
         if (!$a) {
-            return;
+            return null;
         }
+
         $r = '';
         foreach ($a as $v) {
             $read = $this->isForumRead($v);
@@ -169,17 +185,19 @@ class IDX
             if ($v['show_sub'] >= 1 && isset($this->subforums[$v['id']])) {
                 $sf = $this->subforums[$v['id']];
             }
+
             if ($v['show_sub'] == 2) {
                 foreach ($this->getsubs($v['id']) as $i) {
                     $sf .= $this->subforums[$i];
                 }
             }
+
             if ($v['redirect']) {
                 $r .= $PAGE->meta(
                     'idx-redirect-row',
                     $v['id'],
                     $v['title'],
-                    nl2br($v['subtitle']),
+                    nl2br((string) $v['subtitle']),
                     'Redirects: ' . $v['redirects'],
                     $JAX->pick(
                         $PAGE->meta('icon-redirect'),
@@ -188,9 +206,9 @@ class IDX
                 );
             } else {
                 $vId = $v['id'];
-                $hrefCode = !$read
-                    ? ' href="?act=vf' . $v['id'] . '&amp;markread=1"'
-                    : '';
+                $hrefCode = $read
+                    ? ''
+                    : ' href="?act=vf' . $v['id'] . '&amp;markread=1"';
                 $linkText = $read
                     ? $JAX->pick(
                         $PAGE->meta('icon-read'),
@@ -203,15 +221,15 @@ class IDX
                     'idx-row',
                     $v['id'],
                     $JAX->wordfilter($v['title']),
-                    nl2br($v['subtitle']),
+                    nl2br((string) $v['subtitle']),
                     $sf
                     ? $PAGE->meta(
                         'idx-subforum-wrapper',
                         mb_substr(
-                            $sf,
+                            (string) $sf,
                             0,
                             -1 * mb_strlen(
-                                $PAGE->meta('idx-subforum-splitter'),
+                                (string) $PAGE->meta('idx-subforum-splitter'),
                             ),
                         ),
                     ) : '',
@@ -243,13 +261,13 @@ class IDX
         $this->updateLastPosts();
     }
 
-    public function getBoardStats()
+    public function getBoardStats(): string
     {
         global $DB,$JAX,$PAGE,$PERMS;
         if (!$PERMS['can_view_stats']) {
             return '';
         }
-        $e = '';
+
         $legend = '';
         $page = '';
         $userstoday = '';
@@ -292,6 +310,7 @@ class IDX
             if (!$f['id']) {
                 continue;
             }
+
             $fId = $f['id'];
             $fName = $f['name'];
             $fGroupId = $f['group_id'];
@@ -309,6 +328,7 @@ class IDX
             $userstoday .= ', ';
             ++$nuserstoday;
         }
+
         $userstoday = mb_substr($userstoday, 0, -2);
         $usersonline = $this->getusersonlinelist();
         $result = $DB->safeselect(
@@ -320,7 +340,8 @@ class IDX
             $legend .= '<a href="?" class="mgroup' . $row['id'] . '">'
                 . $row['title'] . '</a> ';
         }
-        $page .= $PAGE->meta(
+
+        return $page . $PAGE->meta(
             'idx-stats',
             $usersonline[1],
             $usersonline[0],
@@ -338,11 +359,9 @@ class IDX
             ),
             $legend,
         );
-
-        return $page;
     }
 
-    public function getusersonlinelist()
+    public function getusersonlinelist(): array
     {
         global $DB,$PAGE,$JAX,$CFG;
         $r = '';
@@ -385,8 +404,9 @@ class IDX
         global $PAGE,$DB,$SESS,$CFG;
         $list = [];
         if ($SESS->users_online_cache) {
-            $oldcache = array_flip(explode(',', $SESS->users_online_cache));
+            $oldcache = array_flip(explode(',', (string) $SESS->users_online_cache));
         }
+
         $useronlinecache = '';
         foreach ($DB->getUsersOnline() as $f) {
             $lastActionIdle = $SESS->last_update - $CFG['timetoidle'] - 30;
@@ -408,17 +428,21 @@ class IDX
                         $f['location_verbose'],
                     ];
                 }
+
                 if (isset($oldcache)) {
                     unset($oldcache[$f['uid']]);
                 }
+
                 $useronlinecache .= $f['uid'] . ',';
             }
         }
-        if (isset($oldcache) && !empty($oldcache)) {
+
+        if (isset($oldcache) && $oldcache !== []) {
             $PAGE->JS('setoffline', implode(',', array_flip($oldcache)));
         }
+
         $SESS->users_online_cache = mb_substr($useronlinecache, 0, -1);
-        if (!empty($list)) {
+        if ($list !== []) {
             $PAGE->JS('onlinelist', $list);
         }
     }
@@ -492,12 +516,13 @@ class IDX
         );
     }
 
-    public function isForumRead($forum)
+    public function isForumRead($forum): bool
     {
         global $SESS,$USER,$JAX;
         if (!$this->forumsread) {
             $this->forumsread = $JAX->parsereadmarkers($SESS->forumsread);
         }
+
         if (!isset($this->forumsread[$forum['id']])) {
             $this->forumsread[$forum['id']] = null;
         }

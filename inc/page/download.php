@@ -20,6 +20,7 @@ class downloader
             $data = $DB->arow($result);
             $DB->disposeresult($result);
         }
+
         if ($data) {
             $DB->safespecial(
                 <<<'EOT'
@@ -31,20 +32,19 @@ class downloader
                 ['files'],
                 $id,
             );
-            $ext = explode('.', $data['name']);
-            if (count($ext) == 1) {
-                $ext = '';
-            } else {
-                $ext = mb_strtolower(array_pop($ext));
-            }
+            $ext = explode('.', (string) $data['name']);
+            $ext = count($ext) == 1 ? '' : mb_strtolower(array_pop($ext));
+
             if (in_array($ext, ['jpeg', 'jpg', 'png', 'gif', 'bmp'])) {
                 $data['hash'] .= '.' . $ext;
             }
+
             $file = BOARDPATH . 'Uploads/' . $data['hash'];
             if (file_exists($file)) {
                 if (!$data['name']) {
                     $data['name'] = 'unknown';
                 }
+
                 header('Content-type:application/idk');
                 header(
                     'Content-disposition:attachment;filename="'

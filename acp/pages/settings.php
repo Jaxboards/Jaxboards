@@ -41,26 +41,12 @@ class settings
             $JAX->b['do'] = null;
         }
 
-        switch ($JAX->b['do']) {
-            case 'pages':
-                $this->pages();
-
-                break;
-
-            case 'shoutbox':
-                $this->shoutbox();
-
-                break;
-
-            case 'birthday':
-                $this->birthday();
-
-                break;
-
-            case 'global':
-            default:
-                $this->boardname();
-        }
+        match ($JAX->b['do']) {
+            'pages' => $this->pages(),
+            'shoutbox' => $this->shoutbox(),
+            'birthday' => $this->birthday(),
+            default => $this->boardname(),
+        };
     }
 
     public function boardname(): void
@@ -69,7 +55,7 @@ class settings
         $page = '';
         $e = '';
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
-            if (trim($JAX->p['boardname']) === '') {
+            if (trim((string) $JAX->p['boardname']) === '') {
                 $e = 'Board name is required';
             } elseif (
                 !isset($JAX->p['logourl'])
@@ -78,7 +64,8 @@ class settings
             ) {
                 $e = 'Please enter a valid logo url.';
             }
-            if ($e) {
+
+            if ($e !== '' && $e !== '0') {
                 $page .= $PAGE->error($e);
             } else {
                 $write = [];
@@ -91,6 +78,7 @@ class settings
                 $page .= $PAGE->success('Settings saved!');
             }
         }
+
         $page .= $PAGE->parseTemplate(
             'settings/boardname.html',
             [
@@ -101,16 +89,17 @@ class settings
         $PAGE->addContentBox('Board Name/Logo', $page);
 
         $page = '';
-        $boardOfflineCode = !$PAGE->getCFGSetting('boardoffline')
-            ? 'checked="checked"' : '';
-        $boardOfflineText = $JAX->blockhtml(
+        if (!$PAGE->getCFGSetting('boardoffline')) {
+        }
+
+        $JAX->blockhtml(
             $PAGE->getCFGSetting('offlinetext'),
         );
         $page .= $PAGE->parseTemplate(
             'settings/boardname-board-offline.html',
             [
-                'board_offline_checked' => !$PAGE->getCFGSetting('boardoffline')
-                    ? ' checked="checked"' : '',
+                'board_offline_checked' => $PAGE->getCFGSetting('boardoffline')
+                    ? '' : ' checked="checked"',
                 'board_offline_text' => $JAX->blockhtml(
                     $PAGE->getCFGSetting('offlinetext'),
                 ),
@@ -130,24 +119,25 @@ class settings
         if (isset($JAX->b['delete']) && $JAX->b['delete']) {
             $this->pages_delete($JAX->b['delete']);
         }
+
         if (isset($JAX->b['page']) && $JAX->b['page']) {
             $newact = preg_replace(
                 '@\W@',
                 '<span style="font-weight:bold;color:#F00;">$0</span>',
-                $JAX->b['page'],
+                (string) $JAX->b['page'],
             );
             if ($newact != $JAX->b['page']) {
                 $e = 'The page URL must contain only letters and numbers. '
                     . "Invalid characters: {$newact}";
-            } elseif (mb_strlen($newact) > 25) {
+            } elseif (mb_strlen((string) $newact) > 25) {
                 $e = 'The page URL cannot exceed 25 characters.';
             } else {
                 return $this->pages_edit($newact);
             }
-            if ($e) {
-                $page .= $PAGE->error($e);
-            }
+
+            $page .= $PAGE->error($e);
         }
+
         $result = $DB->safeselect(
             '`act`,`page`',
             'pages',
@@ -161,7 +151,8 @@ class settings
                 ],
             ) . PHP_EOL;
         }
-        if ($table) {
+
+        if ($table !== '' && $table !== '0') {
             $page .= $PAGE->parseTemplate(
                 'settings/pages.html',
                 [
@@ -169,6 +160,7 @@ class settings
                 ],
             );
         }
+
         $hiddenFields = $JAX->hiddenFormFields(
             [
                 'act' => 'settings',
@@ -226,11 +218,13 @@ class settings
                     ],
                 );
             }
+
             $pageinfo['page'] = $JAX->p['pagecontents'];
             $page .= $PAGE->success(
                 "Page saved. Preview <a href='/?act={$pageurl}'>here</a>",
             );
         }
+
         $page .= $PAGE->parseTemplate(
             'settings/pages-edit.html',
             [
@@ -255,13 +249,16 @@ class settings
             );
             $page .= $PAGE->success('Shoutbox cleared!');
         }
+
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             if (!isset($JAX->p['sbe'])) {
                 $JAX->p['sbe'] = false;
             }
+
             if (!isset($JAX->p['sbava'])) {
                 $JAX->p['sbava'] = false;
             }
+
             $write = [
                 'shoutbox' => $JAX->p['sbe'] ? 1 : 0,
                 'shoutboxava' => $JAX->p['sbava'] ? 1 : 0,
@@ -275,13 +272,15 @@ class settings
             } else {
                 $e = 'Shouts to show must be between 1 and 10';
             }
+
             $PAGE->writeCFG($write);
-            if ($e) {
+            if ($e !== '' && $e !== '0') {
                 $page .= $PAGE->error($e);
             } else {
                 $page .= $PAGE->success('Data saved.');
             }
         }
+
         $page .= $PAGE->parseTemplate(
             'settings/shoutbox.html',
             [
@@ -303,16 +302,18 @@ class settings
             if (!isset($JAX->p['bicon'])) {
                 $JAX->p['bicon'] = false;
             }
+
             $PAGE->writeCFG(
                 [
                     'birthdays' => $birthdays = ($JAX->p['bicon'] ? 1 : 0),
                 ],
             );
         }
+
         $page = $PAGE->parseTemplate(
             'settings/birthday.html',
             [
-                'checked' => $birthdays & 1 ? ' checked="checked"' : '',
+                'checked' => ($birthdays & 1) !== 0 ? ' checked="checked"' : '',
             ],
         );
 

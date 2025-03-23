@@ -6,17 +6,21 @@ $IDX = new FORUM();
 class FORUM
 {
     public $topicsRead = [];
+
     public $forumsRead = [];
+
     public $forumReadTime = 0;
-    public $numperpage;
-    public $page;
+
+    public $numperpage = 20;
+
+    /**
+     * @var float|int
+     */
+    public $page = 0;
 
     public function __construct()
     {
         global $JAX,$PAGE;
-
-        $this->numperpage = 20;
-        $this->page = 0;
         if (
             isset($JAX->b['page'])
             && is_numeric($JAX->b['page'])
@@ -25,12 +29,14 @@ class FORUM
             $this->page = $JAX->b['page'] - 1;
         }
 
-        preg_match('@^([a-zA-Z_]+)(\d+)$@', $JAX->g['act'], $act);
+        preg_match('@^([a-zA-Z_]+)(\d+)$@', (string) $JAX->g['act'], $act);
         if (isset($JAX->b['markread']) && $JAX->b['markread']) {
             $this->markread($act[2]);
+            $PAGE->location('?');
 
-            return $PAGE->location('?');
+            return;
         }
+
         if ($PAGE->jsupdate) {
             $this->update();
         } elseif (isset($JAX->b['replies']) && is_numeric($JAX->b['replies'])) {
@@ -49,7 +55,9 @@ class FORUM
             return $PAGE->location('?');
         }
 
-        $page = $rows = $table = '';
+        $page = '';
+        $rows = '';
+        $table = '';
 
         $result = $DB->safespecial(
             <<<'EOT'
@@ -143,6 +151,7 @@ class FORUM
             if ($this->page) {
                 continue;
             }
+
             $rows .= $PAGE->meta(
                 'forum-subforum-row',
                 $f['id'],
@@ -179,19 +188,21 @@ class FORUM
                 $unread = true;
             }
         }
-        if ($rows) {
+
+        if ($rows !== '' && $rows !== '0') {
             $page .= $PAGE->collapsebox(
                 'Subforums',
                 $PAGE->meta('forum-subforum-table', $rows),
             );
         }
 
-        $rows = $table = '';
+        $rows = '';
+        $table = '';
 
         // Generate pages.
         $numpages = ceil($fdata['topics'] / $this->numperpage);
         $forumpages = '';
-        if ($numpages) {
+        if ($numpages !== 0.0) {
             foreach ($JAX->pages($numpages, $this->page + 1, 10) as $v) {
                 $forumpages .= '<a href="?act=vf' . $fid . '&amp;page='
                     . $v . '"' . (($v - 1) == $this->page ? ' class="active"' : '')
@@ -218,12 +229,13 @@ class FORUM
         $orderby = '`lp_date` DESC';
         if ($fdata['orderby']) {
             $fdata['orderby'] = (int) $fdata['orderby'];
-            if ($fdata['orderby'] & 1) {
+            if (($fdata['orderby'] & 1) !== 0) {
                 $orderby = 'ASC';
                 --$fdata['orderby'];
             } else {
                 $orderby = 'DESC';
             }
+
             if ($fdata['orderby'] == 2) {
                 $orderby = '`id` ' . $orderby;
             } elseif ($fdata['orderby'] == 4) {
@@ -275,8 +287,10 @@ class FORUM
                     $pages .= "<a href='?act=vt" . $f['id']
                         . "&amp;page={$v}'>{$v}</a> ";
                 }
+
                 $pages = $PAGE->meta('forum-topic-pages', $pages);
             }
+
             $read = false;
             $unread = false;
             $rows .= $PAGE->meta(
@@ -299,7 +313,7 @@ class FORUM
                 // 8
                 ($f['pinned'] ? 'pinned' : '') . ' ' . ($f['locked'] ? 'locked' : ''),
                 // 9
-                $f['summary'] ? $f['summary'] . (mb_strlen($f['summary']) > 45 ? '...' : '') : '',
+                $f['summary'] ? $f['summary'] . (mb_strlen((string) $f['summary']) > 45 ? '...' : '') : '',
                 // 10
                 $PERMS['can_moderate'] ? '<a href="?act=modcontrols&do=modt&tid='
                 . $f['id'] . '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>' : '',
@@ -322,18 +336,21 @@ class FORUM
                 $unread = true;
             }
         }
+
         // If they're on the first page and no topics
         // were marked as unread, mark the whole forum as read
         // since we don't care about pages past the first one.
         if (!$this->page && !$unread) {
             $this->markread($fid);
         }
-        if ($rows) {
+
+        if ($rows !== '' && $rows !== '0') {
             $table = $PAGE->meta('forum-table', $rows);
         } else {
             if ($this->page > 0) {
                 return $PAGE->location('?act=vf' . $fid);
             }
+
             if ($fdata['perms']['start']) {
                 $table = $PAGE->error(
                     "This forum is empty! Don't like it? "
@@ -341,6 +358,7 @@ class FORUM
                 );
             }
         }
+
         $page .= $PAGE->meta('box', ' id="fid_' . $fid . '_listing"', $title, $table);
         $page .= $PAGE->meta('forum-pages-bottom', $forumpages);
         $page .= $PAGE->meta('forum-buttons-bottom', $forumbuttons);
@@ -348,7 +366,7 @@ class FORUM
         // Start building the nav path.
         $path[$fdata['cat']] = '?act=vc' . $fdata['cat_id'];
         if ($fdata['path']) {
-            $pathids = explode(' ', $fdata['path']);
+            $pathids = explode(' ', (string) $fdata['path']);
             $forums = [];
             $result = $DB->safeselect(
                 '`title`,`id`',
@@ -359,10 +377,12 @@ class FORUM
             while ($f = $DB->arow($result)) {
                 $forums[$f['id']] = [$f['title'], '?act=vf' . $f['id']];
             }
+
             foreach ($pathids as $v) {
                 $path[$forums[$v][0]] = $forums[$v][1];
             }
         }
+
         $path[$title] = "?act=vf{$fid}";
         $PAGE->updatepath($path);
         if ($PAGE->jsaccess) {
@@ -370,6 +390,8 @@ class FORUM
         } else {
             $PAGE->append('PAGE', $page);
         }
+
+        return null;
     }
 
     public function getreplysummary($tid): void
@@ -393,6 +415,7 @@ class FORUM
         while ($f = $DB->arow($result)) {
             $page .= '<tr><td>' . $f['name'] . '</td><td>' . $f['replies'] . '</td></tr>';
         }
+
         $PAGE->JS('softurl');
         $PAGE->JS(
             'window',
@@ -408,44 +431,42 @@ class FORUM
         // Update the topic listing.
     }
 
-    public function isTopicRead($topic, $fid)
+    public function isTopicRead($topic, $fid): bool
     {
         global $SESS,$USER,$JAX,$PAGE;
         if (empty($this->topicsRead)) {
             $this->topicsRead = $JAX->parsereadmarkers($SESS->topicsread);
         }
+
         if (empty($this->forumsRead)) {
             $fr = $JAX->parsereadmarkers($SESS->forumsread);
             if (isset($fr[$fid])) {
                 $this->forumReadTime = $fr[$fid];
             }
         }
+
         if (!isset($this->topicsRead[$topic['id']])) {
             $this->topicsRead[$topic['id']] = 0;
         }
 
-        return ! (
-            $topic['lp_date'] > $JAX->pick(
-                max($this->topicsRead[$topic['id']], $this->forumReadTime),
-                $SESS->read_date,
-                $USER['last_visit'],
-            )
+        return $topic['lp_date'] <= $JAX->pick(
+            max($this->topicsRead[$topic['id']], $this->forumReadTime),
+            $SESS->read_date,
+            $USER['last_visit'],
         );
     }
 
-    public function isForumRead($forum)
+    public function isForumRead($forum): bool
     {
         global $SESS,$USER,$JAX;
         if (!$this->forumsRead) {
             $this->forumsRead = $JAX->parsereadmarkers($SESS->forumsread);
         }
 
-        return ! (
-            $forum['lp_date'] > $JAX->pick(
-                $this->forumsRead[$forum['id']],
-                $SESS->read_date,
-                $USER['last_visit'],
-            )
+        return $forum['lp_date'] <= $JAX->pick(
+            $this->forumsRead[$forum['id']],
+            $SESS->read_date,
+            $USER['last_visit'],
         );
     }
 

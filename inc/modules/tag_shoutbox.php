@@ -13,12 +13,15 @@ class SHOUTBOX
         if (!isset($CFG['shoutbox'])) {
             $CFG['shoutbox'] = false;
         }
+
         if (!isset($PERMS['can_view_shoutbox'])) {
             $PERMS['can_view_shoutbox'] = false;
         }
+
         if (!$CFG['shoutbox'] || !$PERMS['can_view_shoutbox']) {
             return;
         }
+
         $this->shoutlimit = $CFG['shoutbox_num'];
         if (
             isset($JAX->b['shoutbox_delete'])
@@ -31,12 +34,14 @@ class SHOUTBOX
         ) {
             $this->showallshouts();
         }
+
         if (
             isset($JAX->p['shoutbox_shout'])
             && trim($JAX->p['shoutbox_shout']) !== ''
         ) {
             $this->addshout();
         }
+
         if (!$PAGE->jsaccess) {
             $this->displayshoutbox();
         } else {
@@ -58,6 +63,7 @@ class SHOUTBOX
                 );
                 $shoutrow = $DB->arow($result);
             }
+
             if (
                 isset($shoutrow['uid'])
                 && $shoutrow['uid'] == $USER['id']
@@ -88,8 +94,9 @@ class SHOUTBOX
         if (!$this->canDelete(0, $row)) {
             $deletelink = '';
         }
-        if (mb_substr($shout, 0, 4) == '/me ') {
-            $shout = $PAGE->meta(
+
+        if (mb_substr((string) $shout, 0, 4) === '/me ') {
+            return $PAGE->meta(
                 'shout-action',
                 $JAX->smalldate(
                     $row['date'],
@@ -97,23 +104,21 @@ class SHOUTBOX
                 ),
                 $user,
                 mb_substr(
-                    $shout,
+                    (string) $shout,
                     3,
                 ),
                 $deletelink,
             );
-        } else {
-            $shout = $PAGE->meta(
-                'shout',
-                $row['date'],
-                $user,
-                $shout . PHP_EOL,
-                $deletelink,
-                $avatar,
-            );
         }
 
-        return $shout;
+        return $PAGE->meta(
+            'shout',
+            $row['date'],
+            $user,
+            $shout . PHP_EOL,
+            $deletelink,
+            $avatar,
+        );
     }
 
     public function displayshoutbox(): void
@@ -140,8 +145,10 @@ class SHOUTBOX
             if (!$first) {
                 $first = $f['id'];
             }
+
             $shouts .= $this->formatshout($f);
         }
+
         $SESS->addvar('sb_id', $first);
         $PAGE->append(
             'shoutbox',
@@ -199,6 +206,7 @@ class SHOUTBOX
                         );
                     }
                 }
+
                 $last = $f['id'];
             }
         }
@@ -223,6 +231,7 @@ class SHOUTBOX
         ) {
             $pagen = $JAX->b['page'] - 1;
         }
+
         $result = $DB->safeselect(
             'COUNT(`id`)',
             'shouts',
@@ -233,6 +242,7 @@ class SHOUTBOX
         if ($numshouts > 1000) {
             $numshouts = 1000;
         }
+
         if ($numshouts > $perpage) {
             $pages .= " &middot; Pages: <span class='pages'>";
             $pageArray = $JAX->pages(
@@ -246,13 +256,16 @@ class SHOUTBOX
                     . (($v + 1) == $pagen ? ' class="active"' : '')
                     . '>' . $v . '</a> ';
             }
+
             $pages .= '</span>';
         }
+
         $PAGE->path(['Shoutbox History' => '?module=shoutbox']);
         $PAGE->updatepath();
         if ($PAGE->jsupdate) {
             return;
         }
+
         $result = $DB->safespecial(
             <<<'EOT'
                 SELECT s.`id` AS `id`,s.`uid` AS `uid`,s.`shout` AS `shout`,
@@ -273,6 +286,7 @@ class SHOUTBOX
         while ($f = $DB->arow($result)) {
             $shouts .= $this->formatshout($f);
         }
+
         $page = $PAGE->meta(
             'box',
             '',
@@ -289,17 +303,21 @@ class SHOUTBOX
         if (!$USER) {
             return $PAGE->location('?');
         }
+
         $delete = $JAX->b['shoutbox_delete'] ?? 0;
         $candelete = $this->canDelete($delete);
         if (!$candelete) {
             return $PAGE->location('?');
         }
+
         $PAGE->JS('softurl');
         $DB->safedelete(
             'shouts',
             'WHERE `id`=?',
             $delete,
         );
+
+        return null;
     }
 
     public function addshout(): void
@@ -309,18 +327,21 @@ class SHOUTBOX
         $e = '';
         $shout = $JAX->p['shoutbox_shout'];
         $shout = $JAX->linkify($shout);
+
         $perms = $JAX->getPerms();
         if (!$perms['can_shout']) {
             $e = 'You do not have permission to shout!';
-        } elseif (mb_strlen($shout) > 300) {
+        } elseif (mb_strlen((string) $shout) > 300) {
             $e = 'Shout must be less than 300 characters.';
         }
-        if ($e) {
+
+        if ($e !== '' && $e !== '0') {
             $PAGE->JS('error', $e);
             $PAGE->prepend('shoutbox', $PAGE->error($e));
 
             return;
         }
+
         $DB->safeinsert(
             'shouts',
             [

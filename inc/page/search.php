@@ -13,15 +13,19 @@ new search();
 class search
 {
     public $page = '';
+
     public $pagenum = 0;
+
     public $fids = [];
+
+    /**
+     * @var int
+     */
     public $perpage;
 
     public function __construct()
     {
         global $PAGE,$JAX;
-
-        $this->page = '';
         $this->pagenum = $JAX->b['page'] ?? 0;
         if (!is_numeric($this->pagenum) || $this->pagenum < 0) {
             $this->pagenum = 1;
@@ -58,7 +62,7 @@ class search
         $PAGE->append('page', $this->page);
     }
 
-    public function getForumSelection()
+    public function getForumSelection(): string
     {
         global $DB;
         $this->getSearchableForums();
@@ -66,6 +70,7 @@ class search
         if (!$this->fids) {
             return '--No forums--';
         }
+
         $result = $DB->safeselect(
             '`id`,`title`,`path`',
             'forums',
@@ -78,28 +83,28 @@ class search
 
         while ($f = $DB->arow($result)) {
             $titles[$f['id']] = $f['title'];
-            $path = trim($f['path']) ? explode(' ', $f['path']) : [];
+            $path = trim((string) $f['path']) !== '' && trim((string) $f['path']) !== '0' ? explode(' ', (string) $f['path']) : [];
             $t = &$tree;
             foreach ($path as $v) {
                 if (!isset($t[$v]) || !is_array($t[$v])) {
                     $t[$v] = [];
                 }
+
                 $t = &$t[$v];
             }
+
             if (!isset($t[$f['id']])) {
                 $t[$f['id']] = true;
             }
         }
 
-        $r .= $this->rtreeselect(
+        return $r . $this->rtreeselect(
             $tree,
             $titles,
         );
-
-        return $r;
     }
 
-    public function rtreeselect($tree, $titles, $level = 0)
+    public function rtreeselect($tree, $titles, $level = 0): string
     {
         $r = '';
         foreach ($tree as $k => $v) {
@@ -108,28 +113,32 @@ class search
                     . str_repeat('+-', $level) . $titles[$k]
                     . '</option>';
             }
+
             if (is_array($v)) {
                 $r .= $this->rtreeselect($v, $titles, $level + 1);
             }
         }
+
         if (!$level) {
-            $r = '<select size="15" title="List of forums" multiple="multiple" name="fids">' . $r . '</select>';
+            return '<select size="15" title="List of forums" multiple="multiple" name="fids">' . $r . '</select>';
         }
 
         return $r;
     }
 
-    public function pdate($a)
+    public function pdate($a): false|int
     {
-        $a = explode('/', $a);
+        $a = explode('/', (string) $a);
         if (count($a) != 3) {
             return false;
         }
+
         for ($x = 0; $x < 3; ++$x) {
             if (!is_numeric($a[$x])) {
                 return false;
             }
         }
+
         if (
             ($a[0] % 2)
             && $a[1] == 31
@@ -173,9 +182,11 @@ class search
             } else {
                 $fids = $this->fids;
             }
+
             if ($JAX->b['datestart']) {
                 $datestart = $this->pdate($JAX->b['datestart']);
             }
+
             if ($JAX->b['dateend']) {
                 $dateend = $this->pdate($JAX->b['dateend']);
             }
@@ -221,29 +232,31 @@ class search
                 $DB->basicvalue($termraw),
                 $fids,
             ];
-
             if (is_int($JAX->b['mid'])) {
-                array_push($arguments, (int) $JAX->b['mid']);
+                $arguments[] = $JAX->b['mid'];
             }
+
             if (isset($datestart) && $datestart) {
-                array_push($arguments, date('Y-m-d H:i:s', $datestart));
+                $arguments[] = date('Y-m-d H:i:s', $datestart);
             }
+
             if (isset($dateend) && $dateend) {
-                array_push($arguments, date('Y-m-d H:i:s', $dateend));
+                $arguments[] = date('Y-m-d H:i:s', $dateend);
             }
 
-            array_push($arguments, $DB->basicvalue($termraw));
-            array_push($arguments, $DB->basicvalue($termraw));
-            array_push($arguments, $fids);
-
+            $arguments[] = $DB->basicvalue($termraw);
+            $arguments[] = $DB->basicvalue($termraw);
+            $arguments[] = $fids;
             if (is_int($JAX->b['mid'])) {
-                array_push($arguments, (int) $JAX->b['mid']);
+                $arguments[] = $JAX->b['mid'];
             }
+
             if (isset($datestart) && $datestart) {
-                array_push($arguments, date('Y-m-d H:i:s', $datestart));
+                $arguments[] = date('Y-m-d H:i:s', $datestart);
             }
+
             if (isset($dateend) && $dateend) {
-                array_push($arguments, date('Y-m-d H:i:s', $dateend));
+                $arguments[] = date('Y-m-d H:i:s', $dateend);
             }
 
             $result = call_user_func_array(
@@ -260,6 +273,7 @@ class search
                     $ids .= $id['id'] . ',';
                 }
             }
+
             $ids = mb_substr($ids, 0, -1);
             $SESS->addvar('search', $ids);
             $SESS->addvar('searcht', $termraw);
@@ -268,9 +282,9 @@ class search
 
         $result = null;
         if ($ids) {
-            $numresults = count(explode(',', $ids));
+            $numresults = count(explode(',', (string) $ids));
             $idarray = array_slice(
-                explode(',', $ids),
+                explode(',', (string) $ids),
                 ($this->pagenum - 1) * $this->perpage,
                 $this->perpage,
             );
@@ -302,8 +316,8 @@ class search
 
         $terms = [];
 
-        foreach (preg_split('@\W+@', $termraw) as $v) {
-            if (trim($v)) {
+        foreach (preg_split('@\W+@', (string) $termraw) as $v) {
+            if (trim($v) !== '' && trim($v) !== '0') {
                 $terms[] = preg_quote($v);
             }
         }
@@ -312,16 +326,16 @@ class search
             $post = $f['post'];
             $post = $JAX->textonly($post);
             $post = $JAX->blockhtml($post);
-            $post = nl2br($post);
+            $post = nl2br((string) $post);
             $post = preg_replace(
                 '@' . implode('|', $terms) . '@i',
-                $PAGE->meta('search-highlight', '$0'),
+                (string) $PAGE->meta('search-highlight', '$0'),
                 $post,
             );
             $title = preg_replace(
                 '@' . implode('|', $terms) . '@i',
-                $PAGE->meta('search-highlight', '$0'),
-                $f['title'],
+                (string) $PAGE->meta('search-highlight', '$0'),
+                (string) $f['title'],
             );
 
             $page .= $PAGE->meta(
@@ -333,7 +347,7 @@ class search
             );
         }
 
-        if (!$numresults) {
+        if ($numresults === 0) {
             $e = 'No results found. '
                 . 'Try refining your search, or using longer terms.';
 
@@ -343,11 +357,13 @@ class search
                     $omitted[] = $v;
                 }
             }
-            if (!empty($omitted)) {
+
+            if ($omitted !== []) {
                 $e .= '<br /><br />'
                     . 'The following terms were omitted due to length: '
                     . implode(', ', $omitted);
             }
+
             $page = $PAGE->error($e);
         } else {
             $resultsArray = $JAX->pages(
@@ -375,6 +391,7 @@ class search
         if ($this->fids) {
             return $this->fids;
         }
+
         $this->fids = [];
         global $DB,$JAX,$USER;
         $result = $DB->safeselect(

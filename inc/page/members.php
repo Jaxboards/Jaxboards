@@ -4,14 +4,16 @@ $PAGE->loadmeta('members');
 new members();
 class members
 {
+    /**
+     * @var float|int
+     */
     public $page = 0;
-    public $perpage = 0;
+
+    public $perpage = 20;
 
     public function __construct()
     {
         global $JAX,$PAGE;
-        $this->page = 0;
-        $this->perpage = 20;
         if (
             isset($JAX->b['page'])
             && is_numeric($JAX->b['page'])
@@ -19,6 +21,7 @@ class members
         ) {
             $this->page = $JAX->b['page'] - 1;
         }
+
         if (!$PAGE->jsupdate) {
             $this->showmemberlist();
         }
@@ -46,6 +49,7 @@ class members
         ) {
             $sortby = $JAX->b['sortby'];
         }
+
         if (isset($JAX->g['filter']) && $JAX->g['filter'] == 'staff') {
             $sortby = 'g.`can_access_acp` DESC ,' . $sortby;
             $where = 'WHERE g.`can_access_acp`=1 OR g.`can_moderate`=1';
@@ -120,6 +124,7 @@ class members
                 . "{$sortby}&amp;how={$sorthow}&amp;page={$v}'"
                 . ($v - 1 == $this->page ? ' class="active"' : '') . ">{$v}</a> ";
         }
+
         $url = '?act=members'
             . ($this->page ? '&page=' . ($this->page + 1) : '')
             . ((isset($JAX->g['filter']) && $JAX->g['filter'])
@@ -127,10 +132,11 @@ class members
         $links = [];
         foreach ($vars as $k => $v) {
             $links[] = "<a href=\"{$url}&amp;sortby={$k}"
-            . ($sortby == $k ? ($sorthow == 'ASC' ? '&amp;how=DESC' : '')
-                . '" class="sort' . ($sorthow == 'DESC' ? ' desc' : '') : '')
+            . ($sortby === $k ? ($sorthow === 'ASC' ? '&amp;how=DESC' : '')
+                . '" class="sort' . ($sorthow === 'DESC' ? ' desc' : '') : '')
                 . "\">{$v}</a>";
         }
+
         foreach ($memberarray as $f) {
             $contactdetails = '';
             $contactUrls = [
@@ -152,6 +158,7 @@ class members
                         . '" title="' . $k . ' contact">&nbsp;</a>';
                 }
             }
+
             $contactdetails .= '<a title="PM this member" class="pm contact" '
                 . 'href="?act=ucp&amp;what=inbox&amp;page=compose&amp;mid='
                 . $f['id'] . '"></a>';
@@ -172,6 +179,7 @@ class members
                 $contactdetails,
             );
         }
+
         $page = $PAGE->meta(
             'members-table',
             $links[0],

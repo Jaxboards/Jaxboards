@@ -9,12 +9,23 @@ $PAGE->metadefs['post-preview'] = $PAGE->meta('box', '', 'Post Preview', '%s');
 new POST();
 class POST
 {
+    public $canmod;
+
     public $postdata = '';
+
     public $postpreview = '';
+
+    /**
+     * @var false
+     */
     public $nopost = true;
+
     public $tid;
+
     public $fid;
+
     public $pid;
+
     public $how;
 
     public function __construct()
@@ -29,6 +40,7 @@ class POST
             $this->nopost = false;
             $this->postdata = $JAX->p['postdata'];
         }
+
         if ($this->postdata) {
             // Linkify stuff before sending it.
             $this->postdata = str_replace("\t", '    ', $this->postdata);
@@ -38,6 +50,7 @@ class POST
             // Poor forum martyr.
             $this->postdata = str_replace('youtube]', 'video]', $this->postdata);
         }
+
         if (
             isset($_FILES['Filedata'], $_FILES['Filedata']['tmp_name'])
             && $_FILES['Filedata']['tmp_name']
@@ -46,6 +59,7 @@ class POST
                 . $this->upload($_FILES['Filedata'])
                 . '[/attachment]';
         }
+
         if (
             isset($JAX->p['submit'])
             && ($JAX->p['submit'] === 'Preview'
@@ -70,29 +84,29 @@ class POST
         }
     }
 
-    public function upload($fileobj, $uid = false)
+    public function upload($fileobj, $uid = false): string
     {
         global $CFG,$DB,$USER,$JAX;
         if ($uid === false) {
             $uid = $USER['id'];
         }
+
         if ($uid === false && !$USER) {
             return 'must be logged in';
         }
+
         $size = filesize($fileobj['tmp_name']);
         $hash = hash_file('sha512', $fileobj['tmp_name']);
         $uploadpath = BOARDPATH . 'Uploads/';
 
-        $ext = explode('.', $fileobj['name']);
-        if (count($ext) == 1) {
-            $ext = '';
-        } else {
-            $ext = mb_strtolower(array_pop($ext));
-        }
+        $ext = explode('.', (string) $fileobj['name']);
+        $ext = count($ext) == 1 ? '' : mb_strtolower(array_pop($ext));
+
         if (!in_array($ext, $CFG['images'])) {
             $ext = '';
         }
-        if ($ext) {
+
+        if ($ext !== '' && $ext !== '0') {
             $ext = '.' . $ext;
         }
 
@@ -129,11 +143,12 @@ class POST
     {
         global $JAX,$PAGE;
         $post = $this->postdata;
-        if (trim($post)) {
+        if (trim((string) $post) !== '' && trim((string) $post) !== '0') {
             $post = $JAX->theworks($post);
             $post = $PAGE->meta('post-preview', $post);
             $this->postpreview = $post;
         }
+
         if (!$PAGE->jsaccess || $this->how === 'qreply') {
             $this->showpostform();
         }
@@ -148,6 +163,7 @@ class POST
         if ($PAGE->jsupdate) {
             return;
         }
+
         $postdata = $this->postdata;
         $page = '<div id="post-preview">' . $this->postpreview . '</div>';
         $fid = $this->fid;
@@ -169,7 +185,7 @@ class POST
             $DB->disposeresult($result);
 
             if (!$tdata) {
-                $e = 'The topic you\'re trying to edit does not exist.';
+                $e = "The topic you're trying to edit does not exist.";
             } else {
                 $result = $DB->safeselect(
                     '`post`',
@@ -184,6 +200,7 @@ class POST
                     $postdata = $postdata[0];
                 }
             }
+
             $fid = $tdata['fid'];
         }
 
@@ -202,10 +219,10 @@ class POST
         );
 
         if (!$fdata) {
-            $e = 'This forum doesn\'t exist. Weird.';
+            $e = "This forum doesn't exist. Weird.";
         }
 
-        if ($e) {
+        if ($e !== '' && $e !== '0') {
             $page .= $PAGE->meta('error', $e);
         } else {
             if (!isset($tdata)) {
@@ -214,6 +231,7 @@ class POST
                     'subtitle' => '',
                 ];
             }
+
             $form = '<form method="post" data-ajax-form="true"
                 onsubmit="if(this.submitButton.value.match(/post/i)) this.submitButton.disabled=true;">
  <div class="topicform">
@@ -259,12 +277,14 @@ onclick="this.form.submitButton=this" /></div>
 </form>';
             $page .= $PAGE->meta('box', '', $fdata['title'] . ' > New Topic', $form);
         }
+
         $PAGE->append('page', $page);
         $PAGE->JS('update', 'page', $page);
-        if (!$e) {
+        if ($e === '' || $e === '0') {
             if ($fdata['perms']['upload']) {
                 $PAGE->JS('attachfiles');
             }
+
             $PAGE->JS('SCRIPT', "document.querySelector('#pollchoices').style.display='none'");
         }
     }
@@ -277,9 +297,11 @@ onclick="this.form.submitButton=this" /></div>
         if ($PAGE->jsupdate && $this->how != 'qreply') {
             return;
         }
+
         if ($USER && $this->how == 'qreply') {
             $PAGE->JS('closewindow', '#qreply');
         }
+
         if ($tid) {
             $result = $DB->safespecial(
                 <<<'EOT'
@@ -301,12 +323,14 @@ onclick="this.form.submitButton=this" /></div>
                     "The topic you're attempting to reply in no longer exists.",
                 );
             }
+
             $tdata['title'] = $JAX->wordfilter($tdata['title']);
             $tdata['perms'] = $JAX->parseperms(
                 $tdata['perms'],
                 $USER ? $USER['group_id'] : 3,
             );
         }
+
         $page .= '<div id="post-preview">' . $this->postpreview . '</div>';
         $postdata = $JAX->blockhtml($this->postdata);
         $varsarray = [
@@ -318,6 +342,7 @@ onclick="this.form.submitButton=this" /></div>
         } else {
             $varsarray['tid'] = $tid;
         }
+
         $vars = '';
         foreach ($varsarray as $k => $v) {
             $vars .= '<input type="hidden" name="' . $k . '" value="' . $v . '" />';
@@ -347,6 +372,7 @@ onclick="this.form.submitButton=this" /></div>
             while ($f = $DB->arow($result)) {
                 $postdata .= '[quote=' . $f['name'] . ']' . $f['post'] . '[/quote]' . PHP_EOL;
             }
+
             $SESS->delvar('multiquote');
         }
 
@@ -372,7 +398,7 @@ onclick="this.form.submitButton=this"/></div>
         }
     }
 
-    public function canedit($post)
+    public function canedit($post): bool
     {
         global $PERMS,$USER;
 
@@ -389,10 +415,12 @@ onclick="this.form.submitButton=this"/></div>
         if ($this->canmod) {
             return $this->canmod;
         }
+
         $canmod = false;
         if ($PERMS['can_moderate']) {
             $canmod = true;
         }
+
         if ($USER['mod']) {
             $result = $DB->safespecial(
                 'SELECT mods FROM %t WHERE id=(SELECT fid FROM %t WHERE id=?)',
@@ -401,7 +429,7 @@ onclick="this.form.submitButton=this"/></div>
             );
             $mods = $DB->arow($result);
             $DB->disposeresult($result);
-            if (in_array($USER['id'], explode(',', $mods['mods']))) {
+            if (in_array($USER['id'], explode(',', (string) $mods['mods']))) {
                 $canmod = true;
             }
         }
@@ -409,7 +437,7 @@ onclick="this.form.submitButton=this"/></div>
         return $this->canmod = $canmod;
     }
 
-    public function editpost()
+    public function editpost(): ?bool
     {
         global $DB,$JAX,$PAGE,$USER,$PERMS;
         $pid = $this->pid;
@@ -418,14 +446,16 @@ onclick="this.form.submitButton=this"/></div>
         if (!$pid || !is_numeric($pid)) {
             $e = 'Invalid post to edit.';
         }
+
         if ($this->postdata) {
-            if (!$this->nopost && trim($this->postdata) === '') {
+            if (!$this->nopost && trim((string) $this->postdata) === '') {
                 $e = "You didn't supply a post!";
-            } elseif (mb_strlen($this->postdata) > 65535) {
+            } elseif (mb_strlen((string) $this->postdata) > 65535) {
                 $e = 'Post must not exceed 65,535 bytes.';
             }
         }
-        if (!$e) {
+
+        if ($e === '' || $e === '0') {
             $result = $DB->safeselect(
                 <<<'EOT'
                     `id`,`auth_id`,`post`,UNIX_TIMESTAMP(`date`) AS `date`,`showsig`,`showemotes`,
@@ -444,11 +474,12 @@ onclick="this.form.submitButton=this"/></div>
                 $e = 'The post you are trying to edit does not exist.';
             } elseif (!$this->canedit($tmp)) {
                 $e = "You don't have permission to edit that post!";
-            } elseif (!isset($this->postdata)) {
+            } elseif ($this->postdata === null) {
                 $editpost = true;
                 $this->postdata = $tmp['post'];
             }
         }
+
         if ($tid && !$e) {
             if (!is_numeric($tid) || !$tid) {
                 $e = 'Invalid post to edit.';
@@ -471,7 +502,7 @@ onclick="this.form.submitButton=this"/></div>
 
                 if (!$tmp) {
                     $e = "The topic you are trying to edit doesn't exist.";
-                } elseif (trim($JAX->p['ttitle']) === '') {
+                } elseif (trim((string) $JAX->p['ttitle']) === '') {
                     $e = 'You must supply a topic title!';
                 } else {
                     $DB->safeupdate(
@@ -480,10 +511,10 @@ onclick="this.form.submitButton=this"/></div>
                             'title' => $JAX->blockhtml($JAX->p['ttitle']),
                             'subtitle' => $JAX->blockhtml($JAX->p['tdesc']),
                             'summary' => mb_substr(
-                                preg_replace(
+                                (string) preg_replace(
                                     '@\s+@',
                                     ' ',
-                                    $JAX->wordfilter(
+                                    (string) $JAX->wordfilter(
                                         $JAX->blockhtml(
                                             $JAX->textonly(
                                                 $this->postdata,
@@ -501,34 +532,18 @@ onclick="this.form.submitButton=this"/></div>
                 }
             }
         }
-        if ($e) {
+
+        if ($e !== '' && $e !== '0') {
             $PAGE->JS('error', $e);
             $PAGE->append('PAGE', $PAGE->error($e));
         }
-        if ($e || $editpost) {
-            $this->showpostform();
 
-            return false;
-        }
-        $DB->safeupdate(
-            'posts',
-            [
-                'post' => $this->postdata,
-                'edit_date' => date('Y-m-d H:i:s', time()),
-                'editby' => $USER['id'],
-            ],
-            'WHERE `id`=?',
-            $DB->basicvalue($pid),
-        );
-        $PAGE->JS(
-            'update',
-            "#pid_{$pid} .post_content",
-            $JAX->theworks($this->postdata),
-        );
-        $PAGE->JS('softurl');
+        $this->showpostform();
+
+        return false;
     }
 
-    public function submitpost()
+    public function submitpost(): ?bool
     {
         global $JAX,$PAGE,$DB,$SESS,$USER,$PERMS;
         $SESS->act();
@@ -539,12 +554,11 @@ onclick="this.form.submitButton=this"/></div>
         $newtopic = false;
         $time = time();
         $uid = $USER['id'];
-        $uname = $USER['name'] ?? '';
         $e = '';
 
-        if (!$this->nopost && trim($postdata) === '') {
+        if (!$this->nopost && trim((string) $postdata) === '') {
             $e = "You didn't supply a post!";
-        } elseif (mb_strlen($postdata) > 50000) {
+        } elseif (mb_strlen((string) $postdata) > 50000) {
             $e = 'Post must not exceed 50,000 characters.';
         }
 
@@ -568,20 +582,22 @@ onclick="this.form.submitButton=this"/></div>
                 $e = 'Subtitle must not exceed 255 characters';
             } elseif (isset($JAX->p['poll_type']) && $JAX->p['poll_type']) {
                 $pollchoices = [];
-                $pollChoice = preg_split("@[\r\n]+@", $JAX->p['pollchoices']);
-                foreach ($pollChoice as $k => $v) {
-                    if (trim($v)) {
+                $pollChoice = preg_split("@[\r\n]+@", (string) $JAX->p['pollchoices']);
+                foreach ($pollChoice as $v) {
+                    if (trim($v) !== '' && trim($v) !== '0') {
                         $pollchoices[] = $JAX->blockhtml($v);
                     }
                 }
-                if (trim($JAX->p['pollq']) === '') {
+
+                if (trim((string) $JAX->p['pollq']) === '') {
                     $e = "You didn't specify a poll question!";
                 } elseif (count($pollchoices) > 10) {
                     $e = 'Poll choices must not exceed 10.';
-                } elseif (empty($pollchoices)) {
+                } elseif ($pollchoices === []) {
                     $e = "You didn't provide any poll choices!";
                 }
             }
+
             // Perms.
             $result = $DB->safeselect(
                 '`perms`',
@@ -604,6 +620,7 @@ onclick="this.form.submitButton=this"/></div>
                         You don't have permission to post a new topic in that forum.
                         EOT;
                 }
+
                 if (
                     ((isset($JAX->p['poll_type']) && $JAX->p['poll_type'])
                     || (isset($JAX->p['pollq']) && $JAX->p['pollq']))
@@ -613,7 +630,7 @@ onclick="this.form.submitButton=this"/></div>
                 }
             }
 
-            if (!$e) {
+            if ($e === '' || $e === '0') {
                 $DB->safeinsert(
                     'topics',
                     [
@@ -632,10 +649,10 @@ onclick="this.form.submitButton=this"/></div>
                         'poll_choices' => isset($pollchoices) && $pollchoices
                         ? $JAX->json_encode($pollchoices) : '',
                         'summary' => mb_substr(
-                            preg_replace(
+                            (string) preg_replace(
                                 '@\s+@',
                                 ' ',
-                                $JAX->blockhtml(
+                                (string) $JAX->blockhtml(
                                     $JAX->textonly(
                                         $this->postdata,
                                     ),
@@ -648,10 +665,11 @@ onclick="this.form.submitButton=this"/></div>
                 );
                 $tid = $DB->insert_id(1);
             }
+
             $newtopic = true;
         }
 
-        if ($e) {
+        if ($e !== '' && $e !== '0') {
             $PAGE->append('PAGE', $PAGE->error($e));
             $PAGE->JS('error', $e);
             $PAGE->JS('enable', 'submitbutton');
@@ -661,7 +679,7 @@ onclick="this.form.submitButton=this"/></div>
                 $this->showpostform();
             }
 
-            return;
+            return null;
         }
 
         if ($tid && is_numeric($tid)) {
@@ -681,6 +699,7 @@ onclick="this.form.submitButton=this"/></div>
             $fdata = $DB->arow($result);
             $DB->disposeresult($result);
         }
+
         if (!$fdata) {
             $e = "The topic you're trying to reply to does not exist.";
             $PAGE->append('PAGE', $PAGE->error($e));
@@ -688,6 +707,7 @@ onclick="this.form.submitButton=this"/></div>
 
             return false;
         }
+
         $fdata['perms'] = $JAX->parseperms(
             $fdata['perms'],
             $USER ? $USER['group_id'] : 3,
@@ -761,7 +781,7 @@ onclick="this.form.submitButton=this"/></div>
         }
 
         // Do some magic to update the tree all the way up (for subforums).
-        $path = trim($fdata['path']) ? explode(' ', $fdata['path']) : [];
+        $path = trim((string) $fdata['path']) !== '' && trim((string) $fdata['path']) !== '0' ? explode(' ', (string) $fdata['path']) : [];
         if (!in_array($fdata['id'], $path)) {
             $path[] = $fdata['id'];
         }
@@ -836,5 +856,7 @@ onclick="this.form.submitButton=this"/></div>
         } else {
             $PAGE->location('?act=vt' . $tid . '&getlast=1');
         }
+
+        return null;
     }
 }

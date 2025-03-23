@@ -14,17 +14,10 @@ class stats
             $JAX->g['do'] = null;
         }
 
-        switch ($JAX->g['do']) {
-            case 'recount':
-                $this->recount_statistics();
-
-                break;
-
-            default:
-                $this->showstats();
-
-                break;
-        }
+        match ($JAX->g['do']) {
+            'recount' => $this->recount_statistics(),
+            default => $this->showstats(),
+        };
     }
 
     public function showstats(): void
@@ -48,6 +41,7 @@ class stats
         while ($f = $DB->arow($result)) {
             $pc[$f['id']] = $f['nocount'];
         }
+
         $result = $DB->safespecial(
             <<<'EOT'
                 SELECT p.`id` AS `id`,
@@ -74,36 +68,45 @@ class stats
                 if (!isset($stat['forum_topics'][$f['fid']])) {
                     $stat['forum_topics'][$f['fid']] = 0;
                 }
+
                 ++$stat['forum_topics'][$f['fid']];
                 if (!isset($stat['forum_posts'][$f['fid']])) {
                     $stat['forum_posts'][$f['fid']] = 0;
                 }
+
                 if (!isset($stat['topics'])) {
                     $stat['topics'] = 0;
                 }
+
                 ++$stat['topics'];
                 $stat['topic_posts'][$f['tid']] = 0;
             } else {
                 if (!isset($stat['topic_posts'][$f['tid']])) {
                     $stat['topic_posts'][$f['tid']] = 0;
                 }
+
                 ++$stat['topic_posts'][$f['tid']];
                 if (!isset($stat['forum_posts'][$f['fid']])) {
                     $stat['forum_posts'][$f['fid']] = 0;
                 }
+
                 ++$stat['forum_posts'][$f['fid']];
             }
+
             if (!$pc[$f['fid']]) {
                 if (!isset($stat['member_posts'][$f['auth_id']])) {
                     $stat['member_posts'][$f['auth_id']] = 0;
                 }
+
                 ++$stat['member_posts'][$f['auth_id']];
-            } elseif (!$stat['member_posts'][$f['auth_id']]) {
+            } elseif ($stat['member_posts'][$f['auth_id']] === 0) {
                 $stat['member_posts'][$f['auth_id']] = 0;
             }
+
             if (!isset($stat['posts'])) {
                 $stat['posts'] = 0;
             }
+
             ++$stat['posts'];
         }
 
@@ -118,14 +121,16 @@ class stats
             if (!isset($stat['cat_posts'][$f['cat_id']])) {
                 $stat['cat_posts'][$f['cat_id']] = 0;
             }
+
             if (!isset($stat['cat_topics'][$f['cat_id']])) {
                 $stat['cat_topics'][$f['cat_id']] = 0;
             }
+
             $stat['cat_posts'][$f['cat_id']] += $stat['forum_posts'][$f['id']];
             $stat['cat_topics'][$f['cat_id']] += $stat['forum_topics'][$f['id']];
 
             if ($f['path']) {
-                foreach (explode(' ', $f['path']) as $v) {
+                foreach (explode(' ', (string) $f['path']) as $v) {
                     $stat['forum_topics'][$v] += $stat['forum_topics'][$f['id']];
                     $stat['forum_posts'][$v] += $stat['forum_posts'][$f['id']];
                 }

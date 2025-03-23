@@ -39,16 +39,10 @@ class tools
             $JAX->b['do'] = null;
         }
 
-        switch ($JAX->b['do']) {
-            case 'backup':
-                $this->backup();
-
-                break;
-
-            case 'files':
-            default:
-                $this->filemanager();
-        }
+        match ($JAX->b['do']) {
+            'backup' => $this->backup(),
+            default => $this->filemanager(),
+        };
     }
 
     public function filemanager(): void
@@ -68,18 +62,20 @@ class tools
             $f = $DB->arow($result);
             $DB->disposeresult($result);
             if ($f) {
-                $ext = mb_strtolower(pathinfo($f['name'], PATHINFO_EXTENSION));
+                $ext = mb_strtolower(pathinfo((string) $f['name'], PATHINFO_EXTENSION));
                 if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp'])) {
                     $f['hash'] .= '.' . $ext;
                 }
+
                 if (is_writable(BOARDPATH . 'Uploads/' . $f['hash'])) {
                     $page .= unlink(BOARDPATH . 'Uploads/' . $f['hash'])
                         ? $PAGE->success('File deleted')
                         : $PAGE->error(
-                            'Error deleting file, maybe it\'s already been '
+                            "Error deleting file, maybe it's already been "
                             . 'deleted? Removed from DB',
                         );
                 }
+
                 $DB->safedelete(
                     'files',
                     'WHERE `id`=?',
@@ -87,9 +83,10 @@ class tools
                 );
             }
         }
+
         if (isset($JAX->p['dl']) && is_array($JAX->p['dl'])) {
             foreach ($JAX->p['dl'] as $k => $v) {
-                if (ctype_digit($v)) {
+                if (ctype_digit((string) $v)) {
                     $DB->safeupdate(
                         'files',
                         [
@@ -100,8 +97,10 @@ class tools
                     );
                 }
             }
+
             $page .= $PAGE->success('Changes saved.');
         }
+
         $result = $DB->safeselect(
             '`id`,`tid`,`post`',
             'posts',
@@ -112,7 +111,7 @@ class tools
         while ($f = $DB->arow($result)) {
             preg_match_all(
                 '@\[attachment\](\d+)\[/attachment\]@',
-                $f['post'],
+                (string) $f['post'],
                 $m,
             );
             foreach ($m[1] as $v) {
@@ -125,6 +124,7 @@ class tools
                 );
             }
         }
+
         $result = $DB->safespecial(
             <<<'EOT'
                 SELECT f.`id` AS `id`,f.`name` AS `name`,f.`hash` AS `hash`,f.`uid` AS `uid`,
@@ -141,10 +141,11 @@ class tools
         echo $DB->error(1);
         $table = '';
         while ($file = $DB->arow($result)) {
-            $filepieces = explode('.', $file['name']);
+            $filepieces = explode('.', (string) $file['name']);
             if (count($filepieces) > 1) {
                 $ext = mb_strtolower(array_pop($filepieces));
             }
+
             if (in_array($ext, $CFG['images'])) {
                 $file['name'] = '<a href="'
                     . BOARDPATHURL . 'Uploads/' . $file['hash'] . '.' . $ext . '">'
@@ -153,6 +154,7 @@ class tools
                 $file['name'] = '<a href="../?act=download&id='
                     . $file['id'] . '">' . $file['name'] . '</a>';
             }
+
             $table .= $PAGE->parseTemplate(
                 'tools/file-manager-row.html',
                 [
@@ -167,7 +169,8 @@ class tools
                 ],
             ) . PHP_EOL;
         }
-        $page .= $table ? $PAGE->parseTemplate(
+
+        $page .= $table !== '' && $table !== '0' ? $PAGE->parseTemplate(
             'tools/file-manager.html',
             [
                 'content' => $table,
@@ -197,7 +200,7 @@ class tools
                 echo "SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';" . PHP_EOL;
                 echo PHP_EOL;
                 foreach ($tables as $f) {
-                    $f[0] = mb_substr(mb_strstr($f[0], '_'), 1);
+                    $f[0] = mb_substr(mb_strstr((string) $f[0], '_'), 1);
                     $page .= $f[0];
                     echo PHP_EOL . '-- ' . $f[0] . PHP_EOL . PHP_EOL;
                     $createtable = $DB->safespecial(
@@ -219,9 +222,11 @@ class tools
                             echo "INSERT INTO {$table} ({$columns}) "
                                 . "VALUES {$values};" . PHP_EOL;
                         }
+
                         echo PHP_EOL;
                     }
                 }
+
                 echo PHP_EOL;
                 echo 'SET foreign_key_checks = 1;' . PHP_EOL;
                 echo PHP_EOL;
@@ -229,6 +234,7 @@ class tools
 
             exit;
         }
+
         $PAGE->addContentBox(
             'Backup Forum',
             $PAGE->parseTemplate(

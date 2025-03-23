@@ -1,8 +1,8 @@
 <?php
 
-require '../config.php';
+require __DIR__ . '/../config.php';
 
-require '../inc/classes/mysql.php';
+require __DIR__ . '/../inc/classes/mysql.php';
 $DB = new MySQL();
 $DB->connect(
     $CFG['sql_host'],
@@ -11,7 +11,7 @@ $DB->connect(
     $CFG['sql_db'],
 );
 
-require '../domaindefinitions.php';
+require __DIR__ . '/../domaindefinitions.php';
 $list = [[], []];
 
 switch ($_GET['act']) {
@@ -37,4 +37,5 @@ switch ($_GET['act']) {
     case '':
         break;
 }
+
 echo json_encode($list);

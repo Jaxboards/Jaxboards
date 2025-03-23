@@ -32,10 +32,10 @@ $microtime = microtime(true);
 require_once JAXBOARDS_ROOT . '/vendor/autoload.php';
 
 // Get the config.
-require 'config.php';
+require __DIR__ . '/config.php';
 
 // DB connect!
-require_once 'inc/classes/mysql.php';
+require_once __DIR__ . '/inc/classes/mysql.php';
 $DB = new MySQL();
 $connected = $DB->connect(
     $CFG['sql_host'],
@@ -57,7 +57,7 @@ ini_set('session.use_only_cookies', 1);
 session_start();
 
 // Board Service Stuff, get the board as specified by URL.
-require_once 'domaindefinitions.php';
+require_once __DIR__ . '/domaindefinitions.php';
 
 // Require the classes.
 require_once JAXBOARDS_ROOT . '/inc/classes/page.php';
@@ -89,6 +89,7 @@ if (!isset($_SESSION['uid']) && isset($JAX->c['utoken'])) {
         $_SESSION['uid'] = $token['uid'];
     }
 }
+
 if (!$SESS->is_bot && isset($_SESSION['uid']) && $_SESSION['uid']) {
     $JAX->getUser($_SESSION['uid']);
 }
@@ -129,6 +130,7 @@ if (isset($JAX->b['skin_id'])) {
         }
     }
 }
+
 if (isset($SESS->vars['skin_id']) && $SESS->vars['skin_id']) {
     $PAGE->append(
         'NAVIGATION',
@@ -143,12 +145,10 @@ if (isset($SESS->vars['skin_id']) && $SESS->vars['skin_id']) {
 // If they're logged in through cookies, (username & password)
 // but the session variable has changed/been removed/not updated for some reason
 // this fixes it.
-if ($JAX->userData && !$SESS->is_bot) {
-    if ($JAX->userData['id'] != $SESS->uid) {
-        $SESS->clean($USER['id']);
-        $SESS->uid = $USER['id'];
-        $SESS->applychanges();
-    }
+if ($JAX->userData && !$SESS->is_bot && $JAX->userData['id'] != $SESS->uid) {
+    $SESS->clean($USER['id']);
+    $SESS->uid = $USER['id'];
+    $SESS->applychanges();
 }
 
 // If the user's navigated to a new page, change their action time.
@@ -171,10 +171,11 @@ if (!$PAGE->jsaccess) {
     foreach (['sound_im', 'wysiwyg'] as $v) {
         $variables[] = "{$v}:" . ($USER ? ($USER[$v] ? 1 : 0) : 1);
     }
+
     $variables[] = 'can_im:' . ($PERMS['can_im'] ? 1 : 0);
     if ($USER) {
         $variables[] = 'groupid:' . $JAX->pick($USER['group_id'], 3);
-        $variables[] = "username:'" . addslashes($USER['display_name']) . "'";
+        $variables[] = "username:'" . addslashes((string) $USER['display_name']) . "'";
         $variables[] = 'userid:' . $JAX->pick($USER['id'], 0);
     }
 
@@ -209,6 +210,7 @@ if (!$PAGE->jsaccess) {
             '<link rel="icon" href="' . $PAGE->meta('favicon') . '">',
         );
     }
+
     $PAGE->append(
         'LOGO',
         $PAGE->meta(
@@ -241,9 +243,11 @@ if (!$PAGE->jsaccess) {
         $nummessages = array_pop($thisrow);
         $DB->disposeresult($result);
     }
+
     if (!isset($nummessages)) {
         $nummessages = 0;
     }
+
     $PAGE->addvar('inbox', $nummessages);
     if ($nummessages) {
         $PAGE->append(
@@ -253,6 +257,7 @@ if (!$PAGE->jsaccess) {
             . ' new message' . ($nummessages == 1 ? '' : 's') . '</div></a>',
         );
     }
+
     if (!isset($CFG['nocopyright']) || !$CFG['nocopyright']) {
         $PAGE->append(
             'FOOTER',
@@ -262,6 +267,7 @@ if (!$PAGE->jsaccess) {
             . '&copy; 2007-' . date('Y') . '</div>',
         );
     }
+
     $PAGE->addvar('modlink', $PERMS['can_moderate'] ? $PAGE->meta('modlink') : '');
     $PAGE->addvar('ismod', $PERMS['can_moderate'] ? 1 : 0);
     $PAGE->addvar('acplink', $PERMS['can_access_acp'] ? $PAGE->meta('acplink') : '');
@@ -283,7 +289,9 @@ if (!$PAGE->jsaccess) {
             $nummessages,
         ) : $PAGE->meta('userbox-logged-out'),
     );
-} // end if !jsaccess only
+}
+
+// end if !jsaccess only
 if ($USER) {
     $PAGE->addvar('groupid', $JAX->pick($USER['group_id'], 3));
     $PAGE->addvar('userposts', $USER['posts']);
@@ -296,19 +304,11 @@ if ($USER) {
 if (!isset($JAX->b['act'])) {
     $JAX->b['act'] = null;
 }
+
 if (
-    $JAX->b['act'] != 'logreg'
-        && $JAX->b['act'] != 'logreg2'
-        && $JAX->b['act'] != 'logreg4'
-        && $JAX->b['act'] != 'logreg3'
+    $JAX->b['act'] != 'logreg' && $JAX->b['act'] != 'logreg2' && $JAX->b['act'] != 'logreg4' && $JAX->b['act'] != 'logreg3' && (!$PERMS['can_view_board'] || $CFG['boardoffline'] && !$PERMS['can_view_offline_board'])
 ) {
-    if (
-        !$PERMS['can_view_board']
-        || $CFG['boardoffline']
-        && !$PERMS['can_view_offline_board']
-    ) {
-        $JAX->b['act'] = 'boardoffline';
-    }
+    $JAX->b['act'] = 'boardoffline';
 }
 
 // Include modules.
@@ -326,7 +326,7 @@ foreach (glob('inc/modules/*.php') as $v) {
 }
 
 // Looks like it's straight out of IPB, doesn't it?
-$actraw = isset($JAX->b['act']) ? mb_strtolower($JAX->b['act']) : '';
+$actraw = isset($JAX->b['act']) ? mb_strtolower((string) $JAX->b['act']) : '';
 preg_match('@^[a-zA-Z_]+@', $actraw, $act);
 $act = array_shift($act);
 $actdefs = [
@@ -338,6 +338,7 @@ $actdefs = [
 if (isset($actdefs[$act]) && $actdefs[$act]) {
     $act = $actdefs[$act];
 }
+
 if ($act == 'idx' && isset($JAX->b['module']) && $JAX->b['module']) {
     // Do nothing.
 } elseif ($act && is_file($act = 'inc/page/' . $act . '.php')) {
@@ -379,6 +380,7 @@ if (in_array($JAX->getIp(), ['127.0.0.1', '::1'])) {
         $debug .= "<b>{$v}</b> " . $DB->queryList[$k] . '<br>';
         $qtime += $v;
     }
+
     $debug .= $PAGE->debug() . '<br>';
     $PAGE->JS('update', '#query .content', $debug);
     $PAGE->append(
@@ -395,6 +397,7 @@ if (in_array($JAX->getIp(), ['127.0.0.1', '::1'])) {
         $pagegen = 'Page Generated in ' . round(1000 * (microtime(true) - $microtime)) . ' ms',
     );
 }
+
 $PAGE->append(
     'DEBUG',
     "<div id='pagegen' style='text-align:center'>"
@@ -405,4 +408,5 @@ $PAGE->append(
 if ($PAGE->jsnewlocation) {
     $PAGE->JS('title', htmlspecialchars_decode($PAGE->get('TITLE'), ENT_QUOTES));
 }
+
 $PAGE->out();

@@ -35,13 +35,15 @@ class buddylist
         global $PAGE,$JAX,$USER;
 
         $PAGE->JS('softurl');
-
         if (!$USER) {
-            return $PAGE->JS(
+            $PAGE->JS(
                 'error',
                 'Sorry, you must be logged in to use this feature.',
             );
+
+            return;
         }
+
         if (isset($JAX->b['add']) && $JAX->b['add']) {
             $this->addbuddy($JAX->b['add']);
         } elseif (isset($JAX->b['remove']) && $JAX->b['remove']) {
@@ -63,6 +65,7 @@ class buddylist
         if (!$USER) {
             return;
         }
+
         $PAGE->JS('softurl');
         $crap = '';
         if ($USER['friends']) {
@@ -71,7 +74,7 @@ class buddylist
                 '`id`,`avatar`,`display_name` AS `name`,`usertitle`',
                 'members',
                 'WHERE `id` IN ? ORDER BY `name` ASC',
-                explode(',', $USER['friends']),
+                explode(',', (string) $USER['friends']),
             );
             while ($f = $DB->arow($result)) {
                 $crap .= $PAGE->meta(
@@ -85,12 +88,13 @@ class buddylist
                 );
             }
         }
+
         if ($USER['enemies']) {
             $result = $DB->safeselect(
                 '`id`,`avatar`,`display_name` AS `name`,`usertitle`',
                 'members',
                 'WHERE `id` IN ? ORDER BY `name` ASC',
-                explode(',', $USER['enemies']),
+                explode(',', (string) $USER['enemies']),
             );
             while ($f = $DB->arow($result)) {
                 $crap .= $PAGE->meta(
@@ -103,12 +107,14 @@ class buddylist
                 );
             }
         }
-        if (!$crap) {
+
+        if ($crap === '' || $crap === '0') {
             $crap = $PAGE->meta(
                 'error',
                 "You don't have any contacts added to your buddy list!",
             );
         }
+
         $PAGE->JS(
             'window',
             [
@@ -131,7 +137,7 @@ class buddylist
         $friends = $USER['friends'];
         $e = '';
 
-        if ($USER['enemies'] && in_array($uid, explode(',', $USER['enemies']))) {
+        if ($USER['enemies'] && in_array($uid, explode(',', (string) $USER['enemies']))) {
             $this->unblock($uid);
         }
 
@@ -164,11 +170,11 @@ class buddylist
         if (!$user) {
             $e = 'This user does not exist, and therefore could '
                 . 'not be added to your contacts list.';
-        } elseif (in_array($uid, explode(',', $friends))) {
+        } elseif (in_array($uid, explode(',', (string) $friends))) {
             $e = 'This user is already in your contacts list.';
         }
 
-        if ($e) {
+        if ($e !== '' && $e !== '0') {
             $PAGE->append('PAGE', $e);
             $PAGE->JS('error', $e);
         } else {
@@ -177,6 +183,7 @@ class buddylist
             } else {
                 $friends = $uid;
             }
+
             $USER['friends'] = $friends;
             $DB->safeupdate(
                 'members',
@@ -203,19 +210,22 @@ class buddylist
         if (!is_numeric($uid)) {
             return;
         }
+
         global $DB,$PAGE,$USER;
         $e = '';
-        $enemies = $USER['enemies'] ? explode(',', $USER['enemies']) : [];
-        $friends = $USER['friends'] ? explode(',', $USER['friends']) : [];
-        $isenemy = array_search($uid, $enemies);
-        $isfriend = array_search($uid, $friends);
+        $enemies = $USER['enemies'] ? explode(',', (string) $USER['enemies']) : [];
+        $friends = $USER['friends'] ? explode(',', (string) $USER['friends']) : [];
+        $isenemy = array_search($uid, $enemies, true);
+        $isfriend = array_search($uid, $friends, true);
         if ($isfriend !== false) {
             $this->dropbuddy($uid, 1);
         }
+
         if ($isenemy !== false) {
             $e = 'This user is already blocked.';
         }
-        if ($e) {
+
+        if ($e !== '' && $e !== '0') {
             $PAGE->JS('error', $e);
         } else {
             $enemies[] = $uid;
@@ -237,11 +247,12 @@ class buddylist
     {
         global $DB,$USER,$PAGE;
         if ($uid && is_numeric($uid)) {
-            $enemies = explode(',', $USER['enemies']);
-            $id = array_search($uid, $enemies);
+            $enemies = explode(',', (string) $USER['enemies']);
+            $id = array_search($uid, $enemies, true);
             if ($id === false) {
                 return;
             }
+
             unset($enemies[$id]);
             $enemies = implode(',', $enemies);
             $USER['enemies'] = $enemies;
@@ -254,6 +265,7 @@ class buddylist
                 $USER['id'],
             );
         }
+
         $this->displaybuddylist();
     }
 
@@ -261,11 +273,12 @@ class buddylist
     {
         global $DB,$USER,$PAGE;
         if ($uid && is_numeric($uid)) {
-            $friends = explode(',', $USER['friends']);
-            $id = array_search($uid, $friends);
+            $friends = explode(',', (string) $USER['friends']);
+            $id = array_search($uid, $friends, true);
             if ($id === false) {
                 return;
             }
+
             unset($friends[$id]);
             $friends = implode(',', $friends);
             $USER['friends'] = $friends;
@@ -278,6 +291,7 @@ class buddylist
                 $USER['id'],
             );
         }
+
         if (!$shh) {
             $this->displaybuddylist();
         }

@@ -80,7 +80,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $errors[] = 'There was an error connecting to the MySQL database.';
     }
 
-    $JAX->p['boardurl'] = mb_strtolower($JAX->b['boardurl']);
+    $JAX->p['boardurl'] = mb_strtolower((string) $JAX->b['boardurl']);
     if (
         !$JAX->p['boardurl']
         || !$JAX->p['username']
@@ -90,7 +90,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $errors[] = 'all fields required.';
     } elseif (mb_strlen($JAX->p['boardurl']) > 30) {
         $errors[] = 'board url too long';
-    } elseif ($JAX->p['boardurl'] == 'www') {
+    } elseif ($JAX->p['boardurl'] === 'www') {
         $errors[] = 'WWW is reserved.';
     } elseif (preg_match('@\W@', $JAX->p['boardurl'])) {
         $errors[] = 'board url needs to consist of letters, '
@@ -113,9 +113,9 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $errors[] = 'invalid email';
     }
 
-    if (mb_strlen($JAX->p['username']) > 50) {
+    if (mb_strlen((string) $JAX->p['username']) > 50) {
         $errors[] = 'username too long';
-    } elseif (preg_match('@\W@', $JAX->p['username'])) {
+    } elseif (preg_match('@\W@', (string) $JAX->p['username'])) {
         $errors[] = 'username needs to consist of letters, '
             . 'numbers, and underscore only';
     }
@@ -131,7 +131,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     }
     $DB->disposeresult($result);
 
-    if (empty($errors)) {
+    if ($errors === []) {
         $board = $JAX->p['boardurl'];
         $boardPrefix = $board . '_';
 
@@ -157,10 +157,12 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $lines = file(SERVICE_ROOT . '/blueprint.sql');
         foreach ($lines as $line) {
             // Skip comments.
-            if (mb_substr($line, 0, 2) == '--' || $line == '') {
+            if (mb_substr($line, 0, 2) === '--') {
                 continue;
             }
-
+            if ($line === '') {
+                continue;
+            }
             // Replace blueprint_ with board name.
             $line = preg_replace('/blueprint_/', $boardPrefix, $line);
 
@@ -168,7 +170,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             $query .= $line;
 
             // If it has a semicolon at the end, it's the end of the query.
-            if (mb_substr(trim($line), -1, 1) == ';') {
+            if (mb_substr(trim((string) $line), -1, 1) === ';') {
                 // Perform the query.
                 $result = $DB->safequery($query);
                 $DB->disposeresult($result);
@@ -183,7 +185,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             [
                 'name' => $JAX->p['username'],
                 'display_name' => $JAX->p['username'],
-                'pass' => password_hash($JAX->p['password'], PASSWORD_DEFAULT),
+                'pass' => password_hash((string) $JAX->p['password'], PASSWORD_DEFAULT),
                 'email' => $JAX->p['email'],
                 'sig' => '',
                 'posts' => 0,

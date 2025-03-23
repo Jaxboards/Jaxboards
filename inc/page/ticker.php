@@ -9,7 +9,6 @@ class ticker
     public function __construct()
     {
         global $PAGE;
-        $this->maxticks = 60;
         if ($PAGE->jsnewlocation || !$PAGE->jsaccess) {
             $this->index();
         } else {
@@ -56,11 +55,14 @@ class ticker
             if (!$p['read']) {
                 continue;
             }
+
             if (!$first) {
                 $first = $f['id'];
             }
+
             $ticks .= $this->ftick($f);
         }
+
         $SESS->addvar('tickid', $first);
         $page = $PAGE->meta('ticker', $ticks);
         $PAGE->append('PAGE', $page);
@@ -106,11 +108,14 @@ class ticker
             if (!$p['read']) {
                 continue;
             }
+
             if (!$first) {
                 $first = $f['id'];
             }
+
             $PAGE->JS('tick', $this->ftick($f));
         }
+
         if ($first) {
             $SESS->addvar('tickid', $first);
         }

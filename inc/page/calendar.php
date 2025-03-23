@@ -16,6 +16,7 @@ class CALENDAR
         } else {
             $this->month = date('n');
         }
+
         $this->monthview();
     }
 
@@ -26,6 +27,7 @@ class CALENDAR
         if ($PAGE->jsupdate) {
             return;
         }
+
         $page = '';
         $today = date('n j Y');
         [
@@ -81,22 +83,25 @@ class CALENDAR
                     $offset,
                 );
             }
+
             $week .= $PAGE->meta(
                 'calendar-day',
-                ($month . ' ' . $x . ' ' . $year) == $today ? 'today' : '',
+                $month . ' ' . $x . ' ' . $year === $today ? 'today' : '',
                 $x,
-                !empty($birthdays[$x]) ? $PAGE->meta(
+                empty($birthdays[$x]) ? '' : $PAGE->meta(
                     'calendar-birthdays',
                     implode(',', $birthdays[$x]),
-                ) : '',
+                ),
             );
             if (0 == ($x + $offset) % 7 || $x == $daysinmonth && $week) {
                 $page .= $PAGE->meta('calendar-week', $week);
                 $week = '';
             }
         }
+
         $page = $PAGE->meta('calendar', $page);
         $page = $PAGE->meta('box', '', 'Calendar', $page);
+
         $PAGE->append('PAGE', $page);
         $PAGE->JS('update', 'page', $page);
     }
