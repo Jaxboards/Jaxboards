@@ -40,7 +40,7 @@ if ($sonarqube_report === '') {
     exit(1);
 }
 
-/*
+/**
  * Validate CLI arguments are usable
  */
 
@@ -65,7 +65,8 @@ if (file_exists($sonarqube_report) && !is_writable($sonarqube_report)) {
     exit(1);
 }
 
-if (!file_exists($sonarqube_report)
+if (
+    !file_exists($sonarqube_report)
     && !is_writable(dirname($sonarqube_report))
 ) {
     fwrite(
@@ -79,8 +80,7 @@ if (!file_exists($sonarqube_report)
 $data = json_decode(
     file_get_contents($php_codesniffer_report),
     null,
-    512,
-    // default
+    512, // default
     JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
 );
 
