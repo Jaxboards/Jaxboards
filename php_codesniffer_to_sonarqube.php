@@ -151,13 +151,6 @@ file_put_contents(
                                 'message' => $message['message'],
                                 'filePath' => $file,
                                 'textRange' => [
-                                    'endColumn' =>
-                                        // SonarQube starts at 0 for columns
-                                        // while PHP_CodeSniffer starts at 1
-                                        (string) (
-                                            ((int) $message['column']) - 1
-                                        ),
-                                    'endLine' => (string) $message['line'],
                                     'startColumn' =>
                                         // SonarQube starts at 0 for columns
                                         // while PHP_CodeSniffer starts at 1
@@ -165,6 +158,14 @@ file_put_contents(
                                             ((int) $message['column']) - 1
                                         ),
                                     'startLine' => (string) $message['line'],
+                                    // we don't know when this ends due to lack
+                                    // of information from PHP_CodeSniffer so we
+                                    // just add 1 to the starting positions
+                                    // (otherwise SonarQube crashes)
+                                    'endColumn' => (string) $message['column'],
+                                    'endLine' => (string) (
+                                        (int) $message['line'] + 1
+                                    ),
                                 ],
                             ],
 
