@@ -12,6 +12,12 @@ boards
 # Log files
 *.log
 
+# Scan Results
+eslint-report.json
+phpcs-report-sonarqube.json
+phpcs-report.json
+stylelint-report.json
+
 # Vendor files
 node_modules
 vendor
