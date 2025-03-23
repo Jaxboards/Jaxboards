@@ -221,7 +221,7 @@ return RectorConfig::configure()
         instanceOf: true,
         earlyReturn: true,
         strictBooleans: true,
-        carbon: false,
+        carbon: true,
         rectorPreset: true,
         phpunitCodeQuality: false,
         doctrineCodeQuality: false,
