@@ -563,14 +563,14 @@ EOT;
                     $error = "That birth date doesn't exist!";
                 }
             }
-            
+
             if (!$data['dob_year'] && !$data['dob_month'] && !$data['dob_year']) {
                 // User provided no birthdate, just set field to null
                 $data['birthdate'] = null;
             } else {
                 $data['birthdate'] = ($data['dob_year'] ?? '0000') . '-' .
                     ($data['dob_month'] ?? '00') . '-' .
-                    ($data['dob_day'] ?? '00')
+                    ($data['dob_day'] ?? '00');
             }
 
             unset($data['dob_year']);
