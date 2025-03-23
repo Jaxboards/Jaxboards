@@ -9,5 +9,6 @@
 
 // phpcs:disable SlevomatCodingStandard.Variables.UnusedVariable.UnusedVariable
 $CFG = [];
+
 // always load configuration
 require __DIR__ . '/config.default.php';
