@@ -1,5 +1,4 @@
 <?php
-
 /**
  * JaxBoards default config file. This is loaded on install, so don't delete
  * this until you've installed Jaxboards!
@@ -15,7 +14,6 @@
  *
  * @link https://github.com/Jaxboards/Jaxboards Jaxboards on Github
  */
-
 $CFG = json_decode(
 <<<'EOD'
 {

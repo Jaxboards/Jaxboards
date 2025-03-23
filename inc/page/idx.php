@@ -391,8 +391,7 @@ EOT;
         foreach ($DB->getUsersOnline() as $f) {
             $lastActionIdle = $SESS->last_update - $CFG['timetoidle'] - 30;
             if ($f['uid'] || $f['is_bot']) {
-                if (
-                    $f['last_action'] >= $SESS->last_update
+                if ($f['last_action'] >= $SESS->last_update
                     || 'idle' == $f['status']
                     && $f['last_action'] > $lastActionIdle
                 ) {

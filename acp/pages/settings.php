@@ -64,8 +64,7 @@ class settings
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             if ('' === trim($JAX->p['boardname'])) {
                 $e = 'Board name is required';
-            } elseif (
-                !isset($JAX->p['logourl'])
+            } elseif (!isset($JAX->p['logourl'])
                 || ('' !== trim($JAX->p['logourl'])
                 && !$JAX->isURL($JAX->p['logourl']))
             ) {
@@ -263,8 +262,7 @@ class settings
                 'shoutbox' => $JAX->p['sbe'] ? 1 : 0,
                 'shoutboxava' => $JAX->p['sbava'] ? 1 : 0,
             );
-            if (
-                is_numeric($JAX->p['sbnum'])
+            if (is_numeric($JAX->p['sbnum'])
                 && $JAX->p['sbnum'] <= 10
                 && $JAX->p['sbnum'] > 0
             ) {
