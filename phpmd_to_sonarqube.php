@@ -300,8 +300,7 @@ file_put_contents(
                                 (string) $violation['description'],
                                 $matches,
                             );
-                            // columns start at 0 for SonarQube
-                            $column = (int) ($matches['column'] ?? 1) - 1;
+                            $column = (int) ($matches['column'] ?? 0);
 
                             return [
                                 'ruleId' => $violation['rule'],
