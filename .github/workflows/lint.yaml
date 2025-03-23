@@ -24,7 +24,7 @@ jobs:
           echo "[]" > stylelint-report.json &&
           echo '{"issues": [], "rules": []}' > phpcs-report-sonarqube.json
         shell: bash
-      - run: npm run-script lint
+      - run: npm run-script ci-lint
       - run: >
           php php_codesniffer_to_sonarqube.php
           phpcs-report.json

@@ -25,9 +25,9 @@
   "scripts": {
     "autofix": "npm run-script prettier && npm run-script eslint-fix && npm run-script stylelint-fix && npm run-script phpcbf",
     "build": "rollup -c",
+    "ci-lint": "eslint 'Script/**/*.js' --format json --output-file eslint-report.json; stylelint \"./**/*.{c,sa,sc,le}ss\" --formatter json --output-file stylelint-report.json; npm run-script phpcs -- -- --report-file=phpcs-report.json --report=json --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1",
     "eslint": "eslint 'Script/**/*.js'",
     "eslint-fix": "eslint 'Script/**/*.js' --fix",
-    "lint": "eslint 'Script/**/*.js' --format json --output-file eslint-report.json; stylelint \"./**/*.{c,sa,sc,le}ss\" --formatter json --output-file stylelint-report.json; npm run-script phpcs -- -- --report-file=phpcs-report.json --report=json --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1",
     "php-lint": "composer-runner -- run-script lint",
     "phpcbf": "composer-runner -- run-script phpcbf",
     "phpcs": "composer-runner -- run-script phpcs",
