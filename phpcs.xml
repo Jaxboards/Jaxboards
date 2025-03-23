@@ -57,7 +57,8 @@
   <rule ref="SlevomatCodingStandard.Attributes.DisallowMultipleAttributesPerLine"/>
   <rule ref="SlevomatCodingStandard.Attributes.RequireAttributeAfterDocComment"/>
   <rule ref="SlevomatCodingStandard.Classes.ClassConstantVisibility"/>
-  <rule ref="SlevomatCodingStandard.Classes.ClassLength"/>
+  <!-- disable this rule because it breakse the sonarqube reports -->
+  <!--rule ref="SlevomatCodingStandard.Classes.ClassLength"/-->
   <rule ref="SlevomatCodingStandard.Classes.ClassStructure">
     <properties>
       <property name="methodGroups" type="array">
