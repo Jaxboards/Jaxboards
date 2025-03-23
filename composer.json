@@ -29,6 +29,10 @@
     ],
     "php-cs-fixer": "php-cs-fixer fix --allow-risky yes --verbose --verbose",
     "phpcbf": "phpcbf",
-    "phpcs": "phpcs -s"
+    "phpcs": "phpcs -s",
+    "phpcs-report": [
+      "phpcs -s --report-file=phpcs-report.json --report=json --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1",
+      "php php_codesniffer_to_sonarqube.php phpcs-report.json phpcs-report-sonarqube.json"
+    ]
   }
 }

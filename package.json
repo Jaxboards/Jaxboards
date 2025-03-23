@@ -24,18 +24,21 @@
   "scripts": {
     "autofix": "npm run-script prettier && npm run-script eslint-fix && npm run-script stylelint-fix && npm run-script phpcbf && npm run-script php-cs-fixer",
     "build": "rollup -c",
-    "ci-lint": "eslint 'Script/**/*.js' --format json --output-file eslint-report.json; stylelint \"./**/*.{c,sa,sc,le}ss\" --formatter json --output-file stylelint-report.json; npm run-script phpcs -- -- --report-file=phpcs-report.json --report=json --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1",
+    "ci-lint": "npm run-script eslint-report; npm run-script stylelint-report; npm run-script phpcs-report",
     "eslint": "eslint 'Script/**/*.js'",
     "eslint-fix": "eslint 'Script/**/*.js' --fix",
+    "eslint-report": "eslint 'Script/**/*.js' --format json --output-file eslint-report.json",
     "php-cs-fixer": "composer-runner -- run-script --no-interaction php-cs-fixer",
     "php-lint": "composer-runner -- run-script --no-interaction lint",
     "phpcbf": "composer-runner -- run-script --no-interaction phpcbf",
     "phpcs": "composer-runner -- run-script --no-interaction phpcs",
+    "phpcs-report": "composer-runner -- run-script --no-interaction phpcs-report",
     "postinstall": "composer-runner -- install",
     "pre-commit": "npm run-script eslint && npm run-script stylelint && npm run-script php-lint",
     "prettier": "prettier --write --single-quote \"**/*.{{t,j}s{,x,on},{c,sa,sc,le}ss,vue,md,y{,a}ml,graphql}\"",
     "stylelint": "stylelint \"./**/*.{c,sa,sc,le}ss\"",
-    "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\""
+    "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\"",
+    "stylelint-report": "stylelint \"./**/*.{c,sa,sc,le}ss\" --formatter json --output-file stylelint-report.json"
   },
   "type": "module"
 }
