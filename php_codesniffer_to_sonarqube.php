@@ -93,7 +93,79 @@ if (!is_array($data['files'])) {
     exit(1);
 }
 
-$currentRules = [];
+$rules = array_reduce(
+    $data['files'],
+    static fn(array $rules, array $file): array => array_reduce(
+        $file['messages'],
+        static function (array $rules, array $message) {
+            if (array_key_exists($message['source'], $rules)) {
+                return $rules;
+            }
+            $description = preg_replace(
+                '/ Currently using \d+ lines./',
+                '',
+                (string) $message['message'],
+            ) ?? '';
+            $description = preg_replace(
+                '/Unused variable \$\w+/',
+                'Unused variable',
+                $description,
+            ) ?? '';
+            $description = preg_replace(
+                '/Class name \w+ does not match filepath [\/\w\.]+/',
+                'Class name does not match filepath',
+                $description,
+            ) ?? '';
+            $description = preg_replace(
+                '/Cognitive complexity for "\w+" is \d+ but has to be/',
+                'Cognitive complexity must be',
+                $description,
+            ) ?? '';
+            $description = preg_replace(
+                '/; contains \d+ characters/',
+                '',
+                $description,
+            ) ?? '';
+            $description = preg_replace(
+                '/Unused parameter \$\w+/',
+                'Unused parameter',
+                $description,
+            ) ?? '';
+            $description = preg_replace(
+                '/Property \\\\\w+::\$\w+ does not have/',
+                'Property does not have',
+                $description,
+            ) ?? '';
+            $description = preg_replace(
+                '/Method \\\\\w+::\w+\(\) does not have/',
+                'Method does not have',
+                $description,
+            );
+
+            $rules[$message['source']] = [
+                'cleanCodeAttribute' => 'FORMATTED',
+                'description' => $description,
+                'engineId' => 'PHP_CodeSniffer',
+                'id' => $message['source'],
+                'impacts' => [
+                    [
+                        // we don't have a way to guage this easily so we
+                        // always set it to low
+                        'severity' => 'LOW',
+                        // we don't have a way to guage this easily so we
+                        // always set it to mainability
+                        'softwareQuality' => 'MAINTAINABILITY',
+                    ],
+                ],
+                'name' => $message['source'],
+            ];
+
+            return $rules;
+        },
+        $rules,
+    ),
+    [],
+);
 
 file_put_contents(
     $sonarQubeReport,
@@ -103,44 +175,7 @@ file_put_contents(
             static function (
                 array $result,
                 $file,
-            ) use (
-                &$currentRules,
-                $data,
-            ): array {
-                array_push(
-                    $result['rules'],
-                    ...array_map(
-                        static fn(array $message): array => [
-                            'cleanCodeAttribute' => 'FORMATTED',
-                            'engineId' => 'PHP_CodeSniffer',
-                            'id' => $message['source'],
-                            'impacts' => [
-                                [
-                                    'severity' => 'LOW',
-                                    'softwareQuality' => 'MAINTAINABILITY',
-                                ],
-                            ],
-                            'name' => $message['message'],
-                        ],
-                        array_filter(
-                            $data['files'][$file]['messages'],
-                            // phpcs:disable Generic.WhiteSpace.ScopeIndent.IncorrectExact
-                            static fn(
-                                // phpcs:enable Generic.WhiteSpace.ScopeIndent.IncorrectExact
-                                array $message,
-                            ): bool => !in_array(
-                                $message['source'],
-                                $currentRules,
-                            ),
-                        ),
-                    ),
-                );
-
-                $currentRules = array_map(
-                    static fn(array $rule): string => $rule['id'],
-                    $result['rules'],
-                );
-
+            ) use ($data): array {
                 array_push(
                     $result['issues'],
                     ...array_map(
@@ -178,7 +213,7 @@ file_put_contents(
             },
             [
                 'issues' => [],
-                'rules' => [],
+                'rules' => array_values($rules),
             ],
         ),
         JSON_THROW_ON_ERROR,
