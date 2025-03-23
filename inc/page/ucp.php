@@ -101,15 +101,17 @@ EOT
                 $this->showboardsettings();
                 break;
             case 'inbox':
-                if (isset($JAX->p['dmessage'])
-                && is_array($JAX->p['dmessage'])
+                if (
+                    isset($JAX->p['dmessage'])
+                    && is_array($JAX->p['dmessage'])
                 ) {
                     foreach ($JAX->p['dmessage'] as $v) {
                         $this->delete($v, false);
                     }
                 }
-                if (isset($JAX->p['messageid'])
-                && is_numeric($JAX->p['messageid'])
+                if (
+                    isset($JAX->p['messageid'])
+                    && is_numeric($JAX->p['messageid'])
                 ) {
                     switch (mb_strtolower($JAX->p['page'])) {
                         case 'delete':
@@ -128,16 +130,18 @@ EOT
                     }
                     if ('compose' == $JAX->b['page']) {
                         $this->compose();
-                    } elseif (isset($JAX->g['view'])
-                    && is_numeric($JAX->g['view'])
+                    } elseif (
+                        isset($JAX->g['view'])
+                        && is_numeric($JAX->g['view'])
                     ) {
                         $this->viewmessage($JAX->g['view']);
                     } elseif ('sent' == $JAX->b['page']) {
                         $this->viewmessages('sent');
                     } elseif ('flagged' == $JAX->b['page']) {
                         $this->viewmessages('flagged');
-                    } elseif (isset($JAX->b['flag'])
-                    && is_numeric($JAX->b['flag'])
+                    } elseif (
+                        isset($JAX->b['flag'])
+                        && is_numeric($JAX->b['flag'])
                     ) {
                         return $this->flag($JAX->b['flag']);
                     } else {
@@ -317,7 +321,8 @@ EOT
             if (!$JAX->p['showpass'] && $JAX->p['newpass1'] != $JAX->p['newpass2']) {
                 $e = 'Those passwords do not match.';
             }
-            if (!$JAX->p['newpass1']
+            if (
+                !$JAX->p['newpass1']
                 || !$JAX->p['showpass']
                 && !$JAX->p['newpass2']
                 || !$JAX->p['curpass']
@@ -482,7 +487,8 @@ EOT;
             if ('' === $data['display_name']) {
                 $data['display_name'] = $USER['name'];
             }
-            if ($CFG['badnamechars']
+            if (
+                $CFG['badnamechars']
                 && preg_match($CFG['badnamechars'], $data['display_name'])
             ) {
                 $error = 'Invalid characters in display name!';
@@ -499,8 +505,9 @@ EOT;
                     $error = 'That display name is already in use.';
                 }
             }
-            
-            if (!$data['dob_year']
+
+            if (
+                !$data['dob_year']
                 || !is_numeric($data['dob_year'])
                 || $data['dob_year'] < 1
                 || $data['dob_year'] > (int) date('Y')
@@ -513,7 +520,8 @@ EOT;
                 );
             }
 
-            if (!$data['dob_month']
+            if (
+                !$data['dob_month']
                 || !is_numeric($data['dob_month'])
                 || $data['dob_month'] < 1
                 || $data['dob_month'] > 12
@@ -525,8 +533,9 @@ EOT;
                     strtotime('2000/' . $data['dob_month'] . '/1')
                 );
             }
-            
-            if (!$data['dob_day']
+
+            if (
+                !$data['dob_day']
                 || !is_numeric($data['dob_day'])
                 || $data['dob_day'] < 1
             ) {
@@ -542,7 +551,8 @@ EOT;
             if ($data['dob_month'] && $data['dob_day']) {
                 // Feb 29th check for leap years
                 if (2 === (int) $data['dob_month']) {
-                    if ($data['dob_year'] > 0
+                    if (
+                        $data['dob_year'] > 0
                         && date('L', strtotime($data['dob_year']))
                     ) {
                         $daysInMonth = 29;
@@ -563,7 +573,7 @@ EOT;
                     $error = "That birth date doesn't exist!";
                 }
             }
-            
+
             if (!$data['dob_year'] && !$data['dob_month'] && !$data['dob_year']) {
                 // User provided no birthdate, just set field to null
                 $data['birthdate'] = null;
@@ -577,7 +587,8 @@ EOT;
             unset($data['dob_month']);
             unset($data['dob_day']);
 
-            foreach (array(
+            foreach (
+                array(
                 'contact_skype' => 'Skype username',
                 'contact_discord' => 'Discord username',
                 'contact_yim' => 'YIM username',
@@ -593,8 +604,10 @@ EOT;
                 'website' => 'Website URL',
                 'usertitle' => 'User Title',
                 'location' => 'Location',
-            ) as $k => $v) {
-                if (false !== mb_strstr($k, 'contact')
+                ) as $k => $v
+            ) {
+                if (
+                    false !== mb_strstr($k, 'contact')
                     && preg_match('/[^\\w.@]/', $data[$k])
                 ) {
                     $error = "Invalid characters in {$v}";

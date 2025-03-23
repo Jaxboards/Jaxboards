@@ -109,16 +109,19 @@ class LOGREG
                 throw new Exception('Name and display name required.');
             } elseif ($pass1 != $pass2) {
                 throw new Exception('The passwords do not match.');
-            } elseif (mb_strlen($dispname) > 30
+            } elseif (
+                mb_strlen($dispname) > 30
                 || mb_strlen($name) > 30
             ) {
                 throw new Exception('Display name and username must be under 30 characters.');
-            } elseif (($CFG['badnamechars']
+            } elseif (
+                ($CFG['badnamechars']
                 && preg_match($CFG['badnamechars'], $name))
                 || $JAX->blockhtml($name) != $name
             ) {
                 throw new Exception('Invalid characters in username!');
-            } elseif (($CFG['badnamechars']
+            } elseif (
+                ($CFG['badnamechars']
                 && preg_match($CFG['badnamechars'], $dispname))
             ) {
                 throw new Exception('Invalid characters in display name!');

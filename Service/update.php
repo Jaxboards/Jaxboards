@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Updater to update existing jaxboards to new MySQL standards.
  *
@@ -12,6 +13,7 @@
  *
  * @link https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
+
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', dirname(__DIR__));
 }
@@ -1550,7 +1552,8 @@ EOT
         }
     }
     $DB->disposeresult($result);
-    if (in_array('dob_year', $columns)
+    if (
+        in_array('dob_year', $columns)
         && in_array('dob_month', $columns)
         && in_array('dob_day', $columns)
         && !in_array('birthdate', $columns)
@@ -1673,10 +1676,12 @@ EOT
                 );
                 $DB->disposeresult($result);
             }
-            if (!preg_match(
-                "/FOREIGN\s+KEY\s+\(`{$column}`\)\s+REFERENCES\s+{$foreign['table']}\s+\(`{$foreign['column']}`\)/i",
-                $createTableStatement
-            )
+            if (
+                !preg_match(
+                    "/FOREIGN\s+KEY\s+\(`{$column}`\)\s+REFERENCES\s+"
+                    . "{$foreign['table']}\s+\(`{$foreign['column']}`\)/i",
+                    $createTableStatement
+                )
             ) {
                 $result = $DB->safequery(
                     str_replace(

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Service signup file, for users to create their own JaxBoards forum.
  *
@@ -13,6 +14,7 @@
  *
  * @link https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
+
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', dirname(__DIR__));
 }
@@ -77,7 +79,8 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     }
 
     $JAX->p['boardurl'] = mb_strtolower($JAX->b['boardurl']);
-    if (!$JAX->p['boardurl']
+    if (
+        !$JAX->p['boardurl']
         || !$JAX->p['username']
         || !$JAX->p['password']
         || !$JAX->p['email']
