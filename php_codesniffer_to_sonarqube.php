@@ -15,9 +15,9 @@
  */
 
 // Fetch CLI arguments.
-$php_codesniffer_report = $argv[1] ?? '';
+$phpCodeSnifferReport = $argv[1] ?? '';
 
-if ($php_codesniffer_report === '') {
+if ($phpCodeSnifferReport === '') {
     fwrite(
         STDERR,
         'Please enter the path to your PHP_CodeSniffer report json file',
@@ -26,9 +26,9 @@ if ($php_codesniffer_report === '') {
     exit(1);
 }
 
-$sonarqube_report = $argv[2] ?? '';
+$sonarQubeReport = $argv[2] ?? '';
 
-if ($sonarqube_report === '') {
+if ($sonarQubeReport === '') {
     fwrite(
         STDERR,
         'Please enter the path to where to save your SonarQube report json '
@@ -39,19 +39,22 @@ if ($sonarqube_report === '') {
 }
 
 // Validate CLI arguments are usable
-if (!file_exists($php_codesniffer_report)) {
+if (!file_exists($phpCodeSnifferReport)) {
     fwrite(STDERR, 'Provided PHP_CodeSniffer report json file does not exist');
 
     exit(1);
 }
 
-if (!is_readable($php_codesniffer_report)) {
+if (!is_readable($phpCodeSnifferReport)) {
     fwrite(STDERR, 'Provided PHP_CodeSniffer report json file is not readable');
 
     exit(1);
 }
 
-if (file_exists($sonarqube_report) && !is_writable($sonarqube_report)) {
+if (
+    file_exists($sonarQubeReport)
+    && !is_writable($sonarQubeReport)
+) {
     fwrite(
         STDERR,
         'SonarQube report file already exists and is not writable',
@@ -61,8 +64,8 @@ if (file_exists($sonarqube_report) && !is_writable($sonarqube_report)) {
 }
 
 if (
-    !file_exists($sonarqube_report)
-    && !is_writable(dirname($sonarqube_report))
+    !file_exists($sonarQubeReport)
+    && !is_writable(dirname($sonarQubeReport))
 ) {
     fwrite(
         STDERR,
@@ -72,11 +75,15 @@ if (
     exit(1);
 }
 
+$dataJSON = file_get_contents($phpCodeSnifferReport);
+if ($dataJSON === false) {
+    $dataJSON = '';
+}
 $data = json_decode(
-    file_get_contents($php_codesniffer_report),
+    $dataJSON,
     null,
-    512,
     // default
+    512,
     JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
 );
 
@@ -89,18 +96,18 @@ if (!is_array($data['files'])) {
     exit(1);
 }
 
-$current_rules = [];
+$currentRules = [];
 
 file_put_contents(
-    $sonarqube_report,
+    $sonarQubeReport,
     json_encode(
         array_reduce(
             array_keys($data['files']),
             static function (
                 array $result,
-                string $file,
+                $file,
             ) use (
-                &$current_rules,
+                &$currentRules,
                 $data,
             ): array {
                 array_push(
@@ -126,13 +133,13 @@ file_put_contents(
                                 array $message,
                             ): bool => !in_array(
                                 $message['source'],
-                                $current_rules,
+                                $currentRules,
                             ),
                         ),
                     ),
                 );
 
-                $current_rules = array_map(
+                $currentRules = array_map(
                     static fn(array $rule): string => $rule['id'],
                     $result['rules'],
                 );
