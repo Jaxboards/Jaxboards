@@ -1,1 +1,1 @@
-npm run-script pre-commit
+npm run-script prettier
