@@ -17,6 +17,8 @@ boards
 eslint-report.json
 phpcs-report-sonarqube.json
 phpcs-report.json
+phpmd-report-sonarqube.json
+phpmd-report.json
 phpstan-report.json
 psalm-report.json
 stylelint-report.json
