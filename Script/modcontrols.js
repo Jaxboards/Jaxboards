@@ -13,7 +13,8 @@ const postIDs = function fetchPIDs(a) {
   }
   const pl = pids ? pids.length : 0;
   const pluralPosts = pids.length === 1 ? '' : 's';
-  return [pids, pl, pluralPosts];
+  const andPosts = pl ? ' and <br />' : '';
+  return [pids, pl, pluralPosts, andPosts];
 };
 
 const threadIDs = function fetchTIDs(a) {
@@ -35,7 +36,7 @@ class ModControls {
       },
 
       modcontrols_postsync: (a) => {
-        const [pids, pl, pluralPosts] = postIDs(a);
+        const [pids, pl, pluralPosts, andPosts] = postIDs(a);
         const [tids, tl, pluralThreads] = threadIDs(a);
         const html =
           `${
@@ -54,7 +55,7 @@ class ModControls {
                   "<option value='unlock'>Unlock</option>" +
                   '</select>' +
                   '&nbsp; &nbsp; <strong>'
-                }${tl}</strong> topic${pluralThreads}${pl ? ' and <br />' : ''}`
+                }${tl}</strong> topic${pluralThreads}${andPosts}`
               : ''
           }${
             pl
