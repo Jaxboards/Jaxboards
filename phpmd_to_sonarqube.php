@@ -300,7 +300,6 @@ file_put_contents(
                                 (string) $violation['description'],
                                 $matches,
                             );
-                            $column = (int) ($matches['column'] ?? 0);
                             // although we have column data, we can't use it
                             // because SonarQube interprets columns differently
                             // and bugs out :(
@@ -315,7 +314,7 @@ file_put_contents(
                                     'textRange' => [
                                         // we don't have end column data so just
                                         // add one to make SonarQube happy
-                                        'endColumn' => (string) ($column + 1),
+                                        'endColumn' => (string) 1,
                                         'endLine' => (string) $violation['endLine'],
                                         'startColumn' => (string) $column,
                                         'startLine' => (string) $violation['beginLine'],
