@@ -11,7 +11,7 @@ final class modcontrols
         $script = file_get_contents('dist/modcontrols.js');
         if (!$PAGE || !$PAGE->jsaccess) {
             header('Content-Type: application/javascript; charset=utf-8');
-            header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 2592000) . ' GMT');
+            header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 2_592_000) . ' GMT');
 
             echo $script;
 
