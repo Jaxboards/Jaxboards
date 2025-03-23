@@ -165,7 +165,10 @@ file_put_contents(
                                     // of information from PHP_CodeSniffer so we
                                     // just add 1 to the starting positions
                                     // (otherwise SonarQube crashes)
-                                    'endColumn' => (string) $message['column'],
+                                    'endColumn'
+                                        => (string) (
+                                            ((int) $message['column']) - 1
+                                        ),
                                     'endLine' => (string) (
                                         (int) $message['line'] + 1
                                     ),
