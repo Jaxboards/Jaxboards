@@ -69,8 +69,8 @@ class members
         */
 
         $PAGE->sidebar($PAGE->parseTemplate('sidebar-list.html', [
-                    'content' => $sidebarLinks,
-                ]));
+            'content' => $sidebarLinks,
+        ]));
     }
 
     public function showmain()
@@ -102,8 +102,8 @@ EOT
             ).PHP_EOL;
         }
         $PAGE->addContentBox('Member List', $PAGE->parseTemplate('members/show-main.html', [
-                    'rows' => $rows,
-                ]));
+            'rows' => $rows,
+        ]));
     }
 
     public function editmem()
@@ -286,8 +286,8 @@ EOT
                 $page .= $this->heading('System-Generated Variables');
                 $page .= $this->formfield('Post Count:', 'posts', $data['posts']);
                 $page = $PAGE->parseTemplate('members/edit-form.html', [
-                        'content' => $page,
-                    ]);
+                    'content' => $page,
+                ]);
             }
         } else {
             $page = $PAGE->parseTemplate('members/edit.html');
@@ -375,8 +375,8 @@ EOT
         }
 
         return $PAGE->parseTemplate('members/get-groups.html', [
-                'content' => $page,
-            ]);
+            'content' => $page,
+        ]);
     }
 
     public function merge()
@@ -404,48 +404,48 @@ EOT
 
                 // Files.
                 $DB->safeupdate('files', [
-                        'uid' => $mid2,
-                    ], 'WHERE `uid`=?', $mid1);
+                    'uid' => $mid2,
+                ], 'WHERE `uid`=?', $mid1);
                 // PMs.
                 $DB->safeupdate('messages', [
-                        'to' => $mid2,
-                    ], 'WHERE `to`=?', $mid1);
+                    'to' => $mid2,
+                ], 'WHERE `to`=?', $mid1);
                 $DB->safeupdate('messages', [
-                        'from' => $mid2,
-                    ], 'WHERE `from`=?', $mid1);
+                    'from' => $mid2,
+                ], 'WHERE `from`=?', $mid1);
                 // Posts.
                 $DB->safeupdate('posts', [
-                        'auth_id' => $mid2,
-                    ], 'WHERE `auth_id`=?', $mid1);
+                    'auth_id' => $mid2,
+                ], 'WHERE `auth_id`=?', $mid1);
                 // Profile comments.
                 $DB->safeupdate('profile_comments', [
-                        'to' => $mid2,
-                    ], 'WHERE `to`=?', $mid1);
+                    'to' => $mid2,
+                ], 'WHERE `to`=?', $mid1);
                 $DB->safeupdate('profile_comments', [
-                        'from' => $mid2,
-                    ], 'WHERE `from`=?', $mid1);
+                    'from' => $mid2,
+                ], 'WHERE `from`=?', $mid1);
                 // Topics.
                 $DB->safeupdate('topics', [
-                        'auth_id' => $mid2,
-                    ], 'WHERE `auth_id`=?', $mid1);
+                    'auth_id' => $mid2,
+                ], 'WHERE `auth_id`=?', $mid1);
                 $DB->safeupdate('topics', [
-                        'lp_uid' => $mid2,
-                    ], 'WHERE `lp_uid`=?', $mid1);
+                    'lp_uid' => $mid2,
+                ], 'WHERE `lp_uid`=?', $mid1);
 
                 // Forums.
                 $DB->safeupdate('forums', [
-                        'lp_uid' => $mid2,
-                    ], 'WHERE `lp_uid`=?', $mid1);
+                    'lp_uid' => $mid2,
+                ], 'WHERE `lp_uid`=?', $mid1);
 
                 // Shouts.
                 $DB->safeupdate('shouts', [
-                        'uid' => $mid2,
-                    ], 'WHERE `uid`=?', $mid1);
+                    'uid' => $mid2,
+                ], 'WHERE `uid`=?', $mid1);
 
                 // Session.
                 $DB->safeupdate('session', [
-                        'uid' => $mid2,
-                    ], 'WHERE `uid`=?', $mid1);
+                    'uid' => $mid2,
+                ], 'WHERE `uid`=?', $mid1);
 
                 // Sum post count on account being merged into.
                 $result = $DB->safeselect('`posts`,`id`', 'members', 'WHERE `id`=?', $mid1);
@@ -623,8 +623,8 @@ EOT
         $PAGE->addContentBox(
             'IP Bans',
             $PAGE->parseTemplate('members/ip-bans.html', [
-                    'content' => htmlspecialchars($data),
-                ])
+                'content' => htmlspecialchars($data),
+            ])
         );
     }
 
@@ -672,9 +672,9 @@ EOT
         global $PAGE,$DB;
         if (isset($_POST['submit1'])) {
             $PAGE->writeCFG([
-                    'membervalidation' => isset($_POST['v_enable'])
-                    && $_POST['v_enable'] ? 1 : 0,
-                ]);
+                'membervalidation' => isset($_POST['v_enable'])
+                && $_POST['v_enable'] ? 1 : 0,
+            ]);
         }
         $page = $PAGE->parseTemplate(
             'members/validation.html',
@@ -688,8 +688,8 @@ EOT
         if (isset($_POST['mid'])) {
             if ($_POST['action'] == 'Allow') {
                 $DB->safeupdate('members', [
-                        'group_id' => 1,
-                    ], 'WHERE `id`=?', $DB->basicvalue($_POST['mid']));
+                    'group_id' => 1,
+                ], 'WHERE `id`=?', $DB->basicvalue($_POST['mid']));
             }
         }
         $result = $DB->safeselect(
@@ -751,7 +751,7 @@ EOT
         global $PAGE;
 
         return $PAGE->parseTemplate('members/edit-heading.html', [
-                'value' => $value,
-            ]);
+            'value' => $value,
+        ]);
     }
 }

@@ -35,8 +35,8 @@ class forums
         ).PHP_EOL;
 
         $PAGE->sidebar($PAGE->parseTemplate('sidebar-list.html', [
-                    'content' => $sidebarLinks,
-                ]));
+            'content' => $sidebarLinks,
+        ]));
 
         if (isset($JAX->b['delete']) && $JAX->b['delete']) {
             if (is_numeric($JAX->b['delete'])) {
@@ -172,8 +172,8 @@ EOT
             }
             if ($k[0] == 'c') {
                 $DB->safeupdate('categories', [
-                        'order' => $order,
-                    ], 'WHERE `id`=?', $cat);
+                    'order' => $order,
+                ], 'WHERE `id`=?', $cat);
             } else {
                 $DB->safeupdate(
                     'forums',
@@ -303,8 +303,8 @@ EOT
                 unset($exploded[array_search($JAX->b['rmod'], $exploded)]);
                 $fdata['mods'] = implode(',', $exploded);
                 $DB->safeupdate('forums', [
-                        'mods' => $fdata['mods'],
-                    ], 'WHERE `id`=?', $DB->basicvalue($fid));
+                    'mods' => $fdata['mods'],
+                ], 'WHERE `id`=?', $DB->basicvalue($fid));
                 $this->updateperforummodflag();
                 $PAGE->location('?act=forums&edit='.$fid);
             }
@@ -415,8 +415,8 @@ EOT
                     && $fdata['trashcan'])
                 ) {
                     $DB->safeupdate('forums', [
-                            'trashcan' => 0,
-                        ]);
+                        'trashcan' => 0,
+                    ]);
                 }
 
                 if ($fdata) {
@@ -591,8 +591,8 @@ EOT
             $DB->safedelete('forums', 'WHERE `id`=?', $DB->basicvalue($id));
             if ($JAX->p['moveto']) {
                 $DB->safeupdate('topics', [
-                        'fid' => $JAX->p['moveto'],
-                    ], ' WHERE `fid`=?', $DB->basicvalue($id));
+                    'fid' => $JAX->p['moveto'],
+                ], ' WHERE `fid`=?', $DB->basicvalue($id));
                 $topics = $DB->affected_rows(1);
             } else {
                 $result = $DB->safespecial(
@@ -624,8 +624,8 @@ EOT
             return $PAGE->addContentBox(
                 'Forum Deletion',
                 $PAGE->success($PAGE->parseTemplate('forums/delete-forum-deleted.html', [
-                            'content' => $page,
-                        ]))
+                    'content' => $page,
+                ]))
             );
         }
         $result = $DB->safeselect(
@@ -671,8 +671,8 @@ EOT
         $PAGE->addContentBox(
             'Deleting Forum: '.$fdata['title'],
             $PAGE->parseTemplate('forums/delete-forum.html', [
-                    'forum_options' => $forums,
-                ])
+                'forum_options' => $forums,
+            ])
         );
     }
 
@@ -796,8 +796,8 @@ EOT
     {
         global $DB;
         $DB->safeupdate('members', [
-                'mod' => 0,
-            ]);
+            'mod' => 0,
+        ]);
         $result = $DB->safeselect('`mods`', 'forums');
         // Build an array of mods.
         $mods = [];
@@ -810,8 +810,8 @@ EOT
         }
         // Update.
         $DB->safeupdate('members', [
-                'mod' => 1,
-            ], 'WHERE `id` IN ?', array_keys($mods));
+            'mod' => 1,
+        ], 'WHERE `id` IN ?', array_keys($mods));
     }
 
     public function checkbox($id, $name, $checked)

@@ -29,8 +29,8 @@ class groups
             ).PHP_EOL;
         }
         $PAGE->sidebar($PAGE->parseTemplate('sidebar-list.html', [
-                    'content' => $sidebarLinks,
-                ]));
+            'content' => $sidebarLinks,
+        ]));
         if (isset($JAX->g['edit']) && $JAX->g['edit']) {
             $JAX->g['do'] = 'edit';
         }
@@ -384,9 +384,9 @@ EOT
         while ($f = $DB->arow($result)) {
             $found = true;
             $page .= $PAGE->parseTemplate('groups/delete.html', [
-                    'id' => $f['id'],
-                    'title' => $f['title'],
-                ]);
+                'id' => $f['id'],
+                'title' => $f['title'],
+            ]);
         }
         if (! $found) {
             $page .= $PAGE->error(

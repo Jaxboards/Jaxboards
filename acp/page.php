@@ -72,8 +72,8 @@ class PAGE
     {
         if ($sidebar) {
             $this->parts['sidebar'] = $this->parseTemplate('sidebar.html', [
-                    'content' => $sidebar,
-                ]);
+                'content' => $sidebar,
+            ]);
         } else {
             $this->parts['sidebar'] = '';
         }
@@ -129,15 +129,15 @@ class PAGE
     public function error($a)
     {
         return $this->parseTemplate('error.html', [
-                'content' => $a,
-            ]);
+            'content' => $a,
+        ]);
     }
 
     public function success($a)
     {
         return $this->parseTemplate('success.html', [
-                'content' => $a,
-            ]);
+            'content' => $a,
+        ]);
     }
 
     public function location($a)

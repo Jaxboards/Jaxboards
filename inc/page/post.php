@@ -679,8 +679,8 @@ EOT
         // Set op.
         if ($newtopic) {
             $DB->safeupdate('topics', [
-                    'op' => $pid,
-                ], 'WHERE `id`=?', $tid);
+                'op' => $pid,
+            ], 'WHERE `id`=?', $tid);
         }
 
         // Update activity history.

@@ -179,8 +179,8 @@ EOT
                 );
 
                 $JAX->setCookie([
-                        'utoken' => $logintoken,
-                    ], time() + 3600 * 24 * 30);
+                    'utoken' => $logintoken,
+                ], time() + 3600 * 24 * 30);
                 $SESS->clean($f['id']);
                 $SESS->user = $u;
                 $SESS->uid = $f['id'];
@@ -211,8 +211,8 @@ EOT
             $DB->safedelete('tokens', 'WHERE `token`=?', $DB->basicvalue($JAX->c['utoken']));
             unset($JAX->c['utoken']);
             $JAX->setCookie([
-                    'utoken' => null,
-                ], -1);
+                'utoken' => null,
+            ], -1);
         }
         $SESS->hide = 1;
         $SESS->applyChanges();
@@ -342,10 +342,10 @@ EOT
                     $page .= $PAGE->meta(
                         'forgot-password2-form',
                         $JAX->hiddenFormFields([
-                                'uid' => $uid,
-                                'id' => $id,
-                                'act' => 'logreg6',
-                            ])
+                            'uid' => $uid,
+                            'id' => $id,
+                            'act' => 'logreg6',
+                        ])
                     );
                 }
             }
@@ -419,8 +419,8 @@ EOT
                 'forgot-password-form',
                 $PAGE->jsaccess ?
                 $JAX->hiddenFormFields([
-                        'act' => 'logreg6',
-                    ]) : ''
+                    'act' => 'logreg6',
+                ]) : ''
             );
         }
 
