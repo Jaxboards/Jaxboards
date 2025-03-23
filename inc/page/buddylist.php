@@ -1,6 +1,8 @@
 <?php
 
-$buddylist = $JAX->hiddenFormFields(array('module' => 'buddylist'));
+$buddylist = $JAX->hiddenFormFields([
+    'module' => 'buddylist',
+]);
 $PAGE->metadefs['buddylist-contacts'] = <<<EOT
 <div class="contacts">
     <form method="?" data-ajax-form="true">
@@ -36,7 +38,7 @@ class buddylist
 
         $PAGE->JS('softurl');
 
-        if (!$USER) {
+        if (! $USER) {
             return $PAGE->JS(
                 'error',
                 'Sorry, you must be logged in to use this feature.'
@@ -60,7 +62,7 @@ class buddylist
     public function displaybuddylist()
     {
         global $JAX,$PAGE,$USER,$DB,$SESS;
-        if (!$USER) {
+        if (! $USER) {
             return;
         }
         $PAGE->JS('softurl');
@@ -103,15 +105,12 @@ class buddylist
                 );
             }
         }
-        if (!$crap) {
-            $crap = $PAGE->meta(
-                'error',
-                "You don't have any contacts added to your buddy list!"
-            );
+        if (! $crap) {
+            $crap = $PAGE->meta('error', "You don't have any contacts added to your buddy list!");
         }
         $PAGE->JS(
             'window',
-            array(
+            [
                 'title' => 'Buddies',
                 'content' => $PAGE->meta(
                     'buddylist-contacts',
@@ -120,8 +119,8 @@ class buddylist
                     $crap
                 ),
                 'id' => 'buddylist',
-                'pos' => 'tr 20 20'
-            )
+                'pos' => 'tr 20 20',
+            ]
         );
     }
 
@@ -161,8 +160,8 @@ EOT
             $DB->disposeresult($result);
         }
 
-        if (!$user) {
-            $e = 'This user does not exist, and therefore could ' .
+        if (! $user) {
+            $e = 'This user does not exist, and therefore could '.
                 'not be added to your contacts list.';
         } elseif (in_array($uid, explode(',', $friends))) {
             $e = 'This user is already in your contacts list.';
@@ -173,46 +172,38 @@ EOT
             $PAGE->JS('error', $e);
         } else {
             if ($friends) {
-                $friends .= ',' . $uid;
+                $friends .= ','.$uid;
             } else {
                 $friends = $uid;
             }
             $USER['friends'] = $friends;
-            $DB->safeupdate(
-                'members',
-                array(
+            $DB->safeupdate('members', [
                     'friends' => $friends,
-                ),
-                ' WHERE `id`=?',
-                $USER['id']
-            );
-            $DB->safeinsert(
-                'activity',
-                array(
+                ], ' WHERE `id`=?', $USER['id']);
+            $DB->safeinsert('activity', [
                     'type' => 'buddy_add',
                     'affected_uid' => $uid,
                     'uid' => $USER['id'],
-                )
-            );
+                ]);
             $this->displaybuddylist();
         }
     }
 
     public function block($uid)
     {
-        if (!is_numeric($uid)) {
+        if (! is_numeric($uid)) {
             return;
         }
         global $DB,$PAGE,$USER;
         $e = '';
-        $enemies = $USER['enemies'] ? explode(',', $USER['enemies']) : array();
-        $friends = $USER['friends'] ? explode(',', $USER['friends']) : array();
+        $enemies = $USER['enemies'] ? explode(',', $USER['enemies']) : [];
+        $friends = $USER['friends'] ? explode(',', $USER['friends']) : [];
         $isenemy = array_search($uid, $enemies);
         $isfriend = array_search($uid, $friends);
-        if (false !== $isfriend) {
+        if ($isfriend !== false) {
             $this->dropbuddy($uid, 1);
         }
-        if (false !== $isenemy) {
+        if ($isenemy !== false) {
             $e = 'This user is already blocked.';
         }
         if ($e) {
@@ -221,14 +212,9 @@ EOT
             $enemies[] = $uid;
             $enemies = implode(',', $enemies);
             $USER['enemies'] = $enemies;
-            $DB->safeupdate(
-                'members',
-                array(
+            $DB->safeupdate('members', [
                     'enemies' => $enemies,
-                ),
-                ' WHERE `id`=?',
-                $USER['id']
-            );
+                ], ' WHERE `id`=?', $USER['id']);
             $this->displaybuddylist();
         }
     }
@@ -239,20 +225,15 @@ EOT
         if ($uid && is_numeric($uid)) {
             $enemies = explode(',', $USER['enemies']);
             $id = array_search($uid, $enemies);
-            if (false === $id) {
+            if ($id === false) {
                 return;
             }
             unset($enemies[$id]);
             $enemies = implode(',', $enemies);
             $USER['enemies'] = $enemies;
-            $DB->safeupdate(
-                'members',
-                array(
+            $DB->safeupdate('members', [
                     'enemies' => $enemies,
-                ),
-                ' WHERE `id`=?',
-                $USER['id']
-            );
+                ], ' WHERE `id`=?', $USER['id']);
         }
         $this->displaybuddylist();
     }
@@ -263,22 +244,17 @@ EOT
         if ($uid && is_numeric($uid)) {
             $friends = explode(',', $USER['friends']);
             $id = array_search($uid, $friends);
-            if (false === $id) {
+            if ($id === false) {
                 return;
             }
             unset($friends[$id]);
             $friends = implode(',', $friends);
             $USER['friends'] = $friends;
-            $DB->safeupdate(
-                'members',
-                array(
+            $DB->safeupdate('members', [
                     'friends' => $friends,
-                ),
-                ' WHERE `id`=?',
-                $USER['id']
-            );
+                ], ' WHERE `id`=?', $USER['id']);
         }
-        if (!$shh) {
+        if (! $shh) {
             $this->displaybuddylist();
         }
     }
@@ -287,14 +263,9 @@ EOT
     {
         global $DB,$USER,$PAGE;
         if ($USER && $USER['usertitle'] != $status) {
-            $DB->safeupdate(
-                'members',
-                array(
+            $DB->safeupdate('members', [
                     'usertitle' => $status,
-                ),
-                'WHERE `id`=?',
-                $USER['id']
-            );
+                ], 'WHERE `id`=?', $USER['id']);
         }
     }
 }

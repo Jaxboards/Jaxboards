@@ -10,7 +10,7 @@ class ticker
     {
         global $PAGE;
         $this->maxticks = 60;
-        if ($PAGE->jsnewlocation || !$PAGE->jsaccess) {
+        if ($PAGE->jsnewlocation || ! $PAGE->jsaccess) {
             $this->index();
         } else {
             $this->update();
@@ -46,17 +46,17 @@ ORDER BY p.`id` DESC
 LIMIT ?
 EOT
             ,
-            array('posts', 'topics', 'forums', 'members', 'members'),
+            ['posts', 'topics', 'forums', 'members', 'members'],
             $this->maxticks
         );
         $ticks = '';
         $first = 0;
         while ($f = $DB->arow($result)) {
             $p = $JAX->parseperms($f['perms'], $USER ? $USER['group_id'] : 3);
-            if (!$p['read']) {
+            if (! $p['read']) {
                 continue;
             }
-            if (!$first) {
+            if (! $first) {
                 $first = $f['id'];
             }
             $ticks .= $this->ftick($f);
@@ -96,17 +96,17 @@ ORDER BY p.`id` DESC
 LIMIT ?
 EOT
             ,
-            array('posts', 'topics', 'forums', 'members', 'members'),
+            ['posts', 'topics', 'forums', 'members', 'members'],
             $JAX->pick($SESS->vars['tickid'], 0),
             $this->maxticks
         );
         $first = false;
         while ($f = $DB->arow($result)) {
             $p = $JAX->parseperms($f['perms'], $USER ? $USER['group_id'] : 3);
-            if (!$p['read']) {
+            if (! $p['read']) {
                 continue;
             }
-            if (!$first) {
+            if (! $first) {
                 $first = $f['id'];
             }
             $PAGE->JS('tick', $this->ftick($f));
@@ -123,24 +123,14 @@ EOT
         return $PAGE->meta(
             'ticker-tick',
             $JAX->smalldate($t['date'], false, true),
-            $PAGE->meta(
-                'user-link',
-                $t['auth_id'],
-                $t['group_id'],
-                $t['display_name']
-            ),
+            $PAGE->meta('user-link', $t['auth_id'], $t['group_id'], $t['display_name']),
             $t['tid'],
             $t['id'],
             // Post id.
             $t['title'],
             $t['fid'],
             $t['ftitle'],
-            $PAGE->meta(
-                'user-link',
-                $t['auth_id2'],
-                $t['group_id2'],
-                $t['display_name2']
-            ),
+            $PAGE->meta('user-link', $t['auth_id2'], $t['group_id2'], $t['display_name2']),
             $t['replies']
         );
     }

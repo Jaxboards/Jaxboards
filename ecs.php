@@ -84,30 +84,26 @@ return ECSConfig::configure()
         ],
     ])
     ->withPaths([
-        __DIR__ . '/Script',
-        __DIR__ . '/Service',
-        __DIR__ . '/acp',
-        __DIR__ . '/config.default.php',
-        __DIR__ . '/domaindefinitions.php',
-        __DIR__ . '/ecs.php',
-        __DIR__ . '/inc',
-        __DIR__ . '/index.php',
-        __DIR__ . '/misc',
-        __DIR__ . '/ecs_to_sonarqube.php',
+        __DIR__.'/Script',
+        __DIR__.'/Service',
+        __DIR__.'/acp',
+        __DIR__.'/config.default.php',
+        __DIR__.'/domaindefinitions.php',
+        __DIR__.'/ecs.php',
+        __DIR__.'/inc',
+        __DIR__.'/index.php',
+        __DIR__.'/misc',
+        __DIR__.'/ecs_to_sonarqube.php',
     ])
-    ->withPreparedSets(psr12: true)
-    ->withRules([
-        BlockCommentSniff::class,
-        InlineCommentSniff::class,
-        PostStatementCommentSniff::class,
-    ])
+    ->withPreparedSets(psr12: true, common: true, symplify: true, laravel: true)
+    ->withRules([BlockCommentSniff::class, InlineCommentSniff::class, PostStatementCommentSniff::class])
     ->withSkip([
-        BlockCommentSniff::class . '.InvalidEndChar',
-        BlockCommentSniff::class . '.NotCapital',
+        BlockCommentSniff::class.'.InvalidEndChar',
+        BlockCommentSniff::class.'.NotCapital',
         CamelCapsMethodNameSniff::class,
         ClassDeclarationSniff::class,
-        InlineCommentSniff::class . '.InvalidEndChar',
-        InlineCommentSniff::class . '.NotCapital',
+        InlineCommentSniff::class.'.InvalidEndChar',
+        InlineCommentSniff::class.'.NotCapital',
         SideEffectsSniff::class,
         ValidClassNameSniff::class,
     ]);

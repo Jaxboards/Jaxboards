@@ -6,11 +6,17 @@ $IDX = new TOPIC();
 class TOPIC
 {
     public $id = 0;
+
     public $page = '';
+
     public $numperpage = 0;
+
     public $canmod = false;
+
     public $firstPostID = 0;
+
     public $lastPostID;
+
     public $topicdata;
 
     public function __construct()
@@ -20,28 +26,28 @@ class TOPIC
         preg_match('@\\d+$@', $JAX->b['act'], $act);
 
         $this->id = $id = $act[0] ? $act[0] : 0;
-        if (!$id) {
+        if (! $id) {
             return $PAGE->location('?');
         }
 
         $this->getTopicData($id);
-        if (!$this->topicdata) {
+        if (! $this->topicdata) {
             // Put the user back on the index and skip these next few lines.
             return $PAGE->location('?');
         }
 
         $this->page = isset($JAX->b['page']) ? (int) $JAX->b['page'] : 0;
-        if ($this->page <= 0 || !is_numeric($this->page)) {
+        if ($this->page <= 0 || ! is_numeric($this->page)) {
             $this->page = 1;
         }
-        --$this->page;
+        $this->page--;
 
         $this->numperpage = 10;
-        if (isset($JAX->b['qreply']) && $JAX->b['qreply'] && !$PAGE->jsupdate) {
-            if ($PAGE->jsaccess && !$PAGE->jsdirectlink) {
+        if (isset($JAX->b['qreply']) && $JAX->b['qreply'] && ! $PAGE->jsupdate) {
+            if ($PAGE->jsaccess && ! $PAGE->jsdirectlink) {
                 $this->qreplyform($id);
             } else {
-                $PAGE->location('?act=post&tid=' . $id);
+                $PAGE->location('?act=post&tid='.$id);
             }
         } elseif (isset($JAX->b['ratepost']) && $JAX->b['ratepost']) {
             $this->ratepost($JAX->b['ratepost'], $JAX->b['niblet']);
@@ -98,8 +104,9 @@ LEFT JOIN %t AS c
 WHERE a.`id` = ?
 LIMIT 1
 
-MySQL,
-            array('topics', 'forums', 'categories'),
+MySQL
+,
+            ['topics', 'forums', 'categories'],
             $id
         );
         $this->topicdata = $DB->arow($result);
@@ -107,10 +114,7 @@ MySQL,
 
         $this->topicdata['topic_title'] = $JAX->wordfilter($this->topicdata['topic_title']);
         $this->topicdata['subtitle'] = $JAX->wordfilter($this->topicdata['subtitle']);
-        $this->topicdata['fperms'] = $JAX->parseperms(
-            $this->topicdata['fperms'],
-            $USER ? $USER['group_id'] : 3
-        );
+        $this->topicdata['fperms'] = $JAX->parseperms($this->topicdata['fperms'], $USER ? $USER['group_id'] : 3);
     }
 
     public function viewtopic($id)
@@ -121,24 +125,24 @@ MySQL,
         if ($USER && $this->topicdata['lp_date'] > $USER['last_visit']) {
             $this->markread($id);
         }
-        if (!$this->topicdata['fperms']['read']) {
+        if (! $this->topicdata['fperms']['read']) {
             // No business being here.
             return $PAGE->location('?');
         }
 
-        $PAGE->append('TITLE', ' -> ' . $this->topicdata['topic_title']);
-        $SESS->location_verbose = "In topic '" . $this->topicdata['topic_title'] . "'";
+        $PAGE->append('TITLE', ' -> '.$this->topicdata['topic_title']);
+        $SESS->location_verbose = "In topic '".$this->topicdata['topic_title']."'";
 
         // Output RSS instead.
-        if (isset($JAX->b['fmt']) && 'RSS' == $JAX->b['fmt']) {
+        if (isset($JAX->b['fmt']) && $JAX->b['fmt'] == 'RSS') {
             include_once 'inc/classes/rssfeed.php';
-            $link = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'];
+            $link = 'https://'.$_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'];
             $feed = new rssfeed(
-                array(
+                [
                     'title' => $this->topicdata['topic_title'],
                     'description' => $this->topicdata['subtitle'],
-                    'link' => $link . '?act=vt' . $id,
-                )
+                    'link' => $link.'?act=vt'.$id,
+                ]
             );
             $result = $DB->safespecial(
                 <<<'MySQL'
@@ -152,42 +156,38 @@ LEFT JOIN %t m
     ON p.`auth_id` = m.`id`
     WHERE p.`tid` = ?
 
-MySQL,
-                array('posts', 'members'),
+MySQL
+,
+                ['posts', 'members'],
                 $DB->basicvalue($id)
             );
             echo $DB->error(1);
             while ($f = $DB->arow($result)) {
                 $feed->additem(
-                    array(
-                        'title' => $f['display_name'] . ':',
-                        'link' => $link . '?act=vt' . $id . '&amp;findpost=' . $f['id'],
+                    [
+                        'title' => $f['display_name'].':',
+                        'link' => $link.'?act=vt'.$id.'&amp;findpost='.$f['id'],
                         'description' => $JAX->blockhtml($JAX->theworks($f['post'])),
                         'guid' => $f['id'],
                         'pubDate' => date('r', $f['date']),
-                    )
+                    ]
                 );
             }
             $feed->publish();
-            die();
+            exit();
         }
 
         // Fix this to work with subforums.
         $PAGE->path(
-            array(
-                $this->topicdata['cat_title'] => '?act=vc' . $this->topicdata['cat_id'],
-                $this->topicdata['forum_title'] => '?act=vf' . $this->topicdata['fid'],
+            [
+                $this->topicdata['cat_title'] => '?act=vc'.$this->topicdata['cat_id'],
+                $this->topicdata['forum_title'] => '?act=vf'.$this->topicdata['fid'],
                 $this->topicdata['topic_title'] => "?act=vt{$id}",
-            )
+            ]
         );
 
         // Generate pages.
-        $result = $DB->safeselect(
-            'COUNT(`id`)',
-            'posts',
-            'WHERE `tid`=?',
-            $id
-        );
+        $result = $DB->safeselect('COUNT(`id`)', 'posts', 'WHERE `tid`=?', $id);
         $thisrow = $DB->arow($result);
         $posts = array_pop($thisrow);
         $DB->disposeresult($result);
@@ -216,9 +216,7 @@ MySQL,
                 $this->generatepoll(
                     $this->topicdata['poll_q'],
                     $this->topicdata['poll_type'],
-                    $JAX->json_decode(
-                        $this->topicdata['poll_choices']
-                    ),
+                    $JAX->json_decode($this->topicdata['poll_choices']),
                     $this->topicdata['poll_results']
                 )
             );
@@ -230,49 +228,43 @@ MySQL,
         $page = $PAGE->meta('topic-table', $this->postsintooutput());
         $page = $PAGE->meta(
             'topic-wrapper',
-            $this->topicdata['topic_title'] .
-            ($this->topicdata['subtitle'] ? ', ' . $this->topicdata['subtitle'] : ''),
+            $this->topicdata['topic_title'].
+            ($this->topicdata['subtitle'] ? ', '.$this->topicdata['subtitle'] : ''),
             $page,
-            '<a href="./?act=vt' . $id . '&amp;fmt=RSS" class="social rss" title="RSS Feed for this Topic">RSS</a>'
+            '<a href="./?act=vt'.$id.'&amp;fmt=RSS" class="social rss" title="RSS Feed for this Topic">RSS</a>'
         );
 
         // Add buttons.
-        $buttons = array(
+        $buttons = [
             $this->topicdata['fperms']['start'] ?
-            "<a href='?act=post&fid=" . $this->topicdata['fid'] . "'>" .
+            "<a href='?act=post&fid=".$this->topicdata['fid']."'>".
             ($PAGE->meta(
                 $PAGE->metaexists('button-newtopic') ?
                 'button-newtopic' : 'topic-button-newtopic'
-            )) . '</a>' :
+            )).'</a>' :
             '&nbsp;',
             $this->topicdata['fperms']['reply']
-            && (!$this->topicdata['locked']
+            && (! $this->topicdata['locked']
             || $PERMS['can_override_locked_topics']) ?
-            "<a href='?act=vt{$id}&qreply=1'>" .
-            ($PAGE->meta(
-                $PAGE->metaexists('button-qreply') ?
-                'button-qreply' : 'topic-button-qreply'
-            )) : '',
+            "<a href='?act=vt{$id}&qreply=1'>".
+            ($PAGE->meta($PAGE->metaexists('button-qreply') ? 'button-qreply' : 'topic-button-qreply')) : '',
             $this->topicdata['fperms']['reply']
-            && (!$this->topicdata['locked']
+            && (! $this->topicdata['locked']
             || $PERMS['can_override_locked_topics']) ?
-            "<a href='?act=post&tid={$id}'>" .
-            ($PAGE->meta(
-                $PAGE->metaexists('button-reply') ?
-                'button-reply' : 'topic-button-reply'
-            )) . '</a>' : '',
-        );
+            "<a href='?act=post&tid={$id}'>".
+            ($PAGE->meta($PAGE->metaexists('button-reply') ? 'button-reply' : 'topic-button-reply')).'</a>' : '',
+        ];
 
         // Make the users online list.
         $usersonline = '';
         foreach ($DB->getUsersOnline() as $f) {
-            if (!empty($f['uid']) && $f['location'] == "vt{$id}") {
+            if (! empty($f['uid']) && $f['location'] == "vt{$id}") {
                 $usersonline .= (isset($f['is_bot']) && $f['is_bot']) ?
-                    '<a class="user' . $f['uid'] . '">' . $f['name'] . '</a>' :
+                    '<a class="user'.$f['uid'].'">'.$f['name'].'</a>' :
                     $PAGE->meta(
                         'user-link',
                         $f['uid'],
-                        $f['group_id'] . ('idle' == $f['status'] ? ' idle' : ''),
+                        $f['group_id'].($f['status'] == 'idle' ? ' idle' : ''),
                         $f['name']
                     );
             }
@@ -280,31 +272,19 @@ MySQL,
         $page .= $PAGE->meta('topic-users-online', $usersonline);
 
         // Add in other page elements.
-        $page = $poll . $PAGE->meta(
-            'topic-pages-top',
-            $pagelist
-        ) . $PAGE->meta(
+        $page = $poll.$PAGE->meta('topic-pages-top', $pagelist).$PAGE->meta(
             'topic-buttons-top',
             $buttons
-        ) . $page . $PAGE->meta(
-            'topic-pages-bottom',
-            $pagelist
-        ) . $PAGE->meta(
-            'topic-buttons-bottom',
-            $buttons
-        );
+        ).$page.$PAGE->meta('topic-pages-bottom', $pagelist).$PAGE->meta('topic-buttons-bottom', $buttons);
 
         // Update view count.
-        $DB->safespecial(
-            <<<'MySQL'
+        $DB->safespecial(<<<'MySQL'
 UPDATE %t
 SET `views` = `views` + 1
 WHERE `id` = ?
 
-MySQL,
-            array('topics'),
-            $id
-        );
+MySQL
+, ['topics'], $id);
 
         if ($PAGE->jsaccess) {
             $PAGE->JS('update', 'page', $page);
@@ -340,25 +320,25 @@ MySQL,
         }
 
         // Update users online list.
-        $list = array();
+        $list = [];
         $oldcache = array_flip(explode(',', $SESS->users_online_cache));
         $newcache = '';
         foreach ($DB->getUsersOnline() as $f) {
             if ($f['uid'] && $f['location'] == "vt{$id}") {
-                if (!isset($oldcache[$f['uid']])) {
-                    $list[] = array(
+                if (! isset($oldcache[$f['uid']])) {
+                    $list[] = [
                         $f['uid'],
                         $f['group_id'],
-                        ('active' != $f['status'] ? $f['status'] : ''),
+                        ($f['status'] != 'active' ? $f['status'] : ''),
                         $f['name'],
-                    );
+                    ];
                 } else {
                     unset($oldcache[$f['uid']]);
                 }
-                $newcache .= $f['uid'] . ',';
+                $newcache .= $f['uid'].',';
             }
         }
-        if (!empty($list)) {
+        if (! empty($list)) {
             $PAGE->JS('onlinelist', $list);
         }
         $oldcache = implode(',', array_flip($oldcache));
@@ -395,37 +375,29 @@ LEFT JOIN %t m
     ON p.`auth_id` = m.`id`
     WHERE p.`id` IN ?
 
-MySQL,
-                array('posts', 'members'),
+MySQL
+,
+                ['posts', 'members'],
                 explode(',', $SESS->vars['multiquote'])
             );
 
             while ($f = $DB->arow($result)) {
-                $prefilled .= '[quote=' . $f['name'] . ']' . $f['post'] . '[/quote]' . PHP_EOL;
+                $prefilled .= '[quote='.$f['name'].']'.$f['post'].'[/quote]'.PHP_EOL;
             }
             $SESS->delvar('multiquote');
         }
-        $result = $DB->safeselect(
-            'title',
-            'topics',
-            'WHERE `id`=?',
-            $id
-        );
+        $result = $DB->safeselect('title', 'topics', 'WHERE `id`=?', $id);
         $tdata = $DB->arow($result);
         $DB->disposeresult($result);
 
         $PAGE->JS(
             'window',
-            array(
+            [
                 'id' => 'qreply',
                 'title' => $JAX->wordfilter($tdata['title']),
-                'content' => $PAGE->meta(
-                    'topic-reply-form',
-                    $id,
-                    $JAX->blockhtml($prefilled)
-                ),
+                'content' => $PAGE->meta('topic-reply-form', $id, $JAX->blockhtml($prefilled)),
                 'resize' => 'textarea',
-            )
+            ]
         );
         $PAGE->JS('updateqreply', '');
     }
@@ -488,8 +460,9 @@ WHERE p.`tid` = ?
   AND p.`id` > ?
 ORDER BY `pid`
 
-MySQL,
-                array('posts', 'members', 'member_groups', 'members'),
+MySQL
+,
+                ['posts', 'members', 'member_groups', 'members'],
                 $this->id,
                 $lastpid
             );
@@ -572,8 +545,9 @@ ORDER BY `newtopic` DESC
     , `pid` ASC
 LIMIT ?, ?
 
-MySQL,
-                array('posts', 'members', 'member_groups', 'members'),
+MySQL
+,
+                ['posts', 'members', 'member_groups', 'members'],
                 $this->id,
                 (($topic_post_counter = ($this->page) * $this->numperpage)),
                 $this->numperpage
@@ -582,7 +556,7 @@ MySQL,
 
         $rows = '';
         while ($post = $DB->arow($query)) {
-            if (!$this->firstPostID) {
+            if (! $this->firstPostID) {
                 $this->firstPostID = $post['pid'];
             }
             $postt = $post['post'];
@@ -592,36 +566,28 @@ MySQL,
             // Post rating content goes here.
             if (isset($CFG['ratings']) && $CFG['ratings'] & 1) {
                 $postrating = $showrating = '';
-                $prating = array();
+                $prating = [];
                 if ($post['rating']) {
                     $prating = json_decode($post['rating'], true);
                 }
                 $rniblets = $DB->getRatingNiblets();
                 if ($rniblets) {
                     foreach ($rniblets as $k => $v) {
-                        $postrating .= '<a href="?act=topic&amp;ratepost=' .
-                            $post['pid'] . '&amp;niblet=' . $k . '">' .
-                            $PAGE->meta(
-                                'rating-niblet',
-                                $v['img'],
-                                $v['title']
-                            ) . '</a>';
+                        $postrating .= '<a href="?act=topic&amp;ratepost='.
+                            $post['pid'].'&amp;niblet='.$k.'">'.
+                            $PAGE->meta('rating-niblet', $v['img'], $v['title']).'</a>';
                         if (isset($prating[$k]) && $prating[$k]) {
-                            $num = 'x' . count($prating[$k]);
+                            $num = 'x'.count($prating[$k]);
                             $postrating .= $num;
-                            $showrating .= $PAGE->meta(
-                                'rating-niblet',
-                                $v['img'],
-                                $v['title']
-                            ) . $num;
+                            $showrating .= $PAGE->meta('rating-niblet', $v['img'], $v['title']).$num;
                         }
                     }
                     $postrating = $PAGE->meta(
                         'rating-wrapper',
                         $postrating,
-                        (!($CFG['ratings'] & 2) ?
-                        '<a href="?act=vt' . $this->id .
-                        '&amp;listrating=' . $post['pid'] . '">(List)</a>' : ''),
+                        (! ($CFG['ratings'] & 2) ?
+                        '<a href="?act=vt'.$this->id.
+                        '&amp;listrating='.$post['pid'].'">(List)</a>' : ''),
                         $showrating
                     );
                 }
@@ -641,7 +607,7 @@ MySQL,
                 $post['usertitle'],
                 $post['posts'],
                 $PAGE->meta(
-                    'topic-status-' .
+                    'topic-status-'.
                     (isset($usersonline[$post['auth_id']])
                     && $usersonline[$post['auth_id']] ? 'online' : 'offline')
                 ),
@@ -649,47 +615,36 @@ MySQL,
                 $post['auth_id'],
                 // Adds the Edit button
                 ($this->canedit($post) ?
-                "<a href='?act=vt" . $this->id . '&amp;edit=' . $post['pid'] .
-                "' class='edit'>" . $PAGE->meta('topic-edit-button') .
-                '</a>' : '') .
+                "<a href='?act=vt".$this->id.'&amp;edit='.$post['pid'].
+                "' class='edit'>".$PAGE->meta('topic-edit-button').
+                '</a>' : '').
                 // Adds the Quote button
                 ($this->topicdata['fperms']['reply'] ?
-                " <a href='?act=vt" . $this->id . '&amp;quote=' . $post['pid'] .
-                "' onclick='RUN.handleQuoting(this);return false;' " .
-                "class='quotepost'>" . $PAGE->meta('topic-quote-button') . '</a> ' : '') .
+                " <a href='?act=vt".$this->id.'&amp;quote='.$post['pid'].
+                "' onclick='RUN.handleQuoting(this);return false;' ".
+                "class='quotepost'>".$PAGE->meta('topic-quote-button').'</a> ' : '').
                 // Adds the Moderate options
                 ($this->canmoderate() ?
-                "<a href='?act=modcontrols&amp;do=modp&amp;pid=" . $post['pid'] .
-                "' class='modpost' onclick='RUN.modcontrols.togbutton(this)'>" .
-                $PAGE->meta('topic-mod-button') . '</a>' : ''),
+                "<a href='?act=modcontrols&amp;do=modp&amp;pid=".$post['pid'].
+                "' class='modpost' onclick='RUN.modcontrols.togbutton(this)'>".
+                $PAGE->meta('topic-mod-button').'</a>' : ''),
                 $JAX->date($post['date']),
-                '<a href="?act=vt' . $this->id . '&amp;findpost=' . $post['pid'] .
-                '" onclick="prompt(\'Link to this post:\',this.href)">' .
-                $PAGE->meta('topic-perma-button') . '</a>',
+                '<a href="?act=vt'.$this->id.'&amp;findpost='.$post['pid'].
+                '" onclick="prompt(\'Link to this post:\',this.href)">'.
+                $PAGE->meta('topic-perma-button').'</a>',
                 $postt,
                 isset($post['sig']) && $post['sig'] ?
                 $JAX->theworks($post['sig']) : '',
                 $post['auth_id'],
                 $post['edit_date'] ? $PAGE->meta(
                     'topic-edit-by',
-                    $PAGE->meta(
-                        'user-link',
-                        $post['editby'],
-                        $post['egroup_id'],
-                        $post['ename']
-                    ),
+                    $PAGE->meta('user-link', $post['editby'], $post['egroup_id'], $post['ename']),
                     $JAX->date($post['edit_date'])
                 ) : '',
                 $PERMS['can_moderate'] ?
-                '<a href="?act=modcontrols&amp;do=iptools&amp;ip=' .
-                $post['ip'] . '">' . $PAGE->meta(
-                    'topic-mod-ipbutton',
-                    $post['ip']
-                ) . '</a>' : '',
-                $post['icon'] ? $PAGE->meta(
-                    'topic-icon-wrapper',
-                    $post['icon']
-                ) : '',
+                '<a href="?act=modcontrols&amp;do=iptools&amp;ip='.
+                $post['ip'].'">'.$PAGE->meta('topic-mod-ipbutton', $post['ip']).'</a>' : '',
+                $post['icon'] ? $PAGE->meta('topic-icon-wrapper', $post['icon']) : '',
                 ++$topic_post_counter,
                 isset($post['contact_skype']) ? $post['contact_skype'] : '',
                 isset($post['contact_discord']) ? $post['contact_discord'] : '',
@@ -747,8 +702,9 @@ WHERE `id` = (
     FROM %t
     WHERE `id` = ?
 )
-MySQL,
-                array('forums', 'topics'),
+MySQL
+,
+                ['forums', 'topics'],
                 $DB->basicvalue($this->id)
             );
             $mods = $DB->arow($result);
@@ -763,8 +719,8 @@ MySQL,
 
     public function generatepoll($q, $type, $choices, $results)
     {
-        if (!$choices) {
-            $choices = array();
+        if (! $choices) {
+            $choices = [];
         }
         global $PAGE,$USER,$JAX;
         $page = '';
@@ -773,13 +729,13 @@ MySQL,
             // * Determine if the user has voted.
             // * Count up the number of votes.
             // * Parse the result set.
-            $presults = array();
+            $presults = [];
             $voted = false;
             $totalvotes = 0;
-            $usersvoted = array();
-            $numvotes = array();
+            $usersvoted = [];
+            $numvotes = [];
             foreach (explode(';', $results) as $k => $v) {
-                $presults[$k] = $v ? explode(',', $v) : array();
+                $presults[$k] = $v ? explode(',', $v) : [];
                 $totalvotes += ($numvotes[$k] = count($presults[$k]));
                 if (in_array($USER['id'], $presults[$k])) {
                     $voted = true;
@@ -793,39 +749,37 @@ MySQL,
         if ($voted) {
             $page .= '<table>';
             foreach ($choices as $k => $v) {
-                $page .= "<tr><td>{$v}</td><td class='numvotes'>" .
-                    $numvotes[$k] . ' votes (' .
-                    round($numvotes[$k] / $totalvotes * 100, 2) .
-                    "%)</td><td style='width:200px'><div class='bar' style='width:" .
-                    round($numvotes[$k] / $totalvotes * 100) .
+                $page .= "<tr><td>{$v}</td><td class='numvotes'>".
+                    $numvotes[$k].' votes ('.
+                    round($numvotes[$k] / $totalvotes * 100, 2).
+                    "%)</td><td style='width:200px'><div class='bar' style='width:".
+                    round($numvotes[$k] / $totalvotes * 100).
                     "%;'></div></td></tr>";
             }
-            $page .= "<tr><td colspan='3' class='totalvotes'>Total Votes: " .
-                $usersvoted . '</td></tr>';
+            $page .= "<tr><td colspan='3' class='totalvotes'>Total Votes: ".
+                $usersvoted.'</td></tr>';
             $page .= '</table>';
         } else {
-            $page = "<form method='post' action='?' " .
-                "data-ajax-form='true'>" .
-                $JAX->hiddenFormFields(
-                    array(
-                        'act' => 'vt' . $this->id,
+            $page = "<form method='post' action='?' ".
+                "data-ajax-form='true'>".
+                $JAX->hiddenFormFields([
+                        'act' => 'vt'.$this->id,
                         'votepoll' => 1,
-                    )
-                );
-            if ('multi' == $type) {
+                    ]);
+            if ($type == 'multi') {
                 foreach ($choices as $k => $v) {
-                    $page .= "<div class='choice'><input type='checkbox' " .
-                        "name='choice[]' value='{$k}' id='poll_{$k}' /> " .
+                    $page .= "<div class='choice'><input type='checkbox' ".
+                        "name='choice[]' value='{$k}' id='poll_{$k}' /> ".
                         "<label for='poll_{$k}'>{$v}</label></div>";
                 }
             } else {
                 foreach ($choices as $k => $v) {
-                    $page .= "<div class='choice'><input type='radio' " .
-                        "name='choice' value='{$k}' id='poll_{$k}' /> " .
+                    $page .= "<div class='choice'><input type='radio' ".
+                        "name='choice' value='{$k}' id='poll_{$k}' /> ".
                         "<label for='poll_{$k}'>{$v}</label></div>";
                 }
             }
-            $page .= "<div class='buttons'><input type='submit' " .
+            $page .= "<div class='buttons'><input type='submit' ".
                 "value='Vote'></div></form>";
         }
 
@@ -838,7 +792,7 @@ MySQL,
 
         $e = '';
 
-        if (!$USER) {
+        if (! $USER) {
             $e = 'You must be logged in to vote!';
         } else {
             $result = $DB->safeselect(
@@ -857,10 +811,10 @@ MySQL,
             if ($results) {
                 $results = explode(';', $results);
                 foreach ($results as $k => $v) {
-                    $results[$k] = $v ? explode(',', $v) : array();
+                    $results[$k] = $v ? explode(',', $v) : [];
                 }
             } else {
-                $results = array();
+                $results = [];
             }
 
             // Results is now an array of arrays, the keys of the parent array
@@ -881,17 +835,17 @@ MySQL,
                 $e = 'You have already voted on this poll!';
             }
 
-            if ('multi' == $row['poll_type']) {
+            if ($row['poll_type'] == 'multi') {
                 if (is_array($choice)) {
                     foreach ($choice as $c) {
-                        if (!is_numeric($c) || $c >= $numchoices || $c < 0) {
+                        if (! is_numeric($c) || $c >= $numchoices || $c < 0) {
                             $e = 'Invalid choices';
                         }
                     }
                 } else {
                     $e = 'Invalid Choice';
                 }
-            } elseif (!is_numeric($choice) || $c >= $numchoices || $c < 0) {
+            } elseif (! is_numeric($choice) || $c >= $numchoices || $c < 0) {
                 $e = 'Invalid choice';
             }
         }
@@ -900,7 +854,7 @@ MySQL,
             return $PAGE->JS('error', $e);
         }
 
-        if ('multi' == $row['poll_type']) {
+        if ($row['poll_type'] == 'multi') {
             foreach ($choice as $c) {
                 $results[$c][] = $USER['id'];
             }
@@ -908,8 +862,8 @@ MySQL,
             $results[$choice][] = $USER['id'];
         }
 
-        $presults = array();
-        for ($x = 0; $x < $numchoices; ++$x) {
+        $presults = [];
+        for ($x = 0; $x < $numchoices; $x++) {
             $presults[$x] = isset($results[$x]) && $results[$x]
                 ? implode(',', $results[$x]) : '';
         }
@@ -918,52 +872,37 @@ MySQL,
         $PAGE->JS(
             'update',
             '#poll .content',
-            $this->generatePoll(
-                $row['poll_q'],
-                $row['poll_type'],
-                $choices,
-                $presults
-            ),
+            $this->generatePoll($row['poll_q'], $row['poll_type'], $choices, $presults),
             '1'
         );
 
-        $DB->safeupdate(
-            'topics',
-            array(
+        $DB->safeupdate('topics', [
                 'poll_results' => $presults,
-            ),
-            'WHERE `id`=?',
-            $this->id
-        );
+            ], 'WHERE `id`=?', $this->id);
     }
 
     public function ratepost($postid, $nibletid)
     {
         global $DB,$USER,$PAGE;
         $PAGE->JS('softurl');
-        if (!is_numeric($postid) || !is_numeric($nibletid)) {
+        if (! is_numeric($postid) || ! is_numeric($nibletid)) {
             return false;
         }
-        $result = $DB->safeselect(
-            '`rating`',
-            'posts',
-            'WHERE `id`=?',
-            $DB->basicvalue($postid)
-        );
+        $result = $DB->safeselect('`rating`', 'posts', 'WHERE `id`=?', $DB->basicvalue($postid));
         $f = $DB->arow($result);
         $DB->disposeresult($result);
 
         $niblets = $DB->getRatingNiblets();
-        if (!$USER['id']) {
+        if (! $USER['id']) {
             $e = "You don't have permission to rate posts.";
-        } elseif (!$f) {
+        } elseif (! $f) {
             $e = "That post doesn't exist.";
-        } elseif (!$niblets[$nibletid]) {
+        } elseif (! $niblets[$nibletid]) {
             $e = 'Invalid rating';
         } else {
             $ratings = json_decode($f['rating'], true);
-            if (!$ratings) {
-                $ratings = array();
+            if (! $ratings) {
+                $ratings = [];
             } else {
                 $found = false;
                 foreach ($ratings as $k => $v) {
@@ -982,9 +921,9 @@ MySQL,
             $ratings[(int) $nibletid][] = (int) $USER['id'];
             $DB->safeupdate(
                 'posts',
-                array(
+                [
                     'rating' => json_encode($ratings),
-                ),
+                ],
                 'WHERE `id`=?',
                 $DB->basicvalue($postid)
             );
@@ -995,11 +934,11 @@ MySQL,
     public function qeditpost($id)
     {
         global $DB,$JAX,$PAGE,$USER,$PERMS;
-        if (!is_numeric($id)) {
+        if (! is_numeric($id)) {
             return;
         }
-        if (!$PAGE->jsaccess) {
-            $PAGE->location('?act=post&pid=' . $id);
+        if (! $PAGE->jsaccess) {
+            $PAGE->location('?act=post&pid='.$id);
         }
         $PAGE->JS('softurl');
         $result = $DB->safeselect(
@@ -1016,7 +955,8 @@ MySQL,
 , UNIX_TIMESTAMP(`edit_date`) AS `edit_date`
 , `editby`
 , `rating`
-MySQL,
+MySQL
+,
             'posts',
             'WHERE `id`=?',
             $id
@@ -1024,26 +964,22 @@ MySQL,
         $post = $DB->arow($result);
         $DB->disposeresult($result);
 
-        $hiddenfields = $JAX->hiddenFormFields(
-            array(
+        $hiddenfields = $JAX->hiddenFormFields([
                 'act' => 'post',
                 'how' => 'qedit',
                 'pid' => $id,
-            )
-        );
+            ]);
 
         if ($PAGE->jsnewlocation) {
-            if (!$post) {
+            if (! $post) {
                 $PAGE->JS('alert', 'Post not found!');
-            } elseif (!$this->canedit($post)) {
+            } elseif (! $this->canedit($post)) {
                 $PAGE->JS('alert', "You don't have permission to edit this post.");
             } else {
                 if ($post['newtopic']) {
-                    $hiddenfields .= $JAX->hiddenFormFields(
-                        array(
+                    $hiddenfields .= $JAX->hiddenFormFields([
                             'tid' => $post['tid'],
-                        )
-                    );
+                        ]);
                     $result = $DB->safeselect(
                         <<<'MySQL'
 `id`
@@ -1066,7 +1002,8 @@ MySQL,
 , `op`
 , `cal_event`
 
-MySQL,
+MySQL
+,
                         'topics',
                         'WHERE `id`=?',
                         $post['tid']
@@ -1082,12 +1019,7 @@ MySQL,
                         $JAX->blockhtml($post['post'])
                     );
                 } else {
-                    $form = $PAGE->meta(
-                        'topic-qedit-post',
-                        $hiddenfields,
-                        $JAX->blockhtml($post['post']),
-                        $id
-                    );
+                    $form = $PAGE->meta('topic-qedit-post', $hiddenfields, $JAX->blockhtml($post['post']), $id);
                 }
                 $PAGE->JS('update', "#pid_{$id} .post_content", $form);
             }
@@ -1109,14 +1041,15 @@ LEFT JOIN %t m
   ON p.`auth_id` = m.`id`
 WHERE p.`id` = ?
 
-MySQL,
-                array('posts', 'members'),
+MySQL
+,
+                ['posts', 'members'],
                 $pid
             );
             $post = $DB->arow($result);
             $DB->disposeresult($result);
         }
-        if (!$post) {
+        if (! $post) {
             $e = "That post doesn't exist!";
             $PAGE->JS('alert', $e);
             $PAGE->append('PAGE', $PAGE->meta('error', $e));
@@ -1126,14 +1059,14 @@ MySQL,
         if ($JAX->b['qreply']) {
             $PAGE->JS(
                 'updateqreply',
-                '[quote=' . $post['name'] . ']' . $post['post'] . '[/quote]' .
-                PHP_EOL . PHP_EOL
+                '[quote='.$post['name'].']'.$post['post'].'[/quote]'.
+                PHP_EOL.PHP_EOL
             );
         } else {
-            if (!in_array($pid, explode(' ', $SESS->vars['multiquote']))) {
+            if (! in_array($pid, explode(' ', $SESS->vars['multiquote']))) {
                 $SESS->addvar(
                     'multiquote',
-                    $SESS->vars['multiquote'] ? $SESS->vars['multiquote'] . ',' .
+                    $SESS->vars['multiquote'] ? $SESS->vars['multiquote'].','.
                     $pid : $pid
                 );
             }
@@ -1142,7 +1075,7 @@ MySQL,
             if ($PAGE->jsaccess) {
                 $this->qreplyform($tid);
             } else {
-                header('Location:?act=post&tid=' . $tid);
+                header('Location:?act=post&tid='.$tid);
             }
         }
 
@@ -1163,15 +1096,15 @@ MySQL,
 
         $PAGE->JS('softurl');
         $PAGE->location(
-            "?act=vt{$tid}&page=" . (ceil(($f['numposts'] / $this->numperpage))) .
-            '&pid=' . $f['lastpid'] . '#pid_' . $f['lastpid']
+            "?act=vt{$tid}&page=".(ceil(($f['numposts'] / $this->numperpage))).
+            '&pid='.$f['lastpid'].'#pid_'.$f['lastpid']
         );
     }
 
     public function findpost($pid)
     {
         global $PAGE,$DB;
-        if (!is_numeric($pid)) {
+        if (! is_numeric($pid)) {
             $couldntfindit = true;
         } else {
             $result = $DB->safespecial(
@@ -1196,8 +1129,9 @@ WHERE tid=(
 )
 ORDER BY `id` ASC
 
-MySQL,
-                array('posts', 'posts'),
+MySQL
+,
+                ['posts', 'posts'],
                 $pid
             );
             $num = 1;
@@ -1207,7 +1141,7 @@ MySQL,
                     $couldntfindit = false;
                     break;
                 }
-                ++$num;
+                $num++;
             }
         }
         $PAGE->JS('softurl');
@@ -1215,8 +1149,8 @@ MySQL,
             $PAGE->JS('alert', "that post doesn't exist");
         } else {
             $PAGE->location(
-                '?act=vt' . $this->id . '&page=' .
-                (ceil($num / $this->numperpage)) . '&pid=' . $pid . '#pid_' . $pid
+                '?act=vt'.$this->id.'&page='.
+                (ceil($num / $this->numperpage)).'&pid='.$pid.'#pid_'.$pid
             );
         }
     }
@@ -1236,51 +1170,36 @@ MySQL,
             return;
         }
         $PAGE->JS('softurl');
-        $result = $DB->safeselect(
-            '`rating`',
-            'posts',
-            'WHERE `id`=?',
-            $DB->basicvalue($pid)
-        );
+        $result = $DB->safeselect('`rating`', 'posts', 'WHERE `id`=?', $DB->basicvalue($pid));
         $row = $DB->arow($result);
         $DB->disposeresult($result);
 
         if ($row) {
             $ratings = json_decode($row[0], true);
         } else {
-            $ratings = array();
+            $ratings = [];
         }
         if (empty($ratings)) {
             return;
         }
 
-        $members = array();
+        $members = [];
         foreach ($ratings as $v) {
             $members = array_merge($members, $v);
         }
-        $result = $DB->safeselect(
-            '`id`,`display_name`,`group_id`',
-            'members',
-            'WHERE `id` IN ?',
-            $members
-        );
-        $mdata = array($result);
+        $result = $DB->safeselect('`id`,`display_name`,`group_id`', 'members', 'WHERE `id` IN ?', $members);
+        $mdata = [$result];
         while ($f = $DB->arow($result)) {
-            $mdata[$f['id']] = array($f['display_name'], $f['group_id']);
+            $mdata[$f['id']] = [$f['display_name'], $f['group_id']];
         }
         unset($members);
         $niblets = $DB->getRatingNiblets();
         foreach ($ratings as $k => $v) {
             $page .= '<div class="column">';
-            $page .= '<img src="' . $niblets[$k]['img'] . '" /> ' .
-                $niblets[$k]['title'] . '<ul>';
+            $page .= '<img src="'.$niblets[$k]['img'].'" /> '.
+                $niblets[$k]['title'].'<ul>';
             foreach ($v as $mid) {
-                $page .= '<li>' . $PAGE->meta(
-                    'user-link',
-                    $mid,
-                    $mdata[$mid][1],
-                    $mdata[$mid][0]
-                ) . '</li>';
+                $page .= '<li>'.$PAGE->meta('user-link', $mid, $mdata[$mid][1], $mdata[$mid][0]).'</li>';
             }
             $page .= '</ul></div>';
         }

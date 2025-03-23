@@ -1,6 +1,6 @@
 <?php
 
-$CFG = array(
+$CFG = [
     'upateinterval' => '2',
     'timetoidle' => '300',
     'timetologout' => '600',
@@ -10,4 +10,4 @@ $CFG = array(
     'offlinetext' => 'The board is offline!',
     'shoutbox' => '1',
     'shoutbox_num' => '10',
-);
+];

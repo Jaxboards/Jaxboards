@@ -5,36 +5,30 @@
  *
  * PHP Version 8
  *
- * @category Jaxboards
- * @package  Jaxboards
- *
- * @author  Sean Johnson <seanjohnson08@gmail.com>
- * @author  World's Tallest Ladder <wtl420@users.noreply.github.com>
  * @license MIT <https://opensource.org/licenses/MIT>
  *
  * @link https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
-
-if (!defined('JAXBOARDS_ROOT')) {
+if (! defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', dirname(__DIR__));
 }
-if (!defined('SERVICE_ROOT')) {
+if (! defined('SERVICE_ROOT')) {
     define('SERVICE_ROOT', __DIR__);
 }
 
-require_once JAXBOARDS_ROOT . '/inc/classes/mysql.php';
-require_once JAXBOARDS_ROOT . '/inc/classes/jax.php';
+require_once JAXBOARDS_ROOT.'/inc/classes/mysql.php';
+require_once JAXBOARDS_ROOT.'/inc/classes/jax.php';
 
 $JAX = new JAX();
 $DB = new MySQL();
 
-if (!file_exists(JAXBOARDS_ROOT . '/config.php')) {
-    die('Jaxboards not installed!');
+if (! file_exists(JAXBOARDS_ROOT.'/config.php')) {
+    exit('Jaxboards not installed!');
 }
-require_once JAXBOARDS_ROOT . '/config.php';
+require_once JAXBOARDS_ROOT.'/config.php';
 
-if (!$CFG['service']) {
-    die('Service mode not enabled');
+if (! $CFG['service']) {
+    exit('Service mode not enabled');
 }
 
 /**
@@ -42,56 +36,49 @@ if (!$CFG['service']) {
  *
  * @param string $src The source directory- this must exist already
  * @param string $dst The destination directory- this is assumed to not exist already
- *
- * @return void
  */
 function recurseCopy($src, $dst)
 {
     $dir = opendir($src);
     @mkdir($dst);
     while (false !== ($file = readdir($dir))) {
-        if (('.' !== $file) && ('..' !== $file)) {
-            if (is_dir($src . '/' . $file)) {
-                recurseCopy($src . '/' . $file, $dst . '/' . $file);
+        if (($file !== '.') && ($file !== '..')) {
+            if (is_dir($src.'/'.$file)) {
+                recurseCopy($src.'/'.$file, $dst.'/'.$file);
             } else {
-                copy($src . '/' . $file, $dst . '/' . $file);
+                copy($src.'/'.$file, $dst.'/'.$file);
             }
         }
     }
     closedir($dir);
 }
 
-$connected = $DB->connect(
-    $CFG['sql_host'],
-    $CFG['sql_username'],
-    $CFG['sql_password'],
-    $CFG['sql_db']
-);
+$connected = $DB->connect($CFG['sql_host'], $CFG['sql_username'], $CFG['sql_password'], $CFG['sql_db']);
 
-$errors = array();
+$errors = [];
 if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     if (isset($JAX->p['post']) && $JAX->p['post']) {
-        header('Location: https://test.' . $CFG['domain']);
+        header('Location: https://test.'.$CFG['domain']);
     }
 
-    if (!$connected) {
+    if (! $connected) {
         $errors[] = 'There was an error connecting to the MySQL database.';
     }
 
     $JAX->p['boardurl'] = mb_strtolower($JAX->b['boardurl']);
     if (
-        !$JAX->p['boardurl']
-        || !$JAX->p['username']
-        || !$JAX->p['password']
-        || !$JAX->p['email']
+        ! $JAX->p['boardurl']
+        || ! $JAX->p['username']
+        || ! $JAX->p['password']
+        || ! $JAX->p['email']
     ) {
         $errors[] = 'all fields required.';
     } elseif (mb_strlen($JAX->p['boardurl']) > 30) {
         $errors[] = 'board url too long';
-    } elseif ('www' == $JAX->p['boardurl']) {
+    } elseif ($JAX->p['boardurl'] == 'www') {
         $errors[] = 'WWW is reserved.';
     } elseif (preg_match('@\\W@', $JAX->p['boardurl'])) {
-        $errors[] = 'board url needs to consist of letters, ' .
+        $errors[] = 'board url needs to consist of letters, '.
             'numbers, and underscore only';
     }
 
@@ -107,23 +94,18 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     }
     $DB->disposeresult($result);
 
-    if (!$JAX->isemail($JAX->p['email'])) {
+    if (! $JAX->isemail($JAX->p['email'])) {
         $errors[] = 'invalid email';
     }
 
     if (mb_strlen($JAX->p['username']) > 50) {
         $errors[] = 'username too long';
     } elseif (preg_match('@\\W@', $JAX->p['username'])) {
-        $errors[] = 'username needs to consist of letters, ' .
+        $errors[] = 'username needs to consist of letters, '.
             'numbers, and underscore only';
     }
 
-    $result = $DB->safeselect(
-        '`id`',
-        'directory',
-        'WHERE `boardname`=?',
-        $DB->basicvalue($JAX->p['boardurl'])
-    );
+    $result = $DB->safeselect('`id`', 'directory', 'WHERE `boardname`=?', $DB->basicvalue($JAX->p['boardurl']));
     if ($DB->arow($result)) {
         $errors[] = 'that board already exists';
     }
@@ -131,19 +113,19 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
 
     if (empty($errors)) {
         $board = $JAX->p['boardurl'];
-        $boardPrefix = $board . '_';
+        $boardPrefix = $board.'_';
 
         $DB->prefix('');
         // Add board to directory.
         $DB->safeinsert(
             'directory',
-            array(
+            [
                 'boardname' => $board,
                 'registrar_email' => $JAX->p['email'],
                 'registrar_ip' => $JAX->ip2bin(),
                 'date' => date('Y-m-d H:i:s', time()),
                 'referral' => isset($JAX->b['r']) ? $JAX->b['r'] : '',
-            )
+            ]
         );
         $DB->prefix($boardPrefix);
 
@@ -152,10 +134,10 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         // https://stackoverflow.com/a/19752106
         // It's not pretty or perfect but it'll work for our use case...
         $query = '';
-        $lines = file(SERVICE_ROOT . '/blueprint.sql');
+        $lines = file(SERVICE_ROOT.'/blueprint.sql');
         foreach ($lines as $line) {
             // Skip comments.
-            if ('--' == mb_substr($line, 0, 2) || '' == $line) {
+            if (mb_substr($line, 0, 2) == '--' || $line == '') {
                 continue;
             }
 
@@ -166,7 +148,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             $query .= $line;
 
             // If it has a semicolon at the end, it's the end of the query.
-            if (';' == mb_substr(trim($line), -1, 1)) {
+            if (mb_substr(trim($line), -1, 1) == ';') {
                 // Perform the query.
                 $result = $DB->safequery($query);
                 $DB->disposeresult($result);
@@ -178,7 +160,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         // Don't forget to create the admin.
         $DB->safeinsert(
             'members',
-            array(
+            [
                 'name' => $JAX->p['username'],
                 'display_name' => $JAX->p['username'],
                 'pass' => password_hash($JAX->p['password'], PASSWORD_DEFAULT),
@@ -188,16 +170,16 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                 'group_id' => 2,
                 'join_date' => date('Y-m-d H:i:s', time()),
                 'last_visit' => date('Y-m-d H:i:s', time()),
-            )
+            ]
         );
 
         $dbError = $DB->error();
         if ($dbError) {
             $errors[] = $dbError;
         } else {
-            recurseCopy('blueprint', JAXBOARDS_ROOT . '/boards/' . $board);
+            recurseCopy('blueprint', JAXBOARDS_ROOT.'/boards/'.$board);
 
-            header('Location: https://' . $JAX->p['boardurl'] . '.' . $CFG['domain']);
+            header('Location: https://'.$JAX->p['boardurl'].'.'.$CFG['domain']);
         }
     }
 }

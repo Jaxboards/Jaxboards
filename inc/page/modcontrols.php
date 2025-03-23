@@ -7,24 +7,12 @@ class modcontrols
 {
     public $perms;
 
-    private function box($title, $content)
-    {
-        $content = ($content ?: '--No Data--');
-
-        return <<<EOT
-<div class='minibox'>
-    <div class='title'>{$title}</div>
-    <div class='content'>{$content}</div>
-</div>
-EOT;
-    }
-
     public function __construct()
     {
         global $JAX,$PAGE,$USER;
 
         $this->perms = $JAX->getPerms();
-        if (!$this->perms['can_moderate'] && !$USER['mod']) {
+        if (! $this->perms['can_moderate'] && ! $USER['mod']) {
             $PAGE->JS('softurl');
 
             return $PAGE->JS(
@@ -90,7 +78,7 @@ EOT
                 );
                 $rowfound = $DB->arow($result);
                 $DB->disposeresult($result);
-                if (!is_numeric($JAX->p['id']) || !$rowfound) {
+                if (! is_numeric($JAX->p['id']) || ! $rowfound) {
                     return;
                 }
 
@@ -107,9 +95,9 @@ EOT
                 $fids = array_flip($fids);
                 $DB->safeupdate(
                     'topics',
-                    array(
-                    'fid' => $JAX->p['id'],
-                    ),
+                    [
+                        'fid' => $JAX->p['id'],
+                    ],
                     'WHERE `id` IN ?',
                     explode(',', $SESS->vars['modtids'])
                 );
@@ -118,14 +106,14 @@ EOT
                 foreach ($fids as $v) {
                     $DB->fixForumLastPost($v);
                 }
-                $PAGE->location('?act=vf' . $JAX->p['id']);
+                $PAGE->location('?act=vf'.$JAX->p['id']);
                 break;
             case 'pin':
                 $DB->safeupdate(
                     'topics',
-                    array(
-                    'pinned' => 1,
-                    ),
+                    [
+                        'pinned' => 1,
+                    ],
                     'WHERE `id` IN ?',
                     explode(',', $SESS->vars['modtids'])
                 );
@@ -138,9 +126,9 @@ EOT
             case 'unpin':
                 $DB->safeupdate(
                     'topics',
-                    array(
-                    'pinned' => 0,
-                    ),
+                    [
+                        'pinned' => 0,
+                    ],
                     'WHERE `id` IN ?',
                     explode(',', $SESS->vars['modtids'])
                 );
@@ -153,9 +141,9 @@ EOT
             case 'lock':
                 $DB->safeupdate(
                     'topics',
-                    array(
-                    'locked' => 1,
-                    ),
+                    [
+                        'locked' => 1,
+                    ],
                     'WHERE `id` IN ?',
                     explode(',', $SESS->vars['modtids'])
                 );
@@ -168,9 +156,9 @@ EOT
             case 'unlock':
                 $DB->safeupdate(
                     'topics',
-                    array(
-                    'locked' => 0,
-                    ),
+                    [
+                        'locked' => 0,
+                    ],
                     'WHERE `id` IN ?',
                     explode(',', $SESS->vars['modtids'])
                 );
@@ -197,14 +185,14 @@ EOT
             case 'moveto':
                 $DB->safeupdate(
                     'posts',
-                    array(
-                    'tid' => $JAX->p['id'],
-                    ),
+                    [
+                        'tid' => $JAX->p['id'],
+                    ],
                     'WHERE `id` IN ?',
                     explode(',', $SESS->vars['modpids'])
                 );
                 $this->cancel();
-                $PAGE->location('?act=vt' . $JAX->p['id']);
+                $PAGE->location('?act=vt'.$JAX->p['id']);
                 break;
             case 'delete':
                 $this->deleteposts();
@@ -225,7 +213,7 @@ EOT
     public function modpost($pid)
     {
         global $PAGE,$SESS,$DB,$USER;
-        if (!is_numeric($pid)) {
+        if (! is_numeric($pid)) {
             return;
         }
 
@@ -245,7 +233,7 @@ EOT
         $postdata = $DB->arow($result);
         $DB->disposeresult($result);
 
-        if (!$postdata) {
+        if (! $postdata) {
             return;
         }
         if ($postdata['newtopic']) {
@@ -255,7 +243,7 @@ EOT
         $PAGE->JS('softurl');
 
         // See if they have permission to manipulate this post.
-        if (!$this->perms['can_moderate']) {
+        if (! $this->perms['can_moderate']) {
             $result = $DB->safespecial(
                 <<<'EOT'
 SELECT `mods`
@@ -267,18 +255,18 @@ WHERE `id`=(
 )
 EOT
                 ,
-                array('forums', 'topics'),
+                ['forums', 'topics'],
                 $postdata['tid']
             );
 
             $mods = $DB->arow($result);
             $DB->disposeresult($result);
 
-            if (!$mods) {
+            if (! $mods) {
                 return;
             }
             $mods = explode(',', $mods['mods']);
-            if (!in_array($USER['id'], $mods)) {
+            if (! in_array($USER['id'], $mods)) {
                 return $PAGE->JS(
                     'error',
                     "You don't have permission to be moderating in this forum"
@@ -286,15 +274,15 @@ EOT
             }
         }
         $currentPids = isset($SESS->vars['modpids']) ?
-            explode(',', $SESS->vars['modpids']) : array();
-        $pids = array();
+            explode(',', $SESS->vars['modpids']) : [];
+        $pids = [];
         foreach ($currentPids as $currentPid) {
             if (is_numeric($currentPid)) {
                 $pids[] = (int) $currentPid;
             }
         }
         if (in_array($pid, $pids, true)) {
-            $pids = array_diff($pids, array($pid));
+            $pids = array_diff($pids, [$pid]);
         } else {
             $pids[] = $pid;
         }
@@ -307,11 +295,11 @@ EOT
     {
         global $PAGE,$SESS,$DB,$USER,$PERMS;
         $PAGE->JS('softurl');
-        if (!is_numeric($tid)) {
+        if (! is_numeric($tid)) {
             return;
         }
         $tid = (int) $tid;
-        if (!$PERMS['can_moderate']) {
+        if (! $PERMS['can_moderate']) {
             $result = $DB->safespecial(
                 <<<'EOT'
 SELECT `mods`
@@ -323,17 +311,17 @@ WHERE `id`=(
 )
 EOT
                 ,
-                array('forums', 'topics'),
+                ['forums', 'topics'],
                 $DB->basicvalue($tid)
             );
             $mods = $DB->arow($result);
             $DB->disposeresult($result);
 
-            if (!$mods) {
+            if (! $mods) {
                 return $PAGE->JS('error', $DB->error());
             }
             $mods = explode(',', $mods['mods']);
-            if (!in_array($USER['id'], $mods)) {
+            if (! in_array($USER['id'], $mods)) {
                 return $PAGE->JS(
                     'error',
                     "You don't have permission to be moderating in this forum"
@@ -341,15 +329,15 @@ EOT
             }
         }
         $currentTids = isset($SESS->vars['modtids']) ?
-            explode(',', $SESS->vars['modtids']) : array();
-        $tids = array();
+            explode(',', $SESS->vars['modtids']) : [];
+        $tids = [];
         foreach ($currentTids as $currentTid) {
             if (is_numeric($currentTid)) {
                 $tids[] = (int) $currentTid;
             }
         }
         if (in_array($tid, $tids, true)) {
-            $tids = array_diff($tids, array($tid));
+            $tids = array_diff($tids, [$tid]);
         } else {
             $tids[] = $tid;
         }
@@ -371,29 +359,20 @@ EOT
     public function deleteposts()
     {
         global $SESS,$PAGE,$DB,$USER;
-        if (!isset($SESS->vars['modpids']) || !$SESS->vars['modpids']) {
+        if (! isset($SESS->vars['modpids']) || ! $SESS->vars['modpids']) {
             return $PAGE->JS('error', 'No posts to delete.');
         }
 
         // Get trashcan.
-        $result = $DB->safeselect(
-            '`id`',
-            'forums',
-            'WHERE `trashcan`=1 LIMIT 1'
-        );
+        $result = $DB->safeselect('`id`', 'forums', 'WHERE `trashcan`=1 LIMIT 1');
         $trashcan = $DB->arow($result);
         $trashcan = isset($trashcan['id']) ? (int) $trashcan['id'] : 0;
         $DB->disposeresult($result);
 
-        $result = $DB->safeselect(
-            '`tid`',
-            'posts',
-            'WHERE `id` IN ?',
-            explode(',', $SESS->vars['modpids'])
-        );
+        $result = $DB->safeselect('`tid`', 'posts', 'WHERE `id` IN ?', explode(',', $SESS->vars['modpids']));
 
         // Build list of topic ids that the posts were in.
-        $tids = array();
+        $tids = [];
         $pids = explode(',', $SESS->vars['modpids']);
         while ($f = $DB->arow($result)) {
             $tids[] = (int) $f['tid'];
@@ -403,27 +382,22 @@ EOT
         if ($trashcan) {
             // Get first & last post.
             foreach ($pids as $v) {
-                if (!isset($op) || !$op || $v < $op) {
+                if (! isset($op) || ! $op || $v < $op) {
                     $op = $v;
                 }
-                if (!isset($lp) || !$lp || $v > $lp) {
+                if (! isset($lp) || ! $lp || $v > $lp) {
                     $lp = $v;
                 }
             }
-            $result = $DB->safeselect(
-                '`auth_id`',
-                'posts',
-                'WHERE `id`=?',
-                $DB->basicvalue($lp)
-            );
+            $result = $DB->safeselect('`auth_id`', 'posts', 'WHERE `id`=?', $DB->basicvalue($lp));
             $lp = $DB->arow($result);
             $DB->disposeresult($result);
 
             // Create a new topic.
             $DB->safeinsert(
                 'topics',
-                array(
-                    'title' => 'Posts deleted from: ' .
+                [
+                    'title' => 'Posts deleted from: '.
                         implode(',', $tids),
                     'op' => $op,
                     'auth_id' => $USER['id'],
@@ -431,33 +405,24 @@ EOT
                     'lp_date' => date('Y-m-d H:i:s', time()),
                     'lp_uid' => $lp['auth_id'],
                     'replies' => 0,
-                )
+                ]
             );
             $tid = $DB->insert_id(1);
             $DB->safeupdate(
                 'posts',
-                array(
+                [
                     'tid' => $tid,
                     'newtopic' => 0,
-                ),
+                ],
                 'WHERE `id` IN ?',
                 explode(',', $SESS->vars['modpids'])
             );
-            $DB->safeupdate(
-                'posts',
-                array(
+            $DB->safeupdate('posts', [
                     'newtopic' => 1,
-                ),
-                'WHERE `id`=?',
-                $DB->basicvalue($op)
-            );
+                ], 'WHERE `id`=?', $DB->basicvalue($op));
             $tids[] = $tid;
         } else {
-            $DB->safedelete(
-                'posts',
-                'WHERE `id` IN ?',
-                explode(',', $SESS->vars['modpids'])
-            );
+            $DB->safedelete('posts', 'WHERE `id` IN ?', explode(',', $SESS->vars['modpids']));
         }
         foreach ($tids as $tid) {
             // Recount replies.
@@ -472,23 +437,18 @@ SET `replies`=(
 WHERE `id`=?
 EOT
                 ,
-                array('topics', 'posts'),
+                ['topics', 'posts'],
                 $tid,
                 $tid
             );
         }
         // Fix forum last post for all forums topics were in.
-        $fids = array();
+        $fids = [];
         // Add trashcan here too just in case.
         if ($trashcan) {
             $fids[] = $trashcan;
         }
-        $result = $DB->safeselect(
-            '`fid`',
-            'topics',
-            'WHERE `id` IN ?',
-            $tids
-        );
+        $result = $DB->safeselect('`fid`', 'topics', 'WHERE `id` IN ?', $tids);
         while ($f = $DB->arow($result)) {
             if (is_numeric($f['fid']) && $f['fid'] > 0) {
                 $fids[] = (int) $f['fid'];
@@ -501,40 +461,31 @@ EOT
         }
         // Remove them from the page.
         foreach ($pids as $v) {
-            $PAGE->JS('removeel', '#pid_' . $v);
+            $PAGE->JS('removeel', '#pid_'.$v);
         }
     }
 
     public function deletetopics()
     {
         global $SESS,$DB,$PAGE;
-        if (!$SESS->vars['modtids']) {
+        if (! $SESS->vars['modtids']) {
             return $PAGE->JS('error', 'No topics to delete');
         }
-        $data = array();
+        $data = [];
 
         // Get trashcan id.
-        $result = $DB->safeselect(
-            '`id`',
-            'forums',
-            'WHERE `trashcan`=1 LIMIT 1'
-        );
+        $result = $DB->safeselect('`id`', 'forums', 'WHERE `trashcan`=1 LIMIT 1');
         $trashcan = $DB->arow($result);
         $DB->disposeresult($result);
 
         $trashcan = isset($trashcan['id']) ? $trashcan['id'] : false;
-        $result = $DB->safeselect(
-            '`fid`,`id`',
-            'topics',
-            'WHERE `id` IN ?',
-            explode(',', $SESS->vars['modtids'])
-        );
-        $delete = array();
+        $result = $DB->safeselect('`fid`,`id`', 'topics', 'WHERE `id` IN ?', explode(',', $SESS->vars['modtids']));
+        $delete = [];
         while ($f = $DB->arow($result)) {
-            if (!isset($data[$f['fid']])) {
+            if (! isset($data[$f['fid']])) {
                 $data[$f['fid']] = 0;
             }
-            ++$data[$f['fid']];
+            $data[$f['fid']]++;
             if ($trashcan && $trashcan == $f['fid']) {
                 $delete[] = $f['id'];
             }
@@ -542,9 +493,9 @@ EOT
         if ($trashcan) {
             $DB->safeupdate(
                 'topics',
-                array(
+                [
                     'fid' => $trashcan,
-                ),
+                ],
                 'WHERE `id` IN ?',
                 explode(',', $SESS->vars['modtids'])
             );
@@ -553,17 +504,9 @@ EOT
         } else {
             $delete = $SESS->vars['modtids'];
         }
-        if (!empty($delete)) {
-            $DB->safedelete(
-                'posts',
-                'WHERE `tid` IN ?',
-                explode(',', $delete)
-            );
-            $DB->safedelete(
-                'topics',
-                'WHERE `id` IN ?',
-                explode(',', $delete)
-            );
+        if (! empty($delete)) {
+            $DB->safedelete('posts', 'WHERE `tid` IN ?', explode(',', $delete));
+            $DB->safedelete('topics', 'WHERE `id` IN ?', explode(',', $delete));
         }
         foreach ($data as $k => $v) {
             $DB->fixForumLastPost($k);
@@ -578,7 +521,7 @@ EOT
         global $SESS,$DB,$PAGE,$JAX;
         $page = '';
         $exploded = isset($SESS->vars['modtids']) ?
-            explode(',', $SESS->vars['modtids']) : array();
+            explode(',', $SESS->vars['modtids']) : [];
         if (
             isset($JAX->p['ot'])
             && is_numeric($JAX->p['ot'])
@@ -587,64 +530,43 @@ EOT
             // Move the posts and set all posts to normal (newtopic=0).
             $DB->safeupdate(
                 'posts',
-                array(
+                [
                     'tid' => $JAX->p['ot'],
                     'newtopic' => '0',
-                ),
+                ],
                 'WHERE `tid` IN ?',
                 explode(',', $SESS->vars['modtids'])
             );
 
             // Make the first post in the topic have newtopic=1.
             // Get the op.
-            $result = $DB->safeselect(
-                'MIN(`id`)',
-                'posts',
-                'WHERE `tid`=?',
-                $DB->basicvalue($JAX->p['ot'])
-            );
+            $result = $DB->safeselect('MIN(`id`)', 'posts', 'WHERE `tid`=?', $DB->basicvalue($JAX->p['ot']));
             $thisrow = $DB->arow($result);
             $op = array_pop($thisrow);
             $DB->disposeresult($result);
 
-            $DB->safeupdate(
-                'posts',
-                array(
+            $DB->safeupdate('posts', [
                     'newtopic' => 1,
-                ),
-                'WHERE `id`=?',
-                $op
-            );
+                ], 'WHERE `id`=?', $op);
 
             // Also fix op.
-            $DB->safeupdate(
-                'topics',
-                array(
+            $DB->safeupdate('topics', [
                     'op' => $op,
-                ),
-                'WHERE `id`=?',
-                $DB->basicvalue($JAX->p['ot'])
-            );
+                ], 'WHERE `id`=?', $DB->basicvalue($JAX->p['ot']));
             unset($exploded[array_search($JAX->p['ot'], $exploded)]);
-            if (!empty($exploded)) {
-                $DB->safedelete(
-                    'topics',
-                    'WHERE `id` IN ?',
-                    $exploded
-                );
+            if (! empty($exploded)) {
+                $DB->safedelete('topics', 'WHERE `id` IN ?', $exploded);
             }
             $this->cancel();
-            $PAGE->location('?act=vt' . $JAX->p['ot']);
+            $PAGE->location('?act=vt'.$JAX->p['ot']);
         }
-        $page .= '<form method="post" data-ajax-form="true" ' .
-            'style="padding:10px;">' .
+        $page .= '<form method="post" data-ajax-form="true" '.
+            'style="padding:10px;">'.
             'Which topic should the topics be merged into?<br />';
-        $page .= $JAX->hiddenFormFields(
-            array(
+        $page .= $JAX->hiddenFormFields([
                 'act' => 'modcontrols',
                 'dot' => 'merge',
-            )
-        );
+            ]);
 
         if (isset($SESS->vars['modtids'])) {
             $result = $DB->safeselect(
@@ -653,14 +575,14 @@ EOT
                 'WHERE `id` IN ?',
                 explode(',', $SESS->vars['modtids'])
             );
-            $titles = array();
+            $titles = [];
             while ($f = $DB->arow($result)) {
                 $titles[$f['id']] = $f['title'];
             }
             foreach ($exploded as $v) {
                 if (isset($titles[$v])) {
-                    $page .= '<input type="radio" name="ot" value="' . $v . '" /> ' .
-                        $titles[$v] . '<br />';
+                    $page .= '<input type="radio" name="ot" value="'.$v.'" /> '.
+                        $titles[$v].'<br />';
                 }
             }
         }
@@ -685,15 +607,15 @@ EOT
             $PAGE->JS('script', $script);
         } else {
             header('Content-Type: application/javascript; charset=utf-8');
-            header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 2592000) . ' GMT');
-            die($script);
+            header('Expires: '.gmdate('D, d M Y H:i:s', time() + 2592000).' GMT');
+            exit($script);
         }
     }
 
     public function showmodcp($cppage = '')
     {
         global $PAGE,$PERMS;
-        if (!$PERMS['can_moderate']) {
+        if (! $PERMS['can_moderate']) {
             return;
         }
         $page = $PAGE->meta('modcp-index', $cppage);
@@ -705,49 +627,44 @@ EOT
     public function editmembers()
     {
         global $PAGE,$JAX,$DB,$USER,$PERMS;
-        if (!$PERMS['can_moderate']) {
+        if (! $PERMS['can_moderate']) {
             return;
         }
         $e = '';
-        $data = array();
-        $page = '<form method="post" data-ajax-form="true">' .
-            $JAX->hiddenFormFields(
-                array(
+        $data = [];
+        $page = '<form method="post" data-ajax-form="true">'.
+            $JAX->hiddenFormFields([
                     'submit' => 'showform',
                     'act' => 'modcontrols',
                     'do' => 'emem',
-                )
-            ) .
-            'Member name: <input type="text" title="Enter member name" name="mname" ' .
-            'data-autocomplete-action="searchmembers" ' .
-            'data-autocomplete-output="#mid" ' .
-            'data-autocomplete-indicator="#validname" />' .
+                ]).
+            'Member name: <input type="text" title="Enter member name" name="mname" '.
+            'data-autocomplete-action="searchmembers" '.
+            'data-autocomplete-output="#mid" '.
+            'data-autocomplete-indicator="#validname" />'.
             '<span id="validname"></span>
             <input type="hidden" name="mid" id="mid" onchange="this.form.onsubmit();" />
             <input type="submit" type="View member details" value="Go" />
             </form>';
-        if (isset($JAX->p['submit']) && 'save' == $JAX->p['submit']) {
-            if (!trim($JAX->p['display_name'])) {
+        if (isset($JAX->p['submit']) && $JAX->p['submit'] == 'save') {
+            if (! trim($JAX->p['display_name'])) {
                 $page .= $PAGE->meta('error', 'Display name is invalid.');
             } else {
                 $DB->safeupdate(
                     'members',
-                    array(
+                    [
                         'sig' => $JAX->p['signature'],
                         'display_name' => $JAX->p['display_name'],
                         'full_name' => $JAX->p['full_name'],
                         'about' => $JAX->p['about'],
                         'avatar' => $JAX->p['avatar'],
-                    ),
+                    ],
                     'WHERE `id`=?',
                     $DB->basicvalue($JAX->p['mid'])
                 );
                 $error = $DB->error();
                 if ($error) {
-                    $page .= $PAGE->meta(
-                        'error',
-                        'Error updating profile information.'
-                    );
+                    $page .= $PAGE->meta('error', 'Error updating profile information.');
                 } else {
                     $page .= $PAGE->meta('success', 'Profile information saved.');
                 }
@@ -755,7 +672,7 @@ EOT
         }
         if (
             (isset($JAX->p['submit'])
-            && 'showform' == $JAX->p['submit'])
+            && $JAX->p['submit'] == 'showform')
             || isset($JAX->b['mid'])
         ) {
             // Get the member data.
@@ -801,9 +718,9 @@ EOT
                     ,
                     'members',
                     'WHERE `display_name` LIKE ?',
-                    $DB->basicvalue($JAX->p['mname'] . '%')
+                    $DB->basicvalue($JAX->p['mname'].'%')
                 );
-                $data = array();
+                $data = [];
                 while ($f = $DB->arow($result)) {
                     $data[] = $f;
                 }
@@ -816,15 +733,15 @@ EOT
                 $e = 'Member name is a required field.';
             }
 
-            if (!$data) {
+            if (! $data) {
                 $e = 'No members found that matched the criteria.';
             }
             if (
                 (isset($data['can_moderate'])
                 && $data['can_moderate'])
-                && 2 != $USER['group_id']
-                || 2 == $data['group_id']
-                && (1 != $USER['id']
+                && $USER['group_id'] != 2
+                || $data['group_id'] == 2
+                && ($USER['id'] != 1
                 && $data['id'] != $USER['id'])
             ) {
                 $e = 'You do not have permission to edit this profile.';
@@ -835,42 +752,28 @@ EOT
             } else {
                 function field($label, $name, $value, $type = 'input')
                 {
-                    return '<tr><td><label for="m_' . $name . '">' . $label .
-                        '</label></td><td>' .
-                        ('textarea' == $type ? '<textarea name="' . $name .
-                        '" id="m_' . $name . '">' . $value . '</textarea>' :
-                        '<input type="text" id="m_' . $name . '" name="' . $name .
-                        '" value="' . $value . '" />') . '</td></tr>';
+                    return '<tr><td><label for="m_'.$name.'">'.$label.
+                        '</label></td><td>'.
+                        ($type == 'textarea' ? '<textarea name="'.$name.
+                        '" id="m_'.$name.'">'.$value.'</textarea>' :
+                        '<input type="text" id="m_'.$name.'" name="'.$name.
+                        '" value="'.$value.'" />').'</td></tr>';
                 }
-                $page .= '<form method="post" ' .
+                $page .= '<form method="post" '.
                     'data-ajax-form="true"><table>';
                 $page .= $JAX->hiddenFormFields(
-                    array(
+                    [
                         'act' => 'modcontrols',
                         'do' => 'emem',
                         'mid' => $data['id'],
                         'submit' => 'save',
-                    )
+                    ]
                 );
-                $page .= field(
-                    'Display Name',
-                    'display_name',
-                    $data['display_name']
-                ) .
-                    field('Avatar', 'avatar', $data['avatar']) .
-                    field('Full Name', 'full_name', $data['full_name']) .
-                    field(
-                        'About',
-                        'about',
-                        $JAX->blockhtml($data['about']),
-                        'textarea'
-                    ) .
-                    field(
-                        'Signature',
-                        'signature',
-                        $JAX->blockhtml($data['sig']),
-                        'textarea'
-                    );
+                $page .= field('Display Name', 'display_name', $data['display_name']).
+                    field('Avatar', 'avatar', $data['avatar']).
+                    field('Full Name', 'full_name', $data['full_name']).
+                    field('About', 'about', $JAX->blockhtml($data['about']), 'textarea').
+                    field('Signature', 'signature', $JAX->blockhtml($data['sig']), 'textarea');
                 $page .= '</table><input type="submit" value="Save" /></form>';
             }
         }
@@ -884,14 +787,14 @@ EOT
         $page = '';
 
         $ip = isset($JAX->b['ip']) ? $JAX->b['ip'] : '';
-        if (!filter_var($ip, FILTER_VALIDATE_IP)) {
+        if (! filter_var($ip, FILTER_VALIDATE_IP)) {
             $ip = '';
         }
 
         $changed = false;
 
         if (isset($JAX->p['ban']) && $JAX->p['ban']) {
-            if (!$JAX->ipbanned($ip)) {
+            if (! $JAX->ipbanned($ip)) {
                 $changed = true;
                 $JAX->ipbancache[] = $ip;
             }
@@ -902,17 +805,15 @@ EOT
             }
         }
         if ($changed) {
-            $o = fopen(BOARDPATH . '/bannedips.txt', 'w');
+            $o = fopen(BOARDPATH.'/bannedips.txt', 'w');
             fwrite($o, implode(PHP_EOL, $JAX->ipbancache));
             fclose($o);
         }
 
-        $hiddenFields = $JAX->hiddenFormFields(
-            array(
+        $hiddenFields = $JAX->hiddenFormFields([
                 'act' => 'modcontrols',
                 'do' => 'iptools',
-            )
-        );
+            ]);
         $form = <<<EOT
 <form method='post' data-ajax-form='true'>
     {$hiddenFields}
@@ -924,13 +825,11 @@ EOT;
         if ($ip) {
             $page .= "<h3>Data for {$ip}:</h3>";
 
-            $hiddenFields = $JAX->hiddenFormFields(
-                array(
+            $hiddenFields = $JAX->hiddenFormFields([
                     'ip' => $ip,
                     'act' => 'modcontrols',
                     'do' => 'iptools',
-                )
-            );
+                ]);
             if ($JAX->ipbanned($ip)) {
                 $banCode = <<<'EOT'
 <span style="color:#900">
@@ -972,7 +871,7 @@ IP Lookup Services: <ul>
 EOT
             );
 
-            $content = array();
+            $content = [];
             $result = $DB->safeselect(
                 '`group_id`,`display_name`,`id`',
                 'members',
@@ -980,12 +879,7 @@ EOT
                 $DB->basicvalue($ip)
             );
             while ($f = $DB->arow($result)) {
-                $content[] = $PAGE->meta(
-                    'user-link',
-                    $f['id'],
-                    $f['group_id'],
-                    $f['display_name']
-                );
+                $content[] = $PAGE->meta('user-link', $f['id'], $f['group_id'], $f['display_name']);
             }
             $page .= $this->box('Users with this IP:', implode(', ', $content));
 
@@ -1004,20 +898,12 @@ ORDER BY `id`
 DESC LIMIT 5
 EOT
                     ,
-                    array(
-                        'shouts',
-                        'members',
-                    ),
+                    ['shouts', 'members'],
                     $DB->basicvalue($ip)
                 );
                 while ($f = $DB->arow($result)) {
-                    $content .= $PAGE->meta(
-                        'user-link',
-                        $f['uid'],
-                        $f['group_id'],
-                        $f['display_name']
-                    );
-                    $content .= ' : ' . $f['shout'] . '<br />';
+                    $content .= $PAGE->meta('user-link', $f['uid'], $f['group_id'], $f['display_name']);
+                    $content .= ' : '.$f['shout'].'<br />';
                 }
                 $page .= $this->box('Last 5 shouts:', $content);
             }
@@ -1029,12 +915,24 @@ EOT
                 $DB->basicvalue($ip)
             );
             while ($f = $DB->arow($result)) {
-                $content .= "<div class='post'>" .
-                    nl2br($JAX->blockhtml($JAX->textonly($f['post']))) .
+                $content .= "<div class='post'>".
+                    nl2br($JAX->blockhtml($JAX->textonly($f['post']))).
                     '</div>';
             }
             $page .= $this->box('Last 5 posts:', $content);
         }
-        $this->showmodcp($form . $page);
+        $this->showmodcp($form.$page);
+    }
+
+    private function box($title, $content)
+    {
+        $content = ($content ?: '--No Data--');
+
+        return <<<EOT
+<div class='minibox'>
+    <div class='title'>{$title}</div>
+    <div class='content'>{$content}</div>
+</div>
+EOT;
     }
 }

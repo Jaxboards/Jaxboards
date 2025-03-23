@@ -2,7 +2,7 @@
 
 class rssfeed
 {
-    public $feed = array();
+    public $feed = [];
 
     public function __construct($settings)
     {
@@ -35,11 +35,11 @@ EOT;
             $isn = is_numeric($k);
             if (is_array($v) && $v[0]) {
                 foreach ($v as $v2) {
-                    $r .= "<{$k}>" . $this->make_xml($v2) . "</{$k}>";
+                    $r .= "<{$k}>".$this->make_xml($v2)."</{$k}>";
                 }
             } else {
-                $r .= "<{$k}" . ('content' == $k ? ' type="html"' : '') . '>' .
-                    (is_array($v) ? $this->make_xml($v, $k) : $v) . "</{$k}>";
+                $r .= "<{$k}".($k == 'content' ? ' type="html"' : '').'>'.
+                    (is_array($v) ? $this->make_xml($v, $k) : $v)."</{$k}>";
             }
         }
 
