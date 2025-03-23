@@ -188,7 +188,8 @@
   <rule ref="SlevomatCodingStandard.ControlStructures.UselessTernaryOperator"/>
   <rule ref="SlevomatCodingStandard.Exceptions.DeadCatch"/>
   <rule ref="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch"/>
-  <rule ref="SlevomatCodingStandard.Files.FileLength"/>
+  <!-- disable this rule because it breakse the sonarqube reports -->
+  <!-- rule ref="SlevomatCodingStandard.Files.FileLength"/ -->
   <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName"/>
   <rule ref="SlevomatCodingStandard.Functions.DisallowEmptyFunction"/>
   <rule ref="SlevomatCodingStandard.Functions.FunctionLength"/>
