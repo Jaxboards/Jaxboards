@@ -86,7 +86,8 @@ class IM
         $onlineusers = $DB->getUsersOnline();
         $logoutTime = time() - $CFG['timetologout'];
         $updateTime = time() - $CFG['updateinterval'] * 5;
-        if (!isset($onlineusers[$uid])
+        if (
+            !isset($onlineusers[$uid])
             || !$onlineusers[$uid]
             || $onlineusers[$uid]['last_update'] < $logoutTime
             || $onlineusers[$uid]['last_update'] < $updateTime
