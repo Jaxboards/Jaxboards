@@ -532,13 +532,13 @@ SELECT m.`id` AS `id`
     , m.`notify_pm` AS `notify_pm`
     , m.`notify_postinmytopic` AS `notify_postinmytopic`
     , m.`notify_postinsubscribedtopic` AS `notify_postinsubscribedtopic`
-    , .`ucpnotepad` AS `ucpnotepad`
+    , m.`ucpnotepad` AS `ucpnotepad`
     , m.`skin_id` AS `skin_id`
-    , .`contact_twitter` AS `contact_twitter`
-    , .`contact_discord` AS `contact_discord`
-    , .`contact_youtube` AS `contact_youtube`
-    , .`contact_bluesky` AS `contact_bluesky`
-    , .`email_settings` AS `email_settings`
+    , m.`contact_twitter` AS `contact_twitter`
+    , m.`contact_discord` AS `contact_discord`
+    , m.`contact_youtube` AS `contact_youtube`
+    , m.`contact_bluesky` AS `contact_bluesky`
+    , m.`email_settings` AS `email_settings`
     , m.`nowordfilter` AS `nowordfilter`
     , NET6_NTOA(m.`ip`) AS `ip`
     , m.`mod` AS `mod`
