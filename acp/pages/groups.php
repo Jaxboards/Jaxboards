@@ -155,12 +155,14 @@ class groups
 
         $page = '';
 
-        if ($this->updatePermissions
+        if (
+            $this->updatePermissions
             && isset($JAX->p['perm'])
             && $JAX->p['perm']
         ) {
             foreach (explode(',', $JAX->p['grouplist']) as $v) {
-                if (!isset($JAX->p['perm'][$v])
+                if (
+                    !isset($JAX->p['perm'][$v])
                     || !$JAX->p['perm'][$v]
                 ) {
                     $JAX->p['perm'][$v] = array();
@@ -169,7 +171,8 @@ class groups
 
             return $this->updateperms($JAX->p['perm']);
         }
-        if (!isset($JAX->b['grouplist'])
+        if (
+            !isset($JAX->b['grouplist'])
             || preg_match('@[^\\d,]@', $JAX->b['grouplist'])
             || false !== mb_strpos($JAX->b['grouplist'], ',,')
         ) {
@@ -400,7 +403,8 @@ EOT
     {
         global $PAGE,$DB,$JAX;
         $page = '';
-        if (isset($JAX->b['delete'])
+        if (
+            isset($JAX->b['delete'])
             && is_numeric($JAX->b['delete'])
             && $JAX->b['delete'] > 5
         ) {

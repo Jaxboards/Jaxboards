@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Figures out what board we're talking about if it's a service,
  * but regardless defines some important paths.
@@ -14,6 +15,7 @@
  *
  * @link https://github.com/jaxboards/jaxboards Jaxboards Github Repo
  */
+
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', __DIR__);
 }
@@ -30,7 +32,8 @@ $baseURL = (isset($_SERVER['REQUEST_SCHEME']) ?
     $_SERVER['REQUEST_SCHEME'] : 'https') . '://';
 $baseURL .= (isset($_SERVER['SERVER_NAME']) ?
     $_SERVER['SERVER_NAME'] : $CFG['domain']);
-if (!('443' === $_SERVER['SERVER_PORT'] && 'https' === $_SERVER['REQUEST_SCHEME'])
+if (
+    !('443' === $_SERVER['SERVER_PORT'] && 'https' === $_SERVER['REQUEST_SCHEME'])
     && !('80' === $_SERVER['SERVER_PORT'] && 'http' === $_SERVER['REQUEST_SCHEME'])
 ) {
     $baseURL .= (isset($_SERVER['SERVER_PORT']) ? ':' . $_SERVER['SERVER_PORT'] : '');

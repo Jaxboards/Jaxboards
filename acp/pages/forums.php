@@ -244,7 +244,8 @@ EOT
                 } else {
                     $trashcan = '';
                 }
-                if (isset($data[$id]['mods'])
+                if (
+                    isset($data[$id]['mods'])
                     && is_array($data[$id]['mods'])
                     && !empty($data[$id]['mods'])
                 ) {
@@ -435,11 +436,12 @@ EOT
                     $DB->basicvalue($JAX->p['modid'])
                 );
                 if ($DB->arow($result)) {
-                    if (false === array_search(
-                        $JAX->p['modid'],
-                        isset($fdata['mods']) ?
-                        explode(',', $fdata['mods']) : array()
-                    )
+                    if (
+                        false === array_search(
+                            $JAX->p['modid'],
+                            isset($fdata['mods']) ?
+                            explode(',', $fdata['mods']) : array()
+                        )
                     ) {
                         $write['mods'] = (isset($fdata['mods'])
                             && $fdata['mods']) ?
@@ -457,7 +459,8 @@ EOT
 
             if (!$e) {
                 // Clear trashcan on other forums.
-                if ($write['trashcan']
+                if (
+                    $write['trashcan']
                     || (!$write['trashcan']
                     && isset($fdata['trashcan'])
                     && $fdata['trashcan'])

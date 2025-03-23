@@ -1,5 +1,6 @@
 <?php
-/*
+
+/**
     Chat box
     better color >_>
 
@@ -29,7 +30,8 @@ class search
 
         $this->perpage = 10;
 
-        if ((isset($JAX->b['searchterm']) && $JAX->b['searchterm'])
+        if (
+            (isset($JAX->b['searchterm']) && $JAX->b['searchterm'])
             || (isset($JAX->b['page']) && $JAX->b['page'])
         ) {
             $this->dosearch();
@@ -129,7 +131,8 @@ class search
                 return false;
             }
         }
-        if (($a[0] % 2)
+        if (
+            ($a[0] % 2)
             && 31 == $a[1]
             || 2 == $a[0]
             && (!$a[2] % 4
