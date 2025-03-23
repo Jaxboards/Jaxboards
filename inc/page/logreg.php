@@ -369,7 +369,9 @@ final class LOGREG
                     // registration redirects to the index.
                     $this->registering = true;
 
-                    return $this->login($udata['name'], $JAX->p['pass1']);
+                    $this->login($udata['name'], $JAX->p['pass1']);
+
+                    return;
                 }
 
                 $page .= $PAGE->meta(
