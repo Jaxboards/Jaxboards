@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<psalm
+    errorLevel="4"
+    resolveFromConfigFile="true"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+    findUnusedBaselineEntry="true"
+    findUnusedCode="true"
+>
+    <projectFiles>
+        <file name="index.php" />
+        <file name="domaindefinitions.php" />
+        <file name="php_codesniffer_to_sonarqube.php" />
+        <file name="config.default.php" />
+        <directory name="misc" />
+        <directory name="Service" />
+        <directory name="acp" />
+        <directory name="inc" />
+        <directory name="emoticons" />
+        <ignoreFiles>
+            <directory name="vendor" />
+        </ignoreFiles>
+    </projectFiles>
+</psalm>

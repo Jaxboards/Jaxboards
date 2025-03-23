@@ -24,7 +24,7 @@
   "scripts": {
     "autofix": "npm run-script prettier && npm run-script eslint-fix && npm run-script stylelint-fix && npm run-script phpcbf && npm run-script php-cs-fixer",
     "build": "rollup -c",
-    "ci-lint": "npm run-script eslint-report; npm run-script stylelint-report; npm run-script phpcs-report; npm run-script phpstan-report",
+    "ci-lint": "npm run-script eslint-report; npm run-script stylelint-report; npm run-script phpcs-report; npm run-script phpstan-report; npm run-script psalm-report",
     "eslint": "eslint 'Script/**/*.js'",
     "eslint-fix": "eslint 'Script/**/*.js' --fix",
     "eslint-report": "eslint 'Script/**/*.js' --format json --output-file eslint-report.json",
@@ -38,6 +38,8 @@
     "postinstall": "composer-runner -- install",
     "pre-commit": "npm run-script eslint && npm run-script stylelint && npm run-script php-lint",
     "prettier": "prettier --write --single-quote \"**/*.{{t,j}s{,x,on},{c,sa,sc,le}ss,vue,md,y{,a}ml,graphql}\"",
+    "psalm": "composer-runner -- run-script --no-interaction psalm",
+    "psalm-report": "composer-runner -- run-script --no-interaction psalm-report",
     "stylelint": "stylelint \"./**/*.{c,sa,sc,le}ss\"",
     "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\"",
     "stylelint-report": "stylelint \"./**/*.{c,sa,sc,le}ss\" --formatter json --output-file stylelint-report.json"
