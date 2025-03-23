@@ -173,6 +173,7 @@ final class PAGE
             if (!headers_sent()) {
                 header('Content-type:text/plain');
             }
+
             foreach ($this->JSOutput as $k => $v) {
                 $this->JSOutput[$k] = $SESS->addSessID($v);
             }

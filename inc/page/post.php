@@ -305,10 +305,10 @@ onclick="this.form.submitButton=this" /></div>
         }
 
         $tdata = [
-            'title' => '',
             'perms' => [
                 'upload' => false,
             ],
+            'title' => '',
         ];
         if ($tid) {
             $result = $DB->safespecial(
