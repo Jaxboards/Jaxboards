@@ -154,7 +154,7 @@ final class members
                 'youtube' => 'https://youtube.com/%s',
             ];
             foreach ($contactUrls as $k => $v) {
-                if (!$f['contact_' . $k]) {
+                if (!($f['contact_' . $k] ?? false)) {
                     continue;
                 }
 

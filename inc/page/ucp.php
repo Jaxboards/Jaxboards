@@ -442,8 +442,8 @@ final class UCP
                     'members',
                     [
                         'email' => $JAX->p['email'],
-                        'email_settings' => ($JAX->p['notifications'] ? 2 : 0)
-                        + ($JAX->p['adminemails'] ? 1 : 0),
+                        'email_settings' => ($JAX->p['notifications'] ?? false ? 2 : 0)
+                        + ($JAX->p['adminemails'] ?? false ? 1 : 0),
                     ],
                     'WHERE `id`=?',
                     $USER['id'],
