@@ -11,7 +11,7 @@
 $CFG = json_decode(
     <<<'EOD'
         {
-            "badnamechars": "@[^\\w']@",
+            "badnamechars": "@[^\\w' ?]@",
             "boardname": "Example Forums",
             "domain": "example.com",
             "dthemepath": "Service\/Themes\/Default\/",
