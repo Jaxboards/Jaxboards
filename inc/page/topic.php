@@ -1200,11 +1200,14 @@ final class TOPIC
                 . PHP_EOL . PHP_EOL,
             );
         } else {
-            if (!in_array($pid, explode(' ', (string) $SESS->vars['multiquote']))) {
+            $multiquote = (string) ($SESS->vars['multiquote'] ?? '');
+            $multiquotes = explode(' ', $multiquote);
+            if (!in_array((string) $pid, $multiquotes, true)) {
                 $SESS->addvar(
                     'multiquote',
-                    $SESS->vars['multiquote'] ? $SESS->vars['multiquote'] . ','
-                    . $pid : $pid,
+                    $multiquote !== '' && $multiquote !== '0'
+                        ? $multiquote . ',' . $pid
+                        : $pid,
                 );
             }
 
