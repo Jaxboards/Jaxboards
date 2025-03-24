@@ -1201,13 +1201,14 @@ final class TOPIC
             );
         } else {
             $multiquote = (string) ($SESS->vars['multiquote'] ?? '');
-            $multiquotes = explode(' ', $multiquote);
+            $multiquotes = $multiquote !== ''
+                ? explode(',', $multiquote)
+                : [];
             if (!in_array((string) $pid, $multiquotes, true)) {
+                $multiquotes[] = $pid;
                 $SESS->addvar(
                     'multiquote',
-                    $multiquote !== '' && $multiquote !== '0'
-                        ? $multiquote . ',' . $pid
-                        : $pid,
+                    implode(',', $multiquotes),
                 );
             }
 
