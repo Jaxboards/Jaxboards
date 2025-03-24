@@ -11,6 +11,11 @@ final class PAGE
     public $jsaccess = '';
 
     /**
+     * @var string|null Store the UCP page data
+     */
+    public ?string $ucppage = null;
+
+    /**
      * @var bool
      */
     public $jsupdate = false;
