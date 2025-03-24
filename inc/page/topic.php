@@ -575,7 +575,6 @@ final class TOPIC
                     , m.`contact_bluesky` AS `contact_bluesky`
                     , m.`email_settings` AS `email_settings`
                     , m.`nowordfilter` AS `nowordfilter`
-                    , m.`ip` AS `ip`
                     , m.`mod` AS `mod`
                     , m.`wysiwyg` AS `wysiwyg`
                     , p.`tid` AS `tid`
