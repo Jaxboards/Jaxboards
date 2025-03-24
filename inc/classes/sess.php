@@ -184,12 +184,14 @@ final class SESS
 
         $time = time();
         $sessData = [
+            'forumsread' => '{}',
             'id' => $sid,
             'ip' => $JAX->ip2bin(),
             'is_bot' => $isbot,
             'last_action' => date('Y-m-d H:i:s', $time),
             'last_update' => date('Y-m-d H:i:s', $time),
             'runonce' => '',
+            'topicsread' => '{}',
             'uid' => $uid,
             'useragent' => $_SERVER['HTTP_USER_AGENT'],
         ];
