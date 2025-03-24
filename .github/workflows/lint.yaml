@@ -36,7 +36,11 @@ jobs:
       - run: |
           echo "[]" > eslint-report.json &&
           echo "[]" > stylelint-report.json &&
-          echo '{"issues": [], "rules": []}' > phpcs-report-sonarqube.json
+          echo '{"issues":[],"rules":[]}' > parallel-lint-report-sonarqube.json &&
+          echo '{"issues":[],"rules":[]}' > phpcs-report-sonarqube.json &&
+          echo '{"issues":[],"rules":[]}' > phpmd-report-sonarqube.json &&
+          echo '{"totals":{"errors":0,"file_errors":0},"files":{},"errors":[]}' > phpstan-report.json &&
+          echo "[]" > psalm-report.json
         shell: bash
       - run: npm run-script ci-lint
       - name: SonarQube Scan
