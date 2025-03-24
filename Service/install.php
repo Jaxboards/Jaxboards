@@ -120,7 +120,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $JAX->p['domain']
         && !parse_url((string) $JAX->p['domain'], PHP_URL_HOST)
     ) {
-        if (preg_match('@[^\w.]@', (string) $JAX->p['domain'])) {
+        if (preg_match('@[^\w-.]@', (string) $JAX->p['domain'])) {
             $errors[] = 'Invalid domain';
         } else {
             // Looks like we have a proper hostname,
