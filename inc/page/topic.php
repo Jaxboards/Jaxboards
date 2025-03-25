@@ -540,7 +540,7 @@ SELECT m.`id` AS `id`
     , m.`contact_bluesky` AS `contact_bluesky`
     , m.`email_settings` AS `email_settings`
     , m.`nowordfilter` AS `nowordfilter`
-    , NET6_NTOA(m.`ip`) AS `ip`
+    , INET6_NTOA(m.`ip`) AS `ip`
     , m.`mod` AS `mod`
     , m.`wysiwyg` AS `wysiwyg`
     , p.`tid` AS `tid`
