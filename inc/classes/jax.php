@@ -700,7 +700,7 @@ EOT
             'user-link',
             $a['uid'],
             $a['group_id'],
-            $USER['id'] == $a['uid'] ? 'You' : $a['name']
+            $USER && $USER['id'] == $a['uid'] ? 'You' : $a['name']
         );
         $otherguy = $PAGE->meta(
             'user-link',
