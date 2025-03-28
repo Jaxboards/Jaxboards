@@ -550,78 +550,50 @@ EOT
 
     public function bbcode_videocallback($m)
     {
-        if (false !== mb_strpos($m[1], 'youtube')) {
-            preg_match('@t=(\\d+m)?(\\d+s)?@', $m[0], $time);
-            preg_match('@v=([\\w-]+)@', $m[1], $m);
-            $seconds = '';
-            if ($time) {
-                $seconds = (($time[1] ? mb_substr($time[1], 0, -1) * 60 : 0) +
-                    mb_substr($time[2], 0, -1));
-            }
-
-            $youtubeLink = 'https://www.youtube.com/watch?v=' .
-                $m[1] . ($seconds ? '&t=' : '') . $seconds;
-            $youtubeEmbed = 'https://www.youtube.com/embed/' . $m[1] .
-                '?start=' . $seconds;
-
-            return
-                <<<EOT
-<div class="media youtube">
-    <div class="summary">
-        Watch Youtube Video:
-        <a href="{$youtubeLink}">
-            {$youtubeLink}
-        </a>
-    </div>
-    <div class="open">
-        <a href="{$youtubeLink}" class="popout">
-            Popout
-        </a>
-        &middot;
-        <a href="{$youtubeLink}" class="inline">
-            Inline
-        </a>
-    </div>
-    <div class="movie" style="display:none">
-        <iframe width="560" height="315" frameborder="0" allowfullscreen="" src="{$youtubeEmbed}">
-        </iframe>
-    </div>
-</div>
-EOT;
-        }
-        if (false !== mb_strpos($m[1], 'vimeo')) {
-            preg_match('@(?:vimeo.com|video)/(\\d+)@', $m[1], $id);
-
-            $vimeoLink = 'https://vimeo.com/' . $id[1];
-            $vimeoEmbed = 'https://player.vimeo.com/video/' .
-                $id[1] . '?title=0&byline=0&portrait=0';
-
+        function youtubeEmbedHTML($link, $embedUrl) {
             return <<<EOT
-<div class="media vimeo">
-    <div class="summary">
-        Watch Vimeo Video:
-        <a href="{$vimeoLink}">
-            {$vimeoLink}
-        </a>
-    </div>
-    <div class="open">
-        <a href="{$vimeoLink}" class="popout">
-            Popout
-        </a>
-        &middot;
-        <a href="{$vimeoLink}" class="inline">
-            Inline
-        </a>
-    </div>
-    <div class="movie" style="display:none">
-        <iframe src="{$vimeoEmbed}" width="400" height="300" frameborder="0"
-            webkitAllowFullScreen allowFullScreen></iframe>
-    </div>
-</div>
-EOT;
+            <div class="media youtube">
+                <div class="summary">
+                    Watch Youtube Video:
+                    <a href="{$link}">
+                        {$link}
+                    </a>
+                </div>
+                <div class="open">
+                    <a href="{$link}" class="popout">
+                        Popout
+                    </a>
+                    &middot;
+                    <a href="{$link}" class="inline">
+                        Inline
+                    </a>
+                </div>
+                <div class="movie" style="display:none">
+                    <iframe width="560" height="315" src="{$embedUrl}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+            </div>
+            EOT;
         }
+        
+        switch(true) {
+            // Example URL: https://www.youtube.com/watch?v=7LuwPdp-_4c
+            case str_contains($m[1], 'youtube.com'):
+                preg_match('@v=([\\w-]+)@', $m[1], $youtubeMatches);
+                $embedUrl = "https://www.youtube.com/embed/{$youtubeMatches[1]}";
+    
+                return youtubeEmbedHTML($m[1], $embedUrl);
+                break;
 
-        return '-Invalid Video URL-';
+            // Example URL: https://youtu.be/7LuwPdp-_4c?si=8EMZ8yxxXIXkguem&t=1024
+            case str_contains($m[1], 'youtu.be'):
+                preg_match('@youtu.be/(?P<params>.+)$@', $m[1], $youtubeMatches);
+                $embedUrl = "https://www.youtube.com/embed/{$youtubeMatches[1]}";
+
+                return youtubeEmbedHTML($m[1], $embedUrl);
+            
+            default:
+                return '-Invalid Video Url-';
+        }
     }
 
     public function bbcode_licallback($m)
