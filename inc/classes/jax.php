@@ -588,7 +588,7 @@ EOT
             // Example URL: https://youtu.be/7LuwPdp-_4c?si=8EMZ8yxxXIXkguem&t=1024
             case str_contains($m[1], 'youtu.be'):
                 preg_match('@youtu.be/(?P<params>.+)$@', $m[1], $youtubeMatches);
-                $embedUrl = "https://www.youtube.com/embed/{$youtubeMatches[1]}";
+                $embedUrl = "https://www.youtube.com/embed/{$youtubeMatches['params']}";
 
                 return youtubeEmbedHTML($m[1], $embedUrl);
 

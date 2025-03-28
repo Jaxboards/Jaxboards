@@ -563,7 +563,6 @@ class MySQL
     {
         global $CFG,$USER,$SESS;
         $idletimeout = time() - $CFG['timetoidle'];
-        $r = array('guestcount' => 0);
         if (!$this->usersOnlineCache) {
             $result = $this->safespecial(
                 <<<'EOT'
@@ -604,8 +603,6 @@ EOT
                     if (!isset($r[$f['uid']]) || !$r[$f['uid']]) {
                         $r[$f['uid']] = $f;
                     }
-                } else {
-                    ++$r['guestcount'];
                 }
             }
 
