@@ -1129,11 +1129,13 @@ MySQL,
                 PHP_EOL . PHP_EOL
             );
         } else {
-            if (!in_array($pid, explode(' ', $SESS->vars['multiquote']))) {
+            $multiquote = (string) ($SESS->vars['multiquote'] ?? '');
+            $multiquotes = $multiquote != '' ? explode(',', $multiquote) : [];
+            if (!in_array((string) $pid, $multiquotes, true)) {
+                $multiquotes[] = $pid;
                 $SESS->addvar(
                     'multiquote',
-                    $SESS->vars['multiquote'] ? $SESS->vars['multiquote'] . ',' .
-                    $pid : $pid
+                    implode(',', $multiquotes)
                 );
             }
             // This line toggles whether or not the qreply window should open
