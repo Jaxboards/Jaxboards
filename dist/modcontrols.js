@@ -2273,6 +2273,7 @@
         const href = link.getAttribute('href');
         if (href.charAt(0) === '?') {
           const oldclick = link.onclick;
+          link.onclick = undefined;
           link.addEventListener('click', (event) => {
             // Some links have an onclick that returns true/false based on whether
             // or not the link should execute.

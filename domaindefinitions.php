@@ -6,40 +6,45 @@
  *
  * PHP Version 5.4.0
  *
- * @see https://github.com/jaxboards/jaxboards Jaxboards Github Repo
+ * @category Jaxboards
+ * @package  Jaxboards
+ *
+ * @author  Sean Johnson <seanjohnson08@gmail.com>
+ * @author  World's Tallest Ladder <wtl420@users.noreply.github.com>
+ * @license MIT <https://opensource.org/licenses/MIT>
+ *
+ * @link https://github.com/jaxboards/jaxboards Jaxboards Github Repo
  */
+
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', __DIR__);
 }
 
 // This file must be required after mysql connecting.
 if (!isset($DB)) {
-    echo 'This file must be required after mysql connecting';
-
-    exit(1);
+    die('This file must be required after mysql connecting');
 }
 
 // Figure out url.
 $host = $_SERVER['SERVER_NAME'];
 // Build the url.
-$baseURL = '//' . ($_SERVER['SERVER_NAME'] ?? $CFG['domain']);
+$baseURL = "//" . ($_SERVER['SERVER_NAME'] ?? $CFG['domain']);
 if (
-    !($_SERVER['SERVER_PORT'] === '443' && $_SERVER['REQUEST_SCHEME'] === 'https')
-    && !($_SERVER['SERVER_PORT'] === '80' && $_SERVER['REQUEST_SCHEME'] === 'http')
+    !('443' === $_SERVER['SERVER_PORT'] && 'https' === $_SERVER['REQUEST_SCHEME'])
+    && !('80' === $_SERVER['SERVER_PORT'] && 'http' === $_SERVER['REQUEST_SCHEME'])
 ) {
     $baseURL .= (isset($_SERVER['SERVER_PORT']) ? ':' . $_SERVER['SERVER_PORT'] : '');
 }
-
 define('BOARDURL', $baseURL . '/');
 
 define('SOUNDSURL', BOARDURL . 'Sounds/');
 define('SCRIPTURL', BOARDURL . 'Script/');
 define('FLAGURL', BOARDURL . 'Service/flags/');
 
-$domain_match = str_replace('.', '\.', $CFG['domain']);
+$domain_match = str_replace('.', '\\.', $CFG['domain']);
 // Get prefix.
 if ($CFG['service']) {
-    preg_match('@(.*)\.' . $domain_match . '@i', (string) $host, $matches);
+    preg_match('@(.*)\\.' . $domain_match . '@i', $host, $matches);
     if (isset($matches[1]) && $matches[1]) {
         $prefix = $matches[1];
         $CFG['prefix'] = $prefix;
@@ -60,7 +65,6 @@ if ($prefix) {
     if ($DB) {
         $DB->prefix($CFG['sql_prefix']);
     }
-
     $tempCFG = $CFG;
     if (@include_once BOARDCONFIG) {
         $CFG = array_merge($tempCFG, $CFG);
