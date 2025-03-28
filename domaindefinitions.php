@@ -28,10 +28,7 @@ if (!isset($DB)) {
 // Figure out url.
 $host = $_SERVER['SERVER_NAME'];
 // Build the url.
-$baseURL = (isset($_SERVER['REQUEST_SCHEME']) ?
-    $_SERVER['REQUEST_SCHEME'] : 'https') . '://';
-$baseURL .= (isset($_SERVER['SERVER_NAME']) ?
-    $_SERVER['SERVER_NAME'] : $CFG['domain']);
+$baseURL = "//" . ($_SERVER['SERVER_NAME'] ?? $CFG['domain']);
 if (
     !('443' === $_SERVER['SERVER_PORT'] && 'https' === $_SERVER['REQUEST_SCHEME'])
     && !('80' === $_SERVER['SERVER_PORT'] && 'http' === $_SERVER['REQUEST_SCHEME'])
