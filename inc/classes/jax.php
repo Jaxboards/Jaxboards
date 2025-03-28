@@ -550,7 +550,8 @@ EOT
 
     public function bbcode_videocallback($m)
     {
-        function youtubeEmbedHTML($link, $embedUrl) {
+        function youtubeEmbedHTML($link, $embedUrl)
+        {
             return <<<EOT
             <div class="media youtube">
                 <div class="summary">
@@ -574,13 +575,13 @@ EOT
             </div>
             EOT;
         }
-        
-        switch(true) {
+
+        switch (true) {
             // Example URL: https://www.youtube.com/watch?v=7LuwPdp-_4c
             case str_contains($m[1], 'youtube.com'):
                 preg_match('@v=([\\w-]+)@', $m[1], $youtubeMatches);
                 $embedUrl = "https://www.youtube.com/embed/{$youtubeMatches[1]}";
-    
+
                 return youtubeEmbedHTML($m[1], $embedUrl);
                 break;
 
@@ -590,7 +591,7 @@ EOT
                 $embedUrl = "https://www.youtube.com/embed/{$youtubeMatches[1]}";
 
                 return youtubeEmbedHTML($m[1], $embedUrl);
-            
+
             default:
                 return '-Invalid Video Url-';
         }
