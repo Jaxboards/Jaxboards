@@ -53,7 +53,8 @@ class members
 
         $pages = '';
 
-        $memberquery = $DB->safespecial(<<<MySQL
+        $memberquery = $DB->safespecial(
+            <<<MySQL
             SELECT
                 m.`id` AS `id`,
                 m.`name` AS `name`,
