@@ -20,7 +20,7 @@ switch ($_GET['act']) {
             [
                 'id',
                 'display_name',
-            ]
+            ],
             'members',
             'WHERE `display_name` LIKE ? ORDER BY `display_name` LIMIT 10',
             $DB->basicvalue(

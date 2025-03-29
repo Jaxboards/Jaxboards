@@ -1261,6 +1261,7 @@ final class TOPIC
     public function findpost($pid): void
     {
         global $PAGE,$DB;
+        $couldntfindit = false;
         if (!is_numeric($pid)) {
             $couldntfindit = true;
         } else {

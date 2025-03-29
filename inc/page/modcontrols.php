@@ -114,14 +114,14 @@ final class modcontrols
                         'lp_uid',
                         'mods',
                         'nocount',
-                        'order',
+                        '`order`',
                         'orderby',
                         'path',
                         'perms',
                         'posts',
                         'redirect',
                         'redirects',
-                        'show_ledby'
+                        'show_ledby',
                         'show_sub',
                         'subtitle',
                         'title',
@@ -303,7 +303,7 @@ final class modcontrols
                 'id',
                 'newtopic',
                 'post',
-                'rating'
+                'rating',
                 'showemotes',
                 'showsig',
                 'tid',
@@ -627,7 +627,6 @@ final class modcontrols
         // Get trashcan id.
         $result = $DB->safeselect(
             ['id'],
-            ]
             'forums',
             'WHERE `trashcan`=1 LIMIT 1',
         );
@@ -909,7 +908,7 @@ final class modcontrols
                         'group_id',
                         'id',
                         'location',
-                        'mod',
+                        '`mod`',
                         'name',
                         'notify_pm',
                         'notify_postinmytopic',
@@ -967,7 +966,7 @@ final class modcontrols
                         'group_id',
                         'id',
                         'location',
-                        'mod',
+                        '`mod`',
                         'name',
                         'notify_pm',
                         'notify_postinmytopic',
