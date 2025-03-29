@@ -222,7 +222,17 @@ final class MySQL
             where the first " = ?," comes from the implode.
          */
 
-        return '`' . implode('` = ?, `', array_keys($kvarray)) . '` = ?';
+        return implode(PHP_EOL . ', ', array_map(
+            static function (string $key): string {
+                $value = '?';
+                if ($key === 'ip') {
+                    $value = 'INET6_ATON(?)';
+                }
+
+                return "`{$key}` = {$value}";
+            },
+            array_keys($kvarray),
+        ));
     }
 
     public function buildUpdate($a): string
