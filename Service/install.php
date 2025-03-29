@@ -315,7 +315,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         // fwrite($file, '');
         // fclose($file);
         // Send us to the service page.
-        header('Location: ' . dirname((string) $_SERVER['REQUEST_URI']));
+        header('Refresh:0');
     }
 }
 
@@ -330,8 +330,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
 </head>
 <body onload="if(top.location!=self.location) top.location=self.location">
 <div id='container'>
-<div id='logo'>
-    <a href="https://<?php echo $_SERVER['REQUEST_URI']; ?>">&nbsp;</a>
+<div id='logo'/>
 </div>
   <div id='content'>
    <div class='box'>
