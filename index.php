@@ -389,10 +389,6 @@ $pagegen = '';
 
 if (in_array($JAX->getIp(), ['127.0.0.1', '::1'])) {
     $debug = '';
-    foreach ($DB->queryRuntime as $k => $v) {
-        $debug .= "<b>{$v}</b> " . $DB->queryList[$k] . '<br>';
-        $qtime += $v;
-    }
 
     $debug .= $PAGE->debug() . '<br>';
     $PAGE->JS('update', '#query .content', $debug);
