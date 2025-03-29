@@ -17,22 +17,23 @@ if (!isset($DB)) {
     exit('This file must be required after mysql connecting');
 }
 
+function pathjoin(...$paths) {
+    return preg_replace('@\/+@', '/', implode('/', $paths) . '/');
+}
+
 // Figure out url.
 $host = $_SERVER['SERVER_NAME'];
 // Build the url.
-$baseURL = '//' . ($_SERVER['SERVER_NAME'] ?? $CFG['domain']);
+$boardURL = '//' . ($_SERVER['SERVER_NAME'] ?? $CFG['domain']);
 if (
     !($_SERVER['SERVER_PORT'] === '443' && $_SERVER['REQUEST_SCHEME'] === 'https')
     && !($_SERVER['SERVER_PORT'] === '80' && $_SERVER['REQUEST_SCHEME'] === 'http')
 ) {
-    $baseURL .= (isset($_SERVER['SERVER_PORT']) ? ':' . $_SERVER['SERVER_PORT'] : '');
+    $boardURL .= (isset($_SERVER['SERVER_PORT']) ? ':' . $_SERVER['SERVER_PORT'] : '');
 }
 
-define('BOARDURL', $baseURL . '/');
-
-define('SOUNDSURL', BOARDURL . 'Sounds/');
-define('SCRIPTURL', BOARDURL . 'Script/');
-define('FLAGURL', BOARDURL . 'Service/flags/');
+define('BOARDURL', $boardURL . '/');
+define('SOUNDSURL', pathjoin(BOARDURL, 'Sounds'));
 
 $domain_match = str_replace('.', '\.', $CFG['domain']);
 // Get prefix.
@@ -50,17 +51,16 @@ if ($CFG['service']) {
 }
 
 if ($prefix) {
-    define('BOARDPATH', JAXBOARDS_ROOT . '/boards/' . $prefix . '/');
-    define('BOARDPATHURL', BOARDURL . 'boards/' . $prefix . '/');
-    define('STHEMEPATH', JAXBOARDS_ROOT . '/Service/Themes/');
-    define('AVAURL', BOARDURL . 'Service/Themes/Default/avatars/');
-    define('BOARDCONFIG', BOARDPATH . 'config.php');
+    define('BOARDPATH', pathjoin(JAXBOARDS_ROOT, 'boards',  $prefix));
+    define('BOARDPATHURL', pathjoin(BOARDURL, 'boards', $prefix));
+    define('STHEMEPATH', pathjoin(JAXBOARDS_ROOT, 'Service/Themes'));
+    define('AVAURL', pathjoin(BOARDURL, 'Service/Themes/Default/avatars'));
     if ($DB) {
         $DB->prefix($CFG['sql_prefix']);
     }
 
     $tempCFG = $CFG;
-    if (@include_once BOARDCONFIG) {
+    if (@include_once BOARDPATH . 'config.php') {
         $CFG = array_merge($tempCFG, $CFG);
     } else {
         $CFG['noboard'] = 1;
