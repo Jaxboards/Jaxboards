@@ -11,6 +11,7 @@ final class MySQL
      * @var bool
      */
     public $nolog;
+
     public $lastQuery;
 
     public $queryList = [];
@@ -67,7 +68,7 @@ final class MySQL
         return '`' . $this->prefix . $a . '`';
     }
 
-    public function error($use_mysqli = 0)
+    public function error()
     {
         if ($this->mysqli_connection) {
             return $this->mysqli_connection->error;
@@ -76,7 +77,7 @@ final class MySQL
         return '';
     }
 
-    public function affected_rows($use_mysqli = 0)
+    public function affected_rows()
     {
         if ($this->mysqli_connection) {
             return $this->mysqli_connection->affected_rows;
@@ -125,7 +126,7 @@ final class MySQL
         return $this->safequery(...$va_array);
     }
 
-    public function insert_id($use_mysqli = 0)
+    public function insert_id()
     {
         if ($this->mysqli_connection) {
             return $this->mysqli_connection->insert_id;
@@ -262,7 +263,7 @@ final class MySQL
     }
 
     // Only new-style mysqli.
-    public function arows($a = null)
+    public function arows($a = null): array|false
     {
         $a = $a ?: $this->lastQuery;
         if ($a) {
@@ -273,7 +274,7 @@ final class MySQL
     }
 
     // Only new-style mysqli.
-    public function rows($a = null)
+    public function rows($a = null): array|false
     {
         $a = $a ?: $this->lastQuery;
         if ($a) {
@@ -393,10 +394,10 @@ final class MySQL
                     $query_string = $this->safequery_sub_array(
                         $query_string,
                         $i + $added_placeholders,
-                        mb_strlen((string) $type),
+                        mb_strlen($type),
                     );
 
-                    $added_placeholders += mb_strlen((string) $type) - 1;
+                    $added_placeholders += mb_strlen($type) - 1;
 
                     foreach ($value as $singlevalue) {
                         if ($singlevalue === null) {
@@ -509,7 +510,7 @@ final class MySQL
     }
 
     // Like evalue, but does not quote strings.  For use with safequery().
-    public function basicvalue($value, $forsprintf = 0)
+    public function basicvalue($value)
     {
         if (is_array($value)) {
             return $value[0];
@@ -625,13 +626,10 @@ final class MySQL
                 }
 
                 unset($f['id'], $f['dob']);
-                if (
-                    !$f['uid']
-                    || (
-                        isset($return[$f['uid']])
-                        && $return[$f['uid']]
-                    )
-                ) {
+                if (!$f['uid']) {
+                    continue;
+                }
+                if (isset($return[$f['uid']]) && $return[$f['uid']]) {
                     continue;
                 }
 
@@ -742,7 +740,7 @@ final class MySQL
      */
     private function fetchAll(
         mysqli_result $result,
-        $resultType = MYSQLI_ASSOC,
+        int $resultType = MYSQLI_ASSOC,
     ): array {
         if (function_exists('mysqli_fetch_all')) {
             return $result->fetch_all($resultType);
