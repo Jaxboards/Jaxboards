@@ -200,7 +200,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                       `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
                       `registrar_email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
                       `registrar_ip` varbinary(16) NOT NULL DEFAULT '',
-                      `date` datetime NOT NULL DEFAULT '1970-01-01 00:00:00',
+                      `date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
                       `boardname` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
                       `referral` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
                       PRIMARY KEY (`id`)
