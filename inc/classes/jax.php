@@ -991,7 +991,7 @@ final class JAX
     public function parsereadmarkers($readmarkers)
     {
         if ($readmarkers) {
-            return json_decode((string) $readmarkers, true);
+            return json_decode((string) $readmarkers, true) ?? [];
         }
 
         return [];

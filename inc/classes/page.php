@@ -28,11 +28,6 @@ final class PAGE
     /**
      * @var bool
      */
-    public $jsnewloc = false;
-
-    /**
-     * @var bool
-     */
     public $jsdirectlink = false;
 
     /**
@@ -61,7 +56,7 @@ final class PAGE
         $this->jsnewlocation = $this->jsaccess >= 2;
         $this->jsnewloc = $this->jsaccess >= 2;
         $this->jsdirectlink = ($this->jsaccess === 3);
-        $this->mobile = mb_stripos((string) $_SERVER['HTTP_USER_AGENT'], 'mobile') !== false;
+        $this->mobile = str_contains((string) $_SERVER['HTTP_USER_AGENT'], 'mobile');
     }
 
     public function get($a)

@@ -32,7 +32,7 @@ final class userprofile
         if ($id === '' || $id === '0') {
             $PAGE->location('?');
         } elseif (
-            $PAGE->jsnewloc
+            $PAGE->jsnewlocation
             && !$PAGE->jsdirectlink
             && !$JAX->b['view']
         ) {
