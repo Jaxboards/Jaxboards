@@ -241,10 +241,10 @@ final class groups
 
         $permissionsChart = [
             'Global' => [
-                'can_view_board' => 'View Online Board',
-                'can_view_offline_board' => 'View Offline Board',
                 'can_access_acp' => 'Access ACP',
                 'can_moderate' => 'Global Moderator',
+                'can_view_board' => 'View Online Board',
+                'can_view_offline_board' => 'View Offline Board',
             ],
 
             'Members' => [
@@ -252,20 +252,16 @@ final class groups
             ],
 
             'Posts' => [
-                'can_post' => 'Create',
-                'can_edit_posts' => 'Edit',
-                'can_delete_own_posts' => '*Delete Own Posts',
                 'can_attach' => 'Attach files',
+                'can_delete_own_posts' => '*Delete Own Posts',
+                'can_edit_posts' => 'Edit',
+                'can_post' => 'Create',
                 'can_use_sigs' => '*Can have signatures',
             ],
 
-            'Topics' => [
-                'can_post_topics' => 'Create',
-                'can_edit_topics' => 'Edit',
-                'can_poll' => 'Add Polls',
-                'can_delete_own_topics' => '*Delete Own Topics',
-                'can_lock_own_topics' => '*Lock Own Topics',
-                'can_override_locked_topics' => 'Post in locked topics',
+            'Private/Instant Messaging' => [
+                'can_im' => 'Can IM',
+                'can_pm' => 'Can PM',
             ],
 
             'Profiles' => [
@@ -275,10 +271,10 @@ final class groups
             ],
 
             'Shoutbox' => [
-                'can_view_shoutbox' => 'View Shoutbox',
-                'can_shout' => 'Can Shout',
-                'can_delete_shouts' => 'Delete All Shouts',
                 'can_delete_own_shouts' => 'Delete Own Shouts',
+                'can_delete_shouts' => 'Delete All Shouts',
+                'can_shout' => 'Can Shout',
+                'can_view_shoutbox' => 'View Shoutbox',
             ],
 
             'Statistics' => [
@@ -286,9 +282,13 @@ final class groups
                 'legend' => 'Display in Legend',
             ],
 
-            'Private/Instant Messaging' => [
-                'can_pm' => 'Can PM',
-                'can_im' => 'Can IM',
+            'Topics' => [
+                'can_delete_own_topics' => '*Delete Own Topics',
+                'can_edit_topics' => 'Edit',
+                'can_lock_own_topics' => '*Lock Own Topics',
+                'can_override_locked_topics' => 'Post in locked topics',
+                'can_poll' => 'Add Polls',
+                'can_post_topics' => 'Create',
             ],
         ];
         $permissionsTable = '';
@@ -301,7 +301,7 @@ final class groups
                 ],
             ) . PHP_EOL;
 
-            foreach($permissions as $k => $v) {
+            foreach ($permissions as $k => $v) {
                 $groupColumns = '';
                 foreach ($perms as $groupId => $groupData) {
                     $groupColumns .= $PAGE->parseTemplate(
@@ -323,7 +323,6 @@ final class groups
                     ],
                 ) . PHP_EOL;
             }
-
         }
 
         $page .= $PAGE->parseTemplate(
