@@ -8,7 +8,7 @@ final class PAGE
 
     public $JSOutput = [];
 
-    public $jsaccess = false;
+    public $jsaccess = 0;
 
     /**
      * @var null|string Store the UCP page data
