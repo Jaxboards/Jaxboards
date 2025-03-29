@@ -8,7 +8,6 @@ class PAGE
     public $jsaccess = '';
     public $jsupdate = false;
     public $jsnewlocation = false;
-    public $jsnewloc = false;
     public $jsdirectlink = false;
     public $mobile = false;
     public $parts = array();
@@ -25,7 +24,7 @@ class PAGE
         $this->jsaccess = isset($_SERVER['HTTP_X_JSACCESS']) ?
             $_SERVER['HTTP_X_JSACCESS'] : false;
         $this->jsupdate = (1 == $this->jsaccess);
-        $this->jsnewlocation = $this->jsnewloc = ($this->jsaccess >= 2);
+        $this->jsnewlocation = ($this->jsaccess >= 2);
         $this->jsdirectlink = (3 == $this->jsaccess);
         $this->mobile = false !== mb_stripos($_SERVER['HTTP_USER_AGENT'], 'mobile');
         $this->parts = array();

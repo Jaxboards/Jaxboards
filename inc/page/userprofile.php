@@ -30,7 +30,7 @@ class userprofile
         }
         if (!$id) {
             $PAGE->location('?');
-        } elseif ($PAGE->jsnewloc && !$PAGE->jsdirectlink && !$JAX->b['view']) {
+        } elseif ($PAGE->jsnewlocation && !$PAGE->jsdirectlink && !$JAX->b['view']) {
             $this->showcontactcard($id);
         } else {
             $this->showfullprofile($id);
