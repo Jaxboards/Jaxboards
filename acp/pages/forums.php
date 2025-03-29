@@ -79,7 +79,9 @@ final class forums
                 }
 
                 $classes = [];
-                $classes[] = is_string($id) && $id[0] === 'c' ? 'parentlock' : 'nofirstlevel';
+                $classes[] = is_string($id) && $id[0] === 'c'
+                    ? 'parentlock'
+                    : 'nofirstlevel';
 
                 if ($highlight && $id === $highlight) {
                     $classes[] = 'highlight';
@@ -243,7 +245,7 @@ final class forums
             [
                 'id',
                 'title',
-                '`order`'
+                '`order`',
             ],
             'categories',
             'ORDER BY `order`,`id` ASC',
@@ -255,7 +257,8 @@ final class forums
 
         $DB->disposeresult($result);
 
-        $result = $DB->safeselect([
+        $result = $DB->safeselect(
+            [
                 'id',
                 'cat_id',
                 'title',
@@ -276,9 +279,8 @@ final class forums
                 'redirects',
                 'trashcan',
                 'mods',
-                'show_ledby'
-        ]
-            ,
+                'show_ledby',
+            ],
             'forums',
             'ORDER BY `order`,`title`',
         );
@@ -345,7 +347,8 @@ final class forums
         $forumperms = '';
         $fdata = [];
         if ($fid) {
-            $result = $DB->safeselect([
+            $result = $DB->safeselect(
+                [
                     'id',
                     'cat_id',
                     'title',
@@ -366,9 +369,8 @@ final class forums
                     'redirects',
                     'trashcan',
                     'mods',
-                    'show_ledby'
-                ]
-                ,
+                    'show_ledby',
+                ],
                 'forums',
                 'WHERE `id`=?',
                 $DB->basicvalue($fid),
@@ -478,57 +480,57 @@ final class forums
 
             // Add per-forum moderator.
             if (is_numeric($JAX->p['modid'])) {
-                $result = $DB->safeselect([
-                    'about',
-                    'avatar',
-                    'birthdate',
-                    'contact_aim',
-                    'contact_bluesky',
-                    'contact_discord',
-                    'contact_gtalk',
-                    'contact_msn',
-                    'contact_skype',
-                    'contact_steam',
-                    'contact_twitter',
-                    'contact_yim',
-                    'contact_youtube',
-                    'display_name',
-                    'email_settings',
-                    'email',
-                    'enemies',
-                    'friends',
-                    'full_name',
-                    'gender',
-                    'group_id',
-                    'id',
-                    'location',
-                    'mod',
-                    'name',
-                    'notify_pm',
-                    'notify_postinmytopic',
-                    'notify_postinsubscribedtopic',
-                    'nowordfilter',
-                    'pass',
-                    'posts',
-                    'sig',
-                    'skin_id',
-                    'sound_im',
-                    'sound_pm',
-                    'sound_postinmytopic',
-                    'sound_postinsubscribedtopic',
-                    'sound_shout',
-                    'ucpnotepad',
-                    'usertitle',
-                    'website',
-                    'wysiwyg',
-                    'DAY(`birthdate`) AS `dob_day`',
-                    'INET6_NTOA(`ip`) AS `ip`',
-                    'MONTH(`birthdate`) AS `dob_month`',
-                    'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
-                    'UNIX_TIMESTAMP(`last_visit`) AS `last_visit`',
-                    'YEAR(`birthdate`) AS `dob_year`'
-                ]
-                    ,
+                $result = $DB->safeselect(
+                    [
+                        'about',
+                        'avatar',
+                        'birthdate',
+                        'contact_aim',
+                        'contact_bluesky',
+                        'contact_discord',
+                        'contact_gtalk',
+                        'contact_msn',
+                        'contact_skype',
+                        'contact_steam',
+                        'contact_twitter',
+                        'contact_yim',
+                        'contact_youtube',
+                        'display_name',
+                        'email_settings',
+                        'email',
+                        'enemies',
+                        'friends',
+                        'full_name',
+                        'gender',
+                        'group_id',
+                        'id',
+                        'location',
+                        'mod',
+                        'name',
+                        'notify_pm',
+                        'notify_postinmytopic',
+                        'notify_postinsubscribedtopic',
+                        'nowordfilter',
+                        'pass',
+                        'posts',
+                        'sig',
+                        'skin_id',
+                        'sound_im',
+                        'sound_pm',
+                        'sound_postinmytopic',
+                        'sound_postinsubscribedtopic',
+                        'sound_shout',
+                        'ucpnotepad',
+                        'usertitle',
+                        'website',
+                        'wysiwyg',
+                        'DAY(`birthdate`) AS `dob_day`',
+                        'INET6_NTOA(`ip`) AS `ip`',
+                        'MONTH(`birthdate`) AS `dob_month`',
+                        'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
+                        'UNIX_TIMESTAMP(`last_visit`) AS `last_visit`',
+                        'YEAR(`birthdate`) AS `dob_year`',
+                    ],
                     'members',
                     'WHERE `id`=?',
                     $DB->basicvalue($JAX->p['modid']),
@@ -601,7 +603,8 @@ final class forums
             }
         }
 
-        $result = $DB->safeselect([
+        $result = $DB->safeselect(
+            [
                 'can_access_acp',
                 'can_add_comments',
                 'can_attach',
@@ -632,7 +635,7 @@ final class forums
                 'icon',
                 'id',
                 'legend',
-                'title'
+                'title',
             ],
             'member_groups',
         );
@@ -881,7 +884,7 @@ final class forums
                 'title',
                 'topics',
                 'trashcan',
-                'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`'
+                'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
             ],
             'forums',
             'WHERE `id`=?',
@@ -919,9 +922,8 @@ final class forums
                 'title',
                 'topics',
                 'trashcan',
-                'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`'
-            ]
-            ,
+                'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
+            ],
             'forums',
         );
         $forums = '';
