@@ -10,6 +10,7 @@ new POST();
 final class POST
 {
     public $canmod;
+
     public $postdata = '';
 
     public $postpreview = '';
@@ -514,7 +515,7 @@ onclick="this.form.submitButton=this"/></div>
                         [
                             'subtitle' => $JAX->blockhtml($JAX->p['tdesc']),
                             'summary' => mb_substr(
-                                preg_replace(
+                                (string) preg_replace(
                                     '@\s+@',
                                     ' ',
                                     (string) $JAX->wordfilter(
@@ -609,10 +610,12 @@ onclick="this.form.submitButton=this"/></div>
                 $pollchoices = [];
                 $pollChoice = preg_split("@[\r\n]+@", (string) $JAX->p['pollchoices']);
                 foreach ($pollChoice as $v) {
-                    if (trim($v) === '' || trim($v) === '0') {
+                    if (trim($v) === '') {
                         continue;
                     }
-
+                    if (trim($v) === '0') {
+                        continue;
+                    }
                     $pollchoices[] = $JAX->blockhtml($v);
                 }
 
@@ -676,7 +679,7 @@ onclick="this.form.submitButton=this"/></div>
                         'replies' => 0,
                         'subtitle' => $JAX->blockhtml($JAX->p['tdesc']),
                         'summary' => mb_substr(
-                            preg_replace(
+                            (string) preg_replace(
                                 '@\s+@',
                                 ' ',
                                 (string) $JAX->blockhtml(
