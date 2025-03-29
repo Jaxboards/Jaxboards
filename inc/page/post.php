@@ -613,9 +613,11 @@ onclick="this.form.submitButton=this"/></div>
                     if (trim($v) === '') {
                         continue;
                     }
+
                     if (trim($v) === '0') {
                         continue;
                     }
+
                     $pollchoices[] = $JAX->blockhtml($v);
                 }
 
