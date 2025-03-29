@@ -2,10 +2,6 @@
 
 final class MySQL
 {
-    /**
-     * @var bool
-     */
-    public $debugMode;
 
     /**
      * @var bool
@@ -15,8 +11,6 @@ final class MySQL
     public $lastQuery;
 
     public $queryList = [];
-
-    public $queryRuntime = [];
 
     public $connected = false;
 
@@ -46,11 +40,6 @@ final class MySQL
         $this->db = $database;
 
         return (bool) $this->mysqli_connection;
-    }
-
-    public function debug_mode(): void
-    {
-        $this->debugMode = true;
     }
 
     public function nolog(): void
