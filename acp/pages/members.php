@@ -374,7 +374,7 @@ final class members
                 $page .= $PAGE->error($e);
             } else {
                 $member = [
-                    'birthdate' => '0000-00-00',
+                    'birthdate' => '1970-01-01',
                     'display_name' => $JAX->p['displayname'],
                     'group_id' => 1,
                     'last_visit' => date('Y-m-d H:i:s', time()),
@@ -638,7 +638,7 @@ final class members
                 $DB->safeupdate(
                     'forums',
                     [
-                        'lp_date' => '0000-00-00 00:00:00',
+                        'lp_date' => '1970-01-01 00:00:00',
                         'lp_tid' => null,
                         'lp_topic' => '',
                         'lp_uid' => null,
