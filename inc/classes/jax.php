@@ -629,9 +629,11 @@ final class JAX
             if (trim($v) === '') {
                 continue;
             }
+
             if (trim($v) === '0') {
                 continue;
             }
+
             $lis .= '<li>' . $v . ' </li>';
         }
 
@@ -836,9 +838,11 @@ final class JAX
                     if ($v === '') {
                         continue;
                     }
+
                     if ($v === '0') {
                         continue;
                     }
+
                     if ($v[0] === '#') {
                         continue;
                     }

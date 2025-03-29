@@ -66,7 +66,7 @@ final class TOPIC
         } elseif (isset($JAX->b['ratepost']) && $JAX->b['ratepost']) {
             $this->ratepost($JAX->b['ratepost'], $JAX->b['niblet']);
         } elseif (isset($JAX->b['votepoll']) && $JAX->b['votepoll']) {
-            $this->votepoll($id);
+            $this->votepoll();
         } elseif (isset($JAX->b['findpost']) && $JAX->b['findpost']) {
             $this->findpost($JAX->b['findpost']);
         } elseif (isset($JAX->b['getlast']) && $JAX->b['getlast']) {
@@ -290,9 +290,11 @@ final class TOPIC
             if (empty($f['uid'])) {
                 continue;
             }
+
             if ($f['location'] !== "vt{$id}") {
                 continue;
             }
+
             $usersonline .= isset($f['is_bot']) && $f['is_bot']
                 ? '<a class="user' . $f['uid'] . '">' . $f['name'] . '</a>'
                 : $PAGE->meta(
@@ -375,9 +377,11 @@ final class TOPIC
             if (!$f['uid']) {
                 continue;
             }
+
             if ($f['location'] !== "vt{$id}") {
                 continue;
             }
+
             if (!isset($oldcache[$f['uid']])) {
                 $list[] = [
                     $f['uid'],
@@ -647,6 +651,7 @@ final class TOPIC
                         if (!isset($prating[$k])) {
                             continue;
                         }
+
                         if (!$prating[$k]) {
                             continue;
                         }
@@ -957,9 +962,11 @@ final class TOPIC
                 $e = 'Invalid choice';
             }
         }
+
         if ($e !== '' && $e !== '0') {
             return $PAGE->JS('error', $e);
         }
+
         if ($row['poll_type'] === 'multi') {
             foreach ($choice as $c) {
                 $results[$c][] = $USER['id'];
@@ -967,11 +974,13 @@ final class TOPIC
         } else {
             $results[$choice][] = $USER['id'];
         }
+
         $presults = [];
         for ($x = 0; $x < $numchoices; ++$x) {
             $presults[$x] = isset($results[$x]) && $results[$x]
                 ? implode(',', $results[$x]) : '';
         }
+
         $presults = implode(';', $presults);
         $PAGE->JS(
             'update',
