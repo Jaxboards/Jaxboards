@@ -563,6 +563,7 @@ class MySQL
     {
         global $CFG,$USER,$SESS;
         $idletimeout = time() - $CFG['timetoidle'];
+        $return = [];
         if (!$this->usersOnlineCache) {
             $result = $this->safespecial(
                 <<<'EOT'
@@ -600,8 +601,8 @@ EOT
                 }
                 unset($f['id'], $f['dob']);
                 if ($f['uid']) {
-                    if (!isset($r[$f['uid']]) || !$r[$f['uid']]) {
-                        $r[$f['uid']] = $f;
+                    if (!isset($return[$f['uid']]) || !$return[$f['uid']]) {
+                        $return[$f['uid']] = $f;
                     }
                 }
             }
@@ -611,8 +612,8 @@ EOT
                 we'll want to include the user in the usersonline.
             */
 
-            if ($USER && isset($r[$USER['id']]) && $r[$USER['id']]) {
-                $r[$USER['id']] = array(
+            if ($USER && isset($return[$USER['id']]) && $return[$USER['id']]) {
+                $return[$USER['id']] = array(
                     'uid' => $USER['id'],
                     'group_id' => $USER['group_id'],
                     'last_action' => date('Y-m-d H:i:s', $SESS->last_action),
@@ -625,7 +626,7 @@ EOT
                     'location_verbose' => $SESS->location_verbose,
                 );
             }
-            $this->usersOnlineCache = $r;
+            $this->usersOnlineCache = $return;
         }
 
         return $this->usersOnlineCache;
