@@ -1,0 +1,24 @@
+# vi:ft=yaml
+# PHPStan configuration
+#
+# See https://phpstan.org/config-reference
+parameters:
+  bootstrapFiles:
+    - phpstan-bootstrap.php
+  excludePaths:
+    analyse:
+      - node_modules
+      - vendor
+  level: 8
+  paths:
+    - Script
+    - Service
+    - acp
+    - config.default.php
+    - domaindefinitions.php
+    - emoticons
+    - inc
+    - index.php
+    - misc
+    - php_codesniffer_to_sonarqube.php
+

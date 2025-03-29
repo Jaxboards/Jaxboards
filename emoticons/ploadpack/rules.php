@@ -1,18 +1,18 @@
 <?php
 
-$rules = array(
-    '8D' => 'awesome.png',
-    ':|' => 'blank.png',
-    'B)' => 'cool.png',
-    ':D' => 'grin.png',
-    ':)' => 'happy.png',
-    '&lt;3' => 'love.png',
+$rules = [
     '&gt;:(' => 'mad.png',
+    '&lt;3' => 'love.png',
+    '8D' => 'awesome.png',
+    ':(' => 'sad.png',
+    ':)' => 'happy.png',
+    ':/' => 'slant.png',
+    ':D' => 'grin.png',
     ':O' => 'oh.png',
     ':o' => 'oh.png',
-    ':(' => 'sad.png',
-    'X(' => 'sick.png',
-    ':/' => 'slant.png',
     ':P' => 'tongue.png',
     ':p' => 'tongue.png',
-);
+    ':|' => 'blank.png',
+    'B)' => 'cool.png',
+    'X(' => 'sick.png',
+];
