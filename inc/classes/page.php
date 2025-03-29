@@ -2,18 +2,13 @@
 
 final class PAGE
 {
-    /**
-     * @var bool
-     */
-    public $jsnewloc;
-
     public $metadefs = [];
 
     public $debuginfo = '';
 
     public $JSOutput = [];
 
-    public $jsaccess = '';
+    public $jsaccess = false;
 
     /**
      * @var null|string Store the UCP page data
@@ -56,11 +51,13 @@ final class PAGE
 
     public function __construct()
     {
-        $this->jsaccess = $_SERVER['HTTP_X_JSACCESS'] ?? false;
-        $this->jsupdate = ($this->jsaccess === 1);
-        $this->jsnewlocation = $this->jsaccess >= 2;
-        $this->jsnewloc = $this->jsaccess >= 2;
-        $this->jsdirectlink = ($this->jsaccess === 3);
+        $this->jsaccess = (int) ($_SERVER['HTTP_X_JSACCESS'] ?? 0);
+
+        if ($this->jsaccess) {
+            $this->jsupdate = $this->jsaccess === 1;
+            $this->jsnewlocation = $this->jsaccess >= 2;
+            $this->jsdirectlink = $this->jsaccess === 3;
+        }
         $this->mobile = str_contains((string) $_SERVER['HTTP_USER_AGENT'], 'mobile');
     }
 
