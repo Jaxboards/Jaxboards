@@ -240,60 +240,68 @@ final class groups
         }
 
         $permissionsChart = [
-            'breaker1' => 'Global',
+            'Global' => [
+                'can_view_board' => 'View Online Board',
+                'can_view_offline_board' => 'View Offline Board',
+                'can_access_acp' => 'Access ACP',
+                'can_moderate' => 'Global Moderator',
+            ],
 
-            'breaker2' => 'Members',
+            'Members' => [
+                'can_karma' => '*Change Karma',
+            ],
 
-            'breaker3' => 'Posts',
+            'Posts' => [
+                'can_post' => 'Create',
+                'can_edit_posts' => 'Edit',
+                'can_delete_own_posts' => '*Delete Own Posts',
+                'can_attach' => 'Attach files',
+                'can_use_sigs' => '*Can have signatures',
+            ],
 
-            'breaker4' => 'Topics',
+            'Topics' => [
+                'can_post_topics' => 'Create',
+                'can_edit_topics' => 'Edit',
+                'can_poll' => 'Add Polls',
+                'can_delete_own_topics' => '*Delete Own Topics',
+                'can_lock_own_topics' => '*Lock Own Topics',
+                'can_override_locked_topics' => 'Post in locked topics',
+            ],
 
-            'breaker5' => 'Profiles',
+            'Profiles' => [
+                'can_add_comments' => 'Add Comments',
+                'can_delete_comments' => '*Delete own Comments',
+                'can_view_fullprofile' => 'Can View Full Profile',
+            ],
 
-            'breaker6' => 'Shoutbox',
+            'Shoutbox' => [
+                'can_view_shoutbox' => 'View Shoutbox',
+                'can_shout' => 'Can Shout',
+                'can_delete_shouts' => 'Delete All Shouts',
+                'can_delete_own_shouts' => 'Delete Own Shouts',
+            ],
 
-            'breaker7' => 'Private/Instant Messaging',
+            'Statistics' => [
+                'can_view_stats' => 'View Board Stats',
+                'legend' => 'Display in Legend',
+            ],
 
-            'breaker8' => 'Statistics',
-            'can_access_acp' => 'Access ACP',
-            'can_add_comments' => 'Add Comments',
-            'can_attach' => 'Attach files',
-            'can_delete_comments' => '*Delete own Comments',
-            'can_delete_own_posts' => '*Delete Own Posts',
-            'can_delete_own_shouts' => 'Delete Own Shouts',
-            'can_delete_own_topics' => '*Delete Own Topics',
-            'can_delete_shouts' => 'Delete All Shouts',
-            'can_edit_posts' => 'Edit',
-            'can_edit_topics' => 'Edit',
-            'can_im' => 'Can IM',
-            'can_karma' => '*Change Karma',
-            'can_lock_own_topics' => '*Lock Own Topics',
-            'can_moderate' => 'Global Moderator',
-            'can_override_locked_topics' => 'Post in locked topics',
-            'can_pm' => 'Can PM',
-            'can_poll' => 'Add Polls',
-            'can_post' => 'Create',
-            'can_post_topics' => 'Create',
-            'can_shout' => 'Can Shout',
-            'can_use_sigs' => '*Can have signatures',
-            'can_view_board' => 'View Online Board',
-            'can_view_fullprofile' => 'Can View Full Profile',
-            'can_view_offline_board' => 'View Offline Board',
-            'can_view_shoutbox' => 'View Shoutbox',
-            'can_view_stats' => 'View Board Stats',
-            'legend' => 'Display in Legend',
+            'Private/Instant Messaging' => [
+                'can_pm' => 'Can PM',
+                'can_im' => 'Can IM',
+            ],
         ];
         $permissionsTable = '';
-        foreach ($permissionsChart as $k => $v) {
-            if (mb_substr($k, 0, 7) === 'breaker') {
-                $permissionsTable .= $PAGE->parseTemplate(
-                    'groups/show-permissions-breaker-row.html',
-                    [
-                        'column_count' => 1 + $numgroups,
-                        'title' => $v,
-                    ],
-                ) . PHP_EOL;
-            } else {
+        foreach ($permissionsChart as $category => $permissions) {
+            $permissionsTable .= $PAGE->parseTemplate(
+                'groups/show-permissions-breaker-row.html',
+                [
+                    'column_count' => 1 + $numgroups,
+                    'title' => $category,
+                ],
+            ) . PHP_EOL;
+
+            foreach($permissions as $k => $v) {
                 $groupColumns = '';
                 foreach ($perms as $groupId => $groupData) {
                     $groupColumns .= $PAGE->parseTemplate(
@@ -315,6 +323,7 @@ final class groups
                     ],
                 ) . PHP_EOL;
             }
+
         }
 
         $page .= $PAGE->parseTemplate(
