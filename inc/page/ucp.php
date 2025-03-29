@@ -384,14 +384,6 @@ final class UCP
             }
 
             $verified_password = password_verify((string) $JAX->p['curpass'], (string) $USER['pass']);
-            // Check if it's an old md5 hash.
-            if (
-                !$verified_password
-                && hash('md5', (string) $JAX->p['curpass']) === $USER['pass']
-            ) {
-                $verified_password = true;
-            }
-
             if (!$verified_password) {
                 $e = 'The password you entered is incorrect.';
             }

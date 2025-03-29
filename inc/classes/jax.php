@@ -242,13 +242,8 @@ final class JAX
         // Password parsing.
         if ($pass !== false) {
             $verified_password = password_verify((string) $pass, (string) $user['pass']);
-            if (!$verified_password) {
-                // Check if it's an old md5 hash.
-                if (hash('md5', (string) $pass) === $user['pass']) {
-                    $verified_password = true;
-                    $needs_rehash = true;
-                }
-            } else {
+            $needs_rehash = false;
+            if ($verified_password) {
                 $needs_rehash = password_needs_rehash(
                     $user['pass'],
                     PASSWORD_DEFAULT,
