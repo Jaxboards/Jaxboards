@@ -16,9 +16,8 @@ final class downloader
                     'uid',
                     'size',
                     'downloads',
-                    'INET6_NTOA(`ip`) AS `ip`'
+                    'INET6_NTOA(`ip`) AS `ip`',
                 ],
-
                 'files',
                 'WHERE `id`=?',
                 $id,

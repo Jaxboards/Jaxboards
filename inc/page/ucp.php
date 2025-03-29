@@ -24,7 +24,8 @@ final class UCP
             return;
         }
 
-        $result = $DB->safeselect([
+        $result = $DB->safeselect(
+            [
                 'about',
                 'avatar',
                 'birthdate',

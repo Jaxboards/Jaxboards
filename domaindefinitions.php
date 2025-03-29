@@ -27,6 +27,7 @@ if (
 ) {
     $baseURL .= (isset($_SERVER['SERVER_PORT']) ? ':' . $_SERVER['SERVER_PORT'] : '');
 }
+
 define('BOARDURL', $baseURL . '/jaxboards/');
 
 define('SOUNDSURL', BOARDURL . 'Sounds/');

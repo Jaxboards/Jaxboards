@@ -164,7 +164,7 @@ final class IM
             $result = $DB->safeselect(
                 [
                     'id',
-                    '`display_name` AS `name`'
+                    '`display_name` AS `name`',
                 ],
                 'members',
                 'WHERE `id` IN ? ORDER BY `name` ASC',

@@ -908,7 +908,7 @@ final class TOPIC
                     'poll_q',
                     'poll_results',
                     'poll_choices',
-                    'poll_type'
+                    'poll_type',
                 ],
                 'topics',
                 'WHERE `id`=?',
@@ -1085,7 +1085,8 @@ final class TOPIC
         }
 
         $PAGE->JS('softurl');
-        $result = $DB->safeselect([
+        $result = $DB->safeselect(
+            [
                 'auth_id',
                 'editby',
                 'id',
@@ -1097,7 +1098,7 @@ final class TOPIC
                 'tid',
                 'INET6_NTOA(`ip`) AS `ip`',
                 'UNIX_TIMESTAMP(`date`)',
-                'UNIX_TIMESTAMP(`edit_date`) AS `edit_date`'
+                'UNIX_TIMESTAMP(`edit_date`) AS `edit_date`',
             ],
             'posts',
             'WHERE `id`=?',
@@ -1129,7 +1130,8 @@ final class TOPIC
                         'tid' => $post['tid'],
                     ],
                 );
-                $result = $DB->safeselect([
+                $result = $DB->safeselect(
+                    [
                         'auth_id',
                         'cal_event',
                         'fid',
@@ -1351,7 +1353,7 @@ final class TOPIC
             [
                 'id',
                 'display_name',
-                'group_id'
+                'group_id',
             ],
             'members',
             'WHERE `id` IN ?',

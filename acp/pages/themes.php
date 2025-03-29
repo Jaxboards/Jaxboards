@@ -271,7 +271,7 @@ final class themes
                 'custom',
                 'wrapper',
                 '`default`',
-                'hidden'
+                'hidden',
             ],
             'skins',
             'ORDER BY title ASC',
@@ -373,7 +373,7 @@ final class themes
                 'custom',
                 'wrapper',
                 '`default`',
-                'hidden'
+                'hidden',
             ],
             'skins',
             'WHERE `id`=?',

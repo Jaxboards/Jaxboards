@@ -177,7 +177,7 @@ final class settings
                 'type',
                 'needle',
                 'replacement',
-                'enabled'
+                'enabled',
             ],
             'textrules',
             "WHERE `type`='emote'",

@@ -151,7 +151,8 @@ final class buddylist
 
         $user = false;
         if ($uid && is_numeric($uid)) {
-            $result = $DB->safeselect([
+            $result = $DB->safeselect(
+                [
                     'about',
                     'avatar',
                     'birthdate',

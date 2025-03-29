@@ -475,7 +475,8 @@ onclick="this.form.submitButton=this"/></div>
         }
 
         if ($e === '' || $e === '0') {
-            $result = $DB->safeselect([
+            $result = $DB->safeselect(
+                [
                     'auth_id',
                     'editby',
                     'id',

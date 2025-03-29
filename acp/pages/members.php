@@ -120,7 +120,8 @@ final class members
                 && $JAX->b['mid']
                 && is_numeric($JAX->b['mid'])
             ) {
-                $result = $DB->safeselect([
+                $result = $DB->safeselect(
+                    [
                         'about',
                         'avatar',
                         'birthdate',

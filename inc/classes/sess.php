@@ -128,7 +128,8 @@ final class SESS
 
         if ($sid) {
             $result = $isbot === 0
-                ? $DB->safeselect([
+                ? $DB->safeselect(
+                    [
                         'buddy_list_cache',
                         'forumsread',
                         'hide',
@@ -152,7 +153,8 @@ final class SESS
                     $DB->basicvalue($sid),
                     $JAX->getIp(),
                 )
-                    : $DB->safeselect([
+                    : $DB->safeselect(
+                        [
                             'buddy_list_cache',
                             'forumsread',
                             'hide',
@@ -309,7 +311,7 @@ final class SESS
         $query = $DB->safeselect(
             [
                 'uid',
-                'UNIX_TIMESTAMP(MAX(`last_action`)) AS `last_action`'
+                'UNIX_TIMESTAMP(MAX(`last_action`)) AS `last_action`',
             ],
             'session',
             'WHERE `last_update`<? GROUP BY uid',

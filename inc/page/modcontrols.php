@@ -626,7 +626,8 @@ final class modcontrols
 
         // Get trashcan id.
         $result = $DB->safeselect(
-            ['id'],]
+            ['id'],
+            ]
             'forums',
             'WHERE `trashcan`=1 LIMIT 1',
         );
@@ -883,7 +884,8 @@ final class modcontrols
         ) {
             // Get the member data.
             if (is_numeric($JAX->b['mid'])) {
-                $result = $DB->safeselect([
+                $result = $DB->safeselect(
+                    [
                         'about',
                         'avatar',
                         'birthdate',
@@ -940,7 +942,8 @@ final class modcontrols
                 $data = $DB->arow($result);
                 $DB->disposeresult($result);
             } elseif ($JAX->p['mname']) {
-                $result = $DB->safeselect([
+                $result = $DB->safeselect(
+                    [
                         'about',
                         'avatar',
                         'birthdate',
