@@ -142,6 +142,15 @@ $rules = array_reduce(
                 $description,
             );
 
+            // we don't have a way to guage this easily so we always set it to
+            // low/minor for errors and info for warnings
+            $impact_severity = $message['type'] === 'ERROR'
+                ? 'LOW'
+                : 'INFO';
+            $severity = $message['type'] === 'ERROR'
+                ? 'MINOR'
+                : 'INFO';
+
             $rules[$message['source']] = [
                 'cleanCodeAttribute' => 'FORMATTED',
                 'description' => $description,
@@ -149,18 +158,14 @@ $rules = array_reduce(
                 'id' => $message['source'],
                 'impacts' => [
                     [
-                        // we don't have a way to guage this easily so we
-                        // always set it to low
-                        'severity' => 'LOW',
+                        'severity' => $impact_severity,
                         // we don't have a way to guage this easily so we
                         // always set it to mainability
                         'softwareQuality' => 'MAINTAINABILITY',
                     ],
                 ],
                 'name' => $message['source'],
-                // we don't have a way to guage this easily so we
-                // always set it to minor
-                'severity' => 'MINOR',
+                'severity' => $severity,
                 'type' => 'CODE_SMELL',
             ];
 
