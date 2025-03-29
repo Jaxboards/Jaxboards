@@ -2,7 +2,6 @@
 
 final class MySQL
 {
-
     /**
      * @var bool
      */

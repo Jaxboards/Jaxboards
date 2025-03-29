@@ -8,6 +8,9 @@ final class PAGE
 
     public $JSOutput = [];
 
+    /**
+     * @var int
+     */
     public $jsaccess = 0;
 
     /**
@@ -53,11 +56,12 @@ final class PAGE
     {
         $this->jsaccess = (int) ($_SERVER['HTTP_X_JSACCESS'] ?? 0);
 
-        if ($this->jsaccess) {
+        if ($this->jsaccess !== 0) {
             $this->jsupdate = $this->jsaccess === 1;
             $this->jsnewlocation = $this->jsaccess >= 2;
             $this->jsdirectlink = $this->jsaccess === 3;
         }
+
         $this->mobile = str_contains((string) $_SERVER['HTTP_USER_AGENT'], 'mobile');
     }
 
