@@ -50,11 +50,15 @@ final class tools
         global $PAGE,$DB,$JAX,$CFG;
         $page = '';
         if (isset($JAX->b['delete']) && is_numeric($JAX->b['delete'])) {
-            $result = $DB->safeselect(
-                <<<'EOT'
-                    `id`,`name`,`hash`,`uid`,`size`,`downloads`,INET6_NTOA(`ip`) AS `ip`
-                    EOT
-                ,
+            $result = $DB->safeselect([
+                    'downloads',
+                    'hash',
+                    'id',
+                    'name',
+                    'size',
+                    'uid',
+                    'INET6_NTOA(`ip`) AS `ip`'
+                ],
                 'files',
                 'WHERE `id`=?',
                 $DB->basicvalue($JAX->b['delete']),

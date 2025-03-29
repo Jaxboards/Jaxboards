@@ -103,7 +103,7 @@ final class LOGREG
             $dispname = $JAX->blockhtml($dispname);
             $name = $JAX->blockhtml($name);
             $result = $DB->safeselect(
-                '`name`,`display_name`',
+                ['name', 'display_name'],
                 'members',
                 'WHERE `name`=? OR `display_name`=?',
                 $DB->basicvalue($name),
@@ -169,7 +169,7 @@ final class LOGREG
             }
 
             $result = $DB->safeselect(
-                '`id`',
+                ['id'],
                 'members',
                 'WHERE `name`=?',
                 $DB->basicvalue($u),
@@ -358,7 +358,7 @@ final class LOGREG
 
                     // Get username.
                     $result = $DB->safeselect(
-                        '`id`,`name`',
+                        ['id', 'name'],
                         'members',
                         'WHERE `id`=?',
                         $DB->basicvalue($udata['id']),
@@ -393,7 +393,7 @@ final class LOGREG
         } else {
             if ($JAX->p['user']) {
                 $result = $DB->safeselect(
-                    '`id`,`email`',
+                    ['id', 'email'],
                     'members',
                     'WHERE `name`=?',
                     $DB->basicvalue($JAX->p['user']),

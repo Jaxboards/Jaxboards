@@ -264,7 +264,15 @@ final class themes
         }
 
         $result = $DB->safeselect(
-            '`id`,`using`,`title`,`custom`,`wrapper`,`default`,`hidden`',
+            [
+                'id',
+                '`using`',
+                'title',
+                'custom',
+                'wrapper',
+                '`default`',
+                'hidden'
+            ],
             'skins',
             'ORDER BY title ASC',
         );
@@ -358,7 +366,15 @@ final class themes
     {
         global $PAGE,$DB,$JAX;
         $result = $DB->safeselect(
-            '`id`,`using`,`title`,`custom`,`wrapper`,`default`,`hidden`',
+            [
+                'id',
+                '`using`',
+                'title',
+                'custom',
+                'wrapper',
+                'default',
+                'hidden'
+            ],
             'skins',
             'WHERE `id`=?',
             $id,

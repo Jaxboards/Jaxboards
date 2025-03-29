@@ -106,13 +106,29 @@ final class modcontrols
 
             case 'moveto':
                 $result = $DB->safeselect(
-                    <<<'EOT'
-                        `id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
-                        UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,`show_sub`,
-                        `redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,`redirects`,
-                        `trashcan`,`mods`,`show_ledby`
-                        EOT
-                    ,
+                    [
+                        'cat_id',
+                        'id',
+                        'lp_tid',
+                        'lp_topic',
+                        'lp_uid',
+                        'mods',
+                        'nocount',
+                        'order',
+                        'orderby',
+                        'path',
+                        'perms',
+                        'posts',
+                        'redirect',
+                        'redirects',
+                        'show_ledby'
+                        'show_sub',
+                        'subtitle',
+                        'title',
+                        'topics',
+                        'trashcan',
+                        'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
+                    ],
                     'forums',
                     'WHERE `id`=?',
                     $DB->basicvalue($JAX->p['id']),
@@ -124,7 +140,7 @@ final class modcontrols
                 }
 
                 $result = $DB->safeselect(
-                    '`fid`',
+                    ['fid'],
                     'topics',
                     'WHERE `id` IN ?',
                     explode(',', (string) $SESS->vars['modtids']),
@@ -281,12 +297,20 @@ final class modcontrols
         $pid = (int) $pid;
 
         $result = $DB->safeselect(
-            <<<'EOT'
-                `id`,`auth_id`,`post`,UNIX_TIMESTAMP(`date`) AS `date`,`showsig`,`showemotes`,
-                `tid`,`newtopic`,INET6_NTOA(`ip`) AS `ip`,
-                UNIX_TIMESTAMP(`edit_date`) AS `edit_date`,`editby`,`rating`
-                EOT
-            ,
+            [
+                'auth_id',
+                'editby',
+                'id',
+                'newtopic',
+                'post',
+                'rating'
+                'showemotes',
+                'showsig',
+                'tid',
+                'INET6_NTOA(`ip`) AS `ip`',
+                'UNIX_TIMESTAMP(`date`) AS `date`',
+                'UNIX_TIMESTAMP(`edit_date`) AS `edit_date`',
+            ],
             'posts',
             'WHERE id=?',
             $DB->basicvalue($pid),
@@ -484,7 +508,7 @@ final class modcontrols
             }
 
             $result = $DB->safeselect(
-                '`auth_id`',
+                ['auth_id'],
                 'posts',
                 'WHERE `id`=?',
                 $DB->basicvalue($lp),
@@ -560,7 +584,7 @@ final class modcontrols
         }
 
         $result = $DB->safeselect(
-            '`fid`',
+            ['fid'],
             'topics',
             'WHERE `id` IN ?',
             $tids,
@@ -602,7 +626,7 @@ final class modcontrols
 
         // Get trashcan id.
         $result = $DB->safeselect(
-            '`id`',
+            ['id'],]
             'forums',
             'WHERE `trashcan`=1 LIMIT 1',
         );
@@ -611,7 +635,7 @@ final class modcontrols
 
         $trashcan = $trashcan['id'] ?? false;
         $result = $DB->safeselect(
-            '`fid`,`id`',
+            ['id', 'fid'],
             'topics',
             'WHERE `id` IN ?',
             explode(',', (string) $SESS->vars['modtids']),
@@ -750,7 +774,7 @@ final class modcontrols
 
         if (isset($SESS->vars['modtids'])) {
             $result = $DB->safeselect(
-                '`id`,`title`',
+                ['id', 'title'],
                 'topics',
                 'WHERE `id` IN ?',
                 explode(',', $SESS->vars['modtids']),
@@ -859,22 +883,56 @@ final class modcontrols
         ) {
             // Get the member data.
             if (is_numeric($JAX->b['mid'])) {
-                $result = $DB->safeselect(
-                    <<<'EOT'
-                        `id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
-                        UNIX_TIMESTAMP(`join_date`) AS `join_date`,
-                        UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,`contact_skype`,`contact_yim`,
-                        `contact_msn`,`contact_gtalk`,`contact_aim`,`website`,`birthdate`,
-                        DAY(`birthdate`) AS `dob_day`,MONTH(`birthdate`) AS `dob_month`,
-                        YEAR(`birthdate`) AS `dob_year`,`about`,`display_name`,`full_name`,
-                        `contact_steam`,`location`,`gender`,`friends`,`enemies`,`sound_shout`,
-                        `sound_im`,`sound_pm`,`sound_postinmytopic`,`sound_postinsubscribedtopic`,
-                        `notify_pm`,`notify_postinmytopic`,`notify_postinsubscribedtopic`,`ucpnotepad`,
-                        `skin_id`,`contact_twitter`,`contact_discord`,`contact_youtube`,`contact_bluesky`,
-                        `email_settings`,`nowordfilter`,
-                        INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
-                        EOT
-                    ,
+                $result = $DB->safeselect([
+                        'about',
+                        'avatar',
+                        'birthdate',
+                        'contact_aim',
+                        'contact_bluesky',
+                        'contact_discord',
+                        'contact_gtalk',
+                        'contact_msn',
+                        'contact_skype',
+                        'contact_steam',
+                        'contact_twitter',
+                        'contact_yim',
+                        'contact_youtube',
+                        'display_name',
+                        'email_settings',
+                        'email',
+                        'enemies',
+                        'friends',
+                        'full_name',
+                        'gender',
+                        'group_id',
+                        'id',
+                        'location',
+                        'mod',
+                        'name',
+                        'notify_pm',
+                        'notify_postinmytopic',
+                        'notify_postinsubscribedtopic',
+                        'nowordfilter',
+                        'pass',
+                        'posts',
+                        'sig',
+                        'skin_id',
+                        'sound_im',
+                        'sound_pm',
+                        'sound_postinmytopic',
+                        'sound_postinsubscribedtopic',
+                        'sound_shout',
+                        'ucpnotepad',
+                        'usertitle',
+                        'website',
+                        'wysiwyg',
+                        'DAY(`birthdate`) AS `dob_day`',
+                        'INET6_NTOA(`ip`) AS `ip`',
+                        'MONTH(`birthdate`) AS `dob_month`',
+                        'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
+                        'UNIX_TIMESTAMP(`last_visit`) AS `last_visit`',
+                        'YEAR(`birthdate`) AS `dob_year`',
+                    ],
                     'members',
                     'WHERE `id`=?',
                     $DB->basicvalue($JAX->b['mid']),
@@ -882,22 +940,56 @@ final class modcontrols
                 $data = $DB->arow($result);
                 $DB->disposeresult($result);
             } elseif ($JAX->p['mname']) {
-                $result = $DB->safeselect(
-                    <<<'EOT'
-                        `id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
-                        UNIX_TIMESTAMP(`join_date`) AS `join_date`,
-                        UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,`contact_skype`,`contact_yim`,
-                        `contact_msn`,`contact_gtalk`,`contact_aim`,`website`,`birthdate`,
-                        DAY(`birthdate`) AS `dob_day`,MONTH(`birthdate`) AS `dob_month`,
-                        YEAR(`birthdate`) AS `dob_year`,`about`,`display_name`,`full_name`,
-                        `contact_steam`,`location`,`gender`,`friends`,`enemies`,`sound_shout`,
-                        `sound_im`,`sound_pm`,`sound_postinmytopic`,`sound_postinsubscribedtopic`,
-                        `notify_pm`,`notify_postinmytopic`,`notify_postinsubscribedtopic`,`ucpnotepad`,
-                        `skin_id`,`contact_twitter`,`contact_discord`,`contact_youtube`,`contact_bluesky`,
-                        `email_settings`,`nowordfilter`,
-                        INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
-                        EOT
-                    ,
+                $result = $DB->safeselect([
+                        'about',
+                        'avatar',
+                        'birthdate',
+                        'contact_aim',
+                        'contact_bluesky',
+                        'contact_discord',
+                        'contact_gtalk',
+                        'contact_msn',
+                        'contact_skype',
+                        'contact_steam',
+                        'contact_twitter',
+                        'contact_yim',
+                        'contact_youtube',
+                        'display_name',
+                        'email_settings',
+                        'email',
+                        'enemies',
+                        'friends',
+                        'full_name',
+                        'gender',
+                        'group_id',
+                        'id',
+                        'location',
+                        'mod',
+                        'name',
+                        'notify_pm',
+                        'notify_postinmytopic',
+                        'notify_postinsubscribedtopic',
+                        'nowordfilter',
+                        'pass',
+                        'posts',
+                        'sig',
+                        'skin_id',
+                        'sound_im',
+                        'sound_pm',
+                        'sound_postinmytopic',
+                        'sound_postinsubscribedtopic',
+                        'sound_shout',
+                        'ucpnotepad',
+                        'usertitle',
+                        'website',
+                        'wysiwyg',
+                        'DAY(`birthdate`) AS `dob_day`',
+                        'INET6_NTOA(`ip`) AS `ip`',
+                        'MONTH(`birthdate`) AS `dob_month`',
+                        'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
+                        'UNIX_TIMESTAMP(`last_visit`) AS `last_visit`',
+                        'YEAR(`birthdate`) AS `dob_year`',
+                ],
                     'members',
                     'WHERE `display_name` LIKE ?',
                     $DB->basicvalue($JAX->p['mname'] . '%'),
@@ -1074,7 +1166,11 @@ final class modcontrols
 
             $content = [];
             $result = $DB->safeselect(
-                '`group_id`,`display_name`,`id`',
+                [
+                    'display_name',
+                    'group_id',
+                    'id'
+                ],
                 'members',
                 'WHERE `ip`=INET6_ATON(?)',
                 $DB->basicvalue($ip),
@@ -1126,7 +1222,7 @@ final class modcontrols
 
             $content = '';
             $result = $DB->safeselect(
-                '`post`',
+                ['post'],
                 'posts',
                 'WHERE `ip`=INET6_ATON(?) ORDER BY `id` DESC LIMIT 5',
                 $DB->basicvalue($ip),

@@ -72,7 +72,7 @@ final class search
         }
 
         $result = $DB->safeselect(
-            '`id`,`title`,`path`',
+            ['id', 'title', 'path'],
             'forums',
             'WHERE `id` IN ? ORDER BY `order` ASC,`title` DESC',
             $this->fids,
@@ -414,7 +414,7 @@ final class search
         $this->fids = [];
         global $DB,$JAX,$USER;
         $result = $DB->safeselect(
-            '`id`,`perms`',
+            ['id', 'perms'],
             'forums',
         );
         while ($f = $DB->arow($result)) {

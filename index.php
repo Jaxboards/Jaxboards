@@ -84,7 +84,7 @@ $SESS = new SESS($_SESSION['sid'] ?? false);
 
 if (!isset($_SESSION['uid']) && isset($JAX->c['utoken'])) {
     $result = $DB->safeselect(
-        '`uid`',
+        ['uid'],
         'tokens',
         'WHERE `token`=?',
         $JAX->c['utoken'],
@@ -358,7 +358,7 @@ if ($act === 'idx' && isset($JAX->b['module']) && $JAX->b['module']) {
     include_once $act;
 } elseif (!$PAGE->jsaccess || $PAGE->jsnewlocation) {
     $result = $DB->safeselect(
-        '`page`',
+        ['page'],
         'pages',
         'WHERE `act`=?',
         $DB->basicvalue($actraw),

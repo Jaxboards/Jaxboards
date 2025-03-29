@@ -695,7 +695,7 @@ final class MySQL
 
     public function fixAllForumLastPosts(): void
     {
-        $query = $this->safeselect('`id`', 'forums');
+        $query = $this->safeselect(['id'], 'forums');
         while ($fid = $this->arow($query)) {
             $this->fixForumLastPost($fid['id']);
         }
@@ -708,7 +708,7 @@ final class MySQL
         }
 
         $result = $this->safeselect(
-            '`id`,`img`,`title`',
+            ['id', 'img', 'title'],
             'ratingniblets',
         );
         $r = [];

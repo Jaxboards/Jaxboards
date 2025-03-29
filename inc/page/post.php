@@ -126,7 +126,7 @@ final class POST
             $id = $DB->insert_id(1);
         } else {
             $result = $DB->safeselect(
-                '`id`',
+                ['id'],
                 'files',
                 'WHERE `hash`=?',
                 $hash,
@@ -170,13 +170,27 @@ final class POST
 
         if ($this->how === 'edit') {
             $result = $DB->safeselect(
-                <<<'EOT'
-                    `id`,`title`,`subtitle`,`lp_uid`,UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,
-                    `fid`,`auth_id`,`replies`,`views`,
-                    `pinned`,`poll_choices`,`poll_results`,`poll_q`,`poll_type`,`summary`,
-                    `locked`,UNIX_TIMESTAMP(`date`) AS `date`,`op`,`cal_event`
-                    EOT
-                ,
+                [
+                    'auth_id',
+                    'cal_event'
+                    'fid',
+                    'id',
+                    'locked',
+                    'lp_uid',
+                    'op',
+                    'pinned',
+                    'poll_choices',
+                    'poll_q',
+                    'poll_results',
+                    'poll_type',
+                    'replies',
+                    'subtitle',
+                    'summary',
+                    'title',
+                    'views',
+                    'UNIX_TIMESTAMP(`date`) AS `date`',
+                    'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
+                ],
                 'topics',
                 'WHERE `id`=?',
                 $DB->basicvalue($this->tid),
@@ -188,7 +202,7 @@ final class POST
                 $e = "The topic you're trying to edit does not exist.";
             } else {
                 $result = $DB->safeselect(
-                    '`post`',
+                    ['post'],
                     'posts',
                     'WHERE `id`=?',
                     $DB->basicvalue($tdata['op']),
@@ -205,7 +219,7 @@ final class POST
         }
 
         $result = $DB->safeselect(
-            '`title`,`perms`',
+            ['title', 'perms'],
             'forums',
             'WHERE `id`=?',
             $fid,
@@ -461,13 +475,20 @@ onclick="this.form.submitButton=this"/></div>
         }
 
         if ($e === '' || $e === '0') {
-            $result = $DB->safeselect(
-                <<<'EOT'
-                    `id`,`auth_id`,`post`,UNIX_TIMESTAMP(`date`) AS `date`,`showsig`,`showemotes`,
-                        `tid`,`newtopic`,INET6_NTOA(`ip`) AS `ip`,
-                        UNIX_TIMESTAMP(`edit_date`) AS `edit_date`,`editby`,`rating`
-                    EOT
-                ,
+            $result = $DB->safeselect([
+                    'auth_id',
+                    'editby',
+                    'id',
+                    'newtopic',
+                    'post',
+                    'rating'
+                    'showemotes',
+                    'showsig',
+                    'tid',
+                    'INET6_NTOA(`ip`) AS `ip`',
+                    'UNIX_TIMESTAMP(`date`) AS `date`',
+                    'UNIX_TIMESTAMP(`edit_date`) AS `edit_date`',
+                ],
                 'posts',
                 'WHERE `id`=?',
                 $pid,
@@ -490,13 +511,27 @@ onclick="this.form.submitButton=this"/></div>
                 $e = 'Invalid post to edit.';
             } else {
                 $result = $DB->safeselect(
-                    <<<'EOT'
-                        `id`,`title`,`subtitle`,`lp_uid`,UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,
-                        `fid`,`auth_id`,`replies`,`views`,
-                        `pinned`,`poll_choices`,`poll_results`,`poll_q`,`poll_type`,`summary`,
-                        `locked`,UNIX_TIMESTAMP(`date`) AS `date`,`op`,`cal_event`
-                        EOT
-                    ,
+                    [
+                        'auth_id',
+                        'cal_event'
+                        'fid',
+                        'id',
+                        'locked',
+                        'lp_uid',
+                        'op',
+                        'pinned',
+                        'poll_choices',
+                        'poll_q',
+                        'poll_results',
+                        'poll_type',
+                        'replies',
+                        'subtitle',
+                        'summary',
+                        'title',
+                        'views',
+                        'UNIX_TIMESTAMP(`date`) AS `date`',
+                        'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
+                    ],
                     'topics',
                     'WHERE `id`=?',
                     $tid,
@@ -632,7 +667,7 @@ onclick="this.form.submitButton=this"/></div>
 
             // Perms.
             $result = $DB->safeselect(
-                '`perms`',
+                ['perms'],
                 'forums',
                 'WHERE `id`=?',
                 $fid,

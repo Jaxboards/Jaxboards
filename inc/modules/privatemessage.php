@@ -162,7 +162,10 @@ final class IM
         if ($JAX->b['im_invitemenu']) {
             $online = $DB->getUsersOnline();
             $result = $DB->safeselect(
-                '`id`,`display_name` AS `name`',
+                [
+                    'id',
+                    '`display_name` AS `name`'
+                ],
                 'members',
                 'WHERE `id` IN ? ORDER BY `name` ASC',
                 explode(',', (string) $USER['friends']),

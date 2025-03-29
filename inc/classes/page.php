@@ -251,7 +251,7 @@ final class PAGE
         $skin = [];
         if ($id) {
             $result = $DB->safeselect(
-                'title,custom,wrapper',
+                ['title', 'custom', 'wrapper'],
                 'skins',
                 'WHERE id=? LIMIT 1',
                 $id,
@@ -262,7 +262,7 @@ final class PAGE
 
         if (empty($skin)) {
             $result = $DB->safeselect(
-                'title,custom,wrapper',
+                ['title', 'custom', 'wrapper'],
                 'skins',
                 'WHERE `default`=1 LIMIT 1',
             );

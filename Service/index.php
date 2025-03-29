@@ -96,7 +96,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     }
 
     $result = $DB->safeselect(
-        '`id`',
+        ['id'],
         'directory',
         'WHERE `registrar_ip`=INET6_ATON(?) AND `date`>?',
         $JAX->getIp(),
@@ -119,7 +119,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     }
 
     $result = $DB->safeselect(
-        '`id`',
+        ['id'],
         'directory',
         'WHERE `boardname`=?',
         $DB->basicvalue($JAX->p['boardurl']),

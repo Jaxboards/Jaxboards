@@ -139,7 +139,7 @@ final class settings
         }
 
         $result = $DB->safeselect(
-            '`act`,`page`',
+            ['act', 'page'],
             'pages',
         );
         $table = '';
@@ -192,7 +192,7 @@ final class settings
         global $PAGE,$DB,$JAX;
         $page = '';
         $result = $DB->safeselect(
-            '`act`,`page`',
+            ['act', 'page'],
             'pages',
             'WHERE `act`=?',
             $DB->basicvalue($pageurl),

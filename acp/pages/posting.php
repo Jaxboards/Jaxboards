@@ -64,7 +64,13 @@ final class settings
         $page = '';
         $wordfilter = [];
         $result = $DB->safeselect(
-            '`id`,`type`,`needle`,`replacement`,`enabled`',
+            [
+                'id',
+                'enabled',
+                'needle',
+                'replacement',
+                'type',
+            ],
             'textrules',
             "WHERE `type`='badword'",
         );
@@ -166,7 +172,13 @@ final class settings
 
         // Select emoticons.
         $result = $DB->safeselect(
-            '`id`,`type`,`needle`,`replacement`,`enabled`',
+            [
+                'id',
+                'type',
+                'needle',
+                'replacement',
+                'enabled'
+            ],
             'textrules',
             "WHERE `type`='emote'",
         );
@@ -282,7 +294,7 @@ final class settings
         $page2 = '';
         $niblets = [];
         $result = $DB->safeselect(
-            '`id`,`img`,`title`',
+            ['id', 'img', 'title'],
             'ratingniblets',
             'ORDER BY `id` DESC',
         );
