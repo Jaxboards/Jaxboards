@@ -256,10 +256,10 @@ $rules = array_reduce(
                 'impacts' => [
                     [
                         'severity' => match ((int) $violation['priority']) {
-                            1 => 'BLOCKER',
-                            2 => 'HIGH',
-                            3 => 'MEDIUM',
-                            4 => 'LOW',
+                            // despite there being different levels, it looks
+                            // like all issues are getting grouped as a blocker
+                            // so we should generally consider them low
+                            1, 2, 3, 4 => 'LOW',
                             default => 'INFO',
                         },
                         // we don't have a way to guage this easily so we
