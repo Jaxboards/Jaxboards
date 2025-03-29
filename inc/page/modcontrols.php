@@ -991,7 +991,7 @@ final class modcontrols
                         'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
                         'UNIX_TIMESTAMP(`last_visit`) AS `last_visit`',
                         'YEAR(`birthdate`) AS `dob_year`',
-                ],
+                    ],
                     'members',
                     'WHERE `display_name` LIKE ?',
                     $DB->basicvalue($JAX->p['mname'] . '%'),
@@ -1171,7 +1171,7 @@ final class modcontrols
                 [
                     'display_name',
                     'group_id',
-                    'id'
+                    'id',
                 ],
                 'members',
                 'WHERE `ip`=INET6_ATON(?)',
