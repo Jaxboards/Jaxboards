@@ -175,7 +175,7 @@ final class LOGREG
                 $DB->basicvalue($u),
             );
             $user = $DB->arow($result);
-            $u = $user['id'];
+            $u = $user['id'] ?? 0;
 
             $f = $JAX->getUser($u, $p);
 
