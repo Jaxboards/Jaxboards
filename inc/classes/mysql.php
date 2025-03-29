@@ -629,6 +629,7 @@ final class MySQL
                 if (!$f['uid']) {
                     continue;
                 }
+
                 if (isset($return[$f['uid']]) && $return[$f['uid']]) {
                     continue;
                 }
