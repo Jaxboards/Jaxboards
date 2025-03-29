@@ -963,7 +963,7 @@ EOT
     public function parsereadmarkers($readmarkers)
     {
         if ($readmarkers) {
-            return json_decode($readmarkers, true);
+            return json_decode($readmarkers, true) ?? [];
         }
 
         return array();
