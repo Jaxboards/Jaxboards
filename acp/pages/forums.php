@@ -79,7 +79,7 @@ final class forums
                 }
 
                 $classes = [];
-                $classes[] = $id[0] === 'c' ? 'parentlock' : 'nofirstlevel';
+                $classes[] = is_string($id) && $id[0] === 'c' ? 'parentlock' : 'nofirstlevel';
 
                 if ($highlight && $id === $highlight) {
                     $classes[] = 'highlight';
