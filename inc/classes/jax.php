@@ -46,12 +46,19 @@ final class JAX
     }
 
     public $attachmentdata;
+
     public $userPerms = '';
 
     public $c = [];
 
+    /**
+     * @var array<mixed>|string
+     */
     public $g = [];
 
+    /**
+     * @var array<mixed>|string
+     */
     public $p = [];
 
     public $s = [];
@@ -452,7 +459,7 @@ final class JAX
                 $codes[2][$k] = $codes[1][$k] === '=php' ? highlight_string($codes[2][$k], 1) : preg_replace(
                     "@([ \r\n]|^) @m",
                     '$1&nbsp;',
-                    (string) $this->blockhtml($codes[2][$k]),
+                    $this->blockhtml($codes[2][$k]),
                 );
             }
 
@@ -480,7 +487,7 @@ final class JAX
         return $r;
     }
 
-    public function textonly($a)
+    public function textonly($a): ?string
     {
         while (($t = preg_replace('@\[(\w+)[^\]]*\]([\w\W]*)\[/\1\]@U', '$2', (string) $a)) !== $a) {
             $a = $t;
@@ -489,7 +496,7 @@ final class JAX
         return $a;
     }
 
-    public function bbcodes($a, $minimal = false)
+    public function bbcodes($a, $minimal = false): ?string
     {
         $x = 0;
         $bbcodes = [
@@ -596,12 +603,14 @@ final class JAX
                 </div>
                 EOT;
         }
+
         if (str_contains((string) $m[1], 'youtube.com')) {
             preg_match('@v=([\w-]+)@', (string) $m[1], $youtubeMatches);
             $embedUrl = "https://www.youtube.com/embed/{$youtubeMatches[1]}";
 
             return youtubeEmbedHTML($m[1], $embedUrl);
         }
+
         if (str_contains((string) $m[1], 'youtu.be')) {
             preg_match('@youtu.be/(?P<params>.+)$@', (string) $m[1], $youtubeMatches);
             $embedUrl = "https://www.youtube.com/embed/{$youtubeMatches['params']}";
@@ -617,10 +626,12 @@ final class JAX
         $lis = '';
         $m[2] = preg_split("@(^|[\r\n])\\*@", (string) $m[2]);
         foreach ($m[2] as $v) {
-            if (trim($v) === '' || trim($v) === '0') {
+            if (trim($v) === '') {
                 continue;
             }
-
+            if (trim($v) === '0') {
+                continue;
+            }
             $lis .= '<li>' . $v . ' </li>';
         }
 
@@ -692,7 +703,7 @@ final class JAX
         }
 
         $a = $this->blockhtml($a);
-        $a = nl2br((string) $a);
+        $a = nl2br($a);
 
         if (@!$cfg['noemotes']) {
             $a = $this->emotes($a);
@@ -822,7 +833,13 @@ final class JAX
             if (file_exists(BOARDPATH . '/bannedips.txt')) {
                 foreach (file(BOARDPATH . '/bannedips.txt') as $v) {
                     $v = trim($v);
-                    if (!$v || $v[0] === '#') {
+                    if ($v === '') {
+                        continue;
+                    }
+                    if ($v === '0') {
+                        continue;
+                    }
+                    if ($v[0] === '#') {
                         continue;
                     }
 

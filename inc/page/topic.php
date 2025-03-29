@@ -287,10 +287,12 @@ final class TOPIC
         // Make the users online list.
         $usersonline = '';
         foreach ($DB->getUsersOnline() as $f) {
-            if (empty($f['uid']) || $f['location'] !== "vt{$id}") {
+            if (empty($f['uid'])) {
                 continue;
             }
-
+            if ($f['location'] !== "vt{$id}") {
+                continue;
+            }
             $usersonline .= isset($f['is_bot']) && $f['is_bot']
                 ? '<a class="user' . $f['uid'] . '">' . $f['name'] . '</a>'
                 : $PAGE->meta(
@@ -360,7 +362,7 @@ final class TOPIC
             && $SESS->vars['topic_lastpage']
         ) {
             $newposts = $this->postsintooutput($SESS->vars['topic_lastpid']);
-            if ($newposts) {
+            if ($newposts !== '' && $newposts !== '0') {
                 $PAGE->JS('appendrows', '#intopic', $newposts);
             }
         }
@@ -370,10 +372,12 @@ final class TOPIC
         $oldcache = array_flip(explode(',', (string) $SESS->users_online_cache));
         $newcache = '';
         foreach ($DB->getUsersOnline() as $f) {
-            if (!$f['uid'] || $f['location'] !== "vt{$id}") {
+            if (!$f['uid']) {
                 continue;
             }
-
+            if ($f['location'] !== "vt{$id}") {
+                continue;
+            }
             if (!isset($oldcache[$f['uid']])) {
                 $list[] = [
                     $f['uid'],
@@ -640,7 +644,10 @@ final class TOPIC
                                 $v['img'],
                                 $v['title'],
                             ) . '</a>';
-                        if (!isset($prating[$k]) || !$prating[$k]) {
+                        if (!isset($prating[$k])) {
+                            continue;
+                        }
+                        if (!$prating[$k]) {
                             continue;
                         }
 
@@ -884,12 +891,10 @@ final class TOPIC
         return $page;
     }
 
-    public function votepoll($tid)
+    public function votepoll()
     {
         global $DB,$PAGE,$USER,$JAX;
-
         $e = '';
-
         if (!$USER) {
             $e = 'You must be logged in to vote!';
         } else {
@@ -952,11 +957,9 @@ final class TOPIC
                 $e = 'Invalid choice';
             }
         }
-
         if ($e !== '' && $e !== '0') {
             return $PAGE->JS('error', $e);
         }
-
         if ($row['poll_type'] === 'multi') {
             foreach ($choice as $c) {
                 $results[$c][] = $USER['id'];
@@ -964,15 +967,12 @@ final class TOPIC
         } else {
             $results[$choice][] = $USER['id'];
         }
-
         $presults = [];
         for ($x = 0; $x < $numchoices; ++$x) {
             $presults[$x] = isset($results[$x]) && $results[$x]
                 ? implode(',', $results[$x]) : '';
         }
-
         $presults = implode(';', $presults);
-
         $PAGE->JS(
             'update',
             '#poll .content',
@@ -984,7 +984,6 @@ final class TOPIC
             ),
             '1',
         );
-
         $DB->safeupdate(
             'topics',
             [
