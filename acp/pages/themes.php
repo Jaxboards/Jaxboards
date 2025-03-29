@@ -372,7 +372,7 @@ final class themes
                 'title',
                 'custom',
                 'wrapper',
-                'default',
+                '`default`',
                 'hidden'
             ],
             'skins',
