@@ -17,7 +17,8 @@ if (!isset($DB)) {
     exit('This file must be required after mysql connecting');
 }
 
-function pathjoin(...$paths) {
+function pathjoin(...$paths): ?string
+{
     return preg_replace('@\/+@', '/', implode('/', $paths) . '/');
 }
 
@@ -51,7 +52,7 @@ if ($CFG['service']) {
 }
 
 if ($prefix) {
-    define('BOARDPATH', pathjoin(JAXBOARDS_ROOT, 'boards',  $prefix));
+    define('BOARDPATH', pathjoin(JAXBOARDS_ROOT, 'boards', $prefix));
     define('BOARDPATHURL', pathjoin(BOARDURL, 'boards', $prefix));
     define('STHEMEPATH', pathjoin(JAXBOARDS_ROOT, 'Service/Themes'));
     define('AVAURL', pathjoin(BOARDURL, 'Service/Themes/Default/avatars'));

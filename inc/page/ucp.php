@@ -793,7 +793,7 @@ final class UCP
                     'custom',
                     'wrapper',
                     'default',
-                    'hidden'
+                    'hidden',
                 ],
                 'skins',
                 'WHERE `id`=?',
@@ -840,7 +840,7 @@ final class UCP
                     'custom',
                     'wrapper',
                     'default',
-                    'hidden'
+                    'hidden',
                 ],
                 'skins',
                 'WHERE `hidden`!=1 ORDER BY `title` ASC',
@@ -853,7 +853,7 @@ final class UCP
                     'custom',
                     'wrapper',
                     'default',
-                    'hidden'
+                    'hidden',
                 ],
                 'skins',
                 'ORDER BY `title` ASC',
@@ -1147,7 +1147,7 @@ final class UCP
                     [
                         'id',
                         'email',
-                        'email_settings'
+                        'email_settings',
                     ],
                     'members',
                     'WHERE `display_name`=?',
@@ -1160,7 +1160,7 @@ final class UCP
                     [
                         'id',
                         'email',
-                        'email_settings'
+                        'email_settings',
                     ],
                     'members',
                     'WHERE `id`=?',
@@ -1341,7 +1341,7 @@ final class UCP
                 'date',
                 'del_recipient',
                 'del_sender',
-                'flag'
+                'flag',
             ],
             'messages',
             'WHERE `id`=?',
