@@ -676,11 +676,6 @@ final class MySQL
         $this->safeupdate(
             'forums',
             [
-                'lp_date' => isset($d['lp_date'])
-                && is_numeric($d['lp_date'])
-                && $d['lp_date']
-                    ? date('Y-m-d H:i:s', (int) $d['lp_date'])
-                    : '1970-01-01 00:00:00',
                 'lp_tid' => isset($d['id'])
                 && is_numeric($d['id'])
                 && $d['id'] ? (int) $d['id'] : null,
