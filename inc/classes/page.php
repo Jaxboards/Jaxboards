@@ -6,6 +6,7 @@ final class PAGE
      * @var bool
      */
     public $jsnewloc;
+
     public $metadefs = [];
 
     public $debuginfo = '';
