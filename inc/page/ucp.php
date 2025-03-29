@@ -49,7 +49,7 @@ final class UCP
                 'group_id',
                 'id',
                 'location',
-                'mod',
+                '`mod`',
                 'name',
                 'notify_pm',
                 'notify_postinmytopic',
@@ -1250,7 +1250,7 @@ final class UCP
                 [
                     'del_recipient',
                     'del_sender',
-                    'flag'
+                    'flag',
                     'from',
                     'id',
                     'message',
@@ -1378,7 +1378,7 @@ final class UCP
             [
                 'del_recipient',
                 'del_sender',
-                'flag'
+                'flag',
                 'from',
                 'id',
                 'message',
