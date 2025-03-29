@@ -241,16 +241,16 @@ final class JAX
 
         // Password parsing.
         if ($pass !== false) {
-            $verified_password = password_verify((string) $pass, (string) $user['pass']);
-            $needs_rehash = false;
-            if ($verified_password) {
-                $needs_rehash = password_needs_rehash(
+            $verifiedPassword = password_verify((string) $pass, (string) $user['pass']);
+            $needsRehash = false;
+            if ($verifiedPassword) {
+                $needsRehash = password_needs_rehash(
                     $user['pass'],
                     PASSWORD_DEFAULT,
                 );
             }
 
-            if ($verified_password && $needs_rehash) {
+            if ($verifiedPassword && $needsRehash) {
                 $new_hash = password_hash((string) $pass, PASSWORD_DEFAULT);
                 // Add the new hash.
                 $DB->safeupdate(
@@ -263,7 +263,7 @@ final class JAX
                 );
             }
 
-            if (!$verified_password) {
+            if (!$verifiedPassword) {
                 return $this->userData = false;
             }
 
