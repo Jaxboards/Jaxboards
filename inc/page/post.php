@@ -415,6 +415,7 @@ onclick="this.form.submitButton=this"/></div>
         $pid = $this->pid;
         $tid = $this->tid;
         $e = '';
+        $editingpost = false;
         if (!$pid || !is_numeric($pid)) {
             $e = 'Invalid post to edit.';
         }
@@ -445,7 +446,7 @@ EOT
             } elseif (!$this->canedit($tmp)) {
                 $e = "You don't have permission to edit that post!";
             } elseif (!isset($this->postdata)) {
-                $editpost = true;
+                $editingpost = true;
                 $this->postdata = $tmp['post'];
             }
         }
@@ -505,7 +506,7 @@ EOT
             $PAGE->JS('error', $e);
             $PAGE->append('PAGE', $PAGE->error($e));
         }
-        if ($e || $editpost) {
+        if ($e || $editingpost) {
             $this->showpostform();
 
             return false;
