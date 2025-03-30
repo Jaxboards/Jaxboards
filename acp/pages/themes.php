@@ -135,7 +135,10 @@ final class themes
                 $JAX->p['hidden'] = [];
             }
 
-            if (array_key_exists('wrapper', $JAX->p) && is_array($JAX->p['wrapper'])) {
+            if (
+                array_key_exists('wrapper', $JAX->p)
+                && is_array($JAX->p['wrapper'])
+            ) {
                 foreach ($JAX->p['wrapper'] as $k => $v) {
                     if (!isset($JAX->p['hidden'][$k])) {
                         $JAX->p['hidden'][$k] = false;
