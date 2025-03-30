@@ -485,6 +485,6 @@ final class FORUM
         global $SESS,$JAX;
         $forumsread = $JAX->parsereadmarkers($SESS->forumsread);
         $forumsread[$id] = time();
-        $SESS->forumsread = json_encode($forumsread, true);
+        $SESS->forumsread = json_encode($forumsread);
     }
 }
