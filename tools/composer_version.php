@@ -3,9 +3,7 @@
 
 declare(strict_types=1);
 
-/**
- * Fetch the composer version for use in our pre-commit hook.
- */
+// Fetch the composer version for use in our pre-commit hook.
 define('PACKAGE_FILE', dirname(__DIR__) . '/package.json');
 
 $packageJSON = file_get_contents(PACKAGE_FILE);

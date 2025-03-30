@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-/**
+/*
  * Admin control panel.
  *
  * PHP Version 5.3.7

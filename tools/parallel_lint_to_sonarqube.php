@@ -3,7 +3,7 @@
 
 declare(strict_types=1);
 
-/**
+/*
  * Tool to convert parallel-lint output into something SonarQube can read.
  *
  * @see https://docs.sonarsource.com/sonarqube-cloud/enriching/generic-issue-data/
