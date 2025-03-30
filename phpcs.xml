@@ -17,9 +17,6 @@
   <rule ref="PSR12">
     <!-- Disable these rules as they require big changes to the codebase -->
     <exclude name="PSR1.Files.SideEffects" />
-    <exclude name="PSR1.Classes.ClassDeclaration" />
-    <exclude name="PSR1.Methods.CamelCapsMethodName" />
-    <exclude name="Squiz.Classes.ValidClassName" />
     <!-- Remove rules which conflict with php-cs-fixer rules -->
     <exclude name="Generic.WhiteSpace.ScopeIndent.Incorrect"/>
     <exclude name="Generic.WhiteSpace.ScopeIndent.IncorrectExact"/>

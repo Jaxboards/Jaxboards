@@ -144,7 +144,7 @@ $rules = array_reduce(
 
             // we don't have a way to guage this easily so we always set it to
             // low/minor for errors and info for warnings
-            $impact_severity = $message['type'] === 'ERROR'
+            $impactSeverity = $message['type'] === 'ERROR'
                 ? 'LOW'
                 : 'INFO';
             $severity = $message['type'] === 'ERROR'
@@ -158,7 +158,7 @@ $rules = array_reduce(
                 'id' => $message['source'],
                 'impacts' => [
                     [
-                        'severity' => $impact_severity,
+                        'severity' => $impactSeverity,
                         // we don't have a way to guage this easily so we
                         // always set it to mainability
                         'softwareQuality' => 'MAINTAINABILITY',

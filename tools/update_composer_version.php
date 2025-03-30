@@ -4,10 +4,10 @@
 /**
  * Update our composer version to the latest available.
  */
-$version_json = file_get_contents('https://getcomposer.org/versions');
+$versionJSON = file_get_contents('https://getcomposer.org/versions');
 
 $versions = json_decode(
-    $version_json,
+    $versionJSON,
     null,
     // Default
     512,
@@ -24,48 +24,48 @@ if ($version === null) {
 
 define('COMPOSER_FILE', dirname(__DIR__) . '/composer.json');
 
-$composer_json = file_get_contents(COMPOSER_FILE);
+$composerJSON = file_get_contents(COMPOSER_FILE);
 
-$composer_data = json_decode(
-    $composer_json,
+$composerData = json_decode(
+    $composerJSON,
     null,
     // Default
     512,
     JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
 );
 
-$composer_data['config']['platform']['composer'] = $version;
-ksort($composer_data['config']['platform']);
-$composer_data['require-dev']['composer'] = $version;
-ksort($composer_data['require-dev']);
+$composerData['config']['platform']['composer'] = $version;
+ksort($composerData['config']['platform']);
+$composerData['require-dev']['composer'] = $version;
+ksort($composerData['require-dev']);
 
 file_put_contents(
     COMPOSER_FILE,
     json_encode(
-        $composer_data,
+        $composerData,
         JSON_PRETTY_PRINT,
     ),
 );
 
 define('PACKAGE_FILE', dirname(__DIR__) . '/package.json');
 
-$package_json = file_get_contents(PACKAGE_FILE);
+$packageJSON = file_get_contents(PACKAGE_FILE);
 
-$package_data = json_decode(
-    $package_json,
+$packageData = json_decode(
+    $packageJSON,
     null,
     // Default
     512,
     JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
 );
 
-$package_data['engines']['composer'] = $version;
-ksort($package_data['engines']);
+$packageData['engines']['composer'] = $version;
+ksort($packageData['engines']);
 
 file_put_contents(
     PACKAGE_FILE,
     json_encode(
-        $package_data,
+        $packageData,
         JSON_PRETTY_PRINT,
     ),
 );
