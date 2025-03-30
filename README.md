@@ -131,6 +131,15 @@ in other ways. It is recommened you fix any errors given off by these tools
 before you commit anything, so we can keep our code clean and easy to manage.
 Here's how to get the developer tools working and running:
 
+### `direnv`
+
+Direnv is a tool that lets us set specific environment settings in this
+directory.
+
+See [installation
+instructions](https://github.com/direnv/direnv/blob/master/docs/installation.md)
+here.
+
 ### node.js Tools
 
 We use a few tools made with node.js.
