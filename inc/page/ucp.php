@@ -150,6 +150,7 @@ final class UCP
                             $this->compose($JAX->p['messageid']);
 
                             break;
+
                         default:
                     }
                 } else {
