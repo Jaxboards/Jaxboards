@@ -13,9 +13,6 @@ boards
 # Log files
 *.log
 
-# node version management
-.n
-
 # Scan Results
 eslint-report.json
 parallel-lint-report-sonarqube.json
