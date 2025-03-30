@@ -13,6 +13,7 @@
   "minimum-stability": "stable",
   "prefer-stable": true,
   "require-dev": {
+    "composer": "2.8.6",
     "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
     "friendsofphp/php-cs-fixer": "^3.73",
     "php-parallel-lint/php-parallel-lint": "^1.4",
