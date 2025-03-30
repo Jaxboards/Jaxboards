@@ -4,7 +4,6 @@
 /**
  * Update our composer version to the latest available.
  */
-
 const COMPOSER_VERSIONS_URL = 'https://getcomposer.org/versions';
 
 $versionJSON = file_get_contents(COMPOSER_VERSIONS_URL);

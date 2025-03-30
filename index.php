@@ -418,6 +418,7 @@ if ($act === 'idx' && isset($JAX->b['module']) && $JAX->b['module']) {
     // Do nothing.
 } elseif ($act && is_file('inc/page/' . $act . '.php')) {
     $act = 'inc/page/' . $act . '.php';
+
     include_once $act;
 } elseif (
     // @phpstan-ignore-next-line property.notFound
@@ -463,7 +464,7 @@ $pagegen = '';
 if (in_array($JAX->getIp(), ['127.0.0.1', '::1'], true)) {
     $debug = '';
 
-    // @phpstan-ignore-next-line method.notFound
+    /** @phpstan-ignore-next-line method.notFound */
     $debug .= $PAGE->debug() . '<br>';
     // @phpstan-ignore-next-line method.notFound
     $PAGE->JS('update', '#query .content', $debug);
