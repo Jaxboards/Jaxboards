@@ -29,7 +29,8 @@
     "composer": "2.8.6",
     "php": "^8.3.16",
     "doctrine/orm": "^3.3",
-    "symfony/polyfill-php84": "^1.31"
+    "symfony/polyfill-php84": "^1.31",
+    "symfony/cache": "^7"
   },
   "scripts": {
     "lint": [
