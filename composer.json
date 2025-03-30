@@ -36,7 +36,7 @@
     "lint": [
       "@phpcs"
     ],
-    "parallel-lint": "parallel-lint --exclude .git --exclude vendor --exclude node_modules --show-deprecated .",
+    "parallel-lint": "parallel-lint --blame --exclude .git --exclude vendor --exclude node_modules --show-deprecated .",
     "parallel-lint-report": [
       "parallel-lint --exclude .git --exclude vendor --exclude node_modules --json --show-deprecated . > parallel-lint-report.json; (exit 0)",
       "php parallel_lint_to_sonarqube.php parallel-lint-report.json parallel-lint-report-sonarqube.json"

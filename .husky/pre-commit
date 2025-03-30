@@ -1,1 +1,2 @@
-npm run-script parallel-lint
+php ./node_modules/node-composer-runner/bin/composer.2.8.6.phar \
+  run-script parallel-lint
