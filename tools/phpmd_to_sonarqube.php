@@ -105,137 +105,137 @@ $rules = array_reduce(
                 '/ on line \d+/',
                 '',
                 (string) $violation['description'],
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/ variable names like \$\w+/',
                 ' variable names',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/ variable \$\w+ is/',
                 ' variable is',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/ variables with short names like \$\w+/',
                 ' variables with short names',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/ undefined variables such as \'\$\w+\'/',
                 ' undefined variables',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/ unused local variables such as \'\$\w+\'/',
                 ' unused local variables',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/ method \w+\(\) has a Cyclomatic Complexity of \d+/',
                 ' method has a Cyclomatic Complexity that exceeds the threshoold',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/The method \w+ uses an else expression. /',
                 '',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/The class \w+ has \d+ lines of code. /',
                 'The class has more lines of code than our threshold. ',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/The class \w+ has an overall complexity of \d+ /',
                 'The class an overall complexity ',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/ method \w+ has a boolean flag argument \$\w+/',
                 ' method has a boolean flag argument',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/ class \$\w+ is/',
                 ' class is',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/ property \$\w+ is/',
                 ' property is',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/The method \w+\(\) has an NPath complexity of \d+. /',
                 'The method has more NPath complexity than our threshold. ',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/\w+ accesses the super-global variable \$\w+/',
                 'No accessing superglobal variables',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/ \(line \'\d+\', column \'\d+\'\)/',
                 '',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/The class \w+ is not named/',
                 'The class is not named',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/The method \w+\(\) has \d+ lines of code. /',
                 'The method has excessive lines of code. ',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/parameter \$\w+/',
                 'parameter',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/method \w+\(\) contains/',
                 'method contains',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/class \w+ has \d+ public methods/',
                 'class has a lot of public methods',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/class \w+ has \d+ non-getter-/',
                 'class has a lot of non-getter-',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/such as \'\$\w+\'/',
                 '',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/The method \w+::\w+\(\)/',
                 'The method',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/The class \w+ has \d+ fields. Consider redesigning \w+/',
                 'Consider redesigning this class',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/ short method names like \w+::\w+\(\)/',
                 ' short method names',
                 $description,
-            );
+            ) ?? '';
             $description = preg_replace(
                 '/ classes with short names like \w+/',
                 ' classes with short names',
                 $description,
-            );
+            ) ?? '';
 
             $description .= PHP_EOL
                 . PHP_EOL

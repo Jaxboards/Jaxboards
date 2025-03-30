@@ -1,5 +1,6 @@
 <?php
 
+#[AllowDynamicProperties]
 final class SESS
 {
     public $data = [];

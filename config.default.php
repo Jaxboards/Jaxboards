@@ -8,6 +8,7 @@
  *
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards on Github
  */
+// phpcs:disable SlevomatCodingStandard.Variables.UnusedVariable.UnusedVariable
 $CFG = json_decode(
     <<<'EOD'
         {
@@ -40,3 +41,4 @@ $CFG = json_decode(
     ,
     true,
 );
+// phpcs:enable

@@ -4,7 +4,16 @@
 /**
  * Update our composer version to the latest available.
  */
-$versionJSON = file_get_contents('https://getcomposer.org/versions');
+
+const COMPOSER_VERSIONS_URL = 'https://getcomposer.org/versions';
+
+$versionJSON = file_get_contents(COMPOSER_VERSIONS_URL);
+
+if ($versionJSON === false) {
+    fwrite(STDERR, 'Could not read ' . COMPOSER_VERSIONS_URL);
+
+    exit(1);
+}
 
 $versions = json_decode(
     $versionJSON,
@@ -25,6 +34,12 @@ if ($version === null) {
 define('COMPOSER_FILE', dirname(__DIR__) . '/composer.json');
 
 $composerJSON = file_get_contents(COMPOSER_FILE);
+
+if ($composerJSON === false) {
+    fwrite(STDERR, 'Could not read ' . COMPOSER_FILE);
+
+    exit(1);
+}
 
 $composerData = json_decode(
     $composerJSON,
@@ -50,6 +65,12 @@ file_put_contents(
 define('PACKAGE_FILE', dirname(__DIR__) . '/package.json');
 
 $packageJSON = file_get_contents(PACKAGE_FILE);
+
+if ($packageJSON === false) {
+    fwrite(STDERR, 'Could not read ' . PACKAGE_FILE);
+
+    exit(1);
+}
 
 $packageData = json_decode(
     $packageJSON,

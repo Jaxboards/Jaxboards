@@ -13,15 +13,18 @@ if (!defined('JAXBOARDS_ROOT')) {
 }
 
 // This file must be required after mysql connecting.
-if (!isset($DB)) {
-    exit('This file must be required after mysql connecting');
+if (!isset($CFG) || !isset($DB)) {
+    fwrite(STDERR, 'This file must be required after mysql connecting');
+
+    exit(1);
 }
 
-function pathjoin(...$paths): ?string
+function pathjoin(string ...$paths): ?string
 {
     return preg_replace('@\/+@', '/', implode('/', $paths) . '/');
 }
 
+// phpcs:disable SlevomatCodingStandard.Variables.DisallowSuperGlobalVariable
 // Figure out url.
 $host = $_SERVER['SERVER_NAME'];
 // Build the url.
@@ -32,14 +35,15 @@ if (
 ) {
     $boardURL .= (isset($_SERVER['SERVER_PORT']) ? ':' . $_SERVER['SERVER_PORT'] : '');
 }
+// phpcs:enable
 
 define('BOARDURL', $boardURL . '/');
 define('SOUNDSURL', pathjoin(BOARDURL, 'Sounds'));
 
-$domain_match = str_replace('.', '\.', $CFG['domain']);
+$domainMatch = str_replace('.', '\.', $CFG['domain']);
 // Get prefix.
 if ($CFG['service']) {
-    preg_match('@(.*)\.' . $domain_match . '@i', (string) $host, $matches);
+    preg_match('@(.*)\.' . $domainMatch . '@i', (string) $host, $matches);
     if (isset($matches[1]) && $matches[1]) {
         $prefix = $matches[1];
         $CFG['prefix'] = $prefix;
