@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 $PAGE->loadmeta('members');
 new members();
 final class members

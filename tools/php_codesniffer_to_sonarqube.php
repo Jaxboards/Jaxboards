@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+declare(strict_types=1);
+
 /**
  * Tool to convert PHP_CodeSniffer output into something SonarQube can read.
  *

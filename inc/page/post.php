@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // IMPORTANT TO DO: fix file uploading so that it checks
 // permissions within the forum
 // I've already hidden the attach files button,

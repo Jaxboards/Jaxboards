@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 new IM();
 final class IM
 {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 $CFG = [
     'boardoffline' => '0',
     'emotepack' => 'keshaemotes',
