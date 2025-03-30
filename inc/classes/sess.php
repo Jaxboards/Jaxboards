@@ -1,5 +1,6 @@
 <?php
 
+#[AllowDynamicProperties]
 final class SESS
 {
     public $data = [];
@@ -129,30 +130,50 @@ final class SESS
         if ($sid) {
             $result = $isbot === 0
                 ? $DB->safeselect(
-                    <<<'EOT'
-                        `id`,`uid`,INET6_NTOA(`ip`) as `ip`,`vars`,
-                        UNIX_TIMESTAMP(`last_update`) AS `last_update`,
-                        UNIX_TIMESTAMP(`last_action`) AS `last_action`,`runonce`,`location`,
-                        `users_online_cache`,`is_bot`,`buddy_list_cache`,`location_verbose`,
-                        `useragent`,`forumsread`,`topicsread`,
-                        UNIX_TIMESTAMP(`read_date`) AS `read_date`,`hide`
-                        EOT
-                    ,
+                    [
+                        'buddy_list_cache',
+                        'forumsread',
+                        'hide',
+                        'id',
+                        'is_bot',
+                        'location_verbose',
+                        'location',
+                        'runonce',
+                        'topicsread',
+                        'uid',
+                        'useragent',
+                        'users_online_cache',
+                        'vars',
+                        'INET6_NTOA(`ip`) as `ip`',
+                        'UNIX_TIMESTAMP(`last_action`) AS `last_action`',
+                        'UNIX_TIMESTAMP(`last_update`) AS `last_update`',
+                        'UNIX_TIMESTAMP(`read_date`) AS `read_date`',
+                    ],
                     'session',
                     'WHERE `id`=? AND `ip`=INET6_ATON(?)',
                     $DB->basicvalue($sid),
                     $JAX->getIp(),
                 )
                     : $DB->safeselect(
-                        <<<'EOT'
-                            `id`,`uid`,INET6_NTOA(`ip`) as `ip`,`vars`,
-                            UNIX_TIMESTAMP(`last_update`) AS `last_update`,
-                            UNIX_TIMESTAMP(`last_action`) AS `last_action`,`runonce`,`location`,
-                            `users_online_cache`,`is_bot`,`buddy_list_cache`,`location_verbose`,
-                            `useragent`,`forumsread`,`topicsread`,
-                            UNIX_TIMESTAMP(`read_date`) AS `read_date`,`hide`
-                            EOT
-                        ,
+                        [
+                            'buddy_list_cache',
+                            'forumsread',
+                            'hide',
+                            'id',
+                            'is_bot',
+                            'location_verbose',
+                            'location',
+                            'runonce',
+                            'topicsread',
+                            'uid',
+                            'useragent',
+                            'users_online_cache',
+                            'vars',
+                            'INET6_NTOA(`ip`) as `ip`',
+                            'UNIX_TIMESTAMP(`last_action`) AS `last_action`',
+                            'UNIX_TIMESTAMP(`last_update`) AS `last_update`',
+                            'UNIX_TIMESTAMP(`read_date`) AS `read_date`',
+                        ],
                         'session',
                         'WHERE `id`=?',
                         $DB->basicvalue($sid),
@@ -289,7 +310,10 @@ final class SESS
 
         $yesterday = mktime(0, 0, 0);
         $query = $DB->safeselect(
-            '`uid`,UNIX_TIMESTAMP(MAX(`last_action`)) AS `last_action`',
+            [
+                'uid',
+                'UNIX_TIMESTAMP(MAX(`last_action`)) AS `last_action`',
+            ],
             'session',
             'WHERE `last_update`<? GROUP BY uid',
             date('Y-m-d H:i:s', $yesterday),

@@ -70,18 +70,20 @@ final class PAGE
         return $this->parts[$a];
     }
 
-    public function append($a, $b)
+    public function append($a, $b): void
     {
         $a = mb_strtoupper((string) $a);
         if (!$this->jsaccess || $a === 'TITLE') {
             if (!isset($this->parts[$a])) {
-                return $this->reset($a, $b);
+                $this->reset($a, $b);
+
+                return;
             }
 
-            return $this->parts[$a] .= $b;
-        }
+            $this->parts[$a] .= $b;
 
-        return null;
+            return;
+        }
     }
 
     public function addvar($a, $b): void
@@ -94,18 +96,20 @@ final class PAGE
         return str_replace(array_keys($this->vars), array_values($this->vars), $a);
     }
 
-    public function prepend($a, $b)
+    public function prepend($a, $b): void
     {
-        if (!$this->jsaccess) {
-            $a = mb_strtoupper((string) $a);
-            if (!isset($this->parts[$a])) {
-                return $this->reset($a, $b);
-            }
-
-            return $this->parts[$a] = $b . $this->parts[$a];
+        if ($this->jsaccess) {
+            return;
         }
 
-        return null;
+        $a = mb_strtoupper((string) $a);
+        if (!isset($this->parts[$a])) {
+            $this->reset($a, $b);
+
+            return;
+        }
+
+        $this->parts[$a] = $b . $this->parts[$a];
     }
 
     public function location($a): void
@@ -251,7 +255,7 @@ final class PAGE
         $skin = [];
         if ($id) {
             $result = $DB->safeselect(
-                'title,custom,wrapper',
+                ['title', 'custom', 'wrapper'],
                 'skins',
                 'WHERE id=? LIMIT 1',
                 $id,
@@ -262,7 +266,7 @@ final class PAGE
 
         if (empty($skin)) {
             $result = $DB->safeselect(
-                'title,custom,wrapper',
+                ['title', 'custom', 'wrapper'],
                 'skins',
                 'WHERE `default`=1 LIMIT 1',
             );
@@ -420,37 +424,15 @@ final class PAGE
         foreach (explode($s, (string) $m[1]) as $piece) {
             preg_match('@(\S+?)\s*([!><]?=|[><])\s*(\S*)@', $piece, $pp);
 
-            switch ($pp[2]) {
-                case '=':
-                    $c = $pp[1] === $pp[3];
-
-                    break;
-
-                case '!=':
-                    $c = $pp[1] !== $pp[3];
-
-                    break;
-
-                case '>=':
-                    $c = $pp[1] >= $pp[3];
-
-                    break;
-
-                case '>':
-                    $c = $pp[1] > $pp[3];
-
-                    break;
-
-                case '<=':
-                    $c = $pp[1] <= $pp[3];
-
-                    break;
-
-                case '<':
-                    $c = $pp[1] < $pp[3];
-
-                    break;
-            }
+            $c = match ($pp[2]) {
+                '=' => $pp[1] === $pp[3],
+                '!=' => $pp[1] !== $pp[3],
+                '>=' => $pp[1] >= $pp[3],
+                '>' => $pp[1] > $pp[3],
+                '<=' => $pp[1] <= $pp[3],
+                '<' => $pp[1] < $pp[3],
+                default => false,
+            };
 
             if ($s === '&&' && !$c) {
                 break;

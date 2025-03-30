@@ -189,70 +189,6 @@ final class userprofile
         $pfbox = '';
 
         switch ($pfpageloc) {
-            case 'activity':
-            default:
-                $pfpageloc = 'activity';
-                $result = $DB->safespecial(
-                    <<<'EOT'
-                        SELECT a.`id` AS `id`,a.`type` AS `type`,a.`arg1` AS `arg1`,a.`uid` AS `uid`,
-                            UNIX_TIMESTAMP(a.`date`) AS `date`,a.`affected_uid` AS `affected_uid`,
-                            a.`tid` AS `tid`,a.`pid` AS `pid`,a.`arg2` AS `arg2`,
-                            a.`affected_uid` AS `aff_id`,m.`display_name` AS `aff_name`,
-                            m.`group_id` AS `aff_group_id`
-                        FROM %t a
-                        LEFT JOIN %t m
-                            ON a.`affected_uid`=m.`id`
-                        WHERE a.`uid`=?
-                        ORDER BY a.`id` DESC
-                        LIMIT ?
-                        EOT,
-                    ['activity', 'members'],
-                    $id,
-                    $this->num_activity,
-                );
-                if (isset($JAX->b['fmt']) && $JAX->b['fmt'] === 'RSS') {
-                    include_once __DIR__ . '/inc/classes/rssfeed.php';
-                    $feed = new rssfeed(
-                        [
-                            'description' => $udata['usertitle'],
-                            'title' => $udata['display_name'] . "'s recent activity",
-                        ],
-                    );
-                    while ($f = $DB->arow($result)) {
-                        $f['name'] = $udata['display_name'];
-                        $f['group_id'] = $udata['group_id'];
-                        $data = $JAX->parse_activity($f, true);
-                        $feed->additem(
-                            [
-                                'description' => $data['text'],
-                                'guid' => $f['id'],
-                                'link' => 'https://' . $_SERVER['SERVER_NAME']
-                                . $_SERVER['PHP_SELF'] . $data['link'],
-                                'pubDate' => date('r', $f['date']),
-                                'title' => $data['text'],
-                            ],
-                        );
-                    }
-
-                    $feed->publish();
-
-                    exit;
-                }
-
-                while ($f = $DB->arow($result)) {
-                    $f['name'] = $udata['display_name'];
-                    $f['group_id'] = $udata['group_id'];
-                    $pfbox .= $JAX->parse_activity($f);
-                }
-
-                $pfbox = $pfbox === '' || $pfbox === '0'
-                    ? 'This user has yet to do anything noteworthy!'
-                    : "<a href='./?act=vu" . $id
-                    . "&amp;page=activity&amp;fmt=RSS' class='social rss' "
-                    . "style='float:right'>RSS</a>" . $pfbox;
-
-                break;
-
             case 'posts':
                 $result = $DB->safespecial(
                     <<<'EOT'
@@ -487,6 +423,68 @@ final class userprofile
                 }
 
                 break;
+
+            case 'activity':
+            default:
+                $pfpageloc = 'activity';
+                $result = $DB->safespecial(
+                    <<<'EOT'
+                        SELECT a.`id` AS `id`,a.`type` AS `type`,a.`arg1` AS `arg1`,a.`uid` AS `uid`,
+                            UNIX_TIMESTAMP(a.`date`) AS `date`,a.`affected_uid` AS `affected_uid`,
+                            a.`tid` AS `tid`,a.`pid` AS `pid`,a.`arg2` AS `arg2`,
+                            a.`affected_uid` AS `aff_id`,m.`display_name` AS `aff_name`,
+                            m.`group_id` AS `aff_group_id`
+                        FROM %t a
+                        LEFT JOIN %t m
+                            ON a.`affected_uid`=m.`id`
+                        WHERE a.`uid`=?
+                        ORDER BY a.`id` DESC
+                        LIMIT ?
+                        EOT,
+                    ['activity', 'members'],
+                    $id,
+                    $this->num_activity,
+                );
+                if (isset($JAX->b['fmt']) && $JAX->b['fmt'] === 'RSS') {
+                    include_once __DIR__ . '/inc/classes/rssfeed.php';
+                    $feed = new rssfeed(
+                        [
+                            'description' => $udata['usertitle'],
+                            'title' => $udata['display_name'] . "'s recent activity",
+                        ],
+                    );
+                    while ($f = $DB->arow($result)) {
+                        $f['name'] = $udata['display_name'];
+                        $f['group_id'] = $udata['group_id'];
+                        $data = $JAX->parse_activity($f, true);
+                        $feed->additem(
+                            [
+                                'description' => $data['text'],
+                                'guid' => $f['id'],
+                                'link' => 'https://' . $_SERVER['SERVER_NAME']
+                                . $_SERVER['PHP_SELF'] . $data['link'],
+                                'pubDate' => date('r', $f['date']),
+                                'title' => $data['text'],
+                            ],
+                        );
+                    }
+
+                    $feed->publish();
+
+                    exit;
+                }
+
+                while ($f = $DB->arow($result)) {
+                    $f['name'] = $udata['display_name'];
+                    $f['group_id'] = $udata['group_id'];
+                    $pfbox .= $JAX->parse_activity($f);
+                }
+
+                $pfbox = $pfbox === '' || $pfbox === '0'
+                    ? 'This user has yet to do anything noteworthy!'
+                    : "<a href='./?act=vu" . $id
+                    . "&amp;page=activity&amp;fmt=RSS' class='social rss' "
+                    . "style='float:right'>RSS</a>" . $pfbox;
         }
 
         if (

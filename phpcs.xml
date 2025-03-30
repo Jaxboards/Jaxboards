@@ -15,11 +15,6 @@
   <!-- Follow PSR coding style guides -->
   <!-- PSR12: Extended Coding Style https://www.php-fig.org/psr/psr-12 -->
   <rule ref="PSR12">
-    <!-- Disable these rules as they require big changes to the codebase -->
-    <exclude name="PSR1.Files.SideEffects" />
-    <exclude name="PSR1.Classes.ClassDeclaration" />
-    <exclude name="PSR1.Methods.CamelCapsMethodName" />
-    <exclude name="Squiz.Classes.ValidClassName" />
     <!-- Remove rules which conflict with php-cs-fixer rules -->
     <exclude name="Generic.WhiteSpace.ScopeIndent.Incorrect"/>
     <exclude name="Generic.WhiteSpace.ScopeIndent.IncorrectExact"/>
@@ -36,6 +31,9 @@
     <exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine"/>
     <exclude name="Squiz.WhiteSpace.ScopeClosingBrace.ContentBefore"/>
     <exclude name="Squiz.WhiteSpace.ScopeClosingBrace.Indent"/>
+  </rule>
+  <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
+    <exclude-pattern>./tools/update_composer_version.php</exclude-pattern>
   </rule>
   <!-- Here's some comment rules we can follow -->
   <rule ref="Squiz.Commenting.InlineComment">
@@ -190,7 +188,11 @@
   <rule ref="SlevomatCodingStandard.ControlStructures.UselessTernaryOperator"/>
   <rule ref="SlevomatCodingStandard.Exceptions.DeadCatch"/>
   <rule ref="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch"/>
-  <rule ref="SlevomatCodingStandard.Files.FileLength"/>
+  <rule ref="SlevomatCodingStandard.Files.FileLength">
+    <exclude-pattern>./index.php</exclude-pattern>
+    <exclude-pattern>./rector.php</exclude-pattern>
+    <exclude-pattern>./tools/phpmd_to_sonarqube.php</exclude-pattern>
+  </rule>
   <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName"/>
   <rule ref="SlevomatCodingStandard.Functions.DisallowEmptyFunction"/>
   <rule ref="SlevomatCodingStandard.Functions.FunctionLength"/>

@@ -61,6 +61,7 @@ final class FORUM
         $page = '';
         $rows = '';
         $table = '';
+        $unread = false;
 
         $result = $DB->safespecial(
             <<<'EOT'
@@ -376,7 +377,7 @@ final class FORUM
             $pathids = explode(' ', (string) $fdata['path']);
             $forums = [];
             $result = $DB->safeselect(
-                '`title`,`id`',
+                ['id', 'title'],
                 'forums',
                 'WHERE `id` IN ?',
                 $pathids,

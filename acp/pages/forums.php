@@ -79,7 +79,9 @@ final class forums
                 }
 
                 $classes = [];
-                $classes[] = $id[0] === 'c' ? 'parentlock' : 'nofirstlevel';
+                $classes[] = is_string($id) && $id[0] === 'c'
+                    ? 'parentlock'
+                    : 'nofirstlevel';
 
                 if ($highlight && $id === $highlight) {
                     $classes[] = 'highlight';
@@ -99,7 +101,7 @@ final class forums
                     $mods = $PAGE->parseTemplate(
                         'forums/order-forums-tree-item-mods.html',
                         [
-                            'content' => 'moderator' . ($nummods === 1 ? '' : 's'),
+                            'content' => 'moderator' . ($modCount === 1 ? '' : 's'),
                             'mod_count' => $modCount,
                         ],
                     );
@@ -240,7 +242,11 @@ final class forums
 
         $forums = [];
         $result = $DB->safeselect(
-            '`id`,`title`,`order`',
+            [
+                'id',
+                'title',
+                '`order`',
+            ],
             'categories',
             'ORDER BY `order`,`id` ASC',
         );
@@ -252,13 +258,29 @@ final class forums
         $DB->disposeresult($result);
 
         $result = $DB->safeselect(
-            <<<'EOT'
-                `id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
-                UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,`show_sub`,
-                `redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,`redirects`,
-                `trashcan`,`mods`,`show_ledby`
-                EOT
-            ,
+            [
+                'id',
+                'cat_id',
+                'title',
+                'subtitle',
+                'lp_uid',
+                'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
+                'lp_tid',
+                'lp_topic',
+                'path',
+                'show_sub',
+                'redirect',
+                'topics',
+                'posts',
+                '`order`',
+                'perms',
+                'orderby',
+                'nocount',
+                'redirects',
+                'trashcan',
+                'mods',
+                'show_ledby',
+            ],
             'forums',
             'ORDER BY `order`,`title`',
         );
@@ -326,13 +348,29 @@ final class forums
         $fdata = [];
         if ($fid) {
             $result = $DB->safeselect(
-                <<<'EOT'
-                    `id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
-                    UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,`show_sub`,
-                    `redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,`redirects`,
-                    `trashcan`,`mods`,`show_ledby`
-                    EOT
-                ,
+                [
+                    'id',
+                    'cat_id',
+                    'title',
+                    'subtitle',
+                    'lp_uid',
+                    'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
+                    'lp_tid',
+                    'lp_topic',
+                    'path',
+                    'show_sub',
+                    'redirect',
+                    'topics',
+                    'posts',
+                    'order',
+                    'perms',
+                    'orderby',
+                    'nocount',
+                    'redirects',
+                    'trashcan',
+                    'mods',
+                    'show_ledby',
+                ],
                 'forums',
                 'WHERE `id`=?',
                 $DB->basicvalue($fid),
@@ -376,7 +414,7 @@ final class forums
             $grouppermsa = [];
             $groupperms = '';
             $result = $DB->safeselect(
-                '`id`',
+                ['id'],
                 'member_groups',
             );
             while ($f = $DB->arow($result)) {
@@ -417,7 +455,7 @@ final class forums
             }
 
             $result = $DB->safeselect(
-                '`id`',
+                ['id'],
                 'categories',
             );
             $thisrow = $DB->arow($result);
@@ -443,21 +481,56 @@ final class forums
             // Add per-forum moderator.
             if (is_numeric($JAX->p['modid'])) {
                 $result = $DB->safeselect(
-                    <<<'EOT'
-                        `id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
-                        UNIX_TIMESTAMP(`join_date`) AS `join_date`,
-                        UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,`contact_skype`,`contact_yim`,
-                        `contact_msn`,`contact_gtalk`,`contact_aim`,`website`,
-                        `birthdate`, DAY(`birthdate`) AS `dob_day`,
-                        MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
-                        `about`,`display_name`,`full_name`,`contact_steam`,`location`,`gender`,
-                        `friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
-                        `sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
-                        `notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
-                        `contact_discord`,`contact_youtube`,`contact_bluesky`,
-                        `email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
-                        EOT
-                    ,
+                    [
+                        'about',
+                        'avatar',
+                        'birthdate',
+                        'contact_aim',
+                        'contact_bluesky',
+                        'contact_discord',
+                        'contact_gtalk',
+                        'contact_msn',
+                        'contact_skype',
+                        'contact_steam',
+                        'contact_twitter',
+                        'contact_yim',
+                        'contact_youtube',
+                        'display_name',
+                        'email_settings',
+                        'email',
+                        'enemies',
+                        'friends',
+                        'full_name',
+                        'gender',
+                        'group_id',
+                        'id',
+                        'location',
+                        'mod',
+                        'name',
+                        'notify_pm',
+                        'notify_postinmytopic',
+                        'notify_postinsubscribedtopic',
+                        'nowordfilter',
+                        'pass',
+                        'posts',
+                        'sig',
+                        'skin_id',
+                        'sound_im',
+                        'sound_pm',
+                        'sound_postinmytopic',
+                        'sound_postinsubscribedtopic',
+                        'sound_shout',
+                        'ucpnotepad',
+                        'usertitle',
+                        'website',
+                        'wysiwyg',
+                        'DAY(`birthdate`) AS `dob_day`',
+                        'INET6_NTOA(`ip`) AS `ip`',
+                        'MONTH(`birthdate`) AS `dob_month`',
+                        'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
+                        'UNIX_TIMESTAMP(`last_visit`) AS `last_visit`',
+                        'YEAR(`birthdate`) AS `dob_year`',
+                    ],
                     'members',
                     'WHERE `id`=?',
                     $DB->basicvalue($JAX->p['modid']),
@@ -531,16 +604,39 @@ final class forums
         }
 
         $result = $DB->safeselect(
-            <<<'EOT'
-                `id`,`title`,`can_post`,`can_edit_posts`,`can_post_topics`,`can_edit_topics`,
-                `can_add_comments`,`can_delete_comments`,`can_view_board`,
-                `can_view_offline_board`,`flood_control`,`can_override_locked_topics`,
-                `icon`,`can_shout`,`can_moderate`,`can_delete_shouts`,`can_delete_own_shouts`,
-                `can_karma`,`can_im`,`can_pm`,`can_lock_own_topics`,`can_delete_own_topics`,
-                `can_use_sigs`,`can_attach`,`can_delete_own_posts`,`can_poll`,`can_access_acp`,
-                `can_view_shoutbox`,`can_view_stats`,`legend`,`can_view_fullprofile`
-                EOT
-            ,
+            [
+                'can_access_acp',
+                'can_add_comments',
+                'can_attach',
+                'can_delete_comments',
+                'can_delete_own_posts',
+                'can_delete_own_shouts',
+                'can_delete_own_topics',
+                'can_delete_shouts',
+                'can_edit_posts',
+                'can_edit_topics',
+                'can_im',
+                'can_karma',
+                'can_lock_own_topics',
+                'can_moderate',
+                'can_override_locked_topics',
+                'can_pm',
+                'can_poll',
+                'can_post_topics',
+                'can_post',
+                'can_shout',
+                'can_use_sigs',
+                'can_view_board',
+                'can_view_fullprofile',
+                'can_view_offline_board',
+                'can_view_shoutbox',
+                'can_view_stats',
+                'flood_control',
+                'icon',
+                'id',
+                'legend',
+                'title',
+            ],
             'member_groups',
         );
 
@@ -655,7 +751,7 @@ final class forums
 
         if (isset($fdata['mods']) && $fdata['mods']) {
             $result = $DB->safeselect(
-                '`display_name`,`id`',
+                ['display_name', 'id'],
                 'members',
                 'WHERE `id` IN ?',
                 explode(',', (string) $fdata['mods']),
@@ -767,13 +863,29 @@ final class forums
         }
 
         $result = $DB->safeselect(
-            <<<'EOT'
-                `id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
-                UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,
-                `show_sub`,`redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,
-                `redirects`,`trashcan`,`mods`,`show_ledby`
-                EOT
-            ,
+            [
+                'cat_id',
+                'id',
+                'lp_tid',
+                'lp_topic',
+                'lp_uid',
+                'mods',
+                'nocount',
+                'order',
+                'orderby',
+                'path',
+                'perms',
+                'posts',
+                'redirect',
+                'redirects',
+                'show_ledby',
+                'show_sub',
+                'subtitle',
+                'title',
+                'topics',
+                'trashcan',
+                'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
+            ],
             'forums',
             'WHERE `id`=?',
             $DB->basicvalue($id),
@@ -789,13 +901,29 @@ final class forums
         }
 
         $result = $DB->safeselect(
-            <<<'EOT'
-                `id`,`cat_id`,`title`,`subtitle`,`lp_uid`,
-                UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`lp_tid`,`lp_topic`,`path`,
-                `show_sub`,`redirect`,`topics`,`posts`,`order`,`perms`,`orderby`,`nocount`,
-                `redirects`,`trashcan`,`mods`,`show_ledby`
-                EOT
-            ,
+            [
+                'cat_id',
+                'id',
+                'lp_tid',
+                'lp_topic',
+                'lp_uid',
+                'mods',
+                'nocount',
+                'order',
+                'orderby',
+                'path',
+                'perms',
+                'posts',
+                'redirect',
+                'redirects',
+                'show_ledby',
+                'show_sub',
+                'subtitle',
+                'title',
+                'topics',
+                'trashcan',
+                'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
+            ],
             'forums',
         );
         $forums = '';
@@ -834,7 +962,7 @@ final class forums
 
         if ($cid) {
             $result = $DB->safeselect(
-                '`id`,`title`',
+                ['id', 'title'],
                 'categories',
                 'WHERE `id`=?',
                 $DB->basicvalue($cid),
@@ -900,7 +1028,7 @@ final class forums
         $page = '';
         $e = '';
         $result = $DB->safeselect(
-            '`id`,`title`',
+            ['id', 'title'],
             'categories',
         );
         $categories = [];
@@ -983,7 +1111,7 @@ final class forums
             ],
         );
         $result = $DB->safeselect(
-            '`mods`',
+            ['mods'],
             'forums',
         );
         // Build an array of mods.

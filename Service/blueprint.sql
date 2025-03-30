@@ -1,3 +1,4 @@
+SET @WELCOME_TO_CHILIS = 'Welcome to jaxboards!';
 SET NAMES 'utf8mb4';
 SET foreign_key_checks = 0;
 SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
@@ -97,7 +98,7 @@ CREATE TABLE `blueprint_forums` (
 
 TRUNCATE `blueprint_forums`;
 INSERT INTO `blueprint_forums` (`id`, `cat_id`, `title`, `subtitle`, `lp_uid`, `lp_date`, `lp_tid`, `lp_topic`, `path`, `show_sub`, `redirect`, `topics`, `posts`, `order`, `perms`, `orderby`, `nocount`, `redirects`, `trashcan`, `mods`, `show_ledby`) VALUES
-(1,	1,	'Forum',	'Your very first forum!',	1, NOW(),	1,	'Welcome to jaxboards!',	'',	0,	'',	1,	1,	0,	UNHEX(''),	0,	0,	0,	0,	'',	0);
+(1,	1,	'Forum',	'Your very first forum!',	1, NOW(),	1,	@WELCOME_TO_CHILIS,	'',	0,	'',	1,	1,	0,	UNHEX(''),	0,	0,	0,	0,	'',	0);
 
 DROP TABLE IF EXISTS `blueprint_logs`;
 CREATE TABLE `blueprint_logs` (
@@ -353,7 +354,7 @@ CREATE TABLE `blueprint_shouts` (
 
 TRUNCATE `blueprint_shouts`;
 INSERT INTO `blueprint_shouts` (`id`, `uid`, `shout`, `date`, `ip`) VALUES
-(1,	NULL,	'Welcome to jaxboards!', NOW(),	'');
+(1,	NULL,	@WELCOME_TO_CHILIS,	NOW(),	'');
 
 DROP TABLE IF EXISTS `blueprint_skins`;
 CREATE TABLE `blueprint_skins` (
@@ -449,7 +450,7 @@ CREATE TABLE `blueprint_topics` (
 
 TRUNCATE `blueprint_topics`;
 INSERT INTO `blueprint_topics` (`id`, `title`, `subtitle`, `lp_uid`, `lp_date`, `fid`, `auth_id`, `replies`, `views`, `pinned`, `poll_choices`, `poll_results`, `poll_q`, `poll_type`, `summary`, `locked`, `date`, `op`, `cal_event`) VALUES
-(1,	'Welcome to jaxboards!',	'Support appreciated.',	1, NOW(),	1,	1,	0, 0, 0,	'',	'',	'',	'',	'Now, it\'s only a matter of time before you have',	0, NOW(),	1,	0);
+(1,	@WELCOME_TO_CHILIS,	'Support appreciated.',	1, NOW(),	1,	1,	0,	0,	0, '',	'',	'',	'',	'Now, it\'s only a matter of time before you have',	0, NOW(),	1,	0);
 
 SET foreign_key_checks = 1;
 

@@ -1,6 +1,12 @@
-<tr class="%1$s" onclick="if(event.target.tagName=='TD') {
+<tr
+    class="%1$s"
+    onClick="if(event.target.tagName=='TD') {
         this.querySelector('input').click();
-    }">
+    }"
+    onKeyDown="if(event.target.tagName=='TD') {
+        this.querySelector('input').click();
+    }"
+    >
   <td class="center">
     %2$s
   </td>

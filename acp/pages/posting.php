@@ -40,22 +40,11 @@ final class settings
             $JAX->b['do'] = false;
         }
 
-        switch ($JAX->b['do']) {
-            case 'emoticons':
-                $this->emoticons();
-
-                break;
-
-            case 'wordfilter':
-                $this->wordfilter();
-
-                break;
-
-            case 'postrating':
-                $this->postrating();
-
-                break;
-        }
+        match ($JAX->b['do']) {
+            'emoticons' => $this->emoticons(),
+            'postrating' => $this->postrating(),
+            'wordfilter' => $this->wordfilter(),
+        };
     }
 
     public function wordfilter(): void
@@ -64,7 +53,13 @@ final class settings
         $page = '';
         $wordfilter = [];
         $result = $DB->safeselect(
-            '`id`,`type`,`needle`,`replacement`,`enabled`',
+            [
+                'id',
+                'enabled',
+                'needle',
+                'replacement',
+                'type',
+            ],
             'textrules',
             "WHERE `type`='badword'",
         );
@@ -166,7 +161,13 @@ final class settings
 
         // Select emoticons.
         $result = $DB->safeselect(
-            '`id`,`type`,`needle`,`replacement`,`enabled`',
+            [
+                'id',
+                'type',
+                'needle',
+                'replacement',
+                'enabled',
+            ],
             'textrules',
             "WHERE `type`='emote'",
         );
@@ -282,7 +283,7 @@ final class settings
         $page2 = '';
         $niblets = [];
         $result = $DB->safeselect(
-            '`id`,`img`,`title`',
+            ['id', 'img', 'title'],
             'ratingniblets',
             'ORDER BY `id` DESC',
         );

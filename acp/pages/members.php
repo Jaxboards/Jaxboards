@@ -121,21 +121,56 @@ final class members
                 && is_numeric($JAX->b['mid'])
             ) {
                 $result = $DB->safeselect(
-                    <<<'EOT'
-                        `id`,`name`,`pass`,`email`,`sig`,`posts`,`group_id`,`avatar`,`usertitle`,
-                        UNIX_TIMESTAMP(`join_date`) AS `join_date`,
-                        UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,
-                        `contact_skype`,`contact_yim`,`contact_msn`,`contact_gtalk`,`contact_aim`,
-                        `website`,`birthdate`, DAY(`birthdate`) AS `dob_day`,
-                        MONTH(`birthdate`) AS `dob_month`, YEAR(`birthdate`) AS `dob_year`,
-                        `about`,`display_name`,`full_name`,`contact_steam`,`location`,`gender`,
-                        `friends`,`enemies`,`sound_shout`,`sound_im`,`sound_pm`,`sound_postinmytopic`,
-                        `sound_postinsubscribedtopic`,`notify_pm`,`notify_postinmytopic`,
-                        `notify_postinsubscribedtopic`,`ucpnotepad`,`skin_id`,`contact_twitter`,
-                        `contact_discord`,`contact_youtube`,`contact_bluesky`,
-                        `email_settings`,`nowordfilter`,INET6_NTOA(`ip`) AS `ip`,`mod`,`wysiwyg`
-                        EOT
-                    ,
+                    [
+                        'about',
+                        'avatar',
+                        'birthdate',
+                        'contact_aim',
+                        'contact_bluesky',
+                        'contact_discord',
+                        'contact_gtalk',
+                        'contact_msn',
+                        'contact_skype',
+                        'contact_steam',
+                        'contact_twitter',
+                        'contact_yim',
+                        'contact_youtube',
+                        'display_name',
+                        'email_settings',
+                        'email',
+                        'enemies',
+                        'friends',
+                        'full_name',
+                        'gender',
+                        'group_id',
+                        'id',
+                        'location',
+                        '`mod`',
+                        'name',
+                        'notify_pm',
+                        'notify_postinmytopic',
+                        'notify_postinsubscribedtopic',
+                        'nowordfilter',
+                        'pass',
+                        'posts',
+                        'sig',
+                        'skin_id',
+                        'sound_im',
+                        'sound_pm',
+                        'sound_postinmytopic',
+                        'sound_postinsubscribedtopic',
+                        'sound_shout',
+                        'ucpnotepad',
+                        'usertitle',
+                        'website',
+                        'wysiwyg',
+                        'DAY(`birthdate`) AS `dob_day`',
+                        'INET6_NTOA(`ip`) AS `ip`',
+                        'MONTH(`birthdate`) AS `dob_month`',
+                        'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
+                        'UNIX_TIMESTAMP(`last_visit`) AS `last_visit`',
+                        'YEAR(`birthdate`) AS `dob_year`',
+                    ],
                     'members',
                     'WHERE `id`=?',
                     $DB->basicvalue($JAX->b['mid']),
@@ -562,7 +597,7 @@ final class members
 
                 // Sum post count on account being merged into.
                 $result = $DB->safeselect(
-                    '`posts`,`id`',
+                    ['id', 'posts'],
                     'members',
                     'WHERE `id`=?',
                     $mid1,
@@ -813,7 +848,7 @@ final class members
                 $page .= $PAGE->error('All fields required!');
             } else {
                 $q = $DB->safeselect(
-                    '`id`',
+                    ['id'],
                     'members',
                     'WHERE (?-UNIX_TIMESTAMP(`last_visit`))<?',
                     time(),
@@ -884,8 +919,13 @@ final class members
         }
 
         $result = $DB->safeselect(
-            '`id`,`display_name`,INET6_NTOA(`ip`) AS `ip`,`email`,'
-            . 'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
+            [
+                'display_name',
+                'email',
+                'id',
+                'INET6_NTOA(`ip`) AS `ip`',
+                'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
+            ],
             'members',
             'WHERE `group_id`=5',
         );

@@ -44,11 +44,14 @@ final class CALENDAR
         $SESS->location_verbose
             = 'Checking out the calendar for ' . $monthname . ' ' . $year;
         $result = $DB->safeselect(
-            <<<'EOT'
-                `id`,`display_name` AS `name`,`group_id`,DAY(`birthdate`) AS `dob_day`,
-                MONTH(`birthdate`) AS `dob_month`,YEAR(`birthdate`) AS `dob_year`
-                EOT
-            ,
+            [
+                'id',
+                '`display_name` AS `name`',
+                'group_id',
+                'DAY(`birthdate`) AS `dob_day`',
+                'MONTH(`birthdate`) AS `dob_month`',
+                'YEAR(`birthdate`) AS `dob_year`',
+            ],
             'members',
             'WHERE MONTH(`birthdate`)=? AND YEAR(`birthdate`)<?',
             $DB->basicvalue($month),

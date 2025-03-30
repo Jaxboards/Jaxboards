@@ -904,7 +904,12 @@ final class TOPIC
             $e = 'You must be logged in to vote!';
         } else {
             $result = $DB->safeselect(
-                '`poll_q`,`poll_results`,`poll_choices`,`poll_type`',
+                [
+                    'poll_q',
+                    'poll_results',
+                    'poll_choices',
+                    'poll_type',
+                ],
                 'topics',
                 'WHERE `id`=?',
                 $this->id,
@@ -958,7 +963,11 @@ final class TOPIC
                 } else {
                     $e = 'Invalid Choice';
                 }
-            } elseif (!is_numeric($choice) || $c >= $numchoices || $c < 0) {
+            } elseif (
+                !is_numeric($choice)
+                || $choice >= $numchoices
+                || $choice < 0
+            ) {
                 $e = 'Invalid choice';
             }
         }
@@ -1014,7 +1023,7 @@ final class TOPIC
         }
 
         $result = $DB->safeselect(
-            '`rating`',
+            ['rating'],
             'posts',
             'WHERE `id`=?',
             $DB->basicvalue($postid),
@@ -1081,20 +1090,20 @@ final class TOPIC
 
         $PAGE->JS('softurl');
         $result = $DB->safeselect(
-            <<<'MySQL'
-                `id`
-                , `auth_id`
-                , `post`
-                , UNIX_TIMESTAMP(`date`)
-                , `showsig`
-                , `showemotes`
-                , `tid`
-                , `newtopic`
-                , INET6_NTOA(`ip`) AS `ip`
-                , UNIX_TIMESTAMP(`edit_date`) AS `edit_date`
-                , `editby`
-                , `rating`
-                MySQL,
+            [
+                'auth_id',
+                'editby',
+                'id',
+                'newtopic',
+                'post',
+                'rating',
+                'showemotes',
+                'showsig',
+                'tid',
+                'INET6_NTOA(`ip`) AS `ip`',
+                'UNIX_TIMESTAMP(`date`)',
+                'UNIX_TIMESTAMP(`edit_date`) AS `edit_date`',
+            ],
             'posts',
             'WHERE `id`=?',
             $id,
@@ -1126,28 +1135,27 @@ final class TOPIC
                     ],
                 );
                 $result = $DB->safeselect(
-                    <<<'MySQL'
-                        `id`
-                        , `title`
-                        , `subtitle`
-                        , `lp_uid`
-                        , UNIX_TIMESTAMP(`lp_date`) AS `lp_date`
-                        , `fid`
-                        , `auth_id`
-                        , `replies`
-                        , `views`
-                        , `pinned`
-                        , `poll_choices`
-                        , `poll_results`
-                        , `poll_q`
-                        , `poll_type`
-                        , `summary`
-                        , `locked`
-                        , UNIX_TIMESTAMP(`date`) AS `date`
-                        , `op`
-                        , `cal_event`
-
-                        MySQL,
+                    [
+                        'auth_id',
+                        'cal_event',
+                        'fid',
+                        'id',
+                        'locked',
+                        'lp_uid',
+                        'op',
+                        'pinned',
+                        'poll_choices',
+                        'poll_q',
+                        'poll_results',
+                        'poll_type',
+                        'replies',
+                        'subtitle',
+                        'summary',
+                        'title',
+                        'views',
+                        'UNIX_TIMESTAMP(`date`) AS `date`',
+                        'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
+                    ],
                     'topics',
                     'WHERE `id`=?',
                     $post['tid'],
@@ -1257,6 +1265,7 @@ final class TOPIC
     public function findpost($pid): void
     {
         global $PAGE,$DB;
+        $couldntfindit = false;
         if (!is_numeric($pid)) {
             $couldntfindit = true;
         } else {
@@ -1327,7 +1336,7 @@ final class TOPIC
 
         $PAGE->JS('softurl');
         $result = $DB->safeselect(
-            '`rating`',
+            ['rating'],
             'posts',
             'WHERE `id`=?',
             $DB->basicvalue($pid),
@@ -1346,7 +1355,11 @@ final class TOPIC
         }
 
         $result = $DB->safeselect(
-            '`id`,`display_name`,`group_id`',
+            [
+                'id',
+                'display_name',
+                'group_id',
+            ],
             'members',
             'WHERE `id` IN ?',
             $members,

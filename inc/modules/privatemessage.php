@@ -59,12 +59,6 @@ final class IM
         $ud = $USER;
         $e = '';
         $fatal = false;
-        if (false && in_array($uid, explode(',', (string) $USER['enemies']))) {
-            return $PAGE->JS(
-                'error',
-                "You've blocked this recipient and cannot send messages to them.",
-            );
-        }
 
         if (!$ud) {
             return $PAGE->JS('error', 'You must be logged in to instant message!');
@@ -140,7 +134,7 @@ final class IM
     // Stuff I'm doing.
     public function invite($room, $uid, $otherguy = false): void
     {
-        global $USER,$CFG,$DB;
+        global $CFG, $DB, $PAGE, $USER;
         if (!$USER['id']) {
             return;
         }
@@ -162,7 +156,10 @@ final class IM
         if ($JAX->b['im_invitemenu']) {
             $online = $DB->getUsersOnline();
             $result = $DB->safeselect(
-                '`id`,`display_name` AS `name`',
+                [
+                    'id',
+                    '`display_name` AS `name`',
+                ],
                 'members',
                 'WHERE `id` IN ? ORDER BY `name` ASC',
                 explode(',', (string) $USER['friends']),

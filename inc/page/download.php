@@ -9,10 +9,15 @@ final class downloader
         $id = $JAX->b['id'];
         if (is_numeric($id)) {
             $result = $DB->safeselect(
-                <<<'EOT'
-                    `id`,`name`,`hash`,`uid`,`size`,`downloads`,INET6_NTOA(`ip`) AS `ip`
-                    EOT
-                ,
+                [
+                    'id',
+                    'name',
+                    'hash',
+                    'uid',
+                    'size',
+                    'downloads',
+                    'INET6_NTOA(`ip`) AS `ip`',
+                ],
                 'files',
                 'WHERE `id`=?',
                 $id,

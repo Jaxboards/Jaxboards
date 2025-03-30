@@ -13,31 +13,37 @@ if (!defined('JAXBOARDS_ROOT')) {
 }
 
 // This file must be required after mysql connecting.
-if (!isset($DB)) {
-    exit('This file must be required after mysql connecting');
+if (!isset($CFG) || !isset($DB)) {
+    fwrite(STDERR, 'This file must be required after mysql connecting');
+
+    exit(1);
 }
 
+function pathjoin(string ...$paths): ?string
+{
+    return preg_replace('@\/+@', '/', implode('/', $paths) . '/');
+}
+
+// phpcs:disable SlevomatCodingStandard.Variables.DisallowSuperGlobalVariable
 // Figure out url.
 $host = $_SERVER['SERVER_NAME'];
 // Build the url.
-$baseURL = '//' . ($_SERVER['SERVER_NAME'] ?? $CFG['domain']);
+$boardURL = '//' . ($_SERVER['SERVER_NAME'] ?? $CFG['domain']);
 if (
     !($_SERVER['SERVER_PORT'] === '443' && $_SERVER['REQUEST_SCHEME'] === 'https')
     && !($_SERVER['SERVER_PORT'] === '80' && $_SERVER['REQUEST_SCHEME'] === 'http')
 ) {
-    $baseURL .= (isset($_SERVER['SERVER_PORT']) ? ':' . $_SERVER['SERVER_PORT'] : '');
+    $boardURL .= (isset($_SERVER['SERVER_PORT']) ? ':' . $_SERVER['SERVER_PORT'] : '');
 }
+// phpcs:enable
 
-define('BOARDURL', $baseURL . '/');
+define('BOARDURL', $boardURL . '/');
+define('SOUNDSURL', pathjoin(BOARDURL, 'Sounds'));
 
-define('SOUNDSURL', BOARDURL . 'Sounds/');
-define('SCRIPTURL', BOARDURL . 'Script/');
-define('FLAGURL', BOARDURL . 'Service/flags/');
-
-$domain_match = str_replace('.', '\.', $CFG['domain']);
+$domainMatch = str_replace('.', '\.', $CFG['domain']);
 // Get prefix.
 if ($CFG['service']) {
-    preg_match('@(.*)\.' . $domain_match . '@i', (string) $host, $matches);
+    preg_match('@(.*)\.' . $domainMatch . '@i', (string) $host, $matches);
     if (isset($matches[1]) && $matches[1]) {
         $prefix = $matches[1];
         $CFG['prefix'] = $prefix;
@@ -50,17 +56,16 @@ if ($CFG['service']) {
 }
 
 if ($prefix) {
-    define('BOARDPATH', JAXBOARDS_ROOT . '/boards/' . $prefix . '/');
-    define('BOARDPATHURL', BOARDURL . 'boards/' . $prefix . '/');
-    define('STHEMEPATH', JAXBOARDS_ROOT . '/Service/Themes/');
-    define('AVAURL', BOARDURL . 'Service/Themes/Default/avatars/');
-    define('BOARDCONFIG', BOARDPATH . 'config.php');
+    define('BOARDPATH', pathjoin(JAXBOARDS_ROOT, 'boards', $prefix));
+    define('BOARDPATHURL', BOARDURL . pathjoin('boards', $prefix));
+    define('STHEMEPATH', pathjoin(JAXBOARDS_ROOT, 'Service/Themes'));
+    define('AVAURL', BOARDURL . 'Service/Themes/Default/avatars');
     if ($DB) {
         $DB->prefix($CFG['sql_prefix']);
     }
 
     $tempCFG = $CFG;
-    if (@include_once BOARDCONFIG) {
+    if (@include_once BOARDPATH . 'config.php') {
         $CFG = array_merge($tempCFG, $CFG);
     } else {
         $CFG['noboard'] = 1;

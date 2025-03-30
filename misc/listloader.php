@@ -17,7 +17,10 @@ $list = [[], []];
 switch ($_GET['act']) {
     case 'searchmembers':
         $result = $DB->safeselect(
-            '`id`,`display_name` AS `name`',
+            [
+                'id',
+                'display_name',
+            ],
             'members',
             'WHERE `display_name` LIKE ? ORDER BY `display_name` LIMIT 10',
             $DB->basicvalue(
@@ -29,13 +32,12 @@ switch ($_GET['act']) {
         );
         while ($f = $DB->arow($result)) {
             $list[0][] = $f['id'];
-            $list[1][] = $f['name'];
+            $list[1][] = $f['display_name'];
         }
 
         break;
 
-    case '':
-        break;
+    default:
 }
 
 echo json_encode($list);

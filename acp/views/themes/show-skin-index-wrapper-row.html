@@ -3,8 +3,14 @@
     <span>
       {{ title }}
     </span>
-    <a href="#" onclick="return edit(this,'wrapper')" class="icons edit" title="Rename Wrapper">
-    </a>
+    <button
+      class="icons edit"
+      onClick="return edit(this,'wrapper')"
+      onKeyDown="return edit(this,'wrapper')"
+      title="Rename Wrapper"
+      type="button"
+      >
+    </button>
   </td>
   <td>
     <a href="?act=themes&editwrapper={{ title }}">Edit Wrapper</a>

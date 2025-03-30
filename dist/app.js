@@ -2288,12 +2288,12 @@
           const oldclick = link.onclick;
           link.onclick = undefined;
           link.addEventListener('click', (event) => {
+            event.preventDefault();
             // Some links have an onclick that returns true/false based on whether
             // or not the link should execute.
             if (!oldclick || oldclick.call(link) !== false) {
               RUN.stream.location(href);
             }
-            event.preventDefault();
           });
 
           // Open external links in a new window
@@ -2619,8 +2619,7 @@
       document.querySelector(`#im_${a}`).classList.add('offline');
     },
     window([options]) {
-      const existingWindow =
-        options.id && options.id && document.getElementById(options.id);
+      const existingWindow = options.id && document.getElementById(options.id);
       if (existingWindow) {
         existingWindow.querySelector('.title').innerHTML = options.title;
         existingWindow.querySelector('.content').innerHTML = options.content;

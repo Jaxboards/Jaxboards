@@ -220,8 +220,7 @@ export default {
     document.querySelector(`#im_${a}`).classList.add('offline');
   },
   window([options]) {
-    const existingWindow =
-      options.id && options.id && document.getElementById(options.id);
+    const existingWindow = options.id && document.getElementById(options.id);
     if (existingWindow) {
       existingWindow.querySelector('.title').innerHTML = options.title;
       existingWindow.querySelector('.content').innerHTML = options.content;

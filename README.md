@@ -129,7 +129,21 @@ If you want to contribute, great! We make use of some command line utilities,
 though there may be was to integrate these tools in your development environment
 in other ways. It is recommened you fix any errors given off by these tools
 before you commit anything, so we can keep our code clean and easy to manage.
+
+These tools are designed for POSIX compatible shells, so running on bare Windows
+probably won't work. Thankfully Windows has a great solution for this via
+[Windows Subsystem for Linux (wsl)](https://learn.microsoft.com/en-us/windows/wsl/install). Version 1 or 2 should both work.
+
 Here's how to get the developer tools working and running:
+
+### `direnv`
+
+Direnv is a tool that lets us set specific environment settings in this
+directory.
+
+See [installation
+instructions](https://github.com/direnv/direnv/blob/master/docs/installation.md)
+here.
 
 ### node.js Tools
 

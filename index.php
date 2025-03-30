@@ -8,10 +8,13 @@
  *
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
+
+// phpcs:disable SlevomatCodingStandard.Variables.DisallowSuperGlobalVariable
 if ($_GET['showerrors'] ?? false) {
     error_reporting(E_ALL);
     ini_set('display_errors', '1');
 }
+// phpcs:enable
 
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', __DIR__);
@@ -19,7 +22,6 @@ if (!defined('JAXBOARDS_ROOT')) {
 
 header('Cache-Control: no-cache, must-revalidate');
 
-$local = $_SERVER['REMOTE_ADDR'] === '127.0.0.1';
 $microtime = microtime(true);
 
 // Load composer dependencies.
@@ -31,7 +33,7 @@ if (is_readable(CONFIG_FILE)) {
     require CONFIG_FILE;
 }
 
-if (empty($CFG)) {
+if (!isset($CFG)) {
     fwrite(STDERR, 'missing configuration');
 
     http_response_code(500);
@@ -55,10 +57,10 @@ if (!$connected) {
 }
 
 // Start a session.
-ini_set('session.cookie_secure', 1);
-ini_set('session.cookie_httponly', 1);
-ini_set('session.use_cookies', 1);
-ini_set('session.use_only_cookies', 1);
+ini_set('session.cookie_secure', '1');
+ini_set('session.cookie_httponly', '1');
+ini_set('session.use_cookies', '1');
+ini_set('session.use_only_cookies', '1');
 session_start();
 
 // Board Service Stuff, get the board as specified by URL.
@@ -80,11 +82,12 @@ if (isset($CFG['noboard']) && $CFG['noboard']) {
 
 $PAGE = new PAGE();
 $JAX = new JAX();
+// phpcs:disable SlevomatCodingStandard.Variables.DisallowSuperGlobalVariable
 $SESS = new SESS($_SESSION['sid'] ?? false);
 
 if (!isset($_SESSION['uid']) && isset($JAX->c['utoken'])) {
     $result = $DB->safeselect(
-        '`uid`',
+        ['uid'],
         'tokens',
         'WHERE `token`=?',
         $JAX->c['utoken'],
@@ -95,18 +98,24 @@ if (!isset($_SESSION['uid']) && isset($JAX->c['utoken'])) {
     }
 }
 
+// @phpstan-ignore-next-line property.notFound
 if (!$SESS->is_bot && isset($_SESSION['uid']) && $_SESSION['uid']) {
     $JAX->getUser($_SESSION['uid']);
 }
+// phpcs:enable
 
+// phpcs:disable SlevomatCodingStandard.PHP.DisallowReference.DisallowedAssigningByReference
 $USER = &$JAX->userData;
+// phpcs:enable
 $PERMS = $JAX->getPerms();
 
 // Fix ip if necessary.
+// @phpstan-ignore-next-line property.notFound
 if ($USER && $SESS->ip !== $USER['ip']) {
     $DB->safeupdate(
         'members',
         [
+            // @phpstan-ignore-next-line property.notFound
             'ip' => $SESS->ip,
         ],
         'WHERE id=?',
@@ -115,22 +124,27 @@ if ($USER && $SESS->ip !== $USER['ip']) {
 }
 
 // Load the theme.
+// @phpstan-ignore-next-line method.notFound
 $PAGE->loadskin(
     $JAX->pick(
         $SESS->vars['skin_id'] ?? false,
         $USER['skin_id'] ?? false,
     ),
 );
+// @phpstan-ignore-next-line method.notFound
 $PAGE->loadmeta('global');
 
 // Skin selector.
 if (isset($JAX->b['skin_id'])) {
     if (!$JAX->b['skin_id']) {
         $SESS->delvar('skin_id');
+        // @phpstan-ignore-next-line method.notFound
         $PAGE->JS('reload');
     } else {
         $SESS->addvar('skin_id', $JAX->b['skin_id']);
+        // @phpstan-ignore-next-line property.notFound
         if ($PAGE->jsaccess) {
+            // @phpstan-ignore-next-line method.notFound
             $PAGE->JS('reload');
         }
     }
@@ -150,29 +164,45 @@ if (isset($SESS->vars['skin_id']) && $SESS->vars['skin_id']) {
 // If they're logged in through cookies, (username & password)
 // but the session variable has changed/been removed/not updated for some reason
 // this fixes it.
-if ($JAX->userData && !$SESS->is_bot && $JAX->userData['id'] !== $SESS->uid) {
+if (
+    $JAX->userData
+    // @phpstan-ignore-next-line property.notFound
+    && !$SESS->is_bot
+    // @phpstan-ignore-next-line property.notFound
+    && $JAX->userData['id'] !== $SESS->uid
+) {
     $SESS->clean($USER['id']);
+    // @phpstan-ignore-next-line property.notFound
     $SESS->uid = $USER['id'];
     $SESS->applychanges();
 }
 
 // If the user's navigated to a new page, change their action time.
-if ($PAGE->jsnewlocation || !$PAGE->jsaccess) {
+if (
+    // @phpstan-ignore-next-line property.notFound
+    $PAGE->jsnewlocation
+    // @phpstan-ignore-next-line property.notFound
+    || !$PAGE->jsaccess
+) {
     $SESS->act($JAX->b['act'] ?? null);
 }
 
 // Set Navigation.
+// @phpstan-ignore-next-line method.notFound
 $PAGE->path([$JAX->pick($CFG['boardname'], 'Home') => '?']);
 $PAGE->append(
     'TITLE',
     $JAX->pick(
+        // @phpstan-ignore-next-line method.notFound
         $PAGE->meta('title'),
         $CFG['boardname'],
         'JaxBoards',
     ),
 );
 
+// @phpstan-ignore-next-line property.notFound
 if (!$PAGE->jsaccess) {
+    $variables = [];
     foreach (['sound_im', 'wysiwyg'] as $v) {
         $variables[] = "{$v}:" . ($USER ? ($USER[$v] ? 1 : 0) : 1);
     }
@@ -206,18 +236,22 @@ if (!$PAGE->jsaccess) {
 
     $PAGE->append(
         'CSS',
+        // @phpstan-ignore-next-line constant.notFound
         '<link rel="stylesheet" type="text/css" href="' . THEMEPATHURL
         . 'css.css">',
     );
+    // @phpstan-ignore-next-line method.notFound
     if ($PAGE->meta('favicon')) {
         $PAGE->append(
             'CSS',
+            // @phpstan-ignore-next-line method.notFound
             '<link rel="icon" href="' . $PAGE->meta('favicon') . '">',
         );
     }
 
     $PAGE->append(
         'LOGO',
+        // @phpstan-ignore-next-line method.notFound
         $PAGE->meta(
             'logo',
             $JAX->pick(
@@ -228,6 +262,7 @@ if (!$PAGE->jsaccess) {
     );
     $PAGE->append(
         'NAVIGATION',
+        // @phpstan-ignore-next-line method.notFound
         $PAGE->meta(
             'navigation',
             $PERMS['can_moderate']
@@ -245,7 +280,10 @@ if (!$PAGE->jsaccess) {
             $USER['id'],
         );
         $thisrow = $DB->arow($result);
-        $nummessages = array_pop($thisrow);
+        $nummessages = 0;
+        if (is_array($thisrow)) {
+            $nummessages = array_pop($thisrow);
+        }
         $DB->disposeresult($result);
     }
 
@@ -253,6 +291,7 @@ if (!$PAGE->jsaccess) {
         $nummessages = 0;
     }
 
+    // @phpstan-ignore-next-line method.notFound
     $PAGE->addvar('inbox', $nummessages);
     if ($nummessages) {
         $PAGE->append(
@@ -273,15 +312,23 @@ if (!$PAGE->jsaccess) {
         );
     }
 
+    // @phpstan-ignore-next-line method.notFound
     $PAGE->addvar('modlink', $PERMS['can_moderate'] ? $PAGE->meta('modlink') : '');
+    // @phpstan-ignore-next-line method.notFound
     $PAGE->addvar('ismod', $PERMS['can_moderate'] ? 1 : 0);
+    // @phpstan-ignore-next-line method.notFound
     $PAGE->addvar('acplink', $PERMS['can_access_acp'] ? $PAGE->meta('acplink') : '');
+    // @phpstan-ignore-next-line method.notFound
     $PAGE->addvar('isadmin', $PERMS['can_access_acp'] ? 1 : 0);
+    // @phpstan-ignore-next-line method.notFound
     $PAGE->addvar('boardname', $CFG['boardname']);
     $PAGE->append(
         'USERBOX',
-        $USER && $USER['id'] ? $PAGE->meta(
+        $USER && $USER['id']
+        // @phpstan-ignore-next-line method.notFound
+        ? $PAGE->meta(
             'userbox-logged-in',
+            // @phpstan-ignore-next-line method.notFound
             $PAGE->meta(
                 'user-link',
                 $USER['id'],
@@ -292,17 +339,25 @@ if (!$PAGE->jsaccess) {
                 $USER['last_visit'],
             ),
             $nummessages,
-        ) : $PAGE->meta('userbox-logged-out'),
+        )
+        // @phpstan-ignore-next-line method.notFound
+        : $PAGE->meta('userbox-logged-out'),
     );
 }
 
 // end if !jsaccess only
 if ($USER) {
+    // @phpstan-ignore-next-line method.notFound
     $PAGE->addvar('groupid', $JAX->pick($USER['group_id'], 3));
+    // @phpstan-ignore-next-line method.notFound
     $PAGE->addvar('userposts', $USER['posts']);
+    // @phpstan-ignore-next-line method.notFound
     $PAGE->addvar('grouptitle', $PERMS['title']);
+    // @phpstan-ignore-next-line method.notFound
     $PAGE->addvar('avatar', $JAX->pick($USER['avatar'], $PAGE->meta('default-avatar')));
+    // @phpstan-ignore-next-line method.notFound
     $PAGE->addvar('username', $USER['display_name']);
+    // @phpstan-ignore-next-line method.notFound
     $PAGE->addvar('userid', $JAX->pick($USER['id'], 0));
 }
 
@@ -325,16 +380,23 @@ if (
 }
 
 // Include modules.
-foreach (glob('inc/modules/*.php') as $v) {
-    if (preg_match('/tag_(\w+)/', $v, $m)) {
-        if (
-            isset($m[1]) && ((isset($JAX->b['module'])
-            && $JAX->b['module'] === $m[1]) || $PAGE->templatehas($m[1]))
-        ) {
+$modules = glob('inc/modules/*.php');
+if ($modules) {
+    foreach ($modules as $v) {
+        $m = [];
+        if (preg_match('/tag_(\w+)/', $v, $m)) {
+            if (
+                (
+                    isset($JAX->b['module'])
+                    && $JAX->b['module'] === $m[1]
+                    // @phpstan-ignore-next-line method.notFound
+                ) || $PAGE->templatehas($m[1])
+            ) {
+                include $v;
+            }
+        } else {
             include $v;
         }
-    } else {
-        include $v;
     }
 }
 
@@ -348,26 +410,36 @@ $actdefs = [
     'vt' => 'topic',
     'vu' => 'userprofile',
 ];
-if (isset($actdefs[$act]) && $actdefs[$act]) {
+if (isset($actdefs[$act])) {
     $act = $actdefs[$act];
 }
 
 if ($act === 'idx' && isset($JAX->b['module']) && $JAX->b['module']) {
     // Do nothing.
-} elseif ($act && is_file($act = 'inc/page/' . $act . '.php')) {
+} elseif ($act && is_file('inc/page/' . $act . '.php')) {
+    $act = 'inc/page/' . $act . '.php';
+
     include_once $act;
-} elseif (!$PAGE->jsaccess || $PAGE->jsnewlocation) {
+} elseif (
+    // @phpstan-ignore-next-line property.notFound
+    !$PAGE->jsaccess
+    // @phpstan-ignore-next-line property.notFound
+    || $PAGE->jsnewlocation
+) {
     $result = $DB->safeselect(
-        '`page`',
+        ['page'],
         'pages',
         'WHERE `act`=?',
         $DB->basicvalue($actraw),
     );
-    if ($page = $DB->arow($result)) {
+    $page = $DB->arow($result);
+    if ($page) {
         $DB->disposeresult($result);
         $page['page'] = $JAX->bbcodes($page['page']);
         $PAGE->append('PAGE', $page['page']);
+        // @phpstan-ignore-next-line property.notFound
         if ($PAGE->jsnewlocation) {
+            // @phpstan-ignore-next-line method.notFound
             $PAGE->JS('update', 'page', $page['page']);
         }
     } else {
@@ -376,7 +448,9 @@ if ($act === 'idx' && isset($JAX->b['module']) && $JAX->b['module']) {
 }
 
 // Process temporary commands.
+// @phpstan-ignore-next-line property.notFound
 if ($PAGE->jsaccess && $SESS->runonce) {
+    // @phpstan-ignore-next-line method.notFound
     $PAGE->JSRaw($SESS->runonce);
     $SESS->runonce = '';
 }
@@ -387,23 +461,28 @@ $SESS->applyChanges();
 
 $pagegen = '';
 
-if (in_array($JAX->getIp(), ['127.0.0.1', '::1'])) {
+if (in_array($JAX->getIp(), ['127.0.0.1', '::1'], true)) {
     $debug = '';
 
+    /** @phpstan-ignore-next-line method.notFound */
     $debug .= $PAGE->debug() . '<br>';
+    // @phpstan-ignore-next-line method.notFound
     $PAGE->JS('update', '#query .content', $debug);
     $PAGE->append(
         'FOOTER',
+        // @phpstan-ignore-next-line method.notFound
         $PAGE->collapsebox(
             'Debug',
             $debug,
             'query',
         ) . "<div id='debug2'></div><div id='pagegen'></div>",
     );
+    // @phpstan-ignore-next-line method.notFound
     $PAGE->JS(
         'update',
         'pagegen',
-        $pagegen = 'Page Generated in ' . round(1000 * (microtime(true) - $microtime)) . ' ms',
+        $pagegen = 'Page Generated in '
+            . round(1_000 * (microtime(true) - $microtime)) . ' ms',
     );
 }
 
@@ -414,7 +493,9 @@ $PAGE->append(
     . "</div><div id='debug' style='display:none'></div>",
 );
 
+// @phpstan-ignore-next-line property.notFound
 if ($PAGE->jsnewlocation) {
+    // @phpstan-ignore-next-line method.notFound
     $PAGE->JS('title', htmlspecialchars_decode($PAGE->get('TITLE'), ENT_QUOTES));
 }
 

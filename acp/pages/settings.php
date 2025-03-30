@@ -112,7 +112,7 @@ final class settings
     /**
      * Custom pages.
      */
-    public function pages()
+    public function pages(): void
     {
         global $DB,$PAGE,$JAX;
         $page = '';
@@ -132,14 +132,16 @@ final class settings
             } elseif (mb_strlen((string) $newact) > 25) {
                 $e = 'The page URL cannot exceed 25 characters.';
             } else {
-                return $this->pages_edit($newact);
+                $this->pages_edit($newact);
+
+                return;
             }
 
             $page .= $PAGE->error($e);
         }
 
         $result = $DB->safeselect(
-            '`act`,`page`',
+            ['act', 'page'],
             'pages',
         );
         $table = '';
@@ -192,7 +194,7 @@ final class settings
         global $PAGE,$DB,$JAX;
         $page = '';
         $result = $DB->safeselect(
-            '`act`,`page`',
+            ['act', 'page'],
             'pages',
             'WHERE `act`=?',
             $DB->basicvalue($pageurl),

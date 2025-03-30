@@ -111,7 +111,7 @@ final class IDX
 
         $this->mods = array_keys($this->mods);
         $catq = $DB->safeselect(
-            '`id`,`title`,`order`',
+            ['id', 'title', '`order`'],
             'categories',
             'ORDER BY `order`,`title` ASC',
         );
@@ -165,7 +165,7 @@ final class IDX
         if (!$this->moderatorinfo) {
             $this->moderatorinfo = [];
             $result = $DB->safeselect(
-                '`id`,`display_name`,`group_id`',
+                ['id', 'display_name', 'group_id'],
                 '`members`',
                 'WHERE `id` IN ?',
                 $this->mods,
@@ -180,6 +180,7 @@ final class IDX
             }
         }
 
+        $r = '';
         foreach (explode(',', (string) $modids) as $v) {
             $r .= $this->moderatorinfo[$v] . $PAGE->meta('idx-ledby-splitter');
         }
@@ -279,7 +280,7 @@ final class IDX
 
     public function getBoardStats(): string
     {
-        global $DB,$JAX,$PAGE,$PERMS;
+        global $CFG, $DB, $JAX, $PAGE, $PERMS;
         if (!$PERMS['can_view_stats']) {
             return '';
         }
@@ -348,7 +349,7 @@ final class IDX
         $userstoday = mb_substr($userstoday, 0, -2);
         $usersonline = $this->getusersonlinelist();
         $result = $DB->safeselect(
-            '`id`,`title`',
+            ['id', 'title'],
             'member_groups',
             'WHERE `legend`=1 ORDER BY `title`',
         );

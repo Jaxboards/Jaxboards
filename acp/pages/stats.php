@@ -35,7 +35,7 @@ final class stats
     {
         global $DB,$PAGE;
         $result = $DB->safeselect(
-            '`id`,`nocount`',
+            ['id', 'nocount'],
             'forums',
         );
         while ($f = $DB->arow($result)) {
@@ -113,7 +113,7 @@ final class stats
         // Go through and sum up category posts as well
         // as forums with subforums.
         $result = $DB->safeselect(
-            '`id`,`path`,`cat_id`',
+            ['id', 'path', 'cat_id'],
             'forums',
         );
         while ($f = $DB->arow($result)) {

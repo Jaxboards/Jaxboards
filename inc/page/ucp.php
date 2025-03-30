@@ -25,57 +25,56 @@ final class UCP
         }
 
         $result = $DB->safeselect(
-            <<<'EOT'
-                `id`,
-                `name`,
-                `pass`,
-                `email`,
-                `sig`,
-                `posts`,
-                `group_id`,
-                `avatar`,
-                `usertitle`,
-                UNIX_TIMESTAMP(`join_date`) AS `join_date`,
-                UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,
-                `contact_aim`,
-                `contact_bluesky`,
-                `contact_discord`,
-                `contact_gtalk`,
-                `contact_msn`,
-                `contact_skype`,
-                `contact_steam`,
-                `contact_yim`,
-                `contact_youtube`,
-                `website`,
-                `birthdate`,
-                DAY(`birthdate`) AS `dob_day`,
-                MONTH(`birthdate`) AS `dob_month`,
-                YEAR(`birthdate`) AS `dob_year`,
-                `about`,
-                `display_name`,
-                `full_name`,
-                `location`,
-                `gender`,
-                `friends`,
-                `enemies`,
-                `sound_shout`,
-                `sound_im`,
-                `sound_pm`,
-                `sound_postinmytopic`,
-                `sound_postinsubscribedtopic`,
-                `notify_pm`,
-                `notify_postinmytopic`,
-                `notify_postinsubscribedtopic`,
-                `ucpnotepad`,
-                `skin_id`,
-                `contact_twitter`,
-                `email_settings`,
-                `nowordfilter`,
-                INET6_NTOA(`ip`) AS `ip`,
-                `mod`,
-                `wysiwyg`
-                EOT
-            ,
+            [
+                'about',
+                'avatar',
+                'birthdate',
+                'contact_aim',
+                'contact_bluesky',
+                'contact_discord',
+                'contact_gtalk',
+                'contact_msn',
+                'contact_skype',
+                'contact_steam',
+                'contact_twitter',
+                'contact_yim',
+                'contact_youtube',
+                'display_name',
+                'email_settings',
+                'email',
+                'enemies',
+                'friends',
+                'full_name',
+                'gender',
+                'group_id',
+                'id',
+                'location',
+                '`mod`',
+                'name',
+                'notify_pm',
+                'notify_postinmytopic',
+                'notify_postinsubscribedtopic',
+                'nowordfilter',
+                'pass',
+                'posts',
+                'sig',
+                'skin_id',
+                'sound_im',
+                'sound_pm',
+                'sound_postinmytopic',
+                'sound_postinsubscribedtopic',
+                'sound_shout',
+                'ucpnotepad',
+                'usertitle',
+                'website',
+                'wysiwyg',
+                'DAY(`birthdate`) AS `dob_day`',
+                'INET6_NTOA(`ip`) AS `ip`',
+                'MONTH(`birthdate`) AS `dob_month`',
+                'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
+                'UNIX_TIMESTAMP(`last_visit`) AS `last_visit`',
+                'YEAR(`birthdate`) AS `dob_year`',
+            ],
             'members',
             'WHERE `id`=?',
             $DB->basicvalue($USER['id']),
@@ -151,6 +150,7 @@ final class UCP
                             $this->compose($JAX->p['messageid']);
 
                             break;
+                        default:
                     }
                 } else {
                     if (!isset($JAX->b['page'])) {
@@ -787,7 +787,15 @@ final class UCP
         $showthing = false;
         if (isset($JAX->b['skin']) && is_numeric($JAX->b['skin'])) {
             $result = $DB->safeselect(
-                '`id`,`using`,`title`,`custom`,`wrapper`,`default`,`hidden`',
+                [
+                    'id',
+                    '`using`',
+                    'title',
+                    'custom',
+                    'wrapper',
+                    '`default`',
+                    'hidden',
+                ],
                 'skins',
                 'WHERE `id`=?',
                 $JAX->b['skin'],
@@ -826,12 +834,28 @@ final class UCP
 
         $result = $USER['group_id'] !== 2
             ? $DB->safeselect(
-                '`id`,`using`,`title`,`custom`,`wrapper`,`default`,`hidden`',
+                [
+                    'id',
+                    '`using`',
+                    'title',
+                    'custom',
+                    'wrapper',
+                    '`default`',
+                    'hidden',
+                ],
                 'skins',
                 'WHERE `hidden`!=1 ORDER BY `title` ASC',
             )
             : $DB->safeselect(
-                '`id`,`using`,`title`,`custom`,`wrapper`,`default`,`hidden`',
+                [
+                    'id',
+                    '`using`',
+                    'title',
+                    'custom',
+                    'wrapper',
+                    '`default`',
+                    'hidden',
+                ],
                 'skins',
                 'ORDER BY `title` ASC',
             );
@@ -1121,7 +1145,11 @@ final class UCP
             $mid = $JAX->b['mid'];
             if (!$mid && $JAX->b['to']) {
                 $result = $DB->safeselect(
-                    '`id`,`email`,`email_settings`',
+                    [
+                        'id',
+                        'email',
+                        'email_settings',
+                    ],
                     'members',
                     'WHERE `display_name`=?',
                     $DB->basicvalue($JAX->b['to']),
@@ -1130,7 +1158,11 @@ final class UCP
                 $DB->disposeresult($result);
             } else {
                 $result = $DB->safeselect(
-                    '`id`,`email`,`email_settings`',
+                    [
+                        'id',
+                        'email',
+                        'email_settings',
+                    ],
                     'members',
                     'WHERE `id`=?',
                     $DB->basicvalue($mid),
@@ -1216,11 +1248,18 @@ final class UCP
         $msg = '';
         if ($messageid) {
             $result = $DB->safeselect(
-                <<<'EOT'
-                    `id`,`to`,`from`,`title`,`message`,`read`,UNIX_TIMESTAMP(`date`) AS `date`,
-                    `del_recipient`,`del_sender`,`flag`
-                    EOT
-                ,
+                [
+                    'del_recipient',
+                    'del_sender',
+                    'flag',
+                    'from',
+                    'id',
+                    'message',
+                    'read',
+                    'title',
+                    'to',
+                    'UNIX_TIMESTAMP(`date`) AS `date`',
+                ],
                 'messages',
                 'WHERE (`to`=? OR `from`=?) AND `id`=?',
                 $USER['id'],
@@ -1233,7 +1272,7 @@ final class UCP
 
             $mid = $message['from'];
             $result = $DB->safeselect(
-                '`display_name`',
+                ['display_name'],
                 'members',
                 'WHERE `id`=?',
                 $mid,
@@ -1255,7 +1294,7 @@ final class UCP
             $showfull = 1;
             $mid = $JAX->b['mid'];
             $result = $DB->safeselect(
-                '`display_name`',
+                ['display_name'],
                 'members',
                 'WHERE `id`=?',
                 $mid,
@@ -1293,11 +1332,18 @@ final class UCP
     {
         global $PAGE,$JAX,$DB,$USER;
         $result = $DB->safeselect(
-            <<<'EOT'
-                `id`,`to`,`from`,`title`,`message`,`read`,`date`,`del_recipient`,`del_sender`,
-                `flag`
-                EOT
-            ,
+            [
+                'id',
+                'to',
+                'from',
+                'title',
+                'message',
+                'read',
+                'date',
+                'del_recipient',
+                'del_sender',
+                'flag',
+            ],
             'messages',
             'WHERE `id`=?',
             $DB->basicvalue($id),
@@ -1330,11 +1376,18 @@ final class UCP
         }
 
         $result = $DB->safeselect(
-            <<<'EOT'
-                `id`,`to`,`from`,`title`,`message`,`read`,UNIX_TIMESTAMP(`date`) AS `date`,
-                `del_recipient`,`del_sender`,`flag`
-                EOT
-            ,
+            [
+                'del_recipient',
+                'del_sender',
+                'flag',
+                'from',
+                'id',
+                'message',
+                'read',
+                'title',
+                'to',
+                'UNIX_TIMESTAMP(`date`) AS `date`',
+            ],
             'messages',
             'WHERE `id`=?',
             $DB->basicvalue($id),

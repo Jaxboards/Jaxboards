@@ -29,6 +29,10 @@ jobs:
           cache: npm
       - uses: ramsey/composer-install@v3
       - run: npm clean-install
+      - run: ./tools/update_composer_version.php
+      # get the package-lock.json and composer.lock files up to date
+      - run: npm install --include=dev node-composer-runner
+      - run: composer require --dev roave/security-advisories:dev-master@dev
       - run: npm run-script autofix
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:

@@ -24,11 +24,11 @@ define('INACP', 'true');
 
 require JAXBOARDS_ROOT . '/config.php';
 
-require JAXBOARDS_ROOT . '/inc/classes/jax.php';
+require_once JAXBOARDS_ROOT . '/inc/classes/jax.php';
 
-require JAXBOARDS_ROOT . '/inc/classes/mysql.php';
+require_once JAXBOARDS_ROOT . '/inc/classes/mysql.php';
 
-require JAXBOARDS_ROOT . '/acp/page.php';
+require_once JAXBOARDS_ROOT . '/acp/page.php';
 
 /**
  * Strip slashes from input, recursively.

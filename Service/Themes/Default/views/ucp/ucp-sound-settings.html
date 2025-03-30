@@ -10,9 +10,15 @@
   <br>
   &nbsp;%s play a sound
   <br>
-  &nbsp;<input type="checkbox" title="notify_im" onclick="if(!window.webkitNotifications) {alert('browser not supported');
+  &nbsp;<input
+            id="dtnotify"
+            onClick="if(!window.webkitNotifications) {alert('browser not supported');
         } webkitNotifications.requestPermission()"
-    id="dtnotify" />
+            onKeyDown="if(!window.webkitNotifications) {alert('browser not supported');
+        } webkitNotifications.requestPermission()"
+            title="notify_im"
+            type="checkbox"
+            />
   display a desktop notification
   <br>
   <br>
