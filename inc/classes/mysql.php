@@ -38,7 +38,7 @@ final class MySQL
         $this->prefix = $prefix;
         $this->db = $database;
 
-        return (bool) $this->mysqli_connection->connect_errno;
+        return !$this->mysqli_connection->connect_errno;
     }
 
     public function nolog(): void
