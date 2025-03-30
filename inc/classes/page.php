@@ -80,10 +80,10 @@ final class PAGE
                 return;
             }
 
-            return $this->parts[$a] .= $b;
-        }
+            $this->parts[$a] .= $b;
 
-        return null;
+            return;
+        }
     }
 
     public function addvar($a, $b): void
