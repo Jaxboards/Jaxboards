@@ -460,7 +460,7 @@ final class FORUM
         return $topic['lp_date'] <= $JAX->pick(
             max($this->topicsRead[$topic['id']], $this->forumReadTime),
             $SESS->read_date,
-            $USER['last_visit'],
+            $USER && $USER['last_visit'],
         );
     }
 
