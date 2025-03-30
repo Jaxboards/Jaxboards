@@ -106,10 +106,8 @@ final class PAGE
                 return;
             }
 
-            return $this->parts[$a] = $b . $this->parts[$a];
+            $this->parts[$a] = $b . $this->parts[$a];
         }
-
-        return null;
     }
 
     public function location($a): void
