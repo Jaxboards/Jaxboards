@@ -172,7 +172,7 @@ final class POST
             $result = $DB->safeselect(
                 [
                     'auth_id',
-                    'cal_event'
+                    'cal_event',
                     'fid',
                     'id',
                     'locked',
@@ -482,7 +482,7 @@ onclick="this.form.submitButton=this"/></div>
                     'id',
                     'newtopic',
                     'post',
-                    'rating'
+                    'rating',
                     'showemotes',
                     'showsig',
                     'tid',
@@ -514,7 +514,7 @@ onclick="this.form.submitButton=this"/></div>
                 $result = $DB->safeselect(
                     [
                         'auth_id',
-                        'cal_event'
+                        'cal_event',
                         'fid',
                         'id',
                         'locked',
