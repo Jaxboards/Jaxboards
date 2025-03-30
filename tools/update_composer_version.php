@@ -2,9 +2,8 @@
 <?php
 
 /**
- * Update our composer version to the latest available
+ * Update our composer version to the latest available.
  */
-
 $version_json = file_get_contents('https://getcomposer.org/versions');
 
 $versions = json_decode(
