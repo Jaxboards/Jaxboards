@@ -705,6 +705,7 @@
 
   function dropdownMenu(e) {
     const el = e.target;
+
     if (el.tagName.toLowerCase() === 'a') {
       const menu = document.querySelector(`#menu_${el.classList[0]}`);
       el.classList.add('active');
