@@ -91,6 +91,7 @@ final class modcontrols
                 $this->iptools();
 
                 break;
+            default:
         }
     }
 
@@ -243,6 +244,7 @@ final class modcontrols
                 $this->mergetopics();
 
                 break;
+            default:
         }
     }
 
@@ -275,6 +277,7 @@ final class modcontrols
                 $this->cancel();
 
                 break;
+            default:
         }
     }
 

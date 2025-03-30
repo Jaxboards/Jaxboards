@@ -29,6 +29,8 @@ require_once JAXBOARDS_ROOT . '/acp/page.php';
 // Get default CFG.
 require_once JAXBOARDS_ROOT . '/config.default.php';
 
+const DB_DATETIME = 'Y-m-d H:i:s';
+
 /**
  * Recursively copies one directory to another.
  *
@@ -244,7 +246,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                     'directory',
                     [
                         'boardname' => $board,
-                        'date' => date('Y-m-d H:i:s', time()),
+                        'date' => date(DB_DATETIME, time()),
                         'referral' => $JAX->b['r'] ?? '',
                         'registrar_email' => $JAX->p['admin_email'],
                         'registrar_ip' => $JAX->ip2bin(),
@@ -268,7 +270,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                     continue;
                 }
                 // Replace blueprint_ with board name.
-                $line = preg_replace('/blueprint_/', $boardPrefix, $line);
+                $line = str_replace('blueprint_', $boardPrefix, $line);
 
                 // Add line to current query.
                 $query .= $line;
@@ -292,8 +294,8 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                     'display_name' => $JAX->p['admin_username'],
                     'email' => $JAX->p['admin_email'],
                     'group_id' => 2,
-                    'join_date' => date('Y-m-d H:i:s', time()),
-                    'last_visit' => date('Y-m-d H:i:s', time()),
+                    'join_date' => date(DB_DATETIME, time()),
+                    'last_visit' => date(DB_DATETIME, time()),
                     'name' => $JAX->p['admin_username'],
                     'pass' => password_hash(
                         (string) $JAX->p['admin_password'],

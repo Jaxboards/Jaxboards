@@ -37,8 +37,7 @@ switch ($_GET['act']) {
 
         break;
 
-    case '':
-        break;
+    default:
 }
 
 echo json_encode($list);

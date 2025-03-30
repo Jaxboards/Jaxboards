@@ -424,37 +424,15 @@ final class PAGE
         foreach (explode($s, (string) $m[1]) as $piece) {
             preg_match('@(\S+?)\s*([!><]?=|[><])\s*(\S*)@', $piece, $pp);
 
-            switch ($pp[2]) {
-                case '=':
-                    $c = $pp[1] === $pp[3];
-
-                    break;
-
-                case '!=':
-                    $c = $pp[1] !== $pp[3];
-
-                    break;
-
-                case '>=':
-                    $c = $pp[1] >= $pp[3];
-
-                    break;
-
-                case '>':
-                    $c = $pp[1] > $pp[3];
-
-                    break;
-
-                case '<=':
-                    $c = $pp[1] <= $pp[3];
-
-                    break;
-
-                case '<':
-                    $c = $pp[1] < $pp[3];
-
-                    break;
-            }
+            $c = match ($pp[2]) {
+                '=' => $pp[1] === $pp[3],
+                '!=' => $pp[1] !== $pp[3],
+                '>=' => $pp[1] >= $pp[3],
+                '>' => $pp[1] > $pp[3],
+                '<=' => $pp[1] <= $pp[3],
+                '<' => $pp[1] < $pp[3],
+                default => false,
+            };
 
             if ($s === '&&' && !$c) {
                 break;

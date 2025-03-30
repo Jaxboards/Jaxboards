@@ -35,6 +35,8 @@ if (!$CFG['service']) {
     exit(1);
 }
 
+const DB_DATETIME = 'Y-m-d H:i:s';
+
 /**
  * Recurisvely copies one directory to another.
  *
@@ -100,7 +102,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         'directory',
         'WHERE `registrar_ip`=INET6_ATON(?) AND `date`>?',
         $JAX->getIp(),
-        date('Y-m-d H:i:s', time() - 7 * 24 * 60 * 60),
+        date(DB_DATETIME, time() - 7 * 24 * 60 * 60),
     );
     if ($DB->num_rows($result) > 3) {
         $errors[] = 'You may only register one 3 boards per week.';
@@ -139,7 +141,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             'directory',
             [
                 'boardname' => $board,
-                'date' => date('Y-m-d H:i:s', time()),
+                'date' => date(DB_DATETIME, time()),
                 'referral' => $JAX->b['r'] ?? '',
                 'registrar_email' => $JAX->p['email'],
                 'registrar_ip' => $JAX->ip2bin(),
@@ -162,7 +164,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                 continue;
             }
             // Replace blueprint_ with board name.
-            $line = preg_replace('/blueprint_/', $boardPrefix, $line);
+            $line = str_replace('blueprint_', $boardPrefix, $line);
 
             // Add line to current query.
             $query .= $line;
@@ -186,8 +188,8 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                 'display_name' => $JAX->p['username'],
                 'email' => $JAX->p['email'],
                 'group_id' => 2,
-                'join_date' => date('Y-m-d H:i:s', time()),
-                'last_visit' => date('Y-m-d H:i:s', time()),
+                'join_date' => date(DB_DATETIME, time()),
+                'last_visit' => date(DB_DATETIME, time()),
                 'name' => $JAX->p['username'],
                 'pass' => password_hash((string) $JAX->p['password'], PASSWORD_DEFAULT),
                 'posts' => 0,

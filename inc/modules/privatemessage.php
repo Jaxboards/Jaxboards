@@ -59,12 +59,6 @@ final class IM
         $ud = $USER;
         $e = '';
         $fatal = false;
-        if (false && in_array($uid, explode(',', (string) $USER['enemies']))) {
-            return $PAGE->JS(
-                'error',
-                "You've blocked this recipient and cannot send messages to them.",
-            );
-        }
 
         if (!$ud) {
             return $PAGE->JS('error', 'You must be logged in to instant message!');

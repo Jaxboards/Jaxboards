@@ -40,22 +40,11 @@ final class settings
             $JAX->b['do'] = false;
         }
 
-        switch ($JAX->b['do']) {
-            case 'emoticons':
-                $this->emoticons();
-
-                break;
-
-            case 'wordfilter':
-                $this->wordfilter();
-
-                break;
-
-            case 'postrating':
-                $this->postrating();
-
-                break;
-        }
+        match ($JAX->b['do']) {
+            'emoticons' => $this->emoticons(),
+            'postrating' => $this->postrating(),
+            'wordfilter' => $this->wordfilter(),
+        };
     }
 
     public function wordfilter(): void
