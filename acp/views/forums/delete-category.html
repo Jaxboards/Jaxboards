@@ -1,10 +1,10 @@
 <form method="post">
   <label>
     Move all forums to:
+    <select name="moveto">
+      {{ category_options }}
+    </select>
   </label>
-  <select name="moveto">
-    {{ category_options }}
-  </select>
   <br />
   <input type="submit" value="Delete" name="submit" />
 </form>

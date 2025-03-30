@@ -132,7 +132,9 @@ final class settings
             } elseif (mb_strlen((string) $newact) > 25) {
                 $e = 'The page URL cannot exceed 25 characters.';
             } else {
-                return $this->pages_edit($newact);
+                $this->pages_edit($newact);
+
+                return;
             }
 
             $page .= $PAGE->error($e);

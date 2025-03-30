@@ -493,7 +493,7 @@ final class LOGREG
                 $fields_string .= $k . '=' . urlencode((string) $v) . '&';
             }
 
-            rtrim($fields_string, '&');
+            $fields_string = rtrim($fields_string, '&');
 
             $curl_request = curl_init();
             // Set the url, number of POST vars, POST data.

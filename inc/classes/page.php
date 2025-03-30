@@ -75,7 +75,9 @@ final class PAGE
         $a = mb_strtoupper((string) $a);
         if (!$this->jsaccess || $a === 'TITLE') {
             if (!isset($this->parts[$a])) {
-                return $this->reset($a, $b);
+                $this->reset($a, $b);
+
+                return;
             }
 
             return $this->parts[$a] .= $b;
@@ -99,7 +101,9 @@ final class PAGE
         if (!$this->jsaccess) {
             $a = mb_strtoupper((string) $a);
             if (!isset($this->parts[$a])) {
-                return $this->reset($a, $b);
+                $this->reset($a, $b);
+
+                return;
             }
 
             return $this->parts[$a] = $b . $this->parts[$a];

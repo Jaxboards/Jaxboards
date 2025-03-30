@@ -140,7 +140,7 @@ final class IM
     // Stuff I'm doing.
     public function invite($room, $uid, $otherguy = false): void
     {
-        global $USER,$CFG,$DB;
+        global $CFG, $DB, $PAGE, $USER;
         if (!$USER['id']) {
             return;
         }

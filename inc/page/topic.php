@@ -963,7 +963,11 @@ final class TOPIC
                 } else {
                     $e = 'Invalid Choice';
                 }
-            } elseif (!is_numeric($choice) || $c >= $numchoices || $c < 0) {
+            } elseif (
+                !is_numeric($choice)
+                || $choice >= $numchoices
+                || $choice < 0
+            ) {
                 $e = 'Invalid choice';
             }
         }

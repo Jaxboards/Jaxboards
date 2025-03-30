@@ -3,7 +3,12 @@
   <table class="listing">
     <tr>
       <th class="center" width="5%%">
-        <input type="checkbox" title="Select All Messages" onclick="document.querySelectorAll('.check').forEach(checkbox => checkbox.checked = this.checked)" />
+        <input
+          onClick="document.querySelectorAll('.check').forEach(checkbox => checkbox.checked = this.checked)"
+          onKeyDown="document.querySelectorAll('.check').forEach(checkbox => checkbox.checked = this.checked)"
+          title="Select All Messages"
+          type="checkbox"
+          />
       </th>
       <th width="5%%">
         Flag

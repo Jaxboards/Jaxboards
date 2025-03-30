@@ -101,7 +101,7 @@ final class forums
                     $mods = $PAGE->parseTemplate(
                         'forums/order-forums-tree-item-mods.html',
                         [
-                            'content' => 'moderator' . ($nummods === 1 ? '' : 's'),
+                            'content' => 'moderator' . ($modCount === 1 ? '' : 's'),
                             'mod_count' => $modCount,
                         ],
                     );

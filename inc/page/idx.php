@@ -180,6 +180,7 @@ final class IDX
             }
         }
 
+        $r = '';
         foreach (explode(',', (string) $modids) as $v) {
             $r .= $this->moderatorinfo[$v] . $PAGE->meta('idx-ledby-splitter');
         }
@@ -279,7 +280,7 @@ final class IDX
 
     public function getBoardStats(): string
     {
-        global $DB,$JAX,$PAGE,$PERMS;
+        global $CFG, $DB, $JAX, $PAGE, $PERMS;
         if (!$PERMS['can_view_stats']) {
             return '';
         }
