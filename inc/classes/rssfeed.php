@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 final class rssfeed
 {
     public $feed = [];

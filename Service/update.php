@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Updater to update existing jaxboards to new MySQL standards.
  *

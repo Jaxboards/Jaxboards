@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 $rules = [
     '&gt;:(' => 'mad.png',
     '&lt;3' => 'love.png',

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 $rules = [
     '&gt;:(' => 'angry.gif',
     '(!)' => 'exclamation.gif',

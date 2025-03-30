@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Jaxboards. THE ULTIMATE 4UMS WOOOOOOO
  * By Sean John's son (2007 @ 4 AM).

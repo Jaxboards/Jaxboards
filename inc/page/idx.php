@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 $PAGE->loadmeta('idx');
 new IDX();
 final class IDX

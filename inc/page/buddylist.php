@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 $buddylist = $JAX->hiddenFormFields(['module' => 'buddylist']);
 $PAGE->metadefs['buddylist-contacts'] = <<<EOT
     <div class="contacts">

@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+declare(strict_types=1);
+
 /**
  * Tool to convert parallel-lint output into something SonarQube can read.
  *

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 $PAGE->loadmeta('calendar');
 new CALENDAR();
 final class CALENDAR
