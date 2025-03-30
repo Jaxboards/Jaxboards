@@ -1326,7 +1326,7 @@ final class TOPIC
         global $SESS,$PAGE,$JAX;
         $topicsread = $JAX->parsereadmarkers($SESS->topicsread);
         $topicsread[$id] = time();
-        $SESS->topicsread = json_encode($topicsread, true);
+        $SESS->topicsread = json_encode($topicsread);
     }
 
     public function listrating($pid): void
