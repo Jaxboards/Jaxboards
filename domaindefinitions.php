@@ -57,9 +57,9 @@ if ($CFG['service']) {
 
 if ($prefix) {
     define('BOARDPATH', pathjoin(JAXBOARDS_ROOT, 'boards', $prefix));
-    define('BOARDPATHURL', pathjoin(BOARDURL, 'boards', $prefix));
+    define('BOARDPATHURL', BOARDURL . pathjoin('boards', $prefix));
     define('STHEMEPATH', pathjoin(JAXBOARDS_ROOT, 'Service/Themes'));
-    define('AVAURL', pathjoin(BOARDURL, 'Service/Themes/Default/avatars'));
+    define('AVAURL', BOARDURL . 'Service/Themes/Default/avatars');
     if ($DB) {
         $DB->prefix($CFG['sql_prefix']);
     }
