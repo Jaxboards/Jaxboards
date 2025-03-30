@@ -11,4 +11,4 @@
 $CFG = [];
 
 // always load configuration
-require __DIR__ . '/config.default.php';
+require dirname(__DIR__) . '/config.default.php';
