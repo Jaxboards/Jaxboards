@@ -59,16 +59,6 @@ return (new Config())
         'align_multiline_comment' => [
             'comment_type' => 'all_multiline',
         ],
-        // Force strict types declaration in all files.
-        //
-        // Forcing strict types will stop non strict code from working.
-        //
-        // We disable this rule because while this is how php's type system
-				// _should_ work by default, code before that and without tests is
-				// pretty risky to enable it on.
-        //
-        // @see https://cs.symfony.com/doc/rules/strict/declare_strict_types.html
-        'declare_strict_types' => false,
         // Replaces short-echo `<?=` with long format `<?php echo`/`<?php print`
         // syntax, or vice-versa.
         //
