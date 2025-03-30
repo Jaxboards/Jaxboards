@@ -112,7 +112,7 @@ final class settings
     /**
      * Custom pages.
      */
-    public function pages()
+    public function pages(): void
     {
         global $DB,$PAGE,$JAX;
         $page = '';

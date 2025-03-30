@@ -70,7 +70,7 @@ final class PAGE
         return $this->parts[$a];
     }
 
-    public function append($a, $b)
+    public function append($a, $b): void
     {
         $a = mb_strtoupper((string) $a);
         if (!$this->jsaccess || $a === 'TITLE') {
@@ -96,18 +96,20 @@ final class PAGE
         return str_replace(array_keys($this->vars), array_values($this->vars), $a);
     }
 
-    public function prepend($a, $b)
+    public function prepend($a, $b): void
     {
-        if (!$this->jsaccess) {
-            $a = mb_strtoupper((string) $a);
-            if (!isset($this->parts[$a])) {
-                $this->reset($a, $b);
-
-                return;
-            }
-
-            $this->parts[$a] = $b . $this->parts[$a];
+        if ($this->jsaccess) {
+            return;
         }
+
+        $a = mb_strtoupper((string) $a);
+        if (!isset($this->parts[$a])) {
+            $this->reset($a, $b);
+
+            return;
+        }
+
+        $this->parts[$a] = $b . $this->parts[$a];
     }
 
     public function location($a): void
