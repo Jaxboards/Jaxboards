@@ -33,12 +33,12 @@ final class MySQL
         $password,
         $database = '',
         $prefix = '',
-    ): true {
+    ): bool {
         $this->mysqli_connection = new mysqli($host, $user, $password, $database);
         $this->prefix = $prefix;
         $this->db = $database;
 
-        return (bool) $this->mysqli_connection;
+        return (bool) $this->mysqli_connection->connect_errno;
     }
 
     public function nolog(): void
