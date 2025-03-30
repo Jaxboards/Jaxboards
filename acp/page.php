@@ -258,7 +258,7 @@ final class PAGE
             foreach ($data as $name => $content) {
                 $template = str_replace(
                     '{{ ' . mb_strtolower($name) . ' }}',
-                    $content,
+                    $content ?? '',
                     $template,
                 );
             }
