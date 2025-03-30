@@ -788,11 +788,11 @@ final class UCP
             $result = $DB->safeselect(
                 [
                     'id',
-                    'using',
+                    '`using`',
                     'title',
                     'custom',
                     'wrapper',
-                    'default',
+                    '`default`',
                     'hidden',
                 ],
                 'skins',
@@ -835,11 +835,11 @@ final class UCP
             ? $DB->safeselect(
                 [
                     'id',
-                    'using',
+                    '`using`',
                     'title',
                     'custom',
                     'wrapper',
-                    'default',
+                    '`default`',
                     'hidden',
                 ],
                 'skins',
@@ -848,11 +848,11 @@ final class UCP
             : $DB->safeselect(
                 [
                     'id',
-                    'using',
+                    '`using`',
                     'title',
                     'custom',
                     'wrapper',
-                    'default',
+                    '`default`',
                     'hidden',
                 ],
                 'skins',
