@@ -27,7 +27,8 @@
   },
   "require": {
     "composer": "2.8.6",
-    "php": "^8.3.16"
+    "php": "^8.3.16",
+    "doctrine/orm": "*"
   },
   "scripts": {
     "lint": [
