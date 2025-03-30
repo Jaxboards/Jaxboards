@@ -145,7 +145,7 @@ final class members
                         'group_id',
                         'id',
                         'location',
-                        'mod',
+                        '`mod`',
                         'name',
                         'notify_pm',
                         'notify_postinmytopic',
