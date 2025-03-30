@@ -381,6 +381,14 @@ final class SESS
             return;
         }
 
+        if (mb_strlen($sd['location_verbose'] ?? '') > 100) {
+            $sd['location_verbose'] = mb_substr(
+                $sd['location_verbose'],
+                0,
+                100,
+            );
+        }
+
         // Only update if there's data to update.
         $DB->safeupdate(
             'session',
