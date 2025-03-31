@@ -9,6 +9,8 @@ if (!defined(INACP)) {
 new members();
 final class members
 {
+    const DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
+
     public function __construct()
     {
         global $JAX,$PAGE;
@@ -69,6 +71,7 @@ final class members
     public function showmain(): void
     {
         global $PAGE,$DB,$JAX;
+
         $result = $DB->safespecial(
             <<<'EOT'
                 SELECT m.`id` AS `id`,m.`avatar` AS `avatar`,
@@ -89,7 +92,7 @@ final class members
                 [
                     'avatar_url' => $JAX->pick(
                         $f['avatar'],
-                        AVAURL . 'default.gif',
+                        self::DEFAULT_AVATAR,
                     ),
                     'group_title' => $f['group_title'],
                     'id' => $f['id'],
@@ -371,7 +374,7 @@ final class members
                         [
                             'avatar_url' => $JAX->pick(
                                 $v['avatar'],
-                                AVAURL . 'default.gif',
+                                self::DEFAULT_AVATAR,
                             ),
                             'id' => $v['id'],
                             'title' => $v['display_name'],

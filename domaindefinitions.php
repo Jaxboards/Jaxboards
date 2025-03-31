@@ -61,7 +61,6 @@ if ($prefix) {
     define('BOARDPATH', pathjoin(JAXBOARDS_ROOT, 'boards', $prefix));
     define('BOARDPATHURL', BOARDURL . pathjoin('boards', $prefix));
     define('STHEMEPATH', pathjoin(JAXBOARDS_ROOT, 'Service/Themes'));
-    define('AVAURL', BOARDURL . 'Service/Themes/Default/avatars');
     if ($DB) {
         $DB->prefix($CFG['sql_prefix']);
     }
