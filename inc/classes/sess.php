@@ -10,77 +10,51 @@ final class SESS
     public $userData = [];
 
     public $bots = [
-        // Moz SEO crawler
-        'AhrefsBot' => 'Ahrefs',
+        'Googlebot' => 'Google',
+	'GoogleOther' => 'GoogleOther',
+        'Bingbot' => 'Bing',
+        'DuckDuckBot' => 'DuckDuckGo',
+        'Teoma' => 'Ask.com',
+        'archive.org_bot' => 'Internet Archive',
+	'ia_archiver' => 'Internet Archive Alexa',
+        'facebookexternalhit' => 'Facebook',
+        'meta-externalagent' => 'Meta', // May be AI-related
+        'WhatsApp' => 'WhatsApp',
+        'Twitterbot' => 'Twitter',
+        'Bytespider' => 'Bytespider',
+	'TikTokSpider' => 'TikTok',
+        'Discordbot' => 'Discord',
         'Amazonbot' => 'Amazon',
         'Applebot' => 'Applebot',
-        'archive.org_bot' => 'Internet Archive',
-        // SEO graphing services
-        'AwarioBot' => 'Awario',
-        // Machine learning researcher
-        'Baiduspider' => 'Baidu',
-        // SEO crawler
-        'Barkrowler' => 'Babbar.tech',
-        'Bingbot' => 'Bing',
-        'Bytespider' => 'TikTok',
-        // Palo Alto Networks security scanning service
-        'CensysInspect' => 'CensysInspect',
-        // Czech search engine
-        'Centurybot' => 'Century',
-        // SEO crawler
-        'ChatGLM-Spider' => 'ChatGLM',
-        // Anthropic AI bot
-        'ChatGPT-User' => 'ChatGPT',
-        'ClaudeBot' => 'ClaudeBot',
-        'Discordbot' => 'Discord',
-        // Backlink tracking company
-        'DotBot' => 'DotBot',
-        'DuckDuckBot' => 'DuckDuckGo',
-        // Plagiarism scanning software
-        'Expanse' => 'Expanse',
-        'facebookexternalhit' => 'Facebook',
-        // Social media management company
-        'Friendly_Crawler' => 'FriendlyCrawler',
-        'Googlebot' => 'Google',
-        'GoogleOther' => 'GoogleOther',
-        // AI developer
-        'GPTBot' => 'GPTBot',
-        'ia_archiver' => 'Internet Archive Alexa',
-        // AI answers site
-        'ImagesiftBot' => 'Imagesift',
-        // SEO crawler
-        'linkdexbot' => 'Linkdex',
-        // a.k.a. RightDao, a search engine
-        'Mail.RU_Bot' => 'Mail.RU',
-        'meta-externalagent' => 'Meta',
-        // Hive image search; may be AI-related
-        'mj12bot' => 'Majestic',
-        'MojeekBot' => 'Mojeek',
-        // AI developer
-        'OAI-SearchBot' => 'OpenAI',
-        // AI developer
-        'PerplexityBot' => 'Perplexity',
-        // Russian search engine
-        'PetalBot' => 'PetalBot',
-        // British search engine
-        'Qwantbot' => 'Qwant',
-        // British SEO crawler
-        'SemrushBot' => 'Semrush',
-        // Chinese search engine
-        'SeznamBot' => 'Seznam',
-        // French search engine
-        'Sogou web spider' => 'Sogou',
-        'Teoma' => 'Ask.com',
-        'Turnitin' => 'Turnitin',
-        'Twitterbot' => 'Twitter',
-        // May be AI-related
-        'WhatsApp' => 'WhatsApp',
-        // Chinese search crawler (Huawei)
+        'ClaudeBot' => 'ClaudeBot', // Anthropic AI bot
+	'ChatGPT-User' => 'ChatGPT', // AI developer
+        'GPTBot' => 'GPTBot', // AI developer
+        'OAI-SearchBot' => 'OpenAI', // AI developer
+        'PerplexityBot' => 'Perplexity', // AI answers site
+	'ImagesiftBot' => 'Imagesift', // Hive image search; may be AI-related
+        'mj12bot' => 'Majestic', // British SEO crawler
+        'SemrushBot' => 'Semrush', // Backlink tracking company
+        'DotBot' => 'DotBot', // Moz SEO crawler
+        'AhrefsBot' => 'Ahrefs', // SEO crawler
+        'ChatGLM-Spider' => 'ChatGLM', // SEO crawler
+        'linkdexbot' => 'Linkdex', // SEO crawler
+        'Barkrowler' => 'Babbar.tech', // SEO graphing services
+        'AwarioBot' => 'Awario', // Social media management company
+        'Friendly_Crawler' => 'FriendlyCrawler', // Machine learning researcher
+        'Baiduspider' => 'Baidu', // Chinese search engine
+        'YandexBot' => 'Yandex', // Russian search engine
+        'PetalBot' => 'PetalBot', // Chinese search crawler (Huawei)
         'Y!J-WSC' => 'Yahoo Japan',
-        'yahoo! slurp' => 'Yahoo',
-        // Chinese search engine
-        'YandexBot' => 'Yandex',
-        // Security scanner
+	'yahoo! slurp' => 'Yahoo',
+        'MojeekBot' => 'Mojeek', // British search engine
+        'Qwantbot' => 'Qwant', // French search engine
+        'Sogou web spider' => 'Sogou', // Chinese search engine
+        'SeznamBot' => 'Seznam', // Czech search engine
+	'Centurybot' => 'Century', // a.k.a. RightDao, a search engine
+        'Mail.RU_Bot' => 'Mail.RU', // Russian mail service
+	'Turnitin' => 'Turnitin', // Plagiarism scanning software
+        'Expanse' => 'Expanse', // Palo Alto Networks security scanning service
+	'CensysInspect' => 'CensysInspect', // Security scanner
     ];
 
     public $changedData = [];
