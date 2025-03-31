@@ -639,14 +639,14 @@ final class JAX
             preg_match('@v=([\w-]+)@', (string) $m[1], $youtubeMatches);
             $embedUrl = "https://www.youtube.com/embed/{$youtubeMatches[1]}";
 
-            return youtubeEmbedHTML($m[1], $embedUrl);
+            return $this->youtubeEmbedHTML($m[1], $embedUrl);
         }
 
         if (str_contains((string) $m[1], 'youtu.be')) {
             preg_match('@youtu.be/(?P<params>.+)$@', (string) $m[1], $youtubeMatches);
             $embedUrl = "https://www.youtube.com/embed/{$youtubeMatches['params']}";
 
-            return youtubeEmbedHTML($m[1], $embedUrl);
+            return $this->youtubeEmbedHTML($m[1], $embedUrl);
         }
 
         return '-Invalid Video Url-';
@@ -1126,11 +1126,14 @@ final class JAX
             . 'From: ' . $CFG['mail_from'] . PHP_EOL,
         );
     }
-}
 
-function youtubeEmbedHTML($link, $embedUrl): string
-{
-    return <<<EOT
+    // phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength
+    private function youtubeEmbedHTML(
+        string $link,
+        string $embedUrl,
+    ): string {
+        // phpcs:disable Generic.Files.LineLength.TooLong
+        return <<<HTML
         <div class="media youtube">
             <div class="summary">
                 Watch Youtube Video:
@@ -1148,8 +1151,19 @@ function youtubeEmbedHTML($link, $embedUrl): string
                 </a>
             </div>
             <div class="movie" style="display:none">
-                <iframe width="560" height="315" src="{$embedUrl}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <iframe
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen="allowfullscreen"
+                    frameborder="0"
+                    height="315"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    src="{$embedUrl}"
+                    title="YouTube video player"
+                    width="560"
+                    ></iframe>
             </div>
         </div>
-        EOT;
+        HTML;
+        // phpcs:enable
+    }
 }
