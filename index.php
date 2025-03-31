@@ -314,16 +314,6 @@ if (!$PAGE->jsaccess) {
         );
     }
 
-    // @phpstan-ignore-next-line method.notFound
-    $PAGE->addvar('modlink', $PERMS['can_moderate'] ? $PAGE->meta('modlink') : '');
-    // @phpstan-ignore-next-line method.notFound
-    $PAGE->addvar('ismod', $PERMS['can_moderate'] ? 1 : 0);
-    // @phpstan-ignore-next-line method.notFound
-    $PAGE->addvar('acplink', $PERMS['can_access_acp'] ? $PAGE->meta('acplink') : '');
-    // @phpstan-ignore-next-line method.notFound
-    $PAGE->addvar('isadmin', $PERMS['can_access_acp'] ? 1 : 0);
-    // @phpstan-ignore-next-line method.notFound
-    $PAGE->addvar('boardname', $CFG['boardname']);
     $PAGE->append(
         'USERBOX',
         $USER && $USER['id']
@@ -347,7 +337,22 @@ if (!$PAGE->jsaccess) {
     );
 }
 
-// end if !jsaccess only
+
+// @phpstan-ignore-next-line method.notFound
+$PAGE->addvar('modlink', $PERMS['can_moderate'] ? $PAGE->meta('modlink') : '');
+
+// @phpstan-ignore-next-line method.notFound
+$PAGE->addvar('ismod', $PERMS['can_moderate'] ? 'true' : 'false');
+// @phpstan-ignore-next-line method.notFound
+$PAGE->addvar('isguest', !$USER ? 'true' : 'false');
+// @phpstan-ignore-next-line method.notFound
+$PAGE->addvar('isadmin', $PERMS['can_access_acp'] ? 'true' : 'false');
+
+// @phpstan-ignore-next-line method.notFound
+$PAGE->addvar('acplink', $PERMS['can_access_acp'] ? $PAGE->meta('acplink') : '');
+// @phpstan-ignore-next-line method.notFound
+$PAGE->addvar('boardname', $CFG['boardname']);
+
 if ($USER) {
     // @phpstan-ignore-next-line method.notFound
     $PAGE->addvar('groupid', $JAX->pick($USER['group_id'], 3));

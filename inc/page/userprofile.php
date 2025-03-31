@@ -99,13 +99,13 @@ final class userprofile
                     $ud['usertitle'],
                     $ud['uid'],
                     $contactdetails,
-                    in_array(
+                    $USER && in_array(
                         $ud['uid'],
                         explode(',', (string) $USER['friends']),
                     ) ? '<a href="?act=buddylist&remove=' . $ud['uid']
                     . '">Remove Contact</a>' : '<a href="?act=buddylist&add='
                     . $ud['uid'] . '">Add Contact</a>',
-                    in_array(
+                    $USER && in_array(
                         $ud['uid'],
                         explode(',', (string) $USER['enemies']),
                     ) ? '<a href="?act=buddylist&unblock=' . $ud['uid']

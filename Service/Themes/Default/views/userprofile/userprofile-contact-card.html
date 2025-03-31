@@ -13,17 +13,19 @@
         </div>
       </td>
       <td class="right">
-        <button
-          data-window-close="true"
-          onClick="new IMWindow('%4$s',this.innerHTML.match(/IM (.+)/)[1]);"
-          type="button"
-          >
-          IM %1$s
-        </button>
-        <br />
-        <a href="?act=ucp&what=inbox&page=compose&mid=%4$s" data-window-close="true">
-          PM %1$s
-        </a>
+        {if <%isguest%>!=true}
+          <button
+            data-window-close="true"
+            onClick="new IMWindow('%4$s',this.innerHTML.match(/IM (.+)/)[1]);"
+            type="button"
+            >
+            IM %1$s
+          </button>
+          <br />
+          <a href="?act=ucp&what=inbox&page=compose&mid=%4$s" data-window-close="true">
+            PM %1$s
+          </a>
+        {/if}
         <br />
         <br />
         %6$s
