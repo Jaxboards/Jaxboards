@@ -148,7 +148,6 @@ export default {
     if (
       !document.hasFocus() &&
       window.Notification &&
-      Notification &&
       Notification.permission === 'granted'
     ) {
       const notify = new Notification(`${fromName} says:`, { body: message });
