@@ -13,10 +13,10 @@ final class CALENDAR
         global $JAX;
         if (isset($JAX->b['month'])) {
             if (is_numeric($JAX->b['month'])) {
-                $this->month = $JAX->b['month'];
+                $this->month = (int) $JAX->b['month'];
             }
         } else {
-            $this->month = gmdate('n');
+            $this->month = (int) gmdate('n');
         }
 
         $this->monthview();
