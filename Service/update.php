@@ -151,7 +151,7 @@ if ($CFG['service']) {
             <<<'EOT'
                 ALTER TABLE `directory`
                     CHANGE `date` `date_tmp` int(11) unsigned NOT NULL AFTER `registrar_ip`,
-                    ADD `date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `date_tmp`;
+                    ADD `date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `date_tmp`;
                 EOT,
             <<<'EOT'
                 UPDATE `directory`
@@ -1415,7 +1415,7 @@ foreach ($boards as $board) {
                   `type` enum('login','forgotpassword')
                     COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'login',
                   `uid` int(11) unsigned NOT NULL,
-                  `expires` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+                  `expires` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
                   PRIMARY KEY (`token`),
                   KEY `uid` (`uid`),
                   KEY `expires` (`expires`),
@@ -1491,7 +1491,7 @@ foreach ($boards as $board) {
                 <<<EOT
                         ALTER TABLE {$table}
                             CHANGE `{$old}` `{$old}_tmp` int(11) unsigned NOT NULL AFTER `{$pos}`,
-                            ADD `{$new}` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `{$old}_tmp`;
+                            ADD `{$new}` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `{$old}_tmp`;
                     EOT,
                 <<<EOT
                         UPDATE {$table} SET `{$new}`=FROM_UNIXTIME(COALESCE(`{$old}_tmp`, 0));
@@ -1530,7 +1530,7 @@ foreach ($boards as $board) {
         $queries = [
             <<<EOT
                     ALTER TABLE {$table}
-                        ADD `birthdate` date NOT NULL DEFAULT '0000-00-00' AFTER `dob_year`;
+                        ADD `birthdate` date DEFAULT NULL AFTER `dob_year`;
                 EOT,
             <<<EOT
                 UPDATE {$table} SET `dob_year` = 0 WHERE `dob_year` IS NULL;
