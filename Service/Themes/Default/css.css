@@ -68,7 +68,7 @@ textarea {
 }
 
 .window .title {
-  padding-right: 20px;
+  padding: 5px 20px;
   cursor: move;
   text-align: center;
   background: url('img/boxgrad.png') bottom;
@@ -79,7 +79,7 @@ textarea {
 .window .title .controls {
   cursor: pointer;
   position: absolute;
-  top: 2px;
+  top: 7px;
   right: 2px;
   font-size: smaller;
 }
