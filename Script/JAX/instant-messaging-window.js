@@ -1,3 +1,5 @@
+/* global RUN, globalsettings */
+
 export default class IMWindow {
   constructor(uid, uname) {
     if (!globalsettings.can_im) {
