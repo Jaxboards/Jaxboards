@@ -409,7 +409,7 @@ final class JAX
                 $emotepack .= '/';
             }
 
-            $emoteRules = __DIR__ . '/../../' . $emotepack .'rules.php';
+            $emoteRules = __DIR__ . '/../../' . $emotepack . 'rules.php';
 
             if (file_exists($emoteRules)) {
                 require_once $emoteRules;

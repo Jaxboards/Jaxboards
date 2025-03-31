@@ -2946,6 +2946,8 @@
     });
   });
 
+  /* global RUN, globalsettings */
+
   class IMWindow {
     constructor(uid, uname) {
       if (!globalsettings.can_im) {

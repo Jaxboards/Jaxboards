@@ -14,6 +14,7 @@ $DB->connect(
 );
 
 require __DIR__ . '/../domaindefinitions.php';
+
 require __DIR__ . '/../inc/classes/jax.php';
 
 $list = [[], []];
@@ -43,15 +44,15 @@ switch ($_GET['act'] ?? '') {
         break;
 
     case 'emotes':
-            $JAX = new JAX();
-            $rules = $JAX->getEmoteRules(0);
-            foreach ($rules as $k => $v) {
-                $rules[$k] = '<img src="' . $v . '" alt="' . $JAX->blockhtml($k) . '" />';
-            }
+        $JAX = new JAX();
+        $rules = $JAX->getEmoteRules(0);
+        foreach ($rules as $k => $v) {
+            $rules[$k] = '<img src="' . $v . '" alt="' . $JAX->blockhtml($k) . '" />';
+        }
 
-            echo json_encode([array_keys($rules), array_values($rules)]);
-            break;
+        echo json_encode([array_keys($rules), array_values($rules)]);
+
+        break;
 
     default:
 }
-

@@ -14,9 +14,11 @@ final class IM
             $this->filter();
         }
 
-        if (trim($im ?? '') !== '' && $uid) {
-            $this->message($uid, $im);
+        if (!(trim($im ?? '') !== '') || !$uid) {
+            return;
         }
+
+        $this->message($uid, $im);
     }
 
     public function filter(): void

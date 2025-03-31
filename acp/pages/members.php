@@ -9,7 +9,7 @@ if (!defined(INACP)) {
 new members();
 final class members
 {
-    const DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
+    public const string DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
 
     public function __construct()
     {
