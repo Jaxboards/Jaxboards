@@ -830,15 +830,17 @@ final class TOPIC
 
         global $PAGE,$USER,$JAX;
         $page = '';
+        $usersvoted = [];
+        $voted = false;
+        
         if ($USER) {
             // Accomplish three things at once:
             // * Determine if the user has voted.
             // * Count up the number of votes.
             // * Parse the result set.
             $presults = [];
-            $voted = false;
+
             $totalvotes = 0;
-            $usersvoted = [];
             $numvotes = [];
             foreach (explode(';', (string) $results) as $k => $v) {
                 $presults[$k] = $v !== '' && $v !== '0' ? explode(',', $v) : [];
