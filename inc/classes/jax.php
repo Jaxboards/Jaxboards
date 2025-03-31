@@ -634,31 +634,6 @@ final class JAX
 
     public function bbcode_videocallback($m)
     {
-        function youtubeEmbedHTML($link, $embedUrl): string
-        {
-            return <<<EOT
-                <div class="media youtube">
-                    <div class="summary">
-                        Watch Youtube Video:
-                        <a href="{$link}">
-                            {$link}
-                        </a>
-                    </div>
-                    <div class="open">
-                        <a href="{$link}" class="popout">
-                            Popout
-                        </a>
-                        &middot;
-                        <a href="{$link}" class="inline">
-                            Inline
-                        </a>
-                    </div>
-                    <div class="movie" style="display:none">
-                        <iframe width="560" height="315" src="{$embedUrl}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                    </div>
-                </div>
-                EOT;
-        }
 
         if (str_contains((string) $m[1], 'youtube.com')) {
             preg_match('@v=([\w-]+)@', (string) $m[1], $youtubeMatches);
@@ -1151,4 +1126,30 @@ final class JAX
             . 'From: ' . $CFG['mail_from'] . PHP_EOL,
         );
     }
+}
+
+function youtubeEmbedHTML($link, $embedUrl): string
+{
+    return <<<EOT
+        <div class="media youtube">
+            <div class="summary">
+                Watch Youtube Video:
+                <a href="{$link}">
+                    {$link}
+                </a>
+            </div>
+            <div class="open">
+                <a href="{$link}" class="popout">
+                    Popout
+                </a>
+                &middot;
+                <a href="{$link}" class="inline">
+                    Inline
+                </a>
+            </div>
+            <div class="movie" style="display:none">
+                <iframe width="560" height="315" src="{$embedUrl}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            </div>
+        </div>
+        EOT;
 }
