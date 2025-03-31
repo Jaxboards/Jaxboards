@@ -42,7 +42,6 @@
     "phpstan": "composer-runner -- run-script --no-interaction phpstan",
     "phpstan-report": "composer-runner -- run-script --no-interaction phpstan-report",
     "postinstall": "composer-runner -- install",
-    "pre-commit": "npm run-script eslint && npm run-script stylelint && npm run-script php-lint",
     "prettier": "prettier --write --single-quote \"**/*.{{t,j}s{,x,on},{c,sa,sc,le}ss,vue,md,y{,a}ml,graphql}\"",
     "psalm": "composer-runner -- run-script --no-interaction psalm",
     "psalm-report": "composer-runner -- run-script --no-interaction psalm-report",
