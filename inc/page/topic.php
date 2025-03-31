@@ -832,7 +832,7 @@ final class TOPIC
         $page = '';
         $usersvoted = [];
         $voted = false;
-        
+
         if ($USER) {
             // Accomplish three things at once:
             // * Determine if the user has voted.
