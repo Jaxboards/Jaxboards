@@ -25,6 +25,7 @@ final class LOGREG
     public function register()
     {
         global $PAGE,$JAX,$DB,$CFG;
+
         $this->registering = true;
 
         if (isset($JAX->p['username']) && $JAX->p['username']) {
@@ -47,7 +48,9 @@ final class LOGREG
 
         // Show registration form.
         if (!isset($JAX->p['register'])) {
-            $PAGE->JS('update', 'page', $p);
+            if (!$PAGE->jsupdate) {
+                $PAGE->JS('update', 'page', $p);
+            }
 
             return $PAGE->append('PAGE', $p);
         }
@@ -113,7 +116,7 @@ final class LOGREG
             );
             $f = $DB->arow($result);
             $DB->disposeresult($result);
-            if ($f !== false) {
+            if ($f) {
                 if ($f['name'] === $name) {
                     throw new Exception('That username is taken!');
                 }
@@ -130,7 +133,7 @@ final class LOGREG
                 [
                     'display_name' => $dispname,
                     'email' => $email,
-                    'group_id' => $CFG['membervalidation'] ? 5 : 1,
+                    'group_id' => array_key_exists('membervalidation', $CFG) && $CFG['membervalidation'] ? 5 : 1,
                     'ip' => $JAX->ip2bin(),
                     'join_date' => date('Y-m-d H:i:s', time()),
                     'last_visit' => date('Y-m-d H:i:s', time()),
