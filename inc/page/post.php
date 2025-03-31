@@ -591,7 +591,7 @@ onclick="this.form.submitButton=this"/></div>
             'posts',
             [
                 'editby' => $USER['id'],
-                'edit_date' => date('Y-m-d H:i:s', time()),
+                'edit_date' => gmdate('Y-m-d H:i:s'),
                 'post' => $this->postdata,
             ],
             'WHERE `id`=?',
@@ -616,7 +616,7 @@ onclick="this.form.submitButton=this"/></div>
         $postdata = $this->postdata;
         $fdata = false;
         $newtopic = false;
-        $time = time();
+        $postDate = gmdate('Y-m-d H:i:s');
         $uid = $USER['id'];
         $e = '';
 
@@ -705,9 +705,9 @@ onclick="this.form.submitButton=this"/></div>
                     'topics',
                     [
                         'auth_id' => $uid,
-                        'date' => date('Y-m-d H:i:s', $time),
+                        'date' => $postDate,
                         'fid' => $fid,
-                        'lp_date' => date('Y-m-d H:i:s', $time),
+                        'lp_date' => $postDate,
                         'lp_uid' => $uid,
                         'poll_choices' => isset($pollchoices) && $pollchoices
                             ? $JAX->json_encode($pollchoices)
@@ -801,7 +801,7 @@ onclick="this.form.submitButton=this"/></div>
             'posts',
             [
                 'auth_id' => $uid,
-                'date' => date('Y-m-d H:i:s', $time),
+                'date' => $postDate,
                 'ip' => $JAX->ip2bin(),
                 'newtopic' => $newtopic ? 1 : 0,
                 'post' => $postdata,
@@ -827,7 +827,7 @@ onclick="this.form.submitButton=this"/></div>
             'activity',
             [
                 'arg1' => $fdata['topictitle'],
-                'date' => date('Y-m-d H:i:s', $time),
+                'date' => $postDate,
                 'pid' => $pid,
                 'tid' => $tid,
                 'type' => $newtopic ? 'new_topic' : 'new_post',
@@ -847,7 +847,7 @@ onclick="this.form.submitButton=this"/></div>
                 ,
                 ['topics'],
                 $uid,
-                date('Y-m-d H:i:s', $time),
+                $postDate,
                 $tid,
             );
         }
@@ -873,7 +873,7 @@ onclick="this.form.submitButton=this"/></div>
                 $uid,
                 $tid,
                 $fdata['topictitle'],
-                date('Y-m-d H:i:s', $time),
+                $postDate,
                 $path,
             );
         } else {
@@ -889,7 +889,7 @@ onclick="this.form.submitButton=this"/></div>
                 $uid,
                 $tid,
                 $fdata['topictitle'],
-                date('Y-m-d H:i:s', $time),
+                $postDate,
                 $path,
             );
         }

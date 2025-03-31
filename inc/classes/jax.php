@@ -103,12 +103,12 @@ final class JAX
             $fmt = 'a minute ago';
         } elseif ($delta < 3600) {
             $fmt = round($delta / 60) . ' minutes ago';
-        } elseif (date('m j Y') === date('m j Y', $date)) {
-            $fmt = 'Today @ ' . date('g:i a', $date);
-        } elseif (date('m j Y', strtotime('yesterday')) === date('m j Y', $date)) {
-            $fmt = 'Yesterday @ ' . date('g:i a', $date);
+        } elseif (gmdate('m j Y') === gmdate('m j Y', $date)) {
+            $fmt = 'Today @ ' . gmdate('g:i a', $date);
+        } elseif (gmdate('m j Y', strtotime('yesterday')) === gmdate('m j Y', $date)) {
+            $fmt = 'Yesterday @ ' . gmdate('g:i a', $date);
         } else {
-            $fmt = date('M jS, Y @ g:i a', $date);
+            $fmt = gmdate('M jS, Y @ g:i a', $date);
         }
 
         if (!$autodate) {
@@ -130,7 +130,7 @@ final class JAX
         return ($autodate
             ? '<span class="autodate smalldate" title="' . $date . '">'
             : '')
-            . date('g:i' . ($seconds ? ':s' : '') . 'a, n/j/y', $date)
+            . gmdate('g:i' . ($seconds ? ':s' : '') . 'a, n/j/y', $date)
             . ($autodate ? '</span>' : '');
     }
 

@@ -135,8 +135,8 @@ final class LOGREG
                     'email' => $email,
                     'group_id' => array_key_exists('membervalidation', $CFG) && $CFG['membervalidation'] ? 5 : 1,
                     'ip' => $JAX->ip2bin(),
-                    'join_date' => date('Y-m-d H:i:s', time()),
-                    'last_visit' => date('Y-m-d H:i:s', time()),
+                    'join_date' => gmdate('Y-m-d H:i:s'),
+                    'last_visit' => gmdate('Y-m-d H:i:s'),
                     'name' => $name,
                     'pass' => password_hash(
                         $pass1,
@@ -194,7 +194,7 @@ final class LOGREG
                 $DB->safeinsert(
                     'tokens',
                     [
-                        'expires' => date('Y-m-d H:i:s', time() + 3600 * 24 * 30),
+                        'expires' => gmdate('Y-m-d H:i:s', time() + 3600 * 24 * 30),
                         'token' => $logintoken,
                         'type' => 'login',
                         'uid' => $f['id'],
@@ -420,7 +420,7 @@ final class LOGREG
                     $DB->safeinsert(
                         'tokens',
                         [
-                            'expires' => date('Y-m-d H:i:s', time() + 3600 * 24),
+                            'expires' => gmdate('Y-m-d H:i:s', time() + 3600 * 24),
                             'token' => $forgotpasswordtoken,
                             'type' => 'forgotpassword',
                             'uid' => $udata['id'],

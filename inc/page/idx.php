@@ -324,7 +324,7 @@ final class IDX
             ['session', 'members'],
         );
         $nuserstoday = 0;
-        $today = date('n j');
+        $today = gmdate('n j');
         while ($f = $DB->arow($result)) {
             if (!$f['id']) {
                 continue;
@@ -486,7 +486,7 @@ final class IDX
                 EOT
             ,
             ['forums', 'members'],
-            date('Y-m-d H:i:s', $JAX->pick($SESS->last_update, time())),
+            gmdate('Y-m-d H:i:s', $JAX->pick($SESS->last_update)),
         );
 
         while ($f = $DB->arow($result)) {

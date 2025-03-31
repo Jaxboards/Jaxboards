@@ -604,9 +604,9 @@ final class MySQL
                     EOT
                 ,
                 ['session', 'members'],
-                date('Y-m-d H:i:s', time() - $CFG['timetologout']),
+                gmdate('Y-m-d H:i:s', time() - $CFG['timetologout']),
             );
-            $today = date('n j');
+            $today = gmdate('n j');
             while ($f = $this->arow($result)) {
                 if ($f['hide']) {
                     if ($USER && $USER['group_id'] !== 2) {
@@ -646,7 +646,7 @@ final class MySQL
                 $return[$USER['id']] = [
                     'birthday' => $USER['birthday'],
                     'group_id' => $USER['group_id'],
-                    'last_action' => date('Y-m-d H:i:s', $SESS->last_action),
+                    'last_action' => gmdate('Y-m-d H:i:s', $SESS->last_action),
                     'last_update' => $SESS->last_update,
                     'location' => $SESS->location,
                     'location_verbose' => $SESS->location_verbose,
@@ -680,7 +680,7 @@ final class MySQL
             [
                 'lp_date' => isset($d['lp_date'])
                 && is_numeric($d['lp_date'])
-                && $d['lp_date'] ? date('Y-m-d H:i:s', $d['lp_date'])
+                && $d['lp_date'] ? gmdate('Y-m-d H:i:s', $d['lp_date'])
                 : '0000-00-00 00:00:00',
                 'lp_tid' => isset($d['id'])
                 && is_numeric($d['id'])

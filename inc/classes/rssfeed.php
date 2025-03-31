@@ -18,7 +18,7 @@ final class rssfeed
 
     public function publish(): void
     {
-        $this->feed['pubDate'] = date('r');
+        $this->feed['pubDate'] = gmdate('r');
         $xmlFeed = $this->make_xml($this->feed);
         echo <<<EOT
             <?xml version="1.0" encoding="UTF-8" ?>

@@ -530,7 +530,7 @@ final class modcontrols
                 [
                     'auth_id' => $USER['id'],
                     'fid' => $trashcan,
-                    'lp_date' => date('Y-m-d H:i:s', time()),
+                    'lp_date' => gmdate('Y-m-d H:i:s'),
                     'lp_uid' => $lp['auth_id'],
                     'op' => $op,
                     'replies' => 0,
@@ -1150,7 +1150,7 @@ final class modcontrols
                     onclick="this.form.submitButton=this" value="Ban" />
                 EOT;
 
-            $torDate = date('Y-m-d', strtotime('-2 days'));
+            $torDate = gmdate('Y-m-d', strtotime('-2 days'));
             $page .= $this->box(
                 'Info',
                 <<<EOT

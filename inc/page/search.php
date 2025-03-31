@@ -248,11 +248,11 @@ final class search
             }
 
             if (isset($datestart) && $datestart) {
-                $arguments[] = date('Y-m-d H:i:s', $datestart);
+                $arguments[] = gmdate('Y-m-d H:i:s', $datestart);
             }
 
             if (isset($dateend) && $dateend) {
-                $arguments[] = date('Y-m-d H:i:s', $dateend);
+                $arguments[] = gmdate('Y-m-d H:i:s', $dateend);
             }
 
             $arguments[] = $DB->basicvalue($termraw);
@@ -263,11 +263,11 @@ final class search
             }
 
             if (isset($datestart) && $datestart) {
-                $arguments[] = date('Y-m-d H:i:s', $datestart);
+                $arguments[] = gmdate('Y-m-d H:i:s', $datestart);
             }
 
             if (isset($dateend) && $dateend) {
-                $arguments[] = date('Y-m-d H:i:s', $dateend);
+                $arguments[] = gmdate('Y-m-d H:i:s', $dateend);
             }
 
             $result = call_user_func_array(

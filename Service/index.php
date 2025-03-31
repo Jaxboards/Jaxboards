@@ -102,7 +102,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         'directory',
         'WHERE `registrar_ip`=INET6_ATON(?) AND `date`>?',
         $JAX->getIp(),
-        date(DB_DATETIME, time() - 7 * 24 * 60 * 60),
+        gmdate(DB_DATETIME, time() - 7 * 24 * 60 * 60),
     );
     if ($DB->num_rows($result) > 3) {
         $errors[] = 'You may only register one 3 boards per week.';
@@ -141,7 +141,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             'directory',
             [
                 'boardname' => $board,
-                'date' => date(DB_DATETIME, time()),
+                'date' => gmdate(DB_DATETIME),
                 'referral' => $JAX->b['r'] ?? '',
                 'registrar_email' => $JAX->p['email'],
                 'registrar_ip' => $JAX->ip2bin(),
@@ -188,8 +188,8 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                 'display_name' => $JAX->p['username'],
                 'email' => $JAX->p['email'],
                 'group_id' => 2,
-                'join_date' => date(DB_DATETIME, time()),
-                'last_visit' => date(DB_DATETIME, time()),
+                'join_date' => gmdate(DB_DATETIME),
+                'last_visit' => gmdate(DB_DATETIME),
                 'name' => $JAX->p['username'],
                 'pass' => password_hash((string) $JAX->p['password'], PASSWORD_DEFAULT),
                 'posts' => 0,
@@ -292,7 +292,7 @@ Save your refresh button.
    </div>
 </div>
    <div id='copyright'>
-        JaxBoards &copy; 2007-<?php date('Y'); ?>, All Rights Reserved
+        JaxBoards &copy; 2007-<?php gmdate('Y'); ?>, All Rights Reserved
     </div>
 </body>
 </html>

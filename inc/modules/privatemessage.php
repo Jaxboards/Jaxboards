@@ -121,7 +121,7 @@ final class IM
             ['session'],
             $DB->basicvalue(json_encode($cmd) . PHP_EOL),
             $uid,
-            date('Y-m-d H:i:s', time() - $CFG['updateinterval'] * 5),
+            gmdate('Y-m-d H:i:s', time() - $CFG['updateinterval'] * 5),
         );
 
         return $DB->affected_rows(1) !== 0;

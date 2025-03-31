@@ -569,8 +569,8 @@ final class UCP
                 = !$data['dob_year']
                 || !is_numeric($data['dob_year'])
                 || $data['dob_year'] < 1
-                || $data['dob_year'] > (int) date('Y')
-             ? null : date(
+                || $data['dob_year'] > (int) gmdate('Y')
+             ? null : gmdate(
                  'Y',
                  strtotime($data['dob_year'] . '/1/1'),
              );
@@ -580,7 +580,7 @@ final class UCP
                 || !is_numeric($data['dob_month'])
                 || $data['dob_month'] < 1
                 || $data['dob_month'] > 12
-             ? null : date(
+             ? null : gmdate(
                  'm',
                  strtotime('2000/' . $data['dob_month'] . '/1'),
              );
@@ -589,7 +589,7 @@ final class UCP
                 = !$data['dob_day']
                 || !is_numeric($data['dob_day'])
                 || $data['dob_day'] < 1
-             ? null : date(
+             ? null : gmdate(
                  'd',
                  strtotime('2000/1/' . $data['dob_day']),
              );
@@ -600,7 +600,7 @@ final class UCP
                 if ((int) $data['dob_month'] === 2) {
                     if (
                         $data['dob_year'] > 0
-                        && date('L', strtotime($data['dob_year']))
+                        && gmdate('L', strtotime($data['dob_year']))
                     ) {
                         $daysInMonth = 29;
                     } elseif ($data['dob_year'] > 0) {
@@ -611,7 +611,7 @@ final class UCP
                         $daysInMonth = 29;
                     }
                 } else {
-                    $daysInMonth = (int) date(
+                    $daysInMonth = (int) gmdate(
                         't',
                         strtotime($data['dob_month'] . '/1'),
                     );
@@ -684,7 +684,7 @@ final class UCP
                         [
                             'arg1' => $USER['display_name'],
                             'arg2' => $data['display_name'],
-                            'date' => date('Y-m-d H:i:s', time()),
+                            'date' => gmdate('Y-m-d H:i:s'),
                             'type' => 'profile_name_change',
                             'uid' => $USER['id'],
                         ],
@@ -748,7 +748,7 @@ final class UCP
 
         $dobselect .= '</select><select name="dob_year" title="Year">'
             . '<option value="">--</option>';
-        $thisyear = (int) date('Y');
+        $thisyear = (int) gmdate('Y');
         for ($x = $thisyear; $x > $thisyear - 100; --$x) {
             $dobselect .= '<option value="' . $x . '"'
                 . ($x === $data['dob_year'] ? ' selected="selected"' : '')
@@ -1191,7 +1191,7 @@ final class UCP
                 $DB->safeinsert(
                     'messages',
                     [
-                        'date' => date('Y-m-d H:i:s', time()),
+                        'date' => gmdate('Y-m-d H:i:s'),
                         'del_recipient' => 0,
                         'del_sender' => 0,
                         'from' => $USER['id'],

@@ -349,7 +349,7 @@ final class SHOUTBOX
         $DB->safeinsert(
             'shouts',
             [
-                'date' => date('Y-m-d H:i:s', time()),
+                'date' => gmdate('Y-m-d H:i:s'),
                 'ip' => $JAX->ip2bin(),
                 'shout' => $shout,
                 'uid' => $JAX->pick($JAX->userData['id'], 0),

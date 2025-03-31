@@ -341,7 +341,7 @@ final class userprofile
                             'activity',
                             [
                                 'affected_uid' => $id,
-                                'date' => date('Y-m-d H:i:s', time()),
+                                'date' => gmdate('Y-m-d H:i:s'),
                                 'type' => 'profile_comment',
                                 'uid' => $USER['id'],
                             ],
@@ -350,7 +350,7 @@ final class userprofile
                             'profile_comments',
                             [
                                 'comment' => $JAX->p['comment'],
-                                'date' => date('Y-m-d H:i:s', time()),
+                                'date' => gmdate('Y-m-d H:i:s'),
                                 'from' => $USER['id'],
                                 'to' => $id,
                             ],
@@ -465,7 +465,7 @@ final class userprofile
                                 'guid' => $f['id'],
                                 'link' => 'https://' . $_SERVER['SERVER_NAME']
                                 . $_SERVER['PHP_SELF'] . $data['link'],
-                                'pubDate' => date('r', $f['date']),
+                                'pubDate' => gmdate('r', $f['date']),
                                 'title' => $data['text'],
                             ],
                         );

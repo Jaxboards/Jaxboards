@@ -183,7 +183,7 @@ final class TOPIC
                         'description' => $JAX->blockhtml($JAX->theworks($f['post'])),
                         'guid' => $f['id'],
                         'link' => $link . '?act=vt' . $id . '&amp;findpost=' . $f['id'],
-                        'pubDate' => date('r', $f['date']),
+                        'pubDate' => gmdate('r', $f['date']),
                         'title' => $f['display_name'] . ':',
                     ],
                 );

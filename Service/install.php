@@ -246,7 +246,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                     'directory',
                     [
                         'boardname' => $board,
-                        'date' => date(DB_DATETIME, time()),
+                        'date' => gmdate(DB_DATETIME),
                         'referral' => $JAX->b['r'] ?? '',
                         'registrar_email' => $JAX->p['admin_email'],
                         'registrar_ip' => $JAX->ip2bin(),
@@ -294,8 +294,8 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                     'display_name' => $JAX->p['admin_username'],
                     'email' => $JAX->p['admin_email'],
                     'group_id' => 2,
-                    'join_date' => date(DB_DATETIME, time()),
-                    'last_visit' => date(DB_DATETIME, time()),
+                    'join_date' => gmdate(DB_DATETIME),
+                    'last_visit' => gmdate(DB_DATETIME),
                     'name' => $JAX->p['admin_username'],
                     'pass' => password_hash(
                         (string) $JAX->p['admin_password'],
@@ -407,7 +407,7 @@ Save your refresh button.
 
 </div>
    <div id='copyright'>
-JaxBoards &copy; 2007-<?php echo date('Y'); ?>, All Rights Reserved
+JaxBoards &copy; 2007-<?php echo gmdate('Y'); ?>, All Rights Reserved
 </div>
 </body>
 </html>

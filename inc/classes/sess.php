@@ -179,14 +179,14 @@ final class SESS
             $_SESSION['sid'] = $sid;
         }
 
-        $time = time();
+        $actionTime = gmdate('Y-m-d H:i:s');
         $sessData = [
             'forumsread' => '{}',
             'id' => $sid,
             'ip' => $JAX->ip2bin(),
             'is_bot' => $isbot,
-            'last_action' => date('Y-m-d H:i:s', $time),
-            'last_update' => date('Y-m-d H:i:s', $time),
+            'last_action' => $actionTime,
+            'last_update' => $actionTime,
             'runonce' => '',
             'topicsread' => '{}',
             'uid' => $uid,
@@ -273,7 +273,7 @@ final class SESS
                 'session',
                 'WHERE `uid`=? AND `last_update`<?',
                 $DB->basicvalue($uid),
-                date('Y-m-d H:i:s', $timeago),
+                gmdate('Y-m-d H:i:s', $timeago),
             );
             // Delete all expired tokens as well while we're here...
             $DB->safedelete(
@@ -292,7 +292,7 @@ final class SESS
             ],
             'session',
             'WHERE `last_update`<? GROUP BY uid',
-            date('Y-m-d H:i:s', $yesterday),
+            gmdate('Y-m-d H:i:s', $yesterday),
         );
         while ($f = $DB->arow($query)) {
             if (!$f['uid']) {
@@ -302,7 +302,7 @@ final class SESS
             $DB->safeupdate(
                 'members',
                 [
-                    'last_visit' => date('Y-m-d H:i:s', $f['last_action']),
+                    'last_visit' => gmdate('Y-m-d H:i:s', $f['last_action']),
                 ],
                 'WHERE `id`=?',
                 $f['uid'],
@@ -316,8 +316,8 @@ final class SESS
                     OR (`uid` IS NULL AND `last_update`<?)
                 EOT
             ,
-            date('Y-m-d H:i:s', $yesterday),
-            date('Y-m-d H:i:s', $timeago),
+            gmdate('Y-m-d H:i:s', $yesterday),
+            gmdate('Y-m-d H:i:s', $timeago),
         );
 
         return true;
@@ -328,14 +328,14 @@ final class SESS
         global $DB,$PAGE;
         $sd = $this->changedData;
         $id = $this->data['id'];
-        $sd['last_update'] = date('Y-m-d H:i:s', time());
+        $sd['last_update'] = gmdate('Y-m-d H:i:s');
         $datetimes = ['last_action', 'read_date'];
         foreach ($datetimes as $datetime) {
             if (!isset($sd[$datetime])) {
                 continue;
             }
 
-            $sd[$datetime] = date('Y-m-d H:i:s', $sd[$datetime]);
+            $sd[$datetime] = gmdate('Y-m-d H:i:s', $sd[$datetime]);
         }
 
         if ($this->data['is_bot']) {
@@ -345,7 +345,7 @@ final class SESS
         }
 
         if (!$this->data['last_action']) {
-            $sd['last_action'] = date('Y-m-d H:i:s', time());
+            $sd['last_action'] = gmdate('Y-m-d H:i:s');
         }
 
         if (isset($sd['user'])) {

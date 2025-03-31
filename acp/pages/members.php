@@ -484,7 +484,7 @@ final class members
                     'birthdate' => '0000-00-00',
                     'display_name' => $JAX->p['displayname'],
                     'group_id' => 1,
-                    'last_visit' => date('Y-m-d H:i:s', time()),
+                    'last_visit' => gmdate('Y-m-d H:i:s'),
                     'name' => $JAX->p['username'],
                     'pass' => password_hash(
                         (string) $JAX->p['pass'],
@@ -933,7 +933,7 @@ final class members
                     $DB->safeinsert(
                         'messages',
                         [
-                            'date' => date('Y-m-d H:i:s', time()),
+                            'date' => gmdate('Y-m-d H:i:s'),
                             'del_recipient' => 0,
                             'del_sender' => 0,
                             'flag' => 0,
@@ -1011,7 +1011,7 @@ final class members
                     'email_address' => $f['email'],
                     'id' => $f['id'],
                     'ip_address' => $f['ip'],
-                    'join_date' => date('M jS, Y @ g:i A', $f['join_date']),
+                    'join_date' => gmdate('M jS, Y @ g:i A', $f['join_date']),
                     'title' => $f['display_name'],
                 ],
             ) . PHP_EOL;

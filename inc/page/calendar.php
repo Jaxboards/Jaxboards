@@ -16,7 +16,7 @@ final class CALENDAR
                 $this->month = $JAX->b['month'];
             }
         } else {
-            $this->month = date('n');
+            $this->month = gmdate('n');
         }
 
         $this->monthview();
@@ -31,7 +31,7 @@ final class CALENDAR
         }
 
         $page = '';
-        $today = date('n j Y');
+        $today = gmdate('n j Y');
         [
             $offset,
             $daysinmonth,
@@ -40,7 +40,7 @@ final class CALENDAR
             $month,
         ] = explode(
             ' ',
-            date('w t F Y n', mktime(0, 0, 0, $monthoffset, 1)),
+            gmdate('w t F Y n', mktime(0, 0, 0, $monthoffset, 1)),
         );
 
         $SESS->location_verbose

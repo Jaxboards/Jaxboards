@@ -191,14 +191,14 @@ final class tools
             header('Content-type: text/plain');
             header(
                 'Content-Disposition: attachment;filename="' . $DB->prefix
-                . date('Y-m-d_His') . '.sql"',
+                . gmdate('Y-m-d_His') . '.sql"',
             );
             $result = $DB->safequery("SHOW TABLES LIKE '{$DB->prefix}%%'");
             $tables = $DB->rows($result);
             $page = '';
             if ($tables) {
                 echo PHP_EOL . "-- Jaxboards Backup {$DB->prefix} "
-                    . date('Y-m-d H:i:s') . PHP_EOL . PHP_EOL;
+                    . gmdate('Y-m-d H:i:s') . PHP_EOL . PHP_EOL;
                 echo 'SET NAMES utf8mb4;' . PHP_EOL;
                 echo "SET time_zone = '+00:00';" . PHP_EOL;
                 echo 'SET foreign_key_checks = 0;' . PHP_EOL;

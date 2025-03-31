@@ -310,7 +310,7 @@ if (!$PAGE->jsaccess) {
             '<div class="footer">'
             . 'Jaxboards 2.0.1! '
             // Removed the defunct URL
-            . '&copy; 2007-' . date('Y') . '</div>',
+            . '&copy; 2007-' . gmdate('Y') . '</div>',
         );
     }
 
