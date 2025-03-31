@@ -409,8 +409,10 @@ final class JAX
                 $emotepack .= '/';
             }
 
-            if (file_exists($emotepack . 'rules.php')) {
-                require_once $emotepack . 'rules.php';
+            $emoteRules = __DIR__ . '/../../' . $emotepack .'rules.php';
+
+            if (file_exists($emoteRules)) {
+                require_once $emoteRules;
                 if (!$rules) {
                     exit('Emoticon ruleset corrupted!');
                 }

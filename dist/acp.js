@@ -644,7 +644,7 @@
         : '';
       const searchTerm = encodeURIComponent(this.element.value);
       const queryParams = `act=${this.action}&term=${searchTerm}`;
-      new Ajax().load(`${relativePath}misc/listloader.php?${queryParams}`, {
+      new Ajax().load(`${relativePath}api/?${queryParams}`, {
         callback: (xml) => {
           const data = JSON.parse(xml.responseText);
           resultsContainer.innerHTML = '';

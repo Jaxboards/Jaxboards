@@ -149,7 +149,7 @@ export default class Editor extends Component {
   showEmotes(x, y) {
     const emotewin = this.emoteWindow;
     if (!emotewin) {
-      new Ajax().load('/misc/emotes.php?json', {
+      new Ajax().load('/api/?act=emotes', {
         callback: (response) => this.createEmoteWindow(response, { x, y }),
       });
       return;
