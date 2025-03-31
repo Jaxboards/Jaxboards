@@ -214,7 +214,7 @@ final class TOPIC
         $posts = array_pop($thisrow);
         $DB->disposeresult($result);
 
-        $totalpages = ceil($posts / $this->numperpage);
+        $totalpages = (int) ceil($posts / $this->numperpage);
         $pagelist = '';
         foreach ($JAX->pages($totalpages, $this->page + 1, 10) as $x) {
             $pagelist .= $PAGE->meta(
@@ -227,7 +227,7 @@ final class TOPIC
         }
 
         // Are they on the last page? This stores a session variable.
-        $SESS->addvar('topic_lastpage', $page + 1 === $totalpages);
+        $SESS->addvar('topic_lastpage', ($page + 1) === $totalpages);
 
         // If it's a poll, put it in.
         $poll = $this->topicdata['poll_type'] ? $PAGE->meta(
