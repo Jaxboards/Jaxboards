@@ -39,7 +39,7 @@ final class settings
         );
 
         if (!isset($JAX->b['do'])) {
-            $JAX->b['do'] = false;
+            return;
         }
 
         match ($JAX->b['do']) {
