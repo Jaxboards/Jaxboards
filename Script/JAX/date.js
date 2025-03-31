@@ -55,7 +55,7 @@ export function date(gmtUnixTimestamp) {
   yday.setTime(yday - 1000 * 60 * 60 * 24);
 
   const serverAsLocalDate = new Date();
-  date.setUTCSeconds(gmtUnixTimestamp);
+  serverAsLocalDate.setUTCSeconds(gmtUnixTimestamp);
 
   const deltaInSeconds = (localTimeNow - serverAsLocalDate) / 1000;
 
