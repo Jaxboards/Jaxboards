@@ -55,7 +55,7 @@ class AppState {
       }
 
       if (
-        (inputField.type === 'checkbox' || inputField.type === 'radio') &&
+        ['checkbox', 'radio'].includes(inputField.type) &&
         !inputField.checked
       ) {
         return;
