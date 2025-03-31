@@ -159,7 +159,7 @@ export default {
 
     if (!messagesContainer) {
       const imWindow = new Window();
-      imWindow.title = `${fromName} <a href="#" onclick="IMWindow.menu(event,${fromId});return false;">&rsaquo;</a>`;
+      imWindow.title = `${fromName}`;
       imWindow.content =
         "<div class='ims'></div><div class='offline'>This user may be offline</div><div><form data-ajax-form='resetOnSubmit' method='post'><input type='hidden' name='im_uid' value='%s' /><input type='text' name='im_im' autocomplete='off' /><input type='hidden' name='act' value='blank' /></form></div>".replace(
           /%s/g,

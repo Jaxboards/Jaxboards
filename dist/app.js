@@ -2558,7 +2558,7 @@
 
       if (!messagesContainer) {
         const imWindow = new Window();
-        imWindow.title = `${fromName} <a href="#" onclick="IMWindow.menu(event,${fromId});return false;">&rsaquo;</a>`;
+        imWindow.title = `${fromName}`;
         imWindow.content =
           "<div class='ims'></div><div class='offline'>This user may be offline</div><div><form data-ajax-form='resetOnSubmit' method='post'><input type='hidden' name='im_uid' value='%s' /><input type='text' name='im_im' autocomplete='off' /><input type='hidden' name='act' value='blank' /></form></div>".replace(
             /%s/g,
@@ -2948,8 +2948,6 @@
     });
   });
 
-  /* global RUN,globalsettings */
-
   class IMWindow {
     constructor(uid, uname) {
       if (!globalsettings.can_im) {
@@ -2960,27 +2958,6 @@
       }
     }
   }
-
-  IMWindow.menu = function openMenu(event, uid) {
-    const e = Event$1(event).stopBubbling();
-    const d = document.createElement('div');
-    d.innerHTML = 'loading';
-    d.style.position = 'absolute';
-    d.style.left = `${e.pageX}px`;
-    d.style.top = `${e.pageY}px`;
-    d.style.zIndex = getHighestZIndex();
-    d.id = 'immenu';
-    d.className = 'immenu';
-    document.body.appendChild(d);
-    document.body.onclick = (clickEvent) => {
-      const ce = Event$1(clickEvent);
-      if (ce.srcElement !== d && !isChildOf(ce.srcElement, d)) {
-        d.parentNode.removeChild(d);
-      }
-    };
-
-    RUN.stream.load(`?module=privatemessage&im_menu=${uid}`);
-  };
 
   // TODO: Make these not globally defined
   assign(window, {

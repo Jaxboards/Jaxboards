@@ -17,12 +17,6 @@ final class IM
         if (trim($im ?? '') !== '' && $uid) {
             $this->message($uid, $im);
         }
-
-        if (!isset($JAX->b['in_menu']) || !$JAX->b['im_menu']) {
-            return;
-        }
-
-        $this->immenu($JAX->b['im_menu']);
     }
 
     public function filter(): void
@@ -131,67 +125,5 @@ final class IM
         );
 
         return $DB->affected_rows(1) !== 0;
-    }
-
-    // Stuff I'm doing.
-    public function invite($room, $uid, $otherguy = false): void
-    {
-        global $CFG, $DB, $PAGE, $USER;
-        if (!$USER['id']) {
-            return;
-        }
-
-        if ($otherguy) {
-            $room = base64_encode(openssl_random_pseudo_bytes(128));
-            // Make the window the guy that invited multi.
-            $PAGE->JS('immakemulti', $otherguy);
-            // Update other guy.
-            $this->sendcmd(['immakemulti', $USER['id']], $otherguy);
-        }
-
-        $this->sendcmd(['iminvite', $room]);
-    }
-
-    public function immenu($id): void
-    {
-        global $PAGE,$JAX,$USER,$DB;
-        if ($JAX->b['im_invitemenu']) {
-            $online = $DB->getUsersOnline();
-            $result = $DB->safeselect(
-                [
-                    'id',
-                    '`display_name` AS `name`',
-                ],
-                'members',
-                'WHERE `id` IN ? ORDER BY `name` ASC',
-                explode(',', (string) $USER['friends']),
-            );
-            $menu = '';
-            while ($f = $DB->arow($result)) {
-                if (!$online[$f['id']]) {
-                    continue;
-                }
-
-                if ($f['id'] === $id) {
-                    continue;
-                }
-
-                $menu .= $f['name'] . '<br />';
-            }
-
-            if ($menu === '' || $menu === '0') {
-                $menu = $USER['friends']
-                    ? 'None of your friends<br />are currently online'
-                    : 'You must add users to your contacts list<br />'
-                                . 'to use this feature.';
-            }
-        } else {
-            $menu = "<a href='?act=vu{$id}'>View Profile</a><br />"
-                . "<a href='?module=privatemessage&im_menu={$id}"
-                . "&im_invitemenu=1'>Add User to Chat</a>";
-        }
-
-        $PAGE->JS('update', 'immenu', $menu);
-        $PAGE->JS('softurl');
     }
 }
