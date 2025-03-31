@@ -144,23 +144,20 @@ export default {
   im([fromId, fromName, message, fromMe, timestamp]) {
     let messagesContainer = document.querySelector(`#im_${fromId} .ims`);
     flashTitle(`New message from ${fromName}!`);
-    const { webkitNotifications } = window;
+
     if (
       !document.hasFocus() &&
-      webkitNotifications &&
-      webkitNotifications.checkPermission() === 0
+      window.Notification &&
+      Notification &&
+      Notification.permission === 'granted'
     ) {
-      const notify = webkitNotifications.createNotification(
-        '',
-        `${fromName} says:`,
-        message,
-      );
-      notify.show();
+      const notify = new Notification(`${fromName} says:`, { body: message });
       notify.onclick = () => {
         window.focus();
-        notify.cancel();
+        notify.close();
       };
     }
+
     if (!messagesContainer) {
       const imWindow = new Window();
       imWindow.title = `${fromName} <a href="#" onclick="IMWindow.menu(event,${fromId});return false;">&rsaquo;</a>`;

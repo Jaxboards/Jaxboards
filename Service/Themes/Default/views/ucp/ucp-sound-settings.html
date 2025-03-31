@@ -12,8 +12,8 @@
   <br>
   &nbsp;<input
             id="dtnotify"
-            onChange="if(!window.webkitNotifications) {alert('browser not supported');
-        } webkitNotifications.requestPermission()"
+            onChange="if(!window.Notification) {alert('browser not supported');
+        } else { Notification.requestPermission() }"
             title="notify_im"
             type="checkbox"
             />
