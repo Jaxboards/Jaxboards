@@ -427,8 +427,7 @@
     const yday = new Date();
     yday.setTime(yday - 1000 * 60 * 60 * 24);
 
-    const serverAsLocalDate = new Date();
-    serverAsLocalDate.setUTCSeconds(gmtUnixTimestamp);
+    const serverAsLocalDate = new Date(gmtUnixTimestamp * 1000);
 
     const deltaInSeconds = (localTimeNow - serverAsLocalDate) / 1000;
 
@@ -455,9 +454,9 @@
   )}, ${serverAsLocalDate.getFullYear()} @ ${timeAsAMPM(serverAsLocalDate)}`;
   }
 
-  function smalldate(serverDate) {
-    const serverAsLocalDate = new Date(0);
-    serverAsLocalDate.setUTCSeconds(serverDate);
+  function smalldate(gmtUnixTimestamp) {
+    const serverAsLocalDate = new Date(gmtUnixTimestamp * 1000);
+
     let hours = serverAsLocalDate.getHours();
     const ampm = hours >= 12 ? 'pm' : 'am';
     hours %= 12;
