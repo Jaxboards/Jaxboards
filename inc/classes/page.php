@@ -2,6 +2,42 @@
 
 declare(strict_types=1);
 
+/**
+ * This class is entirely responsible for rendering the page.
+ *
+ * Because there weren't any good PHP template systems at the time (Blade, Twig) we built our own.
+ *
+ * Here's how it works:
+ *
+ * 1. The page's "components" are separated out into "meta" definitions. These are stored on `metadefs` as key/value (value being an HTML template).
+ *    Template components are passed data through `vsprintf`, so each individual piece of data going into a template can be referenced using full sprintf syntax.
+ *
+ * 2. Theme templates can overwrite meta definitions through their board template using "<M>" tags.
+ *    An example would look like this: `<M name="logo"><img src="logo.png" /></M>`
+ *
+ * 3. There is a "variable" syntax that templates can use:
+ *    <%varname%>
+ *    These variables are page-level (global) and are defined using `addvar`. They can be used in any template piece anywhere.
+ *
+ * 4. There is a rudimentary conditional syntax that looks like this:
+ *    {if <%isguest%>=true}You should sign up!{/if}
+ *    As of writing, these conditionals must use one of the following operators: =, !=, >, <, >=, <=
+ *    There are also && and || which can be used for chaining conditions together.
+ *
+ *    Conditionals can mix and match page variables and component variables. For example: {if <%isguest%>!=true&&%1$s="Sean"}Hello Sean{/if}
+ *
+ *    Conditionals do not tolerate whitespace, so it must all be mashed together. To be improved one day perhaps.
+ *
+ * 5. The root template defines the page's widgets using this syntax:
+ *    <!--NAVIGATION-->
+ *    <!--PATH-->
+ *
+ *    These sections are defined through calls to $PAGE->append()
+ *
+ *    Interestingly, I tried to create some sort of module system that would only conditionally load modules if the template has it.
+ *    For example - none of the `tag_shoutbox` will be included or used if <!--SHOUTBOX--> is not in the root template.
+ *    The filenames of these "modules" must be prefixed with "tag_" for this to work. Otherwise the modules will always be loaded.
+ */
 final class PAGE
 {
     public $metadefs = [];
