@@ -375,6 +375,8 @@ h2 {
 
 .icons.edit {
   background-position: 0 0;
+  border: 0;
+  cursor: pointer;
 }
 
 .icons.delete {
