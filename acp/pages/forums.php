@@ -364,7 +364,7 @@ final class forums
                     'redirect',
                     'topics',
                     'posts',
-                    'order',
+                    '`order`',
                     'perms',
                     'orderby',
                     'nocount',
@@ -707,7 +707,7 @@ final class forums
                 'select-option.html',
                 [
                     'label' => $label,
-                    'selected' => isset($fdata['show_sub']) && $k === $fdata['show_sub']
+                    'selected' => isset($fdata['show_sub']) && $value === $fdata['show_sub']
                     ? 'selected="selected"' : '',
                     'value' => $value,
                 ],
@@ -728,7 +728,7 @@ final class forums
                 'select-option.html',
                 [
                     'label' => $label,
-                    'selected' => isset($fdata['show_sub']) && $k === $fdata['show_sub']
+                    'selected' => isset($fdata['show_sub']) && $value === $fdata['show_sub']
                     ? 'selected="selected"' : '',
                     'value' => $value,
                 ],
