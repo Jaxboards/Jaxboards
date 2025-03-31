@@ -245,7 +245,8 @@ final class members
                     }
                 }
 
-                $result = $DB->safeselect([
+                $result = $DB->safeselect(
+                    [
                         'about',
                         'avatar',
                         'birthdate',
@@ -294,14 +295,14 @@ final class members
                         'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
                         'UNIX_TIMESTAMP(`last_visit`) AS `last_visit`',
                         'YEAR(`birthdate`) AS `dob_year`',
-                    ]
-                    ,
+                    ],
                     'members',
                     'WHERE `id`=?',
                     $DB->basicvalue($JAX->b['mid']),
                 );
             } else {
-                $result = $DB->safeselect([
+                $result = $DB->safeselect(
+                    [
                         'about',
                         'avatar',
                         'birthdate',
