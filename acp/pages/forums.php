@@ -452,7 +452,7 @@ final class forums
                 $groupperms .= pack('n*', $k, $v);
             }
 
-            $sub = $JAX->p['showsub'];
+            $sub = (int) $JAX->p['show_sub'];
             if (is_numeric($JAX->p['orderby'])) {
                 $orderby = $JAX->p['orderby'];
             }
@@ -702,14 +702,14 @@ final class forums
             1 => 'One level below',
             2 => 'All subforums',
         ];
+
         $subforumOptions = '';
         foreach ($subforumOptionsArray as $value => $label) {
             $subforumOptions .= $PAGE->parseTemplate(
                 'select-option.html',
                 [
                     'label' => $label,
-                    'selected' => isset($fdata['show_sub']) && $value === $fdata['show_sub']
-                    ? 'selected="selected"' : '',
+                    'selected' => isset($fdata['show_sub']) && $value === $fdata['show_sub'] ? 'selected="selected"' : '',
                     'value' => $value,
                 ],
             ) . PHP_EOL;
