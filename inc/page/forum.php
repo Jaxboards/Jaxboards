@@ -474,7 +474,7 @@ final class FORUM
         }
 
         return $forum['lp_date'] <= $JAX->pick(
-            $this->forumsRead[$forum['id']],
+            $this->forumsRead[$forum['id']] ?? null,
             $SESS->read_date,
             $USER['last_visit'],
         );
