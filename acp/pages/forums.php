@@ -28,7 +28,8 @@ final class forums
             ++$order;
             $childPath = $path . $k . ' ';
             sscanf($childPath, 'c_%d', $cat);
-            $formattedPath = trim(mb_strstr($path, ' '));
+            $children = mb_strstr($path, ' ');
+            $formattedPath = $children ? trim($children) : '';
             if (is_array($v)) {
                 self::mysqltree($v, $childPath . ' ', $order);
             }
