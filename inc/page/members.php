@@ -39,6 +39,7 @@ final class members
             'g_title' => 'Group',
             'id' => 'ID',
             'posts' => 'Posts',
+            'join_date' => 'Join Date',
         ];
 
         $page = '';
@@ -155,6 +156,7 @@ final class members
             . ($this->page ? '&page=' . ($this->page + 1) : '')
             . (isset($JAX->g['filter']) && $JAX->g['filter']
             ? '&filter=' . $JAX->g['filter'] : '');
+
         $links = [];
         foreach ($vars as $k => $v) {
             $links[] = "<a href=\"{$url}&amp;sortby={$k}"
@@ -214,6 +216,7 @@ final class members
             $links[1],
             $links[2],
             $links[3],
+            $links[4],
             $page,
         );
         $page = "<div class='pages pages-top'>{$pages}</div>"
