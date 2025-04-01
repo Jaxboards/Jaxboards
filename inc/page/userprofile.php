@@ -180,7 +180,7 @@ final class userprofile
         }
 
         if (!$udata || $nouser) {
-            $e = $PAGE->meta('error', "Sorry, This user doesn't exist.");
+            $e = $PAGE->meta('error', "Sorry, this user doesn't exist.");
             $PAGE->JS('update', 'page', $e);
             $PAGE->append('page', $e);
 
