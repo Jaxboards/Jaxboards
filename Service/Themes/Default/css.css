@@ -1826,7 +1826,7 @@ textarea {
  * if you want to remove that border, just remove the background from .box
  * and remove the margin on .box>.title */
 .box {
-  margin: 10px 5px 10px;
+  margin: 10px 5px;
   background: url('img/silver_grad.png') repeat-x;
   border: 1px solid #000;
 }
