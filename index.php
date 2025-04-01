@@ -113,7 +113,7 @@ $PERMS = $JAX->getPerms();
 
 // Fix ip if necessary.
 // @phpstan-ignore-next-line property.notFound
-if ($USER && $SESS->ip !== $USER['ip']) {
+if ($USER && $SESS->ip && $SESS->ip !== $USER['ip']) {
     $DB->safeupdate(
         'members',
         [
