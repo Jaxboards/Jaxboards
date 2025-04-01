@@ -1,10 +1,10 @@
 /* WYSWYG Editor CSS */
 @import url('../../wysiwyg.css');
-
+html { font-size: 62.5%; }
 body {
   background: url('img/bg.jpg');
   font-family: Arial, sans-serif;
-  font-size: 16px;
+  font-size: 1.6rem;
   color: #004;
   text-align: center;
   overflow-y: scroll;
@@ -190,7 +190,7 @@ textarea {
   background: #ecc;
   font-style: italic;
   padding: 5px;
-  font-size: 10px;
+  font-size: 1rem;
 }
 
 .immenu,
@@ -221,7 +221,7 @@ textarea {
 
 #ucp .leftbar .icon {
   margin: 10px;
-  font-size: 12px;
+  font-size: 1.2rem;
   padding: 2px 25px;
   background: url('icons/inboxicons.png') 0 0 no-repeat;
 }
@@ -229,7 +229,7 @@ textarea {
 #ucp .leftbar h2 {
   margin: 0;
   background: #ddf;
-  font-size: 16px;
+  font-size: 1.6rem;
   border: 1px solid #fff;
   padding: 3px;
 }
@@ -281,12 +281,12 @@ textarea {
 /* stylelint-disable no-descending-specificity */
 #ucppage h2 {
   border-bottom: 1px solid #aaf;
-  font-size: 20px;
+  font-size: 2rem;
 }
 /* stylelint-enable no-descending-specificity */
 
 #ucppage .tooltip {
-  font-size: 14px;
+  font-size: 1.4rem;
   background: url('icons/help.png') no-repeat;
   text-indent: -1000px;
   display: inline-block;
@@ -356,7 +356,7 @@ textarea {
 
 .inbox .listing {
   border: 1px solid #99c;
-  font-size: 14px;
+  font-size: 1.4rem;
   width: 100%;
   border-collapse: collapse;
 }
@@ -446,7 +446,7 @@ textarea {
 
 .inbox .messageinfo {
   background: #f5f5ff;
-  font-size: smaller;
+  font-size: 1.4rem;
 }
 
 /* stylelint-disable no-descending-specificity */
@@ -483,7 +483,7 @@ textarea {
   background: #eef;
   border-right: 1px solid #99c;
   font:
-    14px Arial,
+    1.4rem Arial,
     sans-serif;
   max-width: 700px;
 }
@@ -604,7 +604,7 @@ textarea {
 #buddylist .status {
   white-space: nowrap;
   overflow: hidden;
-  font-size: 12px;
+  font-size: 1.2rem;
   color: #555;
 }
 
@@ -620,7 +620,7 @@ textarea {
 
 /* stylelint-disable no-descending-specificity */
 .contact-card .content a {
-  font-size: 14px;
+  font-size: 1.4rem;
 }
 /* stylelint-enable no-descending-specificity */
 
@@ -640,7 +640,7 @@ textarea {
 
 /* stylelint-disable-next-line selector-class-pattern */
 .contact-card .contact_details {
-  font-size: 12px;
+  font-size: 1.2rem;
   margin-top: 20px;
 }
 
@@ -690,7 +690,7 @@ textarea {
 /* stylelint-enable no-descending-specificity */
 
 .userprofile .leftbar .usertitle {
-  font-size: 0.8em;
+  font-size: 1rem;
   margin: 1px;
   text-align: center;
 }
@@ -704,13 +704,13 @@ textarea {
 
 /* stylelint-disable no-descending-specificity */
 .userprofile .infobox .content {
-  font-size: 0.8em;
+  font-size: 1rem;
 }
 /* stylelint-enable no-descending-specificity */
 
 /* stylelint-disable no-descending-specificity */
 .userprofile .infobox div {
-  font-size: 0.8em;
+  font-size: 1rem;
   margin: 5px;
 }
 /* stylelint-enable no-descending-specificity */
@@ -727,7 +727,7 @@ textarea {
 /* stylelint-enable no-descending-specificity */
 
 .userprofile .rightbar .postdate {
-  font-size: 0.8em;
+  font-size: 1rem;
   margin: 10px;
   background: #ccf;
   border: 1px solid #339;
@@ -944,7 +944,7 @@ textarea {
 
 #userbox form {
   margin: 0;
-  font-size: 16px;
+  font-size: 1.6rem;
 }
 
 #userbox form input {
@@ -1005,7 +1005,7 @@ textarea {
 /* Breadcrumbs */
 #path {
   font:
-    14px Arial,
+    1.4rem Arial,
     sans-serif;
   background: #eef;
   border: 1px solid #99f;
@@ -1048,7 +1048,7 @@ textarea {
   width: 100%;
   border-collapse: collapse;
   font:
-    12px Arial,
+    1.2rem Arial,
     sans-serif;
 }
 
@@ -1104,7 +1104,7 @@ textarea {
 /* stylelint-disable no-descending-specificity */
 .boardindex .forum a {
   font:
-    14px Arial,
+    1.4rem Arial,
     sans-serif;
 }
 /* stylelint-enable no-descending-specificity */
@@ -1115,7 +1115,7 @@ textarea {
 .boardindex .subforums a,
 .boardindex .ledby a {
   font-style: italic;
-  font-size: 10px;
+  font-size: 1rem;
 }
 /* stylelint-enable no-descending-specificity */
 
@@ -1123,7 +1123,7 @@ textarea {
 .boardindex .item_1,
 /* stylelint-disable-next-line selector-class-pattern */
 .boardindex .item_2 {
-  font-size: 11px;
+  font-size: 1.2rem;
   width: 165px;
   background: #f6f6f6;
   text-align: center;
@@ -1136,7 +1136,7 @@ textarea {
   width: 100%;
   border-collapse: collapse;
   font:
-    12px Arial,
+    1.2rem Arial,
     sans-serif;
 }
 
@@ -1238,7 +1238,7 @@ textarea {
   width: 100%;
   border-collapse: collapse;
   font:
-    12px Arial,
+    1.2rem Arial,
     sans-serif;
 }
 
@@ -1288,7 +1288,7 @@ textarea {
 /* stylelint-disable no-descending-specificity */
 .subindex .forum a {
   font:
-    14px Arial,
+    1.4rem Arial,
     sans-serif;
 }
 /* stylelint-enable no-descending-specificity */
@@ -1303,7 +1303,7 @@ textarea {
 .subindex .item_1,
 /* stylelint-disable-next-line selector-class-pattern */
 .subindex .item_2 {
-  font-size: 11px;
+  font-size: 1.2rem;
   width: 165px;
   background: #f6f6f6;
   text-align: center;
@@ -1755,7 +1755,7 @@ textarea {
 #ticker .date {
   float: left;
   width: 110px;
-  font-size: 10px;
+  font-size: 1rem;
   padding-top: 3px;
 }
 
@@ -1774,7 +1774,7 @@ textarea {
 }
 
 .calendar .month {
-  font-size: 25px;
+  font-size: 2.5rem;
   padding: 20px;
 }
 
@@ -1899,7 +1899,7 @@ textarea {
   border: 1px solid #000;
   bottom: 10px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 1.4rem;
   padding: 20px;
   position: fixed;
   right: 10px;
@@ -2096,7 +2096,7 @@ a.mgroup4 {
   background: #e0e0ff;
   padding: 10px;
   font-family: Consolas, Fixedsys, monospace;
-  font-size: 12px;
+  font-size: 1.2rem;
 }
 /* stylelint-enable no-descending-specificity */
 
