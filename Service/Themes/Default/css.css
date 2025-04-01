@@ -877,12 +877,13 @@ textarea {
   padding: 0;
   margin: 0;
   height: 41px;
+  display: flex;
 }
 
 .navigation ul li {
   margin: 1px 0 0 1px;
   padding: 11px 20px;
-  float: left;
+  white-space: nowrap;
   background: url('img/seperator.png') no-repeat top right;
 }
 
