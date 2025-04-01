@@ -1,8 +1,9 @@
 /* WYSWYG Editor CSS */
 @import url('../../wysiwyg.css');
+
 html {
   font-size: 62.5%; /* set 1rem to 10px */
-  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
   text-size-adjust: none;
 }
 
