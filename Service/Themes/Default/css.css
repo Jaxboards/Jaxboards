@@ -1317,7 +1317,8 @@ textarea {
 /* stylelint-disable-next-line selector-class-pattern */
 .subindex .item_2 {
   font-size: 1.2rem;
-  width: 165px;
+  width: 20vw;
+  max-width: 165px;
   background: #f6f6f6;
   text-align: center;
   padding: 5px 2px;
