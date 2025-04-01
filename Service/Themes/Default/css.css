@@ -1,6 +1,11 @@
 /* WYSWYG Editor CSS */
 @import url('../../wysiwyg.css');
-html { font-size: 62.5%; }
+html {
+  font-size: 62.5%; /* set 1rem to 10px */
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+}
+
 body {
   background: url('img/bg.jpg');
   font-family: Arial, sans-serif;
@@ -855,7 +860,7 @@ textarea {
 /* Surrounding Container/Template for Board */
 #container {
   margin: auto;
-  width: 940px;
+  max-width: 940px;
   text-align: left;
 }
 
@@ -1124,7 +1129,7 @@ textarea {
 /* stylelint-disable-next-line selector-class-pattern */
 .boardindex .item_2 {
   font-size: 1.2rem;
-  width: 165px;
+  width: 20vw;
   background: #f6f6f6;
   text-align: center;
   padding: 5px 2px;
@@ -1169,7 +1174,7 @@ textarea {
 
 /* stylelint-disable-next-line selector-class-pattern */
 .forumindex .last_post {
-  width: 250px;
+  width: 20vw;
   background-color: #e0e0ff;
 }
 
@@ -1183,7 +1188,7 @@ textarea {
 .forumindex .item_1,
 /* stylelint-disable-next-line selector-class-pattern */
 .forumindex .item_2 {
-  width: 65px;
+  width: 10vw;
   text-align: center;
   background-color: #ececff;
 }
