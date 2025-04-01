@@ -18,7 +18,7 @@ final class SESS
         'Baiduspider' => 'Baidu', // Chinese search engine
         'Barkrowler' => 'Babbar.tech', // SEO graphing services
         'Bingbot' => 'Bing',
-        'Bytespider' => 'Bytespider',
+        'Bytespider' => 'Bytespider', // TikTok parent company
         'CensysInspect' => 'CensysInspect', // Security scanner
         'Centurybot' => 'Century', // a.k.a. RightDao, a search engine
         'ChatGLM-Spider' => 'ChatGLM', // SEO crawler
@@ -51,7 +51,8 @@ final class SESS
         'TikTokSpider' => 'TikTok',
         'Turnitin' => 'Turnitin', // Plagiarism scanning software
         'Twitterbot' => 'Twitter',
-        'WhatsApp' => 'WhatsApp',
+        'W3C_Validator' => 'W3C Validator', // HTML syntax checker
+	'WhatsApp' => 'WhatsApp',
         'Y!J-WSC' => 'Yahoo Japan',
         'yahoo! slurp' => 'Yahoo',
         'YandexBot' => 'Yandex', // Russian search engine
