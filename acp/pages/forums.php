@@ -454,7 +454,7 @@ final class forums
 
             $sub = (int) $JAX->p['show_sub'];
             if (is_numeric($JAX->p['orderby'])) {
-                $orderby = $JAX->p['orderby'];
+                $orderby = (int) $JAX->p['orderby'];
             }
 
             $result = $DB->safeselect(
@@ -729,7 +729,7 @@ final class forums
                 'select-option.html',
                 [
                     'label' => $label,
-                    'selected' => isset($fdata['show_sub']) && $value === $fdata['show_sub']
+                    'selected' => isset($fdata['orderby']) && $value === $fdata['orderby']
                     ? 'selected="selected"' : '',
                     'value' => $value,
                 ],
