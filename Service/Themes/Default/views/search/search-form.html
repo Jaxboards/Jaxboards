@@ -17,6 +17,11 @@
         Advanced
       </button>
       <table id="searchadvanced" class="display-none">
+        <colgroup>
+          <col width="33%%" />
+          <col width="33%%" />
+          <col width="33%%" />
+        </colgroup>
         <tr>
           <th>
             In forum(s):
@@ -33,25 +38,27 @@
             %2$s
           </td>
           <td>
-            <label>
+            <label for="datestart">
               From:
-              <input
-                class="date"
-                name="datestart"
-                title="From Date"
-                type="text"
-                />
             </label>
+            <input
+              class="date"
+              id="datestart"
+              name="datestart"
+              title="From Date"
+              type="text"
+              />
             <br />
-            <label>
+            <label for="dateend">
               To:
-              <input
-                class="date"
-                name="dateend"
-                title="To Date"
-                type="text"
-                />
             </label>
+            <input
+              class="date"
+              id="dateend"
+              name="dateend"
+              title="To Date"
+              type="text"
+              />
           </td>
           <td>
             Posted by:
