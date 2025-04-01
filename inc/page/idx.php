@@ -428,13 +428,13 @@ final class IDX
 
         $useronlinecache = '';
         foreach ($DB->getUsersOnline() as $f) {
-            $lastActionIdle = $SESS->last_update - $CFG['timetoidle'] - 30;
+            $lastActionIdle = (int) ($SESS->last_update ?? 0) - $CFG['timetoidle'] - 30;
             if (!$f['uid'] && !$f['is_bot']) {
                 continue;
             }
 
             if (
-                $f['last_action'] >= $SESS->last_update
+                $f['last_action'] >= (int) $SESS->last_update
                 || $f['status'] === 'idle'
                 && $f['last_action'] > $lastActionIdle
             ) {
@@ -486,7 +486,7 @@ final class IDX
                 EOT
             ,
             ['forums', 'members'],
-            gmdate('Y-m-d H:i:s', $JAX->pick($SESS->last_update)),
+            gmdate('Y-m-d H:i:s', (int) ($SESS->last_update ?? time())),
         );
 
         while ($f = $DB->arow($result)) {
