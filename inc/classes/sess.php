@@ -52,7 +52,7 @@ final class SESS
         'Turnitin' => 'Turnitin', // Plagiarism scanning software
         'Twitterbot' => 'Twitter',
         'W3C_Validator' => 'W3C Validator', // HTML syntax checker
-	'WhatsApp' => 'WhatsApp',
+        'WhatsApp' => 'WhatsApp',
         'Y!J-WSC' => 'Yahoo Japan',
         'yahoo! slurp' => 'Yahoo',
         'YandexBot' => 'Yandex', // Russian search engine
