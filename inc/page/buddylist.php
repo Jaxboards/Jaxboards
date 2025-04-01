@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-$buddylist = $JAX->hiddenFormFields(['module' => 'buddylist']);
+$buddylist = $JAX->hiddenFormFields(['act' => 'buddylist']);
 $PAGE->metadefs['buddylist-contacts'] = <<<EOT
     <div class="contacts">
         <form method="?" data-ajax-form="true">
