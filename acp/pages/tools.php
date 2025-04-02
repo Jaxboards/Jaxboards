@@ -262,8 +262,9 @@ final class tools
 
         $contents = "Sorry, jaxboards does not have file permissions to read your PHP error log file. ({$logPath})";
 
-        if (@is_readable($logPath)) {
-            $contents = "<textarea class='editor'>" . htmlspecialchars(file_get_contents($logPath)) . '</textarea>';
+        if (is_readable($logPath)) {
+            $last100Lines = $this->tail($logPath, 100);
+            $contents = "<textarea class='editor'>" . htmlspecialchars(implode("\n", $last100Lines)) . '</textarea>';
         }
 
         $PAGE->addContentBox(
@@ -271,4 +272,39 @@ final class tools
             $contents,
         );
     }
+
+    /* Reads the last $totalLines of a file */
+    function tail($path, $totalLines) {
+        $lines = array();
+
+        $fp = fopen($path, 'r');
+        fseek($fp, 0, SEEK_END);
+        $lastLine = "";
+
+        // Loop backward until we have our lines or we reach the start
+        for ($pos = ftell($fp) - 1; $pos >= 0; $pos--) {
+          fseek($fp, $pos);
+          $character = fgetc($fp);
+
+          if ($pos === 0 || $character !== "\n") {
+            $lastLine = $character.$lastLine;
+          }
+
+          if ($pos === 0 || $character === "\n") {
+            // skip empty lines
+            if (trim($lastLine) != "") {
+              $lines[] = $lastLine;
+              $lastLine = '';
+              if (count($lines) >= $totalLines) {
+                break;
+              }
+            }
+
+          }
+        }
+
+        $lines = array_reverse($lines);
+
+        return $lines;
+      }
 }
