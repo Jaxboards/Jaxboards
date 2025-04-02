@@ -273,8 +273,8 @@ final class tools
         );
     }
 
-    /* Reads the last $totalLines of a file */
-    function tail($path, $totalLines, $reverse = false)
+    // Reads the last $totalLines of a file
+    public function tail($path, $totalLines, $reverse = false)
     {
 
         $fp = fopen($path, 'r');
@@ -306,7 +306,9 @@ final class tools
             }
         }
 
-        if (!$reverse) $lines = array_reverse($lines);
+        if (!$reverse) {
+            $lines = array_reverse($lines);
+        }
 
         return $lines;
     }
