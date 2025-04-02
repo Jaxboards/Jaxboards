@@ -273,38 +273,40 @@ final class tools
         );
     }
 
-    /* Reads the last $totalLines of a file */
-    function tail($path, $totalLines) {
-        $lines = array();
+    // Reads the last $totalLines of a file
+    public function tail($path, $totalLines)
+    {
+        $lines = [];
 
         $fp = fopen($path, 'r');
         fseek($fp, 0, SEEK_END);
-        $lastLine = "";
+        $lastLine = '';
 
         // Loop backward until we have our lines or we reach the start
-        for ($pos = ftell($fp) - 1; $pos >= 0; $pos--) {
-          fseek($fp, $pos);
-          $character = fgetc($fp);
+        for ($pos = ftell($fp) - 1; $pos >= 0; --$pos) {
+            fseek($fp, $pos);
+            $character = fgetc($fp);
 
-          if ($pos === 0 || $character !== "\n") {
-            $lastLine = $character.$lastLine;
-          }
-
-          if ($pos === 0 || $character === "\n") {
-            // skip empty lines
-            if (trim($lastLine) != "") {
-              $lines[] = $lastLine;
-              $lastLine = '';
-              if (count($lines) >= $totalLines) {
-                break;
-              }
+            if ($pos === 0 || $character !== "\n") {
+                $lastLine = $character . $lastLine;
             }
 
-          }
+            if ($pos !== 0 && $character !== "\n") {
+                continue;
+            }
+
+            // skip empty lines
+            if (trim($lastLine) === '') {
+                continue;
+            }
+
+            $lines[] = $lastLine;
+            $lastLine = '';
+            if (count($lines) >= $totalLines) {
+                break;
+            }
         }
 
-        $lines = array_reverse($lines);
-
-        return $lines;
-      }
+        return array_reverse($lines);
+    }
 }
