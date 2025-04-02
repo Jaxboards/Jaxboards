@@ -152,7 +152,7 @@ final class PAGE
 
     public function writeData($page, $name, $data, $mode = 'w'): string
     {
-        $data_string = json_encode($data);
+        $data_string = json_encode($data, JSON_PRETTY_PRINT);
         $write = <<<EOT
             <?php
             /**
