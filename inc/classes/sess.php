@@ -378,7 +378,7 @@ final class SESS
     public function addSessID($html)
     {
         global $JAX;
-        if (!empty($JAX->c)) {
+        if (!empty($JAX->c) || !is_string($html)) {
             return $html;
         }
 
