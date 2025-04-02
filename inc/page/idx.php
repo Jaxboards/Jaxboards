@@ -168,7 +168,7 @@ final class IDX
             $this->moderatorinfo = [];
             $result = $DB->safeselect(
                 ['id', 'display_name', 'group_id'],
-                '`members`',
+                'members',
                 'WHERE `id` IN ?',
                 $this->mods,
             );
