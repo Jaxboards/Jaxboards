@@ -546,6 +546,7 @@
     ) {
       // requestType is an enum (1=update, 2=load new)
       let sendData = null;
+
       if (
         data &&
         Array.isArray(data) &&
@@ -556,6 +557,7 @@
       } else if (typeof data !== 'string') {
         sendData = buildQueryString(data);
       }
+
       const request = new XMLHttpRequest();
       if (callback) {
         this.setup.callback = callback;
@@ -565,16 +567,18 @@
           this.setup.callback(request);
         }
       };
-      if (!request) return false;
+
       request.open(method, url, true);
       request.url = url;
       request.type = requestType;
+
       if (method) {
         request.setRequestHeader(
           'Content-Type',
           'application/x-www-form-urlencoded',
         );
       }
+
       request.setRequestHeader('X-JSACCESS', requestType);
       request.send(sendData);
       return request;
@@ -1296,61 +1300,85 @@
         if (DISALLOWED_TAGS.includes(lcTag)) {
           return '';
         }
-        if (style.match(/background(-color)?:[^;]+(rgb\([^)]+\)|#\s+)/i)) {
+
+        const textAlignMatch = style.match(/text-align: ?(right|center|left)/i);
+        const backgroundColorMatch = style.match(/background(-color)?:[^;]+(rgb\([^)]+\)|#\s+)/i);
+        const italicMatch = style.match(/font-style: ?italic/i);
+        const underlineMatch = style.match(/text-decoration:[^;]*underline/i);
+        const lineThroughMatch = style.match(/text-decoration:[^;]*line-through/i);
+        const fontSizeMatch = style.match(/font-size: ?([^;]+)/i);
+        const fontColorMatch = style.match(/color: ?([^;]+)/i);
+        const fontWeightMatch = style.match(/font-weight: ?bold/i);
+
+        if (backgroundColorMatch) {
           innerhtml = `[bgcolor=#${new Color(
-          RegExp.$2,
+          backgroundColorMatch[2],
         ).toHex()}]${innerhtml}[/bgcolor]`;
         }
-        if (style.match(/text-align: ?(right|center|left)/i)) {
-          innerhtml = `[align=${RegExp.$1}]${innerhtml}[/align]`;
+        if (textAlignMatch) {
+          innerhtml = `[align=${textAlignMatch[1]}]${innerhtml}[/align]`;
         }
+
         if (
-          style.match(/font-style: ?italic/i) ||
+          italicMatch ||
           lcTag === 'i' ||
           lcTag === 'em'
         ) {
           innerhtml = `[I]${innerhtml}[/I]`;
         }
-        if (style.match(/text-decoration:[^;]*underline/i) || lcTag === 'u') {
+
+        if (underlineMatch || lcTag === 'u') {
           innerhtml = `[U]${innerhtml}[/U]`;
         }
+
         if (
-          style.match(/text-decoration:[^;]*line-through/i) ||
+          lineThroughMatch ||
           lcTag === 's' ||
           lcTag === 'strike'
         ) {
           innerhtml = `[S]${innerhtml}[/S]`;
         }
+
         if (
-          style.match(/font-weight: ?bold/i) ||
+          fontWeightMatch ||
           lcTag === 'strong' ||
           lcTag === 'b'
         ) {
           innerhtml = `[B]${innerhtml}[/B]`;
         }
-        if (att.size || style.match(/font-size: ?([^;]+)/i)) {
-          innerhtml = `[size=${att.size || RegExp.$1}]${innerhtml}[/size]`;
+
+        if (att.size || fontSizeMatch) {
+          innerhtml = `[size=${att.size || fontSizeMatch[1]}]${innerhtml}[/size]`;
         }
-        if (att.color || style.match(/color: ?([^;]+)/i)) {
-          innerhtml = `[color=${att.color || RegExp.$1}]${innerhtml}[/color]`;
+
+        if (att.color || fontColorMatch) {
+          innerhtml = `[color=${att.color || fontColorMatch[1]}]${innerhtml}[/color]`;
         }
+
         if (lcTag === 'a' && att.href) {
           innerhtml = `[url=${att.href}]${innerhtml}[/url]`;
         }
+
         if (lcTag === 'ol') innerhtml = `[ol]${innerhtml}[/ol]`;
         if (lcTag === 'ul') innerhtml = `[ul]${innerhtml}[/ul]`;
+
+        // h1-h6
         if (lcTag.match(/h\d/i)) {
           innerhtml = `[${lcTag}]${innerhtml}[/${lcTag}]`;
         }
+
         if (lcTag === 'li') {
           innerhtml = `*${innerhtml.replace(/[\n\r]+/, '')}\n`;
         }
+
         if (lcTag === 'p') {
           innerhtml = `\n${innerhtml === '&nbsp' ? '' : innerhtml}\n`;
         }
+
         if (lcTag === 'div') {
           innerhtml = `\n${innerhtml}`;
         }
+
         return innerhtml;
       },
     );

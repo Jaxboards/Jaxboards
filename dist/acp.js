@@ -149,6 +149,7 @@
     ) {
       // requestType is an enum (1=update, 2=load new)
       let sendData = null;
+
       if (
         data &&
         Array.isArray(data) &&
@@ -159,6 +160,7 @@
       } else if (typeof data !== 'string') {
         sendData = buildQueryString(data);
       }
+
       const request = new XMLHttpRequest();
       if (callback) {
         this.setup.callback = callback;
@@ -168,16 +170,18 @@
           this.setup.callback(request);
         }
       };
-      if (!request) return false;
+
       request.open(method, url, true);
       request.url = url;
       request.type = requestType;
+
       if (method) {
         request.setRequestHeader(
           'Content-Type',
           'application/x-www-form-urlencoded',
         );
       }
+
       request.setRequestHeader('X-JSACCESS', requestType);
       request.send(sendData);
       return request;

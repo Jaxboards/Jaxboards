@@ -109,8 +109,9 @@ class ModControls {
   checkLocation() {
     const { whichone } = this;
     const regex = whichone ? /act=vt(\d+)/ : /act=vf(\d+)/;
-    if (document.location.toString().match(regex)) {
-      this.moveto(RegExp.$1);
+    const locationMatch = document.location.toString().match(regex);
+    if (locationMatch) {
+      this.moveto(locationMatch[1]);
     } else {
       RUN.stream.commands.modcontrols_move();
     }
