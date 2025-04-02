@@ -13,11 +13,11 @@
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Jaxboards_Jaxboards&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=Jaxboards_Jaxboards)
 
 Jaxboards is PHP/MySQL forum software built sometime between 2007 and October 6,
-2010\, and has received semi-regular maintenance to keep it running.
-
-It's pretty full-featured and offers a unique experience over other forum
+2010\. It's pretty full-featured and offers a unique experience over other forum
 software even today. It delivers outstanding performance, and creating themes is
-relatively easy.
+relatively easy. That being said, it's showing its age, and relies on some older
+technologies to get by. It is not recommended to run this in production these
+days.
 
 ## Getting Started
 
@@ -27,6 +27,8 @@ local machine for development purposes.
 ## Deployment
 
 Tested on Apache and Linux only.
+
+It is not recommended to run Jaxboards in production.
 
 ### Prerequisites
 
