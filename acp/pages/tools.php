@@ -262,7 +262,7 @@ final class tools
 
         $contents = "Sorry, jaxboards does not have file permissions to read your PHP error log file. ({$logPath})";
 
-        if (is_readable($logPath)) {
+        if (@is_readable($logPath)) {
             $contents = "<textarea class='editor'>" . htmlspecialchars(file_get_contents($logPath)) . '</textarea>';
         }
 
