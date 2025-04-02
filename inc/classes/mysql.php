@@ -646,7 +646,7 @@ final class MySQL
                 $return[$USER['id']] = [
                     'birthday' => $USER['birthday'],
                     'group_id' => $USER['group_id'],
-                    'last_action' => gmdate('Y-m-d H:i:s', $SESS->last_action),
+                    'last_action' => gmdate('Y-m-d H:i:s', (int) ($SESS->last_action ?? 0)),
                     'last_update' => $SESS->last_update,
                     'location' => $SESS->location,
                     'location_verbose' => $SESS->location_verbose,
