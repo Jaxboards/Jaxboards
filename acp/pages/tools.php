@@ -254,15 +254,16 @@ final class tools
         );
     }
 
-    public function errorlog(): void {
+    public function errorlog(): void
+    {
         global $PAGE;
 
         $logPath = ini_get('error_log');
 
-        $contents = "Sorry, jaxboards does not have file permissions to read your PHP error log file. ($logPath)";
+        $contents = "Sorry, jaxboards does not have file permissions to read your PHP error log file. ({$logPath})";
 
         if (is_readable($logPath)) {
-            $contents = "<textarea class='editor'>" . htmlspecialchars(file_get_contents($logPath)) . "</textarea>";
+            $contents = "<textarea class='editor'>" . htmlspecialchars(file_get_contents($logPath)) . '</textarea>';
         }
 
         $PAGE->addContentBox(
