@@ -263,20 +263,19 @@ final class tools
         $contents = "Sorry, jaxboards does not have file permissions to read your PHP error log file. ({$logPath})";
 
         if (is_readable($logPath)) {
-            $last100Lines = $this->tail($logPath, 100);
+            $last100Lines = $this->tail($logPath, 100, true);
             $contents = "<textarea class='editor'>" . htmlspecialchars(implode("\n", $last100Lines)) . '</textarea>';
         }
 
         $PAGE->addContentBox(
-            'Error Log Viewer',
+            'Error Log Viewer (Last 100, reverse chronological)',
             $contents,
         );
     }
 
-    // Reads the last $totalLines of a file
-    public function tail($path, $totalLines)
+    /* Reads the last $totalLines of a file */
+    function tail($path, $totalLines, $reverse = false)
     {
-        $lines = [];
 
         $fp = fopen($path, 'r');
         fseek($fp, 0, SEEK_END);
@@ -307,6 +306,8 @@ final class tools
             }
         }
 
-        return array_reverse($lines);
+        if (!$reverse) $lines = array_reverse($lines);
+
+        return $lines;
     }
 }
