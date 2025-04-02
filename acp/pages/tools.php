@@ -16,8 +16,11 @@ final class tools
         $links = [
             'backup' => 'Backup',
             'files' => 'File Manager',
+            'errorlog' => 'View Error Log',
         ];
+
         $sidebarLinks = '';
+
         foreach ($links as $do => $title) {
             $sidebarLinks .= $PAGE->parseTemplate(
                 'sidebar-list-link.html',
@@ -43,6 +46,7 @@ final class tools
 
         match ($JAX->b['do']) {
             'backup' => $this->backup(),
+            'errorlog' => $this->errorlog(),
             default => $this->filemanager(),
         };
     }
@@ -247,6 +251,23 @@ final class tools
             $PAGE->parseTemplate(
                 'tools/backup.html',
             ),
+        );
+    }
+
+    public function errorlog(): void {
+        global $PAGE;
+
+        $logPath = ini_get('error_log');
+
+        $contents = "Sorry, jaxboards does not have file permissions to read your PHP error log file. ($logPath)";
+
+        if (is_readable($logPath)) {
+            $contents = "<textarea class='editor'>" . htmlspecialchars(file_get_contents($logPath)) . "</textarea>";
+        }
+
+        $PAGE->addContentBox(
+            'Error Log Viewer',
+            $contents,
         );
     }
 }

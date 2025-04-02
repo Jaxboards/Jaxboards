@@ -155,6 +155,7 @@ $PAGE->addNavMenu(
     [
         '?act=tools&do=backup' => 'Backup Forum',
         '?act=tools&do=files' => 'File Manager',
+        '?act=tools&do=errorlog' => 'View Error Log',
     ],
 );
 
