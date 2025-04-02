@@ -1302,10 +1302,14 @@
         }
 
         const textAlignMatch = style.match(/text-align: ?(right|center|left)/i);
-        const backgroundColorMatch = style.match(/background(-color)?:[^;]+(rgb\([^)]+\)|#\s+)/i);
+        const backgroundColorMatch = style.match(
+          /background(-color)?:[^;]+(rgb\([^)]+\)|#\s+)/i,
+        );
         const italicMatch = style.match(/font-style: ?italic/i);
         const underlineMatch = style.match(/text-decoration:[^;]*underline/i);
-        const lineThroughMatch = style.match(/text-decoration:[^;]*line-through/i);
+        const lineThroughMatch = style.match(
+          /text-decoration:[^;]*line-through/i,
+        );
         const fontSizeMatch = style.match(/font-size: ?([^;]+)/i);
         const fontColorMatch = style.match(/color: ?([^;]+)/i);
         const fontWeightMatch = style.match(/font-weight: ?bold/i);
@@ -1319,11 +1323,7 @@
           innerhtml = `[align=${textAlignMatch[1]}]${innerhtml}[/align]`;
         }
 
-        if (
-          italicMatch ||
-          lcTag === 'i' ||
-          lcTag === 'em'
-        ) {
+        if (italicMatch || lcTag === 'i' || lcTag === 'em') {
           innerhtml = `[I]${innerhtml}[/I]`;
         }
 
@@ -1331,19 +1331,11 @@
           innerhtml = `[U]${innerhtml}[/U]`;
         }
 
-        if (
-          lineThroughMatch ||
-          lcTag === 's' ||
-          lcTag === 'strike'
-        ) {
+        if (lineThroughMatch || lcTag === 's' || lcTag === 'strike') {
           innerhtml = `[S]${innerhtml}[/S]`;
         }
 
-        if (
-          fontWeightMatch ||
-          lcTag === 'strong' ||
-          lcTag === 'b'
-        ) {
+        if (fontWeightMatch || lcTag === 'strong' || lcTag === 'b') {
           innerhtml = `[B]${innerhtml}[/B]`;
         }
 
