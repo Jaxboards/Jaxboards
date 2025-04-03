@@ -13,28 +13,22 @@
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Jaxboards_Jaxboards&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=Jaxboards_Jaxboards)
 
 Jaxboards is PHP/MySQL forum software built sometime between 2007 and October 6,
-2010\. It's pretty full-featured and offers a unique experience over other forum
-software even today. It delivers outstanding performance, and creating themes is
-relatively easy. That being said, it's showing its age, and relies on some older
-technologies to get by. It is not recommended to run this in production these
-days.
+2010, and is semi-regularly maintained.
+
+It's pretty full-featured and offers a unique experience when compared to other forum software, even today.
+
+It delivers outstanding performance and creating themes is relatively easy.
 
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your
 local machine for development purposes.
 
-## Deployment
-
-Tested on Apache and Linux only.
-
-It is not recommended to run Jaxboards in production.
-
 ### Prerequisites
 
 - PHP 8.3.16 or higher
 - MySQL >= 8.0.41 < 8.1
-- TLS certificate (due to hardcoded URLs in codebase)
+- TLS certificate (for security and protection of user data)
 
 You'll want a dedicated database just for Jaxboards just to avoid any kind of
 conflicts with anything else.
@@ -159,7 +153,7 @@ The tools have `npm` scripts for them, so you can easily get the tools working.
 
 #### JS Compilation
 
-_EXPERIMENTAL / IN PROGRESS_: All Javascript sourcecode is modularized into ES6
+All Javascript sourcecode is modularized into ES6
 classes, and is bundled together using
 [rollup](https://www.npmjs.com/package/rollup). To build a bundled source
 ("jsnew.js") from the modules, run:
