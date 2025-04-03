@@ -187,7 +187,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                 'installed' => true,
                 'service' => $service,
                 'prefix' => $service ? '' : 'jaxboards',
-                'sql_prefix' => $service ? '' : 'jaxboards_'
+                'sql_prefix' => $service ? '' : 'jaxboards_',
             ],
         );
 
