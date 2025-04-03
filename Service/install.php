@@ -172,25 +172,23 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
 
     if ($errors === []) {
         // Update with our settings.
-        $CFG['boardname'] = 'Jaxboards';
-        $CFG['domain'] = $JAX->p['domain'];
-        $CFG['mail_from'] = $JAX->p['admin_username'] . ' <'
-            . $JAX->p['admin_email'] . '>';
-        $CFG['sql_db'] = $JAX->p['sql_db'];
-        $CFG['sql_host'] = $JAX->p['sql_host'];
-        $CFG['sql_username'] = $JAX->p['sql_username'];
-        $CFG['sql_password'] = $JAX->p['sql_password'];
-        $CFG['installed'] = true;
-        $CFG['service'] = $service;
-        $CFG['prefix'] = $service ? '' : 'jaxboards';
-        $CFG['sql_prefix'] = $CFG['prefix'] !== '' && $CFG['prefix'] !== '0'
-            ? $CFG['prefix'] . '_'
-            : '';
-
         $PAGE->writeData(
             JAXBOARDS_ROOT . '/config.php',
             'CFG',
-            $CFG,
+            [
+                'boardname' => 'Jaxboards',
+                'domain' => $JAX->p['domain'],
+                'mail_from' => $JAX->p['admin_username'] . ' <'
+                    . $JAX->p['admin_email'] . '>',
+                'sql_db' => $JAX->p['sql_db'],
+                'sql_host' => $JAX->p['sql_host'],
+                'sql_username' => $JAX->p['sql_username'],
+                'sql_password' => $JAX->p['sql_password'],
+                'installed' => true,
+                'service' => $service,
+                'prefix' => $service ? '' : 'jaxboards',
+                'sql_prefix' => $service ? '' : 'jaxboards_'
+            ],
         );
 
         if ($service) {
