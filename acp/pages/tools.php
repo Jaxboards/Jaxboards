@@ -278,6 +278,8 @@ final class tools
     {
         $logFile = new SplFileObject($path, 'r');
         $logFile->fseek(0, SEEK_END);
+
+        $lines = [];
         $lastLine = '';
 
         // Loop backward until we have our lines or we reach the start
@@ -300,6 +302,7 @@ final class tools
 
             $lines[] = $lastLine;
             $lastLine = '';
+
             if (count($lines) >= $totalLines) {
                 break;
             }
