@@ -268,23 +268,22 @@ final class tools
         }
 
         $PAGE->addContentBox(
-            'Error Log Viewer (Last 100, reverse chronological)',
+            'Error Log Viewer (Last 100, chronological)',
             $contents,
         );
     }
 
     // Reads the last $totalLines of a file
-    public function tail($path, $totalLines, $reverse = false)
+    public function tail($path, $totalLines)
     {
-
-        $fp = fopen($path, 'r');
-        fseek($fp, 0, SEEK_END);
+        $logFile = new SplFileObject($path, 'r');
+        $logFile->fseek(0, SEEK_END);
         $lastLine = '';
 
         // Loop backward until we have our lines or we reach the start
-        for ($pos = ftell($fp) - 1; $pos >= 0; --$pos) {
-            fseek($fp, $pos);
-            $character = fgetc($fp);
+        for ($pos = $logFile->ftell() - 1; $pos >= 0; --$pos) {
+            $logFile->fseek($pos);
+            $character = $logFile->fgetc();
 
             if ($pos === 0 || $character !== "\n") {
                 $lastLine = $character . $lastLine;
@@ -306,9 +305,7 @@ final class tools
             }
         }
 
-        if (!$reverse) {
-            $lines = array_reverse($lines);
-        }
+        $lines = array_reverse($lines);
 
         return $lines;
     }
