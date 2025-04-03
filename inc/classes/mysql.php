@@ -161,8 +161,12 @@ final class MySQL
         return $r;
     }
 
-    public function safeupdate($table, $kvarray, $whereformat = '', ...$whereparams)
-    {
+    public function safeupdate(
+        $table,
+        $kvarray,
+        $whereformat = '',
+        ...$whereparams,
+    ) {
         if (empty($kvarray)) {
             // Nothing to update.
             return null;
