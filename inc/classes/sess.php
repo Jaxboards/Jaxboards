@@ -80,14 +80,18 @@ final class SESS
         return $this->data[$a] ?? null;
     }
 
-    public function __set($a, $b): void
+    public function __set($property, $value): void
     {
-        if (isset($this->data[$a]) && $this->data[$a] === $b) {
+        if (isset($this->data[$property]) && $this->data[$property] === $value) {
             return;
         }
 
-        $this->changedData[$a] = $b;
-        $this->data[$a] = $b;
+        if ($property === 'ip' && !filter_var($value, FILTER_VALIDATE_IP)) {
+            return;
+        }
+
+        $this->changedData[$property] = $value;
+        $this->data[$property] = $value;
     }
 
     public function getSess($sid = false)
@@ -127,9 +131,9 @@ final class SESS
                         'UNIX_TIMESTAMP(`read_date`) AS `read_date`',
                     ],
                     'session',
-                    'WHERE `id`=? AND `ip`=INET6_ATON(?)',
+                    'WHERE `id`=? AND `ip`=?',
                     $DB->basicvalue($sid),
-                    $JAX->getIp(),
+                    $JAX->ip2bin(),
                 )
                     : $DB->safeselect(
                         [
@@ -341,8 +345,8 @@ final class SESS
 
         if ($this->data['is_bot']) {
             // Bots tend to read a lot of content.
-            $sd['forumsread'] = '';
-            $sd['topicsread'] = '';
+            $sd['forumsread'] = '{}';
+            $sd['topicsread'] = '{}';
         }
 
         if (!$this->data['last_action']) {

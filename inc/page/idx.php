@@ -21,8 +21,8 @@ final class IDX
         global $PAGE,$CFG,$JAX,$SESS;
         if (isset($JAX->b['markread']) && $JAX->b['markread']) {
             $PAGE->JS('softurl');
-            $SESS->forumsread = '';
-            $SESS->topicsread = '';
+            $SESS->forumsread = '{}';
+            $SESS->topicsread = '{}';
             $SESS->read_date = time();
         }
 

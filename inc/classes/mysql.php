@@ -85,7 +85,7 @@ final class MySQL
         return $this->db;
     }
 
-    public function safeselect($selectors_input, $table, $where = '')
+    public function safeselect($selectors_input, $table, $where = '', ...$vars)
     {
         // set new variable to not impact debug_backtrace value for inspecting
         // input
@@ -100,20 +100,11 @@ final class MySQL
             return null;
         }
 
-        // phpcs:disable PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
-        $va_array = func_get_args();
-        // phpcs:enable
-        array_shift($va_array);
-        // Selectors.
-        array_shift($va_array);
-        // Table.
-        array_shift($va_array);
         // Where.
         $query = 'SELECT ' . $selectors . ' FROM '
             . $this->ftable($table) . ($where ? ' ' . $where : '');
-        array_unshift($va_array, $query);
 
-        return $this->safequery(...$va_array);
+        return $this->safequery($query, ...$vars);
     }
 
     public function insert_id()
@@ -170,22 +161,13 @@ final class MySQL
         return $r;
     }
 
-    public function safeupdate($table, $kvarray, $whereformat = '')
+    public function safeupdate($table, $kvarray, $whereformat = '', ...$whereparams)
     {
         if (empty($kvarray)) {
             // Nothing to update.
             return null;
         }
 
-        // phpcs:disable PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
-        $whereparams = func_get_args();
-        // phpcs:enable
-        array_shift($whereparams);
-        // Table.
-        array_shift($whereparams);
-        // Key-value array.
-        array_shift($whereparams);
-        // Whereformat
         // $whereparams now contains the parameters for the "WHERE" clause.
         $va_array = array_merge(array_values($kvarray), $whereparams);
 
@@ -196,9 +178,7 @@ final class MySQL
 
         $query = 'UPDATE ' . $this->ftable($table) . ' SET ' . $keynames . $whereformat;
 
-        array_unshift($va_array, $query);
-
-        return $this->safequery(...$va_array);
+        return $this->safequery($query, ...$va_array);
     }
 
     public function safeBuildUpdate($kvarray): string
@@ -235,23 +215,13 @@ final class MySQL
         return mb_substr($r, 0, -1);
     }
 
-    public function safedelete($table, $whereformat): mixed
+    public function safedelete($table, $whereformat, ...$vars): mixed
     {
         $query = 'DELETE FROM ' . $this->ftable($table)
             . ($whereformat ? ' ' . $whereformat : '');
 
-        // phpcs:disable PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
-        $va_array = func_get_args();
-        // phpcs:enable
-
-        array_shift($va_array);
-        // Table.
-        array_shift($va_array);
-        // Whereformat.
-        array_unshift($va_array, $query);
-
         // Put the format string back.
-        return $this->safequery(...$va_array);
+        return $this->safequery($query, ...$vars);
     }
 
     public function row($a = null): null|array|false
