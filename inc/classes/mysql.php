@@ -172,17 +172,11 @@ final class MySQL
             return null;
         }
 
-        // $whereparams now contains the parameters for the "WHERE" clause.
-        $va_array = array_merge(array_values($kvarray), $whereparams);
+        $keysPrepared = $this->safeBuildUpdate($kvarray);
+        $values = array_values($kvarray);
+        $query = 'UPDATE ' . $this->ftable($table) . ' SET ' . $keysPrepared . ' ' .$whereformat;
 
-        $keynames = $this->safeBuildUpdate($kvarray);
-        if (!empty($whereformat)) {
-            $whereformat = ' ' . $whereformat;
-        }
-
-        $query = 'UPDATE ' . $this->ftable($table) . ' SET ' . $keynames . $whereformat;
-
-        return $this->safequery($query, ...$va_array);
+        return $this->safequery($query, ...$values, ...$whereparams);
     }
 
     public function safeBuildUpdate($kvarray): string
