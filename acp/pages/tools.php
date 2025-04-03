@@ -305,8 +305,6 @@ final class tools
             }
         }
 
-        $lines = array_reverse($lines);
-
-        return $lines;
+        return array_reverse($lines);
     }
 }
