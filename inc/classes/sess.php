@@ -86,10 +86,6 @@ final class SESS
             return;
         }
 
-        if ($property === 'ip' && !filter_var($value, FILTER_VALIDATE_IP)) {
-            return;
-        }
-
         $this->changedData[$property] = $value;
         $this->data[$property] = $value;
     }
