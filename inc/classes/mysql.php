@@ -174,7 +174,7 @@ final class MySQL
 
         $keysPrepared = $this->safeBuildUpdate($kvarray);
         $values = array_values($kvarray);
-        $query = 'UPDATE ' . $this->ftable($table) . ' SET ' . $keysPrepared . ' ' .$whereformat;
+        $query = 'UPDATE ' . $this->ftable($table) . ' SET ' . $keysPrepared . ' ' . $whereformat;
 
         return $this->safequery($query, ...$values, ...$whereparams);
     }
