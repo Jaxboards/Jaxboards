@@ -151,7 +151,7 @@ final class TOPIC
 
         // Output RSS instead.
         if (isset($JAX->b['fmt']) && $JAX->b['fmt'] === 'RSS') {
-            include_once __DIR__ . '/inc/classes/rssfeed.php';
+            include_once __DIR__ . '/../classes/rssfeed.php';
             $link = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'];
             $feed = new rssfeed(
                 [

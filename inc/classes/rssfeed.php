@@ -20,6 +20,7 @@ final class rssfeed
     {
         $this->feed['pubDate'] = gmdate('r');
         $xmlFeed = $this->make_xml($this->feed);
+        header('Content-type: application/rss+xml');
         echo <<<EOT
             <?xml version="1.0" encoding="UTF-8" ?>
             <rss version="2.0">
