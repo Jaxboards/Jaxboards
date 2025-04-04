@@ -484,7 +484,7 @@ final class forums
             // Add per-forum moderator.
             if (is_numeric($JAX->p['modid'])) {
                 $result = $DB->safeselect(
-                    [ 'id' ],
+                    ['id'],
                     'members',
                     'WHERE `id`=?',
                     $DB->basicvalue($JAX->p['modid']),
