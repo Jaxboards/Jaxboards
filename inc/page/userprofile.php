@@ -448,7 +448,7 @@ final class userprofile
                     $this->num_activity,
                 );
                 if (isset($JAX->b['fmt']) && $JAX->b['fmt'] === 'RSS') {
-                    include_once __DIR__ . '/inc/classes/rssfeed.php';
+                    include_once __DIR__ . '/../classes/rssfeed.php';
                     $feed = new rssfeed(
                         [
                             'description' => $udata['usertitle'],
