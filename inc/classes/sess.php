@@ -112,6 +112,7 @@ final class SESS
                         'forumsread',
                         'hide',
                         'id',
+                        'ip',
                         'is_bot',
                         'location_verbose',
                         'location',
@@ -121,7 +122,6 @@ final class SESS
                         'useragent',
                         'users_online_cache',
                         'vars',
-                        'INET6_NTOA(`ip`) as `ip`',
                         'UNIX_TIMESTAMP(`last_action`) AS `last_action`',
                         'UNIX_TIMESTAMP(`last_update`) AS `last_update`',
                         'UNIX_TIMESTAMP(`read_date`) AS `read_date`',
@@ -137,6 +137,7 @@ final class SESS
                             'forumsread',
                             'hide',
                             'id',
+                            'ip',
                             'is_bot',
                             'location_verbose',
                             'location',
@@ -146,7 +147,6 @@ final class SESS
                             'useragent',
                             'users_online_cache',
                             'vars',
-                            'INET6_NTOA(`ip`) as `ip`',
                             'UNIX_TIMESTAMP(`last_action`) AS `last_action`',
                             'UNIX_TIMESTAMP(`last_update`) AS `last_update`',
                             'UNIX_TIMESTAMP(`read_date`) AS `read_date`',
@@ -156,6 +156,7 @@ final class SESS
                         $DB->basicvalue($sid),
                     );
             $r = $DB->arow($result);
+            $r['ip'] = $JAX->bin2ip($r['ip']);
             $DB->disposeresult($result);
         }
 

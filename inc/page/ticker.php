@@ -24,16 +24,21 @@ final class ticker
         $SESS->location_verbose = 'Using the ticker!';
         $result = $DB->safespecial(
             <<<'EOT'
-                SELECT p.`id` AS `id`,p.`auth_id` AS `auth_id`,p.`post` AS `post`,
-                    UNIX_TIMESTAMP(p.`date`) AS `date`,p.`showsig` AS `showsig`,
-                    p.`showemotes` AS `showemotes`,
-                    p.`tid` AS `tid`,p.`newtopic` AS `newtopic`,INET6_NTOA(p.`ip`) AS `ip`,
-                    UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`,p.`editby` AS `editby`,
-                    p.`rating` AS `rating`,f.`perms` AS `perms`,f.`title` AS `ftitle`,
-                    t.`title` AS `title`,t.`fid` AS `fid`,t.`replies` AS `replies`,
-                    t.`auth_id` AS `auth_id2`,m.`group_id` AS `group_id`,
-                    m.`display_name` AS `display_name`,m2.`group_id` AS `group_id2`,
-                    m2.`display_name` AS `display_name2`
+                SELECT
+                    f.`perms` AS `perms`,
+                    f.`title` AS `ftitle`,
+                    m.`display_name` AS `display_name`,
+                    m.`group_id` AS `group_id`,
+                    m2.`display_name` AS `display_name2`,
+                    m2.`group_id` AS `group_id2`,
+                    p.`auth_id` AS `auth_id`,
+                    p.`id` AS `id`,
+                    p.`tid` AS `tid`,
+                    t.`auth_id` AS `auth_id2`,
+                    t.`fid` AS `fid`,
+                    t.`replies` AS `replies`,
+                    t.`title` AS `title`,
+                    UNIX_TIMESTAMP(p.`date`) AS `date`
                 FROM %t p
                 LEFT JOIN %t t
                     ON t.`id`=p.`tid`
@@ -52,17 +57,17 @@ final class ticker
         );
         $ticks = '';
         $first = 0;
-        while ($f = $DB->arow($result)) {
-            $p = $JAX->parseperms($f['perms'], $USER ? $USER['group_id'] : 3);
+        while ($tick = $DB->arow($result)) {
+            $p = $JAX->parseperms($tick['perms'], $USER ? $USER['group_id'] : 3);
             if (!$p['read']) {
                 continue;
             }
 
             if (!$first) {
-                $first = $f['id'];
+                $first = $tick['id'];
             }
 
-            $ticks .= $this->ftick($f);
+            $ticks .= $this->ftick($tick);
         }
 
         $SESS->addvar('tickid', $first);
@@ -76,16 +81,21 @@ final class ticker
         global $PAGE,$DB,$SESS,$USER,$JAX;
         $result = $DB->safespecial(
             <<<'EOT'
-                SELECT p.`id` AS `id`,p.`auth_id` AS `auth_id`,p.`post` AS `post`,
-                    UNIX_TIMESTAMP(p.`date`) AS `date`,p.`showsig` AS `showsig`,
-                    p.`showemotes` AS `showemotes`,
-                    p.`tid` AS `tid`,p.`newtopic` AS `newtopic`,INET6_NTOA(p.`ip`) AS `ip`,
-                    UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`,p.`editby` AS `editby`,
-                    p.`rating` AS `rating`,f.`perms` AS `perms`,f.`title` AS `ftitle`,
-                    t.`title` AS `title`,t.`fid` AS `fid`,t.`replies` AS `replies`,
-                    t.`auth_id` AS `auth_id2`,m.`group_id` AS `group_id`,
-                    m.`display_name` AS `display_name`,m2.`group_id` AS `group_id2`,
-                    m2.`display_name` AS `display_name2`
+                SELECT
+                    f.`perms` AS `perms`,
+                    f.`title` AS `ftitle`,
+                    m.`display_name` AS `display_name`,
+                    m.`group_id` AS `group_id`,
+                    m2.`display_name` AS `display_name2`,
+                    m2.`group_id` AS `group_id2`,
+                    p.`auth_id` AS `auth_id`,
+                    p.`id` AS `id`,
+                    p.`tid` AS `tid`,
+                    t.`auth_id` AS `auth_id2`,
+                    t.`fid` AS `fid`,
+                    t.`replies` AS `replies`,
+                    t.`title` AS `title`,
+                    UNIX_TIMESTAMP(p.`date`) AS `date`
                 FROM %t p
                 LEFT JOIN %t t
                     ON t.`id`=p.`tid`

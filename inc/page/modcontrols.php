@@ -306,18 +306,8 @@ final class modcontrols
 
         $result = $DB->safeselect(
             [
-                'auth_id',
-                'editby',
-                'id',
                 'newtopic',
-                'post',
-                'rating',
-                'showemotes',
-                'showsig',
                 'tid',
-                'INET6_NTOA(`ip`) AS `ip`',
-                'UNIX_TIMESTAMP(`date`) AS `date`',
-                'UNIX_TIMESTAMP(`edit_date`) AS `edit_date`',
             ],
             'posts',
             'WHERE id=?',
@@ -889,59 +879,19 @@ final class modcontrols
             && $JAX->p['submit'] === 'showform')
             || isset($JAX->b['mid'])
         ) {
+            $memberFields = [
+                'group_id',
+                'id',
+                'display_name',
+                'avatar',
+                'full_name',
+                'about',
+                'sig',
+            ];
             // Get the member data.
             if (is_numeric($JAX->b['mid'])) {
                 $result = $DB->safeselect(
-                    [
-                        'about',
-                        'avatar',
-                        'birthdate',
-                        'contact_aim',
-                        'contact_bluesky',
-                        'contact_discord',
-                        'contact_gtalk',
-                        'contact_msn',
-                        'contact_skype',
-                        'contact_steam',
-                        'contact_twitter',
-                        'contact_yim',
-                        'contact_youtube',
-                        'display_name',
-                        'email_settings',
-                        'email',
-                        'enemies',
-                        'friends',
-                        'full_name',
-                        'gender',
-                        'group_id',
-                        'id',
-                        'location',
-                        '`mod`',
-                        'name',
-                        'notify_pm',
-                        'notify_postinmytopic',
-                        'notify_postinsubscribedtopic',
-                        'nowordfilter',
-                        'pass',
-                        'posts',
-                        'sig',
-                        'skin_id',
-                        'sound_im',
-                        'sound_pm',
-                        'sound_postinmytopic',
-                        'sound_postinsubscribedtopic',
-                        'sound_shout',
-                        'ucpnotepad',
-                        'usertitle',
-                        'website',
-                        'wysiwyg',
-                        'DAY(`birthdate`) AS `dob_day`',
-                        'INET6_NTOA(`ip`) AS `ip`',
-                        'MONTH(`birthdate`) AS `dob_month`',
-                        'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
-                        'UNIX_TIMESTAMP(`last_visit`) AS `last_visit`',
-                        'YEAR(`birthdate`) AS `dob_year`',
-                    ],
+                    $memberFields,
                     'members',
                     'WHERE `id`=?',
                     $DB->basicvalue($JAX->b['mid']),
@@ -950,56 +900,7 @@ final class modcontrols
                 $DB->disposeresult($result);
             } elseif ($JAX->p['mname']) {
                 $result = $DB->safeselect(
-                    [
-                        'about',
-                        'avatar',
-                        'birthdate',
-                        'contact_aim',
-                        'contact_bluesky',
-                        'contact_discord',
-                        'contact_gtalk',
-                        'contact_msn',
-                        'contact_skype',
-                        'contact_steam',
-                        'contact_twitter',
-                        'contact_yim',
-                        'contact_youtube',
-                        'display_name',
-                        'email_settings',
-                        'email',
-                        'enemies',
-                        'friends',
-                        'full_name',
-                        'gender',
-                        'group_id',
-                        'id',
-                        'location',
-                        '`mod`',
-                        'name',
-                        'notify_pm',
-                        'notify_postinmytopic',
-                        'notify_postinsubscribedtopic',
-                        'nowordfilter',
-                        'pass',
-                        'posts',
-                        'sig',
-                        'skin_id',
-                        'sound_im',
-                        'sound_pm',
-                        'sound_postinmytopic',
-                        'sound_postinsubscribedtopic',
-                        'sound_shout',
-                        'ucpnotepad',
-                        'usertitle',
-                        'website',
-                        'wysiwyg',
-                        'DAY(`birthdate`) AS `dob_day`',
-                        'INET6_NTOA(`ip`) AS `ip`',
-                        'MONTH(`birthdate`) AS `dob_month`',
-                        'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
-                        'UNIX_TIMESTAMP(`last_visit`) AS `last_visit`',
-                        'YEAR(`birthdate`) AS `dob_year`',
-                    ],
+                    $memberFields,
                     'members',
                     'WHERE `display_name` LIKE ?',
                     $DB->basicvalue($JAX->p['mname'] . '%'),
@@ -1023,9 +924,7 @@ final class modcontrols
             }
 
             if (
-                (isset($data['can_moderate'])
-                && $data['can_moderate'])
-                && $USER['group_id'] !== 2
+                $USER['group_id'] !== 2
                 || $data['group_id'] === 2
                 && ($USER['id'] !== 1
                 && $data['id'] !== $USER['id'])
@@ -1200,9 +1099,13 @@ final class modcontrols
                 $content = '';
                 $result = $DB->safespecial(
                     <<<'EOT'
-                        SELECT s.`id` AS `id`,s.`uid` AS `uid`,s.`shout` AS `shout`,
-                        UNIX_TIMESTAMP(s.`date`) AS `date`,INET6_NTOA(s.`ip`) AS `ip`,
-                        m.`group_id` AS `group_id`, m.`display_name` AS `display_name`
+                        SELECT
+                            m.`display_name` AS `display_name`,
+                            m.`group_id` AS `group_id`,
+                            s.`id` AS `id`,
+                            s.`shout` AS `shout`,
+                            s.`uid` AS `uid`,
+                            UNIX_TIMESTAMP(s.`date`) AS `date`
                         FROM %t s
                         LEFT JOIN %t m
                             ON m.`id`=s.`uid`

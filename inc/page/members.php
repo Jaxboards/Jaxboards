@@ -65,54 +65,23 @@ final class members
         $memberquery = $DB->safespecial(
             <<<MySQL
                     SELECT
-                        m.`id` AS `id`,
-                        m.`name` AS `name`,
-                        m.`email` AS `email`,
-                        m.`sig` AS `sig`,
-                        m.`posts` AS `posts`,
-                        m.`group_id` AS `group_id`,
+                        g.`title` AS `g_title`,
                         m.`avatar` AS `avatar`,
-                        m.`usertitle` AS `usertitle`,
-                        UNIX_TIMESTAMP(m.`join_date`) AS `join_date`,
-                        UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`,
                         m.`contact_aim` AS `contact_aim`,
                         m.`contact_bluesky` AS `contact_bluesky`,
                         m.`contact_discord` AS `contact_discord`,
                         m.`contact_gtalk` AS `contact_googlechat`,
                         m.`contact_msn` AS `contact_msn`,
                         m.`contact_skype` AS `contact_skype`,
+                        m.`contact_steam` AS `contact_steam`,
                         m.`contact_twitter` AS `contact_twitter`,
                         m.`contact_yim` AS `contact_yim`,
                         m.`contact_youtube` AS `contact_youtube`,
-                        m.`website` AS `website`,
-                        m.`birthdate` AS `birthdate`,
-                        DAY(m.`birthdate`) AS `dob_day`,
-                        MONTH(m.`birthdate`) AS `dob_month`,
-                        YEAR(m.`birthdate`) AS `dob_year`,
-                        m.`about` AS `about`,
                         m.`display_name` AS `display_name`,
-                        m.`full_name` AS `full_name`,
-                        m.`contact_steam` AS `contact_steam`,
-                        m.`location` AS `location`,
-                        m.`gender` AS `gender`,
-                        m.`friends` AS `friends`,
-                        m.`enemies` AS `enemies`,
-                        m.`sound_shout` AS `sound_shout`,
-                        m.`sound_im` AS `sound_im`,
-                        m.`sound_pm` AS `sound_pm`,
-                        m.`sound_postinmytopic` AS `sound_postinmytopic`,
-                        m.`sound_postinsubscribedtopic` AS `sound_postinsubscribedtopic`,
-                        m.`notify_pm` AS `notify_pm`,
-                        m.`notify_postinmytopic` AS `notify_postinmytopic`,
-                        m.`notify_postinsubscribedtopic` AS `notify_postinsubscribedtopic`,
-                        m.`ucpnotepad` AS `ucpnotepad`,
-                        m.`skin_id` AS `skin_id`,
-                        m.`email_settings` AS `email_settings`,
-                        m.`nowordfilter` AS `nowordfilter`,
-                        INET6_NTOA(m.`ip`) AS `ip`,
-                        m.`mod` AS `mod`,
-                        m.`wysiwyg` AS `wysiwyg`,
-                        g.`title` AS `g_title`
+                        m.`group_id` AS `group_id`,
+                        m.`id` AS `id`,
+                        m.`posts` AS `posts`,
+                        UNIX_TIMESTAMP(m.`join_date`) AS `join_date`
                     FROM %t m
                     LEFT JOIN %t g
                         ON g.id=m.group_id
@@ -165,7 +134,7 @@ final class members
                 . "\">{$v}</a>";
         }
 
-        foreach ($memberarray as $f) {
+        foreach ($memberarray as $member) {
             $contactdetails = '';
             $contactUrls = [
                 'aim' => 'aim:goaim?screenname=%s',
@@ -180,32 +149,32 @@ final class members
                 'youtube' => 'https://youtube.com/%s',
             ];
             foreach ($contactUrls as $k => $v) {
-                if (!$f['contact_' . $k]) {
+                if (!$member['contact_' . $k]) {
                     continue;
                 }
 
                 $contactdetails .= '<a class="' . $k . ' contact" href="'
-                    . sprintf($v, $JAX->blockhtml($f['contact_' . $k]))
+                    . sprintf($v, $JAX->blockhtml($member['contact_' . $k]))
                     . '" title="' . $k . ' contact">&nbsp;</a>';
             }
 
             $contactdetails .= '<a title="PM this member" class="pm contact" '
                 . 'href="?act=ucp&amp;what=inbox&amp;page=compose&amp;mid='
-                . $f['id'] . '"></a>';
+                . $member['id'] . '"></a>';
             $page .= $PAGE->meta(
                 'members-row',
-                $f['id'],
-                $JAX->pick($f['avatar'], $PAGE->meta('default-avatar')),
+                $member['id'],
+                $JAX->pick($member['avatar'], $PAGE->meta('default-avatar')),
                 $PAGE->meta(
                     'user-link',
-                    $f['id'],
-                    $f['group_id'],
-                    $f['display_name'],
+                    $member['id'],
+                    $member['group_id'],
+                    $member['display_name'],
                 ),
-                $f['g_title'],
-                $f['id'],
-                $f['posts'],
-                $JAX->date($f['join_date']),
+                $member['g_title'],
+                $member['id'],
+                $member['posts'],
+                $JAX->date($member['join_date']),
                 $contactdetails,
             );
         }

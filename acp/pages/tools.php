@@ -58,28 +58,23 @@ final class tools
         if (isset($JAX->b['delete']) && is_numeric($JAX->b['delete'])) {
             $result = $DB->safeselect(
                 [
-                    'downloads',
                     'hash',
-                    'id',
                     'name',
-                    'size',
-                    'uid',
-                    'INET6_NTOA(`ip`) AS `ip`',
                 ],
                 'files',
                 'WHERE `id`=?',
                 $DB->basicvalue($JAX->b['delete']),
             );
-            $f = $DB->arow($result);
+            $file = $DB->arow($result);
             $DB->disposeresult($result);
-            if ($f) {
-                $ext = mb_strtolower(pathinfo((string) $f['name'], PATHINFO_EXTENSION));
+            if ($file) {
+                $ext = mb_strtolower(pathinfo((string) $file['name'], PATHINFO_EXTENSION));
                 if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp'])) {
-                    $f['hash'] .= '.' . $ext;
+                    $file['hash'] .= '.' . $ext;
                 }
 
-                if (is_writable(BOARDPATH . 'Uploads/' . $f['hash'])) {
-                    $page .= unlink(BOARDPATH . 'Uploads/' . $f['hash'])
+                if (is_writable(BOARDPATH . 'Uploads/' . $file['hash'])) {
+                    $page .= unlink(BOARDPATH . 'Uploads/' . $file['hash'])
                         ? $PAGE->success('File deleted')
                         : $PAGE->error(
                             "Error deleting file, maybe it's already been "
@@ -140,8 +135,13 @@ final class tools
 
         $result = $DB->safespecial(
             <<<'EOT'
-                SELECT f.`id` AS `id`,f.`name` AS `name`,f.`hash` AS `hash`,f.`uid` AS `uid`,
-                    f.`size` AS `size`,f.`downloads` AS `downloads`,INET6_NTOA(f.`ip`) AS `ip`,
+                SELECT
+                    f.`id` AS `id`,
+                    f.`name` AS `name`,
+                    f.`hash` AS `hash`,
+                    f.`uid` AS `uid`,
+                    f.`size` AS `size`,
+                    f.`downloads` AS `downloads`,
                     m.`display_name` AS `uname`
                 FROM %t f
                 LEFT JOIN %t m

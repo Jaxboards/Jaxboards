@@ -10,7 +10,7 @@ new themes();
 
 final class themes
 {
-    private const string WRAPPERS_PATH = 'Wrappers';
+    private const WRAPPERS_PATH = 'Wrappers';
 
     public function __construct()
     {

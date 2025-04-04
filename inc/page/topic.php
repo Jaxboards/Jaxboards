@@ -427,7 +427,7 @@ final class TOPIC
                         , p.`showemotes` AS `showemotes`
                         , p.`tid` AS `tid`
                         , p.`newtopic` AS `newtopic`
-                        , INET6_NTOA(p.`ip`) AS `ip`
+                        , p.`ip` AS `ip`
                         , UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`
                         , p.`editby` AS `editby`
                         , p.`rating` AS `rating`
@@ -443,6 +443,7 @@ final class TOPIC
             );
 
             while ($f = $DB->arow($result)) {
+                $f['ip'] = $JAX->bin2ip($f['ip']);
                 $prefilled .= '[quote=' . $f['name'] . ']' . $f['post'] . '[/quote]' . PHP_EOL;
             }
 
@@ -499,14 +500,12 @@ final class TOPIC
                     , m.`wysiwyg` AS `wysiwyg`
                     , m.`avatar` AS `avatar`
                     , m.`usertitle` AS `usertitle`
-                    , CONCAT(MONTH(m.`birthdate`)
-                    , ' '
-                    , MONTH(m.`birthdate`)) as `birthday`
+                    , CONCAT(MONTH(m.`birthdate`), ' ', MONTH(m.`birthdate`)) as `birthday`
                     , m.`mod` AS `mod`
                     , m.`posts` AS `posts`
                     , p.`tid` AS `tid`
                     , p.`id` AS `pid`
-                    , INET6_NTOA(p.`ip`) AS `ip`
+                    , p.`ip` AS `ip`
                     , p.`newtopic` AS `newtopic`
                     , p.`post` AS `post`
                     , p.`showsig` AS `showsig`
@@ -582,12 +581,11 @@ final class TOPIC
                     , m.`contact_bluesky` AS `contact_bluesky`
                     , m.`email_settings` AS `email_settings`
                     , m.`nowordfilter` AS `nowordfilter`
-                    , INET6_NTOA(m.`ip`) AS `ip`
+                    , COALESCE(p.`ip`, m.`ip`) AS `ip`
                     , m.`mod` AS `mod`
                     , m.`wysiwyg` AS `wysiwyg`
                     , p.`tid` AS `tid`
                     , p.`id` AS `pid`
-                    , INET6_NTOA(p.`ip`) AS `ip`
                     , p.`newtopic` AS `newtopic`
                     , p.`post` AS `post`
                     , p.`showsig` AS `showsig`
@@ -623,6 +621,7 @@ final class TOPIC
 
         $rows = '';
         while ($post = $DB->arow($query)) {
+            $post['ip'] = $JAX->bin2ip($post['ip']);
             if (!$this->firstPostID) {
                 $this->firstPostID = $post['pid'];
             }
@@ -1096,17 +1095,9 @@ final class TOPIC
         $result = $DB->safeselect(
             [
                 'auth_id',
-                'editby',
-                'id',
                 'newtopic',
                 'post',
-                'rating',
-                'showemotes',
-                'showsig',
                 'tid',
-                'INET6_NTOA(`ip`) AS `ip`',
-                'UNIX_TIMESTAMP(`date`)',
-                'UNIX_TIMESTAMP(`edit_date`) AS `edit_date`',
             ],
             'posts',
             'WHERE `id`=?',
@@ -1275,18 +1266,8 @@ final class TOPIC
         } else {
             $result = $DB->safespecial(
                 <<<'MySQL'
-                    SELECT `id`
-                        , `auth_id`
-                        , `post`
-                        , UNIX_TIMESTAMP(`date`) AS `date`
-                        , `showsig`
-                        , `showemotes`
-                        , `tid`
-                        , `newtopic`
-                        , INET6_NTOA(`ip`) AS `ip`
-                        , UNIX_TIMESTAMP(`edit_date`) AS `edit_date`
-                        , `editby`
-                        , `rating`
+                    SELECT
+                        `id`
                     FROM %t
                     WHERE tid=(
                         SELECT tid

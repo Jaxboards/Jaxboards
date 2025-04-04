@@ -9,7 +9,7 @@ if (!defined(INACP)) {
 new members();
 final class members
 {
-    public const string DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
+    public const DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
 
     public function __construct()
     {
@@ -126,56 +126,7 @@ final class members
                 && is_numeric($JAX->b['mid'])
             ) {
                 $result = $DB->safeselect(
-                    [
-                        'about',
-                        'avatar',
-                        'birthdate',
-                        'contact_aim',
-                        'contact_bluesky',
-                        'contact_discord',
-                        'contact_gtalk',
-                        'contact_msn',
-                        'contact_skype',
-                        'contact_steam',
-                        'contact_twitter',
-                        'contact_yim',
-                        'contact_youtube',
-                        'display_name',
-                        'email_settings',
-                        'email',
-                        'enemies',
-                        'friends',
-                        'full_name',
-                        'gender',
-                        'group_id',
-                        'id',
-                        'location',
-                        '`mod`',
-                        'name',
-                        'notify_pm',
-                        'notify_postinmytopic',
-                        'notify_postinsubscribedtopic',
-                        'nowordfilter',
-                        'pass',
-                        'posts',
-                        'sig',
-                        'skin_id',
-                        'sound_im',
-                        'sound_pm',
-                        'sound_postinmytopic',
-                        'sound_postinsubscribedtopic',
-                        'sound_shout',
-                        'ucpnotepad',
-                        'usertitle',
-                        'website',
-                        'wysiwyg',
-                        'DAY(`birthdate`) AS `dob_day`',
-                        'INET6_NTOA(`ip`) AS `ip`',
-                        'MONTH(`birthdate`) AS `dob_month`',
-                        'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
-                        'UNIX_TIMESTAMP(`last_visit`) AS `last_visit`',
-                        'YEAR(`birthdate`) AS `dob_year`',
-                    ],
+                    [ 'group_id' ],
                     'members',
                     'WHERE `id`=?',
                     $DB->basicvalue($JAX->b['mid']),
@@ -184,8 +135,7 @@ final class members
                 $DB->disposeresult($result);
                 if (isset($JAX->p['savedata']) && $JAX->p['savedata']) {
                     if (
-                        $data['group_id'] !== 2
-                        || $JAX->userData['id'] === 1
+                        $data['group_id'] !== 2 || $JAX->userData['id'] === 1
                     ) {
                         $write = [];
                         if ($JAX->p['password']) {
@@ -293,11 +243,8 @@ final class members
                         'website',
                         'wysiwyg',
                         'DAY(`birthdate`) AS `dob_day`',
-                        'INET6_NTOA(`ip`) AS `ip`',
-                        'MONTH(`birthdate`) AS `dob_month`',
                         'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
                         'UNIX_TIMESTAMP(`last_visit`) AS `last_visit`',
-                        'YEAR(`birthdate`) AS `dob_year`',
                     ],
                     'members',
                     'WHERE `id`=?',
@@ -348,12 +295,6 @@ final class members
                         'usertitle',
                         'website',
                         'wysiwyg',
-                        'DAY(`birthdate`) AS `dob_day`',
-                        'INET6_NTOA(`ip`) AS `ip`',
-                        'MONTH(`birthdate`) AS `dob_month`',
-                        'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
-                        'UNIX_TIMESTAMP(`last_visit`) AS `last_visit`',
-                        'YEAR(`birthdate`) AS `dob_year`',
                     ],
                     'members',
                     'WHERE `display_name` LIKE ?',
@@ -965,7 +906,7 @@ final class members
 
     public function validation(): void
     {
-        global $PAGE,$DB;
+        global $PAGE, $DB, $JAX;
         if (isset($_POST['submit1'])) {
             $PAGE->writeCFG(
                 [
@@ -1000,7 +941,7 @@ final class members
                 'display_name',
                 'email',
                 'id',
-                'INET6_NTOA(`ip`) AS `ip`',
+                'ip',
                 'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
             ],
             'members',
@@ -1013,7 +954,7 @@ final class members
                 [
                     'email_address' => $f['email'],
                     'id' => $f['id'],
-                    'ip_address' => $f['ip'],
+                    'ip_address' => $JAX->bin2ip($f['ip']),
                     'join_date' => gmdate('M jS, Y @ g:i A', $f['join_date']),
                     'title' => $f['display_name'],
                 ],
