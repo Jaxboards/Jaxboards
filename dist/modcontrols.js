@@ -491,7 +491,7 @@
   function onImagesLoaded(imgs, timeout = 2000) {
     return new Promise((resolve) => {
       const images = new Set();
-      const imagesToWaitOn = Array.from(imgs).filter(img => !img.complete);
+      const imagesToWaitOn = Array.from(imgs).filter((img) => !img.complete);
 
       if (!imagesToWaitOn.length) {
         resolve();
