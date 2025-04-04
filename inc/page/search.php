@@ -234,45 +234,43 @@ final class search
 
             $result = $DB->safespecial(
                 <<<"SQL"
-                    SELECT
-                        `id`,
-                        SUM(`relevance`) AS `relevance`
-                    FROM (
-                        (
-                            SELECT
-                                p.`id` AS `id`,
-                                MATCH(p.`post`) AGAINST(?) AS `relevance`
-                            FROM %t p
-                            LEFT JOIN %t t
-                                ON p.`tid`=t.`id`
-                            WHERE MATCH(p.`post`) AGAINST(? IN BOOLEAN MODE)
-                                AND t.`fid` IN ?
-                                {$queryPostAuthor}
-                                {$queryPostDateStart}
-                                {$queryPostDateEnd}
-                            ORDER BY `relevance` DESC LIMIT 100
-                        ) UNION (
-                            SELECT t.`op` AS `op`,MATCH(t.`title`) AGAINST(?) AS `relevance`
-                            FROM %t t
-                            WHERE MATCH(`title`) AGAINST(? IN BOOLEAN MODE)
-                                AND t.`fid` IN ?
-                                {$queryTopicAuthor}
-                                {$queryTopicDateStart}
-                                {$queryTopicDateEnd}
-                            ORDER BY `relevance` DESC LIMIT 100
-                        )
-                    ) dt
-                    GROUP BY `id` ORDER BY `relevance` DESC
-                SQL,
+                        SELECT
+                            `id`,
+                            SUM(`relevance`) AS `relevance`
+                        FROM (
+                            (
+                                SELECT
+                                    p.`id` AS `id`,
+                                    MATCH(p.`post`) AGAINST(?) AS `relevance`
+                                FROM %t p
+                                LEFT JOIN %t t
+                                    ON p.`tid`=t.`id`
+                                WHERE MATCH(p.`post`) AGAINST(? IN BOOLEAN MODE)
+                                    AND t.`fid` IN ?
+                                    {$queryPostAuthor}
+                                    {$queryPostDateStart}
+                                    {$queryPostDateEnd}
+                                ORDER BY `relevance` DESC LIMIT 100
+                            ) UNION (
+                                SELECT t.`op` AS `op`,MATCH(t.`title`) AGAINST(?) AS `relevance`
+                                FROM %t t
+                                WHERE MATCH(`title`) AGAINST(? IN BOOLEAN MODE)
+                                    AND t.`fid` IN ?
+                                    {$queryTopicAuthor}
+                                    {$queryTopicDateStart}
+                                    {$queryTopicDateEnd}
+                                ORDER BY `relevance` DESC LIMIT 100
+                            )
+                        ) dt
+                        GROUP BY `id` ORDER BY `relevance` DESC
+                    SQL,
                 ['posts', 'topics', 'topics'],
-
                 // Posts
                 ...[$sanitizedSearchTerm, $sanitizedSearchTerm, $fids],
                 ...$postParams,
-
                 // Topics
                 ...[$sanitizedSearchTerm, $sanitizedSearchTerm, $fids],
-                ...$topicParams
+                ...$topicParams,
             );
 
             if (!$result) {
