@@ -29,12 +29,12 @@ export function onImagesLoaded(imgs, timeout = 2000) {
       return;
     }
 
-     function markImageLoaded() {
+    function markImageLoaded() {
       images.delete(this.src);
       if (images.size === 0) {
         resolve();
       }
-    };
+    }
 
     Array.from(imgs).forEach((img) => {
       if (!images.has(img.src) && !img.loaded) {
