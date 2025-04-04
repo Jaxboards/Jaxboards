@@ -49,14 +49,10 @@ export default function gracefulDegrade(container) {
   // Handle image hover magnification
   const bbcodeimgs = Array.from(container.querySelectorAll('.bbcodeimg'));
   if (bbcodeimgs) {
-    onImagesLoaded(
-      bbcodeimgs,
-      () => {
-        // resizer on large images
-        imageResizer(bbcodeimgs);
-      },
-      2000,
-    );
+    onImagesLoaded(bbcodeimgs).then(() => {
+      // resizer on large images
+      imageResizer(bbcodeimgs);
+    });
   }
 
   // Make BBCode code blocks selectable when clicked

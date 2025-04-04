@@ -488,39 +488,33 @@
     return null;
   }
 
-  function onImagesLoaded(imgs, callback, timeout) {
-    const dbj = {
-      imgs: [],
-      called: false,
-      force() {
-        if (!dbj.called) callback();
-      },
-      callback() {
-        if (dbj.called) {
-          return;
+  function onImagesLoaded(imgs, timeout = 2000) {
+    return new Promise((resolve) => {
+      const images = new Set();
+
+      if (!imgs.length) {
+        return resolve();
+      }
+
+      const markImageLoaded = function () {
+        images.delete(this.src);
+        if (images.size === 0) {
+          resolve();
         }
-        if (!dbj.imgs.includes(this.src)) {
-          return;
+      };
+
+      Array.from(imgs).forEach((img) => {
+        if (!images.has(img.src) && !img.loaded) {
+          images.add(img.src);
+          img.addEventListener('error', markImageLoaded);
+          img.addEventListener('load', markImageLoaded);
         }
-        dbj.imgs.splice(dbj.imgs.indexOf(this.src), 1);
-        if (dbj.imgs.length === 0) {
-          callback();
-          dbj.called = true;
-        }
-      },
-    };
-    Array.from(imgs).forEach((img) => {
-      if (dbj.imgs.includes(img.src) === false && !img.loaded) {
-        dbj.imgs.push(img.src);
-        img.addEventListener('load', dbj.callback);
+      });
+
+      if (timeout) {
+        setTimeout(resolve, timeout);
       }
     });
-    if (!imgs.length) {
-      callback();
-      dbj.called = true;
-    } else {
-      setTimeout(dbj.force, timeout);
-    }
   }
 
   function updateDates() {
@@ -2128,13 +2122,9 @@
       s.zIndex = this.zIndex + 5;
 
       if (this.wait) {
-        onImagesLoaded(
-          windowContainer.querySelectorAll('img'),
-          () => {
-            this.setPosition(pos);
-          },
-          2000,
-        );
+        onImagesLoaded(windowContainer.querySelectorAll('img')).then(() => {
+          this.setPosition(pos);
+        });
       } else this.setPosition(pos);
 
       this.drag = new Drag()
@@ -2309,14 +2299,10 @@
     // Handle image hover magnification
     const bbcodeimgs = Array.from(container.querySelectorAll('.bbcodeimg'));
     if (bbcodeimgs) {
-      onImagesLoaded(
-        bbcodeimgs,
-        () => {
-          // resizer on large images
-          imageResizer(bbcodeimgs);
-        },
-        2000,
-      );
+      onImagesLoaded(bbcodeimgs).then(() => {
+        // resizer on large images
+        imageResizer(bbcodeimgs);
+      });
     }
 
     // Make BBCode code blocks selectable when clicked

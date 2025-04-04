@@ -112,13 +112,9 @@ class Window {
     s.zIndex = this.zIndex + 5;
 
     if (this.wait) {
-      onImagesLoaded(
-        windowContainer.querySelectorAll('img'),
-        () => {
-          this.setPosition(pos);
-        },
-        2000,
-      );
+      onImagesLoaded(windowContainer.querySelectorAll('img')).then(() => {
+        this.setPosition(pos);
+      });
     } else this.setPosition(pos);
 
     this.drag = new Drag()
