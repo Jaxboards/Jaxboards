@@ -228,7 +228,7 @@ final class search
             if ($datestart) {
                 $postParams[] = 'p.`date`>?';
                 $postValues[] = gmdate('Y-m-d H:i:s', $datestart);
-                $topicParams[]= 't.`date`>?';
+                $topicParams[] = 't.`date`>?';
                 $topicValues[] = gmdate('Y-m-d H:i:s', $datestart);
             }
 
@@ -239,8 +239,8 @@ final class search
                 $topicValues[] = gmdate('Y-m-d H:i:s', $datestart);
             }
 
-            $postWhere = join(' ', array_map(fn($q) => "AND $q", $postParams));
-            $topicWhere = join(' ', array_map(fn($q) => "AND $q", $topicParams));
+            $postWhere = implode(' ', array_map(static fn($q) => "AND {$q}", $postParams));
+            $topicWhere = implode(' ', array_map(static fn($q) => "AND {$q}", $topicParams));
 
             $sanitizedSearchTerm = $DB->basicvalue($termraw);
 
@@ -271,14 +271,12 @@ final class search
                         GROUP BY `id` ORDER BY `relevance` DESC
                     SQL,
                 ['posts', 'topics', 'topics'],
-
                 // Posts
                 ...[$sanitizedSearchTerm, $sanitizedSearchTerm],
                 ...$postValues,
-
                 // Topics
                 ...[$sanitizedSearchTerm, $sanitizedSearchTerm],
-                ...$topicValues
+                ...$topicValues,
             );
 
             if (!$result) {
