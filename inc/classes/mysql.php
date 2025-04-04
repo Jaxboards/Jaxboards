@@ -37,8 +37,10 @@ final class MySQL
         $prefix = '',
     ): bool {
         $this->mysqli_connection = new mysqli($host, $user, $password, $database);
+
+         // All datetimes are GMT for jaxboards
         $this->mysqli_connection->query("SET time_zone = '+0:00'");
-        // All datetimes are GMT for jaxboards
+
         $this->prefix = $prefix;
         $this->db = $database;
 
