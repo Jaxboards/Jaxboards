@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e1b7770c03ab2510e4406f349bf81f9c",
+    "content-hash": "e3fc5492f87cab4b9c2abbd494640631",
     "packages": [
         {
             "name": "doctrine/collections",
@@ -5173,12 +5173,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "7d7e09f5c5ae97767252450bdae6bc4ec6b8f53a"
+                "reference": "975c081c7e430d0316a94047e5d8ab26e0a8f49e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/7d7e09f5c5ae97767252450bdae6bc4ec6b8f53a",
-                "reference": "7d7e09f5c5ae97767252450bdae6bc4ec6b8f53a",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/975c081c7e430d0316a94047e5d8ab26e0a8f49e",
+                "reference": "975c081c7e430d0316a94047e5d8ab26e0a8f49e",
                 "shasum": ""
             },
             "conflict": {
@@ -5207,7 +5207,8 @@
                 "andrewhaine/silverstripe-form-capture": ">=0.2,<=0.2.3|>=1,<1.0.2|>=2,<2.2.5",
                 "apache-solr-for-typo3/solr": "<2.8.3",
                 "apereo/phpcas": "<1.6",
-                "api-platform/core": ">=2.2,<2.2.10|>=2.3,<2.3.6|>=2.6,<2.7.10|>=3,<3.0.12|>=3.1,<3.1.3|>=3.2,<3.2.5|>=3.3.8,<3.3.15",
+                "api-platform/core": "<4.0.22",
+                "api-platform/graphql": "<4.0.22",
                 "appwrite/server-ce": "<=1.2.1",
                 "arc/web": "<3",
                 "area17/twill": "<1.2.5|>=2,<2.5.3",
@@ -5281,7 +5282,7 @@
                 "codingms/additional-tca": ">=1.7,<1.15.17|>=1.16,<1.16.9",
                 "components/jquery": ">=1.0.3,<3.5",
                 "composer/composer": "<1.10.27|>=2,<2.2.24|>=2.3,<2.7.7",
-                "concrete5/concrete5": "<9.4.0.0-RC1-dev",
+                "concrete5/concrete5": "<9.4.0.0-RC2-dev",
                 "concrete5/core": "<8.5.8|>=9,<9.1",
                 "contao-components/mediaelement": ">=2.14.2,<2.21.1",
                 "contao/comments-bundle": ">=2,<4.13.40|>=5.0.0.0-RC1-dev,<5.3.4",
@@ -6061,7 +6062,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-04-03T13:11:39+00:00"
+            "time": "2025-04-04T15:05:17+00:00"
         },
         {
             "name": "sebastian/diff",
@@ -7322,10 +7323,10 @@
         "php": "^8.3.16"
     },
     "platform-dev": {
-        "composer": "2.8.7"
+        "composer": "2.8.8"
     },
     "platform-overrides": {
-        "composer": "2.8.7",
+        "composer": "2.8.8",
         "php": "8.3.16"
     },
     "plugin-api-version": "2.6.0"
