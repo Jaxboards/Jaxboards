@@ -973,7 +973,7 @@ final class JAX
     {
         $l = mb_strlen($ip);
 
-        return inet_ntop($ip) ?: inet_ntop(pack('A' . $l, $ip));
+        return inet_ntop($ip) ?: inet_ntop(pack('A' . $l, $ip)) ?: '';
     }
 
     public function parseperms($permstoparse, $uid = false): array

@@ -2,13 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * Chat box
- * better color >_>.
- *
- * <_<
- * we need to be able to search "All" :>
- */
 $PAGE->loadmeta('search');
 
 new search();
@@ -135,32 +128,35 @@ final class search
         return $r;
     }
 
+    // TODO: use strtotime instead?
     public function pdate($a): false|int
     {
-        $a = explode('/', (string) $a);
-        if (count($a) !== 3) {
+        $dayMonthYear = explode('/', (string) $a);
+        if (count($dayMonthYear) !== 3) {
             return false;
         }
 
         for ($x = 0; $x < 3; ++$x) {
-            if (!is_numeric($a[$x])) {
+            if (!is_numeric($dayMonthYear[$x])) {
                 return false;
             }
         }
 
+        $dayMonthYear = array_map('intval', $dayMonthYear);
+
         if (
-            ($a[0] % 2)
-            && $a[1] === 31
-            || $a[0] === 2
-            && (!$a[2] % 4
-            && $a[1] > 29
-            || $a[2] % 4
-            && $a[1] > 28)
+            ($dayMonthYear[0] % 2)
+            && $dayMonthYear[1] === 31
+            || $dayMonthYear[0] === 2
+            && (!$dayMonthYear[2] % 4
+            && $dayMonthYear[1] > 29
+            || $dayMonthYear[2] % 4
+            && $dayMonthYear[1] > 28)
         ) {
             return false;
         }
 
-        return mktime(0, 0, 0, $a[0], $a[1], $a[2]);
+        return mktime(0, 0, 0, $dayMonthYear[0], $dayMonthYear[1], $dayMonthYear[2]);
     }
 
     public function dosearch(): void
@@ -194,86 +190,91 @@ final class search
                 $fids = $this->fids;
             }
 
+            $datestart = null;
             if ($JAX->b['datestart']) {
                 $datestart = $this->pdate($JAX->b['datestart']);
             }
 
+            $dateend = null;
             if ($JAX->b['dateend']) {
                 $dateend = $this->pdate($JAX->b['dateend']);
             }
 
-            /*
-                Note bug: should be is_int, not is_numeric,
-                because that DB field is an integer, not a float.
-             */
+            $authorId = null;
+            if ($JAX->b['mid'] && ctype_digit($JAX->b['mid'])) {
+                $authorId = (int) $JAX->b['mid'];
+            }
 
-            $arguments = [
-                <<<'EOT'
-                    SELECT `id`,SUM(`relevance`) AS `relevance`
+            $postParams = [];
+            $queryPostAuthor = ($authorId ? ' AND p.`auth_id`=? ' : '');
+            $queryPostDateStart = ($datestart ? ' AND p.`date`>? ' : '');
+            $queryPostDateEnd = ($dateend ? ' AND p.`date`<? ' : '');
+
+            $topicParams = [];
+            $queryTopicAuthor = ($authorId ? ' AND t.`auth_id`= ? ' : '');
+            $queryTopicDateStart = ($datestart ? ' AND t.`date`>? ' : '');
+            $queryTopicDateEnd = ($dateend ? ' AND t.`date`<? ' : '');
+
+            if ($authorId) {
+                $postParams[] = $authorId;
+                $topicParams[] = $authorId;
+            }
+
+            if ($datestart) {
+                $postParams[] = gmdate('Y-m-d H:i:s', $datestart);
+                $topicParams[] = gmdate('Y-m-d H:i:s', $datestart);
+            }
+
+            if ($dateend) {
+                $postParams[] = gmdate('Y-m-d H:i:s', $dateend);
+                $topicParams[] = gmdate('Y-m-d H:i:s', $datestart);
+            }
+
+            $sanitizedSearchTerm = $DB->basicvalue($termraw);
+
+            $result = $DB->safespecial(
+                <<<"SQL"
+                    SELECT
+                        `id`,
+                        SUM(`relevance`) AS `relevance`
                     FROM (
                         (
-                            SELECT p.`id` AS `id`,MATCH(p.`post`) AGAINST(?) AS `relevance`
+                            SELECT
+                                p.`id` AS `id`,
+                                MATCH(p.`post`) AGAINST(?) AS `relevance`
                             FROM %t p
                             LEFT JOIN %t t
                                 ON p.`tid`=t.`id`
                             WHERE MATCH(p.`post`) AGAINST(? IN BOOLEAN MODE)
                                 AND t.`fid` IN ?
-                    EOT
-            . (is_int($JAX->b['mid']) ? ' AND p.`auth_id =? ' : '')
-                 . (isset($datestart) && $datestart ? ' AND p.`date`>? ' : '')
-                 . (isset($dateend) && $dateend ? ' AND p.`date`<? ' : '')
-            . <<<'EOT'
-                    ORDER BY `relevance` DESC LIMIT 100
-                    ) UNION (
-                        SELECT t.`op` AS `op`,MATCH(t.`title`) AGAINST(?) AS `relevance`
-                        FROM %t t
-                        WHERE MATCH(`title`) AGAINST(? IN BOOLEAN MODE)
-                            AND t.`fid` IN ?
-                EOT
-            . (is_int($JAX->b['mid']) ? ' AND t.`auth_id`= ? ' : '')
-                 . (isset($datestart) && $datestart ? ' AND t.`date`>? ' : '')
-                 . (isset($dateend) && $dateend ? ' AND t.`date`<? ' : '')
-            . <<<'EOT'
-                    ORDER BY `relevance` DESC LIMIT 100
-                    )
-                ) dt GROUP BY `id` ORDER BY `relevance` DESC
-                EOT,
+                                {$queryPostAuthor}
+                                {$queryPostDateStart}
+                                {$queryPostDateEnd}
+                            ORDER BY `relevance` DESC LIMIT 100
+                        ) UNION (
+                            SELECT t.`op` AS `op`,MATCH(t.`title`) AGAINST(?) AS `relevance`
+                            FROM %t t
+                            WHERE MATCH(`title`) AGAINST(? IN BOOLEAN MODE)
+                                AND t.`fid` IN ?
+                                {$queryTopicAuthor}
+                                {$queryTopicDateStart}
+                                {$queryTopicDateEnd}
+                            ORDER BY `relevance` DESC LIMIT 100
+                        )
+                    ) dt
+                    GROUP BY `id` ORDER BY `relevance` DESC
+                SQL,
                 ['posts', 'topics', 'topics'],
-                $DB->basicvalue($termraw),
-                $DB->basicvalue($termraw),
-                $fids,
-            ];
-            if (is_int($JAX->b['mid'])) {
-                $arguments[] = $JAX->b['mid'];
-            }
 
-            if (isset($datestart) && $datestart) {
-                $arguments[] = gmdate('Y-m-d H:i:s', $datestart);
-            }
+                // Posts
+                ...[$sanitizedSearchTerm, $sanitizedSearchTerm, $fids],
+                ...$postParams,
 
-            if (isset($dateend) && $dateend) {
-                $arguments[] = gmdate('Y-m-d H:i:s', $dateend);
-            }
-
-            $arguments[] = $DB->basicvalue($termraw);
-            $arguments[] = $DB->basicvalue($termraw);
-            $arguments[] = $fids;
-            if (is_int($JAX->b['mid'])) {
-                $arguments[] = $JAX->b['mid'];
-            }
-
-            if (isset($datestart) && $datestart) {
-                $arguments[] = gmdate('Y-m-d H:i:s', $datestart);
-            }
-
-            if (isset($dateend) && $dateend) {
-                $arguments[] = gmdate('Y-m-d H:i:s', $dateend);
-            }
-
-            $result = call_user_func_array(
-                [$DB, 'safespecial'],
-                $arguments,
+                // Topics
+                ...[$sanitizedSearchTerm, $sanitizedSearchTerm, $fids],
+                ...$topicParams
             );
+
             if (!$result) {
                 syslog(LOG_EMERG, 'ERROR: ' . $DB->error(1) . PHP_EOL);
             }
@@ -304,18 +305,18 @@ final class search
             $ids = implode(',', $idarray);
 
             $result = $DB->safespecial(
-                <<<EOT
+                <<<SQL
                     SELECT
                         p.`id` AS `id`,
                         p.`tid` AS `tid`,
-                        p.`post` AS `post`
+                        p.`post` AS `post`,
                         t.`title` AS `title`
                     FROM %t p
                     LEFT JOIN %t t
                         ON p.`tid`=t.`id`
                     WHERE p.`id` IN ?
                     ORDER BY FIELD(p.`id`,{$ids})
-                    EOT
+                    SQL
                 ,
                 ['posts', 'topics'],
                 $idarray,
