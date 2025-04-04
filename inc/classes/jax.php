@@ -687,7 +687,7 @@ final class JAX
     {
         global $DB,$CFG;
         $a = $a[1];
-        if ($this->attachmentdata[$a]) {
+        if (isset($this->attachmentdata[$a])) {
             $data = $this->attachmentdata[$a];
         } else {
             $result = $DB->safeselect(
@@ -709,7 +709,7 @@ final class JAX
             if (!$data) {
                 return "Attachment doesn't exist";
             }
-            $data['ip'] = $JAX->bin2ip($data['ip']);
+            $data['ip'] = $this->bin2ip($data['ip']);
 
             $this->attachmentdata[$a] = $data;
         }
