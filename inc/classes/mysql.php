@@ -277,21 +277,7 @@ final class MySQL
 
     public function disposeresult($result): void
     {
-        if (!$result) {
-            syslog(
-                LOG_ERR,
-                'NULL RESULT in disposeresult' . PHP_EOL . print_r(
-                    // phpcs:disable PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
-                    debug_backtrace(),
-                    // phpcs:enable
-                    true,
-                ),
-            );
-
-            return;
-        }
-
-        $this->fetchAll($result);
+        $result->free();
     }
 
     // Warning: nested arrays are *not* supported.
