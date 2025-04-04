@@ -1,4 +1,4 @@
-![Jaxboards](https://github.com/Jaxboards/Jaxboards/blob/main/Service/img/header.png?raw=true)
+![Jaxboards](https://github.com/Jaxboards/Jaxboards/blob/main/Service/Themes/Default/img/logo.png?raw=true)
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Jaxboards_Jaxboards&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Jaxboards_Jaxboards)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Jaxboards_Jaxboards&metric=bugs)](https://sonarcloud.io/summary/new_code?id=Jaxboards_Jaxboards)
