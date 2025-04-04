@@ -377,7 +377,7 @@ onclick="this.form.submitButton=this" /></div>
                     FROM %t p
                     LEFT JOIN %t m
                         ON p.`auth_id`=m.`id`
-                    WHERE p.`id` IN ?
+                    WHERE p.`id` IN (?)
                     EOT
                 ,
                 ['posts', 'members'],
