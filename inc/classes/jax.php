@@ -269,26 +269,29 @@ final class JAX
             $DB->basicvalue($uid),
         );
         $user = $DB->arow($result);
-        $user['ip'] = $this->bin2ip($user['ip']);
-        if (!$user || !is_array($user) || $user === []) {
+        $DB->disposeresult($result);
+
+        if (empty($user)) {
             return $this->userData = false;
         }
 
-        $DB->disposeresult($result);
+        $user['ip'] = $this->bin2ip($user['ip']);
         $user['birthday'] = (date('n j') === $user['birthday'] ? 1 : 0);
 
         // Password parsing.
         if ($pass !== false) {
             $verifiedPassword = password_verify((string) $pass, (string) $user['pass']);
-            $needsRehash = false;
-            if ($verifiedPassword) {
-                $needsRehash = password_needs_rehash(
-                    $user['pass'],
-                    PASSWORD_DEFAULT,
-                );
+
+            if (!$verifiedPassword) {
+                return $this->userData = false;
             }
 
-            if ($verifiedPassword && $needsRehash) {
+            $needsRehash = password_needs_rehash(
+                $user['pass'],
+                PASSWORD_DEFAULT,
+            );
+
+            if ($needsRehash) {
                 $new_hash = password_hash((string) $pass, PASSWORD_DEFAULT);
                 // Add the new hash.
                 $DB->safeupdate(
@@ -299,10 +302,6 @@ final class JAX
                     'WHERE `id` = ?',
                     $user['id'],
                 );
-            }
-
-            if (!$verifiedPassword) {
-                return $this->userData = false;
             }
 
             unset($user['pass']);
