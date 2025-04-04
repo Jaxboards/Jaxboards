@@ -156,11 +156,11 @@ final class SESS
                         $DB->basicvalue($sid),
                     );
             $r = $DB->arow($result);
-            $r['ip'] = $JAX->bin2ip($r['ip']);
             $DB->disposeresult($result);
         }
 
         if (!empty($r)) {
+            $r['ip'] = $JAX->bin2ip($r['ip']);
             return $r;
         }
 
