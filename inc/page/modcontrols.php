@@ -1182,8 +1182,8 @@ final class modcontrols
                     'id',
                 ],
                 'members',
-                'WHERE `ip`=INET6_ATON(?)',
-                $DB->basicvalue($ip),
+                'WHERE `ip`=?',
+                $DB->basicvalue($JAX->ip2bin($ip)),
             );
             while ($f = $DB->arow($result)) {
                 $content[] = $PAGE->meta(
@@ -1206,7 +1206,7 @@ final class modcontrols
                         FROM %t s
                         LEFT JOIN %t m
                             ON m.`id`=s.`uid`
-                        WHERE s.`ip`=INET6_ATON(?)
+                        WHERE s.`ip`=?
                         ORDER BY `id`
                         DESC LIMIT 5
                         EOT
@@ -1215,7 +1215,7 @@ final class modcontrols
                         'shouts',
                         'members',
                     ],
-                    $DB->basicvalue($ip),
+                    $DB->basicvalue($JAX->ip2bin($ip)),
                 );
                 while ($f = $DB->arow($result)) {
                     $content .= $PAGE->meta(
@@ -1234,8 +1234,8 @@ final class modcontrols
             $result = $DB->safeselect(
                 ['post'],
                 'posts',
-                'WHERE `ip`=INET6_ATON(?) ORDER BY `id` DESC LIMIT 5',
-                $DB->basicvalue($ip),
+                'WHERE `ip`=? ORDER BY `id` DESC LIMIT 5',
+                $DB->basicvalue($JAX->ip2bin($ip)),
             );
             while ($f = $DB->arow($result)) {
                 $content .= "<div class='post'>"

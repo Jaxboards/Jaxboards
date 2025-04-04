@@ -926,11 +926,11 @@ final class JAX
             <<<'EOT'
                 SELECT COUNT(`ip`) as `banned`
                     FROM `banlist`
-                    WHERE ip = INET6_ATON(?)
+                    WHERE ip = ?
                 EOT
             ,
             [],
-            $DB->basicvalue($ipAddress),
+            $DB->basicvalue($JAX->ip2bin($ipAddress)),
         );
         $row = $DB->arow($result);
         $DB->disposeresult($result);

@@ -193,9 +193,6 @@ final class MySQL
         return implode(PHP_EOL . ', ', array_map(
             static function (string $key): string {
                 $value = '?';
-                if ($key === 'ip') {
-                    $value = 'INET6_ATON(?)';
-                }
 
                 return "`{$key}` = {$value}";
             },

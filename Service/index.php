@@ -100,8 +100,8 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     $result = $DB->safeselect(
         ['id'],
         'directory',
-        'WHERE `registrar_ip`=INET6_ATON(?) AND `date`>?',
-        $JAX->getIp(),
+        'WHERE `registrar_ip`=? AND `date`>?',
+        $JAX->ip2bin(),
         gmdate(DB_DATETIME, time() - 7 * 24 * 60 * 60),
     );
     if ($DB->num_rows($result) > 3) {
