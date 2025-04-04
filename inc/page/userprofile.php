@@ -198,7 +198,7 @@ final class userprofile
             );
             echo $DB->error(1);
             $udata = $DB->arow($result);
-            $udata['ip'] = $JAX->bin2ip($udata['ip']);
+            if ($udata['ip']) $udata['ip'] = $JAX->bin2ip($udata['ip']);
             $DB->disposeresult($result);
         }
 
