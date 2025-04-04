@@ -268,7 +268,7 @@ final class tools
         }
 
         $PAGE->addContentBox(
-            "PHP Error Log ($logPath)",
+            "PHP Error Log ({$logPath})",
             $contents,
         );
     }
