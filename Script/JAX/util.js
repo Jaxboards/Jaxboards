@@ -37,7 +37,7 @@ export function onImagesLoaded(imgs, timeout = 2000) {
     }
 
     Array.from(imgs).forEach((img) => {
-      if (!images.has(img.src) && !img.loaded) {
+      if (!images.has(img.src) && !img.complete) {
         images.add(img.src);
         img.addEventListener('error', markImageLoaded);
         img.addEventListener('load', markImageLoaded);
