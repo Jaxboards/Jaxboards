@@ -25,10 +25,11 @@ export function onImagesLoaded(imgs, timeout = 2000) {
     const images = new Set();
 
     if (!imgs.length) {
-      return resolve();
+      resolve();
+      return;
     }
 
-    const markImageLoaded = function () {
+     function markImageLoaded() {
       images.delete(this.src);
       if (images.size === 0) {
         resolve();
