@@ -141,7 +141,7 @@ final class userprofile
                 <<<'EOT'
                     SELECT
                         g.`title` AS `group`,
-                        INET6_NTOA(m.`ip`) AS `ip`,
+                        `ip`,
                         m.`about` AS `about`,
                         m.`avatar` AS `avatar`,
                         m.`birthdate` AS `birthdate`,
@@ -198,6 +198,7 @@ final class userprofile
             );
             echo $DB->error(1);
             $udata = $DB->arow($result);
+            $udata['ip'] = $JAX->bin2ip($udata['ip']);
             $DB->disposeresult($result);
         }
 

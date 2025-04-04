@@ -213,62 +213,63 @@ final class JAX
         }
 
         $result = $DB->safeselect(
-            <<<'MySQL'
-                    `about`,
-                    `avatar`,
-                    `birthdate`,
-                    `contact_aim`,
-                    `contact_bluesky`,
-                    `contact_discord`,
-                    `contact_gtalk`,
-                    `contact_msn`,
-                    `contact_skype`,
-                    `contact_steam`,
-                    `contact_twitter`,
-                    `contact_yim`,
-                    `contact_youtube`,
-                    `display_name`,
-                    `email_settings`,
-                    `email`,
-                    `enemies`,
-                    `friends`,
-                    `full_name`,
-                    `gender`,
-                    `group_id`,
-                    `id`,
-                    `location`,
-                    `mod`,
-                    `name`,
-                    `notify_pm`,
-                    `notify_postinmytopic`,
-                    `notify_postinsubscribedtopic`,
-                    `nowordfilter`,
-                    `pass`,
-                    `posts`,
-                    `sig`,
-                    `skin_id`,
-                    `sound_im`,
-                    `sound_pm`,
-                    `sound_postinmytopic`,
-                    `sound_postinsubscribedtopic`,
-                    `sound_shout`,
-                    `ucpnotepad`,
-                    `usertitle`,
-                    `website`,
-                    `wysiwyg`,
-                    CONCAT(MONTH(`birthdate`),' ',DAY(`birthdate`)) as `birthday`,
-                    DAY(`birthdate`) AS `dob_day`,
-                    INET6_NTOA(`ip`) AS `ip`,
-                    MONTH(`birthdate`) AS `dob_month`,
-                    UNIX_TIMESTAMP(`join_date`) AS `join_date`,
-                    UNIX_TIMESTAMP(`last_visit`) AS `last_visit`,
-                    YEAR(`birthdate`) AS `dob_year`
-                MySQL,
+            [
+                'about',
+                'avatar',
+                'birthdate',
+                'contact_aim',
+                'contact_bluesky',
+                'contact_discord',
+                'contact_gtalk',
+                'contact_msn',
+                'contact_skype',
+                'contact_steam',
+                'contact_twitter',
+                'contact_yim',
+                'contact_youtube',
+                'display_name',
+                'email_settings',
+                'email',
+                'enemies',
+                'friends',
+                'full_name',
+                'gender',
+                'group_id',
+                'id',
+                'ip',
+                'location',
+                '`mod`',
+                'name',
+                'notify_pm',
+                'notify_postinmytopic',
+                'notify_postinsubscribedtopic',
+                'nowordfilter',
+                'pass',
+                'posts',
+                'sig',
+                'skin_id',
+                'sound_im',
+                'sound_pm',
+                'sound_postinmytopic',
+                'sound_postinsubscribedtopic',
+                'sound_shout',
+                'ucpnotepad',
+                'usertitle',
+                'website',
+                'wysiwyg',
+                'CONCAT(MONTH(`birthdate`),\' \',DAY(`birthdate`)) as `birthday`',
+                'DAY(`birthdate`) AS `dob_day`',
+                'MONTH(`birthdate`) AS `dob_month`',
+                'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
+                'UNIX_TIMESTAMP(`last_visit`) AS `last_visit`',
+                'YEAR(`birthdate`) AS `dob_year`',
+            ],
             'members',
             'WHERE `id`=?',
             $DB->basicvalue($uid),
         );
         $user = $DB->arow($result);
+        $user['ip'] = $this->bin2ip($user['ip']);
         if (!$user || !is_array($user) || $user === []) {
             return $this->userData = false;
         }
@@ -691,10 +692,15 @@ final class JAX
             $data = $this->attachmentdata[$a];
         } else {
             $result = $DB->safeselect(
-                <<<'EOT'
-                    `id`,`name`,`hash`,`uid`,`size`,`downloads`,INET6_NTOA(`ip`) AS `ip`
-                    EOT
-                ,
+                [
+                    'id',
+                    'ip',
+                    'name',
+                    'hash',
+                    'uid',
+                    'size',
+                    'downloads',
+                ],
                 'files',
                 'WHERE `id`=?',
                 $a,
@@ -704,6 +710,7 @@ final class JAX
             if (!$data) {
                 return "Attachment doesn't exist";
             }
+            $data['ip'] = $JAX->bin2ip($data['ip']);
 
             $this->attachmentdata[$a] = $data;
         }
@@ -963,18 +970,11 @@ final class JAX
     // we need to do something for mysql IP addresses:
     // https://secure.php.net/manual/en/function.inet-ntop.php#117398
     // .
-    public function bin2ip($ip = false): false|string
+    public function bin2ip($ip): string
     {
-        if (!is_string($ip)) {
-            return '';
-        }
-
         $l = mb_strlen($ip);
-        if ($l === 4 || $l === 16) {
-            return inet_ntop(pack('A' . $l, $ip));
-        }
 
-        return '';
+        return inet_ntop($ip) ?: inet_ntop(pack('A' . $l, $ip));
     }
 
     public function parseperms($permstoparse, $uid = false): array

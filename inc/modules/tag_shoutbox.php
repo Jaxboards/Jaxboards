@@ -128,10 +128,14 @@ final class SHOUTBOX
         global $PAGE,$DB,$SESS,$USER;
         $result = $DB->safespecial(
             <<<'EOT'
-                SELECT s.`id` AS `id`,s.`uid` AS `uid`,s.`shout` AS `shout`,
-                    UNIX_TIMESTAMP(s.`date`) AS `date`,INET6_NTOA(s.`ip`) AS `ip`,
-                    m.`display_name` AS `display_name`, m.`group_id` AS `group_id`,
-                    m.`avatar` AS `avatar`
+                SELECT
+                    m.`avatar` AS `avatar`,
+                    m.`display_name` AS `display_name`,
+                    m.`group_id` AS `group_id`,
+                    s.`id` AS `id`,
+                    s.`shout` AS `shout`,
+                    s.`uid` AS `uid`,
+                    UNIX_TIMESTAMP(s.`date`) AS `date`
                 FROM %t s
                 LEFT JOIN %t m
                     ON s.`uid`=m.`id`
@@ -181,10 +185,14 @@ final class SHOUTBOX
         if (isset($SESS->vars['sb_id']) && $SESS->vars['sb_id']) {
             $result = $DB->safespecial(
                 <<<'EOT'
-                    SELECT s.`id` AS `id`,s.`uid` AS `uid`,s.`shout` AS `shout`,
-                        UNIX_TIMESTAMP(s.`date`) AS `date`,INET6_NTOA(s.`ip`) AS `ip`,
-                        m.`display_name` AS `display_name`, m.`group_id` AS `group_id`,
-                        m.`avatar` AS `avatar`
+                    SELECT
+                        m.`avatar` AS `avatar`,
+                        m.`display_name` AS `display_name`,
+                        m.`group_id` AS `group_id`,
+                        s.`id` AS `id`,
+                        s.`shout` AS `shout`,
+                        s.`uid` AS `uid`,
+                        UNIX_TIMESTAMP(s.`date`) AS `date`
                     FROM %t s
                     LEFT JOIN %t m
                         ON s.`uid`=m.`id`
@@ -272,9 +280,13 @@ final class SHOUTBOX
 
         $result = $DB->safespecial(
             <<<'EOT'
-                SELECT s.`id` AS `id`,s.`uid` AS `uid`,s.`shout` AS `shout`,
-                    UNIX_TIMESTAMP(s.`date`) AS `date`,INET6_NTOA(s.`ip`) AS `ip`,
-                    m.`display_name` AS `display_name`, m.`group_id` AS `group_id`,
+                SELECT
+                    s.`id` AS `id`,
+                    s.`uid` AS `uid`,
+                    s.`shout` AS `shout`,
+                    UNIX_TIMESTAMP(s.`date`) AS `date`,
+                    m.`display_name` AS `display_name`,
+                     m.`group_id` AS `group_id`,
                     m.`avatar` AS `avatar`
                 FROM %t s
                 LEFT JOIN %t m

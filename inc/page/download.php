@@ -12,13 +12,8 @@ final class downloader
         if (is_numeric($id)) {
             $result = $DB->safeselect(
                 [
-                    'id',
                     'name',
                     'hash',
-                    'uid',
-                    'size',
-                    'downloads',
-                    'INET6_NTOA(`ip`) AS `ip`',
                 ],
                 'files',
                 'WHERE `id`=?',

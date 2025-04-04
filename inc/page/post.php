@@ -371,12 +371,9 @@ onclick="this.form.submitButton=this" /></div>
 
             $result = $DB->safespecial(
                 <<<'EOT'
-                    SELECT p.`id` AS `id`,p.`auth_id` AS `auth_id`,p.`post` AS `post`,
-                        UNIX_TIMESTAMP(p.`date`) AS `date`,p.`showsig` AS `showsig`,
-                        p.`showemotes` AS `showemotes`,
-                    	p.`tid` AS `tid`,p.`newtopic` AS `newtopic`,INET6_NTOA(p.`ip`) AS `ip`,
-                        UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`,p.`editby` AS `editby`,
-                        p.`rating` AS `rating`,m.`display_name` AS `name`
+                    SELECT
+                        m.`display_name` AS `name`,
+                        p.`post` AS `post`
                     FROM %t p
                     LEFT JOIN %t m
                         ON p.`auth_id`=m.`id`
@@ -387,8 +384,8 @@ onclick="this.form.submitButton=this" /></div>
                 $SESS->vars['multiquote'],
             );
 
-            while ($f = $DB->arow($result)) {
-                $postdata .= '[quote=' . $f['name'] . ']' . $f['post'] . '[/quote]' . PHP_EOL;
+            while ($postRow = $DB->arow($result)) {
+                $postdata .= '[quote=' . $postRow['name'] . ']' . $postRow['post'] . '[/quote]' . PHP_EOL;
             }
 
             $SESS->delvar('multiquote');
@@ -480,32 +477,24 @@ onclick="this.form.submitButton=this"/></div>
             $result = $DB->safeselect(
                 [
                     'auth_id',
-                    'editby',
-                    'id',
                     'newtopic',
                     'post',
-                    'rating',
-                    'showemotes',
-                    'showsig',
-                    'tid',
-                    'INET6_NTOA(`ip`) AS `ip`',
-                    'UNIX_TIMESTAMP(`date`) AS `date`',
-                    'UNIX_TIMESTAMP(`edit_date`) AS `edit_date`',
+                    'tid'
                 ],
                 'posts',
                 'WHERE `id`=?',
                 $pid,
             );
-            $tmp = $DB->arow($result);
+            $post = $DB->arow($result);
             $DB->disposeresult($result);
 
-            if (!$tmp) {
+            if (!$post) {
                 $e = 'The post you are trying to edit does not exist.';
-            } elseif (!$this->canedit($tmp)) {
+            } elseif (!$this->canedit($post)) {
                 $e = "You don't have permission to edit that post!";
             } elseif ($this->postdata === null) {
                 $editingpost = true;
-                $this->postdata = $tmp['post'];
+                $this->postdata = $post['post'];
             }
         }
 

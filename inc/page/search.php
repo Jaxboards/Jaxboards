@@ -305,11 +305,11 @@ final class search
 
             $result = $DB->safespecial(
                 <<<EOT
-                    SELECT p.`id` AS `id`,p.`auth_id` AS `auth_id`,p.`post` AS `post`,
-                    UNIX_TIMESTAMP(p.`date`) AS `date`,p.`showsig` AS `showsig`,
-                    p.`showemotes` AS `showemotes`,p.`tid` AS `tid`,p.`newtopic` AS `newtopic`,
-                    INET6_NTOA(p.`ip`) AS `ip`,UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`,
-                    p.`editby` AS `editby`,p.`rating` AS `rating`,t.`title` AS `title`
+                    SELECT
+                        p.`id` AS `id`,
+                        p.`tid` AS `tid`,
+                        p.`post` AS `post`
+                        t.`title` AS `title`
                     FROM %t p
                     LEFT JOIN %t t
                         ON p.`tid`=t.`id`
@@ -341,9 +341,8 @@ final class search
             $terms[] = preg_quote($v);
         }
 
-        while ($f = $DB->arow($result)) {
-            $post = $f['post'];
-            $post = $JAX->textonly($post);
+        while ($postRow = $DB->arow($result)) {
+            $post = $JAX->textonly($postRow['post']);
             $post = $JAX->blockhtml($post);
             $post = nl2br((string) $post);
             $post = preg_replace(
@@ -354,14 +353,14 @@ final class search
             $title = preg_replace(
                 '@' . implode('|', $terms) . '@i',
                 (string) $PAGE->meta('search-highlight', '$0'),
-                (string) $f['title'],
+                (string) $postRow['title'],
             );
 
             $page .= $PAGE->meta(
                 'search-result',
-                $f['tid'],
+                $postRow['tid'],
                 $title,
-                $f['id'],
+                $postRow['id'],
                 $post,
             );
         }
