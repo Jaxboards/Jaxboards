@@ -206,29 +206,41 @@ final class search
             }
 
             $postParams = [];
-            $queryPostAuthor = ($authorId ? ' AND p.`auth_id`=? ' : '');
-            $queryPostDateStart = ($datestart ? ' AND p.`date`>? ' : '');
-            $queryPostDateEnd = ($dateend ? ' AND p.`date`<? ' : '');
+            $postValues = [];
 
             $topicParams = [];
-            $queryTopicAuthor = ($authorId ? ' AND t.`auth_id`= ? ' : '');
-            $queryTopicDateStart = ($datestart ? ' AND t.`date`>? ' : '');
-            $queryTopicDateEnd = ($dateend ? ' AND t.`date`<? ' : '');
+            $topicValues = [];
+
+            if (!empty($fids)) {
+                $postParams[] = 't.`fid` IN ?';
+                $postValues[] = $fids;
+                $topicParams[] = 't.`fid` IN ?';
+                $topicValues[] = $fids;
+            }
 
             if ($authorId) {
-                $postParams[] = $authorId;
-                $topicParams[] = $authorId;
+                $postParams[] = 'p.`auth_id`=?';
+                $postValues[] = $authorId;
+                $topicParams[] = 't.`auth_id`=?';
+                $topicValues[] = $authorId;
             }
 
             if ($datestart) {
-                $postParams[] = gmdate('Y-m-d H:i:s', $datestart);
-                $topicParams[] = gmdate('Y-m-d H:i:s', $datestart);
+                $postParams[] = 'p.`date`>?';
+                $postValues[] = gmdate('Y-m-d H:i:s', $datestart);
+                $topicParams[]= 't.`date`>?';
+                $topicValues[] = gmdate('Y-m-d H:i:s', $datestart);
             }
 
             if ($dateend) {
-                $postParams[] = gmdate('Y-m-d H:i:s', $dateend);
-                $topicParams[] = gmdate('Y-m-d H:i:s', $datestart);
+                $postParams[] = 'p.`date`<?';
+                $postValues[] = gmdate('Y-m-d H:i:s', $dateend);
+                $topicParams[] = 't.`date`<?';
+                $topicValues[] = gmdate('Y-m-d H:i:s', $datestart);
             }
+
+            $postWhere = join(' ', array_map(fn($q) => "AND $q", $postParams));
+            $topicWhere = join(' ', array_map(fn($q) => "AND $q", $topicParams));
 
             $sanitizedSearchTerm = $DB->basicvalue($termraw);
 
@@ -246,31 +258,27 @@ final class search
                                 LEFT JOIN %t t
                                     ON p.`tid`=t.`id`
                                 WHERE MATCH(p.`post`) AGAINST(? IN BOOLEAN MODE)
-                                    AND t.`fid` IN ?
-                                    {$queryPostAuthor}
-                                    {$queryPostDateStart}
-                                    {$queryPostDateEnd}
+                                    {$postWhere}
                                 ORDER BY `relevance` DESC LIMIT 100
                             ) UNION (
                                 SELECT t.`op` AS `op`,MATCH(t.`title`) AGAINST(?) AS `relevance`
                                 FROM %t t
                                 WHERE MATCH(`title`) AGAINST(? IN BOOLEAN MODE)
-                                    AND t.`fid` IN ?
-                                    {$queryTopicAuthor}
-                                    {$queryTopicDateStart}
-                                    {$queryTopicDateEnd}
+                                    {$topicWhere}
                                 ORDER BY `relevance` DESC LIMIT 100
                             )
                         ) dt
                         GROUP BY `id` ORDER BY `relevance` DESC
                     SQL,
                 ['posts', 'topics', 'topics'],
+
                 // Posts
-                ...[$sanitizedSearchTerm, $sanitizedSearchTerm, $fids],
-                ...$postParams,
+                ...[$sanitizedSearchTerm, $sanitizedSearchTerm],
+                ...$postValues,
+
                 // Topics
-                ...[$sanitizedSearchTerm, $sanitizedSearchTerm, $fids],
-                ...$topicParams,
+                ...[$sanitizedSearchTerm, $sanitizedSearchTerm],
+                ...$topicValues
             );
 
             if (!$result) {
