@@ -23,8 +23,9 @@ export function tryInvoke(method, ...args) {
 export function onImagesLoaded(imgs, timeout = 2000) {
   return new Promise((resolve) => {
     const images = new Set();
+    const imagesToWaitOn = Array.from(imgs).filter(img => !img.complete);
 
-    if (!imgs.length) {
+    if (!imagesToWaitOn.length) {
       resolve();
       return;
     }
@@ -36,8 +37,8 @@ export function onImagesLoaded(imgs, timeout = 2000) {
       }
     }
 
-    Array.from(imgs).forEach((img) => {
-      if (!images.has(img.src) && !img.complete) {
+    imagesToWaitOn.forEach((img) => {
+      if (!images.has(img.src)) {
         images.add(img.src);
         img.addEventListener('error', markImageLoaded);
         img.addEventListener('load', markImageLoaded);
