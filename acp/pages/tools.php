@@ -268,7 +268,7 @@ final class tools
         }
 
         $PAGE->addContentBox(
-            'Error Log Viewer (Last 100, chronological)',
+            "PHP Error Log ($logPath)",
             $contents,
         );
     }
