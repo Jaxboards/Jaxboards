@@ -772,7 +772,7 @@ final class modcontrols
 
         $page .= '<form method="post" data-ajax-form="true" '
             . 'style="padding:10px;">'
-            . 'Which topic should the topics be merged into?<br />';
+            . 'Which topic should the topics be merged into?<br>';
         $page .= $JAX->hiddenFormFields(
             [
                 'act' => 'modcontrols',
@@ -798,7 +798,7 @@ final class modcontrols
                 }
 
                 $page .= '<input type="radio" name="ot" value="' . $v . '" /> '
-                    . $titles[$v] . '<br />';
+                    . $titles[$v] . '<br>';
             }
         }
 
@@ -1156,7 +1156,7 @@ final class modcontrols
                 <<<EOT
                     <form method='post' data-ajax-form='true'>
                         {$hiddenFields}
-                        IP ban status: {$banCode}<br />
+                        IP ban status: {$banCode}<br>
                     </form>
                     IP Lookup Services: <ul>
                         <li><a href="https://whois.domaintools.com/{$ip}">DomainTools Whois</a></li>
@@ -1224,7 +1224,7 @@ final class modcontrols
                         $f['group_id'],
                         $f['display_name'],
                     );
-                    $content .= ' : ' . $f['shout'] . '<br />';
+                    $content .= ': ' . $f['shout'] . '<br>';
                 }
 
                 $page .= $this->box('Last 5 shouts:', $content);
