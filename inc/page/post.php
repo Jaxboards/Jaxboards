@@ -479,7 +479,7 @@ onclick="this.form.submitButton=this"/></div>
                     'auth_id',
                     'newtopic',
                     'post',
-                    'tid'
+                    'tid',
                 ],
                 'posts',
                 'WHERE `id`=?',

@@ -9,7 +9,7 @@ if (!defined(INACP)) {
 new members();
 final class members
 {
-    public const DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
+    public const string DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
 
     public function __construct()
     {
@@ -126,7 +126,7 @@ final class members
                 && is_numeric($JAX->b['mid'])
             ) {
                 $result = $DB->safeselect(
-                    [ 'group_id' ],
+                    ['group_id'],
                     'members',
                     'WHERE `id`=?',
                     $DB->basicvalue($JAX->b['mid']),
