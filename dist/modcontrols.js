@@ -2300,7 +2300,7 @@
 
     // Handle image hover magnification
     const bbcodeimgs = Array.from(container.querySelectorAll('.bbcodeimg'));
-    if (bbcodeimgs) {
+    if (bbcodeimgs.length) {
       onImagesLoaded(bbcodeimgs).then(() => {
         // resizer on large images
         imageResizer(bbcodeimgs);
