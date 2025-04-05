@@ -41,14 +41,19 @@ final class FORUM
 
         if ($PAGE->jsupdate) {
             $this->update();
-        } elseif (
+            return;
+        }
+
+        if (
             isset($JAX->b['replies'])
             && is_numeric($JAX->b['replies'])
         ) {
+            if (!$PAGE->jsaccess) $PAGE->location('?');
             $this->getreplysummary($JAX->b['replies']);
-        } else {
-            $this->viewforum($act[2]);
+            return;
         }
+
+        $this->viewforum($act[2]);
     }
 
     public function viewforum($fid)
