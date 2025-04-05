@@ -41,6 +41,7 @@ final class FORUM
 
         if ($PAGE->jsupdate) {
             $this->update();
+
             return;
         }
 
@@ -48,8 +49,11 @@ final class FORUM
             isset($JAX->b['replies'])
             && is_numeric($JAX->b['replies'])
         ) {
-            if (!$PAGE->jsaccess) $PAGE->location('?');
+            if (!$PAGE->jsaccess) {
+                $PAGE->location('?');
+            }
             $this->getreplysummary($JAX->b['replies']);
+
             return;
         }
 
