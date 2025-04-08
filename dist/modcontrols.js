@@ -168,7 +168,11 @@
   }
 
   function stripHTML(html) {
-    return html.valueOf().replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    if (typeof html !== 'string') {
+      // not a string, no HTML to strip
+      return html;
+    }
+    return html.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
   function toolTip(el) {
