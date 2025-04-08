@@ -406,10 +406,11 @@
   function toolTip(el) {
     let tooltip = document.getElementById('tooltip_thingy');
     const pos = getCoordinates(el);
-    const title = stripHTML(el.title);
+    let title = el.getAttribute('title');
+    if (!title) return;
+    title = stripHTML(title);
     // Prevent the browser from showing its own title
     el.title = '';
-    if (!title) return;
     if (!tooltip) {
       tooltip = document.createElement('table');
       const t = tooltip.insertRow(0);
