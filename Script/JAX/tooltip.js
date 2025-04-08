@@ -1,7 +1,11 @@
 import { getCoordinates, getHighestZIndex } from './el';
 
 function stripHTML(html) {
-  return html.valueOf().replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  if (typeof html !== 'string') {
+    // not a string, no HTML to strip
+    return html;
+  }
+  return html.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 export default function toolTip(el) {
