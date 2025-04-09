@@ -170,7 +170,7 @@
   function toolTip(el) {
     let tooltip = document.getElementById('tooltip_thingy');
     const pos = getCoordinates(el);
-    let title = el.getAttribute('title');
+    const title = el.getAttribute('title');
     if (!title) return;
     // Prevent the browser from showing its own title
     el.title = '';
