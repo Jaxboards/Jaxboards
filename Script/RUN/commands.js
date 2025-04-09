@@ -267,7 +267,7 @@ export default {
         status ? ` ${status}` : ''
       }`;
       if (tooltip) {
-        link.onmouseover = () => {
+        link.onmouseover = function() {
           openTooltip(this, this.title);
         };
       }
