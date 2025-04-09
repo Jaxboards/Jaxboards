@@ -2676,7 +2676,7 @@
         status ? ` ${status}` : ''
       }`;
         if (tooltip) {
-          link.onmouseover = () => {
+          link.onmouseover = function() {
             toolTip(this, this.title);
           };
         }
