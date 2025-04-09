@@ -395,22 +395,11 @@
       });
   }
 
-  function stripHTML(html) {
-    if (typeof html !== 'string') {
-      // not a string, no HTML to strip
-      return html;
-    }
-    const span = document.createElement('span');
-    span.innerHTML = html;
-    return span.innerText;
-  }
-
   function toolTip(el) {
     let tooltip = document.getElementById('tooltip_thingy');
     const pos = getCoordinates(el);
     let title = el.getAttribute('title');
     if (!title) return;
-    title = stripHTML(title);
     // Prevent the browser from showing its own title
     el.title = '';
     if (!tooltip) {
@@ -444,7 +433,7 @@
       document.querySelector('#page').appendChild(tooltip);
     }
 
-    tooltip.rows[1].cells[1].innerHTML = title;
+    tooltip.rows[1].cells[1].innerText = title;
     tooltip.style.display = '';
     tooltip.style.top = `${pos.y - tooltip.clientHeight}px`;
     tooltip.style.left = `${pos.x}px`;
