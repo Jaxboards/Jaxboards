@@ -400,7 +400,9 @@
       // not a string, no HTML to strip
       return html;
     }
-    return html.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const span = document.createElement('span');
+    span.innerHTML = html;
+    return span.innerText;
   }
 
   function toolTip(el) {
