@@ -31,8 +31,8 @@ jobs:
       - run: npm clean-install
       - run: ./tools/update_composer_version.php
       # get the package-lock.json and composer.lock files up to date
-      - run: npm install --include=dev node-composer-runner
-      - run: composer require --dev roave/security-advisories:dev-master@dev
+      - run: npm clean-install --ignore-scripts --package-lock-only
+      - run: composer update --lock
       - run: npm run-script build
       - run: npm run-script autofix
       - uses: stefanzweifel/git-auto-commit-action@v5
