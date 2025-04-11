@@ -33,6 +33,8 @@ jobs:
       # get the package-lock.json and composer.lock files up to date
       - run: npm clean-install --ignore-scripts --package-lock-only
       - run: composer update --lock
+      # run npm install _again_ due to --package-lock-only above
+      - run: npm clean-install
       - run: npm run-script build
       - run: npm run-script autofix
       - uses: stefanzweifel/git-auto-commit-action@v5
