@@ -260,11 +260,11 @@ final class tools
 
         $logPath = ini_get('error_log');
 
-        $contents = "Sorry, jaxboards does not have file permissions to read your PHP error log file. ({$logPath})";
+        $contents = "Sorry, Jaxboards does not have file permissions to read your PHP error log file. ({$logPath})";
 
         if (is_readable($logPath)) {
             $last100Lines = $this->tail($logPath, 100, true);
-            $contents = "<textarea class='editor'>" . htmlspecialchars(implode("\n", $last100Lines)) . '</textarea>';
+            $contents = "<textarea class='editor' title='Recent PHP error log output'>" . htmlspecialchars(implode("\n", $last100Lines)) . '</textarea>';
         }
 
         $PAGE->addContentBox(
