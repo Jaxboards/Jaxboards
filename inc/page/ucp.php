@@ -884,9 +884,11 @@ final class UCP
             . ($USER['wysiwyg'] ? ' checked="checked"' : '')
             . ' />',
         );
-        if ($showthing) {
-            $this->showucp();
+        if (!$showthing) {
+            return;
         }
+
+        $this->showucp();
     }
 
     /*
