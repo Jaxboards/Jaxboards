@@ -334,7 +334,7 @@ final class PAGE
         $this->loadtemplate(
             $skin['wrapper']
             ? BOARDPATH . 'Wrappers/' . $skin['wrapper'] . '.txt'
-            : THEMEPATH . 'wrappers.txt',
+            : THEMEPATH . 'wrappers.html',
         );
     }
 

@@ -121,7 +121,7 @@ final class themes
                 if ($o !== false) {
                     fwrite(
                         $o,
-                        file_get_contents(DTHEMEPATH . 'wrappers.txt'),
+                        file_get_contents(DTHEMEPATH . 'wrappers.html'),
                     );
                     fclose($o);
                 } else {
