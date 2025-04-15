@@ -24,7 +24,7 @@ require_once JAXBOARDS_ROOT . '/vendor/autoload.php';
 
 define('INACP', 'true');
 
-require JAXBOARDS_ROOT . '/config.php';
+require_once JAXBOARDS_ROOT . '/config.php';
 
 require_once JAXBOARDS_ROOT . '/inc/classes/jax.php';
 

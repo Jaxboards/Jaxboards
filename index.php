@@ -32,7 +32,7 @@ require_once JAXBOARDS_ROOT . '/vendor/autoload.php';
 // Get the config.
 const CONFIG_FILE = __DIR__ . '/config.php';
 if (is_readable(CONFIG_FILE)) {
-    require CONFIG_FILE;
+    require_once CONFIG_FILE;
 }
 
 if (!isset($CFG)) {
