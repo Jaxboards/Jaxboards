@@ -916,7 +916,9 @@ textarea {
   background: #fff;
   padding-bottom: 20px;
   margin: 0 9px;
-  box-shadow: rgba(0,0,0,.2) -5px 0px 2px, rgba(0,0,0,.2) 5px 0px 2px;
+  box-shadow:
+    rgb(0 0 0 / 20%) -5px 0 2px,
+    rgb(0 0 0 / 20%) 5px 0 2px;
   border: 1px solid #404040;
   border-radius: 0 0 15px 15px;
 }
