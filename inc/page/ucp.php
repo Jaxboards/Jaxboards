@@ -777,7 +777,7 @@ final class UCP
         );
     }
 
-    public function showboardsettings()
+    public function showboardsettings(): void
     {
         global $PAGE,$DB,$JAX,$USER;
         $e = '';
@@ -887,8 +887,6 @@ final class UCP
         if ($showthing) {
             $this->showucp();
         }
-
-        return null;
     }
 
     /*
