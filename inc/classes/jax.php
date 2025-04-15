@@ -658,7 +658,7 @@ final class JAX
     {
         $items = preg_split("@(^|[\r\n])\\*@", (string) $m[2]);
 
-        $html = $m[1] == 'ol' ? '<ol>' : '<ul>';
+        $html = $m[1] === 'ol' ? '<ol>' : '<ul>';
         foreach ($items as $item) {
             if (trim($item) === '') {
                 continue;
@@ -666,7 +666,7 @@ final class JAX
 
             $html .= '<li>' . $item . ' </li>';
         }
-        $html .= $m[1] == 'ol' ? '</ol>' : '</ul>';
+        $html .= $m[1] === 'ol' ? '</ol>' : '</ul>';
 
         return $html;
     }
