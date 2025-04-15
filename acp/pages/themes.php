@@ -14,7 +14,7 @@ final class themes
     {
         global $PAGE,$JAX,$CFG;
 
-        $this->WRAPPERS_PATH = 'Wrappers/';
+        $this->WRAPPERS_PATH = BOARDPATH . 'Wrappers/';
 
         if (!defined('DTHEMEPATH')) {
             define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . $CFG['dthemepath']);
@@ -66,7 +66,7 @@ final class themes
     public function getwrappers(): array
     {
         $wrappers = [];
-        $o = opendir(BOARDPATH . $this->WRAPPERS_PATH);
+        $o = opendir($this->WRAPPERS_PATH);
         while ($f = readdir($o)) {
             if ($f === '.') {
                 continue;
@@ -92,12 +92,12 @@ final class themes
         $errorwrapper = '';
 
         if (isset($JAX->g['deletewrapper']) && $JAX->g['deletewrapper']) {
-            $wrapperPath = BOARDPATH . $this->WRAPPERS_PATH . $JAX->g['deletewrapper'] . '.html';
+            $wrapperPath = $this->WRAPPERS_PATH . $JAX->g['deletewrapper'] . '.html';
             if (
                 !preg_match('@[^\w ]@', (string) $JAX->g['deletewrapper'])
                 && file_exists($wrapperPath)
             ) {
-                unlink(BOARDPATH . $this->WRAPPERS_PATH . $JAX->g['deletewrapper'] . '.html');
+                unlink($this->WRAPPERS_PATH . $JAX->g['deletewrapper'] . '.html');
                 $PAGE->location('?act=themes');
             } else {
                 $errorwrapper
@@ -107,7 +107,7 @@ final class themes
 
         if (isset($JAX->p['newwrapper']) && $JAX->p['newwrapper']) {
             $newWrapperPath
-                = BOARDPATH . $this->WRAPPERS_PATH . $JAX->p['newwrapper'] . '.html';
+                = $this->WRAPPERS_PATH . $JAX->p['newwrapper'] . '.html';
             if (preg_match('@[^\w ]@', (string) $JAX->p['newwrapper'])) {
                 $errorwrapper
                     = 'Wrapper name must consist of letters, numbers, '
@@ -220,7 +220,7 @@ final class themes
                         continue;
                     }
 
-                    if (!is_file(BOARDPATH . $this->WRAPPERS_PATH . $k . '.html')) {
+                    if (!is_file($this->WRAPPERS_PATH . $k . '.html')) {
                         continue;
                     }
 
@@ -232,7 +232,7 @@ final class themes
                             Wrapper name must consist of letters, numbers, spaces, and underscore, and be
                             under 50 characters long.
                             EOT;
-                    } elseif (is_file(BOARDPATH . $this->WRAPPERS_PATH . $v . '.html')) {
+                    } elseif (is_file($this->WRAPPERS_PATH . $v . '.html')) {
                         $errorwrapper = 'That wrapper name is already being used.';
                     } else {
                         $DB->safeupdate(
@@ -244,8 +244,8 @@ final class themes
                             $DB->basicvalue($k),
                         );
                         rename(
-                            BOARDPATH . $this->WRAPPERS_PATH . $k . '.html',
-                            BOARDPATH . $this->WRAPPERS_PATH . $v . '.html',
+                            $this->WRAPPERS_PATH . $k . '.html',
+                            $this->WRAPPERS_PATH . $v . '.html',
                         );
                     }
 
@@ -425,7 +425,7 @@ final class themes
     {
         global $PAGE,$JAX;
         $saved = '';
-        $wrapperf = BOARDPATH . $this->WRAPPERS_PATH . $wrapper . '.html';
+        $wrapperf = $this->WRAPPERS_PATH . $wrapper . '.html';
         if (preg_match('@[^ \w]@', (string) $wrapper) && !is_file($wrapperf)) {
             $PAGE->addContentBox(
                 'Error',
