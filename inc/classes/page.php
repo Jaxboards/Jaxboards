@@ -333,7 +333,7 @@ final class PAGE
         define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . $CFG['dthemepath']);
         $this->loadtemplate(
             $skin['wrapper']
-            ? BOARDPATH . 'Wrappers/' . $skin['wrapper'] . '.txt'
+            ? BOARDPATH . 'Wrappers/' . $skin['wrapper'] . '.html'
             : THEMEPATH . 'wrappers.html',
         );
     }
