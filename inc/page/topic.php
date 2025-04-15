@@ -641,7 +641,7 @@ final class TOPIC
                 $rniblets = $DB->getRatingNiblets();
                 if ($rniblets) {
                     foreach ($rniblets as $k => $v) {
-                        $postratingbuttons .= '<a href="?act=vt'. $this->id.'&amp;ratepost='
+                        $postratingbuttons .= '<a href="?act=vt' . $this->id . '&amp;ratepost='
                             . $post['pid'] . '&amp;niblet=' . $k . '">'
                             . $PAGE->meta(
                                 'rating-niblet',
@@ -677,9 +677,9 @@ final class TOPIC
                 }
             }
 
-            $postbuttons =
+            $postbuttons
             // Adds the Edit button
-            ($this->canedit($post)
+            = ($this->canedit($post)
                 ? "<a href='?act=vt" . $this->id . '&amp;edit=' . $post['pid']
             . "' class='edit'>" . $PAGE->meta('topic-edit-button')
             . '</a>'
@@ -1019,7 +1019,7 @@ final class TOPIC
         return null;
     }
 
-    public function ratepost($postid, $nibletid)
+    public function ratepost($postid, $nibletid): void
     {
         global $DB,$USER,$PAGE;
         $PAGE->JS('softurl');
@@ -1054,17 +1054,20 @@ final class TOPIC
 
         if ($e) {
             $PAGE->JS('error', $e);
+
             return;
         }
 
-        if (!array_key_exists((int) $nibletid, $ratings)) $ratings[(int) $nibletid] = [];
+        if (!array_key_exists((int) $nibletid, $ratings)) {
+            $ratings[(int) $nibletid] = [];
+        }
 
         $unrate = in_array((int) $USER['id'], $ratings[(int) $nibletid]);
         // Unrate
         if ($unrate) {
             $ratings[(int) $nibletid] = array_diff($ratings[(int) $nibletid], [(int) $USER['id']]);
         } else {
-        // Rate
+            // Rate
             $ratings[(int) $nibletid][] = (int) $USER['id'];
         }
 
@@ -1340,6 +1343,7 @@ final class TOPIC
 
         if (!$members) {
             $PAGE->JS('alert', 'This post has no ratings yet!');
+
             return;
         }
 
