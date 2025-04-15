@@ -479,8 +479,6 @@ final class TOPIC
     {
         global $DB,$PAGE,$JAX,$SESS,$USER,$PERMS,$CFG;
         $usersonline = $DB->getUsersOnline();
-        $postrating = '';
-        $showrating = '';
 
         $topic_post_counter = 0;
 
@@ -631,10 +629,11 @@ final class TOPIC
             $postt = $JAX->theworks($postt);
 
             // Post rating content goes here.
+            $postrating = '';
+            $showrating = '';
             if (isset($CFG['ratings']) && $CFG['ratings'] & 1) {
-                $postrating = '';
-                $showrating = '';
                 $prating = [];
+                $postratingbuttons = '';
                 if ($post['rating']) {
                     $prating = json_decode((string) $post['rating'], true);
                 }
@@ -642,7 +641,7 @@ final class TOPIC
                 $rniblets = $DB->getRatingNiblets();
                 if ($rniblets) {
                     foreach ($rniblets as $k => $v) {
-                        $postrating .= '<a href="?act=topic&amp;ratepost='
+                        $postratingbuttons .= '<a href="?act=vt'. $this->id.'&amp;ratepost='
                             . $post['pid'] . '&amp;niblet=' . $k . '">'
                             . $PAGE->meta(
                                 'rating-niblet',
@@ -658,7 +657,7 @@ final class TOPIC
                         }
 
                         $num = 'x' . count($prating[$k]);
-                        $postrating .= $num;
+                        $postratingbuttons .= $num;
                         $showrating .= $PAGE->meta(
                             'rating-niblet',
                             $v['img'],
@@ -668,7 +667,7 @@ final class TOPIC
 
                     $postrating = $PAGE->meta(
                         'rating-wrapper',
-                        $postrating,
+                        $postratingbuttons,
                         ($CFG['ratings'] & 2) === 0
                             ? '<a href="?act=vt' . $this->id
                         . '&amp;listrating=' . $post['pid'] . '">(List)</a>'
@@ -677,6 +676,26 @@ final class TOPIC
                     );
                 }
             }
+
+            $postbuttons =
+            // Adds the Edit button
+            ($this->canedit($post)
+                ? "<a href='?act=vt" . $this->id . '&amp;edit=' . $post['pid']
+            . "' class='edit'>" . $PAGE->meta('topic-edit-button')
+            . '</a>'
+                : '')
+            // Adds the Quote button
+            . ($this->topicdata['fperms']['reply']
+                ? " <a href='?act=vt" . $this->id . '&amp;quote=' . $post['pid']
+            . "' onclick='RUN.handleQuoting(this);return false;' "
+            . "class='quotepost'>" . $PAGE->meta('topic-quote-button') . '</a> '
+                : '')
+            // Adds the Moderate options
+            . ($this->canmoderate()
+                ? "<a href='?act=modcontrols&amp;do=modp&amp;pid=" . $post['pid']
+            . "' class='modpost' onclick='RUN.modcontrols.togbutton(this)'>"
+            . $PAGE->meta('topic-mod-button') . '</a>'
+                : '');
 
             $rows .= $PAGE->meta(
                 'topic-post-row',
@@ -698,24 +717,7 @@ final class TOPIC
                 ),
                 $post['title'],
                 $post['auth_id'],
-                // Adds the Edit button
-                ($this->canedit($post)
-                    ? "<a href='?act=vt" . $this->id . '&amp;edit=' . $post['pid']
-                . "' class='edit'>" . $PAGE->meta('topic-edit-button')
-                . '</a>'
-                    : '')
-                // Adds the Quote button
-                . ($this->topicdata['fperms']['reply']
-                    ? " <a href='?act=vt" . $this->id . '&amp;quote=' . $post['pid']
-                . "' onclick='RUN.handleQuoting(this);return false;' "
-                . "class='quotepost'>" . $PAGE->meta('topic-quote-button') . '</a> '
-                    : '')
-                // Adds the Moderate options
-                . ($this->canmoderate()
-                    ? "<a href='?act=modcontrols&amp;do=modp&amp;pid=" . $post['pid']
-                . "' class='modpost' onclick='RUN.modcontrols.togbutton(this)'>"
-                . $PAGE->meta('topic-mod-button') . '</a>'
-                    : ''),
+                $postbuttons,
                 $JAX->date($post['date']),
                 '<a href="?act=vt' . $this->id . '&amp;findpost=' . $post['pid']
                 . '" onclick="prompt(\'Link to this post:\',this.href)">'
@@ -747,6 +749,7 @@ final class TOPIC
                     $post['icon'],
                 ) : '',
                 ++$topic_post_counter,
+                $postrating,
                 $post['contact_skype'] ?? '',
                 $post['contact_discord'] ?? '',
                 $post['contact_yim'] ?? '',
@@ -760,7 +763,6 @@ final class TOPIC
                 '',
                 '',
                 '',
-                $postrating,
             );
             $lastpid = $post['pid'];
         }
@@ -1017,12 +1019,12 @@ final class TOPIC
         return null;
     }
 
-    public function ratepost($postid, $nibletid): ?bool
+    public function ratepost($postid, $nibletid)
     {
         global $DB,$USER,$PAGE;
         $PAGE->JS('softurl');
         if (!is_numeric($postid) || !is_numeric($nibletid)) {
-            return false;
+            return;
         }
 
         $result = $DB->safeselect(
@@ -1035,6 +1037,8 @@ final class TOPIC
         $DB->disposeresult($result);
 
         $niblets = $DB->getRatingNiblets();
+        $e = null;
+        $ratings = [];
         if (!$USER['id']) {
             $e = "You don't have permission to rate posts.";
         } elseif (!$f) {
@@ -1045,39 +1049,34 @@ final class TOPIC
             $ratings = json_decode((string) $f['rating'], true);
             if (!$ratings) {
                 $ratings = [];
-            } else {
-                $found = false;
-                foreach ($ratings as $k => $v) {
-                    if (($pos = array_search($USER['id'], $v, true)) === false) {
-                        continue;
-                    }
-
-                    unset($ratings[$k][$pos]);
-                    if (!empty($ratings[$k])) {
-                        continue;
-                    }
-
-                    unset($ratings[$k]);
-                }
             }
         }
 
-        if ($e !== '0') {
+        if ($e) {
             $PAGE->JS('error', $e);
-        } else {
-            $ratings[(int) $nibletid][] = (int) $USER['id'];
-            $DB->safeupdate(
-                'posts',
-                [
-                    'rating' => json_encode($ratings),
-                ],
-                'WHERE `id`=?',
-                $DB->basicvalue($postid),
-            );
-            $PAGE->JS('alert', 'Rated!');
+            return;
         }
 
-        return null;
+        if (!array_key_exists((int) $nibletid, $ratings)) $ratings[(int) $nibletid] = [];
+
+        $unrate = in_array((int) $USER['id'], $ratings[(int) $nibletid]);
+        // Unrate
+        if ($unrate) {
+            $ratings[(int) $nibletid] = array_diff($ratings[(int) $nibletid], [(int) $USER['id']]);
+        } else {
+        // Rate
+            $ratings[(int) $nibletid][] = (int) $USER['id'];
+        }
+
+        $DB->safeupdate(
+            'posts',
+            [
+                'rating' => json_encode($ratings),
+            ],
+            'WHERE `id`=?',
+            $DB->basicvalue($postid),
+        );
+        $PAGE->JS('alert', $unrate ? 'Unrated!' : 'Rated!');
     }
 
     public function qeditpost($id): void
@@ -1328,7 +1327,7 @@ final class TOPIC
         );
         $row = $DB->arow($result);
         $DB->disposeresult($result);
-        $ratings = $row ? json_decode((string) $row[0], true) : [];
+        $ratings = $row ? json_decode((string) $row['rating'], true) : [];
 
         if (empty($ratings)) {
             return;
@@ -1337,6 +1336,11 @@ final class TOPIC
         $members = [];
         foreach ($ratings as $v) {
             $members = array_merge($members, $v);
+        }
+
+        if (!$members) {
+            $PAGE->JS('alert', 'This post has no ratings yet!');
+            return;
         }
 
         $result = $DB->safeselect(
@@ -1356,6 +1360,7 @@ final class TOPIC
 
         unset($members);
         $niblets = $DB->getRatingNiblets();
+        $page = '';
         foreach ($ratings as $k => $v) {
             $page .= '<div class="column">';
             $page .= '<img src="' . $niblets[$k]['img'] . '" /> '

@@ -324,8 +324,8 @@ final class settings
 
         if (isset($JAX->p['rsubmit']) && $JAX->p['rsubmit']) {
             $cfg = [
-                'ratings' => ($JAX->p['renabled'] ? 1 : 0)
-                + ($JAX->p['ranon'] ? 2 : 0),
+                'ratings' => (isset($JAX->p['renabled']) ? 1 : 0)
+                + (isset($JAX->p['ranon']) ? 2 : 0),
             ];
             $PAGE->writeCFG($cfg);
             $page2 .= $PAGE->success('Settings saved!');

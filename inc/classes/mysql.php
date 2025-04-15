@@ -314,6 +314,7 @@ final class MySQL
     ): string {
         $arr = explode('?', (string) $query_string, $placeholder_number + 1);
         $last = array_pop($arr);
+        $replacement = '';
 
         if ($arrlen > 0) {
             $replacement = '(' . str_repeat('?, ', $arrlen - 1) . ' ?)';

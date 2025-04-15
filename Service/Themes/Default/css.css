@@ -1435,7 +1435,8 @@ textarea {
 
 /* Post Ratings */
 #intopic .postrating {
-  float: left;
+  min-height: 1.4em;
+  padding-left: 20px;
 }
 
 #intopic .postrating .form {
