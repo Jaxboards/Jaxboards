@@ -76,7 +76,7 @@ final class themes
             }
 
             // TODO: better file extension truncation
-            $wrappers[] = mb_substr($f, 0, -5); 
+            $wrappers[] = mb_substr($f, 0, -5);
         }
 
         closedir($o);
