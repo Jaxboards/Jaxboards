@@ -656,21 +656,19 @@ final class JAX
 
     public function bbcode_licallback($m): string
     {
-        $lis = '';
-        $m[2] = preg_split("@(^|[\r\n])\\*@", (string) $m[2]);
-        foreach ($m[2] as $v) {
-            if (trim($v) === '') {
+        $items = preg_split("@(^|[\r\n])\\*@", (string) $m[2]);
+
+        $html = $m[1] == 'ol' ? '<ol>' : '<ul>';
+        foreach ($items as $item) {
+            if (trim($item) === '') {
                 continue;
             }
 
-            if (trim($v) === '0') {
-                continue;
-            }
-
-            $lis .= '<li>' . $v . ' </li>';
+            $html .= '<li>' . $item . ' </li>';
         }
+        $html .= $m[1] == 'ol' ? '</ol>' : '</ul>';
 
-        return '<' . $m[1] . '>' . $lis . '</' . $m[1] . '>';
+        return $html;
     }
 
     public function attachments($a): null|array|string
