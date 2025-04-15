@@ -917,7 +917,7 @@ final class JAX
      */
     public function ipServiceBanned($ipAddress = false): bool
     {
-        global $DB,$CFG;
+        global $DB,$CFG,$JAX;
 
         if (!$CFG['service']) {
             // Can't be service banned if there's no service.
@@ -1134,7 +1134,7 @@ final class JAX
         string $embedUrl,
     ): string {
         // phpcs:disable Generic.Files.LineLength.TooLong
-        return <<<HTML
+        return <<<DOC
             <div class="media youtube">
                 <div class="summary">
                     Watch Youtube Video:
@@ -1164,7 +1164,7 @@ final class JAX
                         ></iframe>
                 </div>
             </div>
-            HTML;
+            DOC;
         // phpcs:enable
     }
 }

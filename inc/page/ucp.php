@@ -816,12 +816,16 @@ final class UCP
                 $USER['skin_id'] = $JAX->b['skin'];
             }
 
-            if ($e === '' || $e === '0') {
+            if ($e === '') {
                 if ($PAGE->jsaccess) {
-                    return $PAGE->JS('reload');
+                    $PAGE->JS('reload');
+
+                    return;
                 }
 
-                return header('Location: ?act=ucp&what=board');
+                header('Location: ?act=ucp&what=board');
+
+                return;
             }
 
             $this->ucppage .= $PAGE->meta('error', $e);
