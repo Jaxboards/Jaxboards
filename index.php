@@ -409,7 +409,7 @@ if ($modules) {
         }
 
         require_once $module;
-        $module = new $moduleClassName;
+        $module = new $moduleClassName();
         $module->init();
     }
 }

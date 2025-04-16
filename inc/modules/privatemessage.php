@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 final class PrivateMessage
 {
-    public function init()
+    public function init(): void
     {
         global $JAX,$DB,$PAGE,$SESS;
         $im = $JAX->p['im_im'] ?? null;

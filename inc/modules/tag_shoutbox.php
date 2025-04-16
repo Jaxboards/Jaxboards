@@ -6,7 +6,9 @@ $PAGE->loadmeta('shoutbox');
 
 final class Shoutbox
 {
-    public function init()
+    public $shoutlimit;
+
+    public function init(): void
     {
         global $PAGE,$JAX,$CFG,$PERMS;
         if (!isset($CFG['shoutbox'])) {
@@ -47,8 +49,6 @@ final class Shoutbox
             $this->updateshoutbox();
         }
     }
-
-    public $shoutlimit;
 
     public function canDelete($id, $shoutrow = false)
     {
