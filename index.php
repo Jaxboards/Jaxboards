@@ -118,7 +118,7 @@ if ($USER && $SESS->ip && $SESS->ip !== $USER['ip']) {
         'members',
         [
             // @phpstan-ignore-next-line property.notFound
-            'ip' => $SESS->ip,
+            'ip' => $JAX->ip2bin(),
         ],
         'WHERE id=?',
         $USER['id'],
