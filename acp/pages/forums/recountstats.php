@@ -6,23 +6,9 @@ if (!defined(INACP)) {
     exit;
 }
 
-new stats();
-final class stats
+final class RecountStats
 {
-    public function __construct()
-    {
-        global $PAGE,$JAX;
-        if (!isset($JAX->g['do'])) {
-            $JAX->g['do'] = null;
-        }
-
-        match ($JAX->g['do']) {
-            'recount' => $this->recount_statistics(),
-            default => $this->showstats(),
-        };
-    }
-
-    public function showstats(): void
+    public static function showstats(): void
     {
         global $PAGE;
         $PAGE->addContentBox(
@@ -33,7 +19,7 @@ final class stats
         );
     }
 
-    public function recount_statistics(): void
+    public static function recountStatistics(): void
     {
         global $DB,$PAGE;
         $result = $DB->safeselect(
@@ -56,8 +42,6 @@ final class stats
             ['posts', 'topics'],
         );
         $stat = [
-            'cat_posts' => [],
-            'cat_topics' => [],
             'forum_posts' => [],
             'forum_topics' => [],
             'member_posts' => [],
@@ -119,32 +103,16 @@ final class stats
             'forums',
         );
         while ($f = $DB->arow($result)) {
-            // I realize I don't use cat stats yet, but I may.
-            if (!isset($stat['cat_posts'][$f['cat_id']])) {
-                $stat['cat_posts'][$f['cat_id']] = 0;
-            }
-
-            if (!isset($stat['cat_topics'][$f['cat_id']])) {
-                $stat['cat_topics'][$f['cat_id']] = 0;
-            }
-
-            $stat['cat_posts'][$f['cat_id']] += $stat['forum_posts'][$f['id']];
-            $stat['cat_topics'][$f['cat_id']] += $stat['forum_topics'][$f['id']];
-
             if (!$f['path']) {
                 continue;
             }
 
-            foreach (explode(' ', (string) $f['path']) as $v) {
-                $stat['forum_topics'][$v] += $stat['forum_topics'][$f['id']];
-                $stat['forum_posts'][$v] += $stat['forum_posts'][$f['id']];
+            foreach (explode(' ', (string) $f['path']) as $fid) {
+                $stat['forum_topics'][$fid] += $stat['forum_topics'][$f['id']] ?? 0;
+                $stat['forum_posts'][$fid] += $stat['forum_posts'][$f['id']] ?? 0;
             }
         }
 
-        // YEAH, this is bad. A bajillion update statements
-        // however, I have been unable to find a better way to do this.
-        // I have to do a seperate update query for every user,
-        // topic, category, and forum. pretty sick.
         // Update Topic Replies.
         foreach ($stat['topic_posts'] as $k => $v) {
             $DB->safeupdate(
@@ -204,9 +172,6 @@ final class stats
         $PAGE->addContentBox(
             'Board Statistics',
             $PAGE->success('Board statistics recounted successfully.')
-            . PHP_EOL . $PAGE->parseTemplate(
-                'stats/recount-statistics.html',
-            ),
         );
     }
 }

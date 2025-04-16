@@ -146,7 +146,7 @@ $PAGE->addNavMenu(
         '?act=forums&do=create' => 'Create Forum',
         '?act=forums&do=createc' => 'Create Category',
         '?act=forums&do=order' => 'Manage',
-        '?act=stats' => 'Refresh Statistics',
+        '?act=forums&do=recountstats' => 'Recount Statistics',
     ],
 );
 $PAGE->addNavMenu(
