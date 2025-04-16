@@ -6,9 +6,7 @@ if (!defined(INACP)) {
     exit;
 }
 
-new themes();
-
-final class themes
+final class Themes
 {
     public function __construct()
     {

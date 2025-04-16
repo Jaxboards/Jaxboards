@@ -8,7 +8,6 @@ if (!defined(INACP)) {
     exit;
 }
 
-new Forums();
 final class Forums
 {
     public function __construct()

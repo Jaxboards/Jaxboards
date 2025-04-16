@@ -159,10 +159,12 @@ $PAGE->addNavMenu(
     ],
 );
 
-$a = $JAX->g['act'] ?? null;
+$act = $JAX->g['act'] ?? null;
 
-if ($a && file_exists("./pages/{$a}.php")) {
-    include_once "./pages/{$a}.php";
+if ($act && file_exists("./pages/{$act}.php")) {
+    include_once "./pages/{$act}.php";
+    $className = ucfirst($act);
+    new $className();
 }
 
 $PAGE->out();

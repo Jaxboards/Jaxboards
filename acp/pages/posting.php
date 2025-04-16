@@ -6,8 +6,7 @@ if (!defined(INACP)) {
     exit;
 }
 
-new settings();
-final class settings
+final class Posting
 {
     public function __construct()
     {

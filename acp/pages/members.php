@@ -6,8 +6,7 @@ if (!defined(INACP)) {
     exit;
 }
 
-new members();
-final class members
+final class Members
 {
     public const string DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
 

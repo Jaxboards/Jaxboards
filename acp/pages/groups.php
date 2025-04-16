@@ -6,8 +6,7 @@ if (!defined(INACP)) {
     exit;
 }
 
-new groups();
-final class groups
+final class Groups
 {
     public function __construct()
     {

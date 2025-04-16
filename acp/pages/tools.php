@@ -6,8 +6,7 @@ if (!defined(INACP)) {
     exit;
 }
 
-new tools();
-final class tools
+final class Tools
 {
     public function __construct()
     {
