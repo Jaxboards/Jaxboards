@@ -6,7 +6,17 @@ $PAGE->loadmeta('ucp');
 
 final class UCP
 {
-    public function route()
+    public $what = '';
+
+    public $runscript = false;
+
+    public $shownucp = false;
+
+    public $ucppage = '';
+
+    public $showentirething;
+
+    public function route(): void
     {
         global $PAGE,$JAX,$USER,$DB;
         if (!$USER || $USER['group_id'] === 4) {
@@ -184,16 +194,6 @@ final class UCP
 
         $this->showucp();
     }
-
-    public $what = '';
-
-    public $runscript = false;
-
-    public $shownucp = false;
-
-    public $ucppage = '';
-
-    public $showentirething;
 
     public function getlocationforform()
     {

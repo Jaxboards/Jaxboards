@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 final class BoardOffline
 {
-    public function route()
+    public function route(): void
     {
         global $PAGE,$JAX,$CFG;
         if ($PAGE->jsupdate) {

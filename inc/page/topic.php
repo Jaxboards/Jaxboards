@@ -6,7 +6,27 @@ $PAGE->loadmeta('topic');
 
 final class Topic
 {
-    public function route()
+    public $id = 0;
+
+    /**
+     * @var int
+     */
+    public $page = '';
+
+    /**
+     * @var int
+     */
+    public $numperpage = 0;
+
+    public $canmod = false;
+
+    public $firstPostID = 0;
+
+    public $lastPostID;
+
+    public $topicdata;
+
+    public function route(): void
     {
         global $JAX,$PAGE;
 
@@ -69,26 +89,6 @@ final class Topic
             $this->viewtopic($id);
         }
     }
-
-    public $id = 0;
-
-    /**
-     * @var int
-     */
-    public $page = '';
-
-    /**
-     * @var int
-     */
-    public $numperpage = 0;
-
-    public $canmod = false;
-
-    public $firstPostID = 0;
-
-    public $lastPostID;
-
-    public $topicdata;
 
     public function getTopicData($id): void
     {

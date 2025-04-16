@@ -32,7 +32,7 @@ $PAGE->metadefs['buddylist-contact'] = <<<'EOT'
 
 final class BuddyList
 {
-    public function route()
+    public function route(): void
     {
         global $PAGE,$JAX,$USER;
 

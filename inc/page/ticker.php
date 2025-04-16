@@ -6,7 +6,9 @@ $PAGE->loadmeta('ticker');
 
 final class Ticker
 {
-    public function route()
+    public $maxticks = 60;
+
+    public function route(): void
     {
         global $PAGE;
         if ($PAGE->jsnewlocation || !$PAGE->jsaccess) {
@@ -15,8 +17,6 @@ final class Ticker
             $this->update();
         }
     }
-
-    public $maxticks = 60;
 
     public function index(): void
     {

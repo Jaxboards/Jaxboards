@@ -6,7 +6,14 @@ $PAGE->loadmeta('members');
 
 final class Members
 {
-    public function route()
+    /**
+     * @var float|int
+     */
+    public $page = 0;
+
+    public $perpage = 20;
+
+    public function route(): void
     {
         global $JAX,$PAGE;
         if (
@@ -23,13 +30,6 @@ final class Members
 
         $this->showmemberlist();
     }
-
-    /**
-     * @var float|int
-     */
-    public $page = 0;
-
-    public $perpage = 20;
 
     public function showmemberlist(): void
     {

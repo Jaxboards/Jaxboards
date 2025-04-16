@@ -6,7 +6,20 @@ $PAGE->loadmeta('forum');
 
 final class Forum
 {
-    public function route()
+    public $topicsRead = [];
+
+    public $forumsRead = [];
+
+    public $forumReadTime = 0;
+
+    public $numperpage = 20;
+
+    /**
+     * @var float|int
+     */
+    public $page = 0;
+
+    public function route(): void
     {
         global $JAX,$PAGE;
         if (
@@ -45,19 +58,6 @@ final class Forum
 
         $this->viewforum($act[2]);
     }
-
-    public $topicsRead = [];
-
-    public $forumsRead = [];
-
-    public $forumReadTime = 0;
-
-    public $numperpage = 20;
-
-    /**
-     * @var float|int
-     */
-    public $page = 0;
 
     public function viewforum($fid)
     {

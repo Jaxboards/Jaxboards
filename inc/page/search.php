@@ -6,7 +6,18 @@ $PAGE->loadmeta('search');
 
 final class Search
 {
-    public function route()
+    public $page = '';
+
+    public $pagenum = 0;
+
+    public $fids = [];
+
+    /**
+     * @var int
+     */
+    public $perpage;
+
+    public function route(): void
     {
         global $PAGE,$JAX;
         $this->pagenum = $JAX->b['page'] ?? 0;
@@ -25,17 +36,6 @@ final class Search
             $this->form();
         }
     }
-
-    public $page = '';
-
-    public $pagenum = 0;
-
-    public $fids = [];
-
-    /**
-     * @var int
-     */
-    public $perpage;
 
     public function form(): void
     {

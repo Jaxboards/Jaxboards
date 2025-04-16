@@ -6,7 +6,9 @@ $PAGE->loadmeta('calendar');
 
 final class Calendar
 {
-    public function route()
+    public $month;
+
+    public function route(): void
     {
         global $JAX;
         if (isset($JAX->b['month'])) {
@@ -19,8 +21,6 @@ final class Calendar
 
         $this->monthview();
     }
-
-    public $month;
 
     public function monthview(): void
     {

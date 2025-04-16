@@ -6,7 +6,9 @@ $PAGE->loadmeta('logreg');
 
 final class LogReg
 {
-    public function route()
+    public $registering = false;
+
+    public function route(): void
     {
         global $JAX,$PAGE;
 
@@ -19,8 +21,6 @@ final class LogReg
             default => $this->login($JAX->p['user'], $JAX->p['pass']),
         };
     }
-
-    public $registering = false;
 
     public function register()
     {

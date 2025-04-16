@@ -432,7 +432,7 @@ if ($act === 'idx' && isset($JAX->b['module']) && $JAX->b['module']) {
     // Do nothing.
 } elseif ($act && is_file('inc/page/' . $act . '.php')) {
     require_once 'inc/page/' . $act . '.php';
-    $page = new $act;
+    $page = new $act();
     $page->route();
 } elseif (
     // @phpstan-ignore-next-line property.notFound

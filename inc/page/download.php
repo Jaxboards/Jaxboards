@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 final class Download
 {
-    public function route()
+    public function route(): void
     {
         global $JAX;
         $this->downloadFile($JAX->b['id']);
     }
 
-    public function downloadFile($id) {
+    public function downloadFile($id): void
+    {
         global $DB;
         if (is_numeric($id)) {
             $result = $DB->safeselect(

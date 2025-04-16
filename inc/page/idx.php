@@ -6,7 +6,17 @@ $PAGE->loadmeta('idx');
 
 final class IDX
 {
-    public function route()
+    public $moderatorinfo;
+
+    public $forumsread = [];
+
+    public $mods;
+
+    public $subforumids;
+
+    public $subforums;
+
+    public function route(): void
     {
         global $PAGE,$CFG,$JAX,$SESS;
         if (isset($JAX->b['markread']) && $JAX->b['markread']) {
@@ -22,16 +32,6 @@ final class IDX
             $this->viewidx();
         }
     }
-
-    public $moderatorinfo;
-
-    public $forumsread = [];
-
-    public $mods;
-
-    public $subforumids;
-
-    public $subforums;
 
     public function viewidx(): void
     {
