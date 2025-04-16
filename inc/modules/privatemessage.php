@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-new IM();
-final class IM
+final class PrivateMessage
 {
-    public function __construct()
+    public function init()
     {
         global $JAX,$DB,$PAGE,$SESS;
         $im = $JAX->p['im_im'] ?? null;

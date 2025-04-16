@@ -389,21 +389,28 @@ if (
 // Include modules.
 $modules = glob('inc/modules/*.php');
 if ($modules) {
-    foreach ($modules as $v) {
+    foreach ($modules as $module) {
         $m = [];
-        if (preg_match('/tag_(\w+)/', $v, $m)) {
+        $moduleClassName = '';
+
+        if (preg_match('/tag_(\w+)/', $module, $m)) {
+            $moduleClassName = $m[1];
             if (
-                (
+                !(
                     isset($JAX->b['module'])
-                    && $JAX->b['module'] === $m[1]
+                    && $JAX->b['module'] === $moduleClassName
                     // @phpstan-ignore-next-line method.notFound
-                ) || $PAGE->templatehas($m[1])
+                ) && !$PAGE->templatehas($moduleClassName)
             ) {
-                include $v;
+                continue;
             }
         } else {
-            include $v;
+            $moduleClassName = pathinfo($module, PATHINFO_FILENAME);
         }
+
+        require_once $module;
+        $module = new $moduleClassName;
+        $module->init();
     }
 }
 
