@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 $PAGE->loadmeta('members');
-new members();
-final class members
+
+final class Members
 {
-    public function __construct()
+    public function route()
     {
         global $JAX,$PAGE;
         if (

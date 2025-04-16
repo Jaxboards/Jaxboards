@@ -29,10 +29,10 @@ $PAGE->metadefs['buddylist-contact'] = <<<'EOT'
             </div>
     </div>
     EOT;
-new buddylist();
-final class buddylist
+
+final class BuddyList
 {
-    public function __construct()
+    public function route()
     {
         global $PAGE,$JAX,$USER;
 

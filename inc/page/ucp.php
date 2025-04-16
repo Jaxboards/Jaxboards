@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 $PAGE->loadmeta('ucp');
 
-new UCP();
 final class UCP
 {
-    public function __construct()
+    public function route()
     {
         global $PAGE,$JAX,$USER,$DB;
         if (!$USER || $USER['group_id'] === 4) {

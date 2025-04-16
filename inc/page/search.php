@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 $PAGE->loadmeta('search');
 
-new search();
-final class search
+final class Search
 {
-    public function __construct()
+    public function route()
     {
         global $PAGE,$JAX;
         $this->pagenum = $JAX->b['page'] ?? 0;

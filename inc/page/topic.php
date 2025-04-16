@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 $PAGE->loadmeta('topic');
 
-$IDX = new TOPIC();
-final class TOPIC
+final class Topic
 {
-    public function __construct()
+    public function route()
     {
         global $JAX,$PAGE;
 

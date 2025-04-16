@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 $PAGE->loadmeta('modcp');
 
-new modcontrols();
-final class modcontrols
+final class ModControls
 {
-    public function __construct()
+    public function route()
     {
         global $JAX,$PAGE,$USER;
 

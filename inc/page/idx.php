@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 $PAGE->loadmeta('idx');
-new IDX();
+
 final class IDX
 {
-    public function __construct()
+    public function route()
     {
         global $PAGE,$CFG,$JAX,$SESS;
         if (isset($JAX->b['markread']) && $JAX->b['markread']) {

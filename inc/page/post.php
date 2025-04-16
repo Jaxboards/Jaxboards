@@ -8,8 +8,7 @@ declare(strict_types=1);
 // but it's possible for people to still upload.
 $PAGE->metadefs['post-preview'] = $PAGE->meta('box', '', 'Post Preview', '%s');
 
-new POST();
-final class POST
+final class Post
 {
     public function __construct()
     {
@@ -30,7 +29,8 @@ final class POST
             $codes = $JAX->startcodetags($this->postdata);
             $this->postdata = $JAX->linkify($this->postdata);
             $this->postdata = $JAX->finishcodetags($this->postdata, $codes, true);
-            // Poor forum martyr.
+
+            // This is aliases [youtube] to [video] but it probably should not be here
             $this->postdata = str_replace('youtube]', 'video]', $this->postdata);
         }
 

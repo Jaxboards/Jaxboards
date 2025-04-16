@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 $PAGE->loadmeta('forum');
 
-$IDX = new FORUM();
-final class FORUM
+final class Forum
 {
-    public function __construct()
+    public function route()
     {
         global $JAX,$PAGE;
         if (

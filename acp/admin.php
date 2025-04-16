@@ -163,9 +163,8 @@ $act = $JAX->g['act'] ?? null;
 
 if ($act && file_exists("./pages/{$act}.php")) {
     require_once "./pages/{$act}.php";
-    $className = ucfirst($act);
 
-    $page = new $className();
+    $page = new $act();
     $page->route();
 }
 

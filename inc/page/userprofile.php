@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 $PAGE->loadmeta('userprofile');
 
-$IDX = new userprofile();
-final class userprofile
+final class UserProfile
 {
-    public function __construct()
+    public function route()
     {
         global $JAX,$PAGE;
         preg_match('@\d+@', (string) $JAX->b['act'], $m);
