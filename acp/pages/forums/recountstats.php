@@ -171,7 +171,7 @@ final class RecountStats
 
         $PAGE->addContentBox(
             'Board Statistics',
-            $PAGE->success('Board statistics recounted successfully.')
+            $PAGE->success('Board statistics recounted successfully.'),
         );
     }
 }
