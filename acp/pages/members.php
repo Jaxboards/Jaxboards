@@ -10,7 +10,7 @@ final class Members
 {
     public const string DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
 
-    function route()
+    public function route()
     {
         global $JAX,$PAGE;
         if (!isset($JAX->b['do'])) {

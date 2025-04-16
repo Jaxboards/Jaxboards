@@ -37,14 +37,11 @@ final class Posting
             ),
         );
 
-        if (!isset($JAX->b['do'])) {
-            return;
-        }
-
-        match ($JAX->b['do']) {
+        match ($JAX->b['do'] ?? '') {
             'emoticons' => $this->emoticons(),
             'postrating' => $this->postrating(),
             'wordfilter' => $this->wordfilter(),
+            default => $this->emoticons(),
         };
     }
 
