@@ -418,31 +418,19 @@ final class Topic
         if (isset($SESS->vars['multiquote']) && $SESS->vars['multiquote']) {
             $result = $DB->safespecial(
                 <<<'MySQL'
-                    SELECT p.`id` AS `id`
-                        , p.`auth_id` AS `auth_id`
-                        , p.`post` AS `post`
-                        , UNIX_TIMESTAMP(p.`date`) AS `date`
-                        , p.`showsig` AS `showsig`
-                        , p.`showemotes` AS `showemotes`
-                        , p.`tid` AS `tid`
-                        , p.`newtopic` AS `newtopic`
-                        , p.`ip` AS `ip`
-                        , UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`
-                        , p.`editby` AS `editby`
-                        , p.`rating` AS `rating`
-                        , m.`display_name` AS `name`
+                    SELECT
+                        p.`post` AS `post`,
+                        m.`display_name` AS `name`
                     FROM %t p
                     LEFT JOIN %t m
                         ON p.`auth_id` = m.`id`
                         WHERE p.`id` IN ?
-
                     MySQL,
                 ['posts', 'members'],
                 explode(',', (string) $SESS->vars['multiquote']),
             );
 
             while ($f = $DB->arow($result)) {
-                $f['ip'] = $JAX->bin2ip($f['ip']);
                 $prefilled .= '[quote=' . $f['name'] . ']' . $f['post'] . '[/quote]' . PHP_EOL;
             }
 
@@ -618,7 +606,6 @@ final class Topic
 
         $rows = '';
         while ($post = $DB->arow($query)) {
-            $post['ip'] = $JAX->bin2ip($post['ip']);
             if (!$this->firstPostID) {
                 $this->firstPostID = $post['pid'];
             }
@@ -738,9 +725,9 @@ final class Topic
                 ) : '',
                 $PERMS['can_moderate']
                     ? '<a href="?act=modcontrols&amp;do=iptools&amp;ip='
-                . $post['ip'] . '">' . $PAGE->meta(
+                . $JAX->bin2ip($post['ip']) . '">' . $PAGE->meta(
                     'topic-mod-ipbutton',
-                    $post['ip'],
+                    $JAX->bin2ip($post['ip']),
                 ) . '</a>'
                     : '',
                 $post['icon'] ? $PAGE->meta(

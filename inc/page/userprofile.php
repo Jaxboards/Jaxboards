@@ -197,9 +197,6 @@ final class UserProfile
             );
             echo $DB->error(1);
             $udata = $DB->arow($result);
-            if ($udata['ip']) {
-                $udata['ip'] = $JAX->bin2ip($udata['ip']);
-            }
             $DB->disposeresult($result);
         }
 
@@ -567,8 +564,8 @@ final class UserProfile
                 . $udata['id'] . '">PM</a></div>';
             if ($PERMS['can_moderate']) {
                 $contactdetails .= '<div>IP: <a href="'
-                    . '?act=modcontrols&do=iptools&ip=' . $udata['ip']
-                    . '">' . $udata['ip'] . '</a></div>';
+                    . '?act=modcontrols&do=iptools&ip=' . $JAX->bin2ip($udata['ip'])
+                    . '">' . $JAX->bin2ip($udata['ip']) . '</a></div>';
             }
 
             $page = $PAGE->meta(

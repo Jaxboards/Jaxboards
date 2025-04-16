@@ -275,7 +275,6 @@ final class JAX
             return $this->userData = false;
         }
 
-        $user['ip'] = $this->bin2ip($user['ip']);
         $user['birthday'] = (date('n j') === $user['birthday'] ? 1 : 0);
 
         // Password parsing.
@@ -691,10 +690,8 @@ final class JAX
             $result = $DB->safeselect(
                 [
                     'id',
-                    'ip',
                     'name',
                     'hash',
-                    'uid',
                     'size',
                     'downloads',
                 ],
@@ -707,7 +704,6 @@ final class JAX
             if (!$data) {
                 return "Attachment doesn't exist";
             }
-            $data['ip'] = $this->bin2ip($data['ip']);
 
             $this->attachmentdata[$a] = $data;
         }

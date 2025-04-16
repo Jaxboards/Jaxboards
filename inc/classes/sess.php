@@ -160,8 +160,6 @@ final class SESS
         }
 
         if (!empty($r)) {
-            $r['ip'] = $JAX->bin2ip($r['ip']);
-
             return $r;
         }
 

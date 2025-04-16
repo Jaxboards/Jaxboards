@@ -785,7 +785,7 @@ onclick="this.form.submitButton=this"/></div>
             return false;
         }
 
-        // Actually PUT THE POST IN for godsakes.
+        // Actually PUT THE POST IN!
         $DB->safeinsert(
             'posts',
             [
