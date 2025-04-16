@@ -8,7 +8,7 @@ if (!defined(INACP)) {
 
 final class Posting
 {
-    public function route()
+    public function route(): void
     {
         global $JAX, $PAGE;
 

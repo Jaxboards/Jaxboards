@@ -8,7 +8,9 @@ if (!defined(INACP)) {
 
 final class Groups
 {
-    public function route()
+    public $updatePermissions = true;
+
+    public function route(): void
     {
         global $JAX,$PAGE;
         $links = [
@@ -51,8 +53,6 @@ final class Groups
             default => $this->showperms(),
         };
     }
-
-    public $updatePermissions = true;
 
     public function updateperms($perms)
     {

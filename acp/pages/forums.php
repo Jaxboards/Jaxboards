@@ -10,77 +10,6 @@ if (!defined(INACP)) {
 
 final class Forums
 {
-    public function route()
-    {
-        global $JAX,$PAGE;
-
-        $links = [
-            'create' => 'Create Forum',
-            'createc' => 'Create Category',
-            'order' => 'Manage',
-            'recountstats' => 'Recount Statistics',
-        ];
-
-        $sidebarLinks = '';
-        foreach ($links as $do => $title) {
-            $sidebarLinks .= $PAGE->parseTemplate(
-                'sidebar-list-link.html',
-                [
-                    'title' => $title,
-                    'url' => '?act=forums&do=' . $do,
-                ],
-            ) . PHP_EOL;
-        }
-
-        $PAGE->sidebar(
-            $PAGE->parseTemplate(
-                'sidebar-list.html',
-                [
-                    'content' => $sidebarLinks,
-                ],
-            ),
-        );
-
-        if (isset($JAX->b['delete']) && $JAX->b['delete']) {
-            if (is_numeric($JAX->b['delete'])) {
-                $this->deleteforum($JAX->b['delete']);
-
-                return;
-            }
-
-            if (preg_match('@c_(\d+)@', (string) $JAX->b['delete'], $m)) {
-                $this->deletecategory($m[1]);
-
-                return;
-            }
-        } elseif (isset($JAX->b['edit']) && $JAX->b['edit']) {
-            if (is_numeric($JAX->b['edit'])) {
-                $this->createforum($JAX->b['edit']);
-
-                return;
-            }
-
-            if (preg_match('@c_(\d+)@', (string) $JAX->b['edit'], $m)) {
-                $this->createcategory($m[1]);
-
-                return;
-            }
-        }
-
-        if (!isset($JAX->g['do'])) {
-            $JAX->g['do'] = null;
-        }
-
-        match ($JAX->g['do']) {
-            'order' => $this->orderforums(),
-            'create' => $this->createforum(),
-            'createc' => $this->createcategory(),
-            'recountstats' => RecountStats::showstats(),
-            'recountstats2' => RecountStats::recountStatistics(),
-            default => $this->orderforums(),
-        };
-    }
-
     /**
      * Saves the posted tree to mysql.
      *
@@ -218,6 +147,77 @@ final class Forums
         }
 
         return '';
+    }
+
+    public function route(): void
+    {
+        global $JAX,$PAGE;
+
+        $links = [
+            'create' => 'Create Forum',
+            'createc' => 'Create Category',
+            'order' => 'Manage',
+            'recountstats' => 'Recount Statistics',
+        ];
+
+        $sidebarLinks = '';
+        foreach ($links as $do => $title) {
+            $sidebarLinks .= $PAGE->parseTemplate(
+                'sidebar-list-link.html',
+                [
+                    'title' => $title,
+                    'url' => '?act=forums&do=' . $do,
+                ],
+            ) . PHP_EOL;
+        }
+
+        $PAGE->sidebar(
+            $PAGE->parseTemplate(
+                'sidebar-list.html',
+                [
+                    'content' => $sidebarLinks,
+                ],
+            ),
+        );
+
+        if (isset($JAX->b['delete']) && $JAX->b['delete']) {
+            if (is_numeric($JAX->b['delete'])) {
+                $this->deleteforum($JAX->b['delete']);
+
+                return;
+            }
+
+            if (preg_match('@c_(\d+)@', (string) $JAX->b['delete'], $m)) {
+                $this->deletecategory($m[1]);
+
+                return;
+            }
+        } elseif (isset($JAX->b['edit']) && $JAX->b['edit']) {
+            if (is_numeric($JAX->b['edit'])) {
+                $this->createforum($JAX->b['edit']);
+
+                return;
+            }
+
+            if (preg_match('@c_(\d+)@', (string) $JAX->b['edit'], $m)) {
+                $this->createcategory($m[1]);
+
+                return;
+            }
+        }
+
+        if (!isset($JAX->g['do'])) {
+            $JAX->g['do'] = null;
+        }
+
+        match ($JAX->g['do']) {
+            'order' => $this->orderforums(),
+            'create' => $this->createforum(),
+            'createc' => $this->createcategory(),
+            'recountstats' => RecountStats::showstats(),
+            'recountstats2' => RecountStats::recountStatistics(),
+            default => $this->orderforums(),
+        };
     }
 
     public function orderforums($highlight = 0): void
