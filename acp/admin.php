@@ -162,9 +162,11 @@ $PAGE->addNavMenu(
 $act = $JAX->g['act'] ?? null;
 
 if ($act && file_exists("./pages/{$act}.php")) {
-    include_once "./pages/{$act}.php";
+    require_once "./pages/{$act}.php";
     $className = ucfirst($act);
-    new $className();
+
+    $page = new $className();
+    $page->route();
 }
 
 $PAGE->out();

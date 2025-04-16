@@ -10,7 +10,7 @@ if (!defined(INACP)) {
 
 final class Forums
 {
-    public function __construct()
+    public function route()
     {
         global $JAX,$PAGE;
 

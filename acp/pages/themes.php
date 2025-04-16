@@ -8,7 +8,7 @@ if (!defined(INACP)) {
 
 final class Themes
 {
-    public function __construct()
+    public function route()
     {
         global $PAGE,$JAX,$CFG;
 

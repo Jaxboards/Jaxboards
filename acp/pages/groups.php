@@ -8,7 +8,7 @@ if (!defined(INACP)) {
 
 final class Groups
 {
-    public function __construct()
+    public function route()
     {
         global $JAX,$PAGE;
         $links = [

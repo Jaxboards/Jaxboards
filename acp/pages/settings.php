@@ -8,7 +8,7 @@ if (!defined(INACP)) {
 
 final class Settings
 {
-    public function __construct()
+    public function route()
     {
         global $JAX, $PAGE;
 
