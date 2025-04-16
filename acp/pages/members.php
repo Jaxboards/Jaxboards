@@ -9,6 +9,8 @@ if (!defined(INACP)) {
 new members();
 final class members
 {
+    public const string DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
+
     public function __construct()
     {
         global $JAX,$PAGE;
@@ -65,8 +67,6 @@ final class members
             ),
         );
     }
-
-    public const string DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
 
     public function showmain(): void
     {
