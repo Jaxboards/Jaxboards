@@ -64,6 +64,9 @@
         <element key="phpunit before" value="setUp, @before, #PHPUnit\Framework\Attributes\Before"/>
       </property>
       <property name="groups" type="array">
+        <element value="constructor"/>
+        <element value="destructor"/>
+
         <!-- first things that apply to the class -->
         <element value="uses"/>
         <element value="enum cases"/>
@@ -87,8 +90,6 @@
         <element value="public properties"/>
         <element value="protected properties"/>
         <element value="private properties"/>
-        <element value="constructor"/>
-        <element value="destructor"/>
         <element value="magic methods"/>
         <element value="phpunit before"/>
         <element value="public methods"/>
