@@ -9,8 +9,6 @@ if (!defined(INACP)) {
 new groups();
 final class groups
 {
-    public $updatePermissions = true;
-
     public function __construct()
     {
         global $JAX,$PAGE;
@@ -54,6 +52,8 @@ final class groups
             default => $this->showperms(),
         };
     }
+
+    public $updatePermissions = true;
 
     public function updateperms($perms)
     {

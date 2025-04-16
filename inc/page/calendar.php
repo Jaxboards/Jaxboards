@@ -6,8 +6,6 @@ $PAGE->loadmeta('calendar');
 new CALENDAR();
 final class CALENDAR
 {
-    public $month;
-
     public function __construct()
     {
         global $JAX;
@@ -21,6 +19,8 @@ final class CALENDAR
 
         $this->monthview();
     }
+
+    public $month;
 
     public function monthview(): void
     {

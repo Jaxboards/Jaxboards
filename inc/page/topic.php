@@ -7,26 +7,6 @@ $PAGE->loadmeta('topic');
 $IDX = new TOPIC();
 final class TOPIC
 {
-    public $id = 0;
-
-    /**
-     * @var int
-     */
-    public $page = '';
-
-    /**
-     * @var int
-     */
-    public $numperpage = 0;
-
-    public $canmod = false;
-
-    public $firstPostID = 0;
-
-    public $lastPostID;
-
-    public $topicdata;
-
     public function __construct()
     {
         global $JAX,$PAGE;
@@ -90,6 +70,26 @@ final class TOPIC
             $this->viewtopic($id);
         }
     }
+
+    public $id = 0;
+
+    /**
+     * @var int
+     */
+    public $page = '';
+
+    /**
+     * @var int
+     */
+    public $numperpage = 0;
+
+    public $canmod = false;
+
+    public $firstPostID = 0;
+
+    public $lastPostID;
+
+    public $topicdata;
 
     public function getTopicData($id): void
     {

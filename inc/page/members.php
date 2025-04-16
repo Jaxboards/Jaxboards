@@ -6,13 +6,6 @@ $PAGE->loadmeta('members');
 new members();
 final class members
 {
-    /**
-     * @var float|int
-     */
-    public $page = 0;
-
-    public $perpage = 20;
-
     public function __construct()
     {
         global $JAX,$PAGE;
@@ -30,6 +23,13 @@ final class members
 
         $this->showmemberlist();
     }
+
+    /**
+     * @var float|int
+     */
+    public $page = 0;
+
+    public $perpage = 20;
 
     public function showmemberlist(): void
     {

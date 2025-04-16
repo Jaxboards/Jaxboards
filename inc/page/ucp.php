@@ -7,16 +7,6 @@ $PAGE->loadmeta('ucp');
 new UCP();
 final class UCP
 {
-    public $what = '';
-
-    public $runscript = false;
-
-    public $shownucp = false;
-
-    public $ucppage = '';
-
-    public $showentirething;
-
     public function __construct()
     {
         global $PAGE,$JAX,$USER,$DB;
@@ -195,6 +185,16 @@ final class UCP
 
         $this->showucp();
     }
+
+    public $what = '';
+
+    public $runscript = false;
+
+    public $shownucp = false;
+
+    public $ucppage = '';
+
+    public $showentirething;
 
     public function getlocationforform()
     {

@@ -7,19 +7,6 @@ $PAGE->loadmeta('forum');
 $IDX = new FORUM();
 final class FORUM
 {
-    public $topicsRead = [];
-
-    public $forumsRead = [];
-
-    public $forumReadTime = 0;
-
-    public $numperpage = 20;
-
-    /**
-     * @var float|int
-     */
-    public $page = 0;
-
     public function __construct()
     {
         global $JAX,$PAGE;
@@ -59,6 +46,19 @@ final class FORUM
 
         $this->viewforum($act[2]);
     }
+
+    public $topicsRead = [];
+
+    public $forumsRead = [];
+
+    public $forumReadTime = 0;
+
+    public $numperpage = 20;
+
+    /**
+     * @var float|int
+     */
+    public $page = 0;
 
     public function viewforum($fid)
     {

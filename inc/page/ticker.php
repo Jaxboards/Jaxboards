@@ -6,8 +6,6 @@ $PAGE->loadmeta('ticker');
 new ticker();
 final class ticker
 {
-    public $maxticks = 60;
-
     public function __construct()
     {
         global $PAGE;
@@ -17,6 +15,8 @@ final class ticker
             $this->update();
         }
     }
+
+    public $maxticks = 60;
 
     public function index(): void
     {

@@ -4,6 +4,14 @@ declare(strict_types=1);
 
 final class JAX
 {
+    public function __construct()
+    {
+        $this->c = $this->filterInput($_COOKIE);
+        $this->g = $this->filterInput($_GET);
+        $this->p = $this->filterInput($_POST);
+        $this->b = array_merge($this->p, $this->g);
+    }
+
     public static function json_encode($a, $forceaa = false)
     {
         if ($forceaa) {
@@ -77,14 +85,6 @@ final class JAX
     public $ipbancache;
 
     public $emoteRules;
-
-    public function __construct()
-    {
-        $this->c = $this->filterInput($_COOKIE);
-        $this->g = $this->filterInput($_GET);
-        $this->p = $this->filterInput($_POST);
-        $this->b = array_merge($this->p, $this->g);
-    }
 
     public function between($a, $b, $c): bool
     {

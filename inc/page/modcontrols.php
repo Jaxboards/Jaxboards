@@ -7,25 +7,6 @@ $PAGE->loadmeta('modcp');
 new modcontrols();
 final class modcontrols
 {
-    public static function load(): void
-    {
-        global $PAGE;
-        $script = file_get_contents('dist/modcontrols.js');
-        if (!$PAGE || !$PAGE->jsaccess) {
-            header('Content-Type: application/javascript; charset=utf-8');
-            header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 2_592_000) . ' GMT');
-
-            echo $script;
-
-            exit(0);
-        }
-
-        $PAGE->JS('softurl');
-        $PAGE->JS('script', $script);
-    }
-
-    public $perms;
-
     public function __construct()
     {
         global $JAX,$PAGE,$USER;
@@ -97,6 +78,25 @@ final class modcontrols
             default:
         }
     }
+
+    public static function load(): void
+    {
+        global $PAGE;
+        $script = file_get_contents('dist/modcontrols.js');
+        if (!$PAGE || !$PAGE->jsaccess) {
+            header('Content-Type: application/javascript; charset=utf-8');
+            header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 2_592_000) . ' GMT');
+
+            echo $script;
+
+            exit(0);
+        }
+
+        $PAGE->JS('softurl');
+        $PAGE->JS('script', $script);
+    }
+
+    public $perms;
 
     public function dotopics($do): void
     {

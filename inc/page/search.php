@@ -7,17 +7,6 @@ $PAGE->loadmeta('search');
 new search();
 final class search
 {
-    public $page = '';
-
-    public $pagenum = 0;
-
-    public $fids = [];
-
-    /**
-     * @var int
-     */
-    public $perpage;
-
     public function __construct()
     {
         global $PAGE,$JAX;
@@ -37,6 +26,17 @@ final class search
             $this->form();
         }
     }
+
+    public $page = '';
+
+    public $pagenum = 0;
+
+    public $fids = [];
+
+    /**
+     * @var int
+     */
+    public $perpage;
 
     public function form(): void
     {

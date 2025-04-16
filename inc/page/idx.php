@@ -6,16 +6,6 @@ $PAGE->loadmeta('idx');
 new IDX();
 final class IDX
 {
-    public $moderatorinfo;
-
-    public $forumsread = [];
-
-    public $mods;
-
-    public $subforumids;
-
-    public $subforums;
-
     public function __construct()
     {
         global $PAGE,$CFG,$JAX,$SESS;
@@ -32,6 +22,16 @@ final class IDX
             $this->viewidx();
         }
     }
+
+    public $moderatorinfo;
+
+    public $forumsread = [];
+
+    public $mods;
+
+    public $subforumids;
+
+    public $subforums;
 
     public function viewidx(): void
     {

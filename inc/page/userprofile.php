@@ -7,21 +7,6 @@ $PAGE->loadmeta('userprofile');
 $IDX = new userprofile();
 final class userprofile
 {
-    public $num_activity = 30;
-
-    public $contacturls = [
-        'aim' => 'aim:goaim?screenname=%s',
-        'bluesky' => 'https://bsky.app/profile/%s.bsky.social',
-        'discord' => 'discord:%s',
-        'googlechat' => 'gchat:chat?jid=%s',
-        'msn' => 'msnim:chat?contact=%s',
-        'skype' => 'skype:%s',
-        'steam' => 'https://steamcommunity.com/id/%s',
-        'twitter' => 'https://twitter.com/%s',
-        'yim' => 'ymsgr:sendim?%s',
-        'youtube' => 'https://youtube.com/%s',
-    ];
-
     public function __construct()
     {
         global $JAX,$PAGE;
@@ -43,6 +28,21 @@ final class userprofile
             $this->showfullprofile($id);
         }
     }
+
+    public $num_activity = 30;
+
+    public $contacturls = [
+        'aim' => 'aim:goaim?screenname=%s',
+        'bluesky' => 'https://bsky.app/profile/%s.bsky.social',
+        'discord' => 'discord:%s',
+        'googlechat' => 'gchat:chat?jid=%s',
+        'msn' => 'msnim:chat?contact=%s',
+        'skype' => 'skype:%s',
+        'steam' => 'https://steamcommunity.com/id/%s',
+        'twitter' => 'https://twitter.com/%s',
+        'yim' => 'ymsgr:sendim?%s',
+        'youtube' => 'https://youtube.com/%s',
+    ];
 
     public function showcontactcard($id): void
     {

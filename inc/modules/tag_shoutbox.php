@@ -7,8 +7,6 @@ $PAGE->loadmeta('shoutbox');
 new SHOUTBOX();
 final class SHOUTBOX
 {
-    public $shoutlimit;
-
     public function __construct()
     {
         global $PAGE,$JAX,$CFG,$PERMS;
@@ -50,6 +48,8 @@ final class SHOUTBOX
             $this->updateshoutbox();
         }
     }
+
+    public $shoutlimit;
 
     public function canDelete($id, $shoutrow = false)
     {

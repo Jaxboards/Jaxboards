@@ -6,8 +6,6 @@ $PAGE->loadmeta('logreg');
 $IDX = new LOGREG();
 final class LOGREG
 {
-    public $registering = false;
-
     public function __construct()
     {
         global $JAX,$PAGE;
@@ -21,6 +19,8 @@ final class LOGREG
             default => $this->login($JAX->p['user'], $JAX->p['pass']),
         };
     }
+
+    public $registering = false;
 
     public function register()
     {
