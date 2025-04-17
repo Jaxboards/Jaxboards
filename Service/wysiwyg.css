@@ -1,4 +1,5 @@
 .editorframe {
+  width: 100%;
   background: #fff;
   border: 1px solid #000;
 }
@@ -6,9 +7,6 @@
 .editbar {
   display: block;
   text-align: left;
-  background: url('wysiwygbar.png') bottom right;
-  width: 800px;
-  height: 24px;
   overflow: hidden;
 }
 

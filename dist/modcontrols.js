@@ -1450,8 +1450,6 @@
       this.editbar = document.createElement('div');
       this.buildEditBar();
 
-      this.editbar.style.width = `${element.clientWidth + 2}px`;
-      iframe.style.width = `${element.clientWidth}px`;
       iframe.style.height = `${element.clientHeight}px`;
 
       insertBefore(this.editbar, element);
