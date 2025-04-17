@@ -16,6 +16,10 @@
   display: inline-block;
 }
 
+.editbar a:hover {
+  background-position-y: -24px;
+}
+
 .editbar .bold {
   width: 32px;
 }
@@ -122,10 +126,6 @@
   background-position: -549px 0;
 }
 
-.editbar a:hover {
-  background-position-y: -24px;
-}
-
 .emotewin {
   height: 200px;
   width: 150px;
@@ -133,7 +133,7 @@
   background: #eef;
   border: 1px solid #000;
 }
-
+/* stylelint-disable no-descending-specificity */
 .emotewin a {
   border-bottom: 1px solid #ccf;
   display: block;
@@ -144,6 +144,7 @@
 .emotewin a:hover {
   background: #ccf;
 }
+/* stylelint-enable no-descending-specificity */
 
 .emotewin a img {
   border: 0;
