@@ -1374,7 +1374,6 @@ textarea {
 
 #intopic .edit,
 #intopic .quotepost {
-  margin-left: 10px;
   padding-left: 18px;
   padding-bottom: 2px;
   background: url('icons/posticons.png') no-repeat top left;
@@ -1393,33 +1392,38 @@ textarea {
   background-position: 0 -32px;
 }
 
-/* stylelint-disable no-descending-specificity */
 #intopic .post {
   line-height: 140%;
   background: #fff;
   max-width: 700px;
 }
-/* stylelint-enable no-descending-specificity */
 
-#intopic .post .attachment {
+#intopic .attachment {
   font-size: smaller;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
-#intopic .post .post_content {
+#intopic .post_content {
   padding: 20px;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
-#intopic .post .post_buttons {
+#intopic .posttop {
+  margin-left: 10px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+#intopic .post_buttons {
+  flex: 1;
+  display: flex;
+  gap: 5px;
+
+  white-space: no-wrap;
   font-size: smaller;
-  float: left;
   text-align: left;
   padding: 4px;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
-#intopic .post .post_info {
+#intopic .post_info {
   padding: 4px;
   text-align: right;
   color: #55c;
