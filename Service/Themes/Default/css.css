@@ -1196,7 +1196,7 @@ textarea {
 /* stylelint-disable-next-line selector-class-pattern */
 .forumindex .item_2 {
   width: 10vw;
-  max-width: 65px;
+  max-width: 75px;
   text-align: center;
   background-color: #ececff;
 }
