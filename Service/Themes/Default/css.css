@@ -493,11 +493,18 @@ textarea {
   max-width: 700px;
 }
 
+#shoutbox .shoutbox {
+  display: flex;
+  flex-wrap: wrap;
+}
+#shoutbox .shouts {
+  flex: 1;
+  min-width: 200px;
+}
 #shoutbox .shoutform {
-  background: url('img/shade.png') bottom repeat-x #fff;
+  align-content: center;
   padding: 20px;
-  width: 220px;
-  margin-top: 30px;
+  width: 200px;
 }
 
 /* stylelint-disable no-descending-specificity */
