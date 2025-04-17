@@ -470,17 +470,9 @@ textarea {
   background: none;
 }
 
-#shoutbox .content table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-#shoutbox .shout.highlight {
-  background: #ff0;
-}
-
-#shoutbox .shout {
-  background: #eef;
+#shoutbox .shoutbox {
+  display: flex;
+  flex-wrap: wrap;
 }
 
 #shoutbox .shouts {
@@ -491,16 +483,18 @@ textarea {
     1.4rem Arial,
     sans-serif;
   max-width: 700px;
-}
-
-#shoutbox .shoutbox {
-  display: flex;
-  flex-wrap: wrap;
-}
-#shoutbox .shouts {
   flex: 1;
   min-width: 200px;
 }
+
+#shoutbox .shout {
+  background: #eef;
+}
+
+#shoutbox .shout.highlight {
+  background: #ff0;
+}
+
 #shoutbox .shoutform {
   align-content: center;
   padding: 20px;
