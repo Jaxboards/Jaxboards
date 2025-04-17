@@ -10,7 +10,26 @@ $PAGE->metadefs['post-preview'] = $PAGE->meta('box', '', 'Post Preview', '%s');
 
 final class Post
 {
-    public function route()
+    public $canmod;
+
+    public $postdata = '';
+
+    public $postpreview = '';
+
+    /**
+     * @var false
+     */
+    public $nopost = true;
+
+    public $tid;
+
+    public $fid;
+
+    public $pid;
+
+    public $how;
+
+    public function route(): void
     {
         global $JAX,$PAGE;
         $this->tid = $JAX->b['tid'] ?? 0;
@@ -66,25 +85,6 @@ final class Post
             $PAGE->location('?');
         }
     }
-
-    public $canmod;
-
-    public $postdata = '';
-
-    public $postpreview = '';
-
-    /**
-     * @var false
-     */
-    public $nopost = true;
-
-    public $tid;
-
-    public $fid;
-
-    public $pid;
-
-    public $how;
 
     public function upload($fileobj, $uid = false): string
     {
