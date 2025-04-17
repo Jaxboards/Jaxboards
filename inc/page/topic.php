@@ -704,6 +704,7 @@ final class Topic
                 $post['title'],
                 $post['auth_id'],
                 $postbuttons,
+                // ^10
                 $JAX->date($post['date']),
                 '<a href="?act=vt' . $this->id . '&amp;findpost=' . $post['pid']
                 . '" onclick="prompt(\'Link to this post:\',this.href)">'
@@ -736,6 +737,7 @@ final class Topic
                 ) : '',
                 ++$topic_post_counter,
                 $postrating,
+                // 30 V
                 $post['contact_skype'] ?? '',
                 $post['contact_discord'] ?? '',
                 $post['contact_yim'] ?? '',
