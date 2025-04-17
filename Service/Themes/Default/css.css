@@ -1392,16 +1392,19 @@ textarea {
   background-position: 0 -32px;
 }
 
+/* stylelint-disable no-descending-specificity */
 #intopic .post {
   line-height: 140%;
   background: #fff;
   max-width: 700px;
 }
+/* stylelint-enable no-descending-specificity */
 
 #intopic .attachment {
   font-size: smaller;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 #intopic .post_content {
   padding: 20px;
 }
@@ -1412,17 +1415,17 @@ textarea {
   flex-wrap: wrap;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 #intopic .post_buttons {
   flex: 1;
   display: flex;
   gap: 5px;
-
-  white-space: no-wrap;
   font-size: smaller;
   text-align: left;
   padding: 4px;
 }
 
+/* stylelint-disable-next-line selector-class-pattern */
 #intopic .post_info {
   padding: 4px;
   text-align: right;
