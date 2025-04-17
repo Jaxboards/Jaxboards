@@ -10,7 +10,7 @@ $PAGE->metadefs['post-preview'] = $PAGE->meta('box', '', 'Post Preview', '%s');
 
 final class Post
 {
-    public function __construct()
+    public function route()
     {
         global $JAX,$PAGE;
         $this->tid = $JAX->b['tid'] ?? 0;
