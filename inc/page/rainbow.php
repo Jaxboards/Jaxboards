@@ -11,6 +11,7 @@ final class Rainbow
             let i = 0;
             if (window.rainbow) {
                 clearInterval(window.rainbow);
+                window.rainbow = null;
             } else {
                 window.rainbow=setInterval(() => document.documentElement.style.filter = 'hue-rotate(' + (++i) + 'deg)', 1000/60);
             }
