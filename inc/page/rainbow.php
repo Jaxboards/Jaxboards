@@ -16,5 +16,6 @@ final class Rainbow
                 window.rainbow=setInterval(() => document.documentElement.style.filter = 'hue-rotate(' + (++i) + 'deg)', 1000/60);
             }
         })()");
+        $PAGE->JS('playsound', 'always', './Sounds/always.mp3');
     }
 }
