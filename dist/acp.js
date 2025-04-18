@@ -246,10 +246,6 @@
     return e;
   }
 
-  // TODO: There are places in the source that are using this to store a callback
-  // Refactor this
-  Event$1.onPageChange = function onPageChange() {};
-
   class Drag {
     constructor() {
       this.droppables = [];

@@ -324,10 +324,6 @@
     return e;
   }
 
-  // TODO: There are places in the source that are using this to store a callback
-  // Refactor this
-  Event$1.onPageChange = function onPageChange() {};
-
   const maxDimension = '999999px';
 
   function makeResizer(iw, nw, ih, nh, img) {
@@ -2969,7 +2965,6 @@
     }
   }
 
-  // TODO: Make these not globally defined
   assign(window, {
     RUN: RUN$1,
     IMWindow,

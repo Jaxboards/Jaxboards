@@ -74,7 +74,6 @@ final class Themes
                 continue;
             }
 
-            // TODO: better file extension truncation
             $wrappers[] = pathinfo($f, PATHINFO_FILENAME);
         }
 

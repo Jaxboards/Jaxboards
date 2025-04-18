@@ -1,6 +1,3 @@
-// TODO: Create an instance for this state
-// instead of abusing the module
-
 let flashInterval;
 let originalTitle = '';
 let lastTitle = '';

@@ -127,7 +127,6 @@ final class Search
         return $r;
     }
 
-    // TODO: use strtotime instead?
     public function pdate($a): false|int
     {
         $dayMonthYear = explode('/', (string) $a);

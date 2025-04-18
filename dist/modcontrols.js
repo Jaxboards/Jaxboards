@@ -43,10 +43,6 @@
     return e;
   }
 
-  // TODO: There are places in the source that are using this to store a callback
-  // Refactor this
-  Event$1.onPageChange = function onPageChange() {};
-
   function getComputedStyle(a, b) {
     if (!a) return false;
     if (a.currentStyle) return a.currentStyle;
@@ -2338,9 +2334,6 @@
 
   /* global RUN */
 
-  // TODO: Find a place for this state
-  let onPageChangeOld;
-
   const postIDs = function fetchPIDs(a) {
     let pids = [];
     if (a[0] && (typeof a[0] === 'string' || typeof a[0] === 'number')) {
@@ -2418,7 +2411,6 @@
 
         modcontrols_move: (act) => {
           const whichone = parseInt((act && act[0]) || this.whichone, 10);
-          if (!this.busy && onPageChangeOld) ;
           this.whichone = whichone;
           window.addEventListener('pushstate', this.boundCheckLocation);
           this.createModControls(
@@ -2479,7 +2471,6 @@
 
     destroyModControls() {
       window.removeEventListener('pushstate', this.boundCheckLocation);
-      Event$1.onPageChange = null;
       if (this.modb) {
         this.modb.innerHTML = '';
         this.modb.style.display = 'none';
