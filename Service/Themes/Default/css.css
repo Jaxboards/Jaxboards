@@ -918,6 +918,7 @@ textarea {
 
 .navigation .spacer {
   flex: 1;
+  padding: 0;
 }
 
 .navigation ul li.active {
