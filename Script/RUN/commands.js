@@ -267,9 +267,9 @@ export default {
         status ? ` ${status}` : ''
       }`;
       if (tooltip) {
-        link.onmouseover = () => openTooltip(link, link.title);
+        link.title = tooltip;
+        link.onmouseover = () => openTooltip(link, tooltip);
       }
-      link.title = tooltip;
       if (status !== 'idle') {
         if (statusers.firstChild) {
           statusers.insertBefore(link, statusers.firstChild);
