@@ -867,8 +867,8 @@ textarea {
 
 .head {
   height: 158px;
-  background: #1D72D0;
-  background-image: linear-gradient(#1D72D0, #2C476D, #1D72D0);
+  background: #1d72d0;
+  background-image: linear-gradient(#1d72d0, #2c476d, #1d72d0);
   box-sizing: border-box;
   padding: 10px;
   padding-bottom: 0;
@@ -878,22 +878,21 @@ textarea {
 .head::before {
   content: '';
   position: absolute;
-  top: 3px;
-  right: 3px;
-  bottom: 3px;
-  left: 3px;
-  background-image: linear-gradient(#75A7E0 5%, #3F5677 50%, #275690 70%, #1D72D0 85%);
-  filter: blur(1px)
+  inset: 3px;
+  background-image: linear-gradient(
+    #75a7e0 5%,
+    #3f5677 50%,
+    #275690 70%,
+    #1d72d0 85%
+  );
+  filter: blur(1px);
 }
 
 .head::after {
   content: '';
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-image: linear-gradient(#2C476D 50%, rgba(29,114,208, 0.5));
+  inset: 0;
+  background-image: linear-gradient(#2c476d 50%, rgb(29 114 208 / 50%));
   clip-path: ellipse(60% 50% at 50% 100%);
 }
 
@@ -972,11 +971,11 @@ textarea {
 
 /* UserBox */
 #userbox {
-  background: rgba(27,46,79,0.5);
-  border-image: linear-gradient(#435F80 20%, #7EAEE4) 1;
+  background: rgb(27 46 79 / 50%);
+  border-image: linear-gradient(#435f80 20%, #7eaee4) 1;
   border-style: solid;
   border-width: 3px;
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+  box-shadow: 2px 2px 5px rgb(0 0 0 / 40%);
   box-sizing: border-box;
   color: #fff;
   height: calc(100% - 20px);
