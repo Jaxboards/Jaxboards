@@ -1001,7 +1001,8 @@ textarea {
 }
 
 /* stylelint-disable no-descending-specificity */
-#userbox .logout, #userbox .register {
+#userbox .logout,
+#userbox .register {
   color: #0ff;
 }
 /* stylelint-enable no-descending-specificity */
