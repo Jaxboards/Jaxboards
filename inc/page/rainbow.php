@@ -1,6 +1,10 @@
 <?php
-class Rainbow {
-    public function route() {
+
+declare(strict_types=1);
+final class Rainbow
+{
+    public function route(): void
+    {
         global $PAGE;
         $PAGE->JS('softurl');
         $PAGE->JS('script', "(function() {
@@ -13,4 +17,3 @@ class Rainbow {
         })()");
     }
 }
-?>
