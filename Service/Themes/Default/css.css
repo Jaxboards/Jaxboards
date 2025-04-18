@@ -868,6 +868,7 @@ textarea {
 .head {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   min-height: 158px;
   background: #1d72d0;
   background-image: linear-gradient(#1d72d0, #2c476d, #1d72d0);
