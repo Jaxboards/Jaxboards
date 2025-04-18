@@ -169,10 +169,7 @@ if (
 }
 
 // If the user's navigated to a new page, change their action time.
-if (
-    $PAGE->jsnewlocation
-    || !$PAGE->jsaccess
-) {
+if ($PAGE->jsnewlocation || !$PAGE->jsaccess) {
     $SESS->act($JAX->b['act'] ?? null);
 }
 
@@ -395,10 +392,7 @@ if ($act === 'idx' && isset($JAX->b['module']) && $JAX->b['module']) {
     require_once 'inc/page/' . $act . '.php';
     $page = new $act();
     $page->route();
-} elseif (
-    !$PAGE->jsaccess
-    || $PAGE->jsnewlocation
-) {
+} elseif (!$PAGE->jsaccess || $PAGE->jsnewlocation) {
     $result = $DB->safeselect(
         ['page'],
         'pages',
