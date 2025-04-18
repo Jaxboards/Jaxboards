@@ -14,8 +14,6 @@ final class UCP
 
     public $ucppage = '';
 
-    public $showentirething;
-
     public function route(): void
     {
         global $PAGE,$JAX,$USER,$DB;
@@ -151,7 +149,6 @@ final class UCP
             trim((string) $USER['ucpnotepad']) !== '' && trim((string) $USER['ucpnotepad']) !== '0'
             ? $JAX->blockhtml($USER['ucpnotepad']) : 'Personal notes go here.',
         );
-        $this->showentirething = true;
         $this->showucp();
     }
 
@@ -1169,16 +1166,9 @@ final class UCP
         if ($messageid) {
             $result = $DB->safeselect(
                 [
-                    'del_recipient',
-                    'del_sender',
-                    'flag',
-                    'from',
-                    'id',
+                    '`from`',
                     'message',
-                    'read',
                     'title',
-                    'to',
-                    'UNIX_TIMESTAMP(`date`) AS `date`',
                 ],
                 'messages',
                 'WHERE (`to`=? OR `from`=?) AND `id`=?',
@@ -1253,16 +1243,10 @@ final class UCP
         global $PAGE,$JAX,$DB,$USER;
         $result = $DB->safeselect(
             [
-                'id',
-                'to',
-                'from',
-                'title',
-                'message',
-                'read',
-                'date',
+                '`to`',
+                '`from`',
                 'del_recipient',
                 'del_sender',
-                'flag',
             ],
             'messages',
             'WHERE `id`=?',
@@ -1298,15 +1282,7 @@ final class UCP
         $result = $DB->safeselect(
             [
                 'del_recipient',
-                'del_sender',
-                'flag',
-                'from',
-                'id',
-                'message',
-                'read',
-                'title',
-                'to',
-                'UNIX_TIMESTAMP(`date`) AS `date`',
+                'del_sender'
             ],
             'messages',
             'WHERE `id`=?',
