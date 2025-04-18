@@ -609,9 +609,7 @@
         resultsContainer = assign(document.createElement('div'), {
           id: 'autocomplete',
         });
-        // TODO: move static properties to CSS
         assign(resultsContainer.style, {
-          position: 'absolute',
           zIndex: getHighestZIndex(),
         });
         document.body.appendChild(resultsContainer);

@@ -623,9 +623,7 @@
         resultsContainer = assign(document.createElement('div'), {
           id: 'autocomplete',
         });
-        // TODO: move static properties to CSS
         assign(resultsContainer.style, {
-          position: 'absolute',
           zIndex: getHighestZIndex(),
         });
         document.body.appendChild(resultsContainer);
@@ -2346,9 +2344,6 @@
     });
   }
 
-  // TODO: Create an instance for this state
-  // instead of abusing the module
-
   let flashInterval;
   let originalTitle = '';
   let lastTitle = '';
@@ -2672,9 +2667,7 @@
         status ? ` ${status}` : ''
       }`;
         if (tooltip) {
-          link.onmouseover = function () {
-            toolTip(this, this.title);
-          };
+          link.onmouseover = () => toolTip(link, link.title);
         }
         link.title = tooltip;
         if (status !== 'idle') {
