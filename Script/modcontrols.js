@@ -1,5 +1,4 @@
 /* global RUN */
-import Event from './JAX/event';
 import gracefulDegrade from './JAX/graceful-degrade';
 import { assign, onDOMReady } from './JAX/util';
 
