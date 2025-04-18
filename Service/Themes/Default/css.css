@@ -2291,7 +2291,7 @@ a.mgroup4 {
 
 /* AutoComplete */
 #autocomplete {
-  position: 'absolute';
+  position: absolute;
   border: 1px solid #000;
   background: #eef;
   text-align: left;
