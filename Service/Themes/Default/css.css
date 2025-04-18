@@ -497,7 +497,7 @@ textarea {
 
 #shoutbox .shoutform {
   align-content: center;
-  padding: 20px;
+  margin: 10px 20px;
 }
 
 /* stylelint-disable no-descending-specificity */
