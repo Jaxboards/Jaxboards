@@ -866,34 +866,63 @@ textarea {
 }
 
 .head {
-  height: 200px;
+  height: 158px;
+  background: #1D72D0;
+  background-image: linear-gradient(#1D72D0, #2C476D, #1D72D0);
+  box-sizing: border-box;
   padding: 10px;
   padding-bottom: 0;
-  background: url('img/jbhead.png') no-repeat;
   position: relative;
 }
 
-.navigation {
-  overflow-y: auto;
+.head::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  bottom: 3px;
+  left: 3px;
+  background-image: linear-gradient(#75A7E0 5%, #3F5677 50%, #275690 70%, #1D72D0 85%);
+  filter: blur(1px)
+}
+
+.head::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-image: linear-gradient(#2C476D 50%, rgba(29,114,208, 0.5));
+  clip-path: ellipse(60% 50% at 50% 100%);
 }
 
 .navigation ul {
   list-style-type: none;
   padding: 0;
   margin: 0;
-  height: 41px;
+  width: 100%;
   display: flex;
+  flex-wrap: wrap;
 }
 
 .navigation ul li {
-  margin: 1px 0 0 1px;
+  margin-right: 1px;
   padding: 11px 20px;
   white-space: nowrap;
-  background: url('img/seperator.png') no-repeat top right;
+  background: linear-gradient(#2f2f2f, black);
+  border-width: 1px;
+  border-style: solid;
+  border-image: linear-gradient(white, #393939) 1;
+  border-bottom: 0;
+}
+
+.navigation .spacer {
+  flex: 1;
 }
 
 .navigation ul li.active {
-  background: url('img/nav_blue.png') no-repeat top right;
+  background: linear-gradient(#384b61, #22354b);
 }
 
 /* stylelint-disable no-descending-specificity */
@@ -916,7 +945,6 @@ textarea {
 #body {
   background: #fff;
   padding-bottom: 20px;
-  margin: 0 9px;
   box-shadow:
     rgb(0 0 0 / 20%) -5px 0 2px,
     rgb(0 0 0 / 20%) 5px 0 2px;
@@ -930,9 +958,10 @@ textarea {
 
 /* Logo */
 #logo {
-  clear: both;
+  position: relative;
+  z-index: 1;
   margin-left: 40px;
-  line-height: 155px;
+  line-height: 140px;
 }
 
 /* stylelint-disable no-descending-specificity */
@@ -943,13 +972,19 @@ textarea {
 
 /* UserBox */
 #userbox {
-  padding: 15px;
+  background: rgba(27,46,79,0.5);
+  border-image: linear-gradient(#435F80 20%, #7EAEE4) 1;
+  border-style: solid;
+  border-width: 3px;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+  box-sizing: border-box;
   color: #fff;
+  height: calc(100% - 20px);
   position: absolute;
-  top: 65px;
-  right: 28px;
-  width: 209px;
-  height: 102px;
+  padding: 20px;
+  right: 14px;
+  top: 10px;
+  z-index: 1;
 }
 
 #userbox form {
@@ -966,7 +1001,7 @@ textarea {
 }
 
 /* stylelint-disable no-descending-specificity */
-#userbox a {
+#userbox .logout {
   color: #0ff;
 }
 /* stylelint-enable no-descending-specificity */
