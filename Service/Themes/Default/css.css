@@ -866,12 +866,13 @@ textarea {
 }
 
 .head {
-  height: 158px;
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 158px;
   background: #1d72d0;
   background-image: linear-gradient(#1d72d0, #2c476d, #1d72d0);
   box-sizing: border-box;
   padding: 10px;
-  padding-bottom: 0;
   position: relative;
 }
 
@@ -958,17 +959,11 @@ textarea {
 
 /* Logo */
 #logo {
-  position: relative;
   z-index: 1;
-  margin-left: 40px;
-  line-height: 140px;
+  flex: 1;
+  margin: 20px 40px;
+  align-self: center;
 }
-
-/* stylelint-disable no-descending-specificity */
-#logo img {
-  vertical-align: middle;
-}
-/* stylelint-enable no-descending-specificity */
 
 /* UserBox */
 #userbox {
@@ -979,11 +974,8 @@ textarea {
   box-shadow: 2px 2px 5px rgb(0 0 0 / 40%);
   box-sizing: border-box;
   color: #fff;
-  height: calc(100% - 20px);
-  position: absolute;
   padding: 20px;
-  right: 14px;
-  top: 10px;
+  position: relative;
   z-index: 1;
 }
 
