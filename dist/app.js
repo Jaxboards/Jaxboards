@@ -2386,7 +2386,18 @@
     }
 
     load(title, file, autoplay) {
-      const audio = new Audio();
+      let audio = this.soundCache[title];
+
+      if (audio) {
+        if (autoplay) {
+          this.play(title);
+        }
+
+        // do not load again
+        return;
+      }
+
+      audio = new Audio();
       this.soundCache[title] = audio;
       audio.autoplay = !!autoplay;
       audio.src = file;
