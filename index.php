@@ -100,7 +100,6 @@ if (!isset($_SESSION['uid']) && isset($JAX->c['utoken'])) {
     }
 }
 
-// @phpstan-ignore-next-line property.notFound
 if (!$SESS->is_bot && isset($_SESSION['uid']) && $_SESSION['uid']) {
     $JAX->getUser($_SESSION['uid']);
 }
@@ -112,12 +111,10 @@ $USER = &$JAX->userData;
 $PERMS = $JAX->getPerms();
 
 // Fix ip if necessary.
-// @phpstan-ignore-next-line property.notFound
 if ($USER && $SESS->ip && $SESS->ip !== $USER['ip']) {
     $DB->safeupdate(
         'members',
         [
-            // @phpstan-ignore-next-line property.notFound
             'ip' => $JAX->ip2bin(),
         ],
         'WHERE id=?',
@@ -126,27 +123,22 @@ if ($USER && $SESS->ip && $SESS->ip !== $USER['ip']) {
 }
 
 // Load the theme.
-// @phpstan-ignore-next-line method.notFound
 $PAGE->loadskin(
     $JAX->pick(
         $SESS->vars['skin_id'] ?? false,
         $USER['skin_id'] ?? false,
     ),
 );
-// @phpstan-ignore-next-line method.notFound
 $PAGE->loadmeta('global');
 
 // Skin selector.
 if (isset($JAX->b['skin_id'])) {
     if (!$JAX->b['skin_id']) {
         $SESS->delvar('skin_id');
-        // @phpstan-ignore-next-line method.notFound
         $PAGE->JS('reload');
     } else {
         $SESS->addvar('skin_id', $JAX->b['skin_id']);
-        // @phpstan-ignore-next-line property.notFound
         if ($PAGE->jsaccess) {
-            // @phpstan-ignore-next-line method.notFound
             $PAGE->JS('reload');
         }
     }
@@ -168,41 +160,33 @@ if (isset($SESS->vars['skin_id']) && $SESS->vars['skin_id']) {
 // this fixes it.
 if (
     $JAX->userData
-    // @phpstan-ignore-next-line property.notFound
     && !$SESS->is_bot
-    // @phpstan-ignore-next-line property.notFound
     && $JAX->userData['id'] !== $SESS->uid
 ) {
     $SESS->clean($USER['id']);
-    // @phpstan-ignore-next-line property.notFound
     $SESS->uid = $USER['id'];
     $SESS->applychanges();
 }
 
 // If the user's navigated to a new page, change their action time.
 if (
-    // @phpstan-ignore-next-line property.notFound
     $PAGE->jsnewlocation
-    // @phpstan-ignore-next-line property.notFound
     || !$PAGE->jsaccess
 ) {
     $SESS->act($JAX->b['act'] ?? null);
 }
 
 // Set Navigation.
-// @phpstan-ignore-next-line method.notFound
 $PAGE->path([$JAX->pick($CFG['boardname'], 'Home') => '?']);
 $PAGE->append(
     'TITLE',
     $JAX->pick(
-        // @phpstan-ignore-next-line method.notFound
         $PAGE->meta('title'),
         $CFG['boardname'],
         'JaxBoards',
     ),
 );
 
-// @phpstan-ignore-next-line property.notFound
 if (!$PAGE->jsaccess) {
     $variables = [];
     foreach (['sound_im', 'wysiwyg'] as $v) {
@@ -238,22 +222,18 @@ if (!$PAGE->jsaccess) {
 
     $PAGE->append(
         'CSS',
-        // @phpstan-ignore-next-line constant.notFound
         '<link rel="stylesheet" type="text/css" href="' . THEMEPATHURL
         . 'css.css">',
     );
-    // @phpstan-ignore-next-line method.notFound
     if ($PAGE->meta('favicon')) {
         $PAGE->append(
             'CSS',
-            // @phpstan-ignore-next-line method.notFound
             '<link rel="icon" href="' . $PAGE->meta('favicon') . '">',
         );
     }
 
     $PAGE->append(
         'LOGO',
-        // @phpstan-ignore-next-line method.notFound
         $PAGE->meta(
             'logo',
             $JAX->pick(
@@ -264,7 +244,6 @@ if (!$PAGE->jsaccess) {
     );
     $PAGE->append(
         'NAVIGATION',
-        // @phpstan-ignore-next-line method.notFound
         $PAGE->meta(
             'navigation',
             $PERMS['can_moderate']
@@ -293,7 +272,6 @@ if (!$PAGE->jsaccess) {
         $nummessages = 0;
     }
 
-    // @phpstan-ignore-next-line method.notFound
     $PAGE->addvar('inbox', $nummessages);
     if ($nummessages) {
         $PAGE->append(
@@ -317,10 +295,8 @@ if (!$PAGE->jsaccess) {
     $PAGE->append(
         'USERBOX',
         $USER && $USER['id']
-        // @phpstan-ignore-next-line method.notFound
         ? $PAGE->meta(
             'userbox-logged-in',
-            // @phpstan-ignore-next-line method.notFound
             $PAGE->meta(
                 'user-link',
                 $USER['id'],
@@ -332,39 +308,26 @@ if (!$PAGE->jsaccess) {
             ),
             $nummessages,
         )
-        // @phpstan-ignore-next-line method.notFound
         : $PAGE->meta('userbox-logged-out'),
     );
 }
 
 
-// @phpstan-ignore-next-line method.notFound
 $PAGE->addvar('modlink', $PERMS['can_moderate'] ? $PAGE->meta('modlink') : '');
 
-// @phpstan-ignore-next-line method.notFound
 $PAGE->addvar('ismod', $PERMS['can_moderate'] ? 'true' : 'false');
-// @phpstan-ignore-next-line method.notFound
 $PAGE->addvar('isguest', !$USER ? 'true' : 'false');
-// @phpstan-ignore-next-line method.notFound
 $PAGE->addvar('isadmin', $PERMS['can_access_acp'] ? 'true' : 'false');
 
-// @phpstan-ignore-next-line method.notFound
 $PAGE->addvar('acplink', $PERMS['can_access_acp'] ? $PAGE->meta('acplink') : '');
-// @phpstan-ignore-next-line method.notFound
 $PAGE->addvar('boardname', $CFG['boardname']);
 
 if ($USER) {
-    // @phpstan-ignore-next-line method.notFound
     $PAGE->addvar('groupid', $JAX->pick($USER['group_id'], 3));
-    // @phpstan-ignore-next-line method.notFound
     $PAGE->addvar('userposts', $USER['posts']);
-    // @phpstan-ignore-next-line method.notFound
     $PAGE->addvar('grouptitle', $PERMS['title']);
-    // @phpstan-ignore-next-line method.notFound
     $PAGE->addvar('avatar', $JAX->pick($USER['avatar'], $PAGE->meta('default-avatar')));
-    // @phpstan-ignore-next-line method.notFound
     $PAGE->addvar('username', $USER['display_name']);
-    // @phpstan-ignore-next-line method.notFound
     $PAGE->addvar('userid', $JAX->pick($USER['id'], 0));
 }
 
@@ -399,7 +362,6 @@ if ($modules) {
                 !(
                     isset($JAX->b['module'])
                     && $JAX->b['module'] === $moduleClassName
-                    // @phpstan-ignore-next-line method.notFound
                 ) && !$PAGE->templatehas($moduleClassName)
             ) {
                 continue;
@@ -414,7 +376,6 @@ if ($modules) {
     }
 }
 
-// Looks like it's straight out of IPB, doesn't it?
 $actraw = isset($JAX->b['act']) ? mb_strtolower((string) $JAX->b['act']) : '';
 preg_match('@^[a-zA-Z_]+@', $actraw, $act);
 $act = array_shift($act);
@@ -435,9 +396,7 @@ if ($act === 'idx' && isset($JAX->b['module']) && $JAX->b['module']) {
     $page = new $act();
     $page->route();
 } elseif (
-    // @phpstan-ignore-next-line property.notFound
     !$PAGE->jsaccess
-    // @phpstan-ignore-next-line property.notFound
     || $PAGE->jsnewlocation
 ) {
     $result = $DB->safeselect(
@@ -451,9 +410,7 @@ if ($act === 'idx' && isset($JAX->b['module']) && $JAX->b['module']) {
         $DB->disposeresult($result);
         $page['page'] = $JAX->bbcodes($page['page']);
         $PAGE->append('PAGE', $page['page']);
-        // @phpstan-ignore-next-line property.notFound
         if ($PAGE->jsnewlocation) {
-            // @phpstan-ignore-next-line method.notFound
             $PAGE->JS('update', 'page', $page['page']);
         }
     } else {
@@ -462,9 +419,7 @@ if ($act === 'idx' && isset($JAX->b['module']) && $JAX->b['module']) {
 }
 
 // Process temporary commands.
-// @phpstan-ignore-next-line property.notFound
 if ($PAGE->jsaccess && $SESS->runonce) {
-    // @phpstan-ignore-next-line method.notFound
     $PAGE->JSRaw($SESS->runonce);
     $SESS->runonce = '';
 }
@@ -478,20 +433,16 @@ $pagegen = '';
 if (in_array($JAX->getIp(), ['127.0.0.1', '::1'], true)) {
     $debug = '';
 
-    /** @phpstan-ignore-next-line method.notFound */
     $debug .= $PAGE->debug() . '<br>';
-    // @phpstan-ignore-next-line method.notFound
     $PAGE->JS('update', '#query .content', $debug);
     $PAGE->append(
         'FOOTER',
-        // @phpstan-ignore-next-line method.notFound
         $PAGE->collapsebox(
             'Debug',
             $debug,
             'query',
         ) . "<div id='debug2'></div><div id='pagegen'></div>",
     );
-    // @phpstan-ignore-next-line method.notFound
     $PAGE->JS(
         'update',
         'pagegen',
@@ -507,9 +458,7 @@ $PAGE->append(
     . "</div><div id='debug' style='display:none'></div>",
 );
 
-// @phpstan-ignore-next-line property.notFound
 if ($PAGE->jsnewlocation) {
-    // @phpstan-ignore-next-line method.notFound
     $PAGE->JS('title', htmlspecialchars_decode($PAGE->get('TITLE'), ENT_QUOTES));
 }
 
