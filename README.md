@@ -1,6 +1,5 @@
 ![Jaxboards](https://github.com/Jaxboards/Jaxboards/blob/main/acp/img/loginlogo.png?raw=true)
 
-
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Jaxboards_Jaxboards&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Jaxboards_Jaxboards)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Jaxboards_Jaxboards&metric=bugs)](https://sonarcloud.io/summary/new_code?id=Jaxboards_Jaxboards)
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=Jaxboards_Jaxboards&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=Jaxboards_Jaxboards)
