@@ -1282,7 +1282,7 @@ final class UCP
         $result = $DB->safeselect(
             [
                 'del_recipient',
-                'del_sender'
+                'del_sender',
             ],
             'messages',
             'WHERE `id`=?',
