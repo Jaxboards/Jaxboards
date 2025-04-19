@@ -1232,7 +1232,7 @@ textarea {
 /* stylelint-disable no-descending-specificity */
 .forumindex .locked .topic > a:first-child {
   background: url('icons/lock.png') left no-repeat;
-  padding-left: 18px;
+  padding-left: 14px;
 }
 /* stylelint-enable no-descending-specificity */
 
