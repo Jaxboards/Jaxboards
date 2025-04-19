@@ -163,6 +163,7 @@ final class SESS
             $r['last_action'] = (int) $r['last_action'];
             $r['last_update'] = (int) $r['last_update'];
             $r['read_date'] = (int) $r['read_date'];
+
             return $r;
         }
 
