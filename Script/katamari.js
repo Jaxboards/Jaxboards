@@ -146,11 +146,11 @@ function StickyNodes() {
 
     this.addWords = function (el) {
         var textEls = [];
-        
+
         function shouldAddChildren(el) {
             return el.tagName && REPLACE_WORDS_IN[el.tagName.toLowerCase()];
         }
-        
+
         function buildTextEls(el, shouldAdd) {
             var i, len;
             if (shouldAdd && el.nodeType === Node.TEXT_NODE &&
@@ -166,7 +166,7 @@ function StickyNodes() {
                 buildTextEls(el.childNodes[i], shouldAdd);
             }
         }
-        
+
         function wordsToSpans(textEl) {
             var p = textEl.parentNode,
                 words = textEl.nodeValue.split(/\s+/),
@@ -190,11 +190,11 @@ function StickyNodes() {
             }
             p.removeChild(textEl);
         }
-        
+
         buildTextEls(el, shouldAddChildren(el));
         textEls.map(wordsToSpans);
     };
-    
+
     /* includes el. */
     this.addTagNames = function (el, tagNames) {
         var tname = el.tagName && el.tagName.toLowerCase(),
@@ -217,7 +217,7 @@ function StickyNodes() {
             }
         }
     };
-    
+
     this.finalize = function (docW, docH) {
         var xi, yi, i, len, startXI, startYI, el, go, off, w, h,
             endXI = Math.floor(docW / GRIDX) + 1,
@@ -247,7 +247,7 @@ function StickyNodes() {
                 x: off.left + (w / 2),    /* center x. */
                 y: off.top + (h / 2),    /* center y. */
                 diag: Math.sqrt(((w * w) + (h * h)) / 4), /* center to corner */
-               
+
                 /* these are for removing ourselves from the grid. */
                 arrs: [], /* which arrays we're in (grid[x][y]). */
                 idxs: []  /* what indexes. */
@@ -272,7 +272,7 @@ function StickyNodes() {
             }
         }
     };
-    
+
     function removeGridObj(go) {
         var i;
         for (i = 0; i < go.arrs.length; i++) {
@@ -283,7 +283,7 @@ function StickyNodes() {
         delete go.arrs;
         delete go.idxs;
     }
-    
+
     /**
      * cb(gridObj) -> boolean true if the object should be removed.
      */
@@ -321,16 +321,16 @@ function PlayerBall(parentNode, stickyNodes, ballOpts, sounds) {
         radius = 20,
         lastR = 0, /**< optimization: only resize when necessary. */
         docW = 10000, docH = 10000,
-        
+
         attached = [],
         attachedDiv, /* div to put attached nodes into. */
         canvas_el,
         canvas_ctx,
         color = ballOpts.color,
-        
+
         accelTargetX = 0, accelTargetY = 0,
         accel = false,
-        
+
         VOL_MULT = ballOpts.VOL_MULT,
         MAX_ATTACHED_VISIBLE = ballOpts.MAX_ATTACHED_VISIBLE,
         CHECK_VOLS = ballOpts.CHECK_VOLS,
@@ -343,7 +343,7 @@ function PlayerBall(parentNode, stickyNodes, ballOpts, sounds) {
          * Same rotation as css transform.
          */
         th = 0,
-        
+
         /**
          * Ball angle in the rotation axis / z plane, in radians.
          * phi: 0 is pointing in the direction the ball is rolling.
@@ -351,7 +351,7 @@ function PlayerBall(parentNode, stickyNodes, ballOpts, sounds) {
          * note that forward rotation means phi -= 0.1.
          */
         phi = 0;
-        
+
     this.init = function () {
         canvas_el = document.createElement('canvas');
         canvas_el.width = radius * 2;
@@ -359,15 +359,15 @@ function PlayerBall(parentNode, stickyNodes, ballOpts, sounds) {
         canvas_el.style.cssText = 'position: absolute; z-index: 500;';
         parentNode.appendChild(canvas_el);
         canvas_ctx = canvas_el.getContext('2d');
-        
+
         attachedDiv = document.createElement('div');
         parentNode.appendChild(attachedDiv);
     };
-    
+
     this.setRadius = function (r) {
         radius = r;
     };
-    
+
     this.getState = function () {
         return {
             x: x,
@@ -379,7 +379,7 @@ function PlayerBall(parentNode, stickyNodes, ballOpts, sounds) {
             phi: phi,
         };
     };
-    
+
     this.setState = function (s) {
         x = s.x;
         y = s.y;
@@ -389,16 +389,16 @@ function PlayerBall(parentNode, stickyNodes, ballOpts, sounds) {
         th = s.th;
         phi = s.phi;
     };
-        
+
     this.setXY = function (sx, sy) {
         x = sx;
         y = sy;
     };
-    
+
     this.setTh = function (sth) {
         th = sth;
     };
-    
+
     this.setPhi = function (sphi) {
         phi = sphi;
     };
@@ -406,21 +406,21 @@ function PlayerBall(parentNode, stickyNodes, ballOpts, sounds) {
     this.setColor = function (c) {
         color = c;
     };
-    
+
     this.setDocSize = function (w, h) {
         docW = w;
         docH = h;
     };
-    
+
     this.setAccel = function (bool) {
         accel = bool;
     };
-    
+
     this.setAccelTarget = function (tx, ty) {
         accelTargetX = tx;
         accelTargetY = ty;
     };
-    
+
     function getVol() {
         return (4 * Math.PI * radius * radius * radius / 3);
     }
@@ -429,7 +429,7 @@ function PlayerBall(parentNode, stickyNodes, ballOpts, sounds) {
         var newVol = getVol() + gridObjVol(go) * VOL_MULT;
         radius = Math.pow(newVol * 3 / (4 * Math.PI), 1 / 3);
     }
-    
+
     function attachGridObj(go) {
         var attXY = getClosestPoint(x, y, go),
             dx = attXY[0] - x,
@@ -477,7 +477,7 @@ function PlayerBall(parentNode, stickyNodes, ballOpts, sounds) {
             sounds.play_pop();
         }
     }
-    
+
     /**
      * @return true if the object should be removed from stickyNodes.
      */
@@ -488,7 +488,7 @@ function PlayerBall(parentNode, stickyNodes, ballOpts, sounds) {
         attachGridObj(go);
         return true;
     }
-    
+
     this.updatePhysics = function () {
         var oldX = x, oldY = y, dx, dy,
             bounce = false,
@@ -535,7 +535,7 @@ function PlayerBall(parentNode, stickyNodes, ballOpts, sounds) {
             sounds.play_bounce();
         }
     };
-    
+
     function drawBall() {
         var sx1, sy1, sx2, sy2, dx, dy, i, pct1, pct2, z1, z2;
         /* move/resize canvas element. */
@@ -580,7 +580,7 @@ function PlayerBall(parentNode, stickyNodes, ballOpts, sounds) {
             }
         }
     }
-    
+
     /**
      * @return true if the attached object is roughly visible.
      */
@@ -618,12 +618,12 @@ function PlayerBall(parentNode, stickyNodes, ballOpts, sounds) {
             att.attT, null);
         return true;
     }
-    
+
     function onAttachedRemoved(att) {
         attachedDiv.removeChild(att.el);
         delete att.el;
     }
-    
+
     this.draw = function () {
         var i, att, numAttachedVisible = 0;
         drawBall();
@@ -654,7 +654,7 @@ function Game(gameDiv, stickyNodes, ballOpts) {
     player1.init();
     player1.setXY(300, 300);
     window.scrollTo(0, 200);
-    
+
     function on_resize() {
         player1.setDocSize(jQuery(document).width() - 5,
                            jQuery(document).height() - 5);
@@ -678,7 +678,7 @@ function Game(gameDiv, stickyNodes, ballOpts) {
             return preventDefault(event);
         }
     }, true);
-    
+
     if (ballOpts.MOUSEB !== -5) {
         /* mouse buttons */
         document.addEventListener('mousemove', function (event) {
@@ -726,7 +726,7 @@ function whenAllLoaded(gameDiv, popup, stickyNodes) {
                 bgmusic = document.createElement('audio');
                 bgmusic.id = 'khbgmusic';
                 bgmusic.loop = 'loop';
-                bgmusic.src = 'http://kathack.com/js/katamari.mp3';
+                bgmusic.src = './Sounds/katamari.mp3';
                 gameDiv.appendChild(bgmusic);
             }
             bgmusic.play();
@@ -800,12 +800,12 @@ Realistic Pickups? <input id="checkv" type="checkbox" checked="checked" />\
 
 function main() {
     var gameDiv, checkInterval, stickyNodes, popup;
-    
+
     gameDiv = document.createElement('div');
     gameDiv.khIgnore = true;
     document.body.appendChild(gameDiv);
     popup = buildPopup(gameDiv);
-    
+
     /* setTimeout so that the popup displays before we freeze. */
     setTimeout(function () {
         var i, len, el;
