@@ -30,7 +30,7 @@ final class Tardis
                     i.style.position = "fixed";
                     var c = i.getBoundingClientRect();
                     i.style.left = c.x + "px";
-                    i.style.top = c.y - (document.documentElement.scrollTop || document.body.scrollTop) + "px";
+                    i.style.top = c.y + "px";
                 }
                 t = parseInt(i.style.top) + i.vy;
                 l = parseInt(i.style.left) + i.vx;
