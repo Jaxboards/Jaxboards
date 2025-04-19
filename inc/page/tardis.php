@@ -1,12 +1,14 @@
 
 <?php
 
-class Tardis {
-    public function route() {
+final class Tardis
+{
+    public function route(): void
+    {
         global $PAGE;
 
-        $PAGE->JS("softurl");
-        $PAGE->JS("script",'(function() {
+        $PAGE->JS('softurl');
+        $PAGE->JS('script', '(function() {
             if (window.tardis) {
                 return;
             }
@@ -39,8 +41,6 @@ class Tardis {
             }
             setInterval(window.tardis, 10);
         })()');
-        $PAGE->JS("playsound", "drwho", "./Sounds/doctorwhotheme.mp3");
+        $PAGE->JS('playsound', 'drwho', './Sounds/doctorwhotheme.mp3');
     }
 }
-
-?>
