@@ -187,7 +187,7 @@ $rules = array_reduce(
                     '/Function \w+\(\)/' => 'Function',
                 ];
 
-                foreach($replacements as $replace => $replacement) {
+                foreach ($replacements as $replace => $replacement) {
                     $description = preg_replace(
                         $replace,
                         $replacement,
