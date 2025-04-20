@@ -864,8 +864,8 @@ textarea {
   max-width: 940px;
   text-align: left;
   box-shadow:
-  rgb(0 0 0 / 20%) -5px 0 2px,
-  rgb(0 0 0 / 20%) 5px 0 2px;
+    rgb(0 0 0 / 20%) -5px 0 2px,
+    rgb(0 0 0 / 20%) 5px 0 2px;
   border-radius: 0 0 15px 15px;
 }
 
