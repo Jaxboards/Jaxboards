@@ -205,8 +205,7 @@ if (!$PAGE->jsaccess) {
     );
     $PAGE->append(
         'SCRIPT',
-        ' <script src="' . BOARDURL
-        . 'dist/app.js"></script>',
+        '<script src="' . BOARDURL . 'dist/app.js" defer></script>',
     );
 
     if ($USER && ($PERMS['can_moderate'] || $USER['mod'])) {
