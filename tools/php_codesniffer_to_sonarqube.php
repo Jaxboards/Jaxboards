@@ -111,356 +111,91 @@ $rules = array_reduce(
             $description = (static function (
                 string $description_input,
             ): string {
-                // Make rule descriptions more generic for SonarCloud issue
-                // rules
-                $description = preg_replace(
-                    '/ Currently using \d+ lines./',
-                    '',
-                    $description_input,
-                ) ?? '';
-                $description = preg_replace(
-                    '/Unused variable \$\w+/',
-                    'Unused variable',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/Class name \w+ does not match filepath [\/\w\.]+/',
-                    'Class name does not match filepath',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/Cognitive complexity for "\w+" is \d+ but has to be/',
-                    'Cognitive complexity must be',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/; contains \d+ characters/',
-                    '',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/Unused parameter \$\w+/',
-                    'Unused parameter',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/Property [\\\\\w]+::\$\w+ does not have/',
-                    'Property does not have',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/Method [\\\\\w]+::\w+\(\) does not have/',
-                    'Method does not have',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/inside string is disallowed, found "\$\w+"/',
-                    'inside string is disallowed',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/is deprecated as of PHP 8.2, found "\$\{\w+\}"/',
-                    'is deprecated as of PHP 8.2',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/on property "\$\w+"/',
-                    'on property',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/on method "\w+"/',
-                    'on method',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/variable \$\w+/',
-                    'varaible',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/for constant \w+/',
-                    'for a constant',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/default value of parameter \$\w+/',
-                    'default value of parameter',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/Useless alias "\w+" for use of "[\w\\\]+"/',
-                    'Useless alias',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/ The first wrong one is [\w\\\]+./',
-                    '',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/annotation @\w+ is/',
-                    'this annotation is',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/array type hint syntax in \"\w+\[\]" is disallowed/',
-                    'array type hint syntax (e.g. "string[]")',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/Unknown type hint \"[\w\[\]\\\<,>]+\" found for \$\w+/',
-                    'Unknown type hint',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/Type hint \"[\w\[\]\\\<,>]+\" missing for \$\w+/',
-                    'Type hint missing',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/Type [\w\\\]+ is not used in this file/',
-                    'Type is not used in this file',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/ spaces but found \d/',
-                    ' spaces',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/ but found "\w+"/',
-                    '',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/ method "\w+" should/',
-                    ' method should',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/ Found: \(\w+\)/',
-                    '',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/Property name "\$\w+"/',
-                    'Property',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/Property [\\\\\w]+::\$\w+/',
-                    'Property',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/; found: <\?php.*/',
-                    '',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/; found: <%.*/',
-                    '',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/Parameter \$\w+/',
-                    'Parameter',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/; expected "\(\w+\)" but found "\(\w+\)"/',
-                    '',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/; expected "[\\\\\w]+" but found "[\\\\\w]+"/',
-                    '',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/Operator [=!]= is disallowed, use [=!]== instead/',
-                    'Use strict equality instead',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/Null type hint should be on last position in "[\w\|]+"/',
-                    'Null type hint should be on last position, e.g. `string|null`',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/; expected "\/\/ .*" but found "\/\/.*"/',
-                    '',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/ class \w+/',
-                    '',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/ function \w+\(\)/',
-                    '',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/ tag for "[\w\\\]+" exception/',
-                    ' tag for exception',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/Method name "\w+"/',
-                    'Method name',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/Method [\\\\\w]+::\w+\(\)/',
-                    'Method',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/property [\\\\\w]+::\$\w+/',
-                    'property',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/type hint "[\w<,\s>]+"; found "[\w<,\s>]+" for \$\w+/',
-                    'type hint not found',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/type hint "[\w<,\s>]+"; found "[\w<,\s>]+" for \$\w+/',
-                    'type hint not found',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/Expected "[\w<,\s>]+" but found "[\w<,\s>]+"/',
-                    'Incorrect type hint found',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/; \d+ found/',
-                    '',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/; found \d+/',
-                    '',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/parameter "\$\w+"/',
-                    'parameter',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/parameter \$\w+/',
-                    'parameter',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/; expected "\w+"/',
-                    '',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/Constant [\\\\\w]+::\w+/',
-                    'Constant',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/TODO task\s+.*/',
-                    'TODO task',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/FIXME task\s+.*/',
-                    'FIXME task',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/Class name "\w+"/',
-                    'Class name',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/; expected \w+ but found \w+/',
-                    '',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/Class \\\[\w\\\]+/',
-                    'Class',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/ Expected @\w+, found @\w+/',
-                    '',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/ The first symbol is defined on line \d+ and the first side effect is on line \d+./',
-                    '',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/method [\\\\\w]+::\w+\(\)/',
-                    'this method',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/forbidden comment ".*"/',
-                    'forbidden comment',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/Function \w+ is specialized/',
-                    'Function is specialized',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/missing in \w+\(\)/',
-                    'missing in function',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/true in \w+\(\)/',
-                    'true in function',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/prefix "\w+"/',
-                    'prefix, e.g. Exception prefixed with Exception',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/suffix "\w+"/',
-                    'suffix, e.g. Exception ending in Exception',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/; use \w+\(\) instead/',
-                    '; use the recommended alternative instead',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
-                    '/".+=" operator instead of "=" and ".+"/',
-                    'combined assignment operator instead of assignment and operation',
-                    $description,
-                ) ?? '';
-                $description = preg_replace(
+                $description = $description_input;
+                // Make rule descriptions more generic for SonarCloud issue rules
+                $replacements = [
+                    '/ Currently using \d+ lines./' => '',
+                    '/Unused variable \$\w+/' => 'Unused variable',
+                    '/Class name \w+ does not match filepath [\/\w\.]+/' => 'Class name does not match filepath',
+                    '/Cognitive complexity for "\w+" is \d+ but has to be/' => 'Cognitive complexity must be',
+                    '/; contains \d+ characters/' => '',
+                    '/Unused parameter \$\w+/' => 'Unused parameter',
+                    '/Property [\\\\\w]+::\$\w+ does not have/' => 'Property does not have',
+                    '/Method [\\\\\w]+::\w+\(\) does not have/' => 'Method does not have',
+                    '/inside string is disallowed, found "\$\w+"/' => 'inside string is disallowed',
+                    '/is deprecated as of PHP 8.2, found "\$\{\w+\}"/' => 'is deprecated as of PHP 8.2',
+                    '/on property "\$\w+"/' => 'on property',
+                    '/on method "\w+"/' => 'on method',
+                    '/variable \$\w+/' => 'varaible',
+                    '/for constant \w+/' => 'for a constant',
+                    '/default value of parameter \$\w+/' => 'default value of parameter',
+                    '/Useless alias "\w+" for use of "[\w\\\]+"/' => 'Useless alias',
+                    '/ The first wrong one is [\w\\\]+./' => '',
+                    '/annotation @\w+ is/' => 'this annotation is',
+                    '/array type hint syntax in \"\w+\[\]" is disallowed/' => 'array type hint syntax (e.g. "string[]")',
+                    '/Unknown type hint \"[\w\[\]\\\<,>]+\" found for \$\w+/' => 'Unknown type hint',
+                    '/Type hint \"[\w\[\]\\\<,>]+\" missing for \$\w+/' => 'Type hint missing',
+                    '/Type [\w\\\]+ is not used in this file/' => 'Type is not used in this file',
+                    '/ spaces but found \d/' => ' spaces',
+                    '/ but found "\w+"/' => '',
+                    '/ method "\w+" should/' => ' method should',
+                    '/ Found: \(\w+\)/' => '',
+                    '/Property name "\$\w+"/' => 'Property',
+                    '/Property [\\\\\w]+::\$\w+/' => 'Property',
+                    '/; found: <\?php.*/' => '',
+                    '/; found: <%.*/' => '',
+                    '/Parameter \$\w+/' => 'Parameter',
+                    '/; expected "\(\w+\)" but found "\(\w+\)"/' => '',
+                    '/; expected "[\\\\\w]+" but found "[\\\\\w]+"/' => '',
+                    '/Operator [=!]= is disallowed, use [=!]== instead/' => 'Use strict equality instead',
+                    '/Null type hint should be on last position in "[\w\|]+"/' => 'Null type hint should be on last position, e.g. `string|null`',
+                    '/; expected "\/\/ .*" but found "\/\/.*"/' => '',
+                    '/ class \w+/' => '',
+                    '/ function \w+\(\)/' => '',
+                    '/ tag for "[\w\\\]+" exception/' => ' tag for exception',
+                    '/Method name "\w+"/' => 'Method name',
+                    '/Method [\\\\\w]+::\w+\(\)/' => 'Method',
+                    '/property [\\\\\w]+::\$\w+/' => 'property',
+                    '/type hint "[\w<,\s>]+"; found "[\w<,\s>]+" for \$\w+/' => 'type hint not found',
+                    '/type hint "[\w<,\s>]+"; found "[\w<,\s>]+" for \$\w+/' => 'type hint not found',
+                    '/Expected "[\w<,\s>]+" but found "[\w<,\s>]+"/' => 'Incorrect type hint found',
+                    '/; \d+ found/' => '',
+                    '/; found \d+/' => '',
+                    '/parameter "\$\w+"/' => 'parameter',
+                    '/parameter \$\w+/' => 'parameter',
+                    '/; expected "\w+"/' => '',
+                    '/Constant [\\\\\w]+::\w+/' => 'Constant',
+                    '/TODO task\s+.*/' => 'TODO task',
+                    '/FIXME task\s+.*/' => 'FIXME task',
+                    '/Class name "\w+"/' => 'Class name',
+                    '/; expected \w+ but found \w+/' => '',
+                    '/Class \\\[\w\\\]+/' => 'Class',
+                    '/ Expected @\w+, found @\w+/' => '',
+                    '/ The first symbol is defined on line \d+ and the first side effect is on line \d+./' => '',
+                    '/method [\\\\\w]+::\w+\(\)/' => 'this method',
+                    '/forbidden comment ".*"/' => 'forbidden comment',
+                    '/Function \w+ is specialized/' => 'Function is specialized',
+                    '/missing in \w+\(\)/' => 'missing in function',
+                    '/true in \w+\(\)/' => 'true in function',
+                    '/prefix "\w+"/' => 'prefix, e.g. Exception prefixed with Exception',
+                    '/suffix "\w+"/' => 'suffix, e.g. Exception ending in Exception',
+                    '/; use \w+\(\) instead/' => '; use the recommended alternative instead',
+                    '/".+=" operator instead of "=" and ".+"/' => 'combined assignment operator instead of assignment and operation',
                     // phpcs:disable Generic.Files.LineLength.TooLong
-                    '/placement of "[\w\s]+" group is invalid. Last group was "[\w\s]+" and one of these is expected after it: [\w\s]+/',
+                    '/placement of "[\w\s]+" group is invalid. Last group was "[\w\s]+" and one of these is expected after it: [\w\s]+/' => 'structure of this class must be ordered',
                     // phpcs:enable
-                    'structure of this class must be ordered',
-                    $description,
-                ) ?? '';
+                    '/Function \w+\(\)/' => 'Function',
+                ];
 
-                return preg_replace(
-                    '/Function \w+\(\)/',
-                    'Function',
-                    $description,
-                ) ?? '';
+                foreach($replacements as $replace => $replacement) {
+                    $description = preg_replace(
+                        $replace,
+                        $replacement,
+                        $description,
+                    ) ?? '';
+                }
+
+                return $description;
             })((string) $message['message']);
 
             // We don't have a way to guage severity so we always set it to
