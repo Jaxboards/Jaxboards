@@ -859,9 +859,14 @@ textarea {
 
 /* Surrounding Container/Template for Board */
 #container {
-  margin: auto;
+  background: #fff;
+  margin: 5px auto;
   max-width: 940px;
   text-align: left;
+  box-shadow:
+  rgb(0 0 0 / 20%) -5px 0 2px,
+  rgb(0 0 0 / 20%) 5px 0 2px;
+  border-radius: 0 0 15px 15px;
 }
 
 .head {
@@ -932,25 +937,13 @@ textarea {
 }
 /* stylelint-enable no-descending-specificity */
 
-/* stylelint-disable-next-line selector-class-pattern */
-.c_bottom {
-  background: url('img/c_shadow_bottom.png');
-  height: 9px;
-}
-
 .footer {
   text-align: center;
   margin: 10px;
 }
 
 #body {
-  background: #fff;
   padding-bottom: 20px;
-  box-shadow:
-    rgb(0 0 0 / 20%) -5px 0 2px,
-    rgb(0 0 0 / 20%) 5px 0 2px;
-  border: 1px solid #404040;
-  border-radius: 0 0 15px 15px;
 }
 
 *:focus {
