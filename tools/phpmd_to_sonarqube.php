@@ -242,8 +242,6 @@ $issues = array_merge_recursive(
                 },
                 $file['violations'],
             );
-
-            return $result;
         },
         $data['files'],
     ),
