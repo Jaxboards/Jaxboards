@@ -277,13 +277,13 @@ if (!$PAGE->jsaccess) {
         );
     }
 
-        $PAGE->append(
-            'FOOTER',
-            '<div class="footer">'
-            . 'Jaxboards 2.1.0! '
-            // Removed the defunct URL
-            . '&copy; 2007-' . gmdate('Y') . '</div>',
-        );
+    $PAGE->append(
+        'FOOTER',
+        '<div class="footer">'
+        . 'Jaxboards 2.1.0! '
+        // Removed the defunct URL
+        . '&copy; 2007-' . gmdate('Y') . '</div>',
+    );
 
     $PAGE->append(
         'USERBOX',
