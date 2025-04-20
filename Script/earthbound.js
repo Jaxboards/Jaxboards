@@ -1,3 +1,4 @@
+/* eslint-disable */
 /** Taken from with modifications: https://github.com/gjtorikian/Earthbound-Battle-Backgrounds-JS */
 
 (function() {
