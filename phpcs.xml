@@ -194,6 +194,7 @@
   <rule ref="SlevomatCodingStandard.Files.FileLength">
     <exclude-pattern>./index.php</exclude-pattern>
     <exclude-pattern>./rector.php</exclude-pattern>
+    <exclude-pattern>./tools/php_codesniffer_to_sonarqube.php</exclude-pattern>
     <exclude-pattern>./tools/phpmd_to_sonarqube.php</exclude-pattern>
   </rule>
   <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName"/>
