@@ -212,8 +212,7 @@ if (!$PAGE->jsaccess) {
     if ($USER && ($PERMS['can_moderate'] || $USER['mod'])) {
         $PAGE->append(
             'SCRIPT',
-            '<script type="text/javascript" '
-            . 'src="?act=modcontrols&do=load"></script>',
+            '<script type="text/javascript" src="?act=modcontrols&do=load" defer></script>',
         );
     }
 
