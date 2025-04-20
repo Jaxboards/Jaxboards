@@ -244,7 +244,7 @@ $issues = array_merge_recursive(
         static function (
             $filename,
         ) use ($data): array {
-            $file = new SplFileObject(dirname(__DIR__) . "/{$filename}");
+            $file = new SplFileObject($filename);
 
             return array_map(
                 static function (array $message) use (
