@@ -100,7 +100,8 @@ if (!is_array($data['files'])) {
     exit(1);
 }
 
-function generify($description_input) {
+function generify($description_input)
+{
     $description = $description_input;
 
     $replacements = [
@@ -244,8 +245,8 @@ $issues = array_merge_recursive(
 
             return $result;
         },
-        $data['files']
-    )
+        $data['files'],
+    ),
 );
 
 file_put_contents(
