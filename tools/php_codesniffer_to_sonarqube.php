@@ -3,7 +3,7 @@
 
 declare(strict_types=1);
 
-// phpcs:disable Generic.Files.LineLength.TooLong
+// phpcs:disable Generic.Files.LineLength.TooLong,PSR12.Files.FileHeader.IncorrectOrder,Squiz.Commenting.InlineComment.DocBlock,Squiz.Commenting.BlockComment.WrongStart
 
 /**
  * Tool to convert PHP_CodeSniffer output into something SonarQube can read.
