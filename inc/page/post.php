@@ -871,7 +871,7 @@ onclick="this.form.submitButton=this"/></div>
                     UPDATE %t
                     SET `lp_uid`= ?, `lp_tid` = ?, `lp_topic` = ?, `lp_date` = ?,
                         `posts` = `posts` + 1
-                    WHERE `id` IN ?
+                    WHERE `id` IN (?)
                     EOT
                 ,
                 ['forums'],
