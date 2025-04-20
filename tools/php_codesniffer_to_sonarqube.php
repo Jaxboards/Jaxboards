@@ -101,7 +101,8 @@ if (!is_array($data['files'])) {
 }
 
 // Make rule descriptions more generic for SonarCloud issue rules
-function generify(string $description_input): string {
+function generify(string $description_input): string
+{
     $description = $description_input;
     $replacements = [
         '/ Currently using \d+ lines./' => '',
@@ -186,7 +187,7 @@ function generify(string $description_input): string {
     }
 
     return $description;
-};
+}
 
 $rules = array_reduce(
     $data['files'],
