@@ -567,11 +567,11 @@
                 var index = toAbsoluteIndex(fromIndex, length);
                 var value;
                 // Array#includes uses SameValueZero equality algorithm
-                 
+
                 if (IS_INCLUDES && el != el)
                   while (length > index) {
                     value = O[index++];
-                     
+
                     if (value != value) return true;
                     // Array#indexOf ignores holes, Array#includes - not
                   }
@@ -1146,7 +1146,7 @@
           /*! no static exports found */
           /***/ function (module, exports) {
             var core = (module.exports = { version: '2.5.7' });
-            if (typeof __e == 'number') __e = core;  
+            if (typeof __e == 'number') __e = core;
 
             /***/
           },
@@ -1483,9 +1483,8 @@
                 ? window
                 : typeof self != 'undefined' && self.Math == Math
                   ? self
-                  :  
-                    Function('return this')());
-            if (typeof __g == 'number') __g = global;  
+                  : Function('return this')());
+            if (typeof __g == 'number') __g = global;
 
             /***/
           },
@@ -1585,7 +1584,7 @@
             var cof = __webpack_require__(
               /*! ./_cof */ './node_modules/babel-runtime/node_modules/core-js/library/modules/_cof.js',
             );
-             
+
             module.exports = Object('z').propertyIsEnumerable(0)
               ? Object
               : function (it) {
@@ -1880,7 +1879,7 @@
               riter['return'] = function () {
                 SAFE_CLOSING = true;
               };
-               
+
               Array.from(riter, function () {
                 throw 2;
               });
@@ -2066,7 +2065,7 @@
               __webpack_require__(
                 /*! ./_html */ './node_modules/babel-runtime/node_modules/core-js/library/modules/_html.js',
               ).appendChild(iframe);
-              iframe.src = 'javascript:';  
+              iframe.src = 'javascript:';
               // createDict = iframe.contentWindow.Object;
               // html.removeChild(iframe);
               iframeDocument = iframe.contentWindow.document;
@@ -3428,7 +3427,7 @@
               obj[sym] = symVal;
               for (sym in obj) {
                 return false;
-              }  
+              }
               if (
                 typeof Object.keys === 'function' &&
                 Object.keys(obj).length !== 0
@@ -3641,7 +3640,7 @@
               var obj = {};
               try {
                 origDefineProperty(obj, 'x', { enumerable: false, value: obj });
-                 
+
                 for (var _ in obj) {
                   // jscs:ignore disallowUnusedVariables
                   return false;
@@ -3989,7 +3988,7 @@
             // http://www.ecma-international.org/ecma-262/5.1/#sec-9.3
 
             module.exports = function ToNumber(value) {
-              return +value;  
+              return +value;
             };
 
             /***/
@@ -4027,7 +4026,6 @@
             var ThrowTypeError = $gOPD
               ? (function () {
                   try {
-                     
                     arguments.callee; // IE 8 does not throw here
                     return throwTypeError;
                   } catch (calleeThrows) {
@@ -4049,7 +4047,7 @@
               Object.getPrototypeOf ||
               function (x) {
                 return x.__proto__;
-              };  
+              };
 
             var generator; // = function * () {};
             var generatorFunction = generator ? getProto(generator) : undefined;
@@ -4113,7 +4111,7 @@
               '%encodeURIComponent%': encodeURIComponent,
               '%Error%': Error,
               '%ErrorPrototype%': Error.prototype,
-              '%eval%': eval,  
+              '%eval%': eval,
               '%EvalError%': EvalError,
               '%EvalErrorPrototype%': EvalError.prototype,
               '%Float32Array%':
@@ -4789,7 +4787,7 @@
               var toStr = Object.prototype.toString;
               var isArgs = __webpack_require__(
                 /*! ./isArguments */ './node_modules/string.prototype.padstart/node_modules/object-keys/isArguments.js',
-              );  
+              );
               var isEnumerable = Object.prototype.propertyIsEnumerable;
               var hasDontEnumBug = !isEnumerable.call(
                 { toString: null },
@@ -4965,7 +4963,6 @@
                 })(1, 2);
                 if (!keysWorksWithArguments) {
                   Object.keys = function keys(object) {
-                     
                     if (isArgs(object)) {
                       return originalKeys(slice.call(object));
                     }
@@ -6848,7 +6845,7 @@
               var bpos = 0;
               var bpos2 = 0;
               var tmp = void 0;
-              var newRead = read;  
+              var newRead = read;
               while (data[pos] !== 0xff) {
                 // Data overflow before end of compressed data
                 if (pos >= data.length) {
