@@ -623,32 +623,31 @@ final class UserProfile
         );
 
         $text = match ($activity['type']) {
-            'profile_comment' => "$user  commented on  $otherguy's profile",
-            'new_post' => "$user posted in topic <a href='?act=vt{$activity['tid']}&findpost={$activity['pid']}'>{$activity['arg1']}</a>, ". $JAX->smalldate($activity['date']),
-            'new_topic' => "$user created new topic <a href='?act=vt{$activity['tid']}'>{$activity['arg1']}</a>, " . $JAX->smalldate($activity['date']),
+            'profile_comment' => "{$user}  commented on  {$otherguy}'s profile",
+            'new_post' => "{$user} posted in topic <a href='?act=vt{$activity['tid']}&findpost={$activity['pid']}'>{$activity['arg1']}</a>, " . $JAX->smalldate($activity['date']),
+            'new_topic' => "{$user} created new topic <a href='?act=vt{$activity['tid']}'>{$activity['arg1']}</a>, " . $JAX->smalldate($activity['date']),
             'profile_name_change' => $PAGE->meta(
-                    'user-link',
-                    $activity['uid'],
-                    $activity['group_id'],
-                    $activity['arg1'],
-                ) . ' is now known as ' . $PAGE->meta(
-                    'user-link',
-                    $activity['uid'],
-                    $activity['group_id'],
-                    $activity['arg2'],
-                ) . ', ' . $JAX->smalldate($activity['date']),
+                'user-link',
+                $activity['uid'],
+                $activity['group_id'],
+                $activity['arg1'],
+            ) . ' is now known as ' . $PAGE->meta(
+                'user-link',
+                $activity['uid'],
+                $activity['group_id'],
+                $activity['arg2'],
+            ) . ', ' . $JAX->smalldate($activity['date']),
             'buddy_add' => $user . ' made friends with ' . $otherguy,
         };
 
-        return  "<div class=\"activity {$activity['type']}\">$text</div>";
+        return "<div class=\"activity {$activity['type']}\">{$text}</div>";
     }
-
 
     public function parse_activity_rss($activity): array|string
     {
         global $PAGE,$USER,$JAX;
 
-        return match($activity['type']) {
+        return match ($activity['type']) {
             'profile_comment' => [
                 'link' => $JAX->blockhtml('?act=vu' . $activity['aff_id']),
                 'text' => $activity['name'] . ' commented on '
