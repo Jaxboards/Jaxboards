@@ -1,6 +1,3 @@
-/* WYSWYG Editor CSS */
-@import url('../../wysiwyg.css');
-
 html {
   font-size: 62.5%; /* set 1rem to 10px */
   text-size-adjust: none;
@@ -255,12 +252,6 @@ textarea {
   background-position: 0 -128px;
 }
 
-/* stylelint-disable block-no-empty,emptyRules */
-#ucp .leftbar,
-.ucp #ucppage {
-}
-/* stylelint-enable block-no-empty,emptyRules */
-
 #ucp .leftbar a {
   display: block;
   margin: 5px 10px;
@@ -352,12 +343,6 @@ textarea {
   width: 500px;
   height: 100px;
 }
-
-/* Inbox */
-/* stylelint-disable block-no-empty,emptyRules */
-.inbox {
-}
-/* stylelint-enable block-no-empty,emptyRules */
 
 .inbox .listing {
   border: 1px solid #99c;
@@ -616,12 +601,6 @@ textarea {
 #buddylist .contact:hover .status {
   white-space: normal;
 }
-
-/* Contact cards */
-/* stylelint-disable no-descending-specificity,block-no-empty,emptyRules */
-.contact-card .content {
-}
-/* stylelint-enable no-descending-specificity,block-no-empty,emptyRules */
 
 /* stylelint-disable no-descending-specificity */
 .contact-card .content a {

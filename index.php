@@ -217,8 +217,8 @@ if (!$PAGE->jsaccess) {
 
     $PAGE->append(
         'CSS',
-        '<link rel="stylesheet" type="text/css" href="' . THEMEPATHURL
-        . 'css.css">',
+        '<link rel="stylesheet" type="text/css" href="' . THEMEPATHURL . 'css.css">' .
+        '<link rel="preload" as="style" type="text/css" href="./Service/wysiwyg.css" onload="this.onload=null;this.rel=\'stylesheet\'" />',
     );
     if ($PAGE->meta('favicon')) {
         $PAGE->append(

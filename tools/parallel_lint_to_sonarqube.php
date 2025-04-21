@@ -149,7 +149,7 @@ file_put_contents(
             ),
             'rules' => array_values($rules),
         ],
-        JSON_THROW_ON_ERROR,
+        JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT,
     ),
     LOCK_EX,
 );
