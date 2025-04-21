@@ -16,7 +16,7 @@ final class rssfeed
         $this->feed['item'][] = $settings;
     }
 
-    public function publish(): void
+    public function publish(): never
     {
         $this->feed['pubDate'] = gmdate('r');
         $xmlFeed = $this->make_xml($this->feed);
@@ -29,6 +29,7 @@ final class rssfeed
                 </channel>
             </rss>
             EOT;
+
         exit(0);
     }
 
