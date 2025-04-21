@@ -4,30 +4,20 @@ declare(strict_types=1);
 
 final class MySQL
 {
-    /**
-     * @var bool
-     */
-    public $nolog;
+    public $debugMode = false;
+    private $queryList = [];
 
-    public $lastQuery;
+    private $mysqli_connection = false;
 
-    public $queryList = [];
+    private $engine = 'MySQL';
 
-    public $connected = false;
+    private $prefix = '';
 
-    public $mysqli_connection = false;
+    private $usersOnlineCache = '';
 
-    public $lastfailedstatement = false;
+    private $ratingNiblets = [];
 
-    public $engine = 'MySQL';
-
-    public $prefix = '';
-
-    public $usersOnlineCache = '';
-
-    public $ratingNiblets = [];
-
-    public $db = '';
+    private $db = '';
 
     public function connect(
         $host,
@@ -45,11 +35,6 @@ final class MySQL
         $this->db = $database;
 
         return !$this->mysqli_connection->connect_errno;
-    }
-
-    public function nolog(): void
-    {
-        $this->nolog = true;
     }
 
     public function prefix($a): void
@@ -373,6 +358,9 @@ final class MySQL
         array_unshift($out_args, $typestring);
 
         $stmt = $connection->prepare($query_string);
+        if ($this->debugMode) {
+            $this->queryList[] = $query_string;
+        }
         if (!$stmt) {
             $error = $this->mysqli_connection->error;
             if ($error) {
@@ -409,7 +397,6 @@ final class MySQL
         }
 
         if (!$stmt->execute()) {
-            $this->lastfailedstatement = $stmt;
             $error = $this->mysqli_connection->error;
             if ($error) {
                 error_log(
@@ -679,10 +666,10 @@ final class MySQL
 
     public function debug(): string
     {
-        return '<div>' . implode(
-            '<br />',
+        return '<div><p>' . implode(
+            '</p><p>',
             $this->queryList,
-        ) . '</div>';
+        ) . '</p></div>';
     }
 
     /**

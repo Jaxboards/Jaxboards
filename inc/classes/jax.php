@@ -855,7 +855,7 @@ final class JAX
         return !isset($row['banned']) || $row['banned'] > 0;
     }
 
-    public function getIp()
+    public static function getIp()
     {
         global $_SERVER;
 
