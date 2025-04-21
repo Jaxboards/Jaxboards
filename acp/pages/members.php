@@ -6,10 +6,10 @@ if (!defined(INACP)) {
     exit;
 }
 
+$DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
+
 final class Members
 {
-    public const string DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
-
     public function route(): void
     {
         global $JAX,$PAGE;
@@ -91,7 +91,7 @@ final class Members
                 [
                     'avatar_url' => $JAX->pick(
                         $f['avatar'],
-                        self::DEFAULT_AVATAR,
+                        $DEFAULT_AVATAR,
                     ),
                     'group_title' => $f['group_title'],
                     'id' => $f['id'],
@@ -314,7 +314,7 @@ final class Members
                         [
                             'avatar_url' => $JAX->pick(
                                 $v['avatar'],
-                                self::DEFAULT_AVATAR,
+                                $DEFAULT_AVATAR,
                             ),
                             'id' => $v['id'],
                             'title' => $v['display_name'],
