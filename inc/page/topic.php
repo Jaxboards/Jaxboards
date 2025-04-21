@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 final class Topic
 {
+    public function __construct()
+    {
+        global $PAGE;
+        $PAGE->loadmeta('topic');
+    }
+
     /**
      * @var int
      */
@@ -30,14 +36,9 @@ final class Topic
     private $firstPostID = 0;
 
     /**
-     * @var array|null
+     * @var null|array
      */
     private $topicdata;
-
-    public function __construct() {
-        global $PAGE;
-        $PAGE->loadmeta('topic');
-    }
 
     public function route(): void
     {
@@ -46,7 +47,7 @@ final class Topic
         preg_match('@\d+$@', (string) $JAX->b['act'], $act);
         $this->tid = (int) $act[0] ?: 0;
 
-        if (!$this->tid) {
+        if ($this->tid === 0) {
             $PAGE->location('?');
 
             return;
@@ -266,21 +267,33 @@ final class Topic
                 $PAGE->metaexists('button-newtopic')
                     ? 'button-newtopic'
                     : 'topic-button-newtopic',
-            ) .
-            '</a>';
+            )
+            . '</a>';
         }
 
-        if ($this->topicdata['fperms']['reply'] && (!$this->topicdata['locked'] || $PERMS['can_override_locked_topics'])) {
+        if (
+            $this->topicdata['fperms']['reply']
+            && (
+                !$this->topicdata['locked']
+                || $PERMS['can_override_locked_topics']
+            )
+        ) {
             $buttons[] = "<a href='?act=vt{$tid}&qreply=1'>" . $PAGE->meta(
-            $PAGE->metaexists('button-qreply')
+                $PAGE->metaexists('button-qreply')
                 ? 'button-qreply'
                 : 'topic-button-qreply',
-                ) . "</a>";
+            ) . '</a>';
         }
 
-        if ($this->topicdata['fperms']['reply'] && (!$this->topicdata['locked'] || $PERMS['can_override_locked_topics'])) {
+        if (
+            $this->topicdata['fperms']['reply']
+            && (
+                !$this->topicdata['locked']
+                || $PERMS['can_override_locked_topics']
+            )
+        ) {
             $buttons[] = "<a href='?act=post&tid={$tid}'>" . $PAGE->meta(
-            $PAGE->metaexists('button-reply')
+                $PAGE->metaexists('button-reply')
                 ? 'button-reply'
                 : 'topic-button-reply',
             ) . '</a>';
@@ -300,6 +313,7 @@ final class Topic
 
             if (isset($user['is_bot']) && $user['is_bot']) {
                 $usersonline .= '<a class="user' . $user['uid'] . '">' . $user['name'] . '</a>';
+
                 continue;
             }
 
@@ -403,6 +417,7 @@ final class Topic
                     $f['status'] !== 'active' ? $f['status'] : '',
                     $f['name'],
                 ];
+
                 continue;
             }
 
@@ -1121,10 +1136,13 @@ final class Topic
 
         if (!$post) {
             $PAGE->JS('alert', 'Post not found!');
+
             return;
         }
+
         if (!$this->canedit($post)) {
             $PAGE->JS('alert', "You don't have permission to edit this post.");
+
             return;
         }
 
