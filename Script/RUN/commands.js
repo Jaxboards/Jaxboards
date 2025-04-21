@@ -15,9 +15,7 @@ import Sound from '../sound';
  */
 export default {
   loadscript([src]) {
-    const s = document.createElement('script');
-    s.src = src;
-    document.body.appendChild(s);
+    document.body.appendChild(Object.assign(document.createElement('script'), { src }));
   },
   script(a) {
     // eslint-disable-next-line
