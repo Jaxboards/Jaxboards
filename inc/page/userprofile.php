@@ -636,7 +636,7 @@ final class UserProfile
                     $activity['uid'],
                     $activity['group_id'],
                     $activity['arg2'],
-                ) . ', ' . $this->smalldate($activity['date']),
+                ) . ', ' . $JAX->smalldate($activity['date']),
             'buddy_add' => $user . ' made friends with ' . $otherguy,
         };
 
