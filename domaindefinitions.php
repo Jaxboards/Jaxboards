@@ -26,7 +26,6 @@ function pathjoin(string ...$paths): ?string
     return preg_replace('@\/+@', '/', implode('/', $paths) . '/');
 }
 
-// phpcs:disable SlevomatCodingStandard.Variables.DisallowSuperGlobalVariable
 // Figure out url.
 $host = $_SERVER['SERVER_NAME'];
 // Build the url.

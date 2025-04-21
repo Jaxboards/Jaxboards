@@ -11,7 +11,6 @@ declare(strict_types=1);
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
 
-// phpcs:disable SlevomatCodingStandard.Variables.DisallowSuperGlobalVariable
 if ($_GET['showerrors'] ?? false) {
     error_reporting(E_ALL);
     ini_set('display_errors', '1');
@@ -85,7 +84,6 @@ if (isset($CFG['noboard']) && $CFG['noboard']) {
 
 $PAGE = new PAGE();
 $JAX = new JAX();
-// phpcs:disable SlevomatCodingStandard.Variables.DisallowSuperGlobalVariable
 $SESS = new SESS($_SESSION['sid'] ?? false);
 
 if (!isset($_SESSION['uid']) && isset($JAX->c['utoken'])) {

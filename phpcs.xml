@@ -257,7 +257,6 @@
   <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint"/>
   <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint"/>
   <rule ref="SlevomatCodingStandard.TypeHints.UselessConstantTypeHint"/>
-  <rule ref="SlevomatCodingStandard.Variables.DisallowSuperGlobalVariable"/>
   <rule ref="SlevomatCodingStandard.Variables.DisallowVariableVariable"/>
   <rule ref="SlevomatCodingStandard.Variables.DuplicateAssignmentToVariable"/>
   <rule ref="SlevomatCodingStandard.Variables.UnusedVariable"/>
