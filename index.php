@@ -283,7 +283,7 @@ if (!$PAGE->jsaccess) {
     $version = json_decode(
         file_get_contents(__DIR__ . '/composer.json'),
         null,
-        1,
+        512,
         JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
     )['version'] ?? 'Unknown';
 
