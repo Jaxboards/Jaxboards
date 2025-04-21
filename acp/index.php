@@ -22,8 +22,6 @@ if (!defined('JAXBOARDS_ROOT')) {
 // Load composer dependencies.
 require_once JAXBOARDS_ROOT . '/vendor/autoload.php';
 
-define('INACP', 'true');
-
 require_once JAXBOARDS_ROOT . '/config.php';
 
 require_once JAXBOARDS_ROOT . '/inc/classes/jax.php';
