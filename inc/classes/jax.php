@@ -55,6 +55,13 @@ final class JAX
         return $v;
     }
 
+    public static function getIp()
+    {
+        global $_SERVER;
+
+        return $_SERVER['REMOTE_ADDR'];
+    }
+
     public $attachmentdata;
 
     public $userPerms = '';
@@ -154,7 +161,7 @@ final class JAX
 
     public function linkify($a)
     {
-        $a = str_replace('<IP>', $this->getIp(), $a);
+        $a = str_replace('<IP>', self::getIp(), $a);
 
         return preg_replace_callback(
             '@(^|\s)(https?://[^\s\)\(<>]+)@',
@@ -773,7 +780,7 @@ final class JAX
         global $PAGE;
 
         if (!$ip) {
-            $ip = $this->getIp();
+            $ip = self::getIp();
         }
 
         if ($this->ipbancache === null) {
@@ -836,7 +843,7 @@ final class JAX
         }
 
         if (!$ipAddress) {
-            $ipAddress = $this->getIp();
+            $ipAddress = self::getIp();
         }
 
         $result = $DB->safespecial(
@@ -855,17 +862,10 @@ final class JAX
         return !isset($row['banned']) || $row['banned'] > 0;
     }
 
-    public static function getIp()
-    {
-        global $_SERVER;
-
-        return $_SERVER['REMOTE_ADDR'];
-    }
-
     public function ip2bin($ip = false): false|string
     {
         if (!$ip) {
-            $ip = $this->getIp();
+            $ip = self::getIp();
         }
 
         if (!filter_var($ip, FILTER_VALIDATE_IP)) {

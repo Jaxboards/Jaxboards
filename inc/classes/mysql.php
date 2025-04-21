@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 final class MySQL
 {
+    public $lastQuery;
     public $debugMode = false;
+
     private $queryList = [];
 
     private $mysqli_connection = false;
-
-    private $engine = 'MySQL';
 
     private $prefix = '';
 
@@ -361,6 +361,7 @@ final class MySQL
         if ($this->debugMode) {
             $this->queryList[] = $query_string;
         }
+
         if (!$stmt) {
             $error = $this->mysqli_connection->error;
             if ($error) {

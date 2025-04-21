@@ -5,13 +5,17 @@ declare(strict_types=1);
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', __DIR__);
 }
+
 // Load composer dependencies.
 require_once JAXBOARDS_ROOT . '/vendor/autoload.php';
 
 // Require the classes.
 require_once JAXBOARDS_ROOT . '/inc/classes/page.php';
+
 require_once JAXBOARDS_ROOT . '/inc/classes/sess.php';
+
 require_once JAXBOARDS_ROOT . '/inc/classes/jax.php';
+
 require_once __DIR__ . '/inc/classes/mysql.php';
 
 require_once __DIR__ . '/config.php';
