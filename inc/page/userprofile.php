@@ -479,7 +479,7 @@ final class UserProfile
                     while ($f = $DB->arow($result)) {
                         $f['name'] = $udata['display_name'];
                         $f['group_id'] = $udata['group_id'];
-                        $data = $JAX->parse_activity($f, true);
+                        $data = $this->parse_activity_rss($f);
                         $feed->additem(
                             [
                                 'description' => $data['text'],
@@ -500,7 +500,7 @@ final class UserProfile
                 while ($f = $DB->arow($result)) {
                     $f['name'] = $udata['display_name'];
                     $f['group_id'] = $udata['group_id'];
-                    $pfbox .= $JAX->parse_activity($f);
+                    $pfbox .= $this->parse_activity($f);
                 }
 
                 $pfbox = $pfbox === '' || $pfbox === '0'
@@ -604,5 +604,72 @@ final class UserProfile
         }
 
         return null;
+    }
+
+    public function parse_activity($activity): array|string
+    {
+        global $PAGE,$USER,$JAX;
+        $user = $PAGE->meta(
+            'user-link',
+            $activity['uid'],
+            $activity['group_id'],
+            $USER && $USER['id'] === $activity['uid'] ? 'You' : $activity['name'],
+        );
+        $otherguy = $PAGE->meta(
+            'user-link',
+            $activity['aff_id'],
+            $activity['aff_group_id'],
+            $activity['aff_name'],
+        );
+
+        $text = match ($activity['type']) {
+            'profile_comment' => "$user  commented on  $otherguy's profile",
+            'new_post' => "$user posted in topic <a href='?act=vt{$activity['tid']}&findpost={$activity['pid']}'>{$activity['arg1']}</a>, ". $JAX->smalldate($activity['date']),
+            'new_topic' => "$user created new topic <a href='?act=vt{$activity['tid']}'>{$activity['arg1']}</a>, " . $JAX->smalldate($activity['date']),
+            'profile_name_change' => $PAGE->meta(
+                    'user-link',
+                    $activity['uid'],
+                    $activity['group_id'],
+                    $activity['arg1'],
+                ) . ' is now known as ' . $PAGE->meta(
+                    'user-link',
+                    $activity['uid'],
+                    $activity['group_id'],
+                    $activity['arg2'],
+                ) . ', ' . $this->smalldate($activity['date']),
+            'buddy_add' => $user . ' made friends with ' . $otherguy,
+        };
+
+        return  "<div class=\"activity {$activity['type']}\">$text</div>";
+    }
+
+
+    public function parse_activity_rss($activity): array|string
+    {
+        global $PAGE,$USER,$JAX;
+
+        return match($activity['type']) {
+            'profile_comment' => [
+                'link' => $JAX->blockhtml('?act=vu' . $activity['aff_id']),
+                'text' => $activity['name'] . ' commented on '
+                . $activity['aff_name'] . "'s profile",
+            ],
+            'new_post' => [
+                'link' => $JAX->blockhtml('?act=vt' . $activity['tid'] . '&findpost=' . $activity['pid']),
+                'text' => $activity['name'] . ' posted in topic ' . $activity['arg1'],
+            ],
+            'new_topic' => [
+                'link' => $JAX->blockhtml('?act=vt' . $activity['tid']),
+                'text' => $activity['name'] . ' created new topic ' . $activity['arg1'],
+            ],
+            'profile_name_change' => [
+                'link' => $JAX->blockhtml('?act=vu' . $activity['uid']),
+                'text' => $activity['arg1'] . ' is now known as ' . $activity['arg2'],
+            ],
+            'buddy_add' => [
+                'link' => $JAX->blockhtml('?act=vu' . $activity['uid']),
+                'text' => $activity['name'] . ' made friends with ' . $activity['aff_name'],
+            ],
+        };
     }
 }
