@@ -22,8 +22,6 @@ final class Topic
 
     private $firstPostID = 0;
 
-    private $lastPostID;
-
     private $topicdata;
 
     public function route(): void
@@ -67,55 +65,67 @@ final class Topic
             }
 
             $PAGE->location('?act=post&tid=' . $tid);
+
             return;
         }
 
         if (isset($JAX->b['ratepost']) && $JAX->b['ratepost']) {
             $this->ratepost($JAX->b['ratepost'], $JAX->b['niblet']);
+
             return;
         }
 
         if (isset($JAX->b['votepoll']) && $JAX->b['votepoll']) {
             $this->votepoll();
+
             return;
         }
 
         if (isset($JAX->b['findpost']) && $JAX->b['findpost']) {
             $this->findpost($JAX->b['findpost']);
+
             return;
         }
 
         if (isset($JAX->b['getlast']) && $JAX->b['getlast']) {
             $this->getlastpost($tid);
+
             return;
         }
 
         if (isset($JAX->b['edit']) && $JAX->b['edit']) {
             $this->qeditpost($JAX->b['edit']);
+
             return;
         }
 
         if (isset($JAX->b['quote']) && $JAX->b['quote']) {
             $this->multiquote($tid);
+
             return;
         }
+
         if (isset($JAX->b['markread']) && $JAX->b['markread']) {
             $this->markread($tid);
+
             return;
         }
 
         if (isset($JAX->b['listrating']) && $JAX->b['listrating']) {
             $this->listrating($JAX->b['listrating']);
+
             return;
         }
 
         if ($PAGE->jsupdate) {
             $this->update($tid);
+
             return;
         }
 
         if (isset($JAX->b['fmt']) && $JAX->b['fmt'] === 'RSS') {
             $this->viewrss($tid);
+
             return;
         }
 
@@ -159,51 +169,6 @@ final class Topic
             $this->topicdata['fperms'],
             $USER ? $USER['group_id'] : 3,
         );
-    }
-
-    private function viewrss($tid) {
-        global $JAX,$DB;
-        include_once __DIR__ . '/../classes/rssfeed.php';
-        $link = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['SCRIPT_NAME'];
-        $feed = new rssfeed(
-            [
-                'description' => $this->topicdata['subtitle'],
-                'link' => $link . '?act=vt' . $tid,
-                'title' => $this->topicdata['topic_title'],
-            ],
-        );
-        $result = $DB->safespecial(
-            <<<'MySQL'
-                SELECT p.`id` AS `id`
-                    , p.`post` AS `post`
-                    , UNIX_TIMESTAMP(p.`date`) AS `date`
-                    , m.`id` AS `id`
-                    , m.`display_name` AS `display_name`
-                FROM %t p
-                LEFT JOIN %t m
-                    ON p.`auth_id` = m.`id`
-                    WHERE p.`tid` = ?
-
-                MySQL,
-            ['posts', 'members'],
-            $DB->basicvalue($tid),
-        );
-        echo $DB->error(1);
-        while ($f = $DB->arow($result)) {
-            $feed->additem(
-                [
-                    'description' => $JAX->blockhtml($JAX->theworks($f['post'])),
-                    'guid' => $f['id'],
-                    'link' => "{$link}?act=vt{$tid}&amp;findpost={$f['id']}",
-                    'pubDate' => gmdate('r', $f['date']),
-                    'title' => $f['display_name'] . ':',
-                ],
-            );
-        }
-
-        $feed->publish();
-
-        exit();
     }
 
     public function viewtopic($tid): void
@@ -365,12 +330,16 @@ final class Topic
             $PAGE->updatepath();
             if (isset($JAX->b['pid']) && $JAX->b['pid']) {
                 $PAGE->JS('scrollToPost', $JAX->b['pid']);
+
                 return;
             }
+
             if (isset($JAX->b['page']) && $JAX->b['page']) {
                 $PAGE->JS('scrollToPost', $this->firstPostID, 1);
+
                 return;
             }
+
             return;
         }
 
@@ -781,8 +750,6 @@ final class Topic
             );
             $lastpid = $post['pid'];
         }
-
-        $this->lastPostID = $lastpid;
         $SESS->addvar('topic_lastpid', $lastpid);
 
         return $rows;
@@ -886,33 +853,34 @@ final class Topic
 
             $page .= "<tr><td colspan='3' class='totalvotes'>Total Votes: "
                 . $usersvoted . '</td></tr>';
-            $page .= '</table>';
-            return $page;
+
+            return $page . '</table>';
         }
 
         $page = $JAX->hiddenFormFields(
-                [
-                    'act' => 'vt' . $this->tid,
-                    'votepoll' => 1,
-                ],
-            );
+            [
+                'act' => 'vt' . $this->tid,
+                'votepoll' => 1,
+            ],
+        );
 
         foreach ($choices as $k => $v) {
-            $page .= "<div class='choice'>".
-            ($type === 'multi' ?
-                "<input type='checkbox' name='choice[]' value='{$k}' id='poll_{$k}' />" :
-                "<input type='radio' name='choice' value='{$k}' id='poll_{$k}' /> "
-            ) .
-            "<label for='poll_{$k}'>{$v}</label>".
-            "</div>";
+            $page .= "<div class='choice'>"
+            . (
+                $type === 'multi'
+                ? "<input type='checkbox' name='choice[]' value='{$k}' id='poll_{$k}' />"
+                : "<input type='radio' name='choice' value='{$k}' id='poll_{$k}' /> "
+            )
+            . "<label for='poll_{$k}'>{$v}</label>"
+            . '</div>';
         }
 
-        return "<form method='post' action='?' data-ajax-form='true'>".
-            $page .
-            "<div class='buttons'>".
-            "<input type='submit' value='Vote'>" .
-            "</div>" .
-            "</form>";
+        return "<form method='post' action='?' data-ajax-form='true'>"
+            . $page
+            . "<div class='buttons'>"
+            . "<input type='submit' value='Vote'>"
+            . '</div>'
+            . '</form>';
     }
 
     public function votepoll()
@@ -1312,6 +1280,7 @@ final class Topic
         $PAGE->JS('softurl');
         if ($couldntfindit) {
             $PAGE->JS('alert', "that post doesn't exist");
+
             return;
         }
 
@@ -1397,5 +1366,52 @@ final class Topic
         }
 
         $PAGE->JS('listrating', $pid, $page);
+    }
+
+    private function viewrss(string $tid): void
+    {
+        global $JAX,$DB;
+
+        include_once __DIR__ . '/../classes/rssfeed.php';
+        $link = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['SCRIPT_NAME'];
+        $feed = new rssfeed(
+            [
+                'description' => $this->topicdata['subtitle'],
+                'link' => $link . '?act=vt' . $tid,
+                'title' => $this->topicdata['topic_title'],
+            ],
+        );
+        $result = $DB->safespecial(
+            <<<'MySQL'
+                SELECT p.`id` AS `id`
+                    , p.`post` AS `post`
+                    , UNIX_TIMESTAMP(p.`date`) AS `date`
+                    , m.`id` AS `id`
+                    , m.`display_name` AS `display_name`
+                FROM %t p
+                LEFT JOIN %t m
+                    ON p.`auth_id` = m.`id`
+                    WHERE p.`tid` = ?
+
+                MySQL,
+            ['posts', 'members'],
+            $DB->basicvalue($tid),
+        );
+        echo $DB->error(1);
+        while ($f = $DB->arow($result)) {
+            $feed->additem(
+                [
+                    'description' => $JAX->blockhtml($JAX->theworks($f['post'])),
+                    'guid' => $f['id'],
+                    'link' => "{$link}?act=vt{$tid}&amp;findpost={$f['id']}",
+                    'pubDate' => gmdate('r', $f['date']),
+                    'title' => $f['display_name'] . ':',
+                ],
+            );
+        }
+
+        $feed->publish();
+
+        exit;
     }
 }
