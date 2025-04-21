@@ -3,7 +3,7 @@
 
 declare(strict_types=1);
 
-/**
+/*
  * Fetch the greater version property between two json files.
  *
  * USAGE:
