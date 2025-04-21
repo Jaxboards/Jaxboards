@@ -29,6 +29,7 @@ final class rssfeed
                 </channel>
             </rss>
             EOT;
+        exit(0);
     }
 
     public function make_xml($array): string

@@ -493,8 +493,6 @@ final class UserProfile
                     }
 
                     $feed->publish();
-
-                    exit;
                 }
 
                 while ($f = $DB->arow($result)) {

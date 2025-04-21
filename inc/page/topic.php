@@ -1395,7 +1395,7 @@ final class Topic
 
         include_once __DIR__ . '/../classes/rssfeed.php';
         $link = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['SCRIPT_NAME'];
-        $feed = new rssfeed(
+        $feed = new RSSFeed(
             [
                 'description' => $this->topicdata['subtitle'],
                 'link' => $link . '?act=vt' . $tid,
@@ -1407,7 +1407,6 @@ final class Topic
                 SELECT p.`id` AS `id`
                     , p.`post` AS `post`
                     , UNIX_TIMESTAMP(p.`date`) AS `date`
-                    , m.`id` AS `id`
                     , m.`display_name` AS `display_name`
                 FROM %t p
                 LEFT JOIN %t m
@@ -1418,21 +1417,18 @@ final class Topic
             ['posts', 'members'],
             $DB->basicvalue($tid),
         );
-        echo $DB->error(1);
-        while ($f = $DB->arow($result)) {
+        while ($post = $DB->arow($result)) {
             $feed->additem(
                 [
-                    'description' => $JAX->blockhtml($JAX->theworks($f['post'])),
-                    'guid' => $f['id'],
-                    'link' => "{$link}?act=vt{$tid}&amp;findpost={$f['id']}",
-                    'pubDate' => gmdate('r', $f['date']),
-                    'title' => $f['display_name'] . ':',
+                    'description' => $JAX->blockhtml($JAX->theworks($post['post'])),
+                    'guid' => $post['id'],
+                    'link' => "{$link}?act=vt{$tid}&amp;findpost={$post['id']}",
+                    'pubDate' => gmdate('r', $post['date']),
+                    'title' => $post['display_name'] . ':',
                 ],
             );
         }
 
         $feed->publish();
-
-        exit;
     }
 }
