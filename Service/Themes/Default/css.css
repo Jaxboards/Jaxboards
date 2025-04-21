@@ -603,14 +603,14 @@ textarea {
 }
 
 /* stylelint-disable no-descending-specificity */
+.contact-card .content {
+  display: flex;
+}
+
 .contact-card .content a {
   font-size: 1.4rem;
 }
 /* stylelint-enable no-descending-specificity */
-
-.contact-card .content {
-  display: flex;
-}
 
 .contact-card .right {
   padding: 10px;
