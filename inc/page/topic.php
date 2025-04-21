@@ -6,41 +6,41 @@ $PAGE->loadmeta('topic');
 
 final class Topic
 {
-    public $id = 0;
+    private $tid = 0;
 
     /**
      * @var int
      */
-    public $page = '';
+    private $page = '';
 
     /**
      * @var int
      */
-    public $numperpage = 0;
+    private $numperpage = 0;
 
-    public $canmod = false;
+    private $canMod = false;
 
-    public $firstPostID = 0;
+    private $firstPostID = 0;
 
-    public $lastPostID;
+    private $lastPostID;
 
-    public $topicdata;
+    private $topicdata;
 
     public function route(): void
     {
         global $JAX,$PAGE;
 
         preg_match('@\d+$@', (string) $JAX->b['act'], $act);
-        $this->id = $act[0] ?: 0;
-        $id = $act[0] ?: 0;
-        if (!$id) {
+        $this->tid = $act[0] ?: 0;
+        $tid = $act[0] ?: 0;
+        if (!$tid) {
             $PAGE->location('?');
 
             return;
         }
 
-        $this->getTopicData($id);
-        if (!$this->topicdata) {
+        $this->getTopicData($tid);
+        if (!$this->topicdata || !$this->topicdata['fperms']['read']) {
             $PAGE->location('?');
 
             return;
@@ -54,43 +54,75 @@ final class Topic
         --$this->page;
 
         $this->numperpage = 10;
+
         if (
             isset($JAX->b['qreply'])
             && $JAX->b['qreply']
             && !$PAGE->jsupdate
         ) {
             if ($PAGE->jsaccess && !$PAGE->jsdirectlink) {
-                $this->qreplyform($id);
-            } else {
-                $PAGE->location('?act=post&tid=' . $id);
+                $this->qreplyform($tid);
+
+                return;
             }
-        } elseif (isset($JAX->b['ratepost']) && $JAX->b['ratepost']) {
-            $this->ratepost($JAX->b['ratepost'], $JAX->b['niblet']);
-        } elseif (isset($JAX->b['votepoll']) && $JAX->b['votepoll']) {
-            $this->votepoll();
-        } elseif (isset($JAX->b['findpost']) && $JAX->b['findpost']) {
-            $this->findpost($JAX->b['findpost']);
-        } elseif (isset($JAX->b['getlast']) && $JAX->b['getlast']) {
-            $this->getlastpost($id);
-        } elseif (isset($JAX->b['edit']) && $JAX->b['edit']) {
-            $this->qeditpost($JAX->b['edit']);
-        } elseif (isset($JAX->b['quote']) && $JAX->b['quote']) {
-            $this->multiquote($id);
-        } elseif (isset($JAX->b['markread']) && $JAX->b['markread']) {
-            $this->markread($id);
-        } elseif (
-            isset($JAX->b['listrating'])
-            && $JAX->b['listrating']
-        ) {
-            $this->listrating($JAX->b['listrating']);
-        } elseif ($PAGE->jsupdate) {
-            $this->update($id);
-        } else {
-            $this->viewtopic($id);
+
+            $PAGE->location('?act=post&tid=' . $tid);
+            return;
         }
+
+        if (isset($JAX->b['ratepost']) && $JAX->b['ratepost']) {
+            $this->ratepost($JAX->b['ratepost'], $JAX->b['niblet']);
+            return;
+        }
+
+        if (isset($JAX->b['votepoll']) && $JAX->b['votepoll']) {
+            $this->votepoll();
+            return;
+        }
+
+        if (isset($JAX->b['findpost']) && $JAX->b['findpost']) {
+            $this->findpost($JAX->b['findpost']);
+            return;
+        }
+
+        if (isset($JAX->b['getlast']) && $JAX->b['getlast']) {
+            $this->getlastpost($tid);
+            return;
+        }
+
+        if (isset($JAX->b['edit']) && $JAX->b['edit']) {
+            $this->qeditpost($JAX->b['edit']);
+            return;
+        }
+
+        if (isset($JAX->b['quote']) && $JAX->b['quote']) {
+            $this->multiquote($tid);
+            return;
+        }
+        if (isset($JAX->b['markread']) && $JAX->b['markread']) {
+            $this->markread($tid);
+            return;
+        }
+
+        if (isset($JAX->b['listrating']) && $JAX->b['listrating']) {
+            $this->listrating($JAX->b['listrating']);
+            return;
+        }
+
+        if ($PAGE->jsupdate) {
+            $this->update($tid);
+            return;
+        }
+
+        if (isset($JAX->b['fmt']) && $JAX->b['fmt'] === 'RSS') {
+            $this->viewrss($tid);
+            return;
+        }
+
+        $this->viewtopic($tid);
     }
 
-    public function getTopicData($id): void
+    public function getTopicData($tid): void
     {
         global $DB,$JAX,$USER;
         $result = $DB->safespecial(
@@ -109,16 +141,14 @@ final class Topic
                     , a.`poll_results` AS `poll_results`
                     , a.`subtitle` AS `subtitle`
                 FROM %t a
-                LEFT JOIN %t b
-                		ON a.`fid` = b.`id`
-                LEFT JOIN %t AS c
-                		ON b.`cat_id` = c.`id`
+                LEFT JOIN %t b ON a.`fid` = b.`id`
+                LEFT JOIN %t AS c ON b.`cat_id` = c.`id`
                 WHERE a.`id` = ?
                 LIMIT 1
 
                 MySQL,
             ['topics', 'forums', 'categories'],
-            $id,
+            $tid,
         );
         $this->topicdata = $DB->arow($result);
         $DB->disposeresult($result);
@@ -131,74 +161,69 @@ final class Topic
         );
     }
 
-    public function viewtopic($id)
+    private function viewrss($tid) {
+        global $JAX,$DB;
+        include_once __DIR__ . '/../classes/rssfeed.php';
+        $link = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['SCRIPT_NAME'];
+        $feed = new rssfeed(
+            [
+                'description' => $this->topicdata['subtitle'],
+                'link' => $link . '?act=vt' . $tid,
+                'title' => $this->topicdata['topic_title'],
+            ],
+        );
+        $result = $DB->safespecial(
+            <<<'MySQL'
+                SELECT p.`id` AS `id`
+                    , p.`post` AS `post`
+                    , UNIX_TIMESTAMP(p.`date`) AS `date`
+                    , m.`id` AS `id`
+                    , m.`display_name` AS `display_name`
+                FROM %t p
+                LEFT JOIN %t m
+                    ON p.`auth_id` = m.`id`
+                    WHERE p.`tid` = ?
+
+                MySQL,
+            ['posts', 'members'],
+            $DB->basicvalue($tid),
+        );
+        echo $DB->error(1);
+        while ($f = $DB->arow($result)) {
+            $feed->additem(
+                [
+                    'description' => $JAX->blockhtml($JAX->theworks($f['post'])),
+                    'guid' => $f['id'],
+                    'link' => "{$link}?act=vt{$tid}&amp;findpost={$f['id']}",
+                    'pubDate' => gmdate('r', $f['date']),
+                    'title' => $f['display_name'] . ':',
+                ],
+            );
+        }
+
+        $feed->publish();
+
+        exit();
+    }
+
+    public function viewtopic($tid): void
     {
         global $DB,$PAGE,$JAX,$SESS,$USER,$PERMS;
         $page = $this->page;
 
         if ($USER && $this->topicdata['lp_date'] > $USER['last_visit']) {
-            $this->markread($id);
-        }
-
-        if (!$this->topicdata['fperms']['read']) {
-            // No business being here.
-            return $PAGE->location('?');
+            $this->markread($tid);
         }
 
         $PAGE->append('TITLE', ' -> ' . $this->topicdata['topic_title']);
         $SESS->location_verbose = "In topic '" . $this->topicdata['topic_title'] . "'";
-
-        // Output RSS instead.
-        if (isset($JAX->b['fmt']) && $JAX->b['fmt'] === 'RSS') {
-            include_once __DIR__ . '/../classes/rssfeed.php';
-            $link = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['SCRIPT_NAME'];
-            $feed = new rssfeed(
-                [
-                    'description' => $this->topicdata['subtitle'],
-                    'link' => $link . '?act=vt' . $id,
-                    'title' => $this->topicdata['topic_title'],
-                ],
-            );
-            $result = $DB->safespecial(
-                <<<'MySQL'
-                    SELECT p.`id` AS `id`
-                        , p.`post` AS `post`
-                        , UNIX_TIMESTAMP(p.`date`) AS `date`
-                        , m.`id` AS `id`
-                        , m.`display_name` AS `display_name`
-                    FROM %t p
-                    LEFT JOIN %t m
-                        ON p.`auth_id` = m.`id`
-                        WHERE p.`tid` = ?
-
-                    MySQL,
-                ['posts', 'members'],
-                $DB->basicvalue($id),
-            );
-            echo $DB->error(1);
-            while ($f = $DB->arow($result)) {
-                $feed->additem(
-                    [
-                        'description' => $JAX->blockhtml($JAX->theworks($f['post'])),
-                        'guid' => $f['id'],
-                        'link' => $link . '?act=vt' . $id . '&amp;findpost=' . $f['id'],
-                        'pubDate' => gmdate('r', $f['date']),
-                        'title' => $f['display_name'] . ':',
-                    ],
-                );
-            }
-
-            $feed->publish();
-
-            exit;
-        }
 
         // Fix this to work with subforums.
         $PAGE->path(
             [
                 $this->topicdata['cat_title'] => '?act=vc' . $this->topicdata['cat_id'],
                 $this->topicdata['forum_title'] => '?act=vf' . $this->topicdata['fid'],
-                $this->topicdata['topic_title'] => "?act=vt{$id}",
+                $this->topicdata['topic_title'] => "?act=vt{$tid}",
             ],
         );
 
@@ -207,7 +232,7 @@ final class Topic
             'COUNT(`id`)',
             'posts',
             'WHERE `tid`=?',
-            $id,
+            $tid,
         );
         $thisrow = $DB->arow($result);
         $posts = array_pop($thisrow);
@@ -218,7 +243,7 @@ final class Topic
         foreach ($JAX->pages($totalpages, $this->page + 1, 10) as $x) {
             $pagelist .= $PAGE->meta(
                 'topic-pages-part',
-                $id,
+                $tid,
                 $x,
                 $x === $this->page + 1 ? ' class="active"' : '',
                 $x,
@@ -250,7 +275,7 @@ final class Topic
             $this->topicdata['topic_title']
             . ($this->topicdata['subtitle'] ? ', ' . $this->topicdata['subtitle'] : ''),
             $page,
-            '<a href="./?act=vt' . $id . '&amp;fmt=RSS" class="social rss" title="RSS Feed for this Topic">RSS</a>',
+            '<a href="./?act=vt' . $tid . '&amp;fmt=RSS" class="social rss" title="RSS Feed for this Topic">RSS</a>',
         );
 
         // Add buttons.
@@ -266,7 +291,7 @@ final class Topic
             $this->topicdata['fperms']['reply']
             && (!$this->topicdata['locked']
             || $PERMS['can_override_locked_topics'])
-                ? "<a href='?act=vt{$id}&qreply=1'>"
+                ? "<a href='?act=vt{$tid}&qreply=1'>"
             . $PAGE->meta(
                 $PAGE->metaexists('button-qreply')
                     ? 'button-qreply'
@@ -276,7 +301,7 @@ final class Topic
             $this->topicdata['fperms']['reply']
             && (!$this->topicdata['locked']
             || $PERMS['can_override_locked_topics'])
-                ? "<a href='?act=post&tid={$id}'>"
+                ? "<a href='?act=post&tid={$tid}'>"
             . $PAGE->meta(
                 $PAGE->metaexists('button-reply')
                     ? 'button-reply'
@@ -292,7 +317,7 @@ final class Topic
                 continue;
             }
 
-            if ($f['location'] !== "vt{$id}") {
+            if ($f['location'] !== "vt{$tid}") {
                 continue;
             }
 
@@ -332,7 +357,7 @@ final class Topic
 
                 MySQL,
             ['topics'],
-            $id,
+            $tid,
         );
 
         if ($PAGE->jsaccess) {
@@ -340,22 +365,24 @@ final class Topic
             $PAGE->updatepath();
             if (isset($JAX->b['pid']) && $JAX->b['pid']) {
                 $PAGE->JS('scrollToPost', $JAX->b['pid']);
-            } elseif (isset($JAX->b['page']) && $JAX->b['page']) {
-                $PAGE->JS('scrollToPost', $this->firstPostID, 1);
+                return;
             }
-        } else {
-            $PAGE->append('page', $page);
+            if (isset($JAX->b['page']) && $JAX->b['page']) {
+                $PAGE->JS('scrollToPost', $this->firstPostID, 1);
+                return;
+            }
+            return;
         }
 
-        return null;
+        $PAGE->append('page', $page);
     }
 
-    public function update($id): void
+    public function update($tid): void
     {
         global $SESS,$PAGE,$DB,$JAX;
 
         // Check for new posts and append them.
-        if ($SESS->location !== "vt{$id}") {
+        if ($SESS->location !== "vt{$tid}") {
             $SESS->delvar('topic_lastpid');
         }
 
@@ -379,7 +406,7 @@ final class Topic
                 continue;
             }
 
-            if ($f['location'] !== "vt{$id}") {
+            if ($f['location'] !== "vt{$tid}") {
                 continue;
             }
 
@@ -410,7 +437,7 @@ final class Topic
         $SESS->users_online_cache = $newcache;
     }
 
-    public function qreplyform($id): void
+    public function qreplyform($tid): void
     {
         global $PAGE,$SESS,$DB,$JAX;
         $prefilled = '';
@@ -441,7 +468,7 @@ final class Topic
             'title',
             'topics',
             'WHERE `id`=?',
-            $id,
+            $tid,
         );
         $tdata = $DB->arow($result);
         $DB->disposeresult($result);
@@ -451,7 +478,7 @@ final class Topic
             [
                 'content' => $PAGE->meta(
                     'topic-reply-form',
-                    $id,
+                    $tid,
                     $JAX->blockhtml($prefilled),
                 ),
                 'id' => 'qreply',
@@ -518,7 +545,7 @@ final class Topic
 
                 MySQL,
             ['posts', 'members', 'member_groups', 'members'],
-            $this->id,
+            $this->tid,
             $lastpid,
         ) : $DB->safespecial(
             <<<'MySQL'
@@ -599,7 +626,7 @@ final class Topic
 
                 MySQL,
             ['posts', 'members', 'member_groups', 'members'],
-            $this->id,
+            $this->tid,
             $topic_post_counter = $this->page * $this->numperpage,
             $this->numperpage,
         );
@@ -627,7 +654,7 @@ final class Topic
                 $rniblets = $DB->getRatingNiblets();
                 if ($rniblets) {
                     foreach ($rniblets as $k => $v) {
-                        $postratingbuttons .= '<a href="?act=vt' . $this->id . '&amp;ratepost='
+                        $postratingbuttons .= '<a href="?act=vt' . $this->tid . '&amp;ratepost='
                             . $post['pid'] . '&amp;niblet=' . $k . '">'
                             . $PAGE->meta(
                                 'rating-niblet',
@@ -655,7 +682,7 @@ final class Topic
                         'rating-wrapper',
                         $postratingbuttons,
                         ($CFG['ratings'] & 2) === 0
-                            ? '<a href="?act=vt' . $this->id
+                            ? '<a href="?act=vt' . $this->tid
                         . '&amp;listrating=' . $post['pid'] . '">(List)</a>'
                             : '',
                         $showrating,
@@ -666,18 +693,18 @@ final class Topic
             $postbuttons
             // Adds the Edit button
             = ($this->canedit($post)
-                ? "<a href='?act=vt" . $this->id . '&amp;edit=' . $post['pid']
+                ? "<a href='?act=vt" . $this->tid . '&amp;edit=' . $post['pid']
             . "' class='edit'>" . $PAGE->meta('topic-edit-button')
             . '</a>'
                 : '')
             // Adds the Quote button
             . ($this->topicdata['fperms']['reply']
-                ? " <a href='?act=vt" . $this->id . '&amp;quote=' . $post['pid']
+                ? " <a href='?act=vt" . $this->tid . '&amp;quote=' . $post['pid']
             . "' onclick='RUN.handleQuoting(this);return false;' "
             . "class='quotepost'>" . $PAGE->meta('topic-quote-button') . '</a> '
                 : '')
             // Adds the Moderate options
-            . ($this->canmoderate()
+            . ($this->canModerate()
                 ? "<a href='?act=modcontrols&amp;do=modp&amp;pid=" . $post['pid']
             . "' class='modpost' onclick='RUN.modcontrols.togbutton(this)'>"
             . $PAGE->meta('topic-mod-button') . '</a>'
@@ -686,7 +713,7 @@ final class Topic
             $rows .= $PAGE->meta(
                 'topic-post-row',
                 $post['pid'],
-                $this->id,
+                $this->tid,
                 $post['auth_id'] ? $PAGE->meta(
                     'user-link',
                     $post['auth_id'],
@@ -706,7 +733,7 @@ final class Topic
                 $postbuttons,
                 // ^10
                 $JAX->date($post['date']),
-                '<a href="?act=vt' . $this->id . '&amp;findpost=' . $post['pid']
+                '<a href="?act=vt' . $this->tid . '&amp;findpost=' . $post['pid']
                 . '" onclick="prompt(\'Link to this post:\',this.href)">'
                 . $PAGE->meta('topic-perma-button') . '</a>',
                 $postt,
@@ -764,7 +791,7 @@ final class Topic
     public function canedit($post): bool
     {
         global $PERMS,$USER;
-        if ($this->canmoderate()) {
+        if ($this->canModerate()) {
             return true;
         }
 
@@ -775,16 +802,16 @@ final class Topic
         && $post['auth_id'] === $USER['id'];
     }
 
-    public function canmoderate()
+    public function canModerate()
     {
         global $PAGE,$PERMS,$USER,$DB;
-        if ($this->canmod) {
-            return $this->canmod;
+        if ($this->canMod) {
+            return $this->canMod;
         }
 
-        $canmod = false;
+        $canMod = false;
         if ($PERMS['can_moderate']) {
-            $canmod = true;
+            $canMod = true;
         }
 
         if ($USER && $USER['mod']) {
@@ -799,16 +826,16 @@ final class Topic
                     )
                     MySQL,
                 ['forums', 'topics'],
-                $DB->basicvalue($this->id),
+                $DB->basicvalue($this->tid),
             );
             $mods = $DB->arow($result);
             $DB->disposeresult($result);
             if (in_array($USER['id'], explode(',', (string) $mods['mods']))) {
-                $canmod = true;
+                $canMod = true;
             }
         }
 
-        return $this->canmod = $canmod;
+        return $this->canMod = $canMod;
     }
 
     public function generatepoll($q, $type, $choices, $results): string
@@ -845,6 +872,7 @@ final class Topic
         }
 
         $usersvoted = count($usersvoted);
+
         if ($voted) {
             $page .= '<table>';
             foreach ($choices as $k => $v) {
@@ -859,34 +887,32 @@ final class Topic
             $page .= "<tr><td colspan='3' class='totalvotes'>Total Votes: "
                 . $usersvoted . '</td></tr>';
             $page .= '</table>';
-        } else {
-            $page = "<form method='post' action='?' "
-                . "data-ajax-form='true'>"
-                . $JAX->hiddenFormFields(
-                    [
-                        'act' => 'vt' . $this->id,
-                        'votepoll' => 1,
-                    ],
-                );
-            if ($type === 'multi') {
-                foreach ($choices as $k => $v) {
-                    $page .= "<div class='choice'><input type='checkbox' "
-                        . "name='choice[]' value='{$k}' id='poll_{$k}' /> "
-                        . "<label for='poll_{$k}'>{$v}</label></div>";
-                }
-            } else {
-                foreach ($choices as $k => $v) {
-                    $page .= "<div class='choice'><input type='radio' "
-                        . "name='choice' value='{$k}' id='poll_{$k}' /> "
-                        . "<label for='poll_{$k}'>{$v}</label></div>";
-                }
-            }
-
-            $page .= "<div class='buttons'><input type='submit' "
-                . "value='Vote'></div></form>";
+            return $page;
         }
 
-        return $page;
+        $page = $JAX->hiddenFormFields(
+                [
+                    'act' => 'vt' . $this->tid,
+                    'votepoll' => 1,
+                ],
+            );
+
+        foreach ($choices as $k => $v) {
+            $page .= "<div class='choice'>".
+            ($type === 'multi' ?
+                "<input type='checkbox' name='choice[]' value='{$k}' id='poll_{$k}' />" :
+                "<input type='radio' name='choice' value='{$k}' id='poll_{$k}' /> "
+            ) .
+            "<label for='poll_{$k}'>{$v}</label>".
+            "</div>";
+        }
+
+        return "<form method='post' action='?' data-ajax-form='true'>".
+            $page .
+            "<div class='buttons'>".
+            "<input type='submit' value='Vote'>" .
+            "</div>" .
+            "</form>";
     }
 
     public function votepoll()
@@ -905,7 +931,7 @@ final class Topic
                 ],
                 'topics',
                 'WHERE `id`=?',
-                $this->id,
+                $this->tid,
             );
             $row = $DB->arow($result);
             $DB->disposeresult($result);
@@ -1001,7 +1027,7 @@ final class Topic
                 'poll_results' => $presults,
             ],
             'WHERE `id`=?',
-            $this->id,
+            $this->tid,
         );
 
         return null;
@@ -1070,15 +1096,15 @@ final class Topic
         $PAGE->JS('alert', $unrate ? 'Unrated!' : 'Rated!');
     }
 
-    public function qeditpost($id): void
+    public function qeditpost($pid): void
     {
         global $DB,$JAX,$PAGE,$USER,$PERMS;
-        if (!is_numeric($id)) {
+        if (!is_numeric($pid)) {
             return;
         }
 
         if (!$PAGE->jsaccess) {
-            $PAGE->location('?act=post&pid=' . $id);
+            $PAGE->location('?act=post&pid=' . $pid);
         }
 
         $PAGE->JS('softurl');
@@ -1091,7 +1117,7 @@ final class Topic
             ],
             'posts',
             'WHERE `id`=?',
-            $id,
+            $pid,
         );
         $post = $DB->arow($result);
         $DB->disposeresult($result);
@@ -1100,7 +1126,7 @@ final class Topic
             [
                 'act' => 'post',
                 'how' => 'qedit',
-                'pid' => $id,
+                'pid' => $pid,
             ],
         );
 
@@ -1160,11 +1186,11 @@ final class Topic
                     'topic-qedit-post',
                     $hiddenfields,
                     $JAX->blockhtml($post['post']),
-                    $id,
+                    $pid,
                 );
             }
 
-            $PAGE->JS('update', "#pid_{$id} .post_content", $form);
+            $PAGE->JS('update', "#pid_{$pid} .post_content", $form);
         }
     }
 
@@ -1286,19 +1312,20 @@ final class Topic
         $PAGE->JS('softurl');
         if ($couldntfindit) {
             $PAGE->JS('alert', "that post doesn't exist");
-        } else {
-            $PAGE->location(
-                '?act=vt' . $this->id . '&page='
-                . ceil($num / $this->numperpage) . '&pid=' . $pid . '#pid_' . $pid,
-            );
+            return;
         }
+
+        $PAGE->location(
+            '?act=vt' . $this->tid . '&page='
+            . ceil($num / $this->numperpage) . '&pid=' . $pid . '#pid_' . $pid,
+        );
     }
 
-    public function markread($id): void
+    public function markread($tid): void
     {
         global $SESS,$PAGE,$JAX;
         $topicsread = $JAX->parsereadmarkers($SESS->topicsread);
-        $topicsread[$id] = time();
+        $topicsread[$tid] = time();
         $SESS->topicsread = json_encode($topicsread);
     }
 
