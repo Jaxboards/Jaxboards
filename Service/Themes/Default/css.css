@@ -2079,7 +2079,7 @@ textarea {
 
 /* Member/Group Specific */
 a.birthday {
-  background: url('icons/birthday.png') no-repeat 2px 2px;
+  background: url('icons/birthday.png') no-repeat;
   padding-left: 18px;
 }
 
