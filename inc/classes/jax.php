@@ -4,6 +4,14 @@ declare(strict_types=1);
 
 final class JAX
 {
+    public function __construct()
+    {
+        $this->c = $this->filterInput($_COOKIE);
+        $this->g = $this->filterInput($_GET);
+        $this->p = $this->filterInput($_POST);
+        $this->b = array_merge($this->p, $this->g);
+    }
+
     public static function json_encode($a, $forceaa = false)
     {
         if ($forceaa) {
@@ -77,14 +85,6 @@ final class JAX
     public $ipbancache;
 
     public $emoteRules;
-
-    public function __construct()
-    {
-        $this->c = $this->filterInput($_COOKIE);
-        $this->g = $this->filterInput($_GET);
-        $this->p = $this->filterInput($_POST);
-        $this->b = array_merge($this->p, $this->g);
-    }
 
     public function between($a, $b, $c): bool
     {
@@ -257,7 +257,7 @@ final class JAX
                 'usertitle',
                 'website',
                 'wysiwyg',
-                'CONCAT(MONTH(`birthdate`),\' \',DAY(`birthdate`)) as `birthday`',
+                "CONCAT(MONTH(`birthdate`),' ',DAY(`birthdate`)) as `birthday`",
                 'DAY(`birthdate`) AS `dob_day`',
                 'MONTH(`birthdate`) AS `dob_month`',
                 'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
@@ -275,7 +275,6 @@ final class JAX
             return $this->userData = false;
         }
 
-        $user['ip'] = $this->bin2ip($user['ip']);
         $user['birthday'] = (date('n j') === $user['birthday'] ? 1 : 0);
 
         // Password parsing.
@@ -634,7 +633,7 @@ final class JAX
             . $m[1] . ($m[2] ?: 'px') . '">' . $m[3] . '</span>';
     }
 
-    public function bbcode_videocallback($m)
+    public function bbcode_videocallback($m): string
     {
 
         if (str_contains((string) $m[1], 'youtube.com')) {
@@ -656,21 +655,18 @@ final class JAX
 
     public function bbcode_licallback($m): string
     {
-        $lis = '';
-        $m[2] = preg_split("@(^|[\r\n])\\*@", (string) $m[2]);
-        foreach ($m[2] as $v) {
-            if (trim($v) === '') {
+        $items = preg_split("@(^|[\r\n])\\*@", (string) $m[2]);
+
+        $html = $m[1] === 'ol' ? '<ol>' : '<ul>';
+        foreach ($items as $item) {
+            if (trim($item) === '') {
                 continue;
             }
 
-            if (trim($v) === '0') {
-                continue;
-            }
-
-            $lis .= '<li>' . $v . ' </li>';
+            $html .= '<li>' . $item . ' </li>';
         }
 
-        return '<' . $m[1] . '>' . $lis . '</' . $m[1] . '>';
+        return $html . $m[1] === 'ol' ? '</ol>' : '</ul>';
     }
 
     public function attachments($a): null|array|string
@@ -693,10 +689,8 @@ final class JAX
             $result = $DB->safeselect(
                 [
                     'id',
-                    'ip',
                     'name',
                     'hash',
-                    'uid',
                     'size',
                     'downloads',
                 ],
@@ -709,7 +703,6 @@ final class JAX
             if (!$data) {
                 return "Attachment doesn't exist";
             }
-            $data['ip'] = $this->bin2ip($data['ip']);
 
             $this->attachmentdata[$a] = $data;
         }
@@ -917,7 +910,7 @@ final class JAX
      */
     public function ipServiceBanned($ipAddress = false): bool
     {
-        global $DB,$CFG;
+        global $DB,$CFG,$JAX;
 
         if (!$CFG['service']) {
             // Can't be service banned if there's no service.
@@ -971,9 +964,9 @@ final class JAX
     // .
     public function bin2ip($ip): string
     {
-        $l = mb_strlen($ip);
+        $l = mb_strlen((string) $ip);
 
-        return inet_ntop($ip) ?: inet_ntop(pack('A' . $l, $ip)) ?: '';
+        return (inet_ntop($ip) ?: inet_ntop(pack('A' . $l, $ip))) ?: '';
     }
 
     public function parseperms($permstoparse, $uid = false): array
@@ -1134,7 +1127,7 @@ final class JAX
         string $embedUrl,
     ): string {
         // phpcs:disable Generic.Files.LineLength.TooLong
-        return <<<HTML
+        return <<<DOC
             <div class="media youtube">
                 <div class="summary">
                     Watch Youtube Video:
@@ -1164,7 +1157,7 @@ final class JAX
                         ></iframe>
                 </div>
             </div>
-            HTML;
+            DOC;
         // phpcs:enable
     }
 }

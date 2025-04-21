@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-new IM();
-final class IM
+final class PrivateMessage
 {
-    public function __construct()
+    public function init(): void
     {
         global $JAX,$DB,$PAGE,$SESS;
         $im = $JAX->p['im_im'] ?? null;
@@ -14,7 +13,7 @@ final class IM
             $this->filter();
         }
 
-        if (!(trim($im ?? '') !== '') || !$uid) {
+        if (trim($im ?? '') === '' || !$uid) {
             return;
         }
 

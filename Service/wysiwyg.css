@@ -1,4 +1,11 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
 .editorframe {
+  width: 100%;
   background: #fff;
   border: 1px solid #000;
 }
@@ -6,9 +13,6 @@
 .editbar {
   display: block;
   text-align: left;
-  background: url('wysiwygbar.png') bottom right;
-  width: 800px;
-  height: 24px;
   overflow: hidden;
 }
 
@@ -16,6 +20,10 @@
   background: url('wysiwygbar.png');
   height: 24px;
   display: inline-block;
+}
+
+.editbar a:hover {
+  background-position-y: -24px;
 }
 
 .editbar .bold {
@@ -120,114 +128,8 @@
 
 /* stylelint-disable-next-line selector-class-pattern */
 .editbar .c_switcheditmode {
-  width: 30px;
+  width: 29px;
   background-position: -549px 0;
-}
-
-.editbar a:hover.bold {
-  width: 32px;
-}
-
-.editbar a:hover.italic {
-  width: 33px;
-  background-position: -32px -24px;
-}
-
-.editbar a:hover.underline {
-  width: 35px;
-  background-position: -65px -24px;
-}
-
-.editbar a:hover.strikethrough {
-  width: 30px;
-  background-position: -100px -24px;
-}
-
-.editbar a:hover.forecolor {
-  width: 31px;
-  background-position: -130px -24px;
-}
-
-.editbar a:hover.backcolor {
-  width: 32px;
-  background-position: -161px -24px;
-}
-
-.editbar a:hover.insertimage {
-  width: 29px;
-  background-position: -193px -24px;
-}
-
-.editbar a:hover.createlink {
-  width: 28px;
-  background-position: -222px -24px;
-}
-
-/* stylelint-disable-next-line selector-class-pattern */
-.editbar a:hover.c_email {
-  width: 27px;
-  background-position: -250px -24px;
-}
-
-.editbar a:hover.justifyleft {
-  width: 26px;
-  background-position: -277px -24px;
-}
-
-.editbar a:hover.justifycenter {
-  width: 27px;
-  background-position: -303px -24px;
-}
-
-.editbar a:hover.justifyright {
-  width: 26px;
-  background-position: -330px -24px;
-}
-
-/* stylelint-disable-next-line selector-class-pattern */
-.editbar a:hover.c_youtube {
-  width: 28px;
-  background-position: -356px -24px;
-}
-
-/* stylelint-disable-next-line selector-class-pattern */
-.editbar a:hover.c_code {
-  width: 26px;
-  background-position: -384px -24px;
-}
-
-/* stylelint-disable-next-line selector-class-pattern */
-.editbar a:hover.c_quote {
-  width: 25px;
-  background-position: -410px -24px;
-}
-
-/* stylelint-disable-next-line selector-class-pattern */
-.editbar a:hover.c_spoiler {
-  width: 29px;
-  background-position: -435px -24px;
-}
-
-.editbar a:hover.insertorderedlist {
-  width: 28px;
-  background-position: -464px -24px;
-}
-
-.editbar a:hover.insertunorderedlist {
-  width: 28px;
-  background-position: -492px -24px;
-}
-
-/* stylelint-disable-next-line selector-class-pattern */
-.editbar a:hover.c_smileys {
-  width: 29px;
-  background-position: -520px -24px;
-}
-
-/* stylelint-disable-next-line selector-class-pattern */
-.editbar a:hover.c_switcheditmode {
-  width: 30px;
-  background-position: -549px -24px;
 }
 
 .emotewin {
@@ -237,7 +139,7 @@
   background: #eef;
   border: 1px solid #000;
 }
-
+/* stylelint-disable no-descending-specificity */
 .emotewin a {
   border-bottom: 1px solid #ccf;
   display: block;
@@ -248,6 +150,7 @@
 .emotewin a:hover {
   background: #ccf;
 }
+/* stylelint-enable no-descending-specificity */
 
 .emotewin a img {
   border: 0;

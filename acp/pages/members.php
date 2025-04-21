@@ -2,16 +2,11 @@
 
 declare(strict_types=1);
 
-if (!defined(INACP)) {
-    exit;
-}
-
-new members();
-final class members
+final class Members
 {
-    public const string DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
+    public const DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
 
-    public function __construct()
+    public function route(): void
     {
         global $JAX,$PAGE;
         if (!isset($JAX->b['do'])) {

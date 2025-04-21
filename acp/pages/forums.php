@@ -2,12 +2,9 @@
 
 declare(strict_types=1);
 
-if (!defined(INACP)) {
-    exit;
-}
+require_once __DIR__ . '/forums/recountstats.php';
 
-new forums();
-final class forums
+final class Forums
 {
     /**
      * Saves the posted tree to mysql.
@@ -148,7 +145,7 @@ final class forums
         return '';
     }
 
-    public function __construct()
+    public function route(): void
     {
         global $JAX,$PAGE;
 
@@ -156,7 +153,9 @@ final class forums
             'create' => 'Create Forum',
             'createc' => 'Create Category',
             'order' => 'Manage',
+            'recountstats' => 'Recount Statistics',
         ];
+
         $sidebarLinks = '';
         foreach ($links as $do => $title) {
             $sidebarLinks .= $PAGE->parseTemplate(
@@ -167,14 +166,6 @@ final class forums
                 ],
             ) . PHP_EOL;
         }
-
-        $sidebarLinks .= $PAGE->parseTemplate(
-            'sidebar-list-link.html',
-            [
-                'title' => 'Recount Statistics',
-                'url' => '?act=stats',
-            ],
-        ) . PHP_EOL;
 
         $PAGE->sidebar(
             $PAGE->parseTemplate(
@@ -219,6 +210,8 @@ final class forums
             'order' => $this->orderforums(),
             'create' => $this->createforum(),
             'createc' => $this->createcategory(),
+            'recountstats' => RecountStats::showstats(),
+            'recountstats2' => RecountStats::recountStatistics(),
             default => $this->orderforums(),
         };
     }

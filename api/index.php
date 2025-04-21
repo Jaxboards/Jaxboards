@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../config.php';
+require_once __DIR__ . '/../config.php';
 
-require __DIR__ . '/../inc/classes/mysql.php';
+require_once __DIR__ . '/../inc/classes/mysql.php';
 $DB = new MySQL();
 $DB->connect(
     $CFG['sql_host'],
@@ -13,9 +13,9 @@ $DB->connect(
     $CFG['sql_db'],
 );
 
-require __DIR__ . '/../domaindefinitions.php';
+require_once __DIR__ . '/../domaindefinitions.php';
 
-require __DIR__ . '/../inc/classes/jax.php';
+require_once __DIR__ . '/../inc/classes/jax.php';
 
 $list = [[], []];
 
@@ -39,6 +39,7 @@ switch ($_GET['act'] ?? '') {
             $list[0][] = $f['id'];
             $list[1][] = $f['display_name'];
         }
+
         echo json_encode($list);
 
         break;

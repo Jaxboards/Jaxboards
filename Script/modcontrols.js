@@ -1,10 +1,6 @@
 /* global RUN */
-import Event from './JAX/event';
 import gracefulDegrade from './JAX/graceful-degrade';
 import { assign, onDOMReady } from './JAX/util';
-
-// TODO: Find a place for this state
-let onPageChangeOld;
 
 const postIDs = function fetchPIDs(a) {
   let pids = [];
@@ -83,9 +79,6 @@ class ModControls {
 
       modcontrols_move: (act) => {
         const whichone = parseInt((act && act[0]) || this.whichone, 10);
-        if (!this.busy && onPageChangeOld) {
-          onPageChangeOld = Event.onPageChange;
-        }
         this.whichone = whichone;
         window.addEventListener('pushstate', this.boundCheckLocation);
         this.createModControls(
@@ -146,10 +139,6 @@ class ModControls {
 
   destroyModControls() {
     window.removeEventListener('pushstate', this.boundCheckLocation);
-    if (onPageChangeOld) {
-      Event.onPageChange = onPageChangeOld;
-      onPageChangeOld = null;
-    } else Event.onPageChange = null;
     if (this.modb) {
       this.modb.innerHTML = '';
       this.modb.style.display = 'none';

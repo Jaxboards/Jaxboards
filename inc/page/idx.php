@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 $PAGE->loadmeta('idx');
-new IDX();
+
 final class IDX
 {
     public $moderatorinfo;
@@ -16,7 +16,7 @@ final class IDX
 
     public $subforums;
 
-    public function __construct()
+    public function route(): void
     {
         global $PAGE,$CFG,$JAX,$SESS;
         if (isset($JAX->b['markread']) && $JAX->b['markread']) {

@@ -2,19 +2,16 @@
 
 declare(strict_types=1);
 
-if (!defined(INACP)) {
-    exit;
-}
-
-new themes();
-
-final class themes
+final class Themes
 {
-    private const string WRAPPERS_PATH = 'Wrappers';
+    public $WRAPPERS_PATH;
 
-    public function __construct()
+    public function route(): void
     {
         global $PAGE,$JAX,$CFG;
+
+        $this->WRAPPERS_PATH = BOARDPATH . 'Wrappers/';
+
         if (!defined('DTHEMEPATH')) {
             define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . $CFG['dthemepath']);
         }
@@ -65,7 +62,7 @@ final class themes
     public function getwrappers(): array
     {
         $wrappers = [];
-        $o = opendir(BOARDPATH . self::WRAPPERS_PATH);
+        $o = opendir($this->WRAPPERS_PATH);
         while ($f = readdir($o)) {
             if ($f === '.') {
                 continue;
@@ -75,7 +72,7 @@ final class themes
                 continue;
             }
 
-            $wrappers[] = mb_substr($f, 0, -4);
+            $wrappers[] = pathinfo($f, PATHINFO_FILENAME);
         }
 
         closedir($o);
@@ -90,12 +87,12 @@ final class themes
         $errorwrapper = '';
 
         if (isset($JAX->g['deletewrapper']) && $JAX->g['deletewrapper']) {
-            $wrapperPath = BOARDPATH . self::WRAPPERS_PATH . '/' . $JAX->g['deletewrapper'] . '.txt';
+            $wrapperPath = $this->WRAPPERS_PATH . $JAX->g['deletewrapper'] . '.html';
             if (
                 !preg_match('@[^\w ]@', (string) $JAX->g['deletewrapper'])
                 && file_exists($wrapperPath)
             ) {
-                unlink(BOARDPATH . self::WRAPPERS_PATH . '/' . $JAX->g['deletewrapper'] . '.txt');
+                unlink($this->WRAPPERS_PATH . $JAX->g['deletewrapper'] . '.html');
                 $PAGE->location('?act=themes');
             } else {
                 $errorwrapper
@@ -105,7 +102,7 @@ final class themes
 
         if (isset($JAX->p['newwrapper']) && $JAX->p['newwrapper']) {
             $newWrapperPath
-                = BOARDPATH . self::WRAPPERS_PATH . '/' . $JAX->p['newwrapper'] . '.txt';
+                = $this->WRAPPERS_PATH . $JAX->p['newwrapper'] . '.html';
             if (preg_match('@[^\w ]@', (string) $JAX->p['newwrapper'])) {
                 $errorwrapper
                     = 'Wrapper name must consist of letters, numbers, '
@@ -121,7 +118,7 @@ final class themes
                 if ($o !== false) {
                     fwrite(
                         $o,
-                        file_get_contents(DTHEMEPATH . 'wrappers.txt'),
+                        file_get_contents(DTHEMEPATH . 'wrappers.html'),
                     );
                     fclose($o);
                 } else {
@@ -218,7 +215,7 @@ final class themes
                         continue;
                     }
 
-                    if (!is_file(BOARDPATH . self::WRAPPERS_PATH . '/' . $k . '.txt')) {
+                    if (!is_file($this->WRAPPERS_PATH . $k . '.html')) {
                         continue;
                     }
 
@@ -230,7 +227,7 @@ final class themes
                             Wrapper name must consist of letters, numbers, spaces, and underscore, and be
                             under 50 characters long.
                             EOT;
-                    } elseif (is_file(BOARDPATH . self::WRAPPERS_PATH . '/' . $v . '.txt')) {
+                    } elseif (is_file($this->WRAPPERS_PATH . $v . '.html')) {
                         $errorwrapper = 'That wrapper name is already being used.';
                     } else {
                         $DB->safeupdate(
@@ -242,8 +239,8 @@ final class themes
                             $DB->basicvalue($k),
                         );
                         rename(
-                            BOARDPATH . self::WRAPPERS_PATH . '/' . $k . '.txt',
-                            BOARDPATH . self::WRAPPERS_PATH . '/' . $v . '.txt',
+                            $this->WRAPPERS_PATH . $k . '.html',
+                            $this->WRAPPERS_PATH . $v . '.html',
                         );
                     }
 
@@ -364,7 +361,7 @@ final class themes
             ],
         );
         $PAGE->addContentBox(
-            self::WRAPPERS_PATH,
+            'Wrappers',
             ($errorwrapper !== '' && $errorwrapper !== '0' ? $PAGE->error($errorwrapper) : '') . $wrap,
         );
     }
@@ -423,7 +420,7 @@ final class themes
     {
         global $PAGE,$JAX;
         $saved = '';
-        $wrapperf = BOARDPATH . self::WRAPPERS_PATH . '/' . $wrapper . '.txt';
+        $wrapperf = $this->WRAPPERS_PATH . $wrapper . '.html';
         if (preg_match('@[^ \w]@', (string) $wrapper) && !is_file($wrapperf)) {
             $PAGE->addContentBox(
                 'Error',

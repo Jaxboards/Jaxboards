@@ -2,13 +2,17 @@
 
 declare(strict_types=1);
 
-new downloader();
-final class downloader
+final class Download
 {
-    public function __construct()
+    public function route(): void
     {
-        global $JAX,$DB;
-        $id = $JAX->b['id'];
+        global $JAX;
+        $this->downloadFile($JAX->b['id']);
+    }
+
+    public function downloadFile($id): void
+    {
+        global $DB;
         if (is_numeric($id)) {
             $result = $DB->safeselect(
                 [

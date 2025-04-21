@@ -160,7 +160,9 @@ final class SESS
         }
 
         if (!empty($r)) {
-            $r['ip'] = $JAX->bin2ip($r['ip']);
+            $r['last_action'] = (int) $r['last_action'];
+            $r['last_update'] = (int) $r['last_update'];
+            $r['read_date'] = (int) $r['read_date'];
 
             return $r;
         }
@@ -266,10 +268,10 @@ final class SESS
                 'WHERE `uid`=? GROUP BY `uid`',
                 $uid,
             );
-            $la = $DB->arow($result);
+            $lastAction = $DB->arow($result);
             $DB->disposeresult($result);
-            if ($la) {
-                $la = $la['last_action'];
+            if ($lastAction) {
+                $lastAction = (int) $lastAction['last_action'];
             }
 
             $DB->safedelete(
@@ -284,7 +286,7 @@ final class SESS
                 'WHERE `expires`<=?',
                 $DB->basicvalue(date('Y-m-d H:i:s', time())),
             );
-            $this->__set('read_date', $JAX->pick($la, 0));
+            $this->__set('read_date', $JAX->pick($lastAction, 0));
         }
 
         $yesterday = mktime(0, 0, 0);
@@ -362,7 +364,7 @@ final class SESS
 
         if (mb_strlen($sd['location_verbose'] ?? '') > 100) {
             $sd['location_verbose'] = mb_substr(
-                $sd['location_verbose'],
+                (string) $sd['location_verbose'],
                 0,
                 100,
             );
@@ -387,7 +389,7 @@ final class SESS
         return preg_replace_callback(
             "@href=['\"]?([^'\"]+)['\"]?@",
             $this->addSessIDCB(...),
-            (string) $html,
+            $html,
         );
     }
 

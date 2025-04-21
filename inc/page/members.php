@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 $PAGE->loadmeta('members');
-new members();
-final class members
+
+final class Members
 {
     /**
      * @var float|int
@@ -13,7 +13,7 @@ final class members
 
     public $perpage = 20;
 
-    public function __construct()
+    public function route(): void
     {
         global $JAX,$PAGE;
         if (

@@ -3,12 +3,12 @@
 declare(strict_types=1);
 
 $PAGE->loadmeta('logreg');
-$IDX = new LOGREG();
-final class LOGREG
+
+final class LogReg
 {
     public $registering = false;
 
-    public function __construct()
+    public function route(): void
     {
         global $JAX,$PAGE;
 

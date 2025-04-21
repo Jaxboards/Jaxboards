@@ -42,8 +42,4 @@ function Event(e) {
   return e;
 }
 
-// TODO: There are places in the source that are using this to store a callback
-// Refactor this
-Event.onPageChange = function onPageChange() {};
-
 export default Event;

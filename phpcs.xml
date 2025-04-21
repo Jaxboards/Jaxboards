@@ -64,12 +64,17 @@
         <element key="phpunit before" value="setUp, @before, #PHPUnit\Framework\Attributes\Before"/>
       </property>
       <property name="groups" type="array">
-        <!-- first things that apply to the class -->
-        <element value="uses"/>
-        <element value="enum cases"/>
         <element value="public constants"/>
         <element value="protected constants"/>
         <element value="private constants"/>
+
+        <element value="constructor"/>
+        <element value="destructor"/>
+
+        <!-- first things that apply to the class -->
+        <element value="uses"/>
+        <element value="enum cases"/>
+
         <element value="public static properties"/>
         <element value="protected static properties"/>
         <element value="private static properties"/>
@@ -87,8 +92,6 @@
         <element value="public properties"/>
         <element value="protected properties"/>
         <element value="private properties"/>
-        <element value="constructor"/>
-        <element value="destructor"/>
         <element value="magic methods"/>
         <element value="phpunit before"/>
         <element value="public methods"/>
@@ -191,6 +194,7 @@
   <rule ref="SlevomatCodingStandard.Files.FileLength">
     <exclude-pattern>./index.php</exclude-pattern>
     <exclude-pattern>./rector.php</exclude-pattern>
+    <exclude-pattern>./tools/php_codesniffer_to_sonarqube.php</exclude-pattern>
     <exclude-pattern>./tools/phpmd_to_sonarqube.php</exclude-pattern>
   </rule>
   <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName"/>
@@ -264,8 +268,8 @@
     </properties>
   </rule>
 
-  <!-- Make sure this works with PHP 8.3+ -->
-  <config name="testVersion" value="8.3-" />
+  <!-- Make sure this works with PHP 8.2+ -->
+  <config name="testVersion" value="8.2-" />
   <rule ref="PHPCompatibility" />
 
   <!-- Ban some functions -->

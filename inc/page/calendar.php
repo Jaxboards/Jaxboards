@@ -3,12 +3,12 @@
 declare(strict_types=1);
 
 $PAGE->loadmeta('calendar');
-new CALENDAR();
-final class CALENDAR
+
+final class Calendar
 {
     public $month;
 
-    public function __construct()
+    public function route(): void
     {
         global $JAX;
         if (isset($JAX->b['month'])) {

@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 $PAGE->loadmeta('search');
 
-new search();
-final class search
+final class Search
 {
     public $page = '';
 
@@ -18,7 +17,7 @@ final class search
      */
     public $perpage;
 
-    public function __construct()
+    public function route(): void
     {
         global $PAGE,$JAX;
         $this->pagenum = $JAX->b['page'] ?? 0;
@@ -128,7 +127,6 @@ final class search
         return $r;
     }
 
-    // TODO: use strtotime instead?
     public function pdate($a): false|int
     {
         $dayMonthYear = explode('/', (string) $a);
@@ -201,7 +199,7 @@ final class search
             }
 
             $authorId = null;
-            if ($JAX->b['mid'] && ctype_digit($JAX->b['mid'])) {
+            if ($JAX->b['mid'] && ctype_digit((string) $JAX->b['mid'])) {
                 $authorId = (int) $JAX->b['mid'];
             }
 
@@ -239,8 +237,8 @@ final class search
                 $topicValues[] = gmdate('Y-m-d H:i:s', $datestart);
             }
 
-            $postWhere = implode(' ', array_map(static fn($q) => "AND {$q}", $postParams));
-            $topicWhere = implode(' ', array_map(static fn($q) => "AND {$q}", $topicParams));
+            $postWhere = implode(' ', array_map(static fn($q): string => "AND {$q}", $postParams));
+            $topicWhere = implode(' ', array_map(static fn($q): string => "AND {$q}", $topicParams));
 
             $sanitizedSearchTerm = $DB->basicvalue($termraw);
 

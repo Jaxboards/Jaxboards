@@ -1,4 +1,4 @@
-![Jaxboards](https://github.com/Jaxboards/Jaxboards/blob/main/Service/Themes/Default/img/logo.png?raw=true)
+![Jaxboards](https://github.com/Jaxboards/Jaxboards/blob/main/acp/img/loginlogo.png?raw=true)
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Jaxboards_Jaxboards&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Jaxboards_Jaxboards)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Jaxboards_Jaxboards&metric=bugs)](https://sonarcloud.io/summary/new_code?id=Jaxboards_Jaxboards)
@@ -26,7 +26,7 @@ local machine for development purposes.
 
 ### Prerequisites
 
-- PHP 8.3.16 or higher
+- PHP 8.2.12 or higher
 - MySQL >= 8.0.41 < 8.1
 - TLS certificate (for security and protection of user data)
 
@@ -71,8 +71,8 @@ a new install. It does the following:
   $CFG['prefix'] = $service ? '' : 'jaxboards';
   $CFG['sql_prefix'] = $CFG['prefix'] ? $CFG['prefix'] . '_' : '';
   ```
-- Figures out if you're installing a service (multiple boards like
-  jaxboards.com) or a single-board install.
+- Figures out if you're installing a service (multiple boards) or a single-board
+  install.
 - If it's a service install, install those special service tables.
 - Copy over the MySQL tables here. Service installs have an additional step of
   adding each board installed to the directory table. Once the database is
@@ -103,7 +103,7 @@ PUBLIC_PATH="/var/www/html/<your_domain_name>/public_html" && \
 ```
 
 If you plan to reuse any old themes, be prepared to update hardcoded images,
-especially those that refer to the now-defunct jaxboards.com domain.
+especially those that refer to the now-defunct jaxboards service domain.
 
 ### Updating
 
@@ -252,7 +252,7 @@ This project is licensed under the MIT License - see the
 
 ## Acknowledgments
 
-- Contributors to the original [Jaxboards Service](https://jaxboards.com);
+- Contributors to the original Jaxboards Service;
   Jaxboards wouldn't exist without feedback from everyone who's supported it
   over the years.
 

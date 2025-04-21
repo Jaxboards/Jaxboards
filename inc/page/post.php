@@ -8,8 +8,7 @@ declare(strict_types=1);
 // but it's possible for people to still upload.
 $PAGE->metadefs['post-preview'] = $PAGE->meta('box', '', 'Post Preview', '%s');
 
-new POST();
-final class POST
+final class Post
 {
     public $canmod;
 
@@ -30,7 +29,7 @@ final class POST
 
     public $how;
 
-    public function __construct()
+    public function route(): void
     {
         global $JAX,$PAGE;
         $this->tid = $JAX->b['tid'] ?? 0;
@@ -49,7 +48,8 @@ final class POST
             $codes = $JAX->startcodetags($this->postdata);
             $this->postdata = $JAX->linkify($this->postdata);
             $this->postdata = $JAX->finishcodetags($this->postdata, $codes, true);
-            // Poor forum martyr.
+
+            // This is aliases [youtube] to [video] but it probably should not be here
             $this->postdata = str_replace('youtube]', 'video]', $this->postdata);
         }
 
@@ -785,7 +785,7 @@ onclick="this.form.submitButton=this"/></div>
             return false;
         }
 
-        // Actually PUT THE POST IN for godsakes.
+        // Actually PUT THE POST IN!
         $DB->safeinsert(
             'posts',
             [
@@ -871,7 +871,7 @@ onclick="this.form.submitButton=this"/></div>
                     UPDATE %t
                     SET `lp_uid`= ?, `lp_tid` = ?, `lp_topic` = ?, `lp_date` = ?,
                         `posts` = `posts` + 1
-                    WHERE `id` IN ?
+                    WHERE `id` IN (?)
                     EOT
                 ,
                 ['forums'],

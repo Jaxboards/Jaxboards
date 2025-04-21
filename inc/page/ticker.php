@@ -3,12 +3,12 @@
 declare(strict_types=1);
 
 $PAGE->loadmeta('ticker');
-new ticker();
-final class ticker
+
+final class Ticker
 {
     public $maxticks = 60;
 
-    public function __construct()
+    public function route(): void
     {
         global $PAGE;
         if ($PAGE->jsnewlocation || !$PAGE->jsaccess) {

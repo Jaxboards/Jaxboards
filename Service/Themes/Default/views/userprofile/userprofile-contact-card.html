@@ -1,45 +1,39 @@
-<div class="contact-card">
-  <table>
-    <tr>
-      <td class="left">
-        <div class="username">
-          %1$s
-        </div>
-        <div class="avatar">
-          <img src="%2$s" alt="Contact's avatar"/>
-        </div>
-        <div class="usertitle">
-          %3$s
-        </div>
-      </td>
-      <td class="right">
-        {if <%isguest%>!=true}
-          <button
-            data-window-close="true"
-            onClick="new IMWindow('%4$s',this.innerHTML.match(/IM (.+)/)[1]);"
-            type="button"
-            >
-            IM %1$s
-          </button>
-          <br />
-          <a href="?act=ucp&what=inbox&page=compose&mid=%4$s" data-window-close="true">
-            PM %1$s
-          </a>
-          <br />
-          <br />
-          %6$s
-          <br />
-          %7$s
-          <br />
-          <br />
-        {/if}
-        <a href="?act=vu%4$s&view=profile" data-window-close="true">
-          Full Profile
-        </a>
-        <div class="contact_details">
-          %5$s
-        </div>
-      </td>
-    </tr>
-  </table>
+<div class="left">
+  <div class="username">
+    %1$s
+  </div>
+  <div class="avatar">
+    <img src="%2$s" alt="Contact's avatar"/>
+  </div>
+  <div class="usertitle">
+    %3$s
+  </div>
+</div>
+<div class="right">
+  {if <%isguest%>!=true}
+    <button
+      data-window-close="true"
+      onClick="new IMWindow('%4$s',this.innerHTML.match(/IM (.+)/)[1]);"
+      type="button"
+      >
+      IM %1$s
+    </button>
+    <br />
+    <a href="?act=ucp&what=inbox&page=compose&mid=%4$s" data-window-close="true">
+      PM %1$s
+    </a>
+    <br />
+    <br />
+    %6$s
+    <br />
+    %7$s
+    <br />
+    <br />
+  {/if}
+  <a href="?act=vu%4$s&view=profile" data-window-close="true">
+    Full Profile
+  </a>
+  <div class="contact_details">
+    %5$s
+  </div>
 </div>

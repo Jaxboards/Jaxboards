@@ -14,6 +14,10 @@ jobs:
       contents: write
     if: github.event.pull_request.draft == false
     steps:
+      - uses: awalsh128/cache-apt-pkgs-action@v1
+        with:
+          packages: jq
+          version: 1.0
       - uses: actions/checkout@v4
         with:
           # disable shallow clones for better SonarQube analysis
@@ -37,6 +41,18 @@ jobs:
       - run: npm clean-install
       - run: npm run-script build
       - run: npm run-script autofix
+      - run: echo "BRANCH=$(echo ${GITHUB_REF##*/})" >> $GITHUB_ENV
+      - run: echo "VERSION=$(./tools/greater_version.php composer.json package.json)" >> $GITHUB_ENV
+      - if: env.BRANCH == 'main'
+        run: |
+          jq ".version = \"$VERSION\"" composer.json > /tmp/composer.json && \
+          mv /tmp/composer.json composer.json
+        shell: bash
+      - if: env.BRANCH == 'main'
+        run: |
+          jq ".version = \"$VERSION\"" package.json > /tmp/package.json && \
+          mv /tmp/package.json package.json
+        shell: bash
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>

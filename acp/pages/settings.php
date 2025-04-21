@@ -2,14 +2,9 @@
 
 declare(strict_types=1);
 
-if (!defined(INACP)) {
-    exit;
-}
-
-new settings();
-final class settings
+final class Settings
 {
-    public function __construct()
+    public function route(): void
     {
         global $JAX, $PAGE;
 

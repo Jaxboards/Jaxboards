@@ -2,11 +2,9 @@
 
 declare(strict_types=1);
 
-new offlineboard();
-
-final class offlineboard
+final class BoardOffline
 {
-    public function __construct()
+    public function route(): void
     {
         global $PAGE,$JAX,$CFG;
         if ($PAGE->jsupdate) {

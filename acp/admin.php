@@ -24,7 +24,7 @@ require_once JAXBOARDS_ROOT . '/vendor/autoload.php';
 
 define('INACP', 'true');
 
-require JAXBOARDS_ROOT . '/config.php';
+require_once JAXBOARDS_ROOT . '/config.php';
 
 require_once JAXBOARDS_ROOT . '/inc/classes/jax.php';
 
@@ -146,7 +146,7 @@ $PAGE->addNavMenu(
         '?act=forums&do=create' => 'Create Forum',
         '?act=forums&do=createc' => 'Create Category',
         '?act=forums&do=order' => 'Manage',
-        '?act=stats' => 'Refresh Statistics',
+        '?act=forums&do=recountstats' => 'Recount Statistics',
     ],
 );
 $PAGE->addNavMenu(
@@ -159,10 +159,13 @@ $PAGE->addNavMenu(
     ],
 );
 
-$a = $JAX->g['act'] ?? null;
+$act = $JAX->g['act'] ?? null;
 
-if ($a && file_exists("./pages/{$a}.php")) {
-    include_once "./pages/{$a}.php";
+if ($act && file_exists("./pages/{$act}.php")) {
+    require_once "./pages/{$act}.php";
+
+    $page = new $act();
+    $page->route();
 }
 
 $PAGE->out();

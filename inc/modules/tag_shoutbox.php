@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 $PAGE->loadmeta('shoutbox');
 
-new SHOUTBOX();
-final class SHOUTBOX
+final class Shoutbox
 {
     public $shoutlimit;
 
-    public function __construct()
+    public function init(): void
     {
         global $PAGE,$JAX,$CFG,$PERMS;
         if (!isset($CFG['shoutbox'])) {

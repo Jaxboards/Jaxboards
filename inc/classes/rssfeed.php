@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 final class rssfeed
 {
-    public $feed = [];
-
     public function __construct($settings)
     {
         $this->feed = array_merge($this->feed, $settings);
     }
+
+    public $feed = [];
 
     public function additem($settings): void
     {

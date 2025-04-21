@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 $PAGE->loadmeta('forum');
 
-$IDX = new FORUM();
-final class FORUM
+final class Forum
 {
     public $topicsRead = [];
 
@@ -20,7 +19,7 @@ final class FORUM
      */
     public $page = 0;
 
-    public function __construct()
+    public function route(): void
     {
         global $JAX,$PAGE;
         if (
@@ -52,6 +51,7 @@ final class FORUM
             if (!$PAGE->jsaccess) {
                 $PAGE->location('?');
             }
+
             $this->getreplysummary($JAX->b['replies']);
 
             return;

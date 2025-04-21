@@ -13,7 +13,7 @@ declare(strict_types=1);
 $CFG = [];
 
 // always load configuration
-require dirname(__DIR__) . '/config.default.php';
+require_once dirname(__DIR__) . '/config.default.php';
 
 // load classes
 $classFiles = glob(dirname(__DIR__) . '/inc/classes/*.php');

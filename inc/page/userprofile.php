@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 $PAGE->loadmeta('userprofile');
 
-$IDX = new userprofile();
-final class userprofile
+final class UserProfile
 {
     public $num_activity = 30;
 
@@ -22,7 +21,7 @@ final class userprofile
         'youtube' => 'https://youtube.com/%s',
     ];
 
-    public function __construct()
+    public function route(): void
     {
         global $JAX,$PAGE;
         preg_match('@\d+@', (string) $JAX->b['act'], $m);
@@ -198,9 +197,6 @@ final class userprofile
             );
             echo $DB->error(1);
             $udata = $DB->arow($result);
-            if ($udata['ip']) {
-                $udata['ip'] = $JAX->bin2ip($udata['ip']);
-            }
             $DB->disposeresult($result);
         }
 
@@ -568,8 +564,8 @@ final class userprofile
                 . $udata['id'] . '">PM</a></div>';
             if ($PERMS['can_moderate']) {
                 $contactdetails .= '<div>IP: <a href="'
-                    . '?act=modcontrols&do=iptools&ip=' . $udata['ip']
-                    . '">' . $udata['ip'] . '</a></div>';
+                    . '?act=modcontrols&do=iptools&ip=' . $JAX->bin2ip($udata['ip'])
+                    . '">' . $JAX->bin2ip($udata['ip']) . '</a></div>';
             }
 
             $page = $PAGE->meta(

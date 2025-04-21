@@ -3,10 +3,13 @@
 
 declare(strict_types=1);
 
-/*
+// phpcs:disable Generic.Files.LineLength.TooLong,PSR12.Files.FileHeader.IncorrectOrder,Squiz.Commenting.InlineComment.DocBlock,Squiz.Commenting.BlockComment.WrongStart
+
+/**
  * Tool to convert parallel-lint output into something SonarQube can read.
  *
  * @see https://docs.sonarsource.com/sonarqube-cloud/enriching/generic-issue-data/
+ * @see https://docs.sonarsource.com/sonarqube-server/latest/analyzing-source-code/importing-external-issues/generic-issue-import-format/
  * @see https://community.sonarsource.com/t/how-can-i-include-php-codesniffer-and-mess-detector-ruleset-or-report/47776/4
  * @see https://community.sonarsource.com/t/how-can-i-include-php-codesniffer-and-mess-detector-ruleset-or-report/47776/8
  *
@@ -15,6 +18,8 @@ declare(strict_types=1);
  * parallel_lint_to_sonarqube.php <input.json> <output.json>
  * ```
  */
+
+// phpcs:disable
 
 // Fetch CLI arguments.
 $parallelLintReport = $argv[1] ?? '';
@@ -81,7 +86,7 @@ if ($dataJSON === false) {
 $data = json_decode(
     $dataJSON,
     null,
-    // default
+    // Default
     512,
     JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
 );
@@ -144,7 +149,7 @@ file_put_contents(
             ),
             'rules' => array_values($rules),
         ],
-        JSON_THROW_ON_ERROR,
+        JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT,
     ),
     LOCK_EX,
 );

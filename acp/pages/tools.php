@@ -2,14 +2,9 @@
 
 declare(strict_types=1);
 
-if (!defined(INACP)) {
-    exit;
-}
-
-new tools();
-final class tools
+final class Tools
 {
-    public function __construct()
+    public function route(): void
     {
         global $JAX,$PAGE;
 
@@ -263,8 +258,19 @@ final class tools
         $contents = "Sorry, Jaxboards does not have file permissions to read your PHP error log file. ({$logPath})";
 
         if (is_readable($logPath)) {
-            $last100Lines = $this->tail($logPath, 100, true);
-            $contents = "<textarea class='editor' title='Recent PHP error log output'>" . htmlspecialchars(implode("\n", $last100Lines)) . '</textarea>';
+            $last100Lines = htmlspecialchars(implode(PHP_EOL, $this->tail(
+                $logPath,
+                100,
+            )));
+            $contents = <<<HTML
+                <label>
+                    Recent PHP error log output
+                    <textarea
+                        class="editor"
+                        >{$last100Lines}</textarea>
+                </label>
+
+                HTML;
         }
 
         $PAGE->addContentBox(
@@ -274,7 +280,7 @@ final class tools
     }
 
     // Reads the last $totalLines of a file
-    public function tail($path, $totalLines)
+    public function tail($path, $totalLines): array
     {
         $logFile = new SplFileObject($path, 'r');
         $logFile->fseek(0, SEEK_END);

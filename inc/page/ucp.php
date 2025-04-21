@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 $PAGE->loadmeta('ucp');
 
-new UCP();
 final class UCP
 {
     public $what = '';
@@ -15,9 +14,7 @@ final class UCP
 
     public $ucppage = '';
 
-    public $showentirething;
-
-    public function __construct()
+    public function route(): void
     {
         global $PAGE,$JAX,$USER,$DB;
         if (!$USER || $USER['group_id'] === 4) {
@@ -26,170 +23,22 @@ final class UCP
             return;
         }
 
-        $result = $DB->safeselect(
-            [
-                'about',
-                'avatar',
-                'birthdate',
-                'contact_aim',
-                'contact_bluesky',
-                'contact_discord',
-                'contact_gtalk',
-                'contact_msn',
-                'contact_skype',
-                'contact_steam',
-                'contact_twitter',
-                'contact_yim',
-                'contact_youtube',
-                'display_name',
-                'email_settings',
-                'email',
-                'full_name',
-                'gender',
-                'group_id',
-                'id',
-                'location',
-                'name',
-                'notify_pm',
-                'notify_postinmytopic',
-                'notify_postinsubscribedtopic',
-                'nowordfilter',
-                'pass',
-                'posts',
-                'sig',
-                'skin_id',
-                'sound_im',
-                'sound_pm',
-                'sound_postinmytopic',
-                'sound_postinsubscribedtopic',
-                'sound_shout',
-                'ucpnotepad',
-                'usertitle',
-                'website',
-                'wysiwyg',
-                'DAY(`birthdate`) AS `dob_day`',
-                'MONTH(`birthdate`) AS `dob_month`',
-                'YEAR(`birthdate`) AS `dob_year`',
-            ],
-            'members',
-            'WHERE `id`=?',
-            $DB->basicvalue($USER['id']),
-        );
-        $GLOBALS['USER'] = $DB->arow($result);
-        $DB->disposeresult($result);
-
         $PAGE->path(['UCP' => '?act=ucp']);
         $this->what = $JAX->b['what'] ?? '';
 
-        switch ($this->what) {
-            case 'sounds':
-                $this->showsoundsettings();
+        match ($this->what) {
+            'sounds' => $this->showsoundsettings(),
+            'signature' => $this->showsigsettings(),
+            'pass' => $this->showpasssettings(),
+            'email' => $this->showemailsettings(),
+            'avatar' => $this->showavatarsettings(),
+            'profile' => $this->showprofilesettings(),
+            'board' => $this->showboardsettings(),
+            'inbox' => $this->showinbox(),
+            default => $this->showmain(),
+        };
 
-                break;
-
-            case 'signature':
-                $this->showsigsettings();
-
-                break;
-
-            case 'pass':
-                $this->showpasssettings();
-
-                break;
-
-            case 'email':
-                $this->showemailsettings();
-
-                break;
-
-            case 'avatar':
-                $this->showavatarsettings();
-
-                break;
-
-            case 'profile':
-                $this->showprofilesettings();
-
-                break;
-
-            case 'board':
-                $this->showboardsettings();
-
-                break;
-
-            case 'inbox':
-                if (
-                    isset($JAX->p['dmessage'])
-                    && is_array($JAX->p['dmessage'])
-                ) {
-                    foreach ($JAX->p['dmessage'] as $v) {
-                        $this->delete($v, false);
-                    }
-                }
-
-                if (
-                    isset($JAX->p['messageid'])
-                    && is_numeric($JAX->p['messageid'])
-                ) {
-                    switch (mb_strtolower((string) $JAX->p['page'])) {
-                        case 'delete':
-                            $this->delete($JAX->p['messageid']);
-
-                            break;
-
-                        case 'forward':
-                            $this->compose($JAX->p['messageid'], 'fwd');
-
-                            break;
-
-                        case 'reply':
-                            $this->compose($JAX->p['messageid']);
-
-                            break;
-
-                        default:
-                    }
-                } else {
-                    if (!isset($JAX->b['page'])) {
-                        $JAX->b['page'] = false;
-                    }
-
-                    if ($JAX->b['page'] === 'compose') {
-                        $this->compose();
-                    } elseif (
-                        isset($JAX->g['view'])
-                        && is_numeric($JAX->g['view'])
-                    ) {
-                        $this->viewmessage($JAX->g['view']);
-                    } elseif ($JAX->b['page'] === 'sent') {
-                        $this->viewmessages('sent');
-                    } elseif ($JAX->b['page'] === 'flagged') {
-                        $this->viewmessages('flagged');
-                    } elseif (
-                        isset($JAX->b['flag'])
-                        && is_numeric($JAX->b['flag'])
-                    ) {
-                        $this->flag();
-
-                        return;
-                    } else {
-                        $this->viewmessages();
-                    }
-                }
-
-                break;
-
-            default:
-                if ($PAGE->jsupdate && empty($JAX->p)) {
-                    return;
-                }
-
-                $this->showmain();
-
-                break;
-        }
-
-        if ($PAGE->jsaccess && !$PAGE->jsnewlocation) {
+        if ($PAGE->jsupdate) {
             return;
         }
 
@@ -203,10 +52,78 @@ final class UCP
         return $JAX->hiddenFormFields(['act' => 'ucp', 'what' => $this->what]);
     }
 
+    public function showinbox(): void
+    {
+        global $JAX;
+        if (
+            isset($JAX->p['dmessage'])
+            && is_array($JAX->p['dmessage'])
+        ) {
+            foreach ($JAX->p['dmessage'] as $v) {
+                $this->delete($v, false);
+            }
+        }
+
+        if (
+            isset($JAX->p['messageid'])
+            && is_numeric($JAX->p['messageid'])
+        ) {
+            switch (mb_strtolower((string) $JAX->p['page'])) {
+                case 'delete':
+                    $this->delete($JAX->p['messageid']);
+
+                    break;
+
+                case 'forward':
+                    $this->compose($JAX->p['messageid'], 'fwd');
+
+                    break;
+
+                case 'reply':
+                    $this->compose($JAX->p['messageid']);
+
+                    break;
+
+                default:
+            }
+        } else {
+            if (!isset($JAX->b['page'])) {
+                $JAX->b['page'] = false;
+            }
+
+            if ($JAX->b['page'] === 'compose') {
+                $this->compose();
+            } elseif (
+                isset($JAX->g['view'])
+                && is_numeric($JAX->g['view'])
+            ) {
+                $this->viewmessage($JAX->g['view']);
+            } elseif ($JAX->b['page'] === 'sent') {
+                $this->viewmessages('sent');
+            } elseif ($JAX->b['page'] === 'flagged') {
+                $this->viewmessages('flagged');
+            } elseif (
+                isset($JAX->b['flag'])
+                && is_numeric($JAX->b['flag'])
+            ) {
+                $this->flag();
+
+                return;
+            } else {
+                $this->viewmessages();
+            }
+        }
+    }
+
     public function showmain(): void
     {
         global $PAGE,$JAX,$USER,$DB;
         $e = '';
+
+        if ($PAGE->jsupdate && empty($JAX->p)) {
+            return;
+        }
+
         if (isset($JAX->p['ucpnotepad']) && $JAX->p['ucpnotepad']) {
             if (mb_strlen((string) $JAX->p['ucpnotepad']) > 2000) {
                 $e = 'The UCP notepad cannot exceed 2000 characters.';
@@ -232,7 +149,6 @@ final class UCP
             trim((string) $USER['ucpnotepad']) !== '' && trim((string) $USER['ucpnotepad']) !== '0'
             ? $JAX->blockhtml($USER['ucpnotepad']) : 'Personal notes go here.',
         );
-        $this->showentirething = true;
         $this->showucp();
     }
 
@@ -777,7 +693,7 @@ final class UCP
         );
     }
 
-    public function showboardsettings()
+    public function showboardsettings(): void
     {
         global $PAGE,$DB,$JAX,$USER;
         $e = '';
@@ -816,12 +732,16 @@ final class UCP
                 $USER['skin_id'] = $JAX->b['skin'];
             }
 
-            if ($e === '' || $e === '0') {
+            if ($e === '') {
                 if ($PAGE->jsaccess) {
-                    return $PAGE->JS('reload');
+                    $PAGE->JS('reload');
+
+                    return;
                 }
 
-                return header('Location: ?act=ucp&what=board');
+                header('Location: ?act=ucp&what=board');
+
+                return;
             }
 
             $this->ucppage .= $PAGE->meta('error', $e);
@@ -880,11 +800,11 @@ final class UCP
             . ($USER['wysiwyg'] ? ' checked="checked"' : '')
             . ' />',
         );
-        if ($showthing) {
-            $this->showucp();
+        if (!$showthing) {
+            return;
         }
 
-        return null;
+        $this->showucp();
     }
 
     /*
@@ -1246,16 +1166,9 @@ final class UCP
         if ($messageid) {
             $result = $DB->safeselect(
                 [
-                    'del_recipient',
-                    'del_sender',
-                    'flag',
-                    'from',
-                    'id',
+                    '`from`',
                     'message',
-                    'read',
                     'title',
-                    'to',
-                    'UNIX_TIMESTAMP(`date`) AS `date`',
                 ],
                 'messages',
                 'WHERE (`to`=? OR `from`=?) AND `id`=?',
@@ -1330,16 +1243,10 @@ final class UCP
         global $PAGE,$JAX,$DB,$USER;
         $result = $DB->safeselect(
             [
-                'id',
-                'to',
-                'from',
-                'title',
-                'message',
-                'read',
-                'date',
+                '`to`',
+                '`from`',
                 'del_recipient',
                 'del_sender',
-                'flag',
             ],
             'messages',
             'WHERE `id`=?',
@@ -1376,14 +1283,6 @@ final class UCP
             [
                 'del_recipient',
                 'del_sender',
-                'flag',
-                'from',
-                'id',
-                'message',
-                'read',
-                'title',
-                'to',
-                'UNIX_TIMESTAMP(`date`) AS `date`',
             ],
             'messages',
             'WHERE `id`=?',

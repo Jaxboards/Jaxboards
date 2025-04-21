@@ -2,14 +2,9 @@
 
 declare(strict_types=1);
 
-if (!defined(INACP)) {
-    exit;
-}
-
-new settings();
-final class settings
+final class Posting
 {
-    public function __construct()
+    public function route(): void
     {
         global $JAX, $PAGE;
 
@@ -38,14 +33,11 @@ final class settings
             ),
         );
 
-        if (!isset($JAX->b['do'])) {
-            return;
-        }
-
-        match ($JAX->b['do']) {
+        match ($JAX->b['do'] ?? '') {
             'emoticons' => $this->emoticons(),
             'postrating' => $this->postrating(),
             'wordfilter' => $this->wordfilter(),
+            default => $this->emoticons(),
         };
     }
 
@@ -324,8 +316,8 @@ final class settings
 
         if (isset($JAX->p['rsubmit']) && $JAX->p['rsubmit']) {
             $cfg = [
-                'ratings' => ($JAX->p['renabled'] ? 1 : 0)
-                + ($JAX->p['ranon'] ? 2 : 0),
+                'ratings' => (isset($JAX->p['renabled']) ? 1 : 0)
+                + (isset($JAX->p['ranon']) ? 2 : 0),
             ];
             $PAGE->writeCFG($cfg);
             $page2 .= $PAGE->success('Settings saved!');

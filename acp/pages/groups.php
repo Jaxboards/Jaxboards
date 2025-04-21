@@ -2,16 +2,11 @@
 
 declare(strict_types=1);
 
-if (!defined(INACP)) {
-    exit;
-}
-
-new groups();
-final class groups
+final class Groups
 {
     public $updatePermissions = true;
 
-    public function __construct()
+    public function route(): void
     {
         global $JAX,$PAGE;
         $links = [
