@@ -42,11 +42,11 @@ jobs:
       - run: npm run-script build
       - run: npm run-script autofix
       - run: echo "BRANCH=$(echo ${GITHUB_REF##*/})" >> $GITHUB_ENV
-      - if: env.BRANCH === "main"
+      - if: env.BRANCH == "main"
         run: |
           cat composer.json | jq ".version = \"$(git describe)\"" > composer.json
         shell: bash
-      - if: env.BRANCH === "main"
+      - if: env.BRANCH == "main"
         run: |
           cat package.json | jq ".version = \"$(jq -r '.version' composer.json)\"" > package.json
         shell: bash
