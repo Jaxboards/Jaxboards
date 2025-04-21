@@ -5,6 +5,7 @@ declare(strict_types=1);
 final class MySQL
 {
     public $lastQuery;
+
     public $debugMode = false;
 
     private $queryList = [];
