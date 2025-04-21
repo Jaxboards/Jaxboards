@@ -8,7 +8,7 @@ final class Earthbound
     {
         global $PAGE;
         $PAGE->JS('softurl');
-        $PAGE->JS('script', "var s=document.createElement('script');s.src='./Script/earthbound.js';document.body.appendChild(s);");
+        $PAGE->JS('loadscript', './Script/earthbound.js');
         $PAGE->JS('playsound', 'earthbound', './Sounds/earthboundbattle.mp3');
     }
 }

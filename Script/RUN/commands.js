@@ -14,6 +14,11 @@ import Sound from '../sound';
  * that the server can send to the client.
  */
 export default {
+  loadscript([src]) {
+    const s=document.createElement('script');
+    s.src=src;
+    document.body.appendChild(s);
+  },
   script(a) {
     // eslint-disable-next-line
     eval(a[0]);
