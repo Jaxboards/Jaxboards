@@ -65,7 +65,7 @@ final class PAGE
     public $jsaccess = 0;
 
     /**
-     * @var null|string Store the UCP page data
+     * @var string|null Store the UCP page data
      */
     public ?string $ucppage = null;
 

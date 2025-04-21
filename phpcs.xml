@@ -268,8 +268,8 @@
     </properties>
   </rule>
 
-  <!-- Make sure this works with PHP 8.3+ -->
-  <config name="testVersion" value="8.3-" />
+  <!-- Make sure this works with PHP 8.2+ -->
+  <config name="testVersion" value="8.2-" />
   <rule ref="PHPCompatibility" />
 
   <!-- Ban some functions -->

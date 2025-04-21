@@ -26,7 +26,7 @@ local machine for development purposes.
 
 ### Prerequisites
 
-- PHP 8.3.16 or higher
+- PHP 8.2.12 or higher
 - MySQL >= 8.0.41 < 8.1
 - TLS certificate (for security and protection of user data)
 
