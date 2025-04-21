@@ -277,10 +277,17 @@ if (!$PAGE->jsaccess) {
         );
     }
 
+    $version = json_decode(
+        file_get_contents(__DIR__ . '/composer.json'),
+        null,
+        1,
+        JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
+    )['version'] ?? 'Unknown';
+
     $PAGE->append(
         'FOOTER',
         '<div class="footer">'
-        . '<a href="https://jaxboards.github.io">Jaxboards</a> 2.1.0! '
+        . "<a href=\"https://jaxboards.github.io\">Jaxboards</a> {$version}! "
         // Removed the defunct URL
         . '&copy; 2007-' . gmdate('Y') . '</div>',
     );
