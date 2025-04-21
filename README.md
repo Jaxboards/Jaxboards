@@ -71,8 +71,8 @@ a new install. It does the following:
   $CFG['prefix'] = $service ? '' : 'jaxboards';
   $CFG['sql_prefix'] = $CFG['prefix'] ? $CFG['prefix'] . '_' : '';
   ```
-- Figures out if you're installing a service (multiple boards like
-  jaxboards.com) or a single-board install.
+- Figures out if you're installing a service (multiple boards) or a single-board
+  install.
 - If it's a service install, install those special service tables.
 - Copy over the MySQL tables here. Service installs have an additional step of
   adding each board installed to the directory table. Once the database is
@@ -103,7 +103,7 @@ PUBLIC_PATH="/var/www/html/<your_domain_name>/public_html" && \
 ```
 
 If you plan to reuse any old themes, be prepared to update hardcoded images,
-especially those that refer to the now-defunct jaxboards.com domain.
+especially those that refer to the now-defunct jaxboards service domain.
 
 ### Updating
 
@@ -252,7 +252,7 @@ This project is licensed under the MIT License - see the
 
 ## Acknowledgments
 
-- Contributors to the original [Jaxboards Service](https://jaxboards.com);
+- Contributors to the original Jaxboards Service;
   Jaxboards wouldn't exist without feedback from everyone who's supported it
   over the years.
 
