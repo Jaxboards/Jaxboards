@@ -51,5 +51,6 @@
     "stylelint-report": "stylelint \"./**/*.{c,sa,sc,le}ss\" --formatter json --output-file stylelint-report.json",
     "prepare": "husky"
   },
-  "type": "module"
+  "type": "module",
+  "version": "2.1.1"
 }

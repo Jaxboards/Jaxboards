@@ -55,5 +55,6 @@
     "psalm": "psalm",
     "psalm-report": "psalm --output-format=sonarqube --report=psalm-report.json",
     "rector": "rector --verbose --verbose"
-  }
+  },
+  "version": "2.1.2"
 }
