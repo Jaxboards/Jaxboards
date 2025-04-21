@@ -263,13 +263,14 @@ final class Tools
                 100,
             )));
             $contents = <<<HTML
-                <label>
+                <label for="errorlog">
                     Recent PHP error log output
-                    <textarea
-                        class="editor"
-                        disabled="disabled"
-                        >{$last100Lines}</textarea>
-                </label>
+                 </label>
+                <textarea
+                    id="errorlog"
+                    class="editor"
+                    disabled="disabled"
+                    >{$last100Lines}</textarea>
 
                 HTML;
         }
