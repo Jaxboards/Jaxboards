@@ -45,12 +45,16 @@ jobs:
       - run: echo "VERSION=$(./tools/greater_version.php composer.json package.json)" >> $GITHUB_ENV
       - if: env.BRANCH == 'main'
         run: |
-          cat composer.json | jq ".version = \"$VERSION\"" > composer.json
+          cat composer.json | jq -r ".version = \"$VERSION\"" > composer.json
         shell: bash
+        env:
+          VERSION: ${{ env.VERSION }}
       - if: env.BRANCH == 'main'
         run: |
-          cat package.json | jq ".version = \"$VERSION\"" > package.json
+          cat package.json | jq -r ".version = \"$VERSION\"" > package.json
         shell: bash
+        env:
+          VERSION: ${{ env.VERSION }}
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
