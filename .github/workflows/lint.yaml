@@ -48,15 +48,11 @@ jobs:
           jq ".version = \"$VERSION\"" composer.json > /tmp/composer.json && \
           mv /tmp/composer.json composer.json
         shell: bash
-        env:
-          VERSION: ${{ env.VERSION }}
       - if: env.BRANCH == 'main'
         run: |
           jq ".version = \"$VERSION\"" package.json > /tmp/package.json && \
           mv /tmp/package.json package.json
         shell: bash
-        env:
-          VERSION: ${{ env.VERSION }}
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
