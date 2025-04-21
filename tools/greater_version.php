@@ -1,15 +1,16 @@
 #!/usr/bin/env php
 <?php
 
+declare(strict_types=1);
+
 /**
- * Fetch the greater version property between two json files
+ * Fetch the greater version property between two json files.
  *
  * USAGE:
  * ```sh
  * <script.php> <first.json> <second.json>
  * ```
  */
-
 $version1 = json_decode(
     file_get_contents($argv[1] ?? ''),
     null,
