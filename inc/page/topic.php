@@ -750,6 +750,7 @@ final class Topic
             );
             $lastpid = $post['pid'];
         }
+
         $SESS->addvar('topic_lastpid', $lastpid);
 
         return $rows;
