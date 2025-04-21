@@ -15,8 +15,8 @@ import Sound from '../sound';
  */
 export default {
   loadscript([src]) {
-    const s=document.createElement('script');
-    s.src=src;
+    const s = document.createElement('script');
+    s.src = src;
     document.body.appendChild(s);
   },
   script(a) {
