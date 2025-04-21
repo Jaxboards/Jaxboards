@@ -262,7 +262,7 @@ final class Tools
         $contents = "Sorry, jaxboards does not have file permissions to read your PHP error log file. ({$logPath})";
 
         if (is_readable($logPath)) {
-            $last100Lines = $this->tail($logPath, 100, true);
+            $last100Lines = $this->tail($logPath, 100);
             $contents = "<textarea class='editor'>" . htmlspecialchars(implode("\n", $last100Lines)) . '</textarea>';
         }
 
@@ -273,7 +273,7 @@ final class Tools
     }
 
     // Reads the last $totalLines of a file
-    public function tail($path, $totalLines)
+    public function tail($path, $totalLines): array
     {
         $logFile = new SplFileObject($path, 'r');
         $logFile->fseek(0, SEEK_END);

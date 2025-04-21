@@ -364,7 +364,7 @@ final class SESS
 
         if (mb_strlen($sd['location_verbose'] ?? '') > 100) {
             $sd['location_verbose'] = mb_substr(
-                $sd['location_verbose'],
+                (string) $sd['location_verbose'],
                 0,
                 100,
             );
@@ -389,7 +389,7 @@ final class SESS
         return preg_replace_callback(
             "@href=['\"]?([^'\"]+)['\"]?@",
             $this->addSessIDCB(...),
-            (string) $html,
+            $html,
         );
     }
 

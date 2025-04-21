@@ -148,7 +148,6 @@ function generify(string $description_input): string
         '/Method [\\\\\w]+::\w+\(\)/' => 'Method',
         '/property [\\\\\w]+::\$\w+/' => 'property',
         '/type hint "[\w<,\s>]+"; found "[\w<,\s>]+" for \$\w+/' => 'type hint not found',
-        '/type hint "[\w<,\s>]+"; found "[\w<,\s>]+" for \$\w+/' => 'type hint not found',
         '/Expected "[\w<,\s>]+" but found "[\w<,\s>]+"/' => 'Incorrect type hint found',
         '/; \d+ found/' => '',
         '/; found \d+/' => '',

@@ -8,6 +8,8 @@ if (!defined(INACP)) {
 
 final class Themes
 {
+    public $WRAPPERS_PATH;
+
     public function route(): void
     {
         global $PAGE,$JAX,$CFG;

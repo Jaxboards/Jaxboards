@@ -100,7 +100,7 @@ if (!is_array($data['files'])) {
     exit(1);
 }
 
-function generify($description_input)
+function generify($description_input): array|string
 {
     $description = $description_input;
 
@@ -138,7 +138,7 @@ function generify($description_input)
         $description = preg_replace(
             $replace,
             $replacement,
-            $description,
+            (string) $description,
         ) ?? '';
     }
 

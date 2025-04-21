@@ -257,7 +257,7 @@ final class JAX
                 'usertitle',
                 'website',
                 'wysiwyg',
-                'CONCAT(MONTH(`birthdate`),\' \',DAY(`birthdate`)) as `birthday`',
+                "CONCAT(MONTH(`birthdate`),' ',DAY(`birthdate`)) as `birthday`",
                 'DAY(`birthdate`) AS `dob_day`',
                 'MONTH(`birthdate`) AS `dob_month`',
                 'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
@@ -633,7 +633,7 @@ final class JAX
             . $m[1] . ($m[2] ?: 'px') . '">' . $m[3] . '</span>';
     }
 
-    public function bbcode_videocallback($m)
+    public function bbcode_videocallback($m): string
     {
 
         if (str_contains((string) $m[1], 'youtube.com')) {
@@ -665,9 +665,8 @@ final class JAX
 
             $html .= '<li>' . $item . ' </li>';
         }
-        $html .= $m[1] === 'ol' ? '</ol>' : '</ul>';
 
-        return $html;
+        return $html . $m[1] === 'ol' ? '</ol>' : '</ul>';
     }
 
     public function attachments($a): null|array|string
@@ -965,9 +964,9 @@ final class JAX
     // .
     public function bin2ip($ip): string
     {
-        $l = mb_strlen($ip);
+        $l = mb_strlen((string) $ip);
 
-        return inet_ntop($ip) ?: inet_ntop(pack('A' . $l, $ip)) ?: '';
+        return (inet_ntop($ip) ?: inet_ntop(pack('A' . $l, $ip))) ?: '';
     }
 
     public function parseperms($permstoparse, $uid = false): array

@@ -1329,7 +1329,7 @@ final class Topic
             $members = array_merge($members, $v);
         }
 
-        if (!$members) {
+        if ($members === []) {
             $PAGE->JS('alert', 'This post has no ratings yet!');
 
             return;

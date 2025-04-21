@@ -51,6 +51,7 @@ final class Forum
             if (!$PAGE->jsaccess) {
                 $PAGE->location('?');
             }
+
             $this->getreplysummary($JAX->b['replies']);
 
             return;

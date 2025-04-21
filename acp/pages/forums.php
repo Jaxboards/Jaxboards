@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-require_once 'forums/recountstats.php';
+require_once __DIR__ . '/forums/recountstats.php';
 
 if (!defined(INACP)) {
     exit;

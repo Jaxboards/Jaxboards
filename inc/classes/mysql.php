@@ -144,7 +144,7 @@ final class MySQL
             ksort($v);
             foreach ($v as $k2 => $v2) {
                 if (is_string($v2) && mb_check_encoding($v2) !== 'UTF-8') {
-                    $v2 = mb_convert_encoding((string) $v2, 'UTF-8', 'ISO-8859-1');
+                    $v2 = mb_convert_encoding($v2, 'UTF-8', 'ISO-8859-1');
                 }
 
                 if ($k === 0) {

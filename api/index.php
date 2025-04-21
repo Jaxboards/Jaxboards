@@ -39,6 +39,7 @@ switch ($_GET['act'] ?? '') {
             $list[0][] = $f['id'];
             $list[1][] = $f['display_name'];
         }
+
         echo json_encode($list);
 
         break;

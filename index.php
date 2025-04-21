@@ -16,6 +16,7 @@ if ($_GET['showerrors'] ?? false) {
     error_reporting(E_ALL);
     ini_set('display_errors', '1');
 }
+
 // phpcs:enable
 
 if (!defined('JAXBOARDS_ROOT')) {
@@ -103,6 +104,7 @@ if (!isset($_SESSION['uid']) && isset($JAX->c['utoken'])) {
 if (!$SESS->is_bot && isset($_SESSION['uid']) && $_SESSION['uid']) {
     $JAX->getUser($_SESSION['uid']);
 }
+
 // phpcs:enable
 
 // phpcs:disable SlevomatCodingStandard.PHP.DisallowReference.DisallowedAssigningByReference
@@ -260,6 +262,7 @@ if (!$PAGE->jsaccess) {
         if (is_array($thisrow)) {
             $nummessages = array_pop($thisrow);
         }
+
         $DB->disposeresult($result);
     }
 
@@ -316,7 +319,7 @@ if (!$PAGE->jsaccess) {
 $PAGE->addvar('modlink', $PERMS['can_moderate'] ? $PAGE->meta('modlink') : '');
 
 $PAGE->addvar('ismod', $PERMS['can_moderate'] ? 'true' : 'false');
-$PAGE->addvar('isguest', !$USER ? 'true' : 'false');
+$PAGE->addvar('isguest', $USER ? 'false' : 'true');
 $PAGE->addvar('isadmin', $PERMS['can_access_acp'] ? 'true' : 'false');
 
 $PAGE->addvar('acplink', $PERMS['can_access_acp'] ? $PAGE->meta('acplink') : '');
@@ -456,7 +459,7 @@ $PAGE->append(
 );
 
 if ($PAGE->jsnewlocation) {
-    $PAGE->JS('title', htmlspecialchars_decode($PAGE->get('TITLE'), ENT_QUOTES));
+    $PAGE->JS('title', htmlspecialchars_decode((string) $PAGE->get('TITLE'), ENT_QUOTES));
 }
 
 $PAGE->out();

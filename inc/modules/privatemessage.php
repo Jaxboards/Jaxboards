@@ -13,7 +13,7 @@ final class PrivateMessage
             $this->filter();
         }
 
-        if (!(trim($im ?? '') !== '') || !$uid) {
+        if (trim($im ?? '') === '' || !$uid) {
             return;
         }
 

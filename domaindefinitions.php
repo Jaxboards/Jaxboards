@@ -37,6 +37,7 @@ if (
 ) {
     $boardURL .= (isset($_SERVER['SERVER_PORT']) ? ':' . $_SERVER['SERVER_PORT'] : '');
 }
+
 // phpcs:enable
 
 define('BOARDURL', $boardURL . '/');

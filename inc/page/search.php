@@ -199,7 +199,7 @@ final class Search
             }
 
             $authorId = null;
-            if ($JAX->b['mid'] && ctype_digit($JAX->b['mid'])) {
+            if ($JAX->b['mid'] && ctype_digit((string) $JAX->b['mid'])) {
                 $authorId = (int) $JAX->b['mid'];
             }
 
@@ -237,8 +237,8 @@ final class Search
                 $topicValues[] = gmdate('Y-m-d H:i:s', $datestart);
             }
 
-            $postWhere = implode(' ', array_map(static fn($q) => "AND {$q}", $postParams));
-            $topicWhere = implode(' ', array_map(static fn($q) => "AND {$q}", $topicParams));
+            $postWhere = implode(' ', array_map(static fn($q): string => "AND {$q}", $postParams));
+            $topicWhere = implode(' ', array_map(static fn($q): string => "AND {$q}", $topicParams));
 
             $sanitizedSearchTerm = $DB->basicvalue($termraw);
 
