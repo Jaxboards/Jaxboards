@@ -267,6 +267,7 @@ final class Tools
                     Recent PHP error log output
                     <textarea
                         class="editor"
+                        disabled="disabled"
                         >{$last100Lines}</textarea>
                 </label>
 
