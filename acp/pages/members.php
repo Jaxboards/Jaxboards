@@ -2,11 +2,6 @@
 
 declare(strict_types=1);
 
-if (!defined(INACP)) {
-    exit;
-}
-
-
 final class Members
 {
     public const DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';

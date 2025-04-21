@@ -2,10 +2,6 @@
 
 declare(strict_types=1);
 
-if (!defined(INACP)) {
-    exit;
-}
-
 final class RecountStats
 {
     public static function showstats(): void
