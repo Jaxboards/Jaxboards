@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../inc/autoload.php';
+define('JAXBOARDS_ROOT', dirname(__DIR__));
 
-require_once __DIR__ . '/../config.php';
+require_once JAXBOARDS_ROOT . '/inc/autoload.php';
+
+require_once JAXBOARDS_ROOT . '/config.php';
 
 $DB = new MySQL();
 $DB->connect(
@@ -15,7 +17,7 @@ $DB->connect(
     $CFG['sql_prefix'],
 );
 
-require_once __DIR__ . '/../domaindefinitions.php';
+require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
 
 $list = [[], []];
 
