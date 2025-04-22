@@ -10,9 +10,9 @@ if (!defined('JAXBOARDS_ROOT')) {
 require_once JAXBOARDS_ROOT . '/inc/autoload.php';
 
 
-require_once __DIR__ . '/config.php';
+require_once JAXBOARDS_ROOT . '/config.php';
 
-require_once __DIR__ . '/domaindefinitions.php';
+require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
 
 /*
  * Jaxboards. THE ULTIMATE 4UMS WOOOOOOO

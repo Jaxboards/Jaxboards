@@ -63,7 +63,7 @@ $DB->connect(
     $CFG['sql_prefix'],
 );
 
-require_once __DIR__ . '/../domaindefinitions.php';
+require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
 
 $JAX = new JAX();
 if (isset($_SESSION['auid'])) {
