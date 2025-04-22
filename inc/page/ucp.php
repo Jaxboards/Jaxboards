@@ -2,10 +2,15 @@
 
 declare(strict_types=1);
 
-$PAGE->loadmeta('ucp');
+namespace Page;
 
 final class UCP
 {
+    public function __construct() {
+        global $PAGE;
+        $PAGE->loadmeta('ucp');
+    }
+
     public $what = '';
 
     public $runscript = false;

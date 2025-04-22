@@ -2,10 +2,16 @@
 
 declare(strict_types=1);
 
-$PAGE->loadmeta('logreg');
+namespace Page;
+use IPAddress;
 
 final class LogReg
 {
+    public function __construct() {
+        global $PAGE;
+        $PAGE->loadmeta('logreg');
+    }
+
     public $registering = false;
 
     public function route(): void

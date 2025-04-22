@@ -9,7 +9,6 @@ if (!defined('JAXBOARDS_ROOT')) {
 // Load composer dependencies.
 require_once JAXBOARDS_ROOT . '/inc/autoload.php';
 
-
 require_once JAXBOARDS_ROOT . '/config.php';
 
 require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
@@ -377,9 +376,9 @@ if (isset($actdefs[$act])) {
 
 if ($act === 'idx' && isset($JAX->b['module']) && $JAX->b['module']) {
     // Do nothing.
-} elseif ($act && is_file('inc/page/' . $act . '.php')) {
-    require_once 'inc/page/' . $act . '.php';
-    $page = new $act();
+} elseif ($act && file_exists('inc/page/' . $act . '.php')) {
+    $pageClass = 'Page\\' . $act;
+    $page = new $pageClass();
     $page->route();
 } elseif (!$PAGE->jsaccess || $PAGE->jsnewlocation) {
     $result = $DB->safeselect(

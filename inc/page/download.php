@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace Page;
+
 final class Download
 {
     public function route(): void

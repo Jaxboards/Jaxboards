@@ -2,10 +2,15 @@
 
 declare(strict_types=1);
 
-$PAGE->loadmeta('userprofile');
+namespace Page;
 
 final class UserProfile
 {
+    public function __construct() {
+        global $PAGE;
+        $PAGE->loadmeta('userprofile');
+    }
+
     public $num_activity = 30;
 
     public $contacturls = [

@@ -8,7 +8,10 @@ if (!defined('JAXBOARDS_ROOT')) {
 require_once JAXBOARDS_ROOT . '/vendor/autoload.php';
 
 spl_autoload_register(static function ($className): void {
-    $classPath = JAXBOARDS_ROOT . "/inc/classes/{$className}.php";
+    $classPath = JAXBOARDS_ROOT . match(true) {
+        str_starts_with($className, 'Page\\') => '/inc/page/' . str_replace('Page\\', '', $className) . '.php',
+        default => "/inc/classes/{$className}.php"
+    };
 
     if (!file_exists($classPath)) {
         return;

@@ -1,6 +1,9 @@
 <?php
 
 declare(strict_types=1);
+
+namespace Page;
+
 final class Katamari
 {
     public function route(): void

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-$PAGE->loadmeta('idx');
+namespace Page;
 
 final class IDX
 {
@@ -15,6 +15,11 @@ final class IDX
     public $subforumids;
 
     public $subforums;
+
+    function __construct() {
+        global $PAGE;
+        $PAGE->loadmeta('idx');
+    }
 
     public function route(): void
     {

@@ -2,11 +2,16 @@
 
 declare(strict_types=1);
 
-$PAGE->loadmeta('calendar');
+namespace Page;
 
 final class Calendar
 {
     public $month;
+
+    public function __construct() {
+        global $PAGE;
+        $PAGE->loadmeta('calendar');
+    }
 
     public function route(): void
     {

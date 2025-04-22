@@ -2,14 +2,15 @@
 
 declare(strict_types=1);
 
-// IMPORTANT TO DO: fix file uploading so that it checks
-// permissions within the forum
-// I've already hidden the attach files button,
-// but it's possible for people to still upload.
-$PAGE->metadefs['post-preview'] = $PAGE->meta('box', '', 'Post Preview', '%s');
+namespace Page;
+use IPAddress;
 
 final class Post
 {
+    public function __construct() {
+        global $PAGE;
+        $PAGE->metadefs['post-preview'] = $PAGE->meta('box', '', 'Post Preview', '%s');
+    }
     public $canmod;
 
     public $postdata = '';

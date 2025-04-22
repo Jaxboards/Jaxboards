@@ -2,10 +2,17 @@
 
 declare(strict_types=1);
 
-$PAGE->loadmeta('modcp');
+namespace Page;
+use IPAddress;
 
 final class ModControls
 {
+    public function __construct() {
+        global $PAGE;
+
+        $PAGE->loadmeta('modcp');
+    }
+
     public $perms;
 
     public static function load(): void

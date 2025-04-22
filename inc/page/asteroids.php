@@ -1,6 +1,9 @@
 <?php
 
 declare(strict_types=1);
+
+namespace Page;
+
 final class Asteroids
 {
     public function route(): void

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace Page;
+
 final class Earthbound
 {
     public function route(): void

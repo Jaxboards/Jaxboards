@@ -2,10 +2,15 @@
 
 declare(strict_types=1);
 
-$PAGE->loadmeta('search');
+namespace Page;
 
 final class Search
 {
+    public function __construct() {
+        global $PAGE;
+
+        $PAGE->loadmeta('search');
+    }
     public $page = '';
 
     public $pagenum = 0;

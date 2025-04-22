@@ -2,10 +2,15 @@
 
 declare(strict_types=1);
 
-$PAGE->loadmeta('members');
+namespace Page;
 
 final class Members
 {
+    public function __construct() {
+        global $PAGE;
+
+        $PAGE->loadmeta('members');
+    }
     /**
      * @var float|int
      */

@@ -2,10 +2,15 @@
 
 declare(strict_types=1);
 
-$PAGE->loadmeta('ticker');
+namespace Page;
 
 final class Ticker
 {
+    public function __construct() {
+        global $PAGE;
+        $PAGE->loadmeta('ticker');
+    }
+
     public $maxticks = 60;
 
     public function route(): void

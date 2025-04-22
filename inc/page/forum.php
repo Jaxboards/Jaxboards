@@ -2,10 +2,16 @@
 
 declare(strict_types=1);
 
-$PAGE->loadmeta('forum');
+namespace Page;
 
 final class Forum
 {
+    public function __construct() {
+        global $PAGE;
+
+        $PAGE->loadmeta('forum');
+    }
+
     public $topicsRead = [];
 
     public $forumsRead = [];
