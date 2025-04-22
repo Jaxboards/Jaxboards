@@ -6,6 +6,7 @@ namespace Page;
 
 use IPAddress;
 use JAX;
+use RSSFeed;
 
 use function array_diff;
 use function array_flip;
@@ -1421,7 +1422,6 @@ final class Topic
     {
         global $JAX,$DB;
 
-        include_once __DIR__ . '/../classes/rssfeed.php';
         $link = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['SCRIPT_NAME'];
         $feed = new RSSFeed(
             [
