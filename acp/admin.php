@@ -20,15 +20,9 @@ if (!defined('JAXBOARDS_ROOT')) {
 }
 
 // Load composer dependencies.
-require_once JAXBOARDS_ROOT . '/vendor/autoload.php';
+require_once JAXBOARDS_ROOT . '/inc/autoload.php';
 
 require_once JAXBOARDS_ROOT . '/config.php';
-
-require_once JAXBOARDS_ROOT . '/inc/classes/ipaddress.php';
-
-require_once JAXBOARDS_ROOT . '/inc/classes/jax.php';
-
-require_once JAXBOARDS_ROOT . '/inc/classes/mysql.php';
 
 require_once JAXBOARDS_ROOT . '/acp/page.php';
 

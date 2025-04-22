@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/../inc/autoload.php';
+
 require_once __DIR__ . '/../config.php';
 
-require_once __DIR__ . '/../inc/classes/mysql.php';
 $DB = new MySQL();
 $DB->connect(
     $CFG['sql_host'],
@@ -15,8 +16,6 @@ $DB->connect(
 );
 
 require_once __DIR__ . '/../domaindefinitions.php';
-
-require_once __DIR__ . '/../inc/classes/jax.php';
 
 $list = [[], []];
 

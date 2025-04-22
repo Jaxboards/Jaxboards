@@ -7,24 +7,12 @@ if (!defined('JAXBOARDS_ROOT')) {
 }
 
 // Load composer dependencies.
-require_once JAXBOARDS_ROOT . '/vendor/autoload.php';
+require_once JAXBOARDS_ROOT . '/inc/autoload.php';
 
 
 require_once __DIR__ . '/config.php';
 
 require_once __DIR__ . '/domaindefinitions.php';
-
-// Require the classes.
-require_once JAXBOARDS_ROOT . '/inc/classes/page.php';
-
-require_once JAXBOARDS_ROOT . '/inc/classes/sess.php';
-
-require_once JAXBOARDS_ROOT . '/inc/classes/ipaddress.php';
-
-require_once JAXBOARDS_ROOT . '/inc/classes/jax.php';
-
-require_once __DIR__ . '/inc/classes/mysql.php';
-
 
 /*
  * Jaxboards. THE ULTIMATE 4UMS WOOOOOOO
