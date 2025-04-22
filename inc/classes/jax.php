@@ -8,6 +8,9 @@ final class JAX
 
     public $userPerms = '';
 
+    /**
+     * @var array<mixed>
+     */
     public $c = [];
 
     /**

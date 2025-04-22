@@ -1119,7 +1119,7 @@ final class UCP
                 $cmd = json_encode(
                     [
                         'newmessage',
-                        'You have a new message from '. $USER['display_name'],
+                        'You have a new message from ' . $USER['display_name'],
                         $DB->insert_id(1),
                     ],
                 ) . PHP_EOL;
