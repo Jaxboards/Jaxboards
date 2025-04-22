@@ -207,6 +207,7 @@ if (!$PAGE->jsaccess) {
             . '</script>',
         );
     }
+
     $PAGE->append(
         'SCRIPT',
         '<script src="' . BOARDURL . 'dist/app.js" defer></script>',
