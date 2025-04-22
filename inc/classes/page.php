@@ -40,19 +40,6 @@ declare(strict_types=1);
  */
 final class PAGE
 {
-    public function __construct()
-    {
-        $this->jsaccess = (int) ($_SERVER['HTTP_X_JSACCESS'] ?? 0);
-
-        if ($this->jsaccess !== 0) {
-            $this->jsupdate = $this->jsaccess === 1;
-            $this->jsnewlocation = $this->jsaccess >= 2;
-            $this->jsdirectlink = $this->jsaccess === 3;
-        }
-
-        $this->mobile = str_contains((string) $_SERVER['HTTP_USER_AGENT'], 'mobile');
-    }
-
     public $metadefs = [];
 
     public $debuginfo = '';
@@ -102,6 +89,19 @@ final class PAGE
     public $metaqueue;
 
     public $done;
+
+    public function __construct()
+    {
+        $this->jsaccess = (int) ($_SERVER['HTTP_X_JSACCESS'] ?? 0);
+
+        if ($this->jsaccess !== 0) {
+            $this->jsupdate = $this->jsaccess === 1;
+            $this->jsnewlocation = $this->jsaccess >= 2;
+            $this->jsdirectlink = $this->jsaccess === 3;
+        }
+
+        $this->mobile = str_contains((string) $_SERVER['HTTP_USER_AGENT'], 'mobile');
+    }
 
     public function get($a)
     {

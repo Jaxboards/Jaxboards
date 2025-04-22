@@ -6,6 +6,8 @@ $PAGE->loadmeta('modcp');
 
 final class ModControls
 {
+    public $perms;
+
     public static function load(): void
     {
         global $PAGE;
@@ -22,8 +24,6 @@ final class ModControls
         $PAGE->JS('softurl');
         $PAGE->JS('script', $script);
     }
-
-    public $perms;
 
     public function route(): void
     {

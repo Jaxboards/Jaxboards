@@ -4,6 +4,35 @@ declare(strict_types=1);
 
 final class JAX
 {
+    public $attachmentdata;
+
+    public $userPerms = '';
+
+    public $c = [];
+
+    /**
+     * @var array<mixed>|string
+     */
+    public $g = [];
+
+    /**
+     * @var array<mixed>|string
+     */
+    public $p = [];
+
+    public $s = [];
+
+    /**
+     * @var array<mixed>
+     */
+    public $b = [];
+
+    public $textRules;
+
+    public $userData;
+
+    public $emoteRules;
+
     public function __construct()
     {
         $this->c = $this->filterInput($_COOKIE);
@@ -54,35 +83,6 @@ final class JAX
 
         return $v;
     }
-
-    public $attachmentdata;
-
-    public $userPerms = '';
-
-    public $c = [];
-
-    /**
-     * @var array<mixed>|string
-     */
-    public $g = [];
-
-    /**
-     * @var array<mixed>|string
-     */
-    public $p = [];
-
-    public $s = [];
-
-    /**
-     * @var array<mixed>
-     */
-    public $b = [];
-
-    public $textRules;
-
-    public $userData;
-
-    public $emoteRules;
 
     public function between($a, $b, $c): bool
     {
@@ -150,12 +150,12 @@ final class JAX
         }
     }
 
-    public function linkify($a)
+    public function linkify($a): ?string
     {
         return preg_replace_callback(
             '@(^|\s)(https?://[^\s\)\(<>]+)@',
             $this->linkify_callback(...),
-            $a,
+            (string) $a,
         );
     }
 

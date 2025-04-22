@@ -11,6 +11,7 @@ require_once JAXBOARDS_ROOT . '/vendor/autoload.php';
 
 
 require_once __DIR__ . '/config.php';
+
 require_once __DIR__ . '/domaindefinitions.php';
 
 // Require the classes.
@@ -65,7 +66,7 @@ $connected = $DB->connect(
     $CFG['sql_username'],
     $CFG['sql_password'],
     $CFG['sql_db'],
-    $CFG['sql_prefix']
+    $CFG['sql_prefix'],
 );
 if (!$connected) {
     echo 'Could not connect';
@@ -81,7 +82,6 @@ ini_set('session.use_only_cookies', '1');
 session_start();
 
 // Board Service Stuff, get the board as specified by URL.
-
 // Initialize them.
 if (isset($CFG['noboard']) && $CFG['noboard']) {
     echo 'board not found';

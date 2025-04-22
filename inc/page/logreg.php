@@ -57,7 +57,7 @@ final class LogReg
 
         // Validate input and actually register the user.
         try {
-            if (IPAddress::isServiceBanned()) {
+            if ((new IPAddress())->isServiceBanned()) {
                 throw new Exception(
                     'You have been banned from registration on all boards. If'
                     . ' you feel that this is in error, please contact the'

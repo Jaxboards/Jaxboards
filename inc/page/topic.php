@@ -4,12 +4,6 @@ declare(strict_types=1);
 
 final class Topic
 {
-    public function __construct()
-    {
-        global $PAGE;
-        $PAGE->loadmeta('topic');
-    }
-
     /**
      * @var int
      */
@@ -39,6 +33,12 @@ final class Topic
      * @var null|array
      */
     private $topicdata;
+
+    public function __construct()
+    {
+        global $PAGE;
+        $PAGE->loadmeta('topic');
+    }
 
     public function route(): void
     {

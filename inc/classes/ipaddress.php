@@ -4,14 +4,6 @@ declare(strict_types=1);
 
 final class IPAddress
 {
-    private static function getIp()
-    {
-        global $_SERVER;
-
-        return $_SERVER['REMOTE_ADDR'];
-    }
-
-
     public static function asBinary($ip = null): false|string
     {
         if (!$ip) {
@@ -30,7 +22,7 @@ final class IPAddress
     // we need to do something for mysql IP addresses:
     // https://secure.php.net/manual/en/function.inet-ntop.php#117398
     // .
-    public static function asHumanReadable(string $ip = null): string
+    public static function asHumanReadable(?string $ip = null): string
     {
         if (!$ip) {
             return self::getIp();
@@ -79,6 +71,13 @@ final class IPAddress
         return false;
     }
 
+    private static function getIp()
+    {
+        global $_SERVER;
+
+        return $_SERVER['REMOTE_ADDR'];
+    }
+
     /**
      * Check if an IP is banned from the service.
      * Will use the $this->getIp() ipAddress field is left empty.
@@ -87,7 +86,7 @@ final class IPAddress
      *
      * @return bool if the IP is banned form the service or not
      */
-    public function isServiceBanned(string $ipAddress = null): bool
+    public function isServiceBanned(?string $ipAddress = null): bool
     {
         global $DB,$CFG,$JAX;
 
@@ -108,7 +107,7 @@ final class IPAddress
                 EOT
             ,
             [],
-            $DB->basicvalue(IPAddress::asBinary($ipAddress)),
+            $DB->basicvalue(self::asBinary($ipAddress)),
         );
         $row = $DB->arow($result);
         $DB->disposeresult($result);
