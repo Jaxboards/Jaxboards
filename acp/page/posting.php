@@ -258,7 +258,7 @@ final class Posting
 
         $emoticonRows = '';
         if ($emotepack) {
-            include JAXBOARDS_ROOT . "/emoticons/{$emotepack}/rules.php";
+            require_once JAXBOARDS_ROOT . "/emoticons/{$emotepack}/rules.php";
             foreach ($rules as $emoticon => $smileyFile) {
                 $emoticonRows .= $PAGE->parseTemplate(
                     'posting/emoticon-packs-row.html',
