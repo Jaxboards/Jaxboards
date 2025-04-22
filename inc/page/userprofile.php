@@ -6,6 +6,7 @@ namespace Page;
 
 use IPAddress;
 use JAX;
+use RSSFeed;
 
 use function explode;
 use function gmdate;
@@ -488,8 +489,7 @@ final class UserProfile
                     $this->num_activity,
                 );
                 if (isset($JAX->b['fmt']) && $JAX->b['fmt'] === 'RSS') {
-                    include_once __DIR__ . '/../classes/rssfeed.php';
-                    $feed = new rssfeed(
+                    $feed = new RSSFeed(
                         [
                             'description' => $udata['usertitle'],
                             'title' => $udata['display_name'] . "'s recent activity",
