@@ -83,7 +83,6 @@ if (isset($_SESSION['auid'])) {
 
 if (!$PERMS['can_access_acp']) {
     // header('Location: ./');
-
     exit;
 }
 

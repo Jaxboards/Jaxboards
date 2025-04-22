@@ -78,7 +78,7 @@ if (isset($JAX->p['submit'])) {
 
         $verified_password = (bool) $DB->getUser($uinfo['id'], $password);
 
-        if ($isAdmin && $verified_password) {
+        if ($verified_password) {
             $_SESSION['auid'] = $uinfo['id'];
             header('Location: admin.php');
         }

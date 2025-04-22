@@ -161,11 +161,7 @@ if (isset($SESS->vars['skin_id']) && $SESS->vars['skin_id']) {
 // If they're logged in through cookies, (username & password)
 // but the session variable has changed/been removed/not updated for some reason
 // this fixes it.
-if (
-    $USER
-    && !$SESS->is_bot
-    && $USER['id'] !== $SESS->uid
-) {
+if ($USER && !$SESS->is_bot && $USER['id'] !== $SESS->uid) {
     $SESS->clean($USER['id']);
     $SESS->uid = $USER['id'];
     $SESS->applychanges();
