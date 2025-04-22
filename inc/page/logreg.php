@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Page;
 
 use IPAddress;
+use JAX;
+use Exception;
 
 use function array_key_exists;
 use function base64_encode;
@@ -421,7 +423,7 @@ final class LogReg
             } else {
                 $page .= $PAGE->meta(
                     'forgot-password2-form',
-                    $JAX->hiddenFormFields(
+                    JAX::hiddenFormFields(
                         [
                             'act' => 'logreg6',
                             'id' => $id,
@@ -504,7 +506,7 @@ final class LogReg
             $page .= $PAGE->meta(
                 'forgot-password-form',
                 $PAGE->jsaccess
-                ? $JAX->hiddenFormFields(
+                ? JAX::hiddenFormFields(
                     [
                         'act' => 'logreg6',
                     ],

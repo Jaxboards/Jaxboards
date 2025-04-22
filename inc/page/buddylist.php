@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Page;
+use JAX;
 
 use function array_search;
 use function explode;
@@ -16,7 +17,7 @@ final class BuddyList
     {
         global $PAGE;
 
-        $buddylist = $JAX->hiddenFormFields(['act' => 'buddylist']);
+        $buddylist = JAX::hiddenFormFields(['act' => 'buddylist']);
         $PAGE->metadefs['buddylist-contacts'] = <<<EOT
             <div class="contacts">
                 <form method="?" data-ajax-form="true">

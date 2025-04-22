@@ -307,14 +307,14 @@ final class JAX
         return $a;
     }
 
-    public function hiddenFormFields($a): string
+    public static function hiddenFormFields($fields): string
     {
-        $r = '';
-        foreach ($a as $k => $v) {
-            $r .= '<input type="hidden" name="' . $k . '" value="' . $v . '" />';
+        $html = '';
+        foreach ($fields as $key => $value) {
+            $html .= '<input type="hidden" name="' . $key . '" value="' . $value . '" />';
         }
 
-        return $r;
+        return $html;
     }
 
     public function textonly($a): ?string

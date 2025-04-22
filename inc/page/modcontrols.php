@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Page;
 
 use IPAddress;
+use JAX;
 
 use function array_diff;
 use function array_flip;
@@ -798,7 +799,7 @@ final class ModControls
         $page .= '<form method="post" data-ajax-form="true" '
             . 'style="padding:10px;">'
             . 'Which topic should the topics be merged into?<br>';
-        $page .= $JAX->hiddenFormFields(
+        $page .= JAX::hiddenFormFields(
             [
                 'act' => 'modcontrols',
                 'dot' => 'merge',
@@ -863,7 +864,7 @@ final class ModControls
         $e = '';
         $data = [];
         $page = '<form method="post" data-ajax-form="true">'
-            . $JAX->hiddenFormFields(
+            . JAX::hiddenFormFields(
                 [
                     'act' => 'modcontrols',
                     'do' => 'emem',
@@ -982,7 +983,7 @@ final class ModControls
 
                 $page .= '<form method="post" '
                     . 'data-ajax-form="true"><table>';
-                $page .= $JAX->hiddenFormFields(
+                $page .= JAX::hiddenFormFields(
                     [
                         'act' => 'modcontrols',
                         'do' => 'emem',
@@ -1046,7 +1047,7 @@ final class ModControls
             fclose($o);
         }
 
-        $hiddenFields = $JAX->hiddenFormFields(
+        $hiddenFields = JAX::hiddenFormFields(
             [
                 'act' => 'modcontrols',
                 'do' => 'iptools',
@@ -1063,7 +1064,7 @@ final class ModControls
         if ($ip) {
             $page .= "<h3>Data for {$ip}:</h3>";
 
-            $hiddenFields = $JAX->hiddenFormFields(
+            $hiddenFields = JAX::hiddenFormFields(
                 [
                     'act' => 'modcontrols',
                     'do' => 'iptools',

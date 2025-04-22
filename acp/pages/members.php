@@ -336,7 +336,7 @@ final class Members
                     . $PAGE->back(),
                 );
             } else {
-                $page .= $JAX->hiddenFormFields(['mid' => $data['id']]);
+                $page .= JAX::hiddenFormFields(['mid' => $data['id']]);
                 $page .= $this->formfield('Display Name:', 'display_name', $data['display_name']);
                 $page .= $this->formfield('Username:', 'name', $data['name']);
                 $page .= $this->formfield('Real Name:', 'full_name', $data['full_name']);

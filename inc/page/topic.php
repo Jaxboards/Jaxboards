@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Page;
 
 use IPAddress;
+use JAX;
 
 use function array_diff;
 use function array_flip;
@@ -912,7 +913,7 @@ final class Topic
             return $page . '</table>';
         }
 
-        $page = $JAX->hiddenFormFields(
+        $page = JAX::hiddenFormFields(
             [
                 'act' => 'vt' . $this->tid,
                 'votepoll' => 1,
@@ -1145,7 +1146,7 @@ final class Topic
         $post = $DB->arow($result);
         $DB->disposeresult($result);
 
-        $hiddenfields = $JAX->hiddenFormFields(
+        $hiddenfields = JAX::hiddenFormFields(
             [
                 'act' => 'post',
                 'how' => 'qedit',
@@ -1170,7 +1171,7 @@ final class Topic
         }
 
         if ($post['newtopic']) {
-            $hiddenfields .= $JAX->hiddenFormFields(
+            $hiddenfields .= JAX::hiddenFormFields(
                 [
                     'tid' => $post['tid'],
                 ],

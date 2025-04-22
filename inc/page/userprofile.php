@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Page;
+use JAX;
 
 use function explode;
 use function gmdate;
@@ -405,7 +406,7 @@ final class UserProfile
                         'userprofile-comment-form',
                         $USER['name'] ?? '',
                         $JAX->pick($USER['avatar'], $PAGE->meta('default-avatar')),
-                        $JAX->hiddenFormFields(
+                        JAX::hiddenFormFields(
                             [
                                 'act' => 'vu' . $id,
                                 'page' => 'comments',
