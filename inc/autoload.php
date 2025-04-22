@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 if (!defined('JAXBOARDS_ROOT')) {
-    exit(1);
+    define('JAXBOARDS_ROOT', dirname(__DIR__));
 }
 
 require_once JAXBOARDS_ROOT . '/vendor/autoload.php';
