@@ -11,6 +11,7 @@ $DB->connect(
     $CFG['sql_username'],
     $CFG['sql_password'],
     $CFG['sql_db'],
+    $CFG['sql_prefix'],
 );
 
 require_once __DIR__ . '/../domaindefinitions.php';

@@ -110,6 +110,7 @@ final class Members
     public function editmem()
     {
         global $PAGE,$JAX,$DB;
+        $userData = $DB->getUser();
         $page = '';
         if (
             (isset($JAX->b['mid']) && $JAX->b['mid'])
@@ -130,7 +131,7 @@ final class Members
                 $DB->disposeresult($result);
                 if (isset($JAX->p['savedata']) && $JAX->p['savedata']) {
                     if (
-                        $data['group_id'] !== 2 || $JAX->userData['id'] === 1
+                        $data['group_id'] !== 2 || $userData['id'] === 1
                     ) {
                         $write = [];
                         if ($JAX->p['password']) {
@@ -329,7 +330,7 @@ final class Members
             }
 
             $data = array_pop($data);
-            if ($data['group_id'] === 2 && $JAX->userData['id'] !== 1) {
+            if ($data['group_id'] === 2 && $userData['id'] !== 1) {
                 $page = $PAGE->error(
                     'You do not have permission to edit this profile. '
                     . $PAGE->back(),
@@ -852,6 +853,7 @@ final class Members
     public function massmessage(): void
     {
         global $PAGE,$JAX,$DB;
+        $userData = $DB->getUser();
         $page = '';
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             if (
@@ -876,7 +878,7 @@ final class Members
                             'del_recipient' => 0,
                             'del_sender' => 0,
                             'flag' => 0,
-                            'from' => $JAX->userData['id'],
+                            'from' => $userData['id'],
                             'message' => $JAX->p['message'],
                             'read' => 0,
                             'title' => $JAX->p['title'],

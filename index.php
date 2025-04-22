@@ -162,9 +162,9 @@ if (isset($SESS->vars['skin_id']) && $SESS->vars['skin_id']) {
 // but the session variable has changed/been removed/not updated for some reason
 // this fixes it.
 if (
-    $JAX->userData
+    $USER
     && !$SESS->is_bot
-    && $JAX->userData['id'] !== $SESS->uid
+    && $USER['id'] !== $SESS->uid
 ) {
     $SESS->clean($USER['id']);
     $SESS->uid = $USER['id'];

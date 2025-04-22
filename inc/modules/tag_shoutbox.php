@@ -338,6 +338,7 @@ final class Shoutbox
     public function addshout(): void
     {
         global $JAX,$DB,$PAGE,$SESS;
+        $userData = $DB->getUser();
         $SESS->act();
         $e = '';
         $shout = $JAX->p['shoutbox_shout'];
@@ -363,7 +364,7 @@ final class Shoutbox
                 'date' => gmdate('Y-m-d H:i:s'),
                 'ip' => IPAddress::asBinary(),
                 'shout' => $shout,
-                'uid' => $JAX->pick($JAX->userData['id'], 0),
+                'uid' => $userData['id'] ?? 0,
             ],
         );
     }

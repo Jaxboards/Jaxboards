@@ -93,6 +93,7 @@ final class SESS
     public function getSess($sid = false)
     {
         global $DB,$JAX,$_SESSION;
+        $userData = $this->getUser();
         $isbot = 0;
         $r = [];
         foreach ($this->bots as $k => $v) {
@@ -173,11 +174,11 @@ final class SESS
 
         $uid = 0;
         if (
-            !empty($JAX->userData)
-            && isset($JAX->userData['id'])
-            && $JAX->userData['id'] > 0
+            !empty($userData)
+            && isset($userData['id'])
+            && $userData['id'] > 0
         ) {
-            $uid = (int) $JAX->userData['id'];
+            $uid = (int) $userData['id'];
         }
 
         if ($isbot === 0) {

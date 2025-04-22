@@ -24,6 +24,8 @@ require_once JAXBOARDS_ROOT . '/vendor/autoload.php';
 
 require_once JAXBOARDS_ROOT . '/config.php';
 
+require_once JAXBOARDS_ROOT . '/inc/classes/ipaddress.php';
+
 require_once JAXBOARDS_ROOT . '/inc/classes/jax.php';
 
 require_once JAXBOARDS_ROOT . '/inc/classes/mysql.php';
@@ -71,8 +73,8 @@ require_once __DIR__ . '/../domaindefinitions.php';
 
 $JAX = new JAX();
 if (isset($_SESSION['auid'])) {
-    $DB->getUser($_SESSION['auid']);
-    $PERMS = $DB->getPerms($JAX->userData['group_id']);
+    $userData = $DB->getUser($_SESSION['auid']);
+    $PERMS = $DB->getPerms($userData['group_id']);
 } else {
     $PERMS = [
         'can_access_acp' => false,
@@ -80,13 +82,14 @@ if (isset($_SESSION['auid'])) {
 }
 
 if (!$PERMS['can_access_acp']) {
-    header('Location: ./');
+    // header('Location: ./');
 
     exit;
 }
 
+$USER = $DB->getUser();
 $PAGE = new PAGE();
-$PAGE->append('username', $JAX->userData['display_name']);
+$PAGE->append('username', $USER['display_name']);
 $PAGE->title($PAGE->getCFGSetting('boardname') . ' - ACP');
 $PAGE->addNavMenu(
     'Settings',

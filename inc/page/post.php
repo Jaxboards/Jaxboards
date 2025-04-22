@@ -893,7 +893,7 @@ onclick="this.form.submitButton=this"/></div>
                     EOT
                 ,
                 ['members'],
-                $DB->basicvalue($JAX->userData['id']),
+                $DB->basicvalue($USER['id']),
             );
         }
 

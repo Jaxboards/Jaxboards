@@ -24,6 +24,10 @@ require_once JAXBOARDS_ROOT . '/vendor/autoload.php';
 
 require_once JAXBOARDS_ROOT . '/config.php';
 
+require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
+
+require_once JAXBOARDS_ROOT . '/inc/classes/ipaddress.php';
+
 require_once JAXBOARDS_ROOT . '/inc/classes/jax.php';
 
 require_once JAXBOARDS_ROOT . '/inc/classes/mysql.php';
@@ -39,28 +43,29 @@ $DB->connect(
     $CFG['sql_prefix'],
 );
 
-require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
 
 $JAX = new JAX();
 $submitted = false;
-if (isset($JAX->p['submit']) && $JAX->p['submit']) {
+if (isset($JAX->p['submit'])) {
     $submitted = true;
     // Start with least permissions, not admin, no password.
-    $notadmin = true;
+    $isAdmin = true;
 
-    $u = $JAX->p['user'];
-    $p = $JAX->p['pass'];
+    $user = $JAX->p['user'];
+    $password = $JAX->p['pass'];
+
     $result = $DB->safespecial(
         <<<'EOT'
-            SELECT m.`id` as `id`, g.`can_access_acp` as `can_access_acp`
-                FROM %t m
-                LEFT JOIN %t g
-                    ON m.`group_id` = g.`id`
+            SELECT
+                m.`id` as `id`,
+                g.`can_access_acp` as `can_access_acp`
+            FROM %t m
+                LEFT JOIN %t g ON m.`group_id` = g.`id`
                 WHERE m.`name`=?;
             EOT
         ,
         ['members', 'member_groups'],
-        $DB->basicvalue($u),
+        $DB->basicvalue($user),
     );
     $uinfo = $DB->arow($result);
     $DB->disposeresult($result);
@@ -68,11 +73,12 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     // Check password.
     if (is_array($uinfo)) {
         if ($uinfo['can_access_acp']) {
-            $notadmin = false;
+            $isAdmin = true;
         }
 
-        $verified_password = (bool) $DB->getUser($uinfo['id'], $p);
-        if (!$notadmin && $verified_password) {
+        $verified_password = (bool) $DB->getUser($uinfo['id'], $password);
+
+        if ($isAdmin && $verified_password) {
             $_SESSION['auid'] = $uinfo['id'];
             header('Location: admin.php');
         }
