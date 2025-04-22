@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace ACP\Page;
+
 use JAX;
 
 use function is_numeric;

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace ACP;
+
 use Exception;
 
 use function error_log;
