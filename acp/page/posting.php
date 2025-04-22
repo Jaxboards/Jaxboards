@@ -241,32 +241,34 @@ final class Posting
 
         $PAGE->addContentBox('Custom Emoticons', $page);
 
-        $emoticonpath = Config::getSetting('emotepack');
-        $emoticonsetting = $emoticonpath;
+        $emotepack = Config::getSetting('emotepack');
         $emoticonPackOptions = '';
         foreach ($basesets as $packId => $packName) {
             $emoticonPackOptions .= $PAGE->parseTemplate(
                 'select-option.html',
                 [
                     'label' => $packName,
-                    'selected' => $emoticonsetting === $packId
+                    'selected' => $emotepack === $packId
                 ? ' selected="selected"' : '',
                     'value' => $packId,
                 ],
             );
         }
 
-        include JAXBOARDS_ROOT . "/emoticons/{$emoticonpath}/rules.php";
         $emoticonRows = '';
-        foreach ($rules as $emoticon => $smileyFile) {
-            $emoticonRows .= $PAGE->parseTemplate(
-                'posting/emoticon-packs-row.html',
-                [
-                    'emoticon' => $emoticon,
-                    'smiley_url' => "/emoticons/{$emoticonpath}/{$smileyFile}",
-                ],
-            ) . PHP_EOL;
+        if ($emotepack) {
+            include JAXBOARDS_ROOT . "/emoticons/{$emotepack}/rules.php";
+            foreach ($rules as $emoticon => $smileyFile) {
+                $emoticonRows .= $PAGE->parseTemplate(
+                    'posting/emoticon-packs-row.html',
+                    [
+                        'emoticon' => $emoticon,
+                        'smiley_url' => "/emoticons/{$emotepack}/{$smileyFile}",
+                    ],
+                ) . PHP_EOL;
+            }
         }
+
 
         $page = $PAGE->parseTemplate(
             'posting/emoticon-packs.html',
