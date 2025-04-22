@@ -489,9 +489,10 @@ final class JAX
 
         if ($ext !== '') {
             $attachmentURL = BOARDPATHURL . '/Uploads/' . $data['hash'] . '.' . $ext;
-            return "<a href='{$attachmentURL}'>" .
-                "<img src='{$attachmentURL}' alt='attachment' class='bbcodeimg' />" .
-                "</a>";
+
+            return "<a href='{$attachmentURL}'>"
+                . "<img src='{$attachmentURL}' alt='attachment' class='bbcodeimg' />"
+                . '</a>';
         }
 
         return '<div class="attachment">'
