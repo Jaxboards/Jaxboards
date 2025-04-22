@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-require_once JAXBOARDS_ROOT . '/forums/recountstats.php';
+require_once JAXBOARDS_ROOT . '/acp/pages/forums/recountstats.php';
 
 final class Forums
 {
