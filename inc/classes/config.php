@@ -19,9 +19,7 @@ final class Config
 
         require_once JAXBOARDS_ROOT . '/config.php';
 
-        $serviceConfig = $CFG;
-
-        return $serviceConfig;
+        return $serviceConfig = $CFG;
     }
 
     public static function getBoardConfig($write = null)
@@ -44,9 +42,7 @@ final class Config
 
         require_once BOARDPATH . '/config.php';
 
-        $boardConfig = $CFG;
-
-        return $boardConfig;
+        return $boardConfig = $CFG;
     }
 
     public static function getSetting(string $key)
@@ -94,20 +90,6 @@ final class Config
 
         return <<<EOT
             <?php
-            /**
-             * JaxBoards config file. It's just JSON embedded in PHP- wow!
-             *
-             * PHP Version 5.3.0
-             *
-             * @category Jaxboards
-             * @package  Jaxboards
-             *
-             * @author  Sean Johnson <seanjohnson08@gmail.com>
-             * @author  World's Tallest Ladder <wtl420@users.noreply.github.com>
-             * @license MIT <https://opensource.org/licenses/MIT>
-             *
-             * @link https://github.com/Jaxboards/Jaxboards Jaxboards on Github
-             */
             \$CFG = json_decode(
             <<<'EOD'
             {$dataString}
