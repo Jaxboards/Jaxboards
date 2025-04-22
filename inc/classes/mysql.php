@@ -615,18 +615,18 @@ final class MySQL
         return $userData;
     }
 
-    public function getPerms($group_id = '')
+    public function getPerms($groupId = null)
     {
         static $userPerms = null;
 
-        if ($group_id === '' && $userPerms !== null) {
+        if ($groupId === '' && $userPerms !== null) {
             return $userPerms;
         }
 
         $userData = $this->getUser();
 
-        if ($group_id === '' && $userData) {
-            $group_id = $userData['group_id'];
+        if ($groupId === '' && $userData) {
+            $groupId = $userData['group_id'];
         }
 
 
@@ -667,7 +667,7 @@ final class MySQL
             ,
             'member_groups',
             'WHERE `id`=?',
-            $group_id ?? 3,
+            $groupId ?? 3,
         );
         $retval = $this->arow($result);
         $userPerms = $retval;

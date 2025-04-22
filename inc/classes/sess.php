@@ -93,7 +93,7 @@ final class SESS
     public function getSess($sid = false)
     {
         global $DB,$JAX,$_SESSION;
-        $userData = $this->getUser();
+        $userData = $DB->getUser();
         $isbot = 0;
         $r = [];
         foreach ($this->bots as $k => $v) {
