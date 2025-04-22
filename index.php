@@ -192,24 +192,21 @@ $PAGE->append(
 );
 
 if (!$PAGE->jsaccess) {
-    $variables = [];
-    foreach (['sound_im', 'wysiwyg'] as $v) {
-        $variables[] = "{$v}:" . ($USER ? ($USER[$v] ? 1 : 0) : 1);
-    }
-
-    $variables[] = 'can_im:' . ($PERMS['can_im'] ? 1 : 0);
     if ($USER) {
-        $variables[] = 'groupid:' . $JAX->pick($USER['group_id'], 3);
-        $variables[] = "username:'" . addslashes((string) $USER['display_name']) . "'";
-        $variables[] = 'userid:' . $JAX->pick($USER['id'], 0);
+        $PAGE->append(
+            'SCRIPT',
+            '<script>const globalsettings='
+            . json_encode([
+                'sound_im' => $USER['sound_im'] ? 1 : 0,
+                'wysiwyg' => $USER['wysiwyg'] ? 1 : 0,
+                'can_im' => $PERMS['can_im'] ? 1 : 0,
+                'groupid' => $USER['group_id'] ?? 3,
+                'username' => $USER['display_name'],
+                'userid' => $USER['id'] ?? 0,
+            ])
+            . '</script>',
+        );
     }
-
-    $PAGE->append(
-        'SCRIPT',
-        ' <script>var globalsettings={'
-        . implode(',', $variables)
-        . '}</script>',
-    );
     $PAGE->append(
         'SCRIPT',
         '<script src="' . BOARDURL . 'dist/app.js" defer></script>',
