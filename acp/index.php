@@ -39,9 +39,17 @@ $DB->connect(
 
 
 $JAX = new JAX();
-$submitted = false;
+$PAGE = new PAGE();
+
+$themeElements = [
+    'board_name' => $CFG['boardname'],
+    'board_url' => BOARDURL,
+    'content' => '',
+    'css_url' => BOARDURL . 'acp/css/login.css',
+    'favicon_url' => BOARDURL . 'favicon.ico',
+];
+
 if (isset($JAX->p['submit'])) {
-    $submitted = true;
     $user = $JAX->p['user'];
     $password = $JAX->p['pass'];
 
@@ -61,39 +69,25 @@ if (isset($JAX->p['submit'])) {
     $uinfo = $DB->arow($result);
     $DB->disposeresult($result);
 
-    // Check password.
-    if (is_array($uinfo)) {
+    if (!$uinfo) {
+        $themeElements['content'] = $PAGE->error(
+            'The username/password supplied was incorrect',
+        );
+    } elseif (is_array($uinfo)) {
+        // Check password.
         $verified_password = (bool) $DB->getUser($uinfo['id'], $password);
 
         if ($uinfo['can_access_acp'] && $verified_password) {
             $_SESSION['auid'] = $uinfo['id'];
+            // Successful login, redirect
             header('Location: admin.php');
+        } else {
+            $themeElements['content'] = $PAGE->error(
+                'You are not authorized to log in to the ACP',
+            );
         }
     }
 }
-
-$themeElements = [
-    'board_name' => $CFG['boardname'],
-    'board_url' => BOARDURL,
-    'content' => '',
-    'css_url' => BOARDURL . 'acp/css/login.css',
-    'favicon_url' => BOARDURL . 'favicon.ico',
-];
-
-$PAGE = new PAGE();
-
-if ($submitted) {
-    if ((isset($uinfo) && $uinfo === false) || !$verified_password) {
-        $themeElements['content'] = $PAGE->error(
-            'The username/password supplied was incorrect',
-        );
-    } elseif (isset($uinfo) && $notadmin) {
-        $themeElements['content'] = $PAGE->error(
-            'You are not authorized to log in to the ACP',
-        );
-    }
-}
-
 
 echo $PAGE->parseTemplate(
     'login.html',
