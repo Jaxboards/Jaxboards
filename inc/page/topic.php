@@ -286,7 +286,7 @@ final class Topic
         $buttons = [
             '',
             '',
-            ''
+            '',
         ];
 
         if ($this->topicdata['fperms']['start']) {
