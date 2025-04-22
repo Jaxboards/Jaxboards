@@ -418,9 +418,8 @@ final class PAGE
         }
     }
 
-    public function meta(...$args): ?string
+    public function meta($meta, ...$args): ?string
     {
-        $meta = array_shift($args);
         $this->processqueue($meta);
         $r = vsprintf(
             str_replace(

@@ -283,10 +283,14 @@ final class Topic
         );
 
         // Add buttons.
-        $buttons = [];
+        $buttons = [
+            '',
+            '',
+            ''
+        ];
 
         if ($this->topicdata['fperms']['start']) {
-            $buttons[] = "<a href='?act=post&fid=" . $this->topicdata['fid'] . "'>"
+            $buttons[0] = "<a href='?act=post&fid=" . $this->topicdata['fid'] . "'>"
             . $PAGE->meta(
                 $PAGE->metaexists('button-newtopic')
                     ? 'button-newtopic'
@@ -302,7 +306,7 @@ final class Topic
                 || $PERMS['can_override_locked_topics']
             )
         ) {
-            $buttons[] = "<a href='?act=vt{$tid}&qreply=1'>" . $PAGE->meta(
+            $buttons[1] = "<a href='?act=vt{$tid}&qreply=1'>" . $PAGE->meta(
                 $PAGE->metaexists('button-qreply')
                 ? 'button-qreply'
                 : 'topic-button-qreply',
@@ -316,7 +320,7 @@ final class Topic
                 || $PERMS['can_override_locked_topics']
             )
         ) {
-            $buttons[] = "<a href='?act=post&tid={$tid}'>" . $PAGE->meta(
+            $buttons[2] = "<a href='?act=post&tid={$tid}'>" . $PAGE->meta(
                 $PAGE->metaexists('button-reply')
                 ? 'button-reply'
                 : 'topic-button-reply',
