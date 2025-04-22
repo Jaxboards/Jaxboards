@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use IPAddress;
-
 final class Members
 {
     public const DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
