@@ -487,14 +487,11 @@ final class JAX
             $ext = '';
         }
 
-        if ($ext !== '' && $ext !== '0') {
-            $ext = '.' . $ext;
-        }
-
-        if ($ext !== '' && $ext !== '0') {
-            return '<a href="' . BOARDPATHURL . '/Uploads/' . $data['hash'] . $ext . '">'
-                . '<img src="' . BOARDPATHURL . 'Uploads/' . $data['hash'] . $ext . '" '
-                . 'class="bbcodeimg" /></a>';
+        if ($ext !== '') {
+            $attachmentURL = BOARDPATHURL . '/Uploads/' . $data['hash'] . '.' . $ext;
+            return "<a href='{$attachmentURL}'>" .
+                "<img src='{$attachmentURL}' alt='attachment' class='bbcodeimg' />" .
+                "</a>";
         }
 
         return '<div class="attachment">'
