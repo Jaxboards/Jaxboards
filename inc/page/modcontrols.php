@@ -27,7 +27,7 @@ final class ModControls
 
     public function route(): void
     {
-        global $JAX,$PAGE,$USER;
+        global $JAX,$DB,$PAGE,$USER;
 
         $this->perms = $DB->getPerms();
         if (!$this->perms['can_moderate'] && !$USER['mod']) {
