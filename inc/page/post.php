@@ -699,7 +699,7 @@ onclick="this.form.submitButton=this"/></div>
                         'lp_date' => $postDate,
                         'lp_uid' => $uid,
                         'poll_choices' => isset($pollchoices) && $pollchoices
-                            ? $JAX->json_encode($pollchoices)
+                            ? json_encode($pollchoices)
                             : '',
                         'poll_q' => isset($JAX->p['pollq'])
                             ? $JAX->blockhtml($JAX->p['pollq'])

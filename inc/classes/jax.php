@@ -35,42 +35,10 @@ final class JAX
 
     public function __construct()
     {
-        $this->c = $this->filterInput($_COOKIE);
-        $this->g = $this->filterInput($_GET);
-        $this->p = $this->filterInput($_POST);
+        $this->c = $_COOKIE;
+        $this->g = $_GET;
+        $this->p = $_POST;
         $this->b = array_merge($this->p, $this->g);
-    }
-
-    public static function json_encode($a, $forceaa = false)
-    {
-        if ($forceaa) {
-            return json_encode(json_decode(json_encode($a), true));
-        }
-
-        return json_encode($a);
-    }
-
-    public static function json_decode($a, $aa = true): mixed
-    {
-        return json_decode((string) $a, $aa);
-    }
-
-    public static function utf8_encode($a): array|string
-    {
-        if (is_array($a)) {
-            foreach ($a as $k => $v) {
-                $a[$k] = self::utf8_encode($v);
-            }
-        } else {
-            $a = mb_convert_encoding((string) $a, 'UTF-8', 'ISO-8859-1');
-        }
-
-        return $a;
-    }
-
-    public static function is_numerical_array($a): bool
-    {
-        return range(0, count($a) - 1) === array_keys($a);
     }
 
     public static function pick(...$args)
@@ -82,11 +50,6 @@ final class JAX
         }
 
         return $v;
-    }
-
-    public function between($a, $b, $c): bool
-    {
-        return $a >= $b && $a <= $c;
     }
 
     public function date($date, $autodate = true): false|string
@@ -179,15 +142,6 @@ final class JAX
         }
 
         return $match[1] . '[url=' . $match[2] . ']' . ($nice ?: $match[2]) . '[/url]';
-    }
-
-    public function filterInput($a): array|string
-    {
-        if (is_array($a)) {
-            return array_map($this->filterInput(...), $a);
-        }
-
-        return stripslashes((string) $a);
     }
 
     /*

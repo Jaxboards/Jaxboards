@@ -1116,11 +1116,11 @@ final class UCP
                     ],
                 );
                 // Give them a notification.
-                $cmd = $JAX->json_encode(
+                $cmd = json_encode(
                     [
                         'newmessage',
-                        'You have a new message from '
-                        . $USER['display_name'], $DB->insert_id(1),
+                        'You have a new message from '. $USER['display_name'],
+                        $DB->insert_id(1),
                     ],
                 ) . PHP_EOL;
                 $result = $DB->safespecial(

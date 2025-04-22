@@ -241,9 +241,7 @@ final class Topic
             $this->generatepoll(
                 $this->topicdata['poll_q'],
                 $this->topicdata['poll_type'],
-                $JAX->json_decode(
-                    $this->topicdata['poll_choices'],
-                ),
+                json_decode($this->topicdata['poll_choices']),
                 $this->topicdata['poll_results'],
             ),
         ) : '';
@@ -937,7 +935,7 @@ final class Topic
             $DB->disposeresult($result);
 
             $choice = $JAX->b['choice'];
-            $choices = $JAX->json_decode($row['poll_choices']);
+            $choices = json_decode($row['poll_choices'], true);
             $numchoices = count($choices);
             $results = $row['poll_results'];
             if ($results) {

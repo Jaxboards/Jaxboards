@@ -228,7 +228,7 @@ final class PAGE
 
             echo empty($this->JSOutput)
                 ? ''
-                : $JAX::json_encode($this->JSOutput);
+                : json_encode($this->JSOutput);
         } else {
             $autobox = ['PAGE', 'COPYRIGHT', 'USERBOX'];
             foreach ($this->parts as $k => $v) {
