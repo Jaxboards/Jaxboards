@@ -949,7 +949,7 @@ final class Members
                 [
                     'email_address' => $f['email'],
                     'id' => $f['id'],
-                    'ip_address' => $JAX->bin2ip($f['ip']),
+                    'ip_address' => IPAddress::asHumanReadable($f['ip']),
                     'join_date' => gmdate('M jS, Y @ g:i A', $f['join_date']),
                     'title' => $f['display_name'],
                 ],

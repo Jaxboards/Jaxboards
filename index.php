@@ -9,16 +9,21 @@ if (!defined('JAXBOARDS_ROOT')) {
 // Load composer dependencies.
 require_once JAXBOARDS_ROOT . '/vendor/autoload.php';
 
+
+require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/domaindefinitions.php';
+
 // Require the classes.
 require_once JAXBOARDS_ROOT . '/inc/classes/page.php';
 
 require_once JAXBOARDS_ROOT . '/inc/classes/sess.php';
 
+require_once JAXBOARDS_ROOT . '/inc/classes/ipaddress.php';
+
 require_once JAXBOARDS_ROOT . '/inc/classes/jax.php';
 
 require_once __DIR__ . '/inc/classes/mysql.php';
 
-require_once __DIR__ . '/config.php';
 
 /*
  * Jaxboards. THE ULTIMATE 4UMS WOOOOOOO
@@ -42,14 +47,12 @@ $microtime = microtime(true);
 
 
 if (!isset($CFG)) {
-    fwrite(STDERR, 'missing configuration');
-
-    http_response_code(500);
+    echo 'missing configuration';
 
     exit(1);
 }
 
-$onLocalHost = in_array(JAX::getIp(), ['127.0.0.1', '::1'], true);
+$onLocalHost = in_array(IPAddress::asHumanReadable(), ['127.0.0.1', '::1'], true);
 
 // DB connect!
 $DB = new MySQL();
@@ -62,6 +65,7 @@ $connected = $DB->connect(
     $CFG['sql_username'],
     $CFG['sql_password'],
     $CFG['sql_db'],
+    $CFG['sql_prefix']
 );
 if (!$connected) {
     echo 'Could not connect';
@@ -77,7 +81,6 @@ ini_set('session.use_only_cookies', '1');
 session_start();
 
 // Board Service Stuff, get the board as specified by URL.
-require_once __DIR__ . '/domaindefinitions.php';
 
 // Initialize them.
 if (isset($CFG['noboard']) && $CFG['noboard']) {
@@ -119,7 +122,7 @@ if ($USER && $SESS->ip && $SESS->ip !== $USER['ip']) {
     $DB->safeupdate(
         'members',
         [
-            'ip' => $JAX->ip2bin(),
+            'ip' => IPAddress::asBinary(),
         ],
         'WHERE id=?',
         $USER['id'],

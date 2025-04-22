@@ -15,8 +15,8 @@ if (!defined('JAXBOARDS_ROOT')) {
 }
 
 // This file must be required after mysql connecting.
-if (!isset($CFG) || !isset($DB)) {
-    fwrite(STDERR, 'This file must be required after mysql connecting');
+if (!isset($CFG)) {
+    echo 'This file must be required after config';
 
     exit(1);
 }
@@ -61,9 +61,6 @@ if ($prefix) {
     define('BOARDPATH', pathjoin(JAXBOARDS_ROOT, 'boards', $prefix));
     define('BOARDPATHURL', BOARDURL . pathjoin('boards', $prefix));
     define('STHEMEPATH', pathjoin(JAXBOARDS_ROOT, 'Service/Themes'));
-    if ($DB) {
-        $DB->prefix($CFG['sql_prefix']);
-    }
 
     $tempCFG = $CFG;
     if (@include_once BOARDPATH . 'config.php') {

@@ -361,7 +361,7 @@ final class Shoutbox
             'shouts',
             [
                 'date' => gmdate('Y-m-d H:i:s'),
-                'ip' => $JAX->ip2bin(),
+                'ip' => IPAddress::asBinary(),
                 'shout' => $shout,
                 'uid' => $JAX->pick($JAX->userData['id'], 0),
             ],

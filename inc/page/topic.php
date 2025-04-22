@@ -753,9 +753,9 @@ final class Topic
                 ) : '',
                 $PERMS['can_moderate']
                     ? '<a href="?act=modcontrols&amp;do=iptools&amp;ip='
-                . $JAX->bin2ip($post['ip']) . '">' . $PAGE->meta(
+                . IPAddress::asHumanReadable($post['ip']) . '">' . $PAGE->meta(
                     'topic-mod-ipbutton',
-                    $JAX->bin2ip($post['ip']),
+                    IPAddress::asHumanReadable($post['ip']),
                 ) . '</a>'
                     : '',
                 $post['icon'] ? $PAGE->meta(

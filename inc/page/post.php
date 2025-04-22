@@ -119,7 +119,7 @@ final class Post
                 'files',
                 [
                     'hash' => $hash,
-                    'ip' => $JAX->ip2bin(),
+                    'ip' => IPAddress::asBinary(),
                     'name' => $fileobj['name'],
                     'size' => $size,
                     'uid' => $uid,
@@ -791,7 +791,7 @@ onclick="this.form.submitButton=this"/></div>
             [
                 'auth_id' => $uid,
                 'date' => $postDate,
-                'ip' => $JAX->ip2bin(),
+                'ip' => IPAddress::asBinary(),
                 'newtopic' => $newtopic ? 1 : 0,
                 'post' => $postdata,
                 'tid' => $tid,

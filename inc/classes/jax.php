@@ -55,13 +55,6 @@ final class JAX
         return $v;
     }
 
-    public static function getIp()
-    {
-        global $_SERVER;
-
-        return $_SERVER['REMOTE_ADDR'];
-    }
-
     public $attachmentdata;
 
     public $userPerms = '';
@@ -88,8 +81,6 @@ final class JAX
     public $textRules;
 
     public $userData;
-
-    public $ipbancache;
 
     public $emoteRules;
 
@@ -161,8 +152,6 @@ final class JAX
 
     public function linkify($a)
     {
-        $a = str_replace('<IP>', self::getIp(), $a);
-
         return preg_replace_callback(
             '@(^|\s)(https?://[^\s\)\(<>]+)@',
             $this->linkify_callback(...),
@@ -327,7 +316,7 @@ final class JAX
             $group_id = $this->userData['group_id'];
         }
 
-        if ($this->ipbanned()) {
+        if (IPAddress::isBanned()) {
             $this->userData['group_id'] = $group_id = 4;
         }
 
@@ -775,118 +764,6 @@ final class JAX
         return preg_match('/[\w\+.]+@[\w.]+/', (string) $email);
     }
 
-    public function ipbanned($ip = false)
-    {
-        global $PAGE;
-
-        if (!$ip) {
-            $ip = self::getIp();
-        }
-
-        if ($this->ipbancache === null) {
-            if ($PAGE) {
-                $PAGE->debug('loaded ip ban list');
-            }
-
-            $this->ipbancache = [];
-            if (file_exists(BOARDPATH . '/bannedips.txt')) {
-                foreach (file(BOARDPATH . '/bannedips.txt') as $v) {
-                    $v = trim($v);
-                    if ($v === '') {
-                        continue;
-                    }
-
-                    if ($v === '0') {
-                        continue;
-                    }
-
-                    if ($v[0] === '#') {
-                        continue;
-                    }
-
-                    $this->ipbancache[] = $v;
-                }
-            }
-        }
-
-        foreach ($this->ipbancache as $v) {
-            if (
-                (mb_substr((string) $v, -1) === ':' || mb_substr((string) $v, -1) === '.')
-                && mb_strtolower(mb_substr((string) $ip, 0, mb_strlen((string) $v))) === $v
-            ) {
-                return $v;
-            }
-
-            if ($v === $ip) {
-                return $v;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Check if an IP is banned from the service.
-     * Will use the $this->getIp() ipAddress field is left empty.
-     *
-     * @param string $ipAddress the IP Address to check
-     *
-     * @return bool if the IP is banned form the service or not
-     */
-    public function ipServiceBanned($ipAddress = false): bool
-    {
-        global $DB,$CFG,$JAX;
-
-        if (!$CFG['service']) {
-            // Can't be service banned if there's no service.
-            return false;
-        }
-
-        if (!$ipAddress) {
-            $ipAddress = self::getIp();
-        }
-
-        $result = $DB->safespecial(
-            <<<'EOT'
-                SELECT COUNT(`ip`) as `banned`
-                    FROM `banlist`
-                    WHERE ip = ?
-                EOT
-            ,
-            [],
-            $DB->basicvalue($JAX->ip2bin($ipAddress)),
-        );
-        $row = $DB->arow($result);
-        $DB->disposeresult($result);
-
-        return !isset($row['banned']) || $row['banned'] > 0;
-    }
-
-    public function ip2bin($ip = false): false|string
-    {
-        if (!$ip) {
-            $ip = self::getIp();
-        }
-
-        if (!filter_var($ip, FILTER_VALIDATE_IP)) {
-            // Not an IP, so don't need to send anything back.
-            return '';
-        }
-
-        return inet_pton($ip);
-    }
-
-    // This comment suggests MySQL's aton is different from php's pton, so
-    // we need to do something for mysql IP addresses:
-    // https://secure.php.net/manual/en/function.inet-ntop.php#117398
-    // .
-    public function bin2ip($ip): string
-    {
-        $l = mb_strlen((string) $ip);
-
-        return (inet_ntop($ip) ?: inet_ntop(pack('A' . $l, $ip))) ?: '';
-    }
-
     public function parseperms($permstoparse, $uid = false): array
     {
         global $PERMS;
@@ -995,26 +872,6 @@ final class JAX
         }
 
         return round($bs, 2) . ' ' . ($p !== 0 ? $sizes[$p] : '') . 'B';
-    }
-
-    public function gethostbyaddr($ip)
-    {
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-            $ptr = implode(
-                '.',
-                array_reverse(
-                    explode(
-                        '.',
-                        (string) $ip,
-                    ),
-                ),
-            ) . '.in-addr.arpa';
-            $host = dns_get_record($ptr, DNS_PTR);
-
-            return $host ? $host[0]['target'] : $ip;
-        }
-
-        return gethostbyaddr($ip);
     }
 
     public function mail($email, $topic, $message)

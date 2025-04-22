@@ -993,12 +993,12 @@ final class ModControls
         $changed = false;
 
         if (isset($JAX->p['ban']) && $JAX->p['ban']) {
-            if (!$JAX->ipbanned($ip)) {
+            if (!IPAddress::isBanned($ip)) {
                 $changed = true;
                 $JAX->ipbancache[] = $ip;
             }
         } elseif (isset($JAX->p['unban']) && $JAX->p['unban']) {
-            if ($entry = $JAX->ipbanned($ip)) {
+            if ($entry = IPAddress::isBanned($ip)) {
                 $changed = true;
                 unset($JAX->ipbancache[array_search($entry, $JAX->ipbancache, true)]);
             }
@@ -1034,7 +1034,7 @@ final class ModControls
                     'ip' => $ip,
                 ],
             );
-            $banCode = $JAX->ipbanned($ip) ? <<<'EOT'
+            $banCode = IPAddress::isBanned($ip) ? <<<'EOT'
                 <span style="color:#900">
                     banned
                 </span>
@@ -1081,7 +1081,7 @@ final class ModControls
                 ],
                 'members',
                 'WHERE `ip`=?',
-                $DB->basicvalue($JAX->ip2bin($ip)),
+                $DB->basicvalue(IPAddress::asBinary($ip)),
             );
             while ($f = $DB->arow($result)) {
                 $content[] = $PAGE->meta(
@@ -1117,7 +1117,7 @@ final class ModControls
                         'shouts',
                         'members',
                     ],
-                    $DB->basicvalue($JAX->ip2bin($ip)),
+                    $DB->basicvalue(IPAddress::asBinary($ip)),
                 );
                 while ($f = $DB->arow($result)) {
                     $content .= $PAGE->meta(
@@ -1137,7 +1137,7 @@ final class ModControls
                 ['post'],
                 'posts',
                 'WHERE `ip`=? ORDER BY `id` DESC LIMIT 5',
-                $DB->basicvalue($JAX->ip2bin($ip)),
+                $DB->basicvalue(IPAddress::asBinary($ip)),
             );
             while ($f = $DB->arow($result)) {
                 $content .= "<div class='post'>"

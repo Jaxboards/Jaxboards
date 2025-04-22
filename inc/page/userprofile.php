@@ -562,8 +562,8 @@ final class UserProfile
                 . $udata['id'] . '">PM</a></div>';
             if ($PERMS['can_moderate']) {
                 $contactdetails .= '<div>IP: <a href="'
-                    . '?act=modcontrols&do=iptools&ip=' . $JAX->bin2ip($udata['ip'])
-                    . '">' . $JAX->bin2ip($udata['ip']) . '</a></div>';
+                    . '?act=modcontrols&do=iptools&ip=' . IPAddress::asHumanReadable($udata['ip'])
+                    . '">' . IPAddress::asHumanReadable($udata['ip']) . '</a></div>';
             }
 
             $page = $PAGE->meta(

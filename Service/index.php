@@ -101,7 +101,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         ['id'],
         'directory',
         'WHERE `registrar_ip`=? AND `date`>?',
-        $JAX->ip2bin(),
+        IPAddress::asBinary(),
         gmdate(DB_DATETIME, time() - 7 * 24 * 60 * 60),
     );
     if ($DB->num_rows($result) > 3) {
@@ -144,7 +144,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                 'date' => gmdate(DB_DATETIME),
                 'referral' => $JAX->b['r'] ?? '',
                 'registrar_email' => $JAX->p['email'],
-                'registrar_ip' => $JAX->ip2bin(),
+                'registrar_ip' => IPAddress::asBinary(),
             ],
         );
         $DB->prefix($boardPrefix);

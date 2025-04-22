@@ -57,7 +57,7 @@ final class LogReg
 
         // Validate input and actually register the user.
         try {
-            if ($JAX->ipServiceBanned()) {
+            if (IPAddress::isServiceBanned()) {
                 throw new Exception(
                     'You have been banned from registration on all boards. If'
                     . ' you feel that this is in error, please contact the'
@@ -96,7 +96,7 @@ final class LogReg
                 throw new Exception("That isn't a valid email!");
             }
 
-            if ($JAX->ipbanned()) {
+            if (IPAddress::isBanned()) {
                 throw new Exception('You have been banned from registering on this board.');
             }
 
@@ -134,7 +134,7 @@ final class LogReg
                     'display_name' => $dispname,
                     'email' => $email,
                     'group_id' => array_key_exists('membervalidation', $CFG) && $CFG['membervalidation'] ? 5 : 1,
-                    'ip' => $JAX->ip2bin(),
+                    'ip' => IPAddress::asBinary(),
                     'join_date' => gmdate('Y-m-d H:i:s'),
                     'last_visit' => gmdate('Y-m-d H:i:s'),
                     'name' => $name,

@@ -64,20 +64,24 @@
         <element key="phpunit before" value="setUp, @before, #PHPUnit\Framework\Attributes\Before"/>
       </property>
       <property name="groups" type="array">
+        <element value="uses"/>
+        <element value="enum cases"/>
+
         <element value="public constants"/>
         <element value="protected constants"/>
         <element value="private constants"/>
 
-        <element value="constructor"/>
-        <element value="destructor"/>
-
-        <!-- first things that apply to the class -->
-        <element value="uses"/>
-        <element value="enum cases"/>
-
         <element value="public static properties"/>
         <element value="protected static properties"/>
         <element value="private static properties"/>
+        <element value="public properties"/>
+        <element value="protected properties"/>
+        <element value="private properties"/>
+
+        <element value="constructor"/>
+        <element value="destructor"/>
+        <element value="static constructors" />
+
         <element value="public static abstract methods"/>
         <element value="protected static abstract methods"/>
         <element value="public static final methods"/>
@@ -85,13 +89,11 @@
         <element value="protected static final methods"/>
         <element value="protected static methods"/>
         <element value="private static methods"/>
-        <element value="static constructors" />
+
         <element value="public abstract methods"/>
         <element value="protected abstract methods"/>
         <!-- first things that apply to the instances -->
-        <element value="public properties"/>
-        <element value="protected properties"/>
-        <element value="private properties"/>
+
         <element value="magic methods"/>
         <element value="phpunit before"/>
         <element value="public methods"/>

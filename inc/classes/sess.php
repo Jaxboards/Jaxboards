@@ -129,7 +129,7 @@ final class SESS
                     'session',
                     'WHERE `id`=? AND `ip`=?',
                     $DB->basicvalue($sid),
-                    $JAX->ip2bin(),
+                    IPAddress::asBinary(),
                 )
                     : $DB->safeselect(
                         [
@@ -188,7 +188,7 @@ final class SESS
         $sessData = [
             'forumsread' => '{}',
             'id' => $sid,
-            'ip' => $JAX->ip2bin(),
+            'ip' => IPAddress::asBinary(),
             'is_bot' => $isbot,
             'last_action' => $actionTime,
             'last_update' => $actionTime,
