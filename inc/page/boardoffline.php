@@ -28,7 +28,7 @@ final class BoardOffline
                     . 'If you have an account that has permission, '
                     . 'please log in.'
                     . (Config::getSetting('boardoffline') && Config::getSetting('offlinetext')
-                    ? '<br /><br />Note:<br />' . nl2br((string) Config::getSetting['offlinetext'])
+                    ? '<br /><br />Note:<br />' . nl2br((string) Config::getSetting('offlinetext'))
                     : ''),
                 ),
             ),
