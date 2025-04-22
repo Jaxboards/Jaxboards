@@ -26,34 +26,6 @@ require_once JAXBOARDS_ROOT . '/config.php';
 
 require_once JAXBOARDS_ROOT . '/acp/page.php';
 
-/**
- * Strip slashes from input, recursively.
- *
- * @param mixed $input The input to strip slashes from
- *
- * @return mixed The input, without slashes
- */
-function recursiveStripSlashes($input): mixed
-{
-    /*
-     *
-        if (!get_magic_quotes_gpc()) {
-        return $input;
-        }
-     */
-
-    foreach ($input as $key => $value) {
-        $input[$key] = is_array($value)
-            ? recursiveStripSlashes($value) : stripslashes((string) $value);
-    }
-
-    return $input;
-}
-
-$_GET = recursiveStripSlashes($_GET);
-$_POST = recursiveStripSlashes($_POST);
-$_COOKIE = recursiveStripSlashes($_COOKIE);
-
 $DB = new MySQL();
 $DB->connect(
     $CFG['sql_host'],
