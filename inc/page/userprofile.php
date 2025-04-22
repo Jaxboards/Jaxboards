@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 namespace Page;
-use IPAddress;
 
+use IPAddress;
 use JAX;
 
 use function explode;
