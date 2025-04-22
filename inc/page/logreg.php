@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Page;
 
 use Config;
-
 use Exception;
 use IPAddress;
 use JAX;
@@ -124,9 +123,7 @@ final class LogReg
                 throw new Exception('Invalid characters in username!');
             }
 
-            if (
-                $badNameChars && preg_match($badNameChars, $dispname)
-            ) {
+            if ($badNameChars && preg_match($badNameChars, $dispname)) {
                 throw new Exception('Invalid characters in display name!');
             }
 

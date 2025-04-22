@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 namespace Page;
-use Config;
 
+use Config;
 use JAX;
 
 use function array_pop;

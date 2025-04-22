@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 namespace Page;
-use Config;
 
+use Config;
 use IPAddress;
 
 use function array_pop;

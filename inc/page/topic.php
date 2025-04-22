@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 namespace Page;
-use Config;
 
+use Config;
 use IPAddress;
 use JAX;
 use RSSFeed;
@@ -675,7 +675,7 @@ final class Topic
             // Post rating content goes here.
             $postrating = '';
             $showrating = '';
-            if ($ratingConfig & 1) {
+            if (($ratingConfig & 1) !== 0) {
                 $prating = [];
                 $postratingbuttons = '';
                 if ($post['rating']) {
@@ -1354,7 +1354,7 @@ final class Topic
     {
         global $DB,$PAGE;
         $ratingConfig = Config::getSetting('ratings') ?? 0;
-        if ($ratingConfig & 2) {
+        if (($ratingConfig & 2) !== 0) {
             return;
         }
 

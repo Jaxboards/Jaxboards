@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Page;
 
 use Config;
-
 use IPAddress;
 use JAX;
 
