@@ -17,7 +17,7 @@ final class Config
             return $serviceConfig;
         }
 
-        require JAXBOARDS_ROOT . '/config.php';
+        require_once JAXBOARDS_ROOT . '/config.php';
 
         $serviceConfig = $CFG;
 
@@ -42,7 +42,7 @@ final class Config
             return $boardConfig;
         }
 
-        require BOARDPATH . '/config.php';
+        require_once BOARDPATH . '/config.php';
 
         $boardConfig = $CFG;
 
