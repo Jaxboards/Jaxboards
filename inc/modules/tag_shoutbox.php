@@ -343,7 +343,7 @@ final class Shoutbox
         $shout = $JAX->p['shoutbox_shout'];
         $shout = $JAX->linkify($shout);
 
-        $perms = $JAX->getPerms();
+        $perms = $DB->getPerms();
         if (!$perms['can_shout']) {
             $e = 'You do not have permission to shout!';
         } elseif (mb_strlen((string) $shout) > 300) {

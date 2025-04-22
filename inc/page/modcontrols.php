@@ -29,7 +29,7 @@ final class ModControls
     {
         global $JAX,$PAGE,$USER;
 
-        $this->perms = $JAX->getPerms();
+        $this->perms = $DB->getPerms();
         if (!$this->perms['can_moderate'] && !$USER['mod']) {
             $PAGE->JS('softurl');
             $PAGE->JS(

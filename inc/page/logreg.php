@@ -114,14 +114,14 @@ final class LogReg
                 $DB->basicvalue($name),
                 $DB->basicvalue($dispname),
             );
-            $f = $DB->arow($result);
+            $member = $DB->arow($result);
             $DB->disposeresult($result);
-            if ($f) {
-                if ($f['name'] === $name) {
+            if ($member) {
+                if ($member['name'] === $name) {
                     throw new Exception('That username is taken!');
                 }
 
-                if ($f['display_name'] === $dispname) {
+                if ($member['display_name'] === $dispname) {
                     throw new Exception('That display name is already used by another member.');
                 }
             }
@@ -182,14 +182,14 @@ final class LogReg
             $user = $DB->arow($result);
             $u = $user['id'] ?? 0;
 
-            $f = $JAX->getUser($u, $p);
+            $user = $DB->getUser($u, $p);
 
-            if ($f) {
+            if ($user) {
                 if (isset($JAX->p['popup']) && $JAX->p['popup']) {
                     $PAGE->JS('closewindow', '#loginform');
                 }
 
-                $_SESSION['uid'] = $f['id'];
+                $_SESSION['uid'] = $user['id'];
                 $logintoken = base64_encode(openssl_random_pseudo_bytes(128));
                 $DB->safeinsert(
                     'tokens',
@@ -197,7 +197,7 @@ final class LogReg
                         'expires' => gmdate('Y-m-d H:i:s', time() + 3600 * 24 * 30),
                         'token' => $logintoken,
                         'type' => 'login',
-                        'uid' => $f['id'],
+                        'uid' => $user['id'],
                     ],
                 );
 
@@ -205,11 +205,11 @@ final class LogReg
                     ['utoken' => $logintoken],
                     time() + 3600 * 24 * 30,
                 );
-                $SESS->clean($f['id']);
+                $SESS->clean($user['id']);
                 $SESS->user = $u;
-                $SESS->uid = $f['id'];
+                $SESS->uid = $user['id'];
                 $SESS->act();
-                $perms = $JAX->getPerms($f['group_id']);
+                $perms = $DB->getPerms($user['group_id']);
                 if ($this->registering) {
                     $PAGE->JS('location', '/');
                 } elseif ($PAGE->jsaccess) {

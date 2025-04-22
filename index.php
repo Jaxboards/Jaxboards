@@ -107,15 +107,11 @@ if (!isset($_SESSION['uid']) && isset($JAX->c['utoken'])) {
 }
 
 if (!$SESS->is_bot && isset($_SESSION['uid']) && $_SESSION['uid']) {
-    $JAX->getUser($_SESSION['uid']);
+    $DB->getUser($_SESSION['uid']);
 }
 
-// phpcs:enable
-
-// phpcs:disable SlevomatCodingStandard.PHP.DisallowReference.DisallowedAssigningByReference
-$USER = &$JAX->userData;
-// phpcs:enable
-$PERMS = $JAX->getPerms();
+$USER = $DB->getUser();
+$PERMS = $DB->getPerms();
 
 // Fix ip if necessary.
 if ($USER && $SESS->ip && $SESS->ip !== $USER['ip']) {

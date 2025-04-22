@@ -71,7 +71,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             $notadmin = false;
         }
 
-        $verified_password = (bool) $JAX->getUser($uinfo['id'], $p);
+        $verified_password = (bool) $DB->getUser($uinfo['id'], $p);
         if (!$notadmin && $verified_password) {
             $_SESSION['auid'] = $uinfo['id'];
             header('Location: admin.php');

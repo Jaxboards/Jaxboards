@@ -71,8 +71,8 @@ require_once __DIR__ . '/../domaindefinitions.php';
 
 $JAX = new JAX();
 if (isset($_SESSION['auid'])) {
-    $JAX->getUser($_SESSION['auid']);
-    $PERMS = $JAX->getPerms($JAX->userData['group_id']);
+    $DB->getUser($_SESSION['auid']);
+    $PERMS = $DB->getPerms($JAX->userData['group_id']);
 } else {
     $PERMS = [
         'can_access_acp' => false,
