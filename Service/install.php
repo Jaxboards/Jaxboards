@@ -170,9 +170,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
 
     if ($errors === []) {
         // Update with our settings.
-        $PAGE->writeData(
-            JAXBOARDS_ROOT . '/config.php',
-            'CFG',
+        Config::writeServiceConfig(
             [
                 'boardname' => 'Jaxboards',
                 'domain' => $JAX->p['domain'],
@@ -186,7 +184,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                 'service' => $service,
                 'prefix' => $service ? '' : 'jaxboards',
                 'sql_prefix' => $service ? '' : 'jaxboards_',
-            ],
+            ]
         );
 
         if ($service) {
