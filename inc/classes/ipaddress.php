@@ -86,7 +86,7 @@ final class IPAddress
      *
      * @return bool if the IP is banned form the service or not
      */
-    public function isServiceBanned(?string $ipAddress = null): bool
+    public static function isServiceBanned(?string $ipAddress = null): bool
     {
         global $DB,$CFG,$JAX;
 
