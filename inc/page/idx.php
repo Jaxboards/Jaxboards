@@ -449,7 +449,7 @@ final class IDX
 
         $useronlinecache = '';
         foreach ($DB->getUsersOnline() as $f) {
-            $lastActionIdle = (int) ($SESS->last_update ?? 0) - $CFG['timetoidle'] - 30;
+            $lastActionIdle = (int) ($SESS->last_update ?? 0) - ($CFG['timetoidle'] ?? 300) - 30;
             if (!$f['uid'] && !$f['is_bot']) {
                 continue;
             }

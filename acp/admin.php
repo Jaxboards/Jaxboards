@@ -23,8 +23,9 @@ if (!defined('JAXBOARDS_ROOT')) {
 
 // Load composer dependencies.
 require_once JAXBOARDS_ROOT . '/inc/autoload.php';
+require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
 
-require_once JAXBOARDS_ROOT . '/config.php';
+$CFG = Config::get();
 
 $DB = new MySQL();
 $DB->connect(
@@ -34,8 +35,6 @@ $DB->connect(
     $CFG['sql_db'],
     $CFG['sql_prefix'],
 );
-
-require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
 
 $JAX = new JAX();
 if (isset($_SESSION['auid'])) {
@@ -56,7 +55,7 @@ if (!$PERMS['can_access_acp']) {
 $USER = $DB->getUser();
 $PAGE = new Page();
 $PAGE->append('username', $USER['display_name']);
-$PAGE->title($PAGE->getCFGSetting('boardname') . ' - ACP');
+$PAGE->title(Config::getSetting('boardname') . ' - ACP');
 $PAGE->addNavMenu(
     'Settings',
     '?act=settings',

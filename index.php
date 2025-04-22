@@ -9,8 +9,6 @@ if (!defined('JAXBOARDS_ROOT')) {
 // Load composer dependencies.
 require_once JAXBOARDS_ROOT . '/inc/autoload.php';
 
-require_once JAXBOARDS_ROOT . '/config.php';
-
 require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
 
 /*
@@ -33,14 +31,9 @@ header('Cache-Control: no-cache, must-revalidate');
 
 $microtime = microtime(true);
 
-
-if (!isset($CFG)) {
-    echo 'missing configuration';
-
-    exit(1);
-}
-
 $onLocalHost = in_array(IPAddress::asHumanReadable(), ['127.0.0.1', '::1'], true);
+
+$CFG = Config::get();
 
 // DB connect!
 $DB = new MySQL();

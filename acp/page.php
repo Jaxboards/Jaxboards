@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace ACP;
+use Config;
 
 use Exception;
 
@@ -205,28 +206,6 @@ final class Page
         fclose($file);
 
         return $write;
-    }
-
-    public function writeCFG($data): string
-    {
-        include BOARDPATH . 'config.php';
-        foreach ($data as $k => $v) {
-            $CFG[$k] = $v;
-        }
-
-        $this->CFG = $CFG;
-
-        return $this->writeData(BOARDPATH . 'config.php', 'CFG', $this->CFG);
-    }
-
-    public function getCFGSetting($setting)
-    {
-        if (!$this->CFG) {
-            include BOARDPATH . 'config.php';
-            $this->CFG = $CFG;
-        }
-
-        return @$this->CFG[$setting];
     }
 
     /**

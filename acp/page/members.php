@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace ACP\Page;
+use Config;
 
 use function array_pop;
 use function count;
@@ -934,7 +935,7 @@ final class Members
     {
         global $PAGE, $DB, $JAX;
         if (isset($_POST['submit1'])) {
-            $PAGE->writeCFG(
+            Config::write(
                 [
                     'membervalidation' => isset($_POST['v_enable'])
                     && $_POST['v_enable'] ? 1 : 0,
@@ -945,7 +946,7 @@ final class Members
         $page = $PAGE->parseTemplate(
             'members/validation.html',
             [
-                'checked' => $PAGE->getCFGSetting('membervalidation')
+                'checked' => Config::getSetting('membervalidation')
                 ? 'checked="checked"' : '',
             ],
         ) . PHP_EOL;

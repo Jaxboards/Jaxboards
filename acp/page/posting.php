@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace ACP\Page;
+use Config;
 
 use function array_reverse;
 use function krsort;
@@ -198,7 +199,7 @@ final class Posting
         }
 
         if (isset($JAX->p['baseset']) && $basesets[$JAX->p['baseset']]) {
-            $PAGE->writeCFG(['emotepack' => $JAX->p['baseset']]);
+            Config::write(['emotepack' => $JAX->p['baseset']]);
         }
 
         if ($emoticons === []) {
@@ -240,7 +241,7 @@ final class Posting
 
         $PAGE->addContentBox('Custom Emoticons', $page);
 
-        $emoticonpath = $PAGE->getCFGSetting('emotepack');
+        $emoticonpath = Config::getSetting('emotepack');
         $emoticonsetting = $emoticonpath;
         $emoticonPackOptions = '';
         foreach ($basesets as $packId => $packName) {
@@ -323,15 +324,14 @@ final class Posting
         }
 
         if (isset($JAX->p['rsubmit']) && $JAX->p['rsubmit']) {
-            $cfg = [
+            Config::write([
                 'ratings' => (isset($JAX->p['renabled']) ? 1 : 0)
                 + (isset($JAX->p['ranon']) ? 2 : 0),
-            ];
-            $PAGE->writeCFG($cfg);
+            ]);
             $page2 .= $PAGE->success('Settings saved!');
         }
 
-        $ratingsettings = $PAGE->getCFGSetting('ratings');
+        $ratingsettings = Config::getSetting('ratings');
 
         $page2 .= $PAGE->parseTemplate(
             'posting/post-rating-settings.html',

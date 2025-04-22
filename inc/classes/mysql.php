@@ -711,7 +711,7 @@ final class MySQL
     public function getUsersOnline()
     {
         global $CFG,$USER,$SESS;
-        $idletimeout = time() - $CFG['timetoidle'];
+        $idletimeout = time() - ($CFG['timetoidle'] ?? 300);
         $return = [];
         if (!$this->usersOnlineCache) {
             $result = $this->safespecial(

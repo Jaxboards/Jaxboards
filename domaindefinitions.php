@@ -14,12 +14,7 @@ if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', __DIR__);
 }
 
-// This file must be required after mysql connecting.
-if (!isset($CFG)) {
-    echo 'This file must be required after config';
-
-    exit(1);
-}
+$serviceConfig = Config::getServiceConfig();
 
 function pathjoin(string ...$paths): ?string
 {
@@ -29,7 +24,7 @@ function pathjoin(string ...$paths): ?string
 // Figure out url.
 $host = $_SERVER['SERVER_NAME'];
 // Build the url.
-$boardURL = '//' . ($_SERVER['SERVER_NAME'] ?? $CFG['domain']);
+$boardURL = '//' . ($_SERVER['SERVER_NAME'] ?? $serviceConfig['domain']);
 if (
     !($_SERVER['SERVER_PORT'] === '443' && $_SERVER['REQUEST_SCHEME'] === 'https')
     && !($_SERVER['SERVER_PORT'] === '80' && $_SERVER['REQUEST_SCHEME'] === 'http')
@@ -42,32 +37,27 @@ if (
 define('BOARDURL', $boardURL . '/');
 define('SOUNDSURL', pathjoin(BOARDURL, 'Sounds'));
 
-$domainMatch = str_replace('.', '\.', $CFG['domain']);
+$domainMatch = str_replace('.', '\.', $serviceConfig['domain']);
+
+$prefix = $serviceConfig['prefix'];
+
 // Get prefix.
-if ($CFG['service']) {
+if ($serviceConfig['service']) {
     preg_match('@(.*)\.' . $domainMatch . '@i', (string) $host, $matches);
     if (isset($matches[1]) && $matches[1]) {
         $prefix = $matches[1];
-        $CFG['prefix'] = $prefix;
-        $CFG['sql_prefix'] = $prefix . '_';
+        Config::override([
+            'prefix' => $prefix,
+            'sql_prefix' => $prefix . '_'
+        ]);
     } else {
-        $prefix = '';
+        $prefix = null;
     }
-} else {
-    $prefix = $CFG['prefix'];
 }
+
+define('STHEMEPATH', pathjoin(JAXBOARDS_ROOT, 'Service/Themes'));
 
 if ($prefix) {
     define('BOARDPATH', pathjoin(JAXBOARDS_ROOT, 'boards', $prefix));
     define('BOARDPATHURL', BOARDURL . pathjoin('boards', $prefix));
-    define('STHEMEPATH', pathjoin(JAXBOARDS_ROOT, 'Service/Themes'));
-
-    $tempCFG = $CFG;
-    if (@include_once BOARDPATH . 'config.php') {
-        $CFG = array_merge($tempCFG, $CFG);
-    } else {
-        $CFG['noboard'] = 1;
-    }
-} else {
-    $CFG['noboard'] = 1;
 }
