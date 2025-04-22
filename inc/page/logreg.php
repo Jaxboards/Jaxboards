@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Page;
 
+use Exception;
 use IPAddress;
 use JAX;
-use Exception;
 
 use function array_key_exists;
 use function base64_encode;

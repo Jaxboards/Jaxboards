@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Page;
+
 use JAX;
 
 use function array_pop;
@@ -73,7 +74,7 @@ final class UCP
         $this->showucp();
     }
 
-    public function getlocationforform()
+    public function getlocationforform(): string
     {
         global $JAX;
 

@@ -51,6 +51,16 @@ final class JAX
         return $v;
     }
 
+    public static function hiddenFormFields($fields): string
+    {
+        $html = '';
+        foreach ($fields as $key => $value) {
+            $html .= '<input type="hidden" name="' . $key . '" value="' . $value . '" />';
+        }
+
+        return $html;
+    }
+
     public function date($date, $autodate = true): false|string
     {
         if (!$date) {
@@ -305,16 +315,6 @@ final class JAX
         }
 
         return $a;
-    }
-
-    public static function hiddenFormFields($fields): string
-    {
-        $html = '';
-        foreach ($fields as $key => $value) {
-            $html .= '<input type="hidden" name="' . $key . '" value="' . $value . '" />';
-        }
-
-        return $html;
     }
 
     public function textonly($a): ?string
