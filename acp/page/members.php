@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace ACP\Page;
+
 final class Members
 {
     public const DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use ACP\Page;
+
 /*
  * Admin login.
  *
@@ -25,8 +27,6 @@ require_once JAXBOARDS_ROOT . '/inc/autoload.php';
 require_once JAXBOARDS_ROOT . '/config.php';
 
 require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
-
-require_once JAXBOARDS_ROOT . '/acp/page.php';
 
 $DB = new MySQL();
 $DB->connect(

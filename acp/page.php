@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-final class PAGE
+namespace ACP;
+
+final class Page
 {
     public $CFG = [];
 

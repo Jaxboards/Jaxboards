@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use ACP\Page;
+
 /*
  * Admin control panel.
  *
@@ -23,8 +25,6 @@ if (!defined('JAXBOARDS_ROOT')) {
 require_once JAXBOARDS_ROOT . '/inc/autoload.php';
 
 require_once JAXBOARDS_ROOT . '/config.php';
-
-require_once JAXBOARDS_ROOT . '/acp/page.php';
 
 $DB = new MySQL();
 $DB->connect(
@@ -128,10 +128,9 @@ $PAGE->addNavMenu(
 
 $act = $JAX->g['act'] ?? null;
 
-if ($act && file_exists("./pages/{$act}.php")) {
-    require_once "./pages/{$act}.php";
-
-    $page = new $act();
+if ($act && file_exists("./page/{$act}.php")) {
+    $acpPageClass = "ACP\\Page\\{$act}";
+    $page = new $acpPageClass();
     $page->route();
 }
 

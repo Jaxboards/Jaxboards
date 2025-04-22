@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace ACP\Page;
+
 final class Themes
 {
     public $WRAPPERS_PATH;

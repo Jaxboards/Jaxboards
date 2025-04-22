@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace ACP\Page\Forums;
+
 final class RecountStats
 {
     public static function showstats(): void

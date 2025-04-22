@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
-require_once JAXBOARDS_ROOT . '/acp/pages/forums/recountstats.php';
+namespace ACP\Page;
+
+use ACP\Page\Forums\RecountStats;
 
 final class Forums
 {
