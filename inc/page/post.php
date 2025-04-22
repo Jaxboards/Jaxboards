@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Page;
+use Config;
 
 use IPAddress;
 
@@ -113,7 +114,7 @@ final class Post
 
     public function upload($fileobj, $uid = false): string
     {
-        global $CFG,$DB,$USER,$JAX;
+        global $DB,$USER,$JAX;
         if ($uid === false) {
             $uid = $USER['id'];
         }
@@ -129,7 +130,7 @@ final class Post
         $ext = explode('.', (string) $fileobj['name']);
         $ext = count($ext) === 1 ? '' : mb_strtolower(array_pop($ext));
 
-        if (!in_array($ext, $CFG['images'])) {
+        if (!in_array($ext, Config::getSetting('images') ?? [])) {
             $ext = '';
         }
 

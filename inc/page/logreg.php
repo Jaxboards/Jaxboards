@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Page;
 
+use Config;
+
 use Exception;
 use IPAddress;
 use JAX;
@@ -61,7 +63,7 @@ final class LogReg
 
     public function register()
     {
-        global $PAGE,$JAX,$DB,$CFG;
+        global $PAGE,$JAX,$DB;
 
         $this->registering = true;
 
@@ -77,8 +79,8 @@ final class LogReg
         $email = $JAX->p['email'] ?? '';
 
         $recaptcha = '';
-        if (isset($CFG['recaptcha']) && $CFG['recaptcha']) {
-            $recaptcha = $PAGE->meta('anti-spam', $CFG['recaptcha']['public_key']);
+        if (Config::getSetting('recaptcha')) {
+            $recaptcha = $PAGE->meta('anti-spam', Config::getSetting('recaptcha')['public_key']);
         }
 
         $p = $PAGE->meta('register-form', $recaptcha);
@@ -114,17 +116,16 @@ final class LogReg
                 throw new Exception('Display name and username must be under 30 characters.');
             }
 
+            $badNameChars = Config::getSetting('badnamechars');
             if (
-                ($CFG['badnamechars']
-                && preg_match($CFG['badnamechars'], $name))
+                ($badNameChars && preg_match($badNameChars, $name))
                 || $JAX->blockhtml($name) !== $name
             ) {
                 throw new Exception('Invalid characters in username!');
             }
 
             if (
-                $CFG['badnamechars']
-                && preg_match($CFG['badnamechars'], $dispname)
+                $badNameChars && preg_match($badNameChars, $dispname)
             ) {
                 throw new Exception('Invalid characters in display name!');
             }
@@ -204,7 +205,7 @@ final class LogReg
 
     public function login($u = false, $p = false): void
     {
-        global $PAGE,$JAX,$SESS,$DB,$CFG,$_SESSION;
+        global $PAGE,$JAX,$SESS,$DB,$_SESSION;
         if ($u && $p) {
             if ($SESS->is_bot) {
                 return;
@@ -354,7 +355,7 @@ final class LogReg
 
     public function forgotpassword($uid, $id): void
     {
-        global $PAGE,$JAX,$DB,$CFG;
+        global $PAGE,$JAX,$DB;
         $page = '';
 
         if ($PAGE->jsupdate && empty($JAX->p)) {
@@ -520,14 +521,14 @@ final class LogReg
 
     private function isHuman()
     {
-        global $CFG,$JAX;
+        global $JAX;
 
-        if (isset($CFG['recaptcha']) && $CFG['recaptcha']) {
+        if (Config::getSetting('recaptcha')) {
             // Validate reCAPTCHA.
             $url = 'https://www.google.com/recaptcha/api/siteverify';
             $fields = [
                 'response' => $JAX->p['g-recaptcha-response'],
-                'secret' => $CFG['recaptcha']['private_key'],
+                'secret' => Config::getSetting('recaptcha')['private_key'],
             ];
 
             $fields_string = '';

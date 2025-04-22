@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Page;
 
+use Config;
+
 use function array_flip;
 use function array_keys;
 use function array_merge;
@@ -39,7 +41,7 @@ final class IDX
 
     public function route(): void
     {
-        global $PAGE,$CFG,$JAX,$SESS;
+        global $PAGE,$JAX,$SESS;
         if (isset($JAX->b['markread']) && $JAX->b['markread']) {
             $PAGE->JS('softurl');
             $SESS->forumsread = '{}';
@@ -56,7 +58,7 @@ final class IDX
 
     public function viewidx(): void
     {
-        global $DB,$PAGE,$SESS,$JAX,$USER,$CFG;
+        global $DB,$PAGE,$SESS,$JAX,$USER;
         $SESS->location_verbose = 'Viewing board index';
         $page = '';
         $result = $DB->safespecial(
@@ -303,7 +305,7 @@ final class IDX
 
     public function getBoardStats(): string
     {
-        global $CFG, $DB, $JAX, $PAGE, $PERMS;
+        global $DB, $JAX, $PAGE, $PERMS;
         if (!$PERMS['can_view_stats']) {
             return '';
         }
@@ -355,7 +357,7 @@ final class IDX
             $fName = $f['name'];
             $fGroupId = $f['group_id'];
             $birthdayCode = $f['birthday'] === $today
-                && ($CFG['birthdays'] & 1) ? ' birthday' : '';
+                && Config::getSetting('birthdays') ? ' birthday' : '';
             $lastOnlineCode = $JAX->date(
                 $f['hide'] ? $f['read_date'] : $f['last_update'],
                 false,
@@ -403,7 +405,7 @@ final class IDX
 
     public function getusersonlinelist(): array
     {
-        global $DB,$PAGE,$JAX,$CFG;
+        global $DB,$PAGE,$JAX;
         $r = '';
         $guests = 0;
         $nummembers = 0;
@@ -423,10 +425,9 @@ final class IDX
                             . 'title="%4$s" data-use-tooltip="true">'
                             . '%3$s</a>',
                         $f['uid'],
-                        $f['group_id'] . ($f['status'] === 'idle'
-                            ? ' idle'
-                            : ($f['birthday'] && ($CFG['birthdays'] & 1)
-                            ? ' birthday' : '')),
+                        $f['group_id']
+                        . ($f['status'] === 'idle' ? ' idle' : '')
+                        . ($f['birthday'] && Config::getSetting('birthdays') ? ' birthday' : ''),
                         $f['name'],
                         $title,
                     );

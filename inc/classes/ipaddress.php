@@ -81,9 +81,9 @@ final class IPAddress
      */
     public static function isServiceBanned(?string $ipAddress = null): bool
     {
-        global $DB,$CFG,$JAX;
+        global $DB,$JAX;
 
-        if (!$CFG['service']) {
+        if (!Config::getSetting('service')) {
             // Can't be service banned if there's no service.
             return false;
         }

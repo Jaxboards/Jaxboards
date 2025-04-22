@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Page;
 
+use Config;
+
 use function nl2br;
 
 final class BoardOffline
 {
     public function route(): void
     {
-        global $PAGE,$JAX,$CFG;
+        global $PAGE,$JAX;
         if ($PAGE->jsupdate) {
             return;
         }
@@ -25,8 +27,8 @@ final class BoardOffline
                     "You don't have permission to view the board. "
                     . 'If you have an account that has permission, '
                     . 'please log in.'
-                    . ($CFG['boardoffline'] && $CFG['offlinetext']
-                    ? '<br /><br />Note:<br />' . nl2br((string) $CFG['offlinetext'])
+                    . (Config::getSetting('boardoffline') && Config::getSetting('offlinetext')
+                    ? '<br /><br />Note:<br />' . nl2br((string) Config::getSetting['offlinetext'])
                     : ''),
                 ),
             ),

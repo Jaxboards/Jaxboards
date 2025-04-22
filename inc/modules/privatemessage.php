@@ -51,7 +51,7 @@ final class PrivateMessage
 
     public function message($uid, $im)
     {
-        global $DB,$JAX,$PAGE,$SESS,$CFG,$USER,$PERMS;
+        global $DB,$JAX,$PAGE,$SESS,$USER,$PERMS;
         $SESS->act();
         $ud = $USER;
         $e = '';
@@ -87,8 +87,8 @@ final class PrivateMessage
         $cmd[1] = $ud['id'];
         $cmd[4] = 0;
         $onlineusers = $DB->getUsersOnline();
-        $logoutTime = time() - $CFG['timetologout'];
-        $updateTime = time() - $CFG['updateinterval'] * 5;
+        $logoutTime = time() - Config::getSetting('timetologout');
+        $updateTime = time() - Config::getSetting('updateinterval') * 5;
         if (
             !isset($onlineusers[$uid])
             || !$onlineusers[$uid]
@@ -107,7 +107,7 @@ final class PrivateMessage
 
     public function sendcmd($cmd, $uid): ?bool
     {
-        global $DB,$CFG;
+        global $DB;
         if (!is_numeric($uid)) {
             return null;
         }
@@ -122,7 +122,7 @@ final class PrivateMessage
             ['session'],
             $DB->basicvalue(json_encode($cmd) . PHP_EOL),
             $uid,
-            gmdate('Y-m-d H:i:s', time() - $CFG['updateinterval'] * 5),
+            gmdate('Y-m-d H:i:s', time() - Config::getSetting('updateinterval') * 5),
         );
 
         return $DB->affected_rows(1) !== 0;

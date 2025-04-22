@@ -258,8 +258,8 @@ final class SESS
 
     public function clean($uid): bool
     {
-        global $DB,$CFG,$PAGE,$JAX;
-        $timeago = time() - $CFG['timetologout'];
+        global $DB,$PAGE,$JAX;
+        $timeago = time() - Config::getSetting('timetologout');
         if (!is_numeric($uid) || $uid < 1) {
             $uid = null;
         } else {

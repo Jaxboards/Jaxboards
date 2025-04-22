@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace ACP\Page;
+use Config;
 
 use function array_key_exists;
 use function closedir;
@@ -40,12 +41,12 @@ final class Themes
 
     public function route(): void
     {
-        global $PAGE,$JAX,$CFG;
+        global $PAGE,$JAX;
 
         $this->WRAPPERS_PATH = BOARDPATH . 'Wrappers/';
 
         if (!defined('DTHEMEPATH')) {
-            define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . $CFG['dthemepath']);
+            define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . Config::getSetting('dthemepath'));
         }
 
         $links = [

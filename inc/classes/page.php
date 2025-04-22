@@ -289,7 +289,7 @@ final class PAGE
 
     public function loadskin($id): void
     {
-        global $DB,$CFG;
+        global $DB;
         $skin = [];
         if ($id) {
             $result = $DB->safeselect(
@@ -326,11 +326,11 @@ final class PAGE
             define('THEMEPATH', $t);
             define('THEMEPATHURL', $turl);
         } else {
-            define('THEMEPATH', JAXBOARDS_ROOT . '/' . $CFG['dthemepath']);
-            define('THEMEPATHURL', BOARDURL . $CFG['dthemepath']);
+            define('THEMEPATH', JAXBOARDS_ROOT . '/' . Config::getSetting('dthemepath'));
+            define('THEMEPATHURL', BOARDURL . Config::getSetting('dthemepath'));
         }
 
-        define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . $CFG['dthemepath']);
+        define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . Config::getSetting('dthemepath'));
         $this->loadtemplate(
             $skin['wrapper']
             ? BOARDPATH . 'Wrappers/' . $skin['wrapper'] . '.html'

@@ -161,7 +161,7 @@ final class JAX
 
     public function getTextRules()
     {
-        global $CFG,$DB;
+        global $DB;
         if ($this->textRules) {
             return $this->textRules;
         }
@@ -184,7 +184,7 @@ final class JAX
         }
 
         // Load emoticon pack.
-        $emotepack = $CFG['emotepack'] ?? null;
+        $emotepack = Config::getSetting('emotepack');
         if ($emotepack) {
             $emotepack = 'emoticons/' . $emotepack;
             if (mb_substr($emotepack, -1) !== '/') {
@@ -223,7 +223,7 @@ final class JAX
 
     public function getEmoteRules($escape = 1)
     {
-        global $CFG,$DB;
+        global $DB;
         if ($this->textRules === null) {
             $this->getTextRules();
         }
@@ -258,7 +258,7 @@ final class JAX
 
     public function getwordfilter()
     {
-        global $CFG,$DB;
+        global $DB;
         if ($this->textRules === null) {
             $this->getTextRules();
         }
@@ -454,7 +454,7 @@ final class JAX
 
     public function attachment_callback($a): string
     {
-        global $DB,$CFG;
+        global $DB;
         $a = $a[1];
         if (isset($this->attachmentdata[$a])) {
             $data = $this->attachmentdata[$a];
@@ -483,7 +483,7 @@ final class JAX
         $ext = explode('.', (string) $data['name']);
         $ext = count($ext) === 1 ? '' : mb_strtolower(array_pop($ext));
 
-        if (!in_array($ext, $CFG['images'])) {
+        if (!in_array($ext, Config::getSetting('images') ?? [])) {
             $ext = '';
         }
 
@@ -651,9 +651,9 @@ final class JAX
 
     public function mail($email, $topic, $message)
     {
-        global $CFG, $_SERVER;
+        global $_SERVER;
 
-        $boardname = $CFG['boardname'] ?: 'JaxBoards';
+        $boardname = Config::getSetting('boardname') ?: 'JaxBoards';
         $boardurl = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'];
         $boardlink = "<a href='https://" . $boardurl . "'>" . $boardname . '</a>';
 
@@ -667,7 +667,7 @@ final class JAX
             ),
             'MIME-Version: 1.0' . PHP_EOL
             . 'Content-type:text/html;charset=iso-8859-1' . PHP_EOL
-            . 'From: ' . $CFG['mail_from'] . PHP_EOL,
+            . 'From: ' . Config::getSetting('mail_from') . PHP_EOL,
         );
     }
 

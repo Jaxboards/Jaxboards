@@ -710,8 +710,8 @@ final class MySQL
 
     public function getUsersOnline()
     {
-        global $CFG,$USER,$SESS;
-        $idletimeout = time() - ($CFG['timetoidle'] ?? 300);
+        global $USER,$SESS;
+        $idletimeout = time() - (Config::getSetting('timetoidle') ?? 300);
         $return = [];
         if (!$this->usersOnlineCache) {
             $result = $this->safespecial(
@@ -731,7 +731,7 @@ final class MySQL
                     EOT
                 ,
                 ['session', 'members'],
-                gmdate('Y-m-d H:i:s', time() - $CFG['timetologout']),
+                gmdate('Y-m-d H:i:s', time() - Config::getSetting('timetologout')),
             );
             $today = gmdate('n j');
             while ($f = $this->arow($result)) {

@@ -10,20 +10,17 @@ final class Shoutbox
 
     public function init(): void
     {
-        global $PAGE,$JAX,$CFG,$PERMS;
-        if (!isset($CFG['shoutbox'])) {
-            $CFG['shoutbox'] = false;
-        }
+        global $PAGE,$JAX,$PERMS;
 
         if (!isset($PERMS['can_view_shoutbox'])) {
             $PERMS['can_view_shoutbox'] = false;
         }
 
-        if (!$CFG['shoutbox'] || !$PERMS['can_view_shoutbox']) {
+        if (!Config::getSetting('shoutbox') || !$PERMS['can_view_shoutbox']) {
             return;
         }
 
-        $this->shoutlimit = $CFG['shoutbox_num'];
+        $this->shoutlimit = Config::getSetting('shoutbox_num');
         if (
             isset($JAX->b['shoutbox_delete'])
             && is_numeric($JAX->b['shoutbox_delete'])
@@ -78,7 +75,7 @@ final class Shoutbox
 
     public function formatshout($row)
     {
-        global $PAGE,$JAX,$CFG;
+        global $PAGE,$JAX;
         $shout = $JAX->theworks($row['shout'], ['minimalbb' => true]);
         $user = $row['uid'] ? $PAGE->meta(
             'user-link',
@@ -86,7 +83,7 @@ final class Shoutbox
             $row['group_id'],
             $row['display_name'],
         ) : 'Guest';
-        $avatar = isset($CFG['shoutboxava']) && $CFG['shoutboxava']
+        $avatar = Config::getSetting('shoutboxava')
             ? '<img src="' . $JAX->pick(
                 $row['avatar'],
                 $PAGE->meta('default-avatar'),
@@ -176,7 +173,7 @@ final class Shoutbox
 
     public function updateshoutbox(): void
     {
-        global $PAGE,$JAX,$DB,$SESS,$USER,$CFG;
+        global $PAGE,$JAX,$DB,$SESS,$USER;
 
         // This is a bit tricky, we're transversing the shouts
         // in reverse order, since they're shifted onto the list, not pushed.
@@ -205,7 +202,7 @@ final class Shoutbox
             );
             while ($f = $DB->arow($result)) {
                 $PAGE->JS('addshout', $this->formatshout($f));
-                if (isset($CFG['shoutboxsounds']) && $CFG['shoutboxsounds']) {
+                if (Config::getSetting('shoutboxsounds')) {
                     $sounds = [];
                     if ($USER['sound_shout'] && $sounds[$f['shout']]) {
                         $PAGE->JS(

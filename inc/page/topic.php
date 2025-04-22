@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Page;
+use Config;
 
 use IPAddress;
 use JAX;
@@ -522,6 +523,7 @@ final class Topic
     {
         global $DB,$PAGE,$JAX,$SESS,$USER,$PERMS,$CFG;
         $usersonline = $DB->getUsersOnline();
+        $ratingConfig = Config::getSetting('ratings') ?? 0;
 
         $topicPostCounter = 0;
 
@@ -673,7 +675,7 @@ final class Topic
             // Post rating content goes here.
             $postrating = '';
             $showrating = '';
-            if (isset($CFG['ratings']) && $CFG['ratings'] & 1) {
+            if ($ratingConfig & 1) {
                 $prating = [];
                 $postratingbuttons = '';
                 if ($post['rating']) {
@@ -710,7 +712,7 @@ final class Topic
                     $postrating = $PAGE->meta(
                         'rating-wrapper',
                         $postratingbuttons,
-                        ($CFG['ratings'] & 2) === 0
+                        ($ratingConfig & 2) === 0
                             ? '<a href="?act=vt' . $this->tid
                         . '&amp;listrating=' . $post['pid'] . '">(List)</a>'
                             : '',
@@ -1350,8 +1352,9 @@ final class Topic
 
     public function listrating($pid): void
     {
-        global $DB,$PAGE,$CFG;
-        if (($CFG['ratings'] & 2) !== 0) {
+        global $DB,$PAGE;
+        $ratingConfig = Config::getSetting('ratings') ?? 0;
+        if ($ratingConfig & 2) {
             return;
         }
 

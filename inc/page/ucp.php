@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Page;
+use Config;
 
 use JAX;
 
@@ -451,7 +452,7 @@ final class UCP
 
     public function showprofilesettings(): void
     {
-        global $USER,$JAX,$PAGE,$DB,$CFG;
+        global $USER,$JAX,$PAGE,$DB;
         $error = '';
         $genderOptions = ['', 'male', 'female', 'other'];
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
@@ -485,9 +486,10 @@ final class UCP
                 $data['display_name'] = $USER['name'];
             }
 
+            $badNameChars = Config::getSetting('badnamechars');
             if (
-                $CFG['badnamechars']
-                && preg_match($CFG['badnamechars'], (string) $data['display_name'])
+                $badNameChars
+                && preg_match($badNameChars, (string) $data['display_name'])
             ) {
                 $error = 'Invalid characters in display name!';
             } else {
@@ -1081,7 +1083,7 @@ final class UCP
 
     public function compose($messageid = '', $todo = ''): void
     {
-        global $PAGE,$JAX,$USER,$DB,$CFG;
+        global $PAGE,$JAX,$USER,$DB;
         $showfull = 0;
         $e = '';
         $mid = 0;

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Page;
 
+use Config;
+
 use IPAddress;
 use JAX;
 
@@ -1019,7 +1021,7 @@ final class ModControls
 
     public function iptools(): void
     {
-        global $PAGE,$DB,$CFG,$JAX,$USER;
+        global $PAGE,$DB,$JAX,$USER;
         $page = '';
 
         $ip = $JAX->b['ip'] ?? '';
@@ -1131,7 +1133,7 @@ final class ModControls
 
             $page .= $this->box('Users with this IP:', implode(', ', $content));
 
-            if ($CFG['shoutbox']) {
+            if (Config::getSetting('shoutbox')) {
                 $content = '';
                 $result = $DB->safespecial(
                     <<<'EOT'
