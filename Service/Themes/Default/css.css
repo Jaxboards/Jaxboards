@@ -1773,28 +1773,10 @@ textarea {
 }
 
 /* Ticker */
-#ticker .tick {
-  display: flex;
-  height: 20px;
-  padding: 5px;
-  border-bottom: 1px solid #ccc;
-}
-
-#ticker .tick_title {
-  flex: 1;
-}
-
-#ticker .date {
-  width: 110px;
-  font-size: 1rem;
-  padding-top: 3px;
-}
-
-#ticker .by {
-  height: 100%;
-  overflow: hidden;
-  text-align: right;
-}
+#ticker .tick {display: flex;padding: 5px;border-bottom: 1px solid #ccc;}
+#ticker .tick-title {flex: 1;}
+#ticker .date {width: 110px;font-size: 1rem;padding-top: 3px;}
+#ticker .by {overflow: hidden;text-align: right;}
 
 /* Calendar */
 .calendar {
