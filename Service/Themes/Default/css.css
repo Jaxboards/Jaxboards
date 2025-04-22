@@ -1780,7 +1780,7 @@ textarea {
   border-bottom: 1px solid #ccc;
 }
 
-#ticker .title {
+#ticker .tick_title {
   flex: 1;
 }
 
