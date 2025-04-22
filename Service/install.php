@@ -184,7 +184,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                 'service' => $service,
                 'prefix' => $service ? '' : 'jaxboards',
                 'sql_prefix' => $service ? '' : 'jaxboards_',
-            ]
+            ],
         );
 
         if ($service) {
