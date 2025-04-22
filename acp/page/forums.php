@@ -6,6 +6,29 @@ namespace ACP\Page;
 
 use ACP\Page\Forums\RecountStats;
 
+use function array_keys;
+use function array_pop;
+use function array_search;
+use function array_unshift;
+use function count;
+use function explode;
+use function implode;
+use function in_array;
+use function is_array;
+use function is_numeric;
+use function is_string;
+use function json_decode;
+use function mb_strstr;
+use function mb_substr;
+use function pack;
+use function preg_match;
+use function preg_replace;
+use function sscanf;
+use function trim;
+use function unpack;
+
+use const PHP_EOL;
+
 final class Forums
 {
     /**

@@ -4,6 +4,25 @@ declare(strict_types=1);
 
 namespace ACP;
 
+use function error_log;
+use function fclose;
+use function file_get_contents;
+use function fopen;
+use function fwrite;
+use function header;
+use function is_array;
+use function is_file;
+use function json_encode;
+use function mb_strtolower;
+use function mb_substr;
+use function pathinfo;
+use function preg_replace;
+use function str_replace;
+
+use const JSON_PRETTY_PRINT;
+use const PATHINFO_EXTENSION;
+use const PHP_EOL;
+
 final class Page
 {
     public $CFG = [];

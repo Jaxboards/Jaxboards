@@ -4,6 +4,36 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
+use function array_key_exists;
+use function closedir;
+use function define;
+use function defined;
+use function dirname;
+use function fclose;
+use function file_exists;
+use function file_get_contents;
+use function fopen;
+use function fwrite;
+use function glob;
+use function in_array;
+use function is_array;
+use function is_dir;
+use function is_file;
+use function is_numeric;
+use function is_writable;
+use function mb_strlen;
+use function mb_strpos;
+use function mkdir;
+use function opendir;
+use function pathinfo;
+use function preg_match;
+use function readdir;
+use function rename;
+use function unlink;
+
+use const PATHINFO_FILENAME;
+use const PHP_EOL;
+
 final class Themes
 {
     public $WRAPPERS_PATH;

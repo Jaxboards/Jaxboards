@@ -4,6 +4,13 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
+use function is_numeric;
+use function mb_strlen;
+use function preg_replace;
+use function trim;
+
+use const PHP_EOL;
+
 final class Settings
 {
     public function route(): void

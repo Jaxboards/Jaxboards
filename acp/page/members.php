@@ -4,6 +4,33 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
+use function array_pop;
+use function count;
+use function ctype_xdigit;
+use function explode;
+use function fclose;
+use function file_exists;
+use function file_get_contents;
+use function filter_var;
+use function fopen;
+use function fwrite;
+use function gmdate;
+use function htmlspecialchars;
+use function implode;
+use function is_numeric;
+use function mb_strlen;
+use function mb_strstr;
+use function mb_strtolower;
+use function mb_substr;
+use function password_hash;
+use function time;
+use function trim;
+
+use const FILTER_FLAG_IPV6;
+use const FILTER_VALIDATE_IP;
+use const PASSWORD_DEFAULT;
+use const PHP_EOL;
+
 final class Members
 {
     public const DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';

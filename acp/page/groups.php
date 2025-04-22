@@ -4,6 +4,16 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
+use function array_flip;
+use function explode;
+use function is_numeric;
+use function mb_strlen;
+use function mb_strpos;
+use function mb_substr;
+use function preg_match;
+
+use const PHP_EOL;
+
 final class Groups
 {
     public $updatePermissions = true;

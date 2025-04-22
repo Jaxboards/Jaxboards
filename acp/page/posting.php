@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
+use function array_reverse;
+use function krsort;
+use function rawurlencode;
+
+use const PHP_EOL;
+
 final class Posting
 {
     public function route(): void

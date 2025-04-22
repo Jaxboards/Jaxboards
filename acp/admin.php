@@ -54,7 +54,7 @@ if (!$PERMS['can_access_acp']) {
 }
 
 $USER = $DB->getUser();
-$PAGE = new PAGE();
+$PAGE = new Page();
 $PAGE->append('username', $USER['display_name']);
 $PAGE->title($PAGE->getCFGSetting('boardname') . ' - ACP');
 $PAGE->addNavMenu(

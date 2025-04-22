@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace ACP\Page\Forums;
 
+use function array_pop;
+use function explode;
+
 final class RecountStats
 {
     public static function showstats(): void

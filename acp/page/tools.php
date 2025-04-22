@@ -4,6 +4,33 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
+use function array_pop;
+use function array_reverse;
+use function count;
+use function ctype_digit;
+use function explode;
+use function gmdate;
+use function header;
+use function htmlspecialchars;
+use function implode;
+use function in_array;
+use function ini_get;
+use function is_array;
+use function is_numeric;
+use function is_readable;
+use function is_writable;
+use function mb_strstr;
+use function mb_strtolower;
+use function mb_substr;
+use function pathinfo;
+use function preg_match_all;
+use function trim;
+use function unlink;
+
+use const PATHINFO_EXTENSION;
+use const PHP_EOL;
+use const SEEK_END;
+
 final class Tools
 {
     public function route(): void

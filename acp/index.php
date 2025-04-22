@@ -39,7 +39,7 @@ $DB->connect(
 
 
 $JAX = new JAX();
-$PAGE = new PAGE();
+$PAGE = new Page();
 
 $themeElements = [
     'board_name' => $CFG['boardname'],
