@@ -71,13 +71,6 @@ final class IPAddress
         return false;
     }
 
-    private static function getIp()
-    {
-        global $_SERVER;
-
-        return $_SERVER['REMOTE_ADDR'];
-    }
-
     /**
      * Check if an IP is banned from the service.
      * Will use the $this->getIp() ipAddress field is left empty.
@@ -113,5 +106,12 @@ final class IPAddress
         $DB->disposeresult($result);
 
         return !isset($row['banned']) || $row['banned'] > 0;
+    }
+
+    private static function getIp()
+    {
+        global $_SERVER;
+
+        return $_SERVER['REMOTE_ADDR'];
     }
 }
