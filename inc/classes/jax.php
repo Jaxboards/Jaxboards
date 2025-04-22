@@ -30,8 +30,6 @@ final class JAX
 
     public $textRules;
 
-    public $userData;
-
     public $emoteRules;
 
     public function __construct()
