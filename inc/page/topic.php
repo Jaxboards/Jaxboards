@@ -3,7 +3,29 @@
 declare(strict_types=1);
 
 namespace Page;
+
 use IPAddress;
+
+use function array_diff;
+use function array_flip;
+use function array_key_exists;
+use function array_merge;
+use function ceil;
+use function count;
+use function explode;
+use function gmdate;
+use function header;
+use function implode;
+use function in_array;
+use function is_array;
+use function is_numeric;
+use function json_decode;
+use function json_encode;
+use function preg_match;
+use function round;
+use function time;
+
+use const PHP_EOL;
 
 final class Topic
 {

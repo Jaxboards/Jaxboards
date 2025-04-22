@@ -4,13 +4,29 @@ declare(strict_types=1);
 
 namespace Page;
 
+use function array_pop;
+use function gmdate;
+use function header;
+use function htmlspecialchars;
+use function in_array;
+use function is_array;
+use function is_numeric;
+use function json_encode;
+use function mb_strlen;
+use function mb_strstr;
+use function mb_strtolower;
+use function password_hash;
+use function password_verify;
+use function preg_match;
+use function strtotime;
+use function trim;
+use function ucfirst;
+
+use const PASSWORD_DEFAULT;
+use const PHP_EOL;
+
 final class UCP
 {
-    public function __construct() {
-        global $PAGE;
-        $PAGE->loadmeta('ucp');
-    }
-
     public $what = '';
 
     public $runscript = false;
@@ -18,6 +34,12 @@ final class UCP
     public $shownucp = false;
 
     public $ucppage = '';
+
+    public function __construct()
+    {
+        global $PAGE;
+        $PAGE->loadmeta('ucp');
+    }
 
     public function route(): void
     {

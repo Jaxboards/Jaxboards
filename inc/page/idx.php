@@ -4,6 +4,21 @@ declare(strict_types=1);
 
 namespace Page;
 
+use function array_flip;
+use function array_keys;
+use function array_merge;
+use function explode;
+use function gmdate;
+use function implode;
+use function max;
+use function mb_strlen;
+use function mb_substr;
+use function nl2br;
+use function number_format;
+use function preg_match;
+use function sprintf;
+use function time;
+
 final class IDX
 {
     public $moderatorinfo;
@@ -16,7 +31,8 @@ final class IDX
 
     public $subforums;
 
-    function __construct() {
+    public function __construct()
+    {
         global $PAGE;
         $PAGE->loadmeta('idx');
     }

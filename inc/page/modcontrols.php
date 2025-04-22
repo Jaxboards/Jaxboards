@@ -3,17 +3,46 @@
 declare(strict_types=1);
 
 namespace Page;
+
 use IPAddress;
+
+use function array_diff;
+use function array_flip;
+use function array_keys;
+use function array_pop;
+use function array_search;
+use function array_shift;
+use function array_unique;
+use function count;
+use function explode;
+use function fclose;
+use function file_get_contents;
+use function filter_var;
+use function fopen;
+use function fwrite;
+use function gmdate;
+use function header;
+use function implode;
+use function in_array;
+use function is_numeric;
+use function nl2br;
+use function strtotime;
+use function time;
+use function trim;
+
+use const FILTER_VALIDATE_IP;
+use const PHP_EOL;
 
 final class ModControls
 {
-    public function __construct() {
+    public $perms;
+
+    public function __construct()
+    {
         global $PAGE;
 
         $PAGE->loadmeta('modcp');
     }
-
-    public $perms;
 
     public static function load(): void
     {

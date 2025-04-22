@@ -4,6 +4,16 @@ declare(strict_types=1);
 
 namespace Page;
 
+use function array_pop;
+use function count;
+use function explode;
+use function file_exists;
+use function header;
+use function in_array;
+use function is_numeric;
+use function mb_strtolower;
+use function readfile;
+
 final class Download
 {
     public function route(): void

@@ -3,14 +3,32 @@
 declare(strict_types=1);
 
 namespace Page;
+
 use IPAddress;
+
+use function array_pop;
+use function count;
+use function explode;
+use function filesize;
+use function gmdate;
+use function hash_file;
+use function in_array;
+use function is_file;
+use function is_numeric;
+use function json_encode;
+use function mb_strlen;
+use function mb_strtolower;
+use function mb_substr;
+use function move_uploaded_file;
+use function preg_replace;
+use function preg_split;
+use function str_replace;
+use function trim;
+
+use const PHP_EOL;
 
 final class Post
 {
-    public function __construct() {
-        global $PAGE;
-        $PAGE->metadefs['post-preview'] = $PAGE->meta('box', '', 'Post Preview', '%s');
-    }
     public $canmod;
 
     public $postdata = '';
@@ -29,6 +47,12 @@ final class Post
     public $pid;
 
     public $how;
+
+    public function __construct()
+    {
+        global $PAGE;
+        $PAGE->metadefs['post-preview'] = $PAGE->meta('box', '', 'Post Preview', '%s');
+    }
 
     public function route(): void
     {

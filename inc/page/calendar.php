@@ -4,11 +4,19 @@ declare(strict_types=1);
 
 namespace Page;
 
+use function explode;
+use function gmdate;
+use function implode;
+use function is_numeric;
+use function mktime;
+use function sprintf;
+
 final class Calendar
 {
     public $month;
 
-    public function __construct() {
+    public function __construct()
+    {
         global $PAGE;
         $PAGE->loadmeta('calendar');
     }

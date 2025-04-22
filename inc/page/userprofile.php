@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace Page;
 
+use function explode;
+use function gmdate;
+use function in_array;
+use function is_numeric;
+use function mb_substr;
+use function preg_match;
+use function sprintf;
+use function ucfirst;
+use function ucwords;
+
 final class UserProfile
 {
-    public function __construct() {
-        global $PAGE;
-        $PAGE->loadmeta('userprofile');
-    }
-
     public $num_activity = 30;
 
     public $contacturls = [
@@ -25,6 +30,12 @@ final class UserProfile
         'yim' => 'ymsgr:sendim?%s',
         'youtube' => 'https://youtube.com/%s',
     ];
+
+    public function __construct()
+    {
+        global $PAGE;
+        $PAGE->loadmeta('userprofile');
+    }
 
     public function route(): void
     {

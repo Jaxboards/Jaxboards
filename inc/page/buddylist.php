@@ -4,9 +4,16 @@ declare(strict_types=1);
 
 namespace Page;
 
+use function array_search;
+use function explode;
+use function implode;
+use function in_array;
+use function is_numeric;
+
 final class BuddyList
 {
-    public function __construct() {
+    public function __construct()
+    {
         global $PAGE;
 
         $buddylist = $JAX->hiddenFormFields(['act' => 'buddylist']);
@@ -37,6 +44,7 @@ final class BuddyList
             </div>
             EOT;
     }
+
     public function route(): void
     {
         global $PAGE,$JAX,$USER;

@@ -4,19 +4,25 @@ declare(strict_types=1);
 
 namespace Page;
 
+use function ceil;
+use function is_numeric;
+use function sprintf;
+
 final class Members
 {
-    public function __construct() {
-        global $PAGE;
-
-        $PAGE->loadmeta('members');
-    }
     /**
      * @var float|int
      */
     public $page = 0;
 
     public $perpage = 20;
+
+    public function __construct()
+    {
+        global $PAGE;
+
+        $PAGE->loadmeta('members');
+    }
 
     public function route(): void
     {

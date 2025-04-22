@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Page;
 
+use function nl2br;
+
 final class BoardOffline
 {
     public function route(): void

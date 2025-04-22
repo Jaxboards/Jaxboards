@@ -19,6 +19,7 @@ if (file_exists(SERVICE_ROOT . '/install.lock')) {
 
     exit(1);
 }
+
 require_once JAXBOARDS_ROOT . '/inc/autoload.php';
 
 require_once JAXBOARDS_ROOT . '/acp/page.php';

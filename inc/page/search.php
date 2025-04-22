@@ -4,13 +4,33 @@ declare(strict_types=1);
 
 namespace Page;
 
+use function array_map;
+use function array_slice;
+use function ceil;
+use function count;
+use function ctype_digit;
+use function explode;
+use function gmdate;
+use function implode;
+use function in_array;
+use function is_array;
+use function is_numeric;
+use function mb_strlen;
+use function mb_substr;
+use function mktime;
+use function nl2br;
+use function preg_quote;
+use function preg_replace;
+use function preg_split;
+use function str_repeat;
+use function syslog;
+use function trim;
+
+use const LOG_EMERG;
+use const PHP_EOL;
+
 final class Search
 {
-    public function __construct() {
-        global $PAGE;
-
-        $PAGE->loadmeta('search');
-    }
     public $page = '';
 
     public $pagenum = 0;
@@ -21,6 +41,13 @@ final class Search
      * @var int
      */
     public $perpage;
+
+    public function __construct()
+    {
+        global $PAGE;
+
+        $PAGE->loadmeta('search');
+    }
 
     public function route(): void
     {

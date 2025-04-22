@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace Page;
 
+use function ceil;
+use function explode;
+use function is_numeric;
+use function json_encode;
+use function max;
+use function mb_strlen;
+use function number_format;
+use function preg_match;
+use function time;
+
 final class Forum
 {
-    public function __construct() {
-        global $PAGE;
-
-        $PAGE->loadmeta('forum');
-    }
-
     public $topicsRead = [];
 
     public $forumsRead = [];
@@ -24,6 +28,13 @@ final class Forum
      * @var float|int
      */
     public $page = 0;
+
+    public function __construct()
+    {
+        global $PAGE;
+
+        $PAGE->loadmeta('forum');
+    }
 
     public function route(): void
     {
