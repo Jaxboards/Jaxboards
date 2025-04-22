@@ -2,17 +2,20 @@
 
 declare(strict_types=1);
 
-class Config {
-    static function get() {
-        $config = array_merge(self::getServiceConfig(), self::getBoardConfig(), self::override());
-
-        return $config;
+final class Config
+{
+    public static function get(): array
+    {
+        return array_merge(self::getServiceConfig(), self::getBoardConfig(), self::override());
     }
 
-    static function getServiceConfig() {
+    public static function getServiceConfig()
+    {
         static $serviceConfig = null;
 
-        if ($serviceConfig) return $serviceConfig;
+        if ($serviceConfig) {
+            return $serviceConfig;
+        }
 
         require JAXBOARDS_ROOT . '/config.php';
 
@@ -21,15 +24,21 @@ class Config {
         return $serviceConfig;
     }
 
-    static function getBoardConfig($write = null) {
+    public static function getBoardConfig($write = null)
+    {
         static $boardConfig = null;
 
-        if ($write) $boardConfig = array_merge($boardConfig, $write);
+        if ($write) {
+            $boardConfig = array_merge($boardConfig, $write);
+        }
 
-        if ($boardConfig) return $boardConfig;
+        if ($boardConfig) {
+            return $boardConfig;
+        }
 
         if (!defined('BOARDPATH')) {
             $boardConfig = ['noboard' => 1];
+
             return $boardConfig;
         }
 
@@ -40,7 +49,8 @@ class Config {
         return $boardConfig;
     }
 
-    static function getSetting(string $key) {
+    public static function getSetting(string $key)
+    {
         $config = self::get();
 
         if (array_key_exists($key, $config)) {
@@ -50,7 +60,8 @@ class Config {
         return null;
     }
 
-    static function override($override = null) {
+    public static function override($override = null)
+    {
         static $overrideConfig = [];
 
         if ($override) {
@@ -60,7 +71,25 @@ class Config {
         return $overrideConfig;
     }
 
-    static private function configFileContents($data) {
+    public static function write($data): void
+    {
+        $boardConfig = self::getBoardConfig($data);
+
+        if (!defined('BOARDPATH')) {
+            throw new Exception('Board config file not determinable');
+        }
+
+        file_put_contents(BOARDPATH . 'config.php', self::configFileContents($boardConfig));
+    }
+
+    // Only used during installation
+    public static function writeServiceConfig($data): void
+    {
+        file_put_contents(JAXBOARDS_ROOT . '/config.php', self::configFileContents($data));
+    }
+
+    private static function configFileContents($data): string
+    {
         $dataString = json_encode($data, JSON_PRETTY_PRINT);
 
         return <<<EOT
@@ -88,19 +117,4 @@ class Config {
             );
             EOT;
     }
-
-    static public function write($data)
-    {
-        $boardConfig = Config::getBoardConfig($data);
-
-        if (!defined('BOARDPATH')) throw new Exception('Board config file not determinable');
-
-        file_put_contents(BOARDPATH . 'config.php', self::configFileContents($boardConfig));
-    }
-
-    // Only used during installation
-    static function writeServiceConfig($data) {
-        file_put_contents(JAXBOARDS_ROOT . '/config.php', self::configFileContents($data));
-    }
 }
-?>
