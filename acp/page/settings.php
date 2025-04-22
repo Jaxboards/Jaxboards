@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
-use JAX;
 use Config;
+use JAX;
 
 use function is_numeric;
 use function mb_strlen;
@@ -81,7 +81,7 @@ final class Settings
                     'boardname' => $JAX->p['boardname'],
                     'logourl' => $JAX->p['logourl'],
                     'boardoffline' => isset($JAX->p['boardoffline']) && $JAX->p['boardoffline'] ? '0' : '1',
-                    'offlinetext' => $JAX->p['offlinetext']
+                    'offlinetext' => $JAX->p['offlinetext'],
                 ]);
                 $page .= $PAGE->success('Settings saved!');
             }

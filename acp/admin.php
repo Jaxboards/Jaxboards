@@ -23,6 +23,7 @@ if (!defined('JAXBOARDS_ROOT')) {
 
 // Load composer dependencies.
 require_once JAXBOARDS_ROOT . '/inc/autoload.php';
+
 require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
 
 $CFG = Config::get();

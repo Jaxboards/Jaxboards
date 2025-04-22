@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace ACP\Page;
+
 use Config;
 
 use function array_reverse;

@@ -48,7 +48,7 @@ if ($serviceConfig['service']) {
         $prefix = $matches[1];
         Config::override([
             'prefix' => $prefix,
-            'sql_prefix' => $prefix . '_'
+            'sql_prefix' => $prefix . '_',
         ]);
     } else {
         $prefix = null;
