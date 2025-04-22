@@ -42,9 +42,6 @@ $JAX = new JAX();
 $submitted = false;
 if (isset($JAX->p['submit'])) {
     $submitted = true;
-    // Start with least permissions, not admin, no password.
-    $isAdmin = true;
-
     $user = $JAX->p['user'];
     $password = $JAX->p['pass'];
 
@@ -66,13 +63,9 @@ if (isset($JAX->p['submit'])) {
 
     // Check password.
     if (is_array($uinfo)) {
-        if ($uinfo['can_access_acp']) {
-            $isAdmin = true;
-        }
-
         $verified_password = (bool) $DB->getUser($uinfo['id'], $password);
 
-        if ($verified_password) {
+        if ($uinfo['can_access_acp'] && $verified_password) {
             $_SESSION['auid'] = $uinfo['id'];
             header('Location: admin.php');
         }
