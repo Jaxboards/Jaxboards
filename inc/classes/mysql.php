@@ -619,13 +619,13 @@ final class MySQL
     {
         static $userPerms = null;
 
-        if ($groupId === '' && $userPerms !== null) {
+        if ($groupId === null && $userPerms !== null) {
             return $userPerms;
         }
 
         $userData = $this->getUser();
 
-        if ($groupId === '' && $userData) {
+        if ($groupId === null && $userData) {
             $groupId = $userData['group_id'];
         }
 
