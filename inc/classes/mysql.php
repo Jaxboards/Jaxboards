@@ -615,7 +615,6 @@ final class MySQL
         return $userData;
     }
 
-
     public function getPerms($group_id = '')
     {
         static $userPerms = null;
