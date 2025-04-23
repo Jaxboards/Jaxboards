@@ -17,7 +17,7 @@ parameters:
     - config.default.php
     - domaindefinitions.php
     - emoticons
-    - inc
+    - jax
     - index.php
     - misc
     - php_codesniffer_to_sonarqube.php
