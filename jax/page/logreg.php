@@ -91,7 +91,7 @@ final class LogReg
 
         // Show registration form.
         if (!isset($this->jax->p['register'])) {
-            if (!$PAGE->jsupdate) {
+            if (!$this->page->jsupdate) {
                 $this->page->JS('update', 'page', $p);
             }
 
@@ -251,7 +251,7 @@ final class LogReg
                 $perms = $this->database->getPerms($user['group_id']);
                 if ($this->registering) {
                     $this->page->JS('location', '/');
-                } elseif ($PAGE->jsaccess) {
+                } elseif ($this->page->jsaccess) {
                     $this->page->JS('reload');
                 } else {
                     $this->page->location('?');
@@ -298,7 +298,7 @@ final class LogReg
         $this->page->JS('update', 'userbox', $this->page->meta('userbox-logged-out'));
         $this->page->JS('softurl');
         $this->page->append('page', $this->page->meta('success', 'Logged out successfully'));
-        if ($PAGE->jsaccess) {
+        if ($this->page->jsaccess) {
             return;
         }
 
@@ -355,7 +355,7 @@ final class LogReg
     {
         $page = '';
 
-        if ($PAGE->jsupdate && empty($this->jax->p)) {
+        if ($this->page->jsupdate && empty($this->jax->p)) {
             return;
         }
 
