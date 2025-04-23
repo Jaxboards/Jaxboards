@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use Exception;
+
 use function array_keys;
 use function array_pop;
 use function array_shift;
@@ -27,8 +29,6 @@ use function pathinfo;
 use function preg_match;
 use function preg_replace;
 use function preg_replace_callback;
-use function property_exists;
-use function str_contains;
 use function str_replace;
 use function vsprintf;
 
@@ -86,11 +86,6 @@ final class Page
     public $jsaccess = 0;
 
     /**
-     * @var null|string Store the UCP page data
-     */
-    private ?string $ucppage = null;
-
-    /**
      * @var bool
      */
     public $jsupdate = false;
@@ -99,16 +94,6 @@ final class Page
      * @var bool
      */
     public $jsnewlocation = false;
-
-    /**
-     * @var bool
-     */
-    private $jsdirectlink = false;
-
-    /**
-     * @var bool
-     */
-    private $mobile = false;
 
     private $parts = [];
 
@@ -122,8 +107,6 @@ final class Page
 
     private $metaqueue;
 
-    private $done;
-
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
@@ -135,10 +118,7 @@ final class Page
         if ($this->jsaccess !== 0) {
             $this->jsupdate = $this->jsaccess === 1;
             $this->jsnewlocation = $this->jsaccess >= 2;
-            $this->jsdirectlink = $this->jsaccess === 3;
         }
-
-        $this->mobile = str_contains((string) $_SERVER['HTTP_USER_AGENT'], 'mobile');
     }
 
     public function get(string $part)
@@ -148,7 +128,7 @@ final class Page
 
     public function append(string $part, string $content): void
     {
-        $part = mb_strtoupper((string) $part);
+        $part = mb_strtoupper($part);
         if (!$this->jsaccess || $part === 'TITLE') {
             if (!isset($this->parts[$part])) {
                 $this->reset($part, $content);
@@ -167,7 +147,7 @@ final class Page
         $this->vars['<%' . $varName . '%>'] = $value;
     }
 
-    public function filtervars(string $string)
+    public function filtervars(string $string): string
     {
         return str_replace(array_keys($this->vars), array_values($this->vars), $string);
     }
@@ -178,7 +158,7 @@ final class Page
             return;
         }
 
-        $part = mb_strtoupper((string) $part);
+        $part = mb_strtoupper($part);
         if (!isset($this->parts[$part])) {
             $this->reset($part, $content);
 
@@ -191,7 +171,7 @@ final class Page
     public function location(string $newLocation): void
     {
         if ($this->jax->c === [] && $newLocation[0] === '?') {
-            $newLocation = '?sessid=' . $this->session->data['id'] . '&' . mb_substr((string) $newLocation, 1);
+            $newLocation = '?sessid=' . $this->session->data['id'] . '&' . mb_substr($newLocation, 1);
         }
 
         if ($this->jsaccess) {
@@ -203,7 +183,7 @@ final class Page
 
     public function reset(string $part, string $content = ''): void
     {
-        $part = mb_strtoupper((string) $part);
+        $part = mb_strtoupper($part);
         $this->parts[$part] = $content;
     }
 
@@ -222,7 +202,7 @@ final class Page
 
     public function JSRaw(string $script): void
     {
-        foreach (explode(PHP_EOL, (string) $script) as $line) {
+        foreach (explode(PHP_EOL, $script) as $line) {
             $decoded = json_decode($line);
             if (!is_array($decoded)) {
                 continue;
@@ -289,8 +269,6 @@ final class Page
 
             echo $this->template;
         }
-
-        return;
     }
 
     public function collapsebox(string $title, string $contents, $boxId = null): ?string
@@ -464,9 +442,7 @@ final class Page
             isset($args[0]) && is_array($args[0]) ? $args[0] : $args,
         );
         if ($formatted === false) {
-            throw new \Exception($meta . ' has too many arguments');
-
-            return '';
+            throw new Exception($meta . ' has too many arguments');
         }
 
         if (
@@ -569,7 +545,7 @@ final class Page
         return $this->meta('path', $path);
     }
 
-    public function updatepath(array $crumbs = null): void
+    public function updatepath(?array $crumbs = null): void
     {
         if ($crumbs) {
             $this->path($crumbs);
@@ -578,12 +554,12 @@ final class Page
         $this->JS('update', 'path', $this->buildpath());
     }
 
-    public function debug(string $data = null)
+    public function debug(?string $data = null): ?string
     {
         if ($data) {
             $this->debuginfo[] = $data;
 
-            return;
+            return null;
         }
 
         return implode('<br>', $this->debuginfo);

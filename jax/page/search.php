@@ -390,12 +390,12 @@ final class Search
             $post = nl2br($post);
             $post = preg_replace(
                 '@' . implode('|', $terms) . '@i',
-                (string) $this->page->meta('search-highlight', '$0'),
+                $this->page->meta('search-highlight', '$0'),
                 $post,
             );
             $title = preg_replace(
                 '@' . implode('|', $terms) . '@i',
-                (string) $this->page->meta('search-highlight', '$0'),
+                $this->page->meta('search-highlight', '$0'),
                 (string) $postRow['title'],
             );
 

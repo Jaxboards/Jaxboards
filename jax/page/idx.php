@@ -216,7 +216,7 @@ final class IDX
             $r .= $this->moderatorinfo[$v] . $this->page->meta('idx-ledby-splitter');
         }
 
-        return mb_substr($r, 0, -mb_strlen((string) $this->page->meta('idx-ledby-splitter')));
+        return mb_substr($r, 0, -mb_strlen($this->page->meta('idx-ledby-splitter')));
     }
 
     public function buildTable($a): ?string
@@ -276,7 +276,7 @@ final class IDX
                             (string) $sf,
                             0,
                             -1 * mb_strlen(
-                                (string) $this->page->meta('idx-subforum-splitter'),
+                                $this->page->meta('idx-subforum-splitter'),
                             ),
                         ),
                     ) : '',
