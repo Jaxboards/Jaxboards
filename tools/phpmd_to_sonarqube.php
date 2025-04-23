@@ -211,7 +211,7 @@ define(
     '/^' . preg_quote(JAXBOARDS_ROOT . '/', '/') . '/',
 );
 $issues = array_merge_recursive(
-    array_map(
+    ...array_map(
         static function (
             array $file,
         ): array {
