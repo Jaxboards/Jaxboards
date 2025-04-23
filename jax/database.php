@@ -72,9 +72,7 @@ final class Database
 
     private $db = '';
 
-    public function __construct(
-        private readonly Config $config,
-    ) {}
+    public function __construct(private readonly Config $config) {}
 
     public function connect(
         $host,
