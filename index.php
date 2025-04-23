@@ -338,26 +338,16 @@ if (
 $modules = glob('jax/modules/*.php');
 if ($modules) {
     foreach ($modules as $module) {
-        $m = [];
-        $moduleClassName = '';
+        $moduleClassName = "Jax\\Modules\\" . pathinfo($module, PATHINFO_FILENAME);
 
-        if (preg_match('/tag_(\w+)/', $module, $m)) {
-            $moduleClassName = $m[1];
-            if (
-                !(
-                    isset($JAX->b['module'])
-                    && $JAX->b['module'] === $moduleClassName
-                ) && !$PAGE->templatehas($moduleClassName)
-            ) {
-                continue;
-            }
-        } else {
-            $moduleClassName = pathinfo($module, PATHINFO_FILENAME);
-        }
-
-        require_once $module;
         $module = new $moduleClassName();
-        $module->init();
+
+        if (!property_exists($module, 'TAG') || !(
+            isset($JAX->b['module'])
+            && $JAX->b['module'] === $moduleClassName
+        ) && !$PAGE->templatehas($moduleClassName)) {
+            $module->init();
+        }
     }
 }
 

@@ -2,10 +2,14 @@
 
 declare(strict_types=1);
 
+namespace Jax\Modules;
+
 use Jax\Config;
 
 final class Shoutbox
 {
+    public const TAG = true;
+
     private $shoutlimit;
 
     public function __construct()

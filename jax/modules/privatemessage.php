@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+namespace Jax\Modules;
+
+use Jax\Config;
+
 final class PrivateMessage
 {
     public function init(): void
