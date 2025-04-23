@@ -260,7 +260,7 @@ if (!$PAGE->jsaccess) {
         $nummessages = 0;
     }
 
-    $PAGE->addvar('inbox', $nummessages);
+    $PAGE->addvar('inbox', (string) $nummessages);
     if ($nummessages) {
         $PAGE->append(
             'FOOTER',
@@ -316,12 +316,12 @@ $PAGE->addvar('acplink', $PERMS['can_access_acp'] ? $PAGE->meta('acplink') : '')
 $PAGE->addvar('boardname', $CFG['boardname']);
 
 if ($USER) {
-    $PAGE->addvar('groupid', $JAX->pick($USER['group_id'], 3));
-    $PAGE->addvar('userposts', $USER['posts']);
+    $PAGE->addvar('groupid', (string) $JAX->pick($USER['group_id'], 3));
+    $PAGE->addvar('userposts', (string) $USER['posts']);
     $PAGE->addvar('grouptitle', $PERMS['title']);
     $PAGE->addvar('avatar', $JAX->pick($USER['avatar'], $PAGE->meta('default-avatar')));
     $PAGE->addvar('username', $USER['display_name']);
-    $PAGE->addvar('userid', $JAX->pick($USER['id'], 0));
+    $PAGE->addvar('userid', (string) $JAX->pick($USER['id'], 0));
 }
 
 if (!isset($JAX->b['act'])) {

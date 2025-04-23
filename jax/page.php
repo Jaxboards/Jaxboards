@@ -74,11 +74,11 @@ use const PHP_EOL;
  */
 final class Page
 {
-    public $metadefs = [];
+    private $metadefs = [];
 
-    public $debuginfo = '';
+    private $debuginfo = [];
 
-    public $JSOutput = [];
+    private $JSOutput = [];
 
     /**
      * @var int
@@ -88,7 +88,7 @@ final class Page
     /**
      * @var null|string Store the UCP page data
      */
-    public ?string $ucppage = null;
+    private ?string $ucppage = null;
 
     /**
      * @var bool
@@ -103,26 +103,26 @@ final class Page
     /**
      * @var bool
      */
-    public $jsdirectlink = false;
+    private $jsdirectlink = false;
 
     /**
      * @var bool
      */
-    public $mobile = false;
+    private $mobile = false;
 
-    public $parts = [];
+    private $parts = [];
 
-    public $vars = [];
+    private $vars = [];
 
-    public $userMetaDefs = [];
+    private $userMetaDefs = [];
 
-    public $moreFormatting = [];
+    private $moreFormatting = [];
 
-    public $template;
+    private $template;
 
-    public $metaqueue;
+    private $metaqueue;
 
-    public $done;
+    private $done;
 
     public function __construct(
         private readonly Config $config,
@@ -141,76 +141,76 @@ final class Page
         $this->mobile = str_contains((string) $_SERVER['HTTP_USER_AGENT'], 'mobile');
     }
 
-    public function get($a)
+    public function get(string $part)
     {
-        return $this->parts[$a];
+        return $this->parts[$part];
     }
 
-    public function append($a, $b): void
+    public function append(string $part, string $content): void
     {
-        $a = mb_strtoupper((string) $a);
-        if (!$this->jsaccess || $a === 'TITLE') {
-            if (!isset($this->parts[$a])) {
-                $this->reset($a, $b);
+        $part = mb_strtoupper((string) $part);
+        if (!$this->jsaccess || $part === 'TITLE') {
+            if (!isset($this->parts[$part])) {
+                $this->reset($part, $content);
 
                 return;
             }
 
-            $this->parts[$a] .= $b;
+            $this->parts[$part] .= $content;
 
             return;
         }
     }
 
-    public function addvar($a, $b): void
+    public function addvar(string $varName, string $value): void
     {
-        $this->vars['<%' . $a . '%>'] = $b;
+        $this->vars['<%' . $varName . '%>'] = $value;
     }
 
-    public function filtervars($a)
+    public function filtervars(string $string)
     {
-        return str_replace(array_keys($this->vars), array_values($this->vars), $a);
+        return str_replace(array_keys($this->vars), array_values($this->vars), $string);
     }
 
-    public function prepend($a, $b): void
+    public function prepend(string $part, $content): void
     {
         if ($this->jsaccess) {
             return;
         }
 
-        $a = mb_strtoupper((string) $a);
-        if (!isset($this->parts[$a])) {
-            $this->reset($a, $b);
+        $part = mb_strtoupper((string) $part);
+        if (!isset($this->parts[$part])) {
+            $this->reset($part, $content);
 
             return;
         }
 
-        $this->parts[$a] = $b . $this->parts[$a];
+        $this->parts[$part] = $content . $this->parts[$a];
     }
 
-    public function location($a): void
+    public function location(string $newLocation): void
     {
-        if ($this->jax->c === [] && $a[0] === '?') {
-            $a = '?sessid=' . $this->session->data['id'] . '&' . mb_substr((string) $a, 1);
+        if ($this->jax->c === [] && $newLocation[0] === '?') {
+            $newLocation = '?sessid=' . $this->session->data['id'] . '&' . mb_substr((string) $newLocation, 1);
         }
 
         if ($this->jsaccess) {
-            $this->JS('location', $a);
+            $this->JS('location', $newLocation);
         } else {
-            header("Location: {$a}");
+            header("Location: {$newLocation}");
         }
     }
 
-    public function reset($a, $b = ''): void
+    public function reset(string $part, string $content = ''): void
     {
-        $a = mb_strtoupper((string) $a);
-        $this->parts[$a] = $b;
+        $part = mb_strtoupper((string) $part);
+        $this->parts[$part] = $content;
     }
 
     public function JS(...$args): void
     {
         if ($args[0] === 'softurl') {
-            $GLOBALS['SESS']->erase('location');
+            $this->session->erase('location');
         }
 
         if (!$this->jsaccess) {
@@ -220,36 +220,36 @@ final class Page
         $this->JSOutput[] = $args;
     }
 
-    public function JSRaw($a): void
+    public function JSRaw(string $script): void
     {
-        foreach (explode(PHP_EOL, (string) $a) as $a22) {
-            $a2 = json_decode($a22);
-            if (!is_array($a2)) {
+        foreach (explode(PHP_EOL, (string) $script) as $line) {
+            $decoded = json_decode($line);
+            if (!is_array($decoded)) {
                 continue;
             }
 
-            if (is_array($a2[0])) {
-                foreach ($a2 as $v) {
+            if (is_array($decoded[0])) {
+                foreach ($decoded as $v) {
                     $this->JSOutput[] = $v;
                 }
             } else {
-                $this->JSOutput[] = $a2;
+                $this->JSOutput[] = $decoded;
             }
         }
     }
 
-    public function JSRawArray($a): void
+    public function JSRawArray(string $line): void
     {
-        $this->JSOutput[] = $a;
+        $this->JSOutput[] = $line;
     }
 
-    public function out(): ?bool
+    public function out(): void
     {
-        if (property_exists($this, 'done') && $this->done !== null) {
-            return false;
+        static $done = null;
+        if ($done) {
+            return;
         }
 
-        $this->done = true;
         $this->parts['path']
             = "<div id='path' class='path'>" . $this->buildpath() . '</div>';
 
@@ -267,18 +267,18 @@ final class Page
                 : json_encode($this->JSOutput);
         } else {
             $autobox = ['PAGE', 'COPYRIGHT', 'USERBOX'];
-            foreach ($this->parts as $k => $v) {
-                $k = mb_strtoupper((string) $k);
-                if (in_array($k, $autobox)) {
-                    $v = '<div id="' . mb_strtolower($k) . '">' . $v . '</div>';
+            foreach ($this->parts as $part => $contents) {
+                $part = mb_strtoupper((string) $part);
+                if (in_array($part, $autobox)) {
+                    $contents = '<div id="' . mb_strtolower($part) . '">' . $contents . '</div>';
                 }
 
-                if ($k === 'PATH') {
+                if ($part === 'PATH') {
                     $this->template
-                        = preg_replace('@<!--PATH-->@', (string) $v, (string) $this->template, 1);
+                        = preg_replace('@<!--PATH-->@', (string) $contents, (string) $this->template, 1);
                 }
 
-                $this->template = str_replace('<!--' . $k . '-->', $v, $this->template);
+                $this->template = str_replace('<!--' . $part . '-->', $contents, $this->template);
             }
 
             $this->template = $this->filtervars($this->template);
@@ -290,12 +290,12 @@ final class Page
             echo $this->template;
         }
 
-        return null;
+        return;
     }
 
-    public function collapsebox($a, $b, $c = false): ?string
+    public function collapsebox(string $title, string $contents, $boxId = null): ?string
     {
-        return $this->meta('collapsebox', $c ? ' id="' . $c . '"' : '', $a, $b);
+        return $this->meta('collapsebox', $boxId ? ' id="' . $boxId . '"' : '', $title, $contents);
     }
 
     public function error($a): ?string
@@ -452,10 +452,10 @@ final class Page
         }
     }
 
-    public function meta($meta, ...$args): ?string
+    public function meta($meta, ...$args): string
     {
         $this->processqueue($meta);
-        $r = vsprintf(
+        $formatted = vsprintf(
             str_replace(
                 ['<%', '%>'],
                 ['<%%', '%%>'],
@@ -463,67 +463,63 @@ final class Page
             ),
             isset($args[0]) && is_array($args[0]) ? $args[0] : $args,
         );
-        if ($r === false) {
-            echo $meta . ' has too many arguments';
+        if ($formatted === false) {
+            throw new \Exception($meta . ' has too many arguments');
 
-            exit(1);
+            return '';
         }
 
         if (
             isset($this->moreFormatting[$meta])
             && $this->moreFormatting[$meta]
         ) {
-            return $this->metaextended($r);
+            return $this->metaextended($formatted);
         }
 
-        return $r;
+        return $formatted;
     }
 
-    public function metaextended($m): ?string
+    public function metaextended(string $content): string
     {
         return preg_replace_callback(
             '@{if ([^}]+)}(.*){/if}@Us',
             $this->metaextendedifcb(...),
-            (string) $this->filtervars($m),
+            (string) $this->filtervars($content),
         );
     }
 
-    public function metaextendedifcb($m)
+    public function metaextendedifcb(array $match)
     {
-        $s = mb_strpos((string) $m[1], '||') !== false ? '||' : '&&';
+        $logicalOperator = mb_strpos((string) $match[1], '||') !== false ? '||' : '&&';
 
-        foreach (explode($s, (string) $m[1]) as $piece) {
-            preg_match('@(\S+?)\s*([!><]?=|[><])\s*(\S*)@', $piece, $pp);
+        foreach (explode($logicalOperator, (string) $match[1]) as $piece) {
+            preg_match('@(\S+?)\s*([!><]?=|[><])\s*(\S*)@', $piece, $args);
 
-            $c = match ($pp[2]) {
-                '=' => $pp[1] === $pp[3],
-                '!=' => $pp[1] !== $pp[3],
-                '>=' => $pp[1] >= $pp[3],
-                '>' => $pp[1] > $pp[3],
-                '<=' => $pp[1] <= $pp[3],
-                '<' => $pp[1] < $pp[3],
+            $conditionPasses = match ($args[2]) {
+                '=' => $args[1] === $args[3],
+                '!=' => $args[1] !== $args[3],
+                '>=' => $args[1] >= $args[3],
+                '>' => $args[1] > $args[3],
+                '<=' => $args[1] <= $args[3],
+                '<' => $args[1] < $args[3],
                 default => false,
             };
 
-            if ($s === '&&' && !$c) {
+            if ($logicalOperator === '&&' && !$conditionPasses) {
                 break;
             }
 
-            if ($s === '||' && $c) {
+            if ($logicalOperator === '||' && $conditionPasses) {
                 break;
             }
         }
 
-        if ($c) {
-            return $m[2];
-        }
-
-        return '';
+        return $conditionPasses ? $match[2] : '';
     }
 
-    public function checkextended($data, $meta = null): bool
+    public function checkextended(string $data, $meta = null): bool
     {
-        if (mb_strpos((string) $data, '{if ') !== false) {
+        if (mb_strpos($data, '{if ') !== false) {
             if (!$meta) {
                 return true;
             }
@@ -540,7 +536,7 @@ final class Page
             || isset($this->metadefs[$meta]);
     }
 
-    public function path($a): bool
+    public function path(array $crumbs): bool
     {
         if (
             !isset($this->parts['path'])
@@ -549,14 +545,14 @@ final class Page
             $this->parts['path'] = [];
         }
 
-        foreach ($a as $value => $link) {
+        foreach ($crumbs as $value => $link) {
             $this->parts['path'][$link] = $value;
         }
 
         return true;
     }
 
-    public function buildpath(): ?string
+    public function buildpath(): string
     {
         $first = true;
         $path = '';
@@ -573,23 +569,23 @@ final class Page
         return $this->meta('path', $path);
     }
 
-    public function updatepath($a = false): void
+    public function updatepath(array $crumbs = null): void
     {
-        if ($a) {
-            $this->path($a);
+        if ($crumbs) {
+            $this->path($crumbs);
         }
 
         $this->JS('update', 'path', $this->buildpath());
     }
 
-    public function debug($data = '')
+    public function debug(string $data = null)
     {
-        if (!$data) {
-            return $this->debuginfo;
+        if ($data) {
+            $this->debuginfo[] = $data;
+
+            return;
         }
 
-        $this->debuginfo .= $data . '<br />';
-
-        return null;
+        return implode('<br>', $this->debuginfo);
     }
 }
