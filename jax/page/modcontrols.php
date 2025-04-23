@@ -53,7 +53,7 @@ final class ModControls
         $this->page->loadmeta('modcp');
     }
 
-    public static function load(): void
+    public function load(): void
     {
         $script = file_get_contents('dist/modcontrols.js');
         if (!$PAGE || !$this->page->jsaccess) {
@@ -118,7 +118,7 @@ final class ModControls
                 break;
 
             case 'load':
-                self::load();
+                $this->load();
 
                 break;
 
@@ -798,7 +798,7 @@ final class ModControls
         $page .= '<form method="post" data-ajax-form="true" '
             . 'style="padding:10px;">'
             . 'Which topic should the topics be merged into?<br>';
-        $page .= Jax::hiddenFormFields(
+        $page .= $this->jax->hiddenFormFields(
             [
                 'act' => 'modcontrols',
                 'dot' => 'merge',
@@ -862,7 +862,7 @@ final class ModControls
         $e = '';
         $data = [];
         $page = '<form method="post" data-ajax-form="true">'
-            . Jax::hiddenFormFields(
+            . $this->jax->hiddenFormFields(
                 [
                     'act' => 'modcontrols',
                     'do' => 'emem',
@@ -984,7 +984,7 @@ final class ModControls
 
                 $page .= '<form method="post" '
                     . 'data-ajax-form="true"><table>';
-                $page .= Jax::hiddenFormFields(
+                $page .= $this->jax->hiddenFormFields(
                     [
                         'act' => 'modcontrols',
                         'do' => 'emem',
@@ -1048,7 +1048,7 @@ final class ModControls
             fclose($o);
         }
 
-        $hiddenFields = Jax::hiddenFormFields(
+        $hiddenFields = $this->jax->hiddenFormFields(
             [
                 'act' => 'modcontrols',
                 'do' => 'iptools',
@@ -1065,7 +1065,7 @@ final class ModControls
         if ($ip) {
             $page .= "<h3>Data for {$ip}:</h3>";
 
-            $hiddenFields = Jax::hiddenFormFields(
+            $hiddenFields = $this->jax->hiddenFormFields(
                 [
                     'act' => 'modcontrols',
                     'do' => 'iptools',

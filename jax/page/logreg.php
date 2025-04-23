@@ -421,7 +421,7 @@ final class LogReg
             } else {
                 $page .= $this->page->meta(
                     'forgot-password2-form',
-                    Jax::hiddenFormFields(
+                    $this->jax->hiddenFormFields(
                         [
                             'act' => 'logreg6',
                             'id' => $id,
@@ -504,7 +504,7 @@ final class LogReg
             $page .= $this->page->meta(
                 'forgot-password-form',
                 $this->page->jsaccess
-                ? Jax::hiddenFormFields(
+                ? $this->jax->hiddenFormFields(
                     [
                         'act' => 'logreg6',
                     ],

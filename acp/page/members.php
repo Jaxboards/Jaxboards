@@ -376,7 +376,7 @@ final readonly class Members
                     . $this->page->back(),
                 );
             } else {
-                $page .= Jax::hiddenFormFields(['mid' => $data['id']]);
+                $page .= $this->jax->hiddenFormFields(['mid' => $data['id']]);
                 $page .= $this->formfield('Display Name:', 'display_name', $data['display_name']);
                 $page .= $this->formfield('Username:', 'name', $data['name']);
                 $page .= $this->formfield('Real Name:', 'full_name', $data['full_name']);

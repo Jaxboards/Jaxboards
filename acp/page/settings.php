@@ -177,7 +177,7 @@ final readonly class Settings
             );
         }
 
-        $hiddenFields = Jax::hiddenFormFields(
+        $hiddenFields = $this->jax->hiddenFormFields(
             [
                 'act' => 'settings',
                 'do' => 'pages',
