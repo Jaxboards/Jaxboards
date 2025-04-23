@@ -71,7 +71,7 @@ final class Session
         private readonly IPAddress $ipAddress,
         private readonly Database $database,
     ) {
-        $this->data = $this->getSess($_SESSION['sid'] ?? false);
+        $this->data = $this->getSess($_SESSION['sid'] ?? null);
         if (!isset($this->data['vars'])) {
             $this->data['vars'] = serialize([]);
         }
@@ -99,12 +99,7 @@ final class Session
         $this->data[$property] = $value;
     }
 
-    /**
-     * @param mixed $sid
-     *
-     * @return mixed[]
-     */
-    public function getSess($sid = false): array
+    public function getSess($sid = null): array
     {
         $userData = $this->database->getUser();
         $isbot = 0;
