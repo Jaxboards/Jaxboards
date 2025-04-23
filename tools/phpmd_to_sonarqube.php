@@ -5,7 +5,7 @@ declare(strict_types=1);
 
 // phpcs:disable Generic.Files.LineLength.TooLong,PSR12.Files.FileHeader.IncorrectOrder,Squiz.Commenting.InlineComment.DocBlock,Squiz.Commenting.BlockComment.WrongStart
 
-/**
+/*
  * Tool to convert phpmd output into something SonarQube can read.
  *
  * @see https://docs.sonarsource.com/sonarqube-cloud/enriching/generic-issue-data/
@@ -113,8 +113,7 @@ function generify(string $description_input): string
         '/ variables with short names like \$\w+/' => ' variables with short names',
         '/ undefined variables such as \'\$\w+\'/' => ' undefined variables',
         '/ unused local variables such as \'\$\w+\'/' => ' unused local variables',
-        '/ method \w+\(\) has a Cyclomatic Complexity of \d+/'
-            => ' method has a Cyclomatic Complexity that exceeds the threshoold',
+        '/ method \w+\(\) has a Cyclomatic Complexity of \d+/' => ' method has a Cyclomatic Complexity that exceeds the threshoold',
         '/The method \w+ uses an else expression. /' => '',
         '/The class \w+ has \d+ lines of code. /' => 'The class has more lines of code than our threshold. ',
         '/The class \w+ has an overall complexity of \d+ /' => 'The class an overall complexity ',
@@ -219,7 +218,7 @@ $issues = array_merge_recursive(
             $filename = preg_replace(
                 REMOVE_JAXBOARDS_ROOT,
                 '',
-                $file['file'],
+                (string) $file['file'],
             );
 
             return array_map(
@@ -245,8 +244,8 @@ $issues = array_merge_recursive(
                     }
 
                     if ($issue['primaryLocation']['textRange']['startLine'] < 1) {
-                        $issue['primaryLocation']['textRange']['startLine'] =
-                            '1';
+                        $issue['primaryLocation']['textRange']['startLine']
+                            = '1';
                     }
 
                     $matches = [];
