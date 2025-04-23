@@ -102,11 +102,8 @@ if (!is_array($data['files'])) {
     exit(1);
 }
 
-function generify(string $description_input): string
-{
-    $description = $description_input;
-
-    $replacements = [
+// phpcs:disable SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys.IncorrectKeyOrder,Generic.Files.LineLength.TooLong
+const RULE_DESCRIPTION_REPLACEMENTS = [
         '/ on line \d+/' => '',
         '/ variable names like \$\w+/' => ' variable names',
         '/ variable \$\w+ is/' => ' variable is',
@@ -134,17 +131,29 @@ function generify(string $description_input): string
         '/The class \w+ has \d+ fields. Consider redesigning \w+/' => 'Consider redesigning this class',
         '/ short method names like \w+::\w+\(\)/' => ' short method names',
         '/ classes with short names like \w+/' => ' classes with short names',
-    ];
+];
+// phpcs:enable
 
-    foreach ($replacements as $replace => $replacement) {
-        $description = preg_replace(
+/**
+ * Make rule descriptions more generic for SonarCloud issue rules
+ *
+ * @param string    $input  The description to work with
+ *
+ * @return string   The "generified" input
+ */
+function generify(string $input): string
+{
+    $output = $input;
+
+    foreach (RULE_DESCRIPTION_REPLACEMENTS as $replace => $replacement) {
+        $output = preg_replace(
             $replace,
             $replacement,
-            (string) $description,
-        ) ?? '';
+            $output ?? '',
+        );
     }
 
-    return $description;
+    return $output ?? '';
 }
 
 $rules = array_reduce(
@@ -156,7 +165,7 @@ $rules = array_reduce(
                 return $rules;
             }
 
-            $description = generify($violation['description']);
+            $description = generify($violation['description'] ?? '');
 
             $description .= PHP_EOL
                 . PHP_EOL

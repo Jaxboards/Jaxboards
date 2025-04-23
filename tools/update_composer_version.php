@@ -1,17 +1,20 @@
 #!/usr/bin/env php
 <?php
 
-declare(strict_types=1);
-
 /**
  * Update our composer version to the latest available.
  */
+
+declare(strict_types=1);
+
 const COMPOSER_VERSIONS_URL = 'https://getcomposer.org/versions';
+
+const COULD_NOT_READ = 'Could not read ';
 
 $versionJSON = file_get_contents(COMPOSER_VERSIONS_URL);
 
 if ($versionJSON === false) {
-    fwrite(STDERR, 'Could not read ' . COMPOSER_VERSIONS_URL);
+    fwrite(STDERR, COULD_NOT_READ . COMPOSER_VERSIONS_URL);
 
     exit(1);
 }
@@ -37,7 +40,7 @@ define('COMPOSER_FILE', dirname(__DIR__) . '/composer.json');
 $composerJSON = file_get_contents(COMPOSER_FILE);
 
 if ($composerJSON === false) {
-    fwrite(STDERR, 'Could not read ' . COMPOSER_FILE);
+    fwrite(STDERR, COULD_NOT_READ . COMPOSER_FILE);
 
     exit(1);
 }
@@ -68,7 +71,7 @@ define('PACKAGE_FILE', dirname(__DIR__) . '/package.json');
 $packageJSON = file_get_contents(PACKAGE_FILE);
 
 if ($packageJSON === false) {
-    fwrite(STDERR, 'Could not read ' . PACKAGE_FILE);
+    fwrite(STDERR, COULD_NOT_READ . PACKAGE_FILE);
 
     exit(1);
 }

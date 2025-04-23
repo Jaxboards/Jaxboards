@@ -33,6 +33,7 @@
     <exclude name="Squiz.WhiteSpace.ScopeClosingBrace.Indent"/>
   </rule>
   <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
+    <exclude-pattern>./tools/phpmd_to_sonarqube.php</exclude-pattern>
     <exclude-pattern>./tools/update_composer_version.php</exclude-pattern>
   </rule>
   <!-- Here's some comment rules we can follow -->

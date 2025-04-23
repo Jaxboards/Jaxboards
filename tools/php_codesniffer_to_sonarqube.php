@@ -100,92 +100,102 @@ if (!is_array($data['files'])) {
     exit(1);
 }
 
-// Make rule descriptions more generic for SonarCloud issue rules
-function generify(string $description_input): string
-{
-    $description = $description_input;
-    $replacements = [
-        '/ Currently using \d+ lines./' => '',
-        '/Unused variable \$\w+/' => 'Unused variable',
-        '/Class name \w+ does not match filepath [\/\w\.]+/' => 'Class name does not match filepath',
-        '/Cognitive complexity for "\w+" is \d+ but has to be/' => 'Cognitive complexity must be',
-        '/; contains \d+ characters/' => '',
-        '/Unused parameter \$\w+/' => 'Unused parameter',
-        '/Property [\\\\\w]+::\$\w+ does not have/' => 'Property does not have',
-        '/Method [\\\\\w]+::\w+\(\) does not have/' => 'Method does not have',
-        '/inside string is disallowed, found "\$\w+"/' => 'inside string is disallowed',
-        '/is deprecated as of PHP 8.2, found "\$\{\w+\}"/' => 'is deprecated as of PHP 8.2',
-        '/on property "\$\w+"/' => 'on property',
-        '/on method "\w+"/' => 'on method',
-        '/variable \$\w+/' => 'varaible',
-        '/for constant \w+/' => 'for a constant',
-        '/default value of parameter \$\w+/' => 'default value of parameter',
-        '/Useless alias "\w+" for use of "[\w\\\]+"/' => 'Useless alias',
-        '/ The first wrong one is [\w\\\]+./' => '',
-        '/annotation @\w+ is/' => 'this annotation is',
-        '/array type hint syntax in \"\w+\[\]" is disallowed/' => 'array type hint syntax (e.g. "string[]")',
-        '/Unknown type hint \"[\w\[\]\\\<,>]+\" found for \$\w+/' => 'Unknown type hint',
-        '/Type hint \"[\w\[\]\\\<,>]+\" missing for \$\w+/' => 'Type hint missing',
-        '/Type [\w\\\]+ is not used in this file/' => 'Type is not used in this file',
-        '/ spaces but found \d/' => ' spaces',
-        '/ but found "\w+"/' => '',
-        '/ method "\w+" should/' => ' method should',
-        '/ Found: \(\w+\)/' => '',
-        '/Property name "\$\w+"/' => 'Property',
-        '/Property [\\\\\w]+::\$\w+/' => 'Property',
-        '/; found: <\?php.*/' => '',
-        '/; found: <%.*/' => '',
-        '/Parameter \$\w+/' => 'Parameter',
-        '/; expected "\(\w+\)" but found "\(\w+\)"/' => '',
-        '/; expected "[\\\\\w]+" but found "[\\\\\w]+"/' => '',
-        '/Operator [=!]= is disallowed, use [=!]== instead/' => 'Use strict equality instead',
-        '/Null type hint should be on last position in "[\w\|]+"/' => 'Null type hint should be on last position, e.g. `string|null`',
-        '/; expected "\/\/ .*" but found "\/\/.*"/' => '',
-        '/ class \w+/' => '',
-        '/ function \w+\(\)/' => '',
-        '/ tag for "[\w\\\]+" exception/' => ' tag for exception',
-        '/Method name "\w+"/' => 'Method name',
-        '/Method [\\\\\w]+::\w+\(\)/' => 'Method',
-        '/property [\\\\\w]+::\$\w+/' => 'property',
-        '/type hint "[\w<,\s>]+"; found "[\w<,\s>]+" for \$\w+/' => 'type hint not found',
-        '/Expected "[\w<,\s>]+" but found "[\w<,\s>]+"/' => 'Incorrect type hint found',
-        '/; \d+ found/' => '',
-        '/; found \d+/' => '',
-        '/parameter "\$\w+"/' => 'parameter',
-        '/parameter \$\w+/' => 'parameter',
-        '/; expected "\w+"/' => '',
-        '/Constant [\\\\\w]+::\w+/' => 'Constant',
-        '/TODO task\s+.*/' => 'TODO task',
-        '/FIXME task\s+.*/' => 'FIXME task',
-        '/Class name "\w+"/' => 'Class name',
-        '/; expected \w+ but found \w+/' => '',
-        '/Class \\\[\w\\\]+/' => 'Class',
-        '/ Expected @\w+, found @\w+/' => '',
-        '/ The first symbol is defined on line \d+ and the first side effect is on line \d+./' => '',
-        '/method [\\\\\w]+::\w+\(\)/' => 'this method',
-        '/forbidden comment ".*"/' => 'forbidden comment',
-        '/Function \w+ is specialized/' => 'Function is specialized',
-        '/missing in \w+\(\)/' => 'missing in function',
-        '/true in \w+\(\)/' => 'true in function',
-        '/prefix "\w+"/' => 'prefix, e.g. Exception prefixed with Exception',
-        '/suffix "\w+"/' => 'suffix, e.g. Exception ending in Exception',
-        '/; use \w+\(\) instead/' => '; use the recommended alternative instead',
-        '/".+=" operator instead of "=" and ".+"/' => 'combined assignment operator instead of assignment and operation',
-        // phpcs:disable Generic.Files.LineLength.TooLong
-        '/placement of "[\w\s]+" group is invalid. Last group was "[\w\s]+" and one of these is expected after it: [\w\s]+/' => 'structure of this class must be ordered',
-        // phpcs:enable
-        '/Function \w+\(\)/' => 'Function',
-    ];
 
-    foreach ($replacements as $replace => $replacement) {
-        $description = preg_replace(
+// phpcs:disable SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys.IncorrectKeyOrder,Generic.Files.LineLength.TooLong
+const RULE_DESCRIPTION_REPLACEMENTS = [
+    '/ Currently using \d+ lines./' => '',
+    '/Unused variable \$\w+/' => 'Unused variable',
+    '/Class name \w+ does not match filepath [\/\w\.]+/' => 'Class name does not match filepath',
+    '/Cognitive complexity for "\w+" is \d+ but has to be/' => 'Cognitive complexity must be',
+    '/; contains \d+ characters/' => '',
+    '/Unused parameter \$\w+/' => 'Unused parameter',
+    '/Property [\\\\\w]+::\$\w+ does not have/' => 'Property does not have',
+    '/Method [\\\\\w]+::\w+\(\) does not have/' => 'Method does not have',
+    '/inside string is disallowed, found "\$\w+"/' => 'inside string is disallowed',
+    '/is deprecated as of PHP 8.2, found "\$\{\w+\}"/' => 'is deprecated as of PHP 8.2',
+    '/on property "\$\w+"/' => 'on property',
+    '/on method "\w+"/' => 'on method',
+    '/variable \$\w+/' => 'varaible',
+    '/for constant \w+/' => 'for a constant',
+    '/default value of parameter \$\w+/' => 'default value of parameter',
+    '/Useless alias "\w+" for use of "[\w\\\]+"/' => 'Useless alias',
+    '/ The first wrong one is [\w\\\]+./' => '',
+    '/annotation @\w+ is/' => 'this annotation is',
+    '/array type hint syntax in \"\w+\[\]" is disallowed/' => 'array type hint syntax (e.g. "string[]")',
+    '/Unknown type hint \"[\w\[\]\\\<,>]+\" found for \$\w+/' => 'Unknown type hint',
+    '/Type hint \"[\w\[\]\\\<,>]+\" missing for \$\w+/' => 'Type hint missing',
+    '/Type [\w\\\]+ is not used in this file/' => 'Type is not used in this file',
+    '/ spaces but found \d/' => ' spaces',
+    '/ but found "\w+"/' => '',
+    '/ method "\w+" should/' => ' method should',
+    '/ Found: \(\w+\)/' => '',
+    '/Property name "\$\w+"/' => 'Property',
+    '/Property [\\\\\w]+::\$\w+/' => 'Property',
+    '/; found: <\?php.*/' => '',
+    '/; found: <%.*/' => '',
+    '/Parameter \$\w+/' => 'Parameter',
+    '/; expected "\(\w+\)" but found "\(\w+\)"/' => '',
+    '/; expected "[\\\\\w]+" but found "[\\\\\w]+"/' => '',
+    '/Operator [=!]= is disallowed, use [=!]== instead/' => 'Use strict equality instead',
+    '/Null type hint should be on last position in "[\w\|]+"/' => 'Null type hint should be on last position, e.g. `string|null`',
+    '/; expected "\/\/ .*" but found "\/\/.*"/' => '',
+    '/ class \w+/' => '',
+    '/ function \w+\(\)/' => '',
+    '/ tag for "[\w\\\]+" exception/' => ' tag for exception',
+    '/Method name "\w+"/' => 'Method name',
+    '/Method [\\\\\w]+::\w+\(\)/' => 'Method',
+    '/property [\\\\\w]+::\$\w+/' => 'property',
+    '/type hint "[\w<,\s>]+"; found "[\w<,\s>]+" for \$\w+/' => 'type hint not found',
+    '/Expected "[\w<,\s>]+" but found "[\w<,\s>]+"/' => 'Incorrect type hint found',
+    '/; \d+ found/' => '',
+    '/; found \d+/' => '',
+    '/parameter "\$\w+"/' => 'parameter',
+    '/parameter \$\w+/' => 'parameter',
+    '/; expected "\w+"/' => '',
+    '/Constant [\\\\\w]+::\w+/' => 'Constant',
+    '/TODO task\s+.*/' => 'TODO task',
+    '/FIXME task\s+.*/' => 'FIXME task',
+    '/Class name "\w+"/' => 'Class name',
+    '/; expected \w+ but found \w+/' => '',
+    '/Class \\\[\w\\\]+/' => 'Class',
+    '/ Expected @\w+, found @\w+/' => '',
+    '/ The first symbol is defined on line \d+ and the first side effect is on line \d+./' => '',
+    '/method [\\\\\w]+::\w+\(\)/' => 'this method',
+    '/forbidden comment ".*"/' => 'forbidden comment',
+    '/Function \w+ is specialized/' => 'Function is specialized',
+    '/missing in \w+\(\)/' => 'missing in function',
+    '/true in \w+\(\)/' => 'true in function',
+    '/prefix "\w+"/' => 'prefix, e.g. Exception prefixed with Exception',
+    '/suffix "\w+"/' => 'suffix, e.g. Exception ending in Exception',
+    '/; use \w+\(\) instead/' => '; use the recommended alternative instead',
+    '/".+=" operator instead of "=" and ".+"/' => 'combined assignment operator instead of assignment and operation',
+    // phpcs:disable Generic.Files.LineLength.TooLong
+    '/placement of "[\w\s]+" group is invalid. Last group was "[\w\s]+" and one of these is expected after it: [\w\s]+/' => 'structure of this class must be ordered',
+    // phpcs:enable
+    '/Function \w+\(\)/' => 'Function',
+];
+// phpcs:enable
+
+/**
+ * Make rule descriptions more generic for SonarCloud issue rules
+ *
+ * @param string    $input  The description to work with
+ *
+ * @return string   The "generified" input
+ */
+function generify(string $input): string
+{
+    $output = $input;
+
+    foreach (RULE_DESCRIPTION_REPLACEMENTS as $replace => $replacement) {
+        $output = preg_replace(
             $replace,
             $replacement,
-            $description,
+            $output,
         ) ?? '';
     }
 
-    return $description;
+    return $output;
 }
 
 $rules = array_reduce(
@@ -197,7 +207,7 @@ $rules = array_reduce(
                 return $rules;
             }
 
-            $description = generify((string) $message['message']);
+            $description = generify($message['message'] ?? '');
 
             // We don't have a way to guage severity so we always set it to
             // low/minor for errors and info for warnings
