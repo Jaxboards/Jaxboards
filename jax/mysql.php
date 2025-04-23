@@ -7,6 +7,51 @@ namespace Jax;
 use MySQLi;
 use ReflectionClass;
 
+use function addslashes;
+use function array_keys;
+use function array_map;
+use function array_pop;
+use function array_shift;
+use function array_unshift;
+use function array_values;
+use function count;
+use function date;
+use function debug_backtrace;
+use function error_log;
+use function explode;
+use function func_get_arg;
+use function func_num_args;
+use function function_exists;
+use function gmdate;
+use function implode;
+use function is_array;
+use function is_int;
+use function is_numeric;
+use function is_string;
+use function ksort;
+use function mb_check_encoding;
+use function mb_convert_encoding;
+use function mb_strlen;
+use function mb_substr;
+use function mysqli_fetch_array;
+use function mysqli_fetch_assoc;
+use function password_hash;
+use function password_needs_rehash;
+use function password_verify;
+use function preg_match;
+use function print_r;
+use function str_repeat;
+use function str_replace;
+use function syslog;
+use function time;
+use function vsprintf;
+
+use const LOG_ERR;
+use const MYSQLI_ASSOC;
+use const MYSQLI_BOTH;
+use const PASSWORD_DEFAULT;
+use const PHP_EOL;
+
 final class MySQL
 {
     public $lastQuery;

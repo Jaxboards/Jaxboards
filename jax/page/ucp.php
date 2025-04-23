@@ -79,7 +79,7 @@ final class UCP
     {
         global $JAX;
 
-        return JAX::hiddenFormFields(['act' => 'ucp', 'what' => $this->what]);
+        return Jax::hiddenFormFields(['act' => 'ucp', 'what' => $this->what]);
     }
 
     public function showinbox(): void
@@ -173,7 +173,7 @@ final class UCP
 
         $this->ucppage = ($e !== '' && $e !== '0' ? $PAGE->meta('error', $e) : '') . $PAGE->meta(
             'ucp-index',
-            JAX::hiddenFormFields(['act' => 'ucp']),
+            Jax::hiddenFormFields(['act' => 'ucp']),
             $USER['display_name'],
             $JAX->pick($USER['avatar'], $PAGE->meta('default-avatar')),
             trim((string) $USER['ucpnotepad']) !== '' && trim((string) $USER['ucpnotepad']) !== '0'
@@ -250,7 +250,7 @@ final class UCP
         }
 
         $checkboxes = [
-            $this->getlocationforform() . JAX::hiddenFormFields(
+            $this->getlocationforform() . Jax::hiddenFormFields(
                 ['submit' => 1],
             ),
         ];
@@ -357,7 +357,7 @@ final class UCP
         $this->ucppage .= $PAGE->meta(
             'ucp-pass-settings',
             $this->getlocationforform()
-            . JAX::hiddenFormFields(['passchange' => 1]),
+            . Jax::hiddenFormFields(['passchange' => 1]),
         );
     }
 
@@ -392,7 +392,7 @@ final class UCP
 
         $this->ucppage .= $PAGE->meta(
             'ucp-email-settings',
-            $this->getlocationforform() . JAX::hiddenFormFields(
+            $this->getlocationforform() . Jax::hiddenFormFields(
                 ['submit' => 'true'],
             ),
             isset($JAX->b['change']) && $JAX->b['change'] ? <<<HTML
@@ -701,7 +701,7 @@ final class UCP
         $this->ucppage = $PAGE->meta(
             'ucp-profile-settings',
             $this->getlocationforform()
-            . JAX::hiddenFormFields(['submit' => '1']),
+            . Jax::hiddenFormFields(['submit' => '1']),
             $USER['name'],
             $data['display_name'],
             $data['full_name'],
@@ -922,7 +922,7 @@ final class UCP
             $JAX->theworks($message['message']),
             $JAX->pick($message['avatar'], $PAGE->meta('default-avatar')),
             $message['usertitle'],
-            JAX::hiddenFormFields(
+            Jax::hiddenFormFields(
                 [
                     'act' => 'ucp',
                     'messageid' => $message['id'],
@@ -1064,7 +1064,7 @@ final class UCP
 
         $page = $PAGE->meta(
             'inbox-messages-listing',
-            JAX::hiddenFormFields(
+            Jax::hiddenFormFields(
                 [
                     'act' => 'ucp',
                     'what' => 'inbox',
@@ -1252,7 +1252,7 @@ final class UCP
 
         $page = $PAGE->meta(
             'inbox-composeform',
-            JAX::hiddenFormFields(
+            Jax::hiddenFormFields(
                 [
                     'act' => 'ucp',
                     'page' => 'compose',

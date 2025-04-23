@@ -1,6 +1,9 @@
 <?php
 
-/**
+use Jax\JAX;
+use Jax\MySQL;
+
+/*
  * Service signup file, for users to create their own JaxBoards forum.
  *
  * PHP Version 8
@@ -16,8 +19,8 @@ if (!defined('SERVICE_ROOT')) {
 
 require_once JAXBOARDS_ROOT . '/jax/autoload.php';
 
-$JAX = new Jax\JAX();
-$DB = new Jax\MySQL();
+$JAX = new JAX();
+$DB = new MySQL();
 
 if (!file_exists(JAXBOARDS_ROOT . '/config.php')) {
     echo 'Jaxboards not installed!';

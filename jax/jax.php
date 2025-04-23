@@ -4,6 +4,50 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use function array_keys;
+use function array_merge;
+use function array_pop;
+use function array_values;
+use function count;
+use function explode;
+use function file_exists;
+use function floor;
+use function glob;
+use function gmdate;
+use function highlight_string;
+use function htmlspecialchars;
+use function implode;
+use function in_array;
+use function is_array;
+use function is_dir;
+use function json_decode;
+use function mail;
+use function mb_strtolower;
+use function mb_substr;
+use function nl2br;
+use function parse_url;
+use function preg_match;
+use function preg_match_all;
+use function preg_quote;
+use function preg_replace;
+use function preg_replace_callback;
+use function preg_split;
+use function rmdir;
+use function round;
+use function setcookie;
+use function str_contains;
+use function str_ireplace;
+use function str_replace;
+use function strtotime;
+use function time;
+use function trim;
+use function unlink;
+use function unpack;
+use function urlencode;
+
+use const ENT_QUOTES;
+use const PHP_EOL;
+
 final class Jax
 {
     public $attachmentdata;

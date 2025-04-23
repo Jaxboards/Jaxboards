@@ -171,7 +171,7 @@ final class Settings
             );
         }
 
-        $hiddenFields = JAX::hiddenFormFields(
+        $hiddenFields = Jax::hiddenFormFields(
             [
                 'act' => 'settings',
                 'do' => 'pages',

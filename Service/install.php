@@ -4,7 +4,7 @@ use ACP\Page;
 use Jax\Jax;
 use Jax\MySQL;
 
-/**
+/*
  * Service install file, for installing a new JaxBoards service.
  *
  * PHP Version 5.3.7
@@ -59,9 +59,9 @@ function recurseCopy($src, $dst): void
     closedir($dir);
 }
 
-$JAX = new JAX();
+$JAX = new Jax();
 $DB = new MySQL();
-$PAGE = new PAGE();
+$PAGE = new Page();
 
 $fields = [
     'admin_email' => [

@@ -409,7 +409,7 @@ final class UserProfile
                         'userprofile-comment-form',
                         $USER['name'] ?? '',
                         $JAX->pick($USER['avatar'], $PAGE->meta('default-avatar')),
-                        JAX::hiddenFormFields(
+                        Jax::hiddenFormFields(
                             [
                                 'act' => 'vu' . $id,
                                 'page' => 'comments',

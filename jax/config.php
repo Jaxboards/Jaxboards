@@ -4,6 +4,14 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use function array_key_exists;
+use function array_merge;
+use function defined;
+use function file_put_contents;
+use function json_encode;
+
+use const JSON_PRETTY_PRINT;
+
 final class Config
 {
     public static function get(): array

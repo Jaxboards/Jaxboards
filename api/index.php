@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
+use Jax\MySQL;
+
 define('JAXBOARDS_ROOT', dirname(__DIR__));
 
 require_once JAXBOARDS_ROOT . '/jax/autoload.php';
 
 require_once JAXBOARDS_ROOT . '/config.php';
 
-$DB = new Jax\MySQL();
+$DB = new MySQL();
 $DB->connect(
     $CFG['sql_host'],
     $CFG['sql_username'],

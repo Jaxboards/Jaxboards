@@ -9,12 +9,12 @@ if (!defined('JAXBOARDS_ROOT')) {
 // Load composer dependencies.
 require_once JAXBOARDS_ROOT . '/jax/autoload.php';
 
+use Jax\Config;
 use Jax\IPAddress;
+use Jax\Jax;
 use Jax\MySQL;
 use Jax\Page;
-use Jax\Jax;
 use Jax\Sess;
-use Jax\Config;
 
 require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
 
@@ -377,7 +377,7 @@ if (isset($actdefs[$act])) {
 if ($act === 'idx' && isset($JAX->b['module']) && $JAX->b['module']) {
     // Do nothing.
 } elseif ($act && file_exists('jax/page/' . $act . '.php')) {
-    $pageClass = 'Jax\\Page\\' . $act;
+    $pageClass = 'Jax\Page\\' . $act;
     $page = new $pageClass();
     $page->route();
 } elseif (!$PAGE->jsaccess || $PAGE->jsnewlocation) {

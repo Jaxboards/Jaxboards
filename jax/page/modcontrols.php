@@ -800,7 +800,7 @@ final class ModControls
         $page .= '<form method="post" data-ajax-form="true" '
             . 'style="padding:10px;">'
             . 'Which topic should the topics be merged into?<br>';
-        $page .= JAX::hiddenFormFields(
+        $page .= Jax::hiddenFormFields(
             [
                 'act' => 'modcontrols',
                 'dot' => 'merge',
@@ -865,7 +865,7 @@ final class ModControls
         $e = '';
         $data = [];
         $page = '<form method="post" data-ajax-form="true">'
-            . JAX::hiddenFormFields(
+            . Jax::hiddenFormFields(
                 [
                     'act' => 'modcontrols',
                     'do' => 'emem',
@@ -984,7 +984,7 @@ final class ModControls
 
                 $page .= '<form method="post" '
                     . 'data-ajax-form="true"><table>';
-                $page .= JAX::hiddenFormFields(
+                $page .= Jax::hiddenFormFields(
                     [
                         'act' => 'modcontrols',
                         'do' => 'emem',
@@ -1048,7 +1048,7 @@ final class ModControls
             fclose($o);
         }
 
-        $hiddenFields = JAX::hiddenFormFields(
+        $hiddenFields = Jax::hiddenFormFields(
             [
                 'act' => 'modcontrols',
                 'do' => 'iptools',
@@ -1065,7 +1065,7 @@ final class ModControls
         if ($ip) {
             $page .= "<h3>Data for {$ip}:</h3>";
 
-            $hiddenFields = JAX::hiddenFormFields(
+            $hiddenFields = Jax::hiddenFormFields(
                 [
                     'act' => 'modcontrols',
                     'do' => 'iptools',

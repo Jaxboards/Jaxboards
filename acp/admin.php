@@ -40,7 +40,7 @@ $DB->connect(
     $CFG['sql_prefix'],
 );
 
-$JAX = new JAX();
+$JAX = new Jax();
 if (isset($_SESSION['auid'])) {
     $userData = $DB->getUser($_SESSION['auid']);
     $PERMS = $DB->getPerms($userData['group_id']);

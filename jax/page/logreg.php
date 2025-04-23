@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
-use Jax\Config;
 use Exception;
+use Jax\Config;
 use Jax\IPAddress;
 use Jax\Jax;
 
@@ -421,7 +421,7 @@ final class LogReg
             } else {
                 $page .= $PAGE->meta(
                     'forgot-password2-form',
-                    JAX::hiddenFormFields(
+                    Jax::hiddenFormFields(
                         [
                             'act' => 'logreg6',
                             'id' => $id,
@@ -504,7 +504,7 @@ final class LogReg
             $page .= $PAGE->meta(
                 'forgot-password-form',
                 $PAGE->jsaccess
-                ? JAX::hiddenFormFields(
+                ? Jax::hiddenFormFields(
                     [
                         'act' => 'logreg6',
                     ],

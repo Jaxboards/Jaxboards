@@ -8,7 +8,8 @@ final class Shoutbox
 {
     private $shoutlimit;
 
-    public function __construct() {
+    public function __construct()
+    {
         global $PAGE;
 
         $PAGE->loadmeta('shoutbox');

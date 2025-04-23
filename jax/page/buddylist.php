@@ -18,7 +18,7 @@ final class BuddyList
     {
         global $PAGE;
 
-        $buddylist = JAX::hiddenFormFields(['act' => 'buddylist']);
+        $buddylist = Jax::hiddenFormFields(['act' => 'buddylist']);
         $PAGE->metadefs['buddylist-contacts'] = <<<EOT
             <div class="contacts">
                 <form method="?" data-ajax-form="true">

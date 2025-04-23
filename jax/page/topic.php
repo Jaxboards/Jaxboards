@@ -920,7 +920,7 @@ final class Topic
             return $page . '</table>';
         }
 
-        $page = JAX::hiddenFormFields(
+        $page = Jax::hiddenFormFields(
             [
                 'act' => 'vt' . $this->tid,
                 'votepoll' => 1,
@@ -1153,7 +1153,7 @@ final class Topic
         $post = $DB->arow($result);
         $DB->disposeresult($result);
 
-        $hiddenfields = JAX::hiddenFormFields(
+        $hiddenfields = Jax::hiddenFormFields(
             [
                 'act' => 'post',
                 'how' => 'qedit',
@@ -1178,7 +1178,7 @@ final class Topic
         }
 
         if ($post['newtopic']) {
-            $hiddenfields .= JAX::hiddenFormFields(
+            $hiddenfields .= Jax::hiddenFormFields(
                 [
                     'tid' => $post['tid'],
                 ],

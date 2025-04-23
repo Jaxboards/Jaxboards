@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use ACP\Page;
 use Jax\Config;
-use Jax\MySQL;
 use Jax\Jax;
+use Jax\MySQL;
 
 /*
  * Admin login.
@@ -41,7 +41,7 @@ $DB->connect(
 );
 
 
-$JAX = new JAX();
+$JAX = new Jax();
 $PAGE = new Page();
 
 $themeElements = [
