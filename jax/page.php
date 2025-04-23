@@ -460,7 +460,7 @@ final class Page
         return preg_replace_callback(
             '@{if ([^}]+)}(.*){/if}@Us',
             $this->metaextendedifcb(...),
-            (string) $this->filtervars($content),
+            $this->filtervars($content),
         );
     }
 
