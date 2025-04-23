@@ -21,18 +21,18 @@ use function time;
 
 final class Forum
 {
-    public $topicsRead = [];
+    private $topicsRead = [];
 
-    public $forumsRead = [];
+    private $forumsRead = [];
 
-    public $forumReadTime = 0;
+    private $forumReadTime = 0;
 
-    public $numperpage = 20;
+    private $numperpage = 20;
 
     /**
      * @var float|int
      */
-    public $pageNumber = 0;
+    private $pageNumber = 0;
 
     public function __construct(
         private readonly Database $database,

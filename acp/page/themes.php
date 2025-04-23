@@ -41,7 +41,7 @@ use const PHP_EOL;
 
 final class Themes
 {
-    public $WRAPPERS_PATH;
+    private $WRAPPERS_PATH = BOARDPATH . 'Wrappers/';
 
     public function __construct(
         private readonly Config $config,
@@ -52,8 +52,6 @@ final class Themes
 
     public function route(): void
     {
-        $this->WRAPPERS_PATH = BOARDPATH . 'Wrappers/';
-
         if (!defined('DTHEMEPATH')) {
             define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . $this->config->getSetting('dthemepath'));
         }

@@ -27,15 +27,15 @@ use function time;
 
 final class IDX
 {
-    public $moderatorinfo;
+    private $moderatorinfo;
 
-    public $forumsread = [];
+    private $forumsread = [];
 
-    public $mods;
+    private $mods;
 
-    public $subforumids;
+    private $subforumids;
 
-    public $subforums;
+    private $subforums;
 
     public function __construct(
         private readonly Config $config,

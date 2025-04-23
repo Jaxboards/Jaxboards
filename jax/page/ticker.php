@@ -11,7 +11,7 @@ use Jax\Session;
 
 final class Ticker
 {
-    public $maxticks = 60;
+    private $maxticks = 60;
 
     public function __construct(
         private readonly Database $database,

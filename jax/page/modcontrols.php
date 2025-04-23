@@ -40,7 +40,7 @@ use const PHP_EOL;
 
 final class ModControls
 {
-    public $perms;
+    private $perms;
 
     public function __construct(
         private readonly Config $config,

@@ -20,7 +20,7 @@ use const PHP_EOL;
 
 final class Groups
 {
-    public $updatePermissions = true;
+    private $updatePermissions = true;
 
     public function __construct(
         private readonly Database $database,

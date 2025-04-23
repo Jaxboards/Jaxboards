@@ -38,7 +38,7 @@ use const PHP_EOL;
 
 final readonly class Members
 {
-    public const DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
+    private const DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
 
     public function __construct(
         private Config $config,

@@ -17,9 +17,9 @@ final class Members
     /**
      * @var float|int
      */
-    public $pageNumber = 0;
+    private $pageNumber = 0;
 
-    public $perpage = 20;
+    private $perpage = 20;
 
     public function __construct(
         private readonly Database $database,

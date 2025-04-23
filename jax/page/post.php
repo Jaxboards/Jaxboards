@@ -33,24 +33,24 @@ use const PHP_EOL;
 
 final class Post
 {
-    public $canmod;
+    private $canmod;
 
-    public $postdata = '';
+    private $postdata = '';
 
-    public $postpreview = '';
+    private $postpreview = '';
 
     /**
      * @var false
      */
-    public $nopost = true;
+    private $nopost = true;
 
-    public $tid;
+    private $tid;
 
-    public $fid;
+    private $fid;
 
-    public $pid;
+    private $pid;
 
-    public $how;
+    private $how;
 
     public function __construct(
         private readonly Config $config,

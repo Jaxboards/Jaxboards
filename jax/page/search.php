@@ -37,14 +37,14 @@ use const PHP_EOL;
 
 final class Search
 {
-    public $pagenum = 0;
+    private $pagenum = 0;
 
-    public $fids = [];
+    private $fids = [];
 
     /**
      * @var int
      */
-    public $perpage;
+    private $perpage;
 
     public function __construct(
         private readonly Database $database,

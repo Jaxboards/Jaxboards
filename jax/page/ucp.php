@@ -32,13 +32,13 @@ use const PHP_EOL;
 
 final class UCP
 {
-    public $what = '';
+    private $what = '';
 
-    public $runscript = false;
+    private $runscript = false;
 
-    public $shownucp = false;
+    private $shownucp = false;
 
-    public $ucppage = '';
+    private $ucppage = '';
 
     /**
      * @var Config
