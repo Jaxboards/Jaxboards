@@ -14,12 +14,10 @@ if (!defined('SERVICE_ROOT')) {
     define('SERVICE_ROOT', __DIR__);
 }
 
-require_once JAXBOARDS_ROOT . '/inc/classes/mysql.php';
+require_once JAXBOARDS_ROOT . '/jax/autoload.php';
 
-require_once JAXBOARDS_ROOT . '/inc/classes/jax.php';
-
-$JAX = new JAX();
-$DB = new MySQL();
+$JAX = new Jax\JAX();
+$DB = new Jax\MySQL();
 
 if (!file_exists(JAXBOARDS_ROOT . '/config.php')) {
     echo 'Jaxboards not installed!';

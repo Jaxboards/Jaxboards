@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 use ACP\Page;
+use Jax\Config;
+use Jax\Jax;
+use Jax\MySQL;
 
 /*
  * Admin control panel.
@@ -22,7 +25,7 @@ if (!defined('JAXBOARDS_ROOT')) {
 }
 
 // Load composer dependencies.
-require_once JAXBOARDS_ROOT . '/inc/autoload.php';
+require_once JAXBOARDS_ROOT . '/jax/autoload.php';
 
 require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
 

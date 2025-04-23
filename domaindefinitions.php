@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace Jax;
+
 /*
  * Figures out what board we're talking about if it's a service,
  * but regardless defines some important paths.

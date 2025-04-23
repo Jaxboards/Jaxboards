@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
-use Config;
+use Jax\Config;
 
 use function array_key_exists;
 use function closedir;

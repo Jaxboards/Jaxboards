@@ -16,7 +16,7 @@ $CFG = [];
 require_once dirname(__DIR__) . '/config.default.php';
 
 // load classes
-$classFiles = glob(dirname(__DIR__) . '/inc/classes/*.php');
+$classFiles = glob(dirname(__DIR__) . '/jax/*.php');
 if ($classFiles) {
     foreach ($classFiles as $classFile) {
         require_once $classFile;

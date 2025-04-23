@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 define('JAXBOARDS_ROOT', dirname(__DIR__));
 
-require_once JAXBOARDS_ROOT . '/inc/autoload.php';
+require_once JAXBOARDS_ROOT . '/jax/autoload.php';
 
 require_once JAXBOARDS_ROOT . '/config.php';
 
-$DB = new MySQL();
+$DB = new Jax\MySQL();
 $DB->connect(
     $CFG['sql_host'],
     $CFG['sql_username'],

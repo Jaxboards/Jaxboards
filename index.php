@@ -7,7 +7,14 @@ if (!defined('JAXBOARDS_ROOT')) {
 }
 
 // Load composer dependencies.
-require_once JAXBOARDS_ROOT . '/inc/autoload.php';
+require_once JAXBOARDS_ROOT . '/jax/autoload.php';
+
+use Jax\IPAddress;
+use Jax\MySQL;
+use Jax\Page;
+use Jax\Jax;
+use Jax\Sess;
+use Jax\Config;
 
 require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
 
@@ -69,9 +76,9 @@ if (isset($CFG['noboard']) && $CFG['noboard']) {
     exit(1);
 }
 
-$PAGE = new PAGE();
-$JAX = new JAX();
-$SESS = new SESS($_SESSION['sid'] ?? false);
+$PAGE = new Page();
+$JAX = new Jax();
+$SESS = new Sess($_SESSION['sid'] ?? false);
 
 if (!isset($_SESSION['uid']) && isset($JAX->c['utoken'])) {
     $result = $DB->safeselect(
@@ -328,7 +335,7 @@ if (
 }
 
 // Include modules.
-$modules = glob('inc/modules/*.php');
+$modules = glob('jax/modules/*.php');
 if ($modules) {
     foreach ($modules as $module) {
         $m = [];
@@ -369,8 +376,8 @@ if (isset($actdefs[$act])) {
 
 if ($act === 'idx' && isset($JAX->b['module']) && $JAX->b['module']) {
     // Do nothing.
-} elseif ($act && file_exists('inc/page/' . $act . '.php')) {
-    $pageClass = 'Page\\' . $act;
+} elseif ($act && file_exists('jax/page/' . $act . '.php')) {
+    $pageClass = 'Jax\\Page\\' . $act;
     $page = new $pageClass();
     $page->route();
 } elseif (!$PAGE->jsaccess || $PAGE->jsnewlocation) {

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
-use Config;
-use JAX;
+use Jax\Config;
+use Jax\Jax;
 
 use function is_numeric;
 use function mb_strlen;
