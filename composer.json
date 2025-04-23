@@ -27,7 +27,8 @@
     "vimeo/psalm": "^6.5"
   },
   "require": {
-    "php": "^8.2.12"
+    "php": "^8.2.12",
+    "php-di/php-di": "^7.0"
   },
   "scripts": {
     "lint": [
