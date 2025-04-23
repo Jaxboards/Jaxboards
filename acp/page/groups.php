@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace ACP\Page;
 
 use ACP\Page;
+use Jax\Jax;
+use Jax\Database;
 
 use function array_flip;
 use function explode;
@@ -20,11 +22,14 @@ final class Groups
 {
     public $updatePermissions = true;
 
-    public function __construct(private readonly Page $page) {}
+    public function __construct(
+        private readonly Database $database,
+        private readonly Jax $jax,
+        private readonly Page $page
+    ) {}
 
     public function route(): void
     {
-        global $JAX;
         $links = [
             'create' => 'Create Group',
             'delete' => 'Delete Group',
@@ -49,18 +54,18 @@ final class Groups
                 ],
             ),
         );
-        if (isset($JAX->g['edit']) && $JAX->g['edit']) {
-            $JAX->g['do'] = 'edit';
+        if (isset($this->jax->g['edit']) && $this->jax->g['edit']) {
+            $this->jax->g['do'] = 'edit';
         }
 
-        if (!isset($JAX->g['do'])) {
-            $JAX->g['do'] = null;
+        if (!isset($this->jax->g['do'])) {
+            $this->jax->g['do'] = null;
         }
 
-        match ($JAX->g['do']) {
+        match ($this->jax->g['do']) {
             'perms' => $this->showperms(),
             'create' => $this->create(),
-            'edit' => $this->create($JAX->g['edit']),
+            'edit' => $this->create($this->jax->g['edit']),
             'delete' => $this->delete(),
             default => $this->showperms(),
         };
@@ -68,7 +73,6 @@ final class Groups
 
     public function updateperms($perms)
     {
-        global $DB;
         $columns = [
             'can_access_acp',
             'can_post',
@@ -133,7 +137,7 @@ final class Groups
                 continue;
             }
 
-            $DB->safeupdate(
+            $this->database->safeupdate(
                 'member_groups',
                 $v,
                 'WHERE `id`=?',
@@ -141,7 +145,7 @@ final class Groups
             );
         }
 
-        $error = $DB->error();
+        $error = $this->database->error();
         if ($error) {
             $this->page->addContentBox(
                 'Error',
@@ -163,36 +167,34 @@ final class Groups
 
     public function showperms()
     {
-        global $DB,$JAX;
-
         $page = '';
 
         if (
             $this->updatePermissions
-            && isset($JAX->p['perm'])
-            && $JAX->p['perm']
+            && isset($this->jax->p['perm'])
+            && $this->jax->p['perm']
         ) {
-            foreach (explode(',', (string) $JAX->p['grouplist']) as $v) {
-                if (isset($JAX->p['perm'][$v]) && $JAX->p['perm'][$v]) {
+            foreach (explode(',', (string) $this->jax->p['grouplist']) as $v) {
+                if (isset($this->jax->p['perm'][$v]) && $this->jax->p['perm'][$v]) {
                     continue;
                 }
 
-                $JAX->p['perm'][$v] = [];
+                $this->jax->p['perm'][$v] = [];
             }
 
-            return $this->updateperms($JAX->p['perm']);
+            return $this->updateperms($this->jax->p['perm']);
         }
 
         if (
-            !isset($JAX->b['grouplist'])
-            || preg_match('@[^\d,]@', $JAX->b['grouplist'])
-            || mb_strpos($JAX->b['grouplist'], ',,') !== false
+            !isset($this->jax->b['grouplist'])
+            || preg_match('@[^\d,]@', $this->jax->b['grouplist'])
+            || mb_strpos($this->jax->b['grouplist'], ',,') !== false
         ) {
-            $JAX->b['grouplist'] = '';
+            $this->jax->b['grouplist'] = '';
         }
 
-        $result = $JAX->b['grouplist']
-            ? $DB->safeselect(
+        $result = $this->jax->b['grouplist']
+            ? $this->database->safeselect(
                 [
                     'id',
                     'title',
@@ -228,9 +230,9 @@ final class Groups
                 ],
                 'member_groups',
                 'WHERE `id` IN ? ORDER BY `id` ASC',
-                explode(',', (string) $JAX->b['grouplist']),
+                explode(',', (string) $this->jax->b['grouplist']),
             )
-            : $DB->safeselect(
+            : $this->database->safeselect(
                 [
                     'can_access_acp',
                     'can_add_comments',
@@ -269,7 +271,7 @@ final class Groups
             );
         $numgroups = 0;
         $grouplist = '';
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             ++$numgroups;
             $perms[$f['id']] = $f;
             $grouplist .= $f['id'] . ',';
@@ -404,19 +406,18 @@ final class Groups
             $gid = false;
         }
 
-        global $JAX,$DB;
         $page = '';
         $e = '';
-        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
-            if (!isset($JAX->p['groupname']) || !$JAX->p['groupname']) {
+        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
+            if (!isset($this->jax->p['groupname']) || !$this->jax->p['groupname']) {
                 $e = 'Group name required!';
-            } elseif (mb_strlen((string) $JAX->p['groupname']) > 250) {
+            } elseif (mb_strlen((string) $this->jax->p['groupname']) > 250) {
                 $e = 'Group name must not exceed 250 characters!';
-            } elseif (mb_strlen((string) $JAX->p['groupicon']) > 250) {
+            } elseif (mb_strlen((string) $this->jax->p['groupicon']) > 250) {
                 $e = 'Group icon must not exceed 250 characters!';
             } elseif (
-                $JAX->p['groupicon']
-                && !$JAX->isurl($JAX->p['groupicon'])
+                $this->jax->p['groupicon']
+                && !$this->jax->isurl($this->jax->p['groupicon'])
             ) {
                 $e = 'Group icon must be a valid image url';
             }
@@ -425,18 +426,18 @@ final class Groups
                 $page .= $this->page->error($e);
             } else {
                 $write = [
-                    'icon' => $JAX->p['groupicon'],
-                    'title' => $JAX->p['groupname'],
+                    'icon' => $this->jax->p['groupicon'],
+                    'title' => $this->jax->p['groupname'],
                 ];
                 if ($gid) {
-                    $DB->safeupdate(
+                    $this->database->safeupdate(
                         'member_groups',
                         $write,
                         'WHERE `id`=?',
-                        $DB->basicvalue($gid),
+                        $this->database->basicvalue($gid),
                     );
                 } else {
-                    $DB->safeinsert(
+                    $this->database->safeinsert(
                         'member_groups',
                         $write,
                     );
@@ -454,22 +455,22 @@ final class Groups
         }
 
         if ($gid) {
-            $result = $DB->safeselect(
+            $result = $this->database->safeselect(
                 ['title', 'icon'],
                 'member_groups',
                 'WHERE `id`=?',
-                $DB->basicvalue($gid),
+                $this->database->basicvalue($gid),
             );
-            $gdata = $DB->arow($result);
-            $DB->disposeresult($result);
+            $gdata = $this->database->arow($result);
+            $this->database->disposeresult($result);
         }
 
         $page .= $this->page->parseTemplate(
             'groups/create.html',
             [
-                'icon_url' => $gid ? $JAX->blockhtml($gdata['icon']) : '',
+                'icon_url' => $gid ? $this->jax->blockhtml($gdata['icon']) : '',
                 'submit' => $gid ? 'Edit' : 'Create',
-                'title' => $gid ? $JAX->blockhtml($gdata['title']) : '',
+                'title' => $gid ? $this->jax->blockhtml($gdata['title']) : '',
             ],
         );
         $this->page->addContentBox(
@@ -482,35 +483,34 @@ final class Groups
 
     public function delete(): void
     {
-        global $DB,$JAX;
         $page = '';
         if (
-            isset($JAX->b['delete'])
-            && is_numeric($JAX->b['delete'])
-            && $JAX->b['delete'] > 5
+            isset($this->jax->b['delete'])
+            && is_numeric($this->jax->b['delete'])
+            && $this->jax->b['delete'] > 5
         ) {
-            $DB->safedelete(
+            $this->database->safedelete(
                 'member_groups',
                 'WHERE `id`=?',
-                $DB->basicvalue($JAX->b['delete']),
+                $this->database->basicvalue($this->jax->b['delete']),
             );
-            $DB->safeupdate(
+            $this->database->safeupdate(
                 'members',
                 [
                     'group_id' => 1,
                 ],
                 'WHERE `group_id`=?',
-                $DB->basicvalue($JAX->b['delete']),
+                $this->database->basicvalue($this->jax->b['delete']),
             );
         }
 
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             ['id', 'title'],
             'member_groups',
             'WHERE `id`>5',
         );
         $found = false;
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             $found = true;
             $page .= $this->page->parseTemplate(
                 'groups/delete.html',

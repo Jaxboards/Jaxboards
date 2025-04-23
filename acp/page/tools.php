@@ -6,6 +6,9 @@ namespace ACP\Page;
 
 use ACP\Page;
 use Jax\Config;
+use Jax\Jax;
+use Jax\Database;
+
 use SplFileObject;
 
 use function array_pop;
@@ -37,12 +40,15 @@ use const SEEK_END;
 
 final readonly class Tools
 {
-    public function __construct(private Config $config, private Page $page) {}
+    public function __construct(
+        private readonly Config $config,
+        private readonly Database $database,
+        private readonly Page $page,
+        private readonly Jax $jax
+    ) {}
 
     public function route(): void
     {
-        global $JAX;
-
         $links = [
             'backup' => 'Backup',
             'files' => 'File Manager',
@@ -70,11 +76,11 @@ final readonly class Tools
             ),
         );
 
-        if (!isset($JAX->b['do'])) {
-            $JAX->b['do'] = null;
+        if (!isset($this->jax->b['do'])) {
+            $this->jax->b['do'] = null;
         }
 
-        match ($JAX->b['do']) {
+        match ($this->jax->b['do']) {
             'backup' => $this->backup(),
             'errorlog' => $this->errorlog(),
             default => $this->filemanager(),
@@ -83,20 +89,19 @@ final readonly class Tools
 
     public function filemanager(): void
     {
-        global $DB,$JAX;
         $page = '';
-        if (isset($JAX->b['delete']) && is_numeric($JAX->b['delete'])) {
-            $result = $DB->safeselect(
+        if (isset($this->jax->b['delete']) && is_numeric($this->jax->b['delete'])) {
+            $result = $this->database->safeselect(
                 [
                     'hash',
                     'name',
                 ],
                 'files',
                 'WHERE `id`=?',
-                $DB->basicvalue($JAX->b['delete']),
+                $this->database->basicvalue($this->jax->b['delete']),
             );
-            $file = $DB->arow($result);
-            $DB->disposeresult($result);
+            $file = $this->database->arow($result);
+            $this->database->disposeresult($result);
             if ($file) {
                 $ext = mb_strtolower(pathinfo((string) $file['name'], PATHINFO_EXTENSION));
                 if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp'])) {
@@ -112,41 +117,41 @@ final readonly class Tools
                         );
                 }
 
-                $DB->safedelete(
+                $this->database->safedelete(
                     'files',
                     'WHERE `id`=?',
-                    $DB->basicvalue($JAX->b['delete']),
+                    $this->database->basicvalue($this->jax->b['delete']),
                 );
             }
         }
 
-        if (isset($JAX->p['dl']) && is_array($JAX->p['dl'])) {
-            foreach ($JAX->p['dl'] as $k => $v) {
+        if (isset($this->jax->p['dl']) && is_array($this->jax->p['dl'])) {
+            foreach ($this->jax->p['dl'] as $k => $v) {
                 if (!ctype_digit((string) $v)) {
                     continue;
                 }
 
-                $DB->safeupdate(
+                $this->database->safeupdate(
                     'files',
                     [
                         'downloads' => $v,
                     ],
                     'WHERE `id`=?',
-                    $DB->basicvalue($k),
+                    $this->database->basicvalue($k),
                 );
             }
 
             $page .= $this->page->success('Changes saved.');
         }
 
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             '`id`,`tid`,`post`',
             'posts',
             "WHERE MATCH (`post`) AGAINST ('attachment') "
             . "AND post LIKE '%[attachment]%'",
         );
         $linkedin = [];
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             preg_match_all(
                 '@\[attachment\](\d+)\[/attachment\]@',
                 (string) $f['post'],
@@ -163,7 +168,7 @@ final readonly class Tools
             }
         }
 
-        $result = $DB->safespecial(
+        $result = $this->database->safespecial(
             <<<'EOT'
                 SELECT
                     f.`id` AS `id`,
@@ -181,9 +186,9 @@ final readonly class Tools
             ,
             ['files', 'members'],
         );
-        echo $DB->error(1);
+        echo $this->database->error(1);
         $table = '';
-        while ($file = $DB->arow($result)) {
+        while ($file = $this->database->arow($result)) {
             $filepieces = explode('.', (string) $file['name']);
             if (count($filepieces) > 1) {
                 $ext = mb_strtolower(array_pop($filepieces));
@@ -198,7 +203,7 @@ final readonly class Tools
                 'tools/file-manager-row.html',
                 [
                     'downloads' => $file['downloads'],
-                    'filesize' => $JAX->filesize($file['size']),
+                    'filesize' => $this->jax->filesize($file['size']),
                     'id' => $file['id'],
                     'linked_in' => isset($linkedin[$file['id']]) && $linkedin[$file['id']]
                         ? implode(', ', $linkedin[$file['id']]) : 'Not linked!',
@@ -220,18 +225,17 @@ final readonly class Tools
 
     public function backup(): void
     {
-        global $JAX,$DB;
-        if (isset($JAX->p['dl']) && $JAX->p['dl']) {
+        if (isset($this->jax->p['dl']) && $this->jax->p['dl']) {
             header('Content-type: text/plain');
             header(
-                'Content-Disposition: attachment;filename="' . $DB->prefix
+                'Content-Disposition: attachment;filename="' . $this->database->prefix
                 . gmdate('Y-m-d_His') . '.sql"',
             );
-            $result = $DB->safequery("SHOW TABLES LIKE '{$DB->prefix}%%'");
-            $tables = $DB->rows($result);
+            $result = $this->database->safequery("SHOW TABLES LIKE '{$this->database->prefix}%%'");
+            $tables = $this->database->rows($result);
             $page = '';
             if ($tables) {
-                echo PHP_EOL . "-- Jaxboards Backup {$DB->prefix} "
+                echo PHP_EOL . "-- Jaxboards Backup {$this->database->prefix} "
                     . gmdate('Y-m-d H:i:s') . PHP_EOL . PHP_EOL;
                 echo 'SET NAMES utf8mb4;' . PHP_EOL;
                 echo "SET time_zone = '+00:00';" . PHP_EOL;
@@ -242,23 +246,23 @@ final readonly class Tools
                     $f[0] = mb_substr(mb_strstr((string) $f[0], '_'), 1);
                     $page .= $f[0];
                     echo PHP_EOL . '-- ' . $f[0] . PHP_EOL . PHP_EOL;
-                    $createtable = $DB->safespecial(
+                    $createtable = $this->database->safespecial(
                         'SHOW CREATE TABLE %t',
                         [$f[0]],
                     );
-                    $thisrow = $DB->row($createtable);
+                    $thisrow = $this->database->row($createtable);
                     if (!$thisrow) {
                         continue;
                     }
 
-                    $table = $DB->ftable($f[0]);
+                    $table = $this->database->ftable($f[0]);
                     echo "DROP TABLE IF EXISTS {$table};" . PHP_EOL;
                     echo array_pop($thisrow) . ';' . PHP_EOL;
-                    $DB->disposeresult($createtable);
+                    $this->database->disposeresult($createtable);
                     // Only time I really want to use *.
-                    $select = $DB->safeselect('*', $f[0]);
-                    while ($row = $DB->arow($select)) {
-                        $insert = $DB->buildInsert($row);
+                    $select = $this->database->safeselect('*', $f[0]);
+                    while ($row = $this->database->arow($select)) {
+                        $insert = $this->database->buildInsert($row);
                         $columns = $insert[0];
                         $values = $insert[1];
                         echo "INSERT INTO {$table} ({$columns}) "

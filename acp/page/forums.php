@@ -6,6 +6,8 @@ namespace ACP\Page;
 
 use ACP\Page;
 use ACP\Page\Forums\RecountStats;
+use Jax\Database;
+use Jax\Jax;
 
 use function array_keys;
 use function array_pop;
@@ -33,8 +35,10 @@ use const PHP_EOL;
 final readonly class Forums
 {
     public function __construct(
-        private Page $page,
-        private RecountStats $recountStats,
+        private readonly Database $database,
+        private readonly Jax $jax,
+        private readonly Page $page,
+        private readonly RecountStats $recountStats,
     ) {}
 
     /**
@@ -46,7 +50,6 @@ final readonly class Forums
      */
     public function mysqltree($tree, $path = '', $order = 0): void
     {
-        global $DB;
         if (!is_array($tree)) {
             return;
         }
@@ -63,7 +66,7 @@ final readonly class Forums
             }
 
             if ($k[0] === 'c') {
-                $DB->safeupdate(
+                $this->database->safeupdate(
                     'categories',
                     [
                         'order' => $order,
@@ -72,7 +75,7 @@ final readonly class Forums
                     $cat,
                 );
             } else {
-                $DB->safeupdate(
+                $this->database->safeupdate(
                     'forums',
                     [
                         'cat_id' => $cat,
@@ -176,8 +179,6 @@ final readonly class Forums
 
     public function route(): void
     {
-        global $JAX;
-
         $links = [
             'create' => 'Create Forum',
             'createc' => 'Create Category',
@@ -205,37 +206,37 @@ final readonly class Forums
             ),
         );
 
-        if (isset($JAX->b['delete']) && $JAX->b['delete']) {
-            if (is_numeric($JAX->b['delete'])) {
-                $this->deleteforum($JAX->b['delete']);
+        if (isset($this->jax->b['delete']) && $this->jax->b['delete']) {
+            if (is_numeric($this->jax->b['delete'])) {
+                $this->deleteforum($this->jax->b['delete']);
 
                 return;
             }
 
-            if (preg_match('@c_(\d+)@', (string) $JAX->b['delete'], $m)) {
+            if (preg_match('@c_(\d+)@', (string) $this->jax->b['delete'], $m)) {
                 $this->deletecategory($m[1]);
 
                 return;
             }
-        } elseif (isset($JAX->b['edit']) && $JAX->b['edit']) {
-            if (is_numeric($JAX->b['edit'])) {
-                $this->createforum($JAX->b['edit']);
+        } elseif (isset($this->jax->b['edit']) && $this->jax->b['edit']) {
+            if (is_numeric($this->jax->b['edit'])) {
+                $this->createforum($this->jax->b['edit']);
 
                 return;
             }
 
-            if (preg_match('@c_(\d+)@', (string) $JAX->b['edit'], $m)) {
+            if (preg_match('@c_(\d+)@', (string) $this->jax->b['edit'], $m)) {
                 $this->createcategory($m[1]);
 
                 return;
             }
         }
 
-        if (!isset($JAX->g['do'])) {
-            $JAX->g['do'] = null;
+        if (!isset($this->jax->g['do'])) {
+            $this->jax->g['do'] = null;
         }
 
-        match ($JAX->g['do']) {
+        match ($this->jax->g['do']) {
             'order' => $this->orderforums(),
             'create' => $this->createforum(),
             'createc' => $this->createcategory(),
@@ -247,7 +248,6 @@ final readonly class Forums
 
     public function orderforums($highlight = 0): void
     {
-        global $DB,$JAX;
         $page = '';
         if ($highlight) {
             $page .= $this->page->success(
@@ -255,10 +255,10 @@ final readonly class Forums
             );
         }
 
-        if (isset($JAX->p['tree']) && $JAX->p['tree']) {
-            $JAX->p['tree'] = json_decode((string) $JAX->p['tree'], true);
-            $data = self::mysqltree($JAX->p['tree']);
-            if ($JAX->g['do'] === 'create') {
+        if (isset($this->jax->p['tree']) && $this->jax->p['tree']) {
+            $this->jax->p['tree'] = json_decode((string) $this->jax->p['tree'], true);
+            $data = self::mysqltree($this->jax->p['tree']);
+            if ($this->jax->g['do'] === 'create') {
                 return;
             }
 
@@ -266,7 +266,7 @@ final readonly class Forums
         }
 
         $forums = [];
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             [
                 'id',
                 'title',
@@ -275,14 +275,14 @@ final readonly class Forums
             'categories',
             'ORDER BY `order`,`id` ASC',
         );
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             $forums['c_' . $f['id']] = ['title' => $f['title']];
             $cats[] = $f['id'];
         }
 
-        $DB->disposeresult($result);
+        $this->database->disposeresult($result);
 
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             [
                 'id',
                 'cat_id',
@@ -310,7 +310,7 @@ final readonly class Forums
             'ORDER BY `order`,`title`',
         );
         $tree = [$result];
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             $forums[$f['id']] = [
                 'mods' => $f['mods'],
                 'title' => $f['title'],
@@ -366,13 +366,12 @@ final readonly class Forums
      */
     public function createforum($fid = 0)
     {
-        global $JAX,$DB;
         $page = '';
         $e = '';
         $forumperms = '';
         $fdata = [];
         if ($fid) {
-            $result = $DB->safeselect(
+            $result = $this->database->safeselect(
                 [
                     'id',
                     'cat_id',
@@ -398,14 +397,14 @@ final readonly class Forums
                 ],
                 'forums',
                 'WHERE `id`=?',
-                $DB->basicvalue($fid),
+                $this->database->basicvalue($fid),
             );
-            $fdata = $DB->arow($result);
-            $DB->disposeresult($result);
+            $fdata = $this->database->arow($result);
+            $this->database->disposeresult($result);
         }
 
-        if (isset($JAX->p['tree'])) {
-            if ($JAX->p['tree']) {
+        if (isset($this->jax->p['tree'])) {
+            if ($this->jax->p['tree']) {
                 $this->orderforums();
             }
 
@@ -414,41 +413,41 @@ final readonly class Forums
 
         // Remove mod from forum.
         if (
-            isset($JAX->b['rmod'])
-            && is_numeric($JAX->b['rmod'])
+            isset($this->jax->b['rmod'])
+            && is_numeric($this->jax->b['rmod'])
             && $fdata['mods']
         ) {
             $exploded = explode(',', (string) $fdata['mods']);
-            unset($exploded[array_search($JAX->b['rmod'], $exploded, true)]);
+            unset($exploded[array_search($this->jax->b['rmod'], $exploded, true)]);
             $fdata['mods'] = implode(',', $exploded);
-            $DB->safeupdate(
+            $this->database->safeupdate(
                 'forums',
                 [
                     'mods' => $fdata['mods'],
                 ],
                 'WHERE `id`=?',
-                $DB->basicvalue($fid),
+                $this->database->basicvalue($fid),
             );
             $this->updateperforummodflag();
             $this->page->location('?act=forums&edit=' . $fid);
         }
 
-        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
+        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
             // Saves all of the data
             // really should be its own function, but I don't care.
             $grouppermsa = [];
             $groupperms = '';
-            $result = $DB->safeselect(
+            $result = $this->database->safeselect(
                 ['id'],
                 'member_groups',
             );
-            while ($f = $DB->arow($result)) {
-                if (!isset($JAX->p['groups'][$f['id']])) {
-                    $JAX->p['groups'][$f['id']] = [];
+            while ($f = $this->database->arow($result)) {
+                if (!isset($this->jax->p['groups'][$f['id']])) {
+                    $this->jax->p['groups'][$f['id']] = [];
                 }
 
                 $options = ['read', 'start', 'reply', 'upload', 'view', 'poll'];
-                $v = $JAX->p['groups'][$f['id']];
+                $v = $this->jax->p['groups'][$f['id']];
                 if (isset($v['global']) && $v['global']) {
                     continue;
                 }
@@ -474,55 +473,55 @@ final readonly class Forums
                 $groupperms .= pack('n*', $k, $v);
             }
 
-            $sub = (int) $JAX->p['show_sub'];
-            if (is_numeric($JAX->p['orderby'])) {
-                $orderby = (int) $JAX->p['orderby'];
+            $sub = (int) $this->jax->p['show_sub'];
+            if (is_numeric($this->jax->p['orderby'])) {
+                $orderby = (int) $this->jax->p['orderby'];
             }
 
-            $result = $DB->safeselect(
+            $result = $this->database->safeselect(
                 ['id'],
                 'categories',
             );
-            $thisrow = $DB->arow($result);
+            $thisrow = $this->database->arow($result);
             $write = [
-                'cat_id' => $JAX->pick(
+                'cat_id' => $this->jax->pick(
                     $fdata['cat_id'] ?? null,
                     array_pop($thisrow),
                 ),
                 'mods' => $fdata['mods'] ?? null,
-                'nocount' => $JAX->p['nocount'] ? 0 : 1,
+                'nocount' => $this->jax->p['nocount'] ? 0 : 1,
                 'orderby' => $orderby > 0 && $orderby <= 5 ? $orderby : 0,
                 'perms' => $groupperms,
-                'redirect' => $JAX->p['redirect'],
-                'show_ledby' => (int) (isset($JAX->p['show_ledby']) && $JAX->p['show_ledby']),
+                'redirect' => $this->jax->p['redirect'],
+                'show_ledby' => (int) (isset($this->jax->p['show_ledby']) && $this->jax->p['show_ledby']),
                 'show_sub' => $sub === 1 || $sub === 2 ? $sub : 0,
-                'subtitle' => $JAX->p['description'],
-                'title' => $JAX->p['title'],
-                'trashcan' => (int) (isset($JAX->p['trashcan']) && $JAX->p['trashcan']),
+                'subtitle' => $this->jax->p['description'],
+                'title' => $this->jax->p['title'],
+                'trashcan' => (int) (isset($this->jax->p['trashcan']) && $this->jax->p['trashcan']),
                 // Handling done below.
             ];
-            $DB->disposeresult($result);
+            $this->database->disposeresult($result);
 
             // Add per-forum moderator.
-            if (is_numeric($JAX->p['modid'])) {
-                $result = $DB->safeselect(
+            if (is_numeric($this->jax->p['modid'])) {
+                $result = $this->database->safeselect(
                     ['id'],
                     'members',
                     'WHERE `id`=?',
-                    $DB->basicvalue($JAX->p['modid']),
+                    $this->database->basicvalue($this->jax->p['modid']),
                 );
-                if ($DB->arow($result)) {
-                    if (!in_array($JAX->p['modid'], isset($fdata['mods']) ? explode(',', $fdata['mods']) : [])) {
+                if ($this->database->arow($result)) {
+                    if (!in_array($this->jax->p['modid'], isset($fdata['mods']) ? explode(',', $fdata['mods']) : [])) {
                         $write['mods'] = isset($fdata['mods'])
                             && $fdata['mods']
-                            ? $fdata['mods'] . ',' . $JAX->p['modid']
-                            : $JAX->p['modid'];
+                            ? $fdata['mods'] . ',' . $this->jax->p['modid']
+                            : $this->jax->p['modid'];
                     }
                 } else {
                     $e = "You tried to add a moderator that doesn't exist!";
                 }
 
-                $DB->disposeresult($result);
+                $this->database->disposeresult($result);
             }
 
             if (!$write['title']) {
@@ -537,7 +536,7 @@ final readonly class Forums
                     && isset($fdata['trashcan'])
                     && $fdata['trashcan'])
                 ) {
-                    $DB->safeupdate(
+                    $this->database->safeupdate(
                         'forums',
                         [
                             'trashcan' => 0,
@@ -546,21 +545,21 @@ final readonly class Forums
                 }
 
                 if (!$fdata) {
-                    $DB->safeinsert(
+                    $this->database->safeinsert(
                         'forums',
                         $write,
                     );
 
-                    return $this->orderforums($DB->insert_id(1));
+                    return $this->orderforums($this->database->insert_id(1));
                 }
 
-                $DB->safeupdate(
+                $this->database->safeupdate(
                     'forums',
                     $write,
                     'WHERE `id`=?',
                     $fid,
                 );
-                if ($JAX->p['modid']) {
+                if ($this->jax->p['modid']) {
                     $this->updateperforummodflag();
                 }
 
@@ -579,7 +578,7 @@ final readonly class Forums
             }
         }
 
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             [
                 'can_access_acp',
                 'can_add_comments',
@@ -617,11 +616,11 @@ final readonly class Forums
         );
 
         $groupperms = '';
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             $global = !isset($perms[$f['id']]);
             if (!$global) {
                 $p = isset($perms[$f['id']])
-                    ? $JAX->parseperms($perms[$f['id']])
+                    ? $this->jax->parseperms($perms[$f['id']])
                     : null;
             }
 
@@ -713,27 +712,27 @@ final readonly class Forums
         $page .= $this->page->parseTemplate(
             'forums/create-forum.html',
             [
-                'description' => isset($fdata['subtitle']) ? $JAX->blockhtml($fdata['subtitle']) : '',
+                'description' => isset($fdata['subtitle']) ? $this->jax->blockhtml($fdata['subtitle']) : '',
                 'no_count' => isset($fdata['nocount']) && $fdata['nocount']
                 ? '' : ' checked="checked"',
                 'order_by_options' => $orderByOptions,
-                'redirect_url' => isset($fdata['redirect']) ? $JAX->blockhtml($fdata['redirect']) : '',
+                'redirect_url' => isset($fdata['redirect']) ? $this->jax->blockhtml($fdata['redirect']) : '',
                 'subforum_options' => $subforumOptions,
-                'title' => isset($fdata['title']) ? $JAX->blockhtml($fdata['title']) : '',
+                'title' => isset($fdata['title']) ? $this->jax->blockhtml($fdata['title']) : '',
                 'trashcan' => isset($fdata['trashcan']) && $fdata['trashcan']
                 ? ' checked="checked"' : '',
             ],
         ) . PHP_EOL;
 
         if (isset($fdata['mods']) && $fdata['mods']) {
-            $result = $DB->safeselect(
+            $result = $this->database->safeselect(
                 ['display_name', 'id'],
                 'members',
                 'WHERE `id` IN ?',
                 explode(',', (string) $fdata['mods']),
             );
             $modList = '';
-            while ($f = $DB->arow($result)) {
+            while ($f = $this->database->arow($result)) {
                 $modList .= $this->page->parseTemplate(
                     'forums/create-forum-moderators-mod.html',
                     [
@@ -765,7 +764,7 @@ final readonly class Forums
 
         $this->page->addContentBox(
             ($fid ? 'Edit' : 'Create') . ' Forum'
-            . ($fid ? ' - ' . $JAX->blockhtml($fdata['title']) : ''),
+            . ($fid ? ' - ' . $this->jax->blockhtml($fdata['title']) : ''),
             $page,
         );
         $this->page->addContentBox('Moderators', $moderators);
@@ -774,27 +773,26 @@ final readonly class Forums
 
     public function deleteforum($id)
     {
-        global $JAX,$DB;
-        if (isset($JAX->p['submit']) && $JAX->p['submit'] === 'Cancel') {
+        if (isset($this->jax->p['submit']) && $this->jax->p['submit'] === 'Cancel') {
             $this->page->location('?act=forums&do=order');
-        } elseif (isset($JAX->p['submit']) && $JAX->p['submit']) {
-            $DB->safedelete(
+        } elseif (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
+            $this->database->safedelete(
                 'forums',
                 'WHERE `id`=?',
-                $DB->basicvalue($id),
+                $this->database->basicvalue($id),
             );
-            if ($JAX->p['moveto']) {
-                $DB->safeupdate(
+            if ($this->jax->p['moveto']) {
+                $this->database->safeupdate(
                     'topics',
                     [
-                        'fid' => $JAX->p['moveto'],
+                        'fid' => $this->jax->p['moveto'],
                     ],
                     ' WHERE `fid`=?',
-                    $DB->basicvalue($id),
+                    $this->database->basicvalue($id),
                 );
-                $topics = $DB->affected_rows(1);
+                $topics = $this->database->affected_rows(1);
             } else {
-                $result = $DB->safespecial(
+                $result = $this->database->safespecial(
                     <<<'EOT'
                         DELETE
                         FROM %t
@@ -806,21 +804,21 @@ final readonly class Forums
                         EOT
                     ,
                     ['posts', 'topics'],
-                    $DB->basicvalue($id),
+                    $this->database->basicvalue($id),
                 );
 
-                $posts = $DB->affected_rows(1);
-                $DB->safedelete(
+                $posts = $this->database->affected_rows(1);
+                $this->database->safedelete(
                     'topics',
                     'WHERE `fid`=?',
-                    $DB->basicvalue($id),
+                    $this->database->basicvalue($id),
                 );
-                $topics = $DB->affected_rows(1);
+                $topics = $this->database->affected_rows(1);
             }
 
             $page = '';
             if ($topics > 0) {
-                $page .= ($JAX->p['moveto'] ? 'Moved' : 'Deleted')
+                $page .= ($this->jax->p['moveto'] ? 'Moved' : 'Deleted')
                     . " {$topics} topics" . (isset($posts) && $posts
                     ? " and {$posts} posts" : '');
             }
@@ -838,7 +836,7 @@ final readonly class Forums
             );
         }
 
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             [
                 'cat_id',
                 'id',
@@ -864,10 +862,10 @@ final readonly class Forums
             ],
             'forums',
             'WHERE `id`=?',
-            $DB->basicvalue($id),
+            $this->database->basicvalue($id),
         );
-        $fdata = $DB->arow($result);
-        $DB->disposeresult($result);
+        $fdata = $this->database->arow($result);
+        $this->database->disposeresult($result);
 
         if (!$fdata) {
             return $this->page->addContentBox(
@@ -876,7 +874,7 @@ final readonly class Forums
             );
         }
 
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             [
                 'cat_id',
                 'id',
@@ -903,7 +901,7 @@ final readonly class Forums
             'forums',
         );
         $forums = '';
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             $forums .= $this->page->parseTemplate(
                 'select-option.html',
                 [
@@ -929,51 +927,50 @@ final readonly class Forums
 
     public function createcategory($cid = false): void
     {
-        global $JAX,$DB;
         $page = '';
         $cdata = [];
-        if (!$cid && isset($JAX->p['cat_id'])) {
-            $cid = (int) $JAX->p['cat_id'];
+        if (!$cid && isset($this->jax->p['cat_id'])) {
+            $cid = (int) $this->jax->p['cat_id'];
         }
 
         if ($cid) {
-            $result = $DB->safeselect(
+            $result = $this->database->safeselect(
                 ['id', 'title'],
                 'categories',
                 'WHERE `id`=?',
-                $DB->basicvalue($cid),
+                $this->database->basicvalue($cid),
             );
-            $cdata = $DB->arow($result);
-            $DB->disposeresult($result);
+            $cdata = $this->database->arow($result);
+            $this->database->disposeresult($result);
         }
 
-        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
+        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
             if (
-                trim((string) $JAX->p['cat_name']) === ''
-                || trim((string) $JAX->p['cat_name']) === '0'
+                trim((string) $this->jax->p['cat_name']) === ''
+                || trim((string) $this->jax->p['cat_name']) === '0'
             ) {
                 $page .= $this->page->error('All fields required');
             } else {
-                $data = ['title' => $JAX->p['cat_name']];
+                $data = ['title' => $this->jax->p['cat_name']];
                 if (!empty($cdata)) {
-                    $DB->safeupdate(
+                    $this->database->safeupdate(
                         'categories',
                         $data,
                         'WHERE `id`=?',
-                        $DB->basicvalue($cid),
+                        $this->database->basicvalue($cid),
                     );
                     $page .= $this->page->success(
                         'Category edited.',
                     );
                 } else {
-                    $DB->safeinsert(
+                    $this->database->safeinsert(
                         'categories',
                         $data,
                     );
                     $page .= $this->page->success(
                         'Category created.',
                     );
-                    $data['id'] = (int) $DB->insert_id();
+                    $data['id'] = (int) $this->database->insert_id();
                 }
 
                 $cdata = $data;
@@ -982,7 +979,7 @@ final readonly class Forums
 
         $categoryTitle = '';
         if (isset($cdata['title'])) {
-            $categoryTitle = $JAX->blockhtml($cdata['title']);
+            $categoryTitle = $this->jax->blockhtml($cdata['title']);
         }
 
         $this->page->addContentBox(
@@ -1000,16 +997,15 @@ final readonly class Forums
 
     public function deletecategory($id): void
     {
-        global $DB,$JAX;
         $page = '';
         $e = '';
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             ['id', 'title'],
             'categories',
         );
         $categories = [];
         $cattitle = false;
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             if ($f['id'] !== $id) {
                 $categories[$f['id']] = $f['title'];
             } else {
@@ -1021,22 +1017,22 @@ final readonly class Forums
             $e = "The category you're trying to delete does not exist.";
         }
 
-        if (!$e && isset($JAX->p['submit']) && $JAX->p['submit']) {
-            if (!isset($categories[$JAX->p['moveto']])) {
+        if (!$e && isset($this->jax->p['submit']) && $this->jax->p['submit']) {
+            if (!isset($categories[$this->jax->p['moveto']])) {
                 $e = 'Invalid category to move forums to.';
             } else {
-                $DB->safeupdate(
+                $this->database->safeupdate(
                     'forums',
                     [
-                        'cat_id' => $JAX->p['moveto'],
+                        'cat_id' => $this->jax->p['moveto'],
                     ],
                     'WHERE `cat_id`=?',
-                    $DB->basicvalue($id),
+                    $this->database->basicvalue($id),
                 );
-                $DB->safedelete(
+                $this->database->safedelete(
                     'categories',
                     'WHERE `id`=?',
-                    $DB->basicvalue($id),
+                    $this->database->basicvalue($id),
                 );
                 $page .= $this->page->success('Category deleted!');
             }
@@ -1079,20 +1075,19 @@ final readonly class Forums
      */
     public function updateperforummodflag(): void
     {
-        global $DB;
-        $DB->safeupdate(
+        $this->database->safeupdate(
             'members',
             [
                 'mod' => 0,
             ],
         );
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             ['mods'],
             'forums',
         );
         // Build an array of mods.
         $mods = [];
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             foreach (explode(',', (string) $f['mods']) as $v) {
                 if ($v === '') {
                     continue;
@@ -1107,7 +1102,7 @@ final readonly class Forums
         }
 
         // Update.
-        $DB->safeupdate(
+        $this->database->safeupdate(
             'members',
             [
                 'mod' => 1,

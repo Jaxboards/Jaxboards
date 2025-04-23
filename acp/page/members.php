@@ -7,6 +7,7 @@ namespace ACP\Page;
 use ACP\Page;
 use Jax\Config;
 use Jax\Jax;
+use Jax\Database;
 
 use function array_pop;
 use function count;
@@ -39,16 +40,15 @@ final readonly class Members
 {
     public const DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
 
-    public function __construct(private Config $config, private Page $page) {}
+    public function __construct(private Config $config, private Page $page, private Database $database, private Jax $jax) {}
 
     public function route(): void
     {
-        global $JAX;
-        if (!isset($JAX->b['do'])) {
-            $JAX->b['do'] = null;
+        if (!isset($this->jax->b['do'])) {
+            $this->jax->b['do'] = null;
         }
 
-        match ($JAX->b['do']) {
+        match ($this->jax->b['do']) {
             'merge' => $this->merge(),
             'edit' => $this->editmem(),
             'delete' => $this->deletemem(),
@@ -100,9 +100,7 @@ final readonly class Members
 
     public function showmain(): void
     {
-        global $DB,$JAX;
-
-        $result = $DB->safespecial(
+        $result = $this->database->safespecial(
             <<<'EOT'
                 SELECT m.`id` AS `id`,m.`avatar` AS `avatar`,
                     m.`display_name` AS `display_name`,m.`group_id` AS `group_id`,
@@ -116,11 +114,11 @@ final readonly class Members
             ['members', 'member_groups'],
         );
         $rows = '';
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             $rows .= $this->page->parseTemplate(
                 'members/show-main-row.html',
                 [
-                    'avatar_url' => $JAX->pick(
+                    'avatar_url' => $this->jax->pick(
                         $f['avatar'],
                         self::DEFAULT_AVATAR,
                     ),
@@ -144,34 +142,33 @@ final readonly class Members
 
     public function editmem()
     {
-        global $JAX,$DB;
-        $userData = $DB->getUser();
+        $userData = $this->database->getUser();
         $page = '';
         if (
-            (isset($JAX->b['mid']) && $JAX->b['mid'])
-            || (isset($JAX->p['submit']) && $JAX->p['submit'])
+            (isset($this->jax->b['mid']) && $this->jax->b['mid'])
+            || (isset($this->jax->p['submit']) && $this->jax->p['submit'])
         ) {
             if (
-                isset($JAX->b['mid'])
-                && $JAX->b['mid']
-                && is_numeric($JAX->b['mid'])
+                isset($this->jax->b['mid'])
+                && $this->jax->b['mid']
+                && is_numeric($this->jax->b['mid'])
             ) {
-                $result = $DB->safeselect(
+                $result = $this->database->safeselect(
                     ['group_id'],
                     'members',
                     'WHERE `id`=?',
-                    $DB->basicvalue($JAX->b['mid']),
+                    $this->database->basicvalue($this->jax->b['mid']),
                 );
-                $data = $DB->arow($result);
-                $DB->disposeresult($result);
-                if (isset($JAX->p['savedata']) && $JAX->p['savedata']) {
+                $data = $this->database->arow($result);
+                $this->database->disposeresult($result);
+                if (isset($this->jax->p['savedata']) && $this->jax->p['savedata']) {
                     if (
                         $data['group_id'] !== 2 || $userData['id'] === 1
                     ) {
                         $write = [];
-                        if ($JAX->p['password']) {
+                        if ($this->jax->p['password']) {
                             $write['pass'] = password_hash(
-                                (string) $JAX->p['password'],
+                                (string) $this->jax->p['password'],
                                 PASSWORD_DEFAULT,
                             );
                         }
@@ -202,23 +199,23 @@ final readonly class Members
                             'group_id',
                         ];
                         foreach ($fields as $field) {
-                            if (!isset($JAX->p[$field])) {
+                            if (!isset($this->jax->p[$field])) {
                                 continue;
                             }
 
-                            $write[$field] = $JAX->p[$field];
+                            $write[$field] = $this->jax->p[$field];
                         }
 
                         // Make it so root admins can't get out of admin.
-                        if ($JAX->b['mid'] === 1) {
+                        if ($this->jax->b['mid'] === 1) {
                             $write['group_id'] = 2;
                         }
 
-                        $DB->safeupdate(
+                        $this->database->safeupdate(
                             'members',
                             $write,
                             'WHERE `id`=?',
-                            $DB->basicvalue($JAX->b['mid']),
+                            $this->database->basicvalue($this->jax->b['mid']),
                         );
                         $page = $this->page->success('Profile data saved');
                     } else {
@@ -229,7 +226,7 @@ final readonly class Members
                     }
                 }
 
-                $result = $DB->safeselect(
+                $result = $this->database->safeselect(
                     [
                         'about',
                         'avatar',
@@ -279,10 +276,10 @@ final readonly class Members
                     ],
                     'members',
                     'WHERE `id`=?',
-                    $DB->basicvalue($JAX->b['mid']),
+                    $this->database->basicvalue($this->jax->b['mid']),
                 );
             } else {
-                $result = $DB->safeselect(
+                $result = $this->database->safeselect(
                     [
                         'about',
                         'avatar',
@@ -329,12 +326,12 @@ final readonly class Members
                     ],
                     'members',
                     'WHERE `display_name` LIKE ?',
-                    $DB->basicvalue($JAX->p['name'] . '%'),
+                    $this->database->basicvalue($this->jax->p['name'] . '%'),
                 );
             }
 
             $data = [];
-            while ($f = $DB->arow($result)) {
+            while ($f = $this->database->arow($result)) {
                 $data[] = $f;
             }
 
@@ -344,7 +341,7 @@ final readonly class Members
                     $page .= $this->page->parseTemplate(
                         'members/edit-select-option.html',
                         [
-                            'avatar_url' => $JAX->pick(
+                            'avatar_url' => $this->jax->pick(
                                 $v['avatar'],
                                 self::DEFAULT_AVATAR,
                             ),
@@ -421,35 +418,34 @@ final readonly class Members
 
     public function preregister(): void
     {
-        global $JAX,$DB;
         $page = '';
         $e = '';
-        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
+        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
             if (
-                !$JAX->p['username']
-                || !$JAX->p['displayname']
-                || !$JAX->p['pass']
+                !$this->jax->p['username']
+                || !$this->jax->p['displayname']
+                || !$this->jax->p['pass']
             ) {
                 $e = 'All fields required.';
             } elseif (
-                mb_strlen((string) $JAX->p['username']) > 30
-                || $JAX->p['displayname'] > 30
+                mb_strlen((string) $this->jax->p['username']) > 30
+                || $this->jax->p['displayname'] > 30
             ) {
                 $e = 'Display name and username must be under 30 characters.';
             } else {
-                $result = $DB->safeselect(
+                $result = $this->database->safeselect(
                     ['name', 'display_name'],
                     'members',
                     'WHERE `name`=? OR `display_name`=?',
-                    $DB->basicvalue($JAX->p['username']),
-                    $DB->basicvalue($JAX->p['displayname']),
+                    $this->database->basicvalue($this->jax->p['username']),
+                    $this->database->basicvalue($this->jax->p['displayname']),
                 );
-                if ($f = $DB->arow($result)) {
-                    $e = 'That ' . ($f['name'] === $JAX->p['username']
+                if ($f = $this->database->arow($result)) {
+                    $e = 'That ' . ($f['name'] === $this->jax->p['username']
                         ? 'username' : 'display name') . ' is already taken';
                 }
 
-                $DB->disposeresult($result);
+                $this->database->disposeresult($result);
             }
 
             if ($e !== '' && $e !== '0') {
@@ -457,19 +453,19 @@ final readonly class Members
             } else {
                 $member = [
                     'birthdate' => '0000-00-00',
-                    'display_name' => $JAX->p['displayname'],
+                    'display_name' => $this->jax->p['displayname'],
                     'group_id' => 1,
                     'last_visit' => gmdate('Y-m-d H:i:s'),
-                    'name' => $JAX->p['username'],
+                    'name' => $this->jax->p['username'],
                     'pass' => password_hash(
-                        (string) $JAX->p['pass'],
+                        (string) $this->jax->p['pass'],
                         PASSWORD_DEFAULT,
                     ),
                     'posts' => 0,
                 ];
-                $result = $DB->safeinsert('members', $member);
-                $error = $DB->error();
-                $DB->disposeresult($result);
+                $result = $this->database->safeinsert('members', $member);
+                $error = $this->database->error();
+                $this->database->disposeresult($result);
                 if (!$error) {
                     $page .= $this->page->success('Member registered.');
                 } else {
@@ -489,14 +485,13 @@ final readonly class Members
 
     public function getGroups($group_id = 0): ?string
     {
-        global $DB;
         $page = '';
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             ['id', 'title'],
             'member_groups',
             'ORDER BY `title` DESC',
         );
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             $page .= $this->page->parseTemplate(
                 'select-option.html',
                 [
@@ -517,34 +512,33 @@ final readonly class Members
 
     public function merge(): void
     {
-        global $JAX,$DB;
         $page = '';
         $e = '';
-        if (!isset($JAX->p['submit'])) {
-            $JAX->p['submit'] = false;
+        if (!isset($this->jax->p['submit'])) {
+            $this->jax->p['submit'] = false;
         }
 
-        if ($JAX->p['submit']) {
-            if (!$JAX->p['mid1'] || !$JAX->p['mid2']) {
+        if ($this->jax->p['submit']) {
+            if (!$this->jax->p['mid1'] || !$this->jax->p['mid2']) {
                 $e = 'All fields are required';
             } elseif (
-                !is_numeric($JAX->p['mid1'])
-                || !is_numeric($JAX->p['mid2'])
+                !is_numeric($this->jax->p['mid1'])
+                || !is_numeric($this->jax->p['mid2'])
             ) {
                 $e = 'An error occurred in processing your request';
-            } elseif ($JAX->p['mid1'] === $JAX->p['mid2']) {
+            } elseif ($this->jax->p['mid1'] === $this->jax->p['mid2']) {
                 $e = "Can't merge a member with her/himself";
             }
 
             if ($e !== '' && $e !== '0') {
                 $page .= $this->page->error($e);
             } else {
-                $mid1 = $DB->basicvalue($JAX->p['mid1']);
-                $mid1int = $JAX->p['mid1'];
-                $mid2 = $JAX->p['mid2'];
+                $mid1 = $this->database->basicvalue($this->jax->p['mid1']);
+                $mid1int = $this->jax->p['mid1'];
+                $mid2 = $this->jax->p['mid2'];
 
                 // Files.
-                $DB->safeupdate(
+                $this->database->safeupdate(
                     'files',
                     [
                         'uid' => $mid2,
@@ -553,7 +547,7 @@ final readonly class Members
                     $mid1,
                 );
                 // PMs.
-                $DB->safeupdate(
+                $this->database->safeupdate(
                     'messages',
                     [
                         'to' => $mid2,
@@ -561,7 +555,7 @@ final readonly class Members
                     'WHERE `to`=?',
                     $mid1,
                 );
-                $DB->safeupdate(
+                $this->database->safeupdate(
                     'messages',
                     [
                         'from' => $mid2,
@@ -570,7 +564,7 @@ final readonly class Members
                     $mid1,
                 );
                 // Posts.
-                $DB->safeupdate(
+                $this->database->safeupdate(
                     'posts',
                     [
                         'auth_id' => $mid2,
@@ -579,7 +573,7 @@ final readonly class Members
                     $mid1,
                 );
                 // Profile comments.
-                $DB->safeupdate(
+                $this->database->safeupdate(
                     'profile_comments',
                     [
                         'to' => $mid2,
@@ -587,7 +581,7 @@ final readonly class Members
                     'WHERE `to`=?',
                     $mid1,
                 );
-                $DB->safeupdate(
+                $this->database->safeupdate(
                     'profile_comments',
                     [
                         'from' => $mid2,
@@ -596,7 +590,7 @@ final readonly class Members
                     $mid1,
                 );
                 // Topics.
-                $DB->safeupdate(
+                $this->database->safeupdate(
                     'topics',
                     [
                         'auth_id' => $mid2,
@@ -604,7 +598,7 @@ final readonly class Members
                     'WHERE `auth_id`=?',
                     $mid1,
                 );
-                $DB->safeupdate(
+                $this->database->safeupdate(
                     'topics',
                     [
                         'lp_uid' => $mid2,
@@ -614,7 +608,7 @@ final readonly class Members
                 );
 
                 // Forums.
-                $DB->safeupdate(
+                $this->database->safeupdate(
                     'forums',
                     [
                         'lp_uid' => $mid2,
@@ -624,7 +618,7 @@ final readonly class Members
                 );
 
                 // Shouts.
-                $DB->safeupdate(
+                $this->database->safeupdate(
                     'shouts',
                     [
                         'uid' => $mid2,
@@ -634,7 +628,7 @@ final readonly class Members
                 );
 
                 // Session.
-                $DB->safeupdate(
+                $this->database->safeupdate(
                     'session',
                     [
                         'uid' => $mid2,
@@ -644,17 +638,17 @@ final readonly class Members
                 );
 
                 // Sum post count on account being merged into.
-                $result = $DB->safeselect(
+                $result = $this->database->safeselect(
                     ['id', 'posts'],
                     'members',
                     'WHERE `id`=?',
                     $mid1,
                 );
-                $posts = $DB->arow($result);
-                $DB->disposeresult($result);
+                $posts = $this->database->arow($result);
+                $this->database->disposeresult($result);
                 $posts = $posts ? $posts['posts'] : 0;
 
-                $DB->safespecial(
+                $this->database->safespecial(
                     'UPDATE %t SET `posts` = `posts` + ? WHERE `id`=?',
                     ['members'],
                     $posts,
@@ -662,10 +656,10 @@ final readonly class Members
                 );
 
                 // Delete the account.
-                $DB->safedelete('members', 'WHERE `id`=?', $mid1);
+                $this->database->safedelete('members', 'WHERE `id`=?', $mid1);
 
                 // Update stats.
-                $DB->safespecial(
+                $this->database->safespecial(
                     <<<'EOT'
                         UPDATE %t
                         SET `members` = `members` - 1,
@@ -690,34 +684,33 @@ final readonly class Members
 
     public function deletemem(): void
     {
-        global $JAX,$DB;
         $page = '';
         $e = '';
-        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
-            if (!$JAX->p['mid']) {
+        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
+            if (!$this->jax->p['mid']) {
                 $e = 'All fields are required';
-            } elseif (!is_numeric($JAX->p['mid'])) {
+            } elseif (!is_numeric($this->jax->p['mid'])) {
                 $e = 'An error occurred in processing your request';
             }
 
             if ($e !== '' && $e !== '0') {
                 $page .= $this->page->error($e);
             } else {
-                $mid = $DB->basicvalue($JAX->p['mid']);
+                $mid = $this->database->basicvalue($this->jax->p['mid']);
 
                 // PMs.
-                $DB->safedelete('messages', 'WHERE `to`=?', $mid);
-                $DB->safedelete('messages', 'WHERE `from`=?', $mid);
+                $this->database->safedelete('messages', 'WHERE `to`=?', $mid);
+                $this->database->safedelete('messages', 'WHERE `from`=?', $mid);
                 // Posts.
-                $DB->safedelete('posts', 'WHERE `auth_id`=?', $mid);
+                $this->database->safedelete('posts', 'WHERE `auth_id`=?', $mid);
                 // Profile comments.
-                $DB->safedelete('profile_comments', 'WHERE `to`=?', $mid);
-                $DB->safedelete('profile_comments', 'WHERE `from`=?', $mid);
+                $this->database->safedelete('profile_comments', 'WHERE `to`=?', $mid);
+                $this->database->safedelete('profile_comments', 'WHERE `from`=?', $mid);
                 // Topics.
-                $DB->safedelete('topics', 'WHERE `auth_id`=?', $mid);
+                $this->database->safedelete('topics', 'WHERE `auth_id`=?', $mid);
 
                 // Forums.
-                $DB->safeupdate(
+                $this->database->safeupdate(
                     'forums',
                     [
                         'lp_date' => '0000-00-00 00:00:00',
@@ -730,18 +723,18 @@ final readonly class Members
                 );
 
                 // Shouts.
-                $DB->safedelete('shouts', 'WHERE `uid`=?', $mid);
+                $this->database->safedelete('shouts', 'WHERE `uid`=?', $mid);
 
                 // Session.
-                $DB->safedelete('session', 'WHERE `uid`=?', $mid);
+                $this->database->safedelete('session', 'WHERE `uid`=?', $mid);
 
                 // Delete the account.
-                $DB->safedelete('members', 'WHERE `id`=?', $mid);
+                $this->database->safedelete('members', 'WHERE `id`=?', $mid);
 
-                $DB->fixAllForumLastPosts();
+                $this->database->fixAllForumLastPosts();
 
                 // Update stats.
-                $DB->safespecial(
+                $this->database->safespecial(
                     <<<'EOT'
                         UPDATE %t
                         SET `members` = `members` - 1,
@@ -768,9 +761,8 @@ final readonly class Members
 
     public function ipbans(): void
     {
-        global $JAX;
-        if (isset($JAX->p['ipbans'])) {
-            $data = explode(PHP_EOL, $JAX->p['ipbans']);
+        if (isset($this->jax->p['ipbans'])) {
+            $data = explode(PHP_EOL, $this->jax->p['ipbans']);
             foreach ($data as $k => $v) {
                 $iscomment = false;
                 // Check to see if each line is an ip, if it isn't,
@@ -886,17 +878,16 @@ final readonly class Members
 
     public function massmessage(): void
     {
-        global $JAX,$DB;
-        $userData = $DB->getUser();
+        $userData = $this->database->getUser();
         $page = '';
-        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
+        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
             if (
-                !trim((string) $JAX->p['title'])
-                || !trim((string) $JAX->p['message'])
+                !trim((string) $this->jax->p['title'])
+                || !trim((string) $this->jax->p['message'])
             ) {
                 $page .= $this->page->error('All fields required!');
             } else {
-                $q = $DB->safeselect(
+                $q = $this->database->safeselect(
                     ['id'],
                     'members',
                     'WHERE (?-UNIX_TIMESTAMP(`last_visit`))<?',
@@ -904,8 +895,8 @@ final readonly class Members
                     60 * 60 * 24 * 31 * 6,
                 );
                 $num = 0;
-                while ($f = $DB->arow($q)) {
-                    $DB->safeinsert(
+                while ($f = $this->database->arow($q)) {
+                    $this->database->safeinsert(
                         'messages',
                         [
                             'date' => gmdate('Y-m-d H:i:s'),
@@ -913,9 +904,9 @@ final readonly class Members
                             'del_sender' => 0,
                             'flag' => 0,
                             'from' => $userData['id'],
-                            'message' => $JAX->p['message'],
+                            'message' => $this->jax->p['message'],
                             'read' => 0,
-                            'title' => $JAX->p['title'],
+                            'title' => $this->jax->p['title'],
                             'to' => $f['id'],
                         ],
                     );
@@ -937,7 +928,6 @@ final readonly class Members
 
     public function validation(): void
     {
-        global $DB, $JAX;
         if (isset($_POST['submit1'])) {
             $this->config->write(
                 [
@@ -957,17 +947,17 @@ final readonly class Members
         $this->page->addContentBox('Enable Member Validation', $page);
 
         if (isset($_POST['mid']) && $_POST['action'] === 'Allow') {
-            $DB->safeupdate(
+            $this->database->safeupdate(
                 'members',
                 [
                     'group_id' => 1,
                 ],
                 'WHERE `id`=?',
-                $DB->basicvalue($_POST['mid']),
+                $this->database->basicvalue($_POST['mid']),
             );
         }
 
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             [
                 'display_name',
                 'email',
@@ -979,7 +969,7 @@ final readonly class Members
             'WHERE `group_id`=5',
         );
         $page = '';
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             $page .= $this->page->parseTemplate(
                 'members/validation-list-row.html',
                 [

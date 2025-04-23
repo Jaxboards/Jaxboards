@@ -6,6 +6,8 @@ namespace ACP\Page;
 
 use ACP\Page;
 use Jax\Config;
+use Jax\Jax;
+use Jax\Database;
 
 use function array_key_exists;
 use function closedir;
@@ -43,13 +45,13 @@ final class Themes
 
     public function __construct(
         private readonly Config $config,
-        private readonly Page $page,
+        private readonly Database $database,
+        private readonly Jax $jax,
+        private readonly Page $page
     ) {}
 
     public function route(): void
     {
-        global $JAX;
-
         $this->WRAPPERS_PATH = BOARDPATH . 'Wrappers/';
 
         if (!defined('DTHEMEPATH')) {
@@ -80,16 +82,16 @@ final class Themes
             ),
         );
 
-        if (isset($JAX->g['editcss']) && $JAX->g['editcss']) {
-            $this->editcss($JAX->g['editcss']);
-        } elseif (isset($JAX->g['editwrapper']) && $JAX->g['editwrapper']) {
-            $this->editwrapper($JAX->g['editwrapper']);
+        if (isset($this->jax->g['editcss']) && $this->jax->g['editcss']) {
+            $this->editcss($this->jax->g['editcss']);
+        } elseif (isset($this->jax->g['editwrapper']) && $this->jax->g['editwrapper']) {
+            $this->editwrapper($this->jax->g['editwrapper']);
         } elseif (
-            isset($JAX->g['deleteskin'])
-            && is_numeric($JAX->g['deleteskin'])
+            isset($this->jax->g['deleteskin'])
+            && is_numeric($this->jax->g['deleteskin'])
         ) {
-            $this->deleteskin($JAX->g['deleteskin']);
-        } elseif (isset($JAX->g['do']) && $JAX->g['do'] === 'create') {
+            $this->deleteskin($this->jax->g['deleteskin']);
+        } elseif (isset($this->jax->g['do']) && $this->jax->g['do'] === 'create') {
             $this->createskin();
         } else {
             $this->showskinindex();
@@ -122,17 +124,16 @@ final class Themes
 
     public function showskinindex(): void
     {
-        global $DB,$JAX;
         $errorskins = '';
         $errorwrapper = '';
 
-        if (isset($JAX->g['deletewrapper']) && $JAX->g['deletewrapper']) {
-            $wrapperPath = $this->WRAPPERS_PATH . $JAX->g['deletewrapper'] . '.html';
+        if (isset($this->jax->g['deletewrapper']) && $this->jax->g['deletewrapper']) {
+            $wrapperPath = $this->WRAPPERS_PATH . $this->jax->g['deletewrapper'] . '.html';
             if (
-                !preg_match('@[^\w ]@', (string) $JAX->g['deletewrapper'])
+                !preg_match('@[^\w ]@', (string) $this->jax->g['deletewrapper'])
                 && file_exists($wrapperPath)
             ) {
-                unlink($this->WRAPPERS_PATH . $JAX->g['deletewrapper'] . '.html');
+                unlink($this->WRAPPERS_PATH . $this->jax->g['deletewrapper'] . '.html');
                 $this->page->location('?act=themes');
             } else {
                 $errorwrapper
@@ -140,14 +141,14 @@ final class Themes
             }
         }
 
-        if (isset($JAX->p['newwrapper']) && $JAX->p['newwrapper']) {
+        if (isset($this->jax->p['newwrapper']) && $this->jax->p['newwrapper']) {
             $newWrapperPath
-                = $this->WRAPPERS_PATH . $JAX->p['newwrapper'] . '.html';
-            if (preg_match('@[^\w ]@', (string) $JAX->p['newwrapper'])) {
+                = $this->WRAPPERS_PATH . $this->jax->p['newwrapper'] . '.html';
+            if (preg_match('@[^\w ]@', (string) $this->jax->p['newwrapper'])) {
                 $errorwrapper
                     = 'Wrapper name must consist of letters, numbers, '
                     . 'spaces, and underscore.';
-            } elseif (mb_strlen((string) $JAX->p['newwrapper']) > 50) {
+            } elseif (mb_strlen((string) $this->jax->p['newwrapper']) > 50) {
                 $errorwrapper = 'Wrapper name must be less than 50 characters.';
             } elseif (file_exists($newWrapperPath)) {
                 $errorwrapper = 'That wrapper already exists.';
@@ -170,29 +171,29 @@ final class Themes
         // Make an array of wrappers.
         $wrappers = $this->getwrappers();
 
-        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
+        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
             // Update wrappers/hidden status.
-            if (!isset($JAX->p['hidden'])) {
-                $JAX->p['hidden'] = [];
+            if (!isset($this->jax->p['hidden'])) {
+                $this->jax->p['hidden'] = [];
             }
 
             if (
-                array_key_exists('wrapper', $JAX->p)
-                && is_array($JAX->p['wrapper'])
+                array_key_exists('wrapper', $this->jax->p)
+                && is_array($this->jax->p['wrapper'])
             ) {
-                foreach ($JAX->p['wrapper'] as $k => $v) {
-                    if (!isset($JAX->p['hidden'][$k])) {
-                        $JAX->p['hidden'][$k] = false;
+                foreach ($this->jax->p['wrapper'] as $k => $v) {
+                    if (!isset($this->jax->p['hidden'][$k])) {
+                        $this->jax->p['hidden'][$k] = false;
                     }
 
                     if ($v && !in_array($v, $wrappers)) {
                         continue;
                     }
 
-                    $DB->safeupdate(
+                    $this->database->safeupdate(
                         'skins',
                         [
-                            'hidden' => $JAX->p['hidden'][$k] ? 1 : 0,
+                            'hidden' => $this->jax->p['hidden'][$k] ? 1 : 0,
                             'wrapper' => $v,
                         ],
                         'WHERE `id`=?',
@@ -202,10 +203,10 @@ final class Themes
             }
 
             if (
-                isset($JAX->p['renameskin'])
-                && is_array($JAX->p['renameskin'])
+                isset($this->jax->p['renameskin'])
+                && is_array($this->jax->p['renameskin'])
             ) {
-                foreach ($JAX->p['renameskin'] as $k => $v) {
+                foreach ($this->jax->p['renameskin'] as $k => $v) {
                     if ($k === $v) {
                         continue;
                     }
@@ -229,13 +230,13 @@ final class Themes
                     } elseif (is_dir(BOARDPATH . 'Themes/' . $v)) {
                         $errorskins = 'That skin name is already being used.';
                     } else {
-                        $DB->safeupdate(
+                        $this->database->safeupdate(
                             'skins',
                             [
                                 'title' => $v,
                             ],
                             'WHERE `title`=? AND `custom`=1',
-                            $DB->basicvalue($k),
+                            $this->database->basicvalue($k),
                         );
                         rename(BOARDPATH . 'Themes/' . $k, BOARDPATH . 'Themes/' . $v);
                     }
@@ -243,10 +244,10 @@ final class Themes
             }
 
             if (
-                isset($JAX->p['renamewrapper'])
-                && is_array($JAX->p['renamewrapper'])
+                isset($this->jax->p['renamewrapper'])
+                && is_array($this->jax->p['renamewrapper'])
             ) {
-                foreach ($JAX->p['renamewrapper'] as $k => $v) {
+                foreach ($this->jax->p['renamewrapper'] as $k => $v) {
                     if ($k === $v) {
                         continue;
                     }
@@ -270,13 +271,13 @@ final class Themes
                     } elseif (is_file($this->WRAPPERS_PATH . $v . '.html')) {
                         $errorwrapper = 'That wrapper name is already being used.';
                     } else {
-                        $DB->safeupdate(
+                        $this->database->safeupdate(
                             'skins',
                             [
                                 'wrapper' => $v,
                             ],
                             'WHERE `wrapper`=? AND `custom`=1',
-                            $DB->basicvalue($k),
+                            $this->database->basicvalue($k),
                         );
                         rename(
                             $this->WRAPPERS_PATH . $k . '.html',
@@ -289,25 +290,25 @@ final class Themes
             }
 
             // Set default.
-            if (isset($JAX->p['default'])) {
-                $DB->safeupdate(
+            if (isset($this->jax->p['default'])) {
+                $this->database->safeupdate(
                     'skins',
                     [
                         'default' => 0,
                     ],
                 );
-                $DB->safeupdate(
+                $this->database->safeupdate(
                     'skins',
                     [
                         'default' => 1,
                     ],
                     'WHERE `id`=?',
-                    $JAX->p['default'],
+                    $this->jax->p['default'],
                 );
             }
         }
 
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             [
                 'id',
                 '`using`',
@@ -322,7 +323,7 @@ final class Themes
         );
         $usedwrappers = [];
         $skins = '';
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             $wrapperOptions = '';
             foreach ($wrappers as $wrapper) {
                 $wrapperOptions .= $this->page->parseTemplate(
@@ -408,8 +409,7 @@ final class Themes
 
     public function editcss($id): void
     {
-        global $DB,$JAX;
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             [
                 'id',
                 '`using`',
@@ -423,15 +423,15 @@ final class Themes
             'WHERE `id`=?',
             $id,
         );
-        $skin = $DB->arow($result);
-        $DB->disposeresult($result);
-        if (!isset($JAX->p['newskindata'])) {
-            $JAX->p['newskindata'] = false;
+        $skin = $this->database->arow($result);
+        $this->database->disposeresult($result);
+        if (!isset($this->jax->p['newskindata'])) {
+            $this->jax->p['newskindata'] = false;
         }
 
-        if ($skin && $skin['custom'] && $JAX->p['newskindata']) {
+        if ($skin && $skin['custom'] && $this->jax->p['newskindata']) {
             $o = fopen(BOARDPATH . 'Themes/' . $skin['title'] . '/css.css', 'w');
-            fwrite($o, (string) $JAX->p['newskindata']);
+            fwrite($o, (string) $this->jax->p['newskindata']);
             fclose($o);
         }
 
@@ -440,7 +440,7 @@ final class Themes
             $this->page->parseTemplate(
                 'themes/edit-css.html',
                 [
-                    'content' => $JAX->blockhtml(
+                    'content' => $this->jax->blockhtml(
                         file_get_contents(
                             (
                                 $skin['custom']
@@ -457,9 +457,7 @@ final class Themes
     }
 
     public function editwrapper($wrapper): void
-    {
-        global $JAX;
-        $saved = '';
+    {        $saved = '';
         $wrapperf = $this->WRAPPERS_PATH . $wrapper . '.html';
         if (preg_match('@[^ \w]@', (string) $wrapper) && !is_file($wrapperf)) {
             $this->page->addContentBox(
@@ -467,15 +465,15 @@ final class Themes
                 "The theme you're trying to edit does not exist.",
             );
         } else {
-            if (isset($JAX->p['newwrapper'])) {
-                if (mb_strpos($JAX->p['newwrapper'], '<!--FOOTER-->') === false) {
+            if (isset($this->jax->p['newwrapper'])) {
+                if (mb_strpos($this->jax->p['newwrapper'], '<!--FOOTER-->') === false) {
                     $saved = $this->page->error(
                         '&lt;!--FOOTER--&gt; must not be removed from the wrapper.',
                     );
                 } else {
                     $o = fopen($wrapperf, 'w');
                     if ($o !== false) {
-                        fwrite($o, $JAX->p['newwrapper']);
+                        fwrite($o, $this->jax->p['newwrapper']);
                         fclose($o);
                         $saved = $this->page->success('Wrapper saved successfully.');
                     } else {
@@ -489,7 +487,7 @@ final class Themes
                 $saved . $this->page->parseTemplate(
                     'themes/edit-wrapper.html',
                     [
-                        'content' => $JAX->blockhtml(file_get_contents($wrapperf)),
+                        'content' => $this->jax->blockhtml(file_get_contents($wrapperf)),
                     ],
                 ),
             );
@@ -498,47 +496,46 @@ final class Themes
 
     public function createskin(): void
     {
-        global $JAX,$DB;
         $page = '';
-        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
+        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
             $e = '';
-            if (!isset($JAX->p['skinname']) || !$JAX->p['skinname']) {
+            if (!isset($this->jax->p['skinname']) || !$this->jax->p['skinname']) {
                 $e = 'No skin name supplied!';
-            } elseif (preg_match('@[^\w ]@', (string) $JAX->p['skinname'])) {
+            } elseif (preg_match('@[^\w ]@', (string) $this->jax->p['skinname'])) {
                 $e = 'Skinname must only consist of letters, numbers, and spaces.';
-            } elseif (mb_strlen((string) $JAX->p['skinname']) > 50) {
+            } elseif (mb_strlen((string) $this->jax->p['skinname']) > 50) {
                 $e = 'Skin name must be less than 50 characters.';
-            } elseif (is_dir(BOARDPATH . 'Themes/' . $JAX->p['skinname'])) {
+            } elseif (is_dir(BOARDPATH . 'Themes/' . $this->jax->p['skinname'])) {
                 $e = 'A skin with that name already exists.';
-            } elseif (!in_array($JAX->p['wrapper'], $this->getwrappers())) {
+            } elseif (!in_array($this->jax->p['wrapper'], $this->getwrappers())) {
                 $e = 'Invalid wrapper.';
             } else {
-                if (!isset($JAX->p['hidden'])) {
-                    $JAX->p['hidden'] = false;
+                if (!isset($this->jax->p['hidden'])) {
+                    $this->jax->p['hidden'] = false;
                 }
 
-                if (!isset($JAX->p['default'])) {
-                    $JAX->p['default'] = false;
+                if (!isset($this->jax->p['default'])) {
+                    $this->jax->p['default'] = false;
                 }
 
-                $DB->safeinsert(
+                $this->database->safeinsert(
                     'skins',
                     [
                         'custom' => 1,
-                        'default' => $JAX->p['default'] ? 1 : 0,
-                        'hidden' => $JAX->p['hidden'] ? 1 : 0,
-                        'title' => $JAX->p['skinname'],
-                        'wrapper' => $JAX->p['wrapper'],
+                        'default' => $this->jax->p['default'] ? 1 : 0,
+                        'hidden' => $this->jax->p['hidden'] ? 1 : 0,
+                        'title' => $this->jax->p['skinname'],
+                        'wrapper' => $this->jax->p['wrapper'],
                     ],
                 );
-                if ($JAX->p['default']) {
-                    $DB->safeupdate(
+                if ($this->jax->p['default']) {
+                    $this->database->safeupdate(
                         'skins',
                         [
                             'default' => 0,
                         ],
                         'WHERE `id`!=?',
-                        $DB->insert_id(1),
+                        $this->database->insert_id(1),
                     );
                 }
 
@@ -548,8 +545,8 @@ final class Themes
 
                 if (is_dir(BOARDPATH . 'Themes')) {
                     mkdir(BOARDPATH . 'Themes');
-                    mkdir(BOARDPATH . 'Themes/' . $JAX->p['skinname']);
-                    $o = fopen(BOARDPATH . 'Themes/' . $JAX->p['skinname'] . '/css.css', 'w');
+                    mkdir(BOARDPATH . 'Themes/' . $this->jax->p['skinname']);
+                    $o = fopen(BOARDPATH . 'Themes/' . $this->jax->p['skinname'] . '/css.css', 'w');
                     fwrite(
                         $o,
                         file_get_contents(
@@ -590,32 +587,31 @@ final class Themes
 
     public function deleteskin($id): void
     {
-        global $DB,$JAX;
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             '`id`,`using`,`title`,`custom`,`wrapper`,`default`,`hidden`',
             'skins',
             'WHERE `id`=?',
             $id,
         );
-        $skin = $DB->arow($result);
-        $DB->disposeresult($result);
+        $skin = $this->database->arow($result);
+        $this->database->disposeresult($result);
         $skindir = BOARDPATH . 'Themes/' . $skin['title'];
         if (is_dir($skindir)) {
             foreach (glob($skindir . '/*') as $v) {
                 unlink($v);
             }
 
-            $JAX->rmdir($skindir);
+            $this->jax->rmdir($skindir);
         }
 
-        $DB->safedelete(
+        $this->database->safedelete(
             'skins',
             'WHERE `id`=?',
             $id,
         );
         // Make a random skin default if it's the default.
         if ($skin['default']) {
-            $DB->safeupdate(
+            $this->database->safeupdate(
                 'skins',
                 [
                     'default' => 1,

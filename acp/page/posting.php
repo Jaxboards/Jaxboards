@@ -6,6 +6,8 @@ namespace ACP\Page;
 
 use ACP\Page;
 use Jax\Config;
+use Jax\Jax;
+use Jax\Database;
 
 use function array_reverse;
 use function krsort;
@@ -15,12 +17,10 @@ use const PHP_EOL;
 
 final readonly class Posting
 {
-    public function __construct(private Config $config, private Page $page) {}
+    public function __construct(private Config $config, private Page $page, private Jax $jax, private Database $database) {}
 
     public function route(): void
     {
-        global $JAX;
-
         $links = [
             'emoticons' => 'Emoticons',
             'postrating' => 'Post Rating',
@@ -46,7 +46,7 @@ final readonly class Posting
             ),
         );
 
-        match ($JAX->b['do'] ?? '') {
+        match ($this->jax->b['do'] ?? '') {
             'emoticons' => $this->emoticons(),
             'postrating' => $this->postrating(),
             'wordfilter' => $this->wordfilter(),
@@ -56,10 +56,9 @@ final readonly class Posting
 
     public function wordfilter(): void
     {
-        global $JAX,$DB;
         $page = '';
         $wordfilter = [];
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             [
                 'id',
                 'enabled',
@@ -70,42 +69,42 @@ final readonly class Posting
             'textrules',
             "WHERE `type`='badword'",
         );
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             $wordfilter[$f['needle']] = $f['replacement'];
         }
 
         // Delete.
-        if (isset($JAX->g['d']) && $JAX->g['d']) {
-            $DB->safedelete(
+        if (isset($this->jax->g['d']) && $this->jax->g['d']) {
+            $this->database->safedelete(
                 'textrules',
                 "WHERE `type`='badword' AND `needle`=?",
-                $DB->basicvalue($JAX->g['d']),
+                $this->database->basicvalue($this->jax->g['d']),
             );
-            unset($wordfilter[$JAX->g['d']]);
+            unset($wordfilter[$this->jax->g['d']]);
         }
 
         // Insert.
-        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
-            $JAX->p['badword'] = $JAX->blockhtml($JAX->p['badword']);
-            if (!$JAX->p['badword'] || !$JAX->p['replacement']) {
+        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
+            $this->jax->p['badword'] = $this->jax->blockhtml($this->jax->p['badword']);
+            if (!$this->jax->p['badword'] || !$this->jax->p['replacement']) {
                 $page .= $this->page->error('All fields required.');
             } elseif (
-                isset($wordfilter[$JAX->p['badword']])
-                && $wordfilter[$JAX->p['badword']]
+                isset($wordfilter[$this->jax->p['badword']])
+                && $wordfilter[$this->jax->p['badword']]
             ) {
                 $page .= $this->page->error(
-                    "'" . $JAX->p['badword'] . "' is already used.",
+                    "'" . $this->jax->p['badword'] . "' is already used.",
                 );
             } else {
-                $DB->safeinsert(
+                $this->database->safeinsert(
                     'textrules',
                     [
-                        'needle' => $JAX->p['badword'],
-                        'replacement' => $JAX->p['replacement'],
+                        'needle' => $this->jax->p['badword'],
+                        'replacement' => $this->jax->p['replacement'],
                         'type' => 'badword',
                     ],
                 );
-                $wordfilter[$JAX->p['badword']] = $JAX->p['replacement'];
+                $wordfilter[$this->jax->p['badword']] = $this->jax->p['replacement'];
             }
         }
 
@@ -123,7 +122,7 @@ final readonly class Posting
             );
             $currentFilters = array_reverse($wordfilter, true);
             foreach ($currentFilters as $filter => $result) {
-                $resultCode = $JAX->blockhtml($result);
+                $resultCode = $this->jax->blockhtml($result);
                 $filterUrlEncoded = rawurlencode($filter);
                 $table .= $this->page->parseTemplate(
                     'posting/word-filter-row.html',
@@ -148,7 +147,6 @@ final readonly class Posting
 
     public function emoticons(): void
     {
-        global $JAX,$DB;
 
         $basesets = [
             '' => 'None',
@@ -158,16 +156,16 @@ final readonly class Posting
         $page = '';
         $emoticons = [];
         // Delete emoticon.
-        if (isset($JAX->g['d']) && $JAX->g['d']) {
-            $DB->safedelete(
+        if (isset($this->jax->g['d']) && $this->jax->g['d']) {
+            $this->database->safedelete(
                 'textrules',
                 "WHERE `type`='emote' AND `needle`=?",
-                $DB->basicvalue($_GET['d']),
+                $this->database->basicvalue($_GET['d']),
             );
         }
 
         // Select emoticons.
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             [
                 'id',
                 'type',
@@ -178,32 +176,32 @@ final readonly class Posting
             'textrules',
             "WHERE `type`='emote'",
         );
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             $emoticons[$f['needle']] = $f['replacement'];
         }
 
         // Insert emoticon.
-        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
-            if (!$JAX->p['emoticon'] || !$JAX->p['image']) {
+        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
+            if (!$this->jax->p['emoticon'] || !$this->jax->p['image']) {
                 $page .= $this->page->error('All fields required.');
-            } elseif (isset($emoticons[$JAX->blockhtml($JAX->p['emoticon'])])) {
+            } elseif (isset($emoticons[$this->jax->blockhtml($this->jax->p['emoticon'])])) {
                 $page .= $this->page->error('That emoticon is already being used.');
             } else {
-                $DB->safeinsert(
+                $this->database->safeinsert(
                     'textrules',
                     [
                         'enabled' => 1,
-                        'needle' => $JAX->blockhtml($JAX->p['emoticon']),
-                        'replacement' => $JAX->p['image'],
+                        'needle' => $this->jax->blockhtml($this->jax->p['emoticon']),
+                        'replacement' => $this->jax->p['image'],
                         'type' => 'emote',
                     ],
                 );
-                $emoticons[$JAX->blockhtml($JAX->p['emoticon'])] = $JAX->p['image'];
+                $emoticons[$this->jax->blockhtml($this->jax->p['emoticon'])] = $this->jax->p['image'];
             }
         }
 
-        if (isset($JAX->p['baseset']) && $basesets[$JAX->p['baseset']]) {
-            $this->config->write(['emotepack' => $JAX->p['baseset']]);
+        if (isset($this->jax->p['baseset']) && $basesets[$this->jax->p['baseset']]) {
+            $this->config->write(['emotepack' => $this->jax->p['baseset']]);
         }
 
         if ($emoticons === []) {
@@ -223,7 +221,7 @@ final readonly class Posting
             $emoticons = array_reverse($emoticons, true);
 
             foreach ($emoticons as $emoticon => $smileyFile) {
-                $smileyFile = $JAX->blockhtml($smileyFile);
+                $smileyFile = $this->jax->blockhtml($smileyFile);
                 $emoticonUrlEncoded = rawurlencode($emoticon);
                 $table .= $this->page->parseTemplate(
                     'posting/emoticon-row.html',
@@ -287,52 +285,51 @@ final readonly class Posting
 
     public function postrating(): void
     {
-        global $JAX,$DB;
         $page = '';
         $page2 = '';
         $niblets = [];
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             ['id', 'img', 'title'],
             'ratingniblets',
             'ORDER BY `id` DESC',
         );
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             $niblets[$f['id']] = ['img' => $f['img'], 'title' => $f['title']];
         }
 
         // Delete.
-        if (isset($JAX->g['d']) && $JAX->g['d']) {
-            $DB->safedelete(
+        if (isset($this->jax->g['d']) && $this->jax->g['d']) {
+            $this->database->safedelete(
                 'ratingniblets',
                 'WHERE `id`=?',
-                $DB->basicvalue($JAX->g['d']),
+                $this->database->basicvalue($this->jax->g['d']),
             );
-            unset($niblets[$JAX->g['d']]);
+            unset($niblets[$this->jax->g['d']]);
         }
 
         // Insert.
-        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
-            if (!$JAX->p['img'] || !$JAX->p['title']) {
+        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
+            if (!$this->jax->p['img'] || !$this->jax->p['title']) {
                 $page .= $this->page->error('All fields required.');
             } else {
-                $DB->safeinsert(
+                $this->database->safeinsert(
                     'ratingniblets',
                     [
-                        'img' => $JAX->p['img'],
-                        'title' => $JAX->p['title'],
+                        'img' => $this->jax->p['img'],
+                        'title' => $this->jax->p['title'],
                     ],
                 );
-                $niblets[$DB->insert_id(1)] = [
-                    'img' => $JAX->p['img'],
-                    'title' => $JAX->p['title'],
+                $niblets[$this->database->insert_id(1)] = [
+                    'img' => $this->jax->p['img'],
+                    'title' => $this->jax->p['title'],
                 ];
             }
         }
 
-        if (isset($JAX->p['rsubmit']) && $JAX->p['rsubmit']) {
+        if (isset($this->jax->p['rsubmit']) && $this->jax->p['rsubmit']) {
             $this->config->write([
-                'ratings' => (isset($JAX->p['renabled']) ? 1 : 0)
-                + (isset($JAX->p['ranon']) ? 2 : 0),
+                'ratings' => (isset($this->jax->p['renabled']) ? 1 : 0)
+                + (isset($this->jax->p['ranon']) ? 2 : 0),
             ]);
             $page2 .= $this->page->success('Settings saved!');
         }
@@ -360,8 +357,8 @@ final readonly class Posting
                     'posting/post-rating-row.html',
                     [
                         'id' => $ratingId,
-                        'image_url' => $JAX->blockhtml($rating['img']),
-                        'title' => $JAX->blockhtml($rating['title']),
+                        'image_url' => $this->jax->blockhtml($rating['img']),
+                        'title' => $this->jax->blockhtml($rating['title']),
                     ],
                 );
             }

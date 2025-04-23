@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace ACP\Page\Forums;
 
 use ACP\Page;
+use Jax\Database;
 
 use function array_pop;
 use function explode;
 
 final readonly class RecountStats
 {
-    public function __construct(private Page $page) {}
-
+    function __construct(
+        private readonly Page $page,
+        private readonly Database $database
+    ){}
     public function showstats(): void
     {
         $this->page->addContentBox(
@@ -25,16 +28,15 @@ final readonly class RecountStats
 
     public function recountStatistics(): void
     {
-        global $DB;
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             ['id', 'nocount'],
             'forums',
         );
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             $pc[$f['id']] = $f['nocount'];
         }
 
-        $result = $DB->safespecial(
+        $result = $this->database->safespecial(
             <<<'EOT'
                 SELECT p.`id` AS `id`,
                     p.`auth_id` AS `auth_id`,p.`tid` AS `tid`,t.`fid` AS `fid`
@@ -53,7 +55,7 @@ final readonly class RecountStats
             'topics' => 0,
             'topic_posts' => [],
         ];
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             if (!isset($stat['topic_posts'][$f['tid']])) {
                 if (!isset($stat['forum_topics'][$f['fid']])) {
                     $stat['forum_topics'][$f['fid']] = 0;
@@ -102,11 +104,11 @@ final readonly class RecountStats
 
         // Go through and sum up category posts as well
         // as forums with subforums.
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             ['id', 'path', 'cat_id'],
             'forums',
         );
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             if (!$f['path']) {
                 continue;
             }
@@ -119,7 +121,7 @@ final readonly class RecountStats
 
         // Update Topic Replies.
         foreach ($stat['topic_posts'] as $k => $v) {
-            $DB->safeupdate(
+            $this->database->safeupdate(
                 'topics',
                 [
                     'replies' => $v,
@@ -131,7 +133,7 @@ final readonly class RecountStats
 
         // Update member posts.
         foreach ($stat['member_posts'] as $k => $v) {
-            $DB->safeupdate(
+            $this->database->safeupdate(
                 'members',
                 [
                     'posts' => $v,
@@ -143,7 +145,7 @@ final readonly class RecountStats
 
         // Update forum posts.
         foreach ($stat['forum_posts'] as $k => $v) {
-            $DB->safeupdate(
+            $this->database->safeupdate(
                 'forums',
                 [
                     'posts' => $v,
@@ -155,16 +157,16 @@ final readonly class RecountStats
         }
 
         // Get # of members.
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             'COUNT(`id`)',
             'members',
         );
-        $thisrow = $DB->arow($result);
+        $thisrow = $this->database->arow($result);
         $stat['members'] = array_pop($thisrow);
-        $DB->disposeresult($result);
+        $this->database->disposeresult($result);
 
         // Update global board stats.
-        $DB->safeupdate(
+        $this->database->safeupdate(
             'stats',
             [
                 'members' => $stat['members'],
