@@ -1,9 +1,11 @@
 <?php
 
-use Jax\JAX;
+use Jax\Config;
+use Jax\IPAddress;
+use Jax\Jax;
 use Jax\MySQL;
 
-/*
+/**
  * Service signup file, for users to create their own JaxBoards forum.
  *
  * PHP Version 8
@@ -19,7 +21,7 @@ if (!defined('SERVICE_ROOT')) {
 
 require_once JAXBOARDS_ROOT . '/jax/autoload.php';
 
-$JAX = new JAX();
+$JAX = new Jax();
 $DB = new MySQL();
 
 if (!file_exists(JAXBOARDS_ROOT . '/config.php')) {
@@ -30,7 +32,7 @@ if (!file_exists(JAXBOARDS_ROOT . '/config.php')) {
 
 require_once JAXBOARDS_ROOT . '/config.php';
 
-if (!$CFG['service']) {
+if (!Config::getSetting('service')) {
     echo 'Service mode not enabled';
 
     exit(1);
