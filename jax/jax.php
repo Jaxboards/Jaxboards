@@ -81,7 +81,7 @@ final class Jax
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
-    )  {
+    ) {
         $this->c = $_COOKIE;
         $this->g = $_GET;
         $this->p = $_POST;
