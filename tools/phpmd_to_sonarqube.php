@@ -19,6 +19,8 @@ declare(strict_types=1);
  * ```
  */
 
+define('JAXBOARDS_ROOT', dirname(__DIR__));
+
 // phpcs:enable
 
 // Fetch CLI arguments.
@@ -100,7 +102,7 @@ if (!is_array($data['files'])) {
     exit(1);
 }
 
-function generify($description_input): array|string
+function generify(string $description_input): string
 {
     $description = $description_input;
 
@@ -111,7 +113,8 @@ function generify($description_input): array|string
         '/ variables with short names like \$\w+/' => ' variables with short names',
         '/ undefined variables such as \'\$\w+\'/' => ' undefined variables',
         '/ unused local variables such as \'\$\w+\'/' => ' unused local variables',
-        '/ method \w+\(\) has a Cyclomatic Complexity of \d+/' => ' method has a Cyclomatic Complexity that exceeds the threshoold',
+        '/ method \w+\(\) has a Cyclomatic Complexity of \d+/'
+            => ' method has a Cyclomatic Complexity that exceeds the threshoold',
         '/The method \w+ uses an else expression. /' => '',
         '/The class \w+ has \d+ lines of code. /' => 'The class has more lines of code than our threshold. ',
         '/The class \w+ has an overall complexity of \d+ /' => 'The class an overall complexity ',
@@ -204,12 +207,20 @@ $rules = array_reduce(
     [],
 );
 
+define(
+    'REMOVE_JAXBOARDS_ROOT',
+    '/^' . preg_quote(JAXBOARDS_ROOT . '/', '/') . '/',
+);
 $issues = array_merge_recursive(
-    ...array_map(
+    array_map(
         static function (
             array $file,
         ): array {
-            $filename = $file['file'];
+            $filename = preg_replace(
+                REMOVE_JAXBOARDS_ROOT,
+                '',
+                $file['file'],
+            );
 
             return array_map(
                 static function (array $violation) use ($filename): array {
@@ -226,6 +237,18 @@ $issues = array_merge_recursive(
                         'ruleId' => $violation['rule'],
                     ];
 
+                    if (
+                        $issue['primaryLocation']['textRange']['endLine']
+                        === $issue['primaryLocation']['textRange']['startLine']
+                    ) {
+                        unset($issue['primaryLocation']['textRange']['endLine']);
+                    }
+
+                    if ($issue['primaryLocation']['textRange']['startLine'] < 1) {
+                        $issue['primaryLocation']['textRange']['startLine'] =
+                            '1';
+                    }
+
                     $matches = [];
                     preg_match(
                         '/ \(line \'\d+\', column \'(?P<column>\d+)\'\)/',
@@ -234,7 +257,7 @@ $issues = array_merge_recursive(
                     );
                     $column = $matches['column'] ?? '';
 
-                    if ($column !== '') {
+                    if ($column !== '' && $column > 0) {
                         $issue['primaryLocation']['textRange']['startColumn'] = $column;
                     }
 

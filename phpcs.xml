@@ -181,11 +181,6 @@
   <rule ref="SlevomatCodingStandard.ControlStructures.RequireNullCoalesceEqualOperator"/>
   <rule ref="SlevomatCodingStandard.ControlStructures.RequireNullCoalesceOperator"/>
   <rule ref="SlevomatCodingStandard.ControlStructures.RequireNullSafeObjectOperator"/>
-  <rule ref="SlevomatCodingStandard.ControlStructures.RequireSingleLineCondition">
-    <properties>
-      <property name="maxLineLength" value="72"/>
-    </properties>
-  </rule>
   <rule ref="SlevomatCodingStandard.ControlStructures.RequireShortTernaryOperator"/>
   <rule ref="SlevomatCodingStandard.ControlStructures.RequireTernaryOperator"/>
   <rule ref="SlevomatCodingStandard.ControlStructures.DisallowYodaComparison"/>
