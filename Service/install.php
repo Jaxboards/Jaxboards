@@ -1,5 +1,9 @@
 <?php
 
+use ACP\Page;
+use Jax\Jax;
+use Jax\MySQL;
+
 /**
  * Service install file, for installing a new JaxBoards service.
  *
@@ -56,7 +60,7 @@ function recurseCopy($src, $dst): void
 }
 
 $JAX = new JAX();
-$DB = new Jax\MySQL();
+$DB = new MySQL();
 $PAGE = new PAGE();
 
 $fields = [
