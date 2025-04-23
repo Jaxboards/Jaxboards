@@ -248,6 +248,7 @@ final class Page
             echo empty($this->JSOutput)
                 ? ''
                 : json_encode($this->JSOutput);
+
             return;
         }
 
