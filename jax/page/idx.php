@@ -442,7 +442,7 @@ final class IDX
 
     public function updateStats(): void
     {
-        global $PAGE,$DB,$SESS,$CFG;
+        global $PAGE,$DB,$SESS;
         $list = [];
         if ($SESS->users_online_cache) {
             $oldcache = array_flip(explode(',', (string) $SESS->users_online_cache));
@@ -450,7 +450,7 @@ final class IDX
 
         $useronlinecache = '';
         foreach ($DB->getUsersOnline() as $f) {
-            $lastActionIdle = (int) ($SESS->last_update ?? 0) - ($CFG['timetoidle'] ?? 300) - 30;
+            $lastActionIdle = (int) ($SESS->last_update ?? 0) - ($this->config->getSetting('timetoidle') ?? 300) - 30;
             if (!$f['uid'] && !$f['is_bot']) {
                 continue;
             }

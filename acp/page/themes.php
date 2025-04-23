@@ -118,7 +118,7 @@ final class Themes
 
     public function showskinindex(): void
     {
-        global $PAGE,$DB,$JAX,$CFG;
+        global $PAGE,$DB,$JAX;
         $errorskins = '';
         $errorwrapper = '';
 
@@ -494,7 +494,7 @@ final class Themes
 
     public function createskin(): void
     {
-        global $PAGE,$JAX,$DB,$CFG;
+        global $PAGE,$JAX,$DB;
         $page = '';
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             $e = '';

@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Exception;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Config;
 
 use function array_key_exists;
 use function base64_encode;
@@ -39,10 +40,7 @@ final class LogReg
 {
     public $registering = false;
 
-    /**
-     * @var Config
-     */
-    public function __construct(private readonly IPAddress $ipAddress)
+    public function __construct(private readonly Config $config, private readonly IPAddress $ipAddress)
     {
         global $PAGE;
 
@@ -65,7 +63,7 @@ final class LogReg
 
     public function register()
     {
-        global $CFG,$PAGE,$JAX,$DB;
+        global $PAGE,$JAX,$DB;
 
         $this->registering = true;
 
@@ -81,8 +79,8 @@ final class LogReg
         $email = $JAX->p['email'] ?? '';
 
         $recaptcha = '';
-        if ($CFG['recaptcha']) {
-            $recaptcha = $PAGE->meta('anti-spam', $CFG['recaptcha']['public_key']);
+        if ($this->config->getSetting('recaptcha')) {
+            $recaptcha = $PAGE->meta('anti-spam', $this->config->getSetting('recaptcha')['public_key']);
         }
 
         $p = $PAGE->meta('register-form', $recaptcha);
@@ -118,7 +116,7 @@ final class LogReg
                 throw new Exception('Display name and username must be under 30 characters.');
             }
 
-            $badNameChars = $CFG['badnamechars'];
+            $badNameChars = $this->config->getSetting('badnamechars');
             if (
                 ($badNameChars && preg_match($badNameChars, $name))
                 || $JAX->blockhtml($name) !== $name
@@ -171,7 +169,7 @@ final class LogReg
                 [
                     'display_name' => $dispname,
                     'email' => $email,
-                    'group_id' => array_key_exists('membervalidation', $CFG) && $CFG['membervalidation'] ? 5 : 1,
+                    'group_id' => $this->config->getSetting('membervalidation') ? 5 : 1,
                     'ip' => $this->ipAddress->asBinary(),
                     'join_date' => gmdate('Y-m-d H:i:s'),
                     'last_visit' => gmdate('Y-m-d H:i:s'),
@@ -521,14 +519,14 @@ final class LogReg
 
     private function isHuman()
     {
-        global $CFG,$JAX;
+        global $JAX;
 
-        if ($CFG['recaptcha']) {
+        if ($this->config->getSetting('recaptcha')) {
             // Validate reCAPTCHA.
             $url = 'https://www.google.com/recaptcha/api/siteverify';
             $fields = [
                 'response' => $JAX->p['g-recaptcha-response'],
-                'secret' => $CFG['recaptcha']['private_key'],
+                'secret' => $this->config->getSetting('recaptcha')['private_key'],
             ];
 
             $fields_string = '';

@@ -529,7 +529,7 @@ final class Topic
 
     public function postsintooutput($lastpid = 0): string
     {
-        global $DB,$PAGE,$JAX,$SESS,$USER,$PERMS,$CFG;
+        global $DB,$PAGE,$JAX,$SESS,$USER,$PERMS;
         $usersonline = $DB->getUsersOnline();
         $ratingConfig = $this->config->getSetting('ratings') ?? 0;
 

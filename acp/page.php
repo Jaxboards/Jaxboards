@@ -22,8 +22,6 @@ use const PHP_EOL;
 
 final class Page
 {
-    public $CFG = [];
-
     public $parts = [
         'content' => '',
         'sidebar' => '',

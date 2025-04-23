@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace ACP\Page;
+use Jax\Config;
 
 use SplFileObject;
 
@@ -35,6 +36,8 @@ use const SEEK_END;
 
 final class Tools
 {
+    function __construct(private Config $config) {}
+
     public function route(): void
     {
         global $JAX,$PAGE;
@@ -79,7 +82,7 @@ final class Tools
 
     public function filemanager(): void
     {
-        global $PAGE,$DB,$JAX,$CFG;
+        global $PAGE,$DB,$JAX;
         $page = '';
         if (isset($JAX->b['delete']) && is_numeric($JAX->b['delete'])) {
             $result = $DB->safeselect(
@@ -185,7 +188,7 @@ final class Tools
                 $ext = mb_strtolower(array_pop($filepieces));
             }
 
-            $file['name'] = in_array($ext, $CFG['images']) ? '<a href="'
+            $file['name'] = in_array($ext, $this-config->getSetting('images')) ? '<a href="'
                     . BOARDPATHURL . 'Uploads/' . $file['hash'] . '.' . $ext . '">'
                     . $file['name'] . '</a>' : '<a href="../?act=download&id='
                     . $file['id'] . '">' . $file['name'] . '</a>';
