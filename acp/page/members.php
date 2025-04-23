@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ACP\Page;
 
 use Jax\Config;
+use Jax\Jax;
 
 use function array_pop;
 use function count;
@@ -367,7 +368,7 @@ final class Members
                     . $PAGE->back(),
                 );
             } else {
-                $page .= JAX::hiddenFormFields(['mid' => $data['id']]);
+                $page .= Jax::hiddenFormFields(['mid' => $data['id']]);
                 $page .= $this->formfield('Display Name:', 'display_name', $data['display_name']);
                 $page .= $this->formfield('Username:', 'name', $data['name']);
                 $page .= $this->formfield('Real Name:', 'full_name', $data['full_name']);
