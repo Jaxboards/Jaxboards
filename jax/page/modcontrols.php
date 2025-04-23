@@ -498,7 +498,10 @@ final class ModControls
     public function deleteposts()
     {
         global $USER;
-        if (!isset($this->session->vars['modpids']) || !$this->session->vars['modpids']) {
+        if (
+            !isset($this->session->vars['modpids'])
+            || !$this->session->vars['modpids']
+        ) {
             return $this->page->JS('error', 'No posts to delete.');
         }
 

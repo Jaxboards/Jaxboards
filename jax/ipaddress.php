@@ -4,6 +4,19 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use function file;
+use function file_exists;
+use function filter_var;
+use function inet_ntop;
+use function inet_pton;
+use function mb_strlen;
+use function mb_strtolower;
+use function mb_substr;
+use function pack;
+use function trim;
+
+use const FILTER_VALIDATE_IP;
+
 final readonly class IPAddress
 {
     public function __construct(private Config $config) {}

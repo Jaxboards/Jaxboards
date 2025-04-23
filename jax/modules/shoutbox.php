@@ -4,12 +4,22 @@ declare(strict_types=1);
 
 namespace Jax\Modules;
 
-use Jax\IPAddress;
 use Jax\Config;
 use Jax\Database;
+use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
 use Jax\Session;
+
+use function array_pop;
+use function ceil;
+use function gmdate;
+use function is_numeric;
+use function mb_strlen;
+use function mb_substr;
+use function trim;
+
+use const PHP_EOL;
 
 final class Shoutbox
 {
@@ -36,7 +46,10 @@ final class Shoutbox
             $PERMS['can_view_shoutbox'] = false;
         }
 
-        if (!$this->config->getSetting('shoutbox') || !$PERMS['can_view_shoutbox']) {
+        if (
+            !$this->config->getSetting('shoutbox')
+            || !$PERMS['can_view_shoutbox']
+        ) {
             return;
         }
 
@@ -197,7 +210,10 @@ final class Shoutbox
         // This is a bit tricky, we're transversing the shouts
         // in reverse order, since they're shifted onto the list, not pushed.
         $last = 0;
-        if (isset($this->session->vars['sb_id']) && $this->session->vars['sb_id']) {
+        if (
+            isset($this->session->vars['sb_id'])
+            && $this->session->vars['sb_id']
+        ) {
             $result = $this->database->safespecial(
                 <<<'EOT'
                     SELECT

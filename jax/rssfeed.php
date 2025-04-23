@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use function array_merge;
+use function gmdate;
+use function header;
+use function is_array;
+use function is_numeric;
+
 final class RSSFeed
 {
     public $feed = [];

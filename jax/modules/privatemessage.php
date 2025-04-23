@@ -10,6 +10,18 @@ use Jax\Jax;
 use Jax\Page;
 use Jax\Session;
 
+use function explode;
+use function gmdate;
+use function implode;
+use function in_array;
+use function is_numeric;
+use function json_decode;
+use function json_encode;
+use function time;
+use function trim;
+
+use const PHP_EOL;
+
 final readonly class PrivateMessage
 {
     public function __construct(

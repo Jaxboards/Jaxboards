@@ -4,6 +4,38 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use function array_keys;
+use function array_pop;
+use function array_shift;
+use function array_values;
+use function define;
+use function explode;
+use function file_get_contents;
+use function glob;
+use function header;
+use function headers_sent;
+use function in_array;
+use function is_array;
+use function is_dir;
+use function json_decode;
+use function json_encode;
+use function mb_strpos;
+use function mb_strtolower;
+use function mb_strtoupper;
+use function mb_substr;
+use function pathinfo;
+use function preg_match;
+use function preg_replace;
+use function preg_replace_callback;
+use function property_exists;
+use function str_contains;
+use function str_replace;
+use function vsprintf;
+
+use const PATHINFO_BASENAME;
+use const PATHINFO_FILENAME;
+use const PHP_EOL;
+
 /**
  * This class is entirely responsible for rendering the page.
  *

@@ -480,7 +480,10 @@ final class Topic
     {
         $prefilled = '';
         $this->page->JS('softurl');
-        if (isset($this->session->vars['multiquote']) && $this->session->vars['multiquote']) {
+        if (
+            isset($this->session->vars['multiquote'])
+            && $this->session->vars['multiquote']
+        ) {
             $result = $this->database->safespecial(
                 <<<'MySQL'
                     SELECT

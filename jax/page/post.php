@@ -398,7 +398,10 @@ onclick="this.form.submitButton=this" /></div>
             $vars .= '<input type="hidden" name="' . $k . '" value="' . $v . '" />';
         }
 
-        if (isset($this->session->vars['multiquote']) && $this->session->vars['multiquote']) {
+        if (
+            isset($this->session->vars['multiquote'])
+            && $this->session->vars['multiquote']
+        ) {
             $postdata = '';
 
             $result = $this->database->safespecial(
