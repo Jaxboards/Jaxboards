@@ -95,6 +95,13 @@ final class Page
      */
     public $jsnewlocation = false;
 
+
+    /**
+     * @var bool
+     */
+    public $jsdirectlink = false;
+
+
     private $parts = [];
 
     private $vars = [];
@@ -118,6 +125,7 @@ final class Page
         if ($this->jsaccess !== 0) {
             $this->jsupdate = $this->jsaccess === 1;
             $this->jsnewlocation = $this->jsaccess >= 2;
+            $this->jsdirectlink = $this->jsaccess === 3;
         }
     }
 
@@ -225,11 +233,6 @@ final class Page
 
     public function out(): void
     {
-        static $done = null;
-        if ($done) {
-            return;
-        }
-
         $this->parts['path']
             = "<div id='path' class='path'>" . $this->buildpath() . '</div>';
 
@@ -245,30 +248,31 @@ final class Page
             echo empty($this->JSOutput)
                 ? ''
                 : json_encode($this->JSOutput);
-        } else {
-            $autobox = ['PAGE', 'COPYRIGHT', 'USERBOX'];
-            foreach ($this->parts as $part => $contents) {
-                $part = mb_strtoupper((string) $part);
-                if (in_array($part, $autobox)) {
-                    $contents = '<div id="' . mb_strtolower($part) . '">' . $contents . '</div>';
-                }
-
-                if ($part === 'PATH') {
-                    $this->template
-                        = preg_replace('@<!--PATH-->@', (string) $contents, (string) $this->template, 1);
-                }
-
-                $this->template = str_replace('<!--' . $part . '-->', $contents, $this->template);
-            }
-
-            $this->template = $this->filtervars($this->template);
-            $this->template = $this->session->addSessId($this->template);
-            if ($this->checkextended($this->template, null)) {
-                $this->template = $this->metaextended($this->template);
-            }
-
-            echo $this->template;
+            return;
         }
+
+        $autobox = ['PAGE', 'COPYRIGHT', 'USERBOX'];
+        foreach ($this->parts as $part => $contents) {
+            $part = mb_strtoupper((string) $part);
+            if (in_array($part, $autobox)) {
+                $contents = '<div id="' . mb_strtolower($part) . '">' . $contents . '</div>';
+            }
+
+            if ($part === 'PATH') {
+                $this->template
+                    = preg_replace('@<!--PATH-->@', (string) $contents, (string) $this->template, 1);
+            }
+
+            $this->template = str_replace('<!--' . $part . '-->', $contents, $this->template);
+        }
+
+        $this->template = $this->filtervars($this->template);
+        $this->template = $this->session->addSessId($this->template);
+        if ($this->checkextended($this->template, null)) {
+            $this->template = $this->metaextended($this->template);
+        }
+
+        echo $this->template;
     }
 
     public function collapsebox(string $title, string $contents, $boxId = null): ?string
@@ -301,15 +305,15 @@ final class Page
         );
     }
 
-    public function loadskin($id): void
+    public function loadskin($skinId): void
     {
         $skin = [];
-        if ($id) {
+        if ($skinId) {
             $result = $this->database->safeselect(
                 ['title', 'custom', 'wrapper'],
                 'skins',
                 'WHERE id=? LIMIT 1',
-                $id,
+                $skinId,
             );
             $skin = $this->database->arow($result);
             $this->database->disposeresult($result);
@@ -351,21 +355,21 @@ final class Page
         );
     }
 
-    public function userMetaParse($m): string
+    public function userMetaParse($match): string
     {
-        $this->checkextended($m[3], $m[2]);
-        $this->userMetaDefs[$m[2]] = $m[3];
+        $this->checkextended($match[3], $match[2]);
+        $this->userMetaDefs[$match[2]] = $match[3];
 
         return '';
     }
 
-    public function includer($m)
+    public function includer(string $pageAct)
     {
         $result = $this->database->safeselect(
             'page',
             'pages',
             'WHERE `act`=?',
-            $this->database->basicvalue($m[1]),
+            $this->database->basicvalue($pageAct[1]),
         );
         $page = array_shift($this->database->arow($result));
         $this->database->disposeresult($result);

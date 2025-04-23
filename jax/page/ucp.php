@@ -253,7 +253,7 @@ final class UCP
 
             $this->page->JS('alert', 'Settings saved successfully.');
 
-            $this->page->ucppage = 'Settings saved successfully.';
+            $this->ucppage = 'Settings saved successfully.';
         } elseif ($this->page->jsupdate) {
             return true;
         }
@@ -660,7 +660,7 @@ final class UCP
                 return;
             }
 
-            $this->page->ucppage .= $this->page->meta('error', $error);
+            $this->ucppage .= $this->page->meta('error', $error);
             $this->page->JS('error', $error);
         }
 

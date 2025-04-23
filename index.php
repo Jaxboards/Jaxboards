@@ -182,7 +182,7 @@ if (!$PAGE->jsaccess) {
     if ($USER) {
         $PAGE->append(
             'SCRIPT',
-            '<script>const globalsettings='
+            '<script>window.globalsettings='
             . json_encode([
                 'sound_im' => $USER['sound_im'] ? 1 : 0,
                 'wysiwyg' => $USER['wysiwyg'] ? 1 : 0,
