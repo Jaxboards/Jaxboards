@@ -776,7 +776,7 @@ final class Topic
                 // ^10
                 $this->jax->date($post['date']),
                 '<a href="?act=vt' . $this->tid . '&amp;findpost=' . $post['pid']
-                . '" onclick="prompt(\'Link to this post:\',this.href)">'
+                . '" onclick="prompt(\'Link to this post:\',this.href);return false">'
                 . $this->page->meta('topic-perma-button') . '</a>',
                 $postt,
                 isset($post['sig']) && $post['sig']
