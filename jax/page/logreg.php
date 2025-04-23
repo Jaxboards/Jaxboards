@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Exception;
-use Jax\Config;
 use Jax\IPAddress;
 use Jax\Jax;
 
@@ -62,7 +61,7 @@ final class LogReg
 
     public function register()
     {
-        global $PAGE,$JAX,$DB;
+        global $CFG,$PAGE,$JAX,$DB;
 
         $this->registering = true;
 
@@ -78,8 +77,8 @@ final class LogReg
         $email = $JAX->p['email'] ?? '';
 
         $recaptcha = '';
-        if (Config::getSetting('recaptcha')) {
-            $recaptcha = $PAGE->meta('anti-spam', Config::getSetting('recaptcha')['public_key']);
+        if ($CFG['recaptcha']) {
+            $recaptcha = $PAGE->meta('anti-spam', $CFG['recaptcha']['public_key']);
         }
 
         $p = $PAGE->meta('register-form', $recaptcha);
@@ -115,7 +114,7 @@ final class LogReg
                 throw new Exception('Display name and username must be under 30 characters.');
             }
 
-            $badNameChars = Config::getSetting('badnamechars');
+            $badNameChars = $CFG['badnamechars'];
             if (
                 ($badNameChars && preg_match($badNameChars, $name))
                 || $JAX->blockhtml($name) !== $name
@@ -518,14 +517,14 @@ final class LogReg
 
     private function isHuman()
     {
-        global $JAX;
+        global $CFG,$JAX;
 
-        if (Config::getSetting('recaptcha')) {
+        if ($CFG['recaptcha']) {
             // Validate reCAPTCHA.
             $url = 'https://www.google.com/recaptcha/api/siteverify';
             $fields = [
                 'response' => $JAX->p['g-recaptcha-response'],
-                'secret' => Config::getSetting('recaptcha')['private_key'],
+                'secret' => $CFG['recaptcha']['private_key'],
             ];
 
             $fields_string = '';
