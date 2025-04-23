@@ -6,6 +6,7 @@ namespace Jax;
 
 use MySQLi;
 use ReflectionClass;
+use mysqli_result;
 
 use function addslashes;
 use function array_keys;
