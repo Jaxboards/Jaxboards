@@ -16,6 +16,10 @@ use const PHP_EOL;
 
 final class Settings
 {
+    public function __construct(\Jax\Config $config) {
+        $this->config = $config;
+    }
+
     public function route(): void
     {
         global $JAX, $PAGE;
@@ -77,7 +81,7 @@ final class Settings
             if ($e !== '' && $e !== '0') {
                 $page .= $PAGE->error($e);
             } else {
-                Config::write([
+                $this->config->write([
                     'boardname' => $JAX->p['boardname'],
                     'logourl' => $JAX->p['logourl'],
                     'boardoffline' => isset($JAX->p['boardoffline']) && $JAX->p['boardoffline'] ? '0' : '1',
@@ -90,26 +94,26 @@ final class Settings
         $page .= $PAGE->parseTemplate(
             'settings/boardname.html',
             [
-                'board_name' => Config::getSetting('boardname'),
-                'logo_url' => Config::getSetting('logourl'),
+                'board_name' => $this->config->getSetting('boardname'),
+                'logo_url' => $this->config->getSetting('logourl'),
             ],
         );
         $PAGE->addContentBox('Board Name/Logo', $page);
 
         $page = '';
-        if (!Config::getSetting('boardoffline')) {
+        if (!$this->config->getSetting('boardoffline')) {
         }
 
         $JAX->blockhtml(
-            Config::getSetting('offlinetext'),
+            $this->config->getSetting('offlinetext'),
         );
         $page .= $PAGE->parseTemplate(
             'settings/boardname-board-offline.html',
             [
-                'board_offline_checked' => Config::getSetting('boardoffline')
+                'board_offline_checked' => $this->config->getSetting('boardoffline')
                     ? '' : ' checked="checked"',
                 'board_offline_text' => $JAX->blockhtml(
-                    Config::getSetting('offlinetext'),
+                    $this->config->getSetting('offlinetext'),
                 ),
                 'content' => $page,
             ],
@@ -283,7 +287,7 @@ final class Settings
                 $e = 'Shouts to show must be between 1 and 10';
             }
 
-            Config::write($write);
+            $this->config->write($write);
             if ($e !== '' && $e !== '0') {
                 $page .= $PAGE->error($e);
             } else {
@@ -294,11 +298,11 @@ final class Settings
         $page .= $PAGE->parseTemplate(
             'settings/shoutbox.html',
             [
-                'shoutbox_avatar_checked' => Config::getSetting('shoutboxava')
+                'shoutbox_avatar_checked' => $this->config->getSetting('shoutboxava')
                 ? ' checked="checked"' : '',
-                'shoutbox_checked' => Config::getSetting('shoutbox')
+                'shoutbox_checked' => $this->config->getSetting('shoutbox')
                     ? ' checked="checked"' : '',
-                'show_shouts' => Config::getSetting('shoutbox_num'),
+                'show_shouts' => $this->config->getSetting('shoutbox_num'),
             ],
         );
         $PAGE->addContentBox('Shoutbox', $page);
@@ -307,13 +311,13 @@ final class Settings
     public function birthday(): void
     {
         global $PAGE,$JAX;
-        $birthdays = Config::getSetting('birthdays');
+        $birthdays = $this->config->getSetting('birthdays');
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             if (!isset($JAX->p['bicon'])) {
                 $JAX->p['bicon'] = false;
             }
 
-            Config::write(
+            $this->config->write(
                 [
                     'birthdays' => $birthdays = ($JAX->p['bicon'] ? 1 : 0),
                 ],

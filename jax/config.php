@@ -14,12 +14,13 @@ use const JSON_PRETTY_PRINT;
 
 final class Config
 {
-    public static function get(): array
+
+    public function get(): array
     {
         return array_merge(self::getServiceConfig(), self::getBoardConfig(), self::override());
     }
 
-    public static function getServiceConfig()
+    public function getServiceConfig()
     {
         static $serviceConfig = null;
 
@@ -32,7 +33,7 @@ final class Config
         return $serviceConfig = $CFG;
     }
 
-    public static function getBoardConfig($write = null)
+    public function getBoardConfig($write = null)
     {
         static $boardConfig = null;
 
@@ -55,7 +56,7 @@ final class Config
         return $boardConfig = $CFG;
     }
 
-    public static function getSetting(string $key)
+    public function getSetting(string $key)
     {
         $config = self::get();
 
@@ -66,7 +67,7 @@ final class Config
         return null;
     }
 
-    public static function override($override = null)
+    public function override($override = null)
     {
         static $overrideConfig = [];
 
@@ -77,7 +78,7 @@ final class Config
         return $overrideConfig;
     }
 
-    public static function write($data): void
+    public function write($data): void
     {
         $boardConfig = self::getBoardConfig($data);
 
@@ -89,12 +90,12 @@ final class Config
     }
 
     // Only used during installation
-    public static function writeServiceConfig($data): void
+    public function writeServiceConfig($data): void
     {
         file_put_contents(JAXBOARDS_ROOT . '/config.php', self::configFileContents($data));
     }
 
-    private static function configFileContents($data): string
+    private function configFileContents($data): string
     {
         $dataString = json_encode($data, JSON_PRETTY_PRINT);
 

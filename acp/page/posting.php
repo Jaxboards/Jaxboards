@@ -14,6 +14,10 @@ use const PHP_EOL;
 
 final class Posting
 {
+    public function __construct(\Jax\Config $config) {
+        $this->config = $config;
+    }
+
     public function route(): void
     {
         global $JAX, $PAGE;
@@ -200,7 +204,7 @@ final class Posting
         }
 
         if (isset($JAX->p['baseset']) && $basesets[$JAX->p['baseset']]) {
-            Config::write(['emotepack' => $JAX->p['baseset']]);
+            $this->config->write(['emotepack' => $JAX->p['baseset']]);
         }
 
         if ($emoticons === []) {
@@ -242,7 +246,7 @@ final class Posting
 
         $PAGE->addContentBox('Custom Emoticons', $page);
 
-        $emotepack = Config::getSetting('emotepack');
+        $emotepack = $this->config->getSetting('emotepack');
         $emoticonPackOptions = '';
         foreach ($basesets as $packId => $packName) {
             $emoticonPackOptions .= $PAGE->parseTemplate(
@@ -327,14 +331,14 @@ final class Posting
         }
 
         if (isset($JAX->p['rsubmit']) && $JAX->p['rsubmit']) {
-            Config::write([
+            $this->config->write([
                 'ratings' => (isset($JAX->p['renabled']) ? 1 : 0)
                 + (isset($JAX->p['ranon']) ? 2 : 0),
             ]);
             $page2 .= $PAGE->success('Settings saved!');
         }
 
-        $ratingsettings = Config::getSetting('ratings');
+        $ratingsettings = $this->config->getSetting('ratings');
 
         $page2 .= $PAGE->parseTemplate(
             'posting/post-rating-settings.html',

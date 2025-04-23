@@ -37,11 +37,12 @@ final class UCP
     public $shownucp = false;
 
     public $ucppage = '';
-
-    public function __construct()
+    public function __construct(\Jax\Config $config)
     {
         global $PAGE;
         $PAGE->loadmeta('ucp');
+
+        $this->config = $config;
     }
 
     public function route(): void
@@ -486,7 +487,7 @@ final class UCP
                 $data['display_name'] = $USER['name'];
             }
 
-            $badNameChars = Config::getSetting('badnamechars');
+            $badNameChars = $this->config->getSetting('badnamechars');
             if (
                 $badNameChars
                 && preg_match($badNameChars, (string) $data['display_name'])

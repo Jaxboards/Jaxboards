@@ -12,11 +12,13 @@ final class Shoutbox
 
     private $shoutlimit;
 
-    public function __construct()
+    public function __construct(\Jax\Config $config, \Jax\IPAddress $ipAddress)
     {
         global $PAGE;
 
         $PAGE->loadmeta('shoutbox');
+        $this->config = $config;
+        $this->ipAddress = $ipAddress;
     }
 
     public function init(): void
@@ -27,11 +29,11 @@ final class Shoutbox
             $PERMS['can_view_shoutbox'] = false;
         }
 
-        if (!Config::getSetting('shoutbox') || !$PERMS['can_view_shoutbox']) {
+        if (!$this->config->getSetting('shoutbox') || !$PERMS['can_view_shoutbox']) {
             return;
         }
 
-        $this->shoutlimit = Config::getSetting('shoutbox_num');
+        $this->shoutlimit = $this->config->getSetting('shoutbox_num');
         if (
             isset($JAX->b['shoutbox_delete'])
             && is_numeric($JAX->b['shoutbox_delete'])
@@ -94,7 +96,7 @@ final class Shoutbox
             $row['group_id'],
             $row['display_name'],
         ) : 'Guest';
-        $avatar = Config::getSetting('shoutboxava')
+        $avatar = $this->config->getSetting('shoutboxava')
             ? '<img src="' . $JAX->pick(
                 $row['avatar'],
                 $PAGE->meta('default-avatar'),
@@ -213,7 +215,7 @@ final class Shoutbox
             );
             while ($f = $DB->arow($result)) {
                 $PAGE->JS('addshout', $this->formatshout($f));
-                if (Config::getSetting('shoutboxsounds')) {
+                if ($this->config->getSetting('shoutboxsounds')) {
                     $sounds = [];
                     if ($USER['sound_shout'] && $sounds[$f['shout']]) {
                         $PAGE->JS(
@@ -370,7 +372,7 @@ final class Shoutbox
             'shouts',
             [
                 'date' => gmdate('Y-m-d H:i:s'),
-                'ip' => IPAddress::asBinary(),
+                'ip' => $this->ipAddress->asBinary(),
                 'shout' => $shout,
                 'uid' => $userData['id'] ?? 0,
             ],

@@ -39,11 +39,14 @@ final class ModControls
 {
     public $perms;
 
-    public function __construct()
+    public function __construct(\Jax\Config $config, \Jax\IPAddress $ipAddress)
     {
         global $PAGE;
 
         $PAGE->loadmeta('modcp');
+
+        $this->config = $config;
+        $this->ipAddress = $ipAddress;
     }
 
     public static function load(): void
@@ -1031,12 +1034,12 @@ final class ModControls
         $changed = false;
 
         if (isset($JAX->p['ban']) && $JAX->p['ban']) {
-            if (!IPAddress::isBanned($ip)) {
+            if (!$this->ipAddress->isBanned($ip)) {
                 $changed = true;
                 $JAX->ipbancache[] = $ip;
             }
         } elseif (isset($JAX->p['unban']) && $JAX->p['unban']) {
-            if ($entry = IPAddress::isBanned($ip)) {
+            if ($entry = $this->ipAddress->isBanned($ip)) {
                 $changed = true;
                 unset($JAX->ipbancache[array_search($entry, $JAX->ipbancache, true)]);
             }
@@ -1072,7 +1075,7 @@ final class ModControls
                     'ip' => $ip,
                 ],
             );
-            $banCode = IPAddress::isBanned($ip) ? <<<'EOT'
+            $banCode = $this->ipAddress->isBanned($ip) ? <<<'EOT'
                 <span style="color:#900">
                     banned
                 </span>
@@ -1119,7 +1122,7 @@ final class ModControls
                 ],
                 'members',
                 'WHERE `ip`=?',
-                $DB->basicvalue(IPAddress::asBinary($ip)),
+                $DB->basicvalue($this->ipAddress->asBinary($ip)),
             );
             while ($f = $DB->arow($result)) {
                 $content[] = $PAGE->meta(
@@ -1132,7 +1135,7 @@ final class ModControls
 
             $page .= $this->box('Users with this IP:', implode(', ', $content));
 
-            if (Config::getSetting('shoutbox')) {
+            if ($this->config->getSetting('shoutbox')) {
                 $content = '';
                 $result = $DB->safespecial(
                     <<<'EOT'
@@ -1155,7 +1158,7 @@ final class ModControls
                         'shouts',
                         'members',
                     ],
-                    $DB->basicvalue(IPAddress::asBinary($ip)),
+                    $DB->basicvalue($this->ipAddress->asBinary($ip)),
                 );
                 while ($f = $DB->arow($result)) {
                     $content .= $PAGE->meta(
@@ -1175,7 +1178,7 @@ final class ModControls
                 ['post'],
                 'posts',
                 'WHERE `ip`=? ORDER BY `id` DESC LIMIT 5',
-                $DB->basicvalue(IPAddress::asBinary($ip)),
+                $DB->basicvalue($this->ipAddress->asBinary($ip)),
             );
             while ($f = $DB->arow($result)) {
                 $content .= "<div class='post'>"

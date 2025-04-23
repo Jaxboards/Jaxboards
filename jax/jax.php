@@ -78,8 +78,9 @@ final class Jax
 
     public $emoteRules;
 
-    public function __construct()
+    public function __construct(\Jax\Config $config)
     {
+        $this->config = $config;
         $this->c = $_COOKIE;
         $this->g = $_GET;
         $this->p = $_POST;
@@ -230,7 +231,7 @@ final class Jax
         }
 
         // Load emoticon pack.
-        $emotepack = Config::getSetting('emotepack');
+        $emotepack = $this->config->getSetting('emotepack');
         if ($emotepack) {
             $emotepack = 'emoticons/' . $emotepack;
             if (mb_substr($emotepack, -1) !== '/') {
@@ -529,7 +530,7 @@ final class Jax
         $ext = explode('.', (string) $data['name']);
         $ext = count($ext) === 1 ? '' : mb_strtolower(array_pop($ext));
 
-        if (!in_array($ext, Config::getSetting('images') ?? [])) {
+        if (!in_array($ext, $this->config->getSetting('images') ?? [])) {
             $ext = '';
         }
 
@@ -699,7 +700,7 @@ final class Jax
     {
         global $_SERVER;
 
-        $boardname = Config::getSetting('boardname') ?: 'JaxBoards';
+        $boardname = $this->config->getSetting('boardname') ?: 'JaxBoards';
         $boardurl = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'];
         $boardlink = "<a href='https://" . $boardurl . "'>" . $boardname . '</a>';
 
@@ -713,7 +714,7 @@ final class Jax
             ),
             'MIME-Version: 1.0' . PHP_EOL
             . 'Content-type:text/html;charset=iso-8859-1' . PHP_EOL
-            . 'From: ' . Config::getSetting('mail_from') . PHP_EOL,
+            . 'From: ' . $this->config->getSetting('mail_from') . PHP_EOL,
         );
     }
 

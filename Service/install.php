@@ -3,6 +3,7 @@
 use ACP\Page;
 use Jax\Jax;
 use Jax\MySQL;
+use Jax\Config;
 
 /*
  * Service install file, for installing a new JaxBoards service.
@@ -25,6 +26,7 @@ if (file_exists(SERVICE_ROOT . '/install.lock')) {
 }
 
 require_once JAXBOARDS_ROOT . '/jax/autoload.php';
+$container = new DI\Container();
 
 require_once JAXBOARDS_ROOT . '/acp/page.php';
 
@@ -59,9 +61,9 @@ function recurseCopy($src, $dst): void
     closedir($dir);
 }
 
-$JAX = new Jax();
-$DB = new MySQL();
-$PAGE = new Page();
+$JAX = $container->get('\Jax\Jax');
+$DB = $container->get('\Jax\MySQL');
+$PAGE = $container->get('\ACP\Page');
 
 $fields = [
     'admin_email' => [
@@ -174,7 +176,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
 
     if ($errors === []) {
         // Update with our settings.
-        Config::writeServiceConfig(
+        $container->get('\Jax\Config')->writeServiceConfig(
             [
                 'boardname' => 'Jaxboards',
                 'domain' => $JAX->p['domain'],
@@ -247,7 +249,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                         'date' => gmdate(DB_DATETIME),
                         'referral' => $JAX->b['r'] ?? '',
                         'registrar_email' => $JAX->p['admin_email'],
-                        'registrar_ip' => IPAddress::asBinary(),
+                        'registrar_ip' => $container->get('\Jax\IPAddress')->asBinary(),
                     ],
                 );
                 $DB->prefix($boardPrefix);

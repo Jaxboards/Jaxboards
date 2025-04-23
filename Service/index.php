@@ -20,9 +20,11 @@ if (!defined('SERVICE_ROOT')) {
 }
 
 require_once JAXBOARDS_ROOT . '/jax/autoload.php';
+$container = new DI\Container();
 
-$JAX = new Jax();
-$DB = new MySQL();
+$JAX = $container->get('\Jax\Jax');
+$DB = $container->get('\Jax\MySQL');
+$CFG = $container->get('\Jax\Config')->get();
 
 if (!file_exists(JAXBOARDS_ROOT . '/config.php')) {
     echo 'Jaxboards not installed!';
@@ -32,7 +34,7 @@ if (!file_exists(JAXBOARDS_ROOT . '/config.php')) {
 
 require_once JAXBOARDS_ROOT . '/config.php';
 
-if (!Config::getSetting('service')) {
+if (!$CFG['service']) {
     echo 'Service mode not enabled';
 
     exit(1);
@@ -104,7 +106,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         ['id'],
         'directory',
         'WHERE `registrar_ip`=? AND `date`>?',
-        IPAddress::asBinary(),
+        $container->get('\Jax\IPAddress')->asBinary(),
         gmdate(DB_DATETIME, time() - 7 * 24 * 60 * 60),
     );
     if ($DB->num_rows($result) > 3) {
@@ -147,7 +149,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                 'date' => gmdate(DB_DATETIME),
                 'referral' => $JAX->b['r'] ?? '',
                 'registrar_email' => $JAX->p['email'],
-                'registrar_ip' => IPAddress::asBinary(),
+                'registrar_ip' => $container->get('\Jax\IPAddress')->asBinary(),
             ],
         );
         $DB->prefix($boardPrefix);

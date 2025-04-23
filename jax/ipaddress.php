@@ -6,7 +6,11 @@ namespace Jax;
 
 final class IPAddress
 {
-    public static function asBinary($ip = null): false|string
+    function __constructor(\Jax\Config $config) {
+        $this->config = $config;
+    }
+
+    public function asBinary($ip = null): false|string
     {
         if (!$ip) {
             $ip = self::getIp();
@@ -24,7 +28,7 @@ final class IPAddress
     // we need to do something for mysql IP addresses:
     // https://secure.php.net/manual/en/function.inet-ntop.php#117398
     // .
-    public static function asHumanReadable(?string $ip = null): string
+    public function asHumanReadable(?string $ip = null): string
     {
         if (!$ip) {
             return self::getIp();
@@ -35,9 +39,9 @@ final class IPAddress
         return (inet_ntop($ip) ?: inet_ntop(pack('A' . $length, $ip))) ?: '';
     }
 
-    public static function isBanned($ip = false)
+    public function isBanned($ip = false)
     {
-        static $ipbancache = null;
+     $ipbancache = null;
 
         if (!$ip) {
             $ip = self::getIp();
@@ -81,11 +85,11 @@ final class IPAddress
      *
      * @return bool if the IP is banned form the service or not
      */
-    public static function isServiceBanned(?string $ipAddress = null): bool
+    public function isServiceBanned(?string $ipAddress = null): bool
     {
         global $DB,$JAX;
 
-        if (!Config::getSetting('service')) {
+        if (!$this->config->getSetting('service')) {
             // Can't be service banned if there's no service.
             return false;
         }
@@ -110,7 +114,7 @@ final class IPAddress
         return !isset($row['banned']) || $row['banned'] > 0;
     }
 
-    private static function getIp()
+    private function getIp()
     {
         global $_SERVER;
 

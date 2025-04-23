@@ -40,6 +40,10 @@ final class Themes
 {
     public $WRAPPERS_PATH;
 
+    public function __construct(\Jax\Config $config) {
+        $this->config = $config;
+    }
+
     public function route(): void
     {
         global $PAGE,$JAX;
@@ -47,7 +51,7 @@ final class Themes
         $this->WRAPPERS_PATH = BOARDPATH . 'Wrappers/';
 
         if (!defined('DTHEMEPATH')) {
-            define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . Config::getSetting('dthemepath'));
+            define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . $this->config->getSetting('dthemepath'));
         }
 
         $links = [

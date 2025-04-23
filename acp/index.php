@@ -26,12 +26,13 @@ if (!defined('JAXBOARDS_ROOT')) {
 
 // Load composer dependencies.
 require_once JAXBOARDS_ROOT . '/jax/autoload.php';
+$container = new DI\Container();
 
 require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
 
-$CFG = Config::get();
+$CFG = $container->get('\Jax\Config')->get();
 
-$DB = new MySQL();
+$DB = $container->get('\Jax\MySQL');
 $DB->connect(
     $CFG['sql_host'],
     $CFG['sql_username'],
@@ -41,8 +42,8 @@ $DB->connect(
 );
 
 
-$JAX = new Jax();
-$PAGE = new Page();
+$JAX = $container->get('\Jax\Jax');
+$PAGE = $container->get('\ACP\Page');
 
 $themeElements = [
     'board_name' => $CFG['boardname'],

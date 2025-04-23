@@ -38,6 +38,10 @@ final class Members
 {
     public const DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
 
+    public function __construct(\Jax\Config $config) {
+        $this->config = $config;
+    }
+
     public function route(): void
     {
         global $JAX,$PAGE;
@@ -937,7 +941,7 @@ final class Members
     {
         global $PAGE, $DB, $JAX;
         if (isset($_POST['submit1'])) {
-            Config::write(
+            $this->config->write(
                 [
                     'membervalidation' => isset($_POST['v_enable'])
                     && $_POST['v_enable'] ? 1 : 0,
@@ -948,7 +952,7 @@ final class Members
         $page = $PAGE->parseTemplate(
             'members/validation.html',
             [
-                'checked' => Config::getSetting('membervalidation')
+                'checked' => $this->config->getSetting('membervalidation')
                 ? 'checked="checked"' : '',
             ],
         ) . PHP_EOL;

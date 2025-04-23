@@ -2,19 +2,20 @@
 
 declare(strict_types=1);
 
-if (!defined('JAXBOARDS_ROOT')) {
-    define('JAXBOARDS_ROOT', __DIR__);
-}
-
-// Load composer dependencies.
-require_once JAXBOARDS_ROOT . '/jax/autoload.php';
-
 use Jax\Config;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\MySQL;
 use Jax\Page;
 use Jax\Sess;
+
+if (!defined('JAXBOARDS_ROOT')) {
+    define('JAXBOARDS_ROOT', __DIR__);
+}
+
+// Load composer dependencies.
+require_once JAXBOARDS_ROOT . '/jax/autoload.php';
+$container = new DI\Container();
 
 require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
 
@@ -38,12 +39,12 @@ header('Cache-Control: no-cache, must-revalidate');
 
 $microtime = microtime(true);
 
-$onLocalHost = in_array(IPAddress::asHumanReadable(), ['127.0.0.1', '::1'], true);
+$onLocalHost = in_array($container->get('\Jax\IPAddress')->asHumanReadable(), ['127.0.0.1', '::1'], true);
 
-$CFG = Config::get();
+$CFG = $container->get('\Jax\Config')->get();
 
 // DB connect!
-$DB = new MySQL();
+$DB = $container->get('\Jax\MySQL');
 if ($onLocalHost) {
     $DB->debugMode = true;
 }
@@ -76,9 +77,9 @@ if (isset($CFG['noboard']) && $CFG['noboard']) {
     exit(1);
 }
 
-$PAGE = new Page();
-$JAX = new Jax();
-$SESS = new Sess($_SESSION['sid'] ?? false);
+$PAGE = $container->get('\Jax\Page');
+$JAX = $container->get('\Jax\Jax');
+$SESS = $container->get('\Jax\Sess');
 
 if (!isset($_SESSION['uid']) && isset($JAX->c['utoken'])) {
     $result = $DB->safeselect(
@@ -105,7 +106,7 @@ if ($USER && $SESS->ip && $SESS->ip !== $USER['ip']) {
     $DB->safeupdate(
         'members',
         [
-            'ip' => IPAddress::asBinary(),
+            'ip' => $container->get('\Jax\IPAddress')->asBinary(),
         ],
         'WHERE id=?',
         $USER['id'],
@@ -338,15 +339,15 @@ if (
 $modules = glob('jax/modules/*.php');
 if ($modules) {
     foreach ($modules as $module) {
-        $moduleClassName = 'Jax\Modules\\' . pathinfo($module, PATHINFO_FILENAME);
+        $moduleName = pathinfo($module, PATHINFO_FILENAME);
 
-        $module = new $moduleClassName();
+        $module = $container->get('Jax\Modules\\' . $moduleName);
 
         if (
             property_exists($module, 'TAG') && !(!(
                 isset($JAX->b['module'])
-            && $JAX->b['module'] === $moduleClassName
-            ) && !$PAGE->templatehas($moduleClassName))
+            && $JAX->b['module'] === $moduleName
+            ) && !$PAGE->templatehas($moduleName))
         ) {
             continue;
         }
@@ -371,8 +372,7 @@ if (isset($actdefs[$act])) {
 if ($act === 'idx' && isset($JAX->b['module']) && $JAX->b['module']) {
     // Do nothing.
 } elseif ($act && file_exists('jax/page/' . $act . '.php')) {
-    $pageClass = 'Jax\Page\\' . $act;
-    $page = new $pageClass();
+    $page = $container->get('Jax\Page\\' . $act);
     $page->route();
 } elseif (!$PAGE->jsaccess || $PAGE->jsnewlocation) {
     $result = $DB->safeselect(

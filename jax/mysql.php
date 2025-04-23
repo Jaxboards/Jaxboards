@@ -71,6 +71,11 @@ final class MySQL
 
     private $db = '';
 
+    function __construct(\Jax\Config $config, \Jax\IPAddress $ipAddress) {
+        $this->config = $config;
+        $this->ipAddress = $ipAddress;
+    }
+
     public function connect(
         $host,
         $user,
@@ -626,7 +631,7 @@ final class MySQL
             return $userData = false;
         }
 
-        if (IPAddress::isBanned()) {
+        if ($this->ipAddress->isBanned()) {
             $userData['group_id'] = 4;
         }
 
@@ -762,7 +767,7 @@ final class MySQL
     public function getUsersOnline()
     {
         global $USER,$SESS;
-        $idletimeout = time() - (Config::getSetting('timetoidle') ?? 300);
+        $idletimeout = time() - ($this->config->getSetting('timetoidle') ?? 300);
         $return = [];
         if (!$this->usersOnlineCache) {
             $result = $this->safespecial(
@@ -782,7 +787,7 @@ final class MySQL
                     EOT
                 ,
                 ['session', 'members'],
-                gmdate('Y-m-d H:i:s', time() - Config::getSetting('timetologout')),
+                gmdate('Y-m-d H:i:s', time() - $this->config->getSetting('timetologout')),
             );
             $today = gmdate('n j');
             while ($f = $this->arow($result)) {

@@ -35,10 +35,12 @@ final class UserProfile
         'youtube' => 'https://youtube.com/%s',
     ];
 
-    public function __construct()
+    public function __construct(\Jax\IPAddress $ipAddress)
     {
         global $PAGE;
         $PAGE->loadmeta('userprofile');
+
+        $this->ipAddress = $ipAddress;
     }
 
     public function route(): void
@@ -581,8 +583,8 @@ final class UserProfile
                 . $udata['id'] . '">PM</a></div>';
             if ($PERMS['can_moderate']) {
                 $contactdetails .= '<div>IP: <a href="'
-                    . '?act=modcontrols&do=iptools&ip=' . IPAddress::asHumanReadable($udata['ip'])
-                    . '">' . IPAddress::asHumanReadable($udata['ip']) . '</a></div>';
+                    . '?act=modcontrols&do=iptools&ip=' . $this->ipAddress->asHumanReadable($udata['ip'])
+                    . '">' . $this->ipAddress->asHumanReadable($udata['ip']) . '</a></div>';
             }
 
             $page = $PAGE->meta(

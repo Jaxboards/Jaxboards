@@ -39,10 +39,14 @@ final class LogReg
 {
     public $registering = false;
 
-    public function __construct()
+    public function __construct(\Jax\Config $config, \Jax\IPAddress $ipAddress)
     {
         global $PAGE;
+
         $PAGE->loadmeta('logreg');
+
+        $this->config = $config;
+        $this->ipAddress = $ipAddress;
     }
 
     public function route(): void
@@ -94,7 +98,7 @@ final class LogReg
 
         // Validate input and actually register the user.
         try {
-            if (IPAddress::isServiceBanned()) {
+            if ($this->ipAddress->isServiceBanned()) {
                 throw new Exception(
                     'You have been banned from registration on all boards. If'
                     . ' you feel that this is in error, please contact the'
@@ -130,7 +134,7 @@ final class LogReg
                 throw new Exception("That isn't a valid email!");
             }
 
-            if (IPAddress::isBanned()) {
+            if ($this->ipAddress->isBanned()) {
                 throw new Exception('You have been banned from registering on this board.');
             }
 
@@ -168,7 +172,7 @@ final class LogReg
                     'display_name' => $dispname,
                     'email' => $email,
                     'group_id' => array_key_exists('membervalidation', $CFG) && $CFG['membervalidation'] ? 5 : 1,
-                    'ip' => IPAddress::asBinary(),
+                    'ip' => $this->ipAddress->asBinary(),
                     'join_date' => gmdate('Y-m-d H:i:s'),
                     'last_visit' => gmdate('Y-m-d H:i:s'),
                     'name' => $name,

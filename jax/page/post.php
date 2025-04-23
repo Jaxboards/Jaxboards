@@ -49,10 +49,12 @@ final class Post
 
     public $how;
 
-    public function __construct()
+    public function __construct(\Jax\Config $config, \Jax\IPAddress $ipAddress)
     {
         global $PAGE;
         $PAGE->metadefs['post-preview'] = $PAGE->meta('box', '', 'Post Preview', '%s');
+        $this->config = $config;
+        $this->ipAddress = $ipAddress;
     }
 
     public function route(): void
@@ -130,7 +132,7 @@ final class Post
         $ext = explode('.', (string) $fileobj['name']);
         $ext = count($ext) === 1 ? '' : mb_strtolower(array_pop($ext));
 
-        if (!in_array($ext, Config::getSetting('images') ?? [])) {
+        if (!in_array($ext, $this->config->getSetting('images') ?? [])) {
             $ext = '';
         }
 
@@ -145,7 +147,7 @@ final class Post
                 'files',
                 [
                     'hash' => $hash,
-                    'ip' => IPAddress::asBinary(),
+                    'ip' => $this->ipAddress->asBinary(),
                     'name' => $fileobj['name'],
                     'size' => $size,
                     'uid' => $uid,
@@ -817,7 +819,7 @@ onclick="this.form.submitButton=this"/></div>
             [
                 'auth_id' => $uid,
                 'date' => $postDate,
-                'ip' => IPAddress::asBinary(),
+                'ip' => $this->ipAddress->asBinary(),
                 'newtopic' => $newtopic ? 1 : 0,
                 'post' => $postdata,
                 'tid' => $tid,

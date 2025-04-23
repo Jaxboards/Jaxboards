@@ -10,6 +10,10 @@ use function nl2br;
 
 final class BoardOffline
 {
+    public function __construct(\Jax\Config $config) {
+        $this->config = $config;
+    }
+
     public function route(): void
     {
         global $PAGE,$JAX;
@@ -27,8 +31,8 @@ final class BoardOffline
                     "You don't have permission to view the board. "
                     . 'If you have an account that has permission, '
                     . 'please log in.'
-                    . (Config::getSetting('boardoffline') && Config::getSetting('offlinetext')
-                    ? '<br /><br />Note:<br />' . nl2br((string) Config::getSetting('offlinetext'))
+                    . ($this->config->getSetting('boardoffline') && $this->config->getSetting('offlinetext')
+                    ? '<br /><br />Note:<br />' . nl2br((string) $this->config->getSetting('offlinetext'))
                     : ''),
                 ),
             ),

@@ -9,10 +9,11 @@ use Jax\MySQL;
 define('JAXBOARDS_ROOT', dirname(__DIR__));
 
 require_once JAXBOARDS_ROOT . '/jax/autoload.php';
+$container = new DI\Container();
 
-$CFG = Config::get();
+$CFG = $container->get('\Jax\Config')->get();
 
-$DB = new MySQL();
+$DB = $container->get('\Jax\MySQL');
 $DB->connect(
     $CFG['sql_host'],
     $CFG['sql_username'],
@@ -51,7 +52,7 @@ switch ($_GET['act'] ?? '') {
         break;
 
     case 'emotes':
-        $JAX = new Jax();
+        $JAX = $container->get('\Jax\Jax');
         $rules = $JAX->getEmoteRules(0);
         foreach ($rules as $k => $v) {
             $rules[$k] = '<img src="' . $v . '" alt="' . $JAX->blockhtml($k) . '" />';

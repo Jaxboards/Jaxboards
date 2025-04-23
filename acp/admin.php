@@ -26,12 +26,13 @@ if (!defined('JAXBOARDS_ROOT')) {
 
 // Load composer dependencies.
 require_once JAXBOARDS_ROOT . '/jax/autoload.php';
+$container = new DI\Container();
 
 require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
 
-$CFG = Config::get();
+$CFG = $container->get('\Jax\Config')->get();
 
-$DB = new MySQL();
+$DB = $container->get('\Jax\MySQL');
 $DB->connect(
     $CFG['sql_host'],
     $CFG['sql_username'],
@@ -40,7 +41,7 @@ $DB->connect(
     $CFG['sql_prefix'],
 );
 
-$JAX = new Jax();
+$JAX = $container->get('\Jax\Jax');
 if (isset($_SESSION['auid'])) {
     $userData = $DB->getUser($_SESSION['auid']);
     $PERMS = $DB->getPerms($userData['group_id']);
@@ -57,9 +58,9 @@ if (!$PERMS['can_access_acp']) {
 }
 
 $USER = $DB->getUser();
-$PAGE = new Page();
+$PAGE = $container->get('\ACP\Page');
 $PAGE->append('username', $USER['display_name']);
-$PAGE->title(Config::getSetting('boardname') . ' - ACP');
+$PAGE->title($CFG['boardname'] . ' - ACP');
 $PAGE->addNavMenu(
     'Settings',
     '?act=settings',
@@ -132,8 +133,7 @@ $PAGE->addNavMenu(
 $act = $JAX->g['act'] ?? null;
 
 if ($act && file_exists("./page/{$act}.php")) {
-    $acpPageClass = "ACP\\Page\\{$act}";
-    $page = new $acpPageClass();
+    $page = $container->get('ACP\\Page\\' . $act);
     $page->route();
 }
 

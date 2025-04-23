@@ -62,9 +62,12 @@ final class Sess
 
     public $changedData = [];
 
-    public function __construct($sid = false)
+    public function __construct(\Jax\Config $config, \Jax\IPAddress $ipAddress)
     {
-        $this->data = $this->getSess($sid);
+        $this->config = $config;
+        $this->ipAddress = $ipAddress;
+
+        $this->data = $this->getSess($_SESSION['sid'] ?? false);
         if (!isset($this->data['vars'])) {
             $this->data['vars'] = serialize([]);
         }
@@ -84,6 +87,12 @@ final class Sess
 
     public function __set($property, $value): void
     {
+        // TODO: overhaul this class to not use magic setter and getters
+        if (in_array($property, ['config', 'ipAddress'])) {
+            $this->{$property} = $value;
+            return;
+        }
+
         if (isset($this->data[$property]) && $this->data[$property] === $value) {
             return;
         }
@@ -132,7 +141,7 @@ final class Sess
                     'session',
                     'WHERE `id`=? AND `ip`=?',
                     $DB->basicvalue($sid),
-                    IPAddress::asBinary(),
+                    $this->ipAddress->asBinary(),
                 )
                     : $DB->safeselect(
                         [
@@ -191,7 +200,7 @@ final class Sess
         $sessData = [
             'forumsread' => '{}',
             'id' => $sid,
-            'ip' => IPAddress::asBinary(),
+            'ip' => $this->ipAddress->asBinary(),
             'is_bot' => $isbot,
             'last_action' => $actionTime,
             'last_update' => $actionTime,
@@ -261,7 +270,7 @@ final class Sess
     public function clean($uid): bool
     {
         global $DB,$PAGE,$JAX;
-        $timeago = time() - Config::getSetting('timetologout');
+        $timeago = time() - $this->config->getSetting('timetologout');
         if (!is_numeric($uid) || $uid < 1) {
             $uid = null;
         } else {

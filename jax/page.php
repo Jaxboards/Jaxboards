@@ -92,8 +92,9 @@ final class Page
 
     public $done;
 
-    public function __construct()
+    public function __construct(\Jax\Config $config)
     {
+        $this->config = $config;
         $this->jsaccess = (int) ($_SERVER['HTTP_X_JSACCESS'] ?? 0);
 
         if ($this->jsaccess !== 0) {
@@ -328,11 +329,11 @@ final class Page
             define('THEMEPATH', $t);
             define('THEMEPATHURL', $turl);
         } else {
-            define('THEMEPATH', JAXBOARDS_ROOT . '/' . Config::getSetting('dthemepath'));
-            define('THEMEPATHURL', BOARDURL . Config::getSetting('dthemepath'));
+            define('THEMEPATH', JAXBOARDS_ROOT . '/' . $this->config->getSetting('dthemepath'));
+            define('THEMEPATHURL', BOARDURL . $this->config->getSetting('dthemepath'));
         }
 
-        define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . Config::getSetting('dthemepath'));
+        define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . $this->config->getSetting('dthemepath'));
         $this->loadtemplate(
             $skin['wrapper']
             ? BOARDPATH . 'Wrappers/' . $skin['wrapper'] . '.html'

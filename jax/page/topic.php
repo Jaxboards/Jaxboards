@@ -62,10 +62,13 @@ final class Topic
      */
     private $topicdata;
 
-    public function __construct()
+    public function __construct(\Jax\Config $config, \Jax\IPAddress $ipAddress)
     {
         global $PAGE;
         $PAGE->loadmeta('topic');
+
+        $this->config = $config;
+        $this->ipAddress = $ipAddress;
     }
 
     public function route(): void
@@ -523,7 +526,7 @@ final class Topic
     {
         global $DB,$PAGE,$JAX,$SESS,$USER,$PERMS,$CFG;
         $usersonline = $DB->getUsersOnline();
-        $ratingConfig = Config::getSetting('ratings') ?? 0;
+        $ratingConfig = $this->config->getSetting('ratings') ?? 0;
 
         $topicPostCounter = 0;
 
@@ -784,9 +787,9 @@ final class Topic
                 ) : '',
                 $PERMS['can_moderate']
                     ? '<a href="?act=modcontrols&amp;do=iptools&amp;ip='
-                . IPAddress::asHumanReadable($post['ip']) . '">' . $PAGE->meta(
+                . $this->ipAddress->asHumanReadable($post['ip']) . '">' . $PAGE->meta(
                     'topic-mod-ipbutton',
-                    IPAddress::asHumanReadable($post['ip']),
+                    $this->ipAddress->asHumanReadable($post['ip']),
                 ) . '</a>'
                     : '',
                 $post['icon'] ? $PAGE->meta(
@@ -1353,7 +1356,7 @@ final class Topic
     public function listrating($pid): void
     {
         global $DB,$PAGE;
-        $ratingConfig = Config::getSetting('ratings') ?? 0;
+        $ratingConfig = $this->config->getSetting('ratings') ?? 0;
         if (($ratingConfig & 2) !== 0) {
             return;
         }

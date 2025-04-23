@@ -8,6 +8,10 @@ use Jax\Config;
 
 final class PrivateMessage
 {
+    public function __construct(\Jax\Config $config) {
+        $this->config = $config;
+    }
+
     public function init(): void
     {
         global $JAX,$DB,$PAGE,$SESS;
@@ -91,8 +95,8 @@ final class PrivateMessage
         $cmd[1] = $ud['id'];
         $cmd[4] = 0;
         $onlineusers = $DB->getUsersOnline();
-        $logoutTime = time() - Config::getSetting('timetologout');
-        $updateTime = time() - Config::getSetting('updateinterval') * 5;
+        $logoutTime = time() - $this->config->getSetting('timetologout');
+        $updateTime = time() - $this->config->getSetting('updateinterval') * 5;
         if (
             !isset($onlineusers[$uid])
             || !$onlineusers[$uid]
@@ -126,7 +130,7 @@ final class PrivateMessage
             ['session'],
             $DB->basicvalue(json_encode($cmd) . PHP_EOL),
             $uid,
-            gmdate('Y-m-d H:i:s', time() - Config::getSetting('updateinterval') * 5),
+            gmdate('Y-m-d H:i:s', time() - $this->config->getSetting('updateinterval') * 5),
         );
 
         return $DB->affected_rows(1) !== 0;

@@ -33,10 +33,11 @@ final class IDX
 
     public $subforums;
 
-    public function __construct()
+    public function __construct(\Jax\Config $config)
     {
         global $PAGE;
         $PAGE->loadmeta('idx');
+        $this->config = $config;
     }
 
     public function route(): void
@@ -357,7 +358,7 @@ final class IDX
             $fName = $f['name'];
             $fGroupId = $f['group_id'];
             $birthdayCode = $f['birthday'] === $today
-                && Config::getSetting('birthdays') ? ' birthday' : '';
+                && $this->config->getSetting('birthdays') ? ' birthday' : '';
             $lastOnlineCode = $JAX->date(
                 $f['hide'] ? $f['read_date'] : $f['last_update'],
                 false,
@@ -427,7 +428,7 @@ final class IDX
                         $f['uid'],
                         $f['group_id']
                         . ($f['status'] === 'idle' ? ' idle' : '')
-                        . ($f['birthday'] && Config::getSetting('birthdays') ? ' birthday' : ''),
+                        . ($f['birthday'] && $this->config->getSetting('birthdays') ? ' birthday' : ''),
                         $f['name'],
                         $title,
                     );
