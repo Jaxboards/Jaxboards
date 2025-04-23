@@ -11,13 +11,13 @@
     <projectFiles>
         <file name="index.php" />
         <file name="domaindefinitions.php" />
-        <file name="php_codesniffer_to_sonarqube.php" />
         <file name="config.default.php" />
-        <directory name="misc" />
-        <directory name="Service" />
         <directory name="acp" />
-        <directory name="inc" />
+        <directory name="api" />
         <directory name="emoticons" />
+        <directory name="jax" />
+        <directory name="tools" />
+        <directory name="Service" />
         <ignoreFiles>
             <directory name="vendor" />
         </ignoreFiles>
