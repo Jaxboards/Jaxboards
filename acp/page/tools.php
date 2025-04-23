@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 namespace ACP\Page;
-use Jax\Config;
 
 use SplFileObject;
 
@@ -30,14 +29,13 @@ use function preg_match_all;
 use function trim;
 use function unlink;
 
+use const CONFIG;
 use const PATHINFO_EXTENSION;
 use const PHP_EOL;
 use const SEEK_END;
 
-final class Tools
+final readonly class Tools
 {
-    function __construct(private Config $config) {}
-
     public function route(): void
     {
         global $JAX,$PAGE;
@@ -188,7 +186,7 @@ final class Tools
                 $ext = mb_strtolower(array_pop($filepieces));
             }
 
-            $file['name'] = in_array($ext, $this-config->getSetting('images')) ? '<a href="'
+            $file['name'] = in_array($ext, $this - CONFIG->getSetting('images')) ? '<a href="'
                     . BOARDPATHURL . 'Uploads/' . $file['hash'] . '.' . $ext . '">'
                     . $file['name'] . '</a>' : '<a href="../?act=download&id='
                     . $file['id'] . '">' . $file['name'] . '</a>';

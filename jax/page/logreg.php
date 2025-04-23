@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Exception;
+use Jax\Config;
 use Jax\IPAddress;
 use Jax\Jax;
-use Jax\Config;
 
-use function array_key_exists;
 use function base64_encode;
 use function count;
 use function curl_exec;
@@ -40,8 +39,10 @@ final class LogReg
 {
     public $registering = false;
 
-    public function __construct(private readonly Config $config, private readonly IPAddress $ipAddress)
-    {
+    public function __construct(
+        private readonly Config $config,
+        private readonly IPAddress $ipAddress,
+    ) {
         global $PAGE;
 
         $PAGE->loadmeta('logreg');
