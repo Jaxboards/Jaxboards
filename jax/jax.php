@@ -78,7 +78,7 @@ final class Jax
 
     public $emoteRules;
 
-    public function __construct(public Config $config)
+    public function __construct(private Config $config)
     {
         $this->c = $_COOKIE;
         $this->g = $_GET;

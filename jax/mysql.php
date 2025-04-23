@@ -72,8 +72,8 @@ final class MySQL
     private $db = '';
 
     public function __construct(
-        public Config $config,
-        public IPAddress $ipAddress,
+        private Config $config,
+        private IPAddress $ipAddress,
     ) {}
 
     public function connect(

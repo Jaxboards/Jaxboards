@@ -46,8 +46,8 @@ final class ModControls
         /**
          * @var IPAddress
          */
-        public Config $config,
-        public IPAddress $ipAddress,
+        private Config $config,
+        private IPAddress $ipAddress,
     ) {
         global $PAGE;
 

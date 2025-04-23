@@ -92,7 +92,7 @@ final class Page
 
     public $done;
 
-    public function __construct(public Config $config)
+    public function __construct(private Config $config)
     {
         $this->jsaccess = (int) ($_SERVER['HTTP_X_JSACCESS'] ?? 0);
 

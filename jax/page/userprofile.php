@@ -38,7 +38,7 @@ final class UserProfile
     /**
      * @var IPAddress
      */
-    public function __construct(public IPAddress $ipAddress)
+    public function __construct(private IPAddress $ipAddress)
     {
         global $PAGE;
         $PAGE->loadmeta('userprofile');

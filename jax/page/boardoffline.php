@@ -10,7 +10,7 @@ use function nl2br;
 
 final readonly class BoardOffline
 {
-    public function __construct(public Config $config) {}
+    public function __construct(private Config $config) {}
 
     public function route(): void
     {

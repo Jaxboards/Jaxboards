@@ -8,7 +8,7 @@ use Jax\Config;
 
 final readonly class PrivateMessage
 {
-    public function __construct(public Config $config) {}
+    public function __construct(private Config $config) {}
 
     public function init(): void
     {

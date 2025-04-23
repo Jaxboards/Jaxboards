@@ -40,7 +40,7 @@ final class Themes
 {
     public $WRAPPERS_PATH;
 
-    public function __construct(public Config $config) {}
+    public function __construct(private Config $config) {}
 
     public function route(): void
     {

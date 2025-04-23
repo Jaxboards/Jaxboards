@@ -14,7 +14,7 @@ use const PHP_EOL;
 
 final readonly class Posting
 {
-    public function __construct(public Config $config) {}
+    public function __construct(private Config $config) {}
 
     public function route(): void
     {

@@ -33,7 +33,7 @@ final class IDX
 
     public $subforums;
 
-    public function __construct(public Config $config)
+    public function __construct(private Config $config)
     {
         global $PAGE;
         $PAGE->loadmeta('idx');

@@ -42,7 +42,7 @@ final readonly class Members
         /**
          * @var Config
          */
-        public Config $config,
+        private Config $config,
     ) {}
 
     public function route(): void
