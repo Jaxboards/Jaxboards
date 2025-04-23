@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 namespace ACP\Page;
-use ACP\Page;
 
+use ACP\Page;
 use Jax\Config;
 use Jax\Jax;
 
@@ -487,7 +487,7 @@ final readonly class Members
         $this->page->addContentBox('Pre-Register', $page);
     }
 
-    public function getGroups($group_id = 0)
+    public function getGroups($group_id = 0): ?string
     {
         global $DB;
         $page = '';
@@ -769,7 +769,6 @@ final readonly class Members
     public function ipbans(): void
     {
         global $JAX;
-        $page = '';
         if (isset($JAX->p['ipbans'])) {
             $data = explode(PHP_EOL, $JAX->p['ipbans']);
             foreach ($data as $k => $v) {
@@ -1025,7 +1024,7 @@ final readonly class Members
         ) . PHP_EOL;
     }
 
-    public function heading($value)
+    public function heading($value): ?string
     {
         return $this->page->parseTemplate(
             'members/edit-heading.html',

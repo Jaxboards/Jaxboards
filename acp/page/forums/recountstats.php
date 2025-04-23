@@ -3,14 +3,16 @@
 declare(strict_types=1);
 
 namespace ACP\Page\Forums;
+
 use ACP\Page;
 
 use function array_pop;
 use function explode;
 
-final class RecountStats
+final readonly class RecountStats
 {
-    function __construct(private Page $page){}
+    public function __construct(private Page $page) {}
+
     public function showstats(): void
     {
         $this->page->addContentBox(

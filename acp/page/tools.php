@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 namespace ACP\Page;
+
 use ACP\Page;
 use Jax\Config;
-
 use SplFileObject;
 
 use function array_pop;
@@ -37,7 +37,7 @@ use const SEEK_END;
 
 final readonly class Tools
 {
-    function __construct(private Config $config, private Page $page) {}
+    public function __construct(private Config $config, private Page $page) {}
 
     public function route(): void
     {

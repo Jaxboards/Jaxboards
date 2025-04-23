@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ACP\Page;
 
 use ACP\Page;
-
 use Jax\Config;
 
 use function array_key_exists;
@@ -42,7 +41,10 @@ final class Themes
 {
     public $WRAPPERS_PATH;
 
-    public function __construct(private readonly Config $config, private Page $page) {}
+    public function __construct(
+        private readonly Config $config,
+        private readonly Page $page,
+    ) {}
 
     public function route(): void
     {

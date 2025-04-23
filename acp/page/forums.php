@@ -30,9 +30,13 @@ use function unpack;
 
 use const PHP_EOL;
 
-final class Forums
+final readonly class Forums
 {
-    function __construct(private Page $page, private RecountStats $recountStats) {}
+    public function __construct(
+        private Page $page,
+        private RecountStats $recountStats,
+    ) {}
+
     /**
      * Saves the posted tree to mysql.
      *
@@ -91,7 +95,7 @@ final class Forums
         $data,
         $class = false,
         $highlight = 0,
-    ) {
+    ): ?string {
         $html = '';
         if (count($tree) > 0) {
             foreach ($tree as $id => $children) {
@@ -1113,7 +1117,7 @@ final class Forums
         );
     }
 
-    public function checkbox($id, $name, $checked)
+    public function checkbox($id, $name, $checked): ?string
     {
         return $this->page->parseTemplate(
             'forums/create-forum-permissions-row-checkbox.html',

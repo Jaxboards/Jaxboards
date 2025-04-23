@@ -18,8 +18,9 @@ use const PHP_EOL;
 
 final class Groups
 {
-    function __construct(private Page $page) {}
     public $updatePermissions = true;
+
+    public function __construct(private readonly Page $page) {}
 
     public function route(): void
     {
