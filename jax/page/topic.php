@@ -69,8 +69,8 @@ final class Topic
         /**
          * @var IPAddress
          */
-        private Config $config,
-        private IPAddress $ipAddress,
+        private readonly Config $config,
+        private readonly IPAddress $ipAddress,
     ) {
         global $PAGE;
         $PAGE->loadmeta('topic');

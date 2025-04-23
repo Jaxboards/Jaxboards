@@ -13,7 +13,7 @@ final class Shoutbox
 
     private $shoutlimit;
 
-    public function __construct(private Config $config, private IPAddress $ipAddress)
+    public function __construct(private readonly Config $config, private readonly IPAddress $ipAddress)
     {
         global $PAGE;
 

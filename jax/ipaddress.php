@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Jax;
 
-final class IPAddress
+final readonly class IPAddress
 {
-    public function __construct(private Config $config)
-    {
-    }
+    public function __construct(private Config $config) {}
 
     public function asBinary($ip = null): false|string
     {

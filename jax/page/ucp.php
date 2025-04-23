@@ -41,7 +41,7 @@ final class UCP
     /**
      * @var Config
      */
-    public function __construct(private Config $config)
+    public function __construct(private readonly Config $config)
     {
         global $PAGE;
         $PAGE->loadmeta('ucp');

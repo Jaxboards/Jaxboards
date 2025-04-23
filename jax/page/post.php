@@ -50,8 +50,8 @@ final class Post
     public $how;
 
     public function __construct(
-        private Config $config,
-        private IPAddress $ipAddress,
+        private readonly Config $config,
+        private readonly IPAddress $ipAddress,
     ) {
         global $PAGE;
         $PAGE->metadefs['post-preview'] = $PAGE->meta('box', '', 'Post Preview', '%s');

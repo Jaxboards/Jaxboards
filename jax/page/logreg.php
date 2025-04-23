@@ -44,11 +44,7 @@ final class LogReg
      * @var Config
      */
     public function __construct(
-        /**
-         * @var IPAddress
-         */
-        private Config $config,
-        private IPAddress $ipAddress,
+        private readonly IPAddress $ipAddress,
     ) {
         global $PAGE;
 

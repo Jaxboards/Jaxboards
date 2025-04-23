@@ -62,7 +62,7 @@ final class Sess
 
     public $changedData = [];
 
-    public function __construct(private Config $config, private IPAddress $ipAddress)
+    public function __construct(private readonly Config $config, private readonly IPAddress $ipAddress)
     {
         $this->data = $this->getSess($_SESSION['sid'] ?? false);
         if (!isset($this->data['vars'])) {
