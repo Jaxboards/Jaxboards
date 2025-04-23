@@ -67,8 +67,7 @@ final class Session
         private readonly Jax $jax,
         private readonly IPAddress $ipAddress,
         private readonly Database $database,
-    )
-    {
+    ) {
         $this->data = $this->getSess($_SESSION['sid'] ?? false);
         if (!isset($this->data['vars'])) {
             $this->data['vars'] = serialize([]);
@@ -97,7 +96,12 @@ final class Session
         $this->data[$property] = $value;
     }
 
-    public function getSess($sid = false)
+    /**
+     * @param mixed $sid
+     *
+     * @return mixed[]
+     */
+    public function getSess($sid = false): array
     {
         $userData = $this->database->getUser();
         $isbot = 0;
@@ -385,7 +389,7 @@ final class Session
 
     public function addSessID($html)
     {
-        if (!empty($this->jax->c) || !is_string($html)) {
+        if ($this->jax->c !== [] || !is_string($html)) {
             return $html;
         }
 

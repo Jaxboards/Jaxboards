@@ -97,8 +97,7 @@ final class Page
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly Session $session,
-    )
-    {
+    ) {
         $this->jsaccess = (int) ($_SERVER['HTTP_X_JSACCESS'] ?? 0);
 
         if ($this->jsaccess !== 0) {
@@ -159,7 +158,7 @@ final class Page
 
     public function location($a): void
     {
-        if (empty($this->jax->c) && $a[0] === '?') {
+        if ($this->jax->c === [] && $a[0] === '?') {
             $a = '?sessid=' . $this->session->data['id'] . '&' . mb_substr((string) $a, 1);
         }
 

@@ -24,9 +24,8 @@ final class Calendar
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly Page $page,
-        private readonly Session $session
-    )
-    {
+        private readonly Session $session,
+    ) {
         $this->page->loadmeta('calendar');
     }
 

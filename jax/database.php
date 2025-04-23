@@ -3,8 +3,6 @@
 declare(strict_types=1);
 
 namespace Jax;
-use Jax\IPAddress;
-use Jax\Session;
 
 use MySQLi;
 use mysqli_result;

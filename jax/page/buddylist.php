@@ -22,8 +22,7 @@ final readonly class BuddyList
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly Session $session,
-    )
-    {
+    ) {
         $buddylist = $this->jax->hiddenFormFields(['act' => 'buddylist']);
         $this->page->metadefs['buddylist-contacts'] = <<<EOT
             <div class="contacts">

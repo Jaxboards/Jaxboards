@@ -24,8 +24,7 @@ final class Shoutbox
         private readonly IPAddress $ipAddress,
         private readonly Page $page,
         private readonly Session $session,
-    )
-    {
+    ) {
         $this->page->loadmeta('shoutbox');
     }
 
@@ -56,7 +55,7 @@ final class Shoutbox
 
         if (
             isset($this->jax->p['shoutbox_shout'])
-            && trim($this->jax->p['shoutbox_shout']) !== ''
+            && trim((string) $this->jax->p['shoutbox_shout']) !== ''
         ) {
             $this->addshout();
         }
@@ -94,7 +93,7 @@ final class Shoutbox
         return $candelete;
     }
 
-    public function formatshout($row)
+    public function formatshout($row): ?string
     {
         $shout = $this->jax->theworks($row['shout'], ['minimalbb' => true]);
         $user = $row['uid'] ? $this->page->meta(
