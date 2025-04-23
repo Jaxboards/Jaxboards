@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
+use ACP\Page;
 use Jax\Config;
 use Jax\Jax;
 
@@ -16,16 +17,11 @@ use const PHP_EOL;
 
 final readonly class Settings
 {
-    public function __construct(
-        /**
-         * @var Config
-         */
-        private Config $config,
-    ) {}
+    public function __construct(private Config $config, private Page $page) {}
 
     public function route(): void
     {
-        global $JAX, $PAGE;
+        global $JAX;
 
         $links = [
             'birthday' => 'Birthdays',
@@ -35,7 +31,7 @@ final readonly class Settings
         ];
         $sidebarLinks = '';
         foreach ($links as $do => $title) {
-            $sidebarLinks .= $PAGE->parseTemplate(
+            $sidebarLinks .= $this->page->parseTemplate(
                 'sidebar-list-link.html',
                 [
                     'title' => $title,
@@ -44,8 +40,8 @@ final readonly class Settings
             ) . PHP_EOL;
         }
 
-        $PAGE->sidebar(
-            $PAGE->parseTemplate(
+        $this->page->sidebar(
+            $this->page->parseTemplate(
                 'sidebar-list.html',
                 [
                     'content' => $sidebarLinks,
@@ -67,7 +63,7 @@ final readonly class Settings
 
     public function boardname(): void
     {
-        global $PAGE,$JAX;
+        global $JAX;
         $page = '';
         $e = '';
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
@@ -82,7 +78,7 @@ final readonly class Settings
             }
 
             if ($e !== '' && $e !== '0') {
-                $page .= $PAGE->error($e);
+                $page .= $this->page->error($e);
             } else {
                 $this->config->write([
                     'boardname' => $JAX->p['boardname'],
@@ -90,18 +86,18 @@ final readonly class Settings
                     'boardoffline' => isset($JAX->p['boardoffline']) && $JAX->p['boardoffline'] ? '0' : '1',
                     'offlinetext' => $JAX->p['offlinetext'],
                 ]);
-                $page .= $PAGE->success('Settings saved!');
+                $page .= $this->page->success('Settings saved!');
             }
         }
 
-        $page .= $PAGE->parseTemplate(
+        $page .= $this->page->parseTemplate(
             'settings/boardname.html',
             [
                 'board_name' => $this->config->getSetting('boardname'),
                 'logo_url' => $this->config->getSetting('logourl'),
             ],
         );
-        $PAGE->addContentBox('Board Name/Logo', $page);
+        $this->page->addContentBox('Board Name/Logo', $page);
 
         $page = '';
         if (!$this->config->getSetting('boardoffline')) {
@@ -110,7 +106,7 @@ final readonly class Settings
         $JAX->blockhtml(
             $this->config->getSetting('offlinetext'),
         );
-        $page .= $PAGE->parseTemplate(
+        $page .= $this->page->parseTemplate(
             'settings/boardname-board-offline.html',
             [
                 'board_offline_checked' => $this->config->getSetting('boardoffline')
@@ -121,7 +117,7 @@ final readonly class Settings
                 'content' => $page,
             ],
         );
-        $PAGE->addContentBox('Board Online/Offline', $page);
+        $this->page->addContentBox('Board Online/Offline', $page);
     }
 
     /**
@@ -129,7 +125,7 @@ final readonly class Settings
      */
     public function pages(): void
     {
-        global $DB,$PAGE,$JAX;
+        global $DB,$JAX;
         $page = '';
         if (isset($JAX->b['delete']) && $JAX->b['delete']) {
             $this->pages_delete($JAX->b['delete']);
@@ -152,7 +148,7 @@ final readonly class Settings
                 return;
             }
 
-            $page .= $PAGE->error($e);
+            $page .= $this->page->error($e);
         }
 
         $result = $DB->safeselect(
@@ -161,7 +157,7 @@ final readonly class Settings
         );
         $table = '';
         while ($f = $DB->arow($result)) {
-            $table .= $PAGE->parseTemplate(
+            $table .= $this->page->parseTemplate(
                 'settings/pages-row.html',
                 [
                     'act' => $f['act'],
@@ -170,7 +166,7 @@ final readonly class Settings
         }
 
         if ($table !== '' && $table !== '0') {
-            $page .= $PAGE->parseTemplate(
+            $page .= $this->page->parseTemplate(
                 'settings/pages.html',
                 [
                     'content' => $table,
@@ -184,13 +180,13 @@ final readonly class Settings
                 'do' => 'pages',
             ],
         );
-        $page .= $PAGE->parseTemplate(
+        $page .= $this->page->parseTemplate(
             'settings/pages-new.html',
             [
                 'hidden_fields' => $hiddenFields,
             ],
         );
-        $PAGE->addContentBox('Custom Pages', $page);
+        $this->page->addContentBox('Custom Pages', $page);
     }
 
     public function pages_delete($page)
@@ -206,7 +202,7 @@ final readonly class Settings
 
     public function pages_edit($pageurl): void
     {
-        global $PAGE,$DB,$JAX;
+        global $DB,$JAX;
         $page = '';
         $result = $DB->safeselect(
             ['act', 'page'],
@@ -237,18 +233,18 @@ final readonly class Settings
             }
 
             $pageinfo['page'] = $JAX->p['pagecontents'];
-            $page .= $PAGE->success(
+            $page .= $this->page->success(
                 "Page saved. Preview <a href='/?act={$pageurl}'>here</a>",
             );
         }
 
-        $page .= $PAGE->parseTemplate(
+        $page .= $this->page->parseTemplate(
             'settings/pages-edit.html',
             [
                 'content' => $JAX->blockhtml($pageinfo['page']),
             ],
         );
-        $PAGE->addContentBox("Editing Page: {$pageurl}", $page);
+        $this->page->addContentBox("Editing Page: {$pageurl}", $page);
     }
 
     /**
@@ -256,7 +252,7 @@ final readonly class Settings
      */
     public function shoutbox(): void
     {
-        global $PAGE,$JAX,$DB;
+        global $JAX,$DB;
         $page = '';
         $e = '';
         if (isset($JAX->p['clearall']) && $JAX->p['clearall']) {
@@ -264,7 +260,7 @@ final readonly class Settings
                 'TRUNCATE TABLE %t',
                 ['shouts'],
             );
-            $page .= $PAGE->success('Shoutbox cleared!');
+            $page .= $this->page->success('Shoutbox cleared!');
         }
 
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
@@ -292,13 +288,13 @@ final readonly class Settings
 
             $this->config->write($write);
             if ($e !== '' && $e !== '0') {
-                $page .= $PAGE->error($e);
+                $page .= $this->page->error($e);
             } else {
-                $page .= $PAGE->success('Data saved.');
+                $page .= $this->page->success('Data saved.');
             }
         }
 
-        $page .= $PAGE->parseTemplate(
+        $page .= $this->page->parseTemplate(
             'settings/shoutbox.html',
             [
                 'shoutbox_avatar_checked' => $this->config->getSetting('shoutboxava')
@@ -308,12 +304,12 @@ final readonly class Settings
                 'show_shouts' => $this->config->getSetting('shoutbox_num'),
             ],
         );
-        $PAGE->addContentBox('Shoutbox', $page);
+        $this->page->addContentBox('Shoutbox', $page);
     }
 
     public function birthday(): void
     {
-        global $PAGE,$JAX;
+        global $JAX;
         $birthdays = $this->config->getSetting('birthdays');
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             if (!isset($JAX->p['bicon'])) {
@@ -327,13 +323,13 @@ final readonly class Settings
             );
         }
 
-        $page = $PAGE->parseTemplate(
+        $page = $this->page->parseTemplate(
             'settings/birthday.html',
             [
                 'checked' => ($birthdays & 1) !== 0 ? ' checked="checked"' : '',
             ],
         );
 
-        $PAGE->addContentBox('Birthdays', $page);
+        $this->page->addContentBox('Birthdays', $page);
     }
 }

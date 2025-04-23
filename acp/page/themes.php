@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
+use ACP\Page;
+
 use Jax\Config;
 
 use function array_key_exists;
@@ -40,11 +42,11 @@ final class Themes
 {
     public $WRAPPERS_PATH;
 
-    public function __construct(private readonly Config $config) {}
+    public function __construct(private readonly Config $config, private Page $page) {}
 
     public function route(): void
     {
-        global $PAGE,$JAX;
+        global $JAX;
 
         $this->WRAPPERS_PATH = BOARDPATH . 'Wrappers/';
 
@@ -58,7 +60,7 @@ final class Themes
         ];
         $sidebarLinks = '';
         foreach ($links as $do => $title) {
-            $sidebarLinks .= $PAGE->parseTemplate(
+            $sidebarLinks .= $this->page->parseTemplate(
                 'sidebar-list-link.html',
                 [
                     'title' => $title,
@@ -67,8 +69,8 @@ final class Themes
             ) . PHP_EOL;
         }
 
-        $PAGE->sidebar(
-            $PAGE->parseTemplate(
+        $this->page->sidebar(
+            $this->page->parseTemplate(
                 'sidebar-list.html',
                 [
                     'content' => $sidebarLinks,
@@ -118,7 +120,7 @@ final class Themes
 
     public function showskinindex(): void
     {
-        global $PAGE,$DB,$JAX;
+        global $DB,$JAX;
         $errorskins = '';
         $errorwrapper = '';
 
@@ -129,7 +131,7 @@ final class Themes
                 && file_exists($wrapperPath)
             ) {
                 unlink($this->WRAPPERS_PATH . $JAX->g['deletewrapper'] . '.html');
-                $PAGE->location('?act=themes');
+                $this->page->location('?act=themes');
             } else {
                 $errorwrapper
                     = 'The wrapper you are trying to delete does not exist.';
@@ -321,7 +323,7 @@ final class Themes
         while ($f = $DB->arow($result)) {
             $wrapperOptions = '';
             foreach ($wrappers as $wrapper) {
-                $wrapperOptions .= $PAGE->parseTemplate(
+                $wrapperOptions .= $this->page->parseTemplate(
                     'select-option.html',
                     [
                         'label' => $wrapper,
@@ -332,15 +334,15 @@ final class Themes
                 ) . PHP_EOL;
             }
 
-            $skins .= $PAGE->parseTemplate(
+            $skins .= $this->page->parseTemplate(
                 'themes/show-skin-index-css-row.html',
                 [
                     'custom' => $f['custom']
-                        ? $PAGE->parseTemplate(
+                        ? $this->page->parseTemplate(
                             'themes/show-skin-index-css-row-custom.html',
                         ) : '',
                     'default_checked' => $f['default'] ? "checked='checked'" : '',
-                    'default_option' => $f['custom'] ? '' : $PAGE->parseTemplate(
+                    'default_option' => $f['custom'] ? '' : $this->page->parseTemplate(
                         'select-option.html',
                         [
                             'label' => 'Skin Default',
@@ -348,7 +350,7 @@ final class Themes
                             'value' => '',
                         ],
                     ),
-                    'delete' => $f['custom'] ? $PAGE->parseTemplate(
+                    'delete' => $f['custom'] ? $this->page->parseTemplate(
                         'themes/show-skin-index-css-row-delete.html',
                         [
                             'id' => $f['id'],
@@ -364,22 +366,22 @@ final class Themes
             $usedwrappers[] = $f['wrapper'];
         }
 
-        $skins = ($errorskins !== '' && $errorskins !== '0' ? $PAGE->error($errorskins) : '')
-            . $PAGE->parseTemplate(
+        $skins = ($errorskins !== '' && $errorskins !== '0' ? $this->page->error($errorskins) : '')
+            . $this->page->parseTemplate(
                 'themes/show-skin-index-css.html',
                 [
                     'content' => $skins,
                 ],
             );
-        $PAGE->addContentBox('Themes', $skins);
+        $this->page->addContentBox('Themes', $skins);
 
         $wrap = '';
         foreach ($wrappers as $wrapper) {
-            $wrap .= $PAGE->parseTemplate(
+            $wrap .= $this->page->parseTemplate(
                 'themes/show-skin-index-wrapper-row.html',
                 [
                     'delete' => in_array($wrapper, $usedwrappers) ? 'In use'
-                    : $PAGE->parseTemplate(
+                    : $this->page->parseTemplate(
                         'themes/show-skin-index-wrapper-row-delete.html',
                         [
                             'title' => $wrapper,
@@ -390,21 +392,21 @@ final class Themes
             ) . PHP_EOL;
         }
 
-        $wrap = $PAGE->parseTemplate(
+        $wrap = $this->page->parseTemplate(
             'themes/show-skin-index-wrapper.html',
             [
                 'content' => $wrap,
             ],
         );
-        $PAGE->addContentBox(
+        $this->page->addContentBox(
             'Wrappers',
-            ($errorwrapper !== '' && $errorwrapper !== '0' ? $PAGE->error($errorwrapper) : '') . $wrap,
+            ($errorwrapper !== '' && $errorwrapper !== '0' ? $this->page->error($errorwrapper) : '') . $wrap,
         );
     }
 
     public function editcss($id): void
     {
-        global $PAGE,$DB,$JAX;
+        global $DB,$JAX;
         $result = $DB->safeselect(
             [
                 'id',
@@ -431,9 +433,9 @@ final class Themes
             fclose($o);
         }
 
-        $PAGE->addContentBox(
+        $this->page->addContentBox(
             ($skin['custom'] ? 'Editing' : 'Viewing') . ' Skin: ' . $skin['title'],
-            $PAGE->parseTemplate(
+            $this->page->parseTemplate(
                 'themes/edit-css.html',
                 [
                     'content' => $JAX->blockhtml(
@@ -444,7 +446,7 @@ final class Themes
                             ) . $skin['title'] . '/css.css',
                         ),
                     ),
-                    'save' => $skin['custom'] ? $PAGE->parseTemplate(
+                    'save' => $skin['custom'] ? $this->page->parseTemplate(
                         'save-changes.html',
                     ) : '',
                 ],
@@ -454,18 +456,18 @@ final class Themes
 
     public function editwrapper($wrapper): void
     {
-        global $PAGE,$JAX;
+        global $JAX;
         $saved = '';
         $wrapperf = $this->WRAPPERS_PATH . $wrapper . '.html';
         if (preg_match('@[^ \w]@', (string) $wrapper) && !is_file($wrapperf)) {
-            $PAGE->addContentBox(
+            $this->page->addContentBox(
                 'Error',
                 "The theme you're trying to edit does not exist.",
             );
         } else {
             if (isset($JAX->p['newwrapper'])) {
                 if (mb_strpos($JAX->p['newwrapper'], '<!--FOOTER-->') === false) {
-                    $saved = $PAGE->error(
+                    $saved = $this->page->error(
                         '&lt;!--FOOTER--&gt; must not be removed from the wrapper.',
                     );
                 } else {
@@ -473,16 +475,16 @@ final class Themes
                     if ($o !== false) {
                         fwrite($o, $JAX->p['newwrapper']);
                         fclose($o);
-                        $saved = $PAGE->success('Wrapper saved successfully.');
+                        $saved = $this->page->success('Wrapper saved successfully.');
                     } else {
-                        $saved = $PAGE->error('Error saving wrapper.');
+                        $saved = $this->page->error('Error saving wrapper.');
                     }
                 }
             }
 
-            $PAGE->addContentBox(
+            $this->page->addContentBox(
                 "Editing Wrapper: {$wrapper}",
-                $saved . $PAGE->parseTemplate(
+                $saved . $this->page->parseTemplate(
                     'themes/edit-wrapper.html',
                     [
                         'content' => $JAX->blockhtml(file_get_contents($wrapperf)),
@@ -494,7 +496,7 @@ final class Themes
 
     public function createskin(): void
     {
-        global $PAGE,$JAX,$DB;
+        global $JAX,$DB;
         $page = '';
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             $e = '';
@@ -555,17 +557,17 @@ final class Themes
                     fclose($o);
                 }
 
-                $PAGE->location('?act=themes');
+                $this->page->location('?act=themes');
             }
 
             if ($e !== '' && $e !== '0') {
-                $page = $PAGE->error($e);
+                $page = $this->page->error($e);
             }
         }
 
         $wrapperOptions = '';
         foreach ($this->getwrappers() as $wrapper) {
-            $wrapperOptions .= $PAGE->parseTemplate(
+            $wrapperOptions .= $this->page->parseTemplate(
                 'select-option.html',
                 [
                     'label' => $wrapper,
@@ -575,18 +577,18 @@ final class Themes
             ) . PHP_EOL;
         }
 
-        $page .= $PAGE->parseTemplate(
+        $page .= $this->page->parseTemplate(
             'themes/create-skin.html',
             [
                 'wrapper_options' => $wrapperOptions,
             ],
         );
-        $PAGE->addContentBox('Create New Skin', $page);
+        $this->page->addContentBox('Create New Skin', $page);
     }
 
     public function deleteskin($id): void
     {
-        global $PAGE,$DB,$JAX;
+        global $DB,$JAX;
         $result = $DB->safeselect(
             '`id`,`using`,`title`,`custom`,`wrapper`,`default`,`hidden`',
             'skins',
@@ -620,6 +622,6 @@ final class Themes
             );
         }
 
-        $PAGE->location('?act=themes');
+        $this->page->location('?act=themes');
     }
 }

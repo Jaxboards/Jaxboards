@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
+use ACP\Page;
 use Jax\Config;
 
 use function array_reverse;
@@ -14,11 +15,11 @@ use const PHP_EOL;
 
 final readonly class Posting
 {
-    public function __construct(private Config $config) {}
+    public function __construct(private Config $config, private Page $page) {}
 
     public function route(): void
     {
-        global $JAX, $PAGE;
+        global $JAX;
 
         $links = [
             'emoticons' => 'Emoticons',
@@ -27,7 +28,7 @@ final readonly class Posting
         ];
         $sidebarLinks = '';
         foreach ($links as $do => $title) {
-            $sidebarLinks .= $PAGE->parseTemplate(
+            $sidebarLinks .= $this->page->parseTemplate(
                 'sidebar-list-link.html',
                 [
                     'title' => $title,
@@ -36,8 +37,8 @@ final readonly class Posting
             ) . PHP_EOL;
         }
 
-        $PAGE->sidebar(
-            $PAGE->parseTemplate(
+        $this->page->sidebar(
+            $this->page->parseTemplate(
                 'sidebar-list.html',
                 [
                     'content' => $sidebarLinks,
@@ -55,7 +56,7 @@ final readonly class Posting
 
     public function wordfilter(): void
     {
-        global $PAGE,$JAX,$DB;
+        global $JAX,$DB;
         $page = '';
         $wordfilter = [];
         $result = $DB->safeselect(
@@ -87,12 +88,12 @@ final readonly class Posting
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             $JAX->p['badword'] = $JAX->blockhtml($JAX->p['badword']);
             if (!$JAX->p['badword'] || !$JAX->p['replacement']) {
-                $page .= $PAGE->error('All fields required.');
+                $page .= $this->page->error('All fields required.');
             } elseif (
                 isset($wordfilter[$JAX->p['badword']])
                 && $wordfilter[$JAX->p['badword']]
             ) {
-                $page .= $PAGE->error(
+                $page .= $this->page->error(
                     "'" . $JAX->p['badword'] . "' is already used.",
                 );
             } else {
@@ -109,22 +110,22 @@ final readonly class Posting
         }
 
         if ($wordfilter === []) {
-            $table = $PAGE->parseTemplate(
+            $table = $this->page->parseTemplate(
                 'posting/word-filter-empty.html',
-            ) . PHP_EOL . $PAGE->parseTemplate(
+            ) . PHP_EOL . $this->page->parseTemplate(
                 'posting/word-filter-submit-row.html',
             );
         } else {
-            $table = $PAGE->parseTemplate(
+            $table = $this->page->parseTemplate(
                 'posting/word-filter-heading.html',
-            ) . PHP_EOL . $PAGE->parseTemplate(
+            ) . PHP_EOL . $this->page->parseTemplate(
                 'posting/word-filter-submit-row.html',
             );
             $currentFilters = array_reverse($wordfilter, true);
             foreach ($currentFilters as $filter => $result) {
                 $resultCode = $JAX->blockhtml($result);
                 $filterUrlEncoded = rawurlencode($filter);
-                $table .= $PAGE->parseTemplate(
+                $table .= $this->page->parseTemplate(
                     'posting/word-filter-row.html',
                     [
                         'filter' => $filter,
@@ -135,19 +136,19 @@ final readonly class Posting
             }
         }
 
-        $page .= $PAGE->parseTemplate(
+        $page .= $this->page->parseTemplate(
             'posting/word-filter.html',
             [
                 'content' => $table,
             ],
         );
 
-        $PAGE->addContentBox('Word Filter', $page);
+        $this->page->addContentBox('Word Filter', $page);
     }
 
     public function emoticons(): void
     {
-        global $PAGE,$JAX,$DB;
+        global $JAX,$DB;
 
         $basesets = [
             '' => 'None',
@@ -184,9 +185,9 @@ final readonly class Posting
         // Insert emoticon.
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             if (!$JAX->p['emoticon'] || !$JAX->p['image']) {
-                $page .= $PAGE->error('All fields required.');
+                $page .= $this->page->error('All fields required.');
             } elseif (isset($emoticons[$JAX->blockhtml($JAX->p['emoticon'])])) {
-                $page .= $PAGE->error('That emoticon is already being used.');
+                $page .= $this->page->error('That emoticon is already being used.');
             } else {
                 $DB->safeinsert(
                     'textrules',
@@ -206,17 +207,17 @@ final readonly class Posting
         }
 
         if ($emoticons === []) {
-            $table = $PAGE->parseTemplate(
+            $table = $this->page->parseTemplate(
                 'posting/emoticon-heading.html',
-            ) . PHP_EOL . $PAGE->parseTemplate(
+            ) . PHP_EOL . $this->page->parseTemplate(
                 'posting/emoticon-submit-row.html',
-            ) . PHP_EOL . $PAGE->parseTemplate(
+            ) . PHP_EOL . $this->page->parseTemplate(
                 'posting/emoticon-empty-row.html',
             );
         } else {
-            $table = $PAGE->parseTemplate(
+            $table = $this->page->parseTemplate(
                 'posting/emoticon-heading.html',
-            ) . PHP_EOL . $PAGE->parseTemplate(
+            ) . PHP_EOL . $this->page->parseTemplate(
                 'posting/emoticon-submit-row.html',
             );
             $emoticons = array_reverse($emoticons, true);
@@ -224,7 +225,7 @@ final readonly class Posting
             foreach ($emoticons as $emoticon => $smileyFile) {
                 $smileyFile = $JAX->blockhtml($smileyFile);
                 $emoticonUrlEncoded = rawurlencode($emoticon);
-                $table .= $PAGE->parseTemplate(
+                $table .= $this->page->parseTemplate(
                     'posting/emoticon-row.html',
                     [
                         'emoticon' => $emoticon,
@@ -235,19 +236,19 @@ final readonly class Posting
             }
         }
 
-        $page .= $PAGE->parseTemplate(
+        $page .= $this->page->parseTemplate(
             'posting/emoticons.html',
             [
                 'content' => $table,
             ],
         );
 
-        $PAGE->addContentBox('Custom Emoticons', $page);
+        $this->page->addContentBox('Custom Emoticons', $page);
 
         $emotepack = $this->config->getSetting('emotepack');
         $emoticonPackOptions = '';
         foreach ($basesets as $packId => $packName) {
-            $emoticonPackOptions .= $PAGE->parseTemplate(
+            $emoticonPackOptions .= $this->page->parseTemplate(
                 'select-option.html',
                 [
                     'label' => $packName,
@@ -262,7 +263,7 @@ final readonly class Posting
         if ($emotepack) {
             require_once JAXBOARDS_ROOT . "/emoticons/{$emotepack}/rules.php";
             foreach ($rules as $emoticon => $smileyFile) {
-                $emoticonRows .= $PAGE->parseTemplate(
+                $emoticonRows .= $this->page->parseTemplate(
                     'posting/emoticon-packs-row.html',
                     [
                         'emoticon' => $emoticon,
@@ -273,7 +274,7 @@ final readonly class Posting
         }
 
 
-        $page = $PAGE->parseTemplate(
+        $page = $this->page->parseTemplate(
             'posting/emoticon-packs.html',
             [
                 'emoticon_packs' => $emoticonPackOptions,
@@ -281,12 +282,12 @@ final readonly class Posting
             ],
         );
 
-        $PAGE->addContentBox('Base Emoticon Set', $page);
+        $this->page->addContentBox('Base Emoticon Set', $page);
     }
 
     public function postrating(): void
     {
-        global $PAGE,$JAX,$DB;
+        global $JAX,$DB;
         $page = '';
         $page2 = '';
         $niblets = [];
@@ -312,7 +313,7 @@ final readonly class Posting
         // Insert.
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             if (!$JAX->p['img'] || !$JAX->p['title']) {
-                $page .= $PAGE->error('All fields required.');
+                $page .= $this->page->error('All fields required.');
             } else {
                 $DB->safeinsert(
                     'ratingniblets',
@@ -333,29 +334,29 @@ final readonly class Posting
                 'ratings' => (isset($JAX->p['renabled']) ? 1 : 0)
                 + (isset($JAX->p['ranon']) ? 2 : 0),
             ]);
-            $page2 .= $PAGE->success('Settings saved!');
+            $page2 .= $this->page->success('Settings saved!');
         }
 
         $ratingsettings = $this->config->getSetting('ratings');
 
-        $page2 .= $PAGE->parseTemplate(
+        $page2 .= $this->page->parseTemplate(
             'posting/post-rating-settings.html',
             [
                 'ratings_anonymous' => ($ratingsettings & 2) !== 0 ? ' checked="checked"' : '',
                 'ratings_enabled' => ($ratingsettings & 1) !== 0 ? ' checked="checked"' : '',
             ],
         );
-        $table = $PAGE->parseTemplate(
+        $table = $this->page->parseTemplate(
             'posting/post-rating-heading.html',
         );
         if ($niblets === []) {
-            $table .= $PAGE->parseTemplate(
+            $table .= $this->page->parseTemplate(
                 'posting/post-rating-empty-row.html',
             );
         } else {
             krsort($niblets);
             foreach ($niblets as $ratingId => $rating) {
-                $table .= $PAGE->parseTemplate(
+                $table .= $this->page->parseTemplate(
                     'posting/post-rating-row.html',
                     [
                         'id' => $ratingId,
@@ -366,13 +367,13 @@ final readonly class Posting
             }
         }
 
-        $page .= $PAGE->parseTemplate(
+        $page .= $this->page->parseTemplate(
             'posting/post-rating.html',
             [
                 'content' => $table,
             ],
         );
-        $PAGE->addContentBox('Post Rating System', $page2);
-        $PAGE->addContentBox('Post Rating Niblets', $page);
+        $this->page->addContentBox('Post Rating System', $page2);
+        $this->page->addContentBox('Post Rating Niblets', $page);
     }
 }

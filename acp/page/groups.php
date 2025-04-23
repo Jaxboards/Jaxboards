@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
+use ACP\Page;
+
 use function array_flip;
 use function explode;
 use function is_numeric;
@@ -16,11 +18,12 @@ use const PHP_EOL;
 
 final class Groups
 {
+    function __construct(private Page $page) {}
     public $updatePermissions = true;
 
     public function route(): void
     {
-        global $JAX,$PAGE;
+        global $JAX;
         $links = [
             'create' => 'Create Group',
             'delete' => 'Delete Group',
@@ -28,7 +31,7 @@ final class Groups
         ];
         $sidebarLinks = '';
         foreach ($links as $do => $title) {
-            $sidebarLinks .= $PAGE->parseTemplate(
+            $sidebarLinks .= $this->page->parseTemplate(
                 'sidebar-list-link.html',
                 [
                     'title' => $title,
@@ -37,8 +40,8 @@ final class Groups
             ) . PHP_EOL;
         }
 
-        $PAGE->sidebar(
-            $PAGE->parseTemplate(
+        $this->page->sidebar(
+            $this->page->parseTemplate(
                 'sidebar-list.html',
                 [
                     'content' => $sidebarLinks,
@@ -64,7 +67,7 @@ final class Groups
 
     public function updateperms($perms)
     {
-        global $PAGE,$DB;
+        global $DB;
         $columns = [
             'can_access_acp',
             'can_post',
@@ -139,14 +142,14 @@ final class Groups
 
         $error = $DB->error();
         if ($error) {
-            $PAGE->addContentBox(
+            $this->page->addContentBox(
                 'Error',
-                $PAGE->error($error),
+                $this->page->error($error),
             );
         } else {
-            $PAGE->addContentBox(
+            $this->page->addContentBox(
                 'Success!',
-                $PAGE->success(
+                $this->page->success(
                     'Changes Saved successfully.',
                 ),
             );
@@ -159,7 +162,7 @@ final class Groups
 
     public function showperms()
     {
-        global $DB,$PAGE,$JAX;
+        global $DB,$JAX;
 
         $page = '';
 
@@ -272,9 +275,9 @@ final class Groups
         }
 
         if ($numgroups === 0) {
-            $PAGE->addContentBox(
+            $this->page->addContentBox(
                 'Error',
-                $PAGE->error(
+                $this->page->error(
                     "Don't play with my variables!",
                 ),
             );
@@ -284,7 +287,7 @@ final class Groups
         $widthPercent = 1 / $numgroups * 100;
         $groupHeadings = '';
         foreach ($perms as $groupId => $groupData) {
-            $groupHeadings .= $PAGE->parseTemplate(
+            $groupHeadings .= $this->page->parseTemplate(
                 'groups/show-permissions-group-heading.html',
                 [
                     'id' => $groupId,
@@ -348,7 +351,7 @@ final class Groups
         ];
         $permissionsTable = '';
         foreach ($permissionsChart as $category => $permissions) {
-            $permissionsTable .= $PAGE->parseTemplate(
+            $permissionsTable .= $this->page->parseTemplate(
                 'groups/show-permissions-breaker-row.html',
                 [
                     'column_count' => 1 + $numgroups,
@@ -359,7 +362,7 @@ final class Groups
             foreach ($permissions as $k => $v) {
                 $groupColumns = '';
                 foreach ($perms as $groupId => $groupData) {
-                    $groupColumns .= $PAGE->parseTemplate(
+                    $groupColumns .= $this->page->parseTemplate(
                         'groups/show-permissions-permission-row-group-column.html',
                         [
                             'checked' => $groupData[$k]
@@ -370,7 +373,7 @@ final class Groups
                     ) . PHP_EOL;
                 }
 
-                $permissionsTable .= $PAGE->parseTemplate(
+                $permissionsTable .= $this->page->parseTemplate(
                     'groups/show-permissions-permission-row.html',
                     [
                         'group_columns' => $groupColumns,
@@ -380,7 +383,7 @@ final class Groups
             }
         }
 
-        $page .= $PAGE->parseTemplate(
+        $page .= $this->page->parseTemplate(
             'groups/show-permissions.html',
             [
                 'group_headings' => $groupHeadings,
@@ -389,7 +392,7 @@ final class Groups
             ],
         );
 
-        $PAGE->addContentBox('Perms', $page);
+        $this->page->addContentBox('Perms', $page);
 
         return null;
     }
@@ -400,7 +403,7 @@ final class Groups
             $gid = false;
         }
 
-        global $PAGE,$JAX,$DB;
+        global $JAX,$DB;
         $page = '';
         $e = '';
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
@@ -418,7 +421,7 @@ final class Groups
             }
 
             if ($e !== '' && $e !== '0') {
-                $page .= $PAGE->error($e);
+                $page .= $this->page->error($e);
             } else {
                 $write = [
                     'icon' => $JAX->p['groupicon'],
@@ -438,9 +441,9 @@ final class Groups
                     );
                 }
 
-                $PAGE->addContentBox(
+                $this->page->addContentBox(
                     $write['title'] . ' ' . ($gid ? 'edited' : 'created'),
-                    $PAGE->success(
+                    $this->page->success(
                         'Data saved.',
                     ),
                 );
@@ -460,7 +463,7 @@ final class Groups
             $DB->disposeresult($result);
         }
 
-        $page .= $PAGE->parseTemplate(
+        $page .= $this->page->parseTemplate(
             'groups/create.html',
             [
                 'icon_url' => $gid ? $JAX->blockhtml($gdata['icon']) : '',
@@ -468,7 +471,7 @@ final class Groups
                 'title' => $gid ? $JAX->blockhtml($gdata['title']) : '',
             ],
         );
-        $PAGE->addContentBox(
+        $this->page->addContentBox(
             $gid ? 'Editing group: ' . $gdata['title'] : 'Create a group!',
             $page,
         );
@@ -478,7 +481,7 @@ final class Groups
 
     public function delete(): void
     {
-        global $PAGE,$DB,$JAX;
+        global $DB,$JAX;
         $page = '';
         if (
             isset($JAX->b['delete'])
@@ -508,7 +511,7 @@ final class Groups
         $found = false;
         while ($f = $DB->arow($result)) {
             $found = true;
-            $page .= $PAGE->parseTemplate(
+            $page .= $this->page->parseTemplate(
                 'groups/delete.html',
                 [
                     'id' => $f['id'],
@@ -518,12 +521,12 @@ final class Groups
         }
 
         if (!$found) {
-            $page .= $PAGE->error(
+            $page .= $this->page->error(
                 "You haven't created any groups to delete. "
                 . "(Hint: default groups can't be deleted)",
             );
         }
 
-        $PAGE->addContentBox('Delete Groups', $page);
+        $this->page->addContentBox('Delete Groups', $page);
     }
 }

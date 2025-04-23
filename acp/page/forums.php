@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
+use ACP\Page;
 use ACP\Page\Forums\RecountStats;
 
 use function array_keys;
@@ -31,6 +32,7 @@ use const PHP_EOL;
 
 final class Forums
 {
+    function __construct(private Page $page, private RecountStats $recountStats) {}
     /**
      * Saves the posted tree to mysql.
      *
@@ -38,7 +40,7 @@ final class Forums
      * @param string $path  The path in the tree
      * @param int    $order where the tree is place n the database
      */
-    public static function mysqltree($tree, $path = '', $order = 0): void
+    public function mysqltree($tree, $path = '', $order = 0): void
     {
         global $DB;
         if (!is_array($tree)) {
@@ -84,14 +86,12 @@ final class Forums
         }
     }
 
-    public static function printtree(
+    public function printtree(
         $tree,
         $data,
         $class = false,
         $highlight = 0,
     ) {
-        global $PAGE;
-
         $html = '';
         if (count($tree) > 0) {
             foreach ($tree as $id => $children) {
@@ -113,7 +113,7 @@ final class Forums
                 }
 
                 $classes = implode(' ', $classes);
-                $trashcan = isset($data[$id]['trashcan']) && $data[$id]['trashcan'] ? $PAGE->parseTemplate(
+                $trashcan = isset($data[$id]['trashcan']) && $data[$id]['trashcan'] ? $this->page->parseTemplate(
                     'forums/order-forums-tree-item-trashcan.html',
                 ) : '';
 
@@ -123,7 +123,7 @@ final class Forums
                     && !empty($data[$id]['mods'])
                 ) {
                     $modCount = count(explode(',', $data[$id]['mods']));
-                    $mods = $PAGE->parseTemplate(
+                    $mods = $this->page->parseTemplate(
                         'forums/order-forums-tree-item-mods.html',
                         [
                             'content' => 'moderator' . ($modCount === 1 ? '' : 's'),
@@ -136,7 +136,7 @@ final class Forums
 
                 $content = '';
                 if (is_array($children)) {
-                    $content = '' . self::printtree(
+                    $content = '' . $this->printtree(
                         $children,
                         $data,
                         '',
@@ -145,7 +145,7 @@ final class Forums
                 }
 
                 $title = $data[$id]['title'];
-                $html .= $PAGE->parseTemplate(
+                $html .= $this->page->parseTemplate(
                     'forums/order-forums-tree-item.html',
                     [
                         'class' => $classes,
@@ -158,7 +158,7 @@ final class Forums
                 );
             }
 
-            return $PAGE->parseTemplate(
+            return $this->page->parseTemplate(
                 'forums/order-forums-tree.html',
                 [
                     'class' => $class ?: '',
@@ -172,7 +172,7 @@ final class Forums
 
     public function route(): void
     {
-        global $JAX,$PAGE;
+        global $JAX;
 
         $links = [
             'create' => 'Create Forum',
@@ -183,7 +183,7 @@ final class Forums
 
         $sidebarLinks = '';
         foreach ($links as $do => $title) {
-            $sidebarLinks .= $PAGE->parseTemplate(
+            $sidebarLinks .= $this->page->parseTemplate(
                 'sidebar-list-link.html',
                 [
                     'title' => $title,
@@ -192,8 +192,8 @@ final class Forums
             ) . PHP_EOL;
         }
 
-        $PAGE->sidebar(
-            $PAGE->parseTemplate(
+        $this->page->sidebar(
+            $this->page->parseTemplate(
                 'sidebar-list.html',
                 [
                     'content' => $sidebarLinks,
@@ -235,18 +235,18 @@ final class Forums
             'order' => $this->orderforums(),
             'create' => $this->createforum(),
             'createc' => $this->createcategory(),
-            'recountstats' => RecountStats::showstats(),
-            'recountstats2' => RecountStats::recountStatistics(),
+            'recountstats' => $this->recountStats->showstats(),
+            'recountstats2' => $this->recountStats->recountStatistics(),
             default => $this->orderforums(),
         };
     }
 
     public function orderforums($highlight = 0): void
     {
-        global $PAGE,$DB,$JAX;
+        global $DB,$JAX;
         $page = '';
         if ($highlight) {
-            $page .= $PAGE->success(
+            $page .= $this->page->success(
                 'Forum Created. Now, just place it wherever you like!',
             );
         }
@@ -258,7 +258,7 @@ final class Forums
                 return;
             }
 
-            $page .= $PAGE->success('Data Saved');
+            $page .= $this->page->success('Data Saved');
         }
 
         $forums = [];
@@ -342,16 +342,16 @@ final class Forums
             $sortedtree['c_' . $v] = $tree['c_' . $v] ?? null;
         }
 
-        $page .= self::printtree(
+        $page .= $this->printtree(
             $sortedtree,
             $forums,
             'tree',
             $highlight,
         );
-        $page .= $PAGE->parseTemplate(
+        $page .= $this->page->parseTemplate(
             'forums/order-forums.html',
         );
-        $PAGE->addContentBox('Forums', $page);
+        $this->page->addContentBox('Forums', $page);
     }
 
     /**
@@ -362,7 +362,7 @@ final class Forums
      */
     public function createforum($fid = 0)
     {
-        global $PAGE,$JAX,$DB;
+        global $JAX,$DB;
         $page = '';
         $e = '';
         $forumperms = '';
@@ -405,7 +405,7 @@ final class Forums
                 $this->orderforums();
             }
 
-            $page .= $PAGE->success('Forum created.');
+            $page .= $this->page->success('Forum created.');
         }
 
         // Remove mod from forum.
@@ -426,7 +426,7 @@ final class Forums
                 $DB->basicvalue($fid),
             );
             $this->updateperforummodflag();
-            $PAGE->location('?act=forums&edit=' . $fid);
+            $this->page->location('?act=forums&edit=' . $fid);
         }
 
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
@@ -560,7 +560,7 @@ final class Forums
                     $this->updateperforummodflag();
                 }
 
-                $page .= $PAGE->success('Data saved.');
+                $page .= $this->page->success('Data saved.');
             }
 
             $fdata = $write;
@@ -621,7 +621,7 @@ final class Forums
                     : null;
             }
 
-            $groupperms .= $PAGE->parseTemplate(
+            $groupperms .= $this->page->parseTemplate(
                 'forums/create-forum-permissions-row.html',
                 [
                     'global' => $this->checkbox($f['id'], 'global', $global),
@@ -663,7 +663,7 @@ final class Forums
         }
 
         if ($e !== '' && $e !== '0') {
-            $page .= $PAGE->error($e);
+            $page .= $this->page->error($e);
         }
 
         $subforumOptionsArray = [
@@ -674,7 +674,7 @@ final class Forums
 
         $subforumOptions = '';
         foreach ($subforumOptionsArray as $value => $label) {
-            $subforumOptions .= $PAGE->parseTemplate(
+            $subforumOptions .= $this->page->parseTemplate(
                 'select-option.html',
                 [
                     'label' => $label,
@@ -694,7 +694,7 @@ final class Forums
         ];
         $orderByOptions = '';
         foreach ($orderByOptionsArray as $value => $label) {
-            $orderByOptions .= $PAGE->parseTemplate(
+            $orderByOptions .= $this->page->parseTemplate(
                 'select-option.html',
                 [
                     'label' => $label,
@@ -706,7 +706,7 @@ final class Forums
         }
 
 
-        $page .= $PAGE->parseTemplate(
+        $page .= $this->page->parseTemplate(
             'forums/create-forum.html',
             [
                 'description' => isset($fdata['subtitle']) ? $JAX->blockhtml($fdata['subtitle']) : '',
@@ -730,7 +730,7 @@ final class Forums
             );
             $modList = '';
             while ($f = $DB->arow($result)) {
-                $modList .= $PAGE->parseTemplate(
+                $modList .= $this->page->parseTemplate(
                     'forums/create-forum-moderators-mod.html',
                     [
                         'delete_link' => '?act=forums&edit=' . $fid . '&rmod=' . $f['id'],
@@ -742,7 +742,7 @@ final class Forums
             $modList = 'No forum-specific moderators added!';
         }
 
-        $moderators = $PAGE->parseTemplate(
+        $moderators = $this->page->parseTemplate(
             'forums/create-forum-moderators.html',
             [
                 'mod_list' => $modList,
@@ -751,7 +751,7 @@ final class Forums
             ],
         );
 
-        $forumperms = $PAGE->parseTemplate(
+        $forumperms = $this->page->parseTemplate(
             'forums/create-forum-permissions.html',
             [
                 'content' => $groupperms,
@@ -759,20 +759,20 @@ final class Forums
             ],
         );
 
-        $PAGE->addContentBox(
+        $this->page->addContentBox(
             ($fid ? 'Edit' : 'Create') . ' Forum'
             . ($fid ? ' - ' . $JAX->blockhtml($fdata['title']) : ''),
             $page,
         );
-        $PAGE->addContentBox('Moderators', $moderators);
-        $PAGE->addContentBox('Forum Permissions', $forumperms);
+        $this->page->addContentBox('Moderators', $moderators);
+        $this->page->addContentBox('Forum Permissions', $forumperms);
     }
 
     public function deleteforum($id)
     {
-        global $JAX,$DB,$PAGE;
+        global $JAX,$DB;
         if (isset($JAX->p['submit']) && $JAX->p['submit'] === 'Cancel') {
-            $PAGE->location('?act=forums&do=order');
+            $this->page->location('?act=forums&do=order');
         } elseif (isset($JAX->p['submit']) && $JAX->p['submit']) {
             $DB->safedelete(
                 'forums',
@@ -821,10 +821,10 @@ final class Forums
                     ? " and {$posts} posts" : '');
             }
 
-            return $PAGE->addContentBox(
+            return $this->page->addContentBox(
                 'Forum Deletion',
-                $PAGE->success(
-                    $PAGE->parseTemplate(
+                $this->page->success(
+                    $this->page->parseTemplate(
                         'forums/delete-forum-deleted.html',
                         [
                             'content' => $page,
@@ -866,9 +866,9 @@ final class Forums
         $DB->disposeresult($result);
 
         if (!$fdata) {
-            return $PAGE->addContentBox(
+            return $this->page->addContentBox(
                 'Deleting Forum: ' . $id,
-                $PAGE->error("Forum doesn't exist."),
+                $this->page->error("Forum doesn't exist."),
             );
         }
 
@@ -900,7 +900,7 @@ final class Forums
         );
         $forums = '';
         while ($f = $DB->arow($result)) {
-            $forums .= $PAGE->parseTemplate(
+            $forums .= $this->page->parseTemplate(
                 'select-option.html',
                 [
                     'label' => $f['title'],
@@ -910,9 +910,9 @@ final class Forums
             ) . PHP_EOL;
         }
 
-        $PAGE->addContentBox(
+        $this->page->addContentBox(
             'Deleting Forum: ' . $fdata['title'],
-            $PAGE->parseTemplate(
+            $this->page->parseTemplate(
                 'forums/delete-forum.html',
                 [
                     'forum_options' => $forums,
@@ -925,7 +925,7 @@ final class Forums
 
     public function createcategory($cid = false): void
     {
-        global $JAX,$DB,$PAGE;
+        global $JAX,$DB;
         $page = '';
         $cdata = [];
         if (!$cid && isset($JAX->p['cat_id'])) {
@@ -948,7 +948,7 @@ final class Forums
                 trim((string) $JAX->p['cat_name']) === ''
                 || trim((string) $JAX->p['cat_name']) === '0'
             ) {
-                $page .= $PAGE->error('All fields required');
+                $page .= $this->page->error('All fields required');
             } else {
                 $data = ['title' => $JAX->p['cat_name']];
                 if (!empty($cdata)) {
@@ -958,7 +958,7 @@ final class Forums
                         'WHERE `id`=?',
                         $DB->basicvalue($cid),
                     );
-                    $page .= $PAGE->success(
+                    $page .= $this->page->success(
                         'Category edited.',
                     );
                 } else {
@@ -966,7 +966,7 @@ final class Forums
                         'categories',
                         $data,
                     );
-                    $page .= $PAGE->success(
+                    $page .= $this->page->success(
                         'Category created.',
                     );
                     $data['id'] = (int) $DB->insert_id();
@@ -981,9 +981,9 @@ final class Forums
             $categoryTitle = $JAX->blockhtml($cdata['title']);
         }
 
-        $PAGE->addContentBox(
+        $this->page->addContentBox(
             ($cdata ? 'Edit' : 'Create') . ' Category',
-            $page . PHP_EOL . $PAGE->parseTemplate(
+            $page . PHP_EOL . $this->page->parseTemplate(
                 'forums/create-category.html',
                 [
                     'id' => $cdata && isset($cdata['id']) ? $cdata['id'] : 0,
@@ -996,7 +996,7 @@ final class Forums
 
     public function deletecategory($id): void
     {
-        global $PAGE,$DB,$JAX;
+        global $DB,$JAX;
         $page = '';
         $e = '';
         $result = $DB->safeselect(
@@ -1034,7 +1034,7 @@ final class Forums
                     'WHERE `id`=?',
                     $DB->basicvalue($id),
                 );
-                $page .= $PAGE->success('Category deleted!');
+                $page .= $this->page->success('Category deleted!');
             }
         }
 
@@ -1043,11 +1043,11 @@ final class Forums
         }
 
         if ($e !== '' && $e !== '0') {
-            $page .= $PAGE->error($e);
+            $page .= $this->page->error($e);
         } else {
             $categoryOptions = '';
             foreach ($categories as $categoryId => $categoryName) {
-                $categoryOptions .= $PAGE->parseTemplate(
+                $categoryOptions .= $this->page->parseTemplate(
                     'select-option.html',
                     [
                         'label' => $categoryName,
@@ -1057,7 +1057,7 @@ final class Forums
                 ) . PHP_EOL;
             }
 
-            $page .= $PAGE->parseTemplate(
+            $page .= $this->page->parseTemplate(
                 'forums/delete-category.html',
                 [
                     'category_options' => $categoryOptions,
@@ -1065,7 +1065,7 @@ final class Forums
             );
         }
 
-        $PAGE->addContentBox('Category Deletion', $page);
+        $this->page->addContentBox('Category Deletion', $page);
     }
 
     /**
@@ -1115,9 +1115,7 @@ final class Forums
 
     public function checkbox($id, $name, $checked)
     {
-        global $PAGE;
-
-        return $PAGE->parseTemplate(
+        return $this->page->parseTemplate(
             'forums/create-forum-permissions-row-checkbox.html',
             [
                 'checked' => $checked ? 'checked="checked" ' : '',

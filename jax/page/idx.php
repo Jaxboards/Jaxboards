@@ -466,7 +466,7 @@ final class IDX
 
                     $f['status'] !== 'active'
                     ? $f['status']
-                    : ($f['birthday'] && ($CFG['birthdays'] & 1)
+                    : ($f['birthday'] && ($this->config->getSetting('birthdays') & 1)
                     ? ' birthday' : ''),
                     $f['name'],
                     $f['location_verbose'],

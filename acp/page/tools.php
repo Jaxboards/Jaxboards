@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 namespace ACP\Page;
+use ACP\Page;
+use Jax\Config;
 
 use SplFileObject;
 
@@ -35,9 +37,11 @@ use const SEEK_END;
 
 final readonly class Tools
 {
+    function __construct(private Config $config, private Page $page) {}
+
     public function route(): void
     {
-        global $JAX,$PAGE;
+        global $JAX;
 
         $links = [
             'backup' => 'Backup',
@@ -48,7 +52,7 @@ final readonly class Tools
         $sidebarLinks = '';
 
         foreach ($links as $do => $title) {
-            $sidebarLinks .= $PAGE->parseTemplate(
+            $sidebarLinks .= $this->page->parseTemplate(
                 'sidebar-list-link.html',
                 [
                     'title' => $title,
@@ -57,8 +61,8 @@ final readonly class Tools
             ) . PHP_EOL;
         }
 
-        $PAGE->sidebar(
-            $PAGE->parseTemplate(
+        $this->page->sidebar(
+            $this->page->parseTemplate(
                 'sidebar-list.html',
                 [
                     'content' => $sidebarLinks,
@@ -79,7 +83,7 @@ final readonly class Tools
 
     public function filemanager(): void
     {
-        global $PAGE,$DB,$JAX;
+        global $DB,$JAX;
         $page = '';
         if (isset($JAX->b['delete']) && is_numeric($JAX->b['delete'])) {
             $result = $DB->safeselect(
@@ -101,8 +105,8 @@ final readonly class Tools
 
                 if (is_writable(BOARDPATH . 'Uploads/' . $file['hash'])) {
                     $page .= unlink(BOARDPATH . 'Uploads/' . $file['hash'])
-                        ? $PAGE->success('File deleted')
-                        : $PAGE->error(
+                        ? $this->page->success('File deleted')
+                        : $this->page->error(
                             "Error deleting file, maybe it's already been "
                             . 'deleted? Removed from DB',
                         );
@@ -132,7 +136,7 @@ final readonly class Tools
                 );
             }
 
-            $page .= $PAGE->success('Changes saved.');
+            $page .= $this->page->success('Changes saved.');
         }
 
         $result = $DB->safeselect(
@@ -149,7 +153,7 @@ final readonly class Tools
                 $m,
             );
             foreach ($m[1] as $v) {
-                $linkedin[$v][] = $PAGE->parseTemplate(
+                $linkedin[$v][] = $this->page->parseTemplate(
                     'tools/attachment-link.html',
                     [
                         'post_id' => $f['id'],
@@ -190,7 +194,7 @@ final readonly class Tools
                     . $file['name'] . '</a>' : '<a href="../?act=download&id='
                     . $file['id'] . '">' . $file['name'] . '</a>';
 
-            $table .= $PAGE->parseTemplate(
+            $table .= $this->page->parseTemplate(
                 'tools/file-manager-row.html',
                 [
                     'downloads' => $file['downloads'],
@@ -205,18 +209,18 @@ final readonly class Tools
             ) . PHP_EOL;
         }
 
-        $page .= $table !== '' && $table !== '0' ? $PAGE->parseTemplate(
+        $page .= $table !== '' && $table !== '0' ? $this->page->parseTemplate(
             'tools/file-manager.html',
             [
                 'content' => $table,
             ],
-        ) : $PAGE->error('No files to show.');
-        $PAGE->addContentBox('File Manager', $page);
+        ) : $this->page->error('No files to show.');
+        $this->page->addContentBox('File Manager', $page);
     }
 
     public function backup(): void
     {
-        global $JAX,$PAGE,$DB;
+        global $JAX,$DB;
         if (isset($JAX->p['dl']) && $JAX->p['dl']) {
             header('Content-type: text/plain');
             header(
@@ -272,9 +276,9 @@ final readonly class Tools
             exit;
         }
 
-        $PAGE->addContentBox(
+        $this->page->addContentBox(
             'Backup Forum',
-            $PAGE->parseTemplate(
+            $this->page->parseTemplate(
                 'tools/backup.html',
             ),
         );
@@ -282,8 +286,6 @@ final readonly class Tools
 
     public function errorlog(): void
     {
-        global $PAGE;
-
         $logPath = ini_get('error_log');
 
         $contents = "Sorry, Jaxboards does not have file permissions to read your PHP error log file. ({$logPath})";
@@ -306,7 +308,7 @@ final readonly class Tools
                 HTML;
         }
 
-        $PAGE->addContentBox(
+        $this->page->addContentBox(
             "PHP Error Log ({$logPath})",
             $contents,
         );

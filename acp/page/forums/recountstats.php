@@ -3,26 +3,27 @@
 declare(strict_types=1);
 
 namespace ACP\Page\Forums;
+use ACP\Page;
 
 use function array_pop;
 use function explode;
 
 final class RecountStats
 {
-    public static function showstats(): void
+    function __construct(private Page $page){}
+    public function showstats(): void
     {
-        global $PAGE;
-        $PAGE->addContentBox(
+        $this->page->addContentBox(
             'Board Statistics',
-            $PAGE->parseTemplate(
+            $this->page->parseTemplate(
                 'stats/show-stats.html',
             ),
         );
     }
 
-    public static function recountStatistics(): void
+    public function recountStatistics(): void
     {
-        global $DB,$PAGE;
+        global $DB;
         $result = $DB->safeselect(
             ['id', 'nocount'],
             'forums',
@@ -170,9 +171,9 @@ final class RecountStats
             ],
         );
 
-        $PAGE->addContentBox(
+        $this->page->addContentBox(
             'Board Statistics',
-            $PAGE->success('Board statistics recounted successfully.'),
+            $this->page->success('Board statistics recounted successfully.'),
         );
     }
 }

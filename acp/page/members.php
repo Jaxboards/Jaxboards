@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace ACP\Page;
+use ACP\Page;
 
 use Jax\Config;
 use Jax\Jax;
@@ -38,16 +39,11 @@ final readonly class Members
 {
     public const DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
 
-    public function __construct(
-        /**
-         * @var Config
-         */
-        private Config $config,
-    ) {}
+    public function __construct(private Config $config, private Page $page) {}
 
     public function route(): void
     {
-        global $JAX,$PAGE;
+        global $JAX;
         if (!isset($JAX->b['do'])) {
             $JAX->b['do'] = null;
         }
@@ -73,7 +69,7 @@ final readonly class Members
         ];
         $sidebarLinks = '';
         foreach ($links as $do => $title) {
-            $sidebarLinks .= $PAGE->parseTemplate(
+            $sidebarLinks .= $this->page->parseTemplate(
                 'sidebar-list-link.html',
                 [
                     'title' => $title,
@@ -83,7 +79,7 @@ final readonly class Members
         }
 
         /*
-            $sidebarLinks .= $PAGE->parseTemplate(
+            $sidebarLinks .= $this->page->parseTemplate(
             'sidebar-list-link.html',
             array(
                 'url' => '?act=stats',
@@ -92,8 +88,8 @@ final readonly class Members
             ) . PHP_EOL;
          */
 
-        $PAGE->sidebar(
-            $PAGE->parseTemplate(
+        $this->page->sidebar(
+            $this->page->parseTemplate(
                 'sidebar-list.html',
                 [
                     'content' => $sidebarLinks,
@@ -104,7 +100,7 @@ final readonly class Members
 
     public function showmain(): void
     {
-        global $PAGE,$DB,$JAX;
+        global $DB,$JAX;
 
         $result = $DB->safespecial(
             <<<'EOT'
@@ -121,7 +117,7 @@ final readonly class Members
         );
         $rows = '';
         while ($f = $DB->arow($result)) {
-            $rows .= $PAGE->parseTemplate(
+            $rows .= $this->page->parseTemplate(
                 'members/show-main-row.html',
                 [
                     'avatar_url' => $JAX->pick(
@@ -135,9 +131,9 @@ final readonly class Members
             ) . PHP_EOL;
         }
 
-        $PAGE->addContentBox(
+        $this->page->addContentBox(
             'Member List',
-            $PAGE->parseTemplate(
+            $this->page->parseTemplate(
                 'members/show-main.html',
                 [
                     'rows' => $rows,
@@ -148,7 +144,7 @@ final readonly class Members
 
     public function editmem()
     {
-        global $PAGE,$JAX,$DB;
+        global $JAX,$DB;
         $userData = $DB->getUser();
         $page = '';
         if (
@@ -224,11 +220,11 @@ final readonly class Members
                             'WHERE `id`=?',
                             $DB->basicvalue($JAX->b['mid']),
                         );
-                        $page = $PAGE->success('Profile data saved');
+                        $page = $this->page->success('Profile data saved');
                     } else {
-                        $page = $PAGE->error(
+                        $page = $this->page->error(
                             'You do not have permission to edit this profile.'
-                            . $PAGE->back(),
+                            . $this->page->back(),
                         );
                     }
                 }
@@ -345,7 +341,7 @@ final readonly class Members
             $nummembers = count($data);
             if ($nummembers > 1) {
                 foreach ($data as $v) {
-                    $page .= $PAGE->parseTemplate(
+                    $page .= $this->page->parseTemplate(
                         'members/edit-select-option.html',
                         [
                             'avatar_url' => $JAX->pick(
@@ -358,21 +354,21 @@ final readonly class Members
                     ) . PHP_EOL;
                 }
 
-                return $PAGE->addContentBox('Select Member to Edit', $page);
+                return $this->page->addContentBox('Select Member to Edit', $page);
             }
 
             if ($nummembers === 0) {
-                return $PAGE->addContentBox(
+                return $this->page->addContentBox(
                     'Error',
-                    $PAGE->error('This member does not exist. ' . $PAGE->back()),
+                    $this->page->error('This member does not exist. ' . $this->page->back()),
                 );
             }
 
             $data = array_pop($data);
             if ($data['group_id'] === 2 && $userData['id'] !== 1) {
-                $page = $PAGE->error(
+                $page = $this->page->error(
                     'You do not have permission to edit this profile. '
-                    . $PAGE->back(),
+                    . $this->page->back(),
                 );
             } else {
                 $page .= Jax::hiddenFormFields(['mid' => $data['id']]);
@@ -403,18 +399,18 @@ final readonly class Members
                 $page .= $this->formfield('YouTube:', 'contact_youtube', $data['contact_youtube']);
                 $page .= $this->heading('System-Generated Variables');
                 $page .= $this->formfield('Post Count:', 'posts', $data['posts']);
-                $page = $PAGE->parseTemplate(
+                $page = $this->page->parseTemplate(
                     'members/edit-form.html',
                     ['content' => $page],
                 );
             }
         } else {
-            $page = $PAGE->parseTemplate(
+            $page = $this->page->parseTemplate(
                 'members/edit.html',
             );
         }
 
-        $PAGE->addContentBox(
+        $this->page->addContentBox(
             isset($data['name']) && $data['name']
             ? 'Editing ' . $data['name'] . "'s details" : 'Edit Member',
             $page,
@@ -425,7 +421,7 @@ final readonly class Members
 
     public function preregister(): void
     {
-        global $PAGE,$JAX,$DB;
+        global $JAX,$DB;
         $page = '';
         $e = '';
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
@@ -457,7 +453,7 @@ final readonly class Members
             }
 
             if ($e !== '' && $e !== '0') {
-                $page .= $PAGE->error($e);
+                $page .= $this->page->error($e);
             } else {
                 $member = [
                     'birthdate' => '0000-00-00',
@@ -475,9 +471,9 @@ final readonly class Members
                 $error = $DB->error();
                 $DB->disposeresult($result);
                 if (!$error) {
-                    $page .= $PAGE->success('Member registered.');
+                    $page .= $this->page->success('Member registered.');
                 } else {
-                    $page .= $PAGE->error(
+                    $page .= $this->page->error(
                         'An error occurred while processing your request. '
                         . $error,
                     );
@@ -485,15 +481,15 @@ final readonly class Members
             }
         }
 
-        $page .= $PAGE->parseTemplate(
+        $page .= $this->page->parseTemplate(
             'members/pre-register.html',
         );
-        $PAGE->addContentBox('Pre-Register', $page);
+        $this->page->addContentBox('Pre-Register', $page);
     }
 
     public function getGroups($group_id = 0)
     {
-        global $DB, $PAGE;
+        global $DB;
         $page = '';
         $result = $DB->safeselect(
             ['id', 'title'],
@@ -501,7 +497,7 @@ final readonly class Members
             'ORDER BY `title` DESC',
         );
         while ($f = $DB->arow($result)) {
-            $page .= $PAGE->parseTemplate(
+            $page .= $this->page->parseTemplate(
                 'select-option.html',
                 [
                     'label' => $f['title'],
@@ -511,7 +507,7 @@ final readonly class Members
             ) . PHP_EOL;
         }
 
-        return $PAGE->parseTemplate(
+        return $this->page->parseTemplate(
             'members/get-groups.html',
             [
                 'content' => $page,
@@ -521,7 +517,7 @@ final readonly class Members
 
     public function merge(): void
     {
-        global $PAGE,$JAX,$DB;
+        global $JAX,$DB;
         $page = '';
         $e = '';
         if (!isset($JAX->p['submit'])) {
@@ -541,7 +537,7 @@ final readonly class Members
             }
 
             if ($e !== '' && $e !== '0') {
-                $page .= $PAGE->error($e);
+                $page .= $this->page->error($e);
             } else {
                 $mid1 = $DB->basicvalue($JAX->p['mid1']);
                 $mid1int = $JAX->p['mid1'];
@@ -678,15 +674,15 @@ final readonly class Members
                     ,
                     ['stats', 'members'],
                 );
-                $page .= $PAGE->success('Successfully merged the two accounts.');
+                $page .= $this->page->success('Successfully merged the two accounts.');
             }
         }
 
         $page .= '';
-        $PAGE->addContentBox(
+        $this->page->addContentBox(
             'Account Merge',
             $page . PHP_EOL
-            . $PAGE->parseTemplate(
+            . $this->page->parseTemplate(
                 'members/merge.html',
             ),
         );
@@ -694,7 +690,7 @@ final readonly class Members
 
     public function deletemem(): void
     {
-        global $PAGE,$JAX,$DB;
+        global $JAX,$DB;
         $page = '';
         $e = '';
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
@@ -705,7 +701,7 @@ final readonly class Members
             }
 
             if ($e !== '' && $e !== '0') {
-                $page .= $PAGE->error($e);
+                $page .= $this->page->error($e);
             } else {
                 $mid = $DB->basicvalue($JAX->p['mid']);
 
@@ -754,17 +750,17 @@ final readonly class Members
                     ,
                     ['stats', 'members'],
                 );
-                $page .= $PAGE->success(
+                $page .= $this->page->success(
                     'Successfully deleted the member account. '
                     . 'Board Stat Recount suggested.',
                 );
             }
         }
 
-        $PAGE->addContentBox(
+        $this->page->addContentBox(
             'Delete Account',
             $page . PHP_EOL
-            . $PAGE->parseTemplate(
+            . $this->page->parseTemplate(
                 'members/delete.html',
             ),
         );
@@ -772,7 +768,7 @@ final readonly class Members
 
     public function ipbans(): void
     {
-        global $PAGE,$JAX;
+        global $JAX;
         $page = '';
         if (isset($JAX->p['ipbans'])) {
             $data = explode(PHP_EOL, $JAX->p['ipbans']);
@@ -878,9 +874,9 @@ final readonly class Members
             $data = '';
         }
 
-        $PAGE->addContentBox(
+        $this->page->addContentBox(
             'IP Bans',
-            $PAGE->parseTemplate(
+            $this->page->parseTemplate(
                 'members/ip-bans.html',
                 [
                     'content' => htmlspecialchars($data),
@@ -891,7 +887,7 @@ final readonly class Members
 
     public function massmessage(): void
     {
-        global $PAGE,$JAX,$DB;
+        global $JAX,$DB;
         $userData = $DB->getUser();
         $page = '';
         if (isset($JAX->p['submit']) && $JAX->p['submit']) {
@@ -899,7 +895,7 @@ final readonly class Members
                 !trim((string) $JAX->p['title'])
                 || !trim((string) $JAX->p['message'])
             ) {
-                $page .= $PAGE->error('All fields required!');
+                $page .= $this->page->error('All fields required!');
             } else {
                 $q = $DB->safeselect(
                     ['id'],
@@ -927,14 +923,14 @@ final readonly class Members
                     ++$num;
                 }
 
-                $page .= $PAGE->success("Successfully delivered {$num} messages");
+                $page .= $this->page->success("Successfully delivered {$num} messages");
             }
         }
 
-        $PAGE->addContentBox(
+        $this->page->addContentBox(
             'Mass Message',
             $page . PHP_EOL
-            . $PAGE->parseTemplate(
+            . $this->page->parseTemplate(
                 'members/mass-message.html',
             ),
         );
@@ -942,7 +938,7 @@ final readonly class Members
 
     public function validation(): void
     {
-        global $PAGE, $DB, $JAX;
+        global $DB, $JAX;
         if (isset($_POST['submit1'])) {
             $this->config->write(
                 [
@@ -952,14 +948,14 @@ final readonly class Members
             );
         }
 
-        $page = $PAGE->parseTemplate(
+        $page = $this->page->parseTemplate(
             'members/validation.html',
             [
                 'checked' => $this->config->getSetting('membervalidation')
                 ? 'checked="checked"' : '',
             ],
         ) . PHP_EOL;
-        $PAGE->addContentBox('Enable Member Validation', $page);
+        $this->page->addContentBox('Enable Member Validation', $page);
 
         if (isset($_POST['mid']) && $_POST['action'] === 'Allow') {
             $DB->safeupdate(
@@ -985,7 +981,7 @@ final readonly class Members
         );
         $page = '';
         while ($f = $DB->arow($result)) {
-            $page .= $PAGE->parseTemplate(
+            $page .= $this->page->parseTemplate(
                 'members/validation-list-row.html',
                 [
                     'email_address' => $f['email'],
@@ -997,21 +993,19 @@ final readonly class Members
             ) . PHP_EOL;
         }
 
-        $page = $page !== '' && $page !== '0' ? $PAGE->parseTemplate(
+        $page = $page !== '' && $page !== '0' ? $this->page->parseTemplate(
             'members/validation-list.html',
             [
                 'content' => $page,
             ],
         ) : 'There are currently no members awaiting validation.';
-        $PAGE->addContentBox('Members Awaiting Validation', $page);
+        $this->page->addContentBox('Members Awaiting Validation', $page);
     }
 
     public function formfield($label, $name, $value, $which = false): string
     {
-        global $PAGE;
-
         if (mb_strtolower((string) $which) === 'textarea') {
-            return $PAGE->parseTemplate(
+            return $this->page->parseTemplate(
                 'members/edit-form-field-textarea.html',
                 [
                     'label' => $label,
@@ -1021,7 +1015,7 @@ final readonly class Members
             ) . PHP_EOL;
         }
 
-        return $PAGE->parseTemplate(
+        return $this->page->parseTemplate(
             'members/edit-form-field-text.html',
             [
                 'label' => $label,
@@ -1033,9 +1027,7 @@ final readonly class Members
 
     public function heading($value)
     {
-        global $PAGE;
-
-        return $PAGE->parseTemplate(
+        return $this->page->parseTemplate(
             'members/edit-heading.html',
             [
                 'value' => $value,
