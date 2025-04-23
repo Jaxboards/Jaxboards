@@ -33,11 +33,10 @@ final class IDX
 
     public $subforums;
 
-    public function __construct(\Jax\Config $config)
+    public function __construct(public Config $config)
     {
         global $PAGE;
         $PAGE->loadmeta('idx');
-        $this->config = $config;
     }
 
     public function route(): void

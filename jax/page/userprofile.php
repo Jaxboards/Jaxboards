@@ -35,12 +35,13 @@ final class UserProfile
         'youtube' => 'https://youtube.com/%s',
     ];
 
-    public function __construct(\Jax\IPAddress $ipAddress)
+    /**
+     * @var IPAddress
+     */
+    public function __construct(public IPAddress $ipAddress)
     {
         global $PAGE;
         $PAGE->loadmeta('userprofile');
-
-        $this->ipAddress = $ipAddress;
     }
 
     public function route(): void

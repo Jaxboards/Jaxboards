@@ -6,11 +6,9 @@ namespace Jax\Modules;
 
 use Jax\Config;
 
-final class PrivateMessage
+final readonly class PrivateMessage
 {
-    public function __construct(\Jax\Config $config) {
-        $this->config = $config;
-    }
+    public function __construct(public Config $config) {}
 
     public function init(): void
     {

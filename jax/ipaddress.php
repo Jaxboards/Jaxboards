@@ -6,7 +6,10 @@ namespace Jax;
 
 final class IPAddress
 {
-    function __constructor(\Jax\Config $config) {
+    public $config;
+
+    public function __constructor(Config $config): void
+    {
         $this->config = $config;
     }
 
@@ -39,32 +42,29 @@ final class IPAddress
         return (inet_ntop($ip) ?: inet_ntop(pack('A' . $length, $ip))) ?: '';
     }
 
-    public function isBanned($ip = false)
+    public function isBanned($ip = false): false|string
     {
-     $ipbancache = null;
+        $ipbancache = null;
 
         if (!$ip) {
             $ip = self::getIp();
         }
-
-        if ($ipbancache === null) {
-            $ipbancache = [];
-            if (file_exists(BOARDPATH . '/bannedips.txt')) {
-                foreach (file(BOARDPATH . '/bannedips.txt') as $v) {
-                    $v = trim($v);
-                    if ($v === '') {
-                        continue;
-                    }
-
-                    $ipbancache[] = $v;
+        $ipbancache = [];
+        if (file_exists(BOARDPATH . '/bannedips.txt')) {
+            foreach (file(BOARDPATH . '/bannedips.txt') as $v) {
+                $v = trim($v);
+                if ($v === '') {
+                    continue;
                 }
+
+                $ipbancache[] = $v;
             }
         }
 
         foreach ($ipbancache as $v) {
             if (
-                (mb_substr((string) $v, -1) === ':' || mb_substr((string) $v, -1) === '.')
-                && mb_strtolower(mb_substr((string) $ip, 0, mb_strlen((string) $v))) === $v
+                (mb_substr($v, -1) === ':' || mb_substr($v, -1) === '.')
+                && mb_strtolower(mb_substr((string) $ip, 0, mb_strlen($v))) === $v
             ) {
                 return $v;
             }

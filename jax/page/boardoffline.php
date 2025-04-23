@@ -8,11 +8,9 @@ use Jax\Config;
 
 use function nl2br;
 
-final class BoardOffline
+final readonly class BoardOffline
 {
-    public function __construct(\Jax\Config $config) {
-        $this->config = $config;
-    }
+    public function __construct(public Config $config) {}
 
     public function route(): void
     {

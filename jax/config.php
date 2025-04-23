@@ -14,7 +14,6 @@ use const JSON_PRETTY_PRINT;
 
 final class Config
 {
-
     public function get(): array
     {
         return array_merge(self::getServiceConfig(), self::getBoardConfig(), self::override());

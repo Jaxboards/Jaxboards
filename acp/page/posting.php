@@ -12,11 +12,9 @@ use function rawurlencode;
 
 use const PHP_EOL;
 
-final class Posting
+final readonly class Posting
 {
-    public function __construct(\Jax\Config $config) {
-        $this->config = $config;
-    }
+    public function __construct(public Config $config) {}
 
     public function route(): void
     {

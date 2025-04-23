@@ -71,10 +71,10 @@ final class MySQL
 
     private $db = '';
 
-    function __construct(\Jax\Config $config, \Jax\IPAddress $ipAddress) {
-        $this->config = $config;
-        $this->ipAddress = $ipAddress;
-    }
+    public function __construct(
+        public Config $config,
+        public IPAddress $ipAddress,
+    ) {}
 
     public function connect(
         $host,

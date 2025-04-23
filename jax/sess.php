@@ -62,7 +62,7 @@ final class Sess
 
     public $changedData = [];
 
-    public function __construct(\Jax\Config $config, \Jax\IPAddress $ipAddress)
+    public function __construct(Config $config, IPAddress $ipAddress)
     {
         $this->config = $config;
         $this->ipAddress = $ipAddress;
@@ -90,6 +90,7 @@ final class Sess
         // TODO: overhaul this class to not use magic setter and getters
         if (in_array($property, ['config', 'ipAddress'])) {
             $this->{$property} = $value;
+
             return;
         }
 

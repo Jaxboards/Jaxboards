@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use DI\Container;
 use Jax\Config;
 use Jax\IPAddress;
 use Jax\Jax;
@@ -15,7 +16,7 @@ if (!defined('JAXBOARDS_ROOT')) {
 
 // Load composer dependencies.
 require_once JAXBOARDS_ROOT . '/jax/autoload.php';
-$container = new DI\Container();
+$container = new Container();
 
 require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
 
@@ -39,12 +40,12 @@ header('Cache-Control: no-cache, must-revalidate');
 
 $microtime = microtime(true);
 
-$onLocalHost = in_array($container->get('\Jax\IPAddress')->asHumanReadable(), ['127.0.0.1', '::1'], true);
+$onLocalHost = in_array($container->get(IPAddress::class)->asHumanReadable(), ['127.0.0.1', '::1'], true);
 
-$CFG = $container->get('\Jax\Config')->get();
+$CFG = $container->get(Config::class)->get();
 
 // DB connect!
-$DB = $container->get('\Jax\MySQL');
+$DB = $container->get(MySQL::class);
 if ($onLocalHost) {
     $DB->debugMode = true;
 }
@@ -77,9 +78,9 @@ if (isset($CFG['noboard']) && $CFG['noboard']) {
     exit(1);
 }
 
-$PAGE = $container->get('\Jax\Page');
-$JAX = $container->get('\Jax\Jax');
-$SESS = $container->get('\Jax\Sess');
+$PAGE = $container->get(Page::class);
+$JAX = $container->get(Jax::class);
+$SESS = $container->get(Sess::class);
 
 if (!isset($_SESSION['uid']) && isset($JAX->c['utoken'])) {
     $result = $DB->safeselect(
@@ -106,7 +107,7 @@ if ($USER && $SESS->ip && $SESS->ip !== $USER['ip']) {
     $DB->safeupdate(
         'members',
         [
-            'ip' => $container->get('\Jax\IPAddress')->asBinary(),
+            'ip' => $container->get(IPAddress::class)->asBinary(),
         ],
         'WHERE id=?',
         $USER['id'],

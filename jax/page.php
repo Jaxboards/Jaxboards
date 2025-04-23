@@ -92,9 +92,8 @@ final class Page
 
     public $done;
 
-    public function __construct(\Jax\Config $config)
+    public function __construct(public Config $config)
     {
-        $this->config = $config;
         $this->jsaccess = (int) ($_SERVER['HTTP_X_JSACCESS'] ?? 0);
 
         if ($this->jsaccess !== 0) {

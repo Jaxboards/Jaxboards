@@ -14,11 +14,14 @@ use function trim;
 
 use const PHP_EOL;
 
-final class Settings
+final readonly class Settings
 {
-    public function __construct(\Jax\Config $config) {
-        $this->config = $config;
-    }
+    public function __construct(
+        /**
+         * @var Config
+         */
+        public Config $config,
+    ) {}
 
     public function route(): void
     {

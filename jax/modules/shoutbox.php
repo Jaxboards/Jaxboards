@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Modules;
 
+use Jax\IPAddress;
 use Jax\Config;
 
 final class Shoutbox
@@ -12,13 +13,11 @@ final class Shoutbox
 
     private $shoutlimit;
 
-    public function __construct(\Jax\Config $config, \Jax\IPAddress $ipAddress)
+    public function __construct(public Config $config, public IPAddress $ipAddress)
     {
         global $PAGE;
 
         $PAGE->loadmeta('shoutbox');
-        $this->config = $config;
-        $this->ipAddress = $ipAddress;
     }
 
     public function init(): void

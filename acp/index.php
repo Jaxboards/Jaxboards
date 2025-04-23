@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use ACP\Page;
+use DI\Container;
 use Jax\Config;
 use Jax\Jax;
 use Jax\MySQL;
@@ -26,13 +27,13 @@ if (!defined('JAXBOARDS_ROOT')) {
 
 // Load composer dependencies.
 require_once JAXBOARDS_ROOT . '/jax/autoload.php';
-$container = new DI\Container();
+$container = new Container();
 
 require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
 
-$CFG = $container->get('\Jax\Config')->get();
+$CFG = $container->get(Config::class)->get();
 
-$DB = $container->get('\Jax\MySQL');
+$DB = $container->get(MySQL::class);
 $DB->connect(
     $CFG['sql_host'],
     $CFG['sql_username'],
@@ -42,8 +43,8 @@ $DB->connect(
 );
 
 
-$JAX = $container->get('\Jax\Jax');
-$PAGE = $container->get('\ACP\Page');
+$JAX = $container->get(Jax::class);
+$PAGE = $container->get(Page::class);
 
 $themeElements = [
     'board_name' => $CFG['boardname'],

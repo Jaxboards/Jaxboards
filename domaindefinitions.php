@@ -23,7 +23,7 @@ if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', __DIR__);
 }
 
-$serviceConfig = $container->get('\Jax\Config')->getServiceConfig();
+$serviceConfig = $container->get(Config::class)->getServiceConfig();
 
 function pathjoin(string ...$paths): ?string
 {
@@ -55,7 +55,7 @@ if ($serviceConfig['service']) {
     preg_match('@(.*)\.' . $domainMatch . '@i', (string) $host, $matches);
     if (isset($matches[1]) && $matches[1]) {
         $prefix = $matches[1];
-        $container->get('\Jax\Config')->override([
+        $container->get(Config::class)->override([
             'prefix' => $prefix,
             'sql_prefix' => $prefix . '_',
         ]);

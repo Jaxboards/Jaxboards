@@ -49,12 +49,12 @@ final class Post
 
     public $how;
 
-    public function __construct(\Jax\Config $config, \Jax\IPAddress $ipAddress)
-    {
+    public function __construct(
+        public Config $config,
+        public IPAddress $ipAddress,
+    ) {
         global $PAGE;
         $PAGE->metadefs['post-preview'] = $PAGE->meta('box', '', 'Post Preview', '%s');
-        $this->config = $config;
-        $this->ipAddress = $ipAddress;
     }
 
     public function route(): void

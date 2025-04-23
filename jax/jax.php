@@ -78,9 +78,8 @@ final class Jax
 
     public $emoteRules;
 
-    public function __construct(\Jax\Config $config)
+    public function __construct(public Config $config)
     {
-        $this->config = $config;
         $this->c = $_COOKIE;
         $this->g = $_GET;
         $this->p = $_POST;

@@ -34,13 +34,16 @@ use const FILTER_VALIDATE_IP;
 use const PASSWORD_DEFAULT;
 use const PHP_EOL;
 
-final class Members
+final readonly class Members
 {
     public const DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
 
-    public function __construct(\Jax\Config $config) {
-        $this->config = $config;
-    }
+    public function __construct(
+        /**
+         * @var Config
+         */
+        public Config $config,
+    ) {}
 
     public function route(): void
     {

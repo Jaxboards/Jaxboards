@@ -40,9 +40,7 @@ final class Themes
 {
     public $WRAPPERS_PATH;
 
-    public function __construct(\Jax\Config $config) {
-        $this->config = $config;
-    }
+    public function __construct(public Config $config) {}
 
     public function route(): void
     {

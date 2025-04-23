@@ -37,12 +37,14 @@ final class UCP
     public $shownucp = false;
 
     public $ucppage = '';
-    public function __construct(\Jax\Config $config)
+
+    /**
+     * @var Config
+     */
+    public function __construct(public Config $config)
     {
         global $PAGE;
         $PAGE->loadmeta('ucp');
-
-        $this->config = $config;
     }
 
     public function route(): void

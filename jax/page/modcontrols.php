@@ -39,14 +39,19 @@ final class ModControls
 {
     public $perms;
 
-    public function __construct(\Jax\Config $config, \Jax\IPAddress $ipAddress)
-    {
+    /**
+     * @var Config
+     */
+    public function __construct(
+        /**
+         * @var IPAddress
+         */
+        public Config $config,
+        public IPAddress $ipAddress,
+    ) {
         global $PAGE;
 
         $PAGE->loadmeta('modcp');
-
-        $this->config = $config;
-        $this->ipAddress = $ipAddress;
     }
 
     public static function load(): void

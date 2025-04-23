@@ -1,9 +1,11 @@
 <?php
 
 use ACP\Page;
+use DI\Container;
+use Jax\Config;
+use Jax\IPAddress;
 use Jax\Jax;
 use Jax\MySQL;
-use Jax\Config;
 
 /*
  * Service install file, for installing a new JaxBoards service.
@@ -26,7 +28,7 @@ if (file_exists(SERVICE_ROOT . '/install.lock')) {
 }
 
 require_once JAXBOARDS_ROOT . '/jax/autoload.php';
-$container = new DI\Container();
+$container = new Container();
 
 require_once JAXBOARDS_ROOT . '/acp/page.php';
 
@@ -61,9 +63,9 @@ function recurseCopy($src, $dst): void
     closedir($dir);
 }
 
-$JAX = $container->get('\Jax\Jax');
-$DB = $container->get('\Jax\MySQL');
-$PAGE = $container->get('\ACP\Page');
+$JAX = $container->get(Jax::class);
+$DB = $container->get(MySQL::class);
+$PAGE = $container->get(Page::class);
 
 $fields = [
     'admin_email' => [
@@ -176,7 +178,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
 
     if ($errors === []) {
         // Update with our settings.
-        $container->get('\Jax\Config')->writeServiceConfig(
+        $container->get(Config::class)->writeServiceConfig(
             [
                 'boardname' => 'Jaxboards',
                 'domain' => $JAX->p['domain'],
@@ -249,7 +251,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                         'date' => gmdate(DB_DATETIME),
                         'referral' => $JAX->b['r'] ?? '',
                         'registrar_email' => $JAX->p['admin_email'],
-                        'registrar_ip' => $container->get('\Jax\IPAddress')->asBinary(),
+                        'registrar_ip' => $container->get(IPAddress::class)->asBinary(),
                     ],
                 );
                 $DB->prefix($boardPrefix);
