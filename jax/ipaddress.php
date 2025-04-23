@@ -19,7 +19,10 @@ use const FILTER_VALIDATE_IP;
 
 final readonly class IPAddress
 {
-    public function __construct(private Config $config) {}
+    public function __construct(
+        private Config $config,
+        private Database $database,
+    ) {}
 
     public function asBinary($ip = null): false|string
     {
@@ -50,7 +53,7 @@ final readonly class IPAddress
         return (inet_ntop($ip) ?: inet_ntop(pack('A' . $length, $ip))) ?: '';
     }
 
-    public function isBanned($ip = false): false|string
+    public function isBanned($ip = false): bool
     {
         $ipbancache = null;
 
@@ -75,13 +78,14 @@ final readonly class IPAddress
                 (mb_substr($v, -1) === ':' || mb_substr($v, -1) === '.')
                 && mb_strtolower(mb_substr((string) $ip, 0, mb_strlen($v))) === $v
             ) {
-                return $v;
+                return true;
             }
 
             if ($v === $ip) {
-                return $v;
+                return true;
             }
         }
+
 
         return false;
     }
@@ -96,8 +100,6 @@ final readonly class IPAddress
      */
     public function isServiceBanned(?string $ipAddress = null): bool
     {
-        global $DB,$JAX;
-
         if (!$this->config->getSetting('service')) {
             // Can't be service banned if there's no service.
             return false;
@@ -107,7 +109,7 @@ final readonly class IPAddress
             $ipAddress = self::getIp();
         }
 
-        $result = $DB->safespecial(
+        $result = $this->database->safespecial(
             <<<'EOT'
                 SELECT COUNT(`ip`) as `banned`
                     FROM `banlist`
@@ -115,18 +117,16 @@ final readonly class IPAddress
                 EOT
             ,
             [],
-            $DB->basicvalue(self::asBinary($ipAddress)),
+            $this->database->basicvalue(self::asBinary($ipAddress)),
         );
-        $row = $DB->arow($result);
-        $DB->disposeresult($result);
+        $row = $this->database->arow($result);
+        $this->database->disposeresult($result);
 
         return !isset($row['banned']) || $row['banned'] > 0;
     }
 
     private function getIp()
     {
-        global $_SERVER;
-
         return $_SERVER['REMOTE_ADDR'];
     }
 }

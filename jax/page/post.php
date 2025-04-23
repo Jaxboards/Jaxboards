@@ -463,7 +463,7 @@ onclick="this.form.submitButton=this"/></div>
 
     public function canmoderate($tid)
     {
-        global $PERMS,$USER,$DB;
+        global $PERMS,$USER;
         if ($this->canmod) {
             return $this->canmod;
         }

@@ -74,7 +74,6 @@ final class Database
 
     public function __construct(
         private readonly Config $config,
-        private readonly IPAddress $ipAddress,
     ) {}
 
     public function connect(
@@ -268,7 +267,6 @@ final class Database
 
     public function row($a = null): null|array|false
     {
-        global $PAGE;
         $a = $a ?: $this->lastQuery;
 
         return $a ? mysqli_fetch_array($a) : false;
@@ -299,7 +297,6 @@ final class Database
 
     public function arow($a = null): null|array|false
     {
-        global $PAGE;
         $a = $a ?: $this->lastQuery;
         if ($a) {
             return @mysqli_fetch_assoc($a);
@@ -632,10 +629,6 @@ final class Database
             return $userData = false;
         }
 
-        if ($this->ipAddress->isBanned()) {
-            $userData['group_id'] = 4;
-        }
-
         $user['birthday'] = (date('n j') === $user['birthday'] ? 1 : 0);
 
         // Password parsing.
@@ -829,7 +822,6 @@ final class Database
 
     public function fixForumLastPost($fid): void
     {
-        global $PAGE;
         $result = $this->safeselect(
             '`lp_uid`,UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`id`,`title`',
             'topics',

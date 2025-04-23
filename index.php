@@ -82,6 +82,17 @@ $PAGE = $container->get(Page::class);
 $JAX = $container->get(Jax::class);
 $SESS = $container->get(Session::class);
 
+if (!$SESS->is_bot && isset($_SESSION['uid']) && $_SESSION['uid']) {
+    $DB->getUser($_SESSION['uid']);
+}
+
+$USER = $DB->getUser();
+
+// If they're IP banned, put them in the banned group
+if ($container->get(IPAddress::class)->isBanned()) {
+    $USER['group_id'] = 4;
+}
+
 if (!isset($_SESSION['uid']) && isset($JAX->c['utoken'])) {
     $result = $DB->safeselect(
         ['uid'],
@@ -95,12 +106,7 @@ if (!isset($_SESSION['uid']) && isset($JAX->c['utoken'])) {
     }
 }
 
-if (!$SESS->is_bot && isset($_SESSION['uid']) && $_SESSION['uid']) {
-    $DB->getUser($_SESSION['uid']);
-}
-
-$USER = $DB->getUser();
-$PERMS = $DB->getPerms();
+$PERMS = $DB->getPerms($USER['group_id']);
 
 // Fix ip if necessary.
 if ($USER && $SESS->ip && $SESS->ip !== $USER['ip']) {

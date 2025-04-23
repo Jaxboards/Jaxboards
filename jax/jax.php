@@ -78,8 +78,10 @@ final class Jax
 
     public $emoteRules;
 
-    public function __construct(private readonly Config $config)
-    {
+    public function __construct(
+        private readonly Config $config,
+        private readonly Database $database,
+    )  {
         $this->c = $_COOKIE;
         $this->g = $_GET;
         $this->p = $_POST;
@@ -179,8 +181,6 @@ final class Jax
 
     public function linkify_callback($match): string
     {
-        global $_SERVER;
-
         $url = parse_url((string) $match[2]);
         if (!$url['fragment'] && $url['query']) {
             $url['fragment'] = $url['query'];
@@ -207,12 +207,11 @@ final class Jax
 
     public function getTextRules()
     {
-        global $DB;
         if ($this->textRules) {
             return $this->textRules;
         }
 
-        $q = $DB->safeselect(
+        $q = $this->database->safeselect(
             <<<'EOT'
                 `id`,`type`,`needle`,`replacement`,`enabled`
                 EOT
@@ -225,7 +224,7 @@ final class Jax
             'bbcode' => [],
             'emote' => [],
         ];
-        while ($f = $DB->arow($q)) {
+        while ($f = $this->database->arow($q)) {
             $textRules[$f['type']][$f['needle']] = $f['replacement'];
         }
 
@@ -269,7 +268,6 @@ final class Jax
 
     public function getEmoteRules($escape = 1)
     {
-        global $DB;
         if ($this->textRules === null) {
             $this->getTextRules();
         }
@@ -304,7 +302,6 @@ final class Jax
 
     public function getwordfilter()
     {
-        global $DB;
         if ($this->textRules === null) {
             $this->getTextRules();
         }
@@ -500,12 +497,11 @@ final class Jax
 
     public function attachment_callback($a): string
     {
-        global $DB;
         $a = $a[1];
         if (isset($this->attachmentdata[$a])) {
             $data = $this->attachmentdata[$a];
         } else {
-            $result = $DB->safeselect(
+            $result = $this->database->safeselect(
                 [
                     'id',
                     'name',
@@ -517,8 +513,8 @@ final class Jax
                 'WHERE `id`=?',
                 $a,
             );
-            $data = $DB->arow($result);
-            $DB->disposeresult($result);
+            $data = $this->database->arow($result);
+            $this->database->disposeresult($result);
             if (!$data) {
                 return "Attachment doesn't exist";
             }

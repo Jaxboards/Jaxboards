@@ -775,7 +775,7 @@ final readonly class Members
                 $iscomment = false;
                 // Check to see if each line is an ip, if it isn't,
                 // add a comment.
-                if ($v[0] === '#') {
+                if ($v && $v[0] === '#') {
                     $iscomment = true;
                 } elseif (!filter_var($v, FILTER_VALIDATE_IP)) {
                     if (mb_strstr($v, '.')) {
