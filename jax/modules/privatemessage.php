@@ -5,17 +5,24 @@ declare(strict_types=1);
 namespace Jax\Modules;
 
 use Jax\Config;
+use Jax\Jax;
+use Jax\Page;
+use Jax\Session;
 
 final readonly class PrivateMessage
 {
-    public function __construct(private Config $config) {}
+    public function __construct(
+        private Config $config,
+        private Jax $jax,
+        private Page $page,
+        private Session $session,
+    ) {}
 
     public function init(): void
     {
-        global $JAX,$DB,$PAGE,$SESS;
-        $im = $JAX->p['im_im'] ?? null;
-        $uid = $JAX->p['im_uid'] ?? null;
-        if ($SESS->runonce) {
+        $im = $this->jax->p['im_im'] ?? null;
+        $uid = $this->jax->p['im_uid'] ?? null;
+        if ($this->session->runonce) {
             $this->filter();
         }
 
@@ -28,7 +35,7 @@ final readonly class PrivateMessage
 
     public function filter(): void
     {
-        global $SESS,$USER,$PAGE;
+        global $USER;
         if (!$USER['enemies']) {
             return;
         }
@@ -36,7 +43,7 @@ final readonly class PrivateMessage
         $enemies = explode(',', (string) $USER['enemies']);
         // Kinda gross I know, unparses then parses then
         // unparses again later on.. Oh well.
-        $exploded = explode(PHP_EOL, (string) $SESS->runonce);
+        $exploded = explode(PHP_EOL, (string) $this->session->runonce);
         foreach ($exploded as $k => $v) {
             $v = json_decode($v);
             if ($v[0] !== 'im') {
@@ -48,38 +55,38 @@ final readonly class PrivateMessage
                 // This user's blocked, don't do anything.
             } else {
                 // Send it on up.
-                $PAGE->JSRawArray($v);
+                $this->page->JSRawArray($v);
             }
         }
 
-        $SESS->runonce = implode(PHP_EOL, $exploded);
+        $this->session->runonce = implode(PHP_EOL, $exploded);
     }
 
     public function message($uid, $im)
     {
-        global $DB,$JAX,$PAGE,$SESS,$USER,$PERMS;
-        $SESS->act();
+        global $USER,$PERMS;
+        $this->session->act();
         $ud = $USER;
         $e = '';
         $fatal = false;
 
         if (!$ud) {
-            return $PAGE->JS('error', 'You must be logged in to instant message!');
+            return $this->page->JS('error', 'You must be logged in to instant message!');
         }
 
         if (!$uid) {
-            return $PAGE->JS('error', 'You must have a recipient!');
+            return $this->page->JS('error', 'You must have a recipient!');
         }
 
         if (!$PERMS['can_im']) {
-            return $PAGE->JS(
+            return $this->page->JS(
                 'error',
                 "You don't have permission to use this feature.",
             );
         }
 
-        $im = $JAX->linkify($im);
-        $im = $JAX->theworks($im);
+        $im = $this->jax->linkify($im);
+        $im = $this->jax->theworks($im);
 
         $cmd = [
             'im',
@@ -89,10 +96,10 @@ final readonly class PrivateMessage
             $USER['id'],
             time(),
         ];
-        $PAGE->JSRawArray($cmd);
+        $this->page->JSRawArray($cmd);
         $cmd[1] = $ud['id'];
         $cmd[4] = 0;
-        $onlineusers = $DB->getUsersOnline();
+        $onlineusers = $this->database->getUsersOnline();
         $logoutTime = time() - $this->config->getSetting('timetologout');
         $updateTime = time() - $this->config->getSetting('updateinterval') * 5;
         if (
@@ -101,11 +108,11 @@ final readonly class PrivateMessage
             || $onlineusers[$uid]['last_update'] < $logoutTime
             || $onlineusers[$uid]['last_update'] < $updateTime
         ) {
-            $PAGE->JS('imtoggleoffline', $uid);
+            $this->page->JS('imtoggleoffline', $uid);
         }
 
         if (!$this->sendcmd($cmd, $uid)) {
-            $PAGE->JS('imtoggleoffline', $uid);
+            $this->page->JS('imtoggleoffline', $uid);
         }
 
         return !$e && !$fatal;
@@ -113,12 +120,11 @@ final readonly class PrivateMessage
 
     public function sendcmd($cmd, $uid): ?bool
     {
-        global $DB;
         if (!is_numeric($uid)) {
             return null;
         }
 
-        $DB->safespecial(
+        $this->database->safespecial(
             <<<'EOT'
                 UPDATE %t
                 SET `runonce`=CONCAT(`runonce`,?)
@@ -126,11 +132,11 @@ final readonly class PrivateMessage
                 EOT
             ,
             ['session'],
-            $DB->basicvalue(json_encode($cmd) . PHP_EOL),
+            $this->database->basicvalue(json_encode($cmd) . PHP_EOL),
             $uid,
             gmdate('Y-m-d H:i:s', time() - $this->config->getSetting('updateinterval') * 5),
         );
 
-        return $DB->affected_rows(1) !== 0;
+        return $this->database->affected_rows(1) !== 0;
     }
 }

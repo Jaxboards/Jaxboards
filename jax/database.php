@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 namespace Jax;
+use Jax\IPAddress;
+use Jax\Session;
 
 use MySQLi;
 use mysqli_result;
@@ -767,7 +769,7 @@ final class Database
 
     public function getUsersOnline()
     {
-        global $USER,$SESS;
+        global $USER;
         $idletimeout = time() - ($this->config->getSetting('timetoidle') ?? 300);
         $return = [];
         if (!$this->usersOnlineCache) {
@@ -819,27 +821,6 @@ final class Database
                 }
 
                 $return[$f['uid']] = $f;
-            }
-
-            /*
-                Since we update the session data at the END of the page,
-                we'll want to include the user in the usersonline.
-             */
-
-            if ($USER && isset($return[$USER['id']]) && $return[$USER['id']]) {
-                $return[$USER['id']] = [
-                    'birthday' => $USER['birthday'],
-                    'group_id' => $USER['group_id'],
-                    'last_action' => gmdate('Y-m-d H:i:s', (int) ($SESS->last_action ?? 0)),
-                    'last_update' => $SESS->last_update,
-                    'location' => $SESS->location,
-                    'location_verbose' => $SESS->location_verbose,
-                    'name' => ($SESS->hide ? '* ' : '') . $USER['display_name'],
-                    'status' => $SESS->last_action < $idletimeout
-                        ? 'idle'
-                        : 'active',
-                    'uid' => $USER['id'],
-                ];
             }
 
             $this->usersOnlineCache = $return;

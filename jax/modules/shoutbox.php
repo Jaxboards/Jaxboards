@@ -6,6 +6,10 @@ namespace Jax\Modules;
 
 use Jax\IPAddress;
 use Jax\Config;
+use Jax\Database;
+use Jax\Jax;
+use Jax\Page;
+use Jax\Session;
 
 final class Shoutbox
 {
@@ -13,16 +17,21 @@ final class Shoutbox
 
     private $shoutlimit;
 
-    public function __construct(private readonly Config $config, private readonly IPAddress $ipAddress)
+    public function __construct(
+        private readonly Config $config,
+        private readonly Database $database,
+        private readonly Jax $jax,
+        private readonly IPAddress $ipAddress,
+        private readonly Page $page,
+        private readonly Session $session,
+    )
     {
-        global $PAGE;
-
-        $PAGE->loadmeta('shoutbox');
+        $this->page->loadmeta('shoutbox');
     }
 
     public function init(): void
     {
-        global $PAGE,$JAX,$PERMS;
+        global $PERMS;
 
         if (!isset($PERMS['can_view_shoutbox'])) {
             $PERMS['can_view_shoutbox'] = false;
@@ -34,25 +43,25 @@ final class Shoutbox
 
         $this->shoutlimit = $this->config->getSetting('shoutbox_num');
         if (
-            isset($JAX->b['shoutbox_delete'])
-            && is_numeric($JAX->b['shoutbox_delete'])
+            isset($this->jax->b['shoutbox_delete'])
+            && is_numeric($this->jax->b['shoutbox_delete'])
         ) {
             $this->deleteshout();
         } elseif (
-            isset($JAX->b['module'])
-            && $JAX->b['module'] === 'shoutbox'
+            isset($this->jax->b['module'])
+            && $this->jax->b['module'] === 'shoutbox'
         ) {
             $this->showallshouts();
         }
 
         if (
-            isset($JAX->p['shoutbox_shout'])
-            && trim($JAX->p['shoutbox_shout']) !== ''
+            isset($this->jax->p['shoutbox_shout'])
+            && trim($this->jax->p['shoutbox_shout']) !== ''
         ) {
             $this->addshout();
         }
 
-        if (!$PAGE->jsaccess) {
+        if (!$this->page->jsaccess) {
             $this->displayshoutbox();
         } else {
             $this->updateshoutbox();
@@ -61,17 +70,17 @@ final class Shoutbox
 
     public function canDelete($id, $shoutrow = false)
     {
-        global $PERMS,$USER,$DB;
+        global $PERMS,$USER;
         $candelete = $PERMS['can_delete_shouts'];
         if (!$candelete && $PERMS['can_delete_own_shouts']) {
             if (!$shoutrow) {
-                $result = $DB->safeselect(
+                $result = $this->database->safeselect(
                     '`uid`',
                     'shouts',
                     'WHERE `id`=?',
                     $id,
                 );
-                $shoutrow = $DB->arow($result);
+                $shoutrow = $this->database->arow($result);
             }
 
             if (
@@ -87,28 +96,27 @@ final class Shoutbox
 
     public function formatshout($row)
     {
-        global $PAGE,$JAX;
-        $shout = $JAX->theworks($row['shout'], ['minimalbb' => true]);
-        $user = $row['uid'] ? $PAGE->meta(
+        $shout = $this->jax->theworks($row['shout'], ['minimalbb' => true]);
+        $user = $row['uid'] ? $this->page->meta(
             'user-link',
             $row['uid'],
             $row['group_id'],
             $row['display_name'],
         ) : 'Guest';
         $avatar = $this->config->getSetting('shoutboxava')
-            ? '<img src="' . $JAX->pick(
+            ? '<img src="' . $this->jax->pick(
                 $row['avatar'],
-                $PAGE->meta('default-avatar'),
+                $this->page->meta('default-avatar'),
             ) . '" class="avatar" alt="avatar" />' : '';
-        $deletelink = $PAGE->meta('shout-delete', $row['id']);
+        $deletelink = $this->page->meta('shout-delete', $row['id']);
         if (!$this->canDelete(0, $row)) {
             $deletelink = '';
         }
 
         if (mb_substr((string) $shout, 0, 4) === '/me ') {
-            return $PAGE->meta(
+            return $this->page->meta(
                 'shout-action',
-                $JAX->smalldate(
+                $this->jax->smalldate(
                     $row['date'],
                     1,
                 ),
@@ -121,7 +129,7 @@ final class Shoutbox
             );
         }
 
-        return $PAGE->meta(
+        return $this->page->meta(
             'shout',
             $row['date'],
             $user,
@@ -133,8 +141,8 @@ final class Shoutbox
 
     public function displayshoutbox(): void
     {
-        global $PAGE,$DB,$SESS,$USER;
-        $result = $DB->safespecial(
+        global $USER;
+        $result = $this->database->safespecial(
             <<<'EOT'
                 SELECT
                     m.`avatar` AS `avatar`,
@@ -155,7 +163,7 @@ final class Shoutbox
         );
         $shouts = '';
         $first = 0;
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             if (!$first) {
                 $first = $f['id'];
             }
@@ -163,16 +171,16 @@ final class Shoutbox
             $shouts .= $this->formatshout($f);
         }
 
-        $SESS->addvar('sb_id', $first);
-        $PAGE->append(
+        $this->session->addvar('sb_id', $first);
+        $this->page->append(
             'shoutbox',
-            $PAGE->meta(
+            $this->page->meta(
                 'collapsebox',
                 " id='shoutbox'",
-                $PAGE->meta(
+                $this->page->meta(
                     'shoutbox-title',
                 ),
-                $PAGE->meta(
+                $this->page->meta(
                     'shoutbox',
                     $shouts,
                 ),
@@ -185,13 +193,13 @@ final class Shoutbox
 
     public function updateshoutbox(): void
     {
-        global $PAGE,$JAX,$DB,$SESS,$USER;
+        global $USER;
 
         // This is a bit tricky, we're transversing the shouts
         // in reverse order, since they're shifted onto the list, not pushed.
         $last = 0;
-        if (isset($SESS->vars['sb_id']) && $SESS->vars['sb_id']) {
-            $result = $DB->safespecial(
+        if (isset($this->session->vars['sb_id']) && $this->session->vars['sb_id']) {
+            $result = $this->database->safespecial(
                 <<<'EOT'
                     SELECT
                         m.`avatar` AS `avatar`,
@@ -209,15 +217,15 @@ final class Shoutbox
                     EOT
                 ,
                 ['shouts', 'members'],
-                $JAX->pick($SESS->vars['sb_id'], 0),
+                $this->jax->pick($this->session->vars['sb_id'], 0),
                 $this->shoutlimit,
             );
-            while ($f = $DB->arow($result)) {
-                $PAGE->JS('addshout', $this->formatshout($f));
+            while ($f = $this->database->arow($result)) {
+                $this->page->JS('addshout', $this->formatshout($f));
                 if ($this->config->getSetting('shoutboxsounds')) {
                     $sounds = [];
                     if ($USER['sound_shout'] && $sounds[$f['shout']]) {
-                        $PAGE->JS(
+                        $this->page->JS(
                             'playsound',
                             'sfx',
                             SOUNDSURL . $sounds[$f['shout']] . '.mp3',
@@ -234,38 +242,37 @@ final class Shoutbox
             return;
         }
 
-        $SESS->addvar('sb_id', $last);
+        $this->session->addvar('sb_id', $last);
     }
 
     public function showallshouts(): void
     {
-        global $PAGE,$DB,$JAX;
         $perpage = 100;
         $pagen = 0;
         $pages = '';
         $page = '';
         if (
-            isset($JAX->b['page'])
-            && is_numeric($JAX->b['page'])
-            && $JAX->b['page'] > 1
+            isset($this->jax->b['page'])
+            && is_numeric($this->jax->b['page'])
+            && $this->jax->b['page'] > 1
         ) {
-            $pagen = $JAX->b['page'] - 1;
+            $pagen = $this->jax->b['page'] - 1;
         }
 
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             'COUNT(`id`)',
             'shouts',
         );
-        $thisrow = $DB->arow($result);
+        $thisrow = $this->database->arow($result);
         $numshouts = array_pop($thisrow);
-        $DB->disposeresult($result);
+        $this->database->disposeresult($result);
         if ($numshouts > 1000) {
             $numshouts = 1000;
         }
 
         if ($numshouts > $perpage) {
             $pages .= " &middot; Pages: <span class='pages'>";
-            $pageArray = $JAX->pages(
+            $pageArray = $this->jax->pages(
                 ceil($numshouts / $perpage),
                 $pagen + 1,
                 10,
@@ -280,13 +287,13 @@ final class Shoutbox
             $pages .= '</span>';
         }
 
-        $PAGE->path(['Shoutbox History' => '?module=shoutbox']);
-        $PAGE->updatepath();
-        if ($PAGE->jsupdate) {
+        $this->page->path(['Shoutbox History' => '?module=shoutbox']);
+        $this->page->updatepath();
+        if ($this->page->jsupdate) {
             return;
         }
 
-        $result = $DB->safespecial(
+        $result = $this->database->safespecial(
             <<<'EOT'
                 SELECT
                     s.`id` AS `id`,
@@ -307,35 +314,35 @@ final class Shoutbox
             $perpage,
         );
         $shouts = '';
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             $shouts .= $this->formatshout($f);
         }
 
-        $page = $PAGE->meta(
+        $page = $this->page->meta(
             'box',
             '',
             'Shoutbox' . $pages,
             '<div class="sbhistory">' . $shouts . '</div>',
         );
-        $PAGE->JS('update', 'page', $page);
-        $PAGE->append('PAGE', $page);
+        $this->page->JS('update', 'page', $page);
+        $this->page->append('PAGE', $page);
     }
 
     public function deleteshout()
     {
-        global $JAX,$DB,$PAGE,$USER;
+        global $USER;
         if (!$USER) {
-            return $PAGE->location('?');
+            return $this->page->location('?');
         }
 
-        $delete = $JAX->b['shoutbox_delete'] ?? 0;
+        $delete = $this->jax->b['shoutbox_delete'] ?? 0;
         $candelete = $this->canDelete($delete);
         if (!$candelete) {
-            return $PAGE->location('?');
+            return $this->page->location('?');
         }
 
-        $PAGE->JS('softurl');
-        $DB->safedelete(
+        $this->page->JS('softurl');
+        $this->database->safedelete(
             'shouts',
             'WHERE `id`=?',
             $delete,
@@ -346,14 +353,13 @@ final class Shoutbox
 
     public function addshout(): void
     {
-        global $JAX,$DB,$PAGE,$SESS;
-        $userData = $DB->getUser();
-        $SESS->act();
+        $userData = $this->database->getUser();
+        $this->session->act();
         $e = '';
-        $shout = $JAX->p['shoutbox_shout'];
-        $shout = $JAX->linkify($shout);
+        $shout = $this->jax->p['shoutbox_shout'];
+        $shout = $this->jax->linkify($shout);
 
-        $perms = $DB->getPerms();
+        $perms = $this->database->getPerms();
         if (!$perms['can_shout']) {
             $e = 'You do not have permission to shout!';
         } elseif (mb_strlen((string) $shout) > 300) {
@@ -361,13 +367,13 @@ final class Shoutbox
         }
 
         if ($e !== '' && $e !== '0') {
-            $PAGE->JS('error', $e);
-            $PAGE->prepend('shoutbox', $PAGE->error($e));
+            $this->page->JS('error', $e);
+            $this->page->prepend('shoutbox', $this->page->error($e));
 
             return;
         }
 
-        $DB->safeinsert(
+        $this->database->safeinsert(
             'shouts',
             [
                 'date' => gmdate('Y-m-d H:i:s'),

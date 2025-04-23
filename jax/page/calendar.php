@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Session;
 
 use function explode;
 use function gmdate;
@@ -23,7 +24,9 @@ final class Calendar
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly Page $page,
-    ) {
+        private readonly Session $session
+    )
+    {
         $this->page->loadmeta('calendar');
     }
 
@@ -42,7 +45,6 @@ final class Calendar
 
     public function monthview(): void
     {
-        global $SESS;
         $monthoffset = $this->month;
         if ($this->page->jsupdate) {
             return;
@@ -61,7 +63,7 @@ final class Calendar
             gmdate('w t F Y n', mktime(0, 0, 0, $monthoffset, 1)),
         );
 
-        $SESS->location_verbose
+        $this->session->location_verbose
             = 'Checking out the calendar for ' . $monthname . ' ' . $year;
         $result = $this->database->safeselect(
             [

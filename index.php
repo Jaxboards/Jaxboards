@@ -8,7 +8,7 @@ use Jax\Database;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
-use Jax\Sess;
+use Jax\Session;
 
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', __DIR__);
@@ -80,7 +80,7 @@ if (isset($CFG['noboard']) && $CFG['noboard']) {
 
 $PAGE = $container->get(Page::class);
 $JAX = $container->get(Jax::class);
-$SESS = $container->get(Sess::class);
+$SESS = $container->get(Session::class);
 
 if (!isset($_SESSION['uid']) && isset($JAX->c['utoken'])) {
     $result = $DB->safeselect(

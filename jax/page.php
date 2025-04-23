@@ -34,7 +34,7 @@ namespace Jax;
  *    <!--NAVIGATION-->
  *    <!--PATH-->
  *
- *    These sections are defined through calls to $PAGE->append()
+ *    These sections are defined through calls to $this->append()
  *
  *    Interestingly, I tried to create some sort of module system that would only conditionally load modules if the template has it.
  *    For example - none of the `tag_shoutbox` will be included or used if <!--SHOUTBOX--> is not in the root template.
@@ -92,7 +92,12 @@ final class Page
 
     public $done;
 
-    public function __construct(private readonly Config $config)
+    public function __construct(
+        private readonly Config $config,
+        private readonly Database $database,
+        private readonly Jax $jax,
+        private readonly Session $session,
+    )
     {
         $this->jsaccess = (int) ($_SERVER['HTTP_X_JSACCESS'] ?? 0);
 
@@ -154,13 +159,12 @@ final class Page
 
     public function location($a): void
     {
-        global $PAGE,$SESS,$JAX;
-        if (empty($JAX->c) && $a[0] === '?') {
-            $a = '?sessid=' . $SESS->data['id'] . '&' . mb_substr((string) $a, 1);
+        if (empty($this->jax->c) && $a[0] === '?') {
+            $a = '?sessid=' . $this->session->data['id'] . '&' . mb_substr((string) $a, 1);
         }
 
-        if ($PAGE->jsaccess) {
-            $PAGE->JS('location', $a);
+        if ($this->jsaccess) {
+            $this->JS('location', $a);
         } else {
             header("Location: {$a}");
         }
@@ -210,7 +214,6 @@ final class Page
 
     public function out(): ?bool
     {
-        global $SESS,$JAX;
         if (property_exists($this, 'done') && $this->done !== null) {
             return false;
         }
@@ -225,7 +228,7 @@ final class Page
             }
 
             foreach ($this->JSOutput as $k => $v) {
-                $this->JSOutput[$k] = $SESS->addSessID($v);
+                $this->JSOutput[$k] = $this->session->addSessID($v);
             }
 
             echo empty($this->JSOutput)
@@ -248,7 +251,7 @@ final class Page
             }
 
             $this->template = $this->filtervars($this->template);
-            $this->template = $SESS->addSessId($this->template);
+            $this->template = $this->session->addSessId($this->template);
             if ($this->checkextended($this->template, null)) {
                 $this->template = $this->metaextended($this->template);
             }
@@ -291,27 +294,26 @@ final class Page
 
     public function loadskin($id): void
     {
-        global $DB;
         $skin = [];
         if ($id) {
-            $result = $DB->safeselect(
+            $result = $this->database->safeselect(
                 ['title', 'custom', 'wrapper'],
                 'skins',
                 'WHERE id=? LIMIT 1',
                 $id,
             );
-            $skin = $DB->arow($result);
-            $DB->disposeresult($result);
+            $skin = $this->database->arow($result);
+            $this->database->disposeresult($result);
         }
 
         if (empty($skin)) {
-            $result = $DB->safeselect(
+            $result = $this->database->safeselect(
                 ['title', 'custom', 'wrapper'],
                 'skins',
                 'WHERE `default`=1 LIMIT 1',
             );
-            $skin = $DB->arow($result);
-            $DB->disposeresult($result);
+            $skin = $this->database->arow($result);
+            $this->database->disposeresult($result);
         }
 
         if (!$skin) {
@@ -350,15 +352,14 @@ final class Page
 
     public function includer($m)
     {
-        global $DB;
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             'page',
             'pages',
             'WHERE `act`=?',
-            $DB->basicvalue($m[1]),
+            $this->database->basicvalue($m[1]),
         );
-        $page = array_shift($DB->arow($result));
-        $DB->disposeresult($result);
+        $page = array_shift($this->database->arow($result));
+        $this->database->disposeresult($result);
 
         return $page ?: '';
     }

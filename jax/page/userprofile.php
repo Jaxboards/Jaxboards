@@ -22,9 +22,9 @@ use function ucwords;
 
 final class UserProfile
 {
-    public $num_activity = 30;
+    private $num_activity = 30;
 
-    public $contacturls = [
+    private $contacturls = [
         'aim' => 'aim:goaim?screenname=%s',
         'bluesky' => 'https://bsky.app/profile/%s.bsky.social',
         'discord' => 'discord:%s',
@@ -42,6 +42,7 @@ final class UserProfile
         private readonly IPAddress $ipAddress,
         private readonly Jax $jax,
         private readonly Page $page,
+        private readonly Session $session,
     ) {
         $this->page->loadmeta('userprofile');
     }
@@ -69,7 +70,7 @@ final class UserProfile
 
     public function showcontactcard($id): void
     {
-        global $SESS,$USER;
+        global $USER;
         $contactdetails = '';
         $result = $this->database->safespecial(
             <<<'EOT'
@@ -145,7 +146,7 @@ final class UserProfile
 
     public function showfullprofile($id)
     {
-        global $USER,$SESS,$PERMS;
+        global $USER,$PERMS;
         if ($this->page->jsupdate && empty($this->jax->p)) {
             return false;
         }
@@ -630,7 +631,7 @@ final class UserProfile
             $this->page->JS('update', 'page', $page);
             $this->page->append('page', $page);
 
-            $SESS->location_verbose = 'Viewing ' . $udata['display_name'] . "'s profile";
+            $this->session->location_verbose = 'Viewing ' . $udata['display_name'] . "'s profile";
         }
 
         return null;

@@ -8,6 +8,7 @@ use Jax\Config;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Session;
 
 use function array_flip;
 use function array_keys;
@@ -41,18 +42,18 @@ final class IDX
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly Page $page,
+        private readonly Session $session
     ) {
         $this->page->loadmeta('idx');
     }
 
     public function route(): void
     {
-        global $SESS;
         if (isset($this->jax->b['markread']) && $this->jax->b['markread']) {
             $this->page->JS('softurl');
-            $SESS->forumsread = '{}';
-            $SESS->topicsread = '{}';
-            $SESS->read_date = time();
+            $this->session->forumsread = '{}';
+            $this->session->topicsread = '{}';
+            $this->session->read_date = time();
         }
 
         if ($this->page->jsupdate) {
@@ -64,8 +65,8 @@ final class IDX
 
     public function viewidx(): void
     {
-        global $SESS,$USER;
-        $SESS->location_verbose = 'Viewing board index';
+        global $USER;
+        $this->session->location_verbose = 'Viewing board index';
         $page = '';
         $result = $this->database->safespecial(
             <<<'EOT'
@@ -445,21 +446,20 @@ final class IDX
 
     public function updateStats(): void
     {
-        global $SESS;
         $list = [];
-        if ($SESS->users_online_cache) {
-            $oldcache = array_flip(explode(',', (string) $SESS->users_online_cache));
+        if ($this->session->users_online_cache) {
+            $oldcache = array_flip(explode(',', (string) $this->session->users_online_cache));
         }
 
         $useronlinecache = '';
         foreach ($this->database->getUsersOnline() as $f) {
-            $lastActionIdle = (int) ($SESS->last_update ?? 0) - ($this->config->getSetting('timetoidle') ?? 300) - 30;
+            $lastActionIdle = (int) ($this->session->last_update ?? 0) - ($this->config->getSetting('timetoidle') ?? 300) - 30;
             if (!$f['uid'] && !$f['is_bot']) {
                 continue;
             }
 
             if (
-                $f['last_action'] >= (int) $SESS->last_update
+                $f['last_action'] >= (int) $this->session->last_update
                 || $f['status'] === 'idle'
                 && $f['last_action'] > $lastActionIdle
             ) {
@@ -487,7 +487,7 @@ final class IDX
             $this->page->JS('setoffline', implode(',', array_flip($oldcache)));
         }
 
-        $SESS->users_online_cache = mb_substr($useronlinecache, 0, -1);
+        $this->session->users_online_cache = mb_substr($useronlinecache, 0, -1);
         if ($list === []) {
             return;
         }
@@ -497,7 +497,6 @@ final class IDX
 
     public function updateLastPosts(): void
     {
-        global $SESS;
         $result = $this->database->safespecial(
             <<<'EOT'
                 SELECT f.`id` AS `id`,f.`lp_tid` AS `lp_tid`,f.`lp_topic` AS `lp_topic`,
@@ -511,7 +510,7 @@ final class IDX
                 EOT
             ,
             ['forums', 'members'],
-            gmdate('Y-m-d H:i:s', (int) ($SESS->last_update ?? time())),
+            gmdate('Y-m-d H:i:s', (int) ($this->session->last_update ?? time())),
         );
 
         while ($f = $this->database->arow($result)) {
@@ -564,9 +563,9 @@ final class IDX
 
     public function isForumRead($forum): bool
     {
-        global $SESS,$USER;
+        global $USER;
         if (!$this->forumsread) {
-            $this->forumsread = $this->jax->parsereadmarkers($SESS->forumsread);
+            $this->forumsread = $this->jax->parsereadmarkers($this->session->forumsread);
         }
 
         if (!isset($this->forumsread[$forum['id']])) {
@@ -575,7 +574,7 @@ final class IDX
 
         return $forum['lp_date'] < max(
             $this->forumsread[$forum['id']],
-            $SESS->read_date,
+            $this->session->read_date,
             $USER && $USER['last_visit'],
         );
     }

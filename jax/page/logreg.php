@@ -10,6 +10,7 @@ use Jax\Database;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Session;
 
 use function base64_encode;
 use function count;
@@ -44,9 +45,10 @@ final class LogReg
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
+        private readonly IPAddress $ipAddress,
         private readonly Jax $jax,
         private readonly Page $page,
-        private readonly IPAddress $ipAddress,
+        private readonly Session $session,
     ) {
         $this->page->loadmeta('logreg');
     }
@@ -205,9 +207,8 @@ final class LogReg
 
     public function login($u = false, $p = false): void
     {
-        global $SESS;
         if ($u && $p) {
-            if ($SESS->is_bot) {
+            if ($this->session->is_bot) {
                 return;
             }
 
@@ -243,10 +244,10 @@ final class LogReg
                     ['utoken' => $logintoken],
                     time() + 3600 * 24 * 30,
                 );
-                $SESS->clean($user['id']);
-                $SESS->user = $u;
-                $SESS->uid = $user['id'];
-                $SESS->act();
+                $this->session->clean($user['id']);
+                $this->session->user = $u;
+                $this->session->uid = $user['id'];
+                $this->session->act();
                 $perms = $this->database->getPerms($user['group_id']);
                 if ($this->registering) {
                     $this->page->JS('location', '/');
@@ -263,7 +264,7 @@ final class LogReg
                 $this->page->JS('error', 'Incorrect username/password');
             }
 
-            $SESS->erase('location');
+            $this->session->erase('location');
         }
 
         $this->page->append('page', $this->page->meta('login-form'));
@@ -271,7 +272,6 @@ final class LogReg
 
     public function logout(): void
     {
-        global $SESS;
         // Just make a new session rather than fuss with the old one,
         // to maintain users online.
         if (isset($this->jax->c['utoken'])) {
@@ -289,9 +289,9 @@ final class LogReg
             );
         }
 
-        $SESS->hide = 1;
-        $SESS->applyChanges();
-        $SESS->getSess(false);
+        $this->session->hide = 1;
+        $this->session->applyChanges();
+        $this->session->getSess(false);
         session_unset();
         session_destroy();
         $this->page->reset('USERBOX', $this->page->meta('userbox-logged-out'));
@@ -343,12 +343,11 @@ final class LogReg
 
     public function toggleinvisible(): void
     {
-        global $SESS;
-        $SESS->hide = $SESS->hide ? 0 : 1;
+        $this->session->hide = $this->session->hide ? 0 : 1;
 
-        $SESS->applyChanges();
+        $this->session->applyChanges();
 
-        $this->page->JS('setstatus', $SESS->hide !== 0 ? 'invisible' : 'online');
+        $this->page->JS('setstatus', $this->session->hide !== 0 ? 'invisible' : 'online');
         $this->page->JS('softurl');
     }
 

@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Session;
 
 use function array_key_exists;
 use function array_map;
@@ -49,6 +50,7 @@ final class Search
         private readonly Database $database,
         private readonly Page $page,
         private readonly Jax $jax,
+        private readonly Session $session,
     ) {
         $this->page->loadmeta('search');
     }
@@ -74,7 +76,6 @@ final class Search
 
     public function form($pageContents = ''): void
     {
-        global $SESS;
         if ($this->page->jsupdate) {
             return;
         }
@@ -82,7 +83,7 @@ final class Search
         $page = $this->page->meta(
             'search-form',
             $this->jax->blockhtml(
-                $SESS->vars['searcht'] ?? '',
+                $this->session->vars['searcht'] ?? '',
             ),
             $this->getForumSelection(),
             $pageContents,
@@ -193,7 +194,6 @@ final class Search
 
     public function dosearch(): void
     {
-        global $SESS;
 
         if ($this->page->jsupdate && empty($this->jax->p)) {
             return;
@@ -202,14 +202,14 @@ final class Search
         $termraw = $this->jax->b['searchterm'] ?? '';
 
         if (!$termraw && $this->pagenum) {
-            $termraw = $SESS->vars['searcht'];
+            $termraw = $this->session->vars['searcht'];
         }
 
         if (
             empty($this->jax->p)
             && !array_key_exists('searchterm', $this->jax->b)
         ) {
-            $ids = $SESS->vars['search'];
+            $ids = $this->session->vars['search'];
         } else {
             $this->getSearchableForums();
             if (isset($this->jax->b['fids']) && $this->jax->b['fids']) {
@@ -331,8 +331,8 @@ final class Search
             }
 
             $ids = mb_substr($ids, 0, -1);
-            $SESS->addvar('search', $ids);
-            $SESS->addvar('searcht', $termraw);
+            $this->session->addvar('search', $ids);
+            $this->session->addvar('searcht', $termraw);
             $this->pagenum = 1;
         }
 

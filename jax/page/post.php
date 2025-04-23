@@ -8,6 +8,7 @@ use Jax\Config;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Session;
 
 use function array_pop;
 use function count;
@@ -57,6 +58,7 @@ final class Post
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly IPAddress $ipAddress,
+        private readonly Session $session,
     ) {
         $this->page->metadefs['post-preview'] = $this->page->meta('box', '', 'Post Preview', '%s');
     }
@@ -339,7 +341,7 @@ onclick="this.form.submitButton=this" /></div>
 
     public function showpostform(): void
     {
-        global $SESS,$USER;
+        global $USER;
         $page = '';
         $tid = $this->tid;
         if ($this->page->jsupdate && $this->how !== 'qreply') {
@@ -396,7 +398,7 @@ onclick="this.form.submitButton=this" /></div>
             $vars .= '<input type="hidden" name="' . $k . '" value="' . $v . '" />';
         }
 
-        if (isset($SESS->vars['multiquote']) && $SESS->vars['multiquote']) {
+        if (isset($this->session->vars['multiquote']) && $this->session->vars['multiquote']) {
             $postdata = '';
 
             $result = $this->database->safespecial(
@@ -411,14 +413,14 @@ onclick="this.form.submitButton=this" /></div>
                     EOT
                 ,
                 ['posts', 'members'],
-                $SESS->vars['multiquote'],
+                $this->session->vars['multiquote'],
             );
 
             while ($postRow = $this->database->arow($result)) {
                 $postdata .= '[quote=' . $postRow['name'] . ']' . $postRow['post'] . '[/quote]' . PHP_EOL;
             }
 
-            $SESS->delvar('multiquote');
+            $this->session->delvar('multiquote');
         }
 
         $form = '<div class="postform">
@@ -628,8 +630,8 @@ onclick="this.form.submitButton=this"/></div>
 
     public function submitpost(): ?bool
     {
-        global $SESS,$USER,$PERMS;
-        $SESS->act();
+        global $USER,$PERMS;
+        $this->session->act();
         $tid = $this->tid;
         $fid = $this->fid;
         $postdata = $this->postdata;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 #[AllowDynamicProperties]
-final class Sess
+final class Session
 {
     public $data = [];
 
@@ -62,7 +62,12 @@ final class Sess
 
     public $changedData = [];
 
-    public function __construct(private readonly Config $config, private readonly IPAddress $ipAddress)
+    public function __construct(
+        private readonly Config $config,
+        private readonly Jax $jax,
+        private readonly IPAddress $ipAddress,
+        private readonly Database $database,
+    )
     {
         $this->data = $this->getSess($_SESSION['sid'] ?? false);
         if (!isset($this->data['vars'])) {
@@ -94,8 +99,7 @@ final class Sess
 
     public function getSess($sid = false)
     {
-        global $DB,$JAX,$_SESSION;
-        $userData = $DB->getUser();
+        $userData = $this->database->getUser();
         $isbot = 0;
         $r = [];
         foreach ($this->bots as $k => $v) {
@@ -109,7 +113,7 @@ final class Sess
 
         if ($sid) {
             $result = $isbot === 0
-                ? $DB->safeselect(
+                ? $this->database->safeselect(
                     [
                         'buddy_list_cache',
                         'forumsread',
@@ -131,10 +135,10 @@ final class Sess
                     ],
                     'session',
                     'WHERE `id`=? AND `ip`=?',
-                    $DB->basicvalue($sid),
+                    $this->database->basicvalue($sid),
                     $this->ipAddress->asBinary(),
                 )
-                    : $DB->safeselect(
+                    : $this->database->safeselect(
                         [
                             'buddy_list_cache',
                             'forumsread',
@@ -156,10 +160,10 @@ final class Sess
                         ],
                         'session',
                         'WHERE `id`=?',
-                        $DB->basicvalue($sid),
+                        $this->database->basicvalue($sid),
                     );
-            $r = $DB->arow($result);
-            $DB->disposeresult($result);
+            $r = $this->database->arow($result);
+            $this->database->disposeresult($result);
         }
 
         if (!empty($r)) {
@@ -204,7 +208,7 @@ final class Sess
             unset($sessData['uid']);
         }
 
-        $DB->safeinsert(
+        $this->database->safeinsert(
             'session',
             $sessData,
         );
@@ -244,7 +248,6 @@ final class Sess
 
     public function act($a = false): void
     {
-        global $JAX;
         $this->__set('last_action', time());
         if (!$a) {
             return;
@@ -260,40 +263,39 @@ final class Sess
 
     public function clean($uid): bool
     {
-        global $DB,$PAGE,$JAX;
         $timeago = time() - $this->config->getSetting('timetologout');
         if (!is_numeric($uid) || $uid < 1) {
             $uid = null;
         } else {
-            $result = $DB->safeselect(
+            $result = $this->database->safeselect(
                 'UNIX_TIMESTAMP(MAX(`last_action`)) AS `last_action`',
                 'session',
                 'WHERE `uid`=? GROUP BY `uid`',
                 $uid,
             );
-            $lastAction = $DB->arow($result);
-            $DB->disposeresult($result);
+            $lastAction = $this->database->arow($result);
+            $this->database->disposeresult($result);
             if ($lastAction) {
                 $lastAction = (int) $lastAction['last_action'];
             }
 
-            $DB->safedelete(
+            $this->database->safedelete(
                 'session',
                 'WHERE `uid`=? AND `last_update`<?',
-                $DB->basicvalue($uid),
+                $this->database->basicvalue($uid),
                 gmdate('Y-m-d H:i:s', $timeago),
             );
             // Delete all expired tokens as well while we're here...
-            $DB->safedelete(
+            $this->database->safedelete(
                 'tokens',
                 'WHERE `expires`<=?',
-                $DB->basicvalue(date('Y-m-d H:i:s', time())),
+                $this->database->basicvalue(date('Y-m-d H:i:s', time())),
             );
-            $this->__set('read_date', $JAX->pick($lastAction, 0));
+            $this->__set('read_date', $this->jax->pick($lastAction, 0));
         }
 
         $yesterday = mktime(0, 0, 0);
-        $query = $DB->safeselect(
+        $query = $this->database->safeselect(
             [
                 'uid',
                 'UNIX_TIMESTAMP(MAX(`last_action`)) AS `last_action`',
@@ -302,12 +304,12 @@ final class Sess
             'WHERE `last_update`<? GROUP BY uid',
             gmdate('Y-m-d H:i:s', $yesterday),
         );
-        while ($f = $DB->arow($query)) {
+        while ($f = $this->database->arow($query)) {
             if (!$f['uid']) {
                 continue;
             }
 
-            $DB->safeupdate(
+            $this->database->safeupdate(
                 'members',
                 [
                     'last_visit' => gmdate('Y-m-d H:i:s', $f['last_action']),
@@ -317,7 +319,7 @@ final class Sess
             );
         }
 
-        $DB->safedelete(
+        $this->database->safedelete(
             'session',
             <<<'EOT'
                 WHERE `last_update`<?
@@ -333,7 +335,6 @@ final class Sess
 
     public function applyChanges(): void
     {
-        global $DB,$PAGE;
         $sd = $this->changedData;
         $id = $this->data['id'];
         $sd['last_update'] = gmdate('Y-m-d H:i:s');
@@ -374,18 +375,17 @@ final class Sess
         }
 
         // Only update if there's data to update.
-        $DB->safeupdate(
+        $this->database->safeupdate(
             'session',
             $sd,
             'WHERE `id`=?',
-            $DB->basicvalue($id),
+            $this->database->basicvalue($id),
         );
     }
 
     public function addSessID($html)
     {
-        global $JAX;
-        if (!empty($JAX->c) || !is_string($html)) {
+        if (!empty($this->jax->c) || !is_string($html)) {
             return $html;
         }
 

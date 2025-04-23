@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Session;
 
 use function ceil;
 use function explode;
@@ -37,6 +38,7 @@ final class Forum
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly Page $page,
+        private readonly Session $session,
     ) {
         $this->page->loadmeta('forum');
     }
@@ -472,13 +474,13 @@ final class Forum
 
     public function isTopicRead($topic, $fid): bool
     {
-        global $SESS,$USER;
+        global $USER;
         if (empty($this->topicsRead)) {
-            $this->topicsRead = $this->jax->parsereadmarkers($SESS->topicsread);
+            $this->topicsRead = $this->jax->parsereadmarkers($this->session->topicsread);
         }
 
         if (empty($this->forumsRead)) {
-            $fr = $this->jax->parsereadmarkers($SESS->forumsread);
+            $fr = $this->jax->parsereadmarkers($this->session->forumsread);
             if (isset($fr[$fid])) {
                 $this->forumReadTime = $fr[$fid];
             }
@@ -490,30 +492,29 @@ final class Forum
 
         return $topic['lp_date'] <= $this->jax->pick(
             max($this->topicsRead[$topic['id']], $this->forumReadTime),
-            $SESS->read_date,
+            $this->session->read_date,
             $USER && $USER['last_visit'],
         );
     }
 
     public function isForumRead($forum): bool
     {
-        global $SESS,$USER;
+        global $USER;
         if (!$this->forumsRead) {
-            $this->forumsRead = $this->jax->parsereadmarkers($SESS->forumsread);
+            $this->forumsRead = $this->jax->parsereadmarkers($this->session->forumsread);
         }
 
         return $forum['lp_date'] <= $this->jax->pick(
             $this->forumsRead[$forum['id']] ?? null,
-            $SESS->read_date,
+            $this->session->read_date,
             $USER && $USER['last_visit'],
         );
     }
 
     public function markread($id): void
     {
-        global $SESS;
-        $forumsread = $this->jax->parsereadmarkers($SESS->forumsread);
+        $forumsread = $this->jax->parsereadmarkers($this->session->forumsread);
         $forumsread[$id] = time();
-        $SESS->forumsread = json_encode($forumsread);
+        $this->session->forumsread = json_encode($forumsread);
     }
 }

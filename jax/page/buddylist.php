@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Session;
 
 use function array_search;
 use function explode;
@@ -17,10 +18,12 @@ use function is_numeric;
 final readonly class BuddyList
 {
     public function __construct(
-        private Database $database,
-        private Jax $jax,
-        private Page $page,
-    ) {
+        private readonly Database $database,
+        private readonly Jax $jax,
+        private readonly Page $page,
+        private readonly Session $session,
+    )
+    {
         $buddylist = $this->jax->hiddenFormFields(['act' => 'buddylist']);
         $this->page->metadefs['buddylist-contacts'] = <<<EOT
             <div class="contacts">
@@ -84,7 +87,7 @@ final readonly class BuddyList
 
     public function displaybuddylist(): void
     {
-        global $USER,$SESS;
+        global $USER;
         if (!$USER) {
             return;
         }
@@ -148,7 +151,7 @@ final readonly class BuddyList
             [
                 'content' => $this->page->meta(
                     'buddylist-contacts',
-                    $SESS->hide ? 'invisible' : '',
+                    $this->session->hide ? 'invisible' : '',
                     $USER['usertitle'],
                     $contacts,
                 ),

@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Session;
 
 final class Ticker
 {
@@ -16,6 +17,7 @@ final class Ticker
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly Page $page,
+        private readonly Session $session
     ) {
         $this->page->loadmeta('ticker');
     }
@@ -31,8 +33,8 @@ final class Ticker
 
     public function index(): void
     {
-        global $SESS,$USER;
-        $SESS->location_verbose = 'Using the ticker!';
+        global $USER;
+        $this->session->location_verbose = 'Using the ticker!';
         $result = $this->database->safespecial(
             <<<'EOT'
                 SELECT
@@ -81,7 +83,7 @@ final class Ticker
             $ticks .= $this->ftick($tick);
         }
 
-        $SESS->addvar('tickid', $first);
+        $this->session->addvar('tickid', $first);
         $page = $this->page->meta('ticker', $ticks);
         $this->page->append('PAGE', $page);
         $this->page->JS('update', 'page', $page);
@@ -89,7 +91,7 @@ final class Ticker
 
     public function update(): void
     {
-        global $SESS,$USER;
+        global $USER;
         $result = $this->database->safespecial(
             <<<'EOT'
                 SELECT
@@ -122,7 +124,7 @@ final class Ticker
                 EOT
             ,
             ['posts', 'topics', 'forums', 'members', 'members'],
-            $this->jax->pick($SESS->vars['tickid'], 0),
+            $this->jax->pick($this->session->vars['tickid'], 0),
             $this->maxticks,
         );
         $first = false;
@@ -143,7 +145,7 @@ final class Ticker
             return;
         }
 
-        $SESS->addvar('tickid', $first);
+        $this->session->addvar('tickid', $first);
     }
 
     public function ftick($t): ?string
