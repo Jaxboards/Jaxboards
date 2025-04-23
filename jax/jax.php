@@ -86,7 +86,7 @@ final class Jax
         $this->b = array_merge($this->p, $this->g);
     }
 
-    public static function pick(...$args)
+    public function pick(...$args)
     {
         foreach ($args as $v) {
             if ($v) {
@@ -97,7 +97,7 @@ final class Jax
         return $v;
     }
 
-    public static function hiddenFormFields($fields): string
+    public function hiddenFormFields($fields): string
     {
         $html = '';
         foreach ($fields as $key => $value) {
