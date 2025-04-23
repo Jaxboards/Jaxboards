@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Jax\MySQL;
 use Jax\Config;
 use Jax\Jax;
+use Jax\MySQL;
 
 define('JAXBOARDS_ROOT', dirname(__DIR__));
 
@@ -51,7 +51,7 @@ switch ($_GET['act'] ?? '') {
         break;
 
     case 'emotes':
-        $JAX = new JAX();
+        $JAX = new Jax();
         $rules = $JAX->getEmoteRules(0);
         foreach ($rules as $k => $v) {
             $rules[$k] = '<img src="' . $v . '" alt="' . $JAX->blockhtml($k) . '" />';

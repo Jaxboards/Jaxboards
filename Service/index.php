@@ -5,7 +5,7 @@ use Jax\IPAddress;
 use Jax\Jax;
 use Jax\MySQL;
 
-/**
+/*
  * Service signup file, for users to create their own JaxBoards forum.
  *
  * PHP Version 8
