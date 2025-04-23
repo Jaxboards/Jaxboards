@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\Config;
+use Jax\Database;
+use Jax\Jax;
+use Jax\Page;
 
 use function array_flip;
 use function array_keys;
@@ -33,23 +36,27 @@ final class IDX
 
     public $subforums;
 
-    public function __construct(private readonly Config $config)
+    public function __construct(
+        private readonly Config $config,
+        private readonly Database $database,
+        private readonly Jax $jax,
+        private readonly Page $page,
+    )
     {
-        global $PAGE;
-        $PAGE->loadmeta('idx');
+        $this->page->loadmeta('idx');
     }
 
     public function route(): void
     {
-        global $PAGE,$JAX,$SESS;
-        if (isset($JAX->b['markread']) && $JAX->b['markread']) {
-            $PAGE->JS('softurl');
+        global $SESS;
+        if (isset($this->jax->b['markread']) && $this->jax->b['markread']) {
+            $this->page->JS('softurl');
             $SESS->forumsread = '{}';
             $SESS->topicsread = '{}';
             $SESS->read_date = time();
         }
 
-        if ($PAGE->jsupdate) {
+        if ($this->page->jsupdate) {
             $this->update();
         } else {
             $this->viewidx();
@@ -58,10 +65,10 @@ final class IDX
 
     public function viewidx(): void
     {
-        global $DB,$PAGE,$SESS,$JAX,$USER;
+        global $SESS,$USER;
         $SESS->location_verbose = 'Viewing board index';
         $page = '';
-        $result = $DB->safespecial(
+        $result = $this->database->safespecial(
             <<<'EOT'
                 SELECT f.`id` AS `id`,
                     f.`cat_id` AS `cat_id`,f.`title` AS `title`,f.`subtitle` AS `subtitle`,
@@ -90,8 +97,8 @@ final class IDX
         $this->mods = [];
 
         // This while loop just grabs all of the data, displaying is done below.
-        while ($r = $DB->arow($result)) {
-            $perms = $JAX->parseperms($r['perms'], $USER ? $USER['group_id'] : 3);
+        while ($r = $this->database->arow($result)) {
+            $perms = $this->jax->parseperms($r['perms'], $USER ? $USER['group_id'] : 3);
             if ($r['perms'] && !$perms['view']) {
                 continue;
             }
@@ -101,12 +108,12 @@ final class IDX
                 preg_match('@\d+$@', (string) $r['path'], $m);
                 if (isset($this->subforums[$m[0]])) {
                     $this->subforumids[$m[0]][] = $r['id'];
-                    $this->subforums[$m[0]] .= $PAGE->meta(
+                    $this->subforums[$m[0]] .= $this->page->meta(
                         'idx-subforum-link',
                         $r['id'],
                         $r['title'],
-                        $JAX->blockhtml($r['subtitle']),
-                    ) . $PAGE->meta('idx-subforum-splitter');
+                        $this->jax->blockhtml($r['subtitle']),
+                    ) . $this->page->meta('idx-subforum-splitter');
                 }
             } else {
                 $data[$r['cat_id']][] = $r;
@@ -135,17 +142,17 @@ final class IDX
         }
 
         $this->mods = array_keys($this->mods);
-        $catq = $DB->safeselect(
+        $catq = $this->database->safeselect(
             ['id', 'title', '`order`'],
             'categories',
             'ORDER BY `order`,`title` ASC',
         );
-        while ($r = $DB->arow($catq)) {
+        while ($r = $this->database->arow($catq)) {
             if (empty($data[$r['id']])) {
                 continue;
             }
 
-            $page .= $PAGE->collapsebox(
+            $page .= $this->page->collapsebox(
                 $r['title'],
                 $this->buildTable(
                     $data[$r['id']],
@@ -154,15 +161,15 @@ final class IDX
             );
         }
 
-        $page .= $PAGE->meta('idx-tools');
+        $page .= $this->page->meta('idx-tools');
 
         $page .= $this->getBoardStats();
 
-        if ($PAGE->jsnewlocation) {
-            $PAGE->JS('update', 'page', $page);
-            $PAGE->updatepath();
+        if ($this->page->jsnewlocation) {
+            $this->page->JS('update', 'page', $page);
+            $this->page->updatepath();
         } else {
-            $PAGE->append('PAGE', $page);
+            $this->page->append('PAGE', $page);
         }
     }
 
@@ -186,36 +193,34 @@ final class IDX
 
     public function getmods($modids): string
     {
-        global $DB,$PAGE;
         if (!$this->moderatorinfo) {
             $this->moderatorinfo = [];
-            $result = $DB->safeselect(
+            $result = $this->database->safeselect(
                 ['id', 'display_name', 'group_id'],
                 'members',
                 'WHERE `id` IN ?',
                 $this->mods,
             );
-            while ($f = $DB->arow($result)) {
-                $this->moderatorinfo[$f['id']] = $PAGE->meta(
+            while ($member = $this->database->arow($result)) {
+                $this->moderatorinfo[$member['id']] = $this->page->meta(
                     'user-link',
-                    $f['id'],
-                    $f['group_id'],
-                    $f['display_name'],
+                    $member['id'],
+                    $member['group_id'],
+                    $member['display_name'],
                 );
             }
         }
 
         $r = '';
         foreach (explode(',', (string) $modids) as $v) {
-            $r .= $this->moderatorinfo[$v] . $PAGE->meta('idx-ledby-splitter');
+            $r .= $this->moderatorinfo[$v] . $this->page->meta('idx-ledby-splitter');
         }
 
-        return mb_substr($r, 0, -mb_strlen((string) $PAGE->meta('idx-ledby-splitter')));
+        return mb_substr($r, 0, -mb_strlen((string) $this->page->meta('idx-ledby-splitter')));
     }
 
     public function buildTable($a)
     {
-        global $PAGE,$JAX;
         if (!$a) {
             return null;
         }
@@ -235,15 +240,15 @@ final class IDX
             }
 
             if ($v['redirect']) {
-                $r .= $PAGE->meta(
+                $r .= $this->page->meta(
                     'idx-redirect-row',
                     $v['id'],
                     $v['title'],
                     nl2br((string) $v['subtitle']),
                     'Redirects: ' . $v['redirects'],
-                    $JAX->pick(
-                        $PAGE->meta('icon-redirect'),
-                        $PAGE->meta('idx-icon-redirect'),
+                    $this->jax->pick(
+                        $this->page->meta('icon-redirect'),
+                        $this->page->meta('idx-icon-redirect'),
                     ),
                 );
             } else {
@@ -252,32 +257,32 @@ final class IDX
                     ? ''
                     : ' href="?act=vf' . $v['id'] . '&amp;markread=1"';
                 $linkText = $read
-                    ? $JAX->pick(
-                        $PAGE->meta('icon-read'),
-                        $PAGE->meta('idx-icon-read'),
-                    ) : $JAX->pick(
-                        $PAGE->meta('icon-unread'),
-                        $PAGE->meta('idx-icon-unread'),
+                    ? $this->jax->pick(
+                        $this->page->meta('icon-read'),
+                        $this->page->meta('idx-icon-read'),
+                    ) : $this->jax->pick(
+                        $this->page->meta('icon-unread'),
+                        $this->page->meta('idx-icon-unread'),
                     );
-                $r .= $PAGE->meta(
+                $r .= $this->page->meta(
                     'idx-row',
                     $v['id'],
-                    $JAX->wordfilter($v['title']),
+                    $this->jax->wordfilter($v['title']),
                     nl2br((string) $v['subtitle']),
                     $sf
-                    ? $PAGE->meta(
+                    ? $this->page->meta(
                         'idx-subforum-wrapper',
                         mb_substr(
                             (string) $sf,
                             0,
                             -1 * mb_strlen(
-                                (string) $PAGE->meta('idx-subforum-splitter'),
+                                (string) $this->page->meta('idx-subforum-splitter'),
                             ),
                         ),
                     ) : '',
                     $this->formatlastpost($v),
-                    $PAGE->meta('idx-topics-count', $v['topics']),
-                    $PAGE->meta('idx-replies-count', $v['posts']),
+                    $this->page->meta('idx-topics-count', $v['topics']),
+                    $this->page->meta('idx-replies-count', $v['posts']),
                     $read ? 'read' : 'unread',
                     <<<EOT
                          <a id="fid_{$vId}_icon"{$hrefCode}>
@@ -286,7 +291,7 @@ final class IDX
                         EOT
                     ,
                     $v['show_ledby'] && $v['mods']
-                        ? $PAGE->meta(
+                        ? $this->page->meta(
                             'idx-ledby-wrapper',
                             $this->getmods($v['mods']),
                         ) : '',
@@ -294,7 +299,7 @@ final class IDX
             }
         }
 
-        return $PAGE->meta('idx-table', $r);
+        return $this->page->meta('idx-table', $r);
     }
 
     public function update(): void
@@ -305,7 +310,7 @@ final class IDX
 
     public function getBoardStats(): string
     {
-        global $DB, $JAX, $PAGE, $PERMS;
+        global $PERMS;
         if (!$PERMS['can_view_stats']) {
             return '';
         }
@@ -313,7 +318,7 @@ final class IDX
         $legend = '';
         $page = '';
         $userstoday = '';
-        $result = $DB->safespecial(
+        $result = $this->database->safespecial(
             <<<'EOT'
                 SELECT s.`posts` AS `posts`,s.`topics` AS `topics`,s.`members` AS `members`,
                     s.`most_members` AS `most_members`,
@@ -327,10 +332,10 @@ final class IDX
             ,
             ['stats', 'members'],
         );
-        $stats = $DB->arow($result);
-        $DB->disposeresult($result);
+        $stats = $this->database->arow($result);
+        $this->database->disposeresult($result);
 
-        $result = $DB->safespecial(
+        $result = $this->database->safespecial(
             <<<'EOT'
                 SELECT UNIX_TIMESTAMP(MAX(s.`last_update`)) AS `last_update`,m.`id` AS `id`,
                     m.`group_id` AS `group_id`,m.`display_name` AS `name`,
@@ -348,7 +353,7 @@ final class IDX
         );
         $nuserstoday = 0;
         $today = gmdate('n j');
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             if (!$f['id']) {
                 continue;
             }
@@ -358,7 +363,7 @@ final class IDX
             $fGroupId = $f['group_id'];
             $birthdayCode = $f['birthday'] === $today
                 && $this->config->getSetting('birthdays') ? ' birthday' : '';
-            $lastOnlineCode = $JAX->date(
+            $lastOnlineCode = $this->jax->date(
                 $f['hide'] ? $f['read_date'] : $f['last_update'],
                 false,
             );
@@ -373,17 +378,17 @@ final class IDX
 
         $userstoday = mb_substr($userstoday, 0, -2);
         $usersonline = $this->getusersonlinelist();
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             ['id', 'title'],
             'member_groups',
             'WHERE `legend`=1 ORDER BY `title`',
         );
-        while ($row = $DB->arow($result)) {
+        while ($row = $this->database->arow($result)) {
             $legend .= '<a href="?" class="mgroup' . $row['id'] . '">'
                 . $row['title'] . '</a> ';
         }
 
-        return $page . $PAGE->meta(
+        return $page . $this->page->meta(
             'idx-stats',
             $usersonline[1],
             $usersonline[0],
@@ -393,7 +398,7 @@ final class IDX
             number_format($stats['members']),
             number_format($stats['topics']),
             number_format($stats['posts']),
-            $PAGE->meta(
+            $this->page->meta(
                 'user-link',
                 $stats['last_register'],
                 $stats['group_id'],
@@ -405,14 +410,13 @@ final class IDX
 
     public function getusersonlinelist(): array
     {
-        global $DB,$PAGE,$JAX;
         $r = '';
         $guests = 0;
         $nummembers = 0;
-        foreach ($DB->getUsersOnline() as $f) {
+        foreach ($this->database->getUsersOnline() as $f) {
             if (!empty($f['uid']) || (isset($f['is_bot']) && $f['is_bot'])) {
-                $title = $JAX->blockhtml(
-                    $JAX->pick($f['location_verbose'], 'Viewing the board.'),
+                $title = $this->jax->blockhtml(
+                    $this->jax->pick($f['location_verbose'], 'Viewing the board.'),
                 );
                 if (isset($f['is_bot']) && $f['is_bot']) {
                     $r .= '<a class="user' . $f['uid'] . '" '
@@ -442,14 +446,14 @@ final class IDX
 
     public function updateStats(): void
     {
-        global $PAGE,$DB,$SESS;
+        global $SESS;
         $list = [];
         if ($SESS->users_online_cache) {
             $oldcache = array_flip(explode(',', (string) $SESS->users_online_cache));
         }
 
         $useronlinecache = '';
-        foreach ($DB->getUsersOnline() as $f) {
+        foreach ($this->database->getUsersOnline() as $f) {
             $lastActionIdle = (int) ($SESS->last_update ?? 0) - ($this->config->getSetting('timetoidle') ?? 300) - 30;
             if (!$f['uid'] && !$f['is_bot']) {
                 continue;
@@ -481,7 +485,7 @@ final class IDX
         }
 
         if (isset($oldcache) && $oldcache !== []) {
-            $PAGE->JS('setoffline', implode(',', array_flip($oldcache)));
+            $this->page->JS('setoffline', implode(',', array_flip($oldcache)));
         }
 
         $SESS->users_online_cache = mb_substr($useronlinecache, 0, -1);
@@ -489,13 +493,13 @@ final class IDX
             return;
         }
 
-        $PAGE->JS('onlinelist', $list);
+        $this->page->JS('onlinelist', $list);
     }
 
     public function updateLastPosts(): void
     {
-        global $DB,$SESS,$PAGE,$JAX;
-        $result = $DB->safespecial(
+        global $SESS;
+        $result = $this->database->safespecial(
             <<<'EOT'
                 SELECT f.`id` AS `id`,f.`lp_tid` AS `lp_tid`,f.`lp_topic` AS `lp_topic`,
                     UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,f.`lp_uid` AS `lp_uid`,
@@ -511,61 +515,59 @@ final class IDX
             gmdate('Y-m-d H:i:s', (int) ($SESS->last_update ?? time())),
         );
 
-        while ($f = $DB->arow($result)) {
-            $PAGE->JS('addclass', '#fid_' . $f['id'], 'unread');
-            $PAGE->JS(
+        while ($f = $this->database->arow($result)) {
+            $this->page->JS('addclass', '#fid_' . $f['id'], 'unread');
+            $this->page->JS(
                 'update',
                 '#fid_' . $f['id'] . '_icon',
-                $JAX->pick(
-                    $PAGE->meta('icon-unread'),
-                    $PAGE->meta('idx-icon-unread'),
+                $this->jax->pick(
+                    $this->page->meta('icon-unread'),
+                    $this->page->meta('idx-icon-unread'),
                 ),
             );
-            $PAGE->JS(
+            $this->page->JS(
                 'update',
                 '#fid_' . $f['id'] . '_lastpost',
                 $this->formatlastpost($f),
                 '1',
             );
-            $PAGE->JS(
+            $this->page->JS(
                 'update',
                 '#fid_' . $f['id'] . '_topics',
-                $PAGE->meta('idx-topics-count', $f['topics']),
+                $this->page->meta('idx-topics-count', $f['topics']),
             );
-            $PAGE->JS(
+            $this->page->JS(
                 'update',
                 '#fid_' . $f['id'] . '_replies',
-                $PAGE->meta('idx-replies-count', $f['posts']),
+                $this->page->meta('idx-replies-count', $f['posts']),
             );
         }
     }
 
     public function formatlastpost($v)
     {
-        global $PAGE,$JAX;
-
-        return $PAGE->meta(
+        return $this->page->meta(
             'idx-row-lastpost',
             $v['lp_tid'],
-            $JAX->pick(
-                $JAX->wordfilter($v['lp_topic']),
+            $this->jax->pick(
+                $this->jax->wordfilter($v['lp_topic']),
                 '- - - - -',
             ),
-            $v['lp_uid'] ? $PAGE->meta(
+            $v['lp_uid'] ? $this->page->meta(
                 'user-link',
                 $v['lp_uid'],
                 $v['lp_gid'],
                 $v['lp_name'],
             ) : 'None',
-            $JAX->pick($JAX->date($v['lp_date']), '- - - - -'),
+            $this->jax->pick($this->jax->date($v['lp_date']), '- - - - -'),
         );
     }
 
     public function isForumRead($forum): bool
     {
-        global $SESS,$USER,$JAX;
+        global $SESS,$USER;
         if (!$this->forumsread) {
-            $this->forumsread = $JAX->parsereadmarkers($SESS->forumsread);
+            $this->forumsread = $this->jax->parsereadmarkers($SESS->forumsread);
         }
 
         if (!isset($this->forumsread[$forum['id']])) {

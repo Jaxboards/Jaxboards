@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
+use Jax\Database;
+use Jax\Jax;
+use Jax\Page;
+
 use function array_map;
 use function array_slice;
 use function ceil;
@@ -31,8 +35,6 @@ use const PHP_EOL;
 
 final class Search
 {
-    public $page = '';
-
     public $pagenum = 0;
 
     public $fids = [];
@@ -42,17 +44,18 @@ final class Search
      */
     public $perpage;
 
-    public function __construct()
+    public function __construct(
+        private readonly Database $database,
+        private readonly Page $page,
+        private readonly Jax $jax,
+    )
     {
-        global $PAGE;
-
-        $PAGE->loadmeta('search');
+        $this->page->loadmeta('search');
     }
 
     public function route(): void
     {
-        global $PAGE,$JAX;
-        $this->pagenum = $JAX->b['page'] ?? 0;
+        $this->pagenum = $this->jax->b['page'] ?? 0;
         if (!is_numeric($this->pagenum) || $this->pagenum < 0) {
             $this->pagenum = 1;
         }
@@ -60,8 +63,8 @@ final class Search
         $this->perpage = 10;
 
         if (
-            (isset($JAX->b['searchterm']) && $JAX->b['searchterm'])
-            || (isset($JAX->b['page']) && $JAX->b['page'])
+            (isset($this->jax->b['searchterm']) && $this->jax->b['searchterm'])
+            || (isset($this->jax->b['page']) && $this->jax->b['page'])
         ) {
             $this->dosearch();
         } else {
@@ -69,35 +72,34 @@ final class Search
         }
     }
 
-    public function form(): void
+    public function form($pageContents = ''): void
     {
-        global $PAGE,$JAX,$SESS;
-        if ($PAGE->jsupdate) {
+        global $SESS;
+        if ($this->page->jsupdate) {
             return;
         }
 
-        $this->page = $PAGE->meta(
+        $page = $this->page->meta(
             'search-form',
-            $JAX->blockhtml(
+            $this->jax->blockhtml(
                 $SESS->vars['searcht'] ?? '',
             ),
             $this->getForumSelection(),
-            $this->page,
+            $pageContents,
         );
-        $PAGE->JS('update', 'page', $this->page);
-        $PAGE->append('page', $this->page);
+        $this->page->JS('update', 'page', $page);
+        $this->page->append('page', $page);
     }
 
     public function getForumSelection(): string
     {
-        global $DB;
         $this->getSearchableForums();
         $r = '';
         if (!$this->fids) {
             return '--No forums--';
         }
 
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             ['id', 'title', 'path'],
             'forums',
             'WHERE `id` IN ? ORDER BY `order` ASC,`title` DESC',
@@ -107,7 +109,7 @@ final class Search
         $tree = [];
         $titles = [];
 
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             $titles[$f['id']] = $f['title'];
             $path = trim((string) $f['path']) !== ''
                 && trim((string) $f['path']) !== '0'
@@ -191,25 +193,25 @@ final class Search
 
     public function dosearch(): void
     {
-        global $JAX,$PAGE,$DB,$SESS;
+        global $SESS;
 
-        if ($PAGE->jsupdate && empty($JAX->p)) {
+        if ($this->page->jsupdate && empty($this->jax->p)) {
             return;
         }
 
-        $termraw = $JAX->b['searchterm'];
+        $termraw = $this->jax->b['searchterm'] ?? '';
 
         if (!$termraw && $this->pagenum) {
             $termraw = $SESS->vars['searcht'];
         }
 
-        if (empty($JAX->p) && !$JAX->b['searchterm']) {
+        if (empty($this->jax->p) && !array_key_exists('searchterm', $this->jax->b)) {
             $ids = $SESS->vars['search'];
         } else {
             $this->getSearchableForums();
-            if (isset($JAX->b['fids']) && $JAX->b['fids']) {
+            if (isset($this->jax->b['fids']) && $this->jax->b['fids']) {
                 $fids = [];
-                foreach ($JAX->b['fids'] as $v) {
+                foreach ($this->jax->b['fids'] as $v) {
                     if (!in_array($v, $this->fids)) {
                         continue;
                     }
@@ -221,18 +223,18 @@ final class Search
             }
 
             $datestart = null;
-            if ($JAX->b['datestart']) {
-                $datestart = $this->pdate($JAX->b['datestart']);
+            if ($this->jax->b['datestart'] ?? 0) {
+                $datestart = $this->pdate($this->jax->b['datestart']);
             }
 
             $dateend = null;
-            if ($JAX->b['dateend']) {
-                $dateend = $this->pdate($JAX->b['dateend']);
+            if ($this->jax->b['dateend'] ?? 0) {
+                $dateend = $this->pdate($this->jax->b['dateend']);
             }
 
             $authorId = null;
-            if ($JAX->b['mid'] && ctype_digit((string) $JAX->b['mid'])) {
-                $authorId = (int) $JAX->b['mid'];
+            if (($this->jax->b['mid'] ?? 0) && ctype_digit((string) $this->jax->b['mid'])) {
+                $authorId = (int) $this->jax->b['mid'];
             }
 
             $postParams = [];
@@ -272,9 +274,9 @@ final class Search
             $postWhere = implode(' ', array_map(static fn($q): string => "AND {$q}", $postParams));
             $topicWhere = implode(' ', array_map(static fn($q): string => "AND {$q}", $topicParams));
 
-            $sanitizedSearchTerm = $DB->basicvalue($termraw);
+            $sanitizedSearchTerm = $this->database->basicvalue($termraw);
 
-            $result = $DB->safespecial(
+            $result = $this->database->safespecial(
                 <<<"SQL"
                         SELECT
                             `id`,
@@ -310,11 +312,11 @@ final class Search
             );
 
             if (!$result) {
-                syslog(LOG_EMERG, 'ERROR: ' . $DB->error(1) . PHP_EOL);
+                syslog(LOG_EMERG, 'ERROR: ' . $this->database->error(1) . PHP_EOL);
             }
 
             $ids = '';
-            while ($id = $DB->arow($result)) {
+            while ($id = $this->database->arow($result)) {
                 if (!$id['id']) {
                     continue;
                 }
@@ -338,7 +340,7 @@ final class Search
             );
             $ids = implode(',', $idarray);
 
-            $result = $DB->safespecial(
+            $result = $this->database->safespecial(
                 <<<SQL
                     SELECT
                         p.`id` AS `id`,
@@ -376,22 +378,22 @@ final class Search
             $terms[] = preg_quote($v);
         }
 
-        while ($postRow = $DB->arow($result)) {
-            $post = $JAX->textonly($postRow['post']);
-            $post = $JAX->blockhtml($post);
+        while ($postRow = $this->database->arow($result)) {
+            $post = $this->jax->textonly($postRow['post']);
+            $post = $this->jax->blockhtml($post);
             $post = nl2br((string) $post);
             $post = preg_replace(
                 '@' . implode('|', $terms) . '@i',
-                (string) $PAGE->meta('search-highlight', '$0'),
+                (string) $this->page->meta('search-highlight', '$0'),
                 $post,
             );
             $title = preg_replace(
                 '@' . implode('|', $terms) . '@i',
-                (string) $PAGE->meta('search-highlight', '$0'),
+                (string) $this->page->meta('search-highlight', '$0'),
                 (string) $postRow['title'],
             );
 
-            $page .= $PAGE->meta(
+            $page .= $this->page->meta(
                 'search-result',
                 $postRow['tid'],
                 $title,
@@ -419,9 +421,9 @@ final class Search
                     . implode(', ', $omitted);
             }
 
-            $page = $PAGE->error($e);
+            $page = $this->page->error($e);
         } else {
-            $resultsArray = $JAX->pages(
+            $resultsArray = $this->jax->pages(
                 ceil($numresults / $this->perpage),
                 $this->pagenum,
                 10,
@@ -431,30 +433,30 @@ final class Search
             }
         }
 
-        $page = $PAGE->meta('box', '', 'Search Results - ' . $pages, $page);
+        $page = $this->page->meta('box', '', 'Search Results - ' . $pages, $page);
 
-        if ($PAGE->jsaccess && !$PAGE->jsdirectlink) {
-            $PAGE->JS('update', 'searchresults', $page);
+        if ($this->page->jsaccess && !$this->page->jsdirectlink) {
+            $this->page->JS('update', 'searchresults', $page);
         } else {
-            $this->page .= $page;
-            $this->form();
+            $this->form($page);
         }
     }
 
     public function getSearchableForums()
     {
+        global $USER;
+
         if ($this->fids) {
             return $this->fids;
         }
 
         $this->fids = [];
-        global $DB,$JAX,$USER;
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             ['id', 'perms'],
             'forums',
         );
-        while ($f = $DB->arow($result)) {
-            $perms = $JAX->parseperms($f['perms'], $USER ? $USER['group_id'] : 3);
+        while ($f = $this->database->arow($result)) {
+            $perms = $this->jax->parseperms($f['perms'], $USER ? $USER['group_id'] : 3);
             if (!$perms['read']) {
                 continue;
             }

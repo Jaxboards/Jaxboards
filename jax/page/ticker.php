@@ -4,20 +4,26 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
+use Jax\Database;
+use Jax\Jax;
+use Jax\Page;
+
 final class Ticker
 {
     public $maxticks = 60;
 
-    public function __construct()
+    public function __construct(
+        private readonly Database $database,
+        private readonly Jax $jax,
+        private readonly Page $page
+    )
     {
-        global $PAGE;
-        $PAGE->loadmeta('ticker');
+        $this->page->loadmeta('ticker');
     }
 
     public function route(): void
     {
-        global $PAGE;
-        if ($PAGE->jsnewlocation || !$PAGE->jsaccess) {
+        if ($this->page->jsnewlocation || !$this->page->jsaccess) {
             $this->index();
         } else {
             $this->update();
@@ -26,9 +32,9 @@ final class Ticker
 
     public function index(): void
     {
-        global $PAGE,$DB,$SESS,$JAX,$USER;
+        global $SESS,$USER;
         $SESS->location_verbose = 'Using the ticker!';
-        $result = $DB->safespecial(
+        $result = $this->database->safespecial(
             <<<'EOT'
                 SELECT
                     f.`perms` AS `perms`,
@@ -63,8 +69,8 @@ final class Ticker
         );
         $ticks = '';
         $first = 0;
-        while ($tick = $DB->arow($result)) {
-            $p = $JAX->parseperms($tick['perms'], $USER ? $USER['group_id'] : 3);
+        while ($tick = $this->database->arow($result)) {
+            $p = $this->jax->parseperms($tick['perms'], $USER ? $USER['group_id'] : 3);
             if (!$p['read']) {
                 continue;
             }
@@ -77,15 +83,15 @@ final class Ticker
         }
 
         $SESS->addvar('tickid', $first);
-        $page = $PAGE->meta('ticker', $ticks);
-        $PAGE->append('PAGE', $page);
-        $PAGE->JS('update', 'page', $page);
+        $page = $this->page->meta('ticker', $ticks);
+        $this->page->append('PAGE', $page);
+        $this->page->JS('update', 'page', $page);
     }
 
     public function update(): void
     {
-        global $PAGE,$DB,$SESS,$USER,$JAX;
-        $result = $DB->safespecial(
+        global $SESS,$USER;
+        $result = $this->database->safespecial(
             <<<'EOT'
                 SELECT
                     f.`perms` AS `perms`,
@@ -117,12 +123,12 @@ final class Ticker
                 EOT
             ,
             ['posts', 'topics', 'forums', 'members', 'members'],
-            $JAX->pick($SESS->vars['tickid'], 0),
+            $this->jax->pick($SESS->vars['tickid'], 0),
             $this->maxticks,
         );
         $first = false;
-        while ($f = $DB->arow($result)) {
-            $p = $JAX->parseperms($f['perms'], $USER ? $USER['group_id'] : 3);
+        while ($f = $this->database->arow($result)) {
+            $p = $this->jax->parseperms($f['perms'], $USER ? $USER['group_id'] : 3);
             if (!$p['read']) {
                 continue;
             }
@@ -131,7 +137,7 @@ final class Ticker
                 $first = $f['id'];
             }
 
-            $PAGE->JS('tick', $this->ftick($f));
+            $this->page->JS('tick', $this->ftick($f));
         }
 
         if (!$first) {
@@ -143,12 +149,10 @@ final class Ticker
 
     public function ftick($t)
     {
-        global $PAGE,$JAX;
-
-        return $PAGE->meta(
+        return $this->page->meta(
             'ticker-tick',
-            $JAX->smalldate($t['date'], false, true),
-            $PAGE->meta(
+            $this->jax->smalldate($t['date'], false, true),
+            $this->page->meta(
                 'user-link',
                 $t['auth_id'],
                 $t['group_id'],
@@ -160,7 +164,7 @@ final class Ticker
             $t['title'],
             $t['fid'],
             $t['ftitle'],
-            $PAGE->meta(
+            $this->page->meta(
                 'user-link',
                 $t['auth_id2'],
                 $t['group_id2'],

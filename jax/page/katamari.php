@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
+use Jax\Page;
+
 final class Katamari
 {
+    public function __construct(
+        private readonly Page $page
+    ){}
+
     public function route(): void
     {
-        global $PAGE;
-
-        $PAGE->JS('loadscript', './Script/katamari.js');
-        $PAGE->JS('softurl');
+        $this->page->JS('loadscript', './Script/katamari.js');
+        $this->page->JS('softurl');
     }
 }

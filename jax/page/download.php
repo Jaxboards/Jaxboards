@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
+use Jax\Database;
+use Jax\Jax;
+
 use function array_pop;
 use function count;
 use function explode;
@@ -16,17 +19,19 @@ use function readfile;
 
 final class Download
 {
+    public function __construct(
+        private readonly Database $database,
+        private readonly Jax $jax,
+    ) {}
     public function route(): void
     {
-        global $JAX;
-        $this->downloadFile($JAX->b['id']);
+        $this->downloadFile($this->jax->b['id']);
     }
 
     public function downloadFile($id): void
     {
-        global $DB;
         if (is_numeric($id)) {
-            $result = $DB->safeselect(
+            $result = $this->database->safeselect(
                 [
                     'name',
                     'hash',
@@ -35,15 +40,15 @@ final class Download
                 'WHERE `id`=?',
                 $id,
             );
-            $data = $DB->arow($result);
-            $DB->disposeresult($result);
+            $data = $this->database->arow($result);
+            $this->database->disposeresult($result);
         }
 
         if (!$data) {
             return;
         }
 
-        $DB->safespecial(
+        $this->database->safespecial(
             <<<'EOT'
                 UPDATE %t
                 SET `downloads` = `downloads` + 1

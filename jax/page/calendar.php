@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
+use Jax\Database;
+use Jax\Jax;
+use Jax\Page;
+
 use function explode;
 use function gmdate;
 use function implode;
@@ -15,18 +19,20 @@ final class Calendar
 {
     public $month;
 
-    public function __construct()
+    public function __construct(
+        private readonly Database $database,
+        private readonly Jax $jax,
+        private readonly Page $page
+    )
     {
-        global $PAGE;
-        $PAGE->loadmeta('calendar');
+        $this->page->loadmeta('calendar');
     }
 
     public function route(): void
     {
-        global $JAX;
-        if (isset($JAX->b['month'])) {
-            if (is_numeric($JAX->b['month'])) {
-                $this->month = (int) $JAX->b['month'];
+        if (isset($this->jax->b['month'])) {
+            if (is_numeric($this->jax->b['month'])) {
+                $this->month = (int) $this->jax->b['month'];
             }
         } else {
             $this->month = (int) gmdate('n');
@@ -37,9 +43,9 @@ final class Calendar
 
     public function monthview(): void
     {
-        global $PAGE,$DB,$SESS;
+        global $SESS;
         $monthoffset = $this->month;
-        if ($PAGE->jsupdate) {
+        if ($this->page->jsupdate) {
             return;
         }
 
@@ -58,7 +64,7 @@ final class Calendar
 
         $SESS->location_verbose
             = 'Checking out the calendar for ' . $monthname . ' ' . $year;
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             [
                 'id',
                 '`display_name` AS `name`',
@@ -69,11 +75,11 @@ final class Calendar
             ],
             'members',
             'WHERE MONTH(`birthdate`)=? AND YEAR(`birthdate`)<?',
-            $DB->basicvalue($month),
+            $this->database->basicvalue($month),
             $year,
         );
         $birthdays = [];
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             $birthdays[$f['dob_day']][] = sprintf(
                 '<a href="?act=vu%1$s" class="user%1$s mgroup%2$s" '
                 . 'title="%4$s years old!" data-use-tooltip="true">'
@@ -85,28 +91,28 @@ final class Calendar
             );
         }
 
-        $page .= $PAGE->meta(
+        $page .= $this->page->meta(
             'calendar-heading',
             $monthname,
             $year,
             $monthoffset - 1,
             $monthoffset + 1,
         );
-        $page .= $PAGE->meta('calendar-daynames');
+        $page .= $this->page->meta('calendar-daynames');
         $week = '';
         for ($x = 1; $x <= $daysinmonth; ++$x) {
             if ($x === 1 && $offset) {
-                $week .= $PAGE->meta(
+                $week .= $this->page->meta(
                     'calendar-padding',
                     $offset,
                 );
             }
 
-            $week .= $PAGE->meta(
+            $week .= $this->page->meta(
                 'calendar-day',
                 $month . ' ' . $x . ' ' . $year === $today ? 'today' : '',
                 $x,
-                empty($birthdays[$x]) ? '' : $PAGE->meta(
+                empty($birthdays[$x]) ? '' : $this->page->meta(
                     'calendar-birthdays',
                     implode(',', $birthdays[$x]),
                 ),
@@ -115,14 +121,14 @@ final class Calendar
                 continue;
             }
 
-            $page .= $PAGE->meta('calendar-week', $week);
+            $page .= $this->page->meta('calendar-week', $week);
             $week = '';
         }
 
-        $page = $PAGE->meta('calendar', $page);
-        $page = $PAGE->meta('box', '', 'Calendar', $page);
+        $page = $this->page->meta('calendar', $page);
+        $page = $this->page->meta('box', '', 'Calendar', $page);
 
-        $PAGE->append('PAGE', $page);
-        $PAGE->JS('update', 'page', $page);
+        $this->page->append('PAGE', $page);
+        $this->page->JS('update', 'page', $page);
     }
 }

@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
+use Jax\Page;
+
 final class Tardis
 {
+    public function __construct(
+        private readonly Page $page,
+    ) {}
     public function route(): void
     {
-        global $PAGE;
-
-        $PAGE->JS('softurl');
-        $PAGE->JS('script', '(function() {
+        $this->page->JS('softurl');
+        $this->page->JS('script', '(function() {
             if (window.tardis) {
                 return;
             }
@@ -44,6 +47,6 @@ final class Tardis
             }
             setInterval(window.tardis, 10);
         })()');
-        $PAGE->JS('playsound', 'drwho', './Sounds/doctorwhotheme.mp3');
+        $this->page->JS('playsound', 'drwho', './Sounds/doctorwhotheme.mp3');
     }
 }

@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
+use Jax\Page;
+
 final class Earthbound
 {
+    public function __construct(
+        private readonly Page $page
+    ) {}
+
     public function route(): void
     {
-        global $PAGE;
-        $PAGE->JS('softurl');
-        $PAGE->JS('loadscript', './Script/earthbound.js');
-        $PAGE->JS('playsound', 'earthbound', './Sounds/earthboundbattle.mp3');
+        $this->page->JS('softurl');
+        $this->page->JS('loadscript', './Script/earthbound.js');
+        $this->page->JS('playsound', 'earthbound', './Sounds/earthboundbattle.mp3');
     }
 }

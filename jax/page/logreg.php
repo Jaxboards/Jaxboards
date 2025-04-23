@@ -6,8 +6,10 @@ namespace Jax\Page;
 
 use Exception;
 use Jax\Config;
+use Jax\Database;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Page;
 
 use function base64_encode;
 use function count;
@@ -41,58 +43,55 @@ final class LogReg
 
     public function __construct(
         private readonly Config $config,
+        private readonly Database $database,
+        private readonly Jax $jax,
+        private readonly Page $page,
         private readonly IPAddress $ipAddress,
     ) {
-        global $PAGE;
-
-        $PAGE->loadmeta('logreg');
+       $this->page->loadmeta('logreg');
     }
 
     public function route(): void
     {
-        global $JAX,$PAGE;
-
-        match ((int) mb_substr((string) $JAX->b['act'], 6)) {
+        match ((int) mb_substr((string) $this->jax->b['act'], 6)) {
             1 => $this->register(),
             2 => $this->logout(),
             4 => $this->loginpopup(),
             5 => $this->toggleinvisible(),
-            6 => $this->forgotpassword($JAX->b['uid'], $JAX->b['id']),
-            default => $this->login($JAX->p['user'], $JAX->p['pass']),
+            6 => $this->forgotpassword($this->jax->b['uid'], $this->jax->b['id']),
+            default => $this->login($this->jax->p['user'], $this->jax->p['pass']),
         };
     }
 
     public function register()
     {
-        global $PAGE,$JAX,$DB;
-
         $this->registering = true;
 
-        if (isset($JAX->p['username']) && $JAX->p['username']) {
-            $PAGE->location('?');
+        if (isset($this->jax->p['username']) && $this->jax->p['username']) {
+           $this->page->location('?');
         }
 
-        $name = isset($JAX->p['name']) ? trim($JAX->p['name']) : '';
-        $dispname = isset($JAX->p['display_name'])
-            ? trim($JAX->p['display_name']) : '';
-        $pass1 = $JAX->p['pass1'] ?? '';
-        $pass2 = $JAX->p['pass2'] ?? '';
-        $email = $JAX->p['email'] ?? '';
+        $name = isset($this->jax->p['name']) ? trim($this->jax->p['name']) : '';
+        $dispname = isset($this->jax->p['display_name'])
+            ? trim($this->jax->p['display_name']) : '';
+        $pass1 = $this->jax->p['pass1'] ?? '';
+        $pass2 = $this->jax->p['pass2'] ?? '';
+        $email = $this->jax->p['email'] ?? '';
 
         $recaptcha = '';
         if ($this->config->getSetting('recaptcha')) {
-            $recaptcha = $PAGE->meta('anti-spam', $this->config->getSetting('recaptcha')['public_key']);
+            $recaptcha =$this->page->meta('anti-spam', $this->config->getSetting('recaptcha')['public_key']);
         }
 
-        $p = $PAGE->meta('register-form', $recaptcha);
+        $p =$this->page->meta('register-form', $recaptcha);
 
         // Show registration form.
-        if (!isset($JAX->p['register'])) {
+        if (!isset($this->jax->p['register'])) {
             if (!$PAGE->jsupdate) {
-                $PAGE->JS('update', 'page', $p);
+               $this->page->JS('update', 'page', $p);
             }
 
-            return $PAGE->append('PAGE', $p);
+            return$this->page->append('PAGE', $p);
         }
 
         // Validate input and actually register the user.
@@ -120,7 +119,7 @@ final class LogReg
             $badNameChars = $this->config->getSetting('badnamechars');
             if (
                 ($badNameChars && preg_match($badNameChars, $name))
-                || $JAX->blockhtml($name) !== $name
+                || $this->jax->blockhtml($name) !== $name
             ) {
                 throw new Exception('Invalid characters in username!');
             }
@@ -129,7 +128,7 @@ final class LogReg
                 throw new Exception('Invalid characters in display name!');
             }
 
-            if (!$JAX->isemail($email)) {
+            if (!$this->jax->isemail($email)) {
                 throw new Exception("That isn't a valid email!");
             }
 
@@ -142,17 +141,17 @@ final class LogReg
             }
 
             // Are they attempting to use an existing username/display name?
-            $dispname = $JAX->blockhtml($dispname);
-            $name = $JAX->blockhtml($name);
-            $result = $DB->safeselect(
+            $dispname = $this->jax->blockhtml($dispname);
+            $name = $this->jax->blockhtml($name);
+            $result = $this->database->safeselect(
                 ['name', 'display_name'],
                 'members',
                 'WHERE `name`=? OR `display_name`=?',
-                $DB->basicvalue($name),
-                $DB->basicvalue($dispname),
+                $this->database->basicvalue($name),
+                $this->database->basicvalue($dispname),
             );
-            $member = $DB->arow($result);
-            $DB->disposeresult($result);
+            $member = $this->database->arow($result);
+            $this->database->disposeresult($result);
             if ($member) {
                 if ($member['name'] === $name) {
                     throw new Exception('That username is taken!');
@@ -165,7 +164,7 @@ final class LogReg
 
 
             // All clear!
-            $DB->safeinsert(
+            $this->database->safeinsert(
                 'members',
                 [
                     'display_name' => $dispname,
@@ -183,20 +182,20 @@ final class LogReg
                     'wysiwyg' => 1,
                 ],
             );
-            $DB->safespecial(
+            $this->database->safespecial(
                 <<<'EOT'
                     UPDATE %t
                     SET `members` = `members` + 1, `last_register` = ?
                     EOT
                 ,
                 ['stats'],
-                $DB->insert_id(1),
+                $this->database->insert_id(1),
             );
             $this->login($name, $pass1);
         } catch (Exception $e) {
             $e = $e->getMessage();
-            $PAGE->JS('alert', $e);
-            $PAGE->append('page', $PAGE->meta('error', $e));
+           $this->page->JS('alert', $e);
+           $this->page->append('page',$this->page->meta('error', $e));
         }
 
         return null;
@@ -204,31 +203,31 @@ final class LogReg
 
     public function login($u = false, $p = false): void
     {
-        global $PAGE,$JAX,$SESS,$DB,$_SESSION;
+        global $SESS;
         if ($u && $p) {
             if ($SESS->is_bot) {
                 return;
             }
 
-            $result = $DB->safeselect(
+            $result = $this->database->safeselect(
                 ['id'],
                 'members',
                 'WHERE `name`=?',
-                $DB->basicvalue($u),
+                $this->database->basicvalue($u),
             );
-            $user = $DB->arow($result);
+            $user = $this->database->arow($result);
             $u = $user['id'] ?? 0;
 
-            $user = $DB->getUser($u, $p);
+            $user = $this->database->getUser($u, $p);
 
             if ($user) {
-                if (isset($JAX->p['popup']) && $JAX->p['popup']) {
-                    $PAGE->JS('closewindow', '#loginform');
+                if (isset($this->jax->p['popup']) && $this->jax->p['popup']) {
+                   $this->page->JS('closewindow', '#loginform');
                 }
 
                 $_SESSION['uid'] = $user['id'];
                 $logintoken = base64_encode(openssl_random_pseudo_bytes(128));
-                $DB->safeinsert(
+                $this->database->safeinsert(
                     'tokens',
                     [
                         'expires' => gmdate('Y-m-d H:i:s', time() + 3600 * 24 * 30),
@@ -238,7 +237,7 @@ final class LogReg
                     ],
                 );
 
-                $JAX->setCookie(
+                $this->jax->setCookie(
                     ['utoken' => $logintoken],
                     time() + 3600 * 24 * 30,
                 );
@@ -246,41 +245,41 @@ final class LogReg
                 $SESS->user = $u;
                 $SESS->uid = $user['id'];
                 $SESS->act();
-                $perms = $DB->getPerms($user['group_id']);
+                $perms = $this->database->getPerms($user['group_id']);
                 if ($this->registering) {
-                    $PAGE->JS('location', '/');
+                   $this->page->JS('location', '/');
                 } elseif ($PAGE->jsaccess) {
-                    $PAGE->JS('reload');
+                   $this->page->JS('reload');
                 } else {
-                    $PAGE->location('?');
+                   $this->page->location('?');
                 }
             } else {
-                $PAGE->append(
+               $this->page->append(
                     'page',
-                    $PAGE->meta('error', 'Incorrect username/password'),
+                   $this->page->meta('error', 'Incorrect username/password'),
                 );
-                $PAGE->JS('error', 'Incorrect username/password');
+               $this->page->JS('error', 'Incorrect username/password');
             }
 
             $SESS->erase('location');
         }
 
-        $PAGE->append('page', $PAGE->meta('login-form'));
+       $this->page->append('page',$this->page->meta('login-form'));
     }
 
     public function logout(): void
     {
-        global $DB,$PAGE,$JAX,$SESS;
+        global $SESS;
         // Just make a new session rather than fuss with the old one,
         // to maintain users online.
-        if (isset($JAX->c['utoken'])) {
-            $DB->safedelete(
+        if (isset($this->jax->c['utoken'])) {
+            $this->database->safedelete(
                 'tokens',
                 'WHERE `token`=?',
-                $DB->basicvalue($JAX->c['utoken']),
+                $this->database->basicvalue($this->jax->c['utoken']),
             );
-            unset($JAX->c['utoken']);
-            $JAX->setCookie(
+            unset($this->jax->c['utoken']);
+            $this->jax->setCookie(
                 [
                     'utoken' => null,
                 ],
@@ -293,10 +292,10 @@ final class LogReg
         $SESS->getSess(false);
         session_unset();
         session_destroy();
-        $PAGE->reset('USERBOX', $PAGE->meta('userbox-logged-out'));
-        $PAGE->JS('update', 'userbox', $PAGE->meta('userbox-logged-out'));
-        $PAGE->JS('softurl');
-        $PAGE->append('page', $PAGE->meta('success', 'Logged out successfully'));
+       $this->page->reset('USERBOX',$this->page->meta('userbox-logged-out'));
+       $this->page->JS('update', 'userbox',$this->page->meta('userbox-logged-out'));
+       $this->page->JS('softurl');
+       $this->page->append('page',$this->page->meta('success', 'Logged out successfully'));
         if ($PAGE->jsaccess) {
             return;
         }
@@ -306,9 +305,8 @@ final class LogReg
 
     public function loginpopup(): void
     {
-        global $PAGE;
-        $PAGE->JS('softurl');
-        $PAGE->JS(
+       $this->page->JS('softurl');
+       $this->page->JS(
             'window',
             [
                 'content' => <<<'EOT'
@@ -343,85 +341,84 @@ final class LogReg
 
     public function toggleinvisible(): void
     {
-        global $PAGE,$SESS;
+        global $SESS;
         $SESS->hide = $SESS->hide ? 0 : 1;
 
         $SESS->applyChanges();
 
-        $PAGE->JS('setstatus', $SESS->hide !== 0 ? 'invisible' : 'online');
-        $PAGE->JS('softurl');
+       $this->page->JS('setstatus', $SESS->hide !== 0 ? 'invisible' : 'online');
+       $this->page->JS('softurl');
     }
 
     public function forgotpassword($uid, $id): void
     {
-        global $PAGE,$JAX,$DB;
         $page = '';
 
-        if ($PAGE->jsupdate && empty($JAX->p)) {
+        if ($PAGE->jsupdate && empty($this->jax->p)) {
             return;
         }
 
         if ($id) {
-            $result = $DB->safeselect(
+            $result = $this->database->safeselect(
                 'uid AS id',
                 'tokens',
                 'WHERE `token`=?
                 AND `expires`>=NOW()',
-                $DB->basicvalue($id),
+                $this->database->basicvalue($id),
             );
-            $udata = $DB->arow($result);
+            $udata = $this->database->arow($result);
             if (!$udata) {
                 $e = 'This link has expired. Please try again.';
             }
 
-            $DB->disposeresult($result);
+            $this->database->disposeresult($result);
 
             if ($e !== '') {
-                $page = $PAGE->meta('error', $e);
-            } elseif ($JAX->p['pass1'] && $JAX->p['pass2']) {
-                if ($JAX->p['pass1'] === $JAX->p['pass2']) {
-                    $DB->safeupdate(
+                $page =$this->page->meta('error', $e);
+            } elseif ($this->jax->p['pass1'] && $this->jax->p['pass2']) {
+                if ($this->jax->p['pass1'] === $this->jax->p['pass2']) {
+                    $this->database->safeupdate(
                         'members',
                         [
                             'pass' => password_hash(
-                                (string) $JAX->p['pass1'],
+                                (string) $this->jax->p['pass1'],
                                 PASSWORD_DEFAULT,
                             ),
                         ],
                         'WHERE `id`=?',
-                        $DB->basicvalue($udata['id']),
+                        $this->database->basicvalue($udata['id']),
                     );
                     // Delete all forgotpassword tokens for this user.
-                    $DB->safedelete(
+                    $this->database->safedelete(
                         'tokens',
                         "WHERE `uid`=? AND `type`='forgotpassword'",
-                        $DB->basicvalue($udata['id']),
+                        $this->database->basicvalue($udata['id']),
                     );
 
                     // Get username.
-                    $result = $DB->safeselect(
+                    $result = $this->database->safeselect(
                         ['id', 'name'],
                         'members',
                         'WHERE `id`=?',
-                        $DB->basicvalue($udata['id']),
+                        $this->database->basicvalue($udata['id']),
                     );
-                    $udata = $DB->arow($result);
+                    $udata = $this->database->arow($result);
 
                     // Just making use of the way
                     // registration redirects to the index.
                     $this->registering = true;
 
-                    $this->login($udata['name'], $JAX->p['pass1']);
+                    $this->login($udata['name'], $this->jax->p['pass1']);
 
                     return;
                 }
 
-                $page .= $PAGE->meta(
+                $page .=$this->page->meta(
                     'error',
                     'The passwords did not match, please try again!',
                 );
             } else {
-                $page .= $PAGE->meta(
+                $page .=$this->page->meta(
                     'forgot-password2-form',
                     Jax::hiddenFormFields(
                         [
@@ -433,28 +430,28 @@ final class LogReg
                 );
             }
         } else {
-            if ($JAX->p['user']) {
-                $result = $DB->safeselect(
+            if ($this->jax->p['user']) {
+                $result = $this->database->safeselect(
                     ['id', 'email'],
                     'members',
                     'WHERE `name`=?',
-                    $DB->basicvalue($JAX->p['user']),
+                    $this->database->basicvalue($this->jax->p['user']),
                 );
-                if (!($udata = $DB->arow($result))) {
+                if (!($udata = $this->database->arow($result))) {
                     $e = 'There is no user registered as <strong>'
-                        . $JAX->b['user']
+                        . $this->jax->b['user']
                         . '</strong>, sure this is correct?';
                 }
 
-                $DB->disposeresult($result);
+                $this->database->disposeresult($result);
 
                 if ($e !== '0') {
-                    $page .= $PAGE->meta('error', $e);
+                    $page .=$this->page->meta('error', $e);
                 } else {
                     // Generate token.
                     $forgotpasswordtoken
                         = base64_encode(openssl_random_pseudo_bytes(128));
-                    $DB->safeinsert(
+                    $this->database->safeinsert(
                         'tokens',
                         [
                             'expires' => gmdate('Y-m-d H:i:s', time() + 3600 * 24),
@@ -465,7 +462,7 @@ final class LogReg
                     );
                     $link = BOARDURL . '?act=logreg6&uid='
                         . $udata['id'] . '&id=' . rawurlencode($forgotpasswordtoken);
-                    $mailResult = $JAX->mail(
+                    $mailResult = $this->jax->mail(
                         $udata['email'],
                         'Recover Your Password!',
                         <<<HTML
@@ -486,13 +483,13 @@ final class LogReg
                     );
 
                     if (!$mailResult) {
-                        $page .= $PAGE->meta(
+                        $page .=$this->page->meta(
                             'error',
                             'There was a problem sending the email. '
                             . 'Please contact the administrator.',
                         );
                     } else {
-                        $page .= $PAGE->meta(
+                        $page .=$this->page->meta(
                             'success',
                             'An email has been sent to the email associated '
                             . 'with this account. Please check your email and '
@@ -503,9 +500,9 @@ final class LogReg
                 }
             }
 
-            $page .= $PAGE->meta(
+            $page .=$this->page->meta(
                 'forgot-password-form',
-                $PAGE->jsaccess
+               $this->page->jsaccess
                 ? Jax::hiddenFormFields(
                     [
                         'act' => 'logreg6',
@@ -514,19 +511,17 @@ final class LogReg
             );
         }
 
-        $PAGE->append('PAGE', $page);
-        $PAGE->JS('update', 'page', $page);
+       $this->page->append('PAGE', $page);
+       $this->page->JS('update', 'page', $page);
     }
 
     private function isHuman()
     {
-        global $JAX;
-
         if ($this->config->getSetting('recaptcha')) {
             // Validate reCAPTCHA.
             $url = 'https://www.google.com/recaptcha/api/siteverify';
             $fields = [
-                'response' => $JAX->p['g-recaptcha-response'],
+                'response' => $this->jax->p['g-recaptcha-response'],
                 'secret' => $this->config->getSetting('recaptcha')['private_key'],
             ];
 

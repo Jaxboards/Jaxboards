@@ -5,27 +5,31 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\Config;
+use Jax\Page;
 
 use function nl2br;
 
 final readonly class BoardOffline
 {
-    public function __construct(private Config $config) {}
+    public function __construct(
+        private readonly Config $config,
+        private readonly Page $page,
+    ) {}
+
 
     public function route(): void
     {
-        global $PAGE,$JAX;
-        if ($PAGE->jsupdate) {
+        if ($this->page->jsupdate) {
             return;
         }
 
-        $PAGE->append(
+        $this->page->append(
             'PAGE',
-            $PAGE->meta(
+            $this->page->meta(
                 'box',
                 '',
                 'Error',
-                $PAGE->error(
+                $this->page->error(
                     "You don't have permission to view the board. "
                     . 'If you have an account that has permission, '
                     . 'please log in.'

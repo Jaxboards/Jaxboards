@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
+use Jax\Database;
 use Jax\Jax;
+use Jax\Page;
 
 use function array_search;
 use function explode;
@@ -14,12 +16,14 @@ use function is_numeric;
 
 final class BuddyList
 {
-    public function __construct()
+    public function __construct(
+        protected readonly Database $database,
+        protected readonly Jax $jax,
+        protected readonly Page $page,
+    )
     {
-        global $PAGE;
-
-        $buddylist = Jax::hiddenFormFields(['act' => 'buddylist']);
-        $PAGE->metadefs['buddylist-contacts'] = <<<EOT
+        $buddylist = $this->jax->hiddenFormFields(['act' => 'buddylist']);
+        $this->page->metadefs['buddylist-contacts'] = <<<EOT
             <div class="contacts">
                 <form method="?" data-ajax-form="true">
                     {$buddylist}
@@ -30,7 +34,7 @@ final class BuddyList
                     %s
             </div>
             EOT;
-        $PAGE->metadefs['buddylist-contact'] = <<<'EOT'
+        $this->page->metadefs['buddylist-contact'] = <<<'EOT'
             <div
                 class="contact %3$s">
                 <a href="?act=vu%1$s">
@@ -49,11 +53,11 @@ final class BuddyList
 
     public function route(): void
     {
-        global $PAGE,$JAX,$USER;
+        global $USER;
 
-        $PAGE->JS('softurl');
+        $this->page->JS('softurl');
         if (!$USER) {
-            $PAGE->JS(
+            $this->page->JS(
                 'error',
                 'Sorry, you must be logged in to use this feature.',
             );
@@ -61,16 +65,16 @@ final class BuddyList
             return;
         }
 
-        if (isset($JAX->b['add']) && $JAX->b['add']) {
-            $this->addbuddy($JAX->b['add']);
-        } elseif (isset($JAX->b['remove']) && $JAX->b['remove']) {
-            $this->dropbuddy($JAX->b['remove']);
-        } elseif (isset($JAX->b['status']) && $JAX->b['status']) {
-            $this->setstatus($JAX->b['status']);
-        } elseif (isset($JAX->b['block']) && $JAX->b['block']) {
-            $this->block($JAX->b['block']);
-        } elseif (isset($JAX->b['unblock']) && $JAX->b['unblock']) {
-            $this->unblock($JAX->b['unblock']);
+        if (isset($this->jax->b['add']) && $this->jax->b['add']) {
+            $this->addbuddy($this->jax->b['add']);
+        } elseif (isset($this->jax->b['remove']) && $this->jax->b['remove']) {
+            $this->dropbuddy($this->jax->b['remove']);
+        } elseif (isset($this->jax->b['status']) && $this->jax->b['status']) {
+            $this->setstatus($this->jax->b['status']);
+        } elseif (isset($this->jax->b['block']) && $this->jax->b['block']) {
+            $this->block($this->jax->b['block']);
+        } elseif (isset($this->jax->b['unblock']) && $this->jax->b['unblock']) {
+            $this->unblock($this->jax->b['unblock']);
         } else {
             $this->displaybuddylist();
         }
@@ -78,16 +82,16 @@ final class BuddyList
 
     public function displaybuddylist(): void
     {
-        global $JAX,$PAGE,$USER,$DB,$SESS;
+        global $USER,$SESS;
         if (!$USER) {
             return;
         }
 
-        $PAGE->JS('softurl');
-        $crap = '';
+        $this->page->JS('softurl');
+        $contacts = '';
         if ($USER['friends']) {
-            $online = $DB->getUsersOnline();
-            $result = $DB->safeselect(
+            $online = $this->database->getUsersOnline();
+            $result = $this->database->safeselect(
                 [
                     'id',
                     'avatar',
@@ -98,53 +102,53 @@ final class BuddyList
                 'WHERE `id` IN ? ORDER BY `name` ASC',
                 explode(',', (string) $USER['friends']),
             );
-            while ($f = $DB->arow($result)) {
-                $crap .= $PAGE->meta(
+            while ($f = $this->database->arow($result)) {
+                $contacts .= $this->page->meta(
                     'buddylist-contact',
                     $f['id'],
                     $f['name'],
                     isset($online[$f['id']]) && $online[$f['id']]
                     ? 'online' : 'offline',
-                    $JAX->pick($f['avatar'], $PAGE->meta('default-avatar')),
+                    $this->jax->pick($f['avatar'], $this->page->meta('default-avatar')),
                     $f['usertitle'],
                 );
             }
         }
 
         if ($USER['enemies']) {
-            $result = $DB->safeselect(
+            $result = $this->database->safeselect(
                 '`id`,`avatar`,`display_name` AS `name`,`usertitle`',
                 'members',
                 'WHERE `id` IN ? ORDER BY `name` ASC',
                 explode(',', (string) $USER['enemies']),
             );
-            while ($f = $DB->arow($result)) {
-                $crap .= $PAGE->meta(
+            while ($f = $this->database->arow($result)) {
+                $contacts .= $this->page->meta(
                     'buddylist-contact',
                     $f['id'],
                     $f['name'],
                     'blocked',
-                    $JAX->pick($f['avatar'], $PAGE->meta('default-avatar')),
+                    $this->jax->pick($f['avatar'], $this->page->meta('default-avatar')),
                     $f['usertitle'],
                 );
             }
         }
 
-        if ($crap === '' || $crap === '0') {
-            $crap = $PAGE->meta(
+        if ($contacts === '' || $contacts === '0') {
+            $contacts = $this->page->meta(
                 'error',
                 "You don't have any contacts added to your buddy list!",
             );
         }
 
-        $PAGE->JS(
+        $this->page->JS(
             'window',
             [
-                'content' => $PAGE->meta(
+                'content' => $this->page->meta(
                     'buddylist-contacts',
                     $SESS->hide ? 'invisible' : '',
                     $USER['usertitle'],
-                    $crap,
+                    $contacts,
                 ),
                 'id' => 'buddylist',
                 'pos' => 'tr 20 20',
@@ -155,7 +159,7 @@ final class BuddyList
 
     public function addbuddy($uid): void
     {
-        global $DB,$PAGE,$USER;
+        global $USER;
         $friends = $USER['friends'];
         $e = '';
 
@@ -168,14 +172,14 @@ final class BuddyList
 
         $user = false;
         if ($uid && is_numeric($uid)) {
-            $result = $DB->safeselect(
+            $result = $this->database->safeselect(
                 ['id'],
                 'members',
                 'WHERE `id`=?',
                 $uid,
             );
-            $user = $DB->arow($result);
-            $DB->disposeresult($result);
+            $user = $this->database->arow($result);
+            $this->database->disposeresult($result);
         }
 
         if (!$user) {
@@ -186,8 +190,8 @@ final class BuddyList
         }
 
         if ($e !== '' && $e !== '0') {
-            $PAGE->append('PAGE', $e);
-            $PAGE->JS('error', $e);
+            $this->page->append('PAGE', $e);
+            $this->page->JS('error', $e);
         } else {
             if ($friends) {
                 $friends .= ',' . $uid;
@@ -196,7 +200,7 @@ final class BuddyList
             }
 
             $USER['friends'] = $friends;
-            $DB->safeupdate(
+            $this->database->safeupdate(
                 'members',
                 [
                     'friends' => $friends,
@@ -204,7 +208,7 @@ final class BuddyList
                 ' WHERE `id`=?',
                 $USER['id'],
             );
-            $DB->safeinsert(
+            $this->database->safeinsert(
                 'activity',
                 [
                     'affected_uid' => $uid,
@@ -222,7 +226,7 @@ final class BuddyList
             return;
         }
 
-        global $DB,$PAGE,$USER;
+        global $USER;
         $e = '';
         $enemies = $USER['enemies']
             ? explode(',', (string) $USER['enemies'])
@@ -241,12 +245,12 @@ final class BuddyList
         }
 
         if ($e !== '' && $e !== '0') {
-            $PAGE->JS('error', $e);
+            $this->page->JS('error', $e);
         } else {
             $enemies[] = $uid;
             $enemies = implode(',', $enemies);
             $USER['enemies'] = $enemies;
-            $DB->safeupdate(
+            $this->database->safeupdate(
                 'members',
                 [
                     'enemies' => $enemies,
@@ -260,7 +264,7 @@ final class BuddyList
 
     public function unblock($uid): void
     {
-        global $DB,$USER,$PAGE;
+        global $USER;
         if ($uid && is_numeric($uid)) {
             $enemies = explode(',', (string) $USER['enemies']);
             $id = array_search($uid, $enemies, true);
@@ -271,7 +275,7 @@ final class BuddyList
             unset($enemies[$id]);
             $enemies = implode(',', $enemies);
             $USER['enemies'] = $enemies;
-            $DB->safeupdate(
+            $this->database->safeupdate(
                 'members',
                 [
                     'enemies' => $enemies,
@@ -286,7 +290,7 @@ final class BuddyList
 
     public function dropbuddy($uid, $shh = 0): void
     {
-        global $DB,$USER,$PAGE;
+        global $USER;
         if ($uid && is_numeric($uid)) {
             $friends = explode(',', (string) $USER['friends']);
             $id = array_search($uid, $friends, true);
@@ -297,7 +301,7 @@ final class BuddyList
             unset($friends[$id]);
             $friends = implode(',', $friends);
             $USER['friends'] = $friends;
-            $DB->safeupdate(
+            $this->database->safeupdate(
                 'members',
                 [
                     'friends' => $friends,
@@ -316,12 +320,12 @@ final class BuddyList
 
     public function setstatus($status): void
     {
-        global $DB,$USER,$PAGE;
+        global $USER;
         if (!$USER || $USER['usertitle'] === $status) {
             return;
         }
 
-        $DB->safeupdate(
+        $this->database->safeupdate(
             'members',
             [
                 'usertitle' => $status,

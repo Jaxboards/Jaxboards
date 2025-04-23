@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\Config;
+use Jax\Database;
 use Jax\Jax;
+use Jax\Page;
 
 use function array_pop;
 use function gmdate;
@@ -41,23 +43,27 @@ final class UCP
     /**
      * @var Config
      */
-    public function __construct(private readonly Config $config)
+    public function __construct(
+        private readonly Config $config,
+        private readonly Database $database,
+        private readonly Jax $jax,
+        private readonly Page $page,
+    )
     {
-        global $PAGE;
-        $PAGE->loadmeta('ucp');
+        $this->page->loadmeta('ucp');
     }
 
     public function route(): void
     {
-        global $PAGE,$JAX,$USER,$DB;
+        global $USER;
         if (!$USER || $USER['group_id'] === 4) {
-            $PAGE->location('?');
+            $this->page->location('?');
 
             return;
         }
 
-        $PAGE->path(['UCP' => '?act=ucp']);
-        $this->what = $JAX->b['what'] ?? '';
+        $this->page->path(['UCP' => '?act=ucp']);
+        $this->what = $this->jax->b['what'] ?? '';
 
         match ($this->what) {
             'sounds' => $this->showsoundsettings(),
@@ -71,7 +77,7 @@ final class UCP
             default => $this->showmain(),
         };
 
-        if ($PAGE->jsupdate) {
+        if ($this->page->jsupdate) {
             return;
         }
 
@@ -80,64 +86,61 @@ final class UCP
 
     public function getlocationforform(): string
     {
-        global $JAX;
-
-        return Jax::hiddenFormFields(['act' => 'ucp', 'what' => $this->what]);
+        return $this->jax->hiddenFormFields(['act' => 'ucp', 'what' => $this->what]);
     }
 
     public function showinbox(): void
     {
-        global $JAX;
         if (
-            isset($JAX->p['dmessage'])
-            && is_array($JAX->p['dmessage'])
+            isset($this->jax->p['dmessage'])
+            && is_array($this->jax->p['dmessage'])
         ) {
-            foreach ($JAX->p['dmessage'] as $v) {
+            foreach ($this->jax->p['dmessage'] as $v) {
                 $this->delete($v, false);
             }
         }
 
         if (
-            isset($JAX->p['messageid'])
-            && is_numeric($JAX->p['messageid'])
+            isset($this->jax->p['messageid'])
+            && is_numeric($this->jax->p['messageid'])
         ) {
-            switch (mb_strtolower((string) $JAX->p['page'])) {
+            switch (mb_strtolower((string) $this->jax->p['page'])) {
                 case 'delete':
-                    $this->delete($JAX->p['messageid']);
+                    $this->delete($this->jax->p['messageid']);
 
                     break;
 
                 case 'forward':
-                    $this->compose($JAX->p['messageid'], 'fwd');
+                    $this->compose($this->jax->p['messageid'], 'fwd');
 
                     break;
 
                 case 'reply':
-                    $this->compose($JAX->p['messageid']);
+                    $this->compose($this->jax->p['messageid']);
 
                     break;
 
                 default:
             }
         } else {
-            if (!isset($JAX->b['page'])) {
-                $JAX->b['page'] = false;
+            if (!isset($this->jax->b['page'])) {
+                $this->jax->b['page'] = false;
             }
 
-            if ($JAX->b['page'] === 'compose') {
+            if ($this->jax->b['page'] === 'compose') {
                 $this->compose();
             } elseif (
-                isset($JAX->g['view'])
-                && is_numeric($JAX->g['view'])
+                isset($this->jax->g['view'])
+                && is_numeric($this->jax->g['view'])
             ) {
-                $this->viewmessage($JAX->g['view']);
-            } elseif ($JAX->b['page'] === 'sent') {
+                $this->viewmessage($this->jax->g['view']);
+            } elseif ($this->jax->b['page'] === 'sent') {
                 $this->viewmessages('sent');
-            } elseif ($JAX->b['page'] === 'flagged') {
+            } elseif ($this->jax->b['page'] === 'flagged') {
                 $this->viewmessages('flagged');
             } elseif (
-                isset($JAX->b['flag'])
-                && is_numeric($JAX->b['flag'])
+                isset($this->jax->b['flag'])
+                && is_numeric($this->jax->b['flag'])
             ) {
                 $this->flag();
 
@@ -150,44 +153,43 @@ final class UCP
 
     public function showmain(): void
     {
-        global $PAGE,$JAX,$USER,$DB;
+        global $USER;
         $e = '';
 
-        if ($PAGE->jsupdate && empty($JAX->p)) {
+        if ($this->page->jsupdate && empty($this->jax->p)) {
             return;
         }
 
-        if (isset($JAX->p['ucpnotepad']) && $JAX->p['ucpnotepad']) {
-            if (mb_strlen((string) $JAX->p['ucpnotepad']) > 2000) {
+        if (isset($this->jax->p['ucpnotepad']) && $this->jax->p['ucpnotepad']) {
+            if (mb_strlen((string) $this->jax->p['ucpnotepad']) > 2000) {
                 $e = 'The UCP notepad cannot exceed 2000 characters.';
-                $PAGE->JS('error', $e);
+                $this->page->JS('error', $e);
             } else {
-                $DB->safeupdate(
+                $this->database->safeupdate(
                     'members',
                     [
-                        'ucpnotepad' => $JAX->p['ucpnotepad'],
+                        'ucpnotepad' => $this->jax->p['ucpnotepad'],
                     ],
                     'WHERE `id`=?',
                     $USER['id'],
                 );
-                $USER['ucpnotepad'] = $JAX->p['ucpnotepad'];
+                $USER['ucpnotepad'] = $this->jax->p['ucpnotepad'];
             }
         }
 
-        $this->ucppage = ($e !== '' && $e !== '0' ? $PAGE->meta('error', $e) : '') . $PAGE->meta(
+        $this->ucppage = ($e !== '' && $e !== '0' ? $this->page->meta('error', $e) : '') . $this->page->meta(
             'ucp-index',
-            Jax::hiddenFormFields(['act' => 'ucp']),
+            $this->jax->hiddenFormFields(['act' => 'ucp']),
             $USER['display_name'],
-            $JAX->pick($USER['avatar'], $PAGE->meta('default-avatar')),
+            $this->jax->pick($USER['avatar'], $this->page->meta('default-avatar')),
             trim((string) $USER['ucpnotepad']) !== '' && trim((string) $USER['ucpnotepad']) !== '0'
-            ? $JAX->blockhtml($USER['ucpnotepad']) : 'Personal notes go here.',
+            ? $this->jax->blockhtml($USER['ucpnotepad']) : 'Personal notes go here.',
         );
         $this->showucp();
     }
 
     public function showucp($page = false): void
     {
-        global $PAGE;
         if ($this->shownucp) {
             return;
         }
@@ -196,22 +198,22 @@ final class UCP
             $page = $this->ucppage;
         }
 
-        $page = $PAGE->meta('ucp-wrapper', $page);
-        // $PAGE->JS("window",Array("id"=>"ucpwin","title"=>"Settings","content"=>$page,"animate"=>false));
-        $PAGE->append('PAGE', $page);
-        $PAGE->JS('update', 'page', $page);
+        $page = $this->page->meta('ucp-wrapper', $page);
+        // $this->page->JS("window",Array("id"=>"ucpwin","title"=>"Settings","content"=>$page,"animate"=>false));
+        $this->page->append('PAGE', $page);
+        $this->page->JS('update', 'page', $page);
         if ($this->runscript) {
-            $PAGE->JS('script', $this->runscript);
+            $this->page->JS('script', $this->runscript);
         }
 
-        $PAGE->updatepath();
+        $this->page->updatepath();
 
         $this->shownucp = true;
     }
 
     public function showsoundsettings(): ?bool
     {
-        global $USER,$PAGE,$JAX,$DB;
+        global $USER;
 
         $variables = [
             'sound_shout',
@@ -224,13 +226,13 @@ final class UCP
             'notify_postinsubscribedtopic',
         ];
 
-        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
+        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
             $update = [];
             foreach ($variables as $v) {
-                $update[$v] = isset($JAX->p[$v]) && $JAX->p[$v] ? 1 : 0;
+                $update[$v] = isset($this->jax->p[$v]) && $this->jax->p[$v] ? 1 : 0;
             }
 
-            $DB->safeupdate(
+            $this->database->safeupdate(
                 'members',
                 $update,
                 'WHERE `id`=?',
@@ -238,22 +240,22 @@ final class UCP
             );
 
             foreach ($variables as $v) {
-                $PAGE->JS(
+                $this->page->JS(
                     'script',
                     "window.globalsettings.{$v}="
-                    . (isset($JAX->p[$v]) && $JAX->p[$v] ? 1 : 0),
+                    . (isset($this->jax->p[$v]) && $this->jax->p[$v] ? 1 : 0),
                 );
             }
 
-            $PAGE->JS('alert', 'Settings saved successfully.');
+            $this->page->JS('alert', 'Settings saved successfully.');
 
-            $PAGE->ucppage = 'Settings saved successfully.';
-        } elseif ($PAGE->jsupdate) {
+            $this->page->ucppage = 'Settings saved successfully.';
+        } elseif ($this->page->jsupdate) {
             return true;
         }
 
         $checkboxes = [
-            $this->getlocationforform() . Jax::hiddenFormFields(
+            $this->getlocationforform() . $this->jax->hiddenFormFields(
                 ['submit' => 1],
             ),
         ];
@@ -263,7 +265,7 @@ final class UCP
                 . ($USER[$v] ? 'checked="checked"' : '') . '/>';
         }
 
-        $this->ucppage = $PAGE->meta('ucp-sound-settings', $checkboxes);
+        $this->ucppage = $this->page->meta('ucp-sound-settings', $checkboxes);
         $this->runscript = "if(document.querySelector('#dtnotify')&&window.webkitNotifications) "
             . "document.querySelector('#dtnotify').checked=(webkitNotifications.checkPermission()==0)";
 
@@ -274,12 +276,12 @@ final class UCP
 
     public function showsigsettings(): void
     {
-        global $USER,$JAX,$DB,$PAGE;
+        global $USER;
         $update = false;
         $sig = $USER['sig'];
-        if (isset($JAX->p['changesig'])) {
-            $sig = $JAX->linkify($JAX->p['changesig']);
-            $DB->safeupdate(
+        if (isset($this->jax->p['changesig'])) {
+            $sig = $this->jax->linkify($this->jax->p['changesig']);
+            $this->database->safeupdate(
                 'members',
                 [
                     'sig' => $sig,
@@ -290,12 +292,12 @@ final class UCP
             $update = true;
         }
 
-        $this->ucppage = $PAGE->meta(
+        $this->ucppage = $this->page->meta(
             'ucp-sig-settings',
             $this->getlocationforform(),
             $sig !== ''
-            ? $JAX->theworks($sig) : '( none )',
-            $JAX->blockhtml($sig),
+            ? $this->jax->theworks($sig) : '( none )',
+            $this->jax->blockhtml($sig),
         );
         if (!$update) {
             return;
@@ -306,37 +308,37 @@ final class UCP
 
     public function showpasssettings()
     {
-        global $JAX,$USER,$PAGE,$DB;
+        global $USER;
         $e = '';
-        if (isset($JAX->p['passchange'])) {
-            if (!isset($JAX->p['showpass'])) {
-                $JAX->p['showpass'] = false;
+        if (isset($this->jax->p['passchange'])) {
+            if (!isset($this->jax->p['showpass'])) {
+                $this->jax->p['showpass'] = false;
             }
 
             if (
-                !$JAX->p['showpass']
-                && $JAX->p['newpass1'] !== $JAX->p['newpass2']
+                !$this->jax->p['showpass']
+                && $this->jax->p['newpass1'] !== $this->jax->p['newpass2']
             ) {
                 $e = 'Those passwords do not match.';
             }
 
             if (
-                !$JAX->p['newpass1']
-                || !$JAX->p['showpass']
-                && !$JAX->p['newpass2']
-                || !$JAX->p['curpass']
+                !$this->jax->p['newpass1']
+                || !$this->jax->p['showpass']
+                && !$this->jax->p['newpass2']
+                || !$this->jax->p['curpass']
             ) {
                 $e = 'All form fields are required.';
             }
 
-            $verified_password = password_verify((string) $JAX->p['curpass'], (string) $USER['pass']);
+            $verified_password = password_verify((string) $this->jax->p['curpass'], (string) $USER['pass']);
             if (!$verified_password) {
                 $e = 'The password you entered is incorrect.';
             }
 
             if ($e === '' || $e === '0') {
-                $hashpass = password_hash((string) $JAX->p['newpass1'], PASSWORD_DEFAULT);
-                $DB->safeupdate(
+                $hashpass = password_hash((string) $this->jax->p['newpass1'], PASSWORD_DEFAULT);
+                $this->database->safeupdate(
                     'members',
                     [
                         'pass' => $hashpass,
@@ -353,35 +355,35 @@ final class UCP
                 return $this->showucp();
             }
 
-            $this->ucppage .= $PAGE->meta('error', $e);
-            $PAGE->JS('error', $e);
+            $this->ucppage .= $this->page->meta('error', $e);
+            $this->page->JS('error', $e);
         }
 
-        $this->ucppage .= $PAGE->meta(
+        $this->ucppage .= $this->page->meta(
             'ucp-pass-settings',
             $this->getlocationforform()
-            . Jax::hiddenFormFields(['passchange' => 1]),
+            . $this->jax->hiddenFormFields(['passchange' => 1]),
         );
     }
 
     public function showemailsettings()
     {
-        global $USER,$JAX,$PAGE,$DB;
+        global $USER;
         $e = '';
-        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
-            if ($JAX->p['email'] && !$JAX->isemail($JAX->p['email'])) {
+        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
+            if ($this->jax->p['email'] && !$this->jax->isemail($this->jax->p['email'])) {
                 $e = 'Please enter a valid email!';
             }
 
             if ($e !== '' && $e !== '0') {
-                $PAGE->JS('alert', $e);
+                $this->page->JS('alert', $e);
             } else {
-                $DB->safeupdate(
+                $this->database->safeupdate(
                     'members',
                     [
-                        'email' => $JAX->p['email'],
-                        'email_settings' => ($JAX->p['notifications'] ?? false ? 2 : 0)
-                        + ($JAX->p['adminemails'] ?? false ? 1 : 0),
+                        'email' => $this->jax->p['email'],
+                        'email_settings' => ($this->jax->p['notifications'] ?? false ? 2 : 0)
+                        + ($this->jax->p['adminemails'] ?? false ? 1 : 0),
                     ],
                     'WHERE `id`=?',
                     $USER['id'],
@@ -393,19 +395,19 @@ final class UCP
             return $this->showucp();
         }
 
-        $this->ucppage .= $PAGE->meta(
+        $this->ucppage .= $this->page->meta(
             'ucp-email-settings',
-            $this->getlocationforform() . Jax::hiddenFormFields(
+            $this->getlocationforform() . $this->jax->hiddenFormFields(
                 ['submit' => 'true'],
             ),
-            isset($JAX->b['change']) && $JAX->b['change'] ? <<<HTML
+            isset($this->jax->b['change']) && $this->jax->b['change'] ? <<<HTML
                 <input
                     type="text"
                     name="email"
                     aria-label="Email"
                     title="Enter your new email address"
                     value="{$USER['email']}" />
-                HTML : '<strong>' . $JAX->pick($USER['email'], '--none--')
+                HTML : '<strong>' . $this->jax->pick($USER['email'], '--none--')
             . "</strong> <a href='?act=ucp&what=email&change=1'>Change</a>"
             . "<input type='hidden' name='email' value='" . $USER['email'] . "' />",
             '<input type="checkbox" title="Notifications" name="notifications"'
@@ -417,33 +419,33 @@ final class UCP
 
     public function showavatarsettings(): void
     {
-        global $USER,$PAGE,$JAX,$DB;
+        global $USER;
         $e = '';
         $update = false;
-        if (isset($JAX->p['changedava'])) {
-            if ($JAX->p['changedava'] && !$JAX->isurl($JAX->p['changedava'])) {
+        if (isset($this->jax->p['changedava'])) {
+            if ($this->jax->p['changedava'] && !$this->jax->isurl($this->jax->p['changedava'])) {
                 $e = 'Please enter a valid image URL.';
             } else {
-                $DB->safeupdate(
+                $this->database->safeupdate(
                     'members',
-                    ['avatar' => $JAX->p['changedava']],
+                    ['avatar' => $this->jax->p['changedava']],
                     'WHERE `id`=?',
                     $USER['id'],
                 );
-                $USER['avatar'] = $JAX->p['changedava'];
+                $USER['avatar'] = $this->jax->p['changedava'];
             }
 
             $update = true;
         }
 
         $this->ucppage = 'Your avatar: <span class="avatar"><img src="'
-            . $JAX->pick($USER['avatar'], $PAGE->meta('default-avatar'))
+            . $this->jax->pick($USER['avatar'], $this->page->meta('default-avatar'))
             . '" alt="Your avatar"></span><br><br>
             <form data-ajax-form="true" method="post">'
             . $this->getlocationforform()
-            . ($e !== '' && $e !== '0' ? $PAGE->error($e) : '')
+            . ($e !== '' && $e !== '0' ? $this->page->error($e) : '')
             . '<input type="text" name="changedava" title="Your avatar" value="'
-            . $JAX->blockhtml($USER['avatar']) . '" />
+            . $this->jax->blockhtml($USER['avatar']) . '" />
             <input type="submit" value="Edit" />
             </form>';
         if (!$update) {
@@ -455,33 +457,33 @@ final class UCP
 
     public function showprofilesettings(): void
     {
-        global $USER,$JAX,$PAGE,$DB;
+        global $USER;
         $error = '';
         $genderOptions = ['', 'male', 'female', 'other'];
-        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
+        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
             // Insert the profile info into the database.
             $data = [
-                'about' => $JAX->p['about'],
-                'contact_aim' => $JAX->p['con_aim'],
-                'contact_bluesky' => $JAX->p['con_bluesky'],
-                'contact_discord' => $JAX->p['con_discord'],
-                'contact_gtalk' => $JAX->p['con_gtalk'],
-                'contact_msn' => $JAX->p['con_msn'],
-                'contact_skype' => $JAX->p['con_skype'],
-                'contact_steam' => $JAX->p['con_steam'],
-                'contact_twitter' => $JAX->p['con_twitter'],
-                'contact_yim' => $JAX->p['con_yim'],
-                'contact_youtube' => $JAX->p['con_youtube'],
-                'display_name' => trim((string) $JAX->p['display_name']),
-                'dob_day' => $JAX->pick($JAX->p['dob_day'], null),
-                'dob_month' => $JAX->pick($JAX->p['dob_month'], null),
-                'dob_year' => $JAX->pick($JAX->p['dob_year'], null),
-                'full_name' => $JAX->p['full_name'],
-                'gender' => in_array($JAX->p['gender'], $genderOptions)
-                ? $JAX->p['gender'] : '',
-                'location' => $JAX->p['location'],
-                'usertitle' => $JAX->p['usertitle'],
-                'website' => $JAX->p['website'],
+                'about' => $this->jax->p['about'],
+                'contact_aim' => $this->jax->p['con_aim'],
+                'contact_bluesky' => $this->jax->p['con_bluesky'],
+                'contact_discord' => $this->jax->p['con_discord'],
+                'contact_gtalk' => $this->jax->p['con_gtalk'],
+                'contact_msn' => $this->jax->p['con_msn'],
+                'contact_skype' => $this->jax->p['con_skype'],
+                'contact_steam' => $this->jax->p['con_steam'],
+                'contact_twitter' => $this->jax->p['con_twitter'],
+                'contact_yim' => $this->jax->p['con_yim'],
+                'contact_youtube' => $this->jax->p['con_youtube'],
+                'display_name' => trim((string) $this->jax->p['display_name']),
+                'dob_day' => $this->jax->pick($this->jax->p['dob_day'], null),
+                'dob_month' => $this->jax->pick($this->jax->p['dob_month'], null),
+                'dob_year' => $this->jax->pick($this->jax->p['dob_year'], null),
+                'full_name' => $this->jax->p['full_name'],
+                'gender' => in_array($this->jax->p['gender'], $genderOptions)
+                ? $this->jax->p['gender'] : '',
+                'location' => $this->jax->p['location'],
+                'usertitle' => $this->jax->p['usertitle'],
+                'website' => $this->jax->p['website'],
             ];
 
             // Begin input checking.
@@ -496,14 +498,14 @@ final class UCP
             ) {
                 $error = 'Invalid characters in display name!';
             } else {
-                $result = $DB->safeselect(
+                $result = $this->database->safeselect(
                     'COUNT(`id`) AS `same_display_name`',
                     'members',
                     'WHERE `display_name` = ? AND `id`!=? LIMIT 1',
-                    $DB->basicvalue($data['display_name']),
+                    $this->database->basicvalue($data['display_name']),
                     $USER['id'],
                 );
-                $displayNameCheck = $DB->arow($result);
+                $displayNameCheck = $this->database->arow($result);
                 if ($displayNameCheck['same_display_name'] > 0) {
                     $error = 'That display name is already in use.';
                 }
@@ -609,7 +611,7 @@ final class UCP
                     $error = "Invalid characters in {$v}";
                 }
 
-                $data[$k] = $JAX->blockhtml($data[$k]);
+                $data[$k] = $this->jax->blockhtml($data[$k]);
                 $length = $k === 'display_name'
                     ? 30
                     : ($k === 'location' ? 100 : 50);
@@ -623,7 +625,7 @@ final class UCP
             // Handle errors/insert.
             if ($error === '' || $error === '0') {
                 if ($data['display_name'] !== $USER['display_name']) {
-                    $DB->safeinsert(
+                    $this->database->safeinsert(
                         'activity',
                         [
                             'arg1' => $USER['display_name'],
@@ -635,7 +637,7 @@ final class UCP
                     );
                 }
 
-                $DB->safeupdate(
+                $this->database->safeupdate(
                     'members',
                     $data,
                     'WHERE `id`=?',
@@ -648,8 +650,8 @@ final class UCP
                 return;
             }
 
-            $PAGE->ucppage .= $PAGE->meta('error', $error);
-            $PAGE->JS('error', $error);
+            $this->page->ucppage .= $this->page->meta('error', $error);
+            $this->page->JS('error', $error);
         }
 
         $data = $USER;
@@ -657,7 +659,7 @@ final class UCP
         foreach (['', 'male', 'female', 'other'] as $v) {
             $genderselect .= '<option value="' . $v . '"'
                 . ($data['gender'] === $v ? ' selected="selected"' : '')
-                . '>' . $JAX->pick(ucfirst($v), 'Not telling') . '</option>';
+                . '>' . $this->jax->pick(ucfirst($v), 'Not telling') . '</option>';
         }
 
         $genderselect .= '</select>';
@@ -701,10 +703,10 @@ final class UCP
 
         $dobselect .= '</select>';
 
-        $this->ucppage = $PAGE->meta(
+        $this->ucppage = $this->page->meta(
             'ucp-profile-settings',
             $this->getlocationforform()
-            . Jax::hiddenFormFields(['submit' => '1']),
+            . $this->jax->hiddenFormFields(['submit' => '1']),
             $USER['name'],
             $data['display_name'],
             $data['full_name'],
@@ -729,11 +731,11 @@ final class UCP
 
     public function showboardsettings(): void
     {
-        global $PAGE,$DB,$JAX,$USER;
+        global $USER;
         $e = '';
         $showthing = false;
-        if (isset($JAX->b['skin']) && is_numeric($JAX->b['skin'])) {
-            $result = $DB->safeselect(
+        if (isset($this->jax->b['skin']) && is_numeric($this->jax->b['skin'])) {
+            $result = $this->database->safeselect(
                 [
                     'id',
                     '`using`',
@@ -745,30 +747,30 @@ final class UCP
                 ],
                 'skins',
                 'WHERE `id`=?',
-                $JAX->b['skin'],
+                $this->jax->b['skin'],
             );
-            if (!$DB->arow($result)) {
+            if (!$this->database->arow($result)) {
                 $e = 'The skin chosen no longer exists.';
             } else {
-                $DB->disposeresult($result);
-                $DB->safeupdate(
+                $this->database->disposeresult($result);
+                $this->database->safeupdate(
                     'members',
                     [
-                        'nowordfilter' => isset($JAX->p['usewordfilter'])
-                        && $JAX->p['usewordfilter'] ? 0 : 1,
-                        'skin_id' => $JAX->b['skin'],
-                        'wysiwyg' => isset($JAX->p['wysiwyg'])
-                        && $JAX->p['wysiwyg'] ? 1 : 0,
+                        'nowordfilter' => isset($this->jax->p['usewordfilter'])
+                        && $this->jax->p['usewordfilter'] ? 0 : 1,
+                        'skin_id' => $this->jax->b['skin'],
+                        'wysiwyg' => isset($this->jax->p['wysiwyg'])
+                        && $this->jax->p['wysiwyg'] ? 1 : 0,
                     ],
                     'WHERE `id`=?',
                     $USER['id'],
                 );
-                $USER['skin_id'] = $JAX->b['skin'];
+                $USER['skin_id'] = $this->jax->b['skin'];
             }
 
             if ($e === '') {
-                if ($PAGE->jsaccess) {
-                    $PAGE->JS('reload');
+                if ($this->page->jsaccess) {
+                    $this->page->JS('reload');
 
                     return;
                 }
@@ -778,13 +780,13 @@ final class UCP
                 return;
             }
 
-            $this->ucppage .= $PAGE->meta('error', $e);
+            $this->ucppage .= $this->page->meta('error', $e);
 
             $showthing = true;
         }
 
         $result = $USER['group_id'] !== 2
-            ? $DB->safeselect(
+            ? $this->database->safeselect(
                 [
                     'id',
                     '`using`',
@@ -797,7 +799,7 @@ final class UCP
                 'skins',
                 'WHERE `hidden`!=1 ORDER BY `title` ASC',
             )
-            : $DB->safeselect(
+            : $this->database->safeselect(
                 [
                     'id',
                     '`using`',
@@ -811,7 +813,7 @@ final class UCP
                 'ORDER BY `title` ASC',
             );
         $select = '';
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             $select .= "<option value='" . $f['id'] . "' "
                 . ($USER['skin_id'] === $f['id'] ? "selected='selected'" : '')
                 . '/>' . ($f['hidden'] ? '*' : '') . $f['title'] . '</option>';
@@ -823,7 +825,7 @@ final class UCP
             $select = '--No Skins--';
         }
 
-        $this->ucppage .= $PAGE->meta(
+        $this->ucppage .= $this->page->meta(
             'ucp-board-settings',
             $this->getlocationforform(),
             $select,
@@ -848,28 +850,28 @@ final class UCP
 
     public function flag(): void
     {
-        global $PAGE,$DB,$JAX,$USER;
-        $PAGE->JS('softurl');
-        $DB->safeupdate(
+        global $USER;
+        $this->page->JS('softurl');
+        $this->database->safeupdate(
             'messages',
             [
-                'flag' => $JAX->b['tog'] ? 1 : 0,
+                'flag' => $this->jax->b['tog'] ? 1 : 0,
             ],
             'WHERE `id`=? AND `to`=?',
-            $DB->basicvalue($JAX->b['flag']),
+            $this->database->basicvalue($this->jax->b['flag']),
             $USER['id'],
         );
     }
 
     public function viewmessage($messageid): void
     {
-        global $PAGE,$DB,$JAX,$USER;
-        if ($PAGE->jsupdate && !$PAGE->jsdirectlink) {
+        global $USER;
+        if ($this->page->jsupdate && !$this->page->jsdirectlink) {
             return;
         }
 
         $e = '';
-        $result = $DB->safespecial(
+        $result = $this->database->safespecial(
             <<<'EOT'
                 SELECT a.`id` AS `id`,a.`to` AS `to`,a.`from` AS `from`,a.`title` AS `title`,
                     a.`message` AS `message`,a.`read` AS `read`,
@@ -885,10 +887,10 @@ final class UCP
                 EOT
             ,
             ['messages', 'members'],
-            $DB->basicvalue($messageid),
+            $this->database->basicvalue($messageid),
         );
-        $message = $DB->arow($result);
-        $DB->disposeresult($result);
+        $message = $this->database->arow($result);
+        $this->database->disposeresult($result);
         if (
             $message['from'] !== $USER['id']
             && $message['to'] !== $USER['id']
@@ -903,7 +905,7 @@ final class UCP
         }
 
         if (!$message['read'] && $message['to'] === $USER['id']) {
-            $DB->safeupdate(
+            $this->database->safeupdate(
                 'messages',
                 ['read' => 1],
                 'WHERE `id`=?',
@@ -912,20 +914,20 @@ final class UCP
             $this->updatenummessages();
         }
 
-        $page = $PAGE->meta(
+        $page = $this->page->meta(
             'inbox-messageview',
             $message['title'],
-            $PAGE->meta(
+            $this->page->meta(
                 'user-link',
                 $message['from'],
                 $message['group_id'],
                 $message['name'],
             ),
-            $JAX->date($message['date']),
-            $JAX->theworks($message['message']),
-            $JAX->pick($message['avatar'], $PAGE->meta('default-avatar')),
+            $this->jax->date($message['date']),
+            $this->jax->theworks($message['message']),
+            $this->jax->pick($message['avatar'], $this->page->meta('default-avatar')),
             $message['usertitle'],
-            Jax::hiddenFormFields(
+            $this->jax->hiddenFormFields(
                 [
                     'act' => 'ucp',
                     'messageid' => $message['id'],
@@ -939,25 +941,25 @@ final class UCP
 
     public function updatenummessages(): void
     {
-        global $DB,$PAGE,$USER;
-        $result = $DB->safeselect(
+        global $USER;
+        $result = $this->database->safeselect(
             'COUNT(`id`)',
             'messages',
             'WHERE `to`=? AND !`read`',
             $USER['id'],
         );
-        $unread = $DB->arow($result);
-        $DB->disposeresult($result);
+        $unread = $this->database->arow($result);
+        $this->database->disposeresult($result);
 
         $unread = array_pop($unread);
-        $PAGE->JS('update', 'num-messages', $unread);
+        $this->page->JS('update', 'num-messages', $unread);
     }
 
     public function viewmessages($view = 'inbox'): void
     {
-        global $PAGE,$DB,$JAX,$USER;
+        global $USER;
 
-        if ($PAGE->jsupdate && empty($JAX->p)) {
+        if ($this->page->jsupdate && empty($this->jax->p)) {
             return;
         }
 
@@ -965,7 +967,7 @@ final class UCP
         $result = null;
         $hasmessages = false;
         if ($view === 'sent') {
-            $result = $DB->safespecial(
+            $result = $this->database->safespecial(
                 <<<'MySQL'
                     SELECT a.`id` AS `id`
                     , a.`to` AS `to`
@@ -989,7 +991,7 @@ final class UCP
                 $USER['id'],
             );
         } elseif ($view === 'flagged') {
-            $result = $DB->safespecial(
+            $result = $this->database->safespecial(
                 <<<'EOT'
                     SELECT a.`id` AS `id`,a.`to` AS `to`,a.`from` AS `from`,a.`title` AS `title`,
                         a.`message` AS `message`,a.`read` AS `read`,
@@ -1007,7 +1009,7 @@ final class UCP
                 $USER['id'],
             );
         } else {
-            $result = $DB->safespecial(
+            $result = $this->database->safespecial(
                 <<<'EOT'
                     SELECT a.`id` AS `id`,a.`to` AS `to`,a.`from` AS `from`,a.`title` AS `title`,
                         a.`message` AS `message`,a.`read` AS `read`,
@@ -1027,7 +1029,7 @@ final class UCP
         }
 
         $unread = 0;
-        while ($f = $DB->arow($result)) {
+        while ($f = $this->database->arow($result)) {
             $hasmessages = 1;
             if (!$f['read']) {
                 ++$unread;
@@ -1036,7 +1038,7 @@ final class UCP
             $dmessageOnchange = "RUN.stream.location('"
                 . '?act=ucp&what=inbox&flag=' . $f['id'] . "&tog='+" . '
                 (this.checked?1:0), 1)';
-            $page .= $PAGE->meta(
+            $page .= $this->page->meta(
                 'inbox-messages-row',
                 $f['read'] ? 'read' : 'unread',
                 '<input class="check" type="checkbox" title="PM Checkbox" name="dmessage[]" '
@@ -1047,7 +1049,7 @@ final class UCP
                 $f['id'],
                 $f['title'],
                 $f['display_name'],
-                $JAX->date($f['date']),
+                $this->jax->date($f['date']),
             );
         }
 
@@ -1065,9 +1067,9 @@ final class UCP
             $page .= '<tr><td colspan="5" class="error">' . $msg . '</td></tr>';
         }
 
-        $page = $PAGE->meta(
+        $page = $this->page->meta(
             'inbox-messages-listing',
-            Jax::hiddenFormFields(
+            $this->jax->hiddenFormFields(
                 [
                     'act' => 'ucp',
                     'what' => 'inbox',
@@ -1078,7 +1080,7 @@ final class UCP
         );
 
         if ($view === 'inbox') {
-            $PAGE->JS('update', 'num-messages', $unread);
+            $this->page->JS('update', 'num-messages', $unread);
         }
 
         $this->showucp($page);
@@ -1086,16 +1088,16 @@ final class UCP
 
     public function compose($messageid = '', $todo = ''): void
     {
-        global $PAGE,$JAX,$USER,$DB;
+        global $USER;
         $showfull = 0;
         $e = '';
         $mid = 0;
         $mname = '';
         $mtitle = '';
-        if (isset($JAX->p['submit']) && $JAX->p['submit']) {
-            $mid = $JAX->b['mid'];
-            if (!$mid && $JAX->b['to']) {
-                $result = $DB->safeselect(
+        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
+            $mid = $this->jax->b['mid'];
+            if (!$mid && $this->jax->b['to']) {
+                $result = $this->database->safeselect(
                     [
                         'id',
                         'email',
@@ -1103,12 +1105,12 @@ final class UCP
                     ],
                     'members',
                     'WHERE `display_name`=?',
-                    $DB->basicvalue($JAX->b['to']),
+                    $this->database->basicvalue($this->jax->b['to']),
                 );
-                $udata = $DB->arow($result);
-                $DB->disposeresult($result);
+                $udata = $this->database->arow($result);
+                $this->database->disposeresult($result);
             } else {
-                $result = $DB->safeselect(
+                $result = $this->database->safeselect(
                     [
                         'id',
                         'email',
@@ -1116,36 +1118,36 @@ final class UCP
                     ],
                     'members',
                     'WHERE `id`=?',
-                    $DB->basicvalue($mid),
+                    $this->database->basicvalue($mid),
                 );
-                $udata = $DB->arow($result);
-                $DB->disposeresult($result);
+                $udata = $this->database->arow($result);
+                $this->database->disposeresult($result);
             }
 
             if (!$udata) {
                 $e = 'Invalid user!';
             } elseif (
-                trim((string) $JAX->b['title']) === ''
-                || trim((string) $JAX->b['title']) === '0'
+                trim((string) $this->jax->b['title']) === ''
+                || trim((string) $this->jax->b['title']) === '0'
             ) {
                 $e = 'You must enter a title.';
             }
 
             if ($e !== '' && $e !== '0') {
-                $PAGE->JS('error', $e);
-                $PAGE->append('PAGE', $PAGE->error($e));
+                $this->page->JS('error', $e);
+                $this->page->append('PAGE', $this->page->error($e));
             } else {
                 // Put it into the table.
-                $DB->safeinsert(
+                $this->database->safeinsert(
                     'messages',
                     [
                         'date' => gmdate('Y-m-d H:i:s'),
                         'del_recipient' => 0,
                         'del_sender' => 0,
                         'from' => $USER['id'],
-                        'message' => $JAX->p['message'],
+                        'message' => $this->jax->p['message'],
                         'read' => 0,
-                        'title' => $JAX->blockhtml($JAX->p['title']),
+                        'title' => $this->jax->blockhtml($this->jax->p['title']),
                         'to' => $udata['id'],
                     ],
                 );
@@ -1154,10 +1156,10 @@ final class UCP
                     [
                         'newmessage',
                         'You have a new message from ' . $USER['display_name'],
-                        $DB->insert_id(1),
+                        $this->database->insert_id(1),
                     ],
                 ) . PHP_EOL;
-                $result = $DB->safespecial(
+                $result = $this->database->safespecial(
                     <<<'EOT'
                         UPDATE %t
                         SET `runonce`=concat(`runonce`,?)
@@ -1165,12 +1167,12 @@ final class UCP
                         EOT
                     ,
                     ['session'],
-                    $DB->basicvalue($cmd, 1),
+                    $this->database->basicvalue($cmd, 1),
                     $udata['id'],
                 );
                 // Send em an email!
                 if (($udata['email_settings'] & 2) !== 0) {
-                    $JAX->mail(
+                    $this->jax->mail(
                         $udata['email'],
                         'PM From ' . $USER['display_name'],
                         "You are receiving this email because you've "
@@ -1192,13 +1194,13 @@ final class UCP
             }
         }
 
-        if ($PAGE->jsupdate && !$messageid) {
+        if ($this->page->jsupdate && !$messageid) {
             return;
         }
 
         $msg = '';
         if ($messageid) {
-            $result = $DB->safeselect(
+            $result = $this->database->safeselect(
                 [
                     '`from`',
                     'message',
@@ -1208,22 +1210,22 @@ final class UCP
                 'WHERE (`to`=? OR `from`=?) AND `id`=?',
                 $USER['id'],
                 $USER['id'],
-                $DB->basicvalue($messageid),
+                $this->database->basicvalue($messageid),
             );
 
-            $message = $DB->arow($result);
-            $DB->disposeresult($result);
+            $message = $this->database->arow($result);
+            $this->database->disposeresult($result);
 
             $mid = $message['from'];
-            $result = $DB->safeselect(
+            $result = $this->database->safeselect(
                 ['display_name'],
                 'members',
                 'WHERE `id`=?',
                 $mid,
             );
-            $thisrow = $DB->arow($result);
+            $thisrow = $this->database->arow($result);
             $mname = array_pop($thisrow);
-            $DB->disposeresult($result);
+            $this->database->disposeresult($result);
 
             $msg = PHP_EOL . PHP_EOL . PHP_EOL
                 . '[quote=' . $mname . ']' . $message['message'] . '[/quote]';
@@ -1234,18 +1236,18 @@ final class UCP
             }
         }
 
-        if (isset($JAX->g['mid']) && is_numeric($JAX->g['mid'])) {
+        if (isset($this->jax->g['mid']) && is_numeric($this->jax->g['mid'])) {
             $showfull = 1;
-            $mid = $JAX->b['mid'];
-            $result = $DB->safeselect(
+            $mid = $this->jax->b['mid'];
+            $result = $this->database->safeselect(
                 ['display_name'],
                 'members',
                 'WHERE `id`=?',
                 $mid,
             );
-            $thisrow = $DB->arow($result);
+            $thisrow = $this->database->arow($result);
             $mname = array_pop($thisrow);
-            $DB->disposeresult($result);
+            $this->database->disposeresult($result);
 
             if (!$mname) {
                 $mid = 0;
@@ -1253,9 +1255,9 @@ final class UCP
             }
         }
 
-        $page = $PAGE->meta(
+        $page = $this->page->meta(
             'inbox-composeform',
-            Jax::hiddenFormFields(
+            $this->jax->hiddenFormFields(
                 [
                     'act' => 'ucp',
                     'page' => 'compose',
@@ -1274,8 +1276,8 @@ final class UCP
 
     public function delete($id, $relocate = true): void
     {
-        global $PAGE,$JAX,$DB,$USER;
-        $result = $DB->safeselect(
+        global $USER;
+        $result = $this->database->safeselect(
             [
                 '`to`',
                 '`from`',
@@ -1284,52 +1286,52 @@ final class UCP
             ],
             'messages',
             'WHERE `id`=?',
-            $DB->basicvalue($id),
+            $this->database->basicvalue($id),
         );
-        $message = $DB->arow($result);
-        $DB->disposeresult($result);
+        $message = $this->database->arow($result);
+        $this->database->disposeresult($result);
 
         $is_recipient = $message['to'] === $USER['id'];
         $is_sender = $message['from'] === $USER['id'];
         if ($is_recipient) {
-            $DB->safeupdate(
+            $this->database->safeupdate(
                 'messages',
                 [
                     'del_recipient' => 1,
                 ],
                 'WHERE `id`=?',
-                $DB->basicvalue($id),
+                $this->database->basicvalue($id),
             );
         }
 
         if ($is_sender) {
-            $DB->safeupdate(
+            $this->database->safeupdate(
                 'messages',
                 [
                     'del_sender' => 1,
                 ],
                 'WHERE `id`=?',
-                $DB->basicvalue($id),
+                $this->database->basicvalue($id),
             );
         }
 
-        $result = $DB->safeselect(
+        $result = $this->database->safeselect(
             [
                 'del_recipient',
                 'del_sender',
             ],
             'messages',
             'WHERE `id`=?',
-            $DB->basicvalue($id),
+            $this->database->basicvalue($id),
         );
-        $message = $DB->arow($result);
-        $DB->disposeresult($result);
+        $message = $this->database->arow($result);
+        $this->database->disposeresult($result);
 
         if ($message['del_recipient'] && $message['del_sender']) {
-            $DB->safedelete(
+            $this->database->safedelete(
                 'messages',
                 'WHERE `id`=?',
-                $DB->basicvalue($id),
+                $this->database->basicvalue($id),
             );
         }
 
@@ -1337,10 +1339,10 @@ final class UCP
             return;
         }
 
-        $PAGE->location(
+        $this->page->location(
             '?act=ucp&what=inbox'
-            . (isset($JAX->b['prevpage']) && $JAX->b['prevpage']
-            ? '&page=' . $JAX->b['prevpage'] : ''),
+            . (isset($this->jax->b['prevpage']) && $this->jax->b['prevpage']
+            ? '&page=' . $this->jax->b['prevpage'] : ''),
         );
     }
 }

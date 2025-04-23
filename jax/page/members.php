@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
+use Jax\Database;
+use Jax\Jax;
+use Jax\Page;
+
 use function ceil;
 use function is_numeric;
 use function sprintf;
@@ -13,29 +17,30 @@ final class Members
     /**
      * @var float|int
      */
-    public $page = 0;
+    public $pageNumber = 0;
 
     public $perpage = 20;
 
-    public function __construct()
+    public function __construct(
+        private readonly Database $database,
+        private readonly Jax $jax,
+        private readonly Page $page,
+    )
     {
-        global $PAGE;
-
-        $PAGE->loadmeta('members');
+        $this->page->loadmeta('members');
     }
 
     public function route(): void
     {
-        global $JAX,$PAGE;
         if (
-            isset($JAX->b['page'])
-            && is_numeric($JAX->b['page'])
-            && $JAX->b['page'] > 0
+            isset($this->jax->b['page'])
+            && is_numeric($this->jax->b['page'])
+            && $this->jax->b['page'] > 0
         ) {
-            $this->page = $JAX->b['page'] - 1;
+            $this->pageNumber = $this->jax->b['page'] - 1;
         }
 
-        if ($PAGE->jsupdate) {
+        if ($this->page->jsupdate) {
             return;
         }
 
@@ -44,7 +49,6 @@ final class Members
 
     public function showmemberlist(): void
     {
-        global $PAGE,$DB,$JAX;
         $vars = [
             'display_name' => 'Name',
             'g_title' => 'Group',
@@ -56,24 +60,24 @@ final class Members
         $page = '';
 
         $sortby = 'm.`display_name`';
-        $sorthow = isset($JAX->b['how']) && $JAX->b['how'] === 'DESC'
+        $sorthow = isset($this->jax->b['how']) && $this->jax->b['how'] === 'DESC'
             ? 'DESC' : 'ASC';
         $where = '';
         if (
-            isset($JAX->b['sortby'], $vars[$JAX->b['sortby']])
-            && $vars[$JAX->b['sortby']]
+            isset($this->jax->b['sortby'], $vars[$this->jax->b['sortby']])
+            && $vars[$this->jax->b['sortby']]
         ) {
-            $sortby = $JAX->b['sortby'];
+            $sortby = $this->jax->b['sortby'];
         }
 
-        if (isset($JAX->g['filter']) && $JAX->g['filter'] === 'staff') {
+        if (isset($this->jax->g['filter']) && $this->jax->g['filter'] === 'staff') {
             $sortby = 'g.`can_access_acp` DESC ,' . $sortby;
             $where = 'WHERE g.`can_access_acp`=1 OR g.`can_moderate`=1';
         }
 
         $pages = '';
 
-        $memberquery = $DB->safespecial(
+        $memberquery = $this->database->safespecial(
             <<<MySQL
                     SELECT
                         g.`title` AS `g_title`,
@@ -101,13 +105,13 @@ final class Members
                     LIMIT ?, ?
                 MySQL,
             ['members', 'member_groups'],
-            $this->page * $this->perpage,
+            $this->pageNumber * $this->perpage,
             $this->perpage,
         );
 
-        $memberarray = $DB->arows($memberquery);
+        $memberarray = $this->database->arows($memberquery);
 
-        $nummemberquery = $DB->safespecial(
+        $nummemberquery = $this->database->safespecial(
             <<<EOT
                 SELECT COUNT(m.`id`) AS `num_members`
                 FROM %t m
@@ -118,24 +122,24 @@ final class Members
                 EOT,
             ['members', 'member_groups'],
         );
-        $thisrow = $DB->arow($nummemberquery);
+        $thisrow = $this->database->arow($nummemberquery);
         $nummembers = $thisrow['num_members'];
 
-        $pagesArray = $JAX->pages(
+        $pagesArray = $this->jax->pages(
             ceil($nummembers / $this->perpage),
-            $this->page + 1,
+            $this->pageNumber + 1,
             $this->perpage,
         );
         foreach ($pagesArray as $v) {
             $pages .= "<a href='?act=members&amp;sortby="
                 . "{$sortby}&amp;how={$sorthow}&amp;page={$v}'"
-                . ($v - 1 === $this->page ? ' class="active"' : '') . ">{$v}</a> ";
+                . ($v - 1 === $this->pageNumber ? ' class="active"' : '') . ">{$v}</a> ";
         }
 
         $url = '?act=members'
-            . ($this->page ? '&page=' . ($this->page + 1) : '')
-            . (isset($JAX->g['filter']) && $JAX->g['filter']
-            ? '&filter=' . $JAX->g['filter'] : '');
+            . ($this->pageNumber ? '&page=' . ($this->pageNumber + 1) : '')
+            . (isset($this->jax->g['filter']) && $this->jax->g['filter']
+            ? '&filter=' . $this->jax->g['filter'] : '');
 
         $links = [];
         foreach ($vars as $k => $v) {
@@ -165,18 +169,18 @@ final class Members
                 }
 
                 $contactdetails .= '<a class="' . $k . ' contact" href="'
-                    . sprintf($v, $JAX->blockhtml($member['contact_' . $k]))
+                    . sprintf($v, $this->jax->blockhtml($member['contact_' . $k]))
                     . '" title="' . $k . ' contact">&nbsp;</a>';
             }
 
             $contactdetails .= '<a title="PM this member" class="pm contact" '
                 . 'href="?act=ucp&amp;what=inbox&amp;page=compose&amp;mid='
                 . $member['id'] . '"></a>';
-            $page .= $PAGE->meta(
+            $page .= $this->page->meta(
                 'members-row',
                 $member['id'],
-                $JAX->pick($member['avatar'], $PAGE->meta('default-avatar')),
-                $PAGE->meta(
+                $this->jax->pick($member['avatar'], $this->page->meta('default-avatar')),
+                $this->page->meta(
                     'user-link',
                     $member['id'],
                     $member['group_id'],
@@ -185,12 +189,12 @@ final class Members
                 $member['g_title'],
                 $member['id'],
                 $member['posts'],
-                $JAX->date($member['join_date']),
+                $this->jax->date($member['join_date']),
                 $contactdetails,
             );
         }
 
-        $page = $PAGE->meta(
+        $page = $this->page->meta(
             'members-table',
             $links[0],
             $links[1],
@@ -200,7 +204,7 @@ final class Members
             $page,
         );
         $page = "<div class='pages pages-top'>{$pages}</div>"
-            . $PAGE->meta(
+            . $this->page->meta(
                 'box',
                 ' id="memberlist"',
                 'Members',
@@ -208,7 +212,7 @@ final class Members
             )
             . "<div class='pages pages-bottom'>{$pages}</div>"
             . "<div class='clear'></div>";
-        $PAGE->JS('update', 'page', $page);
-        $PAGE->append('PAGE', $page);
+        $this->page->JS('update', 'page', $page);
+        $this->page->append('PAGE', $page);
     }
 }
