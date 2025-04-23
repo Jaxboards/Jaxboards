@@ -29,7 +29,6 @@ use function preg_match_all;
 use function trim;
 use function unlink;
 
-use const CONFIG;
 use const PATHINFO_EXTENSION;
 use const PHP_EOL;
 use const SEEK_END;
