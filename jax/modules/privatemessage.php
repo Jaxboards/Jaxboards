@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax\Modules;
 
 use Jax\Config;
+use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
 use Jax\Session;
@@ -13,6 +14,7 @@ final readonly class PrivateMessage
 {
     public function __construct(
         private Config $config,
+        private Database $database,
         private Jax $jax,
         private Page $page,
         private Session $session,
