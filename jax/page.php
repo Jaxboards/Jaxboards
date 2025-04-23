@@ -160,22 +160,6 @@ final class Page
         return str_replace(array_keys($this->vars), array_values($this->vars), $string);
     }
 
-    public function prepend(string $part, $content): void
-    {
-        if ($this->jsaccess) {
-            return;
-        }
-
-        $part = mb_strtoupper($part);
-        if (!isset($this->parts[$part])) {
-            $this->reset($part, $content);
-
-            return;
-        }
-
-        $this->parts[$part] = $content . $this->parts[$part];
-    }
-
     public function location(string $newLocation): void
     {
         if ($this->jax->c === [] && $newLocation[0] === '?') {

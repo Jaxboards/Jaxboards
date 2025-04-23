@@ -383,7 +383,7 @@ final class Shoutbox
 
         if ($e !== '' && $e !== '0') {
             $this->page->JS('error', $e);
-            $this->page->prepend('shoutbox', $this->page->error($e));
+            $this->page->append('shoutbox', $this->page->error($e));
 
             return;
         }
