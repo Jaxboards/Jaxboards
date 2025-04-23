@@ -7,6 +7,9 @@ namespace Jax;
 #[AllowDynamicProperties]
 final class Session
 {
+    /**
+     * @var mixed[]
+     */
     public $data = [];
 
     public $userData = [];
