@@ -3,9 +3,9 @@
 use ACP\Page;
 use DI\Container;
 use Jax\Config;
+use Jax\Database;
 use Jax\IPAddress;
 use Jax\Jax;
-use Jax\Database;
 
 /*
  * Service install file, for installing a new JaxBoards service.

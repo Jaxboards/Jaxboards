@@ -6,8 +6,8 @@ namespace ACP\Page;
 
 use ACP\Page;
 use Jax\Config;
-use Jax\Jax;
 use Jax\Database;
+use Jax\Jax;
 
 use function array_key_exists;
 use function closedir;
@@ -47,7 +47,7 @@ final class Themes
         private readonly Config $config,
         private readonly Database $database,
         private readonly Jax $jax,
-        private readonly Page $page
+        private readonly Page $page,
     ) {}
 
     public function route(): void
@@ -84,14 +84,20 @@ final class Themes
 
         if (isset($this->jax->g['editcss']) && $this->jax->g['editcss']) {
             $this->editcss($this->jax->g['editcss']);
-        } elseif (isset($this->jax->g['editwrapper']) && $this->jax->g['editwrapper']) {
+        } elseif (
+            isset($this->jax->g['editwrapper'])
+            && $this->jax->g['editwrapper']
+        ) {
             $this->editwrapper($this->jax->g['editwrapper']);
         } elseif (
             isset($this->jax->g['deleteskin'])
             && is_numeric($this->jax->g['deleteskin'])
         ) {
             $this->deleteskin($this->jax->g['deleteskin']);
-        } elseif (isset($this->jax->g['do']) && $this->jax->g['do'] === 'create') {
+        } elseif (
+            isset($this->jax->g['do'])
+            && $this->jax->g['do'] === 'create'
+        ) {
             $this->createskin();
         } else {
             $this->showskinindex();
@@ -127,7 +133,10 @@ final class Themes
         $errorskins = '';
         $errorwrapper = '';
 
-        if (isset($this->jax->g['deletewrapper']) && $this->jax->g['deletewrapper']) {
+        if (
+            isset($this->jax->g['deletewrapper'])
+            && $this->jax->g['deletewrapper']
+        ) {
             $wrapperPath = $this->WRAPPERS_PATH . $this->jax->g['deletewrapper'] . '.html';
             if (
                 !preg_match('@[^\w ]@', (string) $this->jax->g['deletewrapper'])
@@ -141,7 +150,10 @@ final class Themes
             }
         }
 
-        if (isset($this->jax->p['newwrapper']) && $this->jax->p['newwrapper']) {
+        if (
+            isset($this->jax->p['newwrapper'])
+            && $this->jax->p['newwrapper']
+        ) {
             $newWrapperPath
                 = $this->WRAPPERS_PATH . $this->jax->p['newwrapper'] . '.html';
             if (preg_match('@[^\w ]@', (string) $this->jax->p['newwrapper'])) {
@@ -457,7 +469,8 @@ final class Themes
     }
 
     public function editwrapper($wrapper): void
-    {        $saved = '';
+    {
+        $saved = '';
         $wrapperf = $this->WRAPPERS_PATH . $wrapper . '.html';
         if (preg_match('@[^ \w]@', (string) $wrapper) && !is_file($wrapperf)) {
             $this->page->addContentBox(
@@ -466,14 +479,14 @@ final class Themes
             );
         } else {
             if (isset($this->jax->p['newwrapper'])) {
-                if (mb_strpos($this->jax->p['newwrapper'], '<!--FOOTER-->') === false) {
+                if (mb_strpos((string) $this->jax->p['newwrapper'], '<!--FOOTER-->') === false) {
                     $saved = $this->page->error(
                         '&lt;!--FOOTER--&gt; must not be removed from the wrapper.',
                     );
                 } else {
                     $o = fopen($wrapperf, 'w');
                     if ($o !== false) {
-                        fwrite($o, $this->jax->p['newwrapper']);
+                        fwrite($o, (string) $this->jax->p['newwrapper']);
                         fclose($o);
                         $saved = $this->page->success('Wrapper saved successfully.');
                     } else {
@@ -499,7 +512,10 @@ final class Themes
         $page = '';
         if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
             $e = '';
-            if (!isset($this->jax->p['skinname']) || !$this->jax->p['skinname']) {
+            if (
+                !isset($this->jax->p['skinname'])
+                || !$this->jax->p['skinname']
+            ) {
                 $e = 'No skin name supplied!';
             } elseif (preg_match('@[^\w ]@', (string) $this->jax->p['skinname'])) {
                 $e = 'Skinname must only consist of letters, numbers, and spaces.';
@@ -535,7 +551,7 @@ final class Themes
                             'default' => 0,
                         ],
                         'WHERE `id`!=?',
-                        $this->database->insert_id(1),
+                        $this->database->insert_id(),
                     );
                 }
 

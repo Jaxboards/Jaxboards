@@ -550,7 +550,7 @@ final readonly class Forums
                         $write,
                     );
 
-                    return $this->orderforums($this->database->insert_id(1));
+                    return $this->orderforums($this->database->insert_id());
                 }
 
                 $this->database->safeupdate(
@@ -773,7 +773,10 @@ final readonly class Forums
 
     public function deleteforum($id)
     {
-        if (isset($this->jax->p['submit']) && $this->jax->p['submit'] === 'Cancel') {
+        if (
+            isset($this->jax->p['submit'])
+            && $this->jax->p['submit'] === 'Cancel'
+        ) {
             $this->page->location('?act=forums&do=order');
         } elseif (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
             $this->database->safedelete(
@@ -790,7 +793,7 @@ final readonly class Forums
                     ' WHERE `fid`=?',
                     $this->database->basicvalue($id),
                 );
-                $topics = $this->database->affected_rows(1);
+                $topics = $this->database->affected_rows();
             } else {
                 $result = $this->database->safespecial(
                     <<<'EOT'
@@ -807,13 +810,13 @@ final readonly class Forums
                     $this->database->basicvalue($id),
                 );
 
-                $posts = $this->database->affected_rows(1);
+                $posts = $this->database->affected_rows();
                 $this->database->safedelete(
                     'topics',
                     'WHERE `fid`=?',
                     $this->database->basicvalue($id),
                 );
-                $topics = $this->database->affected_rows(1);
+                $topics = $this->database->affected_rows();
             }
 
             $page = '';

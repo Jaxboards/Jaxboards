@@ -6,8 +6,8 @@ namespace ACP\Page;
 
 use ACP\Page;
 use Jax\Config;
-use Jax\Jax;
 use Jax\Database;
+use Jax\Jax;
 
 use function array_pop;
 use function count;
@@ -40,7 +40,12 @@ final readonly class Members
 {
     public const DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
 
-    public function __construct(private Config $config, private Page $page, private Database $database, private Jax $jax) {}
+    public function __construct(
+        private Config $config,
+        private Page $page,
+        private Database $database,
+        private Jax $jax,
+    ) {}
 
     public function route(): void
     {
@@ -161,7 +166,10 @@ final readonly class Members
                 );
                 $data = $this->database->arow($result);
                 $this->database->disposeresult($result);
-                if (isset($this->jax->p['savedata']) && $this->jax->p['savedata']) {
+                if (
+                    isset($this->jax->p['savedata'])
+                    && $this->jax->p['savedata']
+                ) {
                     if (
                         $data['group_id'] !== 2 || $userData['id'] === 1
                     ) {
@@ -762,7 +770,7 @@ final readonly class Members
     public function ipbans(): void
     {
         if (isset($this->jax->p['ipbans'])) {
-            $data = explode(PHP_EOL, $this->jax->p['ipbans']);
+            $data = explode(PHP_EOL, (string) $this->jax->p['ipbans']);
             foreach ($data as $k => $v) {
                 $iscomment = false;
                 // Check to see if each line is an ip, if it isn't,

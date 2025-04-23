@@ -2,9 +2,9 @@
 
 use DI\Container;
 use Jax\Config;
+use Jax\Database;
 use Jax\IPAddress;
 use Jax\Jax;
-use Jax\Database;
 
 /*
  * Service signup file, for users to create their own JaxBoards forum.

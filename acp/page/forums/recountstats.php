@@ -12,10 +12,11 @@ use function explode;
 
 final readonly class RecountStats
 {
-    function __construct(
+    public function __construct(
         private readonly Page $page,
-        private readonly Database $database
-    ){}
+        private readonly Database $database,
+    ) {}
+
     public function showstats(): void
     {
         $this->page->addContentBox(

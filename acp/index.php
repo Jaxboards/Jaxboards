@@ -5,8 +5,8 @@ declare(strict_types=1);
 use ACP\Page;
 use DI\Container;
 use Jax\Config;
-use Jax\Jax;
 use Jax\Database;
+use Jax\Jax;
 
 /*
  * Admin login.

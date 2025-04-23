@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use DI\Container;
 use Jax\Config;
-use Jax\Jax;
 use Jax\Database;
+use Jax\Jax;
 
 define('JAXBOARDS_ROOT', dirname(__DIR__));
 

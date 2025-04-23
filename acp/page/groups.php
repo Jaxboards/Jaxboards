@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace ACP\Page;
 
 use ACP\Page;
-use Jax\Jax;
 use Jax\Database;
+use Jax\Jax;
 
 use function array_flip;
 use function explode;
@@ -25,7 +25,7 @@ final class Groups
     public function __construct(
         private readonly Database $database,
         private readonly Jax $jax,
-        private readonly Page $page
+        private readonly Page $page,
     ) {}
 
     public function route(): void
@@ -175,7 +175,10 @@ final class Groups
             && $this->jax->p['perm']
         ) {
             foreach (explode(',', (string) $this->jax->p['grouplist']) as $v) {
-                if (isset($this->jax->p['perm'][$v]) && $this->jax->p['perm'][$v]) {
+                if (
+                    isset($this->jax->p['perm'][$v])
+                    && $this->jax->p['perm'][$v]
+                ) {
                     continue;
                 }
 
@@ -187,8 +190,8 @@ final class Groups
 
         if (
             !isset($this->jax->b['grouplist'])
-            || preg_match('@[^\d,]@', $this->jax->b['grouplist'])
-            || mb_strpos($this->jax->b['grouplist'], ',,') !== false
+            || preg_match('@[^\d,]@', (string) $this->jax->b['grouplist'])
+            || mb_strpos((string) $this->jax->b['grouplist'], ',,') !== false
         ) {
             $this->jax->b['grouplist'] = '';
         }
@@ -409,7 +412,10 @@ final class Groups
         $page = '';
         $e = '';
         if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
-            if (!isset($this->jax->p['groupname']) || !$this->jax->p['groupname']) {
+            if (
+                !isset($this->jax->p['groupname'])
+                || !$this->jax->p['groupname']
+            ) {
                 $e = 'Group name required!';
             } elseif (mb_strlen((string) $this->jax->p['groupname']) > 250) {
                 $e = 'Group name must not exceed 250 characters!';

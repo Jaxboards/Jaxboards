@@ -6,9 +6,8 @@ namespace ACP\Page;
 
 use ACP\Page;
 use Jax\Config;
-use Jax\Jax;
 use Jax\Database;
-
+use Jax\Jax;
 use SplFileObject;
 
 use function array_pop;
@@ -44,7 +43,7 @@ final readonly class Tools
         private readonly Config $config,
         private readonly Database $database,
         private readonly Page $page,
-        private readonly Jax $jax
+        private readonly Jax $jax,
     ) {}
 
     public function route(): void
@@ -90,7 +89,10 @@ final readonly class Tools
     public function filemanager(): void
     {
         $page = '';
-        if (isset($this->jax->b['delete']) && is_numeric($this->jax->b['delete'])) {
+        if (
+            isset($this->jax->b['delete'])
+            && is_numeric($this->jax->b['delete'])
+        ) {
             $result = $this->database->safeselect(
                 [
                     'hash',
@@ -186,7 +188,7 @@ final readonly class Tools
             ,
             ['files', 'members'],
         );
-        echo $this->database->error(1);
+        echo $this->database->error();
         $table = '';
         while ($file = $this->database->arow($result)) {
             $filepieces = explode('.', (string) $file['name']);

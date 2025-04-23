@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 use DI\Container;
 use Jax\Config;
+use Jax\Database;
 use Jax\IPAddress;
 use Jax\Jax;
-use Jax\Database;
 use Jax\Page;
 use Jax\Sess;
 

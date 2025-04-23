@@ -6,8 +6,8 @@ namespace ACP\Page;
 
 use ACP\Page;
 use Jax\Config;
-use Jax\Jax;
 use Jax\Database;
+use Jax\Jax;
 
 use function is_numeric;
 use function mb_strlen;
@@ -22,7 +22,7 @@ final readonly class Settings
         private Config $config,
         private Database $database,
         private Jax $jax,
-        private Page $page
+        private Page $page,
     ) {}
 
     public function route(): void
@@ -192,7 +192,7 @@ final readonly class Settings
         $this->page->addContentBox('Custom Pages', $page);
     }
 
-    public function pages_delete($page)
+    public function pages_delete($page): mixed
     {
         return $this->database->safedelete(
             'pages',
@@ -212,7 +212,10 @@ final readonly class Settings
         );
         $pageinfo = $this->database->arow($result);
         $this->database->disposeresult($result);
-        if (isset($this->jax->p['pagecontents']) && $this->jax->p['pagecontents']) {
+        if (
+            isset($this->jax->p['pagecontents'])
+            && $this->jax->p['pagecontents']
+        ) {
             if ($pageinfo) {
                 $this->database->safeupdate(
                     'pages',

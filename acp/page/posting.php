@@ -6,8 +6,8 @@ namespace ACP\Page;
 
 use ACP\Page;
 use Jax\Config;
-use Jax\Jax;
 use Jax\Database;
+use Jax\Jax;
 
 use function array_reverse;
 use function krsort;
@@ -17,7 +17,12 @@ use const PHP_EOL;
 
 final readonly class Posting
 {
-    public function __construct(private Config $config, private Page $page, private Jax $jax, private Database $database) {}
+    public function __construct(
+        private Config $config,
+        private Page $page,
+        private Jax $jax,
+        private Database $database,
+    ) {}
 
     public function route(): void
     {
@@ -200,7 +205,10 @@ final readonly class Posting
             }
         }
 
-        if (isset($this->jax->p['baseset']) && $basesets[$this->jax->p['baseset']]) {
+        if (
+            isset($this->jax->p['baseset'])
+            && $basesets[$this->jax->p['baseset']]
+        ) {
             $this->config->write(['emotepack' => $this->jax->p['baseset']]);
         }
 
@@ -319,7 +327,7 @@ final readonly class Posting
                         'title' => $this->jax->p['title'],
                     ],
                 );
-                $niblets[$this->database->insert_id(1)] = [
+                $niblets[$this->database->insert_id()] = [
                     'img' => $this->jax->p['img'],
                     'title' => $this->jax->p['title'],
                 ];
