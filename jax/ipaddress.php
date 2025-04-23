@@ -6,11 +6,8 @@ namespace Jax;
 
 final class IPAddress
 {
-    public $config;
-
-    public function __constructor(Config $config): void
+    public function __construct(private Config $config)
     {
-        $this->config = $config;
     }
 
     public function asBinary($ip = null): false|string
