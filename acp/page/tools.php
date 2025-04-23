@@ -186,7 +186,7 @@ final readonly class Tools
                 $ext = mb_strtolower(array_pop($filepieces));
             }
 
-            $file['name'] = in_array($ext, $this - CONFIG->getSetting('images')) ? '<a href="'
+            $file['name'] = in_array($ext, $this->config->getSetting('images')) ? '<a href="'
                     . BOARDPATHURL . 'Uploads/' . $file['hash'] . '.' . $ext . '">'
                     . $file['name'] . '</a>' : '<a href="../?act=download&id='
                     . $file['id'] . '">' . $file['name'] . '</a>';
