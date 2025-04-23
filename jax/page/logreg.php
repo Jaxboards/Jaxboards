@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Exception;
-use Jax\Config;
 use Jax\IPAddress;
 use Jax\Jax;
 
@@ -43,9 +42,8 @@ final class LogReg
     /**
      * @var Config
      */
-    public function __construct(
-        private readonly IPAddress $ipAddress,
-    ) {
+    public function __construct(private readonly IPAddress $ipAddress)
+    {
         global $PAGE;
 
         $PAGE->loadmeta('logreg');
