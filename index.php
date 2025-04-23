@@ -6,7 +6,7 @@ use DI\Container;
 use Jax\Config;
 use Jax\IPAddress;
 use Jax\Jax;
-use Jax\MySQL;
+use Jax\Database;
 use Jax\Page;
 use Jax\Sess;
 
@@ -45,7 +45,7 @@ $onLocalHost = in_array($container->get(IPAddress::class)->asHumanReadable(), ['
 $CFG = $container->get(Config::class)->get();
 
 // DB connect!
-$DB = $container->get(MySQL::class);
+$DB = $container->get(Database::class);
 if ($onLocalHost) {
     $DB->debugMode = true;
 }

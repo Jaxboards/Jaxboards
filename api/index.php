@@ -5,7 +5,7 @@ declare(strict_types=1);
 use DI\Container;
 use Jax\Config;
 use Jax\Jax;
-use Jax\MySQL;
+use Jax\Database;
 
 define('JAXBOARDS_ROOT', dirname(__DIR__));
 
@@ -14,7 +14,7 @@ $container = new Container();
 
 $CFG = $container->get(Config::class)->get();
 
-$DB = $container->get(MySQL::class);
+$DB = $container->get(Database::class);
 $DB->connect(
     $CFG['sql_host'],
     $CFG['sql_username'],

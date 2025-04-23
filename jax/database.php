@@ -53,7 +53,8 @@ use const MYSQLI_BOTH;
 use const PASSWORD_DEFAULT;
 use const PHP_EOL;
 
-final class MySQL
+// TODO: Migrate jaxboards to be database-independent and not tied to MySQL
+final class Database
 {
     public $lastQuery;
 

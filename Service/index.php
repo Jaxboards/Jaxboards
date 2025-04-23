@@ -4,7 +4,7 @@ use DI\Container;
 use Jax\Config;
 use Jax\IPAddress;
 use Jax\Jax;
-use Jax\MySQL;
+use Jax\Database;
 
 /*
  * Service signup file, for users to create their own JaxBoards forum.
@@ -24,7 +24,7 @@ require_once JAXBOARDS_ROOT . '/jax/autoload.php';
 $container = new Container();
 
 $JAX = $container->get(Jax::class);
-$DB = $container->get(MySQL::class);
+$DB = $container->get(Database::class);
 $CFG = $container->get(Config::class)->get();
 
 if (!file_exists(JAXBOARDS_ROOT . '/config.php')) {

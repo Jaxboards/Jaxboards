@@ -6,7 +6,7 @@ use ACP\Page;
 use DI\Container;
 use Jax\Config;
 use Jax\Jax;
-use Jax\MySQL;
+use Jax\Database;
 
 /*
  * Admin control panel.
@@ -33,7 +33,7 @@ require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
 
 $CFG = $container->get(Config::class)->get();
 
-$DB = $container->get(MySQL::class);
+$DB = $container->get(Database::class);
 $DB->connect(
     $CFG['sql_host'],
     $CFG['sql_username'],

@@ -5,7 +5,7 @@ use DI\Container;
 use Jax\Config;
 use Jax\IPAddress;
 use Jax\Jax;
-use Jax\MySQL;
+use Jax\Database;
 
 /*
  * Service install file, for installing a new JaxBoards service.
@@ -64,7 +64,7 @@ function recurseCopy($src, $dst): void
 }
 
 $JAX = $container->get(Jax::class);
-$DB = $container->get(MySQL::class);
+$DB = $container->get(Database::class);
 $PAGE = $container->get(Page::class);
 
 $fields = [
