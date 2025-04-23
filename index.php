@@ -338,12 +338,12 @@ if (
 $modules = glob('jax/modules/*.php');
 if ($modules) {
     foreach ($modules as $module) {
-        $moduleClassName = 'Jax\\Modules\\' . pathinfo($module, PATHINFO_FILENAME);
+        $moduleClassName = 'Jax\Modules\\' . pathinfo($module, PATHINFO_FILENAME);
 
         $module = new $moduleClassName();
 
         if (
-            !(!property_exists($module, 'TAG') || !(
+            property_exists($module, 'TAG') && !(!(
                 isset($JAX->b['module'])
             && $JAX->b['module'] === $moduleClassName
             ) && !$PAGE->templatehas($moduleClassName))
