@@ -62,11 +62,8 @@ final class Sess
 
     public $changedData = [];
 
-    public function __construct(Config $config, IPAddress $ipAddress)
+    public function __construct(private Config $config, private IPAddress $ipAddress)
     {
-        $this->config = $config;
-        $this->ipAddress = $ipAddress;
-
         $this->data = $this->getSess($_SESSION['sid'] ?? false);
         if (!isset($this->data['vars'])) {
             $this->data['vars'] = serialize([]);
@@ -87,13 +84,6 @@ final class Sess
 
     public function __set($property, $value): void
     {
-        // TODO: overhaul this class to not use magic setter and getters
-        if (in_array($property, ['config', 'ipAddress'])) {
-            $this->{$property} = $value;
-
-            return;
-        }
-
         if (isset($this->data[$property]) && $this->data[$property] === $value) {
             return;
         }
