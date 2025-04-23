@@ -6,11 +6,9 @@ namespace Jax\Page;
 
 use Jax\Page;
 
-final class Rainbow
+final readonly class Rainbow
 {
-    public function __construct(
-        private readonly Page $page
-    ){}
+    public function __construct(private Page $page) {}
 
     public function route(): void
     {

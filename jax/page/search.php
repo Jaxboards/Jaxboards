@@ -8,6 +8,7 @@ use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
 
+use function array_key_exists;
 use function array_map;
 use function array_slice;
 use function ceil;
@@ -48,8 +49,7 @@ final class Search
         private readonly Database $database,
         private readonly Page $page,
         private readonly Jax $jax,
-    )
-    {
+    ) {
         $this->page->loadmeta('search');
     }
 
@@ -205,7 +205,10 @@ final class Search
             $termraw = $SESS->vars['searcht'];
         }
 
-        if (empty($this->jax->p) && !array_key_exists('searchterm', $this->jax->b)) {
+        if (
+            empty($this->jax->p)
+            && !array_key_exists('searchterm', $this->jax->b)
+        ) {
             $ids = $SESS->vars['search'];
         } else {
             $this->getSearchableForums();
@@ -233,7 +236,10 @@ final class Search
             }
 
             $authorId = null;
-            if (($this->jax->b['mid'] ?? 0) && ctype_digit((string) $this->jax->b['mid'])) {
+            if (
+                ($this->jax->b['mid'] ?? 0)
+                && ctype_digit((string) $this->jax->b['mid'])
+            ) {
                 $authorId = (int) $this->jax->b['mid'];
             }
 
@@ -312,7 +318,7 @@ final class Search
             );
 
             if (!$result) {
-                syslog(LOG_EMERG, 'ERROR: ' . $this->database->error(1) . PHP_EOL);
+                syslog(LOG_EMERG, 'ERROR: ' . $this->database->error() . PHP_EOL);
             }
 
             $ids = '';
@@ -381,7 +387,7 @@ final class Search
         while ($postRow = $this->database->arow($result)) {
             $post = $this->jax->textonly($postRow['post']);
             $post = $this->jax->blockhtml($post);
-            $post = nl2br((string) $post);
+            $post = nl2br($post);
             $post = preg_replace(
                 '@' . implode('|', $terms) . '@i',
                 (string) $this->page->meta('search-highlight', '$0'),

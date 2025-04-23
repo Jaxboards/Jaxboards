@@ -15,9 +15,8 @@ final class Ticker
     public function __construct(
         private readonly Database $database,
         private readonly Jax $jax,
-        private readonly Page $page
-    )
-    {
+        private readonly Page $page,
+    ) {
         $this->page->loadmeta('ticker');
     }
 
@@ -147,7 +146,7 @@ final class Ticker
         $SESS->addvar('tickid', $first);
     }
 
-    public function ftick($t)
+    public function ftick($t): ?string
     {
         return $this->page->meta(
             'ticker-tick',

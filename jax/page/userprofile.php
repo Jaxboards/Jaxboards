@@ -42,8 +42,7 @@ final class UserProfile
         private readonly IPAddress $ipAddress,
         private readonly Jax $jax,
         private readonly Page $page,
-    )
-    {
+    ) {
         $this->page->loadmeta('userprofile');
     }
 
@@ -220,7 +219,7 @@ final class UserProfile
                 ['members', 'member_groups'],
                 $id,
             );
-            echo $this->database->error(1);
+            echo $this->database->error();
             $udata = $this->database->arow($result);
             $this->database->disposeresult($result);
         }
@@ -362,7 +361,10 @@ final class UserProfile
                 break;
 
             case 'comments':
-                if (isset($this->jax->b['del']) && is_numeric($this->jax->b['del'])) {
+                if (
+                    isset($this->jax->b['del'])
+                    && is_numeric($this->jax->b['del'])
+                ) {
                     if ($PERMS['can_moderate']) {
                         $this->database->safedelete(
                             'profile_comments',
@@ -379,7 +381,10 @@ final class UserProfile
                     }
                 }
 
-                if (isset($this->jax->p['comment']) && $this->jax->p['comment'] !== '') {
+                if (
+                    isset($this->jax->p['comment'])
+                    && $this->jax->p['comment'] !== ''
+                ) {
                     if (!$USER || !$PERMS['can_add_comments']) {
                         $e = 'No permission to add comments!';
                     } else {
@@ -493,7 +498,10 @@ final class UserProfile
                     $id,
                     $this->num_activity,
                 );
-                if (isset($this->jax->b['fmt']) && $this->jax->b['fmt'] === 'RSS') {
+                if (
+                    isset($this->jax->b['fmt'])
+                    && $this->jax->b['fmt'] === 'RSS'
+                ) {
                     $feed = new RSSFeed(
                         [
                             'description' => $udata['usertitle'],

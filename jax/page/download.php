@@ -17,12 +17,13 @@ use function is_numeric;
 use function mb_strtolower;
 use function readfile;
 
-final class Download
+final readonly class Download
 {
     public function __construct(
-        private readonly Database $database,
-        private readonly Jax $jax,
+        private Database $database,
+        private Jax $jax,
     ) {}
+
     public function route(): void
     {
         $this->downloadFile($this->jax->b['id']);

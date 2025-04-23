@@ -92,7 +92,9 @@ final class Topic
             return;
         }
 
-        $this->pageNumber = isset($this->jax->b['page']) ? (int) $this->jax->b['page'] : 0;
+        $this->pageNumber = isset($this->jax->b['page'])
+            ? (int) $this->jax->b['page']
+            : 0;
         if ($this->pageNumber <= 0 || !is_numeric($this->pageNumber)) {
             $this->pageNumber = 1;
         }
@@ -159,7 +161,10 @@ final class Topic
             return;
         }
 
-        if (isset($this->jax->b['listrating']) && $this->jax->b['listrating']) {
+        if (
+            isset($this->jax->b['listrating'])
+            && $this->jax->b['listrating']
+        ) {
             $this->listrating($this->jax->b['listrating']);
 
             return;

@@ -22,9 +22,8 @@ final class Calendar
     public function __construct(
         private readonly Database $database,
         private readonly Jax $jax,
-        private readonly Page $page
-    )
-    {
+        private readonly Page $page,
+    ) {
         $this->page->loadmeta('calendar');
     }
 

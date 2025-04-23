@@ -36,9 +36,8 @@ final class Forum
     public function __construct(
         private readonly Database $database,
         private readonly Jax $jax,
-        private readonly Page $page
-    )
-    {
+        private readonly Page $page,
+    ) {
         $this->page->loadmeta('forum');
     }
 
@@ -244,7 +243,7 @@ final class Forum
         if ($numpages !== 0.0) {
             foreach ($this->jax->pages($numpages, $this->pageNumber + 1, 10) as $v) {
                 $forumpages .= '<a href="?act=vf' . $fid . '&amp;page='
-                    . $v . '"' . (($v - 1) === $this->pageNumber ? ' class="active"' : '')
+                    . $v . '"' . ($v - 1 === $this->pageNumber ? ' class="active"' : '')
                     . '>' . $v . '</a> · ';
             }
         }

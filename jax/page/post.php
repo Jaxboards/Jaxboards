@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\Config;
+use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
-use Jax\IPAddress;
 
 use function array_pop;
 use function count;
@@ -264,7 +264,7 @@ final class Post
             $USER ? $USER['group_id'] : 3,
         );
 
-        if (!$fdata) {
+        if ($fdata === []) {
             $e = "This forum doesn't exist. Weird.";
         }
 
@@ -650,12 +650,12 @@ onclick="this.form.submitButton=this"/></div>
                 $e = 'No forum specified exists.';
             } elseif (
                 !isset($this->jax->p['ttitle'])
-                || trim($this->jax->p['ttitle']) === ''
+                || trim((string) $this->jax->p['ttitle']) === ''
             ) {
                 $e = "You didn't specify a topic title!";
             } elseif (
                 isset($this->jax->p['ttitle'])
-                && mb_strlen($this->jax->p['ttitle']) > 255
+                && mb_strlen((string) $this->jax->p['ttitle']) > 255
             ) {
                 $e = 'Topic title must not exceed 255 characters';
             } elseif (
@@ -663,7 +663,10 @@ onclick="this.form.submitButton=this"/></div>
                 && mb_strlen($this->jax->p['subtitle']) > 255
             ) {
                 $e = 'Subtitle must not exceed 255 characters';
-            } elseif (isset($this->jax->p['poll_type']) && $this->jax->p['poll_type']) {
+            } elseif (
+                isset($this->jax->p['poll_type'])
+                && $this->jax->p['poll_type']
+            ) {
                 $pollchoices = [];
                 $pollChoice = preg_split("@[\r\n]+@", (string) $this->jax->p['pollchoices']);
                 foreach ($pollChoice as $v) {
@@ -741,7 +744,7 @@ onclick="this.form.submitButton=this"/></div>
                             (string) preg_replace(
                                 '@\s+@',
                                 ' ',
-                                (string) $this->jax->blockhtml(
+                                $this->jax->blockhtml(
                                     $this->jax->textonly(
                                         $this->postdata,
                                     ),

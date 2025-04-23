@@ -6,11 +6,10 @@ namespace Jax\Page;
 
 use Jax\Page;
 
-final class Tardis
+final readonly class Tardis
 {
-    public function __construct(
-        private readonly Page $page,
-    ) {}
+    public function __construct(private Page $page) {}
+
     public function route(): void
     {
         $this->page->JS('softurl');

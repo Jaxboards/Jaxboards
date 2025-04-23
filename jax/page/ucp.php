@@ -48,8 +48,7 @@ final class UCP
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly Page $page,
-    )
-    {
+    ) {
         $this->page->loadmeta('ucp');
     }
 
@@ -160,7 +159,10 @@ final class UCP
             return;
         }
 
-        if (isset($this->jax->p['ucpnotepad']) && $this->jax->p['ucpnotepad']) {
+        if (
+            isset($this->jax->p['ucpnotepad'])
+            && $this->jax->p['ucpnotepad']
+        ) {
             if (mb_strlen((string) $this->jax->p['ucpnotepad']) > 2000) {
                 $e = 'The UCP notepad cannot exceed 2000 characters.';
                 $this->page->JS('error', $e);
@@ -229,7 +231,9 @@ final class UCP
         if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
             $update = [];
             foreach ($variables as $v) {
-                $update[$v] = isset($this->jax->p[$v]) && $this->jax->p[$v] ? 1 : 0;
+                $update[$v] = isset($this->jax->p[$v]) && $this->jax->p[$v]
+                    ? 1
+                    : 0;
             }
 
             $this->database->safeupdate(
@@ -371,7 +375,10 @@ final class UCP
         global $USER;
         $e = '';
         if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
-            if ($this->jax->p['email'] && !$this->jax->isemail($this->jax->p['email'])) {
+            if (
+                $this->jax->p['email']
+                && !$this->jax->isemail($this->jax->p['email'])
+            ) {
                 $e = 'Please enter a valid email!';
             }
 
@@ -423,7 +430,10 @@ final class UCP
         $e = '';
         $update = false;
         if (isset($this->jax->p['changedava'])) {
-            if ($this->jax->p['changedava'] && !$this->jax->isurl($this->jax->p['changedava'])) {
+            if (
+                $this->jax->p['changedava']
+                && !$this->jax->isurl($this->jax->p['changedava'])
+            ) {
                 $e = 'Please enter a valid image URL.';
             } else {
                 $this->database->safeupdate(
@@ -615,7 +625,7 @@ final class UCP
                 $length = $k === 'display_name'
                     ? 30
                     : ($k === 'location' ? 100 : 50);
-                if (mb_strlen((string) $data[$k]) <= $length) {
+                if (mb_strlen($data[$k]) <= $length) {
                     continue;
                 }
 
@@ -734,7 +744,10 @@ final class UCP
         global $USER;
         $e = '';
         $showthing = false;
-        if (isset($this->jax->b['skin']) && is_numeric($this->jax->b['skin'])) {
+        if (
+            isset($this->jax->b['skin'])
+            && is_numeric($this->jax->b['skin'])
+        ) {
             $result = $this->database->safeselect(
                 [
                     'id',
@@ -1156,7 +1169,7 @@ final class UCP
                     [
                         'newmessage',
                         'You have a new message from ' . $USER['display_name'],
-                        $this->database->insert_id(1),
+                        $this->database->insert_id(),
                     ],
                 ) . PHP_EOL;
                 $result = $this->database->safespecial(
@@ -1167,7 +1180,7 @@ final class UCP
                         EOT
                     ,
                     ['session'],
-                    $this->database->basicvalue($cmd, 1),
+                    $this->database->basicvalue($cmd),
                     $udata['id'],
                 );
                 // Send em an email!

@@ -16,7 +16,6 @@ final readonly class BoardOffline
         private readonly Page $page,
     ) {}
 
-
     public function route(): void
     {
         if ($this->page->jsupdate) {

@@ -569,7 +569,7 @@ final class ModControls
                         . implode(',', $tids),
                 ],
             );
-            $tid = $this->database->insert_id(1);
+            $tid = $this->database->insert_id();
             $this->database->safeupdate(
                 'posts',
                 [
@@ -883,7 +883,10 @@ final class ModControls
             <input type="hidden" name="mid" id="mid" onchange="this.form.onsubmit();" />
             <input type="submit" type="View member details" value="Go" />
             </form>';
-        if (isset($this->jax->p['submit']) && $this->jax->p['submit'] === 'save') {
+        if (
+            isset($this->jax->p['submit'])
+            && $this->jax->p['submit'] === 'save'
+        ) {
             if (
                 trim((string) $this->jax->p['display_name']) === ''
                 || trim((string) $this->jax->p['display_name']) === '0'
@@ -1182,7 +1185,7 @@ final class ModControls
             );
             while ($f = $this->database->arow($result)) {
                 $content .= "<div class='post'>"
-                    . nl2br((string) $this->jax->blockhtml($this->jax->textonly($f['post'])))
+                    . nl2br($this->jax->blockhtml($this->jax->textonly($f['post'])))
                     . '</div>';
             }
 

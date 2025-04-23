@@ -41,8 +41,7 @@ final class IDX
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly Page $page,
-    )
-    {
+    ) {
         $this->page->loadmeta('idx');
     }
 
@@ -219,7 +218,7 @@ final class IDX
         return mb_substr($r, 0, -mb_strlen((string) $this->page->meta('idx-ledby-splitter')));
     }
 
-    public function buildTable($a)
+    public function buildTable($a): ?string
     {
         if (!$a) {
             return null;
@@ -544,7 +543,7 @@ final class IDX
         }
     }
 
-    public function formatlastpost($v)
+    public function formatlastpost($v): ?string
     {
         return $this->page->meta(
             'idx-row-lastpost',

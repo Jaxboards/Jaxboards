@@ -25,8 +25,7 @@ final class Members
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly Page $page,
-    )
-    {
+    ) {
         $this->page->loadmeta('members');
     }
 
@@ -70,7 +69,10 @@ final class Members
             $sortby = $this->jax->b['sortby'];
         }
 
-        if (isset($this->jax->g['filter']) && $this->jax->g['filter'] === 'staff') {
+        if (
+            isset($this->jax->g['filter'])
+            && $this->jax->g['filter'] === 'staff'
+        ) {
             $sortby = 'g.`can_access_acp` DESC ,' . $sortby;
             $where = 'WHERE g.`can_access_acp`=1 OR g.`can_moderate`=1';
         }

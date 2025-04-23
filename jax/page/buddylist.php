@@ -14,14 +14,13 @@ use function implode;
 use function in_array;
 use function is_numeric;
 
-final class BuddyList
+final readonly class BuddyList
 {
     public function __construct(
-        protected readonly Database $database,
-        protected readonly Jax $jax,
-        protected readonly Page $page,
-    )
-    {
+        private Database $database,
+        private Jax $jax,
+        private Page $page,
+    ) {
         $buddylist = $this->jax->hiddenFormFields(['act' => 'buddylist']);
         $this->page->metadefs['buddylist-contacts'] = <<<EOT
             <div class="contacts">
@@ -73,7 +72,10 @@ final class BuddyList
             $this->setstatus($this->jax->b['status']);
         } elseif (isset($this->jax->b['block']) && $this->jax->b['block']) {
             $this->block($this->jax->b['block']);
-        } elseif (isset($this->jax->b['unblock']) && $this->jax->b['unblock']) {
+        } elseif (
+            isset($this->jax->b['unblock'])
+            && $this->jax->b['unblock']
+        ) {
             $this->unblock($this->jax->b['unblock']);
         } else {
             $this->displaybuddylist();
