@@ -173,7 +173,7 @@ final class Page
             return;
         }
 
-        $this->parts[$part] = $content . $this->parts[$a];
+        $this->parts[$part] = $content . $this->parts[$part];
     }
 
     public function location(string $newLocation): void
