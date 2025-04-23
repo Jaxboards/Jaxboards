@@ -177,11 +177,11 @@ const RULE_DESCRIPTION_REPLACEMENTS = [
 // phpcs:enable
 
 /**
- * Make rule descriptions more generic for SonarCloud issue rules
+ * Make rule descriptions more generic for SonarCloud issue rules.
  *
- * @param string    $input  The description to work with
+ * @param string $input The description to work with
  *
- * @return string   The "generified" input
+ * @return string The "generified" input
  */
 function generify(string $input): string
 {

@@ -104,42 +104,42 @@ if (!is_array($data['files'])) {
 
 // phpcs:disable SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys.IncorrectKeyOrder,Generic.Files.LineLength.TooLong
 const RULE_DESCRIPTION_REPLACEMENTS = [
-        '/ on line \d+/' => '',
-        '/ variable names like \$\w+/' => ' variable names',
-        '/ variable \$\w+ is/' => ' variable is',
-        '/ variables with short names like \$\w+/' => ' variables with short names',
-        '/ undefined variables such as \'\$\w+\'/' => ' undefined variables',
-        '/ unused local variables such as \'\$\w+\'/' => ' unused local variables',
-        '/ method \w+\(\) has a Cyclomatic Complexity of \d+/' => ' method has a Cyclomatic Complexity that exceeds the threshoold',
-        '/The method \w+ uses an else expression. /' => '',
-        '/The class \w+ has \d+ lines of code. /' => 'The class has more lines of code than our threshold. ',
-        '/The class \w+ has an overall complexity of \d+ /' => 'The class an overall complexity ',
-        '/ method \w+ has a boolean flag argument \$\w+/' => ' method has a boolean flag argument',
-        '/ class \$\w+ is/' => ' class is',
-        '/ property \$\w+ is/' => ' property is',
-        '/The method \w+\(\) has an NPath complexity of \d+. /' => 'The method has more NPath complexity than our threshold. ',
-        '/\w+ accesses the super-global variable \$\w+/' => 'No accessing superglobal variables',
-        '/ \(line \'\d+\', column \'\d+\'\)/' => '',
-        '/The class \w+ is not named/' => 'The class is not named',
-        '/The method \w+\(\) has \d+ lines of code. /' => 'The method has excessive lines of code. ',
-        '/parameter \$\w+/' => 'parameter',
-        '/method \w+\(\) contains/' => 'method contains',
-        '/class \w+ has \d+ public methods/' => 'class has a lot of public methods',
-        '/class \w+ has \d+ non-getter-/' => 'class has a lot of non-getter-',
-        '/such as \'\$\w+\'/' => '',
-        '/The method \w+::\w+\(\)/' => 'The method',
-        '/The class \w+ has \d+ fields. Consider redesigning \w+/' => 'Consider redesigning this class',
-        '/ short method names like \w+::\w+\(\)/' => ' short method names',
-        '/ classes with short names like \w+/' => ' classes with short names',
+    '/ on line \d+/' => '',
+    '/ variable names like \$\w+/' => ' variable names',
+    '/ variable \$\w+ is/' => ' variable is',
+    '/ variables with short names like \$\w+/' => ' variables with short names',
+    '/ undefined variables such as \'\$\w+\'/' => ' undefined variables',
+    '/ unused local variables such as \'\$\w+\'/' => ' unused local variables',
+    '/ method \w+\(\) has a Cyclomatic Complexity of \d+/' => ' method has a Cyclomatic Complexity that exceeds the threshoold',
+    '/The method \w+ uses an else expression. /' => '',
+    '/The class \w+ has \d+ lines of code. /' => 'The class has more lines of code than our threshold. ',
+    '/The class \w+ has an overall complexity of \d+ /' => 'The class an overall complexity ',
+    '/ method \w+ has a boolean flag argument \$\w+/' => ' method has a boolean flag argument',
+    '/ class \$\w+ is/' => ' class is',
+    '/ property \$\w+ is/' => ' property is',
+    '/The method \w+\(\) has an NPath complexity of \d+. /' => 'The method has more NPath complexity than our threshold. ',
+    '/\w+ accesses the super-global variable \$\w+/' => 'No accessing superglobal variables',
+    '/ \(line \'\d+\', column \'\d+\'\)/' => '',
+    '/The class \w+ is not named/' => 'The class is not named',
+    '/The method \w+\(\) has \d+ lines of code. /' => 'The method has excessive lines of code. ',
+    '/parameter \$\w+/' => 'parameter',
+    '/method \w+\(\) contains/' => 'method contains',
+    '/class \w+ has \d+ public methods/' => 'class has a lot of public methods',
+    '/class \w+ has \d+ non-getter-/' => 'class has a lot of non-getter-',
+    '/such as \'\$\w+\'/' => '',
+    '/The method \w+::\w+\(\)/' => 'The method',
+    '/The class \w+ has \d+ fields. Consider redesigning \w+/' => 'Consider redesigning this class',
+    '/ short method names like \w+::\w+\(\)/' => ' short method names',
+    '/ classes with short names like \w+/' => ' classes with short names',
 ];
 // phpcs:enable
 
 /**
- * Make rule descriptions more generic for SonarCloud issue rules
+ * Make rule descriptions more generic for SonarCloud issue rules.
  *
- * @param string    $input  The description to work with
+ * @param string $input The description to work with
  *
- * @return string   The "generified" input
+ * @return string The "generified" input
  */
 function generify(string $input): string
 {
