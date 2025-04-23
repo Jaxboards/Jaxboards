@@ -49,6 +49,7 @@ final class IPAddress
         if (!$ip) {
             $ip = self::getIp();
         }
+
         $ipbancache = [];
         if (file_exists(BOARDPATH . '/bannedips.txt')) {
             foreach (file(BOARDPATH . '/bannedips.txt') as $v) {
