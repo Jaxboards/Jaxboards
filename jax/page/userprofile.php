@@ -9,6 +9,7 @@ use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
 use Jax\RSSFeed;
+use Jax\Session;
 
 use function explode;
 use function gmdate;
