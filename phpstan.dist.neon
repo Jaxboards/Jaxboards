@@ -14,11 +14,11 @@ parameters:
     - Script
     - Service
     - acp
+    - api
     - config.default.php
     - domaindefinitions.php
     - emoticons
     - jax
+    - tools
     - index.php
-    - misc
-    - php_codesniffer_to_sonarqube.php
 
