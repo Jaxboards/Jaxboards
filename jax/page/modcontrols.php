@@ -56,7 +56,8 @@ final class ModControls
     public function load(): void
     {
         $script = file_get_contents('dist/modcontrols.js');
-        if (!$PAGE || !$this->page->jsaccess) {
+
+        if (!$this->page->jsaccess) {
             header('Content-Type: application/javascript; charset=utf-8');
             header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 2_592_000) . ' GMT');
 
