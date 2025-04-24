@@ -583,7 +583,7 @@ onclick="this.form.submitButton=this"/></div>
                                 (string) preg_replace(
                                     '@\s+@',
                                     ' ',
-                                    (string) $this->textFormatting->wordfilter(
+                                    $this->textFormatting->wordfilter(
                                         $this->textFormatting->blockhtml(
                                             $this->textFormatting->textonly(
                                                 $this->postdata,

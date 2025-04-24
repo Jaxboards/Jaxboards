@@ -402,7 +402,7 @@ final class TextFormatting
             . $file['name'] . '</a> Downloads: ' . $file['downloads'] . '</div>';
     }
 
-    public function theworks(string $text, array $cfg = [])
+    public function theworks(string $text, array $cfg = []): string
     {
         if (@!$cfg['nobb'] && @!$cfg['minimalbb']) {
             $codes = $this->startcodetags($text);
