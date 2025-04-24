@@ -157,7 +157,7 @@ final class TextFormatting
         }
 
         $text = preg_replace_callback(
-            '@(\s)(' . implode('|', array_map(fn(string $emote) => preg_quote($emote, '@'), array_keys($this->emotes))) . ')@',
+            '@(\s)(' . implode('|', array_map(static fn(string $emote): string => preg_quote($emote, '@'), array_keys($this->emotes))) . ')@',
             $this->emotecallback(...),
             ' ' . $text,
             $emoticonLimit,
