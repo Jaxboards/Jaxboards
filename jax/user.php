@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use function array_key_exists;
 use function date;
 use function password_hash;
 use function password_needs_rehash;
@@ -22,15 +21,13 @@ final class User
     {
         if (!$this->userData) {
             // TODO: default other property values for guests
-            return match($property) {
+            return match ($property) {
                 'group_id' => 3,
-                default => null
+                default => null,
             };
         }
 
-        return array_key_exists($property, $this->userData)
-            ? $this->userData[$property]
-            : null;
+        return $this->userData[$property] ?? null;
     }
 
     public function set(string $property, $value): void
