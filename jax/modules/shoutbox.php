@@ -127,7 +127,7 @@ final class Shoutbox
             $deletelink = '';
         }
 
-        if (mb_substr((string) $shout, 0, 4) === '/me ') {
+        if (mb_substr($shout, 0, 4) === '/me ') {
             return $this->page->meta(
                 'shout-action',
                 $this->jax->smalldate(
@@ -136,7 +136,7 @@ final class Shoutbox
                 ),
                 $user,
                 mb_substr(
-                    (string) $shout,
+                    $shout,
                     3,
                 ),
                 $deletelink,
