@@ -77,12 +77,16 @@ final class Page
     /**
      * @var array<string, string>
      */
-    public $meta;
-
     private $metadefs = [];
 
+    /**
+     * @var array<string>
+     */
     private $debuginfo = [];
 
+    /**
+     * @var array<string>
+     */
     private $JSOutput = [];
 
     /**
@@ -369,7 +373,7 @@ final class Page
 
     public function addmeta(string $meta, string $content): void
     {
-        $this->meta[$meta] = $content;
+        $this->metadefs[$meta] = $content;
     }
 
     public function loadmeta($component): void
