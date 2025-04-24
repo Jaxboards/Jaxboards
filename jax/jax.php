@@ -50,9 +50,8 @@ final class Jax
      */
     public $b = [];
 
-    public function __construct(
-        private readonly Config $config,
-    ) {
+    public function __construct(private readonly Config $config)
+    {
         $this->c = $_COOKIE;
         $this->g = $_GET;
         $this->p = $_POST;

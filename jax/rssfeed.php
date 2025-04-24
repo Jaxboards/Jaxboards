@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use function array_map;
 use function array_merge;
 use function gmdate;
 use function header;
+use function implode;
 use function is_array;
 
 final class RSSFeed

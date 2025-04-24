@@ -16,6 +16,7 @@ use function file_get_contents;
 use function glob;
 use function header;
 use function headers_sent;
+use function implode;
 use function in_array;
 use function is_array;
 use function is_dir;
@@ -75,21 +76,6 @@ use const PHP_EOL;
 final class Page
 {
     /**
-     * @var array<string, string>
-     */
-    private $metadefs = [];
-
-    /**
-     * @var array<string>
-     */
-    private $debuginfo = [];
-
-    /**
-     * @var array<string>
-     */
-    private $JSOutput = [];
-
-    /**
      * @var int
      */
     public $jsaccess = 0;
@@ -109,6 +95,21 @@ final class Page
      * @var bool
      */
     public $jsdirectlink = false;
+
+    /**
+     * @var array<string, string>
+     */
+    private $metadefs = [];
+
+    /**
+     * @var array<string>
+     */
+    private $debuginfo = [];
+
+    /**
+     * @var array<string>
+     */
+    private $JSOutput = [];
 
 
     private $parts = [];
@@ -131,11 +132,13 @@ final class Page
     ) {
         $this->jsaccess = (int) ($_SERVER['HTTP_X_JSACCESS'] ?? 0);
 
-        if ($this->jsaccess !== 0) {
-            $this->jsupdate = $this->jsaccess === 1;
-            $this->jsnewlocation = $this->jsaccess >= 2;
-            $this->jsdirectlink = $this->jsaccess === 3;
+        if ($this->jsaccess === 0) {
+            return;
         }
+
+        $this->jsupdate = $this->jsaccess === 1;
+        $this->jsnewlocation = $this->jsaccess >= 2;
+        $this->jsdirectlink = $this->jsaccess === 3;
     }
 
     public function get(string $part)
@@ -269,8 +272,11 @@ final class Page
         echo $this->template;
     }
 
-    public function collapsebox(string $title, string $contents, $boxId = null): ?string
-    {
+    public function collapsebox(
+        string $title,
+        string $contents,
+        $boxId = null,
+    ): ?string {
         return $this->meta('collapsebox', $boxId ? ' id="' . $boxId . '"' : '', $title, $contents);
     }
 
@@ -469,7 +475,9 @@ final class Page
 
     public function metaextendedifcb(array $match)
     {
-        $logicalOperator = mb_strpos((string) $match[1], '||') !== false ? '||' : '&&';
+        $logicalOperator = mb_strpos((string) $match[1], '||') !== false
+            ? '||'
+            : '&&';
 
         foreach (explode($logicalOperator, (string) $match[1]) as $piece) {
             preg_match('@(\S+?)\s*([!><]?=|[><])\s*(\S*)@', $piece, $args);
