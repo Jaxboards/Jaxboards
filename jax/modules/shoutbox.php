@@ -361,14 +361,15 @@ final class Shoutbox
 
     public function addshout(): void
     {
-        $userData = $this->user->getUser();
         $this->session->act();
         $e = '';
         $shout = $this->jax->p['shoutbox_shout'];
         $shout = $this->textFormatting->linkify($shout);
 
         $perms = $this->user->getPerms();
-        if (!$perms['can_shout']) {
+        if ($this->user->isGuest()) {
+            $e = 'You must be logged in to shout!';
+        } elseif (!$perms['can_shout']) {
             $e = 'You do not have permission to shout!';
         } elseif (mb_strlen((string) $shout) > 300) {
             $e = 'Shout must be less than 300 characters.';
@@ -387,7 +388,7 @@ final class Shoutbox
                 'date' => gmdate('Y-m-d H:i:s'),
                 'ip' => $this->ipAddress->asBinary(),
                 'shout' => $shout,
-                'uid' => $userData['id'] ?? 0,
+                'uid' => $this->user->get('id'),
             ],
         );
     }

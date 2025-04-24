@@ -102,7 +102,6 @@ final class Session
 
     public function getSess($sid = null): array
     {
-        $userData = $this->user->getUser();
         $isbot = 0;
         $r = [];
         foreach ($this->bots as $k => $v) {
@@ -181,14 +180,6 @@ final class Session
             $sid = base64_encode(openssl_random_pseudo_bytes(128));
         }
 
-        $uid = 0;
-        if (
-            !empty($userData)
-            && isset($userData['id'])
-            && $userData['id'] > 0
-        ) {
-            $uid = (int) $userData['id'];
-        }
 
         if ($isbot === 0) {
             $_SESSION['sid'] = $sid;
@@ -204,12 +195,11 @@ final class Session
             'last_update' => $actionTime,
             'runonce' => '',
             'topicsread' => '{}',
-            'uid' => $uid,
             'useragent' => $_SERVER['HTTP_USER_AGENT'],
         ];
-        if ($uid < 1) {
-            unset($sessData['uid']);
-        }
+
+        $uid = $this->user->get('id');
+        if ($uid) $sessData['uid'] = $uid;
 
         $this->database->safeinsert(
             'session',
