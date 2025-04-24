@@ -70,6 +70,7 @@ final class Session
         private readonly Jax $jax,
         private readonly IPAddress $ipAddress,
         private readonly Database $database,
+        private readonly User $user,
     ) {
         $this->data = $this->getSess($_SESSION['sid'] ?? null);
         if (!isset($this->data['vars'])) {
@@ -101,7 +102,7 @@ final class Session
 
     public function getSess($sid = null): array
     {
-        $userData = $this->database->getUser();
+        $userData = $this->user->getUser();
         $isbot = 0;
         $r = [];
         foreach ($this->bots as $k => $v) {

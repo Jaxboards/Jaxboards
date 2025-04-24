@@ -11,6 +11,7 @@ use Jax\Jax;
 use Jax\Page;
 use Jax\Session;
 use Jax\TextFormatting;
+use Jax\User;
 
 use function array_diff;
 use function array_flip;
@@ -51,6 +52,7 @@ final class ModControls
         private readonly Page $page,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
+        private readonly User $user,
     ) {
         $this->page->loadmeta('modcp');
     }
@@ -76,7 +78,7 @@ final class ModControls
     {
         global $USER;
 
-        $this->perms = $this->database->getPerms();
+        $this->perms = $this->user->getPerms();
         if (!$this->perms['can_moderate'] && !$USER['mod']) {
             $this->page->JS('softurl');
             $this->page->JS(

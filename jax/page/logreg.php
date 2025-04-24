@@ -12,6 +12,7 @@ use Jax\Jax;
 use Jax\Page;
 use Jax\Session;
 use Jax\TextFormatting;
+use Jax\User;
 
 use function base64_encode;
 use function count;
@@ -51,6 +52,7 @@ final class LogReg
         private readonly Page $page,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
+        private readonly User $user,
     ) {
         $this->page->loadmeta('logreg');
     }
@@ -223,7 +225,7 @@ final class LogReg
             $user = $this->database->arow($result);
             $u = $user['id'] ?? 0;
 
-            $user = $this->database->getUser($u, $p);
+            $user = $this->user->getUser($u, $p);
 
             if ($user) {
                 if (isset($this->jax->p['popup']) && $this->jax->p['popup']) {
@@ -250,7 +252,7 @@ final class LogReg
                 $this->session->user = $u;
                 $this->session->uid = $user['id'];
                 $this->session->act();
-                $perms = $this->database->getPerms($user['group_id']);
+                $perms = $this->user->getPerms($user['group_id']);
                 if ($this->registering) {
                     $this->page->JS('location', '/');
                 } elseif ($this->page->jsaccess) {

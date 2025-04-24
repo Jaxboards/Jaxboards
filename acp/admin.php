@@ -7,6 +7,7 @@ use DI\Container;
 use Jax\Config;
 use Jax\Database;
 use Jax\Jax;
+use Jax\User;
 
 /*
  * Admin control panel.
@@ -41,11 +42,12 @@ $DB->connect(
     $CFG['sql_db'],
     $CFG['sql_prefix'],
 );
+$USERCLASS = $container->get(User::class);
 
 $JAX = $container->get(Jax::class);
 if (isset($_SESSION['auid'])) {
-    $userData = $DB->getUser($_SESSION['auid']);
-    $PERMS = $DB->getPerms($userData['group_id']);
+    $userData = $USERCLASS->getUser($_SESSION['auid']);
+    $PERMS = $USERCLASS->getPerms($userData['group_id']);
 } else {
     $PERMS = [
         'can_access_acp' => false,
@@ -58,7 +60,8 @@ if (!$PERMS['can_access_acp']) {
     exit;
 }
 
-$USER = $DB->getUser();
+// TODO: make global $USER point to class not user data
+$USER = $USERCLASS->getUser();
 $PAGE = $container->get(Page::class);
 $PAGE->append('username', $USER['display_name']);
 $PAGE->title($CFG['boardname'] . ' - ACP');

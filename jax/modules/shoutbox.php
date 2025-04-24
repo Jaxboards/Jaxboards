@@ -11,6 +11,7 @@ use Jax\Jax;
 use Jax\Page;
 use Jax\Session;
 use Jax\TextFormatting;
+use Jax\User;
 
 use function array_pop;
 use function ceil;
@@ -31,11 +32,12 @@ final class Shoutbox
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
-        private readonly Jax $jax,
         private readonly IPAddress $ipAddress,
+        private readonly Jax $jax,
         private readonly Page $page,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
+        private readonly User $user,
     ) {
         $this->page->loadmeta('shoutbox');
     }
@@ -370,13 +372,13 @@ final class Shoutbox
 
     public function addshout(): void
     {
-        $userData = $this->database->getUser();
+        $userData = $this->user->getUser();
         $this->session->act();
         $e = '';
         $shout = $this->jax->p['shoutbox_shout'];
         $shout = $this->textFormatting->linkify($shout);
 
-        $perms = $this->database->getPerms();
+        $perms = $this->user->getPerms();
         if (!$perms['can_shout']) {
             $e = 'You do not have permission to shout!';
         } elseif (mb_strlen((string) $shout) > 300) {

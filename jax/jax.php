@@ -28,8 +28,6 @@ use const PHP_EOL;
 
 final class Jax
 {
-    public $attachmentdata;
-
     /**
      * @var array<mixed>
      */

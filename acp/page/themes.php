@@ -110,7 +110,7 @@ final readonly class Themes
     public function getwrappers(): array
     {
         $wrappers = [];
-        $o = opendir(this::WRAPPERS_PATH);
+        $o = opendir(self::WRAPPERS_PATH);
         while ($f = readdir($o)) {
             if ($f === '.') {
                 continue;

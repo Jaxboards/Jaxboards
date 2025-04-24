@@ -9,6 +9,7 @@ use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
 use Jax\Session;
+use Jax\User;
 
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', __DIR__);
@@ -81,12 +82,10 @@ if (isset($CFG['noboard']) && $CFG['noboard']) {
 $PAGE = $container->get(Page::class);
 $JAX = $container->get(Jax::class);
 $SESS = $container->get(Session::class);
+$USERCLASS = $container->get(User::class);
 
-if (!$SESS->is_bot && isset($_SESSION['uid']) && $_SESSION['uid']) {
-    $DB->getUser($_SESSION['uid']);
-}
-
-$USER = $DB->getUser();
+// TODO: make global $USER point to class not data
+$USER = $USERCLASS->getUser(!$SESS->is_bot && isset($_SESSION['uid']) && $_SESSION['uid'] ? $_SESSION['uid'] : null);
 
 // If they're IP banned, put them in the banned group
 if ($container->get(IPAddress::class)->isBanned()) {
@@ -106,7 +105,7 @@ if (!isset($_SESSION['uid']) && isset($JAX->c['utoken'])) {
     }
 }
 
-$PERMS = $DB->getPerms($USER['group_id'] ?? 3);
+$PERMS = $USERCLASS->getPerms($USER['group_id'] ?? 3);
 
 // Fix ip if necessary.
 if ($USER && $SESS->ip && $SESS->ip !== $USER['ip']) {

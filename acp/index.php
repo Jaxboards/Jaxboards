@@ -7,6 +7,7 @@ use DI\Container;
 use Jax\Config;
 use Jax\Database;
 use Jax\Jax;
+use Jax\User;
 
 /*
  * Admin login.
@@ -45,6 +46,7 @@ $DB->connect(
 
 $JAX = $container->get(Jax::class);
 $PAGE = $container->get(Page::class);
+$USERCLASS = $container->get(User::class);
 
 $themeElements = [
     'board_name' => $CFG['boardname'],
@@ -80,7 +82,7 @@ if (isset($JAX->p['submit'])) {
         );
     } elseif (is_array($uinfo)) {
         // Check password.
-        $verified_password = (bool) $DB->getUser($uinfo['id'], $password);
+        $verified_password = (bool) $USERCLASS->getUser($uinfo['id'], $password);
 
         if ($uinfo['can_access_acp'] && $verified_password) {
             $_SESSION['auid'] = $uinfo['id'];
