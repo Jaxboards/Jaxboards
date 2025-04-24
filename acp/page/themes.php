@@ -42,7 +42,7 @@ use const PHP_EOL;
 
 final readonly class Themes
 {
-    const WRAPPERS_PATH = BOARDPATH . 'Wrappers/';
+    public const WRAPPERS_PATH = BOARDPATH . 'Wrappers/';
 
     public function __construct(
         private Config $config,

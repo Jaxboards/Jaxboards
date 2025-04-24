@@ -161,7 +161,7 @@ final class Post
                     'uid' => $uid,
                 ],
             );
-            $id = $this->database->insert_id(1);
+            $id = $this->database->insert_id();
         } else {
             $result = $this->database->safeselect(
                 ['id'],
@@ -765,7 +765,7 @@ onclick="this.form.submitButton=this"/></div>
                         'views' => 0,
                     ],
                 );
-                $tid = $this->database->insert_id(1);
+                $tid = $this->database->insert_id();
             }
 
             $newtopic = true;
@@ -839,7 +839,7 @@ onclick="this.form.submitButton=this"/></div>
             ],
         );
 
-        $pid = $this->database->insert_id(1);
+        $pid = $this->database->insert_id();
         // Set op.
         if ($newtopic) {
             $this->database->safeupdate(

@@ -74,6 +74,10 @@ use const PHP_EOL;
  */
 final class Page
 {
+    /**
+     * @var array<string, string>
+     */
+    public $meta;
     private $metadefs = [];
 
     private $debuginfo = [];
@@ -362,7 +366,8 @@ final class Page
         return $page ?: '';
     }
 
-    public function addmeta(string $meta, string $content) {
+    public function addmeta(string $meta, string $content): void
+    {
         $this->meta[$meta] = $content;
     }
 
