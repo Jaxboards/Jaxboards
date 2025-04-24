@@ -20,7 +20,15 @@ final class User
 
     public function get(string $property)
     {
-        return $this->userData && array_key_exists($property, $this->userData)
+        if (!$this->userData) {
+            // TODO: default other property values for guests
+            return match($property) {
+                'group_id' => 3,
+                default => null
+            };
+        }
+
+        return array_key_exists($property, $this->userData)
             ? $this->userData[$property]
             : null;
     }

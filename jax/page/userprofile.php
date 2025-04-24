@@ -259,7 +259,7 @@ final class UserProfile
                     $id,
                 );
                 while ($f = $this->database->arow($result)) {
-                    $p = $this->jax->parseperms($f['perms'], $this->user->get('group_id') ?? 3);
+                    $p = $this->jax->parseperms($f['perms'], $this->user->get('group_id'));
                     if (!$p['read']) {
                         continue;
                     }
@@ -295,7 +295,7 @@ final class UserProfile
                     $id,
                 );
                 while ($f = $this->database->arow($result)) {
-                    $p = $this->jax->parseperms($f['perms'], $this->user->get('group_id') ?? 3);
+                    $p = $this->jax->parseperms($f['perms'], $this->user->get('group_id'));
                     if (!$p['read']) {
                         continue;
                     }

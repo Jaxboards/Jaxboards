@@ -225,7 +225,7 @@ final class Topic
         $this->topicdata['subtitle'] = $this->textFormatting->wordfilter($this->topicdata['subtitle']);
         $this->topicdata['fperms'] = $this->jax->parseperms(
             $this->topicdata['fperms'],
-            $this->user->get('group_id') ?? 3,
+            $this->user->get('group_id'),
         );
     }
 

@@ -175,7 +175,7 @@ if (!$PAGE->jsaccess) {
                 'sound_im' => $USER->get('sound_im') ? 1 : 0,
                 'wysiwyg' => $USER->get('wysiwyg') ? 1 : 0,
                 'can_im' => $PERMS['can_im'] ? 1 : 0,
-                'groupid' => $USER->get('group_id') ?? 3,
+                'groupid' => $USER->get('group_id'),
                 'username' => $USER->get('display_name'),
                 'userid' => $USER->get('id') ?? 0,
             ])

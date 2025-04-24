@@ -464,7 +464,7 @@ final class Search
             'forums',
         );
         while ($f = $this->database->arow($result)) {
-            $perms = $this->jax->parseperms($f['perms'], $this->user->get('group_id') ?? 3);
+            $perms = $this->jax->parseperms($f['perms'], $this->user->get('group_id'));
             if (!$perms['read']) {
                 continue;
             }

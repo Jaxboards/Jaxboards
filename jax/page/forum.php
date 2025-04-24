@@ -150,7 +150,7 @@ final class Forum
 
         $fdata['perms'] = $this->jax->parseperms(
             $fdata['perms'],
-            $this->user->get('group_id') ?? 3,
+            $this->user->get('group_id'),
         );
         if (!$fdata['perms']['read']) {
             $this->page->JS('alert', 'no permission');

@@ -267,7 +267,7 @@ final class Post
 
         $fdata['perms'] = $this->jax->parsePerms(
             $fdata['perms'],
-            $this->user->get('group_id') ?? 3,
+            $this->user->get('group_id'),
         );
 
         if ($fdata === []) {
@@ -380,7 +380,7 @@ onclick="this.form.submitButton=this" /></div>
             $tdata['title'] = $this->textFormatting->wordfilter($tdata['title']);
             $tdata['perms'] = $this->jax->parseperms(
                 $tdata['perms'],
-                $this->user->get('group_id') ?? 3,
+                $this->user->get('group_id'),
             );
         }
 
@@ -715,7 +715,7 @@ onclick="this.form.submitButton=this"/></div>
             } else {
                 $fdata['perms'] = $this->jax->parseperms(
                     $fdata['perms'],
-                    $this->user->get('group_id') ?? 3,
+                    $this->user->get('group_id'),
                 );
                 if (!$fdata['perms']['start']) {
                     $e = <<<'EOT'
@@ -814,7 +814,7 @@ onclick="this.form.submitButton=this"/></div>
 
         $fdata['perms'] = $this->jax->parseperms(
             $fdata['perms'],
-            $this->user->get('group_id') ?? 3,
+            $this->user->get('group_id'),
         );
         if (
             !$fdata['perms']['reply']
