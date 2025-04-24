@@ -23,7 +23,7 @@ final class User
         private readonly IPAddress $ipAddress,
     ) {}
 
-    public function get(string $property)
+    public function get(string $property): string|int|null
     {
         if (!$this->userData) {
             // TODO: default other property values for guests
@@ -52,7 +52,7 @@ final class User
         );
     }
 
-    public function getUser($uid = false, $pass = false)
+    public function getUser($uid = false, $pass = false): array|null
     {
         if ($this->userData) {
             return $this->userData;
@@ -159,14 +159,14 @@ final class User
         return $this->userData = $user;
     }
 
-    public function getPerm(string $perm)
+    public function getPerm(string $perm): int|string|null
     {
         $perms = $this->getPerms();
 
         return $perms[$perm] ?? null;
     }
 
-    public function getPerms($groupId = null)
+    public function getPerms($groupId = null): array|null
     {
         static $userPerms = null;
 
