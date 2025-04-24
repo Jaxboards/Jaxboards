@@ -238,7 +238,7 @@ final class Page
                 $this->JSOutput[$k] = $this->session->addSessID($v);
             }
 
-            echo empty($this->JSOutput)
+            echo $this->JSOutput === []
                 ? ''
                 : json_encode($this->JSOutput);
 
