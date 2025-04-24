@@ -279,7 +279,11 @@ final class User
 
     public function isBanned(): bool
     {
-        return $this->get('group_id') === 4 || $this->ipAddress->isBanned();
+        if ($this->get('group_id') === 4) {
+            return true;
+        }
+
+        return $this->ipAddress->isBanned();
     }
 
     public function isGuest(): bool
