@@ -234,7 +234,7 @@ final class User
         $groupId = $this->get('group_id');
 
         if ($permstoparse !== '') {
-            if ($groupId !== false) {
+            if ($groupId) {
                 $unpack = unpack('n*', $permstoparse);
                 $permstoparse = [];
                 $counter = count($unpack);
