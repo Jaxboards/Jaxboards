@@ -21,6 +21,7 @@ use function nl2br;
 use function parse_url;
 use function preg_match;
 use function preg_match_all;
+use function preg_quote;
 use function preg_replace;
 use function preg_replace_callback;
 use function preg_split;
@@ -156,7 +157,7 @@ final class TextFormatting
         }
 
         $text = preg_replace_callback(
-            '@(\s)(' . implode('|', array_map('preg_quote', array_keys($this->emotes))) . ')@',
+            '@(\s)(' . implode('|', array_map(fn(string $emote) => preg_quote($emote, '@'), array_keys($this->emotes))) . ')@',
             $this->emotecallback(...),
             ' ' . $text,
             $emoticonLimit,
