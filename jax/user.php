@@ -32,12 +32,15 @@ final class User
 
     public function set(string $property, $value): void
     {
-        $this->userData[$property] = $value;
+        $this->setBulk([ $property => $value ]);
+    }
+
+    public function setBulk(array $fields): void
+    {
+        $this->userData = array_merge($this->userData, $fields);
         $this->database->safeupdate(
             'members',
-            [
-                $property => $value,
-            ],
+            $fields,
             ' WHERE `id`=?',
             $this->get('id'),
         );

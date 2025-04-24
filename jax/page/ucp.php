@@ -157,8 +157,6 @@ final class UCP
     {
         $e = '';
 
-        $ucpnotepad = $this->user->get('ucpnotepad');
-
         if ($this->page->jsupdate && empty($this->jax->p)) {
             return;
         }
@@ -171,17 +169,11 @@ final class UCP
                 $e = 'The UCP notepad cannot exceed 2000 characters.';
                 $this->page->JS('error', $e);
             } else {
-                $this->database->safeupdate(
-                    'members',
-                    [
-                        'ucpnotepad' => $this->jax->p['ucpnotepad'],
-                    ],
-                    'WHERE `id`=?',
-                    $this->user->get('id'),
-                );
-                $ucpnotepad = $this->jax->p['ucpnotepad'];
+                $this->user->set('ucpnotepad', $this->jax->p['ucpnotepad']);
             }
         }
+
+        $ucpnotepad = $this->user->get('ucpnotepad');
 
         $this->ucppage = ($e !== '' && $e !== '0' ? $this->page->meta('error', $e) : '') . $this->page->meta(
             'ucp-index',
@@ -238,12 +230,7 @@ final class UCP
                     : 0;
             }
 
-            $this->database->safeupdate(
-                'members',
-                $update,
-                'WHERE `id`=?',
-                $this->user->get('id'),
-            );
+            $this->user->setBulk($update);
 
             foreach ($variables as $v) {
                 $this->page->JS(
@@ -286,14 +273,7 @@ final class UCP
         $sig = $this->user->get('sig');
         if (isset($this->jax->p['changesig'])) {
             $sig = $this->textFormatting->linkify($this->jax->p['changesig']);
-            $this->database->safeupdate(
-                'members',
-                [
-                    'sig' => $sig,
-                ],
-                'WHERE `id`=?',
-                $this->user->get('id'),
-            );
+            $this->user->set('sig', $sig);
             $update = true;
         }
 
@@ -342,14 +322,7 @@ final class UCP
 
             if ($e === '' || $e === '0') {
                 $hashpass = password_hash((string) $this->jax->p['newpass1'], PASSWORD_DEFAULT);
-                $this->database->safeupdate(
-                    'members',
-                    [
-                        'pass' => $hashpass,
-                    ],
-                    'WHERE `id`=?',
-                    $this->user->get('id'),
-                );
+                $this->user->set('pass', $hashpass);
                 $this->ucppage = <<<'EOT'
                     Password changed.
                         <br><br>
@@ -384,16 +357,11 @@ final class UCP
             if ($e !== '' && $e !== '0') {
                 $this->page->JS('alert', $e);
             } else {
-                $this->database->safeupdate(
-                    'members',
-                    [
-                        'email' => $this->jax->p['email'],
-                        'email_settings' => ($this->jax->p['notifications'] ?? false ? 2 : 0)
-                        + ($this->jax->p['adminemails'] ?? false ? 1 : 0),
-                    ],
-                    'WHERE `id`=?',
-                    $this->user->get('id'),
-                );
+                $this->setBulk([
+                    'email' => $this->jax->p['email'],
+                    'email_settings' => ($this->jax->p['notifications'] ?? false ? 2 : 0)
+                    + ($this->jax->p['adminemails'] ?? false ? 1 : 0),
+                ]);
                 $this->ucppage = 'Email settings updated.'
                     . '<br><br><a href="?act=ucp&what=email">Back</a>';
             }
@@ -435,12 +403,7 @@ final class UCP
             ) {
                 $e = 'Please enter a valid image URL.';
             } else {
-                $this->database->safeupdate(
-                    'members',
-                    ['avatar' => $this->jax->p['changedava']],
-                    'WHERE `id`=?',
-                    $this->user->get('id'),
-                );
+                $this->user->set('avatar', $this->jax->p['changedava']);
                 $avatar = $this->jax->p['changedava'];
             }
 
@@ -645,12 +608,7 @@ final class UCP
                     );
                 }
 
-                $this->database->safeupdate(
-                    'members',
-                    $data,
-                    'WHERE `id`=?',
-                    $this->user->get('id'),
-                );
+                $this->user->setBulk($data);
                 $this->ucppage = 'Profile successfully updated.<br>'
                     . '<br><a href="?act=ucp&what=profile">Back</a>';
                 $this->showucp();
@@ -765,18 +723,13 @@ final class UCP
                 $skinId = $this->jax->b['skin'];
 
                 $this->database->disposeresult($result);
-                $this->database->safeupdate(
-                    'members',
-                    [
-                        'nowordfilter' => isset($this->jax->p['usewordfilter'])
-                        && $this->jax->p['usewordfilter'] ? 0 : 1,
-                        'skin_id' => $skinId,
-                        'wysiwyg' => isset($this->jax->p['wysiwyg'])
-                        && $this->jax->p['wysiwyg'] ? 1 : 0,
-                    ],
-                    'WHERE `id`=?',
-                    $this->user->get('id'),
-                );
+                $this->user->setBulk([
+                    'nowordfilter' => isset($this->jax->p['usewordfilter'])
+                    && $this->jax->p['usewordfilter'] ? 0 : 1,
+                    'skin_id' => $skinId,
+                    'wysiwyg' => isset($this->jax->p['wysiwyg'])
+                    && $this->jax->p['wysiwyg'] ? 1 : 0,
+                ]);
 
             }
 
