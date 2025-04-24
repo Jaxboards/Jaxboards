@@ -229,7 +229,7 @@ final class User
         return $userPerms;
     }
 
-    public function parseForumPerms(string $permstoparse): array
+    public function parseForumPerms(string|int $permstoparse): array
     {
         if ($permstoparse === '') {
             return [
@@ -242,10 +242,9 @@ final class User
             ];
         }
 
-        $permFlags = 0;
 
         $groupId = $this->get('group_id');
-        if ($groupId) {
+        if ($groupId && is_string($permstoparse)) {
             $unpack = unpack('n*', $permstoparse);
             $parsedPerms = [];
             $counter = count($unpack);
@@ -253,17 +252,19 @@ final class User
                 $parsedPerms[$unpack[$x]] = $unpack[$x + 1];
             }
 
-            $permFlags = $parsedPerms[$groupId] ?? null;
+            $permstoparse = $parsedPerms[$groupId] ?? 0;
         }
 
-        return [
-            'poll' => $permFlags & 32,
-            'read' => $permFlags & 8,
-            'reply' => $permFlags & 2,
-            'start' => $permFlags & 4,
-            'upload' => $permFlags & 1,
-            'view' => $permFlags & 16,
+        $ret = [
+            'poll' => $permstoparse & 32,
+            'read' => $permstoparse & 8,
+            'reply' => $permstoparse & 2,
+            'start' => $permstoparse & 4,
+            'upload' => $permstoparse & 1,
+            'view' => $permstoparse & 16,
         ];
+
+        return $ret;
     }
 
     public function isAdmin(): bool
