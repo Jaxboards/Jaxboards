@@ -11,6 +11,7 @@ use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
 use Jax\Session;
+use Jax\TextFormatting;
 
 use function base64_encode;
 use function count;

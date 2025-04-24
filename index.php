@@ -106,7 +106,7 @@ if (!isset($_SESSION['uid']) && isset($JAX->c['utoken'])) {
     }
 }
 
-$PERMS = $USER ? $DB->getPerms($USER['group_id']) : [];
+$PERMS = $DB->getPerms($USER['group_id'] ?? 3);
 
 // Fix ip if necessary.
 if ($USER && $SESS->ip && $SESS->ip !== $USER['ip']) {
