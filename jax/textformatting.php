@@ -53,8 +53,8 @@ final class TextFormatting
         private readonly Database $database,
     ) {
         // Preload custom rules and emojis
-        $this->getCustomRules();
         $this->getEmoteRules();
+        $this->getCustomRules();
     }
 
     public function getCustomRules(): void
@@ -93,19 +93,18 @@ final class TextFormatting
 
         // Load emoticon pack.
         $emotepack = $this->config->getSetting('emotepack');
+
         if ($emotepack) {
-            $emotepack = 'emoticons/' . $emotepack;
+            $rulesPath = JAXBOARDS_ROOT . '/emoticons/' . $emotepack . '/rules.php';
 
-            $emotePath = __DIR__ . '/../../' . $emotepack . '/rules.php';
-
-            if (file_exists($emotePath)) {
-                require_once $emotePath;
+            if (file_exists($rulesPath)) {
+                require_once $rulesPath;
                 if (!$rules) {
                     exit('Emoticon ruleset corrupted!');
                 }
 
                 foreach ($rules as $emote => $path) {
-                    $emotes[$emote] = $emotepack . $path;
+                    $emotes[$emote] = 'emoticons/'. $emotepack . '/' . $path;
                 }
             }
         }
@@ -156,7 +155,7 @@ final class TextFormatting
         }
 
         $text = preg_replace_callback(
-            '@(\s)(' . implode('|', array_keys($this->emotes)) . ')@',
+            '@(\s)(' . implode('|', array_map('preg_quote', array_keys($this->emotes))) . ')@',
             $this->emotecallback(...),
             ' ' . $text,
             $emoticonLimit,
