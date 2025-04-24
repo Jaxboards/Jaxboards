@@ -20,7 +20,6 @@ use function nl2br;
 use function parse_url;
 use function preg_match;
 use function preg_match_all;
-use function preg_quote;
 use function preg_replace;
 use function preg_replace_callback;
 use function preg_split;
@@ -58,7 +57,7 @@ final class TextFormatting
         $this->getEmoteRules();
     }
 
-    public function getCustomRules()
+    public function getCustomRules(): void
     {
         $result = $this->database->safeselect(
             <<<'EOT'
@@ -69,19 +68,23 @@ final class TextFormatting
             '',
         );
         while ($rule = $this->database->arow($result)) {
-            switch($rule['type']) {
+            switch ($rule['type']) {
                 case 'emote':
                     $this->emotes[$rule['needle']] = $rule['replacement'];
+
                     break;
+
                 case 'badword':
                     $this->badwords[$rule['needle']] = $rule['replacement'];
+
                     break;
 
             }
         }
     }
 
-    function getEmoteRules() {
+    public function getEmoteRules()
+    {
         if ($this->emotes) {
             return $this->emotes;
         }
@@ -108,6 +111,8 @@ final class TextFormatting
         }
 
         $this->emotes = $emotes;
+
+        return null;
     }
 
     public function linkify(string $text): ?string
@@ -145,7 +150,7 @@ final class TextFormatting
         return str_replace('{if', '&#123;if', htmlspecialchars($text, ENT_QUOTES));
     }
 
-    public function emotes(string $text)
+    public function emotes(string $text): string
     {
         $emoticonLimit = 15;
         if (!$this->emotes) {
@@ -165,10 +170,11 @@ final class TextFormatting
     public function emotecallback(array $match): string
     {
         [, $space, $emoteText] = $match;
+
         return $space . '<img src="' . $this->emotes[$emoteText] . '" alt="' . $this->blockhtml($emoteText) . '"/>';
     }
 
-    public function wordfilter(string $text)
+    public function wordfilter(string $text): string
     {
         global $USER;
         if ($USER && $USER['nowordfilter']) {
@@ -192,7 +198,7 @@ final class TextFormatting
         return $codes;
     }
 
-    public function finishcodetags(string $text, array $codes, bool $returnbb = false)
+    public function finishcodetags(string $text, array $codes, bool $returnbb = false): array|string
     {
         foreach ($codes[0] as $key => $value) {
             if (!$returnbb) {
@@ -219,7 +225,7 @@ final class TextFormatting
 
     public function textonly(string $text): ?string
     {
-        while (($cleaned = preg_replace('@\[(\w+)[^\]]*\]([\w\W]*)\[/\1\]@U', '$2', $text)) !== $text) {
+        while (($cleaned = preg_replace('@\[(\w+)[^\]]*\]([\w\W]*)\[/\1\]@U', '$2', (string) $text)) !== $text) {
             $text = $cleaned;
         }
 
@@ -255,7 +261,7 @@ final class TextFormatting
 
         $keys = array_keys($bbcodes);
         $values = array_values($bbcodes);
-        while (($tmp = preg_replace($keys, $values, $text)) !== $text) {
+        while (($tmp = preg_replace($keys, $values, (string) $text)) !== $text) {
             $text = $tmp;
         }
 
@@ -264,13 +270,13 @@ final class TextFormatting
         }
 
         // UL/LI tags.
-        while ($text !== ($tmp = preg_replace_callback('@\[(ul|ol)\](.*)\[/\1\]@Usi', $this->bbcode_licallback(...), $text))) {
+        while ($text !== ($tmp = preg_replace_callback('@\[(ul|ol)\](.*)\[/\1\]@Usi', $this->bbcode_licallback(...), (string) $text))) {
             $text = $tmp;
         }
 
         // Size code (actually needs a callback simply because of
         // the variability of the arguments).
-        while ($text !== ($tmp = preg_replace_callback('@\[size=([0-4]?\d)(px|pt|em|)\](.*)\[/size\]@Usi', $this->bbcode_sizecallback(...), $text))) {
+        while ($text !== ($tmp = preg_replace_callback('@\[size=([0-4]?\d)(px|pt|em|)\](.*)\[/size\]@Usi', $this->bbcode_sizecallback(...), (string) $text))) {
             $text = $tmp;
         }
 
@@ -278,9 +284,9 @@ final class TextFormatting
         for (
             $nestLimit = 0; $nestLimit < 10 && preg_match(
                 '@\[quote(?>=([^\]]+))?\](.*?)\[/quote\]\r?\n?@is',
-                $text,
+                (string) $text,
                 $match,
-            ); $nestLimit++
+            ); ++$nestLimit
         ) {
             $text = str_replace(
                 $match[0],
@@ -294,7 +300,7 @@ final class TextFormatting
         return preg_replace_callback(
             '@\[video\](.*)\[/video\]@Ui',
             $this->bbcode_videocallback(...),
-            $text,
+            (string) $text,
         );
     }
 
@@ -307,7 +313,7 @@ final class TextFormatting
     public function bbcode_videocallback(array $match): string
     {
 
-        if (str_contains($match[1], 'youtube.com')) {
+        if (str_contains((string) $match[1], 'youtube.com')) {
             preg_match('@v=([\w-]+)@', (string) $match[1], $youtubeMatches);
             $embedUrl = "https://www.youtube.com/embed/{$youtubeMatches[1]}";
 
