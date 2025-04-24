@@ -8,6 +8,7 @@ use Jax\Config;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
+use Jax\TextFormatting;
 
 use function array_pop;
 use function gmdate;
@@ -48,6 +49,7 @@ final class UCP
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly Page $page,
+        private readonly TextFormatting $textFormatting,
     ) {
         $this->page->loadmeta('ucp');
     }
@@ -185,7 +187,7 @@ final class UCP
             $USER['display_name'],
             $this->jax->pick($USER['avatar'], $this->page->meta('default-avatar')),
             trim((string) $USER['ucpnotepad']) !== '' && trim((string) $USER['ucpnotepad']) !== '0'
-            ? $this->jax->blockhtml($USER['ucpnotepad']) : 'Personal notes go here.',
+            ? $this->textFormatting->blockhtml($USER['ucpnotepad']) : 'Personal notes go here.',
         );
         $this->showucp();
     }
@@ -284,7 +286,7 @@ final class UCP
         $update = false;
         $sig = $USER['sig'];
         if (isset($this->jax->p['changesig'])) {
-            $sig = $this->jax->linkify($this->jax->p['changesig']);
+            $sig = $this->textFormatting->linkify($this->jax->p['changesig']);
             $this->database->safeupdate(
                 'members',
                 [
@@ -300,8 +302,8 @@ final class UCP
             'ucp-sig-settings',
             $this->getlocationforform(),
             $sig !== ''
-            ? $this->jax->theworks($sig) : '( none )',
-            $this->jax->blockhtml($sig),
+            ? $this->textFormatting->theworks($sig) : '( none )',
+            $this->textFormatting->blockhtml($sig),
         );
         if (!$update) {
             return;
@@ -455,7 +457,7 @@ final class UCP
             . $this->getlocationforform()
             . ($e !== '' && $e !== '0' ? $this->page->error($e) : '')
             . '<input type="text" name="changedava" title="Your avatar" value="'
-            . $this->jax->blockhtml($USER['avatar']) . '" />
+            . $this->textFormatting->blockhtml($USER['avatar']) . '" />
             <input type="submit" value="Edit" />
             </form>';
         if (!$update) {
@@ -621,7 +623,7 @@ final class UCP
                     $error = "Invalid characters in {$v}";
                 }
 
-                $data[$k] = $this->jax->blockhtml($data[$k]);
+                $data[$k] = $this->textFormatting->blockhtml($data[$k]);
                 $length = $k === 'display_name'
                     ? 30
                     : ($k === 'location' ? 100 : 50);
@@ -937,7 +939,7 @@ final class UCP
                 $message['name'],
             ),
             $this->jax->date($message['date']),
-            $this->jax->theworks($message['message']),
+            $this->textFormatting->theworks($message['message']),
             $this->jax->pick($message['avatar'], $this->page->meta('default-avatar')),
             $message['usertitle'],
             $this->jax->hiddenFormFields(
@@ -1160,7 +1162,7 @@ final class UCP
                         'from' => $USER['id'],
                         'message' => $this->jax->p['message'],
                         'read' => 0,
-                        'title' => $this->jax->blockhtml($this->jax->p['title']),
+                        'title' => $this->textFormatting->blockhtml($this->jax->p['title']),
                         'to' => $udata['id'],
                     ],
                 );

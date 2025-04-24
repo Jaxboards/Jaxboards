@@ -10,6 +10,7 @@ use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
 use Jax\Session;
+use Jax\TextFormatting;
 
 use function array_pop;
 use function ceil;
@@ -34,6 +35,7 @@ final class Shoutbox
         private readonly IPAddress $ipAddress,
         private readonly Page $page,
         private readonly Session $session,
+        private readonly TextFormatting $textFormatting,
     ) {
         $this->page->loadmeta('shoutbox');
     }
@@ -108,7 +110,7 @@ final class Shoutbox
 
     public function formatshout($row): ?string
     {
-        $shout = $this->jax->theworks($row['shout'], ['minimalbb' => true]);
+        $shout = $this->textFormatting->theworks($row['shout'], ['minimalbb' => true]);
         $user = $row['uid'] ? $this->page->meta(
             'user-link',
             $row['uid'],
@@ -372,7 +374,7 @@ final class Shoutbox
         $this->session->act();
         $e = '';
         $shout = $this->jax->p['shoutbox_shout'];
-        $shout = $this->jax->linkify($shout);
+        $shout = $this->textFormatting->linkify($shout);
 
         $perms = $this->database->getPerms();
         if (!$perms['can_shout']) {

@@ -8,6 +8,7 @@ use ACP\Page;
 use ACP\Page\Forums\RecountStats;
 use Jax\Database;
 use Jax\Jax;
+use Jax\TextFormatting;
 
 use function array_keys;
 use function array_pop;
@@ -39,6 +40,7 @@ final readonly class Forums
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly RecountStats $recountStats,
+        private readonly TextFormatting $textFormatting,
     ) {}
 
     /**
@@ -712,13 +714,13 @@ final readonly class Forums
         $page .= $this->page->parseTemplate(
             'forums/create-forum.html',
             [
-                'description' => isset($fdata['subtitle']) ? $this->jax->blockhtml($fdata['subtitle']) : '',
+                'description' => isset($fdata['subtitle']) ? $this->textFormatting->blockhtml($fdata['subtitle']) : '',
                 'no_count' => isset($fdata['nocount']) && $fdata['nocount']
                 ? '' : ' checked="checked"',
                 'order_by_options' => $orderByOptions,
-                'redirect_url' => isset($fdata['redirect']) ? $this->jax->blockhtml($fdata['redirect']) : '',
+                'redirect_url' => isset($fdata['redirect']) ? $this->textFormatting->blockhtml($fdata['redirect']) : '',
                 'subforum_options' => $subforumOptions,
-                'title' => isset($fdata['title']) ? $this->jax->blockhtml($fdata['title']) : '',
+                'title' => isset($fdata['title']) ? $this->textFormatting->blockhtml($fdata['title']) : '',
                 'trashcan' => isset($fdata['trashcan']) && $fdata['trashcan']
                 ? ' checked="checked"' : '',
             ],
@@ -764,7 +766,7 @@ final readonly class Forums
 
         $this->page->addContentBox(
             ($fid ? 'Edit' : 'Create') . ' Forum'
-            . ($fid ? ' - ' . $this->jax->blockhtml($fdata['title']) : ''),
+            . ($fid ? ' - ' . $this->textFormatting->blockhtml($fdata['title']) : ''),
             $page,
         );
         $this->page->addContentBox('Moderators', $moderators);
@@ -982,7 +984,7 @@ final readonly class Forums
 
         $categoryTitle = '';
         if (isset($cdata['title'])) {
-            $categoryTitle = $this->jax->blockhtml($cdata['title']);
+            $categoryTitle = $this->textFormatting->blockhtml($cdata['title']);
         }
 
         $this->page->addContentBox(

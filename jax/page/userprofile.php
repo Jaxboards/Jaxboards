@@ -10,6 +10,7 @@ use Jax\Jax;
 use Jax\Page;
 use Jax\RSSFeed;
 use Jax\Session;
+use Jax\TextFormatting;
 
 use function explode;
 use function gmdate;
@@ -44,6 +45,7 @@ final class UserProfile
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly Session $session,
+        private readonly TextFormatting $textFormatting,
     ) {
         $this->page->loadmeta('userprofile');
     }
@@ -107,7 +109,7 @@ final class UserProfile
 
             $contactdetails .= '<a class="' . $k . ' contact" title="' . $k . ' contact" href="' . sprintf(
                 $v,
-                $this->jax->blockhtml($ud['contact_' . $k]),
+                $this->textFormatting->blockhtml($ud['contact_' . $k]),
             ) . '">&nbsp;</a>';
         }
 
@@ -267,7 +269,7 @@ final class UserProfile
                         $f['title'],
                         $f['pid'],
                         $this->jax->date($f['date']),
-                        $this->jax->theworks($f['post']),
+                        $this->textFormatting->theworks($f['post']),
                     );
                 }
 
@@ -302,7 +304,7 @@ final class UserProfile
                         $f['tid'],
                         $f['title'],
                         $this->jax->date($f['date']),
-                        $this->jax->theworks($f['post']),
+                        $this->textFormatting->theworks($f['post']),
                     );
                 }
 
@@ -315,8 +317,8 @@ final class UserProfile
             case 'about':
                 $pfbox = $this->page->meta(
                     'userprofile-about',
-                    $this->jax->theworks($udata['about']),
-                    $this->jax->theworks($udata['sig']),
+                    $this->textFormatting->theworks($udata['about']),
+                    $this->textFormatting->theworks($udata['sig']),
                 );
 
                 break;
@@ -462,7 +464,7 @@ final class UserProfile
                             $this->page->meta('default-avatar'),
                         ),
                         $this->jax->date($f['date']),
-                        $this->jax->theworks($f['comment'])
+                        $this->textFormatting->theworks($f['comment'])
                         . ($PERMS['can_delete_comments']
                         && $f['from'] === $USER['id']
                         || $PERMS['can_moderate']
@@ -681,24 +683,24 @@ final class UserProfile
 
         return match ($activity['type']) {
             'profile_comment' => [
-                'link' => $this->jax->blockhtml('?act=vu' . $activity['aff_id']),
+                'link' => $this->textFormatting->blockhtml('?act=vu' . $activity['aff_id']),
                 'text' => $activity['name'] . ' commented on '
                 . $activity['aff_name'] . "'s profile",
             ],
             'new_post' => [
-                'link' => $this->jax->blockhtml('?act=vt' . $activity['tid'] . '&findpost=' . $activity['pid']),
+                'link' => $this->textFormatting->blockhtml('?act=vt' . $activity['tid'] . '&findpost=' . $activity['pid']),
                 'text' => $activity['name'] . ' posted in topic ' . $activity['arg1'],
             ],
             'new_topic' => [
-                'link' => $this->jax->blockhtml('?act=vt' . $activity['tid']),
+                'link' => $this->textFormatting->blockhtml('?act=vt' . $activity['tid']),
                 'text' => $activity['name'] . ' created new topic ' . $activity['arg1'],
             ],
             'profile_name_change' => [
-                'link' => $this->jax->blockhtml('?act=vu' . $activity['uid']),
+                'link' => $this->textFormatting->blockhtml('?act=vu' . $activity['uid']),
                 'text' => $activity['arg1'] . ' is now known as ' . $activity['arg2'],
             ],
             'buddy_add' => [
-                'link' => $this->jax->blockhtml('?act=vu' . $activity['uid']),
+                'link' => $this->textFormatting->blockhtml('?act=vu' . $activity['uid']),
                 'text' => $activity['name'] . ' made friends with ' . $activity['aff_name'],
             ],
         };

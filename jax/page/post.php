@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\Config;
+use Jax\Database;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
 use Jax\Session;
+use Jax\TextFormatting;
 
 use function array_pop;
 use function count;
@@ -59,8 +61,9 @@ final class Post
         private readonly Page $page,
         private readonly IPAddress $ipAddress,
         private readonly Session $session,
+        private readonly TextFormatting $textFormatting,
     ) {
-        $this->page->metadefs['post-preview'] = $this->page->meta('box', '', 'Post Preview', '%s');
+        $this->page->addmeta('post-preview', $this->page->meta('box', '', 'Post Preview', '%s'));
     }
 
     public function route(): void
@@ -78,9 +81,9 @@ final class Post
         if ($this->postdata) {
             // Linkify stuff before sending it.
             $this->postdata = str_replace("\t", '    ', $this->postdata);
-            $codes = $this->jax->startcodetags($this->postdata);
-            $this->postdata = $this->jax->linkify($this->postdata);
-            $this->postdata = $this->jax->finishcodetags($this->postdata, $codes, true);
+            $codes = $this->textFormatting->startcodetags($this->postdata);
+            $this->postdata = $this->textFormatting->linkify($this->postdata);
+            $this->postdata = $this->textFormatting->finishcodetags($this->postdata, $codes, true);
 
             // This is aliases [youtube] to [video] but it probably should not be here
             $this->postdata = str_replace('youtube]', 'video]', $this->postdata);
@@ -178,7 +181,7 @@ final class Post
     {
         $post = $this->postdata;
         if (trim((string) $post) !== '' && trim((string) $post) !== '0') {
-            $post = $this->jax->theworks($post);
+            $post = $this->textFormatting->theworks($post);
             $post = $this->page->meta('post-preview', $post);
             $this->postpreview = $post;
         }
@@ -303,7 +306,7 @@ final class Post
     id="postdata"
     title="Type your post here"
     class="bbcode-editor"
-    >' . $this->jax->blockhtml($postdata) . '</textarea>
+    >' . $this->textFormatting->blockhtml($postdata) . '</textarea>
 <br><div class="postoptions">
   ' . ($fdata['perms']['poll'] ? '<label class="addpoll" for="addpoll">Add a
 Poll</label> <select name="poll_type" title="Add a poll"  onchange="document.querySelector(\'#polloptions\').'
@@ -374,7 +377,7 @@ onclick="this.form.submitButton=this" /></div>
                 );
             }
 
-            $tdata['title'] = $this->jax->wordfilter($tdata['title']);
+            $tdata['title'] = $this->textFormatting->wordfilter($tdata['title']);
             $tdata['perms'] = $this->jax->parseperms(
                 $tdata['perms'],
                 $USER ? $USER['group_id'] : 3,
@@ -382,7 +385,7 @@ onclick="this.form.submitButton=this" /></div>
         }
 
         $page .= '<div id="post-preview">' . $this->postpreview . '</div>';
-        $postdata = $this->jax->blockhtml($this->postdata);
+        $postdata = $this->textFormatting->blockhtml($this->postdata);
         $varsarray = [
             'act' => 'post',
             'how' => 'fullpost',
@@ -575,13 +578,13 @@ onclick="this.form.submitButton=this"/></div>
                     $this->database->safeupdate(
                         'topics',
                         [
-                            'subtitle' => $this->jax->blockhtml($this->jax->p['tdesc']),
+                            'subtitle' => $this->textFormatting->blockhtml($this->jax->p['tdesc']),
                             'summary' => mb_substr(
                                 (string) preg_replace(
                                     '@\s+@',
                                     ' ',
-                                    (string) $this->jax->wordfilter(
-                                        $this->jax->blockhtml(
+                                    (string) $this->textFormatting->wordfilter(
+                                        $this->textFormatting->blockhtml(
                                             $this->jax->textonly(
                                                 $this->postdata,
                                             ),
@@ -591,7 +594,7 @@ onclick="this.form.submitButton=this"/></div>
                                 0,
                                 50,
                             ),
-                            'title' => $this->jax->blockhtml($this->jax->p['ttitle']),
+                            'title' => $this->textFormatting->blockhtml($this->jax->p['ttitle']),
                         ],
                         'WHERE `id`=?',
                         $tid,
@@ -624,7 +627,7 @@ onclick="this.form.submitButton=this"/></div>
         $this->page->JS(
             'update',
             "#pid_{$pid} .post_content",
-            $this->jax->theworks($this->postdata),
+            $this->textFormatting->theworks($this->postdata),
         );
         $this->page->JS('softurl');
 
@@ -683,7 +686,7 @@ onclick="this.form.submitButton=this"/></div>
                         continue;
                     }
 
-                    $pollchoices[] = $this->jax->blockhtml($v);
+                    $pollchoices[] = $this->textFormatting->blockhtml($v);
                 }
 
                 if (trim((string) $this->jax->p['pollq']) === '') {
@@ -740,16 +743,16 @@ onclick="this.form.submitButton=this"/></div>
                             ? json_encode($pollchoices)
                             : '',
                         'poll_q' => isset($this->jax->p['pollq'])
-                            ? $this->jax->blockhtml($this->jax->p['pollq'])
+                            ? $this->textFormatting->blockhtml($this->jax->p['pollq'])
                             : '',
                         'poll_type' => $this->jax->p['poll_type'] ?? '',
                         'replies' => 0,
-                        'subtitle' => $this->jax->blockhtml($this->jax->p['tdesc']),
+                        'subtitle' => $this->textFormatting->blockhtml($this->jax->p['tdesc']),
                         'summary' => mb_substr(
                             (string) preg_replace(
                                 '@\s+@',
                                 ' ',
-                                $this->jax->blockhtml(
+                                $this->textFormatting->blockhtml(
                                     $this->jax->textonly(
                                         $this->postdata,
                                     ),
@@ -758,7 +761,7 @@ onclick="this.form.submitButton=this"/></div>
                             0,
                             50,
                         ),
-                        'title' => $this->jax->blockhtml($this->jax->p['ttitle']),
+                        'title' => $this->textFormatting->blockhtml($this->jax->p['ttitle']),
                         'views' => 0,
                     ],
                 );

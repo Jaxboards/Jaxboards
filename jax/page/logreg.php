@@ -49,6 +49,7 @@ final class LogReg
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly Session $session,
+        private readonly TextFormatting $textFormatting,
     ) {
         $this->page->loadmeta('logreg');
     }
@@ -123,7 +124,7 @@ final class LogReg
             $badNameChars = $this->config->getSetting('badnamechars');
             if (
                 ($badNameChars && preg_match($badNameChars, $name))
-                || $this->jax->blockhtml($name) !== $name
+                || $this->textFormatting->blockhtml($name) !== $name
             ) {
                 throw new Exception('Invalid characters in username!');
             }
@@ -145,8 +146,8 @@ final class LogReg
             }
 
             // Are they attempting to use an existing username/display name?
-            $dispname = $this->jax->blockhtml($dispname);
-            $name = $this->jax->blockhtml($name);
+            $dispname = $this->textFormatting->blockhtml($dispname);
+            $name = $this->textFormatting->blockhtml($name);
             $result = $this->database->safeselect(
                 ['name', 'display_name'],
                 'members',

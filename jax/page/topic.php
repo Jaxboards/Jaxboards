@@ -11,6 +11,7 @@ use Jax\Jax;
 use Jax\Page;
 use Jax\RSSFeed;
 use Jax\Session;
+use Jax\TextFormatting;
 
 use function array_diff;
 use function array_flip;
@@ -72,6 +73,7 @@ final class Topic
         private readonly IPAddress $ipAddress,
         private readonly Page $page,
         private readonly Session $session,
+        private readonly TextFormatting $textFormatting,
     ) {
         $this->page->loadmeta('topic');
     }
@@ -218,8 +220,8 @@ final class Topic
         $this->topicdata = $this->database->arow($result);
         $this->database->disposeresult($result);
 
-        $this->topicdata['topic_title'] = $this->jax->wordfilter($this->topicdata['topic_title']);
-        $this->topicdata['subtitle'] = $this->jax->wordfilter($this->topicdata['subtitle']);
+        $this->topicdata['topic_title'] = $this->textFormatting->wordfilter($this->topicdata['topic_title']);
+        $this->topicdata['subtitle'] = $this->textFormatting->wordfilter($this->topicdata['subtitle']);
         $this->topicdata['fperms'] = $this->jax->parseperms(
             $this->topicdata['fperms'],
             $USER ? $USER['group_id'] : 3,
@@ -520,11 +522,11 @@ final class Topic
                 'content' => $this->page->meta(
                     'topic-reply-form',
                     $tid,
-                    $this->jax->blockhtml($prefilled),
+                    $this->textFormatting->blockhtml($prefilled),
                 ),
                 'id' => 'qreply',
                 'resize' => 'textarea',
-                'title' => $this->jax->wordfilter($tdata['title']),
+                'title' => $this->textFormatting->wordfilter($tdata['title']),
             ],
         );
         $this->page->JS('updateqreply', '');
@@ -681,7 +683,7 @@ final class Topic
 
             $postt = $post['post'];
 
-            $postt = $this->jax->theworks($postt);
+            $postt = $this->textFormatting->theworks($postt);
 
             // Post rating content goes here.
             $postrating = '';
@@ -780,7 +782,7 @@ final class Topic
                 . $this->page->meta('topic-perma-button') . '</a>',
                 $postt,
                 isset($post['sig']) && $post['sig']
-                    ? $this->jax->theworks($post['sig'])
+                    ? $this->textFormatting->theworks($post['sig'])
                     : '',
                 $post['auth_id'],
                 $post['edit_date'] ? $this->page->meta(
@@ -1212,13 +1214,13 @@ final class Topic
                 $hiddenfields,
                 $topic['title'],
                 $topic['subtitle'],
-                $this->jax->blockhtml($post['post']),
+                $this->textFormatting->blockhtml($post['post']),
             );
         } else {
             $form = $this->page->meta(
                 'topic-qedit-post',
                 $hiddenfields,
-                $this->jax->blockhtml($post['post']),
+                $this->textFormatting->blockhtml($post['post']),
                 $pid,
             );
         }
@@ -1457,7 +1459,7 @@ final class Topic
         while ($post = $this->database->arow($result)) {
             $feed->additem(
                 [
-                    'description' => $this->jax->blockhtml($this->jax->theworks($post['post'])),
+                    'description' => $this->textFormatting->blockhtml($this->textFormatting->theworks($post['post'])),
                     'guid' => $post['id'],
                     'link' => "{$link}?act=vt{$tid}&amp;findpost={$post['id']}",
                     'pubDate' => gmdate('r', $post['date']),

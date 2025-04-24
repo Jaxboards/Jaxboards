@@ -8,6 +8,7 @@ use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
 use Jax\Session;
+use Jax\TextFormatting;
 
 use function ceil;
 use function explode;
@@ -39,6 +40,7 @@ final class Forum
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly Session $session,
+        private readonly TextFormatting $textFormatting,
     ) {
         $this->page->loadmeta('forum');
     }
@@ -337,9 +339,9 @@ final class Forum
                 'forum-row',
                 $f['id'],
                 // 1
-                $this->jax->wordfilter($f['title']),
+                $this->textFormatting->wordfilter($f['title']),
                 // 2
-                $this->jax->wordfilter($f['subtitle']),
+                $this->textFormatting->wordfilter($f['subtitle']),
                 // 3
                 $this->page->meta('user-link', $f['auth_id'], $f['auth_gid'], $f['auth_name']),
                 // 4

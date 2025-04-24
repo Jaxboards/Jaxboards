@@ -362,6 +362,10 @@ final class Page
         return $page ?: '';
     }
 
+    public function addmeta(string $meta, string $content) {
+        $this->meta[$meta] = $content;
+    }
+
     public function loadmeta($component): void
     {
         $component = mb_strtolower((string) $component);

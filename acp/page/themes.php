@@ -8,6 +8,7 @@ use ACP\Page;
 use Jax\Config;
 use Jax\Database;
 use Jax\Jax;
+use Jax\TextFormatting;
 
 use function array_key_exists;
 use function closedir;
@@ -39,15 +40,16 @@ use function unlink;
 use const PATHINFO_FILENAME;
 use const PHP_EOL;
 
-final class Themes
+final readonly class Themes
 {
-    private $WRAPPERS_PATH = BOARDPATH . 'Wrappers/';
+    const WRAPPERS_PATH = BOARDPATH . 'Wrappers/';
 
     public function __construct(
-        private readonly Config $config,
-        private readonly Database $database,
-        private readonly Jax $jax,
-        private readonly Page $page,
+        private Config $config,
+        private Database $database,
+        private Jax $jax,
+        private Page $page,
+        private TextFormatting $textFormatting,
     ) {}
 
     public function route(): void
@@ -108,7 +110,7 @@ final class Themes
     public function getwrappers(): array
     {
         $wrappers = [];
-        $o = opendir($this->WRAPPERS_PATH);
+        $o = opendir(this::WRAPPERS_PATH);
         while ($f = readdir($o)) {
             if ($f === '.') {
                 continue;
@@ -135,12 +137,12 @@ final class Themes
             isset($this->jax->g['deletewrapper'])
             && $this->jax->g['deletewrapper']
         ) {
-            $wrapperPath = $this->WRAPPERS_PATH . $this->jax->g['deletewrapper'] . '.html';
+            $wrapperPath = self::WRAPPERS_PATH . $this->jax->g['deletewrapper'] . '.html';
             if (
                 !preg_match('@[^\w ]@', (string) $this->jax->g['deletewrapper'])
                 && file_exists($wrapperPath)
             ) {
-                unlink($this->WRAPPERS_PATH . $this->jax->g['deletewrapper'] . '.html');
+                unlink(self::WRAPPERS_PATH . $this->jax->g['deletewrapper'] . '.html');
                 $this->page->location('?act=themes');
             } else {
                 $errorwrapper
@@ -153,7 +155,7 @@ final class Themes
             && $this->jax->p['newwrapper']
         ) {
             $newWrapperPath
-                = $this->WRAPPERS_PATH . $this->jax->p['newwrapper'] . '.html';
+                = self::WRAPPERS_PATH . $this->jax->p['newwrapper'] . '.html';
             if (preg_match('@[^\w ]@', (string) $this->jax->p['newwrapper'])) {
                 $errorwrapper
                     = 'Wrapper name must consist of letters, numbers, '
@@ -266,7 +268,7 @@ final class Themes
                         continue;
                     }
 
-                    if (!is_file($this->WRAPPERS_PATH . $k . '.html')) {
+                    if (!is_file(self::WRAPPERS_PATH . $k . '.html')) {
                         continue;
                     }
 
@@ -278,7 +280,7 @@ final class Themes
                             Wrapper name must consist of letters, numbers, spaces, and underscore, and be
                             under 50 characters long.
                             EOT;
-                    } elseif (is_file($this->WRAPPERS_PATH . $v . '.html')) {
+                    } elseif (is_file(self::WRAPPERS_PATH . $v . '.html')) {
                         $errorwrapper = 'That wrapper name is already being used.';
                     } else {
                         $this->database->safeupdate(
@@ -290,8 +292,8 @@ final class Themes
                             $this->database->basicvalue($k),
                         );
                         rename(
-                            $this->WRAPPERS_PATH . $k . '.html',
-                            $this->WRAPPERS_PATH . $v . '.html',
+                            self::WRAPPERS_PATH . $k . '.html',
+                            self::WRAPPERS_PATH . $v . '.html',
                         );
                     }
 
@@ -450,7 +452,7 @@ final class Themes
             $this->page->parseTemplate(
                 'themes/edit-css.html',
                 [
-                    'content' => $this->jax->blockhtml(
+                    'content' => $this->textFormatting->blockhtml(
                         file_get_contents(
                             (
                                 $skin['custom']
@@ -469,7 +471,7 @@ final class Themes
     public function editwrapper($wrapper): void
     {
         $saved = '';
-        $wrapperf = $this->WRAPPERS_PATH . $wrapper . '.html';
+        $wrapperf = self::WRAPPERS_PATH . $wrapper . '.html';
         if (preg_match('@[^ \w]@', (string) $wrapper) && !is_file($wrapperf)) {
             $this->page->addContentBox(
                 'Error',
@@ -498,7 +500,7 @@ final class Themes
                 $saved . $this->page->parseTemplate(
                     'themes/edit-wrapper.html',
                     [
-                        'content' => $this->jax->blockhtml(file_get_contents($wrapperf)),
+                        'content' => $this->textFormatting->blockhtml(file_get_contents($wrapperf)),
                     ],
                 ),
             );

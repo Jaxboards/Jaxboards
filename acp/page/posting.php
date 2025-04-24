@@ -8,6 +8,7 @@ use ACP\Page;
 use Jax\Config;
 use Jax\Database;
 use Jax\Jax;
+use Jax\TextFormatting;
 
 use function array_reverse;
 use function krsort;
@@ -19,9 +20,10 @@ final readonly class Posting
 {
     public function __construct(
         private Config $config,
-        private Page $page,
-        private Jax $jax,
         private Database $database,
+        private Jax $jax,
+        private Page $page,
+        private TextFormatting $textFormatting,
     ) {}
 
     public function route(): void
@@ -90,7 +92,7 @@ final readonly class Posting
 
         // Insert.
         if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
-            $this->jax->p['badword'] = $this->jax->blockhtml($this->jax->p['badword']);
+            $this->jax->p['badword'] = $this->textFormatting->blockhtml($this->jax->p['badword']);
             if (!$this->jax->p['badword'] || !$this->jax->p['replacement']) {
                 $page .= $this->page->error('All fields required.');
             } elseif (
@@ -127,7 +129,7 @@ final readonly class Posting
             );
             $currentFilters = array_reverse($wordfilter, true);
             foreach ($currentFilters as $filter => $result) {
-                $resultCode = $this->jax->blockhtml($result);
+                $resultCode = $this->textFormatting->blockhtml($result);
                 $filterUrlEncoded = rawurlencode($filter);
                 $table .= $this->page->parseTemplate(
                     'posting/word-filter-row.html',
@@ -189,19 +191,19 @@ final readonly class Posting
         if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
             if (!$this->jax->p['emoticon'] || !$this->jax->p['image']) {
                 $page .= $this->page->error('All fields required.');
-            } elseif (isset($emoticons[$this->jax->blockhtml($this->jax->p['emoticon'])])) {
+            } elseif (isset($emoticons[$this->textFormatting->blockhtml($this->jax->p['emoticon'])])) {
                 $page .= $this->page->error('That emoticon is already being used.');
             } else {
                 $this->database->safeinsert(
                     'textrules',
                     [
                         'enabled' => 1,
-                        'needle' => $this->jax->blockhtml($this->jax->p['emoticon']),
+                        'needle' => $this->textFormatting->blockhtml($this->jax->p['emoticon']),
                         'replacement' => $this->jax->p['image'],
                         'type' => 'emote',
                     ],
                 );
-                $emoticons[$this->jax->blockhtml($this->jax->p['emoticon'])] = $this->jax->p['image'];
+                $emoticons[$this->textFormatting->blockhtml($this->jax->p['emoticon'])] = $this->jax->p['image'];
             }
         }
 
@@ -229,7 +231,7 @@ final readonly class Posting
             $emoticons = array_reverse($emoticons, true);
 
             foreach ($emoticons as $emoticon => $smileyFile) {
-                $smileyFile = $this->jax->blockhtml($smileyFile);
+                $smileyFile = $this->textFormatting->blockhtml($smileyFile);
                 $emoticonUrlEncoded = rawurlencode($emoticon);
                 $table .= $this->page->parseTemplate(
                     'posting/emoticon-row.html',
@@ -365,8 +367,8 @@ final readonly class Posting
                     'posting/post-rating-row.html',
                     [
                         'id' => $ratingId,
-                        'image_url' => $this->jax->blockhtml($rating['img']),
-                        'title' => $this->jax->blockhtml($rating['title']),
+                        'image_url' => $this->textFormatting->blockhtml($rating['img']),
+                        'title' => $this->textFormatting->blockhtml($rating['title']),
                     ],
                 );
             }

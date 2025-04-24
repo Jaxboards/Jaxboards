@@ -7,6 +7,7 @@ namespace ACP\Page;
 use ACP\Page;
 use Jax\Database;
 use Jax\Jax;
+use Jax\TextFormatting;
 
 use function array_flip;
 use function explode;
@@ -26,6 +27,7 @@ final class Groups
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly Page $page,
+        private readonly TextFormatting $textFormatting,
     ) {}
 
     public function route(): void
@@ -474,9 +476,9 @@ final class Groups
         $page .= $this->page->parseTemplate(
             'groups/create.html',
             [
-                'icon_url' => $gid ? $this->jax->blockhtml($gdata['icon']) : '',
+                'icon_url' => $gid ? $this->textFormatting->blockhtml($gdata['icon']) : '',
                 'submit' => $gid ? 'Edit' : 'Create',
-                'title' => $gid ? $this->jax->blockhtml($gdata['title']) : '',
+                'title' => $gid ? $this->textFormatting->blockhtml($gdata['title']) : '',
             ],
         );
         $this->page->addContentBox(

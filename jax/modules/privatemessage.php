@@ -9,6 +9,7 @@ use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
 use Jax\Session;
+use Jax\TextFormatting;
 
 use function explode;
 use function gmdate;
@@ -30,6 +31,7 @@ final readonly class PrivateMessage
         private Jax $jax,
         private Page $page,
         private Session $session,
+        private TextFormatting $textFormatting,
     ) {}
 
     public function init(): void
@@ -99,8 +101,8 @@ final readonly class PrivateMessage
             );
         }
 
-        $im = $this->jax->linkify($im);
-        $im = $this->jax->theworks($im);
+        $im = $this->textFormatting->linkify($im);
+        $im = $this->textFormatting->theworks($im);
 
         $cmd = [
             'im',

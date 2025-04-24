@@ -8,6 +8,7 @@ use ACP\Page;
 use Jax\Config;
 use Jax\Database;
 use Jax\Jax;
+use Jax\TextFormatting;
 
 use function is_numeric;
 use function mb_strlen;
@@ -23,6 +24,7 @@ final readonly class Settings
         private Database $database,
         private Jax $jax,
         private Page $page,
+        private TextFormatting $textFormatting,
     ) {}
 
     public function route(): void
@@ -107,7 +109,7 @@ final readonly class Settings
         if (!$this->config->getSetting('boardoffline')) {
         }
 
-        $this->jax->blockhtml(
+        $this->textFormatting->blockhtml(
             $this->config->getSetting('offlinetext'),
         );
         $page .= $this->page->parseTemplate(
@@ -115,7 +117,7 @@ final readonly class Settings
             [
                 'board_offline_checked' => $this->config->getSetting('boardoffline')
                     ? '' : ' checked="checked"',
-                'board_offline_text' => $this->jax->blockhtml(
+                'board_offline_text' => $this->textFormatting->blockhtml(
                     $this->config->getSetting('offlinetext'),
                 ),
                 'content' => $page,
@@ -244,7 +246,7 @@ final readonly class Settings
         $page .= $this->page->parseTemplate(
             'settings/pages-edit.html',
             [
-                'content' => $this->jax->blockhtml($pageinfo['page']),
+                'content' => $this->textFormatting->blockhtml($pageinfo['page']),
             ],
         );
         $this->page->addContentBox("Editing Page: {$pageurl}", $page);

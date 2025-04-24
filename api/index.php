@@ -5,7 +5,7 @@ declare(strict_types=1);
 use DI\Container;
 use Jax\Config;
 use Jax\Database;
-use Jax\Jax;
+use Jax\TextFormatting;
 
 define('JAXBOARDS_ROOT', dirname(__DIR__));
 
@@ -53,10 +53,10 @@ switch ($_GET['act'] ?? '') {
         break;
 
     case 'emotes':
-        $JAX = $container->get(Jax::class);
-        $rules = $JAX->getEmoteRules(0);
+        $textFormatting = $container->get(TextFormatting::class);
+        $rules = $textFormatting->getEmoteRules(0);
         foreach ($rules as $k => $v) {
-            $rules[$k] = '<img src="' . $v . '" alt="' . $JAX->blockhtml($k) . '" />';
+            $rules[$k] = '<img src="' . $v . '" alt="' . $textFormatting->blockhtml($k) . '" />';
         }
 
         echo json_encode([array_keys($rules), array_values($rules)]);

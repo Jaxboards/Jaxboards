@@ -9,6 +9,7 @@ use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
 use Jax\Session;
+use Jax\TextFormatting;
 
 use function array_flip;
 use function array_keys;
@@ -27,15 +28,13 @@ use function time;
 
 final class IDX
 {
-    private $moderatorinfo;
+    private array $forumsread = [];
 
-    private $forumsread = [];
+    private array $mods;
 
-    private $mods;
+    private array $subforumids;
 
-    private $subforumids;
-
-    private $subforums;
+    private array $subforums;
 
     public function __construct(
         private readonly Config $config,
@@ -43,6 +42,7 @@ final class IDX
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly Session $session,
+        private readonly TextFormatting $textFormatting,
     ) {
         $this->page->loadmeta('idx');
     }
@@ -112,7 +112,7 @@ final class IDX
                         'idx-subforum-link',
                         $r['id'],
                         $r['title'],
-                        $this->jax->blockhtml($r['subtitle']),
+                        $this->textFormatting->blockhtml($r['subtitle']),
                     ) . $this->page->meta('idx-subforum-splitter');
                 }
             } else {
@@ -193,8 +193,10 @@ final class IDX
 
     public function getmods($modids): string
     {
-        if (!$this->moderatorinfo) {
-            $this->moderatorinfo = [];
+        static $moderatorinfo = null;
+
+        if (!$moderatorinfo) {
+            $moderatorinfo = [];
             $result = $this->database->safeselect(
                 ['id', 'display_name', 'group_id'],
                 'members',
@@ -202,7 +204,7 @@ final class IDX
                 $this->mods,
             );
             while ($member = $this->database->arow($result)) {
-                $this->moderatorinfo[$member['id']] = $this->page->meta(
+                $moderatorinfo[$member['id']] = $this->page->meta(
                     'user-link',
                     $member['id'],
                     $member['group_id'],
@@ -213,7 +215,7 @@ final class IDX
 
         $r = '';
         foreach (explode(',', (string) $modids) as $v) {
-            $r .= $this->moderatorinfo[$v] . $this->page->meta('idx-ledby-splitter');
+            $r .= $moderatorinfo[$v] . $this->page->meta('idx-ledby-splitter');
         }
 
         return mb_substr($r, 0, -mb_strlen($this->page->meta('idx-ledby-splitter')));
@@ -267,7 +269,7 @@ final class IDX
                 $r .= $this->page->meta(
                     'idx-row',
                     $v['id'],
-                    $this->jax->wordfilter($v['title']),
+                    $this->textFormatting->wordfilter($v['title']),
                     nl2br((string) $v['subtitle']),
                     $sf
                     ? $this->page->meta(
@@ -415,7 +417,7 @@ final class IDX
         $nummembers = 0;
         foreach ($this->database->getUsersOnline() as $f) {
             if (!empty($f['uid']) || (isset($f['is_bot']) && $f['is_bot'])) {
-                $title = $this->jax->blockhtml(
+                $title = $this->textFormatting->blockhtml(
                     $this->jax->pick($f['location_verbose'], 'Viewing the board.'),
                 );
                 if (isset($f['is_bot']) && $f['is_bot']) {
@@ -548,7 +550,7 @@ final class IDX
             'idx-row-lastpost',
             $v['lp_tid'],
             $this->jax->pick(
-                $this->jax->wordfilter($v['lp_topic']),
+                $this->textFormatting->wordfilter($v['lp_topic']),
                 '- - - - -',
             ),
             $v['lp_uid'] ? $this->page->meta(

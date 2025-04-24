@@ -10,6 +10,7 @@ use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
 use Jax\Session;
+use Jax\TextFormatting;
 
 use function array_diff;
 use function array_flip;
@@ -49,6 +50,7 @@ final class ModControls
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly Session $session,
+        private readonly TextFormatting $textFormatting,
     ) {
         $this->page->loadmeta('modcp');
     }
@@ -1006,13 +1008,13 @@ final class ModControls
                     . field(
                         'About',
                         'about',
-                        $this->jax->blockhtml($data['about']),
+                        $this->textFormatting->blockhtml($data['about']),
                         'textarea',
                     )
                     . field(
                         'Signature',
                         'signature',
-                        $this->jax->blockhtml($data['sig']),
+                        $this->textFormatting->blockhtml($data['sig']),
                         'textarea',
                     );
                 $page .= '</table><input type="submit" value="Save" /></form>';
@@ -1183,7 +1185,7 @@ final class ModControls
             );
             while ($f = $this->database->arow($result)) {
                 $content .= "<div class='post'>"
-                    . nl2br($this->jax->blockhtml($this->jax->textonly($f['post'])))
+                    . nl2br($this->textFormatting->blockhtml($this->jax->textonly($f['post'])))
                     . '</div>';
             }
 

@@ -8,6 +8,7 @@ use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
 use Jax\Session;
+use Jax\TextFormatting;
 
 use function array_key_exists;
 use function array_map;
@@ -51,6 +52,7 @@ final class Search
         private readonly Page $page,
         private readonly Jax $jax,
         private readonly Session $session,
+        private readonly TextFormatting $textFormatting,
     ) {
         $this->page->loadmeta('search');
     }
@@ -82,7 +84,7 @@ final class Search
 
         $page = $this->page->meta(
             'search-form',
-            $this->jax->blockhtml(
+            $this->textFormatting->blockhtml(
                 $this->session->vars['searcht'] ?? '',
             ),
             $this->getForumSelection(),
@@ -386,7 +388,7 @@ final class Search
 
         while ($postRow = $this->database->arow($result)) {
             $post = $this->jax->textonly($postRow['post']);
-            $post = $this->jax->blockhtml($post);
+            $post = $this->textFormatting->blockHtml($post);
             $post = nl2br($post);
             $post = preg_replace(
                 '@' . implode('|', $terms) . '@i',

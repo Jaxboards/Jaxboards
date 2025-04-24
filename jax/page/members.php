@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
+use Jax\TextFormatting;
 
 use function ceil;
 use function is_numeric;
@@ -25,6 +26,7 @@ final class Members
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly Page $page,
+        private readonly TextFormatting $textFormatting,
     ) {
         $this->page->loadmeta('members');
     }
@@ -171,7 +173,7 @@ final class Members
                 }
 
                 $contactdetails .= '<a class="' . $k . ' contact" href="'
-                    . sprintf($v, $this->jax->blockhtml($member['contact_' . $k]))
+                    . sprintf($v, $this->textFormatting->blockhtml($member['contact_' . $k]))
                     . '" title="' . $k . ' contact">&nbsp;</a>';
             }
 
