@@ -230,22 +230,17 @@ final class User
         return $userPerms;
     }
 
+    /**
+     * This function expands the permissions bitflag into a readable associative array.
+     *
+     * This function can receive either a binary encoded string (which is an array of all group bitflags)
+     * Or an integer (bitflag) for a specific group's permissions.
+     */
     public function parseForumPerms(int|string $permstoparse): array
     {
-        if ($permstoparse === '') {
-            return [
-                'poll' => $this->getPerm('can_poll'),
-                'read' => 1,
-                'reply' => $this->getPerm('can_post'),
-                'start' => $this->getPerm('can_post_topics'),
-                'upload' => $this->getPerm('can_attach'),
-                'view' => 1,
-            ];
-        }
-
-
-        $groupId = $this->get('group_id');
-        if ($groupId && is_string($permstoparse)) {
+        // If it's a binary string, unpack it into all group bitflags and choose
+        // the bitflag as determined by the user's group.
+        if (is_string($permstoparse)) {
             $unpack = unpack('n*', $permstoparse);
             $parsedPerms = [];
             $counter = count($unpack);
@@ -253,16 +248,32 @@ final class User
                 $parsedPerms[$unpack[$x]] = $unpack[$x + 1];
             }
 
-            $permstoparse = $parsedPerms[$groupId] ?? 0;
+            $permFlags = $parsedPerms[$this->get('group_id')] ?? null;
+        } else {
+            $permFlags = $permstoparse;
+        }
+
+
+        // Null $permFlags means to fall back to global permissions.
+        if ($permFlags !== null) {
+            // Decode the bitflags
+            return [
+                'poll' => $permFlags & 32,
+                'read' => $permFlags & 8,
+                'reply' => $permFlags & 2,
+                'start' => $permFlags & 4,
+                'upload' => $permFlags & 1,
+                'view' => $permFlags & 16,
+            ];
         }
 
         return [
-            'poll' => $permstoparse & 32,
-            'read' => $permstoparse & 8,
-            'reply' => $permstoparse & 2,
-            'start' => $permstoparse & 4,
-            'upload' => $permstoparse & 1,
-            'view' => $permstoparse & 16,
+            'poll' => $this->getPerm('can_poll'),
+            'read' => 1, // There is no global "forum read" permission so default to assuming the user can read it
+            'reply' => $this->getPerm('can_post'),
+            'start' => $this->getPerm('can_post_topics'),
+            'upload' => $this->getPerm('can_attach'),
+            'view' => 1, // There is no global "forum view" permission so default to assuming the user can see it
         ];
     }
 
