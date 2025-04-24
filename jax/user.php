@@ -7,6 +7,7 @@ namespace Jax;
 use function array_merge;
 use function count;
 use function date;
+use function is_string;
 use function password_hash;
 use function password_needs_rehash;
 use function password_verify;
@@ -229,7 +230,7 @@ final class User
         return $userPerms;
     }
 
-    public function parseForumPerms(string|int $permstoparse): array
+    public function parseForumPerms(int|string $permstoparse): array
     {
         if ($permstoparse === '') {
             return [
@@ -255,7 +256,7 @@ final class User
             $permstoparse = $parsedPerms[$groupId] ?? 0;
         }
 
-        $ret = [
+        return [
             'poll' => $permstoparse & 32,
             'read' => $permstoparse & 8,
             'reply' => $permstoparse & 2,
@@ -263,8 +264,6 @@ final class User
             'upload' => $permstoparse & 1,
             'view' => $permstoparse & 16,
         ];
-
-        return $ret;
     }
 
     public function isAdmin(): bool
