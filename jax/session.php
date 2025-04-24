@@ -85,7 +85,8 @@ final class Session
         $this->data['vars'] = [];
     }
 
-    public function loginWithToken(): ?int {
+    public function loginWithToken(): ?int
+    {
         if ($this->is_bot) {
             return null;
         }
