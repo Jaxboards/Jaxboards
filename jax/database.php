@@ -573,7 +573,7 @@ final class Database
         return $this->safequery(...$va_array);
     }
 
-    public function getUsersOnline(bool $canViewHiddenMembers)
+    public function getUsersOnline(bool $canViewHiddenMembers = false)
     {
         $idletimeout = time() - ($this->config->getSetting('timetoidle') ?? 300);
         $return = [];
