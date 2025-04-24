@@ -8,7 +8,6 @@ use function array_merge;
 use function gmdate;
 use function header;
 use function is_array;
-use function is_numeric;
 
 final class RSSFeed
 {
@@ -50,8 +49,9 @@ final class RSSFeed
         foreach ($array as $property => $value) {
             if (is_array($value)) {
                 $xml .= implode('', array_map(
-                    fn($content) => "<{$property}>" . $this->make_xml($content) . "</{$property}>"
-                , $value));
+                    fn($content): string => "<{$property}>" . $this->make_xml($content) . "</{$property}>",
+                    $value,
+                ));
             } else {
                 $xml .= "<{$property}" . ($property === 'content' ? ' type="html"' : '') . '>'
                     . (is_array($value) ? $this->make_xml($value) : $value) . "</{$property}>";
