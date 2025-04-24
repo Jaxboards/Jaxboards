@@ -196,7 +196,6 @@ final class Post
 
     public function showtopicform(): void
     {
-        global $PERMS;
         $e = '';
         if ($this->page->jsupdate) {
             return;
@@ -265,7 +264,7 @@ final class Post
         $fdata = $this->database->arow($result);
         $this->database->disposeresult($result);
 
-        $fdata['perms'] = $this->jax->parsePerms(
+        $fdata['perms'] = $this->user->parsePerms(
             $fdata['perms'],
             $this->user->get('group_id'),
         );
@@ -378,7 +377,7 @@ onclick="this.form.submitButton=this" /></div>
             }
 
             $tdata['title'] = $this->textFormatting->wordfilter($tdata['title']);
-            $tdata['perms'] = $this->jax->parseperms(
+            $tdata['perms'] = $this->user->parseperms(
                 $tdata['perms'],
                 $this->user->get('group_id'),
             );
@@ -455,10 +454,9 @@ onclick="this.form.submitButton=this"/></div>
 
     public function canedit($post): bool
     {
-        global $PERMS;
         if ($post['auth_id']
-            && ($post['newtopic'] ? $PERMS['can_edit_topics']
-            : $PERMS['can_edit_posts'])
+            && ($post['newtopic'] ? $this->user->getPerm('can_edit_topics')
+            : $this->user->getPerm('can_edit_posts'))
             && $post['auth_id'] === $this->user->get('id')) {
             return true;
         }
@@ -468,13 +466,12 @@ onclick="this.form.submitButton=this"/></div>
 
     public function canmoderate($tid)
     {
-        global $PERMS;
         if ($this->canmod) {
             return $this->canmod;
         }
 
         $canmod = false;
-        if ($PERMS['can_moderate']) {
+        if ($this->user->getPerm('can_moderate')) {
             $canmod = true;
         }
 
@@ -496,7 +493,6 @@ onclick="this.form.submitButton=this"/></div>
 
     public function editpost(): ?bool
     {
-        global $PERMS;
         $pid = $this->pid;
         $tid = $this->tid;
         $e = '';
@@ -638,7 +634,6 @@ onclick="this.form.submitButton=this"/></div>
 
     public function submitpost(): ?bool
     {
-        global $PERMS;
         $this->session->act();
         $tid = $this->tid;
         $fid = $this->fid;
@@ -713,7 +708,7 @@ onclick="this.form.submitButton=this"/></div>
             if (!$fdata) {
                 $e = "The forum you're trying to post in does not exist.";
             } else {
-                $fdata['perms'] = $this->jax->parseperms(
+                $fdata['perms'] = $this->user->parseperms(
                     $fdata['perms'],
                     $this->user->get('group_id'),
                 );
@@ -812,14 +807,14 @@ onclick="this.form.submitButton=this"/></div>
             return false;
         }
 
-        $fdata['perms'] = $this->jax->parseperms(
+        $fdata['perms'] = $this->user->parseperms(
             $fdata['perms'],
             $this->user->get('group_id'),
         );
         if (
             !$fdata['perms']['reply']
             || $fdata['locked']
-            && !$PERMS['can_override_locked_topics']
+            && !$this->user->getPerm('can_override_locked_topics')
         ) {
             $e = "You don't have permission to post here.";
             $this->page->append('PAGE', $this->page->error($e));

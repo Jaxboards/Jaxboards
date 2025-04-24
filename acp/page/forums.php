@@ -9,6 +9,7 @@ use ACP\Page\Forums\RecountStats;
 use Jax\Database;
 use Jax\Jax;
 use Jax\TextFormatting;
+use Jax\User;
 
 use function array_keys;
 use function array_pop;
@@ -41,6 +42,7 @@ final readonly class Forums
         private readonly Page $page,
         private readonly RecountStats $recountStats,
         private readonly TextFormatting $textFormatting,
+        private readonly User $user,
     ) {}
 
     /**
@@ -622,7 +624,7 @@ final readonly class Forums
             $global = !isset($perms[$f['id']]);
             if (!$global) {
                 $p = isset($perms[$f['id']])
-                    ? $this->jax->parseperms($perms[$f['id']])
+                    ? $this->user->parseperms($perms[$f['id']])
                     : null;
             }
 

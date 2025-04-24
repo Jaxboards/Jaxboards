@@ -223,7 +223,7 @@ final class Topic
 
         $this->topicdata['topic_title'] = $this->textFormatting->wordfilter($this->topicdata['topic_title']);
         $this->topicdata['subtitle'] = $this->textFormatting->wordfilter($this->topicdata['subtitle']);
-        $this->topicdata['fperms'] = $this->jax->parseperms(
+        $this->topicdata['fperms'] = $this->user->parseperms(
             $this->topicdata['fperms'],
             $this->user->get('group_id'),
         );
@@ -231,8 +231,6 @@ final class Topic
 
     public function viewtopic($tid): void
     {
-        global $PERMS;
-
         if (!$this->user->isGuest() && $this->topicdata['lp_date'] > $this->user->get('last_visit')) {
             $this->markread($tid);
         }
@@ -318,7 +316,7 @@ final class Topic
             $this->topicdata['fperms']['reply']
             && (
                 !$this->topicdata['locked']
-                || $PERMS['can_override_locked_topics']
+                || $this->user->getPerm('can_override_locked_topics')
             )
         ) {
             $buttons[1] = "<a href='?act=vt{$tid}&qreply=1'>" . $this->page->meta(
@@ -332,7 +330,7 @@ final class Topic
             $this->topicdata['fperms']['reply']
             && (
                 !$this->topicdata['locked']
-                || $PERMS['can_override_locked_topics']
+                || $this->user->getPerm('can_override_locked_topics')
             )
         ) {
             $buttons[2] = "<a href='?act=post&tid={$tid}'>" . $this->page->meta(
@@ -535,7 +533,6 @@ final class Topic
 
     public function postsintooutput($lastpid = 0): string
     {
-        global $PERMS;
         $usersonline = $this->database->getUsersOnline();
         $ratingConfig = $this->config->getSetting('ratings') ?? 0;
 
@@ -796,7 +793,7 @@ final class Topic
                     ),
                     $this->jax->date($post['edit_date']),
                 ) : '',
-                $PERMS['can_moderate']
+                $this->user->getPerm('can_moderate')
                     ? '<a href="?act=modcontrols&amp;do=iptools&amp;ip='
                 . $this->ipAddress->asHumanReadable($post['ip']) . '">' . $this->page->meta(
                     'topic-mod-ipbutton',
@@ -834,27 +831,25 @@ final class Topic
 
     public function canedit($post): bool
     {
-        global $PERMS;
         if ($this->canModerate()) {
             return true;
         }
 
         return $post['auth_id']
         && ($post['newtopic']
-            ? $PERMS['can_edit_topics']
-            : $PERMS['can_edit_posts'])
+            ? $this->user->getPerm('can_edit_topics')
+            : $this->user->getPerm('can_edit_posts'))
         && $post['auth_id'] === $this->user->get('id');
     }
 
     public function canModerate()
     {
-        global $PERMS;
         if ($this->canMod) {
             return $this->canMod;
         }
 
         $canMod = false;
-        if ($PERMS['can_moderate']) {
+        if ($this->user->getPerm('can_moderate')) {
             $canMod = true;
         }
 
@@ -1141,7 +1136,6 @@ final class Topic
 
     public function qeditpost($pid): void
     {
-        global $PERMS;
         if (!is_numeric($pid)) {
             return;
         }

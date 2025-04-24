@@ -150,12 +150,11 @@ final class UserProfile
 
     public function showfullprofile($id)
     {
-        global $PERMS;
         if ($this->page->jsupdate && empty($this->jax->p)) {
             return false;
         }
 
-        if (!$PERMS['can_view_fullprofile']) {
+        if (!$this->user->getPerm('can_view_fullprofile')) {
             return $this->page->location('?');
         }
 
@@ -259,7 +258,7 @@ final class UserProfile
                     $id,
                 );
                 while ($f = $this->database->arow($result)) {
-                    $p = $this->jax->parseperms($f['perms'], $this->user->get('group_id'));
+                    $p = $this->user->parseperms($f['perms'], $this->user->get('group_id'));
                     if (!$p['read']) {
                         continue;
                     }
@@ -295,7 +294,7 @@ final class UserProfile
                     $id,
                 );
                 while ($f = $this->database->arow($result)) {
-                    $p = $this->jax->parseperms($f['perms'], $this->user->get('group_id'));
+                    $p = $this->user->parseperms($f['perms'], $this->user->get('group_id'));
                     if (!$p['read']) {
                         continue;
                     }
@@ -370,13 +369,13 @@ final class UserProfile
                     isset($this->jax->b['del'])
                     && is_numeric($this->jax->b['del'])
                 ) {
-                    if ($PERMS['can_moderate']) {
+                    if ($this->user->getPerm('can_moderate')) {
                         $this->database->safedelete(
                             'profile_comments',
                             'WHERE `id`=?',
                             $this->database->basicvalue($this->jax->b['del']),
                         );
-                    } elseif ($PERMS['can_delete_comments']) {
+                    } elseif ($this->user->getPerm('can_delete_comments')) {
                         $this->database->safedelete(
                             'profile_comments',
                             'WHERE `id`=? AND `from`=?',
@@ -390,7 +389,7 @@ final class UserProfile
                     isset($this->jax->p['comment'])
                     && $this->jax->p['comment'] !== ''
                 ) {
-                    if ($this->user->isGuest() || !$PERMS['can_add_comments']) {
+                    if ($this->user->isGuest() || !$this->user->getPerm('can_add_comments')) {
                         $e = 'No permission to add comments!';
                     } else {
                         $this->database->safeinsert(
@@ -419,7 +418,7 @@ final class UserProfile
                     }
                 }
 
-                if (!$this->user->isGuest() && $PERMS['can_add_comments']) {
+                if (!$this->user->isGuest() && $this->user->getPerm('can_add_comments')) {
                     $pfbox = $this->page->meta(
                         'userprofile-comment-form',
                         $this->user->get('name') ?? '',
@@ -466,9 +465,9 @@ final class UserProfile
                         ),
                         $this->jax->date($f['date']),
                         $this->textFormatting->theworks($f['comment'])
-                        . ($PERMS['can_delete_comments']
+                        . ($this->user->getPerm('can_delete_comments')
                         && $f['from'] === $this->user->get('id')
-                        || $PERMS['can_moderate']
+                        || $this->user->getPerm('can_moderate')
                         ? ' <a href="?act=' . $this->jax->b['act']
                         . '&view=profile&page=comments&del=' . $f['id']
                         . '" class="delete">[X]</a>' : ''),
@@ -597,7 +596,7 @@ final class UserProfile
             $contactdetails .= '<div class="contact pm">'
                 . '<a href="?act=ucp&what=inbox&page=compose&mid='
                 . $udata['id'] . '">PM</a></div>';
-            if ($PERMS['can_moderate']) {
+            if ($this->user->getPerm('can_moderate')) {
                 $contactdetails .= '<div>IP: <a href="'
                     . '?act=modcontrols&do=iptools&ip=' . $this->ipAddress->asHumanReadable($udata['ip'])
                     . '">' . $this->ipAddress->asHumanReadable($udata['ip']) . '</a></div>';
@@ -628,7 +627,7 @@ final class UserProfile
                 $tabs[4],
                 $tabs[5],
                 $pfbox,
-                $PERMS['can_moderate']
+                $this->user->getPerm('can_moderate')
                 ? '<a class="moderate" href="?act=modcontrols&do=emem&mid='
                 . $udata['id'] . '">Edit</a>' : '',
             );

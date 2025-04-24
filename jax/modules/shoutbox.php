@@ -44,15 +44,9 @@ final class Shoutbox
 
     public function init(): void
     {
-        global $PERMS;
-
-        if (!isset($PERMS['can_view_shoutbox'])) {
-            $PERMS['can_view_shoutbox'] = false;
-        }
-
         if (
             !$this->config->getSetting('shoutbox')
-            || !$PERMS['can_view_shoutbox']
+            || !$this->user->getPerm('can_view_shoutbox')
         ) {
             return;
         }
@@ -86,9 +80,8 @@ final class Shoutbox
 
     public function canDelete($id, $shoutrow = false)
     {
-        global $PERMS;
-        $candelete = $PERMS['can_delete_shouts'];
-        if (!$candelete && $PERMS['can_delete_own_shouts']) {
+        $candelete = $this->user->getPerm('can_delete_shouts');
+        if (!$candelete && $this->user->getPerm('can_delete_own_shouts')) {
             if (!$shoutrow) {
                 $result = $this->database->safeselect(
                     '`uid`',

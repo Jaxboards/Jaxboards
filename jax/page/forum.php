@@ -89,8 +89,6 @@ final class Forum
 
     public function viewforum($fid)
     {
-        global $PERMS;
-
         // If no fid supplied, go to the index and halt execution.
         if (!$fid) {
             return $this->page->location('?');
@@ -148,7 +146,7 @@ final class Forum
 
         $title = &$fdata['title'];
 
-        $fdata['perms'] = $this->jax->parseperms(
+        $fdata['perms'] = $this->user->parseperms(
             $fdata['perms'],
             $this->user->get('group_id'),
         );
@@ -359,7 +357,7 @@ final class Forum
                 // 9
                 $f['summary'] ? $f['summary'] . (mb_strlen((string) $f['summary']) > 45 ? '...' : '') : '',
                 // 10
-                $PERMS['can_moderate'] ? '<a href="?act=modcontrols&do=modt&tid='
+                $this->user->getPerm('can_moderate') ? '<a href="?act=modcontrols&do=modt&tid='
                 . $f['id'] . '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>' : '',
                 // 11
                 $pages,

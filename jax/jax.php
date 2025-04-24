@@ -48,7 +48,8 @@ final class Jax
      */
     public $b = [];
 
-    public function __construct(private readonly Config $config)
+    public function __construct(
+        private readonly Config $config)
     {
         $this->c = $_COOKIE;
         $this->g = $_GET;
@@ -146,50 +147,6 @@ final class Jax
     public function isemail($email): false|int
     {
         return preg_match('/[\w\+.]+@[\w.]+/', (string) $email);
-    }
-
-    public function parseperms($permstoparse, $uid = false): array
-    {
-        global $PERMS;
-        $permstoparse .= '';
-        if ($permstoparse === '' || $permstoparse === '0') {
-            $permstoparse = '0';
-        }
-
-        if ($permstoparse !== '0') {
-            if ($uid !== false) {
-                $unpack = unpack('n*', $permstoparse);
-                $permstoparse = [];
-                $counter = count($unpack);
-                for ($x = 1; $x < $counter; $x += 2) {
-                    $permstoparse[$unpack[$x]] = $unpack[$x + 1];
-                }
-
-                $permstoparse = $permstoparse[$uid] ?? null;
-            }
-        } else {
-            $permstoparse = null;
-        }
-
-        if ($permstoparse === null) {
-            return [
-                'poll' => $PERMS['can_poll'],
-                'read' => 1,
-                'reply' => $PERMS['can_post'],
-                'start' => $PERMS['can_post_topics'],
-                'upload' => $PERMS['can_attach'],
-                'view' => 1,
-            ];
-        }
-
-        return [
-            'poll' => $permstoparse & 32,
-            'read' => $permstoparse & 8,
-            'reply' => $permstoparse & 2,
-            'start' => $permstoparse & 4,
-            'upload' => $permstoparse & 1,
-            'view' => $permstoparse & 16,
-        ];
     }
 
     public function parsereadmarkers($readmarkers)

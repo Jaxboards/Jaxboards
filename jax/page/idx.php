@@ -99,7 +99,7 @@ final class IDX
 
         // This while loop just grabs all of the data, displaying is done below.
         while ($r = $this->database->arow($result)) {
-            $perms = $this->jax->parseperms($r['perms'], $this->user->get('group_id'));
+            $perms = $this->user->parseperms($r['perms'], $this->user->get('group_id'));
             if ($r['perms'] && !$perms['view']) {
                 continue;
             }
@@ -313,8 +313,7 @@ final class IDX
 
     public function getBoardStats(): string
     {
-        global $PERMS;
-        if (!$PERMS['can_view_stats']) {
+        if (!$this->user->getPerm('can_view_stats')) {
             return '';
         }
 

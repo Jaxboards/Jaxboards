@@ -425,14 +425,13 @@ final class ModControls
 
     public function modtopic($tid)
     {
-        global $PERMS;
         $this->page->JS('softurl');
         if (!is_numeric($tid)) {
             return null;
         }
 
         $tid = (int) $tid;
-        if (!$PERMS['can_moderate']) {
+        if (!$this->user->getPerm('can_moderate')) {
             $result = $this->database->safespecial(
                 <<<'EOT'
                     SELECT `mods`
@@ -844,8 +843,7 @@ final class ModControls
 
     public function showmodcp($cppage = ''): void
     {
-        global $PERMS;
-        if (!$PERMS['can_moderate']) {
+        if (!$this->user->getPerm('can_moderate')) {
             return;
         }
 
@@ -858,8 +856,7 @@ final class ModControls
 
     public function editmembers(): void
     {
-        global $PERMS;
-        if (!$PERMS['can_moderate']) {
+        if (!$this->user->getPerm('can_moderate')) {
             return;
         }
 

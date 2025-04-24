@@ -100,9 +100,6 @@ if (!isset($_SESSION['uid']) && isset($JAX->c['utoken'])) {
     }
 }
 
-// If they're IP banned, put them in the banned group
-$PERMS = $USER->getPerms(($container->get(IPAddress::class)->isBanned() ? 4 : $USER->get('group_id')) ?? 3);
-
 // Fix ip if necessary.
 if (!$USER->isGuest() && $SESS->ip && $SESS->ip !== $USER->get('ip')) {
     $USER->set('ip', $container->get(IPAddress::class)->asBinary());
@@ -174,7 +171,7 @@ if (!$PAGE->jsaccess) {
             . json_encode([
                 'sound_im' => $USER->get('sound_im') ? 1 : 0,
                 'wysiwyg' => $USER->get('wysiwyg') ? 1 : 0,
-                'can_im' => $PERMS['can_im'] ? 1 : 0,
+                'can_im' => $USER->getPerm('can_im') ? 1 : 0,
                 'groupid' => $USER->get('group_id'),
                 'username' => $USER->get('display_name'),
                 'userid' => $USER->get('id') ?? 0,
@@ -188,7 +185,7 @@ if (!$PAGE->jsaccess) {
         '<script src="' . BOARDURL . 'dist/app.js" defer></script>',
     );
 
-    if ($PERMS['can_moderate'] || $USER->get('mod')) {
+    if ($USER->getPerm('can_moderate') || $USER->get('mod')) {
         $PAGE->append(
             'SCRIPT',
             '<script type="text/javascript" src="?act=modcontrols&do=load" defer></script>',
@@ -221,9 +218,9 @@ if (!$PAGE->jsaccess) {
         'NAVIGATION',
         $PAGE->meta(
             'navigation',
-            $PERMS['can_moderate']
+            $USER->getPerm('can_moderate')
             ? '<li><a href="?act=modcontrols&do=cp">Mod CP</a></li>' : '',
-            $PERMS['can_access_acp']
+            $USER->getPerm('can_access_acp')
             ? '<li><a href="./acp/" target="_BLANK">ACP</a></li>' : '',
             isset($CFG['navlinks']) && $CFG['navlinks'] ? $CFG['navlinks'] : '',
         ),
@@ -294,19 +291,19 @@ if (!$PAGE->jsaccess) {
 }
 
 
-$PAGE->addvar('modlink', $PERMS['can_moderate'] ? $PAGE->meta('modlink') : '');
+$PAGE->addvar('modlink', $USER->getPerm('can_moderate') ? $PAGE->meta('modlink') : '');
 
-$PAGE->addvar('ismod', $PERMS['can_moderate'] ? 'true' : 'false');
+$PAGE->addvar('ismod', $USER->getPerm('can_moderate') ? 'true' : 'false');
 $PAGE->addvar('isguest', $USER->isGuest() ? 'true' : 'false');
-$PAGE->addvar('isadmin', $PERMS['can_access_acp'] ? 'true' : 'false');
+$PAGE->addvar('isadmin', $USER->getPerm('can_access_acp') ? 'true' : 'false');
 
-$PAGE->addvar('acplink', $PERMS['can_access_acp'] ? $PAGE->meta('acplink') : '');
+$PAGE->addvar('acplink', $USER->getPerm('can_access_acp') ? $PAGE->meta('acplink') : '');
 $PAGE->addvar('boardname', $CFG['boardname']);
 
 if (!$USER->isGuest()) {
     $PAGE->addvar('groupid', (string) $JAX->pick($USER->get('group_id'), 3));
     $PAGE->addvar('userposts', (string) $USER->get('posts'));
-    $PAGE->addvar('grouptitle', $PERMS['title']);
+    $PAGE->addvar('grouptitle', $USER->getPerm('title'));
     $PAGE->addvar('avatar', $JAX->pick($USER->get('avatar'), $PAGE->meta('default-avatar')));
     $PAGE->addvar('username', $USER->get('display_name'));
     $PAGE->addvar('userid', (string) $JAX->pick($USER->get('id'), 0));
@@ -322,9 +319,9 @@ if (
     && $JAX->b['act'] !== 'logreg4'
     && $JAX->b['act'] !== 'logreg3'
     && (
-        !$PERMS['can_view_board']
+        !$USER->getPerm('can_view_board')
         || $CFG['boardoffline']
-        && !$PERMS['can_view_offline_board']
+        && !$USER->getPerm('can_view_offline_board')
     )
 ) {
     $JAX->b['act'] = 'boardoffline';

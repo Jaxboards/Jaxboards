@@ -45,16 +45,12 @@ $DB->connect(
 $USER = $container->get(User::class);
 
 $JAX = $container->get(Jax::class);
+
 if (isset($_SESSION['auid'])) {
     $userData = $USER->getUser($_SESSION['auid']);
-    $PERMS = $USER->getPerms($userData['group_id']);
-} else {
-    $PERMS = [
-        'can_access_acp' => false,
-    ];
 }
 
-if (!$PERMS['can_access_acp']) {
+if (!$USER->getPerm('can_access_acp')) {
     header('Location: ./');
 
     exit;

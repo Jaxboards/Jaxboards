@@ -82,7 +82,6 @@ final readonly class PrivateMessage
 
     public function message($uid, $im)
     {
-        global $PERMS;
         $this->session->act();
         $e = '';
         $fatal = false;
@@ -95,7 +94,7 @@ final readonly class PrivateMessage
             return $this->page->JS('error', 'You must have a recipient!');
         }
 
-        if (!$PERMS['can_im']) {
+        if (!$this->user->getPerm('can_im')) {
             return $this->page->JS(
                 'error',
                 "You don't have permission to use this feature.",

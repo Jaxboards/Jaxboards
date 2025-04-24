@@ -16,7 +16,11 @@ final class User
 {
     private ?array $userData = null;
 
-    public function __construct(private readonly Database $database) {}
+    public function __construct(
+        private readonly Database $database,
+        private readonly IPAddress $ipAddress,
+    ) {
+    }
 
     public function get(string $property)
     {
@@ -154,54 +158,63 @@ final class User
         return $this->userData = $user;
     }
 
+    public function getPerm(string $perm) {
+        $perms = $this->getPerms();
+
+        return array_key_exists($perm, $perms) ? $perms[$perm] : null;
+    }
+
     public function getPerms($groupId = null)
     {
         static $userPerms = null;
 
-        if ($groupId === null && $userPerms !== null) {
-            return $userPerms;
+        if ($groupId === null) {
+            if ($userPerms !== null) {
+                return $userPerms;
+            }
+
+            if ($this->userData) {
+                $groupId = $this->userData['group_id'];
+            }
+
+            if ($this->isBanned()) {
+                $groupId = 4;
+            }
         }
 
-        if ($groupId === null && $this->userData) {
-            $groupId = $this->userData['group_id'];
-        }
-
-
-        $result = $this->database->safeselect(
-            <<<'EOT'
-                `can_access_acp`,
-                `can_add_comments`,
-                `can_attach`,
-                `can_delete_comments`,
-                `can_delete_own_posts`,
-                `can_delete_own_shouts`,
-                `can_delete_own_topics`,
-                `can_delete_shouts`,
-                `can_edit_posts`,
-                `can_edit_topics`,
-                `can_im`,
-                `can_karma`,
-                `can_lock_own_topics`,
-                `can_moderate`,
-                `can_override_locked_topics`,
-                `can_pm`,
-                `can_poll`,
-                `can_post_topics`,
-                `can_post`,
-                `can_shout`,
-                `can_use_sigs`,
-                `can_view_board`,
-                `can_view_fullprofile`,
-                `can_view_offline_board`,
-                `can_view_shoutbox`,
-                `can_view_stats`,
-                `flood_control`,
-                `icon`,
-                `id`,
-                `legend`,
-                `title`
-                EOT
-            ,
+        $result = $this->database->safeselect([
+                'can_access_acp',
+                'can_add_comments',
+                'can_attach',
+                'can_delete_comments',
+                'can_delete_own_posts',
+                'can_delete_own_shouts',
+                'can_delete_own_topics',
+                'can_delete_shouts',
+                'can_edit_posts',
+                'can_edit_topics',
+                'can_im',
+                'can_karma',
+                'can_lock_own_topics',
+                'can_moderate',
+                'can_override_locked_topics',
+                'can_pm',
+                'can_poll',
+                'can_post_topics',
+                'can_post',
+                'can_shout',
+                'can_use_sigs',
+                'can_view_board',
+                'can_view_fullprofile',
+                'can_view_offline_board',
+                'can_view_shoutbox',
+                'can_view_stats',
+                'flood_control',
+                'icon',
+                'id',
+                'legend',
+                'title'
+            ],
             'member_groups',
             'WHERE `id`=?',
             $groupId ?? 3,
@@ -211,6 +224,54 @@ final class User
         $this->database->disposeresult($result);
 
         return $userPerms;
+    }
+
+    public function parseperms($permstoparse, $uid = false): array
+    {
+        $permstoparse .= '';
+        if ($permstoparse === '' || $permstoparse === '0') {
+            $permstoparse = '0';
+        }
+
+        if ($permstoparse !== '0') {
+            if ($uid !== false) {
+                $unpack = unpack('n*', $permstoparse);
+                $permstoparse = [];
+                $counter = count($unpack);
+                for ($x = 1; $x < $counter; $x += 2) {
+                    $permstoparse[$unpack[$x]] = $unpack[$x + 1];
+                }
+
+                $permstoparse = $permstoparse[$uid] ?? null;
+            }
+        } else {
+            $permstoparse = null;
+        }
+
+        if ($permstoparse === null) {
+            return [
+                'poll' => $this->getPerm('can_poll'),
+                'read' => 1,
+                'reply' => $this->getPerm('can_post'),
+                'start' => $this->getPerm('can_post_topics'),
+                'upload' => $this->getPerm('can_attach'),
+                'view' => 1,
+            ];
+        }
+
+        return [
+            'poll' => $permstoparse & 32,
+            'read' => $permstoparse & 8,
+            'reply' => $permstoparse & 2,
+            'start' => $permstoparse & 4,
+            'upload' => $permstoparse & 1,
+            'view' => $permstoparse & 16,
+        ];
+    }
+
+    public function isBanned(): bool
+    {
+        return $this->ipAddress->isBanned();
     }
 
     public function isGuest(): bool
