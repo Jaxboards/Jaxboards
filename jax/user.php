@@ -121,7 +121,7 @@ final class User
         $user = $this->database->arow($result);
         $this->database->disposeresult($result);
 
-        if (empty($user)) {
+        if (!$user) {
             return $this->userData = null;
         }
 
@@ -132,7 +132,7 @@ final class User
             $verifiedPassword = password_verify((string) $pass, (string) $user['pass']);
 
             if (!$verifiedPassword) {
-                return $this->userData = false;
+                return $this->userData = null;
             }
 
             $needsRehash = password_needs_rehash(
@@ -141,12 +141,12 @@ final class User
             );
 
             if ($needsRehash) {
-                $new_hash = password_hash((string) $pass, PASSWORD_DEFAULT);
+                $newHash = password_hash((string) $pass, PASSWORD_DEFAULT);
                 // Add the new hash.
-                $this->safeupdate(
+                $this->database->safeupdate(
                     'members',
                     [
-                        'pass' => $new_hash,
+                        'pass' => $newHash,
                     ],
                     'WHERE `id` = ?',
                     $user['id'],
@@ -231,24 +231,7 @@ final class User
 
     public function parseForumPerms(string $permstoparse): array
     {
-        $groupId = $this->get('group_id');
-
-        if ($permstoparse !== '') {
-            if ($groupId) {
-                $unpack = unpack('n*', $permstoparse);
-                $permstoparse = [];
-                $counter = count($unpack);
-                for ($x = 1; $x < $counter; $x += 2) {
-                    $permstoparse[$unpack[$x]] = $unpack[$x + 1];
-                }
-
-                $permstoparse = $permstoparse[$groupId] ?? null;
-            }
-        } else {
-            $permstoparse = null;
-        }
-
-        if ($permstoparse === null) {
+        if ($permstoparse === '') {
             return [
                 'poll' => $this->getPerm('can_poll'),
                 'read' => 1,
@@ -259,13 +242,27 @@ final class User
             ];
         }
 
+        $permFlags = 0;
+
+        $groupId = $this->get('group_id');
+        if ($groupId) {
+            $unpack = unpack('n*', $permstoparse);
+            $parsedPerms = [];
+            $counter = count($unpack);
+            for ($x = 1; $x < $counter; $x += 2) {
+                $parsedPerms[$unpack[$x]] = $unpack[$x + 1];
+            }
+
+            $permFlags = $parsedPerms[$groupId] ?? null;
+        }
+
         return [
-            'poll' => $permstoparse & 32,
-            'read' => $permstoparse & 8,
-            'reply' => $permstoparse & 2,
-            'start' => $permstoparse & 4,
-            'upload' => $permstoparse & 1,
-            'view' => $permstoparse & 16,
+            'poll' => $permFlags & 32,
+            'read' => $permFlags & 8,
+            'reply' => $permFlags & 2,
+            'start' => $permFlags & 4,
+            'upload' => $permFlags & 1,
+            'view' => $permFlags & 16,
         ];
     }
 
