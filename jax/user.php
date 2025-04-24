@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use function array_key_exists;
 use function date;
 use function password_hash;
 use function password_needs_rehash;
@@ -13,15 +14,19 @@ use const PASSWORD_DEFAULT;
 
 final class User
 {
-    private array|null $userData = null;
+    private ?array $userData = null;
 
     public function __construct(private readonly Database $database) {}
 
-    public function get(string $property) {
-        return $this->userData && array_key_exists($property, $this->userData) ? $this->userData[$property] : null;
+    public function get(string $property)
+    {
+        return $this->userData && array_key_exists($property, $this->userData)
+            ? $this->userData[$property]
+            : null;
     }
 
-    public function set(string $property, $value) {
+    public function set(string $property, $value): void
+    {
         $this->userData[$property] = $value;
         $this->database->safeupdate(
             'members',
@@ -199,7 +204,8 @@ final class User
         return $userPerms;
     }
 
-    public function isGuest() {
+    public function isGuest(): bool
+    {
         return !$this->getUser();
     }
 }

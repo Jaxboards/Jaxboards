@@ -1097,7 +1097,7 @@ final class Topic
         $e = null;
         $ratings = [];
         if ($this->user->isGuest()) {
-            $e = "You must be logged in to rate posts.";
+            $e = 'You must be logged in to rate posts.';
         } elseif (!$f) {
             $e = "That post doesn't exist.";
         } elseif (!$niblets[$nibletid]) {

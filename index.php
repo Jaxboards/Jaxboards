@@ -188,7 +188,7 @@ if (!$PAGE->jsaccess) {
         '<script src="' . BOARDURL . 'dist/app.js" defer></script>',
     );
 
-    if (($PERMS['can_moderate'] || $USERCLASS->get('mod'))) {
+    if ($PERMS['can_moderate'] || $USERCLASS->get('mod')) {
         $PAGE->append(
             'SCRIPT',
             '<script type="text/javascript" src="?act=modcontrols&do=load" defer></script>',
@@ -289,7 +289,7 @@ if (!$PAGE->jsaccess) {
                 $USERCLASS->get('last_visit'),
             ),
             $nummessages,
-        )
+        ),
     );
 }
 

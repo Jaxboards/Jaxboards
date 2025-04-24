@@ -456,12 +456,14 @@ onclick="this.form.submitButton=this"/></div>
     public function canedit($post): bool
     {
         global $PERMS;
-
-        return ($post['auth_id']
+        if ($post['auth_id']
             && ($post['newtopic'] ? $PERMS['can_edit_topics']
             : $PERMS['can_edit_posts'])
-            && $post['auth_id'] === $this->user->get('id'))
-            || $this->canmoderate($post['tid']);
+            && $post['auth_id'] === $this->user->get('id')) {
+            return true;
+        }
+
+        return (bool) $this->canmoderate($post['tid']);
     }
 
     public function canmoderate($tid)
@@ -812,7 +814,7 @@ onclick="this.form.submitButton=this"/></div>
 
         $fdata['perms'] = $this->jax->parseperms(
             $fdata['perms'],
-            $this->user->get('group_id') ?? 3
+            $this->user->get('group_id') ?? 3,
         );
         if (
             !$fdata['perms']['reply']
