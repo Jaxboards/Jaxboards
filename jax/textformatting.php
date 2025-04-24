@@ -21,7 +21,6 @@ use function nl2br;
 use function parse_url;
 use function preg_match;
 use function preg_match_all;
-use function preg_quote;
 use function preg_replace;
 use function preg_replace_callback;
 use function preg_split;
