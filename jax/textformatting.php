@@ -104,7 +104,7 @@ final class TextFormatting
                 }
 
                 foreach ($rules as $emote => $path) {
-                    $emotes[$emote] = 'emoticons/'. $emotepack . '/' . $path;
+                    $emotes[$emote] = 'emoticons/' . $emotepack . '/' . $path;
                 }
             }
         }
