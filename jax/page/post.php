@@ -585,7 +585,7 @@ onclick="this.form.submitButton=this"/></div>
                                     ' ',
                                     (string) $this->textFormatting->wordfilter(
                                         $this->textFormatting->blockhtml(
-                                            $this->jax->textonly(
+                                            $this->textFormatting->textonly(
                                                 $this->postdata,
                                             ),
                                         ),
@@ -753,7 +753,7 @@ onclick="this.form.submitButton=this"/></div>
                                 '@\s+@',
                                 ' ',
                                 $this->textFormatting->blockhtml(
-                                    $this->jax->textonly(
+                                    $this->textFormatting->textonly(
                                         $this->postdata,
                                     ),
                                 ),

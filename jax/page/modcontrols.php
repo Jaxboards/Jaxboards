@@ -1185,7 +1185,7 @@ final class ModControls
             );
             while ($f = $this->database->arow($result)) {
                 $content .= "<div class='post'>"
-                    . nl2br($this->textFormatting->blockhtml($this->jax->textonly($f['post'])))
+                    . nl2br($this->textFormatting->blockhtml($this->textFormatting->textonly($f['post'])))
                     . '</div>';
             }
 
