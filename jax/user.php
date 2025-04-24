@@ -269,11 +269,13 @@ final class User
 
         return [
             'poll' => $this->getPerm('can_poll'),
-            'read' => 1, // There is no global "forum read" permission so default to assuming the user can read it
+            'read' => 1,
+            // There is no global "forum read" permission so default to assuming the user can read it
             'reply' => $this->getPerm('can_post'),
             'start' => $this->getPerm('can_post_topics'),
             'upload' => $this->getPerm('can_attach'),
-            'view' => 1, // There is no global "forum view" permission so default to assuming the user can see it
+            'view' => 1,
+            // There is no global "forum view" permission so default to assuming the user can see it
         ];
     }
 
