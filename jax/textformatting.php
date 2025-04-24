@@ -46,15 +46,17 @@ final class TextFormatting
     private $badwords = [];
 
     /**
-     * Merged emote pack rules with custom emote rules
+     * Merged emote pack rules with custom emote rules.
+     *
      * @var array<string, string>
      */
     private $emotes = [];
 
-    private string $emotepack = "";
+    private string $emotepack = '';
 
     /**
-     * Emotes from the emote pack
+     * Emotes from the emote pack.
+     *
      * @var array<string, string>
      */
     private $emotePackRules = [];
@@ -100,15 +102,16 @@ final class TextFormatting
         return $this->emotes;
     }
 
-    function getEmotePackRules(string $emotepack) {
-        if ($this->emotepack == $emotepack && $this->emotePackRules) {
+    public function getEmotePackRules(string $emotepack)
+    {
+        if ($this->emotepack === $emotepack && $this->emotePackRules) {
             return $this->emotePackRules;
         }
 
         // Load emoticon pack.
 
         $emotes = [];
-        if ($emotepack) {
+        if ($emotepack !== '' && $emotepack !== '0') {
             $this->emotepack = $emotepack;
             $rulesPath = JAXBOARDS_ROOT . '/emoticons/' . $emotepack . '/rules.php';
 
@@ -118,6 +121,7 @@ final class TextFormatting
                 if (!$rules) {
                     exit('Emoticon ruleset corrupted!');
                 }
+
                 $this->emotePackRules = $rules;
 
                 foreach ($rules as $emote => $path) {
@@ -127,6 +131,7 @@ final class TextFormatting
         }
 
         $this->emotes = $emotes;
+
         return $this->emotePackRules = $emotes;
     }
 
@@ -168,7 +173,7 @@ final class TextFormatting
     public function emotes(string $text): string
     {
         $emoticonLimit = 15;
-        $emotes = $this->getEmoteRules();
+        $emotes = $this->emotes;
 
         if (!$emotes) {
             return $text;
