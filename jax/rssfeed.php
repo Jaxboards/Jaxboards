@@ -54,7 +54,7 @@ final class RSSFeed
                 ));
             } else {
                 $xml .= "<{$property}" . ($property === 'content' ? ' type="html"' : '') . '>'
-                    . (is_array($value) ? $this->make_xml($value) : $value) . "</{$property}>";
+                    . $value . "</{$property}>";
             }
         }
 
