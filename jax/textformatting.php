@@ -6,6 +6,7 @@ namespace Jax;
 
 use function array_keys;
 use function array_pop;
+use function array_map;
 use function array_values;
 use function count;
 use function explode;
@@ -20,6 +21,7 @@ use function nl2br;
 use function parse_url;
 use function preg_match;
 use function preg_match_all;
+use function preg_quote;
 use function preg_replace;
 use function preg_replace_callback;
 use function preg_split;
@@ -256,9 +258,7 @@ final class TextFormatting
                 . 'align="absmiddle" />';
         }
 
-        $keys = array_keys($bbcodes);
-        $values = array_values($bbcodes);
-        while (($tmp = preg_replace($keys, $values, (string) $text)) !== $text) {
+        while (($tmp = preg_replace(array_keys($bbcodes), array_values($bbcodes), (string) $text)) !== $text) {
             $text = $tmp;
         }
 
