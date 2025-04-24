@@ -229,15 +229,12 @@ final class User
         return $userPerms;
     }
 
-    public function parseperms($permstoparse, $uid = false): array
+    public function parseForumPerms(string $permstoparse): array
     {
-        $permstoparse .= '';
-        if ($permstoparse === '' || $permstoparse === '0') {
-            $permstoparse = '0';
-        }
+        $groupId = $this->get('group_id');
 
-        if ($permstoparse !== '0') {
-            if ($uid !== false) {
+        if ($permstoparse !== '') {
+            if ($groupId !== false) {
                 $unpack = unpack('n*', $permstoparse);
                 $permstoparse = [];
                 $counter = count($unpack);
@@ -245,7 +242,7 @@ final class User
                     $permstoparse[$unpack[$x]] = $unpack[$x + 1];
                 }
 
-                $permstoparse = $permstoparse[$uid] ?? null;
+                $permstoparse = $permstoparse[$groupId] ?? null;
             }
         } else {
             $permstoparse = null;

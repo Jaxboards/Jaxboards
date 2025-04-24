@@ -146,10 +146,7 @@ final class Forum
 
         $title = &$fdata['title'];
 
-        $fdata['perms'] = $this->user->parseperms(
-            $fdata['perms'],
-            $this->user->get('group_id'),
-        );
+        $fdata['perms'] = $this->user->parseForumPerms($fdata['perms']);
         if (!$fdata['perms']['read']) {
             $this->page->JS('alert', 'no permission');
 

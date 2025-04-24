@@ -258,7 +258,7 @@ final class UserProfile
                     $id,
                 );
                 while ($f = $this->database->arow($result)) {
-                    $p = $this->user->parseperms($f['perms'], $this->user->get('group_id'));
+                    $p = $this->user->parseForumPerms($f['perms']);
                     if (!$p['read']) {
                         continue;
                     }
@@ -294,7 +294,7 @@ final class UserProfile
                     $id,
                 );
                 while ($f = $this->database->arow($result)) {
-                    $p = $this->user->parseperms($f['perms'], $this->user->get('group_id'));
+                    $p = $this->user->parseForumPerms($f['perms']);
                     if (!$p['read']) {
                         continue;
                     }

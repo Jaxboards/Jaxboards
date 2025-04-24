@@ -624,7 +624,7 @@ final readonly class Forums
             $global = !isset($perms[$f['id']]);
             if (!$global) {
                 $p = isset($perms[$f['id']])
-                    ? $this->user->parseperms($perms[$f['id']])
+                    ? $this->user->parseForumPerms($perms[$f['id']])
                     : null;
             }
 

@@ -223,10 +223,7 @@ final class Topic
 
         $this->topicdata['topic_title'] = $this->textFormatting->wordfilter($this->topicdata['topic_title']);
         $this->topicdata['subtitle'] = $this->textFormatting->wordfilter($this->topicdata['subtitle']);
-        $this->topicdata['fperms'] = $this->user->parseperms(
-            $this->topicdata['fperms'],
-            $this->user->get('group_id'),
-        );
+        $this->topicdata['fperms'] = $this->user->parseForumPerms($this->topicdata['fperms']);
     }
 
     public function viewtopic($tid): void
@@ -439,29 +436,29 @@ final class Topic
         $list = [];
         $oldcache = array_flip(explode(',', (string) $this->session->users_online_cache));
         $newcache = [];
-        foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $f) {
-            if (!$f['uid']) {
+        foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $user) {
+            if (!$user['uid']) {
                 continue;
             }
 
-            if ($f['location'] !== "vt{$tid}") {
+            if ($user['location'] !== "vt{$tid}") {
                 continue;
             }
 
-            $newcache[] = $f['uid'];
+            $newcache[] = $user['uid'];
 
-            if (!isset($oldcache[$f['uid']])) {
+            if (!isset($oldcache[$user['uid']])) {
                 $list[] = [
-                    $f['uid'],
-                    $f['group_id'],
-                    $f['status'] !== 'active' ? $f['status'] : '',
-                    $f['name'],
+                    $user['uid'],
+                    $user['group_id'],
+                    $user['status'] !== 'active' ? $user['status'] : '',
+                    $user['name'],
                 ];
 
                 continue;
             }
 
-            unset($oldcache[$f['uid']]);
+            unset($oldcache[$user['uid']]);
         }
 
         if ($list !== []) {

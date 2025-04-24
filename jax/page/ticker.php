@@ -72,7 +72,7 @@ final class Ticker
         $ticks = '';
         $first = 0;
         while ($tick = $this->database->arow($result)) {
-            $p = $this->user->parseperms($tick['perms'], $this->user->get('group_id'));
+            $p = $this->user->parseForumPerms($tick['perms']);
             if (!$p['read']) {
                 continue;
             }
@@ -129,7 +129,7 @@ final class Ticker
         );
         $first = false;
         while ($f = $this->database->arow($result)) {
-            $p = $this->user->parseperms($f['perms'], $this->user->get('group_id'));
+            $p = $this->user->parseForumPerms($f['perms']);
             if (!$p['read']) {
                 continue;
             }

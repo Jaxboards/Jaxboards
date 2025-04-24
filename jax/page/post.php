@@ -377,10 +377,7 @@ onclick="this.form.submitButton=this" /></div>
             }
 
             $tdata['title'] = $this->textFormatting->wordfilter($tdata['title']);
-            $tdata['perms'] = $this->user->parseperms(
-                $tdata['perms'],
-                $this->user->get('group_id'),
-            );
+            $tdata['perms'] = $this->user->parseForumPerms($tdata['perms']);
         }
 
         $page .= '<div id="post-preview">' . $this->postpreview . '</div>';
@@ -708,10 +705,7 @@ onclick="this.form.submitButton=this"/></div>
             if (!$fdata) {
                 $e = "The forum you're trying to post in does not exist.";
             } else {
-                $fdata['perms'] = $this->user->parseperms(
-                    $fdata['perms'],
-                    $this->user->get('group_id'),
-                );
+                $fdata['perms'] = $this->user->parseForumPerms($fdata['perms']);
                 if (!$fdata['perms']['start']) {
                     $e = <<<'EOT'
                         You don't have permission to post a new topic in that forum.
@@ -807,10 +801,7 @@ onclick="this.form.submitButton=this"/></div>
             return false;
         }
 
-        $fdata['perms'] = $this->user->parseperms(
-            $fdata['perms'],
-            $this->user->get('group_id'),
-        );
+        $fdata['perms'] = $this->user->parseForumPerms($fdata['perms']);
         if (
             !$fdata['perms']['reply']
             || $fdata['locked']
