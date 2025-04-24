@@ -84,21 +84,10 @@ $JAX = $container->get(Jax::class);
 $SESS = $container->get(Session::class);
 $USER = $container->get(User::class);
 
-// Prefetch user data
-$USER->getUser(!$SESS->is_bot && isset($_SESSION['uid']) && $_SESSION['uid'] ? $_SESSION['uid'] : null);
+$userId = $SESS->loginWithToken();
 
-if (!isset($_SESSION['uid']) && isset($JAX->c['utoken'])) {
-    $result = $DB->safeselect(
-        ['uid'],
-        'tokens',
-        'WHERE `token`=?',
-        $JAX->c['utoken'],
-    );
-    $token = $DB->arow($result);
-    if ($token) {
-        $_SESSION['uid'] = $token['uid'];
-    }
-}
+// Prefetch user data
+$USER->getUser($userId);
 
 // Fix ip if necessary.
 if (!$USER->isGuest() && $SESS->ip && $SESS->ip !== $USER->get('ip')) {

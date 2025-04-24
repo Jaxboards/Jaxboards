@@ -85,6 +85,27 @@ final class Session
         $this->data['vars'] = [];
     }
 
+    public function loginWithToken(): ?int {
+        if ($this->is_bot) {
+            return null;
+        }
+
+        if (!isset($_SESSION['uid']) && isset($this->jax->c['utoken'])) {
+            $result = $DB->safeselect(
+                ['uid'],
+                'tokens',
+                'WHERE `token`=?',
+                $this->jax->c['utoken'],
+            );
+            $token = $DB->arow($result);
+            if ($token) {
+                $_SESSION['uid'] = $token['uid'];
+            }
+        }
+
+        return $_SESSION['uid'];
+    }
+
     public function __get($a)
     {
         return $this->data[$a] ?? null;
