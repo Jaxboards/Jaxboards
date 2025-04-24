@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Jax;
 
 use function array_merge;
+use function count;
 use function date;
 use function password_hash;
 use function password_needs_rehash;
 use function password_verify;
+use function unpack;
 
 use const PASSWORD_DEFAULT;
 
@@ -19,8 +21,7 @@ final class User
     public function __construct(
         private readonly Database $database,
         private readonly IPAddress $ipAddress,
-    ) {
-    }
+    ) {}
 
     public function get(string $property)
     {
@@ -158,10 +159,11 @@ final class User
         return $this->userData = $user;
     }
 
-    public function getPerm(string $perm) {
+    public function getPerm(string $perm)
+    {
         $perms = $this->getPerms();
 
-        return array_key_exists($perm, $perms) ? $perms[$perm] : null;
+        return $perms[$perm] ?? null;
     }
 
     public function getPerms($groupId = null)
@@ -182,7 +184,8 @@ final class User
             }
         }
 
-        $result = $this->database->safeselect([
+        $result = $this->database->safeselect(
+            [
                 'can_access_acp',
                 'can_add_comments',
                 'can_attach',
@@ -213,7 +216,7 @@ final class User
                 'icon',
                 'id',
                 'legend',
-                'title'
+                'title',
             ],
             'member_groups',
             'WHERE `id`=?',

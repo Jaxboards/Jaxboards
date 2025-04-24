@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Jax;
 
 use function array_merge;
-use function count;
 use function floor;
 use function glob;
 use function gmdate;
@@ -22,7 +21,6 @@ use function str_replace;
 use function strtotime;
 use function time;
 use function unlink;
-use function unpack;
 
 use const PHP_EOL;
 
@@ -49,8 +47,8 @@ final class Jax
     public $b = [];
 
     public function __construct(
-        private readonly Config $config)
-    {
+        private readonly Config $config,
+    ) {
         $this->c = $_COOKIE;
         $this->g = $_GET;
         $this->p = $_POST;
