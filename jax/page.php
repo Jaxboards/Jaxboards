@@ -78,6 +78,7 @@ final class Page
      * @var array<string, string>
      */
     public $meta;
+
     private $metadefs = [];
 
     private $debuginfo = [];
