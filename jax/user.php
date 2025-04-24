@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use function array_merge;
 use function date;
 use function password_hash;
 use function password_needs_rehash;
@@ -32,7 +33,7 @@ final class User
 
     public function set(string $property, $value): void
     {
-        $this->setBulk([ $property => $value ]);
+        $this->setBulk([$property => $value]);
     }
 
     public function setBulk(array $fields): void
