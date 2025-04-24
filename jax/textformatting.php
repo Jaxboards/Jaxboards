@@ -110,9 +110,7 @@ final class TextFormatting
             }
         }
 
-        $this->emotes = $emotes;
-
-        return null;
+        return $this->emotes = $emotes;
     }
 
     public function linkify(string $text): ?string
