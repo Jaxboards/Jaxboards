@@ -24,7 +24,7 @@ final readonly class BuddyList
         private readonly Session $session,
     ) {
         $buddylist = $this->jax->hiddenFormFields(['act' => 'buddylist']);
-        $this->page->metadefs['buddylist-contacts'] = <<<EOT
+        $this->page->addMeta('buddylist-contacts', <<<EOT
             <div class="contacts">
                 <form method="?" data-ajax-form="true">
                     {$buddylist}
@@ -34,8 +34,9 @@ final readonly class BuddyList
                         onblur="this.form.onsubmit()" value="%s"/>
                     %s
             </div>
-            EOT;
-        $this->page->metadefs['buddylist-contact'] = <<<'EOT'
+        EOT
+        );
+        $this->page->addMeta('buddylist-contact', <<<'EOT'
             <div
                 class="contact %3$s">
                 <a href="?act=vu%1$s">
@@ -49,7 +50,8 @@ final readonly class BuddyList
                         %5$s
                     </div>
             </div>
-            EOT;
+        EOT
+        );
     }
 
     public function route(): void
