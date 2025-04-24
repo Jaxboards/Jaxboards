@@ -4,31 +4,16 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use function array_merge;
-use function count;
-use function floor;
-use function glob;
-use function gmdate;
-use function is_array;
-use function is_dir;
-use function json_decode;
-use function mail;
-use function mb_substr;
-use function preg_match;
-use function rmdir;
-use function round;
-use function setcookie;
-use function str_replace;
-use function strtotime;
-use function time;
-use function unlink;
-use function unpack;
+use function date;
+use function password_hash;
+use function password_needs_rehash;
+use function password_verify;
 
-use const PHP_EOL;
+use const PASSWORD_DEFAULT;
 
-final class User
+final readonly class User
 {
-    public function __construct(private readonly Database $database) {}
+    public function __construct(private Database $database) {}
 
     public function getUser($uid = false, $pass = false)
     {

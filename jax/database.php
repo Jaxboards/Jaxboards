@@ -16,7 +16,6 @@ use function array_shift;
 use function array_unshift;
 use function array_values;
 use function count;
-use function date;
 use function debug_backtrace;
 use function error_log;
 use function explode;
@@ -36,9 +35,6 @@ use function mb_strlen;
 use function mb_substr;
 use function mysqli_fetch_array;
 use function mysqli_fetch_assoc;
-use function password_hash;
-use function password_needs_rehash;
-use function password_verify;
 use function preg_match;
 use function print_r;
 use function str_repeat;
@@ -50,7 +46,6 @@ use function vsprintf;
 use const LOG_ERR;
 use const MYSQLI_ASSOC;
 use const MYSQLI_BOTH;
-use const PASSWORD_DEFAULT;
 use const PHP_EOL;
 
 // TODO: Migrate jaxboards to be database-independent and not tied to MySQL
