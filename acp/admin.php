@@ -42,12 +42,12 @@ $DB->connect(
     $CFG['sql_db'],
     $CFG['sql_prefix'],
 );
-$USERCLASS = $container->get(User::class);
+$USER = $container->get(User::class);
 
 $JAX = $container->get(Jax::class);
 if (isset($_SESSION['auid'])) {
-    $userData = $USERCLASS->getUser($_SESSION['auid']);
-    $PERMS = $USERCLASS->getPerms($userData['group_id']);
+    $userData = $USER->getUser($_SESSION['auid']);
+    $PERMS = $USER->getPerms($userData['group_id']);
 } else {
     $PERMS = [
         'can_access_acp' => false,
@@ -60,10 +60,8 @@ if (!$PERMS['can_access_acp']) {
     exit;
 }
 
-// TODO: make global $USER point to class not user data
-$USER = $USERCLASS->getUser();
 $PAGE = $container->get(Page::class);
-$PAGE->append('username', $USER['display_name']);
+$PAGE->append('username', $USER->get('display_name'));
 $PAGE->title($CFG['boardname'] . ' - ACP');
 $PAGE->addNavMenu(
     'Settings',

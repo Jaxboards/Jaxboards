@@ -269,7 +269,8 @@ final readonly class Posting
 
         $emoticonRows = '';
         if ($emotepack) {
-            require_once JAXBOARDS_ROOT . "/emoticons/{$emotepack}/rules.php";
+            require JAXBOARDS_ROOT . "/emoticons/{$emotepack}/rules.php";
+
             foreach ($rules as $emoticon => $smileyFile) {
                 $emoticonRows .= $this->page->parseTemplate(
                     'posting/emoticon-packs-row.html',
