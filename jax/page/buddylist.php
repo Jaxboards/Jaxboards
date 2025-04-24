@@ -24,33 +24,37 @@ final readonly class BuddyList
         private readonly Session $session,
     ) {
         $buddylist = $this->jax->hiddenFormFields(['act' => 'buddylist']);
-        $this->page->addMeta('buddylist-contacts', <<<EOT
-            <div class="contacts">
-                <form method="?" data-ajax-form="true">
-                    {$buddylist}
-                    <a href="?act=logreg5" id="status" class="%s">
-                    </a>
-                    <input style="width:100%%;padding-left:20px;" type="text" name="status"
-                        onblur="this.form.onsubmit()" value="%s"/>
-                    %s
-            </div>
-        EOT
+        $this->page->addMeta(
+            'buddylist-contacts',
+            <<<EOT
+                    <div class="contacts">
+                        <form method="?" data-ajax-form="true">
+                            {$buddylist}
+                            <a href="?act=logreg5" id="status" class="%s">
+                            </a>
+                            <input style="width:100%%;padding-left:20px;" type="text" name="status"
+                                onblur="this.form.onsubmit()" value="%s"/>
+                            %s
+                    </div>
+                EOT,
         );
-        $this->page->addMeta('buddylist-contact', <<<'EOT'
-            <div
-                class="contact %3$s">
-                <a href="?act=vu%1$s">
-                    <div class="avatar">
-                        <img src="%4$s" alt="Avatar"/>
+        $this->page->addMeta(
+            'buddylist-contact',
+            <<<'EOT'
+                    <div
+                        class="contact %3$s">
+                        <a href="?act=vu%1$s">
+                            <div class="avatar">
+                                <img src="%4$s" alt="Avatar"/>
+                            </div>
+                            <div class="name">
+                                %2$s
+                            </div>
+                            <div class="status">
+                                %5$s
+                            </div>
                     </div>
-                    <div class="name">
-                        %2$s
-                    </div>
-                    <div class="status">
-                        %5$s
-                    </div>
-            </div>
-        EOT
+                EOT,
         );
     }
 
