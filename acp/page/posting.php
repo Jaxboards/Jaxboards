@@ -268,18 +268,14 @@ final readonly class Posting
         }
 
         $emoticonRows = '';
-        if ($emotepack) {
-            require JAXBOARDS_ROOT . "/emoticons/{$emotepack}/rules.php";
-
-            foreach ($rules as $emoticon => $smileyFile) {
-                $emoticonRows .= $this->page->parseTemplate(
-                    'posting/emoticon-packs-row.html',
-                    [
-                        'emoticon' => $emoticon,
-                        'smiley_url' => "/emoticons/{$emotepack}/{$smileyFile}",
-                    ],
-                ) . PHP_EOL;
-            }
+        foreach ($this->textFormatting->getEmotePackRules($emotepack) as $emoticon => $smileyFile) {
+            $emoticonRows .= $this->page->parseTemplate(
+                'posting/emoticon-packs-row.html',
+                [
+                    'emoticon' => $emoticon,
+                    'smiley_url' => '/' . $smileyFile,
+                ],
+            ) . PHP_EOL;
         }
 
 

@@ -46,9 +46,18 @@ final class TextFormatting
     private $badwords = [];
 
     /**
+     * Merged emote pack rules with custom emote rules
      * @var array<string, string>
      */
     private $emotes = [];
+
+    private string $emotepack = "";
+
+    /**
+     * Emotes from the emote pack
+     * @var array<string, string>
+     */
+    private $emotePackRules = [];
 
     public function __construct(
         private readonly Config $config,
@@ -56,7 +65,7 @@ final class TextFormatting
         private readonly User $user,
     ) {
         // Preload custom rules and emojis
-        $this->getEmoteRules();
+        $this->getEmotePackRules($this->config->getSetting('emotepack'));
         $this->getCustomRules();
     }
 
@@ -88,23 +97,28 @@ final class TextFormatting
 
     public function getEmoteRules()
     {
-        if ($this->emotes) {
-            return $this->emotes;
+        return $this->emotes;
+    }
+
+    function getEmotePackRules(string $emotepack) {
+        if ($this->emotepack == $emotepack && $this->emotePackRules) {
+            return $this->emotePackRules;
         }
 
-        $emotes = [];
-
         // Load emoticon pack.
-        $emotepack = $this->config->getSetting('emotepack');
 
+        $emotes = [];
         if ($emotepack) {
+            $this->emotepack = $emotepack;
             $rulesPath = JAXBOARDS_ROOT . '/emoticons/' . $emotepack . '/rules.php';
 
             if (file_exists($rulesPath)) {
                 require_once $rulesPath;
+
                 if (!$rules) {
                     exit('Emoticon ruleset corrupted!');
                 }
+                $this->emotePackRules = $rules;
 
                 foreach ($rules as $emote => $path) {
                     $emotes[$emote] = 'emoticons/' . $emotepack . '/' . $path;
@@ -112,7 +126,8 @@ final class TextFormatting
             }
         }
 
-        return $this->emotes = $emotes;
+        $this->emotes = $emotes;
+        return $this->emotePackRules = $emotes;
     }
 
     public function linkify(string $text): ?string
@@ -153,12 +168,14 @@ final class TextFormatting
     public function emotes(string $text): string
     {
         $emoticonLimit = 15;
-        if (!$this->emotes) {
+        $emotes = $this->getEmoteRules();
+
+        if (!$emotes) {
             return $text;
         }
 
         $text = preg_replace_callback(
-            '@(\s)(' . implode('|', array_map(static fn(string $emote): string => preg_quote($emote, '@'), array_keys($this->emotes))) . ')@',
+            '@(\s)(' . implode('|', array_map(static fn(string $emote): string => preg_quote($emote, '@'), array_keys($emotes))) . ')@',
             $this->emotecallback(...),
             ' ' . $text,
             $emoticonLimit,
