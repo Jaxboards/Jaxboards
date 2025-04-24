@@ -601,7 +601,7 @@ final class Database
             $today = gmdate('n j');
             while ($f = $this->arow($result)) {
                 if ($f['hide']) {
-                    if ($USER && $USER['group_id'] !== 2) {
+                    if ($USER->get('group_id') !== 2) {
                         continue;
                     }
 
