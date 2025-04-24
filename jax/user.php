@@ -272,9 +272,14 @@ final class User
         ];
     }
 
+    public function isAdmin(): bool
+    {
+        return $this->get('group_id') === 2;
+    }
+
     public function isBanned(): bool
     {
-        return $this->ipAddress->isBanned();
+        return $this->get('group_id') === 4 || $this->ipAddress->isBanned();
     }
 
     public function isGuest(): bool

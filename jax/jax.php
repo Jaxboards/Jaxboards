@@ -215,8 +215,6 @@ final class Jax
 
     public function mail($email, $topic, $message)
     {
-        global $_SERVER;
-
         $boardname = $this->config->getSetting('boardname') ?: 'JaxBoards';
         $boardurl = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'];
         $boardlink = "<a href='https://" . $boardurl . "'>" . $boardname . '</a>';

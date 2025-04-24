@@ -343,7 +343,7 @@ final class Topic
 
         // Make the users online list.
         $usersonline = '';
-        foreach ($this->database->getUsersOnline() as $user) {
+        foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $user) {
             if (!$user['uid']) {
                 continue;
             }
@@ -439,7 +439,7 @@ final class Topic
         $list = [];
         $oldcache = array_flip(explode(',', (string) $this->session->users_online_cache));
         $newcache = [];
-        foreach ($this->database->getUsersOnline() as $f) {
+        foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $f) {
             if (!$f['uid']) {
                 continue;
             }
@@ -1073,7 +1073,6 @@ final class Topic
 
     public function ratepost($postid, $nibletid): void
     {
-        global $PAGE;
         $this->page->JS('softurl');
         if (!is_numeric($postid) || !is_numeric($nibletid)) {
             return;

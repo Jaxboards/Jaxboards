@@ -573,9 +573,8 @@ final class Database
         return $this->safequery(...$va_array);
     }
 
-    public function getUsersOnline()
+    public function getUsersOnline(bool $canViewHiddenMembers)
     {
-        global $USER;
         $idletimeout = time() - ($this->config->getSetting('timetoidle') ?? 300);
         $return = [];
         if (!$this->usersOnlineCache) {
@@ -601,7 +600,7 @@ final class Database
             $today = gmdate('n j');
             while ($f = $this->arow($result)) {
                 if ($f['hide']) {
-                    if ($USER->get('group_id') !== 2) {
+                    if (!$canViewHiddenMembers) {
                         continue;
                     }
 

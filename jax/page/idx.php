@@ -415,31 +415,32 @@ final class IDX
         $r = '';
         $guests = 0;
         $nummembers = 0;
-        foreach ($this->database->getUsersOnline() as $f) {
-            if (!empty($f['uid']) || (isset($f['is_bot']) && $f['is_bot'])) {
+
+        foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $user) {
+            if (!empty($user['uid']) || (isset($user['is_bot']) && $user['is_bot'])) {
                 $title = $this->textFormatting->blockhtml(
-                    $this->jax->pick($f['location_verbose'], 'Viewing the board.'),
+                    $this->jax->pick($user['location_verbose'], 'Viewing the board.'),
                 );
-                if (isset($f['is_bot']) && $f['is_bot']) {
-                    $r .= '<a class="user' . $f['uid'] . '" '
+                if (isset($user['is_bot']) && $user['is_bot']) {
+                    $r .= '<a class="user' . $user['uid'] . '" '
                         . 'title="' . $title . '" data-use-tooltip="true">'
-                        . $f['name'] . '</a>';
+                        . $user['name'] . '</a>';
                 } else {
                     ++$nummembers;
                     $r .= sprintf(
                         '<a href="?act=vu%1$s" class="user%1$s mgroup%2$s" '
                             . 'title="%4$s" data-use-tooltip="true">'
                             . '%3$s</a>',
-                        $f['uid'],
-                        $f['group_id']
-                        . ($f['status'] === 'idle' ? ' idle' : '')
-                        . ($f['birthday'] && $this->config->getSetting('birthdays') ? ' birthday' : ''),
-                        $f['name'],
+                        $user['uid'],
+                        $user['group_id']
+                        . ($user['status'] === 'idle' ? ' idle' : '')
+                        . ($user['birthday'] && $this->config->getSetting('birthdays') ? ' birthday' : ''),
+                        $user['name'],
                         $title,
                     );
                 }
             } else {
-                $guests = $f;
+                $guests = $user;
             }
         }
 
@@ -454,7 +455,7 @@ final class IDX
         }
 
         $useronlinecache = '';
-        foreach ($this->database->getUsersOnline() as $f) {
+        foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $f) {
             $lastActionIdle = (int) ($this->session->last_update ?? 0) - ($this->config->getSetting('timetoidle') ?? 300) - 30;
             if (!$f['uid'] && !$f['is_bot']) {
                 continue;
