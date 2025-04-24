@@ -76,10 +76,8 @@ final class ModControls
 
     public function route(): void
     {
-        global $USER;
-
         $this->perms = $this->user->getPerms();
-        if (!$this->perms['can_moderate'] && !$USER['mod']) {
+        if (!$this->perms['can_moderate'] && !$this->user->get('mod')) {
             $this->page->JS('softurl');
             $this->page->JS(
                 'alert',
@@ -340,7 +338,6 @@ final class ModControls
 
     public function modpost($pid)
     {
-        global $USER;
         if (!is_numeric($pid)) {
             return null;
         }
@@ -394,7 +391,7 @@ final class ModControls
             }
 
             $mods = explode(',', (string) $mods['mods']);
-            if (!in_array($USER['id'], $mods)) {
+            if (!in_array($this->user->get('id'), $mods)) {
                 return $this->page->JS(
                     'error',
                     "You don't have permission to be moderating in this forum",
@@ -428,7 +425,7 @@ final class ModControls
 
     public function modtopic($tid)
     {
-        global $USER,$PERMS;
+        global $PERMS;
         $this->page->JS('softurl');
         if (!is_numeric($tid)) {
             return null;
@@ -458,7 +455,7 @@ final class ModControls
             }
 
             $mods = explode(',', (string) $mods['mods']);
-            if (!in_array($USER['id'], $mods)) {
+            if (!in_array($this->user->get('id'), $mods)) {
                 return $this->page->JS(
                     'error',
                     "You don't have permission to be moderating in this forum",
@@ -501,7 +498,6 @@ final class ModControls
 
     public function deleteposts()
     {
-        global $USER;
         if (
             !isset($this->session->vars['modpids'])
             || !$this->session->vars['modpids']
@@ -563,7 +559,7 @@ final class ModControls
             $this->database->safeinsert(
                 'topics',
                 [
-                    'auth_id' => $USER['id'],
+                    'auth_id' => $this->user->get('id'),
                     'fid' => $trashcan,
                     'lp_date' => gmdate('Y-m-d H:i:s'),
                     'lp_uid' => $lp['auth_id'],
@@ -862,7 +858,7 @@ final class ModControls
 
     public function editmembers(): void
     {
-        global $USER,$PERMS;
+        global $PERMS;
         if (!$PERMS['can_moderate']) {
             return;
         }
@@ -969,10 +965,10 @@ final class ModControls
             }
 
             if (
-                $USER['group_id'] !== 2
+                $this->user->get('group_id') !== 2
                 || $data['group_id'] === 2
-                && ($USER['id'] !== 1
-                && $data['id'] !== $USER['id'])
+                && ($this->user->get('id') !== 1
+                && $data['id'] !== $this->user->get('id'))
             ) {
                 $e = 'You do not have permission to edit this profile.';
             }
@@ -1028,7 +1024,6 @@ final class ModControls
 
     public function iptools(): void
     {
-        global $USER;
         $page = '';
 
         $ip = $this->jax->b['ip'] ?? '';

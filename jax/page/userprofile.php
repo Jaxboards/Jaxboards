@@ -11,6 +11,7 @@ use Jax\Page;
 use Jax\RSSFeed;
 use Jax\Session;
 use Jax\TextFormatting;
+use Jax\User;
 
 use function explode;
 use function gmdate;
@@ -46,6 +47,7 @@ final class UserProfile
         private readonly Page $page,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
+        private readonly User $user,
     ) {
         $this->page->loadmeta('userprofile');
     }
@@ -73,7 +75,6 @@ final class UserProfile
 
     public function showcontactcard($id): void
     {
-        global $USER;
         $contactdetails = '';
         $result = $this->database->safespecial(
             <<<'EOT'
@@ -96,20 +97,20 @@ final class UserProfile
             ['members', 'member_groups'],
             $id,
         );
-        $ud = $this->database->arow($result);
+        $contactUser = $this->database->arow($result);
         $this->database->disposeresult($result);
-        if (!$ud) {
+        if (!$contactUser) {
             $this->page->error("This user doesn't exist!");
         }
 
         foreach ($this->contacturls as $k => $v) {
-            if (!$ud['contact_' . $k]) {
+            if (!$contactUser['contact_' . $k]) {
                 continue;
             }
 
             $contactdetails .= '<a class="' . $k . ' contact" title="' . $k . ' contact" href="' . sprintf(
                 $v,
-                $this->textFormatting->blockhtml($ud['contact_' . $k]),
+                $this->textFormatting->blockhtml($contactUser['contact_' . $k]),
             ) . '">&nbsp;</a>';
         }
 
@@ -121,23 +122,23 @@ final class UserProfile
                 'className' => 'contact-card',
                 'content' => $this->page->meta(
                     'userprofile-contact-card',
-                    $ud['uname'],
-                    $this->jax->pick($ud['avatar'], $this->page->meta('default-avatar')),
-                    $ud['usertitle'],
-                    $ud['uid'],
+                    $contactUser['uname'],
+                    $this->jax->pick($contactUser['avatar'], $this->page->meta('default-avatar')),
+                    $contactUser['usertitle'],
+                    $contactUser['uid'],
                     $contactdetails,
-                    $USER && in_array(
-                        $ud['uid'],
-                        explode(',', (string) $USER['friends']),
-                    ) ? '<a href="?act=buddylist&remove=' . $ud['uid']
+                    !$this->user->isGuest() && in_array(
+                        $contactUser['uid'],
+                        explode(',', (string) $this->user->get('friends')),
+                    ) ? '<a href="?act=buddylist&remove=' . $contactUser['uid']
                     . '">Remove Contact</a>' : '<a href="?act=buddylist&add='
-                    . $ud['uid'] . '">Add Contact</a>',
-                    $USER && in_array(
-                        $ud['uid'],
-                        explode(',', (string) $USER['enemies']),
-                    ) ? '<a href="?act=buddylist&unblock=' . $ud['uid']
+                    . $contactUser['uid'] . '">Add Contact</a>',
+                    !$this->user->isGuest() && in_array(
+                        $contactUser['uid'],
+                        explode(',', (string) $this->user->get('enemies')),
+                    ) ? '<a href="?act=buddylist&unblock=' . $contactUser['uid']
                     . '">Unblock Contact</a>'
-                    : '<a href="?act=buddylist&block=' . $ud['uid']
+                    : '<a href="?act=buddylist&block=' . $contactUser['uid']
                     . '">Block Contact</>',
                 ),
                 'minimizable' => false,
@@ -149,7 +150,7 @@ final class UserProfile
 
     public function showfullprofile($id)
     {
-        global $USER,$PERMS;
+        global $PERMS;
         if ($this->page->jsupdate && empty($this->jax->p)) {
             return false;
         }
@@ -258,7 +259,7 @@ final class UserProfile
                     $id,
                 );
                 while ($f = $this->database->arow($result)) {
-                    $p = $this->jax->parseperms($f['perms'], $USER ? $USER['group_id'] : 3);
+                    $p = $this->jax->parseperms($f['perms'], $this->user->get('group_id') ?? 3);
                     if (!$p['read']) {
                         continue;
                     }
@@ -294,7 +295,7 @@ final class UserProfile
                     $id,
                 );
                 while ($f = $this->database->arow($result)) {
-                    $p = $this->jax->parseperms($f['perms'], $USER ? $USER['group_id'] : 3);
+                    $p = $this->jax->parseperms($f['perms'], $this->user->get('group_id') ?? 3);
                     if (!$p['read']) {
                         continue;
                     }
@@ -380,7 +381,7 @@ final class UserProfile
                             'profile_comments',
                             'WHERE `id`=? AND `from`=?',
                             $this->database->basicvalue($this->jax->b['del']),
-                            $this->database->basicvalue($USER['id']),
+                            $this->database->basicvalue($this->user->get('id')),
                         );
                     }
                 }
@@ -389,7 +390,7 @@ final class UserProfile
                     isset($this->jax->p['comment'])
                     && $this->jax->p['comment'] !== ''
                 ) {
-                    if (!$USER || !$PERMS['can_add_comments']) {
+                    if ($this->user->isGuest() || !$PERMS['can_add_comments']) {
                         $e = 'No permission to add comments!';
                     } else {
                         $this->database->safeinsert(
@@ -398,7 +399,7 @@ final class UserProfile
                                 'affected_uid' => $id,
                                 'date' => gmdate('Y-m-d H:i:s'),
                                 'type' => 'profile_comment',
-                                'uid' => $USER['id'],
+                                'uid' => $this->user->get('id'),
                             ],
                         );
                         $this->database->safeinsert(
@@ -406,7 +407,7 @@ final class UserProfile
                             [
                                 'comment' => $this->jax->p['comment'],
                                 'date' => gmdate('Y-m-d H:i:s'),
-                                'from' => $USER['id'],
+                                'from' => $this->user->get('id'),
                                 'to' => $id,
                             ],
                         );
@@ -418,11 +419,11 @@ final class UserProfile
                     }
                 }
 
-                if ($USER && $PERMS['can_add_comments']) {
+                if (!$this->user->isGuest() && $PERMS['can_add_comments']) {
                     $pfbox = $this->page->meta(
                         'userprofile-comment-form',
-                        $USER['name'] ?? '',
-                        $this->jax->pick($USER['avatar'], $this->page->meta('default-avatar')),
+                        $this->user->get('name') ?? '',
+                        $this->jax->pick($this->user->get('avatar'), $this->page->meta('default-avatar')),
                         $this->jax->hiddenFormFields(
                             [
                                 'act' => 'vu' . $id,
@@ -466,7 +467,7 @@ final class UserProfile
                         $this->jax->date($f['date']),
                         $this->textFormatting->theworks($f['comment'])
                         . ($PERMS['can_delete_comments']
-                        && $f['from'] === $USER['id']
+                        && $f['from'] === $this->user->get('id')
                         || $PERMS['can_moderate']
                         ? ' <a href="?act=' . $this->jax->b['act']
                         . '&view=profile&page=comments&del=' . $f['id']
@@ -642,12 +643,11 @@ final class UserProfile
 
     public function parse_activity($activity): array|string
     {
-        global $USER;
         $user = $this->page->meta(
             'user-link',
             $activity['uid'],
             $activity['group_id'],
-            $USER && $USER['id'] === $activity['uid'] ? 'You' : $activity['name'],
+            $this->user->get('id') === $activity['uid'] ? 'You' : $activity['name'],
         );
         $otherguy = $this->page->meta(
             'user-link',
@@ -679,8 +679,6 @@ final class UserProfile
 
     public function parse_activity_rss($activity): array|string
     {
-        global $USER;
-
         return match ($activity['type']) {
             'profile_comment' => [
                 'link' => $this->textFormatting->blockhtml('?act=vu' . $activity['aff_id']),

@@ -12,6 +12,7 @@ use Jax\Page;
 use Jax\RSSFeed;
 use Jax\Session;
 use Jax\TextFormatting;
+use Jax\User;
 
 use function array_diff;
 use function array_flip;
@@ -74,6 +75,7 @@ final class Topic
         private readonly Page $page,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
+        private readonly User $user,
     ) {
         $this->page->loadmeta('topic');
     }
@@ -191,7 +193,6 @@ final class Topic
 
     public function getTopicData($tid): void
     {
-        global $USER;
         $result = $this->database->safespecial(
             <<<'MySQL'
                 SELECT a.`title` AS `topic_title`
@@ -224,15 +225,15 @@ final class Topic
         $this->topicdata['subtitle'] = $this->textFormatting->wordfilter($this->topicdata['subtitle']);
         $this->topicdata['fperms'] = $this->jax->parseperms(
             $this->topicdata['fperms'],
-            $USER ? $USER['group_id'] : 3,
+            $this->user->get('group_id') ?? 3,
         );
     }
 
     public function viewtopic($tid): void
     {
-        global $USER,$PERMS;
+        global $PERMS;
 
-        if ($USER && $this->topicdata['lp_date'] > $USER['last_visit']) {
+        if (!$this->user->isGuest() && $this->topicdata['lp_date'] > $this->user->get('last_visit')) {
             $this->markread($tid);
         }
 
@@ -534,7 +535,7 @@ final class Topic
 
     public function postsintooutput($lastpid = 0): string
     {
-        global $USER,$PERMS;
+        global $PERMS;
         $usersonline = $this->database->getUsersOnline();
         $ratingConfig = $this->config->getSetting('ratings') ?? 0;
 
@@ -833,7 +834,7 @@ final class Topic
 
     public function canedit($post): bool
     {
-        global $PERMS,$USER;
+        global $PERMS;
         if ($this->canModerate()) {
             return true;
         }
@@ -842,12 +843,12 @@ final class Topic
         && ($post['newtopic']
             ? $PERMS['can_edit_topics']
             : $PERMS['can_edit_posts'])
-        && $post['auth_id'] === $USER['id'];
+        && $post['auth_id'] === $this->user->get('id');
     }
 
     public function canModerate()
     {
-        global $PERMS,$USER;
+        global $PERMS;
         if ($this->canMod) {
             return $this->canMod;
         }
@@ -857,7 +858,7 @@ final class Topic
             $canMod = true;
         }
 
-        if ($USER && $USER['mod']) {
+        if ($this->user->get('mod')) {
             $result = $this->database->safespecial(
                 <<<'MySQL'
                     SELECT `mods`
@@ -873,7 +874,7 @@ final class Topic
             );
             $mods = $this->database->arow($result);
             $this->database->disposeresult($result);
-            if (in_array($USER['id'], explode(',', (string) $mods['mods']), true)) {
+            if (in_array($this->user->get('id'), explode(',', (string) $mods['mods']), true)) {
                 $canMod = true;
             }
         }
@@ -883,8 +884,6 @@ final class Topic
 
     public function generatepoll($q, $type, $choices, $results): string
     {
-        global $USER;
-
         if (!$choices) {
             $choices = [];
         }
@@ -893,7 +892,7 @@ final class Topic
         $usersvoted = [];
         $voted = false;
 
-        if ($USER) {
+        if (!$this->user->isGuest()) {
             // Accomplish three things at once:
             // * Determine if the user has voted.
             // * Count up the number of votes.
@@ -905,7 +904,7 @@ final class Topic
             foreach (explode(';', (string) $results) as $k => $v) {
                 $presults[$k] = $v !== '' && $v !== '0' ? explode(',', $v) : [];
                 $totalvotes += ($numvotes[$k] = count($presults[$k]));
-                if (in_array($USER['id'], $presults[$k], true)) {
+                if (in_array($this->user->get('id'), $presults[$k], true)) {
                     $voted = true;
                 }
 
@@ -962,9 +961,8 @@ final class Topic
 
     public function votepoll()
     {
-        global $USER;
         $e = '';
-        if (!$USER) {
+        if ($this->user->isGuest()) {
             $e = 'You must be logged in to vote!';
         } else {
             $result = $this->database->safeselect(
@@ -1003,7 +1001,7 @@ final class Topic
             $voted = false;
             foreach ($results as $v) {
                 foreach ($v as $v2) {
-                    if ($v2 === $USER['id']) {
+                    if ($v2 === $this->user->get('id')) {
                         $voted = true;
 
                         break;
@@ -1042,10 +1040,10 @@ final class Topic
 
         if ($row['poll_type'] === 'multi') {
             foreach ($choice as $c) {
-                $results[$c][] = $USER['id'];
+                $results[$c][] = $this->user->get('id');
             }
         } else {
-            $results[$choice][] = $USER['id'];
+            $results[$choice][] = $this->user->get('id');
         }
 
         $presults = [];
@@ -1080,7 +1078,7 @@ final class Topic
 
     public function ratepost($postid, $nibletid): void
     {
-        global $USER,$PAGE;
+        global $PAGE;
         $this->page->JS('softurl');
         if (!is_numeric($postid) || !is_numeric($nibletid)) {
             return;
@@ -1098,8 +1096,8 @@ final class Topic
         $niblets = $this->database->getRatingNiblets();
         $e = null;
         $ratings = [];
-        if (!$USER['id']) {
-            $e = "You don't have permission to rate posts.";
+        if ($this->user->isGuest()) {
+            $e = "You must be logged in to rate posts.";
         } elseif (!$f) {
             $e = "That post doesn't exist.";
         } elseif (!$niblets[$nibletid]) {
@@ -1121,13 +1119,13 @@ final class Topic
             $ratings[(int) $nibletid] = [];
         }
 
-        $unrate = in_array((int) $USER['id'], $ratings[(int) $nibletid], true);
+        $unrate = in_array((int) $this->user->get('id'), $ratings[(int) $nibletid], true);
         // Unrate
         if ($unrate) {
-            $ratings[(int) $nibletid] = array_diff($ratings[(int) $nibletid], [(int) $USER['id']]);
+            $ratings[(int) $nibletid] = array_diff($ratings[(int) $nibletid], [(int) $this->user->get('id')]);
         } else {
             // Rate
-            $ratings[(int) $nibletid][] = (int) $USER['id'];
+            $ratings[(int) $nibletid][] = (int) $this->user->get('id');
         }
 
         $this->database->safeupdate(
@@ -1143,7 +1141,7 @@ final class Topic
 
     public function qeditpost($pid): void
     {
-        global $USER,$PERMS;
+        global $PERMS;
         if (!is_numeric($pid)) {
             return;
         }

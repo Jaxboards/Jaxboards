@@ -10,6 +10,7 @@ use Jax\Jax;
 use Jax\Page;
 use Jax\Session;
 use Jax\TextFormatting;
+use Jax\User;
 
 use function explode;
 use function gmdate;
@@ -32,6 +33,7 @@ final readonly class PrivateMessage
         private Page $page,
         private Session $session,
         private TextFormatting $textFormatting,
+        private User $user,
     ) {}
 
     public function init(): void
@@ -51,12 +53,12 @@ final readonly class PrivateMessage
 
     public function filter(): void
     {
-        global $USER;
-        if (!$USER['enemies']) {
+        $enemies = $this->user->get('enemies');
+        if (!$enemies) {
             return;
         }
 
-        $enemies = explode(',', (string) $USER['enemies']);
+        $enemies = explode(',', (string) $enemies);
         // Kinda gross I know, unparses then parses then
         // unparses again later on.. Oh well.
         $exploded = explode(PHP_EOL, (string) $this->session->runonce);
@@ -80,13 +82,12 @@ final readonly class PrivateMessage
 
     public function message($uid, $im)
     {
-        global $USER,$PERMS;
+        global $PERMS;
         $this->session->act();
-        $ud = $USER;
         $e = '';
         $fatal = false;
 
-        if (!$ud) {
+        if ($this->user->isGuest()) {
             return $this->page->JS('error', 'You must be logged in to instant message!');
         }
 
@@ -107,13 +108,13 @@ final readonly class PrivateMessage
         $cmd = [
             'im',
             $uid,
-            $ud['display_name'],
+            $this->user->get('display_name'),
             $im,
-            $USER['id'],
+            $this->user->get('id'),
             time(),
         ];
         $this->page->JSRawArray($cmd);
-        $cmd[1] = $ud['id'];
+        $cmd[1] = $this->user->get('id');
         $cmd[4] = 0;
         $onlineusers = $this->database->getUsersOnline();
         $logoutTime = time() - $this->config->getSetting('timetologout');

@@ -222,9 +222,9 @@ final class Page
         }
     }
 
-    public function JSRawArray(string $line): void
+    public function JSRawArray(array $command): void
     {
-        $this->JSOutput[] = $line;
+        $this->JSOutput[] = $command;
     }
 
     public function out(): void

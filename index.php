@@ -87,11 +87,6 @@ $USERCLASS = $container->get(User::class);
 // TODO: make global $USER point to class not data
 $USER = $USERCLASS->getUser(!$SESS->is_bot && isset($_SESSION['uid']) && $_SESSION['uid'] ? $_SESSION['uid'] : null);
 
-// If they're IP banned, put them in the banned group
-if ($container->get(IPAddress::class)->isBanned()) {
-    $USER['group_id'] = 4;
-}
-
 if (!isset($_SESSION['uid']) && isset($JAX->c['utoken'])) {
     $result = $DB->safeselect(
         ['uid'],
@@ -105,25 +100,19 @@ if (!isset($_SESSION['uid']) && isset($JAX->c['utoken'])) {
     }
 }
 
-$PERMS = $USERCLASS->getPerms($USER['group_id'] ?? 3);
+// If they're IP banned, put them in the banned group
+$PERMS = $USERCLASS->getPerms(($container->get(IPAddress::class)->isBanned() ? 4 : $USERCLASS->get('group_id')) ?? 3);
 
 // Fix ip if necessary.
-if ($USER && $SESS->ip && $SESS->ip !== $USER['ip']) {
-    $DB->safeupdate(
-        'members',
-        [
-            'ip' => $container->get(IPAddress::class)->asBinary(),
-        ],
-        'WHERE id=?',
-        $USER['id'],
-    );
+if (!$USERCLASS->isGuest() && $SESS->ip && $SESS->ip !== $USERCLASS->get('ip')) {
+    $USERCLASS->set('ip', $container->get(IPAddress::class)->asBinary());
 }
 
 // Load the theme.
 $PAGE->loadskin(
     $JAX->pick(
         $SESS->vars['skin_id'] ?? false,
-        $USER['skin_id'] ?? false,
+        $USERCLASS->get('skin_id') ?? false,
     ),
 );
 $PAGE->loadmeta('global');
@@ -155,9 +144,9 @@ if (isset($SESS->vars['skin_id']) && $SESS->vars['skin_id']) {
 // If they're logged in through cookies, (username & password)
 // but the session variable has changed/been removed/not updated for some reason
 // this fixes it.
-if ($USER && !$SESS->is_bot && $USER['id'] !== $SESS->uid) {
-    $SESS->clean($USER['id']);
-    $SESS->uid = $USER['id'];
+if (!$SESS->is_bot && $USERCLASS->get('id') !== $SESS->uid) {
+    $SESS->clean($USERCLASS->get('id'));
+    $SESS->uid = $USERCLASS->get('id');
     $SESS->applychanges();
 }
 
@@ -178,17 +167,17 @@ $PAGE->append(
 );
 
 if (!$PAGE->jsaccess) {
-    if ($USER) {
+    if (!$USERCLASS->isGuest()) {
         $PAGE->append(
             'SCRIPT',
             '<script>window.globalsettings='
             . json_encode([
-                'sound_im' => $USER['sound_im'] ? 1 : 0,
-                'wysiwyg' => $USER['wysiwyg'] ? 1 : 0,
+                'sound_im' => $USERCLASS->get('sound_im') ? 1 : 0,
+                'wysiwyg' => $USERCLASS->get('wysiwyg') ? 1 : 0,
                 'can_im' => $PERMS['can_im'] ? 1 : 0,
-                'groupid' => $USER['group_id'] ?? 3,
-                'username' => $USER['display_name'],
-                'userid' => $USER['id'] ?? 0,
+                'groupid' => $USERCLASS->get('group_id') ?? 3,
+                'username' => $USERCLASS->get('display_name'),
+                'userid' => $USERCLASS->get('id') ?? 0,
             ])
             . '</script>',
         );
@@ -199,7 +188,7 @@ if (!$PAGE->jsaccess) {
         '<script src="' . BOARDURL . 'dist/app.js" defer></script>',
     );
 
-    if ($USER && ($PERMS['can_moderate'] || $USER['mod'])) {
+    if (($PERMS['can_moderate'] || $USERCLASS->get('mod'))) {
         $PAGE->append(
             'SCRIPT',
             '<script type="text/javascript" src="?act=modcontrols&do=load" defer></script>',
@@ -239,12 +228,12 @@ if (!$PAGE->jsaccess) {
             isset($CFG['navlinks']) && $CFG['navlinks'] ? $CFG['navlinks'] : '',
         ),
     );
-    if ($USER && $USER['id']) {
+    if ($USERCLASS->get('id')) {
         $result = $DB->safeselect(
             'COUNT(`id`)',
             'messages',
             'WHERE `read`=0 AND `to`=?',
-            $USER['id'],
+            $USERCLASS->get('id'),
         );
         $thisrow = $DB->arow($result);
         $nummessages = 0;
@@ -286,21 +275,21 @@ if (!$PAGE->jsaccess) {
 
     $PAGE->append(
         'USERBOX',
-        $USER && $USER['id']
-        ? $PAGE->meta(
+        $USERCLASS->isGuest()
+        ? $PAGE->meta('userbox-logged-out')
+        : $PAGE->meta(
             'userbox-logged-in',
             $PAGE->meta(
                 'user-link',
-                $USER['id'],
-                $USER['group_id'],
-                $USER['display_name'],
+                $USERCLASS->get('id'),
+                $USERCLASS->get('group_id'),
+                $USERCLASS->get('display_name'),
             ),
             $JAX->smalldate(
-                $USER['last_visit'],
+                $USERCLASS->get('last_visit'),
             ),
             $nummessages,
         )
-        : $PAGE->meta('userbox-logged-out'),
     );
 }
 
@@ -308,19 +297,19 @@ if (!$PAGE->jsaccess) {
 $PAGE->addvar('modlink', $PERMS['can_moderate'] ? $PAGE->meta('modlink') : '');
 
 $PAGE->addvar('ismod', $PERMS['can_moderate'] ? 'true' : 'false');
-$PAGE->addvar('isguest', $USER ? 'false' : 'true');
+$PAGE->addvar('isguest', $USERCLASS->isGuest() ? 'true' : 'false');
 $PAGE->addvar('isadmin', $PERMS['can_access_acp'] ? 'true' : 'false');
 
 $PAGE->addvar('acplink', $PERMS['can_access_acp'] ? $PAGE->meta('acplink') : '');
 $PAGE->addvar('boardname', $CFG['boardname']);
 
-if ($USER) {
-    $PAGE->addvar('groupid', (string) $JAX->pick($USER['group_id'], 3));
-    $PAGE->addvar('userposts', (string) $USER['posts']);
+if (!$USERCLASS->isGuest()) {
+    $PAGE->addvar('groupid', (string) $JAX->pick($USERCLASS->get('group_id'), 3));
+    $PAGE->addvar('userposts', (string) $USERCLASS->get('posts'));
     $PAGE->addvar('grouptitle', $PERMS['title']);
-    $PAGE->addvar('avatar', $JAX->pick($USER['avatar'], $PAGE->meta('default-avatar')));
-    $PAGE->addvar('username', $USER['display_name']);
-    $PAGE->addvar('userid', (string) $JAX->pick($USER['id'], 0));
+    $PAGE->addvar('avatar', $JAX->pick($USERCLASS->get('avatar'), $PAGE->meta('default-avatar')));
+    $PAGE->addvar('username', $USERCLASS->get('display_name'));
+    $PAGE->addvar('userid', (string) $JAX->pick($USERCLASS->get('id'), 0));
 }
 
 if (!isset($JAX->b['act'])) {

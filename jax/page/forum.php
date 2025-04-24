@@ -9,6 +9,7 @@ use Jax\Jax;
 use Jax\Page;
 use Jax\Session;
 use Jax\TextFormatting;
+use Jax\User;
 
 use function ceil;
 use function explode;
@@ -41,6 +42,7 @@ final class Forum
         private readonly Page $page,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
+        private readonly User $user,
     ) {
         $this->page->loadmeta('forum');
     }
@@ -87,7 +89,7 @@ final class Forum
 
     public function viewforum($fid)
     {
-        global $PERMS,$USER;
+        global $PERMS;
 
         // If no fid supplied, go to the index and halt execution.
         if (!$fid) {
@@ -148,7 +150,7 @@ final class Forum
 
         $fdata['perms'] = $this->jax->parseperms(
             $fdata['perms'],
-            $USER ? $USER['group_id'] : 3,
+            $this->user->get('group_id') ?? 3,
         );
         if (!$fdata['perms']['read']) {
             $this->page->JS('alert', 'no permission');
@@ -476,7 +478,6 @@ final class Forum
 
     public function isTopicRead($topic, $fid): bool
     {
-        global $USER;
         if (empty($this->topicsRead)) {
             $this->topicsRead = $this->jax->parsereadmarkers($this->session->topicsread);
         }
@@ -495,13 +496,12 @@ final class Forum
         return $topic['lp_date'] <= $this->jax->pick(
             max($this->topicsRead[$topic['id']], $this->forumReadTime),
             $this->session->read_date,
-            $USER && $USER['last_visit'],
+            $this->user->get('last_visit'),
         );
     }
 
     public function isForumRead($forum): bool
     {
-        global $USER;
         if (!$this->forumsRead) {
             $this->forumsRead = $this->jax->parsereadmarkers($this->session->forumsread);
         }
@@ -509,7 +509,7 @@ final class Forum
         return $forum['lp_date'] <= $this->jax->pick(
             $this->forumsRead[$forum['id']] ?? null,
             $this->session->read_date,
-            $USER && $USER['last_visit'],
+            $this->user->get('last_visit'),
         );
     }
 

@@ -53,6 +53,7 @@ final class TextFormatting
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
+        private readonly User $user,
     ) {
         // Preload custom rules and emojis
         $this->getEmoteRules();
@@ -175,8 +176,7 @@ final class TextFormatting
 
     public function wordfilter(string $text): string
     {
-        global $USER;
-        if ($USER && $USER['nowordfilter']) {
+        if ($this->user->get('nowordfilter')) {
             return $text;
         }
 

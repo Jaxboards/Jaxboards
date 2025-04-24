@@ -8,6 +8,7 @@ use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
 use Jax\Session;
+use Jax\User;
 
 final class Ticker
 {
@@ -18,6 +19,7 @@ final class Ticker
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly Session $session,
+        private readonly User $user,
     ) {
         $this->page->loadmeta('ticker');
     }
@@ -33,7 +35,6 @@ final class Ticker
 
     public function index(): void
     {
-        global $USER;
         $this->session->location_verbose = 'Using the ticker!';
         $result = $this->database->safespecial(
             <<<'EOT'
@@ -71,7 +72,7 @@ final class Ticker
         $ticks = '';
         $first = 0;
         while ($tick = $this->database->arow($result)) {
-            $p = $this->jax->parseperms($tick['perms'], $USER ? $USER['group_id'] : 3);
+            $p = $this->jax->parseperms($tick['perms'], $this->user->get('group_id') ?? 3);
             if (!$p['read']) {
                 continue;
             }
@@ -91,7 +92,6 @@ final class Ticker
 
     public function update(): void
     {
-        global $USER;
         $result = $this->database->safespecial(
             <<<'EOT'
                 SELECT
@@ -129,7 +129,7 @@ final class Ticker
         );
         $first = false;
         while ($f = $this->database->arow($result)) {
-            $p = $this->jax->parseperms($f['perms'], $USER ? $USER['group_id'] : 3);
+            $p = $this->jax->parseperms($f['perms'], $this->user->get('group_id') ?? 3);
             if (!$p['read']) {
                 continue;
             }

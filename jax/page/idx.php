@@ -10,6 +10,7 @@ use Jax\Jax;
 use Jax\Page;
 use Jax\Session;
 use Jax\TextFormatting;
+use Jax\User;
 
 use function array_flip;
 use function array_keys;
@@ -43,6 +44,7 @@ final class IDX
         private readonly Page $page,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
+        private readonly User $user,
     ) {
         $this->page->loadmeta('idx');
     }
@@ -65,7 +67,6 @@ final class IDX
 
     public function viewidx(): void
     {
-        global $USER;
         $this->session->location_verbose = 'Viewing board index';
         $page = '';
         $result = $this->database->safespecial(
@@ -98,7 +99,7 @@ final class IDX
 
         // This while loop just grabs all of the data, displaying is done below.
         while ($r = $this->database->arow($result)) {
-            $perms = $this->jax->parseperms($r['perms'], $USER ? $USER['group_id'] : 3);
+            $perms = $this->jax->parseperms($r['perms'], $this->user->get('group_id') ?? 3);
             if ($r['perms'] && !$perms['view']) {
                 continue;
             }
@@ -565,7 +566,6 @@ final class IDX
 
     public function isForumRead($forum): bool
     {
-        global $USER;
         if (!$this->forumsread) {
             $this->forumsread = $this->jax->parsereadmarkers($this->session->forumsread);
         }
@@ -577,7 +577,7 @@ final class IDX
         return $forum['lp_date'] < max(
             $this->forumsread[$forum['id']],
             $this->session->read_date,
-            $USER && $USER['last_visit'],
+            $this->user->get('last_visit'),
         );
     }
 }

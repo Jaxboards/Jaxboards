@@ -11,6 +11,7 @@ use Jax\Jax;
 use Jax\Page;
 use Jax\Session;
 use Jax\TextFormatting;
+use Jax\User;
 
 use function array_pop;
 use function count;
@@ -62,6 +63,7 @@ final class Post
         private readonly IPAddress $ipAddress,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
+        private readonly User $user,
     ) {
         $this->page->addmeta('post-preview', $this->page->meta('box', '', 'Post Preview', '%s'));
     }
@@ -124,12 +126,11 @@ final class Post
 
     public function upload($fileobj, $uid = false): string
     {
-        global $USER;
         if ($uid === false) {
-            $uid = $USER['id'];
+            $uid = $this->user->get('id');
         }
 
-        if ($uid === false && !$USER) {
+        if ($uid === false && $this->user->isGuest()) {
             return 'must be logged in';
         }
 
@@ -195,7 +196,7 @@ final class Post
 
     public function showtopicform(): void
     {
-        global $PERMS,$USER;
+        global $PERMS;
         $e = '';
         if ($this->page->jsupdate) {
             return;
@@ -266,7 +267,7 @@ final class Post
 
         $fdata['perms'] = $this->jax->parsePerms(
             $fdata['perms'],
-            $USER ? $USER['group_id'] : 3,
+            $this->user->get('group_id') ?? 3,
         );
 
         if ($fdata === []) {
@@ -344,14 +345,13 @@ onclick="this.form.submitButton=this" /></div>
 
     public function showpostform(): void
     {
-        global $USER;
         $page = '';
         $tid = $this->tid;
         if ($this->page->jsupdate && $this->how !== 'qreply') {
             return;
         }
 
-        if ($USER && $this->how === 'qreply') {
+        if (!$this->user->isGuest() && $this->how === 'qreply') {
             $this->page->JS('closewindow', '#qreply');
         }
 
@@ -380,7 +380,7 @@ onclick="this.form.submitButton=this" /></div>
             $tdata['title'] = $this->textFormatting->wordfilter($tdata['title']);
             $tdata['perms'] = $this->jax->parseperms(
                 $tdata['perms'],
-                $USER ? $USER['group_id'] : 3,
+                $this->user->get('group_id') ?? 3,
             );
         }
 
@@ -455,18 +455,18 @@ onclick="this.form.submitButton=this"/></div>
 
     public function canedit($post): bool
     {
-        global $PERMS,$USER;
+        global $PERMS;
 
         return ($post['auth_id']
             && ($post['newtopic'] ? $PERMS['can_edit_topics']
             : $PERMS['can_edit_posts'])
-            && $post['auth_id'] === $USER['id'])
+            && $post['auth_id'] === $this->user->get('id'))
             || $this->canmoderate($post['tid']);
     }
 
     public function canmoderate($tid)
     {
-        global $PERMS,$USER;
+        global $PERMS;
         if ($this->canmod) {
             return $this->canmod;
         }
@@ -476,7 +476,7 @@ onclick="this.form.submitButton=this"/></div>
             $canmod = true;
         }
 
-        if ($USER['mod']) {
+        if ($this->user->get('mod')) {
             $result = $this->database->safespecial(
                 'SELECT mods FROM %t WHERE id=(SELECT fid FROM %t WHERE id=?)',
                 ['forums', 'topics'],
@@ -484,7 +484,7 @@ onclick="this.form.submitButton=this"/></div>
             );
             $mods = $this->database->arow($result);
             $this->database->disposeresult($result);
-            if (in_array($USER['id'], explode(',', (string) $mods['mods']))) {
+            if (in_array($this->user->get('id'), explode(',', (string) $mods['mods']))) {
                 $canmod = true;
             }
         }
@@ -494,7 +494,7 @@ onclick="this.form.submitButton=this"/></div>
 
     public function editpost(): ?bool
     {
-        global $USER,$PERMS;
+        global $PERMS;
         $pid = $this->pid;
         $tid = $this->tid;
         $e = '';
@@ -617,7 +617,7 @@ onclick="this.form.submitButton=this"/></div>
         $this->database->safeupdate(
             'posts',
             [
-                'editby' => $USER['id'],
+                'editby' => $this->user->get('id'),
                 'edit_date' => gmdate('Y-m-d H:i:s'),
                 'post' => $this->postdata,
             ],
@@ -636,7 +636,7 @@ onclick="this.form.submitButton=this"/></div>
 
     public function submitpost(): ?bool
     {
-        global $USER,$PERMS;
+        global $PERMS;
         $this->session->act();
         $tid = $this->tid;
         $fid = $this->fid;
@@ -644,7 +644,7 @@ onclick="this.form.submitButton=this"/></div>
         $fdata = false;
         $newtopic = false;
         $postDate = gmdate('Y-m-d H:i:s');
-        $uid = $USER['id'];
+        $uid = $this->user->get('id');
         $e = '';
 
         if (!$this->nopost && trim((string) $postdata) === '') {
@@ -713,7 +713,7 @@ onclick="this.form.submitButton=this"/></div>
             } else {
                 $fdata['perms'] = $this->jax->parseperms(
                     $fdata['perms'],
-                    $USER ? $USER['group_id'] : 3,
+                    $this->user->get('group_id') ?? 3,
                 );
                 if (!$fdata['perms']['start']) {
                     $e = <<<'EOT'
@@ -812,7 +812,7 @@ onclick="this.form.submitButton=this"/></div>
 
         $fdata['perms'] = $this->jax->parseperms(
             $fdata['perms'],
-            $USER ? $USER['group_id'] : 3,
+            $this->user->get('group_id') ?? 3
         );
         if (
             !$fdata['perms']['reply']
@@ -926,16 +926,7 @@ onclick="this.form.submitButton=this"/></div>
 
         // Update statistics.
         if (!$fdata['nocount']) {
-            $this->database->safespecial(
-                <<<'EOT'
-                    UPDATE %t
-                    SET `posts` = `posts` + 1
-                    WHERE `id`=?
-                    EOT
-                ,
-                ['members'],
-                $this->database->basicvalue($USER['id']),
-            );
+            $this->user->set('posts', $this->user->get('posts') + 1);
         }
 
         if ($newtopic) {

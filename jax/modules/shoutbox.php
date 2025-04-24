@@ -86,7 +86,7 @@ final class Shoutbox
 
     public function canDelete($id, $shoutrow = false)
     {
-        global $PERMS,$USER;
+        global $PERMS;
         $candelete = $PERMS['can_delete_shouts'];
         if (!$candelete && $PERMS['can_delete_own_shouts']) {
             if (!$shoutrow) {
@@ -101,7 +101,7 @@ final class Shoutbox
 
             if (
                 isset($shoutrow['uid'])
-                && $shoutrow['uid'] === $USER['id']
+                && $shoutrow['uid'] === $this->user->get('id')
             ) {
                 $candelete = true;
             }
@@ -157,7 +157,6 @@ final class Shoutbox
 
     public function displayshoutbox(): void
     {
-        global $USER;
         $result = $this->database->safespecial(
             <<<'EOT'
                 SELECT
@@ -202,15 +201,13 @@ final class Shoutbox
                 ),
             ) . "<script type='text/javascript'>globalsettings.shoutlimit="
             . $this->shoutlimit . ';globalsettings.sound_shout='
-            . (!$USER || $USER['sound_shout'] ? 1 : 0)
+            . ($this->user->get('sound_shout') ? 1 : 0)
             . '</script>',
         );
     }
 
     public function updateshoutbox(): void
     {
-        global $USER;
-
         // This is a bit tricky, we're transversing the shouts
         // in reverse order, since they're shifted onto the list, not pushed.
         $last = 0;
@@ -243,7 +240,7 @@ final class Shoutbox
                 $this->page->JS('addshout', $this->formatshout($f));
                 if ($this->config->getSetting('shoutboxsounds')) {
                     $sounds = [];
-                    if ($USER['sound_shout'] && $sounds[$f['shout']]) {
+                    if ($this->user->get('sound_shout') && $sounds[$f['shout']]) {
                         $this->page->JS(
                             'playsound',
                             'sfx',
@@ -349,8 +346,7 @@ final class Shoutbox
 
     public function deleteshout()
     {
-        global $USER;
-        if (!$USER) {
+        if ($this->user->isGuest()) {
             return $this->page->location('?');
         }
 

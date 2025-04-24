@@ -9,6 +9,7 @@ use Jax\Jax;
 use Jax\Page;
 use Jax\Session;
 use Jax\TextFormatting;
+use Jax\User;
 
 use function array_key_exists;
 use function array_map;
@@ -53,6 +54,7 @@ final class Search
         private readonly Jax $jax,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
+        private readonly User $user,
     ) {
         $this->page->loadmeta('search');
     }
@@ -452,8 +454,6 @@ final class Search
 
     public function getSearchableForums()
     {
-        global $USER;
-
         if ($this->fids) {
             return $this->fids;
         }
@@ -464,7 +464,7 @@ final class Search
             'forums',
         );
         while ($f = $this->database->arow($result)) {
-            $perms = $this->jax->parseperms($f['perms'], $USER ? $USER['group_id'] : 3);
+            $perms = $this->jax->parseperms($f['perms'], $this->user->get('group_id') ?? 3);
             if (!$perms['read']) {
                 continue;
             }

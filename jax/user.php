@@ -11,20 +11,36 @@ use function password_verify;
 
 use const PASSWORD_DEFAULT;
 
-final readonly class User
+final class User
 {
-    public function __construct(private Database $database) {}
+    private array|null $userData = null;
+
+    public function __construct(private readonly Database $database) {}
+
+    public function get(string $property) {
+        return $this->userData && array_key_exists($property, $this->userData) ? $this->userData[$property] : null;
+    }
+
+    public function set(string $property, $value) {
+        $this->userData[$property] = $value;
+        $this->database->safeupdate(
+            'members',
+            [
+                $property => $value,
+            ],
+            ' WHERE `id`=?',
+            $this->get('id'),
+        );
+    }
 
     public function getUser($uid = false, $pass = false)
     {
-        static $userData = false;
-
-        if ($userData) {
-            return $userData;
+        if ($this->userData) {
+            return $this->userData;
         }
 
         if (!$uid) {
-            return false;
+            return null;
         }
 
         $result = $this->database->safeselect(
@@ -87,7 +103,7 @@ final readonly class User
         $this->database->disposeresult($result);
 
         if (empty($user)) {
-            return $userData = false;
+            return $this->userData = null;
         }
 
         $user['birthday'] = (date('n j') === $user['birthday'] ? 1 : 0);
@@ -97,7 +113,7 @@ final readonly class User
             $verifiedPassword = password_verify((string) $pass, (string) $user['pass']);
 
             if (!$verifiedPassword) {
-                return $userData = false;
+                return $this->userData = false;
             }
 
             $needsRehash = password_needs_rehash(
@@ -121,9 +137,7 @@ final readonly class User
             unset($user['pass']);
         }
 
-        $userData = $user;
-
-        return $userData;
+        return $this->userData = $user;
     }
 
     public function getPerms($groupId = null)
@@ -134,10 +148,8 @@ final readonly class User
             return $userPerms;
         }
 
-        $userData = $this->getUser();
-
-        if ($groupId === null && $userData) {
-            $groupId = $userData['group_id'];
+        if ($groupId === null && $this->userData) {
+            $groupId = $this->userData['group_id'];
         }
 
 
@@ -185,5 +197,9 @@ final readonly class User
         $this->database->disposeresult($result);
 
         return $userPerms;
+    }
+
+    public function isGuest() {
+        return !$this->getUser();
     }
 }

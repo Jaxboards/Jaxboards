@@ -9,6 +9,7 @@ use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
 use Jax\TextFormatting;
+use Jax\User;
 
 use function array_pop;
 use function gmdate;
@@ -50,14 +51,14 @@ final class UCP
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly TextFormatting $textFormatting,
+        private readonly User $user,
     ) {
         $this->page->loadmeta('ucp');
     }
 
     public function route(): void
     {
-        global $USER;
-        if (!$USER || $USER['group_id'] === 4) {
+        if ($this->user->isGuest() || $this->user->get('group_id') === 4) {
             $this->page->location('?');
 
             return;
@@ -154,8 +155,9 @@ final class UCP
 
     public function showmain(): void
     {
-        global $USER;
         $e = '';
+
+        $ucpnotepad = $this->user->get('ucpnotepad');
 
         if ($this->page->jsupdate && empty($this->jax->p)) {
             return;
@@ -175,19 +177,19 @@ final class UCP
                         'ucpnotepad' => $this->jax->p['ucpnotepad'],
                     ],
                     'WHERE `id`=?',
-                    $USER['id'],
+                    $this->user->get('id'),
                 );
-                $USER['ucpnotepad'] = $this->jax->p['ucpnotepad'];
+                $ucpnotepad = $this->jax->p['ucpnotepad'];
             }
         }
 
         $this->ucppage = ($e !== '' && $e !== '0' ? $this->page->meta('error', $e) : '') . $this->page->meta(
             'ucp-index',
             $this->jax->hiddenFormFields(['act' => 'ucp']),
-            $USER['display_name'],
-            $this->jax->pick($USER['avatar'], $this->page->meta('default-avatar')),
-            trim((string) $USER['ucpnotepad']) !== '' && trim((string) $USER['ucpnotepad']) !== '0'
-            ? $this->textFormatting->blockhtml($USER['ucpnotepad']) : 'Personal notes go here.',
+            $this->user->get('display_name'),
+            $this->jax->pick($this->user->get('avatar'), $this->page->meta('default-avatar')),
+            trim((string) $ucpnotepad) !== '' && trim((string) $ucpnotepad) !== '0'
+            ? $this->textFormatting->blockhtml($ucpnotepad) : 'Personal notes go here.',
         );
         $this->showucp();
     }
@@ -217,8 +219,6 @@ final class UCP
 
     public function showsoundsettings(): ?bool
     {
-        global $USER;
-
         $variables = [
             'sound_shout',
             'sound_im',
@@ -242,7 +242,7 @@ final class UCP
                 'members',
                 $update,
                 'WHERE `id`=?',
-                $USER['id'],
+                $this->user->get('id'),
             );
 
             foreach ($variables as $v) {
@@ -268,7 +268,7 @@ final class UCP
 
         foreach ($variables as $v) {
             $checkboxes[] = '<input type="checkbox" title="' . $v . '" name="' . $v . '" '
-                . ($USER[$v] ? 'checked="checked"' : '') . '/>';
+                . ($this->user->get($v) ? 'checked="checked"' : '') . '/>';
         }
 
         $this->ucppage = $this->page->meta('ucp-sound-settings', $checkboxes);
@@ -282,9 +282,8 @@ final class UCP
 
     public function showsigsettings(): void
     {
-        global $USER;
         $update = false;
-        $sig = $USER['sig'];
+        $sig = $this->user->get('sig');
         if (isset($this->jax->p['changesig'])) {
             $sig = $this->textFormatting->linkify($this->jax->p['changesig']);
             $this->database->safeupdate(
@@ -293,7 +292,7 @@ final class UCP
                     'sig' => $sig,
                 ],
                 'WHERE `id`=?',
-                $USER['id'],
+                $this->user->get('id'),
             );
             $update = true;
         }
@@ -314,7 +313,6 @@ final class UCP
 
     public function showpasssettings()
     {
-        global $USER;
         $e = '';
         if (isset($this->jax->p['passchange'])) {
             if (!isset($this->jax->p['showpass'])) {
@@ -337,7 +335,7 @@ final class UCP
                 $e = 'All form fields are required.';
             }
 
-            $verified_password = password_verify((string) $this->jax->p['curpass'], (string) $USER['pass']);
+            $verified_password = password_verify((string) $this->jax->p['curpass'], (string) $this->user->get('pass'));
             if (!$verified_password) {
                 $e = 'The password you entered is incorrect.';
             }
@@ -350,7 +348,7 @@ final class UCP
                         'pass' => $hashpass,
                     ],
                     'WHERE `id`=?',
-                    $USER['id'],
+                    $this->user->get('id'),
                 );
                 $this->ucppage = <<<'EOT'
                     Password changed.
@@ -374,7 +372,6 @@ final class UCP
 
     public function showemailsettings()
     {
-        global $USER;
         $e = '';
         if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
             if (
@@ -395,7 +392,7 @@ final class UCP
                         + ($this->jax->p['adminemails'] ?? false ? 1 : 0),
                     ],
                     'WHERE `id`=?',
-                    $USER['id'],
+                    $this->user->get('id'),
                 );
                 $this->ucppage = 'Email settings updated.'
                     . '<br><br><a href="?act=ucp&what=email">Back</a>';
@@ -415,22 +412,22 @@ final class UCP
                     name="email"
                     aria-label="Email"
                     title="Enter your new email address"
-                    value="{$USER['email']}" />
-                HTML : '<strong>' . $this->jax->pick($USER['email'], '--none--')
+                    value="{$this->user->get('email')}" />
+                HTML : '<strong>' . $this->jax->pick($this->user->get('email'), '--none--')
             . "</strong> <a href='?act=ucp&what=email&change=1'>Change</a>"
-            . "<input type='hidden' name='email' value='" . $USER['email'] . "' />",
+            . "<input type='hidden' name='email' value='" . $this->user->get('email') . "' />",
             '<input type="checkbox" title="Notifications" name="notifications"'
-            . (($USER['email_settings'] & 2) !== 0 ? " checked='checked'" : '') . '>',
+            . (($this->user->get('email_settings') & 2) !== 0 ? " checked='checked'" : '') . '>',
             '<input type="checkbox" title="Admin Emails" name="adminemails"'
-            . (($USER['email_settings'] & 1) !== 0 ? ' checked="checked"' : '') . '>',
+            . (($this->user->get('email_settings') & 1) !== 0 ? ' checked="checked"' : '') . '>',
         );
     }
 
     public function showavatarsettings(): void
     {
-        global $USER;
         $e = '';
         $update = false;
+        $avatar = $this->user->get('avatar');
         if (isset($this->jax->p['changedava'])) {
             if (
                 $this->jax->p['changedava']
@@ -442,22 +439,22 @@ final class UCP
                     'members',
                     ['avatar' => $this->jax->p['changedava']],
                     'WHERE `id`=?',
-                    $USER['id'],
+                    $this->user->get('id'),
                 );
-                $USER['avatar'] = $this->jax->p['changedava'];
+                $avatar = $this->jax->p['changedava'];
             }
 
             $update = true;
         }
 
         $this->ucppage = 'Your avatar: <span class="avatar"><img src="'
-            . $this->jax->pick($USER['avatar'], $this->page->meta('default-avatar'))
+            . $this->jax->pick($avatar, $this->page->meta('default-avatar'))
             . '" alt="Your avatar"></span><br><br>
             <form data-ajax-form="true" method="post">'
             . $this->getlocationforform()
             . ($e !== '' && $e !== '0' ? $this->page->error($e) : '')
             . '<input type="text" name="changedava" title="Your avatar" value="'
-            . $this->textFormatting->blockhtml($USER['avatar']) . '" />
+            . $this->textFormatting->blockhtml($avatar) . '" />
             <input type="submit" value="Edit" />
             </form>';
         if (!$update) {
@@ -469,7 +466,6 @@ final class UCP
 
     public function showprofilesettings(): void
     {
-        global $USER;
         $error = '';
         $genderOptions = ['', 'male', 'female', 'other'];
         if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
@@ -500,7 +496,7 @@ final class UCP
 
             // Begin input checking.
             if ($data['display_name'] === '') {
-                $data['display_name'] = $USER['name'];
+                $data['display_name'] = $this->user->get('name');
             }
 
             $badNameChars = $this->config->getSetting('badnamechars');
@@ -515,7 +511,7 @@ final class UCP
                     'members',
                     'WHERE `display_name` = ? AND `id`!=? LIMIT 1',
                     $this->database->basicvalue($data['display_name']),
-                    $USER['id'],
+                    $this->user->get('id'),
                 );
                 $displayNameCheck = $this->database->arow($result);
                 if ($displayNameCheck['same_display_name'] > 0) {
@@ -636,15 +632,15 @@ final class UCP
 
             // Handle errors/insert.
             if ($error === '' || $error === '0') {
-                if ($data['display_name'] !== $USER['display_name']) {
+                if ($data['display_name'] !== $this->user->get('display_name')) {
                     $this->database->safeinsert(
                         'activity',
                         [
-                            'arg1' => $USER['display_name'],
+                            'arg1' => $this->user->get('display_name'),
                             'arg2' => $data['display_name'],
                             'date' => gmdate('Y-m-d H:i:s'),
                             'type' => 'profile_name_change',
-                            'uid' => $USER['id'],
+                            'uid' => $this->user->get('id'),
                         ],
                     );
                 }
@@ -653,7 +649,7 @@ final class UCP
                     'members',
                     $data,
                     'WHERE `id`=?',
-                    $USER['id'],
+                    $this->user->get('id'),
                 );
                 $this->ucppage = 'Profile successfully updated.<br>'
                     . '<br><a href="?act=ucp&what=profile">Back</a>';
@@ -666,11 +662,10 @@ final class UCP
             $this->page->JS('error', $error);
         }
 
-        $data = $USER;
         $genderselect = '<select name="gender" title="Your gender" aria-label="Gender">';
         foreach (['', 'male', 'female', 'other'] as $v) {
             $genderselect .= '<option value="' . $v . '"'
-                . ($data['gender'] === $v ? ' selected="selected"' : '')
+                . ($this->user->get('gender') === $v ? ' selected="selected"' : '')
                 . '>' . $this->jax->pick(ucfirst($v), 'Not telling') . '</option>';
         }
 
@@ -693,14 +688,14 @@ final class UCP
         ];
         foreach ($fullMonthNames as $k => $v) {
             $dobselect .= '<option value="' . ($k + 1) . '"'
-                . ($k + 1 === $data['dob_month'] ? ' selected="selected"' : '')
+                . ($k + 1 === $this->user->get('dob_month') ? ' selected="selected"' : '')
                 . '>' . $v . '</option>';
         }
 
         $dobselect .= '</select><select name="dob_day" title="Day"><option value="">--</option>';
         for ($x = 1; $x < 32; ++$x) {
             $dobselect .= '<option value="' . $x . '"'
-                . ($x === $data['dob_day'] ? ' selected="selected"' : '')
+                . ($x === $this->user->get('dob_day') ? ' selected="selected"' : '')
                 . '>' . $x . '</option>';
         }
 
@@ -709,7 +704,7 @@ final class UCP
         $thisyear = (int) gmdate('Y');
         for ($x = $thisyear; $x > $thisyear - 100; --$x) {
             $dobselect .= '<option value="' . $x . '"'
-                . ($x === $data['dob_year'] ? ' selected="selected"' : '')
+                . ($x === $this->user->get('dob_year') ? ' selected="selected"' : '')
                 . '>' . $x . '</option>';
         }
 
@@ -719,33 +714,33 @@ final class UCP
             'ucp-profile-settings',
             $this->getlocationforform()
             . $this->jax->hiddenFormFields(['submit' => '1']),
-            $USER['name'],
-            $data['display_name'],
-            $data['full_name'],
-            $data['usertitle'],
-            $data['about'],
-            $data['location'],
+            $this->user->get('name'),
+            $this->user->get('display_name'),
+            $this->user->get('full_name'),
+            $this->user->get('usertitle'),
+            $this->user->get('about'),
+            $this->user->get('location'),
             $genderselect,
             $dobselect,
-            $data['contact_skype'],
-            $data['contact_discord'],
-            $data['contact_yim'],
-            $data['contact_msn'],
-            $data['contact_gtalk'],
-            $data['contact_aim'],
-            $data['contact_youtube'],
-            $data['contact_steam'],
-            $data['contact_twitter'],
-            $data['contact_bluesky'],
-            $data['website'],
+            $this->user->get('contact_skype'),
+            $this->user->get('contact_discord'),
+            $this->user->get('contact_yim'),
+            $this->user->get('contact_msn'),
+            $this->user->get('contact_gtalk'),
+            $this->user->get('contact_aim'),
+            $this->user->get('contact_youtube'),
+            $this->user->get('contact_steam'),
+            $this->user->get('contact_twitter'),
+            $this->user->get('contact_bluesky'),
+            $this->user->get('website'),
         );
     }
 
     public function showboardsettings(): void
     {
-        global $USER;
         $e = '';
         $showthing = false;
+        $skinId = $this->user->get('skin_id');
         if (
             isset($this->jax->b['skin'])
             && is_numeric($this->jax->b['skin'])
@@ -767,20 +762,22 @@ final class UCP
             if (!$this->database->arow($result)) {
                 $e = 'The skin chosen no longer exists.';
             } else {
+                $skinId = $this->jax->b['skin'];
+
                 $this->database->disposeresult($result);
                 $this->database->safeupdate(
                     'members',
                     [
                         'nowordfilter' => isset($this->jax->p['usewordfilter'])
                         && $this->jax->p['usewordfilter'] ? 0 : 1,
-                        'skin_id' => $this->jax->b['skin'],
+                        'skin_id' => $skinId,
                         'wysiwyg' => isset($this->jax->p['wysiwyg'])
                         && $this->jax->p['wysiwyg'] ? 1 : 0,
                     ],
                     'WHERE `id`=?',
-                    $USER['id'],
+                    $this->user->get('id'),
                 );
-                $USER['skin_id'] = $this->jax->b['skin'];
+
             }
 
             if ($e === '') {
@@ -800,7 +797,7 @@ final class UCP
             $showthing = true;
         }
 
-        $result = $USER['group_id'] !== 2
+        $result = $this->user->get('group_id') !== 2
             ? $this->database->safeselect(
                 [
                     'id',
@@ -830,7 +827,7 @@ final class UCP
         $select = '';
         while ($f = $this->database->arow($result)) {
             $select .= "<option value='" . $f['id'] . "' "
-                . ($USER['skin_id'] === $f['id'] ? "selected='selected'" : '')
+                . ($skinId === $f['id'] ? "selected='selected'" : '')
                 . '/>' . ($f['hidden'] ? '*' : '') . $f['title'] . '</option>';
             $found = true;
         }
@@ -845,10 +842,10 @@ final class UCP
             $this->getlocationforform(),
             $select,
             '<input type="checkbox" name="usewordfilter" title="Use Word Filter"'
-            . ($USER['nowordfilter'] ? '' : ' checked="checked"')
+            . ($this->user->get('nowordfilter') ? '' : ' checked="checked"')
             . ' />',
             '<input type="checkbox" name="wysiwyg" title="WYSIWYG Enabled"'
-            . ($USER['wysiwyg'] ? ' checked="checked"' : '')
+            . ($this->user->get('wysiwyg') ? ' checked="checked"' : '')
             . ' />',
         );
         if (!$showthing) {
@@ -865,7 +862,6 @@ final class UCP
 
     public function flag(): void
     {
-        global $USER;
         $this->page->JS('softurl');
         $this->database->safeupdate(
             'messages',
@@ -874,13 +870,12 @@ final class UCP
             ],
             'WHERE `id`=? AND `to`=?',
             $this->database->basicvalue($this->jax->b['flag']),
-            $USER['id'],
+            $this->user->get('id'),
         );
     }
 
     public function viewmessage($messageid): void
     {
-        global $USER;
         if ($this->page->jsupdate && !$this->page->jsdirectlink) {
             return;
         }
@@ -907,8 +902,8 @@ final class UCP
         $message = $this->database->arow($result);
         $this->database->disposeresult($result);
         if (
-            $message['from'] !== $USER['id']
-            && $message['to'] !== $USER['id']
+            $message['from'] !== $this->user->get('id')
+            && $message['to'] !== $this->user->get('id')
         ) {
             $e = "You don't have permission to view this message.";
         }
@@ -919,7 +914,7 @@ final class UCP
             return;
         }
 
-        if (!$message['read'] && $message['to'] === $USER['id']) {
+        if (!$message['read'] && $message['to'] === $this->user->get('id')) {
             $this->database->safeupdate(
                 'messages',
                 ['read' => 1],
@@ -956,12 +951,11 @@ final class UCP
 
     public function updatenummessages(): void
     {
-        global $USER;
         $result = $this->database->safeselect(
             'COUNT(`id`)',
             'messages',
             'WHERE `to`=? AND !`read`',
-            $USER['id'],
+            $this->user->get('id'),
         );
         $unread = $this->database->arow($result);
         $this->database->disposeresult($result);
@@ -972,8 +966,6 @@ final class UCP
 
     public function viewmessages($view = 'inbox'): void
     {
-        global $USER;
-
         if ($this->page->jsupdate && empty($this->jax->p)) {
             return;
         }
@@ -1003,7 +995,7 @@ final class UCP
 
                     MySQL,
                 ['messages', 'members'],
-                $USER['id'],
+                $this->user->get('id'),
             );
         } elseif ($view === 'flagged') {
             $result = $this->database->safespecial(
@@ -1021,7 +1013,7 @@ final class UCP
                     EOT
                 ,
                 ['messages', 'members'],
-                $USER['id'],
+                $this->user->get('id'),
             );
         } else {
             $result = $this->database->safespecial(
@@ -1039,7 +1031,7 @@ final class UCP
                     EOT
                 ,
                 ['messages', 'members'],
-                $USER['id'],
+                $this->user->get('id'),
             );
         }
 
@@ -1103,7 +1095,6 @@ final class UCP
 
     public function compose($messageid = '', $todo = ''): void
     {
-        global $USER;
         $showfull = 0;
         $e = '';
         $mid = 0;
@@ -1159,7 +1150,7 @@ final class UCP
                         'date' => gmdate('Y-m-d H:i:s'),
                         'del_recipient' => 0,
                         'del_sender' => 0,
-                        'from' => $USER['id'],
+                        'from' => $this->user->get('id'),
                         'message' => $this->jax->p['message'],
                         'read' => 0,
                         'title' => $this->textFormatting->blockhtml($this->jax->p['title']),
@@ -1170,7 +1161,7 @@ final class UCP
                 $cmd = json_encode(
                     [
                         'newmessage',
-                        'You have a new message from ' . $USER['display_name'],
+                        'You have a new message from ' . $this->user->get('display_name'),
                         $this->database->insert_id(),
                     ],
                 ) . PHP_EOL;
@@ -1189,9 +1180,9 @@ final class UCP
                 if (($udata['email_settings'] & 2) !== 0) {
                     $this->jax->mail(
                         $udata['email'],
-                        'PM From ' . $USER['display_name'],
+                        'PM From ' . $this->user->get('display_name'),
                         "You are receiving this email because you've "
-                        . 'received a message from ' . $USER['display_name']
+                        . 'received a message from ' . $this->user->get('display_name')
                         . ' on {BOARDLINK}.<br>'
                         . '<br>Please go to '
                         . "<a href='{BOARDURL}?act=ucp&what=inbox'>"
@@ -1223,8 +1214,8 @@ final class UCP
                 ],
                 'messages',
                 'WHERE (`to`=? OR `from`=?) AND `id`=?',
-                $USER['id'],
-                $USER['id'],
+                $this->user->get('id'),
+                $this->user->get('id'),
                 $this->database->basicvalue($messageid),
             );
 
@@ -1291,7 +1282,6 @@ final class UCP
 
     public function delete($id, $relocate = true): void
     {
-        global $USER;
         $result = $this->database->safeselect(
             [
                 '`to`',
@@ -1306,8 +1296,8 @@ final class UCP
         $message = $this->database->arow($result);
         $this->database->disposeresult($result);
 
-        $is_recipient = $message['to'] === $USER['id'];
-        $is_sender = $message['from'] === $USER['id'];
+        $is_recipient = $message['to'] === $this->user->get('id');
+        $is_sender = $message['from'] === $this->user->get('id');
         if ($is_recipient) {
             $this->database->safeupdate(
                 'messages',
