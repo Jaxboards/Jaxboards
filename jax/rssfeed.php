@@ -12,7 +12,10 @@ use function is_numeric;
 
 final class RSSFeed
 {
-    public $feed = [];
+    /**
+     * @var array<string, array|string>
+     */
+    private $feed = [];
 
     public function __construct($settings)
     {
@@ -41,21 +44,20 @@ final class RSSFeed
         exit(0);
     }
 
-    public function make_xml($array): string
+    public function make_xml(array $array): string
     {
-        $r = '';
-        foreach ($array as $k => $v) {
-            $isn = is_numeric($k);
-            if (is_array($v) && $v[0]) {
-                foreach ($v as $v2) {
-                    $r .= "<{$k}>" . $this->make_xml($v2) . "</{$k}>";
-                }
+        $xml = '';
+        foreach ($array as $property => $value) {
+            if (is_array($value)) {
+                $xml .= implode('', array_map(
+                    fn($content) => "<{$property}>" . $this->make_xml($content) . "</{$property}>"
+                , $value));
             } else {
-                $r .= "<{$k}" . ($k === 'content' ? ' type="html"' : '') . '>'
-                    . (is_array($v) ? $this->make_xml($v) : $v) . "</{$k}>";
+                $xml .= "<{$property}" . ($property === 'content' ? ' type="html"' : '') . '>'
+                    . (is_array($value) ? $this->make_xml($value) : $value) . "</{$property}>";
             }
         }
 
-        return $r;
+        return $xml;
     }
 }
