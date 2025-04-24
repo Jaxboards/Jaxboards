@@ -375,7 +375,7 @@ final class TextFormatting
         );
     }
 
-    public function attachment_callback(string $match): string
+    public function attachment_callback(array $match): string
     {
         $attachment = $match[1];
         if (isset($this->attachmentData[$attachment])) {
