@@ -92,13 +92,13 @@ final class Session
         }
 
         if (!isset($_SESSION['uid']) && isset($this->jax->c['utoken'])) {
-            $result = $DB->safeselect(
+            $result = $this->database->safeselect(
                 ['uid'],
                 'tokens',
                 'WHERE `token`=?',
                 $this->jax->c['utoken'],
             );
-            $token = $DB->arow($result);
+            $token = $this->database->arow($result);
             if ($token) {
                 $_SESSION['uid'] = $token['uid'];
             }
