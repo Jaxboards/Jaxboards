@@ -54,7 +54,7 @@ switch ($_GET['act'] ?? '') {
 
     case 'emotes':
         $textFormatting = $container->get(TextFormatting::class);
-        $rules = $textFormatting->getEmoteRules(0);
+        $rules = $textFormatting->getEmoteRules();
         foreach ($rules as $k => $v) {
             $rules[$k] = '<img src="' . $v . '" alt="' . $textFormatting->blockhtml($k) . '" />';
         }

@@ -34,26 +34,33 @@ use const ENT_QUOTES;
 
 final class TextFormatting
 {
-    private $attachmentdata;
+    /**
+     * @var array<string, array>
+     */
+    private $attachmentData;
 
-    private $textRules;
+    /**
+     * @var array<string, string>
+     */
+    private $badwords = [];
 
-    private $emoteRules;
+    /**
+     * @var array<string, string>
+     */
+    private $emotes = [];
 
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
     ) {
-        $this->getTextRules();
+        // Preload custom rules and emojis
+        $this->getCustomRules();
+        $this->getEmoteRules();
     }
 
-    public function getTextRules()
+    public function getCustomRules()
     {
-        if ($this->textRules) {
-            return $this->textRules;
-        }
-
-        $q = $this->database->safeselect(
+        $result = $this->database->safeselect(
             <<<'EOT'
                 `id`,`type`,`needle`,`replacement`,`enabled`
                 EOT
@@ -61,63 +68,58 @@ final class TextFormatting
             'textrules',
             '',
         );
-        $textRules = [
-            'badword' => [],
-            'bbcode' => [],
-            'emote' => [],
-        ];
-        while ($f = $this->database->arow($q)) {
-            $textRules[$f['type']][$f['needle']] = $f['replacement'];
+        while ($rule = $this->database->arow($result)) {
+            switch($rule['type']) {
+                case 'emote':
+                    $this->emotes[$rule['needle']] = $rule['replacement'];
+                    break;
+                case 'badword':
+                    $this->badwords[$rule['needle']] = $rule['replacement'];
+                    break;
+
+            }
         }
+    }
+
+    function getEmoteRules() {
+        if ($this->emotes) {
+            return $this->emotes;
+        }
+
+        $emotes = [];
 
         // Load emoticon pack.
         $emotepack = $this->config->getSetting('emotepack');
         if ($emotepack) {
             $emotepack = 'emoticons/' . $emotepack;
-            if (mb_substr($emotepack, -1) !== '/') {
-                $emotepack .= '/';
-            }
 
-            $emoteRules = __DIR__ . '/../../' . $emotepack . 'rules.php';
+            $emotePath = __DIR__ . '/../../' . $emotepack . '/rules.php';
 
-            if (file_exists($emoteRules)) {
-                require_once $emoteRules;
+            if (file_exists($emotePath)) {
+                require_once $emotePath;
                 if (!$rules) {
                     exit('Emoticon ruleset corrupted!');
                 }
 
-                foreach ($rules as $k => $v) {
-                    if (isset($textRules['emote'][$k])) {
-                        continue;
-                    }
-
-                    $textRules['emote'][$k] = $emotepack . $v;
+                foreach ($rules as $emote => $path) {
+                    $emotes[$emote] = $emotepack . $path;
                 }
             }
         }
 
-        $nrules = [];
-        foreach ($textRules['emote'] as $k => $v) {
-            $nrules[preg_quote($k, '@')]
-                = '<img src="' . $v . '" alt="' . $this->blockhtml($k) . '"/>';
-        }
-
-        $this->emoteRules = $nrules === [] ? false : $nrules;
-        $this->textRules = $textRules;
-
-        return $this->textRules;
+        $this->emotes = $emotes;
     }
 
-    public function linkify($a): ?string
+    public function linkify(string $text): ?string
     {
         return preg_replace_callback(
             '@(^|\s)(https?://[^\s\)\(<>]+)@',
             $this->linkify_callback(...),
-            (string) $a,
+            $text,
         );
     }
 
-    public function linkify_callback($match): string
+    public function linkify_callback(array $match): string
     {
         $url = parse_url((string) $match[2]);
         if (!$url['fragment'] && $url['query']) {
@@ -125,10 +127,10 @@ final class TextFormatting
         }
 
         if ($url['host'] === $_SERVER['HTTP_HOST'] && $url['fragment']) {
-            if (preg_match('@act=vt(\d+)@', $url['fragment'], $m)) {
-                $nice = preg_match('@pid=(\d+)@', $url['fragment'], $m2)
-                    ? 'Post #' . $m2[1]
-                    : 'Topic #' . $m[1];
+            if (preg_match('@act=vt(\d+)@', $url['fragment'], $match)) {
+                $nice = preg_match('@pid=(\d+)@', $url['fragment'], $match2)
+                    ? 'Post #' . $match2[1]
+                    : 'Topic #' . $match[1];
             }
 
             $match[2] = '?' . $url['fragment'];
@@ -137,107 +139,95 @@ final class TextFormatting
         return $match[1] . '[url=' . $match[2] . ']' . ($nice ?: $match[2]) . '[/url]';
     }
 
-    public function blockhtml($a): string
+    public function blockhtml(string $text): string
     {
         // Fix for template conditionals.
-        return str_replace('{if', '&#123;if', htmlspecialchars((string) $a, ENT_QUOTES));
+        return str_replace('{if', '&#123;if', htmlspecialchars($text, ENT_QUOTES));
     }
 
-    public function getEmoteRules($escape = 1)
+    public function emotes(string $text)
     {
-        return $escape ? $this->emoteRules : $this->textRules['emote'];
-    }
-
-    public function emotes($a)
-    {
-        // Believe it or not, adding a space and then removing it later
-        // is 20% faster than doing (^|\s).
-        $emoticonlimit = 15;
-        if (!$this->emoteRules) {
-            return $a;
+        $emoticonLimit = 15;
+        if (!$this->emotes) {
+            return $text;
         }
 
-        $a = preg_replace_callback(
-            '@(\s)(' . implode('|', array_keys($this->emoteRules)) . ')@',
+        $text = preg_replace_callback(
+            '@(\s)(' . implode('|', array_keys($this->emotes)) . ')@',
             $this->emotecallback(...),
-            ' ' . $a,
-            $emoticonlimit,
+            ' ' . $text,
+            $emoticonLimit,
         );
 
-        return mb_substr((string) $a, 1);
+        return mb_substr((string) $text, 1);
     }
 
-    public function emotecallback($a): string
+    public function emotecallback(array $match): string
     {
-        return $a[1] . $this->emoteRules[preg_quote((string) $a[2], '@')];
+        [, $space, $emoteText] = $match;
+        return $space . '<img src="' . $this->emotes[$emoteText] . '" alt="' . $this->blockhtml($emoteText) . '"/>';
     }
 
-    public function getwordfilter()
-    {
-        return $this->textRules['badword'];
-    }
-
-    public function wordfilter($a)
+    public function wordfilter(string $text)
     {
         global $USER;
         if ($USER && $USER['nowordfilter']) {
-            return $a;
+            return $text;
         }
 
         return str_ireplace(
-            array_keys($this->textRules['badword']),
-            array_values($this->textRules['badword']),
-            $a,
+            array_keys($this->badwords),
+            array_values($this->badwords),
+            $text,
         );
     }
 
-    public function startcodetags(&$a)
+    public function startcodetags(string &$text)
     {
-        preg_match_all('@\[code(=\w+)?\](.*?)\[/code\]@is', (string) $a, $codes);
-        foreach ($codes[0] as $k => $v) {
-            $a = str_replace($v, '[code]' . $k . '[/code]', $a);
+        preg_match_all('@\[code(=\w+)?\](.*?)\[/code\]@is', $text, $codes);
+        foreach ($codes[0] as $key => $fullMatch) {
+            $text = str_replace($fullMatch, '[code]' . $key . '[/code]', $text);
         }
 
         return $codes;
     }
 
-    public function finishcodetags($a, $codes, $returnbb = false)
+    public function finishcodetags(string $text, array $codes, bool $returnbb = false)
     {
-        foreach ($codes[0] as $k => $v) {
+        foreach ($codes[0] as $key => $value) {
             if (!$returnbb) {
-                $codes[2][$k] = $codes[1][$k] === '=php' ? highlight_string($codes[2][$k], 1) : preg_replace(
+                $codes[2][$key] = $codes[1][$key] === '=php' ? highlight_string($codes[2][$key], 1) : preg_replace(
                     "@([ \r\n]|^) @m",
                     '$1&nbsp;',
-                    $this->blockhtml($codes[2][$k]),
+                    $this->blockhtml($codes[2][$key]),
                 );
             }
 
-            $a = str_replace(
-                '[code]' . $k . '[/code]',
+            $text = str_replace(
+                '[code]' . $key . '[/code]',
                 $returnbb
-                    ? '[code' . $codes[1][$k] . ']' . $codes[2][$k] . '[/code]'
+                    ? '[code' . $codes[1][$key] . ']' . $codes[2][$key] . '[/code]'
                     : '<div class="bbcode code'
-                . ($codes[1][$k] ? ' ' . $codes[1][$k] : '') . '">'
-                . $codes[2][$k] . '</div>',
-                $a,
+                . ($codes[1][$key] ? ' ' . $codes[1][$key] : '') . '">'
+                . $codes[2][$key] . '</div>',
+                $text,
             );
         }
 
-        return $a;
+        return $text;
     }
 
-    public function textonly($a): ?string
+    public function textonly(string $text): ?string
     {
-        while (($t = preg_replace('@\[(\w+)[^\]]*\]([\w\W]*)\[/\1\]@U', '$2', (string) $a)) !== $a) {
-            $a = $t;
+        while (($cleaned = preg_replace('@\[(\w+)[^\]]*\]([\w\W]*)\[/\1\]@U', '$2', $text)) !== $text) {
+            $text = $cleaned;
         }
 
-        return $a;
+        return $text;
     }
 
-    public function bbcodes($a, $minimal = false): ?string
+    public function bbcodes(string $text, $minimal = false): ?string
     {
-        $x = 0;
         $bbcodes = [
             '@\[(bg|bgcolor|background)=(#?[\s\w\d]+)\](.*)\[/\1\]@Usi' => '<span style="background:$2">$3</span>',
             '@\[blink\](.*)\[/blink\]@Usi' => '<span style="text-decoration:blink">$1</span>',
@@ -265,81 +255,80 @@ final class TextFormatting
 
         $keys = array_keys($bbcodes);
         $values = array_values($bbcodes);
-        while (($tmp = preg_replace($keys, $values, (string) $a)) !== $a) {
-            $a = $tmp;
+        while (($tmp = preg_replace($keys, $values, $text)) !== $text) {
+            $text = $tmp;
         }
 
         if ($minimal) {
-            return $a;
+            return $text;
         }
 
         // UL/LI tags.
-        while ($a !== ($tmp = preg_replace_callback('@\[(ul|ol)\](.*)\[/\1\]@Usi', $this->bbcode_licallback(...), (string) $a))) {
-            $a = $tmp;
+        while ($text !== ($tmp = preg_replace_callback('@\[(ul|ol)\](.*)\[/\1\]@Usi', $this->bbcode_licallback(...), $text))) {
+            $text = $tmp;
         }
 
         // Size code (actually needs a callback simply because of
         // the variability of the arguments).
-        while ($a !== ($tmp = preg_replace_callback('@\[size=([0-4]?\d)(px|pt|em|)\](.*)\[/size\]@Usi', $this->bbcode_sizecallback(...), (string) $a))) {
-            $a = $tmp;
+        while ($text !== ($tmp = preg_replace_callback('@\[size=([0-4]?\d)(px|pt|em|)\](.*)\[/size\]@Usi', $this->bbcode_sizecallback(...), $text))) {
+            $text = $tmp;
         }
 
         // Do quote tags.
-        while (
-            preg_match(
+        for (
+            $nestLimit = 0; $nestLimit < 10 && preg_match(
                 '@\[quote(?>=([^\]]+))?\](.*?)\[/quote\]\r?\n?@is',
-                (string) $a,
-                $m,
-            ) && $x < 10
+                $text,
+                $match,
+            ); $nestLimit++
         ) {
-            ++$x;
-            $a = str_replace(
-                $m[0],
+            $text = str_replace(
+                $match[0],
                 '<div class="quote">'
-                . ($m[1] !== '' && $m[1] !== '0' ? '<div class="quotee">' . $m[1] . '</div>' : '')
-                . $m[2] . '</div>',
-                $a,
+                . ($match[1] !== '' && $match[1] !== '0' ? '<div class="quotee">' . $match[1] . '</div>' : '')
+                . $match[2] . '</div>',
+                $text,
             );
         }
 
         return preg_replace_callback(
             '@\[video\](.*)\[/video\]@Ui',
             $this->bbcode_videocallback(...),
-            (string) $a,
+            $text,
         );
     }
 
-    public function bbcode_sizecallback($m): string
+    public function bbcode_sizecallback(array $match): string
     {
         return '<span style="font-size:'
-            . $m[1] . ($m[2] ?: 'px') . '">' . $m[3] . '</span>';
+            . $match[1] . ($match[2] ?: 'px') . '">' . $match[3] . '</span>';
     }
 
-    public function bbcode_videocallback($m): string
+    public function bbcode_videocallback(array $match): string
     {
 
-        if (str_contains((string) $m[1], 'youtube.com')) {
-            preg_match('@v=([\w-]+)@', (string) $m[1], $youtubeMatches);
+        if (str_contains($match[1], 'youtube.com')) {
+            preg_match('@v=([\w-]+)@', (string) $match[1], $youtubeMatches);
             $embedUrl = "https://www.youtube.com/embed/{$youtubeMatches[1]}";
 
-            return $this->youtubeEmbedHTML($m[1], $embedUrl);
+            return $this->youtubeEmbedHTML($match[1], $embedUrl);
         }
 
-        if (str_contains((string) $m[1], 'youtu.be')) {
-            preg_match('@youtu.be/(?P<params>.+)$@', (string) $m[1], $youtubeMatches);
+        if (str_contains((string) $match[1], 'youtu.be')) {
+            preg_match('@youtu.be/(?P<params>.+)$@', (string) $match[1], $youtubeMatches);
             $embedUrl = "https://www.youtube.com/embed/{$youtubeMatches['params']}";
 
-            return $this->youtubeEmbedHTML($m[1], $embedUrl);
+            return $this->youtubeEmbedHTML($match[1], $embedUrl);
         }
 
         return '-Invalid Video Url-';
     }
 
-    public function bbcode_licallback($m): string
+    public function bbcode_licallback(array $match): string
     {
-        $items = preg_split("@(^|[\r\n])\\*@", (string) $m[2]);
+        $items = preg_split("@(^|[\r\n])\\*@", (string) $match[2]);
 
-        $html = $m[1] === 'ol' ? '<ol>' : '<ul>';
+        $html = $match[1] === 'ol' ? '<ol>' : '<ul>';
         foreach ($items as $item) {
             if (trim($item) === '') {
                 continue;
@@ -348,24 +337,24 @@ final class TextFormatting
             $html .= '<li>' . $item . ' </li>';
         }
 
-        return $html . $m[1] === 'ol' ? '</ol>' : '</ul>';
+        return $html . $match[1] === 'ol' ? '</ol>' : '</ul>';
     }
 
-    public function attachments($a): null|array|string
+    public function attachments(string $text): null|array|string
     {
-        return $a = preg_replace_callback(
+        return $text = preg_replace_callback(
             '@\[attachment\](\d+)\[/attachment\]@',
             $this->attachment_callback(...),
-            (string) $a,
+            $text,
             20,
         );
     }
 
-    public function attachment_callback($a): string
+    public function attachment_callback(string $match): string
     {
-        $a = $a[1];
-        if (isset($this->attachmentdata[$a])) {
-            $data = $this->attachmentdata[$a];
+        $attachment = $match[1];
+        if (isset($this->attachmentData[$attachment])) {
+            $data = $this->attachmentData[$attachment];
         } else {
             $result = $this->database->safeselect(
                 [
@@ -377,18 +366,18 @@ final class TextFormatting
                 ],
                 'files',
                 'WHERE `id`=?',
-                $a,
+                $attachment,
             );
-            $data = $this->database->arow($result);
+            $file = $this->database->arow($result);
             $this->database->disposeresult($result);
-            if (!$data) {
+            if (!$file) {
                 return "Attachment doesn't exist";
             }
 
-            $this->attachmentdata[$a] = $data;
+            $this->attachmentData[$attachment] = $file;
         }
 
-        $ext = explode('.', (string) $data['name']);
+        $ext = explode('.', (string) $file['name']);
         $ext = count($ext) === 1 ? '' : mb_strtolower(array_pop($ext));
 
         if (!in_array($ext, $this->config->getSetting('images') ?? [])) {
@@ -396,7 +385,7 @@ final class TextFormatting
         }
 
         if ($ext !== '') {
-            $attachmentURL = BOARDPATHURL . '/Uploads/' . $data['hash'] . '.' . $ext;
+            $attachmentURL = BOARDPATHURL . '/Uploads/' . $file['hash'] . '.' . $ext;
 
             return "<a href='{$attachmentURL}'>"
                 . "<img src='{$attachmentURL}' alt='attachment' class='bbcodeimg' />"
@@ -405,36 +394,36 @@ final class TextFormatting
 
         return '<div class="attachment">'
             . '<a href="index.php?act=download&id='
-            . $data['id'] . '&name=' . urlencode((string) $data['name']) . '" class="name">'
-            . $data['name'] . '</a> Downloads: ' . $data['downloads'] . '</div>';
+            . $file['id'] . '&name=' . urlencode((string) $file['name']) . '" class="name">'
+            . $file['name'] . '</a> Downloads: ' . $file['downloads'] . '</div>';
     }
 
-    public function theworks($a, $cfg = [])
+    public function theworks(string $text, array $cfg = [])
     {
         if (@!$cfg['nobb'] && @!$cfg['minimalbb']) {
-            $codes = $this->startcodetags($a);
+            $codes = $this->startcodetags($text);
         }
 
-        $a = $this->blockhtml($a);
-        $a = nl2br($a);
+        $text = $this->blockhtml($text);
+        $text = nl2br($text);
 
         if (@!$cfg['noemotes']) {
-            $a = $this->emotes($a);
+            $text = $this->emotes($text);
         }
 
         if (@!$cfg['nobb']) {
-            $a = $this->bbcodes($a, @$cfg['minimalbb']);
+            $text = $this->bbcodes($text, @$cfg['minimalbb']);
         }
 
         if (@!$cfg['nobb'] && @!$cfg['minimalbb']) {
-            $a = $this->finishcodetags($a, $codes);
+            $text = $this->finishcodetags($text, $codes);
         }
 
         if (@!$cfg['nobb'] && @!$cfg['minimalbb']) {
-            $a = $this->attachments($a);
+            $text = $this->attachments($text);
         }
 
-        return $this->wordfilter($a);
+        return $this->wordfilter($text);
     }
 
     // phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength
