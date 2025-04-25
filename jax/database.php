@@ -614,7 +614,7 @@ final class Database
                 'lp_uid',
                 'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
                 'id',
-                'title'
+                'title',
             ],
             'topics',
             'WHERE `fid`=? ORDER BY `lp_date` DESC LIMIT 1',
