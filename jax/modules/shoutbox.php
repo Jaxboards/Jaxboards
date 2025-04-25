@@ -243,7 +243,7 @@ final class Shoutbox
                         $this->page->JS(
                             'playsound',
                             'sfx',
-                            $this->domainDefinitions->getSoundsUrl() . $sounds[$f['shout']] . '.mp3',
+                            $this->domainDefinitions->getSoundsURL() . $sounds[$f['shout']] . '.mp3',
                         );
                     }
                 }

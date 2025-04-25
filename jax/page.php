@@ -347,7 +347,7 @@ final class Page
             define('THEMEPATHURL', $turl);
         } else {
             define('THEMEPATH', JAXBOARDS_ROOT . '/' . $this->config->getSetting('dthemepath'));
-            define('THEMEPATHURL', $this->domainDefinitions->getBoardUrl() . $this->config->getSetting('dthemepath'));
+            define('THEMEPATHURL', $this->domainDefinitions->getBoardURL() . $this->config->getSetting('dthemepath'));
         }
 
         define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . $this->config->getSetting('dthemepath'));

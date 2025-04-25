@@ -150,7 +150,7 @@ final class Page
                 'nav_dropdowns' => $this->partparts['navdropdowns'],
             ],
         );
-        $boardURL = $this->domainDefinitions->getBoardUrl();
+        $boardURL = $this->domainDefinitions->getBoardURL();
         $data['css_url'] = $boardURL . 'acp/css/css.css';
         $data['bbcode_css_url'] = $boardURL . 'Service/Themes/Default/bbcode.css';
         $data['themes_css_url'] = $boardURL . 'acp/css/themes.css';

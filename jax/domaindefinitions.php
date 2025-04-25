@@ -30,25 +30,16 @@ function pathjoin(string ...$paths): ?string
 
 final class DomainDefinitions
 {
-    /**
-     * @var null|string
-     */
-    public $soundUrl;
 
-    /**
-     * @var string
-     */
-    public $boardPathURL;
+    public string $boardURL = '';
 
-    public string $boardUrl = '';
-
-    public string $soundsUrl = '';
+    public string $soundsURL = '';
 
     public string $serviceThemePath = '';
 
     public string $boardPath = '';
 
-    public string $boardPathUrl = '';
+    public string $boardPathURL = '';
 
     public function __construct(private readonly ServiceConfig $serviceConfig)
     {
@@ -69,8 +60,8 @@ final class DomainDefinitions
             $boardURL .= ($port ? ':' . $port : '');
         }
 
-        $this->boardUrl = $boardURL . '/';
-        $this->soundUrl = pathjoin($this->boardUrl, 'Sounds');
+        $this->boardURL = $boardURL . '/';
+        $this->soundsURL = pathjoin($this->boardURL, 'Sounds');
 
         $domainMatch = str_replace('.', '\.', $serviceConfig['domain']);
 
@@ -96,17 +87,17 @@ final class DomainDefinitions
         }
 
         $this->boardPath = pathjoin(JAXBOARDS_ROOT, 'boards', $prefix);
-        $this->boardPathURL = $this->boardUrl . pathjoin('boards', $prefix);
+        $this->boardPathURL = $this->boardURL . pathjoin('boards', $prefix);
     }
 
-    public function getBoardUrl(): string
+    public function getBoardURL(): string
     {
-        return $this->boardUrl;
+        return $this->boardURL;
     }
 
-    public function getSoundsUrl(): string
+    public function getSoundsURL(): string
     {
-        return $this->soundsUrl;
+        return $this->soundsURL;
     }
 
     public function getServiceThemePath(): string
@@ -121,6 +112,6 @@ final class DomainDefinitions
 
     public function getBoardPathUrl(): string
     {
-        return $this->boardPathUrl;
+        return $this->boardPathURL;
     }
 }

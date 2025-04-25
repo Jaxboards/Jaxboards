@@ -30,7 +30,7 @@ final readonly class Login
     {
         $this->startSession();
 
-        $boardUrl = $this->domainDefinitions->getBoardUrl();
+        $boardUrl = $this->domainDefinitions->getBoardURL();
         $pageElements = [
             'board_name' => $this->config->getSetting('boardname'),
             'board_url' => $boardUrl,

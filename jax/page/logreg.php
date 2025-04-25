@@ -469,7 +469,7 @@ final class LogReg
                             'uid' => $udata['id'],
                         ],
                     );
-                    $link = $this->domainDefinitions->getBoardUrl() . '?act=logreg6&uid='
+                    $link = $this->domainDefinitions->getBoardURL() . '?act=logreg6&uid='
                         . $udata['id'] . '&id=' . rawurlencode($forgotpasswordtoken);
                     $mailResult = $this->jax->mail(
                         $udata['email'],
