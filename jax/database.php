@@ -38,7 +38,6 @@ use const PHP_EOL;
 // TODO: Migrate jaxboards to be database-independent and not tied to MySQL
 final class Database
 {
-    public $ratingNiblets;
     public mysqli_result $lastQuery;
 
     public bool $debugMode = false;
@@ -561,7 +560,7 @@ final class Database
         static $ratingNiblets = null;
 
         if ($ratingNiblets) {
-            return $this->ratingNiblets;
+            return $ratingNiblets;
         }
 
         $result = $this->safeselect(
