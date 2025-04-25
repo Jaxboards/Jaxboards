@@ -10,18 +10,7 @@ use Jax\User;
 
 use function DI\Create;
 
-final class MockIPAddress extends IPAddress
-{
-    public function __construct() {}
-
-    public function isBanned($ipAddress = false): bool
-    {
-        return false;
-    }
-}
-
 $container = new Container();
-$container->set(IPAddress::class, Create(MockIPAddress::class));
 
 /*
  *          Use Global?     View        Read    Start   Reply   Upload  Polls
