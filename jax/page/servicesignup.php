@@ -38,13 +38,13 @@ use const PASSWORD_DEFAULT;
  *
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
-final class ServiceSignup
+final readonly class ServiceSignup
 {
     public function __construct(
-        private readonly Config $config,
-        private readonly Database $database,
-        private readonly IPAddress $ipAddress,
-        private readonly Jax $jax,
+        private Config $config,
+        private Database $database,
+        private IPAddress $ipAddress,
+        private Jax $jax,
     ) {}
 
     public function render(): void
