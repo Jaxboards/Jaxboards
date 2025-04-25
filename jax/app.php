@@ -39,7 +39,7 @@ final class App
     /**
      * @var float
      */
-    public $microtime;
+    private float $microtime;
 
     private bool $onLocalHost = false;
 
