@@ -24,14 +24,6 @@ final readonly class Login
 
     public function render(): void
     {
-        $this->database->connect(
-            $this->config->getSetting('sql_host'),
-            $this->config->getSetting('sql_username'),
-            $this->config->getSetting('sql_password'),
-            $this->config->getSetting('sql_db'),
-            $this->config->getSetting('sql_prefix'),
-        );
-
         $pageElements = [
             'board_name' => $this->config->getSetting('boardname'),
             'board_url' => BOARDURL,

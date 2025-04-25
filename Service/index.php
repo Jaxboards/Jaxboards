@@ -67,13 +67,6 @@ function recurseCopy($src, $dst): void
     closedir($dir);
 }
 
-$connected = $DB->connect(
-    $CFG['sql_host'],
-    $CFG['sql_username'],
-    $CFG['sql_password'],
-    $CFG['sql_db'],
-);
-
 $errors = [];
 if (isset($JAX->p['submit']) && $JAX->p['submit']) {
     if (isset($JAX->p['post']) && $JAX->p['post']) {

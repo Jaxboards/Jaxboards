@@ -30,9 +30,12 @@ final class Config
             return $serviceConfig;
         }
 
-        require_once JAXBOARDS_ROOT . '/config.php';
+        if (file_exists(JAXBOARDS_ROOT . '/config.php')) {
+            require_once JAXBOARDS_ROOT . '/config.php';
+            $serviceConfig = $CFG;
+        }
 
-        return $serviceConfig = $CFG;
+        return $serviceConfig;
     }
 
     public function getBoardConfig($write = null)

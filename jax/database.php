@@ -53,7 +53,23 @@ final class Database
 
     private string $prefix = '';
 
-    public function __construct(private readonly Config $config) {}
+    public function __construct(private readonly Config $config) {
+        try {
+            if ($this->config->getServiceConfig()) {
+                $this->connect(
+                    $this->config->getSetting('sql_host'),
+                    $this->config->getSetting('sql_username'),
+                    $this->config->getSetting('sql_password'),
+                    $this->config->getSetting('sql_db'),
+                    $this->config->getSetting('sql_prefix'),
+                );
+            }
+        } catch (Exception $e) {
+            echo "Failed to connect to database. The following error was collected: <pre>{$e}</pre>";
+
+            exit(1);
+        }
+    }
 
     public function connect(
         string $host,

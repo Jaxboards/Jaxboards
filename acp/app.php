@@ -33,11 +33,8 @@ final readonly class App
         private User $user,
     ) {}
 
-    public function render(): void
-    {
+    public function render(): void {
         $this->startSession();
-
-        $this->connectDB();
 
         if (isset($_SESSION['auid'])) {
             $userData = $this->user->getUser($_SESSION['auid']);

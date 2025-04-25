@@ -55,13 +55,13 @@ final class App
     ) {
         $this->onLocalHost = in_array($this->ipAddress->asHumanReadable(), ['127.0.0.1', '::1'], true);
         $this->microtime = microtime(true);
+        $this->database->debugMode = $this->onLocalHost;
     }
 
     public function render(): void
     {
         header('Cache-Control: no-cache, must-revalidate');
 
-        $this->connectDB();
 
         $this->startSession();
 
@@ -95,27 +95,6 @@ final class App
         }
 
         $this->page->out();
-    }
-
-    private function connectDB(): void
-    {
-        try {
-            if ($this->onLocalHost) {
-                $this->database->debugMode = true;
-            }
-
-            $this->database->connect(
-                $this->config->getSetting('sql_host'),
-                $this->config->getSetting('sql_username'),
-                $this->config->getSetting('sql_password'),
-                $this->config->getSetting('sql_db'),
-                $this->config->getSetting('sql_prefix'),
-            );
-        } catch (Exception $e) {
-            echo "Failed to connect to database. The following error was collected: <pre>{$e}</pre>";
-
-            exit(1);
-        }
     }
 
     private function startSession(): void

@@ -16,13 +16,6 @@ $container = new Container();
 $CFG = $container->get(Config::class)->get();
 
 $DB = $container->get(Database::class);
-$DB->connect(
-    $CFG['sql_host'],
-    $CFG['sql_username'],
-    $CFG['sql_password'],
-    $CFG['sql_db'],
-    $CFG['sql_prefix'],
-);
 
 $container->get(DomainDefinitions::class)->defineConstants();
 
