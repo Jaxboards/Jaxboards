@@ -4,27 +4,34 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use Jax\Database;
-use Jax\TextFormatting;
+use function array_keys;
+use function array_values;
+use function header;
+use function htmlspecialchars;
+use function json_encode;
+use function str_replace;
 
-class API {
+use const ENT_QUOTES;
+
+final class API
+{
     public function __construct(
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly TextFormatting $textFormatting,
     ) {}
 
-    public function render() {
-        $list = [[], []];
-
-        match($this->jax->g['act'] ?? '') {
+    public function render(): void
+    {
+        match ($this->jax->g['act'] ?? '') {
             'searchmembers' => $this->searchmembers(),
             'emotes' => $this->emotes(),
             default => header('Location: /'),
         };
     }
 
-    private function searchmembers() {
+    private function searchmembers(): void
+    {
         $result = $this->database->safeselect(
             [
                 'id',
@@ -47,7 +54,8 @@ class API {
         echo json_encode($list);
     }
 
-    private function emotes() {
+    private function emotes(): void
+    {
         $rules = $this->textFormatting->getEmoteRules();
         foreach ($rules as $k => $v) {
             $rules[$k] = '<img src="' . $v . '" alt="' . $this->textFormatting->blockhtml($k) . '" />';

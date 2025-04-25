@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use DI\Container;
-use Jax\DomainDefinitions;
 use Jax\API;
+use Jax\DomainDefinitions;
 
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', dirname(__DIR__));
