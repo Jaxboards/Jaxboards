@@ -48,10 +48,6 @@ final class Database
 
     private $prefix = '';
 
-    private $usersOnlineCache = '';
-
-    private $ratingNiblets = [];
-
     public function __construct(private readonly Config $config) {}
 
     public function connect(
@@ -445,68 +441,70 @@ final class Database
 
     public function getUsersOnline(bool $canViewHiddenMembers = false)
     {
-        $idletimeout = time() - ($this->config->getSetting('timetoidle') ?? 300);
-        $return = [];
-        if (!$this->usersOnlineCache) {
-            $result = $this->safespecial(
-                <<<'EOT'
-                    SELECT
-                        s.`id` as `id`,
-                        s.`uid` AS `uid`,
-                        s.`location` AS `location`,
-                        s.`location_verbose` AS `location_verbose`,
-                        s.`hide` AS `hide`,
-                        s.`is_bot` AS `is_bot`,
-                        m.`display_name` AS `name`,
-                        m.`group_id` AS `group_id`,
-                        m.`birthdate` AS `birthdate`,
-                        CONCAT(MONTH(m.`birthdate`),' ',DAY(m.`birthdate`)) AS `dob`,
-                        UNIX_TIMESTAMP(s.`last_action`) AS `last_action`,
-                        UNIX_TIMESTAMP(s.`last_update`) AS `last_update`
-                    FROM %t s
-                    LEFT JOIN %t m ON s.`uid`=m.`id`
-                    WHERE s.`last_update`>=?
-                    ORDER BY s.`last_action` DESC
-                    EOT
-                ,
-                ['session', 'members'],
-                gmdate('Y-m-d H:i:s', time() - $this->config->getSetting('timetologout')),
-            );
-            $today = gmdate('n j');
-            while ($user = $this->arow($result)) {
-                if ($user['hide']) {
-                    if (!$canViewHiddenMembers) {
-                        continue;
-                    }
-
-                    $user['name'] = '* ' . $user['name'];
-                }
-
-                $user['birthday'] = ($user['dob'] === $today ? 1 : 0);
-                $user['status'] = $user['last_action'] < $idletimeout
-                    ? 'idle'
-                    : 'active';
-                if ($user['is_bot']) {
-                    $user['name'] = $user['id'];
-                    $user['uid'] = $user['id'];
-                }
-
-                unset($user['id'], $user['dob']);
-                if (!$user['uid']) {
-                    continue;
-                }
-
-                if (isset($return[$user['uid']]) && $return[$user['uid']]) {
-                    continue;
-                }
-
-                $return[$user['uid']] = $user;
-            }
-
-            $this->usersOnlineCache = $return;
+        static $usersOnlineCache = null;
+        if ($usersOnlineCache) {
+            return $usersOnlineCache;
         }
 
-        return $this->usersOnlineCache;
+        $idletimeout = time() - ($this->config->getSetting('timetoidle') ?? 300);
+        $usersOnlineCache = [];
+
+        $result = $this->safespecial(
+            <<<'EOT'
+                SELECT
+                    s.`id` as `id`,
+                    s.`uid` AS `uid`,
+                    s.`location` AS `location`,
+                    s.`location_verbose` AS `location_verbose`,
+                    s.`hide` AS `hide`,
+                    s.`is_bot` AS `is_bot`,
+                    m.`display_name` AS `name`,
+                    m.`group_id` AS `group_id`,
+                    m.`birthdate` AS `birthdate`,
+                    CONCAT(MONTH(m.`birthdate`),' ',DAY(m.`birthdate`)) AS `dob`,
+                    UNIX_TIMESTAMP(s.`last_action`) AS `last_action`,
+                    UNIX_TIMESTAMP(s.`last_update`) AS `last_update`
+                FROM %t s
+                LEFT JOIN %t m ON s.`uid`=m.`id`
+                WHERE s.`last_update`>=?
+                ORDER BY s.`last_action` DESC
+                EOT
+            ,
+            ['session', 'members'],
+            gmdate('Y-m-d H:i:s', time() - $this->config->getSetting('timetologout')),
+        );
+        $today = gmdate('n j');
+        while ($user = $this->arow($result)) {
+            if ($user['hide']) {
+                if (!$canViewHiddenMembers) {
+                    continue;
+                }
+
+                $user['name'] = '* ' . $user['name'];
+            }
+
+            $user['birthday'] = ($user['dob'] === $today ? 1 : 0);
+            $user['status'] = $user['last_action'] < $idletimeout
+                ? 'idle'
+                : 'active';
+            if ($user['is_bot']) {
+                $user['name'] = $user['id'];
+                $user['uid'] = $user['id'];
+            }
+
+            unset($user['id'], $user['dob']);
+            if (!$user['uid']) {
+                continue;
+            }
+
+            if (isset($usersOnlineCache[$user['uid']]) && $usersOnlineCache[$user['uid']]) {
+                continue;
+            }
+
+            $usersOnlineCache[$user['uid']] = $user;
+        }
+
+        return $usersOnlineCache;
     }
 
     public function fixForumLastPost($fid): void
@@ -547,7 +545,9 @@ final class Database
 
     public function getRatingNiblets()
     {
-        if (!empty($this->ratingNiblets)) {
+        static $ratingNiblets = null;
+
+        if ($ratingNiblets) {
             return $this->ratingNiblets;
         }
 
@@ -555,12 +555,12 @@ final class Database
             ['id', 'img', 'title'],
             'ratingniblets',
         );
-        $niblets = [];
+        $ratingNiblets = [];
         while ($niblet = $this->arow($result)) {
-            $niblets[$niblet['id']] = ['img' => $niblet['img'], 'title' => $niblet['title']];
+            $ratingNiblets[$niblet['id']] = ['img' => $niblet['img'], 'title' => $niblet['title']];
         }
 
-        return $this->ratingNiblets = $niblets;
+        return $ratingNiblets;
     }
 
     public function debug(): string
