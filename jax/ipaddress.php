@@ -24,7 +24,7 @@ final readonly class IPAddress
         private Database $database,
     ) {}
 
-    public function asBinary(string $ipAddress = null): false|string
+    public function asBinary(?string $ipAddress = null): false|string
     {
         if (!$ipAddress) {
             $ipAddress = self::getIp();
@@ -78,8 +78,8 @@ final readonly class IPAddress
 
         foreach ($ipBanCache as $bannedIp) {
             if (
-                (mb_substr($bannedIp, -1) === ':' || mb_substr($bannedIp, -1) === '.')
-                && mb_strtolower(mb_substr((string) $ipAddress, 0, mb_strlen($bannedIp))) === $bannedIp
+                (mb_substr((string) $bannedIp, -1) === ':' || mb_substr((string) $bannedIp, -1) === '.')
+                && mb_strtolower(mb_substr($ipAddress, 0, mb_strlen((string) $bannedIp))) === $bannedIp
             ) {
                 return true;
             }
