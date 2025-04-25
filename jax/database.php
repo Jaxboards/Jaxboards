@@ -38,6 +38,7 @@ use const PHP_EOL;
 // TODO: Migrate jaxboards to be database-independent and not tied to MySQL
 final class Database
 {
+    public $ratingNiblets;
     public mysqli_result $lastQuery;
 
     public bool $debugMode = false;
@@ -85,12 +86,12 @@ final class Database
         return '`' . $this->prefix . $tableName . '`';
     }
 
-    public function error()
+    public function error(): string
     {
         return $this->connection->error;
     }
 
-    public function affectedRows()
+    public function affectedRows(): int|string
     {
         return $this->connection->affected_rows;
     }
@@ -107,19 +108,19 @@ final class Database
 
         // Where.
         $query = 'SELECT ' . $fieldsString . ' FROM '
-            . $this->ftable($table) . ($where ? ' ' . $where : '');
+            . $this->ftable($table) . ($where !== '' && $where !== '0' ? ' ' . $where : '');
 
         return $this->safequery($query, ...$vars);
     }
 
-    public function insertId()
+    public function insertId(): int|string
     {
         return $this->connection->insert_id;
     }
 
     public function safeinsert(string $table, array $data)
     {
-        if (!empty($data) && array_keys($data) !== []) {
+        if ($data !== [] && array_keys($data) !== []) {
             return $this->safequery(
                 'INSERT INTO ' . $this->ftable($table)
                 . ' (`' . implode('`, `', array_keys($data)) . '`) VALUES ?;',
@@ -174,7 +175,7 @@ final class Database
         string $whereFormat = '',
         ...$whereParams,
     ) {
-        if (empty($kvarray)) {
+        if ($kvarray === []) {
             // Nothing to update.
             return null;
         }
@@ -188,7 +189,7 @@ final class Database
 
     public function safeBuildUpdate(array $kvarray): string
     {
-        if ($kvarray == []) {
+        if ($kvarray === []) {
             return '';
         }
 
@@ -217,16 +218,19 @@ final class Database
         return mb_substr($updateString, 0, -1);
     }
 
-    public function safedelete(string $table, string $whereformat, ...$vars): mixed
-    {
+    public function safedelete(
+        string $table,
+        string $whereformat,
+        ...$vars,
+    ): mixed {
         $query = 'DELETE FROM ' . $this->ftable($table)
-            . ($whereformat ? ' ' . $whereformat : '');
+            . ($whereformat !== '' && $whereformat !== '0' ? ' ' . $whereformat : '');
 
         // Put the format string back.
         return $this->safequery($query, ...$vars);
     }
 
-    public function row(mysqli_result $result = null): null|array|false
+    public function row(?mysqli_result $result = null): null|array|false
     {
         $result = $result ?: $this->lastQuery;
 
@@ -234,7 +238,7 @@ final class Database
     }
 
     // Only new-style mysqli.
-    public function arows(mysqli_result $result = null): array|false
+    public function arows(?mysqli_result $result = null): array|false
     {
         $result = $result ?: $this->lastQuery;
 
@@ -242,21 +246,21 @@ final class Database
     }
 
     // Only new-style mysqli.
-    public function rows(mysqli_result $result = null): array|false
+    public function rows(?mysqli_result $result = null): array|false
     {
         $result = $result ?: $this->lastQuery;
 
         return $result ? $this->fetchAll($result, MYSQLI_BOTH) : false;
     }
 
-    public function arow(mysqli_result $result = null): null|array|false
+    public function arow(?mysqli_result $result = null): null|array|false
     {
         $result = $result ?: $this->lastQuery;
 
         return $result ? mysqli_fetch_assoc($result) : false;
     }
 
-    public function numRows(mysqli_result $result = null)
+    public function numRows(?mysqli_result $result = null): int|string
     {
         $result = $result ?: $this->lastQuery;
 
@@ -350,7 +354,7 @@ final class Database
 
         if (!$stmt) {
             $error = $this->connection->error;
-            if ($error) {
+            if ($error !== '' && $error !== '0') {
                 error_log(
                     "ERROR WITH QUERY: {$compiledQueryString}" . PHP_EOL . "{$error}",
                 );
@@ -365,7 +369,7 @@ final class Database
 
         if (!$stmt->execute()) {
             $error = $this->connection->error;
-            if ($error) {
+            if ($error !== '' && $error !== '0') {
                 error_log(
                     "ERROR WITH QUERY: {$queryString}" . PHP_EOL . "{$error}",
                 );
@@ -377,7 +381,7 @@ final class Database
         $retval = $stmt->get_result();
 
         $error = $this->connection->error;
-        if ($error) {
+        if ($error !== '' && $error !== '0') {
             error_log(
                 "ERROR WITH QUERY: {$queryString}" . PHP_EOL . "{$error}",
             );
@@ -420,13 +424,16 @@ final class Database
             : "'" . $this->escape($value) . "'";
     }
 
-    public function escape($a)
+    public function escape($a): string
     {
         return $this->connection->real_escape_string($a);
     }
 
-    public function safespecial(string $format, array $tablenames, ...$va_array): mixed
-    {
+    public function safespecial(
+        string $format,
+        array $tablenames,
+        ...$va_array,
+    ): mixed {
         // Table names.
         $tempformat = str_replace('%t', '%s', $format);
 
@@ -500,7 +507,10 @@ final class Database
                 continue;
             }
 
-            if (isset($usersOnlineCache[$user['uid']]) && $usersOnlineCache[$user['uid']]) {
+            if (
+                isset($usersOnlineCache[$user['uid']])
+                && $usersOnlineCache[$user['uid']]
+            ) {
                 continue;
             }
 
