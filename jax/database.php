@@ -7,7 +7,6 @@ namespace Jax;
 use MySQLi;
 use mysqli_result;
 
-use function addslashes;
 use function array_keys;
 use function array_map;
 use function array_pop;
@@ -19,7 +18,6 @@ use function gmdate;
 use function implode;
 use function is_array;
 use function is_int;
-use function is_numeric;
 use function is_string;
 use function ksort;
 use function mb_check_encoding;
@@ -46,7 +44,7 @@ final class Database
 
     private $queryList = [];
 
-    private $connection = null;
+    private $connection;
 
     private $prefix = '';
 
@@ -565,6 +563,14 @@ final class Database
         return $this->ratingNiblets = $niblets;
     }
 
+    public function debug(): string
+    {
+        return '<div><p>' . implode(
+            '</p><p>',
+            $this->queryList,
+        ) . '</p></div>';
+    }
+
     /**
      * A function to deal with the `mysqli_fetch_all` function only exiting
      * for the `mysqlnd` driver. Fetches all rows from a MySQLi query result.
@@ -589,13 +595,5 @@ final class Database
         }
 
         return $result;
-    }
-
-    public function debug(): string
-    {
-        return '<div><p>' . implode(
-            '</p><p>',
-            $this->queryList,
-        ) . '</p></div>';
     }
 }
