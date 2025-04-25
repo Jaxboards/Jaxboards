@@ -196,7 +196,7 @@ final class Database
 
         return "INSERT INTO {$tableName}"
             . ' (' . implode(',', $columnNames) . ')'
-            . ' VALUES (' . implode('),(', $rows) . ')';
+            . ' VALUES (' . implode('),(', $rows) . ');';
     }
 
     public function safeupdate(
