@@ -24,18 +24,18 @@ final readonly class IPAddress
         private Database $database,
     ) {}
 
-    public function asBinary($ip = null): false|string
+    public function asBinary(string $ipAddress = null): false|string
     {
-        if (!$ip) {
-            $ip = self::getIp();
+        if (!$ipAddress) {
+            $ipAddress = self::getIp();
         }
 
-        if (!filter_var($ip, FILTER_VALIDATE_IP)) {
+        if (!filter_var($ipAddress, FILTER_VALIDATE_IP)) {
             // Not an IP, so don't need to send anything back.
             return '';
         }
 
-        return inet_pton($ip);
+        return inet_pton($ipAddress);
     }
 
     // This comment suggests MySQL's aton is different from php's pton, so
@@ -61,7 +61,7 @@ final readonly class IPAddress
             $ipAddress = self::getIp();
         }
 
-        if ($ipBanCache) {
+        if (!$ipBanCache) {
             $ipBanCache = [];
 
             if (file_exists(BOARDPATH . '/bannedips.txt')) {
@@ -76,11 +76,10 @@ final readonly class IPAddress
             }
         }
 
-
         foreach ($ipBanCache as $bannedIp) {
             if (
                 (mb_substr($bannedIp, -1) === ':' || mb_substr($bannedIp, -1) === '.')
-                && mb_strtolower(mb_substr((string) $ip, 0, mb_strlen($bannedIp))) === $bannedIp
+                && mb_strtolower(mb_substr((string) $ipAddress, 0, mb_strlen($bannedIp))) === $bannedIp
             ) {
                 return true;
             }
