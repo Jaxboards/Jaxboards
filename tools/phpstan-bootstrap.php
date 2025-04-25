@@ -19,10 +19,8 @@ require_once dirname(__DIR__) . '/config.default.php';
 $classFiles = glob(dirname(__DIR__) . '/jax/*.php');
 
 // Exclude tests
-$classFiles = array_filter($classFiles, fn($fileName) => !str_contains($fileName, '.test.'));
+$classFiles = array_filter($classFiles, static fn($fileName): bool => !str_contains((string) $fileName, '.test.'));
 
-if ($classFiles) {
-    foreach ($classFiles as $classFile) {
-        require_once $classFile;
-    }
+foreach ($classFiles as $classFile) {
+    require_once $classFile;
 }
