@@ -13,6 +13,7 @@ class App
      * @var float
      */
     public $microtime;
+
     private bool $onLocalHost = false;
 
     public function __construct(
