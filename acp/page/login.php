@@ -10,7 +10,10 @@ use Jax\Database;
 use Jax\Jax;
 use Jax\User;
 
-class Login {
+use function header;
+
+final class Login
+{
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
@@ -18,14 +21,9 @@ class Login {
         private readonly Page $page,
         private readonly User $user,
     ) {}
-    private function sessionStart() {
-        ini_set('session.cookie_secure', 1);
-        ini_set('session.cookie_httponly', 1);
-        ini_set('session.use_cookies', 1);
-        ini_set('session.use_only_cookies', 1);
-        session_start();
-    }
-    public function render() {
+
+    public function render(): void
+    {
         $this->database->connect(
             $this->config->getSetting('sql_host'),
             $this->config->getSetting('sql_username'),
@@ -50,10 +48,12 @@ class Login {
                 ['id'],
                 'members',
                 'WHERE `name`=?',
-                $user
+                $user,
             );
             $member = $this->database->row($result);
-            $user = $member ? $this->user->getUser($member['id'], $password) : null;
+            $user = $member
+                ? $this->user->getUser($member['id'], $password)
+                : null;
             $this->database->disposeresult($result);
 
             if ($user === null) {
