@@ -12,6 +12,8 @@ use Jax\Jax;
 use Jax\User;
 
 use function header;
+use function ini_set;
+use function session_start;
 
 final readonly class Login
 {
