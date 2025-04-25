@@ -4,21 +4,16 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use function array_key_exists;
 use function array_merge;
-use function defined;
 use function file_exists;
-use function file_put_contents;
-use function json_encode;
-
-use const JSON_PRETTY_PRINT;
-
 
 /**
  * @psalm-api
  */
-final class ServiceConfig {
-    public function get() {
+final class ServiceConfig
+{
+    public function get(): array
+    {
         return array_merge($this->getServiceConfig(), $this->override());
     }
 
@@ -37,7 +32,6 @@ final class ServiceConfig {
 
         return $serviceConfig;
     }
-
 
     public function getSetting(string $key)
     {

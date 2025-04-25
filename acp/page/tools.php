@@ -240,7 +240,7 @@ final readonly class Tools
                 . gmdate('Y-m-d_His') . '.sql"',
             );
             $result = $this->database->safequery("SHOW TABLES LIKE '{$this->database->getPrefix()}%%'");
-            $tables = array_map(static fn($row) => $row[0], $this->database->rows($result));
+            $tables = array_map(static fn(array $row) => $row[0], $this->database->rows($result));
             $page = '';
             if ($tables !== []) {
                 echo PHP_EOL . "-- Jaxboards Backup {$this->database->getPrefix()} "

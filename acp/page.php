@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace ACP;
 
-use Jax\DomainDefinitions;
-
 use Exception;
+use Jax\DomainDefinitions;
 
 use function error_log;
 use function file_get_contents;
@@ -27,10 +26,6 @@ use const PHP_EOL;
  */
 final class Page
 {
-    public function __construct(
-        private DomainDefinitions $domainDefinitions,
-    ){}
-
     public $parts = [
         'content' => '',
         'sidebar' => '',
@@ -41,6 +36,10 @@ final class Page
         'nav' => '',
         'navdropdowns' => '',
     ];
+
+    public function __construct(
+        private readonly DomainDefinitions $domainDefinitions,
+    ) {}
 
     /**
      * Creates a nav menu in the ACP.

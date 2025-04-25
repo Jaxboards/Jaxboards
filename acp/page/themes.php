@@ -47,7 +47,9 @@ use const PHP_EOL;
 final readonly class Themes
 {
     private string $wrappersPath;
+
     private string $boardPath;
+
     private string $themesPath;
 
     public function __construct(
@@ -566,7 +568,10 @@ final readonly class Themes
                     );
                 }
 
-                if (!is_dir($this->boardPath . 'Themes') && is_writable($this->boardPath)) {
+                if (
+                    !is_dir($this->boardPath . 'Themes')
+                    && is_writable($this->boardPath)
+                ) {
                     mkdir($this->boardPath . 'Themes');
                 }
 

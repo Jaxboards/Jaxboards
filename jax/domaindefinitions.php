@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use function array_key_exists;
 use function define;
 use function defined;
 use function implode;
@@ -31,13 +30,27 @@ function pathjoin(string ...$paths): ?string
 
 final class DomainDefinitions
 {
+    /**
+     * @var null|string
+     */
+    public $soundUrl;
+
+    /**
+     * @var string
+     */
+    public $boardPathURL;
     public string $boardUrl = '';
+
     public string $soundsUrl = '';
+
     public string $serviceThemePath = '';
+
     public string $boardPath = '';
+
     public string $boardPathUrl = '';
 
-    public function __construct(private readonly ServiceConfig $serviceConfig) {
+    public function __construct(private readonly ServiceConfig $serviceConfig)
+    {
         $serviceConfig = $this->serviceConfig->get();
 
 
@@ -85,19 +98,28 @@ final class DomainDefinitions
         $this->boardPathURL = $this->boardUrl . pathjoin('boards', $prefix);
     }
 
-    public function getBoardUrl(): string {
+    public function getBoardUrl(): string
+    {
         return $this->boardUrl;
     }
-    public function getSoundsUrl(): string {
+
+    public function getSoundsUrl(): string
+    {
         return $this->soundsUrl;
     }
-    public function getServiceThemePath(): string {
+
+    public function getServiceThemePath(): string
+    {
         return $this->serviceThemePath;
     }
-    public function getBoardPath(): string {
+
+    public function getBoardPath(): string
+    {
         return $this->boardPath;
     }
-    public function getBoardPathUrl(): string {
+
+    public function getBoardPathUrl(): string
+    {
         return $this->boardPathUrl;
     }
 }

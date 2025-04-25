@@ -7,7 +7,6 @@ namespace Jax;
 use function array_key_exists;
 use function array_merge;
 use function defined;
-use function file_exists;
 use function file_put_contents;
 use function json_encode;
 
@@ -16,12 +15,12 @@ use const JSON_PRETTY_PRINT;
 /**
  * @psalm-api
  */
-final class Config
+final readonly class Config
 {
-    function __construct(
+    public function __construct(
         private ServiceConfig $serviceConfig,
         private DomainDefinitions $domainDefinitions,
-    ){}
+    ) {}
 
     public function get(): array
     {
@@ -41,7 +40,7 @@ final class Config
         }
 
         $boardPath = $this->domainDefinitions->getBoardPath();
-        if (!$boardPath) {
+        if ($boardPath === '' || $boardPath === '0') {
             $boardConfig = ['noboard' => 1];
 
             return $boardConfig;
