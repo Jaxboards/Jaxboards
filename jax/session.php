@@ -27,83 +27,86 @@ final class Session
      */
     private $data = [];
 
+    /**
+     * @var array<string,string>
+     */
     private $bots = [
-        'AhrefsBot' => 'Ahrefs',
         // SEO crawler
+        'AhrefsBot' => 'Ahrefs',
         'Amazonbot' => 'Amazon',
         'Applebot' => 'Applebot',
         'archive.org_bot' => 'Internet Archive',
-        'AwarioBot' => 'Awario',
         // Social media management company
-        'Baiduspider' => 'Baidu',
+        'AwarioBot' => 'Awario',
         // Chinese search engine
-        'Barkrowler' => 'Babbar.tech',
+        'Baiduspider' => 'Baidu',
         // SEO graphing services
+        'Barkrowler' => 'Babbar.tech',
         'Bingbot' => 'Bing',
-        'Bytespider' => 'Bytespider',
         // TikTok parent company
-        'CensysInspect' => 'CensysInspect',
+        'Bytespider' => 'Bytespider',
         // Security scanner
-        'Centurybot' => 'Century',
+        'CensysInspect' => 'CensysInspect',
         // a.k.a. RightDao, a search engine
-        'ChatGLM-Spider' => 'ChatGLM',
+        'Centurybot' => 'Century',
         // SEO crawler
-        'ChatGPT-User' => 'ChatGPT',
+        'ChatGLM-Spider' => 'ChatGLM',
         // AI developer
-        'ClaudeBot' => 'ClaudeBot',
+        'ChatGPT-User' => 'ChatGPT',
         // Anthropic AI bot
+        'ClaudeBot' => 'ClaudeBot',
         'Discordbot' => 'Discord',
-        'DotBot' => 'DotBot',
         // Moz SEO crawler
+        'DotBot' => 'DotBot',
         'DuckDuckBot' => 'DuckDuckGo',
-        'Expanse' => 'Expanse',
         // Palo Alto Networks security scanning service
+        'Expanse' => 'Expanse',
         'facebookexternalhit' => 'Facebook',
-        'Friendly_Crawler' => 'FriendlyCrawler',
         // Machine learning researcher
+        'Friendly_Crawler' => 'FriendlyCrawler',
         'Googlebot' => 'Google',
         'GoogleOther' => 'GoogleOther',
+        // AI developer
         'GPTBot' => 'GPTBot',
-        // AI developer
         'ia_archiver' => 'Internet Archive Alexa',
-        'ImagesiftBot' => 'Imagesift',
         // Hive image search; may be AI-related
-        'linkdexbot' => 'Linkdex',
+        'ImagesiftBot' => 'Imagesift',
         // SEO crawler
-        'Mail.RU_Bot' => 'Mail.RU',
+        'linkdexbot' => 'Linkdex',
         // Russian mail service
-        'meta-externalagent' => 'Meta',
+        'Mail.RU_Bot' => 'Mail.RU',
         // May be AI-related
-        'mj12bot' => 'Majestic',
+        'meta-externalagent' => 'Meta',
         // British SEO crawler
-        'MojeekBot' => 'Mojeek',
+        'mj12bot' => 'Majestic',
         // British search engine
-        'OAI-SearchBot' => 'OpenAI',
+        'MojeekBot' => 'Mojeek',
         // AI developer
-        'PerplexityBot' => 'Perplexity',
+        'OAI-SearchBot' => 'OpenAI',
         // AI answers site
-        'PetalBot' => 'PetalBot',
+        'PerplexityBot' => 'Perplexity',
         // Chinese search crawler (Huawei)
-        'Qwantbot' => 'Qwant',
+        'PetalBot' => 'PetalBot',
         // French search engine
-        'SemrushBot' => 'Semrush',
+        'Qwantbot' => 'Qwant',
         // Backlink tracking company
-        'SeznamBot' => 'Seznam',
+        'SemrushBot' => 'Semrush',
         // Czech search engine
-        'Sogou web spider' => 'Sogou',
+        'SeznamBot' => 'Seznam',
         // Chinese search engine
+        'Sogou web spider' => 'Sogou',
         'Teoma' => 'Ask.com',
         'TikTokSpider' => 'TikTok',
-        'Turnitin' => 'Turnitin',
         // Plagiarism scanning software
+        'Turnitin' => 'Turnitin',
         'Twitterbot' => 'Twitter',
-        'W3C_Validator' => 'W3C Validator',
         // HTML syntax checker
+        'W3C_Validator' => 'W3C Validator',
         'WhatsApp' => 'WhatsApp',
         'Y!J-WSC' => 'Yahoo Japan',
         'yahoo! slurp' => 'Yahoo',
-        'YandexBot' => 'Yandex',
         // Russian search engine
+        'YandexBot' => 'Yandex',
     ];
 
     private $changedData = [];
@@ -152,19 +155,19 @@ final class Session
             }
         }
 
-        return $_SESSION['uid'];
+        return $_SESSION['uid'] ?? 0;
     }
 
     public function getSess($sid = null): array
     {
         $isbot = 0;
-        $r = [];
-        foreach ($this->bots as $k => $v) {
-            if (mb_stripos(mb_strtolower((string) $_SERVER['HTTP_USER_AGENT']), (string) $k) === false) {
+        $session = [];
+        foreach ($this->bots as $agentName => $friendlyName) {
+            if (mb_stripos(mb_strtolower((string) $_SERVER['HTTP_USER_AGENT']), (string) $agentName) === false) {
                 continue;
             }
 
-            $sid = $v;
+            $sid = $friendlyName;
             $isbot = 1;
         }
 
@@ -219,16 +222,17 @@ final class Session
                         'WHERE `id`=?',
                         $this->database->basicvalue($sid),
                     );
-            $r = $this->database->arow($result);
+            $session = $this->database->arow($result);
             $this->database->disposeresult($result);
         }
 
-        if (!empty($r)) {
-            $r['last_action'] = (int) $r['last_action'];
-            $r['last_update'] = (int) $r['last_update'];
-            $r['read_date'] = (int) $r['read_date'];
 
-            return $r;
+        if ($session !== []) {
+            $session['last_action'] = (int) $session['last_action'];
+            $session['last_update'] = (int) $session['last_update'];
+            $session['read_date'] = (int) $session['read_date'];
+
+            return $session;
         }
 
         if ($isbot === 0) {
@@ -281,26 +285,26 @@ final class Session
         $this->data[$field] = $value;
     }
 
-    public function addvar($a, $b): void
+    public function addvar(string $varName, mixed $value): void
     {
         if (
-            isset($this->data['vars'][$a])
-            && $this->data['vars'][$a] === $b
+            isset($this->data['vars'][$varName])
+            && $this->data['vars'][$varName] === $value
         ) {
             return;
         }
 
-        $this->data['vars'][$a] = $b;
+        $this->data['vars'][$varName] = $value;
         $this->changedData['vars'] = serialize($this->data['vars']);
     }
 
-    public function deleteVar($a): void
+    public function deleteVar(string $varName): void
     {
-        if (!isset($this->data['vars'][$a])) {
+        if (!isset($this->data['vars'][$varName])) {
             return;
         }
 
-        unset($this->data['vars'][$a]);
+        unset($this->data['vars'][$varName]);
         $this->changedData['vars'] = serialize($this->data['vars']);
     }
 
@@ -319,9 +323,9 @@ final class Session
         $this->set('location', $location);
     }
 
-    public function erase($a): void
+    public function erase(string $fieldName): void
     {
-        unset($this->changedData[$a]);
+        unset($this->changedData[$fieldName]);
     }
 
     public function clean($uid): bool
@@ -354,7 +358,7 @@ final class Session
                 'WHERE `expires`<=?',
                 $this->database->basicvalue(date('Y-m-d H:i:s', time())),
             );
-            $this->__set('read_date', $this->jax->pick($lastAction, 0));
+            $this->set('read_date', $this->jax->pick($lastAction, 0));
         }
 
         $yesterday = mktime(0, 0, 0);
@@ -367,18 +371,18 @@ final class Session
             'WHERE `last_update`<? GROUP BY uid',
             gmdate('Y-m-d H:i:s', $yesterday),
         );
-        while ($f = $this->database->arow($query)) {
-            if (!$f['uid']) {
+        while ($session = $this->database->arow($query)) {
+            if (!$session['uid']) {
                 continue;
             }
 
             $this->database->safeupdate(
                 'members',
                 [
-                    'last_visit' => gmdate('Y-m-d H:i:s', $f['last_action']),
+                    'last_visit' => gmdate('Y-m-d H:i:s', $session['last_action']),
                 ],
                 'WHERE `id`=?',
-                $f['uid'],
+                $session['uid'],
             );
         }
 
@@ -398,40 +402,39 @@ final class Session
 
     public function applyChanges(): void
     {
-        $sd = $this->changedData;
-        $id = $this->data['id'];
-        $sd['last_update'] = gmdate('Y-m-d H:i:s');
+        $session = $this->changedData;
+        $session['last_update'] = gmdate('Y-m-d H:i:s');
         $datetimes = ['last_action', 'read_date'];
         foreach ($datetimes as $datetime) {
             if (!isset($sd[$datetime])) {
                 continue;
             }
 
-            $sd[$datetime] = gmdate('Y-m-d H:i:s', $sd[$datetime]);
+            $session[$datetime] = gmdate('Y-m-d H:i:s', $session[$datetime]);
         }
 
         if ($this->data['is_bot']) {
             // Bots tend to read a lot of content.
-            $sd['forumsread'] = '{}';
-            $sd['topicsread'] = '{}';
+            $session['forumsread'] = '{}';
+            $session['topicsread'] = '{}';
         }
 
         if (!$this->data['last_action']) {
-            $sd['last_action'] = gmdate('Y-m-d H:i:s');
+            $session['last_action'] = gmdate('Y-m-d H:i:s');
         }
 
-        if (isset($sd['user'])) {
+        if (isset($session['user'])) {
             // This doesn't exist.
-            unset($sd['user']);
+            unset($session['user']);
         }
 
-        if (empty($sd)) {
+        if ($session === []) {
             return;
         }
 
-        if (mb_strlen($sd['location_verbose'] ?? '') > 100) {
-            $sd['location_verbose'] = mb_substr(
-                (string) $sd['location_verbose'],
+        if (mb_strlen($session['location_verbose'] ?? '') > 100) {
+            $session['location_verbose'] = mb_substr(
+                (string) $session['location_verbose'],
                 0,
                 100,
             );
@@ -440,9 +443,9 @@ final class Session
         // Only update if there's data to update.
         $this->database->safeupdate(
             'session',
-            $sd,
+            $session,
             'WHERE `id`=?',
-            $this->database->basicvalue($id),
+            $this->database->basicvalue($this->data['id']),
         );
     }
 
@@ -459,12 +462,12 @@ final class Session
         );
     }
 
-    public function addSessIDCB($m): string
+    public function addSessIDCB(array $match): string
     {
-        if ($m[1][0] === '?') {
-            $m[1] .= '&amp;sessid=' . $this->data['id'];
+        if ($match[1][0] === '?') {
+            $match[1] .= '&amp;sessid=' . $this->data['id'];
         }
 
-        return 'href="' . $m[1] . '"';
+        return 'href="' . $match[1] . '"';
     }
 }

@@ -420,7 +420,7 @@ final class Topic
     {
 
         // Check for new posts and append them.
-        if ($this->session->location !== "vt{$tid}") {
+        if ($this->session->get('location') !== "vt{$tid}") {
             $this->session->deleteVar('topic_lastpid');
         }
 

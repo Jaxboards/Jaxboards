@@ -507,19 +507,24 @@ final class IDX
     public function updateLastPosts(): void
     {
         $result = $this->database->safespecial(
-            <<<'EOT'
-                SELECT f.`id` AS `id`,f.`lp_tid` AS `lp_tid`,f.`lp_topic` AS `lp_topic`,
-                    UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,f.`lp_uid` AS `lp_uid`,
-                    f.`topics` AS `topics`,f.`posts` AS `posts`,m.`display_name` AS `lp_name`,
+            <<<'SQL'
+                SELECT
+                    f.`id` AS `id`,
+                    f.`lp_tid` AS `lp_tid`,
+                    f.`lp_topic` AS `lp_topic`,
+                    UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,
+                    f.`lp_uid` AS `lp_uid`,
+                    f.`topics` AS `topics`,
+                    f.`posts` AS `posts`,
+                    m.`display_name` AS `lp_name`,
                     m.`group_id` AS `lp_gid`
                 FROM %t f
-                LEFT JOIN %t m
-                    ON f.`lp_uid`=m.`id`
+                LEFT JOIN %t m ON f.`lp_uid`=m.`id`
                 WHERE f.`lp_date`>=?
-                EOT
+                SQL
             ,
             ['forums', 'members'],
-            gmdate('Y-m-d H:i:s', (int) ($this->session->get('last_update') ?? time())),
+            $this->session->get('last_update') ? gmdate('Y-m-d H:i:s', (int) $this->session->get('last_update')) : gmdate('Y-m-d H:i:s'),
         );
 
         while ($f = $this->database->arow($result)) {
