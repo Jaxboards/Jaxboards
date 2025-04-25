@@ -39,6 +39,7 @@ final class DomainDefinitions
      * @var string
      */
     public $boardPathURL;
+
     public string $boardUrl = '';
 
     public string $soundsUrl = '';
