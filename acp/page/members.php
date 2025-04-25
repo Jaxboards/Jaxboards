@@ -68,7 +68,8 @@ final readonly class Members
             'validation' => $this->validation(),
             default => $this->showmain(),
         };
-        $links = [
+
+        $this->page->sidebar([
             'delete' => 'Delete Account',
             'edit' => 'Edit Members',
             'ipbans' => 'IP Bans',
@@ -76,19 +77,7 @@ final readonly class Members
             'merge' => 'Account Merge',
             'prereg' => 'Pre-Register',
             'validation' => 'Validation',
-        ];
-        $sidebarLinks = '';
-        foreach ($links as $do => $title) {
-            $sidebarLinks .= $this->page->parseTemplate(
-                'sidebar-list-link.html',
-                [
-                    'title' => $title,
-                    'url' => '?act=members&do=' . $do,
-                ],
-            ) . PHP_EOL;
-        }
-
-        $this->page->sidebar($sidebarLinks);
+        ]);
     }
 
     public function showmain(): void

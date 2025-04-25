@@ -186,25 +186,12 @@ final readonly class Forums
 
     public function render(): void
     {
-        $links = [
+        $this->page->sidebar([
             'create' => 'Create Forum',
             'createc' => 'Create Category',
             'order' => 'Manage',
             'recountstats' => 'Recount Statistics',
-        ];
-
-        $sidebarLinks = '';
-        foreach ($links as $do => $title) {
-            $sidebarLinks .= $this->page->parseTemplate(
-                'sidebar-list-link.html',
-                [
-                    'title' => $title,
-                    'url' => '?act=forums&do=' . $do,
-                ],
-            ) . PHP_EOL;
-        }
-
-        $this->page->sidebar($sidebarLinks);
+        ]);
 
         if (isset($this->jax->b['delete']) && $this->jax->b['delete']) {
             if (is_numeric($this->jax->b['delete'])) {

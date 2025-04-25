@@ -31,23 +31,11 @@ final readonly class Posting
 
     public function render(): void
     {
-        $links = [
+        $this->page->sidebar([
             'emoticons' => 'Emoticons',
             'postrating' => 'Post Rating',
             'wordfilter' => 'Word Filter',
-        ];
-        $sidebarLinks = '';
-        foreach ($links as $do => $title) {
-            $sidebarLinks .= $this->page->parseTemplate(
-                'sidebar-list-link.html',
-                [
-                    'title' => $title,
-                    'url' => '?act=posting&do=' . $do,
-                ],
-            ) . PHP_EOL;
-        }
-
-        $this->page->sidebar($sidebarLinks);
+        ]);
 
         match ($this->jax->b['do'] ?? '') {
             'emoticons' => $this->emoticons(),

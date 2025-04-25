@@ -54,25 +54,11 @@ final readonly class Tools
 
     public function render(): void
     {
-        $links = [
+        $this->page->sidebar([
             'backup' => 'Backup',
             'files' => 'File Manager',
             'errorlog' => 'View Error Log',
-        ];
-
-        $sidebarLinks = '';
-
-        foreach ($links as $do => $title) {
-            $sidebarLinks .= $this->page->parseTemplate(
-                'sidebar-list-link.html',
-                [
-                    'title' => $title,
-                    'url' => '?act=tools&do=' . $do,
-                ],
-            ) . PHP_EOL;
-        }
-
-        $this->page->sidebar($sidebarLinks);
+        ]);
 
         if (!isset($this->jax->b['do'])) {
             $this->jax->b['do'] = null;

@@ -71,22 +71,10 @@ final readonly class Themes
             define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . $this->config->getSetting('dthemepath'));
         }
 
-        $links = [
+        $this->page->sidebar([
             'create' => 'Create New Skin',
             'manage' => 'Manage Skins',
-        ];
-        $sidebarLinks = '';
-        foreach ($links as $do => $title) {
-            $sidebarLinks .= $this->page->parseTemplate(
-                'sidebar-list-link.html',
-                [
-                    'title' => $title,
-                    'url' => '?act=themes&do=' . $do,
-                ],
-            ) . PHP_EOL;
-        }
-
-        $this->page->sidebar($sidebarLinks);
+        ]);
 
         if (isset($this->jax->g['editcss']) && $this->jax->g['editcss']) {
             $this->editcss($this->jax->g['editcss']);

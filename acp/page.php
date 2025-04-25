@@ -89,15 +89,26 @@ final class Page
         $this->parts[$partName] = $content;
     }
 
-    public function sidebar(string $sidebarLinks): void
+    public function sidebar(array $links): void
     {
+        $content = '';
+        foreach ($links as $do => $title) {
+            $content .= $this->parseTemplate(
+                'sidebar-list-link.html',
+                [
+                    'title' => $title,
+                    'url' => '?act=forums&do=' . $do,
+                ],
+            ) . PHP_EOL;
+        }
+
         $this->parts['sidebar'] = $this->parseTemplate(
             'sidebar.html',
             [
                 'content' => $this->parseTemplate(
                     'sidebar-list.html',
                     [
-                        'content' => $sidebarLinks,
+                        'content' => $content,
                     ],
                 ),
             ],

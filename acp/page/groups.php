@@ -35,23 +35,12 @@ final class Groups
 
     public function render(): void
     {
-        $links = [
+        $this->page->sidebar([
             'create' => 'Create Group',
             'delete' => 'Delete Group',
             'perms' => 'Edit Permissions',
-        ];
-        $sidebarLinks = '';
-        foreach ($links as $do => $title) {
-            $sidebarLinks .= $this->page->parseTemplate(
-                'sidebar-list-link.html',
-                [
-                    'title' => $title,
-                    'url' => '?act=groups&do=' . $do,
-                ],
-            ) . PHP_EOL;
-        }
+        ]);
 
-        $this->page->sidebar($sidebarLinks);
         if (isset($this->jax->g['edit']) && $this->jax->g['edit']) {
             $this->jax->g['do'] = 'edit';
         }

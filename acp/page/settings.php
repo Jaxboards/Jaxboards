@@ -32,25 +32,12 @@ final readonly class Settings
 
     public function render(): void
     {
-
-        $links = [
+        $this->page->sidebar([
             'birthday' => 'Birthdays',
             'global' => 'Global Settings',
             'pages' => 'Custom Pages',
             'shoutbox' => 'Shoutbox',
-        ];
-        $sidebarLinks = '';
-        foreach ($links as $do => $title) {
-            $sidebarLinks .= $this->page->parseTemplate(
-                'sidebar-list-link.html',
-                [
-                    'title' => $title,
-                    'url' => '?act=settings&do=' . $do,
-                ],
-            ) . PHP_EOL;
-        }
-
-        $this->page->sidebar($sidebarLinks);
+        ]);
 
         if (!isset($this->jax->b['do'])) {
             $this->jax->b['do'] = null;
