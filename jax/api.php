@@ -13,17 +13,17 @@ use function str_replace;
 
 use const ENT_QUOTES;
 
-final class API
+final readonly class API
 {
     public function __construct(
-        private readonly Database $database,
-        private readonly Jax $jax,
-        private readonly TextFormatting $textFormatting,
+        private Database $database,
+        private Jax $jax,
+        private TextFormatting $textFormatting,
     ) {}
 
     public function render(): void
     {
-        match($this->jax->g['act'] ?? '') {
+        match ($this->jax->g['act'] ?? '') {
             'searchmembers' => $this->searchmembers(),
             'emotes' => $this->emotes(),
             default => header('Location: /'),
@@ -47,7 +47,7 @@ final class API
             ),
         );
 
-        $list = [[],[]];
+        $list = [[], []];
         while ($member = $this->database->arow($result)) {
             $list[0][] = $member['id'];
             $list[1][] = $member['display_name'];
