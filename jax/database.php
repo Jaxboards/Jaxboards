@@ -37,7 +37,6 @@ use function preg_match;
 use function print_r;
 use function str_repeat;
 use function str_replace;
-use function syslog;
 use function time;
 use function vsprintf;
 
@@ -388,32 +387,10 @@ final class Database
                 );
             }
 
-            syslog(
-                LOG_ERR,
-                "SAFEQUERY PREPARE FAILED FOR {$compiledQueryString}, "
-                . print_r($outArgs, true) . PHP_EOL,
-            );
-
             return null;
         }
 
         $refValues = $this->refValues($outArgs);
-
-        if ($args !== []) {
-            $refclass = new ReflectionClass('mysqli_stmt');
-            $method = $refclass->getMethod('bind_param');
-            if (!$method->invokeArgs($stmt, $refValues)) {
-                syslog(LOG_ERR, 'BIND PARAMETERS FAILED' . PHP_EOL);
-                syslog(LOG_ERR, "QUERYSTRING: {$queryString}" . PHP_EOL);
-                syslog(LOG_ERR, 'ELEMENTCOUNT: ' . mb_strlen($typeString));
-                syslog(LOG_ERR, 'BINDVARCOUNT: ' . count($refValues[1]));
-                syslog(LOG_ERR, 'QUERYARGS: ' . print_r($outArgs, true) . PHP_EOL);
-                syslog(LOG_ERR, 'REFVALUES: ' . print_r($refValues, true) . PHP_EOL);
-                // phpcs:disable PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
-                syslog(LOG_ERR, print_r(debug_backtrace(), true));
-                // phpcs:enable
-            }
-        }
 
         if (!$stmt->execute()) {
             $error = $this->connection->error;
@@ -426,19 +403,7 @@ final class Database
             return null;
         }
 
-        if (!$stmt) {
-            syslog(LOG_ERR, "Statement is NULL for {$queryString}" . PHP_EOL);
-        }
-
         $retval = $stmt->get_result();
-
-        if (
-            !$retval
-            && !preg_match('/^\s*(UPDATE|DELETE|INSERT)\s/i', (string) $queryString)
-        ) {
-            // This is normal for a non-SELECT query.
-            syslog(LOG_ERR, "Result is NULL for {$queryString}" . PHP_EOL);
-        }
 
         $error = $this->connection->error;
         if ($error) {
@@ -516,16 +481,6 @@ final class Database
         $tablenames = array_shift($va_array);
         // Table names.
         $tempformat = str_replace('%t', '%s', $format);
-
-        if (!$tablenames) {
-            syslog(
-                LOG_ERR,
-                'NO TABLE NAMES' . PHP_EOL . print_r(
-                    debug_backtrace(),
-                    true,
-                ),
-            );
-        }
 
         $newformat = vsprintf(
             $tempformat,
