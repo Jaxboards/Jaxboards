@@ -32,6 +32,9 @@ use function ucfirst;
 use const PASSWORD_DEFAULT;
 use const PHP_EOL;
 
+/**
+ * @psalm-api
+ */
 final class UCP
 {
     private $what = '';

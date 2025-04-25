@@ -34,6 +34,9 @@ use function unpack;
 
 use const PHP_EOL;
 
+/**
+ * @psalm-api
+ */
 final readonly class Forums
 {
     public function __construct(

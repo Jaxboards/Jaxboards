@@ -24,6 +24,9 @@ use function unlink;
 
 use const PHP_EOL;
 
+/**
+ * @psalm-api
+ */
 final class Jax
 {
     /**

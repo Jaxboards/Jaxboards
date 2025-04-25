@@ -12,6 +12,9 @@ use function json_encode;
 
 use const JSON_PRETTY_PRINT;
 
+/**
+ * @psalm-api
+ */
 final class Config
 {
     public function get(): array

@@ -23,6 +23,9 @@ use function sprintf;
 use function ucfirst;
 use function ucwords;
 
+/**
+ * @psalm-api
+ */
 final class UserProfile
 {
     private $num_activity = 30;

@@ -35,7 +35,9 @@ use const MYSQLI_ASSOC;
 use const MYSQLI_BOTH;
 use const PHP_EOL;
 
-// TODO: Migrate jaxboards to be database-independent and not tied to MySQL
+/**
+ * @psalm-api
+ */
 final class Database
 {
     public mysqli_result $lastQuery;

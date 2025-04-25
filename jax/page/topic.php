@@ -35,6 +35,9 @@ use function time;
 
 use const PHP_EOL;
 
+/**
+ * @psalm-api
+ */
 final class Topic
 {
     /**

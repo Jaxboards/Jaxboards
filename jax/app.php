@@ -34,6 +34,9 @@ use const JSON_OBJECT_AS_ARRAY;
 use const JSON_THROW_ON_ERROR;
 use const PATHINFO_FILENAME;
 
+/**
+ * @psalm-api
+ */
 final class App
 {
     private readonly float $microtime;

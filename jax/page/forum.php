@@ -21,6 +21,9 @@ use function number_format;
 use function preg_match;
 use function time;
 
+/**
+ * @psalm-api
+ */
 final class Forum
 {
     private $topicsRead = [];

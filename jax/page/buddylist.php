@@ -16,6 +16,9 @@ use function implode;
 use function in_array;
 use function is_numeric;
 
+/**
+ * @psalm-api
+ */
 final readonly class BuddyList
 {
     public function __construct(

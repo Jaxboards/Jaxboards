@@ -10,6 +10,9 @@ use Jax\Page;
 use Jax\Session;
 use Jax\User;
 
+/**
+ * @psalm-api
+ */
 final class Ticker
 {
     private $maxticks = 60;

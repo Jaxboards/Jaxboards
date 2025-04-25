@@ -16,6 +16,9 @@ use function is_numeric;
 use function mktime;
 use function sprintf;
 
+/**
+ * @psalm-api
+ */
 final class Calendar
 {
     private $month;

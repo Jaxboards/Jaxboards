@@ -15,6 +15,9 @@ use function unpack;
 
 use const PASSWORD_DEFAULT;
 
+/**
+ * @psalm-api
+ */
 final class User
 {
     public ?array $userData = null;

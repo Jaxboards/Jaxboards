@@ -16,6 +16,9 @@ use function rawurlencode;
 
 use const PHP_EOL;
 
+/**
+ * @psalm-api
+ */
 final readonly class Posting
 {
     public function __construct(

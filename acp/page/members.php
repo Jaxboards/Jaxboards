@@ -36,6 +36,9 @@ use const FILTER_VALIDATE_IP;
 use const PASSWORD_DEFAULT;
 use const PHP_EOL;
 
+/**
+ * @psalm-api
+ */
 final readonly class Members
 {
     private const DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';

@@ -33,6 +33,9 @@ use function urlencode;
 
 use const ENT_QUOTES;
 
+/**
+ * @psalm-api
+ */
 final class TextFormatting
 {
     /**

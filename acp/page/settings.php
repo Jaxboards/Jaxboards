@@ -17,6 +17,9 @@ use function trim;
 
 use const PHP_EOL;
 
+/**
+ * @psalm-api
+ */
 final readonly class Settings
 {
     public function __construct(

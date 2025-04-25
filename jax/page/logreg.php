@@ -39,6 +39,9 @@ use const CURLOPT_RETURNTRANSFER;
 use const CURLOPT_URL;
 use const PASSWORD_DEFAULT;
 
+/**
+ * @psalm-api
+ */
 final class LogReg
 {
     private $registering = false;

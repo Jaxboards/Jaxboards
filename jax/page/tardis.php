@@ -6,6 +6,9 @@ namespace Jax\Page;
 
 use Jax\Page;
 
+/**
+ * @psalm-api
+ */
 final readonly class Tardis
 {
     public function __construct(private Page $page) {}

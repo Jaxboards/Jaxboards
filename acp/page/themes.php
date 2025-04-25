@@ -40,6 +40,9 @@ use function unlink;
 use const PATHINFO_FILENAME;
 use const PHP_EOL;
 
+/**
+ * @psalm-api
+ */
 final readonly class Themes
 {
     private const WRAPPERS_PATH = BOARDPATH . 'Wrappers/';

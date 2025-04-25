@@ -38,6 +38,9 @@ use const PATHINFO_EXTENSION;
 use const PHP_EOL;
 use const SEEK_END;
 
+/**
+ * @psalm-api
+ */
 final readonly class Tools
 {
     public function __construct(

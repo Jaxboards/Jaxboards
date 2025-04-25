@@ -18,6 +18,9 @@ use function serialize;
 use function time;
 use function unserialize;
 
+/**
+ * @psalm-api
+ */
 final class Session
 {
     /**

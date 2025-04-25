@@ -17,6 +17,9 @@ use function trim;
 
 use const FILTER_VALIDATE_IP;
 
+/**
+ * @psalm-api
+ */
 final readonly class IPAddress
 {
     public function __construct(

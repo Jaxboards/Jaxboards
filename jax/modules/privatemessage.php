@@ -23,6 +23,9 @@ use function trim;
 
 use const PHP_EOL;
 
+/**
+ * @psalm-api
+ */
 final readonly class PrivateMessage
 {
     public function __construct(

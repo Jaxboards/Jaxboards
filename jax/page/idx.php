@@ -27,6 +27,9 @@ use function preg_match;
 use function sprintf;
 use function time;
 
+/**
+ * @psalm-api
+ */
 final class IDX
 {
     private array $forumsread = [];

@@ -20,6 +20,9 @@ use function str_replace;
 use const PATHINFO_EXTENSION;
 use const PHP_EOL;
 
+/**
+ * @psalm-api
+ */
 final class Page
 {
     public $parts = [
