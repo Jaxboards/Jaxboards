@@ -365,7 +365,8 @@ if ($act === 'idx' && isset($JAX->b['module']) && $JAX->b['module']) {
     $page = $DB->arow($result);
     if ($page) {
         $DB->disposeresult($result);
-        $page['page'] = $JAX->bbcodes($page['page']);
+        $textFormatting = $container->get('Jax\TextFormatting');
+        $page['page'] = $textFormatting->bbcodes($page['page']);
         $PAGE->append('PAGE', $page['page']);
         if ($PAGE->jsnewlocation) {
             $PAGE->JS('update', 'page', $page['page']);
