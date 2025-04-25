@@ -463,7 +463,7 @@ final readonly class Members
                     'birthdate' => '0000-00-00',
                     'display_name' => $this->jax->p['displayname'],
                     'group_id' => 1,
-                    'last_visit' => gmdate('Y-m-d H:i:s'),
+                    'last_visit' => $this->database->datetime(),
                     'name' => $this->jax->p['username'],
                     'pass' => password_hash(
                         (string) $this->jax->p['pass'],
@@ -907,7 +907,7 @@ final readonly class Members
                     $this->database->safeinsert(
                         'messages',
                         [
-                            'date' => gmdate('Y-m-d H:i:s'),
+                            'date' => $this->database->datetime(),
                             'del_recipient' => 0,
                             'del_sender' => 0,
                             'flag' => 0,

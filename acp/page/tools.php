@@ -239,7 +239,7 @@ final readonly class Tools
             $page = '';
             if ($tables !== []) {
                 echo PHP_EOL . "-- Jaxboards Backup {$this->database->getPrefix()} "
-                    . gmdate('Y-m-d H:i:s') . PHP_EOL . PHP_EOL;
+                    . $this->database->datetime() . PHP_EOL . PHP_EOL;
                 echo 'SET NAMES utf8mb4;' . PHP_EOL;
                 echo "SET time_zone = '+00:00';" . PHP_EOL;
                 echo 'SET foreign_key_checks = 0;' . PHP_EOL;
