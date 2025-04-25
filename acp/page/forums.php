@@ -797,7 +797,7 @@ final readonly class Forums
                     ' WHERE `fid`=?',
                     $this->database->basicvalue($id),
                 );
-                $topics = $this->database->affected_rows();
+                $topics = $this->database->affectedRows();
             } else {
                 $result = $this->database->safespecial(
                     <<<'EOT'
@@ -814,13 +814,13 @@ final readonly class Forums
                     $this->database->basicvalue($id),
                 );
 
-                $posts = $this->database->affected_rows();
+                $posts = $this->database->affectedRows();
                 $this->database->safedelete(
                     'topics',
                     'WHERE `fid`=?',
                     $this->database->basicvalue($id),
                 );
-                $topics = $this->database->affected_rows();
+                $topics = $this->database->affectedRows();
             }
 
             $page = '';

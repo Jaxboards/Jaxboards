@@ -153,6 +153,6 @@ final readonly class PrivateMessage
             gmdate('Y-m-d H:i:s', time() - $this->config->getSetting('updateinterval') * 5),
         );
 
-        return $this->database->affected_rows() !== 0;
+        return $this->database->affectedRows() !== 0;
     }
 }
