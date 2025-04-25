@@ -17,7 +17,7 @@ use function trim;
 
 use const FILTER_VALIDATE_IP;
 
-final class IPAddress
+class IPAddress
 {
     public function __construct(
         private readonly Config $config,

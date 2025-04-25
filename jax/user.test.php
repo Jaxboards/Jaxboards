@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+require_once 'autoload.php';
+
 use DI\Container;
 use Jax\IPAddress;
 use Jax\User;
