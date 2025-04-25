@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Jax;
 
 use function base64_encode;
-use function date;
-use function gmdate;
 use function is_numeric;
 use function is_string;
 use function mb_stripos;

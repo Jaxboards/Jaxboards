@@ -428,7 +428,8 @@ final class Database
         return $this->connection->real_escape_string($a);
     }
 
-    public function datetime(int $timestamp = null) {
+    public function datetime(?int $timestamp = null): string
+    {
         return gmdate('Y-m-d H:i:s', $timestamp);
     }
 

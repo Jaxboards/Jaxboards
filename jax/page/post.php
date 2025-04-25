@@ -17,7 +17,6 @@ use function array_pop;
 use function count;
 use function explode;
 use function filesize;
-use function gmdate;
 use function hash_file;
 use function in_array;
 use function is_file;

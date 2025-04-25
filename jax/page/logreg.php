@@ -19,7 +19,6 @@ use function count;
 use function curl_exec;
 use function curl_init;
 use function curl_setopt;
-use function gmdate;
 use function json_decode;
 use function mb_strlen;
 use function mb_substr;

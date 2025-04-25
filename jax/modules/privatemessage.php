@@ -13,7 +13,6 @@ use Jax\TextFormatting;
 use Jax\User;
 
 use function explode;
-use function gmdate;
 use function implode;
 use function in_array;
 use function is_numeric;

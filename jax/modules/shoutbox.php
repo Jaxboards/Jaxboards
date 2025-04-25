@@ -15,7 +15,6 @@ use Jax\User;
 
 use function array_pop;
 use function ceil;
-use function gmdate;
 use function is_numeric;
 use function mb_strlen;
 use function mb_substr;

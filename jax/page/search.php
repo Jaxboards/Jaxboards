@@ -18,7 +18,6 @@ use function ceil;
 use function count;
 use function ctype_digit;
 use function explode;
-use function gmdate;
 use function implode;
 use function in_array;
 use function is_array;
