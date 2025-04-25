@@ -23,9 +23,9 @@ if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', __DIR__);
 }
 
-final class DomainDefinitions
+final readonly class DomainDefinitions
 {
-    public function __construct(private readonly Config $config) {}
+    public function __construct(private Config $config) {}
 
     public function defineConstants(): void
     {
