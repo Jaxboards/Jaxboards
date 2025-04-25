@@ -6,7 +6,6 @@ namespace Jax;
 
 use MySQLi;
 use mysqli_result;
-use ReflectionClass;
 
 use function addslashes;
 use function array_keys;
@@ -15,8 +14,6 @@ use function array_pop;
 use function array_shift;
 use function array_unshift;
 use function array_values;
-use function count;
-use function debug_backtrace;
 use function error_log;
 use function explode;
 use function function_exists;
@@ -33,14 +30,11 @@ use function mb_strlen;
 use function mb_substr;
 use function mysqli_fetch_array;
 use function mysqli_fetch_assoc;
-use function preg_match;
-use function print_r;
 use function str_repeat;
 use function str_replace;
 use function time;
 use function vsprintf;
 
-use const LOG_ERR;
 use const MYSQLI_ASSOC;
 use const MYSQLI_BOTH;
 use const PHP_EOL;
@@ -390,7 +384,7 @@ final class Database
             return null;
         }
 
-        $refValues = $this->refValues($outArgs);
+        $this->refValues($outArgs);
 
         if (!$stmt->execute()) {
             $error = $this->connection->error;
