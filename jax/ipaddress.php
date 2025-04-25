@@ -42,46 +42,49 @@ final readonly class IPAddress
     // we need to do something for mysql IP addresses:
     // https://secure.php.net/manual/en/function.inet-ntop.php#117398
     // .
-    public function asHumanReadable(?string $ip = null): string
+    public function asHumanReadable(?string $ipAddress = null): string
     {
-        if (!$ip) {
+        if (!$ipAddress) {
             return self::getIp();
         }
 
-        $length = mb_strlen($ip);
+        $length = mb_strlen($ipAddress);
 
-        return (inet_ntop($ip) ?: inet_ntop(pack('A' . $length, $ip))) ?: '';
+        return (inet_ntop($ipAddress) ?: inet_ntop(pack('A' . $length, $ipAddress))) ?: '';
     }
 
-    public function isBanned($ip = false): bool
+    public function isBanned(string $ipAddress = null): bool
     {
-        $ipbancache = null;
+        static $ipBanCache = null;
 
-        if (!$ip) {
-            $ip = self::getIp();
+        if (!$ipAddress) {
+            $ipAddress = self::getIp();
         }
+        if ($ipBanCache) {
+            $ipBanCache = [];
 
-        $ipbancache = [];
-        if (file_exists(BOARDPATH . '/bannedips.txt')) {
-            foreach (file(BOARDPATH . '/bannedips.txt') as $v) {
-                $v = trim($v);
-                if ($v === '') {
-                    continue;
+            if (file_exists(BOARDPATH . '/bannedips.txt')) {
+                foreach (file(BOARDPATH . '/bannedips.txt') as $line) {
+                    $line = trim($line);
+                    if ($line === '') {
+                        continue;
+                    }
+
+                    $ipBanCache[] = $line;
                 }
-
-                $ipbancache[] = $v;
             }
         }
 
-        foreach ($ipbancache as $v) {
+
+        foreach ($ipBanCache as $bannedIp) {
             if (
-                (mb_substr($v, -1) === ':' || mb_substr($v, -1) === '.')
-                && mb_strtolower(mb_substr((string) $ip, 0, mb_strlen($v))) === $v
+                (mb_substr($bannedIp, -1) === ':' || mb_substr($bannedIp, -1) === '.')
+                && mb_strtolower(mb_substr((string) $ip, 0, mb_strlen($bannedIp))) === $bannedIp
             ) {
                 return true;
             }
 
-            if ($v === $ip) {
+            if ($bannedIp === $ipAddress) {
                 return true;
             }
         }
@@ -125,7 +128,10 @@ final readonly class IPAddress
         return !isset($row['banned']) || $row['banned'] > 0;
     }
 
-    private function getIp()
+    /**
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
+    private function getIp(): string
     {
         return $_SERVER['REMOTE_ADDR'];
     }
