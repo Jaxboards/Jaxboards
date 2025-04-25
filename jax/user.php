@@ -254,18 +254,16 @@ final class User
             $permFlags = $permstoparse;
         }
 
-
         // Null $permFlags means to fall back to global permissions.
         if ($permFlags !== null) {
-            // Decode the bitflags
-            return [
-                'poll' => ($permFlags & 32) !== 0 ? 1 : 0,
-                'read' => ($permFlags & 8) !== 0 ? 1 : 0,
-                'reply' => ($permFlags & 2) !== 0 ? 1 : 0,
-                'start' => ($permFlags & 4) !== 0 ? 1 : 0,
-                'upload' => ($permFlags & 1) !== 0 ? 1 : 0,
-                'view' => ($permFlags & 16) !== 0 ? 1 : 0,
-            ];
+            $bitFlagOrder = ['upload', 'reply', 'start', 'read', 'view', 'poll'];
+
+            $decoded = [];
+            foreach ($bitFlagOrder as $index => $name) {
+                $decoded[$name] = $permFlags & (1 << $index) ? 1 : 0;
+            }
+
+            return $decoded;
         }
 
         return [
