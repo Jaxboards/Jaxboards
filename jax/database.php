@@ -384,7 +384,9 @@ final class Database
             return null;
         }
 
-        $this->refValues($outArgs);
+        if ($args !== []) {
+            $stmt->bind_param(...$this->refValues($outArgs));
+        }
 
         if (!$stmt->execute()) {
             $error = $this->connection->error;
