@@ -110,8 +110,8 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $container->get(IPAddress::class)->asBinary(),
         gmdate(DB_DATETIME, time() - 7 * 24 * 60 * 60),
     );
-    if ($DB->num_rows($result) > 3) {
-        $errors[] = 'You may only register one 3 boards per week.';
+    if ($DB->numRows($result) > 3) {
+        $errors[] = 'You may only register 3 boards per week.';
     }
     $DB->disposeresult($result);
 

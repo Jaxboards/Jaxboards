@@ -234,7 +234,7 @@ final readonly class Tools
                 . gmdate('Y-m-d_His') . '.sql"',
             );
             $result = $this->database->safequery("SHOW TABLES LIKE '{$this->database->getPrefix()}%%'");
-            $tables = $this->database->rows($result);
+            $tables = array_map(fn($row) => $row[0], $this->database->rows($result));
             $page = '';
             if ($tables) {
                 echo PHP_EOL . "-- Jaxboards Backup {$this->database->getPrefix()} "
@@ -244,27 +244,27 @@ final readonly class Tools
                 echo 'SET foreign_key_checks = 0;' . PHP_EOL;
                 echo "SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';" . PHP_EOL;
                 echo PHP_EOL;
-                foreach ($tables as $f) {
-                    $f[0] = mb_substr(mb_strstr((string) $f[0], '_'), 1);
-                    $page .= $f[0];
-                    echo PHP_EOL . '-- ' . $f[0] . PHP_EOL . PHP_EOL;
+                foreach ($tables as $table) {
+                    $table = mb_substr(mb_strstr((string) $table, '_'), 1);
+                    $page .= $table;
+                    echo PHP_EOL . '-- ' . $table . PHP_EOL . PHP_EOL;
                     $createtable = $this->database->safespecial(
                         'SHOW CREATE TABLE %t',
-                        [$f[0]],
+                        [$table],
                     );
                     $thisrow = $this->database->row($createtable);
                     if (!$thisrow) {
                         continue;
                     }
 
-                    $table = $this->database->ftable($f[0]);
-                    echo "DROP TABLE IF EXISTS {$table};" . PHP_EOL;
+                    $ftable = $this->database->ftable($table);
+                    echo "DROP TABLE IF EXISTS {$ftable};" . PHP_EOL;
                     echo array_pop($thisrow) . ';' . PHP_EOL;
                     $this->database->disposeresult($createtable);
                     // Only time I really want to use *.
-                    $select = $this->database->safeselect('*', $f[0]);
+                    $select = $this->database->safeselect('*', $table);
                     while ($row = $this->database->arow($select)) {
-                        echo $this->database->buildInsertQuery($table, $row) . PHP_EOL;
+                        echo $this->database->buildInsertQuery($ftable, $row) . PHP_EOL;
                     }
 
                     echo PHP_EOL;

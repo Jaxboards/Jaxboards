@@ -261,43 +261,30 @@ final class Database
     public function arows($result = null): array|false
     {
         $result = $result ?: $this->lastQuery;
-        if ($result) {
-            return $this->fetchAll($result, MYSQLI_ASSOC);
-        }
 
-        return false;
+        return $result ? $this->fetchAll($result, MYSQLI_ASSOC) : false;
     }
 
     // Only new-style mysqli.
     public function rows($result = null): array|false
     {
         $result = $result ?: $this->lastQuery;
-        if ($result) {
-            return $this->fetchAll($result, MYSQLI_BOTH);
-            // Disturbingly, not MYSQLI_NUM.
-        }
 
-        return false;
+        return $result ? $this->fetchAll($result, MYSQLI_BOTH) : false;
     }
 
     public function arow($result = null): null|array|false
     {
         $result = $result ?: $this->lastQuery;
-        if ($result) {
-            return @mysqli_fetch_assoc($result);
-        }
 
-        return false;
+        return $result ? mysqli_fetch_assoc($result) : false;
     }
 
-    public function num_rows($result = null)
+    public function numRows($result = null)
     {
         $result = $result ?: $this->lastQuery;
-        if ($result) {
-            return $result->num_rows;
-        }
 
-        return 0;
+        return $result?->num_rows ?? 0;
     }
 
     public function disposeresult($result): void
@@ -318,16 +305,15 @@ final class Database
 
     public function safequery_typeforvalue($value): string
     {
-        $type = 's';
         if (is_array($value)) {
-            $type = 'a';
+            return 'a';
         }
 
         if (is_int($value)) {
             return 'i';
         }
 
-        return $type;
+        return 's';
     }
 
     // Blah ?1 blah ?2 blah ?3 blah
@@ -355,7 +341,7 @@ final class Database
 
         $connection = $this->connection;
 
-        $typestring = '';
+        $typeString = '';
         $outArgs = [];
 
         $added_placeholders = 0;
@@ -373,21 +359,21 @@ final class Database
 
                 $added_placeholders += mb_strlen($type) - 1;
 
-                foreach ($value as $singlevalue) {
-                    if ($singlevalue === null) {
-                        $singlevalue = '';
+                foreach ($value as $singleValue) {
+                    if ($singleValue === null) {
+                        $singleValue = '';
                     }
 
-                    $outArgs[] = $singlevalue;
+                    $outArgs[] = $singleValue;
                 }
             } else {
                 $outArgs[] = $value;
             }
 
-            $typestring .= $type;
+            $typeString .= $type;
         }
 
-        array_unshift($outArgs, $typestring);
+        array_unshift($outArgs, $typeString);
 
         $stmt = $connection->prepare($compiledQueryString);
         if ($this->debugMode) {
@@ -419,7 +405,7 @@ final class Database
             if (!$method->invokeArgs($stmt, $refValues)) {
                 syslog(LOG_ERR, 'BIND PARAMETERS FAILED' . PHP_EOL);
                 syslog(LOG_ERR, "QUERYSTRING: {$queryString}" . PHP_EOL);
-                syslog(LOG_ERR, 'ELEMENTCOUNT: ' . mb_strlen($typestring));
+                syslog(LOG_ERR, 'ELEMENTCOUNT: ' . mb_strlen($typeString));
                 syslog(LOG_ERR, 'BINDVARCOUNT: ' . count($refValues[1]));
                 syslog(LOG_ERR, 'QUERYARGS: ' . print_r($outArgs, true) . PHP_EOL);
                 syslog(LOG_ERR, 'REFVALUES: ' . print_r($refValues, true) . PHP_EOL);
@@ -499,7 +485,7 @@ final class Database
         return $value;
     }
 
-    public function evalue($value, $forsprintf = 0)
+    public function evalue($value)
     {
         if (is_array($value)) {
             $value = $value[0];
@@ -508,9 +494,7 @@ final class Database
         } else {
             $value = is_int($value)
                 ? $value
-                : "'" . $this->escape(
-                    $forsprintf ? str_replace('%', '%%', $value) : $value,
-                ) . "'";
+                : "'" . $this->escape($value) . "'";
         }
 
         return $value;
@@ -564,52 +548,57 @@ final class Database
         if (!$this->usersOnlineCache) {
             $result = $this->safespecial(
                 <<<'EOT'
-                    SELECT a.`id` as `id`,a.`uid` AS `uid`,a.`location` AS `location`,
-                        a.`location_verbose` AS `location_verbose`,a.`hide` AS `hide`,
-                        a.`is_bot` AS `is_bot`,b.`display_name` AS `name`,
-                        b.`group_id` AS `group_id`,b.`birthdate` AS `birthdate`,
-                        CONCAT(MONTH(b.`birthdate`),' ',DAY(b.`birthdate`)) AS `dob`,
-                        UNIX_TIMESTAMP(a.`last_action`) AS `last_action`,
-                        UNIX_TIMESTAMP(a.`last_update`) AS `last_update`
-                    FROM %t a
-                    LEFT JOIN %t b
-                        ON a.`uid`=b.`id`
-                    WHERE a.`last_update`>=?
-                    ORDER BY a.`last_action` DESC
+                    SELECT
+                        s.`id` as `id`,
+                        s.`uid` AS `uid`,
+                        s.`location` AS `location`,
+                        s.`location_verbose` AS `location_verbose`,
+                        s.`hide` AS `hide`,
+                        s.`is_bot` AS `is_bot`,
+                        m.`display_name` AS `name`,
+                        m.`group_id` AS `group_id`,
+                        m.`birthdate` AS `birthdate`,
+                        CONCAT(MONTH(m.`birthdate`),' ',DAY(m.`birthdate`)) AS `dob`,
+                        UNIX_TIMESTAMP(s.`last_action`) AS `last_action`,
+                        UNIX_TIMESTAMP(s.`last_update`) AS `last_update`
+                    FROM %t s
+                    LEFT JOIN %t m ON s.`uid`=m.`id`
+                    WHERE s.`last_update`>=?
+                    ORDER BY s.`last_action` DESC
                     EOT
                 ,
                 ['session', 'members'],
                 gmdate('Y-m-d H:i:s', time() - $this->config->getSetting('timetologout')),
             );
             $today = gmdate('n j');
-            while ($f = $this->arow($result)) {
-                if ($f['hide']) {
+            while ($user = $this->arow($result)) {
+                if ($user['hide']) {
                     if (!$canViewHiddenMembers) {
                         continue;
                     }
 
-                    $f['name'] = '* ' . $f['name'];
+                    $user['name'] = '* ' . $user['name'];
                 }
 
-                $f['birthday'] = ($f['dob'] === $today ? 1 : 0);
-                $f['status'] = $f['last_action'] < $idletimeout
+                $user['birthday'] = ($user['dob'] === $today ? 1 : 0);
+                $user['status'] = $user['last_action'] < $idletimeout
                     ? 'idle'
                     : 'active';
-                if ($f['is_bot']) {
-                    $f['name'] = $f['id'];
-                    $f['uid'] = $f['id'];
+                if ($user['is_bot']) {
+                    $user['name'] = $user['id'];
+                    $user['uid'] = $user['id'];
                 }
 
-                unset($f['id'], $f['dob']);
-                if (!$f['uid']) {
+                unset($user['id'], $user['dob']);
+                if (!$user['uid']) {
                     continue;
                 }
 
-                if (isset($return[$f['uid']]) && $return[$f['uid']]) {
+                if (isset($return[$user['uid']]) && $return[$user['uid']]) {
                     continue;
                 }
 
-                $return[$f['uid']] = $f;
+                $return[$user['uid']] = $user;
             }
 
             $this->usersOnlineCache = $return;
@@ -621,27 +610,32 @@ final class Database
     public function fixForumLastPost($fid): void
     {
         $result = $this->safeselect(
-            '`lp_uid`,UNIX_TIMESTAMP(`lp_date`) AS `lp_date`,`id`,`title`',
+            [
+                'lp_uid',
+                'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
+                'id',
+                'title'
+            ],
             'topics',
             'WHERE `fid`=? ORDER BY `lp_date` DESC LIMIT 1',
             $fid,
         );
-        $d = $this->arow($result);
+        $topic = $this->arow($result);
         $this->disposeresult($result);
         $this->safeupdate(
             'forums',
             [
-                'lp_date' => isset($d['lp_date'])
-                && is_numeric($d['lp_date'])
-                && $d['lp_date'] ? gmdate('Y-m-d H:i:s', $d['lp_date'])
+                'lp_date' => isset($topic['lp_date'])
+                && is_numeric($topic['lp_date'])
+                && $topic['lp_date'] ? gmdate('Y-m-d H:i:s', $topic['lp_date'])
                 : '0000-00-00 00:00:00',
-                'lp_tid' => isset($d['id'])
-                && is_numeric($d['id'])
-                && $d['id'] ? (int) $d['id'] : null,
-                'lp_topic' => $d['title'] ?? '',
-                'lp_uid' => isset($d['lp_uid'])
-                && is_numeric($d['lp_uid'])
-                && $d['lp_uid'] ? (int) $d['lp_uid'] : null,
+                'lp_tid' => isset($topic['id'])
+                && is_numeric($topic['id'])
+                && $topic['id'] ? (int) $topic['id'] : null,
+                'lp_topic' => $topic['title'] ?? '',
+                'lp_uid' => isset($topic['lp_uid'])
+                && is_numeric($topic['lp_uid'])
+                && $topic['lp_uid'] ? (int) $topic['lp_uid'] : null,
             ],
             'WHERE id=?',
             $fid,
@@ -651,8 +645,8 @@ final class Database
     public function fixAllForumLastPosts(): void
     {
         $query = $this->safeselect(['id'], 'forums');
-        while ($fid = $this->arow($query)) {
-            $this->fixForumLastPost($fid['id']);
+        while ($forum = $this->arow($query)) {
+            $this->fixForumLastPost($forum['id']);
         }
     }
 
@@ -666,12 +660,12 @@ final class Database
             ['id', 'img', 'title'],
             'ratingniblets',
         );
-        $r = [];
-        while ($f = $this->arow($result)) {
-            $r[$f['id']] = ['img' => $f['img'], 'title' => $f['title']];
+        $niblets = [];
+        while ($niblet = $this->arow($result)) {
+            $niblets[$niblet['id']] = ['img' => $niblet['img'], 'title' => $niblet['title']];
         }
 
-        return $this->ratingNiblets = $r;
+        return $this->ratingNiblets = $niblets;
     }
 
     public function debug(): string
