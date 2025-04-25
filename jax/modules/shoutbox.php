@@ -368,22 +368,21 @@ final class Shoutbox
     public function addshout(): void
     {
         $this->session->act();
-        $e = '';
         $shout = $this->jax->p['shoutbox_shout'];
         $shout = $this->textFormatting->linkify($shout);
 
         $perms = $this->user->getPerms();
-        if ($this->user->isGuest()) {
-            $e = 'You must be logged in to shout!';
-        } elseif (!$perms['can_shout']) {
-            $e = 'You do not have permission to shout!';
-        } elseif (mb_strlen((string) $shout) > 300) {
-            $e = 'Shout must be less than 300 characters.';
-        }
 
-        if ($e !== '' && $e !== '0') {
-            $this->page->JS('error', $e);
-            $this->page->append('shoutbox', $this->page->error($e));
+        $error = match(true) {
+            $this->user->isGuest() => 'You must be logged in to shout!',
+            !$perms['can_shout'] => 'You do not have permission to shout!',
+            mb_strlen((string) $shout) > 300 => 'Shout must be less than 300 characters.',
+            default => null
+        };
+
+        if ($error !== null) {
+            $this->page->JS('error', $error);
+            $this->page->append('shoutbox', $this->page->error($error));
 
             return;
         }
