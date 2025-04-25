@@ -31,15 +31,15 @@ function pathjoin(string ...$paths): ?string
 final class DomainDefinitions
 {
 
-    public string $boardURL = '';
+    private string $boardURL = '';
 
-    public string $soundsURL = '';
+    private string $soundsURL = '';
 
-    public string $serviceThemePath = '';
+    private string $serviceThemePath = '';
 
-    public string $boardPath = '';
+    private string $boardPath = '';
 
-    public string $boardPathURL = '';
+    private string $boardPathURL = '';
 
     public function __construct(private readonly ServiceConfig $serviceConfig)
     {
