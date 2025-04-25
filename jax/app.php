@@ -203,7 +203,7 @@ final class App
                 !$this->user->getPerm('can_view_board')
                 || $this->config->getSetting('boardoffline')
                 && !$this->user->getPerm('can_view_offline_board')
-            ) && !str_contains('logreg')
+            ) && !str_contains($action, 'logreg')
         ) {
             $action = 'boardoffline';
         }
