@@ -105,18 +105,6 @@ PUBLIC_PATH="/var/www/html/<your_domain_name>/public_html" && \
 If you plan to reuse any old themes, be prepared to update hardcoded images,
 especially those that refer to the now-defunct jaxboards service domain.
 
-### Updating
-
-In the unlikely event that you're restoring from an old (pre-2020) Jaxboards
-database, you can update it to the latest with the update script. It's only
-meant to run via the CLI, so run it with this:
-
-```bash
-php ./Service/update.php
-```
-
-If you're just starting to use this repo, you don't need to run this script.
-
 ## Contributing
 
 If you want to contribute, great! We make use of some command line utilities,
