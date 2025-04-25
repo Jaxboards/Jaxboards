@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use ACP\App;
 use DI\Container;
-use Jax\DomainDefinitions;
 
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', dirname(__DIR__));
@@ -20,8 +19,5 @@ if (!defined('JAXBOARDS_ROOT')) {
 
 // Load composer dependencies.
 require_once JAXBOARDS_ROOT . '/jax/autoload.php';
-$container = new Container();
-
-$container->get(DomainDefinitions::class)->defineConstants();
 
 $container->get(App::class)->render();

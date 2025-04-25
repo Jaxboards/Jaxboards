@@ -5,7 +5,6 @@ declare(strict_types=1);
 
 use DI\Container;
 use Jax\App;
-use Jax\DomainDefinitions;
 
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', __DIR__);
@@ -13,9 +12,6 @@ if (!defined('JAXBOARDS_ROOT')) {
 
 // Load composer dependencies.
 require_once JAXBOARDS_ROOT . '/jax/autoload.php';
-$container = new Container();
-
-$container->get(DomainDefinitions::class)->defineConstants();
 
 /*
  * Jaxboards. THE ULTIMATE 4UMS WOOOOOOO

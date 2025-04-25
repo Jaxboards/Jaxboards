@@ -1,6 +1,11 @@
 <?php
 
 declare(strict_types=1);
+
+namespace Jax;
+
+use \DI\Container;
+
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', dirname(__DIR__));
 }
@@ -19,3 +24,6 @@ spl_autoload_register(static function ($className): void {
 
     require_once $classPath;
 });
+
+$container = new Container();
+$container->get(DomainDefinitions::class)->defineConstants();

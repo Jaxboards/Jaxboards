@@ -23,19 +23,25 @@ if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', __DIR__);
 }
 
-final readonly class DomainDefinitions
+function pathjoin(string ...$paths): ?string
 {
-    public function __construct(private Config $config) {}
+    return preg_replace('@\/+@', '/', implode('/', $paths) . '/');
+}
+
+final class DomainDefinitions
+{
+    private bool $definedAlready = false;
+
+    public function __construct(private readonly Config $config) {}
 
     public function defineConstants(): void
     {
+        if ($this->definedAlready) {
+            return;
+        }
+        $this->definedAlready = true;
 
         $serviceConfig = $this->config->getServiceConfig();
-
-        function pathjoin(string ...$paths): ?string
-        {
-            return preg_replace('@\/+@', '/', implode('/', $paths) . '/');
-        }
 
         // Figure out url.
         $host = $_SERVER['SERVER_NAME'];
