@@ -260,7 +260,7 @@ final class User
 
             $decoded = [];
             foreach ($bitFlagOrder as $index => $name) {
-                $decoded[$name] = $permFlags & 1 << $index ? 1 : 0;
+                $decoded[$name] = ($permFlags & 1 << $index) !== 0 ? 1 : 0;
             }
 
             return $decoded;

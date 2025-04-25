@@ -5,10 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/autoload.php';
 
 use DI\Container;
-use Jax\IPAddress;
 use Jax\User;
-
-use function DI\Create;
 
 $container = new Container();
 

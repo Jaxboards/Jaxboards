@@ -17,11 +17,11 @@ use function trim;
 
 use const FILTER_VALIDATE_IP;
 
-final class IPAddress
+final readonly class IPAddress
 {
     public function __construct(
-        private readonly Config $config,
-        private readonly Database $database,
+        private Config $config,
+        private Database $database,
     ) {}
 
     public function asBinary($ip = null): false|string
