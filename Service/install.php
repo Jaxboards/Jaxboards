@@ -239,10 +239,10 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
 
         foreach (array_keys($default_boards) as $board) {
             $boardPrefix = $board . '_';
-            $DB->prefix($boardPrefix);
+            $DB->setPrefix($boardPrefix);
 
             if ($service) {
-                $DB->prefix('');
+                $DB->setPrefix('');
                 // Add board to directory.
                 $DB->safeinsert(
                     'directory',
@@ -254,7 +254,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                         'registrar_ip' => $container->get(IPAddress::class)->asBinary(),
                     ],
                 );
-                $DB->prefix($boardPrefix);
+                $DB->setPrefix($boardPrefix);
             }
 
             // Create the directory and blueprint tables

@@ -141,7 +141,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $board = $JAX->p['boardurl'];
         $boardPrefix = $board . '_';
 
-        $DB->prefix('');
+        $DB->setPrefix('');
         // Add board to directory.
         $DB->safeinsert(
             'directory',
@@ -153,7 +153,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                 'registrar_ip' => $container->get(IPAddress::class)->asBinary(),
             ],
         );
-        $DB->prefix($boardPrefix);
+        $DB->setPrefix($boardPrefix);
 
         // Create the directory and blueprint tables
         // Import sql file and run it with php from this:

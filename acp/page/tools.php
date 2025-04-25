@@ -230,14 +230,14 @@ final readonly class Tools
         if (isset($this->jax->p['dl']) && $this->jax->p['dl']) {
             header('Content-type: text/plain');
             header(
-                'Content-Disposition: attachment;filename="' . $this->database->prefix
+                'Content-Disposition: attachment;filename="' . $this->database->getPrefix()
                 . gmdate('Y-m-d_His') . '.sql"',
             );
-            $result = $this->database->safequery("SHOW TABLES LIKE '{$this->database->prefix}%%'");
+            $result = $this->database->safequery("SHOW TABLES LIKE '{$this->database->getPrefix()}%%'");
             $tables = $this->database->rows($result);
             $page = '';
             if ($tables) {
-                echo PHP_EOL . "-- Jaxboards Backup {$this->database->prefix} "
+                echo PHP_EOL . "-- Jaxboards Backup {$this->database->getPrefix()} "
                     . gmdate('Y-m-d H:i:s') . PHP_EOL . PHP_EOL;
                 echo 'SET NAMES utf8mb4;' . PHP_EOL;
                 echo "SET time_zone = '+00:00';" . PHP_EOL;

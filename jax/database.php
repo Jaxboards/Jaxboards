@@ -87,14 +87,18 @@ final class Database
         return !$this->mysqli_connection->connect_errno;
     }
 
-    public function prefix($a): void
+    public function setPrefix(string $prefix): void
     {
-        $this->prefix = $a;
+        $this->prefix = $prefix;
     }
 
-    public function ftable($a): string
+    public function getPrefix(): string {
+        return $this->prefix;
+    }
+
+    public function ftable(string $tableName): string
     {
-        return '`' . $this->prefix . $a . '`';
+        return '`' . $this->prefix . $tableName . '`';
     }
 
     public function error()
@@ -113,15 +117,6 @@ final class Database
         }
 
         return -1;
-    }
-
-    public function select_db($a)
-    {
-        if ($this->mysqli_connection->select_db($a)) {
-            $this->db = $a;
-        }
-
-        return $this->db;
     }
 
     public function safeselect($selectors_input, $table, $where = '', ...$vars)
@@ -239,14 +234,14 @@ final class Database
         ));
     }
 
-    public function buildUpdate($a): string
+    public function buildUpdate(array $keyValuePairs): string
     {
-        $r = '';
-        foreach ($a as $k => $v) {
-            $r .= $this->eKey($k) . '=' . $this->evalue($v) . ',';
+        $updateString = '';
+        foreach ($keyValuePairs as $key => $value) {
+            $updateString .= $this->eKey($key) . '=' . $this->evalue($value) . ',';
         }
 
-        return mb_substr($r, 0, -1);
+        return mb_substr($updateString, 0, -1);
     }
 
     public function safedelete($table, $whereformat, ...$vars): mixed
@@ -258,51 +253,51 @@ final class Database
         return $this->safequery($query, ...$vars);
     }
 
-    public function row($a = null): null|array|false
+    public function row($result = null): null|array|false
     {
-        $a = $a ?: $this->lastQuery;
+        $result = $result ?: $this->lastQuery;
 
-        return $a ? mysqli_fetch_array($a) : false;
+        return $result ? mysqli_fetch_array($result) : false;
     }
 
     // Only new-style mysqli.
-    public function arows($a = null): array|false
+    public function arows($result = null): array|false
     {
-        $a = $a ?: $this->lastQuery;
-        if ($a) {
-            return $this->fetchAll($a, MYSQLI_ASSOC);
+        $result = $result ?: $this->lastQuery;
+        if ($result) {
+            return $this->fetchAll($result, MYSQLI_ASSOC);
         }
 
         return false;
     }
 
     // Only new-style mysqli.
-    public function rows($a = null): array|false
+    public function rows($result = null): array|false
     {
-        $a = $a ?: $this->lastQuery;
-        if ($a) {
-            return $this->fetchAll($a, MYSQLI_BOTH);
+        $result = $result ?: $this->lastQuery;
+        if ($result) {
+            return $this->fetchAll($result, MYSQLI_BOTH);
             // Disturbingly, not MYSQLI_NUM.
         }
 
         return false;
     }
 
-    public function arow($a = null): null|array|false
+    public function arow($result = null): null|array|false
     {
-        $a = $a ?: $this->lastQuery;
-        if ($a) {
-            return @mysqli_fetch_assoc($a);
+        $result = $result ?: $this->lastQuery;
+        if ($result) {
+            return @mysqli_fetch_assoc($result);
         }
 
         return false;
     }
 
-    public function num_rows($a = null)
+    public function num_rows($result = null)
     {
-        $a = $a ?: $this->lastQuery;
-        if ($a) {
-            return $a->num_rows;
+        $result = $result ?: $this->lastQuery;
+        if ($result) {
+            return $result->num_rows;
         }
 
         return 0;
@@ -341,11 +336,11 @@ final class Database
     // Blah ?1 blah ?2 blah ?3 blah
     // Note that placeholder_number is indexed from 1.
     public function safequery_sub_array(
-        $query_string,
+        $queryString,
         $placeholder_number,
         $arrlen,
     ): string {
-        $arr = explode('?', (string) $query_string, $placeholder_number + 1);
+        $arr = explode('?', (string) $queryString, $placeholder_number + 1);
         $last = array_pop($arr);
         $replacement = '';
 
@@ -356,17 +351,17 @@ final class Database
         return implode('?', $arr) . $replacement . $last;
     }
 
-    public function safequery($query_string_input)
+    public function safequery($queryString_input)
     {
         // set new variable to not impact debug_backtrace value for inspecting
         // input
-        $query_string = $query_string_input;
+        $queryString = $queryString_input;
 
         $my_argc = func_num_args();
         $connection = $this->mysqli_connection;
 
         $typestring = '';
-        $out_args = [];
+        $outArgs = [];
 
         $added_placeholders = 0;
         if ($my_argc > 1) {
@@ -380,8 +375,8 @@ final class Database
                 if ($type === 'a') {
                     $type = $this->safequery_array_types($value);
 
-                    $query_string = $this->safequery_sub_array(
-                        $query_string,
+                    $queryString = $this->safequery_sub_array(
+                        $queryString,
                         $i + $added_placeholders,
                         mb_strlen($type),
                     );
@@ -393,51 +388,51 @@ final class Database
                             $singlevalue = '';
                         }
 
-                        $out_args[] = $singlevalue;
+                        $outArgs[] = $singlevalue;
                     }
                 } else {
-                    $out_args[] = $value;
+                    $outArgs[] = $value;
                 }
 
                 $typestring .= $type;
             }
         }
 
-        array_unshift($out_args, $typestring);
+        array_unshift($outArgs, $typestring);
 
-        $stmt = $connection->prepare($query_string);
+        $stmt = $connection->prepare($queryString);
         if ($this->debugMode) {
-            $this->queryList[] = $query_string;
+            $this->queryList[] = $queryString;
         }
 
         if (!$stmt) {
             $error = $this->mysqli_connection->error;
             if ($error) {
                 error_log(
-                    "ERROR WITH QUERY: {$query_string}" . PHP_EOL . "{$error}",
+                    "ERROR WITH QUERY: {$queryString}" . PHP_EOL . "{$error}",
                 );
             }
 
             syslog(
                 LOG_ERR,
-                "SAFEQUERY PREPARE FAILED FOR {$query_string}, "
-                . print_r($out_args, true) . PHP_EOL,
+                "SAFEQUERY PREPARE FAILED FOR {$queryString}, "
+                . print_r($outArgs, true) . PHP_EOL,
             );
 
             return null;
         }
 
-        $refvalues = $this->refValues($out_args);
+        $refvalues = $this->refValues($outArgs);
 
         if ($my_argc > 1) {
             $refclass = new ReflectionClass('mysqli_stmt');
             $method = $refclass->getMethod('bind_param');
             if (!$method->invokeArgs($stmt, $refvalues)) {
                 syslog(LOG_ERR, 'BIND PARAMETERS FAILED' . PHP_EOL);
-                syslog(LOG_ERR, "QUERYSTRING: {$query_string}" . PHP_EOL);
+                syslog(LOG_ERR, "QUERYSTRING: {$queryString}" . PHP_EOL);
                 syslog(LOG_ERR, 'ELEMENTCOUNT: ' . mb_strlen($typestring));
                 syslog(LOG_ERR, 'BINDVARCOUNT: ' . count($refvalues[1]));
-                syslog(LOG_ERR, 'QUERYARGS: ' . print_r($out_args, true) . PHP_EOL);
+                syslog(LOG_ERR, 'QUERYARGS: ' . print_r($outArgs, true) . PHP_EOL);
                 syslog(LOG_ERR, 'REFVALUES: ' . print_r($refvalues, true) . PHP_EOL);
                 // phpcs:disable PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
                 syslog(LOG_ERR, print_r(debug_backtrace(), true));
@@ -449,7 +444,7 @@ final class Database
             $error = $this->mysqli_connection->error;
             if ($error) {
                 error_log(
-                    "ERROR WITH QUERY: {$query_string}" . PHP_EOL . "{$error}",
+                    "ERROR WITH QUERY: {$queryString}" . PHP_EOL . "{$error}",
                 );
             }
 
@@ -457,23 +452,23 @@ final class Database
         }
 
         if (!$stmt) {
-            syslog(LOG_ERR, "Statement is NULL for {$query_string}" . PHP_EOL);
+            syslog(LOG_ERR, "Statement is NULL for {$queryString}" . PHP_EOL);
         }
 
         $retval = $stmt->get_result();
 
         if (
             !$retval
-            && !preg_match('/^\s*(UPDATE|DELETE|INSERT)\s/i', (string) $query_string)
+            && !preg_match('/^\s*(UPDATE|DELETE|INSERT)\s/i', (string) $queryString)
         ) {
             // This is normal for a non-SELECT query.
-            syslog(LOG_ERR, "Result is NULL for {$query_string}" . PHP_EOL);
+            syslog(LOG_ERR, "Result is NULL for {$queryString}" . PHP_EOL);
         }
 
         $error = $this->mysqli_connection->error;
         if ($error) {
             error_log(
-                "ERROR WITH QUERY: {$query_string}" . PHP_EOL . "{$error}",
+                "ERROR WITH QUERY: {$queryString}" . PHP_EOL . "{$error}",
             );
         }
 
