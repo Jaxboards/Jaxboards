@@ -72,6 +72,7 @@ use const PHP_EOL;
  *    Interestingly, I tried to create some sort of module system that would only conditionally load modules if the template has it.
  *    For example - none of the `tag_shoutbox` will be included or used if <!--SHOUTBOX--> is not in the root template.
  *    The filenames of these "modules" must be prefixed with "tag_" for this to work. Otherwise the modules will always be loaded.
+ *
  * @psalm-api
  */
 final class Page
