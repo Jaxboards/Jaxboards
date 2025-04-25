@@ -296,7 +296,7 @@ Save your refresh button.
    </div>
 </div>
    <div id='copyright'>
-        JaxBoards &copy; 2007-<?php gmdate('Y'); ?>, All Rights Reserved
+        JaxBoards &copy; 2007-<?php echo gmdate('Y'); ?>, All Rights Reserved
     </div>
 </body>
 </html>
