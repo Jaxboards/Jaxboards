@@ -30,7 +30,6 @@ function pathjoin(string ...$paths): ?string
 
 final class DomainDefinitions
 {
-
     private string $boardURL = '';
 
     private string $soundsURL = '';
