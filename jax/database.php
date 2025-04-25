@@ -11,8 +11,6 @@ use function addslashes;
 use function array_keys;
 use function array_map;
 use function array_pop;
-use function array_shift;
-use function array_unshift;
 use function array_values;
 use function error_log;
 use function explode;
