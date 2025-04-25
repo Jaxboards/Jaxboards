@@ -87,7 +87,7 @@ final class Search
         $page = $this->page->meta(
             'search-form',
             $this->textFormatting->blockhtml(
-                $this->session->vars['searcht'] ?? '',
+                $this->session->getVar('searcht') ?? '',
             ),
             $this->getForumSelection(),
             $pageContents,
@@ -206,14 +206,14 @@ final class Search
         $termraw = $this->jax->b['searchterm'] ?? '';
 
         if (!$termraw && $this->pagenum) {
-            $termraw = $this->session->vars['searcht'];
+            $termraw = $this->session->getVar('searcht');
         }
 
         if (
             empty($this->jax->p)
             && !array_key_exists('searchterm', $this->jax->b)
         ) {
-            $ids = $this->session->vars['search'];
+            $ids = $this->session->getVar('search');
         } else {
             $this->getSearchableForums();
             if (isset($this->jax->b['fids']) && $this->jax->b['fids']) {
@@ -335,8 +335,8 @@ final class Search
             }
 
             $ids = mb_substr($ids, 0, -1);
-            $this->session->addvar('search', $ids);
-            $this->session->addvar('searcht', $termraw);
+            $this->session->addVar('search', $ids);
+            $this->session->addVar('searcht', $termraw);
             $this->pagenum = 1;
         }
 

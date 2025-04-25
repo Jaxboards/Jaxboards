@@ -212,7 +212,7 @@ final class LogReg
     public function login($u = false, $p = false): void
     {
         if ($u && $p) {
-            if ($this->session->is_bot) {
+            if ($this->session->get('is_bot')) {
                 return;
             }
 
@@ -249,8 +249,8 @@ final class LogReg
                     time() + 3600 * 24 * 30,
                 );
                 $this->session->clean($user['id']);
-                $this->session->user = $u;
-                $this->session->uid = $user['id'];
+                $this->session->set('user', $u);
+                $this->session->set('uid', $user['id']);
                 $this->session->act();
                 $perms = $this->user->getPerms($user['group_id']);
                 if ($this->registering) {
@@ -293,7 +293,7 @@ final class LogReg
             );
         }
 
-        $this->session->hide = 1;
+        $this->session->set('hide', 1);
         $this->session->applyChanges();
         $this->session->getSess(false);
         session_unset();
@@ -347,11 +347,11 @@ final class LogReg
 
     public function toggleinvisible(): void
     {
-        $this->session->hide = $this->session->hide ? 0 : 1;
+        $this->session->set('hide', $this->session->get('hide') ? 0 : 1);
 
         $this->session->applyChanges();
 
-        $this->page->JS('setstatus', $this->session->hide !== 0 ? 'invisible' : 'online');
+        $this->page->JS('setstatus', $this->session->get('hide') !== 0 ? 'invisible' : 'online');
         $this->page->JS('softurl');
     }
 

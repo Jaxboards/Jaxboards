@@ -53,9 +53,9 @@ final class IDX
     {
         if (isset($this->jax->b['markread']) && $this->jax->b['markread']) {
             $this->page->JS('softurl');
-            $this->session->forumsread = '{}';
-            $this->session->topicsread = '{}';
-            $this->session->read_date = time();
+            $this->session->set('forumsread', '{}');
+            $this->session->set('topicsread', '{}');
+            $this->session->set('read_date', time());
         }
 
         if ($this->page->jsupdate) {
@@ -67,7 +67,7 @@ final class IDX
 
     public function viewidx(): void
     {
-        $this->session->location_verbose = 'Viewing board index';
+        $this->session->set('location_verbose', 'Viewing board index');
         $page = '';
         $result = $this->database->safespecial(
             <<<'EOT'
@@ -456,19 +456,19 @@ final class IDX
     public function updateStats(): void
     {
         $list = [];
-        if ($this->session->users_online_cache) {
-            $oldcache = array_flip(explode(',', (string) $this->session->users_online_cache));
+        if ($this->session->get('users_online_cache')) {
+            $oldcache = array_flip(explode(',', (string) $this->session->get('users_online_cache')));
         }
 
         $useronlinecache = '';
         foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $f) {
-            $lastActionIdle = (int) ($this->session->last_update ?? 0) - ($this->config->getSetting('timetoidle') ?? 300) - 30;
+            $lastActionIdle = (int) ($this->session->get('last_update') ?? 0) - ($this->config->getSetting('timetoidle') ?? 300) - 30;
             if (!$f['uid'] && !$f['is_bot']) {
                 continue;
             }
 
             if (
-                $f['last_action'] >= (int) $this->session->last_update
+                $f['last_action'] >= (int) $this->session->get('last_update')
                 || $f['status'] === 'idle'
                 && $f['last_action'] > $lastActionIdle
             ) {
@@ -496,7 +496,7 @@ final class IDX
             $this->page->JS('setoffline', implode(',', array_flip($oldcache)));
         }
 
-        $this->session->users_online_cache = mb_substr($useronlinecache, 0, -1);
+        $this->session->set('users_online_cache', mb_substr($useronlinecache, 0, -1));
         if ($list === []) {
             return;
         }
@@ -519,7 +519,7 @@ final class IDX
                 EOT
             ,
             ['forums', 'members'],
-            gmdate('Y-m-d H:i:s', (int) ($this->session->last_update ?? time())),
+            gmdate('Y-m-d H:i:s', (int) ($this->session->get('last_update') ?? time())),
         );
 
         while ($f = $this->database->arow($result)) {
@@ -573,7 +573,7 @@ final class IDX
     public function isForumRead($forum): bool
     {
         if (!$this->forumsread) {
-            $this->forumsread = $this->jax->parsereadmarkers($this->session->forumsread);
+            $this->forumsread = $this->jax->parsereadmarkers($this->session->get('forumsread'));
         }
 
         if (!isset($this->forumsread[$forum['id']])) {
@@ -582,7 +582,7 @@ final class IDX
 
         return $forum['lp_date'] < max(
             $this->forumsread[$forum['id']],
-            $this->session->read_date,
+            $this->session->get('read_date'),
             $this->user->get('last_visit'),
         );
     }

@@ -155,7 +155,7 @@ final readonly class BuddyList
             [
                 'content' => $this->page->meta(
                     'buddylist-contacts',
-                    $this->session->hide ? 'invisible' : '',
+                    $this->session->get('hide') ? 'invisible' : '',
                     $this->user->get('usertitle'),
                     $contacts,
                 ),

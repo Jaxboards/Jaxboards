@@ -640,7 +640,7 @@ final class UserProfile
             $this->page->JS('update', 'page', $page);
             $this->page->append('page', $page);
 
-            $this->session->location_verbose = 'Viewing ' . $udata['display_name'] . "'s profile";
+            $this->session->set('location_verbose', 'Viewing ' . $udata['display_name'] . "'s profile");
         }
 
         return null;

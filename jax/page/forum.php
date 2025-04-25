@@ -474,11 +474,11 @@ final class Forum
     public function isTopicRead($topic, $fid): bool
     {
         if (empty($this->topicsRead)) {
-            $this->topicsRead = $this->jax->parsereadmarkers($this->session->topicsread);
+            $this->topicsRead = $this->jax->parsereadmarkers($this->session->get('topicsread'));
         }
 
         if (empty($this->forumsRead)) {
-            $fr = $this->jax->parsereadmarkers($this->session->forumsread);
+            $fr = $this->jax->parsereadmarkers($this->session->get('forumsread'));
             if (isset($fr[$fid])) {
                 $this->forumReadTime = $fr[$fid];
             }
@@ -490,7 +490,7 @@ final class Forum
 
         return $topic['lp_date'] <= $this->jax->pick(
             max($this->topicsRead[$topic['id']], $this->forumReadTime),
-            $this->session->read_date,
+            $this->session->get('read_date'),
             $this->user->get('last_visit'),
         );
     }
@@ -498,20 +498,20 @@ final class Forum
     public function isForumRead($forum): bool
     {
         if (!$this->forumsRead) {
-            $this->forumsRead = $this->jax->parsereadmarkers($this->session->forumsread);
+            $this->forumsRead = $this->jax->parsereadmarkers($this->session->get('forumsread'));
         }
 
         return $forum['lp_date'] <= $this->jax->pick(
             $this->forumsRead[$forum['id']] ?? null,
-            $this->session->read_date,
+            $this->session->get('read_date'),
             $this->user->get('last_visit'),
         );
     }
 
     public function markread($id): void
     {
-        $forumsread = $this->jax->parsereadmarkers($this->session->forumsread);
+        $forumsread = $this->jax->parsereadmarkers($this->session->get('forumsread'));
         $forumsread[$id] = time();
-        $this->session->forumsread = json_encode($forumsread);
+        $this->session->set('forumsread', json_encode($forumsread));
     }
 }

@@ -191,7 +191,7 @@ final class ModControls
                     ['fid'],
                     'topics',
                     'WHERE `id` IN ?',
-                    explode(',', (string) $this->session->vars['modtids']),
+                    explode(',', (string) $this->session->getVar('modtids')),
                 );
                 while ($f = $this->database->arow($result)) {
                     $fids[$f['fid']] = 1;
@@ -204,7 +204,7 @@ final class ModControls
                         'fid' => $this->jax->p['id'],
                     ],
                     'WHERE `id` IN ?',
-                    explode(',', (string) $this->session->vars['modtids']),
+                    explode(',', (string) $this->session->getVar('modtids')),
                 );
                 $this->cancel();
                 $fids[] = $this->jax->p['id'];
@@ -223,7 +223,7 @@ final class ModControls
                         'pinned' => 1,
                     ],
                     'WHERE `id` IN ?',
-                    explode(',', (string) $this->session->vars['modtids']),
+                    explode(',', (string) $this->session->getVar('modtids')),
                 );
                 $this->page->JS(
                     'alert',
@@ -240,7 +240,7 @@ final class ModControls
                         'pinned' => 0,
                     ],
                     'WHERE `id` IN ?',
-                    explode(',', (string) $this->session->vars['modtids']),
+                    explode(',', (string) $this->session->getVar('modtids')),
                 );
                 $this->page->JS(
                     'alert',
@@ -257,7 +257,7 @@ final class ModControls
                         'locked' => 1,
                     ],
                     'WHERE `id` IN ?',
-                    explode(',', (string) $this->session->vars['modtids']),
+                    explode(',', (string) $this->session->getVar('modtids')),
                 );
                 $this->page->JS(
                     'alert',
@@ -274,7 +274,7 @@ final class ModControls
                         'locked' => 0,
                     ],
                     'WHERE `id` IN ?',
-                    explode(',', (string) $this->session->vars['modtids']),
+                    explode(',', (string) $this->session->getVar('modtids')),
                 );
                 $this->page->JS('alert', 'topics unlocked!');
                 $this->cancel();
@@ -311,7 +311,7 @@ final class ModControls
                         'tid' => $this->jax->p['id'],
                     ],
                     'WHERE `id` IN ?',
-                    explode(',', (string) $this->session->vars['modpids']),
+                    explode(',', (string) $this->session->getVar('modpids')),
                 );
                 $this->cancel();
                 $this->page->location('?act=vt' . $this->jax->p['id']);
@@ -330,8 +330,8 @@ final class ModControls
 
     public function cancel(): void
     {
-        $this->session->delvar('modpids');
-        $this->session->delvar('modtids');
+        $this->session->deleteVar('modpids');
+        $this->session->deleteVar('modtids');
         $this->sync();
         $this->page->JS('modcontrols_clearbox');
     }
@@ -399,8 +399,7 @@ final class ModControls
             }
         }
 
-        $currentPids = isset($this->session->vars['modpids'])
-            ? explode(',', $this->session->vars['modpids']) : [];
+        $currentPids = explode(',', $this->session->getVar('modpids') ?? '');
         $pids = [];
         foreach ($currentPids as $currentPid) {
             if (!is_numeric($currentPid)) {
@@ -416,7 +415,7 @@ final class ModControls
             $pids[] = $pid;
         }
 
-        $this->session->addvar('modpids', implode(',', $pids));
+        $this->session->addVar('modpids', implode(',', $pids));
 
         $this->sync();
 
@@ -462,8 +461,7 @@ final class ModControls
             }
         }
 
-        $currentTids = isset($this->session->vars['modtids'])
-            ? explode(',', $this->session->vars['modtids']) : [];
+        $currentTids = explode(',', $this->session->getVar('modtids') ?? '');
         $tids = [];
         foreach ($currentTids as $currentTid) {
             if (!is_numeric($currentTid)) {
@@ -479,7 +477,7 @@ final class ModControls
             $tids[] = $tid;
         }
 
-        $this->session->addvar('modtids', implode(',', $tids));
+        $this->session->addVar('modtids', implode(',', $tids));
 
         $this->sync();
 
@@ -490,16 +488,15 @@ final class ModControls
     {
         $this->page->JS(
             'modcontrols_postsync',
-            $this->session->vars['modpids'] ?? '',
-            $this->session->vars['modtids'] ?? '',
+            $this->session->getVar('modpids') ?? '',
+            $this->session->getVar('modtids') ?? '',
         );
     }
 
     public function deleteposts()
     {
         if (
-            !isset($this->session->vars['modpids'])
-            || !$this->session->vars['modpids']
+            !$this->session->getVar('modpids')
         ) {
             return $this->page->JS('error', 'No posts to delete.');
         }
@@ -519,12 +516,12 @@ final class ModControls
             '`tid`',
             'posts',
             'WHERE `id` IN ?',
-            explode(',', (string) $this->session->vars['modpids']),
+            explode(',', (string) $this->session->getVar('modpids')),
         );
 
         // Build list of topic ids that the posts were in.
         $tids = [];
-        $pids = explode(',', (string) $this->session->vars['modpids']);
+        $pids = explode(',', (string) $this->session->getVar('modpids'));
         while ($f = $this->database->arow($result)) {
             $tids[] = (int) $f['tid'];
         }
@@ -576,7 +573,7 @@ final class ModControls
                     'tid' => $tid,
                 ],
                 'WHERE `id` IN ?',
-                explode(',', (string) $this->session->vars['modpids']),
+                explode(',', (string) $this->session->getVar('modpids')),
             );
             $this->database->safeupdate(
                 'posts',
@@ -591,7 +588,7 @@ final class ModControls
             $this->database->safedelete(
                 'posts',
                 'WHERE `id` IN ?',
-                explode(',', (string) $this->session->vars['modpids']),
+                explode(',', (string) $this->session->getVar('modpids')),
             );
         }
 
@@ -655,7 +652,7 @@ final class ModControls
 
     public function deletetopics()
     {
-        if (!$this->session->vars['modtids']) {
+        if (!$this->session->getVar('modtids')) {
             return $this->page->JS('error', 'No topics to delete');
         }
 
@@ -675,7 +672,7 @@ final class ModControls
             ['id', 'fid'],
             'topics',
             'WHERE `id` IN ?',
-            explode(',', (string) $this->session->vars['modtids']),
+            explode(',', (string) $this->session->getVar('modtids')),
         );
         $delete = [];
         while ($f = $this->database->arow($result)) {
@@ -702,12 +699,12 @@ final class ModControls
                     'fid' => $trashcan,
                 ],
                 'WHERE `id` IN ?',
-                explode(',', (string) $this->session->vars['modtids']),
+                explode(',', (string) $this->session->getVar('modtids')),
             );
             $delete = implode(',', $delete);
             $data[$trashcan] = 1;
         } else {
-            $delete = $this->session->vars['modtids'];
+            $delete = $this->session->getVar('modtids');
         }
 
         if (!empty($delete)) {
@@ -727,7 +724,7 @@ final class ModControls
             $this->database->fixForumLastPost($k);
         }
 
-        $this->session->delvar('modtids');
+        $this->session->deleteVar('modtids');
         $this->page->JS('modcontrols_clearbox');
         $this->page->JS('alert', 'topics deleted!');
 
@@ -737,8 +734,7 @@ final class ModControls
     public function mergetopics(): void
     {
         $page = '';
-        $exploded = isset($this->session->vars['modtids'])
-            ? explode(',', $this->session->vars['modtids']) : [];
+        $exploded = explode(',', $this->session->getVar('modtids') ?? '');
         if (
             isset($this->jax->p['ot'])
             && is_numeric($this->jax->p['ot'])
@@ -752,7 +748,7 @@ final class ModControls
                     'tid' => $this->jax->p['ot'],
                 ],
                 'WHERE `tid` IN ?',
-                explode(',', (string) $this->session->vars['modtids']),
+                explode(',', (string) $this->session->getVar('modtids')),
             );
 
             // Make the first post in the topic have newtopic=1.
@@ -808,12 +804,12 @@ final class ModControls
             ],
         );
 
-        if (isset($this->session->vars['modtids'])) {
+        if ($this->session->getVar('modtids')) {
             $result = $this->database->safeselect(
                 ['id', 'title'],
                 'topics',
                 'WHERE `id` IN ?',
-                explode(',', $this->session->vars['modtids']),
+                explode(',', $this->session->getVar('modtids')),
             );
             $titles = [];
             while ($f = $this->database->arow($result)) {

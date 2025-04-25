@@ -398,8 +398,7 @@ onclick="this.form.submitButton=this" /></div>
         }
 
         if (
-            isset($this->session->vars['multiquote'])
-            && $this->session->vars['multiquote']
+            $this->session->getVar('multiquote')
         ) {
             $postdata = '';
 
@@ -415,14 +414,14 @@ onclick="this.form.submitButton=this" /></div>
                     EOT
                 ,
                 ['posts', 'members'],
-                $this->session->vars['multiquote'],
+                $this->session->getVar('multiquote'),
             );
 
             while ($postRow = $this->database->arow($result)) {
                 $postdata .= '[quote=' . $postRow['name'] . ']' . $postRow['post'] . '[/quote]' . PHP_EOL;
             }
 
-            $this->session->delvar('multiquote');
+            $this->session->deleteVar('multiquote');
         }
 
         $form = '<div class="postform">

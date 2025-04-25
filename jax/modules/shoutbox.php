@@ -179,7 +179,7 @@ final class Shoutbox
             $shouts .= $this->formatshout($f);
         }
 
-        $this->session->addvar('sb_id', $first);
+        $this->session->addVar('sb_id', $first);
         $this->page->append(
             'shoutbox',
             $this->page->meta(
@@ -205,8 +205,7 @@ final class Shoutbox
         // in reverse order, since they're shifted onto the list, not pushed.
         $last = 0;
         if (
-            isset($this->session->vars['sb_id'])
-            && $this->session->vars['sb_id']
+            $this->session->getVar('sb_id')
         ) {
             $result = $this->database->safespecial(
                 <<<'EOT'
@@ -226,7 +225,7 @@ final class Shoutbox
                     EOT
                 ,
                 ['shouts', 'members'],
-                $this->jax->pick($this->session->vars['sb_id'], 0),
+                $this->jax->pick($this->session->getVar('sb_id'), 0),
                 $this->shoutlimit,
             );
             while ($f = $this->database->arow($result)) {
@@ -254,7 +253,7 @@ final class Shoutbox
             return;
         }
 
-        $this->session->addvar('sb_id', $last);
+        $this->session->addVar('sb_id', $last);
     }
 
     public function showallshouts(): void

@@ -40,7 +40,7 @@ final readonly class PrivateMessage
     {
         $im = $this->jax->p['im_im'] ?? null;
         $uid = $this->jax->p['im_uid'] ?? null;
-        if ($this->session->runonce) {
+        if ($this->session->get('runonce')) {
             $this->filter();
         }
 
@@ -61,7 +61,7 @@ final readonly class PrivateMessage
         $enemies = explode(',', (string) $enemies);
         // Kinda gross I know, unparses then parses then
         // unparses again later on.. Oh well.
-        $exploded = explode(PHP_EOL, (string) $this->session->runonce);
+        $exploded = explode(PHP_EOL, (string) $this->session->get('runonce'));
         foreach ($exploded as $k => $v) {
             $v = json_decode($v);
             if ($v[0] !== 'im') {
@@ -77,7 +77,7 @@ final readonly class PrivateMessage
             }
         }
 
-        $this->session->runonce = implode(PHP_EOL, $exploded);
+        $this->session->set('runonce', implode(PHP_EOL, $exploded));
     }
 
     public function message($uid, $im)

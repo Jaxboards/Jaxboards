@@ -78,9 +78,9 @@ final class App
         $this->loadPageFromAction();
 
         // Process temporary commands.
-        if ($this->page->jsaccess && $this->session->runonce) {
-            $this->page->JSRaw($this->session->runonce);
-            $this->session->runonce = '';
+        if ($this->page->jsaccess && $this->session->get('runonce')) {
+            $this->page->JSRaw($this->session->get('runonce'));
+            $this->session->set('runonce', '');;
         }
 
         // Any changes to the session variables of the
@@ -138,8 +138,8 @@ final class App
         // Fix ip if necessary.
         if (
             !$this->user->isGuest()
-            && $this->session->ip
-            && $this->session->ip !== $this->user->get('ip')
+            && $this->session->get('ip')
+            && $this->session->get('ip') !== $this->user->get('ip')
         ) {
             $this->user->set('ip', $this->ipAddress->asBinary());
         }
@@ -149,11 +149,11 @@ final class App
         // but the session variable has changed/been removed/not updated for some reason
         // this fixes it.
         if (
-            !$this->session->is_bot
-            && $this->user->get('id') !== $this->session->uid
+            !$this->session->get('is_bot')
+            && $this->user->get('id') !== $this->session->get('uid')
         ) {
             $this->session->clean($this->user->get('id'));
-            $this->session->uid = $this->user->get('id');
+            $this->session->set('uid', $this->user->get('id'));
             $this->session->applychanges();
         }
 
@@ -252,8 +252,8 @@ final class App
     {
         $this->page->loadskin(
             $this->jax->pick(
-                $this->session->vars['skin_id'] ?? false,
-                $this->user->get('skin_id') ?? false,
+                $this->session->getVar('skin_id'),
+                $this->user->get('skin_id'),
             ),
         );
         $this->page->loadmeta('global');
@@ -262,10 +262,10 @@ final class App
         // Skin selector.
         if (isset($this->jax->b['skin_id'])) {
             if (!$this->jax->b['skin_id']) {
-                $this->session->delvar('skin_id');
+                $this->session->deleteVar('skin_id');
                 $this->page->JS('reload');
             } else {
-                $this->session->addvar('skin_id', $this->jax->b['skin_id']);
+                $this->session->addVar('skin_id', $this->jax->b['skin_id']);
                 if ($this->page->jsaccess) {
                     $this->page->JS('reload');
                 }
@@ -273,8 +273,7 @@ final class App
         }
 
         if (
-            !isset($this->session->vars['skin_id'])
-            || !$this->session->vars['skin_id']
+            !$this->session->getVar('skin_id')
         ) {
             return;
         }

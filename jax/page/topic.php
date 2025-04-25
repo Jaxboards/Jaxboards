@@ -236,7 +236,7 @@ final class Topic
         }
 
         $this->page->append('TITLE', ' -> ' . $this->topicdata['topic_title']);
-        $this->session->location_verbose = "In topic '" . $this->topicdata['topic_title'] . "'";
+        $this->session->set('location_verbose', "In topic '" . $this->topicdata['topic_title'] . "'");
 
         // Fix this to work with subforums.
         $this->page->path(
@@ -270,7 +270,7 @@ final class Topic
         }
 
         // Are they on the last page? This stores a session variable.
-        $this->session->addvar('topic_lastpage', $this->pageNumber + 1 === $totalpages);
+        $this->session->addVar('topic_lastpage', $this->pageNumber + 1 === $totalpages);
 
         // If it's a poll, put it in.
         $poll = $this->topicdata['poll_type'] ? $this->page->meta(
@@ -421,15 +421,14 @@ final class Topic
 
         // Check for new posts and append them.
         if ($this->session->location !== "vt{$tid}") {
-            $this->session->delvar('topic_lastpid');
+            $this->session->deleteVar('topic_lastpid');
         }
 
         if (
-            isset($this->session->vars['topic_lastpid'], $this->session->vars['topic_lastpage'])
-            && is_numeric($this->session->vars['topic_lastpid'])
-            && $this->session->vars['topic_lastpage']
+            $this->session->getVar('topic_lastpid')
+            && $this->session->getVar('topic_lastpage')
         ) {
-            $newposts = $this->postsintooutput($this->session->vars['topic_lastpid']);
+            $newposts = $this->postsintooutput($this->session->getVar('topic_lastpid'));
             if ($newposts !== '' && $newposts !== '0') {
                 $this->page->JS('appendrows', '#intopic', $newposts);
             }
@@ -437,7 +436,7 @@ final class Topic
 
         // Update users online list.
         $list = [];
-        $oldcache = array_flip(explode(',', (string) $this->session->users_online_cache));
+        $oldcache = array_flip(explode(',', (string) $this->session->get('users_online_cache')));
         $newcache = [];
         foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $user) {
             if (!$user['uid']) {
@@ -474,7 +473,7 @@ final class Topic
             $this->page->JS('setoffline', $oldcache);
         }
 
-        $this->session->users_online_cache = $newcache;
+        $this->session->set('users_online_cache', $newcache);
     }
 
     public function qreplyform($tid): void
@@ -482,8 +481,7 @@ final class Topic
         $prefilled = '';
         $this->page->JS('softurl');
         if (
-            isset($this->session->vars['multiquote'])
-            && $this->session->vars['multiquote']
+            $this->session->getVar('multiquote')
         ) {
             $result = $this->database->safespecial(
                 <<<'MySQL'
@@ -496,14 +494,14 @@ final class Topic
                         WHERE p.`id` IN ?
                     MySQL,
                 ['posts', 'members'],
-                explode(',', (string) $this->session->vars['multiquote']),
+                explode(',', $this->session->getVar('multiquote') ?? ''),
             );
 
             while ($post = $this->database->arow($result)) {
                 $prefilled .= '[quote=' . $post['name'] . ']' . $post['post'] . '[/quote]' . PHP_EOL;
             }
 
-            $this->session->delvar('multiquote');
+            $this->session->deleteVar('multiquote');
         }
 
         $result = $this->database->safeselect(
@@ -824,7 +822,7 @@ final class Topic
             $lastpid = $post['pid'];
         }
 
-        $this->session->addvar('topic_lastpid', $lastpid);
+        $this->session->addVar('topic_lastpid', $lastpid);
 
         return $rows;
     }
@@ -1256,11 +1254,11 @@ final class Topic
                 . PHP_EOL . PHP_EOL,
             );
         } else {
-            $multiquote = (string) ($this->session->vars['multiquote'] ?? '');
+            $multiquote = (string) ($this->session->getVar('multiquote') ?? '');
             $multiquotes = $multiquote !== '' ? explode(',', $multiquote) : [];
             if (!in_array((string) $pid, $multiquotes, true)) {
                 $multiquotes[] = $pid;
-                $this->session->addvar(
+                $this->session->addVar(
                     'multiquote',
                     implode(',', $multiquotes),
                 );
@@ -1346,9 +1344,9 @@ final class Topic
 
     public function markread($tid): void
     {
-        $topicsread = $this->jax->parsereadmarkers($this->session->topicsread);
+        $topicsread = $this->jax->parsereadmarkers($this->session->get('topicsread'));
         $topicsread[$tid] = time();
-        $this->session->topicsread = json_encode($topicsread);
+        $this->session->set('topicsread', json_encode($topicsread));
     }
 
     public function listrating($pid): void

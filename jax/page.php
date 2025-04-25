@@ -175,7 +175,7 @@ final class Page
     public function location(string $newLocation): void
     {
         if ($this->jax->c === [] && $newLocation[0] === '?') {
-            $newLocation = '?sessid=' . $this->session->data['id'] . '&' . mb_substr($newLocation, 1);
+            $newLocation = '?sessid=' . $this->session->get('id') . '&' . mb_substr($newLocation, 1);
         }
 
         if ($this->jsaccess) {

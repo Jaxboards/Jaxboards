@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace Jax;
 
-#[AllowDynamicProperties]
 final class Session
 {
     /**
      * @var mixed[]
      */
-    public $data = [];
+    private $data = [];
 
-    public $userData = [];
+    private $userData = [];
 
-    public $bots = [
+    private $bots = [
         'AhrefsBot' => 'Ahrefs', // SEO crawler
         'Amazonbot' => 'Amazon',
         'Applebot' => 'Applebot',
@@ -63,7 +62,7 @@ final class Session
         'YandexBot' => 'Yandex', // Russian search engine
     ];
 
-    public $changedData = [];
+    private $changedData = [];
 
     public function __construct(
         private readonly Config $config,
@@ -92,7 +91,7 @@ final class Session
     {
         $this->fetchSessionData();
 
-        if ($this->is_bot) {
+        if ($this->get('is_bot')) {
             return null;
         }
 
@@ -110,21 +109,6 @@ final class Session
         }
 
         return $_SESSION['uid'];
-    }
-
-    public function __get($a)
-    {
-        return $this->data[$a] ?? null;
-    }
-
-    public function __set($property, $value): void
-    {
-        if (isset($this->data[$property]) && $this->data[$property] === $value) {
-            return;
-        }
-
-        $this->changedData[$property] = $value;
-        $this->data[$property] = $value;
     }
 
     public function getSess($sid = null): array
@@ -238,11 +222,19 @@ final class Session
         return $sessData;
     }
 
-    public function set($a): void
+    public function get(string $field) {
+        return $this->data[$field] ?? null;
+    }
+
+    public function set(string $field, mixed $value): void
     {
-        foreach ($a as $k => $v) {
-            $this->__set($k, $v);
+        if (isset($this->data[$field]) && $this->data[$field] === $value) {
+            return;
         }
+
+        $this->changedData[$field] = $value;
+        $this->data[$field] = $value;
+
     }
 
     public function addvar($a, $b): void
@@ -258,7 +250,7 @@ final class Session
         $this->changedData['vars'] = serialize($this->data['vars']);
     }
 
-    public function delvar($a): void
+    public function deleteVar($a): void
     {
         if (!isset($this->data['vars'][$a])) {
             return;
@@ -268,14 +260,18 @@ final class Session
         $this->changedData['vars'] = serialize($this->data['vars']);
     }
 
-    public function act($a = false): void
+    public function getVar(string $varName) {
+        return $this->data['vars'][$varName] ?? null;
+    }
+
+    public function act(string $location = null): void
     {
-        $this->__set('last_action', time());
-        if (!$a) {
+        $this->set('last_action', time());
+        if (!$location) {
             return;
         }
 
-        $this->__set('location', $a);
+        $this->set('location', $location);
     }
 
     public function erase($a): void

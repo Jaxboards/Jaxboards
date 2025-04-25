@@ -35,7 +35,7 @@ final class Ticker
 
     public function index(): void
     {
-        $this->session->location_verbose = 'Using the ticker!';
+        $this->session->set('location_verbose', 'Using the ticker!');
         $result = $this->database->safespecial(
             <<<'EOT'
                 SELECT
@@ -84,7 +84,7 @@ final class Ticker
             $ticks .= $this->ftick($tick);
         }
 
-        $this->session->addvar('tickid', $first);
+        $this->session->addVar('tickid', $first);
         $page = $this->page->meta('ticker', $ticks);
         $this->page->append('PAGE', $page);
         $this->page->JS('update', 'page', $page);
@@ -124,7 +124,7 @@ final class Ticker
                 EOT
             ,
             ['posts', 'topics', 'forums', 'members', 'members'],
-            $this->jax->pick($this->session->vars['tickid'], 0),
+            $this->session->getVar('tickid') ?? 0,
             $this->maxticks,
         );
         $first = false;
@@ -145,7 +145,7 @@ final class Ticker
             return;
         }
 
-        $this->session->addvar('tickid', $first);
+        $this->session->addVar('tickid', $first);
     }
 
     public function ftick($t): ?string

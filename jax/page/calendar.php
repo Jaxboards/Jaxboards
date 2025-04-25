@@ -62,8 +62,7 @@ final class Calendar
             gmdate('w t F Y n', mktime(0, 0, 0, $monthoffset, 1)),
         );
 
-        $this->session->location_verbose
-            = 'Checking out the calendar for ' . $monthname . ' ' . $year;
+        $this->session->set('location_verbose', 'Checking out the calendar for ' . $monthname . ' ' . $year);
         $result = $this->database->safeselect(
             [
                 'id',
