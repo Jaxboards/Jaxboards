@@ -341,7 +341,7 @@ final class Page
         }
 
         $t = ($skin['custom'] ? $this->domainDefinitions->getBoardPath() : '') . 'Themes/' . $skin['title'] . '/';
-        $turl = ($skin['custom'] ? $this->domainDefinitions->boardPathUrl() : '') . 'Themes/' . $skin['title'] . '/';
+        $turl = ($skin['custom'] ? $this->domainDefinitions->getBoardPathUrl() : '') . 'Themes/' . $skin['title'] . '/';
         if (is_dir($t)) {
             define('THEMEPATH', $t);
             define('THEMEPATHURL', $turl);
