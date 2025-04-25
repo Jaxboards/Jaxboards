@@ -168,5 +168,10 @@ ul {
   text-align: center;
 }
 
-.flex { display: flex; }
-.flex1 { flex: 1; }
+.flex {
+  display: flex;
+}
+
+.flex1 {
+  flex: 1;
+}

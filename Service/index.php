@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Jax\Page\ServiceSignup;
 
 /*
@@ -12,6 +14,7 @@ use Jax\Page\ServiceSignup;
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', dirname(__DIR__));
 }
+
 if (!defined('SERVICE_ROOT')) {
     define('SERVICE_ROOT', __DIR__);
 }
@@ -23,4 +26,3 @@ if (!file_exists(JAXBOARDS_ROOT . '/config.php')) {
 } else {
     $container->get(ServiceSignup::class)->render();
 }
-

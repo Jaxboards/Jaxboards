@@ -1,56 +1,54 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Jax\Page;
 
-use DI\Container;
 use Jax\Config;
 use Jax\Database;
 use Jax\IPAddress;
 use Jax\Jax;
 
-/*
+use function array_map;
+use function closedir;
+use function copy;
+use function file;
+use function gmdate;
+use function header;
+use function implode;
+use function is_dir;
+use function mb_strlen;
+use function mb_strtolower;
+use function mb_substr;
+use function mkdir;
+use function opendir;
+use function password_hash;
+use function preg_match;
+use function readdir;
+use function str_replace;
+use function time;
+use function trim;
+
+use const PASSWORD_DEFAULT;
+
+/**
  * Service signup file, for users to create their own JaxBoards forum.
  *
  * PHP Version 8
  *
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
-class ServiceSignup {
+final class ServiceSignup
+{
     public function __construct(
-        private Config $config,
-        private Database $database,
-        private IPAddress $ipAddress,
-        private Jax $jax,
+        private readonly Config $config,
+        private readonly Database $database,
+        private readonly IPAddress $ipAddress,
+        private readonly Jax $jax,
     ) {}
 
-    /**
-     * Recursively copies one directory to another.
-     *
-     * @param string $src The source directory- this must exist already
-     * @param string $dst The destination directory- this is assumed to not exist already
-     */
-    private function recurseCopy(string $source, string $destination): void
+    public function render(): void
     {
-        $dir = opendir($source);
-        mkdir($destination);
-        while (($file = readdir($dir)) !== false) {
-            if ($file === '.') {
-                continue;
-            }
-            if ($file === '..') {
-                continue;
-            }
-            if (is_dir($source . '/' . $file)) {
-                $this->recurseCopy($source . '/' . $file, $destination . '/' . $file);
-            } else {
-                copy($source . '/' . $file, $destination . '/' . $file);
-            }
-        }
-        closedir($dir);
-    }
-
-    public function render() {
         if (!$this->config->getSetting('service')) {
             echo 'Service mode not enabled';
 
@@ -94,6 +92,7 @@ class ServiceSignup {
             if ($this->database->numRows($result) > 3) {
                 $errors[] = 'You may only register 3 boards per week.';
             }
+
             $this->database->disposeresult($result);
 
             if (!$this->jax->isemail($this->jax->p['email'])) {
@@ -116,6 +115,7 @@ class ServiceSignup {
             if ($this->database->arow($result)) {
                 $errors[] = 'that board already exists';
             }
+
             $this->database->disposeresult($result);
 
             if ($errors === []) {
@@ -147,9 +147,11 @@ class ServiceSignup {
                     if (mb_substr($line, 0, 2) === '--') {
                         continue;
                     }
+
                     if ($line === '') {
                         continue;
                     }
+
                     // Replace blueprint_ with board name.
                     $line = str_replace('blueprint_', $boardPrefix, $line);
 
@@ -185,7 +187,7 @@ class ServiceSignup {
                 );
 
                 $dbError = $this->database->error();
-                if ($dbError) {
+                if ($dbError !== '' && $dbError !== '0') {
                     $errors[] = $dbError;
                 } else {
                     $this->recurseCopy('blueprint', JAXBOARDS_ROOT . '/boards/' . $board);
@@ -196,7 +198,7 @@ class ServiceSignup {
         }
 
         $currentYear = gmdate('Y');
-        $errorDisplay = implode('', array_map(fn($error) => "<div class='error'>{$error}</div>", $errors));
+        $errorDisplay = implode('', array_map(static fn($error): string => "<div class='error'>{$error}</div>", $errors));
 
         echo <<<HTML
             <!doctype html>
@@ -288,6 +290,31 @@ class ServiceSignup {
                 </body>
             </html>
             HTML;
+    }
 
+    /**
+     * Recursively copies one directory to another.
+     */
+    private function recurseCopy(string $source, string $destination): void
+    {
+        $dir = opendir($source);
+        mkdir($destination);
+        while (($file = readdir($dir)) !== false) {
+            if ($file === '.') {
+                continue;
+            }
+
+            if ($file === '..') {
+                continue;
+            }
+
+            if (is_dir($source . '/' . $file)) {
+                $this->recurseCopy($source . '/' . $file, $destination . '/' . $file);
+            } else {
+                copy($source . '/' . $file, $destination . '/' . $file);
+            }
+        }
+
+        closedir($dir);
     }
 }
