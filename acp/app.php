@@ -22,15 +22,15 @@ use function session_start;
  *
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
-final class App
+final readonly class App
 {
     public function __construct(
-        private readonly Config $config,
-        private readonly Container $container,
-        private readonly Database $database,
-        private readonly Jax $jax,
-        private readonly Page $page,
-        private readonly User $user,
+        private Config $config,
+        private Container $container,
+        private Database $database,
+        private Jax $jax,
+        private Page $page,
+        private User $user,
     ) {}
 
     public function render(): void
