@@ -406,7 +406,7 @@ final class Session
         $session['last_update'] = gmdate('Y-m-d H:i:s');
         $datetimes = ['last_action', 'read_date'];
         foreach ($datetimes as $datetime) {
-            if (!isset($sd[$datetime])) {
+            if (!isset($session[$datetime])) {
                 continue;
             }
 
