@@ -53,13 +53,14 @@ final readonly class IPAddress
         return (inet_ntop($ipAddress) ?: inet_ntop(pack('A' . $length, $ipAddress))) ?: '';
     }
 
-    public function isBanned(string $ipAddress = null): bool
+    public function isBanned(?string $ipAddress = null): bool
     {
         static $ipBanCache = null;
 
         if (!$ipAddress) {
             $ipAddress = self::getIp();
         }
+
         if ($ipBanCache) {
             $ipBanCache = [];
 
