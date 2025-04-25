@@ -4,23 +4,26 @@ declare(strict_types=1);
 
 namespace ACP;
 
-use ACP\Page;
 use DI\Container;
 use Jax\Config;
 use Jax\Database;
-use Jax\DomainDefinitions;
 use Jax\Jax;
 use Jax\User;
 
-/*
+use function file_exists;
+use function header;
+use function ini_set;
+use function session_start;
+
+/**
  * Admin control panel.
  *
  * PHP Version 5.3.7
  *
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
-
-class App {
+final class App
+{
     public function __construct(
         private readonly Config $config,
         private readonly Container $container,
@@ -30,25 +33,8 @@ class App {
         private readonly User $user,
     ) {}
 
-    private function startSession(): void {
-        ini_set('session.cookie_secure', 1);
-        ini_set('session.cookie_httponly', 1);
-        ini_set('session.use_cookies', 1);
-        ini_set('session.use_only_cookies', 1);
-        session_start();
-    }
-
-    private function connectDB() {
-        $this->database->connect(
-            $this->config->getSetting('sql_host'),
-            $this->config->getSetting('sql_username'),
-            $this->config->getSetting('sql_password'),
-            $this->config->getSetting('sql_db'),
-            $this->config->getSetting('sql_prefix'),
-        );
-    }
-
-    public function render() {
+    public function render(): void
+    {
         $this->startSession();
 
         $this->connectDB();
@@ -142,5 +128,25 @@ class App {
         }
 
         $this->page->out();
+    }
+
+    private function startSession(): void
+    {
+        ini_set('session.cookie_secure', 1);
+        ini_set('session.cookie_httponly', 1);
+        ini_set('session.use_cookies', 1);
+        ini_set('session.use_only_cookies', 1);
+        session_start();
+    }
+
+    private function connectDB(): void
+    {
+        $this->database->connect(
+            $this->config->getSetting('sql_host'),
+            $this->config->getSetting('sql_username'),
+            $this->config->getSetting('sql_password'),
+            $this->config->getSetting('sql_db'),
+            $this->config->getSetting('sql_prefix'),
+        );
     }
 }
