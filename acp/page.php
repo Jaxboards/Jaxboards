@@ -26,13 +26,19 @@ use const PHP_EOL;
  */
 final class Page
 {
-    public $parts = [
+    /**
+     * @var array<string,string>
+     */
+    private $parts = [
         'content' => '',
         'sidebar' => '',
         'title' => '',
     ];
 
-    public $partparts = [
+    /**
+     * @var array<string,string>
+     */
+    private $partparts = [
         'nav' => '',
         'navdropdowns' => '',
     ];
@@ -49,7 +55,7 @@ final class Page
      * @param array  $menu  A list of links and associated labels to print
      *                      out as a drop down list
      */
-    public function addNavmenu($title, $page, $menu): void
+    public function addNavmenu(string $title, string $page, array $menu): void
     {
         $this->partparts['nav'] .= $this->parseTemplate(
             'nav-link.html',
@@ -61,12 +67,12 @@ final class Page
         ) . PHP_EOL;
 
         $navDropdownLinksTemplate = '';
-        foreach ($menu as $menu_url => $menu_title) {
+        foreach ($menu as $menuURL => $menuTitle) {
             $navDropdownLinksTemplate .= $this->parseTemplate(
                 'nav-dropdown-link.html',
                 [
-                    'title' => $menu_title,
-                    'url' => $menu_url,
+                    'title' => $menuTitle,
+                    'url' => $menuURL,
                 ],
             ) . PHP_EOL;
         }
@@ -80,27 +86,32 @@ final class Page
         ) . PHP_EOL;
     }
 
-    public function append($a, $b): void
+    public function append(string $partName, string $content): void
     {
-        $this->parts[$a] = $b;
+        $this->parts[$partName] = $content;
     }
 
-    public function sidebar($sidebar): void
+    public function sidebar(string $sidebarLinks): void
     {
-        $this->parts['sidebar'] = $sidebar ? $this->parseTemplate(
+        $this->parts['sidebar'] = $this->parseTemplate(
             'sidebar.html',
             [
-                'content' => $sidebar,
+                'content' => $this->parseTemplate(
+                    'sidebar-list.html',
+                    [
+                        'content' => $sidebarLinks,
+                    ],
+                ),
             ],
-        ) : '';
+        );
     }
 
-    public function title($title): void
+    public function title(string $title): void
     {
         $this->parts['title'] = $title;
     }
 
-    public function addContentBox($title, $content): void
+    public function addContentBox(string $title, string $content): void
     {
         $this->parts['content'] .= $this->parseTemplate(
             'content-box.html',
@@ -130,11 +141,11 @@ final class Page
                 'nav_dropdowns' => $this->partparts['navdropdowns'],
             ],
         );
-        $boardUrl = $this->domainDefinitions->getBoardUrl();
-        $data['css_url'] = $boardUrl . 'acp/css/css.css';
-        $data['bbcode_css_url'] = $boardUrl . 'Service/Themes/Default/bbcode.css';
-        $data['themes_css_url'] = $boardUrl . 'acp/css/themes.css';
-        $data['admin_js_url'] = $boardUrl . 'dist/acp.js';
+        $boardURL = $this->domainDefinitions->getBoardUrl();
+        $data['css_url'] = $boardURL . 'acp/css/css.css';
+        $data['bbcode_css_url'] = $boardURL . 'Service/Themes/Default/bbcode.css';
+        $data['themes_css_url'] = $boardURL . 'acp/css/themes.css';
+        $data['admin_js_url'] = $boardURL . 'dist/acp.js';
 
         echo $this->parseTemplate(
             'admin.html',
@@ -146,33 +157,32 @@ final class Page
     {
         return $this->parseTemplate(
             'back.html',
-            [],
         );
     }
 
-    public function error($a): ?string
+    public function error(string $content): ?string
     {
         return $this->parseTemplate(
             'error.html',
             [
-                'content' => $a,
+                'content' => $content,
             ],
         );
     }
 
-    public function success($a): ?string
+    public function success(string $content): ?string
     {
         return $this->parseTemplate(
             'success.html',
             [
-                'content' => $a,
+                'content' => $content,
             ],
         );
     }
 
-    public function location($a): void
+    public function location(string $location): void
     {
-        header("Location: {$a}");
+        header("Location: {$location}");
     }
 
     /**
@@ -188,7 +198,7 @@ final class Page
      *
      * @return string returns the template with the data replaced
      */
-    public function parseTemplate($templateFile, $data = null): ?string
+    public function parseTemplate(string $templateFile, array $data = []): ?string
     {
         if (mb_substr($templateFile, 0, 1) !== '/') {
             $templateFile = JAXBOARDS_ROOT . '/acp/views/' . $templateFile;
@@ -202,36 +212,13 @@ final class Page
             $templateFile .= 'html';
         }
 
-        $fileError = false;
-        if (is_file($templateFile)) {
-            try {
-                $template = file_get_contents($templateFile);
-            } catch (Exception) {
-                $fileError = true;
-            }
+        $template = file_get_contents($templateFile);
 
-            if ($template === false) {
-                $fileError = true;
-            }
-        } else {
-            $fileError = true;
-        }
-
-        if ($fileError) {
-            error_log('Could not open file: ' . $templateFile);
-
-            return '';
-        }
-
-        if (is_array($data)) {
-            foreach ($data as $name => $content) {
-                $template = str_replace(
-                    '{{ ' . mb_strtolower($name) . ' }}',
-                    "{$content}",
-                    $template,
-                );
-            }
-        }
+        $template = str_replace(
+            array_map(fn($name) => '{{ ' . mb_strtolower($name) . ' }}', array_keys($data)),
+            array_map(fn($content) => "{$content}", $data),
+            $template,
+        );
 
         // Blank out other template variables.
         return preg_replace('/{{\s+.+\s+}}/', '', $template);

@@ -204,14 +204,7 @@ final readonly class Forums
             ) . PHP_EOL;
         }
 
-        $this->page->sidebar(
-            $this->page->parseTemplate(
-                'sidebar-list.html',
-                [
-                    'content' => $sidebarLinks,
-                ],
-            ),
-        );
+        $this->page->sidebar($sidebarLinks);
 
         if (isset($this->jax->b['delete']) && $this->jax->b['delete']) {
             if (is_numeric($this->jax->b['delete'])) {

@@ -88,24 +88,7 @@ final readonly class Members
             ) . PHP_EOL;
         }
 
-        /*
-            $sidebarLinks .= $this->page->parseTemplate(
-            'sidebar-list-link.html',
-            array(
-                'url' => '?act=stats',
-                'title' => 'Recount Statistics',
-            )
-            ) . PHP_EOL;
-         */
-
-        $this->page->sidebar(
-            $this->page->parseTemplate(
-                'sidebar-list.html',
-                [
-                    'content' => $sidebarLinks,
-                ],
-            ),
-        );
+        $this->page->sidebar($sidebarLinks);
     }
 
     public function showmain(): void

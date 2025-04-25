@@ -50,14 +50,7 @@ final readonly class Settings
             ) . PHP_EOL;
         }
 
-        $this->page->sidebar(
-            $this->page->parseTemplate(
-                'sidebar-list.html',
-                [
-                    'content' => $sidebarLinks,
-                ],
-            ),
-        );
+        $this->page->sidebar($sidebarLinks);
 
         if (!isset($this->jax->b['do'])) {
             $this->jax->b['do'] = null;
