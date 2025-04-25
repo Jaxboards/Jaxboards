@@ -65,8 +65,6 @@ final class Database
 
     private $ratingNiblets = [];
 
-    private $db = '';
-
     public function __construct(private readonly Config $config) {}
 
     public function connect(
@@ -82,7 +80,6 @@ final class Database
         $this->mysqli_connection->query("SET time_zone = '+0:00'");
 
         $this->prefix = $prefix;
-        $this->db = $database;
 
         return !$this->mysqli_connection->connect_errno;
     }
@@ -92,7 +89,8 @@ final class Database
         $this->prefix = $prefix;
     }
 
-    public function getPrefix(): string {
+    public function getPrefix(): string
+    {
         return $this->prefix;
     }
 
