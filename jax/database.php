@@ -19,8 +19,6 @@ use function count;
 use function debug_backtrace;
 use function error_log;
 use function explode;
-use function func_get_arg;
-use function func_num_args;
 use function function_exists;
 use function gmdate;
 use function implode;
@@ -117,8 +115,12 @@ final class Database
         return -1;
     }
 
-    public function safeselect(array|string $fields, $table, $where = '', ...$vars)
-    {
+    public function safeselect(
+        array|string $fields,
+        $table,
+        $where = '',
+        ...$vars,
+    ) {
         // set new variable to not impact debug_backtrace value for inspecting
         // input
         $fieldsString = is_array($fields) ? implode(',', $fields) : $fields;
@@ -357,7 +359,7 @@ final class Database
         $outArgs = [];
 
         $added_placeholders = 0;
-        foreach($args as $index => $value) {
+        foreach ($args as $index => $value) {
             $type = $this->safequery_typeforvalue($value);
 
             if ($type === 'a') {
