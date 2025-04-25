@@ -47,7 +47,7 @@
       "php tools/php_codesniffer_to_sonarqube.php phpcs-report.json phpcs-report-sonarqube.json"
     ],
     "phpstan": "phpstan analyse --memory-limit=1G",
-    "phpstan-report": "phpstan analyse --memory-limit=1G --error-format=json > phpstan-report.json",
+    "phpstan-report": "phpstan analyse --memory-limit=1G --error-format=prettyJson > phpstan-report.json",
     "phpmd": "phpmd . ansi cleancode,codesize,controversial,design,naming,unusedcode --exclude vendor,node_modules",
     "phpmd-report": [
       "phpmd . json cleancode,codesize,controversial,design,naming,unusedcode --exclude vendor,node_modules --ignore-violations-on-exit --report-file phpmd-report.json",

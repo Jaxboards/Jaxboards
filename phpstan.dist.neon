@@ -8,6 +8,7 @@ parameters:
   excludePaths:
     analyse:
       - node_modules
+      - dist
       - vendor
   level: 8
   paths:
@@ -17,7 +18,6 @@ parameters:
     - api
     - config.default.php
     - domaindefinitions.php
-    - emoticons
     - jax
     - tools
     - index.php

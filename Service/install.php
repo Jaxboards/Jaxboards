@@ -1,6 +1,5 @@
 <?php
 
-use ACP\Page;
 use DI\Container;
 use Jax\Config;
 use Jax\Database;
@@ -65,7 +64,6 @@ function recurseCopy($src, $dst): void
 
 $JAX = $container->get(Jax::class);
 $DB = $container->get(Database::class);
-$PAGE = $container->get(Page::class);
 
 $fields = [
     'admin_email' => [
