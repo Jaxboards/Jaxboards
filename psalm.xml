@@ -14,7 +14,6 @@
         <file name="config.default.php" />
         <directory name="acp" />
         <directory name="api" />
-        <directory name="emoticons" />
         <directory name="jax" />
         <directory name="tools" />
         <directory name="Service" />
