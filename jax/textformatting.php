@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Jax;
 
 use function array_keys;
-use function array_pop;
 use function array_map;
+use function array_pop;
 use function array_values;
 use function count;
 use function explode;
@@ -92,7 +92,6 @@ final class TextFormatting
                     $this->badwords[$rule['needle']] = $rule['replacement'];
 
                     break;
-
             }
         }
     }
@@ -109,7 +108,6 @@ final class TextFormatting
         }
 
         // Load emoticon pack.
-
         $emotes = [];
         if ($emotepack !== '' && $emotepack !== '0') {
             $this->emotepack = $emotepack;
@@ -219,8 +217,11 @@ final class TextFormatting
         return $codes;
     }
 
-    public function finishcodetags(string $text, array $codes, bool $returnbb = false): array|string
-    {
+    public function finishcodetags(
+        string $text,
+        array $codes,
+        bool $returnbb = false,
+    ): array|string {
         foreach ($codes[0] as $key => $value) {
             if (!$returnbb) {
                 $codes[2][$key] = $codes[1][$key] === '=php' ? highlight_string($codes[2][$key], 1) : preg_replace(

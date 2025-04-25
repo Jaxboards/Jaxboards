@@ -4,62 +4,106 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use function base64_encode;
+use function date;
+use function gmdate;
+use function is_numeric;
+use function is_string;
+use function mb_stripos;
+use function mb_strlen;
+use function mb_strtolower;
+use function mb_substr;
+use function mktime;
+use function openssl_random_pseudo_bytes;
+use function preg_replace_callback;
+use function serialize;
+use function time;
+use function unserialize;
+
 final class Session
 {
     /**
-     * @var mixed[]
+     * @var array<mixed>
      */
     private $data = [];
 
-    private $userData = [];
-
     private $bots = [
-        'AhrefsBot' => 'Ahrefs', // SEO crawler
+        'AhrefsBot' => 'Ahrefs',
+        // SEO crawler
         'Amazonbot' => 'Amazon',
         'Applebot' => 'Applebot',
         'archive.org_bot' => 'Internet Archive',
-        'AwarioBot' => 'Awario', // Social media management company
-        'Baiduspider' => 'Baidu', // Chinese search engine
-        'Barkrowler' => 'Babbar.tech', // SEO graphing services
+        'AwarioBot' => 'Awario',
+        // Social media management company
+        'Baiduspider' => 'Baidu',
+        // Chinese search engine
+        'Barkrowler' => 'Babbar.tech',
+        // SEO graphing services
         'Bingbot' => 'Bing',
-        'Bytespider' => 'Bytespider', // TikTok parent company
-        'CensysInspect' => 'CensysInspect', // Security scanner
-        'Centurybot' => 'Century', // a.k.a. RightDao, a search engine
-        'ChatGLM-Spider' => 'ChatGLM', // SEO crawler
-        'ChatGPT-User' => 'ChatGPT', // AI developer
-        'ClaudeBot' => 'ClaudeBot', // Anthropic AI bot
+        'Bytespider' => 'Bytespider',
+        // TikTok parent company
+        'CensysInspect' => 'CensysInspect',
+        // Security scanner
+        'Centurybot' => 'Century',
+        // a.k.a. RightDao, a search engine
+        'ChatGLM-Spider' => 'ChatGLM',
+        // SEO crawler
+        'ChatGPT-User' => 'ChatGPT',
+        // AI developer
+        'ClaudeBot' => 'ClaudeBot',
+        // Anthropic AI bot
         'Discordbot' => 'Discord',
-        'DotBot' => 'DotBot', // Moz SEO crawler
+        'DotBot' => 'DotBot',
+        // Moz SEO crawler
         'DuckDuckBot' => 'DuckDuckGo',
-        'Expanse' => 'Expanse', // Palo Alto Networks security scanning service
+        'Expanse' => 'Expanse',
+        // Palo Alto Networks security scanning service
         'facebookexternalhit' => 'Facebook',
-        'Friendly_Crawler' => 'FriendlyCrawler', // Machine learning researcher
+        'Friendly_Crawler' => 'FriendlyCrawler',
+        // Machine learning researcher
         'Googlebot' => 'Google',
         'GoogleOther' => 'GoogleOther',
-        'GPTBot' => 'GPTBot', // AI developer
+        'GPTBot' => 'GPTBot',
+        // AI developer
         'ia_archiver' => 'Internet Archive Alexa',
-        'ImagesiftBot' => 'Imagesift', // Hive image search; may be AI-related
-        'linkdexbot' => 'Linkdex', // SEO crawler
-        'Mail.RU_Bot' => 'Mail.RU', // Russian mail service
-        'meta-externalagent' => 'Meta', // May be AI-related
-        'mj12bot' => 'Majestic', // British SEO crawler
-        'MojeekBot' => 'Mojeek', // British search engine
-        'OAI-SearchBot' => 'OpenAI', // AI developer
-        'PerplexityBot' => 'Perplexity', // AI answers site
-        'PetalBot' => 'PetalBot', // Chinese search crawler (Huawei)
-        'Qwantbot' => 'Qwant', // French search engine
-        'SemrushBot' => 'Semrush', // Backlink tracking company
-        'SeznamBot' => 'Seznam', // Czech search engine
-        'Sogou web spider' => 'Sogou', // Chinese search engine
+        'ImagesiftBot' => 'Imagesift',
+        // Hive image search; may be AI-related
+        'linkdexbot' => 'Linkdex',
+        // SEO crawler
+        'Mail.RU_Bot' => 'Mail.RU',
+        // Russian mail service
+        'meta-externalagent' => 'Meta',
+        // May be AI-related
+        'mj12bot' => 'Majestic',
+        // British SEO crawler
+        'MojeekBot' => 'Mojeek',
+        // British search engine
+        'OAI-SearchBot' => 'OpenAI',
+        // AI developer
+        'PerplexityBot' => 'Perplexity',
+        // AI answers site
+        'PetalBot' => 'PetalBot',
+        // Chinese search crawler (Huawei)
+        'Qwantbot' => 'Qwant',
+        // French search engine
+        'SemrushBot' => 'Semrush',
+        // Backlink tracking company
+        'SeznamBot' => 'Seznam',
+        // Czech search engine
+        'Sogou web spider' => 'Sogou',
+        // Chinese search engine
         'Teoma' => 'Ask.com',
         'TikTokSpider' => 'TikTok',
-        'Turnitin' => 'Turnitin', // Plagiarism scanning software
+        'Turnitin' => 'Turnitin',
+        // Plagiarism scanning software
         'Twitterbot' => 'Twitter',
-        'W3C_Validator' => 'W3C Validator', // HTML syntax checker
+        'W3C_Validator' => 'W3C Validator',
+        // HTML syntax checker
         'WhatsApp' => 'WhatsApp',
         'Y!J-WSC' => 'Yahoo Japan',
         'yahoo! slurp' => 'Yahoo',
-        'YandexBot' => 'Yandex', // Russian search engine
+        'YandexBot' => 'Yandex',
+        // Russian search engine
     ];
 
     private $changedData = [];
@@ -222,7 +266,8 @@ final class Session
         return $sessData;
     }
 
-    public function get(string $field) {
+    public function get(string $field)
+    {
         return $this->data[$field] ?? null;
     }
 
@@ -234,7 +279,6 @@ final class Session
 
         $this->changedData[$field] = $value;
         $this->data[$field] = $value;
-
     }
 
     public function addvar($a, $b): void
@@ -260,11 +304,12 @@ final class Session
         $this->changedData['vars'] = serialize($this->data['vars']);
     }
 
-    public function getVar(string $varName) {
+    public function getVar(string $varName)
+    {
         return $this->data['vars'][$varName] ?? null;
     }
 
-    public function act(string $location = null): void
+    public function act(?string $location = null): void
     {
         $this->set('last_action', time());
         if (!$location) {

@@ -80,7 +80,7 @@ final class App
         // Process temporary commands.
         if ($this->page->jsaccess && $this->session->get('runonce')) {
             $this->page->JSRaw($this->session->get('runonce'));
-            $this->session->set('runonce', '');;
+            $this->session->set('runonce', '');
         }
 
         // Any changes to the session variables of the

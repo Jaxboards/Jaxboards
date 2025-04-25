@@ -809,7 +809,7 @@ final class ModControls
                 ['id', 'title'],
                 'topics',
                 'WHERE `id` IN ?',
-                explode(',', $this->session->getVar('modtids')),
+                explode(',', (string) $this->session->getVar('modtids')),
             );
             $titles = [];
             while ($f = $this->database->arow($result)) {
