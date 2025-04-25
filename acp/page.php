@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace ACP;
 
-use Exception;
 use Jax\DomainDefinitions;
 
-use function error_log;
+use function array_keys;
+use function array_map;
 use function file_get_contents;
 use function header;
-use function is_array;
-use function is_file;
 use function mb_strtolower;
 use function mb_substr;
 use function pathinfo;
@@ -198,8 +196,10 @@ final class Page
      *
      * @return string returns the template with the data replaced
      */
-    public function parseTemplate(string $templateFile, array $data = []): ?string
-    {
+    public function parseTemplate(
+        string $templateFile,
+        array $data = [],
+    ): ?string {
         if (mb_substr($templateFile, 0, 1) !== '/') {
             $templateFile = JAXBOARDS_ROOT . '/acp/views/' . $templateFile;
         }
@@ -215,8 +215,8 @@ final class Page
         $template = file_get_contents($templateFile);
 
         $template = str_replace(
-            array_map(fn($name) => '{{ ' . mb_strtolower($name) . ' }}', array_keys($data)),
-            array_map(fn($content) => "{$content}", $data),
+            array_map(static fn($name): string => '{{ ' . mb_strtolower((string) $name) . ' }}', array_keys($data)),
+            array_map(static fn($content): string => "{$content}", $data),
             $template,
         );
 

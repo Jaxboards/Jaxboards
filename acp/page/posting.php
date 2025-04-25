@@ -47,7 +47,7 @@ final readonly class Posting
             ) . PHP_EOL;
         }
 
-        $this->page->sidebar($sidebarLinks,);
+        $this->page->sidebar($sidebarLinks);
 
         match ($this->jax->b['do'] ?? '') {
             'emoticons' => $this->emoticons(),
