@@ -269,16 +269,16 @@ final class Search
 
             if ($datestart) {
                 $postParams[] = 'p.`date`>?';
-                $postValues[] = gmdate('Y-m-d H:i:s', $datestart);
+                $postValues[] = $this->database->datetime($datestart);
                 $topicParams[] = 't.`date`>?';
-                $topicValues[] = gmdate('Y-m-d H:i:s', $datestart);
+                $topicValues[] = $this->database->datetime($datestart);
             }
 
             if ($dateend) {
                 $postParams[] = 'p.`date`<?';
-                $postValues[] = gmdate('Y-m-d H:i:s', $dateend);
+                $postValues[] = $this->database->datetime($dateend);
                 $topicParams[] = 't.`date`<?';
-                $topicValues[] = gmdate('Y-m-d H:i:s', $datestart);
+                $topicValues[] = $this->database->datetime($datestart);
             }
 
             $postWhere = implode(' ', array_map(static fn($q): string => "AND {$q}", $postParams));

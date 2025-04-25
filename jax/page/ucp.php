@@ -601,7 +601,7 @@ final class UCP
                         [
                             'arg1' => $this->user->get('display_name'),
                             'arg2' => $data['display_name'],
-                            'date' => gmdate('Y-m-d H:i:s'),
+                            'date' => $this->database->datetime(),
                             'type' => 'profile_name_change',
                             'uid' => $this->user->get('id'),
                         ],
@@ -1099,7 +1099,7 @@ final class UCP
                 $this->database->safeinsert(
                     'messages',
                     [
-                        'date' => gmdate('Y-m-d H:i:s'),
+                        'date' => $this->database->datetime(),
                         'del_recipient' => 0,
                         'del_sender' => 0,
                         'from' => $this->user->get('id'),

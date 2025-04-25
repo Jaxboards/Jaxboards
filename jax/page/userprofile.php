@@ -399,7 +399,7 @@ final class UserProfile
                             'activity',
                             [
                                 'affected_uid' => $id,
-                                'date' => gmdate('Y-m-d H:i:s'),
+                                'date' => $this->database->datetime(),
                                 'type' => 'profile_comment',
                                 'uid' => $this->user->get('id'),
                             ],
@@ -408,7 +408,7 @@ final class UserProfile
                             'profile_comments',
                             [
                                 'comment' => $this->jax->p['comment'],
-                                'date' => gmdate('Y-m-d H:i:s'),
+                                'date' => $this->database->datetime(),
                                 'from' => $this->user->get('id'),
                                 'to' => $id,
                             ],

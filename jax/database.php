@@ -428,6 +428,10 @@ final class Database
         return $this->connection->real_escape_string($a);
     }
 
+    public function datetime(int $timestamp = null) {
+        return gmdate('Y-m-d H:i:s', $timestamp);
+    }
+
     public function safespecial(
         string $format,
         array $tablenames,
@@ -480,7 +484,7 @@ final class Database
                 EOT
             ,
             ['session', 'members'],
-            gmdate('Y-m-d H:i:s', time() - $this->config->getSetting('timetologout')),
+            $this->datetime(time() - $this->config->getSetting('timetologout')),
         );
         $today = gmdate('n j');
         while ($user = $this->arow($result)) {
@@ -537,7 +541,7 @@ final class Database
         $this->safeupdate(
             'forums',
             [
-                'lp_date' => gmdate('Y-m-d H:i:s', $topic['lp_date'] ?? 0),
+                'lp_date' => $this->datetime($topic['lp_date'] ?? 0),
                 'lp_tid' => $topic['id'] ?? null,
                 'lp_topic' => $topic['title'] ?? '',
                 'lp_uid' => $topic['lp_uid'] ?? null,

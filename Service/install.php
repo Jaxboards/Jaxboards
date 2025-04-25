@@ -34,8 +34,6 @@ require_once JAXBOARDS_ROOT . '/acp/page.php';
 // Get default CFG.
 require_once JAXBOARDS_ROOT . '/config.default.php';
 
-const DB_DATETIME = 'Y-m-d H:i:s';
-
 /**
  * Recursively copies one directory to another.
  *
@@ -246,7 +244,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                     'directory',
                     [
                         'boardname' => $board,
-                        'date' => gmdate(DB_DATETIME),
+                        'date' => $DB->datetime(),
                         'referral' => $JAX->b['r'] ?? '',
                         'registrar_email' => $JAX->p['admin_email'],
                         'registrar_ip' => $container->get(IPAddress::class)->asBinary(),
@@ -294,8 +292,8 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                     'display_name' => $JAX->p['admin_username'],
                     'email' => $JAX->p['admin_email'],
                     'group_id' => 2,
-                    'join_date' => gmdate(DB_DATETIME),
-                    'last_visit' => gmdate(DB_DATETIME),
+                    'join_date' => $DB->datetime(),
+                    'last_visit' => $DB->datetime(),
                     'name' => $JAX->p['admin_username'],
                     'pass' => password_hash(
                         (string) $JAX->p['admin_password'],

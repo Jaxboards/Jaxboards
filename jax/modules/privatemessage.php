@@ -150,7 +150,7 @@ final readonly class PrivateMessage
             ['session'],
             $this->database->basicvalue(json_encode($cmd) . PHP_EOL),
             $uid,
-            gmdate('Y-m-d H:i:s', time() - $this->config->getSetting('updateinterval') * 5),
+            $this->database->datetime(time() - $this->config->getSetting('updateinterval') * 5),
         );
 
         return $this->database->affectedRows() !== 0;

@@ -524,7 +524,7 @@ final class IDX
                 SQL
             ,
             ['forums', 'members'],
-            $this->session->get('last_update') ? gmdate('Y-m-d H:i:s', (int) $this->session->get('last_update')) : gmdate('Y-m-d H:i:s'),
+            $this->session->get('last_update') ? $this->database->datetime((int) $this->session->get('last_update')) : $this->database->datetime(),
         );
 
         while ($f = $this->database->arow($result)) {

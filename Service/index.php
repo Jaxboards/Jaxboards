@@ -41,8 +41,6 @@ if (!$CFG['service']) {
     exit(1);
 }
 
-const DB_DATETIME = 'Y-m-d H:i:s';
-
 /**
  * Recurisvely copies one directory to another.
  *
@@ -108,7 +106,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         'directory',
         'WHERE `registrar_ip`=? AND `date`>?',
         $container->get(IPAddress::class)->asBinary(),
-        gmdate(DB_DATETIME, time() - 7 * 24 * 60 * 60),
+        $DB->datetime(time() - 7 * 24 * 60 * 60),
     );
     if ($DB->numRows($result) > 3) {
         $errors[] = 'You may only register 3 boards per week.';
@@ -147,7 +145,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             'directory',
             [
                 'boardname' => $board,
-                'date' => gmdate(DB_DATETIME),
+                'date' => $DB->datetime(),
                 'referral' => $JAX->b['r'] ?? '',
                 'registrar_email' => $JAX->p['email'],
                 'registrar_ip' => $container->get(IPAddress::class)->asBinary(),
@@ -194,8 +192,8 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                 'display_name' => $JAX->p['username'],
                 'email' => $JAX->p['email'],
                 'group_id' => 2,
-                'join_date' => gmdate(DB_DATETIME),
-                'last_visit' => gmdate(DB_DATETIME),
+                'join_date' => $DB->datetime(),
+                'last_visit' => $DB->datetime(),
                 'name' => $JAX->p['username'],
                 'pass' => password_hash((string) $JAX->p['password'], PASSWORD_DEFAULT),
                 'posts' => 0,

@@ -557,7 +557,7 @@ final class ModControls
                 [
                     'auth_id' => $this->user->get('id'),
                     'fid' => $trashcan,
-                    'lp_date' => gmdate('Y-m-d H:i:s'),
+                    'lp_date' => $this->database->datetime(),
                     'lp_uid' => $lp['auth_id'],
                     'op' => $op,
                     'replies' => 0,

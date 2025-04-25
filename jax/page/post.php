@@ -614,7 +614,7 @@ onclick="this.form.submitButton=this"/></div>
             'posts',
             [
                 'editby' => $this->user->get('id'),
-                'edit_date' => gmdate('Y-m-d H:i:s'),
+                'edit_date' => $this->database->datetime(),
                 'post' => $this->postdata,
             ],
             'WHERE `id`=?',
@@ -638,7 +638,7 @@ onclick="this.form.submitButton=this"/></div>
         $postdata = $this->postdata;
         $fdata = false;
         $newtopic = false;
-        $postDate = gmdate('Y-m-d H:i:s');
+        $postDate = $this->database->datetime();
         $uid = $this->user->get('id');
         $e = '';
 

@@ -179,8 +179,8 @@ final class LogReg
                     'email' => $email,
                     'group_id' => $this->config->getSetting('membervalidation') ? 5 : 1,
                     'ip' => $this->ipAddress->asBinary(),
-                    'join_date' => gmdate('Y-m-d H:i:s'),
-                    'last_visit' => gmdate('Y-m-d H:i:s'),
+                    'join_date' => $this->database->datetime(),
+                    'last_visit' => $this->database->datetime(),
                     'name' => $name,
                     'pass' => password_hash(
                         (string) $pass1,
@@ -237,7 +237,7 @@ final class LogReg
                 $this->database->safeinsert(
                     'tokens',
                     [
-                        'expires' => gmdate('Y-m-d H:i:s', time() + 3600 * 24 * 30),
+                        'expires' => $this->database->datetime(time() + 3600 * 24 * 30),
                         'token' => $logintoken,
                         'type' => 'login',
                         'uid' => $user['id'],
@@ -459,7 +459,7 @@ final class LogReg
                     $this->database->safeinsert(
                         'tokens',
                         [
-                            'expires' => gmdate('Y-m-d H:i:s', time() + 3600 * 24),
+                            'expires' => $this->database->datetime(time() + 3600 * 24),
                             'token' => $forgotpasswordtoken,
                             'type' => 'forgotpassword',
                             'uid' => $udata['id'],

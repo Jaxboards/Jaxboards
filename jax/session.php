@@ -244,7 +244,7 @@ final class Session
             $_SESSION['sid'] = $sid;
         }
 
-        $actionTime = gmdate('Y-m-d H:i:s');
+        $actionTime = $this->database->datetime();
         $sessData = [
             'forumsread' => '{}',
             'id' => $sid,
@@ -350,13 +350,13 @@ final class Session
                 'session',
                 'WHERE `uid`=? AND `last_update`<?',
                 $this->database->basicvalue($uid),
-                gmdate('Y-m-d H:i:s', $timeago),
+                $this->database->datetime($timeago),
             );
             // Delete all expired tokens as well while we're here...
             $this->database->safedelete(
                 'tokens',
                 'WHERE `expires`<=?',
-                $this->database->basicvalue(date('Y-m-d H:i:s', time())),
+                $this->database->basicvalue($this->database->datetime()),
             );
             $this->set('read_date', $this->jax->pick($lastAction, 0));
         }
@@ -369,7 +369,7 @@ final class Session
             ],
             'session',
             'WHERE `last_update`<? GROUP BY uid',
-            gmdate('Y-m-d H:i:s', $yesterday),
+            $this->database->datetime($yesterday),
         );
         while ($session = $this->database->arow($query)) {
             if (!$session['uid']) {
@@ -379,7 +379,7 @@ final class Session
             $this->database->safeupdate(
                 'members',
                 [
-                    'last_visit' => gmdate('Y-m-d H:i:s', $session['last_action']),
+                    'last_visit' => $this->database->datetime($session['last_action']),
                 ],
                 'WHERE `id`=?',
                 $session['uid'],
@@ -393,8 +393,8 @@ final class Session
                     OR (`uid` IS NULL AND `last_update`<?)
                 EOT
             ,
-            gmdate('Y-m-d H:i:s', $yesterday),
-            gmdate('Y-m-d H:i:s', $timeago),
+            $this->database->datetime($yesterday),
+            $this->database->datetime($timeago),
         );
 
         return true;
@@ -403,14 +403,14 @@ final class Session
     public function applyChanges(): void
     {
         $session = $this->changedData;
-        $session['last_update'] = gmdate('Y-m-d H:i:s');
+        $session['last_update'] = $this->database->datetime();
         $datetimes = ['last_action', 'read_date'];
         foreach ($datetimes as $datetime) {
             if (!isset($session[$datetime])) {
                 continue;
             }
 
-            $session[$datetime] = gmdate('Y-m-d H:i:s', $session[$datetime]);
+            $session[$datetime] = $this->database->datetime($session[$datetime]);
         }
 
         if ($this->data['is_bot']) {
@@ -420,7 +420,7 @@ final class Session
         }
 
         if (!$this->data['last_action']) {
-            $session['last_action'] = gmdate('Y-m-d H:i:s');
+            $session['last_action'] = $this->database->datetime();
         }
 
         if (isset($session['user'])) {

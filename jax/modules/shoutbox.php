@@ -387,7 +387,7 @@ final class Shoutbox
         $this->database->safeinsert(
             'shouts',
             [
-                'date' => gmdate('Y-m-d H:i:s'),
+                'date' => $this->database->datetime(),
                 'ip' => $this->ipAddress->asBinary(),
                 'shout' => $shout,
                 'uid' => $this->user->get('id'),
