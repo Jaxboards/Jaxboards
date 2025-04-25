@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use function array_key_exists;
 use function define;
 use function defined;
 use function implode;
@@ -35,7 +36,9 @@ final class DomainDefinitions
     public function defineConstants(): void
     {
         // Running out of a webpage context, don't define anything
-        if (!array_key_exists('SERVER_NAME', $_SERVER)) return;
+        if (!array_key_exists('SERVER_NAME', $_SERVER)) {
+            return;
+        }
 
         $this->definedAlready = true;
 
