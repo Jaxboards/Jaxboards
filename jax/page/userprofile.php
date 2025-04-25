@@ -55,7 +55,7 @@ final class UserProfile
         $this->page->loadmeta('userprofile');
     }
 
-    public function route(): void
+    public function render(): void
     {
         preg_match('@\d+@', (string) $this->jax->b['act'], $m);
         $id = $m[0];

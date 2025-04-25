@@ -52,7 +52,7 @@ final class IDX
         $this->page->loadmeta('idx');
     }
 
-    public function route(): void
+    public function render(): void
     {
         if (isset($this->jax->b['markread']) && $this->jax->b['markread']) {
             $this->page->JS('softurl');

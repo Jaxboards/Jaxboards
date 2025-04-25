@@ -83,7 +83,7 @@ final class Topic
         $this->page->loadmeta('topic');
     }
 
-    public function route(): void
+    public function render(): void
     {
         preg_match('@\d+$@', (string) $this->jax->b['act'], $act);
         $this->tid = (int) $act[0] ?: 0;

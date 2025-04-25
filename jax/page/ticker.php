@@ -27,7 +27,7 @@ final class Ticker
         $this->page->loadmeta('ticker');
     }
 
-    public function route(): void
+    public function render(): void
     {
         if ($this->page->jsnewlocation || !$this->page->jsaccess) {
             $this->index();

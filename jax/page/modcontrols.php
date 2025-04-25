@@ -77,7 +77,7 @@ final class ModControls
         $this->page->JS('script', $script);
     }
 
-    public function route(): void
+    public function render(): void
     {
         $this->perms = $this->user->getPerms();
         if (!$this->perms['can_moderate'] && !$this->user->get('mod')) {

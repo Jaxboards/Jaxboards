@@ -50,7 +50,7 @@ final class Forum
         $this->page->loadmeta('forum');
     }
 
-    public function route(): void
+    public function render(): void
     {
         if (
             isset($this->jax->b['page'])

@@ -132,7 +132,7 @@ $act = $JAX->g['act'] ?? null;
 
 if ($act && file_exists("./page/{$act}.php")) {
     $page = $container->get('ACP\Page\\' . $act);
-    $page->route();
+    $page->render();
 }
 
 $PAGE->out();

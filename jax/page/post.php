@@ -70,7 +70,7 @@ final class Post
         $this->page->addmeta('post-preview', $this->page->meta('box', '', 'Post Preview', '%s'));
     }
 
-    public function route(): void
+    public function render(): void
     {
         $this->tid = $this->jax->b['tid'] ?? 0;
         $this->fid = $this->jax->b['fid'] ?? 0;

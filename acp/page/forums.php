@@ -184,7 +184,7 @@ final readonly class Forums
         return '';
     }
 
-    public function route(): void
+    public function render(): void
     {
         $links = [
             'create' => 'Create Forum',

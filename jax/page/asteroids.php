@@ -13,7 +13,7 @@ final readonly class Asteroids
 {
     public function __construct(private Page $page) {}
 
-    public function route(): void
+    public function render(): void
     {
         $this->page->JS('loadscript', './Script/asteroids.min.js');
         $this->page->JS('softurl');

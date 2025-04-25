@@ -59,7 +59,7 @@ final class LogReg
         $this->page->loadmeta('logreg');
     }
 
-    public function route(): void
+    public function render(): void
     {
         match ((int) mb_substr((string) $this->jax->b['act'], 6)) {
             1 => $this->register(),

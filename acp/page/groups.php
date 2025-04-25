@@ -33,7 +33,7 @@ final class Groups
         private readonly TextFormatting $textFormatting,
     ) {}
 
-    public function route(): void
+    public function render(): void
     {
         $links = [
             'create' => 'Create Group',

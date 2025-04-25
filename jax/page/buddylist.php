@@ -63,7 +63,7 @@ final readonly class BuddyList
         );
     }
 
-    public function route(): void
+    public function render(): void
     {
         $this->page->JS('softurl');
         if ($this->user->isGuest()) {

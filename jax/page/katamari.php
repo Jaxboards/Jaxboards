@@ -13,7 +13,7 @@ final readonly class Katamari
 {
     public function __construct(private Page $page) {}
 
-    public function route(): void
+    public function render(): void
     {
         $this->page->JS('loadscript', './Script/katamari.js');
         $this->page->JS('softurl');

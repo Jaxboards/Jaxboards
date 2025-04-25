@@ -55,7 +55,7 @@ final readonly class Themes
         private TextFormatting $textFormatting,
     ) {}
 
-    public function route(): void
+    public function render(): void
     {
         if (!defined('DTHEMEPATH')) {
             define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . $this->config->getSetting('dthemepath'));

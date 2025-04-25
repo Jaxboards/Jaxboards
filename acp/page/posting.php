@@ -29,7 +29,7 @@ final readonly class Posting
         private TextFormatting $textFormatting,
     ) {}
 
-    public function route(): void
+    public function render(): void
     {
         $links = [
             'emoticons' => 'Emoticons',

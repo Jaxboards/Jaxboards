@@ -19,7 +19,7 @@ final readonly class BoardOffline
         private readonly Page $page,
     ) {}
 
-    public function route(): void
+    public function render(): void
     {
         if ($this->page->jsupdate) {
             return;

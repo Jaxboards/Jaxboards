@@ -27,7 +27,7 @@ final readonly class Download
         private Jax $jax,
     ) {}
 
-    public function route(): void
+    public function render(): void
     {
         $this->downloadFile($this->jax->b['id']);
     }

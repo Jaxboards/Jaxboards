@@ -50,7 +50,7 @@ final readonly class Members
         private Jax $jax,
     ) {}
 
-    public function route(): void
+    public function render(): void
     {
         if (!isset($this->jax->b['do'])) {
             $this->jax->b['do'] = null;

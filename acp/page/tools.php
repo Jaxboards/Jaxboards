@@ -50,7 +50,7 @@ final readonly class Tools
         private readonly Jax $jax,
     ) {}
 
-    public function route(): void
+    public function render(): void
     {
         $links = [
             'backup' => 'Backup',

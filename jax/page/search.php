@@ -61,7 +61,7 @@ final class Search
         $this->page->loadmeta('search');
     }
 
-    public function route(): void
+    public function render(): void
     {
         $this->pagenum = $this->jax->b['page'] ?? 0;
         if (!is_numeric($this->pagenum) || $this->pagenum < 0) {

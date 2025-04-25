@@ -13,7 +13,7 @@ final readonly class Earthbound
 {
     public function __construct(private Page $page) {}
 
-    public function route(): void
+    public function render(): void
     {
         $this->page->JS('softurl');
         $this->page->JS('loadscript', './Script/earthbound.js');

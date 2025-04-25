@@ -34,7 +34,7 @@ final class Members
         $this->page->loadmeta('members');
     }
 
-    public function route(): void
+    public function render(): void
     {
         if (
             isset($this->jax->b['page'])

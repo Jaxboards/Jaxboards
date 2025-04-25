@@ -59,7 +59,7 @@ final class UCP
         $this->page->loadmeta('ucp');
     }
 
-    public function route(): void
+    public function render(): void
     {
         if ($this->user->isGuest() || $this->user->get('group_id') === 4) {
             $this->page->location('?');

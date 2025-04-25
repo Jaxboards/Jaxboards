@@ -228,7 +228,7 @@ final class App
             // Do nothing.
         } elseif ($act && file_exists('jax/page/' . $act . '.php')) {
             $page = $this->container->get('Jax\Page\\' . $act);
-            $page->route();
+            $page->render();
         } elseif (!$this->page->jsaccess || $this->page->jsnewlocation) {
             $result = $this->database->safeselect(
                 ['page'],

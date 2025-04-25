@@ -32,7 +32,7 @@ final class Calendar
         $this->page->loadmeta('calendar');
     }
 
-    public function route(): void
+    public function render(): void
     {
         if (isset($this->jax->b['month'])) {
             if (is_numeric($this->jax->b['month'])) {
