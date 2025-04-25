@@ -34,6 +34,9 @@ final class DomainDefinitions
 
     public function defineConstants(): void
     {
+        // Running out of a webpage context, don't define anything
+        if (!array_key_exists('SERVER_NAME', $_SERVER)) return;
+
         $this->definedAlready = true;
 
         $serviceConfig = $this->config->getServiceConfig();
