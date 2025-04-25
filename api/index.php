@@ -3,59 +3,15 @@
 declare(strict_types=1);
 
 use DI\Container;
-use Jax\Config;
-use Jax\Database;
 use Jax\DomainDefinitions;
-use Jax\TextFormatting;
+use Jax\API;
 
-define('JAXBOARDS_ROOT', dirname(__DIR__));
+if (!defined('JAXBOARDS_ROOT')) {
+    define('JAXBOARDS_ROOT', dirname(__DIR__));
+}
 
 require_once JAXBOARDS_ROOT . '/jax/autoload.php';
 $container = new Container();
 
-$CFG = $container->get(Config::class)->get();
-
-$DB = $container->get(Database::class);
-
 $container->get(DomainDefinitions::class)->defineConstants();
-
-$list = [[], []];
-
-switch ($_GET['act'] ?? '') {
-    case 'searchmembers':
-        $result = $DB->safeselect(
-            [
-                'id',
-                'display_name',
-            ],
-            'members',
-            'WHERE `display_name` LIKE ? ORDER BY `display_name` LIMIT 10',
-            $DB->basicvalue(
-                htmlspecialchars(
-                    str_replace('_', '\_', $_GET['term']),
-                    ENT_QUOTES,
-                ) . '%',
-            ),
-        );
-        while ($f = $DB->arow($result)) {
-            $list[0][] = $f['id'];
-            $list[1][] = $f['display_name'];
-        }
-
-        echo json_encode($list);
-
-        break;
-
-    case 'emotes':
-        $textFormatting = $container->get(TextFormatting::class);
-        $rules = $textFormatting->getEmoteRules();
-        foreach ($rules as $k => $v) {
-            $rules[$k] = '<img src="' . $v . '" alt="' . $textFormatting->blockhtml($k) . '" />';
-        }
-
-        echo json_encode([array_keys($rules), array_values($rules)]);
-
-        break;
-
-    default:
-}
+$container->get(API::class)->render();

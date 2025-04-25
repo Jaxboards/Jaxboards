@@ -65,7 +65,7 @@ final class Database
                     $this->config->getSetting('sql_prefix'),
                 );
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             echo "Failed to connect to database. The following error was collected: <pre>{$e}</pre>";
 
             exit(1);
