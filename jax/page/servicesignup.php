@@ -61,10 +61,6 @@ final readonly class ServiceSignup
                 header('Location: https://test.' . $this->config->getSetting('domain'));
             }
 
-            if (!$connected) {
-                $errors[] = 'There was an error connecting to the MySQL database.';
-            }
-
             $this->jax->p['boardurl'] = mb_strtolower((string) $this->jax->b['boardurl']);
             if (
                 !$this->jax->p['boardurl']
