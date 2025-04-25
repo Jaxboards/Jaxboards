@@ -46,7 +46,7 @@ final class Database
 
     private $queryList = [];
 
-    private $connection = false;
+    private $connection = null;
 
     private $prefix = '';
 
@@ -90,20 +90,12 @@ final class Database
 
     public function error()
     {
-        if ($this->connection) {
-            return $this->connection->error;
-        }
-
-        return '';
+        return $this->connection->error;
     }
 
     public function affectedRows()
     {
-        if ($this->connection) {
-            return $this->connection->affected_rows;
-        }
-
-        return -1;
+        return $this->connection->affected_rows;
     }
 
     public function safeselect(
@@ -125,11 +117,7 @@ final class Database
 
     public function insertId()
     {
-        if ($this->connection) {
-            return $this->connection->insert_id;
-        }
-
-        return 0;
+        return $this->connection->insert_id;
     }
 
     public function safeinsert($table, $data)
@@ -375,7 +363,7 @@ final class Database
         }
 
         if ($args !== []) {
-            $stmt->bind_param(...$this->refValues([$typeString, ...$outArgs]));
+            $stmt->bind_param($typeString, ...$outArgs);
         }
 
         if (!$stmt->execute()) {
@@ -399,22 +387,6 @@ final class Database
         }
 
         return $retval;
-    }
-
-    /**
-     * @param mixed $arr
-     *
-     * @return array<mixed>
-     */
-    public function refValues($arr): array
-    {
-        $refs = [];
-
-        foreach ($arr as $key => $value) {
-            $refs[$key] = &$arr[$key];
-        }
-
-        return $refs;
     }
 
     public function ekey($key): string
@@ -453,11 +425,7 @@ final class Database
 
     public function escape($a)
     {
-        if ($this->connection) {
-            return $this->connection->real_escape_string($a);
-        }
-
-        return addslashes((string) $a);
+        return $this->connection->real_escape_string($a);
     }
 
     public function safespecial($format, $tablenames, ...$va_array): mixed
@@ -561,17 +529,10 @@ final class Database
         $this->safeupdate(
             'forums',
             [
-                'lp_date' => isset($topic['lp_date'])
-                && is_numeric($topic['lp_date'])
-                && $topic['lp_date'] ? gmdate('Y-m-d H:i:s', $topic['lp_date'])
-                : '0000-00-00 00:00:00',
-                'lp_tid' => isset($topic['id'])
-                && is_numeric($topic['id'])
-                && $topic['id'] ? (int) $topic['id'] : null,
+                'lp_date' => gmdate('Y-m-d H:i:s', $topic['lp_date'] ?? 0),
+                'lp_tid' => $topic['id'] ?? null,
                 'lp_topic' => $topic['title'] ?? '',
-                'lp_uid' => isset($topic['lp_uid'])
-                && is_numeric($topic['lp_uid'])
-                && $topic['lp_uid'] ? (int) $topic['lp_uid'] : null,
+                'lp_uid' => $topic['lp_uid'] ?? null,
             ],
             'WHERE id=?',
             $fid,
@@ -604,14 +565,6 @@ final class Database
         return $this->ratingNiblets = $niblets;
     }
 
-    public function debug(): string
-    {
-        return '<div><p>' . implode(
-            '</p><p>',
-            $this->queryList,
-        ) . '</p></div>';
-    }
-
     /**
      * A function to deal with the `mysqli_fetch_all` function only exiting
      * for the `mysqlnd` driver. Fetches all rows from a MySQLi query result.
@@ -636,5 +589,13 @@ final class Database
         }
 
         return $result;
+    }
+
+    public function debug(): string
+    {
+        return '<div><p>' . implode(
+            '</p><p>',
+            $this->queryList,
+        ) . '</p></div>';
     }
 }
