@@ -148,7 +148,7 @@ final class Groups
         }
 
         $error = $this->database->error();
-        if ($error) {
+        if ($error !== '' && $error !== '0') {
             $this->page->addContentBox(
                 'Error',
                 $this->page->error($error),

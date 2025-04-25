@@ -901,7 +901,7 @@ final class ModControls
                     $this->database->basicvalue($this->jax->p['mid']),
                 );
                 $error = $this->database->error();
-                if ($error) {
+                if ($error !== '' && $error !== '0') {
                     $page .= $this->page->meta(
                         'error',
                         'Error updating profile information.',

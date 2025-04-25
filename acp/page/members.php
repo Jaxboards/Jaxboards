@@ -474,7 +474,7 @@ final readonly class Members
                 $result = $this->database->safeinsert('members', $member);
                 $error = $this->database->error();
                 $this->database->disposeresult($result);
-                if (!$error) {
+                if ($error === '' || $error === '0') {
                     $page .= $this->page->success('Member registered.');
                 } else {
                     $page .= $this->page->error(
