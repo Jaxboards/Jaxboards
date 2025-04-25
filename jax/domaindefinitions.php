@@ -23,12 +23,12 @@ if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', __DIR__);
 }
 
-class DomainDefinitions {
-    public function __construct(
-        private readonly Config $config,
-    ) {}
+final class DomainDefinitions
+{
+    public function __construct(private readonly Config $config) {}
 
-    public function defineConstants() {
+    public function defineConstants(): void
+    {
 
         $serviceConfig = $this->config->getServiceConfig();
 
@@ -73,10 +73,11 @@ class DomainDefinitions {
 
         define('STHEMEPATH', pathjoin(JAXBOARDS_ROOT, 'Service/Themes'));
 
-        if ($prefix) {
-            define('BOARDPATH', pathjoin(JAXBOARDS_ROOT, 'boards', $prefix));
-            define('BOARDPATHURL', BOARDURL . pathjoin('boards', $prefix));
+        if (!$prefix) {
+            return;
         }
+
+        define('BOARDPATH', pathjoin(JAXBOARDS_ROOT, 'boards', $prefix));
+        define('BOARDPATHURL', BOARDURL . pathjoin('boards', $prefix));
     }
 }
-
