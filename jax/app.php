@@ -36,10 +36,7 @@ use const PATHINFO_FILENAME;
 
 final class App
 {
-    /**
-     * @var float
-     */
-    private float $microtime;
+    private readonly float $microtime;
 
     private bool $onLocalHost = false;
 
