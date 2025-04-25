@@ -18,6 +18,7 @@ use const PASSWORD_DEFAULT;
 final class User
 {
     public ?array $userData = null;
+
     public ?array $userPerms = null;
 
     public function __construct(
@@ -258,12 +259,12 @@ final class User
         if ($permFlags !== null) {
             // Decode the bitflags
             return [
-                'poll' => $permFlags & 32 ? 1 : 0,
-                'read' => $permFlags & 8 ? 1 : 0,
-                'reply' => $permFlags & 2 ? 1 : 0,
-                'start' => $permFlags & 4 ? 1 : 0,
-                'upload' => $permFlags & 1 ? 1 : 0,
-                'view' => $permFlags & 16 ? 1 : 0,
+                'poll' => ($permFlags & 32) !== 0 ? 1 : 0,
+                'read' => ($permFlags & 8) !== 0 ? 1 : 0,
+                'reply' => ($permFlags & 2) !== 0 ? 1 : 0,
+                'start' => ($permFlags & 4) !== 0 ? 1 : 0,
+                'upload' => ($permFlags & 1) !== 0 ? 1 : 0,
+                'view' => ($permFlags & 16) !== 0 ? 1 : 0,
             ];
         }
 

@@ -1,20 +1,27 @@
 <?php
 
-require_once 'autoload.php';
+declare(strict_types=1);
 
 use DI\Container;
-use Jax\User;
 use Jax\IPAddress;
+use Jax\User;
 
-class MockIPAddress extends IPAddress {
-    function __construct() {}
-    function isBanned($ipAddress = false): bool { return false; }
+use function DI\Create;
+
+final class MockIPAddress extends IPAddress
+{
+    public function __construct() {}
+
+    public function isBanned($ipAddress = false): bool
+    {
+        return false;
+    }
 }
 
 $container = new Container();
-$container->set(IPAddress::class, \DI\Create(MockIPAddress::class));
+$container->set(IPAddress::class, Create(MockIPAddress::class));
 
-/**
+/*
  *          Use Global?     View        Read    Start   Reply   Upload  Polls
  * Member   X               Y           Y       Y       Y       N       Y
  * Admin    Y
@@ -24,7 +31,7 @@ $container->set(IPAddress::class, \DI\Create(MockIPAddress::class));
 $encodedForumFlags = base64_decode('AAEAPgADABgABAAYAAUAGAAGAD8=');
 
 $tests = [];
-$tests['parseForumPermissionWithInteger'] = function () use ($container, $encodedForumFlags) {
+$tests['parseForumPermissionWithInteger'] = static function () use ($container): void {
     $user = $container->get(User::class);
 
     $allOn = 0b11111111;
@@ -37,10 +44,10 @@ $tests['parseForumPermissionWithInteger'] = function () use ($container, $encode
 };
 
 
-$tests['parseForumPermissionAsAdmin'] = function () use ($container, $encodedForumFlags) {
+$tests['parseForumPermissionAsAdmin'] = static function () use ($container, $encodedForumFlags): void {
     $user = $container->get(User::class);
 
-    $user->userPerms = ['can_poll' => 1, 'can_post' => 1, 'can_post_topics' => 1, 'can_attach' => 1 ];
+    $user->userPerms = ['can_poll' => 1, 'can_post' => 1, 'can_post_topics' => 1, 'can_attach' => 1];
     $user->userData = ['group_id' => 2];
 
     $expected = ['poll' => 1, 'read' => 1, 'reply' => 1, 'start' => 1, 'upload' => 1, 'view' => 1];
@@ -50,7 +57,7 @@ $tests['parseForumPermissionAsAdmin'] = function () use ($container, $encodedFor
     assert($diff === [], 'Expected value differs: ' . json_encode($diff));
 };
 
-$tests['parseForumPermissionAsGuest'] = function () use ($container, $encodedForumFlags) {
+$tests['parseForumPermissionAsGuest'] = static function () use ($container, $encodedForumFlags): void {
     $user = $container->get(User::class);
 
     $user->userPerms = ['can_post' => 1];
@@ -63,7 +70,7 @@ $tests['parseForumPermissionAsGuest'] = function () use ($container, $encodedFor
     assert($diff === [], 'Expected value differs: ' . json_encode($diff));
 };
 
-$tests['parseForumPermissionAsBanned'] = function () use ($container, $encodedForumFlags) {
+$tests['parseForumPermissionAsBanned'] = static function () use ($container, $encodedForumFlags): void {
     $user = $container->get(User::class);
 
     $user->userPerms = ['can_post' => 1];
@@ -77,7 +84,7 @@ $tests['parseForumPermissionAsBanned'] = function () use ($container, $encodedFo
 };
 
 // Poor man's test runner XD
-foreach($tests as $testName => $test) {
+foreach ($tests as $testName => $test) {
     echo $testName;
     $test();
     echo ': Passed' . PHP_EOL;
