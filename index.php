@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Jax\TextFormatting;
 use DI\Container;
 use Jax\Config;
 use Jax\Database;
@@ -365,7 +366,7 @@ if ($act === 'idx' && isset($JAX->b['module']) && $JAX->b['module']) {
     $page = $DB->arow($result);
     if ($page) {
         $DB->disposeresult($result);
-        $textFormatting = $container->get('Jax\TextFormatting');
+        $textFormatting = $container->get(TextFormatting::class);
         $page['page'] = $textFormatting->bbcodes($page['page']);
         $PAGE->append('PAGE', $page['page']);
         if ($PAGE->jsnewlocation) {
