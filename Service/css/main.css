@@ -13,7 +13,7 @@ body {
 }
 
 #logo {
-  background: url('/img/header.png');
+  background: url('../img/header.png');
   height: 96px;
 }
 
@@ -76,7 +76,7 @@ body {
 }
 
 #content {
-  background: url('/img/pagebg.png') top repeat-x #152b49;
+  background: url('../img/pagebg.png') top repeat-x #152b49;
   padding-top: 10px;
 }
 
@@ -86,8 +86,7 @@ body {
 }
 
 .box.mini {
-  width: 31%;
-  float: left;
+  flex: 1;
 }
 
 .box .content {
@@ -120,7 +119,6 @@ body {
 /* stylelint-enable no-descending-specificity */
 
 #signup {
-  float: right;
   background: url('../Themes/Default/img/shade.png') bottom repeat-x;
   border: 2px solid #aac;
   padding: 30px;
@@ -169,3 +167,6 @@ ul {
 .center {
   text-align: center;
 }
+
+.flex { display: flex; }
+.flex1 { flex: 1; }
