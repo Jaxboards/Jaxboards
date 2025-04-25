@@ -6,7 +6,6 @@ declare(strict_types=1);
 use Jax\App;
 use DI\Container;
 
-
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', __DIR__);
 }
@@ -26,4 +25,4 @@ require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
 
-$container->get('Jax\App')->render();
+$container->get(App::class)->render();

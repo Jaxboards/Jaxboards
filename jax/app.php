@@ -1,39 +1,41 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax;
 
+use Exception;
 use DI\Container;
-use Jax\Config;
-use Jax\Database;
-use Jax\IPAddress;
-use Jax\Jax;
-use Jax\Page;
-use Jax\Session;
-use Jax\User;
 
-class App {
+class App
+{
+    /**
+     * @var float
+     */
+    public $microtime;
     private bool $onLocalHost = false;
-    private int $microtimeStart = 0;
 
-    function __construct(
-        private Config $config,
-        private Database $database,
-        private IPAddress $ipAddress,
-        private Jax $jax,
-        private Page $page,
-        private Session $session,
-        private User $user,
-        private Container $container,
+    public function __construct(
+        private readonly Config $config,
+        private readonly Database $database,
+        private readonly IPAddress $ipAddress,
+        private readonly Jax $jax,
+        private readonly Page $page,
+        private readonly Session $session,
+        private readonly User $user,
+        private readonly Container $container,
     ) {
         $this->onLocalHost = in_array($this->ipAddress->asHumanReadable(), ['127.0.0.1', '::1'], true);
         $this->microtime = microtime(true);
     }
 
-    private function connectDB() {
+    private function connectDB(): void
+    {
         try {
             if ($this->onLocalHost) {
                 $this->database->debugMode = true;
             }
+
             $this->database->connect(
                 $this->config->getSetting('sql_host'),
                 $this->config->getSetting('sql_username'),
@@ -41,13 +43,15 @@ class App {
                 $this->config->getSetting('sql_db'),
                 $this->config->getSetting('sql_prefix'),
             );
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             echo "Failed to connect to database. The following error was collected: <pre>{$e}</pre>";
+
             exit(1);
         }
     }
 
-    private function startSession() {
+    private function startSession(): void
+    {
         ini_set('session.cookie_secure', '1');
         ini_set('session.cookie_httponly', '1');
         ini_set('session.use_cookies', '1');
@@ -87,7 +91,8 @@ class App {
         }
     }
 
-    public function render() {
+    public function render(): void
+    {
         header('Cache-Control: no-cache, must-revalidate');
 
         $this->connectDB();
@@ -119,8 +124,6 @@ class App {
         // current user throughout the script are finally put into query form here.
         $this->session->applyChanges();
 
-        $pagegen = '';
-
         if ($this->onLocalHost) {
             $this->renderDebugInfo();
         }
@@ -128,7 +131,8 @@ class App {
         $this->page->out();
     }
 
-    private function loadModules() {
+    private function loadModules(): void
+    {
         $modules = glob('jax/modules/*.php');
         if ($modules) {
             foreach ($modules as $module) {
@@ -150,7 +154,8 @@ class App {
         }
     }
 
-    private function loadPageFromAction() {
+    private function loadPageFromAction(): void
+    {
         $action = mb_strtolower($this->jax->b['act'] ?? '');
 
         // Handle board offline
@@ -191,7 +196,7 @@ class App {
             $page = $this->database->arow($result);
             if ($page) {
                 $this->database->disposeresult($result);
-                $textFormatting = $this->container->get('Jax\TextFormatting');
+                $textFormatting = $this->container->get(TextFormatting::class);
                 $page['page'] = $textFormatting->bbcodes($page['page']);
                 $this->page->append('PAGE', $page['page']);
                 if ($this->page->jsnewlocation) {
@@ -203,7 +208,8 @@ class App {
         }
     }
 
-    private function loadSkin() {
+    private function loadSkin(): void
+    {
         $this->page->loadskin(
             $this->jax->pick(
                 $this->session->vars['skin_id'] ?? false,
@@ -237,7 +243,8 @@ class App {
         }
     }
 
-    private function renderBaseHTML() {
+    private function renderBaseHTML(): void
+    {
         if (!$this->user->isGuest()) {
             $this->page->append(
                 'SCRIPT',
@@ -271,7 +278,7 @@ class App {
             '<link rel="stylesheet" type="text/css" href="' . THEMEPATHURL . 'css.css">'
             . '<link rel="preload" as="style" type="text/css" href="./Service/wysiwyg.css" onload="this.onload=null;this.rel=\'stylesheet\'" />',
         );
-        if ($this->page->meta('favicon')) {
+        if ($this->page->meta('favicon') !== '' && $this->page->meta('favicon') !== '0') {
             $this->page->append(
                 'CSS',
                 '<link rel="icon" href="' . $this->page->meta('favicon') . '">',
@@ -364,7 +371,8 @@ class App {
         );
     }
 
-    private function renderDebugInfo() {
+    private function renderDebugInfo(): void
+    {
         $debug = '';
 
         $debug .= $this->page->debug() . '<br>' . $this->database->debug();
@@ -391,7 +399,8 @@ class App {
         );
     }
 
-    private function renderNavigation() {
+    private function renderNavigation(): void
+    {
         $this->page->path([$this->jax->pick($this->config->getSetting('boardname'), 'Home') => '?']);
         $this->page->append(
             'TITLE',
@@ -406,7 +415,8 @@ class App {
         }
     }
 
-    private function setPageVars() {
+    private function setPageVars(): void
+    {
         $this->page->addvar('modlink', $this->user->getPerm('can_moderate') ? $this->page->meta('modlink') : '');
 
         $this->page->addvar('ismod', $this->user->getPerm('can_moderate') ? 'true' : 'false');

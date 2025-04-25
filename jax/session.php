@@ -71,10 +71,10 @@ final class Session
         private readonly IPAddress $ipAddress,
         private readonly Database $database,
         private readonly User $user,
-    ) {
-    }
+    ) {}
 
-    public function fetchSessionData() {
+    public function fetchSessionData(): void
+    {
         $this->data = $this->getSess($_SESSION['sid'] ?? null);
         if (!isset($this->data['vars'])) {
             $this->data['vars'] = serialize([]);
