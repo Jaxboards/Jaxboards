@@ -38,24 +38,27 @@ use const PHP_EOL;
 // TODO: Migrate jaxboards to be database-independent and not tied to MySQL
 final class Database
 {
-    public $lastQuery;
+    public mysqli_result $lastQuery;
 
-    public $debugMode = false;
+    public bool $debugMode = false;
 
-    private $queryList = [];
+    /**
+     * @var array<string>
+     */
+    private array $queryList = [];
 
-    private $connection;
+    private MySQLi $connection;
 
-    private $prefix = '';
+    private string $prefix = '';
 
     public function __construct(private readonly Config $config) {}
 
     public function connect(
-        $host,
-        $user,
-        $password,
-        $database = '',
-        $prefix = '',
+        string $host,
+        string $user,
+        string $password,
+        string $database = '',
+        string $prefix = '',
     ): bool {
         $this->connection = new MySQLi($host, $user, $password, $database);
 
@@ -94,8 +97,8 @@ final class Database
 
     public function safeselect(
         array|string $fields,
-        $table,
-        $where = '',
+        string $table,
+        string $where = '',
         ...$vars,
     ) {
         // set new variable to not impact debug_backtrace value for inspecting
@@ -114,7 +117,7 @@ final class Database
         return $this->connection->insert_id;
     }
 
-    public function safeinsert($table, $data)
+    public function safeinsert(string $table, array $data)
     {
         if (!empty($data) && array_keys($data) !== []) {
             return $this->safequery(
@@ -166,10 +169,10 @@ final class Database
     }
 
     public function safeupdate(
-        $table,
-        $kvarray,
-        $whereformat = '',
-        ...$whereparams,
+        string $table,
+        array $kvarray,
+        string $whereFormat = '',
+        ...$whereParams,
     ) {
         if (empty($kvarray)) {
             // Nothing to update.
@@ -178,14 +181,14 @@ final class Database
 
         $keysPrepared = $this->safeBuildUpdate($kvarray);
         $values = array_values($kvarray);
-        $query = 'UPDATE ' . $this->ftable($table) . ' SET ' . $keysPrepared . ' ' . $whereformat;
+        $query = 'UPDATE ' . $this->ftable($table) . ' SET ' . $keysPrepared . ' ' . $whereFormat;
 
-        return $this->safequery($query, ...$values, ...$whereparams);
+        return $this->safequery($query, ...$values, ...$whereParams);
     }
 
-    public function safeBuildUpdate($kvarray): string
+    public function safeBuildUpdate(array $kvarray): string
     {
-        if (empty($kvarray)) {
+        if ($kvarray == []) {
             return '';
         }
 
@@ -214,7 +217,7 @@ final class Database
         return mb_substr($updateString, 0, -1);
     }
 
-    public function safedelete($table, $whereformat, ...$vars): mixed
+    public function safedelete(string $table, string $whereformat, ...$vars): mixed
     {
         $query = 'DELETE FROM ' . $this->ftable($table)
             . ($whereformat ? ' ' . $whereformat : '');
@@ -223,7 +226,7 @@ final class Database
         return $this->safequery($query, ...$vars);
     }
 
-    public function row($result = null): null|array|false
+    public function row(mysqli_result $result = null): null|array|false
     {
         $result = $result ?: $this->lastQuery;
 
@@ -231,7 +234,7 @@ final class Database
     }
 
     // Only new-style mysqli.
-    public function arows($result = null): array|false
+    public function arows(mysqli_result $result = null): array|false
     {
         $result = $result ?: $this->lastQuery;
 
@@ -239,28 +242,28 @@ final class Database
     }
 
     // Only new-style mysqli.
-    public function rows($result = null): array|false
+    public function rows(mysqli_result $result = null): array|false
     {
         $result = $result ?: $this->lastQuery;
 
         return $result ? $this->fetchAll($result, MYSQLI_BOTH) : false;
     }
 
-    public function arow($result = null): null|array|false
+    public function arow(mysqli_result $result = null): null|array|false
     {
         $result = $result ?: $this->lastQuery;
 
         return $result ? mysqli_fetch_assoc($result) : false;
     }
 
-    public function numRows($result = null)
+    public function numRows(mysqli_result $result = null)
     {
         $result = $result ?: $this->lastQuery;
 
         return $result?->num_rows ?? 0;
     }
 
-    public function disposeresult($result): void
+    public function disposeresult(mysqli_result $result): void
     {
         $result->free();
     }
@@ -306,7 +309,7 @@ final class Database
         return implode('?', $arr) . $replacement . $last;
     }
 
-    public function safequery($queryString, ...$args)
+    public function safequery(string $queryString, ...$args)
     {
         // set new variable to not impact debug_backtrace value for inspecting
         // input
@@ -383,7 +386,7 @@ final class Database
         return $retval;
     }
 
-    public function ekey($key): string
+    public function ekey(string $key): string
     {
         return '`' . $this->escape($key) . '`';
     }
@@ -422,7 +425,7 @@ final class Database
         return $this->connection->real_escape_string($a);
     }
 
-    public function safespecial($format, $tablenames, ...$va_array): mixed
+    public function safespecial(string $format, array $tablenames, ...$va_array): mixed
     {
         // Table names.
         $tempformat = str_replace('%t', '%s', $format);
