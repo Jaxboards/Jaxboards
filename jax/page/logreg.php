@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Exception;
 use Jax\Config;
 use Jax\Database;
+use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;

@@ -26,6 +26,8 @@ final readonly class Login
 
     public function render(): void
     {
+        $this->startSession();
+
         $boardUrl = $this->domainDefinitions->getBoardUrl();
         $pageElements = [
             'board_name' => $this->config->getSetting('boardname'),
@@ -70,5 +72,14 @@ final readonly class Login
             'login.html',
             $pageElements,
         );
+    }
+
+    private function startSession(): void
+    {
+        ini_set('session.cookie_secure', 1);
+        ini_set('session.cookie_httponly', 1);
+        ini_set('session.use_cookies', 1);
+        ini_set('session.use_only_cookies', 1);
+        session_start();
     }
 }
