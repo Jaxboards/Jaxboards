@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use DI\Container;
 use Jax\API;
 
 if (!defined('JAXBOARDS_ROOT')) {

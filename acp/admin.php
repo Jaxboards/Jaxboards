@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use ACP\App;
-use DI\Container;
 
 if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', dirname(__DIR__));

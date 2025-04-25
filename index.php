@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 
-use DI\Container;
 use Jax\App;
 
 if (!defined('JAXBOARDS_ROOT')) {
