@@ -54,7 +54,7 @@
       "php tools/phpmd_to_sonarqube.php phpmd-report.json phpmd-report-sonarqube.json"
     ],
     "psalm": "psalm",
-    "psalm-report": "psalm --output-format=sonarqube --report=psalm-report.json > psalm-report.json",
+    "psalm-report": "psalm --output-format=sonarqube > psalm-report.json",
     "rector": "rector --verbose --verbose"
   },
   "version": "2.1.5"
