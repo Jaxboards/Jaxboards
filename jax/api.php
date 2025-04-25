@@ -23,7 +23,7 @@ final class API
 
     public function render(): void
     {
-        match ($this->jax->g['act'] ?? '') {
+        match($this->jax->g['act'] ?? '') {
             'searchmembers' => $this->searchmembers(),
             'emotes' => $this->emotes(),
             default => header('Location: /'),
@@ -46,9 +46,11 @@ final class API
                 ) . '%',
             ),
         );
-        while ($f = $this->database->arow($result)) {
-            $list[0][] = $f['id'];
-            $list[1][] = $f['display_name'];
+
+        $list = [[],[]];
+        while ($member = $this->database->arow($result)) {
+            $list[0][] = $member['id'];
+            $list[1][] = $member['display_name'];
         }
 
         echo json_encode($list);
