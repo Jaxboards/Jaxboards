@@ -12,14 +12,14 @@ use Jax\User;
 
 use function header;
 
-final class Login
+final readonly class Login
 {
     public function __construct(
-        private readonly Config $config,
-        private readonly Database $database,
-        private readonly Jax $jax,
-        private readonly Page $page,
-        private readonly User $user,
+        private Config $config,
+        private Database $database,
+        private Jax $jax,
+        private Page $page,
+        private User $user,
     ) {}
 
     public function render(): void
