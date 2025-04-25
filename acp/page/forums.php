@@ -554,7 +554,7 @@ final readonly class Forums
                         $write,
                     );
 
-                    return $this->orderforums($this->database->insert_id());
+                    return $this->orderforums($this->database->insertId());
                 }
 
                 $this->database->safeupdate(
@@ -977,7 +977,7 @@ final readonly class Forums
                     $page .= $this->page->success(
                         'Category created.',
                     );
-                    $data['id'] = (int) $this->database->insert_id();
+                    $data['id'] = (int) $this->database->insertId();
                 }
 
                 $cdata = $data;

@@ -125,7 +125,7 @@ final class Database
         return $this->safequery($query, ...$vars);
     }
 
-    public function insert_id()
+    public function insertId()
     {
         if ($this->connection) {
             return $this->connection->insert_id;
@@ -332,8 +332,6 @@ final class Database
         // input
         $compiledQueryString = $queryString;
 
-        $connection = $this->connection;
-
         $typeString = '';
         $outArgs = [];
 
@@ -353,11 +351,7 @@ final class Database
                 $added_placeholders += mb_strlen($type) - 1;
 
                 foreach ($value as $singleValue) {
-                    if ($singleValue === null) {
-                        $singleValue = '';
-                    }
-
-                    $outArgs[] = $singleValue;
+                    $outArgs[] = $singleValue ?? '';
                 }
             } else {
                 $outArgs[] = $value;
@@ -366,9 +360,7 @@ final class Database
             $typeString .= $type;
         }
 
-        array_unshift($outArgs, $typeString);
-
-        $stmt = $connection->prepare($compiledQueryString);
+        $stmt = $this->connection->prepare($compiledQueryString);
         if ($this->debugMode) {
             $this->queryList[] = $compiledQueryString;
         }
@@ -385,7 +377,7 @@ final class Database
         }
 
         if ($args !== []) {
-            $stmt->bind_param(...$this->refValues($outArgs));
+            $stmt->bind_param(...$this->refValues([$typeString, ...$outArgs]));
         }
 
         if (!$stmt->execute()) {
@@ -449,16 +441,16 @@ final class Database
     public function evalue($value)
     {
         if (is_array($value)) {
-            $value = $value[0];
-        } elseif ($value === null) {
-            $value = 'NULL';
-        } else {
-            $value = is_int($value)
-                ? $value
-                : "'" . $this->escape($value) . "'";
+            return $value[0];
         }
 
-        return $value;
+        if ($value === null) {
+            return 'NULL';
+        }
+
+        return is_int($value)
+            ? $value
+            : "'" . $this->escape($value) . "'";
     }
 
     public function escape($a)
@@ -470,11 +462,8 @@ final class Database
         return addslashes((string) $a);
     }
 
-    public function safespecial(...$va_array): mixed
+    public function safespecial($format, $tablenames, ...$va_array): mixed
     {
-        $format = array_shift($va_array);
-        // Format.
-        $tablenames = array_shift($va_array);
         // Table names.
         $tempformat = str_replace('%t', '%s', $format);
 
@@ -486,10 +475,8 @@ final class Database
             ),
         );
 
-        array_unshift($va_array, $newformat);
-
         // Put the format string back.
-        return $this->safequery(...$va_array);
+        return $this->safequery($newformat, ...$va_array);
     }
 
     public function getUsersOnline(bool $canViewHiddenMembers = false)

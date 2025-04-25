@@ -1115,7 +1115,7 @@ final class UCP
                     [
                         'newmessage',
                         'You have a new message from ' . $this->user->get('display_name'),
-                        $this->database->insert_id(),
+                        $this->database->insertId(),
                     ],
                 ) . PHP_EOL;
                 $result = $this->database->safespecial(

@@ -197,7 +197,7 @@ final class LogReg
                     EOT
                 ,
                 ['stats'],
-                $this->database->insert_id(),
+                $this->database->insertId(),
             );
             $this->login($name, $pass1);
         } catch (Exception $e) {

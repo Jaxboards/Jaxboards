@@ -551,7 +551,7 @@ final readonly class Themes
                             'default' => 0,
                         ],
                         'WHERE `id`!=?',
-                        $this->database->insert_id(),
+                        $this->database->insertId(),
                     );
                 }
 

@@ -568,7 +568,7 @@ final class ModControls
                         . implode(',', $tids),
                 ],
             );
-            $tid = $this->database->insert_id();
+            $tid = $this->database->insertId();
             $this->database->safeupdate(
                 'posts',
                 [

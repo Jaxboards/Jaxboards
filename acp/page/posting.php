@@ -326,7 +326,7 @@ final readonly class Posting
                         'title' => $this->jax->p['title'],
                     ],
                 );
-                $niblets[$this->database->insert_id()] = [
+                $niblets[$this->database->insertId()] = [
                     'img' => $this->jax->p['img'],
                     'title' => $this->jax->p['title'],
                 ];
