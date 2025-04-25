@@ -161,36 +161,37 @@ final class Database
         return null;
     }
 
-    public function buildInsert($a): array
+    public function buildInsertQuery(string $tableName, array $tableData): string
     {
-        $r = [[], [[]]];
-        if (!isset($a[0]) || !is_array($a[0])) {
-            $a = [$a];
+        $columnNames = [];
+        $rows = [[]];
+
+        if (!isset($tableData[0]) || !is_array($tableData[0])) {
+            $tableData = [$tableData];
         }
 
-        foreach ($a as $k => $v) {
-            ksort($v);
-            foreach ($v as $k2 => $v2) {
-                if (is_string($v2) && mb_check_encoding($v2) !== 'UTF-8') {
-                    $v2 = mb_convert_encoding($v2, 'UTF-8', 'ISO-8859-1');
+        foreach ($tableData as $rowIndex => $row) {
+            ksort($row);
+            foreach ($row as $columnName => $value) {
+                if (is_string($value) && mb_check_encoding($value) !== 'UTF-8') {
+                    $value = mb_convert_encoding($value, 'UTF-8', 'ISO-8859-1');
                 }
 
-                if ($k === 0) {
-                    $r[0][] = $this->ekey($k2);
+                if ($rowIndex === 0) {
+                    $columnNames[] = $this->ekey($columnName);
                 }
 
-                $r[1][$k][] = $this->evalue($v2);
+                $rows[$rowIndex][] = $this->evalue($value);
             }
         }
 
-        $r[0] = implode(',', $r[0]);
-        foreach ($r[1] as $k => $v) {
-            $r[1][$k] = implode(',', $v);
+        foreach ($rows as $rowIndex => $rowData) {
+            $rows[$rowIndex] = implode(',', $rowData);
         }
 
-        $r[1] = '(' . implode('),(', $r[1]) . ')';
-
-        return $r;
+        return "INSERT INTO {$tableName}"
+            . ' (' . implode(',', $columnNames) . ')'
+            . ' VALUES (' . implode('),(', $rows) . ')';
     }
 
     public function safeupdate(

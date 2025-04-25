@@ -264,11 +264,7 @@ final readonly class Tools
                     // Only time I really want to use *.
                     $select = $this->database->safeselect('*', $f[0]);
                     while ($row = $this->database->arow($select)) {
-                        $insert = $this->database->buildInsert($row);
-                        $columns = $insert[0];
-                        $values = $insert[1];
-                        echo "INSERT INTO {$table} ({$columns}) "
-                            . "VALUES {$values};" . PHP_EOL;
+                        echo $this->database->buildInsertQuery($table, $row) . PHP_EOL;
                     }
 
                     echo PHP_EOL;
