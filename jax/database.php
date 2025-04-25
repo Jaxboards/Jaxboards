@@ -161,8 +161,10 @@ final class Database
         return null;
     }
 
-    public function buildInsertQuery(string $tableName, array $tableData): string
-    {
+    public function buildInsertQuery(
+        string $tableName,
+        array $tableData,
+    ): string {
         $columnNames = [];
         $rows = [[]];
 
@@ -173,7 +175,10 @@ final class Database
         foreach ($tableData as $rowIndex => $row) {
             ksort($row);
             foreach ($row as $columnName => $value) {
-                if (is_string($value) && mb_check_encoding($value) !== 'UTF-8') {
+                if (
+                    is_string($value)
+                    && mb_check_encoding($value) !== 'UTF-8'
+                ) {
                     $value = mb_convert_encoding($value, 'UTF-8', 'ISO-8859-1');
                 }
 
