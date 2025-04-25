@@ -72,6 +72,9 @@ final class Session
         private readonly Database $database,
         private readonly User $user,
     ) {
+    }
+
+    public function fetchSessionData() {
         $this->data = $this->getSess($_SESSION['sid'] ?? null);
         if (!isset($this->data['vars'])) {
             $this->data['vars'] = serialize([]);
@@ -87,6 +90,8 @@ final class Session
 
     public function loginWithToken(): ?int
     {
+        $this->fetchSessionData();
+
         if ($this->is_bot) {
             return null;
         }
