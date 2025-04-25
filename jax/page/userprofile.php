@@ -389,7 +389,10 @@ final class UserProfile
                     isset($this->jax->p['comment'])
                     && $this->jax->p['comment'] !== ''
                 ) {
-                    if ($this->user->isGuest() || !$this->user->getPerm('can_add_comments')) {
+                    if (
+                        $this->user->isGuest()
+                        || !$this->user->getPerm('can_add_comments')
+                    ) {
                         $e = 'No permission to add comments!';
                     } else {
                         $this->database->safeinsert(
@@ -418,7 +421,10 @@ final class UserProfile
                     }
                 }
 
-                if (!$this->user->isGuest() && $this->user->getPerm('can_add_comments')) {
+                if (
+                    !$this->user->isGuest()
+                    && $this->user->getPerm('can_add_comments')
+                ) {
                     $pfbox = $this->page->meta(
                         'userprofile-comment-form',
                         $this->user->get('name') ?? '',

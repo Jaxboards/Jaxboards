@@ -417,7 +417,13 @@ final class IDX
         $nummembers = 0;
 
         foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $user) {
-            if (!empty($user['uid']) || (isset($user['is_bot']) && $user['is_bot'])) {
+            if (
+                !empty($user['uid'])
+                || (
+                    isset($user['is_bot'])
+                    && $user['is_bot']
+                )
+            ) {
                 $title = $this->textFormatting->blockhtml(
                     $this->jax->pick($user['location_verbose'], 'Viewing the board.'),
                 );

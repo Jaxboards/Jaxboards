@@ -294,7 +294,10 @@ final readonly class BuddyList
 
     public function setstatus($status): void
     {
-        if ($this->user->isGuest() || $this->user->get('usertitle') === $status) {
+        if (
+            $this->user->isGuest()
+            || $this->user->get('usertitle') === $status
+        ) {
             return;
         }
 

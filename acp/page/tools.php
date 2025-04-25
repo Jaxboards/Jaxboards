@@ -10,6 +10,7 @@ use Jax\Database;
 use Jax\Jax;
 use SplFileObject;
 
+use function array_map;
 use function array_pop;
 use function array_reverse;
 use function count;

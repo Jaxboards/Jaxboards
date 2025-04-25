@@ -228,7 +228,10 @@ final class Topic
 
     public function viewtopic($tid): void
     {
-        if (!$this->user->isGuest() && $this->topicdata['lp_date'] > $this->user->get('last_visit')) {
+        if (
+            !$this->user->isGuest()
+            && $this->topicdata['lp_date'] > $this->user->get('last_visit')
+        ) {
             $this->markread($tid);
         }
 

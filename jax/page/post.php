@@ -451,10 +451,12 @@ onclick="this.form.submitButton=this"/></div>
 
     public function canedit($post): bool
     {
-        if ($post['auth_id']
+        if (
+            $post['auth_id']
             && ($post['newtopic'] ? $this->user->getPerm('can_edit_topics')
             : $this->user->getPerm('can_edit_posts'))
-            && $post['auth_id'] === $this->user->get('id')) {
+            && $post['auth_id'] === $this->user->get('id')
+        ) {
             return true;
         }
 

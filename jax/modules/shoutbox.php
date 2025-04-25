@@ -233,7 +233,10 @@ final class Shoutbox
                 $this->page->JS('addshout', $this->formatshout($f));
                 if ($this->config->getSetting('shoutboxsounds')) {
                     $sounds = [];
-                    if ($this->user->get('sound_shout') && $sounds[$f['shout']]) {
+                    if (
+                        $this->user->get('sound_shout')
+                        && $sounds[$f['shout']]
+                    ) {
                         $this->page->JS(
                             'playsound',
                             'sfx',

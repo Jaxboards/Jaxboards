@@ -730,7 +730,6 @@ final class UCP
                     'wysiwyg' => isset($this->jax->p['wysiwyg'])
                     && $this->jax->p['wysiwyg'] ? 1 : 0,
                 ]);
-
             }
 
             if ($e === '') {

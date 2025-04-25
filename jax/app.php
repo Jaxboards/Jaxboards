@@ -4,10 +4,37 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use Exception;
 use DI\Container;
+use Exception;
 
-class App
+use function array_pop;
+use function array_shift;
+use function file_exists;
+use function file_get_contents;
+use function glob;
+use function gmdate;
+use function header;
+use function htmlspecialchars_decode;
+use function in_array;
+use function ini_set;
+use function is_array;
+use function json_decode;
+use function json_encode;
+use function mb_strtolower;
+use function microtime;
+use function pathinfo;
+use function preg_match;
+use function property_exists;
+use function round;
+use function session_start;
+use function str_contains;
+
+use const ENT_QUOTES;
+use const JSON_OBJECT_AS_ARRAY;
+use const JSON_THROW_ON_ERROR;
+use const PATHINFO_FILENAME;
+
+final class App
 {
     /**
      * @var float
@@ -28,6 +55,46 @@ class App
     ) {
         $this->onLocalHost = in_array($this->ipAddress->asHumanReadable(), ['127.0.0.1', '::1'], true);
         $this->microtime = microtime(true);
+    }
+
+    public function render(): void
+    {
+        header('Cache-Control: no-cache, must-revalidate');
+
+        $this->connectDB();
+
+        $this->startSession();
+
+        $this->loadSkin();
+
+        // Set Navigation.
+        $this->renderNavigation();
+
+        if (!$this->page->jsaccess) {
+            $this->renderBaseHTML();
+        }
+
+        $this->setPageVars();
+
+        $this->loadModules();
+
+        $this->loadPageFromAction();
+
+        // Process temporary commands.
+        if ($this->page->jsaccess && $this->session->runonce) {
+            $this->page->JSRaw($this->session->runonce);
+            $this->session->runonce = '';
+        }
+
+        // Any changes to the session variables of the
+        // current user throughout the script are finally put into query form here.
+        $this->session->applyChanges();
+
+        if ($this->onLocalHost) {
+            $this->renderDebugInfo();
+        }
+
+        $this->page->out();
     }
 
     private function connectDB(): void
@@ -72,7 +139,11 @@ class App
         $this->user->getUser($userId);
 
         // Fix ip if necessary.
-        if (!$this->user->isGuest() && $this->session->ip && $this->session->ip !== $this->user->get('ip')) {
+        if (
+            !$this->user->isGuest()
+            && $this->session->ip
+            && $this->session->ip !== $this->user->get('ip')
+        ) {
             $this->user->set('ip', $this->ipAddress->asBinary());
         }
 
@@ -80,78 +151,45 @@ class App
         // If they're logged in through cookies, (username & password)
         // but the session variable has changed/been removed/not updated for some reason
         // this fixes it.
-        if (!$this->session->is_bot && $this->user->get('id') !== $this->session->uid) {
+        if (
+            !$this->session->is_bot
+            && $this->user->get('id') !== $this->session->uid
+        ) {
             $this->session->clean($this->user->get('id'));
             $this->session->uid = $this->user->get('id');
             $this->session->applychanges();
         }
 
         // If the user's navigated to a new page, change their action time.
-        if ($this->page->jsnewlocation || !$this->page->jsaccess) {
-            $this->session->act($this->jax->b['act'] ?? null);
-        }
-    }
-
-    public function render(): void
-    {
-        header('Cache-Control: no-cache, must-revalidate');
-
-        $this->connectDB();
-
-        $this->startSession();
-
-        $this->loadSkin();
-
-        // Set Navigation.
-        $this->renderNavigation();
-
-        if (!$this->page->jsaccess) {
-            $this->renderBaseHTML();
+        if (!$this->page->jsnewlocation && $this->page->jsaccess) {
+            return;
         }
 
-        $this->setPageVars();
-
-        $this->loadModules();
-
-        $this->loadPageFromAction();
-
-        // Process temporary commands.
-        if ($this->page->jsaccess && $this->session->runonce) {
-            $this->page->JSRaw($this->session->runonce);
-            $this->session->runonce = '';
-        }
-
-        // Any changes to the session variables of the
-        // current user throughout the script are finally put into query form here.
-        $this->session->applyChanges();
-
-        if ($this->onLocalHost) {
-            $this->renderDebugInfo();
-        }
-
-        $this->page->out();
+        $this->session->act($this->jax->b['act'] ?? null);
     }
 
     private function loadModules(): void
     {
         $modules = glob('jax/modules/*.php');
-        if ($modules) {
-            foreach ($modules as $module) {
-                $moduleName = pathinfo($module, PATHINFO_FILENAME);
+        if (!$modules) {
+            return;
+        }
 
-                $module = $this->container->get('Jax\Modules\\' . $moduleName);
+        foreach ($modules as $module) {
+            $moduleName = pathinfo($module, PATHINFO_FILENAME);
 
-                if (
-                    property_exists($module, 'TAG') && !(!(
-                        isset($this->jax->b['module'])
-                    && $this->jax->b['module'] === $moduleName
-                    ) && !$this->page->templatehas($moduleName))
-                ) {
-                    continue;
-                }
+            $module = $this->container->get('Jax\Modules\\' . $moduleName);
 
-                $module->init();
+            if (
+                property_exists($module, 'TAG') && !(!(
+                    isset($this->jax->b['module'])
+                && $this->jax->b['module'] === $moduleName
+                ) && !$this->page->templatehas($moduleName))
+            ) {
+                continue;
             }
+
+            $module->init();
         }
     }
 
@@ -182,7 +220,11 @@ class App
             $act = $actdefs[$act];
         }
 
-        if ($act === 'idx' && isset($this->jax->b['module']) && $this->jax->b['module']) {
+        if (
+            $act === 'idx'
+            && isset($this->jax->b['module'])
+            && $this->jax->b['module']
+        ) {
             // Do nothing.
         } elseif ($act && file_exists('jax/page/' . $act . '.php')) {
             $page = $this->container->get('Jax\Page\\' . $act);
@@ -233,15 +275,20 @@ class App
             }
         }
 
-        if (isset($this->session->vars['skin_id']) && $this->session->vars['skin_id']) {
-            $this->page->append(
-                'NAVIGATION',
-                '<div class="success" '
-                . 'style="position:fixed;bottom:0;left:0;width:100%;">'
-                . 'Skin UCP setting being overridden. '
-                . '<a href="?skin_id=0">Revert</a></div>',
-            );
+        if (
+            !isset($this->session->vars['skin_id'])
+            || !$this->session->vars['skin_id']
+        ) {
+            return;
         }
+
+        $this->page->append(
+            'NAVIGATION',
+            '<div class="success" '
+            . 'style="position:fixed;bottom:0;left:0;width:100%;">'
+            . 'Skin UCP setting being overridden. '
+            . '<a href="?skin_id=0">Revert</a></div>',
+        );
     }
 
     private function renderBaseHTML(): void
@@ -279,7 +326,10 @@ class App
             '<link rel="stylesheet" type="text/css" href="' . THEMEPATHURL . 'css.css">'
             . '<link rel="preload" as="style" type="text/css" href="./Service/wysiwyg.css" onload="this.onload=null;this.rel=\'stylesheet\'" />',
         );
-        if ($this->page->meta('favicon') !== '' && $this->page->meta('favicon') !== '0') {
+        if (
+            $this->page->meta('favicon') !== ''
+            && $this->page->meta('favicon') !== '0'
+        ) {
             $this->page->append(
                 'CSS',
                 '<link rel="icon" href="' . $this->page->meta('favicon') . '">',
@@ -411,9 +461,11 @@ class App
                 'JaxBoards',
             ),
         );
-        if ($this->page->jsnewlocation) {
-            $this->page->JS('title', htmlspecialchars_decode((string) $this->page->get('TITLE'), ENT_QUOTES));
+        if (!$this->page->jsnewlocation) {
+            return;
         }
+
+        $this->page->JS('title', htmlspecialchars_decode((string) $this->page->get('TITLE'), ENT_QUOTES));
     }
 
     private function setPageVars(): void
@@ -427,13 +479,15 @@ class App
         $this->page->addvar('acplink', $this->user->getPerm('can_access_acp') ? $this->page->meta('acplink') : '');
         $this->page->addvar('boardname', $this->config->getSetting('boardname'));
 
-        if (!$this->user->isGuest()) {
-            $this->page->addvar('groupid', (string) $this->jax->pick($this->user->get('group_id'), 3));
-            $this->page->addvar('userposts', (string) $this->user->get('posts'));
-            $this->page->addvar('grouptitle', $this->user->getPerm('title'));
-            $this->page->addvar('avatar', $this->jax->pick($this->user->get('avatar'), $this->page->meta('default-avatar')));
-            $this->page->addvar('username', $this->user->get('display_name'));
-            $this->page->addvar('userid', (string) $this->jax->pick($this->user->get('id'), 0));
+        if ($this->user->isGuest()) {
+            return;
         }
+
+        $this->page->addvar('groupid', (string) $this->jax->pick($this->user->get('group_id'), 3));
+        $this->page->addvar('userposts', (string) $this->user->get('posts'));
+        $this->page->addvar('grouptitle', $this->user->getPerm('title'));
+        $this->page->addvar('avatar', $this->jax->pick($this->user->get('avatar'), $this->page->meta('default-avatar')));
+        $this->page->addvar('username', $this->user->get('display_name'));
+        $this->page->addvar('userid', (string) $this->jax->pick($this->user->get('id'), 0));
     }
 }
