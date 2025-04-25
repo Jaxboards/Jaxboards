@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Jax;
 
 use DI\Container;
-use Exception;
 
 use function array_pop;
 use function array_shift;

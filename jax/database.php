@@ -53,7 +53,8 @@ final class Database
 
     private string $prefix = '';
 
-    public function __construct(private readonly Config $config) {
+    public function __construct(private readonly Config $config)
+    {
         try {
             if ($this->config->getServiceConfig()) {
                 $this->connect(

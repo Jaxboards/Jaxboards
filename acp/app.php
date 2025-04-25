@@ -6,7 +6,6 @@ namespace ACP;
 
 use DI\Container;
 use Jax\Config;
-use Jax\Database;
 use Jax\Jax;
 use Jax\User;
 
@@ -27,13 +26,13 @@ final readonly class App
     public function __construct(
         private Config $config,
         private Container $container,
-        private Database $database,
         private Jax $jax,
         private Page $page,
         private User $user,
     ) {}
 
-    public function render(): void {
+    public function render(): void
+    {
         $this->startSession();
 
         if (isset($_SESSION['auid'])) {
@@ -134,16 +133,5 @@ final readonly class App
         ini_set('session.use_cookies', 1);
         ini_set('session.use_only_cookies', 1);
         session_start();
-    }
-
-    private function connectDB(): void
-    {
-        $this->database->connect(
-            $this->config->getSetting('sql_host'),
-            $this->config->getSetting('sql_username'),
-            $this->config->getSetting('sql_password'),
-            $this->config->getSetting('sql_db'),
-            $this->config->getSetting('sql_prefix'),
-        );
     }
 }

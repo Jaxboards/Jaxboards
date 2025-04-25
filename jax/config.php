@@ -7,6 +7,7 @@ namespace Jax;
 use function array_key_exists;
 use function array_merge;
 use function defined;
+use function file_exists;
 use function file_put_contents;
 use function json_encode;
 
