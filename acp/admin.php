@@ -6,6 +6,7 @@ use ACP\Page;
 use DI\Container;
 use Jax\Config;
 use Jax\Database;
+use Jax\DomainDefinitions;
 use Jax\Jax;
 use Jax\User;
 
@@ -30,7 +31,7 @@ if (!defined('JAXBOARDS_ROOT')) {
 require_once JAXBOARDS_ROOT . '/jax/autoload.php';
 $container = new Container();
 
-require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
+$container->get(DomainDefinitions::class)->defineConstants();
 
 $CFG = $container->get(Config::class)->get();
 

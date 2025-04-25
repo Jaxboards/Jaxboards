@@ -5,6 +5,7 @@ declare(strict_types=1);
 use DI\Container;
 use Jax\Config;
 use Jax\Database;
+use Jax\DomainDefinitions;
 use Jax\TextFormatting;
 
 define('JAXBOARDS_ROOT', dirname(__DIR__));
@@ -23,7 +24,7 @@ $DB->connect(
     $CFG['sql_prefix'],
 );
 
-require_once JAXBOARDS_ROOT . '/domaindefinitions.php';
+$container->get(DomainDefinitions::class)->defineConstants();
 
 $list = [[], []];
 

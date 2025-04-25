@@ -10,7 +10,6 @@
 >
     <projectFiles>
         <file name="index.php" />
-        <file name="domaindefinitions.php" />
         <file name="config.default.php" />
         <directory name="acp" />
         <directory name="api" />

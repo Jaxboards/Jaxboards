@@ -55,7 +55,7 @@ final class TextFormatting
      */
     private $emotes = [];
 
-    private string $emotepack = '';
+    private ?string $emotePack = null;
 
     /**
      * Emotes from the emote pack.
@@ -70,7 +70,7 @@ final class TextFormatting
         private readonly User $user,
     ) {
         // Preload custom rules and emojis
-        $this->getEmotePackRules($this->config->getSetting('emotepack'));
+        $this->getEmotePackRules();
         $this->getCustomRules();
     }
 
@@ -104,17 +104,19 @@ final class TextFormatting
         return $this->emotes;
     }
 
-    public function getEmotePackRules(string $emotepack)
+    public function getEmotePackRules(?string $emotePack = null)
     {
-        if ($this->emotepack === $emotepack && $this->emotePackRules) {
+        $emotePack = $emotePack ?: $this->config->getSetting('emotepack');
+
+        if ($this->emotePack === $emotePack && $this->emotePackRules) {
             return $this->emotePackRules;
         }
 
         // Load emoticon pack.
         $emotes = [];
-        if ($emotepack !== '' && $emotepack !== '0') {
-            $this->emotepack = $emotepack;
-            $rulesPath = JAXBOARDS_ROOT . '/emoticons/' . $emotepack . '/rules.php';
+        if ($emotePack !== null) {
+            $this->emotePack = $emotePack;
+            $rulesPath = JAXBOARDS_ROOT . '/emoticons/' . $emotePack . '/rules.php';
 
             if (file_exists($rulesPath)) {
                 require_once $rulesPath;
@@ -126,7 +128,7 @@ final class TextFormatting
                 $this->emotePackRules = $rules;
 
                 foreach ($rules as $emote => $path) {
-                    $emotes[$emote] = 'emoticons/' . $emotepack . '/' . $path;
+                    $emotes[$emote] = 'emoticons/' . $emotePack . '/' . $path;
                 }
             }
         }

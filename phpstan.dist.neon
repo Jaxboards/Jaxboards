@@ -17,7 +17,6 @@ parameters:
     - acp
     - api
     - config.default.php
-    - domaindefinitions.php
     - jax
     - tools
     - index.php
