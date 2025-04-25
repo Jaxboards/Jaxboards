@@ -30,15 +30,10 @@ function pathjoin(string ...$paths): ?string
 
 final class DomainDefinitions
 {
-    private bool $definedAlready = false;
-
     public function __construct(private readonly Config $config) {}
 
     public function defineConstants(): void
     {
-        if ($this->definedAlready) {
-            return;
-        }
         $this->definedAlready = true;
 
         $serviceConfig = $this->config->getServiceConfig();
