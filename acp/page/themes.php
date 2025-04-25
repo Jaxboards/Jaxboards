@@ -7,6 +7,7 @@ namespace ACP\Page;
 use ACP\Page;
 use Jax\Config;
 use Jax\Database;
+use Jax\DomainDefinitions;
 use Jax\Jax;
 use Jax\TextFormatting;
 
@@ -45,15 +46,22 @@ use const PHP_EOL;
  */
 final readonly class Themes
 {
-    private const WRAPPERS_PATH = BOARDPATH . 'Wrappers/';
+    private string $wrappersPath;
+    private string $boardPath;
+    private string $themesPath;
 
     public function __construct(
         private Config $config,
         private Database $database,
+        private DomainDefinitions $domainDefinitions,
         private Jax $jax,
         private Page $page,
         private TextFormatting $textFormatting,
-    ) {}
+    ) {
+        $this->boardPath = $this->domainDefinitions->getBoardPath();
+        $this->wrappersPath = $this->boardPath . 'Wrappers/';
+        $this->themesPath = $this->boardPath . 'Themes/';
+    }
 
     public function render(): void
     {
@@ -113,7 +121,7 @@ final readonly class Themes
     public function getwrappers(): array
     {
         $wrappers = [];
-        $o = opendir(self::WRAPPERS_PATH);
+        $o = opendir($this->wrappersPath);
         while ($f = readdir($o)) {
             if ($f === '.') {
                 continue;
@@ -140,12 +148,12 @@ final readonly class Themes
             isset($this->jax->g['deletewrapper'])
             && $this->jax->g['deletewrapper']
         ) {
-            $wrapperPath = self::WRAPPERS_PATH . $this->jax->g['deletewrapper'] . '.html';
+            $wrapperPath = $this->wrappersPath . $this->jax->g['deletewrapper'] . '.html';
             if (
                 !preg_match('@[^\w ]@', (string) $this->jax->g['deletewrapper'])
                 && file_exists($wrapperPath)
             ) {
-                unlink(self::WRAPPERS_PATH . $this->jax->g['deletewrapper'] . '.html');
+                unlink($this->wrappersPath . $this->jax->g['deletewrapper'] . '.html');
                 $this->page->location('?act=themes');
             } else {
                 $errorwrapper
@@ -158,7 +166,7 @@ final readonly class Themes
             && $this->jax->p['newwrapper']
         ) {
             $newWrapperPath
-                = self::WRAPPERS_PATH . $this->jax->p['newwrapper'] . '.html';
+                = $this->wrappersPath . $this->jax->p['newwrapper'] . '.html';
             if (preg_match('@[^\w ]@', (string) $this->jax->p['newwrapper'])) {
                 $errorwrapper
                     = 'Wrapper name must consist of letters, numbers, '
@@ -230,7 +238,7 @@ final readonly class Themes
                         continue;
                     }
 
-                    if (!is_dir(BOARDPATH . 'Themes/' . $k)) {
+                    if (!is_dir($this->themesPath . $k)) {
                         continue;
                     }
 
@@ -242,7 +250,7 @@ final readonly class Themes
                             Skin name must consist of letters, numbers, spaces, and underscore, and be
                             under 50 characters long.
                             EOT;
-                    } elseif (is_dir(BOARDPATH . 'Themes/' . $v)) {
+                    } elseif (is_dir($this->themesPath . $v)) {
                         $errorskins = 'That skin name is already being used.';
                     } else {
                         $this->database->safeupdate(
@@ -253,7 +261,7 @@ final readonly class Themes
                             'WHERE `title`=? AND `custom`=1',
                             $this->database->basicvalue($k),
                         );
-                        rename(BOARDPATH . 'Themes/' . $k, BOARDPATH . 'Themes/' . $v);
+                        rename($this->themesPath . $k, $this->themesPath . $v);
                     }
                 }
             }
@@ -271,7 +279,7 @@ final readonly class Themes
                         continue;
                     }
 
-                    if (!is_file(self::WRAPPERS_PATH . $k . '.html')) {
+                    if (!is_file($this->wrappersPath . $k . '.html')) {
                         continue;
                     }
 
@@ -283,7 +291,7 @@ final readonly class Themes
                             Wrapper name must consist of letters, numbers, spaces, and underscore, and be
                             under 50 characters long.
                             EOT;
-                    } elseif (is_file(self::WRAPPERS_PATH . $v . '.html')) {
+                    } elseif (is_file($this->wrappersPath . $v . '.html')) {
                         $errorwrapper = 'That wrapper name is already being used.';
                     } else {
                         $this->database->safeupdate(
@@ -295,8 +303,8 @@ final readonly class Themes
                             $this->database->basicvalue($k),
                         );
                         rename(
-                            self::WRAPPERS_PATH . $k . '.html',
-                            self::WRAPPERS_PATH . $v . '.html',
+                            $this->wrappersPath . $k . '.html',
+                            $this->wrappersPath . $v . '.html',
                         );
                     }
 
@@ -445,7 +453,7 @@ final readonly class Themes
         }
 
         if ($skin && $skin['custom'] && $this->jax->p['newskindata']) {
-            $o = fopen(BOARDPATH . 'Themes/' . $skin['title'] . '/css.css', 'w');
+            $o = fopen($this->themesPath . $skin['title'] . '/css.css', 'w');
             fwrite($o, (string) $this->jax->p['newskindata']);
             fclose($o);
         }
@@ -459,7 +467,7 @@ final readonly class Themes
                         file_get_contents(
                             (
                                 $skin['custom']
-                                ? BOARDPATH . 'Themes/' : STHEMEPATH
+                                ? $this->themesPath : $this->domainDefinitions->getServiceThemePath()
                             ) . $skin['title'] . '/css.css',
                         ),
                     ),
@@ -474,7 +482,7 @@ final readonly class Themes
     public function editwrapper($wrapper): void
     {
         $saved = '';
-        $wrapperf = self::WRAPPERS_PATH . $wrapper . '.html';
+        $wrapperf = $this->wrappersPath . $wrapper . '.html';
         if (preg_match('@[^ \w]@', (string) $wrapper) && !is_file($wrapperf)) {
             $this->page->addContentBox(
                 'Error',
@@ -524,7 +532,7 @@ final readonly class Themes
                 $e = 'Skinname must only consist of letters, numbers, and spaces.';
             } elseif (mb_strlen((string) $this->jax->p['skinname']) > 50) {
                 $e = 'Skin name must be less than 50 characters.';
-            } elseif (is_dir(BOARDPATH . 'Themes/' . $this->jax->p['skinname'])) {
+            } elseif (is_dir($this->themesPath . $this->jax->p['skinname'])) {
                 $e = 'A skin with that name already exists.';
             } elseif (!in_array($this->jax->p['wrapper'], $this->getwrappers())) {
                 $e = 'Invalid wrapper.';
@@ -558,14 +566,14 @@ final readonly class Themes
                     );
                 }
 
-                if (!is_dir(BOARDPATH . 'Themes') && is_writable(BOARDPATH)) {
-                    mkdir(BOARDPATH . 'Themes');
+                if (!is_dir($this->boardPath . 'Themes') && is_writable($this->boardPath)) {
+                    mkdir($this->boardPath . 'Themes');
                 }
 
-                if (is_dir(BOARDPATH . 'Themes')) {
-                    mkdir(BOARDPATH . 'Themes');
-                    mkdir(BOARDPATH . 'Themes/' . $this->jax->p['skinname']);
-                    $o = fopen(BOARDPATH . 'Themes/' . $this->jax->p['skinname'] . '/css.css', 'w');
+                if (is_dir($this->boardPath . 'Themes')) {
+                    mkdir($this->boardPath . 'Themes');
+                    mkdir($this->themesPath . $this->jax->p['skinname']);
+                    $o = fopen($this->themesPath . $this->jax->p['skinname'] . '/css.css', 'w');
                     fwrite(
                         $o,
                         file_get_contents(
@@ -614,7 +622,7 @@ final readonly class Themes
         );
         $skin = $this->database->arow($result);
         $this->database->disposeresult($result);
-        $skindir = BOARDPATH . 'Themes/' . $skin['title'];
+        $skindir = $this->themesPath . $skin['title'];
         if (is_dir($skindir)) {
             foreach (glob($skindir . '/*') as $v) {
                 unlink($v);

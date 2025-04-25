@@ -18,25 +18,14 @@ use const JSON_PRETTY_PRINT;
  */
 final class Config
 {
+    function __construct(
+        private ServiceConfig $serviceConfig,
+        private DomainDefinitions $domainDefinitions,
+    ){}
+
     public function get(): array
     {
-        return array_merge(self::getServiceConfig(), self::getBoardConfig(), self::override());
-    }
-
-    public function getServiceConfig()
-    {
-        static $serviceConfig = null;
-
-        if ($serviceConfig) {
-            return $serviceConfig;
-        }
-
-        if (file_exists(JAXBOARDS_ROOT . '/config.php')) {
-            require_once JAXBOARDS_ROOT . '/config.php';
-            $serviceConfig = $CFG;
-        }
-
-        return $serviceConfig;
+        return array_merge($this->serviceConfig->get(), $this::getBoardConfig());
     }
 
     public function getBoardConfig($write = null)
@@ -51,13 +40,14 @@ final class Config
             return $boardConfig;
         }
 
-        if (!defined('BOARDPATH')) {
+        $boardPath = $this->domainDefinitions->getBoardPath();
+        if (!$boardPath) {
             $boardConfig = ['noboard' => 1];
 
             return $boardConfig;
         }
 
-        require_once BOARDPATH . '/config.php';
+        require_once $boardPath . '/config.php';
 
         return $boardConfig = $CFG;
     }
@@ -71,17 +61,6 @@ final class Config
         }
 
         return null;
-    }
-
-    public function override($override = null)
-    {
-        static $overrideConfig = [];
-
-        if ($override) {
-            $overrideConfig = $override;
-        }
-
-        return $overrideConfig;
     }
 
     public function write($data): void

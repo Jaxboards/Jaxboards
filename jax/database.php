@@ -54,16 +54,17 @@ final class Database
 
     private string $prefix = '';
 
-    public function __construct(private readonly Config $config)
+    public function __construct(private readonly ServiceConfig $serviceConfig)
     {
         try {
-            if ($this->config->getServiceConfig()) {
+            $serviceConfig = $this->serviceConfig->get();
+            if ($this->serviceConfig->get()) {
                 $this->connect(
-                    $this->config->getSetting('sql_host'),
-                    $this->config->getSetting('sql_username'),
-                    $this->config->getSetting('sql_password'),
-                    $this->config->getSetting('sql_db'),
-                    $this->config->getSetting('sql_prefix'),
+                    $serviceConfig['sql_host'],
+                    $serviceConfig['sql_username'],
+                    $serviceConfig['sql_password'],
+                    $serviceConfig['sql_db'],
+                    $serviceConfig['sql_prefix'],
                 );
             }
         } catch (Exception $e) {
@@ -480,7 +481,7 @@ final class Database
             return $usersOnlineCache;
         }
 
-        $idletimeout = time() - ($this->config->getSetting('timetoidle') ?? 300);
+        $idletimeout = time() - ($this->serviceConfig->getSetting('timetoidle') ?? 300);
         $usersOnlineCache = [];
 
         $result = $this->safespecial(
@@ -505,7 +506,7 @@ final class Database
                 EOT
             ,
             ['session', 'members'],
-            $this->datetime(time() - $this->config->getSetting('timetologout')),
+            $this->datetime(time() - $this->serviceConfig->getSetting('timetologout')),
         );
         $today = gmdate('n j');
         while ($user = $this->arow($result)) {

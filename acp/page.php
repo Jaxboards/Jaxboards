@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ACP;
 
+use Jax\DomainDefinitions;
+
 use Exception;
 
 use function error_log;
@@ -25,6 +27,10 @@ use const PHP_EOL;
  */
 final class Page
 {
+    public function __construct(
+        private DomainDefinitions $domainDefinitions,
+    ){}
+
     public $parts = [
         'content' => '',
         'sidebar' => '',
@@ -125,10 +131,11 @@ final class Page
                 'nav_dropdowns' => $this->partparts['navdropdowns'],
             ],
         );
-        $data['css_url'] = BOARDURL . 'acp/css/css.css';
-        $data['bbcode_css_url'] = BOARDURL . 'Service/Themes/Default/bbcode.css';
-        $data['themes_css_url'] = BOARDURL . 'acp/css/themes.css';
-        $data['admin_js_url'] = BOARDURL . 'dist/acp.js';
+        $boardUrl = $this->domainDefinitions->getBoardUrl();
+        $data['css_url'] = $boardUrl . 'acp/css/css.css';
+        $data['bbcode_css_url'] = $boardUrl . 'Service/Themes/Default/bbcode.css';
+        $data['themes_css_url'] = $boardUrl . 'acp/css/themes.css';
+        $data['admin_js_url'] = $boardUrl . 'dist/acp.js';
 
         echo $this->parseTemplate(
             'admin.html',

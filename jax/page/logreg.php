@@ -49,6 +49,7 @@ final class LogReg
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
+        private readonly DomainDefinitions $domainDefinitions,
         private readonly IPAddress $ipAddress,
         private readonly Jax $jax,
         private readonly Page $page,
@@ -467,7 +468,7 @@ final class LogReg
                             'uid' => $udata['id'],
                         ],
                     );
-                    $link = BOARDURL . '?act=logreg6&uid='
+                    $link = $this->domainDefinitions->getBoardUrl() . '?act=logreg6&uid='
                         . $udata['id'] . '&id=' . rawurlencode($forgotpasswordtoken);
                     $mailResult = $this->jax->mail(
                         $udata['email'],

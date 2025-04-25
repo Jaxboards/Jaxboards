@@ -67,6 +67,7 @@ final class TextFormatting
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
+        private readonly DomainDefinitions $domainDefinitions,
         private readonly User $user,
     ) {
         // Preload custom rules and emojis
@@ -416,7 +417,7 @@ final class TextFormatting
         }
 
         if ($ext !== '') {
-            $attachmentURL = BOARDPATHURL . '/Uploads/' . $file['hash'] . '.' . $ext;
+            $attachmentURL = $this->domainDefinitions->getBoardPathUrl() . '/Uploads/' . $file['hash'] . '.' . $ext;
 
             return "<a href='{$attachmentURL}'>"
                 . "<img src='{$attachmentURL}' alt='attachment' class='bbcodeimg' />"

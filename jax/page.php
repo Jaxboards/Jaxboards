@@ -129,6 +129,7 @@ final class Page
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
+        private readonly DomainDefinitions $domainDefinitions,
         private readonly Jax $jax,
         private readonly Session $session,
     ) {
@@ -339,20 +340,20 @@ final class Page
             ];
         }
 
-        $t = ($skin['custom'] ? BOARDPATH : '') . 'Themes/' . $skin['title'] . '/';
-        $turl = ($skin['custom'] ? BOARDPATHURL : '') . 'Themes/' . $skin['title'] . '/';
+        $t = ($skin['custom'] ? $this->domainDefinitions->getBoardPath() : '') . 'Themes/' . $skin['title'] . '/';
+        $turl = ($skin['custom'] ? $this->domainDefinitions->boardPathUrl() : '') . 'Themes/' . $skin['title'] . '/';
         if (is_dir($t)) {
             define('THEMEPATH', $t);
             define('THEMEPATHURL', $turl);
         } else {
             define('THEMEPATH', JAXBOARDS_ROOT . '/' . $this->config->getSetting('dthemepath'));
-            define('THEMEPATHURL', BOARDURL . $this->config->getSetting('dthemepath'));
+            define('THEMEPATHURL', $this->domainDefinitions->getBoardUrl() . $this->config->getSetting('dthemepath'));
         }
 
         define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . $this->config->getSetting('dthemepath'));
         $this->loadtemplate(
             $skin['wrapper']
-            ? BOARDPATH . 'Wrappers/' . $skin['wrapper'] . '.html'
+            ? $this->domainDefinitions->getBoardPath() . 'Wrappers/' . $skin['wrapper'] . '.html'
             : THEMEPATH . 'wrappers.html',
         );
     }

@@ -7,6 +7,7 @@ namespace ACP\Page;
 use ACP\Page;
 use Jax\Config;
 use Jax\Database;
+use Jax\DomainDefinitions;
 use Jax\Jax;
 use Jax\User;
 
@@ -17,6 +18,7 @@ final readonly class Login
     public function __construct(
         private Config $config,
         private Database $database,
+        private DomainDefinitions $domainDefinitions,
         private Jax $jax,
         private Page $page,
         private User $user,
@@ -24,12 +26,13 @@ final readonly class Login
 
     public function render(): void
     {
+        $boardUrl = $this->domainDefinitions->getBoardUrl();
         $pageElements = [
             'board_name' => $this->config->getSetting('boardname'),
-            'board_url' => BOARDURL,
+            'board_url' => $boardUrl,
             'content' => '',
-            'css_url' => BOARDURL . 'acp/css/login.css',
-            'favicon_url' => BOARDURL . 'favicon.ico',
+            'css_url' => $boardUrl . 'acp/css/login.css',
+            'favicon_url' => $boardUrl . 'favicon.ico',
         ];
 
         if (isset($this->jax->p['submit'])) {

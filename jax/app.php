@@ -45,6 +45,7 @@ final class App
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
+        private readonly DomainDefinitions $domainDefinitions,
         private readonly IPAddress $ipAddress,
         private readonly Jax $jax,
         private readonly Page $page,
@@ -288,7 +289,7 @@ final class App
 
         $this->page->append(
             'SCRIPT',
-            '<script src="' . BOARDURL . 'dist/app.js" defer></script>',
+            '<script src="' . $this->domainDefinitions->getBoardUrl() . 'dist/app.js" defer></script>',
         );
 
         if ($this->user->getPerm('can_moderate') || $this->user->get('mod')) {
@@ -319,7 +320,7 @@ final class App
                 'logo',
                 $this->jax->pick(
                     $this->config->getSetting('logourl') ?? false,
-                    BOARDURL . 'Service/Themes/Default/img/logo.png',
+                    $this->domainDefinitions->getBoardUrl() . 'Service/Themes/Default/img/logo.png',
                 ),
             ),
         );

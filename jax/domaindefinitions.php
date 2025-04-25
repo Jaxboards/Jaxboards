@@ -31,45 +31,42 @@ function pathjoin(string ...$paths): ?string
 
 final class DomainDefinitions
 {
-    public function __construct(private readonly Config $config) {}
+    public string $boardUrl = '';
+    public string $soundsUrl = '';
+    public string $serviceThemePath = '';
+    public string $boardPath = '';
+    public string $boardPathUrl = '';
 
-    public function defineConstants(): void
-    {
-        // Running out of a webpage context, don't define anything
-        if (!array_key_exists('SERVER_NAME', $_SERVER)) {
-            return;
-        }
+    public function __construct(private readonly ServiceConfig $serviceConfig) {
+        $serviceConfig = $this->serviceConfig->get();
 
-        $this->definedAlready = true;
-
-        $serviceConfig = $this->config->getServiceConfig();
 
         // Figure out url.
-        $host = $_SERVER['SERVER_NAME'];
+        $host = $_SERVER['SERVER_NAME'] ?? $serviceConfig['domain'];
+        $port = $_SERVER['SERVER_PORT'] ?? '443';
+        $scheme = $_SERVER['REQUEST_SCHEME'] ?? 'https';
+
         // Build the url.
-        $boardURL = '//' . ($_SERVER['SERVER_NAME'] ?? $serviceConfig['domain']);
+        $boardURL = '//' . $host;
         if (
-            !($_SERVER['SERVER_PORT'] === '443' && $_SERVER['REQUEST_SCHEME'] === 'https')
-            && !($_SERVER['SERVER_PORT'] === '80' && $_SERVER['REQUEST_SCHEME'] === 'http')
+            !($port === '443' && $scheme === 'https')
+            && !($port === '80' && $scheme === 'http')
         ) {
-            $boardURL .= (isset($_SERVER['SERVER_PORT']) ? ':' . $_SERVER['SERVER_PORT'] : '');
+            $boardURL .= ($port ? ':' . $port : '');
         }
 
-        // phpcs:enable
-
-        define('BOARDURL', $boardURL . '/');
-        define('SOUNDSURL', pathjoin(BOARDURL, 'Sounds'));
+        $this->boardUrl = $boardURL . '/';
+        $this->soundUrl = pathjoin($this->boardUrl, 'Sounds');
 
         $domainMatch = str_replace('.', '\.', $serviceConfig['domain']);
 
-        $prefix = $serviceConfig['prefix'];
-
         // Get prefix.
+        $prefix = $serviceConfig['prefix'];
         if ($serviceConfig['service']) {
             preg_match('@(.*)\.' . $domainMatch . '@i', (string) $host, $matches);
             if (isset($matches[1]) && $matches[1]) {
                 $prefix = $matches[1];
-                $this->config->override([
+                $this->serviceConfig->override([
                     'prefix' => $prefix,
                     'sql_prefix' => $prefix . '_',
                 ]);
@@ -78,13 +75,29 @@ final class DomainDefinitions
             }
         }
 
-        define('STHEMEPATH', pathjoin(JAXBOARDS_ROOT, 'Service/Themes'));
+        $this->serviceThemePath = pathjoin(JAXBOARDS_ROOT, 'Service/Themes');
 
         if (!$prefix) {
             return;
         }
 
-        define('BOARDPATH', pathjoin(JAXBOARDS_ROOT, 'boards', $prefix));
-        define('BOARDPATHURL', BOARDURL . pathjoin('boards', $prefix));
+        $this->boardPath = pathjoin(JAXBOARDS_ROOT, 'boards', $prefix);
+        $this->boardPathURL = $this->boardUrl . pathjoin('boards', $prefix);
+    }
+
+    public function getBoardUrl(): string {
+        return $this->boardUrl;
+    }
+    public function getSoundsUrl(): string {
+        return $this->soundsUrl;
+    }
+    public function getServiceThemePath(): string {
+        return $this->serviceThemePath;
+    }
+    public function getBoardPath(): string {
+        return $this->boardPath;
+    }
+    public function getBoardPathUrl(): string {
+        return $this->boardPathUrl;
     }
 }

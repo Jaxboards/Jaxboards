@@ -7,6 +7,7 @@ namespace ACP\Page;
 use ACP\Page;
 use Jax\Config;
 use Jax\Database;
+use Jax\DomainDefinitions;
 use Jax\Jax;
 
 use function array_pop;
@@ -47,6 +48,7 @@ final readonly class Members
         private Config $config,
         private Page $page,
         private Database $database,
+        private DomainDefinitions $domainDefinitions,
         private Jax $jax,
     ) {}
 
@@ -867,11 +869,11 @@ final readonly class Members
             }
 
             $data = implode(PHP_EOL, $data);
-            $o = fopen(BOARDPATH . 'bannedips.txt', 'w');
+            $o = fopen($this->domainDefinitions->getBoardPath() . 'bannedips.txt', 'w');
             fwrite($o, $data);
             fclose($o);
-        } elseif (file_exists(BOARDPATH . 'bannedips.txt')) {
-            $data = file_get_contents(BOARDPATH . 'bannedips.txt');
+        } elseif (file_exists($this->domainDefinitions->getBoardPath() . 'bannedips.txt')) {
+            $data = file_get_contents($this->domainDefinitions->getBoardPath() . 'bannedips.txt');
         } else {
             $data = '';
         }

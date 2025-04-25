@@ -34,4 +34,3 @@ spl_autoload_register(static function ($className): void {
 });
 
 $container = new Container();
-$container->get(DomainDefinitions::class)->defineConstants();

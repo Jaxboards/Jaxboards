@@ -25,6 +25,7 @@ final readonly class IPAddress
     public function __construct(
         private Config $config,
         private Database $database,
+        private DomainDefinitions $domainDefinitions,
     ) {}
 
     public function asBinary(?string $ipAddress = null): false|string
@@ -67,8 +68,9 @@ final readonly class IPAddress
         if (!$ipBanCache) {
             $ipBanCache = [];
 
-            if (file_exists(BOARDPATH . '/bannedips.txt')) {
-                foreach (file(BOARDPATH . '/bannedips.txt') as $line) {
+            $boardPath = $this->domainDefinitions->getBoardPath();
+            if (file_exists($boardPath . '/bannedips.txt')) {
+                foreach (file($boardPath . '/bannedips.txt') as $line) {
                     $line = trim($line);
                     if ($line === '') {
                         continue;

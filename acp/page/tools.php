@@ -7,6 +7,7 @@ namespace ACP\Page;
 use ACP\Page;
 use Jax\Config;
 use Jax\Database;
+use Jax\DomainDefinitions;
 use Jax\Jax;
 use SplFileObject;
 
@@ -46,6 +47,7 @@ final readonly class Tools
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
+        private readonly DomainDefinitions $domainDefinitions,
         private readonly Page $page,
         private readonly Jax $jax,
     ) {}
@@ -201,7 +203,7 @@ final readonly class Tools
             }
 
             $file['name'] = in_array($ext, $this->config->getSetting('images')) ? '<a href="'
-                    . BOARDPATHURL . 'Uploads/' . $file['hash'] . '.' . $ext . '">'
+                    . $this->domainDefinitions->getBoardPathUrl() . 'Uploads/' . $file['hash'] . '.' . $ext . '">'
                     . $file['name'] . '</a>' : '<a href="../?act=download&id='
                     . $file['id'] . '">' . $file['name'] . '</a>';
 
