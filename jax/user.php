@@ -17,7 +17,8 @@ use const PASSWORD_DEFAULT;
 
 final class User
 {
-    private ?array $userData = null;
+    public ?array $userData = null;
+    public ?array $userPerms = null;
 
     public function __construct(
         private readonly Database $database,
@@ -169,11 +170,10 @@ final class User
 
     public function getPerms($groupId = null): ?array
     {
-        static $userPerms = null;
 
         if ($groupId === null) {
-            if ($userPerms !== null) {
-                return $userPerms;
+            if ($this->userPerms !== null) {
+                return $this->userPerms;
             }
 
             if ($this->userData) {
@@ -224,10 +224,10 @@ final class User
             $groupId ?? 3,
         );
         $retval = $this->database->arow($result);
-        $userPerms = $retval;
+        $this->userPerms = $retval;
         $this->database->disposeresult($result);
 
-        return $userPerms;
+        return $this->userPerms;
     }
 
     /**
@@ -258,12 +258,12 @@ final class User
         if ($permFlags !== null) {
             // Decode the bitflags
             return [
-                'poll' => $permFlags & 32,
-                'read' => $permFlags & 8,
-                'reply' => $permFlags & 2,
-                'start' => $permFlags & 4,
-                'upload' => $permFlags & 1,
-                'view' => $permFlags & 16,
+                'poll' => $permFlags & 32 ? 1 : 0,
+                'read' => $permFlags & 8 ? 1 : 0,
+                'reply' => $permFlags & 2 ? 1 : 0,
+                'start' => $permFlags & 4 ? 1 : 0,
+                'upload' => $permFlags & 1 ? 1 : 0,
+                'view' => $permFlags & 16 ? 1 : 0,
             ];
         }
 
