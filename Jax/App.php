@@ -7,8 +7,6 @@ namespace Jax;
 use DI\Container;
 
 use function array_pop;
-use function array_shift;
-use function file_exists;
 use function file_get_contents;
 use function glob;
 use function gmdate;
@@ -22,11 +20,9 @@ use function json_encode;
 use function mb_strtolower;
 use function microtime;
 use function pathinfo;
-use function preg_match;
 use function property_exists;
 use function round;
 use function session_start;
-use function str_contains;
 
 use const ENT_QUOTES;
 use const JSON_OBJECT_AS_ARRAY;
