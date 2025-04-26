@@ -119,7 +119,7 @@ final class Database
         string $table,
         string $where = '',
         ...$vars,
-    ) {
+    ): null|false|mysqli_result {
         // set new variable to not impact debug_backtrace value for inspecting
         // input
         $fieldsString = is_array($fields) ? implode(',', $fields) : $fields;
@@ -136,8 +136,10 @@ final class Database
         return $this->connection->insert_id;
     }
 
-    public function safeinsert(string $table, array $data)
-    {
+    public function safeinsert(
+        string $table,
+        array $data,
+    ): null|false|mysqli_result {
         if ($data !== [] && array_keys($data) !== []) {
             return $this->safequery(
                 'INSERT INTO ' . $this->ftable($table)
@@ -192,7 +194,7 @@ final class Database
         array $kvarray,
         string $whereFormat = '',
         ...$whereParams,
-    ) {
+    ): null|false|mysqli_result {
         if ($kvarray === []) {
             // Nothing to update.
             return null;
