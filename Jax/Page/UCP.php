@@ -40,7 +40,7 @@ final class UCP
 {
     private string $what = '';
 
-    private bool $runscript = false;
+    private ?string $runscript = null;
 
     private bool $shownucp = false;
 
