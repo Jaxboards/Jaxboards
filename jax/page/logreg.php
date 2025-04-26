@@ -262,7 +262,7 @@ final class LogReg
                 $perms = $this->user->getPerms($user['group_id']);
                 if ($this->registering) {
                     $this->page->JS('location', '/');
-                } elseif ($this->request->jsAccess() !== 0) {
+                } elseif ($this->request->isJSAccess()) {
                     $this->page->JS('reload');
                 } else {
                     $this->page->location('?');
@@ -303,7 +303,7 @@ final class LogReg
         $this->page->JS('update', 'userbox', $this->page->meta('userbox-logged-out'));
         $this->page->JS('softurl');
         $this->page->append('page', $this->page->meta('success', 'Logged out successfully'));
-        if ($this->request->jsAccess() !== 0) {
+        if ($this->request->isJSAccess()) {
             return;
         }
 
@@ -509,7 +509,7 @@ final class LogReg
 
             $page .= $this->page->meta(
                 'forgot-password-form',
-                $this->request->jsAccess() !== 0
+                $this->request->isJSAccess()
                 ? $this->jax->hiddenFormFields(
                     [
                         'act' => 'logreg6',

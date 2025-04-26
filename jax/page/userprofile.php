@@ -579,7 +579,7 @@ final class UserProfile
 
         if (
             $this->request->both('page') !== null
-            && $this->request->jsAccess()
+            && $this->request->isJSAccess()
             && !$this->request->isJSDirectLink()
         ) {
             $this->page->JS('update', 'pfbox', $pfbox);

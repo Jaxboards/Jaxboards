@@ -715,7 +715,7 @@ final class UCP
             }
 
             if ($error === null) {
-                if ($this->request->jsAccess() !== 0) {
+                if ($this->request->isJSAccess()) {
                     $this->page->JS('reload');
 
                     return;

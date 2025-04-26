@@ -47,9 +47,14 @@ final class Request
         return $_POST !== [];
     }
 
-    public function jsAccess(): int
+    private function jsAccess(): int
     {
         return $_SERVER['HTTP_X_JSACCESS'] ?? 0;
+    }
+
+    public function isJSAccess(): bool
+    {
+        return $this->jsAccess() !== 0;
     }
 
     public function isJSUpdate(): bool

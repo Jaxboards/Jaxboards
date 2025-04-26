@@ -444,7 +444,7 @@ final class Search
 
         $page = $this->page->meta('box', '', 'Search Results - ' . $pages, $page);
 
-        if ($this->request->jsAccess() && !$this->request->isJSDirectLink()) {
+        if ($this->request->isJSAccess() && !$this->request->isJSDirectLink()) {
             $this->page->JS('update', 'searchresults', $page);
         } else {
             $this->form($page);

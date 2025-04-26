@@ -71,7 +71,7 @@ final class App
         // Set Navigation.
         $this->renderNavigation();
 
-        if ($this->request->jsAccess() === 0) {
+        if (!$this->request->isJSAccess()) {
             $this->renderBaseHTML();
         }
 
@@ -82,7 +82,7 @@ final class App
         $this->loadPageFromAction();
 
         // Process temporary commands.
-        if ($this->request->jsAccess() && $this->session->get('runonce')) {
+        if ($this->request->isJSAccess() && $this->session->get('runonce')) {
             $this->page->JSRaw($this->session->get('runonce'));
             $this->session->set('runonce', '');
         }
@@ -141,7 +141,7 @@ final class App
         }
 
         // If the user's navigated to a new page, change their action time.
-        if (!$this->request->isJSNewLocation() && $this->request->jsAccess()) {
+        if (!$this->request->isJSNewLocation() && $this->request->isJSAccess()) {
             return;
         }
 
@@ -208,7 +208,7 @@ final class App
             $page = $this->container->get('Jax\Page\\' . $act);
             $page->render();
         } elseif (
-            !$this->request->jsAccess()
+            !$this->request->isJSAccess()
             || $this->request->isJSNewLocation()
         ) {
             $result = $this->database->safeselect(
@@ -250,7 +250,7 @@ final class App
                 $this->page->JS('reload');
             } else {
                 $this->session->addVar('skin_id', $this->request->both('skin_id'));
-                if ($this->request->jsAccess() !== 0) {
+                if ($this->request->isJSAccess()) {
                     $this->page->JS('reload');
                 }
             }

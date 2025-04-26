@@ -188,7 +188,7 @@ final class Post
             $this->postpreview = $post;
         }
 
-        if (!$this->request->jsAccess() || $this->how === 'qreply') {
+        if (!$this->request->isJSAccess() || $this->how === 'qreply') {
             $this->showpostform();
         }
 

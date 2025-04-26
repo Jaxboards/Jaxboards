@@ -76,7 +76,7 @@ final class Forum
         }
 
         if (is_numeric($this->request->both('replies'))) {
-            if ($this->request->jsAccess() === 0) {
+            if (!$this->request->isJSAccess()) {
                 $this->page->location('?');
             }
 
@@ -456,7 +456,7 @@ final class Forum
 
         $path[$title] = "?act=vf{$fid}";
         $this->page->updatepath($path);
-        if ($this->request->jsAccess() !== 0) {
+        if ($this->request->isJSAccess()) {
             $this->page->JS('update', 'page', $page);
         } else {
             $this->page->append('PAGE', $page);

@@ -121,7 +121,7 @@ final class Page
     public function append(string $part, string $content): void
     {
         $part = mb_strtoupper($part);
-        if (!$this->request->jsAccess() || $part === 'TITLE') {
+        if (!$this->request->isJSAccess() || $part === 'TITLE') {
             if (!isset($this->parts[$part])) {
                 $this->reset($part, $content);
 
@@ -150,7 +150,7 @@ final class Page
             $newLocation = '?sessid=' . $this->session->get('id') . '&' . mb_substr($newLocation, 1);
         }
 
-        if ($this->request->jsAccess() !== 0) {
+        if ($this->request->isJSAccess()) {
             $this->JS('location', $newLocation);
         } else {
             header("Location: {$newLocation}");
@@ -169,7 +169,7 @@ final class Page
             $this->session->erase('location');
         }
 
-        if ($this->request->jsAccess() === 0) {
+        if (!$this->request->isJSAccess()) {
             return;
         }
 
@@ -204,7 +204,7 @@ final class Page
         $this->parts['path']
             = "<div id='path' class='path'>" . $this->buildpath() . '</div>';
 
-        if ($this->request->jsAccess() !== 0) {
+        if ($this->request->isJSAccess()) {
             if (!headers_sent()) {
                 header('Content-type:text/plain');
             }
