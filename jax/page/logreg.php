@@ -88,7 +88,7 @@ final class LogReg
             ? trim((string) $this->jax->p['display_name']) : '';
         $pass1 = $this->jax->p['pass1'] ?? '';
         $pass2 = $this->jax->p['pass2'] ?? '';
-        $errormail = $this->jax->p['email'] ?? '';
+        $email = $this->jax->p['email'] ?? '';
 
         $recaptcha = '';
         if ($this->config->getSetting('recaptcha')) {
@@ -140,7 +140,7 @@ final class LogReg
                 throw new Exception('Invalid characters in display name!');
             }
 
-            if (!$this->jax->isemail($errormail)) {
+            if (!$this->jax->isemail($email)) {
                 throw new Exception("That isn't a valid email!");
             }
 
@@ -180,7 +180,7 @@ final class LogReg
                 'members',
                 [
                     'display_name' => $dispname,
-                    'email' => $errormail,
+                    'email' => $email,
                     'group_id' => $this->config->getSetting('membervalidation') ? 5 : 1,
                     'ip' => $this->ipAddress->asBinary(),
                     'join_date' => $this->database->datetime(),
@@ -204,10 +204,10 @@ final class LogReg
                 $this->database->insertId(),
             );
             $this->login($name, $pass1);
-        } catch (Exception $errorrror) {
-            $errorrror = $errorrror->getMessage();
-            $this->page->JS('alert', $errorrror);
-            $this->page->append('page', $this->page->meta('error', $errorrror));
+        } catch (Exception $error) {
+            $error = $error->getMessage();
+            $this->page->JS('alert', $error);
+            $this->page->append('page', $this->page->meta('error', $error));
         }
 
         return null;

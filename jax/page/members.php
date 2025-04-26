@@ -149,11 +149,11 @@ final class Members
             ? '&filter=' . $this->jax->g['filter'] : '');
 
         $links = [];
-        foreach ($fields as $field => $fieldNiceName) {
+        foreach ($fields as $field => $fieldLabel) {
             $links[] = "<a href=\"{$url}&amp;sortby={$field}"
             . ($sortby === $field ? ($sorthow === 'ASC' ? '&amp;how=DESC' : '')
                 . '" class="sort' . ($sorthow === 'DESC' ? ' desc' : '') : '')
-                . "\">{$fieldNiceName}</a>";
+                . "\">{$fieldLabel}</a>";
         }
 
         foreach ($memberarray as $member) {

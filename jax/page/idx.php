@@ -68,7 +68,7 @@ final class IDX
         }
     }
 
-    public function viewidx(): void
+    private function viewidx(): void
     {
         $this->session->set('location_verbose', 'Viewing board index');
         $page = '';
@@ -187,7 +187,7 @@ final class IDX
         }
     }
 
-    public function getsubs($forumId)
+    private function getsubs($forumId)
     {
         if (!isset($this->subforumids[$forumId]) || !$this->subforumids[$forumId]) {
             return [];
@@ -205,7 +205,7 @@ final class IDX
         return $forum;
     }
 
-    public function getmods($modids): string
+    private function getmods($modids): string
     {
         static $moderatorinfo = null;
 
@@ -235,43 +235,43 @@ final class IDX
         return mb_substr($forum, 0, -mb_strlen($this->page->meta('idx-ledby-splitter')));
     }
 
-    public function buildTable($a): ?string
+    private function buildTable($forums): ?string
     {
-        if (!$a) {
+        if (!$forums) {
             return null;
         }
 
-        $forum = '';
-        foreach ($a as $modId) {
-            $read = $this->isForumRead($modId);
+        $table = '';
+        foreach ($forums as $forum) {
+            $read = $this->isForumRead($forum);
             $sf = '';
-            if ($modId['show_sub'] >= 1 && isset($this->subforums[$modId['id']])) {
-                $sf = $this->subforums[$modId['id']];
+            if ($forum['show_sub'] >= 1 && isset($this->subforums[$forum['id']])) {
+                $sf = $this->subforums[$forum['id']];
             }
 
-            if ($modId['show_sub'] === 2) {
-                foreach ($this->getsubs($modId['id']) as $i) {
+            if ($forum['show_sub'] === 2) {
+                foreach ($this->getsubs($forum['id']) as $i) {
                     $sf .= $this->subforums[$i];
                 }
             }
 
-            if ($modId['redirect']) {
-                $forum .= $this->page->meta(
+            if ($forum['redirect']) {
+                $table .= $this->page->meta(
                     'idx-redirect-row',
-                    $modId['id'],
-                    $modId['title'],
-                    nl2br((string) $modId['subtitle']),
-                    'Redirects: ' . $modId['redirects'],
+                    $forum['id'],
+                    $forum['title'],
+                    nl2br((string) $forum['subtitle']),
+                    'Redirects: ' . $forum['redirects'],
                     $this->jax->pick(
                         $this->page->meta('icon-redirect'),
                         $this->page->meta('idx-icon-redirect'),
                     ),
                 );
             } else {
-                $vId = $modId['id'];
+                $forumId = $forum['id'];
                 $hrefCode = $read
                     ? ''
-                    : ' href="?act=vf' . $modId['id'] . '&amp;markread=1"';
+                    : ' href="?act=vf' . $forum['id'] . '&amp;markread=1"';
                 $linkText = $read
                     ? $this->jax->pick(
                         $this->page->meta('icon-read'),
@@ -280,11 +280,11 @@ final class IDX
                         $this->page->meta('icon-unread'),
                         $this->page->meta('idx-icon-unread'),
                     );
-                $forum .= $this->page->meta(
+                $table .= $this->page->meta(
                     'idx-row',
-                    $modId['id'],
-                    $this->textFormatting->wordfilter($modId['title']),
-                    nl2br((string) $modId['subtitle']),
+                    $forum['id'],
+                    $this->textFormatting->wordfilter($forum['title']),
+                    nl2br((string) $forum['subtitle']),
                     $sf
                     ? $this->page->meta(
                         'idx-subforum-wrapper',
@@ -296,35 +296,35 @@ final class IDX
                             ),
                         ),
                     ) : '',
-                    $this->formatlastpost($modId),
-                    $this->page->meta('idx-topics-count', $modId['topics']),
-                    $this->page->meta('idx-replies-count', $modId['posts']),
+                    $this->formatlastpost($forum),
+                    $this->page->meta('idx-topics-count', $forum['topics']),
+                    $this->page->meta('idx-replies-count', $forum['posts']),
                     $read ? 'read' : 'unread',
-                    <<<EOT
-                         <a id="fid_{$vId}_icon"{$hrefCode}>
+                    <<<HTML
+                        <a id="fid_{$forumId}_icon"{$hrefCode}>
                             {$linkText}
                         </a>
-                        EOT
+                        HTML
                     ,
-                    $modId['show_ledby'] && $modId['mods']
+                    $forum['show_ledby'] && $forum['mods']
                         ? $this->page->meta(
                             'idx-ledby-wrapper',
-                            $this->getmods($modId['mods']),
+                            $this->getmods($forum['mods']),
                         ) : '',
                 );
             }
         }
 
-        return $this->page->meta('idx-table', $forum);
+        return $this->page->meta('idx-table', $table);
     }
 
-    public function update(): void
+    private function update(): void
     {
         $this->updateStats();
         $this->updateLastPosts();
     }
 
-    public function getBoardStats(): string
+    private function getBoardStats(): string
     {
         if (!$this->user->getPerm('can_view_stats')) {
             return '';
@@ -400,7 +400,7 @@ final class IDX
         }
 
         $userstoday = mb_substr($userstoday, 0, -2);
-        $usersonline = $this->getusersonlinelist();
+        $usersonline = $this->getUsersOnlineList();
         $result = $this->database->safeselect(
             ['id', 'title'],
             'member_groups',
@@ -431,11 +431,11 @@ final class IDX
         );
     }
 
-    public function getusersonlinelist(): array
+    private function getUsersOnlineList(): array
     {
-        $forum = '';
+        $html = '';
         $guests = 0;
-        $nummembers = 0;
+        $numMembers = 0;
 
         foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $user) {
             if (
@@ -449,12 +449,12 @@ final class IDX
                     $this->jax->pick($user['location_verbose'], 'Viewing the board.'),
                 );
                 if (isset($user['is_bot']) && $user['is_bot']) {
-                    $forum .= '<a class="user' . $user['uid'] . '" '
+                    $html .= '<a class="user' . $user['uid'] . '" '
                         . 'title="' . $title . '" data-use-tooltip="true">'
                         . $user['name'] . '</a>';
                 } else {
-                    ++$nummembers;
-                    $forum .= sprintf(
+                    ++$numMembers;
+                    $html .= sprintf(
                         '<a href="?act=vu%1$s" class="user%1$s mgroup%2$s" '
                             . 'title="%4$s" data-use-tooltip="true">'
                             . '%3$s</a>',
@@ -471,10 +471,10 @@ final class IDX
             }
         }
 
-        return [$forum, $nummembers, $guests];
+        return [$html, $numMembers, $guests];
     }
 
-    public function updateStats(): void
+    private function updateStats(): void
     {
         $list = [];
         if ($this->session->get('users_online_cache')) {
@@ -525,34 +525,34 @@ final class IDX
         $this->page->JS('onlinelist', $list);
     }
 
-    public function updateLastPosts(): void
+    private function updateLastPosts(): void
     {
         $result = $this->database->safespecial(
             <<<'SQL'
                 SELECT
-                    user.`id` AS `id`,
-                    user.`lp_tid` AS `lp_tid`,
-                    user.`lp_topic` AS `lp_topic`,
-                    UNIX_TIMESTAMP(user.`lp_date`) AS `lp_date`,
-                    user.`lp_uid` AS `lp_uid`,
-                    user.`topics` AS `topics`,
-                    user.`posts` AS `posts`,
+                    f.`id` AS `id`,
+                    f.`lp_tid` AS `lp_tid`,
+                    f.`lp_topic` AS `lp_topic`,
+                    UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,
+                    f.`lp_uid` AS `lp_uid`,
+                    f.`topics` AS `topics`,
+                    f.`posts` AS `posts`,
                     m.`display_name` AS `lp_name`,
                     m.`group_id` AS `lp_gid`
-                FROM %t user
-                LEFT JOIN %t m ON user.`lp_uid`=m.`id`
-                WHERE user.`lp_date`>=?
+                FROM %t f
+                LEFT JOIN %t m ON f.`lp_uid`=m.`id`
+                WHERE f.`lp_date`>=?
                 SQL
             ,
             ['forums', 'members'],
             $this->session->get('last_update') ? $this->database->datetime((int) $this->session->get('last_update')) : $this->database->datetime(),
         );
 
-        while ($user = $this->database->arow($result)) {
-            $this->page->JS('addclass', '#fid_' . $user['id'], 'unread');
+        while ($forum = $this->database->arow($result)) {
+            $this->page->JS('addclass', '#fid_' . $forum['id'], 'unread');
             $this->page->JS(
                 'update',
-                '#fid_' . $user['id'] . '_icon',
+                '#fid_' . $forum['id'] . '_icon',
                 $this->jax->pick(
                     $this->page->meta('icon-unread'),
                     $this->page->meta('idx-icon-unread'),
@@ -560,43 +560,43 @@ final class IDX
             );
             $this->page->JS(
                 'update',
-                '#fid_' . $user['id'] . '_lastpost',
-                $this->formatlastpost($user),
+                '#fid_' . $forum['id'] . '_lastpost',
+                $this->formatlastpost($forum),
                 '1',
             );
             $this->page->JS(
                 'update',
-                '#fid_' . $user['id'] . '_topics',
-                $this->page->meta('idx-topics-count', $user['topics']),
+                '#fid_' . $forum['id'] . '_topics',
+                $this->page->meta('idx-topics-count', $forum['topics']),
             );
             $this->page->JS(
                 'update',
-                '#fid_' . $user['id'] . '_replies',
-                $this->page->meta('idx-replies-count', $user['posts']),
+                '#fid_' . $forum['id'] . '_replies',
+                $this->page->meta('idx-replies-count', $forum['posts']),
             );
         }
     }
 
-    public function formatlastpost($modId): ?string
+    private function formatlastpost($forum): ?string
     {
         return $this->page->meta(
             'idx-row-lastpost',
-            $modId['lp_tid'],
+            $forum['lp_tid'],
             $this->jax->pick(
-                $this->textFormatting->wordfilter($modId['lp_topic']),
+                $this->textFormatting->wordfilter($forum['lp_topic']),
                 '- - - - -',
             ),
-            $modId['lp_uid'] ? $this->page->meta(
+            $forum['lp_uid'] ? $this->page->meta(
                 'user-link',
-                $modId['lp_uid'],
-                $modId['lp_gid'],
-                $modId['lp_name'],
+                $forum['lp_uid'],
+                $forum['lp_gid'],
+                $forum['lp_name'],
             ) : 'None',
-            $this->jax->pick($this->jax->date($modId['lp_date']), '- - - - -'),
+            $this->jax->pick($this->jax->date($forum['lp_date']), '- - - - -'),
         );
     }
 
-    public function isForumRead($forum): bool
+    private function isForumRead($forum): bool
     {
         if (!$this->forumsread) {
             $this->forumsread = $this->jax->parsereadmarkers($this->session->get('forumsread'));

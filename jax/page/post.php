@@ -13,6 +13,7 @@ use Jax\Page;
 use Jax\Session;
 use Jax\TextFormatting;
 use Jax\User;
+use PHP_CodeSniffer\Generators\HTML;
 
 use function array_pop;
 use function count;
@@ -142,18 +143,18 @@ final class Post
         $hash = hash_file('sha512', $fileobj['tmp_name']);
         $uploadpath = $this->domainDefinitions->getBoardPath() . 'Uploads/';
 
-        $errorxt = explode('.', (string) $fileobj['name']);
-        $errorxt = count($errorxt) === 1 ? '' : mb_strtolower(array_pop($errorxt));
+        $ext = explode('.', (string) $fileobj['name']);
+        $ext = count($ext) === 1 ? '' : mb_strtolower(array_pop($ext));
 
-        if (!in_array($errorxt, $this->config->getSetting('images') ?? [])) {
-            $errorxt = '';
+        if (!in_array($ext, $this->config->getSetting('images') ?? [])) {
+            $ext = '';
         }
 
-        if ($errorxt !== '' && $errorxt !== '0') {
-            $errorxt = '.' . $errorxt;
+        if ($ext !== '' && $ext !== '0') {
+            $ext = '.' . $ext;
         }
 
-        $file = $uploadpath . $hash . $errorxt;
+        $file = $uploadpath . $hash . $ext;
         if (!is_file($file)) {
             move_uploaded_file($fileobj['tmp_name'], $file);
             $this->database->safeinsert(
@@ -256,7 +257,7 @@ final class Post
                 }
             }
 
-            $fid = $tdata['fid'];
+            var_dump($tdata);
         }
 
         $result = $this->database->safeselect(
@@ -287,55 +288,83 @@ final class Post
                 ];
             }
 
-            $form = '<form method="post" data-ajax-form="true"
-                onsubmit="if(this.submitButton.value.match(/post/i)) this.submitButton.disabled=true;">
- <div class="topicform">
- <input type="hidden" name="act" value="post" />
- <input type="hidden" name="how" value="newtopic" />
- <input type="hidden" name="fid" value="' . $fid . '" />
-  <label for="ttitle">Topic title:</label>
-<input type="text" name="ttitle" id="ttitle" title="Topic Title" value="' . $tdata['title'] . '" />
-<br>
-  <label for="tdesc">Description:</label>
-<input
-    id="tdesc"
-    name="tdesc"
-    title="Topic Description (extra information about your topic)"
-    type="text"
-    value="' . $tdata['subtitle'] . '"
-    />
-<br>
-  <textarea
-    name="postdata"
-    id="postdata"
-    title="Type your post here"
-    class="bbcode-editor"
-    >' . $this->textFormatting->blockhtml($postdata) . '</textarea>
-<br><div class="postoptions">
-  ' . ($forum['perms']['poll'] ? '<label class="addpoll" for="addpoll">Add a
-Poll</label> <select name="poll_type" title="Add a poll"  onchange="document.querySelector(\'#polloptions\').'
-            . 'style.display=this.value?\'block\':\'none\'">
-<option value="">No</option>
-<option value="single">Yes, single-choice</option>
-<option value="multi">Yes, multi-choice</option></select><br>
-  <div id="polloptions" style="display:none">
-   <label for="pollq">Poll Question:</label><input type="text" id="pollq" name="pollq" title="Poll Question"/><br>
-   <label for="pollc">Poll Choices:</label> (one per line)
-<textarea id="pollc" name="pollchoices" title="Poll Choices"></textarea></div>' : '')
-            . ($forum['perms']['upload'] ? '<div id="attachfiles" class="addfile">
-   Add Files <input type="file" name="Filedata" title="Browse for file" /></div>' : '')
-            . '<div class="buttons"><input type="submit" name="submit"
-   value="Post New Topic" title="Submit your post" onclick="this.form.submitButton=this;"
-id="submitbutton" /> <input type="submit" name="submit" value="Preview" title="See a preview of your post"
-onclick="this.form.submitButton=this" /></div>
- </div>
-</form>';
+            $pollForm = !$forum['perms']['poll'] ? '' : <<<HTML
+                    <label class="addpoll" for="addpoll">
+                        Add a Poll
+                    </label>
+                    <select name="poll_type" title="Add a poll"
+                        onchange="document.querySelector('#polloptions').style.display=this.value?'block':'none'">
+                    <option value="">No</option>
+                    <option value="single">Yes, single-choice</option>
+                    <option value="multi">Yes, multi-choice</option></select>
+                    <br>
+                    <div id="polloptions" style="display:none">
+                        <label for="pollq">Poll Question:</label>
+                        <input type="text" id="pollq" name="pollq" title="Poll Question"/><br>
+                        <label for="pollc">Poll Choices:</label> (one per line)
+                        <textarea id="pollc" name="pollchoices" title="Poll Choices"></textarea>
+                    </div>
+                    HTML;
+
+            $uploadButton = $forum['perms']['upload'] ? '' : <<<HTML
+                <div id="attachfiles" class="addfile">
+                    Add Files <input type="file" name="Filedata" title="Browse for file" />
+                </div>
+                HTML;
+
+            $form = <<<HTML
+                <form method="post" data-ajax-form="true"
+                                onsubmit="if(this.submitButton.value.match(/post/i)) this.submitButton.disabled=true;">
+                <div class="topicform">
+                    <input type="hidden" name="act" value="post" />
+                    <input type="hidden" name="how" value="newtopic" />
+                    <input type="hidden" name="fid" value="{$fid}" />
+                    <label for="ttitle">Topic title:</label>
+                    <input type="text" name="ttitle" id="ttitle" title="Topic Title" value="{$tdata['title']}" />
+                    <br>
+                    <label for="tdesc">Description:</label>
+                    <input
+                        id="tdesc"
+                        name="tdesc"
+                        title="Topic Description (extra information about your topic)"
+                        type="text"
+                        value="{$tdata['subtitle']}"
+                        />
+                    <br>
+                    <textarea
+                        name="postdata"
+                        id="postdata"
+                        title="Type your post here"
+                        class="bbcode-editor"
+                        >
+                        {$this->textFormatting->blockhtml($postdata)}
+                    </textarea>
+                    <br><div class="postoptions">
+                        {$pollForm}
+                        {$uploadButton}
+                        <div class="buttons">
+                            <input type="submit" name="submit"
+                                value="Post New Topic"
+                                title="Submit your post"
+                                onclick="this.form.submitButton=this;"
+                                id="submitbutton">
+                            <input
+                                type="submit"
+                                name="submit"
+                                value="Preview"
+                                title="See a preview of your post"
+                                onclick="this.form.submitButton=this">
+                            </div>
+                    </div>
+                </form>
+                HTML;
             $page .= $this->page->meta('box', '', $forum['title'] . ' > New Topic', $form);
         }
 
         $this->page->append('page', $page);
         $this->page->JS('update', 'page', $page);
-        if ($error !== '' && $error !== '0') {
+
+        if ($error !== null) {
             return;
         }
 
