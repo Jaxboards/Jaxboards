@@ -197,7 +197,13 @@
     <exclude-pattern>./tools/php_codesniffer_to_sonarqube.php</exclude-pattern>
     <exclude-pattern>./tools/phpmd_to_sonarqube.php</exclude-pattern>
   </rule>
-  <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName"/>
+  <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">
+  	<properties>
+      <property name="rootNamespaces" type="array">
+        <element key="Jax" value="Jax"/>
+      </property>
+    </properties>
+  </rule>
   <rule ref="SlevomatCodingStandard.Functions.DisallowEmptyFunction"/>
   <rule ref="SlevomatCodingStandard.Functions.FunctionLength"/>
   <rule ref="SlevomatCodingStandard.Functions.RequireArrowFunction"/>
