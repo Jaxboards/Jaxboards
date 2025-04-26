@@ -13,6 +13,6 @@ class Request {
     }
 
     public function both(string $property) {
-        return $_GET[$property] ?? $_GET[$property] ?? null;
+        return $_GET[$property] ?? $_POST[$property] ?? null;
     }
 }
