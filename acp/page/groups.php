@@ -58,7 +58,7 @@ final class Groups
         };
     }
 
-    public function updateperms($perms)
+    private function updateperms($permsInput)
     {
         $columns = [
             'can_access_acp',
@@ -92,43 +92,43 @@ final class Groups
         ];
 
         // Set anything not sent to 0.
-        foreach ($perms as $k => $v2) {
-            foreach ($columns as $v) {
-                if (!isset($v2[$v])) {
-                    $v2[$v] = false;
+        foreach ($permsInput as $groupId => $groupPerms) {
+            foreach ($columns as $field) {
+                if (!isset($groupPerms[$field])) {
+                    $groupPerms[$field] = false;
                 }
 
-                $perms[$k][$v] = $v2[$v] ? 1 : 0;
+                $permsInput[$groupId][$field] = $groupPerms[$field] ? 1 : 0;
             }
         }
 
         // Remove any columns that don't exist silently.
         $columns = array_flip($columns);
-        foreach ($perms as $k => $v) {
-            foreach ($v as $k2 => $v2) {
-                if (isset($columns[$k2])) {
+        foreach ($permsInput as $groupId => $groupPerms) {
+            foreach ($groupPerms as $field => $v2) {
+                if (isset($columns[$field])) {
                     continue;
                 }
 
-                unset($perms[$k][$k2]);
+                unset($permsInput[$groupId][$field]);
             }
         }
 
-        // Update this.
-        foreach ($perms as $k => $v) {
-            if ($k === 2) {
-                $v['can_access_acp'] = 1;
+        foreach ($permsInput as $groupId => $groupPermissions) {
+            // Ensure admins can't remove their own access to the ACP :D
+            if ($groupId === 2) {
+                $groupPermissions['can_access_acp'] = 1;
             }
 
-            if (!$k) {
+            if (!$groupId) {
                 continue;
             }
 
             $this->database->safeupdate(
                 'member_groups',
-                $v,
+                $groupPermissions,
                 'WHERE `id`=?',
-                $k,
+                $groupId,
             );
         }
 
@@ -152,26 +152,27 @@ final class Groups
         return $this->showperms();
     }
 
-    public function showperms()
+    private function showperms()
     {
         $page = '';
 
+        $permInput = $this->request->post('perm');
         if (
             $this->updatePermissions
-            && $this->request->post('perm') !== null
+            && $permInput !== null
         ) {
-            foreach (explode(',', $this->request->post('grouplist') ?? '') as $v) {
+            foreach (explode(',', $this->request->post('grouplist') ?? '') as $groupId) {
                 if (
-                    isset($this->request->post('perm')[$v])
-                    && $this->request->post('perm')[$v]
+                    isset($permInput[$groupId])
+                    && $permInput[$groupId]
                 ) {
                     continue;
                 }
 
-                $this->request->post('perm')[$v] = [];
+                $permInput[$groupId] = [];
             }
 
-            return $this->updateperms($this->request->post('perm'));
+            return $this->updateperms($permInput);
         }
 
         $groupList = $this->request->both('grouplist');
@@ -260,10 +261,10 @@ final class Groups
             );
         $numgroups = 0;
         $grouplist = '';
-        while ($f = $this->database->arow($result)) {
+        while ($group = $this->database->arow($result)) {
             ++$numgroups;
-            $perms[$f['id']] = $f;
-            $grouplist .= $f['id'] . ',';
+            $perms[$group['id']] = $group;
+            $grouplist .= $group['id'] . ',';
         }
 
         if ($numgroups === 0) {
@@ -351,16 +352,16 @@ final class Groups
                 ],
             ) . PHP_EOL;
 
-            foreach ($permissions as $k => $v) {
+            foreach ($permissions as $field => $title) {
                 $groupColumns = '';
                 foreach ($perms as $groupId => $groupData) {
                     $groupColumns .= $this->page->parseTemplate(
                         'groups/show-permissions-permission-row-group-column.html',
                         [
-                            'checked' => $groupData[$k]
+                            'checked' => $groupData[$field]
                             ? 'checked="checked" ' : '',
                             'group_id' => $groupId,
-                            'permission' => $k,
+                            'permission' => $field,
                         ],
                     ) . PHP_EOL;
                 }
@@ -369,7 +370,7 @@ final class Groups
                     'groups/show-permissions-permission-row.html',
                     [
                         'group_columns' => $groupColumns,
-                        'title' => $v,
+                        'title' => $title,
                     ],
                 ) . PHP_EOL;
             }
@@ -389,7 +390,7 @@ final class Groups
         return null;
     }
 
-    public function create($gid = false)
+    private function create($gid = false)
     {
         if ($gid && !is_numeric($gid)) {
             $gid = false;
@@ -470,7 +471,7 @@ final class Groups
         return null;
     }
 
-    public function delete(): void
+    private function delete(): void
     {
         $page = '';
         if (
@@ -498,13 +499,13 @@ final class Groups
             'WHERE `id`>5',
         );
         $found = false;
-        while ($f = $this->database->arow($result)) {
+        while ($group = $this->database->arow($result)) {
             $found = true;
             $page .= $this->page->parseTemplate(
                 'groups/delete.html',
                 [
-                    'id' => $f['id'],
-                    'title' => $f['title'],
+                    'id' => $group['id'],
+                    'title' => $group['title'],
                 ],
             );
         }
