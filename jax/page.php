@@ -130,7 +130,6 @@ final class Page
         private readonly Config $config,
         private readonly Database $database,
         private readonly DomainDefinitions $domainDefinitions,
-        private readonly Jax $jax,
         private readonly Request $request,
         private readonly Session $session,
     ) {

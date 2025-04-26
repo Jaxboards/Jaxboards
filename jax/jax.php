@@ -24,10 +24,9 @@ use const PHP_EOL;
 /**
  * @psalm-api
  */
-final class Jax
+final readonly class Jax
 {
-    public function __construct(private readonly Config $config)
-    {}
+    public function __construct(private Config $config) {}
 
     public function pick(...$args)
     {

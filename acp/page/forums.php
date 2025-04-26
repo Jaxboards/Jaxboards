@@ -312,7 +312,10 @@ final readonly class Forums
                     continue;
                 }
 
-                if (!isset($intree[$treePart]) || !is_array($intree[$treePart])) {
+                if (
+                    !isset($intree[$treePart])
+                    || !is_array($intree[$treePart])
+                ) {
                     $intree[$treePart] = [];
                 }
 
@@ -430,7 +433,10 @@ final readonly class Forums
 
                 $options = ['read', 'start', 'reply', 'upload', 'view', 'poll'];
                 $groupPermInput = $groups[$group['id']];
-                if (isset($groupPermInput['global']) && $groupPermInput['global']) {
+                if (
+                    isset($groupPermInput['global'])
+                    && $groupPermInput['global']
+                ) {
                     continue;
                 }
 

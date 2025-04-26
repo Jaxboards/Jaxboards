@@ -6,7 +6,6 @@ namespace Jax\Modules;
 
 use Jax\Config;
 use Jax\Database;
-use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
@@ -36,7 +35,6 @@ final class Shoutbox
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
-        private readonly DomainDefinitions $domainDefinitions,
         private readonly IPAddress $ipAddress,
         private readonly Jax $jax,
         private readonly Page $page,

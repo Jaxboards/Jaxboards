@@ -11,7 +11,6 @@ use Jax\Jax;
 use Jax\Request;
 use Jax\TextFormatting;
 
-use function array_key_exists;
 use function closedir;
 use function dirname;
 use function fclose;

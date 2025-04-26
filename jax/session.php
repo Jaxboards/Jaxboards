@@ -144,7 +144,10 @@ final class Session
             return null;
         }
 
-        if (!isset($_SESSION['uid']) && $this->request->cookie('utoken') !== null) {
+        if (
+            !isset($_SESSION['uid'])
+            && $this->request->cookie('utoken') !== null
+        ) {
             $result = $this->database->safeselect(
                 ['uid'],
                 'tokens',

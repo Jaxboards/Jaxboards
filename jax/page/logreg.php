@@ -291,7 +291,7 @@ final class LogReg
                 'WHERE `token`=?',
                 $this->database->basicvalue($this->request->cookie('utoken')),
             );
-            $this->request->setCookie('utoken',null,-1);
+            $this->request->setCookie('utoken', null, -1);
         }
 
         $this->session->set('hide', 1);
