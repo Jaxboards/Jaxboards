@@ -119,7 +119,13 @@ final class Session
         private readonly Database $database,
         private readonly Request $request,
         private readonly User $user,
-    ) {}
+    ) {
+        ini_set('session.cookie_secure', '1');
+        ini_set('session.cookie_httponly', '1');
+        ini_set('session.use_cookies', '1');
+        ini_set('session.use_only_cookies', '1');
+        session_start();
+    }
 
     public function fetchSessionData(): void
     {

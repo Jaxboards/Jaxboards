@@ -105,6 +105,8 @@ final class Page
 
     private $metaqueue;
 
+    private ?string $themePath;
+
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
@@ -279,7 +281,7 @@ final class Page
 
     public function loadskin(?int $skinId): void
     {
-        $skin = [];
+        $skin = null;
         if ($skinId) {
             $result = $this->database->safeselect(
                 ['title', 'custom', 'wrapper'],
@@ -291,7 +293,8 @@ final class Page
             $this->database->disposeresult($result);
         }
 
-        if (empty($skin)) {
+        // Couldn't find custom skin, get the default
+        if ($skin === null) {
             $result = $this->database->safeselect(
                 ['title', 'custom', 'wrapper'],
                 'skins',
@@ -299,9 +302,6 @@ final class Page
             );
             $skin = $this->database->arow($result);
             $this->database->disposeresult($result);
-        }
-
-        if (!$skin) {
             $skin = [
                 'custom' => 0,
                 'title' => 'Default',
@@ -309,20 +309,27 @@ final class Page
             ];
         }
 
-        $themePath = ($skin['custom'] ? $this->domainDefinitions->getBoardPath() : '') . '/Themes/' . $skin['title'] . '/';
-        $themePathUrl = ($skin['custom'] ? $this->domainDefinitions->getBoardPathUrl() : '') . '/Themes/' . $skin['title'] . '/';
-        if (is_dir($themePath)) {
-            define('THEMEPATH', $themePath);
-            define('THEMEPATHURL', $themePathUrl);
-        } else {
-            define('THEMEPATH', $this->domainDefinitions->getDefaultThemePath());
-            define('THEMEPATHURL', $this->domainDefinitions->getBoardURL() . '/' . $this->config->getSetting('dthemepath'));
+        $this->themePath = ($skin['custom'] ? $this->domainDefinitions->getBoardPath() : '') . '/Themes/' . $skin['title'];
+        $themePathUrl = ($skin['custom'] ? $this->domainDefinitions->getBoardPathUrl() : '') . '/Themes/' . $skin['title'];
+
+        // Custom theme found but files not there, also fallback to default
+        if (!is_dir($this->themePath)) {
+            $this->themePath = $this->domainDefinitions->getDefaultThemePath();
+            $themePathUrl = $this->domainDefinitions->getBoardURL() . '/' . $this->config->getSetting('dthemepath');
         }
 
+        // Load CSS
+        $this->append(
+            'CSS',
+            '<link rel="stylesheet" type="text/css" href="' . $themePathUrl . '/css.css">'
+            . '<link rel="preload" as="style" type="text/css" href="./Service/wysiwyg.css" onload="this.onload=null;this.rel=\'stylesheet\'" />',
+        );
+
+        // Load Wrapper
         $this->loadtemplate(
             $skin['wrapper']
             ? $this->domainDefinitions->getBoardPath() . '/Wrappers/' . $skin['wrapper'] . '.html'
-            : THEMEPATH . 'wrappers.html',
+            : $this->themePath . '/wrappers.html',
         );
     }
 
@@ -356,7 +363,7 @@ final class Page
     public function loadmeta(string $component): void
     {
         $component = mb_strtolower($component);
-        $themeComponentDir = THEMEPATH . 'views/' . $component;
+        $themeComponentDir = $this->themePath . '/views/' . $component;
         if (is_dir($themeComponentDir)) {
             $componentDir = $themeComponentDir;
         } else {
@@ -389,7 +396,7 @@ final class Page
 
             // Check default components for anything missing.
             $defaultComponentDir = str_replace(
-                THEMEPATH,
+                $this->themePath,
                 $this->domainDefinitions->getDefaultThemePath(),
                 $componentDir,
             );

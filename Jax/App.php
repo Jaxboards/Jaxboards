@@ -60,6 +60,11 @@ final class App
     {
         header('Cache-Control: no-cache, must-revalidate');
 
+        if ($this->config->getSetting('noboard')) {
+            echo 'board not found';
+
+            exit(1);
+        }
 
         $this->startSession();
 
@@ -97,20 +102,6 @@ final class App
 
     private function startSession(): void
     {
-        ini_set('session.cookie_secure', '1');
-        ini_set('session.cookie_httponly', '1');
-        ini_set('session.use_cookies', '1');
-        ini_set('session.use_only_cookies', '1');
-        session_start();
-
-        // Board Service Stuff, get the board as specified by URL.
-        // Initialize them.
-        if ($this->config->getSetting('noboard')) {
-            echo 'board not found';
-
-            exit(1);
-        }
-
         $userId = $this->session->loginWithToken();
         // Prefetch user data
         $this->user->getUser($userId);
@@ -224,22 +215,6 @@ final class App
 
     private function renderBaseHTML(): void
     {
-        if (!$this->user->isGuest()) {
-            $this->page->append(
-                'SCRIPT',
-                '<script>window.globalsettings='
-                . json_encode([
-                    'sound_im' => $this->user->get('sound_im') ? 1 : 0,
-                    'wysiwyg' => $this->user->get('wysiwyg') ? 1 : 0,
-                    'can_im' => $this->user->getPerm('can_im') ? 1 : 0,
-                    'groupid' => $this->user->get('group_id'),
-                    'username' => $this->user->get('display_name'),
-                    'userid' => $this->user->get('id') ?? 0,
-                ])
-                . '</script>',
-            );
-        }
-
         $this->page->append(
             'SCRIPT',
             '<script src="' . $this->domainDefinitions->getBoardURL() . '/dist/app.js" defer></script>',
@@ -252,11 +227,6 @@ final class App
             );
         }
 
-        $this->page->append(
-            'CSS',
-            '<link rel="stylesheet" type="text/css" href="' . THEMEPATHURL . 'css.css">'
-            . '<link rel="preload" as="style" type="text/css" href="./Service/wysiwyg.css" onload="this.onload=null;this.rel=\'stylesheet\'" />',
-        );
         if (
             $this->page->meta('favicon') !== ''
             && $this->page->meta('favicon') !== '0'
@@ -420,5 +390,19 @@ final class App
         $this->page->addvar('avatar', $this->jax->pick($this->user->get('avatar'), $this->page->meta('default-avatar')));
         $this->page->addvar('username', $this->user->get('display_name'));
         $this->page->addvar('userid', (string) $this->jax->pick($this->user->get('id'), 0));
+
+        $this->page->append(
+            'SCRIPT',
+            '<script>window.globalsettings='
+            . json_encode([
+                'can_im' => $this->user->getPerm('can_im'),
+                'groupid' => $this->user->get('group_id'),
+                'sound_im' => $this->user->get('sound_im'),
+                'userid' => $this->user->get('id'),
+                'username' => $this->user->get('display_name'),
+                'wysiwyg' => $this->user->get('wysiwyg'),
+            ])
+            . '</script>',
+        );
     }
 }
