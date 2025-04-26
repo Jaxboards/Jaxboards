@@ -54,20 +54,20 @@ final readonly class Settings
     public function boardname(): void
     {
         $page = '';
-        $e = '';
+        $error = null;
         if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
             if (trim((string) $this->jax->p['boardname']) === '') {
-                $e = 'Board name is required';
+                $error = 'Board name is required';
             } elseif (
                 !isset($this->jax->p['logourl'])
                 || (trim($this->jax->p['logourl']) !== ''
                 && !$this->jax->isURL($this->jax->p['logourl']))
             ) {
-                $e = 'Please enter a valid logo url.';
+                $error = 'Please enter a valid logo url.';
             }
 
-            if ($e !== '' && $e !== '0') {
-                $page .= $this->page->error($e);
+            if ($error !== null) {
+                $page .= $this->page->error($error);
             } else {
                 $this->config->write([
                     'boardname' => $this->jax->p['boardname'],
@@ -126,17 +126,17 @@ final readonly class Settings
                 (string) $this->jax->b['page'],
             );
             if ($newact !== $this->jax->b['page']) {
-                $e = 'The page URL must contain only letters and numbers. '
+                $error = 'The page URL must contain only letters and numbers. '
                     . "Invalid characters: {$newact}";
             } elseif (mb_strlen((string) $newact) > 25) {
-                $e = 'The page URL cannot exceed 25 characters.';
+                $error = 'The page URL cannot exceed 25 characters.';
             } else {
                 $this->pages_edit($newact);
 
                 return;
             }
 
-            $page .= $this->page->error($e);
+            $page .= $this->page->error($error);
         }
 
         $result = $this->database->safeselect(
@@ -241,7 +241,7 @@ final readonly class Settings
     public function shoutbox(): void
     {
         $page = '';
-        $e = '';
+        $error = null;
         if (isset($this->jax->p['clearall']) && $this->jax->p['clearall']) {
             $result = $this->database->safespecial(
                 'TRUNCATE TABLE %t',
@@ -270,12 +270,12 @@ final readonly class Settings
             ) {
                 $write['shoutbox_num'] = $this->jax->p['sbnum'];
             } else {
-                $e = 'Shouts to show must be between 1 and 10';
+                $error = 'Shouts to show must be between 1 and 10';
             }
 
             $this->config->write($write);
-            if ($e !== '' && $e !== '0') {
-                $page .= $this->page->error($e);
+            if ($error !== null) {
+                $page .= $this->page->error($error);
             } else {
                 $page .= $this->page->success('Data saved.');
             }

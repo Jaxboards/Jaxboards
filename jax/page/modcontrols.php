@@ -6,6 +6,7 @@ namespace Jax\Page;
 
 use Jax\Config;
 use Jax\Database;
+use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
@@ -50,6 +51,7 @@ final class ModControls
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
+        private readonly DomainDefinitions $domainDefinitions,
         private readonly IPAddress $ipAddress,
         private readonly Jax $jax,
         private readonly Page $page,
@@ -196,8 +198,8 @@ final class ModControls
                     'WHERE `id` IN ?',
                     explode(',', (string) $this->session->getVar('modtids')),
                 );
-                while ($f = $this->database->arow($result)) {
-                    $fids[$f['fid']] = 1;
+                while ($topic = $this->database->arow($result)) {
+                    $fids[$topic['fid']] = 1;
                 }
 
                 $fids = array_flip($fids);
@@ -211,8 +213,8 @@ final class ModControls
                 );
                 $this->cancel();
                 $fids[] = $this->jax->p['id'];
-                foreach ($fids as $v) {
-                    $this->database->fixForumLastPost($v);
+                foreach ($fids as $forumId) {
+                    $this->database->fixForumLastPost($forumId);
                 }
 
                 $this->page->location('?act=vf' . $this->jax->p['id']);
@@ -372,7 +374,7 @@ final class ModControls
         // See if they have permission to manipulate this post.
         if (!$this->perms['can_moderate']) {
             $result = $this->database->safespecial(
-                <<<'EOT'
+                <<<'SQL'
                     SELECT `mods`
                     FROM %t
                     WHERE `id`=(
@@ -380,7 +382,7 @@ final class ModControls
                         FROM %t
                         WHERE `id`=?
                     )
-                    EOT
+                    SQL
                 ,
                 ['forums', 'topics'],
                 $postdata['tid'],
@@ -435,7 +437,7 @@ final class ModControls
         $tid = (int) $tid;
         if (!$this->user->getPerm('can_moderate')) {
             $result = $this->database->safespecial(
-                <<<'EOT'
+                <<<'SQL'
                     SELECT `mods`
                     FROM %t
                     WHERE `id`=(
@@ -443,7 +445,7 @@ final class ModControls
                         FROM %t
                         WHERE `id`=?
                     )
-                    EOT
+                    SQL
                 ,
                 ['forums', 'topics'],
                 $this->database->basicvalue($tid),
@@ -525,24 +527,24 @@ final class ModControls
         // Build list of topic ids that the posts were in.
         $tids = [];
         $pids = explode(',', (string) $this->session->getVar('modpids'));
-        while ($f = $this->database->arow($result)) {
-            $tids[] = (int) $f['tid'];
+        while ($post = $this->database->arow($result)) {
+            $tids[] = (int) $post['tid'];
         }
 
         $tids = array_unique($tids);
 
         if ($trashcan !== 0) {
             // Get first & last post.
-            foreach ($pids as $v) {
-                if (!isset($op) || !$op || $v < $op) {
-                    $op = $v;
+            foreach ($pids as $postId) {
+                if (!isset($op) || !$op || $postId < $op) {
+                    $op = $postId;
                 }
 
-                if (isset($lp) && $lp && $v <= $lp) {
+                if (isset($lp) && $lp && $postId <= $lp) {
                     continue;
                 }
 
-                $lp = $v;
+                $lp = $postId;
             }
 
             $result = $this->database->safeselect(
@@ -598,7 +600,7 @@ final class ModControls
         foreach ($tids as $tid) {
             // Recount replies.
             $this->database->safespecial(
-                <<<'EOT'
+                <<<'SQL'
                     UPDATE %t
                     SET `replies`=(
                         SELECT COUNT(`id`)
@@ -606,7 +608,7 @@ final class ModControls
                         WHERE `tid`=?
                     )-1
                     WHERE `id`=?
-                    EOT
+                    SQL
                 ,
                 ['topics', 'posts'],
                 $tid,
@@ -627,16 +629,16 @@ final class ModControls
             'WHERE `id` IN ?',
             $tids,
         );
-        while ($f = $this->database->arow($result)) {
-            if (!is_numeric($f['fid'])) {
+        while ($topic = $this->database->arow($result)) {
+            if (!is_numeric($topic['fid'])) {
                 continue;
             }
 
-            if ($f['fid'] <= 0) {
+            if ($topic['fid'] <= 0) {
                 continue;
             }
 
-            $fids[] = (int) $f['fid'];
+            $fids[] = (int) $topic['fid'];
         }
 
         $this->database->disposeresult($result);
@@ -646,8 +648,8 @@ final class ModControls
         }
 
         // Remove them from the page.
-        foreach ($pids as $v) {
-            $this->page->JS('removeel', '#pid_' . $v);
+        foreach ($pids as $postId) {
+            $this->page->JS('removeel', '#pid_' . $postId);
         }
 
         return null;
@@ -659,7 +661,7 @@ final class ModControls
             return $this->page->JS('error', 'No topics to delete');
         }
 
-        $data = [];
+        $forumData = [];
 
         // Get trashcan id.
         $result = $this->database->safeselect(
@@ -678,21 +680,21 @@ final class ModControls
             explode(',', (string) $this->session->getVar('modtids')),
         );
         $delete = [];
-        while ($f = $this->database->arow($result)) {
-            if (!isset($data[$f['fid']])) {
-                $data[$f['fid']] = 0;
+        while ($topic = $this->database->arow($result)) {
+            if (!isset($forumData[$topic['fid']])) {
+                $forumData[$topic['fid']] = 0;
             }
 
-            ++$data[$f['fid']];
+            ++$forumData[$topic['fid']];
             if (!$trashcan) {
                 continue;
             }
 
-            if ($trashcan !== $f['fid']) {
+            if ($trashcan !== $topic['fid']) {
                 continue;
             }
 
-            $delete[] = $f['id'];
+            $delete[] = $topic['id'];
         }
 
         if ($trashcan) {
@@ -705,7 +707,7 @@ final class ModControls
                 explode(',', (string) $this->session->getVar('modtids')),
             );
             $delete = implode(',', $delete);
-            $data[$trashcan] = 1;
+            $forumData[$trashcan] = 1;
         } else {
             $delete = $this->session->getVar('modtids');
         }
@@ -723,8 +725,8 @@ final class ModControls
             );
         }
 
-        foreach (array_keys($data) as $k) {
-            $this->database->fixForumLastPost($k);
+        foreach (array_keys($forumData) as $forumId) {
+            $this->database->fixForumLastPost($forumId);
         }
 
         $this->session->deleteVar('modtids');
@@ -737,11 +739,11 @@ final class ModControls
     public function mergetopics(): void
     {
         $page = '';
-        $exploded = explode(',', $this->session->getVar('modtids') ?? '');
+        $topicIds = explode(',', $this->session->getVar('modtids') ?? '');
         if (
             isset($this->jax->p['ot'])
             && is_numeric($this->jax->p['ot'])
-            && in_array($this->jax->p['ot'], $exploded)
+            && in_array($this->jax->p['ot'], $topicIds)
         ) {
             // Move the posts and set all posts to normal (newtopic=0).
             $this->database->safeupdate(
@@ -784,12 +786,12 @@ final class ModControls
                 'WHERE `id`=?',
                 $this->database->basicvalue($this->jax->p['ot']),
             );
-            unset($exploded[array_search($this->jax->p['ot'], $exploded, true)]);
-            if ($exploded !== []) {
+            unset($topicIds[array_search($this->jax->p['ot'], $topicIds, true)]);
+            if ($topicIds !== []) {
                 $this->database->safedelete(
                     'topics',
                     'WHERE `id` IN ?',
-                    $exploded,
+                    $topicIds,
                 );
             }
 
@@ -815,17 +817,17 @@ final class ModControls
                 explode(',', (string) $this->session->getVar('modtids')),
             );
             $titles = [];
-            while ($f = $this->database->arow($result)) {
-                $titles[$f['id']] = $f['title'];
+            while ($topic = $this->database->arow($result)) {
+                $titles[$topic['id']] = $topic['title'];
             }
 
-            foreach ($exploded as $v) {
-                if (!isset($titles[$v])) {
+            foreach ($topicIds as $topicId) {
+                if (!isset($titles[$topicId])) {
                     continue;
                 }
 
-                $page .= '<input type="radio" name="ot" value="' . $v . '" /> '
-                    . $titles[$v] . '<br>';
+                $page .= '<input type="radio" name="ot" value="' . $topicId . '" /> '
+                    . $titles[$topicId] . '<br>';
             }
         }
 
@@ -859,8 +861,7 @@ final class ModControls
             return;
         }
 
-        $e = '';
-        $data = [];
+        $error = null;
         $page = '<form method="post" data-ajax-form="true">'
             . $this->jax->hiddenFormFields(
                 [
@@ -925,6 +926,9 @@ final class ModControls
                 'about',
                 'sig',
             ];
+
+            $member = null;
+
             // Get the member data.
             if (is_numeric($this->jax->b['mid'])) {
                 $result = $this->database->safeselect(
@@ -933,7 +937,7 @@ final class ModControls
                     'WHERE `id`=?',
                     $this->database->basicvalue($this->jax->b['mid']),
                 );
-                $data = $this->database->arow($result);
+                $member = $this->database->arow($result);
                 $this->database->disposeresult($result);
             } elseif ($this->jax->p['mname']) {
                 $result = $this->database->safeselect(
@@ -942,35 +946,35 @@ final class ModControls
                     'WHERE `display_name` LIKE ?',
                     $this->database->basicvalue($this->jax->p['mname'] . '%'),
                 );
-                $data = [];
-                while ($f = $this->database->arow($result)) {
-                    $data[] = $f;
+                $members = [];
+                while ($member = $this->database->arow($result)) {
+                    $members[] = $member;
                 }
 
-                if (count($data) > 1) {
-                    $e = 'Many users found!';
+                if (count($members) > 1) {
+                    $error = 'Many users found!';
                 } else {
-                    $data = array_shift($data);
+                    $member = array_shift($members);
                 }
             } else {
-                $e = 'Member name is a required field.';
+                $error = 'Member name is a required field.';
             }
 
-            if (!$data) {
-                $e = 'No members found that matched the criteria.';
+            if (!$member) {
+                $error = 'No members found that matched the criteria.';
             }
 
             if (
                 $this->user->get('group_id') !== 2
-                || $data['group_id'] === 2
+                || $member['group_id'] === 2
                 && ($this->user->get('id') !== 1
-                && $data['id'] !== $this->user->get('id'))
+                && $member['id'] !== $this->user->get('id'))
             ) {
-                $e = 'You do not have permission to edit this profile.';
+                $error = 'You do not have permission to edit this profile.';
             }
 
-            if ($e !== '' && $e !== '0') {
-                $page .= $this->page->meta('error', $e);
+            if ($error !== null) {
+                $page .= $this->page->meta('error', $error);
             } else {
                 function field($label, $name, $value, $type = 'input'): string
                 {
@@ -988,27 +992,27 @@ final class ModControls
                     [
                         'act' => 'modcontrols',
                         'do' => 'emem',
-                        'mid' => $data['id'],
+                        'mid' => $member['id'],
                         'submit' => 'save',
                     ],
                 );
                 $page .= field(
                     'Display Name',
                     'display_name',
-                    $data['display_name'],
+                    $member['display_name'],
                 )
-                    . field('Avatar', 'avatar', $data['avatar'])
-                    . field('Full Name', 'full_name', $data['full_name'])
+                    . field('Avatar', 'avatar', $member['avatar'])
+                    . field('Full Name', 'full_name', $member['full_name'])
                     . field(
                         'About',
                         'about',
-                        $this->textFormatting->blockhtml($data['about']),
+                        $this->textFormatting->blockhtml($member['about']),
                         'textarea',
                     )
                     . field(
                         'Signature',
                         'signature',
-                        $this->textFormatting->blockhtml($data['sig']),
+                        $this->textFormatting->blockhtml($member['sig']),
                         'textarea',
                     );
                 $page .= '</table><input type="submit" value="Save" /></form>';
@@ -1022,29 +1026,29 @@ final class ModControls
     {
         $page = '';
 
-        $ip = $this->jax->b['ip'] ?? '';
-        if (!filter_var($ip, FILTER_VALIDATE_IP)) {
-            $ip = '';
+        $ipAddress = $this->jax->b['ip'] ?? '';
+        if (!filter_var($ipAddress, FILTER_VALIDATE_IP)) {
+            $ipAddress = '';
         }
 
         $changed = false;
 
         if (isset($this->jax->p['ban']) && $this->jax->p['ban']) {
-            if (!$this->ipAddress->isBanned($ip)) {
+            if (!$this->ipAddress->isBanned($ipAddress)) {
                 $changed = true;
-                $this->jax->ipbancache[] = $ip;
+                $this->ipAddress->ban($ipAddress);
             }
         } elseif (isset($this->jax->p['unban']) && $this->jax->p['unban']) {
-            if ($entry = $this->ipAddress->isBanned($ip)) {
+            if ($error = $this->ipAddress->isBanned($ipAddress)) {
                 $changed = true;
-                unset($this->jax->ipbancache[array_search($entry, $this->jax->ipbancache, true)]);
+                $this->ipAddress->unBan($ipAddress);
             }
         }
 
         if ($changed) {
-            $o = fopen(BOARDPATH . '/bannedips.txt', 'w');
-            fwrite($o, implode(PHP_EOL, $this->jax->ipbancache));
-            fclose($o);
+            $fileHandle = fopen($this->domainDefinitions->getBoardPath() . '/bannedips.txt', 'w');
+            fwrite($fileHandle, implode(PHP_EOL, $this->ipAddress->getBannedIps()));
+            fclose($fileHandle);
         }
 
         $hiddenFields = $this->jax->hiddenFormFields(
@@ -1057,33 +1061,33 @@ final class ModControls
             <form method='post' data-ajax-form='true'>
                 {$hiddenFields}
                 <label>IP:
-                <input type='text' name='ip' title="Enter IP address" value='{$ip}' /></label>
+                <input type='text' name='ip' title="Enter IP address" value='{$ipAddress}' /></label>
                 <input type='submit' value='Submit' title="Search for IP" />
             </form>
             EOT;
-        if ($ip) {
-            $page .= "<h3>Data for {$ip}:</h3>";
+        if ($ipAddress) {
+            $page .= "<h3>Data for {$ipAddress}:</h3>";
 
             $hiddenFields = $this->jax->hiddenFormFields(
                 [
                     'act' => 'modcontrols',
                     'do' => 'iptools',
-                    'ip' => $ip,
+                    'ip' => $ipAddress,
                 ],
             );
-            $banCode = $this->ipAddress->isBanned($ip) ? <<<'EOT'
+            $banCode = $this->ipAddress->isBanned($ipAddress) ? <<<'HTML'
                 <span style="color:#900">
                     banned
                 </span>
                 <input type="submit" name="unban"
                     onclick="this.form.submitButton=this" value="Unban" />
-                EOT : <<<'EOT'
+                HTML : <<<'HTML'
                 <span style="color:#090">
                     not banned
                 </span>
                 <input type="submit" name="ban"
                     onclick="this.form.submitButton=this" value="Ban" />
-                EOT;
+                HTML;
 
             $torDate = gmdate('Y-m-d', strtotime('-2 days'));
             $page .= $this->box(
@@ -1094,17 +1098,17 @@ final class ModControls
                         IP ban status: {$banCode}<br>
                     </form>
                     IP Lookup Services: <ul>
-                        <li><a href="https://whois.domaintools.com/{$ip}">DomainTools Whois</a></li>
-                        <li><a href="https://www.domaintools.com/research/traceroute/?query={$ip}">
+                        <li><a href="https://whois.domaintools.com/{$ipAddress}">DomainTools Whois</a></li>
+                        <li><a href="https://www.domaintools.com/research/traceroute/?query={$ipAddress}">
                             DomainTools Traceroute
                         </a></li>
-                        <li><a href="https://www.ip2location.com/{$ip}">IP2Location Lookup</a></li>
-                        <li><a href="https://www.dan.me.uk/torcheck?ip={$ip}">IP2Location Lookup</a></li>
-                        <li><a href="https://metrics.torproject.org/exonerator.html?ip={$ip}&timestamp={$torDate}">
+                        <li><a href="https://www.ip2location.com/{$ipAddress}">IP2Location Lookup</a></li>
+                        <li><a href="https://www.dan.me.uk/torcheck?ip={$ipAddress}">IP2Location Lookup</a></li>
+                        <li><a href="https://metrics.torproject.org/exonerator.html?ip={$ipAddress}&timestamp={$torDate}">
                             ExoneraTor Lookup
                         </a></li>
-                        <li><a href="https://www.projecthoneypot.org/ip_{$ip}">Project Honeypot Lookup</a></li>
-                        <li><a href="https://www.stopforumspam.com/ipcheck/{$ip}">StopForumSpam Lookup</a></li>
+                        <li><a href="https://www.projecthoneypot.org/ip_{$ipAddress}">Project Honeypot Lookup</a></li>
+                        <li><a href="https://www.stopforumspam.com/ipcheck/{$ipAddress}">StopForumSpam Lookup</a></li>
                     </ul>
                     EOT,
             );
@@ -1118,14 +1122,14 @@ final class ModControls
                 ],
                 'members',
                 'WHERE `ip`=?',
-                $this->database->basicvalue($this->ipAddress->asBinary($ip)),
+                $this->database->basicvalue($this->ipAddress->asBinary($ipAddress)),
             );
-            while ($f = $this->database->arow($result)) {
+            while ($member = $this->database->arow($result)) {
                 $content[] = $this->page->meta(
                     'user-link',
-                    $f['id'],
-                    $f['group_id'],
-                    $f['display_name'],
+                    $member['id'],
+                    $member['group_id'],
+                    $member['display_name'],
                 );
             }
 
@@ -1134,7 +1138,7 @@ final class ModControls
             if ($this->config->getSetting('shoutbox')) {
                 $content = '';
                 $result = $this->database->safespecial(
-                    <<<'EOT'
+                    <<<'SQL'
                         SELECT
                             m.`display_name` AS `display_name`,
                             m.`group_id` AS `group_id`,
@@ -1148,22 +1152,22 @@ final class ModControls
                         WHERE s.`ip`=?
                         ORDER BY `id`
                         DESC LIMIT 5
-                        EOT
+                        SQL
                     ,
                     [
                         'shouts',
                         'members',
                     ],
-                    $this->database->basicvalue($this->ipAddress->asBinary($ip)),
+                    $this->database->basicvalue($this->ipAddress->asBinary($ipAddress)),
                 );
-                while ($f = $this->database->arow($result)) {
+                while ($shout = $this->database->arow($result)) {
                     $content .= $this->page->meta(
                         'user-link',
-                        $f['uid'],
-                        $f['group_id'],
-                        $f['display_name'],
+                        $shout['uid'],
+                        $shout['group_id'],
+                        $shout['display_name'],
                     );
-                    $content .= ': ' . $f['shout'] . '<br>';
+                    $content .= ': ' . $shout['shout'] . '<br>';
                 }
 
                 $page .= $this->box('Last 5 shouts:', $content);
@@ -1174,11 +1178,11 @@ final class ModControls
                 ['post'],
                 'posts',
                 'WHERE `ip`=? ORDER BY `id` DESC LIMIT 5',
-                $this->database->basicvalue($this->ipAddress->asBinary($ip)),
+                $this->database->basicvalue($this->ipAddress->asBinary($ipAddress)),
             );
-            while ($f = $this->database->arow($result)) {
+            while ($post = $this->database->arow($result)) {
                 $content .= "<div class='post'>"
-                    . nl2br($this->textFormatting->blockhtml($this->textFormatting->textonly($f['post'])))
+                    . nl2br($this->textFormatting->blockhtml($this->textFormatting->textonly($post['post'])))
                     . '</div>';
             }
 

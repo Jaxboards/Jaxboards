@@ -155,7 +155,7 @@ final class Shoutbox
     public function displayshoutbox(): void
     {
         $result = $this->database->safespecial(
-            <<<'EOT'
+            <<<'SQL'
                 SELECT
                     m.`avatar` AS `avatar`,
                     m.`display_name` AS `display_name`,
@@ -168,22 +168,22 @@ final class Shoutbox
                 LEFT JOIN %t m
                     ON s.`uid`=m.`id`
                 ORDER BY s.`id` DESC LIMIT ?
-                EOT
+                SQL
             ,
             ['shouts', 'members'],
             $this->shoutlimit,
         );
         $shouts = '';
-        $first = 0;
-        while ($f = $this->database->arow($result)) {
-            if (!$first) {
-                $first = $f['id'];
+        $shoutirst = 0;
+        while ($shout = $this->database->arow($result)) {
+            if (!$shoutirst) {
+                $shoutirst = $shout['id'];
             }
 
-            $shouts .= $this->formatshout($f);
+            $shouts .= $this->formatshout($shout);
         }
 
-        $this->session->addVar('sb_id', $first);
+        $this->session->addVar('sb_id', $shoutirst);
         $this->page->append(
             'shoutbox',
             $this->page->meta(
@@ -212,7 +212,7 @@ final class Shoutbox
             $this->session->getVar('sb_id')
         ) {
             $result = $this->database->safespecial(
-                <<<'EOT'
+                <<<'SQL'
                     SELECT
                         m.`avatar` AS `avatar`,
                         m.`display_name` AS `display_name`,
@@ -226,29 +226,29 @@ final class Shoutbox
                         ON s.`uid`=m.`id`
                     WHERE s.`id`>?
                     ORDER BY s.`id` ASC LIMIT ?
-                    EOT
+                    SQL
                 ,
                 ['shouts', 'members'],
                 $this->jax->pick($this->session->getVar('sb_id'), 0),
                 $this->shoutlimit,
             );
-            while ($f = $this->database->arow($result)) {
-                $this->page->JS('addshout', $this->formatshout($f));
+            while ($shout = $this->database->arow($result)) {
+                $this->page->JS('addshout', $this->formatshout($shout));
                 if ($this->config->getSetting('shoutboxsounds')) {
                     $sounds = [];
                     if (
                         $this->user->get('sound_shout')
-                        && $sounds[$f['shout']]
+                        && $sounds[$shout['shout']]
                     ) {
                         $this->page->JS(
                             'playsound',
                             'sfx',
-                            $this->domainDefinitions->getSoundsURL() . $sounds[$f['shout']] . '.mp3',
+                            $this->domainDefinitions->getSoundsURL() . $sounds[$shout['shout']] . '.mp3',
                         );
                     }
                 }
 
-                $last = $f['id'];
+                $last = $shout['id'];
             }
         }
 
@@ -309,28 +309,28 @@ final class Shoutbox
         }
 
         $result = $this->database->safespecial(
-            <<<'EOT'
+            <<<'SQL'
                 SELECT
                     s.`id` AS `id`,
                     s.`uid` AS `uid`,
                     s.`shout` AS `shout`,
                     UNIX_TIMESTAMP(s.`date`) AS `date`,
                     m.`display_name` AS `display_name`,
-                     m.`group_id` AS `group_id`,
+                    m.`group_id` AS `group_id`,
                     m.`avatar` AS `avatar`
                 FROM %t s
                 LEFT JOIN %t m
                 ON s.`uid`=m.`id`
                 ORDER BY s.`id` DESC LIMIT ?,?
-                EOT
+                SQL
             ,
             ['shouts', 'members'],
             $pagen * $perpage,
             $perpage,
         );
         $shouts = '';
-        while ($f = $this->database->arow($result)) {
-            $shouts .= $this->formatshout($f);
+        while ($shout = $this->database->arow($result)) {
+            $shouts .= $this->formatshout($shout);
         }
 
         $page = $this->page->meta(

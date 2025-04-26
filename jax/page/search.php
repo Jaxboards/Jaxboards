@@ -101,7 +101,6 @@ final class Search
     public function getForumSelection(): string
     {
         $this->getSearchableForums();
-        $r = '';
         if (!$this->fids) {
             return '--No forums--';
         }
@@ -116,29 +115,27 @@ final class Search
         $tree = [];
         $titles = [];
 
-        while ($f = $this->database->arow($result)) {
-            $titles[$f['id']] = $f['title'];
-            $path = trim((string) $f['path']) !== ''
-                && trim((string) $f['path']) !== '0'
-                ? explode(' ', (string) $f['path'])
+        while ($forum = $this->database->arow($result)) {
+            $titles[$forum['id']] = $forum['title'];
+            $path = trim($forum['path'] ?? '') !== '' ? explode(' ', (string) $forum['path'])
                 : [];
             $t = &$tree;
-            foreach ($path as $v) {
-                if (!isset($t[$v]) || !is_array($t[$v])) {
-                    $t[$v] = [];
+            foreach ($path as $forumId) {
+                if (!isset($t[$forumId]) || !is_array($t[$forumId])) {
+                    $t[$forumId] = [];
                 }
 
-                $t = &$t[$v];
+                $t = &$t[$forumId];
             }
 
-            if (isset($t[$f['id']])) {
+            if (isset($t[$forum['id']])) {
                 continue;
             }
 
-            $t[$f['id']] = true;
+            $t[$forum['id']] = true;
         }
 
-        return $r . $this->rtreeselect(
+        return $this->rtreeselect(
             $tree,
             $titles,
         );
@@ -146,10 +143,10 @@ final class Search
 
     public function rtreeselect($tree, $titles, $level = 0): string
     {
-        $r = '';
+        $options = '';
         foreach ($tree as $k => $v) {
             if (isset($titles[$k])) {
-                $r .= '<option value="' . $k . '">'
+                $options .= '<option value="' . $k . '">'
                     . str_repeat('+-', $level) . $titles[$k]
                     . '</option>';
             }
@@ -158,14 +155,14 @@ final class Search
                 continue;
             }
 
-            $r .= $this->rtreeselect($v, $titles, $level + 1);
+            $options .= $this->rtreeselect($v, $titles, $level + 1);
         }
 
         if (!$level) {
-            return '<select size="15" title="List of forums" multiple="multiple" name="fids">' . $r . '</select>';
+            return '<select size="15" title="List of forums" multiple="multiple" name="fids">' . $options . '</select>';
         }
 
-        return $r;
+        return $options;
     }
 
     public function pdate($a): false|int
@@ -415,7 +412,7 @@ final class Search
         }
 
         if ($numresults === 0) {
-            $e = 'No results found. '
+           $error = 'No results found. '
                 . 'Try refining your search, or using longer terms.';
 
             $omitted = [];
@@ -428,12 +425,12 @@ final class Search
             }
 
             if ($omitted !== []) {
-                $e .= '<br /><br />'
+               $error .= '<br /><br />'
                     . 'The following terms were omitted due to length: '
                     . implode(', ', $omitted);
             }
 
-            $page = $this->page->error($e);
+            $page = $this->page->error($error);
         } else {
             $resultsArray = $this->jax->pages(
                 ceil($numresults / $this->perpage),

@@ -151,10 +151,10 @@ final class Page
             ],
         );
         $boardURL = $this->domainDefinitions->getBoardURL();
-        $data['css_url'] = $boardURL . 'acp/css/css.css';
-        $data['bbcode_css_url'] = $boardURL . 'Service/Themes/Default/bbcode.css';
-        $data['themes_css_url'] = $boardURL . 'acp/css/themes.css';
-        $data['admin_js_url'] = $boardURL . 'dist/acp.js';
+        $data['css_url'] = $boardURL . '/acp/css/css.css';
+        $data['bbcode_css_url'] = $boardURL . '/Service/Themes/Default/bbcode.css';
+        $data['themes_css_url'] = $boardURL . '/acp/css/themes.css';
+        $data['admin_js_url'] = $boardURL . '/dist/acp.js';
 
         echo $this->parseTemplate(
             'admin.html',

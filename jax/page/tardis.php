@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
+use Jax\DomainDefinitions;
 use Jax\Page;
 
 /**
@@ -11,7 +12,7 @@ use Jax\Page;
  */
 final readonly class Tardis
 {
-    public function __construct(private Page $page) {}
+    public function __construct(private Page $page, private DomainDefinitions $domainDefinitions) {}
 
     public function render(): void
     {
@@ -49,6 +50,6 @@ final readonly class Tardis
             }
             setInterval(window.tardis, 10);
         })()');
-        $this->page->JS('playsound', 'drwho', './Sounds/doctorwhotheme.mp3');
+        $this->page->JS('playsound', 'drwho', $this->domainDefinitions->getSoundsUrl() . '/doctorwhotheme.mp3');
     }
 }

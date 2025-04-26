@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\Page;
+use Jax\DomainDefinitions;
 
 /**
  * @psalm-api
  */
 final readonly class Rainbow
 {
-    public function __construct(private Page $page) {}
+    public function __construct(private Page $page, private DomainDefinitions $domainDefinitions) {}
 
     public function render(): void
     {
@@ -30,6 +31,6 @@ final readonly class Rainbow
                 window.rainbow=setInterval(() => document.documentElement.style.filter = 'hue-rotate(' + (++i) + 'deg)', 1000/60);
             }
         })()");
-        $this->page->JS('playsound', 'always', './Sounds/always.mp3');
+        $this->page->JS('playsound', 'always', $this->domainDefinitions->getSoundsUrl() . '/always.mp3');
     }
 }

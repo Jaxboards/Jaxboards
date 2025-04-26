@@ -53,7 +53,7 @@ final class Members
 
     public function showmemberlist(): void
     {
-        $vars = [
+        $fields = [
             'display_name' => 'Name',
             'g_title' => 'Group',
             'id' => 'ID',
@@ -68,8 +68,8 @@ final class Members
             ? 'DESC' : 'ASC';
         $where = '';
         if (
-            isset($this->jax->b['sortby'], $vars[$this->jax->b['sortby']])
-            && $vars[$this->jax->b['sortby']]
+            isset($this->jax->b['sortby'], $fields[$this->jax->b['sortby']])
+            && $fields[$this->jax->b['sortby']]
         ) {
             $sortby = $this->jax->b['sortby'];
         }
@@ -137,10 +137,10 @@ final class Members
             $this->pageNumber + 1,
             $this->perpage,
         );
-        foreach ($pagesArray as $v) {
+        foreach ($pagesArray as $pageNumber) {
             $pages .= "<a href='?act=members&amp;sortby="
-                . "{$sortby}&amp;how={$sorthow}&amp;page={$v}'"
-                . ($v - 1 === $this->pageNumber ? ' class="active"' : '') . ">{$v}</a> ";
+                . "{$sortby}&amp;how={$sorthow}&amp;page={$pageNumber}'"
+                . ($pageNumber - 1 === $this->pageNumber ? ' class="active"' : '') . ">{$pageNumber}</a> ";
         }
 
         $url = '?act=members'
@@ -149,11 +149,11 @@ final class Members
             ? '&filter=' . $this->jax->g['filter'] : '');
 
         $links = [];
-        foreach ($vars as $k => $v) {
-            $links[] = "<a href=\"{$url}&amp;sortby={$k}"
-            . ($sortby === $k ? ($sorthow === 'ASC' ? '&amp;how=DESC' : '')
+        foreach ($fields as $field => $fieldNiceName) {
+            $links[] = "<a href=\"{$url}&amp;sortby={$field}"
+            . ($sortby === $field ? ($sorthow === 'ASC' ? '&amp;how=DESC' : '')
                 . '" class="sort' . ($sorthow === 'DESC' ? ' desc' : '') : '')
-                . "\">{$v}</a>";
+                . "\">{$fieldNiceName}</a>";
         }
 
         foreach ($memberarray as $member) {
@@ -170,14 +170,14 @@ final class Members
                 'yim' => 'ymsgr:sendim?%s',
                 'youtube' => 'https://youtube.com/%s',
             ];
-            foreach ($contactUrls as $k => $v) {
-                if (!$member['contact_' . $k]) {
+            foreach ($contactUrls as $service => $url) {
+                if (!$member['contact_' . $service]) {
                     continue;
                 }
 
-                $contactdetails .= '<a class="' . $k . ' contact" href="'
-                    . sprintf($v, $this->textFormatting->blockhtml($member['contact_' . $k]))
-                    . '" title="' . $k . ' contact">&nbsp;</a>';
+                $contactdetails .= '<a class="' . $service . ' contact" href="'
+                    . sprintf($url, $this->textFormatting->blockhtml($member['contact_' . $service]))
+                    . '" title="' . $service . ' contact">&nbsp;</a>';
             }
 
             $contactdetails .= '<a title="PM this member" class="pm contact" '

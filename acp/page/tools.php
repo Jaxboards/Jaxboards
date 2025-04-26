@@ -95,8 +95,8 @@ final readonly class Tools
                     $file['hash'] .= '.' . $ext;
                 }
 
-                if (is_writable(BOARDPATH . 'Uploads/' . $file['hash'])) {
-                    $page .= unlink(BOARDPATH . 'Uploads/' . $file['hash'])
+                if (is_writable($this->domainDefinitions->getBoardPath() . '/Uploads/' . $file['hash'])) {
+                    $page .= unlink($this->domainDefinitions->getBoardPath() . '/Uploads/' . $file['hash'])
                         ? $this->page->success('File deleted')
                         : $this->page->error(
                             "Error deleting file, maybe it's already been "
@@ -156,7 +156,7 @@ final readonly class Tools
         }
 
         $result = $this->database->safespecial(
-            <<<'EOT'
+            <<<'SQL'
                 SELECT
                     f.`id` AS `id`,
                     f.`name` AS `name`,
@@ -169,7 +169,7 @@ final readonly class Tools
                 LEFT JOIN %t m
                     ON f.`uid`=m.`id`
                 ORDER BY f.`size` DESC
-                EOT
+                SQL
             ,
             ['files', 'members'],
         );
@@ -219,7 +219,7 @@ final readonly class Tools
                 . gmdate('Y-m-d_His') . '.sql"',
             );
             $result = $this->database->safequery("SHOW TABLES LIKE '{$this->database->getPrefix()}%%'");
-            $tables = array_map(static fn(array $row) => $row[0], $this->database->rows($result));
+            $tables = array_map(static fn(array $row) => array_values($row)[0], $this->database->arows($result));
             $page = '';
             if ($tables !== []) {
                 echo PHP_EOL . "-- Jaxboards Backup {$this->database->getPrefix()} "

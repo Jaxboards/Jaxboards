@@ -88,7 +88,7 @@ final class LogReg
             ? trim((string) $this->jax->p['display_name']) : '';
         $pass1 = $this->jax->p['pass1'] ?? '';
         $pass2 = $this->jax->p['pass2'] ?? '';
-        $email = $this->jax->p['email'] ?? '';
+        $errormail = $this->jax->p['email'] ?? '';
 
         $recaptcha = '';
         if ($this->config->getSetting('recaptcha')) {
@@ -140,7 +140,7 @@ final class LogReg
                 throw new Exception('Invalid characters in display name!');
             }
 
-            if (!$this->jax->isemail($email)) {
+            if (!$this->jax->isemail($errormail)) {
                 throw new Exception("That isn't a valid email!");
             }
 
@@ -180,7 +180,7 @@ final class LogReg
                 'members',
                 [
                     'display_name' => $dispname,
-                    'email' => $email,
+                    'email' => $errormail,
                     'group_id' => $this->config->getSetting('membervalidation') ? 5 : 1,
                     'ip' => $this->ipAddress->asBinary(),
                     'join_date' => $this->database->datetime(),
@@ -195,19 +195,19 @@ final class LogReg
                 ],
             );
             $this->database->safespecial(
-                <<<'EOT'
+                <<<'SQL'
                     UPDATE %t
                     SET `members` = `members` + 1, `last_register` = ?
-                    EOT
+                    SQL
                 ,
                 ['stats'],
                 $this->database->insertId(),
             );
             $this->login($name, $pass1);
-        } catch (Exception $e) {
-            $e = $e->getMessage();
-            $this->page->JS('alert', $e);
-            $this->page->append('page', $this->page->meta('error', $e));
+        } catch (Exception $errorrror) {
+            $errorrror = $errorrror->getMessage();
+            $this->page->JS('alert', $errorrror);
+            $this->page->append('page', $this->page->meta('error', $errorrror));
         }
 
         return null;
@@ -319,7 +319,7 @@ final class LogReg
         $this->page->JS(
             'window',
             [
-                'content' => <<<'EOT'
+                'content' => <<<'HTML'
                     <form method="post" data-ajax-form="resetOnSubmit">
                         <input type="hidden" name="act" value="logreg3" />
                         <input type="hidden" name="popup" value="1" />
@@ -341,7 +341,7 @@ final class LogReg
                         <input type="submit" value="Login" />
                         <a href="?act=logreg1" data-window-close="true">Register</a>
                     </form>
-                    EOT,
+                    HTML,
                 'id' => 'loginform',
                 'title' => 'Login',
                 'useoverlay' => 1,
@@ -376,14 +376,11 @@ final class LogReg
                 $this->database->basicvalue($id),
             );
             $udata = $this->database->arow($result);
-            if (!$udata) {
-                $e = 'This link has expired. Please try again.';
-            }
 
             $this->database->disposeresult($result);
 
-            if ($e !== '') {
-                $page = $this->page->meta('error', $e);
+            if (!$udata) {
+                $page = $this->page->meta('error', 'This link has expired. Please try again.');
             } elseif ($this->jax->p['pass1'] && $this->jax->p['pass2']) {
                 if ($this->jax->p['pass1'] === $this->jax->p['pass2']) {
                     $this->database->safeupdate(
@@ -446,16 +443,17 @@ final class LogReg
                     'WHERE `name`=?',
                     $this->database->basicvalue($this->jax->p['user']),
                 );
+                $error = null;
                 if (!($udata = $this->database->arow($result))) {
-                    $e = 'There is no user registered as <strong>'
+                    $error = 'There is no user registered as <strong>'
                         . $this->jax->b['user']
                         . '</strong>, sure this is correct?';
                 }
 
                 $this->database->disposeresult($result);
 
-                if ($e !== '0') {
-                    $page .= $this->page->meta('error', $e);
+                if ($error !== null) {
+                    $page .= $this->page->meta('error', $error);
                 } else {
                     // Generate token.
                     $forgotpasswordtoken

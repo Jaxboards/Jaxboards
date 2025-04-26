@@ -81,15 +81,15 @@ final class Calendar
             $year,
         );
         $birthdays = [];
-        while ($f = $this->database->arow($result)) {
-            $birthdays[$f['dob_day']][] = sprintf(
+        while ($member = $this->database->arow($result)) {
+            $birthdays[$member['dob_day']][] = sprintf(
                 '<a href="?act=vu%1$s" class="user%1$s mgroup%2$s" '
                 . 'title="%4$s years old!" data-use-tooltip="true">'
                 . '%3$s</a>',
-                $f['id'],
-                $f['group_id'],
-                $f['name'],
-                $year - $f['dob_year'],
+                $member['id'],
+                $member['group_id'],
+                $member['name'],
+                $year - $member['dob_year'],
             );
         }
 

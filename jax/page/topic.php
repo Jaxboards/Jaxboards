@@ -262,13 +262,13 @@ final class Topic
 
         $totalpages = (int) ceil($postCount / $this->numperpage);
         $pagelist = '';
-        foreach ($this->jax->pages($totalpages, $this->pageNumber + 1, 10) as $x) {
+        foreach ($this->jax->pages($totalpages, $this->pageNumber + 1, 10) as $pageNumber) {
             $pagelist .= $this->page->meta(
                 'topic-pages-part',
                 $tid,
-                $x,
-                $x === $this->pageNumber + 1 ? ' class="active"' : '',
-                $x,
+                $pageNumber,
+                $pageNumber === $this->pageNumber + 1 ? ' class="active"' : '',
+                $pageNumber,
             );
         }
 
@@ -696,28 +696,28 @@ final class Topic
 
                 $rniblets = $this->database->getRatingNiblets();
                 if ($rniblets) {
-                    foreach ($rniblets as $k => $v) {
+                    foreach ($rniblets as $nibletIndex => $niblet) {
                         $postratingbuttons .= '<a href="?act=vt' . $this->tid . '&amp;ratepost='
-                            . $post['pid'] . '&amp;niblet=' . $k . '">'
+                            . $post['pid'] . '&amp;niblet=' . $nibletIndex . '">'
                             . $this->page->meta(
                                 'rating-niblet',
-                                $v['img'],
-                                $v['title'],
+                                $niblet['img'],
+                                $niblet['title'],
                             ) . '</a>';
-                        if (!isset($prating[$k])) {
+                        if (!isset($prating[$nibletIndex])) {
                             continue;
                         }
 
-                        if (!$prating[$k]) {
+                        if (!$prating[$nibletIndex]) {
                             continue;
                         }
 
-                        $num = 'x' . count($prating[$k]);
+                        $num = 'x' . count($prating[$nibletIndex]);
                         $postratingbuttons .= $num;
                         $showrating .= $this->page->meta(
                             'rating-niblet',
-                            $v['img'],
-                            $v['title'],
+                            $niblet['img'],
+                            $niblet['title'],
                         ) . $num;
                     }
 
@@ -957,9 +957,9 @@ final class Topic
 
     public function votepoll()
     {
-        $e = '';
+        $error = null;
         if ($this->user->isGuest()) {
-            $e = 'You must be logged in to vote!';
+            $error = 'You must be logged in to vote!';
         } else {
             $result = $this->database->safeselect(
                 [
@@ -1006,7 +1006,7 @@ final class Topic
             }
 
             if ($voted) {
-                $e = 'You have already voted on this poll!';
+                $error = 'You have already voted on this poll!';
             }
 
             if ($row['poll_type'] === 'multi') {
@@ -1016,22 +1016,22 @@ final class Topic
                             continue;
                         }
 
-                        $e = 'Invalid choices';
+                        $error = 'Invalid choices';
                     }
                 } else {
-                    $e = 'Invalid Choice';
+                    $error = 'Invalid Choice';
                 }
             } elseif (
                 !is_numeric($choice)
                 || $choice >= $numchoices
                 || $choice < 0
             ) {
-                $e = 'Invalid choice';
+                $error = 'Invalid choice';
             }
         }
 
-        if ($e !== '' && $e !== '0') {
-            return $this->page->JS('error', $e);
+        if ($error !== null) {
+            return $this->page->JS('error', $error);
         }
 
         if ($row['poll_type'] === 'multi') {
@@ -1085,29 +1085,28 @@ final class Topic
             'WHERE `id`=?',
             $this->database->basicvalue($postid),
         );
-        $f = $this->database->arow($result);
+        $post = $this->database->arow($result);
         $this->database->disposeresult($result);
 
         $niblets = $this->database->getRatingNiblets();
-        $e = null;
         $ratings = [];
-        if ($this->user->isGuest()) {
-            $e = 'You must be logged in to rate posts.';
-        } elseif (!$f) {
-            $e = "That post doesn't exist.";
-        } elseif (!$niblets[$nibletid]) {
-            $e = 'Invalid rating';
-        } else {
-            $ratings = json_decode((string) $f['rating'], true);
-            if (!$ratings) {
-                $ratings = [];
-            }
-        }
 
-        if ($e) {
-            $this->page->JS('error', $e);
+        $error = match(true) {
+            $this->user->isGuest() => 'You must be logged in to rate posts.',
+            !$post => "That post doesn't exist.",
+            !$niblets[$nibletid] => 'Invalid rating',
+            default => null,
+        };
+
+        if ($error !== null) {
+            $this->page->JS('error', $error);
 
             return;
+        }
+
+        $ratings = json_decode((string) $post['rating'], true);
+        if (!$ratings) {
+            $ratings = [];
         }
 
         if (!array_key_exists((int) $nibletid, $ratings)) {
@@ -1243,9 +1242,9 @@ final class Topic
         }
 
         if (!$post) {
-            $e = "That post doesn't exist!";
-            $this->page->JS('alert', $e);
-            $this->page->append('PAGE', $this->page->meta('error', $e));
+            $error = "That post doesn't exist!";
+            $this->page->JS('alert', $error);
+            $this->page->append('PAGE', $this->page->meta('error', $error));
 
             return;
         }
@@ -1396,18 +1395,18 @@ final class Topic
             $members,
         );
         $mdata = [$result];
-        while ($f = $this->database->arow($result)) {
-            $mdata[$f['id']] = [$f['display_name'], $f['group_id']];
+        while ($member = $this->database->arow($result)) {
+            $mdata[$member['id']] = [$member['display_name'], $member['group_id']];
         }
 
         unset($members);
         $niblets = $this->database->getRatingNiblets();
         $page = '';
-        foreach ($ratings as $k => $v) {
+        foreach ($ratings as $index => $rating) {
             $page .= '<div class="column">';
-            $page .= '<img src="' . $niblets[$k]['img'] . '" /> '
-                . $niblets[$k]['title'] . '<ul>';
-            foreach ($v as $mid) {
+            $page .= '<img src="' . $niblets[$index]['img'] . '" /> '
+                . $niblets[$index]['title'] . '<ul>';
+            foreach ($rating as $mid) {
                 $page .= '<li>' . $this->page->meta(
                     'user-link',
                     $mid,

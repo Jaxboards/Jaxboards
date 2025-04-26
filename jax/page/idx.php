@@ -73,22 +73,36 @@ final class IDX
         $this->session->set('location_verbose', 'Viewing board index');
         $page = '';
         $result = $this->database->safespecial(
-            <<<'EOT'
-                SELECT f.`id` AS `id`,
-                    f.`cat_id` AS `cat_id`,f.`title` AS `title`,f.`subtitle` AS `subtitle`,
-                    f.`lp_uid` AS `lp_uid`,UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,
-                    f.`lp_tid` AS `lp_tid`,f.`lp_topic` AS `lp_topic`,f.`path` AS `path`,
-                    f.`show_sub` AS `show_sub`,f.`redirect` AS `redirect`,
-                    f.`topics` AS `topics`,f.`posts` AS `posts`,f.`order` AS `order`,
-                    f.`perms` AS `perms`,f.`orderby` AS `orderby`,f.`nocount` AS `nocount`,
-                    f.`redirects` AS `redirects`,f.`trashcan` AS `trashcan`,f.`mods` AS `mods`,
-                    f.`show_ledby` AS `show_ledby`,m.`display_name` AS `lp_name`,
+            <<<'SQL'
+                SELECT
+                    f.`id` AS `id`,
+                    f.`cat_id` AS `cat_id`,
+                    f.`title` AS `title`,
+                    f.`subtitle` AS `subtitle`,
+                    f.`lp_uid` AS `lp_uid`,
+                    UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,
+                    f.`lp_tid` AS `lp_tid`,
+                    f.`lp_topic` AS `lp_topic`,
+                    f.`path` AS `path`,
+                    f.`show_sub` AS `show_sub`,
+                    f.`redirect` AS `redirect`,
+                    f.`topics` AS `topics`,
+                    f.`posts` AS `posts`,
+                    f.`order` AS `order`,
+                    f.`perms` AS `perms`,
+                    f.`orderby` AS `orderby`,
+                    f.`nocount` AS `nocount`,
+                    f.`redirects` AS `redirects`,
+                    f.`trashcan` AS `trashcan`,
+                    f.`mods` AS `mods`,
+                    f.`show_ledby` AS `show_ledby`,
+                    m.`display_name` AS `lp_name`,
                     m.`group_id` AS `lp_gid`
                 FROM %t f
                 LEFT JOIN %t m
                     ON f.`lp_uid`=m.`id`
                 ORDER BY f.`order`, f.`title` ASC
-                EOT
+                SQL
             ,
             [
                 'forums',
@@ -101,47 +115,43 @@ final class IDX
         $this->mods = [];
 
         // This while loop just grabs all of the data, displaying is done below.
-        while ($r = $this->database->arow($result)) {
-            $perms = $this->user->parseForumPerms($r['perms']);
-            if ($r['perms'] && !$perms['view']) {
+        while ($forum = $this->database->arow($result)) {
+            $perms = $this->user->parseForumPerms($forum['perms']);
+            if ($forum['perms'] && !$perms['view']) {
                 continue;
             }
 
             // Store subforum details for later.
-            if ($r['path']) {
-                preg_match('@\d+$@', (string) $r['path'], $m);
-                if (isset($this->subforums[$m[0]])) {
-                    $this->subforumids[$m[0]][] = $r['id'];
-                    $this->subforums[$m[0]] .= $this->page->meta(
+            if ($forum['path']) {
+                preg_match('@\d+$@', (string) $forum['path'], $match);
+                if (isset($this->subforums[$match[0]])) {
+                    $this->subforumids[$match[0]][] = $forum['id'];
+                    $this->subforums[$match[0]] .= $this->page->meta(
                         'idx-subforum-link',
-                        $r['id'],
-                        $r['title'],
-                        $this->textFormatting->blockhtml($r['subtitle']),
+                        $forum['id'],
+                        $forum['title'],
+                        $this->textFormatting->blockhtml($forum['subtitle']),
                     ) . $this->page->meta('idx-subforum-splitter');
                 }
             } else {
-                $data[$r['cat_id']][] = $r;
+                $data[$forum['cat_id']][] = $forum;
             }
 
             // Store mod details for later.
-            if (!$r['show_ledby']) {
+            if (!$forum['show_ledby']) {
                 continue;
             }
 
-            if (!$r['mods']) {
+            if (!$forum['mods']) {
                 continue;
             }
 
-            foreach (explode(',', (string) $r['mods']) as $v) {
-                if ($v === '') {
+            foreach (explode(',', (string) $forum['mods']) as $modId) {
+                if ($modId === '') {
                     continue;
                 }
 
-                if ($v === '0') {
-                    continue;
-                }
-
-                $this->mods[$v] = 1;
+                $this->mods[$modId] = 1;
             }
         }
 
@@ -151,17 +161,17 @@ final class IDX
             'categories',
             'ORDER BY `order`,`title` ASC',
         );
-        while ($r = $this->database->arow($catq)) {
-            if (empty($data[$r['id']])) {
+        while ($forum = $this->database->arow($catq)) {
+            if (empty($data[$forum['id']])) {
                 continue;
             }
 
             $page .= $this->page->collapsebox(
-                $r['title'],
+                $forum['title'],
                 $this->buildTable(
-                    $data[$r['id']],
+                    $data[$forum['id']],
                 ),
-                'cat_' . $r['id'],
+                'cat_' . $forum['id'],
             );
         }
 
@@ -177,22 +187,22 @@ final class IDX
         }
     }
 
-    public function getsubs($id)
+    public function getsubs($forumId)
     {
-        if (!isset($this->subforumids[$id]) || !$this->subforumids[$id]) {
+        if (!isset($this->subforumids[$forumId]) || !$this->subforumids[$forumId]) {
             return [];
         }
 
-        $r = $this->subforumids[$id];
-        foreach ($r as $v) {
-            if (!$this->subforumids[$v]) {
+        $forum = $this->subforumids[$forumId];
+        foreach ($forum as $modId) {
+            if (!$this->subforumids[$modId]) {
                 continue;
             }
 
-            $r = array_merge($r, $this->getsubs($v));
+            $forum = array_merge($forum, $this->getsubs($modId));
         }
 
-        return $r;
+        return $forum;
     }
 
     public function getmods($modids): string
@@ -217,12 +227,12 @@ final class IDX
             }
         }
 
-        $r = '';
-        foreach (explode(',', (string) $modids) as $v) {
-            $r .= $moderatorinfo[$v] . $this->page->meta('idx-ledby-splitter');
+        $forum = '';
+        foreach (explode(',', (string) $modids) as $modId) {
+            $forum .= $moderatorinfo[$modId] . $this->page->meta('idx-ledby-splitter');
         }
 
-        return mb_substr($r, 0, -mb_strlen($this->page->meta('idx-ledby-splitter')));
+        return mb_substr($forum, 0, -mb_strlen($this->page->meta('idx-ledby-splitter')));
     }
 
     public function buildTable($a): ?string
@@ -231,37 +241,37 @@ final class IDX
             return null;
         }
 
-        $r = '';
-        foreach ($a as $v) {
-            $read = $this->isForumRead($v);
+        $forum = '';
+        foreach ($a as $modId) {
+            $read = $this->isForumRead($modId);
             $sf = '';
-            if ($v['show_sub'] >= 1 && isset($this->subforums[$v['id']])) {
-                $sf = $this->subforums[$v['id']];
+            if ($modId['show_sub'] >= 1 && isset($this->subforums[$modId['id']])) {
+                $sf = $this->subforums[$modId['id']];
             }
 
-            if ($v['show_sub'] === 2) {
-                foreach ($this->getsubs($v['id']) as $i) {
+            if ($modId['show_sub'] === 2) {
+                foreach ($this->getsubs($modId['id']) as $i) {
                     $sf .= $this->subforums[$i];
                 }
             }
 
-            if ($v['redirect']) {
-                $r .= $this->page->meta(
+            if ($modId['redirect']) {
+                $forum .= $this->page->meta(
                     'idx-redirect-row',
-                    $v['id'],
-                    $v['title'],
-                    nl2br((string) $v['subtitle']),
-                    'Redirects: ' . $v['redirects'],
+                    $modId['id'],
+                    $modId['title'],
+                    nl2br((string) $modId['subtitle']),
+                    'Redirects: ' . $modId['redirects'],
                     $this->jax->pick(
                         $this->page->meta('icon-redirect'),
                         $this->page->meta('idx-icon-redirect'),
                     ),
                 );
             } else {
-                $vId = $v['id'];
+                $vId = $modId['id'];
                 $hrefCode = $read
                     ? ''
-                    : ' href="?act=vf' . $v['id'] . '&amp;markread=1"';
+                    : ' href="?act=vf' . $modId['id'] . '&amp;markread=1"';
                 $linkText = $read
                     ? $this->jax->pick(
                         $this->page->meta('icon-read'),
@@ -270,11 +280,11 @@ final class IDX
                         $this->page->meta('icon-unread'),
                         $this->page->meta('idx-icon-unread'),
                     );
-                $r .= $this->page->meta(
+                $forum .= $this->page->meta(
                     'idx-row',
-                    $v['id'],
-                    $this->textFormatting->wordfilter($v['title']),
-                    nl2br((string) $v['subtitle']),
+                    $modId['id'],
+                    $this->textFormatting->wordfilter($modId['title']),
+                    nl2br((string) $modId['subtitle']),
                     $sf
                     ? $this->page->meta(
                         'idx-subforum-wrapper',
@@ -286,9 +296,9 @@ final class IDX
                             ),
                         ),
                     ) : '',
-                    $this->formatlastpost($v),
-                    $this->page->meta('idx-topics-count', $v['topics']),
-                    $this->page->meta('idx-replies-count', $v['posts']),
+                    $this->formatlastpost($modId),
+                    $this->page->meta('idx-topics-count', $modId['topics']),
+                    $this->page->meta('idx-replies-count', $modId['posts']),
                     $read ? 'read' : 'unread',
                     <<<EOT
                          <a id="fid_{$vId}_icon"{$hrefCode}>
@@ -296,16 +306,16 @@ final class IDX
                         </a>
                         EOT
                     ,
-                    $v['show_ledby'] && $v['mods']
+                    $modId['show_ledby'] && $modId['mods']
                         ? $this->page->meta(
                             'idx-ledby-wrapper',
-                            $this->getmods($v['mods']),
+                            $this->getmods($modId['mods']),
                         ) : '',
                 );
             }
         }
 
-        return $this->page->meta('idx-table', $r);
+        return $this->page->meta('idx-table', $forum);
     }
 
     public function update(): void
@@ -324,16 +334,20 @@ final class IDX
         $page = '';
         $userstoday = '';
         $result = $this->database->safespecial(
-            <<<'EOT'
-                SELECT s.`posts` AS `posts`,s.`topics` AS `topics`,s.`members` AS `members`,
+            <<<'SQL'
+                SELECT
+                    s.`posts` AS `posts`,
+                    s.`topics` AS `topics`,
+                    s.`members` AS `members`,
                     s.`most_members` AS `most_members`,
                     s.`most_members_day` AS `most_members_day`,
-                    s.`last_register` AS `last_register`,m.`group_id` AS `group_id`,
+                    s.`last_register` AS `last_register`,
+                    m.`group_id` AS `group_id`,
                     m.`display_name` AS `display_name`
                 FROM %t s
                 LEFT JOIN %t m
                 ON s.`last_register`=m.`id`
-                EOT
+                SQL
             ,
             ['stats', 'members'],
         );
@@ -341,35 +355,39 @@ final class IDX
         $this->database->disposeresult($result);
 
         $result = $this->database->safespecial(
-            <<<'EOT'
-                SELECT UNIX_TIMESTAMP(MAX(s.`last_update`)) AS `last_update`,m.`id` AS `id`,
-                    m.`group_id` AS `group_id`,m.`display_name` AS `name`,
+            <<<'SQL'
+                SELECT
+                    UNIX_TIMESTAMP(MAX(s.`last_update`)) AS `last_update`,
+                    m.`id` AS `id`,
+                    m.`group_id` AS `group_id`,
+                    m.`display_name` AS `name`,
                     CONCAT(MONTH(m.`birthdate`),' ',DAY(m.`birthdate`)) AS `birthday`,
-                    UNIX_TIMESTAMP(MAX(s.`read_date`)) AS `read_date`,s.`hide` AS `hide`
+                    UNIX_TIMESTAMP(MAX(s.`read_date`)) AS `read_date`,
+                    s.`hide` AS `hide`
                 FROM %t s
                 LEFT JOIN %t m
                     ON s.`uid`=m.`id`
                 WHERE s.`uid` AND s.`hide` = 0
                 GROUP BY m.`id`
                 ORDER BY `name`
-                EOT
+                SQL
             ,
             ['session', 'members'],
         );
         $nuserstoday = 0;
         $today = gmdate('n j');
-        while ($f = $this->database->arow($result)) {
-            if (!$f['id']) {
+        while ($user = $this->database->arow($result)) {
+            if (!$user['id']) {
                 continue;
             }
 
-            $fId = $f['id'];
-            $fName = $f['name'];
-            $fGroupId = $f['group_id'];
-            $birthdayCode = $f['birthday'] === $today
+            $fId = $user['id'];
+            $fName = $user['name'];
+            $fGroupId = $user['group_id'];
+            $birthdayCode = $user['birthday'] === $today
                 && $this->config->getSetting('birthdays') ? ' birthday' : '';
             $lastOnlineCode = $this->jax->date(
-                $f['hide'] ? $f['read_date'] : $f['last_update'],
+                $user['hide'] ? $user['read_date'] : $user['last_update'],
                 false,
             );
             $userstoday
@@ -415,7 +433,7 @@ final class IDX
 
     public function getusersonlinelist(): array
     {
-        $r = '';
+        $forum = '';
         $guests = 0;
         $nummembers = 0;
 
@@ -431,12 +449,12 @@ final class IDX
                     $this->jax->pick($user['location_verbose'], 'Viewing the board.'),
                 );
                 if (isset($user['is_bot']) && $user['is_bot']) {
-                    $r .= '<a class="user' . $user['uid'] . '" '
+                    $forum .= '<a class="user' . $user['uid'] . '" '
                         . 'title="' . $title . '" data-use-tooltip="true">'
                         . $user['name'] . '</a>';
                 } else {
                     ++$nummembers;
-                    $r .= sprintf(
+                    $forum .= sprintf(
                         '<a href="?act=vu%1$s" class="user%1$s mgroup%2$s" '
                             . 'title="%4$s" data-use-tooltip="true">'
                             . '%3$s</a>',
@@ -453,7 +471,7 @@ final class IDX
             }
         }
 
-        return [$r, $nummembers, $guests];
+        return [$forum, $nummembers, $guests];
     }
 
     public function updateStats(): void
@@ -464,35 +482,35 @@ final class IDX
         }
 
         $useronlinecache = '';
-        foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $f) {
+        foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $user) {
             $lastActionIdle = (int) ($this->session->get('last_update') ?? 0) - ($this->config->getSetting('timetoidle') ?? 300) - 30;
-            if (!$f['uid'] && !$f['is_bot']) {
+            if (!$user['uid'] && !$user['is_bot']) {
                 continue;
             }
 
             if (
-                $f['last_action'] >= (int) $this->session->get('last_update')
-                || $f['status'] === 'idle'
-                && $f['last_action'] > $lastActionIdle
+                $user['last_action'] >= (int) $this->session->get('last_update')
+                || $user['status'] === 'idle'
+                && $user['last_action'] > $lastActionIdle
             ) {
                 $list[] = [
-                    $f['uid'],
-                    $f['group_id'],
+                    $user['uid'],
+                    $user['group_id'],
 
-                    $f['status'] !== 'active'
-                    ? $f['status']
-                    : ($f['birthday'] && ($this->config->getSetting('birthdays') & 1)
+                    $user['status'] !== 'active'
+                    ? $user['status']
+                    : ($user['birthday'] && ($this->config->getSetting('birthdays') & 1)
                     ? ' birthday' : ''),
-                    $f['name'],
-                    $f['location_verbose'],
+                    $user['name'],
+                    $user['location_verbose'],
                 ];
             }
 
             if (isset($oldcache)) {
-                unset($oldcache[$f['uid']]);
+                unset($oldcache[$user['uid']]);
             }
 
-            $useronlinecache .= $f['uid'] . ',';
+            $useronlinecache .= $user['uid'] . ',';
         }
 
         if (isset($oldcache) && $oldcache !== []) {
@@ -512,29 +530,29 @@ final class IDX
         $result = $this->database->safespecial(
             <<<'SQL'
                 SELECT
-                    f.`id` AS `id`,
-                    f.`lp_tid` AS `lp_tid`,
-                    f.`lp_topic` AS `lp_topic`,
-                    UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,
-                    f.`lp_uid` AS `lp_uid`,
-                    f.`topics` AS `topics`,
-                    f.`posts` AS `posts`,
+                    user.`id` AS `id`,
+                    user.`lp_tid` AS `lp_tid`,
+                    user.`lp_topic` AS `lp_topic`,
+                    UNIX_TIMESTAMP(user.`lp_date`) AS `lp_date`,
+                    user.`lp_uid` AS `lp_uid`,
+                    user.`topics` AS `topics`,
+                    user.`posts` AS `posts`,
                     m.`display_name` AS `lp_name`,
                     m.`group_id` AS `lp_gid`
-                FROM %t f
-                LEFT JOIN %t m ON f.`lp_uid`=m.`id`
-                WHERE f.`lp_date`>=?
+                FROM %t user
+                LEFT JOIN %t m ON user.`lp_uid`=m.`id`
+                WHERE user.`lp_date`>=?
                 SQL
             ,
             ['forums', 'members'],
             $this->session->get('last_update') ? $this->database->datetime((int) $this->session->get('last_update')) : $this->database->datetime(),
         );
 
-        while ($f = $this->database->arow($result)) {
-            $this->page->JS('addclass', '#fid_' . $f['id'], 'unread');
+        while ($user = $this->database->arow($result)) {
+            $this->page->JS('addclass', '#fid_' . $user['id'], 'unread');
             $this->page->JS(
                 'update',
-                '#fid_' . $f['id'] . '_icon',
+                '#fid_' . $user['id'] . '_icon',
                 $this->jax->pick(
                     $this->page->meta('icon-unread'),
                     $this->page->meta('idx-icon-unread'),
@@ -542,39 +560,39 @@ final class IDX
             );
             $this->page->JS(
                 'update',
-                '#fid_' . $f['id'] . '_lastpost',
-                $this->formatlastpost($f),
+                '#fid_' . $user['id'] . '_lastpost',
+                $this->formatlastpost($user),
                 '1',
             );
             $this->page->JS(
                 'update',
-                '#fid_' . $f['id'] . '_topics',
-                $this->page->meta('idx-topics-count', $f['topics']),
+                '#fid_' . $user['id'] . '_topics',
+                $this->page->meta('idx-topics-count', $user['topics']),
             );
             $this->page->JS(
                 'update',
-                '#fid_' . $f['id'] . '_replies',
-                $this->page->meta('idx-replies-count', $f['posts']),
+                '#fid_' . $user['id'] . '_replies',
+                $this->page->meta('idx-replies-count', $user['posts']),
             );
         }
     }
 
-    public function formatlastpost($v): ?string
+    public function formatlastpost($modId): ?string
     {
         return $this->page->meta(
             'idx-row-lastpost',
-            $v['lp_tid'],
+            $modId['lp_tid'],
             $this->jax->pick(
-                $this->textFormatting->wordfilter($v['lp_topic']),
+                $this->textFormatting->wordfilter($modId['lp_topic']),
                 '- - - - -',
             ),
-            $v['lp_uid'] ? $this->page->meta(
+            $modId['lp_uid'] ? $this->page->meta(
                 'user-link',
-                $v['lp_uid'],
-                $v['lp_gid'],
-                $v['lp_name'],
+                $modId['lp_uid'],
+                $modId['lp_gid'],
+                $modId['lp_name'],
             ) : 'None',
-            $this->jax->pick($this->jax->date($v['lp_date']), '- - - - -'),
+            $this->jax->pick($this->jax->date($modId['lp_date']), '- - - - -'),
         );
     }
 

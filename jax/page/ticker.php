@@ -40,7 +40,7 @@ final class Ticker
     {
         $this->session->set('location_verbose', 'Using the ticker!');
         $result = $this->database->safespecial(
-            <<<'EOT'
+            <<<'SQL'
                 SELECT
                     f.`perms` AS `perms`,
                     f.`title` AS `ftitle`,
@@ -67,7 +67,7 @@ final class Ticker
                     ON t.`auth_id`=m2.`id`
                 ORDER BY p.`id` DESC
                 LIMIT ?
-                EOT
+                SQL
             ,
             ['posts', 'topics', 'forums', 'members', 'members'],
             $this->maxticks,
@@ -96,7 +96,7 @@ final class Ticker
     public function update(): void
     {
         $result = $this->database->safespecial(
-            <<<'EOT'
+            <<<'SQL'
                 SELECT
                     f.`perms` AS `perms`,
                     f.`title` AS `ftitle`,
@@ -124,7 +124,7 @@ final class Ticker
                 WHERE p.`id` > ?
                 ORDER BY p.`id` DESC
                 LIMIT ?
-                EOT
+                SQL
             ,
             ['posts', 'topics', 'forums', 'members', 'members'],
             $this->session->getVar('tickid') ?? 0,

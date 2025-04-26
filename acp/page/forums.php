@@ -354,7 +354,6 @@ final readonly class Forums
     public function createforum($fid = 0)
     {
         $page = '';
-        $e = '';
         $forumperms = '';
         $fdata = [];
         if ($fid) {
@@ -489,6 +488,7 @@ final readonly class Forums
             ];
             $this->database->disposeresult($result);
 
+            $error = null;
             // Add per-forum moderator.
             if (is_numeric($this->jax->p['modid'])) {
                 $result = $this->database->safeselect(
@@ -505,17 +505,17 @@ final readonly class Forums
                             : $this->jax->p['modid'];
                     }
                 } else {
-                    $e = "You tried to add a moderator that doesn't exist!";
+                    $error = "You tried to add a moderator that doesn't exist!";
                 }
 
                 $this->database->disposeresult($result);
             }
 
             if (!$write['title']) {
-                $e = 'Forum title is required';
+                $error = 'Forum title is required';
             }
 
-            if ($e === '' || $e === '0') {
+            if ($error !== null) {
                 // Clear trashcan on other forums.
                 if (
                     $write['trashcan']
@@ -652,8 +652,8 @@ final readonly class Forums
             ) . PHP_EOL;
         }
 
-        if ($e !== '' && $e !== '0') {
-            $page .= $this->page->error($e);
+        if ($error !== null) {
+            $page .= $this->page->error($error);
         }
 
         $subforumOptionsArray = [
@@ -719,12 +719,12 @@ final readonly class Forums
                 explode(',', (string) $fdata['mods']),
             );
             $modList = '';
-            while ($f = $this->database->arow($result)) {
+            while ($member = $this->database->arow($result)) {
                 $modList .= $this->page->parseTemplate(
                     'forums/create-forum-moderators-mod.html',
                     [
-                        'delete_link' => '?act=forums&edit=' . $fid . '&rmod=' . $f['id'],
-                        'username' => $f['display_name'],
+                        'delete_link' => '?act=forums&edit=' . $fid . '&rmod=' . $member['id'],
+                        'username' => $member['display_name'],
                     ],
                 ) . PHP_EOL;
             }
@@ -783,7 +783,7 @@ final readonly class Forums
                 $topics = $this->database->affectedRows();
             } else {
                 $result = $this->database->safespecial(
-                    <<<'EOT'
+                    <<<'SQL'
                         DELETE
                         FROM %t
                         WHERE `tid` IN (
@@ -791,7 +791,7 @@ final readonly class Forums
                             FROM %t
                             WHERE `fid`=?
                         )
-                        EOT
+                        SQL
                     ,
                     ['posts', 'topics'],
                     $this->database->basicvalue($id),
@@ -891,13 +891,13 @@ final readonly class Forums
             'forums',
         );
         $forums = '';
-        while ($f = $this->database->arow($result)) {
+        while ($forum = $this->database->arow($result)) {
             $forums .= $this->page->parseTemplate(
                 'select-option.html',
                 [
-                    'label' => $f['title'],
+                    'label' => $forum['title'],
                     'selected' => '',
-                    'value' => $f['id'],
+                    'value' => $forum['id'],
                 ],
             ) . PHP_EOL;
         }
@@ -988,7 +988,7 @@ final readonly class Forums
     public function deletecategory($id): void
     {
         $page = '';
-        $e = '';
+        $error = null;
         $result = $this->database->safeselect(
             ['id', 'title'],
             'categories',
@@ -1004,12 +1004,12 @@ final readonly class Forums
         }
 
         if ($cattitle === false) {
-            $e = "The category you're trying to delete does not exist.";
+            $error = "The category you're trying to delete does not exist.";
         }
 
-        if (!$e && isset($this->jax->p['submit']) && $this->jax->p['submit']) {
+        if ($error !== null && isset($this->jax->p['submit']) && $this->jax->p['submit']) {
             if (!isset($categories[$this->jax->p['moveto']])) {
-                $e = 'Invalid category to move forums to.';
+                $error = 'Invalid category to move forums to.';
             } else {
                 $this->database->safeupdate(
                     'forums',
@@ -1029,11 +1029,11 @@ final readonly class Forums
         }
 
         if ($categories === []) {
-            $e = 'You cannot delete the only category you have left.';
+            $error = 'You cannot delete the only category you have left.';
         }
 
-        if ($e !== '' && $e !== '0') {
-            $page .= $this->page->error($e);
+        if ($error !== null) {
+            $page .= $this->page->error($error);
         } else {
             $categoryOptions = '';
             foreach ($categories as $categoryId => $categoryName) {

@@ -57,22 +57,22 @@ final class UserProfile
 
     public function render(): void
     {
-        preg_match('@\d+@', (string) $this->jax->b['act'], $m);
-        $id = $m[0];
+        preg_match('@\d+@', (string) $this->jax->b['act'], $match);
+        $userId = $match[0];
         if (!isset($this->jax->b['view'])) {
             $this->jax->b['view'] = false;
         }
 
-        if ($id === '' || $id === '0') {
+        if ($userId === '' || $userId === '0') {
             $this->page->location('?');
         } elseif (
             $this->page->jsnewlocation
             && !$this->page->jsdirectlink
             && !$this->jax->b['view']
         ) {
-            $this->showcontactcard($id);
+            $this->showcontactcard($userId);
         } else {
-            $this->showfullprofile($id);
+            $this->showfullprofile($userId);
         }
     }
 
@@ -80,13 +80,20 @@ final class UserProfile
     {
         $contactdetails = '';
         $result = $this->database->safespecial(
-            <<<'EOT'
-                SELECT m.`id` AS `uid`,m.`display_name` AS `uname`,m.`usertitle` AS `usertitle`,
-                    g.`title` AS `title`,m.`avatar` AS `avatar`,
-                    m.`contact_gtalk` AS `contact_googlechat`,m.`contact_aim` AS `contact_aim`,
+            <<<'SQL'
+                SELECT
+                    m.`id` AS `uid`,
+                    m.`display_name` AS `uname`,
+                    m.`usertitle` AS `usertitle`,
+                    g.`title` AS `title`,
+                    m.`avatar` AS `avatar`,
+                    m.`contact_gtalk` AS `contact_googlechat`,
+                    m.`contact_aim` AS `contact_aim`,
                     m.`website` AS `website`,
-                    m.`contact_yim` AS `contact_yim`,m.`contact_msn` AS `contact_msn`,
-                    m.`contact_skype` AS `contact_skype`,m.`contact_steam` AS `contact_steam`,
+                    m.`contact_yim` AS `contact_yim`,
+                    m.`contact_msn` AS `contact_msn`,
+                    m.`contact_skype` AS `contact_skype`,
+                    m.`contact_steam` AS `contact_steam`,
                     m.`contact_twitter` AS `contact_twitter`,
                     m.`contact_discord` AS `contact_discord`,
                     m.`contact_youtube` AS `contact_youtube`,
@@ -95,7 +102,7 @@ final class UserProfile
                 LEFT JOIN %t g
                     ON m.`group_id`=g.`id`
                 WHERE m.`id`=?
-                EOT
+                SQL
             ,
             ['members', 'member_groups'],
             $id,
@@ -106,14 +113,14 @@ final class UserProfile
             $this->page->error("This user doesn't exist!");
         }
 
-        foreach ($this->contacturls as $k => $v) {
-            if (!$contactUser['contact_' . $k]) {
+        foreach ($this->contacturls as $field => $url) {
+            if (!$contactUser['contact_' . $field]) {
                 continue;
             }
 
-            $contactdetails .= '<a class="' . $k . ' contact" title="' . $k . ' contact" href="' . sprintf(
-                $v,
-                $this->textFormatting->blockhtml($contactUser['contact_' . $k]),
+            $contactdetails .= '<a class="' . $field . ' contact" title="' . $field . ' contact" href="' . sprintf(
+                $url,
+                $this->textFormatting->blockhtml($contactUser['contact_' . $field]),
             ) . '">&nbsp;</a>';
         }
 
@@ -161,14 +168,13 @@ final class UserProfile
             return $this->page->location('?');
         }
 
-        $e = '';
         $nouser = false;
-        $udata = null;
+        $user = null;
         if (!$id || !is_numeric($id)) {
             $nouser = true;
         } else {
             $result = $this->database->safespecial(
-                <<<'EOT'
+                <<<'SQL'
                     SELECT
                         g.`title` AS `group`,
                         `ip`,
@@ -222,19 +228,19 @@ final class UserProfile
                     LEFT JOIN %t g
                         ON m.`group_id`=g.`id`
                     WHERE m.`id`=?
-                    EOT,
+                    SQL,
                 ['members', 'member_groups'],
                 $id,
             );
             echo $this->database->error();
-            $udata = $this->database->arow($result);
+            $user = $this->database->arow($result);
             $this->database->disposeresult($result);
         }
 
-        if (!$udata || $nouser) {
-            $e = $this->page->meta('error', "Sorry, this user doesn't exist.");
-            $this->page->JS('update', 'page', $e);
-            $this->page->append('page', $e);
+        if (!$user || $nouser) {
+            $error = $this->page->meta('error', "Sorry, this user doesn't exist.");
+            $this->page->JS('update', 'page', $error);
+            $this->page->append('page', $error);
 
             return null;
         }
@@ -245,7 +251,7 @@ final class UserProfile
         switch ($pfpageloc) {
             case 'posts':
                 $result = $this->database->safespecial(
-                    <<<'EOT'
+                    <<<'SQL'
                         SELECT p.`post` AS `post`,p.`id` AS `pid`,p.`tid` AS `tid`,
                             t.`title` AS `title`,UNIX_TIMESTAMP(p.`date`) AS `date`,f.`perms` AS `perms`
                         FROM %t p
@@ -256,23 +262,23 @@ final class UserProfile
                         WHERE p.`auth_id`=?
                         ORDER BY p.`id` DESC
                         LIMIT 10
-                        EOT,
+                        SQL,
                     ['posts', 'topics', 'forums'],
                     $id,
                 );
-                while ($f = $this->database->arow($result)) {
-                    $p = $this->user->parseForumPerms($f['perms']);
-                    if (!$p['read']) {
+                while ($post = $this->database->arow($result)) {
+                    $perms = $this->user->parseForumPerms($post['perms']);
+                    if (!$perms['read']) {
                         continue;
                     }
 
                     $pfbox .= $this->page->meta(
                         'userprofile-post',
-                        $f['tid'],
-                        $f['title'],
-                        $f['pid'],
-                        $this->jax->date($f['date']),
-                        $this->textFormatting->theworks($f['post']),
+                        $post['tid'],
+                        $post['title'],
+                        $post['pid'],
+                        $this->jax->date($post['date']),
+                        $this->textFormatting->theworks($post['post']),
                     );
                 }
 
@@ -280,9 +286,14 @@ final class UserProfile
 
             case 'topics':
                 $result = $this->database->safespecial(
-                    <<<'EOT'
-                        SELECT p.`post` AS `post`,p.`id` AS `pid`,p.`tid` AS `tid`,
-                            t.`title` AS `title`,UNIX_TIMESTAMP(p.`date`) AS `date`,f.`perms` AS `perms`
+                    <<<'SQL'
+                        SELECT
+                            p.`post` AS `post`,
+                            p.`id` AS `pid`,
+                            p.`tid` AS `tid`,
+                            t.`title` AS `title`,
+                            UNIX_TIMESTAMP(p.`date`) AS `date`,
+                            f.`perms` AS `perms`
                         FROM %t p
                         LEFT JOIN %t t
                             ON p.`tid`=t.`id`
@@ -292,22 +303,22 @@ final class UserProfile
                             AND p.`newtopic`=1
                         ORDER BY p.`id` DESC
                         LIMIT 10
-                        EOT,
+                        SQL,
                     ['posts', 'topics', 'forums'],
                     $id,
                 );
-                while ($f = $this->database->arow($result)) {
-                    $p = $this->user->parseForumPerms($f['perms']);
-                    if (!$p['read']) {
+                while ($post = $this->database->arow($result)) {
+                    $perms = $this->user->parseForumPerms($post['perms']);
+                    if (!$perms['read']) {
                         continue;
                     }
 
                     $pfbox .= $this->page->meta(
                         'userprofile-topic',
-                        $f['tid'],
-                        $f['title'],
-                        $this->jax->date($f['date']),
-                        $this->textFormatting->theworks($f['post']),
+                        $post['tid'],
+                        $post['title'],
+                        $this->jax->date($post['date']),
+                        $this->textFormatting->theworks($post['post']),
                     );
                 }
 
@@ -320,17 +331,20 @@ final class UserProfile
             case 'about':
                 $pfbox = $this->page->meta(
                     'userprofile-about',
-                    $this->textFormatting->theworks($udata['about']),
-                    $this->textFormatting->theworks($udata['sig']),
+                    $this->textFormatting->theworks($user['about']),
+                    $this->textFormatting->theworks($user['sig']),
                 );
 
                 break;
 
             case 'friends':
-                if ($udata['friends']) {
+                if ($user['friends']) {
                     $result = $this->database->safespecial(
-                        <<<'EOT'
-                            SELECT m.`avatar` AS `avatar`,m.`id` AS `id`,m.`display_name` AS `name`,
+                        <<<'SQL'
+                            SELECT
+                                m.`avatar` AS `avatar`,
+                                m.`id` AS `id`,
+                                m.`display_name` AS `name`,
                                 m.`group_id` AS `group_id`,
                                 m.`usertitle` AS `usertitle`
                             FROM %t m
@@ -338,24 +352,24 @@ final class UserProfile
                                 ON m.`group_id`=g.`id`
                             WHERE m.`id` IN ?
                             ORDER BY `name`
-                            EOT,
+                            SQL,
                         ['members', 'member_groups'],
-                        explode(',', (string) $udata['friends']),
+                        explode(',', (string) $user['friends']),
                     );
 
-                    while ($f = $this->database->arow($result)) {
+                    while ($member = $this->database->arow($result)) {
                         $pfbox .= $this->page->meta(
                             'userprofile-friend',
-                            $f['id'],
+                            $member['id'],
                             $this->jax->pick(
-                                $f['avatar'],
+                                $member['avatar'],
                                 $this->page->meta('default-avatar'),
                             ),
                             $this->page->meta(
                                 'user-link',
-                                $f['id'],
-                                $f['group_id'],
-                                $f['name'],
+                                $member['id'],
+                                $member['group_id'],
+                                $member['name'],
                             ),
                         );
                     }
@@ -392,11 +406,12 @@ final class UserProfile
                     isset($this->jax->p['comment'])
                     && $this->jax->p['comment'] !== ''
                 ) {
+                    $error = null;
                     if (
                         $this->user->isGuest()
                         || !$this->user->getPerm('can_add_comments')
                     ) {
-                        $e = 'No permission to add comments!';
+                        $error = 'No permission to add comments!';
                     } else {
                         $this->database->safeinsert(
                             'activity',
@@ -418,9 +433,9 @@ final class UserProfile
                         );
                     }
 
-                    if ($e !== '' && $e !== '0') {
-                        $this->page->JS('error', $e);
-                        $pfbox .= $this->page->meta('error', $e);
+                    if ($error !== null) {
+                        $this->page->JS('error', $error);
+                        $pfbox .= $this->page->meta('error', $error);
                     }
                 }
 
@@ -443,10 +458,15 @@ final class UserProfile
                 }
 
                 $result = $this->database->safespecial(
-                    <<<'EOT'
-                        SELECT c.`id` AS `id`,c.`to` AS `to`,c.`from` AS `from`,
-                            c.`comment` AS `comment`,UNIX_TIMESTAMP(c.`date`) AS `date`,
-                            m.`display_name` AS `display_name`,m.`group_id` AS `group_id`,
+                    <<<'SQL'
+                        SELECT
+                            c.`id` AS `id`,
+                            c.`to` AS `to`,
+                            c.`from` AS `from`,
+                            c.`comment` AS `comment`,
+                            UNIX_TIMESTAMP(c.`date`) AS `date`,
+                            m.`display_name` AS `display_name`,
+                            m.`group_id` AS `group_id`,
                             m.`avatar` AS `avatar`
                         FROM %t c
                         LEFT JOIN %t m
@@ -454,31 +474,31 @@ final class UserProfile
                         WHERE c.`to`=?
                         ORDER BY c.`id` DESC
                         LIMIT 10
-                        EOT,
+                        SQL,
                     ['profile_comments', 'members'],
                     $id,
                 );
                 $found = false;
-                while ($f = $this->database->arow($result)) {
+                while ($comment = $this->database->arow($result)) {
                     $pfbox .= $this->page->meta(
                         'userprofile-comment',
                         $this->page->meta(
                             'user-link',
-                            $f['from'],
-                            $f['group_id'],
-                            $f['display_name'],
+                            $comment['from'],
+                            $comment['group_id'],
+                            $comment['display_name'],
                         ),
                         $this->jax->pick(
-                            $f['avatar'],
+                            $comment['avatar'],
                             $this->page->meta('default-avatar'),
                         ),
-                        $this->jax->date($f['date']),
-                        $this->textFormatting->theworks($f['comment'])
+                        $this->jax->date($comment['date']),
+                        $this->textFormatting->theworks($comment['comment'])
                         . ($this->user->getPerm('can_delete_comments')
-                        && $f['from'] === $this->user->get('id')
+                        && $comment['from'] === $this->user->get('id')
                         || $this->user->getPerm('can_moderate')
                         ? ' <a href="?act=' . $this->jax->b['act']
-                        . '&view=profile&page=comments&del=' . $f['id']
+                        . '&view=profile&page=comments&del=' . $comment['id']
                         . '" class="delete">[X]</a>' : ''),
                     );
                     $found = true;
@@ -494,11 +514,19 @@ final class UserProfile
             default:
                 $pfpageloc = 'activity';
                 $result = $this->database->safespecial(
-                    <<<'EOT'
-                        SELECT a.`id` AS `id`,a.`type` AS `type`,a.`arg1` AS `arg1`,a.`uid` AS `uid`,
-                            UNIX_TIMESTAMP(a.`date`) AS `date`,a.`affected_uid` AS `affected_uid`,
-                            a.`tid` AS `tid`,a.`pid` AS `pid`,a.`arg2` AS `arg2`,
-                            a.`affected_uid` AS `aff_id`,m.`display_name` AS `aff_name`,
+                    <<<'SQL'
+                        SELECT
+                            a.`id` AS `id`,
+                            a.`type` AS `type`,
+                            a.`arg1` AS `arg1`,
+                            a.`uid` AS `uid`,
+                            UNIX_TIMESTAMP(a.`date`) AS `date`,
+                            a.`affected_uid` AS `affected_uid`,
+                            a.`tid` AS `tid`,
+                            a.`pid` AS `pid`,
+                            a.`arg2` AS `arg2`,
+                            a.`affected_uid` AS `aff_id`,
+                            m.`display_name` AS `aff_name`,
                             m.`group_id` AS `aff_group_id`
                         FROM %t a
                         LEFT JOIN %t m
@@ -506,7 +534,7 @@ final class UserProfile
                         WHERE a.`uid`=?
                         ORDER BY a.`id` DESC
                         LIMIT ?
-                        EOT,
+                        SQL,
                     ['activity', 'members'],
                     $id,
                     $this->num_activity,
@@ -517,21 +545,21 @@ final class UserProfile
                 ) {
                     $feed = new RSSFeed(
                         [
-                            'description' => $udata['usertitle'],
-                            'title' => $udata['display_name'] . "'s recent activity",
+                            'description' => $user['usertitle'],
+                            'title' => $user['display_name'] . "'s recent activity",
                         ],
                     );
-                    while ($f = $this->database->arow($result)) {
-                        $f['name'] = $udata['display_name'];
-                        $f['group_id'] = $udata['group_id'];
-                        $data = $this->parse_activity_rss($f);
+                    while ($activity = $this->database->arow($result)) {
+                        $activity['name'] = $user['display_name'];
+                        $activity['group_id'] = $user['group_id'];
+                        $data = $this->parse_activity_rss($activity);
                         $feed->additem(
                             [
                                 'description' => $data['text'],
-                                'guid' => $f['id'],
+                                'guid' => $activity['id'],
                                 'link' => 'https://' . $_SERVER['SERVER_NAME']
                                 . $_SERVER['PHP_SELF'] . $data['link'],
-                                'pubDate' => gmdate('r', $f['date']),
+                                'pubDate' => gmdate('r', $activity['date']),
                                 'title' => $data['text'],
                             ],
                         );
@@ -540,10 +568,10 @@ final class UserProfile
                     $feed->publish();
                 }
 
-                while ($f = $this->database->arow($result)) {
-                    $f['name'] = $udata['display_name'];
-                    $f['group_id'] = $udata['group_id'];
-                    $pfbox .= $this->parse_activity($f);
+                while ($activity = $this->database->arow($result)) {
+                    $activity['name'] = $user['display_name'];
+                    $activity['group_id'] = $user['group_id'];
+                    $pfbox .= $this->parse_activity($activity);
                 }
 
                 $pfbox = $pfbox === '' || $pfbox === '0'
@@ -563,7 +591,7 @@ final class UserProfile
         } else {
             $this->page->path(
                 [
-                    $udata['display_name']
+                    $user['display_name']
                     . "'s profile" => '?act=vu' . $id . '&view=profile',
                 ],
             );
@@ -577,58 +605,58 @@ final class UserProfile
                 'comments',
                 'friends',
             ];
-            foreach ($tabs as $k => $v) {
-                $tabs[$k] = '<a href="?act=vu' . $id . '&view=profile&page='
-                    . $v . '"' . ($v === $pfpageloc ? ' class="active"' : '')
-                    . '>' . ucwords($v) . '</a>';
+            foreach ($tabs as $tabIndex => $tab) {
+                $tabs[$tabIndex] = '<a href="?act=vu' . $id . '&view=profile&page='
+                    . $tab . '"' . ($tab === $pfpageloc ? ' class="active"' : '')
+                    . '>' . ucwords($tab) . '</a>';
             }
 
             $contactdetails = '';
-            foreach ($udata as $k => $v) {
-                if (mb_substr((string) $k, 0, 8) !== 'contact_') {
+            foreach ($user as $fieldIndex => $field) {
+                if (mb_substr((string) $fieldIndex, 0, 8) !== 'contact_') {
                     continue;
                 }
 
-                if (!$v) {
+                if (!$field) {
                     continue;
                 }
 
-                $contactdetails .= '<div class="contact ' . mb_substr((string) $k, 8)
+                $contactdetails .= '<div class="contact ' . mb_substr((string) $fieldIndex, 8)
                     . '"><a href="'
-                    . sprintf($this->contacturls[mb_substr((string) $k, 8)], $v)
-                    . '">' . $v . '</a></div>';
+                    . sprintf($this->contacturls[mb_substr((string) $fieldIndex, 8)], $field)
+                    . '">' . $field . '</a></div>';
             }
 
             $contactdetails .= '<div class="contact im">'
                 . '<a href="javascript:void(0)" onclick="new IMWindow(\''
-                . $udata['id'] . "','" . $udata['display_name'] . '\')">IM</a></div>';
+                . $user['id'] . "','" . $user['display_name'] . '\')">IM</a></div>';
             $contactdetails .= '<div class="contact pm">'
                 . '<a href="?act=ucp&what=inbox&page=compose&mid='
-                . $udata['id'] . '">PM</a></div>';
+                . $user['id'] . '">PM</a></div>';
             if ($this->user->getPerm('can_moderate')) {
                 $contactdetails .= '<div>IP: <a href="'
-                    . '?act=modcontrols&do=iptools&ip=' . $this->ipAddress->asHumanReadable($udata['ip'])
-                    . '">' . $this->ipAddress->asHumanReadable($udata['ip']) . '</a></div>';
+                    . '?act=modcontrols&do=iptools&ip=' . $this->ipAddress->asHumanReadable($user['ip'])
+                    . '">' . $this->ipAddress->asHumanReadable($user['ip']) . '</a></div>';
             }
 
             $page = $this->page->meta(
                 'userprofile-full-profile',
-                $udata['display_name'],
-                $this->jax->pick($udata['avatar'], $this->page->meta('default-avatar')),
-                $udata['usertitle'],
+                $user['display_name'],
+                $this->jax->pick($user['avatar'], $this->page->meta('default-avatar')),
+                $user['usertitle'],
                 $contactdetails,
-                $this->jax->pick($udata['full_name'], 'N/A'),
-                $this->jax->pick(ucfirst((string) $udata['gender']), 'N/A'),
-                $udata['location'],
-                $udata['dob_year'] ? $udata['dob_month'] . '/'
-                . $udata['dob_day'] . '/' . $udata['dob_year'] : 'N/A',
-                $udata['website'] ? '<a href="' . $udata['website'] . '">'
-                . $udata['website'] . '</a>' : 'N/A',
-                $this->jax->date($udata['join_date']),
-                $this->jax->date($udata['last_visit']),
-                $udata['id'],
-                $udata['posts'],
-                $udata['group'],
+                $this->jax->pick($user['full_name'], 'N/A'),
+                $this->jax->pick(ucfirst((string) $user['gender']), 'N/A'),
+                $user['location'],
+                $user['dob_year'] ? $user['dob_month'] . '/'
+                . $user['dob_day'] . '/' . $user['dob_year'] : 'N/A',
+                $user['website'] ? '<a href="' . $user['website'] . '">'
+                . $user['website'] . '</a>' : 'N/A',
+                $this->jax->date($user['join_date']),
+                $this->jax->date($user['last_visit']),
+                $user['id'],
+                $user['posts'],
+                $user['group'],
                 $tabs[0],
                 $tabs[1],
                 $tabs[2],
@@ -638,12 +666,12 @@ final class UserProfile
                 $pfbox,
                 $this->user->getPerm('can_moderate')
                 ? '<a class="moderate" href="?act=modcontrols&do=emem&mid='
-                . $udata['id'] . '">Edit</a>' : '',
+                . $user['id'] . '">Edit</a>' : '',
             );
             $this->page->JS('update', 'page', $page);
             $this->page->append('page', $page);
 
-            $this->session->set('location_verbose', 'Viewing ' . $udata['display_name'] . "'s profile");
+            $this->session->set('location_verbose', 'Viewing ' . $user['display_name'] . "'s profile");
         }
 
         return null;

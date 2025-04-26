@@ -20,13 +20,17 @@ use const FILTER_VALIDATE_IP;
 /**
  * @psalm-api
  */
-final readonly class IPAddress
+final class IPAddress
 {
+    private ?array $ipBanCache = null;
+
     public function __construct(
-        private Config $config,
-        private Database $database,
-        private DomainDefinitions $domainDefinitions,
-    ) {}
+        private readonly Config $config,
+        private readonly Database $database,
+        private readonly DomainDefinitions $domainDefinitions,
+    ) {
+        $this->getBannedIps();
+    }
 
     public function asBinary(?string $ipAddress = null): false|string
     {
@@ -57,31 +61,21 @@ final readonly class IPAddress
         return (inet_ntop($ipAddress) ?: inet_ntop(pack('A' . $length, $ipAddress))) ?: '';
     }
 
+    public function ban(string $ipAddress) {
+        $this->ipBanCache[] = $ipAddress;
+    }
+
+    public function unBan(string $ipAddress) {
+        unset($this->jax->ipbancache[array_search($ipAddress, $this->ipBanCache, true)]);
+    }
+
     public function isBanned(?string $ipAddress = null): bool
     {
-        static $ipBanCache = null;
-
         if (!$ipAddress) {
             $ipAddress = self::getIp();
         }
 
-        if (!$ipBanCache) {
-            $ipBanCache = [];
-
-            $boardPath = $this->domainDefinitions->getBoardPath();
-            if (file_exists($boardPath . '/bannedips.txt')) {
-                foreach (file($boardPath . '/bannedips.txt') as $line) {
-                    $line = trim($line);
-                    if ($line === '') {
-                        continue;
-                    }
-
-                    $ipBanCache[] = $line;
-                }
-            }
-        }
-
-        foreach ($ipBanCache as $bannedIp) {
+        foreach ($this->ipBanCache as $bannedIp) {
             if (
                 (mb_substr((string) $bannedIp, -1) === ':' || mb_substr((string) $bannedIp, -1) === '.')
                 && mb_strtolower(mb_substr($ipAddress, 0, mb_strlen((string) $bannedIp))) === $bannedIp
@@ -96,6 +90,26 @@ final readonly class IPAddress
 
 
         return false;
+    }
+
+    public function getBannedIps() {
+        if ($this->ipBanCache) {
+            return $this->ipBanCache;
+        }
+
+        $this->ipBanCache = [];
+
+        $boardPath = $this->domainDefinitions->getBoardPath();
+        if (file_exists($boardPath . '/bannedips.txt')) {
+            foreach (file($boardPath . '/bannedips.txt') as $line) {
+                $line = trim($line);
+                if ($line === '') {
+                    continue;
+                }
+
+                $this->ipBanCache[] = $line;
+            }
+        }
     }
 
     /**
@@ -118,11 +132,11 @@ final readonly class IPAddress
         }
 
         $result = $this->database->safespecial(
-            <<<'EOT'
+            <<<'SQL'
                 SELECT COUNT(`ip`) as `banned`
                     FROM `banlist`
                     WHERE ip = ?
-                EOT
+                SQL
             ,
             [],
             $this->database->basicvalue(self::asBinary($ipAddress)),

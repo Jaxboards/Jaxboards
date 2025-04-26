@@ -389,10 +389,10 @@ final class Session
 
         $this->database->safedelete(
             'session',
-            <<<'EOT'
+            <<<'SQL'
                 WHERE `last_update`<?
                     OR (`uid` IS NULL AND `last_update`<?)
-                EOT
+                SQL
             ,
             $this->database->datetime($yesterday),
             $this->database->datetime($timeago),

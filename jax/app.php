@@ -289,7 +289,7 @@ final class App
 
         $this->page->append(
             'SCRIPT',
-            '<script src="' . $this->domainDefinitions->getBoardURL() . 'dist/app.js" defer></script>',
+            '<script src="' . $this->domainDefinitions->getBoardURL() . '/dist/app.js" defer></script>',
         );
 
         if ($this->user->getPerm('can_moderate') || $this->user->get('mod')) {
@@ -320,7 +320,7 @@ final class App
                 'logo',
                 $this->jax->pick(
                     $this->config->getSetting('logourl') ?? false,
-                    $this->domainDefinitions->getBoardURL() . 'Service/Themes/Default/img/logo.png',
+                    $this->domainDefinitions->getBoardURL() . '/Service/Themes/Default/img/logo.png',
                 ),
             ),
         );

@@ -265,14 +265,6 @@ final class Database
         return $result ? $this->fetchAll($result, MYSQLI_ASSOC) : false;
     }
 
-    // Only new-style mysqli.
-    public function rows(?mysqli_result $result = null): array|false
-    {
-        $result = $result ?: $this->lastQuery;
-
-        return $result ? $this->fetchAll($result, MYSQLI_BOTH) : false;
-    }
-
     public function arow(?mysqli_result $result = null): null|array|false
     {
         $result = $result ?: $this->lastQuery;
@@ -485,7 +477,7 @@ final class Database
         $usersOnlineCache = [];
 
         $result = $this->safespecial(
-            <<<'EOT'
+            <<<'SQL'
                 SELECT
                     s.`id` as `id`,
                     s.`uid` AS `uid`,
@@ -503,7 +495,7 @@ final class Database
                 LEFT JOIN %t m ON s.`uid`=m.`id`
                 WHERE s.`last_update`>=?
                 ORDER BY s.`last_action` DESC
-                EOT
+                SQL
             ,
             ['session', 'members'],
             $this->datetime(time() - $this->serviceConfig->getSetting('timetologout')),
@@ -545,7 +537,7 @@ final class Database
         return $usersOnlineCache;
     }
 
-    public function fixForumLastPost($fid): void
+    public function fixForumLastPost($forumId): void
     {
         $result = $this->safeselect(
             [
@@ -556,7 +548,7 @@ final class Database
             ],
             'topics',
             'WHERE `fid`=? ORDER BY `lp_date` DESC LIMIT 1',
-            $fid,
+            $forumId,
         );
         $topic = $this->arow($result);
         $this->disposeresult($result);
@@ -569,7 +561,7 @@ final class Database
                 'lp_uid' => $topic['lp_uid'] ?? null,
             ],
             'WHERE id=?',
-            $fid,
+            $forumId,
         );
     }
 
@@ -627,11 +619,11 @@ final class Database
             return $result->fetch_all($resultType);
         }
 
-        $result = [];
+        $rows = [];
         while ($row = $result->fetch_array($resultType)) {
-            $result[] = $row;
+            $rows[] = $row;
         }
 
-        return $result;
+        return $rows;
     }
 }

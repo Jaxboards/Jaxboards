@@ -8,7 +8,9 @@ use ACP\Page;
 use Jax\Config;
 use Jax\Database;
 use Jax\DomainDefinitions;
+use Jax\IPAddress;
 use Jax\Jax;
+use Jax\User;
 
 use function array_pop;
 use function count;
@@ -49,7 +51,9 @@ final readonly class Members
         private Page $page,
         private Database $database,
         private DomainDefinitions $domainDefinitions,
+        private IPAddress $ipAddress,
         private Jax $jax,
+        private User $user,
     ) {}
 
     public function render(): void
@@ -83,15 +87,18 @@ final readonly class Members
     public function showmain(): void
     {
         $result = $this->database->safespecial(
-            <<<'EOT'
-                SELECT m.`id` AS `id`,m.`avatar` AS `avatar`,
-                    m.`display_name` AS `display_name`,m.`group_id` AS `group_id`,
+            <<<'SQL'
+                SELECT
+                    m.`id` AS `id`,
+                    m.`avatar` AS `avatar`,
+                    m.`display_name` AS `display_name`,
+                    m.`group_id` AS `group_id`,
                     g.`title` AS `group_title`
                 FROM %t m
                 LEFT JOIN %t g
                     ON m.`group_id`=g.`id`
                 ORDER BY m.`display_name` ASC
-                EOT
+                SQL
             ,
             ['members', 'member_groups'],
         );
@@ -124,7 +131,7 @@ final readonly class Members
 
     public function editmem()
     {
-        $userData = $this->database->getUser();
+        $userData = $this->user->getUser();
         $page = '';
         if (
             (isset($this->jax->b['mid']) && $this->jax->b['mid'])
@@ -404,19 +411,19 @@ final readonly class Members
     public function preregister(): void
     {
         $page = '';
-        $e = '';
+        $error = null;
         if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
             if (
                 !$this->jax->p['username']
                 || !$this->jax->p['displayname']
                 || !$this->jax->p['pass']
             ) {
-                $e = 'All fields required.';
+                $error = 'All fields required.';
             } elseif (
                 mb_strlen((string) $this->jax->p['username']) > 30
                 || $this->jax->p['displayname'] > 30
             ) {
-                $e = 'Display name and username must be under 30 characters.';
+                $error = 'Display name and username must be under 30 characters.';
             } else {
                 $result = $this->database->safeselect(
                     ['name', 'display_name'],
@@ -426,15 +433,15 @@ final readonly class Members
                     $this->database->basicvalue($this->jax->p['displayname']),
                 );
                 if ($f = $this->database->arow($result)) {
-                    $e = 'That ' . ($f['name'] === $this->jax->p['username']
+                    $error = 'That ' . ($f['name'] === $this->jax->p['username']
                         ? 'username' : 'display name') . ' is already taken';
                 }
 
                 $this->database->disposeresult($result);
             }
 
-            if ($e !== '' && $e !== '0') {
-                $page .= $this->page->error($e);
+            if ($error !== null) {
+                $page .= $this->page->error($error);
             } else {
                 $member = [
                     'birthdate' => '0000-00-00',
@@ -498,25 +505,25 @@ final readonly class Members
     public function merge(): void
     {
         $page = '';
-        $e = '';
+        $error = null;
         if (!isset($this->jax->p['submit'])) {
             $this->jax->p['submit'] = false;
         }
 
         if ($this->jax->p['submit']) {
             if (!$this->jax->p['mid1'] || !$this->jax->p['mid2']) {
-                $e = 'All fields are required';
+                $error = 'All fields are required';
             } elseif (
                 !is_numeric($this->jax->p['mid1'])
                 || !is_numeric($this->jax->p['mid2'])
             ) {
-                $e = 'An error occurred in processing your request';
+                $error = 'An error occurred in processing your request';
             } elseif ($this->jax->p['mid1'] === $this->jax->p['mid2']) {
-                $e = "Can't merge a member with her/himself";
+                $error = "Can't merge a member with her/himself";
             }
 
-            if ($e !== '' && $e !== '0') {
-                $page .= $this->page->error($e);
+            if ($error !== null) {
+                $page .= $this->page->error($error);
             } else {
                 $mid1 = $this->database->basicvalue($this->jax->p['mid1']);
                 $mid1int = $this->jax->p['mid1'];
@@ -645,11 +652,11 @@ final readonly class Members
 
                 // Update stats.
                 $this->database->safespecial(
-                    <<<'EOT'
+                    <<<'SQL'
                         UPDATE %t
                         SET `members` = `members` - 1,
                             `last_register` = (SELECT MAX(`id`) FROM %t)
-                        EOT
+                        SQL
                     ,
                     ['stats', 'members'],
                 );
@@ -670,16 +677,16 @@ final readonly class Members
     public function deletemem(): void
     {
         $page = '';
-        $e = '';
+        $error = null;
         if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
             if (!$this->jax->p['mid']) {
-                $e = 'All fields are required';
+                $error = 'All fields are required';
             } elseif (!is_numeric($this->jax->p['mid'])) {
-                $e = 'An error occurred in processing your request';
+                $error = 'An error occurred in processing your request';
             }
 
-            if ($e !== '' && $e !== '0') {
-                $page .= $this->page->error($e);
+            if ($error !== null) {
+                $page .= $this->page->error($error);
             } else {
                 $mid = $this->database->basicvalue($this->jax->p['mid']);
 
@@ -720,11 +727,11 @@ final readonly class Members
 
                 // Update stats.
                 $this->database->safespecial(
-                    <<<'EOT'
+                    <<<'SQL'
                         UPDATE %t
                         SET `members` = `members` - 1,
                             `last_register` = (SELECT MAX(`id`) FROM %t)
-                        EOT
+                        SQL
                     ,
                     ['stats', 'members'],
                 );
@@ -841,11 +848,11 @@ final readonly class Members
             }
 
             $data = implode(PHP_EOL, $data);
-            $o = fopen($this->domainDefinitions->getBoardPath() . 'bannedips.txt', 'w');
+            $o = fopen($this->domainDefinitions->getBoardPath() . '/bannedips.txt', 'w');
             fwrite($o, $data);
             fclose($o);
-        } elseif (file_exists($this->domainDefinitions->getBoardPath() . 'bannedips.txt')) {
-            $data = file_get_contents($this->domainDefinitions->getBoardPath() . 'bannedips.txt');
+        } elseif (file_exists($this->domainDefinitions->getBoardPath() . '/bannedips.txt')) {
+            $data = file_get_contents($this->domainDefinitions->getBoardPath() . '/bannedips.txt');
         } else {
             $data = '';
         }
@@ -863,7 +870,7 @@ final readonly class Members
 
     public function massmessage(): void
     {
-        $userData = $this->database->getUser();
+        $userData = $this->user->getUser();
         $page = '';
         if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
             if (
@@ -960,7 +967,7 @@ final readonly class Members
                 [
                     'email_address' => $f['email'],
                     'id' => $f['id'],
-                    'ip_address' => IPAddress::asHumanReadable($f['ip']),
+                    'ip_address' => $this->ipAddress->asHumanReadable($f['ip']),
                     'join_date' => gmdate('M jS, Y @ g:i A', $f['join_date']),
                     'title' => $f['display_name'],
                 ],

@@ -24,7 +24,7 @@ final readonly class Config
 
     public function get(): array
     {
-        return array_merge($this->serviceConfig->get(), $this::getBoardConfig());
+        return array_merge($this->serviceConfig->get(), $this->getBoardConfig());
     }
 
     public function getBoardConfig($write = null)
@@ -40,7 +40,7 @@ final readonly class Config
         }
 
         $boardPath = $this->domainDefinitions->getBoardPath();
-        if ($boardPath === '' || $boardPath === '0') {
+        if ($boardPath === null) {
             $boardConfig = ['noboard' => 1];
 
             return $boardConfig;
