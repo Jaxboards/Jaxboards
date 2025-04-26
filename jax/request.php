@@ -73,6 +73,6 @@ final class Request
 
     private function jsAccess(): int
     {
-        return $_SERVER['HTTP_X_JSACCESS'] ?? 0;
+        return (int) ($_SERVER['HTTP_X_JSACCESS'] ?? 0);
     }
 }
