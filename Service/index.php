@@ -19,7 +19,7 @@ if (!defined('SERVICE_ROOT')) {
     define('SERVICE_ROOT', __DIR__);
 }
 
-require_once JAXBOARDS_ROOT . '/jax/autoload.php';
+require_once JAXBOARDS_ROOT . '/Jax/autoload.php';
 
 if (!file_exists(JAXBOARDS_ROOT . '/config.php')) {
     echo 'Jaxboards not installed!';
