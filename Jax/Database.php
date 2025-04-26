@@ -122,16 +122,16 @@ final class Database
     public function safeselect(
         array|string $fields,
         string $table,
-        string $where = '',
+        ?string $where = null,
         ...$vars,
-    ): null|false|mysqli_result {
+    ): ?mysqli_result {
         // set new variable to not impact debug_backtrace value for inspecting
         // input
         $fieldsString = is_array($fields) ? implode(',', $fields) : $fields;
 
         // Where.
-        $query = 'SELECT ' . $fieldsString . ' FROM '
-            . $this->ftable($table) . ($where !== '' && $where !== '0' ? ' ' . $where : '');
+        $query = "SELECT {$fieldsString} FROM "
+            . $this->ftable($table) . ($where !== null ? ' ' . $where : '');
 
         return $this->safequery($query, ...$vars);
     }
@@ -144,7 +144,7 @@ final class Database
     public function safeinsert(
         string $table,
         array $data,
-    ): null|false|mysqli_result {
+    ): ?mysqli_result {
         if ($data !== [] && array_keys($data) !== []) {
             return $this->safequery(
                 'INSERT INTO ' . $this->ftable($table)
@@ -199,7 +199,7 @@ final class Database
         array $kvarray,
         string $whereFormat = '',
         ...$whereParams,
-    ): null|false|mysqli_result {
+    ): ?mysqli_result {
         if ($kvarray === []) {
             // Nothing to update.
             return null;
@@ -247,7 +247,7 @@ final class Database
         string $table,
         string $whereformat,
         ...$vars,
-    ): mixed {
+    ): ?mysqli_result {
         $query = 'DELETE FROM ' . $this->ftable($table)
             . ($whereformat !== '' && $whereformat !== '0' ? ' ' . $whereformat : '');
 
@@ -255,28 +255,28 @@ final class Database
         return $this->safequery($query, ...$vars);
     }
 
-    public function row(?mysqli_result $result = null): null|array|false
+    public function row(?mysqli_result $result = null): null|array
     {
         $result = $result ?: $this->lastQuery;
 
-        return $result !== null ? mysqli_fetch_array($result) : false;
+        $row = mysqli_fetch_array($result);
+
+        return $row ? $row : null;
     }
 
     // Only new-style mysqli.
-    public function arows(?mysqli_result $result = null): array|false
+    public function arows(?mysqli_result $result = null): ?array
     {
         $result = $result ?: $this->lastQuery;
 
-        return $result !== null
-            ? $this->fetchAll($result, MYSQLI_ASSOC)
-            : false;
+        return $result ? $this->fetchAll($result, MYSQLI_ASSOC) : null;
     }
 
-    public function arow(?mysqli_result $result = null): null|array|false
+    public function arow(?mysqli_result $result = null): null|array
     {
         $result = $result ?: $this->lastQuery;
 
-        return $result !== null ? mysqli_fetch_assoc($result) : false;
+        return $result ? mysqli_fetch_assoc($result) : null;
     }
 
     public function numRows(?mysqli_result $result = null): int|string
@@ -335,7 +335,7 @@ final class Database
     public function safequery(
         string $queryString,
         ...$args,
-    ): null|false|mysqli_result {
+    ): ?mysqli_result {
         // set new variable to not impact debug_backtrace value for inspecting
         // input
         $compiledQueryString = $queryString;
@@ -386,7 +386,9 @@ final class Database
             return null;
         }
 
-        return $stmt->get_result();
+        $result = $stmt->get_result();
+
+        return $result ? $result : null;
     }
 
     public function ekey(string $key): string
@@ -592,15 +594,6 @@ final class Database
         mysqli_result $result,
         int $resultType = MYSQLI_ASSOC,
     ): array {
-        if (function_exists('mysqli_fetch_all')) {
-            return $result->fetch_all($resultType);
-        }
-
-        $rows = [];
-        while ($row = $result->fetch_array($resultType)) {
-            $rows[] = $row;
-        }
-
-        return $rows;
+        return $result->fetch_all($resultType);
     }
 }
