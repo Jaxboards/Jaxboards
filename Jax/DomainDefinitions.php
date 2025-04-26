@@ -62,7 +62,7 @@ final class DomainDefinitions
         }
 
         $this->boardURL = $boardURL;
-        $this->soundsURL = pathjoin($this->boardURL, 'Sounds');
+        $this->soundsURL = $this->boardURL . '/Sounds';
 
         $domainMatch = str_replace('.', '\.', $serviceConfig['domain']);
 

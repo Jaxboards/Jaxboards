@@ -176,7 +176,7 @@ final class App
     {
         $action = mb_strtolower($this->request->both('act') ?? '');
 
-        if ($action === 'idx' && $this->request->both('module') !== null) {
+        if ($action === '' && $this->request->both('module') !== null) {
             return;
         }
 
