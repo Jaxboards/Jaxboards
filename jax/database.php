@@ -33,7 +33,6 @@ use function time;
 use function vsprintf;
 
 use const MYSQLI_ASSOC;
-use const MYSQLI_BOTH;
 use const PHP_EOL;
 
 /**

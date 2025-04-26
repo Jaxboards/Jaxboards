@@ -14,6 +14,7 @@ use SplFileObject;
 use function array_map;
 use function array_pop;
 use function array_reverse;
+use function array_values;
 use function count;
 use function ctype_digit;
 use function explode;

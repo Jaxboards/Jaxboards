@@ -189,7 +189,10 @@ final class IDX
 
     private function getsubs($forumId)
     {
-        if (!isset($this->subforumids[$forumId]) || !$this->subforumids[$forumId]) {
+        if (
+            !isset($this->subforumids[$forumId])
+            || !$this->subforumids[$forumId]
+        ) {
             return [];
         }
 
@@ -245,7 +248,10 @@ final class IDX
         foreach ($forums as $forum) {
             $read = $this->isForumRead($forum);
             $sf = '';
-            if ($forum['show_sub'] >= 1 && isset($this->subforums[$forum['id']])) {
+            if (
+                $forum['show_sub'] >= 1
+                && isset($this->subforums[$forum['id']])
+            ) {
                 $sf = $this->subforums[$forum['id']];
             }
 

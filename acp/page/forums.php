@@ -1007,7 +1007,11 @@ final readonly class Forums
             $error = "The category you're trying to delete does not exist.";
         }
 
-        if ($error !== null && isset($this->jax->p['submit']) && $this->jax->p['submit']) {
+        if (
+            $error !== null
+            && isset($this->jax->p['submit'])
+            && $this->jax->p['submit']
+        ) {
             if (!isset($categories[$this->jax->p['moveto']])) {
                 $error = 'Invalid category to move forums to.';
             } else {
