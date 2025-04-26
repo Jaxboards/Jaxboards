@@ -471,9 +471,10 @@ final class Post
                     enctype="multipart/form-data"
                     >
                     {$vars}
-                    <textarea name="postdata" id="post" title="Type your post here" class="bbcode-editor">
-                        {$postdata}
-                    </textarea><br>
+                    <textarea
+                        name="postdata" id="post" title="Type your post here" class="bbcode-editor"
+                        >{$postdata}</textarea>
+                    <br>
                     {$uploadForm}
                     <div class="buttons">
                         <input type="submit" name="submit"  id="submitbutton"
