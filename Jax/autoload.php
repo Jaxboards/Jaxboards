@@ -10,7 +10,6 @@ use function define;
 use function defined;
 use function dirname;
 use function file_exists;
-use function mb_strtolower;
 use function spl_autoload_register;
 use function str_replace;
 
