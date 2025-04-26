@@ -8,6 +8,7 @@ use ACP\Page;
 use ACP\Page\Forums\RecountStats;
 use Jax\Database;
 use Jax\Jax;
+use Jax\Request;
 use Jax\TextFormatting;
 use Jax\User;
 
@@ -44,6 +45,7 @@ final readonly class Forums
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly RecountStats $recountStats,
+        private readonly Request $request,
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
     ) {}
@@ -193,37 +195,33 @@ final readonly class Forums
             'recountstats' => 'Recount Statistics',
         ]);
 
-        if (isset($this->jax->b['delete']) && $this->jax->b['delete']) {
-            if (is_numeric($this->jax->b['delete'])) {
-                $this->deleteforum($this->jax->b['delete']);
+        if ($this->request->both('delete')) {
+            if (is_numeric($this->request->both('delete'))) {
+                $this->deleteforum($this->request->both('delete'));
 
                 return;
             }
 
-            if (preg_match('@c_(\d+)@', (string) $this->jax->b['delete'], $m)) {
+            if (preg_match('@c_(\d+)@', (string) $this->request->both('delete'), $m)) {
                 $this->deletecategory($m[1]);
 
                 return;
             }
-        } elseif (isset($this->jax->b['edit']) && $this->jax->b['edit']) {
-            if (is_numeric($this->jax->b['edit'])) {
-                $this->createforum($this->jax->b['edit']);
+        } elseif ($this->request->both('edit')) {
+            if (is_numeric($this->request->both('edit'))) {
+                $this->createforum($this->request->both('edit'));
 
                 return;
             }
 
-            if (preg_match('@c_(\d+)@', (string) $this->jax->b['edit'], $m)) {
+            if (preg_match('@c_(\d+)@', (string) $this->request->both('edit'), $m)) {
                 $this->createcategory($m[1]);
 
                 return;
             }
         }
 
-        if (!isset($this->jax->g['do'])) {
-            $this->jax->g['do'] = null;
-        }
-
-        match ($this->jax->g['do']) {
+        match ($this->request->get('do') ?? null) {
             'order' => $this->orderforums(),
             'create' => $this->createforum(),
             'createc' => $this->createcategory(),
@@ -242,10 +240,9 @@ final readonly class Forums
             );
         }
 
-        if (isset($this->jax->p['tree']) && $this->jax->p['tree']) {
-            $this->jax->p['tree'] = json_decode((string) $this->jax->p['tree'], true);
-            $data = self::mysqltree($this->jax->p['tree']);
-            if ($this->jax->g['do'] === 'create') {
+        if ($this->request->post('tree')) {
+            $data = self::mysqltree(json_decode((string) $this->request->post('tree'), true));
+            if ($this->request->get('do') === 'create') {
                 return;
             }
 
@@ -389,22 +386,19 @@ final readonly class Forums
             $this->database->disposeresult($result);
         }
 
-        if (isset($this->jax->p['tree'])) {
-            if ($this->jax->p['tree']) {
-                $this->orderforums();
-            }
+        if ($this->request->post('tree')) {
+            $this->orderforums();
 
             $page .= $this->page->success('Forum created.');
         }
 
         // Remove mod from forum.
         if (
-            isset($this->jax->b['rmod'])
-            && is_numeric($this->jax->b['rmod'])
+            is_numeric( $this->request->both('rmod'))
             && $fdata['mods']
         ) {
             $exploded = explode(',', (string) $fdata['mods']);
-            unset($exploded[array_search($this->jax->b['rmod'], $exploded, true)]);
+            unset($exploded[array_search($this->request->both('rmod'), $exploded, true)]);
             $fdata['mods'] = implode(',', $exploded);
             $this->database->safeupdate(
                 'forums',
@@ -418,7 +412,7 @@ final readonly class Forums
             $this->page->location('?act=forums&edit=' . $fid);
         }
 
-        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
+        if ($this->request->post('submit')) {
             // Saves all of the data
             // really should be its own function, but I don't care.
             $grouppermsa = [];
@@ -428,12 +422,12 @@ final readonly class Forums
                 'member_groups',
             );
             while ($f = $this->database->arow($result)) {
-                if (!isset($this->jax->p['groups'][$f['id']])) {
-                    $this->jax->p['groups'][$f['id']] = [];
+                if (!isset($this->request->post('groups')[$f['id']])) {
+                    $this->request->post('groups')[$f['id']] = [];
                 }
 
                 $options = ['read', 'start', 'reply', 'upload', 'view', 'poll'];
-                $v = $this->jax->p['groups'][$f['id']];
+                $v = $this->request->post('groups')[$f['id']];
                 if (isset($v['global']) && $v['global']) {
                     continue;
                 }
@@ -459,9 +453,9 @@ final readonly class Forums
                 $groupperms .= pack('n*', $k, $v);
             }
 
-            $sub = (int) $this->jax->p['show_sub'];
-            if (is_numeric($this->jax->p['orderby'])) {
-                $orderby = (int) $this->jax->p['orderby'];
+            $sub = (int) $this->request->post('show_sub');
+            if (is_numeric($this->request->post('orderby'))) {
+                $orderby = (int) $this->request->post('orderby');
             }
 
             $result = $this->database->safeselect(
@@ -475,34 +469,34 @@ final readonly class Forums
                     array_pop($thisrow),
                 ),
                 'mods' => $fdata['mods'] ?? null,
-                'nocount' => $this->jax->p['nocount'] ? 0 : 1,
+                'nocount' => $this->request->post('nocount') ? 0 : 1,
                 'orderby' => $orderby > 0 && $orderby <= 5 ? $orderby : 0,
                 'perms' => $groupperms,
-                'redirect' => $this->jax->p['redirect'],
-                'show_ledby' => (int) (isset($this->jax->p['show_ledby']) && $this->jax->p['show_ledby']),
+                'redirect' => $this->request->post('redirect'),
+                'show_ledby' => (int) $this->request->post('show_ledby'),
                 'show_sub' => $sub === 1 || $sub === 2 ? $sub : 0,
-                'subtitle' => $this->jax->p['description'],
-                'title' => $this->jax->p['title'],
-                'trashcan' => (int) (isset($this->jax->p['trashcan']) && $this->jax->p['trashcan']),
+                'subtitle' => $this->request->post('description'),
+                'title' => $this->request->post('title'),
+                'trashcan' => (int) $this->request->post('trashcan'),
                 // Handling done below.
             ];
             $this->database->disposeresult($result);
 
             $error = null;
             // Add per-forum moderator.
-            if (is_numeric($this->jax->p['modid'])) {
+            if (is_numeric($this->request->post('modid'))) {
                 $result = $this->database->safeselect(
                     ['id'],
                     'members',
                     'WHERE `id`=?',
-                    $this->database->basicvalue($this->jax->p['modid']),
+                    $this->database->basicvalue($this->request->post('modid')),
                 );
                 if ($this->database->arow($result)) {
-                    if (!in_array($this->jax->p['modid'], isset($fdata['mods']) ? explode(',', $fdata['mods']) : [])) {
+                    if (!in_array($this->request->post('modid'), isset($fdata['mods']) ? explode(',', $fdata['mods']) : [])) {
                         $write['mods'] = isset($fdata['mods'])
                             && $fdata['mods']
-                            ? $fdata['mods'] . ',' . $this->jax->p['modid']
-                            : $this->jax->p['modid'];
+                            ? $fdata['mods'] . ',' . $this->request->post('modid')
+                            : $this->request->post('modid');
                     }
                 } else {
                     $error = "You tried to add a moderator that doesn't exist!";
@@ -546,7 +540,7 @@ final readonly class Forums
                     'WHERE `id`=?',
                     $fid,
                 );
-                if ($this->jax->p['modid']) {
+                if ($this->request->post('modid')) {
                     $this->updateperforummodflag();
                 }
 
@@ -761,21 +755,20 @@ final readonly class Forums
     public function deleteforum($id)
     {
         if (
-            isset($this->jax->p['submit'])
-            && $this->jax->p['submit'] === 'Cancel'
+            $this->request->post('submit') === 'Cancel'
         ) {
             $this->page->location('?act=forums&do=order');
-        } elseif (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
+        } elseif ($this->request->post('submit')) {
             $this->database->safedelete(
                 'forums',
                 'WHERE `id`=?',
                 $this->database->basicvalue($id),
             );
-            if ($this->jax->p['moveto']) {
+            if ($this->request->post('moveto')) {
                 $this->database->safeupdate(
                     'topics',
                     [
-                        'fid' => $this->jax->p['moveto'],
+                        'fid' => $this->request->post('moveto'),
                     ],
                     ' WHERE `fid`=?',
                     $this->database->basicvalue($id),
@@ -808,7 +801,7 @@ final readonly class Forums
 
             $page = '';
             if ($topics > 0) {
-                $page .= ($this->jax->p['moveto'] ? 'Moved' : 'Deleted')
+                $page .= ($this->request->post('moveto') ? 'Moved' : 'Deleted')
                     . " {$topics} topics" . (isset($posts) && $posts
                     ? " and {$posts} posts" : '');
             }
@@ -919,8 +912,8 @@ final readonly class Forums
     {
         $page = '';
         $cdata = [];
-        if (!$cid && isset($this->jax->p['cat_id'])) {
-            $cid = (int) $this->jax->p['cat_id'];
+        if (!$cid && $this->request->post('cat_id')) {
+            $cid = (int) $this->request->post('cat_id');
         }
 
         if ($cid) {
@@ -934,14 +927,14 @@ final readonly class Forums
             $this->database->disposeresult($result);
         }
 
-        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
+        if ($this->request->post('submit')) {
             if (
-                trim((string) $this->jax->p['cat_name']) === ''
-                || trim((string) $this->jax->p['cat_name']) === '0'
+                trim((string) $this->request->post('cat_name')) === ''
+                || trim((string) $this->request->post('cat_name')) === '0'
             ) {
                 $page .= $this->page->error('All fields required');
             } else {
-                $data = ['title' => $this->jax->p['cat_name']];
+                $data = ['title' => $this->request->post('cat_name')];
                 if (!empty($cdata)) {
                     $this->database->safeupdate(
                         'categories',
@@ -1009,16 +1002,15 @@ final readonly class Forums
 
         if (
             $error !== null
-            && isset($this->jax->p['submit'])
-            && $this->jax->p['submit']
+            && $this->request->post('submit')
         ) {
-            if (!isset($categories[$this->jax->p['moveto']])) {
+            if (!isset($categories[$this->request->post('moveto')])) {
                 $error = 'Invalid category to move forums to.';
             } else {
                 $this->database->safeupdate(
                     'forums',
                     [
-                        'cat_id' => $this->jax->p['moveto'],
+                        'cat_id' => $this->request->post('moveto'),
                     ],
                     'WHERE `cat_id`=?',
                     $this->database->basicvalue($id),

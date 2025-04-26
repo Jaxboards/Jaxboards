@@ -7,6 +7,7 @@ namespace ACP\Page;
 use ACP\Page;
 use Jax\Database;
 use Jax\Jax;
+use Jax\Request;
 use Jax\TextFormatting;
 
 use function array_flip;
@@ -30,6 +31,7 @@ final class Groups
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly Page $page,
+        private readonly Request $request,
         private readonly TextFormatting $textFormatting,
     ) {}
 
@@ -41,18 +43,16 @@ final class Groups
             'perms' => 'Edit Permissions',
         ]);
 
-        if (isset($this->jax->g['edit']) && $this->jax->g['edit']) {
-            $this->jax->g['do'] = 'edit';
+
+        $do = null;
+        if ($this->request->get('edit')) {
+            $do = 'edit';
         }
 
-        if (!isset($this->jax->g['do'])) {
-            $this->jax->g['do'] = null;
-        }
-
-        match ($this->jax->g['do']) {
+        match ($this->request->get('do')) {
             'perms' => $this->showperms(),
             'create' => $this->create(),
-            'edit' => $this->create($this->jax->g['edit']),
+            'edit' => $this->create($this->request->get('edit')),
             'delete' => $this->delete(),
             default => $this->showperms(),
         };
@@ -158,21 +158,20 @@ final class Groups
 
         if (
             $this->updatePermissions
-            && isset($this->jax->p['perm'])
-            && $this->jax->p['perm']
+            && $this->request->post('perm')
         ) {
-            foreach (explode(',', (string) $this->jax->p['grouplist']) as $v) {
+            foreach (explode(',', (string) $this->request->post('grouplist')) as $v) {
                 if (
-                    isset($this->jax->p['perm'][$v])
-                    && $this->jax->p['perm'][$v]
+                    isset($this->request->post('perm')[$v])
+                    && $this->request->post('perm')[$v]
                 ) {
                     continue;
                 }
 
-                $this->jax->p['perm'][$v] = [];
+                $this->request->post('perm')[$v] = [];
             }
 
-            return $this->updateperms($this->jax->p['perm']);
+            return $this->updateperms($this->request->post('perm'));
         }
 
         if (
@@ -398,19 +397,16 @@ final class Groups
 
         $page = '';
         $error = null;
-        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
-            if (
-                !isset($this->jax->p['groupname'])
-                || !$this->jax->p['groupname']
-            ) {
+        if ($this->request->post('submit')) {
+            if (!$this->request->post('groupname')) {
                 $error = 'Group name required!';
-            } elseif (mb_strlen((string) $this->jax->p['groupname']) > 250) {
+            } elseif (mb_strlen((string) $this->request->post('groupname')) > 250) {
                 $error = 'Group name must not exceed 250 characters!';
-            } elseif (mb_strlen((string) $this->jax->p['groupicon']) > 250) {
+            } elseif (mb_strlen((string) $this->request->post('groupicon')) > 250) {
                 $error = 'Group icon must not exceed 250 characters!';
             } elseif (
-                $this->jax->p['groupicon']
-                && !$this->jax->isurl($this->jax->p['groupicon'])
+                $this->request->post('groupicon')
+                && !$this->jax->isurl($this->request->post('groupicon'))
             ) {
                 $error = 'Group icon must be a valid image url';
             }
@@ -419,8 +415,8 @@ final class Groups
                 $page .= $this->page->error($error);
             } else {
                 $write = [
-                    'icon' => $this->jax->p['groupicon'],
-                    'title' => $this->jax->p['groupname'],
+                    'icon' => $this->request->post('groupicon'),
+                    'title' => $this->request->post('groupname'),
                 ];
                 if ($gid) {
                     $this->database->safeupdate(
