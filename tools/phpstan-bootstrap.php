@@ -9,4 +9,4 @@ declare(strict_types=1);
  * static analysis
  */
 
-require_once dirname(__DIR__) . '/jax/autoload.php';
+require_once dirname(__DIR__) . '/Jax/autoload.php';

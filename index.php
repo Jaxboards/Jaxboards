@@ -10,7 +10,7 @@ if (!defined('JAXBOARDS_ROOT')) {
 }
 
 // Load composer dependencies.
-require_once JAXBOARDS_ROOT . '/jax/autoload.php';
+require_once JAXBOARDS_ROOT . '/Jax/autoload.php';
 
 /*
  * Jaxboards. THE ULTIMATE 4UMS WOOOOOOO

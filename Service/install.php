@@ -27,7 +27,7 @@ if (file_exists(SERVICE_ROOT . '/install.lock')) {
     exit(1);
 }
 
-require_once JAXBOARDS_ROOT . '/jax/autoload.php';
+require_once JAXBOARDS_ROOT . '/Jax/autoload.php';
 $container = new Container();
 
 require_once JAXBOARDS_ROOT . '/acp/page.php';
