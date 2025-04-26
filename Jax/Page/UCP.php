@@ -22,7 +22,6 @@ use function is_numeric;
 use function json_encode;
 use function mb_strlen;
 use function mb_strstr;
-use function mb_strtolower;
 use function password_hash;
 use function password_verify;
 use function preg_match;
@@ -105,29 +104,22 @@ final class UCP
             $this->deleteMessages($dmessage);
         }
 
-        match(true) {
-            is_numeric($messageId) => match($page) {
+        match (true) {
+            is_numeric($messageId) => match ($page) {
                 'delete' => $this->delete($messageId),
                 'forward' => $this->compose($messageId, 'fwd'),
                 'reply' => $this->compose($messageId),
-
             },
             is_numeric($view) => $this->viewmessage($view),
             is_numeric($flag) => $this->flag(),
 
-            default => match($page) {
+            default => match ($page) {
                 'compose' => $this->compose(),
                 'sent' => $this->viewmessages('sent'),
                 'flagged' => $this->viewmessages('flagged'),
                 default => $this->viewmessages(),
             },
         };
-    }
-
-    private function deleteMessages(array $messageIds) {
-        foreach ($messageIds as $messageId) {
-            $this->delete($messageId, false);
-        }
     }
 
     public function showmain(): void
@@ -1285,5 +1277,12 @@ final class UCP
             . ($this->request->both('prevpage') !== null
             ? '&page=' . $this->request->both('prevpage') : ''),
         );
+    }
+
+    private function deleteMessages(array $messageIds): void
+    {
+        foreach ($messageIds as $messageId) {
+            $this->delete($messageId, false);
+        }
     }
 }
