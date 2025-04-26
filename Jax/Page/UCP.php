@@ -106,9 +106,9 @@ final class UCP
 
         match (true) {
             is_numeric($messageId) => match ($page) {
-                'delete' => $this->delete($messageId),
-                'forward' => $this->compose($messageId, 'fwd'),
-                'reply' => $this->compose($messageId),
+                'Delete' => $this->delete($messageId),
+                'Forward' => $this->compose($messageId, 'fwd'),
+                'Reply' => $this->compose($messageId),
             },
             is_numeric($view) => $this->viewmessage($view),
             is_numeric($flag) => $this->flag(),
