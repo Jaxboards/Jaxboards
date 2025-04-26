@@ -71,7 +71,7 @@ final class IPAddress
 
     public function unBan(string $ipAddress): void
     {
-        unset($this->jax->ipbancache[array_search($ipAddress, $this->ipBanCache, true)]);
+        unset($this->ipBanCache[array_search($ipAddress, $this->ipBanCache, true)]);
     }
 
     public function isBanned(?string $ipAddress = null): bool
@@ -99,7 +99,7 @@ final class IPAddress
 
     public function getBannedIps()
     {
-        if ($this->ipBanCache) {
+        if ($this->ipBanCache !== null) {
             return $this->ipBanCache;
         }
 
@@ -117,7 +117,7 @@ final class IPAddress
             }
         }
 
-        return null;
+        return $this->ipBanCache;
     }
 
     /**
