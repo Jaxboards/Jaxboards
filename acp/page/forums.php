@@ -63,18 +63,18 @@ final readonly class Forums
             return;
         }
 
-        foreach ($tree as $k => $v) {
-            $k = mb_substr($k, 1);
+        foreach ($tree as $key => $value) {
+            $key = mb_substr($key, 1);
             ++$order;
-            $childPath = $path . $k . ' ';
+            $childPath = $path . $key . ' ';
             sscanf($childPath, 'c_%d', $cat);
             $children = mb_strstr($path, ' ');
             $formattedPath = $children ? trim($children) : '';
-            if (is_array($v)) {
-                self::mysqltree($v, $childPath . ' ', $order);
+            if (is_array($value)) {
+                self::mysqltree($value, $childPath . ' ', $order);
             }
 
-            if ($k[0] === 'c') {
+            if ($key[0] === 'c') {
                 $this->database->safeupdate(
                     'categories',
                     [
@@ -96,7 +96,7 @@ final readonly class Forums
                         ),
                     ],
                     'WHERE `id`=?',
-                    $k,
+                    $key,
                 );
             }
         }
@@ -202,8 +202,8 @@ final readonly class Forums
                 return;
             }
 
-            if (preg_match('@c_(\d+)@', (string) $this->request->both('delete'), $m)) {
-                $this->deletecategory($m[1]);
+            if (preg_match('@c_(\d+)@', (string) $this->request->both('delete'), $match)) {
+                $this->deletecategory($match[1]);
 
                 return;
             }
@@ -214,8 +214,8 @@ final readonly class Forums
                 return;
             }
 
-            if (preg_match('@c_(\d+)@', (string) $this->request->both('edit'), $m)) {
-                $this->createcategory($m[1]);
+            if (preg_match('@c_(\d+)@', (string) $this->request->both('edit'), $match)) {
+                $this->createcategory($match[1]);
 
                 return;
             }
@@ -241,7 +241,7 @@ final readonly class Forums
         }
 
         if ($this->request->post('tree') !== null) {
-            $data = self::mysqltree(json_decode((string) $this->request->post('tree'), true));
+            self::mysqltree(json_decode((string) $this->request->post('tree'), true));
             if ($this->request->get('do') === 'create') {
                 return;
             }
@@ -259,9 +259,9 @@ final readonly class Forums
             'categories',
             'ORDER BY `order`,`id` ASC',
         );
-        while ($f = $this->database->arow($result)) {
-            $forums['c_' . $f['id']] = ['title' => $f['title']];
-            $cats[] = $f['id'];
+        while ($category = $this->database->arow($result)) {
+            $forums['c_' . $category['id']] = ['title' => $category['title']];
+            $cats[] = $category['id'];
         }
 
         $this->database->disposeresult($result);
@@ -294,40 +294,40 @@ final readonly class Forums
             'ORDER BY `order`,`title`',
         );
         $tree = [$result];
-        while ($f = $this->database->arow($result)) {
-            $forums[$f['id']] = [
-                'mods' => $f['mods'],
-                'title' => $f['title'],
-                'trashcan' => $f['trashcan'],
+        while ($forum = $this->database->arow($result)) {
+            $forums[$forum['id']] = [
+                'mods' => $forum['mods'],
+                'title' => $forum['title'],
+                'trashcan' => $forum['trashcan'],
             ];
-            $treeparts = explode(' ', (string) $f['path']);
-            array_unshift($treeparts, 'c_' . $f['cat_id']);
+            $treeparts = explode(' ', (string) $forum['path']);
+            array_unshift($treeparts, 'c_' . $forum['cat_id']);
             $intree = &$tree;
-            foreach ($treeparts as $v) {
-                if (trim($v) === '') {
+            foreach ($treeparts as $treePart) {
+                if (trim($treePart) === '') {
                     continue;
                 }
 
-                if (trim($v) === '0') {
+                if (trim($treePart) === '0') {
                     continue;
                 }
 
-                if (!isset($intree[$v]) || !is_array($intree[$v])) {
-                    $intree[$v] = [];
+                if (!isset($intree[$treePart]) || !is_array($intree[$treePart])) {
+                    $intree[$treePart] = [];
                 }
 
-                $intree = &$intree[$v];
+                $intree = &$intree[$treePart];
             }
 
-            if (isset($intree[$f['id']]) && $intree[$f['id']]) {
+            if (isset($intree[$forum['id']]) && $intree[$forum['id']]) {
                 continue;
             }
 
-            $intree[$f['id']] = true;
+            $intree[$forum['id']] = true;
         }
 
-        foreach ($cats as $v) {
-            $sortedtree['c_' . $v] = $tree['c_' . $v] ?? null;
+        foreach ($cats as $category) {
+            $sortedtree['c_' . $category] = $tree['c_' . $category] ?? null;
         }
 
         $page .= $this->printtree(
@@ -421,38 +421,38 @@ final readonly class Forums
                 ['id'],
                 'member_groups',
             );
-            while ($f = $this->database->arow($result)) {
+            while ($group = $this->database->arow($result)) {
                 $groups = $this->request->post('groups') ?? [];
 
-                if (!$groups[$f['id']]) {
-                    $groups[$f['id']] = [];
+                if (!$groups[$group['id']]) {
+                    $groups[$group['id']] = [];
                 }
 
                 $options = ['read', 'start', 'reply', 'upload', 'view', 'poll'];
-                $v = $groups[$f['id']];
-                if (isset($v['global']) && $v['global']) {
+                $groupPermInput = $groups[$group['id']];
+                if (isset($groupPermInput['global']) && $groupPermInput['global']) {
                     continue;
                 }
 
                 foreach ($options as $option) {
-                    if (isset($v[$option])) {
+                    if (isset($groupPermInput[$option])) {
                         continue;
                     }
 
-                    $v[$option] = false;
+                    $groupPermInput[$option] = false;
                 }
 
-                $grouppermsa[$f['id']]
-                    = ($v['read'] ? 8 : 0)
-                    + ($v['start'] ? 4 : 0)
-                    + ($v['reply'] ? 2 : 0)
-                    + ($v['upload'] ? 1 : 0)
-                    + ($v['view'] ? 16 : 0)
-                    + ($v['poll'] ? 32 : 0);
+                $grouppermsa[$group['id']]
+                    = ($groupPermInput['read'] ? 8 : 0)
+                    + ($groupPermInput['start'] ? 4 : 0)
+                    + ($groupPermInput['reply'] ? 2 : 0)
+                    + ($groupPermInput['upload'] ? 1 : 0)
+                    + ($groupPermInput['view'] ? 16 : 0)
+                    + ($groupPermInput['poll'] ? 32 : 0);
             }
 
-            foreach ($grouppermsa as $k => $v) {
-                $groupperms .= pack('n*', $k, $v);
+            foreach ($grouppermsa as $permission => $flag) {
+                $groupperms .= pack('n*', $permission, $flag);
             }
 
             $sub = (int) $this->request->post('show_sub');
@@ -556,8 +556,8 @@ final readonly class Forums
         if (isset($fdata['perms']) && $fdata['perms']) {
             $unpack = unpack('n*', (string) $fdata['perms']);
             $counter = count($unpack);
-            for ($x = 1; $x < $counter; $x += 2) {
-                $perms[$unpack[$x]] = $unpack[$x + 1];
+            for ($index = 1; $index < $counter; $index += 2) {
+                $perms[$unpack[$index]] = $unpack[$index + 1];
             }
         }
 
@@ -599,50 +599,50 @@ final readonly class Forums
         );
 
         $groupperms = '';
-        while ($f = $this->database->arow($result)) {
-            $global = !isset($perms[$f['id']]);
+        while ($group = $this->database->arow($result)) {
+            $global = !isset($perms[$group['id']]);
             if (!$global) {
-                $p = isset($perms[$f['id']])
-                    ? $this->user->parseForumPerms($perms[$f['id']])
+                $perms = isset($perms[$group['id']])
+                    ? $this->user->parseForumPerms($perms[$group['id']])
                     : null;
             }
 
             $groupperms .= $this->page->parseTemplate(
                 'forums/create-forum-permissions-row.html',
                 [
-                    'global' => $this->checkbox($f['id'], 'global', $global),
+                    'global' => $this->checkbox($group['id'], 'global', $global),
                     'poll' => $this->checkbox(
-                        $f['id'],
+                        $group['id'],
                         'poll',
-                        $global ? $f['can_poll'] : $p['poll'],
+                        $global ? $group['can_poll'] : $perms['poll'],
                     ),
                     'read' => $this->checkbox(
-                        $f['id'],
+                        $group['id'],
                         'read',
-                        $global ? 1 : $p['read'],
+                        $global ? 1 : $perms['read'],
                     ),
                     'reply' => $this->checkbox(
-                        $f['id'],
+                        $group['id'],
                         'reply',
-                        $global ? $f['can_post']
-                        : $p['reply'],
+                        $global ? $group['can_post']
+                        : $perms['reply'],
                     ),
                     'start' => $this->checkbox(
-                        $f['id'],
+                        $group['id'],
                         'start',
-                        $global ? $f['can_post_topics']
-                        : $p['start'],
+                        $global ? $group['can_post_topics']
+                        : $perms['start'],
                     ),
-                    'title' => $f['title'],
+                    'title' => $group['title'],
                     'upload' => $this->checkbox(
-                        $f['id'],
+                        $group['id'],
                         'upload',
-                        $global ? $f['can_attach'] : $p['upload'],
+                        $global ? $group['can_attach'] : $perms['upload'],
                     ),
                     'view' => $this->checkbox(
-                        $f['id'],
+                        $group['id'],
                         'view',
-                        $global ? 1 : $p['view'],
+                        $global ? 1 : $perms['view'],
                     ),
                 ],
             ) . PHP_EOL;
@@ -754,7 +754,7 @@ final readonly class Forums
         $this->page->addContentBox('Forum Permissions', $forumperms);
     }
 
-    public function deleteforum($id)
+    public function deleteforum($forumId)
     {
         if (
             $this->request->post('submit') === 'Cancel'
@@ -764,7 +764,7 @@ final readonly class Forums
             $this->database->safedelete(
                 'forums',
                 'WHERE `id`=?',
-                $this->database->basicvalue($id),
+                $this->database->basicvalue($forumId),
             );
             if ($this->request->post('moveto') !== null) {
                 $this->database->safeupdate(
@@ -773,7 +773,7 @@ final readonly class Forums
                         'fid' => $this->request->post('moveto'),
                     ],
                     ' WHERE `fid`=?',
-                    $this->database->basicvalue($id),
+                    $this->database->basicvalue($forumId),
                 );
                 $topics = $this->database->affectedRows();
             } else {
@@ -789,14 +789,14 @@ final readonly class Forums
                         SQL
                     ,
                     ['posts', 'topics'],
-                    $this->database->basicvalue($id),
+                    $this->database->basicvalue($forumId),
                 );
 
                 $posts = $this->database->affectedRows();
                 $this->database->safedelete(
                     'topics',
                     'WHERE `fid`=?',
-                    $this->database->basicvalue($id),
+                    $this->database->basicvalue($forumId),
                 );
                 $topics = $this->database->affectedRows();
             }
@@ -847,14 +847,14 @@ final readonly class Forums
             ],
             'forums',
             'WHERE `id`=?',
-            $this->database->basicvalue($id),
+            $this->database->basicvalue($forumId),
         );
         $fdata = $this->database->arow($result);
         $this->database->disposeresult($result);
 
         if (!$fdata) {
             return $this->page->addContentBox(
-                'Deleting Forum: ' . $id,
+                'Deleting Forum: ' . $forumId,
                 $this->page->error("Forum doesn't exist."),
             );
         }
@@ -979,7 +979,7 @@ final readonly class Forums
         );
     }
 
-    public function deletecategory($id): void
+    public function deletecategory($catId): void
     {
         $page = '';
         $error = null;
@@ -989,11 +989,11 @@ final readonly class Forums
         );
         $categories = [];
         $cattitle = false;
-        while ($f = $this->database->arow($result)) {
-            if ($f['id'] !== $id) {
-                $categories[$f['id']] = $f['title'];
+        while ($category = $this->database->arow($result)) {
+            if ($category['id'] !== $catId) {
+                $categories[$category['id']] = $category['title'];
             } else {
-                $cattitle = $f['title'];
+                $cattitle = $category['title'];
             }
         }
 
@@ -1014,12 +1014,12 @@ final readonly class Forums
                         'cat_id' => $this->request->post('moveto'),
                     ],
                     'WHERE `cat_id`=?',
-                    $this->database->basicvalue($id),
+                    $this->database->basicvalue($catId),
                 );
                 $this->database->safedelete(
                     'categories',
                     'WHERE `id`=?',
-                    $this->database->basicvalue($id),
+                    $this->database->basicvalue($catId),
                 );
                 $page .= $this->page->success('Category deleted!');
             }
@@ -1074,17 +1074,13 @@ final readonly class Forums
         );
         // Build an array of mods.
         $mods = [];
-        while ($f = $this->database->arow($result)) {
-            foreach (explode(',', (string) $f['mods']) as $v) {
-                if ($v === '') {
+        while ($forum = $this->database->arow($result)) {
+            foreach (explode(',', (string) $forum['mods']) as $modId) {
+                if ($modId === '') {
                     continue;
                 }
 
-                if ($v === '0') {
-                    continue;
-                }
-
-                $mods[$v] = 1;
+                $mods[$modId] = 1;
             }
         }
 
@@ -1099,7 +1095,7 @@ final readonly class Forums
         );
     }
 
-    public function checkbox($id, $name, $checked): ?string
+    public function checkbox($checkId, $name, $checked): ?string
     {
         return $this->page->parseTemplate(
             'forums/create-forum-permissions-row-checkbox.html',
@@ -1108,7 +1104,7 @@ final readonly class Forums
                 'global' => $name === 'global'
                     ? 'onchange="globaltoggle(this.parentNode.parentNode,this.checked);"'
                     : '',
-                'id' => $id,
+                'id' => $checkId,
                 'name' => $name,
             ],
         );
