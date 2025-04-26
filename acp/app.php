@@ -36,7 +36,7 @@ final readonly class App
         $this->startSession();
 
         if (isset($_SESSION['auid'])) {
-            $userData = $this->user->getUser($_SESSION['auid']);
+            $this->user->getUser($_SESSION['auid']);
         }
 
         if (!$this->user->getPerm('can_access_acp')) {
@@ -116,7 +116,7 @@ final readonly class App
             ],
         );
 
-        $act = $this->request->get('test');
+        $act = $this->request->get('act');
 
         if ($act && file_exists("./page/{$act}.php")) {
             $page = $this->container->get('ACP\Page\\' . $act);
