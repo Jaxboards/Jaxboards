@@ -537,7 +537,7 @@ final class UserProfile
                     $this->num_activity,
                 );
                 if (
-                   $this->request->both('fmt') === 'RSS'
+                    $this->request->both('fmt') === 'RSS'
                 ) {
                     $feed = new RSSFeed(
                         [

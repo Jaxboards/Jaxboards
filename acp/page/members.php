@@ -501,7 +501,10 @@ final readonly class Members
         $error = null;
 
         if ($this->request->post('submit') !== null) {
-            if (!$this->request->post('mid1') || !$this->request->post('mid2')) {
+            if (
+                !$this->request->post('mid1')
+                || !$this->request->post('mid2')
+            ) {
                 $error = 'All fields are required';
             } elseif (
                 !is_numeric($this->request->post('mid1'))

@@ -383,7 +383,10 @@ final class LogReg
 
             if (!$udata) {
                 $page = $this->page->meta('error', 'This link has expired. Please try again.');
-            } elseif ($this->request->post('pass1') && $this->request->post('pass2')) {
+            } elseif (
+                $this->request->post('pass1')
+                && $this->request->post('pass2')
+            ) {
                 if ($this->request->post('pass1') === $this->request->post('pass2')) {
                     $this->database->safeupdate(
                         'members',

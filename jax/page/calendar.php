@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\Database;
-use Jax\Jax;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
@@ -26,7 +25,6 @@ final class Calendar
 
     public function __construct(
         private readonly Database $database,
-        private readonly Jax $jax,
         private readonly Page $page,
         private readonly Request $request,
         private readonly Session $session,
@@ -36,11 +34,9 @@ final class Calendar
 
     public function render(): void
     {
-        if (is_numeric($this->request->both('month'))) {
-            $this->month = (int) $this->request->both('month');
-        } else {
-            $this->month = (int) gmdate('n');
-        }
+        $this->month = is_numeric($this->request->both('month'))
+            ? (int) $this->request->both('month')
+            : (int) gmdate('n');
 
         $this->monthview();
     }

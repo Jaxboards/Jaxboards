@@ -12,7 +12,6 @@ use Jax\Session;
 use Jax\TextFormatting;
 use Jax\User;
 
-use function array_key_exists;
 use function array_map;
 use function array_slice;
 use function ceil;

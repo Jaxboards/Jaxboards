@@ -177,10 +177,9 @@ final class Groups
         $groupList = $this->request->both('grouplist');
         if (
             !$groupList
-            || preg_match('@[^\d,]@', $groupList)
+            || preg_match('@[^\d,]@', (string) $groupList)
             || mb_strpos((string) $groupList, ',,') !== false
         ) {
-            $groupList;
         }
 
         $result = $groupList
