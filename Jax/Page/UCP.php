@@ -38,17 +38,14 @@ use const PHP_EOL;
  */
 final class UCP
 {
-    private $what = '';
+    private string $what = '';
 
-    private $runscript = false;
+    private bool $runscript = false;
 
-    private $shownucp = false;
+    private bool $shownucp = false;
 
-    private $ucppage = '';
+    private string $ucppage = '';
 
-    /**
-     * @var Config
-     */
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
@@ -98,49 +95,38 @@ final class UCP
 
     public function showinbox(): void
     {
-        if (
-            is_array($this->request->post('dmessage'))
-        ) {
-            foreach ($this->request->post('dmessage') as $messageId) {
-                $this->delete($messageId, false);
-            }
+        $messageId = $this->request->post('messageid');
+        $page = $this->request->both('page');
+        $view = $this->request->get('view');
+        $flag = $this->request->both('flag');
+        $dmessage = $this->request->post('dmessage');
+
+        if (is_array($dmessage)) {
+            $this->deleteMessages($dmessage);
         }
 
-        if (is_numeric($this->request->post('messageid'))) {
-            switch (mb_strtolower((string) $this->request->post('page'))) {
-                case 'delete':
-                    $this->delete($this->request->post('messageid'));
+        match(true) {
+            is_numeric($messageId) => match($page) {
+                'delete' => $this->delete($messageId),
+                'forward' => $this->compose($messageId, 'fwd'),
+                'reply' => $this->compose($messageId),
 
-                    break;
+            },
+            is_numeric($view) => $this->viewmessage($view),
+            is_numeric($flag) => $this->flag(),
 
-                case 'forward':
-                    $this->compose($this->request->post('messageid'), 'fwd');
+            default => match($page) {
+                'compose' => $this->compose(),
+                'sent' => $this->viewmessages('sent'),
+                'flagged' => $this->viewmessages('flagged'),
+                default => $this->viewmessages(),
+            },
+        };
+    }
 
-                    break;
-
-                case 'reply':
-                    $this->compose($this->request->post('messageid'));
-
-                    break;
-
-                default:
-            }
-        } elseif ($this->request->both('page') === 'compose') {
-            $this->compose();
-        } elseif (
-            is_numeric($this->request->get('view'))
-        ) {
-            $this->viewmessage($this->request->get('view'));
-        } elseif ($this->request->both('page') === 'sent') {
-            $this->viewmessages('sent');
-        } elseif ($this->request->both('page') === 'flagged') {
-            $this->viewmessages('flagged');
-        } elseif (is_numeric($this->request->both('flag'))) {
-            $this->flag();
-
-            return;
-        } else {
-            $this->viewmessages();
+    private function deleteMessages(array $messageIds) {
+        foreach ($messageIds as $messageId) {
+            $this->delete($messageId, false);
         }
     }
 
