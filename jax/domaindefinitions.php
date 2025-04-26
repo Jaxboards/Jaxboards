@@ -86,7 +86,7 @@ final class DomainDefinitions
         }
 
         $this->boardPath = pathjoin(JAXBOARDS_ROOT, 'boards', $prefix);
-        $this->boardPathURL = $this->boardURL . pathjoin('boards', $prefix);
+        $this->boardPathURL = $this->boardURL . '/' . pathjoin('boards', $prefix);
     }
 
     public function getBoardURL(): string
