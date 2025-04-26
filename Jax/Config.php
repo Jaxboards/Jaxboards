@@ -66,11 +66,7 @@ final readonly class Config
     {
         $boardConfig = self::getBoardConfig($data);
 
-        if (!defined('BOARDPATH')) {
-            throw new Exception('Board config file not determinable');
-        }
-
-        file_put_contents(BOARDPATH . 'config.php', self::configFileContents($boardConfig));
+        file_put_contents($this->domainDefinitions->getBoardPath() . '/config.php', self::configFileContents($boardConfig));
     }
 
     // Only used during installation
