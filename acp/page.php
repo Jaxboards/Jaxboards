@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ACP;
 
 use Jax\DomainDefinitions;
+use Jax\Request;
 
 use function array_keys;
 use function array_map;
@@ -43,6 +44,7 @@ final class Page
 
     public function __construct(
         private readonly DomainDefinitions $domainDefinitions,
+        private readonly Request $request,
     ) {}
 
     /**
@@ -97,7 +99,7 @@ final class Page
                 'sidebar-list-link.html',
                 [
                     'title' => $title,
-                    'url' => '?act=forums&do=' . $do,
+                    'url' => '?act=' . $this->request->get('act') . '&do=' .$do,
                 ],
             ) . PHP_EOL;
         }

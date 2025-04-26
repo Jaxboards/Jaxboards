@@ -44,12 +44,7 @@ final class Groups
         ]);
 
 
-        $do = $this->request->get('do');
-        if ($this->request->get('edit')) {
-            $do = 'edit';
-        }
-
-        match ($do) {
+        match ($this->request->get('edit') ? 'edit' : $this->request->get('do')) {
             'perms' => $this->showperms(),
             'create' => $this->create(),
             'edit' => $this->create($this->request->get('edit')),
@@ -105,7 +100,7 @@ final class Groups
         // Remove any columns that don't exist silently.
         $columns = array_flip($columns);
         foreach ($permsInput as $groupId => $groupPerms) {
-            foreach ($groupPerms as $field => $v2) {
+            foreach (array_keys($groupPerms) as $field) {
                 if (isset($columns[$field])) {
                     continue;
                 }
