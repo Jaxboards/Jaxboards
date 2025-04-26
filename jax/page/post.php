@@ -140,7 +140,7 @@ final class Post
 
         $size = filesize($fileobj['tmp_name']);
         $hash = hash_file('sha512', $fileobj['tmp_name']);
-        $uploadpath = $this->domainDefinitions->getBoardPath() . 'Uploads/';
+        $uploadpath = $this->domainDefinitions->getBoardPath() . '/Uploads/';
 
         $ext = explode('.', (string) $fileobj['name']);
         $ext = count($ext) === 1 ? '' : mb_strtolower(array_pop($ext));

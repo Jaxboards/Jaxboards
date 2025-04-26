@@ -353,7 +353,7 @@ final class Page
         define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . $this->config->getSetting('dthemepath'));
         $this->loadtemplate(
             $skin['wrapper']
-            ? $this->domainDefinitions->getBoardPath() . 'Wrappers/' . $skin['wrapper'] . '.html'
+            ? $this->domainDefinitions->getBoardPath() . '/Wrappers/' . $skin['wrapper'] . '.html'
             : THEMEPATH . 'wrappers.html',
         );
     }
