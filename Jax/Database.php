@@ -39,9 +39,9 @@ use const PHP_EOL;
  */
 final class Database
 {
-    public mysqli_result $lastQuery;
+    private ?mysqli_result $lastQuery;
 
-    public bool $debugMode = false;
+    private bool $debugMode = false;
 
     /**
      * @var array<string>
@@ -87,6 +87,10 @@ final class Database
         $this->prefix = $prefix;
 
         return !$this->connection->connect_errno;
+    }
+
+    public function setDebugMode(bool $debugMode){
+        $this->debugMode = $debugMode;
     }
 
     public function setPrefix(string $prefix): void
@@ -362,6 +366,7 @@ final class Database
         }
 
         $stmt = $this->connection->prepare($compiledQueryString);
+
         if ($this->debugMode) {
             $this->queryList[] = $compiledQueryString;
         }
@@ -400,7 +405,7 @@ final class Database
         return $value;
     }
 
-    public function evalue($value)
+    public function evalue(array|string|float|int|null $value)
     {
         if (is_array($value)) {
             return $value[0];
@@ -412,10 +417,10 @@ final class Database
 
         return is_int($value)
             ? $value
-            : "'" . $this->escape($value) . "'";
+            : "'" . $this->escape((string) $value) . "'";
     }
 
-    public function escape($a): string
+    public function escape(string $a): string
     {
         return $this->connection->real_escape_string($a);
     }
@@ -428,7 +433,7 @@ final class Database
     public function safespecial(
         string $format,
         array $tablenames,
-        ...$va_array,
+        ...$args,
     ): mixed {
         // Table names.
         $tempformat = str_replace('%t', '%s', $format);
@@ -442,7 +447,7 @@ final class Database
         );
 
         // Put the format string back.
-        return $this->safequery($newformat, ...$va_array);
+        return $this->safequery($newformat, ...$args);
     }
 
     public function getUsersOnline(bool $canViewHiddenMembers = false)

@@ -53,7 +53,7 @@ final class App
     ) {
         $this->onLocalHost = in_array($this->ipAddress->asHumanReadable(), ['127.0.0.1', '::1'], true);
         $this->microtime = microtime(true);
-        $this->database->debugMode = $this->onLocalHost;
+        $this->database->setDebugMode($this->onLocalHost);
     }
 
     public function render(): void
