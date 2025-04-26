@@ -141,7 +141,10 @@ final class App
         }
 
         // If the user's navigated to a new page, change their action time.
-        if (!$this->request->isJSNewLocation() && $this->request->isJSAccess()) {
+        if (
+            !$this->request->isJSNewLocation()
+            && $this->request->isJSAccess()
+        ) {
             return;
         }
 

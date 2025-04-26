@@ -31,7 +31,10 @@ final class Ticker
 
     public function render(): void
     {
-        if ($this->request->isJSNewLocation() || !$this->request->isJSAccess()) {
+        if (
+            $this->request->isJSNewLocation()
+            || !$this->request->isJSAccess()
+        ) {
             $this->index();
         } else {
             $this->update();
