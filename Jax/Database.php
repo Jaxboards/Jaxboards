@@ -39,7 +39,7 @@ use const PHP_EOL;
  */
 final class Database
 {
-    private ?mysqli_result $lastQuery;
+    private ?mysqli_result $lastQuery = null;
 
     private bool $debugMode = false;
 
@@ -89,7 +89,8 @@ final class Database
         return !$this->connection->connect_errno;
     }
 
-    public function setDebugMode(bool $debugMode){
+    public function setDebugMode(bool $debugMode): void
+    {
         $this->debugMode = $debugMode;
     }
 
@@ -258,7 +259,7 @@ final class Database
     {
         $result = $result ?: $this->lastQuery;
 
-        return $result ? mysqli_fetch_array($result) : false;
+        return $result !== null ? mysqli_fetch_array($result) : false;
     }
 
     // Only new-style mysqli.
@@ -266,14 +267,16 @@ final class Database
     {
         $result = $result ?: $this->lastQuery;
 
-        return $result ? $this->fetchAll($result, MYSQLI_ASSOC) : false;
+        return $result !== null
+            ? $this->fetchAll($result, MYSQLI_ASSOC)
+            : false;
     }
 
     public function arow(?mysqli_result $result = null): null|array|false
     {
         $result = $result ?: $this->lastQuery;
 
-        return $result ? mysqli_fetch_assoc($result) : false;
+        return $result !== null ? mysqli_fetch_assoc($result) : false;
     }
 
     public function numRows(?mysqli_result $result = null): int|string
@@ -405,7 +408,7 @@ final class Database
         return $value;
     }
 
-    public function evalue(array|string|float|int|null $value)
+    public function evalue(null|array|float|int|string $value)
     {
         if (is_array($value)) {
             return $value[0];
