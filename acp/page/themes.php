@@ -172,10 +172,6 @@ final readonly class Themes
                 && is_array($this->request->post('wrapper'))
             ) {
                 foreach ($this->request->post('wrapper') as $k => $v) {
-                    if (!isset($this->request->post('hidden')[$k])) {
-                        $this->request->post('hidden')[$k] = false;
-                    }
-
                     if ($v && !in_array($v, $wrappers)) {
                         continue;
                     }

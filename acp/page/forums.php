@@ -422,12 +422,14 @@ final readonly class Forums
                 'member_groups',
             );
             while ($f = $this->database->arow($result)) {
-                if (!isset($this->request->post('groups')[$f['id']])) {
-                    $this->request->post('groups')[$f['id']] = [];
+                $groups = $this->request->post('groups') ?? [];
+
+                if (!$groups[$f['id']]) {
+                    $groups[$f['id']] = [];
                 }
 
                 $options = ['read', 'start', 'reply', 'upload', 'view', 'poll'];
-                $v = $this->request->post('groups')[$f['id']];
+                $v = $groups[$f['id']];
                 if (isset($v['global']) && $v['global']) {
                     continue;
                 }

@@ -233,20 +233,6 @@ final class Shoutbox
             );
             while ($shout = $this->database->arow($result)) {
                 $this->page->JS('addshout', $this->formatshout($shout));
-                if ($this->config->getSetting('shoutboxsounds')) {
-                    $sounds = [];
-                    if (
-                        $this->user->get('sound_shout')
-                        && $sounds[$shout['shout']]
-                    ) {
-                        $this->page->JS(
-                            'playsound',
-                            'sfx',
-                            $this->domainDefinitions->getSoundsURL() . $sounds[$shout['shout']] . '.mp3',
-                        );
-                    }
-                }
-
                 $last = $shout['id'];
             }
         }
