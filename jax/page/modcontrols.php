@@ -863,22 +863,26 @@ final class ModControls
         }
 
         $error = null;
-        $page = '<form method="post" data-ajax-form="true">'
-            . $this->jax->hiddenFormFields(
-                [
-                    'act' => 'modcontrols',
-                    'do' => 'emem',
-                    'submit' => 'showform',
-                ],
-            )
-            . 'Member name: <input type="text" title="Enter member name" name="mname" '
-            . 'data-autocomplete-action="searchmembers" '
-            . 'data-autocomplete-output="#mid" '
-            . 'data-autocomplete-indicator="#validname" />'
-            . '<span id="validname"></span>
-            <input type="hidden" name="mid" id="mid" onchange="this.form.onsubmit();" />
-            <input type="submit" type="View member details" value="Go" />
-            </form>';
+        $hiddenFormFields = $this->jax->hiddenFormFields(
+            [
+                'act' => 'modcontrols',
+                'do' => 'emem',
+                'submit' => 'showform',
+            ],
+        );
+        $page = <<<HTML
+                <form method="post" data-ajax-form="true">
+                    {$hiddenFormFields}
+                    Member name:
+                    <input type="text" title="Enter member name" name="mname"
+                        data-autocomplete-action="searchmembers"
+                        data-autocomplete-output="#mid"
+                        data-autocomplete-indicator="#validname" />
+                    <span id="validname"></span>
+                    <input type="hidden" name="mid" id="mid" onchange="this.form.onsubmit();" />
+                    <input type="submit" type="View member details" value="Go" />
+                </form>
+            HTML;
         if (
             $this->request->post('submit') === 'save'
         ) {
@@ -900,8 +904,8 @@ final class ModControls
                     'WHERE `id`=?',
                     $this->database->basicvalue($this->request->post('mid')),
                 );
-                $error = $this->database->error();
-                if ($error !== '') {
+
+                if ($this->database->error() !== '') {
                     $page .= $this->page->meta(
                         'error',
                         'Error updating profile information.',
