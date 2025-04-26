@@ -61,8 +61,8 @@ final readonly class Themes
         private TextFormatting $textFormatting,
     ) {
         $this->boardPath = $this->domainDefinitions->getBoardPath();
-        $this->wrappersPath = $this->boardPath . 'Wrappers/';
-        $this->themesPath = $this->boardPath . 'Themes/';
+        $this->wrappersPath = $this->boardPath . '/Wrappers/';
+        $this->themesPath = $this->boardPath . '/Themes/';
     }
 
     public function render(): void
