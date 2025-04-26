@@ -24,6 +24,7 @@ use const FILTER_VALIDATE_IP;
 final class IPAddress
 {
     public $jax;
+
     private ?array $ipBanCache = null;
 
     public function __construct(
