@@ -346,11 +346,10 @@ final class Page
             define('THEMEPATH', $themePath);
             define('THEMEPATHURL', $themePathUrl);
         } else {
-            define('THEMEPATH', JAXBOARDS_ROOT . '/' . $this->config->getSetting('dthemepath'));
+            define('THEMEPATH', $this->domainDefinitions->getDefaultThemePath());
             define('THEMEPATHURL', $this->domainDefinitions->getBoardURL() . '/' . $this->config->getSetting('dthemepath'));
         }
 
-        define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . $this->config->getSetting('dthemepath'));
         $this->loadtemplate(
             $skin['wrapper']
             ? $this->domainDefinitions->getBoardPath() . '/Wrappers/' . $skin['wrapper'] . '.html'
@@ -392,7 +391,7 @@ final class Page
         if (is_dir($themeComponentDir)) {
             $componentDir = $themeComponentDir;
         } else {
-            $componentDir = DTHEMEPATH . 'views/' . $component;
+            $componentDir = $this->domainDefinitions->getDefaultThemePath() . '/views/' . $component;
             if (!is_dir($componentDir)) {
                 $componentDir = false;
             }
@@ -422,7 +421,7 @@ final class Page
             // Check default components for anything missing.
             $defaultComponentDir = str_replace(
                 THEMEPATH,
-                DTHEMEPATH,
+                $this->domainDefinitions->getDefaultThemePath(),
                 $componentDir,
             );
             if ($defaultComponentDir !== $componentDir) {

@@ -40,6 +40,8 @@ final class DomainDefinitions
 
     private string $boardPathURL = '';
 
+    private string $defaultThemePath = '';
+
     public function __construct(private readonly ServiceConfig $serviceConfig)
     {
         $serviceConfig = $this->serviceConfig->get();
@@ -79,6 +81,7 @@ final class DomainDefinitions
             }
         }
 
+        $this->defaultThemePath = pathjoin(JAXBOARDS_ROOT, $this->serviceConfig->getSetting('dthemepath'));
         $this->serviceThemePath = pathjoin(JAXBOARDS_ROOT, 'Service/Themes');
 
         if (!$prefix) {
@@ -92,6 +95,10 @@ final class DomainDefinitions
     public function getBoardURL(): string
     {
         return $this->boardURL;
+    }
+
+    public function getDefaultThemePath() {
+        return $this->defaultThemePath;
     }
 
     public function getSoundsURL(): string

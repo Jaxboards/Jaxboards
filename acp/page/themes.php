@@ -67,10 +67,6 @@ final readonly class Themes
 
     public function render(): void
     {
-        if (!defined('DTHEMEPATH')) {
-            define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . $this->config->getSetting('dthemepath'));
-        }
-
         $this->page->sidebar([
             'create' => 'Create New Skin',
             'manage' => 'Manage Skins',
@@ -165,7 +161,7 @@ final readonly class Themes
                 if ($o !== false) {
                     fwrite(
                         $o,
-                        file_get_contents(DTHEMEPATH . 'wrappers.html'),
+                        file_get_contents($this->domainDefinitions->getDefaultThemePath() . '/wrappers.html'),
                     );
                     fclose($o);
                 } else {
@@ -553,7 +549,7 @@ final readonly class Themes
                     fwrite(
                         $o,
                         file_get_contents(
-                            DTHEMEPATH . 'css.css',
+                            $this->domainDefinitions->getDefaultThemePath() . '/css.css',
                         ),
                     );
                     fclose($o);
