@@ -473,10 +473,10 @@ final readonly class Themes
                         '&lt;!--FOOTER--&gt; must not be removed from the wrapper.',
                     );
                 } else {
-                    $o = fopen($wrapperf, 'w');
-                    if ($o !== false) {
-                        fwrite($o, (string) $this->jax->p['newwrapper']);
-                        fclose($o);
+                    $fileHandle = fopen($wrapperf, 'w');
+                    if ($fileHandle !== false) {
+                        fwrite($fileHandle, (string) $this->jax->p['newwrapper']);
+                        fclose($fileHandle);
                         $saved = $this->page->success('Wrapper saved successfully.');
                     } else {
                         $saved = $this->page->error('Error saving wrapper.');
