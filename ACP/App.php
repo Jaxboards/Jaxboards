@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace ACP;
 
 use DI\Container;
+use Exception;
 use Jax\Config;
 use Jax\Request;
 use Jax\User;
 
-use function file_exists;
 use function header;
 use function ini_set;
 use function session_start;
@@ -122,7 +122,7 @@ final readonly class App
             try {
                 $page = $this->container->get('ACP\Page\\' . $act);
                 $page->render();
-            } catch (\Exception) {
+            } catch (Exception) {
                 // invalid act
             }
         }

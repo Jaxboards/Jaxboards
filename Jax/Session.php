@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use function base64_encode;
+use function ini_set;
 use function is_numeric;
 use function is_string;
 use function mb_stripos;
@@ -15,6 +16,7 @@ use function mktime;
 use function openssl_random_pseudo_bytes;
 use function preg_replace_callback;
 use function serialize;
+use function session_start;
 use function time;
 use function unserialize;
 

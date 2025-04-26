@@ -10,7 +10,6 @@ use function array_keys;
 use function array_pop;
 use function array_shift;
 use function array_values;
-use function define;
 use function explode;
 use function file_get_contents;
 use function glob;
@@ -105,7 +104,7 @@ final class Page
 
     private $metaqueue;
 
-    private ?string $themePath;
+    private ?string $themePath = null;
 
     public function __construct(
         private readonly Config $config,
