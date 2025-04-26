@@ -40,7 +40,7 @@ use const PHP_EOL;
 /**
  * This class is entirely responsible for rendering the page.
  *
- * Because there weren'themePath any good PHP template systems at the time (Blade, Twig) we built our own.
+ * Because there weren't any good PHP template systems at the time (Blade, Twig) we built our own.
  *
  * Here's how it works:
  *
