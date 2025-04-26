@@ -168,7 +168,7 @@ final readonly class Themes
         if ($this->request->post('submit') !== null) {
             // Update wrappers/hidden status.
             if (
-                array_key_exists('wrapper', $this->jax->p)
+                $this->request->post('wrapper') !== null
                 && is_array($this->request->post('wrapper'))
             ) {
                 foreach ($this->request->post('wrapper') as $k => $v) {

@@ -159,7 +159,7 @@ final class UserProfile
 
     public function showfullprofile($id)
     {
-        if ($this->page->jsupdate && empty($this->jax->p)) {
+        if ($this->page->jsupdate && !$this->request->hasPostData()) {
             return false;
         }
 

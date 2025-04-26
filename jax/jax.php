@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use function array_merge;
 use function floor;
 use function glob;
 use function gmdate;
-use function is_array;
 use function is_dir;
 use function json_decode;
 use function mail;
@@ -16,7 +14,6 @@ use function mb_substr;
 use function preg_match;
 use function rmdir;
 use function round;
-use function setcookie;
 use function str_replace;
 use function strtotime;
 use function time;
@@ -29,33 +26,8 @@ use const PHP_EOL;
  */
 final class Jax
 {
-    /**
-     * @var array<mixed>
-     */
-    public $c = [];
-
-    /**
-     * @var array<mixed>|string
-     */
-    public $g = [];
-
-    /**
-     * @var array<mixed>|string
-     */
-    public $p = [];
-
-    /**
-     * @var array<mixed>
-     */
-    public $b = [];
-
     public function __construct(private readonly Config $config)
-    {
-        $this->c = $_COOKIE;
-        $this->g = $_GET;
-        $this->p = $_POST;
-        $this->b = array_merge($this->p, $this->g);
-    }
+    {}
 
     public function pick(...$args)
     {
@@ -119,24 +91,6 @@ final class Jax
             : '')
             . gmdate('g:i' . ($seconds ? ':s' : '') . 'a, n/j/y', $date)
             . ($autodate ? '</span>' : '');
-    }
-
-    public function setCookie(
-        $a,
-        $b = 'false',
-        $c = false,
-        $htmlonly = true,
-    ): void {
-        if (!is_array($a)) {
-            $a = [$a => $b];
-        } elseif ($b !== 'false') {
-            $c = $b;
-        }
-
-        foreach ($a as $k => $v) {
-            $this->c[$k] = $v;
-            setcookie($k, (string) $v, ['expires' => $c, 'path' => null, 'domain' => null, 'secure' => true, 'httponly' => $htmlonly]);
-        }
     }
 
     public function isurl($url): false|int

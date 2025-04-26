@@ -117,6 +117,7 @@ final class Session
         private readonly Jax $jax,
         private readonly IPAddress $ipAddress,
         private readonly Database $database,
+        private readonly Request $request,
         private readonly User $user,
     ) {}
 
@@ -143,12 +144,12 @@ final class Session
             return null;
         }
 
-        if (!isset($_SESSION['uid']) && isset($this->jax->c['utoken'])) {
+        if (!isset($_SESSION['uid']) && $this->request->cookie('utoken') !== null) {
             $result = $this->database->safeselect(
                 ['uid'],
                 'tokens',
                 'WHERE `token`=?',
-                $this->jax->c['utoken'],
+                $this->request->cookie('utoken'),
             );
             $token = $this->database->arow($result);
             if ($token) {
@@ -452,7 +453,7 @@ final class Session
 
     public function addSessID($html)
     {
-        if ($this->jax->c !== [] || !is_string($html)) {
+        if ($this->request->hasCookies() || !is_string($html)) {
             return $html;
         }
 

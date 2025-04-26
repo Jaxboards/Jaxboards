@@ -239,19 +239,20 @@ final class LogReg
                 }
 
                 $_SESSION['uid'] = $user['id'];
-                $logintoken = base64_encode(openssl_random_pseudo_bytes(128));
+                $loginToken = base64_encode(openssl_random_pseudo_bytes(128));
                 $this->database->safeinsert(
                     'tokens',
                     [
                         'expires' => $this->database->datetime(time() + 3600 * 24 * 30),
-                        'token' => $logintoken,
+                        'token' => $loginToken,
                         'type' => 'login',
                         'uid' => $user['id'],
                     ],
                 );
 
-                $this->jax->setCookie(
-                    ['utoken' => $logintoken],
+                $this->request->setCookie(
+                    'utoken',
+                    $loginToken,
                     time() + 3600 * 24 * 30,
                 );
                 $this->session->clean($user['id']);
@@ -284,19 +285,13 @@ final class LogReg
     {
         // Just make a new session rather than fuss with the old one,
         // to maintain users online.
-        if (isset($this->jax->c['utoken'])) {
+        if ($this->request->cookie('utoken') !== null) {
             $this->database->safedelete(
                 'tokens',
                 'WHERE `token`=?',
-                $this->database->basicvalue($this->jax->c['utoken']),
+                $this->database->basicvalue($this->request->cookie('utoken')),
             );
-            unset($this->jax->c['utoken']);
-            $this->jax->setCookie(
-                [
-                    'utoken' => null,
-                ],
-                -1,
-            );
+            $this->request->setCookie('utoken',null,-1);
         }
 
         $this->session->set('hide', 1);
@@ -365,7 +360,7 @@ final class LogReg
     {
         $page = '';
 
-        if ($this->page->jsupdate && empty($this->jax->p)) {
+        if ($this->page->jsupdate && !$this->request->hasPostData()) {
             return;
         }
 

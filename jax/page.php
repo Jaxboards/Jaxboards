@@ -131,6 +131,7 @@ final class Page
         private readonly Database $database,
         private readonly DomainDefinitions $domainDefinitions,
         private readonly Jax $jax,
+        private readonly Request $request,
         private readonly Session $session,
     ) {
         $this->jsaccess = (int) ($_SERVER['HTTP_X_JSACCESS'] ?? 0);
@@ -177,7 +178,7 @@ final class Page
 
     public function location(string $newLocation): void
     {
-        if ($this->jax->c === [] && $newLocation[0] === '?') {
+        if (!$this->request->hasCookies() && $newLocation[0] === '?') {
             $newLocation = '?sessid=' . $this->session->get('id') . '&' . mb_substr($newLocation, 1);
         }
 

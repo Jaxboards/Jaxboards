@@ -199,7 +199,7 @@ final class Search
     public function dosearch(): void
     {
 
-        if ($this->page->jsupdate && empty($this->jax->p)) {
+        if ($this->page->jsupdate && !$this->request->hasPostData()) {
             return;
         }
 

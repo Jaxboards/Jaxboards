@@ -148,7 +148,7 @@ final class UCP
     {
         $error = null;
 
-        if ($this->page->jsupdate && empty($this->jax->p)) {
+        if ($this->page->jsupdate && !$this->request->hasPostData()) {
             return;
         }
 
@@ -900,7 +900,7 @@ final class UCP
 
     public function viewmessages($view = 'inbox'): void
     {
-        if ($this->page->jsupdate && empty($this->jax->p)) {
+        if ($this->page->jsupdate && !$this->request->hasPostData()) {
             return;
         }
 
