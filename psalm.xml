@@ -13,7 +13,7 @@
         <file name="config.default.php" />
         <directory name="acp" />
         <directory name="api" />
-        <directory name="jax" />
+        <directory name="Jax" />
         <directory name="tools" />
         <directory name="Service" />
         <ignoreFiles>

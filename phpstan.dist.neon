@@ -17,7 +17,7 @@ parameters:
     - acp
     - api
     - config.default.php
-    - jax
+    - Jax
     - tools
     - index.php
 
