@@ -13,7 +13,6 @@ use function array_map;
 use function array_pop;
 use function array_values;
 use function explode;
-use function function_exists;
 use function gmdate;
 use function implode;
 use function is_array;
@@ -255,13 +254,13 @@ final class Database
         return $this->safequery($query, ...$vars);
     }
 
-    public function row(?mysqli_result $result = null): null|array
+    public function row(?mysqli_result $result = null): ?array
     {
         $result = $result ?: $this->lastQuery;
 
         $row = mysqli_fetch_array($result);
 
-        return $row ? $row : null;
+        return $row ?: null;
     }
 
     // Only new-style mysqli.
@@ -269,14 +268,14 @@ final class Database
     {
         $result = $result ?: $this->lastQuery;
 
-        return $result ? $this->fetchAll($result, MYSQLI_ASSOC) : null;
+        return $result !== null ? $this->fetchAll($result, MYSQLI_ASSOC) : null;
     }
 
-    public function arow(?mysqli_result $result = null): null|array
+    public function arow(?mysqli_result $result = null): ?array
     {
         $result = $result ?: $this->lastQuery;
 
-        return $result ? mysqli_fetch_assoc($result) : null;
+        return $result !== null ? mysqli_fetch_assoc($result) : null;
     }
 
     public function numRows(?mysqli_result $result = null): int|string
@@ -388,7 +387,7 @@ final class Database
 
         $result = $stmt->get_result();
 
-        return $result ? $result : null;
+        return $result ?: null;
     }
 
     public function ekey(string $key): string
