@@ -174,16 +174,16 @@ final class Shoutbox
             $this->shoutlimit,
         );
         $shouts = '';
-        $shoutirst = 0;
+        $first = 0;
         while ($shout = $this->database->arow($result)) {
-            if (!$shoutirst) {
-                $shoutirst = $shout['id'];
+            if (!$first) {
+                $first = $shout['id'];
             }
 
             $shouts .= $this->formatshout($shout);
         }
 
-        $this->session->addVar('sb_id', $shoutirst);
+        $this->session->addVar('sb_id', $first);
         $this->page->append(
             'shoutbox',
             $this->page->meta(

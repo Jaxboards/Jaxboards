@@ -897,14 +897,14 @@ final class Topic
 
             $totalvotes = 0;
             $numvotes = [];
-            foreach (explode(';', (string) $results) as $k => $v) {
-                $presults[$k] = $v !== '' && $v !== '0' ? explode(',', $v) : [];
-                $totalvotes += ($numvotes[$k] = count($presults[$k]));
-                if (in_array($this->user->get('id'), $presults[$k], true)) {
+            foreach (explode(';', (string) $results) as $optionIndex => $voters) {
+                $presults[$optionIndex] = array_map(static fn($voterId): int => (int) $voterId, explode(',', $voters));
+                $totalvotes += ($numvotes[$optionIndex] = count($presults[$optionIndex]));
+                if (in_array($this->user->get('id'), $presults[$optionIndex], true)) {
                     $voted = true;
                 }
 
-                foreach ($presults[$k] as $user) {
+                foreach ($presults[$optionIndex] as $user) {
                     $usersvoted[$user] = 1;
                 }
             }
@@ -1060,6 +1060,7 @@ final class Topic
             ),
             '1',
         );
+
         $this->database->safeupdate(
             'topics',
             [

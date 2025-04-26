@@ -366,7 +366,7 @@ final class Database
 
         if (!$stmt) {
             $error = $this->connection->error;
-            if ($error !== '' && $error !== '0') {
+            if ($error !== '') {
                 error_log(
                     "ERROR WITH QUERY: {$compiledQueryString}" . PHP_EOL . "{$error}",
                 );
@@ -381,7 +381,7 @@ final class Database
 
         if (!$stmt->execute()) {
             $error = $this->connection->error;
-            if ($error !== '' && $error !== '0') {
+            if ($error !== '') {
                 error_log(
                     "ERROR WITH QUERY: {$queryString}" . PHP_EOL . "{$error}",
                 );
@@ -393,7 +393,7 @@ final class Database
         $retval = $stmt->get_result();
 
         $error = $this->connection->error;
-        if ($error !== '' && $error !== '0') {
+        if ($error !== '') {
             error_log(
                 "ERROR WITH QUERY: {$queryString}" . PHP_EOL . "{$error}",
             );
