@@ -715,7 +715,7 @@ final class UCP
             }
 
             if ($error === null) {
-                if ($this->request->jsAccess()) {
+                if ($this->request->jsAccess() !== 0) {
                     $this->page->JS('reload');
 
                     return;
@@ -810,7 +810,10 @@ final class UCP
 
     public function viewmessage($messageid): void
     {
-        if ($this->request->isJSUpdate() && !$this->request->isJSDirectLink()) {
+        if (
+            $this->request->isJSUpdate()
+            && !$this->request->isJSDirectLink()
+        ) {
             return;
         }
 

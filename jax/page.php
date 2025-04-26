@@ -111,8 +111,7 @@ final class Page
         private readonly DomainDefinitions $domainDefinitions,
         private readonly Request $request,
         private readonly Session $session,
-    ) {
-    }
+    ) {}
 
     public function get(string $part)
     {
@@ -151,7 +150,7 @@ final class Page
             $newLocation = '?sessid=' . $this->session->get('id') . '&' . mb_substr($newLocation, 1);
         }
 
-        if ($this->request->jsAccess()) {
+        if ($this->request->jsAccess() !== 0) {
             $this->JS('location', $newLocation);
         } else {
             header("Location: {$newLocation}");
@@ -170,7 +169,7 @@ final class Page
             $this->session->erase('location');
         }
 
-        if (!$this->request->jsAccess()) {
+        if ($this->request->jsAccess() === 0) {
             return;
         }
 
@@ -205,7 +204,7 @@ final class Page
         $this->parts['path']
             = "<div id='path' class='path'>" . $this->buildpath() . '</div>';
 
-        if ($this->request->jsAccess()) {
+        if ($this->request->jsAccess() !== 0) {
             if (!headers_sent()) {
                 header('Content-type:text/plain');
             }

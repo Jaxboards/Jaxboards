@@ -117,7 +117,10 @@ final class Topic
             $this->request->both('qreply') !== null
             && !$this->request->isJSUpdate()
         ) {
-            if ($this->request->jsAccess() && !$this->request->isJSDirectLink()) {
+            if (
+                $this->request->jsAccess()
+                && !$this->request->isJSDirectLink()
+            ) {
                 $this->qreplyform($this->tid);
 
                 return;
@@ -397,7 +400,7 @@ final class Topic
             $tid,
         );
 
-        if ($this->request->jsAccess()) {
+        if ($this->request->jsAccess() !== 0) {
             $this->page->JS('update', 'page', $page);
             $this->page->updatepath();
             if ($this->request->both('pid') !== null) {
@@ -1139,7 +1142,7 @@ final class Topic
             return;
         }
 
-        if (!$this->request->jsAccess()) {
+        if ($this->request->jsAccess() === 0) {
             $this->page->location('?act=post&pid=' . $pid);
         }
 
@@ -1268,7 +1271,7 @@ final class Topic
 
             // This line toggles whether or not the qreply window should open
             // on quote.
-            if ($this->request->jsAccess()) {
+            if ($this->request->jsAccess() !== 0) {
                 $this->qreplyform($tid);
             } else {
                 header('Location:?act=post&tid=' . $tid);

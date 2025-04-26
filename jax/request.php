@@ -47,7 +47,8 @@ final class Request
         return $_POST !== [];
     }
 
-    public function jsAccess(): int {
+    public function jsAccess(): int
+    {
         return $_SERVER['HTTP_X_JSACCESS'] ?? 0;
     }
 
@@ -56,12 +57,16 @@ final class Request
         return $this->jsAccess() === 1;
     }
 
-    public function isJSNewLocation():bool
+    public function isJSNewLocation(): bool
     {
-        return $this->jsAccess() === 2 || $this->jsAccess() === 3;
+        if ($this->jsAccess() === 2) {
+            return true;
+        }
+
+        return $this->jsAccess() === 3;
     }
 
-    public function isJSDirectLink():bool
+    public function isJSDirectLink(): bool
     {
         return $this->jsAccess() === 3;
     }

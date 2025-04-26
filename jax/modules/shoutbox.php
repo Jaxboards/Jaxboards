@@ -72,7 +72,7 @@ final class Shoutbox
             $this->addshout();
         }
 
-        if (!$this->request->jsAccess()) {
+        if ($this->request->jsAccess() === 0) {
             $this->displayshoutbox();
         } else {
             $this->updateshoutbox();

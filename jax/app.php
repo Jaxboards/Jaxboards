@@ -71,7 +71,7 @@ final class App
         // Set Navigation.
         $this->renderNavigation();
 
-        if (!$this->request->jsAccess()) {
+        if ($this->request->jsAccess() === 0) {
             $this->renderBaseHTML();
         }
 
@@ -207,7 +207,10 @@ final class App
         } elseif ($act && file_exists('jax/page/' . $act . '.php')) {
             $page = $this->container->get('Jax\Page\\' . $act);
             $page->render();
-        } elseif (!$this->request->jsAccess() || $this->request->isJSNewLocation()) {
+        } elseif (
+            !$this->request->jsAccess()
+            || $this->request->isJSNewLocation()
+        ) {
             $result = $this->database->safeselect(
                 ['page'],
                 'pages',
@@ -247,7 +250,7 @@ final class App
                 $this->page->JS('reload');
             } else {
                 $this->session->addVar('skin_id', $this->request->both('skin_id'));
-                if ($this->request->jsAccess()) {
+                if ($this->request->jsAccess() !== 0) {
                     $this->page->JS('reload');
                 }
             }
