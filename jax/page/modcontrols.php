@@ -1039,7 +1039,7 @@ final class ModControls
                 $this->ipAddress->ban($ipAddress);
             }
         } elseif (isset($this->jax->p['unban']) && $this->jax->p['unban']) {
-            if ($error = $this->ipAddress->isBanned($ipAddress)) {
+            if ($this->ipAddress->isBanned($ipAddress)) {
                 $changed = true;
                 $this->ipAddress->unBan($ipAddress);
             }
