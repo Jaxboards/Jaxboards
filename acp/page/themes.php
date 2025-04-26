@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ACP\Page;
 
 use ACP\Page;
-use Jax\Config;
 use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\Jax;
@@ -13,8 +12,6 @@ use Jax\TextFormatting;
 
 use function array_key_exists;
 use function closedir;
-use function define;
-use function defined;
 use function dirname;
 use function fclose;
 use function file_exists;
@@ -53,7 +50,6 @@ final readonly class Themes
     private string $themesPath;
 
     public function __construct(
-        private Config $config,
         private Database $database,
         private DomainDefinitions $domainDefinitions,
         private Jax $jax,

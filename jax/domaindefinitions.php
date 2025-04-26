@@ -97,7 +97,8 @@ final class DomainDefinitions
         return $this->boardURL;
     }
 
-    public function getDefaultThemePath() {
+    public function getDefaultThemePath(): string
+    {
         return $this->defaultThemePath;
     }
 
