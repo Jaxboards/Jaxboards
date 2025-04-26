@@ -8,7 +8,6 @@ use ACP\Page;
 use Jax\Config;
 use Jax\Database;
 use Jax\DomainDefinitions;
-use Jax\Jax;
 use Jax\Request;
 use Jax\User;
 
@@ -22,7 +21,6 @@ final readonly class Login
         private Config $config,
         private Database $database,
         private DomainDefinitions $domainDefinitions,
-        private Jax $jax,
         private Page $page,
         private Request $request,
         private User $user,

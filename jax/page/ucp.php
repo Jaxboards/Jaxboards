@@ -106,9 +106,7 @@ final class UCP
             }
         }
 
-        if (
-            is_numeric($this->request->post('messageid'))
-        ) {
+        if (is_numeric($this->request->post('messageid'))) {
             switch (mb_strtolower((string) $this->request->post('page'))) {
                 case 'delete':
                     $this->delete($this->request->post('messageid'));
@@ -127,24 +125,22 @@ final class UCP
 
                 default:
             }
-        } else {
-            if ($this->request->both('page') === 'compose') {
-                $this->compose();
-            } elseif (
-                is_numeric($this->request->get('view'))
-            ) {
-                $this->viewmessage($this->request->get('view'));
-            } elseif ($this->request->both('page') === 'sent') {
-                $this->viewmessages('sent');
-            } elseif ($this->request->both('page') === 'flagged') {
-                $this->viewmessages('flagged');
-            } elseif (is_numeric($this->request->both('flag'))) {
-                $this->flag();
+        } elseif ($this->request->both('page') === 'compose') {
+            $this->compose();
+        } elseif (
+            is_numeric($this->request->get('view'))
+        ) {
+            $this->viewmessage($this->request->get('view'));
+        } elseif ($this->request->both('page') === 'sent') {
+            $this->viewmessages('sent');
+        } elseif ($this->request->both('page') === 'flagged') {
+            $this->viewmessages('flagged');
+        } elseif (is_numeric($this->request->both('flag'))) {
+            $this->flag();
 
-                return;
-            } else {
-                $this->viewmessages();
-            }
+            return;
+        } else {
+            $this->viewmessages();
         }
     }
 
@@ -362,7 +358,7 @@ final class UCP
             $this->getlocationforform() . $this->jax->hiddenFormFields(
                 ['submit' => 'true'],
             ),
-            $this->request->both('change') !== null? <<<HTML
+            $this->request->both('change') !== null ? <<<HTML
                 <input
                     type="text"
                     name="email"

@@ -6,7 +6,6 @@ namespace Jax\Page;
 
 use Jax\Database;
 use Jax\DomainDefinitions;
-use Jax\Jax;
 use Jax\Request;
 
 use function array_pop;
@@ -27,7 +26,6 @@ final readonly class Download
     public function __construct(
         private Database $database,
         private DomainDefinitions $domainDefinitions,
-        private Jax $jax,
         private Request $request,
     ) {}
 

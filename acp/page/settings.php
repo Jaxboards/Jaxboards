@@ -57,8 +57,8 @@ final readonly class Settings
             if (trim((string) $this->request->post('boardname')) === '') {
                 $error = 'Board name is required';
             } elseif (
-                (trim($this->request->post('logourl')) !== ''
-                && !$this->jax->isURL($this->request->post('logourl')))
+                trim((string) $this->request->post('logourl')) !== ''
+                && !$this->jax->isURL($this->request->post('logourl'))
             ) {
                 $error = 'Please enter a valid logo url.';
             }

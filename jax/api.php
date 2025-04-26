@@ -17,7 +17,6 @@ final readonly class API
 {
     public function __construct(
         private Database $database,
-        private Jax $jax,
         private Request $request,
         private TextFormatting $textFormatting,
     ) {}

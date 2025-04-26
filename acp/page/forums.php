@@ -394,7 +394,7 @@ final readonly class Forums
 
         // Remove mod from forum.
         if (
-            is_numeric( $this->request->both('rmod'))
+            is_numeric($this->request->both('rmod'))
             && $fdata['mods']
         ) {
             $exploded = explode(',', (string) $fdata['mods']);

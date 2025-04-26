@@ -7,7 +7,6 @@ namespace ACP\Page;
 use ACP\Page;
 use Jax\Config;
 use Jax\Database;
-use Jax\Jax;
 use Jax\Request;
 use Jax\TextFormatting;
 
@@ -25,7 +24,6 @@ final readonly class Posting
     public function __construct(
         private Config $config,
         private Database $database,
-        private Jax $jax,
         private Page $page,
         private Request $request,
         private TextFormatting $textFormatting,
@@ -175,7 +173,10 @@ final readonly class Posting
 
         // Insert emoticon.
         if ($this->request->post('submit') !== null) {
-            if (!$this->request->post('emoticon') || !$this->request->post('image')) {
+            if (
+                !$this->request->post('emoticon')
+                || !$this->request->post('image')
+            ) {
                 $page .= $this->page->error('All fields required.');
             } elseif (isset($emoticons[$this->textFormatting->blockhtml($this->request->post('emoticon'))])) {
                 $page .= $this->page->error('That emoticon is already being used.');
@@ -302,7 +303,10 @@ final readonly class Posting
 
         // Insert.
         if ($this->request->post('submit') !== null) {
-            if (!$this->request->post('img') || !$this->request->post('title')) {
+            if (
+                !$this->request->post('img')
+                || !$this->request->post('title')
+            ) {
                 $page .= $this->page->error('All fields required.');
             } else {
                 $this->database->safeinsert(

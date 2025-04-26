@@ -132,7 +132,10 @@ final readonly class Themes
             }
         }
 
-        if ($this->request->post('newwrapper') !== null && $this->request->post('newrapper') !== '') {
+        if (
+            $this->request->post('newwrapper') !== null
+            && $this->request->post('newrapper') !== ''
+        ) {
             $newWrapperPath
                 = $this->wrappersPath . $this->request->post('newwrapper') . '.html';
             if (preg_match('@[^\w ]@', (string) $this->request->post('newwrapper'))) {
@@ -227,7 +230,7 @@ final readonly class Themes
             }
 
             if (
-               is_array($this->request->post('renamewrapper'))
+                is_array($this->request->post('renamewrapper'))
             ) {
                 foreach ($this->request->post('renamewrapper') as $wrapperName => $wrapperNewName) {
                     if ($wrapperName === $wrapperNewName) {

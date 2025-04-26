@@ -8,13 +8,11 @@ use Jax\Config;
 use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\IPAddress;
-use Jax\Jax;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
 use Jax\TextFormatting;
 use Jax\User;
-use PHP_CodeSniffer\Generators\HTML;
 
 use function array_pop;
 use function count;
@@ -64,7 +62,6 @@ final class Post
         private readonly Config $config,
         private readonly Database $database,
         private readonly DomainDefinitions $domainDefinitions,
-        private readonly Jax $jax,
         private readonly Page $page,
         private readonly IPAddress $ipAddress,
         private readonly Request $request,
@@ -457,12 +454,12 @@ final class Post
             $this->session->deleteVar('multiquote');
         }
 
-        $uploadForm = !$tdata['perms']['upload'] ? '' : <<<HTML
+        $uploadForm = $tdata['perms']['upload'] ? <<<'HTML'
             <div id="attachfiles">
                 Add Files
                 <input type="file" name="Filedata" title="Browse for file" />
             </div>
-            HTML;
+            HTML : '';
 
         $form = <<<HTML
             <div class="postform">
