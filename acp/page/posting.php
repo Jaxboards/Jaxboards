@@ -8,6 +8,7 @@ use ACP\Page;
 use Jax\Config;
 use Jax\Database;
 use Jax\Jax;
+use Jax\Request;
 use Jax\TextFormatting;
 
 use function array_reverse;
@@ -26,6 +27,7 @@ final readonly class Posting
         private Database $database,
         private Jax $jax,
         private Page $page,
+        private Request $request,
         private TextFormatting $textFormatting,
     ) {}
 
@@ -65,13 +67,13 @@ final readonly class Posting
         }
 
         // Delete.
-        if (isset($this->jax->g['d']) && $this->jax->g['d']) {
+        if ($this->request->get('d')) {
             $this->database->safedelete(
                 'textrules',
                 "WHERE `type`='badword' AND `needle`=?",
-                $this->database->basicvalue($this->jax->g['d']),
+                $this->database->basicvalue($this->request->get('d')),
             );
-            unset($wordfilter[$this->jax->g['d']]);
+            unset($wordfilter[$this->request->get('d')]);
         }
 
         // Insert.
@@ -147,7 +149,7 @@ final readonly class Posting
         $page = '';
         $emoticons = [];
         // Delete emoticon.
-        if (isset($this->jax->g['d']) && $this->jax->g['d']) {
+        if ($this->request->get('d')) {
             $this->database->safedelete(
                 'textrules',
                 "WHERE `type`='emote' AND `needle`=?",
@@ -289,13 +291,13 @@ final readonly class Posting
         }
 
         // Delete.
-        if (isset($this->jax->g['d']) && $this->jax->g['d']) {
+        if ($this->request->get('d')) {
             $this->database->safedelete(
                 'ratingniblets',
                 'WHERE `id`=?',
-                $this->database->basicvalue($this->jax->g['d']),
+                $this->database->basicvalue($this->request->get('d')),
             );
-            unset($niblets[$this->jax->g['d']]);
+            unset($niblets[$this->request->get('d')]);
         }
 
         // Insert.

@@ -6,8 +6,8 @@ namespace ACP;
 
 use DI\Container;
 use Jax\Config;
-use Jax\Jax;
 use Jax\User;
+use Jax\Request;
 
 use function file_exists;
 use function header;
@@ -26,8 +26,8 @@ final readonly class App
     public function __construct(
         private Config $config,
         private Container $container,
-        private Jax $jax,
         private Page $page,
+        private Request $request,
         private User $user,
     ) {}
 
@@ -116,7 +116,7 @@ final readonly class App
             ],
         );
 
-        $act = $this->jax->g['act'] ?? null;
+        $act = $this->request->get('test');
 
         if ($act && file_exists("./page/{$act}.php")) {
             $page = $this->container->get('ACP\Page\\' . $act);

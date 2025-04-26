@@ -8,6 +8,7 @@ use ACP\Page;
 use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\Jax;
+use Jax\Request;
 use Jax\TextFormatting;
 
 use function array_key_exists;
@@ -53,6 +54,7 @@ final readonly class Themes
         private Database $database,
         private DomainDefinitions $domainDefinitions,
         private Jax $jax,
+        private Request $request,
         private Page $page,
         private TextFormatting $textFormatting,
     ) {
@@ -68,21 +70,18 @@ final readonly class Themes
             'manage' => 'Manage Skins',
         ]);
 
-        if (isset($this->jax->g['editcss']) && $this->jax->g['editcss']) {
-            $this->editcss($this->jax->g['editcss']);
+        if ($this->request->get('editcss')) {
+            $this->editcss($this->request->get('editcss'));
         } elseif (
-            isset($this->jax->g['editwrapper'])
-            && $this->jax->g['editwrapper']
+            $this->request->get('editwrapper')
         ) {
-            $this->editwrapper($this->jax->g['editwrapper']);
+            $this->editwrapper($this->request->get('editwrapper'));
         } elseif (
-            isset($this->jax->g['deleteskin'])
-            && is_numeric($this->jax->g['deleteskin'])
+            is_numeric($this->request->get('deleteskin'))
         ) {
-            $this->deleteskin($this->jax->g['deleteskin']);
+            $this->deleteskin($this->request->get('deleteskin'));
         } elseif (
-            isset($this->jax->g['do'])
-            && $this->jax->g['do'] === 'create'
+            $this->request->get('do') === 'create'
         ) {
             $this->createskin();
         } else {
@@ -119,16 +118,13 @@ final readonly class Themes
         $errorskins = '';
         $errorwrapper = '';
 
-        if (
-            isset($this->jax->g['deletewrapper'])
-            && $this->jax->g['deletewrapper']
-        ) {
-            $wrapperPath = $this->wrappersPath . $this->jax->g['deletewrapper'] . '.html';
+        if ($this->request->get('deletewrapper')) {
+            $wrapperPath = $this->wrappersPath . $this->request->get('deletewrapper') . '.html';
             if (
-                !preg_match('@[^\w ]@', (string) $this->jax->g['deletewrapper'])
+                !preg_match('@[^\w ]@', (string) $this->request->get('deletewrapper'))
                 && file_exists($wrapperPath)
             ) {
-                unlink($this->wrappersPath . $this->jax->g['deletewrapper'] . '.html');
+                unlink($this->wrappersPath . $this->request->get('deletewrapper') . '.html');
                 $this->page->location('?act=themes');
             } else {
                 $errorwrapper
