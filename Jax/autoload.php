@@ -22,9 +22,7 @@ require_once JAXBOARDS_ROOT . '/vendor/autoload.php';
 
 spl_autoload_register(static function ($className): void {
 
-    $classPath = mb_strtolower(JAXBOARDS_ROOT . match (true) {
-        default => '/' . str_replace('\\', '/', $className) . '.php',
-    });
+    $classPath = JAXBOARDS_ROOT . '/' . str_replace('\\', '/', $className) . '.php';
 
     if (!file_exists($classPath)) {
         return;
