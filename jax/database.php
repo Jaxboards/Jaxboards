@@ -323,8 +323,10 @@ final class Database
         return implode('?', $arr) . $replacement . $last;
     }
 
-    public function safequery(string $queryString, ...$args)
-    {
+    public function safequery(
+        string $queryString,
+        ...$args,
+    ): null|false|mysqli_result {
         // set new variable to not impact debug_backtrace value for inspecting
         // input
         $compiledQueryString = $queryString;
@@ -374,9 +376,7 @@ final class Database
             return null;
         }
 
-        $retval = $stmt->get_result();
-
-        return $retval;
+        return $stmt->get_result();
     }
 
     public function ekey(string $key): string
