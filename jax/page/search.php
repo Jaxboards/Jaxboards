@@ -83,7 +83,7 @@ final class Search
 
     public function form($pageContents = ''): void
     {
-        if ($this->page->jsupdate) {
+        if ($this->request->isJSUpdate()) {
             return;
         }
 
@@ -199,7 +199,7 @@ final class Search
     public function dosearch(): void
     {
 
-        if ($this->page->jsupdate && !$this->request->hasPostData()) {
+        if ($this->request->isJSUpdate() && !$this->request->hasPostData()) {
             return;
         }
 
@@ -444,7 +444,7 @@ final class Search
 
         $page = $this->page->meta('box', '', 'Search Results - ' . $pages, $page);
 
-        if ($this->page->jsaccess && !$this->page->jsdirectlink) {
+        if ($this->request->jsAccess() && !$this->request->isJSDirectLink()) {
             $this->page->JS('update', 'searchresults', $page);
         } else {
             $this->form($page);

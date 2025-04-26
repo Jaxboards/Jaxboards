@@ -72,7 +72,7 @@ final class Shoutbox
             $this->addshout();
         }
 
-        if (!$this->page->jsaccess) {
+        if (!$this->request->jsAccess()) {
             $this->displayshoutbox();
         } else {
             $this->updateshoutbox();
@@ -286,7 +286,7 @@ final class Shoutbox
 
         $this->page->path(['Shoutbox History' => '?module=shoutbox']);
         $this->page->updatepath();
-        if ($this->page->jsupdate) {
+        if ($this->request->isJSUpdate()) {
             return;
         }
 

@@ -63,7 +63,7 @@ final class IDX
             $this->session->set('read_date', time());
         }
 
-        if ($this->page->jsupdate) {
+        if ($this->request->isJSUpdate()) {
             $this->update();
         } else {
             $this->viewidx();
@@ -181,7 +181,7 @@ final class IDX
 
         $page .= $this->getBoardStats();
 
-        if ($this->page->jsnewlocation) {
+        if ($this->request->isJSNewLocation()) {
             $this->page->JS('update', 'page', $page);
             $this->page->updatepath();
         } else {

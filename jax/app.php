@@ -71,7 +71,7 @@ final class App
         // Set Navigation.
         $this->renderNavigation();
 
-        if (!$this->page->jsaccess) {
+        if (!$this->request->jsAccess()) {
             $this->renderBaseHTML();
         }
 
@@ -82,7 +82,7 @@ final class App
         $this->loadPageFromAction();
 
         // Process temporary commands.
-        if ($this->page->jsaccess && $this->session->get('runonce')) {
+        if ($this->request->jsAccess() && $this->session->get('runonce')) {
             $this->page->JSRaw($this->session->get('runonce'));
             $this->session->set('runonce', '');
         }
@@ -141,7 +141,7 @@ final class App
         }
 
         // If the user's navigated to a new page, change their action time.
-        if (!$this->page->jsnewlocation && $this->page->jsaccess) {
+        if (!$this->request->isJSNewLocation() && $this->request->jsAccess()) {
             return;
         }
 
@@ -207,7 +207,7 @@ final class App
         } elseif ($act && file_exists('jax/page/' . $act . '.php')) {
             $page = $this->container->get('Jax\Page\\' . $act);
             $page->render();
-        } elseif (!$this->page->jsaccess || $this->page->jsnewlocation) {
+        } elseif (!$this->request->jsAccess() || $this->request->isJSNewLocation()) {
             $result = $this->database->safeselect(
                 ['page'],
                 'pages',
@@ -220,7 +220,7 @@ final class App
                 $textFormatting = $this->container->get(TextFormatting::class);
                 $page['page'] = $textFormatting->bbcodes($page['page']);
                 $this->page->append('PAGE', $page['page']);
-                if ($this->page->jsnewlocation) {
+                if ($this->request->isJSNewLocation()) {
                     $this->page->JS('update', 'page', $page['page']);
                 }
             } else {
@@ -247,7 +247,7 @@ final class App
                 $this->page->JS('reload');
             } else {
                 $this->session->addVar('skin_id', $this->request->both('skin_id'));
-                if ($this->page->jsaccess) {
+                if ($this->request->jsAccess()) {
                     $this->page->JS('reload');
                 }
             }
@@ -438,7 +438,7 @@ final class App
                 'JaxBoards',
             ),
         );
-        if (!$this->page->jsnewlocation) {
+        if (!$this->request->isJSNewLocation()) {
             return;
         }
 

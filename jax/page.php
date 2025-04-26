@@ -78,27 +78,6 @@ use const PHP_EOL;
 final class Page
 {
     /**
-     * @var int
-     */
-    public $jsaccess = 0;
-
-    /**
-     * @var bool
-     */
-    public $jsupdate = false;
-
-    /**
-     * @var bool
-     */
-    public $jsnewlocation = false;
-
-
-    /**
-     * @var bool
-     */
-    public $jsdirectlink = false;
-
-    /**
      * @var array<string, string>
      */
     private $metadefs = [];
@@ -133,15 +112,6 @@ final class Page
         private readonly Request $request,
         private readonly Session $session,
     ) {
-        $this->jsaccess = (int) ($_SERVER['HTTP_X_JSACCESS'] ?? 0);
-
-        if ($this->jsaccess === 0) {
-            return;
-        }
-
-        $this->jsupdate = $this->jsaccess === 1;
-        $this->jsnewlocation = $this->jsaccess >= 2;
-        $this->jsdirectlink = $this->jsaccess === 3;
     }
 
     public function get(string $part)
@@ -152,7 +122,7 @@ final class Page
     public function append(string $part, string $content): void
     {
         $part = mb_strtoupper($part);
-        if (!$this->jsaccess || $part === 'TITLE') {
+        if (!$this->request->jsAccess() || $part === 'TITLE') {
             if (!isset($this->parts[$part])) {
                 $this->reset($part, $content);
 
@@ -181,7 +151,7 @@ final class Page
             $newLocation = '?sessid=' . $this->session->get('id') . '&' . mb_substr($newLocation, 1);
         }
 
-        if ($this->jsaccess) {
+        if ($this->request->jsAccess()) {
             $this->JS('location', $newLocation);
         } else {
             header("Location: {$newLocation}");
@@ -200,7 +170,7 @@ final class Page
             $this->session->erase('location');
         }
 
-        if (!$this->jsaccess) {
+        if (!$this->request->jsAccess()) {
             return;
         }
 
@@ -235,7 +205,7 @@ final class Page
         $this->parts['path']
             = "<div id='path' class='path'>" . $this->buildpath() . '</div>';
 
-        if ($this->jsaccess) {
+        if ($this->request->jsAccess()) {
             if (!headers_sent()) {
                 header('Content-type:text/plain');
             }

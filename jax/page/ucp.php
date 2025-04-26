@@ -84,7 +84,7 @@ final class UCP
             default => $this->showmain(),
         };
 
-        if ($this->page->jsupdate) {
+        if ($this->request->isJSUpdate()) {
             return;
         }
 
@@ -148,7 +148,7 @@ final class UCP
     {
         $error = null;
 
-        if ($this->page->jsupdate && !$this->request->hasPostData()) {
+        if ($this->request->isJSUpdate() && !$this->request->hasPostData()) {
             return;
         }
 
@@ -231,7 +231,7 @@ final class UCP
             $this->page->JS('alert', 'Settings saved successfully.');
 
             $this->ucppage = 'Settings saved successfully.';
-        } elseif ($this->page->jsupdate) {
+        } elseif ($this->request->isJSUpdate()) {
             return true;
         }
 
@@ -715,7 +715,7 @@ final class UCP
             }
 
             if ($error === null) {
-                if ($this->page->jsaccess) {
+                if ($this->request->jsAccess()) {
                     $this->page->JS('reload');
 
                     return;
@@ -810,7 +810,7 @@ final class UCP
 
     public function viewmessage($messageid): void
     {
-        if ($this->page->jsupdate && !$this->page->jsdirectlink) {
+        if ($this->request->isJSUpdate() && !$this->request->isJSDirectLink()) {
             return;
         }
 
@@ -900,7 +900,7 @@ final class UCP
 
     public function viewmessages($view = 'inbox'): void
     {
-        if ($this->page->jsupdate && !$this->request->hasPostData()) {
+        if ($this->request->isJSUpdate() && !$this->request->hasPostData()) {
             return;
         }
 
@@ -1147,7 +1147,7 @@ final class UCP
             }
         }
 
-        if ($this->page->jsupdate && !$messageid) {
+        if ($this->request->isJSUpdate() && !$messageid) {
             return;
         }
 

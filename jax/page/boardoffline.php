@@ -6,6 +6,7 @@ namespace Jax\Page;
 
 use Jax\Config;
 use Jax\Page;
+use Jax\Request;
 
 use function nl2br;
 
@@ -17,11 +18,12 @@ final readonly class BoardOffline
     public function __construct(
         private readonly Config $config,
         private readonly Page $page,
+        private readonly Request $request,
     ) {}
 
     public function render(): void
     {
-        if ($this->page->jsupdate) {
+        if ($this->request->isJSUpdate()) {
             return;
         }
 

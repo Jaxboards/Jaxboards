@@ -68,7 +68,7 @@ final class ModControls
     {
         $script = file_get_contents('dist/modcontrols.js');
 
-        if (!$this->page->jsaccess) {
+        if (!$this->request->jsAccess()) {
             header('Content-Type: application/javascript; charset=utf-8');
             header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 2_592_000) . ' GMT');
 
@@ -100,7 +100,7 @@ final class ModControls
             return;
         }
 
-        if ($this->page->jsupdate && !$this->request->hasPostData()) {
+        if ($this->request->isJSUpdate() && !$this->request->hasPostData()) {
             return;
         }
 

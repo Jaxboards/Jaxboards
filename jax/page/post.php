@@ -188,7 +188,7 @@ final class Post
             $this->postpreview = $post;
         }
 
-        if (!$this->page->jsaccess || $this->how === 'qreply') {
+        if (!$this->request->jsAccess() || $this->how === 'qreply') {
             $this->showpostform();
         }
 
@@ -198,7 +198,7 @@ final class Post
     public function showtopicform(): void
     {
         $error = null;
-        if ($this->page->jsupdate) {
+        if ($this->request->isJSUpdate()) {
             return;
         }
 
@@ -374,7 +374,7 @@ final class Post
     {
         $page = '';
         $tid = $this->tid;
-        if ($this->page->jsupdate && $this->how !== 'qreply') {
+        if ($this->request->isJSUpdate() && $this->how !== 'qreply') {
             return;
         }
 

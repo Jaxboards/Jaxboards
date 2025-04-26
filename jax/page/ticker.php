@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Request;
 use Jax\Session;
 use Jax\User;
 
@@ -21,6 +22,7 @@ final class Ticker
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly Page $page,
+        private readonly Request $request,
         private readonly Session $session,
         private readonly User $user,
     ) {
@@ -29,7 +31,7 @@ final class Ticker
 
     public function render(): void
     {
-        if ($this->page->jsnewlocation || !$this->page->jsaccess) {
+        if ($this->request->isJSNewLocation() || !$this->request->jsAccess()) {
             $this->index();
         } else {
             $this->update();

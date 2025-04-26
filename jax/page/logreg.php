@@ -101,7 +101,7 @@ final class LogReg
 
         // Show registration form.
         if (!$this->request->post('register') !== null) {
-            if (!$this->page->jsupdate) {
+            if (!$this->request->isJSUpdate()) {
                 $this->page->JS('update', 'page', $p);
             }
 
@@ -262,7 +262,7 @@ final class LogReg
                 $perms = $this->user->getPerms($user['group_id']);
                 if ($this->registering) {
                     $this->page->JS('location', '/');
-                } elseif ($this->page->jsaccess) {
+                } elseif ($this->request->jsAccess()) {
                     $this->page->JS('reload');
                 } else {
                     $this->page->location('?');
@@ -303,7 +303,7 @@ final class LogReg
         $this->page->JS('update', 'userbox', $this->page->meta('userbox-logged-out'));
         $this->page->JS('softurl');
         $this->page->append('page', $this->page->meta('success', 'Logged out successfully'));
-        if ($this->page->jsaccess) {
+        if ($this->request->jsAccess()) {
             return;
         }
 
@@ -360,7 +360,7 @@ final class LogReg
     {
         $page = '';
 
-        if ($this->page->jsupdate && !$this->request->hasPostData()) {
+        if ($this->request->isJSUpdate() && !$this->request->hasPostData()) {
             return;
         }
 
@@ -509,7 +509,7 @@ final class LogReg
 
             $page .= $this->page->meta(
                 'forgot-password-form',
-                $this->page->jsaccess
+                $this->request->jsAccess()
                 ? $this->jax->hiddenFormFields(
                     [
                         'act' => 'logreg6',

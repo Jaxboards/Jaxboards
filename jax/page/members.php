@@ -45,7 +45,7 @@ final class Members
             $this->pageNumber = $this->request->both('page') - 1;
         }
 
-        if ($this->page->jsupdate) {
+        if ($this->request->isJSUpdate()) {
             return;
         }
 

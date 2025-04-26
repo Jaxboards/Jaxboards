@@ -65,8 +65,8 @@ final class UserProfile
         if ($userId === '' || $userId === '0') {
             $this->page->location('?');
         } elseif (
-            $this->page->jsnewlocation
-            && !$this->page->jsdirectlink
+            $this->request->isJSNewLocation()
+            && !$this->request->isJSDirectLink()
             && !$this->request->both('view')
         ) {
             $this->showcontactcard($userId);
@@ -159,7 +159,7 @@ final class UserProfile
 
     public function showfullprofile($id)
     {
-        if ($this->page->jsupdate && !$this->request->hasPostData()) {
+        if ($this->request->isJSUpdate() && !$this->request->hasPostData()) {
             return false;
         }
 
@@ -579,8 +579,8 @@ final class UserProfile
 
         if (
             $this->request->both('page') !== null
-            && $this->page->jsaccess
-            && !$this->page->jsdirectlink
+            && $this->request->jsAccess()
+            && !$this->request->isJSDirectLink()
         ) {
             $this->page->JS('update', 'pfbox', $pfbox);
         } else {
