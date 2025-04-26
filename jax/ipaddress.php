@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use function array_search;
 use function file;
 use function file_exists;
 use function filter_var;
@@ -22,6 +23,7 @@ use const FILTER_VALIDATE_IP;
  */
 final class IPAddress
 {
+    public $jax;
     private ?array $ipBanCache = null;
 
     public function __construct(
@@ -61,11 +63,13 @@ final class IPAddress
         return (inet_ntop($ipAddress) ?: inet_ntop(pack('A' . $length, $ipAddress))) ?: '';
     }
 
-    public function ban(string $ipAddress) {
+    public function ban(string $ipAddress): void
+    {
         $this->ipBanCache[] = $ipAddress;
     }
 
-    public function unBan(string $ipAddress) {
+    public function unBan(string $ipAddress): void
+    {
         unset($this->jax->ipbancache[array_search($ipAddress, $this->ipBanCache, true)]);
     }
 
@@ -92,7 +96,8 @@ final class IPAddress
         return false;
     }
 
-    public function getBannedIps() {
+    public function getBannedIps()
+    {
         if ($this->ipBanCache) {
             return $this->ipBanCache;
         }
@@ -110,6 +115,8 @@ final class IPAddress
                 $this->ipBanCache[] = $line;
             }
         }
+
+        return null;
     }
 
     /**

@@ -12,7 +12,10 @@ use Jax\Page;
  */
 final readonly class Tardis
 {
-    public function __construct(private Page $page, private DomainDefinitions $domainDefinitions) {}
+    public function __construct(
+        private Page $page,
+        private DomainDefinitions $domainDefinitions,
+    ) {}
 
     public function render(): void
     {

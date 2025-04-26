@@ -17,6 +17,7 @@ use Jax\User;
 use function array_diff;
 use function array_flip;
 use function array_key_exists;
+use function array_map;
 use function array_merge;
 use function ceil;
 use function count;
@@ -1092,7 +1093,7 @@ final class Topic
         $niblets = $this->database->getRatingNiblets();
         $ratings = [];
 
-        $error = match(true) {
+        $error = match (true) {
             $this->user->isGuest() => 'You must be logged in to rate posts.',
             !$post => "That post doesn't exist.",
             !$niblets[$nibletid] => 'Invalid rating',

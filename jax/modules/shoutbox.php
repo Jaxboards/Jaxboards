@@ -373,11 +373,11 @@ final class Shoutbox
 
         $perms = $this->user->getPerms();
 
-        $error = match(true) {
+        $error = match (true) {
             $this->user->isGuest() => 'You must be logged in to shout!',
             !$perms['can_shout'] => 'You do not have permission to shout!',
             mb_strlen((string) $shout) > 300 => 'Shout must be less than 300 characters.',
-            default => null
+            default => null,
         };
 
         if ($error !== null) {

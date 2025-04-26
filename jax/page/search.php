@@ -412,8 +412,8 @@ final class Search
         }
 
         if ($numresults === 0) {
-           $error = 'No results found. '
-                . 'Try refining your search, or using longer terms.';
+            $error = 'No results found. '
+                 . 'Try refining your search, or using longer terms.';
 
             $omitted = [];
             foreach ($terms as $v) {
@@ -425,9 +425,9 @@ final class Search
             }
 
             if ($omitted !== []) {
-               $error .= '<br /><br />'
-                    . 'The following terms were omitted due to length: '
-                    . implode(', ', $omitted);
+                $error .= '<br /><br />'
+                     . 'The following terms were omitted due to length: '
+                     . implode(', ', $omitted);
             }
 
             $page = $this->page->error($error);

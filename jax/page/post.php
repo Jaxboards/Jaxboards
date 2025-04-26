@@ -13,7 +13,6 @@ use Jax\Page;
 use Jax\Session;
 use Jax\TextFormatting;
 use Jax\User;
-use PHP_CodeSniffer\Generators\HTML;
 
 use function array_pop;
 use function count;
@@ -32,6 +31,7 @@ use function preg_replace;
 use function preg_split;
 use function str_replace;
 use function trim;
+use function var_dump;
 
 use const PHP_EOL;
 
@@ -271,7 +271,6 @@ final class Post
 
         $forum['perms'] = $this->user->parseForumPerms(
             $forum['perms'],
-            $this->user->get('group_id'),
         );
 
         if ($forum === []) {
@@ -288,29 +287,31 @@ final class Post
                 ];
             }
 
-            $pollForm = !$forum['perms']['poll'] ? '' : <<<HTML
-                    <label class="addpoll" for="addpoll">
-                        Add a Poll
-                    </label>
-                    <select name="poll_type" title="Add a poll"
-                        onchange="document.querySelector('#polloptions').style.display=this.value?'block':'none'">
-                    <option value="">No</option>
-                    <option value="single">Yes, single-choice</option>
-                    <option value="multi">Yes, multi-choice</option></select>
-                    <br>
-                    <div id="polloptions" style="display:none">
-                        <label for="pollq">Poll Question:</label>
-                        <input type="text" id="pollq" name="pollq" title="Poll Question"/><br>
-                        <label for="pollc">Poll Choices:</label> (one per line)
-                        <textarea id="pollc" name="pollchoices" title="Poll Choices"></textarea>
+            $pollForm = $forum['perms']['poll'] ? <<<'HTML'
+                <label class="addpoll" for="addpoll">
+                    Add a Poll
+                </label>
+                <select name="poll_type" title="Add a poll"
+                    onchange="document.querySelector('#polloptions').style.display=this.value?'block':'none'">
+                <option value="">No</option>
+                <option value="single">Yes, single-choice</option>
+                <option value="multi">Yes, multi-choice</option></select>
+                <br>
+                <div id="polloptions" style="display:none">
+                    <label for="pollq">Poll Question:</label>
+                    <input type="text" id="pollq" name="pollq" title="Poll Question"/><br>
+                    <label for="pollc">Poll Choices:</label> (one per line)
+                    <textarea id="pollc" name="pollchoices" title="Poll Choices"></textarea>
+                </div>
+                HTML : '';
+
+            $uploadButton = $forum['perms']['upload']
+                ? ''
+                : <<<'HTML'
+                    <div id="attachfiles" class="addfile">
+                        Add Files <input type="file" name="Filedata" title="Browse for file" />
                     </div>
                     HTML;
-
-            $uploadButton = $forum['perms']['upload'] ? '' : <<<HTML
-                <div id="attachfiles" class="addfile">
-                    Add Files <input type="file" name="Filedata" title="Browse for file" />
-                </div>
-                HTML;
 
             $form = <<<HTML
                 <form method="post" data-ajax-form="true"

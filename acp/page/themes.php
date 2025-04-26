@@ -229,7 +229,7 @@ final readonly class Themes
                         preg_match('@[^\w ]@', (string) $v)
                         || mb_strlen((string) $v) > 50
                     ) {
-                        $errorskins = "Skin name must consist of letters, numbers, spaces, and underscore, and be under 50 characters long.";
+                        $errorskins = 'Skin name must consist of letters, numbers, spaces, and underscore, and be under 50 characters long.';
                     } elseif (is_dir($this->themesPath . $v)) {
                         $errorskins = 'That skin name is already being used.';
                     } else {
@@ -267,8 +267,8 @@ final readonly class Themes
                         preg_match('@[^\w ]@', (string) $wrapperNewName)
                         || mb_strlen((string) $wrapperNewName) > 50
                     ) {
-                        $errorwrapper = "Wrapper name must consist of letters, numbers, spaces, and underscore, and be
-                            under 50 characters long.";
+                        $errorwrapper = 'Wrapper name must consist of letters, numbers, spaces, and underscore, and be
+                            under 50 characters long.';
                     } elseif (is_file($this->wrappersPath . $wrapperNewName . '.html')) {
                         $errorwrapper = 'That wrapper name is already being used.';
                     } else {
@@ -500,13 +500,13 @@ final readonly class Themes
     {
         $page = '';
         if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
-            $error = match(true) {
+            $error = match (true) {
                 !isset($this->jax->p['skinname']) || !$this->jax->p['skinname'] => 'No skin name supplied!',
-                (bool) preg_match('@[^\w ]@', (string) $this->jax->p['skinname']) =>  'Skinname must only consist of letters, numbers, and spaces.',
+                (bool) preg_match('@[^\w ]@', (string) $this->jax->p['skinname']) => 'Skinname must only consist of letters, numbers, and spaces.',
                 mb_strlen((string) $this->jax->p['skinname']) > 50 => 'Skin name must be less than 50 characters.',
                 is_dir($this->themesPath . $this->jax->p['skinname']) => 'A skin with that name already exists.',
                 !in_array($this->jax->p['wrapper'], $this->getwrappers()) => 'Invalid wrapper.',
-                default => null
+                default => null,
             };
 
             if ($error === null) {
