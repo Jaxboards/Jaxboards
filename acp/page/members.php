@@ -405,7 +405,7 @@ final readonly class Members
     {
         $page = '';
         $error = null;
-        if ($this->request->post('submit')) {
+        if ($this->request->post('submit') !== null) {
             if (
                 !$this->request->post('username')
                 || !$this->request->post('displayname')
