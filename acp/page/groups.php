@@ -44,12 +44,12 @@ final class Groups
         ]);
 
 
-        $do = null;
+        $do = $this->request->get('do');
         if ($this->request->get('edit')) {
             $do = 'edit';
         }
 
-        match ($this->request->get('do')) {
+        match ($do) {
             'perms' => $this->showperms(),
             'create' => $this->create(),
             'edit' => $this->create($this->request->get('edit')),
@@ -158,9 +158,9 @@ final class Groups
 
         if (
             $this->updatePermissions
-            && $this->request->post('perm')
+            && $this->request->post('perm') !== null
         ) {
-            foreach (explode(',', (string) $this->request->post('grouplist')) as $v) {
+            foreach (explode(',', $this->request->post('grouplist') ?? '') as $v) {
                 if (
                     isset($this->request->post('perm')[$v])
                     && $this->request->post('perm')[$v]
@@ -397,7 +397,7 @@ final class Groups
 
         $page = '';
         $error = null;
-        if ($this->request->post('submit')) {
+        if ($this->request->post('submit') !== null) {
             if (!$this->request->post('groupname')) {
                 $error = 'Group name required!';
             } elseif (mb_strlen((string) $this->request->post('groupname')) > 250) {

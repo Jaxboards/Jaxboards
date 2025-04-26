@@ -221,7 +221,7 @@ final readonly class Forums
             }
         }
 
-        match ($this->request->get('do') ?? null) {
+        match ($this->request->get('do')) {
             'order' => $this->orderforums(),
             'create' => $this->createforum(),
             'createc' => $this->createcategory(),
@@ -240,7 +240,7 @@ final readonly class Forums
             );
         }
 
-        if ($this->request->post('tree')) {
+        if ($this->request->post('tree') !== null) {
             $data = self::mysqltree(json_decode((string) $this->request->post('tree'), true));
             if ($this->request->get('do') === 'create') {
                 return;
@@ -386,7 +386,7 @@ final readonly class Forums
             $this->database->disposeresult($result);
         }
 
-        if ($this->request->post('tree')) {
+        if ($this->request->post('tree') !== null) {
             $this->orderforums();
 
             $page .= $this->page->success('Forum created.');
@@ -412,7 +412,7 @@ final readonly class Forums
             $this->page->location('?act=forums&edit=' . $fid);
         }
 
-        if ($this->request->post('submit')) {
+        if ($this->request->post('submit') !== null) {
             // Saves all of the data
             // really should be its own function, but I don't care.
             $grouppermsa = [];
@@ -758,13 +758,13 @@ final readonly class Forums
             $this->request->post('submit') === 'Cancel'
         ) {
             $this->page->location('?act=forums&do=order');
-        } elseif ($this->request->post('submit')) {
+        } elseif ($this->request->post('submit') !== null) {
             $this->database->safedelete(
                 'forums',
                 'WHERE `id`=?',
                 $this->database->basicvalue($id),
             );
-            if ($this->request->post('moveto')) {
+            if ($this->request->post('moveto') !== null) {
                 $this->database->safeupdate(
                     'topics',
                     [
@@ -927,10 +927,9 @@ final readonly class Forums
             $this->database->disposeresult($result);
         }
 
-        if ($this->request->post('submit')) {
+        if ($this->request->post('submit') !== null) {
             if (
-                trim((string) $this->request->post('cat_name')) === ''
-                || trim((string) $this->request->post('cat_name')) === '0'
+                trim($this->request->post('cat_name') ?? '') === ''
             ) {
                 $page .= $this->page->error('All fields required');
             } else {
@@ -1002,7 +1001,7 @@ final readonly class Forums
 
         if (
             $error !== null
-            && $this->request->post('submit')
+            && $this->request->post('submit') !== null
         ) {
             if (!isset($categories[$this->request->post('moveto')])) {
                 $error = 'Invalid category to move forums to.';
