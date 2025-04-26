@@ -50,6 +50,51 @@ final readonly class Forums
         private readonly User $user,
     ) {}
 
+    public function render(): void
+    {
+        $this->page->sidebar([
+            'create' => 'Create Forum',
+            'createc' => 'Create Category',
+            'order' => 'Manage',
+            'recountstats' => 'Recount Statistics',
+        ]);
+
+        if ($this->request->both('delete')) {
+            if (is_numeric($this->request->both('delete'))) {
+                $this->deleteforum($this->request->both('delete'));
+
+                return;
+            }
+
+            if (preg_match('@c_(\d+)@', (string) $this->request->both('delete'), $match)) {
+                $this->deletecategory($match[1]);
+
+                return;
+            }
+        } elseif ($this->request->both('edit')) {
+            if (is_numeric($this->request->both('edit'))) {
+                $this->createforum($this->request->both('edit'));
+
+                return;
+            }
+
+            if (preg_match('@c_(\d+)@', (string) $this->request->both('edit'), $match)) {
+                $this->createcategory($match[1]);
+
+                return;
+            }
+        }
+
+        match ($this->request->get('do')) {
+            'order' => $this->orderforums(),
+            'create' => $this->createforum(),
+            'createc' => $this->createcategory(),
+            'recountstats' => $this->recountStats->showstats(),
+            'recountstats2' => $this->recountStats->recountStatistics(),
+            default => $this->orderforums(),
+        };
+    }
+
     /**
      * Saves the posted tree to mysql.
      *
@@ -57,8 +102,11 @@ final readonly class Forums
      * @param string $path  The path in the tree
      * @param int    $order where the tree is place n the database
      */
-    private function mysqltree($tree, $path = '', $order = 0): void
-    {
+    private function mysqltree(
+        $tree,
+        string $path = '',
+        float|int $order = 0,
+    ): void {
         if (!is_array($tree)) {
             return;
         }
@@ -186,52 +234,7 @@ final readonly class Forums
         return '';
     }
 
-    public function render(): void
-    {
-        $this->page->sidebar([
-            'create' => 'Create Forum',
-            'createc' => 'Create Category',
-            'order' => 'Manage',
-            'recountstats' => 'Recount Statistics',
-        ]);
-
-        if ($this->request->both('delete')) {
-            if (is_numeric($this->request->both('delete'))) {
-                $this->deleteforum($this->request->both('delete'));
-
-                return;
-            }
-
-            if (preg_match('@c_(\d+)@', (string) $this->request->both('delete'), $match)) {
-                $this->deletecategory($match[1]);
-
-                return;
-            }
-        } elseif ($this->request->both('edit')) {
-            if (is_numeric($this->request->both('edit'))) {
-                $this->createforum($this->request->both('edit'));
-
-                return;
-            }
-
-            if (preg_match('@c_(\d+)@', (string) $this->request->both('edit'), $match)) {
-                $this->createcategory($match[1]);
-
-                return;
-            }
-        }
-
-        match ($this->request->get('do')) {
-            'order' => $this->orderforums(),
-            'create' => $this->createforum(),
-            'createc' => $this->createcategory(),
-            'recountstats' => $this->recountStats->showstats(),
-            'recountstats2' => $this->recountStats->recountStatistics(),
-            default => $this->orderforums(),
-        };
-    }
-
-    private function orderforums($highlight = 0): void
+    private function orderforums(int|string $highlight = 0): void
     {
         $page = '';
         if ($highlight) {
@@ -985,7 +988,7 @@ final readonly class Forums
         );
     }
 
-    private function deletecategory($catId): void
+    private function deletecategory(string $catId): void
     {
         $page = '';
         $error = null;
@@ -1101,7 +1104,7 @@ final readonly class Forums
         );
     }
 
-    private function checkbox($checkId, $name, $checked): ?string
+    private function checkbox($checkId, string $name, $checked): ?string
     {
         return $this->page->parseTemplate(
             'forums/create-forum-permissions-row-checkbox.html',

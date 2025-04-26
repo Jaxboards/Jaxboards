@@ -183,7 +183,7 @@ final readonly class Settings
         );
     }
 
-    private function pages_edit($pageurl): void
+    private function pages_edit(array|string $pageurl): void
     {
         $page = '';
         $result = $this->database->safeselect(

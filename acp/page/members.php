@@ -976,8 +976,12 @@ final readonly class Members
         $this->page->addContentBox('Members Awaiting Validation', $page);
     }
 
-    private function formfield($label, $name, $value, $which = false): string
-    {
+    private function formfield(
+        string $label,
+        string $name,
+        $value,
+        $which = false,
+    ): string {
         if (mb_strtolower((string) $which) === 'textarea') {
             return $this->page->parseTemplate(
                 'members/edit-form-field-textarea.html',
@@ -999,7 +1003,7 @@ final readonly class Members
         ) . PHP_EOL;
     }
 
-    private function heading($value): ?string
+    private function heading(string $value): ?string
     {
         return $this->page->parseTemplate(
             'members/edit-heading.html',

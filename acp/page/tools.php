@@ -300,7 +300,7 @@ final readonly class Tools
     }
 
     // Reads the last $totalLines of a file
-    private function tail($path, $totalLines): array
+    private function tail(bool|string $path, int $totalLines): array
     {
         $logFile = new SplFileObject($path, 'r');
         $logFile->fseek(0, SEEK_END);
