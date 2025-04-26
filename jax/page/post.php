@@ -31,7 +31,6 @@ use function preg_replace;
 use function preg_split;
 use function str_replace;
 use function trim;
-use function var_dump;
 
 use const PHP_EOL;
 

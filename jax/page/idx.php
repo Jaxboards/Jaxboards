@@ -448,7 +448,8 @@ final class IDX
                 $user['uid'] === null || $user['uid'] === 0
                 || (bool) $user['is_bot']
             ) {
-                $guests++;
+                ++$guests;
+
                 continue;
             }
 
