@@ -41,13 +41,15 @@ final readonly class RecountStats
         }
 
         $result = $this->database->safespecial(
-            <<<'EOT'
-                SELECT p.`id` AS `id`,
-                    p.`auth_id` AS `auth_id`,p.`tid` AS `tid`,t.`fid` AS `fid`
+            <<<'SQL'
+                SELECT
+                    p.`id` AS `id`,
+                    p.`auth_id` AS `auth_id`,
+                    p.`tid` AS `tid`,
+                    t.`fid` AS `fid`
                 FROM %t p
-                LEFT JOIN %t t
-                    ON p.`tid`=t.`id`
-                EOT
+                LEFT JOIN %t t ON p.`tid`=t.`id`
+                SQL
             ,
             ['posts', 'topics'],
         );

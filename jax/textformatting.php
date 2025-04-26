@@ -78,9 +78,9 @@ final class TextFormatting
     public function getCustomRules(): void
     {
         $result = $this->database->safeselect(
-            <<<'EOT'
+            <<<'SQL'
                 `id`,`type`,`needle`,`replacement`,`enabled`
-                EOT
+                SQL
             ,
             'textrules',
             '',

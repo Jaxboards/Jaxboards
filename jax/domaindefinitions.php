@@ -59,7 +59,7 @@ final class DomainDefinitions
             $boardURL .= ($port ? ':' . $port : '');
         }
 
-        $this->boardURL = $boardURL . '/';
+        $this->boardURL = $boardURL;
         $this->soundsURL = pathjoin($this->boardURL, 'Sounds');
 
         $domainMatch = str_replace('.', '\.', $serviceConfig['domain']);

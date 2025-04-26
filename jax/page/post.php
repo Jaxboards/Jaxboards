@@ -6,6 +6,7 @@ namespace Jax\Page;
 
 use Jax\Config;
 use Jax\Database;
+use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
@@ -60,6 +61,7 @@ final class Post
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
+        private readonly DomainDefinitions $domainDefinitions,
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly IPAddress $ipAddress,
@@ -138,20 +140,20 @@ final class Post
 
         $size = filesize($fileobj['tmp_name']);
         $hash = hash_file('sha512', $fileobj['tmp_name']);
-        $uploadpath = BOARDPATH . 'Uploads/';
+        $uploadpath = $this->domainDefinitions->getBoardPath() . 'Uploads/';
 
-        $ext = explode('.', (string) $fileobj['name']);
-        $ext = count($ext) === 1 ? '' : mb_strtolower(array_pop($ext));
+        $errorxt = explode('.', (string) $fileobj['name']);
+        $errorxt = count($errorxt) === 1 ? '' : mb_strtolower(array_pop($errorxt));
 
-        if (!in_array($ext, $this->config->getSetting('images') ?? [])) {
-            $ext = '';
+        if (!in_array($errorxt, $this->config->getSetting('images') ?? [])) {
+            $errorxt = '';
         }
 
-        if ($ext !== '' && $ext !== '0') {
-            $ext = '.' . $ext;
+        if ($errorxt !== '' && $errorxt !== '0') {
+            $errorxt = '.' . $errorxt;
         }
 
-        $file = $uploadpath . $hash . $ext;
+        $file = $uploadpath . $hash . $errorxt;
         if (!is_file($file)) {
             move_uploaded_file($fileobj['tmp_name'], $file);
             $this->database->safeinsert(
@@ -198,7 +200,7 @@ final class Post
 
     public function showtopicform(): void
     {
-        $e = '';
+        $error = null;
         if ($this->page->jsupdate) {
             return;
         }
@@ -238,7 +240,7 @@ final class Post
             $this->database->disposeresult($result);
 
             if (!$tdata) {
-                $e = "The topic you're trying to edit does not exist.";
+                $error = "The topic you're trying to edit does not exist.";
             } else {
                 $result = $this->database->safeselect(
                     ['post'],
@@ -263,20 +265,20 @@ final class Post
             'WHERE `id`=?',
             $fid,
         );
-        $fdata = $this->database->arow($result);
+        $forum = $this->database->arow($result);
         $this->database->disposeresult($result);
 
-        $fdata['perms'] = $this->user->parsePerms(
-            $fdata['perms'],
+        $forum['perms'] = $this->user->parseForumPerms(
+            $forum['perms'],
             $this->user->get('group_id'),
         );
 
-        if ($fdata === []) {
-            $e = "This forum doesn't exist. Weird.";
+        if ($forum === []) {
+            $error = "This forum doesn't exist. Weird.";
         }
 
-        if ($e !== '' && $e !== '0') {
-            $page .= $this->page->meta('error', $e);
+        if ($error !== null) {
+            $page .= $this->page->meta('error', $error);
         } else {
             if (!isset($tdata)) {
                 $tdata = [
@@ -310,7 +312,7 @@ final class Post
     class="bbcode-editor"
     >' . $this->textFormatting->blockhtml($postdata) . '</textarea>
 <br><div class="postoptions">
-  ' . ($fdata['perms']['poll'] ? '<label class="addpoll" for="addpoll">Add a
+  ' . ($forum['perms']['poll'] ? '<label class="addpoll" for="addpoll">Add a
 Poll</label> <select name="poll_type" title="Add a poll"  onchange="document.querySelector(\'#polloptions\').'
             . 'style.display=this.value?\'block\':\'none\'">
 <option value="">No</option>
@@ -320,7 +322,7 @@ Poll</label> <select name="poll_type" title="Add a poll"  onchange="document.que
    <label for="pollq">Poll Question:</label><input type="text" id="pollq" name="pollq" title="Poll Question"/><br>
    <label for="pollc">Poll Choices:</label> (one per line)
 <textarea id="pollc" name="pollchoices" title="Poll Choices"></textarea></div>' : '')
-            . ($fdata['perms']['upload'] ? '<div id="attachfiles" class="addfile">
+            . ($forum['perms']['upload'] ? '<div id="attachfiles" class="addfile">
    Add Files <input type="file" name="Filedata" title="Browse for file" /></div>' : '')
             . '<div class="buttons"><input type="submit" name="submit"
    value="Post New Topic" title="Submit your post" onclick="this.form.submitButton=this;"
@@ -328,16 +330,16 @@ id="submitbutton" /> <input type="submit" name="submit" value="Preview" title="S
 onclick="this.form.submitButton=this" /></div>
  </div>
 </form>';
-            $page .= $this->page->meta('box', '', $fdata['title'] . ' > New Topic', $form);
+            $page .= $this->page->meta('box', '', $forum['title'] . ' > New Topic', $form);
         }
 
         $this->page->append('page', $page);
         $this->page->JS('update', 'page', $page);
-        if ($e !== '' && $e !== '0') {
+        if ($error !== '' && $error !== '0') {
             return;
         }
 
-        if ($fdata['perms']['upload']) {
+        if ($forum['perms']['upload']) {
             $this->page->JS('attachfiles');
         }
 
@@ -358,13 +360,15 @@ onclick="this.form.submitButton=this" /></div>
 
         if ($tid) {
             $result = $this->database->safespecial(
-                <<<'EOT'
-                    SELECT t.`title` AS `title`,f.`perms` AS `perms`
+                <<<'SQL'
+                    SELECT
+                        t.`title` AS `title`,
+                        f.`perms` AS `perms`
                     FROM %t t
                     LEFT JOIN %t f
                         ON t.`fid`=f.`id`
                     WHERE t.`id`=?
-                    EOT
+                    SQL
                 ,
                 ['topics', 'forums'],
                 $this->database->basicvalue($tid),
@@ -405,7 +409,7 @@ onclick="this.form.submitButton=this" /></div>
             $postdata = '';
 
             $result = $this->database->safespecial(
-                <<<'EOT'
+                <<<'SQL'
                     SELECT
                         m.`display_name` AS `name`,
                         p.`post` AS `post`
@@ -413,7 +417,7 @@ onclick="this.form.submitButton=this" /></div>
                     LEFT JOIN %t m
                         ON p.`auth_id`=m.`id`
                     WHERE p.`id` IN (?)
-                    EOT
+                    SQL
                 ,
                 ['posts', 'members'],
                 $this->session->getVar('multiquote'),
@@ -495,21 +499,21 @@ onclick="this.form.submitButton=this"/></div>
     {
         $pid = $this->pid;
         $tid = $this->tid;
-        $e = '';
-        $editingpost = false;
+        $error = '';
+        $errorditingpost = false;
         if (!$pid || !is_numeric($pid)) {
-            $e = 'Invalid post to edit.';
+            $error = 'Invalid post to edit.';
         }
 
         if ($this->postdata) {
             if (!$this->nopost && trim((string) $this->postdata) === '') {
-                $e = "You didn't supply a post!";
+                $error = "You didn't supply a post!";
             } elseif (mb_strlen((string) $this->postdata) > 65535) {
-                $e = 'Post must not exceed 65,535 bytes.';
+                $error = 'Post must not exceed 65,535 bytes.';
             }
         }
 
-        if ($e === '' || $e === '0') {
+        if ($error === '' || $error === '0') {
             $result = $this->database->safeselect(
                 [
                     'auth_id',
@@ -525,18 +529,18 @@ onclick="this.form.submitButton=this"/></div>
             $this->database->disposeresult($result);
 
             if (!$post) {
-                $e = 'The post you are trying to edit does not exist.';
+                $error = 'The post you are trying to edit does not exist.';
             } elseif (!$this->canedit($post)) {
-                $e = "You don't have permission to edit that post!";
+                $error = "You don't have permission to edit that post!";
             } elseif ($this->postdata === null) {
-                $editingpost = true;
+                $errorditingpost = true;
                 $this->postdata = $post['post'];
             }
         }
 
-        if ($tid && !$e) {
+        if ($tid && !$error) {
             if (!is_numeric($tid) || !$tid) {
-                $e = 'Invalid post to edit.';
+                $error = 'Invalid post to edit.';
             } else {
                 $result = $this->database->safeselect(
                     [
@@ -569,9 +573,9 @@ onclick="this.form.submitButton=this"/></div>
                 $this->database->disposeresult($result);
 
                 if (!$tmp) {
-                    $e = "The topic you are trying to edit doesn't exist.";
+                    $error = "The topic you are trying to edit doesn't exist.";
                 } elseif (trim((string) $this->jax->p['ttitle']) === '') {
-                    $e = 'You must supply a topic title!';
+                    $error = 'You must supply a topic title!';
                 } else {
                     $this->database->safeupdate(
                         'topics',
@@ -601,12 +605,12 @@ onclick="this.form.submitButton=this"/></div>
             }
         }
 
-        if ($e !== '' && $e !== '0') {
-            $this->page->JS('error', $e);
-            $this->page->append('PAGE', $this->page->error($e));
+        if ($error !== '' && $error !== '0') {
+            $this->page->JS('error', $error);
+            $this->page->append('PAGE', $this->page->error($error));
         }
 
-        if ($e || $editingpost) {
+        if ($error || $errorditingpost) {
             $this->showpostform();
 
             return false;
@@ -642,32 +646,32 @@ onclick="this.form.submitButton=this"/></div>
         $newtopic = false;
         $postDate = $this->database->datetime();
         $uid = $this->user->get('id');
-        $e = '';
+        $error = '';
 
         if (!$this->nopost && trim((string) $postdata) === '') {
-            $e = "You didn't supply a post!";
+            $error = "You didn't supply a post!";
         } elseif (mb_strlen((string) $postdata) > 50000) {
-            $e = 'Post must not exceed 50,000 characters.';
+            $error = 'Post must not exceed 50,000 characters.';
         }
 
-        if (!$e && $this->how === 'newtopic') {
+        if (!$error && $this->how === 'newtopic') {
             if (!$fid || !is_numeric($fid)) {
-                $e = 'No forum specified exists.';
+                $error = 'No forum specified exists.';
             } elseif (
                 !isset($this->jax->p['ttitle'])
                 || trim((string) $this->jax->p['ttitle']) === ''
             ) {
-                $e = "You didn't specify a topic title!";
+                $error = "You didn't specify a topic title!";
             } elseif (
                 isset($this->jax->p['ttitle'])
                 && mb_strlen((string) $this->jax->p['ttitle']) > 255
             ) {
-                $e = 'Topic title must not exceed 255 characters';
+                $error = 'Topic title must not exceed 255 characters';
             } elseif (
                 isset($this->jax->p['subtitle'])
                 && mb_strlen($this->jax->p['subtitle']) > 255
             ) {
-                $e = 'Subtitle must not exceed 255 characters';
+                $error = 'Subtitle must not exceed 255 characters';
             } elseif (
                 isset($this->jax->p['poll_type'])
                 && $this->jax->p['poll_type']
@@ -687,11 +691,11 @@ onclick="this.form.submitButton=this"/></div>
                 }
 
                 if (trim((string) $this->jax->p['pollq']) === '') {
-                    $e = "You didn't specify a poll question!";
+                    $error = "You didn't specify a poll question!";
                 } elseif (count($pollchoices) > 10) {
-                    $e = 'Poll choices must not exceed 10.';
+                    $error = 'Poll choices must not exceed 10.';
                 } elseif ($pollchoices === []) {
-                    $e = "You didn't provide any poll choices!";
+                    $error = "You didn't provide any poll choices!";
                 }
             }
 
@@ -706,13 +710,11 @@ onclick="this.form.submitButton=this"/></div>
             $this->database->disposeresult($result);
 
             if (!$fdata) {
-                $e = "The forum you're trying to post in does not exist.";
+                $error = "The forum you're trying to post in does not exist.";
             } else {
                 $fdata['perms'] = $this->user->parseForumPerms($fdata['perms']);
                 if (!$fdata['perms']['start']) {
-                    $e = <<<'EOT'
-                        You don't have permission to post a new topic in that forum.
-                        EOT;
+                    $error = "You don't have permission to post a new topic in that forum.";
                 }
 
                 if (
@@ -720,11 +722,11 @@ onclick="this.form.submitButton=this"/></div>
                     || (isset($this->jax->p['pollq']) && $this->jax->p['pollq']))
                     && !$fdata['perms']['poll']
                 ) {
-                    $e = "You don't have permission to post a poll in that forum";
+                    $error = "You don't have permission to post a poll in that forum";
                 }
             }
 
-            if ($e === '' || $e === '0') {
+            if ($error === '' || $error === '0') {
                 $this->database->safeinsert(
                     'topics',
                     [
@@ -765,9 +767,9 @@ onclick="this.form.submitButton=this"/></div>
             $newtopic = true;
         }
 
-        if ($e !== '' && $e !== '0') {
-            $this->page->append('PAGE', $this->page->error($e));
-            $this->page->JS('error', $e);
+        if ($error !== '' && $error !== '0') {
+            $this->page->append('PAGE', $this->page->error($error));
+            $this->page->JS('error', $error);
             $this->page->JS('enable', 'submitbutton');
             if ($this->how === 'newtopic') {
                 $this->showtopicform();
@@ -780,14 +782,19 @@ onclick="this.form.submitButton=this"/></div>
 
         if ($tid && is_numeric($tid)) {
             $result = $this->database->safespecial(
-                <<<'EOT'
-                    SELECT t.`title` AS `topictitle`,f.`id` AS `id`,f.`path` AS `path`,
-                        f.`perms` AS `perms`,f.`nocount` AS `nocount`,t.`locked` AS `locked`
+                <<<'SQL'
+                    SELECT
+                        t.`title` AS `topictitle`,
+                        f.`id` AS `id`,
+                        f.`path` AS `path`,
+                        f.`perms` AS `perms`,
+                        f.`nocount` AS `nocount`,
+                        t.`locked` AS `locked`
                     FROM %t t
                     LEFT JOIN %t f
                         ON t.`fid`=f.`id`
                         WHERE t.`id`=?
-                    EOT
+                    SQL
                 ,
                 ['topics', 'forums'],
                 $tid,
@@ -797,9 +804,9 @@ onclick="this.form.submitButton=this"/></div>
         }
 
         if (!$fdata) {
-            $e = "The topic you're trying to reply to does not exist.";
-            $this->page->append('PAGE', $this->page->error($e));
-            $this->page->JS('error', $e);
+            $error = "The topic you're trying to reply to does not exist.";
+            $this->page->append('PAGE', $this->page->error($error));
+            $this->page->JS('error', $error);
 
             return false;
         }
@@ -810,9 +817,9 @@ onclick="this.form.submitButton=this"/></div>
             || $fdata['locked']
             && !$this->user->getPerm('can_override_locked_topics')
         ) {
-            $e = "You don't have permission to post here.";
-            $this->page->append('PAGE', $this->page->error($e));
-            $this->page->JS('error', $e);
+            $error = "You don't have permission to post here.";
+            $this->page->append('PAGE', $this->page->error($error));
+            $this->page->JS('error', $error);
 
             return false;
         }
@@ -860,11 +867,11 @@ onclick="this.form.submitButton=this"/></div>
         // for the topic.
         if (!$newtopic) {
             $this->database->safespecial(
-                <<<'EOT'
+                <<<'SQL'
                     UPDATE %t
                     SET `lp_uid` = ?, `lp_date` = ?, `replies` = `replies` + 1
                     WHERE `id`=?
-                    EOT
+                    SQL
                 ,
                 ['topics'],
                 $uid,
@@ -883,12 +890,16 @@ onclick="this.form.submitButton=this"/></div>
 
         if ($newtopic) {
             $this->database->safespecial(
-                <<<'EOT'
+                <<<'SQL'
                     UPDATE %t
-                    SET `lp_uid`= ?, `lp_tid` = ?, `lp_topic` = ?, `lp_date` = ?,
-                        `topics` = `topics` + 1
+                    SET
+                        `lp_uid`=?,
+                        `lp_tid`=?,
+                        `lp_topic`=?,
+                        `lp_date`=?,
+                        `topics`=`topics`+1
                     WHERE `id` IN ?
-                    EOT
+                    SQL
                 ,
                 ['forums'],
                 $uid,
@@ -899,12 +910,16 @@ onclick="this.form.submitButton=this"/></div>
             );
         } else {
             $this->database->safespecial(
-                <<<'EOT'
+                <<<'SQL'
                     UPDATE %t
-                    SET `lp_uid`= ?, `lp_tid` = ?, `lp_topic` = ?, `lp_date` = ?,
-                        `posts` = `posts` + 1
+                    SET
+                        `lp_uid`=?,
+                        `lp_tid`=?,
+                        `lp_topic`=?,
+                        `lp_date`=?,
+                        `posts`=`posts`+1
                     WHERE `id` IN (?)
-                    EOT
+                    SQL
                 ,
                 ['forums'],
                 $uid,
@@ -922,10 +937,12 @@ onclick="this.form.submitButton=this"/></div>
 
         if ($newtopic) {
             $this->database->safespecial(
-                <<<'EOT'
+                <<<'SQL'
                     UPDATE %t
-                    SET `posts` = `posts` + 1, `topics` = `topics` + 1
-                    EOT
+                    SET
+                        `posts`=`posts` + 1,
+                        `topics`=`topics` + 1
+                    SQL
                 ,
                 ['stats'],
             );

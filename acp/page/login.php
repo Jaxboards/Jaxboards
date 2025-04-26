@@ -35,8 +35,8 @@ final readonly class Login
             'board_name' => $this->config->getSetting('boardname'),
             'board_url' => $boardUrl,
             'content' => '',
-            'css_url' => $boardUrl . 'acp/css/login.css',
-            'favicon_url' => $boardUrl . 'favicon.ico',
+            'css_url' => $boardUrl . '/acp/css/login.css',
+            'favicon_url' => $boardUrl . '/favicon.ico',
         ];
 
         if (isset($this->jax->p['submit'])) {

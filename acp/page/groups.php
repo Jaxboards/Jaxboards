@@ -397,26 +397,26 @@ final class Groups
         }
 
         $page = '';
-        $e = '';
+        $error = null;
         if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
             if (
                 !isset($this->jax->p['groupname'])
                 || !$this->jax->p['groupname']
             ) {
-                $e = 'Group name required!';
+                $error = 'Group name required!';
             } elseif (mb_strlen((string) $this->jax->p['groupname']) > 250) {
-                $e = 'Group name must not exceed 250 characters!';
+                $error = 'Group name must not exceed 250 characters!';
             } elseif (mb_strlen((string) $this->jax->p['groupicon']) > 250) {
-                $e = 'Group icon must not exceed 250 characters!';
+                $error = 'Group icon must not exceed 250 characters!';
             } elseif (
                 $this->jax->p['groupicon']
                 && !$this->jax->isurl($this->jax->p['groupicon'])
             ) {
-                $e = 'Group icon must be a valid image url';
+                $error = 'Group icon must be a valid image url';
             }
 
-            if ($e !== '' && $e !== '0') {
-                $page .= $this->page->error($e);
+            if ($error !== null) {
+                $page .= $this->page->error($error);
             } else {
                 $write = [
                     'icon' => $this->jax->p['groupicon'],

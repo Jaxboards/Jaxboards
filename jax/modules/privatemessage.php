@@ -40,17 +40,17 @@ final readonly class PrivateMessage
 
     public function init(): void
     {
-        $im = $this->jax->p['im_im'] ?? null;
+        $instantMessage = $this->jax->p['im_im'] ?? null;
         $uid = $this->jax->p['im_uid'] ?? null;
         if ($this->session->get('runonce')) {
             $this->filter();
         }
 
-        if (trim($im ?? '') === '' || !$uid) {
+        if (trim($instantMessage ?? '') === '' || !$uid) {
             return;
         }
 
-        $this->message($uid, $im);
+        $this->message($uid, $instantMessage);
     }
 
     public function filter(): void
@@ -82,10 +82,10 @@ final readonly class PrivateMessage
         $this->session->set('runonce', implode(PHP_EOL, $exploded));
     }
 
-    public function message($uid, $im)
+    public function message($uid, $instantMessage)
     {
         $this->session->act();
-        $e = '';
+        $error = null;
         $fatal = false;
 
         if ($this->user->isGuest()) {
@@ -103,14 +103,14 @@ final readonly class PrivateMessage
             );
         }
 
-        $im = $this->textFormatting->linkify($im);
-        $im = $this->textFormatting->theworks($im);
+        $instantMessage = $this->textFormatting->linkify($instantMessage);
+        $instantMessage = $this->textFormatting->theworks($instantMessage);
 
         $cmd = [
             'im',
             $uid,
             $this->user->get('display_name'),
-            $im,
+            $instantMessage,
             $this->user->get('id'),
             time(),
         ];
@@ -133,7 +133,7 @@ final readonly class PrivateMessage
             $this->page->JS('imtoggleoffline', $uid);
         }
 
-        return !$e && !$fatal;
+        return !$error && !$fatal;
     }
 
     public function sendcmd($cmd, $uid): ?bool
@@ -143,11 +143,11 @@ final readonly class PrivateMessage
         }
 
         $this->database->safespecial(
-            <<<'EOT'
+            <<<'SQL'
                 UPDATE %t
                 SET `runonce`=CONCAT(`runonce`,?)
                 WHERE `uid`=? AND `last_update`> ?
-                EOT
+                SQL
             ,
             ['session'],
             $this->database->basicvalue(json_encode($cmd) . PHP_EOL),

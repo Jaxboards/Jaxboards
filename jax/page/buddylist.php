@@ -31,7 +31,7 @@ final readonly class BuddyList
         $buddylist = $this->jax->hiddenFormFields(['act' => 'buddylist']);
         $this->page->addMeta(
             'buddylist-contacts',
-            <<<EOT
+            <<<HTML
                     <div class="contacts">
                         <form method="?" data-ajax-form="true">
                             {$buddylist}
@@ -41,11 +41,11 @@ final readonly class BuddyList
                                 onblur="this.form.onsubmit()" value="%s"/>
                             %s
                     </div>
-                EOT,
+                HTML,
         );
         $this->page->addMeta(
             'buddylist-contact',
-            <<<'EOT'
+            <<<'HTML'
                     <div
                         class="contact %3$s">
                         <a href="?act=vu%1$s">
@@ -59,7 +59,7 @@ final readonly class BuddyList
                                 %5$s
                             </div>
                     </div>
-                EOT,
+                HTML,
         );
     }
 
@@ -114,15 +114,15 @@ final readonly class BuddyList
                 'WHERE `id` IN ? ORDER BY `name` ASC',
                 explode(',', (string) $this->user->get('friends')),
             );
-            while ($f = $this->database->arow($result)) {
+            while ($contact = $this->database->arow($result)) {
                 $contacts .= $this->page->meta(
                     'buddylist-contact',
-                    $f['id'],
-                    $f['name'],
-                    isset($online[$f['id']]) && $online[$f['id']]
+                    $contact['id'],
+                    $contact['name'],
+                    isset($online[$contact['id']]) && $online[$contact['id']]
                     ? 'online' : 'offline',
-                    $this->jax->pick($f['avatar'], $this->page->meta('default-avatar')),
-                    $f['usertitle'],
+                    $this->jax->pick($contact['avatar'], $this->page->meta('default-avatar')),
+                    $contact['usertitle'],
                 );
             }
         }
@@ -134,14 +134,14 @@ final readonly class BuddyList
                 'WHERE `id` IN ? ORDER BY `name` ASC',
                 explode(',', (string) $this->user->get('enemies')),
             );
-            while ($f = $this->database->arow($result)) {
+            while ($contact = $this->database->arow($result)) {
                 $contacts .= $this->page->meta(
                     'buddylist-contact',
-                    $f['id'],
-                    $f['name'],
+                    $contact['id'],
+                    $contact['name'],
                     'blocked',
-                    $this->jax->pick($f['avatar'], $this->page->meta('default-avatar')),
-                    $f['usertitle'],
+                    $this->jax->pick($contact['avatar'], $this->page->meta('default-avatar')),
+                    $contact['usertitle'],
                 );
             }
         }
@@ -172,7 +172,7 @@ final readonly class BuddyList
     public function addbuddy($uid): void
     {
         $friends = $this->user->get('friends');
-        $e = '';
+        $error = null;
 
         if (
             $this->user->get('enemies')
@@ -194,15 +194,15 @@ final readonly class BuddyList
         }
 
         if (!$user) {
-            $e = 'This user does not exist, and therefore could '
+            $error = 'This user does not exist, and therefore could '
                 . 'not be added to your contacts list.';
         } elseif (in_array($uid, explode(',', (string) $friends))) {
-            $e = 'This user is already in your contacts list.';
+            $error = 'This user is already in your contacts list.';
         }
 
-        if ($e !== '' && $e !== '0') {
-            $this->page->append('PAGE', $e);
-            $this->page->JS('error', $e);
+        if ($error !== null) {
+            $this->page->append('PAGE', $error);
+            $this->page->JS('error', $error);
         } else {
             if ($friends) {
                 $friends .= ',' . $uid;
@@ -229,7 +229,7 @@ final readonly class BuddyList
             return;
         }
 
-        $e = '';
+        $error = null;
         $enemies = $this->user->get('enemies')
             ? explode(',', (string) $this->user->get('enemies'))
             : [];
@@ -244,11 +244,11 @@ final readonly class BuddyList
         }
 
         if ($isenemy !== false) {
-            $e = 'This user is already blocked.';
+            $error = 'This user is already blocked.';
         }
 
-        if ($e !== '' && $e !== '0') {
-            $this->page->JS('error', $e);
+        if ($error !== null) {
+            $this->page->JS('error', $error);
         } else {
             $enemies[] = $uid;
             $enemies = implode(',', $enemies);

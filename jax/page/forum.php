@@ -103,21 +103,35 @@ final class Forum
         $unread = false;
 
         $result = $this->database->safespecial(
-            <<<'EOT'
-                SELECT f.`id` AS `id`,f.`cat_id` AS `cat_id`,f.`title` AS `title`,
-                    f.`subtitle` AS `subtitle`,f.`lp_uid` AS `lp_uid`,
-                    UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,f.`lp_tid` AS `lp_tid`,
-                    f.`lp_topic` AS `lp_topic`,f.`path` AS `path`,f.`show_sub` AS `show_sub`,
-                    f.`redirect` AS `redirect`,f.`topics` AS `topics`,f.`posts` AS `posts`,
-                    f.`order` AS `order`,f.`perms` AS `perms`,f.`orderby` AS `orderby`,
-                    f.`nocount` AS `nocount`,f.`redirects` AS `redirects`,
-                    f.`trashcan` AS `trashcan`,f.`mods` AS `mods`,f.`show_ledby` AS `show_ledby`,
+            <<<'SQL'
+                SELECT
+                    f.`id` AS `id`,
+                    f.`cat_id` AS `cat_id`,
+                    f.`title` AS `title`,
+                    f.`subtitle` AS `subtitle`,
+                    f.`lp_uid` AS `lp_uid`,
+                    UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,
+                    f.`lp_tid` AS `lp_tid`,
+                    f.`lp_topic` AS `lp_topic`,
+                    f.`path` AS `path`,
+                    f.`show_sub` AS `show_sub`,
+                    f.`redirect` AS `redirect`,
+                    f.`topics` AS `topics`,
+                    f.`posts` AS `posts`,
+                    f.`order` AS `order`,
+                    f.`perms` AS `perms`,
+                    f.`orderby` AS `orderby`,
+                    f.`nocount` AS `nocount`,
+                    f.`redirects` AS `redirects`,
+                    f.`trashcan` AS `trashcan`,
+                    f.`mods` AS `mods`,
+                    f.`show_ledby` AS `show_ledby`,
                     c.`title` AS `cat`
                 FROM %t f
                 LEFT JOIN %t c
                     ON f.`cat_id`=c.`id`
                 WHERE f.`id`=? LIMIT 1
-                EOT
+                SQL
             ,
             ['forums', 'categories'],
             $fid,
@@ -134,11 +148,11 @@ final class Forum
         if ($fdata['redirect']) {
             $this->page->JS('softurl');
             $this->database->safespecial(
-                <<<'EOT'
+                <<<'SQL'
                     UPDATE %t
                     SET `redirects` = `redirects` + 1
                     WHERE `id`=?
-                    EOT
+                    SQL
                 ,
                 ['forums'],
                 $this->database->basicvalue($fid),
@@ -163,55 +177,70 @@ final class Forum
         // I'm fairly sure this is faster than doing
         // `SELECT count(*) FROM topics`... but I haven't benchmarked it.
         $result = $this->database->safespecial(
-            <<<'EOT'
-                SELECT f.`id` AS `id`,f.`cat_id` AS `cat_id`,f.`title` AS `title`,
-                    f.`subtitle` AS `subtitle`,f.`lp_uid` AS `lp_uid`,
-                    UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,f.`lp_tid` AS `lp_tid`,
-                    f.`lp_topic` AS `lp_topic`,f.`path` AS `path`,f.`show_sub` AS `show_sub`,
-                    f.`redirect` AS `redirect`,f.`topics` AS `topics`,f.`posts` AS `posts`,
-                    f.`order` AS `order`,f.`perms` AS `perms`,f.`orderby` AS `orderby`,
-                    f.`nocount` AS `nocount`,f.`redirects` AS `redirects`,
-                    f.`trashcan` AS `trashcan`,f.`mods` AS `mods`,f.`show_ledby` AS `show_ledby`,
-                    m.`display_name` AS `lp_name`,m.`group_id` AS `lp_gid`
+            <<<'SQL'
+                SELECT
+                    f.`id` AS `id`,
+                    f.`cat_id` AS `cat_id`,
+                    f.`title` AS `title`,
+                    f.`subtitle` AS `subtitle`,
+                    f.`lp_uid` AS `lp_uid`,
+                    UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,
+                    f.`lp_tid` AS `lp_tid`,
+                    f.`lp_topic` AS `lp_topic`,
+                    f.`path` AS `path`,
+                    f.`show_sub` AS `show_sub`,
+                    f.`redirect` AS `redirect`,
+                    f.`topics` AS `topics`,
+                    f.`posts` AS `posts`,
+                    f.`order` AS `order`,
+                    f.`perms` AS `perms`,
+                    f.`orderby` AS `orderby`,
+                    f.`nocount` AS `nocount`,
+                    f.`redirects` AS `redirects`,
+                    f.`trashcan` AS `trashcan`,
+                    f.`mods` AS `mods`,
+                    f.`show_ledby` AS `show_ledby`,
+                    m.`display_name` AS `lp_name`,
+                    m.`group_id` AS `lp_gid`
                 FROM %t f
                 LEFT JOIN %t m
                 ON f.`lp_uid`=m.`id`
                 WHERE f.`path`=?
                     OR f.`path` LIKE ?
                 ORDER BY f.`order`
-                EOT
+                SQL
             ,
             ['forums', 'members'],
             $fid,
             "% {$fid}",
         );
         $rows = '';
-        while ($f = $this->database->arow($result)) {
-            $fdata['topics'] -= $f['topics'];
+        while ($forum = $this->database->arow($result)) {
+            $fdata['topics'] -= $forum['topics'];
             if ($this->pageNumber) {
                 continue;
             }
 
             $rows .= $this->page->meta(
                 'forum-subforum-row',
-                $f['id'],
-                $f['title'],
-                $f['subtitle'],
+                $forum['id'],
+                $forum['title'],
+                $forum['subtitle'],
                 $this->page->meta(
                     'forum-subforum-lastpost',
-                    $f['lp_tid'],
-                    $this->jax->pick($f['lp_topic'], '- - - - -'),
-                    $f['lp_name'] ? $this->page->meta(
+                    $forum['lp_tid'],
+                    $this->jax->pick($forum['lp_topic'], '- - - - -'),
+                    $forum['lp_name'] ? $this->page->meta(
                         'user-link',
-                        $f['lp_uid'],
-                        $f['lp_gid'],
-                        $f['lp_name'],
+                        $forum['lp_uid'],
+                        $forum['lp_gid'],
+                        $forum['lp_name'],
                     ) : 'None',
-                    $this->jax->pick($this->jax->date($f['lp_date']), '- - - - -'),
+                    $this->jax->pick($this->jax->date($forum['lp_date']), '- - - - -'),
                 ),
-                $f['topics'],
-                $f['posts'],
-                ($read = $this->isForumRead($f)) ? 'read' : 'unread',
+                $forum['topics'],
+                $forum['posts'],
+                ($read = $this->isForumRead($forum)) ? 'read' : 'unread',
                 $read ? $this->jax->pick(
                     $this->page->meta(
                         'subforum-icon-read',
@@ -245,10 +274,10 @@ final class Forum
         $numpages = ceil($fdata['topics'] / $this->numperpage);
         $forumpages = '';
         if ($numpages !== 0.0) {
-            foreach ($this->jax->pages($numpages, $this->pageNumber + 1, 10) as $v) {
+            foreach ($this->jax->pages($numpages, $this->pageNumber + 1, 10) as $pageNumber) {
                 $forumpages .= '<a href="?act=vf' . $fid . '&amp;page='
-                    . $v . '"' . ($v - 1 === $this->pageNumber ? ' class="active"' : '')
-                    . '>' . $v . '</a> · ';
+                    . $pageNumber . '"' . ($pageNumber - 1 === $this->pageNumber ? ' class="active"' : '')
+                    . '>' . $pageNumber . '</a> · ';
             }
         }
 
@@ -322,12 +351,12 @@ final class Forum
             $this->numperpage,
         );
 
-        while ($f = $this->database->arow($result)) {
+        while ($forum = $this->database->arow($result)) {
             $pages = '';
-            if ($f['replies'] > 9) {
-                foreach ($this->jax->pages(ceil(($f['replies'] + 1) / 10), 1, 10) as $v) {
-                    $pages .= "<a href='?act=vt" . $f['id']
-                        . "&amp;page={$v}'>{$v}</a> ";
+            if ($forum['replies'] > 9) {
+                foreach ($this->jax->pages(ceil(($forum['replies'] + 1) / 10), 1, 10) as $pageNumber) {
+                    $pages .= "<a href='?act=vt" . $forum['id']
+                        . "&amp;page={$pageNumber}'>{$pageNumber}</a> ";
                 }
 
                 $pages = $this->page->meta('forum-topic-pages', $pages);
@@ -337,32 +366,32 @@ final class Forum
             $unread = false;
             $rows .= $this->page->meta(
                 'forum-row',
-                $f['id'],
+                $forum['id'],
                 // 1
-                $this->textFormatting->wordfilter($f['title']),
+                $this->textFormatting->wordfilter($forum['title']),
                 // 2
-                $this->textFormatting->wordfilter($f['subtitle']),
+                $this->textFormatting->wordfilter($forum['subtitle']),
                 // 3
-                $this->page->meta('user-link', $f['auth_id'], $f['auth_gid'], $f['auth_name']),
+                $this->page->meta('user-link', $forum['auth_id'], $forum['auth_gid'], $forum['auth_name']),
                 // 4
-                $f['replies'],
+                $forum['replies'],
                 // 5
-                number_format($f['views']),
+                number_format($forum['views']),
                 // 6
-                $this->jax->date($f['lp_date']),
+                $this->jax->date($forum['lp_date']),
                 // 7
-                $this->page->meta('user-link', $f['lp_uid'], $f['lp_gid'], $f['lp_name']),
+                $this->page->meta('user-link', $forum['lp_uid'], $forum['lp_gid'], $forum['lp_name']),
                 // 8
-                ($f['pinned'] ? 'pinned' : '') . ' ' . ($f['locked'] ? 'locked' : ''),
+                ($forum['pinned'] ? 'pinned' : '') . ' ' . ($forum['locked'] ? 'locked' : ''),
                 // 9
-                $f['summary'] ? $f['summary'] . (mb_strlen((string) $f['summary']) > 45 ? '...' : '') : '',
+                $forum['summary'] ? $forum['summary'] . (mb_strlen((string) $forum['summary']) > 45 ? '...' : '') : '',
                 // 10
                 $this->user->getPerm('can_moderate') ? '<a href="?act=modcontrols&do=modt&tid='
-                . $f['id'] . '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>' : '',
+                . $forum['id'] . '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>' : '',
                 // 11
                 $pages,
                 // 12
-                ($read = $this->isTopicRead($f, $fid)) ? 'read' : 'unread',
+                ($read = $this->isTopicRead($forum, $fid)) ? 'read' : 'unread',
                 // 13
                 $read ? $this->jax->pick(
                     $this->page->meta('topic-icon-read'),
@@ -418,12 +447,12 @@ final class Forum
                 'WHERE `id` IN ?',
                 $pathids,
             );
-            while ($f = $this->database->arow($result)) {
-                $forums[$f['id']] = [$f['title'], '?act=vf' . $f['id']];
+            while ($forum = $this->database->arow($result)) {
+                $forums[$forum['id']] = [$forum['title'], '?act=vf' . $forum['id']];
             }
 
-            foreach ($pathids as $v) {
-                $path[$forums[$v][0]] = $forums[$v][1];
+            foreach ($pathids as $pathId) {
+                $path[$forums[$pathId][0]] = $forums[$pathId][1];
             }
         }
 
@@ -441,22 +470,24 @@ final class Forum
     public function getreplysummary($tid): void
     {
         $result = $this->database->safespecial(
-            <<<'EOT'
-                SELECT m.`display_name` AS `name`,COUNT(p.`id`) AS `replies`
+            <<<'SQL'
+                SELECT
+                    m.`display_name` AS `name`,
+                    COUNT(p.`id`) AS `replies`
                 FROM %t p
                 LEFT JOIN %t m
                     ON p.`auth_id`=m.`id`
                 WHERE `tid`=?
                 GROUP BY p.`auth_id`
                 ORDER BY `replies` DESC
-                EOT
+                SQL
             ,
             ['posts', 'members'],
             $tid,
         );
         $page = '';
-        while ($f = $this->database->arow($result)) {
-            $page .= '<tr><td>' . $f['name'] . '</td><td>' . $f['replies'] . '</td></tr>';
+        while ($summary = $this->database->arow($result)) {
+            $page .= '<tr><td>' . $summary['name'] . '</td><td>' . $summary['replies'] . '</td></tr>';
         }
 
         $this->page->JS('softurl');

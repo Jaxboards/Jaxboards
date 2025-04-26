@@ -229,10 +229,7 @@ final readonly class Themes
                         preg_match('@[^\w ]@', (string) $v)
                         || mb_strlen((string) $v) > 50
                     ) {
-                        $errorskins = <<<'EOT'
-                            Skin name must consist of letters, numbers, spaces, and underscore, and be
-                            under 50 characters long.
-                            EOT;
+                        $errorskins = "Skin name must consist of letters, numbers, spaces, and underscore, and be under 50 characters long.";
                     } elseif (is_dir($this->themesPath . $v)) {
                         $errorskins = 'That skin name is already being used.';
                     } else {
@@ -253,41 +250,39 @@ final readonly class Themes
                 isset($this->jax->p['renamewrapper'])
                 && is_array($this->jax->p['renamewrapper'])
             ) {
-                foreach ($this->jax->p['renamewrapper'] as $k => $v) {
-                    if ($k === $v) {
+                foreach ($this->jax->p['renamewrapper'] as $wrapperName => $wrapperNewName) {
+                    if ($wrapperName === $wrapperNewName) {
                         continue;
                     }
 
-                    if (preg_match('@[^\w ]@', $k)) {
+                    if (preg_match('@[^\w ]@', $wrapperName)) {
                         continue;
                     }
 
-                    if (!is_file($this->wrappersPath . $k . '.html')) {
+                    if (!is_file($this->wrappersPath . $wrapperName . '.html')) {
                         continue;
                     }
 
                     if (
-                        preg_match('@[^\w ]@', (string) $v)
-                        || mb_strlen((string) $v) > 50
+                        preg_match('@[^\w ]@', (string) $wrapperNewName)
+                        || mb_strlen((string) $wrapperNewName) > 50
                     ) {
-                        $errorwrapper = <<<'EOT'
-                            Wrapper name must consist of letters, numbers, spaces, and underscore, and be
-                            under 50 characters long.
-                            EOT;
-                    } elseif (is_file($this->wrappersPath . $v . '.html')) {
+                        $errorwrapper = "Wrapper name must consist of letters, numbers, spaces, and underscore, and be
+                            under 50 characters long.";
+                    } elseif (is_file($this->wrappersPath . $wrapperNewName . '.html')) {
                         $errorwrapper = 'That wrapper name is already being used.';
                     } else {
                         $this->database->safeupdate(
                             'skins',
                             [
-                                'wrapper' => $v,
+                                'wrapper' => $wrapperNewName,
                             ],
                             'WHERE `wrapper`=? AND `custom`=1',
-                            $this->database->basicvalue($k),
+                            $this->database->basicvalue($wrapperName),
                         );
                         rename(
-                            $this->wrappersPath . $k . '.html',
-                            $this->wrappersPath . $v . '.html',
+                            $this->wrappersPath . $wrapperName . '.html',
+                            $this->wrappersPath . $wrapperNewName . '.html',
                         );
                     }
 
@@ -451,7 +446,7 @@ final readonly class Themes
                             (
                                 $skin['custom']
                                 ? $this->themesPath : $this->domainDefinitions->getServiceThemePath()
-                            ) . $skin['title'] . '/css.css',
+                            ) . "/{$skin['title']}/css.css",
                         ),
                     ),
                     'save' => $skin['custom'] ? $this->page->parseTemplate(
@@ -505,21 +500,16 @@ final readonly class Themes
     {
         $page = '';
         if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
-            $e = '';
-            if (
-                !isset($this->jax->p['skinname'])
-                || !$this->jax->p['skinname']
-            ) {
-                $e = 'No skin name supplied!';
-            } elseif (preg_match('@[^\w ]@', (string) $this->jax->p['skinname'])) {
-                $e = 'Skinname must only consist of letters, numbers, and spaces.';
-            } elseif (mb_strlen((string) $this->jax->p['skinname']) > 50) {
-                $e = 'Skin name must be less than 50 characters.';
-            } elseif (is_dir($this->themesPath . $this->jax->p['skinname'])) {
-                $e = 'A skin with that name already exists.';
-            } elseif (!in_array($this->jax->p['wrapper'], $this->getwrappers())) {
-                $e = 'Invalid wrapper.';
-            } else {
+            $error = match(true) {
+                !isset($this->jax->p['skinname']) || !$this->jax->p['skinname'] => 'No skin name supplied!',
+                (bool) preg_match('@[^\w ]@', (string) $this->jax->p['skinname']) =>  'Skinname must only consist of letters, numbers, and spaces.',
+                mb_strlen((string) $this->jax->p['skinname']) > 50 => 'Skin name must be less than 50 characters.',
+                is_dir($this->themesPath . $this->jax->p['skinname']) => 'A skin with that name already exists.',
+                !in_array($this->jax->p['wrapper'], $this->getwrappers()) => 'Invalid wrapper.',
+                default => null
+            };
+
+            if ($error === null) {
                 if (!isset($this->jax->p['hidden'])) {
                     $this->jax->p['hidden'] = false;
                 }
@@ -572,8 +562,8 @@ final readonly class Themes
                 $this->page->location('?act=themes');
             }
 
-            if ($e !== '' && $e !== '0') {
-                $page = $this->page->error($e);
+            if ($error !== null) {
+                $page = $this->page->error($error);
             }
         }
 

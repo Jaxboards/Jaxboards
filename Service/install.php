@@ -195,7 +195,7 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             // Create directory table.
             $queries = [
                 'DROP TABLE IF EXISTS `directory`;',
-                <<<'EOT'
+                <<<'SQL'
                     CREATE TABLE `directory` (
                       `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
                       `registrar_email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -205,15 +205,15 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                       `referral` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
                       PRIMARY KEY (`id`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-                    EOT,
+                    SQL,
                 'TRUNCATE `directory`;',
                 'DROP TABLE IF EXISTS `banlist`;',
-                <<<'EOT'
+                <<<'SQL'
                     CREATE TABLE `banlist` (
                       `ip` varbinary(16) NOT NULL,
                       UNIQUE KEY `ip` (`ip`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-                    EOT,
+                    SQL,
                 'TRUNCATE `banlist`;',
             ];
             foreach ($queries as $query) {

@@ -53,11 +53,11 @@ final readonly class Download
         }
 
         $this->database->safespecial(
-            <<<'EOT'
+            <<<'SQL'
                 UPDATE %t
                 SET `downloads` = `downloads` + 1
                 WHERE `id`=?
-                EOT
+                SQL
             ,
             ['files'],
             $id,

@@ -40,7 +40,7 @@ use const PHP_EOL;
 /**
  * This class is entirely responsible for rendering the page.
  *
- * Because there weren't any good PHP template systems at the time (Blade, Twig) we built our own.
+ * Because there weren'themePath any good PHP template systems at the time (Blade, Twig) we built our own.
  *
  * Here's how it works:
  *
@@ -340,14 +340,14 @@ final class Page
             ];
         }
 
-        $t = ($skin['custom'] ? $this->domainDefinitions->getBoardPath() : '') . 'Themes/' . $skin['title'] . '/';
-        $turl = ($skin['custom'] ? $this->domainDefinitions->getBoardPathUrl() : '') . 'Themes/' . $skin['title'] . '/';
-        if (is_dir($t)) {
-            define('THEMEPATH', $t);
-            define('THEMEPATHURL', $turl);
+        $themePath = ($skin['custom'] ? $this->domainDefinitions->getBoardPath() : '') . '/Themes/' . $skin['title'] . '/';
+        $themePathUrl = ($skin['custom'] ? $this->domainDefinitions->getBoardPathUrl() : '') . '/Themes/' . $skin['title'] . '/';
+        if (is_dir($themePath)) {
+            define('THEMEPATH', $themePath);
+            define('THEMEPATHURL', $themePathUrl);
         } else {
             define('THEMEPATH', JAXBOARDS_ROOT . '/' . $this->config->getSetting('dthemepath'));
-            define('THEMEPATHURL', $this->domainDefinitions->getBoardURL() . $this->config->getSetting('dthemepath'));
+            define('THEMEPATHURL', $this->domainDefinitions->getBoardURL() . '/' . $this->config->getSetting('dthemepath'));
         }
 
         define('DTHEMEPATH', JAXBOARDS_ROOT . '/' . $this->config->getSetting('dthemepath'));
