@@ -541,7 +541,7 @@ final class Post
     {
         $pid = $this->pid;
         $tid = $this->tid;
-        $error = '';
+        $error = null;
         $errorditingpost = false;
         if (!$pid || !is_numeric($pid)) {
             $error = 'Invalid post to edit.';
@@ -555,7 +555,7 @@ final class Post
             }
         }
 
-        if ($error === '' || $error === '0') {
+        if ($error === null) {
             $result = $this->database->safeselect(
                 [
                     'auth_id',
@@ -580,7 +580,7 @@ final class Post
             }
         }
 
-        if ($tid && !$error) {
+        if ($tid && $error === null) {
             if (!is_numeric($tid) || !$tid) {
                 $error = 'Invalid post to edit.';
             } else {
@@ -647,7 +647,7 @@ final class Post
             }
         }
 
-        if ($error !== '' && $error !== '0') {
+        if ($error !== null) {
             $this->page->JS('error', $error);
             $this->page->append('PAGE', $this->page->error($error));
         }
@@ -688,7 +688,7 @@ final class Post
         $newtopic = false;
         $postDate = $this->database->datetime();
         $uid = $this->user->get('id');
-        $error = '';
+        $error = null;
 
         if (!$this->nopost && trim((string) $postdata) === '') {
             $error = "You didn't supply a post!";
@@ -696,7 +696,7 @@ final class Post
             $error = 'Post must not exceed 50,000 characters.';
         }
 
-        if (!$error && $this->how === 'newtopic') {
+        if ($error === null && $this->how === 'newtopic') {
             if (!$fid || !is_numeric($fid)) {
                 $error = 'No forum specified exists.';
             } elseif (
@@ -765,7 +765,7 @@ final class Post
                 }
             }
 
-            if ($error === '' || $error === '0') {
+            if ($error === null) {
                 $this->database->safeinsert(
                     'topics',
                     [
@@ -806,7 +806,7 @@ final class Post
             $newtopic = true;
         }
 
-        if ($error !== '' && $error !== '0') {
+        if ($error !== null) {
             $this->page->append('PAGE', $this->page->error($error));
             $this->page->JS('error', $error);
             $this->page->JS('enable', 'submitbutton');

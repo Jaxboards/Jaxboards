@@ -12,7 +12,6 @@ use function array_keys;
 use function array_map;
 use function array_pop;
 use function array_values;
-use function error_log;
 use function explode;
 use function function_exists;
 use function gmdate;
@@ -364,13 +363,6 @@ final class Database
         }
 
         if (!$stmt) {
-            $error = $this->connection->error;
-            if ($error !== '') {
-                error_log(
-                    "ERROR WITH QUERY: {$compiledQueryString}" . PHP_EOL . "{$error}",
-                );
-            }
-
             return null;
         }
 
@@ -379,24 +371,10 @@ final class Database
         }
 
         if (!$stmt->execute()) {
-            $error = $this->connection->error;
-            if ($error !== '') {
-                error_log(
-                    "ERROR WITH QUERY: {$queryString}" . PHP_EOL . "{$error}",
-                );
-            }
-
             return null;
         }
 
         $retval = $stmt->get_result();
-
-        $error = $this->connection->error;
-        if ($error !== '') {
-            error_log(
-                "ERROR WITH QUERY: {$queryString}" . PHP_EOL . "{$error}",
-            );
-        }
 
         return $retval;
     }
