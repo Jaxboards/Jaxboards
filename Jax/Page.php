@@ -277,10 +277,10 @@ final class Page
         );
     }
 
-    public function loadskin(int $skinId): void
+    public function loadskin(?int $skinId): void
     {
         $skin = [];
-        if ($skinId !== 0) {
+        if ($skinId) {
             $result = $this->database->safeselect(
                 ['title', 'custom', 'wrapper'],
                 'skins',
