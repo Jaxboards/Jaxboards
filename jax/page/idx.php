@@ -445,35 +445,33 @@ final class IDX
 
         foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $user) {
             if (
-                !empty($user['uid'])
-                || (
-                    isset($user['is_bot'])
-                    && $user['is_bot']
-                )
+                $user['uid'] === null || $user['uid'] === 0
+                || (bool) $user['is_bot']
             ) {
-                $title = $this->textFormatting->blockhtml(
-                    $this->jax->pick($user['location_verbose'], 'Viewing the board.'),
-                );
-                if (isset($user['is_bot']) && $user['is_bot']) {
-                    $html .= '<a class="user' . $user['uid'] . '" '
-                        . 'title="' . $title . '" data-use-tooltip="true">'
-                        . $user['name'] . '</a>';
-                } else {
-                    ++$numMembers;
-                    $html .= sprintf(
-                        '<a href="?act=vu%1$s" class="user%1$s mgroup%2$s" '
-                            . 'title="%4$s" data-use-tooltip="true">'
-                            . '%3$s</a>',
-                        $user['uid'],
-                        $user['group_id']
-                        . ($user['status'] === 'idle' ? ' idle' : '')
-                        . ($user['birthday'] && $this->config->getSetting('birthdays') ? ' birthday' : ''),
-                        $user['name'],
-                        $title,
-                    );
-                }
+                $guests++;
+                continue;
+            }
+
+            $title = $this->textFormatting->blockhtml(
+                $this->jax->pick($user['location_verbose'], 'Viewing the board.'),
+            );
+            if (isset($user['is_bot']) && $user['is_bot']) {
+                $html .= '<a class="user' . $user['uid'] . '" '
+                    . 'title="' . $title . '" data-use-tooltip="true">'
+                    . $user['name'] . '</a>';
             } else {
-                $guests = $user;
+                ++$numMembers;
+                $html .= sprintf(
+                    '<a href="?act=vu%1$s" class="user%1$s mgroup%2$s" '
+                        . 'title="%4$s" data-use-tooltip="true">'
+                        . '%3$s</a>',
+                    $user['uid'],
+                    $user['group_id']
+                    . ($user['status'] === 'idle' ? ' idle' : '')
+                    . ($user['birthday'] && $this->config->getSetting('birthdays') ? ' birthday' : ''),
+                    $user['name'],
+                    $title,
+                );
             }
         }
 

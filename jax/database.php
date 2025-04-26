@@ -493,7 +493,7 @@ final class Database
                 FROM %t s
                 LEFT JOIN %t m ON s.`uid`=m.`id`
                 WHERE s.`last_update`>=?
-                ORDER BY s.`last_action` DESC
+                ORDER BY s.`last_action` ASC
                 SQL
             ,
             ['session', 'members'],
@@ -519,16 +519,6 @@ final class Database
             }
 
             unset($user['id'], $user['dob']);
-            if (!$user['uid']) {
-                continue;
-            }
-
-            if (
-                isset($usersOnlineCache[$user['uid']])
-                && $usersOnlineCache[$user['uid']]
-            ) {
-                continue;
-            }
 
             $usersOnlineCache[$user['uid']] = $user;
         }

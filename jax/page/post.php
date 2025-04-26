@@ -256,8 +256,6 @@ final class Post
                     $postdata = $postdata[0];
                 }
             }
-
-            var_dump($tdata);
         }
 
         $result = $this->database->safeselect(
