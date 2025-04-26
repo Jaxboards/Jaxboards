@@ -11,6 +11,7 @@ use Jax\Request;
 use Jax\TextFormatting;
 
 use function array_flip;
+use function array_keys;
 use function explode;
 use function is_numeric;
 use function mb_strlen;

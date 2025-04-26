@@ -99,7 +99,7 @@ final class Page
                 'sidebar-list-link.html',
                 [
                     'title' => $title,
-                    'url' => '?act=' . $this->request->get('act') . '&do=' .$do,
+                    'url' => '?act=' . $this->request->get('act') . '&do=' . $do,
                 ],
             ) . PHP_EOL;
         }
