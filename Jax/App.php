@@ -44,15 +44,16 @@ final class App
 
     public function __construct(
         private readonly Config $config,
+        private readonly Container $container,
         private readonly Database $database,
         private readonly DomainDefinitions $domainDefinitions,
         private readonly IPAddress $ipAddress,
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly Request $request,
+        private readonly Router $router,
         private readonly Session $session,
         private readonly User $user,
-        private readonly Container $container,
     ) {
         $this->onLocalHost = in_array($this->ipAddress->asHumanReadable(), ['127.0.0.1', '::1'], true);
         $this->microtime = microtime(true);
@@ -153,7 +154,7 @@ final class App
 
     private function loadModules(): void
     {
-        $modules = glob('jax/modules/*.php');
+        $modules = glob('Jax/Modules/*.php');
         if (!$modules) {
             return;
         }
@@ -179,60 +180,11 @@ final class App
     {
         $action = mb_strtolower($this->request->both('act') ?? '');
 
-        // Handle board offline
-        if (
-            (
-                !$this->user->getPerm('can_view_board')
-                || $this->config->getSetting('boardoffline')
-                && !$this->user->getPerm('can_view_offline_board')
-            ) && !str_contains($action, 'logreg')
-        ) {
-            $action = 'boardoffline';
+        if ($action === 'idx' && $this->request->both('module') !== null) {
+            return;
         }
 
-        preg_match('@^[a-zA-Z_]+@', $action, $act);
-        $act = array_shift($act);
-        $actdefs = [
-            '' => 'idx',
-            'vf' => 'forum',
-            'vt' => 'topic',
-            'vu' => 'userprofile',
-        ];
-        if (isset($actdefs[$act])) {
-            $act = $actdefs[$act];
-        }
-
-        if (
-            $act === 'idx'
-            && $this->request->both('module') !== null
-        ) {
-            // Do nothing.
-        } elseif ($act && file_exists('jax/page/' . $act . '.php')) {
-            $page = $this->container->get('Jax\Page\\' . $act);
-            $page->render();
-        } elseif (
-            !$this->request->isJSAccess()
-            || $this->request->isJSNewLocation()
-        ) {
-            $result = $this->database->safeselect(
-                ['page'],
-                'pages',
-                'WHERE `act`=?',
-                $this->database->basicvalue($action),
-            );
-            $page = $this->database->arow($result);
-            if ($page) {
-                $this->database->disposeresult($result);
-                $textFormatting = $this->container->get(TextFormatting::class);
-                $page['page'] = $textFormatting->bbcodes($page['page']);
-                $this->page->append('PAGE', $page['page']);
-                if ($this->request->isJSNewLocation()) {
-                    $this->page->JS('update', 'page', $page['page']);
-                }
-            } else {
-                $this->page->location('?act=idx');
-            }
-        }
+        $this->router->route($action);
     }
 
     private function loadSkin(): void
