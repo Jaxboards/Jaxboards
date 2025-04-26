@@ -49,79 +49,85 @@ final readonly class App
         $this->page->title($this->config->getSetting('boardname') . ' - ACP');
         $this->page->addNavMenu(
             'Settings',
-            '?act=settings',
+            '?act=Settings',
             [
-                '?act=settings&do=birthday' => 'Birthdays',
-                '?act=settings&do=global' => 'Global Settings',
-                '?act=settings&do=pages' => 'Custom Pages',
-                '?act=settings&do=shoutbox' => 'Shoutbox',
+                '?act=Settings&do=birthday' => 'Birthdays',
+                '?act=Settings&do=global' => 'Global Settings',
+                '?act=Settings&do=pages' => 'Custom Pages',
+                '?act=Settings&do=shoutbox' => 'Shoutbox',
             ],
         );
         $this->page->addNavMenu(
             'Members',
-            '?act=members',
+            '?act=Members',
             [
-                '?act=members&do=delete' => 'Delete Account',
-                '?act=members&do=edit' => 'Edit',
-                '?act=members&do=ipbans' => 'IP Bans',
-                '?act=members&do=massmessage' => 'Mass Message',
-                '?act=members&do=merge' => 'Account Merge',
-                '?act=members&do=prereg' => 'Pre-Register',
-                '?act=members&do=validation' => 'Validation',
+                '?act=Members&do=delete' => 'Delete Account',
+                '?act=Members&do=edit' => 'Edit',
+                '?act=Members&do=ipbans' => 'IP Bans',
+                '?act=Members&do=massmessage' => 'Mass Message',
+                '?act=Members&do=merge' => 'Account Merge',
+                '?act=Members&do=prereg' => 'Pre-Register',
+                '?act=Members&do=validation' => 'Validation',
             ],
         );
         $this->page->addNavMenu(
             'Groups',
-            '?act=groups',
+            '?act=Groups',
             [
-                '?act=groups&do=create' => 'Create Group',
-                '?act=groups&do=delete' => 'Delete Groups',
-                '?act=groups&do=perms' => 'Edit Permissions',
+                '?act=Groups&do=create' => 'Create Group',
+                '?act=Groups&do=delete' => 'Delete Groups',
+                '?act=Groups&do=perms' => 'Edit Permissions',
             ],
         );
         $this->page->addNavMenu(
             'Themes',
-            '?act=themes',
+            '?act=Themes',
             [
-                '?act=themes&do=create' => 'Create Skin',
-                '?act=themes' => 'Manage Skin(s)',
+                '?act=Themes&do=create' => 'Create Skin',
+                '?act=Themes' => 'Manage Skin(s)',
             ],
         );
         $this->page->addNavMenu(
             'Posting',
-            '?act=posting',
+            '?act=Posting',
             [
-                '?act=posting&do=emoticons' => 'Emoticons',
-                '?act=posting&do=postrating' => 'Post Rating',
-                '?act=posting&do=wordfilter' => 'Word Filter',
+                '?act=Posting&do=emoticons' => 'Emoticons',
+                '?act=Posting&do=postrating' => 'Post Rating',
+                '?act=Posting&do=wordfilter' => 'Word Filter',
             ],
         );
         $this->page->addNavMenu(
             'Forums',
-            '?act=forums',
+            '?act=Forums',
             [
-                '?act=forums&do=create' => 'Create Forum',
-                '?act=forums&do=createc' => 'Create Category',
-                '?act=forums&do=order' => 'Manage',
-                '?act=forums&do=recountstats' => 'Recount Statistics',
+                '?act=Forums&do=create' => 'Create Forum',
+                '?act=Forums&do=createc' => 'Create Category',
+                '?act=Forums&do=order' => 'Manage',
+                '?act=Forums&do=recountstats' => 'Recount Statistics',
             ],
         );
         $this->page->addNavMenu(
             'Tools',
-            '?act=tools',
+            '?act=Tools',
             [
-                '?act=tools&do=backup' => 'Backup Forum',
-                '?act=tools&do=files' => 'File Manager',
-                '?act=tools&do=errorlog' => 'View Error Log',
+                '?act=Tools&do=backup' => 'Backup Forum',
+                '?act=Tools&do=files' => 'File Manager',
+                '?act=Tools&do=errorlog' => 'View Error Log',
             ],
         );
 
         $act = $this->request->get('act');
 
-        if ($act && file_exists("./page/{$act}.php")) {
-            $page = $this->container->get('ACP\Page\\' . $act);
-            $page->render();
+        if ($act) {
+            try {
+                $page = $this->container->get('ACP\Page\\' . $act);
+                $page->render();
+            } catch (\Exception) {
+                // invalid act
+            }
         }
+
+
 
         $this->page->out();
     }

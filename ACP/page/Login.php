@@ -35,7 +35,7 @@ final readonly class Login
             'board_name' => $this->config->getSetting('boardname'),
             'board_url' => $boardUrl,
             'content' => '',
-            'css_url' => $boardUrl . '/acp/css/login.css',
+            'css_url' => $boardUrl . '/ACP/css/login.css',
             'favicon_url' => $boardUrl . '/favicon.ico',
         ];
 

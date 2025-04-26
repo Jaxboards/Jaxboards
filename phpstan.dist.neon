@@ -14,7 +14,7 @@ parameters:
   paths:
     - Script
     - Service
-    - acp
+    - ACP
     - api
     - config.default.php
     - Jax

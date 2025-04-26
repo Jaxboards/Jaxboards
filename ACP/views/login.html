@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>
+      {{ board_name }} - Admin Control Panel</title>
+    <meta name="description" content="Staff Only" />
+    <link rel="icon" type="image/x-icon" href="{{ favicon_url }}" />
+    <link rel="stylesheet" type="text/css" href="{{ css_url }}" />
+  </head>
+
+  <body>
+    <div id="container">
+      <div id="login">
+        <div id="logo"></div>
+        <div id="loginform">
+          {{ content }}
+          <form method="post">
+            <label for="user">
+              Username:
+            </label>
+            <input type="text" name="user" id="user" autofocus />
+            <br />
+            <label for="pass">Password:</label>
+            <input type="password" name="pass" id="pass" />
+            <br />
+            <input type="submit" value="Log in to the ACP" name="submit" />
+          </form>
+          <div class="goBack">
+            <a class="goBackLink" href="{{ board_url }}">Back to Board</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,9 @@
+<label for="boardoffline">Board Online</label>
+<input type="checkbox" id="boardoffline" name="boardoffline" class="switch yn" title="Board Offline Toggle" {{ board_offline_checked }}/>
+<br>
+<label for="offlinetext" style="vertical-align:top;">Offline Text:</label>
+<textarea id="offlinetext" name="offlinetext">{{ board_offline_text }}</textarea>
+<br>
+<input type="submit" name="submit" value="Save" />
+{{ content }}
+</form>

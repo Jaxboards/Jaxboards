@@ -1,0 +1,11 @@
+<form method="post">
+  <p>List one IP per line.
+    <br>
+    IP Ranges should end in period or colon (for IPv6). For example, 127.0. will ban everything starting with those two octets.
+    <br>
+    Comments should be prepended with hash (#comment).
+  </p>
+  <textarea name="ipbans" title="Enter IP bans here" class="editor">{{ content }}</textarea>
+  <br>
+  <input type="submit" title="Submit changes" value="Save" />
+</form>

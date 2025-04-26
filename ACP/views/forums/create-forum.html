@@ -1,0 +1,68 @@
+<form method="post">
+  <table class="settings">
+    <colgroup>
+      <col width="200px" />
+    </colgroup>
+    <tr>
+      <th scope="row">
+        Forum Title:
+      </td>
+      <td>
+        <input type="text" name="title" title="Forum Title" value="{{ title }}" />
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">
+        Description:
+      </td>
+      <td>
+        <textarea name="description" title="Forum Description">{{ description }}</textarea>
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">
+        Redirect URL:
+      </td>
+      <td>
+        <input type="text" name="redirect" title="Redirect URL" value="{{ redirect_url }}" />
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">
+        Show Subforums:
+      </td>
+      <td>
+        <select name="show_sub" title="Show Subforums Toggle">
+          {{ subforum_options }}
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">
+        Order Topics By:
+      </td>
+      <td>
+        <select name="orderby" title="How to Order Topic List">
+          {{ order_by_options }}
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">
+        Posts count towards post count?
+      </td>
+      <td>
+        <input {{ no_count }} type="checkbox" class="switch yn"
+        name="nocount" title="Post Count Toggle" />
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">
+        Trashcan?
+      </td>
+      <td>
+        <input {{ trashcan }} type="checkbox" class="switch yn"
+        name="trashcan" title="Trashcan Toggle"/>
+      </td>
+    </tr>
+  </table>

@@ -30,7 +30,7 @@ if (file_exists(SERVICE_ROOT . '/install.lock')) {
 require_once JAXBOARDS_ROOT . '/Jax/autoload.php';
 $container = new Container();
 
-require_once JAXBOARDS_ROOT . '/acp/page.php';
+require_once JAXBOARDS_ROOT . '/ACP/Page.php';
 
 // Get default CFG.
 require_once JAXBOARDS_ROOT . '/config.default.php';

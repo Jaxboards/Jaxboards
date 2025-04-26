@@ -97,7 +97,7 @@ export default class AutoComplete extends Component {
       }
     }
 
-    const relativePath = document.location.toString().match('/acp/')
+    const relativePath = document.location.toString().match('/ACP/')
       ? '../'
       : '';
     const searchTerm = encodeURIComponent(this.element.value);

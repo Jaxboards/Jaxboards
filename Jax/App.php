@@ -254,7 +254,7 @@ final class App
                 $this->user->getPerm('can_moderate')
                 ? '<li><a href="?act=modcontrols&do=cp">Mod CP</a></li>' : '',
                 $this->user->getPerm('can_access_acp')
-                ? '<li><a href="./acp/" target="_BLANK">ACP</a></li>' : '',
+                ? '<li><a href="./ACP/" target="_BLANK">ACP</a></li>' : '',
                 $this->config->getSetting('navlinks') ?? '',
             ),
         );

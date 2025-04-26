@@ -1,0 +1,20 @@
+<tr>
+  <td>
+    {{ title }}
+  </td>
+  <td>
+    {{ ip_address }}
+  </td>
+  <td>
+    {{ email_address }}
+  </td>
+  <td>
+    {{ join_date }}
+  </td>
+  <td>
+    <form method="post">
+      <input type="hidden" name="mid" value="{{ id }}" />
+      <input name="action" type="submit" value="Allow" />
+    </form>
+  </td>
+</tr>

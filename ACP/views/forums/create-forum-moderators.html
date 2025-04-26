@@ -1,0 +1,29 @@
+<table class="settings">
+  <colgroup>
+    <col width="200px" />
+  </colgroup>
+  <tr>
+    <th scope="row">
+      Moderators:
+    </td>
+    <td>
+      {{ mod_list }}
+      <br />
+      <input type="text" name="name" title="Add Forum Moderator"
+        data-autocomplete-action="searchmembers"
+        data-autocomplete-output="#modid"
+        data-autocomplete-indicator="#validname"
+      />
+      <input type="hidden" id="modid" name="modid" />
+      <span id="validname"></span>
+      <input type="submit" name="submit" value="Add Moderator" />
+    </td>
+  </tr>
+  <tr>
+    <th scope="row">Show "Forum Led By":</td>
+    <td>
+      <input {{ show_led_by }} type="checkbox" class="switch yn"
+      name="show_ledby" title="Forum Led By Toggle"/>
+    </td>
+  </tr>
+</table>

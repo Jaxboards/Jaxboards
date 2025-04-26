@@ -11,7 +11,7 @@
     <projectFiles>
         <file name="index.php" />
         <file name="config.default.php" />
-        <directory name="acp" />
+        <directory name="ACP" />
         <directory name="api" />
         <directory name="Jax" />
         <directory name="tools" />

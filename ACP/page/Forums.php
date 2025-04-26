@@ -415,7 +415,7 @@ final readonly class Forums
                 $this->database->basicvalue($fid),
             );
             $this->updateperforummodflag();
-            $this->page->location('?act=forums&edit=' . $fid);
+            $this->page->location('?act=Forums&edit=' . $fid);
         }
 
         if ($this->request->post('submit') !== null) {
@@ -728,7 +728,7 @@ final readonly class Forums
                 $modList .= $this->page->parseTemplate(
                     'forums/create-forum-moderators-mod.html',
                     [
-                        'delete_link' => '?act=forums&edit=' . $fid . '&rmod=' . $member['id'],
+                        'delete_link' => '?act=Forums&edit=' . $fid . '&rmod=' . $member['id'],
                         'username' => $member['display_name'],
                     ],
                 ) . PHP_EOL;
@@ -768,7 +768,7 @@ final readonly class Forums
         if (
             $this->request->post('submit') === 'Cancel'
         ) {
-            $this->page->location('?act=forums&do=order');
+            $this->page->location('?act=Forums&do=order');
         } elseif ($this->request->post('submit') !== null) {
             $this->database->safedelete(
                 'forums',
