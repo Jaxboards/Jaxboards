@@ -70,7 +70,7 @@ final readonly class Tools
         };
     }
 
-    public function filemanager(): void
+    private function filemanager(): void
     {
         $page = '';
         if (
@@ -208,7 +208,7 @@ final readonly class Tools
         $this->page->addContentBox('File Manager', $page);
     }
 
-    public function backup(): void
+    private function backup(): void
     {
         if ($this->request->post('dl') !== null) {
             header('Content-type: text/plain');
@@ -269,7 +269,7 @@ final readonly class Tools
         );
     }
 
-    public function errorlog(): void
+    private function errorlog(): void
     {
         $logPath = ini_get('error_log');
 
@@ -300,7 +300,7 @@ final readonly class Tools
     }
 
     // Reads the last $totalLines of a file
-    public function tail($path, $totalLines): array
+    private function tail($path, $totalLines): array
     {
         $logFile = new SplFileObject($path, 'r');
         $logFile->fseek(0, SEEK_END);

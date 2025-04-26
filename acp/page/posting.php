@@ -45,7 +45,7 @@ final readonly class Posting
         };
     }
 
-    public function wordfilter(): void
+    private function wordfilter(): void
     {
         $page = '';
         $wordfilter = [];
@@ -136,7 +136,7 @@ final readonly class Posting
         $this->page->addContentBox('Word Filter', $page);
     }
 
-    public function emoticons(): void
+    private function emoticons(): void
     {
 
         $basesets = [
@@ -277,7 +277,7 @@ final readonly class Posting
         $this->page->addContentBox('Base Emoticon Set', $page);
     }
 
-    public function postrating(): void
+    private function postrating(): void
     {
         $page = '';
         $page2 = '';

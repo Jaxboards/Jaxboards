@@ -82,7 +82,7 @@ final readonly class Members
         ]);
     }
 
-    public function showmain(): void
+    private function showmain(): void
     {
         $result = $this->database->safespecial(
             <<<'SQL'
@@ -127,7 +127,7 @@ final readonly class Members
         );
     }
 
-    public function editmem()
+    private function editmem()
     {
         $userData = $this->user->getUser();
         $page = '';
@@ -401,7 +401,7 @@ final readonly class Members
         return null;
     }
 
-    public function preregister(): void
+    private function preregister(): void
     {
         $page = '';
         $error = null;
@@ -468,7 +468,7 @@ final readonly class Members
         $this->page->addContentBox('Pre-Register', $page);
     }
 
-    public function getGroups($group_id = 0): ?string
+    private function getGroups($group_id = 0): ?string
     {
         $page = '';
         $result = $this->database->safeselect(
@@ -495,7 +495,7 @@ final readonly class Members
         );
     }
 
-    public function merge(): void
+    private function merge(): void
     {
         $page = '';
         $error = null;
@@ -667,7 +667,7 @@ final readonly class Members
         );
     }
 
-    public function deletemem(): void
+    private function deletemem(): void
     {
         $page = '';
         $error = null;
@@ -744,7 +744,7 @@ final readonly class Members
         );
     }
 
-    public function ipbans(): void
+    private function ipbans(): void
     {
         if ($this->request->post('ipbans') !== null) {
             $data = explode(PHP_EOL, (string) $this->request->post('ipbans'));
@@ -861,7 +861,7 @@ final readonly class Members
         );
     }
 
-    public function massmessage(): void
+    private function massmessage(): void
     {
         $userData = $this->user->getUser();
         $page = '';
@@ -911,7 +911,7 @@ final readonly class Members
         );
     }
 
-    public function validation(): void
+    private function validation(): void
     {
         if (isset($_POST['submit1'])) {
             $this->config->write(
@@ -976,7 +976,7 @@ final readonly class Members
         $this->page->addContentBox('Members Awaiting Validation', $page);
     }
 
-    public function formfield($label, $name, $value, $which = false): string
+    private function formfield($label, $name, $value, $which = false): string
     {
         if (mb_strtolower((string) $which) === 'textarea') {
             return $this->page->parseTemplate(
@@ -999,7 +999,7 @@ final readonly class Members
         ) . PHP_EOL;
     }
 
-    public function heading($value): ?string
+    private function heading($value): ?string
     {
         return $this->page->parseTemplate(
             'members/edit-heading.html',

@@ -49,7 +49,7 @@ final readonly class Settings
         };
     }
 
-    public function boardname(): void
+    private function boardname(): void
     {
         $page = '';
         $error = null;
@@ -109,7 +109,7 @@ final readonly class Settings
     /**
      * Custom pages.
      */
-    public function pages(): void
+    private function pages(): void
     {
         $page = '';
         if ($this->request->both('delete') !== null) {
@@ -174,7 +174,7 @@ final readonly class Settings
         $this->page->addContentBox('Custom Pages', $page);
     }
 
-    public function pages_delete($page): mixed
+    private function pages_delete($page): mixed
     {
         return $this->database->safedelete(
             'pages',
@@ -183,7 +183,7 @@ final readonly class Settings
         );
     }
 
-    public function pages_edit($pageurl): void
+    private function pages_edit($pageurl): void
     {
         $page = '';
         $result = $this->database->safeselect(
@@ -234,7 +234,7 @@ final readonly class Settings
     /**
      * Shoutbox.
      */
-    public function shoutbox(): void
+    private function shoutbox(): void
     {
         $page = '';
         $error = null;
@@ -282,7 +282,7 @@ final readonly class Settings
         $this->page->addContentBox('Shoutbox', $page);
     }
 
-    public function birthday(): void
+    private function birthday(): void
     {
         $birthdays = $this->config->getSetting('birthdays');
         if ($this->request->post('submit') !== null) {

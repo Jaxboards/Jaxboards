@@ -91,7 +91,7 @@ final readonly class Themes
     /**
      * @return array<string>
      */
-    public function getwrappers(): array
+    private function getwrappers(): array
     {
         $wrappers = [];
         $o = opendir($this->wrappersPath);
@@ -112,7 +112,7 @@ final readonly class Themes
         return $wrappers;
     }
 
-    public function showskinindex(): void
+    private function showskinindex(): void
     {
         $errorskins = '';
         $errorwrapper = '';
@@ -385,7 +385,7 @@ final readonly class Themes
         );
     }
 
-    public function editcss($id): void
+    private function editcss($id): void
     {
         $result = $this->database->safeselect(
             [
@@ -431,7 +431,7 @@ final readonly class Themes
         );
     }
 
-    public function editwrapper($wrapper): void
+    private function editwrapper($wrapper): void
     {
         $saved = '';
         $wrapperf = $this->wrappersPath . $wrapper . '.html';
@@ -470,7 +470,7 @@ final readonly class Themes
         }
     }
 
-    public function createskin(): void
+    private function createskin(): void
     {
         $page = '';
         if ($this->request->post('submit') !== null) {
@@ -554,7 +554,7 @@ final readonly class Themes
         $this->page->addContentBox('Create New Skin', $page);
     }
 
-    public function deleteskin($id): void
+    private function deleteskin($id): void
     {
         $result = $this->database->safeselect(
             '`id`,`using`,`title`,`custom`,`wrapper`,`default`,`hidden`',

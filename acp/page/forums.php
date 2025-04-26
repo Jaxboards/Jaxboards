@@ -57,7 +57,7 @@ final readonly class Forums
      * @param string $path  The path in the tree
      * @param int    $order where the tree is place n the database
      */
-    public function mysqltree($tree, $path = '', $order = 0): void
+    private function mysqltree($tree, $path = '', $order = 0): void
     {
         if (!is_array($tree)) {
             return;
@@ -102,7 +102,7 @@ final readonly class Forums
         }
     }
 
-    public function printtree(
+    private function printtree(
         $tree,
         $data,
         $class = false,
@@ -231,7 +231,7 @@ final readonly class Forums
         };
     }
 
-    public function orderforums($highlight = 0): void
+    private function orderforums($highlight = 0): void
     {
         $page = '';
         if ($highlight) {
@@ -351,7 +351,7 @@ final readonly class Forums
      * @param int $fid The forum ID. If set, this edits a forum,
      *                 otherwise it creates one.
      */
-    public function createforum($fid = 0)
+    private function createforum($fid = 0)
     {
         $page = '';
         $forumperms = '';
@@ -760,7 +760,7 @@ final readonly class Forums
         $this->page->addContentBox('Forum Permissions', $forumperms);
     }
 
-    public function deleteforum($forumId)
+    private function deleteforum($forumId)
     {
         if (
             $this->request->post('submit') === 'Cancel'
@@ -916,7 +916,7 @@ final readonly class Forums
         return null;
     }
 
-    public function createcategory($cid = false): void
+    private function createcategory($cid = false): void
     {
         $page = '';
         $cdata = [];
@@ -985,7 +985,7 @@ final readonly class Forums
         );
     }
 
-    public function deletecategory($catId): void
+    private function deletecategory($catId): void
     {
         $page = '';
         $error = null;
@@ -1066,7 +1066,7 @@ final readonly class Forums
      * that specify whether or not a user is a per-forum mod
      * based on the comma delimited list of mods for each forum.
      */
-    public function updateperforummodflag(): void
+    private function updateperforummodflag(): void
     {
         $this->database->safeupdate(
             'members',
@@ -1101,7 +1101,7 @@ final readonly class Forums
         );
     }
 
-    public function checkbox($checkId, $name, $checked): ?string
+    private function checkbox($checkId, $name, $checked): ?string
     {
         return $this->page->parseTemplate(
             'forums/create-forum-permissions-row-checkbox.html',
