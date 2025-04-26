@@ -201,6 +201,7 @@
   	<properties>
       <property name="rootNamespaces" type="array">
         <element key="Jax" value="Jax"/>
+        <element key="ACP" value="ACP"/>
       </property>
     </properties>
   </rule>
