@@ -25,7 +25,7 @@ if (!defined('JAXBOARDS_ROOT')) {
 
 function pathjoin(string ...$paths): ?string
 {
-    return preg_replace('@\/+@', '/', implode('/', $paths) . '/');
+    return preg_replace('@\/+@', '/', implode('/', $paths));
 }
 
 final class DomainDefinitions
