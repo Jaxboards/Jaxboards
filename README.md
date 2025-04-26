@@ -59,13 +59,13 @@ a new install. It does the following:
   ```php
   // Update with our settings.
   $CFG['boardname'] = 'Jaxboards';
-  $CFG['domain'] = $JAX->p['domain'];
-  $CFG['mail_from'] = $JAX->p['admin_username'] . ' <' .
-      $JAX->p['admin_email'] . '>';
-  $CFG['sql_db'] = $JAX->p['sql_db'];
-  $CFG['sql_host'] = $JAX->p['sql_host'];
-  $CFG['sql_username'] = $JAX->p['sql_username'];
-  $CFG['sql_password'] = $JAX->p['sql_password'];
+  $CFG['domain'] = $request->post('domain');
+  $CFG['mail_from'] = $request->post('admin_username') . ' <' .
+      $request->post('admin_email') . '>';
+  $CFG['sql_db'] = $request->post('sql_db');
+  $CFG['sql_host'] = $request->post('sql_host');
+  $CFG['sql_username'] = $request->post('sql_username');
+  $CFG['sql_password'] = $request->post('sql_password');
   $CFG['installed'] = true;
   $CFG['service'] = $service; // boolean if it's a service or not
   $CFG['prefix'] = $service ? '' : 'jaxboards';

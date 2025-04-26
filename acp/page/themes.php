@@ -132,17 +132,14 @@ final readonly class Themes
             }
         }
 
-        if (
-            isset($this->jax->p['newwrapper'])
-            && $this->jax->p['newwrapper']
-        ) {
+        if ($this->request->post('newwrapper') !== null && $this->request->post('newrapper') !== '') {
             $newWrapperPath
-                = $this->wrappersPath . $this->jax->p['newwrapper'] . '.html';
-            if (preg_match('@[^\w ]@', (string) $this->jax->p['newwrapper'])) {
+                = $this->wrappersPath . $this->request->post('newwrapper') . '.html';
+            if (preg_match('@[^\w ]@', (string) $this->request->post('newwrapper'))) {
                 $errorwrapper
                     = 'Wrapper name must consist of letters, numbers, '
                     . 'spaces, and underscore.';
-            } elseif (mb_strlen((string) $this->jax->p['newwrapper']) > 50) {
+            } elseif (mb_strlen((string) $this->request->post('newwrapper')) > 50) {
                 $errorwrapper = 'Wrapper name must be less than 50 characters.';
             } elseif (file_exists($newWrapperPath)) {
                 $errorwrapper = 'That wrapper already exists.';
@@ -165,19 +162,15 @@ final readonly class Themes
         // Make an array of wrappers.
         $wrappers = $this->getwrappers();
 
-        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
+        if ($this->request->post('submit') !== null) {
             // Update wrappers/hidden status.
-            if (!isset($this->jax->p['hidden'])) {
-                $this->jax->p['hidden'] = [];
-            }
-
             if (
                 array_key_exists('wrapper', $this->jax->p)
-                && is_array($this->jax->p['wrapper'])
+                && is_array($this->request->post('wrapper'))
             ) {
-                foreach ($this->jax->p['wrapper'] as $k => $v) {
-                    if (!isset($this->jax->p['hidden'][$k])) {
-                        $this->jax->p['hidden'][$k] = false;
+                foreach ($this->request->post('wrapper') as $k => $v) {
+                    if (!isset($this->request->post('hidden')[$k])) {
+                        $this->request->post('hidden')[$k] = false;
                     }
 
                     if ($v && !in_array($v, $wrappers)) {
@@ -187,7 +180,7 @@ final readonly class Themes
                     $this->database->safeupdate(
                         'skins',
                         [
-                            'hidden' => $this->jax->p['hidden'][$k] ? 1 : 0,
+                            'hidden' => $this->request->post('hidden')[$k] ? 1 : 0,
                             'wrapper' => $v,
                         ],
                         'WHERE `id`=?',
@@ -197,10 +190,9 @@ final readonly class Themes
             }
 
             if (
-                isset($this->jax->p['renameskin'])
-                && is_array($this->jax->p['renameskin'])
+                is_array($this->request->post('renameskin'))
             ) {
-                foreach ($this->jax->p['renameskin'] as $k => $v) {
+                foreach ($this->request->post('renameskin') as $k => $v) {
                     if ($k === $v) {
                         continue;
                     }
@@ -235,10 +227,9 @@ final readonly class Themes
             }
 
             if (
-                isset($this->jax->p['renamewrapper'])
-                && is_array($this->jax->p['renamewrapper'])
+               is_array($this->request->post('renamewrapper'))
             ) {
-                foreach ($this->jax->p['renamewrapper'] as $wrapperName => $wrapperNewName) {
+                foreach ($this->request->post('renamewrapper') as $wrapperName => $wrapperNewName) {
                     if ($wrapperName === $wrapperNewName) {
                         continue;
                     }
@@ -279,7 +270,7 @@ final readonly class Themes
             }
 
             // Set default.
-            if (isset($this->jax->p['default'])) {
+            if ($this->request->post('default') !== null) {
                 $this->database->safeupdate(
                     'skins',
                     [
@@ -292,7 +283,7 @@ final readonly class Themes
                         'default' => 1,
                     ],
                     'WHERE `id`=?',
-                    $this->jax->p['default'],
+                    $this->request->post('default'),
                 );
             }
         }
@@ -414,13 +405,10 @@ final readonly class Themes
         );
         $skin = $this->database->arow($result);
         $this->database->disposeresult($result);
-        if (!isset($this->jax->p['newskindata'])) {
-            $this->jax->p['newskindata'] = false;
-        }
 
-        if ($skin && $skin['custom'] && $this->jax->p['newskindata']) {
+        if ($skin && $skin['custom'] && $this->request->post('newskindata')) {
             $o = fopen($this->themesPath . $skin['title'] . '/css.css', 'w');
-            fwrite($o, (string) $this->jax->p['newskindata']);
+            fwrite($o, (string) $this->request->post('newskindata'));
             fclose($o);
         }
 
@@ -455,15 +443,15 @@ final readonly class Themes
                 "The theme you're trying to edit does not exist.",
             );
         } else {
-            if (isset($this->jax->p['newwrapper'])) {
-                if (mb_strpos((string) $this->jax->p['newwrapper'], '<!--FOOTER-->') === false) {
+            if ($this->request->post('newwrapper') !== null) {
+                if (mb_strpos((string) $this->request->post('newwrapper'), '<!--FOOTER-->') === false) {
                     $saved = $this->page->error(
                         '&lt;!--FOOTER--&gt; must not be removed from the wrapper.',
                     );
                 } else {
                     $fileHandle = fopen($wrapperf, 'w');
                     if ($fileHandle !== false) {
-                        fwrite($fileHandle, (string) $this->jax->p['newwrapper']);
+                        fwrite($fileHandle, (string) $this->request->post('newwrapper'));
                         fclose($fileHandle);
                         $saved = $this->page->success('Wrapper saved successfully.');
                     } else {
@@ -487,36 +475,28 @@ final readonly class Themes
     public function createskin(): void
     {
         $page = '';
-        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
+        if ($this->request->post('submit') !== null) {
             $error = match (true) {
-                !isset($this->jax->p['skinname']) || !$this->jax->p['skinname'] => 'No skin name supplied!',
-                (bool) preg_match('@[^\w ]@', (string) $this->jax->p['skinname']) => 'Skinname must only consist of letters, numbers, and spaces.',
-                mb_strlen((string) $this->jax->p['skinname']) > 50 => 'Skin name must be less than 50 characters.',
-                is_dir($this->themesPath . $this->jax->p['skinname']) => 'A skin with that name already exists.',
-                !in_array($this->jax->p['wrapper'], $this->getwrappers()) => 'Invalid wrapper.',
+                !$this->request->post('skinname') => 'No skin name supplied!',
+                (bool) preg_match('@[^\w ]@', (string) $this->request->post('skinname')) => 'Skinname must only consist of letters, numbers, and spaces.',
+                mb_strlen((string) $this->request->post('skinname')) > 50 => 'Skin name must be less than 50 characters.',
+                is_dir($this->themesPath . $this->request->post('skinname')) => 'A skin with that name already exists.',
+                !in_array($this->request->post('wrapper'), $this->getwrappers()) => 'Invalid wrapper.',
                 default => null,
             };
 
             if ($error === null) {
-                if (!isset($this->jax->p['hidden'])) {
-                    $this->jax->p['hidden'] = false;
-                }
-
-                if (!isset($this->jax->p['default'])) {
-                    $this->jax->p['default'] = false;
-                }
-
                 $this->database->safeinsert(
                     'skins',
                     [
                         'custom' => 1,
-                        'default' => $this->jax->p['default'] ? 1 : 0,
-                        'hidden' => $this->jax->p['hidden'] ? 1 : 0,
-                        'title' => $this->jax->p['skinname'],
-                        'wrapper' => $this->jax->p['wrapper'],
+                        'default' => $this->request->post('default') ? 1 : 0,
+                        'hidden' => $this->request->post('hidden') ? 1 : 0,
+                        'title' => $this->request->post('skinname'),
+                        'wrapper' => $this->request->post('wrapper'),
                     ],
                 );
-                if ($this->jax->p['default']) {
+                if ($this->request->post('default')) {
                     $this->database->safeupdate(
                         'skins',
                         [
@@ -536,8 +516,8 @@ final readonly class Themes
 
                 if (is_dir($this->boardPath . 'Themes')) {
                     mkdir($this->boardPath . 'Themes');
-                    mkdir($this->themesPath . $this->jax->p['skinname']);
-                    $o = fopen($this->themesPath . $this->jax->p['skinname'] . '/css.css', 'w');
+                    mkdir($this->themesPath . $this->request->post('skinname'));
+                    $o = fopen($this->themesPath . $this->request->post('skinname') . '/css.css', 'w');
                     fwrite(
                         $o,
                         file_get_contents(

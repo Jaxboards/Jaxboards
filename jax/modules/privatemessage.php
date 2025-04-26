@@ -8,6 +8,7 @@ use Jax\Config;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Request;
 use Jax\Session;
 use Jax\TextFormatting;
 use Jax\User;
@@ -33,6 +34,7 @@ final readonly class PrivateMessage
         private Database $database,
         private Jax $jax,
         private Page $page,
+        private Request $request,
         private Session $session,
         private TextFormatting $textFormatting,
         private User $user,
@@ -40,8 +42,8 @@ final readonly class PrivateMessage
 
     public function init(): void
     {
-        $instantMessage = $this->jax->p['im_im'] ?? null;
-        $uid = $this->jax->p['im_uid'] ?? null;
+        $instantMessage = $this->request->post('im_im');
+        $uid = $this->request->post('im_uid');
         if ($this->session->get('runonce')) {
             $this->filter();
         }

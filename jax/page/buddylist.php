@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Request;
 use Jax\Session;
 use Jax\User;
 
@@ -26,6 +27,7 @@ final readonly class BuddyList
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly Session $session,
+        private readonly Request $request,
         private readonly User $user,
     ) {
         $buddylist = $this->jax->hiddenFormFields(['act' => 'buddylist']);
@@ -75,19 +77,16 @@ final readonly class BuddyList
             return;
         }
 
-        if (isset($this->jax->b['add']) && $this->jax->b['add']) {
-            $this->addbuddy($this->jax->b['add']);
-        } elseif (isset($this->jax->b['remove']) && $this->jax->b['remove']) {
-            $this->dropbuddy($this->jax->b['remove']);
-        } elseif (isset($this->jax->b['status']) && $this->jax->b['status']) {
-            $this->setstatus($this->jax->b['status']);
-        } elseif (isset($this->jax->b['block']) && $this->jax->b['block']) {
-            $this->block($this->jax->b['block']);
-        } elseif (
-            isset($this->jax->b['unblock'])
-            && $this->jax->b['unblock']
-        ) {
-            $this->unblock($this->jax->b['unblock']);
+        if ($this->request->both('add') !== null) {
+            $this->addbuddy($this->request->both('add'));
+        } elseif ($this->request->both('remove') !== null) {
+            $this->dropbuddy($this->request->both('remove'));
+        } elseif ($this->request->both('status') !== null) {
+            $this->setstatus($this->request->both('status'));
+        } elseif ($this->request->both('block') !== null) {
+            $this->block($this->request->both('block'));
+        } elseif ($this->request->both('unblock') !== null) {
+            $this->unblock($this->request->both('unblock'));
         } else {
             $this->displaybuddylist();
         }

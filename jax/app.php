@@ -49,6 +49,7 @@ final class App
         private readonly IPAddress $ipAddress,
         private readonly Jax $jax,
         private readonly Page $page,
+        private readonly Request $request,
         private readonly Session $session,
         private readonly User $user,
         private readonly Container $container,
@@ -144,7 +145,7 @@ final class App
             return;
         }
 
-        $this->session->act($this->jax->b['act'] ?? null);
+        $this->session->act($this->request->both('act'));
     }
 
     private function loadModules(): void
@@ -160,10 +161,9 @@ final class App
             $module = $this->container->get('Jax\Modules\\' . $moduleName);
 
             if (
-                property_exists($module, 'TAG') && !(!(
-                    isset($this->jax->b['module'])
-                && $this->jax->b['module'] === $moduleName
-                ) && !$this->page->templatehas($moduleName))
+                property_exists($module, 'TAG')
+                && $this->request->both('module') !== $moduleName
+                && !$this->page->templatehas($moduleName)
             ) {
                 continue;
             }
@@ -174,7 +174,7 @@ final class App
 
     private function loadPageFromAction(): void
     {
-        $action = mb_strtolower($this->jax->b['act'] ?? '');
+        $action = mb_strtolower($this->request->both('act') ?? '');
 
         // Handle board offline
         if (
@@ -201,8 +201,7 @@ final class App
 
         if (
             $act === 'idx'
-            && isset($this->jax->b['module'])
-            && $this->jax->b['module']
+            && $this->request->both('module') !== null
         ) {
             // Do nothing.
         } elseif ($act && file_exists('jax/page/' . $act . '.php')) {
@@ -242,12 +241,12 @@ final class App
 
 
         // Skin selector.
-        if (isset($this->jax->b['skin_id'])) {
-            if (!$this->jax->b['skin_id']) {
+        if ($this->request->both('skin_id') !== null) {
+            if (!$this->request->both('skin_id')) {
                 $this->session->deleteVar('skin_id');
                 $this->page->JS('reload');
             } else {
-                $this->session->addVar('skin_id', $this->jax->b['skin_id']);
+                $this->session->addVar('skin_id', $this->request->both('skin_id'));
                 if ($this->page->jsaccess) {
                     $this->page->JS('reload');
                 }

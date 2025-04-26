@@ -8,6 +8,7 @@ use Jax\Config;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Request;
 use Jax\TextFormatting;
 use Jax\User;
 
@@ -53,6 +54,7 @@ final class UCP
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly Page $page,
+        private readonly Request $request,
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
     ) {
@@ -68,7 +70,7 @@ final class UCP
         }
 
         $this->page->path(['UCP' => '?act=ucp']);
-        $this->what = $this->jax->b['what'] ?? '';
+        $this->what = $this->request->both('what') ?? '';
 
         match ($this->what) {
             'sounds' => $this->showsoundsettings(),
@@ -97,56 +99,46 @@ final class UCP
     public function showinbox(): void
     {
         if (
-            isset($this->jax->p['dmessage'])
-            && is_array($this->jax->p['dmessage'])
+            is_array($this->request->post('dmessage'))
         ) {
-            foreach ($this->jax->p['dmessage'] as $messageId) {
+            foreach ($this->request->post('dmessage') as $messageId) {
                 $this->delete($messageId, false);
             }
         }
 
         if (
-            isset($this->jax->p['messageid'])
-            && is_numeric($this->jax->p['messageid'])
+            is_numeric($this->request->post('messageid'))
         ) {
-            switch (mb_strtolower((string) $this->jax->p['page'])) {
+            switch (mb_strtolower((string) $this->request->post('page'))) {
                 case 'delete':
-                    $this->delete($this->jax->p['messageid']);
+                    $this->delete($this->request->post('messageid'));
 
                     break;
 
                 case 'forward':
-                    $this->compose($this->jax->p['messageid'], 'fwd');
+                    $this->compose($this->request->post('messageid'), 'fwd');
 
                     break;
 
                 case 'reply':
-                    $this->compose($this->jax->p['messageid']);
+                    $this->compose($this->request->post('messageid'));
 
                     break;
 
                 default:
             }
         } else {
-            if (!isset($this->jax->b['page'])) {
-                $this->jax->b['page'] = false;
-            }
-
-            if ($this->jax->b['page'] === 'compose') {
+            if ($this->request->both('page') === 'compose') {
                 $this->compose();
             } elseif (
-                isset($this->jax->g['view'])
-                && is_numeric($this->jax->g['view'])
+                is_numeric($this->request->get('view'))
             ) {
-                $this->viewmessage($this->jax->g['view']);
-            } elseif ($this->jax->b['page'] === 'sent') {
+                $this->viewmessage($this->request->get('view'));
+            } elseif ($this->request->both('page') === 'sent') {
                 $this->viewmessages('sent');
-            } elseif ($this->jax->b['page'] === 'flagged') {
+            } elseif ($this->request->both('page') === 'flagged') {
                 $this->viewmessages('flagged');
-            } elseif (
-                isset($this->jax->b['flag'])
-                && is_numeric($this->jax->b['flag'])
-            ) {
+            } elseif (is_numeric($this->request->both('flag'))) {
                 $this->flag();
 
                 return;
@@ -165,14 +157,13 @@ final class UCP
         }
 
         if (
-            isset($this->jax->p['ucpnotepad'])
-            && $this->jax->p['ucpnotepad']
+            $this->request->post('ucpnotepad') !== null
         ) {
-            if (mb_strlen((string) $this->jax->p['ucpnotepad']) > 2000) {
+            if (mb_strlen((string) $this->request->post('ucpnotepad')) > 2000) {
                 $error = 'The UCP notepad cannot exceed 2000 characters.';
                 $this->page->JS('error', $error);
             } else {
-                $this->user->set('ucpnotepad', $this->jax->p['ucpnotepad']);
+                $this->user->set('ucpnotepad', $this->request->post('ucpnotepad'));
             }
         }
 
@@ -225,12 +216,10 @@ final class UCP
             'notify_postinsubscribedtopic',
         ];
 
-        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
+        if ($this->request->post('submit') !== null) {
             $update = [];
             foreach ($fields as $field) {
-                $update[$field] = isset($this->jax->p[$field]) && $this->jax->p[$field]
-                    ? 1
-                    : 0;
+                $update[$field] = $this->request->post($field) !== null ? 1 : 0;
             }
 
             $this->user->setBulk($update);
@@ -239,7 +228,7 @@ final class UCP
                 $this->page->JS(
                     'script',
                     "window.globalsettings.{$field}="
-                    . (isset($this->jax->p[$field]) && $this->jax->p[$field] ? 1 : 0),
+                    . ($this->request->post($field) !== null ? 1 : 0),
                 );
             }
 
@@ -274,8 +263,8 @@ final class UCP
     {
         $update = false;
         $sig = $this->user->get('sig');
-        if (isset($this->jax->p['changesig'])) {
-            $sig = $this->textFormatting->linkify($this->jax->p['changesig']);
+        if ($this->request->post('changesig') !== null) {
+            $sig = $this->textFormatting->linkify($this->request->post('changesig'));
             $this->user->set('sig', $sig);
             $update = true;
         }
@@ -297,34 +286,30 @@ final class UCP
     public function showpasssettings()
     {
         $error = null;
-        if (isset($this->jax->p['passchange'])) {
-            if (!isset($this->jax->p['showpass'])) {
-                $this->jax->p['showpass'] = false;
-            }
-
+        if ($this->request->post('passchange') !== null) {
             if (
-                !$this->jax->p['showpass']
-                && $this->jax->p['newpass1'] !== $this->jax->p['newpass2']
+                !$this->request->post('showpass')
+                && $this->request->post('newpass1') !== $this->request->post('newpass2')
             ) {
                 $error = 'Those passwords do not match.';
             }
 
             if (
-                !$this->jax->p['newpass1']
-                || !$this->jax->p['showpass']
-                && !$this->jax->p['newpass2']
-                || !$this->jax->p['curpass']
+                !$this->request->post('newpass1')
+                || !$this->request->post('showpass')
+                && !$this->request->post('newpass2')
+                || !$this->request->post('curpass')
             ) {
                 $error = 'All form fields are required.';
             }
 
-            $verified_password = password_verify((string) $this->jax->p['curpass'], (string) $this->user->get('pass'));
+            $verified_password = password_verify((string) $this->request->post('curpass'), (string) $this->user->get('pass'));
             if (!$verified_password) {
                 $error = 'The password you entered is incorrect.';
             }
 
             if ($error === null) {
-                $hashpass = password_hash((string) $this->jax->p['newpass1'], PASSWORD_DEFAULT);
+                $hashpass = password_hash((string) $this->request->post('newpass1'), PASSWORD_DEFAULT);
                 $this->user->set('pass', $hashpass);
                 $this->ucppage = <<<'HTML'
                     Password changed.
@@ -349,10 +334,10 @@ final class UCP
     public function showemailsettings()
     {
         $error = null;
-        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
+        if ($this->request->post('submit') !== null) {
             if (
-                $this->jax->p['email']
-                && !$this->jax->isemail($this->jax->p['email'])
+                $this->request->post('email')
+                && !$this->jax->isemail($this->request->post('email'))
             ) {
                 $error = 'Please enter a valid email!';
             }
@@ -361,9 +346,9 @@ final class UCP
                 $this->page->JS('alert', $error);
             } else {
                 $this->user->setBulk([
-                    'email' => $this->jax->p['email'],
-                    'email_settings' => ($this->jax->p['notifications'] ?? false ? 2 : 0)
-                    + ($this->jax->p['adminemails'] ?? false ? 1 : 0),
+                    'email' => $this->request->post('email'),
+                    'email_settings' => ($this->request->post('notifications') ?? false ? 2 : 0)
+                    + ($this->request->post('adminemails') ?? false ? 1 : 0),
                 ]);
                 $this->ucppage = 'Email settings updated.'
                     . '<br><br><a href="?act=ucp&what=email">Back</a>';
@@ -377,7 +362,7 @@ final class UCP
             $this->getlocationforform() . $this->jax->hiddenFormFields(
                 ['submit' => 'true'],
             ),
-            isset($this->jax->b['change']) && $this->jax->b['change'] ? <<<HTML
+            $this->request->both('change') !== null? <<<HTML
                 <input
                     type="text"
                     name="email"
@@ -399,15 +384,15 @@ final class UCP
         $error = null;
         $update = false;
         $avatar = $this->user->get('avatar');
-        if (isset($this->jax->p['changedava'])) {
+        if ($this->request->post('changedava') !== null) {
             if (
-                $this->jax->p['changedava']
-                && !$this->jax->isurl($this->jax->p['changedava'])
+                $this->request->post('changedava')
+                && !$this->jax->isurl($this->request->post('changedava'))
             ) {
                 $error = 'Please enter a valid image URL.';
             } else {
-                $this->user->set('avatar', $this->jax->p['changedava']);
-                $avatar = $this->jax->p['changedava'];
+                $this->user->set('avatar', $this->request->post('changedava'));
+                $avatar = $this->request->post('changedava');
             }
 
             $update = true;
@@ -434,30 +419,30 @@ final class UCP
     {
         $error = null;
         $genderOptions = ['', 'male', 'female', 'other'];
-        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
+        if ($this->request->post('submit') !== null) {
             // Insert the profile info into the database.
             $data = [
-                'about' => $this->jax->p['about'],
-                'contact_aim' => $this->jax->p['con_aim'],
-                'contact_bluesky' => $this->jax->p['con_bluesky'],
-                'contact_discord' => $this->jax->p['con_discord'],
-                'contact_gtalk' => $this->jax->p['con_gtalk'],
-                'contact_msn' => $this->jax->p['con_msn'],
-                'contact_skype' => $this->jax->p['con_skype'],
-                'contact_steam' => $this->jax->p['con_steam'],
-                'contact_twitter' => $this->jax->p['con_twitter'],
-                'contact_yim' => $this->jax->p['con_yim'],
-                'contact_youtube' => $this->jax->p['con_youtube'],
-                'display_name' => trim((string) $this->jax->p['display_name']),
-                'dob_day' => $this->jax->pick($this->jax->p['dob_day'], null),
-                'dob_month' => $this->jax->pick($this->jax->p['dob_month'], null),
-                'dob_year' => $this->jax->pick($this->jax->p['dob_year'], null),
-                'full_name' => $this->jax->p['full_name'],
-                'gender' => in_array($this->jax->p['gender'], $genderOptions)
-                ? $this->jax->p['gender'] : '',
-                'location' => $this->jax->p['location'],
-                'usertitle' => $this->jax->p['usertitle'],
-                'website' => $this->jax->p['website'],
+                'about' => $this->request->post('about'),
+                'contact_aim' => $this->request->post('con_aim'),
+                'contact_bluesky' => $this->request->post('con_bluesky'),
+                'contact_discord' => $this->request->post('con_discord'),
+                'contact_gtalk' => $this->request->post('con_gtalk'),
+                'contact_msn' => $this->request->post('con_msn'),
+                'contact_skype' => $this->request->post('con_skype'),
+                'contact_steam' => $this->request->post('con_steam'),
+                'contact_twitter' => $this->request->post('con_twitter'),
+                'contact_yim' => $this->request->post('con_yim'),
+                'contact_youtube' => $this->request->post('con_youtube'),
+                'display_name' => trim((string) $this->request->post('display_name')),
+                'dob_day' => $this->jax->pick($this->request->post('dob_day'), null),
+                'dob_month' => $this->jax->pick($this->request->post('dob_month'), null),
+                'dob_year' => $this->jax->pick($this->request->post('dob_year'), null),
+                'full_name' => $this->request->post('full_name'),
+                'gender' => in_array($this->request->post('gender'), $genderOptions)
+                ? $this->request->post('gender') : '',
+                'location' => $this->request->post('location'),
+                'usertitle' => $this->request->post('usertitle'),
+                'website' => $this->request->post('website'),
             ];
 
             // Begin input checking.
@@ -703,8 +688,7 @@ final class UCP
         $showthing = false;
         $skinId = $this->user->get('skin_id');
         if (
-            isset($this->jax->b['skin'])
-            && is_numeric($this->jax->b['skin'])
+            is_numeric($this->request->both('skin'))
         ) {
             $result = $this->database->safeselect(
                 [
@@ -718,20 +702,19 @@ final class UCP
                 ],
                 'skins',
                 'WHERE `id`=?',
-                $this->jax->b['skin'],
+                $this->request->both('skin'),
             );
             if (!$this->database->arow($result)) {
                 $error = 'The skin chosen no longer exists.';
             } else {
-                $skinId = $this->jax->b['skin'];
+                $skinId = $this->request->both('skin');
 
                 $this->database->disposeresult($result);
                 $this->user->setBulk([
-                    'nowordfilter' => isset($this->jax->p['usewordfilter'])
-                    && $this->jax->p['usewordfilter'] ? 0 : 1,
+                    'nowordfilter' => $this->request->post('usewordfilter') !== null
+                    && $this->request->post('usewordfilter') ? 0 : 1,
                     'skin_id' => $skinId,
-                    'wysiwyg' => isset($this->jax->p['wysiwyg'])
-                    && $this->jax->p['wysiwyg'] ? 1 : 0,
+                    'wysiwyg' => $this->request->post('wysiwyg') !== null ? 1 : 0,
                 ]);
             }
 
@@ -821,10 +804,10 @@ final class UCP
         $this->database->safeupdate(
             'messages',
             [
-                'flag' => $this->jax->b['tog'] ? 1 : 0,
+                'flag' => $this->request->both('tog') ? 1 : 0,
             ],
             'WHERE `id`=? AND `to`=?',
-            $this->database->basicvalue($this->jax->b['flag']),
+            $this->database->basicvalue($this->request->both('flag')),
             $this->user->get('id'),
         );
     }
@@ -1068,9 +1051,9 @@ final class UCP
         $mid = 0;
         $mname = '';
         $mtitle = '';
-        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
-            $mid = $this->jax->b['mid'];
-            if (!$mid && $this->jax->b['to']) {
+        if ($this->request->post('submit') !== null) {
+            $mid = $this->request->both('mid');
+            if (!$mid && $this->request->both('to')) {
                 $result = $this->database->safeselect(
                     [
                         'id',
@@ -1079,7 +1062,7 @@ final class UCP
                     ],
                     'members',
                     'WHERE `display_name`=?',
-                    $this->database->basicvalue($this->jax->b['to']),
+                    $this->database->basicvalue($this->request->both('to')),
                 );
                 $udata = $this->database->arow($result);
                 $this->database->disposeresult($result);
@@ -1101,8 +1084,8 @@ final class UCP
             if (!$udata) {
                 $error = 'Invalid user!';
             } elseif (
-                trim((string) $this->jax->b['title']) === ''
-                || trim((string) $this->jax->b['title']) === '0'
+                trim((string) $this->request->both('title')) === ''
+                || trim((string) $this->request->both('title')) === '0'
             ) {
                 $error = 'You must enter a title.';
             }
@@ -1119,9 +1102,9 @@ final class UCP
                         'del_recipient' => 0,
                         'del_sender' => 0,
                         'from' => $this->user->get('id'),
-                        'message' => $this->jax->p['message'],
+                        'message' => $this->request->post('message'),
                         'read' => 0,
-                        'title' => $this->textFormatting->blockhtml($this->jax->p['title']),
+                        'title' => $this->textFormatting->blockhtml($this->request->post('title')),
                         'to' => $udata['id'],
                     ],
                 );
@@ -1210,9 +1193,9 @@ final class UCP
             }
         }
 
-        if (isset($this->jax->g['mid']) && is_numeric($this->jax->g['mid'])) {
+        if (is_numeric($this->request->get('mid'))) {
             $showfull = 1;
-            $mid = $this->jax->b['mid'];
+            $mid = $this->request->both('mid');
             $result = $this->database->safeselect(
                 ['display_name'],
                 'members',
@@ -1314,8 +1297,8 @@ final class UCP
 
         $this->page->location(
             '?act=ucp&what=inbox'
-            . (isset($this->jax->b['prevpage']) && $this->jax->b['prevpage']
-            ? '&page=' . $this->jax->b['prevpage'] : ''),
+            . ($this->request->both('prevpage') !== null
+            ? '&page=' . $this->request->both('prevpage') : ''),
         );
     }
 }

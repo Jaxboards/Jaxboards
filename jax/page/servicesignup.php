@@ -8,6 +8,7 @@ use Jax\Config;
 use Jax\Database;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Request;
 
 use function array_map;
 use function closedir;
@@ -45,6 +46,7 @@ final readonly class ServiceSignup
         private Database $database,
         private IPAddress $ipAddress,
         private Jax $jax,
+        private Request $request,
     ) {}
 
     public function render(): void
@@ -56,24 +58,24 @@ final readonly class ServiceSignup
         }
 
         $errors = [];
-        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
-            if (isset($this->jax->p['post']) && $this->jax->p['post']) {
+        if ($this->request->post('submit') !== null) {
+            if ($this->request->post('post') !== null) {
                 header('Location: https://test.' . $this->config->getSetting('domain'));
             }
 
-            $this->jax->p['boardurl'] = mb_strtolower((string) $this->jax->b['boardurl']);
+            $boardURL = mb_strtolower((string) $this->request->both('boardurl'));
             if (
-                !$this->jax->p['boardurl']
-                || !$this->jax->p['username']
-                || !$this->jax->p['password']
-                || !$this->jax->p['email']
+                !$boardURL
+                || !$this->request->post('username')
+                || !$this->request->post('password')
+                || !$this->request->post('email')
             ) {
                 $errors[] = 'all fields required.';
-            } elseif (mb_strlen($this->jax->p['boardurl']) > 30) {
+            } elseif (mb_strlen($boardURL) > 30) {
                 $errors[] = 'board url too long';
-            } elseif ($this->jax->p['boardurl'] === 'www') {
+            } elseif ($boardURL === 'www') {
                 $errors[] = 'WWW is reserved.';
-            } elseif (preg_match('@\W@', $this->jax->p['boardurl'])) {
+            } elseif (preg_match('@\W@', $boardURL)) {
                 $errors[] = 'board url needs to consist of letters, '
                     . 'numbers, and underscore only';
             }
@@ -91,13 +93,13 @@ final readonly class ServiceSignup
 
             $this->database->disposeresult($result);
 
-            if (!$this->jax->isemail($this->jax->p['email'])) {
+            if (!$this->jax->isemail($this->request->post('email'))) {
                 $errors[] = 'invalid email';
             }
 
-            if (mb_strlen((string) $this->jax->p['username']) > 50) {
+            if (mb_strlen((string) $this->request->post('username')) > 50) {
                 $errors[] = 'username too long';
-            } elseif (preg_match('@\W@', (string) $this->jax->p['username'])) {
+            } elseif (preg_match('@\W@', (string) $this->request->post('username'))) {
                 $errors[] = 'username needs to consist of letters, '
                     . 'numbers, and underscore only';
             }
@@ -106,7 +108,7 @@ final readonly class ServiceSignup
                 ['id'],
                 'directory',
                 'WHERE `boardname`=?',
-                $this->database->basicvalue($this->jax->p['boardurl']),
+                $this->database->basicvalue($this->request->post('boardurl')),
             );
             if ($this->database->arow($result)) {
                 $errors[] = 'that board already exists';
@@ -115,7 +117,7 @@ final readonly class ServiceSignup
             $this->database->disposeresult($result);
 
             if ($errors === []) {
-                $board = $this->jax->p['boardurl'];
+                $board = $this->request->post('boardurl');
                 $boardPrefix = $board . '_';
 
                 $this->database->setPrefix('');
@@ -125,8 +127,8 @@ final readonly class ServiceSignup
                     [
                         'boardname' => $board,
                         'date' => $this->database->datetime(),
-                        'referral' => $this->jax->b['r'] ?? '',
-                        'registrar_email' => $this->jax->p['email'],
+                        'referral' => $this->request->both('r') ?? '',
+                        'registrar_email' => $this->request->post('email'),
                         'registrar_ip' => $this->ipAddress->asBinary(),
                     ],
                 );
@@ -170,13 +172,13 @@ final readonly class ServiceSignup
                 $this->database->safeinsert(
                     'members',
                     [
-                        'display_name' => $this->jax->p['username'],
-                        'email' => $this->jax->p['email'],
+                        'display_name' => $this->request->post('username'),
+                        'email' => $this->request->post('email'),
                         'group_id' => 2,
                         'join_date' => $this->database->datetime(),
                         'last_visit' => $this->database->datetime(),
-                        'name' => $this->jax->p['username'],
-                        'pass' => password_hash((string) $this->jax->p['password'], PASSWORD_DEFAULT),
+                        'name' => $this->request->post('username'),
+                        'pass' => password_hash((string) $this->request->post('password'), PASSWORD_DEFAULT),
                         'posts' => 0,
                         'sig' => '',
                     ],
@@ -188,7 +190,7 @@ final readonly class ServiceSignup
                 } else {
                     $this->recurseCopy('blueprint', JAXBOARDS_ROOT . '/boards/' . $board);
 
-                    header('Location: https://' . $this->jax->p['boardurl'] . '.' . $this->config->getSetting('domain'));
+                    header('Location: https://' . $this->request->post('boardurl') . '.' . $this->config->getSetting('domain'));
                 }
             }
         }

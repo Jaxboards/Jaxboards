@@ -18,12 +18,13 @@ final readonly class API
     public function __construct(
         private Database $database,
         private Jax $jax,
+        private Request $request,
         private TextFormatting $textFormatting,
     ) {}
 
     public function render(): void
     {
-        match ($this->jax->g['act'] ?? '') {
+        match ($this->request->get('act')) {
             'searchmembers' => $this->searchmembers(),
             'emotes' => $this->emotes(),
             default => header('Location: /'),
@@ -41,7 +42,7 @@ final readonly class API
             'WHERE `display_name` LIKE ? ORDER BY `display_name` LIMIT 10',
             $this->database->basicvalue(
                 htmlspecialchars(
-                    str_replace('_', '\_', $this->jax->g['term']),
+                    str_replace('_', '\_', $this->request->get('term')),
                     ENT_QUOTES,
                 ) . '%',
             ),

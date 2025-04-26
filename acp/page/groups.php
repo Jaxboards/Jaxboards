@@ -174,15 +174,16 @@ final class Groups
             return $this->updateperms($this->request->post('perm'));
         }
 
+        $groupList = $this->request->both('grouplist');
         if (
-            !isset($this->jax->b['grouplist'])
-            || preg_match('@[^\d,]@', (string) $this->jax->b['grouplist'])
-            || mb_strpos((string) $this->jax->b['grouplist'], ',,') !== false
+            !$groupList
+            || preg_match('@[^\d,]@', $groupList)
+            || mb_strpos((string) $groupList, ',,') !== false
         ) {
-            $this->jax->b['grouplist'] = '';
+            $groupList;
         }
 
-        $result = $this->jax->b['grouplist']
+        $result = $groupList
             ? $this->database->safeselect(
                 [
                     'id',
@@ -219,7 +220,7 @@ final class Groups
                 ],
                 'member_groups',
                 'WHERE `id` IN ? ORDER BY `id` ASC',
-                explode(',', (string) $this->jax->b['grouplist']),
+                explode(',', (string) $this->request->both('grouplist')),
             )
             : $this->database->safeselect(
                 [
@@ -474,14 +475,13 @@ final class Groups
     {
         $page = '';
         if (
-            isset($this->jax->b['delete'])
-            && is_numeric($this->jax->b['delete'])
-            && $this->jax->b['delete'] > 5
+            is_numeric($this->request->both('delete'))
+            && $this->request->both('delete') > 5
         ) {
             $this->database->safedelete(
                 'member_groups',
                 'WHERE `id`=?',
-                $this->database->basicvalue($this->jax->b['delete']),
+                $this->database->basicvalue($this->request->both('delete')),
             );
             $this->database->safeupdate(
                 'members',
@@ -489,7 +489,7 @@ final class Groups
                     'group_id' => 1,
                 ],
                 'WHERE `group_id`=?',
-                $this->database->basicvalue($this->jax->b['delete']),
+                $this->database->basicvalue($this->request->both('delete')),
             );
         }
 

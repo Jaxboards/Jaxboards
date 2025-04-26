@@ -10,6 +10,7 @@ use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Request;
 use Jax\User;
 
 use function array_pop;
@@ -48,21 +49,18 @@ final readonly class Members
 
     public function __construct(
         private Config $config,
-        private Page $page,
         private Database $database,
         private DomainDefinitions $domainDefinitions,
         private IPAddress $ipAddress,
         private Jax $jax,
+        private Page $page,
+        private Request $request,
         private User $user,
     ) {}
 
     public function render(): void
     {
-        if (!isset($this->jax->b['do'])) {
-            $this->jax->b['do'] = null;
-        }
-
-        match ($this->jax->b['do']) {
+        match ($this->request->both('do')) {
             'merge' => $this->merge(),
             'edit' => $this->editmem(),
             'delete' => $this->deletemem(),
@@ -134,33 +132,28 @@ final readonly class Members
         $userData = $this->user->getUser();
         $page = '';
         if (
-            (isset($this->jax->b['mid']) && $this->jax->b['mid'])
-            || (isset($this->jax->p['submit']) && $this->jax->p['submit'])
+            $this->request->both('mid')
+            || $this->request->post('submit')
         ) {
-            if (
-                isset($this->jax->b['mid'])
-                && $this->jax->b['mid']
-                && is_numeric($this->jax->b['mid'])
-            ) {
+            if (is_numeric($this->request->both('mid'))) {
                 $result = $this->database->safeselect(
                     ['group_id'],
                     'members',
                     'WHERE `id`=?',
-                    $this->database->basicvalue($this->jax->b['mid']),
+                    $this->database->basicvalue($this->request->both('mid')),
                 );
                 $data = $this->database->arow($result);
                 $this->database->disposeresult($result);
                 if (
-                    isset($this->jax->p['savedata'])
-                    && $this->jax->p['savedata']
+                    $this->request->post('savedata')
                 ) {
                     if (
                         $data['group_id'] !== 2 || $userData['id'] === 1
                     ) {
                         $write = [];
-                        if ($this->jax->p['password']) {
+                        if ($this->request->post('password')) {
                             $write['pass'] = password_hash(
-                                (string) $this->jax->p['password'],
+                                (string) $this->request->post('password'),
                                 PASSWORD_DEFAULT,
                             );
                         }
@@ -191,15 +184,15 @@ final readonly class Members
                             'group_id',
                         ];
                         foreach ($fields as $field) {
-                            if (!isset($this->jax->p[$field])) {
+                            if ($this->request->post($field) === null) {
                                 continue;
                             }
 
-                            $write[$field] = $this->jax->p[$field];
+                            $write[$field] = $this->request->post($field);
                         }
 
                         // Make it so root admins can't get out of admin.
-                        if ($this->jax->b['mid'] === 1) {
+                        if ($this->request->both('mid') === 1) {
                             $write['group_id'] = 2;
                         }
 
@@ -207,7 +200,7 @@ final readonly class Members
                             'members',
                             $write,
                             'WHERE `id`=?',
-                            $this->database->basicvalue($this->jax->b['mid']),
+                            $this->database->basicvalue($this->request->both('mid')),
                         );
                         $page = $this->page->success('Profile data saved');
                     } else {
@@ -268,7 +261,7 @@ final readonly class Members
                     ],
                     'members',
                     'WHERE `id`=?',
-                    $this->database->basicvalue($this->jax->b['mid']),
+                    $this->database->basicvalue($this->request->both('mid')),
                 );
             } else {
                 $result = $this->database->safeselect(
@@ -318,7 +311,7 @@ final readonly class Members
                     ],
                     'members',
                     'WHERE `display_name` LIKE ?',
-                    $this->database->basicvalue($this->jax->p['name'] . '%'),
+                    $this->database->basicvalue($this->request->post('name') . '%'),
                 );
             }
 
@@ -412,16 +405,16 @@ final readonly class Members
     {
         $page = '';
         $error = null;
-        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
+        if ($this->request->post('submit')) {
             if (
-                !$this->jax->p['username']
-                || !$this->jax->p['displayname']
-                || !$this->jax->p['pass']
+                !$this->request->post('username')
+                || !$this->request->post('displayname')
+                || !$this->request->post('pass')
             ) {
                 $error = 'All fields required.';
             } elseif (
-                mb_strlen((string) $this->jax->p['username']) > 30
-                || $this->jax->p['displayname'] > 30
+                mb_strlen((string) $this->request->post('username')) > 30
+                || $this->request->post('displayname') > 30
             ) {
                 $error = 'Display name and username must be under 30 characters.';
             } else {
@@ -429,11 +422,11 @@ final readonly class Members
                     ['name', 'display_name'],
                     'members',
                     'WHERE `name`=? OR `display_name`=?',
-                    $this->database->basicvalue($this->jax->p['username']),
-                    $this->database->basicvalue($this->jax->p['displayname']),
+                    $this->database->basicvalue($this->request->post('username')),
+                    $this->database->basicvalue($this->request->post('displayname')),
                 );
                 if ($f = $this->database->arow($result)) {
-                    $error = 'That ' . ($f['name'] === $this->jax->p['username']
+                    $error = 'That ' . ($f['name'] === $this->request->post('username')
                         ? 'username' : 'display name') . ' is already taken';
                 }
 
@@ -445,12 +438,12 @@ final readonly class Members
             } else {
                 $member = [
                     'birthdate' => '0000-00-00',
-                    'display_name' => $this->jax->p['displayname'],
+                    'display_name' => $this->request->post('displayname'),
                     'group_id' => 1,
                     'last_visit' => $this->database->datetime(),
-                    'name' => $this->jax->p['username'],
+                    'name' => $this->request->post('username'),
                     'pass' => password_hash(
-                        (string) $this->jax->p['pass'],
+                        (string) $this->request->post('pass'),
                         PASSWORD_DEFAULT,
                     ),
                     'posts' => 0,
@@ -506,28 +499,25 @@ final readonly class Members
     {
         $page = '';
         $error = null;
-        if (!isset($this->jax->p['submit'])) {
-            $this->jax->p['submit'] = false;
-        }
 
-        if ($this->jax->p['submit']) {
-            if (!$this->jax->p['mid1'] || !$this->jax->p['mid2']) {
+        if ($this->request->post('submit') !== null) {
+            if (!$this->request->post('mid1') || !$this->request->post('mid2')) {
                 $error = 'All fields are required';
             } elseif (
-                !is_numeric($this->jax->p['mid1'])
-                || !is_numeric($this->jax->p['mid2'])
+                !is_numeric($this->request->post('mid1'))
+                || !is_numeric($this->request->post('mid2'))
             ) {
                 $error = 'An error occurred in processing your request';
-            } elseif ($this->jax->p['mid1'] === $this->jax->p['mid2']) {
+            } elseif ($this->request->post('mid1') === $this->request->post('mid2')) {
                 $error = "Can't merge a member with her/himself";
             }
 
             if ($error !== null) {
                 $page .= $this->page->error($error);
             } else {
-                $mid1 = $this->database->basicvalue($this->jax->p['mid1']);
-                $mid1int = $this->jax->p['mid1'];
-                $mid2 = $this->jax->p['mid2'];
+                $mid1 = $this->database->basicvalue($this->request->post('mid1'));
+                $mid1int = $this->request->post('mid1');
+                $mid2 = $this->request->post('mid2');
 
                 // Files.
                 $this->database->safeupdate(
@@ -678,17 +668,17 @@ final readonly class Members
     {
         $page = '';
         $error = null;
-        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
-            if (!$this->jax->p['mid']) {
+        if ($this->request->post('submit') !== null) {
+            if (!$this->request->post('mid')) {
                 $error = 'All fields are required';
-            } elseif (!is_numeric($this->jax->p['mid'])) {
+            } elseif (!is_numeric($this->request->post('mid'))) {
                 $error = 'An error occurred in processing your request';
             }
 
             if ($error !== null) {
                 $page .= $this->page->error($error);
             } else {
-                $mid = $this->database->basicvalue($this->jax->p['mid']);
+                $mid = $this->database->basicvalue($this->request->post('mid'));
 
                 // PMs.
                 $this->database->safedelete('messages', 'WHERE `to`=?', $mid);
@@ -753,8 +743,8 @@ final readonly class Members
 
     public function ipbans(): void
     {
-        if (isset($this->jax->p['ipbans'])) {
-            $data = explode(PHP_EOL, (string) $this->jax->p['ipbans']);
+        if ($this->request->post('ipbans') !== null) {
+            $data = explode(PHP_EOL, (string) $this->request->post('ipbans'));
             foreach ($data as $k => $v) {
                 $iscomment = false;
                 // Check to see if each line is an ip, if it isn't,
@@ -872,10 +862,10 @@ final readonly class Members
     {
         $userData = $this->user->getUser();
         $page = '';
-        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
+        if ($this->request->post('submit') !== null) {
             if (
-                !trim((string) $this->jax->p['title'])
-                || !trim((string) $this->jax->p['message'])
+                !trim((string) $this->request->post('title'))
+                || !trim((string) $this->request->post('message'))
             ) {
                 $page .= $this->page->error('All fields required!');
             } else {
@@ -896,9 +886,9 @@ final readonly class Members
                             'del_sender' => 0,
                             'flag' => 0,
                             'from' => $userData['id'],
-                            'message' => $this->jax->p['message'],
+                            'message' => $this->request->post('message'),
                             'read' => 0,
-                            'title' => $this->jax->p['title'],
+                            'title' => $this->request->post('title'),
                             'to' => $f['id'],
                         ],
                     );

@@ -10,6 +10,7 @@ use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Request;
 use Jax\Session;
 use Jax\TextFormatting;
 use Jax\User;
@@ -55,6 +56,7 @@ final class ModControls
         private readonly IPAddress $ipAddress,
         private readonly Jax $jax,
         private readonly Page $page,
+        private readonly Request $request,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
@@ -92,7 +94,7 @@ final class ModControls
             return;
         }
 
-        if (isset($this->jax->b['cancel']) && $this->jax->b['cancel']) {
+        if ($this->request->both('cancel') !== null) {
             $this->cancel();
 
             return;
@@ -102,26 +104,26 @@ final class ModControls
             return;
         }
 
-        if (isset($this->jax->p['dot']) && $this->jax->p['dot']) {
-            $this->dotopics($this->jax->p['dot']);
+        if ($this->request->post('dot') !== null) {
+            $this->dotopics($this->request->post('dot'));
 
             return;
         }
 
-        if (isset($this->jax->p['dop']) && $this->jax->p['dop']) {
-            $this->doposts($this->jax->p['dop']);
+        if ($this->request->post('dop') !== null) {
+            $this->doposts($this->request->post('dop'));
 
             return;
         }
 
-        switch ($this->jax->b['do']) {
+        switch ($this->request->both('do')) {
             case 'modp':
-                $this->modpost($this->jax->b['pid']);
+                $this->modpost($this->request->both('pid'));
 
                 break;
 
             case 'modt':
-                $this->modtopic($this->jax->b['tid']);
+                $this->modtopic($this->request->both('tid'));
 
                 break;
 
@@ -184,11 +186,11 @@ final class ModControls
                     ],
                     'forums',
                     'WHERE `id`=?',
-                    $this->database->basicvalue($this->jax->p['id']),
+                    $this->database->basicvalue($this->request->post('id')),
                 );
                 $rowfound = $this->database->arow($result);
                 $this->database->disposeresult($result);
-                if (!is_numeric($this->jax->p['id']) || !$rowfound) {
+                if (!is_numeric($this->request->post('id')) || !$rowfound) {
                     return;
                 }
 
@@ -206,18 +208,18 @@ final class ModControls
                 $this->database->safeupdate(
                     'topics',
                     [
-                        'fid' => $this->jax->p['id'],
+                        'fid' => $this->request->post('id'),
                     ],
                     'WHERE `id` IN ?',
                     explode(',', (string) $this->session->getVar('modtids')),
                 );
                 $this->cancel();
-                $fids[] = $this->jax->p['id'];
+                $fids[] = $this->request->post('id');
                 foreach ($fids as $forumId) {
                     $this->database->fixForumLastPost($forumId);
                 }
 
-                $this->page->location('?act=vf' . $this->jax->p['id']);
+                $this->page->location('?act=vf' . $this->request->post('id'));
 
                 break;
 
@@ -313,13 +315,13 @@ final class ModControls
                 $this->database->safeupdate(
                     'posts',
                     [
-                        'tid' => $this->jax->p['id'],
+                        'tid' => $this->request->post('id'),
                     ],
                     'WHERE `id` IN ?',
                     explode(',', (string) $this->session->getVar('modpids')),
                 );
                 $this->cancel();
-                $this->page->location('?act=vt' . $this->jax->p['id']);
+                $this->page->location('?act=vt' . $this->request->post('id'));
 
                 break;
 
@@ -741,16 +743,15 @@ final class ModControls
         $page = '';
         $topicIds = explode(',', $this->session->getVar('modtids') ?? '');
         if (
-            isset($this->jax->p['ot'])
-            && is_numeric($this->jax->p['ot'])
-            && in_array($this->jax->p['ot'], $topicIds)
+            is_numeric($this->request->post('ot'))
+            && in_array($this->request->post('ot'), $topicIds)
         ) {
             // Move the posts and set all posts to normal (newtopic=0).
             $this->database->safeupdate(
                 'posts',
                 [
                     'newtopic' => '0',
-                    'tid' => $this->jax->p['ot'],
+                    'tid' => $this->request->post('ot'),
                 ],
                 'WHERE `tid` IN ?',
                 explode(',', (string) $this->session->getVar('modtids')),
@@ -762,7 +763,7 @@ final class ModControls
                 'MIN(`id`)',
                 'posts',
                 'WHERE `tid`=?',
-                $this->database->basicvalue($this->jax->p['ot']),
+                $this->database->basicvalue($this->request->post('ot')),
             );
             $thisrow = $this->database->arow($result);
             $op = array_pop($thisrow);
@@ -784,9 +785,9 @@ final class ModControls
                     'op' => $op,
                 ],
                 'WHERE `id`=?',
-                $this->database->basicvalue($this->jax->p['ot']),
+                $this->database->basicvalue($this->request->post('ot')),
             );
-            unset($topicIds[array_search($this->jax->p['ot'], $topicIds, true)]);
+            unset($topicIds[array_search($this->request->post('ot'), $topicIds, true)]);
             if ($topicIds !== []) {
                 $this->database->safedelete(
                     'topics',
@@ -796,7 +797,7 @@ final class ModControls
             }
 
             $this->cancel();
-            $this->page->location('?act=vt' . $this->jax->p['ot']);
+            $this->page->location('?act=vt' . $this->request->post('ot'));
         }
 
         $page .= '<form method="post" data-ajax-form="true" '
@@ -879,26 +880,25 @@ final class ModControls
             <input type="submit" type="View member details" value="Go" />
             </form>';
         if (
-            isset($this->jax->p['submit'])
-            && $this->jax->p['submit'] === 'save'
+            $this->request->post('submit') === 'save'
         ) {
             if (
-                trim((string) $this->jax->p['display_name']) === ''
-                || trim((string) $this->jax->p['display_name']) === '0'
+                trim((string) $this->request->post('display_name')) === ''
+                || trim((string) $this->request->post('display_name')) === '0'
             ) {
                 $page .= $this->page->meta('error', 'Display name is invalid.');
             } else {
                 $this->database->safeupdate(
                     'members',
                     [
-                        'about' => $this->jax->p['about'],
-                        'avatar' => $this->jax->p['avatar'],
-                        'display_name' => $this->jax->p['display_name'],
-                        'full_name' => $this->jax->p['full_name'],
-                        'sig' => $this->jax->p['signature'],
+                        'about' => $this->request->post('about'),
+                        'avatar' => $this->request->post('avatar'),
+                        'display_name' => $this->request->post('display_name'),
+                        'full_name' => $this->request->post('full_name'),
+                        'sig' => $this->request->post('signature'),
                     ],
                     'WHERE `id`=?',
-                    $this->database->basicvalue($this->jax->p['mid']),
+                    $this->database->basicvalue($this->request->post('mid')),
                 );
                 $error = $this->database->error();
                 if ($error !== '') {
@@ -913,9 +913,8 @@ final class ModControls
         }
 
         if (
-            (isset($this->jax->p['submit'])
-            && $this->jax->p['submit'] === 'showform')
-            || isset($this->jax->b['mid'])
+            $this->request->post('submit') === 'showform'
+            || $this->request->both('mid') !== null
         ) {
             $memberFields = [
                 'group_id',
@@ -930,21 +929,21 @@ final class ModControls
             $member = null;
 
             // Get the member data.
-            if (is_numeric($this->jax->b['mid'])) {
+            if (is_numeric($this->request->both('mid'))) {
                 $result = $this->database->safeselect(
                     $memberFields,
                     'members',
                     'WHERE `id`=?',
-                    $this->database->basicvalue($this->jax->b['mid']),
+                    $this->database->basicvalue($this->request->both('mid')),
                 );
                 $member = $this->database->arow($result);
                 $this->database->disposeresult($result);
-            } elseif ($this->jax->p['mname']) {
+            } elseif ($this->request->post('mname')) {
                 $result = $this->database->safeselect(
                     $memberFields,
                     'members',
                     'WHERE `display_name` LIKE ?',
-                    $this->database->basicvalue($this->jax->p['mname'] . '%'),
+                    $this->database->basicvalue($this->request->post('mname') . '%'),
                 );
                 $members = [];
                 while ($member = $this->database->arow($result)) {
@@ -1026,19 +1025,19 @@ final class ModControls
     {
         $page = '';
 
-        $ipAddress = $this->jax->b['ip'] ?? '';
+        $ipAddress = $this->request->both('ip') ?? '';
         if (!filter_var($ipAddress, FILTER_VALIDATE_IP)) {
             $ipAddress = '';
         }
 
         $changed = false;
 
-        if (isset($this->jax->p['ban']) && $this->jax->p['ban']) {
+        if ($this->request->post('ban') !== null) {
             if (!$this->ipAddress->isBanned($ipAddress)) {
                 $changed = true;
                 $this->ipAddress->ban($ipAddress);
             }
-        } elseif (isset($this->jax->p['unban']) && $this->jax->p['unban']) {
+        } elseif ($this->request->post('unban') !== null) {
             if ($this->ipAddress->isBanned($ipAddress)) {
                 $changed = true;
                 $this->ipAddress->unBan($ipAddress);

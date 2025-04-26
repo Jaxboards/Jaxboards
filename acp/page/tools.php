@@ -9,6 +9,7 @@ use Jax\Config;
 use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\Jax;
+use Jax\Request;
 use SplFileObject;
 
 use function array_map;
@@ -49,8 +50,9 @@ final readonly class Tools
         private readonly Config $config,
         private readonly Database $database,
         private readonly DomainDefinitions $domainDefinitions,
-        private readonly Page $page,
         private readonly Jax $jax,
+        private readonly Page $page,
+        private readonly Request $request,
     ) {}
 
     public function render(): void
@@ -61,11 +63,7 @@ final readonly class Tools
             'errorlog' => 'View Error Log',
         ]);
 
-        if (!isset($this->jax->b['do'])) {
-            $this->jax->b['do'] = null;
-        }
-
-        match ($this->jax->b['do']) {
+        match ($this->request->both('do')) {
             'backup' => $this->backup(),
             'errorlog' => $this->errorlog(),
             default => $this->filemanager(),
@@ -76,8 +74,7 @@ final readonly class Tools
     {
         $page = '';
         if (
-            isset($this->jax->b['delete'])
-            && is_numeric($this->jax->b['delete'])
+            is_numeric($this->request->both('delete'))
         ) {
             $result = $this->database->safeselect(
                 [
@@ -86,7 +83,7 @@ final readonly class Tools
                 ],
                 'files',
                 'WHERE `id`=?',
-                $this->database->basicvalue($this->jax->b['delete']),
+                $this->database->basicvalue($this->request->both('delete')),
             );
             $file = $this->database->arow($result);
             $this->database->disposeresult($result);
@@ -108,13 +105,13 @@ final readonly class Tools
                 $this->database->safedelete(
                     'files',
                     'WHERE `id`=?',
-                    $this->database->basicvalue($this->jax->b['delete']),
+                    $this->database->basicvalue($this->request->both('delete')),
                 );
             }
         }
 
-        if (isset($this->jax->p['dl']) && is_array($this->jax->p['dl'])) {
-            foreach ($this->jax->p['dl'] as $k => $v) {
+        if (is_array($this->request->post('dl'))) {
+            foreach ($this->request->post('dl') as $k => $v) {
                 if (!ctype_digit((string) $v)) {
                     continue;
                 }
@@ -213,7 +210,7 @@ final readonly class Tools
 
     public function backup(): void
     {
-        if (isset($this->jax->p['dl']) && $this->jax->p['dl']) {
+        if ($this->request->post('dl') !== null) {
             header('Content-type: text/plain');
             header(
                 'Content-Disposition: attachment;filename="' . $this->database->getPrefix()
