@@ -8,6 +8,7 @@ use Jax\Config;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Request;
 use Jax\Session;
 use Jax\TextFormatting;
 use Jax\User;
@@ -45,6 +46,7 @@ final class IDX
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly Page $page,
+        private readonly Request $request,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
@@ -54,7 +56,7 @@ final class IDX
 
     public function render(): void
     {
-        if (isset($this->jax->b['markread']) && $this->jax->b['markread']) {
+        if ($this->request->both('markread') !== null) {
             $this->page->JS('softurl');
             $this->session->set('forumsread', '{}');
             $this->session->set('topicsread', '{}');

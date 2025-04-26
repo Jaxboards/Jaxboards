@@ -9,6 +9,7 @@ use Jax\Database;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Request;
 use Jax\RSSFeed;
 use Jax\Session;
 use Jax\TextFormatting;
@@ -77,6 +78,7 @@ final class Topic
         private readonly Jax $jax,
         private readonly IPAddress $ipAddress,
         private readonly Page $page,
+        private readonly Request $request,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
@@ -86,7 +88,7 @@ final class Topic
 
     public function render(): void
     {
-        preg_match('@\d+$@', (string) $this->jax->b['act'], $act);
+        preg_match('@\d+$@', (string) $this->request->both('act'), $act);
         $this->tid = (int) $act[0] ?: 0;
 
         if ($this->tid === 0) {
@@ -102,9 +104,7 @@ final class Topic
             return;
         }
 
-        $this->pageNumber = isset($this->jax->b['page'])
-            ? (int) $this->jax->b['page']
-            : 0;
+        $this->pageNumber = (int) $this->request->both('page');
         if ($this->pageNumber <= 0 || !is_numeric($this->pageNumber)) {
             $this->pageNumber = 1;
         }
@@ -114,8 +114,7 @@ final class Topic
         $this->numperpage = 10;
 
         if (
-            isset($this->jax->b['qreply'])
-            && $this->jax->b['qreply']
+            $this->request->both('qreply') !== null
             && !$this->page->jsupdate
         ) {
             if ($this->page->jsaccess && !$this->page->jsdirectlink) {
@@ -129,53 +128,52 @@ final class Topic
             return;
         }
 
-        if (isset($this->jax->b['ratepost']) && $this->jax->b['ratepost']) {
-            $this->ratepost($this->jax->b['ratepost'], $this->jax->b['niblet']);
+        if ($this->request->both('ratepost') !== null) {
+            $this->ratepost($this->request->both('ratepost'), $this->request->both('niblet'));
 
             return;
         }
 
-        if (isset($this->jax->b['votepoll']) && $this->jax->b['votepoll']) {
+        if ($this->request->both('votepoll') !== null) {
             $this->votepoll();
 
             return;
         }
 
-        if (isset($this->jax->b['findpost']) && $this->jax->b['findpost']) {
-            $this->findpost($this->jax->b['findpost']);
+        if ($this->request->both('findpost') !== null) {
+            $this->findpost($this->request->both('findpost'));
 
             return;
         }
 
-        if (isset($this->jax->b['getlast']) && $this->jax->b['getlast']) {
+        if ($this->request->both('getlast') !== null) {
             $this->getlastpost($this->tid);
 
             return;
         }
 
-        if (isset($this->jax->b['edit']) && $this->jax->b['edit']) {
-            $this->qeditpost($this->jax->b['edit']);
+        if ($this->request->both('edit') !== null) {
+            $this->qeditpost($this->request->both('edit'));
 
             return;
         }
 
-        if (isset($this->jax->b['quote']) && $this->jax->b['quote']) {
+        if ($this->request->both('quote') !== null) {
             $this->multiquote($this->tid);
 
             return;
         }
 
-        if (isset($this->jax->b['markread']) && $this->jax->b['markread']) {
+        if ($this->request->both('markread') !== null) {
             $this->markread($this->tid);
 
             return;
         }
 
         if (
-            isset($this->jax->b['listrating'])
-            && $this->jax->b['listrating']
+            $this->request->both('listrating') !== null
         ) {
-            $this->listrating($this->jax->b['listrating']);
+            $this->listrating($this->request->both('listrating'));
 
             return;
         }
@@ -186,7 +184,7 @@ final class Topic
             return;
         }
 
-        if (isset($this->jax->b['fmt']) && $this->jax->b['fmt'] === 'RSS') {
+        if ($this->request->both('fmt') === 'RSS') {
             $this->viewrss($this->tid);
 
             return;
@@ -402,13 +400,13 @@ final class Topic
         if ($this->page->jsaccess) {
             $this->page->JS('update', 'page', $page);
             $this->page->updatepath();
-            if (isset($this->jax->b['pid']) && $this->jax->b['pid']) {
-                $this->page->JS('scrollToPost', $this->jax->b['pid']);
+            if ($this->request->both('pid') !== null) {
+                $this->page->JS('scrollToPost', $this->request->both('pid'));
 
                 return;
             }
 
-            if (isset($this->jax->b['page']) && $this->jax->b['page']) {
+            if ($this->request->both('page') !== null) {
                 $this->page->JS('scrollToPost', $this->firstPostID, 1);
 
                 return;
@@ -976,7 +974,7 @@ final class Topic
             $row = $this->database->arow($result);
             $this->database->disposeresult($result);
 
-            $choice = $this->jax->b['choice'];
+            $choice = $this->request->both('choice');
             $choices = json_decode((string) $row['poll_choices'], true);
             $numchoices = count($choices);
             $results = $row['poll_results'];
@@ -1223,7 +1221,7 @@ final class Topic
 
     public function multiquote($tid): void
     {
-        $pid = $this->jax->b['quote'];
+        $pid = $this->request->both('quote');
         $post = false;
         if ($pid && is_numeric($pid)) {
             $result = $this->database->safespecial(
@@ -1251,7 +1249,7 @@ final class Topic
             return;
         }
 
-        if ($this->jax->b['qreply']) {
+        if ($this->request->both('qreply')) {
             $this->page->JS(
                 'updateqreply',
                 '[quote=' . $post['name'] . ']' . $post['post'] . '[/quote]'

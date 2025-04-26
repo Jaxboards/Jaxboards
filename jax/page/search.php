@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Request;
 use Jax\Session;
 use Jax\TextFormatting;
 use Jax\User;
@@ -54,6 +55,7 @@ final class Search
         private readonly Database $database,
         private readonly Page $page,
         private readonly Jax $jax,
+        private readonly Request $request,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
@@ -63,7 +65,7 @@ final class Search
 
     public function render(): void
     {
-        $this->pagenum = $this->jax->b['page'] ?? 0;
+        $this->pagenum = $this->request->both('page') ?? 0;
         if (!is_numeric($this->pagenum) || $this->pagenum < 0) {
             $this->pagenum = 1;
         }
@@ -71,8 +73,8 @@ final class Search
         $this->perpage = 10;
 
         if (
-            (isset($this->jax->b['searchterm']) && $this->jax->b['searchterm'])
-            || (isset($this->jax->b['page']) && $this->jax->b['page'])
+            $this->request->both('searchterm') !== null
+            || $this->request->both('page') !== null
         ) {
             $this->dosearch();
         } else {
@@ -202,22 +204,21 @@ final class Search
             return;
         }
 
-        $termraw = $this->jax->b['searchterm'] ?? '';
+        $termraw = $this->request->both('searchterm') ?? '';
 
         if (!$termraw && $this->pagenum) {
             $termraw = $this->session->getVar('searcht');
         }
 
         if (
-            empty($this->jax->p)
-            && !array_key_exists('searchterm', $this->jax->b)
+            $this->request->both('searchterm') === null
         ) {
             $ids = $this->session->getVar('search');
         } else {
             $this->getSearchableForums();
-            if (isset($this->jax->b['fids']) && $this->jax->b['fids']) {
+            if ($this->request->both('fids') !== null) {
                 $fids = [];
-                foreach ($this->jax->b['fids'] as $v) {
+                foreach ($this->request->both('fids') as $v) {
                     if (!in_array($v, $this->fids)) {
                         continue;
                     }
@@ -229,21 +230,21 @@ final class Search
             }
 
             $datestart = null;
-            if ($this->jax->b['datestart'] ?? 0) {
-                $datestart = $this->pdate($this->jax->b['datestart']);
+            if ($this->request->both('datestart') !== null) {
+                $datestart = $this->pdate($this->request->both('datestart'));
             }
 
             $dateend = null;
-            if ($this->jax->b['dateend'] ?? 0) {
-                $dateend = $this->pdate($this->jax->b['dateend']);
+            if ($this->request->both('dateend') !== null) {
+                $dateend = $this->pdate($this->request->both('dateend'));
             }
 
             $authorId = null;
             if (
-                ($this->jax->b['mid'] ?? 0)
-                && ctype_digit((string) $this->jax->b['mid'])
+                $this->request->both('mid') !== null
+                && ctype_digit((string) $this->request->both('mid'))
             ) {
-                $authorId = (int) $this->jax->b['mid'];
+                $authorId = (int) $this->request->both('mid');
             }
 
             $postParams = [];

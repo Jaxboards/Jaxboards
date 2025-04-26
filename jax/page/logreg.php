@@ -11,6 +11,7 @@ use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Request;
 use Jax\Session;
 use Jax\TextFormatting;
 use Jax\User;
@@ -54,6 +55,7 @@ final class LogReg
         private readonly IPAddress $ipAddress,
         private readonly Jax $jax,
         private readonly Page $page,
+        private readonly Request $request,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
@@ -63,13 +65,13 @@ final class LogReg
 
     public function render(): void
     {
-        match ((int) mb_substr((string) $this->jax->b['act'], 6)) {
+        match ((int) mb_substr((string) $this->request->both('act'), 6)) {
             1 => $this->register(),
             2 => $this->logout(),
             4 => $this->loginpopup(),
             5 => $this->toggleinvisible(),
-            6 => $this->forgotpassword($this->jax->b['uid'], $this->jax->b['id']),
-            default => $this->login($this->jax->p['user'], $this->jax->p['pass']),
+            6 => $this->forgotpassword($this->request->both('uid'), $this->request->both('id')),
+            default => $this->login($this->request->post('user'), $this->request->post('pass')),
         };
     }
 
@@ -77,18 +79,18 @@ final class LogReg
     {
         $this->registering = true;
 
-        if (isset($this->jax->p['username']) && $this->jax->p['username']) {
+        if ($this->request->post('username') !== null) {
             $this->page->location('?');
         }
 
-        $name = isset($this->jax->p['name'])
-            ? trim((string) $this->jax->p['name'])
+        $name = $this->request->post('name') !== null
+            ? trim((string) $this->request->post('name'))
             : '';
-        $dispname = isset($this->jax->p['display_name'])
-            ? trim((string) $this->jax->p['display_name']) : '';
-        $pass1 = $this->jax->p['pass1'] ?? '';
-        $pass2 = $this->jax->p['pass2'] ?? '';
-        $email = $this->jax->p['email'] ?? '';
+        $dispname = $this->request->post('display_name') !== null
+            ? trim((string) $this->request->post('display_name')) : '';
+        $pass1 = $this->request->post('pass1') ?? '';
+        $pass2 = $this->request->post('pass2') ?? '';
+        $email = $this->request->post('email') ?? '';
 
         $recaptcha = '';
         if ($this->config->getSetting('recaptcha')) {
@@ -98,7 +100,7 @@ final class LogReg
         $p = $this->page->meta('register-form', $recaptcha);
 
         // Show registration form.
-        if (!isset($this->jax->p['register'])) {
+        if (!$this->request->post('register') !== null) {
             if (!$this->page->jsupdate) {
                 $this->page->JS('update', 'page', $p);
             }
@@ -232,7 +234,7 @@ final class LogReg
             $user = $this->user->getUser($u, $p);
 
             if ($user) {
-                if (isset($this->jax->p['popup']) && $this->jax->p['popup']) {
+                if ($this->request->post('popup') !== null) {
                     $this->page->JS('closewindow', '#loginform');
                 }
 
@@ -381,13 +383,13 @@ final class LogReg
 
             if (!$udata) {
                 $page = $this->page->meta('error', 'This link has expired. Please try again.');
-            } elseif ($this->jax->p['pass1'] && $this->jax->p['pass2']) {
-                if ($this->jax->p['pass1'] === $this->jax->p['pass2']) {
+            } elseif ($this->request->post('pass1') && $this->request->post('pass2')) {
+                if ($this->request->post('pass1') === $this->request->post('pass2')) {
                     $this->database->safeupdate(
                         'members',
                         [
                             'pass' => password_hash(
-                                (string) $this->jax->p['pass1'],
+                                (string) $this->request->post('pass1'),
                                 PASSWORD_DEFAULT,
                             ),
                         ],
@@ -414,7 +416,7 @@ final class LogReg
                     // registration redirects to the index.
                     $this->registering = true;
 
-                    $this->login($udata['name'], $this->jax->p['pass1']);
+                    $this->login($udata['name'], $this->request->post('pass1'));
 
                     return;
                 }
@@ -436,17 +438,17 @@ final class LogReg
                 );
             }
         } else {
-            if ($this->jax->p['user']) {
+            if ($this->request->post('user')) {
                 $result = $this->database->safeselect(
                     ['id', 'email'],
                     'members',
                     'WHERE `name`=?',
-                    $this->database->basicvalue($this->jax->p['user']),
+                    $this->database->basicvalue($this->request->post('user')),
                 );
                 $error = null;
                 if (!($udata = $this->database->arow($result))) {
                     $error = 'There is no user registered as <strong>'
-                        . $this->jax->b['user']
+                        . $this->request->both('user')
                         . '</strong>, sure this is correct?';
                 }
 
@@ -528,7 +530,7 @@ final class LogReg
             // Validate reCAPTCHA.
             $url = 'https://www.google.com/recaptcha/api/siteverify';
             $fields = [
-                'response' => $this->jax->p['g-recaptcha-response'],
+                'response' => $this->request->post('g-recaptcha-response'),
                 'secret' => $this->config->getSetting('recaptcha')['private_key'],
             ];
 

@@ -10,6 +10,7 @@ use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Request;
 use Jax\Session;
 use Jax\TextFormatting;
 use Jax\User;
@@ -39,6 +40,7 @@ final class Shoutbox
         private readonly IPAddress $ipAddress,
         private readonly Jax $jax,
         private readonly Page $page,
+        private readonly Request $request,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
@@ -57,20 +59,17 @@ final class Shoutbox
 
         $this->shoutlimit = $this->config->getSetting('shoutbox_num');
         if (
-            isset($this->jax->b['shoutbox_delete'])
-            && is_numeric($this->jax->b['shoutbox_delete'])
+            is_numeric($this->request->both('shoutbox_delete'))
         ) {
             $this->deleteshout();
         } elseif (
-            isset($this->jax->b['module'])
-            && $this->jax->b['module'] === 'shoutbox'
+            $this->request->both('module') === 'shoutbox'
         ) {
             $this->showallshouts();
         }
 
         if (
-            isset($this->jax->p['shoutbox_shout'])
-            && trim((string) $this->jax->p['shoutbox_shout']) !== ''
+            trim($this->request->post('shoutbox_shout') ?? '') !== ''
         ) {
             $this->addshout();
         }
@@ -267,11 +266,10 @@ final class Shoutbox
         $pages = '';
         $page = '';
         if (
-            isset($this->jax->b['page'])
-            && is_numeric($this->jax->b['page'])
-            && $this->jax->b['page'] > 1
+            is_numeric($this->request->both('page'))
+            && $this->request->both('page') > 1
         ) {
-            $pagen = $this->jax->b['page'] - 1;
+            $pagen = $this->request->both('page') - 1;
         }
 
         $result = $this->database->safeselect(
@@ -349,7 +347,7 @@ final class Shoutbox
             return $this->page->location('?');
         }
 
-        $delete = $this->jax->b['shoutbox_delete'] ?? 0;
+        $delete = $this->request->both('shoutbox_delete') ?? 0;
         $candelete = $this->canDelete($delete);
         if (!$candelete) {
             return $this->page->location('?');
@@ -368,7 +366,7 @@ final class Shoutbox
     public function addshout(): void
     {
         $this->session->act();
-        $shout = $this->jax->p['shoutbox_shout'];
+        $shout = $this->request->post('shoutbox_shout');
         $shout = $this->textFormatting->linkify($shout);
 
         $perms = $this->user->getPerms();

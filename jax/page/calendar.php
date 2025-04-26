@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Request;
 use Jax\Session;
 
 use function explode;
@@ -27,6 +28,7 @@ final class Calendar
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly Page $page,
+        private readonly Request $request,
         private readonly Session $session,
     ) {
         $this->page->loadmeta('calendar');
@@ -34,10 +36,8 @@ final class Calendar
 
     public function render(): void
     {
-        if (isset($this->jax->b['month'])) {
-            if (is_numeric($this->jax->b['month'])) {
-                $this->month = (int) $this->jax->b['month'];
-            }
+        if (is_numeric($this->request->both('month'))) {
+            $this->month = (int) $this->request->both('month');
         } else {
             $this->month = (int) gmdate('n');
         }

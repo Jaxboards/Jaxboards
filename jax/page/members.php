@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Request;
 use Jax\TextFormatting;
 
 use function ceil;
@@ -29,6 +30,7 @@ final class Members
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly Page $page,
+        private readonly Request $request,
         private readonly TextFormatting $textFormatting,
     ) {
         $this->page->loadmeta('members');
@@ -37,11 +39,10 @@ final class Members
     public function render(): void
     {
         if (
-            isset($this->jax->b['page'])
-            && is_numeric($this->jax->b['page'])
-            && $this->jax->b['page'] > 0
+            is_numeric($this->request->both('page'))
+            && $this->request->both('page') > 0
         ) {
-            $this->pageNumber = $this->jax->b['page'] - 1;
+            $this->pageNumber = $this->request->both('page') - 1;
         }
 
         if ($this->page->jsupdate) {
@@ -64,20 +65,18 @@ final class Members
         $page = '';
 
         $sortby = 'm.`display_name`';
-        $sorthow = isset($this->jax->b['how']) && $this->jax->b['how'] === 'DESC'
+        $sorthow = $this->request->both('how') === 'DESC'
             ? 'DESC' : 'ASC';
         $where = '';
         if (
-            isset($this->jax->b['sortby'], $fields[$this->jax->b['sortby']])
-            && $fields[$this->jax->b['sortby']]
+            $this->request->both('sortby') !== null
+            && isset($fields[$this->request->both('sortby')])
+            && $fields[$this->request->both('sortby')]
         ) {
-            $sortby = $this->jax->b['sortby'];
+            $sortby = $this->request->both('sortby');
         }
 
-        if (
-            isset($this->jax->g['filter'])
-            && $this->jax->g['filter'] === 'staff'
-        ) {
+        if ($this->request->get('filter') === 'staff') {
             $sortby = 'g.`can_access_acp` DESC ,' . $sortby;
             $where = 'WHERE g.`can_access_acp`=1 OR g.`can_moderate`=1';
         }
@@ -145,8 +144,7 @@ final class Members
 
         $url = '?act=members'
             . ($this->pageNumber ? '&page=' . ($this->pageNumber + 1) : '')
-            . (isset($this->jax->g['filter']) && $this->jax->g['filter']
-            ? '&filter=' . $this->jax->g['filter'] : '');
+            . ($this->request->get('filter') ? '&filter=' . $this->request->get('filter') : '');
 
         $links = [];
         foreach ($fields as $field => $fieldLabel) {

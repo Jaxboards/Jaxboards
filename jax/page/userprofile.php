@@ -8,6 +8,7 @@ use Jax\Database;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Request;
 use Jax\RSSFeed;
 use Jax\Session;
 use Jax\TextFormatting;
@@ -48,6 +49,7 @@ final class UserProfile
         private readonly IPAddress $ipAddress,
         private readonly Jax $jax,
         private readonly Page $page,
+        private readonly Request $request,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
@@ -57,18 +59,15 @@ final class UserProfile
 
     public function render(): void
     {
-        preg_match('@\d+@', (string) $this->jax->b['act'], $match);
+        preg_match('@\d+@', (string) $this->request->both('act'), $match);
         $userId = $match[0];
-        if (!isset($this->jax->b['view'])) {
-            $this->jax->b['view'] = false;
-        }
 
         if ($userId === '' || $userId === '0') {
             $this->page->location('?');
         } elseif (
             $this->page->jsnewlocation
             && !$this->page->jsdirectlink
-            && !$this->jax->b['view']
+            && !$this->request->both('view')
         ) {
             $this->showcontactcard($userId);
         } else {
@@ -245,7 +244,7 @@ final class UserProfile
             return null;
         }
 
-        $pfpageloc = $this->jax->b['page'] ?? '';
+        $pfpageloc = $this->request->both('page') ?? '';
         $pfbox = '';
 
         switch ($pfpageloc) {
@@ -383,28 +382,26 @@ final class UserProfile
 
             case 'comments':
                 if (
-                    isset($this->jax->b['del'])
-                    && is_numeric($this->jax->b['del'])
+                    is_numeric($this->request->both('del'))
                 ) {
                     if ($this->user->getPerm('can_moderate')) {
                         $this->database->safedelete(
                             'profile_comments',
                             'WHERE `id`=?',
-                            $this->database->basicvalue($this->jax->b['del']),
+                            $this->database->basicvalue($this->request->both('del')),
                         );
                     } elseif ($this->user->getPerm('can_delete_comments')) {
                         $this->database->safedelete(
                             'profile_comments',
                             'WHERE `id`=? AND `from`=?',
-                            $this->database->basicvalue($this->jax->b['del']),
+                            $this->database->basicvalue($this->request->both('del')),
                             $this->database->basicvalue($this->user->get('id')),
                         );
                     }
                 }
 
                 if (
-                    isset($this->jax->p['comment'])
-                    && $this->jax->p['comment'] !== ''
+                    $this->request->post('comment') !== ''
                 ) {
                     $error = null;
                     if (
@@ -425,7 +422,7 @@ final class UserProfile
                         $this->database->safeinsert(
                             'profile_comments',
                             [
-                                'comment' => $this->jax->p['comment'],
+                                'comment' => $this->request->post('comment'),
                                 'date' => $this->database->datetime(),
                                 'from' => $this->user->get('id'),
                                 'to' => $id,
@@ -497,7 +494,7 @@ final class UserProfile
                         . ($this->user->getPerm('can_delete_comments')
                         && $comment['from'] === $this->user->get('id')
                         || $this->user->getPerm('can_moderate')
-                        ? ' <a href="?act=' . $this->jax->b['act']
+                        ? ' <a href="?act=' . $this->request->both('act')
                         . '&view=profile&page=comments&del=' . $comment['id']
                         . '" class="delete">[X]</a>' : ''),
                     );
@@ -540,8 +537,7 @@ final class UserProfile
                     $this->num_activity,
                 );
                 if (
-                    isset($this->jax->b['fmt'])
-                    && $this->jax->b['fmt'] === 'RSS'
+                   $this->request->both('fmt') === 'RSS'
                 ) {
                     $feed = new RSSFeed(
                         [
@@ -582,8 +578,7 @@ final class UserProfile
         }
 
         if (
-            isset($this->jax->b['page'])
-            && $this->jax->b['page']
+            $this->request->both('page') !== null
             && $this->page->jsaccess
             && !$this->page->jsdirectlink
         ) {

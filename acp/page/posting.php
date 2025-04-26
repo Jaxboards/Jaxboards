@@ -39,7 +39,7 @@ final readonly class Posting
             'wordfilter' => 'Word Filter',
         ]);
 
-        match ($this->jax->b['do'] ?? '') {
+        match ($this->request->both('do')) {
             'emoticons' => $this->emoticons(),
             'postrating' => $this->postrating(),
             'wordfilter' => $this->wordfilter(),
@@ -77,27 +77,27 @@ final readonly class Posting
         }
 
         // Insert.
-        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
-            $this->jax->p['badword'] = $this->textFormatting->blockhtml($this->jax->p['badword']);
-            if (!$this->jax->p['badword'] || !$this->jax->p['replacement']) {
+        if ($this->request->post('submit') !== null) {
+            $badword = $this->textFormatting->blockhtml($this->request->post('badword'));
+            if (!$badword || !$this->request->post('replacement')) {
                 $page .= $this->page->error('All fields required.');
             } elseif (
-                isset($wordfilter[$this->jax->p['badword']])
-                && $wordfilter[$this->jax->p['badword']]
+                isset($wordfilter[$badword])
+                && $wordfilter[$badword]
             ) {
                 $page .= $this->page->error(
-                    "'" . $this->jax->p['badword'] . "' is already used.",
+                    "'" . $badword . "' is already used.",
                 );
             } else {
                 $this->database->safeinsert(
                     'textrules',
                     [
-                        'needle' => $this->jax->p['badword'],
-                        'replacement' => $this->jax->p['replacement'],
+                        'needle' => $badword,
+                        'replacement' => $this->request->post('replacement'),
                         'type' => 'badword',
                     ],
                 );
-                $wordfilter[$this->jax->p['badword']] = $this->jax->p['replacement'];
+                $wordfilter[$badword] = $this->request->post('replacement');
             }
         }
 
@@ -174,30 +174,30 @@ final readonly class Posting
         }
 
         // Insert emoticon.
-        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
-            if (!$this->jax->p['emoticon'] || !$this->jax->p['image']) {
+        if ($this->request->post('submit') !== null) {
+            if (!$this->request->post('emoticon') || !$this->request->post('image')) {
                 $page .= $this->page->error('All fields required.');
-            } elseif (isset($emoticons[$this->textFormatting->blockhtml($this->jax->p['emoticon'])])) {
+            } elseif (isset($emoticons[$this->textFormatting->blockhtml($this->request->post('emoticon'))])) {
                 $page .= $this->page->error('That emoticon is already being used.');
             } else {
                 $this->database->safeinsert(
                     'textrules',
                     [
                         'enabled' => 1,
-                        'needle' => $this->textFormatting->blockhtml($this->jax->p['emoticon']),
-                        'replacement' => $this->jax->p['image'],
+                        'needle' => $this->textFormatting->blockhtml($this->request->post('emoticon')),
+                        'replacement' => $this->request->post('image'),
                         'type' => 'emote',
                     ],
                 );
-                $emoticons[$this->textFormatting->blockhtml($this->jax->p['emoticon'])] = $this->jax->p['image'];
+                $emoticons[$this->textFormatting->blockhtml($this->request->post('emoticon'))] = $this->request->post('image');
             }
         }
 
         if (
-            isset($this->jax->p['baseset'])
-            && $basesets[$this->jax->p['baseset']]
+            $this->request->post('baseset') !== null
+            && $basesets[$this->request->post('baseset')]
         ) {
-            $this->config->write(['emotepack' => $this->jax->p['baseset']]);
+            $this->config->write(['emotepack' => $this->request->post('baseset')]);
         }
 
         if ($emoticons === []) {
@@ -301,28 +301,28 @@ final readonly class Posting
         }
 
         // Insert.
-        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
-            if (!$this->jax->p['img'] || !$this->jax->p['title']) {
+        if ($this->request->post('submit') !== null) {
+            if (!$this->request->post('img') || !$this->request->post('title')) {
                 $page .= $this->page->error('All fields required.');
             } else {
                 $this->database->safeinsert(
                     'ratingniblets',
                     [
-                        'img' => $this->jax->p['img'],
-                        'title' => $this->jax->p['title'],
+                        'img' => $this->request->post('img'),
+                        'title' => $this->request->post('title'),
                     ],
                 );
                 $niblets[$this->database->insertId()] = [
-                    'img' => $this->jax->p['img'],
-                    'title' => $this->jax->p['title'],
+                    'img' => $this->request->post('img'),
+                    'title' => $this->request->post('title'),
                 ];
             }
         }
 
-        if (isset($this->jax->p['rsubmit']) && $this->jax->p['rsubmit']) {
+        if ($this->request->post('rsubmit') !== null) {
             $this->config->write([
-                'ratings' => (isset($this->jax->p['renabled']) ? 1 : 0)
-                + (isset($this->jax->p['ranon']) ? 2 : 0),
+                'ratings' => ($this->request->post('renabled') !== null ? 1 : 0)
+                + ($this->request->post('ranon') !== null ? 2 : 0),
             ]);
             $page2 .= $this->page->success('Settings saved!');
         }

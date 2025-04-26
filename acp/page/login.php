@@ -9,6 +9,7 @@ use Jax\Config;
 use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\Jax;
+use Jax\Request;
 use Jax\User;
 
 use function header;
@@ -23,6 +24,7 @@ final readonly class Login
         private DomainDefinitions $domainDefinitions,
         private Jax $jax,
         private Page $page,
+        private Request $request,
         private User $user,
     ) {}
 
@@ -39,9 +41,9 @@ final readonly class Login
             'favicon_url' => $boardUrl . '/favicon.ico',
         ];
 
-        if (isset($this->jax->p['submit'])) {
-            $user = $this->jax->p['user'];
-            $password = $this->jax->p['pass'];
+        if ($this->request->post('submit') !== null) {
+            $user = $this->request->post('user');
+            $password = $this->request->post('pass');
 
             $result = $this->database->safeselect(
                 ['id'],

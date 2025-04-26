@@ -5,6 +5,7 @@ use Jax\Config;
 use Jax\Database;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Request;
 
 /*
  * Service install file, for installing a new JaxBoards service.
@@ -62,6 +63,7 @@ function recurseCopy($src, $dst): void
 
 $JAX = $container->get(Jax::class);
 $DB = $container->get(Database::class);
+$request = $container->get(Request::class);
 
 $fields = [
     'admin_email' => [
@@ -111,61 +113,62 @@ $fields = [
 
 $errors = [];
 
-if (isset($JAX->p['submit']) && $JAX->p['submit']) {
+if ($request->post('submit') !== null) {
     // Make sure each field is set.
     foreach ($fields as $field => $attributes) {
-        if ($JAX->p[$field]) {
+        if ($request->post($field)) {
             continue;
         }
 
         $errors[] = $attributes['name'] . ' must be filled in.';
     }
+    $domain = $request->post('domain');
     if (
-        $JAX->p['domain']
-        && !parse_url((string) $JAX->p['domain'], PHP_URL_HOST)
+        $domain !== null
+        && !parse_url((string) $domain, PHP_URL_HOST)
     ) {
-        if (preg_match('@[^\w\-.]@', (string) $JAX->p['domain'])) {
+        if (preg_match('@[^\w\-.]@', (string) $domain)) {
             $errors[] = 'Invalid domain';
         } else {
             // Looks like we have a proper hostname,
             // just remove the leading www. if it exists.
-            $JAX->p['domain'] = preg_replace(
+            $domain = preg_replace(
                 '/^www./',
                 '',
-                (string) $JAX->p['domain'],
+                (string) $domain,
             );
         }
     } else {
         // Remove www if it exists, also only grab host if url is entered.
-        $JAX->p['domain'] = preg_replace(
+        $domain = preg_replace(
             '/^www./',
             '',
-            parse_url((string) $JAX->p['domain'], PHP_URL_HOST),
+            parse_url((string) $domain, PHP_URL_HOST),
         );
     }
-    if ($JAX->p['admin_password'] !== $JAX->p['admin_password_2']) {
+    if ($request->post('admin_password') !== $request->post('admin_password_2')) {
         $errors[] = 'Admin passwords do not match';
     }
 
-    if (!$JAX->isemail($JAX->p['admin_email'])) {
+    if (!$JAX->isemail($request->post('admin_email'))) {
         $errors[] = 'invalid email';
     }
 
-    if (mb_strlen((string) $JAX->p['admin_username']) > 50) {
+    if (mb_strlen((string) $request->post('admin_username')) > 50) {
         $errors[] = 'Admin username is too long';
-    } elseif (preg_match('@\W@', (string) $JAX->p['admin_username'])) {
+    } elseif (preg_match('@\W@', (string) $request->post('admin_username'))) {
         $errors[] = 'Admin username needs to consist of letters,'
             . 'numbers, and underscore only';
     }
 
     // Are we installing this the service way.
-    $service = isset($JAX->p['service']) && (bool) $JAX->p['service'];
+    $service = (bool) $request->post('service');
 
     $connected = $DB->connect(
-        $JAX->p['sql_host'],
-        $JAX->p['sql_username'],
-        $JAX->p['sql_password'],
-        $JAX->p['sql_db'],
+        $request->post('sql_host'),
+        $request->post('sql_username'),
+        $request->post('sql_password'),
+        $request->post('sql_db'),
     );
 
     if (!$connected) {
@@ -177,13 +180,13 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
         $container->get(Config::class)->writeServiceConfig(
             [
                 'boardname' => 'Jaxboards',
-                'domain' => $JAX->p['domain'],
-                'mail_from' => $JAX->p['admin_username'] . ' <'
-                    . $JAX->p['admin_email'] . '>',
-                'sql_db' => $JAX->p['sql_db'],
-                'sql_host' => $JAX->p['sql_host'],
-                'sql_username' => $JAX->p['sql_username'],
-                'sql_password' => $JAX->p['sql_password'],
+                'domain' => $domain,
+                'mail_from' => $request->post('admin_username') . ' <'
+                    . $request->post('admin_email') . '>',
+                'sql_db' => $request->post('sql_db'),
+                'sql_host' => $request->post('sql_host'),
+                'sql_username' => $request->post('sql_username'),
+                'sql_password' => $request->post('sql_password'),
                 'installed' => true,
                 'service' => $service,
                 'prefix' => $service ? '' : 'jaxboards',
@@ -245,8 +248,8 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
                     [
                         'boardname' => $board,
                         'date' => $DB->datetime(),
-                        'referral' => $JAX->b['r'] ?? '',
-                        'registrar_email' => $JAX->p['admin_email'],
+                        'referral' => $request->both('r') ?? '',
+                        'registrar_email' => $request->post('admin_email'),
                         'registrar_ip' => $container->get(IPAddress::class)->asBinary(),
                     ],
                 );
@@ -289,14 +292,14 @@ if (isset($JAX->p['submit']) && $JAX->p['submit']) {
             $DB->safeinsert(
                 'members',
                 [
-                    'display_name' => $JAX->p['admin_username'],
-                    'email' => $JAX->p['admin_email'],
+                    'display_name' => $request->post('admin_username'),
+                    'email' => $request->post('admin_email'),
                     'group_id' => 2,
                     'join_date' => $DB->datetime(),
                     'last_visit' => $DB->datetime(),
-                    'name' => $JAX->p['admin_username'],
+                    'name' => $request->post('admin_username'),
                     'pass' => password_hash(
-                        (string) $JAX->p['admin_password'],
+                        (string) $request->post('admin_password'),
                         PASSWORD_DEFAULT,
                     ),
                     'posts' => 0,

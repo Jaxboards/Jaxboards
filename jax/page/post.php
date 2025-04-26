@@ -10,9 +10,11 @@ use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Request;
 use Jax\Session;
 use Jax\TextFormatting;
 use Jax\User;
+use PHP_CodeSniffer\Generators\HTML;
 
 use function array_pop;
 use function count;
@@ -65,6 +67,7 @@ final class Post
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly IPAddress $ipAddress,
+        private readonly Request $request,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
@@ -74,17 +77,15 @@ final class Post
 
     public function render(): void
     {
-        $this->tid = $this->jax->b['tid'] ?? 0;
-        $this->fid = $this->jax->b['fid'] ?? 0;
-        $this->pid = $this->jax->b['pid'] ?? 0;
-        $this->how = $this->jax->b['how'] ?? '';
+        $this->tid = $this->request->both('tid') ?? 0;
+        $this->fid = $this->request->both('fid') ?? 0;
+        $this->pid = $this->request->both('pid') ?? 0;
+        $this->how = $this->request->both('how') ?? '';
 
-        if (isset($this->jax->p['postdata']) && $this->jax->p['postdata']) {
+        if ($this->request->post('postdata') !== null) {
             $this->nopost = false;
-            $this->postdata = $this->jax->p['postdata'];
-        }
+            $this->postdata = $this->request->post('postdata');
 
-        if ($this->postdata) {
             // Linkify stuff before sending it.
             $this->postdata = str_replace("\t", '    ', $this->postdata);
             $codes = $this->textFormatting->startcodetags($this->postdata);
@@ -99,15 +100,14 @@ final class Post
             isset($_FILES['Filedata'], $_FILES['Filedata']['tmp_name'])
             && $_FILES['Filedata']['tmp_name']
         ) {
-            $this->jax->p['postdata'] .= '[attachment]'
+            $this->postdata .= '[attachment]'
                 . $this->upload($_FILES['Filedata'])
                 . '[/attachment]';
         }
 
         if (
-            isset($this->jax->p['submit'])
-            && ($this->jax->p['submit'] === 'Preview'
-            || $this->jax->p['submit'] === 'Full Reply')
+            $this->request->post('submit') === 'Preview'
+            || $this->request->post('submit') === 'Full Reply'
         ) {
             $this->showpostform();
             $this->previewpost();
@@ -457,20 +457,37 @@ final class Post
             $this->session->deleteVar('multiquote');
         }
 
-        $form = '<div class="postform">
-<form method="post" data-ajax-form="true" onsubmit="if(this.submitButton.value.match(/post/i)) '
-            . 'this.submitButton.disabled=true;" '
-            . 'enctype="multipart/form-data">
- ' . $vars . '
-  <textarea name="postdata" id="post" title="Type your post here" class="bbcode-editor">' . $postdata
-        . '</textarea><br>'
-        . ($tdata['perms']['upload'] ? '<div id="attachfiles">Add Files
-  <input type="file" name="Filedata" title="Browse for file" /></div>' : '')
-        . '<div class="buttons"><input type="submit" name="submit"
-  value="Post" title="Submit your post" onclick="this.form.submitButton=this"
-id="submitbutton"/><input type="submit" name="submit" value="Preview" title="See a preview of your post"
-onclick="this.form.submitButton=this"/></div>
-</form></div>';
+        $uploadForm = !$tdata['perms']['upload'] ? '' : <<<HTML
+            <div id="attachfiles">
+                Add Files
+                <input type="file" name="Filedata" title="Browse for file" />
+            </div>
+            HTML;
+
+        $form = <<<HTML
+            <div class="postform">
+                <form method="post" data-ajax-form="true"
+                    onsubmit="if(this.submitButton.value.match(/post/i)) this.submitButton.disabled=true;"
+                    enctype="multipart/form-data"
+                    >
+                    {$vars}
+                    <textarea name="postdata" id="post" title="Type your post here" class="bbcode-editor">
+                        {$postdata}
+                    </textarea><br>
+                    {$uploadForm}
+                    <div class="buttons">
+                        <input type="submit" name="submit"  id="submitbutton"
+                            value="Post" title="Submit your post"
+                            onclick="this.form.submitButton=this"
+                            />
+                        <input type="submit" name="submit" value="Preview"
+                            title="See a preview of your post"
+                            onclick="this.form.submitButton=this"/>
+                    </div>
+                </form>
+            </div>
+            HTML;
+
         $page .= $this->page->meta('box', '', $tdata['title'] . ' &gt; Reply', $form);
         $this->page->append('page', $page);
         $this->page->JS('update', 'page', $page);
@@ -601,13 +618,13 @@ onclick="this.form.submitButton=this"/></div>
 
                 if (!$tmp) {
                     $error = "The topic you are trying to edit doesn't exist.";
-                } elseif (trim((string) $this->jax->p['ttitle']) === '') {
+                } elseif (trim((string) $this->request->post('ttitle')) === '') {
                     $error = 'You must supply a topic title!';
                 } else {
                     $this->database->safeupdate(
                         'topics',
                         [
-                            'subtitle' => $this->textFormatting->blockhtml($this->jax->p['tdesc']),
+                            'subtitle' => $this->textFormatting->blockhtml($this->request->post('tdesc')),
                             'summary' => mb_substr(
                                 (string) preg_replace(
                                     '@\s+@',
@@ -623,7 +640,7 @@ onclick="this.form.submitButton=this"/></div>
                                 0,
                                 50,
                             ),
-                            'title' => $this->textFormatting->blockhtml($this->jax->p['ttitle']),
+                            'title' => $this->textFormatting->blockhtml($this->request->post('ttitle')),
                         ],
                         'WHERE `id`=?',
                         $tid,
@@ -685,26 +702,22 @@ onclick="this.form.submitButton=this"/></div>
             if (!$fid || !is_numeric($fid)) {
                 $error = 'No forum specified exists.';
             } elseif (
-                !isset($this->jax->p['ttitle'])
-                || trim((string) $this->jax->p['ttitle']) === ''
+                trim($this->request->post('ttitle') ?? '') === ''
             ) {
                 $error = "You didn't specify a topic title!";
             } elseif (
-                isset($this->jax->p['ttitle'])
-                && mb_strlen((string) $this->jax->p['ttitle']) > 255
+                mb_strlen($this->request->post('ttitle') ?? '') > 255
             ) {
                 $error = 'Topic title must not exceed 255 characters';
             } elseif (
-                isset($this->jax->p['subtitle'])
-                && mb_strlen($this->jax->p['subtitle']) > 255
+                mb_strlen($this->request->post('subtitle') ?? '') > 255
             ) {
                 $error = 'Subtitle must not exceed 255 characters';
             } elseif (
-                isset($this->jax->p['poll_type'])
-                && $this->jax->p['poll_type']
+                $this->request->post('poll_type') !== null
             ) {
                 $pollchoices = [];
-                $pollChoice = preg_split("@[\r\n]+@", (string) $this->jax->p['pollchoices']);
+                $pollChoice = preg_split("@[\r\n]+@", (string) $this->request->post('pollchoices'));
                 foreach ($pollChoice as $v) {
                     if (trim($v) === '') {
                         continue;
@@ -717,7 +730,7 @@ onclick="this.form.submitButton=this"/></div>
                     $pollchoices[] = $this->textFormatting->blockhtml($v);
                 }
 
-                if (trim((string) $this->jax->p['pollq']) === '') {
+                if (trim((string) $this->request->post('pollq')) === '') {
                     $error = "You didn't specify a poll question!";
                 } elseif (count($pollchoices) > 10) {
                     $error = 'Poll choices must not exceed 10.';
@@ -745,9 +758,10 @@ onclick="this.form.submitButton=this"/></div>
                 }
 
                 if (
-                    ((isset($this->jax->p['poll_type']) && $this->jax->p['poll_type'])
-                    || (isset($this->jax->p['pollq']) && $this->jax->p['pollq']))
-                    && !$fdata['perms']['poll']
+                    (
+                        $this->request->post('poll_type') !== null
+                        || $this->request->post('pollq') !== null
+                    ) && !$fdata['perms']['poll']
                 ) {
                     $error = "You don't have permission to post a poll in that forum";
                 }
@@ -765,12 +779,12 @@ onclick="this.form.submitButton=this"/></div>
                         'poll_choices' => isset($pollchoices) && $pollchoices
                             ? json_encode($pollchoices)
                             : '',
-                        'poll_q' => isset($this->jax->p['pollq'])
-                            ? $this->textFormatting->blockhtml($this->jax->p['pollq'])
+                        'poll_q' => $this->request->post('pollq') !== null
+                            ? $this->textFormatting->blockhtml($this->request->post('pollq'))
                             : '',
-                        'poll_type' => $this->jax->p['poll_type'] ?? '',
+                        'poll_type' => $this->request->post('poll_type') ?? '',
                         'replies' => 0,
-                        'subtitle' => $this->textFormatting->blockhtml($this->jax->p['tdesc']),
+                        'subtitle' => $this->textFormatting->blockhtml($this->request->post('tdesc')),
                         'summary' => mb_substr(
                             (string) preg_replace(
                                 '@\s+@',
@@ -784,7 +798,7 @@ onclick="this.form.submitButton=this"/></div>
                             0,
                             50,
                         ),
-                        'title' => $this->textFormatting->blockhtml($this->jax->p['ttitle']),
+                        'title' => $this->textFormatting->blockhtml($this->request->post('ttitle')),
                         'views' => 0,
                     ],
                 );

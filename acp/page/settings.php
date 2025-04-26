@@ -8,6 +8,7 @@ use ACP\Page;
 use Jax\Config;
 use Jax\Database;
 use Jax\Jax;
+use Jax\Request;
 use Jax\TextFormatting;
 
 use function is_numeric;
@@ -27,6 +28,7 @@ final readonly class Settings
         private Database $database,
         private Jax $jax,
         private Page $page,
+        private Request $request,
         private TextFormatting $textFormatting,
     ) {}
 
@@ -39,11 +41,7 @@ final readonly class Settings
             'shoutbox' => 'Shoutbox',
         ]);
 
-        if (!isset($this->jax->b['do'])) {
-            $this->jax->b['do'] = null;
-        }
-
-        match ($this->jax->b['do']) {
+        match ($this->request->both('do')) {
             'pages' => $this->pages(),
             'shoutbox' => $this->shoutbox(),
             'birthday' => $this->birthday(),
@@ -55,13 +53,12 @@ final readonly class Settings
     {
         $page = '';
         $error = null;
-        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
-            if (trim((string) $this->jax->p['boardname']) === '') {
+        if ($this->request->post('submit') !== null) {
+            if (trim((string) $this->request->post('boardname')) === '') {
                 $error = 'Board name is required';
             } elseif (
-                !isset($this->jax->p['logourl'])
-                || (trim($this->jax->p['logourl']) !== ''
-                && !$this->jax->isURL($this->jax->p['logourl']))
+                (trim($this->request->post('logourl')) !== ''
+                && !$this->jax->isURL($this->request->post('logourl')))
             ) {
                 $error = 'Please enter a valid logo url.';
             }
@@ -70,10 +67,10 @@ final readonly class Settings
                 $page .= $this->page->error($error);
             } else {
                 $this->config->write([
-                    'boardname' => $this->jax->p['boardname'],
-                    'logourl' => $this->jax->p['logourl'],
-                    'boardoffline' => isset($this->jax->p['boardoffline']) && $this->jax->p['boardoffline'] ? '0' : '1',
-                    'offlinetext' => $this->jax->p['offlinetext'],
+                    'boardname' => $this->request->post('boardname'),
+                    'logourl' => $this->request->post('logourl'),
+                    'boardoffline' => $this->request->post('boardoffline') !== null ? '0' : '1',
+                    'offlinetext' => $this->request->post('offlinetext'),
                 ]);
                 $page .= $this->page->success('Settings saved!');
             }
@@ -115,17 +112,17 @@ final readonly class Settings
     public function pages(): void
     {
         $page = '';
-        if (isset($this->jax->b['delete']) && $this->jax->b['delete']) {
-            $this->pages_delete($this->jax->b['delete']);
+        if ($this->request->both('delete') !== null) {
+            $this->pages_delete($this->request->both('delete'));
         }
 
-        if (isset($this->jax->b['page']) && $this->jax->b['page']) {
+        if ($this->request->both('page') !== null) {
             $newact = preg_replace(
                 '@\W@',
                 '<span style="font-weight:bold;color:#F00;">$0</span>',
-                (string) $this->jax->b['page'],
+                (string) $this->request->both('page'),
             );
-            if ($newact !== $this->jax->b['page']) {
+            if ($newact !== $this->request->both('page')) {
                 $error = 'The page URL must contain only letters and numbers. '
                     . "Invalid characters: {$newact}";
             } elseif (mb_strlen((string) $newact) > 25) {
@@ -198,14 +195,13 @@ final readonly class Settings
         $pageinfo = $this->database->arow($result);
         $this->database->disposeresult($result);
         if (
-            isset($this->jax->p['pagecontents'])
-            && $this->jax->p['pagecontents']
+            $this->request->post('pagecontents') !== null
         ) {
             if ($pageinfo) {
                 $this->database->safeupdate(
                     'pages',
                     [
-                        'page' => $this->jax->p['pagecontents'],
+                        'page' => $this->request->post('pagecontents'),
                     ],
                     'WHERE `act`=?',
                     $this->database->basicvalue($pageurl),
@@ -215,12 +211,12 @@ final readonly class Settings
                     'pages',
                     [
                         'act' => $pageurl,
-                        'page' => $this->jax->p['pagecontents'],
+                        'page' => $this->request->post('pagecontents'),
                     ],
                 );
             }
 
-            $pageinfo['page'] = $this->jax->p['pagecontents'];
+            $pageinfo['page'] = $this->request->post('pagecontents');
             $page .= $this->page->success(
                 "Page saved. Preview <a href='/?act={$pageurl}'>here</a>",
             );
@@ -242,7 +238,7 @@ final readonly class Settings
     {
         $page = '';
         $error = null;
-        if (isset($this->jax->p['clearall']) && $this->jax->p['clearall']) {
+        if ($this->request->post('clearall') !== null) {
             $result = $this->database->safespecial(
                 'TRUNCATE TABLE %t',
                 ['shouts'],
@@ -250,25 +246,17 @@ final readonly class Settings
             $page .= $this->page->success('Shoutbox cleared!');
         }
 
-        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
-            if (!isset($this->jax->p['sbe'])) {
-                $this->jax->p['sbe'] = false;
-            }
-
-            if (!isset($this->jax->p['sbava'])) {
-                $this->jax->p['sbava'] = false;
-            }
-
+        if ($this->request->post('submit') !== null) {
             $write = [
-                'shoutbox' => $this->jax->p['sbe'] ? 1 : 0,
-                'shoutboxava' => $this->jax->p['sbava'] ? 1 : 0,
+                'shoutbox' => $this->request->post('sbe') ? 1 : 0,
+                'shoutboxava' => $this->request->post('sbava') ? 1 : 0,
             ];
             if (
-                is_numeric($this->jax->p['sbnum'])
-                && $this->jax->p['sbnum'] <= 10
-                && $this->jax->p['sbnum'] > 0
+                is_numeric($this->request->post('sbnum'))
+                && $this->request->post('sbnum') <= 10
+                && $this->request->post('sbnum') > 0
             ) {
-                $write['shoutbox_num'] = $this->jax->p['sbnum'];
+                $write['shoutbox_num'] = $this->request->post('sbnum');
             } else {
                 $error = 'Shouts to show must be between 1 and 10';
             }
@@ -297,14 +285,10 @@ final readonly class Settings
     public function birthday(): void
     {
         $birthdays = $this->config->getSetting('birthdays');
-        if (isset($this->jax->p['submit']) && $this->jax->p['submit']) {
-            if (!isset($this->jax->p['bicon'])) {
-                $this->jax->p['bicon'] = false;
-            }
-
+        if ($this->request->post('submit') !== null) {
             $this->config->write(
                 [
-                    'birthdays' => $birthdays = ($this->jax->p['bicon'] ? 1 : 0),
+                    'birthdays' => $birthdays = ($this->request->post('bicon') !== null ? 1 : 0),
                 ],
             );
         }

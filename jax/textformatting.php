@@ -230,7 +230,7 @@ final class TextFormatting
     ): array|string {
         foreach ($codes[0] as $key => $value) {
             if (!$returnbb) {
-                $codes[2][$key] = $codes[1][$key] === '=php' ? highlight_string($codes[2][$key], 1) : preg_replace(
+                $codes[2][$key] = $codes[1][$key] === '=php' ? highlight_string($codes[2][$key], true) : preg_replace(
                     "@([ \r\n]|^) @m",
                     '$1&nbsp;',
                     $this->blockhtml($codes[2][$key]),

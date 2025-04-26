@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\Database;
+use Jax\DomainDefinitions;
 use Jax\Jax;
+use Jax\Request;
 
 use function array_pop;
 use function count;
@@ -24,12 +26,14 @@ final readonly class Download
 {
     public function __construct(
         private Database $database,
+        private DomainDefinitions $domainDefinitions,
         private Jax $jax,
+        private Request $request,
     ) {}
 
     public function render(): void
     {
-        $this->downloadFile($this->jax->b['id']);
+        $this->downloadFile($this->request->both('id'));
     }
 
     public function downloadFile($id): void
@@ -69,7 +73,7 @@ final readonly class Download
             $data['hash'] .= '.' . $ext;
         }
 
-        $file = BOARDPATH . 'Uploads/' . $data['hash'];
+        $file = $this->domainDefinitions->getBoardPath() . '/Uploads/' . $data['hash'];
         if (file_exists($file)) {
             if (!$data['name']) {
                 $data['name'] = 'unknown';

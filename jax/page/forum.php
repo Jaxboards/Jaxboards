@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Request;
 use Jax\Session;
 use Jax\TextFormatting;
 use Jax\User;
@@ -44,6 +45,7 @@ final class Forum
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly Session $session,
+        private readonly Request $request,
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
     ) {
@@ -53,15 +55,14 @@ final class Forum
     public function render(): void
     {
         if (
-            isset($this->jax->b['page'])
-            && is_numeric($this->jax->b['page'])
-            && $this->jax->b['page'] > 0
+            is_numeric($this->request->both('page'))
+            && $this->request->both('page') > 0
         ) {
-            $this->pageNumber = $this->jax->b['page'] - 1;
+            $this->pageNumber = $this->request->both('page') - 1;
         }
 
-        preg_match('@^([a-zA-Z_]+)(\d+)$@', (string) $this->jax->g['act'], $act);
-        if (isset($this->jax->b['markread']) && $this->jax->b['markread']) {
+        preg_match('@^([a-zA-Z_]+)(\d+)$@', (string) $this->request->get('act'), $act);
+        if ($this->request->both('markread') !== null) {
             $this->markread($act[2]);
             $this->page->location('?');
 
@@ -74,15 +75,12 @@ final class Forum
             return;
         }
 
-        if (
-            isset($this->jax->b['replies'])
-            && is_numeric($this->jax->b['replies'])
-        ) {
+        if (is_numeric($this->request->both('replies'))) {
             if (!$this->page->jsaccess) {
                 $this->page->location('?');
             }
 
-            $this->getreplysummary($this->jax->b['replies']);
+            $this->getreplysummary($this->request->both('replies'));
 
             return;
         }
