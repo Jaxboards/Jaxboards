@@ -278,24 +278,24 @@ final class Page
     public function collapsebox(
         string $title,
         string $contents,
-        $boxId = null,
+        ?string $boxId = null,
     ): ?string {
         return $this->meta('collapsebox', $boxId ? ' id="' . $boxId . '"' : '', $title, $contents);
     }
 
-    public function error($a): ?string
+    public function error(string $error): ?string
     {
-        return $this->meta('error', $a);
+        return $this->meta('error', $error);
     }
 
-    public function templatehas($a): false|int
+    public function templatehas(string $part): false|int
     {
-        return preg_match("/<!--{$a}-->/i", (string) $this->template);
+        return preg_match("/<!--{$part}-->/i", (string) $this->template);
     }
 
-    public function loadtemplate($a): void
+    public function loadtemplate(string $file): void
     {
-        $this->template = file_get_contents($a);
+        $this->template = file_get_contents($file);
         $this->template = preg_replace_callback(
             '@<!--INCLUDE:(\w+)-->@',
             $this->includer(...),
@@ -308,7 +308,7 @@ final class Page
         );
     }
 
-    public function loadskin($skinId): void
+    public function loadskin(int $skinId): void
     {
         $skin = [];
         if ($skinId) {
@@ -357,7 +357,7 @@ final class Page
         );
     }
 
-    public function userMetaParse($match): string
+    public function userMetaParse(array $match): string
     {
         $this->checkextended($match[3], $match[2]);
         $this->userMetaDefs[$match[2]] = $match[3];
@@ -384,9 +384,9 @@ final class Page
         $this->metadefs[$meta] = $content;
     }
 
-    public function loadmeta($component): void
+    public function loadmeta(string $component): void
     {
-        $component = mb_strtolower((string) $component);
+        $component = mb_strtolower($component);
         $themeComponentDir = THEMEPATH . 'views/' . $component;
         if (is_dir($themeComponentDir)) {
             $componentDir = $themeComponentDir;
@@ -405,7 +405,7 @@ final class Page
         $this->debug("Added {$component} to queue");
     }
 
-    public function processqueue($process): void
+    public function processqueue(string $process): void
     {
         while ($componentDir = array_pop($this->metaqueue)) {
             $component = pathinfo((string) $componentDir, PATHINFO_BASENAME);
@@ -441,7 +441,7 @@ final class Page
         }
     }
 
-    public function meta($meta, ...$args): string
+    public function meta(string $meta, ...$args): string
     {
         $this->processqueue($meta);
         $formatted = vsprintf(
@@ -506,7 +506,7 @@ final class Page
         return $conditionPasses ? $match[2] : '';
     }
 
-    public function checkextended(string $data, $meta = null): bool
+    public function checkextended(string $data, ?string $meta = null): bool
     {
         if (mb_strpos($data, '{if ') !== false) {
             if (!$meta) {
@@ -519,7 +519,7 @@ final class Page
         return false;
     }
 
-    public function metaexists($meta): bool
+    public function metaexists(string $meta): bool
     {
         return isset($this->userMetaDefs[$meta])
             || isset($this->metadefs[$meta]);
