@@ -34,11 +34,11 @@ final class Request
 
     public function setCookie(
         string $cookieName,
-        ?string $cookieValue = 'false',
+        ?string $cookieValue,
         $expires = false,
         $httponly = true,
     ): void {
-        setcookie($cookieName, $cookieValue, ['expires' => $expires, 'path' => null, 'domain' => null, 'secure' => true, 'httponly' => $httponly]);
+        setcookie($cookieName, $cookieValue ?? 'false', ['expires' => $expires, 'path' => null, 'domain' => null, 'secure' => true, 'httponly' => $httponly]);
     }
 
     public function hasPostData(): bool
