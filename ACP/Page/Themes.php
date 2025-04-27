@@ -85,6 +85,27 @@ final readonly class Themes
     }
 
     /**
+     * Get skins from database
+     * @return array<string,mixed>
+     */
+    private function getSkins(): array {
+        $result = $this->database->safeselect(
+            [
+                'id',
+                '`using`',
+                'title',
+                'custom',
+                'wrapper',
+                '`default`',
+                'hidden',
+            ],
+            'skins',
+            'ORDER BY title ASC',
+        );
+        return $this->database->arows($result);
+    }
+
+    /**
      * @return array<string>
      */
     private function getWrappers(): array
@@ -108,194 +129,224 @@ final readonly class Themes
         return $wrappers;
     }
 
+
+    /**
+     * Delete a wrapper. Returns error string upon failure.
+     */
+    private function deleteWrapper($wrapper):?string
+    {
+        $wrapperPath = $this->wrappersPath . $wrapper . '.html';
+        if (
+            !preg_match('@[^\w ]@', (string) $wrapper)
+            && file_exists($wrapperPath)
+        ) {
+            unlink($this->wrappersPath . $wrapper . '.html');
+            $this->page->location('?act=Themes');
+            return null;
+        }
+
+        return 'The wrapper you are trying to delete does not exist.';
+    }
+
+    /**
+     * Create a wrapper. Returns error string upon failure.
+     */
+    private function createWrapper($wrapper):?string
+    {
+        $newWrapperPath
+            = $this->wrappersPath . $wrapper . '.html';
+        if (preg_match('@[^\w ]@', (string) $wrapper)) {
+            return 'Wrapper name must consist of letters, numbers, spaces, and underscore.';
+        } elseif (mb_strlen((string) $wrapper) > 50) {
+            return 'Wrapper name must be less than 50 characters.';
+        } elseif (file_exists($newWrapperPath)) {
+            return 'That wrapper already exists.';
+        } elseif (!is_writable(dirname($newWrapperPath))) {
+            return 'Wrapper directory is not writable.';
+        } else {
+            $o = fopen($newWrapperPath, 'w');
+            if ($o !== false) {
+                fwrite(
+                    $o,
+                    file_get_contents($this->domainDefinitions->getDefaultThemePath() . '/wrappers.html'),
+                );
+                fclose($o);
+                return null;
+            } else {
+                return 'Wrapper could not be created.';
+            }
+        }
+    }
+
+    /**
+     * Update wrapper properties. Returns error string upon failure.
+     */
+    private function updateWrappers($wrappers):?string
+    {
+        foreach ($wrappers as $wrapperId => $wrapperName) {
+            if ($wrapperName && !in_array($wrapperName, $wrappers)) {
+                continue;
+            }
+
+            $hidden = $this->request->post('hidden') ?? [];
+            $this->database->safeupdate(
+                'skins',
+                [
+                    'hidden' => array_key_exists($wrapperId, $hidden) ? 1 : 0,
+                    'wrapper' => $wrapperName,
+                ],
+                'WHERE `id`=?',
+                $wrapperId,
+            );
+        }
+        return null;
+    }
+
+    /**
+     * Renames skins. Returns error string upon failure.
+     * @param array<string,string> $renameSkins
+     */
+    private function renameSkin(array $renameSkins):?string
+    {
+        foreach ($renameSkins as $oldName => $newName) {
+            if ($oldName === $newName) {
+                continue;
+            }
+
+            if (preg_match('@[^\w ]@', $oldName)) {
+                continue;
+            }
+
+            if (!is_dir($this->themesPath . $oldName)) {
+                continue;
+            }
+
+            if (
+                preg_match('@[^\w ]@', (string) $newName)
+                || mb_strlen((string) $newName) > 50
+            ) {
+                return 'Skin name must consist of letters, numbers, spaces, and underscore, and be under 50 characters long.';
+            } elseif (is_dir($this->themesPath . $newName)) {
+                return 'That skin name is already being used.';
+            }
+
+            $this->database->safeupdate(
+                'skins',
+                [
+                    'title' => $newName,
+                ],
+                'WHERE `title`=? AND `custom`=1',
+                $this->database->basicvalue($oldName),
+            );
+            rename($this->themesPath . $oldName, $this->themesPath . $newName);
+        }
+
+        return null;
+    }
+
+    /**
+     * Rename wrappers. Returns error string upon failure.
+     * @param array<string,string> $wrappers
+     */
+    private function renameWrappers($wrappers):?string
+    {
+        foreach ($wrappers as $wrapperName => $wrapperNewName) {
+            if ($wrapperName === $wrapperNewName) {
+                continue;
+            }
+
+            if (preg_match('@[^\w ]@', $wrapperName)) {
+                continue;
+            }
+
+            if (!is_file($this->wrappersPath . $wrapperName . '.html')) {
+                continue;
+            }
+
+            if (
+                preg_match('@[^\w ]@', (string) $wrapperNewName)
+                || mb_strlen((string) $wrapperNewName) > 50
+            ) {
+                return 'Wrapper name must consist of letters, numbers, spaces, and underscore, and be
+                    under 50 characters long.';
+            } elseif (is_file($this->wrappersPath . $wrapperNewName . '.html')) {
+                return "That wrapper name ($wrapperNewName) is already being used.";
+            }
+
+            $this->database->safeupdate(
+                'skins',
+                [
+                    'wrapper' => $wrapperNewName,
+                ],
+                'WHERE `wrapper`=? AND `custom`=1',
+                $this->database->basicvalue($wrapperName),
+            );
+            rename(
+                $this->wrappersPath . $wrapperName . '.html',
+                $this->wrappersPath . $wrapperNewName . '.html',
+            );
+        }
+
+        return null;
+    }
+
+    private function setDefaultSkin($skinID): void
+    {
+        $this->database->safeupdate(
+            'skins',
+            [
+                'default' => 0,
+            ],
+        );
+        $this->database->safeupdate(
+            'skins',
+            [
+                'default' => 1,
+            ],
+            'WHERE `id`=?',
+            $skinID,
+        );
+    }
+
     private function showSkinIndex(): void
     {
-        $errorskins = '';
-        $error = null;
+        $skinError = null;
+        $wrapperError = null;
 
-        if ($this->request->get('deletewrapper')) {
-            $wrapperPath = $this->wrappersPath . $this->request->get('deletewrapper') . '.html';
-            if (
-                !preg_match('@[^\w ]@', (string) $this->request->get('deletewrapper'))
-                && file_exists($wrapperPath)
-            ) {
-                unlink($this->wrappersPath . $this->request->get('deletewrapper') . '.html');
-                $this->page->location('?act=Themes');
-            } else {
-                $error = 'The wrapper you are trying to delete does not exist.';
-            }
+        $deleteWrapper = $this->request->both('deletewrapper');
+        if ($deleteWrapper) {
+            $wrapperError = $this->deleteWrapper($deleteWrapper);
         }
 
-        if (
-            $this->request->post('newwrapper') !== null
-            && $this->request->post('newrapper') !== ''
-        ) {
-            $newWrapperPath
-                = $this->wrappersPath . $this->request->post('newwrapper') . '.html';
-            if (preg_match('@[^\w ]@', (string) $this->request->post('newwrapper'))) {
-                $error = 'Wrapper name must consist of letters, numbers, spaces, and underscore.';
-            } elseif (mb_strlen((string) $this->request->post('newwrapper')) > 50) {
-                $error = 'Wrapper name must be less than 50 characters.';
-            } elseif (file_exists($newWrapperPath)) {
-                $error = 'That wrapper already exists.';
-            } elseif (!is_writable(dirname($newWrapperPath))) {
-                $error = 'Wrapper directory is not writable.';
-            } else {
-                $o = fopen($newWrapperPath, 'w');
-                if ($o !== false) {
-                    fwrite(
-                        $o,
-                        file_get_contents($this->domainDefinitions->getDefaultThemePath() . '/wrappers.html'),
-                    );
-                    fclose($o);
-                } else {
-                    $error = 'Wrapper could not be created.';
-                }
-            }
+        $newWrapper = $this->request->both('newwrapper');
+        if ($newWrapper !== null && $newWrapper !== '') {
+            $wrapperError = $this->createWrapper($newWrapper);
         }
 
-        // Make an array of wrappers.
-        $wrappers = $this->getWrappers();
-
-        if ($this->request->post('submit') !== null) {
-            // Update wrappers/hidden status.
-            if (
-                $this->request->post('wrapper') !== null
-                && is_array($this->request->post('wrapper'))
-            ) {
-                foreach ($this->request->post('wrapper') as $k => $v) {
-                    if ($v && !in_array($v, $wrappers)) {
-                        continue;
-                    }
-
-                    $hidden = $this->request->post('hidden') ?? [];
-                    $this->database->safeupdate(
-                        'skins',
-                        [
-                            'hidden' => array_key_exists($k, $hidden) ? 1 : 0,
-                            'wrapper' => $v,
-                        ],
-                        'WHERE `id`=?',
-                        $k,
-                    );
-                }
-            }
-
-            if (
-                is_array($this->request->post('renameskin'))
-            ) {
-                foreach ($this->request->post('renameskin') as $oldName => $newName) {
-                    if ($oldName === $newName) {
-                        continue;
-                    }
-
-                    if (preg_match('@[^\w ]@', $oldName)) {
-                        continue;
-                    }
-
-                    if (!is_dir($this->themesPath . $oldName)) {
-                        continue;
-                    }
-
-                    if (
-                        preg_match('@[^\w ]@', (string) $newName)
-                        || mb_strlen((string) $newName) > 50
-                    ) {
-                        $errorskins = 'Skin name must consist of letters, numbers, spaces, and underscore, and be under 50 characters long.';
-                    } elseif (is_dir($this->themesPath . $newName)) {
-                        $errorskins = 'That skin name is already being used.';
-                    } else {
-                        $this->database->safeupdate(
-                            'skins',
-                            [
-                                'title' => $newName,
-                            ],
-                            'WHERE `title`=? AND `custom`=1',
-                            $this->database->basicvalue($oldName),
-                        );
-                        rename($this->themesPath . $oldName, $this->themesPath . $newName);
-                    }
-                }
-            }
-
-            if (
-                is_array($this->request->post('renamewrapper'))
-            ) {
-                foreach ($this->request->post('renamewrapper') as $wrapperName => $wrapperNewName) {
-                    if ($wrapperName === $wrapperNewName) {
-                        continue;
-                    }
-
-                    if (preg_match('@[^\w ]@', $wrapperName)) {
-                        continue;
-                    }
-
-                    if (!is_file($this->wrappersPath . $wrapperName . '.html')) {
-                        continue;
-                    }
-
-                    if (
-                        preg_match('@[^\w ]@', (string) $wrapperNewName)
-                        || mb_strlen((string) $wrapperNewName) > 50
-                    ) {
-                        $error = 'Wrapper name must consist of letters, numbers, spaces, and underscore, and be
-                            under 50 characters long.';
-                    } elseif (is_file($this->wrappersPath . $wrapperNewName . '.html')) {
-                        $error = 'That wrapper name is already being used.';
-                    } else {
-                        $this->database->safeupdate(
-                            'skins',
-                            [
-                                'wrapper' => $wrapperNewName,
-                            ],
-                            'WHERE `wrapper`=? AND `custom`=1',
-                            $this->database->basicvalue($wrapperName),
-                        );
-                        rename(
-                            $this->wrappersPath . $wrapperName . '.html',
-                            $this->wrappersPath . $wrapperNewName . '.html',
-                        );
-                    }
-
-                    $wrappers = $this->getWrappers();
-                }
-            }
-
-            // Set default.
-            if ($this->request->post('default') !== null) {
-                $this->database->safeupdate(
-                    'skins',
-                    [
-                        'default' => 0,
-                    ],
-                );
-                $this->database->safeupdate(
-                    'skins',
-                    [
-                        'default' => 1,
-                    ],
-                    'WHERE `id`=?',
-                    $this->request->post('default'),
-                );
-            }
+        $updateWrappers = $this->request->both('wrapper');
+        if (is_array($updateWrappers)) {
+            $wrapperError = $this->updateWrappers($updateWrappers);
         }
 
-        $result = $this->database->safeselect(
-            [
-                'id',
-                '`using`',
-                'title',
-                'custom',
-                'wrapper',
-                '`default`',
-                'hidden',
-            ],
-            'skins',
-            'ORDER BY title ASC',
-        );
+        $renameSkins = $this->request->both('renameskin');
+        if (is_array($renameSkins)) {
+            $skinError = $this->renameSkin($renameSkins);
+        }
+
+        $renameWrappers = $this->request->both('renamewrapper');
+        if (is_array($renameWrappers)) {
+            $wrapperError = $this->renameWrappers($renameWrappers);
+        }
+
+        $defaultSkin = $this->request->both('default');
+        if ($defaultSkin !== null) {
+            $this->setDefaultSkin($defaultSkin);
+        }
+
         $usedwrappers = [];
         $skins = '';
-        while ($f = $this->database->arow($result)) {
+        $wrappers = $this->getWrappers();
+        foreach ($this->getSkins() as $f) {
             $wrapperOptions = '';
             foreach ($wrappers as $wrapper) {
                 $wrapperOptions .= $this->page->parseTemplate(
@@ -341,7 +392,7 @@ final readonly class Themes
             $usedwrappers[] = $f['wrapper'];
         }
 
-        $skins = ($errorskins !== '' && $errorskins !== '0' ? $this->page->error($errorskins) : '')
+        $skins = ($skinError !== null ? $this->page->error($skinError) : '')
             . $this->page->parseTemplate(
                 'themes/show-skin-index-css.html',
                 [
@@ -375,7 +426,7 @@ final readonly class Themes
         );
         $this->page->addContentBox(
             'Wrappers',
-            ($error !== null ? $this->page->error($error) : '') . $wrap,
+            ($wrapperError !== null ? $this->page->error($wrapperError) : '') . $wrap,
         );
     }
 
