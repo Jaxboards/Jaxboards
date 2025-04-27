@@ -42,9 +42,6 @@ final class Post
 
     private string $postpreview = '';
 
-    /**
-     * @var false
-     */
     private bool $nopost = true;
 
     private $tid;
@@ -179,7 +176,7 @@ final class Post
     private function previewpost(): void
     {
         $post = $this->postdata;
-        if (trim((string) $post) !== '' && trim((string) $post) !== '0') {
+        if (trim($post) !== '' && trim($post) !== '0') {
             $post = $this->textFormatting->theworks($post);
             $post = $this->page->meta('post-preview', $post);
             $this->postpreview = $post;
@@ -504,7 +501,7 @@ final class Post
             return true;
         }
 
-        return (bool) $this->canmoderate($post['tid']);
+        return $this->canmoderate($post['tid']);
     }
 
     private function canmoderate($tid): bool
@@ -544,10 +541,10 @@ final class Post
             $error = 'Invalid post to edit.';
         }
 
-        if ($this->postdata) {
-            if (!$this->nopost && trim((string) $this->postdata) === '') {
+        if ($this->postdata !== '' && $this->postdata !== '0') {
+            if (!$this->nopost && trim($this->postdata) === '') {
                 $error = "You didn't supply a post!";
-            } elseif (mb_strlen((string) $this->postdata) > 65535) {
+            } elseif (mb_strlen($this->postdata) > 65535) {
                 $error = 'Post must not exceed 65,535 bytes.';
             }
         }
@@ -685,9 +682,9 @@ final class Post
         $uid = $this->user->get('id');
         $error = null;
 
-        if (!$this->nopost && trim((string) $postdata) === '') {
+        if (!$this->nopost && trim($postdata) === '') {
             $error = "You didn't supply a post!";
-        } elseif (mb_strlen((string) $postdata) > 50000) {
+        } elseif (mb_strlen($postdata) > 50000) {
             $error = 'Post must not exceed 50,000 characters.';
         }
 

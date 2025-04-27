@@ -398,8 +398,6 @@ final readonly class Members
             ? 'Editing ' . $data['name'] . "'s details" : 'Edit Member',
             $page,
         );
-
-        return;
     }
 
     private function preregister(): void

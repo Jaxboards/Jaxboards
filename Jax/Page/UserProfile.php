@@ -74,7 +74,7 @@ final class UserProfile
         }
     }
 
-    private function showcontactcard($id): void
+    private function showcontactcard(string $id): void
     {
         $contactdetails = '';
         $result = $this->database->safespecial(
@@ -156,7 +156,7 @@ final class UserProfile
         );
     }
 
-    private function showfullprofile($id): void
+    private function showfullprofile(string $id): void
     {
         if ($this->request->isJSUpdate() && !$this->request->hasPostData()) {
             return;

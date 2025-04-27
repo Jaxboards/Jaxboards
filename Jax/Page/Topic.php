@@ -184,7 +184,7 @@ final class Topic
         $this->viewtopic($this->tid);
     }
 
-    private function getTopicData($tid): void
+    private function getTopicData(int $tid): void
     {
         $result = $this->database->safespecial(
             <<<'MySQL'
@@ -271,7 +271,6 @@ final class Topic
             " id='poll'",
             $this->topicdata['poll_q'],
             $this->generatepoll(
-                $this->topicdata['poll_q'],
                 $this->topicdata['poll_type'],
                 json_decode((string) $this->topicdata['poll_choices']),
                 $this->topicdata['poll_results'],
@@ -666,7 +665,7 @@ final class Topic
 
         $rows = '';
         while ($post = $this->database->arow($query)) {
-            if (!$this->firstPostID) {
+            if ($this->firstPostID === 0) {
                 $this->firstPostID = $post['pid'];
             }
 
@@ -868,7 +867,7 @@ final class Topic
         return $this->canMod = $canMod;
     }
 
-    private function generatepoll($q, $type, $choices, $results): string
+    private function generatepoll($type, $choices, $results): string
     {
         if (!$choices) {
             $choices = [];
@@ -1045,7 +1044,6 @@ final class Topic
             'update',
             '#poll .content',
             $this->generatePoll(
-                $row['poll_q'],
                 $row['poll_type'],
                 $choices,
                 $presults,

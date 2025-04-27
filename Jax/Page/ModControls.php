@@ -61,23 +61,6 @@ final class ModControls
         $this->page->loadmeta('modcp');
     }
 
-    private function load(): void
-    {
-        $script = file_get_contents('dist/modcontrols.js');
-
-        if (!$this->request->isJSAccess()) {
-            header('Content-Type: application/javascript; charset=utf-8');
-            header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 2_592_000) . ' GMT');
-
-            echo $script;
-
-            exit(0);
-        }
-
-        $this->page->JS('softurl');
-        $this->page->JS('script', $script);
-    }
-
     public function render(): void
     {
         $this->perms = $this->user->getPerms();
@@ -146,6 +129,23 @@ final class ModControls
 
             default:
         }
+    }
+
+    private function load(): void
+    {
+        $script = file_get_contents('dist/modcontrols.js');
+
+        if (!$this->request->isJSAccess()) {
+            header('Content-Type: application/javascript; charset=utf-8');
+            header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 2_592_000) . ' GMT');
+
+            echo $script;
+
+            exit(0);
+        }
+
+        $this->page->JS('softurl');
+        $this->page->JS('script', $script);
     }
 
     private function dotopics($do): void
@@ -426,8 +426,6 @@ final class ModControls
         $this->session->addVar('modpids', implode(',', $pids));
 
         $this->sync();
-
-        return;
     }
 
     private function modtopic($tid): void
@@ -492,8 +490,6 @@ final class ModControls
         $this->session->addVar('modtids', implode(',', $tids));
 
         $this->sync();
-
-        return;
     }
 
     private function sync(): void
@@ -843,7 +839,7 @@ final class ModControls
         $this->page->append('page', $page);
     }
 
-    private function showmodcp($cppage = ''): void
+    private function showmodcp(string $cppage = ''): void
     {
         if (!$this->user->getPerm('can_moderate')) {
             return;

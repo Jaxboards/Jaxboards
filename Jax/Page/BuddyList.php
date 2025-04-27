@@ -270,7 +270,7 @@ final readonly class BuddyList
         $this->displaybuddylist();
     }
 
-    private function dropbuddy($uid, $shh = 0): void
+    private function dropbuddy($uid, int $shh = 0): void
     {
         if ($uid && is_numeric($uid)) {
             $friends = explode(',', (string) $this->user->get('friends'));
@@ -284,7 +284,7 @@ final readonly class BuddyList
             $this->user->set('friends', $friends);
         }
 
-        if ($shh) {
+        if ($shh !== 0) {
             return;
         }
 

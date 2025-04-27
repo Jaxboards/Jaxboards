@@ -78,7 +78,7 @@ final class Search
         }
     }
 
-    private function form($pageContents = ''): void
+    private function form(string $pageContents = ''): void
     {
         if ($this->request->isJSUpdate()) {
             return;
@@ -139,8 +139,11 @@ final class Search
         );
     }
 
-    private function rtreeselect($tree, $titles, $level = 0): string
-    {
+    private function rtreeselect(
+        array $tree,
+        $titles,
+        float|int $level = 0,
+    ): string {
         $options = '';
         foreach ($tree as $k => $v) {
             if (isset($titles[$k])) {

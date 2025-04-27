@@ -878,7 +878,7 @@ final class UCP
         $this->page->JS('update', 'num-messages', $unread);
     }
 
-    private function viewmessages($view = 'inbox'): void
+    private function viewmessages(string $view = 'inbox'): void
     {
         if ($this->request->isJSUpdate() && !$this->request->hasPostData()) {
             return;
@@ -1021,7 +1021,7 @@ final class UCP
         $this->showucp($page);
     }
 
-    private function compose($messageid = '', $todo = ''): void
+    private function compose($messageid = '', string $todo = ''): void
     {
         $error = null;
         $mid = 0;
@@ -1207,7 +1207,7 @@ final class UCP
         $this->showucp($page);
     }
 
-    private function delete($messageId, $relocate = true): void
+    private function delete($messageId, bool $relocate = true): void
     {
         $result = $this->database->safeselect(
             [
