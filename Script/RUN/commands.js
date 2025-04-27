@@ -2,6 +2,7 @@
 /* eslint-disable no-alert */
 import { toggleOverlay, scrollTo, onImagesLoaded } from '../JAX/util';
 import Animation from '../JAX/animation';
+import { addIdleClock } from '../JAX/date';
 import { getCoordinates, getComputedStyle } from '../JAX/el';
 import { flashTitle } from '../JAX/flashing-title';
 import gracefulDegrade from '../JAX/graceful-degrade';
@@ -256,30 +257,33 @@ export default {
     if (!statusers) {
       return;
     }
-    a[0].forEach(([memberId, groupId, status, name, tooltip]) => {
+    a[0].forEach(([memberId, groupId, status, name, tooltip, lastAction]) => {
       let link = document.querySelector(`#statusers .user${memberId}`);
       if (!link) {
         link = document.createElement('a');
         if (!Number.isNaN(parseInt(memberId, 10))) {
           link.href = `?act=vu${memberId}`;
         }
-        link.innerHTML = name;
         link.onclick = () => {
           RUN.location(link.getAttribute('href'));
         };
       }
+      link.innerHTML = name;
       link.className = `user${memberId} mgroup${groupId} ${
         status ? ` ${status}` : ''
-      }`;
+      } lastAction${lastAction}`;
       if (tooltip) {
         link.title = tooltip;
         link.onmouseover = () => openTooltip(link, tooltip);
       }
-      if (status !== 'idle') {
-        if (statusers.firstChild) {
-          statusers.insertBefore(link, statusers.firstChild);
-        } else statusers.appendChild(link);
+      if (status === 'idle') {
+        addIdleClock(link);
+
+        return;
       }
+      if (statusers.firstChild) {
+        statusers.insertBefore(link, statusers.firstChild);
+      } else statusers.appendChild(link);
     });
   },
   setoffline(a) {
