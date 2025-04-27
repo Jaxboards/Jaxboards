@@ -181,13 +181,7 @@ final class App
 
         $this->page->append(
             'nav',
-            $this->page->parseTemplate(
-                'nav.html',
-                [
-                    'nav' => $this->nav['links'],
-                    'nav_dropdowns' => $this->nav['dropdowns'],
-                ],
-            ),
+            $this->page->parseTemplate('nav.html', $this->nav),
         );
     }
 }
