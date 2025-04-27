@@ -133,8 +133,7 @@ final class Page
      *                             will start searching in the
      *                             JAXBOARDS_ROOT/ACP/views/
      *                             directory.
-     * @param array  $data         A key => value array, where {{ key }}
-     *                             is replaced by value
+     * @param array<string,string> Template variables to be replaced
      *
      * @return string returns the template with the data replaced
      */
