@@ -178,7 +178,7 @@ final class Session
      */
     public function getSess($sid = null): array
     {
-        $session = [];
+        $session = null;
         $botName = $this->getBotName();
 
         if ($botName) {
@@ -241,7 +241,7 @@ final class Session
         }
 
 
-        if ($session !== []) {
+        if ($session !== null) {
             $session['last_action'] = (int) $session['last_action'];
             $session['last_update'] = (int) $session['last_update'];
             $session['read_date'] = (int) $session['read_date'];
