@@ -9,6 +9,7 @@ use Jax\Config;
 use Jax\Request;
 use Jax\Session;
 use Jax\User;
+use Exception;
 
 use function header;
 use function is_string;
@@ -64,7 +65,7 @@ final class App
             try {
                 $page = $this->container->get('ACP\Page\\' . $act);
                 $page->render();
-            } catch (\Exception) {
+            } catch (Exception) {
                 $this->page->addContentBox('Error', "Invalid action: {$act}");
             }
         }
