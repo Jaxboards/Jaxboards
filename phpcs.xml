@@ -209,7 +209,7 @@
   <rule ref="SlevomatCodingStandard.Functions.FunctionLength">
     <properties>
       <!-- default is 20 which is just way too short. -->
-      <property name="maxLinesLength">100</property>
+      <property name="maxLinesLength" value="100"/>
     </properties>
   </rule>
 
