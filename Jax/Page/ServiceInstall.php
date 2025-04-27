@@ -377,7 +377,7 @@ class ServiceInstall
         }
 
         // Send us to the service page.
-        header('Refresh:0');
+        header('Location: ./');
 
         return [];
     }
