@@ -206,7 +206,13 @@
     </properties>
   </rule>
   <rule ref="SlevomatCodingStandard.Functions.DisallowEmptyFunction"/>
-  <rule ref="SlevomatCodingStandard.Functions.FunctionLength"/>
+  <rule ref="SlevomatCodingStandard.Functions.FunctionLength">
+    <properties>
+      <!-- default is 20 which is just way too short. -->
+      <property name="maxLinesLength">100</property>
+    </properties>
+  </rule>
+
   <rule ref="SlevomatCodingStandard.Functions.RequireArrowFunction"/>
   <!-- disable this rule which unfortunately crashes PHP_CodeSniffer -->
   <!--rule ref="SlevomatCodingStandard.Functions.RequireMultiLineCall">

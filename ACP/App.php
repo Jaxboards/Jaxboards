@@ -24,6 +24,9 @@ use function mb_strtolower;
  */
 final class App
 {
+    /**
+     * @var array<string,string>
+     */
     private array $nav = [
         'dropdowns' => '',
         'links' => '',
@@ -53,74 +56,7 @@ final class App
 
         $this->page->append('username', (string) $this->user->get('display_name'));
         $this->page->append('title', $this->config->getSetting('boardname') . ' - ACP');
-        $this->addNavMenu(
-            'Settings',
-            '?act=Settings',
-            [
-                '?act=Settings&do=birthday' => 'Birthdays',
-                '?act=Settings&do=global' => 'Global Settings',
-                '?act=Settings&do=pages' => 'Custom Pages',
-                '?act=Settings&do=shoutbox' => 'Shoutbox',
-            ],
-        );
-        $this->addNavMenu(
-            'Members',
-            '?act=Members',
-            [
-                '?act=Members&do=delete' => 'Delete Account',
-                '?act=Members&do=edit' => 'Edit',
-                '?act=Members&do=ipbans' => 'IP Bans',
-                '?act=Members&do=massmessage' => 'Mass Message',
-                '?act=Members&do=merge' => 'Account Merge',
-                '?act=Members&do=prereg' => 'Pre-Register',
-                '?act=Members&do=validation' => 'Validation',
-            ],
-        );
-        $this->addNavMenu(
-            'Groups',
-            '?act=Groups',
-            [
-                '?act=Groups&do=create' => 'Create Group',
-                '?act=Groups&do=delete' => 'Delete Groups',
-                '?act=Groups&do=perms' => 'Edit Permissions',
-            ],
-        );
-        $this->addNavMenu(
-            'Themes',
-            '?act=Themes',
-            [
-                '?act=Themes&do=create' => 'Create Skin',
-                '?act=Themes' => 'Manage Skin(s)',
-            ],
-        );
-        $this->addNavMenu(
-            'Posting',
-            '?act=Posting',
-            [
-                '?act=Posting&do=emoticons' => 'Emoticons',
-                '?act=Posting&do=postrating' => 'Post Rating',
-                '?act=Posting&do=wordfilter' => 'Word Filter',
-            ],
-        );
-        $this->addNavMenu(
-            'Forums',
-            '?act=Forums',
-            [
-                '?act=Forums&do=create' => 'Create Forum',
-                '?act=Forums&do=createc' => 'Create Category',
-                '?act=Forums&do=order' => 'Manage',
-                '?act=Forums&do=recountstats' => 'Recount Statistics',
-            ],
-        );
-        $this->addNavMenu(
-            'Tools',
-            '?act=Tools',
-            [
-                '?act=Tools&do=backup' => 'Backup Forum',
-                '?act=Tools&do=files' => 'File Manager',
-                '?act=Tools&do=errorlog' => 'View Error Log',
-            ],
-        );
+
         $this->renderNav();
 
         $act = $this->request->get('act');
@@ -143,28 +79,29 @@ final class App
      * Creates a nav menu in the ACP.
      *
      * @param string $title The name of the button
-     * @param string $page  The URL the button links to
-     * @param array  $menu  A list of links and associated labels to print
+     * @param array<string,string> $menu  A list of links and associated labels to print
      *                      out as a drop down list
      */
-    public function addNavmenu(string $title, string $page, array $menu): void
+    public function addNavmenu(string $title, array $menu): void
     {
+        $url = "?act={$title}";
+
         $this->nav['links'] .= $this->page->parseTemplate(
             'nav-link.html',
             [
                 'class' => mb_strtolower($title),
-                'page' => $page,
+                'page' => $url,
                 'title' => $title,
             ],
         );
 
         $dropdownLinks = '';
-        foreach ($menu as $menuURL => $menuTitle) {
+        foreach ($menu as $do => $menuTitle) {
             $dropdownLinks .= $this->page->parseTemplate(
                 'nav-dropdown-link.html',
                 [
                     'title' => $menuTitle,
-                    'url' => $menuURL,
+                    'url' => "{$url}&do={$do}",
                 ],
             );
         }
@@ -180,8 +117,69 @@ final class App
 
     private function renderNav(): void
     {
-        $this->page->append(
-            'nav',
+        $this->addNavMenu(
+            'Settings',
+            [
+                'birthday' => 'Birthdays',
+                'global' => 'Global Settings',
+                'pages' => 'Custom Pages',
+                'shoutbox' => 'Shoutbox',
+            ],
+        );
+        $this->addNavMenu(
+            'Members',
+            [
+                'delete' => 'Delete Account',
+                'edit' => 'Edit',
+                'ipbans' => 'IP Bans',
+                'massmessage' => 'Mass Message',
+                'merge' => 'Account Merge',
+                'prereg' => 'Pre-Register',
+                'validation' => 'Validation',
+            ],
+        );
+        $this->addNavMenu(
+            'Groups',
+            [
+                'create' => 'Create Group',
+                'delete' => 'Delete Groups',
+                'perms' => 'Edit Permissions',
+            ],
+        );
+        $this->addNavMenu(
+            'Themes',
+            [
+                'create' => 'Create Skin',
+                'manage' => 'Manage Skin(s)',
+            ],
+        );
+        $this->addNavMenu(
+            'Posting',
+            [
+                'emoticons' => 'Emoticons',
+                'postrating' => 'Post Rating',
+                'wordfilter' => 'Word Filter',
+            ],
+        );
+        $this->addNavMenu(
+            'Forums',
+            [
+                'create' => 'Create Forum',
+                'createc' => 'Create Category',
+                'order' => 'Manage',
+                'recountstats' => 'Recount Statistics',
+            ],
+        );
+        $this->addNavMenu(
+            'Tools',
+            [
+                'backup' => 'Backup Forum',
+                'files' => 'File Manager',
+                'viewErrorLog' => 'View Error Log',
+            ],
+        );
+
+        $this->page->append('nav',
             $this->page->parseTemplate(
                 'nav.html',
                 [
