@@ -9,6 +9,7 @@ use function setcookie;
 final class Request
 {
     /**
+     * Access $_GET and $_POST together. Prioritizes $_POST
      * @SuppressWarnings("PHPMD.Superglobals")
      */
     public function both(string $property)
@@ -17,6 +18,7 @@ final class Request
     }
 
     /**
+     * Access $_GET
      * @SuppressWarnings("PHPMD.Superglobals")
      */
     public function get(string $property)
@@ -25,6 +27,7 @@ final class Request
     }
 
     /**
+     * Access $_POST
      * @SuppressWarnings("PHPMD.Superglobals")
      */
     public function post(string $property)
@@ -33,11 +36,20 @@ final class Request
     }
 
     /**
+     * Access $_COOKIE
      * @SuppressWarnings("PHPMD.Superglobals")
      */
     public function cookie(string $cookieName)
     {
         return $_COOKIE[$cookieName] ?? null;
+    }
+
+    /**
+     * Access $_FILES
+     * @SuppressWarnings("PHPMD.Superglobals")
+     */
+    public function files(string $property) {
+        return $_FILES[$property] ?? null;
     }
 
     /**

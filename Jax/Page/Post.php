@@ -90,13 +90,13 @@ final class Post
             $this->postdata = str_replace('youtube]', 'video]', $this->postdata);
         }
 
+        $fileData = $this->request->files('Filedata');
         if (
-            isset($_FILES['Filedata'], $_FILES['Filedata']['tmp_name'])
-            && $_FILES['Filedata']['tmp_name']
+            $fileData !== null
+            && $fileData['tmp_name']
         ) {
-            $this->postdata .= '[attachment]'
-                . $this->upload($_FILES['Filedata'])
-                . '[/attachment]';
+            $attachmentId = $this->upload($fileData);
+            $this->postdata .= "[attachment]{$attachmentId}[/attachment]";
         }
 
         if (
