@@ -55,7 +55,7 @@ final class Page
                 'sidebar-list-link.html',
                 [
                     'title' => $title,
-                    'url' => '?act=' . (string) $this->request->get('act') . '&do=' . $do,
+                    'url' => '?act=' . $this->request->get('act') . '&do=' . $do,
                 ],
             );
         }
@@ -128,12 +128,12 @@ final class Page
     /**
      * Parse a template file, replacing {{ key }} with the value of $data['key'].
      *
-     * @param string $templateFile The path to the template file. Paths
-     *                             that don't start with a '/' character
-     *                             will start searching in the
-     *                             JAXBOARDS_ROOT/ACP/views/
-     *                             directory.
-     * @param array<string,string> $data Template variables to be replaced
+     * @param string               $templateFile The path to the template file. Paths
+     *                                           that don't start with a '/' character
+     *                                           will start searching in the
+     *                                           JAXBOARDS_ROOT/ACP/views/
+     *                                           directory.
+     * @param array<string,string> $data         Template variables to be replaced
      *
      * @return string returns the template with the data replaced
      */
@@ -156,7 +156,7 @@ final class Page
         $template = file_get_contents($templateFile);
 
         return str_replace(
-            array_map(static fn($name): string => '{{ ' . mb_strtolower((string) $name) . ' }}', array_keys($data)),
+            array_map(static fn($name): string => '{{ ' . mb_strtolower($name) . ' }}', array_keys($data)),
             array_map(static fn($content): string => "{$content}", $data),
             $template,
         ) . PHP_EOL;
