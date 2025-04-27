@@ -228,7 +228,8 @@ a:visited {
 }
 
 .box .header {
-  background: url('../img/acp-box-header.png');
+  background: linear-gradient(#1b63b6, #192c44);
+  line-height: 36px;
   font-size: 16px;
   color: #fff;
 }
