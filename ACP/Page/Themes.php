@@ -66,28 +66,28 @@ final readonly class Themes
         ]);
 
         if ($this->request->get('editcss')) {
-            $this->editcss($this->request->get('editcss'));
+            $this->editCSS($this->request->get('editcss'));
         } elseif (
             $this->request->get('editwrapper')
         ) {
-            $this->editwrapper($this->request->get('editwrapper'));
+            $this->editWrapper($this->request->get('editwrapper'));
         } elseif (
             is_numeric($this->request->get('deleteskin'))
         ) {
-            $this->deleteskin($this->request->get('deleteskin'));
+            $this->deleteSkin($this->request->get('deleteskin'));
         } elseif (
             $this->request->get('do') === 'create'
         ) {
-            $this->createskin();
+            $this->createSkin();
         } else {
-            $this->showskinindex();
+            $this->showSkinIndex();
         }
     }
 
     /**
      * @return array<string>
      */
-    private function getwrappers(): array
+    private function getWrappers(): array
     {
         $wrappers = [];
         $o = opendir($this->wrappersPath);
@@ -108,7 +108,7 @@ final readonly class Themes
         return $wrappers;
     }
 
-    private function showskinindex(): void
+    private function showSkinIndex(): void
     {
         $errorskins = '';
         $errorwrapper = '';
@@ -158,7 +158,7 @@ final readonly class Themes
         }
 
         // Make an array of wrappers.
-        $wrappers = $this->getwrappers();
+        $wrappers = $this->getWrappers();
 
         if ($this->request->post('submit') !== null) {
             // Update wrappers/hidden status.
@@ -171,10 +171,11 @@ final readonly class Themes
                         continue;
                     }
 
+                    $hidden = $this->request->post('hidden') ?? [];
                     $this->database->safeupdate(
                         'skins',
                         [
-                            'hidden' => $this->request->post('hidden')[$k] ? 1 : 0,
+                            'hidden' => array_key_exists($k, $hidden) ? 1 : 0,
                             'wrapper' => $v,
                         ],
                         'WHERE `id`=?',
@@ -259,7 +260,7 @@ final readonly class Themes
                         );
                     }
 
-                    $wrappers = $this->getwrappers();
+                    $wrappers = $this->getWrappers();
                 }
             }
 
@@ -381,7 +382,7 @@ final readonly class Themes
         );
     }
 
-    private function editcss($id): void
+    private function editCSS($id): void
     {
         $result = $this->database->safeselect(
             [
@@ -427,7 +428,7 @@ final readonly class Themes
         );
     }
 
-    private function editwrapper($wrapper): void
+    private function editWrapper($wrapper): void
     {
         $saved = '';
         $wrapperf = $this->wrappersPath . $wrapper . '.html';
@@ -466,7 +467,7 @@ final readonly class Themes
         }
     }
 
-    private function createskin(): void
+    private function createSkin(): void
     {
         $page = '';
         if ($this->request->post('submit') !== null) {
@@ -475,7 +476,7 @@ final readonly class Themes
                 (bool) preg_match('@[^\w ]@', (string) $this->request->post('skinname')) => 'Skinname must only consist of letters, numbers, and spaces.',
                 mb_strlen((string) $this->request->post('skinname')) > 50 => 'Skin name must be less than 50 characters.',
                 is_dir($this->themesPath . $this->request->post('skinname')) => 'A skin with that name already exists.',
-                !in_array($this->request->post('wrapper'), $this->getwrappers()) => 'Invalid wrapper.',
+                !in_array($this->request->post('wrapper'), $this->getWrappers()) => 'Invalid wrapper.',
                 default => null,
             };
 
@@ -530,7 +531,7 @@ final readonly class Themes
         }
 
         $wrapperOptions = '';
-        foreach ($this->getwrappers() as $wrapper) {
+        foreach ($this->getWrappers() as $wrapper) {
             $wrapperOptions .= $this->page->parseTemplate(
                 'select-option.html',
                 [
@@ -550,7 +551,7 @@ final readonly class Themes
         $this->page->addContentBox('Create New Skin', $page);
     }
 
-    private function deleteskin(string $id): void
+    private function deleteSkin(string $id): void
     {
         $result = $this->database->safeselect(
             '`id`,`using`,`title`,`custom`,`wrapper`,`default`,`hidden`',

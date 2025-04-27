@@ -42,7 +42,7 @@ final class Page
             $this->parts[$partName] = '';
         }
 
-        $this->parts[$partName] = $content;
+        $this->parts[$partName] .= $content;
     }
 
     /**
