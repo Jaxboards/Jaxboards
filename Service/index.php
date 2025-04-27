@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use DI\Container;
 use Jax\Page\ServiceSignup;
 
 /*
@@ -24,5 +25,6 @@ require_once JAXBOARDS_ROOT . '/Jax/autoload.php';
 if (!file_exists(JAXBOARDS_ROOT . '/config.php')) {
     echo 'Jaxboards not installed!';
 } else {
+    $container = new Container();
     $container->get(ServiceSignup::class)->render();
 }

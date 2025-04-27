@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use DI\Container;
 use Jax\API;
 
 if (!defined('JAXBOARDS_ROOT')) {
@@ -10,4 +11,5 @@ if (!defined('JAXBOARDS_ROOT')) {
 
 require_once JAXBOARDS_ROOT . '/Jax/autoload.php';
 
+$container = new Container();
 $container->get(API::class)->render();

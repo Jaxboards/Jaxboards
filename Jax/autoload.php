@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use DI\Container;
-
 use function define;
 use function defined;
 use function dirname;
@@ -29,5 +27,3 @@ spl_autoload_register(static function ($className): void {
 
     require_once $classPath;
 });
-
-$container = new Container();

@@ -55,7 +55,7 @@ final class Page
                 'sidebar-list-link.html',
                 [
                     'title' => $title,
-                    'url' => '?act=' . ($this->request->get('act') ?: '') . '&do=' . $do,
+                    'url' => '?act=' . (string) $this->request->get('act') . '&do=' . $do,
                 ],
             );
         }
@@ -100,7 +100,7 @@ final class Page
         );
     }
 
-    public function error(string $content): ?string
+    public function error(string $content): string
     {
         return $this->parseTemplate(
             'error.html',
@@ -110,7 +110,7 @@ final class Page
         );
     }
 
-    public function success(string $content): ?string
+    public function success(string $content): string
     {
         return $this->parseTemplate(
             'success.html',
@@ -133,7 +133,7 @@ final class Page
      *                             will start searching in the
      *                             JAXBOARDS_ROOT/ACP/views/
      *                             directory.
-     * @param array<string,string> Template variables to be replaced
+     * @param array<string,string> $data Template variables to be replaced
      *
      * @return string returns the template with the data replaced
      */

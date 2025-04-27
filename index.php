@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-
+use DI\Container;
 use Jax\App;
 
 if (!defined('JAXBOARDS_ROOT')) {
@@ -20,5 +20,5 @@ require_once JAXBOARDS_ROOT . '/Jax/autoload.php';
  *
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
-
+$container = new Container();
 $container->get(App::class)->render();
