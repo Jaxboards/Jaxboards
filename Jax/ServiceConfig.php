@@ -49,6 +49,7 @@ final class ServiceConfig
 
     /**
      * @param array<string,mixed> $override
+     *
      * @return array<string,mixed>
      */
     public function override(?array $override = null): array

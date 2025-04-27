@@ -55,10 +55,12 @@ final class Config
 
         return null;
     }
+
     /**
-     * Write board config
+     * Write board config.
      *
      * @param array<string,mixed>
+     * @param mixed $data
      */
     public function write($data): void
     {
@@ -68,7 +70,7 @@ final class Config
     }
 
     /**
-     * Write service config during installation
+     * Write service config during installation.
      *
      * @param array<string,mixed>
      */
