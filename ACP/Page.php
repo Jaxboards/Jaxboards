@@ -150,9 +150,9 @@ final class Page
             ],
         );
         $boardURL = $this->domainDefinitions->getBoardURL();
-        $data['css_url'] = $boardURL . '/acp/css/css.css';
+        $data['css_url'] = $boardURL . '/ACP/css/css.css';
         $data['bbcode_css_url'] = $boardURL . '/Service/Themes/Default/bbcode.css';
-        $data['themes_css_url'] = $boardURL . '/acp/css/themes.css';
+        $data['themes_css_url'] = $boardURL . '/ACP/css/themes.css';
         $data['admin_js_url'] = $boardURL . '/dist/acp.js';
 
         echo $this->parseTemplate(
@@ -199,7 +199,7 @@ final class Page
      * @param string $templateFile The path to the template file. Paths
      *                             that don't start with a '/' character
      *                             will start searching in the
-     *                             JAXBOARDS_ROOT/acp/views/
+     *                             JAXBOARDS_ROOT/ACP/views/
      *                             directory.
      * @param array  $data         A key => value array, where {{ key }}
      *                             is replaced by value
@@ -211,7 +211,7 @@ final class Page
         array $data = [],
     ): ?string {
         if (mb_substr($templateFile, 0, 1) !== '/') {
-            $templateFile = JAXBOARDS_ROOT . '/acp/views/' . $templateFile;
+            $templateFile = JAXBOARDS_ROOT . '/ACP/views/' . $templateFile;
         }
 
         if (pathinfo($templateFile, PATHINFO_EXTENSION) !== 'html') {
