@@ -163,6 +163,8 @@ final class Session
             $token = $this->database->arow($result);
             if ($token) {
                 $this->setPHPSessionValue('uid', $token['uid']);
+
+                return $token['uid'];
             }
         }
 
