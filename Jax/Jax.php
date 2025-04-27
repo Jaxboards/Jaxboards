@@ -21,12 +21,9 @@ use function unlink;
 
 use const PHP_EOL;
 
-/**
- * @psalm-api
- */
 final readonly class Jax
 {
-    public function __construct(private Config $config) {}
+    public function __construct(private Config $config, private DomainDefinitions $domainDefinitions) {}
 
     public function pick(...$args)
     {
@@ -168,11 +165,15 @@ final readonly class Jax
         return round($bs, 2) . ' ' . ($p !== 0 ? $sizes[$p] : '') . 'B';
     }
 
+
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     public function mail($email, $topic, $message)
     {
         $boardname = $this->config->getSetting('boardname') ?: 'JaxBoards';
-        $boardurl = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['PHP_SELF'];
-        $boardlink = "<a href='https://" . $boardurl . "'>" . $boardname . '</a>';
+        $boardurl = $this->domainDefinitions->getBoardURL();
+        $boardlink = "<a href='{$boardurl}'>{$boardname}</a>";
 
         return @mail(
             (string) $email,

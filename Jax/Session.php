@@ -20,17 +20,14 @@ use function session_start;
 use function time;
 use function unserialize;
 
-/**
- * @psalm-api
- */
 final class Session
 {
-    /**
+    /*
      * @var array<mixed>
      */
     private $data = [];
 
-    /**
+    /*
      * @var array<string,string>
      */
     private $bots = [
@@ -131,7 +128,7 @@ final class Session
 
     public function fetchSessionData(): void
     {
-        $this->data = $this->getSess($_SESSION['sid'] ?? null);
+        $this->data = $this->getSess($this->getPHPSessionValue('sid') ?? null);
         if (!isset($this->data['vars'])) {
             $this->data['vars'] = serialize([]);
         }
@@ -152,8 +149,9 @@ final class Session
             return null;
         }
 
+        $userId = $this->getPHPSessionValue('uid');
         if (
-            !isset($_SESSION['uid'])
+            $userId === null
             && $this->request->cookie('utoken') !== null
         ) {
             $result = $this->database->safeselect(
@@ -164,28 +162,43 @@ final class Session
             );
             $token = $this->database->arow($result);
             if ($token) {
-                $_SESSION['uid'] = $token['uid'];
+                $this->setPHPSessionValue('uid', $token['uid']);
             }
         }
 
-        return $_SESSION['uid'] ?? 0;
+        return $userId ?? 0;
+    }
+
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
+    private function getBotName(): ?string
+    {
+        foreach ($this->bots as $agentName => $friendlyName) {
+            if (str_contains(mb_strtolower($this->getUserAgent()), mb_strtolower($agentName))) {
+                return $friendlyName;
+            }
+        }
+
+        return null;
+    }
+
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
+    private function getUserAgent(): ?string {
+        return $_SERVER['HTTP_USER_AGENT'] ?: null;
     }
 
     public function getSess($sid = null): array
     {
-        $isbot = 0;
         $session = [];
-        foreach ($this->bots as $agentName => $friendlyName) {
-            if (mb_stripos(mb_strtolower((string) $_SERVER['HTTP_USER_AGENT']), (string) $agentName) === false) {
-                continue;
-            }
+        $botName = $this->getBotName();
 
-            $sid = $friendlyName;
-            $isbot = 1;
-        }
+        if ($botName) $sid = $botName;
 
         if ($sid) {
-            $result = $isbot === 0
+            $result = $botName === null
                 ? $this->database->safeselect(
                     [
                         'buddy_list_cache',
@@ -248,13 +261,9 @@ final class Session
             return $session;
         }
 
-        if ($isbot === 0) {
+        if ($botName === null) {
             $sid = base64_encode(openssl_random_pseudo_bytes(128));
-        }
-
-
-        if ($isbot === 0) {
-            $_SESSION['sid'] = $sid;
+            $this->setPHPSessionValue('sid', $sid);
         }
 
         $actionTime = $this->database->datetime();
@@ -262,12 +271,12 @@ final class Session
             'forumsread' => '{}',
             'id' => $sid,
             'ip' => $this->ipAddress->asBinary(),
-            'is_bot' => $isbot,
+            'is_bot' => $botName === null ? 0 : 1,
             'last_action' => $actionTime,
             'last_update' => $actionTime,
             'runonce' => '',
             'topicsread' => '{}',
-            'useragent' => $_SERVER['HTTP_USER_AGENT'],
+            'useragent' => $this->getUserAgent(),
         ];
 
         $uid = $this->user->get('id');
@@ -286,6 +295,20 @@ final class Session
     public function get(string $field)
     {
         return $this->data[$field] ?? null;
+    }
+
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
+    public function getPHPSessionValue(string $field) {
+        return $_SESSION[$field] ?? null;
+    }
+
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
+    public function setPHPSessionValue(string $field, string|int $value) {
+        return $_SESSION[$field] = $value;
     }
 
     public function set(string $field, mixed $value): void

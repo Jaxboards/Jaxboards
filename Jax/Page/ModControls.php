@@ -42,9 +42,6 @@ use function trim;
 use const FILTER_VALIDATE_IP;
 use const PHP_EOL;
 
-/**
- * @psalm-api
- */
 final class ModControls
 {
     private $perms;

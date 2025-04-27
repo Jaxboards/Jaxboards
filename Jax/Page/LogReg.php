@@ -41,9 +41,6 @@ use const CURLOPT_RETURNTRANSFER;
 use const CURLOPT_URL;
 use const PASSWORD_DEFAULT;
 
-/**
- * @psalm-api
- */
 final class LogReg
 {
     private $registering = false;
@@ -238,7 +235,7 @@ final class LogReg
                     $this->page->JS('closewindow', '#loginform');
                 }
 
-                $_SESSION['uid'] = $user['id'];
+                $this->session->setPHPSessionValue('uid', $user['id']);
                 $loginToken = base64_encode(openssl_random_pseudo_bytes(128));
                 $this->database->safeinsert(
                     'tokens',

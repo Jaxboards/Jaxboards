@@ -36,16 +36,13 @@ use function trim;
 use const LOG_EMERG;
 use const PHP_EOL;
 
-/**
- * @psalm-api
- */
 final class Search
 {
     private $pagenum = 0;
 
     private $fids = [];
 
-    /**
+    /*
      * @var int
      */
     private $perpage;

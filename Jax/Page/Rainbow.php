@@ -7,9 +7,6 @@ namespace Jax\Page;
 use Jax\DomainDefinitions;
 use Jax\Page;
 
-/**
- * @psalm-api
- */
 final readonly class Rainbow
 {
     public function __construct(

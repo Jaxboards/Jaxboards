@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\Database;
+use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
@@ -24,9 +25,6 @@ use function sprintf;
 use function ucfirst;
 use function ucwords;
 
-/**
- * @psalm-api
- */
 final class UserProfile
 {
     private $num_activity = 30;
@@ -46,6 +44,7 @@ final class UserProfile
 
     public function __construct(
         private readonly Database $database,
+        private readonly DomainDefinitions $domainDefinitions,
         private readonly IPAddress $ipAddress,
         private readonly Jax $jax,
         private readonly Page $page,
@@ -553,8 +552,7 @@ final class UserProfile
                             [
                                 'description' => $data['text'],
                                 'guid' => $activity['id'],
-                                'link' => 'https://' . $_SERVER['SERVER_NAME']
-                                . $_SERVER['PHP_SELF'] . $data['link'],
+                                'link' => $this->domainDefinitions->getBoardUrl() . $data['link'],
                                 'pubDate' => gmdate('r', $activity['date']),
                                 'title' => $data['text'],
                             ],

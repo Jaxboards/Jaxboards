@@ -33,22 +33,19 @@ use function urlencode;
 
 use const ENT_QUOTES;
 
-/**
- * @psalm-api
- */
 final class TextFormatting
 {
-    /**
+    /*
      * @var array<string, array>
      */
     private $attachmentData;
 
-    /**
+    /*
      * @var array<string, string>
      */
     private $badwords = [];
 
-    /**
+    /*
      * Merged emote pack rules with custom emote rules.
      *
      * @var array<string, string>
@@ -57,7 +54,7 @@ final class TextFormatting
 
     private ?string $emotePack = null;
 
-    /**
+    /*
      * Emotes from the emote pack.
      *
      * @var array<string, string>
@@ -148,6 +145,9 @@ final class TextFormatting
         );
     }
 
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     public function linkify_callback(array $match): string
     {
         $url = parse_url((string) $match[2]);

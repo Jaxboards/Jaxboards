@@ -38,9 +38,6 @@ use function unlink;
 use const PATHINFO_FILENAME;
 use const PHP_EOL;
 
-/**
- * @psalm-api
- */
 final readonly class Themes
 {
     private string $wrappersPath;
@@ -88,7 +85,7 @@ final readonly class Themes
         }
     }
 
-    /**
+    /*
      * @return array<string>
      */
     private function getwrappers(): array

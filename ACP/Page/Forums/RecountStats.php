@@ -10,9 +10,6 @@ use Jax\Database;
 use function array_pop;
 use function explode;
 
-/**
- * @psalm-api
- */
 final readonly class RecountStats
 {
     public function __construct(

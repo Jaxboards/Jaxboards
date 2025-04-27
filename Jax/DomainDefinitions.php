@@ -42,6 +42,9 @@ final class DomainDefinitions
 
     private string $defaultThemePath = '';
 
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     public function __construct(private readonly ServiceConfig $serviceConfig)
     {
         $serviceConfig = $this->serviceConfig->get();

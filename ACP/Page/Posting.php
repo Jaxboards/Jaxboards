@@ -16,9 +16,6 @@ use function rawurlencode;
 
 use const PHP_EOL;
 
-/**
- * @psalm-api
- */
 final readonly class Posting
 {
     public function __construct(
@@ -151,7 +148,7 @@ final readonly class Posting
             $this->database->safedelete(
                 'textrules',
                 "WHERE `type`='emote' AND `needle`=?",
-                $this->database->basicvalue($_GET['d']),
+                $this->database->basicvalue($this->request->get('d')),
             );
         }
 

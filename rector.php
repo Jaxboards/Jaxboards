@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * Rector configuration.
  *
  * @see https://getrector.com/documentation

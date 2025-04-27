@@ -18,9 +18,6 @@ use function trim;
 
 use const PHP_EOL;
 
-/**
- * @psalm-api
- */
 final readonly class Settings
 {
     public function __construct(
@@ -106,7 +103,7 @@ final readonly class Settings
         $this->page->addContentBox('Board Online/Offline', $page);
     }
 
-    /**
+    /*
      * Custom pages.
      */
     private function pages(): void
@@ -231,7 +228,7 @@ final readonly class Settings
         $this->page->addContentBox("Editing Page: {$pageurl}", $page);
     }
 
-    /**
+    /*
      * Shoutbox.
      */
     private function shoutbox(): void

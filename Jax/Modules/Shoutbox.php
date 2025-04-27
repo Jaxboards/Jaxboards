@@ -23,9 +23,6 @@ use function trim;
 
 use const PHP_EOL;
 
-/**
- * @psalm-api
- */
 final class Shoutbox
 {
     public const TAG = true;

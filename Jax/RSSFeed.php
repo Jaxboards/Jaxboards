@@ -11,12 +11,9 @@ use function header;
 use function implode;
 use function is_array;
 
-/**
- * @psalm-api
- */
 final class RSSFeed
 {
-    /**
+    /*
      * @var array<string, array|string>
      */
     private $feed = [];

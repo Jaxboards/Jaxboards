@@ -18,9 +18,6 @@ use function is_numeric;
 use function mb_strtolower;
 use function readfile;
 
-/**
- * @psalm-api
- */
 final readonly class Download
 {
     public function __construct(

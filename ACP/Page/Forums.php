@@ -35,9 +35,6 @@ use function unpack;
 
 use const PHP_EOL;
 
-/**
- * @psalm-api
- */
 final readonly class Forums
 {
     public function __construct(
@@ -95,7 +92,7 @@ final readonly class Forums
         };
     }
 
-    /**
+    /*
      * Saves the posted tree to mysql.
      *
      * @param array  $tree  The tree to save
@@ -348,7 +345,7 @@ final readonly class Forums
         $this->page->addContentBox('Forums', $page);
     }
 
-    /**
+    /*
      * Create & Edit forum.
      *
      * @param int $fid The forum ID. If set, this edits a forum,
@@ -359,6 +356,8 @@ final readonly class Forums
         $page = '';
         $forumperms = '';
         $fdata = [];
+        $error = null;
+
         if ($fid) {
             $result = $this->database->safeselect(
                 [
@@ -493,7 +492,6 @@ final readonly class Forums
             ];
             $this->database->disposeresult($result);
 
-            $error = null;
             // Add per-forum moderator.
             if (is_numeric($this->request->post('modid'))) {
                 $result = $this->database->safeselect(
@@ -1064,7 +1062,7 @@ final readonly class Forums
         $this->page->addContentBox('Category Deletion', $page);
     }
 
-    /**
+    /*
      * This function updates all of the user->mod flags
      * that specify whether or not a user is a per-forum mod
      * based on the comma delimited list of mods for each forum.

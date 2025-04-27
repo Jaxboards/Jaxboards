@@ -14,12 +14,9 @@ use function ceil;
 use function is_numeric;
 use function sprintf;
 
-/**
- * @psalm-api
- */
 final class Members
 {
-    /**
+    /*
      * @var float|int
      */
     private $pageNumber = 0;

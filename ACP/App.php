@@ -8,13 +8,14 @@ use DI\Container;
 use Exception;
 use Jax\Config;
 use Jax\Request;
+use Jax\Session;
 use Jax\User;
 
 use function header;
 use function ini_set;
 use function session_start;
 
-/**
+/*
  * Admin control panel.
  *
  * PHP Version 5.3.7
@@ -29,14 +30,14 @@ final readonly class App
         private Page $page,
         private Request $request,
         private User $user,
+        private Session $session,
     ) {}
 
     public function render(): void
     {
-        $this->startSession();
-
-        if (isset($_SESSION['auid'])) {
-            $this->user->getUser($_SESSION['auid']);
+        $adminUserId = $this->session->getPHPSessionValue('auid');
+        if ($adminUserId) {
+            $this->user->getUser($adminUserId);
         }
 
         if (!$this->user->getPerm('can_access_acp')) {
@@ -122,8 +123,8 @@ final readonly class App
             try {
                 $page = $this->container->get('ACP\Page\\' . $act);
                 $page->render();
-            } catch (Exception) {
-                // invalid act
+            } catch(\DI\NotFoundException) {
+                $this->page->addContentBox('Error', "Invalid action: {$act}");
             }
         }
 

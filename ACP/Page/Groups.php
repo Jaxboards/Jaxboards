@@ -21,9 +21,6 @@ use function preg_match;
 
 use const PHP_EOL;
 
-/**
- * @psalm-api
- */
 final class Groups
 {
     private $updatePermissions = true;

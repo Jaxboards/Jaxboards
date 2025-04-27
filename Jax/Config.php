@@ -11,9 +11,6 @@ use function json_encode;
 
 use const JSON_PRETTY_PRINT;
 
-/**
- * @psalm-api
- */
 final readonly class Config
 {
     public function __construct(

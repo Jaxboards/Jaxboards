@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-/**
+/*
  * Update our composer version to the latest available.
  */
 

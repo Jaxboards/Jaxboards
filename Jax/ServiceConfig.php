@@ -7,9 +7,6 @@ namespace Jax;
 use function array_merge;
 use function file_exists;
 
-/**
- * @psalm-api
- */
 final class ServiceConfig
 {
     public function get(): array

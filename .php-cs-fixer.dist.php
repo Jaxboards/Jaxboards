@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * php-cs-fixer configuration
  *
  * This document has been generated with

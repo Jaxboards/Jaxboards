@@ -15,9 +15,6 @@ use function unpack;
 
 use const PASSWORD_DEFAULT;
 
-/**
- * @psalm-api
- */
 final class User
 {
     public ?array $userData = null;
@@ -234,7 +231,7 @@ final class User
         return $this->userPerms;
     }
 
-    /**
+    /*
      * This function expands the permissions bitflag into a readable associative array.
      *
      * This function can receive either a binary encoded string (which is an array of all group bitflags)

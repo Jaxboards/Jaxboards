@@ -6,6 +6,7 @@ namespace Jax\Page;
 
 use Jax\Config;
 use Jax\Database;
+use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
@@ -37,37 +38,34 @@ use function time;
 
 use const PHP_EOL;
 
-/**
- * @psalm-api
- */
 final class Topic
 {
-    /**
+    /*
      * @var int
      */
     private $tid = 0;
 
-    /**
+    /*
      * @var int
      */
     private $pageNumber = 0;
 
-    /**
+    /*
      * @var int
      */
     private $numperpage = 0;
 
-    /**
+    /*
      * @var bool
      */
     private $canMod = false;
 
-    /**
+    /*
      * @var int
      */
     private $firstPostID = 0;
 
-    /**
+    /*
      * @var null|array
      */
     private $topicdata;
@@ -75,6 +73,7 @@ final class Topic
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
+        private readonly DomainDefinitions $domainDefinitions,
         private readonly Jax $jax,
         private readonly IPAddress $ipAddress,
         private readonly Page $page,
@@ -1424,14 +1423,16 @@ final class Topic
         $this->page->JS('listrating', $pid, $page);
     }
 
+    /*
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
     private function viewrss(int $tid): void
     {
-
-        $link = 'https://' . $_SERVER['SERVER_NAME'] . $_SERVER['SCRIPT_NAME'];
+        $boardURL = $this->domainDefinitions->getBoardURL();
         $feed = new RSSFeed(
             [
                 'description' => $this->topicdata['subtitle'],
-                'link' => $link . '?act=vt' . $tid,
+                'link' => "{$boardURL}?act=vt{$tid}",
                 'title' => $this->topicdata['topic_title'],
             ],
         );
@@ -1455,7 +1456,7 @@ final class Topic
                 [
                     'description' => $this->textFormatting->blockhtml($this->textFormatting->theworks($post['post'])),
                     'guid' => $post['id'],
-                    'link' => "{$link}?act=vt{$tid}&amp;findpost={$post['id']}",
+                    'link' => "{$boardURL}?act=vt{$tid}&amp;findpost={$post['id']}",
                     'pubDate' => gmdate('r', $post['date']),
                     'title' => $post['display_name'] . ':',
                 ],

@@ -10,9 +10,6 @@ use Jax\Request;
 
 use function nl2br;
 
-/**
- * @psalm-api
- */
 final readonly class BoardOffline
 {
     public function __construct(

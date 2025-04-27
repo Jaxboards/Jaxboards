@@ -35,7 +35,7 @@ require_once JAXBOARDS_ROOT . '/ACP/Page.php';
 // Get default CFG.
 require_once JAXBOARDS_ROOT . '/config.default.php';
 
-/**
+/*
  * Recursively copies one directory to another.
  *
  * @param string $src The source directory- this must exist already

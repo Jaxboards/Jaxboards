@@ -40,9 +40,6 @@ use const FILTER_VALIDATE_IP;
 use const PASSWORD_DEFAULT;
 use const PHP_EOL;
 
-/**
- * @psalm-api
- */
 final readonly class Members
 {
     private const DEFAULT_AVATAR = '/Service/Themes/Default/avatars/default.gif';
@@ -913,11 +910,11 @@ final readonly class Members
 
     private function validation(): void
     {
-        if (isset($_POST['submit1'])) {
+        if ($this->request->post('submit1') !== null) {
             $this->config->write(
                 [
-                    'membervalidation' => isset($_POST['v_enable'])
-                    && $_POST['v_enable'] ? 1 : 0,
+                    'membervalidation' => $this->request->post('v_enable') !== null
+                    && $this->request->post('v_enable') ? 1 : 0,
                 ],
             );
         }
@@ -931,14 +928,14 @@ final readonly class Members
         ) . PHP_EOL;
         $this->page->addContentBox('Enable Member Validation', $page);
 
-        if (isset($_POST['mid']) && $_POST['action'] === 'Allow') {
+        if ($this->request->post('mid') !== null && $this->request->post('action') === 'Allow') {
             $this->database->safeupdate(
                 'members',
                 [
                     'group_id' => 1,
                 ],
                 'WHERE `id`=?',
-                $this->database->basicvalue($_POST['mid']),
+                $this->database->basicvalue($this->request->post('mid')),
             );
         }
 
