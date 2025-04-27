@@ -375,10 +375,6 @@ class ServiceInstall
             $this->recurseCopy('blueprint', dirname(__DIR__) . '/boards/' . $board);
         }
 
-        // Create lock file.
-        $file = fopen(SERVICE_ROOT . '/install.lock', 'w');
-        fwrite($file, '');
-        fclose($file);
         // Send us to the service page.
         header('Refresh:0');
 
