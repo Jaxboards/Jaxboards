@@ -203,7 +203,6 @@ final readonly class Members
                     } else {
                         $page = $this->page->error(
                             'You do not have permission to edit this profile.'
-                            . $this->page->back(),
                         );
                     }
                 }
@@ -341,7 +340,7 @@ final readonly class Members
             if ($nummembers === 0) {
                 $this->page->addContentBox(
                     'Error',
-                    $this->page->error('This member does not exist. ' . $this->page->back()),
+                    $this->page->error('This member does not exist. '),
                 );
 
                 return;
@@ -349,10 +348,7 @@ final readonly class Members
 
             $data = array_pop($data);
             if ($data['group_id'] === 2 && $userData['id'] !== 1) {
-                $page = $this->page->error(
-                    'You do not have permission to edit this profile. '
-                    . $this->page->back(),
-                );
+                $page = $this->page->error('You do not have permission to edit this profile. ');
             } else {
                 $page .= $this->jax->hiddenFormFields(['mid' => $data['id']]);
                 $page .= $this->formfield('Display Name:', 'display_name', $data['display_name']);
@@ -388,9 +384,7 @@ final readonly class Members
                 );
             }
         } else {
-            $page = $this->page->parseTemplate(
-                'members/edit.html',
-            );
+            $page = $this->page->parseTemplate('members/edit.html');
         }
 
         $this->page->addContentBox(
@@ -461,9 +455,7 @@ final readonly class Members
             }
         }
 
-        $page .= $this->page->parseTemplate(
-            'members/pre-register.html',
-        );
+        $page .= $this->page->parseTemplate('members/pre-register.html');
         $this->page->addContentBox('Pre-Register', $page);
     }
 

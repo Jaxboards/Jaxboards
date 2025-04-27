@@ -57,12 +57,12 @@ final readonly class Tools
         $this->page->sidebar([
             'backup' => 'Backup',
             'files' => 'File Manager',
-            'errorlog' => 'View Error Log',
+            'viewErrorLog' => 'View Error Log',
         ]);
 
         match ($this->request->both('do')) {
             'backup' => $this->backup(),
-            'errorlog' => $this->errorlog(),
+            'viewErrorLog' => $this->viewErrorLog(),
             default => $this->filemanager(),
         };
     }
@@ -266,7 +266,7 @@ final readonly class Tools
         );
     }
 
-    private function errorlog(): void
+    private function viewErrorLog(): void
     {
         $logPath = ini_get('error_log');
 

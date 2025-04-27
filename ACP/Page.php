@@ -31,60 +31,17 @@ final class Page
         'title' => '',
     ];
 
-    /**
-     * @var array<string,string>
-     */
-    private $partparts = [
-        'nav' => '',
-        'navdropdowns' => '',
-    ];
-
     public function __construct(
         private readonly DomainDefinitions $domainDefinitions,
         private readonly Request $request,
     ) {}
 
-    /**
-     * Creates a nav menu in the ACP.
-     *
-     * @param string $title The name of the button
-     * @param string $page  The URL the button links to
-     * @param array  $menu  A list of links and associated labels to print
-     *                      out as a drop down list
-     */
-    public function addNavmenu(string $title, string $page, array $menu): void
-    {
-        $this->partparts['nav'] .= $this->parseTemplate(
-            'nav-link.html',
-            [
-                'class' => mb_strtolower($title),
-                'page' => $page,
-                'title' => $title,
-            ],
-        ) . PHP_EOL;
-
-        $navDropdownLinksTemplate = '';
-        foreach ($menu as $menuURL => $menuTitle) {
-            $navDropdownLinksTemplate .= $this->parseTemplate(
-                'nav-dropdown-link.html',
-                [
-                    'title' => $menuTitle,
-                    'url' => $menuURL,
-                ],
-            ) . PHP_EOL;
-        }
-
-        $this->partparts['navdropdowns'] .= $this->parseTemplate(
-            'nav-dropdown.html',
-            [
-                'dropdown_id' => 'menu_' . mb_strtolower($title),
-                'dropdown_links' => $navDropdownLinksTemplate,
-            ],
-        ) . PHP_EOL;
-    }
-
     public function append(string $partName, string $content): void
     {
+        if (!isset($this->parts[$partName])) {
+            $this->parts[$partName] = '';
+        }
+
         $this->parts[$partName] = $content;
     }
 
@@ -114,41 +71,21 @@ final class Page
         );
     }
 
-    public function title(string $title): void
-    {
-        $this->parts['title'] = $title;
-    }
-
     public function addContentBox(string $title, string $content): void
     {
-        $this->parts['content'] .= $this->parseTemplate(
+        $this->append('content', $this->parseTemplate(
             'content-box.html',
             [
                 'content' => $content,
                 'title' => $title,
             ],
-        );
+        ));
     }
 
     public function out(): void
     {
         $data = $this->parts;
 
-        if (!isset($this->partparts['nav'])) {
-            $this->partparts['nav'] = '';
-        }
-
-        if (!isset($this->partparts['navdropdowns'])) {
-            $this->partparts['navdropdowns'] = '';
-        }
-
-        $data['nav'] = $this->parseTemplate(
-            'nav.html',
-            [
-                'nav' => $this->partparts['nav'],
-                'nav_dropdowns' => $this->partparts['navdropdowns'],
-            ],
-        );
         $boardURL = $this->domainDefinitions->getBoardURL();
         $data['css_url'] = $boardURL . '/ACP/css/css.css';
         $data['bbcode_css_url'] = $boardURL . '/Service/Themes/Default/bbcode.css';
@@ -158,13 +95,6 @@ final class Page
         echo $this->parseTemplate(
             'admin.html',
             $data,
-        );
-    }
-
-    public function back(): ?string
-    {
-        return $this->parseTemplate(
-            'back.html',
         );
     }
 

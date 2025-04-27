@@ -20,15 +20,20 @@ use function header;
  *
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
-final readonly class App
+final class App
 {
+    private array $nav = [
+        'dropdowns' => '',
+        'links' => '',
+    ];
+
     public function __construct(
-        private Config $config,
-        private Container $container,
-        private Page $page,
-        private Request $request,
-        private User $user,
-        private Session $session,
+        private readonly Config $config,
+        private readonly Container $container,
+        private readonly Page $page,
+        private readonly Request $request,
+        private readonly User $user,
+        private readonly Session $session,
     ) {}
 
     public function render(): void
@@ -41,12 +46,12 @@ final readonly class App
         if (!$this->user->getPerm('can_access_acp')) {
             header('Location: ./');
 
-            exit;
+            return;
         }
 
-        $this->page->append('username', $this->user->get('display_name'));
-        $this->page->title($this->config->getSetting('boardname') . ' - ACP');
-        $this->page->addNavMenu(
+        $this->page->append('username', (string) $this->user->get('display_name'));
+        $this->page->append('title', $this->config->getSetting('boardname') . ' - ACP');
+        $this->addNavMenu(
             'Settings',
             '?act=Settings',
             [
@@ -56,7 +61,7 @@ final readonly class App
                 '?act=Settings&do=shoutbox' => 'Shoutbox',
             ],
         );
-        $this->page->addNavMenu(
+        $this->addNavMenu(
             'Members',
             '?act=Members',
             [
@@ -69,7 +74,7 @@ final readonly class App
                 '?act=Members&do=validation' => 'Validation',
             ],
         );
-        $this->page->addNavMenu(
+        $this->addNavMenu(
             'Groups',
             '?act=Groups',
             [
@@ -78,7 +83,7 @@ final readonly class App
                 '?act=Groups&do=perms' => 'Edit Permissions',
             ],
         );
-        $this->page->addNavMenu(
+        $this->addNavMenu(
             'Themes',
             '?act=Themes',
             [
@@ -86,7 +91,7 @@ final readonly class App
                 '?act=Themes' => 'Manage Skin(s)',
             ],
         );
-        $this->page->addNavMenu(
+        $this->addNavMenu(
             'Posting',
             '?act=Posting',
             [
@@ -95,7 +100,7 @@ final readonly class App
                 '?act=Posting&do=wordfilter' => 'Word Filter',
             ],
         );
-        $this->page->addNavMenu(
+        $this->addNavMenu(
             'Forums',
             '?act=Forums',
             [
@@ -105,7 +110,7 @@ final readonly class App
                 '?act=Forums&do=recountstats' => 'Recount Statistics',
             ],
         );
-        $this->page->addNavMenu(
+        $this->addNavMenu(
             'Tools',
             '?act=Tools',
             [
@@ -114,10 +119,11 @@ final readonly class App
                 '?act=Tools&do=errorlog' => 'View Error Log',
             ],
         );
+        $this->renderNav();
 
         $act = $this->request->get('act');
 
-        if ($act) {
+        if (is_string($act) && $act !== '') {
             try {
                 $page = $this->container->get('ACP\Page\\' . $act);
                 $page->render();
@@ -129,5 +135,57 @@ final readonly class App
 
 
         $this->page->out();
+    }
+
+    /**
+     * Creates a nav menu in the ACP.
+     *
+     * @param string $title The name of the button
+     * @param string $page  The URL the button links to
+     * @param array  $menu  A list of links and associated labels to print
+     *                      out as a drop down list
+     */
+    public function addNavmenu(string $title, string $page, array $menu): void
+    {
+        $this->nav['links'] .= $this->page->parseTemplate(
+            'nav-link.html',
+            [
+                'class' => mb_strtolower($title),
+                'page' => $page,
+                'title' => $title,
+            ],
+        );
+
+        $dropdownLinks = '';
+        foreach ($menu as $menuURL => $menuTitle) {
+            $dropdownLinks .= $this->page->parseTemplate(
+                'nav-dropdown-link.html',
+                [
+                    'title' => $menuTitle,
+                    'url' => $menuURL,
+                ],
+            );
+        }
+
+        $this->nav['dropdowns'] .= $this->page->parseTemplate(
+            'nav-dropdown.html',
+            [
+                'dropdown_id' => 'menu_' . mb_strtolower($title),
+                'dropdown_links' => $dropdownLinks,
+            ],
+        );
+
+    }
+
+    private function renderNav() {
+        $this->page->append('nav',
+            $this->page->parseTemplate(
+                'nav.html',
+                [
+                    'nav' => $this->nav['links'],
+                    'nav_dropdowns' => $this->nav['dropdowns'],
+                ],
+            )
+        );
     }
 }
