@@ -142,7 +142,7 @@ final readonly class Settings
                 [
                     'act' => $f['act'],
                 ],
-            ) . PHP_EOL;
+            );
         }
 
         if ($table !== '' && $table !== '0') {

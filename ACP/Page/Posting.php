@@ -99,13 +99,13 @@ final readonly class Posting
         if ($wordfilter === []) {
             $table = $this->page->parseTemplate(
                 'posting/word-filter-empty.html',
-            ) . PHP_EOL . $this->page->parseTemplate(
+            ) . $this->page->parseTemplate(
                 'posting/word-filter-submit-row.html',
             );
         } else {
             $table = $this->page->parseTemplate(
                 'posting/word-filter-heading.html',
-            ) . PHP_EOL . $this->page->parseTemplate(
+            ) . $this->page->parseTemplate(
                 'posting/word-filter-submit-row.html',
             );
             $currentFilters = array_reverse($wordfilter, true);
@@ -119,7 +119,7 @@ final readonly class Posting
                         'filter_url_encoded' => $filterUrlEncoded,
                         'result_code' => $resultCode,
                     ],
-                ) . PHP_EOL;
+                );
             }
         }
 
@@ -201,15 +201,15 @@ final readonly class Posting
         if ($emoticons === []) {
             $table = $this->page->parseTemplate(
                 'posting/emoticon-heading.html',
-            ) . PHP_EOL . $this->page->parseTemplate(
+            ) . $this->page->parseTemplate(
                 'posting/emoticon-submit-row.html',
-            ) . PHP_EOL . $this->page->parseTemplate(
+            ) . $this->page->parseTemplate(
                 'posting/emoticon-empty-row.html',
             );
         } else {
             $table = $this->page->parseTemplate(
                 'posting/emoticon-heading.html',
-            ) . PHP_EOL . $this->page->parseTemplate(
+            ) . $this->page->parseTemplate(
                 'posting/emoticon-submit-row.html',
             );
             $emoticons = array_reverse($emoticons, true);
@@ -224,7 +224,7 @@ final readonly class Posting
                         'emoticon_url_encoded' => rawurlencode($emoticon),
                         'smiley_url' => $smileyFile,
                     ],
-                ) . PHP_EOL;
+                );
             }
         }
 
@@ -259,7 +259,7 @@ final readonly class Posting
                     'emoticon' => $emoticon,
                     'smiley_url' => '/' . $smileyFile,
                 ],
-            ) . PHP_EOL;
+            );
         }
 
 

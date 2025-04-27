@@ -110,7 +110,7 @@ final readonly class Members
                     'id' => $f['id'],
                     'title' => $f['display_name'],
                 ],
-            ) . PHP_EOL;
+            );
         }
 
         $this->page->addContentBox(
@@ -329,7 +329,7 @@ final readonly class Members
                             'id' => $v['id'],
                             'title' => $v['display_name'],
                         ],
-                    ) . PHP_EOL;
+                    );
                 }
 
                 $this->page->addContentBox('Select Member to Edit', $page);
@@ -475,7 +475,7 @@ final readonly class Members
                     'selected' => $group_id === $f['id'] ? ' selected="selected"' : '',
                     'value' => $f['id'],
                 ],
-            ) . PHP_EOL;
+            );
         }
 
         return $this->page->parseTemplate(
@@ -651,7 +651,7 @@ final readonly class Members
         $page .= '';
         $this->page->addContentBox(
             'Account Merge',
-            $page . PHP_EOL
+            $page
             . $this->page->parseTemplate(
                 'members/merge.html',
             ),
@@ -728,7 +728,7 @@ final readonly class Members
 
         $this->page->addContentBox(
             'Delete Account',
-            $page . PHP_EOL
+            $page
             . $this->page->parseTemplate(
                 'members/delete.html',
             ),
@@ -895,7 +895,7 @@ final readonly class Members
 
         $this->page->addContentBox(
             'Mass Message',
-            $page . PHP_EOL
+            $page
             . $this->page->parseTemplate(
                 'members/mass-message.html',
             ),
@@ -919,7 +919,7 @@ final readonly class Members
                 'checked' => $this->config->getSetting('membervalidation')
                 ? 'checked="checked"' : '',
             ],
-        ) . PHP_EOL;
+        );
         $this->page->addContentBox('Enable Member Validation', $page);
 
         if (
@@ -958,7 +958,7 @@ final readonly class Members
                     'join_date' => gmdate('M jS, Y @ g:i A', $f['join_date']),
                     'title' => $f['display_name'],
                 ],
-            ) . PHP_EOL;
+            );
         }
 
         $page = $page !== '' && $page !== '0' ? $this->page->parseTemplate(
@@ -984,7 +984,7 @@ final readonly class Members
                     'title' => $name,
                     'value' => $value,
                 ],
-            ) . PHP_EOL;
+            );
         }
 
         return $this->page->parseTemplate(
@@ -994,7 +994,7 @@ final readonly class Members
                 'title' => $name,
                 'value' => $value,
             ],
-        ) . PHP_EOL;
+        );
     }
 
     private function heading(string $value): ?string

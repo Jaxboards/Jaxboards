@@ -193,7 +193,7 @@ final readonly class Tools
                     'username' => $file['uname'],
                     'user_id' => $file['uid'],
                 ],
-            ) . PHP_EOL;
+            );
         }
 
         $page .= $table !== '' && $table !== '0' ? $this->page->parseTemplate(

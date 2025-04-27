@@ -45,6 +45,9 @@ final class Page
         $this->parts[$partName] = $content;
     }
 
+    /**
+     * @param array<string,string> $links
+     */
     public function sidebar(array $links): void
     {
         $content = '';
@@ -53,9 +56,9 @@ final class Page
                 'sidebar-list-link.html',
                 [
                     'title' => $title,
-                    'url' => '?act=' . $this->request->get('act') . '&do=' . $do,
+                    'url' => '?act=' . ($this->request->get('act') ?: '') . '&do=' . $do,
                 ],
-            ) . PHP_EOL;
+            );
         }
 
         $this->parts['sidebar'] = $this->parseTemplate(
@@ -154,13 +157,10 @@ final class Page
 
         $template = file_get_contents($templateFile);
 
-        $template = str_replace(
+        return str_replace(
             array_map(static fn($name): string => '{{ ' . mb_strtolower((string) $name) . ' }}', array_keys($data)),
             array_map(static fn($content): string => "{$content}", $data),
             $template,
-        );
-
-        // Blank out other template variables.
-        return preg_replace('/{{\s+.+\s+}}/', '', $template);
+        ) . PHP_EOL;
     }
 }

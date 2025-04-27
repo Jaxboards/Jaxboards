@@ -33,8 +33,6 @@ use function sscanf;
 use function trim;
 use function unpack;
 
-use const PHP_EOL;
-
 final readonly class Forums
 {
     public function __construct(
@@ -654,7 +652,7 @@ final readonly class Forums
                         $global ? 1 : $perms['view'],
                     ),
                 ],
-            ) . PHP_EOL;
+            );
         }
 
         if ($error !== null) {
@@ -676,7 +674,7 @@ final readonly class Forums
                     'selected' => isset($fdata['show_sub']) && $value === $fdata['show_sub'] ? 'selected="selected"' : '',
                     'value' => $value,
                 ],
-            ) . PHP_EOL;
+            );
         }
 
         $orderByOptionsArray = [
@@ -697,7 +695,7 @@ final readonly class Forums
                     ? 'selected="selected"' : '',
                     'value' => $value,
                 ],
-            ) . PHP_EOL;
+            );
         }
 
 
@@ -714,7 +712,7 @@ final readonly class Forums
                 'trashcan' => isset($fdata['trashcan']) && $fdata['trashcan']
                 ? ' checked="checked"' : '',
             ],
-        ) . PHP_EOL;
+        );
 
         if (isset($fdata['mods']) && $fdata['mods']) {
             $result = $this->database->safeselect(
@@ -731,7 +729,7 @@ final readonly class Forums
                         'delete_link' => '?act=Forums&edit=' . $fid . '&rmod=' . $member['id'],
                         'username' => $member['display_name'],
                     ],
-                ) . PHP_EOL;
+                );
             }
         } else {
             $modList = 'No forum-specific moderators added!';
@@ -907,7 +905,7 @@ final readonly class Forums
                     'selected' => '',
                     'value' => $forum['id'],
                 ],
-            ) . PHP_EOL;
+            );
         }
 
         $this->page->addContentBox(
@@ -979,7 +977,7 @@ final readonly class Forums
 
         $this->page->addContentBox(
             ($cdata ? 'Edit' : 'Create') . ' Category',
-            $page . PHP_EOL . $this->page->parseTemplate(
+            $page . $this->page->parseTemplate(
                 'forums/create-category.html',
                 [
                     'id' => $cdata && isset($cdata['id']) ? $cdata['id'] : 0,
@@ -1052,7 +1050,7 @@ final readonly class Forums
                         'selected' => '',
                         'value' => '' . $categoryId,
                     ],
-                ) . PHP_EOL;
+                );
             }
 
             $page .= $this->page->parseTemplate(

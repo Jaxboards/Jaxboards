@@ -19,8 +19,6 @@ use function mb_strpos;
 use function mb_substr;
 use function preg_match;
 
-use const PHP_EOL;
-
 final class Groups
 {
     private $updatePermissions = true;
@@ -282,7 +280,7 @@ final class Groups
                     'title' => $groupData['title'],
                     'width_percent' => $widthPercent,
                 ],
-            ) . PHP_EOL;
+            );
         }
 
         $permissionsChart = [
@@ -345,7 +343,7 @@ final class Groups
                     'column_count' => 1 + $numgroups,
                     'title' => $category,
                 ],
-            ) . PHP_EOL;
+            );
 
             foreach ($permissions as $field => $title) {
                 $groupColumns = '';
@@ -358,7 +356,7 @@ final class Groups
                             'group_id' => $groupId,
                             'permission' => $field,
                         ],
-                    ) . PHP_EOL;
+                    );
                 }
 
                 $permissionsTable .= $this->page->parseTemplate(
@@ -367,7 +365,7 @@ final class Groups
                         'group_columns' => $groupColumns,
                         'title' => $title,
                     ],
-                ) . PHP_EOL;
+                );
             }
         }
 

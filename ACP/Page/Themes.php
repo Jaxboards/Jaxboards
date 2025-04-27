@@ -309,7 +309,7 @@ final readonly class Themes
                         ? 'selected="selected"' : '',
                         'value' => $wrapper,
                     ],
-                ) . PHP_EOL;
+                );
             }
 
             $skins .= $this->page->parseTemplate(
@@ -340,7 +340,7 @@ final readonly class Themes
                     'view_or_edit' => $f['custom'] ? 'Edit' : 'View',
                     'wrapper_options' => $wrapperOptions,
                 ],
-            ) . PHP_EOL;
+            );
             $usedwrappers[] = $f['wrapper'];
         }
 
@@ -367,7 +367,7 @@ final readonly class Themes
                     ),
                     'title' => $wrapper,
                 ],
-            ) . PHP_EOL;
+            );
         }
 
         $wrap = $this->page->parseTemplate(
@@ -539,7 +539,7 @@ final readonly class Themes
                     'selected' => '',
                     'value' => $wrapper,
                 ],
-            ) . PHP_EOL;
+            );
         }
 
         $page .= $this->page->parseTemplate(
