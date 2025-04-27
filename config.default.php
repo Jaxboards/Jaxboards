@@ -18,7 +18,6 @@ $CFG = json_decode(
             "boardname": "Example Forums",
             "domain": "example.com",
             "dthemepath": "Service\/Themes\/Default\/",
-            "installed": false,
             "images": [
                 "jpg",
                 "jpeg",

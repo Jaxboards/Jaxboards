@@ -66,7 +66,6 @@ a new install. It does the following:
   $CFG['sql_host'] = $request->post('sql_host');
   $CFG['sql_username'] = $request->post('sql_username');
   $CFG['sql_password'] = $request->post('sql_password');
-  $CFG['installed'] = true;
   $CFG['service'] = $service; // boolean if it's a service or not
   $CFG['prefix'] = $service ? '' : 'jaxboards';
   $CFG['sql_prefix'] = $CFG['prefix'] ? $CFG['prefix'] . '_' : '';

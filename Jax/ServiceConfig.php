@@ -9,6 +9,8 @@ use function file_exists;
 
 final class ServiceConfig
 {
+    private $installed = false;
+
     /**
      * @return array<string,mixed>
      */
@@ -30,7 +32,15 @@ final class ServiceConfig
 
         $serviceConfig = [];
         if (file_exists(dirname(__DIR__) . '/config.php')) {
+            $this->installed = true;
             require_once dirname(__DIR__) . '/config.php';
+
+            if (isset($CFG)) {
+                $serviceConfig = (array) $CFG;
+            }
+        } else {
+            // Likely installing, fetch default config
+            require_once dirname(__DIR__) . '/config.default.php';
 
             if (isset($CFG)) {
                 $serviceConfig = (array) $CFG;
@@ -38,6 +48,11 @@ final class ServiceConfig
         }
 
         return $serviceConfig;
+    }
+
+    public function hasInstalled(): bool
+    {
+        return $this->installed;
     }
 
     public function getSetting(string $key): mixed
@@ -61,5 +76,34 @@ final class ServiceConfig
         }
 
         return $overrideConfig;
+    }
+
+    /**
+     * Write service config during installation.
+     *
+     * @param array<string,mixed>
+     */
+    public function writeServiceConfig(array $data): void
+    {
+        file_put_contents(dirname(__DIR__) . '/config.php', $this->configFileContents($data));
+    }
+
+    /**
+     * @param array<string,mixed>
+     */
+    public function configFileContents(array $data): string
+    {
+        $dataString = json_encode($data, JSON_PRETTY_PRINT);
+
+        return <<<EOT
+            <?php
+            \$CFG = json_decode(
+            <<<'EOD'
+            {$dataString}
+            EOD
+                ,
+                true
+            );
+            EOT;
     }
 }

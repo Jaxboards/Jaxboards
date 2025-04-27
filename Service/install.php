@@ -1,7 +1,7 @@
 <?php
 
 use DI\Container;
-use Jax\Config;
+use Jax\ServiceConfig;
 use Jax\Database;
 use Jax\IPAddress;
 use Jax\Jax;
@@ -15,12 +15,9 @@ use Jax\Request;
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
 
-if (!defined('SERVICE_ROOT')) {
-    define('SERVICE_ROOT', __DIR__);
-}
 
-if (file_exists(SERVICE_ROOT . '/install.lock')) {
-    echo 'Install lock file found! Please remove if you wish to install.';
+if (file_exists(dirname(__DIR__) . '/config.php')) {
+    echo 'Detected config.php at root. Jaxboards has already been installed. If you would like to reinstall, delete the root config.';
 
     exit(1);
 }
@@ -28,8 +25,6 @@ if (file_exists(SERVICE_ROOT . '/install.lock')) {
 require_once dirname(__DIR__) . '/Jax/autoload.php';
 $container = new Container();
 
-// Get default CFG.
-require_once dirname(__DIR__) . '/config.default.php';
 
 /**
  * Recursively copies one directory to another.
@@ -62,9 +57,10 @@ $DB = $container->get(Database::class);
 $request = $container->get(Request::class);
 
 $fields = [
-    'admin_email' => [
-        'name' => 'Admin Email Address',
-        'placeholder' => 'admin@example.com',
+
+    'admin_username' => [
+        'name' => 'Admin Username',
+        'placeholder' => 'admin',
         'type' => 'text',
     ],
     'admin_password' => [
@@ -75,9 +71,9 @@ $fields = [
         'name' => 'Re-Type Admin Password',
         'type' => 'password',
     ],
-    'admin_username' => [
-        'name' => 'Admin Username',
-        'placeholder' => 'admin',
+    'admin_email' => [
+        'name' => 'Admin Email Address',
+        'placeholder' => 'admin@example.com',
         'type' => 'text',
     ],
     'domain' => [
@@ -96,14 +92,14 @@ $fields = [
         'type' => 'text',
         'value' => 'localhost',
     ],
-    'sql_password' => [
-        'name' => 'MySQL Password',
-        'type' => 'password',
-    ],
     'sql_username' => [
         'name' => 'MySQL Username',
         'placeholder' => 'jaxboards',
         'type' => 'text',
+    ],
+    'sql_password' => [
+        'name' => 'MySQL Password',
+        'type' => 'password',
     ],
 ];
 
@@ -173,7 +169,7 @@ if ($request->post('submit') !== null) {
 
     if ($errors === []) {
         // Update with our settings.
-        $container->get(Config::class)->writeServiceConfig(
+        $container->get(ServiceConfig::class)->writeServiceConfig(
             [
                 'boardname' => 'Jaxboards',
                 'domain' => $domain,
@@ -183,12 +179,13 @@ if ($request->post('submit') !== null) {
                 'sql_host' => $request->post('sql_host'),
                 'sql_username' => $request->post('sql_username'),
                 'sql_password' => $request->post('sql_password'),
-                'installed' => true,
                 'service' => $service,
                 'prefix' => $service ? '' : 'jaxboards',
                 'sql_prefix' => $service ? '' : 'jaxboards_',
             ],
         );
+
+        return;
 
         if ($service) {
             // Create directory table.
@@ -310,9 +307,9 @@ if ($request->post('submit') !== null) {
         }
 
         // Create lock file.
-        // $file = fopen(SERVICE_ROOT . '/install.lock', 'w');
-        // fwrite($file, '');
-        // fclose($file);
+        $file = fopen(SERVICE_ROOT . '/install.lock', 'w');
+        fwrite($file, '');
+        fclose($file);
         // Send us to the service page.
         header('Refresh:0');
     }

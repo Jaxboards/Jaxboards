@@ -66,35 +66,7 @@ final class Config
     {
         $this->boardConfig = $data;
 
-        file_put_contents($this->domainDefinitions->getBoardPath() . '/config.php', $this->configFileContents($data));
+        file_put_contents($this->domainDefinitions->getBoardPath() . '/config.php', $this->serviceConfig->configFileContents($data));
     }
 
-    /**
-     * Write service config during installation.
-     *
-     * @param array<string,mixed>
-     */
-    public function writeServiceConfig(array $data): void
-    {
-        file_put_contents(dirname(__DIR__) . '/config.php', $this->configFileContents($data));
-    }
-
-    /**
-     * @param array<string,mixed>
-     */
-    private function configFileContents(array $data): string
-    {
-        $dataString = json_encode($data, JSON_PRETTY_PRINT);
-
-        return <<<EOT
-            <?php
-            \$CFG = json_decode(
-            <<<'EOD'
-            {$dataString}
-            EOD
-                ,
-                true
-            );
-            EOT;
-    }
 }

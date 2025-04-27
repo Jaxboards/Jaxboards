@@ -43,11 +43,9 @@ final class DomainDefinitions
      */
     public function __construct(private readonly ServiceConfig $serviceConfig)
     {
-        $serviceConfig = $this->serviceConfig->get();
-
 
         // Figure out url.
-        $host = $_SERVER['SERVER_NAME'] ?? $serviceConfig['domain'];
+        $host = $_SERVER['SERVER_NAME'] ?? $this->serviceConfig->getSetting('domain');
         $port = $_SERVER['SERVER_PORT'] ?? '443';
         $scheme = $_SERVER['REQUEST_SCHEME'] ?? 'https';
 
@@ -63,11 +61,12 @@ final class DomainDefinitions
         $this->boardURL = $boardURL;
         $this->soundsURL = $this->boardURL . '/Sounds';
 
-        $domainMatch = str_replace('.', '\.', $serviceConfig['domain']);
 
         // Get prefix.
-        $prefix = $serviceConfig['prefix'];
-        if ($serviceConfig['service']) {
+        $prefix = $this->serviceConfig->getSetting('prefix');
+        if ($this->serviceConfig->getSetting('service')) {
+            $domainMatch = str_replace('.', '\.', $this->serviceConfig->getSetting('domain'));
+
             preg_match('@(.*)\.' . $domainMatch . '@i', (string) $host, $matches);
             if (isset($matches[1]) && $matches[1]) {
                 $prefix = $matches[1];

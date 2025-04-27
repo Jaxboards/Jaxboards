@@ -51,14 +51,13 @@ final class Database
     public function __construct(private readonly ServiceConfig $serviceConfig)
     {
         try {
-            $serviceConfig = $this->serviceConfig->get();
-            if ($this->serviceConfig->get()) {
+            if ($serviceConfig->hasInstalled()) {
                 $this->connect(
-                    $serviceConfig['sql_host'],
-                    $serviceConfig['sql_username'],
-                    $serviceConfig['sql_password'],
-                    $serviceConfig['sql_db'],
-                    $serviceConfig['sql_prefix'],
+                    $serviceConfig->getSetting('sql_host'),
+                    $serviceConfig->getSetting('sql_username'),
+                    $serviceConfig->getSetting('sql_password'),
+                    $serviceConfig->getSetting('sql_db'),
+                    $serviceConfig->getSetting('sql_prefix'),
                 );
             }
         } catch (Exception $e) {
