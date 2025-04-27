@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ACP;
 
 use DI\Container;
-use DI\NotFoundException;
 use Jax\Config;
 use Jax\Request;
 use Jax\Session;
@@ -65,7 +64,7 @@ final class App
             try {
                 $page = $this->container->get('ACP\Page\\' . $act);
                 $page->render();
-            } catch (NotFoundException) {
+            } catch (\Exception) {
                 $this->page->addContentBox('Error', "Invalid action: {$act}");
             }
         }
