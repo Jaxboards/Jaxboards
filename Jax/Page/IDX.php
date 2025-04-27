@@ -467,7 +467,11 @@ final class IDX
                         . '%3$s</a>',
                     $user['uid'],
                     $user['group_id']
-                    . ($user['status'] === 'idle' ? ' idle' : '')
+                    . (
+                        $user['status'] === 'idle'
+                        ? " idle lastAction{$user['last_action']}"
+                        : ''
+                    )
                     . ($user['birthday'] && $this->config->getSetting('birthdays') ? ' birthday' : ''),
                     $user['name'],
                     $title,
@@ -507,6 +511,7 @@ final class IDX
                     ? ' birthday' : ''),
                     $user['name'],
                     $user['location_verbose'],
+                    $user['last_action'],
                 ];
             }
 

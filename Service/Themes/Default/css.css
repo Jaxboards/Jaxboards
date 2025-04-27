@@ -2019,9 +2019,6 @@ textarea {
 /* stylelint-enable no-descending-specificity */
 
 #statusers .idle {
-  background: url('icons/clock.png') no-repeat 0 0;
-  padding-left: 18px;
-  padding-bottom: 2px;
   font-style: italic;
 }
 
