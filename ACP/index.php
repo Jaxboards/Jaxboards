@@ -5,10 +5,6 @@ declare(strict_types=1);
 use ACP\Page\Login;
 use DI\Container;
 
-if (!defined('JAXBOARDS_ROOT')) {
-    define('JAXBOARDS_ROOT', dirname(__DIR__));
-}
-
 /**
  * Admin login.
  *
@@ -18,7 +14,7 @@ if (!defined('JAXBOARDS_ROOT')) {
  */
 
 // Load composer dependencies.
-require_once JAXBOARDS_ROOT . '/Jax/autoload.php';
+require_once dirname(__DIR__) . '/Jax/autoload.php';
 
 $container = new Container();
 $container->get(Login::class)->render();

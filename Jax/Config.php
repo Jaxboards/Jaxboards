@@ -76,7 +76,7 @@ final class Config
      */
     public function writeServiceConfig(array $data): void
     {
-        file_put_contents(JAXBOARDS_ROOT . '/config.php', $this->configFileContents($data));
+        file_put_contents(dirname(__DIR__) . '/config.php', $this->configFileContents($data));
     }
 
     /**

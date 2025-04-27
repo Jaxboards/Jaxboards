@@ -14,9 +14,7 @@ use Jax\Request;
  *
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
-if (!defined('JAXBOARDS_ROOT')) {
-    define('JAXBOARDS_ROOT', dirname(__DIR__));
-}
+
 if (!defined('SERVICE_ROOT')) {
     define('SERVICE_ROOT', __DIR__);
 }
@@ -27,13 +25,11 @@ if (file_exists(SERVICE_ROOT . '/install.lock')) {
     exit(1);
 }
 
-require_once JAXBOARDS_ROOT . '/Jax/autoload.php';
+require_once dirname(__DIR__) . '/Jax/autoload.php';
 $container = new Container();
 
-require_once JAXBOARDS_ROOT . '/ACP/Page.php';
-
 // Get default CFG.
-require_once JAXBOARDS_ROOT . '/config.default.php';
+require_once dirname(__DIR__) . '/config.default.php';
 
 /**
  * Recursively copies one directory to another.
@@ -309,8 +305,8 @@ if ($request->post('submit') !== null) {
 
             echo $DB->error();
 
-            @mkdir(JAXBOARDS_ROOT . '/boards');
-            recurseCopy('blueprint', JAXBOARDS_ROOT . '/boards/' . $board);
+            @mkdir(dirname(__DIR__) . '/boards');
+            recurseCopy('blueprint', dirname(__DIR__) . '/boards/' . $board);
         }
 
         // Create lock file.

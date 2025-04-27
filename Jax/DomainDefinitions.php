@@ -19,9 +19,6 @@ use function str_replace;
  *
  * @see https://github.com/jaxboards/jaxboards Jaxboards Github Repo
  */
-if (!defined('JAXBOARDS_ROOT')) {
-    define('JAXBOARDS_ROOT', __DIR__);
-}
 
 function pathjoin(string ...$paths): ?string
 {
@@ -86,15 +83,15 @@ final class DomainDefinitions
             }
         }
 
-        $this->defaultThemePath = pathjoin(JAXBOARDS_ROOT, $this->serviceConfig->getSetting('dthemepath'));
-        $this->serviceThemePath = pathjoin(JAXBOARDS_ROOT, 'Service/Themes');
+        $this->defaultThemePath = pathjoin(dirname(__DIR__), $this->serviceConfig->getSetting('dthemepath'));
+        $this->serviceThemePath = pathjoin(dirname(__DIR__), 'Service/Themes');
 
         if (!$prefix) {
             return;
         }
 
         $this->boardFound = true;
-        $this->boardPath = pathjoin(JAXBOARDS_ROOT, 'boards', $prefix);
+        $this->boardPath = pathjoin(dirname(__DIR__), 'boards', $prefix);
         $this->boardPathURL = $this->boardURL . '/' . pathjoin('boards', $prefix);
     }
 

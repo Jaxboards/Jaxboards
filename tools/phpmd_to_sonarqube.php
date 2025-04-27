@@ -19,8 +19,6 @@ declare(strict_types=1);
  * ```
  */
 
-define('JAXBOARDS_ROOT', dirname(__DIR__));
-
 // phpcs:enable
 
 // Fetch CLI arguments.
@@ -217,7 +215,7 @@ $rules = array_reduce(
 
 define(
     'REMOVE_JAXBOARDS_ROOT',
-    '/^' . preg_quote(JAXBOARDS_ROOT . '/', '/') . '/',
+    '/^' . preg_quote(dirname(__DIR__) . '/', '/') . '/',
 );
 $issues = array_merge_recursive(
     ...array_map(

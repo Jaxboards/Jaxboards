@@ -4,25 +4,19 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use function define;
-use function defined;
 use function dirname;
 use function file_exists;
 use function spl_autoload_register;
 use function str_replace;
 
-if (!defined('JAXBOARDS_ROOT')) {
-    define('JAXBOARDS_ROOT', dirname(__DIR__));
-}
-
-require_once JAXBOARDS_ROOT . '/vendor/autoload.php';
+require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 spl_autoload_register(static function ($className): void {
 
-    $classPath = JAXBOARDS_ROOT . '/' . str_replace('\\', '/', $className) . '.php';
+    $classPath = dirname(__DIR__) . '/' . str_replace('\\', '/', $className) . '.php';
 
     if (!file_exists($classPath)) {
-        return;
+        throw new \Exception("Error loading class: {$classPath}");
     }
 
     require_once $classPath;

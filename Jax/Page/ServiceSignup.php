@@ -188,7 +188,7 @@ final readonly class ServiceSignup
                 if ($dbError !== '' && $dbError !== '0') {
                     $errors[] = $dbError;
                 } else {
-                    $this->recurseCopy('blueprint', JAXBOARDS_ROOT . '/boards/' . $board);
+                    $this->recurseCopy('blueprint', dirname(__DIR__) . '/boards/' . $board);
 
                     header('Location: https://' . $this->request->post('boardurl') . '.' . $this->config->getSetting('domain'));
                 }

@@ -12,17 +12,14 @@ use Jax\Page\ServiceSignup;
  *
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
-if (!defined('JAXBOARDS_ROOT')) {
-    define('JAXBOARDS_ROOT', dirname(__DIR__));
-}
 
 if (!defined('SERVICE_ROOT')) {
     define('SERVICE_ROOT', __DIR__);
 }
 
-require_once JAXBOARDS_ROOT . '/Jax/autoload.php';
+require_once dirname(__DIR__) . '/Jax/autoload.php';
 
-if (!file_exists(JAXBOARDS_ROOT . '/config.php')) {
+if (!file_exists(dirname(__DIR__) . '/config.php')) {
     echo 'Jaxboards not installed!';
 } else {
     $container = new Container();

@@ -5,12 +5,9 @@ declare(strict_types=1);
 use DI\Container;
 use Jax\App;
 
-if (!defined('JAXBOARDS_ROOT')) {
-    define('JAXBOARDS_ROOT', __DIR__);
-}
 
 // Load composer dependencies.
-require_once JAXBOARDS_ROOT . '/Jax/autoload.php';
+require_once __DIR__ . '/Jax/autoload.php';
 
 /**
  * Jaxboards. THE ULTIMATE 4UMS WOOOOOOO

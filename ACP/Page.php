@@ -130,11 +130,7 @@ final class Page
     /**
      * Parse a template file, replacing {{ key }} with the value of $data['key'].
      *
-     * @param string               $templateFile The path to the template file. Paths
-     *                                           that don't start with a '/' character
-     *                                           will start searching in the
-     *                                           JAXBOARDS_ROOT/ACP/views/
-     *                                           directory.
+     * @param string               $templateFile The path to the template file.
      * @param array<string,string> $data         Template variables to be replaced
      *
      * @return string returns the template with the data replaced
@@ -143,7 +139,7 @@ final class Page
         string $templateFile,
         array $data = [],
     ): string {
-        $templateFile = JAXBOARDS_ROOT . '/ACP/views/' . $templateFile;
+        $templateFile = 'views/' . $templateFile;
 
         if (pathinfo($templateFile, PATHINFO_EXTENSION) !== 'html') {
             if (mb_substr($templateFile, -1) !== '.') {

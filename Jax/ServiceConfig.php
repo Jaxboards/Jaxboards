@@ -29,8 +29,8 @@ final class ServiceConfig
         }
 
         $serviceConfig = [];
-        if (file_exists(JAXBOARDS_ROOT . '/config.php')) {
-            require_once JAXBOARDS_ROOT . '/config.php';
+        if (file_exists(dirname(__DIR__) . '/config.php')) {
+            require_once dirname(__DIR__) . '/config.php';
 
             if (isset($CFG)) {
                 $serviceConfig = (array) $CFG;

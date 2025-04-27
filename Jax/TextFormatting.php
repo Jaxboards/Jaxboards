@@ -114,7 +114,7 @@ final class TextFormatting
         $emotes = [];
         if ($emotePack !== null) {
             $this->emotePack = $emotePack;
-            $rulesPath = JAXBOARDS_ROOT . '/emoticons/' . $emotePack . '/rules.php';
+            $rulesPath = dirname(__DIR__) . '/emoticons/' . $emotePack . '/rules.php';
 
             if (file_exists($rulesPath)) {
                 require_once $rulesPath;
