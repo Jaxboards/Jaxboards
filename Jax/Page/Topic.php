@@ -1061,8 +1061,10 @@ final class Topic
         );
     }
 
-    private function ratepost($postid, $nibletid): void
-    {
+    private function ratepost(
+        array|string $postid,
+        null|array|string $nibletid,
+    ): void {
         $this->page->JS('softurl');
         if (!is_numeric($postid) || !is_numeric($nibletid)) {
             return;
@@ -1122,7 +1124,7 @@ final class Topic
         $this->page->JS('alert', $unrate ? 'Unrated!' : 'Rated!');
     }
 
-    private function qeditpost($pid): void
+    private function qeditpost(array|string $pid): void
     {
         if (!is_numeric($pid)) {
             return;
@@ -1285,7 +1287,7 @@ final class Topic
         );
     }
 
-    private function findpost($pid): void
+    private function findpost(array|string $pid): void
     {
         $couldntfindit = false;
         if (!is_numeric($pid)) {
@@ -1340,7 +1342,7 @@ final class Topic
         $this->session->set('topicsread', json_encode($topicsread));
     }
 
-    private function listrating($pid): void
+    private function listrating(array|string $pid): void
     {
         $ratingConfig = $this->config->getSetting('ratings') ?? 0;
         if (($ratingConfig & 2) !== 0) {

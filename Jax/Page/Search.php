@@ -166,7 +166,7 @@ final class Search
         return $options;
     }
 
-    private function pdate($a): false|int
+    private function pdate(array|string $a): false|int
     {
         $dayMonthYear = explode('/', (string) $a);
         if (count($dayMonthYear) !== 3) {

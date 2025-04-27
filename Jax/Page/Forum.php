@@ -469,7 +469,7 @@ final class Forum
         }
     }
 
-    private function getreplysummary($tid): void
+    private function getreplysummary(string $tid): void
     {
         $result = $this->database->safespecial(
             <<<'SQL'

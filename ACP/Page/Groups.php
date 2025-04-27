@@ -51,7 +51,7 @@ final class Groups
         };
     }
 
-    private function updateperms($permsInput): void
+    private function updateperms(array|string $permsInput): void
     {
         $columns = [
             'can_access_acp',

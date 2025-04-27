@@ -12,10 +12,8 @@ final class Request
      * Access $_GET and $_POST together. Prioritizes $_POST.
      *
      * @SuppressWarnings("PHPMD.Superglobals")
-     *
-     * @return
      */
-    public function both(string $property): array|string|null
+    public function both(string $property): null|array|string
     {
         return $_POST[$property] ?? $_GET[$property] ?? null;
     }
@@ -25,7 +23,7 @@ final class Request
      *
      * @SuppressWarnings("PHPMD.Superglobals")
      */
-    public function get(string $property): array|string|null
+    public function get(string $property): null|array|string
     {
         return $_GET[$property] ?? null;
     }
@@ -35,7 +33,7 @@ final class Request
      *
      * @SuppressWarnings("PHPMD.Superglobals")
      */
-    public function post(string $property): array|string|null
+    public function post(string $property): null|array|string
     {
         return $_POST[$property] ?? null;
     }

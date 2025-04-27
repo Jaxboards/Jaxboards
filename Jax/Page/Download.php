@@ -31,7 +31,7 @@ final readonly class Download
         $this->downloadFile($this->request->both('id'));
     }
 
-    private function downloadFile($id): void
+    private function downloadFile(null|array|string $id): void
     {
         if (is_numeric($id)) {
             $result = $this->database->safeselect(

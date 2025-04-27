@@ -148,7 +148,7 @@ final class ModControls
         $this->page->JS('script', $script);
     }
 
-    private function dotopics($do): void
+    private function dotopics(array|string $do): void
     {
         switch ($do) {
             case 'move':
@@ -300,7 +300,7 @@ final class ModControls
         }
     }
 
-    private function doposts($do): void
+    private function doposts(array|string $do): void
     {
         switch ($do) {
             case 'move':
@@ -340,7 +340,7 @@ final class ModControls
         $this->page->JS('modcontrols_clearbox');
     }
 
-    private function modpost($pid): void
+    private function modpost(null|array|string $pid): void
     {
         if (!is_numeric($pid)) {
             return;

@@ -353,8 +353,10 @@ final class LogReg
         $this->page->JS('softurl');
     }
 
-    private function forgotpassword($uid, $id): void
-    {
+    private function forgotpassword(
+        null|array|string $uid,
+        null|array|string $id,
+    ): void {
         $page = '';
 
         if ($this->request->isJSUpdate() && !$this->request->hasPostData()) {

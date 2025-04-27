@@ -785,7 +785,7 @@ final class UCP
         );
     }
 
-    private function viewmessage($messageid): void
+    private function viewmessage(string $messageid): void
     {
         if (
             $this->request->isJSUpdate()
@@ -1021,7 +1021,7 @@ final class UCP
         $this->showucp($page);
     }
 
-    private function compose($messageid = '', string $todo = ''): void
+    private function compose(string $messageid = '', string $todo = ''): void
     {
         $error = null;
         $mid = 0;
@@ -1132,7 +1132,7 @@ final class UCP
         }
 
         $msg = '';
-        if ($messageid) {
+        if ($messageid !== '' && $messageid !== '0') {
             $result = $this->database->safeselect(
                 [
                     '`from`',

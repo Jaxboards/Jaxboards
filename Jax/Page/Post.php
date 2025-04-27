@@ -89,8 +89,7 @@ final class Post
 
         $fileData = $this->request->files('Filedata');
         if (
-            $fileData !== null
-            && $fileData['tmp_name']
+            $fileData['tmp_name']
         ) {
             $attachmentId = $this->upload($fileData);
             $this->postdata .= "[attachment]{$attachmentId}[/attachment]";
@@ -119,7 +118,7 @@ final class Post
         }
     }
 
-    private function upload($fileobj, $uid = false): string
+    private function upload(array $fileobj, $uid = false): string
     {
         if ($uid === false) {
             $uid = $this->user->get('id');

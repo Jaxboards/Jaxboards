@@ -169,7 +169,7 @@ final readonly class Settings
         $this->page->addContentBox('Custom Pages', $page);
     }
 
-    private function pages_delete($page): void
+    private function pages_delete(array|string $page): void
     {
         $this->database->safedelete(
             'pages',

@@ -763,7 +763,7 @@ final readonly class Forums
         $this->page->addContentBox('Forum Permissions', $forumperms);
     }
 
-    private function deleteforum($forumId): void
+    private function deleteforum(string $forumId): void
     {
         if (
             $this->request->post('submit') === 'Cancel'

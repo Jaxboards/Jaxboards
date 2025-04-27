@@ -551,7 +551,7 @@ final readonly class Themes
         $this->page->addContentBox('Create New Skin', $page);
     }
 
-    private function deleteskin($id): void
+    private function deleteskin(string $id): void
     {
         $result = $this->database->safeselect(
             '`id`,`using`,`title`,`custom`,`wrapper`,`default`,`hidden`',

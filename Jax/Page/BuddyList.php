@@ -165,7 +165,7 @@ final readonly class BuddyList
         );
     }
 
-    private function addbuddy($uid): void
+    private function addbuddy(array|string $uid): void
     {
         $friends = $this->user->get('friends');
         $error = null;
@@ -219,7 +219,7 @@ final readonly class BuddyList
         }
     }
 
-    private function block($uid): void
+    private function block(array|string $uid): void
     {
         if (!is_numeric($uid)) {
             return;
@@ -291,7 +291,7 @@ final readonly class BuddyList
         $this->displaybuddylist();
     }
 
-    private function setstatus($status): void
+    private function setstatus(array|string $status): void
     {
         if (
             $this->user->isGuest()
