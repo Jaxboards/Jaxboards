@@ -1,33 +1,31 @@
 <table class="wrappers">
   <tr>
-    <th>
-      Name
-    </th>
-    <th>
-    </th>
-    <th>
-      Delete
-    </th>
+    <th>Name</th>
+    <th></th>
+    <th>Delete</th>
   </tr>
   {{ content }}
 </table>
-<br>
+<br />
 <form method="post">
   <input type="text" name="newwrapper" title="Name for new wrapper" />
   <input type="submit" title="Create new wrapper" value="Create Wrapper" />
 </form>
 <script type="text/javascript">
-function edit(link, suffix)
-{
-  var a = link.parentNode.querySelector('span');
-  link.parentNode.removeChild(link);
-  a.innerHTML = '<input type="text" name="rename' + suffix +
-    '[' + a.innerText + ']" value="' + a.innerText + '" />';
-  if (suffix == 'wrapper')
-  {
-    a.innerHTML = '<form method="post">' + a.innerHTML +
-      '<input type="submit" value="Save" name="submit" /></form>';
-  }
-}
+  function edit(link, name) {
+    var span = link.parentNode.querySelector("span");
+    link.parentNode.removeChild(link);
 
+    span.innerHTML = `<input type="text"
+      name="${name}[${span.innerText}]"
+      value="${span.innerText}"
+    >`;
+
+    if (name == "renamewrapper") {
+      span.innerHTML = `<form method="post">
+        ${span.innerHTML}
+        <input type="submit" value="Save" name="submit">
+        </form>`;
+    }
+  }
 </script>

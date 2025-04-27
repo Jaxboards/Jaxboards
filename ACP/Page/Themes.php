@@ -111,7 +111,7 @@ final readonly class Themes
     private function showSkinIndex(): void
     {
         $errorskins = '';
-        $errorwrapper = '';
+        $error = null;
 
         if ($this->request->get('deletewrapper')) {
             $wrapperPath = $this->wrappersPath . $this->request->get('deletewrapper') . '.html';
@@ -122,8 +122,7 @@ final readonly class Themes
                 unlink($this->wrappersPath . $this->request->get('deletewrapper') . '.html');
                 $this->page->location('?act=Themes');
             } else {
-                $errorwrapper
-                    = 'The wrapper you are trying to delete does not exist.';
+                $error = 'The wrapper you are trying to delete does not exist.';
             }
         }
 
@@ -134,15 +133,13 @@ final readonly class Themes
             $newWrapperPath
                 = $this->wrappersPath . $this->request->post('newwrapper') . '.html';
             if (preg_match('@[^\w ]@', (string) $this->request->post('newwrapper'))) {
-                $errorwrapper
-                    = 'Wrapper name must consist of letters, numbers, '
-                    . 'spaces, and underscore.';
+                $error = 'Wrapper name must consist of letters, numbers, spaces, and underscore.';
             } elseif (mb_strlen((string) $this->request->post('newwrapper')) > 50) {
-                $errorwrapper = 'Wrapper name must be less than 50 characters.';
+                $error = 'Wrapper name must be less than 50 characters.';
             } elseif (file_exists($newWrapperPath)) {
-                $errorwrapper = 'That wrapper already exists.';
+                $error = 'That wrapper already exists.';
             } elseif (!is_writable(dirname($newWrapperPath))) {
-                $errorwrappre = 'Wrapper directory is not writable.';
+                $error = 'Wrapper directory is not writable.';
             } else {
                 $o = fopen($newWrapperPath, 'w');
                 if ($o !== false) {
@@ -152,7 +149,7 @@ final readonly class Themes
                     );
                     fclose($o);
                 } else {
-                    $errorwrapper = 'Wrapper could not be created.';
+                    $error = 'Wrapper could not be created.';
                 }
             }
         }
@@ -187,36 +184,36 @@ final readonly class Themes
             if (
                 is_array($this->request->post('renameskin'))
             ) {
-                foreach ($this->request->post('renameskin') as $k => $v) {
-                    if ($k === $v) {
+                foreach ($this->request->post('renameskin') as $oldName => $newName) {
+                    if ($oldName === $newName) {
                         continue;
                     }
 
-                    if (preg_match('@[^\w ]@', $k)) {
+                    if (preg_match('@[^\w ]@', $oldName)) {
                         continue;
                     }
 
-                    if (!is_dir($this->themesPath . $k)) {
+                    if (!is_dir($this->themesPath . $oldName)) {
                         continue;
                     }
 
                     if (
-                        preg_match('@[^\w ]@', (string) $v)
-                        || mb_strlen((string) $v) > 50
+                        preg_match('@[^\w ]@', (string) $newName)
+                        || mb_strlen((string) $newName) > 50
                     ) {
                         $errorskins = 'Skin name must consist of letters, numbers, spaces, and underscore, and be under 50 characters long.';
-                    } elseif (is_dir($this->themesPath . $v)) {
+                    } elseif (is_dir($this->themesPath . $newName)) {
                         $errorskins = 'That skin name is already being used.';
                     } else {
                         $this->database->safeupdate(
                             'skins',
                             [
-                                'title' => $v,
+                                'title' => $newName,
                             ],
                             'WHERE `title`=? AND `custom`=1',
-                            $this->database->basicvalue($k),
+                            $this->database->basicvalue($oldName),
                         );
-                        rename($this->themesPath . $k, $this->themesPath . $v);
+                        rename($this->themesPath . $oldName, $this->themesPath . $newName);
                     }
                 }
             }
@@ -241,10 +238,10 @@ final readonly class Themes
                         preg_match('@[^\w ]@', (string) $wrapperNewName)
                         || mb_strlen((string) $wrapperNewName) > 50
                     ) {
-                        $errorwrapper = 'Wrapper name must consist of letters, numbers, spaces, and underscore, and be
+                        $error = 'Wrapper name must consist of letters, numbers, spaces, and underscore, and be
                             under 50 characters long.';
                     } elseif (is_file($this->wrappersPath . $wrapperNewName . '.html')) {
-                        $errorwrapper = 'That wrapper name is already being used.';
+                        $error = 'That wrapper name is already being used.';
                     } else {
                         $this->database->safeupdate(
                             'skins',
@@ -378,7 +375,7 @@ final readonly class Themes
         );
         $this->page->addContentBox(
             'Wrappers',
-            ($errorwrapper !== '' && $errorwrapper !== '0' ? $this->page->error($errorwrapper) : '') . $wrap,
+            ($error !== null ? $this->page->error($error) : '') . $wrap,
         );
     }
 
