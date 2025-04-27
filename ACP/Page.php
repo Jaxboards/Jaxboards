@@ -140,7 +140,7 @@ final class Page
     public function parseTemplate(
         string $templateFile,
         array $data = [],
-    ): ?string {
+    ): string {
         if (mb_substr($templateFile, 0, 1) !== '/') {
             $templateFile = JAXBOARDS_ROOT . '/ACP/views/' . $templateFile;
         }
