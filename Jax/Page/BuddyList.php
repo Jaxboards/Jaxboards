@@ -19,7 +19,7 @@ use function is_numeric;
 
 final readonly class BuddyList
 {
-    public function __construct(
+    private function __construct(
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly Page $page,
@@ -89,7 +89,7 @@ final readonly class BuddyList
         }
     }
 
-    public function displaybuddylist(): void
+    private function displaybuddylist(): void
     {
         if ($this->user->isGuest()) {
             return;
@@ -165,7 +165,7 @@ final readonly class BuddyList
         );
     }
 
-    public function addbuddy($uid): void
+    private function addbuddy($uid): void
     {
         $friends = $this->user->get('friends');
         $error = null;
@@ -219,7 +219,7 @@ final readonly class BuddyList
         }
     }
 
-    public function block($uid): void
+    private function block($uid): void
     {
         if (!is_numeric($uid)) {
             return;
@@ -253,7 +253,7 @@ final readonly class BuddyList
         }
     }
 
-    public function unblock($uid): void
+    private function unblock($uid): void
     {
         if ($uid && is_numeric($uid)) {
             $enemies = explode(',', (string) $this->user->get('enemies'));
@@ -270,7 +270,7 @@ final readonly class BuddyList
         $this->displaybuddylist();
     }
 
-    public function dropbuddy($uid, $shh = 0): void
+    private function dropbuddy($uid, $shh = 0): void
     {
         if ($uid && is_numeric($uid)) {
             $friends = explode(',', (string) $this->user->get('friends'));
@@ -291,7 +291,7 @@ final readonly class BuddyList
         $this->displaybuddylist();
     }
 
-    public function setstatus($status): void
+    private function setstatus($status): void
     {
         if (
             $this->user->isGuest()

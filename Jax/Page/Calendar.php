@@ -38,7 +38,7 @@ final class Calendar
         $this->monthview();
     }
 
-    public function monthview(): void
+    private function monthview(): void
     {
         $monthoffset = $this->month;
         if ($this->request->isJSUpdate()) {

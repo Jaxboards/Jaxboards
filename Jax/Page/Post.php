@@ -36,16 +36,16 @@ use const PHP_EOL;
 
 final class Post
 {
-    private $canmod;
+    private bool $canmod;
 
-    private $postdata = '';
+    private string $postdata = '';
 
-    private $postpreview = '';
+    private string $postpreview = '';
 
     /**
      * @var false
      */
-    private $nopost = true;
+    private bool $nopost = true;
 
     private $tid;
 
@@ -78,7 +78,7 @@ final class Post
 
         if ($this->request->post('postdata') !== null) {
             $this->nopost = false;
-            $this->postdata = $this->request->post('postdata');
+            $this->postdata = (string) $this->request->post('postdata');
 
             // Linkify stuff before sending it.
             $this->postdata = str_replace("\t", '    ', $this->postdata);
@@ -122,7 +122,7 @@ final class Post
         }
     }
 
-    public function upload($fileobj, $uid = false): string
+    private function upload($fileobj, $uid = false): string
     {
         if ($uid === false) {
             $uid = $this->user->get('id');
@@ -176,7 +176,7 @@ final class Post
         return (string) $id;
     }
 
-    public function previewpost(): void
+    private function previewpost(): void
     {
         $post = $this->postdata;
         if (trim((string) $post) !== '' && trim((string) $post) !== '0') {
@@ -192,7 +192,7 @@ final class Post
         $this->page->JS('update', 'post-preview', $post);
     }
 
-    public function showtopicform(): void
+    private function showtopicform(): void
     {
         $error = null;
         if ($this->request->isJSUpdate()) {
@@ -367,7 +367,7 @@ final class Post
         $this->page->JS('SCRIPT', "document.querySelector('#pollchoices').style.display='none'");
     }
 
-    public function showpostform(): void
+    private function showpostform(): void
     {
         $page = '';
         $tid = $this->tid;
@@ -493,7 +493,7 @@ final class Post
         $this->page->JS('attachfiles');
     }
 
-    public function canedit($post): bool
+    private function canedit($post): bool
     {
         if (
             $post['auth_id']
@@ -507,7 +507,7 @@ final class Post
         return (bool) $this->canmoderate($post['tid']);
     }
 
-    public function canmoderate($tid)
+    private function canmoderate($tid): bool
     {
         if ($this->canmod) {
             return $this->canmod;
@@ -534,7 +534,7 @@ final class Post
         return $this->canmod = $canmod;
     }
 
-    public function editpost(): ?bool
+    private function editpost(): void
     {
         $pid = $this->pid;
         $tid = $this->tid;
@@ -652,7 +652,7 @@ final class Post
         if ($error || $errorditingpost) {
             $this->showpostform();
 
-            return false;
+            return;
         }
 
         $this->database->safeupdate(
@@ -671,11 +671,9 @@ final class Post
             $this->textFormatting->theworks($this->postdata),
         );
         $this->page->JS('softurl');
-
-        return null;
     }
 
-    public function submitpost(): ?bool
+    private function submitpost(): void
     {
         $this->session->act();
         $tid = $this->tid;
@@ -813,7 +811,7 @@ final class Post
                 $this->showpostform();
             }
 
-            return null;
+            return;
         }
 
         if ($tid && is_numeric($tid)) {
@@ -844,7 +842,7 @@ final class Post
             $this->page->append('PAGE', $this->page->error($error));
             $this->page->JS('error', $error);
 
-            return false;
+            return;
         }
 
         $fdata['perms'] = $this->user->parseForumPerms($fdata['perms']);
@@ -857,7 +855,7 @@ final class Post
             $this->page->append('PAGE', $this->page->error($error));
             $this->page->JS('error', $error);
 
-            return false;
+            return;
         }
 
         // Actually PUT THE POST IN!
@@ -995,7 +993,5 @@ final class Post
         } else {
             $this->page->location('?act=vt' . $tid . '&getlast=1');
         }
-
-        return null;
     }
 }

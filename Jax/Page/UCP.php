@@ -42,7 +42,7 @@ final class UCP
 
     private string $ucppage = '';
 
-    public function __construct(
+    private function __construct(
         private readonly Config $config,
         private readonly Database $database,
         private readonly Jax $jax,
@@ -84,12 +84,12 @@ final class UCP
         $this->showucp();
     }
 
-    public function getlocationforform(): string
+    private function getlocationforform(): string
     {
         return $this->jax->hiddenFormFields(['act' => 'ucp', 'what' => $this->what]);
     }
 
-    public function showinbox(): void
+    private function showinbox(): void
     {
         $messageId = $this->request->post('messageid');
         $page = $this->request->both('page');
@@ -119,7 +119,7 @@ final class UCP
         };
     }
 
-    public function showmain(): void
+    private function showmain(): void
     {
         $error = null;
 
@@ -151,7 +151,7 @@ final class UCP
         $this->showucp();
     }
 
-    public function showucp($page = false): void
+    private function showucp($page = false): void
     {
         if ($this->shownucp) {
             return;
@@ -174,7 +174,7 @@ final class UCP
         $this->shownucp = true;
     }
 
-    public function showsoundsettings(): ?bool
+    private function showsoundsettings(): void
     {
         $fields = [
             'sound_shout',
@@ -207,7 +207,7 @@ final class UCP
 
             $this->ucppage = 'Settings saved successfully.';
         } elseif ($this->request->isJSUpdate()) {
-            return true;
+            return;
         }
 
         $checkboxes = [
@@ -226,11 +226,9 @@ final class UCP
             . "document.querySelector('#dtnotify').checked=(webkitNotifications.checkPermission()==0)";
 
         unset($checkboxes);
-
-        return null;
     }
 
-    public function showsigsettings(): void
+    private function showsigsettings(): void
     {
         $update = false;
         $sig = $this->user->get('sig');
@@ -254,7 +252,7 @@ final class UCP
         $this->showucp();
     }
 
-    public function showpasssettings()
+    private function showpasssettings(): void
     {
         $error = null;
         if ($this->request->post('passchange') !== null) {
@@ -288,7 +286,9 @@ final class UCP
                         <a href="?act=ucp&what=pass">Back</a>
                     HTML;
 
-                return $this->showucp();
+                $this->showucp();
+
+                return;
             }
 
             $this->ucppage .= $this->page->meta('error', $error);
@@ -302,7 +302,7 @@ final class UCP
         );
     }
 
-    public function showemailsettings()
+    private function showemailsettings(): void
     {
         $error = null;
         if ($this->request->post('submit') !== null) {
@@ -325,7 +325,9 @@ final class UCP
                     . '<br><br><a href="?act=ucp&what=email">Back</a>';
             }
 
-            return $this->showucp();
+            $this->showucp();
+
+            return;
         }
 
         $this->ucppage .= $this->page->meta(
@@ -350,7 +352,7 @@ final class UCP
         );
     }
 
-    public function showavatarsettings(): void
+    private function showavatarsettings(): void
     {
         $error = null;
         $update = false;
@@ -386,7 +388,7 @@ final class UCP
         $this->showucp();
     }
 
-    public function showprofilesettings(): void
+    private function showprofilesettings(): void
     {
         $error = null;
         $genderOptions = ['', 'male', 'female', 'other'];
@@ -653,7 +655,7 @@ final class UCP
         );
     }
 
-    public function showboardsettings(): void
+    private function showboardsettings(): void
     {
         $error = null;
         $showthing = false;
@@ -769,7 +771,7 @@ final class UCP
         ARRRRRRRRRRRRRRRRRRRRRRRR
      */
 
-    public function flag(): void
+    private function flag(): void
     {
         $this->page->JS('softurl');
         $this->database->safeupdate(
@@ -783,7 +785,7 @@ final class UCP
         );
     }
 
-    public function viewmessage($messageid): void
+    private function viewmessage($messageid): void
     {
         if (
             $this->request->isJSUpdate()
@@ -861,7 +863,7 @@ final class UCP
         $this->showucp($page);
     }
 
-    public function updatenummessages(): void
+    private function updatenummessages(): void
     {
         $result = $this->database->safeselect(
             'COUNT(`id`)',
@@ -876,7 +878,7 @@ final class UCP
         $this->page->JS('update', 'num-messages', $unread);
     }
 
-    public function viewmessages($view = 'inbox'): void
+    private function viewmessages($view = 'inbox'): void
     {
         if ($this->request->isJSUpdate() && !$this->request->hasPostData()) {
             return;
@@ -1019,7 +1021,7 @@ final class UCP
         $this->showucp($page);
     }
 
-    public function compose($messageid = '', $todo = ''): void
+    private function compose($messageid = '', $todo = ''): void
     {
         $error = null;
         $mid = 0;
@@ -1205,7 +1207,7 @@ final class UCP
         $this->showucp($page);
     }
 
-    public function delete($messageId, $relocate = true): void
+    private function delete($messageId, $relocate = true): void
     {
         $result = $this->database->safeselect(
             [

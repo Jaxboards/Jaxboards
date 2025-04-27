@@ -74,7 +74,7 @@ final class UserProfile
         }
     }
 
-    public function showcontactcard($id): void
+    private function showcontactcard($id): void
     {
         $contactdetails = '';
         $result = $this->database->safespecial(
@@ -156,14 +156,16 @@ final class UserProfile
         );
     }
 
-    public function showfullprofile($id)
+    private function showfullprofile($id): void
     {
         if ($this->request->isJSUpdate() && !$this->request->hasPostData()) {
-            return false;
+            return;
         }
 
         if (!$this->user->getPerm('can_view_fullprofile')) {
-            return $this->page->location('?');
+            $this->page->location('?');
+
+            return;
         }
 
         $nouser = false;
@@ -240,7 +242,7 @@ final class UserProfile
             $this->page->JS('update', 'page', $error);
             $this->page->append('page', $error);
 
-            return null;
+            return;
         }
 
         $pfpageloc = $this->request->both('page') ?? '';
@@ -547,7 +549,7 @@ final class UserProfile
                     while ($activity = $this->database->arow($result)) {
                         $activity['name'] = $user['display_name'];
                         $activity['group_id'] = $user['group_id'];
-                        $data = $this->parse_activity_rss($activity);
+                        $data = $this->parseActivityRSS($activity);
                         $feed->additem(
                             [
                                 'description' => $data['text'],
@@ -565,7 +567,7 @@ final class UserProfile
                 while ($activity = $this->database->arow($result)) {
                     $activity['name'] = $user['display_name'];
                     $activity['group_id'] = $user['group_id'];
-                    $pfbox .= $this->parse_activity($activity);
+                    $pfbox .= $this->parseActivity($activity);
                 }
 
                 $pfbox = $pfbox === '' || $pfbox === '0'
@@ -666,11 +668,9 @@ final class UserProfile
 
             $this->session->set('location_verbose', 'Viewing ' . $user['display_name'] . "'s profile");
         }
-
-        return null;
     }
 
-    public function parse_activity($activity): array|string
+    private function parseActivity($activity): array|string
     {
         $user = $this->page->meta(
             'user-link',
@@ -706,7 +706,7 @@ final class UserProfile
         return "<div class=\"activity {$activity['type']}\">{$text}</div>";
     }
 
-    public function parse_activity_rss($activity): array|string
+    private function parseActivityRSS($activity): array|string
     {
         return match ($activity['type']) {
             'profile_comment' => [

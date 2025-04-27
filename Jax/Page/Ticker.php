@@ -38,7 +38,7 @@ final class Ticker
         }
     }
 
-    public function index(): void
+    private function index(): void
     {
         $this->session->set('location_verbose', 'Using the ticker!');
         $result = $this->database->safespecial(
@@ -95,7 +95,7 @@ final class Ticker
         $this->page->JS('update', 'page', $page);
     }
 
-    public function update(): void
+    private function update(): void
     {
         $result = $this->database->safespecial(
             <<<'SQL'
@@ -153,7 +153,7 @@ final class Ticker
         $this->session->addVar('tickid', $first);
     }
 
-    public function ftick($t): ?string
+    private function ftick($t): ?string
     {
         return $this->page->meta(
             'ticker-tick',

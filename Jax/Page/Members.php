@@ -49,7 +49,7 @@ final class Members
         $this->showmemberlist();
     }
 
-    public function showmemberlist(): void
+    private function showmemberlist(): void
     {
         $fields = [
             'display_name' => 'Name',

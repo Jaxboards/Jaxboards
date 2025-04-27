@@ -61,7 +61,7 @@ final class ModControls
         $this->page->loadmeta('modcp');
     }
 
-    public function load(): void
+    private function load(): void
     {
         $script = file_get_contents('dist/modcontrols.js');
 
@@ -148,7 +148,7 @@ final class ModControls
         }
     }
 
-    public function dotopics($do): void
+    private function dotopics($do): void
     {
         switch ($do) {
             case 'move':
@@ -300,7 +300,7 @@ final class ModControls
         }
     }
 
-    public function doposts($do): void
+    private function doposts($do): void
     {
         switch ($do) {
             case 'move':
@@ -332,7 +332,7 @@ final class ModControls
         }
     }
 
-    public function cancel(): void
+    private function cancel(): void
     {
         $this->session->deleteVar('modpids');
         $this->session->deleteVar('modtids');
@@ -340,10 +340,10 @@ final class ModControls
         $this->page->JS('modcontrols_clearbox');
     }
 
-    public function modpost($pid)
+    private function modpost($pid): void
     {
         if (!is_numeric($pid)) {
-            return null;
+            return;
         }
 
         $pid = (int) $pid;
@@ -361,11 +361,13 @@ final class ModControls
         $this->database->disposeresult($result);
 
         if (!$postdata) {
-            return null;
+            return;
         }
 
         if ($postdata['newtopic']) {
-            return $this->modtopic($postdata['tid']);
+            $this->modtopic($postdata['tid']);
+
+            return;
         }
 
         $this->page->JS('softurl');
@@ -391,15 +393,17 @@ final class ModControls
             $this->database->disposeresult($result);
 
             if (!$mods) {
-                return null;
+                return;
             }
 
             $mods = explode(',', (string) $mods['mods']);
             if (!in_array($this->user->get('id'), $mods)) {
-                return $this->page->JS(
+                $this->page->JS(
                     'error',
                     "You don't have permission to be moderating in this forum",
                 );
+
+                return;
             }
         }
 
@@ -423,14 +427,14 @@ final class ModControls
 
         $this->sync();
 
-        return null;
+        return;
     }
 
-    public function modtopic($tid)
+    private function modtopic($tid): void
     {
         $this->page->JS('softurl');
         if (!is_numeric($tid)) {
-            return null;
+            return;
         }
 
         $tid = (int) $tid;
@@ -453,15 +457,19 @@ final class ModControls
             $this->database->disposeresult($result);
 
             if (!$mods) {
-                return $this->page->JS('error', $this->database->error());
+                $this->page->JS('error', $this->database->error());
+
+                return;
             }
 
             $mods = explode(',', (string) $mods['mods']);
             if (!in_array($this->user->get('id'), $mods)) {
-                return $this->page->JS(
+                $this->page->JS(
                     'error',
                     "You don't have permission to be moderating in this forum",
                 );
+
+                return;
             }
         }
 
@@ -485,10 +493,10 @@ final class ModControls
 
         $this->sync();
 
-        return null;
+        return;
     }
 
-    public function sync(): void
+    private function sync(): void
     {
         $this->page->JS(
             'modcontrols_postsync',
@@ -497,7 +505,7 @@ final class ModControls
         );
     }
 
-    public function deleteposts()
+    private function deleteposts()
     {
         if (
             !$this->session->getVar('modpids')
@@ -654,10 +662,12 @@ final class ModControls
         return null;
     }
 
-    public function deletetopics()
+    private function deletetopics(): void
     {
         if (!$this->session->getVar('modtids')) {
-            return $this->page->JS('error', 'No topics to delete');
+            $this->page->JS('error', 'No topics to delete');
+
+            return;
         }
 
         $forumData = [];
@@ -731,11 +741,9 @@ final class ModControls
         $this->session->deleteVar('modtids');
         $this->page->JS('modcontrols_clearbox');
         $this->page->JS('alert', 'topics deleted!');
-
-        return null;
     }
 
-    public function mergetopics(): void
+    private function mergetopics(): void
     {
         $page = '';
         $topicIds = explode(',', $this->session->getVar('modtids') ?? '');
@@ -835,12 +843,7 @@ final class ModControls
         $this->page->append('page', $page);
     }
 
-    public function banposts(): void
-    {
-        $this->page->JS('alert', 'under construction');
-    }
-
-    public function showmodcp($cppage = ''): void
+    private function showmodcp($cppage = ''): void
     {
         if (!$this->user->getPerm('can_moderate')) {
             return;
@@ -853,7 +856,7 @@ final class ModControls
         $this->page->JS('update', 'page', $page);
     }
 
-    public function editmembers(): void
+    private function editmembers(): void
     {
         if (!$this->user->getPerm('can_moderate')) {
             return;
@@ -1022,7 +1025,7 @@ final class ModControls
         $this->showmodcp($page);
     }
 
-    public function iptools(): void
+    private function iptools(): void
     {
         $page = '';
 

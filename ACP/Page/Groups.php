@@ -51,7 +51,7 @@ final class Groups
         };
     }
 
-    private function updateperms($permsInput)
+    private function updateperms($permsInput): void
     {
         $columns = [
             'can_access_acp',
@@ -142,10 +142,10 @@ final class Groups
 
         $this->updatePermissions = false;
 
-        return $this->showperms();
+        $this->showperms();
     }
 
-    private function showperms()
+    private function showperms(): void
     {
         $page = '';
 
@@ -165,7 +165,9 @@ final class Groups
                 $permInput[$groupId] = [];
             }
 
-            return $this->updateperms($permInput);
+            $this->updateperms($permInput);
+
+            return;
         }
 
         $groupList = $this->request->both('grouplist');
@@ -379,11 +381,9 @@ final class Groups
         );
 
         $this->page->addContentBox('Perms', $page);
-
-        return null;
     }
 
-    private function create($gid = false)
+    private function create($gid = false): void
     {
         if ($gid && !is_numeric($gid)) {
             $gid = false;
@@ -433,7 +433,9 @@ final class Groups
                     ),
                 );
 
-                return $this->showperms();
+                $this->showperms();
+
+                return;
             }
         }
 
@@ -460,8 +462,6 @@ final class Groups
             $gid ? 'Editing group: ' . $gdata['title'] : 'Create a group!',
             $page,
         );
-
-        return null;
     }
 
     private function delete(): void

@@ -72,7 +72,7 @@ final class LogReg
         };
     }
 
-    public function register()
+    private function register(): void
     {
         $this->registering = true;
 
@@ -102,7 +102,9 @@ final class LogReg
                 $this->page->JS('update', 'page', $p);
             }
 
-            return$this->page->append('PAGE', $p);
+            $this->page->append('PAGE', $p);
+
+            return;
         }
 
         // Validate input and actually register the user.
@@ -208,11 +210,9 @@ final class LogReg
             $this->page->JS('alert', $error);
             $this->page->append('page', $this->page->meta('error', $error));
         }
-
-        return null;
     }
 
-    public function login($u = false, $p = false): void
+    private function login($u = false, $p = false): void
     {
         if ($u && $p) {
             if ($this->session->get('is_bot')) {
@@ -278,7 +278,7 @@ final class LogReg
         $this->page->append('page', $this->page->meta('login-form'));
     }
 
-    public function logout(): void
+    private function logout(): void
     {
         // Just make a new session rather than fuss with the old one,
         // to maintain users online.
@@ -307,7 +307,7 @@ final class LogReg
         $this->login();
     }
 
-    public function loginpopup(): void
+    private function loginpopup(): void
     {
         $this->page->JS('softurl');
         $this->page->JS(
@@ -343,7 +343,7 @@ final class LogReg
         );
     }
 
-    public function toggleinvisible(): void
+    private function toggleinvisible(): void
     {
         $this->session->set('hide', $this->session->get('hide') ? 0 : 1);
 
@@ -353,7 +353,7 @@ final class LogReg
         $this->page->JS('softurl');
     }
 
-    public function forgotpassword($uid, $id): void
+    private function forgotpassword($uid, $id): void
     {
         $page = '';
 
@@ -519,7 +519,7 @@ final class LogReg
         $this->page->JS('update', 'page', $page);
     }
 
-    private function isHuman()
+    private function isHuman(): bool
     {
         if ($this->config->getSetting('recaptcha')) {
             // Validate reCAPTCHA.
@@ -546,7 +546,7 @@ final class LogReg
             // Execute post.
             $result = json_decode(curl_exec($curl_request), true);
 
-            return $result['success'];
+            return (bool) $result['success'];
         }
 
         // If recaptcha is not configured, we have to assume that they are in fact human.

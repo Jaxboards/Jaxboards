@@ -85,11 +85,13 @@ final class Forum
         $this->viewforum($act[2]);
     }
 
-    public function viewforum($fid)
+    private function viewforum($fid): void
     {
         // If no fid supplied, go to the index and halt execution.
         if (!$fid) {
-            return $this->page->location('?');
+            $this->page->location('?');
+
+            return;
         }
 
         $page = '';
@@ -136,8 +138,9 @@ final class Forum
 
         if (!$fdata) {
             $this->page->JS('alert', $this->database->error());
+            $this->page->location('?');
 
-            return $this->page->location('?');
+            return;
         }
 
         if ($fdata['redirect']) {
@@ -153,7 +156,9 @@ final class Forum
                 $this->database->basicvalue($fid),
             );
 
-            return $this->page->location($fdata['redirect']);
+            $this->page->location($fdata['redirect']);
+
+            return;
         }
 
         $title = &$fdata['title'];
@@ -162,7 +167,9 @@ final class Forum
         if (!$fdata['perms']['read']) {
             $this->page->JS('alert', 'no permission');
 
-            return $this->page->location('?');
+            $this->page->location('?');
+
+            return;
         }
 
         // NOW we can actually start building the page
@@ -416,7 +423,9 @@ final class Forum
             $table = $this->page->meta('forum-table', $rows);
         } else {
             if ($this->pageNumber > 0) {
-                return $this->page->location('?act=vf' . $fid);
+                $this->page->location('?act=vf' . $fid);
+
+                return;
             }
 
             if ($fdata['perms']['start']) {
@@ -458,11 +467,9 @@ final class Forum
         } else {
             $this->page->append('PAGE', $page);
         }
-
-        return null;
     }
 
-    public function getreplysummary($tid): void
+    private function getreplysummary($tid): void
     {
         $result = $this->database->safespecial(
             <<<'SQL'
@@ -495,12 +502,12 @@ final class Forum
         );
     }
 
-    public function update(): void
+    private function update(): void
     {
         // Update the topic listing.
     }
 
-    public function isTopicRead($topic, $fid): bool
+    private function isTopicRead($topic, $fid): bool
     {
         if (empty($this->topicsRead)) {
             $this->topicsRead = $this->jax->parsereadmarkers($this->session->get('topicsread'));
@@ -524,7 +531,7 @@ final class Forum
         );
     }
 
-    public function isForumRead($forum): bool
+    private function isForumRead($forum): bool
     {
         if (!$this->forumsRead) {
             $this->forumsRead = $this->jax->parsereadmarkers($this->session->get('forumsread'));
@@ -537,7 +544,7 @@ final class Forum
         );
     }
 
-    public function markread($id): void
+    private function markread($id): void
     {
         $forumsread = $this->jax->parsereadmarkers($this->session->get('forumsread'));
         $forumsread[$id] = time();

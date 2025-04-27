@@ -124,7 +124,7 @@ final readonly class Members
         );
     }
 
-    private function editmem(): null
+    private function editmem(): void
     {
         $userData = $this->user->getUser();
         $page = '';
@@ -335,7 +335,7 @@ final readonly class Members
 
                 $this->page->addContentBox('Select Member to Edit', $page);
 
-                return null;
+                return;
             }
 
             if ($nummembers === 0) {
@@ -344,7 +344,7 @@ final readonly class Members
                     $this->page->error('This member does not exist. ' . $this->page->back()),
                 );
 
-                return null;
+                return;
             }
 
             $data = array_pop($data);
@@ -399,7 +399,7 @@ final readonly class Members
             $page,
         );
 
-        return null;
+        return;
     }
 
     private function preregister(): void

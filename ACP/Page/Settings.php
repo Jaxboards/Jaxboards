@@ -169,9 +169,9 @@ final readonly class Settings
         $this->page->addContentBox('Custom Pages', $page);
     }
 
-    private function pages_delete($page): mixed
+    private function pages_delete($page): void
     {
-        return $this->database->safedelete(
+        $this->database->safedelete(
             'pages',
             'WHERE `act`=?',
             $this->database->basicvalue($page),

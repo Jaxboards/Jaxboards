@@ -50,20 +50,11 @@ final class Topic
      */
     private $pageNumber = 0;
 
-    /**
-     * @var int
-     */
-    private $numperpage = 0;
+    private int $numperpage = 10;
 
-    /**
-     * @var bool
-     */
-    private $canMod = false;
+    private bool $canMod = false;
 
-    /**
-     * @var int
-     */
-    private $firstPostID = 0;
+    private int $firstPostID = 0;
 
     /**
      * @var null|array
@@ -109,8 +100,6 @@ final class Topic
         }
 
         --$this->pageNumber;
-
-        $this->numperpage = 10;
 
         if (
             $this->request->both('qreply') !== null
@@ -195,7 +184,7 @@ final class Topic
         $this->viewtopic($this->tid);
     }
 
-    public function getTopicData($tid): void
+    private function getTopicData($tid): void
     {
         $result = $this->database->safespecial(
             <<<'MySQL'
@@ -230,7 +219,7 @@ final class Topic
         $this->topicdata['fperms'] = $this->user->parseForumPerms($this->topicdata['fperms']);
     }
 
-    public function viewtopic($tid): void
+    private function viewtopic($tid): void
     {
         if (
             !$this->user->isGuest()
@@ -420,7 +409,7 @@ final class Topic
         $this->page->append('page', $page);
     }
 
-    public function update($tid): void
+    private function update($tid): void
     {
 
         // Check for new posts and append them.
@@ -480,7 +469,7 @@ final class Topic
         $this->session->set('users_online_cache', $newcache);
     }
 
-    public function qreplyform($tid): void
+    private function qreplyform($tid): void
     {
         $prefilled = '';
         $this->page->JS('softurl');
@@ -533,7 +522,7 @@ final class Topic
         $this->page->JS('updateqreply', '');
     }
 
-    public function postsintooutput($lastpid = 0): string
+    private function postsintooutput($lastpid = 0): string
     {
         $usersonline = $this->database->getUsersOnline();
         $ratingConfig = $this->config->getSetting('ratings') ?? 0;
@@ -831,7 +820,7 @@ final class Topic
         return $rows;
     }
 
-    public function canedit($post): bool
+    private function canedit($post): bool
     {
         if ($this->canModerate()) {
             return true;
@@ -844,7 +833,7 @@ final class Topic
         && $post['auth_id'] === $this->user->get('id');
     }
 
-    public function canModerate()
+    private function canModerate(): bool
     {
         if ($this->canMod) {
             return $this->canMod;
@@ -879,7 +868,7 @@ final class Topic
         return $this->canMod = $canMod;
     }
 
-    public function generatepoll($q, $type, $choices, $results): string
+    private function generatepoll($q, $type, $choices, $results): string
     {
         if (!$choices) {
             $choices = [];
@@ -956,7 +945,7 @@ final class Topic
             . '</form>';
     }
 
-    public function votepoll()
+    private function votepoll(): void
     {
         $error = null;
         if ($this->user->isGuest()) {
@@ -1032,7 +1021,9 @@ final class Topic
         }
 
         if ($error !== null) {
-            return $this->page->JS('error', $error);
+            $this->page->JS('error', $error);
+
+            return;
         }
 
         if ($row['poll_type'] === 'multi') {
@@ -1070,11 +1061,9 @@ final class Topic
             'WHERE `id`=?',
             $this->tid,
         );
-
-        return null;
     }
 
-    public function ratepost($postid, $nibletid): void
+    private function ratepost($postid, $nibletid): void
     {
         $this->page->JS('softurl');
         if (!is_numeric($postid) || !is_numeric($nibletid)) {
@@ -1135,7 +1124,7 @@ final class Topic
         $this->page->JS('alert', $unrate ? 'Unrated!' : 'Rated!');
     }
 
-    public function qeditpost($pid): void
+    private function qeditpost($pid): void
     {
         if (!is_numeric($pid)) {
             return;
@@ -1221,7 +1210,7 @@ final class Topic
         $this->page->JS('update', "#pid_{$pid} .post_content", $form);
     }
 
-    public function multiquote($tid): void
+    private function multiquote($tid): void
     {
         $pid = $this->request->both('quote');
         $post = false;
@@ -1280,7 +1269,7 @@ final class Topic
         $this->page->JS('softurl');
     }
 
-    public function getlastpost($tid): void
+    private function getlastpost($tid): void
     {
         $result = $this->database->safeselect(
             'MAX(`id`) AS `lastpid`,COUNT(`id`) AS `numposts`',
@@ -1298,7 +1287,7 @@ final class Topic
         );
     }
 
-    public function findpost($pid): void
+    private function findpost($pid): void
     {
         $couldntfindit = false;
         if (!is_numeric($pid)) {
@@ -1346,14 +1335,14 @@ final class Topic
         );
     }
 
-    public function markread($tid): void
+    private function markread($tid): void
     {
         $topicsread = $this->jax->parsereadmarkers($this->session->get('topicsread'));
         $topicsread[$tid] = time();
         $this->session->set('topicsread', json_encode($topicsread));
     }
 
-    public function listrating($pid): void
+    private function listrating($pid): void
     {
         $ratingConfig = $this->config->getSetting('ratings') ?? 0;
         if (($ratingConfig & 2) !== 0) {

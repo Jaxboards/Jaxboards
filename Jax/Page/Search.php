@@ -78,7 +78,7 @@ final class Search
         }
     }
 
-    public function form($pageContents = ''): void
+    private function form($pageContents = ''): void
     {
         if ($this->request->isJSUpdate()) {
             return;
@@ -96,7 +96,7 @@ final class Search
         $this->page->append('page', $page);
     }
 
-    public function getForumSelection(): string
+    private function getForumSelection(): string
     {
         $this->getSearchableForums();
         if (!$this->fids) {
@@ -139,7 +139,7 @@ final class Search
         );
     }
 
-    public function rtreeselect($tree, $titles, $level = 0): string
+    private function rtreeselect($tree, $titles, $level = 0): string
     {
         $options = '';
         foreach ($tree as $k => $v) {
@@ -163,7 +163,7 @@ final class Search
         return $options;
     }
 
-    public function pdate($a): false|int
+    private function pdate($a): false|int
     {
         $dayMonthYear = explode('/', (string) $a);
         if (count($dayMonthYear) !== 3) {
@@ -193,7 +193,7 @@ final class Search
         return mktime(0, 0, 0, $dayMonthYear[0], $dayMonthYear[1], $dayMonthYear[2]);
     }
 
-    public function dosearch(): void
+    private function dosearch(): void
     {
 
         if ($this->request->isJSUpdate() && !$this->request->hasPostData()) {
@@ -451,7 +451,7 @@ final class Search
         }
     }
 
-    public function getSearchableForums()
+    private function getSearchableForums()
     {
         if ($this->fids) {
             return $this->fids;
