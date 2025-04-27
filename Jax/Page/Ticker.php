@@ -157,7 +157,7 @@ final class Ticker
     {
         return $this->page->meta(
             'ticker-tick',
-            $this->jax->smalldate($t['date'], false, true),
+            $this->jax->smalldate($t['date'], ['autodate']),
             $this->page->meta(
                 'user-link',
                 $t['auth_id'],

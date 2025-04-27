@@ -393,7 +393,7 @@ final class IDX
                 && $this->config->getSetting('birthdays') ? ' birthday' : '';
             $lastOnlineCode = $this->jax->date(
                 $user['hide'] ? $user['read_date'] : $user['last_update'],
-                false,
+                [],
             );
             $userstoday
                 .= <<<EOT

@@ -430,7 +430,7 @@ final class Search
             $page = $this->page->error($error);
         } else {
             $resultsArray = $this->jax->pages(
-                ceil($numresults / $this->perpage),
+                (int) ceil($numresults / $this->perpage),
                 $this->pagenum,
                 10,
             );

@@ -266,9 +266,9 @@ final class Forum
         $table = '';
 
         // Generate pages.
-        $numpages = ceil($fdata['topics'] / $this->numperpage);
+        $numpages = (int) ceil($fdata['topics'] / $this->numperpage);
         $forumpages = '';
-        if ($numpages !== 0.0) {
+        if ($numpages !== 0) {
             foreach ($this->jax->pages($numpages, $this->pageNumber + 1, 10) as $pageNumber) {
                 $forumpages .= '<a href="?act=vf' . $fid . '&amp;page='
                     . $pageNumber . '"' . ($pageNumber - 1 === $this->pageNumber ? ' class="active"' : '')
@@ -349,7 +349,7 @@ final class Forum
         while ($forum = $this->database->arow($result)) {
             $pages = '';
             if ($forum['replies'] > 9) {
-                foreach ($this->jax->pages(ceil(($forum['replies'] + 1) / 10), 1, 10) as $pageNumber) {
+                foreach ($this->jax->pages((int) ceil(($forum['replies'] + 1) / 10), 1, 10) as $pageNumber) {
                     $pages .= "<a href='?act=vt" . $forum['id']
                         . "&amp;page={$pageNumber}'>{$pageNumber}</a> ";
                 }

@@ -129,7 +129,7 @@ final class Members
         $nummembers = $thisrow['num_members'];
 
         $pagesArray = $this->jax->pages(
-            ceil($nummembers / $this->perpage),
+            (int) ceil($nummembers / $this->perpage),
             $this->pageNumber + 1,
             $this->perpage,
         );

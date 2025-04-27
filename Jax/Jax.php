@@ -39,21 +39,25 @@ final readonly class Jax
         return $v;
     }
 
-    public function hiddenFormFields($fields): string
+    /**
+     * @param array<string,string> $fields
+     */
+    public function hiddenFormFields(array $fields): string
     {
         $html = '';
         foreach ($fields as $key => $value) {
-            $html .= '<input type="hidden" name="' . $key . '" value="' . $value . '" />';
+            $html .= "<input type='hidden' name='{$key}' value='{$value}'>";
         }
 
         return $html;
     }
 
-    public function date($date, $autodate = true): false|string
+    /**
+     * @param array<string> $options can contain 'autodate' to control format
+     */
+    public function date(int $date, $options = ['autodate']): string
     {
-        if (!$date) {
-            return false;
-        }
+        $autodate = in_array('autodate', $options);
 
         $delta = time() - $date;
         $fmt = '';
@@ -76,44 +80,43 @@ final readonly class Jax
         return "<span class='autodate' title='{$date}'>{$fmt}</span>";
     }
 
+    /**
+     * @param array<string> $options can contain 'autodate' or 'seconds' to control format
+     */
     public function smalldate(
-        $date,
-        $seconds = false,
-        $autodate = false,
-    ): false|string {
-        if (!$date) {
-            return false;
-        }
+        int $timestamp,
+        array $options = [],
+    ): string {
+        $autodate = in_array('autodate', $options);
+        $seconds = in_array('seconds', $options);
 
-        return ($autodate
-            ? '<span class="autodate smalldate" title="' . $date . '">'
-            : '')
-            . gmdate('g:i' . ($seconds ? ':s' : '') . 'a, n/j/y', $date)
+        return ($autodate ? "<span class='autodate smalldate' title='{$timestamp}'>" : '')
+            . gmdate('g:i' . ($seconds ? ':s' : '') . 'a, n/j/y', $timestamp)
             . ($autodate ? '</span>' : '');
     }
 
-    public function isurl($url): false|int
+    public function isurl(string $url): false|int
     {
-        return preg_match('@^https?://[\w\.\-%\&\?\=/]+$@', (string) $url);
+        return preg_match('@^https?://[\w\.\-%\&\?\=/]+$@', $url);
     }
 
-    public function isemail($email): false|int
+    public function isemail(string $email): false|int
     {
-        return preg_match('/[\w\+.]+@[\w.]+/', (string) $email);
+        return preg_match('/[\w\+.]+@[\w.]+/', $email);
     }
 
-    public function parsereadmarkers($readmarkers)
+    public function parsereadmarkers(?string $readmarkers)
     {
         if ($readmarkers) {
-            return json_decode((string) $readmarkers, true) ?? [];
+            return json_decode($readmarkers, true) ?? [];
         }
 
         return [];
     }
 
-    public function rmdir($dir): bool
+    public function rmdir(string $dir): bool
     {
-        if (mb_substr((string) $dir, -1) !== '/') {
+        if (mb_substr($dir, -1) !== '/') {
             $dir .= '/';
         }
 
@@ -130,7 +133,7 @@ final readonly class Jax
         return true;
     }
 
-    public function pages($numpages, $active, $tofill)
+    public function pages(int $numpages, int $active, int $tofill)
     {
         $tofill -= 2;
         $pages[] = 1;
@@ -156,7 +159,7 @@ final readonly class Jax
         return $pages;
     }
 
-    public function filesize($bs): string
+    public function filesize(int $bs): string
     {
         $p = 0;
         $sizes = ' KMGT';
@@ -175,14 +178,14 @@ final readonly class Jax
      * @param mixed $topic
      * @param mixed $message
      */
-    public function mail($email, $topic, $message)
+    public function mail(string $email, string $topic, string $message)
     {
         $boardname = $this->config->getSetting('boardname') ?: 'JaxBoards';
         $boardurl = $this->domainDefinitions->getBoardURL();
         $boardlink = "<a href='{$boardurl}'>{$boardname}</a>";
 
-        return @mail(
-            (string) $email,
+        return mail(
+            $email,
             $boardname . ' - ' . $topic,
             str_replace(
                 ['{BOARDNAME}', '{BOARDURL}', '{BOARDLINK}'],
