@@ -7,9 +7,6 @@ namespace Jax;
 use function array_key_exists;
 use function array_merge;
 use function file_put_contents;
-use function json_encode;
-
-use const JSON_PRETTY_PRINT;
 
 final class Config
 {
@@ -68,5 +65,4 @@ final class Config
 
         file_put_contents($this->domainDefinitions->getBoardPath() . '/config.php', $this->serviceConfig->configFileContents($data));
     }
-
 }

@@ -33,6 +33,7 @@ final class ServiceConfig
         $serviceConfig = [];
         if (file_exists(dirname(__DIR__) . '/config.php')) {
             $this->installed = true;
+
             require_once dirname(__DIR__) . '/config.php';
 
             if (isset($CFG)) {
