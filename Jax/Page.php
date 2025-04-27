@@ -301,6 +301,11 @@ final class Page
             );
             $skin = $this->database->arow($result);
             $this->database->disposeresult($result);
+        }
+
+        // We've exhausted all other ways of finding the right skin
+        // Fallback to default
+        if ($skin === null) {
             $skin = [
                 'custom' => 0,
                 'title' => 'Default',
