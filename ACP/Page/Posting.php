@@ -14,8 +14,6 @@ use function array_reverse;
 use function krsort;
 use function rawurlencode;
 
-use const PHP_EOL;
-
 final readonly class Posting
 {
     public function __construct(

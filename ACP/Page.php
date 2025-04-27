@@ -14,7 +14,6 @@ use function header;
 use function mb_strtolower;
 use function mb_substr;
 use function pathinfo;
-use function preg_replace;
 use function str_replace;
 
 use const PATHINFO_EXTENSION;

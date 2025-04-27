@@ -36,7 +36,6 @@ use function rename;
 use function unlink;
 
 use const PATHINFO_FILENAME;
-use const PHP_EOL;
 
 final readonly class Themes
 {

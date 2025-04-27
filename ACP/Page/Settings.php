@@ -16,8 +16,6 @@ use function mb_strlen;
 use function preg_replace;
 use function trim;
 
-use const PHP_EOL;
-
 final readonly class Settings
 {
     public function __construct(
