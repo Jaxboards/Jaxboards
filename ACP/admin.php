@@ -5,7 +5,6 @@ declare(strict_types=1);
 use ACP\App;
 use DI\Container;
 
-
 /**
  * Admin login.
  *

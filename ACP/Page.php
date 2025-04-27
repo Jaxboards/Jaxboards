@@ -130,7 +130,7 @@ final class Page
     /**
      * Parse a template file, replacing {{ key }} with the value of $data['key'].
      *
-     * @param string               $templateFile The path to the template file.
+     * @param string               $templateFile the path to the template file
      * @param array<string,string> $data         Template variables to be replaced
      *
      * @return string returns the template with the data replaced

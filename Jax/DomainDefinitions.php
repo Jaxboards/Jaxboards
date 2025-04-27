@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use function define;
-use function defined;
 use function implode;
 use function preg_match;
 use function preg_replace;
 use function str_replace;
 
-/*
+/**
  * Figures out what board we're talking about if it's a service,
  * but regardless defines some important paths.
  *
@@ -19,7 +17,6 @@ use function str_replace;
  *
  * @see https://github.com/jaxboards/jaxboards Jaxboards Github Repo
  */
-
 function pathjoin(string ...$paths): ?string
 {
     return preg_replace('@\/+@', '/', implode('/', $paths));
