@@ -12,6 +12,8 @@ use Jax\Session;
 use Jax\User;
 
 use function header;
+use function is_string;
+use function mb_strtolower;
 
 /**
  * Admin control panel.
@@ -174,18 +176,19 @@ final class App
                 'dropdown_links' => $dropdownLinks,
             ],
         );
-
     }
 
-    private function renderNav() {
-        $this->page->append('nav',
+    private function renderNav(): void
+    {
+        $this->page->append(
+            'nav',
             $this->page->parseTemplate(
                 'nav.html',
                 [
                     'nav' => $this->nav['links'],
                     'nav_dropdowns' => $this->nav['dropdowns'],
                 ],
-            )
+            ),
         );
     }
 }

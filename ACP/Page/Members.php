@@ -202,7 +202,7 @@ final readonly class Members
                         $page = $this->page->success('Profile data saved');
                     } else {
                         $page = $this->page->error(
-                            'You do not have permission to edit this profile.'
+                            'You do not have permission to edit this profile.',
                         );
                     }
                 }
