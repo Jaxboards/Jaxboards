@@ -43,7 +43,7 @@ final class DomainDefinitions
     private string $defaultThemePath = '';
 
     /**
-     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings("PHPMD.Superglobals")
      */
     public function __construct(private readonly ServiceConfig $serviceConfig)
     {

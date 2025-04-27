@@ -173,7 +173,7 @@ final readonly class Jax
     }
 
     /**
-     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings("PHPMD.Superglobals")
      *
      * @param mixed $email
      * @param mixed $topic

@@ -146,7 +146,7 @@ final class TextFormatting
     }
 
     /**
-     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings("PHPMD.Superglobals")
      */
     public function linkify_callback(array $match): string
     {

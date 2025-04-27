@@ -170,7 +170,7 @@ final class Session
     }
 
     /**
-     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings("PHPMD.Superglobals")
      *
      * @param null|mixed $sid
      */
@@ -284,7 +284,7 @@ final class Session
     }
 
     /**
-     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings("PHPMD.Superglobals")
      */
     public function getPHPSessionValue(string $field)
     {
@@ -292,7 +292,7 @@ final class Session
     }
 
     /**
-     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings("PHPMD.Superglobals")
      */
     public function setPHPSessionValue(
         string $field,
@@ -509,7 +509,7 @@ final class Session
     }
 
     /**
-     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings("PHPMD.Superglobals")
      */
     private function getUserAgent(): ?string
     {

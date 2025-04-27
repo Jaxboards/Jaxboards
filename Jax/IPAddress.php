@@ -153,7 +153,7 @@ final class IPAddress
     }
 
     /**
-     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings("PHPMD.Superglobals")
      */
     private function getIp(): string
     {

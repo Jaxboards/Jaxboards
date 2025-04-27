@@ -1424,7 +1424,7 @@ final class Topic
     }
 
     /**
-     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings("PHPMD.Superglobals")
      */
     private function viewrss(int $tid): void
     {

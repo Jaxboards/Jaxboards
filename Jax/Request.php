@@ -9,7 +9,7 @@ use function setcookie;
 final class Request
 {
     /**
-     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings("PHPMD.Superglobals")
      */
     public function both(string $property)
     {
@@ -17,7 +17,7 @@ final class Request
     }
 
     /**
-     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings("PHPMD.Superglobals")
      */
     public function get(string $property)
     {
@@ -25,7 +25,7 @@ final class Request
     }
 
     /**
-     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings("PHPMD.Superglobals")
      */
     public function post(string $property)
     {
@@ -33,7 +33,7 @@ final class Request
     }
 
     /**
-     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings("PHPMD.Superglobals")
      */
     public function cookie(string $cookieName)
     {
@@ -41,7 +41,7 @@ final class Request
     }
 
     /**
-     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings("PHPMD.Superglobals")
      */
     public function hasCookies(): bool
     {
@@ -58,7 +58,7 @@ final class Request
     }
 
     /**
-     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings("PHPMD.Superglobals")
      */
     public function hasPostData(): bool
     {
@@ -90,7 +90,7 @@ final class Request
     }
 
     /**
-     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings("PHPMD.Superglobals")
      */
     private function jsAccess(): int
     {
