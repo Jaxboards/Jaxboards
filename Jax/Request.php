@@ -53,7 +53,7 @@ final class Request
      *
      * @SuppressWarnings("PHPMD.Superglobals")
      */
-    public function files(string $property): array
+    public function files(string $property): ?array
     {
         return $_FILES[$property] ?? null;
     }
