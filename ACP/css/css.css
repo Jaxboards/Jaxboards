@@ -229,6 +229,7 @@ a:visited {
 
 .box .header {
   background: linear-gradient(#1b63b6, #192c44);
+  border-bottom: 1px solid #000;
   line-height: 36px;
   font-size: 16px;
   color: #fff;
