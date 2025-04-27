@@ -135,10 +135,8 @@ final readonly class Themes
 
     /**
      * Delete a wrapper. Returns error string upon failure.
-     *
-     * @param mixed $wrapper
      */
-    private function deleteWrapper($wrapper): ?string
+    private function deleteWrapper(string $wrapper): ?string
     {
         $wrapperPath = $this->wrappersPath . $wrapper . '.html';
         if (
@@ -156,10 +154,8 @@ final readonly class Themes
 
     /**
      * Create a wrapper. Returns error string upon failure.
-     *
-     * @param mixed $wrapper
      */
-    private function createWrapper($wrapper): ?string
+    private function createWrapper(string $wrapper): ?string
     {
         $newWrapperPath
             = $this->wrappersPath . $wrapper . '.html';
@@ -332,12 +328,12 @@ final readonly class Themes
         $wrapperError = null;
 
         $deleteWrapper = $this->request->both('deletewrapper');
-        if ($deleteWrapper) {
+        if (is_string($deleteWrapper)) {
             $wrapperError = $this->deleteWrapper($deleteWrapper);
         }
 
         $newWrapper = $this->request->both('newwrapper');
-        if ($newWrapper !== null && $newWrapper !== '') {
+        if (is_string($newWrapper) && $newWrapper !== '') {
             $wrapperError = $this->createWrapper($newWrapper);
         }
 
