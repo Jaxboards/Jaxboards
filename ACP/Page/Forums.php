@@ -541,6 +541,7 @@ final readonly class Forums
                     );
 
                     $this->orderforums($this->database->insertId());
+
                     return;
                 }
 
@@ -827,6 +828,7 @@ final readonly class Forums
                     ),
                 ),
             );
+
             return;
         }
 
@@ -866,6 +868,7 @@ final readonly class Forums
                 'Deleting Forum: ' . $forumId,
                 $this->page->error("Forum doesn't exist."),
             );
+
             return;
         }
 
