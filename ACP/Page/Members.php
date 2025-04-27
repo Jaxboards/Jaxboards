@@ -333,14 +333,16 @@ final readonly class Members
                     ) . PHP_EOL;
                 }
 
-                return $this->page->addContentBox('Select Member to Edit', $page);
+                $this->page->addContentBox('Select Member to Edit', $page);
+                return;
             }
 
             if ($nummembers === 0) {
-                return $this->page->addContentBox(
+                $this->page->addContentBox(
                     'Error',
                     $this->page->error('This member does not exist. ' . $this->page->back()),
                 );
+                return;
             }
 
             $data = array_pop($data);

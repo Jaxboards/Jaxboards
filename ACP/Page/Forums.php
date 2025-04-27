@@ -351,7 +351,7 @@ final readonly class Forums
      * @param int $fid The forum ID. If set, this edits a forum,
      *                 otherwise it creates one.
      */
-    private function createforum($fid = 0)
+    private function createforum($fid = 0): void
     {
         $page = '';
         $forumperms = '';
@@ -540,7 +540,8 @@ final readonly class Forums
                         $write,
                     );
 
-                    return $this->orderforums($this->database->insertId());
+                    $this->orderforums($this->database->insertId());
+                    return;
                 }
 
                 $this->database->safeupdate(
@@ -761,7 +762,7 @@ final readonly class Forums
         $this->page->addContentBox('Forum Permissions', $forumperms);
     }
 
-    private function deleteforum($forumId)
+    private function deleteforum($forumId): void
     {
         if (
             $this->request->post('submit') === 'Cancel'
@@ -815,7 +816,7 @@ final readonly class Forums
                     ? " and {$posts} posts" : '');
             }
 
-            return $this->page->addContentBox(
+            $this->page->addContentBox(
                 'Forum Deletion',
                 $this->page->success(
                     $this->page->parseTemplate(
@@ -826,6 +827,7 @@ final readonly class Forums
                     ),
                 ),
             );
+            return;
         }
 
         $result = $this->database->safeselect(
@@ -860,10 +862,11 @@ final readonly class Forums
         $this->database->disposeresult($result);
 
         if (!$fdata) {
-            return $this->page->addContentBox(
+            $this->page->addContentBox(
                 'Deleting Forum: ' . $forumId,
                 $this->page->error("Forum doesn't exist."),
             );
+            return;
         }
 
         $result = $this->database->safeselect(
@@ -913,8 +916,6 @@ final readonly class Forums
                 ],
             ),
         );
-
-        return null;
     }
 
     private function createcategory($cid = false): void
