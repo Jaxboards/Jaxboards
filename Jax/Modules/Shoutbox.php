@@ -125,7 +125,7 @@ final class Shoutbox
                 'shout-action',
                 $this->jax->smalldate(
                     $row['date'],
-                    ['seconds']
+                    ['seconds'],
                 ),
                 $user,
                 mb_substr(

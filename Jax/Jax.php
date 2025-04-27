@@ -7,6 +7,7 @@ namespace Jax;
 use function floor;
 use function glob;
 use function gmdate;
+use function in_array;
 use function is_dir;
 use function json_decode;
 use function mail;
@@ -178,7 +179,7 @@ final readonly class Jax
      * @param mixed $topic
      * @param mixed $message
      */
-    public function mail(string $email, string $topic, string $message)
+    public function mail(string $email, string $topic, string $message): bool
     {
         $boardname = $this->config->getSetting('boardname') ?: 'JaxBoards';
         $boardurl = $this->domainDefinitions->getBoardURL();
