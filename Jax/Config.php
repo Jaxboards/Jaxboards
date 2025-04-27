@@ -55,7 +55,11 @@ final class Config
 
         return null;
     }
-
+    /**
+     * Write board config
+     *
+     * @param array<string,mixed>
+     */
     public function write($data): void
     {
         $this->boardConfig = $data;
@@ -63,13 +67,20 @@ final class Config
         file_put_contents($this->domainDefinitions->getBoardPath() . '/config.php', $this->configFileContents($data));
     }
 
-    // Only used during installation
-    public function writeServiceConfig($data): void
+    /**
+     * Write service config during installation
+     *
+     * @param array<string,mixed>
+     */
+    public function writeServiceConfig(array $data): void
     {
         file_put_contents(JAXBOARDS_ROOT . '/config.php', $this->configFileContents($data));
     }
 
-    private function configFileContents($data): string
+    /**
+     * @param array<string,mixed>
+     */
+    private function configFileContents(array $data): string
     {
         $dataString = json_encode($data, JSON_PRETTY_PRINT);
 
