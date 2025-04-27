@@ -103,9 +103,7 @@ final readonly class Settings
         $this->page->addContentBox('Board Online/Offline', $page);
     }
 
-    /*
-     * Custom pages.
-     */
+    // Custom pages.
     private function pages(): void
     {
         $page = '';
@@ -228,9 +226,7 @@ final readonly class Settings
         $this->page->addContentBox("Editing Page: {$pageurl}", $page);
     }
 
-    /*
-     * Shoutbox.
-     */
+    // Shoutbox.
     private function shoutbox(): void
     {
         $page = '';

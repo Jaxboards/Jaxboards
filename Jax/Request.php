@@ -8,7 +8,7 @@ use function setcookie;
 
 final class Request
 {
-    /*
+    /**
      * @SuppressWarnings(PHPMD.Superglobals)
      */
     public function both(string $property)
@@ -16,7 +16,7 @@ final class Request
         return $_POST[$property] ?? $_GET[$property] ?? null;
     }
 
-    /*
+    /**
      * @SuppressWarnings(PHPMD.Superglobals)
      */
     public function get(string $property)
@@ -24,7 +24,7 @@ final class Request
         return $_GET[$property] ?? null;
     }
 
-    /*
+    /**
      * @SuppressWarnings(PHPMD.Superglobals)
      */
     public function post(string $property)
@@ -32,7 +32,7 @@ final class Request
         return $_POST[$property] ?? null;
     }
 
-    /*
+    /**
      * @SuppressWarnings(PHPMD.Superglobals)
      */
     public function cookie(string $cookieName)
@@ -40,7 +40,7 @@ final class Request
         return $_COOKIE[$cookieName] ?? null;
     }
 
-    /*
+    /**
      * @SuppressWarnings(PHPMD.Superglobals)
      */
     public function hasCookies(): bool
@@ -57,7 +57,7 @@ final class Request
         setcookie($cookieName, $cookieValue ?? 'false', ['expires' => $expires, 'path' => null, 'domain' => null, 'secure' => true, 'httponly' => $httponly]);
     }
 
-    /*
+    /**
      * @SuppressWarnings(PHPMD.Superglobals)
      */
     public function hasPostData(): bool
@@ -89,7 +89,7 @@ final class Request
         return $this->jsAccess() === 3;
     }
 
-    /*
+    /**
      * @SuppressWarnings(PHPMD.Superglobals)
      */
     private function jsAccess(): int

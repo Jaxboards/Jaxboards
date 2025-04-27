@@ -16,7 +16,7 @@ use function sprintf;
 
 final class Members
 {
-    /*
+    /**
      * @var float|int
      */
     private $pageNumber = 0;

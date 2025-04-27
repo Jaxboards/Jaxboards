@@ -36,7 +36,7 @@ use const PATHINFO_BASENAME;
 use const PATHINFO_FILENAME;
 use const PHP_EOL;
 
-/*
+/**
  * This class is entirely responsible for rendering the page.
  *
  * Because there weren't any good PHP template systems at the time (Blade, Twig) we built our own.
@@ -76,17 +76,17 @@ use const PHP_EOL;
  */
 final class Page
 {
-    /*
+    /**
      * @var array<string, string>
      */
     private $metadefs = [];
 
-    /*
+    /**
      * @var array<string>
      */
     private $debuginfo = [];
 
-    /*
+    /**
      * @var array<string>
      */
     private $JSOutput = [];

@@ -32,7 +32,7 @@ use function trim;
 
 use const PASSWORD_DEFAULT;
 
-/*
+/**
  * Service signup file, for users to create their own JaxBoards forum.
  *
  * PHP Version 8
@@ -290,9 +290,7 @@ final readonly class ServiceSignup
             HTML;
     }
 
-    /*
-     * Recursively copies one directory to another.
-     */
+    // Recursively copies one directory to another.
     private function recurseCopy(string $source, string $destination): void
     {
         $dir = opendir($source);

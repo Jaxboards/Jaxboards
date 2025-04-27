@@ -23,7 +23,10 @@ use const PHP_EOL;
 
 final readonly class Jax
 {
-    public function __construct(private Config $config, private DomainDefinitions $domainDefinitions) {}
+    public function __construct(
+        private Config $config,
+        private DomainDefinitions $domainDefinitions,
+    ) {}
 
     public function pick(...$args)
     {
@@ -165,9 +168,12 @@ final readonly class Jax
         return round($bs, 2) . ' ' . ($p !== 0 ? $sizes[$p] : '') . 'B';
     }
 
-
-    /*
+    /**
      * @SuppressWarnings(PHPMD.Superglobals)
+     *
+     * @param mixed $email
+     * @param mixed $topic
+     * @param mixed $message
      */
     public function mail($email, $topic, $message)
     {

@@ -5,7 +5,7 @@ declare(strict_types=1);
 
 // phpcs:disable Generic.Files.LineLength.TooLong,PSR12.Files.FileHeader.IncorrectOrder,Squiz.Commenting.InlineComment.DocBlock,Squiz.Commenting.BlockComment.WrongStart
 
-/*
+/**
  * Tool to convert PHP_CodeSniffer output into something SonarQube can read.
  *
  * @see https://docs.sonarsource.com/sonarqube-cloud/enriching/generic-issue-data/
@@ -176,7 +176,7 @@ const RULE_DESCRIPTION_REPLACEMENTS = [
 ];
 // phpcs:enable
 
-/*
+/**
  * Make rule descriptions more generic for SonarCloud issue rules.
  *
  * @param string $input The description to work with

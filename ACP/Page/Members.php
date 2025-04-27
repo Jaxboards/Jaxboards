@@ -928,7 +928,10 @@ final readonly class Members
         ) . PHP_EOL;
         $this->page->addContentBox('Enable Member Validation', $page);
 
-        if ($this->request->post('mid') !== null && $this->request->post('action') === 'Allow') {
+        if (
+            $this->request->post('mid') !== null
+            && $this->request->post('action') === 'Allow'
+        ) {
             $this->database->safeupdate(
                 'members',
                 [

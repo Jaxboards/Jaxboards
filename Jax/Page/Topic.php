@@ -40,32 +40,32 @@ use const PHP_EOL;
 
 final class Topic
 {
-    /*
+    /**
      * @var int
      */
     private $tid = 0;
 
-    /*
+    /**
      * @var int
      */
     private $pageNumber = 0;
 
-    /*
+    /**
      * @var int
      */
     private $numperpage = 0;
 
-    /*
+    /**
      * @var bool
      */
     private $canMod = false;
 
-    /*
+    /**
      * @var int
      */
     private $firstPostID = 0;
 
-    /*
+    /**
      * @var null|array
      */
     private $topicdata;
@@ -1423,7 +1423,7 @@ final class Topic
         $this->page->JS('listrating', $pid, $page);
     }
 
-    /*
+    /**
      * @SuppressWarnings(PHPMD.Superglobals)
      */
     private function viewrss(int $tid): void

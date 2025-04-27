@@ -92,7 +92,7 @@ final readonly class Forums
         };
     }
 
-    /*
+    /**
      * Saves the posted tree to mysql.
      *
      * @param array  $tree  The tree to save
@@ -345,7 +345,7 @@ final readonly class Forums
         $this->page->addContentBox('Forums', $page);
     }
 
-    /*
+    /**
      * Create & Edit forum.
      *
      * @param int $fid The forum ID. If set, this edits a forum,

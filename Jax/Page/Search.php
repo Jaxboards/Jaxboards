@@ -42,7 +42,7 @@ final class Search
 
     private $fids = [];
 
-    /*
+    /**
      * @var int
      */
     private $perpage;

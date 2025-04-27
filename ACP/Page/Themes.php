@@ -85,7 +85,7 @@ final readonly class Themes
         }
     }
 
-    /*
+    /**
      * @return array<string>
      */
     private function getwrappers(): array

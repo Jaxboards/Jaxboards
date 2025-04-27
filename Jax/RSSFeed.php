@@ -13,7 +13,7 @@ use function is_array;
 
 final class RSSFeed
 {
-    /*
+    /**
      * @var array<string, array|string>
      */
     private $feed = [];

@@ -8,7 +8,7 @@ if (!defined('JAXBOARDS_ROOT')) {
     define('JAXBOARDS_ROOT', dirname(__DIR__));
 }
 
-/*
+/**
  * Admin login.
  *
  * PHP Version 5.3.7

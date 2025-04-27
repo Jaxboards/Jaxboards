@@ -22,7 +22,7 @@ use const PHP_EOL;
 
 final class Page
 {
-    /*
+    /**
      * @var array<string,string>
      */
     private $parts = [
@@ -31,7 +31,7 @@ final class Page
         'title' => '',
     ];
 
-    /*
+    /**
      * @var array<string,string>
      */
     private $partparts = [
@@ -44,7 +44,7 @@ final class Page
         private readonly Request $request,
     ) {}
 
-    /*
+    /**
      * Creates a nav menu in the ACP.
      *
      * @param string $title The name of the button
@@ -193,7 +193,7 @@ final class Page
         header("Location: {$location}");
     }
 
-    /*
+    /**
      * Parse a template file, replacing {{ key }} with the value of $data['key'].
      *
      * @param string $templateFile The path to the template file. Paths

@@ -32,7 +32,7 @@ final class Forum
 
     private $numperpage = 20;
 
-    /*
+    /**
      * @var float|int
      */
     private $pageNumber = 0;

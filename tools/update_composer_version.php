@@ -1,9 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-/*
- * Update our composer version to the latest available.
- */
+// Update our composer version to the latest available.
 
 declare(strict_types=1);
 

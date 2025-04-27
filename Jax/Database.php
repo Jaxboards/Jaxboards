@@ -39,7 +39,7 @@ final class Database
 
     private bool $debugMode = false;
 
-    /*
+    /**
      * @var array<string>
      */
     private array $queryList = [];
@@ -576,7 +576,7 @@ final class Database
         ) . '</p></div>';
     }
 
-    /*
+    /**
      * A function to deal with the `mysqli_fetch_all` function only exiting
      * for the `mysqlnd` driver. Fetches all rows from a MySQLi query result.
      *

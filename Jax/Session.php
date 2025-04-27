@@ -8,7 +8,6 @@ use function base64_encode;
 use function ini_set;
 use function is_numeric;
 use function is_string;
-use function mb_stripos;
 use function mb_strlen;
 use function mb_strtolower;
 use function mb_substr;
@@ -17,17 +16,18 @@ use function openssl_random_pseudo_bytes;
 use function preg_replace_callback;
 use function serialize;
 use function session_start;
+use function str_contains;
 use function time;
 use function unserialize;
 
 final class Session
 {
-    /*
+    /**
      * @var array<mixed>
      */
     private $data = [];
 
-    /*
+    /**
      * @var array<string,string>
      */
     private $bots = [
@@ -169,33 +169,19 @@ final class Session
         return $userId ?? 0;
     }
 
-    /*
+    /**
      * @SuppressWarnings(PHPMD.Superglobals)
+     *
+     * @param null|mixed $sid
      */
-    private function getBotName(): ?string
-    {
-        foreach ($this->bots as $agentName => $friendlyName) {
-            if (str_contains(mb_strtolower($this->getUserAgent()), mb_strtolower($agentName))) {
-                return $friendlyName;
-            }
-        }
-
-        return null;
-    }
-
-    /*
-     * @SuppressWarnings(PHPMD.Superglobals)
-     */
-    private function getUserAgent(): ?string {
-        return $_SERVER['HTTP_USER_AGENT'] ?: null;
-    }
-
     public function getSess($sid = null): array
     {
         $session = [];
         $botName = $this->getBotName();
 
-        if ($botName) $sid = $botName;
+        if ($botName) {
+            $sid = $botName;
+        }
 
         if ($sid) {
             $result = $botName === null
@@ -297,17 +283,21 @@ final class Session
         return $this->data[$field] ?? null;
     }
 
-    /*
+    /**
      * @SuppressWarnings(PHPMD.Superglobals)
      */
-    public function getPHPSessionValue(string $field) {
+    public function getPHPSessionValue(string $field)
+    {
         return $_SESSION[$field] ?? null;
     }
 
-    /*
+    /**
      * @SuppressWarnings(PHPMD.Superglobals)
      */
-    public function setPHPSessionValue(string $field, string|int $value) {
+    public function setPHPSessionValue(
+        string $field,
+        int|string $value,
+    ): int|string {
         return $_SESSION[$field] = $value;
     }
 
@@ -505,5 +495,24 @@ final class Session
         }
 
         return 'href="' . $match[1] . '"';
+    }
+
+    private function getBotName(): ?string
+    {
+        foreach ($this->bots as $agentName => $friendlyName) {
+            if (str_contains(mb_strtolower((string) $this->getUserAgent()), mb_strtolower((string) $agentName))) {
+                return $friendlyName;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
+    private function getUserAgent(): ?string
+    {
+        return $_SERVER['HTTP_USER_AGENT'] ?: null;
     }
 }

@@ -53,7 +53,7 @@ final readonly class Login
                 : null;
             $this->database->disposeresult($result);
 
-            $error = match(true) {
+            $error = match (true) {
                 $user === null => 'The username/password supplied was incorrect',
                 !$this->user->getPerm('can_access_acp') => 'You are not authorized to log in to the ACP',
                 default => null,
@@ -63,6 +63,7 @@ final readonly class Login
                 // Successful login, redirect
                 $this->session->setPHPSessionValue('auid', $user['id']);
                 header('Location: admin.php');
+
                 return;
             }
 

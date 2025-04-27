@@ -42,7 +42,7 @@ final class Post
 
     private $postpreview = '';
 
-    /*
+    /**
      * @var false
      */
     private $nopost = true;

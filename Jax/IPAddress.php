@@ -117,7 +117,7 @@ final class IPAddress
         return $this->ipBanCache;
     }
 
-    /*
+    /**
      * Check if an IP is banned from the service.
      * Will use the $this->getIp() ipAddress field is left empty.
      *
@@ -152,7 +152,7 @@ final class IPAddress
         return !isset($row['banned']) || $row['banned'] > 0;
     }
 
-    /*
+    /**
      * @SuppressWarnings(PHPMD.Superglobals)
      */
     private function getIp(): string

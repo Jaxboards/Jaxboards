@@ -5,17 +5,15 @@ declare(strict_types=1);
 namespace ACP;
 
 use DI\Container;
-use Exception;
+use DI\NotFoundException;
 use Jax\Config;
 use Jax\Request;
 use Jax\Session;
 use Jax\User;
 
 use function header;
-use function ini_set;
-use function session_start;
 
-/*
+/**
  * Admin control panel.
  *
  * PHP Version 5.3.7
@@ -123,7 +121,7 @@ final readonly class App
             try {
                 $page = $this->container->get('ACP\Page\\' . $act);
                 $page->render();
-            } catch(\DI\NotFoundException) {
+            } catch (NotFoundException) {
                 $this->page->addContentBox('Error', "Invalid action: {$act}");
             }
         }
@@ -131,14 +129,5 @@ final readonly class App
 
 
         $this->page->out();
-    }
-
-    private function startSession(): void
-    {
-        ini_set('session.cookie_secure', 1);
-        ini_set('session.cookie_httponly', 1);
-        ini_set('session.use_cookies', 1);
-        ini_set('session.use_only_cookies', 1);
-        session_start();
     }
 }
