@@ -2,7 +2,6 @@
 <?php
 
 // Update our composer version to the latest available.
-
 declare(strict_types=1);
 
 const COMPOSER_VERSIONS_URL = 'https://getcomposer.org/versions';
