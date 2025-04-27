@@ -85,10 +85,12 @@ final readonly class Themes
     }
 
     /**
-     * Get skins from database
+     * Get skins from database.
+     *
      * @return array<string,mixed>
      */
-    private function getSkins(): array {
+    private function getSkins(): array
+    {
         $result = $this->database->safeselect(
             [
                 'id',
@@ -102,6 +104,7 @@ final readonly class Themes
             'skins',
             'ORDER BY title ASC',
         );
+
         return $this->database->arows($result);
     }
 
@@ -129,11 +132,12 @@ final readonly class Themes
         return $wrappers;
     }
 
-
     /**
      * Delete a wrapper. Returns error string upon failure.
+     *
+     * @param mixed $wrapper
      */
-    private function deleteWrapper($wrapper):?string
+    private function deleteWrapper($wrapper): ?string
     {
         $wrapperPath = $this->wrappersPath . $wrapper . '.html';
         if (
@@ -142,6 +146,7 @@ final readonly class Themes
         ) {
             unlink($this->wrappersPath . $wrapper . '.html');
             $this->page->location('?act=Themes');
+
             return null;
         }
 
@@ -150,38 +155,47 @@ final readonly class Themes
 
     /**
      * Create a wrapper. Returns error string upon failure.
+     *
+     * @param mixed $wrapper
      */
-    private function createWrapper($wrapper):?string
+    private function createWrapper($wrapper): ?string
     {
         $newWrapperPath
             = $this->wrappersPath . $wrapper . '.html';
         if (preg_match('@[^\w ]@', (string) $wrapper)) {
             return 'Wrapper name must consist of letters, numbers, spaces, and underscore.';
-        } elseif (mb_strlen((string) $wrapper) > 50) {
-            return 'Wrapper name must be less than 50 characters.';
-        } elseif (file_exists($newWrapperPath)) {
-            return 'That wrapper already exists.';
-        } elseif (!is_writable(dirname($newWrapperPath))) {
-            return 'Wrapper directory is not writable.';
-        } else {
-            $o = fopen($newWrapperPath, 'w');
-            if ($o !== false) {
-                fwrite(
-                    $o,
-                    file_get_contents($this->domainDefinitions->getDefaultThemePath() . '/wrappers.html'),
-                );
-                fclose($o);
-                return null;
-            } else {
-                return 'Wrapper could not be created.';
-            }
         }
+        if (mb_strlen((string) $wrapper) > 50) {
+            return 'Wrapper name must be less than 50 characters.';
+        }
+        if (file_exists($newWrapperPath)) {
+            return 'That wrapper already exists.';
+        }
+        if (!is_writable(dirname($newWrapperPath))) {
+            return 'Wrapper directory is not writable.';
+        }
+        $o = fopen($newWrapperPath, 'w');
+        if ($o !== false) {
+            fwrite(
+                $o,
+                file_get_contents($this->domainDefinitions->getDefaultThemePath() . '/wrappers.html'),
+            );
+            fclose($o);
+
+            return null;
+        }
+
+        return 'Wrapper could not be created.';
+
+
     }
 
     /**
      * Update wrapper properties. Returns error string upon failure.
+     *
+     * @param mixed $wrappers
      */
-    private function updateWrappers($wrappers):?string
+    private function updateWrappers($wrappers): ?string
     {
         foreach ($wrappers as $wrapperId => $wrapperName) {
             if ($wrapperName && !in_array($wrapperName, $wrappers)) {
@@ -199,14 +213,16 @@ final readonly class Themes
                 $wrapperId,
             );
         }
+
         return null;
     }
 
     /**
      * Renames skins. Returns error string upon failure.
+     *
      * @param array<string,string> $renameSkins
      */
-    private function renameSkin(array $renameSkins):?string
+    private function renameSkin(array $renameSkins): ?string
     {
         foreach ($renameSkins as $oldName => $newName) {
             if ($oldName === $newName) {
@@ -226,7 +242,8 @@ final readonly class Themes
                 || mb_strlen((string) $newName) > 50
             ) {
                 return 'Skin name must consist of letters, numbers, spaces, and underscore, and be under 50 characters long.';
-            } elseif (is_dir($this->themesPath . $newName)) {
+            }
+            if (is_dir($this->themesPath . $newName)) {
                 return 'That skin name is already being used.';
             }
 
@@ -246,9 +263,10 @@ final readonly class Themes
 
     /**
      * Rename wrappers. Returns error string upon failure.
+     *
      * @param array<string,string> $wrappers
      */
-    private function renameWrappers($wrappers):?string
+    private function renameWrappers($wrappers): ?string
     {
         foreach ($wrappers as $wrapperName => $wrapperNewName) {
             if ($wrapperName === $wrapperNewName) {
@@ -269,8 +287,9 @@ final readonly class Themes
             ) {
                 return 'Wrapper name must consist of letters, numbers, spaces, and underscore, and be
                     under 50 characters long.';
-            } elseif (is_file($this->wrappersPath . $wrapperNewName . '.html')) {
-                return "That wrapper name ($wrapperNewName) is already being used.";
+            }
+            if (is_file($this->wrappersPath . $wrapperNewName . '.html')) {
+                return "That wrapper name ({$wrapperNewName}) is already being used.";
             }
 
             $this->database->safeupdate(
