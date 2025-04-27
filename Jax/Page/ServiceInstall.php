@@ -172,8 +172,9 @@ class ServiceInstall
      *
      * @return array<string> any errors that happened during installation
      */
-    private function install(): array {
-        $errors=[];
+    private function install(): array
+    {
+        $errors = [];
 
         // Make sure each field is set.
         foreach ($this->fields as $field => $attributes) {
