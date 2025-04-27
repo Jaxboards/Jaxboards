@@ -1,8 +1,12 @@
-html,
+html {
+  font-size: 62.5%; /* set 1rem to 10px */
+  text-size-adjust: none;
+}
+
 body {
   margin: 0;
   padding: 0;
-  font-size: 12px;
+  font-size: 1.2rem;
   font-family: tahoma, sans-serif;
   background: #152b49;
 }
@@ -38,7 +42,7 @@ a:visited {
   right: 20px;
   padding: 10px;
   color: #fff;
-  font-size: larger;
+  font-size: 1.6rem;;
 }
 
 #userbox a {
@@ -120,10 +124,6 @@ a:visited {
   border: 1px solid #000;
 }
 
-.sidebar .title {
-  font-size: 110%;
-}
-
 .switch {
   width: 50px;
   height: 25px;
@@ -200,7 +200,7 @@ a:visited {
   padding: 3px;
   color: #fff;
   border: 1px solid #000;
-  font-size: 14px;
+  font-size: 1.4rem;
 }
 
 #perms {
@@ -231,7 +231,7 @@ a:visited {
   background: linear-gradient(#1b63b6, #192c44);
   border-bottom: 1px solid #000;
   line-height: 36px;
-  font-size: 16px;
+  font-size: 1.6rem;
   color: #fff;
 }
 
@@ -323,7 +323,7 @@ input[type='text'] {
 }
 
 h2 {
-  font-size: 14px;
+  font-size: 1.4rem;
 }
 
 .editor {
