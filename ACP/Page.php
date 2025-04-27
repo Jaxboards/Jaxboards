@@ -50,12 +50,13 @@ final class Page
     public function sidebar(array $links): void
     {
         $content = '';
+        $act = (string) $this->request->get('act');
         foreach ($links as $do => $title) {
             $content .= $this->parseTemplate(
                 'sidebar-list-link.html',
                 [
                     'title' => $title,
-                    'url' => '?act=' . $this->request->get('act') . '&do=' . $do,
+                    'url' => "?act={$act}&do={$do}",
                 ],
             );
         }
@@ -141,9 +142,7 @@ final class Page
         string $templateFile,
         array $data = [],
     ): string {
-        if (mb_substr($templateFile, 0, 1) !== '/') {
-            $templateFile = JAXBOARDS_ROOT . '/ACP/views/' . $templateFile;
-        }
+        $templateFile = JAXBOARDS_ROOT . '/ACP/views/' . $templateFile;
 
         if (pathinfo($templateFile, PATHINFO_EXTENSION) !== 'html') {
             if (mb_substr($templateFile, -1) !== '.') {
@@ -154,6 +153,10 @@ final class Page
         }
 
         $template = file_get_contents($templateFile);
+
+        if ($template === false) {
+            throw new \Exception("Could not load template: {$templateFile}");
+        }
 
         return str_replace(
             array_map(static fn($name): string => '{{ ' . mb_strtolower($name) . ' }}', array_keys($data)),
