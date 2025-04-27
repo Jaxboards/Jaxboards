@@ -20,7 +20,7 @@ final class ServiceConfig
     /**
      * @return array<string,mixed>
      */
-    public function getServiceConfig(): ?array
+    public function getServiceConfig(): array
     {
         static $serviceConfig = null;
 
@@ -28,9 +28,13 @@ final class ServiceConfig
             return $serviceConfig;
         }
 
+        $serviceConfig = [];
         if (file_exists(JAXBOARDS_ROOT . '/config.php')) {
             require_once JAXBOARDS_ROOT . '/config.php';
-            $serviceConfig = $CFG;
+
+            if (isset($CFG)) {
+                $serviceConfig = (array) $CFG;
+            }
         }
 
         return $serviceConfig;
@@ -43,6 +47,10 @@ final class ServiceConfig
         return $config[$key] ?? null;
     }
 
+    /**
+     * @param array<string,mixed> $override
+     * @return array<string,mixed>
+     */
     public function override(?array $override = null): array
     {
         static $overrideConfig = [];
