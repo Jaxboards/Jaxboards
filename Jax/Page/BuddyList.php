@@ -19,7 +19,7 @@ use function is_numeric;
 
 final readonly class BuddyList
 {
-    private function __construct(
+    public function __construct(
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly Page $page,

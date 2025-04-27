@@ -42,7 +42,7 @@ final class UCP
 
     private string $ucppage = '';
 
-    private function __construct(
+    public function __construct(
         private readonly Config $config,
         private readonly Database $database,
         private readonly Jax $jax,
