@@ -78,9 +78,9 @@ final class App
     /**
      * Creates a nav menu in the ACP.
      *
-     * @param string $title The name of the button
+     * @param string               $title The name of the button
      * @param array<string,string> $menu  A list of links and associated labels to print
-     *                      out as a drop down list
+     *                                    out as a drop down list
      */
     public function addNavmenu(string $title, array $menu): void
     {
@@ -179,7 +179,8 @@ final class App
             ],
         );
 
-        $this->page->append('nav',
+        $this->page->append(
+            'nav',
             $this->page->parseTemplate(
                 'nav.html',
                 [
