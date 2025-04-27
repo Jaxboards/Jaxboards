@@ -56,8 +56,12 @@ final readonly class Jax
     /**
      * @param array<string> $options can contain 'autodate' to control format
      */
-    public function date(int $date, $options = ['autodate']): string
+    public function date(?int $date, $options = ['autodate']): string
     {
+        // Some old forums have nullable fields that are no longer nullable
+        // This needs to stay for data backwards compatibility
+        if ($date === null) return '';
+
         $autodate = in_array('autodate', $options);
 
         $delta = time() - $date;
