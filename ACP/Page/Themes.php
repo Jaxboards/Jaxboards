@@ -25,6 +25,7 @@ use function is_array;
 use function is_dir;
 use function is_file;
 use function is_numeric;
+use function is_string;
 use function is_writable;
 use function mb_strlen;
 use function mb_strpos;
