@@ -9,6 +9,7 @@ use Jax\Database;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Request;
+use Jax\ServiceConfig;
 
 use function array_map;
 use function closedir;
@@ -42,7 +43,7 @@ use const PASSWORD_DEFAULT;
 final readonly class ServiceSignup
 {
     public function __construct(
-        private Config $config,
+        private ServiceConfig $serviceConfig,
         private Database $database,
         private IPAddress $ipAddress,
         private Jax $jax,
@@ -51,7 +52,7 @@ final readonly class ServiceSignup
 
     public function render(): void
     {
-        if (!$this->config->getSetting('service')) {
+        if (!$this->serviceConfig->getSetting('service')) {
             echo 'Service mode not enabled';
 
             return;
@@ -60,7 +61,7 @@ final readonly class ServiceSignup
         $errors = [];
         if ($this->request->post('submit') !== null) {
             if ($this->request->post('post') !== null) {
-                header('Location: https://test.' . $this->config->getSetting('domain'));
+                header('Location: https://test.' . $this->serviceConfig->getSetting('domain'));
             }
 
             $boardURL = mb_strtolower((string) $this->request->both('boardurl'));
@@ -190,7 +191,7 @@ final readonly class ServiceSignup
                 } else {
                     $this->recurseCopy('blueprint', dirname(__DIR__) . '/boards/' . $board);
 
-                    header('Location: https://' . $this->request->post('boardurl') . '.' . $this->config->getSetting('domain'));
+                    header('Location: https://' . $this->request->post('boardurl') . '.' . $this->serviceConfig->getSetting('domain'));
                 }
             }
         }
@@ -208,15 +209,15 @@ final readonly class ServiceSignup
                 </head>
                 <body onload="if(top.location!=self.location) top.location=self.location">
                     <div id='container'>
-                    <div id='logo'><a href="https://{$this->config->getSetting('domain')}">&nbsp;</a></div>
+                    <div id='logo'><a href="https://{$this->serviceConfig->getSetting('domain')}">&nbsp;</a></div>
                     <div id='bar'>
-                        <a href="https://support.{$this->config->getSetting('domain')}" class="support">
+                        <a href="https://support.{$this->serviceConfig->getSetting('domain')}" class="support">
                         Support Forum
                         </a>
-                        <a href="https://test.{$this->config->getSetting('domain')}" class="test">
+                        <a href="https://test.{$this->serviceConfig->getSetting('domain')}" class="test">
                         Test Forum
                         </a>
-                        <a href="https://support.{$this->config->getSetting('domain')}" class="resource">
+                        <a href="https://support.{$this->serviceConfig->getSetting('domain')}" class="resource">
                         Resources
                         </a>
                     </div>
@@ -236,7 +237,7 @@ final readonly class ServiceSignup
                                 <div id="signup" class="flex1">
                                     <form  method="post">
                                         {$errorDisplay}
-                                        <input type="text" name="boardurl" id="boardname">.{$this->config->getSetting('domain')}<br>
+                                        <input type="text" name="boardurl" id="boardname">.{$this->serviceConfig->getSetting('domain')}<br>
                                         <label for="username">Username:</label>
                                         <input type="text" id="username" name="username"><br>
                                         <label for="password">Password:</label>

@@ -122,12 +122,13 @@ body {
   background: url('../Themes/Default/img/shade.png') bottom repeat-x;
   border: 2px solid #aac;
   padding: 30px;
-  margin: 30px;
+  max-width: 500px;
+  margin: 30px auto;
 }
 
 label {
   display: inline-block;
-  width: 100px;
+  width: 200px;
 }
 
 input[type='text'],
@@ -161,7 +162,7 @@ ul {
 #copyright {
   text-align: center;
   color: #fff;
-  margin: 10px;
+  padding: 10px;
 }
 
 .center {
