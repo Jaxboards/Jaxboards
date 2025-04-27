@@ -120,7 +120,7 @@ final readonly class Themes
                 && file_exists($wrapperPath)
             ) {
                 unlink($this->wrappersPath . $this->request->get('deletewrapper') . '.html');
-                $this->page->location('?act=themes');
+                $this->page->location('?act=Themes');
             } else {
                 $errorwrapper
                     = 'The wrapper you are trying to delete does not exist.';
@@ -522,7 +522,7 @@ final readonly class Themes
                     fclose($o);
                 }
 
-                $this->page->location('?act=themes');
+                $this->page->location('?act=Themes');
             }
 
             if ($error !== null) {
@@ -586,6 +586,6 @@ final readonly class Themes
             );
         }
 
-        $this->page->location('?act=themes');
+        $this->page->location('?act=Themes');
     }
 }
