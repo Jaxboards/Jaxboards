@@ -1,4 +1,5 @@
 /* global RUN */
+import { addIdleClock } from './date';
 import { imageResizer } from './image-resizer';
 import tooltip from './tooltip';
 import { selectAll } from './selection';
@@ -88,4 +89,9 @@ export default function gracefulDegrade(container) {
       RUN.submitForm(ajaxForm, resetOnSubmit);
     });
   });
+
+  // Add idle clocks to user lists
+  Array.from(document.querySelectorAll('.idle')).forEach((element) =>
+    addIdleClock(element),
+  );
 }
