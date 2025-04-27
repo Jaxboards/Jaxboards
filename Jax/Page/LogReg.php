@@ -97,7 +97,7 @@ final class LogReg
         $p = $this->page->meta('register-form', $recaptcha);
 
         // Show registration form.
-        if (!$this->request->post('register') !== null) {
+        if ($this->request->post('register') === null) {
             if (!$this->request->isJSUpdate()) {
                 $this->page->JS('update', 'page', $p);
             }
@@ -108,108 +108,83 @@ final class LogReg
         }
 
         // Validate input and actually register the user.
-        try {
-            if ($this->ipAddress->isServiceBanned()) {
-                throw new Exception(
-                    'You have been banned from registration on all boards. If'
+        $badNameChars = $this->config->getSetting('badnamechars');
+        $error = match(true) {
+            $this->ipAddress->isServiceBanned() => 'You have been banned from registration on all boards. If'
                     . ' you feel that this is in error, please contact the'
                     . ' administrator.',
-                );
-            }
+            !$name || !$dispname => 'Name and display name required.',
+            $pass1 !== $pass2 => 'The passwords do not match.',
+            mb_strlen($dispname) > 30 || mb_strlen($name) > 30 => 'Display name and username must be under 30 characters.',
+            ($badNameChars && preg_match($badNameChars, $name))
+                || $this->textFormatting->blockhtml($name) !== $name => 'Invalid characters in username!',
+            $badNameChars && preg_match($badNameChars, $dispname) => 'Invalid characters in display name!',
+            !$this->jax->isemail($email) => "That isn't a valid email!",
+            $this->ipAddress->isBanned() => 'You have been banned from registering on this board.',
+            !$this->isHuman() => 'reCAPTCHA failed. Are you a bot?',
+            default => null
+        };
 
-            if (!$name || !$dispname) {
-                throw new Exception('Name and display name required.');
-            }
-
-            if ($pass1 !== $pass2) {
-                throw new Exception('The passwords do not match.');
-            }
-
-            if (mb_strlen($dispname) > 30 || mb_strlen($name) > 30) {
-                throw new Exception('Display name and username must be under 30 characters.');
-            }
-
-            $badNameChars = $this->config->getSetting('badnamechars');
-            if (
-                ($badNameChars && preg_match($badNameChars, $name))
-                || $this->textFormatting->blockhtml($name) !== $name
-            ) {
-                throw new Exception('Invalid characters in username!');
-            }
-
-            if ($badNameChars && preg_match($badNameChars, $dispname)) {
-                throw new Exception('Invalid characters in display name!');
-            }
-
-            if (!$this->jax->isemail($email)) {
-                throw new Exception("That isn't a valid email!");
-            }
-
-            if ($this->ipAddress->isBanned()) {
-                throw new Exception('You have been banned from registering on this board.');
-            }
-
-            if (!$this->isHuman()) {
-                throw new Exception('reCAPTCHA failed. Are you a bot?');
-            }
-
-            // Are they attempting to use an existing username/display name?
-            $dispname = $this->textFormatting->blockhtml($dispname);
-            $name = $this->textFormatting->blockhtml($name);
-            $result = $this->database->safeselect(
-                ['name', 'display_name'],
-                'members',
-                'WHERE `name`=? OR `display_name`=?',
-                $this->database->basicvalue($name),
-                $this->database->basicvalue($dispname),
-            );
-            $member = $this->database->arow($result);
-            $this->database->disposeresult($result);
-            if ($member) {
-                if ($member['name'] === $name) {
-                    throw new Exception('That username is taken!');
-                }
-
-                if ($member['display_name'] === $dispname) {
-                    throw new Exception('That display name is already used by another member.');
-                }
-            }
-
-
-            // All clear!
-            $this->database->safeinsert(
-                'members',
-                [
-                    'display_name' => $dispname,
-                    'email' => $email,
-                    'group_id' => $this->config->getSetting('membervalidation') ? 5 : 1,
-                    'ip' => $this->ipAddress->asBinary(),
-                    'join_date' => $this->database->datetime(),
-                    'last_visit' => $this->database->datetime(),
-                    'name' => $name,
-                    'pass' => password_hash(
-                        (string) $pass1,
-                        PASSWORD_DEFAULT,
-                    ),
-                    'posts' => 0,
-                    'wysiwyg' => 1,
-                ],
-            );
-            $this->database->safespecial(
-                <<<'SQL'
-                    UPDATE %t
-                    SET `members` = `members` + 1, `last_register` = ?
-                    SQL
-                ,
-                ['stats'],
-                $this->database->insertId(),
-            );
-            $this->login($name, $pass1);
-        } catch (Exception $error) {
-            $error = $error->getMessage();
+        if ($error !== null) {
             $this->page->JS('alert', $error);
             $this->page->append('page', $this->page->meta('error', $error));
+            return;
         }
+
+        // Are they attempting to use an existing username/display name?
+        $dispname = $this->textFormatting->blockhtml($dispname);
+        $name = $this->textFormatting->blockhtml($name);
+        $result = $this->database->safeselect(
+            ['name', 'display_name'],
+            'members',
+            'WHERE `name`=? OR `display_name`=?',
+            $this->database->basicvalue($name),
+            $this->database->basicvalue($dispname),
+        );
+        $member = $this->database->arow($result);
+        $this->database->disposeresult($result);
+
+        $error = match(true) {
+            $member && $member['name'] === $name => 'That username is taken!',
+            $member && $member['display_name'] === $dispname => 'That display name is already used by another member.',
+            default => null,
+        };
+
+        if ($error !== null) {
+            $this->page->JS('alert', $error);
+            $this->page->append('page', $this->page->meta('error', $error));
+            return;
+        }
+
+        // All clear!
+        $this->database->safeinsert(
+            'members',
+            [
+                'display_name' => $dispname,
+                'email' => $email,
+                'group_id' => $this->config->getSetting('membervalidation') ? 5 : 1,
+                'ip' => $this->ipAddress->asBinary(),
+                'join_date' => $this->database->datetime(),
+                'last_visit' => $this->database->datetime(),
+                'name' => $name,
+                'pass' => password_hash(
+                    (string) $pass1,
+                    PASSWORD_DEFAULT,
+                ),
+                'posts' => 0,
+                'wysiwyg' => 1,
+            ],
+        );
+        $this->database->safespecial(
+            <<<'SQL'
+                UPDATE %t
+                SET `members` = `members` + 1, `last_register` = ?
+                SQL
+            ,
+            ['stats'],
+            $this->database->insertId(),
+        );
+        $this->login($name, $pass1);
     }
 
     private function login($u = false, $p = false): void
