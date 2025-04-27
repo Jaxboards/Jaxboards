@@ -253,7 +253,7 @@ final readonly class BuddyList
         }
     }
 
-    private function unblock($uid): void
+    private function unblock(array|string $uid): void
     {
         if ($uid && is_numeric($uid)) {
             $enemies = explode(',', (string) $this->user->get('enemies'));
@@ -270,7 +270,7 @@ final readonly class BuddyList
         $this->displaybuddylist();
     }
 
-    private function dropbuddy($uid, int $shh = 0): void
+    private function dropbuddy(array|string $uid, int $shh = 0): void
     {
         if ($uid && is_numeric($uid)) {
             $friends = explode(',', (string) $this->user->get('friends'));
