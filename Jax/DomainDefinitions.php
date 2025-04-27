@@ -42,6 +42,8 @@ final class DomainDefinitions
 
     private string $defaultThemePath = '';
 
+    private bool $boardFound = false;
+
     /**
      * @SuppressWarnings("PHPMD.Superglobals")
      */
@@ -91,8 +93,13 @@ final class DomainDefinitions
             return;
         }
 
+        $this->boardFound = true;
         $this->boardPath = pathjoin(JAXBOARDS_ROOT, 'boards', $prefix);
         $this->boardPathURL = $this->boardURL . '/' . pathjoin('boards', $prefix);
+    }
+
+    public function isBoardFound(): bool {
+        return $this->boardFound;
     }
 
     public function getBoardURL(): string

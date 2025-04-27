@@ -55,10 +55,10 @@ final class App
     {
         header('Cache-Control: no-cache, must-revalidate');
 
-        if ($this->config->getSetting('noboard')) {
+        if (!$this->domainDefinitions->isBoardFound()) {
             echo 'board not found';
 
-            exit(1);
+            return;
         }
 
         $this->startSession();

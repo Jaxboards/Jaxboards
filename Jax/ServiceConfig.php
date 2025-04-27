@@ -9,12 +9,18 @@ use function file_exists;
 
 final class ServiceConfig
 {
+    /**
+     * @return array<string,mixed>
+     */
     public function get(): array
     {
         return array_merge($this->getServiceConfig(), $this->override());
     }
 
-    public function getServiceConfig()
+    /**
+     * @return array<string,mixed>
+     */
+    public function getServiceConfig(): ?array
     {
         static $serviceConfig = null;
 
@@ -30,14 +36,14 @@ final class ServiceConfig
         return $serviceConfig;
     }
 
-    public function getSetting(string $key)
+    public function getSetting(string $key): mixed
     {
         $config = $this->get();
 
         return $config[$key] ?? null;
     }
 
-    public function override($override = null)
+    public function override(?array $override = null): array
     {
         static $overrideConfig = [];
 

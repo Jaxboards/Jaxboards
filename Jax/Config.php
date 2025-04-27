@@ -11,45 +11,43 @@ use function json_encode;
 
 use const JSON_PRETTY_PRINT;
 
-final readonly class Config
+final class Config
 {
+    /**
+     * @var null|array<string,mixed>
+     */
+    private ?array $boardConfig = null;
+
     public function __construct(
-        private ServiceConfig $serviceConfig,
-        private DomainDefinitions $domainDefinitions,
+        private readonly ServiceConfig $serviceConfig,
+        private readonly DomainDefinitions $domainDefinitions,
     ) {}
 
+    /**
+     * @return array<string,mixed>
+     */
     public function get(): array
     {
         return array_merge($this->serviceConfig->get(), $this->getBoardConfig());
     }
 
+    /**
+     * @return array<string,mixed>
+     */
     public function getBoardConfig($write = null)
     {
-        static $boardConfig = null;
-
-        if ($write) {
-            $boardConfig = array_merge($boardConfig, $write);
+        if ($this->boardConfig) {
+            return $this->boardConfig;
         }
 
-        if ($boardConfig) {
-            return $boardConfig;
-        }
+        require_once $this->domainDefinitions->getBoardPath() . '/config.php';
 
-        $boardPath = $this->domainDefinitions->getBoardPath();
-        if ($boardPath === null) {
-            $boardConfig = ['noboard' => 1];
-
-            return $boardConfig;
-        }
-
-        require_once $boardPath . '/config.php';
-
-        return $boardConfig = $CFG;
+        return $this->boardConfig = (array) $CFG;
     }
 
-    public function getSetting(string $key)
+    public function getSetting(string $key): mixed
     {
-        $config = self::get();
+        $config = $this->get();
 
         if (array_key_exists($key, $config)) {
             return $config[$key];
@@ -60,15 +58,15 @@ final readonly class Config
 
     public function write($data): void
     {
-        $boardConfig = self::getBoardConfig($data);
+        $this->boardConfig = $data;
 
-        file_put_contents($this->domainDefinitions->getBoardPath() . '/config.php', self::configFileContents($boardConfig));
+        file_put_contents($this->domainDefinitions->getBoardPath() . '/config.php', $this->configFileContents($data));
     }
 
     // Only used during installation
     public function writeServiceConfig($data): void
     {
-        file_put_contents(JAXBOARDS_ROOT . '/config.php', self::configFileContents($data));
+        file_put_contents(JAXBOARDS_ROOT . '/config.php', $this->configFileContents($data));
     }
 
     private function configFileContents($data): string
