@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ACP;
 
+use Exception;
 use Jax\DomainDefinitions;
 use Jax\Request;
 
@@ -155,7 +156,7 @@ final class Page
         $template = file_get_contents($templateFile);
 
         if ($template === false) {
-            throw new \Exception("Could not load template: {$templateFile}");
+            throw new Exception("Could not load template: {$templateFile}");
         }
 
         return str_replace(
