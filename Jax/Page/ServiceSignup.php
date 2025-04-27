@@ -13,6 +13,7 @@ use Jax\ServiceConfig;
 use function array_map;
 use function closedir;
 use function copy;
+use function dirname;
 use function file;
 use function gmdate;
 use function header;

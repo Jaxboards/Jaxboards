@@ -7,6 +7,7 @@ namespace Jax;
 use DI\Container;
 
 use function array_pop;
+use function dirname;
 use function file_get_contents;
 use function glob;
 use function gmdate;

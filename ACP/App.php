@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace ACP;
 
 use DI\Container;
+use Exception;
 use Jax\Config;
 use Jax\Request;
 use Jax\Session;
 use Jax\User;
-use Exception;
 
 use function header;
 use function is_string;

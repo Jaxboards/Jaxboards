@@ -10,16 +10,33 @@ use Jax\Jax;
 use Jax\Request;
 use Jax\ServiceConfig;
 
-class ServiceInstall
-{
-    public function __construct(
-        private Jax $jax,
-        private Database $database,
-        private IPAddress $ipAddress,
-        private Request $request,
-        private ServiceConfig $serviceConfig,
-    ) {}
+use function array_keys;
+use function array_map;
+use function closedir;
+use function copy;
+use function dirname;
+use function file;
+use function gmdate;
+use function header;
+use function implode;
+use function is_dir;
+use function mb_strlen;
+use function mb_substr;
+use function mkdir;
+use function opendir;
+use function parse_url;
+use function password_hash;
+use function preg_match;
+use function preg_replace;
+use function readdir;
+use function str_replace;
+use function trim;
 
+use const PASSWORD_DEFAULT;
+use const PHP_URL_HOST;
+
+final class ServiceInstall
+{
     private $fields = [
         'admin_username' => [
             'name' => 'Admin Username',
@@ -65,6 +82,14 @@ class ServiceInstall
             'type' => 'password',
         ],
     ];
+
+    public function __construct(
+        private Jax $jax,
+        private Database $database,
+        private IPAddress $ipAddress,
+        private Request $request,
+        private ServiceConfig $serviceConfig,
+    ) {}
 
     public function render(): void
     {

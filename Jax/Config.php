@@ -11,7 +11,7 @@ use function file_put_contents;
 final class Config
 {
     /**
-     * @var null|array<string,mixed>
+     * @var null|array<string, mixed>
      */
     private ?array $boardConfig = null;
 
@@ -31,7 +31,7 @@ final class Config
     /**
      * @return array<string,mixed>
      */
-    public function getBoardConfig()
+    public function getBoardConfig(): array
     {
         if ($this->boardConfig) {
             return $this->boardConfig;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use function dirname;
 use function implode;
 use function preg_match;
 use function preg_replace;

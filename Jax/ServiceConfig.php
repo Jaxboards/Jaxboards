@@ -5,7 +5,12 @@ declare(strict_types=1);
 namespace Jax;
 
 use function array_merge;
+use function dirname;
 use function file_exists;
+use function file_put_contents;
+use function json_encode;
+
+use const JSON_PRETTY_PRINT;
 
 final class ServiceConfig
 {
@@ -89,9 +94,6 @@ final class ServiceConfig
         file_put_contents(dirname(__DIR__) . '/config.php', $this->configFileContents($data));
     }
 
-    /**
-     * @param array<string,mixed>
-     */
     public function configFileContents(array $data): string
     {
         $dataString = json_encode($data, JSON_PRETTY_PRINT);

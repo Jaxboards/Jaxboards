@@ -9,6 +9,7 @@ use function array_map;
 use function array_pop;
 use function array_values;
 use function count;
+use function dirname;
 use function explode;
 use function file_exists;
 use function highlight_string;
