@@ -86,7 +86,7 @@ final class Ticker
                 $first = $tick['id'];
             }
 
-            $ticks .= $this->ftick($tick);
+            $ticks .= $this->renderTick($tick);
         }
 
         $this->session->addVar('tickid', $first);
@@ -143,7 +143,7 @@ final class Ticker
                 $first = $f['id'];
             }
 
-            $this->page->JS('tick', $this->ftick($f));
+            $this->page->JS('tick', $this->renderTick($f));
         }
 
         if (!$first) {
@@ -153,7 +153,7 @@ final class Ticker
         $this->session->addVar('tickid', $first);
     }
 
-    private function ftick($t): ?string
+    private function renderTick($t): ?string
     {
         return $this->page->meta(
             'ticker-tick',

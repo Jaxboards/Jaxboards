@@ -1774,17 +1774,20 @@ textarea {
 
 /* Ticker */
 #ticker .tick {
+  font-size: 1.4rem;
   display: flex;
-  padding: 5px;
+  align-items: center;
+  padding: 10px 5px;
   border-bottom: 1px solid #ccc;
 }
 
 #ticker .tick-title {
   flex: 1;
+  margin: 0 5px;
 }
 
 #ticker .date {
-  width: 110px;
+  min-width: 100px;
   font-size: 1rem;
   padding-top: 3px;
 }
