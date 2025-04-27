@@ -507,7 +507,7 @@ final class Forum
         // Update the topic listing.
     }
 
-    private function isTopicRead($topic, $fid): bool
+    private function isTopicRead($topic, string $fid): bool
     {
         if (empty($this->topicsRead)) {
             $this->topicsRead = $this->jax->parsereadmarkers($this->session->get('topicsread'));
@@ -544,7 +544,7 @@ final class Forum
         );
     }
 
-    private function markread($id): void
+    private function markread(string $id): void
     {
         $forumsread = $this->jax->parsereadmarkers($this->session->get('forumsread'));
         $forumsread[$id] = time();
