@@ -353,7 +353,11 @@ final class Topic
             $usersonline .= $this->page->meta(
                 'user-link',
                 $user['uid'],
-                $user['group_id'] . ($user['status'] === 'idle' ? ' idle' : ''),
+                $user['group_id'] . (
+                    $user['status'] === 'idle'
+                    ? " idle lastAction{$user['last_action']}"
+                    : ''
+                ),
                 $user['name'],
             );
         }
@@ -445,8 +449,14 @@ final class Topic
                 $list[] = [
                     $user['uid'],
                     $user['group_id'],
-                    $user['status'] !== 'active' ? $user['status'] : '',
+                    $user['status'] !== 'active'
+                    ? $user['status']
+                    : ($user['birthday'] && ($this->config->getSetting('birthdays') & 1)
+                    ? ' birthday' : ''),
                     $user['name'],
+                    // don't display location, since we know we're in the topic
+                    false,
+                    $user['last_action'],
                 ];
 
                 continue;
