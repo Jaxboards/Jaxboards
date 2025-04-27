@@ -60,7 +60,9 @@ final readonly class Jax
     {
         // Some old forums have nullable fields that are no longer nullable
         // This needs to stay for data backwards compatibility
-        if ($date === null) return '';
+        if ($date === null) {
+            return '';
+        }
 
         $autodate = in_array('autodate', $options);
 
