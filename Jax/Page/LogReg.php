@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
-use Exception;
 use Jax\Config;
 use Jax\Database;
 use Jax\DomainDefinitions;
@@ -109,7 +108,7 @@ final class LogReg
 
         // Validate input and actually register the user.
         $badNameChars = $this->config->getSetting('badnamechars');
-        $error = match(true) {
+        $error = match (true) {
             $this->ipAddress->isServiceBanned() => 'You have been banned from registration on all boards. If'
                     . ' you feel that this is in error, please contact the'
                     . ' administrator.',
@@ -122,12 +121,13 @@ final class LogReg
             !$this->jax->isemail($email) => "That isn't a valid email!",
             $this->ipAddress->isBanned() => 'You have been banned from registering on this board.',
             !$this->isHuman() => 'reCAPTCHA failed. Are you a bot?',
-            default => null
+            default => null,
         };
 
         if ($error !== null) {
             $this->page->JS('alert', $error);
             $this->page->append('page', $this->page->meta('error', $error));
+
             return;
         }
 
@@ -144,7 +144,7 @@ final class LogReg
         $member = $this->database->arow($result);
         $this->database->disposeresult($result);
 
-        $error = match(true) {
+        $error = match (true) {
             $member && $member['name'] === $name => 'That username is taken!',
             $member && $member['display_name'] === $dispname => 'That display name is already used by another member.',
             default => null,
@@ -153,6 +153,7 @@ final class LogReg
         if ($error !== null) {
             $this->page->JS('alert', $error);
             $this->page->append('page', $this->page->meta('error', $error));
+
             return;
         }
 
