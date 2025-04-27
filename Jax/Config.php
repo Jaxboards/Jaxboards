@@ -34,7 +34,7 @@ final class Config
     /**
      * @return array<string,mixed>
      */
-    public function getBoardConfig($write = null)
+    public function getBoardConfig()
     {
         if ($this->boardConfig) {
             return $this->boardConfig;

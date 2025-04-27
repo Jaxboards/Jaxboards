@@ -98,7 +98,8 @@ final class DomainDefinitions
         $this->boardPathURL = $this->boardURL . '/' . pathjoin('boards', $prefix);
     }
 
-    public function isBoardFound(): bool {
+    public function isBoardFound(): bool
+    {
         return $this->boardFound;
     }
 
