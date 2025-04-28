@@ -150,7 +150,7 @@ final readonly class Forums
         $data,
         $class = false,
         $highlight = 0,
-    ): ?string {
+    ): string {
         $html = '';
         if (count($tree) > 0) {
             foreach ($tree as $id => $children) {
@@ -1104,7 +1104,7 @@ final readonly class Forums
         );
     }
 
-    private function checkbox($checkId, string $name, $checked): ?string
+    private function checkbox($checkId, string $name, $checked): string
     {
         return $this->page->parseTemplate(
             'forums/create-forum-permissions-row-checkbox.html',

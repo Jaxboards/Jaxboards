@@ -464,7 +464,7 @@ final readonly class Members
         $this->page->addContentBox('Pre-Register', $page);
     }
 
-    private function getGroups($group_id = 0): ?string
+    private function getGroups($group_id = 0): string
     {
         $page = '';
         $result = $this->database->safeselect(
@@ -1002,7 +1002,7 @@ final readonly class Members
         );
     }
 
-    private function heading(string $value): ?string
+    private function heading(string $value): string
     {
         return $this->page->parseTemplate(
             'members/edit-heading.html',
