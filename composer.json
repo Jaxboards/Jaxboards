@@ -27,6 +27,8 @@
     "vimeo/psalm": "^6.5"
   },
   "require": {
+    "ext-zip": "*",
+    "lib-zip-libzip": "*",
     "php": "^8.2.12",
     "php-di/php-di": "^7.0"
   },
