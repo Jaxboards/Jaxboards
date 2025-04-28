@@ -496,8 +496,8 @@ final class TextFormatting
         string $link,
         string $embedUrl,
     ): string {
-        // phpcs:disable Generic.Files.LineLength.TooLong
-        return <<<HTML
+        // do NOT replace this with <<<HTML, sonarqube thinks it's an HTML tag and it's bitten me twice
+        return <<<DOC
             <div class="media youtube">
                 <div class="summary">
                     Watch Youtube Video:
@@ -527,7 +527,7 @@ final class TextFormatting
                         ></iframe>
                 </div>
             </div>
-            HTML;
+            DOC;
         // phpcs:enable
     }
 }
