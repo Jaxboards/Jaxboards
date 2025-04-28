@@ -31,12 +31,12 @@ use function is_array;
 use function is_numeric;
 use function is_readable;
 use function is_writable;
-use function mb_strstr;
 use function mb_strtolower;
 use function mb_substr;
 use function pathinfo;
 use function preg_match_all;
 use function readfile;
+use function strlen;
 use function sys_get_temp_dir;
 use function tempnam;
 use function trim;
@@ -224,7 +224,6 @@ final readonly class Tools
         );
     }
 
-
     private function createForumBackup(): void
     {
         $dbPrefix = $this->database->getPrefix();
@@ -242,7 +241,7 @@ final readonly class Tools
             '',
         ];
 
-        foreach($tables as $table) {
+        foreach ($tables as $table) {
             $table = mb_substr($table, strlen($dbPrefix));
             $sqlFileLines[] = '-- ' . $table;
             $sqlFileLines[] = '';
@@ -270,14 +269,17 @@ final readonly class Tools
 
         if (class_exists(ZipArchive::class, false)) {
             $this->outputZipFile(implode(PHP_EOL, $sqlFileLines));
+
             exit;
         }
 
         $this->outputTextFile(implode(PHP_EOL, $sqlFileLines));
+
         exit;
     }
 
-    private function outputZipFile(string $fileContents) {
+    private function outputZipFile(string $fileContents): void
+    {
         header('Content-type: application/zip');
         header(
             'Content-Disposition: attachment;filename="' . $this->database->getPrefix()
@@ -295,7 +297,8 @@ final readonly class Tools
         unlink($tempFile);
     }
 
-    private function outputTextFile(string $fileContents) {
+    private function outputTextFile(string $fileContents): void
+    {
         header('Content-type: text/plain');
         header(
             'Content-Disposition: attachment;filename="' . $this->database->getPrefix()
