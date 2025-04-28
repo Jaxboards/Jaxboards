@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use function array_key_exists;
 use function array_keys;
 use function array_map;
 use function array_pop;
@@ -101,7 +102,8 @@ final class TextFormatting
 
     /**
      * Get emote pack + custom rules.
-     * @return array<string,string>  map with keys of emojis to their URL replacements
+     *
+     * @return array<string,string> map with keys of emojis to their URL replacements
      */
     public function getEmoteRules(): array
     {
@@ -110,6 +112,7 @@ final class TextFormatting
 
     /**
      * Get emote pack rules.
+     *
      * @return array<string,string> map with keys of emojis to their URL replacements
      */
     public function getEmotePackRules(?string $emotePack = null): array
@@ -158,29 +161,6 @@ final class TextFormatting
         );
     }
 
-    /**
-     * @SuppressWarnings("PHPMD.Superglobals")
-     */
-    private function linkifyCallback(array $match): string
-    {
-        $url = parse_url((string) $match[2]);
-        if (!$url['fragment'] && $url['query']) {
-            $url['fragment'] = $url['query'];
-        }
-
-        if ($url['host'] === $_SERVER['HTTP_HOST'] && $url['fragment']) {
-            if (preg_match('@act=vt(\d+)@', $url['fragment'], $match)) {
-                $nice = preg_match('@pid=(\d+)@', $url['fragment'], $match2)
-                    ? 'Post #' . $match2[1]
-                    : 'Topic #' . $match[1];
-            }
-
-            $match[2] = '?' . $url['fragment'];
-        }
-
-        return $match[1] . '[url=' . $match[2] . ']' . ($nice ?: $match[2]) . '[/url]';
-    }
-
     public function blockhtml(string $text): string
     {
         // Fix for template conditionals.
@@ -206,15 +186,8 @@ final class TextFormatting
         return mb_substr((string) $text, 1);
     }
 
-    private function emoteCallback(array $match): string
-    {
-        [, $space, $emoteText] = $match;
-
-        return $space . '<img src="' . $this->emotes[$emoteText] . '" alt="' . $this->blockhtml($emoteText) . '"/>';
-    }
-
     /**
-     * Handles badword replacements
+     * Handles badword replacements.
      */
     public function wordfilter(string $text): string
     {
@@ -234,6 +207,7 @@ final class TextFormatting
      * This essentially pulls all code blocks out of the input text so that code
      * is not treated with badword, emote, and bbcode replacements.
      * finishCodeTags puts the code back into the post.
+     *
      * @return array{string,array{array<string>,array<string>}}
      */
     public function startCodeTags(string $text): array
@@ -357,6 +331,66 @@ final class TextFormatting
         );
     }
 
+    public function theworks(string $text, array $cfg = []): string
+    {
+        $replaceBBCode = !array_key_exists('nobb', $cfg);
+        $minimalBBCode = array_key_exists('minimalbb', $cfg);
+
+        if ($replaceBBCode && !$minimalBBCode) {
+            [$text, $codes] = $this->startcodetags($text);
+        }
+
+        $text = nl2br($this->blockhtml($text));
+
+        if (!array_key_exists('noemotes', $cfg)) {
+            $text = $this->emotes($text);
+        }
+
+        if ($replaceBBCode) {
+            $text = $this->bbcodes($text, $minimalBBCode);
+        }
+
+        if ($replaceBBCode && !$minimalBBCode) {
+            $text = $this->finishcodetags($text, $codes);
+        }
+
+        if ($replaceBBCode && !$minimalBBCode) {
+            $text = $this->attachments($text);
+        }
+
+        return $this->wordfilter($text);
+    }
+
+    /**
+     * @SuppressWarnings("PHPMD.Superglobals")
+     */
+    private function linkifyCallback(array $match): string
+    {
+        $url = parse_url((string) $match[2]);
+        if (!$url['fragment'] && $url['query']) {
+            $url['fragment'] = $url['query'];
+        }
+
+        if ($url['host'] === $_SERVER['HTTP_HOST'] && $url['fragment']) {
+            if (preg_match('@act=vt(\d+)@', $url['fragment'], $match)) {
+                $nice = preg_match('@pid=(\d+)@', $url['fragment'], $match2)
+                    ? 'Post #' . $match2[1]
+                    : 'Topic #' . $match[1];
+            }
+
+            $match[2] = '?' . $url['fragment'];
+        }
+
+        return $match[1] . '[url=' . $match[2] . ']' . ($nice ?: $match[2]) . '[/url]';
+    }
+
+    private function emoteCallback(array $match): string
+    {
+        [, $space, $emoteText] = $match;
+
+        return $space . '<img src="' . $this->emotes[$emoteText] . '" alt="' . $this->blockhtml($emoteText) . '"/>';
+    }
+
     private function bbcodeSizeCallback(array $match): string
     {
         return '<span style="font-size:'
@@ -455,36 +489,6 @@ final class TextFormatting
             . '<a href="index.php?act=download&id='
             . $file['id'] . '&name=' . urlencode((string) $file['name']) . '" class="name">'
             . $file['name'] . '</a> Downloads: ' . $file['downloads'] . '</div>';
-    }
-
-    public function theworks(string $text, array $cfg = []): string
-    {
-        $replaceBBCode = !array_key_exists('nobb', $cfg);
-        $minimalBBCode = array_key_exists('minimalbb', $cfg);
-
-        if ($replaceBBCode && !$minimalBBCode) {
-            [$text, $codes] = $this->startcodetags($text);
-        }
-
-        $text = nl2br($this->blockhtml($text));
-
-        if (!array_key_exists('noemotes', $cfg)) {
-            $text = $this->emotes($text);
-        }
-
-        if ($replaceBBCode) {
-            $text = $this->bbcodes($text, $minimalBBCode);
-        }
-
-        if ($replaceBBCode && !$minimalBBCode) {
-            $text = $this->finishcodetags($text, $codes);
-        }
-
-        if ($replaceBBCode && !$minimalBBCode) {
-            $text = $this->attachments($text);
-        }
-
-        return $this->wordfilter($text);
     }
 
     // phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength
