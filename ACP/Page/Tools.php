@@ -31,6 +31,7 @@ use function is_array;
 use function is_numeric;
 use function is_readable;
 use function is_writable;
+use function mb_strlen;
 use function mb_strtolower;
 use function mb_substr;
 use function pathinfo;
@@ -339,6 +340,7 @@ final readonly class Tools
 
     /**
      * Reads the last $totalLines of a file.
+     *
      * @return array<string>
      */
     private function tail(bool|string $path, int $totalLines): array
