@@ -47,9 +47,10 @@ final class TextFormatting
     private array $badwords = [];
 
     /**
-     * Merged emote pack rules with custom emote rules.
+     * Map of emojis to their URL replacements.
+     * This is a merge of both emote pack and custom emotes.
      *
-     * @var array<string, string>
+     * @var array<string,string>
      */
     private array $emotes = [];
 
@@ -84,26 +85,34 @@ final class TextFormatting
             '',
         );
         while ($rule = $this->database->arow($result)) {
-            switch ($rule['type']) {
-                case 'emote':
-                    $this->emotes[$rule['needle']] = $rule['replacement'];
+            if ($rule['type'] === 'emote') {
+                $this->emotes[$rule['needle']] = $rule['replacement'];
 
-                    break;
+                break;
+            }
 
-                case 'badword':
-                    $this->badwords[$rule['needle']] = $rule['replacement'];
+            if ($rule['type'] === 'badword') {
+                $this->badwords[$rule['needle']] = $rule['replacement'];
 
-                    break;
+                break;
             }
         }
     }
 
-    public function getEmoteRules()
+    /**
+     * Get emote pack + custom rules.
+     * @return array<string,string>  map with keys of emojis to their URL replacements
+     */
+    public function getEmoteRules(): array
     {
         return $this->emotes;
     }
 
-    public function getEmotePackRules(?string $emotePack = null)
+    /**
+     * Get emote pack rules.
+     * @return array<string,string> map with keys of emojis to their URL replacements
+     */
+    public function getEmotePackRules(?string $emotePack = null): array
     {
         $emotePack = $emotePack ?: $this->config->getSetting('emotepack');
 
@@ -137,11 +146,14 @@ final class TextFormatting
         return $this->emotePackRules = $emotes;
     }
 
+    /**
+     * Replaces all URLs with bbcode [url]s so that they become actual links.
+     */
     public function linkify(string $text): ?string
     {
         return preg_replace_callback(
             '@(^|\s)(https?://[^\s\)\(<>]+)@',
-            $this->linkify_callback(...),
+            $this->linkifyCallback(...),
             $text,
         );
     }
@@ -149,7 +161,7 @@ final class TextFormatting
     /**
      * @SuppressWarnings("PHPMD.Superglobals")
      */
-    public function linkify_callback(array $match): string
+    private function linkifyCallback(array $match): string
     {
         $url = parse_url((string) $match[2]);
         if (!$url['fragment'] && $url['query']) {
@@ -186,7 +198,7 @@ final class TextFormatting
 
         $text = preg_replace_callback(
             '@(\s)(' . implode('|', array_map(static fn(string $emote): string => preg_quote($emote, '@'), array_keys($emotes))) . ')@',
-            $this->emotecallback(...),
+            $this->emoteCallback(...),
             ' ' . $text,
             $emoticonLimit,
         );
@@ -194,13 +206,16 @@ final class TextFormatting
         return mb_substr((string) $text, 1);
     }
 
-    public function emotecallback(array $match): string
+    private function emoteCallback(array $match): string
     {
         [, $space, $emoteText] = $match;
 
         return $space . '<img src="' . $this->emotes[$emoteText] . '" alt="' . $this->blockhtml($emoteText) . '"/>';
     }
 
+    /**
+     * Handles badword replacements
+     */
     public function wordfilter(string $text): string
     {
         if ($this->user->get('nowordfilter')) {
@@ -214,21 +229,32 @@ final class TextFormatting
         );
     }
 
-    public function startcodetags(string &$text)
+    /**
+     * Replaces all code tags with an ID.
+     * This essentially pulls all code blocks out of the input text so that code
+     * is not treated with badword, emote, and bbcode replacements.
+     * finishCodeTags puts the code back into the post.
+     * @return array{string,array{array<string>,array<string>}}
+     */
+    public function startCodeTags(string $text): array
     {
         preg_match_all('@\[code(=\w+)?\](.*?)\[/code\]@is', $text, $codes);
         foreach ($codes[0] as $key => $fullMatch) {
             $text = str_replace($fullMatch, '[code]' . $key . '[/code]', $text);
         }
 
-        return $codes;
+        return [$text, $codes];
     }
 
-    public function finishcodetags(
+    /**
+     * Puts code blocks back into the post, and does code highlighting.
+     * Currently only php is supported.
+     */
+    public function finishCodeTags(
         string $text,
         array $codes,
         bool $returnbb = false,
-    ): array|string {
+    ): string {
         foreach ($codes[0] as $key => $value) {
             if (!$returnbb) {
                 $codes[2][$key] = $codes[1][$key] === '=php' ? highlight_string($codes[2][$key], true) : preg_replace(
@@ -297,13 +323,13 @@ final class TextFormatting
         }
 
         // UL/LI tags.
-        while ($text !== ($tmp = preg_replace_callback('@\[(ul|ol)\](.*)\[/\1\]@Usi', $this->bbcode_licallback(...), (string) $text))) {
+        while ($text !== ($tmp = preg_replace_callback('@\[(ul|ol)\](.*)\[/\1\]@Usi', $this->bbcodeLICallback(...), (string) $text))) {
             $text = $tmp;
         }
 
         // Size code (actually needs a callback simply because of
         // the variability of the arguments).
-        while ($text !== ($tmp = preg_replace_callback('@\[size=([0-4]?\d)(px|pt|em|)\](.*)\[/size\]@Usi', $this->bbcode_sizecallback(...), (string) $text))) {
+        while ($text !== ($tmp = preg_replace_callback('@\[size=([0-4]?\d)(px|pt|em|)\](.*)\[/size\]@Usi', $this->bbcodeSizeCallback(...), (string) $text))) {
             $text = $tmp;
         }
 
@@ -326,18 +352,18 @@ final class TextFormatting
 
         return preg_replace_callback(
             '@\[video\](.*)\[/video\]@Ui',
-            $this->bbcode_videocallback(...),
+            $this->bbcodeVideoCallback(...),
             (string) $text,
         );
     }
 
-    public function bbcode_sizecallback(array $match): string
+    private function bbcodeSizeCallback(array $match): string
     {
         return '<span style="font-size:'
             . $match[1] . ($match[2] ?: 'px') . '">' . $match[3] . '</span>';
     }
 
-    public function bbcode_videocallback(array $match): string
+    private function bbcodeVideoCallback(array $match): string
     {
 
         if (str_contains((string) $match[1], 'youtube.com')) {
@@ -357,7 +383,7 @@ final class TextFormatting
         return '-Invalid Video Url-';
     }
 
-    public function bbcode_licallback(array $match): string
+    private function bbcodeLICallback(array $match): string
     {
         $items = preg_split("@(^|[\r\n])\\*@", (string) $match[2]);
 
@@ -373,17 +399,17 @@ final class TextFormatting
         return $html . $match[1] === 'ol' ? '</ol>' : '</ul>';
     }
 
-    public function attachments(string $text): null|array|string
+    private function attachments(string $text): null|array|string
     {
         return $text = preg_replace_callback(
             '@\[attachment\](\d+)\[/attachment\]@',
-            $this->attachment_callback(...),
+            $this->attachmentCallback(...),
             $text,
             20,
         );
     }
 
-    public function attachment_callback(array $match): string
+    private function attachmentCallback(array $match): string
     {
         $attachment = $match[1];
         if (isset($this->attachmentData[$attachment])) {
@@ -433,26 +459,28 @@ final class TextFormatting
 
     public function theworks(string $text, array $cfg = []): string
     {
-        if (@!$cfg['nobb'] && @!$cfg['minimalbb']) {
-            $codes = $this->startcodetags($text);
+        $replaceBBCode = !array_key_exists('nobb', $cfg);
+        $minimalBBCode = array_key_exists('minimalbb', $cfg);
+
+        if ($replaceBBCode && !$minimalBBCode) {
+            [$text, $codes] = $this->startcodetags($text);
         }
 
-        $text = $this->blockhtml($text);
-        $text = nl2br($text);
+        $text = nl2br($this->blockhtml($text));
 
-        if (@!$cfg['noemotes']) {
+        if (!array_key_exists('noemotes', $cfg)) {
             $text = $this->emotes($text);
         }
 
-        if (@!$cfg['nobb']) {
-            $text = $this->bbcodes($text, @$cfg['minimalbb']);
+        if ($replaceBBCode) {
+            $text = $this->bbcodes($text, $minimalBBCode);
         }
 
-        if (@!$cfg['nobb'] && @!$cfg['minimalbb']) {
+        if ($replaceBBCode && !$minimalBBCode) {
             $text = $this->finishcodetags($text, $codes);
         }
 
-        if (@!$cfg['nobb'] && @!$cfg['minimalbb']) {
+        if ($replaceBBCode && !$minimalBBCode) {
             $text = $this->attachments($text);
         }
 
@@ -465,7 +493,7 @@ final class TextFormatting
         string $embedUrl,
     ): string {
         // phpcs:disable Generic.Files.LineLength.TooLong
-        return <<<DOC
+        return <<<HTML
             <div class="media youtube">
                 <div class="summary">
                     Watch Youtube Video:
@@ -495,7 +523,7 @@ final class TextFormatting
                         ></iframe>
                 </div>
             </div>
-            DOC;
+            HTML;
         // phpcs:enable
     }
 }

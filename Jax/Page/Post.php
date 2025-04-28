@@ -79,18 +79,16 @@ final class Post
 
             // Linkify stuff before sending it.
             $this->postdata = str_replace("\t", '    ', $this->postdata);
-            $codes = $this->textFormatting->startcodetags($this->postdata);
+            [$this->postdata, $codes] = $this->textFormatting->startCodeTags($this->postdata);
             $this->postdata = $this->textFormatting->linkify($this->postdata);
-            $this->postdata = $this->textFormatting->finishcodetags($this->postdata, $codes, true);
+            $this->postdata = $this->textFormatting->finishCodeTags($this->postdata, $codes, true);
 
             // This is aliases [youtube] to [video] but it probably should not be here
             $this->postdata = str_replace('youtube]', 'video]', $this->postdata);
         }
 
         $fileData = $this->request->files('Filedata');
-        if (
-            $fileData['tmp_name']
-        ) {
+        if ($fileData !== null) {
             $attachmentId = $this->upload($fileData);
             $this->postdata .= "[attachment]{$attachmentId}[/attachment]";
         }
@@ -324,9 +322,7 @@ final class Post
                         id="postdata"
                         title="Type your post here"
                         class="bbcode-editor"
-                        >
-                        {$this->textFormatting->blockhtml($postdata)}
-                    </textarea>
+                        >{$this->textFormatting->blockhtml($postdata)}</textarea>
                     <br><div class="postoptions">
                         {$pollForm}
                         {$uploadButton}
@@ -702,9 +698,7 @@ final class Post
                 mb_strlen($this->request->post('subtitle') ?? '') > 255
             ) {
                 $error = 'Subtitle must not exceed 255 characters';
-            } elseif (
-                $this->request->post('poll_type') !== null
-            ) {
+            } elseif ($this->request->post('poll_type')) {
                 $pollchoices = [];
                 $pollChoice = preg_split("@[\r\n]+@", (string) $this->request->post('pollchoices'));
                 foreach ($pollChoice as $v) {
