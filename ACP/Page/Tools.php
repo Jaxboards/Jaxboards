@@ -11,6 +11,7 @@ use Jax\DomainDefinitions;
 use Jax\Jax;
 use Jax\Request;
 use SplFileObject;
+use ZipArchive;
 
 use function array_map;
 use function array_pop;
@@ -208,54 +209,7 @@ final readonly class Tools
     private function backup(): void
     {
         if ($this->request->post('dl') !== null) {
-            header('Content-type: text/plain');
-            header(
-                'Content-Disposition: attachment;filename="' . $this->database->getPrefix()
-                . gmdate('Y-m-d_His') . '.sql"',
-            );
-            $result = $this->database->safequery("SHOW TABLES LIKE '{$this->database->getPrefix()}%%'");
-            $tables = array_map(static fn(array $row) => array_values($row)[0], $this->database->arows($result));
-            $page = '';
-            if ($tables !== []) {
-                echo PHP_EOL . "-- Jaxboards Backup {$this->database->getPrefix()} "
-                    . $this->database->datetime() . PHP_EOL . PHP_EOL;
-                echo 'SET NAMES utf8mb4;' . PHP_EOL;
-                echo "SET time_zone = '+00:00';" . PHP_EOL;
-                echo 'SET foreign_key_checks = 0;' . PHP_EOL;
-                echo "SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';" . PHP_EOL;
-                echo PHP_EOL;
-                foreach ($tables as $table) {
-                    $table = mb_substr(mb_strstr((string) $table, '_'), 1);
-                    $page .= $table;
-                    echo PHP_EOL . '-- ' . $table . PHP_EOL . PHP_EOL;
-                    $createtable = $this->database->safespecial(
-                        'SHOW CREATE TABLE %t',
-                        [$table],
-                    );
-                    $thisrow = $this->database->row($createtable);
-                    if (!$thisrow) {
-                        continue;
-                    }
-
-                    $ftable = $this->database->ftable($table);
-                    echo "DROP TABLE IF EXISTS {$ftable};" . PHP_EOL;
-                    echo array_pop($thisrow) . ';' . PHP_EOL;
-                    $this->database->disposeresult($createtable);
-                    // Only time I really want to use *.
-                    $select = $this->database->safeselect('*', $table);
-                    while ($row = $this->database->arow($select)) {
-                        echo $this->database->buildInsertQuery($ftable, $row) . PHP_EOL;
-                    }
-
-                    echo PHP_EOL;
-                }
-
-                echo PHP_EOL;
-                echo 'SET foreign_key_checks = 1;' . PHP_EOL;
-                echo PHP_EOL;
-            }
-
-            exit;
+            $this->createForumBackup();
         }
 
         $this->page->addContentBox(
@@ -264,6 +218,79 @@ final readonly class Tools
                 'tools/backup.html',
             ),
         );
+    }
+
+    private function createForumBackup() {
+        $result = $this->database->safequery("SHOW TABLES LIKE '{$this->database->getPrefix()}%%'");
+        $tables = array_map(static fn(array $row) => array_values($row)[0], $this->database->arows($result));
+
+        if ($tables !== []) {
+            $sqlFileLines = [
+                "-- Jaxboards Backup {$this->database->getPrefix()} {$this->database->datetime()}",
+                '',
+                'SET NAMES utf8mb4;',
+                "SET time_zone = '+00:00';",
+                'SET foreign_key_checks = 0;',
+                "SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';",
+                '',
+            ];
+            foreach($tables as $table) {
+                $table = mb_substr(mb_strstr((string) $table, '_'), 1);
+                $sqlFileLines[] = '-- ' . $table;
+                $sqlFileLines[] = '';
+
+                $result = $this->database->safespecial(
+                    'SHOW CREATE TABLE %t',
+                    [$table],
+                );
+                $createTable = $this->database->arow($result)['Create Table'];
+                $this->database->disposeresult($result);
+
+                if ($createTable === null) {
+                    continue;
+                }
+
+                $ftable = $this->database->ftable($table);
+                $sqlFileLines[] = "DROP TABLE IF EXISTS {$ftable};";
+                $sqlFileLines[] = "{$createTable};";
+
+                // Generate INSERTS with all row data
+                $select = $this->database->safeselect('*', $table);
+                while ($row = $this->database->arow($select)) {
+                    $sqlFileLines[] = $this->database->buildInsertQuery($ftable, $row);
+                }
+
+                $sqlFileLines[] = '';
+            }
+
+            $sqlFileLines[] = '';
+            $sqlFileLines[] = 'SET foreign_key_checks = 1;';
+        }
+
+        $tempFile = tempnam(sys_get_temp_dir(), $this->database->getPrefix());
+        if (class_exists(ZipArchive::class, false)) {
+            header('Content-type: application/zip');
+            header(
+                'Content-Disposition: attachment;filename="' . $this->database->getPrefix()
+                . gmdate('Y-m-d_His') . '.zip"',
+            );
+            $zipFile = new ZipArchive();
+            $zipFile->open($tempFile, ZipArchive::OVERWRITE);
+            $zipFile->addFromString('backup.sql', implode(PHP_EOL, $sqlFileLines));
+            $zipFile->close();
+            readfile($tempFile);
+            unlink($tempFile);
+
+            exit;
+        }
+
+        header('Content-type: text/plain');
+        header(
+            'Content-Disposition: attachment;filename="' . $this->database->getPrefix()
+            . gmdate('Y-m-d_His') . '.sql"',
+        );
+        echo implode(PHP_EOL, $sqlFileLines);
+        exit;
     }
 
     private function viewErrorLog(): void
