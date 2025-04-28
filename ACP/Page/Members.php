@@ -59,13 +59,13 @@ final readonly class Members
     {
         match ($this->request->both('do')) {
             'merge' => $this->merge(),
-            'edit' => $this->editmem(),
-            'delete' => $this->deletemem(),
-            'prereg' => $this->preregister(),
-            'massmessage' => $this->massmessage(),
-            'ipbans' => $this->ipbans(),
+            'edit' => $this->editMember(),
+            'delete' => $this->deleteMember(),
+            'prereg' => $this->preRegister(),
+            'massmessage' => $this->massMessage(),
+            'ipbans' => $this->ipBans(),
             'validation' => $this->validation(),
-            default => $this->showmain(),
+            default => $this->showMain(),
         };
 
         $this->page->sidebar([
@@ -79,7 +79,7 @@ final readonly class Members
         ]);
     }
 
-    private function showmain(): void
+    private function showMain(): void
     {
         $result = $this->database->safespecial(
             <<<'SQL'
@@ -98,17 +98,17 @@ final readonly class Members
             ['members', 'member_groups'],
         );
         $rows = '';
-        while ($f = $this->database->arow($result)) {
+        while ($member = $this->database->arow($result)) {
             $rows .= $this->page->parseTemplate(
                 'members/show-main-row.html',
                 [
                     'avatar_url' => $this->jax->pick(
-                        $f['avatar'],
+                        $member['avatar'],
                         self::DEFAULT_AVATAR,
                     ),
-                    'group_title' => $f['group_title'],
-                    'id' => $f['id'],
-                    'title' => $f['display_name'],
+                    'group_title' => $member['group_title'],
+                    'id' => $member['id'],
+                    'title' => $member['display_name'],
                 ],
             );
         }
@@ -124,9 +124,8 @@ final readonly class Members
         );
     }
 
-    private function editmem(): void
+    private function editMember(): void
     {
-        $userData = $this->user->getUser();
         $page = '';
         if (
             $this->request->both('mid')
@@ -139,72 +138,12 @@ final readonly class Members
                     'WHERE `id`=?',
                     $this->database->basicvalue($this->request->both('mid')),
                 );
-                $data = $this->database->arow($result);
+                $member = $this->database->arow($result);
                 $this->database->disposeresult($result);
                 if (
                     $this->request->post('savedata')
                 ) {
-                    if (
-                        $data['group_id'] !== 2 || $userData['id'] === 1
-                    ) {
-                        $write = [];
-                        if ($this->request->post('password')) {
-                            $write['pass'] = password_hash(
-                                (string) $this->request->post('password'),
-                                PASSWORD_DEFAULT,
-                            );
-                        }
-
-                        $fields = [
-                            'display_name',
-                            'name',
-                            'full_name',
-                            'usertitle',
-                            'location',
-                            'avatar',
-                            'about',
-                            'sig',
-                            'email',
-                            'ucpnotepad',
-                            'contact_aim',
-                            'contact_bluesky',
-                            'contact_discord',
-                            'contact_gtalk',
-                            'contact_msn',
-                            'contact_skype',
-                            'contact_steam',
-                            'contact_twitter',
-                            'contact_yim',
-                            'contact_youtube',
-                            'website',
-                            'posts',
-                            'group_id',
-                        ];
-                        foreach ($fields as $field) {
-                            if ($this->request->post($field) === null) {
-                                continue;
-                            }
-
-                            $write[$field] = $this->request->post($field);
-                        }
-
-                        // Make it so root admins can't get out of admin.
-                        if ($this->request->both('mid') === 1) {
-                            $write['group_id'] = 2;
-                        }
-
-                        $this->database->safeupdate(
-                            'members',
-                            $write,
-                            'WHERE `id`=?',
-                            $this->database->basicvalue($this->request->both('mid')),
-                        );
-                        $page = $this->page->success('Profile data saved');
-                    } else {
-                        $page = $this->page->error(
-                            'You do not have permission to edit this profile.',
-                        );
-                    }
+                    $page = $this->updateMember($member);
                 }
 
                 $result = $this->database->safeselect(
@@ -311,14 +250,14 @@ final readonly class Members
                 );
             }
 
-            $data = [];
+            $member = [];
             while ($f = $this->database->arow($result)) {
-                $data[] = $f;
+                $member[] = $f;
             }
 
-            $nummembers = count($data);
+            $nummembers = count($member);
             if ($nummembers > 1) {
-                foreach ($data as $v) {
+                foreach ($member as $v) {
                     $page .= $this->page->parseTemplate(
                         'members/edit-select-option.html',
                         [
@@ -346,38 +285,38 @@ final readonly class Members
                 return;
             }
 
-            $data = array_pop($data);
-            if ($data['group_id'] === 2 && $userData['id'] !== 1) {
+            $member = array_pop($member);
+            if ($member['group_id'] === 2 && $this->user->get('id') !== 1) {
                 $page = $this->page->error('You do not have permission to edit this profile. ');
             } else {
-                $page .= $this->jax->hiddenFormFields(['mid' => $data['id']]);
-                $page .= $this->formfield('Display Name:', 'display_name', $data['display_name']);
-                $page .= $this->formfield('Username:', 'name', $data['name']);
-                $page .= $this->formfield('Real Name:', 'full_name', $data['full_name']);
+                $page .= $this->jax->hiddenFormFields(['mid' => $member['id']]);
+                $page .= $this->formfield('Display Name:', 'display_name', $member['display_name']);
+                $page .= $this->formfield('Username:', 'name', $member['name']);
+                $page .= $this->formfield('Real Name:', 'full_name', $member['full_name']);
                 $page .= $this->formfield('Password:', 'password', '');
-                $page .= $this->getGroups($data['group_id']);
+                $page .= $this->getGroups($member['group_id']);
                 $page .= $this->heading('Profile Fields');
-                $page .= $this->formfield('User Title:', 'usertitle', $data['usertitle']);
-                $page .= $this->formfield('Location:', 'location', $data['location']);
-                $page .= $this->formfield('Website:', 'website', $data['website']);
-                $page .= $this->formfield('Avatar:', 'avatar', $data['avatar']);
-                $page .= $this->formfield('About:', 'about', $data['about'], 'textarea');
-                $page .= $this->formfield('Signature:', 'sig', $data['sig'], 'textarea');
-                $page .= $this->formfield('Email:', 'email', $data['email']);
-                $page .= $this->formfield('UCP Notepad:', 'ucpnotepad', $data['ucpnotepad'], 'textarea');
+                $page .= $this->formfield('User Title:', 'usertitle', $member['usertitle']);
+                $page .= $this->formfield('Location:', 'location', $member['location']);
+                $page .= $this->formfield('Website:', 'website', $member['website']);
+                $page .= $this->formfield('Avatar:', 'avatar', $member['avatar']);
+                $page .= $this->formfield('About:', 'about', $member['about'], 'textarea');
+                $page .= $this->formfield('Signature:', 'sig', $member['sig'], 'textarea');
+                $page .= $this->formfield('Email:', 'email', $member['email']);
+                $page .= $this->formfield('UCP Notepad:', 'ucpnotepad', $member['ucpnotepad'], 'textarea');
                 $page .= $this->heading('Contact Details');
-                $page .= $this->formfield('AIM:', 'contact_aim', $data['contact_aim']);
-                $page .= $this->formfield('Bluesky:', 'contact_bluesky', $data['contact_bluesky']);
-                $page .= $this->formfield('Discord:', 'contact_discord', $data['contact_discord']);
-                $page .= $this->formfield('Google Chat:', 'contact_gtalk', $data['contact_gtalk']);
-                $page .= $this->formfield('MSN:', 'contact_msn', $data['contact_msn']);
-                $page .= $this->formfield('Skype:', 'contact_skype', $data['contact_skype']);
-                $page .= $this->formfield('Steam:', 'contact_steam', $data['contact_steam']);
-                $page .= $this->formfield('Twitter:', 'contact_twitter', $data['contact_twitter']);
-                $page .= $this->formfield('YIM:', 'contact_yim', $data['contact_yim']);
-                $page .= $this->formfield('YouTube:', 'contact_youtube', $data['contact_youtube']);
+                $page .= $this->formfield('AIM:', 'contact_aim', $member['contact_aim']);
+                $page .= $this->formfield('Bluesky:', 'contact_bluesky', $member['contact_bluesky']);
+                $page .= $this->formfield('Discord:', 'contact_discord', $member['contact_discord']);
+                $page .= $this->formfield('Google Chat:', 'contact_gtalk', $member['contact_gtalk']);
+                $page .= $this->formfield('MSN:', 'contact_msn', $member['contact_msn']);
+                $page .= $this->formfield('Skype:', 'contact_skype', $member['contact_skype']);
+                $page .= $this->formfield('Steam:', 'contact_steam', $member['contact_steam']);
+                $page .= $this->formfield('Twitter:', 'contact_twitter', $member['contact_twitter']);
+                $page .= $this->formfield('YIM:', 'contact_yim', $member['contact_yim']);
+                $page .= $this->formfield('YouTube:', 'contact_youtube', $member['contact_youtube']);
                 $page .= $this->heading('System-Generated Variables');
-                $page .= $this->formfield('Post Count:', 'posts', $data['posts']);
+                $page .= $this->formfield('Post Count:', 'posts', $member['posts']);
                 $page = $this->page->parseTemplate(
                     'members/edit-form.html',
                     ['content' => $page],
@@ -388,13 +327,79 @@ final readonly class Members
         }
 
         $this->page->addContentBox(
-            isset($data['name']) && $data['name']
-            ? 'Editing ' . $data['name'] . "'s details" : 'Edit Member',
+            isset($member['name']) && $member['name']
+            ? 'Editing ' . $member['name'] . "'s details" : 'Edit Member',
             $page,
         );
     }
 
-    private function preregister(): void
+    private function updateMember($member): string
+    {
+        if (
+            $member['group_id'] !== 2 || $this->user->get('id') === 1
+        ) {
+            $write = [];
+            if ($this->request->post('password')) {
+                $write['pass'] = password_hash(
+                    (string) $this->request->post('password'),
+                    PASSWORD_DEFAULT,
+                );
+            }
+
+            $fields = [
+                'display_name',
+                'name',
+                'full_name',
+                'usertitle',
+                'location',
+                'avatar',
+                'about',
+                'sig',
+                'email',
+                'ucpnotepad',
+                'contact_aim',
+                'contact_bluesky',
+                'contact_discord',
+                'contact_gtalk',
+                'contact_msn',
+                'contact_skype',
+                'contact_steam',
+                'contact_twitter',
+                'contact_yim',
+                'contact_youtube',
+                'website',
+                'posts',
+                'group_id',
+            ];
+            foreach ($fields as $field) {
+                if ($this->request->post($field) === null) {
+                    continue;
+                }
+
+                $write[$field] = $this->request->post($field);
+            }
+
+            // Make it so root admins can't get out of admin.
+            if ($this->request->both('mid') === '1') {
+                $write['group_id'] = 2;
+            }
+
+            $this->database->safeupdate(
+                'members',
+                $write,
+                'WHERE `id`=?',
+                $this->database->basicvalue($this->request->both('mid')),
+            );
+
+            return $this->page->success('Profile data saved');
+        }
+
+        return $this->page->error(
+            'You do not have permission to edit this profile.',
+        );
+    }
+
+    private function preRegister(): void
     {
         $page = '';
         $error = null;
@@ -658,7 +663,7 @@ final readonly class Members
         );
     }
 
-    private function deletemem(): void
+    private function deleteMember(): void
     {
         $page = '';
         $error = null;
@@ -735,7 +740,7 @@ final readonly class Members
         );
     }
 
-    private function ipbans(): void
+    private function ipBans(): void
     {
         if ($this->request->post('ipbans') !== null) {
             $data = explode(PHP_EOL, (string) $this->request->post('ipbans'));
@@ -852,7 +857,7 @@ final readonly class Members
         );
     }
 
-    private function massmessage(): void
+    private function massMessage(): void
     {
         $userData = $this->user->getUser();
         $page = '';
@@ -879,7 +884,7 @@ final readonly class Members
                             'del_recipient' => 0,
                             'del_sender' => 0,
                             'flag' => 0,
-                            'from' => $userData['id'],
+                            'from' => $this->user->get('id'),
                             'message' => $this->request->post('message'),
                             'read' => 0,
                             'title' => $this->request->post('title'),
