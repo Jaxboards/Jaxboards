@@ -42,10 +42,7 @@ final class Search
 
     private $fids = [];
 
-    /**
-     * @var int
-     */
-    private $perpage;
+    private int $perpage;
 
     public function __construct(
         private readonly Database $database,

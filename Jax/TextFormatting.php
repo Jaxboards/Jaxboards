@@ -39,19 +39,19 @@ final class TextFormatting
     /**
      * @var array<string, array>
      */
-    private $attachmentData;
+    private array $attachmentData;
 
     /**
      * @var array<string, string>
      */
-    private $badwords = [];
+    private array $badwords = [];
 
     /**
      * Merged emote pack rules with custom emote rules.
      *
      * @var array<string, string>
      */
-    private $emotes = [];
+    private array $emotes = [];
 
     private ?string $emotePack = null;
 
@@ -60,7 +60,7 @@ final class TextFormatting
      *
      * @var array<string, string>
      */
-    private $emotePackRules = [];
+    private array $emotePackRules = [];
 
     public function __construct(
         private readonly Config $config,

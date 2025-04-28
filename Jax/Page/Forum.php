@@ -32,10 +32,7 @@ final class Forum
 
     private $numperpage = 20;
 
-    /**
-     * @var float|int
-     */
-    private $pageNumber = 0;
+    private float|int $pageNumber = 0;
 
     public function __construct(
         private readonly Database $database,

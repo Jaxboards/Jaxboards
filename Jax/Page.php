@@ -79,17 +79,17 @@ final class Page
     /**
      * @var array<string, string>
      */
-    private $metadefs = [];
+    private array $metadefs = [];
 
     /**
      * @var array<string>
      */
-    private $debuginfo = [];
+    private array $debuginfo = [];
 
     /**
      * @var array<string>
      */
-    private $JSOutput = [];
+    private array $JSOutput = [];
 
 
     private $parts = [];

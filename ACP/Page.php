@@ -25,7 +25,7 @@ final class Page
     /**
      * @var array<string,string>
      */
-    private $parts = [
+    private array $parts = [
         'content' => '',
         'sidebar' => '',
         'title' => '',

@@ -16,7 +16,7 @@ final class RSSFeed
     /**
      * @var array<string, array|string>
      */
-    private $feed = [];
+    private array $feed = [];
 
     public function __construct($settings)
     {

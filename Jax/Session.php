@@ -25,12 +25,12 @@ final class Session
     /**
      * @var array<mixed>
      */
-    private $data = [];
+    private array $data = [];
 
     /**
      * @var array<string,string>
      */
-    private $bots = [
+    private array $bots = [
         // SEO crawler
         'AhrefsBot' => 'Ahrefs',
         'Amazonbot' => 'Amazon',

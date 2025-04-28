@@ -16,10 +16,7 @@ use function sprintf;
 
 final class Members
 {
-    /**
-     * @var float|int
-     */
-    private $pageNumber = 0;
+    private float|int $pageNumber = 0;
 
     private $perpage = 20;
 

@@ -40,15 +40,9 @@ use const PHP_EOL;
 
 final class Topic
 {
-    /**
-     * @var int
-     */
-    private $tid = 0;
+    private int $tid = 0;
 
-    /**
-     * @var int
-     */
-    private $pageNumber = 0;
+    private int $pageNumber = 0;
 
     private int $numperpage = 10;
 
@@ -56,10 +50,7 @@ final class Topic
 
     private int $firstPostID = 0;
 
-    /**
-     * @var null|array
-     */
-    private $topicdata;
+    private ?array $topicdata = null;
 
     public function __construct(
         private readonly Config $config,
