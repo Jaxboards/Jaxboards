@@ -7,17 +7,13 @@ namespace Jax;
 use function array_key_exists;
 use function array_keys;
 use function array_map;
-use function array_pop;
 use function array_values;
-use function count;
 use function dirname;
-use function explode;
 use function file_exists;
 use function highlight_string;
 use function htmlspecialchars;
 use function implode;
 use function in_array;
-use function mb_strtolower;
 use function mb_substr;
 use function nl2br;
 use function parse_url;
@@ -26,11 +22,8 @@ use function preg_match_all;
 use function preg_quote;
 use function preg_replace;
 use function preg_replace_callback;
-use function preg_split;
-use function str_contains;
 use function str_ireplace;
 use function str_replace;
-use function trim;
 use function urlencode;
 
 use const ENT_QUOTES;
@@ -66,6 +59,7 @@ final class TextFormatting
 
     public function __construct(
         private readonly Config $config,
+        private readonly BBCode $bbCode,
         private readonly Database $database,
         private readonly DomainDefinitions $domainDefinitions,
         private readonly User $user,
@@ -136,13 +130,13 @@ final class TextFormatting
                 require_once $rulesPath;
 
                 if (!isset($rules)) {
-                    exit('Emoticon ruleset corrupted!');
+                    return $emotes;
                 }
 
                 $this->emotePackRules = $rules;
 
                 foreach ($rules as $emote => $path) {
-                    $emotes[$emote] = 'emoticons/' . $emotePack . '/' . $path;
+                    $emotes[$emote] = "emoticons/{$emotePack}/$path";
                 }
             }
         }
@@ -265,83 +259,13 @@ final class TextFormatting
         return $text;
     }
 
-    public function bbcodes(string $text, $minimal = false): ?string
-    {
-        $bbcodes = [
-            '@\[(bg|bgcolor|background)=(#?[\s\w\d]+)\](.*)\[/\1\]@Usi' => '<span style="background:$2">$3</span>',
-            '@\[blink\](.*)\[/blink\]@Usi' => '<span style="text-decoration:blink">$1</span>',
-            // I recommend keeping nofollow if admin approval of new accounts is not enabled
-            '@\[b\](.*)\[/b\]@Usi' => '<strong>$1</strong>',
-            '@\[color=(#?[\s\w\d]+|rgb\([\d, ]+\))\](.*)\[/color\]@Usi' => '<span style="color:$1">$2</span>',
-            '@\[font=([\s\w]+)](.*)\[/font\]@Usi' => '<span style="font-family:$1">$2</span>',
-            '@\[i\](.*)\[/i\]@Usi' => '<em>$1</em>',
-            '@\[spoiler\](.*)\[/spoiler\]@Usi' => '<span class="spoilertext">$1</span>',
-            // Consider adding nofollow if admin approval is not enabled
-            '@\[s\](.*)\[/s\]@Usi' => '<span style="text-decoration:line-through">$1</span>',
-            '@\[url=(http|ftp|\?|mailto:)([^\]]+)\](.+?)\[/url\]@i' => '<a href="$1$2">$3</a>',
-            '@\[url\](http|ftp|\?)(.*)\[/url\]@Ui' => '<a href="$1$2">$1$2</a>',
-            '@\[u\](.*)\[/u\]@Usi' => '<span style="text-decoration:underline">$1</span>',
-        ];
-
-        if (!$minimal) {
-            $bbcodes['@\[h([1-5])\](.*)\[/h\1\]@Usi'] = '<h$1>$2</h$1>';
-            $bbcodes['@\[align=(center|left|right)\](.*)\[/align\]@Usi']
-                = '<p style="text-align:$1">$2</p>';
-            $bbcodes['@\[img(?:=([^\]]+|))?\]((?:http|ftp)\S+)\[/img\]@Ui']
-                = '<img src="$2" title="$1" alt="$1" class="bbcodeimg" '
-                . 'align="absmiddle" />';
-        }
-
-        while (($tmp = preg_replace(array_keys($bbcodes), array_values($bbcodes), (string) $text)) !== $text) {
-            $text = $tmp;
-        }
-
-        if ($minimal) {
-            return $text;
-        }
-
-        // UL/LI tags.
-        while ($text !== ($tmp = preg_replace_callback('@\[(ul|ol)\](.*)\[/\1\]@Usi', $this->bbcodeLICallback(...), (string) $text))) {
-            $text = $tmp;
-        }
-
-        // Size code (actually needs a callback simply because of
-        // the variability of the arguments).
-        while ($text !== ($tmp = preg_replace_callback('@\[size=([0-4]?\d)(px|pt|em|)\](.*)\[/size\]@Usi', $this->bbcodeSizeCallback(...), (string) $text))) {
-            $text = $tmp;
-        }
-
-        // Do quote tags.
-        for (
-            $nestLimit = 0; $nestLimit < 10 && preg_match(
-                '@\[quote(?>=([^\]]+))?\](.*?)\[/quote\]\r?\n?@is',
-                (string) $text,
-                $match,
-            ); ++$nestLimit
-        ) {
-            $text = str_replace(
-                $match[0],
-                '<div class="quote">'
-                . ($match[1] !== '' && $match[1] !== '0' ? '<div class="quotee">' . $match[1] . '</div>' : '')
-                . $match[2] . '</div>',
-                $text,
-            );
-        }
-
-        return preg_replace_callback(
-            '@\[video\](.*)\[/video\]@Ui',
-            $this->bbcodeVideoCallback(...),
-            (string) $text,
-        );
-    }
-
     public function theworks(string $text, array $cfg = []): string
     {
         $replaceBBCode = !array_key_exists('nobb', $cfg);
         $minimalBBCode = array_key_exists('minimalbb', $cfg);
 
         if ($replaceBBCode && !$minimalBBCode) {
-            [$text, $codes] = $this->startcodetags($text);
+            [$text, $codes] = $this->startCodeTags($text);
         }
 
         $text = nl2br($this->blockhtml($text));
@@ -351,7 +275,7 @@ final class TextFormatting
         }
 
         if ($replaceBBCode) {
-            $text = $this->bbcodes($text, $minimalBBCode);
+            $text = $this->bbCode->toHTML($text, $minimalBBCode);
         }
 
         if ($replaceBBCode && !$minimalBBCode) {
@@ -393,48 +317,6 @@ final class TextFormatting
         [, $space, $emoteText] = $match;
 
         return $space . '<img src="' . $this->emotes[$emoteText] . '" alt="' . $this->blockhtml($emoteText) . '"/>';
-    }
-
-    private function bbcodeSizeCallback(array $match): string
-    {
-        return '<span style="font-size:'
-            . $match[1] . ($match[2] ?: 'px') . '">' . $match[3] . '</span>';
-    }
-
-    private function bbcodeVideoCallback(array $match): string
-    {
-
-        if (str_contains((string) $match[1], 'youtube.com')) {
-            preg_match('@v=([\w-]+)@', (string) $match[1], $youtubeMatches);
-            $embedUrl = "https://www.youtube.com/embed/{$youtubeMatches[1]}";
-
-            return $this->youtubeEmbedHTML($match[1], $embedUrl);
-        }
-
-        if (str_contains((string) $match[1], 'youtu.be')) {
-            preg_match('@youtu.be/(?P<params>.+)$@', (string) $match[1], $youtubeMatches);
-            $embedUrl = "https://www.youtube.com/embed/{$youtubeMatches['params']}";
-
-            return $this->youtubeEmbedHTML($match[1], $embedUrl);
-        }
-
-        return '-Invalid Video Url-';
-    }
-
-    private function bbcodeLICallback(array $match): string
-    {
-        $items = preg_split("@(^|[\r\n])\\*@", (string) $match[2]);
-
-        $html = $match[1] === 'ol' ? '<ol>' : '<ul>';
-        foreach ($items as $item) {
-            if (trim($item) === '') {
-                continue;
-            }
-
-            $html .= '<li>' . $item . ' </li>';
-        }
-
-        return $html . $match[1] === 'ol' ? '</ol>' : '</ul>';
     }
 
     private function attachments(string $text): null|array|string
@@ -502,45 +384,5 @@ final class TextFormatting
             . '<a href="index.php?act=download&id='
             . $file['id'] . '&name=' . urlencode((string) $file['name']) . '" class="name">'
             . $file['name'] . '</a> Downloads: ' . $file['downloads'] . '</div>';
-    }
-
-    // phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength
-    private function youtubeEmbedHTML(
-        string $link,
-        string $embedUrl,
-    ): string {
-        // do NOT replace this with <<<HTML, sonarqube thinks it's an HTML tag and it's bitten me twice
-        return <<<DOC
-            <div class="media youtube">
-                <div class="summary">
-                    Watch Youtube Video:
-                    <a href="{$link}">
-                        {$link}
-                    </a>
-                </div>
-                <div class="open">
-                    <a href="{$link}" class="popout">
-                        Popout
-                    </a>
-                    &middot;
-                    <a href="{$link}" class="inline">
-                        Inline
-                    </a>
-                </div>
-                <div class="movie" style="display:none">
-                    <iframe
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowfullscreen="allowfullscreen"
-                        frameborder="0"
-                        height="315"
-                        referrerpolicy="strict-origin-when-cross-origin"
-                        src="{$embedUrl}"
-                        title="YouTube video player"
-                        width="560"
-                        ></iframe>
-                </div>
-            </div>
-            DOC;
-        // phpcs:enable
     }
 }

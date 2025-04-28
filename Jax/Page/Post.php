@@ -130,14 +130,13 @@ final class Post
         $hash = hash_file('sha512', $fileobj['tmp_name']);
         $uploadpath = $this->domainDefinitions->getBoardPath() . '/Uploads/';
 
-        $ext = explode('.', (string) $fileobj['name']);
-        $ext = count($ext) === 1 ? '' : mb_strtolower(array_pop($ext));
+        $ext = (string) pathinfo($fileobj['name'], PATHINFO_EXTENSION);
 
-        if (!in_array($ext, $this->config->getSetting('images') ?? [])) {
+        if (!in_array($ext, $this->config->getSetting('images') ?? [], true)) {
             $ext = '';
         }
 
-        if ($ext !== '' && $ext !== '0') {
+        if ($ext !== '') {
             $ext = '.' . $ext;
         }
 

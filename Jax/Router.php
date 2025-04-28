@@ -116,8 +116,8 @@ final class Router
 
         if ($page) {
             $this->database->disposeresult($result);
-            $textFormatting = $this->container->get(TextFormatting::class);
-            $pageContents = $textFormatting->bbcodes($page['page']);
+            $bbCode = $this->container->get(BBCode::class);
+            $pageContents = $bbCode->toHTML($page['page']);
             $this->page->append('PAGE', $pageContents);
             if ($this->request->isJSNewLocation()) {
                 $this->page->JS('update', 'page', $pageContents);
