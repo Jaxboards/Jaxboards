@@ -7,6 +7,7 @@ namespace ACP\Page;
 use ACP\Page;
 use Jax\Database;
 use Jax\DomainDefinitions;
+use Jax\FileUtils;
 use Jax\Jax;
 use Jax\Request;
 use Jax\TextFormatting;
@@ -27,7 +28,6 @@ use function is_file;
 use function is_numeric;
 use function is_string;
 use function is_writable;
-use function Jax\FileUtils\removeDirectory;
 use function mb_strlen;
 use function mb_strpos;
 use function mkdir;
@@ -631,7 +631,7 @@ final readonly class Themes
                 unlink($v);
             }
 
-            removeDirectory($skindir);
+            FileUtils::removeDirectory($skindir);
         }
 
         $this->database->safedelete(

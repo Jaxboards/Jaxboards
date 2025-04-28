@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\Database;
+use Jax\FileUtils;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Request;
@@ -394,7 +395,7 @@ final class ServiceInstall
             echo $this->database->error();
 
             mkdir(dirname(__DIR__) . '/boards');
-            copyDirectory('blueprint', dirname(__DIR__) . '/boards/' . $board);
+            FileUtils::copyDirectory('blueprint', dirname(__DIR__) . '/boards/' . $board);
         }
 
         // Send us to the service page.

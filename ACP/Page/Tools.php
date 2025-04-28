@@ -8,6 +8,7 @@ use ACP\Page;
 use Jax\Config;
 use Jax\Database;
 use Jax\DomainDefinitions;
+use Jax\FileUtils;
 use Jax\Jax;
 use Jax\Request;
 use SplFileObject;
@@ -31,7 +32,6 @@ use function is_array;
 use function is_numeric;
 use function is_readable;
 use function is_writable;
-use function Jax\FileUtils\fileSizeHumanReadable;
 use function mb_strlen;
 use function mb_strtolower;
 use function mb_substr;
@@ -191,7 +191,7 @@ final readonly class Tools
                 'tools/file-manager-row.html',
                 [
                     'downloads' => $file['downloads'],
-                    'filesize' => fileSizeHumanReadable($file['size']),
+                    'filesize' => FileUtils::fileSizeHumanReadable($file['size']),
                     'id' => $file['id'],
                     'linked_in' => isset($linkedin[$file['id']]) && $linkedin[$file['id']]
                         ? implode(', ', $linkedin[$file['id']]) : 'Not linked!',

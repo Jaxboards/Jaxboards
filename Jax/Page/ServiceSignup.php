@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\Database;
+use Jax\FileUtils;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Request;
@@ -16,7 +17,6 @@ use function file;
 use function gmdate;
 use function header;
 use function implode;
-use function Jax\FileUtils\copyDirectory;
 use function mb_strlen;
 use function mb_strtolower;
 use function mb_substr;
@@ -184,7 +184,7 @@ final readonly class ServiceSignup
                 if ($dbError !== '' && $dbError !== '0') {
                     $errors[] = $dbError;
                 } else {
-                    copyDirectory('blueprint', dirname(__DIR__) . '/boards/' . $board);
+                    FileUtils::copyDirectory('blueprint', dirname(__DIR__) . '/boards/' . $board);
 
                     header('Location: https://' . $this->request->post('boardurl') . '.' . $this->serviceConfig->getSetting('domain'));
                 }
