@@ -36,7 +36,6 @@ use function mb_substr;
 use function pathinfo;
 use function preg_match_all;
 use function readfile;
-use function strlen;
 use function sys_get_temp_dir;
 use function tempnam;
 use function trim;
@@ -91,7 +90,7 @@ final readonly class Tools
             $this->database->disposeresult($result);
             if ($file) {
                 $ext = mb_strtolower(pathinfo((string) $file['name'], PATHINFO_EXTENSION));
-                if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp'])) {
+                if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp'], true)) {
                     $file['hash'] .= '.' . $ext;
                 }
 
@@ -138,18 +137,18 @@ final readonly class Tools
             . "AND post LIKE '%[attachment]%'",
         );
         $linkedin = [];
-        while ($f = $this->database->arow($result)) {
+        while ($post = $this->database->arow($result)) {
             preg_match_all(
                 '@\[attachment\](\d+)\[/attachment\]@',
-                (string) $f['post'],
-                $m,
+                (string) $post['post'],
+                $matches,
             );
-            foreach ($m[1] as $v) {
-                $linkedin[$v][] = $this->page->parseTemplate(
+            foreach ($matches[1] as $attachmentId) {
+                $linkedin[$attachmentId][] = $this->page->parseTemplate(
                     'tools/attachment-link.html',
                     [
-                        'post_id' => $f['id'],
-                        'topic_id' => $f['tid'],
+                        'post_id' => $post['id'],
+                        'topic_id' => $post['tid'],
                     ],
                 );
             }
@@ -181,7 +180,7 @@ final readonly class Tools
                 $ext = mb_strtolower(array_pop($filepieces));
             }
 
-            $file['name'] = in_array($ext, $this->config->getSetting('images')) ? '<a href="'
+            $file['name'] = in_array($ext, $this->config->getSetting('images'), true) ? '<a href="'
                     . $this->domainDefinitions->getBoardPathUrl() . 'Uploads/' . $file['hash'] . '.' . $ext . '">'
                     . $file['name'] . '</a>' : '<a href="../?act=download&id='
                     . $file['id'] . '">' . $file['name'] . '</a>';
@@ -201,7 +200,7 @@ final readonly class Tools
             );
         }
 
-        $page .= $table !== '' && $table !== '0' ? $this->page->parseTemplate(
+        $page .= $table !== '' ? $this->page->parseTemplate(
             'tools/file-manager.html',
             [
                 'content' => $table,
@@ -242,7 +241,7 @@ final readonly class Tools
         ];
 
         foreach ($tables as $table) {
-            $table = mb_substr($table, strlen($dbPrefix));
+            $table = mb_substr($table, mb_strlen($dbPrefix));
             $sqlFileLines[] = '-- ' . $table;
             $sqlFileLines[] = '';
 
@@ -338,7 +337,10 @@ final readonly class Tools
         );
     }
 
-    // Reads the last $totalLines of a file
+    /**
+     * Reads the last $totalLines of a file.
+     * @return array<string>
+     */
     private function tail(bool|string $path, int $totalLines): array
     {
         $logFile = new SplFileObject($path, 'r');
