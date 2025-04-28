@@ -7,14 +7,15 @@ namespace Jax;
 use Exception;
 
 use function array_keys;
+use function array_merge;
 use function array_pop;
-use function array_shift;
 use function array_values;
 use function explode;
 use function file_get_contents;
 use function glob;
 use function header;
 use function headers_sent;
+use function htmlspecialchars_decode;
 use function implode;
 use function in_array;
 use function is_array;
@@ -29,9 +30,11 @@ use function pathinfo;
 use function preg_match;
 use function preg_replace;
 use function preg_replace_callback;
+use function str_contains;
 use function str_replace;
 use function vsprintf;
 
+use const ENT_QUOTES;
 use const PATHINFO_BASENAME;
 use const PATHINFO_FILENAME;
 use const PHP_EOL;
@@ -98,28 +101,29 @@ final class Page
     /**
      * @var array<string,string>
      */
-    private $parts = [];
+    private array $parts = [];
 
     /**
      * @var array<string,string>
      */
-    private $vars = [];
+    private array $vars = [];
 
     /**
      * @var array<string,string>
      */
-    private $userMetaDefs = [];
+    private array $userMetaDefs = [];
 
     /**
      * @var array<string,bool>
      */
-    private $moreFormatting = [];
+    private array $moreFormatting = [];
 
     /**
-     * Map of human readable label to URL. Used for NAVIGATION
+     * Map of human readable label to URL. Used for NAVIGATION.
+     *
      * @var array<string>
      */
-    private $breadCrumbs = [];
+    private array $breadCrumbs = [];
 
     private string $template;
 
@@ -173,6 +177,7 @@ final class Page
 
         if ($this->request->isJSAccess()) {
             $this->JS('location', $newLocation);
+
             return;
         }
 
@@ -260,21 +265,6 @@ final class Page
         echo $this->template;
     }
 
-    private function outputJavascriptCommands(): void
-    {
-        if (!headers_sent()) {
-            header('Content-type:application/json');
-        }
-
-        // Update browser title and breadcrumbs when changing location
-        if ($this->request->isJSNewLocation()) {
-            $this->JS('title', htmlspecialchars_decode((string) $this->parts['TITLE'], ENT_QUOTES));
-            $this->JS('update', 'path', $this->buildpath());
-        }
-
-        echo json_encode($this->javascriptCommands);
-    }
-
     public function collapseBox(
         string $title,
         string $contents,
@@ -286,21 +276,6 @@ final class Page
     public function error(string $error): ?string
     {
         return $this->meta('error', $error);
-    }
-
-    private function templateHas(string $part): false|int
-    {
-        return preg_match("/<!--{$part}-->/i", (string) $this->template);
-    }
-
-    private function loadTemplate(string $file): void
-    {
-        $this->template = file_get_contents($file);
-        $this->template = preg_replace_callback(
-            '@<M name=([\'"])([^\'"]+)\1>(.*?)</M>@s',
-            $this->userMetaParse(...),
-            (string) $this->template,
-        );
     }
 
     public function loadSkin(?int $skinId): void
@@ -362,14 +337,6 @@ final class Page
         );
     }
 
-    private function userMetaParse(array $match): string
-    {
-        $this->checkExtended($match[3], $match[2]);
-        $this->userMetaDefs[$match[2]] = $match[3];
-
-        return '';
-    }
-
     public function addMeta(string $meta, string $content): void
     {
         $this->metaDefs[$meta] = $content;
@@ -381,10 +348,10 @@ final class Page
         $themeComponentDir = $this->themePath . '/views/' . $component;
         $defaultThemeComponentDir = $this->domainDefinitions->getDefaultThemePath() . '/views/' . $component;
 
-        $componentDir = match(true) {
+        $componentDir = match (true) {
             is_dir($themeComponentDir) => $themeComponentDir,
             is_dir($defaultThemeComponentDir) => $defaultThemeComponentDir,
-            default => null
+            default => null,
         };
 
         if ($componentDir === null) {
@@ -393,6 +360,91 @@ final class Page
 
         $this->metaqueue[] = $componentDir;
         $this->debug("Added {$component} to queue");
+    }
+
+    public function meta(string $meta, ...$args): string
+    {
+        $this->processQueue($meta);
+        $formatted = vsprintf(
+            str_replace(
+                ['<%', '%>'],
+                ['<%%', '%%>'],
+                $this->userMetaDefs[$meta] ?? $this->metaDefs[$meta] ?? '',
+            ),
+            isset($args[0]) && is_array($args[0]) ? $args[0] : $args,
+        );
+        if ($formatted === false) {
+            throw new Exception($meta . ' has too many arguments');
+        }
+
+        if (
+            isset($this->moreFormatting[$meta])
+            && $this->moreFormatting[$meta]
+        ) {
+            return $this->metaExtended($formatted);
+        }
+
+        return $formatted;
+    }
+
+    public function metaExists(string $meta): bool
+    {
+        return isset($this->userMetaDefs[$meta])
+            || isset($this->metaDefs[$meta]);
+    }
+
+    public function path(array $crumbs): void
+    {
+        $this->breadCrumbs = array_merge($this->breadCrumbs, $crumbs);
+    }
+
+    public function debug(?string $data = null): ?string
+    {
+        if ($data) {
+            $this->debuginfo[] = $data;
+
+            return null;
+        }
+
+        return implode('<br>', $this->debuginfo);
+    }
+
+    private function outputJavascriptCommands(): void
+    {
+        if (!headers_sent()) {
+            header('Content-type:application/json');
+        }
+
+        // Update browser title and breadcrumbs when changing location
+        if ($this->request->isJSNewLocation()) {
+            $this->JS('title', htmlspecialchars_decode((string) $this->parts['TITLE'], ENT_QUOTES));
+            $this->JS('update', 'path', $this->buildpath());
+        }
+
+        echo json_encode($this->javascriptCommands);
+    }
+
+    private function templateHas(string $part): false|int
+    {
+        return preg_match("/<!--{$part}-->/i", (string) $this->template);
+    }
+
+    private function loadTemplate(string $file): void
+    {
+        $this->template = file_get_contents($file);
+        $this->template = preg_replace_callback(
+            '@<M name=([\'"])([^\'"]+)\1>(.*?)</M>@s',
+            $this->userMetaParse(...),
+            (string) $this->template,
+        );
+    }
+
+    private function userMetaParse(array $match): string
+    {
+        $this->checkExtended($match[3], $match[2]);
+        $this->userMetaDefs[$match[2]] = $match[3];
+
+        return '';
     }
 
     private function processQueue(string $process): void
@@ -429,31 +481,6 @@ final class Page
 
             $this->metaDefs = $meta + $this->metaDefs;
         }
-    }
-
-    public function meta(string $meta, ...$args): string
-    {
-        $this->processQueue($meta);
-        $formatted = vsprintf(
-            str_replace(
-                ['<%', '%>'],
-                ['<%%', '%%>'],
-                $this->userMetaDefs[$meta] ?? $this->metaDefs[$meta] ?? '',
-            ),
-            isset($args[0]) && is_array($args[0]) ? $args[0] : $args,
-        );
-        if ($formatted === false) {
-            throw new Exception($meta . ' has too many arguments');
-        }
-
-        if (
-            isset($this->moreFormatting[$meta])
-            && $this->moreFormatting[$meta]
-        ) {
-            return $this->metaExtended($formatted);
-        }
-
-        return $formatted;
     }
 
     private function metaExtended(string $content): string
@@ -509,17 +536,6 @@ final class Page
         return false;
     }
 
-    public function metaExists(string $meta): bool
-    {
-        return isset($this->userMetaDefs[$meta])
-            || isset($this->metaDefs[$meta]);
-    }
-
-    public function path(array $crumbs): void
-    {
-        $this->breadCrumbs = array_merge($this->breadCrumbs, $crumbs);
-    }
-
     private function buildPath(): string
     {
         $first = true;
@@ -535,16 +551,5 @@ final class Page
         }
 
         return $this->meta('path', $path);
-    }
-
-    public function debug(?string $data = null): ?string
-    {
-        if ($data) {
-            $this->debuginfo[] = $data;
-
-            return null;
-        }
-
-        return implode('<br>', $this->debuginfo);
     }
 }

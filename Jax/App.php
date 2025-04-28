@@ -12,7 +12,6 @@ use function file_get_contents;
 use function glob;
 use function gmdate;
 use function header;
-use function htmlspecialchars_decode;
 use function in_array;
 use function is_array;
 use function json_decode;
@@ -23,7 +22,6 @@ use function pathinfo;
 use function property_exists;
 use function round;
 
-use const ENT_QUOTES;
 use const JSON_OBJECT_AS_ARRAY;
 use const JSON_THROW_ON_ERROR;
 use const PATHINFO_FILENAME;
