@@ -17,6 +17,7 @@ use function in_array;
 use function mb_substr;
 use function nl2br;
 use function parse_url;
+use function pathinfo;
 use function preg_match;
 use function preg_match_all;
 use function preg_quote;
@@ -27,6 +28,7 @@ use function str_replace;
 use function urlencode;
 
 use const ENT_QUOTES;
+use const PATHINFO_EXTENSION;
 
 final class TextFormatting
 {
@@ -77,7 +79,7 @@ final class TextFormatting
                 'type',
                 'needle',
                 'replacement',
-                'enabled'
+                'enabled',
             ],
             'textrules',
             '',
@@ -136,7 +138,7 @@ final class TextFormatting
                 $this->emotePackRules = $rules;
 
                 foreach ($rules as $emote => $path) {
-                    $emotes[$emote] = "emoticons/{$emotePack}/$path";
+                    $emotes[$emote] = "emoticons/{$emotePack}/{$path}";
                 }
             }
         }
@@ -331,13 +333,14 @@ final class TextFormatting
 
     /**
      * Given an attachment ID, gets the file data associated with it
-     * Returns null if file not found
-     * @return array<string,mixed>|null
+     * Returns null if file not found.
+     *
+     * @return null|array<string,mixed>
      */
     private function getAttachmentData(string $fileId): ?array
     {
         if (isset($this->attachmentData[$fileId])) {
-           return $this->attachmentData[$fileId];
+            return $this->attachmentData[$fileId];
         }
 
         $result = $this->database->safeselect(

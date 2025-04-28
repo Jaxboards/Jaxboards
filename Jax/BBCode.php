@@ -1,8 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax;
 
-class BBCode {
+use function array_keys;
+use function array_values;
+use function preg_match;
+use function preg_replace;
+use function preg_replace_callback;
+use function preg_split;
+use function str_contains;
+use function trim;
+
+final class BBCode
+{
     private array $bbcodes = [
         '@\[(bg|bgcolor|background)=(#?[\s\w\d]+)\](.*)\[/\1\]@Usi' => '<span style="background:$2">$3</span>',
         '@\[blink\](.*)\[/blink\]@Usi' => '<span style="text-decoration:blink">$1</span>',
@@ -22,31 +34,8 @@ class BBCode {
     private array $extendedBBCodes = [
         '@\[h([1-5])\](.*)\[/h\1\]@Usi' => '<h$1>$2</h$1>',
         '@\[align=(center|left|right)\](.*)\[/align\]@Usi' => '<p style="text-align:$1">$2</p>',
-        '@\[img(?:=([^\]]+|))?\]((?:http|ftp)\S+)\[/img\]@Ui' =>
-            '<img src="$2" title="$1" alt="$1" class="bbcodeimg" align="absmiddle" />'
+        '@\[img(?:=([^\]]+|))?\]((?:http|ftp)\S+)\[/img\]@Ui' => '<img src="$2" title="$1" alt="$1" class="bbcodeimg" align="absmiddle" />',
     ];
-
-    private function replaceWithRules(string $text, array $rules): string
-    {
-        for ($nestLimit = 0; $nestLimit < 10; $nestLimit++) {
-            $tmp = preg_replace(array_keys($rules), array_values($rules), $text);
-            if ($tmp === $text) break;
-            $text = $tmp;
-        }
-
-        return $text;
-    }
-
-    private function replaceWithCallback(string $text, string $pattern, callable $callback): string
-    {
-        for ($nestLimit = 0; $nestLimit < 10; $nestLimit++) {
-            $tmp = preg_replace_callback($pattern, $callback, $text);
-            if ($tmp === $text) break;
-            $text = $tmp;
-        }
-
-        return $text;
-    }
 
     public function toHTML(string $text, $minimal = false): ?string
     {
@@ -74,9 +63,40 @@ class BBCode {
         );
     }
 
+    private function replaceWithRules(string $text, array $rules): string
+    {
+        for ($nestLimit = 0; $nestLimit < 10; ++$nestLimit) {
+            $tmp = preg_replace(array_keys($rules), array_values($rules), $text);
+            if ($tmp === $text) {
+                break;
+            }
+            $text = $tmp;
+        }
+
+        return $text;
+    }
+
+    private function replaceWithCallback(
+        string $text,
+        string $pattern,
+        callable $callback,
+    ): string {
+        for ($nestLimit = 0; $nestLimit < 10; ++$nestLimit) {
+            $tmp = preg_replace_callback($pattern, $callback, $text);
+            if ($tmp === $text) {
+                break;
+            }
+            $text = $tmp;
+        }
+
+        return $text;
+    }
+
     private function bbcodeQuoteCallback(array $match): string
     {
-        $quotee = $match[1] !== '' ? "<div class='quotee'>{$match[1]}</div>" : '';
+        $quotee = $match[1] !== ''
+            ? "<div class='quotee'>{$match[1]}</div>"
+            : '';
 
         return "<div class='quote'>{$quotee}{$match[2]}</div>";
     }
@@ -84,6 +104,7 @@ class BBCode {
     private function bbcodeSizeCallback(array $match): string
     {
         $fontSize = $match[1] . ($match[2] ?: 'px');
+
         return "<span style='font-size:{$fontSize}'>{$match[3]}</span>";
     }
 

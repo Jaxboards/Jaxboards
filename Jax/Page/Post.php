@@ -24,14 +24,15 @@ use function is_file;
 use function is_numeric;
 use function json_encode;
 use function mb_strlen;
-use function mb_strtolower;
 use function mb_substr;
 use function move_uploaded_file;
+use function pathinfo;
 use function preg_replace;
 use function preg_split;
 use function str_replace;
 use function trim;
 
+use const PATHINFO_EXTENSION;
 use const PHP_EOL;
 
 final class Post
