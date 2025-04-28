@@ -56,7 +56,7 @@ final class LogReg
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
     ) {
-        $this->page->loadmeta('logreg');
+        $this->page->loadMeta('logreg');
     }
 
     public function render(): void
@@ -126,7 +126,7 @@ final class LogReg
 
         if ($error !== null) {
             $this->page->JS('alert', $error);
-            $this->page->append('page', $this->page->meta('error', $error));
+            $this->page->append('PAGE', $this->page->meta('error', $error));
 
             return;
         }
@@ -152,7 +152,7 @@ final class LogReg
 
         if ($error !== null) {
             $this->page->JS('alert', $error);
-            $this->page->append('page', $this->page->meta('error', $error));
+            $this->page->append('PAGE', $this->page->meta('error', $error));
 
             return;
         }
@@ -242,7 +242,7 @@ final class LogReg
                 }
             } else {
                 $this->page->append(
-                    'page',
+                    'PAGE',
                     $this->page->meta('error', 'Incorrect username/password'),
                 );
                 $this->page->JS('error', 'Incorrect username/password');
@@ -251,7 +251,7 @@ final class LogReg
             $this->session->erase('location');
         }
 
-        $this->page->append('page', $this->page->meta('login-form'));
+        $this->page->append('PAGE', $this->page->meta('login-form'));
     }
 
     private function logout(): void
@@ -275,7 +275,7 @@ final class LogReg
         $this->page->reset('USERBOX', $this->page->meta('userbox-logged-out'));
         $this->page->JS('update', 'userbox', $this->page->meta('userbox-logged-out'));
         $this->page->JS('softurl');
-        $this->page->append('page', $this->page->meta('success', 'Logged out successfully'));
+        $this->page->append('PAGE', $this->page->meta('success', 'Logged out successfully'));
         if ($this->request->isJSAccess()) {
             return;
         }

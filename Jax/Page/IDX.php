@@ -48,7 +48,7 @@ final class IDX
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
     ) {
-        $this->page->loadmeta('idx');
+        $this->page->loadMeta('idx');
     }
 
     public function render(): void
@@ -165,7 +165,7 @@ final class IDX
                 continue;
             }
 
-            $page .= $this->page->collapsebox(
+            $page .= $this->page->collapseBox(
                 $forum['title'],
                 $this->buildTable(
                     $data[$forum['id']],
@@ -180,7 +180,6 @@ final class IDX
 
         if ($this->request->isJSNewLocation()) {
             $this->page->JS('update', 'page', $page);
-            $this->page->updatepath();
         } else {
             $this->page->append('PAGE', $page);
         }

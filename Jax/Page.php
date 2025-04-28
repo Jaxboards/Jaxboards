@@ -43,22 +43,25 @@ use const PHP_EOL;
  *
  * Here's how it works:
  *
- * 1. The page's "components" are separated out into "meta" definitions. These are stored on `metadefs` as key/value (value being an HTML template).
- *    Template components are passed data through `vsprintf`, so each individual piece of data going into a template can be referenced using full sprintf syntax.
+ * 1. The page's "components" are separated out into "meta" definitions. These are stored on `metaDefs` as key/value
+ *    (value being an HTML template). Template components are passed data through `vsprintf`, so each individual
+ *    piece of data going into a template can be referenced using full sprintf syntax.
  *
  * 2. Theme templates can overwrite meta definitions through their board template using "<M>" tags.
  *    An example would look like this: `<M name="logo"><img src="logo.png" /></M>`
  *
  * 3. There is a "variable" syntax that templates can use:
  *    <%varname%>
- *    These variables are page-level (global) and are defined using `addvar`. They can be used in any template piece anywhere.
+ *    These variables are page-level (global) and are defined using `addvar`.
+ *    They can be used in any template piece anywhere.
  *
  * 4. There is a rudimentary conditional syntax that looks like this:
  *    {if <%isguest%>=true}You should sign up!{/if}
  *    As of writing, these conditionals must use one of the following operators: =, !=, >, <, >=, <=
  *    There are also && and || which can be used for chaining conditions together.
  *
- *    Conditionals can mix and match page variables and component variables. For example: {if <%isguest%>!=true&&%1$s="Sean"}Hello Sean{/if}
+ *    Conditionals can mix and match page variables and component variables.
+ *    For example: {if <%isguest%>!=true&&%1$s="Sean"}Hello Sean{/if}
  *
  *    Conditionals do not tolerate whitespace, so it must all be mashed together. To be improved one day perhaps.
  *
@@ -68,18 +71,18 @@ use const PHP_EOL;
  *
  *    These sections are defined through calls to $this->append()
  *
- *    Interestingly, I tried to create some sort of module system that would only conditionally load modules if the template has it.
- *    For example - none of the `tag_shoutbox` will be included or used if <!--SHOUTBOX--> is not in the root template.
- *    The filenames of these "modules" must be prefixed with "tag_" for this to work. Otherwise the modules will always be loaded.
- *
- * @psalm-api
+ *    Interestingly, I tried to create some sort of module system that would only conditionally load modules
+ *    if the template has it. For example - none of the `tag_shoutbox` will be included or used if <!--SHOUTBOX-->
+ *    is not in the root template.
+ *    The filenames of these "modules" must be prefixed with "tag_" for this to work.
+ *    Otherwise the modules will always be loaded.
  */
 final class Page
 {
     /**
      * @var array<string, string>
      */
-    private array $metadefs = [];
+    private array $metaDefs = [];
 
     /**
      * @var array<string>
@@ -89,20 +92,41 @@ final class Page
     /**
      * @var array<string>
      */
-    private array $JSOutput = [];
+    private array $javascriptCommands = [];
 
 
+    /**
+     * @var array<string,string>
+     */
     private $parts = [];
 
+    /**
+     * @var array<string,string>
+     */
     private $vars = [];
 
+    /**
+     * @var array<string,string>
+     */
     private $userMetaDefs = [];
 
+    /**
+     * @var array<string,bool>
+     */
     private $moreFormatting = [];
 
-    private $template;
+    /**
+     * Map of human readable label to URL. Used for NAVIGATION
+     * @var array<string>
+     */
+    private $breadCrumbs = [];
 
-    private $metaqueue;
+    private string $template;
+
+    /**
+     * @var array<string>
+     */
+    private array $metaqueue;
 
     private ?string $themePath = null;
 
@@ -114,25 +138,21 @@ final class Page
         private readonly Session $session,
     ) {}
 
-    public function get(string $part)
-    {
-        return $this->parts[$part];
-    }
-
     public function append(string $part, string $content): void
     {
-        $part = mb_strtoupper($part);
-        if (!$this->request->isJSAccess() || $part === 'TITLE') {
-            if (!isset($this->parts[$part])) {
-                $this->reset($part, $content);
+        // When accessed through javascript, the base page is not rendered
+        // so we can skip all parts except the title
+        if ($this->request->isJSAccess() && $part !== 'TITLE') {
+            return;
+        }
 
-                return;
-            }
-
-            $this->parts[$part] .= $content;
+        if (!isset($this->parts[$part])) {
+            $this->reset($part, $content);
 
             return;
         }
+
+        $this->parts[$part] .= $content;
     }
 
     public function addvar(string $varName, string $value): void
@@ -153,14 +173,14 @@ final class Page
 
         if ($this->request->isJSAccess()) {
             $this->JS('location', $newLocation);
-        } else {
-            header("Location: {$newLocation}");
+            return;
         }
+
+        header("Location: {$newLocation}");
     }
 
     public function reset(string $part, string $content = ''): void
     {
-        $part = mb_strtoupper($part);
         $this->parts[$part] = $content;
     }
 
@@ -174,9 +194,14 @@ final class Page
             return;
         }
 
-        $this->JSOutput[] = $args;
+        $this->javascriptCommands[] = $args;
     }
 
+    /**
+     * Sometimes commands are stored in the session table's runOnce field.
+     * Since they're stored as text, this expands it back out and adds it to
+     * the page output.
+     */
     public function JSRaw(string $script): void
     {
         foreach (explode(PHP_EOL, $script) as $line) {
@@ -186,45 +211,35 @@ final class Page
             }
 
             if (is_array($decoded[0])) {
-                foreach ($decoded as $v) {
-                    $this->JSOutput[] = $v;
-                }
-            } else {
-                $this->JSOutput[] = $decoded;
+                $this->javascriptCommands = array_merge($this->javascriptCommands, $decoded);
+
+                continue;
             }
+
+            $this->javascriptCommands[] = $decoded;
         }
     }
 
     public function JSRawArray(array $command): void
     {
-        $this->JSOutput[] = $command;
+        $this->javascriptCommands[] = $command;
     }
 
     public function out(): void
     {
         $this->parts['path']
-            = "<div id='path' class='path'>" . $this->buildpath() . '</div>';
+            = "<div id='path' class='path'>" . $this->buildPath() . '</div>';
 
         if ($this->request->isJSAccess()) {
-            if (!headers_sent()) {
-                header('Content-type:text/plain');
-            }
-
-            foreach ($this->JSOutput as $k => $v) {
-                $this->JSOutput[$k] = $this->session->addSessID($v);
-            }
-
-            echo $this->JSOutput === []
-                ? ''
-                : json_encode($this->JSOutput);
+            $this->outputJavascriptCommands();
 
             return;
         }
 
-        $autobox = ['PAGE', 'COPYRIGHT', 'USERBOX'];
+        $autoBox = ['PAGE', 'COPYRIGHT', 'USERBOX'];
         foreach ($this->parts as $part => $contents) {
             $part = mb_strtoupper((string) $part);
-            if (in_array($part, $autobox)) {
+            if (in_array($part, $autoBox)) {
                 $contents = '<div id="' . mb_strtolower($part) . '">' . $contents . '</div>';
             }
 
@@ -238,19 +253,34 @@ final class Page
 
         $this->template = $this->filtervars($this->template);
         $this->template = $this->session->addSessId($this->template);
-        if ($this->checkextended($this->template, null)) {
-            $this->template = $this->metaextended($this->template);
+        if ($this->checkExtended($this->template, null)) {
+            $this->template = $this->metaExtended($this->template);
         }
 
         echo $this->template;
     }
 
-    public function collapsebox(
+    private function outputJavascriptCommands(): void
+    {
+        if (!headers_sent()) {
+            header('Content-type:application/json');
+        }
+
+        // Update browser title and breadcrumbs when changing location
+        if ($this->request->isJSNewLocation()) {
+            $this->JS('title', htmlspecialchars_decode((string) $this->parts['TITLE'], ENT_QUOTES));
+            $this->JS('update', 'path', $this->buildpath());
+        }
+
+        echo json_encode($this->javascriptCommands);
+    }
+
+    public function collapseBox(
         string $title,
         string $contents,
         ?string $boxId = null,
     ): ?string {
-        return $this->meta('collapsebox', $boxId ? ' id="' . $boxId . '"' : '', $title, $contents);
+        return $this->meta('collapsebox', $boxId ? " id=\"{$boxId}\"" : '', $title, $contents);
     }
 
     public function error(string $error): ?string
@@ -258,19 +288,14 @@ final class Page
         return $this->meta('error', $error);
     }
 
-    public function templatehas(string $part): false|int
+    private function templateHas(string $part): false|int
     {
         return preg_match("/<!--{$part}-->/i", (string) $this->template);
     }
 
-    public function loadtemplate(string $file): void
+    private function loadTemplate(string $file): void
     {
         $this->template = file_get_contents($file);
-        $this->template = preg_replace_callback(
-            '@<!--INCLUDE:(\w+)-->@',
-            $this->includer(...),
-            $this->template,
-        );
         $this->template = preg_replace_callback(
             '@<M name=([\'"])([^\'"]+)\1>(.*?)</M>@s',
             $this->userMetaParse(...),
@@ -278,7 +303,7 @@ final class Page
         );
     }
 
-    public function loadskin(?int $skinId): void
+    public function loadSkin(?int $skinId): void
     {
         $skin = null;
         if ($skinId) {
@@ -330,54 +355,39 @@ final class Page
         );
 
         // Load Wrapper
-        $this->loadtemplate(
+        $this->loadTemplate(
             $skin['wrapper']
             ? $this->domainDefinitions->getBoardPath() . '/Wrappers/' . $skin['wrapper'] . '.html'
             : $this->themePath . '/wrappers.html',
         );
     }
 
-    public function userMetaParse(array $match): string
+    private function userMetaParse(array $match): string
     {
-        $this->checkextended($match[3], $match[2]);
+        $this->checkExtended($match[3], $match[2]);
         $this->userMetaDefs[$match[2]] = $match[3];
 
         return '';
     }
 
-    public function includer(string $pageAct)
+    public function addMeta(string $meta, string $content): void
     {
-        $result = $this->database->safeselect(
-            'page',
-            'pages',
-            'WHERE `act`=?',
-            $this->database->basicvalue($pageAct[1]),
-        );
-        $page = array_shift($this->database->arow($result));
-        $this->database->disposeresult($result);
-
-        return $page ?: '';
+        $this->metaDefs[$meta] = $content;
     }
 
-    public function addmeta(string $meta, string $content): void
-    {
-        $this->metadefs[$meta] = $content;
-    }
-
-    public function loadmeta(string $component): void
+    public function loadMeta(string $component): void
     {
         $component = mb_strtolower($component);
         $themeComponentDir = $this->themePath . '/views/' . $component;
-        if (is_dir($themeComponentDir)) {
-            $componentDir = $themeComponentDir;
-        } else {
-            $componentDir = $this->domainDefinitions->getDefaultThemePath() . '/views/' . $component;
-            if (!is_dir($componentDir)) {
-                $componentDir = false;
-            }
-        }
+        $defaultThemeComponentDir = $this->domainDefinitions->getDefaultThemePath() . '/views/' . $component;
 
-        if ($componentDir === false) {
+        $componentDir = match(true) {
+            is_dir($themeComponentDir) => $themeComponentDir,
+            is_dir($defaultThemeComponentDir) => $defaultThemeComponentDir,
+            default => null
+        };
+
+        if ($componentDir === null) {
             return;
         }
 
@@ -385,7 +395,7 @@ final class Page
         $this->debug("Added {$component} to queue");
     }
 
-    public function processqueue(string $process): void
+    private function processQueue(string $process): void
     {
         while ($componentDir = array_pop($this->metaqueue)) {
             $component = pathinfo((string) $componentDir, PATHINFO_BASENAME);
@@ -394,7 +404,7 @@ final class Page
             foreach (glob($componentDir . '/*.html') as $metaFile) {
                 $metaName = pathinfo($metaFile, PATHINFO_FILENAME);
                 $metaContent = file_get_contents($metaFile);
-                $this->checkextended($metaContent, $metaName);
+                $this->checkExtended($metaContent, $metaName);
                 $meta[$metaName] = $metaContent;
             }
 
@@ -408,7 +418,7 @@ final class Page
                 foreach (glob($defaultComponentDir . '/*.html') as $metaFile) {
                     $metaName = pathinfo($metaFile, PATHINFO_FILENAME);
                     $metaContent = file_get_contents($metaFile);
-                    $this->checkextended($metaContent, $metaName);
+                    $this->checkExtended($metaContent, $metaName);
                     if (isset($meta[$metaName])) {
                         continue;
                     }
@@ -417,18 +427,18 @@ final class Page
                 }
             }
 
-            $this->metadefs = $meta + $this->metadefs;
+            $this->metaDefs = $meta + $this->metaDefs;
         }
     }
 
     public function meta(string $meta, ...$args): string
     {
-        $this->processqueue($meta);
+        $this->processQueue($meta);
         $formatted = vsprintf(
             str_replace(
                 ['<%', '%>'],
                 ['<%%', '%%>'],
-                $this->userMetaDefs[$meta] ?? $this->metadefs[$meta] ?? '',
+                $this->userMetaDefs[$meta] ?? $this->metaDefs[$meta] ?? '',
             ),
             isset($args[0]) && is_array($args[0]) ? $args[0] : $args,
         );
@@ -440,22 +450,22 @@ final class Page
             isset($this->moreFormatting[$meta])
             && $this->moreFormatting[$meta]
         ) {
-            return $this->metaextended($formatted);
+            return $this->metaExtended($formatted);
         }
 
         return $formatted;
     }
 
-    public function metaextended(string $content): string
+    private function metaExtended(string $content): string
     {
         return preg_replace_callback(
             '@{if ([^}]+)}(.*){/if}@Us',
-            $this->metaextendedifcb(...),
+            $this->metaExtendedIfCB(...),
             $this->filtervars($content),
         );
     }
 
-    public function metaextendedifcb(array $match)
+    private function metaExtendedIfCB(array $match)
     {
         $logicalOperator = mb_strpos((string) $match[1], '||') !== false
             ? '||'
@@ -486,9 +496,9 @@ final class Page
         return $conditionPasses ? $match[2] : '';
     }
 
-    public function checkextended(string $data, ?string $meta = null): bool
+    private function checkExtended(string $data, ?string $meta = null): bool
     {
-        if (mb_strpos($data, '{if ') !== false) {
+        if (str_contains($data, '{if ')) {
             if (!$meta) {
                 return true;
             }
@@ -499,52 +509,32 @@ final class Page
         return false;
     }
 
-    public function metaexists(string $meta): bool
+    public function metaExists(string $meta): bool
     {
         return isset($this->userMetaDefs[$meta])
-            || isset($this->metadefs[$meta]);
+            || isset($this->metaDefs[$meta]);
     }
 
-    public function path(array $crumbs): bool
+    public function path(array $crumbs): void
     {
-        if (
-            !isset($this->parts['path'])
-            || !is_array($this->parts['path'])
-        ) {
-            $this->parts['path'] = [];
-        }
-
-        foreach ($crumbs as $value => $link) {
-            $this->parts['path'][$link] = $value;
-        }
-
-        return true;
+        $this->breadCrumbs = array_merge($this->breadCrumbs, $crumbs);
     }
 
-    public function buildpath(): string
+    private function buildPath(): string
     {
         $first = true;
         $path = '';
-        foreach ($this->parts['path'] as $value => $link) {
+        foreach ($this->breadCrumbs as $value => $link) {
             $path .= $this->meta(
                 $first
-                && $this->metaexists('path-home') ? 'path-home' : 'path-part',
-                $value,
+                && $this->metaExists('path-home') ? 'path-home' : 'path-part',
                 $link,
+                $value,
             );
             $first = false;
         }
 
         return $this->meta('path', $path);
-    }
-
-    public function updatepath(?array $crumbs = null): void
-    {
-        if ($crumbs) {
-            $this->path($crumbs);
-        }
-
-        $this->JS('update', 'path', $this->buildpath());
     }
 
     public function debug(?string $data = null): ?string

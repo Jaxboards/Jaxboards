@@ -477,7 +477,12 @@ final class Session
         );
     }
 
-    public function addSessID($html)
+    /**
+     * For users disallowing cookies, attempt to prepend the session ID to all links.
+     * This is similar to what PHP sessions do and it may be possible to leverage
+     * that logic instead of handwriting it ourselves.
+     */
+    public function addSessID(string $html)
     {
         if ($this->request->hasCookies() || !is_string($html)) {
             return $html;

@@ -53,7 +53,7 @@ final class UserProfile
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
     ) {
-        $this->page->loadmeta('userprofile');
+        $this->page->loadMeta('userprofile');
     }
 
     public function render(): void
@@ -240,7 +240,7 @@ final class UserProfile
         if (!$user || $nouser) {
             $error = $this->page->meta('error', "Sorry, this user doesn't exist.");
             $this->page->JS('update', 'page', $error);
-            $this->page->append('page', $error);
+            $this->page->append('PAGE', $error);
 
             return;
         }
@@ -590,7 +590,6 @@ final class UserProfile
                     . "'s profile" => '?act=vu' . $id . '&view=profile',
                 ],
             );
-            $this->page->updatepath();
 
             $tabs = [
                 'about',
@@ -664,7 +663,7 @@ final class UserProfile
                 . $user['id'] . '">Edit</a>' : '',
             );
             $this->page->JS('update', 'page', $page);
-            $this->page->append('page', $page);
+            $this->page->append('PAGE', $page);
 
             $this->session->set('location_verbose', 'Viewing ' . $user['display_name'] . "'s profile");
         }

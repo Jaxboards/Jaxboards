@@ -58,7 +58,7 @@ final class ModControls
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
     ) {
-        $this->page->loadmeta('modcp');
+        $this->page->loadMeta('modcp');
     }
 
     public function render(): void
@@ -835,9 +835,9 @@ final class ModControls
         }
 
         $page .= '<input type="submit" value="Merge" /></form>';
-        $page = $this->page->collapsebox('Merging Topics', $page);
+        $page = $this->page->collapseBox('Merging Topics', $page);
         $this->page->JS('update', 'page', $page);
-        $this->page->append('page', $page);
+        $this->page->append('PAGE', $page);
     }
 
     private function showmodcp(string $cppage = ''): void
@@ -849,7 +849,7 @@ final class ModControls
         $page = $this->page->meta('modcp-index', $cppage);
         $page = $this->page->meta('box', ' id="modcp"', 'Mod CP', $page);
 
-        $this->page->append('page', $page);
+        $this->page->append('PAGE', $page);
         $this->page->JS('update', 'page', $page);
     }
 

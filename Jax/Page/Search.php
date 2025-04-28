@@ -53,7 +53,7 @@ final class Search
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
     ) {
-        $this->page->loadmeta('search');
+        $this->page->loadMeta('search');
     }
 
     public function render(): void
@@ -90,7 +90,7 @@ final class Search
             $pageContents,
         );
         $this->page->JS('update', 'page', $page);
-        $this->page->append('page', $page);
+        $this->page->append('PAGE', $page);
     }
 
     private function getForumSelection(): string

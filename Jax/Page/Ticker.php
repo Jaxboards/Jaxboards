@@ -23,7 +23,7 @@ final class Ticker
         private readonly Session $session,
         private readonly User $user,
     ) {
-        $this->page->loadmeta('ticker');
+        $this->page->loadMeta('ticker');
     }
 
     public function render(): void

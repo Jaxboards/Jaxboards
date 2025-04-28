@@ -64,7 +64,7 @@ final class Topic
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
     ) {
-        $this->page->loadmeta('topic');
+        $this->page->loadMeta('topic');
     }
 
     public function render(): void
@@ -288,7 +288,7 @@ final class Topic
         if ($this->topicdata['fperms']['start']) {
             $buttons[0] = "<a href='?act=post&fid=" . $this->topicdata['fid'] . "'>"
             . $this->page->meta(
-                $this->page->metaexists('button-newtopic')
+                $this->page->metaExists('button-newtopic')
                     ? 'button-newtopic'
                     : 'topic-button-newtopic',
             )
@@ -303,7 +303,7 @@ final class Topic
             )
         ) {
             $buttons[1] = "<a href='?act=vt{$tid}&qreply=1'>" . $this->page->meta(
-                $this->page->metaexists('button-qreply')
+                $this->page->metaExists('button-qreply')
                 ? 'button-qreply'
                 : 'topic-button-qreply',
             ) . '</a>';
@@ -317,7 +317,7 @@ final class Topic
             )
         ) {
             $buttons[2] = "<a href='?act=post&tid={$tid}'>" . $this->page->meta(
-                $this->page->metaexists('button-reply')
+                $this->page->metaExists('button-reply')
                 ? 'button-reply'
                 : 'topic-button-reply',
             ) . '</a>';
@@ -384,7 +384,6 @@ final class Topic
 
         if ($this->request->isJSAccess()) {
             $this->page->JS('update', 'page', $page);
-            $this->page->updatepath();
             if ($this->request->both('pid') !== null) {
                 $this->page->JS('scrollToPost', $this->request->both('pid'));
 
@@ -400,7 +399,7 @@ final class Topic
             return;
         }
 
-        $this->page->append('page', $page);
+        $this->page->append('PAGE', $page);
     }
 
     private function update($tid): void

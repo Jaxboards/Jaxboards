@@ -51,7 +51,7 @@ final class UCP
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
     ) {
-        $this->page->loadmeta('ucp');
+        $this->page->loadMeta('ucp');
     }
 
     public function render(): void
@@ -168,8 +168,6 @@ final class UCP
         if ($this->runscript) {
             $this->page->JS('script', $this->runscript);
         }
-
-        $this->page->updatepath();
 
         $this->shownucp = true;
     }

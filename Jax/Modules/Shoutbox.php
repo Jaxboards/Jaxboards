@@ -40,7 +40,7 @@ final class Shoutbox
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
     ) {
-        $this->page->loadmeta('shoutbox');
+        $this->page->loadMeta('shoutbox');
     }
 
     public function init(): void
@@ -179,7 +179,7 @@ final class Shoutbox
 
         $this->session->addVar('sb_id', $first);
         $this->page->append(
-            'shoutbox',
+            'SHOUTBOX',
             $this->page->meta(
                 'collapsebox',
                 " id='shoutbox'",
@@ -267,7 +267,7 @@ final class Shoutbox
         if ($numshouts > $perpage) {
             $pages .= " &middot; Pages: <span class='pages'>";
             $pageArray = $this->jax->pages(
-                ceil($numshouts / $perpage),
+                (int) ceil($numshouts / $perpage),
                 $pagen + 1,
                 10,
             );
@@ -282,7 +282,6 @@ final class Shoutbox
         }
 
         $this->page->path(['Shoutbox History' => '?module=shoutbox']);
-        $this->page->updatepath();
         if ($this->request->isJSUpdate()) {
             return;
         }
@@ -361,7 +360,7 @@ final class Shoutbox
 
         if ($error !== null) {
             $this->page->JS('error', $error);
-            $this->page->append('shoutbox', $this->page->error($error));
+            $this->page->append('SHOUTBOX', $this->page->error($error));
 
             return;
         }

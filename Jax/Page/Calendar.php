@@ -26,7 +26,7 @@ final class Calendar
         private readonly Request $request,
         private readonly Session $session,
     ) {
-        $this->page->loadmeta('calendar');
+        $this->page->loadMeta('calendar');
     }
 
     public function render(): void

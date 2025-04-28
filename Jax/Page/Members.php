@@ -27,7 +27,7 @@ final class Members
         private readonly Request $request,
         private readonly TextFormatting $textFormatting,
     ) {
-        $this->page->loadmeta('members');
+        $this->page->loadMeta('members');
     }
 
     public function render(): void

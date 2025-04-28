@@ -64,7 +64,7 @@ final class Post
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
     ) {
-        $this->page->addmeta('post-preview', $this->page->meta('box', '', 'Post Preview', '%s'));
+        $this->page->addMeta('post-preview', $this->page->meta('box', '', 'Post Preview', '%s'));
     }
 
     public function render(): void
@@ -345,7 +345,7 @@ final class Post
             $page .= $this->page->meta('box', '', $forum['title'] . ' > New Topic', $form);
         }
 
-        $this->page->append('page', $page);
+        $this->page->append('PAGE', $page);
         $this->page->JS('update', 'page', $page);
 
         if ($error !== null) {
@@ -476,7 +476,7 @@ final class Post
             HTML;
 
         $page .= $this->page->meta('box', '', $tdata['title'] . ' &gt; Reply', $form);
-        $this->page->append('page', $page);
+        $this->page->append('PAGE', $page);
         $this->page->JS('update', 'page', $page);
         if (!$tdata['perms']['upload']) {
             return;

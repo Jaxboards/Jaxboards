@@ -150,7 +150,7 @@ final class App
             if (
                 property_exists($module, 'TAG')
                 && $this->request->both('module') !== $moduleName
-                && !$this->page->templatehas($moduleName)
+                && !$this->page->templateHas($moduleName)
             ) {
                 continue;
             }
@@ -172,13 +172,13 @@ final class App
 
     private function loadSkin(): void
     {
-        $this->page->loadskin(
+        $this->page->loadSkin(
             $this->jax->pick(
                 $this->session->getVar('skin_id'),
                 $this->user->get('skin_id'),
             ),
         );
-        $this->page->loadmeta('global');
+        $this->page->loadMeta('global');
 
 
         // Skin selector.
@@ -327,7 +327,7 @@ final class App
         $this->page->JS('update', '#query .content', $debug);
         $this->page->append(
             'FOOTER',
-            $this->page->collapsebox(
+            $this->page->collapseBox(
                 'Debug',
                 $debug,
                 'query',
@@ -358,11 +358,6 @@ final class App
                 'JaxBoards',
             ),
         );
-        if (!$this->request->isJSNewLocation()) {
-            return;
-        }
-
-        $this->page->JS('title', htmlspecialchars_decode((string) $this->page->get('TITLE'), ENT_QUOTES));
     }
 
     private function setPageVars(): void

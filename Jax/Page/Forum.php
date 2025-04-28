@@ -43,7 +43,7 @@ final class Forum
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
     ) {
-        $this->page->loadmeta('forum');
+        $this->page->loadMeta('forum');
     }
 
     public function render(): void
@@ -260,7 +260,7 @@ final class Forum
         }
 
         if ($rows !== '' && $rows !== '0') {
-            $page .= $this->page->collapsebox(
+            $page .= $this->page->collapseBox(
                 'Subforums',
                 $this->page->meta('forum-subforum-table', $rows),
             );
@@ -284,7 +284,7 @@ final class Forum
         $forumbuttons = '&nbsp;'
             . ($fdata['perms']['start'] ? '<a href="?act=post&amp;fid=' . $fid . '">'
             . $this->page->meta(
-                $this->page->metaexists('button-newtopic')
+                $this->page->metaExists('button-newtopic')
                 ? 'button-newtopic' : 'forum-button-newtopic',
             ) . '</a>' : '');
         $page .= $this->page->meta(
@@ -458,7 +458,7 @@ final class Forum
         }
 
         $path[$title] = "?act=vf{$fid}";
-        $this->page->updatepath($path);
+        $this->page->path($path);
         if ($this->request->isJSAccess()) {
             $this->page->JS('update', 'page', $page);
         } else {
