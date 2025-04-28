@@ -36,7 +36,7 @@ use const PHP_EOL;
 
 final class Post
 {
-    private bool $canmod;
+    private bool $canmod = false;
 
     private string $postdata = '';
 
