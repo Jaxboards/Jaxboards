@@ -16,7 +16,8 @@ final class ServiceConfig
 {
     private $installed = false;
 
-    public function __construct() {
+    public function __construct()
+    {
         // Prefetch service config
         $this->get();
     }
