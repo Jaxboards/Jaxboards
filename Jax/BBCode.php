@@ -15,22 +15,27 @@ use function trim;
 
 final class BBCode
 {
+    /**
+     * @var array<string,string>
+     */
     private array $bbcodes = [
         '@\[(bg|bgcolor|background)=(#?[\s\w\d]+)\](.*)\[/\1\]@Usi' => '<span style="background:$2">$3</span>',
         '@\[blink\](.*)\[/blink\]@Usi' => '<span style="text-decoration:blink">$1</span>',
-        // I recommend keeping nofollow if admin approval of new accounts is not enabled
         '@\[b\](.*)\[/b\]@Usi' => '<strong>$1</strong>',
         '@\[color=(#?[\s\w\d]+|rgb\([\d, ]+\))\](.*)\[/color\]@Usi' => '<span style="color:$1">$2</span>',
         '@\[font=([\s\w]+)](.*)\[/font\]@Usi' => '<span style="font-family:$1">$2</span>',
         '@\[i\](.*)\[/i\]@Usi' => '<em>$1</em>',
         '@\[spoiler\](.*)\[/spoiler\]@Usi' => '<span class="spoilertext">$1</span>',
-        // Consider adding nofollow if admin approval is not enabled
         '@\[s\](.*)\[/s\]@Usi' => '<span style="text-decoration:line-through">$1</span>',
+        // Consider adding nofollow if admin approval of new accounts is not enabled
         '@\[url=(http|ftp|\?|mailto:)([^\]]+)\](.+?)\[/url\]@i' => '<a href="$1$2">$3</a>',
         '@\[url\](http|ftp|\?)(.*)\[/url\]@Ui' => '<a href="$1$2">$1$2</a>',
         '@\[u\](.*)\[/u\]@Usi' => '<span style="text-decoration:underline">$1</span>',
     ];
 
+    /**
+     * @var array<string,string>
+     */
     private array $extendedBBCodes = [
         '@\[h([1-5])\](.*)\[/h\1\]@Usi' => '<h$1>$2</h$1>',
         '@\[align=(center|left|right)\](.*)\[/align\]@Usi' => '<p style="text-align:$1">$2</p>',
@@ -48,13 +53,25 @@ final class BBCode
         $text = $this->replaceWithRules($text, $this->extendedBBCodes);
 
         // [ul] and [ol]
-        $text = $this->replaceWithCallback($text, '@\[(ul|ol)\](.*)\[/\1\]@Usi', $this->bbcodeLICallback(...));
+        $text = $this->replaceWithCallback(
+            $text,
+            '@\[(ul|ol)\](.*)\[/\1\]@Usi',
+            $this->bbcodeLICallback(...)
+        );
 
         // [size]
-        $text = $this->replaceWithCallback($text, '@\[size=([0-4]?\d)(px|pt|em|)\](.*)\[/size\]@Usi', $this->bbcodeSizeCallback(...));
+        $text = $this->replaceWithCallback(
+            $text,
+            '@\[size=([0-4]?\d)(px|pt|em|)\](.*)\[/size\]@Usi',
+            $this->bbcodeSizeCallback(...)
+        );
 
         // [quote]
-        $text = $this->replaceWithCallback($text, '@\[quote(?>=([^\]]+))?\](.*?)\[/quote\]\r?\n?@is', $this->bbcodeQuoteCallback(...));
+        $text = $this->replaceWithCallback(
+            $text,
+            '@\[quote(?>=([^\]]+))?\](.*?)\[/quote\]\r?\n?@is',
+            $this->bbcodeQuoteCallback(...)
+        );
 
         return preg_replace_callback(
             '@\[video\](.*)\[/video\]@Ui',
@@ -67,7 +84,7 @@ final class BBCode
     {
         for ($nestLimit = 0; $nestLimit < 10; ++$nestLimit) {
             $tmp = preg_replace(array_keys($rules), array_values($rules), $text);
-            if ($tmp === $text) {
+            if ($tmp === $text || !is_string($tmp)) {
                 break;
             }
             $text = $tmp;
@@ -83,7 +100,7 @@ final class BBCode
     ): string {
         for ($nestLimit = 0; $nestLimit < 10; ++$nestLimit) {
             $tmp = preg_replace_callback($pattern, $callback, $text);
-            if ($tmp === $text) {
+            if ($tmp === $text || !is_string($tmp)) {
                 break;
             }
             $text = $tmp;
@@ -149,6 +166,8 @@ final class BBCode
         string $link,
         string $embedUrl,
     ): string {
+        $allow = 'accelerometer; autoplay; clipboard-write; encrypted-media;'
+            . ' gyroscope; picture-in-picture; web-share';
         // do NOT replace this with <<<HTML, sonarqube thinks it's an HTML tag and it's bitten me twice
         return <<<DOC
             <div class="media youtube">
@@ -169,7 +188,7 @@ final class BBCode
                 </div>
                 <div class="movie" style="display:none">
                     <iframe
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allow="{$allow}"
                         allowfullscreen="allowfullscreen"
                         frameborder="0"
                         height="315"
