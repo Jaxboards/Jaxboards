@@ -13,7 +13,6 @@ use function mkdir;
 use function opendir;
 use function readdir;
 use function round;
-use function mb_strlen;
 use function unlink;
 
 final class FileUtils
@@ -24,7 +23,7 @@ final class FileUtils
      * @param string $src The source directory- this must exist already
      * @param string $dst The destination directory- this is assumed to not exist already
      *
-     * @return bool True on success, false on failure.
+     * @return bool true on success, false on failure
      */
     public static function copyDirectory($src, $dst): bool
     {
@@ -44,6 +43,7 @@ final class FileUtils
 
             if (is_dir($sourcePath)) {
                 self::copyDirectory($sourcePath, $destPath);
+
                 continue;
             }
 
@@ -67,6 +67,7 @@ final class FileUtils
         foreach (glob($dir . '*') as $v) {
             if (is_dir($v)) {
                 self::removeDirectory($v);
+
                 continue;
             }
 
