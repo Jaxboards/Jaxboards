@@ -277,7 +277,9 @@ final class TextFormatting
         }
 
         if ($replaceBBCode) {
-            $text = $this->bbCode->toHTML($text, $minimalBBCode);
+            $text = $minimalBBCode
+                ? $this->bbCode->toInlineHTML($text)
+                : $this->bbCode->toHTML($text, $minimalBBCode);
         }
 
         if ($replaceBBCode && !$minimalBBCode) {

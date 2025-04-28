@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use PHP_CodeSniffer\Generators\HTML;
+
 use function array_keys;
 use function array_values;
 use function is_string;
@@ -19,39 +21,36 @@ final class BBCode
     /**
      * @var array<string,string>
      */
-    private array $bbcodes = [
+    private array $inlineBBCodes = [
         '@\[(bg|bgcolor|background)=(#?[\s\w\d]+)\](.*)\[/\1\]@Usi' => '<span style="background:$2">$3</span>',
-        '@\[blink\](.*)\[/blink\]@Usi' => '<span style="text-decoration:blink">$1</span>',
         '@\[b\](.*)\[/b\]@Usi' => '<strong>$1</strong>',
         '@\[color=(#?[\s\w\d]+|rgb\([\d, ]+\))\](.*)\[/color\]@Usi' => '<span style="color:$1">$2</span>',
         '@\[font=([\s\w]+)](.*)\[/font\]@Usi' => '<span style="font-family:$1">$2</span>',
         '@\[i\](.*)\[/i\]@Usi' => '<em>$1</em>',
-        '@\[spoiler\](.*)\[/spoiler\]@Usi' => '<span class="spoilertext">$1</span>',
         '@\[s\](.*)\[/s\]@Usi' => '<span style="text-decoration:line-through">$1</span>',
-        // Consider adding nofollow if admin approval of new accounts is not enabled
-        '@\[url=(http|ftp|\?|mailto:)([^\]]+)\](.+?)\[/url\]@i' => '<a href="$1$2">$3</a>',
-        '@\[url\](http|ftp|\?)(.*)\[/url\]@Ui' => '<a href="$1$2">$1$2</a>',
+        '@\[spoiler\](.*)\[/spoiler\]@Usi' => '<span class="spoilertext">$1</span>',
         '@\[u\](.*)\[/u\]@Usi' => '<span style="text-decoration:underline">$1</span>',
+        // Consider adding nofollow if admin approval of new accounts is not enabled
+        '@\[url\](http|ftp|\?)(.*)\[/url\]@Ui' => '<a href="$1$2">$1$2</a>',
+        '@\[url=(http|ftp|\?|mailto:)([^\]]+)\](.+?)\[/url\]@i' => '<a href="$1$2">$3</a>',
     ];
 
     /**
      * @var array<string,string>
      */
-    private array $extendedBBCodes = [
-        '@\[h([1-5])\](.*)\[/h\1\]@Usi' => '<h$1>$2</h$1>',
+    private array $blockBBCodes = [
         '@\[align=(center|left|right)\](.*)\[/align\]@Usi' => '<p style="text-align:$1">$2</p>',
-        '@\[img(?:=([^\]]+|))?\]((?:http|ftp)\S+)\[/img\]@Ui' => '<img src="$2" title="$1" alt="$1" class="bbcodeimg" align="absmiddle" />',
+        '@\[h([1-5])\](.*)\[/h\1\]@Usi' => '<h$1>$2</h$1>',
+        '@\[img(?:=([^\]]+|))?\]((?:http|ftp)\S+)\[/img\]@Ui' => <<<HTML
+            <img src="$2" title="$1" alt="$1" class="bbcodeimg" />
+            HTML,
     ];
 
-    public function toHTML(string $text, $minimal = false): ?string
+    public function toHTML(string $text): ?string
     {
-        $text = $this->replaceWithRules($text, $this->bbcodes);
+        $text = $this->toInlineHTML($text);
 
-        if ($minimal) {
-            return $text;
-        }
-
-        $text = $this->replaceWithRules($text, $this->extendedBBCodes);
+        $text = $this->replaceWithRules($text, $this->blockBBCodes);
 
         // [ul] and [ol]
         $text = $this->replaceWithCallback(
@@ -79,6 +78,11 @@ final class BBCode
             $this->bbcodeVideoCallback(...),
             $text,
         );
+    }
+
+    public function toInlineHTML(string $text): ?string
+    {
+        return $this->replaceWithRules($text, $this->inlineBBCodes);
     }
 
     private function replaceWithRules(string $text, array $rules): string
