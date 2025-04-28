@@ -6,6 +6,7 @@ namespace Jax;
 
 use function array_keys;
 use function array_values;
+use function is_string;
 use function preg_match;
 use function preg_replace;
 use function preg_replace_callback;
@@ -56,21 +57,21 @@ final class BBCode
         $text = $this->replaceWithCallback(
             $text,
             '@\[(ul|ol)\](.*)\[/\1\]@Usi',
-            $this->bbcodeLICallback(...)
+            $this->bbcodeLICallback(...),
         );
 
         // [size]
         $text = $this->replaceWithCallback(
             $text,
             '@\[size=([0-4]?\d)(px|pt|em|)\](.*)\[/size\]@Usi',
-            $this->bbcodeSizeCallback(...)
+            $this->bbcodeSizeCallback(...),
         );
 
         // [quote]
         $text = $this->replaceWithCallback(
             $text,
             '@\[quote(?>=([^\]]+))?\](.*?)\[/quote\]\r?\n?@is',
-            $this->bbcodeQuoteCallback(...)
+            $this->bbcodeQuoteCallback(...),
         );
 
         return preg_replace_callback(
@@ -168,6 +169,7 @@ final class BBCode
     ): string {
         $allow = 'accelerometer; autoplay; clipboard-write; encrypted-media;'
             . ' gyroscope; picture-in-picture; web-share';
+
         // do NOT replace this with <<<HTML, sonarqube thinks it's an HTML tag and it's bitten me twice
         return <<<DOC
             <div class="media youtube">
