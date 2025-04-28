@@ -224,79 +224,85 @@ final readonly class Tools
         );
     }
 
+
     private function createForumBackup(): void
     {
-        $result = $this->database->safequery("SHOW TABLES LIKE '{$this->database->getPrefix()}%%'");
-        $tables = array_map(static fn(array $row) => array_values($row)[0], $this->database->arows($result));
+        $dbPrefix = $this->database->getPrefix();
 
-        if ($tables !== []) {
-            $sqlFileLines = [
-                "-- Jaxboards Backup {$this->database->getPrefix()} {$this->database->datetime()}",
-                '',
-                'SET NAMES utf8mb4;',
-                "SET time_zone = '+00:00';",
-                'SET foreign_key_checks = 0;',
-                "SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';",
-                '',
-            ];
-            foreach ($tables as $table) {
-                $table = mb_substr(mb_strstr((string) $table, '_'), 1);
-                $sqlFileLines[] = '-- ' . $table;
-                $sqlFileLines[] = '';
+        $result = $this->database->safequery("SHOW TABLES LIKE '{$dbPrefix}%%'");
+        $tables = array_map(static fn(array $row) => (string) array_values($row)[0], $this->database->arows($result));
 
-                $result = $this->database->safespecial(
-                    'SHOW CREATE TABLE %t',
-                    [$table],
-                );
-                $createTable = $this->database->arow($result)['Create Table'];
-                $this->database->disposeresult($result);
+        $sqlFileLines = [
+            "-- Jaxboards Backup {$dbPrefix} {$this->database->datetime()}",
+            '',
+            'SET NAMES utf8mb4;',
+            "SET time_zone = '+00:00';",
+            'SET foreign_key_checks = 0;',
+            "SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';",
+            '',
+        ];
 
-                if ($createTable === null) {
-                    continue;
-                }
-
-                $ftable = $this->database->ftable($table);
-                $sqlFileLines[] = "DROP TABLE IF EXISTS {$ftable};";
-                $sqlFileLines[] = "{$createTable};";
-
-                // Generate INSERTS with all row data
-                $select = $this->database->safeselect('*', $table);
-                while ($row = $this->database->arow($select)) {
-                    $sqlFileLines[] = $this->database->buildInsertQuery($ftable, $row);
-                }
-
-                $sqlFileLines[] = '';
-            }
-
+        foreach($tables as $table) {
+            $table = mb_substr($table, strlen($dbPrefix));
+            $sqlFileLines[] = '-- ' . $table;
             $sqlFileLines[] = '';
-            $sqlFileLines[] = 'SET foreign_key_checks = 1;';
+
+            $result = $this->database->safespecial(
+                'SHOW CREATE TABLE %t',
+                [$table],
+            );
+            $createTable = $this->database->arow($result)['Create Table'];
+            $this->database->disposeresult($result);
+
+            $ftable = $this->database->ftable($table);
+            $sqlFileLines[] = "DROP TABLE IF EXISTS {$ftable};";
+            $sqlFileLines[] = "{$createTable};";
+
+            // Generate INSERTS with all row data
+            $select = $this->database->safeselect('*', $table);
+            while ($row = $this->database->arow($select)) {
+                $sqlFileLines[] = $this->database->buildInsertQuery($ftable, $row);
+            }
+            $sqlFileLines[] = '';
         }
 
-        $tempFile = tempnam(sys_get_temp_dir(), $this->database->getPrefix());
-        if (class_exists(ZipArchive::class, false)) {
-            header('Content-type: application/zip');
-            header(
-                'Content-Disposition: attachment;filename="' . $this->database->getPrefix()
-                . gmdate('Y-m-d_His') . '.zip"',
-            );
-            $zipFile = new ZipArchive();
-            $zipFile->open($tempFile, ZipArchive::OVERWRITE);
-            $zipFile->addFromString('backup.sql', implode(PHP_EOL, $sqlFileLines));
-            $zipFile->close();
-            readfile($tempFile);
-            unlink($tempFile);
+        $sqlFileLines[] = 'SET foreign_key_checks = 1;';
 
+        if (class_exists(ZipArchive::class, false)) {
+            $this->outputZipFile(implode(PHP_EOL, $sqlFileLines));
             exit;
         }
 
+        $this->outputTextFile(implode(PHP_EOL, $sqlFileLines));
+        exit;
+    }
+
+    private function outputZipFile(string $fileContents) {
+        header('Content-type: application/zip');
+        header(
+            'Content-Disposition: attachment;filename="' . $this->database->getPrefix()
+            . gmdate('Y-m-d_His') . '.zip"',
+        );
+
+        $tempFile = tempnam(sys_get_temp_dir(), $this->database->getPrefix());
+
+        $zipFile = new ZipArchive();
+        $zipFile->open($tempFile, ZipArchive::OVERWRITE);
+        $zipFile->addFromString('backup.sql', $fileContents);
+        $zipFile->close();
+
+        readfile($tempFile);
+        unlink($tempFile);
+    }
+
+    private function outputTextFile(string $fileContents) {
         header('Content-type: text/plain');
         header(
             'Content-Disposition: attachment;filename="' . $this->database->getPrefix()
             . gmdate('Y-m-d_His') . '.sql"',
         );
-        echo implode(PHP_EOL, $sqlFileLines);
 
-        exit;
+        echo $fileContents;
     }
 
     private function viewErrorLog(): void
