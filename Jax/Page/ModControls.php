@@ -569,6 +569,7 @@ final class ModControls
                     'lp_uid' => $lp['auth_id'],
                     'op' => $op,
                     'replies' => 0,
+                    'poll_choices' => '',
                     'title' => 'Posts deleted from: '
                         . implode(',', $tids),
                 ],
