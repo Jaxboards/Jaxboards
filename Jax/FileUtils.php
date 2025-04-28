@@ -1,6 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax\FileUtils;
+
+use function closedir;
+use function copy;
+use function glob;
+use function is_dir;
+use function mb_substr;
+use function mkdir;
+use function opendir;
+use function readdir;
+use function round;
+use function strlen;
+use function unlink;
 
 /**
  * Recursively copies one directory to another.
@@ -26,12 +40,12 @@ function copyDirectory($src, $dst): void
         }
     }
     closedir($dir);
-};
+}
 
 
 /**
  * Recursively removes a whole directory and its files.
- * Equivalent to `rmdir -r`
+ * Equivalent to `rmdir -r`.
  */
 function removeDirectory(string $dir): bool
 {
@@ -54,7 +68,6 @@ function removeDirectory(string $dir): bool
 
 /**
  * Computes a human readable filesize.
- *
  */
 function fileSizeHumanReadable(int $sizeInBytes): string
 {
@@ -65,7 +78,9 @@ function fileSizeHumanReadable(int $sizeInBytes): string
         ++$magnitude;
     }
 
-    $prefix = $magnitude > 0 && $magnitude < strlen($sizes) ? $sizes[$magnitude] : '';
+    $prefix = $magnitude > 0 && $magnitude < strlen($sizes)
+        ? $sizes[$magnitude]
+        : '';
 
     return round($sizeInBytes, 2) . "{$prefix}B";
 }

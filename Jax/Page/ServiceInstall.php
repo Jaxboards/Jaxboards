@@ -10,8 +10,6 @@ use Jax\Jax;
 use Jax\Request;
 use Jax\ServiceConfig;
 
-use function Jax\FileUtils\copyDirectory;
-
 use function array_keys;
 use function array_map;
 use function dirname;
@@ -19,6 +17,7 @@ use function file;
 use function gmdate;
 use function header;
 use function implode;
+use function Jax\FileUtils\copyDirectory;
 use function mb_strlen;
 use function mb_substr;
 use function mkdir;
