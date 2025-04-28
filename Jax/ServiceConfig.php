@@ -16,6 +16,11 @@ final class ServiceConfig
 {
     private $installed = false;
 
+    public function __construct() {
+        // Prefetch service config
+        $this->get();
+    }
+
     /**
      * @return array<string,mixed>
      */
