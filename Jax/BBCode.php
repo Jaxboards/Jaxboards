@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use PHP_CodeSniffer\Generators\HTML;
-
 use function array_keys;
 use function array_values;
 use function is_string;
@@ -41,7 +39,7 @@ final class BBCode
     private array $blockBBCodes = [
         '@\[align=(center|left|right)\](.*)\[/align\]@Usi' => '<p style="text-align:$1">$2</p>',
         '@\[h([1-5])\](.*)\[/h\1\]@Usi' => '<h$1>$2</h$1>',
-        '@\[img(?:=([^\]]+|))?\]((?:http|ftp)\S+)\[/img\]@Ui' => <<<HTML
+        '@\[img(?:=([^\]]+|))?\]((?:http|ftp)\S+)\[/img\]@Ui' => <<<'HTML'
             <img src="$2" title="$1" alt="$1" class="bbcodeimg" />
             HTML,
     ];
