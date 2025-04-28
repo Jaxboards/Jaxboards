@@ -31,6 +31,7 @@ use function is_array;
 use function is_numeric;
 use function is_readable;
 use function is_writable;
+use function Jax\FileUtils\fileSizeHumanReadable;
 use function mb_strlen;
 use function mb_strtolower;
 use function mb_substr;
@@ -190,7 +191,7 @@ final readonly class Tools
                 'tools/file-manager-row.html',
                 [
                     'downloads' => $file['downloads'],
-                    'filesize' => $this->jax->filesize($file['size']),
+                    'filesize' => fileSizeHumanReadable($file['size']),
                     'id' => $file['id'],
                     'linked_in' => isset($linkedin[$file['id']]) && $linkedin[$file['id']]
                         ? implode(', ', $linkedin[$file['id']]) : 'Not linked!',

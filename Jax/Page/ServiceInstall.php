@@ -10,25 +10,22 @@ use Jax\Jax;
 use Jax\Request;
 use Jax\ServiceConfig;
 
+use function Jax\FileUtils\copyDirectory;
+
 use function array_keys;
 use function array_map;
-use function closedir;
-use function copy;
 use function dirname;
 use function file;
 use function gmdate;
 use function header;
 use function implode;
-use function is_dir;
 use function mb_strlen;
 use function mb_substr;
 use function mkdir;
-use function opendir;
 use function parse_url;
 use function password_hash;
 use function preg_match;
 use function preg_replace;
-use function readdir;
 use function str_replace;
 use function trim;
 
@@ -398,38 +395,12 @@ final class ServiceInstall
             echo $this->database->error();
 
             mkdir(dirname(__DIR__) . '/boards');
-            $this->recurseCopy('blueprint', dirname(__DIR__) . '/boards/' . $board);
+            copyDirectory('blueprint', dirname(__DIR__) . '/boards/' . $board);
         }
 
         // Send us to the service page.
         header('Location: ./');
 
         return [];
-    }
-
-    /**
-     * Recursively copies one directory to another.
-     *
-     * @param string $src The source directory- this must exist already
-     * @param string $dst The destination directory- this is assumed to not exist already
-     */
-    private function recurseCopy($src, $dst): void
-    {
-        $dir = opendir($src);
-        @mkdir($dst);
-        while (($file = readdir($dir)) !== false) {
-            if ($file === '.') {
-                continue;
-            }
-            if ($file === '..') {
-                continue;
-            }
-            if (is_dir($src . '/' . $file)) {
-                $this->recurseCopy($src . '/' . $file, $dst . '/' . $file);
-            } else {
-                copy($src . '/' . $file, $dst . '/' . $file);
-            }
-        }
-        closedir($dir);
     }
 }

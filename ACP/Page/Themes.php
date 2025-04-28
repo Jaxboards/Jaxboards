@@ -27,6 +27,7 @@ use function is_file;
 use function is_numeric;
 use function is_string;
 use function is_writable;
+use function Jax\FileUtils\removeDirectory;
 use function mb_strlen;
 use function mb_strpos;
 use function mkdir;
@@ -630,7 +631,7 @@ final readonly class Themes
                 unlink($v);
             }
 
-            $this->jax->rmdir($skindir);
+            removeDirectory($skindir);
         }
 
         $this->database->safedelete(

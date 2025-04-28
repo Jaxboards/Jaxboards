@@ -5,20 +5,15 @@ declare(strict_types=1);
 namespace Jax;
 
 use function floor;
-use function glob;
 use function gmdate;
 use function in_array;
-use function is_dir;
 use function json_decode;
 use function mail;
-use function mb_substr;
 use function preg_match;
-use function rmdir;
 use function round;
 use function str_replace;
 use function strtotime;
 use function time;
-use function unlink;
 
 use const PHP_EOL;
 
@@ -121,25 +116,6 @@ final readonly class Jax
         return [];
     }
 
-    public function rmdir(string $dir): bool
-    {
-        if (mb_substr($dir, -1) !== '/') {
-            $dir .= '/';
-        }
-
-        foreach (glob($dir . '*') as $v) {
-            if (is_dir($v)) {
-                $this->rmdir($v);
-            } else {
-                unlink($v);
-            }
-        }
-
-        rmdir($dir);
-
-        return true;
-    }
-
     public function pages(int $numpages, int $active, int $tofill)
     {
         $tofill -= 2;
@@ -164,18 +140,6 @@ final readonly class Jax
         $pages[] = $numpages;
 
         return $pages;
-    }
-
-    public function filesize(int $bs): string
-    {
-        $p = 0;
-        $sizes = ' KMGT';
-        while ($bs > 1024) {
-            $bs /= 1024;
-            ++$p;
-        }
-
-        return round($bs, 2) . ' ' . ($p !== 0 ? $sizes[$p] : '') . 'B';
     }
 
     /**
