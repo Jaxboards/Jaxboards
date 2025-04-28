@@ -38,12 +38,12 @@ use const ENT_QUOTES;
 final class TextFormatting
 {
     /**
-     * @var array<string, array>
+     * @var array<string,array<string,mixed>>
      */
     private array $attachmentData;
 
     /**
-     * @var array<string, string>
+     * @var array<string,string>
      */
     private array $badwords = [];
 
@@ -78,10 +78,13 @@ final class TextFormatting
     public function getCustomRules(): void
     {
         $result = $this->database->safeselect(
-            <<<'SQL'
-                `id`,`type`,`needle`,`replacement`,`enabled`
-                SQL
-            ,
+            [
+                'id',
+                'type',
+                'needle',
+                'replacement',
+                'enabled'
+            ],
             'textrules',
             '',
         );
@@ -132,7 +135,7 @@ final class TextFormatting
             if (file_exists($rulesPath)) {
                 require_once $rulesPath;
 
-                if (!$rules) {
+                if (!isset($rules)) {
                     exit('Emoticon ruleset corrupted!');
                 }
 
@@ -214,7 +217,7 @@ final class TextFormatting
     {
         preg_match_all('@\[code(=\w+)?\](.*?)\[/code\]@is', $text, $codes);
         foreach ($codes[0] as $key => $fullMatch) {
-            $text = str_replace($fullMatch, '[code]' . $key . '[/code]', $text);
+            $text = str_replace($fullMatch, "[code]{$key}[/code]", $text);
         }
 
         return [$text, $codes];
@@ -229,22 +232,23 @@ final class TextFormatting
         array $codes,
         bool $returnbb = false,
     ): string {
-        foreach ($codes[0] as $key => $value) {
+        foreach (array_keys($codes[0]) as $index) {
+            $language = $codes[1][$index];
+            $code = $codes[2][$index];
+
             if (!$returnbb) {
-                $codes[2][$key] = $codes[1][$key] === '=php' ? highlight_string($codes[2][$key], true) : preg_replace(
+                $code = $language === '=php' ? highlight_string($code, true) : preg_replace(
                     "@([ \r\n]|^) @m",
                     '$1&nbsp;',
-                    $this->blockhtml($codes[2][$key]),
+                    $this->blockhtml($code),
                 );
             }
 
             $text = str_replace(
-                '[code]' . $key . '[/code]',
+                "[code]{$index}[/code]",
                 $returnbb
-                    ? '[code' . $codes[1][$key] . ']' . $codes[2][$key] . '[/code]'
-                    : '<div class="bbcode code'
-                . ($codes[1][$key] ? ' ' . $codes[1][$key] : '') . '">'
-                . $codes[2][$key] . '</div>',
+                    ? "[code{$language}]{$code}[/code]"
+                    : "<div class=\"bbcode code {$language}\">{$code}</div>",
                 $text,
             );
         }
@@ -443,37 +447,46 @@ final class TextFormatting
         );
     }
 
-    private function attachmentCallback(array $match): string
+    /**
+     * Given an attachment ID, gets the file data associated with it
+     * Returns null if file not found
+     * @return array<string,mixed>|null
+     */
+    private function getAttachmentData(string $fileId): ?array
     {
-        $attachment = $match[1];
-        if (isset($this->attachmentData[$attachment])) {
-            $data = $this->attachmentData[$attachment];
-        } else {
-            $result = $this->database->safeselect(
-                [
-                    'id',
-                    'name',
-                    'hash',
-                    'size',
-                    'downloads',
-                ],
-                'files',
-                'WHERE `id`=?',
-                $attachment,
-            );
-            $file = $this->database->arow($result);
-            $this->database->disposeresult($result);
-            if (!$file) {
-                return "Attachment doesn't exist";
-            }
-
-            $this->attachmentData[$attachment] = $file;
+        if (isset($this->attachmentData[$fileId])) {
+           return $this->attachmentData[$fileId];
         }
 
-        $ext = explode('.', (string) $file['name']);
-        $ext = count($ext) === 1 ? '' : mb_strtolower(array_pop($ext));
+        $result = $this->database->safeselect(
+            [
+                'id',
+                'name',
+                'hash',
+                'size',
+                'downloads',
+            ],
+            'files',
+            'WHERE `id`=?',
+            $fileId,
+        );
+        $file = $this->database->arow($result);
+        $this->database->disposeresult($result);
 
-        if (!in_array($ext, $this->config->getSetting('images') ?? [])) {
+        return $this->attachmentData[$fileId] = $file;
+    }
+
+    private function attachmentCallback(array $match): string
+    {
+        $file = $this->getAttachmentData($match[1]);
+
+        if (!$file) {
+            return "Attachment doesn't exist";
+        }
+
+        $ext = (string) pathinfo($file['name'], PATHINFO_EXTENSION);
+
+        if (!in_array($ext, $this->config->getSetting('images') ?? [], true)) {
             $ext = '';
         }
 
