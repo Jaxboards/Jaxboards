@@ -17,6 +17,7 @@ use function array_map;
 use function array_pop;
 use function array_reverse;
 use function array_values;
+use function class_exists;
 use function count;
 use function ctype_digit;
 use function explode;
@@ -35,6 +36,9 @@ use function mb_strtolower;
 use function mb_substr;
 use function pathinfo;
 use function preg_match_all;
+use function readfile;
+use function sys_get_temp_dir;
+use function tempnam;
 use function trim;
 use function unlink;
 
@@ -220,7 +224,8 @@ final readonly class Tools
         );
     }
 
-    private function createForumBackup() {
+    private function createForumBackup(): void
+    {
         $result = $this->database->safequery("SHOW TABLES LIKE '{$this->database->getPrefix()}%%'");
         $tables = array_map(static fn(array $row) => array_values($row)[0], $this->database->arows($result));
 
@@ -234,7 +239,7 @@ final readonly class Tools
                 "SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';",
                 '',
             ];
-            foreach($tables as $table) {
+            foreach ($tables as $table) {
                 $table = mb_substr(mb_strstr((string) $table, '_'), 1);
                 $sqlFileLines[] = '-- ' . $table;
                 $sqlFileLines[] = '';
@@ -290,6 +295,7 @@ final readonly class Tools
             . gmdate('Y-m-d_His') . '.sql"',
         );
         echo implode(PHP_EOL, $sqlFileLines);
+
         exit;
     }
 
