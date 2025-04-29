@@ -21,8 +21,9 @@ use const FILTER_VALIDATE_IP;
 
 final class IPAddress
 {
-    public $jax;
-
+    /**
+     * @var list<string> list of human readable IPs that are banned
+     */
     private ?array $ipBanCache = null;
 
     public function __construct(
@@ -74,15 +75,12 @@ final class IPAddress
 
     public function isBanned(?string $ipAddress = null): bool
     {
-        if (!$ipAddress) {
-            $ipAddress = self::getIp();
-        }
+        $ipAddress = $ipAddress ?? self::getIp();
 
         foreach ($this->ipBanCache as $bannedIp) {
-            if (
-                (mb_substr((string) $bannedIp, -1) === ':' || mb_substr((string) $bannedIp, -1) === '.')
-                && mb_strtolower(mb_substr($ipAddress, 0, mb_strlen((string) $bannedIp))) === $bannedIp
-            ) {
+            $isPartial = in_array(mb_substr($bannedIp, -1), [':', '.']);
+
+            if ($isPartial && str_starts_with($ipAddress, $bannedIp)) {
                 return true;
             }
 
@@ -95,12 +93,15 @@ final class IPAddress
         return false;
     }
 
-    public function isLocalHost()
+    public function isLocalHost(): bool
     {
         return in_array($this->asHumanReadable(), ['127.0.0.1', '::1'], true);
     }
 
-    public function getBannedIps()
+    /**
+     * @returns array<string>
+     */
+    public function getBannedIps(): array
     {
         if ($this->ipBanCache !== null) {
             return $this->ipBanCache;
@@ -108,16 +109,12 @@ final class IPAddress
 
         $this->ipBanCache = [];
 
-        $boardPath = $this->domainDefinitions->getBoardPath();
-        if (file_exists($boardPath . '/bannedips.txt')) {
-            foreach (file($boardPath . '/bannedips.txt') as $line) {
-                $line = trim($line);
-                if ($line === '') {
-                    continue;
-                }
-
-                $this->ipBanCache[] = $line;
-            }
+        $bannedIPsPath = $this->domainDefinitions->getBoardPath() . '/bannedips.txt';
+        if (file_exists($bannedIPsPath)) {
+            $this->ipBanCache = array_filter(
+                file($bannedIPsPath),
+                fn($line) => trim($line) !== ''
+            );
         }
 
         return $this->ipBanCache;
