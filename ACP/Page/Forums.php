@@ -748,7 +748,7 @@ final readonly class Forums
         $thisrow = $this->database->arow($result);
 
         return [
-            'cat_id' => $forum['cat_id'] ?: array_pop($thisrow),
+            'cat_id' => $forum['cat_id'] ?? null ?: array_pop($thisrow),
             'mods' => $forum['mods'] ?? null,
             'nocount' => $this->request->post('nocount') ? 0 : 1,
             'orderby' => $orderby > 0 && $orderby <= 5 ? $orderby : 0,
