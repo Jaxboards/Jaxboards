@@ -78,20 +78,11 @@ final class IPAddress
     {
         $ipAddress ??= self::getIp();
 
-        foreach ($this->ipBanCache as $bannedIp) {
-            $isPartial = in_array(mb_substr($bannedIp, -1), [':', '.']);
-
-            if ($isPartial && str_starts_with($ipAddress, $bannedIp)) {
-                return true;
-            }
-
-            if ($bannedIp === $ipAddress) {
-                return true;
-            }
-        }
-
-
-        return false;
+        return array_any(
+            $this->ipBanCache,
+            fn($bannedIp) => $bannedIp === $ipAddress
+                || in_array(mb_substr($bannedIp, -1), [':', '.'], true) && str_starts_with($ipAddress, $bannedIp)
+        );
     }
 
     public function isLocalHost(): bool
@@ -100,7 +91,7 @@ final class IPAddress
     }
 
     /**
-     * @returns array<string>
+     * @return array<string>
      */
     public function getBannedIps(): array
     {
