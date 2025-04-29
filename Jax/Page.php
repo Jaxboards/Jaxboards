@@ -19,6 +19,7 @@ use function header;
 use function headers_sent;
 use function htmlspecialchars_decode;
 use function implode;
+use function in_array;
 use function is_array;
 use function is_dir;
 use function is_string;
