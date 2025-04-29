@@ -417,7 +417,7 @@ final class Inbox
             ),
             $this->jax->date($message['date']),
             $this->textFormatting->theworks($message['message']),
-            $this->jax->pick($message['avatar'], $this->template->meta('default-avatar')),
+            $message['avatar'] ?: $this->template->meta('default-avatar'),
             $message['usertitle'],
             $this->jax->hiddenFormFields(
                 [

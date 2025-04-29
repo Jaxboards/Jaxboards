@@ -472,10 +472,7 @@ final readonly class Forums
             );
             $thisrow = $this->database->arow($result);
             $write = [
-                'cat_id' => $this->jax->pick(
-                    $fdata['cat_id'] ?? null,
-                    array_pop($thisrow),
-                ),
+                'cat_id' => $fdata['cat_id'] ?: array_pop($thisrow),
                 'mods' => $fdata['mods'] ?? null,
                 'nocount' => $this->request->post('nocount') ? 0 : 1,
                 'orderby' => $orderby > 0 && $orderby <= 5 ? $orderby : 0,

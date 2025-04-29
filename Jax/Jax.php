@@ -24,17 +24,6 @@ final readonly class Jax
         private DomainDefinitions $domainDefinitions,
     ) {}
 
-    public function pick(...$args)
-    {
-        foreach ($args as $v) {
-            if ($v) {
-                break;
-            }
-        }
-
-        return $v;
-    }
-
     /**
      * @param array<string,string> $fields
      */

@@ -133,7 +133,7 @@ final class UserProfile
                 'content' => $this->template->meta(
                     'userprofile-contact-card',
                     $contactUser['uname'],
-                    $this->jax->pick($contactUser['avatar'], $this->template->meta('default-avatar')),
+                    $contactUser['avatar'] ?: $this->template->meta('default-avatar'),
                     $contactUser['usertitle'],
                     $contactUser['uid'],
                     $contactdetails,
@@ -363,10 +363,7 @@ final class UserProfile
                         $pfbox .= $this->template->meta(
                             'userprofile-friend',
                             $member['id'],
-                            $this->jax->pick(
-                                $member['avatar'],
-                                $this->template->meta('default-avatar'),
-                            ),
+                            $member['avatar'] ?: $this->template->meta('default-avatar'),
                             $this->template->meta(
                                 'user-link',
                                 $member['id'],
@@ -446,7 +443,7 @@ final class UserProfile
                     $pfbox = $this->template->meta(
                         'userprofile-comment-form',
                         $this->user->get('name') ?? '',
-                        $this->jax->pick($this->user->get('avatar'), $this->template->meta('default-avatar')),
+                        $this->user->get('avatar') ?: $this->template->meta('default-avatar'),
                         $this->jax->hiddenFormFields(
                             [
                                 'act' => 'vu' . $id,
@@ -488,10 +485,7 @@ final class UserProfile
                             $comment['group_id'],
                             $comment['display_name'],
                         ),
-                        $this->jax->pick(
-                            $comment['avatar'],
-                            $this->template->meta('default-avatar'),
-                        ),
+                        $comment['avatar'] ?: $this->template->meta('default-avatar'),
                         $this->jax->date($comment['date']),
                         $this->textFormatting->theworks($comment['comment'])
                         . ($this->user->getPerm('can_delete_comments')
@@ -638,11 +632,11 @@ final class UserProfile
             $page = $this->template->meta(
                 'userprofile-full-profile',
                 $user['display_name'],
-                $this->jax->pick($user['avatar'], $this->template->meta('default-avatar')),
+                $user['avatar'] ?: $this->template->meta('default-avatar'),
                 $user['usertitle'],
                 $contactdetails,
-                $this->jax->pick($user['full_name'], 'N/A'),
-                $this->jax->pick(ucfirst((string) $user['gender']), 'N/A'),
+                $user['full_name'] ?: 'N/A',
+                ucfirst((string) $user['gender']) ?: 'N/A',
                 $user['location'],
                 $user['dob_year'] ? $user['dob_month'] . '/'
                 . $user['dob_day'] . '/' . $user['dob_year'] : 'N/A',

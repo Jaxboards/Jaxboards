@@ -386,7 +386,7 @@ final class Session
                 'WHERE `expires`<=?',
                 $this->database->basicvalue($this->database->datetime()),
             );
-            $this->set('read_date', $this->jax->pick($lastAction, 0));
+            $this->set('read_date', $lastAction ?: 0);
         }
 
         $yesterday = mktime(0, 0, 0);

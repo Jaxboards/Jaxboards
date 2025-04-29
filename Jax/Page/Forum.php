@@ -230,28 +230,24 @@ final class Forum
                 $this->template->meta(
                     'forum-subforum-lastpost',
                     $forum['lp_tid'],
-                    $this->jax->pick($forum['lp_topic'], '- - - - -'),
+                    $forum['lp_topic'] ?: '- - - - -',
                     $forum['lp_name'] ? $this->template->meta(
                         'user-link',
                         $forum['lp_uid'],
                         $forum['lp_gid'],
                         $forum['lp_name'],
                     ) : 'None',
-                    $this->jax->pick($this->jax->date($forum['lp_date']), '- - - - -'),
+                    $this->jax->date($forum['lp_date']) ?: '- - - - -',
                 ),
                 $forum['topics'],
                 $forum['posts'],
                 ($read = $this->isForumRead($forum)) ? 'read' : 'unread',
-                $read ? $this->jax->pick(
-                    $this->template->meta(
-                        'subforum-icon-read',
-                    ),
-                    $this->template->meta(
-                        'icon-read',
-                    ),
-                ) : $this->jax->pick(
-                    $this->template->meta('subforum-icon-unread'),
-                    $this->template->meta('icon-unread'),
+                $read ? (
+                    $this->template->meta('subforum-icon-read')
+                    ?: $this->template->meta('icon-read')
+                ) : (
+                    $this->template->meta('subforum-icon-unread')
+                    ?: $this->template->meta('icon-unread')
                 ),
             );
             if ($read) {
@@ -394,13 +390,13 @@ final class Forum
                 // 12
                 ($read = $this->isTopicRead($forum, $fid)) ? 'read' : 'unread',
                 // 13
-                $read ? $this->jax->pick(
-                    $this->template->meta('topic-icon-read'),
-                    $this->template->meta('icon-read'),
+                $read ? (
+                    $this->template->meta('topic-icon-read')
+                    ?: $this->template->meta('icon-read')
                 )
-                : $this->jax->pick(
-                    $this->template->meta('topic-icon-unread'),
-                    $this->template->meta('icon-read'),
+                : (
+                    $this->template->meta('topic-icon-unread')
+                    ?: $this->template->meta('icon-read')
                 ),
                 // 14
             );
@@ -523,10 +519,10 @@ final class Forum
             $this->topicsRead[$topic['id']] = 0;
         }
 
-        return $topic['lp_date'] <= $this->jax->pick(
-            max($this->topicsRead[$topic['id']], $this->forumReadTime),
-            $this->session->get('read_date'),
-            $this->user->get('last_visit'),
+        return $topic['lp_date'] <= (
+            max($this->topicsRead[$topic['id']], $this->forumReadTime)
+            ?: $this->session->get('read_date')
+            ?: $this->user->get('last_visit')
         );
     }
 
@@ -536,10 +532,10 @@ final class Forum
             $this->forumsRead = $this->jax->parsereadmarkers($this->session->get('forumsread'));
         }
 
-        return $forum['lp_date'] <= $this->jax->pick(
-            $this->forumsRead[$forum['id']] ?? null,
-            $this->session->get('read_date'),
-            $this->user->get('last_visit'),
+        return $forum['lp_date'] <= (
+            $this->forumsRead[$forum['id']]
+            ?: $this->session->get('read_date')
+            ?: $this->user->get('last_visit')
         );
     }
 

@@ -102,10 +102,7 @@ final readonly class Members
             $rows .= $this->page->parseTemplate(
                 'members/show-main-row.html',
                 [
-                    'avatar_url' => $this->jax->pick(
-                        $member['avatar'],
-                        self::DEFAULT_AVATAR,
-                    ),
+                    'avatar_url' => $member['avatar'] ?: self::DEFAULT_AVATAR,
                     'group_title' => $member['group_title'],
                     'id' => $member['id'],
                     'title' => $member['display_name'],
@@ -261,10 +258,7 @@ final readonly class Members
                     $page .= $this->page->parseTemplate(
                         'members/edit-select-option.html',
                         [
-                            'avatar_url' => $this->jax->pick(
-                                $v['avatar'],
-                                self::DEFAULT_AVATAR,
-                            ),
+                            'avatar_url' => $v['avatar'] ?: self::DEFAULT_AVATAR,
                             'id' => $v['id'],
                             'title' => $v['display_name'],
                         ],

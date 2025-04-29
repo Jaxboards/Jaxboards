@@ -180,7 +180,7 @@ final class Members
             $page .= $this->template->meta(
                 'members-row',
                 $member['id'],
-                $this->jax->pick($member['avatar'], $this->template->meta('default-avatar')),
+                $member['avatar'] ?: $this->template->meta('default-avatar'),
                 $this->template->meta(
                     'user-link',
                     $member['id'],

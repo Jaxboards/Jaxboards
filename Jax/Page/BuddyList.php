@@ -119,7 +119,7 @@ final readonly class BuddyList
                     $contact['name'],
                     isset($online[$contact['id']]) && $online[$contact['id']]
                     ? 'online' : 'offline',
-                    $this->jax->pick($contact['avatar'], $this->template->meta('default-avatar')),
+                    $contact['avatar'] ?: $this->template->meta('default-avatar'),
                     $contact['usertitle'],
                 );
             }
@@ -138,7 +138,7 @@ final readonly class BuddyList
                     $contact['id'],
                     $contact['name'],
                     'blocked',
-                    $this->jax->pick($contact['avatar'], $this->template->meta('default-avatar')),
+                    $contact['avatar'] ?: $this->template->meta('default-avatar'),
                     $contact['usertitle'],
                 );
             }

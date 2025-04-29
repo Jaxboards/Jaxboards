@@ -754,7 +754,7 @@ final class Topic
                     $post['group_id'],
                     $post['display_name'],
                 ) : 'Guest',
-                $this->jax->pick($post['avatar'], $this->template->meta('default-avatar')),
+                $post['avatar'] ?: $this->template->meta('default-avatar'),
                 $post['usertitle'],
                 $post['posts'],
                 $this->template->meta(

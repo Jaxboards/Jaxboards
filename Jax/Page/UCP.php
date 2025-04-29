@@ -114,7 +114,7 @@ final class UCP
             'ucp-index',
             $this->jax->hiddenFormFields(['act' => 'ucp']),
             $this->user->get('display_name'),
-            $this->jax->pick($this->user->get('avatar'), $this->template->meta('default-avatar')),
+            $this->user->get('avatar') ?: $this->template->meta('default-avatar'),
             trim((string) $ucpnotepad) !== '' && trim((string) $ucpnotepad) !== '0'
             ? $this->textFormatting->blockhtml($ucpnotepad) : 'Personal notes go here.',
         );
@@ -276,32 +276,45 @@ final class UCP
                 . '<br><br><a href="?act=ucp&what=email">Back</a>';
         }
 
+        $email = $this->user->get('email');
+        $emailSettings = $this->user->get('email_settings');
+        $notificationsChecked = $emailSettings & 2 !== 0 ? 'checked' : '';
+        $adminEmailsChecked = $emailSettings & 1 !== 0 ? 'checked' : '';
+
         return $this->template->meta(
             'ucp-email-settings',
             $this->getlocationforform() . $this->jax->hiddenFormFields(
                 ['submit' => 'true'],
             ),
-            $this->request->both('change') !== null ? <<<HTML
-                <input
-                    type="text"
-                    name="email"
-                    aria-label="Email"
-                    title="Enter your new email address"
-                    value="{$this->user->get('email')}" />
-                HTML : '<strong>' . $this->jax->pick($this->user->get('email'), '--none--')
-            . "</strong> <a href='?act=ucp&what=email&change=1'>Change</a>"
-            . "<input type='hidden' name='email' value='" . $this->user->get('email') . "' />",
-            '<input type="checkbox" title="Notifications" name="notifications"'
-            . (($this->user->get('email_settings') & 2) !== 0 ? " checked='checked'" : '') . '>',
-            '<input type="checkbox" title="Admin Emails" name="adminemails"'
-            . (($this->user->get('email_settings') & 1) !== 0 ? ' checked="checked"' : '') . '>',
+            match (true) {
+                $this->request->both('change') !== null => <<<HTML
+                    <input
+                        type="text"
+                        name="email"
+                        aria-label="Email"
+                        title="Enter your new email address"
+                        value="{$this->user->get('email')}" />
+                    HTML,
+                !!$email => <<<HTML
+                    <strong>{$email}</strong>
+                    <a href='?act=ucp&what=email&change=1'>Change</a>
+                    <input type='hidden' name='email' value='{$email}' />
+                    HTML,
+
+                default => '--none--'
+            },
+            <<<HTML
+                <input type="checkbox" title="Notifications" name="notifications" $notificationsChecked>
+                HTML,
+            <<<HTML
+                <input type="checkbox" title="Admin Emails" name="adminemails" $adminEmailsChecked>
+                HTML
         );
     }
 
     private function showAvatarSettings(): ?string
     {
         $error = null;
-        $update = false;
         $avatar = $this->user->get('avatar');
         if ($this->request->post('changedava') !== null) {
             if (
@@ -313,24 +326,23 @@ final class UCP
                 $this->user->set('avatar', $this->request->post('changedava'));
                 $avatar = $this->request->post('changedava');
             }
-
-            $update = true;
         }
 
-        if (!$update) {
-            return null;
-        }
+        $avatarURL = $avatar ?: $this->template->meta('default-avatar');
+        $locationForForm = $this->getlocationforform();
+        $errorDisplay = $error !== null ? $this->page->error($error) : '';
+        $avatarInputValue = $this->textFormatting->blockhtml($avatar);
 
-        return 'Your avatar: <span class="avatar"><img src="'
-        . $this->jax->pick($avatar, $this->template->meta('default-avatar'))
-        . '" alt="Your avatar"></span><br><br>
-        <form data-ajax-form="true" method="post">'
-        . $this->getlocationforform()
-        . ($error !== null ? $this->page->error($error) : '')
-        . '<input type="text" name="changedava" title="Your avatar" value="'
-        . $this->textFormatting->blockhtml($avatar) . '" />
-        <input type="submit" value="Edit" />
-        </form>';
+        return <<<HTML
+            Your avatar: <span class="avatar"><img src="{$avatarURL}" alt="Your avatar"></span>
+            <br><br>
+            <form data-ajax-form="true" method="post">
+                {$locationForForm}
+                {$errorDisplay}
+                <input type="text" name="changedava" title="Your avatar" value="{$avatarInputValue}">
+                <input type="submit" value="Edit">
+            </form>
+            HTML;
     }
 
     private function showProfileSettings(): ?string
@@ -352,9 +364,9 @@ final class UCP
                 'contact_yim' => $this->request->post('con_yim'),
                 'contact_youtube' => $this->request->post('con_youtube'),
                 'display_name' => trim((string) $this->request->post('display_name')),
-                'dob_day' => $this->jax->pick($this->request->post('dob_day'), null),
-                'dob_month' => $this->jax->pick($this->request->post('dob_month'), null),
-                'dob_year' => $this->jax->pick($this->request->post('dob_year'), null),
+                'dob_day' => $this->request->post('dob_day'),
+                'dob_month' => $this->request->post('dob_month'),
+                'dob_year' => $this->request->post('dob_year'),
                 'full_name' => $this->request->post('full_name'),
                 'gender' => in_array($this->request->post('gender'), $genderOptions, true)
                 ? $this->request->post('gender') : '',
@@ -526,9 +538,11 @@ final class UCP
 
         $genderselect = '<select name="gender" title="Your gender" aria-label="Gender">';
         foreach (['', 'male', 'female', 'other'] as $gender) {
-            $genderselect .= '<option value="' . $gender . '"'
-                . ($this->user->get('gender') === $gender ? ' selected="selected"' : '')
-                . '>' . $this->jax->pick(ucfirst($gender), 'Not telling') . '</option>';
+            $genderSelected = $this->user->get('gender') === $gender ? 'selected' : '';
+            $genderDisplay = ucfirst($gender) ?: 'Not telling';
+            $genderselect .= <<<HTML
+                <option value="{$gender}" {$genderSelected}>{$genderDisplay}</option>
+                HTML;
         }
 
         $genderselect .= '</select>';

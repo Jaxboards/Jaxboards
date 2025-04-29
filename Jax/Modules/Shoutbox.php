@@ -112,11 +112,9 @@ final class Shoutbox
             $row['group_id'],
             $row['display_name'],
         ) : 'Guest';
+        $avatarUrl = $row['avatar'] ?: $this->template->meta('default-avatar');
         $avatar = $this->config->getSetting('shoutboxava')
-            ? '<img src="' . $this->jax->pick(
-                $row['avatar'],
-                $this->template->meta('default-avatar'),
-            ) . '" class="avatar" alt="avatar" />' : '';
+            ? "<img src='{$avatarUrl}' class='avatar' alt='avatar' />" : '';
         $deletelink = $this->template->meta('shout-delete', $row['id']);
         if (!$this->canDelete(0, $row)) {
             $deletelink = '';
@@ -225,7 +223,7 @@ final class Shoutbox
                     SQL
                 ,
                 ['shouts', 'members'],
-                $this->jax->pick($this->session->getVar('sb_id'), 0),
+                $this->session->getVar('sb_id') ?: 0,
                 $this->shoutlimit,
             );
             while ($shout = $this->database->arow($result)) {

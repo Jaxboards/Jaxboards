@@ -171,10 +171,8 @@ final class App
     private function loadSkin(): void
     {
         $this->page->loadSkin(
-            $this->jax->pick(
-                $this->session->getVar('skin_id'),
-                $this->user->get('skin_id'),
-            ),
+            $this->session->getVar('skin_id')
+            ?: $this->user->get('skin_id'),
         );
         $this->template->loadMeta('global');
 
@@ -235,10 +233,8 @@ final class App
             'LOGO',
             $this->template->meta(
                 'logo',
-                $this->jax->pick(
-                    $this->config->getSetting('logourl') ?? false,
-                    $this->domainDefinitions->getBoardURL() . '/Service/Themes/Default/img/logo.png',
-                ),
+                $this->config->getSetting('logourl')
+                ?: $this->domainDefinitions->getBoardURL() . '/Service/Themes/Default/img/logo.png',
             ),
         );
         $this->page->append(
@@ -338,7 +334,7 @@ final class App
 
     private function renderNavigation(): void
     {
-        $this->page->setBreadCrumbs([$this->jax->pick($this->config->getSetting('boardname'), 'Home') => '?']);
+        $this->page->setBreadCrumbs([($this->config->getSetting('boardname') ?: 'Home') => '?']);
     }
 
     private function setPageVars(): void
@@ -356,12 +352,12 @@ final class App
             return;
         }
 
-        $this->template->addVar('groupid', (string) $this->jax->pick($this->user->get('group_id'), 3));
+        $this->template->addVar('groupid', (string) $this->user->get('group_id') ?: '3');
         $this->template->addVar('userposts', (string) $this->user->get('posts'));
         $this->template->addVar('grouptitle', $this->user->getPerm('title'));
-        $this->template->addVar('avatar', $this->jax->pick($this->user->get('avatar'), $this->template->meta('default-avatar')));
+        $this->template->addVar('avatar', $this->user->get('avatar') ?: $this->template->meta('default-avatar'));
         $this->template->addVar('username', $this->user->get('display_name'));
-        $this->template->addVar('userid', (string) $this->jax->pick($this->user->get('id'), 0));
+        $this->template->addVar('userid', (string) $this->user->get('id') ?: '0');
 
         $this->page->append(
             'SCRIPT',

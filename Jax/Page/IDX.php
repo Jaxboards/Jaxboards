@@ -268,10 +268,8 @@ final class IDX
                     $forum['title'],
                     nl2br((string) $forum['subtitle']),
                     'Redirects: ' . $forum['redirects'],
-                    $this->jax->pick(
-                        $this->template->meta('icon-redirect'),
-                        $this->template->meta('idx-icon-redirect'),
-                    ),
+                    $this->template->meta('icon-redirect')
+                    ?: $this->template->meta('idx-icon-redirect'),
                 );
             } else {
                 $forumId = $forum['id'];
@@ -279,12 +277,12 @@ final class IDX
                     ? ''
                     : ' href="?act=vf' . $forum['id'] . '&amp;markread=1"';
                 $linkText = $read
-                    ? $this->jax->pick(
-                        $this->template->meta('icon-read'),
-                        $this->template->meta('idx-icon-read'),
-                    ) : $this->jax->pick(
-                        $this->template->meta('icon-unread'),
-                        $this->template->meta('idx-icon-unread'),
+                    ? (
+                        $this->template->meta('icon-read')
+                        ?: $this->template->meta('idx-icon-read')
+                    ) : (
+                        $this->template->meta('icon-unread')
+                        ?: $this->template->meta('idx-icon-unread')
                     );
                 $table .= $this->template->meta(
                     'idx-row',
@@ -454,7 +452,7 @@ final class IDX
             }
 
             $title = $this->textFormatting->blockhtml(
-                $this->jax->pick($user['location_verbose'], 'Viewing the board.'),
+                $user['location_verbose'] ?: 'Viewing the board.',
             );
             if (isset($user['is_bot']) && $user['is_bot']) {
                 $html .= '<a class="user' . $user['uid'] . '" '
@@ -563,10 +561,8 @@ final class IDX
             $this->page->command(
                 'update',
                 '#fid_' . $forum['id'] . '_icon',
-                $this->jax->pick(
-                    $this->template->meta('icon-unread'),
-                    $this->template->meta('idx-icon-unread'),
-                ),
+                $this->template->meta('icon-unread')
+                ?: $this->template->meta('idx-icon-unread'),
             );
             $this->page->command(
                 'update',
@@ -592,17 +588,14 @@ final class IDX
         return $this->template->meta(
             'idx-row-lastpost',
             $forum['lp_tid'],
-            $this->jax->pick(
-                $this->textFormatting->wordfilter($forum['lp_topic']),
-                '- - - - -',
-            ),
+            $this->textFormatting->wordfilter($forum['lp_topic']) ?: '- - - - -',
             $forum['lp_uid'] ? $this->template->meta(
                 'user-link',
                 $forum['lp_uid'],
                 $forum['lp_gid'],
                 $forum['lp_name'],
             ) : 'None',
-            $this->jax->pick($this->jax->date($forum['lp_date']), '- - - - -'),
+            $this->jax->date($forum['lp_date']) ?: '- - - - -',
         );
     }
 
