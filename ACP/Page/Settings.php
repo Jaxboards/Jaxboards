@@ -46,59 +46,52 @@ final readonly class Settings
 
     private function boardname(): void
     {
-        $page = '';
         $error = null;
+        $status = '';
         if ($this->request->post('submit') !== null) {
-            if (trim((string) $this->request->post('boardname')) === '') {
-                $error = 'Board name is required';
-            } elseif (
-                trim((string) $this->request->post('logourl')) !== ''
-                && !$this->jax->isURL($this->request->post('logourl'))
-            ) {
-                $error = 'Please enter a valid logo url.';
-            }
+            $boardName = $this->request->post('boardname');
+            $logoUrl = $this->request->post('logourl');
+            $error = match(true) {
+                !is_string($boardName) || trim($boardName) === '' => 'Board name is required',
+                trim($logoUrl) !== '' && $this->jax->isURL($this->request->post('logourl'))
+                    => 'Please enter a valid logo url.',
+                default => null,
+            };
 
             if ($error !== null) {
-                $page .= $this->page->error($error);
-            } else {
                 $this->config->write([
                     'boardname' => $this->request->post('boardname'),
                     'logourl' => $this->request->post('logourl'),
                     'boardoffline' => $this->request->post('boardoffline') !== null ? '0' : '1',
                     'offlinetext' => $this->request->post('offlinetext'),
                 ]);
-                $page .= $this->page->success('Settings saved!');
             }
+
+            $status = $error !== null
+                ? $this->page->error($error)
+                : $this->page->success('Settings saved!');
         }
 
-        $page .= $this->page->parseTemplate(
-            'settings/boardname.html',
-            [
-                'board_name' => $this->config->getSetting('boardname'),
-                'logo_url' => $this->config->getSetting('logourl'),
-            ],
-        );
-        $this->page->addContentBox('Board Name/Logo', $page);
-
-        $page = '';
-        if (!$this->config->getSetting('boardoffline')) {
-        }
-
-        $this->textFormatting->blockhtml(
-            $this->config->getSetting('offlinetext'),
-        );
-        $page .= $this->page->parseTemplate(
+        $this->page->addContentBox('Board Online/Offline', $status .$this->page->parseTemplate(
             'settings/boardname-board-offline.html',
             [
                 'board_offline_checked' => $this->config->getSetting('boardoffline')
                     ? '' : ' checked="checked"',
                 'board_offline_text' => $this->textFormatting->blockhtml(
-                    $this->config->getSetting('offlinetext'),
-                ),
-                'content' => $page,
+                    $this->config->getSetting('offlinetext') ?? ''
+                )
             ],
-        );
-        $this->page->addContentBox('Board Online/Offline', $page);
+        ));
+
+        $this->page->addContentBox('Board Name/Logo', $this->page->parseTemplate(
+            'settings/boardname.html',
+            [
+                'board_name' => $this->config->getSetting('boardname'),
+                'logo_url' => $this->config->getSetting('logourl'),
+            ],
+        ));
+
+
     }
 
     // Custom pages.

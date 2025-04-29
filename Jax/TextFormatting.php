@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use DI\Container;
+
 use function array_key_exists;
 use function array_keys;
 use function array_map;
@@ -60,6 +62,7 @@ final class TextFormatting
     private array $emotePackRules = [];
 
     public function __construct(
+        private readonly Container $container,
         private readonly Config $config,
         private readonly BBCode $bbCode,
         private readonly Database $database,
@@ -126,20 +129,11 @@ final class TextFormatting
         $emotes = [];
         if ($emotePack !== null) {
             $this->emotePack = $emotePack;
-            $rulesPath = dirname(__DIR__) . '/emoticons/' . $emotePack . '/rules.php';
 
-            if (file_exists($rulesPath)) {
-                require_once $rulesPath;
+            $this->emotePackRules = $this->container->get("emoticons\\{$emotePack}\\rules")->get();
 
-                if (!isset($rules)) {
-                    return $emotes;
-                }
-
-                $this->emotePackRules = $rules;
-
-                foreach ($rules as $emote => $path) {
-                    $emotes[$emote] = "emoticons/{$emotePack}/{$path}";
-                }
+            foreach ($this->emotePackRules as $emote => $path) {
+                $emotes[$emote] = "emoticons/{$emotePack}/{$path}";
             }
         }
 

@@ -61,8 +61,8 @@ final class Config
      */
     public function write($data): void
     {
-        $this->boardConfig = $data;
+        $this->boardConfig = array_merge($this->boardConfig, $data);
 
-        file_put_contents($this->domainDefinitions->getBoardPath() . '/config.php', $this->serviceConfig->configFileContents($data));
+        file_put_contents($this->domainDefinitions->getBoardPath() . '/config.php', $this->serviceConfig->configFileContents($this->boardConfig));
     }
 }
