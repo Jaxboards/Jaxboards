@@ -14,6 +14,7 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
+use function filter_var;
 use function gmdate;
 use function header;
 use function in_array;
@@ -27,6 +28,8 @@ use function strtotime;
 use function trim;
 use function ucfirst;
 
+use const FILTER_VALIDATE_EMAIL;
+use const FILTER_VALIDATE_URL;
 use const PASSWORD_DEFAULT;
 
 final class UCP

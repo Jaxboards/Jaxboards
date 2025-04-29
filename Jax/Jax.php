@@ -9,7 +9,6 @@ use function gmdate;
 use function in_array;
 use function json_decode;
 use function mail;
-use function preg_match;
 use function round;
 use function str_replace;
 use function strtotime;

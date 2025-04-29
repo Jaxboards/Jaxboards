@@ -11,11 +11,14 @@ use Jax\Jax;
 use Jax\Request;
 use Jax\TextFormatting;
 
+use function filter_var;
 use function is_numeric;
 use function is_string;
 use function mb_strlen;
 use function preg_replace;
 use function trim;
+
+use const FILTER_VALIDATE_URL;
 
 final readonly class Settings
 {
@@ -54,8 +57,7 @@ final readonly class Settings
             $logoUrl = $this->request->post('logourl');
             $error = match (true) {
                 !is_string($boardName) || trim($boardName) === '' => 'Board name is required',
-                trim($logoUrl) !== '' && !filter_var($this->request->post('logourl'), FILTER_VALIDATE_URL)
-                    => 'Please enter a valid logo url.',
+                trim($logoUrl) !== '' && !filter_var($this->request->post('logourl'), FILTER_VALIDATE_URL) => 'Please enter a valid logo url.',
                 default => null,
             };
 

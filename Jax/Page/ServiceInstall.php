@@ -15,6 +15,7 @@ use function array_keys;
 use function array_map;
 use function dirname;
 use function file;
+use function filter_var;
 use function gmdate;
 use function header;
 use function implode;
@@ -28,6 +29,7 @@ use function preg_replace;
 use function str_replace;
 use function trim;
 
+use const FILTER_VALIDATE_EMAIL;
 use const PASSWORD_DEFAULT;
 use const PHP_URL_HOST;
 

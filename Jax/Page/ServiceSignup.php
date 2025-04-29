@@ -14,6 +14,7 @@ use Jax\ServiceConfig;
 use function array_map;
 use function dirname;
 use function file;
+use function filter_var;
 use function gmdate;
 use function header;
 use function implode;
@@ -26,6 +27,7 @@ use function str_replace;
 use function time;
 use function trim;
 
+use const FILTER_VALIDATE_EMAIL;
 use const PASSWORD_DEFAULT;
 
 /**

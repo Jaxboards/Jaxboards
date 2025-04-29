@@ -21,6 +21,7 @@ use function count;
 use function curl_exec;
 use function curl_init;
 use function curl_setopt;
+use function filter_var;
 use function json_decode;
 use function mb_strlen;
 use function mb_substr;
@@ -39,6 +40,7 @@ use const CURLOPT_POST;
 use const CURLOPT_POSTFIELDS;
 use const CURLOPT_RETURNTRANSFER;
 use const CURLOPT_URL;
+use const FILTER_VALIDATE_EMAIL;
 use const PASSWORD_DEFAULT;
 
 final class LogReg

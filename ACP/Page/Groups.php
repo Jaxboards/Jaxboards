@@ -13,11 +13,14 @@ use Jax\TextFormatting;
 use function array_flip;
 use function array_keys;
 use function explode;
+use function filter_var;
 use function is_numeric;
 use function mb_strlen;
 use function mb_strpos;
 use function mb_substr;
 use function preg_match;
+
+use const FILTER_VALIDATE_URL;
 
 final class Groups
 {
