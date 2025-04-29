@@ -221,7 +221,7 @@ final class UCP
 
             $verifiedPassword = password_verify(
                 (string) $this->request->post('curpass'),
-                (string) $this->user->get('pass')
+                (string) $this->user->get('pass'),
             );
             if (!$verifiedPassword) {
                 $error = 'The password you entered is incorrect.';
