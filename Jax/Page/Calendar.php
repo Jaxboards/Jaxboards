@@ -8,6 +8,7 @@ use Jax\Database;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
+use Jax\Template;
 
 use function explode;
 use function gmdate;
@@ -25,8 +26,9 @@ final class Calendar
         private readonly Page $page,
         private readonly Request $request,
         private readonly Session $session,
+        private readonly Template $template,
     ) {
-        $this->page->loadMeta('calendar');
+        $this->template->loadMeta('calendar');
     }
 
     public function render(): void
@@ -86,28 +88,28 @@ final class Calendar
             );
         }
 
-        $page .= $this->page->meta(
+        $page .= $this->template->meta(
             'calendar-heading',
             $monthname,
             $year,
             $monthoffset - 1,
             $monthoffset + 1,
         );
-        $page .= $this->page->meta('calendar-daynames');
+        $page .= $this->template->meta('calendar-daynames');
         $week = '';
         for ($x = 1; $x <= $daysinmonth; ++$x) {
             if ($x === 1 && $offset) {
-                $week .= $this->page->meta(
+                $week .= $this->template->meta(
                     'calendar-padding',
                     $offset,
                 );
             }
 
-            $week .= $this->page->meta(
+            $week .= $this->template->meta(
                 'calendar-day',
                 $month . ' ' . $x . ' ' . $year === $today ? 'today' : '',
                 $x,
-                empty($birthdays[$x]) ? '' : $this->page->meta(
+                empty($birthdays[$x]) ? '' : $this->template->meta(
                     'calendar-birthdays',
                     implode(',', $birthdays[$x]),
                 ),
@@ -116,12 +118,12 @@ final class Calendar
                 continue;
             }
 
-            $page .= $this->page->meta('calendar-week', $week);
+            $page .= $this->template->meta('calendar-week', $week);
             $week = '';
         }
 
-        $page = $this->page->meta('calendar', $page);
-        $page = $this->page->meta('box', '', 'Calendar', $page);
+        $page = $this->template->meta('calendar', $page);
+        $page = $this->template->meta('box', '', 'Calendar', $page);
 
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);

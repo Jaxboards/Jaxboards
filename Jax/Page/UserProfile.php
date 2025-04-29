@@ -12,6 +12,7 @@ use Jax\Page;
 use Jax\Request;
 use Jax\RSSFeed;
 use Jax\Session;
+use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
@@ -51,9 +52,10 @@ final class UserProfile
         private readonly Request $request,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
+        private readonly Template $template,
         private readonly User $user,
     ) {
-        $this->page->loadMeta('userprofile');
+        $this->template->loadMeta('userprofile');
     }
 
     public function render(): void
@@ -128,10 +130,10 @@ final class UserProfile
             [
                 'animate' => false,
                 'className' => 'contact-card',
-                'content' => $this->page->meta(
+                'content' => $this->template->meta(
                     'userprofile-contact-card',
                     $contactUser['uname'],
-                    $this->jax->pick($contactUser['avatar'], $this->page->meta('default-avatar')),
+                    $this->jax->pick($contactUser['avatar'], $this->template->meta('default-avatar')),
                     $contactUser['usertitle'],
                     $contactUser['uid'],
                     $contactdetails,
@@ -238,7 +240,7 @@ final class UserProfile
         }
 
         if (!$user || $nouser) {
-            $error = $this->page->meta('error', "Sorry, this user doesn't exist.");
+            $error = $this->template->meta('error', "Sorry, this user doesn't exist.");
             $this->page->command('update', 'page', $error);
             $this->page->append('PAGE', $error);
 
@@ -272,7 +274,7 @@ final class UserProfile
                         continue;
                     }
 
-                    $pfbox .= $this->page->meta(
+                    $pfbox .= $this->template->meta(
                         'userprofile-post',
                         $post['tid'],
                         $post['title'],
@@ -313,7 +315,7 @@ final class UserProfile
                         continue;
                     }
 
-                    $pfbox .= $this->page->meta(
+                    $pfbox .= $this->template->meta(
                         'userprofile-topic',
                         $post['tid'],
                         $post['title'],
@@ -329,7 +331,7 @@ final class UserProfile
                 break;
 
             case 'about':
-                $pfbox = $this->page->meta(
+                $pfbox = $this->template->meta(
                     'userprofile-about',
                     $this->textFormatting->theworks($user['about']),
                     $this->textFormatting->theworks($user['sig']),
@@ -358,14 +360,14 @@ final class UserProfile
                     );
 
                     while ($member = $this->database->arow($result)) {
-                        $pfbox .= $this->page->meta(
+                        $pfbox .= $this->template->meta(
                             'userprofile-friend',
                             $member['id'],
                             $this->jax->pick(
                                 $member['avatar'],
-                                $this->page->meta('default-avatar'),
+                                $this->template->meta('default-avatar'),
                             ),
-                            $this->page->meta(
+                            $this->template->meta(
                                 'user-link',
                                 $member['id'],
                                 $member['group_id'],
@@ -433,7 +435,7 @@ final class UserProfile
 
                     if ($error !== null) {
                         $this->page->command('error', $error);
-                        $pfbox .= $this->page->meta('error', $error);
+                        $pfbox .= $this->template->meta('error', $error);
                     }
                 }
 
@@ -441,10 +443,10 @@ final class UserProfile
                     !$this->user->isGuest()
                     && $this->user->getPerm('can_add_comments')
                 ) {
-                    $pfbox = $this->page->meta(
+                    $pfbox = $this->template->meta(
                         'userprofile-comment-form',
                         $this->user->get('name') ?? '',
-                        $this->jax->pick($this->user->get('avatar'), $this->page->meta('default-avatar')),
+                        $this->jax->pick($this->user->get('avatar'), $this->template->meta('default-avatar')),
                         $this->jax->hiddenFormFields(
                             [
                                 'act' => 'vu' . $id,
@@ -478,9 +480,9 @@ final class UserProfile
                 );
                 $found = false;
                 while ($comment = $this->database->arow($result)) {
-                    $pfbox .= $this->page->meta(
+                    $pfbox .= $this->template->meta(
                         'userprofile-comment',
-                        $this->page->meta(
+                        $this->template->meta(
                             'user-link',
                             $comment['from'],
                             $comment['group_id'],
@@ -488,7 +490,7 @@ final class UserProfile
                         ),
                         $this->jax->pick(
                             $comment['avatar'],
-                            $this->page->meta('default-avatar'),
+                            $this->template->meta('default-avatar'),
                         ),
                         $this->jax->date($comment['date']),
                         $this->textFormatting->theworks($comment['comment'])
@@ -633,10 +635,10 @@ final class UserProfile
                     . '">' . $this->ipAddress->asHumanReadable($user['ip']) . '</a></div>';
             }
 
-            $page = $this->page->meta(
+            $page = $this->template->meta(
                 'userprofile-full-profile',
                 $user['display_name'],
-                $this->jax->pick($user['avatar'], $this->page->meta('default-avatar')),
+                $this->jax->pick($user['avatar'], $this->template->meta('default-avatar')),
                 $user['usertitle'],
                 $contactdetails,
                 $this->jax->pick($user['full_name'], 'N/A'),
@@ -671,13 +673,13 @@ final class UserProfile
 
     private function parseActivity($activity): array|string
     {
-        $user = $this->page->meta(
+        $user = $this->template->meta(
             'user-link',
             $activity['uid'],
             $activity['group_id'],
             $this->user->get('id') === $activity['uid'] ? 'You' : $activity['name'],
         );
-        $otherguy = $this->page->meta(
+        $otherguy = $this->template->meta(
             'user-link',
             $activity['aff_id'],
             $activity['aff_group_id'],
@@ -688,12 +690,12 @@ final class UserProfile
             'profile_comment' => "{$user}  commented on  {$otherguy}'s profile",
             'new_post' => "{$user} posted in topic <a href='?act=vt{$activity['tid']}&findpost={$activity['pid']}'>{$activity['arg1']}</a>, " . $this->jax->smalldate($activity['date']),
             'new_topic' => "{$user} created new topic <a href='?act=vt{$activity['tid']}'>{$activity['arg1']}</a>, " . $this->jax->smalldate($activity['date']),
-            'profile_name_change' => $this->page->meta(
+            'profile_name_change' => $this->template->meta(
                 'user-link',
                 $activity['uid'],
                 $activity['group_id'],
                 $activity['arg1'],
-            ) . ' is now known as ' . $this->page->meta(
+            ) . ' is now known as ' . $this->template->meta(
                 'user-link',
                 $activity['uid'],
                 $activity['group_id'],

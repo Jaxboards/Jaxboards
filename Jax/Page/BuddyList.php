@@ -9,6 +9,7 @@ use Jax\Jax;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
+use Jax\Template;
 use Jax\User;
 
 use function array_search;
@@ -25,10 +26,11 @@ final readonly class BuddyList
         private readonly Page $page,
         private readonly Session $session,
         private readonly Request $request,
+        private readonly Template $template,
         private readonly User $user,
     ) {
         $buddylist = $this->jax->hiddenFormFields(['act' => 'buddylist']);
-        $this->page->addMeta(
+        $this->template->addMeta(
             'buddylist-contacts',
             <<<HTML
                     <div class="contacts">
@@ -42,7 +44,7 @@ final readonly class BuddyList
                     </div>
                 HTML,
         );
-        $this->page->addMeta(
+        $this->template->addMeta(
             'buddylist-contact',
             <<<'HTML'
                     <div
@@ -111,13 +113,13 @@ final readonly class BuddyList
                 explode(',', (string) $this->user->get('friends')),
             );
             while ($contact = $this->database->arow($result)) {
-                $contacts .= $this->page->meta(
+                $contacts .= $this->template->meta(
                     'buddylist-contact',
                     $contact['id'],
                     $contact['name'],
                     isset($online[$contact['id']]) && $online[$contact['id']]
                     ? 'online' : 'offline',
-                    $this->jax->pick($contact['avatar'], $this->page->meta('default-avatar')),
+                    $this->jax->pick($contact['avatar'], $this->template->meta('default-avatar')),
                     $contact['usertitle'],
                 );
             }
@@ -131,19 +133,19 @@ final readonly class BuddyList
                 explode(',', (string) $this->user->get('enemies')),
             );
             while ($contact = $this->database->arow($result)) {
-                $contacts .= $this->page->meta(
+                $contacts .= $this->template->meta(
                     'buddylist-contact',
                     $contact['id'],
                     $contact['name'],
                     'blocked',
-                    $this->jax->pick($contact['avatar'], $this->page->meta('default-avatar')),
+                    $this->jax->pick($contact['avatar'], $this->template->meta('default-avatar')),
                     $contact['usertitle'],
                 );
             }
         }
 
         if ($contacts === '' || $contacts === '0') {
-            $contacts = $this->page->meta(
+            $contacts = $this->template->meta(
                 'error',
                 "You don't have any contacts added to your buddy list!",
             );
@@ -152,7 +154,7 @@ final readonly class BuddyList
         $this->page->command(
             'window',
             [
-                'content' => $this->page->meta(
+                'content' => $this->template->meta(
                     'buddylist-contacts',
                     $this->session->get('hide') ? 'invisible' : '',
                     $this->user->get('usertitle'),

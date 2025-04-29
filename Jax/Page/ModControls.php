@@ -12,6 +12,7 @@ use Jax\Jax;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
+use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
@@ -56,9 +57,10 @@ final class ModControls
         private readonly Request $request,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
+        private readonly Template $template,
         private readonly User $user,
     ) {
-        $this->page->loadMeta('modcp');
+        $this->template->loadMeta('modcp');
     }
 
     public function render(): void
@@ -846,8 +848,8 @@ final class ModControls
             return;
         }
 
-        $page = $this->page->meta('modcp-index', $cppage);
-        $page = $this->page->meta('box', ' id="modcp"', 'Mod CP', $page);
+        $page = $this->template->meta('modcp-index', $cppage);
+        $page = $this->template->meta('box', ' id="modcp"', 'Mod CP', $page);
 
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
@@ -887,7 +889,7 @@ final class ModControls
                 trim((string) $this->request->post('display_name')) === ''
                 || trim((string) $this->request->post('display_name')) === '0'
             ) {
-                $page .= $this->page->meta('error', 'Display name is invalid.');
+                $page .= $this->template->meta('error', 'Display name is invalid.');
             } else {
                 $this->database->safeupdate(
                     'members',
@@ -903,12 +905,12 @@ final class ModControls
                 );
 
                 if ($this->database->error() !== '') {
-                    $page .= $this->page->meta(
+                    $page .= $this->template->meta(
                         'error',
                         'Error updating profile information.',
                     );
                 } else {
-                    $page .= $this->page->meta('success', 'Profile information saved.');
+                    $page .= $this->template->meta('success', 'Profile information saved.');
                 }
             }
         }
@@ -974,7 +976,7 @@ final class ModControls
             }
 
             if ($error !== null) {
-                $page .= $this->page->meta('error', $error);
+                $page .= $this->template->meta('error', $error);
             } else {
                 function field($label, $name, $value, $type = 'input'): string
                 {
@@ -1125,7 +1127,7 @@ final class ModControls
                 $this->database->basicvalue($this->ipAddress->asBinary($ipAddress)),
             );
             while ($member = $this->database->arow($result)) {
-                $content[] = $this->page->meta(
+                $content[] = $this->template->meta(
                     'user-link',
                     $member['id'],
                     $member['group_id'],
@@ -1161,7 +1163,7 @@ final class ModControls
                     $this->database->basicvalue($this->ipAddress->asBinary($ipAddress)),
                 );
                 while ($shout = $this->database->arow($result)) {
-                    $content .= $this->page->meta(
+                    $content .= $this->template->meta(
                         'user-link',
                         $shout['uid'],
                         $shout['group_id'],

@@ -11,6 +11,7 @@ use Jax\IPAddress;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
+use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
@@ -62,9 +63,10 @@ final class Post
         private readonly Request $request,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
+        private readonly Template $template,
         private readonly User $user,
     ) {
-        $this->page->addMeta('post-preview', $this->page->meta('box', '', 'Post Preview', '%s'));
+        $this->template->addMeta('post-preview', $this->template->meta('box', '', 'Post Preview', '%s'));
     }
 
     public function render(): void
@@ -175,7 +177,7 @@ final class Post
         $post = $this->postdata;
         if (trim($post) !== '' && trim($post) !== '0') {
             $post = $this->textFormatting->theworks($post);
-            $post = $this->page->meta('post-preview', $post);
+            $post = $this->template->meta('post-preview', $post);
             $this->postpreview = $post;
         }
 
@@ -263,7 +265,7 @@ final class Post
         }
 
         if ($error !== null) {
-            $page .= $this->page->meta('error', $error);
+            $page .= $this->template->meta('error', $error);
         } else {
             if (!isset($tdata)) {
                 $tdata = [
@@ -342,7 +344,7 @@ final class Post
                     </div>
                 </form>
                 HTML;
-            $page .= $this->page->meta('box', '', $forum['title'] . ' > New Topic', $form);
+            $page .= $this->template->meta('box', '', $forum['title'] . ' > New Topic', $form);
         }
 
         $this->page->append('PAGE', $page);
@@ -389,7 +391,7 @@ final class Post
             $tdata = $this->database->arow($result);
             $this->database->disposeresult($result);
             if (!$tdata) {
-                $page .= $this->page->meta(
+                $page .= $this->template->meta(
                     'error',
                     "The topic you're attempting to reply in no longer exists.",
                 );
@@ -475,7 +477,7 @@ final class Post
             </div>
             HTML;
 
-        $page .= $this->page->meta('box', '', $tdata['title'] . ' &gt; Reply', $form);
+        $page .= $this->template->meta('box', '', $tdata['title'] . ' &gt; Reply', $form);
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
         if (!$tdata['perms']['upload']) {

@@ -12,6 +12,7 @@ use Jax\Jax;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
+use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
@@ -54,9 +55,10 @@ final class LogReg
         private readonly Request $request,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
+        private readonly Template $template,
         private readonly User $user,
     ) {
-        $this->page->loadMeta('logreg');
+        $this->template->loadMeta('logreg');
     }
 
     public function render(): void
@@ -90,10 +92,10 @@ final class LogReg
 
         $recaptcha = '';
         if ($this->config->getSetting('recaptcha')) {
-            $recaptcha = $this->page->meta('anti-spam', $this->config->getSetting('recaptcha')['public_key']);
+            $recaptcha = $this->template->meta('anti-spam', $this->config->getSetting('recaptcha')['public_key']);
         }
 
-        $p = $this->page->meta('register-form', $recaptcha);
+        $p = $this->template->meta('register-form', $recaptcha);
 
         // Show registration form.
         if ($this->request->post('register') === null) {
@@ -126,7 +128,7 @@ final class LogReg
 
         if ($error !== null) {
             $this->page->command('alert', $error);
-            $this->page->append('PAGE', $this->page->meta('error', $error));
+            $this->page->append('PAGE', $this->template->meta('error', $error));
 
             return;
         }
@@ -152,7 +154,7 @@ final class LogReg
 
         if ($error !== null) {
             $this->page->command('alert', $error);
-            $this->page->append('PAGE', $this->page->meta('error', $error));
+            $this->page->append('PAGE', $this->template->meta('error', $error));
 
             return;
         }
@@ -243,7 +245,7 @@ final class LogReg
             } else {
                 $this->page->append(
                     'PAGE',
-                    $this->page->meta('error', 'Incorrect username/password'),
+                    $this->template->meta('error', 'Incorrect username/password'),
                 );
                 $this->page->command('error', 'Incorrect username/password');
             }
@@ -251,7 +253,7 @@ final class LogReg
             $this->session->erase('location');
         }
 
-        $this->page->append('PAGE', $this->page->meta('login-form'));
+        $this->page->append('PAGE', $this->template->meta('login-form'));
     }
 
     private function logout(): void
@@ -272,10 +274,10 @@ final class LogReg
         $this->session->getSess(false);
         session_unset();
         session_destroy();
-        $this->page->reset('USERBOX', $this->page->meta('userbox-logged-out'));
-        $this->page->command('update', 'userbox', $this->page->meta('userbox-logged-out'));
+        $this->page->reset('USERBOX', $this->template->meta('userbox-logged-out'));
+        $this->page->command('update', 'userbox', $this->template->meta('userbox-logged-out'));
         $this->page->command('softurl');
-        $this->page->append('PAGE', $this->page->meta('success', 'Logged out successfully'));
+        $this->page->append('PAGE', $this->template->meta('success', 'Logged out successfully'));
         if ($this->request->isJSAccess()) {
             return;
         }
@@ -352,7 +354,7 @@ final class LogReg
             $this->database->disposeresult($result);
 
             if (!$udata) {
-                $page = $this->page->meta('error', 'This link has expired. Please try again.');
+                $page = $this->template->meta('error', 'This link has expired. Please try again.');
             } elseif (
                 $this->request->post('pass1')
                 && $this->request->post('pass2')
@@ -394,12 +396,12 @@ final class LogReg
                     return;
                 }
 
-                $page .= $this->page->meta(
+                $page .= $this->template->meta(
                     'error',
                     'The passwords did not match, please try again!',
                 );
             } else {
-                $page .= $this->page->meta(
+                $page .= $this->template->meta(
                     'forgot-password2-form',
                     $this->jax->hiddenFormFields(
                         [
@@ -428,7 +430,7 @@ final class LogReg
                 $this->database->disposeresult($result);
 
                 if ($error !== null) {
-                    $page .= $this->page->meta('error', $error);
+                    $page .= $this->template->meta('error', $error);
                 } else {
                     // Generate token.
                     $forgotpasswordtoken
@@ -465,13 +467,13 @@ final class LogReg
                     );
 
                     if (!$mailResult) {
-                        $page .= $this->page->meta(
+                        $page .= $this->template->meta(
                             'error',
                             'There was a problem sending the email. '
                             . 'Please contact the administrator.',
                         );
                     } else {
-                        $page .= $this->page->meta(
+                        $page .= $this->template->meta(
                             'success',
                             'An email has been sent to the email associated '
                             . 'with this account. Please check your email and '
@@ -482,7 +484,7 @@ final class LogReg
                 }
             }
 
-            $page .= $this->page->meta(
+            $page .= $this->template->meta(
                 'forgot-password-form',
                 $this->request->isJSAccess()
                 ? $this->jax->hiddenFormFields(

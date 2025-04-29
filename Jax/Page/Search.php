@@ -9,6 +9,7 @@ use Jax\Jax;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
+use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
@@ -47,13 +48,14 @@ final class Search
     public function __construct(
         private readonly Database $database,
         private readonly Page $page,
+        private readonly Template $template,
         private readonly Jax $jax,
         private readonly Request $request,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
         private readonly User $user,
     ) {
-        $this->page->loadMeta('search');
+        $this->template->loadMeta('search');
     }
 
     public function render(): void
@@ -81,7 +83,7 @@ final class Search
             return;
         }
 
-        $page = $this->page->meta(
+        $page = $this->template->meta(
             'search-form',
             $this->textFormatting->blockhtml(
                 $this->session->getVar('searcht') ?? '',
@@ -390,16 +392,16 @@ final class Search
             $post = nl2br($post);
             $post = preg_replace(
                 '@' . implode('|', $terms) . '@i',
-                $this->page->meta('search-highlight', '$0'),
+                $this->template->meta('search-highlight', '$0'),
                 $post,
             );
             $title = preg_replace(
                 '@' . implode('|', $terms) . '@i',
-                $this->page->meta('search-highlight', '$0'),
+                $this->template->meta('search-highlight', '$0'),
                 (string) $postRow['title'],
             );
 
-            $page .= $this->page->meta(
+            $page .= $this->template->meta(
                 'search-result',
                 $postRow['tid'],
                 $title,
@@ -439,7 +441,7 @@ final class Search
             }
         }
 
-        $page = $this->page->meta('box', '', 'Search Results - ' . $pages, $page);
+        $page = $this->template->meta('box', '', 'Search Results - ' . $pages, $page);
 
         if (
             $this->request->isJSAccess()

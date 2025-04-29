@@ -9,6 +9,7 @@ use Jax\Jax;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
+use Jax\Template;
 use Jax\User;
 
 final class Ticker
@@ -21,9 +22,10 @@ final class Ticker
         private readonly Page $page,
         private readonly Request $request,
         private readonly Session $session,
+        private readonly Template $template,
         private readonly User $user,
     ) {
-        $this->page->loadMeta('ticker');
+        $this->template->loadMeta('ticker');
     }
 
     public function render(): void
@@ -90,7 +92,7 @@ final class Ticker
         }
 
         $this->session->addVar('tickid', $first);
-        $page = $this->page->meta('ticker', $ticks);
+        $page = $this->template->meta('ticker', $ticks);
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
     }
@@ -155,10 +157,10 @@ final class Ticker
 
     private function renderTick($t): ?string
     {
-        return $this->page->meta(
+        return $this->template->meta(
             'ticker-tick',
             $this->jax->smalldate($t['date'], ['autodate']),
-            $this->page->meta(
+            $this->template->meta(
                 'user-link',
                 $t['auth_id'],
                 $t['group_id'],
@@ -170,7 +172,7 @@ final class Ticker
             $t['title'],
             $t['fid'],
             $t['ftitle'],
-            $this->page->meta(
+            $this->template->meta(
                 'user-link',
                 $t['auth_id2'],
                 $t['group_id2'],

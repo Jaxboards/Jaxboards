@@ -36,6 +36,7 @@ final class App
         private readonly Config $config,
         private readonly Container $container,
         private readonly Database $database,
+        private readonly DebugLog $debugLog,
         private readonly DomainDefinitions $domainDefinitions,
         private readonly IPAddress $ipAddress,
         private readonly Jax $jax,
@@ -43,6 +44,7 @@ final class App
         private readonly Request $request,
         private readonly Router $router,
         private readonly Session $session,
+        private readonly Template $template,
         private readonly User $user,
     ) {
         $this->onLocalHost = in_array($this->ipAddress->asHumanReadable(), ['127.0.0.1', '::1'], true);
@@ -148,7 +150,7 @@ final class App
             if (
                 property_exists($module, 'TAG')
                 && $this->request->both('module') !== $moduleName
-                && !$this->page->templateHas($moduleName)
+                && !$this->template->has($moduleName)
             ) {
                 continue;
             }
@@ -176,7 +178,7 @@ final class App
                 $this->user->get('skin_id'),
             ),
         );
-        $this->page->loadMeta('global');
+        $this->template->loadMeta('global');
 
 
         // Skin selector.
@@ -222,18 +224,18 @@ final class App
         }
 
         if (
-            $this->page->meta('favicon') !== ''
-            && $this->page->meta('favicon') !== '0'
+            $this->template->meta('favicon') !== ''
+            && $this->template->meta('favicon') !== '0'
         ) {
             $this->page->append(
                 'CSS',
-                '<link rel="icon" href="' . $this->page->meta('favicon') . '">',
+                '<link rel="icon" href="' . $this->template->meta('favicon') . '">',
             );
         }
 
         $this->page->append(
             'LOGO',
-            $this->page->meta(
+            $this->template->meta(
                 'logo',
                 $this->jax->pick(
                     $this->config->getSetting('logourl') ?? false,
@@ -243,7 +245,7 @@ final class App
         );
         $this->page->append(
             'NAVIGATION',
-            $this->page->meta(
+            $this->template->meta(
                 'navigation',
                 $this->user->getPerm('can_moderate')
                 ? '<li><a href="?act=modcontrols&do=cp">Mod CP</a></li>' : '',
@@ -272,7 +274,7 @@ final class App
             $nummessages = 0;
         }
 
-        $this->page->addvar('inbox', (string) $nummessages);
+        $this->template->addVar('inbox', (string) $nummessages);
         if ($nummessages) {
             $this->page->append(
                 'FOOTER',
@@ -300,10 +302,10 @@ final class App
         $this->page->append(
             'USERBOX',
             $this->user->isGuest()
-            ? $this->page->meta('userbox-logged-out')
-            : $this->page->meta(
+            ? $this->template->meta('userbox-logged-out')
+            : $this->template->meta(
                 'userbox-logged-in',
-                $this->page->meta(
+                $this->template->meta(
                     'user-link',
                     $this->user->get('id'),
                     $this->user->get('group_id'),
@@ -321,7 +323,7 @@ final class App
     {
         $debug = '';
 
-        $debug .= $this->page->debug() . '<br>' . $this->database->debug();
+        $debug .= implode('<br>', $this->debugLog->getLog()) . '<br>' . $this->database->debug();
         $this->page->command('update', '#query .content', $debug);
         $this->page->append(
             'FOOTER',
@@ -348,37 +350,29 @@ final class App
     private function renderNavigation(): void
     {
         $this->page->path([$this->jax->pick($this->config->getSetting('boardname'), 'Home') => '?']);
-        $this->page->append(
-            'TITLE',
-            $this->jax->pick(
-                $this->page->meta('title'),
-                $this->config->getSetting('boardname'),
-                'JaxBoards',
-            ),
-        );
     }
 
     private function setPageVars(): void
     {
-        $this->page->addvar('modlink', $this->user->getPerm('can_moderate') ? $this->page->meta('modlink') : '');
+        $this->template->addVar('modlink', $this->user->getPerm('can_moderate') ? $this->template->meta('modlink') : '');
 
-        $this->page->addvar('ismod', $this->user->getPerm('can_moderate') ? 'true' : 'false');
-        $this->page->addvar('isguest', $this->user->isGuest() ? 'true' : 'false');
-        $this->page->addvar('isadmin', $this->user->getPerm('can_access_acp') ? 'true' : 'false');
+        $this->template->addVar('ismod', $this->user->getPerm('can_moderate') ? 'true' : 'false');
+        $this->template->addVar('isguest', $this->user->isGuest() ? 'true' : 'false');
+        $this->template->addVar('isadmin', $this->user->getPerm('can_access_acp') ? 'true' : 'false');
 
-        $this->page->addvar('acplink', $this->user->getPerm('can_access_acp') ? $this->page->meta('acplink') : '');
-        $this->page->addvar('boardname', $this->config->getSetting('boardname'));
+        $this->template->addVar('acplink', $this->user->getPerm('can_access_acp') ? $this->template->meta('acplink') : '');
+        $this->template->addVar('boardname', $this->config->getSetting('boardname'));
 
         if ($this->user->isGuest()) {
             return;
         }
 
-        $this->page->addvar('groupid', (string) $this->jax->pick($this->user->get('group_id'), 3));
-        $this->page->addvar('userposts', (string) $this->user->get('posts'));
-        $this->page->addvar('grouptitle', $this->user->getPerm('title'));
-        $this->page->addvar('avatar', $this->jax->pick($this->user->get('avatar'), $this->page->meta('default-avatar')));
-        $this->page->addvar('username', $this->user->get('display_name'));
-        $this->page->addvar('userid', (string) $this->jax->pick($this->user->get('id'), 0));
+        $this->template->addVar('groupid', (string) $this->jax->pick($this->user->get('group_id'), 3));
+        $this->template->addVar('userposts', (string) $this->user->get('posts'));
+        $this->template->addVar('grouptitle', $this->user->getPerm('title'));
+        $this->template->addVar('avatar', $this->jax->pick($this->user->get('avatar'), $this->template->meta('default-avatar')));
+        $this->template->addVar('username', $this->user->get('display_name'));
+        $this->template->addVar('userid', (string) $this->jax->pick($this->user->get('id'), 0));
 
         $this->page->append(
             'SCRIPT',

@@ -9,6 +9,7 @@ use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
 use Jax\Request;
+use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
@@ -49,9 +50,10 @@ final class UCP
         private readonly Page $page,
         private readonly Request $request,
         private readonly TextFormatting $textFormatting,
+        private readonly Template $template,
         private readonly User $user,
     ) {
-        $this->page->loadMeta('ucp');
+        $this->template->loadMeta('ucp');
     }
 
     public function render(): void
@@ -140,11 +142,11 @@ final class UCP
 
         $ucpnotepad = $this->user->get('ucpnotepad');
 
-        $this->ucppage = ($error !== null ? $this->page->meta('error', $error) : '') . $this->page->meta(
+        $this->ucppage = ($error !== null ? $this->template->meta('error', $error) : '') . $this->template->meta(
             'ucp-index',
             $this->jax->hiddenFormFields(['act' => 'ucp']),
             $this->user->get('display_name'),
-            $this->jax->pick($this->user->get('avatar'), $this->page->meta('default-avatar')),
+            $this->jax->pick($this->user->get('avatar'), $this->template->meta('default-avatar')),
             trim((string) $ucpnotepad) !== '' && trim((string) $ucpnotepad) !== '0'
             ? $this->textFormatting->blockhtml($ucpnotepad) : 'Personal notes go here.',
         );
@@ -161,7 +163,7 @@ final class UCP
             $page = $this->ucppage;
         }
 
-        $page = $this->page->meta('ucp-wrapper', $page);
+        $page = $this->template->meta('ucp-wrapper', $page);
         // $this->page->command("window",Array("id"=>"ucpwin","title"=>"Settings","content"=>$page,"animate"=>false));
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
@@ -219,7 +221,7 @@ final class UCP
                 . ($this->user->get($field) ? 'checked="checked"' : '') . '/>';
         }
 
-        $this->ucppage = $this->page->meta('ucp-sound-settings', $checkboxes);
+        $this->ucppage = $this->template->meta('ucp-sound-settings', $checkboxes);
         $this->runscript = "if(document.querySelector('#dtnotify')&&window.webkitNotifications) "
             . "document.querySelector('#dtnotify').checked=(webkitNotifications.checkPermission()==0)";
 
@@ -236,7 +238,7 @@ final class UCP
             $update = true;
         }
 
-        $this->ucppage = $this->page->meta(
+        $this->ucppage = $this->template->meta(
             'ucp-sig-settings',
             $this->getlocationforform(),
             $sig !== ''
@@ -289,11 +291,11 @@ final class UCP
                 return;
             }
 
-            $this->ucppage .= $this->page->meta('error', $error);
+            $this->ucppage .= $this->template->meta('error', $error);
             $this->page->command('error', $error);
         }
 
-        $this->ucppage .= $this->page->meta(
+        $this->ucppage .= $this->template->meta(
             'ucp-pass-settings',
             $this->getlocationforform()
             . $this->jax->hiddenFormFields(['passchange' => 1]),
@@ -328,7 +330,7 @@ final class UCP
             return;
         }
 
-        $this->ucppage .= $this->page->meta(
+        $this->ucppage .= $this->template->meta(
             'ucp-email-settings',
             $this->getlocationforform() . $this->jax->hiddenFormFields(
                 ['submit' => 'true'],
@@ -370,7 +372,7 @@ final class UCP
         }
 
         $this->ucppage = 'Your avatar: <span class="avatar"><img src="'
-            . $this->jax->pick($avatar, $this->page->meta('default-avatar'))
+            . $this->jax->pick($avatar, $this->template->meta('default-avatar'))
             . '" alt="Your avatar"></span><br><br>
             <form data-ajax-form="true" method="post">'
             . $this->getlocationforform()
@@ -575,7 +577,7 @@ final class UCP
                 return;
             }
 
-            $this->ucppage .= $this->page->meta('error', $error);
+            $this->ucppage .= $this->template->meta('error', $error);
             $this->page->command('error', $error);
         }
 
@@ -627,7 +629,7 @@ final class UCP
 
         $dobselect .= '</select>';
 
-        $this->ucppage = $this->page->meta(
+        $this->ucppage = $this->template->meta(
             'ucp-profile-settings',
             $this->getlocationforform()
             . $this->jax->hiddenFormFields(['submit' => '1']),
@@ -701,7 +703,7 @@ final class UCP
                 return;
             }
 
-            $this->ucppage .= $this->page->meta('error', $error);
+            $this->ucppage .= $this->template->meta('error', $error);
 
             $showthing = true;
         }
@@ -746,7 +748,7 @@ final class UCP
             $select = '--No Skins--';
         }
 
-        $this->ucppage .= $this->page->meta(
+        $this->ucppage .= $this->template->meta(
             'ucp-board-settings',
             $this->getlocationforform(),
             $select,
@@ -836,10 +838,10 @@ final class UCP
             $this->updatenummessages();
         }
 
-        $page = $this->page->meta(
+        $page = $this->template->meta(
             'inbox-messageview',
             $message['title'],
-            $this->page->meta(
+            $this->template->meta(
                 'user-link',
                 $message['from'],
                 $message['group_id'],
@@ -847,7 +849,7 @@ final class UCP
             ),
             $this->jax->date($message['date']),
             $this->textFormatting->theworks($message['message']),
-            $this->jax->pick($message['avatar'], $this->page->meta('default-avatar')),
+            $this->jax->pick($message['avatar'], $this->template->meta('default-avatar')),
             $message['usertitle'],
             $this->jax->hiddenFormFields(
                 [
@@ -971,7 +973,7 @@ final class UCP
             $dmessageOnchange = "RUN.stream.location('"
                 . '?act=ucp&what=inbox&flag=' . $message['id'] . "&tog='+" . '
                 (this.checked?1:0), 1)';
-            $page .= $this->page->meta(
+            $page .= $this->template->meta(
                 'inbox-messages-row',
                 $message['read'] ? 'read' : 'unread',
                 '<input class="check" type="checkbox" title="PM Checkbox" name="dmessage[]" '
@@ -1000,7 +1002,7 @@ final class UCP
             $page .= '<tr><td colspan="5" class="error">' . $msg . '</td></tr>';
         }
 
-        $page = $this->page->meta(
+        $page = $this->template->meta(
             'inbox-messages-listing',
             $this->jax->hiddenFormFields(
                 [
@@ -1186,7 +1188,7 @@ final class UCP
             }
         }
 
-        $page = $this->page->meta(
+        $page = $this->template->meta(
             'inbox-composeform',
             $this->jax->hiddenFormFields(
                 [

@@ -8,6 +8,7 @@ use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
 use Jax\Request;
+use Jax\Template;
 use Jax\TextFormatting;
 
 use function ceil;
@@ -24,10 +25,11 @@ final class Members
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly Page $page,
+        private readonly Template $template,
         private readonly Request $request,
         private readonly TextFormatting $textFormatting,
     ) {
-        $this->page->loadMeta('members');
+        $this->template->loadMeta('members');
     }
 
     public function render(): void
@@ -175,11 +177,11 @@ final class Members
             $contactdetails .= '<a title="PM this member" class="pm contact" '
                 . 'href="?act=ucp&amp;what=inbox&amp;page=compose&amp;mid='
                 . $member['id'] . '"></a>';
-            $page .= $this->page->meta(
+            $page .= $this->template->meta(
                 'members-row',
                 $member['id'],
-                $this->jax->pick($member['avatar'], $this->page->meta('default-avatar')),
-                $this->page->meta(
+                $this->jax->pick($member['avatar'], $this->template->meta('default-avatar')),
+                $this->template->meta(
                     'user-link',
                     $member['id'],
                     $member['group_id'],
@@ -193,7 +195,7 @@ final class Members
             );
         }
 
-        $page = $this->page->meta(
+        $page = $this->template->meta(
             'members-table',
             $links[0],
             $links[1],
@@ -203,7 +205,7 @@ final class Members
             $page,
         );
         $page = "<div class='pages pages-top'>{$pages}</div>"
-            . $this->page->meta(
+            . $this->template->meta(
                 'box',
                 ' id="memberlist"',
                 'Members',

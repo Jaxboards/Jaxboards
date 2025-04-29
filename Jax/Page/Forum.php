@@ -9,6 +9,7 @@ use Jax\Jax;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
+use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
@@ -41,9 +42,10 @@ final class Forum
         private readonly Session $session,
         private readonly Request $request,
         private readonly TextFormatting $textFormatting,
+        private readonly Template $template,
         private readonly User $user,
     ) {
-        $this->page->loadMeta('forum');
+        $this->template->loadMeta('forum');
     }
 
     public function render(): void
@@ -220,16 +222,16 @@ final class Forum
                 continue;
             }
 
-            $rows .= $this->page->meta(
+            $rows .= $this->template->meta(
                 'forum-subforum-row',
                 $forum['id'],
                 $forum['title'],
                 $forum['subtitle'],
-                $this->page->meta(
+                $this->template->meta(
                     'forum-subforum-lastpost',
                     $forum['lp_tid'],
                     $this->jax->pick($forum['lp_topic'], '- - - - -'),
-                    $forum['lp_name'] ? $this->page->meta(
+                    $forum['lp_name'] ? $this->template->meta(
                         'user-link',
                         $forum['lp_uid'],
                         $forum['lp_gid'],
@@ -241,15 +243,15 @@ final class Forum
                 $forum['posts'],
                 ($read = $this->isForumRead($forum)) ? 'read' : 'unread',
                 $read ? $this->jax->pick(
-                    $this->page->meta(
+                    $this->template->meta(
                         'subforum-icon-read',
                     ),
-                    $this->page->meta(
+                    $this->template->meta(
                         'icon-read',
                     ),
                 ) : $this->jax->pick(
-                    $this->page->meta('subforum-icon-unread'),
-                    $this->page->meta('icon-unread'),
+                    $this->template->meta('subforum-icon-unread'),
+                    $this->template->meta('icon-unread'),
                 ),
             );
             if ($read) {
@@ -262,7 +264,7 @@ final class Forum
         if ($rows !== '' && $rows !== '0') {
             $page .= $this->page->collapseBox(
                 'Subforums',
-                $this->page->meta('forum-subforum-table', $rows),
+                $this->template->meta('forum-subforum-table', $rows),
             );
         }
 
@@ -283,14 +285,14 @@ final class Forum
         // Buttons.
         $forumbuttons = '&nbsp;'
             . ($fdata['perms']['start'] ? '<a href="?act=post&amp;fid=' . $fid . '">'
-            . $this->page->meta(
-                $this->page->metaExists('button-newtopic')
+            . $this->template->meta(
+                $this->template->metaExists('button-newtopic')
                 ? 'button-newtopic' : 'forum-button-newtopic',
             ) . '</a>' : '');
-        $page .= $this->page->meta(
+        $page .= $this->template->meta(
             'forum-pages-top',
             $forumpages,
-        ) . $this->page->meta(
+        ) . $this->template->meta(
             'forum-buttons-top',
             $forumbuttons,
         );
@@ -358,12 +360,12 @@ final class Forum
                         . "&amp;page={$pageNumber}'>{$pageNumber}</a> ";
                 }
 
-                $pages = $this->page->meta('forum-topic-pages', $pages);
+                $pages = $this->template->meta('forum-topic-pages', $pages);
             }
 
             $read = false;
             $unread = false;
-            $rows .= $this->page->meta(
+            $rows .= $this->template->meta(
                 'forum-row',
                 $forum['id'],
                 // 1
@@ -371,7 +373,7 @@ final class Forum
                 // 2
                 $this->textFormatting->wordfilter($forum['subtitle']),
                 // 3
-                $this->page->meta('user-link', $forum['auth_id'], $forum['auth_gid'], $forum['auth_name']),
+                $this->template->meta('user-link', $forum['auth_id'], $forum['auth_gid'], $forum['auth_name']),
                 // 4
                 $forum['replies'],
                 // 5
@@ -379,7 +381,7 @@ final class Forum
                 // 6
                 $this->jax->date($forum['lp_date']),
                 // 7
-                $this->page->meta('user-link', $forum['lp_uid'], $forum['lp_gid'], $forum['lp_name']),
+                $this->template->meta('user-link', $forum['lp_uid'], $forum['lp_gid'], $forum['lp_name']),
                 // 8
                 ($forum['pinned'] ? 'pinned' : '') . ' ' . ($forum['locked'] ? 'locked' : ''),
                 // 9
@@ -393,12 +395,12 @@ final class Forum
                 ($read = $this->isTopicRead($forum, $fid)) ? 'read' : 'unread',
                 // 13
                 $read ? $this->jax->pick(
-                    $this->page->meta('topic-icon-read'),
-                    $this->page->meta('icon-read'),
+                    $this->template->meta('topic-icon-read'),
+                    $this->template->meta('icon-read'),
                 )
                 : $this->jax->pick(
-                    $this->page->meta('topic-icon-unread'),
-                    $this->page->meta('icon-read'),
+                    $this->template->meta('topic-icon-unread'),
+                    $this->template->meta('icon-read'),
                 ),
                 // 14
             );
@@ -417,7 +419,7 @@ final class Forum
         }
 
         if ($rows !== '' && $rows !== '0') {
-            $table = $this->page->meta('forum-table', $rows);
+            $table = $this->template->meta('forum-table', $rows);
         } else {
             if ($this->pageNumber > 0) {
                 $this->page->location('?act=vf' . $fid);
@@ -433,9 +435,9 @@ final class Forum
             }
         }
 
-        $page .= $this->page->meta('box', ' id="fid_' . $fid . '_listing"', $title, $table);
-        $page .= $this->page->meta('forum-pages-bottom', $forumpages);
-        $page .= $this->page->meta('forum-buttons-bottom', $forumbuttons);
+        $page .= $this->template->meta('box', ' id="fid_' . $fid . '_listing"', $title, $table);
+        $page .= $this->template->meta('forum-pages-bottom', $forumpages);
+        $page .= $this->template->meta('forum-buttons-bottom', $forumbuttons);
 
         // Start building the nav path.
         $path[$fdata['cat']] = '?act=vc' . $fdata['cat_id'];

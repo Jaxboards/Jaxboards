@@ -13,6 +13,7 @@ use Jax\Page;
 use Jax\Request;
 use Jax\RSSFeed;
 use Jax\Session;
+use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
@@ -62,9 +63,10 @@ final class Topic
         private readonly Request $request,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
+        private readonly Template $template,
         private readonly User $user,
     ) {
-        $this->page->loadMeta('topic');
+        $this->template->loadMeta('topic');
     }
 
     public function render(): void
@@ -219,7 +221,7 @@ final class Topic
             $this->markread($tid);
         }
 
-        $this->page->append('TITLE', ' -> ' . $this->topicdata['topic_title']);
+        $this->page->setPageTitle($this->topicdata['topic_title']);
         $this->session->set('location_verbose', "In topic '" . $this->topicdata['topic_title'] . "'");
 
         // Fix this to work with subforums.
@@ -244,7 +246,7 @@ final class Topic
         $totalpages = (int) ceil($postCount / $this->numperpage);
         $pagelist = '';
         foreach ($this->jax->pages($totalpages, $this->pageNumber + 1, 10) as $pageNumber) {
-            $pagelist .= $this->page->meta(
+            $pagelist .= $this->template->meta(
                 'topic-pages-part',
                 $tid,
                 $pageNumber,
@@ -257,7 +259,7 @@ final class Topic
         $this->session->addVar('topic_lastpage', $this->pageNumber + 1 === $totalpages);
 
         // If it's a poll, put it in.
-        $poll = $this->topicdata['poll_type'] ? $this->page->meta(
+        $poll = $this->topicdata['poll_type'] ? $this->template->meta(
             'box',
             " id='poll'",
             $this->topicdata['poll_q'],
@@ -269,8 +271,8 @@ final class Topic
         ) : '';
 
         // Generate post listing.
-        $page = $this->page->meta('topic-table', $this->postsintooutput());
-        $page = $this->page->meta(
+        $page = $this->template->meta('topic-table', $this->postsintooutput());
+        $page = $this->template->meta(
             'topic-wrapper',
             $this->topicdata['topic_title']
             . ($this->topicdata['subtitle'] ? ', ' . $this->topicdata['subtitle'] : ''),
@@ -287,8 +289,8 @@ final class Topic
 
         if ($this->topicdata['fperms']['start']) {
             $buttons[0] = "<a href='?act=post&fid=" . $this->topicdata['fid'] . "'>"
-            . $this->page->meta(
-                $this->page->metaExists('button-newtopic')
+            . $this->template->meta(
+                $this->template->metaExists('button-newtopic')
                     ? 'button-newtopic'
                     : 'topic-button-newtopic',
             )
@@ -302,8 +304,8 @@ final class Topic
                 || $this->user->getPerm('can_override_locked_topics')
             )
         ) {
-            $buttons[1] = "<a href='?act=vt{$tid}&qreply=1'>" . $this->page->meta(
-                $this->page->metaExists('button-qreply')
+            $buttons[1] = "<a href='?act=vt{$tid}&qreply=1'>" . $this->template->meta(
+                $this->template->metaExists('button-qreply')
                 ? 'button-qreply'
                 : 'topic-button-qreply',
             ) . '</a>';
@@ -316,8 +318,8 @@ final class Topic
                 || $this->user->getPerm('can_override_locked_topics')
             )
         ) {
-            $buttons[2] = "<a href='?act=post&tid={$tid}'>" . $this->page->meta(
-                $this->page->metaExists('button-reply')
+            $buttons[2] = "<a href='?act=post&tid={$tid}'>" . $this->template->meta(
+                $this->template->metaExists('button-reply')
                 ? 'button-reply'
                 : 'topic-button-reply',
             ) . '</a>';
@@ -341,7 +343,7 @@ final class Topic
                 continue;
             }
 
-            $usersonline .= $this->page->meta(
+            $usersonline .= $this->template->meta(
                 'user-link',
                 $user['uid'],
                 $user['group_id'] . (
@@ -353,19 +355,19 @@ final class Topic
             );
         }
 
-        $page .= $this->page->meta('topic-users-online', $usersonline);
+        $page .= $this->template->meta('topic-users-online', $usersonline);
 
         // Add in other page elements.
-        $page = $poll . $this->page->meta(
+        $page = $poll . $this->template->meta(
             'topic-pages-top',
             $pagelist,
-        ) . $this->page->meta(
+        ) . $this->template->meta(
             'topic-buttons-top',
             $buttons,
-        ) . $page . $this->page->meta(
+        ) . $page . $this->template->meta(
             'topic-pages-bottom',
             $pagelist,
-        ) . $this->page->meta(
+        ) . $this->template->meta(
             'topic-buttons-bottom',
             $buttons,
         );
@@ -508,7 +510,7 @@ final class Topic
         $this->page->command(
             'window',
             [
-                'content' => $this->page->meta(
+                'content' => $this->template->meta(
                     'topic-reply-form',
                     $tid,
                     $this->textFormatting->blockhtml($prefilled),
@@ -688,7 +690,7 @@ final class Topic
                     foreach ($rniblets as $nibletIndex => $niblet) {
                         $postratingbuttons .= '<a href="?act=vt' . $this->tid . '&amp;ratepost='
                             . $post['pid'] . '&amp;niblet=' . $nibletIndex . '">'
-                            . $this->page->meta(
+                            . $this->template->meta(
                                 'rating-niblet',
                                 $niblet['img'],
                                 $niblet['title'],
@@ -703,14 +705,14 @@ final class Topic
 
                         $num = 'x' . count($prating[$nibletIndex]);
                         $postratingbuttons .= $num;
-                        $showrating .= $this->page->meta(
+                        $showrating .= $this->template->meta(
                             'rating-niblet',
                             $niblet['img'],
                             $niblet['title'],
                         ) . $num;
                     }
 
-                    $postrating = $this->page->meta(
+                    $postrating = $this->template->meta(
                         'rating-wrapper',
                         $postratingbuttons,
                         ($ratingConfig & 2) === 0
@@ -726,36 +728,36 @@ final class Topic
             // Adds the Edit button
             = ($this->canedit($post)
                 ? "<a href='?act=vt" . $this->tid . '&amp;edit=' . $post['pid']
-            . "' class='edit'>" . $this->page->meta('topic-edit-button')
+            . "' class='edit'>" . $this->template->meta('topic-edit-button')
             . '</a>'
                 : '')
             // Adds the Quote button
             . ($this->topicdata['fperms']['reply']
                 ? " <a href='?act=vt" . $this->tid . '&amp;quote=' . $post['pid']
             . "' onclick='RUN.handleQuoting(this);return false;' "
-            . "class='quotepost'>" . $this->page->meta('topic-quote-button') . '</a> '
+            . "class='quotepost'>" . $this->template->meta('topic-quote-button') . '</a> '
                 : '')
             // Adds the Moderate options
             . ($this->canModerate()
                 ? "<a href='?act=modcontrols&amp;do=modp&amp;pid=" . $post['pid']
             . "' class='modpost' onclick='RUN.modcontrols.togbutton(this)'>"
-            . $this->page->meta('topic-mod-button') . '</a>'
+            . $this->template->meta('topic-mod-button') . '</a>'
                 : '');
 
-            $rows .= $this->page->meta(
+            $rows .= $this->template->meta(
                 'topic-post-row',
                 $post['pid'],
                 $this->tid,
-                $post['auth_id'] ? $this->page->meta(
+                $post['auth_id'] ? $this->template->meta(
                     'user-link',
                     $post['auth_id'],
                     $post['group_id'],
                     $post['display_name'],
                 ) : 'Guest',
-                $this->jax->pick($post['avatar'], $this->page->meta('default-avatar')),
+                $this->jax->pick($post['avatar'], $this->template->meta('default-avatar')),
                 $post['usertitle'],
                 $post['posts'],
-                $this->page->meta(
+                $this->template->meta(
                     'topic-status-'
                     . (isset($usersonline[$post['auth_id']])
                     && $usersonline[$post['auth_id']] ? 'online' : 'offline'),
@@ -767,15 +769,15 @@ final class Topic
                 $this->jax->date($post['date']),
                 '<a href="?act=vt' . $this->tid . '&amp;findpost=' . $post['pid']
                 . '" onclick="prompt(\'Link to this post:\',this.href);return false">'
-                . $this->page->meta('topic-perma-button') . '</a>',
+                . $this->template->meta('topic-perma-button') . '</a>',
                 $postt,
                 isset($post['sig']) && $post['sig']
                     ? $this->textFormatting->theworks($post['sig'])
                     : '',
                 $post['auth_id'],
-                $post['edit_date'] ? $this->page->meta(
+                $post['edit_date'] ? $this->template->meta(
                     'topic-edit-by',
-                    $this->page->meta(
+                    $this->template->meta(
                         'user-link',
                         $post['editby'],
                         $post['egroup_id'],
@@ -785,12 +787,12 @@ final class Topic
                 ) : '',
                 $this->user->getPerm('can_moderate')
                     ? '<a href="?act=modcontrols&amp;do=iptools&amp;ip='
-                . $this->ipAddress->asHumanReadable($post['ip']) . '">' . $this->page->meta(
+                . $this->ipAddress->asHumanReadable($post['ip']) . '">' . $this->template->meta(
                     'topic-mod-ipbutton',
                     $this->ipAddress->asHumanReadable($post['ip']),
                 ) . '</a>'
                     : '',
-                $post['icon'] ? $this->page->meta(
+                $post['icon'] ? $this->template->meta(
                     'topic-icon-wrapper',
                     $post['icon'],
                 ) : '',
@@ -1191,7 +1193,7 @@ final class Topic
             $topic = $this->database->arow($result);
             $this->database->disposeresult($result);
 
-            $form = $this->page->meta(
+            $form = $this->template->meta(
                 'topic-qedit-topic',
                 $hiddenfields,
                 $topic['title'],
@@ -1199,7 +1201,7 @@ final class Topic
                 $this->textFormatting->blockhtml($post['post']),
             );
         } else {
-            $form = $this->page->meta(
+            $form = $this->template->meta(
                 'topic-qedit-post',
                 $hiddenfields,
                 $this->textFormatting->blockhtml($post['post']),
@@ -1235,10 +1237,12 @@ final class Topic
         if (!$post) {
             $error = "That post doesn't exist!";
             $this->page->command('alert', $error);
-            $this->page->append('PAGE', $this->page->meta('error', $error));
+            $this->page->append('PAGE', $this->template->meta('error', $error));
 
             return;
         }
+        $this->page->command('alert', 'WTF');
+
 
         if ($this->request->both('qreply')) {
             $this->page->command(
@@ -1398,7 +1402,7 @@ final class Topic
             $page .= '<img src="' . $niblets[$index]['img'] . '" /> '
                 . $niblets[$index]['title'] . '<ul>';
             foreach ($rating as $mid) {
-                $page .= '<li>' . $this->page->meta(
+                $page .= '<li>' . $this->template->meta(
                     'user-link',
                     $mid,
                     $mdata[$mid][1],

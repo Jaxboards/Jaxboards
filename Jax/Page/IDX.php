@@ -10,6 +10,7 @@ use Jax\Jax;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
+use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
@@ -46,9 +47,10 @@ final class IDX
         private readonly Request $request,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
+        private readonly Template $template,
         private readonly User $user,
     ) {
-        $this->page->loadMeta('idx');
+        $this->template->loadMeta('idx');
     }
 
     public function render(): void
@@ -125,12 +127,12 @@ final class IDX
                 preg_match('@\d+$@', (string) $forum['path'], $match);
                 if (isset($this->subforums[$match[0]])) {
                     $this->subforumids[$match[0]][] = $forum['id'];
-                    $this->subforums[$match[0]] .= $this->page->meta(
+                    $this->subforums[$match[0]] .= $this->template->meta(
                         'idx-subforum-link',
                         $forum['id'],
                         $forum['title'],
                         $this->textFormatting->blockhtml($forum['subtitle']),
-                    ) . $this->page->meta('idx-subforum-splitter');
+                    ) . $this->template->meta('idx-subforum-splitter');
                 }
             } else {
                 $data[$forum['cat_id']][] = $forum;
@@ -174,7 +176,7 @@ final class IDX
             );
         }
 
-        $page .= $this->page->meta('idx-tools');
+        $page .= $this->template->meta('idx-tools');
 
         $page .= $this->getBoardStats();
 
@@ -219,7 +221,7 @@ final class IDX
                 $this->mods,
             );
             while ($member = $this->database->arow($result)) {
-                $moderatorinfo[$member['id']] = $this->page->meta(
+                $moderatorinfo[$member['id']] = $this->template->meta(
                     'user-link',
                     $member['id'],
                     $member['group_id'],
@@ -230,10 +232,10 @@ final class IDX
 
         $forum = '';
         foreach (explode(',', (string) $modids) as $modId) {
-            $forum .= $moderatorinfo[$modId] . $this->page->meta('idx-ledby-splitter');
+            $forum .= $moderatorinfo[$modId] . $this->template->meta('idx-ledby-splitter');
         }
 
-        return mb_substr($forum, 0, -mb_strlen($this->page->meta('idx-ledby-splitter')));
+        return mb_substr($forum, 0, -mb_strlen($this->template->meta('idx-ledby-splitter')));
     }
 
     private function buildTable($forums): ?string
@@ -260,15 +262,15 @@ final class IDX
             }
 
             if ($forum['redirect']) {
-                $table .= $this->page->meta(
+                $table .= $this->template->meta(
                     'idx-redirect-row',
                     $forum['id'],
                     $forum['title'],
                     nl2br((string) $forum['subtitle']),
                     'Redirects: ' . $forum['redirects'],
                     $this->jax->pick(
-                        $this->page->meta('icon-redirect'),
-                        $this->page->meta('idx-icon-redirect'),
+                        $this->template->meta('icon-redirect'),
+                        $this->template->meta('idx-icon-redirect'),
                     ),
                 );
             } else {
@@ -278,31 +280,31 @@ final class IDX
                     : ' href="?act=vf' . $forum['id'] . '&amp;markread=1"';
                 $linkText = $read
                     ? $this->jax->pick(
-                        $this->page->meta('icon-read'),
-                        $this->page->meta('idx-icon-read'),
+                        $this->template->meta('icon-read'),
+                        $this->template->meta('idx-icon-read'),
                     ) : $this->jax->pick(
-                        $this->page->meta('icon-unread'),
-                        $this->page->meta('idx-icon-unread'),
+                        $this->template->meta('icon-unread'),
+                        $this->template->meta('idx-icon-unread'),
                     );
-                $table .= $this->page->meta(
+                $table .= $this->template->meta(
                     'idx-row',
                     $forum['id'],
                     $this->textFormatting->wordfilter($forum['title']),
                     nl2br((string) $forum['subtitle']),
                     $sf
-                    ? $this->page->meta(
+                    ? $this->template->meta(
                         'idx-subforum-wrapper',
                         mb_substr(
                             (string) $sf,
                             0,
                             -1 * mb_strlen(
-                                $this->page->meta('idx-subforum-splitter'),
+                                $this->template->meta('idx-subforum-splitter'),
                             ),
                         ),
                     ) : '',
                     $this->formatlastpost($forum),
-                    $this->page->meta('idx-topics-count', $forum['topics']),
-                    $this->page->meta('idx-replies-count', $forum['posts']),
+                    $this->template->meta('idx-topics-count', $forum['topics']),
+                    $this->template->meta('idx-replies-count', $forum['posts']),
                     $read ? 'read' : 'unread',
                     <<<HTML
                         <a id="fid_{$forumId}_icon"{$hrefCode}>
@@ -311,7 +313,7 @@ final class IDX
                         HTML
                     ,
                     $forum['show_ledby'] && $forum['mods']
-                        ? $this->page->meta(
+                        ? $this->template->meta(
                             'idx-ledby-wrapper',
                             $this->getmods($forum['mods']),
                         ) : '',
@@ -319,7 +321,7 @@ final class IDX
             }
         }
 
-        return $this->page->meta('idx-table', $table);
+        return $this->template->meta('idx-table', $table);
     }
 
     private function update(): void
@@ -415,7 +417,7 @@ final class IDX
                 . $row['title'] . '</a> ';
         }
 
-        return $page . $this->page->meta(
+        return $page . $this->template->meta(
             'idx-stats',
             $usersonline[1],
             $usersonline[0],
@@ -425,7 +427,7 @@ final class IDX
             number_format($stats['members']),
             number_format($stats['topics']),
             number_format($stats['posts']),
-            $this->page->meta(
+            $this->template->meta(
                 'user-link',
                 $stats['last_register'],
                 $stats['group_id'],
@@ -562,8 +564,8 @@ final class IDX
                 'update',
                 '#fid_' . $forum['id'] . '_icon',
                 $this->jax->pick(
-                    $this->page->meta('icon-unread'),
-                    $this->page->meta('idx-icon-unread'),
+                    $this->template->meta('icon-unread'),
+                    $this->template->meta('idx-icon-unread'),
                 ),
             );
             $this->page->command(
@@ -575,26 +577,26 @@ final class IDX
             $this->page->command(
                 'update',
                 '#fid_' . $forum['id'] . '_topics',
-                $this->page->meta('idx-topics-count', $forum['topics']),
+                $this->template->meta('idx-topics-count', $forum['topics']),
             );
             $this->page->command(
                 'update',
                 '#fid_' . $forum['id'] . '_replies',
-                $this->page->meta('idx-replies-count', $forum['posts']),
+                $this->template->meta('idx-replies-count', $forum['posts']),
             );
         }
     }
 
     private function formatlastpost($forum): ?string
     {
-        return $this->page->meta(
+        return $this->template->meta(
             'idx-row-lastpost',
             $forum['lp_tid'],
             $this->jax->pick(
                 $this->textFormatting->wordfilter($forum['lp_topic']),
                 '- - - - -',
             ),
-            $forum['lp_uid'] ? $this->page->meta(
+            $forum['lp_uid'] ? $this->template->meta(
                 'user-link',
                 $forum['lp_uid'],
                 $forum['lp_gid'],

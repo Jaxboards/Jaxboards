@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Jax\Config;
 use Jax\Page;
 use Jax\Request;
+use Jax\Template;
 
 use function nl2br;
 
@@ -16,6 +17,7 @@ final readonly class BoardOffline
         private readonly Config $config,
         private readonly Page $page,
         private readonly Request $request,
+        private readonly Template $template,
     ) {}
 
     public function render(): void
@@ -26,7 +28,7 @@ final readonly class BoardOffline
 
         $this->page->append(
             'PAGE',
-            $this->page->meta(
+            $this->template->meta(
                 'box',
                 '',
                 'Error',

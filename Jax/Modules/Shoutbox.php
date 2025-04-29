@@ -11,6 +11,7 @@ use Jax\Jax;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
+use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
@@ -38,9 +39,10 @@ final class Shoutbox
         private readonly Request $request,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
+        private readonly Template $template,
         private readonly User $user,
     ) {
-        $this->page->loadMeta('shoutbox');
+        $this->template->loadMeta('shoutbox');
     }
 
     public function init(): void
@@ -104,7 +106,7 @@ final class Shoutbox
     public function formatshout($row): ?string
     {
         $shout = $this->textFormatting->theworks($row['shout'], ['minimalbb' => true]);
-        $user = $row['uid'] ? $this->page->meta(
+        $user = $row['uid'] ? $this->template->meta(
             'user-link',
             $row['uid'],
             $row['group_id'],
@@ -113,15 +115,15 @@ final class Shoutbox
         $avatar = $this->config->getSetting('shoutboxava')
             ? '<img src="' . $this->jax->pick(
                 $row['avatar'],
-                $this->page->meta('default-avatar'),
+                $this->template->meta('default-avatar'),
             ) . '" class="avatar" alt="avatar" />' : '';
-        $deletelink = $this->page->meta('shout-delete', $row['id']);
+        $deletelink = $this->template->meta('shout-delete', $row['id']);
         if (!$this->canDelete(0, $row)) {
             $deletelink = '';
         }
 
         if (mb_substr($shout, 0, 4) === '/me ') {
-            return $this->page->meta(
+            return $this->template->meta(
                 'shout-action',
                 $this->jax->smalldate(
                     $row['date'],
@@ -136,7 +138,7 @@ final class Shoutbox
             );
         }
 
-        return $this->page->meta(
+        return $this->template->meta(
             'shout',
             $row['date'],
             $user,
@@ -180,13 +182,13 @@ final class Shoutbox
         $this->session->addVar('sb_id', $first);
         $this->page->append(
             'SHOUTBOX',
-            $this->page->meta(
+            $this->template->meta(
                 'collapsebox',
                 " id='shoutbox'",
-                $this->page->meta(
+                $this->template->meta(
                     'shoutbox-title',
                 ),
-                $this->page->meta(
+                $this->template->meta(
                     'shoutbox',
                     $shouts,
                 ),
@@ -311,7 +313,7 @@ final class Shoutbox
             $shouts .= $this->formatshout($shout);
         }
 
-        $page = $this->page->meta(
+        $page = $this->template->meta(
             'box',
             '',
             'Shoutbox' . $pages,
