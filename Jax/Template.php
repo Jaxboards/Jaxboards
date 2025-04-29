@@ -19,7 +19,6 @@ use function in_array;
 use function is_array;
 use function is_dir;
 use function is_string;
-use function mb_strpos;
 use function mb_strtolower;
 use function pathinfo;
 use function preg_match;
@@ -30,7 +29,6 @@ use function vsprintf;
 
 use const PATHINFO_BASENAME;
 use const PATHINFO_FILENAME;
-
 
 /**
  * This class is entirely responsible for rendering the page.
@@ -279,7 +277,7 @@ final class Template
     }
 
     /**
-     * Processes conditionals in the template
+     * Processes conditionals in the template.
      */
     private function metaExtended(string $content): string
     {

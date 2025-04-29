@@ -8,7 +8,6 @@ use function array_merge;
 use function explode;
 use function header;
 use function headers_sent;
-use function implode;
 use function is_array;
 use function is_dir;
 use function json_decode;
@@ -153,9 +152,9 @@ final class Page
         $this->append(
             'CSS',
             <<<"HTML"
-                <link rel="stylesheet" type="text/css" href="{$themeUrl}/css.css">
-                <link rel="preload" as="style" type="text/css" href="./Service/wysiwyg.css" onload="this.onload=null;this.rel=\'stylesheet\'" />
-            HTML
+                    <link rel="stylesheet" type="text/css" href="{$themeUrl}/css.css">
+                    <link rel="preload" as="style" type="text/css" href="./Service/wysiwyg.css" onload="this.onload=null;this.rel=\\'stylesheet\\'" />
+                HTML,
         );
 
         // Load Wrapper
@@ -166,10 +165,22 @@ final class Page
         );
     }
 
+    public function setBreadCrumbs(array $crumbs): void
+    {
+        $this->breadCrumbs = array_merge($this->breadCrumbs, $crumbs);
+    }
+
+    public function setPageTitle(string $title): void
+    {
+        $this->pageTitle = $title;
+        $this->template->reset('TITLE', $this->getPageTitle());
+    }
+
     /**
      * Gets the user selected skin.
      * If not available, gets the board default.
      * If THAT isn't available, get jaxboards default skin.
+     *
      * @return array<string,mixed>
      */
     private function getSelectedSkin(?int $skinId): array
@@ -210,17 +221,6 @@ final class Page
         return $skin;
     }
 
-    public function setBreadCrumbs(array $crumbs): void
-    {
-        $this->breadCrumbs = array_merge($this->breadCrumbs, $crumbs);
-    }
-
-    public function setPageTitle(string $title): void
-    {
-        $this->pageTitle = $title;
-        $this->template->reset('TITLE', $this->getPageTitle());
-    }
-
     private function getPageTitle(): string
     {
         return (
@@ -229,7 +229,6 @@ final class Page
             ?: 'JaxBoards'
         ) . ($this->pageTitle ? ' -> ' . $this->pageTitle : '');
     }
-
 
     private function outputJavascriptCommands(): void
     {
