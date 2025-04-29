@@ -306,17 +306,7 @@ final class Template
         foreach (explode($logicalOperator, $statement) as $piece) {
             preg_match('@(\S+?)\s*([!><]?=|[><])\s*(\S*)@', $piece, $args);
             [, $left, $operator, $right] = $args;
-
-
-            $conditionPasses = match ($operator) {
-                '=' => $left === $right,
-                '!=' => $left !== $right,
-                '>=' => $left >= $right,
-                '>' => $left > $right,
-                '<=' => $left <= $right,
-                '<' => $left < $right,
-                default => false,
-            };
+            $conditionPasses = $this->conditionPasses($left, $operator, $right);
 
             if ($logicalOperator === '&&' && !$conditionPasses) {
                 break;
@@ -328,6 +318,18 @@ final class Template
         }
 
         return $conditionPasses ? $content : '';
+    }
+
+    private function conditionPasses($left, $operator, $right) {
+        return match ($operator) {
+            '=' => $left === $right,
+            '!=' => $left !== $right,
+            '>=' => $left >= $right,
+            '>' => $left > $right,
+            '<=' => $left <= $right,
+            '<' => $left < $right,
+            default => false,
+        };
     }
 
     private function filtervars(string $string): string
