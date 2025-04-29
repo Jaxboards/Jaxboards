@@ -295,6 +295,7 @@ final class Template
      *
      * @param list<string> $match 1 is the statement, 2 is the contents wrapped by the if
      */
+    // phpcs:ignore SlevomatCodingStandard.Complexity.Cognitive.ComplexityTooHigh
     private function metaExtendedIfCB(array $match): string
     {
         [, $statement, $content] = $match;
@@ -306,7 +307,17 @@ final class Template
         foreach (explode($logicalOperator, $statement) as $piece) {
             preg_match('@(\S+?)\s*([!><]?=|[><])\s*(\S*)@', $piece, $args);
             [, $left, $operator, $right] = $args;
-            $conditionPasses = $this->conditionPasses($left, $operator, $right);
+
+
+            $conditionPasses = match ($operator) {
+                '=' => $left === $right,
+                '!=' => $left !== $right,
+                '>=' => $left >= $right,
+                '>' => $left > $right,
+                '<=' => $left <= $right,
+                '<' => $left < $right,
+                default => false,
+            };
 
             if ($logicalOperator === '&&' && !$conditionPasses) {
                 break;
@@ -318,22 +329,6 @@ final class Template
         }
 
         return $conditionPasses ? $content : '';
-    }
-
-    private function conditionPasses(
-        string $left,
-        string $operator,
-        string $right,
-    ): bool {
-        return match ($operator) {
-            '=' => $left === $right,
-            '!=' => $left !== $right,
-            '>=' => $left >= $right,
-            '>' => $left > $right,
-            '<=' => $left <= $right,
-            '<' => $left < $right,
-            default => false,
-        };
     }
 
     private function filtervars(string $string): string
