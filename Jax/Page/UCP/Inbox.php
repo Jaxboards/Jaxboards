@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax\Page\UCP;
 
 use Jax\Database;
@@ -10,7 +12,17 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
-class Inbox {
+use function array_pop;
+use function htmlspecialchars;
+use function is_array;
+use function is_numeric;
+use function json_encode;
+use function trim;
+
+use const PHP_EOL;
+
+final class Inbox
+{
     public function __construct(
         private readonly Database $database,
         private readonly Jax $jax,
@@ -51,8 +63,10 @@ class Inbox {
         };
     }
 
-    private function compose(string $messageid = '', string $todo = ''): ?string
-    {
+    private function compose(
+        string $messageid = '',
+        string $todo = '',
+    ): ?string {
         $error = null;
         $mid = 0;
         $mname = '';
@@ -215,7 +229,7 @@ class Inbox {
             }
         }
 
-        $page = $this->template->meta(
+        return $this->template->meta(
             'inbox-composeform',
             $this->jax->hiddenFormFields(
                 [
@@ -231,7 +245,6 @@ class Inbox {
             $mtitle,
             htmlspecialchars($msg),
         );
-        return $page;
     }
 
     private function delete($messageId, bool $relocate = true): void
@@ -391,7 +404,7 @@ class Inbox {
             $this->updateNumMessages();
         }
 
-        $page = $this->template->meta(
+        return $this->template->meta(
             'inbox-messageview',
             $message['title'],
             $this->template->meta(
@@ -413,10 +426,7 @@ class Inbox {
                 ],
             ),
         );
-        return $page;
     }
-
-
 
     private function viewMessages(string $view = 'inbox'): ?string
     {

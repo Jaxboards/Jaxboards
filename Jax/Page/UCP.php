@@ -62,10 +62,12 @@ final class UCP
 
         // Not a single settings page needs update functionality except inbox
         if (
-            $this->request->isJSUpdate() &&
-            !$this->request->hasPostData() &&
-            $this->what !== 'inbox'
-        ) return;
+            $this->request->isJSUpdate()
+            && !$this->request->hasPostData()
+            && $this->what !== 'inbox'
+        ) {
+            return;
+        }
 
         $page = match ($this->what) {
             'sounds' => $this->showSoundSettings(),
@@ -124,9 +126,11 @@ final class UCP
         // $this->page->command("window",Array("id"=>"ucpwin","title"=>"Settings","content"=>$page,"animate"=>false));
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
-        if ($this->runscript) {
-            $this->page->command('script', $this->runscript);
+        if (!$this->runscript) {
+            return;
         }
+
+        $this->page->command('script', $this->runscript);
     }
 
     private function showSoundSettings(): ?string
@@ -224,6 +228,7 @@ final class UCP
             if ($error === null) {
                 $hashpass = password_hash((string) $this->request->post('newpass1'), PASSWORD_DEFAULT);
                 $this->user->set('pass', $hashpass);
+
                 return <<<'HTML'
                     Password changed.
                         <br><br>
@@ -264,6 +269,7 @@ final class UCP
                 'email_settings' => ($this->request->post('notifications') ?? false ? 2 : 0)
                 + ($this->request->post('adminemails') ?? false ? 1 : 0),
             ]);
+
             return 'Email settings updated.'
                 . '<br><br><a href="?act=ucp&what=email">Back</a>';
         }
@@ -507,11 +513,13 @@ final class UCP
                 }
 
                 $this->user->setBulk($data);
+
                 return 'Profile successfully updated.<br>'
                     . '<br><a href="?act=ucp&what=profile">Back</a>';
             }
 
             $this->page->command('error', $error);
+
             return $this->template->meta('error', $error);
         }
 
