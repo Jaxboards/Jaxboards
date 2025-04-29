@@ -54,7 +54,8 @@ final readonly class Settings
             $logoUrl = $this->request->post('logourl');
             $error = match (true) {
                 !is_string($boardName) || trim($boardName) === '' => 'Board name is required',
-                trim($logoUrl) !== '' && $this->jax->isURL($this->request->post('logourl')) => 'Please enter a valid logo url.',
+                trim($logoUrl) !== '' && !filter_var($this->request->post('logourl'), FILTER_VALIDATE_URL)
+                    => 'Please enter a valid logo url.',
                 default => null,
             };
 

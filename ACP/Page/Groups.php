@@ -398,7 +398,7 @@ final class Groups
                 $error = 'Group icon must not exceed 250 characters!';
             } elseif (
                 $this->request->post('groupicon')
-                && !$this->jax->isurl($this->request->post('groupicon'))
+                && !filter_var($this->request->post('groupicon'), FILTER_VALIDATE_URL)
             ) {
                 $error = 'Group icon must be a valid image url';
             }

@@ -255,7 +255,7 @@ final class UCP
         if ($this->request->post('submit') !== null) {
             if (
                 $this->request->post('email')
-                && !$this->jax->isemail($this->request->post('email'))
+                && !filter_var($this->request->post('email'), FILTER_VALIDATE_EMAIL)
             ) {
                 $error = 'Please enter a valid email!';
             }
@@ -319,7 +319,7 @@ final class UCP
         if ($this->request->post('changedava') !== null) {
             if (
                 $this->request->post('changedava')
-                && !$this->jax->isurl($this->request->post('changedava'))
+                && !filter_var($this->request->post('changedava'), FILTER_VALIDATE_URL)
             ) {
                 $error = 'Please enter a valid image URL.';
             } else {

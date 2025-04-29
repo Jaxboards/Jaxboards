@@ -89,7 +89,7 @@ final readonly class ServiceSignup
 
             $this->database->disposeresult($result);
 
-            if (!$this->jax->isemail($this->request->post('email'))) {
+            if (!filter_var($this->request->post('email'), FILTER_VALIDATE_EMAIL)) {
                 $errors[] = 'invalid email';
             }
 

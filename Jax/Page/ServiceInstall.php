@@ -233,7 +233,7 @@ final class ServiceInstall
             $errors[] = 'Admin passwords do not match';
         }
 
-        if (!$this->jax->isemail($this->request->post('admin_email'))) {
+        if (!filter_var($this->request->post('admin_email'), FILTER_VALIDATE_EMAIL)) {
             $errors[] = 'invalid email';
         }
 

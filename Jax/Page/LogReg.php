@@ -120,7 +120,7 @@ final class LogReg
             ($badNameChars && preg_match($badNameChars, $name))
                 || $this->textFormatting->blockhtml($name) !== $name => 'Invalid characters in username!',
             $badNameChars && preg_match($badNameChars, $dispname) => 'Invalid characters in display name!',
-            !$this->jax->isemail($email) => "That isn't a valid email!",
+            !filter_var($email, FILTER_VALIDATE_EMAIL) => "That isn't a valid email!",
             $this->ipAddress->isBanned() => 'You have been banned from registering on this board.',
             !$this->isHuman() => 'reCAPTCHA failed. Are you a bot?',
             default => null,

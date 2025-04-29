@@ -86,16 +86,6 @@ final readonly class Jax
             . ($autodate ? '</span>' : '');
     }
 
-    public function isurl(string $url): false|int
-    {
-        return preg_match('@^https?://[\w\.\-%\&\?\=/]+$@', $url);
-    }
-
-    public function isemail(string $email): false|int
-    {
-        return preg_match('/[\w\+.]+@[\w.]+/', $email);
-    }
-
     public function parsereadmarkers(?string $readmarkers)
     {
         if ($readmarkers) {
