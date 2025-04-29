@@ -325,7 +325,7 @@ final class Inbox
         }
     }
 
-    private function flag(): void
+    private function flag(): null
     {
         $this->page->command('softurl');
         $this->database->safeupdate(
@@ -337,6 +337,7 @@ final class Inbox
             $this->database->basicvalue($this->request->both('flag')),
             $this->user->get('id'),
         );
+        return null;
     }
 
     private function updateNumMessages(): void
