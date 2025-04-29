@@ -80,8 +80,8 @@ final class IPAddress
 
         return array_any(
             $this->ipBanCache,
-            fn($bannedIp) => $bannedIp === $ipAddress
-                || in_array(mb_substr($bannedIp, -1), [':', '.'], true) && str_starts_with($ipAddress, $bannedIp)
+            static fn($bannedIp) => $bannedIp === $ipAddress
+                || in_array(mb_substr($bannedIp, -1), [':', '.'], true) && str_starts_with($ipAddress, $bannedIp),
         );
     }
 
