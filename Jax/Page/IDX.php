@@ -54,7 +54,7 @@ final class IDX
     public function render(): void
     {
         if ($this->request->both('markread') !== null) {
-            $this->page->JS('softurl');
+            $this->page->command('softurl');
             $this->session->set('forumsread', '{}');
             $this->session->set('topicsread', '{}');
             $this->session->set('read_date', time());
@@ -179,7 +179,7 @@ final class IDX
         $page .= $this->getBoardStats();
 
         if ($this->request->isJSNewLocation()) {
-            $this->page->JS('update', 'page', $page);
+            $this->page->command('update', 'page', $page);
         } else {
             $this->page->append('PAGE', $page);
         }
@@ -522,7 +522,7 @@ final class IDX
         }
 
         if (isset($oldcache) && $oldcache !== []) {
-            $this->page->JS('setoffline', implode(',', array_flip($oldcache)));
+            $this->page->command('setoffline', implode(',', array_flip($oldcache)));
         }
 
         $this->session->set('users_online_cache', mb_substr($useronlinecache, 0, -1));
@@ -530,7 +530,7 @@ final class IDX
             return;
         }
 
-        $this->page->JS('onlinelist', $list);
+        $this->page->command('onlinelist', $list);
     }
 
     private function updateLastPosts(): void
@@ -557,8 +557,8 @@ final class IDX
         );
 
         while ($forum = $this->database->arow($result)) {
-            $this->page->JS('addclass', '#fid_' . $forum['id'], 'unread');
-            $this->page->JS(
+            $this->page->command('addclass', '#fid_' . $forum['id'], 'unread');
+            $this->page->command(
                 'update',
                 '#fid_' . $forum['id'] . '_icon',
                 $this->jax->pick(
@@ -566,18 +566,18 @@ final class IDX
                     $this->page->meta('idx-icon-unread'),
                 ),
             );
-            $this->page->JS(
+            $this->page->command(
                 'update',
                 '#fid_' . $forum['id'] . '_lastpost',
                 $this->formatlastpost($forum),
                 '1',
             );
-            $this->page->JS(
+            $this->page->command(
                 'update',
                 '#fid_' . $forum['id'] . '_topics',
                 $this->page->meta('idx-topics-count', $forum['topics']),
             );
-            $this->page->JS(
+            $this->page->command(
                 'update',
                 '#fid_' . $forum['id'] . '_replies',
                 $this->page->meta('idx-replies-count', $forum['posts']),

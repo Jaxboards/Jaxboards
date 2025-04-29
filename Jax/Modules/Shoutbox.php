@@ -227,7 +227,7 @@ final class Shoutbox
                 $this->shoutlimit,
             );
             while ($shout = $this->database->arow($result)) {
-                $this->page->JS('addshout', $this->formatshout($shout));
+                $this->page->command('addshout', $this->formatshout($shout));
                 $last = $shout['id'];
             }
         }
@@ -317,7 +317,7 @@ final class Shoutbox
             'Shoutbox' . $pages,
             '<div class="sbhistory">' . $shouts . '</div>',
         );
-        $this->page->JS('update', 'page', $page);
+        $this->page->command('update', 'page', $page);
         $this->page->append('PAGE', $page);
     }
 
@@ -333,7 +333,7 @@ final class Shoutbox
             return $this->page->location('?');
         }
 
-        $this->page->JS('softurl');
+        $this->page->command('softurl');
         $this->database->safedelete(
             'shouts',
             'WHERE `id`=?',
@@ -359,7 +359,7 @@ final class Shoutbox
         };
 
         if ($error !== null) {
-            $this->page->JS('error', $error);
+            $this->page->command('error', $error);
             $this->page->append('SHOUTBOX', $this->page->error($error));
 
             return;

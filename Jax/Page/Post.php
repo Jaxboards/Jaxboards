@@ -183,7 +183,7 @@ final class Post
             $this->showpostform();
         }
 
-        $this->page->JS('update', 'post-preview', $post);
+        $this->page->command('update', 'post-preview', $post);
     }
 
     private function showtopicform(): void
@@ -346,17 +346,17 @@ final class Post
         }
 
         $this->page->append('PAGE', $page);
-        $this->page->JS('update', 'page', $page);
+        $this->page->command('update', 'page', $page);
 
         if ($error !== null) {
             return;
         }
 
         if ($forum['perms']['upload']) {
-            $this->page->JS('attachfiles');
+            $this->page->command('attachfiles');
         }
 
-        $this->page->JS('SCRIPT', "document.querySelector('#pollchoices').style.display='none'");
+        $this->page->command('SCRIPT', "document.querySelector('#pollchoices').style.display='none'");
     }
 
     private function showpostform(): void
@@ -368,7 +368,7 @@ final class Post
         }
 
         if (!$this->user->isGuest() && $this->how === 'qreply') {
-            $this->page->JS('closewindow', '#qreply');
+            $this->page->command('closewindow', '#qreply');
         }
 
         if ($tid) {
@@ -477,12 +477,12 @@ final class Post
 
         $page .= $this->page->meta('box', '', $tdata['title'] . ' &gt; Reply', $form);
         $this->page->append('PAGE', $page);
-        $this->page->JS('update', 'page', $page);
+        $this->page->command('update', 'page', $page);
         if (!$tdata['perms']['upload']) {
             return;
         }
 
-        $this->page->JS('attachfiles');
+        $this->page->command('attachfiles');
     }
 
     private function canedit($post): bool
@@ -637,7 +637,7 @@ final class Post
         }
 
         if ($error !== null) {
-            $this->page->JS('error', $error);
+            $this->page->command('error', $error);
             $this->page->append('PAGE', $this->page->error($error));
         }
 
@@ -657,12 +657,12 @@ final class Post
             'WHERE `id`=?',
             $this->database->basicvalue($pid),
         );
-        $this->page->JS(
+        $this->page->command(
             'update',
             "#pid_{$pid} .post_content",
             $this->textFormatting->theworks($this->postdata),
         );
-        $this->page->JS('softurl');
+        $this->page->command('softurl');
     }
 
     private function submitpost(): void
@@ -793,8 +793,8 @@ final class Post
 
         if ($error !== null) {
             $this->page->append('PAGE', $this->page->error($error));
-            $this->page->JS('error', $error);
-            $this->page->JS('enable', 'submitbutton');
+            $this->page->command('error', $error);
+            $this->page->command('enable', 'submitbutton');
             if ($this->how === 'newtopic') {
                 $this->showtopicform();
             } else {
@@ -830,7 +830,7 @@ final class Post
         if (!$fdata) {
             $error = "The topic you're trying to reply to does not exist.";
             $this->page->append('PAGE', $this->page->error($error));
-            $this->page->JS('error', $error);
+            $this->page->command('error', $error);
 
             return;
         }
@@ -843,7 +843,7 @@ final class Post
         ) {
             $error = "You don't have permission to post here.";
             $this->page->append('PAGE', $this->page->error($error));
-            $this->page->JS('error', $error);
+            $this->page->command('error', $error);
 
             return;
         }
@@ -978,8 +978,8 @@ final class Post
         }
 
         if ($this->how === 'qreply') {
-            $this->page->JS('closewindow', '#qreply');
-            $this->page->JS('refreshdata');
+            $this->page->command('closewindow', '#qreply');
+            $this->page->command('refreshdata');
         } else {
             $this->page->location('?act=vt' . $tid . '&getlast=1');
         }

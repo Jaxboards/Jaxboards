@@ -134,14 +134,14 @@ final class Forum
         $this->database->disposeresult($result);
 
         if (!$fdata) {
-            $this->page->JS('alert', $this->database->error());
+            $this->page->command('alert', $this->database->error());
             $this->page->location('?');
 
             return;
         }
 
         if ($fdata['redirect']) {
-            $this->page->JS('softurl');
+            $this->page->command('softurl');
             $this->database->safespecial(
                 <<<'SQL'
                     UPDATE %t
@@ -162,7 +162,7 @@ final class Forum
 
         $fdata['perms'] = $this->user->parseForumPerms($fdata['perms']);
         if (!$fdata['perms']['read']) {
-            $this->page->JS('alert', 'no permission');
+            $this->page->command('alert', 'no permission');
 
             $this->page->location('?');
 
@@ -460,7 +460,7 @@ final class Forum
         $path[$title] = "?act=vf{$fid}";
         $this->page->path($path);
         if ($this->request->isJSAccess()) {
-            $this->page->JS('update', 'page', $page);
+            $this->page->command('update', 'page', $page);
         } else {
             $this->page->append('PAGE', $page);
         }
@@ -489,8 +489,8 @@ final class Forum
             $page .= '<tr><td>' . $summary['name'] . '</td><td>' . $summary['replies'] . '</td></tr>';
         }
 
-        $this->page->JS('softurl');
-        $this->page->JS(
+        $this->page->command('softurl');
+        $this->page->command(
             'window',
             [
                 'content' => '<table>' . $page . '</table>',

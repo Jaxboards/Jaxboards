@@ -64,9 +64,9 @@ final readonly class BuddyList
 
     public function render(): void
     {
-        $this->page->JS('softurl');
+        $this->page->command('softurl');
         if ($this->user->isGuest()) {
-            $this->page->JS(
+            $this->page->command(
                 'error',
                 'Sorry, you must be logged in to use this feature.',
             );
@@ -95,7 +95,7 @@ final readonly class BuddyList
             return;
         }
 
-        $this->page->JS('softurl');
+        $this->page->command('softurl');
         $contacts = '';
         if ($this->user->get('friends')) {
             $online = $this->database->getUsersOnline();
@@ -149,7 +149,7 @@ final readonly class BuddyList
             );
         }
 
-        $this->page->JS(
+        $this->page->command(
             'window',
             [
                 'content' => $this->page->meta(
@@ -198,7 +198,7 @@ final readonly class BuddyList
 
         if ($error !== null) {
             $this->page->append('PAGE', $error);
-            $this->page->JS('error', $error);
+            $this->page->command('error', $error);
         } else {
             if ($friends) {
                 $friends .= ',' . $uid;
@@ -244,7 +244,7 @@ final readonly class BuddyList
         }
 
         if ($error !== null) {
-            $this->page->JS('error', $error);
+            $this->page->command('error', $error);
         } else {
             $enemies[] = $uid;
             $enemies = implode(',', $enemies);

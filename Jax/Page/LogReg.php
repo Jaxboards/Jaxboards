@@ -98,7 +98,7 @@ final class LogReg
         // Show registration form.
         if ($this->request->post('register') === null) {
             if (!$this->request->isJSUpdate()) {
-                $this->page->JS('update', 'page', $p);
+                $this->page->command('update', 'page', $p);
             }
 
             $this->page->append('PAGE', $p);
@@ -125,7 +125,7 @@ final class LogReg
         };
 
         if ($error !== null) {
-            $this->page->JS('alert', $error);
+            $this->page->command('alert', $error);
             $this->page->append('PAGE', $this->page->meta('error', $error));
 
             return;
@@ -151,7 +151,7 @@ final class LogReg
         };
 
         if ($error !== null) {
-            $this->page->JS('alert', $error);
+            $this->page->command('alert', $error);
             $this->page->append('PAGE', $this->page->meta('error', $error));
 
             return;
@@ -208,7 +208,7 @@ final class LogReg
 
             if ($user) {
                 if ($this->request->post('popup') !== null) {
-                    $this->page->JS('closewindow', '#loginform');
+                    $this->page->command('closewindow', '#loginform');
                 }
 
                 $this->session->setPHPSessionValue('uid', $user['id']);
@@ -234,9 +234,9 @@ final class LogReg
                 $this->session->act();
                 $perms = $this->user->getPerms($user['group_id']);
                 if ($this->registering) {
-                    $this->page->JS('location', '/');
+                    $this->page->command('location', '/');
                 } elseif ($this->request->isJSAccess()) {
-                    $this->page->JS('reload');
+                    $this->page->command('reload');
                 } else {
                     $this->page->location('?');
                 }
@@ -245,7 +245,7 @@ final class LogReg
                     'PAGE',
                     $this->page->meta('error', 'Incorrect username/password'),
                 );
-                $this->page->JS('error', 'Incorrect username/password');
+                $this->page->command('error', 'Incorrect username/password');
             }
 
             $this->session->erase('location');
@@ -273,8 +273,8 @@ final class LogReg
         session_unset();
         session_destroy();
         $this->page->reset('USERBOX', $this->page->meta('userbox-logged-out'));
-        $this->page->JS('update', 'userbox', $this->page->meta('userbox-logged-out'));
-        $this->page->JS('softurl');
+        $this->page->command('update', 'userbox', $this->page->meta('userbox-logged-out'));
+        $this->page->command('softurl');
         $this->page->append('PAGE', $this->page->meta('success', 'Logged out successfully'));
         if ($this->request->isJSAccess()) {
             return;
@@ -285,8 +285,8 @@ final class LogReg
 
     private function loginpopup(): void
     {
-        $this->page->JS('softurl');
-        $this->page->JS(
+        $this->page->command('softurl');
+        $this->page->command(
             'window',
             [
                 'content' => <<<'HTML'
@@ -325,8 +325,8 @@ final class LogReg
 
         $this->session->applyChanges();
 
-        $this->page->JS('setstatus', $this->session->get('hide') !== 0 ? 'invisible' : 'online');
-        $this->page->JS('softurl');
+        $this->page->command('setstatus', $this->session->get('hide') !== 0 ? 'invisible' : 'online');
+        $this->page->command('softurl');
     }
 
     private function forgotpassword(
@@ -494,7 +494,7 @@ final class LogReg
         }
 
         $this->page->append('PAGE', $page);
-        $this->page->JS('update', 'page', $page);
+        $this->page->command('update', 'page', $page);
     }
 
     private function isHuman(): bool

@@ -132,7 +132,7 @@ final class UCP
         ) {
             if (mb_strlen((string) $this->request->post('ucpnotepad')) > 2000) {
                 $error = 'The UCP notepad cannot exceed 2000 characters.';
-                $this->page->JS('error', $error);
+                $this->page->command('error', $error);
             } else {
                 $this->user->set('ucpnotepad', $this->request->post('ucpnotepad'));
             }
@@ -162,11 +162,11 @@ final class UCP
         }
 
         $page = $this->page->meta('ucp-wrapper', $page);
-        // $this->page->JS("window",Array("id"=>"ucpwin","title"=>"Settings","content"=>$page,"animate"=>false));
+        // $this->page->command("window",Array("id"=>"ucpwin","title"=>"Settings","content"=>$page,"animate"=>false));
         $this->page->append('PAGE', $page);
-        $this->page->JS('update', 'page', $page);
+        $this->page->command('update', 'page', $page);
         if ($this->runscript) {
-            $this->page->JS('script', $this->runscript);
+            $this->page->command('script', $this->runscript);
         }
 
         $this->shownucp = true;
@@ -194,14 +194,14 @@ final class UCP
             $this->user->setBulk($update);
 
             foreach ($fields as $field) {
-                $this->page->JS(
+                $this->page->command(
                     'script',
                     "window.globalsettings.{$field}="
                     . ($this->request->post($field) !== null ? 1 : 0),
                 );
             }
 
-            $this->page->JS('alert', 'Settings saved successfully.');
+            $this->page->command('alert', 'Settings saved successfully.');
 
             $this->ucppage = 'Settings saved successfully.';
         } elseif ($this->request->isJSUpdate()) {
@@ -290,7 +290,7 @@ final class UCP
             }
 
             $this->ucppage .= $this->page->meta('error', $error);
-            $this->page->JS('error', $error);
+            $this->page->command('error', $error);
         }
 
         $this->ucppage .= $this->page->meta(
@@ -312,7 +312,7 @@ final class UCP
             }
 
             if ($error !== null) {
-                $this->page->JS('alert', $error);
+                $this->page->command('alert', $error);
             } else {
                 $this->user->setBulk([
                     'email' => $this->request->post('email'),
@@ -576,7 +576,7 @@ final class UCP
             }
 
             $this->ucppage .= $this->page->meta('error', $error);
-            $this->page->JS('error', $error);
+            $this->page->command('error', $error);
         }
 
         $genderselect = '<select name="gender" title="Your gender" aria-label="Gender">';
@@ -691,7 +691,7 @@ final class UCP
 
             if ($error === null) {
                 if ($this->request->isJSAccess()) {
-                    $this->page->JS('reload');
+                    $this->page->command('reload');
 
                     return;
                 }
@@ -771,7 +771,7 @@ final class UCP
 
     private function flag(): void
     {
-        $this->page->JS('softurl');
+        $this->page->command('softurl');
         $this->database->safeupdate(
             'messages',
             [
@@ -873,7 +873,7 @@ final class UCP
         $this->database->disposeresult($result);
 
         $unread = array_pop($unread);
-        $this->page->JS('update', 'num-messages', $unread);
+        $this->page->command('update', 'num-messages', $unread);
     }
 
     private function viewmessages(string $view = 'inbox'): void
@@ -1013,7 +1013,7 @@ final class UCP
         );
 
         if ($view === 'inbox') {
-            $this->page->JS('update', 'num-messages', $unread);
+            $this->page->command('update', 'num-messages', $unread);
         }
 
         $this->showucp($page);
@@ -1065,7 +1065,7 @@ final class UCP
             }
 
             if ($error !== null) {
-                $this->page->JS('error', $error);
+                $this->page->command('error', $error);
                 $this->page->append('PAGE', $this->page->error($error));
             } else {
                 // Put it into the table.

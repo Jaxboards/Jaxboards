@@ -124,6 +124,6 @@ final class Calendar
         $page = $this->page->meta('box', '', 'Calendar', $page);
 
         $this->page->append('PAGE', $page);
-        $this->page->JS('update', 'page', $page);
+        $this->page->command('update', 'page', $page);
     }
 }

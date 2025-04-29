@@ -16,8 +16,8 @@ final readonly class Tardis
 
     public function render(): void
     {
-        $this->page->JS('softurl');
-        $this->page->JS('script', '(function() {
+        $this->page->command('softurl');
+        $this->page->command('script', '(function() {
             if (window.tardis) {
                 return;
             }
@@ -50,6 +50,6 @@ final readonly class Tardis
             }
             setInterval(window.tardis, 10);
         })()');
-        $this->page->JS('playsound', 'drwho', $this->domainDefinitions->getSoundsUrl() . '/doctorwhotheme.mp3');
+        $this->page->command('playsound', 'drwho', $this->domainDefinitions->getSoundsUrl() . '/doctorwhotheme.mp3');
     }
 }

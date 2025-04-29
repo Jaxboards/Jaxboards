@@ -92,7 +92,7 @@ final class Ticker
         $this->session->addVar('tickid', $first);
         $page = $this->page->meta('ticker', $ticks);
         $this->page->append('PAGE', $page);
-        $this->page->JS('update', 'page', $page);
+        $this->page->command('update', 'page', $page);
     }
 
     private function update(): void
@@ -143,7 +143,7 @@ final class Ticker
                 $first = $f['id'];
             }
 
-            $this->page->JS('tick', $this->renderTick($f));
+            $this->page->command('tick', $this->renderTick($f));
         }
 
         if (!$first) {

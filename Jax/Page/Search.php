@@ -89,7 +89,7 @@ final class Search
             $this->getForumSelection(),
             $pageContents,
         );
-        $this->page->JS('update', 'page', $page);
+        $this->page->command('update', 'page', $page);
         $this->page->append('PAGE', $page);
     }
 
@@ -445,7 +445,7 @@ final class Search
             $this->request->isJSAccess()
             && !$this->request->isJSDirectLink()
         ) {
-            $this->page->JS('update', 'searchresults', $page);
+            $this->page->command('update', 'searchresults', $page);
         } else {
             $this->form($page);
         }

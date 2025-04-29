@@ -79,7 +79,7 @@ final class App
 
         // Process temporary commands.
         if ($this->request->isJSAccess() && $this->session->get('runonce')) {
-            $this->page->JSRaw($this->session->get('runonce'));
+            $this->page->commandsFromString($this->session->get('runonce'));
             $this->session->set('runonce', '');
         }
 
@@ -183,11 +183,11 @@ final class App
         if ($this->request->both('skin_id') !== null) {
             if (!$this->request->both('skin_id')) {
                 $this->session->deleteVar('skin_id');
-                $this->page->JS('reload');
+                $this->page->command('reload');
             } else {
                 $this->session->addVar('skin_id', $this->request->both('skin_id'));
                 if ($this->request->isJSAccess()) {
-                    $this->page->JS('reload');
+                    $this->page->command('reload');
                 }
             }
         }
@@ -322,7 +322,7 @@ final class App
         $debug = '';
 
         $debug .= $this->page->debug() . '<br>' . $this->database->debug();
-        $this->page->JS('update', '#query .content', $debug);
+        $this->page->command('update', '#query .content', $debug);
         $this->page->append(
             'FOOTER',
             $this->page->collapseBox(
@@ -331,7 +331,7 @@ final class App
                 'query',
             ) . "<div id='debug2'></div><div id='pagegen'></div>",
         );
-        $this->page->JS(
+        $this->page->command(
             'update',
             'pagegen',
             $pagegen = 'Page Generated in '

@@ -88,13 +88,13 @@ final class TextFormatting
             if ($rule['type'] === 'emote') {
                 $this->emotes[$rule['needle']] = $rule['replacement'];
 
-                break;
+                continue;
             }
 
             if ($rule['type'] === 'badword') {
                 $this->badwords[$rule['needle']] = $rule['replacement'];
 
-                break;
+                continue;
             }
         }
     }

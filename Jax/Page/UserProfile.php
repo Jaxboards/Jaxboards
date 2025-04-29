@@ -122,8 +122,8 @@ final class UserProfile
             ) . '">&nbsp;</a>';
         }
 
-        $this->page->JS('softurl');
-        $this->page->JS(
+        $this->page->command('softurl');
+        $this->page->command(
             'window',
             [
                 'animate' => false,
@@ -239,7 +239,7 @@ final class UserProfile
 
         if (!$user || $nouser) {
             $error = $this->page->meta('error', "Sorry, this user doesn't exist.");
-            $this->page->JS('update', 'page', $error);
+            $this->page->command('update', 'page', $error);
             $this->page->append('PAGE', $error);
 
             return;
@@ -432,7 +432,7 @@ final class UserProfile
                     }
 
                     if ($error !== null) {
-                        $this->page->JS('error', $error);
+                        $this->page->command('error', $error);
                         $pfbox .= $this->page->meta('error', $error);
                     }
                 }
@@ -582,7 +582,7 @@ final class UserProfile
             && $this->request->isJSAccess()
             && !$this->request->isJSDirectLink()
         ) {
-            $this->page->JS('update', 'pfbox', $pfbox);
+            $this->page->command('update', 'pfbox', $pfbox);
         } else {
             $this->page->path(
                 [
@@ -662,7 +662,7 @@ final class UserProfile
                 ? '<a class="moderate" href="?act=modcontrols&do=emem&mid='
                 . $user['id'] . '">Edit</a>' : '',
             );
-            $this->page->JS('update', 'page', $page);
+            $this->page->command('update', 'page', $page);
             $this->page->append('PAGE', $page);
 
             $this->session->set('location_verbose', 'Viewing ' . $user['display_name'] . "'s profile");

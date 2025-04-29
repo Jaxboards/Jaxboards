@@ -12,7 +12,7 @@ final readonly class Katamari
 
     public function render(): void
     {
-        $this->page->JS('loadscript', './Script/katamari.js');
-        $this->page->JS('softurl');
+        $this->page->command('loadscript', './Script/katamari.js');
+        $this->page->command('softurl');
     }
 }

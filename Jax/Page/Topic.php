@@ -383,15 +383,15 @@ final class Topic
         );
 
         if ($this->request->isJSAccess()) {
-            $this->page->JS('update', 'page', $page);
+            $this->page->command('update', 'page', $page);
             if ($this->request->both('pid') !== null) {
-                $this->page->JS('scrollToPost', $this->request->both('pid'));
+                $this->page->command('scrollToPost', $this->request->both('pid'));
 
                 return;
             }
 
             if ($this->request->both('page') !== null) {
-                $this->page->JS('scrollToPost', $this->firstPostID, 1);
+                $this->page->command('scrollToPost', $this->firstPostID, 1);
 
                 return;
             }
@@ -416,7 +416,7 @@ final class Topic
         ) {
             $newposts = $this->postsintooutput($this->session->getVar('topic_lastpid'));
             if ($newposts !== '' && $newposts !== '0') {
-                $this->page->JS('appendrows', '#intopic', $newposts);
+                $this->page->command('appendrows', '#intopic', $newposts);
             }
         }
 
@@ -456,13 +456,13 @@ final class Topic
         }
 
         if ($list !== []) {
-            $this->page->JS('onlinelist', $list);
+            $this->page->command('onlinelist', $list);
         }
 
         $oldcache = implode(',', array_flip($oldcache));
         $newcache = implode(',', $newcache);
         if ($oldcache !== '' && $oldcache !== '0') {
-            $this->page->JS('setoffline', $oldcache);
+            $this->page->command('setoffline', $oldcache);
         }
 
         $this->session->set('users_online_cache', $newcache);
@@ -471,7 +471,7 @@ final class Topic
     private function qreplyform($tid): void
     {
         $prefilled = '';
-        $this->page->JS('softurl');
+        $this->page->command('softurl');
         if (
             $this->session->getVar('multiquote')
         ) {
@@ -505,7 +505,7 @@ final class Topic
         $tdata = $this->database->arow($result);
         $this->database->disposeresult($result);
 
-        $this->page->JS(
+        $this->page->command(
             'window',
             [
                 'content' => $this->page->meta(
@@ -518,7 +518,7 @@ final class Topic
                 'title' => $this->textFormatting->wordfilter($tdata['title']),
             ],
         );
-        $this->page->JS('updateqreply', '');
+        $this->page->command('updateqreply', '');
     }
 
     private function postsintooutput($lastpid = 0): string
@@ -1020,7 +1020,7 @@ final class Topic
         }
 
         if ($error !== null) {
-            $this->page->JS('error', $error);
+            $this->page->command('error', $error);
 
             return;
         }
@@ -1040,7 +1040,7 @@ final class Topic
         }
 
         $presults = implode(';', $presults);
-        $this->page->JS(
+        $this->page->command(
             'update',
             '#poll .content',
             $this->generatePoll(
@@ -1065,7 +1065,7 @@ final class Topic
         array|string $postid,
         null|array|string $nibletid,
     ): void {
-        $this->page->JS('softurl');
+        $this->page->command('softurl');
         if (!is_numeric($postid) || !is_numeric($nibletid)) {
             return;
         }
@@ -1090,7 +1090,7 @@ final class Topic
         };
 
         if ($error !== null) {
-            $this->page->JS('error', $error);
+            $this->page->command('error', $error);
 
             return;
         }
@@ -1121,7 +1121,7 @@ final class Topic
             'WHERE `id`=?',
             $this->database->basicvalue($postid),
         );
-        $this->page->JS('alert', $unrate ? 'Unrated!' : 'Rated!');
+        $this->page->command('alert', $unrate ? 'Unrated!' : 'Rated!');
     }
 
     private function qeditpost(array|string $pid): void
@@ -1134,7 +1134,7 @@ final class Topic
             $this->page->location('?act=post&pid=' . $pid);
         }
 
-        $this->page->JS('softurl');
+        $this->page->command('softurl');
         $result = $this->database->safeselect(
             [
                 'auth_id',
@@ -1162,13 +1162,13 @@ final class Topic
         }
 
         if (!$post) {
-            $this->page->JS('alert', 'Post not found!');
+            $this->page->command('alert', 'Post not found!');
 
             return;
         }
 
         if (!$this->canedit($post)) {
-            $this->page->JS('alert', "You don't have permission to edit this post.");
+            $this->page->command('alert', "You don't have permission to edit this post.");
 
             return;
         }
@@ -1207,7 +1207,7 @@ final class Topic
             );
         }
 
-        $this->page->JS('update', "#pid_{$pid} .post_content", $form);
+        $this->page->command('update', "#pid_{$pid} .post_content", $form);
     }
 
     private function multiquote($tid): void
@@ -1234,14 +1234,14 @@ final class Topic
 
         if (!$post) {
             $error = "That post doesn't exist!";
-            $this->page->JS('alert', $error);
+            $this->page->command('alert', $error);
             $this->page->append('PAGE', $this->page->meta('error', $error));
 
             return;
         }
 
         if ($this->request->both('qreply')) {
-            $this->page->JS(
+            $this->page->command(
                 'updateqreply',
                 '[quote=' . $post['name'] . ']' . $post['post'] . '[/quote]'
                 . PHP_EOL . PHP_EOL,
@@ -1266,7 +1266,7 @@ final class Topic
             }
         }
 
-        $this->page->JS('softurl');
+        $this->page->command('softurl');
     }
 
     private function getlastpost($tid): void
@@ -1280,7 +1280,7 @@ final class Topic
         $f = $this->database->arow($result);
         $this->database->disposeresult($result);
 
-        $this->page->JS('softurl');
+        $this->page->command('softurl');
         $this->page->location(
             "?act=vt{$tid}&page=" . ceil($f['numposts'] / $this->numperpage)
             . '&pid=' . $f['lastpid'] . '#pid_' . $f['lastpid'],
@@ -1322,9 +1322,9 @@ final class Topic
             }
         }
 
-        $this->page->JS('softurl');
+        $this->page->command('softurl');
         if ($couldntfindit) {
-            $this->page->JS('alert', "that post doesn't exist");
+            $this->page->command('alert', "that post doesn't exist");
 
             return;
         }
@@ -1349,7 +1349,7 @@ final class Topic
             return;
         }
 
-        $this->page->JS('softurl');
+        $this->page->command('softurl');
         $result = $this->database->safeselect(
             ['rating'],
             'posts',
@@ -1370,7 +1370,7 @@ final class Topic
         }
 
         if ($members === []) {
-            $this->page->JS('alert', 'This post has no ratings yet!');
+            $this->page->command('alert', 'This post has no ratings yet!');
 
             return;
         }
@@ -1409,7 +1409,7 @@ final class Topic
             $page .= '</ul></div>';
         }
 
-        $this->page->JS('listrating', $pid, $page);
+        $this->page->command('listrating', $pid, $page);
     }
 
     /**

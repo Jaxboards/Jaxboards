@@ -65,8 +65,8 @@ final class ModControls
     {
         $this->perms = $this->user->getPerms();
         if (!$this->perms['can_moderate'] && !$this->user->get('mod')) {
-            $this->page->JS('softurl');
-            $this->page->JS(
+            $this->page->command('softurl');
+            $this->page->command(
                 'alert',
                 'Your account does not have moderator permissions.',
             );
@@ -144,15 +144,15 @@ final class ModControls
             exit(0);
         }
 
-        $this->page->JS('softurl');
-        $this->page->JS('script', $script);
+        $this->page->command('softurl');
+        $this->page->command('script', $script);
     }
 
     private function dotopics(array|string $do): void
     {
         switch ($do) {
             case 'move':
-                $this->page->JS('modcontrols_move', 0);
+                $this->page->command('modcontrols_move', 0);
 
                 break;
 
@@ -229,7 +229,7 @@ final class ModControls
                     'WHERE `id` IN ?',
                     explode(',', (string) $this->session->getVar('modtids')),
                 );
-                $this->page->JS(
+                $this->page->command(
                     'alert',
                     'topics pinned!',
                 );
@@ -246,7 +246,7 @@ final class ModControls
                     'WHERE `id` IN ?',
                     explode(',', (string) $this->session->getVar('modtids')),
                 );
-                $this->page->JS(
+                $this->page->command(
                     'alert',
                     'topics unpinned!',
                 );
@@ -263,7 +263,7 @@ final class ModControls
                     'WHERE `id` IN ?',
                     explode(',', (string) $this->session->getVar('modtids')),
                 );
-                $this->page->JS(
+                $this->page->command(
                     'alert',
                     'topics locked!',
                 );
@@ -280,7 +280,7 @@ final class ModControls
                     'WHERE `id` IN ?',
                     explode(',', (string) $this->session->getVar('modtids')),
                 );
-                $this->page->JS('alert', 'topics unlocked!');
+                $this->page->command('alert', 'topics unlocked!');
                 $this->cancel();
 
                 break;
@@ -304,7 +304,7 @@ final class ModControls
     {
         switch ($do) {
             case 'move':
-                $this->page->JS('modcontrols_move', 1);
+                $this->page->command('modcontrols_move', 1);
 
                 break;
 
@@ -337,7 +337,7 @@ final class ModControls
         $this->session->deleteVar('modpids');
         $this->session->deleteVar('modtids');
         $this->sync();
-        $this->page->JS('modcontrols_clearbox');
+        $this->page->command('modcontrols_clearbox');
     }
 
     private function modpost(null|array|string $pid): void
@@ -370,7 +370,7 @@ final class ModControls
             return;
         }
 
-        $this->page->JS('softurl');
+        $this->page->command('softurl');
 
         // See if they have permission to manipulate this post.
         if (!$this->perms['can_moderate']) {
@@ -398,7 +398,7 @@ final class ModControls
 
             $mods = explode(',', (string) $mods['mods']);
             if (!in_array($this->user->get('id'), $mods)) {
-                $this->page->JS(
+                $this->page->command(
                     'error',
                     "You don't have permission to be moderating in this forum",
                 );
@@ -430,7 +430,7 @@ final class ModControls
 
     private function modtopic($tid): void
     {
-        $this->page->JS('softurl');
+        $this->page->command('softurl');
         if (!is_numeric($tid)) {
             return;
         }
@@ -455,14 +455,14 @@ final class ModControls
             $this->database->disposeresult($result);
 
             if (!$mods) {
-                $this->page->JS('error', $this->database->error());
+                $this->page->command('error', $this->database->error());
 
                 return;
             }
 
             $mods = explode(',', (string) $mods['mods']);
             if (!in_array($this->user->get('id'), $mods)) {
-                $this->page->JS(
+                $this->page->command(
                     'error',
                     "You don't have permission to be moderating in this forum",
                 );
@@ -494,7 +494,7 @@ final class ModControls
 
     private function sync(): void
     {
-        $this->page->JS(
+        $this->page->command(
             'modcontrols_postsync',
             $this->session->getVar('modpids') ?? '',
             $this->session->getVar('modtids') ?? '',
@@ -506,7 +506,7 @@ final class ModControls
         if (
             !$this->session->getVar('modpids')
         ) {
-            return $this->page->JS('error', 'No posts to delete.');
+            return $this->page->command('error', 'No posts to delete.');
         }
 
         // Get trashcan.
@@ -653,7 +653,7 @@ final class ModControls
 
         // Remove them from the page.
         foreach ($pids as $postId) {
-            $this->page->JS('removeel', '#pid_' . $postId);
+            $this->page->command('removeel', '#pid_' . $postId);
         }
 
         return null;
@@ -662,7 +662,7 @@ final class ModControls
     private function deletetopics(): void
     {
         if (!$this->session->getVar('modtids')) {
-            $this->page->JS('error', 'No topics to delete');
+            $this->page->command('error', 'No topics to delete');
 
             return;
         }
@@ -736,8 +736,8 @@ final class ModControls
         }
 
         $this->session->deleteVar('modtids');
-        $this->page->JS('modcontrols_clearbox');
-        $this->page->JS('alert', 'topics deleted!');
+        $this->page->command('modcontrols_clearbox');
+        $this->page->command('alert', 'topics deleted!');
     }
 
     private function mergetopics(): void
@@ -836,7 +836,7 @@ final class ModControls
 
         $page .= '<input type="submit" value="Merge" /></form>';
         $page = $this->page->collapseBox('Merging Topics', $page);
-        $this->page->JS('update', 'page', $page);
+        $this->page->command('update', 'page', $page);
         $this->page->append('PAGE', $page);
     }
 
@@ -850,7 +850,7 @@ final class ModControls
         $page = $this->page->meta('box', ' id="modcp"', 'Mod CP', $page);
 
         $this->page->append('PAGE', $page);
-        $this->page->JS('update', 'page', $page);
+        $this->page->command('update', 'page', $page);
     }
 
     private function editmembers(): void

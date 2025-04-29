@@ -94,22 +94,30 @@ final class Page
     private array $debuginfo = [];
 
     /**
+     * These are sent when the browser requests updates through javascript.
+     * They're parsed and executed in the client side javascript.
+     *
      * @var array<array<mixed>>
      */
-    private array $javascriptCommands = [];
-
+    private array $commands = [];
 
     /**
+     * Stores the major page components, for example <!--PAGE-->
+     * Please keep the array keys as uppercase for consistency and
+     * easy grepping
      * @var array<string,string>
      */
     private array $parts = [];
 
     /**
+     * Stores page variables, like <%ismod%>
+     *
      * @var array<string,string>
      */
     private array $vars = [];
 
     /**
+     * These are custom meta definitions parsed from M tags in the board template
      * @var array<string,string>
      */
     private array $userMetaDefs = [];
@@ -129,6 +137,8 @@ final class Page
     private string $template;
 
     /**
+     * Array of component directories to load.
+     * Any component directory added to the queue will have all of its HTML files loaded.
      * @var array<string>
      */
     private array $metaqueue;
@@ -177,7 +187,7 @@ final class Page
         }
 
         if ($this->request->isJSAccess()) {
-            $this->JS('location', $newLocation);
+            $this->command('location', $newLocation);
 
             return;
         }
@@ -190,7 +200,7 @@ final class Page
         $this->parts[$part] = $content;
     }
 
-    public function JS(...$args): void
+    public function command(...$args): void
     {
         if ($args[0] === 'softurl') {
             $this->session->erase('location');
@@ -200,7 +210,7 @@ final class Page
             return;
         }
 
-        $this->javascriptCommands[] = $args;
+        $this->commands[] = $args;
     }
 
     /**
@@ -208,7 +218,7 @@ final class Page
      * Since they're stored as text, this expands it back out and adds it to
      * the page output.
      */
-    public function JSRaw(string $script): void
+    public function commandsFromString(string $script): void
     {
         foreach (explode(PHP_EOL, $script) as $line) {
             $decoded = json_decode($line);
@@ -217,44 +227,29 @@ final class Page
             }
 
             if (is_array($decoded[0])) {
-                $this->javascriptCommands = array_merge($this->javascriptCommands, $decoded);
+                $this->commands = array_merge($this->commands, $decoded);
 
                 continue;
             }
 
-            $this->javascriptCommands[] = $decoded;
+            $this->commands[] = $decoded;
         }
-    }
-
-    public function JSRawArray(array $command): void
-    {
-        $this->javascriptCommands[] = $command;
     }
 
     public function out(): void
     {
-        $this->parts['path']
-            = "<div id='path' class='path'>" . $this->buildPath() . '</div>';
-
         if ($this->request->isJSAccess()) {
             $this->outputJavascriptCommands();
 
             return;
         }
 
-        $autoBox = ['PAGE', 'COPYRIGHT', 'USERBOX'];
+        $this->append('path', $this->buildPath());
+
         foreach ($this->parts as $part => $contents) {
-            $part = mb_strtoupper((string) $part);
-            if (in_array($part, $autoBox)) {
-                $contents = '<div id="' . mb_strtolower($part) . '">' . $contents . '</div>';
-            }
+            $contents = '<div id="' . mb_strtolower($part) . '">' . $contents . '</div>';
 
-            if ($part === 'PATH') {
-                $this->template
-                    = preg_replace('@<!--PATH-->@', (string) $contents, (string) $this->template, 1);
-            }
-
-            $this->template = str_replace('<!--' . $part . '-->', $contents, $this->template);
+            $this->template = str_replace("<!--{$part}-->", $contents, $this->template);
         }
 
         $this->template = $this->filtervars($this->template);
@@ -383,10 +378,7 @@ final class Page
             throw new Exception($meta . ' has too many arguments');
         }
 
-        if (
-            isset($this->moreFormatting[$meta])
-            && $this->moreFormatting[$meta]
-        ) {
+        if (array_key_exists($meta, $this->moreFormatting)) {
             return $this->metaExtended($formatted);
         }
 
@@ -423,11 +415,11 @@ final class Page
 
         // Update browser title and breadcrumbs when changing location
         if ($this->request->isJSNewLocation()) {
-            $this->JS('title', htmlspecialchars_decode((string) $this->parts['TITLE'], ENT_QUOTES));
-            $this->JS('update', 'path', $this->buildpath());
+            $this->command('title', htmlspecialchars_decode((string) $this->parts['TITLE'], ENT_QUOTES));
+            $this->command('update', 'path', $this->buildpath());
         }
 
-        echo json_encode($this->javascriptCommands);
+        echo json_encode($this->commands);
     }
 
     private function loadTemplate(string $file): void
@@ -448,43 +440,53 @@ final class Page
         return '';
     }
 
+    /**
+     * Loads any components requested so far.
+     */
     private function processQueue(string $process): void
     {
         while ($componentDir = array_pop($this->metaqueue)) {
-            $component = pathinfo((string) $componentDir, PATHINFO_BASENAME);
-            $this->debug("{$process} triggered {$component} to load");
-            $meta = [];
-            foreach (glob($componentDir . '/*.html') as $metaFile) {
-                $metaName = (string) pathinfo($metaFile, PATHINFO_FILENAME);
-                $metaContent = file_get_contents($metaFile);
-                if (!$metaContent) {
-                    continue;
-                }
-                $this->checkExtended($metaContent, $metaName);
-                $meta[$metaName] = $metaContent;
-            }
-
-            // Check default components for anything missing.
             $defaultComponentDir = str_replace(
                 $this->themePath,
                 $this->domainDefinitions->getDefaultThemePath(),
                 $componentDir,
             );
-            if ($defaultComponentDir !== $componentDir) {
-                foreach (glob($defaultComponentDir . '/*.html') as $metaFile) {
-                    $metaName = (string) pathinfo($metaFile, PATHINFO_FILENAME);
-                    $metaContent = file_get_contents($metaFile);
-                    $this->checkExtended($metaContent, $metaName);
-                    if (isset($meta[$metaName]) || !is_string($metaContent)) {
-                        continue;
-                    }
 
-                    $meta[$metaName] = $metaContent;
-                }
+            $component = pathinfo($componentDir, PATHINFO_BASENAME);
+            $this->debug("{$process} triggered {$component} to load");
+
+
+            $metaDefs = array_merge(
+                // Load default templates for component first
+                $this->loadComponentTemplates($defaultComponentDir),
+
+                // Then override with any overrides from the theme
+                $this->loadComponentTemplates($componentDir)
+            );
+
+            $this->metaDefs = array_merge($metaDefs, $this->metaDefs);
+        }
+    }
+
+    /**
+     * Given a component directory, loads all of the HTML views in it.
+     * @return array<string,string> Map of metaName => view HTML
+     */
+    private function loadComponentTemplates($componentDir): array
+    {
+        return array_reduce(glob($componentDir . '/*.html'), function($meta, $metaFile) {
+            $metaName = (string) pathinfo($metaFile, PATHINFO_FILENAME);
+            $metaContent = file_get_contents($metaFile);
+
+            if (!is_string($metaContent)) {
+                return $meta;
             }
 
-            $this->metaDefs = array_merge($meta, $this->metaDefs);
-        }
+            $this->checkExtended($metaContent, $metaName);
+            $meta[$metaName] = $metaContent;
+
+            return $meta;
+        }, []);
     }
 
     private function metaExtended(string $content): string

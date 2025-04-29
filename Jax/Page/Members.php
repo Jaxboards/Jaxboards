@@ -211,7 +211,7 @@ final class Members
             )
             . "<div class='pages pages-bottom'>{$pages}</div>"
             . "<div class='clear'></div>";
-        $this->page->JS('update', 'page', $page);
+        $this->page->command('update', 'page', $page);
         $this->page->append('PAGE', $page);
     }
 }

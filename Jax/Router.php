@@ -120,7 +120,7 @@ final class Router
             $pageContents = $bbCode->toHTML($page['page']);
             $this->page->append('PAGE', $pageContents);
             if ($this->request->isJSNewLocation()) {
-                $this->page->JS('update', 'page', $pageContents);
+                $this->page->command('update', 'page', $pageContents);
             }
 
             return;

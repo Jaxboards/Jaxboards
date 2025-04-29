@@ -58,25 +58,20 @@ final readonly class PrivateMessage
         }
 
         $enemies = explode(',', (string) $enemies);
-        // Kinda gross I know, unparses then parses then
-        // unparses again later on.. Oh well.
-        $exploded = explode(PHP_EOL, (string) $this->session->get('runonce'));
-        foreach ($exploded as $k => $v) {
-            $v = json_decode($v);
-            if ($v[0] !== 'im') {
+        $commands = explode(PHP_EOL, (string) $this->session->get('runonce'));
+        foreach ($commands as $index => $command) {
+            $command = json_decode($command);
+            if ($command[0] !== 'im') {
                 continue;
             }
 
-            unset($exploded[$k]);
-            if (in_array($v[1], $enemies)) {
-                // This user's blocked, don't do anything.
-            } else {
-                // Send it on up.
-                $this->page->JSRawArray($v);
+            unset($commands[$index]);
+            if (!in_array($command[1], $enemies)) {
+                $this->page->command(...$command);
             }
         }
 
-        $this->session->set('runonce', implode(PHP_EOL, $exploded));
+        $this->session->set('runonce', implode(PHP_EOL, $commands));
     }
 
     public function message($uid, $instantMessage)
@@ -86,15 +81,15 @@ final readonly class PrivateMessage
         $fatal = false;
 
         if ($this->user->isGuest()) {
-            return $this->page->JS('error', 'You must be logged in to instant message!');
+            return $this->page->command('error', 'You must be logged in to instant message!');
         }
 
         if (!$uid) {
-            return $this->page->JS('error', 'You must have a recipient!');
+            return $this->page->command('error', 'You must have a recipient!');
         }
 
         if (!$this->user->getPerm('can_im')) {
-            return $this->page->JS(
+            return $this->page->command(
                 'error',
                 "You don't have permission to use this feature.",
             );
@@ -111,7 +106,7 @@ final readonly class PrivateMessage
             $this->user->get('id'),
             time(),
         ];
-        $this->page->JSRawArray($cmd);
+        $this->page->command(...$cmd);
         $cmd[1] = $this->user->get('id');
         $cmd[4] = 0;
         $onlineusers = $this->database->getUsersOnline();
@@ -123,11 +118,11 @@ final readonly class PrivateMessage
             || $onlineusers[$uid]['last_update'] < $logoutTime
             || $onlineusers[$uid]['last_update'] < $updateTime
         ) {
-            $this->page->JS('imtoggleoffline', $uid);
+            $this->page->command('imtoggleoffline', $uid);
         }
 
         if (!$this->sendcmd($cmd, $uid)) {
-            $this->page->JS('imtoggleoffline', $uid);
+            $this->page->command('imtoggleoffline', $uid);
         }
 
         return !$error && !$fatal;

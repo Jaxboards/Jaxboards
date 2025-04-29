@@ -12,7 +12,7 @@ final readonly class Asteroids
 
     public function render(): void
     {
-        $this->page->JS('loadscript', './Script/asteroids.min.js');
-        $this->page->JS('softurl');
+        $this->page->command('loadscript', './Script/asteroids.min.js');
+        $this->page->command('softurl');
     }
 }
