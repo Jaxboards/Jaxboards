@@ -61,7 +61,7 @@ final readonly class Settings
                 default => null,
             };
 
-            if ($error !== null) {
+            if ($error === null) {
                 $this->config->write([
                     'boardname' => $this->request->post('boardname'),
                     'logourl' => $this->request->post('logourl'),
@@ -74,6 +74,9 @@ final readonly class Settings
                 ? $this->page->error($error)
                 : $this->page->success('Settings saved!');
         }
+
+        // This is silly, but we need the whole page to be a form
+        $this->page->append('content', '<form method="post">');
 
         $this->page->addContentBox('Board Online/Offline', $status . $this->page->parseTemplate(
             'settings/boardname-board-offline.html',
@@ -93,6 +96,9 @@ final readonly class Settings
                 'logo_url' => $this->config->getSetting('logourl'),
             ],
         ));
+
+        $this->page->append('content', '</form>');
+
     }
 
     // Custom pages.
