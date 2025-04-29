@@ -1,10 +1,38 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax;
 
 use InvalidArgumentException;
 
-class Template {
+use function array_key_exists;
+use function array_keys;
+use function array_merge;
+use function array_pop;
+use function array_reduce;
+use function array_values;
+use function explode;
+use function file_get_contents;
+use function glob;
+use function in_array;
+use function is_array;
+use function is_dir;
+use function is_string;
+use function mb_strpos;
+use function mb_strtolower;
+use function pathinfo;
+use function preg_match;
+use function preg_replace_callback;
+use function str_contains;
+use function str_replace;
+use function vsprintf;
+
+use const PATHINFO_BASENAME;
+use const PATHINFO_FILENAME;
+
+final class Template
+{
     /**
      * @var array<string, string>
      */
@@ -53,8 +81,7 @@ class Template {
     public function __construct(
         private readonly DebugLog $debugLog,
         private readonly DomainDefinitions $domainDefinitions,
-    ) {
-    }
+    ) {}
 
     public function addMeta(string $meta, string $content): void
     {
@@ -162,7 +189,8 @@ class Template {
         return $html;
     }
 
-    public function setThemePath(string $themePath) {
+    public function setThemePath(string $themePath): void
+    {
         $this->themePath = $themePath;
     }
 

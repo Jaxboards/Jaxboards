@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use Exception;
-
 use function array_merge;
 use function explode;
 use function header;
 use function headers_sent;
 use function implode;
-use function in_array;
 use function is_array;
 use function is_dir;
 use function json_decode;
@@ -261,7 +258,8 @@ final class Page
         $this->template->reset('TITLE', $this->getPageTitle());
     }
 
-    public function getPageTitle() {
+    public function getPageTitle()
+    {
         return (
             $this->template->meta('title')
             ?: $this->config->getSetting('boardname')

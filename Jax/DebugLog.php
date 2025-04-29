@@ -1,21 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax;
 
-class DebugLog {
+final class DebugLog
+{
     /**
      * @var array<string>
      */
     private array $lines;
 
-    function log(string $content) {
+    public function log(string $content): void
+    {
         $this->lines[] = $content;
     }
 
     /**
      * @return array<string>
      */
-    function getLog(): array
+    public function getLog(): array
     {
         return $this->lines;
     }
