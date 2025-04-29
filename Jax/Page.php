@@ -158,7 +158,7 @@ final class Page
                         as="style"
                         type="text/css"
                         href="./Service/wysiwyg.css"
-                        onload="this.onload=null;this.rel=\\'stylesheet\\'"
+                        onload="this.onload=null;this.rel='stylesheet'"
                     >
                 HTML,
         );
