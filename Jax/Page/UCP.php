@@ -295,20 +295,20 @@ final class UCP
                         title="Enter your new email address"
                         value="{$this->user->get('email')}" />
                     HTML,
-                !!$email => <<<HTML
+                (bool) $email => <<<HTML
                     <strong>{$email}</strong>
                     <a href='?act=ucp&what=email&change=1'>Change</a>
                     <input type='hidden' name='email' value='{$email}' />
                     HTML,
 
-                default => '--none--'
+                default => '--none--',
             },
             <<<HTML
-                <input type="checkbox" title="Notifications" name="notifications" $notificationsChecked>
+                <input type="checkbox" title="Notifications" name="notifications" {$notificationsChecked}>
                 HTML,
             <<<HTML
-                <input type="checkbox" title="Admin Emails" name="adminemails" $adminEmailsChecked>
-                HTML
+                <input type="checkbox" title="Admin Emails" name="adminemails" {$adminEmailsChecked}>
+                HTML,
         );
     }
 
@@ -538,7 +538,9 @@ final class UCP
 
         $genderselect = '<select name="gender" title="Your gender" aria-label="Gender">';
         foreach (['', 'male', 'female', 'other'] as $gender) {
-            $genderSelected = $this->user->get('gender') === $gender ? 'selected' : '';
+            $genderSelected = $this->user->get('gender') === $gender
+                ? 'selected'
+                : '';
             $genderDisplay = ucfirst($gender) ?: 'Not telling';
             $genderselect .= <<<HTML
                 <option value="{$gender}" {$genderSelected}>{$genderDisplay}</option>
