@@ -98,7 +98,6 @@ final readonly class Settings
         ));
 
         $this->page->append('content', '</form>');
-
     }
 
     // Custom pages.
