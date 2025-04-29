@@ -93,7 +93,7 @@ final class Page
     private array $debuginfo = [];
 
     /**
-     * @var array<string>
+     * @var array<array<mixed>>
      */
     private array $javascriptCommands = [];
 
@@ -278,6 +278,11 @@ final class Page
         return $this->meta('error', $error);
     }
 
+    public function templateHas(string $part): false|int
+    {
+        return preg_match("/<!--{$part}-->/i", (string) $this->template);
+    }
+
     public function loadSkin(?int $skinId): void
     {
         $skin = null;
@@ -424,11 +429,6 @@ final class Page
         echo json_encode($this->javascriptCommands);
     }
 
-    private function templateHas(string $part): false|int
-    {
-        return preg_match("/<!--{$part}-->/i", (string) $this->template);
-    }
-
     private function loadTemplate(string $file): void
     {
         $this->template = file_get_contents($file);
@@ -454,8 +454,11 @@ final class Page
             $this->debug("{$process} triggered {$component} to load");
             $meta = [];
             foreach (glob($componentDir . '/*.html') as $metaFile) {
-                $metaName = pathinfo($metaFile, PATHINFO_FILENAME);
+                $metaName = (string) pathinfo($metaFile, PATHINFO_FILENAME);
                 $metaContent = file_get_contents($metaFile);
+                if (!$metaContent) {
+                    continue;
+                }
                 $this->checkExtended($metaContent, $metaName);
                 $meta[$metaName] = $metaContent;
             }
@@ -468,10 +471,10 @@ final class Page
             );
             if ($defaultComponentDir !== $componentDir) {
                 foreach (glob($defaultComponentDir . '/*.html') as $metaFile) {
-                    $metaName = pathinfo($metaFile, PATHINFO_FILENAME);
+                    $metaName = (string) pathinfo($metaFile, PATHINFO_FILENAME);
                     $metaContent = file_get_contents($metaFile);
                     $this->checkExtended($metaContent, $metaName);
-                    if (isset($meta[$metaName])) {
+                    if (isset($meta[$metaName]) || !is_string($metaContent)) {
                         continue;
                     }
 
@@ -479,13 +482,13 @@ final class Page
                 }
             }
 
-            $this->metaDefs = $meta + $this->metaDefs;
+            $this->metaDefs = array_merge($meta, $this->metaDefs);
         }
     }
 
     private function metaExtended(string $content): string
     {
-        return preg_replace_callback(
+        return (string) preg_replace_callback(
             '@{if ([^}]+)}(.*){/if}@Us',
             $this->metaExtendedIfCB(...),
             $this->filtervars($content),
