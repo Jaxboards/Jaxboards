@@ -64,7 +64,7 @@ final class UCP
             return;
         }
 
-        $this->page->path(['UCP' => '?act=ucp']);
+        $this->page->setBreadCrumbs(['UCP' => '?act=ucp']);
         $this->what = $this->request->both('what') ?? '';
 
         match ($this->what) {

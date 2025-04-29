@@ -17,54 +17,8 @@ use function mb_substr;
 
 use const PHP_EOL;
 
-/**
- * This class is entirely responsible for rendering the page.
- *
- * Because there weren't any good PHP template systems at the time (Blade, Twig) we built our own.
- *
- * Here's how it works:
- *
- * 1. The page's "components" are separated out into "meta" definitions. These are stored on `metaDefs` as key/value
- *    (value being an HTML template). Template components are passed data through `vsprintf`, so each individual
- *    piece of data going into a template can be referenced using full sprintf syntax.
- *
- * 2. Theme templates can overwrite meta definitions through their board template using "<M>" tags.
- *    An example would look like this: `<M name="logo"><img src="logo.png" /></M>`
- *
- * 3. There is a "variable" syntax that templates can use:
- *    <%varname%>
- *    These variables are page-level (global) and are defined using `addvar`.
- *    They can be used in any template piece anywhere.
- *
- * 4. There is a rudimentary conditional syntax that looks like this:
- *    {if <%isguest%>=true}You should sign up!{/if}
- *    As of writing, these conditionals must use one of the following operators: =, !=, >, <, >=, <=
- *    There are also && and || which can be used for chaining conditions together.
- *
- *    Conditionals can mix and match page variables and component variables.
- *    For example: {if <%isguest%>!=true&&%1$s="Sean"}Hello Sean{/if}
- *
- *    Conditionals do not tolerate whitespace, so it must all be mashed together. To be improved one day perhaps.
- *
- * 5. The root template defines the page's widgets using this syntax:
- *    <!--NAVIGATION-->
- *    <!--PATH-->
- *
- *    These sections are defined through calls to $this->append()
- *
- *    Interestingly, I tried to create some sort of module system that would only conditionally load modules
- *    if the template has it. For example - none of the `tag_shoutbox` will be included or used if <!--SHOUTBOX-->
- *    is not in the root template.
- *    The filenames of these "modules" must be prefixed with "tag_" for this to work.
- *    Otherwise the modules will always be loaded.
- */
 final class Page
 {
-    /**
-     * @var array<string>
-     */
-    private array $debuginfo = [];
-
     /**
      * These are sent when the browser requests updates through javascript.
      * They're parsed and executed in the client side javascript.
@@ -85,7 +39,6 @@ final class Page
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
-        private readonly DebugLog $debugLog,
         private readonly DomainDefinitions $domainDefinitions,
         private readonly Request $request,
         private readonly Template $template,
@@ -116,11 +69,6 @@ final class Page
         }
 
         header("Location: {$newLocation}");
-    }
-
-    public function reset(string $part, string $content = ''): void
-    {
-        $this->template->reset($part, $content);
     }
 
     public function command(...$args): void
@@ -188,6 +136,44 @@ final class Page
 
     public function loadSkin(?int $skinId): void
     {
+        $skin = $this->getSelectedSkin($skinId);
+
+        $themePath = ($skin['custom'] ? $this->domainDefinitions->getBoardPath() : '') . '/Themes/' . $skin['title'];
+        $themeUrl = ($skin['custom'] ? $this->domainDefinitions->getBoardPathUrl() : '') . '/Themes/' . $skin['title'];
+
+        // Custom theme found but files not there, also fallback to default
+        if (!is_dir($themePath)) {
+            $themePath = $this->domainDefinitions->getDefaultThemePath();
+            $themeUrl = $this->domainDefinitions->getBoardURL() . '/' . $this->config->getSetting('dthemepath');
+        }
+
+        $this->template->setThemePath($themePath);
+
+        // Load CSS
+        $this->append(
+            'CSS',
+            <<<"HTML"
+                <link rel="stylesheet" type="text/css" href="{$themeUrl}/css.css">
+                <link rel="preload" as="style" type="text/css" href="./Service/wysiwyg.css" onload="this.onload=null;this.rel=\'stylesheet\'" />
+            HTML
+        );
+
+        // Load Wrapper
+        $this->template->load(
+            $skin['wrapper']
+            ? $this->domainDefinitions->getBoardPath() . '/Wrappers/' . $skin['wrapper'] . '.html'
+            : $themePath . '/wrappers.html',
+        );
+    }
+
+    /**
+     * Gets the user selected skin.
+     * If not available, gets the board default.
+     * If THAT isn't available, get jaxboards default skin.
+     * @return array<string,mixed>
+     */
+    private function getSelectedSkin(?int $skinId): array
+    {
         $skin = null;
         if ($skinId) {
             $result = $this->database->safeselect(
@@ -221,33 +207,10 @@ final class Page
             ];
         }
 
-        $themePath = ($skin['custom'] ? $this->domainDefinitions->getBoardPath() : '') . '/Themes/' . $skin['title'];
-        $themePathUrl = ($skin['custom'] ? $this->domainDefinitions->getBoardPathUrl() : '') . '/Themes/' . $skin['title'];
-
-        // Custom theme found but files not there, also fallback to default
-        if (!is_dir($themePath)) {
-            $themePath = $this->domainDefinitions->getDefaultThemePath();
-            $themePathUrl = $this->domainDefinitions->getBoardURL() . '/' . $this->config->getSetting('dthemepath');
-        }
-
-        $this->template->setThemePath($themePath);
-
-        // Load CSS
-        $this->append(
-            'CSS',
-            '<link rel="stylesheet" type="text/css" href="' . $themePathUrl . '/css.css">'
-            . '<link rel="preload" as="style" type="text/css" href="./Service/wysiwyg.css" onload="this.onload=null;this.rel=\'stylesheet\'" />',
-        );
-
-        // Load Wrapper
-        $this->template->load(
-            $skin['wrapper']
-            ? $this->domainDefinitions->getBoardPath() . '/Wrappers/' . $skin['wrapper'] . '.html'
-            : $themePath . '/wrappers.html',
-        );
+        return $skin;
     }
 
-    public function path(array $crumbs): void
+    public function setBreadCrumbs(array $crumbs): void
     {
         $this->breadCrumbs = array_merge($this->breadCrumbs, $crumbs);
     }
@@ -258,7 +221,7 @@ final class Page
         $this->template->reset('TITLE', $this->getPageTitle());
     }
 
-    public function getPageTitle()
+    private function getPageTitle(): string
     {
         return (
             $this->template->meta('title')
@@ -267,16 +230,6 @@ final class Page
         ) . ($this->pageTitle ? ' -> ' . $this->pageTitle : '');
     }
 
-    public function debug(?string $data = null): ?string
-    {
-        if ($data) {
-            $this->debuginfo[] = $data;
-
-            return null;
-        }
-
-        return implode('<br>', $this->debuginfo);
-    }
 
     private function outputJavascriptCommands(): void
     {

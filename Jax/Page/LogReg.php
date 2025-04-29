@@ -274,7 +274,7 @@ final class LogReg
         $this->session->getSess(false);
         session_unset();
         session_destroy();
-        $this->page->reset('USERBOX', $this->template->meta('userbox-logged-out'));
+        $this->template->reset('USERBOX', $this->template->meta('userbox-logged-out'));
         $this->page->command('update', 'userbox', $this->template->meta('userbox-logged-out'));
         $this->page->command('softurl');
         $this->page->append('PAGE', $this->template->meta('success', 'Logged out successfully'));

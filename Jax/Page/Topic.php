@@ -225,7 +225,7 @@ final class Topic
         $this->session->set('location_verbose', "In topic '" . $this->topicdata['topic_title'] . "'");
 
         // Fix this to work with subforums.
-        $this->page->path(
+        $this->page->setBreadCrumbs(
             [
                 $this->topicdata['cat_title'] => '?act=vc' . $this->topicdata['cat_id'],
                 $this->topicdata['forum_title'] => '?act=vf' . $this->topicdata['fid'],

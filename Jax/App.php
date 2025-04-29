@@ -345,7 +345,7 @@ final class App
 
     private function renderNavigation(): void
     {
-        $this->page->path([$this->jax->pick($this->config->getSetting('boardname'), 'Home') => '?']);
+        $this->page->setBreadCrumbs([$this->jax->pick($this->config->getSetting('boardname'), 'Home') => '?']);
     }
 
     private function setPageVars(): void

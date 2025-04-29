@@ -460,7 +460,7 @@ final class Forum
         }
 
         $path[$title] = "?act=vf{$fid}";
-        $this->page->path($path);
+        $this->page->setBreadCrumbs($path);
         if ($this->request->isJSAccess()) {
             $this->page->command('update', 'page', $page);
         } else {

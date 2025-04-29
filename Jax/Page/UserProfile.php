@@ -586,7 +586,7 @@ final class UserProfile
         ) {
             $this->page->command('update', 'pfbox', $pfbox);
         } else {
-            $this->page->path(
+            $this->page->setBreadCrumbs(
                 [
                     $user['display_name']
                     . "'s profile" => '?act=vu' . $id . '&view=profile',
