@@ -332,7 +332,7 @@ final class App
             $this->page->collapseBox(
                 'Debug',
                 $debug,
-            ) . "<div id='pagegen' style='text-align: center'>{$pagegen}</div>"
+            ) . "<div id='pagegen' style='text-align: center'>{$pagegen}</div>",
         );
     }
 
