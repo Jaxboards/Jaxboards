@@ -100,7 +100,7 @@ final class UCP
         if (
             $this->request->post('ucpnotepad') !== null
         ) {
-            if (mb_strlen((string) $this->request->post('ucpnotepad')) > 2000) {
+            if (mb_strlen((string) $this->request->post('ucpnotepad')) > 2_000) {
                 $error = 'The UCP notepad cannot exceed 2000 characters.';
                 $this->page->command('error', $error);
             } else {
@@ -123,7 +123,6 @@ final class UCP
     private function showucp($page = false): void
     {
         $page = $this->template->meta('ucp-wrapper', $page);
-        // $this->page->command("window",Array("id"=>"ucpwin","title"=>"Settings","content"=>$page,"animate"=>false));
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
         if (!$this->runscript) {
@@ -167,7 +166,7 @@ final class UCP
 
         $checkboxes = [
             $this->getlocationforform() . $this->jax->hiddenFormFields(
-                ['submit' => 1],
+                ['submit' => 'true'],
             ),
         ];
 
@@ -220,8 +219,11 @@ final class UCP
                 $error = 'All form fields are required.';
             }
 
-            $verified_password = password_verify((string) $this->request->post('curpass'), (string) $this->user->get('pass'));
-            if (!$verified_password) {
+            $verifiedPassword = password_verify(
+                (string) $this->request->post('curpass'),
+                (string) $this->user->get('pass')
+            );
+            if (!$verifiedPassword) {
                 $error = 'The password you entered is incorrect.';
             }
 
@@ -243,7 +245,7 @@ final class UCP
         return $page . $this->template->meta(
             'ucp-pass-settings',
             $this->getlocationforform()
-            . $this->jax->hiddenFormFields(['passchange' => 1]),
+            . $this->jax->hiddenFormFields(['passchange' => 'true']),
         );
     }
 
@@ -354,7 +356,7 @@ final class UCP
                 'dob_month' => $this->jax->pick($this->request->post('dob_month'), null),
                 'dob_year' => $this->jax->pick($this->request->post('dob_year'), null),
                 'full_name' => $this->request->post('full_name'),
-                'gender' => in_array($this->request->post('gender'), $genderOptions)
+                'gender' => in_array($this->request->post('gender'), $genderOptions, true)
                 ? $this->request->post('gender') : '',
                 'location' => $this->request->post('location'),
                 'usertitle' => $this->request->post('usertitle'),
@@ -446,7 +448,6 @@ final class UCP
             if (
                 !$data['dob_year']
                 && !$data['dob_month']
-                && !$data['dob_year']
             ) {
                 // User provided no birthdate, just set field to null
                 $data['birthdate'] = null;
@@ -574,7 +575,7 @@ final class UCP
         return $this->template->meta(
             'ucp-profile-settings',
             $this->getlocationforform()
-            . $this->jax->hiddenFormFields(['submit' => '1']),
+            . $this->jax->hiddenFormFields(['submit' => 'true']),
             $this->user->get('name'),
             $this->user->get('display_name'),
             $this->user->get('full_name'),
