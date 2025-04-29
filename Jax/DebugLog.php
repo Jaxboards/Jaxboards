@@ -4,10 +4,17 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use function array_key_exists;
+use function array_keys;
+use function array_merge;
+use function array_reduce;
+use function sort;
+
 final class DebugLog
 {
     /**
-     * Map of log categories => log lines
+     * Map of log categories => log lines.
+     *
      * @var array<string,array<string>>
      */
     private array $lines = [];
@@ -22,6 +29,7 @@ final class DebugLog
 
     /**
      * Returns the full log, with category separation.
+     *
      * @return array<string>
      */
     public function getLog(): array
@@ -29,8 +37,9 @@ final class DebugLog
         $categories = array_keys($this->lines);
         sort($categories);
 
-        return array_reduce($categories, function($lines, $category) {
+        return array_reduce($categories, function ($lines, $category) {
             $heading = $category ? ["---- {$category} ----"] : [];
+
             return array_merge($lines, $heading, $this->lines[$category], ['']);
         }, []);
     }

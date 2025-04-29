@@ -44,8 +44,7 @@ final class Database
     public function __construct(
         private readonly ServiceConfig $serviceConfig,
         private readonly DebugLog $debugLog,
-    )
-    {
+    ) {
         try {
             if ($serviceConfig->hasInstalled()) {
                 $this->connect(
