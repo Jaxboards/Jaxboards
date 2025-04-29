@@ -120,7 +120,6 @@ final class App
         $this->addNavMenu(
             'Settings',
             [
-                'birthday' => 'Birthdays',
                 'global' => 'Global Settings',
                 'pages' => 'Custom Pages',
                 'shoutbox' => 'Shoutbox',

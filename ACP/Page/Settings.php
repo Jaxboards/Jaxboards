@@ -34,7 +34,6 @@ final readonly class Settings
     public function render(): void
     {
         $this->page->sidebar([
-            'birthday' => 'Birthdays',
             'global' => 'Global Settings',
             'pages' => 'Custom Pages',
             'shoutbox' => 'Shoutbox',
@@ -43,12 +42,11 @@ final readonly class Settings
         match ($this->request->both('do')) {
             'pages' => $this->pages(),
             'shoutbox' => $this->shoutbox(),
-            'birthday' => $this->birthday(),
-            default => $this->boardname(),
+            default => $this->global(),
         };
     }
 
-    private function boardname(): void
+    private function global(): void
     {
         $error = null;
         $status = '';
@@ -67,6 +65,7 @@ final readonly class Settings
                     'logourl' => $this->request->post('logourl'),
                     'boardoffline' => $this->request->post('boardoffline') !== null ? '0' : '1',
                     'offlinetext' => $this->request->post('offlinetext'),
+                    'birthdays' => ($this->request->post('bicon') !== null ? 1 : 0),
                 ]);
             }
 
@@ -78,7 +77,7 @@ final readonly class Settings
         // This is silly, but we need the whole page to be a form
         $this->page->append('content', '<form method="post">');
 
-        $this->page->addContentBox('Board Name/Logo', $this->page->parseTemplate(
+        $this->page->addContentBox('Board Name/Logo', $status . $this->page->parseTemplate(
             'settings/boardname.html',
             [
                 'board_name' => $this->config->getSetting('boardname'),
@@ -86,7 +85,7 @@ final readonly class Settings
             ],
         ));
 
-        $this->page->addContentBox('Board Online/Offline', $status . $this->page->parseTemplate(
+        $this->page->addContentBox('Board Online/Offline', $this->page->parseTemplate(
             'settings/boardname-board-offline.html',
             [
                 'board_offline_checked' => $this->config->getSetting('boardoffline')
@@ -94,6 +93,13 @@ final readonly class Settings
                 'board_offline_text' => $this->textFormatting->blockhtml(
                     $this->config->getSetting('offlinetext') ?? '',
                 ),
+            ],
+        ));
+
+        $this->page->addContentBox('Birthdays', $this->page->parseTemplate(
+            'settings/birthday.html',
+            [
+                'checked' => $this->config->getSetting('birthdays') !== 0 ? ' checked="checked"' : '',
             ],
         ));
 
@@ -270,26 +276,5 @@ final readonly class Settings
             ],
         );
         $this->page->addContentBox('Shoutbox', $page);
-    }
-
-    private function birthday(): void
-    {
-        $birthdays = $this->config->getSetting('birthdays');
-        if ($this->request->post('submit') !== null) {
-            $this->config->write(
-                [
-                    'birthdays' => $birthdays = ($this->request->post('bicon') !== null ? 1 : 0),
-                ],
-            );
-        }
-
-        $page = $this->page->parseTemplate(
-            'settings/birthday.html',
-            [
-                'checked' => ($birthdays & 1) !== 0 ? ' checked="checked"' : '',
-            ],
-        );
-
-        $this->page->addContentBox('Birthdays', $page);
     }
 }
