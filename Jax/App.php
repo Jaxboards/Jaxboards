@@ -319,9 +319,7 @@ final class App
 
     private function renderDebugInfo(): void
     {
-        $debug = '';
-
-        $debug .= implode('<br>', $this->debugLog->getLog());
+        $debug = implode('<br>', $this->debugLog->getLog());
         $this->page->command('update', '#query .content', $debug);
         $this->page->append(
             'FOOTER',
