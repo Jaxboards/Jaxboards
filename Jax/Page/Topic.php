@@ -1241,8 +1241,6 @@ final class Topic
 
             return;
         }
-        $this->page->command('alert', 'WTF');
-
 
         if ($this->request->both('qreply')) {
             $this->page->command(
