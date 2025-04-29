@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use function array_filter;
 use function array_search;
 use function file;
 use function file_exists;
@@ -12,9 +13,9 @@ use function in_array;
 use function inet_ntop;
 use function inet_pton;
 use function mb_strlen;
-use function mb_strtolower;
 use function mb_substr;
 use function pack;
+use function str_starts_with;
 use function trim;
 
 use const FILTER_VALIDATE_IP;
@@ -75,7 +76,7 @@ final class IPAddress
 
     public function isBanned(?string $ipAddress = null): bool
     {
-        $ipAddress = $ipAddress ?? self::getIp();
+        $ipAddress ??= self::getIp();
 
         foreach ($this->ipBanCache as $bannedIp) {
             $isPartial = in_array(mb_substr($bannedIp, -1), [':', '.']);
@@ -113,7 +114,7 @@ final class IPAddress
         if (file_exists($bannedIPsPath)) {
             $this->ipBanCache = array_filter(
                 file($bannedIPsPath),
-                fn($line) => trim($line) !== ''
+                static fn($line) => trim($line) !== '',
             );
         }
 
