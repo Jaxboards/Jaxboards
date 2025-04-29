@@ -337,6 +337,7 @@ final class Inbox
             $this->database->basicvalue($this->request->both('flag')),
             $this->user->get('id'),
         );
+
         return null;
     }
 
