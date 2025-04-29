@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace emoticons\ploadpack;
 
-class Rules {
-    public function get() {
+final class Rules
+{
+    public function get()
+    {
         return [
             '&gt;:(' => 'mad.png',
             '&lt;3' => 'love.png',

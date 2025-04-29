@@ -10,8 +10,6 @@ use function array_key_exists;
 use function array_keys;
 use function array_map;
 use function array_values;
-use function dirname;
-use function file_exists;
 use function highlight_string;
 use function htmlspecialchars;
 use function implode;

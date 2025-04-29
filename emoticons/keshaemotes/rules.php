@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace emoticons\keshaemotes;
 
-class Rules {
-    public function get() {
+final class Rules
+{
+    public function get()
+    {
         return [
             '&gt;:(' => 'angry.gif',
             '(!)' => 'exclamation.gif',

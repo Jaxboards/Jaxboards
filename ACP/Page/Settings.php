@@ -12,6 +12,7 @@ use Jax\Request;
 use Jax\TextFormatting;
 
 use function is_numeric;
+use function is_string;
 use function mb_strlen;
 use function preg_replace;
 use function trim;
@@ -51,10 +52,9 @@ final readonly class Settings
         if ($this->request->post('submit') !== null) {
             $boardName = $this->request->post('boardname');
             $logoUrl = $this->request->post('logourl');
-            $error = match(true) {
+            $error = match (true) {
                 !is_string($boardName) || trim($boardName) === '' => 'Board name is required',
-                trim($logoUrl) !== '' && $this->jax->isURL($this->request->post('logourl'))
-                    => 'Please enter a valid logo url.',
+                trim($logoUrl) !== '' && $this->jax->isURL($this->request->post('logourl')) => 'Please enter a valid logo url.',
                 default => null,
             };
 
@@ -72,14 +72,14 @@ final readonly class Settings
                 : $this->page->success('Settings saved!');
         }
 
-        $this->page->addContentBox('Board Online/Offline', $status .$this->page->parseTemplate(
+        $this->page->addContentBox('Board Online/Offline', $status . $this->page->parseTemplate(
             'settings/boardname-board-offline.html',
             [
                 'board_offline_checked' => $this->config->getSetting('boardoffline')
                     ? '' : ' checked="checked"',
                 'board_offline_text' => $this->textFormatting->blockhtml(
-                    $this->config->getSetting('offlinetext') ?? ''
-                )
+                    $this->config->getSetting('offlinetext') ?? '',
+                ),
             ],
         ));
 
@@ -90,8 +90,6 @@ final readonly class Settings
                 'logo_url' => $this->config->getSetting('logourl'),
             ],
         ));
-
-
     }
 
     // Custom pages.
