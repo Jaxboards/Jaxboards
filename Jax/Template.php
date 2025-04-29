@@ -304,7 +304,9 @@ final class Template
             : '&&';
 
         foreach (explode($logicalOperator, $statement) as $piece) {
-            [$left, $operator, $right] = preg_match('@(\S+?)\s*([!><]?=|[><])\s*(\S*)@', $piece, $args);
+            preg_match('@(\S+?)\s*([!><]?=|[><])\s*(\S*)@', $piece, $args);
+            [, $left, $operator, $right] = $args;
+
 
             $conditionPasses = match ($operator) {
                 '=' => $left === $right,
