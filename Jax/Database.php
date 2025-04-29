@@ -112,7 +112,7 @@ final class Database
     ): ?mysqli_result {
         // set new variable to not impact debug_backtrace value for inspecting
         // input
-        $fieldsString = is_array($fields) ? implode(',', $fields) : $fields;
+        $fieldsString = is_array($fields) ? implode(', ', $fields) : $fields;
 
         // Where.
         $query = "SELECT {$fieldsString} FROM "

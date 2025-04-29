@@ -1905,15 +1905,6 @@ textarea {
 }
 
 /* Function-Specific */
-#debug {
-  display: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  background: #fff;
-  color: #000;
-}
-
 #overlay {
   position: fixed;
   top: 0;

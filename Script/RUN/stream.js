@@ -16,12 +16,8 @@ class Stream {
     if (xmlobj.status !== 200) return;
     xmlobj.parsed = true;
     let { responseText } = xmlobj;
-    const debug = document.querySelector('#debug');
     let softurl = false;
     if (typeof responseText !== 'string') responseText = '';
-    if (debug) {
-      debug.innerHTML = `<xmp>${responseText}</xmp>`;
-    }
     let cmds = [];
     if (responseText.length) {
       try {

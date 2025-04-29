@@ -320,15 +320,7 @@ final class App
     private function renderDebugInfo(): void
     {
         $debug = implode('<br>', $this->debugLog->getLog());
-        $this->page->command('update', '#query .content', $debug);
-        $this->page->append(
-            'FOOTER',
-            $this->page->collapseBox(
-                'Debug',
-                $debug,
-                'query',
-            ) . "<div id='debug2'></div><div id='pagegen'></div>",
-        );
+        $this->page->command('update', '#debug .content', $debug);
         $this->page->command(
             'update',
             'pagegen',
@@ -337,9 +329,10 @@ final class App
         );
         $this->page->append(
             'DEBUG',
-            "<div id='pagegen' style='text-align:center'>"
-            . $pagegen
-            . "</div><div id='debug' style='display:none'></div>",
+            $this->page->collapseBox(
+                'Debug',
+                $debug,
+            ) . "<div id='pagegen' style='text-align: center'>{$pagegen}</div>"
         );
     }
 
