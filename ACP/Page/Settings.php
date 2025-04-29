@@ -78,6 +78,14 @@ final readonly class Settings
         // This is silly, but we need the whole page to be a form
         $this->page->append('content', '<form method="post">');
 
+        $this->page->addContentBox('Board Name/Logo', $this->page->parseTemplate(
+            'settings/boardname.html',
+            [
+                'board_name' => $this->config->getSetting('boardname'),
+                'logo_url' => $this->config->getSetting('logourl'),
+            ],
+        ));
+
         $this->page->addContentBox('Board Online/Offline', $status . $this->page->parseTemplate(
             'settings/boardname-board-offline.html',
             [
@@ -86,14 +94,6 @@ final readonly class Settings
                 'board_offline_text' => $this->textFormatting->blockhtml(
                     $this->config->getSetting('offlinetext') ?? '',
                 ),
-            ],
-        ));
-
-        $this->page->addContentBox('Board Name/Logo', $this->page->parseTemplate(
-            'settings/boardname.html',
-            [
-                'board_name' => $this->config->getSetting('boardname'),
-                'logo_url' => $this->config->getSetting('logourl'),
             ],
         ));
 
