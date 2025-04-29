@@ -533,7 +533,7 @@ final class Forum
         }
 
         return $forum['lp_date'] <= (
-            $this->forumsRead[$forum['id']]
+            $this->forumsRead[$forum['id']] ?? null
             ?: $this->session->get('read_date')
             ?: $this->user->get('last_visit')
         );
