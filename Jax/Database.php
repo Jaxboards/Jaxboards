@@ -37,18 +37,14 @@ final class Database
 {
     private ?mysqli_result $lastQuery = null;
 
-    private bool $debugMode = false;
-
-    /**
-     * @var array<string>
-     */
-    private array $queryList = [];
-
     private MySQLi $connection;
 
     private string $prefix = '';
 
-    public function __construct(private readonly ServiceConfig $serviceConfig)
+    public function __construct(
+        private readonly ServiceConfig $serviceConfig,
+        private readonly DebugLog $debugLog,
+    )
     {
         try {
             if ($serviceConfig->hasInstalled()) {
@@ -82,11 +78,6 @@ final class Database
         $this->prefix = $prefix;
 
         return !$this->connection->connect_errno;
-    }
-
-    public function setDebugMode(bool $debugMode): void
-    {
-        $this->debugMode = $debugMode;
     }
 
     public function setPrefix(string $prefix): void
@@ -365,9 +356,7 @@ final class Database
 
         $stmt = $this->connection->prepare($compiledQueryString);
 
-        if ($this->debugMode) {
-            $this->queryList[] = $compiledQueryString;
-        }
+        $this->debugLog->log($compiledQueryString, 'Queries');
 
         if (!$stmt) {
             return null;
@@ -565,14 +554,6 @@ final class Database
         }
 
         return $ratingNiblets;
-    }
-
-    public function debug(): string
-    {
-        return '<div><p>' . implode(
-            '</p><p>',
-            $this->queryList,
-        ) . '</p></div>';
     }
 
     /**

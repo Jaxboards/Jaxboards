@@ -31,8 +31,6 @@ final class App
 {
     private readonly float $microtime;
 
-    private bool $onLocalHost = false;
-
     public function __construct(
         private readonly Config $config,
         private readonly Container $container,
@@ -48,9 +46,7 @@ final class App
         private readonly Template $template,
         private readonly User $user,
     ) {
-        $this->onLocalHost = in_array($this->ipAddress->asHumanReadable(), ['127.0.0.1', '::1'], true);
         $this->microtime = microtime(true);
-        $this->database->setDebugMode($this->onLocalHost);
     }
 
     public function render(): void
@@ -90,7 +86,8 @@ final class App
         // current user throughout the script are finally put into query form here.
         $this->session->applyChanges();
 
-        if ($this->onLocalHost) {
+        $onLocalHost = in_array($this->ipAddress->asHumanReadable(), ['127.0.0.1', '::1'], true);
+        if ($onLocalHost) {
             $this->renderDebugInfo();
         }
 
@@ -324,7 +321,7 @@ final class App
     {
         $debug = '';
 
-        $debug .= implode('<br>', $this->debugLog->getLog()) . '<br>' . $this->database->debug();
+        $debug .= implode('<br>', $this->debugLog->getLog());
         $this->page->command('update', '#query .content', $debug);
         $this->page->append(
             'FOOTER',
