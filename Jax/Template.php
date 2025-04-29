@@ -320,7 +320,8 @@ final class Template
         return $conditionPasses ? $content : '';
     }
 
-    private function conditionPasses($left, $operator, $right) {
+    private function conditionPasses($left, $operator, $right)
+    {
         return match ($operator) {
             '=' => $left === $right,
             '!=' => $left !== $right,
