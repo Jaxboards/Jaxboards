@@ -29,7 +29,7 @@ final class Page
     /**
      * Map of human readable label to URL. Used for NAVIGATION.
      *
-     * @var array<string>
+     * @var array<string,string>
      */
     private array $breadCrumbs = [];
 
@@ -171,6 +171,9 @@ final class Page
         );
     }
 
+    /**
+     * @param array<string,string> $crumbs Map of human readable label to URL. Used for NAVIGATION.
+     */
     public function setBreadCrumbs(array $crumbs): void
     {
         $this->breadCrumbs = array_merge($this->breadCrumbs, $crumbs);

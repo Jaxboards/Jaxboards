@@ -8,19 +8,16 @@ use Jax\Config;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Page\UCP\Inbox;
 use Jax\Request;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
-use function array_pop;
 use function gmdate;
 use function header;
-use function htmlspecialchars;
 use function in_array;
-use function is_array;
 use function is_numeric;
-use function json_encode;
 use function mb_strlen;
 use function mb_strstr;
 use function password_hash;
@@ -31,7 +28,6 @@ use function trim;
 use function ucfirst;
 
 use const PASSWORD_DEFAULT;
-use const PHP_EOL;
 
 final class UCP
 {
@@ -39,14 +35,11 @@ final class UCP
 
     private ?string $runscript = null;
 
-    private bool $shownucp = false;
-
-    private string $ucppage = '';
-
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
         private readonly Jax $jax,
+        private readonly Inbox $inbox,
         private readonly Page $page,
         private readonly Request $request,
         private readonly TextFormatting $textFormatting,
@@ -67,23 +60,26 @@ final class UCP
         $this->page->setBreadCrumbs(['UCP' => '?act=ucp']);
         $this->what = $this->request->both('what') ?? '';
 
-        match ($this->what) {
-            'sounds' => $this->showsoundsettings(),
-            'signature' => $this->showsigsettings(),
-            'pass' => $this->showpasssettings(),
-            'email' => $this->showemailsettings(),
-            'avatar' => $this->showavatarsettings(),
-            'profile' => $this->showprofilesettings(),
-            'board' => $this->showboardsettings(),
-            'inbox' => $this->showinbox(),
-            default => $this->showmain(),
+        // Not a single settings page needs update functionality except inbox
+        if (
+            $this->request->isJSUpdate() &&
+            !$this->request->hasPostData() &&
+            $this->what !== 'inbox'
+        ) return;
+
+        $page = match ($this->what) {
+            'sounds' => $this->showSoundSettings(),
+            'signature' => $this->showSigSettings(),
+            'pass' => $this->showPassSettings(),
+            'email' => $this->showEmailSettings(),
+            'avatar' => $this->showAvatarSettings(),
+            'profile' => $this->showProfileSettings(),
+            'board' => $this->showBoardSettings(),
+            'inbox' => $this->inbox->render(),
+            default => $this->showMain(),
         };
 
-        if ($this->request->isJSUpdate()) {
-            return;
-        }
-
-        $this->showucp();
+        $this->showucp($page);
     }
 
     private function getlocationforform(): string
@@ -91,42 +87,12 @@ final class UCP
         return $this->jax->hiddenFormFields(['act' => 'ucp', 'what' => $this->what]);
     }
 
-    private function showinbox(): void
-    {
-        $messageId = $this->request->post('messageid');
-        $page = $this->request->both('page');
-        $view = $this->request->get('view');
-        $flag = $this->request->both('flag');
-        $dmessage = $this->request->post('dmessage');
-
-        if (is_array($dmessage)) {
-            $this->deleteMessages($dmessage);
-        }
-
-        match (true) {
-            is_numeric($messageId) => match ($page) {
-                'Delete' => $this->delete($messageId),
-                'Forward' => $this->compose($messageId, 'fwd'),
-                'Reply' => $this->compose($messageId),
-            },
-            is_numeric($view) => $this->viewmessage($view),
-            is_numeric($flag) => $this->flag(),
-
-            default => match ($page) {
-                'compose' => $this->compose(),
-                'sent' => $this->viewmessages('sent'),
-                'flagged' => $this->viewmessages('flagged'),
-                default => $this->viewmessages(),
-            },
-        };
-    }
-
-    private function showmain(): void
+    private function showMain(): ?string
     {
         $error = null;
 
         if ($this->request->isJSUpdate() && !$this->request->hasPostData()) {
-            return;
+            return null;
         }
 
         if (
@@ -142,7 +108,7 @@ final class UCP
 
         $ucpnotepad = $this->user->get('ucpnotepad');
 
-        $this->ucppage = ($error !== null ? $this->template->meta('error', $error) : '') . $this->template->meta(
+        return ($error !== null ? $this->template->meta('error', $error) : '') . $this->template->meta(
             'ucp-index',
             $this->jax->hiddenFormFields(['act' => 'ucp']),
             $this->user->get('display_name'),
@@ -150,19 +116,10 @@ final class UCP
             trim((string) $ucpnotepad) !== '' && trim((string) $ucpnotepad) !== '0'
             ? $this->textFormatting->blockhtml($ucpnotepad) : 'Personal notes go here.',
         );
-        $this->showucp();
     }
 
     private function showucp($page = false): void
     {
-        if ($this->shownucp) {
-            return;
-        }
-
-        if (!$page) {
-            $page = $this->ucppage;
-        }
-
         $page = $this->template->meta('ucp-wrapper', $page);
         // $this->page->command("window",Array("id"=>"ucpwin","title"=>"Settings","content"=>$page,"animate"=>false));
         $this->page->append('PAGE', $page);
@@ -170,11 +127,9 @@ final class UCP
         if ($this->runscript) {
             $this->page->command('script', $this->runscript);
         }
-
-        $this->shownucp = true;
     }
 
-    private function showsoundsettings(): void
+    private function showSoundSettings(): ?string
     {
         $fields = [
             'sound_shout',
@@ -204,10 +159,6 @@ final class UCP
             }
 
             $this->page->command('alert', 'Settings saved successfully.');
-
-            $this->ucppage = 'Settings saved successfully.';
-        } elseif ($this->request->isJSUpdate()) {
-            return;
         }
 
         $checkboxes = [
@@ -221,40 +172,33 @@ final class UCP
                 . ($this->user->get($field) ? 'checked="checked"' : '') . '/>';
         }
 
-        $this->ucppage = $this->template->meta('ucp-sound-settings', $checkboxes);
         $this->runscript = "if(document.querySelector('#dtnotify')&&window.webkitNotifications) "
-            . "document.querySelector('#dtnotify').checked=(webkitNotifications.checkPermission()==0)";
+        . "document.querySelector('#dtnotify').checked=(webkitNotifications.checkPermission()==0)";
 
-        unset($checkboxes);
+        return $this->template->meta('ucp-sound-settings', $checkboxes);
     }
 
-    private function showsigsettings(): void
+    private function showSigSettings(): string
     {
-        $update = false;
         $sig = $this->user->get('sig');
         if ($this->request->post('changesig') !== null) {
             $sig = $this->textFormatting->linkify($this->request->post('changesig'));
             $this->user->set('sig', $sig);
-            $update = true;
         }
 
-        $this->ucppage = $this->template->meta(
+        return $this->template->meta(
             'ucp-sig-settings',
             $this->getlocationforform(),
             $sig !== ''
             ? $this->textFormatting->theworks($sig) : '( none )',
             $this->textFormatting->blockhtml($sig),
         );
-        if (!$update) {
-            return;
-        }
-
-        $this->showucp();
     }
 
-    private function showpasssettings(): void
+    private function showPassSettings(): string
     {
         $error = null;
+        $page = '';
         if ($this->request->post('passchange') !== null) {
             if (
                 !$this->request->post('showpass')
@@ -280,29 +224,25 @@ final class UCP
             if ($error === null) {
                 $hashpass = password_hash((string) $this->request->post('newpass1'), PASSWORD_DEFAULT);
                 $this->user->set('pass', $hashpass);
-                $this->ucppage = <<<'HTML'
+                return <<<'HTML'
                     Password changed.
                         <br><br>
                         <a href="?act=ucp&what=pass">Back</a>
                     HTML;
-
-                $this->showucp();
-
-                return;
             }
 
-            $this->ucppage .= $this->template->meta('error', $error);
+            $page .= $this->template->meta('error', $error);
             $this->page->command('error', $error);
         }
 
-        $this->ucppage .= $this->template->meta(
+        return $page . $this->template->meta(
             'ucp-pass-settings',
             $this->getlocationforform()
             . $this->jax->hiddenFormFields(['passchange' => 1]),
         );
     }
 
-    private function showemailsettings(): void
+    private function showEmailSettings(): ?string
     {
         $error = null;
         if ($this->request->post('submit') !== null) {
@@ -315,22 +255,20 @@ final class UCP
 
             if ($error !== null) {
                 $this->page->command('alert', $error);
-            } else {
-                $this->user->setBulk([
-                    'email' => $this->request->post('email'),
-                    'email_settings' => ($this->request->post('notifications') ?? false ? 2 : 0)
-                    + ($this->request->post('adminemails') ?? false ? 1 : 0),
-                ]);
-                $this->ucppage = 'Email settings updated.'
-                    . '<br><br><a href="?act=ucp&what=email">Back</a>';
+
+                return null;
             }
 
-            $this->showucp();
-
-            return;
+            $this->user->setBulk([
+                'email' => $this->request->post('email'),
+                'email_settings' => ($this->request->post('notifications') ?? false ? 2 : 0)
+                + ($this->request->post('adminemails') ?? false ? 1 : 0),
+            ]);
+            return 'Email settings updated.'
+                . '<br><br><a href="?act=ucp&what=email">Back</a>';
         }
 
-        $this->ucppage .= $this->template->meta(
+        return $this->template->meta(
             'ucp-email-settings',
             $this->getlocationforform() . $this->jax->hiddenFormFields(
                 ['submit' => 'true'],
@@ -352,7 +290,7 @@ final class UCP
         );
     }
 
-    private function showavatarsettings(): void
+    private function showAvatarSettings(): ?string
     {
         $error = null;
         $update = false;
@@ -371,24 +309,23 @@ final class UCP
             $update = true;
         }
 
-        $this->ucppage = 'Your avatar: <span class="avatar"><img src="'
-            . $this->jax->pick($avatar, $this->template->meta('default-avatar'))
-            . '" alt="Your avatar"></span><br><br>
-            <form data-ajax-form="true" method="post">'
-            . $this->getlocationforform()
-            . ($error !== null ? $this->page->error($error) : '')
-            . '<input type="text" name="changedava" title="Your avatar" value="'
-            . $this->textFormatting->blockhtml($avatar) . '" />
-            <input type="submit" value="Edit" />
-            </form>';
         if (!$update) {
-            return;
+            return null;
         }
 
-        $this->showucp();
+        return 'Your avatar: <span class="avatar"><img src="'
+        . $this->jax->pick($avatar, $this->template->meta('default-avatar'))
+        . '" alt="Your avatar"></span><br><br>
+        <form data-ajax-form="true" method="post">'
+        . $this->getlocationforform()
+        . ($error !== null ? $this->page->error($error) : '')
+        . '<input type="text" name="changedava" title="Your avatar" value="'
+        . $this->textFormatting->blockhtml($avatar) . '" />
+        <input type="submit" value="Edit" />
+        </form>';
     }
 
-    private function showprofilesettings(): void
+    private function showProfileSettings(): ?string
     {
         $error = null;
         $genderOptions = ['', 'male', 'female', 'other'];
@@ -570,15 +507,12 @@ final class UCP
                 }
 
                 $this->user->setBulk($data);
-                $this->ucppage = 'Profile successfully updated.<br>'
+                return 'Profile successfully updated.<br>'
                     . '<br><a href="?act=ucp&what=profile">Back</a>';
-                $this->showucp();
-
-                return;
             }
 
-            $this->ucppage .= $this->template->meta('error', $error);
             $this->page->command('error', $error);
+            return $this->template->meta('error', $error);
         }
 
         $genderselect = '<select name="gender" title="Your gender" aria-label="Gender">';
@@ -629,7 +563,7 @@ final class UCP
 
         $dobselect .= '</select>';
 
-        $this->ucppage = $this->template->meta(
+        return $this->template->meta(
             'ucp-profile-settings',
             $this->getlocationforform()
             . $this->jax->hiddenFormFields(['submit' => '1']),
@@ -655,11 +589,11 @@ final class UCP
         );
     }
 
-    private function showboardsettings(): void
+    private function showBoardSettings(): ?string
     {
         $error = null;
-        $showthing = false;
         $skinId = $this->user->get('skin_id');
+        $page = '';
         if (
             is_numeric($this->request->both('skin'))
         ) {
@@ -695,17 +629,15 @@ final class UCP
                 if ($this->request->isJSAccess()) {
                     $this->page->command('reload');
 
-                    return;
+                    return null;
                 }
 
                 header('Location: ?act=ucp&what=board');
 
-                return;
+                return null;
             }
 
-            $this->ucppage .= $this->template->meta('error', $error);
-
-            $showthing = true;
+            $page .= $this->template->meta('error', $error);
         }
 
         $result = $this->user->get('group_id') !== 2
@@ -748,7 +680,7 @@ final class UCP
             $select = '--No Skins--';
         }
 
-        $this->ucppage .= $this->template->meta(
+        return $page . $this->template->meta(
             'ucp-board-settings',
             $this->getlocationforform(),
             $select,
@@ -759,529 +691,5 @@ final class UCP
             . ($this->user->get('wysiwyg') ? ' checked="checked"' : '')
             . ' />',
         );
-        if (!$showthing) {
-            return;
-        }
-
-        $this->showucp();
-    }
-
-    /*
-        HERE BE PRIVATE MESSAGING
-        ARRRRRRRRRRRRRRRRRRRRRRRR
-     */
-
-    private function flag(): void
-    {
-        $this->page->command('softurl');
-        $this->database->safeupdate(
-            'messages',
-            [
-                'flag' => $this->request->both('tog') ? 1 : 0,
-            ],
-            'WHERE `id`=? AND `to`=?',
-            $this->database->basicvalue($this->request->both('flag')),
-            $this->user->get('id'),
-        );
-    }
-
-    private function viewmessage(string $messageid): void
-    {
-        if (
-            $this->request->isJSUpdate()
-            && !$this->request->isJSDirectLink()
-        ) {
-            return;
-        }
-
-        $error = null;
-        $result = $this->database->safespecial(
-            <<<'SQL'
-                SELECT a.`id` AS `id`,a.`to` AS `to`,a.`from` AS `from`,a.`title` AS `title`,
-                    a.`message` AS `message`,a.`read` AS `read`,
-                    UNIX_TIMESTAMP(a.`date`) AS `date`,a.`del_recipient` AS `del_recipient`,
-                    a.`del_sender` AS `del_sender`,a.`flag` AS `flag`,
-                    m.`group_id` AS `group_id`,m.`display_name` AS `name`,
-                    m.`avatar` AS `avatar`,m.`usertitle` AS `usertitle`
-                FROM %t a
-                LEFT JOIN %t m
-                    ON a.`from`=m.`id`
-                WHERE a.`id`=?
-                ORDER BY a.`date` DESC
-                SQL
-            ,
-            ['messages', 'members'],
-            $this->database->basicvalue($messageid),
-        );
-        $message = $this->database->arow($result);
-        $this->database->disposeresult($result);
-        if (
-            $message['from'] !== $this->user->get('id')
-            && $message['to'] !== $this->user->get('id')
-        ) {
-            $error = "You don't have permission to view this message.";
-        }
-
-        if ($error !== null) {
-            $this->showucp($error);
-
-            return;
-        }
-
-        if (!$message['read'] && $message['to'] === $this->user->get('id')) {
-            $this->database->safeupdate(
-                'messages',
-                ['read' => 1],
-                'WHERE `id`=?',
-                $message['id'],
-            );
-            $this->updatenummessages();
-        }
-
-        $page = $this->template->meta(
-            'inbox-messageview',
-            $message['title'],
-            $this->template->meta(
-                'user-link',
-                $message['from'],
-                $message['group_id'],
-                $message['name'],
-            ),
-            $this->jax->date($message['date']),
-            $this->textFormatting->theworks($message['message']),
-            $this->jax->pick($message['avatar'], $this->template->meta('default-avatar')),
-            $message['usertitle'],
-            $this->jax->hiddenFormFields(
-                [
-                    'act' => 'ucp',
-                    'messageid' => $message['id'],
-                    'sender' => $message['from'],
-                    'what' => 'inbox',
-                ],
-            ),
-        );
-        $this->showucp($page);
-    }
-
-    private function updatenummessages(): void
-    {
-        $result = $this->database->safeselect(
-            'COUNT(`id`)',
-            'messages',
-            'WHERE `to`=? AND !`read`',
-            $this->user->get('id'),
-        );
-        $unread = $this->database->arow($result);
-        $this->database->disposeresult($result);
-
-        $unread = array_pop($unread);
-        $this->page->command('update', 'num-messages', $unread);
-    }
-
-    private function viewmessages(string $view = 'inbox'): void
-    {
-        if ($this->request->isJSUpdate() && !$this->request->hasPostData()) {
-            return;
-        }
-
-        $page = '';
-        $result = null;
-        $hasmessages = false;
-        if ($view === 'sent') {
-            $result = $this->database->safespecial(
-                <<<'MySQL'
-                    SELECT a.`id` AS `id`
-                    , a.`to` AS `to`
-                    , a.`from` AS `from`
-                    , a.`title` AS `title`
-                    , a.`message` AS `message`
-                    , a.`read` AS `read`
-                    , UNIX_TIMESTAMP(a.`date`) AS `date`
-                    , a.`del_recipient` AS `del_recipient`
-                    , a.`del_sender` AS `del_sender`
-                    , a.`flag` AS `flag`
-                    , m.`display_name` AS `display_name`
-                    FROM %t a
-                    LEFT JOIN %t m
-                        ON a.`to`=m.`id`
-                    WHERE a.`from`=? AND !a.`del_sender`
-                    ORDER BY a.`date` DESC
-
-                    MySQL,
-                ['messages', 'members'],
-                $this->user->get('id'),
-            );
-        } elseif ($view === 'flagged') {
-            $result = $this->database->safespecial(
-                <<<'SQL'
-                    SELECT
-                        a.`id` AS `id`,
-                        a.`to` AS `to`,
-                        a.`from` AS `from`,
-                        a.`title` AS `title`,
-                        a.`message` AS `message`,
-                        a.`read` AS `read`,
-                        UNIX_TIMESTAMP(a.`date`) AS `date`,
-                        a.`del_recipient` AS `del_recipient`,
-                        a.`del_sender` AS `del_sender`,
-                        a.`flag` AS `flag`,
-                        m.`display_name` AS `display_name`
-                    FROM %t a
-                    LEFT JOIN %t m
-                        ON a.`from`=m.`id`
-                    WHERE a.`to`=? AND a.`flag`=1
-                    ORDER BY a.`date` DESC
-                    SQL
-                ,
-                ['messages', 'members'],
-                $this->user->get('id'),
-            );
-        } else {
-            $result = $this->database->safespecial(
-                <<<'SQL'
-                    SELECT
-                        a.`id` AS `id`,
-                        a.`to` AS `to`,
-                        a.`from` AS `from`,
-                        a.`title` AS `title`,
-                        a.`message` AS `message`,
-                        a.`read` AS `read`,
-                        UNIX_TIMESTAMP(a.`date`) AS `date`,
-                        a.`del_recipient` AS `del_recipient`,
-                        a.`del_sender` AS `del_sender`,
-                        a.`flag` AS `flag`,
-                        m.`display_name` AS `display_name`
-                    FROM %t a
-                    LEFT JOIN %t m
-                    ON a.`from`=m.`id`
-                    WHERE a.`to`=? AND !a.`del_recipient`
-                    ORDER BY a.`date` DESC
-                    SQL
-                ,
-                ['messages', 'members'],
-                $this->user->get('id'),
-            );
-        }
-
-        $unread = 0;
-        while ($message = $this->database->arow($result)) {
-            $hasmessages = 1;
-            if (!$message['read']) {
-                ++$unread;
-            }
-
-            $dmessageOnchange = "RUN.stream.location('"
-                . '?act=ucp&what=inbox&flag=' . $message['id'] . "&tog='+" . '
-                (this.checked?1:0), 1)';
-            $page .= $this->template->meta(
-                'inbox-messages-row',
-                $message['read'] ? 'read' : 'unread',
-                '<input class="check" type="checkbox" title="PM Checkbox" name="dmessage[]" '
-                . 'value="' . $message['id'] . '" />',
-                '<input type="checkbox" '
-                . ($message['flag'] ? 'checked="checked" ' : '')
-                . 'class="switch flag" onchange="' . $dmessageOnchange . '" />',
-                $message['id'],
-                $message['title'],
-                $message['display_name'],
-                $this->jax->date($message['date']),
-            );
-        }
-
-        if (!$hasmessages) {
-            if ($view === 'sent') {
-                $msg = 'No sent messages.';
-            } elseif ($view === 'flagged') {
-                $msg = 'No flagged messages.';
-            } else {
-                $msg = 'No messages. You could always try '
-                    . '<a href="?act=ucp&what=inbox&page=compose">'
-                    . 'sending some</a>, though!';
-            }
-
-            $page .= '<tr><td colspan="5" class="error">' . $msg . '</td></tr>';
-        }
-
-        $page = $this->template->meta(
-            'inbox-messages-listing',
-            $this->jax->hiddenFormFields(
-                [
-                    'act' => 'ucp',
-                    'what' => 'inbox',
-                ],
-            ),
-            $view === 'sent' ? 'Recipient' : 'Sender',
-            $page,
-        );
-
-        if ($view === 'inbox') {
-            $this->page->command('update', 'num-messages', $unread);
-        }
-
-        $this->showucp($page);
-    }
-
-    private function compose(string $messageid = '', string $todo = ''): void
-    {
-        $error = null;
-        $mid = 0;
-        $mname = '';
-        $mtitle = '';
-        if ($this->request->post('submit') !== null) {
-            $mid = $this->request->both('mid');
-            if (!$mid && $this->request->both('to')) {
-                $result = $this->database->safeselect(
-                    [
-                        'id',
-                        'email',
-                        'email_settings',
-                    ],
-                    'members',
-                    'WHERE `display_name`=?',
-                    $this->database->basicvalue($this->request->both('to')),
-                );
-                $udata = $this->database->arow($result);
-                $this->database->disposeresult($result);
-            } else {
-                $result = $this->database->safeselect(
-                    [
-                        'id',
-                        'email',
-                        'email_settings',
-                    ],
-                    'members',
-                    'WHERE `id`=?',
-                    $this->database->basicvalue($mid),
-                );
-                $udata = $this->database->arow($result);
-                $this->database->disposeresult($result);
-            }
-
-            if (!$udata) {
-                $error = 'Invalid user!';
-            } elseif (
-                trim((string) $this->request->both('title')) === ''
-                || trim((string) $this->request->both('title')) === '0'
-            ) {
-                $error = 'You must enter a title.';
-            }
-
-            if ($error !== null) {
-                $this->page->command('error', $error);
-                $this->page->append('PAGE', $this->page->error($error));
-            } else {
-                // Put it into the table.
-                $this->database->safeinsert(
-                    'messages',
-                    [
-                        'date' => $this->database->datetime(),
-                        'del_recipient' => 0,
-                        'del_sender' => 0,
-                        'from' => $this->user->get('id'),
-                        'message' => $this->request->post('message'),
-                        'read' => 0,
-                        'title' => $this->textFormatting->blockhtml($this->request->post('title')),
-                        'to' => $udata['id'],
-                    ],
-                );
-                // Give them a notification.
-                $cmd = json_encode(
-                    [
-                        'newmessage',
-                        'You have a new message from ' . $this->user->get('display_name'),
-                        $this->database->insertId(),
-                    ],
-                ) . PHP_EOL;
-                $result = $this->database->safespecial(
-                    <<<'SQL'
-                        UPDATE %t
-                        SET `runonce`=concat(`runonce`,?)
-                        WHERE `uid`=?
-                        SQL
-                    ,
-                    ['session'],
-                    $this->database->basicvalue($cmd),
-                    $udata['id'],
-                );
-                // Send em an email!
-                if (($udata['email_settings'] & 2) !== 0) {
-                    $this->jax->mail(
-                        $udata['email'],
-                        'PM From ' . $this->user->get('display_name'),
-                        "You are receiving this email because you've "
-                        . 'received a message from ' . $this->user->get('display_name')
-                        . ' on {BOARDLINK}.<br>'
-                        . '<br>Please go to '
-                        . "<a href='{BOARDURL}?act=ucp&what=inbox'>"
-                        . '{BOARDURL}?act=ucp&what=inbox</a>'
-                        . ' to view your message.',
-                    );
-                }
-
-                $this->showucp(
-                    'Message successfully delivered.'
-                    . "<br><br><a href='?act=ucp&what=inbox'>Back</a>",
-                );
-
-                return;
-            }
-        }
-
-        if ($this->request->isJSUpdate() && !$messageid) {
-            return;
-        }
-
-        $msg = '';
-        if ($messageid !== '' && $messageid !== '0') {
-            $result = $this->database->safeselect(
-                [
-                    '`from`',
-                    'message',
-                    'title',
-                ],
-                'messages',
-                'WHERE (`to`=? OR `from`=?) AND `id`=?',
-                $this->user->get('id'),
-                $this->user->get('id'),
-                $this->database->basicvalue($messageid),
-            );
-
-            $message = $this->database->arow($result);
-            $this->database->disposeresult($result);
-
-            $mid = $message['from'];
-            $result = $this->database->safeselect(
-                ['display_name'],
-                'members',
-                'WHERE `id`=?',
-                $mid,
-            );
-            $thisrow = $this->database->arow($result);
-            $mname = array_pop($thisrow);
-            $this->database->disposeresult($result);
-
-            $msg = PHP_EOL . PHP_EOL . PHP_EOL
-                . '[quote=' . $mname . ']' . $message['message'] . '[/quote]';
-            $mtitle = ($todo === 'fwd' ? 'FWD:' : 'RE:') . $message['title'];
-            if ($todo === 'fwd') {
-                $mid = '';
-                $mname = '';
-            }
-        }
-
-        if (is_numeric($this->request->get('mid'))) {
-            $showfull = 1;
-            $mid = $this->request->both('mid');
-            $result = $this->database->safeselect(
-                ['display_name'],
-                'members',
-                'WHERE `id`=?',
-                $mid,
-            );
-            $thisrow = $this->database->arow($result);
-            $mname = array_pop($thisrow);
-            $this->database->disposeresult($result);
-
-            if (!$mname) {
-                $mid = 0;
-                $mname = '';
-            }
-        }
-
-        $page = $this->template->meta(
-            'inbox-composeform',
-            $this->jax->hiddenFormFields(
-                [
-                    'act' => 'ucp',
-                    'page' => 'compose',
-                    'submit' => '1',
-                    'what' => 'inbox',
-                ],
-            ),
-            $mid,
-            $mname,
-            $mname ? 'good' : '',
-            $mtitle,
-            htmlspecialchars($msg),
-        );
-        $this->showucp($page);
-    }
-
-    private function delete($messageId, bool $relocate = true): void
-    {
-        $result = $this->database->safeselect(
-            [
-                '`to`',
-                '`from`',
-                'del_recipient',
-                'del_sender',
-            ],
-            'messages',
-            'WHERE `id`=?',
-            $this->database->basicvalue($messageId),
-        );
-        $message = $this->database->arow($result);
-        $this->database->disposeresult($result);
-
-        $is_recipient = $message['to'] === $this->user->get('id');
-        $is_sender = $message['from'] === $this->user->get('id');
-        if ($is_recipient) {
-            $this->database->safeupdate(
-                'messages',
-                [
-                    'del_recipient' => 1,
-                ],
-                'WHERE `id`=?',
-                $this->database->basicvalue($messageId),
-            );
-        }
-
-        if ($is_sender) {
-            $this->database->safeupdate(
-                'messages',
-                [
-                    'del_sender' => 1,
-                ],
-                'WHERE `id`=?',
-                $this->database->basicvalue($messageId),
-            );
-        }
-
-        $result = $this->database->safeselect(
-            [
-                'del_recipient',
-                'del_sender',
-            ],
-            'messages',
-            'WHERE `id`=?',
-            $this->database->basicvalue($messageId),
-        );
-        $message = $this->database->arow($result);
-        $this->database->disposeresult($result);
-
-        if ($message['del_recipient'] && $message['del_sender']) {
-            $this->database->safedelete(
-                'messages',
-                'WHERE `id`=?',
-                $this->database->basicvalue($messageId),
-            );
-        }
-
-        if (!$relocate) {
-            return;
-        }
-
-        $this->page->location(
-            '?act=ucp&what=inbox'
-            . ($this->request->both('prevpage') !== null
-            ? '&page=' . $this->request->both('prevpage') : ''),
-        );
-    }
-
-    private function deleteMessages(array $messageIds): void
-    {
-        foreach ($messageIds as $messageId) {
-            $this->delete($messageId, false);
-        }
     }
 }
