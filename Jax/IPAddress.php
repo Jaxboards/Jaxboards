@@ -8,6 +8,7 @@ use function array_search;
 use function file;
 use function file_exists;
 use function filter_var;
+use function in_array;
 use function inet_ntop;
 use function inet_pton;
 use function mb_strlen;
@@ -94,7 +95,8 @@ final class IPAddress
         return false;
     }
 
-    public function isLocalHost() {
+    public function isLocalHost()
+    {
         return in_array($this->asHumanReadable(), ['127.0.0.1', '::1'], true);
     }
 

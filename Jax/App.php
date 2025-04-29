@@ -13,7 +13,6 @@ use function glob;
 use function gmdate;
 use function header;
 use function implode;
-use function in_array;
 use function is_array;
 use function json_decode;
 use function json_encode;

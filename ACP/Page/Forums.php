@@ -338,7 +338,8 @@ final readonly class Forums
         $this->page->addContentBox('Forums', $page);
     }
 
-    private function fetchForum($forumId): ?array {
+    private function fetchForum($forumId): ?array
+    {
         $result = $this->database->safeselect(
             [
                 'id',
@@ -491,13 +492,13 @@ final readonly class Forums
                     'start' => $this->checkbox(
                         $group['id'],
                         'start',
-                        $groupPerms['start'] ?? $group['can_post_topics']
+                        $groupPerms['start'] ?? $group['can_post_topics'],
                     ),
                     'title' => $group['title'],
                     'upload' => $this->checkbox(
                         $group['id'],
                         'upload',
-                        $groupPerms['upload'] ?? $group['can_attach']
+                        $groupPerms['upload'] ?? $group['can_attach'],
                     ),
                     'view' => $this->checkbox(
                         $group['id'],
@@ -617,7 +618,8 @@ final readonly class Forums
     /**
      * @returns string Error on failure, null on success
      */
-    private function upsertForum(?array $oldForumData, array $write): ?string {
+    private function upsertForum(?array $oldForumData, array $write): ?string
+    {
         $error = null;
 
         // Add per-forum moderator.
@@ -679,13 +681,13 @@ final readonly class Forums
             if ($this->request->post('modid')) {
                 $this->updateperforummodflag();
             }
-
         }
 
         return $error;
     }
 
-    private function computeGroupPermissions() {
+    private function computeGroupPermissions()
+    {
         $groupPerms = [];
         $result = $this->database->safeselect(
             ['id'],
@@ -733,7 +735,8 @@ final readonly class Forums
         return $packed;
     }
 
-    private function getFormData($forum) {
+    private function getFormData($forum)
+    {
         $sub = (int) $this->request->post('show_sub');
         if (is_numeric($this->request->post('orderby'))) {
             $orderby = (int) $this->request->post('orderby');
@@ -743,6 +746,7 @@ final readonly class Forums
             'categories',
         );
         $thisrow = $this->database->arow($result);
+
         return [
             'cat_id' => $forum['cat_id'] ?: array_pop($thisrow),
             'mods' => $forum['mods'] ?? null,
