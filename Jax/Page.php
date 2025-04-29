@@ -6,9 +6,11 @@ namespace Jax;
 
 use Exception;
 
+use function array_key_exists;
 use function array_keys;
 use function array_merge;
 use function array_pop;
+use function array_reduce;
 use function array_values;
 use function explode;
 use function file_get_contents;
@@ -17,7 +19,6 @@ use function header;
 use function headers_sent;
 use function htmlspecialchars_decode;
 use function implode;
-use function in_array;
 use function is_array;
 use function is_dir;
 use function is_string;
@@ -25,11 +26,9 @@ use function json_decode;
 use function json_encode;
 use function mb_strpos;
 use function mb_strtolower;
-use function mb_strtoupper;
 use function mb_substr;
 use function pathinfo;
 use function preg_match;
-use function preg_replace;
 use function preg_replace_callback;
 use function str_contains;
 use function str_replace;
@@ -104,20 +103,22 @@ final class Page
     /**
      * Stores the major page components, for example <!--PAGE-->
      * Please keep the array keys as uppercase for consistency and
-     * easy grepping
+     * easy grepping.
+     *
      * @var array<string,string>
      */
     private array $parts = [];
 
     /**
-     * Stores page variables, like <%ismod%>
+     * Stores page variables, like <%ismod%>.
      *
      * @var array<string,string>
      */
     private array $vars = [];
 
     /**
-     * These are custom meta definitions parsed from M tags in the board template
+     * These are custom meta definitions parsed from M tags in the board template.
+     *
      * @var array<string,string>
      */
     private array $userMetaDefs = [];
@@ -139,6 +140,7 @@ final class Page
     /**
      * Array of component directories to load.
      * Any component directory added to the queue will have all of its HTML files loaded.
+     *
      * @var array<string>
      */
     private array $metaqueue;
@@ -459,9 +461,8 @@ final class Page
             $metaDefs = array_merge(
                 // Load default templates for component first
                 $this->loadComponentTemplates($defaultComponentDir),
-
                 // Then override with any overrides from the theme
-                $this->loadComponentTemplates($componentDir)
+                $this->loadComponentTemplates($componentDir),
             );
 
             $this->metaDefs = array_merge($metaDefs, $this->metaDefs);
@@ -470,11 +471,14 @@ final class Page
 
     /**
      * Given a component directory, loads all of the HTML views in it.
+     *
+     * @param mixed $componentDir
+     *
      * @return array<string,string> Map of metaName => view HTML
      */
     private function loadComponentTemplates($componentDir): array
     {
-        return array_reduce(glob($componentDir . '/*.html'), function($meta, $metaFile) {
+        return array_reduce(glob($componentDir . '/*.html'), function ($meta, $metaFile) {
             $metaName = (string) pathinfo($metaFile, PATHINFO_FILENAME);
             $metaContent = file_get_contents($metaFile);
 

@@ -66,9 +66,11 @@ final readonly class PrivateMessage
             }
 
             unset($commands[$index]);
-            if (!in_array($command[1], $enemies)) {
-                $this->page->command(...$command);
+            if (in_array($command[1], $enemies)) {
+                continue;
             }
+
+            $this->page->command(...$command);
         }
 
         $this->session->set('runonce', implode(PHP_EOL, $commands));
