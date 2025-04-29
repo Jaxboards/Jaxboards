@@ -246,10 +246,13 @@ final class Page
             return;
         }
 
-        $this->append('path', $this->buildPath());
+        $this->append('PATH', $this->buildPath());
+        $header = ['CSS', 'SCRIPT', 'TITLE'];
 
         foreach ($this->parts as $part => $contents) {
-            $contents = '<div id="' . mb_strtolower($part) . '">' . $contents . '</div>';
+            if (!in_array($part, $header)) {
+                $contents = '<div id="' . mb_strtolower($part) . '">' . $contents . '</div>';
+            }
 
             $this->template = str_replace("<!--{$part}-->", $contents, $this->template);
         }
