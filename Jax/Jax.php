@@ -5,14 +5,9 @@ declare(strict_types=1);
 namespace Jax;
 
 use function floor;
-use function gmdate;
-use function in_array;
 use function json_decode;
 use function mail;
-use function round;
 use function str_replace;
-use function strtotime;
-use function time;
 
 use const PHP_EOL;
 

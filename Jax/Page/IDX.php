@@ -393,7 +393,7 @@ final class IDX
             $birthdayCode = $user['birthday'] === $today
                 && $this->config->getSetting('birthdays') ? ' birthday' : '';
             $lastOnlineCode = $this->date->relativeTime(
-                $user['hide'] ? $user['read_date'] : $user['last_update']
+                $user['hide'] ? $user['read_date'] : $user['last_update'],
             );
             $userstoday
                 .= <<<EOT
