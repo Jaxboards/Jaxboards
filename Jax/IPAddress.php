@@ -94,6 +94,10 @@ final class IPAddress
         return false;
     }
 
+    public function isLocalHost() {
+        return in_array($this->asHumanReadable(), ['127.0.0.1', '::1'], true);
+    }
+
     public function getBannedIps()
     {
         if ($this->ipBanCache !== null) {

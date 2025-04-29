@@ -68,25 +68,25 @@ final readonly class Forums
             }
         } elseif ($this->request->both('edit')) {
             if (is_numeric($this->request->both('edit'))) {
-                $this->createforum($this->request->both('edit'));
+                $this->createForum($this->request->both('edit'));
 
                 return;
             }
 
             if (preg_match('@c_(\d+)@', (string) $this->request->both('edit'), $match)) {
-                $this->createcategory($match[1]);
+                $this->createCategory($match[1]);
 
                 return;
             }
         }
 
         match ($this->request->get('do')) {
-            'order' => $this->orderforums(),
-            'create' => $this->createforum(),
-            'createc' => $this->createcategory(),
+            'order' => $this->orderForums(),
+            'create' => $this->createForum(),
+            'createc' => $this->createCategory(),
             'recountstats' => $this->recountStats->showstats(),
             'recountstats2' => $this->recountStats->recountStatistics(),
-            default => $this->orderforums(),
+            default => $this->orderForums(),
         };
     }
 
@@ -229,7 +229,7 @@ final readonly class Forums
         return '';
     }
 
-    private function orderforums(int|string $highlight = 0): void
+    private function orderForums(int|string $highlight = 0): void
     {
         $page = '';
         if ($highlight) {
@@ -270,15 +270,10 @@ final readonly class Forums
                 'cat_id',
                 'title',
                 'subtitle',
-                'lp_uid',
                 'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
-                'lp_tid',
-                'lp_topic',
                 'path',
                 'show_sub',
                 'redirect',
-                'topics',
-                'posts',
                 '`order`',
                 'perms',
                 'orderby',
@@ -343,54 +338,51 @@ final readonly class Forums
         $this->page->addContentBox('Forums', $page);
     }
 
+    private function fetchForum($forumId): ?array {
+        $result = $this->database->safeselect(
+            [
+                'id',
+                'cat_id',
+                'title',
+                'subtitle',
+                'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
+                'path',
+                'show_sub',
+                'redirect',
+                '`order`',
+                'perms',
+                'orderby',
+                'nocount',
+                'redirects',
+                'trashcan',
+                'mods',
+                'show_ledby',
+            ],
+            'forums',
+            'WHERE `id`=?',
+            $this->database->basicvalue($forumId),
+        );
+        $forum = $this->database->arow($result);
+        $this->database->disposeresult($result);
+
+        return $forum;
+    }
+
     /**
      * Create & Edit forum.
      *
      * @param int $fid The forum ID. If set, this edits a forum,
      *                 otherwise it creates one.
      */
-    private function createforum($fid = 0): void
+    private function createForum($fid = 0): void
     {
         $page = '';
         $forumperms = '';
-        $fdata = [];
+        $forum = $this->fetchForum($fid);
         $error = null;
 
-        if ($fid) {
-            $result = $this->database->safeselect(
-                [
-                    'id',
-                    'cat_id',
-                    'title',
-                    'subtitle',
-                    'lp_uid',
-                    'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
-                    'lp_tid',
-                    'lp_topic',
-                    'path',
-                    'show_sub',
-                    'redirect',
-                    'topics',
-                    'posts',
-                    '`order`',
-                    'perms',
-                    'orderby',
-                    'nocount',
-                    'redirects',
-                    'trashcan',
-                    'mods',
-                    'show_ledby',
-                ],
-                'forums',
-                'WHERE `id`=?',
-                $this->database->basicvalue($fid),
-            );
-            $fdata = $this->database->arow($result);
-            $this->database->disposeresult($result);
-        }
-
         if ($this->request->post('tree') !== null) {
-            $this->orderforums();
+            $this->orderForums();
 
             $page .= $this->page->success('Forum created.');
         }
@@ -398,15 +390,15 @@ final readonly class Forums
         // Remove mod from forum.
         if (
             is_numeric($this->request->both('rmod'))
-            && $fdata['mods']
+            && $forum['mods']
         ) {
-            $exploded = explode(',', (string) $fdata['mods']);
+            $exploded = explode(',', (string) $forum['mods']);
             unset($exploded[array_search($this->request->both('rmod'), $exploded, true)]);
-            $fdata['mods'] = implode(',', $exploded);
+            $forum['mods'] = implode(',', $exploded);
             $this->database->safeupdate(
                 'forums',
                 [
-                    'mods' => $fdata['mods'],
+                    'mods' => $forum['mods'],
                 ],
                 'WHERE `id`=?',
                 $this->database->basicvalue($fid),
@@ -416,152 +408,23 @@ final readonly class Forums
         }
 
         if ($this->request->post('submit') !== null) {
-            // Saves all of the data
-            // really should be its own function, but I don't care.
-            $grouppermsa = [];
-            $groupperms = '';
-            $result = $this->database->safeselect(
-                ['id'],
-                'member_groups',
-            );
-            while ($group = $this->database->arow($result)) {
-                $groups = $this->request->post('groups') ?? [];
-
-                if (!$groups[$group['id']]) {
-                    $groups[$group['id']] = [];
-                }
-
-                $options = ['read', 'start', 'reply', 'upload', 'view', 'poll'];
-                $groupPermInput = $groups[$group['id']];
-                if (
-                    isset($groupPermInput['global'])
-                    && $groupPermInput['global']
-                ) {
-                    continue;
-                }
-
-                foreach ($options as $option) {
-                    if (isset($groupPermInput[$option])) {
-                        continue;
-                    }
-
-                    $groupPermInput[$option] = false;
-                }
-
-                $grouppermsa[$group['id']]
-                    = ($groupPermInput['read'] ? 8 : 0)
-                    + ($groupPermInput['start'] ? 4 : 0)
-                    + ($groupPermInput['reply'] ? 2 : 0)
-                    + ($groupPermInput['upload'] ? 1 : 0)
-                    + ($groupPermInput['view'] ? 16 : 0)
-                    + ($groupPermInput['poll'] ? 32 : 0);
-            }
-
-            foreach ($grouppermsa as $permission => $flag) {
-                $groupperms .= pack('n*', $permission, $flag);
-            }
-
-            $sub = (int) $this->request->post('show_sub');
-            if (is_numeric($this->request->post('orderby'))) {
-                $orderby = (int) $this->request->post('orderby');
-            }
-
-            $result = $this->database->safeselect(
-                ['id'],
-                'categories',
-            );
-            $thisrow = $this->database->arow($result);
-            $write = [
-                'cat_id' => $fdata['cat_id'] ?: array_pop($thisrow),
-                'mods' => $fdata['mods'] ?? null,
-                'nocount' => $this->request->post('nocount') ? 0 : 1,
-                'orderby' => $orderby > 0 && $orderby <= 5 ? $orderby : 0,
-                'perms' => $groupperms,
-                'redirect' => $this->request->post('redirect'),
-                'show_ledby' => (int) $this->request->post('show_ledby'),
-                'show_sub' => $sub === 1 || $sub === 2 ? $sub : 0,
-                'subtitle' => $this->request->post('description'),
-                'title' => $this->request->post('title'),
-                'trashcan' => (int) $this->request->post('trashcan'),
-                // Handling done below.
-            ];
-            $this->database->disposeresult($result);
-
-            // Add per-forum moderator.
-            if (is_numeric($this->request->post('modid'))) {
-                $result = $this->database->safeselect(
-                    ['id'],
-                    'members',
-                    'WHERE `id`=?',
-                    $this->database->basicvalue($this->request->post('modid')),
-                );
-                if ($this->database->arow($result)) {
-                    if (!in_array($this->request->post('modid'), isset($fdata['mods']) ? explode(',', $fdata['mods']) : [])) {
-                        $write['mods'] = isset($fdata['mods'])
-                            && $fdata['mods']
-                            ? $fdata['mods'] . ',' . $this->request->post('modid')
-                            : $this->request->post('modid');
-                    }
-                } else {
-                    $error = "You tried to add a moderator that doesn't exist!";
-                }
-
-                $this->database->disposeresult($result);
-            }
-
-            if (!$write['title']) {
-                $error = 'Forum title is required';
-            }
-
+            $write = $this->getFormData($forum);
+            $error = $this->upsertForum($forum, $write);
             if ($error !== null) {
-                // Clear trashcan on other forums.
-                if (
-                    $write['trashcan']
-                    || (!$write['trashcan']
-                    && isset($fdata['trashcan'])
-                    && $fdata['trashcan'])
-                ) {
-                    $this->database->safeupdate(
-                        'forums',
-                        [
-                            'trashcan' => 0,
-                        ],
-                    );
-                }
-
-                if (!$fdata) {
-                    $this->database->safeinsert(
-                        'forums',
-                        $write,
-                    );
-
-                    $this->orderforums($this->database->insertId());
-
-                    return;
-                }
-
-                $this->database->safeupdate(
-                    'forums',
-                    $write,
-                    'WHERE `id`=?',
-                    $fid,
-                );
-                if ($this->request->post('modid')) {
-                    $this->updateperforummodflag();
-                }
-
-                $page .= $this->page->success('Data saved.');
+                $page .= $this->page->error($error);
+            } else {
+                $page .= $this->page->success('Forum saved.');
+                $forum = $write;
             }
-
-            $fdata = $write;
         }
 
+
         $perms = [];
-        if (isset($fdata['perms']) && $fdata['perms']) {
-            $unpack = unpack('n*', (string) $fdata['perms']);
+        if (isset($forum['perms']) && $forum['perms']) {
+            $unpack = unpack('n*', (string) $forum['perms']);
             $counter = count($unpack);
             for ($index = 1; $index < $counter; $index += 2) {
-                $perms[$unpack[$index]] = $unpack[$index + 1];
+                $perms[$unpack[$index]] = $this->user->parseForumPerms($unpack[$index + 1]);
             }
         }
 
@@ -602,51 +465,44 @@ final readonly class Forums
             'member_groups',
         );
 
-        $groupperms = '';
+        $permsTable = '';
         while ($group = $this->database->arow($result)) {
-            $global = !isset($perms[$group['id']]);
-            if (!$global) {
-                $perms = isset($perms[$group['id']])
-                    ? $this->user->parseForumPerms($perms[$group['id']])
-                    : null;
-            }
+            $groupPerms = $perms[$group['id']] ?? null;
 
-            $groupperms .= $this->page->parseTemplate(
+            $permsTable .= $this->page->parseTemplate(
                 'forums/create-forum-permissions-row.html',
                 [
-                    'global' => $this->checkbox($group['id'], 'global', $global),
+                    'global' => $this->checkbox($group['id'], 'global', $groupPerms === null),
                     'poll' => $this->checkbox(
                         $group['id'],
                         'poll',
-                        $global ? $group['can_poll'] : $perms['poll'],
+                        $groupPerms['poll'] ?? $group['can_poll'],
                     ),
                     'read' => $this->checkbox(
                         $group['id'],
                         'read',
-                        $global ? 1 : $perms['read'],
+                        $groupPerms['read'] ?? 1,
                     ),
                     'reply' => $this->checkbox(
                         $group['id'],
                         'reply',
-                        $global ? $group['can_post']
-                        : $perms['reply'],
+                        $groupPerms['reply'] ?? $group['can_post'],
                     ),
                     'start' => $this->checkbox(
                         $group['id'],
                         'start',
-                        $global ? $group['can_post_topics']
-                        : $perms['start'],
+                        $groupPerms['start'] ?? $group['can_post_topics']
                     ),
                     'title' => $group['title'],
                     'upload' => $this->checkbox(
                         $group['id'],
                         'upload',
-                        $global ? $group['can_attach'] : $perms['upload'],
+                        $groupPerms['upload'] ?? $group['can_attach']
                     ),
                     'view' => $this->checkbox(
                         $group['id'],
                         'view',
-                        $global ? 1 : $perms['view'],
+                        $groupPerms['view'] ?? 1,
                     ),
                 ],
             );
@@ -668,7 +524,7 @@ final readonly class Forums
                 'select-option.html',
                 [
                     'label' => $label,
-                    'selected' => isset($fdata['show_sub']) && $value === $fdata['show_sub'] ? 'selected="selected"' : '',
+                    'selected' => isset($forum['show_sub']) && $value === $forum['show_sub'] ? 'selected="selected"' : '',
                     'value' => $value,
                 ],
             );
@@ -688,7 +544,7 @@ final readonly class Forums
                 'select-option.html',
                 [
                     'label' => $label,
-                    'selected' => isset($fdata['orderby']) && $value === $fdata['orderby']
+                    'selected' => isset($forum['orderby']) && $value === $forum['orderby']
                     ? 'selected="selected"' : '',
                     'value' => $value,
                 ],
@@ -699,24 +555,24 @@ final readonly class Forums
         $page .= $this->page->parseTemplate(
             'forums/create-forum.html',
             [
-                'description' => isset($fdata['subtitle']) ? $this->textFormatting->blockhtml($fdata['subtitle']) : '',
-                'no_count' => isset($fdata['nocount']) && $fdata['nocount']
+                'description' => isset($forum['subtitle']) ? $this->textFormatting->blockhtml($forum['subtitle']) : '',
+                'no_count' => isset($forum['nocount']) && $forum['nocount']
                 ? '' : ' checked="checked"',
                 'order_by_options' => $orderByOptions,
-                'redirect_url' => isset($fdata['redirect']) ? $this->textFormatting->blockhtml($fdata['redirect']) : '',
+                'redirect_url' => isset($forum['redirect']) ? $this->textFormatting->blockhtml($forum['redirect']) : '',
                 'subforum_options' => $subforumOptions,
-                'title' => isset($fdata['title']) ? $this->textFormatting->blockhtml($fdata['title']) : '',
-                'trashcan' => isset($fdata['trashcan']) && $fdata['trashcan']
+                'title' => isset($forum['title']) ? $this->textFormatting->blockhtml($forum['title']) : '',
+                'trashcan' => isset($forum['trashcan']) && $forum['trashcan']
                 ? ' checked="checked"' : '',
             ],
         );
 
-        if (isset($fdata['mods']) && $fdata['mods']) {
+        if (isset($forum['mods']) && $forum['mods']) {
             $result = $this->database->safeselect(
                 ['display_name', 'id'],
                 'members',
                 'WHERE `id` IN ?',
-                explode(',', (string) $fdata['mods']),
+                explode(',', (string) $forum['mods']),
             );
             $modList = '';
             while ($member = $this->database->arow($result)) {
@@ -736,7 +592,7 @@ final readonly class Forums
             'forums/create-forum-moderators.html',
             [
                 'mod_list' => $modList,
-                'show_led_by' => isset($fdata['show_ledby']) && $fdata['show_ledby']
+                'show_led_by' => isset($forum['show_ledby']) && $forum['show_ledby']
                      ? 'checked="checked"' : '',
             ],
         );
@@ -744,18 +600,162 @@ final readonly class Forums
         $forumperms = $this->page->parseTemplate(
             'forums/create-forum-permissions.html',
             [
-                'content' => $groupperms,
+                'content' => $permsTable,
                 'submit' => $fid ? 'Save' : 'Next',
             ],
         );
 
         $this->page->addContentBox(
             ($fid ? 'Edit' : 'Create') . ' Forum'
-            . ($fid ? ' - ' . $this->textFormatting->blockhtml($fdata['title']) : ''),
+            . ($fid ? ' - ' . $this->textFormatting->blockhtml($forum['title']) : ''),
             $page,
         );
         $this->page->addContentBox('Moderators', $moderators);
         $this->page->addContentBox('Forum Permissions', $forumperms);
+    }
+
+    /**
+     * @returns string Error on failure, null on success
+     */
+    private function upsertForum(?array $oldForumData, array $write): ?string {
+        $error = null;
+
+        // Add per-forum moderator.
+        if (is_numeric($this->request->post('modid'))) {
+            $result = $this->database->safeselect(
+                ['id'],
+                'members',
+                'WHERE `id`=?',
+                $this->database->basicvalue($this->request->post('modid')),
+            );
+            if ($this->database->arow($result)) {
+                if (!in_array($this->request->post('modid'), isset($oldForumData['mods']) ? explode(',', $oldForumData['mods']) : [])) {
+                    $write['mods'] = isset($oldForumData['mods'])
+                        && $oldForumData['mods']
+                        ? $oldForumData['mods'] . ',' . $this->request->post('modid')
+                        : $this->request->post('modid');
+                }
+            } else {
+                $error = "You tried to add a moderator that doesn't exist!";
+            }
+
+            $this->database->disposeresult($result);
+        }
+
+        if (!$write['title']) {
+            $error = 'Forum title is required';
+        }
+
+        if ($error === null) {
+            // Clear trashcan on other forums.
+            if (
+                $write['trashcan']
+            ) {
+                $this->database->safeupdate(
+                    'forums',
+                    [
+                        'trashcan' => 0,
+                    ],
+                );
+            }
+
+            if (!$oldForumData) {
+                $this->database->safeinsert(
+                    'forums',
+                    $write,
+                );
+
+                $this->orderForums($this->database->insertId());
+
+                return null;
+            }
+
+            $this->database->safeupdate(
+                'forums',
+                $write,
+                'WHERE `id`=?',
+                $oldForumData['id'],
+            );
+            if ($this->request->post('modid')) {
+                $this->updateperforummodflag();
+            }
+
+        }
+
+        return $error;
+    }
+
+    private function computeGroupPermissions() {
+        $groupPerms = [];
+        $result = $this->database->safeselect(
+            ['id'],
+            'member_groups',
+        );
+        while ($group = $this->database->arow($result)) {
+            $groups = $this->request->post('groups') ?? [];
+
+            if (!isset($groups[$group['id']])) {
+                $groups[$group['id']] = [];
+            }
+
+            $options = ['read', 'start', 'reply', 'upload', 'view', 'poll'];
+            $groupPermInput = $groups[$group['id']];
+            if (
+                isset($groupPermInput['global'])
+                && $groupPermInput['global']
+            ) {
+                continue;
+            }
+
+            foreach ($options as $option) {
+                if (isset($groupPermInput[$option])) {
+                    continue;
+                }
+
+                $groupPermInput[$option] = false;
+            }
+
+            $groupPerms[$group['id']]
+                = ($groupPermInput['read'] ? 8 : 0)
+                + ($groupPermInput['start'] ? 4 : 0)
+                + ($groupPermInput['reply'] ? 2 : 0)
+                + ($groupPermInput['upload'] ? 1 : 0)
+                + ($groupPermInput['view'] ? 16 : 0)
+                + ($groupPermInput['poll'] ? 32 : 0);
+        }
+        $this->database->disposeresult($result);
+
+        $packed = '';
+        foreach ($groupPerms as $groupId => $flag) {
+            $packed .= pack('n*', $groupId, $flag);
+        }
+
+        return $packed;
+    }
+
+    private function getFormData($forum) {
+        $sub = (int) $this->request->post('show_sub');
+        if (is_numeric($this->request->post('orderby'))) {
+            $orderby = (int) $this->request->post('orderby');
+        }
+        $result = $this->database->safeselect(
+            ['id'],
+            'categories',
+        );
+        $thisrow = $this->database->arow($result);
+        return [
+            'cat_id' => $forum['cat_id'] ?: array_pop($thisrow),
+            'mods' => $forum['mods'] ?? null,
+            'nocount' => $this->request->post('nocount') ? 0 : 1,
+            'orderby' => $orderby > 0 && $orderby <= 5 ? $orderby : 0,
+            'perms' => $this->computeGroupPermissions(),
+            'redirect' => $this->request->post('redirect'),
+            'show_ledby' => (bool) $this->request->post('show_ledby'),
+            'show_sub' => $sub === 1 || $sub === 2 ? $sub : 0,
+            'subtitle' => $this->request->post('description'),
+            'title' => $this->request->post('title'),
+            'trashcan' => (bool) $this->request->post('trashcan'),
+        ];
     }
 
     private function deleteforum(string $forumId): void
@@ -827,38 +827,9 @@ final readonly class Forums
             return;
         }
 
-        $result = $this->database->safeselect(
-            [
-                'cat_id',
-                'id',
-                'lp_tid',
-                'lp_topic',
-                'lp_uid',
-                'mods',
-                'nocount',
-                'order',
-                'orderby',
-                'path',
-                'perms',
-                'posts',
-                'redirect',
-                'redirects',
-                'show_ledby',
-                'show_sub',
-                'subtitle',
-                'title',
-                'topics',
-                'trashcan',
-                'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
-            ],
-            'forums',
-            'WHERE `id`=?',
-            $this->database->basicvalue($forumId),
-        );
-        $fdata = $this->database->arow($result);
-        $this->database->disposeresult($result);
+        $forum = $this->fetchForum($forumId);
 
-        if (!$fdata) {
+        if (!$forum) {
             $this->page->addContentBox(
                 'Deleting Forum: ' . $forumId,
                 $this->page->error("Forum doesn't exist."),
@@ -869,27 +840,8 @@ final readonly class Forums
 
         $result = $this->database->safeselect(
             [
-                'cat_id',
                 'id',
-                'lp_tid',
-                'lp_topic',
-                'lp_uid',
-                'mods',
-                'nocount',
-                'order',
-                'orderby',
-                'path',
-                'perms',
-                'posts',
-                'redirect',
-                'redirects',
-                'show_ledby',
-                'show_sub',
-                'subtitle',
                 'title',
-                'topics',
-                'trashcan',
-                'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
             ],
             'forums',
         );
@@ -906,7 +858,7 @@ final readonly class Forums
         }
 
         $this->page->addContentBox(
-            'Deleting Forum: ' . $fdata['title'],
+            'Deleting Forum: ' . $forum['title'],
             $this->page->parseTemplate(
                 'forums/delete-forum.html',
                 [
@@ -916,7 +868,7 @@ final readonly class Forums
         );
     }
 
-    private function createcategory($cid = false): void
+    private function createCategory($cid = false): void
     {
         $page = '';
         $cdata = [];

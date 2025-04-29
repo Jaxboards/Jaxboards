@@ -86,8 +86,7 @@ final class App
         // current user throughout the script are finally put into query form here.
         $this->session->applyChanges();
 
-        $onLocalHost = in_array($this->ipAddress->asHumanReadable(), ['127.0.0.1', '::1'], true);
-        if ($onLocalHost) {
+        if ($this->ipAddress->isLocalHost()) {
             $this->renderDebugInfo();
         }
 

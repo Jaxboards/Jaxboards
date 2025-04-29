@@ -7,6 +7,8 @@ namespace ACP;
 use DI\Container;
 use Exception;
 use Jax\Config;
+use Jax\DebugLog;
+use Jax\IPAddress;
 use Jax\Request;
 use Jax\Session;
 use Jax\User;
@@ -35,6 +37,8 @@ final class App
     public function __construct(
         private readonly Config $config,
         private readonly Container $container,
+        private readonly DebugLog $debugLog,
+        private readonly IPAddress $ipAddress,
         private readonly Page $page,
         private readonly Request $request,
         private readonly User $user,
@@ -70,7 +74,9 @@ final class App
             }
         }
 
-
+        if ($this->ipAddress->isLocalHost()) {
+            $this->page->addContentBox('Debug', implode('<br>', $this->debugLog->getLog()));
+        }
 
         $this->page->out();
     }
