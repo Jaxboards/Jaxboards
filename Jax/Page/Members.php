@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\Database;
+use Jax\Date;
 use Jax\Jax;
 use Jax\Page;
 use Jax\Request;
@@ -23,6 +24,7 @@ final class Members
 
     public function __construct(
         private readonly Database $database,
+        private readonly Date $date,
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly Template $template,
@@ -190,7 +192,7 @@ final class Members
                 $member['g_title'],
                 $member['id'],
                 $member['posts'],
-                $this->jax->date($member['join_date']),
+                $this->date->autoDate($member['join_date']),
                 $contactdetails,
             );
         }

@@ -36,55 +36,6 @@ final readonly class Jax
         return $html;
     }
 
-    /**
-     * @param array<string> $options can contain 'autodate' to control format
-     */
-    public function date(?int $date, $options = ['autodate']): string
-    {
-        // Some old forums have nullable fields that are no longer nullable
-        // This needs to stay for data backwards compatibility
-        if ($date === null) {
-            return '';
-        }
-
-        $autodate = in_array('autodate', $options);
-
-        $delta = time() - $date;
-        $fmt = '';
-        if ($delta < 90) {
-            $fmt = 'a minute ago';
-        } elseif ($delta < 3600) {
-            $fmt = round($delta / 60) . ' minutes ago';
-        } elseif (gmdate('m j Y') === gmdate('m j Y', $date)) {
-            $fmt = 'Today @ ' . gmdate('g:i a', $date);
-        } elseif (gmdate('m j Y', strtotime('yesterday')) === gmdate('m j Y', $date)) {
-            $fmt = 'Yesterday @ ' . gmdate('g:i a', $date);
-        } else {
-            $fmt = gmdate('M jS, Y @ g:i a', $date);
-        }
-
-        if (!$autodate) {
-            return $fmt;
-        }
-
-        return "<span class='autodate' title='{$date}'>{$fmt}</span>";
-    }
-
-    /**
-     * @param array<string> $options can contain 'autodate' or 'seconds' to control format
-     */
-    public function smalldate(
-        int $timestamp,
-        array $options = [],
-    ): string {
-        $autodate = in_array('autodate', $options);
-        $seconds = in_array('seconds', $options);
-
-        return ($autodate ? "<span class='autodate smalldate' title='{$timestamp}'>" : '')
-            . gmdate('g:i' . ($seconds ? ':s' : '') . 'a, n/j/y', $timestamp)
-            . ($autodate ? '</span>' : '');
-    }
-
     public function parsereadmarkers(?string $readmarkers)
     {
         if ($readmarkers) {

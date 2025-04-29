@@ -34,6 +34,7 @@ final class App
         private readonly Config $config,
         private readonly Container $container,
         private readonly Database $database,
+        private readonly Date $date,
         private readonly DebugLog $debugLog,
         private readonly DomainDefinitions $domainDefinitions,
         private readonly IPAddress $ipAddress,
@@ -303,7 +304,7 @@ final class App
                     $this->user->get('group_id'),
                     $this->user->get('display_name'),
                 ),
-                $this->jax->smalldate(
+                $this->date->smallDate(
                     $this->user->get('last_visit'),
                 ),
                 $nummessages,

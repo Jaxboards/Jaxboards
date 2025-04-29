@@ -6,6 +6,7 @@ namespace Jax\Page;
 
 use Jax\Config;
 use Jax\Database;
+use Jax\Date;
 use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
@@ -56,6 +57,7 @@ final class Topic
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
+        private readonly Date $date,
         private readonly DomainDefinitions $domainDefinitions,
         private readonly Jax $jax,
         private readonly IPAddress $ipAddress,
@@ -766,7 +768,7 @@ final class Topic
                 $post['auth_id'],
                 $postbuttons,
                 // ^10
-                $this->jax->date($post['date']),
+                $this->date->autoDate($post['date']),
                 '<a href="?act=vt' . $this->tid . '&amp;findpost=' . $post['pid']
                 . '" onclick="prompt(\'Link to this post:\',this.href);return false">'
                 . $this->template->meta('topic-perma-button') . '</a>',
@@ -783,7 +785,7 @@ final class Topic
                         $post['egroup_id'],
                         $post['ename'],
                     ),
-                    $this->jax->date($post['edit_date']),
+                    $this->date->autoDate($post['edit_date']),
                 ) : '',
                 $this->user->getPerm('can_moderate')
                     ? '<a href="?act=modcontrols&amp;do=iptools&amp;ip='

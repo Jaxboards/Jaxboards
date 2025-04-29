@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\Database;
+use Jax\Date;
 use Jax\Jax;
 use Jax\Page;
 use Jax\Request;
@@ -18,6 +19,7 @@ final class Ticker
 
     public function __construct(
         private readonly Database $database,
+        private readonly Date $date,
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly Request $request,
@@ -159,7 +161,7 @@ final class Ticker
     {
         return $this->template->meta(
             'ticker-tick',
-            $this->jax->smalldate($t['date'], ['autodate']),
+            $this->date->smallDate($t['date'], ['autodate' => true]),
             $this->template->meta(
                 'user-link',
                 $t['auth_id'],

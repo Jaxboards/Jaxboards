@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\Database;
+use Jax\Date;
 use Jax\Jax;
 use Jax\Page;
 use Jax\Request;
@@ -37,6 +38,7 @@ final class Forum
 
     public function __construct(
         private readonly Database $database,
+        private readonly Date $date,
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly Session $session,
@@ -237,7 +239,7 @@ final class Forum
                         $forum['lp_gid'],
                         $forum['lp_name'],
                     ) : 'None',
-                    $this->jax->date($forum['lp_date']) ?: '- - - - -',
+                    $this->date->autoDate($forum['lp_date']) ?: '- - - - -',
                 ),
                 $forum['topics'],
                 $forum['posts'],
@@ -375,7 +377,7 @@ final class Forum
                 // 5
                 number_format($forum['views']),
                 // 6
-                $this->jax->date($forum['lp_date']),
+                $this->date->autoDate($forum['lp_date']),
                 // 7
                 $this->template->meta('user-link', $forum['lp_uid'], $forum['lp_gid'], $forum['lp_name']),
                 // 8

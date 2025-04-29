@@ -6,6 +6,7 @@ namespace Jax\Page;
 
 use Jax\Config;
 use Jax\Database;
+use Jax\Date;
 use Jax\Jax;
 use Jax\Page;
 use Jax\Request;
@@ -42,6 +43,7 @@ final class IDX
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
+        private readonly Date $date,
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly Request $request,
@@ -390,9 +392,8 @@ final class IDX
             $fGroupId = $user['group_id'];
             $birthdayCode = $user['birthday'] === $today
                 && $this->config->getSetting('birthdays') ? ' birthday' : '';
-            $lastOnlineCode = $this->jax->date(
-                $user['hide'] ? $user['read_date'] : $user['last_update'],
-                [],
+            $lastOnlineCode = $this->date->relativeTime(
+                $user['hide'] ? $user['read_date'] : $user['last_update']
             );
             $userstoday
                 .= <<<EOT
@@ -595,7 +596,7 @@ final class IDX
                 $forum['lp_gid'],
                 $forum['lp_name'],
             ) : 'None',
-            $this->jax->date($forum['lp_date']) ?: '- - - - -',
+            $this->date->autoDate($forum['lp_date']) ?: '- - - - -',
         );
     }
 

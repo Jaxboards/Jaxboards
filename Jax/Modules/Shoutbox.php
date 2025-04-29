@@ -6,6 +6,7 @@ namespace Jax\Modules;
 
 use Jax\Config;
 use Jax\Database;
+use Jax\Date;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
@@ -33,6 +34,7 @@ final class Shoutbox
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
+        private readonly Date $date,
         private readonly IPAddress $ipAddress,
         private readonly Jax $jax,
         private readonly Page $page,
@@ -123,9 +125,9 @@ final class Shoutbox
         if (mb_substr($shout, 0, 4) === '/me ') {
             return $this->template->meta(
                 'shout-action',
-                $this->jax->smalldate(
+                $this->date->smallDate(
                     $row['date'],
-                    ['seconds'],
+                    ['seconds' => true],
                 ),
                 $user,
                 mb_substr(

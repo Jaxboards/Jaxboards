@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Jax\Database;
+use Jax\Date;
 use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
@@ -45,6 +46,7 @@ final class UserProfile
 
     public function __construct(
         private readonly Database $database,
+        private readonly Date $date,
         private readonly DomainDefinitions $domainDefinitions,
         private readonly IPAddress $ipAddress,
         private readonly Jax $jax,
@@ -279,7 +281,7 @@ final class UserProfile
                         $post['tid'],
                         $post['title'],
                         $post['pid'],
-                        $this->jax->date($post['date']),
+                        $this->date->autoDate($post['date']),
                         $this->textFormatting->theworks($post['post']),
                     );
                 }
@@ -319,7 +321,7 @@ final class UserProfile
                         'userprofile-topic',
                         $post['tid'],
                         $post['title'],
-                        $this->jax->date($post['date']),
+                        $this->date->autoDate($post['date']),
                         $this->textFormatting->theworks($post['post']),
                     );
                 }
@@ -486,7 +488,7 @@ final class UserProfile
                             $comment['display_name'],
                         ),
                         $comment['avatar'] ?: $this->template->meta('default-avatar'),
-                        $this->jax->date($comment['date']),
+                        $this->date->autoDate($comment['date']),
                         $this->textFormatting->theworks($comment['comment'])
                         . ($this->user->getPerm('can_delete_comments')
                         && $comment['from'] === $this->user->get('id')
@@ -642,8 +644,8 @@ final class UserProfile
                 . $user['dob_day'] . '/' . $user['dob_year'] : 'N/A',
                 $user['website'] ? '<a href="' . $user['website'] . '">'
                 . $user['website'] . '</a>' : 'N/A',
-                $this->jax->date($user['join_date']),
-                $this->jax->date($user['last_visit']),
+                $this->date->autoDate($user['join_date']),
+                $this->date->autoDate($user['last_visit']),
                 $user['id'],
                 $user['posts'],
                 $user['group'],
@@ -682,8 +684,8 @@ final class UserProfile
 
         $text = match ($activity['type']) {
             'profile_comment' => "{$user}  commented on  {$otherguy}'s profile",
-            'new_post' => "{$user} posted in topic <a href='?act=vt{$activity['tid']}&findpost={$activity['pid']}'>{$activity['arg1']}</a>, " . $this->jax->smalldate($activity['date']),
-            'new_topic' => "{$user} created new topic <a href='?act=vt{$activity['tid']}'>{$activity['arg1']}</a>, " . $this->jax->smalldate($activity['date']),
+            'new_post' => "{$user} posted in topic <a href='?act=vt{$activity['tid']}&findpost={$activity['pid']}'>{$activity['arg1']}</a>, " . $this->date->smallDate($activity['date']),
+            'new_topic' => "{$user} created new topic <a href='?act=vt{$activity['tid']}'>{$activity['arg1']}</a>, " . $this->date->smallDate($activity['date']),
             'profile_name_change' => $this->template->meta(
                 'user-link',
                 $activity['uid'],
@@ -694,7 +696,7 @@ final class UserProfile
                 $activity['uid'],
                 $activity['group_id'],
                 $activity['arg2'],
-            ) . ', ' . $this->jax->smalldate($activity['date']),
+            ) . ', ' . $this->date->smallDate($activity['date']),
             'buddy_add' => $user . ' made friends with ' . $otherguy,
         };
 

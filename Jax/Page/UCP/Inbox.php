@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax\Page\UCP;
 
 use Jax\Database;
+use Jax\Date;
 use Jax\Jax;
 use Jax\Page;
 use Jax\Request;
@@ -25,6 +26,7 @@ final class Inbox
 {
     public function __construct(
         private readonly Database $database,
+        private readonly Date $date,
         private readonly Jax $jax,
         private readonly Page $page,
         private readonly Request $request,
@@ -415,7 +417,7 @@ final class Inbox
                 $message['group_id'],
                 $message['name'],
             ),
-            $this->jax->date($message['date']),
+            $this->date->autoDate($message['date']),
             $this->textFormatting->theworks($message['message']),
             $message['avatar'] ?: $this->template->meta('default-avatar'),
             $message['usertitle'],
@@ -533,7 +535,7 @@ final class Inbox
                 $message['id'],
                 $message['title'],
                 $message['display_name'],
-                $this->jax->date($message['date']),
+                $this->date->autoDate($message['date']),
             );
         }
 
