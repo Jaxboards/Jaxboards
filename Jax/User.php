@@ -53,7 +53,7 @@ final class User
         );
     }
 
-    public function getUser($uid = false, $pass = false): ?array
+    public function getUser($uid = null, $pass = false): ?array
     {
         if ($this->userData) {
             return $this->userData;
