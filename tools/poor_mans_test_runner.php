@@ -1,11 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tools;
 
-use \DI\Container;
-use Reflection;
+use DI\Container;
 use ReflectionClass;
 use ReflectionMethod;
+use Throwable;
+
+use function array_filter;
+use function array_map;
+use function dirname;
+use function glob;
+use function str_replace;
+use function str_starts_with;
+
+use const PHP_EOL;
 
 $root = dirname(__DIR__);
 
@@ -20,16 +31,16 @@ foreach ($testFiles as $testFile) {
 
     $reflection = new ReflectionClass($classPath);
     $testMethods = array_filter(
-        array_map(fn($method) => $method->name, $reflection->getMethods(ReflectionMethod::IS_PUBLIC)),
-        fn($methodName) => !str_starts_with($methodName, '_'),
+        array_map(static fn($method) => $method->name, $reflection->getMethods(ReflectionMethod::IS_PUBLIC)),
+        static fn($methodName) => !str_starts_with($methodName, '_'),
     );
 
-    echo "--- {$classPath} ---". PHP_EOL;
+    echo "--- {$classPath} ---" . PHP_EOL;
     foreach ($testMethods as $testMethod) {
         try {
             $class->{$testMethod}();
             echo "{$testMethod}: Pass" . PHP_EOL;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             echo "{$testMethod}: FAILED: {$e->getMessage()}" . PHP_EOL;
         }
     }

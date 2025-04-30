@@ -4,26 +4,29 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use Jax\User;
+use function array_diff_assoc;
+use function assert;
+use function base64_decode;
+use function json_encode;
 
-class UserTest {
+final class UserTest
+{
     private string $encodedForumFlags;
 
     // private array $decoded = [
-    //     1 => ['upload' => false, 'reply' => true, 'start' => true, 'read' => true, 'view' => true, 'poll' => true],
-    //     3 => ['upload' => false, 'reply' => false, 'start' => false, 'read' => true, 'view' => true, 'poll' => false],
-    //     4 => ['upload' => false, 'reply' => false, 'start' => false, 'read' => true, 'view' => true, 'poll' => false],
-    //     5 => ['upload' => false, 'reply' => false, 'start' => false, 'read' => true, 'view' => true, 'poll' => false],
-    //     6 => ['upload' => true, 'reply' => true, 'start' => true, 'read' => true, 'view' => true, 'poll' => true],
+    // 1 => ['upload' => false, 'reply' => true, 'start' => true, 'read' => true, 'view' => true, 'poll' => true],
+    // 3 => ['upload' => false, 'reply' => false, 'start' => false, 'read' => true, 'view' => true, 'poll' => false],
+    // 4 => ['upload' => false, 'reply' => false, 'start' => false, 'read' => true, 'view' => true, 'poll' => false],
+    // 5 => ['upload' => false, 'reply' => false, 'start' => false, 'read' => true, 'view' => true, 'poll' => false],
+    // 6 => ['upload' => true, 'reply' => true, 'start' => true, 'read' => true, 'view' => true, 'poll' => true],
     // ];
-
-    public function __construct(
-        private User $user
-    ) {
+    public function __construct(private User $user)
+    {
         $this->encodedForumFlags = base64_decode('AAEAPgADABgABAAYAAUAGAAGAD8=');
     }
 
-    public function getForumPermissionAsAdmin() {
+    public function getForumPermissionAsAdmin(): void
+    {
         $user = $this->user;
 
         $user->userPerms = ['can_poll' => true, 'can_post' => true, 'can_post_topics' => true, 'can_attach' => true];
@@ -36,7 +39,8 @@ class UserTest {
         assert($diff === [], 'Expected value differs: ' . json_encode($diff));
     }
 
-    public function getForumPermissionAsGuest() {
+    public function getForumPermissionAsGuest(): void
+    {
         $user = $this->user;
 
         $user->userPerms = ['can_post' => true];
@@ -49,7 +53,8 @@ class UserTest {
         assert($diff === [], 'Expected value differs: ' . json_encode($diff));
     }
 
-    public function getForumPermissionAsBanned() {
+    public function getForumPermissionAsBanned(): void
+    {
         $user = $this->user;
 
         $user->userPerms = ['can_post' => true];
