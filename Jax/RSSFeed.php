@@ -52,9 +52,10 @@ final class RSSFeed
         foreach ($array as $property => $value) {
             if (is_array($value)) {
                 $xml .= implode('', array_map(
-                        fn($content): string => "<{$property}>" . $this->makeXML($content) . "</{$property}>",
-                        $value,
-                    ));
+                    fn($content): string => "<{$property}>" . $this->makeXML($content) . "</{$property}>",
+                    $value,
+                ));
+
                 continue;
             }
 
