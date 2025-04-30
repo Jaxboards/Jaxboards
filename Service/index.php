@@ -13,10 +13,6 @@ use Jax\Page\ServiceSignup;
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
 
-if (!defined('SERVICE_ROOT')) {
-    define('SERVICE_ROOT', __DIR__);
-}
-
 require_once dirname(__DIR__) . '/Jax/autoload.php';
 
 if (!file_exists(dirname(__DIR__) . '/config.php')) {

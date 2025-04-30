@@ -10,6 +10,7 @@ use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Request;
 use Jax\ServiceConfig;
+use Service\Blueprint;
 
 use function array_map;
 use function dirname;
@@ -40,11 +41,12 @@ use const PASSWORD_DEFAULT;
 final readonly class ServiceSignup
 {
     public function __construct(
-        private ServiceConfig $serviceConfig,
+        private Blueprint $blueprint,
         private Database $database,
         private IPAddress $ipAddress,
         private Jax $jax,
         private Request $request,
+        private ServiceConfig $serviceConfig,
     ) {}
 
     public function render(): void
@@ -137,7 +139,7 @@ final readonly class ServiceSignup
                 // https://stackoverflow.com/a/19752106
                 // It's not pretty or perfect but it'll work for our use case...
                 $query = '';
-                $lines = file(SERVICE_ROOT . '/blueprint.sql');
+                $lines = $this->blueprint->getSchema();
                 foreach ($lines as $line) {
                     // Skip comments.
                     if (mb_substr($line, 0, 2) === '--') {
@@ -186,7 +188,7 @@ final readonly class ServiceSignup
                 if ($dbError !== '' && $dbError !== '0') {
                     $errors[] = $dbError;
                 } else {
-                    FileUtils::copyDirectory('blueprint', dirname(__DIR__) . '/boards/' . $board);
+                    FileUtils::copyDirectory($this->blueprint->getDirectory(), dirname(__DIR__) . '/boards/' . $board);
 
                     header('Location: https://' . $this->request->post('boardurl') . '.' . $this->serviceConfig->getSetting('domain'));
                 }

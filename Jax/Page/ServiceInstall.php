@@ -10,11 +10,11 @@ use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Request;
 use Jax\ServiceConfig;
+use Service\Blueprint;
 
 use function array_keys;
 use function array_map;
 use function dirname;
-use function file;
 use function filter_var;
 use function gmdate;
 use function header;
@@ -82,6 +82,7 @@ final class ServiceInstall
     ];
 
     public function __construct(
+        private Blueprint $blueprint,
         private Jax $jax,
         private Database $database,
         private IPAddress $ipAddress,
@@ -347,7 +348,7 @@ final class ServiceInstall
             // https://stackoverflow.com/a/19752106
             // It's not pretty or perfect but it'll work for our use case...
             $query = '';
-            $lines = file(SERVICE_ROOT . '/blueprint.sql');
+            $lines = $this->blueprint->getSchema();
             foreach ($lines as $line) {
                 // Skip comments.
                 if (mb_substr($line, 0, 2) === '--') {
@@ -396,7 +397,7 @@ final class ServiceInstall
             echo $this->database->error();
 
             mkdir(dirname(__DIR__) . '/boards');
-            FileUtils::copyDirectory('blueprint', dirname(__DIR__) . '/boards/' . $board);
+            FileUtils::copyDirectory($this->blueprint->getDirectory(), dirname(__DIR__) . '/boards/' . $board);
         }
 
         // Send us to the service page.

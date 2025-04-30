@@ -80,7 +80,7 @@ a new install. It does the following:
 After install the MySQL credentials are saved in `config.php`. This is copied
 over from `config.default.php` so you can see what the format looks like there.
 
-`Service/blueprint.sql` contains the base tables and base data for the database
+`Service/schema.sql` contains the base tables and base data for the database
 for a single-board install. Every table is prefixed with `blueprint_` (and
 should be updated to match what the `sql_prefix` setting is in the `config.php`
 file before importing). In addition, a service install (multiple boards) has two
