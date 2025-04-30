@@ -17,29 +17,18 @@ use Jax\TextFormatting;
 use Jax\User;
 
 use function base64_encode;
-use function count;
-use function curl_exec;
-use function curl_init;
-use function curl_setopt;
 use function filter_var;
-use function json_decode;
 use function mb_strlen;
 use function mb_substr;
 use function openssl_random_pseudo_bytes;
 use function password_hash;
 use function preg_match;
 use function rawurlencode;
-use function rtrim;
 use function session_destroy;
 use function session_unset;
 use function time;
 use function trim;
-use function urlencode;
 
-use const CURLOPT_POST;
-use const CURLOPT_POSTFIELDS;
-use const CURLOPT_RETURNTRANSFER;
-use const CURLOPT_URL;
 use const FILTER_VALIDATE_EMAIL;
 use const PASSWORD_DEFAULT;
 
