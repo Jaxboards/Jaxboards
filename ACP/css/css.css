@@ -429,7 +429,7 @@ table.settings td {
   padding: 10px;
 }
 
-table.settings th[scope=row] {
+table.settings th[scope='row'] {
   width: 200px;
 }
 /* stylelint-enable no-descending-specificity */
