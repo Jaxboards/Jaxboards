@@ -217,7 +217,8 @@ define(
     'REMOVE_JAXBOARDS_ROOT',
     '/^' . preg_quote(dirname(__DIR__) . '/', '/') . '/',
 );
-$issues = array_merge_recursive(
+$issues = array_merge(
+    [],
     ...array_map(
         static function (
             array $file,

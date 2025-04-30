@@ -6,7 +6,10 @@ namespace emoticons\ploadpack;
 
 final class Rules
 {
-    public function get()
+    /**
+     * @return array<string,string>
+     */
+    public function get(): array
     {
         return [
             '&gt;:(' => 'mad.png',

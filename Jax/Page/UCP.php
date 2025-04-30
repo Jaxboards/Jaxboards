@@ -281,8 +281,8 @@ final class UCP
 
         $email = $this->user->get('email');
         $emailSettings = $this->user->get('email_settings');
-        $notificationsChecked = $emailSettings & 2 !== 0 ? 'checked' : '';
-        $adminEmailsChecked = $emailSettings & 1 !== 0 ? 'checked' : '';
+        $notificationsChecked = $emailSettings & 2 ? 'checked' : '';
+        $adminEmailsChecked = $emailSettings & 1 ? 'checked' : '';
 
         return $this->template->meta(
             'ucp-email-settings',

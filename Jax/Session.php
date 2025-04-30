@@ -461,10 +461,6 @@ final class Session
             unset($session['user']);
         }
 
-        if ($session === []) {
-            return;
-        }
-
         if (mb_strlen($session['location_verbose'] ?? '') > 100) {
             $session['location_verbose'] = mb_substr(
                 (string) $session['location_verbose'],
@@ -489,7 +485,7 @@ final class Session
      */
     public function addSessID(string $html): string
     {
-        if ($this->request->hasCookies() || !is_string($html)) {
+        if ($this->request->hasCookies()) {
             return $html;
         }
 

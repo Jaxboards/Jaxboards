@@ -172,25 +172,7 @@ final class Search
             return false;
         }
 
-        for ($x = 0; $x < 3; ++$x) {
-            if (!is_numeric($dayMonthYear[$x])) {
-                return false;
-            }
-        }
-
-        $dayMonthYear = array_map('intval', $dayMonthYear);
-
-        if (
-            ($dayMonthYear[0] % 2)
-            && $dayMonthYear[1] === 31
-            || $dayMonthYear[0] === 2
-            && (!$dayMonthYear[2] % 4
-            && $dayMonthYear[1] > 29
-            || $dayMonthYear[2] % 4
-            && $dayMonthYear[1] > 28)
-        ) {
-            return false;
-        }
+        $dayMonthYear = array_map(fn($var) => intval($var), $dayMonthYear);
 
         return mktime(0, 0, 0, $dayMonthYear[0], $dayMonthYear[1], $dayMonthYear[2]);
     }

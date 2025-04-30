@@ -201,6 +201,7 @@
   	<properties>
       <property name="rootNamespaces" type="array">
         <element key="Jax" value="Jax"/>
+        <element key="emoticons" value="emoticons"/>
         <element key="ACP" value="ACP"/>
         <element key="Service" value="Service"/>
       </property>

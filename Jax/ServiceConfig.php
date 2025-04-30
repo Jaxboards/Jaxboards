@@ -86,7 +86,7 @@ final class ServiceConfig
     /**
      * Write service config during installation.
      *
-     * @param array<string,mixed>
+     * @param array<string,mixed> $data
      */
     public function writeServiceConfig(array $data): void
     {

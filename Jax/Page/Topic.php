@@ -89,12 +89,10 @@ final class Topic
             return;
         }
 
-        $this->pageNumber = (int) $this->request->both('page');
-        if ($this->pageNumber <= 0 || !is_numeric($this->pageNumber)) {
-            $this->pageNumber = 1;
+        $this->pageNumber = intval($this->request->both('page')) - 1;
+        if ($this->pageNumber <= 0) {
+            $this->pageNumber = 0;
         }
-
-        --$this->pageNumber;
 
         if (
             $this->request->both('qreply') !== null
@@ -216,6 +214,10 @@ final class Topic
 
     private function viewtopic($tid): void
     {
+        if (!is_array($this->topicdata)) {
+            return;
+        }
+
         if (
             !$this->user->isGuest()
             && $this->topicdata['lp_date'] > $this->user->get('last_visit')
@@ -925,7 +927,7 @@ final class Topic
         $page = $this->jax->hiddenFormFields(
             [
                 'act' => 'vt' . $this->tid,
-                'votepoll' => 1,
+                'votepoll' => '1',
             ],
         );
 
@@ -1251,10 +1253,10 @@ final class Topic
                 . PHP_EOL . PHP_EOL,
             );
         } else {
-            $multiquote = (string) ($this->session->getVar('multiquote') ?? '');
-            $multiquotes = $multiquote !== '' ? explode(',', $multiquote) : [];
+            $multiquote = (string) ($this->session->getVar('multiquote') ?: '');
+            $multiquotes = explode(',', $multiquote);
             if (!in_array((string) $pid, $multiquotes, true)) {
-                $multiquotes[] = $pid;
+                $multiquotes[] = (string) $pid;
                 $this->session->addVar(
                     'multiquote',
                     implode(',', $multiquotes),
@@ -1389,7 +1391,7 @@ final class Topic
             'WHERE `id` IN ?',
             $members,
         );
-        $mdata = [$result];
+        $mdata = [];
         while ($member = $this->database->arow($result)) {
             $mdata[$member['id']] = [$member['display_name'], $member['group_id']];
         }

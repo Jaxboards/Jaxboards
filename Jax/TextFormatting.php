@@ -203,7 +203,7 @@ final class TextFormatting
      * is not treated with badword, emote, and bbcode replacements.
      * finishCodeTags puts the code back into the post.
      *
-     * @return array{string,array{array<string>,array<string>}}
+     * @return array{string,string[][]}
      */
     public function startCodeTags(string $text): array
     {
@@ -218,6 +218,7 @@ final class TextFormatting
     /**
      * Puts code blocks back into the post, and does code highlighting.
      * Currently only php is supported.
+     * @param string[][] $codes
      */
     public function finishCodeTags(
         string $text,
@@ -275,7 +276,7 @@ final class TextFormatting
         if ($replaceBBCode) {
             $text = $minimalBBCode
                 ? $this->bbCode->toInlineHTML($text)
-                : $this->bbCode->toHTML($text, $minimalBBCode);
+                : $this->bbCode->toHTML($text);
         }
 
         if ($replaceBBCode && !$minimalBBCode) {
@@ -368,12 +369,13 @@ final class TextFormatting
         }
 
         $ext = (string) pathinfo($file['name'], PATHINFO_EXTENSION);
+        $imageExtensions = $this->config->getSetting('images') ?? [];
 
-        if (!in_array($ext, $this->config->getSetting('images') ?? [], true)) {
-            $ext = '';
+        if (is_array($imageExtensions) && !in_array($ext, $imageExtensions, true)) {
+            $ext = null;
         }
 
-        if ($ext !== '') {
+        if ($ext !== null) {
             $attachmentURL = $this->domainDefinitions->getBoardPathUrl() . '/Uploads/' . $file['hash'] . '.' . $ext;
 
             return "<a href='{$attachmentURL}'>"

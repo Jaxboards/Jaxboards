@@ -6,7 +6,10 @@ namespace emoticons\keshaemotes;
 
 final class Rules
 {
-    public function get()
+    /**
+     * @return array<string,string>
+     */
+    public function get(): array
     {
         return [
             '&gt;:(' => 'angry.gif',

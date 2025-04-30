@@ -13,7 +13,7 @@ final class Blueprint
      */
     public function getSchema(): array
     {
-        return (array) file(__DIR__ . '/schema.sql');
+        return file(__DIR__ . '/schema.sql') ?: [];
     }
 
     public function getDirectory(): string
