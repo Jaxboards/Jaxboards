@@ -92,12 +92,8 @@ final class LogReg
         $pass2 = $this->request->post('pass2') ?? '';
         $email = $this->request->post('email') ?? '';
 
-        $recaptcha = '';
-        if ($this->config->getSetting('recaptcha')) {
-            $recaptcha = $this->template->meta('anti-spam', $this->config->getSetting('recaptcha')['public_key']);
-        }
 
-        $p = $this->template->meta('register-form', $recaptcha);
+        $p = $this->template->meta('register-form');
 
         // Show registration form.
         if ($this->request->post('register') === null) {
@@ -124,7 +120,6 @@ final class LogReg
             $badNameChars && preg_match($badNameChars, $dispname) => 'Invalid characters in display name!',
             !filter_var($email, FILTER_VALIDATE_EMAIL) => "That isn't a valid email!",
             $this->ipAddress->isBanned() => 'You have been banned from registering on this board.',
-            !$this->isHuman() => 'reCAPTCHA failed. Are you a bot?',
             default => null,
         };
 
@@ -499,39 +494,5 @@ final class LogReg
 
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
-    }
-
-    private function isHuman(): bool
-    {
-        if ($this->config->getSetting('recaptcha')) {
-            // Validate reCAPTCHA.
-            $url = 'https://www.google.com/recaptcha/api/siteverify';
-            $fields = [
-                'response' => $this->request->post('g-recaptcha-response'),
-                'secret' => $this->config->getSetting('recaptcha')['private_key'],
-            ];
-
-            $fields_string = '';
-            foreach ($fields as $k => $v) {
-                $fields_string .= $k . '=' . urlencode((string) $v) . '&';
-            }
-
-            $fields_string = rtrim($fields_string, '&');
-
-            $curl_request = curl_init();
-            // Set the url, number of POST vars, POST data.
-            curl_setopt($curl_request, CURLOPT_URL, $url);
-            curl_setopt($curl_request, CURLOPT_POST, count($fields));
-            curl_setopt($curl_request, CURLOPT_POSTFIELDS, $fields_string);
-            curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, true);
-
-            // Execute post.
-            $result = json_decode(curl_exec($curl_request), true);
-
-            return (bool) $result['success'];
-        }
-
-        // If recaptcha is not configured, we have to assume that they are in fact human.
-        return true;
     }
 }
