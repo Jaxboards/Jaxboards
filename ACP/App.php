@@ -13,7 +13,6 @@ use Jax\Request;
 use Jax\Session;
 use Jax\User;
 
-use function header;
 use function implode;
 use function is_string;
 use function mb_strtolower;
@@ -121,9 +120,7 @@ final class App
         }
 
         if (!$this->user->getPerm('can_access_acp')) {
-            header('Location: ./');
-
-            return;
+            $this->page->location('./');
         }
     }
 

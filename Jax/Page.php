@@ -55,6 +55,10 @@ final class Page
         $this->template->append($part, $content);
     }
 
+    /**
+     * Redirect the user and halt execution
+     * @SuppressWarnings("ExitExpression")
+     */
     public function location(string $newLocation): void
     {
         if (!$this->request->hasCookies() && $newLocation[0] === '?') {
@@ -68,6 +72,7 @@ final class Page
         }
 
         header("Location: {$newLocation}");
+        exit;
     }
 
     public function command(...$args): void

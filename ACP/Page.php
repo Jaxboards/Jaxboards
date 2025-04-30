@@ -121,9 +121,16 @@ final class Page
         );
     }
 
+    /**
+     * Redirect the user and halt execution
+     *
+     * @SuppressWarnings("ExitExpression")
+     */
     public function location(string $location): void
     {
         header("Location: {$location}");
+
+        exit;
     }
 
     /**
