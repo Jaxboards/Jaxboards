@@ -240,13 +240,9 @@ final class User
     {
         // If it's a binary string, unpack it into all group bitflags and choose
         // the bitflag as determined by the user's group.
-        if (is_string($forumPerms)) {
-            $parsedPerms = $this->jax->parseForumPerms($forumPerms);
+        $parsedPerms = $this->jax->parseForumPerms($forumPerms);
 
-            $permFlags = $parsedPerms[$this->get('group_id')] ?? null;
-        } else {
-            $permFlags = $forumPerms;
-        }
+        $permFlags = $parsedPerms[$this->get('group_id')] ?? null;
 
         // Null $permFlags means to fall back to global permissions.
         if ($permFlags !== null) {
