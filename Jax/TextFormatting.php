@@ -333,7 +333,7 @@ final class TextFormatting
      * Given an attachment ID, gets the file data associated with it
      * Returns null if file not found.
      *
-     * @return null|array<string,mixed>
+     * @return null|array<string, mixed>
      */
     private function getAttachmentData(string $fileId): ?array
     {
