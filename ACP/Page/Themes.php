@@ -13,7 +13,6 @@ use Jax\Request;
 use Jax\TextFormatting;
 
 use function array_key_exists;
-use function closedir;
 use function dirname;
 use function fclose;
 use function file_exists;
@@ -31,10 +30,8 @@ use function is_writable;
 use function mb_strlen;
 use function mb_strpos;
 use function mkdir;
-use function opendir;
 use function pathinfo;
 use function preg_match;
-use function readdir;
 use function rename;
 use function unlink;
 
@@ -91,7 +88,7 @@ final readonly class Themes
     /**
      * Get skins from database.
      *
-     * @return array<string,mixed>
+     * @return array<array<string,mixed>>
      */
     private function getSkins(): array
     {
@@ -109,7 +106,7 @@ final readonly class Themes
             'ORDER BY title ASC',
         );
 
-        return $this->database->arows($result);
+        return $this->database->arows($result) ?? [];
     }
 
     /**
@@ -117,23 +114,10 @@ final readonly class Themes
      */
     private function getWrappers(): array
     {
-        $wrappers = [];
-        $o = opendir($this->wrappersPath);
-        while ($f = readdir($o)) {
-            if ($f === '.') {
-                continue;
-            }
-
-            if ($f === '..') {
-                continue;
-            }
-
-            $wrappers[] = pathinfo($f, PATHINFO_FILENAME);
-        }
-
-        closedir($o);
-
-        return $wrappers;
+        return array_map(
+            fn($path) => pathinfo($path, PATHINFO_FILENAME),
+            glob($this->wrappersPath . '/*')
+        );
     }
 
     /**
