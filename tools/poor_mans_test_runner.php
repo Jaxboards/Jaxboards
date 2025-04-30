@@ -25,6 +25,9 @@ $container = new Container();
 
 $testFiles = glob($root . '/**/*Test.php');
 
+$passingTests = 0;
+$failingTests = 0;
+
 foreach ($testFiles as $testFile) {
     $classPath = str_replace([$root, '.php', '/'], ['', '', '\\'], $testFile);
     $class = $container->get($classPath);
@@ -36,13 +39,21 @@ foreach ($testFiles as $testFile) {
     );
 
     echo "--- {$classPath} ---" . PHP_EOL;
+
     foreach ($testMethods as $testMethod) {
         try {
             $class->{$testMethod}();
             echo "{$testMethod}: Pass" . PHP_EOL;
+            $passingTests++;
         } catch (Throwable $e) {
             echo "{$testMethod}: FAILED: {$e->getMessage()}" . PHP_EOL;
+            $failingTests++;
         }
     }
+
     echo PHP_EOL;
 }
+
+echo "Pass: {$passingTests} Fail: {$failingTests}" . PHP_EOL;
+
+exit($failingTests !== 0 ? 1 : 0);
