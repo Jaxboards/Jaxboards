@@ -8,7 +8,6 @@ use ACP\Page;
 use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\FileUtils;
-use Jax\Jax;
 use Jax\Request;
 use Jax\TextFormatting;
 
@@ -18,6 +17,7 @@ use function dirname;
 use function fclose;
 use function file_exists;
 use function file_get_contents;
+use function file_put_contents;
 use function fopen;
 use function fwrite;
 use function glob;
@@ -25,11 +25,9 @@ use function in_array;
 use function is_array;
 use function is_dir;
 use function is_file;
-use function is_numeric;
 use function is_string;
 use function is_writable;
 use function mb_strlen;
-use function mb_strpos;
 use function mkdir;
 use function pathinfo;
 use function preg_match;
@@ -141,7 +139,7 @@ final readonly class Themes
     {
         $newWrapperPath = $this->pathToWrapper($wrapper);
 
-        return match(true) {
+        return match (true) {
             !$this->isValidFilename($wrapper) => 'Wrapper name must consist of letters, '
                 . 'numbers, spaces, and underscore.',
             mb_strlen((string) $wrapper) > 50 => 'Wrapper name must be less than 50 characters.',
@@ -150,7 +148,7 @@ final readonly class Themes
 
             file_put_contents(
                 $newWrapperPath,
-                file_get_contents($this->domainDefinitions->getDefaultThemePath() . '/wrappers.html')
+                file_get_contents($this->domainDefinitions->getDefaultThemePath() . '/wrappers.html'),
             ) === false => 'Wrapper could not be created.',
             default => null,
         };
@@ -306,13 +304,13 @@ final readonly class Themes
         $renameSkins = $this->request->both('renameskin');
         $renameWrappers = $this->request->both('renamewrapper');
 
-        $wrapperError = match(true) {
+        $wrapperError = match (true) {
             is_string($deleteWrapper) => $this->deleteWrapper($deleteWrapper),
             is_string($newWrapper) && $newWrapper !== '' => $this->createWrapper($newWrapper),
             is_array($updateWrappers) => $this->updateWrappers($updateWrappers),
             is_array($renameSkins) => $this->renameSkin($renameSkins),
             is_array($renameWrappers) => $this->renameWrappers($renameWrappers),
-            default => null
+            default => null,
         };
 
         $defaultSkin = $this->request->both('default');
@@ -462,15 +460,16 @@ final readonly class Themes
                 'Error',
                 "The theme you're trying to edit does not exist.",
             );
+
             return;
         }
 
         $wrapperContents = $this->request->post('newwrapper');
-        $saved = match(true) {
+        $saved = match (true) {
             !is_string($wrapperContents) => '',
             default => file_put_contents($wrapperPath, $wrapperContents)
                 ? $this->page->success('Wrapper saved successfully.')
-                : $this->page->error('Error saving wrapper.')
+                : $this->page->error('Error saving wrapper.'),
         };
 
         $this->page->addContentBox(
