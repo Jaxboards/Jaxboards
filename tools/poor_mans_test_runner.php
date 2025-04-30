@@ -11,6 +11,7 @@ use Throwable;
 
 use function array_filter;
 use function array_map;
+use function define;
 use function dirname;
 use function glob;
 use function str_replace;
@@ -31,7 +32,8 @@ $failingTests = 0;
 /**
  * @return class-string
  */
-function getClassPath(string $file) {
+function getClassPath(string $file): string
+{
     return str_replace([ROOT, '.php', '/'], ['', '', '\\'], $file);
 }
 
