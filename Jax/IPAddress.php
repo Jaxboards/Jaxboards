@@ -104,8 +104,8 @@ final class IPAddress
         $bannedIPsPath = $this->domainDefinitions->getBoardPath() . '/bannedips.txt';
         if (file_exists($bannedIPsPath)) {
             $this->ipBanCache = array_filter(
-                file($bannedIPsPath),
-                static fn($line) => trim($line) !== '',
+                file($bannedIPsPath, FILE_IGNORE_NEW_LINES),
+                static fn($line) => $line !== '',
             );
         }
 
