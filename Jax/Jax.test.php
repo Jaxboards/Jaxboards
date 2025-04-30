@@ -16,7 +16,7 @@ $decoded = [
     3 => ['upload' => false, 'reply' => false, 'start' => false, 'read' => true, 'view' => true, 'poll' => false],
     4 => ['upload' => false, 'reply' => false, 'start' => false, 'read' => true, 'view' => true, 'poll' => false],
     5 => ['upload' => false, 'reply' => false, 'start' => false, 'read' => true, 'view' => true, 'poll' => false],
-    6 => ['upload' => true, 'reply' => true, 'start' => true, 'read' => true, 'view' => true, 'poll' => true]
+    6 => ['upload' => true, 'reply' => true, 'start' => true, 'read' => true, 'view' => true, 'poll' => true],
 ];
 
 $tests = [];
@@ -26,7 +26,7 @@ $tests['getForumPermissions'] = static function () use ($container, $encodedForu
 
     foreach (array_keys($decoded) as $groupId) {
         $diff = array_diff($decoded[$groupId], $result[$groupId]);
-        assert($diff === [], "$groupId permissions differs: " . json_encode($diff));
+        assert($diff === [], "{$groupId} permissions differs: " . json_encode($diff));
     }
 };
 
@@ -37,7 +37,7 @@ $tests['serializeForumPermissions'] = static function () use ($container, $encod
     assert($result === $encodedForumFlags);
 };
 
-$tests['sanity'] = static function () use ($container, $encodedForumFlags, $decoded) {
+$tests['sanity'] = static function () use ($container, $encodedForumFlags): void {
     $jax = $container->get(Jax::class);
     assert($encodedForumFlags === $jax->serializeForumPerms($jax->parseForumPerms($encodedForumFlags)));
 };

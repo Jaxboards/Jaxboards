@@ -230,7 +230,7 @@ final class User
         return $this->userPerms;
     }
 
-    /*
+    /**
      * Given a forum permission's binary-encoded string,
      * returns the user's (merged) permissions for the forum.
      *

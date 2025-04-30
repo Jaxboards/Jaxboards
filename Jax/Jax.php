@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use function array_keys;
+use function array_reduce;
 use function count;
 use function floor;
 use function json_decode;
 use function mail;
+use function pack;
 use function str_replace;
 use function unpack;
 
@@ -15,7 +18,7 @@ use const PHP_EOL;
 
 final readonly class Jax
 {
-    const forumPermsOrder = ['upload', 'reply', 'start', 'read', 'view', 'poll'];
+    public const forumPermsOrder = ['upload', 'reply', 'start', 'read', 'view', 'poll'];
 
     public function __construct(
         private Config $config,
@@ -50,7 +53,7 @@ final readonly class Jax
         foreach ($forumPerms as $groupId => $groupPerms) {
             $flag = 0;
             foreach (self::forumPermsOrder as $index => $field) {
-                $flag += ($groupPerms[$field] ?? 0) ? 1 << $index : 0;
+                $flag += $groupPerms[$field] ?? 0 ? 1 << $index : 0;
             }
             $packed .= pack('n*', $groupId, $flag);
         }
@@ -69,11 +72,12 @@ final readonly class Jax
 
             $parsedPerms[$groupId] = array_reduce(
                 array_keys(self::forumPermsOrder),
-                function ($perms, $key) use ($flag) {
+                static function ($perms, $key) use ($flag) {
                     $perms[self::forumPermsOrder[$key]] = (bool) ($flag & (1 << $key));
+
                     return $perms;
                 },
-                []
+                [],
             );
         }
 

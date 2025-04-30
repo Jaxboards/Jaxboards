@@ -16,23 +16,18 @@ $decoded = [
     3 => ['upload' => false, 'reply' => false, 'start' => false, 'read' => true, 'view' => true, 'poll' => false],
     4 => ['upload' => false, 'reply' => false, 'start' => false, 'read' => true, 'view' => true, 'poll' => false],
     5 => ['upload' => false, 'reply' => false, 'start' => false, 'read' => true, 'view' => true, 'poll' => false],
-    6 => ['upload' => true, 'reply' => true, 'start' => true, 'read' => true, 'view' => true, 'poll' => true]
+    6 => ['upload' => true, 'reply' => true, 'start' => true, 'read' => true, 'view' => true, 'poll' => true],
 ];
 
 $tests = [];
 // $tests['getForumPermissionWithInteger'] = static function () use ($container): void {
-//     $user = $container->get(User::class);
-
-//     $allOn = 0b11111111;
-
-//     $expected = ['poll' => true, 'read' => true, 'reply' => true, 'start' => true, 'upload' => true, 'view' => true];
-//     $result = $user->getForumPerms($allOn);
-//     $diff = array_diff_assoc($expected, $result);
-
-//     assert($diff === [], 'Expected value differs: ' . json_encode($diff));
+// $user = $container->get(User::class);
+// $allOn = 0b11111111;
+// $expected = ['poll' => true, 'read' => true, 'reply' => true, 'start' => true, 'upload' => true, 'view' => true];
+// $result = $user->getForumPerms($allOn);
+// $diff = array_diff_assoc($expected, $result);
+// assert($diff === [], 'Expected value differs: ' . json_encode($diff));
 // };
-
-
 $tests['getForumPermissionAsAdmin'] = static function () use ($container, $encodedForumFlags): void {
     $user = $container->get(User::class);
 
