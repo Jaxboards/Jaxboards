@@ -19,8 +19,9 @@ final readonly class RecountStats
         private readonly Request $request,
     ) {}
 
-    public function render() {
-        match(true) {
+    public function render(): void
+    {
+        match (true) {
             $this->request->both('execute') !== null => $this->recountStatistics(),
             default => $this->showStats(),
         };

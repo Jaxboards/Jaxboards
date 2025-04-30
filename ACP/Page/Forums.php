@@ -12,6 +12,7 @@ use Jax\Request;
 use Jax\TextFormatting;
 use Jax\User;
 
+use function array_key_exists;
 use function array_keys;
 use function array_pop;
 use function array_search;
@@ -26,9 +27,9 @@ use function is_string;
 use function json_decode;
 use function mb_strstr;
 use function mb_substr;
-use function preg_match;
 use function preg_replace;
 use function sscanf;
+use function str_starts_with;
 use function trim;
 
 final readonly class Forums
@@ -53,18 +54,18 @@ final readonly class Forums
         ]);
 
         $edit = $this->request->both('edit');
-        $categoryEdit = match(true) {
+        $categoryEdit = match (true) {
             is_string($edit) && str_starts_with($edit, 'c_') => (int) mb_substr($edit, 2),
-            default => null
+            default => null,
         };
         $delete = $this->request->both('delete');
-        $categoryDelete = match(true) {
+        $categoryDelete = match (true) {
             is_string($delete) && str_starts_with($delete, 'c_') => (int) mb_substr($delete, 2),
-            default => null
+            default => null,
         };
 
         match ($this->request->get('do')) {
-            'edit' => match(true) {
+            'edit' => match (true) {
                 is_numeric($edit) => $this->createForum((int) $edit),
                 $categoryEdit !== null => $this->createCategory($categoryEdit),
             },
@@ -775,12 +776,14 @@ final readonly class Forums
                 $topics = $this->database->affectedRows();
             }
 
-            $page = match(true) {
+            $page = match (true) {
                 $topics > 0 => (
-                    $this->request->post('moveto') ? 'Moved' : 'Deleted')
-                    . " {$topics} topics" .
-                    (isset($posts) && $posts ? " and {$posts} posts" : ''
-                ),
+                    $this->request->post('moveto') ? 'Moved' : 'Deleted'
+                )
+                    . " {$topics} topics"
+                    . (
+                        isset($posts) && $posts ? " and {$posts} posts" : ''
+                    ),
                 default => 'This forum was empty, so no topics were moved.',
             };
 
