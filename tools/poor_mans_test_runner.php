@@ -18,18 +18,25 @@ use function str_starts_with;
 
 use const PHP_EOL;
 
-$root = dirname(__DIR__);
+define('ROOT', dirname(__DIR__));
 
-require_once $root . '/Jax/autoload.php';
+require_once ROOT . '/Jax/autoload.php';
 $container = new Container();
 
-$testFiles = glob($root . '/**/*Test.php');
+$testFiles = glob(ROOT . '/**/*Test.php');
 
 $passingTests = 0;
 $failingTests = 0;
 
+/**
+ * @return class-string
+ */
+function getClassPath(string $file) {
+    return str_replace([ROOT, '.php', '/'], ['', '', '\\'], $file);
+}
+
 foreach ($testFiles as $testFile) {
-    $classPath = str_replace([$root, '.php', '/'], ['', '', '\\'], $testFile);
+    $classPath = getClassPath($testFile);
     $class = $container->get($classPath);
 
     $reflection = new ReflectionClass($classPath);
