@@ -8,7 +8,7 @@
   <td>
     {{ filesize }}
   </td>
-  <td align="center">
+  <td style="text-align:center">
     <input type="text" style="text-align:center;width:40px;" name='dl[{{ id }}]' title="Number of downloads"
       value="{{ downloads }}" />
   </td>
@@ -18,7 +18,7 @@
   <td>
     {{ linked_in }}
   </td>
-  <td align="center">
+  <td style="text-align:center">
     <a onclick="return confirm('You sure?')" href="?act=Tools&do=files&delete={{ id }}" class="icons delete" title="Delete attachment"></a>
   </td>
 </tr>
