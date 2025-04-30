@@ -13,6 +13,7 @@ use Jax\Request;
 use Jax\TextFormatting;
 
 use function array_key_exists;
+use function array_map;
 use function dirname;
 use function fclose;
 use function file_exists;
@@ -115,8 +116,8 @@ final readonly class Themes
     private function getWrappers(): array
     {
         return array_map(
-            fn($path) => pathinfo($path, PATHINFO_FILENAME),
-            glob($this->wrappersPath . '/*')
+            static fn($path) => pathinfo($path, PATHINFO_FILENAME),
+            glob($this->wrappersPath . '/*'),
         );
     }
 
