@@ -6,9 +6,7 @@ namespace ACP\Page;
 
 use ACP\Page;
 use ACP\Page\Tools\FileManager;
-use Jax\Config;
 use Jax\Database;
-use Jax\DomainDefinitions;
 use Jax\FileUtils;
 use Jax\Request;
 use ZipArchive;
@@ -34,9 +32,7 @@ use const PHP_EOL;
 final readonly class Tools
 {
     public function __construct(
-        private readonly Config $config,
         private readonly Database $database,
-        private readonly DomainDefinitions $domainDefinitions,
         private readonly FileUtils $fileUtils,
         private readonly Page $page,
         private readonly Request $request,
