@@ -49,7 +49,8 @@
     "stylelint": "stylelint \"./**/*.{c,sa,sc,le}ss\"",
     "stylelint-fix": "stylelint --fix \"./**/*.{c,sa,sc,le}ss\"",
     "stylelint-report": "stylelint \"./**/*.{c,sa,sc,le}ss\" --formatter json --output-file stylelint-report.json",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test": "composer-runner -- run-script --no-interaction test"
   },
   "type": "module",
   "version": "2.1.5"
