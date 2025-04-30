@@ -33,6 +33,7 @@ final class FileManager
         private Config $config,
         private DomainDefinitions $domainDefinitions,
         private Database $database,
+        private FileUtils $fileUtils,
         private Page $page,
         private Request $request,
     ) {}
@@ -155,7 +156,7 @@ final class FileManager
                 'tools/file-manager-row.html',
                 [
                     'downloads' => $file['downloads'],
-                    'filesize' => FileUtils::fileSizeHumanReadable($file['size']),
+                    'filesize' => $this->fileUtils->fileSizeHumanReadable($file['size']),
                     'id' => $file['id'],
                     'linked_in' => isset($linkedIn[$file['id']]) && $linkedIn[$file['id']]
                         ? implode(', ', $linkedIn[$file['id']]) : 'Not linked!',

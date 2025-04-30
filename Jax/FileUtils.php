@@ -34,7 +34,7 @@ final class FileUtils
      *
      * @return bool true on success, false on failure
      */
-    public static function copyDirectory($src, $dst): bool
+    public function copyDirectory($src, $dst): bool
     {
         $dir = opendir($src);
 
@@ -67,7 +67,7 @@ final class FileUtils
      * Recursively removes a whole directory and its files.
      * Equivalent to `rmdir -r`.
      */
-    public static function removeDirectory(string $dir): bool
+    public function removeDirectory(string $dir): bool
     {
         if (mb_substr($dir, -1) !== '/') {
             $dir .= '/';
@@ -91,7 +91,7 @@ final class FileUtils
     /**
      * Computes a human readable filesize.
      */
-    public static function fileSizeHumanReadable(int $sizeInBytes): string
+    public function fileSizeHumanReadable(int $sizeInBytes): string
     {
         $magnitude = 0;
         $sizes = ' KMGTE';
@@ -112,7 +112,7 @@ final class FileUtils
      *
      * @return array<string>
      */
-    public static function tail(bool|string $path, int $totalLines): array
+    public function tail(bool|string $path, int $totalLines): array
     {
         $logFile = new SplFileObject($path, 'r');
         $logFile->fseek(0, SEEK_END);
@@ -154,7 +154,7 @@ final class FileUtils
      *
      * @return class-string
      */
-    public static function toClassPath(string $file): string
+    public function toClassPath(string $file): string
     {
         return str_replace([dirname(__DIR__), '.php', '/'], ['', '', '\\'], $file);
     }

@@ -51,6 +51,7 @@ final readonly class Themes
     public function __construct(
         private Database $database,
         private DomainDefinitions $domainDefinitions,
+        private FileUtils $fileUtils,
         private Jax $jax,
         private Request $request,
         private Page $page,
@@ -631,7 +632,7 @@ final readonly class Themes
                 unlink($v);
             }
 
-            FileUtils::removeDirectory($skindir);
+            $this->fileUtils->removeDirectory($skindir);
         }
 
         $this->database->safedelete(

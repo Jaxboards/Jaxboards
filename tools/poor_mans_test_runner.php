@@ -27,7 +27,7 @@ $passingTests = 0;
 $failingTests = 0;
 
 foreach ($testFiles as $testFile) {
-    $classPath = FileUtils::toClassPath($testFile);
+    $classPath = $container->get(FileUtils::class)->toClassPath($testFile);
     $class = $container->get($classPath);
 
     $reflection = new ReflectionClass($classPath);

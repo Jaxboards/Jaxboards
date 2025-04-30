@@ -83,9 +83,10 @@ final class ServiceInstall
 
     public function __construct(
         private Blueprint $blueprint,
-        private Jax $jax,
         private Database $database,
+        private FileUtils $fileUtils,
         private IPAddress $ipAddress,
+        private Jax $jax,
         private Request $request,
         private ServiceConfig $serviceConfig,
     ) {}
@@ -397,7 +398,7 @@ final class ServiceInstall
             echo $this->database->error();
 
             mkdir(dirname(__DIR__) . '/boards');
-            FileUtils::copyDirectory($this->blueprint->getDirectory(), dirname(__DIR__) . '/boards/' . $board);
+            $this->fileUtils->copyDirectory($this->blueprint->getDirectory(), dirname(__DIR__) . '/boards/' . $board);
         }
 
         // Send us to the service page.

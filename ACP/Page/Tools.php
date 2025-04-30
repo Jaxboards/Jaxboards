@@ -10,7 +10,6 @@ use Jax\Config;
 use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\FileUtils;
-use Jax\Jax;
 use Jax\Request;
 use ZipArchive;
 
@@ -38,7 +37,7 @@ final readonly class Tools
         private readonly Config $config,
         private readonly Database $database,
         private readonly DomainDefinitions $domainDefinitions,
-        private readonly Jax $jax,
+        private readonly FileUtils $fileUtils,
         private readonly Page $page,
         private readonly Request $request,
         private readonly FileManager $fileManager,
@@ -164,7 +163,7 @@ final readonly class Tools
         $contents = "Sorry, Jaxboards does not have file permissions to read your PHP error log file. ({$logPath})";
 
         if (is_readable($logPath)) {
-            $last100Lines = htmlspecialchars(implode(PHP_EOL, FileUtils::tail(
+            $last100Lines = htmlspecialchars(implode(PHP_EOL, $this->fileUtils->tail(
                 $logPath,
                 100,
             )));

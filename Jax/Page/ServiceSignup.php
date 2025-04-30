@@ -42,6 +42,7 @@ final readonly class ServiceSignup
     public function __construct(
         private Blueprint $blueprint,
         private Database $database,
+        private FileUtils $fileUtils,
         private IPAddress $ipAddress,
         private Jax $jax,
         private Request $request,
@@ -187,7 +188,7 @@ final readonly class ServiceSignup
                 if ($dbError !== '' && $dbError !== '0') {
                     $errors[] = $dbError;
                 } else {
-                    FileUtils::copyDirectory($this->blueprint->getDirectory(), dirname(__DIR__) . '/boards/' . $board);
+                    $this->fileUtils->copyDirectory($this->blueprint->getDirectory(), dirname(__DIR__) . '/boards/' . $board);
 
                     header('Location: https://' . $this->request->post('boardurl') . '.' . $this->serviceConfig->getSetting('domain'));
                 }
