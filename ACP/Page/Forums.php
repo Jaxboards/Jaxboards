@@ -70,7 +70,7 @@ final readonly class Forums
                 $categoryEdit !== null => $this->createCategory($categoryEdit),
             },
             'delete' => match (true) {
-                is_numeric($delete) => $this->deleteForum($delete),
+                is_numeric($delete) => $this->deleteForum((int) $delete),
                 $categoryDelete !== null => $this->deleteCategory($categoryDelete),
             },
             'order' => $this->orderForums(),
@@ -395,7 +395,7 @@ final readonly class Forums
                 'WHERE `id`=?',
                 $this->database->basicvalue($fid),
             );
-            $this->updateperforummodflag();
+            $this->updatePerForumModFlag();
             $this->page->location('?act=Forums&edit=' . $fid);
         }
 
@@ -662,42 +662,41 @@ final readonly class Forums
                 $oldForumData['id'],
             );
             if ($this->request->post('modid')) {
-                $this->updateperforummodflag();
+                $this->updatePerForumModFlag();
             }
         }
 
         return $error;
     }
 
-    private function computeGroupPermissions()
+    private function serializePermsFromInput()
     {
-        $groupPerms = [];
         $result = $this->database->safeselect(
             ['id'],
             'member_groups',
         );
+
+        // First fetch all group IDs
+        $groupIds = [];
         while ($group = $this->database->arow($result)) {
-            $groups = $this->request->post('groups') ?? [];
+            $groupIds[] = $group['id'];
+        }
+        $this->database->disposeresult($result);
 
-            if (!isset($groups[$group['id']])) {
-                $groups[$group['id']] = [];
-            }
-
-            $groupPermInput = $groups[$group['id']];
-            if (
-                isset($groupPermInput['global'])
-                && $groupPermInput['global']
-            ) {
+        $groupPerms = [];
+        foreach($this->request->post('groups') as $groupId => $perms) {
+            // If the user chose to use global permissions, we don't need to include them
+            if (array_key_exists('global', $perms)) {
                 continue;
             }
 
-            foreach (Jax::forumPermsOrder as $option) {
-                $groupPermInput[$option] = (bool) $groupPermInput[$option] ?? false;
+            // This is needed to fully populate every permission
+            foreach (Jax::FORUM_PERMS_ORDER as $option) {
+                $perms[$option] = array_key_exists($option, $perms);
             }
 
-            $groupPerms[$group['id']] = $groupPermInput;
+            $groupPerms[$groupId] = $perms;
         }
-        $this->database->disposeresult($result);
 
         return $this->jax->serializeForumPerms($groupPerms);
     }
@@ -719,7 +718,7 @@ final readonly class Forums
             'mods' => $forum['mods'] ?? null,
             'nocount' => $this->request->post('nocount') ? 0 : 1,
             'orderby' => $orderby > 0 && $orderby <= 5 ? $orderby : 0,
-            'perms' => $this->computeGroupPermissions(),
+            'perms' => $this->serializePermsFromInput(),
             'redirect' => $this->request->post('redirect'),
             'show_ledby' => (bool) $this->request->post('show_ledby'),
             'show_sub' => $sub === 1 || $sub === 2 ? $sub : 0,
@@ -729,13 +728,16 @@ final readonly class Forums
         ];
     }
 
-    private function deleteForum(string $forumId): void
+    private function deleteForum(int $forumId): void
     {
         if (
             $this->request->post('submit') === 'Cancel'
         ) {
             $this->page->location('?act=Forums&do=order');
-        } elseif ($this->request->post('submit') !== null) {
+            return;
+        }
+
+        if ($this->request->post('submit') !== null) {
             $this->database->safedelete(
                 'forums',
                 'WHERE `id`=?',
@@ -989,7 +991,7 @@ final readonly class Forums
      * that specify whether or not a user is a per-forum mod
      * based on the comma delimited list of mods for each forum.
      */
-    private function updateperforummodflag(): void
+    private function updatePerForumModFlag(): void
     {
         $this->database->safeupdate(
             'members',

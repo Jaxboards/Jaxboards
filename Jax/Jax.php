@@ -18,7 +18,7 @@ use const PHP_EOL;
 
 final readonly class Jax
 {
-    public const forumPermsOrder = ['upload', 'reply', 'start', 'read', 'view', 'poll'];
+    public const FORUM_PERMS_ORDER = ['upload', 'reply', 'start', 'read', 'view', 'poll'];
 
     public function __construct(
         private Config $config,
@@ -52,7 +52,7 @@ final readonly class Jax
         $packed = '';
         foreach ($forumPerms as $groupId => $groupPerms) {
             $flag = 0;
-            foreach (self::forumPermsOrder as $index => $field) {
+            foreach (self::FORUM_PERMS_ORDER as $index => $field) {
                 $flag += $groupPerms[$field] ?? 0 ? 1 << $index : 0;
             }
             $packed .= pack('n*', $groupId, $flag);
@@ -74,9 +74,9 @@ final readonly class Jax
             $flag = $unpack[$index + 1];
 
             $parsedPerms[$groupId] = array_reduce(
-                array_keys(self::forumPermsOrder),
+                array_keys(self::FORUM_PERMS_ORDER),
                 static function ($perms, $key) use ($flag) {
-                    $perms[self::forumPermsOrder[$key]] = (bool) ($flag & (1 << $key));
+                    $perms[self::FORUM_PERMS_ORDER[$key]] = (bool) ($flag & (1 << $key));
 
                     return $perms;
                 },
