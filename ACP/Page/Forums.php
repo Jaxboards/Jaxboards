@@ -365,7 +365,7 @@ final readonly class Forums
      * @param int $fid The forum ID. If set, this edits a forum,
      *                 otherwise it creates one.
      */
-    private function createForum($fid = 0): void
+    private function createForum(int $fid = 0): void
     {
         $page = '';
         $forumperms = '';
@@ -409,7 +409,7 @@ final readonly class Forums
             }
         }
 
-        $perms = $this->jax->parseForumPerms($forum['perms']);
+        $perms = $forum ? $this->jax->parseForumPerms($forum['perms']) : null;
 
         $result = $this->database->safeselect(
             [
@@ -775,12 +775,14 @@ final readonly class Forums
                 $topics = $this->database->affectedRows();
             }
 
-            $page = '';
-            if ($topics > 0) {
-                $page .= ($this->request->post('moveto') ? 'Moved' : 'Deleted')
-                    . " {$topics} topics" . (isset($posts) && $posts
-                    ? " and {$posts} posts" : '');
-            }
+            $page = match(true) {
+                $topics > 0 => (
+                    $this->request->post('moveto') ? 'Moved' : 'Deleted')
+                    . " {$topics} topics" .
+                    (isset($posts) && $posts ? " and {$posts} posts" : ''
+                ),
+                default => 'This forum was empty, so no topics were moved.',
+            };
 
             $this->page->addContentBox(
                 'Forum Deletion',
@@ -792,17 +794,6 @@ final readonly class Forums
                         ],
                     ),
                 ),
-            );
-
-            return;
-        }
-
-        $forum = $this->fetchForum($forumId);
-
-        if (!$forum) {
-            $this->page->addContentBox(
-                'Deleting Forum: ' . $forumId,
-                $this->page->error("Forum doesn't exist."),
             );
 
             return;
@@ -825,6 +816,17 @@ final readonly class Forums
                     'value' => $forum['id'],
                 ],
             );
+        }
+
+        $forum = $this->fetchForum($forumId);
+
+        if (!$forum) {
+            $this->page->addContentBox(
+                'Deleting Forum: ' . $forumId,
+                $this->page->error("Forum doesn't exist."),
+            );
+
+            return;
         }
 
         $this->page->addContentBox(
