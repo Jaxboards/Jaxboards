@@ -164,7 +164,7 @@ final class Forum
 
         $title = &$fdata['title'];
 
-        $fdata['perms'] = $this->user->parseForumPerms($fdata['perms']);
+        $fdata['perms'] = $this->user->getForumPerms($fdata['perms']);
         if (!$fdata['perms']['read']) {
             $this->page->command('alert', 'no permission');
 

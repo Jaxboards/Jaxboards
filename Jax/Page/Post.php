@@ -256,9 +256,7 @@ final class Post
         $forum = $this->database->arow($result);
         $this->database->disposeresult($result);
 
-        $forum['perms'] = $this->user->parseForumPerms(
-            $forum['perms'],
-        );
+        $forum['perms'] = $this->user->getForumPerms($forum['perms']);
 
         if ($forum === []) {
             $error = "This forum doesn't exist. Weird.";
@@ -398,7 +396,7 @@ final class Post
             }
 
             $tdata['title'] = $this->textFormatting->wordfilter($tdata['title']);
-            $tdata['perms'] = $this->user->parseForumPerms($tdata['perms']);
+            $tdata['perms'] = $this->user->getForumPerms($tdata['perms']);
         }
 
         $page .= '<div id="post-preview">' . $this->postpreview . '</div>';
@@ -737,7 +735,7 @@ final class Post
             if (!$fdata) {
                 $error = "The forum you're trying to post in does not exist.";
             } else {
-                $fdata['perms'] = $this->user->parseForumPerms($fdata['perms']);
+                $fdata['perms'] = $this->user->getForumPerms($fdata['perms']);
                 if (!$fdata['perms']['start']) {
                     $error = "You don't have permission to post a new topic in that forum.";
                 }
@@ -837,7 +835,7 @@ final class Post
             return;
         }
 
-        $fdata['perms'] = $this->user->parseForumPerms($fdata['perms']);
+        $fdata['perms'] = $this->user->getForumPerms($fdata['perms']);
         if (
             !$fdata['perms']['reply']
             || $fdata['locked']

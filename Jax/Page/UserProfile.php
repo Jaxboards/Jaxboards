@@ -271,7 +271,7 @@ final class UserProfile
                     $id,
                 );
                 while ($post = $this->database->arow($result)) {
-                    $perms = $this->user->parseForumPerms($post['perms']);
+                    $perms = $this->user->getForumPerms($post['perms']);
                     if (!$perms['read']) {
                         continue;
                     }
@@ -312,7 +312,7 @@ final class UserProfile
                     $id,
                 );
                 while ($post = $this->database->arow($result)) {
-                    $perms = $this->user->parseForumPerms($post['perms']);
+                    $perms = $this->user->getForumPerms($post['perms']);
                     if (!$perms['read']) {
                         continue;
                     }

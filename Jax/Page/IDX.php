@@ -119,7 +119,7 @@ final class IDX
 
         // This while loop just grabs all of the data, displaying is done below.
         while ($forum = $this->database->arow($result)) {
-            $perms = $this->user->parseForumPerms($forum['perms']);
+            $perms = $this->user->getForumPerms($forum['perms']);
             if ($forum['perms'] && !$perms['view']) {
                 continue;
             }

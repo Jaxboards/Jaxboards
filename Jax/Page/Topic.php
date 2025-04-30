@@ -211,7 +211,7 @@ final class Topic
 
         $this->topicdata['topic_title'] = $this->textFormatting->wordfilter($this->topicdata['topic_title']);
         $this->topicdata['subtitle'] = $this->textFormatting->wordfilter($this->topicdata['subtitle']);
-        $this->topicdata['fperms'] = $this->user->parseForumPerms($this->topicdata['fperms']);
+        $this->topicdata['fperms'] = $this->user->getForumPerms($this->topicdata['fperms']);
     }
 
     private function viewtopic($tid): void

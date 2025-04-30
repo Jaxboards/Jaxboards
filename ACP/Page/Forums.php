@@ -26,12 +26,10 @@ use function is_string;
 use function json_decode;
 use function mb_strstr;
 use function mb_substr;
-use function pack;
 use function preg_match;
 use function preg_replace;
 use function sscanf;
 use function trim;
-use function unpack;
 
 final readonly class Forums
 {
@@ -419,15 +417,7 @@ final readonly class Forums
             }
         }
 
-
-        $perms = [];
-        if (isset($forum['perms']) && $forum['perms']) {
-            $unpack = unpack('n*', (string) $forum['perms']);
-            $counter = count($unpack);
-            for ($index = 1; $index < $counter; $index += 2) {
-                $perms[$unpack[$index]] = $this->user->parseForumPerms($unpack[$index + 1]);
-            }
-        }
+        $perms = $this->jax->parseForumPerms($forum['perms']);
 
         $result = $this->database->safeselect(
             [
@@ -700,7 +690,6 @@ final readonly class Forums
                 $groups[$group['id']] = [];
             }
 
-            $options = ['read', 'start', 'reply', 'upload', 'view', 'poll'];
             $groupPermInput = $groups[$group['id']];
             if (
                 isset($groupPermInput['global'])
@@ -709,30 +698,15 @@ final readonly class Forums
                 continue;
             }
 
-            foreach ($options as $option) {
-                if (isset($groupPermInput[$option])) {
-                    continue;
-                }
-
-                $groupPermInput[$option] = false;
+            foreach (Jax::forumPermsOrder as $option) {
+                $groupPermInput[$option] = (bool) $groupPermInput[$option] ?? false;
             }
 
-            $groupPerms[$group['id']]
-                = ($groupPermInput['read'] ? 8 : 0)
-                + ($groupPermInput['start'] ? 4 : 0)
-                + ($groupPermInput['reply'] ? 2 : 0)
-                + ($groupPermInput['upload'] ? 1 : 0)
-                + ($groupPermInput['view'] ? 16 : 0)
-                + ($groupPermInput['poll'] ? 32 : 0);
+            $groupPerms[$group['id']] = $groupPermInput;
         }
         $this->database->disposeresult($result);
 
-        $packed = '';
-        foreach ($groupPerms as $groupId => $flag) {
-            $packed .= pack('n*', $groupId, $flag);
-        }
-
-        return $packed;
+        return $this->jax->serializeForumPerms($groupPerms);
     }
 
     private function getFormData($forum)

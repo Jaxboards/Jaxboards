@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace Jax;
 
 use function array_merge;
-use function count;
 use function date;
 use function is_string;
 use function password_hash;
 use function password_needs_rehash;
 use function password_verify;
-use function unpack;
 
 use const PASSWORD_DEFAULT;
 
@@ -23,6 +21,7 @@ final class User
 
     public function __construct(
         private readonly Database $database,
+        private readonly Jax $jax,
         private readonly IPAddress $ipAddress,
     ) {}
 
@@ -162,7 +161,7 @@ final class User
         return $this->userData = $user;
     }
 
-    public function getPerm(string $perm): null|int|string
+    public function getPerm(string $perm): mixed
     {
         $perms = $this->getPerms();
 
@@ -232,48 +231,36 @@ final class User
     }
 
     /*
-     * This function expands the permissions bitflag into a readable associative array.
+     * Given a forum permission's binary-encoded string,
+     * returns the user's (merged) permissions for the forum.
      *
-     * This function can receive either a binary encoded string (which is an array of all group bitflags)
-     * Or an integer (bitflag) for a specific group's permissions.
+     * @return array<string,bool>
      */
-    public function parseForumPerms(int|string $permstoparse): array
+    public function getForumPerms(string $forumPerms): array
     {
         // If it's a binary string, unpack it into all group bitflags and choose
         // the bitflag as determined by the user's group.
-        if (is_string($permstoparse)) {
-            $unpack = unpack('n*', $permstoparse);
-            $parsedPerms = [];
-            $counter = count($unpack);
-            for ($x = 1; $x < $counter; $x += 2) {
-                $parsedPerms[$unpack[$x]] = $unpack[$x + 1];
-            }
+        if (is_string($forumPerms)) {
+            $parsedPerms = $this->jax->parseForumPerms($forumPerms);
 
             $permFlags = $parsedPerms[$this->get('group_id')] ?? null;
         } else {
-            $permFlags = $permstoparse;
+            $permFlags = $forumPerms;
         }
 
         // Null $permFlags means to fall back to global permissions.
         if ($permFlags !== null) {
-            $bitFlagOrder = ['upload', 'reply', 'start', 'read', 'view', 'poll'];
-
-            $decoded = [];
-            foreach ($bitFlagOrder as $index => $name) {
-                $decoded[$name] = ($permFlags & 1 << $index) !== 0 ? 1 : 0;
-            }
-
-            return $decoded;
+            return $permFlags;
         }
 
         return [
             'poll' => $this->getPerm('can_poll'),
-            'read' => 1,
+            'read' => true,
             // There is no global "forum read" permission so default to assuming the user can read it
             'reply' => $this->getPerm('can_post'),
             'start' => $this->getPerm('can_post_topics'),
             'upload' => $this->getPerm('can_attach'),
-            'view' => 1,
+            'view' => true,
             // There is no global "forum view" permission so default to assuming the user can see it
         ];
     }
