@@ -684,7 +684,7 @@ final readonly class Forums
         $this->database->disposeresult($result);
 
         $groupPerms = [];
-        foreach($this->request->post('groups') as $groupId => $perms) {
+        foreach ($this->request->post('groups') as $groupId => $perms) {
             // If the user chose to use global permissions, we don't need to include them
             if (array_key_exists('global', $perms)) {
                 continue;
@@ -734,6 +734,7 @@ final readonly class Forums
             $this->request->post('submit') === 'Cancel'
         ) {
             $this->page->location('?act=Forums&do=order');
+
             return;
         }
 
