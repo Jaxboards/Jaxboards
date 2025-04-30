@@ -20,6 +20,7 @@ final class UserTest
         5 => ['upload' => false, 'reply' => false, 'start' => false, 'read' => true, 'view' => true, 'poll' => false],
         6 => ['upload' => true, 'reply' => true, 'start' => true, 'read' => true, 'view' => true, 'poll' => true],
     ];
+
     public function __construct(private User $user)
     {
         $this->encodedForumFlags = base64_decode('AAEAPgADABgABAAYAAUAGAAGAD8=');
