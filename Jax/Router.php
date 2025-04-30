@@ -27,8 +27,7 @@ use Jax\Page\UCP;
 use Jax\Page\UserProfile;
 
 use function array_key_exists;
-use function array_shift;
-use function preg_match;
+use function preg_replace;
 use function str_contains;
 
 final class Router
@@ -36,7 +35,7 @@ final class Router
     /**
      * @var array<string,class-string>
      */
-    private $staticRoutes = [
+    private array $staticRoutes = [
         '' => IDX::class,
         'asteroids' => Asteroids::class,
         'boardoffline' => BoardOffline::class,
@@ -60,7 +59,7 @@ final class Router
     /**
      * @var array<string,class-string>
      */
-    private $dynamicRoutes = [
+    private array $dynamicRoutes = [
         'logreg' => LogReg::class,
         'vf' => Forum::class,
         'vt' => Topic::class,
@@ -80,7 +79,7 @@ final class Router
     {
         $dynamicAction = preg_replace('@\d+$@', '', $action);
 
-        $pageClassName = match(true) {
+        $pageClassName = match (true) {
             // Board offline
             $this->isBoardOffline() && !str_contains($action, 'logreg') => BoardOffline::class,
             // Static actions
@@ -121,7 +120,8 @@ final class Router
     }
 
     /**
-     * Attempts to load a custom page
+     * Attempts to load a custom page.
+     *
      * @return bool true on success or false on failure
      */
     private function loadCustomPage(string $action): bool

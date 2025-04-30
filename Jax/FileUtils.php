@@ -6,6 +6,7 @@ namespace Jax;
 
 use function closedir;
 use function copy;
+use function dirname;
 use function glob;
 use function is_dir;
 use function mb_substr;
@@ -13,8 +14,8 @@ use function mkdir;
 use function opendir;
 use function readdir;
 use function round;
-use function unlink;
 use function str_replace;
+use function unlink;
 
 final class FileUtils
 {
@@ -100,7 +101,8 @@ final class FileUtils
     }
 
     /**
-     * Given a file path, returns the corresponding class path
+     * Given a file path, returns the corresponding class path.
+     *
      * @return class-string
      */
     public static function toClassPath(string $file): string

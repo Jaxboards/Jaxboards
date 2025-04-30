@@ -37,7 +37,7 @@ final class UserTest
             'can_poll' => true,
             'can_post' => true,
             'can_post_topics' => true,
-            'can_attach' => true
+            'can_attach' => true,
         ];
         $user->userData = ['group_id' => 2];
 

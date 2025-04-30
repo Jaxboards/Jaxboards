@@ -169,7 +169,7 @@ final class TextFormatting
 
         $emotesEscaped = array_map(
             static fn(string $emote): string => preg_quote($emote, '@'),
-            array_keys($emotes)
+            array_keys($emotes),
         );
         $text = preg_replace_callback(
             '@(\s)(' . implode('|', $emotesEscaped) . ')@',
@@ -333,7 +333,7 @@ final class TextFormatting
      * Given an attachment ID, gets the file data associated with it
      * Returns null if file not found.
      *
-     * @return array<string,mixed>|null
+     * @return null|array<string,mixed>
      */
     private function getAttachmentData(string $fileId): ?array
     {

@@ -112,7 +112,7 @@ final class Session
     /**
      * @var array<string,mixed>
      */
-    private $changedData = [];
+    private array $changedData = [];
 
     public function __construct(
         private readonly Config $config,
@@ -178,6 +178,7 @@ final class Session
      * @SuppressWarnings("PHPMD.Superglobals")
      *
      * @param ?mixed $sid
+     *
      * @return array<string,mixed>
      */
     public function getSess($sid = null): array
