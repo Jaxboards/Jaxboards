@@ -5,7 +5,7 @@ declare(strict_types=1);
 use DI\Container;
 use Jax\Page\ServiceSignup;
 
-/*
+/**
  * Service signup file, for users to create their own JaxBoards forum.
  *
  * PHP Version 8

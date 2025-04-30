@@ -1,8 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Service;
 
-class Blueprint {
+use function file;
+
+final class Blueprint
+{
     /**
      * @return array<string> lines of the SQL schema file
      */
