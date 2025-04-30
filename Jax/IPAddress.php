@@ -16,8 +16,8 @@ use function mb_strlen;
 use function mb_substr;
 use function pack;
 use function str_starts_with;
-use function trim;
 
+use const FILE_IGNORE_NEW_LINES;
 use const FILTER_VALIDATE_IP;
 
 final class IPAddress
