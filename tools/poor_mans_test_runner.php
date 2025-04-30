@@ -44,10 +44,10 @@ foreach ($testFiles as $testFile) {
         try {
             $class->{$testMethod}();
             echo "{$testMethod}: Pass" . PHP_EOL;
-            $passingTests++;
+            ++$passingTests;
         } catch (Throwable $e) {
             echo "{$testMethod}: FAILED: {$e->getMessage()}" . PHP_EOL;
-            $failingTests++;
+            ++$failingTests;
         }
     }
 
