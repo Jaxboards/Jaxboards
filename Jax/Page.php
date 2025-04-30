@@ -56,7 +56,8 @@ final class Page
     }
 
     /**
-     * Redirect the user and halt execution
+     * Redirect the user and halt execution.
+     *
      * @SuppressWarnings("ExitExpression")
      */
     public function location(string $newLocation): void
@@ -72,6 +73,7 @@ final class Page
         }
 
         header("Location: {$newLocation}");
+
         exit;
     }
 

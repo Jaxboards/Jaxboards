@@ -119,9 +119,11 @@ final class App
             $this->user->getUser($adminUserId);
         }
 
-        if (!$this->user->getPerm('can_access_acp')) {
-            $this->page->location('./');
+        if ($this->user->getPerm('can_access_acp')) {
+            return;
         }
+
+        $this->page->location('./');
     }
 
     private function renderNav(): void
