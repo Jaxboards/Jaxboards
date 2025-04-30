@@ -31,7 +31,7 @@ final class RSSFeed
     public function publish(): never
     {
         $this->feed['pubDate'] = gmdate('r');
-        $xmlFeed = $this->make_xml($this->feed);
+        $xmlFeed = $this->makeXML($this->feed);
         header('Content-type: application/rss+xml');
         echo <<<EOT
             <?xml version="1.0" encoding="UTF-8" ?>
@@ -45,19 +45,21 @@ final class RSSFeed
         exit(0);
     }
 
-    public function make_xml(array $array): string
+    public function makeXML(array $array): string
     {
         $xml = '';
+
         foreach ($array as $property => $value) {
             if (is_array($value)) {
                 $xml .= implode('', array_map(
-                    fn($content): string => "<{$property}>" . $this->make_xml($content) . "</{$property}>",
-                    $value,
-                ));
-            } else {
-                $xml .= "<{$property}" . ($property === 'content' ? ' type="html"' : '') . '>'
-                    . $value . "</{$property}>";
+                        fn($content): string => "<{$property}>" . $this->makeXML($content) . "</{$property}>",
+                        $value,
+                    ));
+                continue;
             }
+
+            $attributes = ($property === 'content' ? ' type="html"' : '');
+            $xml .= "<{$property}{$attributes}>{$value}</{$property}>";
         }
 
         return $xml;
