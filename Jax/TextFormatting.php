@@ -14,6 +14,7 @@ use function highlight_string;
 use function htmlspecialchars;
 use function implode;
 use function in_array;
+use function is_array;
 use function mb_substr;
 use function nl2br;
 use function parse_url;
@@ -203,7 +204,7 @@ final class TextFormatting
      * is not treated with badword, emote, and bbcode replacements.
      * finishCodeTags puts the code back into the post.
      *
-     * @return array{string,string[][]}
+     * @return array{string,array<array<string>>}
      */
     public function startCodeTags(string $text): array
     {
@@ -218,7 +219,8 @@ final class TextFormatting
     /**
      * Puts code blocks back into the post, and does code highlighting.
      * Currently only php is supported.
-     * @param string[][] $codes
+     *
+     * @param array<array<string>> $codes
      */
     public function finishCodeTags(
         string $text,
@@ -371,7 +373,10 @@ final class TextFormatting
         $ext = (string) pathinfo($file['name'], PATHINFO_EXTENSION);
         $imageExtensions = $this->config->getSetting('images') ?? [];
 
-        if (is_array($imageExtensions) && !in_array($ext, $imageExtensions, true)) {
+        if (
+            is_array($imageExtensions)
+            && !in_array($ext, $imageExtensions, true)
+        ) {
             $ext = null;
         }
 

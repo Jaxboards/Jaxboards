@@ -89,7 +89,7 @@ final class Topic
             return;
         }
 
-        $this->pageNumber = intval($this->request->both('page')) - 1;
+        $this->pageNumber = (int) $this->request->both('page') - 1;
         if ($this->pageNumber <= 0) {
             $this->pageNumber = 0;
         }

@@ -7,7 +7,6 @@ namespace Jax;
 use function base64_encode;
 use function ini_set;
 use function is_numeric;
-use function is_string;
 use function mb_strlen;
 use function mb_strtolower;
 use function mb_substr;
