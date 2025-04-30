@@ -167,8 +167,12 @@ final class TextFormatting
             return $text;
         }
 
+        $emotesEscaped = array_map(
+            static fn(string $emote): string => preg_quote($emote, '@'),
+            array_keys($emotes)
+        );
         $text = preg_replace_callback(
-            '@(\s)(' . implode('|', array_map(static fn(string $emote): string => preg_quote($emote, '@'), array_keys($emotes))) . ')@',
+            '@(\s)(' . implode('|', $emotesEscaped) . ')@',
             $this->emoteCallback(...),
             ' ' . $text,
             $emoticonLimit,
@@ -329,7 +333,7 @@ final class TextFormatting
      * Given an attachment ID, gets the file data associated with it
      * Returns null if file not found.
      *
-     * @return null|array<string, mixed>
+     * @return array<string,mixed>|null
      */
     private function getAttachmentData(string $fileId): ?array
     {

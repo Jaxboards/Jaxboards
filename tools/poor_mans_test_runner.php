@@ -5,40 +5,29 @@ declare(strict_types=1);
 namespace Tools;
 
 use DI\Container;
+use Jax\FileUtils;
 use ReflectionClass;
 use ReflectionMethod;
 use Throwable;
 
 use function array_filter;
 use function array_map;
-use function define;
 use function dirname;
 use function glob;
-use function str_replace;
 use function str_starts_with;
 
 use const PHP_EOL;
 
-define('ROOT', dirname(__DIR__));
-
-require_once ROOT . '/Jax/autoload.php';
+require_once dirname(__DIR__) . '/Jax/autoload.php';
 $container = new Container();
 
-$testFiles = glob(ROOT . '/**/*Test.php');
+$testFiles = glob(dirname(__DIR__) . '/**/*Test.php');
 
 $passingTests = 0;
 $failingTests = 0;
 
-/**
- * @return class-string
- */
-function getClassPath(string $file): string
-{
-    return str_replace([ROOT, '.php', '/'], ['', '', '\\'], $file);
-}
-
 foreach ($testFiles as $testFile) {
-    $classPath = getClassPath($testFile);
+    $classPath = FileUtils::toClassPath($testFile);
     $class = $container->get($classPath);
 
     $reflection = new ReflectionClass($classPath);

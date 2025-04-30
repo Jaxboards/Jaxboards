@@ -14,6 +14,7 @@ use function opendir;
 use function readdir;
 use function round;
 use function unlink;
+use function str_replace;
 
 final class FileUtils
 {
@@ -96,5 +97,14 @@ final class FileUtils
             : '';
 
         return round($sizeInBytes, 2) . "{$prefix}B";
+    }
+
+    /**
+     * Given a file path, returns the corresponding class path
+     * @return class-string
+     */
+    public static function toClassPath(string $file): string
+    {
+        return str_replace([dirname(__DIR__), '.php', '/'], ['', '', '\\'], $file);
     }
 }

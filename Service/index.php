@@ -1,10 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
-use DI\Container;
-use Jax\Page\ServiceSignup;
-
 /**
  * Service signup file, for users to create their own JaxBoards forum.
  *
@@ -12,6 +7,11 @@ use Jax\Page\ServiceSignup;
  *
  * @see https://github.com/Jaxboards/Jaxboards Jaxboards Github repo
  */
+
+declare(strict_types=1);
+
+use DI\Container;
+use Jax\Page\ServiceSignup;
 
 require_once dirname(__DIR__) . '/Jax/autoload.php';
 

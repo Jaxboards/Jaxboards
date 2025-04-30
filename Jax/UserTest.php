@@ -13,6 +13,9 @@ final class UserTest
 {
     private string $encodedForumFlags;
 
+    /**
+     * @var array<int,array<string,bool>>
+     */
     private array $decoded = [
         1 => ['upload' => false, 'reply' => true, 'start' => true, 'read' => true, 'view' => true, 'poll' => true],
         3 => ['upload' => false, 'reply' => false, 'start' => false, 'read' => true, 'view' => true, 'poll' => false],
@@ -23,14 +26,19 @@ final class UserTest
 
     public function __construct(private User $user)
     {
-        $this->encodedForumFlags = base64_decode('AAEAPgADABgABAAYAAUAGAAGAD8=');
+        $this->encodedForumFlags = base64_decode('AAEAPgADABgABAAYAAUAGAAGAD8=', true);
     }
 
     public function getForumPermissionAsAdmin(): void
     {
         $user = $this->user;
 
-        $user->userPerms = ['can_poll' => true, 'can_post' => true, 'can_post_topics' => true, 'can_attach' => true];
+        $user->userPerms = [
+            'can_poll' => true,
+            'can_post' => true,
+            'can_post_topics' => true,
+            'can_attach' => true
+        ];
         $user->userData = ['group_id' => 2];
 
         $expected = ['poll' => true, 'read' => true, 'reply' => true, 'start' => true, 'upload' => true, 'view' => true];

@@ -109,6 +109,9 @@ final class Session
         'YandexBot' => 'Yandex',
     ];
 
+    /**
+     * @var array<string,mixed>
+     */
     private $changedData = [];
 
     public function __construct(
@@ -174,7 +177,8 @@ final class Session
     /**
      * @SuppressWarnings("PHPMD.Superglobals")
      *
-     * @param null|mixed $sid
+     * @param ?mixed $sid
+     * @return array<string,mixed>
      */
     public function getSess($sid = null): array
     {
@@ -280,7 +284,7 @@ final class Session
         return $sessData;
     }
 
-    public function get(string $field)
+    public function get(string $field): mixed
     {
         return $this->data[$field] ?? null;
     }
@@ -288,7 +292,7 @@ final class Session
     /**
      * @SuppressWarnings("PHPMD.Superglobals")
      */
-    public function getPHPSessionValue(string $field)
+    public function getPHPSessionValue(string $field): mixed
     {
         return $_SESSION[$field] ?? null;
     }
@@ -336,7 +340,7 @@ final class Session
         $this->changedData['vars'] = serialize($this->data['vars']);
     }
 
-    public function getVar(string $varName)
+    public function getVar(string $varName): mixed
     {
         return $this->data['vars'][$varName] ?? null;
     }
@@ -482,13 +486,13 @@ final class Session
      * This is similar to what PHP sessions do and it may be possible to leverage
      * that logic instead of handwriting it ourselves.
      */
-    public function addSessID(string $html)
+    public function addSessID(string $html): string
     {
         if ($this->request->hasCookies() || !is_string($html)) {
             return $html;
         }
 
-        return preg_replace_callback(
+        return (string) preg_replace_callback(
             "@href=['\"]?([^'\"]+)['\"]?@",
             $this->addSessIDCB(...),
             $html,

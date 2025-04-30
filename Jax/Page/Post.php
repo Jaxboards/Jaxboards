@@ -837,9 +837,9 @@ final class Post
 
         $fdata['perms'] = $this->user->getForumPerms($fdata['perms']);
         if (
-            !$fdata['perms']['reply']
-            || $fdata['locked']
-            && !$this->user->getPerm('can_override_locked_topics')
+            ($this->how !== 'newtopic' && !$fdata['perms']['reply'])
+            || ($fdata['locked']
+            && !$this->user->getPerm('can_override_locked_topics'))
         ) {
             $error = "You don't have permission to post here.";
             $this->page->append('PAGE', $this->page->error($error));

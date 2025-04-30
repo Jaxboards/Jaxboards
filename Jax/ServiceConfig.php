@@ -14,7 +14,7 @@ use const JSON_PRETTY_PRINT;
 
 final class ServiceConfig
 {
-    private $installed = false;
+    private bool $installed = false;
 
     public function __construct()
     {
@@ -42,21 +42,14 @@ final class ServiceConfig
         }
 
         $serviceConfig = [];
-        if (file_exists(dirname(__DIR__) . '/config.php')) {
-            $this->installed = true;
+        $configPath = dirname(__DIR__) . '/config.php';
+        $serviceConfigPath = dirname(__DIR__) . '/config.default.php';
+        $this->installed = file_exists($configPath);
 
-            require_once dirname(__DIR__) . '/config.php';
+        require_once $this->installed ? $configPath : $serviceConfigPath;
 
-            if (isset($CFG)) {
-                $serviceConfig = (array) $CFG;
-            }
-        } else {
-            // Likely installing, fetch default config
-            require_once dirname(__DIR__) . '/config.default.php';
-
-            if (isset($CFG)) {
-                $serviceConfig = (array) $CFG;
-            }
+        if (isset($CFG)) {
+            return $serviceConfig = (array) $CFG;
         }
 
         return $serviceConfig;

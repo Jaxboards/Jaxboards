@@ -15,7 +15,9 @@ use Jax\Page\ServiceInstall;
 
 
 if (file_exists(dirname(__DIR__) . '/config.php')) {
-    echo 'Detected config.php at root. Jaxboards has already been installed. If you would like to reinstall, delete the root config.';
+    echo 'Detected config.php at root. '
+        . 'Jaxboards has already been installed. '
+        . 'If you would like to reinstall, delete the root config.';
 
     exit(1);
 }
