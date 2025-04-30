@@ -48,16 +48,7 @@ final class App
 
     public function render(): void
     {
-        $adminUserId = $this->session->getPHPSessionValue('auid');
-        if ($adminUserId) {
-            $this->user->getUser($adminUserId);
-        }
-
-        if (!$this->user->getPerm('can_access_acp')) {
-            header('Location: ./');
-
-            return;
-        }
+        $this->ensureACPAccess();
 
         $this->page->append('username', (string) $this->user->get('display_name'));
         $this->page->append('title', $this->config->getSetting('boardname') . ' - ACP');
@@ -120,6 +111,20 @@ final class App
                 'dropdown_links' => $dropdownLinks,
             ],
         );
+    }
+
+    private function ensureACPAccess(): void
+    {
+        $adminUserId = $this->session->getPHPSessionValue('auid');
+        if ($adminUserId) {
+            $this->user->getUser($adminUserId);
+        }
+
+        if (!$this->user->getPerm('can_access_acp')) {
+            header('Location: ./');
+
+            return;
+        }
     }
 
     private function renderNav(): void

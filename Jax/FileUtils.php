@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use SplFileObject;
+
 use function closedir;
 use function copy;
 use function dirname;
@@ -98,6 +100,48 @@ final class FileUtils
             : '';
 
         return round($sizeInBytes, 2) . "{$prefix}B";
+    }
+
+    /**
+     * Reads the last $totalLines of a file.
+     *
+     * @return array<string>
+     */
+    public static function tail(bool|string $path, int $totalLines): array
+    {
+        $logFile = new SplFileObject($path, 'r');
+        $logFile->fseek(0, SEEK_END);
+
+        $lines = [];
+        $lastLine = '';
+
+        // Loop backward until we have our lines or we reach the start
+        for ($pos = $logFile->ftell() - 1; $pos >= 0; --$pos) {
+            $logFile->fseek($pos);
+            $character = $logFile->fgetc();
+
+            if ($pos === 0 || $character !== "\n") {
+                $lastLine = $character . $lastLine;
+            }
+
+            if ($pos !== 0 && $character !== "\n") {
+                continue;
+            }
+
+            // skip empty lines
+            if (trim($lastLine) === '') {
+                continue;
+            }
+
+            $lines[] = $lastLine;
+            $lastLine = '';
+
+            if (count($lines) >= $totalLines) {
+                break;
+            }
+        }
+
+        return array_reverse($lines);
     }
 
     /**

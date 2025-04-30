@@ -152,7 +152,7 @@ final class Page
         $template = file_get_contents($templateFile);
 
         if ($template === false) {
-            throw new Exception("Could not load template: {$templateFile}");
+            return '';
         }
 
         return str_replace(
