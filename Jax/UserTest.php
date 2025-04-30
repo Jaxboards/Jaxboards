@@ -13,13 +13,13 @@ final class UserTest
 {
     private string $encodedForumFlags;
 
-    // private array $decoded = [
-    // 1 => ['upload' => false, 'reply' => true, 'start' => true, 'read' => true, 'view' => true, 'poll' => true],
-    // 3 => ['upload' => false, 'reply' => false, 'start' => false, 'read' => true, 'view' => true, 'poll' => false],
-    // 4 => ['upload' => false, 'reply' => false, 'start' => false, 'read' => true, 'view' => true, 'poll' => false],
-    // 5 => ['upload' => false, 'reply' => false, 'start' => false, 'read' => true, 'view' => true, 'poll' => false],
-    // 6 => ['upload' => true, 'reply' => true, 'start' => true, 'read' => true, 'view' => true, 'poll' => true],
-    // ];
+    private array $decoded = [
+        1 => ['upload' => false, 'reply' => true, 'start' => true, 'read' => true, 'view' => true, 'poll' => true],
+        3 => ['upload' => false, 'reply' => false, 'start' => false, 'read' => true, 'view' => true, 'poll' => false],
+        4 => ['upload' => false, 'reply' => false, 'start' => false, 'read' => true, 'view' => true, 'poll' => false],
+        5 => ['upload' => false, 'reply' => false, 'start' => false, 'read' => true, 'view' => true, 'poll' => false],
+        6 => ['upload' => true, 'reply' => true, 'start' => true, 'read' => true, 'view' => true, 'poll' => true],
+    ];
     public function __construct(private User $user)
     {
         $this->encodedForumFlags = base64_decode('AAEAPgADABgABAAYAAUAGAAGAD8=');
@@ -46,7 +46,7 @@ final class UserTest
         $user->userPerms = ['can_post' => true];
         $user->userData = ['group_id' => 3];
 
-        $expected = ['poll' => false, 'read' => true, 'reply' => false, 'start' => false, 'upload' => false, 'view' => true];
+        $expected = $this->decoded[3];
         $result = $user->getForumPerms($this->encodedForumFlags);
         $diff = array_diff_assoc($expected, $result);
 
@@ -60,7 +60,7 @@ final class UserTest
         $user->userPerms = ['can_post' => true];
         $user->userData = ['group_id' => 4];
 
-        $expected = ['poll' => false, 'read' => true, 'reply' => false, 'start' => false, 'upload' => false, 'view' => true];
+        $expected = $this->decoded[4];
         $result = $user->getForumPerms($this->encodedForumFlags);
         $diff = array_diff_assoc($expected, $result);
 
