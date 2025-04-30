@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ACP\Page\Tools;
 
 use ACP\Page;
@@ -9,14 +11,31 @@ use Jax\DomainDefinitions;
 use Jax\FileUtils;
 use Jax\Request;
 
-class FileManager {
+use function array_pop;
+use function count;
+use function ctype_digit;
+use function explode;
+use function implode;
+use function in_array;
+use function is_array;
+use function is_numeric;
+use function is_writable;
+use function mb_strtolower;
+use function pathinfo;
+use function preg_match_all;
+use function unlink;
+
+use const PATHINFO_EXTENSION;
+
+final class FileManager
+{
     public function __construct(
         private Config $config,
         private DomainDefinitions $domainDefinitions,
         private Database $database,
         private Page $page,
         private Request $request,
-    ){}
+    ) {}
 
     public function render(): void
     {

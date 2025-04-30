@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace ACP;
 
-use Exception;
 use Jax\DomainDefinitions;
 use Jax\Request;
 
