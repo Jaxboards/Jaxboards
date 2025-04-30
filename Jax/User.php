@@ -6,7 +6,6 @@ namespace Jax;
 
 use function array_merge;
 use function date;
-use function is_string;
 use function password_hash;
 use function password_needs_rehash;
 use function password_verify;
