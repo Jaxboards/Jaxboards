@@ -61,6 +61,9 @@ final readonly class Jax
         return $packed;
     }
 
+    /**
+     * @return array<int,array<string,bool>>
+     */
     public function parseForumPerms(string $forumPerms): array
     {
         $unpack = unpack('n*', $forumPerms);

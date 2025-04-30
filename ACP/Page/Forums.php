@@ -52,38 +52,30 @@ final readonly class Forums
             'recountstats' => 'Recount Statistics',
         ]);
 
-        if ($this->request->both('delete')) {
-            if (is_numeric($this->request->both('delete'))) {
-                $this->deleteforum($this->request->both('delete'));
-
-                return;
-            }
-
-            if (preg_match('@c_(\d+)@', (string) $this->request->both('delete'), $match)) {
-                $this->deletecategory($match[1]);
-
-                return;
-            }
-        } elseif ($this->request->both('edit')) {
-            if (is_numeric($this->request->both('edit'))) {
-                $this->createForum($this->request->both('edit'));
-
-                return;
-            }
-
-            if (preg_match('@c_(\d+)@', (string) $this->request->both('edit'), $match)) {
-                $this->createCategory($match[1]);
-
-                return;
-            }
-        }
+        $edit = $this->request->both('edit');
+        $categoryEdit = match(true) {
+            is_string($edit) && str_starts_with($edit, 'c_') => (int) mb_substr($edit, 2),
+            default => null
+        };
+        $delete = $this->request->both('delete');
+        $categoryDelete = match(true) {
+            is_string($delete) && str_starts_with($delete, 'c_') => (int) mb_substr($delete, 2),
+            default => null
+        };
 
         match ($this->request->get('do')) {
+            'edit' => match(true) {
+                is_numeric($edit) => $this->createForum((int) $edit),
+                $categoryEdit !== null => $this->createCategory($categoryEdit),
+            },
+            'delete' => match (true) {
+                is_numeric($delete) => $this->deleteForum($delete),
+                $categoryDelete !== null => $this->deleteCategory($categoryDelete),
+            },
             'order' => $this->orderForums(),
             'create' => $this->createForum(),
             'createc' => $this->createCategory(),
-            'recountstats' => $this->recountStats->showstats(),
-            'recountstats2' => $this->recountStats->recountStatistics(),
+            'recountstats' => $this->recountStats->render(),
             default => $this->orderForums(),
         };
     }
@@ -736,7 +728,7 @@ final readonly class Forums
         ];
     }
 
-    private function deleteforum(string $forumId): void
+    private function deleteForum(string $forumId): void
     {
         if (
             $this->request->post('submit') === 'Cancel'
@@ -915,7 +907,7 @@ final readonly class Forums
         );
     }
 
-    private function deletecategory(string $catId): void
+    private function deleteCategory(int $catId): void
     {
         $page = '';
         $error = null;
@@ -924,21 +916,17 @@ final readonly class Forums
             'categories',
         );
         $categories = [];
-        $cattitle = false;
         while ($category = $this->database->arow($result)) {
-            if ($category['id'] !== $catId) {
-                $categories[$category['id']] = $category['title'];
-            } else {
-                $cattitle = $category['title'];
-            }
+            $categories[$category['id']] = $category['title'];
         }
+        $this->database->disposeresult($result);
 
-        if ($cattitle === false) {
+        if (!array_key_exists($catId, $categories)) {
             $error = "The category you're trying to delete does not exist.";
         }
 
         if (
-            $error !== null
+            $error === null
             && $this->request->post('submit') !== null
         ) {
             if (!isset($categories[$this->request->post('moveto')])) {

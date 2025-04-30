@@ -6,6 +6,7 @@ namespace ACP\Page\Forums;
 
 use ACP\Page;
 use Jax\Database;
+use Jax\Request;
 
 use function array_pop;
 use function explode;
@@ -15,9 +16,17 @@ final readonly class RecountStats
     public function __construct(
         private readonly Page $page,
         private readonly Database $database,
+        private readonly Request $request,
     ) {}
 
-    public function showstats(): void
+    public function render() {
+        match(true) {
+            $this->request->both('execute') !== null => $this->recountStatistics(),
+            default => $this->showStats(),
+        };
+    }
+
+    public function showStats(): void
     {
         $this->page->addContentBox(
             'Board Statistics',
