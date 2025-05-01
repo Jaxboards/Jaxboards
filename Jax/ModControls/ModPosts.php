@@ -33,11 +33,7 @@ final class ModPosts
 
     public function addPost(int $pid): void
     {
-        if (!$pid) {
-            return;
-        }
-
-        $post = $this->fetchPost($pid);
+        $post = $pid ? $this->fetchPost($pid) : null;
         if (!$post) {
             return;
         }
@@ -63,18 +59,16 @@ final class ModPosts
         $pids = $this->getModPids();
 
         // Toggle's the PID as being selected
-        if (in_array($pid, $pids, true)) {
-            $pids = array_diff($pids, [$pid]);
-        } else {
-            $pids[] = $pid;
-        }
+        $pids = in_array($pid, $pids, true)
+            ? array_diff($pids, [$pid])
+            : [...$pids, $pid];
 
         $this->session->addVar('modpids', implode(',', $pids));
 
         $this->sync();
     }
 
-    public function doPosts(array|string $do): void
+    public function doPosts(array|string $doAct): void
     {
         $pids = $this->getModPids();
 
@@ -85,10 +79,11 @@ final class ModPosts
             return;
         }
 
-        match ($do) {
+        match ($doAct) {
             'move' => $this->page->command('modcontrols_move', 1),
-            'moveto' => $this->movePostsTo($pids),
-            'delete' => $this->deleteposts($pids),
+            'moveto' => $this->movePostsTo($pids, (int) $this->request->post('id')),
+            'delete' => $this->deletePosts($pids),
+            default => null,
         };
     }
 
@@ -97,6 +92,8 @@ final class ModPosts
      * If they're a global mod, automatically yes.
      * If not, then we need to check the forum permissions to
      * see if they're an assigned moderator of the forum.
+     *
+     * @param array<str,mixed> $post
      */
     private function canModPost(array $post): bool
     {
@@ -116,83 +113,40 @@ final class ModPosts
         $this->page->command('modcontrols_clearbox');
     }
 
-    private function deleteposts(): void
+    /**
+     * @param list<int> $pids
+     */
+    private function deletePosts(array $pids): void
     {
-        // Get trashcan.
-        $result = $this->database->safeselect(
-            '`id`',
-            'forums',
-            'WHERE `trashcan`=1 LIMIT 1',
-        );
-        $trashcan = $this->database->arow($result);
-        $trashcan = isset($trashcan['id']) ? (int) $trashcan['id'] : 0;
-
-        $this->database->disposeresult($result);
+        $trashCanForum = $this->fetchTrashCanForum();
 
         $result = $this->database->safeselect(
             '`tid`',
             'posts',
             'WHERE `id` IN ?',
-            $this->getModPids(),
+            $pids,
         );
 
         // Build list of topic ids that the posts were in.
         $tids = [];
-        $pids = $this->getModPids();
         while ($post = $this->database->arow($result)) {
             $tids[] = (int) $post['tid'];
         }
         $tids = array_unique($tids);
 
-        if ($trashcan !== 0) {
-            $result = $this->database->safeselect(
-                ['auth_id'],
-                'posts',
-                'WHERE `id`=?',
-                $this->database->basicvalue(end($pids)),
+        if ($trashCanForum !== null) {
+            $tids[] = $this->movePostsToTrashcan(
+                $pids,
+                $trashCanForum,
+                'Posts deleted from: ' . implode(',', $tids)
             );
-            $lp = $this->database->arow($result);
-            $this->database->disposeresult($result);
+        }
 
-            // Create a new topic.
-            $this->database->safeinsert(
-                'topics',
-                [
-                    'auth_id' => $this->user->get('id'),
-                    'fid' => $trashcan,
-                    'lp_date' => $this->database->datetime(),
-                    'lp_uid' => $lp['auth_id'],
-                    'op' => $pids[0],
-                    'replies' => 0,
-                    'poll_choices' => '',
-                    'title' => 'Posts deleted from: '
-                        . implode(',', $tids),
-                ],
-            );
-            $tid = $this->database->insertId();
-            $this->database->safeupdate(
-                'posts',
-                [
-                    'newtopic' => 0,
-                    'tid' => $tid,
-                ],
-                'WHERE `id` IN ?',
-                $this->getModPids(),
-            );
-            $this->database->safeupdate(
-                'posts',
-                [
-                    'newtopic' => 1,
-                ],
-                'WHERE `id`=?',
-                $this->database->basicvalue($pids[0]),
-            );
-            $tids[] = $tid;
-        } else {
+        if ($trashCanForum === null) {
             $this->database->safedelete(
                 'posts',
                 'WHERE `id` IN ?',
-                $this->getModPids(),
+                $pids,
             );
         }
 
@@ -216,31 +170,15 @@ final class ModPosts
         }
 
         // Fix forum last post for all forums topics were in.
-        $fids = [];
         // Add trashcan here too just in case.
-        if ($trashcan !== 0) {
-            $fids[] = $trashcan;
-        }
+        $fids = $trashCanForum ? [$trashCanForum['id']] : [];
 
-        $result = $this->database->safeselect(
-            ['fid'],
-            'topics',
-            'WHERE `id` IN ?',
-            $tids,
-        );
+        $result = $this->database->safeselect(['fid'], 'topics', 'WHERE `id` IN ?', $tids);
         while ($topic = $this->database->arow($result)) {
-            if (!is_numeric($topic['fid'])) {
-                continue;
-            }
-
-            if ($topic['fid'] <= 0) {
-                continue;
-            }
-
             $fids[] = (int) $topic['fid'];
         }
-
         $this->database->disposeresult($result);
+
         $fids = array_unique($fids);
         foreach ($fids as $fid) {
             $this->database->fixForumLastPost($fid);
@@ -273,7 +211,7 @@ final class ModPosts
     private function fetchPost(int $pid): ?array
     {
         $result = $this->database->safeselect(
-            ['newtopic', 'tid'],
+            ['auth_id', 'newtopic', 'tid'],
             'posts',
             'WHERE id=?',
             $this->database->basicvalue($pid),
@@ -284,6 +222,9 @@ final class ModPosts
         return $post;
     }
 
+    /**
+     * @return list<int> list of mod user IDs assigned to a forum. Empty array when none.
+     */
     private function fetchForumMods(array $post): array
     {
         $result = $this->database->safespecial(
@@ -303,21 +244,95 @@ final class ModPosts
         $mods = $this->database->arow($result);
         $this->database->disposeresult($result);
 
-        return $mods ? explode(',', (string) $mods['mods']) : null;
+        return $mods ? explode(',', (string) $mods['mods']) : [];
     }
 
-    private function movePostsTo(array $pids): void
+    private function fetchTrashCanForum(): ?array {
+        $result = $this->database->safeselect(
+            '`id`',
+            'forums',
+            'WHERE `trashcan`=1 LIMIT 1',
+        );
+        $trashcan = $this->database->arow($result);
+        $this->database->disposeresult($result);
+        return $trashcan;
+    }
+
+    /**
+     * @param list<int> $pids
+     */
+    private function movePostsTo(array $pids, int $tid): void
     {
+        $this->clear();
+
+        if (!$tid) return;
+
         $this->database->safeupdate(
             'posts',
             [
-                'tid' => $this->request->post('id'),
+                'tid' => $tid,
             ],
             'WHERE `id` IN ?',
             $pids,
         );
-        $this->page->location('?act=vt' . $this->request->post('id'));
-        $this->clear();
+        $this->page->location('?act=vt' . $tid);
+    }
+
+    /**
+     * Move posts to trashcan by creating a new topic there,
+     * then moving all posts to it.
+     *
+     * @param array<str,mixed> $trashCanForum
+     * @param list<int> $pids
+     * @return int The new topic's ID
+     */
+    private function movePostsToTrashcan(
+        array $pids,
+        array $trashCanForum,
+        string $newTopicTitle
+    ) {
+        $lastPost = $this->fetchPost(end($pids));
+
+        // Create a new topic.
+        $this->database->safeinsert(
+            'topics',
+            [
+                'auth_id' => $this->user->get('id'),
+                'fid' => $trashCanForum['id'],
+                'lp_date' => $this->database->datetime(),
+                'lp_uid' => $lastPost['auth_id'],
+                'op' => $pids[0],
+                'poll_choices' => '',
+                'replies' => 0,
+                'title' => $newTopicTitle,
+            ],
+        );
+        $tid = $this->database->insertId();
+
+        $this->movePostsTo($pids, $tid);
+
+        // Put the posts into it
+        $this->database->safeupdate(
+            'posts',
+            [
+                'newtopic' => 0,
+                'tid' => $tid,
+            ],
+            'WHERE `id` IN ?',
+            $pids,
+        );
+
+        // Set the OP
+        $this->database->safeupdate(
+            'posts',
+            [
+                'newtopic' => 1,
+            ],
+            'WHERE `id`=?',
+            $this->database->basicvalue($pids[0]),
+        );
+
+        return $tid;
     }
 
     private function sync(): void
