@@ -39,7 +39,7 @@ use const PHP_EOL;
 
 final class Search
 {
-    private $pagenum = 0;
+    private int $pageNum = 0;
 
     private $fids = [];
 
@@ -60,9 +60,9 @@ final class Search
 
     public function render(): void
     {
-        $this->pagenum = $this->request->both('page') ?? 0;
-        if (!is_numeric($this->pagenum) || $this->pagenum < 0) {
-            $this->pagenum = 1;
+        $this->pageNum = (int) $this->request->both('page') - 1;
+        if ($this->pageNum < 0) {
+            $this->pageNum = 0;
         }
 
         $this->perpage = 10;
@@ -186,7 +186,7 @@ final class Search
 
         $termraw = $this->request->both('searchterm') ?? '';
 
-        if (!$termraw && $this->pagenum) {
+        if (!$termraw && $this->pageNum) {
             $termraw = $this->session->getVar('searcht');
         }
 
@@ -317,7 +317,7 @@ final class Search
             $ids = mb_substr($ids, 0, -1);
             $this->session->addVar('search', $ids);
             $this->session->addVar('searcht', $termraw);
-            $this->pagenum = 1;
+            $this->pageNum = 0;
         }
 
         $result = null;
@@ -325,7 +325,7 @@ final class Search
             $numresults = count(explode(',', (string) $ids));
             $idarray = array_slice(
                 explode(',', (string) $ids),
-                ($this->pagenum - 1) * $this->perpage,
+                ($this->pageNum) * $this->perpage,
                 $this->perpage,
             );
             $ids = implode(',', $idarray);
@@ -415,7 +415,7 @@ final class Search
         } else {
             $resultsArray = $this->jax->pages(
                 (int) ceil($numresults / $this->perpage),
-                $this->pagenum,
+                $this->pageNum,
                 10,
             );
             foreach ($resultsArray as $x) {
