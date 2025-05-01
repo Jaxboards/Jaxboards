@@ -53,6 +53,11 @@ final class UserProfile
         'youtube' => 'https://youtube.com/%s',
     ];
 
+    /**
+     * var array<string,mixed> the profile we are currently viewing
+     */
+    private ?array $profile = null;
+
     public function __construct(
         private readonly Database $database,
         private readonly Date $date,
@@ -74,20 +79,15 @@ final class UserProfile
         preg_match('@\d+@', (string) $this->request->both('act'), $match);
         $userId = (int) $match[0];
 
-        if (!$userId) {
-            $this->page->location('?');
-
-            return;
-        }
 
         // Nothing is live updating on the profile page
         if ($this->request->isJSUpdate() && !$this->request->hasPostData()) {
             return;
         }
 
-        $user = $this->fetchUser($userId);
+        $this->profile = $userId ? $this->fetchUser($userId) : null;
 
-        if (!$user) {
+        if (!$this->profile) {
             $error = $this->template->meta('error', "Sorry, this user doesn't exist.");
             $this->page->command('update', 'page', $error);
             $this->page->append('PAGE', $error);
@@ -98,8 +98,9 @@ final class UserProfile
         match (true) {
             $this->request->isJSNewLocation()
             && !$this->request->isJSDirectLink()
-            && !$this->request->both('view') => $this->showContactCard($user),
-            default => $this->showFullProfile($user),
+            && !$this->request->both('view') => $this->showContactCard(),
+            (bool) $this->user->getPerm('can_view_fullprofile') => $this->showFullProfile(),
+            default => $this->page->location('?'),
         };
     }
 
@@ -183,28 +184,47 @@ final class UserProfile
         return $user;
     }
 
-    /**
-     * @param array<string,mixed> $user
-     */
-    private function showContactCard(array $user): void
+    private function isUserInList(int $userId, string $listName): bool
+    {
+        return !$this->user->isGuest() && in_array(
+            $userId,
+            array_map(
+                fn($userId) => (int) $userId,
+                explode(',', (string) $this->user->get($listName))
+            ),
+            true
+        );
+    }
+
+    private function showContactCard(): void
     {
         $contactdetails = '';
+        $profile = $this->profile;
 
         foreach (self::CONTACT_URLS as $field => $url) {
-            if (!$user['contact_' . $field]) {
+            if (!$profile['contact_' . $field]) {
                 continue;
             }
 
             $href = sprintf(
                 $url,
                 $this->textFormatting->blockhtml(
-                    $user["contact_{$field}"],
+                    $profile["contact_{$field}"],
                 ),
             );
             $contactdetails .= <<<"HTML"
                 <a class="{$field} contact" title="{$field} contact" href="{$href}">&nbsp;</a>
                 HTML;
         }
+
+        $addContactLink = $this->isUserInList($profile['id'], 'friends')
+            ? "<a href='?act=buddylist&remove={$profile['id']}'>Remove Contact</a>"
+            : "<a href='?act=buddylist&add={$profile['id']}'>Add Contact</a>";
+
+        $blockLink = $this->isUserInList($profile['id'], 'enemies')
+            ?  "<a href='?act=buddylist&unblock={$profile['id']}'>Unblock Contact</a>"
+            : "<a href='?act=buddylist&block={$profile['id']}'>Block Contact</a>";
+
 
         $this->page->command('softurl');
         $this->page->command(
@@ -214,24 +234,13 @@ final class UserProfile
                 'className' => 'contact-card',
                 'content' => $this->template->meta(
                     'userprofile-contact-card',
-                    $user['display_name'],
-                    $user['avatar'] ?: $this->template->meta('default-avatar'),
-                    $user['usertitle'],
-                    $user['id'],
+                    $profile['display_name'],
+                    $profile['avatar'] ?: $this->template->meta('default-avatar'),
+                    $profile['usertitle'],
+                    $profile['id'],
                     $contactdetails,
-                    !$this->user->isGuest() && in_array(
-                        $user['id'],
-                        explode(',', (string) $this->user->get('friends')),
-                    ) ? '<a href="?act=buddylist&remove=' . $user['id']
-                    . '">Remove Contact</a>' : '<a href="?act=buddylist&add='
-                    . $user['id'] . '">Add Contact</a>',
-                    !$this->user->isGuest() && in_array(
-                        $user['id'],
-                        explode(',', (string) $this->user->get('enemies')),
-                    ) ? '<a href="?act=buddylist&unblock=' . $user['id']
-                    . '">Unblock Contact</a>'
-                    : '<a href="?act=buddylist&block=' . $user['id']
-                    . '">Block Contact</>',
+                    $addContactLink,
+                    $blockLink,
                 ),
                 'minimizable' => false,
                 'title' => 'Contact Card',
@@ -240,123 +249,80 @@ final class UserProfile
         );
     }
 
-    /**
-     * @param array<string,mixed> $user
-     */
-    private function showFullProfile(array $user): void
+    private function showFullProfile(): void
     {
-        if (!$this->user->getPerm('can_view_fullprofile')) {
-            $this->page->location('?');
+        [$tabs, $tabHTML] = $this->renderTabHTML();
+        $profile = $this->profile;
 
-            return;
+        $this->page->setBreadCrumbs(
+            [
+                $profile['display_name']
+                . "'s profile" => '?act=vu' . $profile['id'] . '&view=profile',
+            ],
+        );
+
+        $contactdetails = '';
+        $contactFields = array_filter(array_keys($profile), fn($field) => str_starts_with($field, 'contact'));
+
+        foreach ($contactFields as $field) {
+            $type = mb_substr($field, 8);
+            $href = sprintf(self::CONTACT_URLS[$type], $profile[$field]);
+            $contactdetails .= <<<HTML
+                <div class="contact {$type}"><a href="{$href}">{$field}</a></div>
+                HTML;
         }
 
-        $page = $this->request->both('page');
-        $pfpageloc = in_array($page, self::TABS, true) ? $page : 'activity';
+        $contactdetails .= <<<HTML
+            <div class="contact im">
+                <a href="javascript:void(0)"
+                    onclick="new IMWindow('{$profile['id']}','{$profile['display_name']}')"
+                    >IM</a>
+            </div>
+            <div class="contact pm">
+                <a href="?act=ucp&what=inbox&page=compose&mid={$profile['id']}">PM</a>
+            </div>
+            HTML;
 
-        $tabHTML = match ($pfpageloc) {
-            'posts' => $this->showTabPosts($user),
-            'topics' => $this->showTabTopics($user),
-            'about' => $this->showTabAbout($user),
-            'friends' => $this->showTabFriends($user),
-            'comments' => $this->showTabComments($user),
-            default => $this->showTabActivity($user),
-        };
-
-        if (
-            $this->request->both('page') !== null
-            && $this->request->isJSAccess()
-            && !$this->request->isJSDirectLink()
-        ) {
-            $this->page->command('update', 'pfbox', $tabHTML);
-        } else {
-            $this->page->setBreadCrumbs(
-                [
-                    $user['display_name']
-                    . "'s profile" => '?act=vu' . $user['id'] . '&view=profile',
-                ],
-            );
-
-            foreach (self::TABS as $tabIndex => $tab) {
-                $active = ($tab === $pfpageloc ? ' class="active"' : '');
-                $uppercase = ucwords($tab);
-                $tabs[$tabIndex] = <<<HTML
-                    <a href="?act=vu{$user['id']}&view=profile&page={$tab}" {$active}>
-                        {$uppercase}
-                    </a>
-                    HTML;
-            }
-
-            $contactdetails = '';
-            foreach ($user as $fieldIndex => $field) {
-                if (mb_substr((string) $fieldIndex, 0, 8) !== 'contact_') {
-                    continue;
-                }
-
-                if (!$field) {
-                    continue;
-                }
-
-                $contactdetails .= '<div class="contact ' . mb_substr((string) $fieldIndex, 8)
-                    . '"><a href="'
-                    . sprintf(self::CONTACT_URLS[mb_substr((string) $fieldIndex, 8)], $field)
-                    . '">' . $field . '</a></div>';
-            }
-
+        if ($this->user->getPerm('can_moderate')) {
+            $ipReadable = $this->ipAddress->asHumanReadable($profile['ip']);
             $contactdetails .= <<<HTML
-                <div class="contact im">
-                    <a href="javascript:void(0)"
-                        onclick="new IMWindow('{$user['id']}','{$user['display_name']}')"
-                        >IM</a>
-                </div>
-                HTML;
-            $contactdetails .= <<<HTML
-                <div class="contact pm">
-                    <a href="?act=ucp&what=inbox&page=compose&mid={$user['id']}">PM</a>
-                </div>
-                HTML;
-            if ($this->user->getPerm('can_moderate')) {
-                $ipReadable = $this->ipAddress->asHumanReadable($user['ip']);
-                $contactdetails .= <<<HTML
-                        <div>IP: <a href="?act=modcontrols&do=iptools&ip={$ipReadable}">{$ipReadable}</a>
-                        </div>
-                    HTML;
-            }
-
-            $page = $this->template->meta(
-                'userprofile-full-profile',
-                $user['display_name'],
-                $user['avatar'] ?: $this->template->meta('default-avatar'),
-                $user['usertitle'],
-                $contactdetails,
-                $user['full_name'] ?: 'N/A',
-                ucfirst((string) $user['gender']) ?: 'N/A',
-                $user['location'],
-                $user['dob_year'] ? $user['dob_month'] . '/'
-                . $user['dob_day'] . '/' . $user['dob_year'] : 'N/A',
-                $user['website'] ? '<a href="' . $user['website'] . '">'
-                . $user['website'] . '</a>' : 'N/A',
-                $this->date->autoDate($user['join_date']),
-                $this->date->autoDate($user['last_visit']),
-                $user['id'],
-                $user['posts'],
-                $this->fetchGroupTitle($user['group_id']),
-                $tabs[0],
-                $tabs[1],
-                $tabs[2],
-                $tabs[3],
-                $tabs[4],
-                $tabs[5],
-                $tabHTML,
-                $this->user->getPerm('can_moderate')
-                ? '<a class="moderate" href="?act=modcontrols&do=emem&mid='
-                . $user['id'] . '">Edit</a>' : '',
-            );
-            $this->page->command('update', 'page', $page);
-            $this->page->append('PAGE', $page);
-
-            $this->session->set('location_verbose', 'Viewing ' . $user['display_name'] . "'s profile");
+                <div>IP: <a href="?act=modcontrols&do=iptools&ip={$ipReadable}">{$ipReadable}</a></div>
+            HTML;
         }
+
+        $page = $this->template->meta(
+            'userprofile-full-profile',
+            $profile['display_name'],
+            $profile['avatar'] ?: $this->template->meta('default-avatar'),
+            $profile['usertitle'],
+            $contactdetails,
+            $profile['full_name'] ?: 'N/A',
+            ucfirst((string) $profile['gender']) ?: 'N/A',
+            $profile['location'],
+            $profile['dob_year'] ? $profile['dob_month'] . '/'
+            . $profile['dob_day'] . '/' . $profile['dob_year'] : 'N/A',
+            $profile['website'] ? '<a href="' . $profile['website'] . '">'
+            . $profile['website'] . '</a>' : 'N/A',
+            $this->date->autoDate($profile['join_date']),
+            $this->date->autoDate($profile['last_visit']),
+            $profile['id'],
+            $profile['posts'],
+            $this->fetchGroupTitle($profile['group_id']),
+            $tabs[0],
+            $tabs[1],
+            $tabs[2],
+            $tabs[3],
+            $tabs[4],
+            $tabs[5],
+            $tabHTML,
+            $this->user->getPerm('can_moderate')
+            ? '<a class="moderate" href="?act=modcontrols&do=emem&mid='
+            . $profile['id'] . '">Edit</a>' : '',
+        );
+        $this->page->command('update', 'page', $page);
+        $this->page->append('PAGE', $page);
+
+        $this->session->set('location_verbose', 'Viewing ' . $profile['display_name'] . "'s profile");
     }
 
     /**
@@ -430,21 +396,48 @@ final class UserProfile
     }
 
     /**
-     * @param array<string,mixed> $user
+     * @return list{string,string}
      */
-    private function showTabAbout(array $user)
+    private function renderTabHTML(): array {
+        $page = $this->request->both('page');
+        $selectedTab = in_array($page, self::TABS, true) ? $page : 'activity';
+
+
+        $tabHTML = match ($selectedTab) {
+            'posts' => $this->showTabPosts(),
+            'topics' => $this->showTabTopics(),
+            'about' => $this->showTabAbout(),
+            'friends' => $this->showTabFriends(),
+            'comments' => $this->showTabComments(),
+            default => $this->showTabActivity(),
+        };
+
+        foreach (self::TABS as $tabIndex => $tab) {
+            $active = ($tab === $selectedTab ? ' class="active"' : '');
+            $uppercase = ucwords($tab);
+            $tabs[$tabIndex] = <<<HTML
+                <a href="?act=vu{$this->profile['id']}&view=profile&page={$tab}" $active>{$uppercase}</a>
+                HTML;
+        }
+
+        $this->page->command('update', 'pfbox', $tabHTML);
+        return [$tabs, $tabHTML];
+
+    }
+
+    private function showTabAbout()
     {
         return $this->template->meta(
             'userprofile-about',
-            $this->textFormatting->theWorks($user['about']),
-            $this->textFormatting->theWorks($user['sig']),
+            $this->textFormatting->theWorks($this->profile['about']),
+            $this->textFormatting->theWorks($this->profile['sig']),
         );
     }
 
     /**
      * @param array<string,mixed> $user
      */
-    private function showTabActivity(array $user): string
+    private function showTabActivity(): string
     {
         $tabHTML = '';
         $result = $this->database->safespecial(
@@ -470,19 +463,19 @@ final class UserProfile
                 LIMIT ?
                 SQL,
             ['activity', 'members'],
-            $user['id'],
+            $this->profile['id'],
             self::ACTIVITY_LIMIT,
         );
         if ($this->request->both('fmt') === 'RSS') {
             $feed = new RSSFeed(
                 [
-                    'description' => $user['usertitle'],
-                    'title' => $user['display_name'] . "'s recent activity",
+                    'description' => $this->profile['usertitle'],
+                    'title' => $this->profile['display_name'] . "'s recent activity",
                 ],
             );
             while ($activity = $this->database->arow($result)) {
-                $activity['name'] = $user['display_name'];
-                $activity['group_id'] = $user['group_id'];
+                $activity['name'] = $this->profile['display_name'];
+                $activity['group_id'] = $this->profile['group_id'];
                 $data = $this->parseActivityRSS($activity);
                 $feed->additem(
                     [
@@ -499,22 +492,19 @@ final class UserProfile
         }
 
         while ($activity = $this->database->arow($result)) {
-            $activity['name'] = $user['display_name'];
-            $activity['group_id'] = $user['group_id'];
+            $activity['name'] = $this->profile['display_name'];
+            $activity['group_id'] = $this->profile['group_id'];
             $tabHTML .= $this->parseActivity($activity);
         }
         $this->database->disposeresult($result);
 
         return !$tabHTML
             ? 'This user has yet to do anything noteworthy!'
-            : "<a href='./?act=vu{$user['id']}&amp;page=activity&amp;fmt=RSS' class='social rss' "
+            : "<a href='./?act=vu{$this->profile['id']}&amp;page=activity&amp;fmt=RSS' class='social rss' "
             . "style='float:right'>RSS</a>{$tabHTML}";
     }
 
-    /**
-     * @param array<string,mixed> $user
-     */
-    private function showTabComments(array $user): string
+    private function showTabComments(): string
     {
         $tabHTML = '';
         if (
@@ -547,7 +537,7 @@ final class UserProfile
                 $this->database->safeinsert(
                     'activity',
                     [
-                        'affected_uid' => $user['id'],
+                        'affected_uid' => $this->profile['id'],
                         'date' => $this->database->datetime(),
                         'type' => 'profile_comment',
                         'uid' => $this->user->get('id'),
@@ -559,7 +549,7 @@ final class UserProfile
                         'comment' => $this->request->post('comment'),
                         'date' => $this->database->datetime(),
                         'from' => $this->user->get('id'),
-                        'to' => $user['id'],
+                        'to' => $this->profile['id'],
                     ],
                 );
             }
@@ -580,7 +570,7 @@ final class UserProfile
                 $this->user->get('avatar') ?: $this->template->meta('default-avatar'),
                 $this->jax->hiddenFormFields(
                     [
-                        'act' => 'vu' . $user['id'],
+                        'act' => 'vu' . $this->profile['id'],
                         'page' => 'comments',
                         'view' => 'profile',
                     ],
@@ -607,7 +597,7 @@ final class UserProfile
                 LIMIT 10
                 SQL,
             ['profile_comments', 'members'],
-            $user['id'],
+            $this->profile['id'],
         );
         $found = false;
         while ($comment = $this->database->arow($result)) {
@@ -639,13 +629,10 @@ final class UserProfile
         return $tabHTML;
     }
 
-    /**
-     * @param array<string,mixed> $user
-     */
-    private function showTabFriends(array $user): string
+    private function showTabFriends(): string
     {
         $tabHTML = '';
-        if ($user['friends']) {
+        if ($this->profile['friends']) {
             $result = $this->database->safeselect(
                 [
                     'avatar',
@@ -656,7 +643,7 @@ final class UserProfile
                 ],
                 'members',
                 Database::WHERE_ID_IN,
-                explode(',', (string) $user['friends']),
+                explode(',', (string) $this->profile['friends']),
             );
 
             while ($member = $this->database->arow($result)) {
@@ -675,14 +662,11 @@ final class UserProfile
         }
 
         return $tabHTML
-            ? "I'm pretty lonely, I have no friends. :("
-            : '<div class="contacts">' . $tabHTML . '<br clear="all" /></div>';
+            ? '<div class="contacts">' . $tabHTML . '<br clear="all" /></div>'
+            : "I'm pretty lonely, I have no friends. :(";
     }
 
-    /**
-     * @param array<string,mixed> $user
-     */
-    private function showTabTopics(array $user): string
+    private function showTabTopics(): string
     {
         $tabHTML = '';
         $result = $this->database->safespecial(
@@ -705,7 +689,7 @@ final class UserProfile
                 LIMIT 10
                 SQL,
             ['posts', 'topics', 'forums'],
-            $user['id'],
+            $this->profile['id'],
         );
         while ($post = $this->database->arow($result)) {
             $perms = $this->user->getForumPerms($post['perms']);
@@ -729,11 +713,9 @@ final class UserProfile
         return $tabHTML;
     }
 
-    /**
-     * @param array<string,mixed> $user
-     */
-    private function showTabPosts(array $user): string
+    private function showTabPosts(): string
     {
+        $profile = $this->profile;
         $tabHTML = '';
 
         $result = $this->database->safespecial(
@@ -750,7 +732,7 @@ final class UserProfile
                 LIMIT 10
                 SQL,
             ['posts', 'topics', 'forums'],
-            $user['id'],
+            $profile['id'],
         );
         while ($post = $this->database->arow($result)) {
             $perms = $this->user->getForumPerms($post['perms']);
