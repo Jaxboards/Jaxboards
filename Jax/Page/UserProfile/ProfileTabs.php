@@ -103,41 +103,56 @@ final class ProfileTabs
         return $this->comments->render($this->profile);
     }
 
-    private function showTabFriends(): string
-    {
-        $tabHTML = '';
-        if ($this->profile['friends']) {
-            $result = $this->database->safeselect(
-                [
-                    'avatar',
-                    'id',
-                    'display_name',
-                    'group_id',
-                    'usertitle',
-                ],
-                'members',
-                Database::WHERE_ID_IN,
-                explode(',', (string) $this->profile['friends']),
-            );
 
-            while ($member = $this->database->arow($result)) {
-                $tabHTML .= $this->template->meta(
-                    'userprofile-friend',
-                    $member['id'],
-                    $member['avatar'] ?: $this->template->meta('default-avatar'),
-                    $this->template->meta(
-                        'user-link',
-                        $member['id'],
-                        $member['group_id'],
-                        $member['display_name'],
-                    ),
-                );
-            }
+    /**
+     * @return null|array<string,string|int>
+     */
+    private function fetchFriends(): ?array
+    {
+        if (!$this->profile['friends']) {
+            return null;
         }
 
-        return $tabHTML
-            ? '<div class="contacts">' . $tabHTML . '<br clear="all" /></div>'
-            : "I'm pretty lonely, I have no friends. :(";
+        $result = $this->database->safeselect(
+            [
+                'avatar',
+                'id',
+                'display_name',
+                'group_id',
+                'usertitle',
+            ],
+            'members',
+            Database::WHERE_ID_IN,
+            explode(',', (string) $this->profile['friends']),
+        );
+        $friends = $this->database->arows($result);
+        $this->database->disposeresult($result);
+        return $friends;
+    }
+
+    private function showTabFriends(): string
+    {
+        $friends = $this->fetchFriends();
+        if (!$friends) {
+            return "I'm pretty lonely, I have no friends. :(";
+        }
+
+        $tabHTML = '';
+        foreach ($friends as $friend) {
+            $tabHTML .= $this->template->meta(
+                'userprofile-friend',
+                $friend['id'],
+                $friend['avatar'] ?: $this->template->meta('default-avatar'),
+                $this->template->meta(
+                    'user-link',
+                    $friend['id'],
+                    $friend['group_id'],
+                    $friend['display_name'],
+                ),
+            );
+        }
+
+        return "<div class='contacts'>{$tabHTML}<br clear='all' /></div>";
     }
 
     private function showTabTopics(): string
