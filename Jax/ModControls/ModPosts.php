@@ -10,11 +10,15 @@ use Jax\Request;
 use Jax\Session;
 use Jax\User;
 
+use function array_diff;
+use function array_map;
 use function array_unique;
+use function end;
 use function explode;
 use function implode;
 use function in_array;
 use function is_numeric;
+use function sort;
 
 final class ModPosts
 {
@@ -50,6 +54,7 @@ final class ModPosts
                 'error',
                 "You don't have permission to be moderating in this forum",
             );
+
             return;
         }
 
@@ -83,7 +88,7 @@ final class ModPosts
         match ($do) {
             'move' => $this->page->command('modcontrols_move', 1),
             'moveto' => $this->movePostsTo($pids),
-            'delete' => $this->deleteposts($pids)
+            'delete' => $this->deleteposts($pids),
         };
     }
 
@@ -100,6 +105,7 @@ final class ModPosts
         }
 
         $mods = $this->fetchForumMods($post);
+
         return in_array($this->user->get('id'), $mods, true);
     }
 
@@ -246,18 +252,22 @@ final class ModPosts
         }
 
         $this->clear();
-        return;
+
     }
 
     /**
-     * Returns sorted list of post IDs we're working with
+     * Returns sorted list of post IDs we're working with.
+     *
      * @return list<int>
      */
     private function getModPids(): array
     {
         $modPids = $this->session->getVar('modpids');
-        $intPids = $modPids ? array_map(fn($pid) => (int) $pid, explode(',', $modPids)) : [];
+        $intPids = $modPids
+            ? array_map(static fn($pid) => (int) $pid, explode(',', $modPids))
+            : [];
         sort($intPids);
+
         return $intPids;
     }
 
@@ -271,6 +281,7 @@ final class ModPosts
         );
         $post = $this->database->arow($result);
         $this->database->disposeresult($result);
+
         return $post;
     }
 
@@ -296,7 +307,8 @@ final class ModPosts
         return $mods ? explode(',', (string) $mods['mods']) : null;
     }
 
-    private function movePostsTo(array $pids) {
+    private function movePostsTo(array $pids): void
+    {
         $this->database->safeupdate(
             'posts',
             [
