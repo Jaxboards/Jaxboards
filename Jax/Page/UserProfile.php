@@ -97,7 +97,7 @@ final class UserProfile
             ['title'],
             'member_groups',
             Database::WHERE_ID_EQUALS,
-            $groupId
+            $groupId,
         );
         $group = $this->database->arow($result);
         $this->database->disposeresult($result);
@@ -108,7 +108,8 @@ final class UserProfile
     /**
      * @return array<string,mixed>
      */
-    private function fetchUser(int $userId): array {
+    private function fetchUser(int $userId): array
+    {
         $result = $this->database->safeselect(
             [
                 'ip',
@@ -158,14 +159,15 @@ final class UserProfile
                 'UNIX_TIMESTAMP(`last_visit`) AS `last_visit`',
                 'DAY(`birthdate`) AS `dob_day`',
                 'MONTH(`birthdate`) AS `dob_month`',
-                'YEAR(`birthdate`) AS `dob_year`'
+                'YEAR(`birthdate`) AS `dob_year`',
             ],
             'members',
             Database::WHERE_ID_EQUALS,
-            $userId
+            $userId,
         );
         $user = $this->database->arow($result);
         $this->database->disposeresult($result);
+
         return $user;
     }
 
@@ -176,6 +178,7 @@ final class UserProfile
 
         if (!$contactUser) {
             $this->page->error("This user doesn't exist!");
+
             return;
         }
 
@@ -187,8 +190,8 @@ final class UserProfile
             $href = sprintf(
                 $url,
                 $this->textFormatting->blockhtml(
-                    $contactUser["contact_{$field}"]
-                )
+                    $contactUser["contact_{$field}"],
+                ),
             );
             $contactdetails .= <<<"HTML"
                 <a class="{$field} contact" title="{$field} contact" href="{$href}">&nbsp;</a>
@@ -419,7 +422,8 @@ final class UserProfile
     /**
      * @param array<string,mixed> $user
      */
-    private function showTabAbout(array $user) {
+    private function showTabAbout(array $user)
+    {
         return $this->template->meta(
             'userprofile-about',
             $this->textFormatting->theWorks($user['about']),
@@ -643,11 +647,11 @@ final class UserProfile
                     'id',
                     'display_name',
                     'group_id',
-                    'usertitle'
+                    'usertitle',
                 ],
                 'members',
                 Database::WHERE_ID_IN,
-                explode(',', (string) $user['friends'])
+                explode(',', (string) $user['friends']),
             );
 
             while ($member = $this->database->arow($result)) {
