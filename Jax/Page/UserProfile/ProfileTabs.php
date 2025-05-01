@@ -103,9 +103,8 @@ final class ProfileTabs
         return $this->comments->render($this->profile);
     }
 
-
     /**
-     * @return null|array<string,string|int>
+     * @return null|array<string,int|string>
      */
     private function fetchFriends(): ?array
     {
@@ -127,6 +126,7 @@ final class ProfileTabs
         );
         $friends = $this->database->arows($result);
         $this->database->disposeresult($result);
+
         return $friends;
     }
 
