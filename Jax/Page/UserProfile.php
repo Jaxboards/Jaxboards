@@ -17,6 +17,9 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
+use function array_filter;
+use function array_keys;
+use function array_map;
 use function explode;
 use function gmdate;
 use function in_array;
@@ -24,6 +27,7 @@ use function is_numeric;
 use function mb_substr;
 use function preg_match;
 use function sprintf;
+use function str_starts_with;
 use function ucfirst;
 use function ucwords;
 
@@ -54,7 +58,7 @@ final class UserProfile
     ];
 
     /**
-     * var array<string,mixed> the profile we are currently viewing
+     * var array<string,mixed> the profile we are currently viewing.
      */
     private ?array $profile = null;
 
@@ -189,10 +193,10 @@ final class UserProfile
         return !$this->user->isGuest() && in_array(
             $userId,
             array_map(
-                fn($userId) => (int) $userId,
-                explode(',', (string) $this->user->get($listName))
+                static fn($userId) => (int) $userId,
+                explode(',', (string) $this->user->get($listName)),
             ),
-            true
+            true,
         );
     }
 
@@ -222,7 +226,7 @@ final class UserProfile
             : "<a href='?act=buddylist&add={$profile['id']}'>Add Contact</a>";
 
         $blockLink = $this->isUserInList($profile['id'], 'enemies')
-            ?  "<a href='?act=buddylist&unblock={$profile['id']}'>Unblock Contact</a>"
+            ? "<a href='?act=buddylist&unblock={$profile['id']}'>Unblock Contact</a>"
             : "<a href='?act=buddylist&block={$profile['id']}'>Block Contact</a>";
 
 
@@ -262,7 +266,7 @@ final class UserProfile
         );
 
         $contactdetails = '';
-        $contactFields = array_filter(array_keys($profile), fn($field) => str_starts_with($field, 'contact'));
+        $contactFields = array_filter(array_keys($profile), static fn($field) => str_starts_with($field, 'contact'));
 
         foreach ($contactFields as $field) {
             $type = mb_substr($field, 8);
@@ -286,8 +290,8 @@ final class UserProfile
         if ($this->user->getPerm('can_moderate')) {
             $ipReadable = $this->ipAddress->asHumanReadable($profile['ip']);
             $contactdetails .= <<<HTML
-                <div>IP: <a href="?act=modcontrols&do=iptools&ip={$ipReadable}">{$ipReadable}</a></div>
-            HTML;
+                    <div>IP: <a href="?act=modcontrols&do=iptools&ip={$ipReadable}">{$ipReadable}</a></div>
+                HTML;
         }
 
         $page = $this->template->meta(
@@ -398,7 +402,8 @@ final class UserProfile
     /**
      * @return list{string,string}
      */
-    private function renderTabHTML(): array {
+    private function renderTabHTML(): array
+    {
         $page = $this->request->both('page');
         $selectedTab = in_array($page, self::TABS, true) ? $page : 'activity';
 
@@ -416,13 +421,13 @@ final class UserProfile
             $active = ($tab === $selectedTab ? ' class="active"' : '');
             $uppercase = ucwords($tab);
             $tabs[$tabIndex] = <<<HTML
-                <a href="?act=vu{$this->profile['id']}&view=profile&page={$tab}" $active>{$uppercase}</a>
+                <a href="?act=vu{$this->profile['id']}&view=profile&page={$tab}" {$active}>{$uppercase}</a>
                 HTML;
         }
 
         $this->page->command('update', 'pfbox', $tabHTML);
-        return [$tabs, $tabHTML];
 
+        return [$tabs, $tabHTML];
     }
 
     private function showTabAbout()
@@ -434,9 +439,6 @@ final class UserProfile
         );
     }
 
-    /**
-     * @param array<string,mixed> $user
-     */
     private function showTabActivity(): string
     {
         $tabHTML = '';
