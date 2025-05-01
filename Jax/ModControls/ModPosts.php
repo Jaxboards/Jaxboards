@@ -252,7 +252,6 @@ final class ModPosts
         }
 
         $this->clear();
-
     }
 
     /**
