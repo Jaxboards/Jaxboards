@@ -63,8 +63,8 @@ final class ProfileTabs
             'topics' => $this->showTabTopics(),
             'about' => $this->showTabAbout(),
             'friends' => $this->showTabFriends(),
-            'comments' => $this->showTabComments(),
-            default => $this->showTabActivity(),
+            'comments' => $this->comments->render($this->profile),
+            default => $this->activity->render($this->profile),
         };
 
         $tabs = array_map(
@@ -92,16 +92,6 @@ final class ProfileTabs
             $this->textFormatting->theWorks($this->profile['about']),
             $this->textFormatting->theWorks($this->profile['sig']),
         );
-    }
-
-    private function showTabActivity(): string
-    {
-        return $this->activity->render($this->profile);
-    }
-
-    private function showTabComments(): string
-    {
-        return $this->comments->render($this->profile);
     }
 
     /**
