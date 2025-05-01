@@ -16,7 +16,6 @@ use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
-use PHP_CodeSniffer\Generators\HTML;
 
 use function explode;
 use function gmdate;
@@ -282,7 +281,7 @@ final class UserProfile
                 $active = ($tab === $pfpageloc ? ' class="active"' : '');
                 $uppercase = ucwords($tab);
                 $tabs[$tabIndex] = <<<HTML
-                    <a href="?act=vu{$user['id']}&view=profile&page={$tab}" $active>
+                    <a href="?act=vu{$user['id']}&view=profile&page={$tab}" {$active}>
                         {$uppercase}
                     </a>
                     HTML;
@@ -319,9 +318,9 @@ final class UserProfile
             if ($this->user->getPerm('can_moderate')) {
                 $ipReadable = $this->ipAddress->asHumanReadable($user['ip']);
                 $contactdetails .= <<<HTML
-                    <div>IP: <a href="?act=modcontrols&do=iptools&ip={$ipReadable}">{$ipReadable}</a>
-                    </div>
-                HTML;
+                        <div>IP: <a href="?act=modcontrols&do=iptools&ip={$ipReadable}">{$ipReadable}</a>
+                        </div>
+                    HTML;
             }
 
             $page = $this->template->meta(
@@ -394,7 +393,7 @@ final class UserProfile
                 $activity['arg2'],
             ) . ', ' . $this->date->smallDate($activity['date']),
             'buddy_add' => $user . ' made friends with ' . $otherguy,
-            default => ''
+            default => '',
         };
 
         return "<div class=\"activity {$activity['type']}\">{$text}</div>";
