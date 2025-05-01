@@ -12,6 +12,7 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
+use function array_map;
 use function explode;
 use function in_array;
 use function ucwords;
@@ -67,14 +68,15 @@ final class ProfileTabs
         };
 
         $tabs = array_map(
-            function($tab) use ($selectedTab) {
+            static function ($tab) use ($selectedTab) {
                 $active = ($tab === $selectedTab ? ' class="active"' : '');
                 $uppercase = ucwords($tab);
+
                 return <<<HTML
                     <a href="?act=vu{$this->profile['id']}&view=profile&page={$tab}" {$active}>{$uppercase}</a>
                     HTML;
             },
-            self::TABS
+            self::TABS,
         );
 
         $this->page->command('update', 'pfbox', $tabHTML);

@@ -180,7 +180,8 @@ final class UserProfile
         );
     }
 
-    private function renderContactDetails(): string {
+    private function renderContactDetails(): string
+    {
         $profile = $this->profile;
         $contactDetails = '';
         $contactFields = array_filter(array_keys($profile), static fn($field) => str_starts_with($field, 'contact'));
@@ -316,7 +317,8 @@ final class UserProfile
         $this->session->set('location_verbose', 'Viewing ' . $profile['display_name'] . "'s profile");
     }
 
-    private function showProfileError() {
+    private function showProfileError(): void
+    {
         $error = $this->template->meta('error', "Sorry, this user doesn't exist.");
         $this->page->command('update', 'page', $error);
         $this->page->append('PAGE', $error);

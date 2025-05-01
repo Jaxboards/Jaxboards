@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax\Page\UserProfile;
 
 use Jax\Database;
@@ -11,8 +13,8 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
-class Comments {
-
+final class Comments
+{
     private ?array $profile = null;
 
     public function __construct(
@@ -27,9 +29,10 @@ class Comments {
     ) {}
 
     /**
-     * @param array<string,int|float|string|null> $profile
+     * @param array<string,null|float|int|string> $profile
      */
-    public function render(array $profile): string {
+    public function render(array $profile): string
+    {
         $this->profile = $profile;
 
         $tabHTML = '';
@@ -37,7 +40,10 @@ class Comments {
         $this->handleCommentDeletion();
         $tabHTML .= $this->handleCommentCreation();
 
-        if (!$this->user->isGuest() && $this->user->getPerm('can_add_comments')) {
+        if (
+            !$this->user->isGuest()
+            && $this->user->getPerm('can_add_comments')
+        ) {
             $tabHTML .= $this->template->meta(
                 'userprofile-comment-form',
                 $this->user->get('name') ?? '',
@@ -60,13 +66,11 @@ class Comments {
 
         foreach ($comments as $comment) {
             $act = $this->request->both('act');
-            $deleteLink = (
-                $this->user->getPerm('can_delete_comments')
+            $deleteLink = $this->user->getPerm('can_delete_comments')
                 && $comment['from'] === $this->user->get('id')
-                || $this->user->getPerm('can_moderate')
-            ) ? <<<HTML
-                <a href="?act={$act}&view=profile&page=comments&del={$comment['id']}" class="delete">[X]</a>
-                HTML
+                || $this->user->getPerm('can_moderate') ? <<<HTML
+                    <a href="?act={$act}&view=profile&page=comments&del={$comment['id']}" class="delete">[X]</a>
+                    HTML
                 : '';
 
             $tabHTML .= $this->template->meta(
@@ -112,22 +116,28 @@ class Comments {
         );
         $comments = $this->database->arows($result);
         $this->database->disposeresult($result);
+
         return $comments;
     }
 
-    private function handleCommentCreation(): string {
+    private function handleCommentCreation(): string
+    {
         $comment = $this->request->post('comment');
         if (!$comment) {
             return '';
         }
 
         $error = null;
-        if ($this->user->isGuest() || !$this->user->getPerm('can_add_comments')) {
+        if (
+            $this->user->isGuest()
+            || !$this->user->getPerm('can_add_comments')
+        ) {
             $error = 'No permission to add comments!';
         }
 
         if ($error !== null) {
             $this->page->command('error', $error);
+
             return $this->template->meta('error', $error);
         }
 
@@ -153,7 +163,8 @@ class Comments {
         return '';
     }
 
-    private function handleCommentDeletion() {
+    private function handleCommentDeletion(): void
+    {
         $deleteComment = (int) $this->request->both('del');
         if (!$deleteComment) {
             return;
@@ -166,6 +177,7 @@ class Comments {
                 Database::WHERE_ID_EQUALS,
                 $this->database->basicvalue($deleteComment),
             );
+
             return;
         }
 
