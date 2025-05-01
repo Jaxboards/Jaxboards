@@ -18,11 +18,8 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
-use function array_diff;
 use function array_shift;
-use function array_unique;
 use function count;
-use function explode;
 use function fclose;
 use function file_get_contents;
 use function filter_var;
@@ -31,7 +28,6 @@ use function fwrite;
 use function gmdate;
 use function header;
 use function implode;
-use function in_array;
 use function is_numeric;
 use function nl2br;
 use function strtotime;
@@ -63,7 +59,10 @@ final class ModControls
 
     public function render(): void
     {
-        if (!$this->user->getPerm('can_moderate') && !$this->user->get('mod')) {
+        if (
+            !$this->user->getPerm('can_moderate')
+            && !$this->user->get('mod')
+        ) {
             $this->page->command('softurl');
             $this->page->command(
                 'alert',
@@ -85,14 +84,14 @@ final class ModControls
             $dot !== null => $this->modTopics->doTopics($dot),
             $dop !== null => $this->modPosts->doPosts($dop),
             $cancel !== null => $this->cancel(),
-            default => match($this->request->both('do')) {
+            default => match ($this->request->both('do')) {
                 'modp' => $this->modPosts->addPost((int) $this->request->both('pid')),
                 'modt' => $this->modTopics->addTopic((int) $this->request->both('tid')),
                 'load' => $this->load(),
                 'cp' => $this->showModCP(),
                 'emem' => $this->editMembers(),
                 'ipTools' => $this->ipTools(),
-            }
+            },
         };
     }
 

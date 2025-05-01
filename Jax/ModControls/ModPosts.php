@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax\ModControls;
 
 use Jax\Database;
@@ -8,7 +10,15 @@ use Jax\Request;
 use Jax\Session;
 use Jax\User;
 
-class ModPosts {
+use function array_diff;
+use function array_unique;
+use function explode;
+use function implode;
+use function in_array;
+use function is_numeric;
+
+final class ModPosts
+{
     public function __construct(
         private readonly Database $database,
         private readonly ModTopics $modTopics,
@@ -16,7 +26,7 @@ class ModPosts {
         private readonly Request $request,
         private readonly Session $session,
         private readonly User $user,
-    ){}
+    ) {}
 
     public function addPost(int $pid): void
     {

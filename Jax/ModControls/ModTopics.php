@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax\ModControls;
 
 use Jax\Database;
@@ -9,7 +11,17 @@ use Jax\Request;
 use Jax\Session;
 use Jax\User;
 
-class ModTopics
+use function array_diff;
+use function array_flip;
+use function array_keys;
+use function array_pop;
+use function array_search;
+use function explode;
+use function implode;
+use function in_array;
+use function is_numeric;
+
+final class ModTopics
 {
     public function __construct(
         private readonly Database $database,
@@ -20,7 +32,7 @@ class ModTopics
         private readonly User $user,
     ) {}
 
-    public function doTopics(string $do)
+    public function doTopics(string $do): void
     {
         switch ($do) {
             case 'move':
