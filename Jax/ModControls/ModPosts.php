@@ -123,18 +123,17 @@ final class ModPosts
         $trashCanForum = $this->fetchTrashCanForum();
 
         $result = $this->database->safeselect(
-            '`tid`',
+            ['tid'],
             'posts',
             'WHERE `id` IN ?',
             $pids,
         );
 
         // Build list of topic ids that the posts were in.
-        $tids = [];
-        while ($post = $this->database->arow($result)) {
-            $tids[] = (int) $post['tid'];
-        }
-        $tids = array_unique($tids);
+        $tids = array_unique(array_map(
+            fn($topic) => (int) $topic['tid'],
+            $this->database->arows($result) ?? []
+        ));
 
         if ($trashCanForum !== null) {
             $tids[] = $this->movePostsToTrashcan(
@@ -152,44 +151,24 @@ final class ModPosts
             );
         }
 
-        foreach ($tids as $tid) {
-            // Recount replies.
-            $this->database->safespecial(
-                <<<'SQL'
-                    UPDATE %t
-                    SET `replies`=(
-                        SELECT COUNT(`id`)
-                        FROM %t
-                        WHERE `tid`=?
-                    )-1
-                    WHERE `id`=?
-                    SQL
-                ,
-                ['topics', 'posts'],
-                $tid,
-                $tid,
-            );
-        }
+        $this->updateTopicStats($tids);
 
         // Fix forum last post for all forums topics were in.
-        // Add trashcan here too just in case.
-        $fids = $trashCanForum ? [$trashCanForum['id']] : [];
-
+        // Add trashcan here too.
         $result = $this->database->safeselect(['fid'], 'topics', 'WHERE `id` IN ?', $tids);
-        while ($topic = $this->database->arow($result)) {
-            $fids[] = (int) $topic['fid'];
-        }
+        $fids = array_unique(array_merge(
+            $trashCanForum ? [$trashCanForum['id']] : [],
+            array_map(
+                fn($topic) => (int) $topic['fid'],
+                $this->database->arows($result) ?? []
+            ),
+        ));
         $this->database->disposeresult($result);
 
-        $fids = array_unique($fids);
-        foreach ($fids as $fid) {
-            $this->database->fixForumLastPost($fid);
-        }
+        array_map(fn($fid) => $this->database->fixForumLastPost($fid), $fids);
 
         // Remove them from the page.
-        foreach ($pids as $postId) {
-            $this->page->command('removeel', '#pid_' . $postId);
-        }
+        array_map(fn($postId) => $this->page->command('removeel', '#pid_' . $postId), $pids);
 
         return true;
     }
@@ -210,6 +189,9 @@ final class ModPosts
         return $intPids;
     }
 
+    /**
+     * @return null|array<str,mixed>
+     */
     private function fetchPost(int $pid): ?array
     {
         $result = $this->database->safeselect(
@@ -246,9 +228,12 @@ final class ModPosts
         $mods = $this->database->arow($result);
         $this->database->disposeresult($result);
 
-        return $mods ? explode(',', (string) $mods['mods']) : [];
+        return $mods ? array_map(fn($id) => (int) $id, explode(',', (string) $mods['mods'])) : [];
     }
 
+    /**
+     * @return null|array<str,mixed>
+     */
     private function fetchTrashCanForum(): ?array
     {
         $result = $this->database->safeselect(
@@ -272,14 +257,7 @@ final class ModPosts
             return false;
         }
 
-        $this->database->safeupdate(
-            'posts',
-            [
-                'tid' => $tid,
-            ],
-            'WHERE `id` IN ?',
-            $pids,
-        );
+        $this->updatePosts($pids, ['tid' => $tid]);
         $this->page->location('?act=vt' . $tid);
 
         return true;
@@ -315,32 +293,58 @@ final class ModPosts
                 'title' => $newTopicTitle,
             ],
         );
-        $tid = $this->database->insertId();
+        $newTopicId = (int) $this->database->insertId();
 
-        $this->movePostsTo($pids, $tid);
+        $this->movePostsTo($pids, $newTopicId);
 
         // Put the posts into it
-        $this->database->safeupdate(
-            'posts',
-            [
-                'newtopic' => 0,
-                'tid' => $tid,
-            ],
-            'WHERE `id` IN ?',
-            $pids,
-        );
+        $this->updatePosts($pids, [
+            'newtopic' => 0,
+            'tid' => $newTopicId,
+        ]);
 
         // Set the OP
+        $this->updatePosts([$pids[0]], ['newtopic' => 1]);
+
+        return $newTopicId;
+    }
+
+    /**
+     * @param list<int> $pids
+     * @param array<str,mixed> $data
+     */
+    private function updatePosts(array $pids, array $data) {
         $this->database->safeupdate(
             'posts',
-            [
-                'newtopic' => 1,
-            ],
+            $data,
             'WHERE `id`=?',
             $this->database->basicvalue($pids[0]),
         );
+    }
 
-        return $tid;
+    /**
+     * @param list<int> $tids
+     */
+    private function updateTopicStats(array $tids): void
+    {
+        foreach ($tids as $tid) {
+            // Recount replies.
+            $this->database->safespecial(
+                <<<'SQL'
+                    UPDATE %t
+                    SET `replies`=(
+                        SELECT COUNT(`id`)
+                        FROM %t
+                        WHERE `tid`=?
+                    )-1
+                    WHERE `id`=?
+                    SQL
+                ,
+                ['topics', 'posts'],
+                $tid,
+                $tid,
+            );
+        }
     }
 
     private function sync(): void
