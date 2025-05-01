@@ -56,20 +56,20 @@ a new install. It does the following:
   information, but it also saves the domain you're running the board on.
   Basically copies `config.default.php` to `config.php` and updates the values.
   Here's the direct PHP code what values are being set specifically:
-  ```php
-  // Update with our settings.
-  $CFG['boardname'] = 'Jaxboards';
-  $CFG['domain'] = $request->post('domain');
-  $CFG['mail_from'] = $request->post('admin_username') . ' <' .
-      $request->post('admin_email') . '>';
-  $CFG['sql_db'] = $request->post('sql_db');
-  $CFG['sql_host'] = $request->post('sql_host');
-  $CFG['sql_username'] = $request->post('sql_username');
-  $CFG['sql_password'] = $request->post('sql_password');
-  $CFG['service'] = $service; // boolean if it's a service or not
-  $CFG['prefix'] = $service ? '' : 'jaxboards';
-  $CFG['sql_prefix'] = $CFG['prefix'] ? $CFG['prefix'] . '_' : '';
-  ```
+    ```php
+    // Update with our settings.
+    $CFG['boardname'] = 'Jaxboards';
+    $CFG['domain'] = $request->post('domain');
+    $CFG['mail_from'] = $request->post('admin_username') . ' <' .
+        $request->post('admin_email') . '>';
+    $CFG['sql_db'] = $request->post('sql_db');
+    $CFG['sql_host'] = $request->post('sql_host');
+    $CFG['sql_username'] = $request->post('sql_username');
+    $CFG['sql_password'] = $request->post('sql_password');
+    $CFG['service'] = $service; // boolean if it's a service or not
+    $CFG['prefix'] = $service ? '' : 'jaxboards';
+    $CFG['sql_prefix'] = $CFG['prefix'] ? $CFG['prefix'] . '_' : '';
+    ```
 - Figures out if you're installing a service (multiple boards) or a single-board
   install.
 - If it's a service install, install those special service tables.

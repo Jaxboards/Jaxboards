@@ -1,75 +1,75 @@
 html,
 body {
-  font-size: 1em;
+    font-size: 1em;
 }
 
 html {
-  height: 100%;
+    height: 100%;
 }
 
 body {
-  background: url('../img/loginglow.png') center no-repeat #274463;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  height: 100%;
-  margin: 0;
+    background: url('../img/loginglow.png') center no-repeat #274463;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    height: 100%;
+    margin: 0;
 }
 
 input[type='submit'] {
-  background: url('../img/buttonbg.png');
-  border-radius: 0.25em;
-  border: 1px solid #000;
-  color: #fff;
-  margin-top: 30px;
+    background: url('../img/buttonbg.png');
+    border-radius: 0.25em;
+    border: 1px solid #000;
+    color: #fff;
+    margin-top: 30px;
 }
 
 label {
-  display: inline-block;
-  text-align: left;
-  width: 130px;
+    display: inline-block;
+    text-align: left;
+    width: 130px;
 }
 
 #container {
-  height: 100%;
-  position: relative;
+    height: 100%;
+    position: relative;
 }
 
 #login {
-  background: #fff;
-  border: 1px solid #000;
-  height: 300px;
-  left: 50%;
-  margin: -150px 0 0 -250px;
-  position: absolute;
-  text-align: center;
-  top: 50%;
-  width: 500px;
+    background: #fff;
+    border: 1px solid #000;
+    height: 300px;
+    left: 50%;
+    margin: -150px 0 0 -250px;
+    position: absolute;
+    text-align: center;
+    top: 50%;
+    width: 500px;
 }
 
 #loginform {
-  padding: 40px 0;
+    padding: 40px 0;
 }
 
 #logo {
-  background: url('../img/loginlogo.png') center;
-  border: 1px solid #2d4669;
-  height: 90px;
+    background: url('../img/loginlogo.png') center;
+    border: 1px solid #2d4669;
+    height: 90px;
 }
 
 .error {
-  background: #fdd;
-  border: 1px solid #f00;
-  color: #f00;
-  margin: -20px 5px 20px;
-  padding: 5px;
+    background: #fdd;
+    border: 1px solid #f00;
+    color: #f00;
+    margin: -20px 5px 20px;
+    padding: 5px;
 }
 
 /* stylelint-disable-next-line selector-class-pattern */
 .goBack {
-  margin: 1em auto;
+    margin: 1em auto;
 }
 
 /* stylelint-disable-next-line selector-class-pattern */
 .goBackLink {
-  font-size: 0.75em;
-  padding: 1ch 1em;
+    font-size: 0.75em;
+    padding: 1ch 1em;
 }

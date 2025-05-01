@@ -3,6 +3,6 @@ import IMWindow from './JAX/instant-messaging-window';
 import { assign } from './JAX/util';
 
 assign(window, {
-  RUN,
-  IMWindow,
+    RUN,
+    IMWindow,
 });

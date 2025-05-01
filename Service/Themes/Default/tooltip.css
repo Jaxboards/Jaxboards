@@ -1,43 +1,43 @@
 .tooltip {
-  position: absolute;
-  border-collapse: collapse;
-  color: #fff;
+    position: absolute;
+    border-collapse: collapse;
+    color: #fff;
 }
 
 .tooltip td {
-  background: url('tooltip.png');
+    background: url('tooltip.png');
 }
 
 .tooltip .top {
-  height: 10px;
+    height: 10px;
 }
 
 .tooltip .bottom {
-  height: 15px;
+    height: 15px;
 }
 
 .tooltip .top .right {
-  background-position: top right;
+    background-position: top right;
 }
 
 .tooltip .content td {
-  background-position: center center;
+    background-position: center center;
 }
 
 .tooltip .content .left {
-  background-position: center left;
-  width: 10px;
+    background-position: center left;
+    width: 10px;
 }
 
 .tooltip .content .right {
-  background-position: center right;
-  width: 10px;
+    background-position: center right;
+    width: 10px;
 }
 
 .tooltip .bottom .left {
-  background-position: bottom left;
+    background-position: bottom left;
 }
 
 .tooltip .bottom .right {
-  background-position: bottom right;
+    background-position: bottom right;
 }

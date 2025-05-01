@@ -7,98 +7,98 @@ import Sound from './sound';
 const useJSLinks = 2;
 
 class AppState {
-  onAppReady() {
-    this.stream = new Stream();
+    onAppReady() {
+        this.stream = new Stream();
 
-    if (useJSLinks) {
-      gracefulDegrade(document.body);
+        if (useJSLinks) {
+            gracefulDegrade(document.body);
+        }
+
+        updateDates();
+        setInterval(updateDates, 1000 * 30);
+
+        this.stream.pollData();
+        window.addEventListener('popstate', ({ state }) => {
+            if (state) {
+                const { queryParams } = state;
+                this.stream.updatePage(queryParams);
+            } else {
+                const queryParams = document.location.search.replace(/^\?/, '');
+                this.stream.updatePage(queryParams);
+            }
+        });
+
+        // Load sounds
+        Sound.load('sbblip', './Sounds/blip.mp3', false);
+        Sound.load('imbeep', './Sounds/receive.mp3', false);
+        Sound.load('imnewwindow', './Sounds/receive.mp3', false);
     }
 
-    updateDates();
-    setInterval(updateDates, 1000 * 30);
+    submitForm(form, resetOnSubmit = false) {
+        const names = [];
+        const values = [];
+        const { submitButton } = form;
 
-    this.stream.pollData();
-    window.addEventListener('popstate', ({ state }) => {
-      if (state) {
-        const { queryParams } = state;
-        this.stream.updatePage(queryParams);
-      } else {
-        const queryParams = document.location.search.replace(/^\?/, '');
-        this.stream.updatePage(queryParams);
-      }
-    });
+        Array.from(form.elements).forEach((inputField) => {
+            if (!inputField.name || inputField.type === 'submit') {
+                return;
+            }
 
-    // Load sounds
-    Sound.load('sbblip', './Sounds/blip.mp3', false);
-    Sound.load('imbeep', './Sounds/receive.mp3', false);
-    Sound.load('imnewwindow', './Sounds/receive.mp3', false);
-  }
+            if (inputField.type === 'select-multiple') {
+                Array.from(inputField.options)
+                    .filter((option) => option.selected)
+                    .forEach((option) => {
+                        names.push(`${inputField.name}[]`);
+                        values.push(option.value);
+                    });
+                return;
+            }
 
-  submitForm(form, resetOnSubmit = false) {
-    const names = [];
-    const values = [];
-    const { submitButton } = form;
+            if (
+                ['checkbox', 'radio'].includes(inputField.type) &&
+                !inputField.checked
+            ) {
+                return;
+            }
+            names.push(inputField.name);
+            values.push(inputField.value);
+        });
 
-    Array.from(form.elements).forEach((inputField) => {
-      if (!inputField.name || inputField.type === 'submit') {
-        return;
-      }
-
-      if (inputField.type === 'select-multiple') {
-        Array.from(inputField.options)
-          .filter((option) => option.selected)
-          .forEach((option) => {
-            names.push(`${inputField.name}[]`);
-            values.push(option.value);
-          });
-        return;
-      }
-
-      if (
-        ['checkbox', 'radio'].includes(inputField.type) &&
-        !inputField.checked
-      ) {
-        return;
-      }
-      names.push(inputField.name);
-      values.push(inputField.value);
-    });
-
-    if (submitButton) {
-      names.push(submitButton.name);
-      values.push(submitButton.value);
+        if (submitButton) {
+            names.push(submitButton.name);
+            values.push(submitButton.value);
+        }
+        this.stream.load('?', { data: [names, values] });
+        if (resetOnSubmit) {
+            form.reset();
+        }
+        this.stream.pollData();
     }
-    this.stream.load('?', { data: [names, values] });
-    if (resetOnSubmit) {
-      form.reset();
+
+    handleQuoting(a) {
+        this.stream.load(
+            `${a.href}&qreply=${document.querySelector('#qreply') ? '1' : '0'}`,
+        );
     }
-    this.stream.pollData();
-  }
 
-  handleQuoting(a) {
-    this.stream.load(
-      `${a.href}&qreply=${document.querySelector('#qreply') ? '1' : '0'}`,
-    );
-  }
-
-  setWindowActive() {
-    document.cookie = `actw=${window.name}; SameSite:Lax`;
-    stopTitleFlashing();
-    this.stream.pollData();
-  }
+    setWindowActive() {
+        document.cookie = `actw=${window.name}; SameSite:Lax`;
+        stopTitleFlashing();
+        this.stream.pollData();
+    }
 }
 
 const RUN = new AppState();
 
 onDOMReady(() => {
-  RUN.onAppReady();
+    RUN.onAppReady();
 });
 onDOMReady(() => {
-  window.name = Math.random();
-  RUN.setWindowActive();
-  window.addEventListener('focus', () => {
+    window.name = Math.random();
     RUN.setWindowActive();
-  });
+    window.addEventListener('focus', () => {
+        RUN.setWindowActive();
+    });
 });
 
 export default RUN;
