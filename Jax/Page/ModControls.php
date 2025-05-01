@@ -90,7 +90,7 @@ final class ModControls
                 'load' => $this->load(),
                 'cp' => $this->showModCP(),
                 'emem' => $this->editMembers(),
-                'ipTools' => $this->ipTools(),
+                'iptools' => $this->ipTools(),
             },
         };
     }
@@ -343,7 +343,7 @@ final class ModControls
         $hiddenFields = $this->jax->hiddenFormFields(
             [
                 'act' => 'modcontrols',
-                'do' => 'ipTools',
+                'do' => 'iptools',
             ],
         );
         $form = <<<EOT
@@ -360,7 +360,7 @@ final class ModControls
             $hiddenFields = $this->jax->hiddenFormFields(
                 [
                     'act' => 'modcontrols',
-                    'do' => 'ipTools',
+                    'do' => 'iptools',
                     'ip' => $ipAddress,
                 ],
             );
