@@ -29,7 +29,7 @@ final class ProfileTabs
     ];
 
     /**
-     * var array<string,int|float|string|null> the profile we are currently viewing.
+     * @var array<string,int|float|string|null> the profile we are currently viewing.
      */
     private ?array $profile = null;
 

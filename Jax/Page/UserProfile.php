@@ -42,7 +42,7 @@ final class UserProfile
     ];
 
     /**
-     * var array<string,int|float|string|null> the profile we are currently viewing.
+     * @var array<string,int|float|string|null> the profile we are currently viewing.
      */
     private ?array $profile = null;
 
@@ -125,7 +125,6 @@ final class UserProfile
                 'contact_yim',
                 'contact_youtube',
                 'display_name',
-                'email_settings',
                 'email',
                 'enemies',
                 'friends',
@@ -136,22 +135,11 @@ final class UserProfile
                 'location',
                 '`mod`',
                 'name',
-                'notify_pm',
-                'notify_postinmytopic',
-                'notify_postinsubscribedtopic',
-                'nowordfilter',
                 'posts',
                 'sig',
                 'skin_id',
-                'sound_im',
-                'sound_pm',
-                'sound_postinmytopic',
-                'sound_postinsubscribedtopic',
-                'sound_shout',
-                'ucpnotepad',
                 'usertitle',
                 'website',
-                'wysiwyg',
                 'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
                 'UNIX_TIMESTAMP(`last_visit`) AS `last_visit`',
                 'DAY(`birthdate`) AS `dob_day`',
@@ -186,13 +174,14 @@ final class UserProfile
         $contactDetails = '';
         $contactFields = array_filter(array_keys($profile), static fn($field) => str_starts_with($field, 'contact'));
 
-        foreach ($contactFields as $field) {
+        $contactDetails = array_reduce($contactFields, function($html, $field) use ($profile) {
             $type = mb_substr($field, 8);
             $href = sprintf(self::CONTACT_URLS[$type], $profile[$field]);
-            $contactDetails .= <<<HTML
+            $html .= <<<HTML
                 <div class="contact {$type}"><a href="{$href}">{$field}</a></div>
                 HTML;
-        }
+            return $html;
+        }, '');
 
         $contactDetails .= <<<HTML
             <div class="contact im">
@@ -244,7 +233,6 @@ final class UserProfile
             ? "<a href='?act=buddylist&unblock={$profile['id']}'>Unblock Contact</a>"
             : "<a href='?act=buddylist&block={$profile['id']}'>Block Contact</a>";
 
-
         $this->page->command('softurl');
         $this->page->command(
             'window',
@@ -275,8 +263,7 @@ final class UserProfile
 
         $this->page->setBreadCrumbs(
             [
-                $profile['display_name']
-                . "'s profile" => '?act=vu' . $profile['id'] . '&view=profile',
+                "{$profile['display_name']}'s profile" => "?act=vu{$profile['id']}&view=profile",
             ],
         );
 
@@ -291,10 +278,8 @@ final class UserProfile
             $profile['full_name'] ?: 'N/A',
             ucfirst((string) $profile['gender']) ?: 'N/A',
             $profile['location'],
-            $profile['dob_year'] ? $profile['dob_month'] . '/'
-            . $profile['dob_day'] . '/' . $profile['dob_year'] : 'N/A',
-            $profile['website'] ? '<a href="' . $profile['website'] . '">'
-            . $profile['website'] . '</a>' : 'N/A',
+            $profile['dob_year'] ? "{$profile['dob_month']}/{$profile['dob_day']}/{$profile['dob_year']}" : 'N/A',
+            $profile['website'] ? "<a href='{$profile['website']}'>{$profile['website']}</a>" : 'N/A',
             $this->date->autoDate($profile['join_date']),
             $this->date->autoDate($profile['last_visit']),
             $profile['id'],
@@ -308,13 +293,12 @@ final class UserProfile
             $tabs[5],
             $tabHTML,
             $this->user->getPerm('can_moderate')
-            ? '<a class="moderate" href="?act=modcontrols&do=emem&mid='
-            . $profile['id'] . '">Edit</a>' : '',
+                ? "<a class='moderate' href='?act=modcontrols&do=emem&mid={$profile['id']}'>Edit</a>" : '',
         );
         $this->page->command('update', 'page', $page);
         $this->page->append('PAGE', $page);
 
-        $this->session->set('location_verbose', 'Viewing ' . $profile['display_name'] . "'s profile");
+        $this->session->set('location_verbose', "Viewing {$profile['display_name']}'s profile");
     }
 
     private function showProfileError(): void
