@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax\Page\UserProfile;
 
 use Jax\Database;
@@ -11,7 +13,10 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
-class Activity {
+use function gmdate;
+
+final class Activity
+{
     private const ACTIVITY_LIMIT = 30;
 
     /**
@@ -28,6 +33,48 @@ class Activity {
         private Template $template,
         private User $user,
     ) {}
+
+    /**
+     * @param array<string,mixed> $profile
+     */
+    public function render(array $profile): string
+    {
+        $this->profile = $profile;
+
+        if ($this->request->both('fmt') === 'RSS') {
+            $this->renderRSSFeed();
+
+            return '';
+        }
+
+        return $this->renderActivitiesPage();
+    }
+
+    public function renderRSSFeed(): void
+    {
+        $feed = new RSSFeed(
+            [
+                'description' => $this->profile['usertitle'],
+                'title' => $this->profile['display_name'] . "'s recent activity",
+            ],
+        );
+        foreach ($this->fetchActivities() as $activity) {
+            $activity['name'] = $this->profile['display_name'];
+            $activity['group_id'] = $this->profile['group_id'];
+            $data = $this->parseActivityRSS($activity);
+            $feed->additem(
+                [
+                    'description' => $data['text'],
+                    'guid' => $activity['id'],
+                    'link' => $this->domainDefinitions->getBoardUrl() . $data['link'],
+                    'pubDate' => gmdate('r', $activity['date']),
+                    'title' => $data['text'],
+                ],
+            );
+        }
+
+        $feed->publish();
+    }
 
     /**
      * @param array<string,mixed> $activity
@@ -99,25 +146,11 @@ class Activity {
         };
     }
 
-    /**
-     * @param array<string,mixed> $profile
-     */
-    public function render(array $profile): string {
-        $this->profile = $profile;
-
-        if ($this->request->both('fmt') === 'RSS') {
-            $this->renderRSSFeed();
-
-            return '';
-        }
-
-        return $this->renderActivitiesPage();
-    }
-
-    private function renderActivitiesPage() {
+    private function renderActivitiesPage()
+    {
         $tabHTML = '';
 
-        foreach($this->fetchActivities() as $activity) {
+        foreach ($this->fetchActivities() as $activity) {
             $activity['name'] = $this->profile['display_name'];
             $activity['group_id'] = $this->profile['group_id'];
             $tabHTML .= $this->parseActivity($activity);
@@ -129,35 +162,11 @@ class Activity {
             . "style='float:right'>RSS</a>{$tabHTML}";
     }
 
-    public function renderRSSFeed() {
-        $feed = new RSSFeed(
-            [
-                'description' => $this->profile['usertitle'],
-                'title' => $this->profile['display_name'] . "'s recent activity",
-            ],
-        );
-        foreach($this->fetchActivities() as $activity) {
-            $activity['name'] = $this->profile['display_name'];
-            $activity['group_id'] = $this->profile['group_id'];
-            $data = $this->parseActivityRSS($activity);
-            $feed->additem(
-                [
-                    'description' => $data['text'],
-                    'guid' => $activity['id'],
-                    'link' => $this->domainDefinitions->getBoardUrl() . $data['link'],
-                    'pubDate' => gmdate('r', $activity['date']),
-                    'title' => $data['text'],
-                ],
-            );
-        }
-
-        $feed->publish();
-    }
-
     /**
      * @return array<string,mixed>
      */
-    private function fetchActivities(): array {
+    private function fetchActivities(): array
+    {
         $result = $this->database->safespecial(
             <<<'SQL'
                 SELECT
@@ -186,6 +195,7 @@ class Activity {
         );
         $rows = $this->database->arows($result);
         $this->database->disposeresult($result);
-        return  $rows ?? [];
+
+        return $rows ?? [];
     }
 }

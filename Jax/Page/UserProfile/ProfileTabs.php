@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax\Page\UserProfile;
 
 use Jax\Database;
@@ -12,8 +14,13 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
-class ProfileTabs {
+use function explode;
+use function in_array;
+use function is_numeric;
+use function ucwords;
 
+final class ProfileTabs
+{
     private const TABS = [
         'about',
         'activity',
@@ -41,12 +48,13 @@ class ProfileTabs {
         private User $user,
     ) {}
 
-
     /**
      * @param array<string,mixed> $profile
+     *
      * @return list{string,string}
      */
-    public function render($profile): array {
+    public function render($profile): array
+    {
         $this->profile = $profile;
 
         $page = $this->request->both('page');

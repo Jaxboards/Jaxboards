@@ -30,7 +30,6 @@ use function ucfirst;
 
 final class UserProfile
 {
-
     private const CONTACT_URLS = [
         'aim' => 'aim:goaim?screenname=%s',
         'bluesky' => 'https://bsky.app/profile/%s.bsky.social',
