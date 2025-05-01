@@ -48,7 +48,7 @@ final class ProfileTabs
     /**
      * @param array<string,mixed> $profile
      *
-     * @return list{string,string}
+     * @return list{list<string>,string}
      */
     public function render($profile): array
     {
@@ -95,7 +95,7 @@ final class ProfileTabs
     }
 
     /**
-     * @return null|array<string,int|string>
+     * @return null|array<array<string,int|string>>
      */
     private function fetchFriends(): ?array
     {
