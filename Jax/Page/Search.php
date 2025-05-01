@@ -368,7 +368,7 @@ final class Search
         }
 
         while ($postRow = $this->database->arow($result)) {
-            $post = $this->textFormatting->textonly($postRow['post']);
+            $post = $this->textFormatting->textOnly($postRow['post']);
             $post = $this->textFormatting->blockHtml($post);
             $post = nl2br($post);
             $post = preg_replace(

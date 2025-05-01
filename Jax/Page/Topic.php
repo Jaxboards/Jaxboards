@@ -681,7 +681,7 @@ final class Topic
 
             $postt = $post['post'];
 
-            $postt = $this->textFormatting->theworks($postt);
+            $postt = $this->textFormatting->theWorks($postt);
 
             // Post rating content goes here.
             $postrating = '';
@@ -780,7 +780,7 @@ final class Topic
                 . $this->template->meta('topic-perma-button') . '</a>',
                 $postt,
                 isset($post['sig']) && $post['sig']
-                    ? $this->textFormatting->theworks($post['sig'])
+                    ? $this->textFormatting->theWorks($post['sig'])
                     : '',
                 $post['auth_id'],
                 $post['edit_date'] ? $this->template->meta(
@@ -1453,7 +1453,7 @@ final class Topic
         while ($post = $this->database->arow($result)) {
             $feed->additem(
                 [
-                    'description' => $this->textFormatting->blockhtml($this->textFormatting->theworks($post['post'])),
+                    'description' => $this->textFormatting->blockhtml($this->textFormatting->theWorks($post['post'])),
                     'guid' => $post['id'],
                     'link' => "{$boardURL}?act=vt{$tid}&amp;findpost={$post['id']}",
                     'pubDate' => gmdate('r', $post['date']),

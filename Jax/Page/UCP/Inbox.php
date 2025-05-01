@@ -418,7 +418,7 @@ final class Inbox
                 $message['name'],
             ),
             $this->date->autoDate($message['date']),
-            $this->textFormatting->theworks($message['message']),
+            $this->textFormatting->theWorks($message['message']),
             $message['avatar'] ?: $this->template->meta('default-avatar'),
             $message['usertitle'],
             $this->jax->hiddenFormFields(

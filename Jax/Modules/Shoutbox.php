@@ -107,7 +107,7 @@ final class Shoutbox
 
     public function formatshout($row): ?string
     {
-        $shout = $this->textFormatting->theworks($row['shout'], ['minimalbb' => true]);
+        $shout = $this->textFormatting->theWorksInline($row['shout']);
         $user = $row['uid'] ? $this->template->meta(
             'user-link',
             $row['uid'],

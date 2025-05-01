@@ -196,7 +196,7 @@ final class UCP
             'ucp-sig-settings',
             $this->getlocationforform(),
             $sig !== ''
-            ? $this->textFormatting->theworks($sig) : '( none )',
+            ? $this->textFormatting->theWorks($sig) : '( none )',
             $this->textFormatting->blockhtml($sig),
         );
     }

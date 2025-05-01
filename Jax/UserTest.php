@@ -29,23 +29,33 @@ final class UserTest
         $this->encodedForumFlags = base64_decode('AAEAPgADABgABAAYAAUAGAAGAD8=', true);
     }
 
+    private function assertDeepEquals(array $expected, array $result): void
+    {
+        $this->assertDeepEquals($expected, $result);
+    }
+
     public function getForumPermissionAsAdmin(): void
     {
         $user = $this->user;
 
         $user->userPerms = [
-            'can_poll' => true,
-            'can_post' => true,
-            'can_post_topics' => true,
             'can_attach' => true,
+            'can_poll' => true,
+            'can_post_topics' => true,
+            'can_post' => true,
         ];
         $user->userData = ['group_id' => 2];
 
-        $expected = ['poll' => true, 'read' => true, 'reply' => true, 'start' => true, 'upload' => true, 'view' => true];
+        $expected = [
+            'poll' => true,
+            'read' => true,
+            'reply' => true,
+            'start' => true,
+            'upload' => true,
+            'view' => true
+        ];
         $result = $user->getForumPerms($this->encodedForumFlags);
-        $diff = array_diff_assoc($expected, $result);
 
-        assert($diff === [], 'Expected value differs: ' . json_encode($diff));
     }
 
     public function getForumPermissionAsGuest(): void
@@ -57,9 +67,7 @@ final class UserTest
 
         $expected = $this->decoded[3];
         $result = $user->getForumPerms($this->encodedForumFlags);
-        $diff = array_diff_assoc($expected, $result);
-
-        assert($diff === [], 'Expected value differs: ' . json_encode($diff));
+        $this->assertDeepEquals($expected, $result);
     }
 
     public function getForumPermissionAsBanned(): void
@@ -71,8 +79,6 @@ final class UserTest
 
         $expected = $this->decoded[4];
         $result = $user->getForumPerms($this->encodedForumFlags);
-        $diff = array_diff_assoc($expected, $result);
-
-        assert($diff === [], 'Expected value differs: ' . json_encode($diff));
+        $this->assertDeepEquals($expected, $result);
     }
 }

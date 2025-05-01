@@ -95,8 +95,6 @@ final class TextFormatting
 
             if ($rule['type'] === 'badword') {
                 $this->badwords[$rule['needle']] = $rule['replacement'];
-
-                continue;
             }
         }
     }
@@ -125,20 +123,20 @@ final class TextFormatting
         }
 
         // Load emoticon pack.
-        $emotes = [];
-        if ($emotePack !== null) {
-            $this->emotePack = $emotePack;
-
-            $this->emotePackRules = $this->container->get("emoticons\\{$emotePack}\\rules")->get();
-
-            foreach ($this->emotePackRules as $emote => $path) {
-                $emotes[$emote] = "emoticons/{$emotePack}/{$path}";
-            }
+        if (!$emotePack) {
+            return [];
         }
 
-        $this->emotes = $emotes;
+        $rules = $this->container->get("emoticons\\{$emotePack}\\rules")->get();
 
-        return $this->emotePackRules = $emotes;
+        $emotes = [];
+        foreach ($rules as $emote => $path) {
+            $emotes[$emote] = "emoticons/{$emotePack}/{$path}";
+        }
+
+        $this->emotePack = $emotePack;
+
+        return $this->emotePackRules = $this->emotes = $emotes;
     }
 
     /**
@@ -224,26 +222,20 @@ final class TextFormatting
      */
     public function finishCodeTags(
         string $text,
-        array $codes,
-        bool $returnbb = false,
+        array $codes
     ): string {
-        foreach (array_keys($codes[0]) as $index) {
-            $language = $codes[1][$index];
+        foreach (array_keys($codes[1]) as $index => $language) {
             $code = $codes[2][$index];
 
-            if (!$returnbb) {
-                $code = $language === '=php' ? highlight_string($code, true) : preg_replace(
-                    "@([ \r\n]|^) @m",
-                    '$1&nbsp;',
-                    $this->blockhtml($code),
-                );
-            }
+            $code = $language === '=php' ? highlight_string($code, true) : preg_replace(
+                "@([ \r\n]|^) @m",
+                '$1&nbsp;',
+                $this->blockhtml($code),
+            );
 
             $text = str_replace(
                 "[code]{$index}[/code]",
-                $returnbb
-                    ? "[code{$language}]{$code}[/code]"
-                    : "<div class=\"bbcode code {$language}\">{$code}</div>",
+                "<div class=\"bbcode code {$language}\">{$code}</div>",
                 $text,
             );
         }
@@ -251,43 +243,62 @@ final class TextFormatting
         return $text;
     }
 
-    public function textonly(string $text): ?string
+    /**
+     * Variant of finishCodeTags that returns bbcode instead of html
+     * @param array<array<string>> $codes
+     */
+    public function finishCodeTagsBB(
+        string $text,
+        array $codes,
+    ): string {
+        foreach ($codes[1] as $index => $language) {
+            $code = $codes[2][$index];
+
+            $text = str_replace(
+                "[code]{$index}[/code]",
+                "[code{$language}]{$code}[/code]",
+                $text,
+            );
+        }
+
+        return $text;
+    }
+
+    public function textOnly(string $text): ?string
     {
-        while (($cleaned = preg_replace('@\[(\w+)[^\]]*\]([\w\W]*)\[/\1\]@U', '$2', (string) $text)) !== $text) {
+        while (($cleaned = preg_replace('@\[(\w+)[^\]]*\](.*)\[/\1\]@Us', '$2', (string) $text)) !== $text) {
             $text = $cleaned;
         }
 
         return $text;
     }
 
-    public function theworks(string $text, array $cfg = []): string
+    /**
+     * Does pretty much all of the post formatting.
+     * BBCodes, badwords, HTML, everything you could want.
+     */
+    public function theWorks(string $text): string
     {
-        $replaceBBCode = !array_key_exists('nobb', $cfg);
-        $minimalBBCode = array_key_exists('minimalbb', $cfg);
-
-        if ($replaceBBCode && !$minimalBBCode) {
-            [$text, $codes] = $this->startCodeTags($text);
-        }
+        [$text, $codes] = $this->startCodeTags($text);
 
         $text = nl2br($this->blockhtml($text));
+        $text = $this->emotes($text);
+        $text = $this->bbCode->toHTML($text);
+        $text = $this->finishCodeTags($text, $codes);
+        $text = $this->attachments($text);
 
-        if (!array_key_exists('noemotes', $cfg)) {
-            $text = $this->emotes($text);
-        }
+        return $this->wordfilter($text);
+    }
 
-        if ($replaceBBCode) {
-            $text = $minimalBBCode
-                ? $this->bbCode->toInlineHTML($text)
-                : $this->bbCode->toHTML($text);
-        }
-
-        if ($replaceBBCode && !$minimalBBCode) {
-            $text = $this->finishcodetags($text, $codes);
-        }
-
-        if ($replaceBBCode && !$minimalBBCode) {
-            $text = $this->attachments($text);
-        }
+    /**
+     * Variant of "theWorks" that does not produce block level elements.
+     * Only inline (<em>, <strong>, etc)
+     */
+    public function theWorksInline(string $text): string
+    {
+        $text = nl2br($this->blockhtml($text));
+        $text = $this->emotes($text);
+        $text = $this->bbCode->toInlineHTML($text);
 
         return $this->wordfilter($text);
     }
@@ -297,29 +308,35 @@ final class TextFormatting
      */
     private function linkifyCallback(array $match): string
     {
-        $url = parse_url((string) $match[2]);
-        if (!$url['fragment'] && $url['query']) {
-            $url['fragment'] = $url['query'];
-        }
+        [, $before, $stringURL] = $match;
 
-        if ($url['host'] === $_SERVER['HTTP_HOST'] && $url['fragment']) {
-            if (preg_match('@act=vt(\d+)@', $url['fragment'], $match)) {
-                $nice = preg_match('@pid=(\d+)@', $url['fragment'], $match2)
-                    ? 'Post #' . $match2[1]
-                    : 'Topic #' . $match[1];
+        $parts = parse_url((string) $stringURL);
+
+        $inner = null;
+
+        if ($parts['host'] === $_SERVER['HTTP_HOST'] && $parts['query']) {
+            preg_match('@act=vt(\d+)@', $parts['query'], $topicMatch);
+            preg_match('@pid=(\d+)@', $parts['query'], $postMatch);
+
+            if ($topicMatch) {
+                $inner = $postMatch
+                    ? 'Post #' . $postMatch[1]
+                    : 'Topic #' . $topicMatch[1];
             }
 
-            $match[2] = '?' . $url['fragment'];
+            $stringURL = "?{$parts['query']}";
         }
 
-        return $match[1] . '[url=' . $match[2] . ']' . ($nice ?: $match[2]) . '[/url]';
+        $inner ??= $stringURL;
+
+        return "{$before}[url={$stringURL}]{$inner}[/url]";
     }
 
     private function emoteCallback(array $match): string
     {
         [, $space, $emoteText] = $match;
 
-        return $space . '<img src="' . $this->emotes[$emoteText] . '" alt="' . $this->blockhtml($emoteText) . '"/>';
+        return "$space<img src='{$this->emotes[$emoteText]}' alt='{$this->blockhtml($emoteText)}' />";
     }
 
     private function attachments(string $text): null|array|string

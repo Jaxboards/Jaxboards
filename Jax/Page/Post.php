@@ -84,7 +84,7 @@ final class Post
             $this->postdata = str_replace("\t", '    ', $this->postdata);
             [$this->postdata, $codes] = $this->textFormatting->startCodeTags($this->postdata);
             $this->postdata = $this->textFormatting->linkify($this->postdata);
-            $this->postdata = $this->textFormatting->finishCodeTags($this->postdata, $codes, true);
+            $this->postdata = $this->textFormatting->finishCodeTagsBB($this->postdata, $codes);
 
             // This is aliases [youtube] to [video] but it probably should not be here
             $this->postdata = str_replace('youtube]', 'video]', $this->postdata);
@@ -176,7 +176,7 @@ final class Post
     {
         $post = $this->postdata;
         if (trim($post) !== '' && trim($post) !== '0') {
-            $post = $this->textFormatting->theworks($post);
+            $post = $this->textFormatting->theWorks($post);
             $post = $this->template->meta('post-preview', $post);
             $this->postpreview = $post;
         }
@@ -618,7 +618,7 @@ final class Post
                                     ' ',
                                     $this->textFormatting->wordfilter(
                                         $this->textFormatting->blockhtml(
-                                            $this->textFormatting->textonly(
+                                            $this->textFormatting->textOnly(
                                                 $this->postdata,
                                             ),
                                         ),
@@ -660,7 +660,7 @@ final class Post
         $this->page->command(
             'update',
             "#pid_{$pid} .post_content",
-            $this->textFormatting->theworks($this->postdata),
+            $this->textFormatting->theWorks($this->postdata),
         );
         $this->page->command('softurl');
     }
@@ -773,7 +773,7 @@ final class Post
                                 '@\s+@',
                                 ' ',
                                 $this->textFormatting->blockhtml(
-                                    $this->textFormatting->textonly(
+                                    $this->textFormatting->textOnly(
                                         $this->postdata,
                                     ),
                                 ),

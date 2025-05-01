@@ -98,7 +98,7 @@ final readonly class PrivateMessage
         }
 
         $instantMessage = $this->textFormatting->linkify($instantMessage);
-        $instantMessage = $this->textFormatting->theworks($instantMessage);
+        $instantMessage = $this->textFormatting->theWorks($instantMessage);
 
         $cmd = [
             'im',

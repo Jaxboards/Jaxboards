@@ -282,7 +282,7 @@ final class UserProfile
                         $post['title'],
                         $post['pid'],
                         $this->date->autoDate($post['date']),
-                        $this->textFormatting->theworks($post['post']),
+                        $this->textFormatting->theWorks($post['post']),
                     );
                 }
 
@@ -322,7 +322,7 @@ final class UserProfile
                         $post['tid'],
                         $post['title'],
                         $this->date->autoDate($post['date']),
-                        $this->textFormatting->theworks($post['post']),
+                        $this->textFormatting->theWorks($post['post']),
                     );
                 }
 
@@ -335,8 +335,8 @@ final class UserProfile
             case 'about':
                 $pfbox = $this->template->meta(
                     'userprofile-about',
-                    $this->textFormatting->theworks($user['about']),
-                    $this->textFormatting->theworks($user['sig']),
+                    $this->textFormatting->theWorks($user['about']),
+                    $this->textFormatting->theWorks($user['sig']),
                 );
 
                 break;
@@ -489,7 +489,7 @@ final class UserProfile
                         ),
                         $comment['avatar'] ?: $this->template->meta('default-avatar'),
                         $this->date->autoDate($comment['date']),
-                        $this->textFormatting->theworks($comment['comment'])
+                        $this->textFormatting->theWorks($comment['comment'])
                         . ($this->user->getPerm('can_delete_comments')
                         && $comment['from'] === $this->user->get('id')
                         || $this->user->getPerm('can_moderate')
