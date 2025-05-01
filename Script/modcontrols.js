@@ -2,10 +2,10 @@
 import gracefulDegrade from './JAX/graceful-degrade';
 import { assign, onDOMReady } from './JAX/util';
 
-const postIDs = function fetchPIDs(a) {
+const postIDs = function fetchPIDs(strPIDs) {
   let pids = [];
-  if (a[0] && (typeof a[0] === 'string' || typeof a[0] === 'number')) {
-    pids = `${a[0]}`.split(',');
+  if (strPIDs) {
+    pids = `${pids}`.split(',');
   }
   const pl = pids ? pids.length : 0;
   const pluralPosts = pids.length === 1 ? '' : 's';
@@ -13,10 +13,10 @@ const postIDs = function fetchPIDs(a) {
   return [pids, pl, pluralPosts, andPosts];
 };
 
-const threadIDs = function fetchTIDs(a) {
+const threadIDs = function fetchTIDs(strTIDs) {
   let tids = [];
-  if (a[1] && (typeof a[1] === 'string' || typeof a[1] === 'number')) {
-    tids = `${a[1]}`.split(',');
+  if (strTIDs) {
+    tids = `${tids}`.split(',');
   }
   const tl = tids ? tids.length : 0;
   const pluralThreads = tl === 1 ? '' : 's';
@@ -31,9 +31,12 @@ class ModControls {
         this.createModControls(html);
       },
 
-      modcontrols_postsync: (a) => {
-        const [pids, pl, pluralPosts, andPosts] = postIDs(a);
-        const [tids, tl, pluralThreads] = threadIDs(a);
+      /**
+       * @param {[string,string]} param0
+       */
+      modcontrols_postsync: ([postIds, threadIds]) => {
+        const [pids, pl, pluralPosts, andPosts] = postIDs(postIds);
+        const [tids, tl, pluralThreads] = threadIDs(threadIds);
         const html =
           `${
             "<form method='post' data-ajax-form='true'>" +

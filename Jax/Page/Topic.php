@@ -207,6 +207,10 @@ final class Topic
         $this->topicdata = $this->database->arow($result);
         $this->database->disposeresult($result);
 
+        if ($this->topicdata === null) {
+            return;
+        }
+
         $this->topicdata['topic_title'] = $this->textFormatting->wordfilter($this->topicdata['topic_title']);
         $this->topicdata['subtitle'] = $this->textFormatting->wordfilter($this->topicdata['subtitle']);
         $this->topicdata['fperms'] = $this->user->getForumPerms($this->topicdata['fperms']);

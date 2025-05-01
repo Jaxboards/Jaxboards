@@ -9,6 +9,8 @@ use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\ModControls\ModPosts;
+use Jax\ModControls\ModTopics;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
@@ -17,10 +19,6 @@ use Jax\TextFormatting;
 use Jax\User;
 
 use function array_diff;
-use function array_flip;
-use function array_keys;
-use function array_pop;
-use function array_search;
 use function array_shift;
 use function array_unique;
 use function count;
@@ -45,14 +43,14 @@ use const PHP_EOL;
 
 final class ModControls
 {
-    private $perms;
-
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
         private readonly DomainDefinitions $domainDefinitions,
         private readonly IPAddress $ipAddress,
         private readonly Jax $jax,
+        private readonly ModTopics $modTopics,
+        private readonly ModPosts $modPosts,
         private readonly Page $page,
         private readonly Request $request,
         private readonly Session $session,
@@ -65,8 +63,7 @@ final class ModControls
 
     public function render(): void
     {
-        $this->perms = $this->user->getPerms();
-        if (!$this->perms['can_moderate'] && !$this->user->get('mod')) {
+        if (!$this->user->getPerm('can_moderate') && !$this->user->get('mod')) {
             $this->page->command('softurl');
             $this->page->command(
                 'alert',
@@ -76,61 +73,27 @@ final class ModControls
             return;
         }
 
-        if ($this->request->both('cancel') !== null) {
-            $this->cancel();
-
-            return;
-        }
-
         if ($this->request->isJSUpdate() && !$this->request->hasPostData()) {
             return;
         }
 
-        if ($this->request->post('dot') !== null) {
-            $this->dotopics($this->request->post('dot'));
+        $dot = $this->request->post('dot');
+        $dop = $this->request->post('dop');
+        $cancel = $this->request->both('cancel');
 
-            return;
-        }
-
-        if ($this->request->post('dop') !== null) {
-            $this->doposts($this->request->post('dop'));
-
-            return;
-        }
-
-        switch ($this->request->both('do')) {
-            case 'modp':
-                $this->modpost($this->request->both('pid'));
-
-                break;
-
-            case 'modt':
-                $this->modtopic($this->request->both('tid'));
-
-                break;
-
-            case 'load':
-                $this->load();
-
-                break;
-
-            case 'cp':
-                $this->showmodcp();
-
-                break;
-
-            case 'emem':
-                $this->editmembers();
-
-                break;
-
-            case 'iptools':
-                $this->iptools();
-
-                break;
-
-            default:
-        }
+        match (true) {
+            $dot !== null => $this->modTopics->doTopics($dot),
+            $dop !== null => $this->modPosts->doPosts($dop),
+            $cancel !== null => $this->cancel(),
+            default => match($this->request->both('do')) {
+                'modp' => $this->modPosts->addPost((int) $this->request->both('pid')),
+                'modt' => $this->modTopics->addTopic((int) $this->request->both('tid')),
+                'load' => $this->load(),
+                'cp' => $this->showModCP(),
+                'emem' => $this->editMembers(),
+                'ipTools' => $this->ipTools(),
+            }
+        };
     }
 
     private function load(): void
@@ -150,348 +113,12 @@ final class ModControls
         $this->page->command('script', $script);
     }
 
-    private function dotopics(array|string $do): void
-    {
-        switch ($do) {
-            case 'move':
-                $this->page->command('modcontrols_move', 0);
-
-                break;
-
-            case 'moveto':
-                $result = $this->database->safeselect(
-                    [
-                        'cat_id',
-                        'id',
-                        'lp_tid',
-                        'lp_topic',
-                        'lp_uid',
-                        'mods',
-                        'nocount',
-                        '`order`',
-                        'orderby',
-                        'path',
-                        'perms',
-                        'posts',
-                        'redirect',
-                        'redirects',
-                        'show_ledby',
-                        'show_sub',
-                        'subtitle',
-                        'title',
-                        'topics',
-                        'trashcan',
-                        'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
-                    ],
-                    'forums',
-                    'WHERE `id`=?',
-                    $this->database->basicvalue($this->request->post('id')),
-                );
-                $rowfound = $this->database->arow($result);
-                $this->database->disposeresult($result);
-                if (!is_numeric($this->request->post('id')) || !$rowfound) {
-                    return;
-                }
-
-                $result = $this->database->safeselect(
-                    ['fid'],
-                    'topics',
-                    'WHERE `id` IN ?',
-                    explode(',', (string) $this->session->getVar('modtids')),
-                );
-                while ($topic = $this->database->arow($result)) {
-                    $fids[$topic['fid']] = 1;
-                }
-
-                $fids = array_flip($fids);
-                $this->database->safeupdate(
-                    'topics',
-                    [
-                        'fid' => $this->request->post('id'),
-                    ],
-                    'WHERE `id` IN ?',
-                    explode(',', (string) $this->session->getVar('modtids')),
-                );
-                $this->cancel();
-                $fids[] = $this->request->post('id');
-                foreach ($fids as $forumId) {
-                    $this->database->fixForumLastPost($forumId);
-                }
-
-                $this->page->location('?act=vf' . $this->request->post('id'));
-
-                break;
-
-            case 'pin':
-                $this->database->safeupdate(
-                    'topics',
-                    [
-                        'pinned' => 1,
-                    ],
-                    'WHERE `id` IN ?',
-                    explode(',', (string) $this->session->getVar('modtids')),
-                );
-                $this->page->command(
-                    'alert',
-                    'topics pinned!',
-                );
-                $this->cancel();
-
-                break;
-
-            case 'unpin':
-                $this->database->safeupdate(
-                    'topics',
-                    [
-                        'pinned' => 0,
-                    ],
-                    'WHERE `id` IN ?',
-                    explode(',', (string) $this->session->getVar('modtids')),
-                );
-                $this->page->command(
-                    'alert',
-                    'topics unpinned!',
-                );
-                $this->cancel();
-
-                break;
-
-            case 'lock':
-                $this->database->safeupdate(
-                    'topics',
-                    [
-                        'locked' => 1,
-                    ],
-                    'WHERE `id` IN ?',
-                    explode(',', (string) $this->session->getVar('modtids')),
-                );
-                $this->page->command(
-                    'alert',
-                    'topics locked!',
-                );
-                $this->cancel();
-
-                break;
-
-            case 'unlock':
-                $this->database->safeupdate(
-                    'topics',
-                    [
-                        'locked' => 0,
-                    ],
-                    'WHERE `id` IN ?',
-                    explode(',', (string) $this->session->getVar('modtids')),
-                );
-                $this->page->command('alert', 'topics unlocked!');
-                $this->cancel();
-
-                break;
-
-            case 'delete':
-                $this->deletetopics();
-                $this->cancel();
-
-                break;
-
-            case 'merge':
-                $this->mergetopics();
-
-                break;
-
-            default:
-        }
-    }
-
-    private function doposts(array|string $do): void
-    {
-        switch ($do) {
-            case 'move':
-                $this->page->command('modcontrols_move', 1);
-
-                break;
-
-            case 'moveto':
-                $this->database->safeupdate(
-                    'posts',
-                    [
-                        'tid' => $this->request->post('id'),
-                    ],
-                    'WHERE `id` IN ?',
-                    explode(',', (string) $this->session->getVar('modpids')),
-                );
-                $this->cancel();
-                $this->page->location('?act=vt' . $this->request->post('id'));
-
-                break;
-
-            case 'delete':
-                $this->deleteposts();
-                $this->cancel();
-
-                break;
-
-            default:
-        }
-    }
-
     private function cancel(): void
     {
         $this->session->deleteVar('modpids');
         $this->session->deleteVar('modtids');
         $this->sync();
         $this->page->command('modcontrols_clearbox');
-    }
-
-    private function modpost(null|array|string $pid): void
-    {
-        if (!is_numeric($pid)) {
-            return;
-        }
-
-        $pid = (int) $pid;
-
-        $result = $this->database->safeselect(
-            [
-                'newtopic',
-                'tid',
-            ],
-            'posts',
-            'WHERE id=?',
-            $this->database->basicvalue($pid),
-        );
-        $postdata = $this->database->arow($result);
-        $this->database->disposeresult($result);
-
-        if (!$postdata) {
-            return;
-        }
-
-        if ($postdata['newtopic']) {
-            $this->modtopic($postdata['tid']);
-
-            return;
-        }
-
-        $this->page->command('softurl');
-
-        // See if they have permission to manipulate this post.
-        if (!$this->perms['can_moderate']) {
-            $result = $this->database->safespecial(
-                <<<'SQL'
-                    SELECT `mods`
-                    FROM %t
-                    WHERE `id`=(
-                        SELECT `fid`
-                        FROM %t
-                        WHERE `id`=?
-                    )
-                    SQL
-                ,
-                ['forums', 'topics'],
-                $postdata['tid'],
-            );
-
-            $mods = $this->database->arow($result);
-            $this->database->disposeresult($result);
-
-            if (!$mods) {
-                return;
-            }
-
-            $mods = explode(',', (string) $mods['mods']);
-            if (!in_array($this->user->get('id'), $mods)) {
-                $this->page->command(
-                    'error',
-                    "You don't have permission to be moderating in this forum",
-                );
-
-                return;
-            }
-        }
-
-        $currentPids = explode(',', $this->session->getVar('modpids') ?? '');
-        $pids = [];
-        foreach ($currentPids as $currentPid) {
-            if (!is_numeric($currentPid)) {
-                continue;
-            }
-
-            $pids[] = (int) $currentPid;
-        }
-
-        if (in_array($pid, $pids, true)) {
-            $pids = array_diff($pids, [$pid]);
-        } else {
-            $pids[] = $pid;
-        }
-
-        $this->session->addVar('modpids', implode(',', $pids));
-
-        $this->sync();
-    }
-
-    private function modtopic($tid): void
-    {
-        $this->page->command('softurl');
-        if (!is_numeric($tid)) {
-            return;
-        }
-
-        $tid = (int) $tid;
-        if (!$this->user->getPerm('can_moderate')) {
-            $result = $this->database->safespecial(
-                <<<'SQL'
-                    SELECT `mods`
-                    FROM %t
-                    WHERE `id`=(
-                        SELECT `fid`
-                        FROM %t
-                        WHERE `id`=?
-                    )
-                    SQL
-                ,
-                ['forums', 'topics'],
-                $this->database->basicvalue($tid),
-            );
-            $mods = $this->database->arow($result);
-            $this->database->disposeresult($result);
-
-            if (!$mods) {
-                $this->page->command('error', $this->database->error());
-
-                return;
-            }
-
-            $mods = explode(',', (string) $mods['mods']);
-            if (!in_array($this->user->get('id'), $mods)) {
-                $this->page->command(
-                    'error',
-                    "You don't have permission to be moderating in this forum",
-                );
-
-                return;
-            }
-        }
-
-        $currentTids = explode(',', $this->session->getVar('modtids') ?? '');
-        $tids = [];
-        foreach ($currentTids as $currentTid) {
-            if (!is_numeric($currentTid)) {
-                continue;
-            }
-
-            $tids[] = (int) $currentTid;
-        }
-
-        if (in_array($tid, $tids, true)) {
-            $tids = array_diff($tids, [$tid]);
-        } else {
-            $tids[] = $tid;
-        }
-
-        $this->session->addVar('modtids', implode(',', $tids));
-
-        $this->sync();
     }
 
     private function sync(): void
@@ -503,346 +130,7 @@ final class ModControls
         );
     }
 
-    private function deleteposts()
-    {
-        if (
-            !$this->session->getVar('modpids')
-        ) {
-            return $this->page->command('error', 'No posts to delete.');
-        }
-
-        // Get trashcan.
-        $result = $this->database->safeselect(
-            '`id`',
-            'forums',
-            'WHERE `trashcan`=1 LIMIT 1',
-        );
-        $trashcan = $this->database->arow($result);
-        $trashcan = isset($trashcan['id']) ? (int) $trashcan['id'] : 0;
-
-        $this->database->disposeresult($result);
-
-        $result = $this->database->safeselect(
-            '`tid`',
-            'posts',
-            'WHERE `id` IN ?',
-            explode(',', (string) $this->session->getVar('modpids')),
-        );
-
-        // Build list of topic ids that the posts were in.
-        $tids = [];
-        $pids = explode(',', (string) $this->session->getVar('modpids'));
-        while ($post = $this->database->arow($result)) {
-            $tids[] = (int) $post['tid'];
-        }
-
-        $tids = array_unique($tids);
-
-        if ($trashcan !== 0) {
-            // Get first & last post.
-            foreach ($pids as $postId) {
-                if (!isset($op) || !$op || $postId < $op) {
-                    $op = $postId;
-                }
-
-                if (isset($lp) && $lp && $postId <= $lp) {
-                    continue;
-                }
-
-                $lp = $postId;
-            }
-
-            $result = $this->database->safeselect(
-                ['auth_id'],
-                'posts',
-                'WHERE `id`=?',
-                $this->database->basicvalue($lp),
-            );
-            $lp = $this->database->arow($result);
-            $this->database->disposeresult($result);
-
-            // Create a new topic.
-            $this->database->safeinsert(
-                'topics',
-                [
-                    'auth_id' => $this->user->get('id'),
-                    'fid' => $trashcan,
-                    'lp_date' => $this->database->datetime(),
-                    'lp_uid' => $lp['auth_id'],
-                    'op' => $op,
-                    'replies' => 0,
-                    'poll_choices' => '',
-                    'title' => 'Posts deleted from: '
-                        . implode(',', $tids),
-                ],
-            );
-            $tid = $this->database->insertId();
-            $this->database->safeupdate(
-                'posts',
-                [
-                    'newtopic' => 0,
-                    'tid' => $tid,
-                ],
-                'WHERE `id` IN ?',
-                explode(',', (string) $this->session->getVar('modpids')),
-            );
-            $this->database->safeupdate(
-                'posts',
-                [
-                    'newtopic' => 1,
-                ],
-                'WHERE `id`=?',
-                $this->database->basicvalue($op),
-            );
-            $tids[] = $tid;
-        } else {
-            $this->database->safedelete(
-                'posts',
-                'WHERE `id` IN ?',
-                explode(',', (string) $this->session->getVar('modpids')),
-            );
-        }
-
-        foreach ($tids as $tid) {
-            // Recount replies.
-            $this->database->safespecial(
-                <<<'SQL'
-                    UPDATE %t
-                    SET `replies`=(
-                        SELECT COUNT(`id`)
-                        FROM %t
-                        WHERE `tid`=?
-                    )-1
-                    WHERE `id`=?
-                    SQL
-                ,
-                ['topics', 'posts'],
-                $tid,
-                $tid,
-            );
-        }
-
-        // Fix forum last post for all forums topics were in.
-        $fids = [];
-        // Add trashcan here too just in case.
-        if ($trashcan !== 0) {
-            $fids[] = $trashcan;
-        }
-
-        $result = $this->database->safeselect(
-            ['fid'],
-            'topics',
-            'WHERE `id` IN ?',
-            $tids,
-        );
-        while ($topic = $this->database->arow($result)) {
-            if (!is_numeric($topic['fid'])) {
-                continue;
-            }
-
-            if ($topic['fid'] <= 0) {
-                continue;
-            }
-
-            $fids[] = (int) $topic['fid'];
-        }
-
-        $this->database->disposeresult($result);
-        $fids = array_unique($fids);
-        foreach ($fids as $fid) {
-            $this->database->fixForumLastPost($fid);
-        }
-
-        // Remove them from the page.
-        foreach ($pids as $postId) {
-            $this->page->command('removeel', '#pid_' . $postId);
-        }
-
-        return null;
-    }
-
-    private function deletetopics(): void
-    {
-        if (!$this->session->getVar('modtids')) {
-            $this->page->command('error', 'No topics to delete');
-
-            return;
-        }
-
-        $forumData = [];
-
-        // Get trashcan id.
-        $result = $this->database->safeselect(
-            ['id'],
-            'forums',
-            'WHERE `trashcan`=1 LIMIT 1',
-        );
-        $trashcan = $this->database->arow($result);
-        $this->database->disposeresult($result);
-
-        $trashcan = $trashcan['id'] ?? false;
-        $result = $this->database->safeselect(
-            ['id', 'fid'],
-            'topics',
-            'WHERE `id` IN ?',
-            explode(',', (string) $this->session->getVar('modtids')),
-        );
-        $delete = [];
-        while ($topic = $this->database->arow($result)) {
-            if (!isset($forumData[$topic['fid']])) {
-                $forumData[$topic['fid']] = 0;
-            }
-
-            ++$forumData[$topic['fid']];
-            if (!$trashcan) {
-                continue;
-            }
-
-            if ($trashcan !== $topic['fid']) {
-                continue;
-            }
-
-            $delete[] = $topic['id'];
-        }
-
-        if ($trashcan) {
-            $this->database->safeupdate(
-                'topics',
-                [
-                    'fid' => $trashcan,
-                ],
-                'WHERE `id` IN ?',
-                explode(',', (string) $this->session->getVar('modtids')),
-            );
-            $delete = implode(',', $delete);
-            $forumData[$trashcan] = 1;
-        } else {
-            $delete = $this->session->getVar('modtids');
-        }
-
-        if (!empty($delete)) {
-            $this->database->safedelete(
-                'posts',
-                'WHERE `tid` IN ?',
-                explode(',', (string) $delete),
-            );
-            $this->database->safedelete(
-                'topics',
-                'WHERE `id` IN ?',
-                explode(',', (string) $delete),
-            );
-        }
-
-        foreach (array_keys($forumData) as $forumId) {
-            $this->database->fixForumLastPost($forumId);
-        }
-
-        $this->session->deleteVar('modtids');
-        $this->page->command('modcontrols_clearbox');
-        $this->page->command('alert', 'topics deleted!');
-    }
-
-    private function mergetopics(): void
-    {
-        $page = '';
-        $topicIds = explode(',', $this->session->getVar('modtids') ?? '');
-        if (
-            is_numeric($this->request->post('ot'))
-            && in_array($this->request->post('ot'), $topicIds)
-        ) {
-            // Move the posts and set all posts to normal (newtopic=0).
-            $this->database->safeupdate(
-                'posts',
-                [
-                    'newtopic' => '0',
-                    'tid' => $this->request->post('ot'),
-                ],
-                'WHERE `tid` IN ?',
-                explode(',', (string) $this->session->getVar('modtids')),
-            );
-
-            // Make the first post in the topic have newtopic=1.
-            // Get the op.
-            $result = $this->database->safeselect(
-                'MIN(`id`)',
-                'posts',
-                'WHERE `tid`=?',
-                $this->database->basicvalue($this->request->post('ot')),
-            );
-            $thisrow = $this->database->arow($result);
-            $op = array_pop($thisrow);
-            $this->database->disposeresult($result);
-
-            $this->database->safeupdate(
-                'posts',
-                [
-                    'newtopic' => 1,
-                ],
-                'WHERE `id`=?',
-                $op,
-            );
-
-            // Also fix op.
-            $this->database->safeupdate(
-                'topics',
-                [
-                    'op' => $op,
-                ],
-                'WHERE `id`=?',
-                $this->database->basicvalue($this->request->post('ot')),
-            );
-            unset($topicIds[array_search($this->request->post('ot'), $topicIds, true)]);
-            if ($topicIds !== []) {
-                $this->database->safedelete(
-                    'topics',
-                    'WHERE `id` IN ?',
-                    $topicIds,
-                );
-            }
-
-            $this->cancel();
-            $this->page->location('?act=vt' . $this->request->post('ot'));
-        }
-
-        $page .= '<form method="post" data-ajax-form="true" '
-            . 'style="padding:10px;">'
-            . 'Which topic should the topics be merged into?<br>';
-        $page .= $this->jax->hiddenFormFields(
-            [
-                'act' => 'modcontrols',
-                'dot' => 'merge',
-            ],
-        );
-
-        if ($this->session->getVar('modtids')) {
-            $result = $this->database->safeselect(
-                ['id', 'title'],
-                'topics',
-                'WHERE `id` IN ?',
-                explode(',', (string) $this->session->getVar('modtids')),
-            );
-            $titles = [];
-            while ($topic = $this->database->arow($result)) {
-                $titles[$topic['id']] = $topic['title'];
-            }
-
-            foreach ($topicIds as $topicId) {
-                if (!isset($titles[$topicId])) {
-                    continue;
-                }
-
-                $page .= '<input type="radio" name="ot" value="' . $topicId . '" /> '
-                    . $titles[$topicId] . '<br>';
-            }
-        }
-
-        $page .= '<input type="submit" value="Merge" /></form>';
-        $page = $this->page->collapseBox('Merging Topics', $page);
-        $this->page->command('update', 'page', $page);
-        $this->page->append('PAGE', $page);
-    }
-
-    private function showmodcp(string $cppage = ''): void
+    private function showModCP(string $cppage = ''): void
     {
         if (!$this->user->getPerm('can_moderate')) {
             return;
@@ -855,7 +143,7 @@ final class ModControls
         $this->page->command('update', 'page', $page);
     }
 
-    private function editmembers(): void
+    private function editMembers(): void
     {
         if (!$this->user->getPerm('can_moderate')) {
             return;
@@ -870,17 +158,17 @@ final class ModControls
             ],
         );
         $page = <<<HTML
-                <form method="post" data-ajax-form="true">
-                    {$hiddenFormFields}
-                    Member name:
-                    <input type="text" title="Enter member name" name="mname"
-                        data-autocomplete-action="searchmembers"
-                        data-autocomplete-output="#mid"
-                        data-autocomplete-indicator="#validname" />
-                    <span id="validname"></span>
-                    <input type="hidden" name="mid" id="mid" onchange="this.form.onsubmit();" />
-                    <input type="submit" type="View member details" value="Go" />
-                </form>
+            <form method="post" data-ajax-form="true">
+                {$hiddenFormFields}
+                Member name:
+                <input type="text" title="Enter member name" name="mname"
+                    data-autocomplete-action="searchmembers"
+                    data-autocomplete-output="#mid"
+                    data-autocomplete-indicator="#validname" />
+                <span id="validname"></span>
+                <input type="hidden" name="mid" id="mid" onchange="this.form.onsubmit();" />
+                <input type="submit" type="View member details" value="Go" />
+            </form>
             HTML;
         if (
             $this->request->post('submit') === 'save'
@@ -1021,10 +309,10 @@ final class ModControls
             }
         }
 
-        $this->showmodcp($page);
+        $this->showModCP($page);
     }
 
-    private function iptools(): void
+    private function ipTools(): void
     {
         $page = '';
 
@@ -1056,7 +344,7 @@ final class ModControls
         $hiddenFields = $this->jax->hiddenFormFields(
             [
                 'act' => 'modcontrols',
-                'do' => 'iptools',
+                'do' => 'ipTools',
             ],
         );
         $form = <<<EOT
@@ -1073,7 +361,7 @@ final class ModControls
             $hiddenFields = $this->jax->hiddenFormFields(
                 [
                     'act' => 'modcontrols',
-                    'do' => 'iptools',
+                    'do' => 'ipTools',
                     'ip' => $ipAddress,
                 ],
             );
@@ -1191,7 +479,7 @@ final class ModControls
             $page .= $this->box('Last 5 posts:', $content);
         }
 
-        $this->showmodcp($form . $page);
+        $this->showModCP($form . $page);
     }
 
     private function box(string $title, string $content): string
