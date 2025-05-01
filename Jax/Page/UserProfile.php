@@ -18,6 +18,7 @@ use Jax\User;
 use function array_filter;
 use function array_keys;
 use function array_map;
+use function array_reduce;
 use function explode;
 use function in_array;
 use function mb_substr;
@@ -42,7 +43,7 @@ final class UserProfile
     ];
 
     /**
-     * @var array<string,int|float|string|null> the profile we are currently viewing.
+     * @var array<string,null|float|int|string> the profile we are currently viewing
      */
     private ?array $profile = null;
 
@@ -174,12 +175,13 @@ final class UserProfile
         $contactDetails = '';
         $contactFields = array_filter(array_keys($profile), static fn($field) => str_starts_with($field, 'contact'));
 
-        $contactDetails = array_reduce($contactFields, function($html, $field) use ($profile) {
+        $contactDetails = array_reduce($contactFields, static function ($html, $field) use ($profile) {
             $type = mb_substr($field, 8);
             $href = sprintf(self::CONTACT_URLS[$type], $profile[$field]);
             $html .= <<<HTML
                 <div class="contact {$type}"><a href="{$href}">{$field}</a></div>
                 HTML;
+
             return $html;
         }, '');
 
