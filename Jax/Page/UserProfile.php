@@ -29,7 +29,16 @@ use function ucwords;
 
 final class UserProfile
 {
-    private $num_activity = 30;
+    private const ACTIVITY_LIMIT = 30;
+
+    private const TABS = [
+        'about',
+        'activity',
+        'posts',
+        'topics',
+        'comments',
+        'friends',
+    ];
 
     private $contacturls = [
         'aim' => 'aim:goaim?screenname=%s',
@@ -63,56 +72,111 @@ final class UserProfile
     public function render(): void
     {
         preg_match('@\d+@', (string) $this->request->both('act'), $match);
-        $userId = $match[0];
+        $userId = (int) $match[0];
 
-        if ($userId === '' || $userId === '0') {
+        if (!$userId) {
             $this->page->location('?');
-        } elseif (
-            $this->request->isJSNewLocation()
-            && !$this->request->isJSDirectLink()
-            && !$this->request->both('view')
-        ) {
-            $this->showcontactcard($userId);
-        } else {
-            $this->showfullprofile($userId);
+
+            return;
         }
+
+        // Nothing is live updating on the profile page
+        if ($this->request->isJSUpdate()) {
+            return;
+        }
+
+        match (true) {
+            $this->request->both('view') !== null => $this->showFullProfile($userId),
+            default => $this->showContactCard($userId),
+        };
     }
 
-    private function showcontactcard(string $id): void
+    private function fetchGroupTitle(int $groupId): string
+    {
+        $result = $this->database->safeselect(
+            ['title'],
+            'member_groups',
+            Database::WHERE_ID_EQUALS,
+            $groupId
+        );
+        $group = $this->database->arow($result);
+        $this->database->disposeresult($result);
+
+        return $group['title'] ?? null;
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    private function fetchUser(int $userId): array {
+        $result = $this->database->safeselect(
+            [
+                'ip',
+                'about',
+                'avatar',
+                'birthdate',
+                'contact_aim',
+                'contact_bluesky',
+                'contact_discord',
+                // TODO: change this in the schema
+                'contact_gtalk AS contact_googlechat',
+                'contact_msn',
+                'contact_skype',
+                'contact_steam',
+                'contact_twitter',
+                'contact_yim',
+                'contact_youtube',
+                'display_name',
+                'email_settings',
+                'email',
+                'enemies',
+                'friends',
+                'full_name',
+                'gender',
+                'group_id',
+                'id',
+                'location',
+                '`mod`',
+                'name',
+                'notify_pm',
+                'notify_postinmytopic',
+                'notify_postinsubscribedtopic',
+                'nowordfilter',
+                'posts',
+                'sig',
+                'skin_id',
+                'sound_im',
+                'sound_pm',
+                'sound_postinmytopic',
+                'sound_postinsubscribedtopic',
+                'sound_shout',
+                'ucpnotepad',
+                'usertitle',
+                'website',
+                'wysiwyg',
+                'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
+                'UNIX_TIMESTAMP(`last_visit`) AS `last_visit`',
+                'DAY(`birthdate`) AS `dob_day`',
+                'MONTH(`birthdate`) AS `dob_month`',
+                'YEAR(`birthdate`) AS `dob_year`'
+            ],
+            'members',
+            Database::WHERE_ID_EQUALS,
+            $userId
+        );
+        $user = $this->database->arow($result);
+        $this->database->disposeresult($result);
+        return $user;
+    }
+
+    private function showContactCard(int $userId): void
     {
         $contactdetails = '';
-        $result = $this->database->safespecial(
-            <<<'SQL'
-                SELECT
-                    m.`id` AS `uid`,
-                    m.`display_name` AS `uname`,
-                    m.`usertitle` AS `usertitle`,
-                    g.`title` AS `title`,
-                    m.`avatar` AS `avatar`,
-                    m.`contact_gtalk` AS `contact_googlechat`,
-                    m.`contact_aim` AS `contact_aim`,
-                    m.`website` AS `website`,
-                    m.`contact_yim` AS `contact_yim`,
-                    m.`contact_msn` AS `contact_msn`,
-                    m.`contact_skype` AS `contact_skype`,
-                    m.`contact_steam` AS `contact_steam`,
-                    m.`contact_twitter` AS `contact_twitter`,
-                    m.`contact_discord` AS `contact_discord`,
-                    m.`contact_youtube` AS `contact_youtube`,
-                    m.`contact_bluesky` AS `contact_bluesky`
-                FROM %t m
-                LEFT JOIN %t g
-                    ON m.`group_id`=g.`id`
-                WHERE m.`id`=?
-                SQL
-            ,
-            ['members', 'member_groups'],
-            $id,
-        );
-        $contactUser = $this->database->arow($result);
-        $this->database->disposeresult($result);
+        $contactUser = $this->fetchUser($userId);
+
         if (!$contactUser) {
             $this->page->error("This user doesn't exist!");
+            return;
         }
 
         foreach ($this->contacturls as $field => $url) {
@@ -120,10 +184,15 @@ final class UserProfile
                 continue;
             }
 
-            $contactdetails .= '<a class="' . $field . ' contact" title="' . $field . ' contact" href="' . sprintf(
+            $href = sprintf(
                 $url,
-                $this->textFormatting->blockhtml($contactUser['contact_' . $field]),
-            ) . '">&nbsp;</a>';
+                $this->textFormatting->blockhtml(
+                    $contactUser["contact_{$field}"]
+                )
+            );
+            $contactdetails .= <<<"HTML"
+                <a class="{$field} contact" title="{$field} contact" href="{$href}">&nbsp;</a>
+                HTML;
         }
 
         $this->page->command('softurl');
@@ -134,23 +203,23 @@ final class UserProfile
                 'className' => 'contact-card',
                 'content' => $this->template->meta(
                     'userprofile-contact-card',
-                    $contactUser['uname'],
+                    $contactUser['display_name'],
                     $contactUser['avatar'] ?: $this->template->meta('default-avatar'),
                     $contactUser['usertitle'],
-                    $contactUser['uid'],
+                    $contactUser['id'],
                     $contactdetails,
                     !$this->user->isGuest() && in_array(
-                        $contactUser['uid'],
+                        $contactUser['id'],
                         explode(',', (string) $this->user->get('friends')),
-                    ) ? '<a href="?act=buddylist&remove=' . $contactUser['uid']
+                    ) ? '<a href="?act=buddylist&remove=' . $contactUser['id']
                     . '">Remove Contact</a>' : '<a href="?act=buddylist&add='
-                    . $contactUser['uid'] . '">Add Contact</a>',
+                    . $contactUser['id'] . '">Add Contact</a>',
                     !$this->user->isGuest() && in_array(
-                        $contactUser['uid'],
+                        $contactUser['id'],
                         explode(',', (string) $this->user->get('enemies')),
-                    ) ? '<a href="?act=buddylist&unblock=' . $contactUser['uid']
+                    ) ? '<a href="?act=buddylist&unblock=' . $contactUser['id']
                     . '">Unblock Contact</a>'
-                    : '<a href="?act=buddylist&block=' . $contactUser['uid']
+                    : '<a href="?act=buddylist&block=' . $contactUser['id']
                     . '">Block Contact</>',
                 ),
                 'minimizable' => false,
@@ -160,7 +229,7 @@ final class UserProfile
         );
     }
 
-    private function showfullprofile(string $id): void
+    private function showFullProfile(int $userId): void
     {
         if ($this->request->isJSUpdate() && !$this->request->hasPostData()) {
             return;
@@ -172,76 +241,9 @@ final class UserProfile
             return;
         }
 
-        $nouser = false;
-        $user = null;
-        if (!$id || !is_numeric($id)) {
-            $nouser = true;
-        } else {
-            $result = $this->database->safespecial(
-                <<<'SQL'
-                    SELECT
-                        g.`title` AS `group`,
-                        `ip`,
-                        m.`about` AS `about`,
-                        m.`avatar` AS `avatar`,
-                        m.`birthdate` AS `birthdate`,
-                        m.`contact_aim` AS `contact_aim`,
-                        m.`contact_bluesky` AS `contact_bluesky`,
-                        m.`contact_discord` AS `contact_discord`,
-                        m.`contact_gtalk` AS `contact_googlechat`,
-                        m.`contact_msn` AS `contact_msn`,
-                        m.`contact_skype` AS `contact_skype`,
-                        m.`contact_steam` AS `contact_steam`,
-                        m.`contact_twitter` AS `contact_twitter`,
-                        m.`contact_yim` AS `contact_yim`,
-                        m.`contact_youtube` AS `contact_youtube`,
-                        m.`display_name` AS `display_name`,
-                        m.`email_settings` AS `email_settings`,
-                        m.`email` AS `email`,
-                        m.`enemies` AS `enemies`,
-                        m.`friends` AS `friends`,
-                        m.`full_name` AS `full_name`,
-                        m.`gender` AS `gender`,
-                        m.`group_id` AS `group_id`,
-                        m.`id` AS `id`,
-                        m.`location` AS `location`,
-                        m.`mod` AS `mod`,
-                        m.`name` AS `name`,
-                        m.`notify_pm` AS `notify_pm`,
-                        m.`notify_postinmytopic` AS `notify_postinmytopic`,
-                        m.`notify_postinsubscribedtopic` AS `notify_postinsubscribedtopic`,
-                        m.`nowordfilter` AS `nowordfilter`,
-                        m.`posts` AS `posts`,
-                        m.`sig` AS `sig`,
-                        m.`skin_id` AS `skin_id`,
-                        m.`sound_im` AS `sound_im`,
-                        m.`sound_pm` AS `sound_pm`,
-                        m.`sound_postinmytopic` AS `sound_postinmytopic`,
-                        m.`sound_postinsubscribedtopic` AS `sound_postinsubscribedtopic`,
-                        m.`sound_shout` AS `sound_shout`,
-                        m.`ucpnotepad` AS `ucpnotepad`,
-                        m.`usertitle` AS `usertitle`,
-                        m.`website` AS `website`,
-                        m.`wysiwyg` AS `wysiwyg`,
-                        UNIX_TIMESTAMP(m.`join_date`) AS `join_date`,
-                        UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`,
-                        DAY(m.`birthdate`) AS `dob_day`,
-                        MONTH(m.`birthdate`) AS `dob_month`,
-                        YEAR(m.`birthdate`) AS `dob_year`
-                    FROM %t m
-                    LEFT JOIN %t g
-                        ON m.`group_id`=g.`id`
-                    WHERE m.`id`=?
-                    SQL,
-                ['members', 'member_groups'],
-                $id,
-            );
-            echo $this->database->error();
-            $user = $this->database->arow($result);
-            $this->database->disposeresult($result);
-        }
+        $user = $this->fetchUser($userId);
 
-        if (!$user || $nouser) {
+        if (!$user) {
             $error = $this->template->meta('error', "Sorry, this user doesn't exist.");
             $this->page->command('update', 'page', $error);
             $this->page->append('PAGE', $error);
@@ -249,356 +251,34 @@ final class UserProfile
             return;
         }
 
-        $pfpageloc = $this->request->both('page') ?? '';
-        $pfbox = '';
+        $page = $this->request->both('page');
+        $pfpageloc = in_array($page, self::TABS, true) ? $page : 'activity';
 
-        switch ($pfpageloc) {
-            case 'posts':
-                $result = $this->database->safespecial(
-                    <<<'SQL'
-                        SELECT p.`post` AS `post`,p.`id` AS `pid`,p.`tid` AS `tid`,
-                            t.`title` AS `title`,UNIX_TIMESTAMP(p.`date`) AS `date`,f.`perms` AS `perms`
-                        FROM %t p
-                        LEFT JOIN %t t
-                            ON p.`tid`=t.`id`
-                        LEFT JOIN %t f
-                            ON f.`id`=t.`fid`
-                        WHERE p.`auth_id`=?
-                        ORDER BY p.`id` DESC
-                        LIMIT 10
-                        SQL,
-                    ['posts', 'topics', 'forums'],
-                    $id,
-                );
-                while ($post = $this->database->arow($result)) {
-                    $perms = $this->user->getForumPerms($post['perms']);
-                    if (!$perms['read']) {
-                        continue;
-                    }
-
-                    $pfbox .= $this->template->meta(
-                        'userprofile-post',
-                        $post['tid'],
-                        $post['title'],
-                        $post['pid'],
-                        $this->date->autoDate($post['date']),
-                        $this->textFormatting->theWorks($post['post']),
-                    );
-                }
-
-                break;
-
-            case 'topics':
-                $result = $this->database->safespecial(
-                    <<<'SQL'
-                        SELECT
-                            p.`post` AS `post`,
-                            p.`id` AS `pid`,
-                            p.`tid` AS `tid`,
-                            t.`title` AS `title`,
-                            UNIX_TIMESTAMP(p.`date`) AS `date`,
-                            f.`perms` AS `perms`
-                        FROM %t p
-                        LEFT JOIN %t t
-                            ON p.`tid`=t.`id`
-                        LEFT JOIN %t f
-                            ON f.`id`=t.`fid`
-                        WHERE p.`auth_id`=?
-                            AND p.`newtopic`=1
-                        ORDER BY p.`id` DESC
-                        LIMIT 10
-                        SQL,
-                    ['posts', 'topics', 'forums'],
-                    $id,
-                );
-                while ($post = $this->database->arow($result)) {
-                    $perms = $this->user->getForumPerms($post['perms']);
-                    if (!$perms['read']) {
-                        continue;
-                    }
-
-                    $pfbox .= $this->template->meta(
-                        'userprofile-topic',
-                        $post['tid'],
-                        $post['title'],
-                        $this->date->autoDate($post['date']),
-                        $this->textFormatting->theWorks($post['post']),
-                    );
-                }
-
-                if ($pfbox === '' || $pfbox === '0') {
-                    $pfbox = 'No topics to show.';
-                }
-
-                break;
-
-            case 'about':
-                $pfbox = $this->template->meta(
-                    'userprofile-about',
-                    $this->textFormatting->theWorks($user['about']),
-                    $this->textFormatting->theWorks($user['sig']),
-                );
-
-                break;
-
-            case 'friends':
-                if ($user['friends']) {
-                    $result = $this->database->safespecial(
-                        <<<'SQL'
-                            SELECT
-                                m.`avatar` AS `avatar`,
-                                m.`id` AS `id`,
-                                m.`display_name` AS `name`,
-                                m.`group_id` AS `group_id`,
-                                m.`usertitle` AS `usertitle`
-                            FROM %t m
-                            LEFT JOIN %t g
-                                ON m.`group_id`=g.`id`
-                            WHERE m.`id` IN ?
-                            ORDER BY `name`
-                            SQL,
-                        ['members', 'member_groups'],
-                        explode(',', (string) $user['friends']),
-                    );
-
-                    while ($member = $this->database->arow($result)) {
-                        $pfbox .= $this->template->meta(
-                            'userprofile-friend',
-                            $member['id'],
-                            $member['avatar'] ?: $this->template->meta('default-avatar'),
-                            $this->template->meta(
-                                'user-link',
-                                $member['id'],
-                                $member['group_id'],
-                                $member['name'],
-                            ),
-                        );
-                    }
-                }
-
-                $pfbox = $pfbox === '' || $pfbox === '0'
-                    ? "I'm pretty lonely, I have no friends. :("
-                    : '<div class="contacts">' . $pfbox . '<br clear="all" /></div>';
-
-                break;
-
-            case 'comments':
-                if (
-                    is_numeric($this->request->both('del'))
-                ) {
-                    if ($this->user->getPerm('can_moderate')) {
-                        $this->database->safedelete(
-                            'profile_comments',
-                            Database::WHERE_ID_EQUALS,
-                            $this->database->basicvalue($this->request->both('del')),
-                        );
-                    } elseif ($this->user->getPerm('can_delete_comments')) {
-                        $this->database->safedelete(
-                            'profile_comments',
-                            'WHERE `id`=? AND `from`=?',
-                            $this->database->basicvalue($this->request->both('del')),
-                            $this->database->basicvalue($this->user->get('id')),
-                        );
-                    }
-                }
-
-                if (
-                    $this->request->post('comment') !== ''
-                ) {
-                    $error = null;
-                    if (
-                        $this->user->isGuest()
-                        || !$this->user->getPerm('can_add_comments')
-                    ) {
-                        $error = 'No permission to add comments!';
-                    } else {
-                        $this->database->safeinsert(
-                            'activity',
-                            [
-                                'affected_uid' => $id,
-                                'date' => $this->database->datetime(),
-                                'type' => 'profile_comment',
-                                'uid' => $this->user->get('id'),
-                            ],
-                        );
-                        $this->database->safeinsert(
-                            'profile_comments',
-                            [
-                                'comment' => $this->request->post('comment'),
-                                'date' => $this->database->datetime(),
-                                'from' => $this->user->get('id'),
-                                'to' => $id,
-                            ],
-                        );
-                    }
-
-                    if ($error !== null) {
-                        $this->page->command('error', $error);
-                        $pfbox .= $this->template->meta('error', $error);
-                    }
-                }
-
-                if (
-                    !$this->user->isGuest()
-                    && $this->user->getPerm('can_add_comments')
-                ) {
-                    $pfbox = $this->template->meta(
-                        'userprofile-comment-form',
-                        $this->user->get('name') ?? '',
-                        $this->user->get('avatar') ?: $this->template->meta('default-avatar'),
-                        $this->jax->hiddenFormFields(
-                            [
-                                'act' => 'vu' . $id,
-                                'page' => 'comments',
-                                'view' => 'profile',
-                            ],
-                        ),
-                    );
-                }
-
-                $result = $this->database->safespecial(
-                    <<<'SQL'
-                        SELECT
-                            c.`id` AS `id`,
-                            c.`to` AS `to`,
-                            c.`from` AS `from`,
-                            c.`comment` AS `comment`,
-                            UNIX_TIMESTAMP(c.`date`) AS `date`,
-                            m.`display_name` AS `display_name`,
-                            m.`group_id` AS `group_id`,
-                            m.`avatar` AS `avatar`
-                        FROM %t c
-                        LEFT JOIN %t m
-                            ON c.`from`=m.`id`
-                        WHERE c.`to`=?
-                        ORDER BY c.`id` DESC
-                        LIMIT 10
-                        SQL,
-                    ['profile_comments', 'members'],
-                    $id,
-                );
-                $found = false;
-                while ($comment = $this->database->arow($result)) {
-                    $pfbox .= $this->template->meta(
-                        'userprofile-comment',
-                        $this->template->meta(
-                            'user-link',
-                            $comment['from'],
-                            $comment['group_id'],
-                            $comment['display_name'],
-                        ),
-                        $comment['avatar'] ?: $this->template->meta('default-avatar'),
-                        $this->date->autoDate($comment['date']),
-                        $this->textFormatting->theWorks($comment['comment'])
-                        . ($this->user->getPerm('can_delete_comments')
-                        && $comment['from'] === $this->user->get('id')
-                        || $this->user->getPerm('can_moderate')
-                        ? ' <a href="?act=' . $this->request->both('act')
-                        . '&view=profile&page=comments&del=' . $comment['id']
-                        . '" class="delete">[X]</a>' : ''),
-                    );
-                    $found = true;
-                }
-
-                if (!$found) {
-                    $pfbox .= 'No comments to display!';
-                }
-
-                break;
-
-            case 'activity':
-            default:
-                $pfpageloc = 'activity';
-                $result = $this->database->safespecial(
-                    <<<'SQL'
-                        SELECT
-                            a.`id` AS `id`,
-                            a.`type` AS `type`,
-                            a.`arg1` AS `arg1`,
-                            a.`uid` AS `uid`,
-                            UNIX_TIMESTAMP(a.`date`) AS `date`,
-                            a.`affected_uid` AS `affected_uid`,
-                            a.`tid` AS `tid`,
-                            a.`pid` AS `pid`,
-                            a.`arg2` AS `arg2`,
-                            a.`affected_uid` AS `aff_id`,
-                            m.`display_name` AS `aff_name`,
-                            m.`group_id` AS `aff_group_id`
-                        FROM %t a
-                        LEFT JOIN %t m
-                            ON a.`affected_uid`=m.`id`
-                        WHERE a.`uid`=?
-                        ORDER BY a.`id` DESC
-                        LIMIT ?
-                        SQL,
-                    ['activity', 'members'],
-                    $id,
-                    $this->num_activity,
-                );
-                if (
-                    $this->request->both('fmt') === 'RSS'
-                ) {
-                    $feed = new RSSFeed(
-                        [
-                            'description' => $user['usertitle'],
-                            'title' => $user['display_name'] . "'s recent activity",
-                        ],
-                    );
-                    while ($activity = $this->database->arow($result)) {
-                        $activity['name'] = $user['display_name'];
-                        $activity['group_id'] = $user['group_id'];
-                        $data = $this->parseActivityRSS($activity);
-                        $feed->additem(
-                            [
-                                'description' => $data['text'],
-                                'guid' => $activity['id'],
-                                'link' => $this->domainDefinitions->getBoardUrl() . $data['link'],
-                                'pubDate' => gmdate('r', $activity['date']),
-                                'title' => $data['text'],
-                            ],
-                        );
-                    }
-
-                    $feed->publish();
-                }
-
-                while ($activity = $this->database->arow($result)) {
-                    $activity['name'] = $user['display_name'];
-                    $activity['group_id'] = $user['group_id'];
-                    $pfbox .= $this->parseActivity($activity);
-                }
-
-                $pfbox = $pfbox === '' || $pfbox === '0'
-                    ? 'This user has yet to do anything noteworthy!'
-                    : "<a href='./?act=vu" . $id
-                    . "&amp;page=activity&amp;fmt=RSS' class='social rss' "
-                    . "style='float:right'>RSS</a>" . $pfbox;
-        }
+        $tabHTML = match ($pfpageloc) {
+            'posts' => $this->showTabPosts($user),
+            'topics' => $this->showTabTopics($user),
+            'about' => $this->showTabAbout($user),
+            'friends' => $this->showTabFriends($user),
+            'comments' => $this->showTabComments($user),
+            default => $this->showTabActivity($user),
+        };
 
         if (
             $this->request->both('page') !== null
             && $this->request->isJSAccess()
             && !$this->request->isJSDirectLink()
         ) {
-            $this->page->command('update', 'pfbox', $pfbox);
+            $this->page->command('update', 'pfbox', $tabHTML);
         } else {
             $this->page->setBreadCrumbs(
                 [
                     $user['display_name']
-                    . "'s profile" => '?act=vu' . $id . '&view=profile',
+                    . "'s profile" => '?act=vu' . $userId . '&view=profile',
                 ],
             );
 
-            $tabs = [
-                'about',
-                'activity',
-                'posts',
-                'topics',
-                'comments',
-                'friends',
-            ];
-            foreach ($tabs as $tabIndex => $tab) {
-                $tabs[$tabIndex] = '<a href="?act=vu' . $id . '&view=profile&page='
+            foreach (self::TABS as $tabIndex => $tab) {
+                $tabs[$tabIndex] = '<a href="?act=vu' . $userId . '&view=profile&page='
                     . $tab . '"' . ($tab === $pfpageloc ? ' class="active"' : '')
                     . '>' . ucwords($tab) . '</a>';
             }
@@ -648,14 +328,14 @@ final class UserProfile
                 $this->date->autoDate($user['last_visit']),
                 $user['id'],
                 $user['posts'],
-                $user['group'],
+                $this->fetchGroupTitle($user['group_id']),
                 $tabs[0],
                 $tabs[1],
                 $tabs[2],
                 $tabs[3],
                 $tabs[4],
                 $tabs[5],
-                $pfbox,
+                $tabHTML,
                 $this->user->getPerm('can_moderate')
                 ? '<a class="moderate" href="?act=modcontrols&do=emem&mid='
                 . $user['id'] . '">Edit</a>' : '',
@@ -667,7 +347,10 @@ final class UserProfile
         }
     }
 
-    private function parseActivity($activity): array|string
+    /**
+     * @param array<string,mixed> $activity
+     */
+    private function parseActivity(array $activity): array|string
     {
         $user = $this->template->meta(
             'user-link',
@@ -703,7 +386,10 @@ final class UserProfile
         return "<div class=\"activity {$activity['type']}\">{$text}</div>";
     }
 
-    private function parseActivityRSS($activity): array|string
+    /**
+     * @param array<string,mixed> $activity
+     */
+    private function parseActivityRSS(array $activity): array|string
     {
         return match ($activity['type']) {
             'profile_comment' => [
@@ -728,5 +414,353 @@ final class UserProfile
                 'text' => $activity['name'] . ' made friends with ' . $activity['aff_name'],
             ],
         };
+    }
+
+    /**
+     * @param array<string,mixed> $user
+     */
+    private function showTabAbout(array $user) {
+        return $this->template->meta(
+            'userprofile-about',
+            $this->textFormatting->theWorks($user['about']),
+            $this->textFormatting->theWorks($user['sig']),
+        );
+    }
+
+    /**
+     * @param array<string,mixed> $user
+     */
+    private function showTabActivity(array $user): string
+    {
+        $userId = $user['id'];
+        $tabHTML = '';
+        $result = $this->database->safespecial(
+            <<<'SQL'
+                SELECT
+                    a.`id` AS `id`,
+                    a.`type` AS `type`,
+                    a.`arg1` AS `arg1`,
+                    a.`uid` AS `uid`,
+                    UNIX_TIMESTAMP(a.`date`) AS `date`,
+                    a.`affected_uid` AS `affected_uid`,
+                    a.`tid` AS `tid`,
+                    a.`pid` AS `pid`,
+                    a.`arg2` AS `arg2`,
+                    a.`affected_uid` AS `aff_id`,
+                    m.`display_name` AS `aff_name`,
+                    m.`group_id` AS `aff_group_id`
+                FROM %t a
+                LEFT JOIN %t m
+                    ON a.`affected_uid`=m.`id`
+                WHERE a.`uid`=?
+                ORDER BY a.`id` DESC
+                LIMIT ?
+                SQL,
+            ['activity', 'members'],
+            $userId,
+            self::ACTIVITY_LIMIT,
+        );
+        if (
+            $this->request->both('fmt') === 'RSS'
+        ) {
+            $feed = new RSSFeed(
+                [
+                    'description' => $user['usertitle'],
+                    'title' => $user['display_name'] . "'s recent activity",
+                ],
+            );
+            while ($activity = $this->database->arow($result)) {
+                $activity['name'] = $user['display_name'];
+                $activity['group_id'] = $user['group_id'];
+                $data = $this->parseActivityRSS($activity);
+                $feed->additem(
+                    [
+                        'description' => $data['text'],
+                        'guid' => $activity['id'],
+                        'link' => $this->domainDefinitions->getBoardUrl() . $data['link'],
+                        'pubDate' => gmdate('r', $activity['date']),
+                        'title' => $data['text'],
+                    ],
+                );
+            }
+
+            $feed->publish();
+        }
+
+        while ($activity = $this->database->arow($result)) {
+            $activity['name'] = $user['display_name'];
+            $activity['group_id'] = $user['group_id'];
+            $tabHTML .= $this->parseActivity($activity);
+        }
+
+        return $tabHTML
+            ? 'This user has yet to do anything noteworthy!'
+            : "<a href='./?act=vu{$userId}&amp;page=activity&amp;fmt=RSS' class='social rss' "
+            . "style='float:right'>RSS</a>{$tabHTML}";
+    }
+
+    /**
+     * @param array<string,mixed> $user
+     */
+    private function showTabComments(array $user): string
+    {
+        $userId = $user['id'];
+        $tabHTML = '';
+        if (
+            is_numeric($this->request->both('del'))
+        ) {
+            if ($this->user->getPerm('can_moderate')) {
+                $this->database->safedelete(
+                    'profile_comments',
+                    Database::WHERE_ID_EQUALS,
+                    $this->database->basicvalue($this->request->both('del')),
+                );
+            } elseif ($this->user->getPerm('can_delete_comments')) {
+                $this->database->safedelete(
+                    'profile_comments',
+                    'WHERE `id`=? AND `from`=?',
+                    $this->database->basicvalue($this->request->both('del')),
+                    $this->database->basicvalue($this->user->get('id')),
+                );
+            }
+        }
+
+        if (
+            $this->request->post('comment') !== ''
+        ) {
+            $error = null;
+            if (
+                $this->user->isGuest()
+                || !$this->user->getPerm('can_add_comments')
+            ) {
+                $error = 'No permission to add comments!';
+            } else {
+                $this->database->safeinsert(
+                    'activity',
+                    [
+                        'affected_uid' => $userId,
+                        'date' => $this->database->datetime(),
+                        'type' => 'profile_comment',
+                        'uid' => $this->user->get('id'),
+                    ],
+                );
+                $this->database->safeinsert(
+                    'profile_comments',
+                    [
+                        'comment' => $this->request->post('comment'),
+                        'date' => $this->database->datetime(),
+                        'from' => $this->user->get('id'),
+                        'to' => $userId,
+                    ],
+                );
+            }
+
+            if ($error !== null) {
+                $this->page->command('error', $error);
+                $tabHTML .= $this->template->meta('error', $error);
+            }
+        }
+
+        if (
+            !$this->user->isGuest()
+            && $this->user->getPerm('can_add_comments')
+        ) {
+            $tabHTML = $this->template->meta(
+                'userprofile-comment-form',
+                $this->user->get('name') ?? '',
+                $this->user->get('avatar') ?: $this->template->meta('default-avatar'),
+                $this->jax->hiddenFormFields(
+                    [
+                        'act' => 'vu' . $userId,
+                        'page' => 'comments',
+                        'view' => 'profile',
+                    ],
+                ),
+            );
+        }
+
+        $result = $this->database->safespecial(
+            <<<'SQL'
+                SELECT
+                    c.`id` AS `id`,
+                    c.`to` AS `to`,
+                    c.`from` AS `from`,
+                    c.`comment` AS `comment`,
+                    UNIX_TIMESTAMP(c.`date`) AS `date`,
+                    m.`display_name` AS `display_name`,
+                    m.`group_id` AS `group_id`,
+                    m.`avatar` AS `avatar`
+                FROM %t c
+                LEFT JOIN %t m
+                    ON c.`from`=m.`id`
+                WHERE c.`to`=?
+                ORDER BY c.`id` DESC
+                LIMIT 10
+                SQL,
+            ['profile_comments', 'members'],
+            $userId,
+        );
+        $found = false;
+        while ($comment = $this->database->arow($result)) {
+            $tabHTML .= $this->template->meta(
+                'userprofile-comment',
+                $this->template->meta(
+                    'user-link',
+                    $comment['from'],
+                    $comment['group_id'],
+                    $comment['display_name'],
+                ),
+                $comment['avatar'] ?: $this->template->meta('default-avatar'),
+                $this->date->autoDate($comment['date']),
+                $this->textFormatting->theWorks($comment['comment'])
+                . ($this->user->getPerm('can_delete_comments')
+                && $comment['from'] === $this->user->get('id')
+                || $this->user->getPerm('can_moderate')
+                ? ' <a href="?act=' . $this->request->both('act')
+                . '&view=profile&page=comments&del=' . $comment['id']
+                . '" class="delete">[X]</a>' : ''),
+            );
+            $found = true;
+        }
+
+        if (!$found) {
+            $tabHTML .= 'No comments to display!';
+        }
+
+        return $tabHTML;
+    }
+
+    /**
+     * @param array<string,mixed> $user
+     */
+    private function showTabFriends(array $user): string
+    {
+        $tabHTML = '';
+        if ($user['friends']) {
+            $result = $this->database->safeselect(
+                [
+                    'avatar',
+                    'id',
+                    'display_name',
+                    'group_id',
+                    'usertitle'
+                ],
+                'members',
+                Database::WHERE_ID_IN,
+                explode(',', (string) $user['friends'])
+            );
+
+            while ($member = $this->database->arow($result)) {
+                $tabHTML .= $this->template->meta(
+                    'userprofile-friend',
+                    $member['id'],
+                    $member['avatar'] ?: $this->template->meta('default-avatar'),
+                    $this->template->meta(
+                        'user-link',
+                        $member['id'],
+                        $member['group_id'],
+                        $member['display_name'],
+                    ),
+                );
+            }
+        }
+
+        return $tabHTML
+            ? "I'm pretty lonely, I have no friends. :("
+            : '<div class="contacts">' . $tabHTML . '<br clear="all" /></div>';
+    }
+
+    /**
+     * @param array<string,mixed> $user
+     */
+    private function showTabTopics(array $user): string
+    {
+        $userId = $user['id'];
+        $tabHTML = '';
+        $result = $this->database->safespecial(
+            <<<'SQL'
+                SELECT
+                    p.`post` AS `post`,
+                    p.`id` AS `pid`,
+                    p.`tid` AS `tid`,
+                    t.`title` AS `title`,
+                    UNIX_TIMESTAMP(p.`date`) AS `date`,
+                    f.`perms` AS `perms`
+                FROM %t p
+                LEFT JOIN %t t
+                    ON p.`tid`=t.`id`
+                LEFT JOIN %t f
+                    ON f.`id`=t.`fid`
+                WHERE p.`auth_id`=?
+                    AND p.`newtopic`=1
+                ORDER BY p.`id` DESC
+                LIMIT 10
+                SQL,
+            ['posts', 'topics', 'forums'],
+            $userId,
+        );
+        while ($post = $this->database->arow($result)) {
+            $perms = $this->user->getForumPerms($post['perms']);
+            if (!$perms['read']) {
+                continue;
+            }
+
+            $tabHTML .= $this->template->meta(
+                'userprofile-topic',
+                $post['tid'],
+                $post['title'],
+                $this->date->autoDate($post['date']),
+                $this->textFormatting->theWorks($post['post']),
+            );
+        }
+
+        if ($tabHTML === '' || $tabHTML === '0') {
+            $tabHTML = 'No topics to show.';
+        }
+
+        return $tabHTML;
+    }
+
+    /**
+     * @param array<string,mixed> $user
+     */
+    private function showTabPosts(array $user): string
+    {
+        $userId = $user['id'];
+        $tabHTML = '';
+
+        $result = $this->database->safespecial(
+            <<<'SQL'
+                SELECT p.`post` AS `post`,p.`id` AS `pid`,p.`tid` AS `tid`,
+                    t.`title` AS `title`,UNIX_TIMESTAMP(p.`date`) AS `date`,f.`perms` AS `perms`
+                FROM %t p
+                LEFT JOIN %t t
+                    ON p.`tid`=t.`id`
+                LEFT JOIN %t f
+                    ON f.`id`=t.`fid`
+                WHERE p.`auth_id`=?
+                ORDER BY p.`id` DESC
+                LIMIT 10
+                SQL,
+            ['posts', 'topics', 'forums'],
+            $userId,
+        );
+        while ($post = $this->database->arow($result)) {
+            $perms = $this->user->getForumPerms($post['perms']);
+            if (!$perms['read']) {
+                continue;
+            }
+
+            $tabHTML .= $this->template->meta(
+                'userprofile-post',
+                $post['tid'],
+                $post['title'],
+                $post['pid'],
+                $this->date->autoDate($post['date']),
+                $this->textFormatting->theWorks($post['post']),
+            );
+        }
+
+        return $tabHTML;
     }
 }

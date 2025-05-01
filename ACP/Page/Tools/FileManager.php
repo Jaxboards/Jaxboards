@@ -139,7 +139,6 @@ final class FileManager
             ,
             ['files', 'members'],
         );
-        echo $this->database->error();
         $table = '';
         while ($file = $this->database->arow($result)) {
             $filepieces = explode('.', (string) $file['name']);
