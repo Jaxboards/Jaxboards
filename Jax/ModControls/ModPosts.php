@@ -327,12 +327,13 @@ final class ModPosts
     {
         foreach ($tids as $tid) {
             // Recount replies.
-            $this->database->safespecial(<<<'SQL'
-                UPDATE %t
-                SET `replies`=(
-                    SELECT COUNT(`id`) FROM %t WHERE `tid`=?)-1
-                WHERE `id`=?
-                SQL,
+            $this->database->safespecial(
+                <<<'SQL'
+                    UPDATE %t
+                    SET `replies`=(
+                        SELECT COUNT(`id`) FROM %t WHERE `tid`=?)-1
+                    WHERE `id`=?
+                    SQL,
                 ['topics', 'posts'],
                 $tid,
                 $tid,
