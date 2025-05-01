@@ -12,6 +12,7 @@ use Jax\User;
 
 use function array_diff;
 use function array_map;
+use function array_merge;
 use function array_unique;
 use function end;
 use function explode;
@@ -84,9 +85,11 @@ final class ModPosts
             default => null,
         };
 
-        if ($shouldClear) {
-            $this->clear();
+        if (!$shouldClear) {
+            return;
         }
+
+        $this->clear();
     }
 
     /**
@@ -131,8 +134,8 @@ final class ModPosts
 
         // Build list of topic ids that the posts were in.
         $tids = array_unique(array_map(
-            fn($topic) => (int) $topic['tid'],
-            $this->database->arows($result) ?? []
+            static fn($topic) => (int) $topic['tid'],
+            $this->database->arows($result) ?? [],
         ));
 
         if ($trashCanForum !== null) {
@@ -159,8 +162,8 @@ final class ModPosts
         $fids = array_unique(array_merge(
             $trashCanForum ? [$trashCanForum['id']] : [],
             array_map(
-                fn($topic) => (int) $topic['fid'],
-                $this->database->arows($result) ?? []
+                static fn($topic) => (int) $topic['fid'],
+                $this->database->arows($result) ?? [],
             ),
         ));
         $this->database->disposeresult($result);
@@ -190,7 +193,7 @@ final class ModPosts
     }
 
     /**
-     * @return null|array<str,mixed>
+     * @return null|array<string,mixed>
      */
     private function fetchPost(int $pid): ?array
     {
@@ -228,11 +231,13 @@ final class ModPosts
         $mods = $this->database->arow($result);
         $this->database->disposeresult($result);
 
-        return $mods ? array_map(fn($id) => (int) $id, explode(',', (string) $mods['mods'])) : [];
+        return $mods
+            ? array_map(static fn($id) => (int) $id, explode(',', (string) $mods['mods']))
+            : [];
     }
 
     /**
-     * @return null|array<str,mixed>
+     * @return null|array<string,mixed>
      */
     private function fetchTrashCanForum(): ?array
     {
@@ -249,6 +254,7 @@ final class ModPosts
 
     /**
      * @param list<int> $pids
+     *
      * @return true on success
      */
     private function movePostsTo(array $pids, int $tid): bool
@@ -310,10 +316,11 @@ final class ModPosts
     }
 
     /**
-     * @param list<int> $pids
-     * @param array<str,mixed> $data
+     * @param list<int>           $pids
+     * @param array<string,mixed> $data
      */
-    private function updatePosts(array $pids, array $data) {
+    private function updatePosts(array $pids, array $data): void
+    {
         $this->database->safeupdate(
             'posts',
             $data,
