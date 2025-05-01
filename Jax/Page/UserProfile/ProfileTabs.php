@@ -6,8 +6,6 @@ namespace Jax\Page\UserProfile;
 
 use Jax\Database;
 use Jax\Date;
-use Jax\DomainDefinitions;
-use Jax\Jax;
 use Jax\Page;
 use Jax\Request;
 use Jax\Template;
@@ -16,7 +14,6 @@ use Jax\User;
 
 use function explode;
 use function in_array;
-use function is_numeric;
 use function ucwords;
 
 final class ProfileTabs
@@ -31,16 +28,15 @@ final class ProfileTabs
     ];
 
     /**
-     * var array<string,mixed> the profile we are currently viewing.
+     * var array<string,int|float|string|null> the profile we are currently viewing.
      */
     private ?array $profile = null;
 
     public function __construct(
         private Activity $activity,
+        private Comments $comments,
         private Database $database,
         private Date $date,
-        private DomainDefinitions $domainDefinitions,
-        private Jax $jax,
         private Page $page,
         private Request $request,
         private Template $template,
@@ -70,20 +66,23 @@ final class ProfileTabs
             default => $this->showTabActivity(),
         };
 
-        foreach (self::TABS as $tabIndex => $tab) {
-            $active = ($tab === $selectedTab ? ' class="active"' : '');
-            $uppercase = ucwords($tab);
-            $tabs[$tabIndex] = <<<HTML
-                <a href="?act=vu{$this->profile['id']}&view=profile&page={$tab}" {$active}>{$uppercase}</a>
-                HTML;
-        }
+        $tabs = array_map(
+            function($tab) use ($selectedTab) {
+                $active = ($tab === $selectedTab ? ' class="active"' : '');
+                $uppercase = ucwords($tab);
+                return <<<HTML
+                    <a href="?act=vu{$this->profile['id']}&view=profile&page={$tab}" {$active}>{$uppercase}</a>
+                    HTML;
+            },
+            self::TABS
+        );
 
         $this->page->command('update', 'pfbox', $tabHTML);
 
         return [$tabs, $tabHTML];
     }
 
-    private function showTabAbout()
+    private function showTabAbout(): string
     {
         return $this->template->meta(
             'userprofile-about',
@@ -99,127 +98,7 @@ final class ProfileTabs
 
     private function showTabComments(): string
     {
-        $tabHTML = '';
-        if (
-            is_numeric($this->request->both('del'))
-        ) {
-            if ($this->user->getPerm('can_moderate')) {
-                $this->database->safedelete(
-                    'profile_comments',
-                    Database::WHERE_ID_EQUALS,
-                    $this->database->basicvalue($this->request->both('del')),
-                );
-            } elseif ($this->user->getPerm('can_delete_comments')) {
-                $this->database->safedelete(
-                    'profile_comments',
-                    'WHERE `id`=? AND `from`=?',
-                    $this->database->basicvalue($this->request->both('del')),
-                    $this->database->basicvalue($this->user->get('id')),
-                );
-            }
-        }
-
-        if ($this->request->post('comment')) {
-            $error = null;
-            if (
-                $this->user->isGuest()
-                || !$this->user->getPerm('can_add_comments')
-            ) {
-                $error = 'No permission to add comments!';
-            } else {
-                $this->database->safeinsert(
-                    'activity',
-                    [
-                        'affected_uid' => $this->profile['id'],
-                        'date' => $this->database->datetime(),
-                        'type' => 'profile_comment',
-                        'uid' => $this->user->get('id'),
-                    ],
-                );
-                $this->database->safeinsert(
-                    'profile_comments',
-                    [
-                        'comment' => $this->request->post('comment'),
-                        'date' => $this->database->datetime(),
-                        'from' => $this->user->get('id'),
-                        'to' => $this->profile['id'],
-                    ],
-                );
-            }
-
-            if ($error !== null) {
-                $this->page->command('error', $error);
-                $tabHTML .= $this->template->meta('error', $error);
-            }
-        }
-
-        if (
-            !$this->user->isGuest()
-            && $this->user->getPerm('can_add_comments')
-        ) {
-            $tabHTML = $this->template->meta(
-                'userprofile-comment-form',
-                $this->user->get('name') ?? '',
-                $this->user->get('avatar') ?: $this->template->meta('default-avatar'),
-                $this->jax->hiddenFormFields(
-                    [
-                        'act' => 'vu' . $this->profile['id'],
-                        'page' => 'comments',
-                        'view' => 'profile',
-                    ],
-                ),
-            );
-        }
-
-        $result = $this->database->safespecial(
-            <<<'SQL'
-                SELECT
-                    c.`id` AS `id`,
-                    c.`to` AS `to`,
-                    c.`from` AS `from`,
-                    c.`comment` AS `comment`,
-                    UNIX_TIMESTAMP(c.`date`) AS `date`,
-                    m.`display_name` AS `display_name`,
-                    m.`group_id` AS `group_id`,
-                    m.`avatar` AS `avatar`
-                FROM %t c
-                LEFT JOIN %t m
-                    ON c.`from`=m.`id`
-                WHERE c.`to`=?
-                ORDER BY c.`id` DESC
-                LIMIT 10
-                SQL,
-            ['profile_comments', 'members'],
-            $this->profile['id'],
-        );
-        $found = false;
-        while ($comment = $this->database->arow($result)) {
-            $tabHTML .= $this->template->meta(
-                'userprofile-comment',
-                $this->template->meta(
-                    'user-link',
-                    $comment['from'],
-                    $comment['group_id'],
-                    $comment['display_name'],
-                ),
-                $comment['avatar'] ?: $this->template->meta('default-avatar'),
-                $this->date->autoDate($comment['date']),
-                $this->textFormatting->theWorks($comment['comment'])
-                . ($this->user->getPerm('can_delete_comments')
-                && $comment['from'] === $this->user->get('id')
-                || $this->user->getPerm('can_moderate')
-                ? ' <a href="?act=' . $this->request->both('act')
-                . '&view=profile&page=comments&del=' . $comment['id']
-                . '" class="delete">[X]</a>' : ''),
-            );
-            $found = true;
-        }
-
-        if (!$found) {
-            $tabHTML .= 'No comments to display!';
-        }
-
-        return $tabHTML;
+        return $this->comments->render($this->profile);
     }
 
     private function showTabFriends(): string

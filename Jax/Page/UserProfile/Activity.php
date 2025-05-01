@@ -20,7 +20,7 @@ final class Activity
     private const ACTIVITY_LIMIT = 30;
 
     /**
-     * var array<string,mixed> the profile we are currently viewing.
+     * var array<string,int|float|string|null> the profile we are currently viewing.
      */
     private ?array $profile = null;
 

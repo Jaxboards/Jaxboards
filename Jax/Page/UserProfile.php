@@ -6,9 +6,7 @@ namespace Jax\Page;
 
 use Jax\Database;
 use Jax\Date;
-use Jax\DomainDefinitions;
 use Jax\IPAddress;
-use Jax\Jax;
 use Jax\Page;
 use Jax\Page\UserProfile\ProfileTabs;
 use Jax\Request;
@@ -44,16 +42,14 @@ final class UserProfile
     ];
 
     /**
-     * var array<string,mixed> the profile we are currently viewing.
+     * var array<string,int|float|string|null> the profile we are currently viewing.
      */
     private ?array $profile = null;
 
     public function __construct(
         private readonly Database $database,
         private readonly Date $date,
-        private readonly DomainDefinitions $domainDefinitions,
         private readonly IPAddress $ipAddress,
-        private readonly Jax $jax,
         private readonly Page $page,
         private readonly ProfileTabs $profileTabs,
         private readonly Request $request,
@@ -78,21 +74,19 @@ final class UserProfile
 
         $this->profile = $userId ? $this->fetchUser($userId) : null;
 
-        if (!$this->profile) {
-            $error = $this->template->meta('error', "Sorry, this user doesn't exist.");
-            $this->page->command('update', 'page', $error);
-            $this->page->append('PAGE', $error);
-
-            return;
-        }
-
         match (true) {
-            $this->request->isJSNewLocation()
-            && !$this->request->isJSDirectLink()
-            && !$this->request->both('view') => $this->showContactCard(),
+            !$this->profile => $this->showProfileError(),
+            $this->didComeFromForum() => $this->showContactCard(),
             (bool) $this->user->getPerm('can_view_fullprofile') => $this->showFullProfile(),
             default => $this->page->location('?'),
         };
+    }
+
+    private function didComeFromForum(): bool
+    {
+        return $this->request->isJSNewLocation()
+            && !$this->request->isJSDirectLink()
+            && !$this->request->both('view');
     }
 
     private function fetchGroupTitle(int $groupId): ?string
@@ -123,7 +117,6 @@ final class UserProfile
                 'contact_aim',
                 'contact_bluesky',
                 'contact_discord',
-                // TODO: change this in the schema
                 'contact_gtalk AS contact_googlechat',
                 'contact_msn',
                 'contact_skype',
@@ -185,6 +178,40 @@ final class UserProfile
             ),
             true,
         );
+    }
+
+    private function renderContactDetails(): string {
+        $profile = $this->profile;
+        $contactDetails = '';
+        $contactFields = array_filter(array_keys($profile), static fn($field) => str_starts_with($field, 'contact'));
+
+        foreach ($contactFields as $field) {
+            $type = mb_substr($field, 8);
+            $href = sprintf(self::CONTACT_URLS[$type], $profile[$field]);
+            $contactDetails .= <<<HTML
+                <div class="contact {$type}"><a href="{$href}">{$field}</a></div>
+                HTML;
+        }
+
+        $contactDetails .= <<<HTML
+            <div class="contact im">
+                <a href="javascript:void(0)"
+                    onclick="new IMWindow('{$profile['id']}','{$profile['display_name']}')"
+                    >IM</a>
+            </div>
+            <div class="contact pm">
+                <a href="?act=ucp&what=inbox&page=compose&mid={$profile['id']}">PM</a>
+            </div>
+            HTML;
+
+        if ($this->user->getPerm('can_moderate')) {
+            $ipReadable = $this->ipAddress->asHumanReadable($profile['ip']);
+            $contactDetails .= <<<HTML
+                    <div>IP: <a href="?act=modcontrols&do=iptools&ip={$ipReadable}">{$ipReadable}</a></div>
+                HTML;
+        }
+
+        return $contactDetails;
     }
 
     private function showContactCard(): void
@@ -252,34 +279,7 @@ final class UserProfile
             ],
         );
 
-        $contactdetails = '';
-        $contactFields = array_filter(array_keys($profile), static fn($field) => str_starts_with($field, 'contact'));
-
-        foreach ($contactFields as $field) {
-            $type = mb_substr($field, 8);
-            $href = sprintf(self::CONTACT_URLS[$type], $profile[$field]);
-            $contactdetails .= <<<HTML
-                <div class="contact {$type}"><a href="{$href}">{$field}</a></div>
-                HTML;
-        }
-
-        $contactdetails .= <<<HTML
-            <div class="contact im">
-                <a href="javascript:void(0)"
-                    onclick="new IMWindow('{$profile['id']}','{$profile['display_name']}')"
-                    >IM</a>
-            </div>
-            <div class="contact pm">
-                <a href="?act=ucp&what=inbox&page=compose&mid={$profile['id']}">PM</a>
-            </div>
-            HTML;
-
-        if ($this->user->getPerm('can_moderate')) {
-            $ipReadable = $this->ipAddress->asHumanReadable($profile['ip']);
-            $contactdetails .= <<<HTML
-                    <div>IP: <a href="?act=modcontrols&do=iptools&ip={$ipReadable}">{$ipReadable}</a></div>
-                HTML;
-        }
+        $contactdetails = $this->renderContactDetails();
 
         $page = $this->template->meta(
             'userprofile-full-profile',
@@ -314,5 +314,11 @@ final class UserProfile
         $this->page->append('PAGE', $page);
 
         $this->session->set('location_verbose', 'Viewing ' . $profile['display_name'] . "'s profile");
+    }
+
+    private function showProfileError() {
+        $error = $this->template->meta('error', "Sorry, this user doesn't exist.");
+        $this->page->command('update', 'page', $error);
+        $this->page->append('PAGE', $error);
     }
 }
