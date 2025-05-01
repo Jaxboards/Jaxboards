@@ -10,7 +10,6 @@ use Jax\Request;
 use Jax\Session;
 use Jax\User;
 
-use function array_diff;
 use function array_unique;
 use function explode;
 use function implode;
@@ -34,75 +33,31 @@ final class ModPosts
             return;
         }
 
-        $result = $this->database->safeselect(
-            [
-                'newtopic',
-                'tid',
-            ],
-            'posts',
-            'WHERE id=?',
-            $this->database->basicvalue($pid),
-        );
-        $post = $this->database->arow($result);
-        $this->database->disposeresult($result);
-
+        $post = $this->fetchPost($pid);
         if (!$post) {
             return;
         }
 
+        // If the post is a topic post, handle it as a topic instead.
         if ($post['newtopic']) {
             $this->modTopics->addTopic($post['tid']);
 
             return;
         }
 
+        if (!$this->canModPost($post)) {
+            $this->page->command(
+                'error',
+                "You don't have permission to be moderating in this forum",
+            );
+            return;
+        }
+
         $this->page->command('softurl');
 
-        // See if they have permission to manipulate this post.
-        if (!$this->user->getPerm('can_moderate')) {
-            $result = $this->database->safespecial(
-                <<<'SQL'
-                    SELECT `mods`
-                    FROM %t
-                    WHERE `id`=(
-                        SELECT `fid`
-                        FROM %t
-                        WHERE `id`=?
-                    )
-                    SQL
-                ,
-                ['forums', 'topics'],
-                $post['tid'],
-            );
+        $pids = $this->getModPids();
 
-            $mods = $this->database->arow($result);
-            $this->database->disposeresult($result);
-
-            if (!$mods) {
-                return;
-            }
-
-            $mods = explode(',', (string) $mods['mods']);
-            if (!in_array($this->user->get('id'), $mods)) {
-                $this->page->command(
-                    'error',
-                    "You don't have permission to be moderating in this forum",
-                );
-
-                return;
-            }
-        }
-
-        $currentPids = explode(',', $this->session->getVar('modpids') ?? '');
-        $pids = [];
-        foreach ($currentPids as $currentPid) {
-            if (!is_numeric($currentPid)) {
-                continue;
-            }
-
-            $pids[] = (int) $currentPid;
-        }
-
+        // Toggle's the PID as being selected
         if (in_array($pid, $pids, true)) {
             $pids = array_diff($pids, [$pid]);
         } else {
@@ -116,44 +71,47 @@ final class ModPosts
 
     public function doPosts(array|string $do): void
     {
-        switch ($do) {
-            case 'move':
-                $this->page->command('modcontrols_move', 1);
+        $pids = $this->getModPids();
 
-                break;
+        if ($pids === []) {
+            $this->page->command('error', 'No posts to work on.');
+            $this->clear();
 
-            case 'moveto':
-                $this->database->safeupdate(
-                    'posts',
-                    [
-                        'tid' => $this->request->post('id'),
-                    ],
-                    'WHERE `id` IN ?',
-                    explode(',', (string) $this->session->getVar('modpids')),
-                );
-                $this->cancel();
-                $this->page->location('?act=vt' . $this->request->post('id'));
-
-                break;
-
-            case 'delete':
-                $this->deleteposts();
-                $this->cancel();
-
-                break;
-
-            default:
+            return;
         }
+
+        match ($do) {
+            'move' => $this->page->command('modcontrols_move', 1),
+            'moveto' => $this->movePostsTo($pids),
+            'delete' => $this->deleteposts($pids)
+        };
     }
 
-    private function deleteposts()
+    /**
+     * Does the user have moderation permission of a post?
+     * If they're a global mod, automatically yes.
+     * If not, then we need to check the forum permissions to
+     * see if they're an assigned moderator of the forum.
+     */
+    private function canModPost(array $post): bool
     {
-        if (
-            !$this->session->getVar('modpids')
-        ) {
-            return $this->page->command('error', 'No posts to delete.');
+        if ($this->user->getPerm('can_moderate')) {
+            return true;
         }
 
+        $mods = $this->fetchForumMods($post);
+        return in_array($this->user->get('id'), $mods, true);
+    }
+
+    private function clear(): void
+    {
+        $this->session->deleteVar('modpids');
+        $this->sync();
+        $this->page->command('modcontrols_clearbox');
+    }
+
+    private function deleteposts(): void
+    {
         // Get trashcan.
         $result = $this->database->safeselect(
             '`id`',
@@ -169,37 +127,23 @@ final class ModPosts
             '`tid`',
             'posts',
             'WHERE `id` IN ?',
-            explode(',', (string) $this->session->getVar('modpids')),
+            $this->getModPids(),
         );
 
         // Build list of topic ids that the posts were in.
         $tids = [];
-        $pids = explode(',', (string) $this->session->getVar('modpids'));
+        $pids = $this->getModPids();
         while ($post = $this->database->arow($result)) {
             $tids[] = (int) $post['tid'];
         }
-
         $tids = array_unique($tids);
 
         if ($trashcan !== 0) {
-            // Get first & last post.
-            foreach ($pids as $postId) {
-                if (!isset($op) || !$op || $postId < $op) {
-                    $op = $postId;
-                }
-
-                if (isset($lp) && $lp && $postId <= $lp) {
-                    continue;
-                }
-
-                $lp = $postId;
-            }
-
             $result = $this->database->safeselect(
                 ['auth_id'],
                 'posts',
                 'WHERE `id`=?',
-                $this->database->basicvalue($lp),
+                $this->database->basicvalue(end($pids)),
             );
             $lp = $this->database->arow($result);
             $this->database->disposeresult($result);
@@ -212,7 +156,7 @@ final class ModPosts
                     'fid' => $trashcan,
                     'lp_date' => $this->database->datetime(),
                     'lp_uid' => $lp['auth_id'],
-                    'op' => $op,
+                    'op' => $pids[0],
                     'replies' => 0,
                     'poll_choices' => '',
                     'title' => 'Posts deleted from: '
@@ -227,7 +171,7 @@ final class ModPosts
                     'tid' => $tid,
                 ],
                 'WHERE `id` IN ?',
-                explode(',', (string) $this->session->getVar('modpids')),
+                $this->getModPids(),
             );
             $this->database->safeupdate(
                 'posts',
@@ -235,14 +179,14 @@ final class ModPosts
                     'newtopic' => 1,
                 ],
                 'WHERE `id`=?',
-                $this->database->basicvalue($op),
+                $this->database->basicvalue($pids[0]),
             );
             $tids[] = $tid;
         } else {
             $this->database->safedelete(
                 'posts',
                 'WHERE `id` IN ?',
-                explode(',', (string) $this->session->getVar('modpids')),
+                $this->getModPids(),
             );
         }
 
@@ -301,14 +245,68 @@ final class ModPosts
             $this->page->command('removeel', '#pid_' . $postId);
         }
 
-        return null;
+        $this->clear();
+        return;
     }
 
-    private function cancel(): void
+    /**
+     * Returns sorted list of post IDs we're working with
+     * @return list<int>
+     */
+    private function getModPids(): array
     {
-        $this->session->deleteVar('modpids');
-        $this->sync();
-        $this->page->command('modcontrols_clearbox');
+        $modPids = $this->session->getVar('modpids');
+        $intPids = $modPids ? array_map(fn($pid) => (int) $pid, explode(',', $modPids)) : [];
+        sort($intPids);
+        return $intPids;
+    }
+
+    private function fetchPost(int $pid): ?array
+    {
+        $result = $this->database->safeselect(
+            ['newtopic', 'tid'],
+            'posts',
+            'WHERE id=?',
+            $this->database->basicvalue($pid),
+        );
+        $post = $this->database->arow($result);
+        $this->database->disposeresult($result);
+        return $post;
+    }
+
+    private function fetchForumMods(array $post): array
+    {
+        $result = $this->database->safespecial(
+            <<<'SQL'
+                SELECT `mods`
+                FROM %t
+                WHERE `id`=(
+                    SELECT `fid`
+                    FROM %t
+                    WHERE `id`=?
+                )
+                SQL
+            ,
+            ['forums', 'topics'],
+            $post['tid'],
+        );
+        $mods = $this->database->arow($result);
+        $this->database->disposeresult($result);
+
+        return $mods ? explode(',', (string) $mods['mods']) : null;
+    }
+
+    private function movePostsTo(array $pids) {
+        $this->database->safeupdate(
+            'posts',
+            [
+                'tid' => $this->request->post('id'),
+            ],
+            'WHERE `id` IN ?',
+            $pids,
+        );
+        $this->page->location('?act=vt' . $this->request->post('id'));
+        $this->clear();
     }
 
     private function sync(): void

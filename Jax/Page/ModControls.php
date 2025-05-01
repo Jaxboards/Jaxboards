@@ -76,22 +76,30 @@ final class ModControls
             return;
         }
 
-        $dot = $this->request->post('dot');
-        $dop = $this->request->post('dop');
-        $cancel = $this->request->both('cancel');
+        if ($this->request->both('cancel')) {
+            $this->cancel();
 
-        match (true) {
-            $dot !== null => $this->modTopics->doTopics($dot),
-            $dop !== null => $this->modPosts->doPosts($dop),
-            $cancel !== null => $this->cancel(),
-            default => match ($this->request->both('do')) {
-                'modp' => $this->modPosts->addPost((int) $this->request->both('pid')),
-                'modt' => $this->modTopics->addTopic((int) $this->request->both('tid')),
-                'load' => $this->load(),
-                'cp' => $this->showModCP(),
-                'emem' => $this->editMembers(),
-                'iptools' => $this->ipTools(),
-            },
+            return;
+        }
+
+        $dot = $this->request->post('dot');
+        if ($dot !== null) {
+            $this->modTopics->doTopics($dot);
+        }
+
+        $dop = $this->request->post('dop');
+        if ($dop !== null) {
+            $this->modPosts->doPosts($dop);
+        }
+
+        match ($this->request->both('do')) {
+            'modp' => $this->modPosts->addPost((int) $this->request->both('pid')),
+            'modt' => $this->modTopics->addTopic((int) $this->request->both('tid')),
+            'load' => $this->load(),
+            'cp' => $this->showModCP(),
+            'emem' => $this->editMembers(),
+            'iptools' => $this->ipTools(),
+            default => null,
         };
     }
 
