@@ -17,7 +17,6 @@ use function end;
 use function explode;
 use function implode;
 use function in_array;
-use function is_numeric;
 use function sort;
 
 final class ModPosts
@@ -93,7 +92,7 @@ final class ModPosts
      * If not, then we need to check the forum permissions to
      * see if they're an assigned moderator of the forum.
      *
-     * @param array<str,mixed> $post
+     * @param array<string,mixed> $post
      */
     private function canModPost(array $post): bool
     {
@@ -138,7 +137,7 @@ final class ModPosts
             $tids[] = $this->movePostsToTrashcan(
                 $pids,
                 $trashCanForum,
-                'Posts deleted from: ' . implode(',', $tids)
+                'Posts deleted from: ' . implode(',', $tids),
             );
         }
 
@@ -247,7 +246,8 @@ final class ModPosts
         return $mods ? explode(',', (string) $mods['mods']) : [];
     }
 
-    private function fetchTrashCanForum(): ?array {
+    private function fetchTrashCanForum(): ?array
+    {
         $result = $this->database->safeselect(
             '`id`',
             'forums',
@@ -255,6 +255,7 @@ final class ModPosts
         );
         $trashcan = $this->database->arow($result);
         $this->database->disposeresult($result);
+
         return $trashcan;
     }
 
@@ -265,7 +266,9 @@ final class ModPosts
     {
         $this->clear();
 
-        if (!$tid) return;
+        if (!$tid) {
+            return;
+        }
 
         $this->database->safeupdate(
             'posts',
@@ -282,15 +285,16 @@ final class ModPosts
      * Move posts to trashcan by creating a new topic there,
      * then moving all posts to it.
      *
-     * @param array<str,mixed> $trashCanForum
-     * @param list<int> $pids
+     * @param array<string,mixed> $trashCanForum
+     * @param list<int>           $pids
+     *
      * @return int The new topic's ID
      */
     private function movePostsToTrashcan(
         array $pids,
         array $trashCanForum,
-        string $newTopicTitle
-    ) {
+        string $newTopicTitle,
+    ): int {
         $lastPost = $this->fetchPost(end($pids));
 
         // Create a new topic.
