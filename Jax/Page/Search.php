@@ -22,7 +22,6 @@ use function explode;
 use function implode;
 use function in_array;
 use function is_array;
-use function is_numeric;
 use function mb_strlen;
 use function mb_substr;
 use function mktime;
@@ -325,7 +324,7 @@ final class Search
             $numresults = count(explode(',', (string) $ids));
             $idarray = array_slice(
                 explode(',', (string) $ids),
-                ($this->pageNum) * $this->perpage,
+                $this->pageNum * $this->perpage,
                 $this->perpage,
             );
             $ids = implode(',', $idarray);
