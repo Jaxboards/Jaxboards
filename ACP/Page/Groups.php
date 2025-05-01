@@ -121,7 +121,7 @@ final class Groups
             $this->database->safeupdate(
                 'member_groups',
                 $groupPermissions,
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $groupId,
             );
         }
@@ -417,7 +417,7 @@ final class Groups
                     $this->database->safeupdate(
                         'member_groups',
                         $write,
-                        'WHERE `id`=?',
+                        Database::WHERE_ID_EQUALS,
                         $this->database->basicvalue($gid),
                     );
                 } else {
@@ -444,7 +444,7 @@ final class Groups
             $result = $this->database->safeselect(
                 ['title', 'icon'],
                 'member_groups',
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $this->database->basicvalue($gid),
             );
             $gdata = $this->database->arow($result);
@@ -474,7 +474,7 @@ final class Groups
         ) {
             $this->database->safedelete(
                 'member_groups',
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $this->database->basicvalue($this->request->both('delete')),
             );
             $this->database->safeupdate(

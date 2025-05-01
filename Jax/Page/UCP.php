@@ -636,7 +636,7 @@ final class UCP
                     'hidden',
                 ],
                 'skins',
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $this->request->both('skin'),
             );
             if (!$this->database->arow($result)) {

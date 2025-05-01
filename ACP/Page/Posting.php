@@ -290,7 +290,7 @@ final readonly class Posting
         if ($this->request->get('d')) {
             $this->database->safedelete(
                 'ratingniblets',
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $this->database->basicvalue($this->request->get('d')),
             );
             unset($niblets[$this->request->get('d')]);

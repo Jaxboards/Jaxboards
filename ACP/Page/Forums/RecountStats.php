@@ -139,7 +139,7 @@ final readonly class RecountStats
                 [
                     'replies' => $v,
                 ],
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $k,
             );
         }
@@ -151,7 +151,7 @@ final readonly class RecountStats
                 [
                     'posts' => $v,
                 ],
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $k,
             );
         }
@@ -164,7 +164,7 @@ final readonly class RecountStats
                     'posts' => $v,
                     'topics' => $stat['forum_topics'][$k],
                 ],
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $k,
             );
         }

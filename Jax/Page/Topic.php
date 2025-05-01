@@ -509,7 +509,7 @@ final class Topic
         $result = $this->database->safeselect(
             'title',
             'topics',
-            'WHERE `id`=?',
+            Database::WHERE_ID_EQUALS,
             $tid,
         );
         $tdata = $this->database->arow($result);
@@ -968,7 +968,7 @@ final class Topic
                     'poll_type',
                 ],
                 'topics',
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $this->tid,
             );
             $row = $this->database->arow($result);
@@ -1066,7 +1066,7 @@ final class Topic
             [
                 'poll_results' => $presults,
             ],
-            'WHERE `id`=?',
+            Database::WHERE_ID_EQUALS,
             $this->tid,
         );
     }
@@ -1083,7 +1083,7 @@ final class Topic
         $result = $this->database->safeselect(
             ['rating'],
             'posts',
-            'WHERE `id`=?',
+            Database::WHERE_ID_EQUALS,
             $this->database->basicvalue($postid),
         );
         $post = $this->database->arow($result);
@@ -1128,7 +1128,7 @@ final class Topic
             [
                 'rating' => json_encode($ratings),
             ],
-            'WHERE `id`=?',
+            Database::WHERE_ID_EQUALS,
             $this->database->basicvalue($postid),
         );
         $this->page->command('alert', $unrate ? 'Unrated!' : 'Rated!');
@@ -1153,7 +1153,7 @@ final class Topic
                 'tid',
             ],
             'posts',
-            'WHERE `id`=?',
+            Database::WHERE_ID_EQUALS,
             $pid,
         );
         $post = $this->database->arow($result);
@@ -1195,7 +1195,7 @@ final class Topic
                     'title',
                 ],
                 'topics',
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $post['tid'],
             );
             $topic = $this->database->arow($result);
@@ -1363,7 +1363,7 @@ final class Topic
         $result = $this->database->safeselect(
             ['rating'],
             'posts',
-            'WHERE `id`=?',
+            Database::WHERE_ID_EQUALS,
             $this->database->basicvalue($pid),
         );
         $row = $this->database->arow($result);
@@ -1392,7 +1392,7 @@ final class Topic
                 'group_id',
             ],
             'members',
-            'WHERE `id` IN ?',
+            Database::WHERE_ID_IN,
             $members,
         );
         $mdata = [];

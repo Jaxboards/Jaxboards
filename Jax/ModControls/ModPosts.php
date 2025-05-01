@@ -128,7 +128,7 @@ final class ModPosts
         $result = $this->database->safeselect(
             ['tid'],
             'posts',
-            'WHERE `id` IN ?',
+            Database::WHERE_ID_IN,
             $pids,
         );
 
@@ -149,7 +149,7 @@ final class ModPosts
         if ($trashCanForum === null) {
             $this->database->safedelete(
                 'posts',
-                'WHERE `id` IN ?',
+                Database::WHERE_ID_IN,
                 $pids,
             );
         }
@@ -158,7 +158,7 @@ final class ModPosts
 
         // Fix forum last post for all forums topics were in.
         // Add trashcan here too.
-        $result = $this->database->safeselect(['fid'], 'topics', 'WHERE `id` IN ?', $tids);
+        $result = $this->database->safeselect(['fid'], 'topics', Database::WHERE_ID_IN, $tids);
         $fids = array_unique(array_merge(
             $trashCanForum ? [$trashCanForum['id']] : [],
             array_map(
@@ -200,7 +200,7 @@ final class ModPosts
         $result = $this->database->safeselect(
             ['auth_id', 'newtopic', 'tid'],
             'posts',
-            'WHERE id=?',
+            Database::WHERE_ID_EQUALS,
             $this->database->basicvalue($pid),
         );
         $post = $this->database->arow($result);
@@ -315,7 +315,7 @@ final class ModPosts
         $this->database->safeupdate(
             'posts',
             $data,
-            'WHERE `id`=?',
+            Database::WHERE_ID_EQUALS,
             $this->database->basicvalue($pids[0]),
         );
     }

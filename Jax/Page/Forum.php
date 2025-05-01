@@ -445,7 +445,7 @@ final class Forum
             $result = $this->database->safeselect(
                 ['id', 'title'],
                 'forums',
-                'WHERE `id` IN ?',
+                Database::WHERE_ID_IN,
                 $pathids,
             );
             while ($forum = $this->database->arow($result)) {

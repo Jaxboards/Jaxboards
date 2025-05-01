@@ -353,7 +353,7 @@ final class TextFormatting
                 'downloads',
             ],
             'files',
-            'WHERE `id`=?',
+            Database::WHERE_ID_EQUALS,
             $fileId,
         );
         $file = $this->database->arow($result);

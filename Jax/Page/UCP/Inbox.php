@@ -96,7 +96,7 @@ final class Inbox
                         'email_settings',
                     ],
                     'members',
-                    'WHERE `id`=?',
+                    Database::WHERE_ID_EQUALS,
                     $this->database->basicvalue($mid),
                 );
                 $udata = $this->database->arow($result);
@@ -197,7 +197,7 @@ final class Inbox
             $result = $this->database->safeselect(
                 ['display_name'],
                 'members',
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $mid,
             );
             $thisrow = $this->database->arow($result);
@@ -218,7 +218,7 @@ final class Inbox
             $result = $this->database->safeselect(
                 ['display_name'],
                 'members',
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $mid,
             );
             $thisrow = $this->database->arow($result);
@@ -259,7 +259,7 @@ final class Inbox
                 'del_sender',
             ],
             'messages',
-            'WHERE `id`=?',
+            Database::WHERE_ID_EQUALS,
             $this->database->basicvalue($messageId),
         );
         $message = $this->database->arow($result);
@@ -273,7 +273,7 @@ final class Inbox
                 [
                     'del_recipient' => 1,
                 ],
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $this->database->basicvalue($messageId),
             );
         }
@@ -284,7 +284,7 @@ final class Inbox
                 [
                     'del_sender' => 1,
                 ],
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $this->database->basicvalue($messageId),
             );
         }
@@ -295,7 +295,7 @@ final class Inbox
                 'del_sender',
             ],
             'messages',
-            'WHERE `id`=?',
+            Database::WHERE_ID_EQUALS,
             $this->database->basicvalue($messageId),
         );
         $message = $this->database->arow($result);
@@ -304,7 +304,7 @@ final class Inbox
         if ($message['del_recipient'] && $message['del_sender']) {
             $this->database->safedelete(
                 'messages',
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $this->database->basicvalue($messageId),
             );
         }
@@ -402,7 +402,7 @@ final class Inbox
             $this->database->safeupdate(
                 'messages',
                 ['read' => 1],
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $message['id'],
             );
             $this->updateNumMessages();

@@ -114,7 +114,7 @@ final readonly class Forums
                     [
                         'order' => $order,
                     ],
-                    'WHERE `id`=?',
+                    Database::WHERE_ID_EQUALS,
                     $cat,
                 );
             } else {
@@ -129,7 +129,7 @@ final readonly class Forums
                             $formattedPath,
                         ),
                     ],
-                    'WHERE `id`=?',
+                    Database::WHERE_ID_EQUALS,
                     $key,
                 );
             }
@@ -351,7 +351,7 @@ final readonly class Forums
                 'show_ledby',
             ],
             'forums',
-            'WHERE `id`=?',
+            Database::WHERE_ID_EQUALS,
             $this->database->basicvalue($forumId),
         );
         $forum = $this->database->arow($result);
@@ -392,7 +392,7 @@ final readonly class Forums
                 [
                     'mods' => $forum['mods'],
                 ],
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $this->database->basicvalue($fid),
             );
             $this->updatePerForumModFlag();
@@ -555,7 +555,7 @@ final readonly class Forums
             $result = $this->database->safeselect(
                 ['display_name', 'id'],
                 'members',
-                'WHERE `id` IN ?',
+                Database::WHERE_ID_IN,
                 explode(',', (string) $forum['mods']),
             );
             $modList = '';
@@ -610,7 +610,7 @@ final readonly class Forums
             $result = $this->database->safeselect(
                 ['id'],
                 'members',
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $this->database->basicvalue($this->request->post('modid')),
             );
             if ($this->database->arow($result)) {
@@ -658,7 +658,7 @@ final readonly class Forums
             $this->database->safeupdate(
                 'forums',
                 $write,
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $oldForumData['id'],
             );
             if ($this->request->post('modid')) {
@@ -741,7 +741,7 @@ final readonly class Forums
         if ($this->request->post('submit') !== null) {
             $this->database->safedelete(
                 'forums',
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $this->database->basicvalue($forumId),
             );
             if ($this->request->post('moveto') !== null) {
@@ -858,7 +858,7 @@ final readonly class Forums
             $result = $this->database->safeselect(
                 ['id', 'title'],
                 'categories',
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $this->database->basicvalue($cid),
             );
             $cdata = $this->database->arow($result);
@@ -876,7 +876,7 @@ final readonly class Forums
                     $this->database->safeupdate(
                         'categories',
                         $data,
-                        'WHERE `id`=?',
+                        Database::WHERE_ID_EQUALS,
                         $this->database->basicvalue($cid),
                     );
                     $page .= $this->page->success(
@@ -950,7 +950,7 @@ final readonly class Forums
                 );
                 $this->database->safedelete(
                     'categories',
-                    'WHERE `id`=?',
+                    Database::WHERE_ID_EQUALS,
                     $this->database->basicvalue($catId),
                 );
                 $page .= $this->page->success('Category deleted!');
@@ -1022,7 +1022,7 @@ final readonly class Forums
             [
                 'mod' => 1,
             ],
-            'WHERE `id` IN ?',
+            Database::WHERE_ID_IN,
             array_keys($mods),
         );
     }

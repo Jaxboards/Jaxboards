@@ -66,7 +66,7 @@ final class ModTopics
                         'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
                     ],
                     'forums',
-                    'WHERE `id`=?',
+                    Database::WHERE_ID_EQUALS,
                     $this->database->basicvalue($this->request->post('id')),
                 );
                 $rowfound = $this->database->arow($result);
@@ -78,7 +78,7 @@ final class ModTopics
                 $result = $this->database->safeselect(
                     ['fid'],
                     'topics',
-                    'WHERE `id` IN ?',
+                    Database::WHERE_ID_IN,
                     explode(',', (string) $this->session->getVar('modtids')),
                 );
                 while ($topic = $this->database->arow($result)) {
@@ -91,7 +91,7 @@ final class ModTopics
                     [
                         'fid' => $this->request->post('id'),
                     ],
-                    'WHERE `id` IN ?',
+                    Database::WHERE_ID_IN,
                     explode(',', (string) $this->session->getVar('modtids')),
                 );
                 $this->cancel();
@@ -110,7 +110,7 @@ final class ModTopics
                     [
                         'pinned' => 1,
                     ],
-                    'WHERE `id` IN ?',
+                    Database::WHERE_ID_IN,
                     explode(',', (string) $this->session->getVar('modtids')),
                 );
                 $this->page->command(
@@ -127,7 +127,7 @@ final class ModTopics
                     [
                         'pinned' => 0,
                     ],
-                    'WHERE `id` IN ?',
+                    Database::WHERE_ID_IN,
                     explode(',', (string) $this->session->getVar('modtids')),
                 );
                 $this->page->command(
@@ -144,7 +144,7 @@ final class ModTopics
                     [
                         'locked' => 1,
                     ],
-                    'WHERE `id` IN ?',
+                    Database::WHERE_ID_IN,
                     explode(',', (string) $this->session->getVar('modtids')),
                 );
                 $this->page->command(
@@ -161,7 +161,7 @@ final class ModTopics
                     [
                         'locked' => 0,
                     ],
-                    'WHERE `id` IN ?',
+                    Database::WHERE_ID_IN,
                     explode(',', (string) $this->session->getVar('modtids')),
                 );
                 $this->page->command('alert', 'topics unlocked!');
@@ -273,7 +273,7 @@ final class ModTopics
         $result = $this->database->safeselect(
             ['id', 'fid'],
             'topics',
-            'WHERE `id` IN ?',
+            Database::WHERE_ID_IN,
             explode(',', (string) $this->session->getVar('modtids')),
         );
         $delete = [];
@@ -300,7 +300,7 @@ final class ModTopics
                 [
                     'fid' => $trashcan,
                 ],
-                'WHERE `id` IN ?',
+                Database::WHERE_ID_IN,
                 explode(',', (string) $this->session->getVar('modtids')),
             );
             $delete = implode(',', $delete);
@@ -317,7 +317,7 @@ final class ModTopics
             );
             $this->database->safedelete(
                 'topics',
-                'WHERE `id` IN ?',
+                Database::WHERE_ID_IN,
                 explode(',', (string) $delete),
             );
         }
@@ -367,7 +367,7 @@ final class ModTopics
                 [
                     'newtopic' => 1,
                 ],
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $op,
             );
 
@@ -377,14 +377,14 @@ final class ModTopics
                 [
                     'op' => $op,
                 ],
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $this->database->basicvalue($this->request->post('ot')),
             );
             unset($topicIds[array_search($this->request->post('ot'), $topicIds, true)]);
             if ($topicIds !== []) {
                 $this->database->safedelete(
                     'topics',
-                    'WHERE `id` IN ?',
+                    Database::WHERE_ID_IN,
                     $topicIds,
                 );
             }
@@ -407,7 +407,7 @@ final class ModTopics
             $result = $this->database->safeselect(
                 ['id', 'title'],
                 'topics',
-                'WHERE `id` IN ?',
+                Database::WHERE_ID_IN,
                 explode(',', (string) $this->session->getVar('modtids')),
             );
             $titles = [];

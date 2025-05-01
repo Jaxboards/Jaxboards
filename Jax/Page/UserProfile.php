@@ -389,7 +389,7 @@ final class UserProfile
                     if ($this->user->getPerm('can_moderate')) {
                         $this->database->safedelete(
                             'profile_comments',
-                            'WHERE `id`=?',
+                            Database::WHERE_ID_EQUALS,
                             $this->database->basicvalue($this->request->both('del')),
                         );
                     } elseif ($this->user->getPerm('can_delete_comments')) {

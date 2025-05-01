@@ -50,7 +50,7 @@ final class FileManager
                     'name',
                 ],
                 'files',
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $this->database->basicvalue($this->request->both('delete')),
             );
             $file = $this->database->arow($result);
@@ -72,7 +72,7 @@ final class FileManager
 
                 $this->database->safedelete(
                     'files',
-                    'WHERE `id`=?',
+                    Database::WHERE_ID_EQUALS,
                     $this->database->basicvalue($this->request->both('delete')),
                 );
             }
@@ -89,7 +89,7 @@ final class FileManager
                     [
                         'downloads' => $v,
                     ],
-                    'WHERE `id`=?',
+                    Database::WHERE_ID_EQUALS,
                     $this->database->basicvalue($k),
                 );
             }

@@ -116,7 +116,7 @@ final class User
                 'YEAR(`birthdate`) AS `dob_year`',
             ],
             'members',
-            'WHERE `id`=?',
+            Database::WHERE_ID_EQUALS,
             $this->database->basicvalue($uid),
         );
         $user = $this->database->arow($result);
@@ -219,7 +219,7 @@ final class User
                 'title',
             ],
             'member_groups',
-            'WHERE `id`=?',
+            Database::WHERE_ID_EQUALS,
             $groupId ?? 3,
         );
         $retval = $this->database->arow($result);

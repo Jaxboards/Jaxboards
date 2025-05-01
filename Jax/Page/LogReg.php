@@ -354,7 +354,7 @@ final class LogReg
                                 PASSWORD_DEFAULT,
                             ),
                         ],
-                        'WHERE `id`=?',
+                        Database::WHERE_ID_EQUALS,
                         $this->database->basicvalue($udata['id']),
                     );
                     // Delete all forgotpassword tokens for this user.
@@ -368,7 +368,7 @@ final class LogReg
                     $result = $this->database->safeselect(
                         ['id', 'name'],
                         'members',
-                        'WHERE `id`=?',
+                        Database::WHERE_ID_EQUALS,
                         $this->database->basicvalue($udata['id']),
                     );
                     $udata = $this->database->arow($result);

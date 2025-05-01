@@ -223,7 +223,7 @@ final class Post
                     'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
                 ],
                 'topics',
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $this->database->basicvalue($this->tid),
             );
             $tdata = $this->database->arow($result);
@@ -235,7 +235,7 @@ final class Post
                 $result = $this->database->safeselect(
                     ['post'],
                     'posts',
-                    'WHERE `id`=?',
+                    Database::WHERE_ID_EQUALS,
                     $this->database->basicvalue($tdata['op']),
                 );
                 $postdata = $this->database->arow($result);
@@ -250,7 +250,7 @@ final class Post
         $result = $this->database->safeselect(
             ['title', 'perms'],
             'forums',
-            'WHERE `id`=?',
+            Database::WHERE_ID_EQUALS,
             $fid,
         );
         $forum = $this->database->arow($result);
@@ -553,7 +553,7 @@ final class Post
                     'tid',
                 ],
                 'posts',
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $pid,
             );
             $post = $this->database->arow($result);
@@ -596,7 +596,7 @@ final class Post
                         'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
                     ],
                     'topics',
-                    'WHERE `id`=?',
+                    Database::WHERE_ID_EQUALS,
                     $tid,
                 );
                 $tmp = $this->database->arow($result);
@@ -629,7 +629,7 @@ final class Post
                             ),
                             'title' => $this->textFormatting->blockhtml($this->request->post('ttitle')),
                         ],
-                        'WHERE `id`=?',
+                        Database::WHERE_ID_EQUALS,
                         $tid,
                     );
                 }
@@ -654,7 +654,7 @@ final class Post
                 'edit_date' => $this->database->datetime(),
                 'post' => $this->postdata,
             ],
-            'WHERE `id`=?',
+            Database::WHERE_ID_EQUALS,
             $this->database->basicvalue($pid),
         );
         $this->page->command(
@@ -726,7 +726,7 @@ final class Post
             $result = $this->database->safeselect(
                 ['perms'],
                 'forums',
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $fid,
             );
             $fdata = $this->database->arow($result);
@@ -869,7 +869,7 @@ final class Post
                 [
                     'op' => $pid,
                 ],
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $tid,
             );
         }

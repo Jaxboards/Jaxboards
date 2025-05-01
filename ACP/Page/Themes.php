@@ -173,7 +173,7 @@ final readonly class Themes
                     'hidden' => array_key_exists($wrapperId, $hidden) ? 1 : 0,
                     'wrapper' => $wrapperName,
                 ],
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $wrapperId,
             );
         }
@@ -288,7 +288,7 @@ final readonly class Themes
             [
                 'default' => 1,
             ],
-            'WHERE `id`=?',
+            Database::WHERE_ID_EQUALS,
             $skinID,
         );
     }
@@ -418,7 +418,7 @@ final readonly class Themes
                 'hidden',
             ],
             'skins',
-            'WHERE `id`=?',
+            Database::WHERE_ID_EQUALS,
             $id,
         );
         $skin = $this->database->arow($result);
@@ -573,7 +573,7 @@ final readonly class Themes
         $result = $this->database->safeselect(
             '`id`,`using`,`title`,`custom`,`wrapper`,`default`,`hidden`',
             'skins',
-            'WHERE `id`=?',
+            Database::WHERE_ID_EQUALS,
             $id,
         );
         $skin = $this->database->arow($result);
@@ -589,7 +589,7 @@ final readonly class Themes
 
         $this->database->safedelete(
             'skins',
-            'WHERE `id`=?',
+            Database::WHERE_ID_EQUALS,
             $id,
         );
         // Make a random skin default if it's the default.

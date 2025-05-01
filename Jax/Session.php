@@ -237,7 +237,7 @@ final class Session
                             'UNIX_TIMESTAMP(`read_date`) AS `read_date`',
                         ],
                         'session',
-                        'WHERE `id`=?',
+                        Database::WHERE_ID_EQUALS,
                         $this->database->basicvalue($sid),
                     );
             $session = $this->database->arow($result);
@@ -413,7 +413,7 @@ final class Session
                 [
                     'last_visit' => $this->database->datetime($session['last_action']),
                 ],
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $session['uid'],
             );
         }
@@ -472,7 +472,7 @@ final class Session
         $this->database->safeupdate(
             'session',
             $session,
-            'WHERE `id`=?',
+            Database::WHERE_ID_EQUALS,
             $this->database->basicvalue($this->data['id']),
         );
     }

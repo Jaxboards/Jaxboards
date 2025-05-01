@@ -195,7 +195,7 @@ final class ModControls
                         'full_name' => $this->request->post('full_name'),
                         'sig' => $this->request->post('signature'),
                     ],
-                    'WHERE `id`=?',
+                    Database::WHERE_ID_EQUALS,
                     $this->database->basicvalue($this->request->post('mid')),
                 );
 
@@ -231,7 +231,7 @@ final class ModControls
                 $result = $this->database->safeselect(
                     $memberFields,
                     'members',
-                    'WHERE `id`=?',
+                    Database::WHERE_ID_EQUALS,
                     $this->database->basicvalue($this->request->both('mid')),
                 );
                 $member = $this->database->arow($result);

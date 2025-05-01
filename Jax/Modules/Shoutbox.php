@@ -88,7 +88,7 @@ final class Shoutbox
                 $result = $this->database->safeselect(
                     '`uid`',
                     'shouts',
-                    'WHERE `id`=?',
+                    Database::WHERE_ID_EQUALS,
                     $id,
                 );
                 $shoutrow = $this->database->arow($result);
@@ -338,7 +338,7 @@ final class Shoutbox
         $this->page->command('softurl');
         $this->database->safedelete(
             'shouts',
-            'WHERE `id`=?',
+            Database::WHERE_ID_EQUALS,
             $delete,
         );
 

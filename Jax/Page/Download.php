@@ -40,7 +40,7 @@ final readonly class Download
                     'hash',
                 ],
                 'files',
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $id,
             );
             $data = $this->database->arow($result);

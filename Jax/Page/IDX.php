@@ -219,7 +219,7 @@ final class IDX
             $result = $this->database->safeselect(
                 ['id', 'display_name', 'group_id'],
                 'members',
-                'WHERE `id` IN ?',
+                Database::WHERE_ID_IN,
                 $this->mods,
             );
             while ($member = $this->database->arow($result)) {

@@ -184,7 +184,7 @@ final readonly class BuddyList
             $result = $this->database->safeselect(
                 ['id'],
                 'members',
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $uid,
             );
             $user = $this->database->arow($result);

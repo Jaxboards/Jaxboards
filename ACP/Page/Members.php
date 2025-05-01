@@ -132,7 +132,7 @@ final readonly class Members
                 $result = $this->database->safeselect(
                     ['group_id'],
                     'members',
-                    'WHERE `id`=?',
+                    Database::WHERE_ID_EQUALS,
                     $this->database->basicvalue($this->request->both('mid')),
                 );
                 $member = $this->database->arow($result);
@@ -192,7 +192,7 @@ final readonly class Members
                         'UNIX_TIMESTAMP(`last_visit`) AS `last_visit`',
                     ],
                     'members',
-                    'WHERE `id`=?',
+                    Database::WHERE_ID_EQUALS,
                     $this->database->basicvalue($this->request->both('mid')),
                 );
             } else {
@@ -381,7 +381,7 @@ final readonly class Members
             $this->database->safeupdate(
                 'members',
                 $write,
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $this->database->basicvalue($this->request->both('mid')),
             );
 
@@ -616,7 +616,7 @@ final readonly class Members
                 $result = $this->database->safeselect(
                     ['id', 'posts'],
                     'members',
-                    'WHERE `id`=?',
+                    Database::WHERE_ID_EQUALS,
                     $mid1,
                 );
                 $posts = $this->database->arow($result);
@@ -631,7 +631,7 @@ final readonly class Members
                 );
 
                 // Delete the account.
-                $this->database->safedelete('members', 'WHERE `id`=?', $mid1);
+                $this->database->safedelete('members', Database::WHERE_ID_EQUALS, $mid1);
 
                 // Update stats.
                 $this->database->safespecial(
@@ -704,7 +704,7 @@ final readonly class Members
                 $this->database->safedelete('session', 'WHERE `uid`=?', $mid);
 
                 // Delete the account.
-                $this->database->safedelete('members', 'WHERE `id`=?', $mid);
+                $this->database->safedelete('members', Database::WHERE_ID_EQUALS, $mid);
 
                 $this->database->fixAllForumLastPosts();
 
@@ -930,7 +930,7 @@ final readonly class Members
                 [
                     'group_id' => 1,
                 ],
-                'WHERE `id`=?',
+                Database::WHERE_ID_EQUALS,
                 $this->database->basicvalue($this->request->post('mid')),
             );
         }
