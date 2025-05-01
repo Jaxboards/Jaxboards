@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use function array_diff_assoc;
-use function assert;
 use function base64_decode;
-use function json_encode;
 
 final class UserTest
 {
@@ -29,11 +26,6 @@ final class UserTest
         $this->encodedForumFlags = base64_decode('AAEAPgADABgABAAYAAUAGAAGAD8=', true);
     }
 
-    private function assertDeepEquals(array $expected, array $result): void
-    {
-        $this->assertDeepEquals($expected, $result);
-    }
-
     public function getForumPermissionAsAdmin(): void
     {
         $user = $this->user;
@@ -52,10 +44,9 @@ final class UserTest
             'reply' => true,
             'start' => true,
             'upload' => true,
-            'view' => true
+            'view' => true,
         ];
         $result = $user->getForumPerms($this->encodedForumFlags);
-
     }
 
     public function getForumPermissionAsGuest(): void
@@ -79,6 +70,11 @@ final class UserTest
 
         $expected = $this->decoded[4];
         $result = $user->getForumPerms($this->encodedForumFlags);
+        $this->assertDeepEquals($expected, $result);
+    }
+
+    private function assertDeepEquals(array $expected, array $result): void
+    {
         $this->assertDeepEquals($expected, $result);
     }
 }

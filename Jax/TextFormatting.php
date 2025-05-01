@@ -6,7 +6,6 @@ namespace Jax;
 
 use DI\Container;
 
-use function array_key_exists;
 use function array_keys;
 use function array_map;
 use function array_values;
@@ -93,9 +92,11 @@ final class TextFormatting
                 continue;
             }
 
-            if ($rule['type'] === 'badword') {
-                $this->badwords[$rule['needle']] = $rule['replacement'];
+            if ($rule['type'] !== 'badword') {
+                continue;
             }
+
+            $this->badwords[$rule['needle']] = $rule['replacement'];
         }
     }
 
@@ -220,10 +221,8 @@ final class TextFormatting
      *
      * @param array<array<string>> $codes
      */
-    public function finishCodeTags(
-        string $text,
-        array $codes
-    ): string {
+    public function finishCodeTags(string $text, array $codes): string
+    {
         foreach (array_keys($codes[1]) as $index => $language) {
             $code = $codes[2][$index];
 
@@ -244,7 +243,8 @@ final class TextFormatting
     }
 
     /**
-     * Variant of finishCodeTags that returns bbcode instead of html
+     * Variant of finishCodeTags that returns bbcode instead of html.
+     *
      * @param array<array<string>> $codes
      */
     public function finishCodeTagsBB(
@@ -292,7 +292,7 @@ final class TextFormatting
 
     /**
      * Variant of "theWorks" that does not produce block level elements.
-     * Only inline (<em>, <strong>, etc)
+     * Only inline (<em>, <strong>, etc).
      */
     public function theWorksInline(string $text): string
     {
@@ -336,7 +336,7 @@ final class TextFormatting
     {
         [, $space, $emoteText] = $match;
 
-        return "$space<img src='{$this->emotes[$emoteText]}' alt='{$this->blockhtml($emoteText)}' />";
+        return "{$space}<img src='{$this->emotes[$emoteText]}' alt='{$this->blockhtml($emoteText)}' />";
     }
 
     private function attachments(string $text): null|array|string
