@@ -68,12 +68,13 @@ final class ProfileTabs
         };
 
         $tabs = array_map(
-            static function ($tab) use ($selectedTab) {
+            function ($tab) use ($selectedTab) {
                 $active = ($tab === $selectedTab ? ' class="active"' : '');
                 $uppercase = ucwords($tab);
+                $profileId = $this->profile['id'];
 
                 return <<<HTML
-                    <a href="?act=vu{$this->profile['id']}&view=profile&page={$tab}" {$active}>{$uppercase}</a>
+                    <a href="?act=vu{$profileId}&view=profile&page={$tab}" {$active}>{$uppercase}</a>
                     HTML;
             },
             self::TABS,
