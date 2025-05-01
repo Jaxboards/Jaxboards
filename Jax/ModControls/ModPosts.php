@@ -73,17 +73,20 @@ final class ModPosts
 
         if ($pids === []) {
             $this->page->command('error', 'No posts to work on.');
-            $this->clear();
 
             return;
         }
 
-        match ($doAct) {
+        $shouldClear = match ($doAct) {
             'move' => $this->page->command('modcontrols_move', 1),
             'moveto' => $this->movePostsTo($pids, (int) $this->request->post('id')),
             'delete' => $this->deletePosts($pids),
             default => null,
         };
+
+        if ($shouldClear) {
+            $this->clear();
+        }
     }
 
     /**
@@ -115,7 +118,7 @@ final class ModPosts
     /**
      * @param list<int> $pids
      */
-    private function deletePosts(array $pids): void
+    private function deletePosts(array $pids): bool
     {
         $trashCanForum = $this->fetchTrashCanForum();
 
@@ -188,7 +191,7 @@ final class ModPosts
             $this->page->command('removeel', '#pid_' . $postId);
         }
 
-        $this->clear();
+        return true;
     }
 
     /**
@@ -261,13 +264,12 @@ final class ModPosts
 
     /**
      * @param list<int> $pids
+     * @return true on success
      */
-    private function movePostsTo(array $pids, int $tid): void
+    private function movePostsTo(array $pids, int $tid): bool
     {
-        $this->clear();
-
         if (!$tid) {
-            return;
+            return false;
         }
 
         $this->database->safeupdate(
@@ -279,6 +281,8 @@ final class ModPosts
             $pids,
         );
         $this->page->location('?act=vt' . $tid);
+
+        return true;
     }
 
     /**
