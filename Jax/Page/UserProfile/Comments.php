@@ -115,10 +115,10 @@ class Comments {
         return $comments;
     }
 
-    private function handleCommentCreation() {
+    private function handleCommentCreation(): string {
         $comment = $this->request->post('comment');
         if (!$comment) {
-            return;
+            return '';
         }
 
         $error = null;
