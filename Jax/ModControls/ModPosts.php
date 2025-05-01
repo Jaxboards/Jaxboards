@@ -232,7 +232,7 @@ final class ModPosts
         $this->database->disposeresult($result);
 
         return $mods
-            ? array_map(static fn($id) => (int) $id, explode(',', (string) $mods['mods']))
+            ? array_map(static fn($mid) => (int) $mid, explode(',', (string) $mods['mods']))
             : [];
     }
 
@@ -255,16 +255,14 @@ final class ModPosts
     /**
      * @param list<int> $pids
      *
-     * @return true on success
+     * @return bool true on success
      */
     private function movePostsTo(array $pids, int $tid): bool
     {
-        if (!$tid) {
-            return false;
+        if ($tid) {
+            $this->updatePosts($pids, ['tid' => $tid]);
+            $this->page->location('?act=vt' . $tid);
         }
-
-        $this->updatePosts($pids, ['tid' => $tid]);
-        $this->page->location('?act=vt' . $tid);
 
         return true;
     }
@@ -301,16 +299,9 @@ final class ModPosts
         );
         $newTopicId = (int) $this->database->insertId();
 
-        $this->movePostsTo($pids, $newTopicId);
-
-        // Put the posts into it
-        $this->updatePosts($pids, [
-            'newtopic' => 0,
-            'tid' => $newTopicId,
-        ]);
-
-        // Set the OP
+        // Set the OP and move posts into the new topic
         $this->updatePosts([$pids[0]], ['newtopic' => 1]);
+        $this->movePostsTo($pids, $newTopicId);
 
         return $newTopicId;
     }
@@ -336,17 +327,12 @@ final class ModPosts
     {
         foreach ($tids as $tid) {
             // Recount replies.
-            $this->database->safespecial(
-                <<<'SQL'
-                    UPDATE %t
-                    SET `replies`=(
-                        SELECT COUNT(`id`)
-                        FROM %t
-                        WHERE `tid`=?
-                    )-1
-                    WHERE `id`=?
-                    SQL
-                ,
+            $this->database->safespecial(<<<'SQL'
+                UPDATE %t
+                SET `replies`=(
+                    SELECT COUNT(`id`) FROM %t WHERE `tid`=?)-1
+                WHERE `id`=?
+                SQL,
                 ['topics', 'posts'],
                 $tid,
                 $tid,
