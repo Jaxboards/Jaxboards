@@ -81,13 +81,15 @@ final class UserProfile
         }
 
         // Nothing is live updating on the profile page
-        if ($this->request->isJSUpdate()) {
+        if ($this->request->isJSUpdate() && !$this->request->hasPostData()) {
             return;
         }
 
         match (true) {
-            $this->request->both('view') !== null => $this->showFullProfile($userId),
-            default => $this->showContactCard($userId),
+            $this->request->isJSNewLocation()
+            && !$this->request->isJSDirectLink()
+            && !$this->request->both('view') => $this->showContactCard($userId),
+            default => $this->showFullProfile($userId),
         };
     }
 
@@ -464,9 +466,7 @@ final class UserProfile
             $userId,
             self::ACTIVITY_LIMIT,
         );
-        if (
-            $this->request->both('fmt') === 'RSS'
-        ) {
+        if ($this->request->both('fmt') === 'RSS') {
             $feed = new RSSFeed(
                 [
                     'description' => $user['usertitle'],
@@ -496,8 +496,9 @@ final class UserProfile
             $activity['group_id'] = $user['group_id'];
             $tabHTML .= $this->parseActivity($activity);
         }
+        $this->database->disposeresult($result);
 
-        return $tabHTML
+        return !$tabHTML
             ? 'This user has yet to do anything noteworthy!'
             : "<a href='./?act=vu{$userId}&amp;page=activity&amp;fmt=RSS' class='social rss' "
             . "style='float:right'>RSS</a>{$tabHTML}";
@@ -529,9 +530,7 @@ final class UserProfile
             }
         }
 
-        if (
-            $this->request->post('comment') !== ''
-        ) {
+        if ($this->request->post('comment')) {
             $error = null;
             if (
                 $this->user->isGuest()
