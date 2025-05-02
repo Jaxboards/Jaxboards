@@ -53,7 +53,7 @@ final class Request
      *
      * @SuppressWarnings("PHPMD.Superglobals")
      *
-     * @return array{error:0,full_path:string,name:string,size:int<0,max>,tmp_name:string,type:string}|null
+     * @return null|array{error:0,full_path:string,name:string,size:int<0,max>,tmp_name:string,type:string}
      */
     public function file(string $fieldName): ?array
     {
@@ -72,6 +72,9 @@ final class Request
 
     /**
      * @SuppressWarnings("BooleanArgumentFlag")
+     *
+     * @param mixed $expires
+     * @param mixed $httponly
      */
     public function setCookie(
         string $cookieName,

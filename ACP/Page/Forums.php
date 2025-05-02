@@ -10,7 +10,6 @@ use Jax\Database;
 use Jax\Jax;
 use Jax\Request;
 use Jax\TextFormatting;
-use Jax\User;
 
 use function array_key_exists;
 use function array_keys;
