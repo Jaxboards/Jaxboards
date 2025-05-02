@@ -82,8 +82,8 @@ final class UserTest
     }
 
     /**
-     * @param null|array<string,mixed> $userData
-     * @param null|array<string,mixed> $userPerms
+     * @param null|array<array-key,mixed> $userPerms
+     * @param null|array<array-key,mixed> $userData
      */
     private function getUser(array $userPerms, array $userData): User
     {

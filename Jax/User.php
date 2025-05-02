@@ -15,8 +15,8 @@ use const PASSWORD_DEFAULT;
 final class User
 {
     /**
-     * @param null|array<string,mixed> $userData
-     * @param null|array<string,mixed> $userPerms
+     * @param null|array<array-key,mixed> $userData
+     * @param null|array<array-key,mixed> $userPerms
      */
     public function __construct(
         private readonly Database $database,
@@ -30,7 +30,6 @@ final class User
     public function get(string $property): null|int|string
     {
         if (!$this->userData) {
-            // TODO: default other property values for guests
             return match ($property) {
                 'group_id' => 3,
                 default => null,

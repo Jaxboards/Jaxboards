@@ -41,7 +41,6 @@ final readonly class Forums
         private readonly RecountStats $recountStats,
         private readonly Request $request,
         private readonly TextFormatting $textFormatting,
-        private readonly User $user,
     ) {}
 
     public function render(): void

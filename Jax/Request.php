@@ -53,7 +53,7 @@ final class Request
      *
      * @SuppressWarnings("PHPMD.Superglobals")
      *
-     * @return array<string,array<string,mixed>>
+     * @return array{error:0,full_path:string,name:string,size:int<0,max>,tmp_name:string,type:string}|null
      */
     public function file(string $fieldName): ?array
     {
@@ -70,6 +70,9 @@ final class Request
         return $_COOKIE !== [];
     }
 
+    /**
+     * @SuppressWarnings("BooleanArgumentFlag")
+     */
     public function setCookie(
         string $cookieName,
         ?string $cookieValue,
