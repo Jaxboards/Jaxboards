@@ -342,6 +342,7 @@ final class ModTopics
     private function getModTids(): array
     {
         $modtids = $this->session->getVar('modtids');
+
         return $modtids ? array_map(
             static fn($tid) => (int) $tid,
             explode(',', (string) $this->session->getVar('modtids')),
