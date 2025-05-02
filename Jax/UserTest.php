@@ -23,7 +23,7 @@ final class UserTest
         6 => ['upload' => true, 'reply' => true, 'start' => true, 'read' => true, 'view' => true, 'poll' => true],
     ];
 
-    public function __construct(private Container $container)
+    public function __construct(private Assert $assert, private Container $container)
     {
         $this->encodedForumFlags = base64_decode('AAEAPgADABgABAAYAAUAGAAGAD8=', true);
     }
@@ -49,7 +49,7 @@ final class UserTest
             'view' => true,
         ];
         $result = $user->getForumPerms($this->encodedForumFlags);
-        $this->assertDeepEquals($expected, $result);
+        $this->assert->deepEquals($expected, $result);
     }
 
     public function getForumPermissionAsGuest(): void
@@ -61,7 +61,7 @@ final class UserTest
 
         $expected = $this->decoded[3];
         $result = $user->getForumPerms($this->encodedForumFlags);
-        $this->assertDeepEquals($expected, $result);
+        $this->assert->deepEquals($expected, $result);
     }
 
     public function getForumPermissionAsBanned(): void
@@ -73,17 +73,12 @@ final class UserTest
 
         $expected = $this->decoded[4];
         $result = $user->getForumPerms($this->encodedForumFlags);
-        $this->assertDeepEquals($expected, $result);
-    }
-
-    private function assertDeepEquals(array $expected, array $result): void
-    {
-        $this->assertDeepEquals($expected, $result);
+        $this->assert->deepEquals($expected, $result);
     }
 
     /**
-     * @param array<array-key,mixed> $userPerms
-     * @param array<array-key,mixed> $userData
+     * @param null|array<array-key,mixed> $userPerms
+     * @param null|array<array-key,mixed> $userData
      */
     private function getUser(array $userPerms, array $userData): User
     {
