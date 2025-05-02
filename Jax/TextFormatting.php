@@ -12,12 +12,9 @@ use function array_values;
 use function highlight_string;
 use function htmlspecialchars;
 use function implode;
-use function in_array;
-use function is_array;
 use function mb_substr;
 use function nl2br;
 use function parse_url;
-use function pathinfo;
 use function preg_match;
 use function preg_match_all;
 use function preg_quote;
@@ -25,18 +22,11 @@ use function preg_replace;
 use function preg_replace_callback;
 use function str_ireplace;
 use function str_replace;
-use function urlencode;
 
 use const ENT_QUOTES;
-use const PATHINFO_EXTENSION;
 
 final class TextFormatting
 {
-    /**
-     * @var array<string,array<string,mixed>>
-     */
-    private array $attachmentData;
-
     public function __construct(
         private readonly Config $config,
         private readonly BBCode $bbCode,
@@ -193,7 +183,6 @@ final class TextFormatting
         $text = $this->emotes($text);
         $text = $this->bbCode->toHTML($text);
         $text = $this->finishCodeTags($text, $codes);
-        $text = $this->attachments($text);
 
         return $this->wordfilter($text);
     }
@@ -243,77 +232,5 @@ final class TextFormatting
         [, $space, $emoteText] = $match;
 
         return "{$space}<img src='{$this->rules->getEmotes()[$emoteText]}' alt='{$this->blockhtml($emoteText)}' />";
-    }
-
-    private function attachments(string $text): null|array|string
-    {
-        return $text = preg_replace_callback(
-            '@\[attachment\](\d+)\[/attachment\]@',
-            $this->attachmentCallback(...),
-            $text,
-            20,
-        );
-    }
-
-    /**
-     * Given an attachment ID, gets the file data associated with it
-     * Returns null if file not found.
-     *
-     * @return null|array<string, mixed>
-     */
-    private function getAttachmentData(string $fileId): ?array
-    {
-        if (isset($this->attachmentData[$fileId])) {
-            return $this->attachmentData[$fileId];
-        }
-
-        $result = $this->database->safeselect(
-            [
-                'id',
-                'name',
-                'hash',
-                'size',
-                'downloads',
-            ],
-            'files',
-            Database::WHERE_ID_EQUALS,
-            $fileId,
-        );
-        $file = $this->database->arow($result);
-        $this->database->disposeresult($result);
-
-        return $this->attachmentData[$fileId] = $file;
-    }
-
-    private function attachmentCallback(array $match): string
-    {
-        $file = $this->getAttachmentData($match[1]);
-
-        if (!$file) {
-            return "Attachment doesn't exist";
-        }
-
-        $ext = (string) pathinfo($file['name'], PATHINFO_EXTENSION);
-        $imageExtensions = $this->config->getSetting('images') ?? [];
-
-        if (
-            is_array($imageExtensions)
-            && !in_array($ext, $imageExtensions, true)
-        ) {
-            $ext = null;
-        }
-
-        if ($ext !== null) {
-            $attachmentURL = $this->domainDefinitions->getBoardPathUrl() . '/Uploads/' . $file['hash'] . '.' . $ext;
-
-            return "<a href='{$attachmentURL}'>"
-                . "<img src='{$attachmentURL}' alt='attachment' class='bbcodeimg' />"
-                . '</a>';
-        }
-
-        return '<div class="attachment">'
-            . '<a href="index.php?act=download&id='
-            . $file['id'] . '&name=' . urlencode((string) $file['name']) . '" class="name">'
-            . $file['name'] . '</a> Downloads: ' . $file['downloads'] . '</div>';
     }
 }

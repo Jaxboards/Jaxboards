@@ -17,8 +17,14 @@ use function trim;
 final class BBCode
 {
     /**
+     * @var array<string,array<string,mixed>>
+     */
+    private array $attachmentData;
+
+    /**
      * @var array<string,string>
      */
+    // phpcs:ignore
     private array $inlineBBCodes = [
         '@\[(bg|bgcolor|background)=(#?[\s\w\d]+)\](.*)\[/\1\]@Usi' => '<span style="background:$2">$3</span>',
         '@\[b\](.*)\[/b\]@Usi' => '<strong>$1</strong>',
@@ -43,6 +49,12 @@ final class BBCode
             <img src="$2" title="$1" alt="$1" class="bbcodeimg" />
             HTML,
     ];
+
+    public function __construct(
+        private readonly Database $database,
+        private readonly DomainDefinitions $domainDefinitions,
+        private readonly Config $config,
+    ) {}
 
     public function toHTML(string $text): ?string
     {
@@ -69,6 +81,13 @@ final class BBCode
             $text,
             '@\[quote(?>=([^\]]+))?\](.*?)\[/quote\]\r?\n?@is',
             $this->bbcodeQuoteCallback(...),
+        );
+
+        // [attachment]
+        $text = $this->replaceWithCallback(
+            $text,
+            '@\[attachment\](\d+)\[/attachment\]@',
+            $this->attachmentCallback(...),
         );
 
         return preg_replace_callback(
@@ -102,7 +121,7 @@ final class BBCode
         callable $callback,
     ): string {
         for ($nestLimit = 0; $nestLimit < 10; ++$nestLimit) {
-            $tmp = preg_replace_callback($pattern, $callback, $text);
+            $tmp = preg_replace_callback($pattern, $callback, $text, 20);
             if ($tmp === $text || !is_string($tmp)) {
                 break;
             }
@@ -110,6 +129,68 @@ final class BBCode
         }
 
         return $text;
+    }
+
+    private function attachmentCallback(array $match): string
+    {
+        $file = $this->getAttachmentData($match[1]);
+
+        if (!$file) {
+            return "Attachment doesn't exist";
+        }
+
+        $ext = (string) pathinfo($file['name'], PATHINFO_EXTENSION);
+        $imageExtensions = $this->config->getSetting('images') ?? [];
+
+        if (
+            is_array($imageExtensions)
+            && !in_array($ext, $imageExtensions, true)
+        ) {
+            $ext = null;
+        }
+
+        if ($ext !== null) {
+            $attachmentURL = $this->domainDefinitions->getBoardPathUrl() . '/Uploads/' . $file['hash'] . '.' . $ext;
+
+            return "<a href='{$attachmentURL}'>"
+                . "<img src='{$attachmentURL}' alt='attachment' class='bbcodeimg' />"
+                . '</a>';
+        }
+
+        return '<div class="attachment">'
+            . '<a href="index.php?act=download&id='
+            . $file['id'] . '&name=' . urlencode((string) $file['name']) . '" class="name">'
+            . $file['name'] . '</a> Downloads: ' . $file['downloads'] . '</div>';
+    }
+
+    /**
+     * Given an attachment ID, gets the file data associated with it
+     * Returns null if file not found.
+     *
+     * @return null|array<string, mixed>
+     */
+    private function getAttachmentData(string $fileId): ?array
+    {
+        if (isset($this->attachmentData[$fileId])) {
+            return $this->attachmentData[$fileId];
+        }
+
+        $result = $this->database->safeselect(
+            [
+                'id',
+                'name',
+                'hash',
+                'size',
+                'downloads',
+            ],
+            'files',
+            Database::WHERE_ID_EQUALS,
+            $fileId,
+        );
+        $file = $this->database->arow($result);
+        $this->database->disposeresult($result);
+
+        return $this->attachmentData[$fileId] = $file;
     }
 
     private function bbcodeQuoteCallback(array $match): string
