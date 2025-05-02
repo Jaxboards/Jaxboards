@@ -34,6 +34,7 @@ use function is_array;
 use function is_numeric;
 use function json_decode;
 use function json_encode;
+use function max;
 use function preg_match;
 use function round;
 use function time;
@@ -778,7 +779,7 @@ final class Topic
                 $this->date->autoDate($post['date']),
                 <<<HTML
                     <a href="?act=vt{$this->tid}&amp;findpost={$post['pid']}"
-                        onclick="prompt(\'Link to this post:\',this.href);return false"
+                        onclick="prompt(\\'Link to this post:\\',this.href);return false"
                         >{$this->template->meta('topic-perma-button')}</a>
                     HTML,
                 $postt,
@@ -1319,10 +1320,11 @@ final class Topic
             ['posts', 'posts'],
             $pid,
         );
-        foreach($this->database->arows($result) as $index => $post) {
+        foreach ($this->database->arows($result) as $index => $post) {
             if ($post['id'] === $pid) {
                 $pid = $post['id'];
                 $postPosition = (int) $index;
+
                 break;
             }
         }
