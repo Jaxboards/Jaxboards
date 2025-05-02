@@ -147,31 +147,6 @@ final class User
         return $this->userData = $user;
     }
 
-    /**
-     * @param array<string,mixed> $user
-     * @return bool if password is correct
-     */
-    private function verifyPassword(array $user, string $pass): bool {
-        if (!password_verify($pass, (string) $user['pass'])) {
-            return false;
-        }
-
-        if (password_needs_rehash($user['pass'], PASSWORD_DEFAULT)) {
-            $newHash = password_hash($pass, PASSWORD_DEFAULT);
-            // Add the new hash.
-            $this->database->safeupdate(
-                'members',
-                [
-                    'pass' => $newHash,
-                ],
-                'WHERE `id` = ?',
-                $user['id'],
-            );
-        }
-
-        return true;
-    }
-
     public function getPerm(string $perm): mixed
     {
         $perms = $this->getPerms();
@@ -185,7 +160,7 @@ final class User
             return $this->userPerms;
         }
 
-        $groupId = match(true) {
+        $groupId = match (true) {
             $this->isBanned() => 4,
             $this->userData !== null => $this->userData['group_id'],
             default => null,
@@ -284,5 +259,32 @@ final class User
     public function isGuest(): bool
     {
         return !$this->getUser();
+    }
+
+    /**
+     * @param array<string,mixed> $user
+     *
+     * @return bool if password is correct
+     */
+    private function verifyPassword(array $user, string $pass): bool
+    {
+        if (!password_verify($pass, (string) $user['pass'])) {
+            return false;
+        }
+
+        if (password_needs_rehash($user['pass'], PASSWORD_DEFAULT)) {
+            $newHash = password_hash($pass, PASSWORD_DEFAULT);
+            // Add the new hash.
+            $this->database->safeupdate(
+                'members',
+                [
+                    'pass' => $newHash,
+                ],
+                'WHERE `id` = ?',
+                $user['id'],
+            );
+        }
+
+        return true;
     }
 }

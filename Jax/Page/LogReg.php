@@ -176,8 +176,10 @@ final class LogReg
         $this->login($name, $pass1);
     }
 
-    private function login(?string $username = null, ?string $password = null): void
-    {
+    private function login(
+        ?string $username = null,
+        ?string $password = null,
+    ): void {
         if ($username && $password) {
             if ($this->session->get('is_bot')) {
                 return;
