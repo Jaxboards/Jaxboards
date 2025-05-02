@@ -133,16 +133,16 @@ final class Request
     /**
      * @SuppressWarnings("PHPMD.Superglobals")
      */
-    private function jsAccess(): int
+    public function getUserAgent(): ?string
     {
-        return (int) ($_SERVER['HTTP_X_JSACCESS'] ?? 0);
+        return $_SERVER['HTTP_USER_AGENT'] ?: null;
     }
 
     /**
      * @SuppressWarnings("PHPMD.Superglobals")
      */
-    public function getUserAgent(): ?string
+    private function jsAccess(): int
     {
-        return $_SERVER['HTTP_USER_AGENT'] ?: null;
+        return (int) ($_SERVER['HTTP_X_JSACCESS'] ?? 0);
     }
 }
