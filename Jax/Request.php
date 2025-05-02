@@ -55,9 +55,10 @@ final class Request
      *
      * @return array<string,array<string,mixed>>
      */
-    public function files(string $property): ?array
+    public function file(string $fieldName): ?array
     {
-        return $_FILES[$property] ?? null;
+        $file = $_FILES[$fieldName] ?? null;
+        return $file && !$file['error'] ? $file : null;
     }
 
     /**

@@ -71,79 +71,60 @@ final class Post
 
     public function render(): void
     {
-        $this->tid = (int) $this->request->both('tid') ?? 0;
-        $this->fid = (int) $this->request->both('fid') ?? 0;
-        $this->pid = (int) $this->request->both('pid') ?? 0;
-        $this->how = $this->request->both('how') ?? '';
+        $this->tid = (int) $this->request->both('tid');
+        $this->fid = (int) $this->request->both('fid');
+        $this->pid = (int) $this->request->both('pid');
+        $this->how = (string) $this->request->both('how');
+        $submit = (string) $this->request->post('submit');
+        $fileData = $this->request->file('Filedata');
+        $postdata = $this->request->post('postdata');
 
-        if ($this->request->post('postdata') !== null) {
+        if ($postdata !== null) {
             $this->nopost = false;
-            $this->postdata = (string) $this->request->post('postdata');
+            $this->postdata = (string) $postdata;
 
-            // Linkify stuff before sending it.
-            $this->postdata = str_replace("\t", '    ', $this->postdata);
             [$this->postdata, $codes] = $this->textFormatting->startCodeTags($this->postdata);
             $this->postdata = $this->textFormatting->linkify($this->postdata);
             $this->postdata = $this->textFormatting->finishCodeTagsBB($this->postdata, $codes);
-
-            // This is aliases [youtube] to [video] but it probably should not be here
-            $this->postdata = str_replace('youtube]', 'video]', $this->postdata);
         }
 
-        $fileData = $this->request->files('Filedata');
-        if ($fileData !== null) {
+        if ($fileData !== null && $this->user->getPerm('can_attach')) {
             $attachmentId = $this->upload($fileData);
-            $this->postdata .= "[attachment]{$attachmentId}[/attachment]";
+            $this->postdata .= "\n\n[attachment]{$attachmentId}[/attachment]";
         }
 
-        if (
-            $this->request->post('submit') === 'Preview'
-            || $this->request->post('submit') === 'Full Reply'
-        ) {
-            $this->showpostform();
-            $this->previewpost();
-        } elseif ($this->pid && is_numeric($this->pid)) {
-            $this->editpost();
-        } elseif (!$this->nopost) {
-            $this->submitpost();
-        } elseif (
-            $this->fid && is_numeric($this->fid)
-            || $this->tid && is_numeric($this->tid)
-            && $this->how === 'edit'
-        ) {
-            $this->showtopicform();
-        } elseif ($this->tid && is_numeric($this->tid)) {
-            $this->showpostform();
-        } else {
-            $this->page->location('?');
-        }
+        match (true) {
+            $submit === 'Preview' || $submit === 'Full Reply' => $this->previewPost(),
+            (bool) $this->pid => $this->editPost(),
+            !$this->nopost => $this->submitPost(),
+            $this->fid || $this->tid && $this->how === 'edit' => $this->showTopicForm(),
+            (bool) $this->tid => $this->showPostForm(),
+            default => $this->page->location('?'),
+        };
     }
 
-    private function upload(array $fileobj, $uid = false): string
+    /**
+     * 1) Compute a hash of the file to use as the filename on the server
+     * 2) If it's an image, keep the extension so we can show it. Otherwise remove it.
+     * 3) If the file has already been uploaded (based on hash) then don't replace it.
+     * @return int|string file ID from the files table, or string on failure
+     */
+    private function upload(array $fileobj): int|string
     {
-        if ($uid === false) {
-            $uid = $this->user->get('id');
-        }
-
-        if ($uid === false && $this->user->isGuest()) {
-            return 'must be logged in';
-        }
+        $uid = $this->user->get('id');
 
         $size = filesize($fileobj['tmp_name']);
         $hash = hash_file('sha512', $fileobj['tmp_name']);
-        $uploadpath = $this->domainDefinitions->getBoardPath() . '/Uploads/';
+        $uploadPath = $this->domainDefinitions->getBoardPath() . '/Uploads/';
 
         $ext = (string) pathinfo($fileobj['name'], PATHINFO_EXTENSION);
 
-        if (!in_array($ext, $this->config->getSetting('images') ?? [], true)) {
-            $ext = '';
-        }
+        $imageExtension = in_array($ext, $this->config->getSetting('images') ?? [], true)
+            ? ".{$ext}"
+            : null;
 
-        if ($ext !== '') {
-            $ext = '.' . $ext;
-        }
+        $file = $uploadPath . $hash . $imageExtension;
 
-        $file = $uploadpath . $hash . $ext;
         if (!is_file($file)) {
             move_uploaded_file($fileobj['tmp_name'], $file);
             $this->database->safeinsert(
@@ -156,23 +137,23 @@ final class Post
                     'uid' => $uid,
                 ],
             );
-            $id = $this->database->insertId();
-        } else {
-            $result = $this->database->safeselect(
-                ['id'],
-                'files',
-                'WHERE `hash`=?',
-                $hash,
-            );
-            $thisrow = $this->database->arow($result);
-            $id = array_pop($thisrow);
-            $this->database->disposeresult($result);
+            return $this->database->insertId();
         }
 
-        return (string) $id;
+        $result = $this->database->safeselect(
+            ['id'],
+            'files',
+            'WHERE `hash`=?',
+            $hash,
+        );
+        $fileRecord = $this->database->arow($result);
+        $id = $fileRecord['id'];
+        $this->database->disposeresult($result);
+
+        return $id;
     }
 
-    private function previewpost(): void
+    private function previewPost(): void
     {
         $post = $this->postdata;
         if (trim($post) !== '' && trim($post) !== '0') {
@@ -182,13 +163,13 @@ final class Post
         }
 
         if (!$this->request->isJSAccess() || $this->how === 'qreply') {
-            $this->showpostform();
+            $this->showPostForm();
         }
 
         $this->page->command('update', 'post-preview', $post);
     }
 
-    private function showtopicform(): void
+    private function showTopicForm(): void
     {
         $error = null;
         if ($this->request->isJSUpdate()) {
@@ -359,7 +340,7 @@ final class Post
         $this->page->command('SCRIPT', "document.querySelector('#pollchoices').style.display='none'");
     }
 
-    private function showpostform(): void
+    private function showPostForm(): void
     {
         $page = '';
         $tid = $this->tid;
@@ -526,7 +507,7 @@ final class Post
         return $this->canmod = $canmod;
     }
 
-    private function editpost(): void
+    private function editPost(): void
     {
         $pid = $this->pid;
         $tid = $this->tid;
@@ -642,7 +623,7 @@ final class Post
         }
 
         if ($error || $errorditingpost) {
-            $this->showpostform();
+            $this->showPostForm();
 
             return;
         }
@@ -665,7 +646,7 @@ final class Post
         $this->page->command('softurl');
     }
 
-    private function submitpost(): void
+    private function submitPost(): void
     {
         $this->session->act();
         $tid = $this->tid;
@@ -796,9 +777,9 @@ final class Post
             $this->page->command('error', $error);
             $this->page->command('enable', 'submitbutton');
             if ($this->how === 'newtopic') {
-                $this->showtopicform();
+                $this->showTopicForm();
             } else {
-                $this->showpostform();
+                $this->showPostForm();
             }
 
             return;
