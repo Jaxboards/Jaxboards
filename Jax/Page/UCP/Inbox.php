@@ -12,20 +12,23 @@ use Jax\Request;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
-use PHP_CodeSniffer\Generators\HTML;
 
+use function array_map;
 use function array_pop;
+use function ceil;
 use function htmlspecialchars;
+use function implode;
 use function is_array;
 use function is_numeric;
 use function json_encode;
+use function max;
 use function trim;
 
 use const PHP_EOL;
 
 final class Inbox
 {
-    const MESSAGES_PER_PAGE = 10;
+    public const MESSAGES_PER_PAGE = 10;
 
     public function __construct(
         private readonly Database $database,
@@ -332,10 +335,10 @@ final class Inbox
 
     private function fetchMessageCount(?string $view = null)
     {
-        $criteria = match($view) {
+        $criteria = match ($view) {
             'sent' => 'WHERE `from`=? AND !`del_sender`',
             'flagged' => 'WHERE `to`=? AND flag=1',
-            default => 'WHERE `to`=? AND !`del_recipient`'
+            default => 'WHERE `to`=? AND !`del_recipient`',
         };
         $result = $this->database->safeselect(
             'COUNT(`id`)',
@@ -345,6 +348,7 @@ final class Inbox
         );
         $unread = $this->database->arow($result);
         $this->database->disposeresult($result);
+
         return array_pop($unread);
     }
 
@@ -387,7 +391,7 @@ final class Inbox
             ['messages', 'members'],
             $this->user->get('id'),
             $pageNumber * self::MESSAGES_PER_PAGE,
-            self::MESSAGES_PER_PAGE
+            self::MESSAGES_PER_PAGE,
         );
 
         return $this->database->arows($result);
@@ -488,9 +492,6 @@ final class Inbox
         );
     }
 
-    /**
-     * @param 'poop'
-     */
     private function viewMessages(string $view = 'inbox'): ?string
     {
         $page = '';
@@ -499,15 +500,16 @@ final class Inbox
         $requestPage = max(1, (int) $this->request->both('page'));
         $numMessages = $this->fetchMessageCount($view, $requestPage);
 
-        $pages = "Pages: ";
+        $pages = 'Pages: ';
         $pageNumbers = $this->jax->pages(
             (int) ceil($numMessages / self::MESSAGES_PER_PAGE),
             $requestPage,
             10,
         );
 
-        $pages .= implode(' &middot; ', array_map(function($pageNumber) use ($requestPage, $view) {
+        $pages .= implode(' &middot; ', array_map(static function ($pageNumber) use ($requestPage, $view) {
             $active = $pageNumber === $requestPage ? ' class="active"' : '';
+
             return <<<HTML
                 <a href="?act=ucp&what=inbox&view={$view}&page={$pageNumber}" {$active}>{$pageNumber}</a>
                 HTML;
