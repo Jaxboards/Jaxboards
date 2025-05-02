@@ -84,9 +84,11 @@ final class UCP
             default => $this->showMain(),
         };
 
-        if ($page) {
-            $this->showucp($page);
+        if (!$page) {
+            return;
         }
+
+        $this->showucp($page);
     }
 
     private function getlocationforform(): string

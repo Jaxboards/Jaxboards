@@ -329,16 +329,16 @@ final class Inbox
 
     private function fetchMessages($view)
     {
-        $criteria = match($view) {
-            'sent' => <<<SQL
+        $criteria = match ($view) {
+            'sent' => <<<'SQL'
                 LEFT JOIN %t m ON a.`to`=m.`id`
                 WHERE a.`from`=? AND !a.`del_sender`
                 SQL,
-            'flagged' => <<<SQL
+            'flagged' => <<<'SQL'
                 LEFT JOIN %t m ON a.`from`=m.`id`
                 WHERE a.`to`=? AND a.`flag`=1
                 SQL,
-            default => <<<SQL
+            default => <<<'SQL'
                 LEFT JOIN %t m ON a.`from`=m.`id`
                 WHERE a.`to`=? AND !a.`del_recipient`
                 SQL,
@@ -365,6 +365,7 @@ final class Inbox
             ['messages', 'members'],
             $this->user->get('id'),
         );
+
         return $this->database->arows($result);
     }
 
