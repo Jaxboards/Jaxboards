@@ -1347,7 +1347,7 @@ final class Topic
 
     private function markread($tid): void
     {
-        $topicsread = $this->jax->parsereadmarkers($this->session->get('topicsread'));
+        $topicsread = $this->jax->parseReadMarkers($this->session->get('topicsread'));
         $topicsread[$tid] = time();
         $this->session->set('topicsread', json_encode($topicsread));
     }

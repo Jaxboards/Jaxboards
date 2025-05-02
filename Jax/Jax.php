@@ -38,15 +38,18 @@ final readonly class Jax
         return $html;
     }
 
-    public function parsereadmarkers(?string $readmarkers)
+    public function parseReadMarkers(?string $readMarkers)
     {
-        if ($readmarkers) {
-            return json_decode($readmarkers, true) ?? [];
+        if ($readMarkers) {
+            return json_decode($readMarkers, true) ?? [];
         }
 
         return [];
     }
 
+    /**
+     * @param array<int,array<string,bool>> $forumPerms
+     */
     public function serializeForumPerms(array $forumPerms): string
     {
         $packed = '';
@@ -87,10 +90,13 @@ final readonly class Jax
         return $parsedPerms;
     }
 
-    public function pages(int $numpages, int $active, int $tofill)
+    /**
+     * @return array<int>
+     */
+    public function pages(int $numpages, int $active, int $tofill): array
     {
         $tofill -= 2;
-        $pages[] = 1;
+        $pages = [1];
         if ($numpages === 1) {
             return $pages;
         }
@@ -114,7 +120,7 @@ final readonly class Jax
     }
 
     /**
-     * @SuppressWarnings("PHPMD.Superglobals")
+     * @SuppressWarnings("PHPMD.ErrorControlOperator")
      *
      * @param mixed $email
      * @param mixed $topic

@@ -59,16 +59,11 @@ final class Forum
             $this->pageNumber = $this->request->both('page') - 1;
         }
 
-        preg_match('@^([a-zA-Z_]+)(\d+)$@', (string) $this->request->get('act'), $act);
-        if ($this->request->both('markread') !== null) {
-            $this->markread($act[2]);
+        // Guaranteed to match here because of the router
+        preg_match('@(\d+)$@', (string) $this->request->get('act'), $act);
+        if ($this->request->both('markRead') !== null) {
+            $this->markRead((int) $act[1]);
             $this->page->location('?');
-
-            return;
-        }
-
-        if ($this->request->isJSUpdate()) {
-            $this->update();
 
             return;
         }
@@ -83,13 +78,13 @@ final class Forum
             return;
         }
 
-        $this->viewforum($act[2]);
+        $this->viewforum((int) $act[1]);
     }
 
-    private function viewforum(string $fid): void
+    private function viewforum(int $fid): void
     {
         // If no fid supplied, go to the index and halt execution.
-        if ($fid === '' || $fid === '0') {
+        if (!$fid) {
             $this->page->location('?');
 
             return;
@@ -413,7 +408,7 @@ final class Forum
         // were marked as unread, mark the whole forum as read
         // since we don't care about pages past the first one.
         if (!$this->pageNumber && !$unread) {
-            $this->markread($fid);
+            $this->markRead($fid);
         }
 
         if ($rows !== '' && $rows !== '0') {
@@ -499,21 +494,16 @@ final class Forum
         );
     }
 
-    private function update(): void
-    {
-        // Update the topic listing.
-    }
-
-    private function isTopicRead($topic, string $fid): bool
+    private function isTopicRead(array $topic, int $fid): bool
     {
         if (empty($this->topicsRead)) {
-            $this->topicsRead = $this->jax->parsereadmarkers($this->session->get('topicsread'));
+            $this->topicsRead = $this->jax->parseReadMarkers($this->session->get('topicsread'));
         }
 
         if (empty($this->forumsRead)) {
-            $fr = $this->jax->parsereadmarkers($this->session->get('forumsread'));
-            if (isset($fr[$fid])) {
-                $this->forumReadTime = $fr[$fid];
+            $forumsRead = $this->jax->parseReadMarkers($this->session->get('forumsread'));
+            if (isset($forumsRead[$fid])) {
+                $this->forumReadTime = $forumsRead[$fid];
             }
         }
 
@@ -531,7 +521,7 @@ final class Forum
     private function isForumRead($forum): bool
     {
         if (!$this->forumsRead) {
-            $this->forumsRead = $this->jax->parsereadmarkers($this->session->get('forumsread'));
+            $this->forumsRead = $this->jax->parseReadMarkers($this->session->get('forumsread'));
         }
 
         return $forum['lp_date'] <= (
@@ -541,9 +531,9 @@ final class Forum
         );
     }
 
-    private function markread(string $id): void
+    private function markRead(int $id): void
     {
-        $forumsread = $this->jax->parsereadmarkers($this->session->get('forumsread'));
+        $forumsread = $this->jax->parseReadMarkers($this->session->get('forumsread'));
         $forumsread[$id] = time();
         $this->session->set('forumsread', json_encode($forumsread));
     }

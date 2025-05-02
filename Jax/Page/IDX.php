@@ -600,7 +600,7 @@ final class IDX
     private function isForumRead($forum): bool
     {
         if (!$this->forumsread) {
-            $this->forumsread = $this->jax->parsereadmarkers($this->session->get('forumsread'));
+            $this->forumsread = $this->jax->parseReadMarkers($this->session->get('forumsread'));
         }
 
         if (!isset($this->forumsread[$forum['id']])) {
