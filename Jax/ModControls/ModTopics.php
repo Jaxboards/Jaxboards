@@ -12,10 +12,11 @@ use Jax\Session;
 use Jax\User;
 
 use function array_diff;
-use function array_flip;
 use function array_keys;
+use function array_map;
 use function array_pop;
 use function array_search;
+use function array_unique;
 use function explode;
 use function implode;
 use function in_array;
@@ -43,7 +44,7 @@ final class ModTopics
             'unlock' => $this->unlock(),
             'delete' => $this->deleteTopics(),
             'merge' => $this->mergeTopics(),
-            default => null
+            default => null,
         };
     }
 
@@ -80,7 +81,7 @@ final class ModTopics
             }
 
             $mods = array_map(
-                fn($modId) => (int) $modId,
+                static fn($modId) => (int) $modId,
                 explode(',', (string) $mods['mods']),
             );
             if (!in_array($this->user->get('id'), $mods, true)) {
@@ -344,8 +345,8 @@ final class ModTopics
             $this->getModTids(),
         );
         $fids = array_unique(array_map(
-            fn($topic) => (int) $topic['fid'],
-            $this->database->arows($result)
+            static fn($topic) => (int) $topic['fid'],
+            $this->database->arows($result),
         ));
 
         $this->database->safeupdate(
@@ -366,12 +367,12 @@ final class ModTopics
     }
 
     /**
-     * @return int[]
+     * @return array<int>
      */
     private function getModTids(): array
     {
         return array_map(
-            fn($tid) => (int) $tid,
+            static fn($tid) => (int) $tid,
             explode(',', (string) $this->session->getVar('modtids')),
         );
     }
