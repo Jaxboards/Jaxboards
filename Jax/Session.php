@@ -450,7 +450,7 @@ final class Session
             'forumsread' => '{}',
             'id' => $sid,
             'ip' => $this->ipAddress->asBinary(),
-            'is_bot' => $botName !== null,
+            'is_bot' => $botName !== null ? 1 : 0,
             'last_action' => $actionTime,
             'last_update' => $actionTime,
             'runonce' => '',
