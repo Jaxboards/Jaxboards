@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use DI\Container;
+
 use function base64_decode;
 
 final class UserTest
@@ -21,22 +23,22 @@ final class UserTest
         6 => ['upload' => true, 'reply' => true, 'start' => true, 'read' => true, 'view' => true, 'poll' => true],
     ];
 
-    public function __construct(private User $user)
+    public function __construct(private Container $container)
     {
         $this->encodedForumFlags = base64_decode('AAEAPgADABgABAAYAAUAGAAGAD8=', true);
     }
 
     public function getForumPermissionAsAdmin(): void
     {
-        $user = $this->user;
-
-        $user->userPerms = [
-            'can_attach' => true,
-            'can_poll' => true,
-            'can_post' => true,
-            'can_post_topics' => true,
-        ];
-        $user->userData = ['group_id' => 2];
+        $user = $this->getUser(
+            [
+                'can_attach' => true,
+                'can_poll' => true,
+                'can_post' => true,
+                'can_post_topics' => true,
+            ],
+            ['group_id' => 2],
+        );
 
         $expected = [
             'poll' => true,
@@ -52,10 +54,10 @@ final class UserTest
 
     public function getForumPermissionAsGuest(): void
     {
-        $user = $this->user;
-
-        $user->userPerms = ['can_post' => true];
-        $user->userData = ['group_id' => 3];
+        $user = $this->getUser(
+            ['can_post' => true],
+            ['group_id' => 3],
+        );
 
         $expected = $this->decoded[3];
         $result = $user->getForumPerms($this->encodedForumFlags);
@@ -64,10 +66,10 @@ final class UserTest
 
     public function getForumPermissionAsBanned(): void
     {
-        $user = $this->user;
-
-        $user->userPerms = ['can_post' => true];
-        $user->userData = ['group_id' => 4];
+        $user = $this->getUser(
+            ['can_post' => true],
+            ['group_id' => 4],
+        );
 
         $expected = $this->decoded[4];
         $result = $user->getForumPerms($this->encodedForumFlags);
@@ -77,5 +79,19 @@ final class UserTest
     private function assertDeepEquals(array $expected, array $result): void
     {
         $this->assertDeepEquals($expected, $result);
+    }
+
+    /**
+     * @param null|array<string,mixed> $userData
+     * @param null|array<string,mixed> $userPerms
+     */
+    private function getUser(array $userPerms, array $userData): User {
+        return new User(
+            $this->container->get(Database::class),
+            $this->container->get(Jax::class),
+            $this->container->get(IPAddress::class),
+            $userData,
+            $userPerms,
+        );
     }
 }

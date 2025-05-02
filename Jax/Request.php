@@ -52,6 +52,7 @@ final class Request
      * Access $_FILES.
      *
      * @SuppressWarnings("PHPMD.Superglobals")
+     * @return array<string,array<string,mixed>>
      */
     public function files(string $property): ?array
     {
@@ -72,7 +73,17 @@ final class Request
         $expires = false,
         $httponly = true,
     ): void {
-        setcookie($cookieName, $cookieValue ?? 'false', ['expires' => $expires, 'path' => null, 'domain' => null, 'secure' => true, 'httponly' => $httponly]);
+        setcookie(
+            $cookieName,
+            $cookieValue ?? 'false',
+            [
+                'domain' => null,
+                'expires' => $expires,
+                'httponly' => $httponly,
+                'path' => null,
+                'secure' => true,
+            ],
+        );
     }
 
     /**

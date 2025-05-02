@@ -15,6 +15,9 @@ use Jax\User;
 
 final class Comments
 {
+    /**
+     * @var array<string,null|float|int|string> $profile
+     */
     private ?array $profile = null;
 
     public function __construct(
@@ -91,6 +94,9 @@ final class Comments
         return $tabHTML;
     }
 
+    /**
+     * @return array<array<string,mixed>>
+     */
     private function fetchComments(): ?array
     {
         $result = $this->database->safespecial(

@@ -15,19 +15,16 @@ use const PASSWORD_DEFAULT;
 final class User
 {
     /**
-     * @var array<string,mixed>
+     * @param null|array<string,mixed> $userData
+     * @param null|array<string,mixed> $userPerms
      */
-    public ?array $userData = null;
-
-    /**
-     * @var array<string,mixed>
-     */
-    public ?array $userPerms = null;
-
     public function __construct(
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly IPAddress $ipAddress,
+        // Exposing these for testing
+        private ?array $userData = null,
+        public ?array $userPerms = null,
     ) {}
 
     public function get(string $property): null|int|string
@@ -66,10 +63,6 @@ final class User
     {
         if ($this->userData) {
             return $this->userData;
-        }
-
-        if (!$uid) {
-            return null;
         }
 
         $result = $this->database->safeselect(
@@ -131,18 +124,14 @@ final class User
         $user = $this->database->arow($result);
         $this->database->disposeresult($result);
 
-        if (!$user) {
-            return $this->userData = null;
+        if ($user) {
+            $user['birthday'] = date('n j') === $user['birthday'];
+
+            // Password parsing.
+            if ($pass && !$this->verifyPassword($user, $pass)) {
+                $user = null;
+            }
         }
-
-        $user['birthday'] = (date('n j') === $user['birthday'] ? 1 : 0);
-
-        // Password parsing.
-        if ($pass !== null && !$this->verifyPassword($user, $pass)) {
-            return $this->userData = null;
-        }
-
-        unset($user['pass']);
 
         return $this->userData = $user;
     }
@@ -154,6 +143,9 @@ final class User
         return $perms[$perm] ?? null;
     }
 
+    /**
+     * @return null|array<string,string>
+     */
     public function getPerms(): ?array
     {
         if ($this->userPerms !== null) {

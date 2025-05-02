@@ -94,10 +94,19 @@ final class Activity
             $activity['aff_name'],
         );
 
+        $date = $this->date->smallDate((int) $activity['date']);
         $text = match ($activity['type']) {
             'profile_comment' => "{$user}  commented on  {$otherguy}'s profile",
-            'new_post' => "{$user} posted in topic <a href='?act=vt{$activity['tid']}&findpost={$activity['pid']}'>{$activity['arg1']}</a>, " . $this->date->smallDate($activity['date']),
-            'new_topic' => "{$user} created new topic <a href='?act=vt{$activity['tid']}'>{$activity['arg1']}</a>, " . $this->date->smallDate($activity['date']),
+            'new_post' => <<<HTML
+                {$user} posted in topic
+                <a href="?act=vt{$activity['tid']}&findpost={$activity['pid']}">{$activity['arg1']}</a>
+                {$date}
+                HTML,
+            'new_topic' => <<<HTML
+                {$user} created new topic
+                <a href="?act=vt{$activity['tid']}">{$activity['arg1']}</a>
+                {$date}
+                HTML,
             'profile_name_change' => $this->template->meta(
                 'user-link',
                 $activity['uid'],
@@ -108,7 +117,7 @@ final class Activity
                 $activity['uid'],
                 $activity['group_id'],
                 $activity['arg2'],
-            ) . ', ' . $this->date->smallDate($activity['date']),
+            ) . ', ' . $date,
             'buddy_add' => $user . ' made friends with ' . $otherguy,
             default => '',
         };
@@ -124,11 +133,10 @@ final class Activity
         return match ($activity['type']) {
             'profile_comment' => [
                 'link' => $this->textFormatting->blockhtml('?act=vu' . $activity['aff_id']),
-                'text' => $activity['name'] . ' commented on '
-                . $activity['aff_name'] . "'s profile",
+                'text' => "{$activity['name']} commented on {$activity['aff_name']}'s profile",
             ],
             'new_post' => [
-                'link' => $this->textFormatting->blockhtml('?act=vt' . $activity['tid'] . '&findpost=' . $activity['pid']),
+                'link' => $this->textFormatting->blockhtml("?act=vt{$activity['tid']}&findpost={$activity['pid']}"),
                 'text' => $activity['name'] . ' posted in topic ' . $activity['arg1'],
             ],
             'new_topic' => [
@@ -146,7 +154,7 @@ final class Activity
         };
     }
 
-    private function renderActivitiesPage()
+    private function renderActivitiesPage(): string
     {
         $tabHTML = '';
 
