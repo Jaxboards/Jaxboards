@@ -315,8 +315,8 @@ final class ModPosts
         $this->database->safeupdate(
             'posts',
             $data,
-            Database::WHERE_ID_EQUALS,
-            $this->database->basicvalue($pids[0]),
+            Database::WHERE_ID_IN,
+            $pids,
         );
     }
 
