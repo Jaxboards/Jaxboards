@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use DI\Container;
 use Jax\Page\TextRules;
 
 use function array_keys;
@@ -39,7 +38,6 @@ final class TextFormatting
     private array $attachmentData;
 
     public function __construct(
-        private readonly Container $container,
         private readonly Config $config,
         private readonly BBCode $bbCode,
         private readonly Database $database,
@@ -133,7 +131,7 @@ final class TextFormatting
      */
     public function finishCodeTags(string $text, array $codes): string
     {
-        foreach (array_keys($codes[1]) as $index => $language) {
+        foreach ($codes[1] as $index => $language) {
             $code = $codes[2][$index];
 
             $code = $language === '=php' ? highlight_string($code, true) : preg_replace(
@@ -224,15 +222,13 @@ final class TextFormatting
 
         $inner = null;
 
-        if ($parts['host'] === $_SERVER['HTTP_HOST'] && $parts['query']) {
-            preg_match('@act=vt(\d+)@', $parts['query'], $topicMatch);
-            preg_match('@pid=(\d+)@', $parts['query'], $postMatch);
+        if ($parts['host'] === $_SERVER['HTTP_HOST']) {
+            $inner = match (true) {
+                (bool) preg_match('@pid=(\d+)@', $parts['query'], $postMatch) => "Post #{$postMatch[1]}",
+                (bool) preg_match('@act=vt(\d+)@', $parts['query'], $topicMatch) => "Topic #{$topicMatch[1]}",
+                default => null,
+            };
 
-            if ($topicMatch) {
-                $inner = $postMatch
-                    ? 'Post #' . $postMatch[1]
-                    : 'Topic #' . $topicMatch[1];
-            }
 
             $stringURL = "?{$parts['query']}";
         }

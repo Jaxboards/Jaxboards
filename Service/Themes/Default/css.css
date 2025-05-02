@@ -2112,6 +2112,7 @@ a.mgroup4 {
     padding: 10px;
     font-family: Consolas, Fixedsys, monospace;
     font-size: 1.2rem;
+    white-space: preserve;
 }
 /* stylelint-enable no-descending-specificity */
 
