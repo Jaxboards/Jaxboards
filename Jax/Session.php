@@ -433,6 +433,9 @@ final class Session
         return 'href="' . $match[1] . '"';
     }
 
+    /**
+     * @return array<string,mixed>
+     */
     private function createSession(): array
     {
         $botName = $this->getBotName();
@@ -460,7 +463,7 @@ final class Session
 
         $this->database->safeinsert('session', $sessData);
 
-        return $this->data = $sessData;
+        return $sessData;
     }
 
     private function getBotName(): ?string
