@@ -79,7 +79,7 @@ final class ModTopics
                     ['fid'],
                     'topics',
                     Database::WHERE_ID_IN,
-                    explode(',', (string) $this->session->getVar('modtids')),
+                    $this->getModTids(),
                 );
                 while ($topic = $this->database->arow($result)) {
                     $fids[$topic['fid']] = 1;
@@ -92,7 +92,7 @@ final class ModTopics
                         'fid' => $this->request->post('id'),
                     ],
                     Database::WHERE_ID_IN,
-                    explode(',', (string) $this->session->getVar('modtids')),
+                    $this->getModTids(),
                 );
                 $this->cancel();
                 $fids[] = $this->request->post('id');
@@ -111,7 +111,7 @@ final class ModTopics
                         'pinned' => 1,
                     ],
                     Database::WHERE_ID_IN,
-                    explode(',', (string) $this->session->getVar('modtids')),
+                    $this->getModTids(),
                 );
                 $this->page->command(
                     'alert',
@@ -128,7 +128,7 @@ final class ModTopics
                         'pinned' => 0,
                     ],
                     Database::WHERE_ID_IN,
-                    explode(',', (string) $this->session->getVar('modtids')),
+                    $this->getModTids(),
                 );
                 $this->page->command(
                     'alert',
@@ -145,7 +145,7 @@ final class ModTopics
                         'locked' => 1,
                     ],
                     Database::WHERE_ID_IN,
-                    explode(',', (string) $this->session->getVar('modtids')),
+                    $this->getModTids(),
                 );
                 $this->page->command(
                     'alert',
@@ -162,7 +162,7 @@ final class ModTopics
                         'locked' => 0,
                     ],
                     Database::WHERE_ID_IN,
-                    explode(',', (string) $this->session->getVar('modtids')),
+                    $this->getModTids(),
                 );
                 $this->page->command('alert', 'topics unlocked!');
                 $this->cancel();
@@ -228,7 +228,7 @@ final class ModTopics
             }
         }
 
-        $currentTids = explode(',', $this->session->getVar('modtids') ?? '');
+        $currentTids = $this->getModTids();
         $tids = [];
         foreach ($currentTids as $currentTid) {
             if (!is_numeric($currentTid)) {
@@ -274,7 +274,7 @@ final class ModTopics
             ['id', 'fid'],
             'topics',
             Database::WHERE_ID_IN,
-            explode(',', (string) $this->session->getVar('modtids')),
+            $this->getModTids(),
         );
         $delete = [];
         while ($topic = $this->database->arow($result)) {
@@ -301,24 +301,23 @@ final class ModTopics
                     'fid' => $trashcan,
                 ],
                 Database::WHERE_ID_IN,
-                explode(',', (string) $this->session->getVar('modtids')),
+                $this->getModTids(),
             );
-            $delete = implode(',', $delete);
             $forumData[$trashcan] = 1;
         } else {
-            $delete = $this->session->getVar('modtids');
+            $delete = $this->getModTids();
         }
 
         if (!empty($delete)) {
             $this->database->safedelete(
                 'posts',
                 'WHERE `tid` IN ?',
-                explode(',', (string) $delete),
+                $delete,
             );
             $this->database->safedelete(
                 'topics',
                 Database::WHERE_ID_IN,
-                explode(',', (string) $delete),
+                $delete,
             );
         }
 
@@ -334,7 +333,7 @@ final class ModTopics
     private function mergetopics(): void
     {
         $page = '';
-        $topicIds = explode(',', $this->session->getVar('modtids') ?? '');
+        $topicIds = $this->getModTids();
         if (
             is_numeric($this->request->post('ot'))
             && in_array($this->request->post('ot'), $topicIds)
@@ -347,7 +346,7 @@ final class ModTopics
                     'tid' => $this->request->post('ot'),
                 ],
                 'WHERE `tid` IN ?',
-                explode(',', (string) $this->session->getVar('modtids')),
+                $this->getModTids(),
             );
 
             // Make the first post in the topic have newtopic=1.
@@ -408,7 +407,7 @@ final class ModTopics
                 ['id', 'title'],
                 'topics',
                 Database::WHERE_ID_IN,
-                explode(',', (string) $this->session->getVar('modtids')),
+                $this->getModTids(),
             );
             $titles = [];
             while ($topic = $this->database->arow($result)) {
@@ -436,6 +435,17 @@ final class ModTopics
         $this->session->deleteVar('modtids');
         $this->sync();
         $this->page->command('modcontrols_clearbox');
+    }
+
+    /**
+     * @return list{int}
+     */
+    private function getModTids()
+    {
+        return array_map(
+            fn($tid) => (int) $tid,
+            explode(',', (string) $this->session->getVar('modtids')),
+        );
     }
 
     private function sync(): void
