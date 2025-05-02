@@ -327,6 +327,47 @@ final class Inbox
         }
     }
 
+    private function fetchMessages($view)
+    {
+        $criteria = match($view) {
+            'sent' => <<<SQL
+                LEFT JOIN %t m ON a.`to`=m.`id`
+                WHERE a.`from`=? AND !a.`del_sender`
+                SQL,
+            'flagged' => <<<SQL
+                LEFT JOIN %t m ON a.`from`=m.`id`
+                WHERE a.`to`=? AND a.`flag`=1
+                SQL,
+            default => <<<SQL
+                LEFT JOIN %t m ON a.`from`=m.`id`
+                WHERE a.`to`=? AND !a.`del_recipient`
+                SQL,
+        };
+
+        $result = $this->database->safespecial(
+            <<<"SQL"
+                SELECT
+                    a.`id` AS `id`,
+                    a.`to` AS `to`,
+                    a.`from` AS `from`,
+                    a.`title` AS `title`,
+                    a.`message` AS `message`,
+                    a.`read` AS `read`,
+                    UNIX_TIMESTAMP(a.`date`) AS `date`,
+                    a.`del_recipient` AS `del_recipient`,
+                    a.`del_sender` AS `del_sender`,
+                    a.`flag` AS `flag`,
+                    m.`display_name` AS `display_name`
+                FROM %t a
+                {$criteria}
+                ORDER BY a.`date` DESC
+                SQL,
+            ['messages', 'members'],
+            $this->user->get('id'),
+        );
+        return $this->database->arows($result);
+    }
+
     private function flag(): null
     {
         $this->page->command('softurl');
@@ -437,81 +478,9 @@ final class Inbox
         $page = '';
         $result = null;
         $hasmessages = false;
-        if ($view === 'sent') {
-            $result = $this->database->safespecial(
-                <<<'SQL'
-                    SELECT
-                        a.`id` AS `id`,
-                        a.`to` AS `to`,
-                        a.`from` AS `from`,
-                        a.`title` AS `title`,
-                        a.`message` AS `message`,
-                        a.`read` AS `read`,
-                        UNIX_TIMESTAMP(a.`date`) AS `date`,
-                        a.`del_recipient` AS `del_recipient`,
-                        a.`del_sender` AS `del_sender`,
-                        a.`flag` AS `flag`,
-                        m.`display_name` AS `display_name`
-                    FROM %t a
-                    LEFT JOIN %t m ON a.`to`=m.`id`
-                    WHERE a.`from`=? AND !a.`del_sender`
-                    ORDER BY a.`date` DESC
-                    SQL,
-                ['messages', 'members'],
-                $this->user->get('id'),
-            );
-        } elseif ($view === 'flagged') {
-            $result = $this->database->safespecial(
-                <<<'SQL'
-                    SELECT
-                        a.`id` AS `id`,
-                        a.`to` AS `to`,
-                        a.`from` AS `from`,
-                        a.`title` AS `title`,
-                        a.`message` AS `message`,
-                        a.`read` AS `read`,
-                        UNIX_TIMESTAMP(a.`date`) AS `date`,
-                        a.`del_recipient` AS `del_recipient`,
-                        a.`del_sender` AS `del_sender`,
-                        a.`flag` AS `flag`,
-                        m.`display_name` AS `display_name`
-                    FROM %t a
-                    LEFT JOIN %t m ON a.`from`=m.`id`
-                    WHERE a.`to`=? AND a.`flag`=1
-                    ORDER BY a.`date` DESC
-                    SQL
-                ,
-                ['messages', 'members'],
-                $this->user->get('id'),
-            );
-        } else {
-            $result = $this->database->safespecial(
-                <<<'SQL'
-                    SELECT
-                        a.`id` AS `id`,
-                        a.`to` AS `to`,
-                        a.`from` AS `from`,
-                        a.`title` AS `title`,
-                        a.`message` AS `message`,
-                        a.`read` AS `read`,
-                        UNIX_TIMESTAMP(a.`date`) AS `date`,
-                        a.`del_recipient` AS `del_recipient`,
-                        a.`del_sender` AS `del_sender`,
-                        a.`flag` AS `flag`,
-                        m.`display_name` AS `display_name`
-                    FROM %t a
-                    LEFT JOIN %t m ON a.`from`=m.`id`
-                    WHERE a.`to`=? AND !a.`del_recipient`
-                    ORDER BY a.`date` DESC
-                    SQL
-                ,
-                ['messages', 'members'],
-                $this->user->get('id'),
-            );
-        }
 
         $unread = 0;
-        while ($message = $this->database->arow($result)) {
+        foreach ($this->fetchMessages($view) as $message) {
             $hasmessages = 1;
             if (!$message['read']) {
                 ++$unread;
