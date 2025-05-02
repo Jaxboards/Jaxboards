@@ -1,5 +1,4 @@
 import { getHighestZIndex } from './el';
-import Browser from './browser';
 import { date, smalldate } from './date';
 
 // This file is just a dumping ground until I can find better homes for these

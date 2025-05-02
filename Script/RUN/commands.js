@@ -319,7 +319,7 @@ export default {
             document.querySelectorAll('#page img'),
         ).then(() => {
             const pos = getCoordinates(el);
-            scrollTo({ top: pos.y });
+            window.scrollTo({ top: pos.y });
         })
         return true;
     },
