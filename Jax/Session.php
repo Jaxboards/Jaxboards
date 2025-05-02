@@ -24,7 +24,7 @@ final class Session
     /**
      * @var array<mixed>
      */
-    private array $data = [];
+    private array $data = ['vars' => []];
 
     /**
      * @var array<string,string>
@@ -128,24 +128,9 @@ final class Session
         session_start();
     }
 
-    public function fetchSessionData(): void
-    {
-        $this->data = $this->getSess($this->getPHPSessionValue('sid') ?? null);
-        if (!isset($this->data['vars'])) {
-            $this->data['vars'] = serialize([]);
-        }
-
-        $this->data['vars'] = unserialize($this->data['vars']);
-        if ($this->data['vars']) {
-            return;
-        }
-
-        $this->data['vars'] = [];
-    }
-
     public function loginWithToken(): ?int
     {
-        $this->fetchSessionData();
+        $this->data = $this->fetchSessionData($this->getPHPSessionValue('sid') ?? null);
 
         if ($this->get('is_bot')) {
             return null;
@@ -174,86 +159,67 @@ final class Session
     }
 
     /**
-     * @SuppressWarnings("PHPMD.Superglobals")
-     *
-     * @param ?mixed $sid
+     * @param ?string|int $sid
      *
      * @return array<string,mixed>
      */
-    public function getSess($sid = null): array
+    public function fetchSessionData($sid = null): array
     {
         $session = null;
         $botName = $this->getBotName();
-
-        if ($botName) {
-            $sid = $botName;
-        }
+        $sid = $botName ?? $sid;
 
         if ($sid) {
-            $result = $botName === null
-                ? $this->database->safeselect(
-                    [
-                        'buddy_list_cache',
-                        'forumsread',
-                        'hide',
-                        'id',
-                        'ip',
-                        'is_bot',
-                        'location_verbose',
-                        'location',
-                        'runonce',
-                        'topicsread',
-                        'uid',
-                        'useragent',
-                        'users_online_cache',
-                        'vars',
-                        'UNIX_TIMESTAMP(`last_action`) AS `last_action`',
-                        'UNIX_TIMESTAMP(`last_update`) AS `last_update`',
-                        'UNIX_TIMESTAMP(`read_date`) AS `read_date`',
-                    ],
-                    'session',
-                    'WHERE `id`=? AND `ip`=?',
-                    $this->database->basicvalue($sid),
-                    $this->ipAddress->asBinary(),
-                )
-                    : $this->database->safeselect(
-                        [
-                            'buddy_list_cache',
-                            'forumsread',
-                            'hide',
-                            'id',
-                            'ip',
-                            'is_bot',
-                            'location_verbose',
-                            'location',
-                            'runonce',
-                            'topicsread',
-                            'uid',
-                            'useragent',
-                            'users_online_cache',
-                            'vars',
-                            'UNIX_TIMESTAMP(`last_action`) AS `last_action`',
-                            'UNIX_TIMESTAMP(`last_update`) AS `last_update`',
-                            'UNIX_TIMESTAMP(`read_date`) AS `read_date`',
-                        ],
-                        'session',
-                        Database::WHERE_ID_EQUALS,
-                        $this->database->basicvalue($sid),
-                    );
+            $params = $botName
+                ? [Database::WHERE_ID_EQUALS, $sid]
+                : ['WHERE `id`=? AND `ip`=?', $sid, $this->ipAddress->asBinary()];
+
+            $result = $this->database->safeselect(
+                [
+                    'buddy_list_cache',
+                    'forumsread',
+                    'hide',
+                    'id',
+                    'ip',
+                    'is_bot',
+                    'location_verbose',
+                    'location',
+                    'runonce',
+                    'topicsread',
+                    'uid',
+                    'useragent',
+                    'users_online_cache',
+                    'vars',
+                    'UNIX_TIMESTAMP(`last_action`) AS `last_action`',
+                    'UNIX_TIMESTAMP(`last_update`) AS `last_update`',
+                    'UNIX_TIMESTAMP(`read_date`) AS `read_date`',
+                ],
+                'session',
+                ...$params,
+            );
             $session = $this->database->arow($result);
             $this->database->disposeresult($result);
         }
-
 
         if ($session !== null) {
             $session['last_action'] = (int) $session['last_action'];
             $session['last_update'] = (int) $session['last_update'];
             $session['read_date'] = (int) $session['read_date'];
+            $session['vars'] = unserialize($session['vars']) ?? [];
 
             return $session;
         }
 
-        if ($botName === null) {
+        return $this->createSession();
+    }
+
+    private function createSession(): array
+    {
+        $botName = $this->getBotName();
+        $isBot = $botName === null;
+        $sid = $botName;
+
+        if (!$isBot) {
             $sid = base64_encode(openssl_random_pseudo_bytes(128));
             $this->setPHPSessionValue('sid', $sid);
         }
@@ -263,25 +229,18 @@ final class Session
             'forumsread' => '{}',
             'id' => $sid,
             'ip' => $this->ipAddress->asBinary(),
-            'is_bot' => $botName === null ? 0 : 1,
+            'is_bot' => $isBot,
             'last_action' => $actionTime,
             'last_update' => $actionTime,
             'runonce' => '',
             'topicsread' => '{}',
             'useragent' => $this->getUserAgent(),
+            'uid' => $this->user->get('id')
         ];
 
-        $uid = $this->user->get('id');
-        if ($uid) {
-            $sessData['uid'] = $uid;
-        }
+        $this->database->safeinsert('session', $sessData);
 
-        $this->database->safeinsert(
-            'session',
-            $sessData,
-        );
-
-        return $sessData;
+        return $this->data = $sessData;
     }
 
     public function get(string $field): mixed
@@ -317,7 +276,7 @@ final class Session
         $this->data[$field] = $value;
     }
 
-    public function addvar(string $varName, mixed $value): void
+    public function addVar(string $varName, mixed $value): void
     {
         if (
             isset($this->data['vars'][$varName])
@@ -507,7 +466,7 @@ final class Session
     private function getBotName(): ?string
     {
         foreach ($this->bots as $agentName => $friendlyName) {
-            if (str_contains(mb_strtolower((string) $this->getUserAgent()), mb_strtolower((string) $agentName))) {
+            if (str_contains(mb_strtolower((string) $this->getUserAgent()), mb_strtolower($agentName))) {
                 return $friendlyName;
             }
         }

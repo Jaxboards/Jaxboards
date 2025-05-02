@@ -443,10 +443,7 @@ final class IDX
         $numMembers = 0;
 
         foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $user) {
-            if (
-                $user['uid'] === null || $user['uid'] === 0
-                || (bool) $user['is_bot']
-            ) {
+            if (!$user['uid'] === null || $user['uid'] === 0) {
                 ++$guests;
 
                 continue;

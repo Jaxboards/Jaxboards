@@ -257,7 +257,6 @@ final class LogReg
 
         $this->session->set('hide', 1);
         $this->session->applyChanges();
-        $this->session->getSess(false);
         session_unset();
         session_destroy();
         $this->template->reset('USERBOX', $this->template->meta('userbox-logged-out'));
