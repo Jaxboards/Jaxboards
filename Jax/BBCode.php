@@ -6,13 +6,19 @@ namespace Jax;
 
 use function array_keys;
 use function array_values;
+use function in_array;
+use function is_array;
 use function is_string;
+use function pathinfo;
 use function preg_match;
 use function preg_replace;
 use function preg_replace_callback;
 use function preg_split;
 use function str_contains;
 use function trim;
+use function urlencode;
+
+use const PATHINFO_EXTENSION;
 
 final class BBCode
 {
