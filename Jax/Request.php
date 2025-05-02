@@ -137,4 +137,12 @@ final class Request
     {
         return (int) ($_SERVER['HTTP_X_JSACCESS'] ?? 0);
     }
+
+    /**
+     * @SuppressWarnings("PHPMD.Superglobals")
+     */
+    public function getUserAgent(): ?string
+    {
+        return $_SERVER['HTTP_USER_AGENT'] ?: null;
+    }
 }

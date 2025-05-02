@@ -115,7 +115,6 @@ final class Session
 
     public function __construct(
         private readonly Config $config,
-        private readonly Jax $jax,
         private readonly IPAddress $ipAddress,
         private readonly Database $database,
         private readonly Request $request,
@@ -457,8 +456,8 @@ final class Session
             'last_update' => $actionTime,
             'runonce' => '',
             'topicsread' => '{}',
-            'useragent' => $this->getUserAgent(),
             'uid' => $this->user->get('id'),
+            'useragent' => $this->request->getUserAgent(),
         ];
 
         $this->database->safeinsert('session', $sessData);
@@ -468,20 +467,13 @@ final class Session
 
     private function getBotName(): ?string
     {
+        $userAgent = mb_strtolower((string) $this->request->getUserAgent());
         foreach ($this->bots as $agentName => $friendlyName) {
-            if (str_contains(mb_strtolower((string) $this->getUserAgent()), mb_strtolower($agentName))) {
+            if (str_contains($userAgent, mb_strtolower($agentName))) {
                 return $friendlyName;
             }
         }
 
         return null;
-    }
-
-    /**
-     * @SuppressWarnings("PHPMD.Superglobals")
-     */
-    private function getUserAgent(): ?string
-    {
-        return $_SERVER['HTTP_USER_AGENT'] ?: null;
     }
 }
