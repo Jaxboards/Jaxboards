@@ -46,8 +46,7 @@ final class TextFormatting
         private readonly DomainDefinitions $domainDefinitions,
         public readonly TextRules $rules,
         private readonly User $user,
-    ) {
-    }
+    ) {}
 
     /**
      * Replaces all URLs with bbcode [url]s so that they become actual links.

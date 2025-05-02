@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax\Page;
 
 use DI\Container;
 use Jax\Config;
 use Jax\Database;
 
-class TextRules {
+final class TextRules
+{
     /**
      * @var array<string,string>
      */
