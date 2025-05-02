@@ -338,6 +338,7 @@ final class Inbox
         $criteria = match ($view) {
             'sent' => 'WHERE `from`=? AND !`del_sender`',
             'flagged' => 'WHERE `to`=? AND flag=1',
+            'read' => 'WHERE `to`=? AND !`read`',
             default => 'WHERE `to`=? AND !`del_recipient`',
         };
         $result = $this->database->safeselect(
@@ -413,11 +414,6 @@ final class Inbox
         return null;
     }
 
-    private function updateNumMessages(): void
-    {
-        $this->page->command('update', 'num-messages', $this->fetchMessageCount());
-    }
-
     private function viewMessage(string $messageid): ?string
     {
         if (
@@ -465,7 +461,7 @@ final class Inbox
                 Database::WHERE_ID_EQUALS,
                 $message['id'],
             );
-            $this->updateNumMessages();
+            $this->page->command('update', 'num-messages', $this->fetchMessageCount('unread'));
         }
 
         return $this->template->meta(
@@ -494,7 +490,7 @@ final class Inbox
 
     private function viewMessages(string $view = 'inbox'): ?string
     {
-        $page = '';
+        $html = '';
         $hasmessages = false;
 
         $requestPage = max(1, (int) $this->request->both('page'));
@@ -525,7 +521,7 @@ final class Inbox
             $dmessageOnchange = "RUN.stream.location('"
                 . '?act=ucp&what=inbox&flag=' . $message['id'] . "&tog='+" . '
                 (this.checked?1:0), 1)';
-            $page .= $this->template->meta(
+            $html .= $this->template->meta(
                 'inbox-messages-row',
                 $message['read'] ? 'read' : 'unread',
                 '<input class="check" type="checkbox" title="PM Checkbox" name="dmessage[]" '
@@ -549,10 +545,10 @@ final class Inbox
                     . 'sending some</a>, though!',
             };
 
-            $page .= '<tr><td colspan="5" class="error">' . $msg . '</td></tr>';
+            $html .= '<tr><td colspan="5" class="error">' . $msg . '</td></tr>';
         }
 
-        $page = $this->template->meta(
+        $html = $this->template->meta(
             'inbox-messages-listing',
             $this->jax->hiddenFormFields(
                 [
@@ -562,13 +558,13 @@ final class Inbox
             ),
             $pages,
             $view === 'sent' ? 'Recipient' : 'Sender',
-            $page,
+            $html,
         );
 
         if ($view === 'inbox') {
             $this->page->command('update', 'num-messages', $unread);
         }
 
-        return $page;
+        return $html;
     }
 }
