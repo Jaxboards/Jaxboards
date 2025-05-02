@@ -12,6 +12,7 @@ use Jax\Request;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
+use PHP_CodeSniffer\Generators\HTML;
 
 use function array_pop;
 use function htmlspecialchars;
@@ -24,6 +25,8 @@ use const PHP_EOL;
 
 final class Inbox
 {
+    const MESSAGES_PER_PAGE = 10;
+
     public function __construct(
         private readonly Database $database,
         private readonly Date $date,
@@ -38,7 +41,7 @@ final class Inbox
     public function render(): ?string
     {
         $messageId = $this->request->post('messageid');
-        $page = $this->request->both('page');
+        $view = $this->request->both('view');
         $view = $this->request->get('view');
         $flag = $this->request->both('flag');
         $dmessage = $this->request->post('dmessage');
@@ -48,7 +51,7 @@ final class Inbox
         }
 
         return match (true) {
-            is_numeric($messageId) => match ($page) {
+            is_numeric($messageId) => match ($view) {
                 'Delete' => $this->delete($messageId),
                 'Forward' => $this->compose($messageId, 'fwd'),
                 'Reply' => $this->compose($messageId),
@@ -56,7 +59,7 @@ final class Inbox
             is_numeric($view) => $this->viewMessage($view),
             is_numeric($flag) => $this->flag(),
 
-            default => match ($page) {
+            default => match ($view) {
                 'compose' => $this->compose(),
                 'sent' => $this->viewMessages('sent'),
                 'flagged' => $this->viewMessages('flagged'),
@@ -327,7 +330,25 @@ final class Inbox
         }
     }
 
-    private function fetchMessages($view)
+    private function fetchMessageCount(?string $view = null)
+    {
+        $criteria = match($view) {
+            'sent' => 'WHERE `from`=? AND !`del_sender`',
+            'flagged' => 'WHERE `to`=? AND flag=1',
+            default => 'WHERE `to`=? AND !`del_recipient`'
+        };
+        $result = $this->database->safeselect(
+            'COUNT(`id`)',
+            'messages',
+            $criteria,
+            $this->user->get('id'),
+        );
+        $unread = $this->database->arow($result);
+        $this->database->disposeresult($result);
+        return array_pop($unread);
+    }
+
+    private function fetchMessages(string $view, int $pageNumber = 0)
     {
         $criteria = match ($view) {
             'sent' => <<<'SQL'
@@ -361,9 +382,12 @@ final class Inbox
                 FROM %t a
                 {$criteria}
                 ORDER BY a.`date` DESC
+                LIMIT ?, ?
                 SQL,
             ['messages', 'members'],
             $this->user->get('id'),
+            $pageNumber * self::MESSAGES_PER_PAGE,
+            self::MESSAGES_PER_PAGE
         );
 
         return $this->database->arows($result);
@@ -387,17 +411,7 @@ final class Inbox
 
     private function updateNumMessages(): void
     {
-        $result = $this->database->safeselect(
-            'COUNT(`id`)',
-            'messages',
-            'WHERE `to`=? AND !`read`',
-            $this->user->get('id'),
-        );
-        $unread = $this->database->arow($result);
-        $this->database->disposeresult($result);
-
-        $unread = array_pop($unread);
-        $this->page->command('update', 'num-messages', $unread);
+        $this->page->command('update', 'num-messages', $this->fetchMessageCount());
     }
 
     private function viewMessage(string $messageid): ?string
@@ -474,14 +488,33 @@ final class Inbox
         );
     }
 
+    /**
+     * @param 'poop'
+     */
     private function viewMessages(string $view = 'inbox'): ?string
     {
         $page = '';
-        $result = null;
         $hasmessages = false;
 
+        $requestPage = max(1, (int) $this->request->both('page'));
+        $numMessages = $this->fetchMessageCount($view, $requestPage);
+
+        $pages = "Pages: ";
+        $pageNumbers = $this->jax->pages(
+            (int) ceil($numMessages / self::MESSAGES_PER_PAGE),
+            $requestPage,
+            10,
+        );
+
+        $pages .= implode(' &middot; ', array_map(function($pageNumber) use ($requestPage, $view) {
+            $active = $pageNumber === $requestPage ? ' class="active"' : '';
+            return <<<HTML
+                <a href="?act=ucp&what=inbox&view={$view}&page={$pageNumber}" {$active}>{$pageNumber}</a>
+                HTML;
+        }, $pageNumbers));
+
         $unread = 0;
-        foreach ($this->fetchMessages($view) as $message) {
+        foreach ($this->fetchMessages($view, $requestPage - 1) as $message) {
             $hasmessages = 1;
             if (!$message['read']) {
                 ++$unread;
@@ -510,7 +543,7 @@ final class Inbox
                 'sent' => 'No sent messages.',
                 'flagged' => 'No flagged messages.',
                 default => 'No messages. You could always try '
-                    . '<a href="?act=ucp&what=inbox&page=compose">'
+                    . '<a href="?act=ucp&what=inbox&view=compose">'
                     . 'sending some</a>, though!',
             };
 
@@ -525,6 +558,7 @@ final class Inbox
                     'what' => 'inbox',
                 ],
             ),
+            $pages,
             $view === 'sent' ? 'Recipient' : 'Sender',
             $page,
         );

@@ -192,7 +192,7 @@ final class UserProfile
                     >IM</a>
             </div>
             <div class="contact pm">
-                <a href="?act=ucp&what=inbox&page=compose&mid={$profile['id']}">PM</a>
+                <a href="?act=ucp&what=inbox&view=compose&mid={$profile['id']}">PM</a>
             </div>
             HTML;
 

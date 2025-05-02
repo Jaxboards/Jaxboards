@@ -1934,8 +1934,7 @@ textarea {
     background: url('icons/newmessage.png') no-repeat 20px center #fff;
 }
 
-.pages-top .active,
-.pages-bottom .active {
+.pages .active {
     color: #f55;
     text-decoration: underline;
 }

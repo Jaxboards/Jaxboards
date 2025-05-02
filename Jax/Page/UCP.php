@@ -67,7 +67,6 @@ final class UCP
         if (
             $this->request->isJSUpdate()
             && !$this->request->hasPostData()
-            && $this->what !== 'inbox'
         ) {
             return;
         }
