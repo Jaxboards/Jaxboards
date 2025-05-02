@@ -537,7 +537,7 @@ final class Post
             $post = $this->database->arow($result);
             $this->database->disposeresult($result);
 
-            $error = match(true) {
+            $error = match (true) {
                 !$post => 'The post you are trying to edit does not exist.',
                 !$this->canEdit($post) => "You don't have permission to edit that post!",
                 default => null,

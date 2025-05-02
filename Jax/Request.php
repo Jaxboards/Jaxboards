@@ -125,9 +125,6 @@ final class Request
         return $this->jsAccess() === 3;
     }
 
-    /**
-     *
-     */
     public function isJSDirectLink(): bool
     {
         return $this->jsAccess() === 3;
