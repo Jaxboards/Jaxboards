@@ -45,7 +45,6 @@ final class Inbox
     {
         $messageId = $this->request->post('messageid');
         $view = $this->request->both('view');
-        $view = $this->request->get('view');
         $flag = $this->request->both('flag');
         $dmessage = $this->request->post('dmessage');
 
@@ -242,7 +241,7 @@ final class Inbox
             $this->jax->hiddenFormFields(
                 [
                     'act' => 'ucp',
-                    'page' => 'compose',
+                    'view' => 'compose',
                     'submit' => '1',
                     'what' => 'inbox',
                 ],
