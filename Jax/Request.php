@@ -52,6 +52,7 @@ final class Request
      * Access $_FILES.
      *
      * @SuppressWarnings("PHPMD.Superglobals")
+     *
      * @return array<string,array<string,mixed>>
      */
     public function files(string $property): ?array

@@ -85,7 +85,8 @@ final class UserTest
      * @param null|array<string,mixed> $userData
      * @param null|array<string,mixed> $userPerms
      */
-    private function getUser(array $userPerms, array $userData): User {
+    private function getUser(array $userPerms, array $userData): User
+    {
         return new User(
             $this->container->get(Database::class),
             $this->container->get(Jax::class),

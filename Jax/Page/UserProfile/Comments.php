@@ -16,7 +16,7 @@ use Jax\User;
 final class Comments
 {
     /**
-     * @var array<string,null|float|int|string> $profile
+     * @var array<string,null|float|int|string>
      */
     private ?array $profile = null;
 
