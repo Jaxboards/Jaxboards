@@ -159,7 +159,7 @@ final class Session
     }
 
     /**
-     * @param ?string|int $sid
+     * @param int|?string $sid
      *
      * @return array<string,mixed>
      */
@@ -211,36 +211,6 @@ final class Session
         }
 
         return $this->createSession();
-    }
-
-    private function createSession(): array
-    {
-        $botName = $this->getBotName();
-        $isBot = $botName === null;
-        $sid = $botName;
-
-        if (!$isBot) {
-            $sid = base64_encode(openssl_random_pseudo_bytes(128));
-            $this->setPHPSessionValue('sid', $sid);
-        }
-
-        $actionTime = $this->database->datetime();
-        $sessData = [
-            'forumsread' => '{}',
-            'id' => $sid,
-            'ip' => $this->ipAddress->asBinary(),
-            'is_bot' => $isBot,
-            'last_action' => $actionTime,
-            'last_update' => $actionTime,
-            'runonce' => '',
-            'topicsread' => '{}',
-            'useragent' => $this->getUserAgent(),
-            'uid' => $this->user->get('id')
-        ];
-
-        $this->database->safeinsert('session', $sessData);
-
-        return $this->data = $sessData;
     }
 
     public function get(string $field): mixed
@@ -461,6 +431,36 @@ final class Session
         }
 
         return 'href="' . $match[1] . '"';
+    }
+
+    private function createSession(): array
+    {
+        $botName = $this->getBotName();
+        $isBot = $botName === null;
+        $sid = $botName;
+
+        if (!$isBot) {
+            $sid = base64_encode(openssl_random_pseudo_bytes(128));
+            $this->setPHPSessionValue('sid', $sid);
+        }
+
+        $actionTime = $this->database->datetime();
+        $sessData = [
+            'forumsread' => '{}',
+            'id' => $sid,
+            'ip' => $this->ipAddress->asBinary(),
+            'is_bot' => $isBot,
+            'last_action' => $actionTime,
+            'last_update' => $actionTime,
+            'runonce' => '',
+            'topicsread' => '{}',
+            'useragent' => $this->getUserAgent(),
+            'uid' => $this->user->get('id'),
+        ];
+
+        $this->database->safeinsert('session', $sessData);
+
+        return $this->data = $sessData;
     }
 
     private function getBotName(): ?string
