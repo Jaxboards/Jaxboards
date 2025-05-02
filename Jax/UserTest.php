@@ -23,8 +23,10 @@ final class UserTest
         6 => ['upload' => true, 'reply' => true, 'start' => true, 'read' => true, 'view' => true, 'poll' => true],
     ];
 
-    public function __construct(private Assert $assert, private Container $container)
-    {
+    public function __construct(
+        private Assert $assert,
+        private Container $container,
+    ) {
         $this->encodedForumFlags = base64_decode('AAEAPgADABgABAAYAAUAGAAGAD8=', true);
     }
 

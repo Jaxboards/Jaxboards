@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use function array_diff;
 use function array_keys;
-use function assert;
 use function base64_decode;
-use function json_encode;
 
 final class JaxTest
 {
@@ -27,9 +24,8 @@ final class JaxTest
 
     public function __construct(
         private Assert $assert,
-        private Jax $jax
-    )
-    {
+        private Jax $jax,
+    ) {
         $this->encodedForumFlags = base64_decode('AAEAPgADABgABAAYAAUAGAAGAD8=', true);
     }
 
@@ -49,19 +45,20 @@ final class JaxTest
         $this->assert->equals($result, $this->encodedForumFlags);
     }
 
-    public function pagesWorks() {
+    public function pagesWorks(): void
+    {
         $result = $this->jax->pages(20, 13, 10);
 
         $this->assert->deepEquals($result, [1, 9, 10, 11, 12, 13, 14, 15, 16, 20]);
-
     }
 
     public function sanity(): void
     {
         $this->assert->equals(
-            $this->encodedForumFlags, $this->jax->serializeForumPerms(
-                $this->jax->parseForumPerms($this->encodedForumFlags)
-            )
+            $this->encodedForumFlags,
+            $this->jax->serializeForumPerms(
+                $this->jax->parseForumPerms($this->encodedForumFlags),
+            ),
         );
     }
 }

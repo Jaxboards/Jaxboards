@@ -93,6 +93,7 @@ final readonly class Jax
     /**
      * Given the total pages, active page, and number of links you want
      * Returns an array that always has the first and last page, with the active page in the middle.
+     *
      * @return array<int>
      */
     public function pages(int $numpages, int $active, int $tofill): array
