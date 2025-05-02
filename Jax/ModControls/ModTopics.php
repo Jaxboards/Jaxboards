@@ -34,155 +34,17 @@ final class ModTopics
 
     public function doTopics(string $do): void
     {
-        switch ($do) {
-            case 'move':
-                $this->page->command('modcontrols_move', 0);
-
-                break;
-
-            case 'moveto':
-                $result = $this->database->safeselect(
-                    [
-                        'cat_id',
-                        'id',
-                        'lp_tid',
-                        'lp_topic',
-                        'lp_uid',
-                        'mods',
-                        'nocount',
-                        '`order`',
-                        'orderby',
-                        'path',
-                        'perms',
-                        'posts',
-                        'redirect',
-                        'redirects',
-                        'show_ledby',
-                        'show_sub',
-                        'subtitle',
-                        'title',
-                        'topics',
-                        'trashcan',
-                        'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
-                    ],
-                    'forums',
-                    Database::WHERE_ID_EQUALS,
-                    $this->database->basicvalue($this->request->post('id')),
-                );
-                $rowfound = $this->database->arow($result);
-                $this->database->disposeresult($result);
-                if (!is_numeric($this->request->post('id')) || !$rowfound) {
-                    return;
-                }
-
-                $result = $this->database->safeselect(
-                    ['fid'],
-                    'topics',
-                    Database::WHERE_ID_IN,
-                    $this->getModTids(),
-                );
-                while ($topic = $this->database->arow($result)) {
-                    $fids[$topic['fid']] = 1;
-                }
-
-                $fids = array_flip($fids);
-                $this->database->safeupdate(
-                    'topics',
-                    [
-                        'fid' => $this->request->post('id'),
-                    ],
-                    Database::WHERE_ID_IN,
-                    $this->getModTids(),
-                );
-                $this->cancel();
-                $fids[] = $this->request->post('id');
-                foreach ($fids as $forumId) {
-                    $this->database->fixForumLastPost($forumId);
-                }
-
-                $this->page->location('?act=vf' . $this->request->post('id'));
-
-                break;
-
-            case 'pin':
-                $this->database->safeupdate(
-                    'topics',
-                    [
-                        'pinned' => 1,
-                    ],
-                    Database::WHERE_ID_IN,
-                    $this->getModTids(),
-                );
-                $this->page->command(
-                    'alert',
-                    'topics pinned!',
-                );
-                $this->cancel();
-
-                break;
-
-            case 'unpin':
-                $this->database->safeupdate(
-                    'topics',
-                    [
-                        'pinned' => 0,
-                    ],
-                    Database::WHERE_ID_IN,
-                    $this->getModTids(),
-                );
-                $this->page->command(
-                    'alert',
-                    'topics unpinned!',
-                );
-                $this->cancel();
-
-                break;
-
-            case 'lock':
-                $this->database->safeupdate(
-                    'topics',
-                    [
-                        'locked' => 1,
-                    ],
-                    Database::WHERE_ID_IN,
-                    $this->getModTids(),
-                );
-                $this->page->command(
-                    'alert',
-                    'topics locked!',
-                );
-                $this->cancel();
-
-                break;
-
-            case 'unlock':
-                $this->database->safeupdate(
-                    'topics',
-                    [
-                        'locked' => 0,
-                    ],
-                    Database::WHERE_ID_IN,
-                    $this->getModTids(),
-                );
-                $this->page->command('alert', 'topics unlocked!');
-                $this->cancel();
-
-                break;
-
-            case 'delete':
-                $this->deletetopics();
-                $this->cancel();
-
-                break;
-
-            case 'merge':
-                $this->mergetopics();
-
-                break;
-
-            default:
-                break;
-        }
+        match ($do) {
+            'move' => $this->page->command('modcontrols_move', 0),
+            'moveto' => $this->moveTo(),
+            'pin' => $this->pin(),
+            'unpin' => $this->unpin(),
+            'lock' => $this->lock(),
+            'unlock' => $this->unlock(),
+            'delete' => $this->deleteTopics(),
+            'merge' => $this->mergeTopics(),
+            default => null
+        };
     }
 
     public function addTopic(int $tid): void
@@ -217,8 +79,11 @@ final class ModTopics
                 return;
             }
 
-            $mods = explode(',', (string) $mods['mods']);
-            if (!in_array($this->user->get('id'), $mods)) {
+            $mods = array_map(
+                fn($modId) => (int) $modId,
+                explode(',', (string) $mods['mods']),
+            );
+            if (!in_array($this->user->get('id'), $mods, true)) {
                 $this->page->command(
                     'error',
                     "You don't have permission to be moderating in this forum",
@@ -249,8 +114,15 @@ final class ModTopics
         $this->sync();
     }
 
+    private function cancel(): void
+    {
+        $this->session->deleteVar('modtids');
+        $this->sync();
+        $this->page->command('modcontrols_clearbox');
+    }
+
     // TODO: Handle deletion of topics already in Trash
-    private function deletetopics(): void
+    private function deleteTopics(): void
     {
         if (!$this->session->getVar('modtids')) {
             $this->page->command('error', 'No topics to delete');
@@ -291,7 +163,7 @@ final class ModTopics
                 continue;
             }
 
-            $delete[] = $topic['id'];
+            $delete[] = (int) $topic['id'];
         }
 
         if ($trashcan) {
@@ -308,7 +180,7 @@ final class ModTopics
             $delete = $this->getModTids();
         }
 
-        if (!empty($delete)) {
+        if ($delete !== []) {
             $this->database->safedelete(
                 'posts',
                 'WHERE `tid` IN ?',
@@ -325,12 +197,11 @@ final class ModTopics
             $this->database->fixForumLastPost($forumId);
         }
 
-        $this->session->deleteVar('modtids');
-        $this->page->command('modcontrols_clearbox');
+        $this->cancel();
         $this->page->command('alert', 'topics deleted!');
     }
 
-    private function mergetopics(): void
+    private function mergeTopics(): void
     {
         $page = '';
         $topicIds = $this->getModTids();
@@ -430,22 +301,144 @@ final class ModTopics
         $this->page->append('PAGE', $page);
     }
 
-    private function cancel(): void
+    private function moveTo(): void
     {
-        $this->session->deleteVar('modtids');
-        $this->sync();
-        $this->page->command('modcontrols_clearbox');
+        $result = $this->database->safeselect(
+            [
+                'cat_id',
+                'id',
+                'lp_tid',
+                'lp_topic',
+                'lp_uid',
+                'mods',
+                'nocount',
+                '`order`',
+                'orderby',
+                'path',
+                'perms',
+                'posts',
+                'redirect',
+                'redirects',
+                'show_ledby',
+                'show_sub',
+                'subtitle',
+                'title',
+                'topics',
+                'trashcan',
+                'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
+            ],
+            'forums',
+            Database::WHERE_ID_EQUALS,
+            $this->database->basicvalue($this->request->post('id')),
+        );
+        $rowfound = $this->database->arow($result);
+        $this->database->disposeresult($result);
+        if (!is_numeric($this->request->post('id')) || !$rowfound) {
+            return;
+        }
+
+        $result = $this->database->safeselect(
+            ['fid'],
+            'topics',
+            Database::WHERE_ID_IN,
+            $this->getModTids(),
+        );
+        $fids = array_unique(array_map(
+            fn($topic) => (int) $topic['fid'],
+            $this->database->arows($result)
+        ));
+
+        $this->database->safeupdate(
+            'topics',
+            [
+                'fid' => $this->request->post('id'),
+            ],
+            Database::WHERE_ID_IN,
+            $this->getModTids(),
+        );
+        $this->cancel();
+        $fids[] = $this->request->post('id');
+        foreach ($fids as $forumId) {
+            $this->database->fixForumLastPost($forumId);
+        }
+
+        $this->page->location('?act=vf' . $this->request->post('id'));
     }
 
     /**
-     * @return list{int}
+     * @return int[]
      */
-    private function getModTids()
+    private function getModTids(): array
     {
         return array_map(
             fn($tid) => (int) $tid,
             explode(',', (string) $this->session->getVar('modtids')),
         );
+    }
+
+    private function lock(): void
+    {
+        $this->database->safeupdate(
+            'topics',
+            [
+                'locked' => 1,
+            ],
+            Database::WHERE_ID_IN,
+            $this->getModTids(),
+        );
+        $this->page->command(
+            'alert',
+            'topics locked!',
+        );
+        $this->cancel();
+    }
+
+    private function pin(): void
+    {
+        $this->database->safeupdate(
+            'topics',
+            [
+                'pinned' => 1,
+            ],
+            Database::WHERE_ID_IN,
+            $this->getModTids(),
+        );
+        $this->page->command(
+            'alert',
+            'topics pinned!',
+        );
+        $this->cancel();
+    }
+
+    private function unlock(): void
+    {
+        $this->database->safeupdate(
+            'topics',
+            [
+                'locked' => 0,
+            ],
+            Database::WHERE_ID_IN,
+            $this->getModTids(),
+        );
+        $this->page->command('alert', 'topics unlocked!');
+        $this->cancel();
+    }
+
+    private function unpin(): void
+    {
+        $this->database->safeupdate(
+            'topics',
+            [
+                'pinned' => 0,
+            ],
+            Database::WHERE_ID_IN,
+            $this->getModTids(),
+        );
+        $this->page->command(
+            'alert',
+            'topics unpinned!',
+        );
+        $this->cancel();
     }
 
     private function sync(): void
