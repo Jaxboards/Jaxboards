@@ -82,16 +82,18 @@ final class Topic
             return;
         }
 
+        $edit = $this->request->both('edit');
+        $findPost = $this->request->both('findpost');
+        $listRating = $this->request->both('listrating');
+        $ratePost = $this->request->both('ratepost');
+        $this->pageNumber = max((int) $this->request->both('page') - 1, 0);
+
+
         $this->getTopicData($this->tid);
         if (!$this->topicdata || !$this->topicdata['fperms']['read']) {
             $this->page->location('?');
 
             return;
-        }
-
-        $this->pageNumber = (int) $this->request->both('page') - 1;
-        if ($this->pageNumber <= 0) {
-            $this->pageNumber = 0;
         }
 
         if (
@@ -112,8 +114,9 @@ final class Topic
             return;
         }
 
-        if ($this->request->both('ratepost') !== null) {
-            $this->ratepost($this->request->both('ratepost'), $this->request->both('niblet'));
+
+        if ($ratePost !== null) {
+            $this->ratepost($ratePost, $this->request->both('niblet'));
 
             return;
         }
@@ -124,8 +127,8 @@ final class Topic
             return;
         }
 
-        if ($this->request->both('findpost') !== null) {
-            $this->findpost($this->request->both('findpost'));
+        if ($findPost !== null) {
+            $this->findpost((int) $findPost);
 
             return;
         }
@@ -136,8 +139,8 @@ final class Topic
             return;
         }
 
-        if ($this->request->both('edit') !== null) {
-            $this->qeditpost($this->request->both('edit'));
+        if ($edit !== null) {
+            $this->qeditpost($edit);
 
             return;
         }
@@ -154,10 +157,8 @@ final class Topic
             return;
         }
 
-        if (
-            $this->request->both('listrating') !== null
-        ) {
-            $this->listrating($this->request->both('listrating'));
+        if ($listRating !== null) {
+            $this->listrating($listRating);
 
             return;
         }
@@ -775,9 +776,11 @@ final class Topic
                 $postbuttons,
                 // ^10
                 $this->date->autoDate($post['date']),
-                '<a href="?act=vt' . $this->tid . '&amp;findpost=' . $post['pid']
-                . '" onclick="prompt(\'Link to this post:\',this.href);return false">'
-                . $this->template->meta('topic-perma-button') . '</a>',
+                <<<HTML
+                    <a href="?act=vt{$this->tid}&amp;findpost={$post['pid']}"
+                        onclick="prompt(\'Link to this post:\',this.href);return false"
+                        >{$this->template->meta('topic-perma-button')}</a>
+                    HTML,
                 $postt,
                 isset($post['sig']) && $post['sig']
                     ? $this->textFormatting->theWorks($post['sig'])
@@ -1297,51 +1300,43 @@ final class Topic
         );
     }
 
-    private function findpost(array|string $pid): void
+    private function findpost(int $pid): void
     {
-        $couldntfindit = false;
-        if (!is_numeric($pid)) {
-            $couldntfindit = true;
-        } else {
-            $result = $this->database->safespecial(
-                <<<'MySQL'
-                    SELECT
-                        `id`
+        $postPosition = null;
+        $result = $this->database->safespecial(
+            <<<'MySQL'
+                SELECT
+                    `id`
+                FROM %t
+                WHERE tid=(
+                    SELECT tid
                     FROM %t
-                    WHERE tid=(
-                        SELECT tid
-                        FROM %t
-                        WHERE `id` = ?
-                    )
-                    ORDER BY `id` ASC
+                    WHERE `id` = ?
+                )
+                ORDER BY `id` ASC
 
-                    MySQL,
-                ['posts', 'posts'],
-                $pid,
-            );
-            $num = 1;
-            while ($f = $this->database->arow($result)) {
-                if ($f['id'] === $pid) {
-                    $pid = $f['id'];
-                    $couldntfindit = false;
-
-                    break;
-                }
-
-                ++$num;
+                MySQL,
+            ['posts', 'posts'],
+            $pid,
+        );
+        foreach($this->database->arows($result) as $index => $post) {
+            if ($post['id'] === $pid) {
+                $pid = $post['id'];
+                $postPosition = (int) $index;
+                break;
             }
         }
 
         $this->page->command('softurl');
-        if ($couldntfindit) {
+        if ($postPosition === null) {
             $this->page->command('alert', "that post doesn't exist");
 
             return;
         }
 
+        $pageNumber = (int) ceil($postPosition / $this->numperpage);
         $this->page->location(
-            '?act=vt' . $this->tid . '&page='
-            . ceil($num / $this->numperpage) . '&pid=' . $pid . '#pid_' . $pid,
+            "?act=vt{$this->tid}&page={$pageNumber}&pid={$pid}#pid_{$pid}",
         );
     }
 
