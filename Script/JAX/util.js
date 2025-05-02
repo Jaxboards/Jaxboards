@@ -98,19 +98,6 @@ export function toggleOverlay(show) {
     }
 }
 
-export function scrollTo(
-    pos,
-    el = Browser.chrome ? document.body : document.documentElement,
-) {
-    const screenrel =
-        parseFloat(document.body.clientHeight) -
-        parseFloat(document.documentElement.clientHeight);
-    const top = parseFloat(el.scrollTop);
-    const position = screenrel < pos ? screenrel : pos;
-    const diff = position - top;
-    el.scrollTop += diff;
-}
-
 /**
  * Run a callback function either when the DOM is loaded and ready,
  * or immediately if the document is already loaded.

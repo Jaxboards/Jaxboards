@@ -403,7 +403,7 @@ final class Topic
             }
 
             if ($this->request->both('page') !== null) {
-                $this->page->command('scrollToPost', $this->firstPostID, 1);
+                $this->page->command('scrollToPost', $this->firstPostID);
 
                 return;
             }
@@ -778,8 +778,8 @@ final class Topic
                 // ^10
                 $this->date->autoDate($post['date']),
                 <<<HTML
-                    <a href="?act=vt{$this->tid}&amp;findpost={$post['pid']}"
-                        onclick="prompt(\\'Link to this post:\\',this.href);return false"
+                    <a href="?act=vt{$this->tid}&amp;findpost={$post['pid']}&pid={$post['pid']}"
+                        onclick="prompt('Link to this post:',this.href);return false"
                         >{$this->template->meta('topic-perma-button')}</a>
                     HTML,
                 $postt,

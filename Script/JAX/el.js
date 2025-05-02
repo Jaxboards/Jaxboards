@@ -5,24 +5,16 @@ export function getComputedStyle(a, b) {
     return false;
 }
 
-export function getCoordinates(a) {
-    let x = 0;
-    let y = 0;
-    const h = parseInt(a.offsetHeight, 10) || 0;
-    const w = parseInt(a.offsetWidth, 10) || 0;
-    let element = a;
-    do {
-        x += parseInt(element.offsetLeft, 10) || 0;
-        y += parseInt(element.offsetTop, 10) || 0;
-        element = element.offsetParent;
-    } while (element);
+export function getCoordinates(el) {
+    const { x, y, height, width } = el.getBoundingClientRect();
+
     return {
         x,
         y,
-        yh: y + h,
-        xw: x + w,
-        w,
-        h,
+        yh: y + height,
+        xw: x + width,
+        w: width,
+        h: height,
     };
 }
 

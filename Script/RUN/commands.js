@@ -1,6 +1,6 @@
 /* global RUN, globalsettings */
 /* eslint-disable no-alert */
-import { toggleOverlay, scrollTo, onImagesLoaded } from '../JAX/util';
+import { toggleOverlay, onImagesLoaded } from '../JAX/util';
 import Animation from '../JAX/animation';
 import { addIdleClock } from '../JAX/date';
 import { getCoordinates, getComputedStyle } from '../JAX/el';
@@ -310,20 +310,17 @@ export default {
         });
     },
 
-    scrollToPost([postId, wait]) {
+    scrollToPost([postId]) {
         const el = document.getElementById(`pid_${postId}`);
-        let pos;
         if (!el) {
             return false;
         }
         onImagesLoaded(
-            document.getElementById('page').getElementsByTagName('img'),
-            () => {
-                pos = getCoordinates(el);
-                scrollTo(pos.y);
-            },
-            wait ? 10 : 1000,
-        );
+            document.querySelectorAll('#page img'),
+        ).then(() => {
+            const pos = getCoordinates(el);
+            scrollTo({ top: pos.y });
+        })
         return true;
     },
     updateqreply(a) {
