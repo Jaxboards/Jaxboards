@@ -434,10 +434,6 @@ final class Inbox
 
     private function viewMessages(string $view = 'inbox'): ?string
     {
-        if ($this->request->isJSUpdate()) {
-            return null;
-        }
-
         $page = '';
         $result = null;
         $hasmessages = false;
@@ -540,15 +536,13 @@ final class Inbox
         }
 
         if (!$hasmessages) {
-            if ($view === 'sent') {
-                $msg = 'No sent messages.';
-            } elseif ($view === 'flagged') {
-                $msg = 'No flagged messages.';
-            } else {
-                $msg = 'No messages. You could always try '
+            $msg = match($view) {
+                'sent' => 'No sent messages.',
+                'flagged' => 'No flagged messages.',
+                default => 'No messages. You could always try '
                     . '<a href="?act=ucp&what=inbox&page=compose">'
-                    . 'sending some</a>, though!';
-            }
+                    . 'sending some</a>, though!',
+            };
 
             $page .= '<tr><td colspan="5" class="error">' . $msg . '</td></tr>';
         }

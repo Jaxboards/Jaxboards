@@ -438,10 +438,9 @@ final class Session
     private function createSession(): array
     {
         $botName = $this->getBotName();
-        $isBot = $botName === null;
         $sid = $botName;
 
-        if (!$isBot) {
+        if (!$sid) {
             $sid = base64_encode(openssl_random_pseudo_bytes(128));
             $this->setPHPSessionValue('sid', $sid);
         }
@@ -451,14 +450,16 @@ final class Session
             'forumsread' => '{}',
             'id' => $sid,
             'ip' => $this->ipAddress->asBinary(),
-            'is_bot' => $isBot,
+            'is_bot' => $botName !== null,
             'last_action' => $actionTime,
             'last_update' => $actionTime,
             'runonce' => '',
             'topicsread' => '{}',
-            'uid' => $this->user->get('id'),
             'useragent' => $this->request->getUserAgent(),
         ];
+
+        $uid = $this->user->get('id');
+        if ($uid) $sessData['uid'] = $uid;
 
         $this->database->safeinsert('session', $sessData);
 
