@@ -21,7 +21,6 @@ use function filesize;
 use function hash_file;
 use function in_array;
 use function is_file;
-use function is_numeric;
 use function json_encode;
 use function mb_strlen;
 use function mb_substr;
@@ -38,11 +37,9 @@ final class Post
 {
     private bool $canmod = false;
 
-    private string $postdata = '';
+    private ?string $postdata = '';
 
     private string $postpreview = '';
-
-    private bool $nopost = true;
 
     private int $tid;
 
@@ -78,7 +75,6 @@ final class Post
         $postdata = $this->request->post('postdata');
 
         if ($postdata !== null) {
-            $this->nopost = false;
             $this->postdata = (string) $postdata;
 
             [$this->postdata, $codes] = $this->textFormatting->startCodeTags($this->postdata);
@@ -94,7 +90,7 @@ final class Post
         match (true) {
             $submit === 'Preview' || $submit === 'Full Reply' => $this->previewPost(),
             (bool) $this->pid => $this->editPost(),
-            !$this->nopost => $this->submitPost(),
+            $this->postdata !== null => $this->submitPost(),
             $this->fid || $this->tid && $this->how === 'edit' => $this->showTopicForm(),
             (bool) $this->tid => $this->showPostForm(),
             default => $this->page->location('?'),
@@ -513,12 +509,12 @@ final class Post
         $tid = $this->tid;
         $error = null;
         $errorditingpost = false;
-        if (!$pid || !is_numeric($pid)) {
+        if (!$pid) {
             $error = 'Invalid post to edit.';
         }
 
         if ($this->postdata !== '' && $this->postdata !== '0') {
-            if (!$this->nopost && trim($this->postdata) === '') {
+            if ($this->postdata !== null && trim($this->postdata) === '') {
                 $error = "You didn't supply a post!";
             } elseif (mb_strlen($this->postdata) > 65535) {
                 $error = 'Post must not exceed 65,535 bytes.';
@@ -551,7 +547,7 @@ final class Post
         }
 
         if ($tid && $error === null) {
-            if (!is_numeric($tid) || !$tid) {
+            if (!$tid) {
                 $error = 'Invalid post to edit.';
             } else {
                 $result = $this->database->safeselect(
@@ -658,14 +654,14 @@ final class Post
         $uid = $this->user->get('id');
         $error = null;
 
-        if (!$this->nopost && trim($postdata) === '') {
+        if ($this->postdata === null && trim($postdata) === '') {
             $error = "You didn't supply a post!";
         } elseif (mb_strlen($postdata) > 50000) {
             $error = 'Post must not exceed 50,000 characters.';
         }
 
         if ($error === null && $this->how === 'newtopic') {
-            if (!$fid || !is_numeric($fid)) {
+            if (!$fid) {
                 $error = 'No forum specified exists.';
             } elseif (
                 trim($this->request->post('ttitle') ?? '') === ''
@@ -785,7 +781,7 @@ final class Post
             return;
         }
 
-        if ($tid && is_numeric($tid)) {
+        if ($tid) {
             $result = $this->database->safespecial(
                 <<<'SQL'
                     SELECT
