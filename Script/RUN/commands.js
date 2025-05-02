@@ -315,12 +315,10 @@ export default {
         if (!el) {
             return false;
         }
-        onImagesLoaded(
-            document.querySelectorAll('#page img'),
-        ).then(() => {
+        onImagesLoaded(document.querySelectorAll('#page img')).then(() => {
             const pos = getCoordinates(el);
             window.scrollTo({ top: pos.y });
-        })
+        });
         return true;
     },
     updateqreply(a) {
