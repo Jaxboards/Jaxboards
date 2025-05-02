@@ -73,15 +73,15 @@ final class Forum
                 $this->page->location('?');
             }
 
-            $this->getreplysummary($this->request->both('replies'));
+            $this->getReplySummary($this->request->both('replies'));
 
             return;
         }
 
-        $this->viewforum((int) $act[1]);
+        $this->viewForum((int) $act[1]);
     }
 
-    private function viewforum(int $fid): void
+    private function viewForum(int $fid): void
     {
         // If no fid supplied, go to the index and halt execution.
         if (!$fid) {
@@ -461,7 +461,7 @@ final class Forum
         }
     }
 
-    private function getreplysummary(string $tid): void
+    private function getReplySummary(string $tid): void
     {
         $result = $this->database->safespecial(
             <<<'SQL'
