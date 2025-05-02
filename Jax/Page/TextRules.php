@@ -67,7 +67,7 @@ final class TextRules
             return [];
         }
 
-        $rules = $this->container->get("emoticons\\{$emotePack}\\rules")->get();
+        $rules = $this->container->get("emoticons\\{$emotePack}\\Rules")->get();
 
         $emotes = [];
         foreach ($rules as $emote => $path) {
