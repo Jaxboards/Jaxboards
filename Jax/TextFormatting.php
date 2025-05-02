@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use DI\Container;
+use Jax\Page\TextRules;
 
 use function array_keys;
 use function array_map;
@@ -37,107 +38,15 @@ final class TextFormatting
      */
     private array $attachmentData;
 
-    /**
-     * @var array<string,string>
-     */
-    private array $badwords = [];
-
-    /**
-     * Map of emojis to their URL replacements.
-     * This is a merge of both emote pack and custom emotes.
-     *
-     * @var array<string,string>
-     */
-    private array $emotes = [];
-
-    private ?string $emotePack = null;
-
-    /**
-     * Emotes from the emote pack.
-     *
-     * @var array<string, string>
-     */
-    private array $emotePackRules = [];
-
     public function __construct(
         private readonly Container $container,
         private readonly Config $config,
         private readonly BBCode $bbCode,
         private readonly Database $database,
         private readonly DomainDefinitions $domainDefinitions,
+        public readonly TextRules $rules,
         private readonly User $user,
     ) {
-        // Preload custom rules and emojis
-        $this->getEmotePackRules();
-        $this->getCustomRules();
-    }
-
-    public function getCustomRules(): void
-    {
-        $result = $this->database->safeselect(
-            [
-                'id',
-                'type',
-                'needle',
-                'replacement',
-                'enabled',
-            ],
-            'textrules',
-            '',
-        );
-        while ($rule = $this->database->arow($result)) {
-            if ($rule['type'] === 'emote') {
-                $this->emotes[$rule['needle']] = $rule['replacement'];
-
-                continue;
-            }
-
-            if ($rule['type'] !== 'badword') {
-                continue;
-            }
-
-            $this->badwords[$rule['needle']] = $rule['replacement'];
-        }
-    }
-
-    /**
-     * Get emote pack + custom rules.
-     *
-     * @return array<string,string> map with keys of emojis to their URL replacements
-     */
-    public function getEmoteRules(): array
-    {
-        return $this->emotes;
-    }
-
-    /**
-     * Get emote pack rules.
-     *
-     * @return array<string,string> map with keys of emojis to their URL replacements
-     */
-    public function getEmotePackRules(?string $emotePack = null): array
-    {
-        $emotePack = $emotePack ?: $this->config->getSetting('emotepack');
-
-        if ($this->emotePack === $emotePack && $this->emotePackRules) {
-            return $this->emotePackRules;
-        }
-
-        // Load emoticon pack.
-        if (!$emotePack) {
-            return [];
-        }
-
-        $rules = $this->container->get("emoticons\\{$emotePack}\\rules")->get();
-
-        $emotes = [];
-        foreach ($rules as $emote => $path) {
-            $emotes[$emote] = "emoticons/{$emotePack}/{$path}";
-        }
-
-        $this->emotePack = $emotePack;
-
-        return $this->emotePackRules = $this->emotes = $emotes;
     }
 
     /**
@@ -161,7 +70,7 @@ final class TextFormatting
     public function emotes(string $text): string
     {
         $emoticonLimit = 15;
-        $emotes = $this->emotes;
+        $emotes = $this->rules->getEmotes();
 
         if (!$emotes) {
             return $text;
@@ -190,9 +99,11 @@ final class TextFormatting
             return $text;
         }
 
+        $badwords = $this->rules->getBadwords();
+
         return str_ireplace(
-            array_keys($this->badwords),
-            array_values($this->badwords),
+            array_keys($badwords),
+            array_values($badwords),
             $text,
         );
     }
@@ -336,7 +247,7 @@ final class TextFormatting
     {
         [, $space, $emoteText] = $match;
 
-        return "{$space}<img src='{$this->emotes[$emoteText]}' alt='{$this->blockhtml($emoteText)}' />";
+        return "{$space}<img src='{$this->rules->getEmotes()[$emoteText]}' alt='{$this->blockhtml($emoteText)}' />";
     }
 
     private function attachments(string $text): null|array|string

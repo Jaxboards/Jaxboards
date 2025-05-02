@@ -323,7 +323,7 @@ final class ModControls
     {
         $page = '';
 
-        $ipAddress = $this->request->both('ip') ?? '';
+        $ipAddress = (string) $this->request->both('ip');
         if (!filter_var($ipAddress, FILTER_VALIDATE_IP)) {
             $ipAddress = '';
         }

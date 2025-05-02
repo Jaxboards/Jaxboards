@@ -46,13 +46,13 @@ final class Post
 
     private bool $nopost = true;
 
-    private $tid;
+    private int $tid;
 
-    private $fid;
+    private int $fid;
 
-    private $pid;
+    private int $pid;
 
-    private $how;
+    private string $how;
 
     public function __construct(
         private readonly Config $config,
@@ -71,9 +71,9 @@ final class Post
 
     public function render(): void
     {
-        $this->tid = $this->request->both('tid') ?? 0;
-        $this->fid = $this->request->both('fid') ?? 0;
-        $this->pid = $this->request->both('pid') ?? 0;
+        $this->tid = (int) $this->request->both('tid') ?? 0;
+        $this->fid = (int) $this->request->both('fid') ?? 0;
+        $this->pid = (int) $this->request->both('pid') ?? 0;
         $this->how = $this->request->both('how') ?? '';
 
         if ($this->request->post('postdata') !== null) {
@@ -485,7 +485,7 @@ final class Post
         $this->page->command('attachfiles');
     }
 
-    private function canedit($post): bool
+    private function canEdit($post): bool
     {
         if (
             $post['auth_id']
@@ -496,10 +496,10 @@ final class Post
             return true;
         }
 
-        return $this->canmoderate($post['tid']);
+        return $this->canModerate($post['tid']);
     }
 
-    private function canmoderate($tid): bool
+    private function canModerate($tid): bool
     {
         if ($this->canmod) {
             return $this->canmod;
@@ -561,7 +561,7 @@ final class Post
 
             if (!$post) {
                 $error = 'The post you are trying to edit does not exist.';
-            } elseif (!$this->canedit($post)) {
+            } elseif (!$this->canEdit($post)) {
                 $error = "You don't have permission to edit that post!";
             } elseif ($this->postdata === null) {
                 $errorditingpost = true;

@@ -85,7 +85,10 @@ final readonly class Rainbow
                 clearInterval(window.rainbow);
                 window.rainbow = null;
             } else {
-                window.rainbow=setInterval(() => document.documentElement.style.filter = 'hue-rotate(' + (++i) + 'deg)', 1000/60);
+                window.rainbow=setInterval(
+                    () => document.documentElement.style.filter = 'hue-rotate(' + (++i) + 'deg)',
+                    1000/60
+                );
             }
         })()");
         $this->page->command('playsound', 'always', $this->domainDefinitions->getSoundsUrl() . '/always.mp3');

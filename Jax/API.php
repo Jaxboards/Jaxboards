@@ -58,7 +58,7 @@ final readonly class API
 
     private function emotes(): void
     {
-        $rules = $this->textFormatting->getEmoteRules();
+        $rules = $this->textFormatting->rules->getEmotes();
         foreach ($rules as $k => $v) {
             $rules[$k] = '<img src="' . $v . '" alt="' . $this->textFormatting->blockhtml($k) . '" />';
         }
