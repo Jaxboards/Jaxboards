@@ -33,8 +33,8 @@ final class UserTest
         $user->userPerms = [
             'can_attach' => true,
             'can_poll' => true,
-            'can_post_topics' => true,
             'can_post' => true,
+            'can_post_topics' => true,
         ];
         $user->userData = ['group_id' => 2];
 
@@ -47,6 +47,7 @@ final class UserTest
             'view' => true,
         ];
         $result = $user->getForumPerms($this->encodedForumFlags);
+        $this->assertDeepEquals($expected, $result);
     }
 
     public function getForumPermissionAsGuest(): void

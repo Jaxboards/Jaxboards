@@ -14,8 +14,14 @@ use const PASSWORD_DEFAULT;
 
 final class User
 {
+    /**
+     * @var array<string,mixed>
+     */
     public ?array $userData = null;
 
+    /**
+     * @var array<string,mixed>
+     */
     public ?array $userPerms = null;
 
     public function __construct(
@@ -53,7 +59,10 @@ final class User
         );
     }
 
-    public function getUser($uid = null, $pass = false): ?array
+    /**
+     * @return array<string,mixed>
+     */
+    public function getUser(?int $uid = null, ?string $pass = null): ?array
     {
         if ($this->userData) {
             return $this->userData;
@@ -129,35 +138,38 @@ final class User
         $user['birthday'] = (date('n j') === $user['birthday'] ? 1 : 0);
 
         // Password parsing.
-        if ($pass !== false) {
-            $verifiedPassword = password_verify((string) $pass, (string) $user['pass']);
-
-            if (!$verifiedPassword) {
-                return $this->userData = null;
-            }
-
-            $needsRehash = password_needs_rehash(
-                $user['pass'],
-                PASSWORD_DEFAULT,
-            );
-
-            if ($needsRehash) {
-                $newHash = password_hash((string) $pass, PASSWORD_DEFAULT);
-                // Add the new hash.
-                $this->database->safeupdate(
-                    'members',
-                    [
-                        'pass' => $newHash,
-                    ],
-                    'WHERE `id` = ?',
-                    $user['id'],
-                );
-            }
-
-            unset($user['pass']);
+        if ($pass !== null && !$this->verifyPassword($user, $pass)) {
+            return $this->userData = null;
         }
 
+        unset($user['pass']);
+
         return $this->userData = $user;
+    }
+
+    /**
+     * @param array<string,mixed> $user
+     * @return bool if password is correct
+     */
+    private function verifyPassword(array $user, string $pass): bool {
+        if (!password_verify($pass, (string) $user['pass'])) {
+            return false;
+        }
+
+        if (password_needs_rehash($user['pass'], PASSWORD_DEFAULT)) {
+            $newHash = password_hash($pass, PASSWORD_DEFAULT);
+            // Add the new hash.
+            $this->database->safeupdate(
+                'members',
+                [
+                    'pass' => $newHash,
+                ],
+                'WHERE `id` = ?',
+                $user['id'],
+            );
+        }
+
+        return true;
     }
 
     public function getPerm(string $perm): mixed
@@ -167,22 +179,17 @@ final class User
         return $perms[$perm] ?? null;
     }
 
-    public function getPerms($groupId = null): ?array
+    public function getPerms(): ?array
     {
-
-        if ($groupId === null) {
-            if ($this->userPerms !== null) {
-                return $this->userPerms;
-            }
-
-            if ($this->userData) {
-                $groupId = $this->userData['group_id'];
-            }
-
-            if ($this->isBanned()) {
-                $groupId = 4;
-            }
+        if ($this->userPerms !== null) {
+            return $this->userPerms;
         }
+
+        $groupId = match(true) {
+            $this->isBanned() => 4,
+            $this->userData !== null => $this->userData['group_id'],
+            default => null,
+        };
 
         $result = $this->database->safeselect(
             [

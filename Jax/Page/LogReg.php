@@ -176,9 +176,9 @@ final class LogReg
         $this->login($name, $pass1);
     }
 
-    private function login($u = false, $p = false): void
+    private function login(?string $username = null, ?string $password = null): void
     {
-        if ($u && $p) {
+        if ($username && $password) {
             if ($this->session->get('is_bot')) {
                 return;
             }
@@ -187,12 +187,11 @@ final class LogReg
                 ['id'],
                 'members',
                 'WHERE `name`=?',
-                $this->database->basicvalue($u),
+                $this->database->basicvalue($username),
             );
-            $user = $this->database->arow($result);
-            $u = $user['id'] ?? 0;
+            $member = $this->database->arow($result);
 
-            $user = $this->user->getUser($u, $p);
+            $user = $this->user->getUser($member['id'] ?? null, $password);
 
             if ($user) {
                 if ($this->request->post('popup') !== null) {
@@ -217,10 +216,9 @@ final class LogReg
                     time() + 3600 * 24 * 30,
                 );
                 $this->session->clean($user['id']);
-                $this->session->set('user', $u);
+                $this->session->set('user', $username);
                 $this->session->set('uid', $user['id']);
                 $this->session->act();
-                $perms = $this->user->getPerms($user['group_id']);
                 if ($this->registering) {
                     $this->page->command('location', '/');
                 } elseif ($this->request->isJSAccess()) {
