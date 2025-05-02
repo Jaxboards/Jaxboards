@@ -459,7 +459,9 @@ final class Session
         ];
 
         $uid = $this->user->get('id');
-        if ($uid) $sessData['uid'] = $uid;
+        if ($uid) {
+            $sessData['uid'] = $uid;
+        }
 
         $this->database->safeinsert('session', $sessData);
 

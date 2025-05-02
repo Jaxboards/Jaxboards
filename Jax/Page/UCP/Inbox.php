@@ -536,7 +536,7 @@ final class Inbox
         }
 
         if (!$hasmessages) {
-            $msg = match($view) {
+            $msg = match ($view) {
                 'sent' => 'No sent messages.',
                 'flagged' => 'No flagged messages.',
                 default => 'No messages. You could always try '
