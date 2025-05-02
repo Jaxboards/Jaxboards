@@ -94,15 +94,7 @@ final class ModTopics
             }
         }
 
-        $currentTids = $this->getModTids();
-        $tids = [];
-        foreach ($currentTids as $currentTid) {
-            if (!is_numeric($currentTid)) {
-                continue;
-            }
-
-            $tids[] = (int) $currentTid;
-        }
+        $tids = $this->getModTids();
 
         if (in_array($tid, $tids, true)) {
             $tids = array_diff($tids, [$tid]);
@@ -305,29 +297,7 @@ final class ModTopics
     private function moveTo(): void
     {
         $result = $this->database->safeselect(
-            [
-                'cat_id',
-                'id',
-                'lp_tid',
-                'lp_topic',
-                'lp_uid',
-                'mods',
-                'nocount',
-                '`order`',
-                'orderby',
-                'path',
-                'perms',
-                'posts',
-                'redirect',
-                'redirects',
-                'show_ledby',
-                'show_sub',
-                'subtitle',
-                'title',
-                'topics',
-                'trashcan',
-                'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
-            ],
+            ['id'],
             'forums',
             Database::WHERE_ID_EQUALS,
             $this->database->basicvalue($this->request->post('id')),
@@ -371,10 +341,11 @@ final class ModTopics
      */
     private function getModTids(): array
     {
-        return array_map(
+        $modtids = $this->session->getVar('modtids');
+        return $modtids ? array_map(
             static fn($tid) => (int) $tid,
             explode(',', (string) $this->session->getVar('modtids')),
-        );
+        ) : [];
     }
 
     private function lock(): void
