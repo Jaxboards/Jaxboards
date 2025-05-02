@@ -336,8 +336,9 @@ final class Inbox
     {
         $criteria = match ($view) {
             'sent' => 'WHERE `from`=? AND !`del_sender`',
-            'flagged' => 'WHERE `to`=? AND flag=1',
-            'read' => 'WHERE `to`=? AND !`read`',
+            'flagged' => 'WHERE `to`=? AND `flag`=1',
+            'unread' => 'WHERE `to`=? AND !`read`',
+            'read' => 'WHERE `to`=? AND `read`=1',
             default => 'WHERE `to`=? AND !`del_recipient`',
         };
         $result = $this->database->safeselect(

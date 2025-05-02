@@ -126,7 +126,7 @@ final readonly class Jax
         $boardurl = $this->domainDefinitions->getBoardURL();
         $boardlink = "<a href='{$boardurl}'>{$boardname}</a>";
 
-        return mail(
+        return @mail(
             $email,
             $boardname . ' - ' . $topic,
             str_replace(
