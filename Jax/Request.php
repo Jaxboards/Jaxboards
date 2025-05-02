@@ -58,6 +58,7 @@ final class Request
     public function file(string $fieldName): ?array
     {
         $file = $_FILES[$fieldName] ?? null;
+
         return $file && !$file['error'] ? $file : null;
     }
 

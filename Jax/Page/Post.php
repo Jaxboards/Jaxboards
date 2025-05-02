@@ -15,7 +15,6 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
-use function array_pop;
 use function count;
 use function explode;
 use function filesize;
@@ -30,7 +29,6 @@ use function move_uploaded_file;
 use function pathinfo;
 use function preg_replace;
 use function preg_split;
-use function str_replace;
 use function trim;
 
 use const PATHINFO_EXTENSION;
@@ -107,6 +105,7 @@ final class Post
      * 1) Compute a hash of the file to use as the filename on the server
      * 2) If it's an image, keep the extension so we can show it. Otherwise remove it.
      * 3) If the file has already been uploaded (based on hash) then don't replace it.
+     *
      * @return int|string file ID from the files table, or string on failure
      */
     private function upload(array $fileobj): int|string
@@ -137,6 +136,7 @@ final class Post
                     'uid' => $uid,
                 ],
             );
+
             return $this->database->insertId();
         }
 
