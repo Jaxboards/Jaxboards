@@ -434,7 +434,7 @@ final class Inbox
 
     private function viewMessages(string $view = 'inbox'): ?string
     {
-        if ($this->request->isJSUpdate() && !$this->request->hasPostData()) {
+        if ($this->request->isJSUpdate()) {
             return null;
         }
 

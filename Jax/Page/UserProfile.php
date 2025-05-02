@@ -69,7 +69,7 @@ final class UserProfile
 
 
         // Nothing is live updating on the profile page
-        if ($this->request->isJSUpdate() && !$this->request->hasPostData()) {
+        if ($this->request->isJSUpdate()) {
             return;
         }
 

@@ -179,7 +179,7 @@ final class Search
     private function dosearch(): void
     {
 
-        if ($this->request->isJSUpdate() && !$this->request->hasPostData()) {
+        if ($this->request->isJSUpdate()) {
             return;
         }
 

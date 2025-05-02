@@ -1677,6 +1677,7 @@ textarea {
 
 #qreply textarea {
     border-style: none none solid;
+    min-width: 400px;
 }
 
 /* New Post Form */

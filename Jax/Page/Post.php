@@ -37,7 +37,7 @@ final class Post
 {
     private bool $canmod = false;
 
-    private ?string $postdata = '';
+    private ?string $postData = null;
 
     private string $postpreview = '';
 
@@ -72,25 +72,30 @@ final class Post
         $this->how = (string) $this->request->both('how');
         $submit = (string) $this->request->post('submit');
         $fileData = $this->request->file('Filedata');
-        $postdata = $this->request->post('postdata');
+        $postData = $this->request->post('postdata');
 
-        if ($postdata !== null) {
-            $this->postdata = (string) $postdata;
+        // Nothing updates on this page
+        if ($this->request->isJSUpdate()) {
+            return;
+        }
 
-            [$this->postdata, $codes] = $this->textFormatting->startCodeTags($this->postdata);
-            $this->postdata = $this->textFormatting->linkify($this->postdata);
-            $this->postdata = $this->textFormatting->finishCodeTagsBB($this->postdata, $codes);
+        if ($postData !== null) {
+            $this->postData = (string) $postData;
+
+            [$this->postData, $codes] = $this->textFormatting->startCodeTags($this->postData);
+            $this->postData = $this->textFormatting->linkify($this->postData);
+            $this->postData = $this->textFormatting->finishCodeTagsBB($this->postData, $codes);
         }
 
         if ($fileData !== null && $this->user->getPerm('can_attach')) {
             $attachmentId = $this->upload($fileData);
-            $this->postdata .= "\n\n[attachment]{$attachmentId}[/attachment]";
+            $this->postData .= "\n\n[attachment]{$attachmentId}[/attachment]";
         }
 
         match (true) {
             $submit === 'Preview' || $submit === 'Full Reply' => $this->previewPost(),
-            (bool) $this->pid => $this->editPost(),
-            $this->postdata !== null => $this->submitPost(),
+            (bool) $this->pid && $this->how === 'edit' => $this->editPost(),
+            $this->postData !== null => $this->submitPost(),
             $this->fid || $this->tid && $this->how === 'edit' => $this->showTopicForm(),
             (bool) $this->tid => $this->showPostForm(),
             default => $this->page->location('?'),
@@ -151,7 +156,7 @@ final class Post
 
     private function previewPost(): void
     {
-        $post = $this->postdata;
+        $post = $this->postData;
         if (trim($post) !== '' && trim($post) !== '0') {
             $post = $this->textFormatting->theWorks($post);
             $post = $this->template->meta('post-preview', $post);
@@ -172,7 +177,7 @@ final class Post
             return;
         }
 
-        $postdata = $this->postdata;
+        $postData = $this->postData;
         $page = '<div id="post-preview">' . $this->postpreview . '</div>';
         $fid = $this->fid;
 
@@ -203,23 +208,23 @@ final class Post
                 Database::WHERE_ID_EQUALS,
                 $this->database->basicvalue($this->tid),
             );
-            $tdata = $this->database->arow($result);
+            $topic = $this->database->arow($result);
             $this->database->disposeresult($result);
 
-            if (!$tdata) {
+            if (!$topic) {
                 $error = "The topic you're trying to edit does not exist.";
             } else {
                 $result = $this->database->safeselect(
                     ['post'],
                     'posts',
                     Database::WHERE_ID_EQUALS,
-                    $this->database->basicvalue($tdata['op']),
+                    $this->database->basicvalue($topic['op']),
                 );
-                $postdata = $this->database->arow($result);
+                $postData = $this->database->arow($result);
                 $this->database->disposeresult($result);
 
-                if ($postdata) {
-                    $postdata = $postdata[0];
+                if ($postData) {
+                    $postData = $postData[0];
                 }
             }
         }
@@ -242,8 +247,8 @@ final class Post
         if ($error !== null) {
             $page .= $this->template->meta('error', $error);
         } else {
-            if (!isset($tdata)) {
-                $tdata = [
+            if (!isset($topic)) {
+                $topic = [
                     'subtitle' => '',
                     'title' => '',
                 ];
@@ -283,7 +288,7 @@ final class Post
                     <input type="hidden" name="how" value="newtopic" />
                     <input type="hidden" name="fid" value="{$fid}" />
                     <label for="ttitle">Topic title:</label>
-                    <input type="text" name="ttitle" id="ttitle" title="Topic Title" value="{$tdata['title']}" />
+                    <input type="text" name="ttitle" id="ttitle" title="Topic Title" value="{$topic['title']}" />
                     <br>
                     <label for="tdesc">Description:</label>
                     <input
@@ -291,7 +296,7 @@ final class Post
                         name="tdesc"
                         title="Topic Description (extra information about your topic)"
                         type="text"
-                        value="{$tdata['subtitle']}"
+                        value="{$topic['subtitle']}"
                         />
                     <br>
                     <textarea
@@ -299,7 +304,7 @@ final class Post
                         id="postdata"
                         title="Type your post here"
                         class="bbcode-editor"
-                        >{$this->textFormatting->blockhtml($postdata)}</textarea>
+                        >{$this->textFormatting->blockhtml($postData ?? '')}</textarea>
                     <br><div class="postoptions">
                         {$pollForm}
                         {$uploadButton}
@@ -363,21 +368,21 @@ final class Post
                 ['topics', 'forums'],
                 $this->database->basicvalue($tid),
             );
-            $tdata = $this->database->arow($result);
+            $topic = $this->database->arow($result);
             $this->database->disposeresult($result);
-            if (!$tdata) {
+            if (!$topic) {
                 $page .= $this->template->meta(
                     'error',
                     "The topic you're attempting to reply in no longer exists.",
                 );
             }
 
-            $tdata['title'] = $this->textFormatting->wordfilter($tdata['title']);
-            $tdata['perms'] = $this->user->getForumPerms($tdata['perms']);
+            $topic['title'] = $this->textFormatting->wordfilter($topic['title']);
+            $topic['perms'] = $this->user->getForumPerms($topic['perms']);
         }
 
         $page .= '<div id="post-preview">' . $this->postpreview . '</div>';
-        $postdata = $this->textFormatting->blockhtml($this->postdata);
+        $postData = $this->textFormatting->blockhtml($this->postData ?? '');
         $varsarray = [
             'act' => 'post',
             'how' => 'fullpost',
@@ -396,7 +401,7 @@ final class Post
         if (
             $this->session->getVar('multiquote')
         ) {
-            $postdata = '';
+            $postData = '';
 
             $result = $this->database->safespecial(
                 <<<'SQL'
@@ -414,13 +419,13 @@ final class Post
             );
 
             while ($postRow = $this->database->arow($result)) {
-                $postdata .= '[quote=' . $postRow['name'] . ']' . $postRow['post'] . '[/quote]' . PHP_EOL;
+                $postData .= '[quote=' . $postRow['name'] . ']' . $postRow['post'] . '[/quote]' . PHP_EOL;
             }
 
             $this->session->deleteVar('multiquote');
         }
 
-        $uploadForm = $tdata['perms']['upload'] ? <<<'HTML'
+        $uploadForm = $topic['perms']['upload'] ? <<<'HTML'
             <div id="attachfiles">
                 Add Files
                 <input type="file" name="Filedata" title="Browse for file" />
@@ -436,7 +441,7 @@ final class Post
                     {$vars}
                     <textarea
                         name="postdata" id="post" title="Type your post here" class="bbcode-editor"
-                        >{$postdata}</textarea>
+                        >{$postData}</textarea>
                     <br>
                     {$uploadForm}
                     <div class="buttons">
@@ -452,10 +457,10 @@ final class Post
             </div>
             HTML;
 
-        $page .= $this->template->meta('box', '', $tdata['title'] . ' &gt; Reply', $form);
+        $page .= $this->template->meta('box', '', $topic['title'] . ' &gt; Reply', $form);
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
-        if (!$tdata['perms']['upload']) {
+        if (!$topic['perms']['upload']) {
             return;
         }
 
@@ -508,18 +513,14 @@ final class Post
         $pid = $this->pid;
         $tid = $this->tid;
         $error = null;
-        $errorditingpost = false;
-        if (!$pid) {
-            $error = 'Invalid post to edit.';
-        }
-
-        if ($this->postdata !== '' && $this->postdata !== '0') {
-            if ($this->postdata !== null && trim($this->postdata) === '') {
-                $error = "You didn't supply a post!";
-            } elseif (mb_strlen($this->postdata) > 65535) {
-                $error = 'Post must not exceed 65,535 bytes.';
-            }
-        }
+        $editingPost = false;
+        $postData = $this->postData;
+        $error = match (true) {
+            !$pid => 'Invalid post to edit.',
+            $postData !== null && trim($postData) === '' => "You didn't supply a post!",
+            mb_strlen($this->postData) > 65_535 => 'Post must not exceed 65,535 bytes.',
+            default => null,
+        };
 
         if ($error === null) {
             $result = $this->database->safeselect(
@@ -536,13 +537,15 @@ final class Post
             $post = $this->database->arow($result);
             $this->database->disposeresult($result);
 
-            if (!$post) {
-                $error = 'The post you are trying to edit does not exist.';
-            } elseif (!$this->canEdit($post)) {
-                $error = "You don't have permission to edit that post!";
-            } elseif ($this->postdata === null) {
-                $errorditingpost = true;
-                $this->postdata = $post['post'];
+            $error = match(true) {
+                !$post => 'The post you are trying to edit does not exist.',
+                !$this->canEdit($post) => "You don't have permission to edit that post!",
+                default => null,
+            };
+
+            if ($this->postData === null) {
+                $editingPost = true;
+                $this->postData = $post['post'];
             }
         }
 
@@ -596,7 +599,7 @@ final class Post
                                     $this->textFormatting->wordfilter(
                                         $this->textFormatting->blockhtml(
                                             $this->textFormatting->textOnly(
-                                                $this->postdata,
+                                                $this->postData,
                                             ),
                                         ),
                                     ),
@@ -618,7 +621,7 @@ final class Post
             $this->page->append('PAGE', $this->page->error($error));
         }
 
-        if ($error || $errorditingpost) {
+        if ($error || $editingPost) {
             $this->showPostForm();
 
             return;
@@ -629,7 +632,7 @@ final class Post
             [
                 'editby' => $this->user->get('id'),
                 'edit_date' => $this->database->datetime(),
-                'post' => $this->postdata,
+                'post' => $this->postData,
             ],
             Database::WHERE_ID_EQUALS,
             $this->database->basicvalue($pid),
@@ -637,7 +640,7 @@ final class Post
         $this->page->command(
             'update',
             "#pid_{$pid} .post_content",
-            $this->textFormatting->theWorks($this->postdata),
+            $this->textFormatting->theWorks($this->postData),
         );
         $this->page->command('softurl');
     }
@@ -647,16 +650,16 @@ final class Post
         $this->session->act();
         $tid = $this->tid;
         $fid = $this->fid;
-        $postdata = $this->postdata;
+        $postData = $this->postData;
         $fdata = false;
         $newtopic = false;
         $postDate = $this->database->datetime();
         $uid = $this->user->get('id');
         $error = null;
 
-        if ($this->postdata === null && trim($postdata) === '') {
+        if ($this->postData !== null && trim($postData) === '') {
             $error = "You didn't supply a post!";
-        } elseif (mb_strlen($postdata) > 50000) {
+        } elseif (mb_strlen($postData) > 50000) {
             $error = 'Post must not exceed 50,000 characters.';
         }
 
@@ -751,7 +754,7 @@ final class Post
                                 ' ',
                                 $this->textFormatting->blockhtml(
                                     $this->textFormatting->textOnly(
-                                        $this->postdata,
+                                        $this->postData,
                                     ),
                                 ),
                             ),
@@ -833,7 +836,7 @@ final class Post
                 'date' => $postDate,
                 'ip' => $this->ipAddress->asBinary(),
                 'newtopic' => $newtopic ? 1 : 0,
-                'post' => $postdata,
+                'post' => $postData,
                 'tid' => $tid,
             ],
         );

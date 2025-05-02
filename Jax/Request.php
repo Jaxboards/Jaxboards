@@ -97,16 +97,25 @@ final class Request
         return $_POST !== [];
     }
 
+    /**
+     * Was the page accessed through javascript?
+     */
     public function isJSAccess(): bool
     {
         return $this->jsAccess() !== 0;
     }
 
+    /**
+     * Is the client just polling for updates?
+     */
     public function isJSUpdate(): bool
     {
-        return $this->jsAccess() === 1;
+        return $this->jsAccess() === 1 && !$this->hasPostData();
     }
 
+    /**
+     * Did a page transition occur?
+     */
     public function isJSNewLocation(): bool
     {
         if ($this->jsAccess() === 2) {
@@ -116,6 +125,9 @@ final class Request
         return $this->jsAccess() === 3;
     }
 
+    /**
+     *
+     */
     public function isJSDirectLink(): bool
     {
         return $this->jsAccess() === 3;

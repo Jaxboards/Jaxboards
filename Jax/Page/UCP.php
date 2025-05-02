@@ -96,7 +96,7 @@ final class UCP
     {
         $error = null;
 
-        if ($this->request->isJSUpdate() && !$this->request->hasPostData()) {
+        if ($this->request->isJSUpdate()) {
             return null;
         }
 
