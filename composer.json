@@ -41,7 +41,9 @@
     "lib-openssl": "*",
     "lib-zip-libzip": "*",
     "php": "^8.2.12",
-    "php-di/php-di": "^7.0"
+    "php-di/php-di": "^7.0",
+    "symfony/polyfill-php83": "^1.32",
+    "symfony/polyfill-php84": "^1.32"
   },
   "scripts": {
     "lint": [
