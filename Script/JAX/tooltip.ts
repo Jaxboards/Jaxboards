@@ -1,9 +1,14 @@
+import { date, emojiTime } from './date';
 import { getCoordinates, getHighestZIndex } from './el';
 
 export default function toolTip(el) {
     let tooltip = document.getElementById('tooltip_thingy');
     const pos = getCoordinates(el);
-    const title = el.getAttribute('title');
+    let title = el.getAttribute('title');
+    if (el.hasAttribute('data-last-online')) {
+        const timestamp = el.getAttribute('data-last-online');
+        title = `Last Online: ${date(timestamp)} ${emojiTime(timestamp)}`;
+    }
     if (!title) return;
     // Prevent the browser from showing its own title
     el.title = '';
