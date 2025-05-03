@@ -237,18 +237,16 @@ final class BBCode
 
     private function bbcodeLICallback(array $match): string
     {
+        $tag = $match[1];
+        $items = $match[2];
         $items = preg_split("@(^|[\r\n])\\*@", (string) $match[2]);
 
-        $html = $match[1] === 'ol' ? '<ol>' : '<ul>';
-        foreach ($items as $item) {
-            if (trim($item) === '') {
-                continue;
-            }
+        $html = implode('', array_map(
+            fn($item) => "<li>{$item}</li>",
+            array_filter($items, fn($line) => (bool) trim($line)),
+        ));
 
-            $html .= '<li>' . $item . ' </li>';
-        }
-
-        return $html . $match[1] === 'ol' ? '</ol>' : '</ul>';
+        return "<$tag>{$html}</{$tag}>";
     }
 
     // phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength
