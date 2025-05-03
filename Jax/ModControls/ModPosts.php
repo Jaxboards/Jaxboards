@@ -292,6 +292,7 @@ final class ModPosts
                 'lp_date' => $this->database->datetime(),
                 'lp_uid' => $lastPost['auth_id'],
                 'op' => $pids[0],
+                'poll_q' => '',
                 'poll_choices' => '',
                 'replies' => 0,
                 'title' => $newTopicTitle,
