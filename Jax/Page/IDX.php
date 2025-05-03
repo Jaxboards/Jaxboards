@@ -71,10 +71,7 @@ final class IDX
         }
     }
 
-    private function viewidx(): void
-    {
-        $this->session->set('location_verbose', 'Viewing board index');
-        $page = '';
+    private function fetchIDXForums() {
         $result = $this->database->safespecial(
             <<<'SQL'
                 SELECT
@@ -112,13 +109,20 @@ final class IDX
                 'members',
             ],
         );
+        return $this->database->arows($result);
+    }
+
+    private function viewidx(): void
+    {
+        $this->session->set('location_verbose', 'Viewing board index');
+        $page = '';
         $data = [];
         $this->subforums = [];
         $this->subforumids = [];
         $this->mods = [];
 
         // This while loop just grabs all of the data, displaying is done below.
-        while ($forum = $this->database->arow($result)) {
+        foreach ($this->fetchIDXForums() as $forum) {
             $perms = $this->user->getForumPerms($forum['perms']);
             if ($forum['perms'] && !$perms['view']) {
                 continue;
@@ -533,28 +537,11 @@ final class IDX
 
     private function updateLastPosts(): void
     {
-        $result = $this->database->safespecial(
-            <<<'SQL'
-                SELECT
-                    f.`id` AS `id`,
-                    f.`lp_tid` AS `lp_tid`,
-                    f.`lp_topic` AS `lp_topic`,
-                    UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,
-                    f.`lp_uid` AS `lp_uid`,
-                    f.`topics` AS `topics`,
-                    f.`posts` AS `posts`,
-                    m.`display_name` AS `lp_name`,
-                    m.`group_id` AS `lp_gid`
-                FROM %t f
-                LEFT JOIN %t m ON f.`lp_uid`=m.`id`
-                WHERE f.`lp_date`>=?
-                SQL
-            ,
-            ['forums', 'members'],
-            $this->session->get('last_update') ? $this->database->datetime((int) $this->session->get('last_update')) : $this->database->datetime(),
+        $unreadForums = array_filter(
+            $this->fetchIDXForums(),
+            fn($forum) => !$this->isForumRead($forum),
         );
-
-        while ($forum = $this->database->arow($result)) {
+        foreach ($unreadForums as $forum) {
             $this->page->command('addclass', '#fid_' . $forum['id'], 'unread');
             $this->page->command(
                 'update',

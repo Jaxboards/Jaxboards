@@ -43,6 +43,7 @@ class AppState {
             ...Array.from(form.querySelectorAll('input')),
             ...Array.from(form.querySelectorAll('select')),
             ...Array.from(form.querySelectorAll('button')),
+            ...Array.from(form.querySelectorAll('textarea')),
         ].forEach((inputField) => {
             if (!inputField.name || inputField.type === 'submit') {
                 return;
