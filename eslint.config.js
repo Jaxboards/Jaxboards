@@ -28,16 +28,15 @@ export default [
             // Disables the rule preventing modifying properties on objects passed in
             'no-param-reassign': [2, { props: false }],
             'prettier/prettier': ['error', { singleQuote: true }],
-            'import/extensions': 0
+            'import/extensions': 0,
         },
 
-        'settings': {
+        settings: {
             'import/resolver': {
-                'node': {
-                    'extensions': ['.js', '.jsx', '.ts', '.tsx'],
+                node: {
+                    extensions: ['.js', '.jsx', '.ts', '.tsx'],
                 },
             },
         },
-    }
-
+    },
 ];

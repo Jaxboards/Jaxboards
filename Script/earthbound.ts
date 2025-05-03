@@ -5671,7 +5671,8 @@
                                                 this.alpha[0] = 0;
                                                 this.alpha[1] = 1;
                                             }
-                                            context.imageSmoothingEnabled = false;
+                                            context.imageSmoothingEnabled =
+                                                false;
                                             canvas.width = SNES_WIDTH;
                                             canvas.height = SNES_HEIGHT;
                                             var image = context.getImageData(
