@@ -29,7 +29,8 @@ export default function gracefulDegrade(container) {
         if (link.href) {
             const href = link.getAttribute('href');
             const { host, pathname } = window.location;
-            const isLocalLink = link.host === host && link.pathname === pathname;
+            const isLocalLink =
+                link.host === host && link.pathname === pathname;
 
             if (isLocalLink) {
                 const oldclick = link.onclick;
