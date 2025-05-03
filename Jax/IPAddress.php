@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use function array_any;
 use function array_filter;
 use function array_search;
 use function file;
