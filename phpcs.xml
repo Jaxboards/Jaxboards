@@ -255,7 +255,7 @@
   <rule ref="SlevomatCodingStandard.PHP.OptimizedFunctionsWithoutUnpacking"/>
   <rule ref="SlevomatCodingStandard.PHP.ShortList"/>
   <rule ref="SlevomatCodingStandard.PHP.TypeCast"/>
-  <rule ref="SlevomatCodingStandard.PHP.UselessParentheses"/>
+  <rule ref="SlevomatCodingStandard.PHP.UselessParentheses" phpcs-only="true"/>
   <rule ref="SlevomatCodingStandard.PHP.UselessSemicolon"/>
   <rule ref="SlevomatCodingStandard.Strings.DisallowVariableParsing">
     <properties>
