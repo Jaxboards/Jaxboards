@@ -1841,7 +1841,7 @@ textarea {
 }
 
 .calendar .birthdays::before {
-    content: "🎂";
+    content: '🎂';
 }
 
 /* Boxes/Collapse Boxes (Global) */
@@ -2077,7 +2077,7 @@ textarea {
 
 /* Member/Group Specific */
 a.birthday::before {
-    content: "🎂";
+    content: '🎂';
 }
 
 a.mgroup2 {
