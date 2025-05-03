@@ -675,14 +675,16 @@ final readonly class Forums
         );
 
         // First fetch all group IDs
-        $groupIds = [];
-        while ($group = $this->database->arow($result)) {
-            $groupIds[] = $group['id'];
-        }
+        $groupIds = array_map(
+            fn($group) => $group['id'],
+            $this->database->arows($result)
+        );
         $this->database->disposeresult($result);
 
         $groupPerms = [];
-        foreach ($this->request->post('groups') as $groupId => $perms) {
+        $groupsInput = $this->request->post('groups');
+        foreach ($groupIds as $groupId) {
+            $perms = $groupsInput[$groupId] ?? [];
             // If the user chose to use global permissions, we don't need to include them
             if (array_key_exists('global', $perms)) {
                 continue;
