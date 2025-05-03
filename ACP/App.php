@@ -60,8 +60,8 @@ final class App
             try {
                 $page = $this->container->get('ACP\Page\\' . $act);
                 $page->render();
-            } catch (Exception) {
-                $this->page->addContentBox('Error', "Invalid action: {$act}");
+            } catch (Exception $e) {
+                $this->page->addContentBox('Error', "Invalid action {$act} or error {$e->getMessage()}");
             }
         }
 
