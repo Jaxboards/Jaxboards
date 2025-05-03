@@ -87,8 +87,8 @@ export function htmlToBBCode(html) {
                 innerhtml = `[url=${att.href}]${innerhtml}[/url]`;
             }
 
-            if (lcTag === 'ol') innerhtml = `[ol]${innerhtml}[/ol]`;
-            if (lcTag === 'ul') innerhtml = `[ul]${innerhtml}[/ul]`;
+            if (lcTag === 'ol') innerhtml = `[ol]\n${innerhtml}[/ol]`;
+            if (lcTag === 'ul') innerhtml = `[ul]\n${innerhtml}[/ul]`;
 
             // h1-h6
             if (lcTag.match(/h\d/i)) {
@@ -148,9 +148,8 @@ export function bbcodeToHTML(bbcode) {
         /\[align=(left|right|center)\](.*?)\[\/align\]/g,
         '<div style="text-align:$1">$2</div>',
     );
-    html = html.replace(/\[(ul|ol)\]([^]*?)\[\/\1\]/gi, (match) => {
-        const tag = match[1];
-        const listItems = match[2].split(/([\r\n]+|^)\*/);
+    html = html.replace(/\[(ul|ol)\]([^]*?)\[\/\1\]/gi, (_, tag, contents) => {
+        const listItems = contents.split(/(^|[\r\n]+)\*/);
         const lis = listItems
             .filter((text) => text.trim())
             .map((text) => `<li>${text}</li>`)
