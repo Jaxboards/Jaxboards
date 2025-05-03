@@ -87,8 +87,8 @@ export function htmlToBBCode(html) {
                 innerhtml = `[url=${att.href}]${innerhtml}[/url]`;
             }
 
-            if (lcTag === 'ol') innerhtml = `[ol]\n${innerhtml}[/ol]`;
-            if (lcTag === 'ul') innerhtml = `[ul]\n${innerhtml}[/ul]`;
+            if (lcTag === 'ol') innerhtml = `[ol]${innerhtml}[/ol]`;
+            if (lcTag === 'ul') innerhtml = `[ul]${innerhtml}[/ul]`;
 
             // h1-h6
             if (lcTag.match(/h\d/i)) {

@@ -242,7 +242,7 @@ final class BBCode
     {
         $tag = $match[1];
         $items = $match[2];
-        $items = preg_split("@(^|[\r\n])\\*@", (string) $match[2]);
+        $items = preg_split("@([\r\n]+|^)\\*@", (string) $match[2]);
 
         $html = implode('', array_map(
             static fn($item) => "<li>{$item}</li>",

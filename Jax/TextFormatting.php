@@ -180,10 +180,10 @@ final class TextFormatting
         [$text, $codes] = $this->startCodeTags($text);
 
         $text = $this->blockhtml($text);
+        $text = nl2br($text);
         $text = $this->emotes($text);
         $text = $this->bbCode->toHTML($text);
         $text = $this->finishCodeTags($text, $codes);
-        $text = nl2br($text);
 
         return $this->wordfilter($text);
     }
