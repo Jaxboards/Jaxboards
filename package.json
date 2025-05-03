@@ -26,7 +26,7 @@
   "private": true,
   "scripts": {
     "autofix": "npm run-script prettier && npm run-script eslint-fix && npm run-script stylelint-fix && npm run-script rector && npm run-script phpcbf && npm run-script php-cs-fixer",
-    "build": "rollup -c",
+    "build": "node ./esbuild",
     "ci-lint": "npm run-script eslint-report && npm run-script stylelint-report && npm run-script parallel-lint-report && npm run-script phpcs-report && npm run-script phpstan-report && npm run-script psalm-report && npm run-script phpmd-report",
     "eslint": "eslint \"Script/**/*.js\"",
     "eslint-fix": "eslint \"Script/**/*.js\" --fix",

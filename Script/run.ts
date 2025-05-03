@@ -7,9 +7,9 @@ import Sound from './sound';
 const useJSLinks = 2;
 
 class AppState {
-    onAppReady() {
-        this.stream = new Stream();
+    stream: Stream = new Stream();
 
+    onAppReady() {
         if (useJSLinks) {
             gracefulDegrade(document.body);
         }
@@ -34,17 +34,21 @@ class AppState {
         Sound.load('imnewwindow', './Sounds/receive.mp3', false);
     }
 
-    submitForm(form, resetOnSubmit = false) {
+    submitForm(form: HTMLFormElement, resetOnSubmit = false) {
         const names = [];
         const values = [];
         const { submitButton } = form;
 
-        Array.from(form.elements).forEach((inputField) => {
+        [
+            ...Array.from(form.querySelectorAll('input')),
+            ...Array.from(form.querySelectorAll('select')),
+            ...Array.from(form.querySelectorAll('button')),
+        ].forEach((inputField) => {
             if (!inputField.name || inputField.type === 'submit') {
                 return;
             }
 
-            if (inputField.type === 'select-multiple') {
+            if (inputField instanceof HTMLSelectElement && inputField.type === 'select-multiple') {
                 Array.from(inputField.options)
                     .filter((option) => option.selected)
                     .forEach((option) => {
@@ -55,6 +59,7 @@ class AppState {
             }
 
             if (
+                inputField instanceof HTMLInputElement &&
                 ['checkbox', 'radio'].includes(inputField.type) &&
                 !inputField.checked
             ) {
@@ -75,9 +80,9 @@ class AppState {
         this.stream.pollData();
     }
 
-    handleQuoting(a) {
+    handleQuoting(link: HTMLLinkElement) {
         this.stream.load(
-            `${a.href}&qreply=${document.querySelector('#qreply') ? '1' : '0'}`,
+            `${link.href}&qreply=${document.querySelector('#qreply') ? '1' : '0'}`,
         );
     }
 
@@ -94,7 +99,7 @@ onDOMReady(() => {
     RUN.onAppReady();
 });
 onDOMReady(() => {
-    window.name = Math.random();
+    window.name = `${Math.random()}`;
     RUN.setWindowActive();
     window.addEventListener('focus', () => {
         RUN.setWindowActive();

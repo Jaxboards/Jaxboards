@@ -68,7 +68,7 @@ class Stream {
         return true;
     }
 
-    pollData(isEager) {
+    pollData(isEager = false) {
         if (isEager) {
             this.loader();
         }
