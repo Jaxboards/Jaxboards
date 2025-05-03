@@ -15,6 +15,7 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
+use function array_filter;
 use function array_flip;
 use function array_keys;
 use function array_merge;
@@ -71,7 +72,8 @@ final class IDX
         }
     }
 
-    private function fetchIDXForums() {
+    private function fetchIDXForums()
+    {
         $result = $this->database->safespecial(
             <<<'SQL'
                 SELECT
@@ -109,6 +111,7 @@ final class IDX
                 'members',
             ],
         );
+
         return $this->database->arows($result);
     }
 
