@@ -238,6 +238,9 @@ final class BBCode
         return '-Invalid Video Url-';
     }
 
+    /**
+     * @param array{string,'ol'|'ul',string} $match
+     */
     private function bbcodeLICallback(array $match): string
     {
         $tag = $match[1];
