@@ -13,6 +13,7 @@ use Jax\TextFormatting;
 
 use function array_key_exists;
 use function array_keys;
+use function array_map;
 use function array_pop;
 use function array_search;
 use function array_unshift;
@@ -676,8 +677,8 @@ final readonly class Forums
 
         // First fetch all group IDs
         $groupIds = array_map(
-            fn($group) => $group['id'],
-            $this->database->arows($result)
+            static fn($group) => $group['id'],
+            $this->database->arows($result),
         );
         $this->database->disposeresult($result);
 
