@@ -28,7 +28,9 @@ export default function gracefulDegrade(container) {
         // Make all links load through AJAX
         if (link.href) {
             const href = link.getAttribute('href');
-            if (href.charAt(0) === '?') {
+            const isLocalLink = link.host === location.host && link.pathname === location.pathname;
+
+            if (isLocalLink) {
                 const oldclick = link.onclick;
                 link.onclick = undefined;
                 link.addEventListener('click', (event) => {
@@ -41,7 +43,7 @@ export default function gracefulDegrade(container) {
                 });
 
                 // Open external links in a new window
-            } else if (link.getAttribute('href').substr(0, 4) === 'http') {
+            } else {
                 link.target = '_BLANK';
             }
         }
