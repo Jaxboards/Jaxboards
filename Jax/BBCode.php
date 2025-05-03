@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use function array_filter;
 use function array_keys;
+use function array_map;
 use function array_values;
+use function implode;
 use function in_array;
 use function is_array;
 use function is_string;
@@ -242,11 +245,11 @@ final class BBCode
         $items = preg_split("@(^|[\r\n])\\*@", (string) $match[2]);
 
         $html = implode('', array_map(
-            fn($item) => "<li>{$item}</li>",
-            array_filter($items, fn($line) => (bool) trim($line)),
+            static fn($item) => "<li>{$item}</li>",
+            array_filter($items, static fn($line) => (bool) trim($line)),
         ));
 
-        return "<$tag>{$html}</{$tag}>";
+        return "<{$tag}>{$html}</{$tag}>";
     }
 
     // phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength
