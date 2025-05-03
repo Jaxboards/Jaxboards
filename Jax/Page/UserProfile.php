@@ -265,7 +265,7 @@ final class UserProfile
 
         $this->page->setBreadCrumbs(
             [
-                "{$profile['display_name']}'s profile" => "?act=vu{$profile['id']}&view=profile",
+                "?act=vu{$profile['id']}&view=profile" => "{$profile['display_name']}'s profile",
             ],
         );
 

@@ -333,7 +333,7 @@ final class App
 
     private function renderNavigation(): void
     {
-        $this->page->setBreadCrumbs([($this->config->getSetting('boardname') ?: 'Home') => '?']);
+        $this->page->setBreadCrumbs(['?' => ($this->config->getSetting('boardname') ?: 'Home')]);
     }
 
     private function setPageVars(): void

@@ -60,7 +60,7 @@ final class UCP
             return;
         }
 
-        $this->page->setBreadCrumbs(['UCP' => '?act=ucp']);
+        $this->page->setBreadCrumbs(['?act=ucp' => 'UCP']);
         $this->what = $this->request->both('what') ?? '';
 
         // Not a single settings page needs update functionality except inbox

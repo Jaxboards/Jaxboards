@@ -433,7 +433,7 @@ final class Forum
         $page .= $this->template->meta('forum-buttons-bottom', $forumbuttons);
 
         // Start building the nav path.
-        $path[$fdata['cat']] = '?act=vc' . $fdata['cat_id'];
+        $path = ["?act=vc{$fdata['cat_id']}" => $fdata['cat']];
         if ($fdata['path']) {
             $pathids = explode(' ', (string) $fdata['path']);
             $forums = [];
@@ -452,7 +452,7 @@ final class Forum
             }
         }
 
-        $path[$title] = "?act=vf{$fid}";
+        $path["?act=vf{$fid}"] = $title;
         $this->page->setBreadCrumbs($path);
         if ($this->request->isJSAccess()) {
             $this->page->command('update', 'page', $page);

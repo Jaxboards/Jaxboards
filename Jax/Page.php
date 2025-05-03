@@ -179,7 +179,7 @@ final class Page
     }
 
     /**
-     * @param array<string,string> $crumbs Map of human readable label to URL. Used for NAVIGATION.
+     * @param array<string,string> $crumbs Map of URLs to human readable labels. Used for NAVIGATION.
      */
     public function setBreadCrumbs(array $crumbs): void
     {
@@ -265,7 +265,7 @@ final class Page
     {
         $first = true;
         $path = '';
-        foreach ($this->breadCrumbs as $value => $link) {
+        foreach ($this->breadCrumbs as $link => $value) {
             $path .= $this->template->meta(
                 $first
                 && $this->template->metaExists('path-home') ? 'path-home' : 'path-part',

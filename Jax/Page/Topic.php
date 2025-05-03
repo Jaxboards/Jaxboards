@@ -237,9 +237,9 @@ final class Topic
         // Fix this to work with subforums.
         $this->page->setBreadCrumbs(
             [
-                $this->topicdata['cat_title'] => '?act=vc' . $this->topicdata['cat_id'],
-                $this->topicdata['forum_title'] => '?act=vf' . $this->topicdata['fid'],
-                $this->topicdata['topic_title'] => "?act=vt{$tid}",
+                "?act=vc{$this->topicdata['cat_id']}" => $this->topicdata['cat_title'],
+                "?act=vf{$this->topicdata['fid']}" => $this->topicdata['forum_title'],
+                "?act=vt{$tid}" => $this->topicdata['topic_title'],
             ],
         );
 

@@ -283,7 +283,7 @@ final class Shoutbox
             $pages .= '</span>';
         }
 
-        $this->page->setBreadCrumbs(['Shoutbox History' => '?module=shoutbox']);
+        $this->page->setBreadCrumbs(['?module=shoutbox' => 'Shoutbox History']);
         if ($this->request->isJSUpdate()) {
             return;
         }
