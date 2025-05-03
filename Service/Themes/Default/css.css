@@ -1838,8 +1838,10 @@ textarea {
     font-size: smaller;
     position: absolute;
     bottom: 0;
-    background: url('icons/birthday.png') no-repeat;
-    padding-left: 18px;
+}
+
+.calendar .birthdays::before {
+    content: "🎂";
 }
 
 /* Boxes/Collapse Boxes (Global) */
@@ -2074,9 +2076,8 @@ textarea {
 }
 
 /* Member/Group Specific */
-a.birthday {
-    background: url('icons/birthday.png') no-repeat;
-    padding-left: 18px;
+a.birthday::before {
+    content: "🎂";
 }
 
 a.mgroup2 {
