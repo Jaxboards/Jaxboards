@@ -247,12 +247,16 @@ final class BBCode
         $items = $match[2];
         $items = preg_split("@([\r\n]+|^)\\*@", (string) $match[2]);
 
-        $html = implode('', array_map(
+        // This HTML construction could be prettier, but
+        // SonarQube requires the <li>s to be surrounded by <ol> and <ul>
+        $html = $tag === 'ol' ? '<ol>' : '<ul>';
+        $html .= implode('', array_map(
             static fn($item) => "<li>{$item}</li>",
             array_filter($items, static fn($line) => (bool) trim($line)),
         ));
+        $html .= $tag === 'ol' ? '</ol>' : '</ul>';
 
-        return "<{$tag}>{$html}</{$tag}>";
+        return $html;
     }
 
     // phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength
