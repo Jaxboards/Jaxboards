@@ -109,3 +109,30 @@ export function onDOMReady(callback) {
         document.addEventListener('DOMContentLoaded', callback);
     }
 }
+
+/**
+ * Check if client supports emoji
+ *
+ * @return {boolean}
+ */
+export function supportsEmoji(): boolean {
+    // validate if a two-code point emoji width matches a single byte emoji
+    // width
+    const widths = [
+        String.fromCodePoint(0x1f1fa, 0x1f1f8),
+        String.fromCodePoint(0x1f354),
+    ].map((character: string): number => {
+        const element = document.body.appendChild(
+            document.createElement('span'),
+        );
+        element.appendChild(document.createTextNode(character));
+        const width = element.offsetWidth;
+        if (element.parentNode) {
+            element.parentNode.removeChild(element);
+        }
+
+        return width;
+    });
+
+    return widths[0] === widths[1];
+}
