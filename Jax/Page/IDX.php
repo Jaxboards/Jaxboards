@@ -72,7 +72,7 @@ final class IDX
         }
     }
 
-    private function fetchIDXForums()
+    private function fetchIDXForums(): ?array
     {
         $result = $this->database->safespecial(
             <<<'SQL'
