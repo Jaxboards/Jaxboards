@@ -182,7 +182,7 @@ final class Topic
     private function getTopicData(int $tid): void
     {
         $result = $this->database->safespecial(
-            <<<'MySQL'
+            <<<'SQL'
                 SELECT a.`title` AS `topic_title`
                     , a.`locked` AS `locked`
                     , UNIX_TIMESTAMP(a.`lp_date`) AS `lp_date`
@@ -202,7 +202,7 @@ final class Topic
                 WHERE a.`id` = ?
                 LIMIT 1
 
-                MySQL,
+                SQL,
             ['topics', 'forums', 'categories'],
             $tid,
         );
@@ -384,12 +384,12 @@ final class Topic
 
         // Update view count.
         $this->database->safespecial(
-            <<<'MySQL'
+            <<<'SQL'
                 UPDATE %t
                 SET `views` = `views` + 1
                 WHERE `id` = ?
 
-                MySQL,
+                SQL,
             ['topics'],
             $tid,
         );
@@ -488,7 +488,7 @@ final class Topic
             $this->session->getVar('multiquote')
         ) {
             $result = $this->database->safespecial(
-                <<<'MySQL'
+                <<<'SQL'
                     SELECT
                         p.`post` AS `post`,
                         m.`display_name` AS `name`
@@ -496,7 +496,7 @@ final class Topic
                     LEFT JOIN %t m
                         ON p.`auth_id` = m.`id`
                         WHERE p.`id` IN ?
-                    MySQL,
+                    SQL,
                 ['posts', 'members'],
                 explode(',', $this->session->getVar('multiquote') ?? ''),
             );
@@ -541,7 +541,7 @@ final class Topic
         $topicPostCounter = 0;
 
         $query = $lastpid ? $this->database->safespecial(
-            <<<'MySQL'
+            <<<'SQL'
                 SELECT m.`id` AS `id`
                     , m.`name` AS `name`
                     , m.`group_id` AS `group_id`
@@ -587,12 +587,12 @@ final class Topic
                   AND p.`id` > ?
                 ORDER BY `pid`
 
-                MySQL,
+                SQL,
             ['posts', 'members', 'member_groups', 'members'],
             $this->tid,
             $lastpid,
         ) : $this->database->safespecial(
-            <<<'MySQL'
+            <<<'SQL'
                 SELECT m.`id` AS `id`
                     , m.`name` AS `name`
                     , m.`email` AS `email`
@@ -668,7 +668,7 @@ final class Topic
                     , `pid` ASC
                 LIMIT ?, ?
 
-                MySQL,
+                SQL,
             ['posts', 'members', 'member_groups', 'members'],
             $this->tid,
             $topicPostCounter = $this->pageNumber * $this->numperpage,
@@ -859,7 +859,7 @@ final class Topic
 
         if ($this->user->get('mod')) {
             $result = $this->database->safespecial(
-                <<<'MySQL'
+                <<<'SQL'
                     SELECT `mods`
                     FROM %t
                     WHERE `id` = (
@@ -867,7 +867,7 @@ final class Topic
                         FROM %t
                         WHERE `id` = ?
                     )
-                    MySQL,
+                    SQL,
                 ['forums', 'topics'],
                 $this->database->basicvalue($this->tid),
             );
@@ -1230,7 +1230,7 @@ final class Topic
         $post = false;
         if ($pid && is_numeric($pid)) {
             $result = $this->database->safespecial(
-                <<<'MySQL'
+                <<<'SQL'
                     SELECT p.`post` AS `post`
                         , m.`display_name` AS `name`
                     FROM %t p
@@ -1238,7 +1238,7 @@ final class Topic
                       ON p.`auth_id` = m.`id`
                     WHERE p.`id` = ?
 
-                    MySQL,
+                    SQL,
                 ['posts', 'members'],
                 $pid,
             );
@@ -1305,7 +1305,7 @@ final class Topic
     {
         $postPosition = null;
         $result = $this->database->safespecial(
-            <<<'MySQL'
+            <<<'SQL'
                 SELECT
                     `id`
                 FROM %t
@@ -1316,7 +1316,7 @@ final class Topic
                 )
                 ORDER BY `id` ASC
 
-                MySQL,
+                SQL,
             ['posts', 'posts'],
             $pid,
         );
@@ -1433,7 +1433,7 @@ final class Topic
             ],
         );
         $result = $this->database->safespecial(
-            <<<'MySQL'
+            <<<'SQL'
                 SELECT p.`id` AS `id`
                     , p.`post` AS `post`
                     , UNIX_TIMESTAMP(p.`date`) AS `date`
@@ -1443,7 +1443,7 @@ final class Topic
                     ON p.`auth_id` = m.`id`
                     WHERE p.`tid` = ?
 
-                MySQL,
+                SQL,
             ['posts', 'members'],
             $this->database->basicvalue($tid),
         );

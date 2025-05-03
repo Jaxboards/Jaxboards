@@ -9,6 +9,7 @@ import gracefulDegrade from '../JAX/graceful-degrade';
 import openTooltip from '../JAX/tooltip';
 import Window from '../JAX/window';
 import Sound from '../sound';
+import { messageReceived } from '../JAX/instant-messaging-window';
 
 /**
  * These are all of the possible commands
@@ -148,82 +149,7 @@ export default {
         }
     },
     im([fromId, fromName, message, fromMe, timestamp]) {
-        let messagesContainer = document.querySelector(`#im_${fromId} .ims`);
-        flashTitle(`New message from ${fromName}!`);
-
-        if (
-            !document.hasFocus() &&
-            window.Notification &&
-            Notification.permission === 'granted'
-        ) {
-            const notify = new Notification(`${fromName} says:`, {
-                body: message,
-            });
-            notify.onclick = () => {
-                window.focus();
-                notify.close();
-            };
-        }
-
-        if (!messagesContainer) {
-            const imWindow = new Window();
-            imWindow.title = `${fromName}`;
-            imWindow.content =
-                "<div class='ims'></div><div class='offline'>This user may be offline</div><div><form data-ajax-form='resetOnSubmit' method='post'><input type='hidden' name='im_uid' value='%s' /><input type='text' name='im_im' autocomplete='off' /><input type='hidden' name='act' value='blank' /></form></div>".replace(
-                    /%s/g,
-                    fromId,
-                );
-            imWindow.className = 'im';
-            imWindow.resize = '.ims';
-            imWindow.animate = true;
-
-            const win = imWindow.create();
-            gracefulDegrade(win);
-            win.id = `im_${fromId}`;
-            win.onclick = () => {
-                win.querySelector('form').im_im.focus();
-            };
-            win.onclick();
-            messagesContainer = document.querySelector(`#im_${fromId} .ims`);
-            const test = getComputedStyle(messagesContainer);
-            messagesContainer.style.width = test.width;
-            messagesContainer.style.height = test.height;
-            if (message && globalsettings.sound_im) Sound.play('imnewwindow');
-        }
-        if (message) {
-            const d = document.createElement('div');
-            const isAction = message.substring(0, 3) === '/me';
-            if (isAction) {
-                d.className = 'action';
-                /* eslint-disable no-param-reassign */
-                message = message.substring(3);
-                fromName = `***${fromName}`;
-                /* eslint-enable no-param-reassign */
-            }
-            d.classList.add(fromMe ? 'you' : 'them');
-            if (!fromMe) {
-                document
-                    .querySelector(`#im_${fromId}`)
-                    .classList.remove('offline');
-            }
-            d.innerHTML = `<a href='?act=vu${
-                fromMe || parseInt(fromId, 10)
-            }' class='name'>${fromName}</a> ${!isAction ? ': ' : ''}${message}`;
-            d.dataset.timestamp = timestamp;
-            const test =
-                messagesContainer.scrollTop >
-                messagesContainer.scrollHeight -
-                    messagesContainer.clientHeight -
-                    50;
-            messagesContainer.appendChild(d);
-            if (test) {
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            }
-            new Animation(d).dehighlight().play();
-            gracefulDegrade(d);
-            if (!messagesContainer && globalsettings.sound_im)
-                Sound.play('imbeep');
-        }
+        messageReceived({ fromId, fromName, message, fromMe, timestamp })
     },
     imtoggleoffline(a) {
         document.querySelector(`#im_${a}`).classList.add('offline');

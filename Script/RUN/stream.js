@@ -8,7 +8,7 @@ class Stream {
         this.request = new Ajax({
             callback: (request) => this.handleRequestData(request),
         });
-        this.lastURL = document.location.search.substr(1);
+        this.lastURL = document.location.search.slice(1);
         this.commands = Commands;
     }
 
@@ -73,7 +73,7 @@ class Stream {
             this.loader();
         }
         clearTimeout(this.timeout);
-        if (document.cookie.match(`actw=${window.name}`)) {
+        if (document.cookie.includes(`actw=${window.name}`)) {
             this.timeout = setTimeout(() => this.loader(), UPDATE_INTERVAL);
         }
     }
