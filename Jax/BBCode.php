@@ -248,7 +248,7 @@ final class BBCode
         $items = preg_split("@([\r\n]+|^)\\*@", (string) $match[2]);
 
         // This HTML construction could be prettier, but
-        // SonarQube requires the <li>s to be surrounded by <ol> and <ul>
+        // SonarQube requires the LI tags to be surrounded by OL and UL
         $html = $tag === 'ol' ? '<ol>' : '<ul>';
         $html .= implode('', array_map(
             static fn($item) => "<li>{$item}</li>",
