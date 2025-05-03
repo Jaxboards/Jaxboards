@@ -5,8 +5,15 @@ export function getComputedStyle(a, b) {
     return false;
 }
 
+/**
+ * Returns an element's position on the page
+ * @param {HTMLElement} el
+ */
 export function getCoordinates(el) {
-    const { x, y, height, width } = el.getBoundingClientRect();
+    const { x: elX, y: elY, height, width } = el.getBoundingClientRect();
+
+    const x = elX + window.scrollX;
+    const y = elY + window.scrollY;
 
     return {
         x,
