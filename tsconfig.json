@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+      "outFile": "dist/app.js",
+      "target": "ESNext",
+      "module": "iife",
+      "moduleResolution": "node",
+      "rootDir": "./Script/",
+      "allowJs": true,
+      "checkJs": false,
+      "removeComments": true,
+      "sourceMap": false,
+      "strict": true,
+      "esModuleInterop": false,
+      "lib": ["es5", "es6", "dom"],
+    },
+    "include": ["./Script/app.ts"]
+}
