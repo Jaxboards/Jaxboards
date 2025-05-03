@@ -1,5 +1,6 @@
 /* global RUN, globalsettings */
 
+import Sound from "../sound";
 import { flashTitle } from "./flashing-title";
 import gracefulDegrade from "./graceful-degrade";
 import Window from "./window";
@@ -52,7 +53,7 @@ export function messageReceived({ fromId, fromName, message, fromMe, timestamp }
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
     gracefulDegrade(div);
-    if (!messagesContainer && globalsettings.sound_im)
+    if (globalsettings.sound_im)
         Sound.play('imbeep');
 }
 
