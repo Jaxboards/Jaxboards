@@ -1166,7 +1166,7 @@ final class Topic
         $hiddenfields = $this->jax->hiddenFormFields(
             [
                 'act' => 'post',
-                'how' => 'qedit',
+                'how' => 'edit',
                 'pid' => $pid,
             ],
         );
