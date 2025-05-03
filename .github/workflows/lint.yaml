@@ -51,8 +51,8 @@ jobs:
                   jq ".version = \"$VERSION\"" package.json > /tmp/package.json && \
                   mv /tmp/package.json package.json
               shell: bash
-            - run: npm run-script build
             - run: npm run-script autofix
+            - run: npm run-script build
             - uses: stefanzweifel/git-auto-commit-action@v5
               with:
                   commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
