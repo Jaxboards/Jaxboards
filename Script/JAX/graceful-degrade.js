@@ -28,7 +28,8 @@ export default function gracefulDegrade(container) {
         // Make all links load through AJAX
         if (link.href) {
             const href = link.getAttribute('href');
-            const isLocalLink = link.host === location.host && link.pathname === location.pathname;
+            const { host, pathname } = window.location;
+            const isLocalLink = link.host === host && link.pathname === pathname;
 
             if (isLocalLink) {
                 const oldclick = link.onclick;
