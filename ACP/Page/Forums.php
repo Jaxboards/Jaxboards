@@ -714,15 +714,15 @@ final readonly class Forums
         return [
             'cat_id' => $forum['cat_id'] ?? null ?: array_pop($thisrow),
             'mods' => $forum['mods'] ?? null,
-            'nocount' => $this->request->post('nocount') ? 0 : 1,
+            'nocount' => (int) $this->request->post('nocount'),
             'orderby' => $orderby > 0 && $orderby <= 5 ? $orderby : 0,
             'perms' => $this->serializePermsFromInput(),
             'redirect' => $this->request->post('redirect'),
-            'show_ledby' => (bool) $this->request->post('show_ledby'),
+            'show_ledby' => (int) $this->request->post('show_ledby'),
             'show_sub' => $sub === 1 || $sub === 2 ? $sub : 0,
             'subtitle' => $this->request->post('description'),
             'title' => $this->request->post('title'),
-            'trashcan' => (bool) $this->request->post('trashcan'),
+            'trashcan' => (int) $this->request->post('trashcan'),
         ];
     }
 
