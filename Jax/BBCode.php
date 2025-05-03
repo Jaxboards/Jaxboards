@@ -255,7 +255,7 @@ final class BBCode
             array_filter($items, static fn($line) => (bool) trim($line)),
         ));
 
-        return $html . $tag === 'ol' ? '</ol>' : '</ul>';
+        return $html . ($tag === 'ol' ? '</ol>' : '</ul>');
     }
 
     // phpcs:disable SlevomatCodingStandard.Functions.FunctionLength.FunctionLength
