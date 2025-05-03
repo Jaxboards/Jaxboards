@@ -48,7 +48,10 @@ class AppState {
                 return;
             }
 
-            if (inputField instanceof HTMLSelectElement && inputField.type === 'select-multiple') {
+            if (
+                inputField instanceof HTMLSelectElement &&
+                inputField.type === 'select-multiple'
+            ) {
                 Array.from(inputField.options)
                     .filter((option) => option.selected)
                     .forEach((option) => {

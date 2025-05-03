@@ -1,8 +1,9 @@
 {
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.26.0",
     "esbuild": "^0.25.3",
-    "eslint": "^9.23.0",
+    "eslint": "^9.26.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-import-resolver-node": "^0.3.9",
@@ -15,7 +16,8 @@
     "stylelint": "^16.16.0",
     "stylelint-config-standard": "^37.0.0",
     "tslib": "^2.8.1",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.31.1"
   },
   "engines": {
     "composer": "2.8.8",
@@ -28,9 +30,9 @@
     "autofix": "npm run-script prettier && npm run-script eslint-fix && npm run-script stylelint-fix && npm run-script rector && npm run-script phpcbf && npm run-script php-cs-fixer",
     "build": "node ./esbuild",
     "ci-lint": "npm run-script eslint-report && npm run-script stylelint-report && npm run-script parallel-lint-report && npm run-script phpcs-report && npm run-script phpstan-report && npm run-script psalm-report && npm run-script phpmd-report",
-    "eslint": "eslint \"Script/**/*.js\"",
-    "eslint-fix": "eslint \"Script/**/*.js\" --fix",
-    "eslint-report": "eslint \"Script/**/*.js\" --format json --output-file eslint-report.json",
+    "eslint": "eslint \"Script/**/*.ts\"",
+    "eslint-fix": "eslint \"Script/**/*.ts\" --fix",
+    "eslint-report": "eslint \"Script/**/*.ts\" --format json --output-file eslint-report.json",
     "parallel-lint": "composer-runner -- run-script --no-interaction parallel-lint",
     "parallel-lint-report": "composer-runner -- run-script --no-interaction parallel-lint-report",
     "php-cs-fixer": "composer-runner -- run-script --no-interaction php-cs-fixer",

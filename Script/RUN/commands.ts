@@ -4,7 +4,6 @@ import { toggleOverlay, onImagesLoaded } from '../JAX/util';
 import Animation from '../JAX/animation';
 import { addIdleClock } from '../JAX/date';
 import { getCoordinates, getComputedStyle } from '../JAX/el';
-import { flashTitle } from '../JAX/flashing-title';
 import gracefulDegrade from '../JAX/graceful-degrade';
 import openTooltip from '../JAX/tooltip';
 import Window from '../JAX/window';
@@ -149,7 +148,7 @@ export default {
         }
     },
     im([fromId, fromName, message, fromMe, timestamp]) {
-        messageReceived({ fromId, fromName, message, fromMe, timestamp })
+        messageReceived({ fromId, fromName, message, fromMe, timestamp });
     },
     imtoggleoffline(a) {
         document.querySelector(`#im_${a}`).classList.add('offline');

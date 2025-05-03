@@ -1,60 +1,26 @@
 /* global RUN, globalsettings */
 
-import Sound from "../sound";
-import { flashTitle } from "./flashing-title";
-import gracefulDegrade from "./graceful-degrade";
-import Window from "./window";
+import Sound from '../sound';
+import { flashTitle } from './flashing-title';
+import gracefulDegrade from './graceful-degrade';
+import Window from './window';
 
-export default function IMWindow(uid, uname) {
-    if (!globalsettings.can_im) {
-        // eslint-disable-next-line no-alert
-        alert('You do not have permission to use this feature.');
-        return;
+function notification(fromName, message) {
+    flashTitle(`New message from ${fromName}!`);
+
+    if (
+        !document.hasFocus() &&
+        window.Notification &&
+        Notification.permission === 'granted'
+    ) {
+        const notify = new Notification(`${fromName} says:`, {
+            body: message,
+        });
+        notify.onclick = () => {
+            window.focus();
+            notify.close();
+        };
     }
-
-    RUN.stream.commands.im([uid, uname, false]);
-}
-
-export function messageReceived({ fromId, fromName, message, fromMe, timestamp }) {
-    notify(fromName, message);
-
-    const messagesContainer = createMessagingWindow({ fromId, fromName, message });
-
-    if (!message) {
-        return;
-    }
-
-    const div = document.createElement('div');
-    const isAction = message.substring(0, 3) === '/me';
-    if (isAction) {
-        div.className = 'action';
-        /* eslint-disable no-param-reassign */
-        message = message.substring(3);
-        fromName = `***${fromName}`;
-        /* eslint-enable no-param-reassign */
-    }
-    div.classList.add(fromMe ? 'you' : 'them');
-    if (!fromMe) {
-        document
-            .querySelector(`#im_${fromId}`)
-            .classList.remove('offline');
-    }
-    div.innerHTML = `<a href='?act=vu${
-        fromMe || parseInt(fromId, 10)
-    }' class='name'>${fromName}</a> ${!isAction ? ': ' : ''}${message}`;
-    div.dataset.timestamp = timestamp;
-    const test =
-        messagesContainer.scrollTop >
-        messagesContainer.scrollHeight -
-            messagesContainer.clientHeight -
-            50;
-    messagesContainer.appendChild(div);
-    if (test) {
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-    gracefulDegrade(div);
-    if (globalsettings.sound_im)
-        Sound.play('imbeep');
 }
 
 function createMessagingWindow({ fromId, fromName, message }) {
@@ -76,15 +42,11 @@ function createMessagingWindow({ fromId, fromName, message }) {
                     <input type='hidden' name='act' value='blank' />
                 </form>
             </div>
-        `.replace(
-            /%s/g,
-            fromId,
-        ),
+        `.replace(/%s/g, fromId),
         className: 'im',
         resize: '.ims',
         animate: true,
     });
-
 
     const win = imWindow.create();
     gracefulDegrade(win);
@@ -102,21 +64,59 @@ function createMessagingWindow({ fromId, fromName, message }) {
     return messagesContainer;
 }
 
-function notify(fromName, message) {
-    flashTitle(`New message from ${fromName}!`);
-
-    if (
-        !document.hasFocus() &&
-        window.Notification &&
-        Notification.permission === 'granted'
-    ) {
-        const notify = new Notification(`${fromName} says:`, {
-            body: message,
-        });
-        notify.onclick = () => {
-            window.focus();
-            notify.close();
-        };
+export default function IMWindow(uid, uname) {
+    if (!globalsettings.can_im) {
+        // eslint-disable-next-line no-alert
+        alert('You do not have permission to use this feature.');
+        return;
     }
+
+    RUN.stream.commands.im([uid, uname, false]);
 }
 
+export function messageReceived({
+    fromId,
+    fromName,
+    message,
+    fromMe,
+    timestamp,
+}) {
+    notification(fromName, message);
+
+    const messagesContainer = createMessagingWindow({
+        fromId,
+        fromName,
+        message,
+    });
+
+    if (!message) {
+        return;
+    }
+
+    const div = document.createElement('div');
+    const isAction = message.substring(0, 3) === '/me';
+    if (isAction) {
+        div.className = 'action';
+        /* eslint-disable no-param-reassign */
+        message = message.substring(3);
+        fromName = `***${fromName}`;
+        /* eslint-enable no-param-reassign */
+    }
+    div.classList.add(fromMe ? 'you' : 'them');
+    if (!fromMe) {
+        document.querySelector(`#im_${fromId}`).classList.remove('offline');
+    }
+    div.innerHTML = `<a href='?act=vu${
+        fromMe || parseInt(fromId, 10)
+    }' class='name'>${fromName}</a> ${!isAction ? ': ' : ''}${message}`;
+    div.dataset.timestamp = timestamp;
+    const test =
+        messagesContainer.scrollTop >
+        messagesContainer.scrollHeight - messagesContainer.clientHeight - 50;
+    messagesContainer.appendChild(div);
+    if (test) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    gracefulDegrade(div);
+    if (globalsettings.sound_im) Sound.play('imbeep');
+}
