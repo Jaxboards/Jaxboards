@@ -17,6 +17,7 @@ use function mb_substr;
 use function mkdir;
 use function opendir;
 use function readdir;
+use function rmdir;
 use function round;
 use function str_replace;
 use function trim;
@@ -79,7 +80,6 @@ final class FileUtils
         }
 
         foreach (glob($dir . '**') as $fileOrDir) {
-            var_dump($fileOrDir);
             if (is_dir($fileOrDir)) {
                 self::removeDirectory($fileOrDir);
 
