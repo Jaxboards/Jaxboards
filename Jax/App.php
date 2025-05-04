@@ -26,24 +26,25 @@ use const JSON_OBJECT_AS_ARRAY;
 use const JSON_THROW_ON_ERROR;
 use const PATHINFO_FILENAME;
 
-final readonly class App
+final class App
 {
-    private float $microtime;
+    private readonly float $microtime;
 
     public function __construct(
-        private Config $config,
-        private Container $container,
-        private Database $database,
-        private Date $date,
-        private DebugLog $debugLog,
-        private DomainDefinitions $domainDefinitions,
-        private IPAddress $ipAddress,
-        private Page $page,
-        private Request $request,
-        private Router $router,
-        private Session $session,
-        private Template $template,
-        private User $user,
+        private readonly Config $config,
+        private readonly Container $container,
+        private readonly Database $database,
+        private readonly Date $date,
+        private readonly DebugLog $debugLog,
+        private readonly DomainDefinitions $domainDefinitions,
+        private readonly IPAddress $ipAddress,
+        private readonly Jax $jax,
+        private readonly Page $page,
+        private readonly Request $request,
+        private readonly Router $router,
+        private readonly Session $session,
+        private readonly Template $template,
+        private readonly User $user,
     ) {
         $this->microtime = microtime(true);
     }

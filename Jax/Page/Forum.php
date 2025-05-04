@@ -84,7 +84,7 @@ final class Forum
     private function viewForum(int $fid): void
     {
         // If no fid supplied, go to the index and halt execution.
-        if ($fid === 0) {
+        if (!$fid) {
             $this->page->location('?');
 
             return;

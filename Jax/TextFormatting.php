@@ -25,12 +25,15 @@ use function str_replace;
 
 use const ENT_QUOTES;
 
-final readonly class TextFormatting
+final class TextFormatting
 {
     public function __construct(
-        private BBCode $bbCode,
-        public TextRules $rules,
-        private User $user,
+        private readonly Config $config,
+        private readonly BBCode $bbCode,
+        private readonly Database $database,
+        private readonly DomainDefinitions $domainDefinitions,
+        public readonly TextRules $rules,
+        private readonly User $user,
     ) {}
 
     /**
@@ -56,7 +59,7 @@ final readonly class TextFormatting
         $emoticonLimit = 15;
         $emotes = $this->rules->getEmotes();
 
-        if ($emotes === []) {
+        if (!$emotes) {
             return $text;
         }
 

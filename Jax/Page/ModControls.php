@@ -37,22 +37,22 @@ use function trim;
 use const FILTER_VALIDATE_IP;
 use const PHP_EOL;
 
-final readonly class ModControls
+final class ModControls
 {
     public function __construct(
-        private Config $config,
-        private Database $database,
-        private DomainDefinitions $domainDefinitions,
-        private IPAddress $ipAddress,
-        private Jax $jax,
-        private ModTopics $modTopics,
-        private ModPosts $modPosts,
-        private Page $page,
-        private Request $request,
-        private Session $session,
-        private TextFormatting $textFormatting,
-        private Template $template,
-        private User $user,
+        private readonly Config $config,
+        private readonly Database $database,
+        private readonly DomainDefinitions $domainDefinitions,
+        private readonly IPAddress $ipAddress,
+        private readonly Jax $jax,
+        private readonly ModTopics $modTopics,
+        private readonly ModPosts $modPosts,
+        private readonly Page $page,
+        private readonly Request $request,
+        private readonly Session $session,
+        private readonly TextFormatting $textFormatting,
+        private readonly Template $template,
+        private readonly User $user,
     ) {
         $this->template->loadMeta('modcp');
     }

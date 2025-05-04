@@ -117,7 +117,7 @@ final class Post
         $hash = hash_file('sha512', $fileobj['tmp_name']);
         $uploadPath = $this->domainDefinitions->getBoardPath() . '/Uploads/';
 
-        $ext = pathinfo((string) $fileobj['name'], PATHINFO_EXTENSION);
+        $ext = (string) pathinfo($fileobj['name'], PATHINFO_EXTENSION);
 
         $imageExtension = in_array($ext, $this->config->getSetting('images') ?? [], true)
             ? ".{$ext}"
@@ -157,7 +157,7 @@ final class Post
     private function previewPost(): void
     {
         $post = $this->postData;
-        if (trim((string) $post) !== '' && trim((string) $post) !== '0') {
+        if (trim($post) !== '' && trim($post) !== '0') {
             $post = $this->textFormatting->theWorks($post);
             $post = $this->template->meta('post-preview', $post);
             $this->postpreview = $post;
@@ -353,7 +353,7 @@ final class Post
             $this->page->command('closewindow', '#qreply');
         }
 
-        if ($tid !== 0) {
+        if ($tid) {
             $result = $this->database->safespecial(
                 <<<'SQL'
                     SELECT
@@ -387,7 +387,7 @@ final class Post
             'act' => 'post',
             'how' => 'fullpost',
         ];
-        if ($this->pid !== 0) {
+        if ($this->pid) {
             $varsarray['pid'] = $this->pid;
         } else {
             $varsarray['tid'] = $tid;
@@ -518,7 +518,7 @@ final class Post
         $error = match (true) {
             !$pid => 'Invalid post to edit.',
             $postData !== null && trim($postData) === '' => "You didn't supply a post!",
-            mb_strlen((string) $this->postData) > 65_535 => 'Post must not exceed 65,535 bytes.',
+            mb_strlen($this->postData) > 65_535 => 'Post must not exceed 65,535 bytes.',
             default => null,
         };
 
@@ -550,7 +550,7 @@ final class Post
         }
 
         if ($tid && $error === null) {
-            if ($tid === 0) {
+            if (!$tid) {
                 $error = 'Invalid post to edit.';
             } else {
                 $result = $this->database->safeselect(
@@ -657,14 +657,14 @@ final class Post
         $uid = $this->user->get('id');
         $error = null;
 
-        if ($this->postData !== null && trim((string) $postData) === '') {
+        if ($this->postData !== null && trim($postData) === '') {
             $error = "You didn't supply a post!";
-        } elseif (mb_strlen((string) $postData) > 50000) {
+        } elseif (mb_strlen($postData) > 50000) {
             $error = 'Post must not exceed 50,000 characters.';
         }
 
         if ($error === null && $this->how === 'newtopic') {
-            if ($fid === 0) {
+            if (!$fid) {
                 $error = 'No forum specified exists.';
             } elseif (
                 trim($this->request->post('ttitle') ?? '') === ''

@@ -10,7 +10,7 @@ use function base64_decode;
 
 final class UserTest
 {
-    private readonly string $encodedForumFlags;
+    private string $encodedForumFlags;
 
     /**
      * @var array<int,array<string,bool>>
@@ -24,8 +24,8 @@ final class UserTest
     ];
 
     public function __construct(
-        private readonly Assert $assert,
-        private readonly Container $container,
+        private Assert $assert,
+        private Container $container,
     ) {
         $this->encodedForumFlags = base64_decode('AAEAPgADABgABAAYAAUAGAAGAD8=', true);
     }

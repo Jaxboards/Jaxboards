@@ -43,12 +43,10 @@ final class FileUtils
         }
 
         while (($file = readdir($dir)) !== false) {
-            if ($file === '.') {
+            if ($file === '.' || $file === '..') {
                 continue;
             }
-            if ($file === '..') {
-                continue;
-            }
+
             $sourcePath = "{$src}/{$file}";
             $destPath = "{$dst}/{$file}";
 
@@ -60,7 +58,6 @@ final class FileUtils
 
             copy($sourcePath, $destPath);
         }
-
         closedir($dir);
 
         return true;

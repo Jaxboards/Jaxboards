@@ -27,7 +27,7 @@ use function unlink;
 
 use const PATHINFO_EXTENSION;
 
-final readonly class FileManager
+final class FileManager
 {
     public function __construct(
         private Config $config,

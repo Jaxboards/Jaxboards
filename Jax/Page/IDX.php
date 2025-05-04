@@ -542,7 +542,7 @@ final class IDX
     {
         $unreadForums = array_filter(
             $this->fetchIDXForums(),
-            fn($forum): bool => !$this->isForumRead($forum),
+            fn($forum) => !$this->isForumRead($forum),
         );
         foreach ($unreadForums as $forum) {
             $this->page->command('addclass', '#fid_' . $forum['id'], 'unread');

@@ -73,7 +73,7 @@ final readonly class Tools
         $dbPrefix = $this->database->getPrefix();
 
         $result = $this->database->safequery("SHOW TABLES LIKE '{$dbPrefix}%%'");
-        $tables = array_map(static fn(array $row): string => (string) array_values($row)[0], $this->database->arows($result));
+        $tables = array_map(static fn(array $row) => (string) array_values($row)[0], $this->database->arows($result));
 
         $sqlFileLines = [
             "-- Jaxboards Backup {$dbPrefix} {$this->database->datetime()}",
@@ -106,7 +106,6 @@ final readonly class Tools
             while ($row = $this->database->arow($select)) {
                 $sqlFileLines[] = $this->database->buildInsertQuery($ftable, $row);
             }
-
             $sqlFileLines[] = '';
         }
 

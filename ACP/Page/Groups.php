@@ -6,6 +6,7 @@ namespace ACP\Page;
 
 use ACP\Page;
 use Jax\Database;
+use Jax\Jax;
 use Jax\Request;
 use Jax\TextFormatting;
 
@@ -27,6 +28,7 @@ final class Groups
 
     public function __construct(
         private readonly Database $database,
+        private readonly Jax $jax,
         private readonly Page $page,
         private readonly Request $request,
         private readonly TextFormatting $textFormatting,

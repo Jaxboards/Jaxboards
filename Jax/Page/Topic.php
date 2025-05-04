@@ -218,7 +218,7 @@ final class Topic
         $this->topicdata['fperms'] = $this->user->getForumPerms($this->topicdata['fperms']);
     }
 
-    private function viewtopic(int $tid): void
+    private function viewtopic($tid): void
     {
         if (!is_array($this->topicdata)) {
             return;
@@ -414,7 +414,7 @@ final class Topic
         $this->page->append('PAGE', $page);
     }
 
-    private function update(int $tid): void
+    private function update($tid): void
     {
 
         // Check for new posts and append them.
@@ -1224,7 +1224,7 @@ final class Topic
         $this->page->command('update', "#pid_{$pid} .post_content", $form);
     }
 
-    private function multiquote(int $tid): void
+    private function multiquote($tid): void
     {
         $pid = $this->request->both('quote');
         $post = false;
@@ -1283,7 +1283,7 @@ final class Topic
         $this->page->command('softurl');
     }
 
-    private function getlastpost(int $tid): void
+    private function getlastpost($tid): void
     {
         $result = $this->database->safeselect(
             'MAX(`id`) AS `lastpid`,COUNT(`id`) AS `numposts`',

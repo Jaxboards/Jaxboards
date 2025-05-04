@@ -36,7 +36,7 @@ final class ContactDetails
     {
         $contactFields = array_filter(
             array_keys($profile),
-            static fn($field): bool => str_starts_with((string) $field, 'contact') && $profile[$field],
+            static fn($field) => str_starts_with($field, 'contact') && $profile[$field],
         );
 
         return array_reduce($contactFields, static function ($links, $field) use ($profile) {

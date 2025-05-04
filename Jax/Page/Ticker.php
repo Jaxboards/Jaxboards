@@ -6,6 +6,7 @@ namespace Jax\Page;
 
 use Jax\Database;
 use Jax\Date;
+use Jax\Jax;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
@@ -19,6 +20,7 @@ final class Ticker
     public function __construct(
         private readonly Database $database,
         private readonly Date $date,
+        private readonly Jax $jax,
         private readonly Page $page,
         private readonly Request $request,
         private readonly Session $session,

@@ -227,7 +227,7 @@ final class Page
         // We've exhausted all other ways of finding the right skin
         // Fallback to default
         if ($skin === null) {
-            return [
+            $skin = [
                 'custom' => 0,
                 'title' => 'Default',
                 'wrapper' => false,
@@ -240,9 +240,10 @@ final class Page
     private function getPageTitle(): string
     {
         return (
-            ($this->template->meta('title') ?: $this->config->getSetting('boardname'))
+            $this->template->meta('title')
+            ?: $this->config->getSetting('boardname')
             ?: 'JaxBoards'
-        ) . ($this->pageTitle !== '' && $this->pageTitle !== '0' ? ' -> ' . $this->pageTitle : '');
+        ) . ($this->pageTitle ? ' -> ' . $this->pageTitle : '');
     }
 
     private function outputJavascriptCommands(): void

@@ -33,7 +33,7 @@ foreach ($testFiles as $testFile) {
     $reflection = new ReflectionClass($classPath);
     $testMethods = array_filter(
         array_map(static fn($method) => $method->name, $reflection->getMethods(ReflectionMethod::IS_PUBLIC)),
-        static fn($methodName): bool => !str_starts_with((string) $methodName, '_'),
+        static fn($methodName) => !str_starts_with($methodName, '_'),
     );
 
     echo "--- {$classPath} ---" . PHP_EOL;

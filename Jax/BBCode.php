@@ -118,7 +118,6 @@ final class BBCode
             if ($tmp === $text || !is_string($tmp)) {
                 break;
             }
-
             $text = $tmp;
         }
 
@@ -135,7 +134,6 @@ final class BBCode
             if ($tmp === $text || !is_string($tmp)) {
                 break;
             }
-
             $text = $tmp;
         }
 
@@ -150,7 +148,7 @@ final class BBCode
             return "Attachment doesn't exist";
         }
 
-        $ext = pathinfo((string) $file['name'], PATHINFO_EXTENSION);
+        $ext = (string) pathinfo($file['name'], PATHINFO_EXTENSION);
         $imageExtensions = $this->config->getSetting('images') ?? [];
 
         if (
@@ -246,14 +244,15 @@ final class BBCode
     private function bbcodeLICallback(array $match): string
     {
         $tag = $match[1];
+        $items = $match[2];
         $items = preg_split("@([\r\n]+|^)\\*@", (string) $match[2]);
 
         // This HTML construction could be prettier, but
         // SonarQube requires the LI tags to be surrounded by OL and UL
         $html = $tag === 'ol' ? '<ol>' : '<ul>';
         $html .= implode('', array_map(
-            static fn($item): string => "<li>{$item}</li>",
-            array_filter($items, static fn($line): bool => (bool) trim((string) $line)),
+            static fn($item) => "<li>{$item}</li>",
+            array_filter($items, static fn($line) => (bool) trim($line)),
         ));
 
         return $html . ($tag === 'ol' ? '</ol>' : '</ul>');

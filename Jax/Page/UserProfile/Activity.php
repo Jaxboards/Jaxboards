@@ -25,13 +25,13 @@ final class Activity
     private ?array $profile = null;
 
     public function __construct(
-        private readonly Database $database,
-        private readonly Date $date,
-        private readonly DomainDefinitions $domainDefinitions,
-        private readonly Request $request,
-        private readonly TextFormatting $textFormatting,
-        private readonly Template $template,
-        private readonly User $user,
+        private Database $database,
+        private Date $date,
+        private DomainDefinitions $domainDefinitions,
+        private Request $request,
+        private TextFormatting $textFormatting,
+        private Template $template,
+        private User $user,
     ) {}
 
     /**
@@ -164,13 +164,13 @@ final class Activity
             $tabHTML .= $this->parseActivity($activity);
         }
 
-        return $tabHTML
-            ? <<<HTML
+        return !$tabHTML
+            ? 'This user has yet to do anything noteworthy!'
+            : <<<HTML
                 <a href="?act=vu{$this->profile['id']}&amp;page=activity&amp;fmt=RSS"
                    target="_blank" class="social" style='float:right'
                 >RSS</a>{$tabHTML}
-                HTML
-            : 'This user has yet to do anything noteworthy!';
+                HTML;
     }
 
     /**

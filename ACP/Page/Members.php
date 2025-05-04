@@ -327,7 +327,7 @@ final readonly class Members
         );
     }
 
-    private function updateMember(?array $member): string
+    private function updateMember($member): string
     {
         if (
             $member['group_id'] !== 2 || $this->user->get('id') === 1
@@ -853,7 +853,7 @@ final readonly class Members
 
     private function massMessage(): void
     {
-        $this->user->getUser();
+        $userData = $this->user->getUser();
         $page = '';
         if ($this->request->post('submit') !== null) {
             if (

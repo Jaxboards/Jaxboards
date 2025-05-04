@@ -328,7 +328,7 @@ final readonly class Forums
         $this->page->addContentBox('Forums', $page);
     }
 
-    private function fetchForum(int $forumId): ?array
+    private function fetchForum($forumId): ?array
     {
         $result = $this->database->safeselect(
             [
@@ -584,13 +584,13 @@ final readonly class Forums
             'forums/create-forum-permissions.html',
             [
                 'content' => $permsTable,
-                'submit' => $fid !== 0 ? 'Save' : 'Next',
+                'submit' => $fid ? 'Save' : 'Next',
             ],
         );
 
         $this->page->addContentBox(
-            ($fid !== 0 ? 'Edit' : 'Create') . ' Forum'
-            . ($fid !== 0 ? ' - ' . $this->textFormatting->blockhtml($forum['title']) : ''),
+            ($fid ? 'Edit' : 'Create') . ' Forum'
+            . ($fid ? ' - ' . $this->textFormatting->blockhtml($forum['title']) : ''),
             $page,
         );
         $this->page->addContentBox('Moderators', $moderators);
@@ -668,7 +668,7 @@ final readonly class Forums
         return $error;
     }
 
-    private function serializePermsFromInput(): string
+    private function serializePermsFromInput()
     {
         $result = $this->database->safeselect(
             ['id'],
@@ -677,7 +677,7 @@ final readonly class Forums
 
         // First fetch all group IDs
         $groupIds = array_map(
-            static fn(array $group) => $group['id'],
+            static fn($group) => $group['id'],
             $this->database->arows($result),
         );
         $this->database->disposeresult($result);
@@ -702,13 +702,12 @@ final readonly class Forums
         return $this->jax->serializeForumPerms($groupPerms);
     }
 
-    private function getFormData(?array $forum): array
+    private function getFormData($forum)
     {
         $sub = (int) $this->request->post('show_sub');
         if (is_numeric($this->request->post('orderby'))) {
             $orderby = (int) $this->request->post('orderby');
         }
-
         $result = $this->database->safeselect(
             ['id'],
             'categories',
@@ -929,7 +928,6 @@ final readonly class Forums
         while ($category = $this->database->arow($result)) {
             $categories[$category['id']] = $category['title'];
         }
-
         $this->database->disposeresult($result);
 
         if (!array_key_exists($catId, $categories)) {
