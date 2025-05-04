@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
+use Carbon\Carbon;
 use Jax\Config;
 use Jax\Database;
 use Jax\Jax;
@@ -24,7 +25,6 @@ use function mb_strstr;
 use function password_hash;
 use function password_verify;
 use function preg_match;
-use function strtotime;
 use function trim;
 use function ucfirst;
 
@@ -413,7 +413,7 @@ final class UCP
                 || $data['dob_year'] > (int) gmdate('Y')
              ? null : gmdate(
                  'Y',
-                 strtotime($data['dob_year'] . '/1/1'),
+                 Carbon::parse($data['dob_year'] . '/1/1')->getTimestamp(),
              );
 
             $data['dob_month']
@@ -423,7 +423,7 @@ final class UCP
                 || $data['dob_month'] > 12
              ? null : gmdate(
                  'm',
-                 strtotime('2000/' . $data['dob_month'] . '/1'),
+                 Carbon::parse('2000/' . $data['dob_month'] . '/1')->getTimestamp(),
              );
 
             $data['dob_day']
@@ -432,7 +432,7 @@ final class UCP
                 || $data['dob_day'] < 1
              ? null : gmdate(
                  'd',
-                 strtotime('2000/1/' . $data['dob_day']),
+                 Carbon::parse('2000/1/' . $data['dob_day'])->getTimestamp(),
              );
 
             // Is the date provided valid?
@@ -441,7 +441,7 @@ final class UCP
                 if ((int) $data['dob_month'] === 2) {
                     if (
                         $data['dob_year'] > 0
-                        && gmdate('L', strtotime($data['dob_year']))
+                        && gmdate('L', Carbon::parse($data['dob_year'])->getTimestamp())
                     ) {
                         $daysInMonth = 29;
                     } elseif ($data['dob_year'] > 0) {
@@ -454,7 +454,7 @@ final class UCP
                 } else {
                     $daysInMonth = (int) gmdate(
                         't',
-                        strtotime($data['dob_month'] . '/1'),
+                        Carbon::parse($data['dob_month'] . '/1')->getTimestamp(),
                     );
                 }
 

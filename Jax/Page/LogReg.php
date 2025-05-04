@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
+use Carbon\Carbon;
 use Jax\Config;
 use Jax\Database;
 use Jax\DomainDefinitions;
@@ -26,7 +27,6 @@ use function preg_match;
 use function rawurlencode;
 use function session_destroy;
 use function session_unset;
-use function time;
 use function trim;
 
 use const FILTER_VALIDATE_EMAIL;
@@ -205,7 +205,7 @@ final class LogReg
                 $this->database->safeinsert(
                     'tokens',
                     [
-                        'expires' => $this->database->datetime(time() + 3600 * 24 * 30),
+                        'expires' => $this->database->datetime(Carbon::now()->getTimestamp() + 3600 * 24 * 30),
                         'token' => $loginToken,
                         'type' => 'login',
                         'uid' => $user['id'],
@@ -215,7 +215,7 @@ final class LogReg
                 $this->request->setCookie(
                     'utoken',
                     $loginToken,
-                    time() + 3600 * 24 * 30,
+                    Carbon::now()->getTimestamp() + 3600 * 24 * 30,
                 );
                 $this->session->clean($user['id']);
                 $this->session->set('user', $username);
@@ -423,7 +423,7 @@ final class LogReg
                     $this->database->safeinsert(
                         'tokens',
                         [
-                            'expires' => $this->database->datetime(time() + 3600 * 24),
+                            'expires' => $this->database->datetime(Carbon::now()->getTimestamp() + 3600 * 24),
                             'token' => $forgotpasswordtoken,
                             'type' => 'forgotpassword',
                             'uid' => $udata['id'],

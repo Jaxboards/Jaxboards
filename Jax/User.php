@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use Carbon\Carbon;
 use function array_merge;
-use function date;
 use function password_hash;
 use function password_needs_rehash;
 use function password_verify;
@@ -124,7 +124,7 @@ final class User
         $this->database->disposeresult($result);
 
         if ($user) {
-            $user['birthday'] = date('n j') === $user['birthday'];
+            $user['birthday'] = Carbon::now()->format('n j') === $user['birthday'];
 
             // Password parsing.
             if ($pass && !$this->verifyPassword($user, $pass)) {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Modules;
 
+use Carbon\Carbon;
 use Jax\Config;
 use Jax\Database;
 use Jax\Page;
@@ -18,7 +19,6 @@ use function in_array;
 use function is_numeric;
 use function json_decode;
 use function json_encode;
-use function time;
 use function trim;
 
 use const PHP_EOL;
@@ -106,14 +106,14 @@ final readonly class PrivateMessage
             $this->user->get('display_name'),
             $instantMessage,
             $this->user->get('id'),
-            time(),
+            Carbon::now()->getTimestamp(),
         ];
         $this->page->command(...$cmd);
         $cmd[1] = $this->user->get('id');
         $cmd[4] = 0;
         $onlineusers = $this->database->getUsersOnline();
-        $logoutTime = time() - $this->config->getSetting('timetologout');
-        $updateTime = time() - $this->config->getSetting('updateinterval') * 5;
+        $logoutTime = Carbon::now()->getTimestamp() - $this->config->getSetting('timetologout');
+        $updateTime = Carbon::now()->subSeconds(5)->getTimestamp();
         if (
             !isset($onlineusers[$uid])
             || !$onlineusers[$uid]
@@ -146,7 +146,7 @@ final readonly class PrivateMessage
             ['session'],
             $this->database->basicvalue(json_encode($cmd) . PHP_EOL),
             $uid,
-            $this->database->datetime(time() - $this->config->getSetting('updateinterval') * 5),
+            $this->database->datetime(Carbon::now()->subSeconds(5)->getTimestamp()),
         );
 
         return $this->database->affectedRows() !== 0;

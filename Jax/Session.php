@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use Carbon\Carbon;
 use function base64_encode;
 use function ini_set;
 use function is_numeric;
@@ -16,7 +17,6 @@ use function preg_replace_callback;
 use function serialize;
 use function session_start;
 use function str_contains;
-use function time;
 use function unserialize;
 
 final class Session
@@ -275,7 +275,7 @@ final class Session
 
     public function act(?string $location = null): void
     {
-        $this->set('last_action', time());
+        $this->set('last_action', Carbon::now()->getTimestamp());
         if (!$location) {
             return;
         }
@@ -290,7 +290,7 @@ final class Session
 
     public function clean($uid): bool
     {
-        $timeago = time() - $this->config->getSetting('timetologout');
+        $timeago = Carbon::now()->getTimestamp() - $this->config->getSetting('timetologout');
         if (!is_numeric($uid) || $uid < 1) {
             $uid = null;
         } else {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
+use Carbon\Carbon;
 use Jax\Database;
 use Jax\Date;
 use Jax\Jax;
@@ -22,7 +23,6 @@ use function max;
 use function mb_strlen;
 use function number_format;
 use function preg_match;
-use function time;
 
 final class Forum
 {
@@ -534,7 +534,7 @@ final class Forum
     private function markRead(int $id): void
     {
         $forumsread = $this->jax->parseReadMarkers($this->session->get('forumsread'));
-        $forumsread[$id] = time();
+        $forumsread[$id] = Carbon::now()->getTimestamp();
         $this->session->set('forumsread', json_encode($forumsread));
     }
 }
