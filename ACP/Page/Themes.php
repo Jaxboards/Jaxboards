@@ -520,11 +520,9 @@ final readonly class Themes
                 }
 
                 mkdir($this->themesPath . $this->request->post('skinname'), 0o777, true);
-                file_put_contents(
+                copy(
+                    $this->domainDefinitions->getDefaultThemePath() . '/css.css',
                     $this->themesPath . $this->request->post('skinname') . '/css.css',
-                    file_get_contents(
-                        $this->domainDefinitions->getDefaultThemePath() . '/css.css',
-                    ),
                 );
 
                 $this->page->location('?act=Themes');
