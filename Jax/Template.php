@@ -259,9 +259,9 @@ final class Template
      *
      * @return array<string,string> Map of metaName => view HTML
      */
-    private function loadComponentTemplates($componentDir): array
+    private function loadComponentTemplates(string $componentDir): array
     {
-        return array_reduce(glob($componentDir . '/*.html'), function ($meta, $metaFile) {
+        return array_reduce(glob($componentDir . '/*.html'), function (array $meta, $metaFile) {
             $metaName = pathinfo($metaFile, PATHINFO_FILENAME);
             $metaContent = file_get_contents($metaFile);
 

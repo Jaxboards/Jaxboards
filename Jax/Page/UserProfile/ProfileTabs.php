@@ -50,7 +50,7 @@ final class ProfileTabs
      *
      * @return list{list<string>,string}
      */
-    public function render($profile): array
+    public function render(?array $profile): array
     {
         $this->profile = $profile;
 

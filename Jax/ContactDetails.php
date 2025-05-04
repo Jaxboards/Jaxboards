@@ -39,7 +39,7 @@ final class ContactDetails
             static fn($field): bool => str_starts_with((string) $field, 'contact') && $profile[$field],
         );
 
-        return array_reduce($contactFields, static function ($links, $field) use ($profile) {
+        return array_reduce($contactFields, static function (array $links, $field) use ($profile) {
             $type = mb_substr($field, 8);
             $value = $profile[$field];
             $href = sprintf(self::CONTACT_URLS[$type], $value);

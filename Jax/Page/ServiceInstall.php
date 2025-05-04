@@ -34,7 +34,7 @@ use const PHP_URL_HOST;
 
 final class ServiceInstall
 {
-    private $fields = [
+    private array $fields = [
         'admin_username' => [
             'name' => 'Admin Username',
             'placeholder' => 'admin',

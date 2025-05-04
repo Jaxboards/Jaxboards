@@ -34,7 +34,7 @@ use const PASSWORD_DEFAULT;
 
 final class LogReg
 {
-    private $registering = false;
+    private bool $registering = false;
 
     public function __construct(
         private readonly Config $config,

@@ -79,7 +79,7 @@ final readonly class Jax
 
             $parsedPerms[$groupId] = array_reduce(
                 array_keys(self::FORUM_PERMS_ORDER),
-                static function ($perms, $key) use ($flag) {
+                static function (array $perms, $key) use ($flag) {
                     $perms[self::FORUM_PERMS_ORDER[$key]] = (bool) ($flag & (1 << $key));
 
                     return $perms;

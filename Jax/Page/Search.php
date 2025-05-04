@@ -40,7 +40,7 @@ final class Search
 {
     private int $pageNum = 0;
 
-    private $fids = [];
+    private array $fids = [];
 
     private int $perpage;
 

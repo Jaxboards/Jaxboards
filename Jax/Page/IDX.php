@@ -571,7 +571,7 @@ final class IDX
         }
     }
 
-    private function formatlastpost($forum): ?string
+    private function formatlastpost(array $forum): ?string
     {
         return $this->template->meta(
             'idx-row-lastpost',
@@ -587,7 +587,7 @@ final class IDX
         );
     }
 
-    private function isForumRead($forum): bool
+    private function isForumRead(array $forum): bool
     {
         if (!$this->forumsread) {
             $this->forumsread = $this->jax->parseReadMarkers($this->session->get('forumsread'));

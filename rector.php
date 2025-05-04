@@ -23,15 +23,6 @@ use Rector\Strict\Rector\If_\BooleanInIfConditionRuleFixerRector;
 use Rector\Strict\Rector\Ternary\BooleanInTernaryOperatorRuleFixerRector;
 use Rector\Strict\Rector\Ternary\DisallowedShortTernaryRuleFixerRector;
 use Rector\TypeDeclaration\Rector\BooleanAnd\BinaryOpNullableToInstanceofRector;
-use Rector\TypeDeclaration\Rector\Class_\PropertyTypeFromStrictSetterGetterRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\AddParamTypeFromPropertyTypeRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\ParamTypeByMethodCallTypeRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\StrictArrayParamDimFetchRector;
-use Rector\TypeDeclaration\Rector\ClassMethod\StrictStringParamConcatRector;
-use Rector\TypeDeclaration\Rector\Empty_\EmptyOnNullableObjectToInstanceOfRector;
-use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
-use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictSetUpRector;
-use Rector\TypeDeclaration\Rector\StmtsAwareInterface\DeclareStrictTypesRector;
 use Rector\TypeDeclaration\Rector\While_\WhileNullableToInstanceofRector;
 
 return RectorConfig::configure()

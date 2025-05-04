@@ -19,7 +19,7 @@ use function sprintf;
 
 final class Calendar
 {
-    private $month;
+    private ?int $month = null;
 
     public function __construct(
         private readonly Database $database,

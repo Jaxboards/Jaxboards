@@ -272,7 +272,7 @@ final readonly class ModControls
             if ($error !== null) {
                 $page .= $this->template->meta('error', $error);
             } else {
-                function field($label, $name, $value, $type = 'input'): string
+                function field(string $label, string $name, string $value, $type = 'input'): string
                 {
                     return '<tr><td><label for="m_' . $name . '">' . $label
                         . '</label></td><td>'
