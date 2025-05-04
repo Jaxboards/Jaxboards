@@ -519,7 +519,7 @@ final readonly class Themes
                     );
                 }
 
-                mkdir($this->themesPath . $this->request->post('skinname'), 0777, true);
+                mkdir($this->themesPath . $this->request->post('skinname'), 0o777, true);
                 file_put_contents(
                     $this->themesPath . $this->request->post('skinname') . '/css.css',
                     file_get_contents(
