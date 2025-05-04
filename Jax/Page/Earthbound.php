@@ -17,7 +17,7 @@ final readonly class Earthbound
     public function render(): void
     {
         $this->page->command('softurl');
-        $this->page->command('loadscript', './Script/earthbound.js');
+        $this->page->command('loadscript', '/Script/eggs/earthbound.js');
         $this->page->command('playsound', 'earthbound', $this->domainDefinitions->getSoundsURL() . '/earthboundbattle.mp3');
     }
 }

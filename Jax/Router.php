@@ -20,6 +20,7 @@ use Jax\Page\ModControls;
 use Jax\Page\Post;
 use Jax\Page\Rainbow;
 use Jax\Page\Search;
+use Jax\Page\Solitaire;
 use Jax\Page\Tardis;
 use Jax\Page\Ticker;
 use Jax\Page\Topic;
@@ -50,6 +51,7 @@ final class Router
         'post' => Post::class,
         'rainbow' => Rainbow::class,
         'search' => Search::class,
+        'solitaire' => Solitaire::class,
         'tardis' => Tardis::class,
         'ticker' => Ticker::class,
         'topic' => Topic::class,

@@ -2,7 +2,7 @@
 import gracefulDegrade from './JAX/graceful-degrade';
 import { assign, onDOMReady } from './JAX/util';
 
-const postIDs = function fetchPIDs(strPIDs) {
+const postIDs = function fetchPIDs(strPIDs: string) {
     const pids = strPIDs ? strPIDs.split(',') : [];
     const pl = pids ? pids.length : 0;
     const pluralPosts = pids.length === 1 ? '' : 's';
@@ -10,7 +10,7 @@ const postIDs = function fetchPIDs(strPIDs) {
     return [pids, pl, pluralPosts, andPosts];
 };
 
-const threadIDs = function fetchTIDs(strTIDs) {
+const threadIDs = function fetchTIDs(strTIDs: string) {
     const tids = strTIDs ? strTIDs.split(',') : [];
     const tl = tids ? tids.length : 0;
     const pluralThreads = tl === 1 ? '' : 's';
