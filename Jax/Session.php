@@ -54,7 +54,7 @@ final class Session
         'Friendly_Crawler' => 'FriendlyCrawler',
         'Googlebot' => 'Google',
         'GoogleOther' => 'GoogleOther',
-	'Google-Read-Aloud' => 'Google-Read-Aloud',
+        'Google-Read-Aloud' => 'Google-Read-Aloud',
         'GPTBot' => 'GPTBot',
         'ia_archiver' => 'Internet Archive Alexa',
         'ImagesiftBot' => 'Imagesift',
