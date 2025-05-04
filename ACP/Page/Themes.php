@@ -519,24 +519,19 @@ final readonly class Themes
                     );
                 }
 
-                if (
-                    !is_dir($this->boardPath . 'Themes')
-                    && is_writable($this->boardPath)
-                ) {
-                    mkdir($this->boardPath . 'Themes');
+                if (!is_dir($this->themesPath)) {
+                    mkdir($this->themesPath);
                 }
 
-                if (is_dir($this->boardPath . 'Themes')) {
-                    mkdir($this->boardPath . 'Themes');
+                if (is_dir($this->themesPath)) {
+                    mkdir($this->themesPath);
                     mkdir($this->themesPath . $this->request->post('skinname'));
-                    $o = fopen($this->themesPath . $this->request->post('skinname') . '/css.css', 'w');
-                    fwrite(
-                        $o,
+                    file_put_contents(
+                        $this->themesPath . $this->request->post('skinname') . '/css.css',
                         file_get_contents(
                             $this->domainDefinitions->getDefaultThemePath() . '/css.css',
                         ),
                     );
-                    fclose($o);
                 }
 
                 $this->page->location('?act=Themes');
