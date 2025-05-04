@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
+use Jax\ContactDetails;
 use Jax\Database;
 use Jax\Date;
 use Jax\IPAddress;
@@ -29,25 +30,13 @@ use function ucfirst;
 
 final class UserProfile
 {
-    private const CONTACT_URLS = [
-        'aim' => 'aim:goaim?screenname=%s',
-        'bluesky' => 'https://bsky.app/profile/%s.bsky.social',
-        'discord' => 'discord:%s',
-        'googlechat' => 'gchat:chat?jid=%s',
-        'msn' => 'msnim:chat?contact=%s',
-        'skype' => 'skype:%s',
-        'steam' => 'https://steamcommunity.com/id/%s',
-        'twitter' => 'https://twitter.com/%s',
-        'yim' => 'ymsgr:sendim?%s',
-        'youtube' => 'https://youtube.com/%s',
-    ];
-
     /**
      * @var array<string,null|float|int|string> the profile we are currently viewing
      */
     private ?array $profile = null;
 
     public function __construct(
+        private readonly ContactDetails $contactDetails,
         private readonly Database $database,
         private readonly Date $date,
         private readonly IPAddress $ipAddress,
@@ -173,21 +162,17 @@ final class UserProfile
     {
         $profile = $this->profile;
         $contactDetails = '';
-        $contactFields = array_filter(
-            array_keys($profile),
-            static fn($field) => str_starts_with($field, 'contact') && $profile[$field],
-        );
 
-        $contactDetails = array_reduce($contactFields, static function ($html, $field) use ($profile) {
-            $type = mb_substr($field, 8);
-            $value = $profile[$field];
-            $href = sprintf(self::CONTACT_URLS[$type], $value);
-            $html .= <<<HTML
-                <div class="contact {$type}"><a href="{$href}">{$value}</a></div>
-                HTML;
-
-            return $html;
-        }, '');
+        $links = $this->contactDetails->getContactLinks($profile);
+        $contactDetails = implode('', array_map(
+            function($service) use ($links) {
+                [$href, $value] = $links[$service];
+                return <<<HTML
+                    <div class="contact {$service}"><a href="{$href}">{$value}</a></div>
+                    HTML;
+            },
+            array_keys($links)
+        ));
 
         $contactDetails .= <<<HTML
             <div class="contact im">
@@ -215,19 +200,9 @@ final class UserProfile
         $contactdetails = '';
         $profile = $this->profile;
 
-        foreach (self::CONTACT_URLS as $field => $url) {
-            if (!$profile['contact_' . $field]) {
-                continue;
-            }
-
-            $href = sprintf(
-                $url,
-                $this->textFormatting->blockhtml(
-                    $profile["contact_{$field}"],
-                ),
-            );
+        foreach ($this->contactDetails->getContactLinks($profile) as $type => [$href]) {
             $contactdetails .= <<<"HTML"
-                <a class="{$field} contact" title="{$field} contact" href="{$href}">&nbsp;</a>
+                <a class="{$type} contact" title="{$type} contact" href="{$href}">&nbsp;</a>
                 HTML;
         }
 

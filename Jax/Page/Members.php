@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
+use Jax\ContactDetails;
 use Jax\Database;
 use Jax\Date;
 use Jax\Jax;
@@ -11,6 +12,7 @@ use Jax\Page;
 use Jax\Request;
 use Jax\Template;
 use Jax\TextFormatting;
+use PHP_CodeSniffer\Generators\HTML;
 
 use function ceil;
 use function is_numeric;
@@ -23,6 +25,7 @@ final class Members
     private $perpage = 20;
 
     public function __construct(
+        private readonly ContactDetails $contactDetails,
         private readonly Database $database,
         private readonly Date $date,
         private readonly Jax $jax,
@@ -154,26 +157,10 @@ final class Members
 
         foreach ($memberarray as $member) {
             $contactdetails = '';
-            $contactUrls = [
-                'aim' => 'aim:goaim?screenname=%s',
-                'bluesky' => 'https://bsky.app/profile/%s.bsky.social',
-                'discord' => 'discord:%s',
-                'googlechat' => 'gtalk:chat?jid=%s',
-                'msn' => 'msnim:chat?contact=%s',
-                'skype' => 'skype:%s',
-                'steam' => 'https://steamcommunity.com/id/%s',
-                'twitter' => 'https://twitter.com/%s',
-                'yim' => 'ymsgr:sendim?%s',
-                'youtube' => 'https://youtube.com/%s',
-            ];
-            foreach ($contactUrls as $service => $url) {
-                if (!$member['contact_' . $service]) {
-                    continue;
-                }
-
-                $contactdetails .= '<a class="' . $service . ' contact" href="'
-                    . sprintf($url, $this->textFormatting->blockhtml($member['contact_' . $service]))
-                    . '" title="' . $service . ' contact">&nbsp;</a>';
+            foreach ($this->contactDetails->getContactLinks($member) as $service => [$href]) {
+                $contactdetails .= <<<HTML
+                    <a class="{$service} contact" href="{$href}" title="{$service} contact">&nbsp;</a>
+                    HTML;
             }
 
             $contactdetails .= '<a title="PM this member" class="pm contact" '
