@@ -312,8 +312,8 @@ final readonly class Forums
             $intree[$forum['id']] = true;
         }
 
-        foreach ($cats as $category) {
-            $sortedtree['c_' . $category] = $tree['c_' . $category] ?? null;
+        foreach ($cats as $cat) {
+            $sortedtree['c_' . $cat] = $tree['c_' . $cat] ?? null;
         }
 
         $page .= $this->printtree(

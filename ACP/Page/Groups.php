@@ -85,12 +85,12 @@ final class Groups
 
         // Set anything not sent to 0.
         foreach ($permsInput as $groupId => $groupPerms) {
-            foreach ($columns as $field) {
-                if (!isset($groupPerms[$field])) {
-                    $groupPerms[$field] = false;
+            foreach ($columns as $column) {
+                if (!isset($groupPerms[$column])) {
+                    $groupPerms[$column] = false;
                 }
 
-                $permsInput[$groupId][$field] = $groupPerms[$field] ? 1 : 0;
+                $permsInput[$groupId][$column] = $groupPerms[$column] ? 1 : 0;
             }
         }
 

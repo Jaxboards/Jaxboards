@@ -396,12 +396,12 @@ final class Search
                  . 'Try refining your search, or using longer terms.';
 
             $omitted = [];
-            foreach ($terms as $v) {
-                if (mb_strlen($v) >= 3) {
+            foreach ($terms as $term) {
+                if (mb_strlen($term) >= 3) {
                     continue;
                 }
 
-                $omitted[] = $v;
+                $omitted[] = $term;
             }
 
             if ($omitted !== []) {
@@ -417,8 +417,8 @@ final class Search
                 $this->pageNum,
                 10,
             );
-            foreach ($resultsArray as $x) {
-                $pages .= '<a href="?act=search&page=' . $x . '">' . $x . '</a> ';
+            foreach ($resultsArray as $resultArray) {
+                $pages .= '<a href="?act=search&page=' . $resultArray . '">' . $resultArray . '</a> ';
             }
         }
 

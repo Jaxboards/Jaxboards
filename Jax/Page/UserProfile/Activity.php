@@ -52,7 +52,7 @@ final class Activity
 
     public function renderRSSFeed(): void
     {
-        $feed = new RSSFeed(
+        $rssFeed = new RSSFeed(
             [
                 'description' => $this->profile['usertitle'],
                 'title' => $this->profile['display_name'] . "'s recent activity",
@@ -62,7 +62,7 @@ final class Activity
             $activity['name'] = $this->profile['display_name'];
             $activity['group_id'] = $this->profile['group_id'];
             $data = $this->parseActivityRSS($activity);
-            $feed->additem(
+            $rssFeed->additem(
                 [
                     'description' => $data['text'],
                     'guid' => $activity['id'],
@@ -73,7 +73,7 @@ final class Activity
             );
         }
 
-        $feed->publish();
+        $rssFeed->publish();
     }
 
     /**

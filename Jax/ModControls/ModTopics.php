@@ -329,8 +329,8 @@ final readonly class ModTopics
         );
         $this->cancel();
         $fids[] = $this->request->post('id');
-        foreach ($fids as $forumId) {
-            $this->database->fixForumLastPost($forumId);
+        foreach ($fids as $fid) {
+            $this->database->fixForumLastPost($fid);
         }
 
         $this->page->location('?act=vf' . $this->request->post('id'));

@@ -133,10 +133,10 @@ final readonly class Tools
 
         $tempFile = tempnam(sys_get_temp_dir(), $this->database->getPrefix());
 
-        $zipFile = new ZipArchive();
-        $zipFile->open($tempFile, ZipArchive::OVERWRITE);
-        $zipFile->addFromString('backup.sql', $fileContents);
-        $zipFile->close();
+        $zipArchive = new ZipArchive();
+        $zipArchive->open($tempFile, ZipArchive::OVERWRITE);
+        $zipArchive->addFromString('backup.sql', $fileContents);
+        $zipArchive->close();
 
         readfile($tempFile);
         unlink($tempFile);

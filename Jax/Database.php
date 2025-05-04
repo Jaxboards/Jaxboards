@@ -41,9 +41,9 @@ final class Database
 
     public const WHERE_ID_IN = 'WHERE `id` IN ?';
 
-    private ?mysqli_result $lastQuery = null;
+    private ?mysqli_result $mysqliresult = null;
 
-    private MySQLi $connection;
+    private MySQLi $mySQLi;
 
     private string $prefix = '';
 
@@ -75,14 +75,14 @@ final class Database
         string $database = '',
         string $prefix = '',
     ): bool {
-        $this->connection = new MySQLi($host, $user, $password, $database);
+        $this->mySQLi = new MySQLi($host, $user, $password, $database);
 
         // All datetimes are GMT for jaxboards
-        $this->connection->query("SET time_zone = '+0:00'");
+        $this->mySQLi->query("SET time_zone = '+0:00'");
 
         $this->prefix = $prefix;
 
-        return !$this->connection->connect_errno;
+        return !$this->mySQLi->connect_errno;
     }
 
     public function setPrefix(string $prefix): void
@@ -102,12 +102,12 @@ final class Database
 
     public function error(): string
     {
-        return $this->connection->error;
+        return $this->mySQLi->error;
     }
 
     public function affectedRows(): int|string
     {
-        return $this->connection->affected_rows;
+        return $this->mySQLi->affected_rows;
     }
 
     public function safeselect(
@@ -129,7 +129,7 @@ final class Database
 
     public function insertId(): int|string
     {
-        return $this->connection->insert_id;
+        return $this->mySQLi->insert_id;
     }
 
     public function safeinsert(
@@ -246,40 +246,40 @@ final class Database
         return $this->safequery($query, ...$vars);
     }
 
-    public function row(?mysqli_result $result = null): ?array
+    public function row(?mysqli_result $mysqliresult = null): ?array
     {
-        $result = $result ?: $this->lastQuery;
+        $mysqliresult = $mysqliresult ?: $this->mysqliresult;
 
-        $row = mysqli_fetch_array($result);
+        $row = mysqli_fetch_array($mysqliresult);
 
         return $row ?: null;
     }
 
     // Only new-style mysqli.
-    public function arows(?mysqli_result $result = null): ?array
+    public function arows(?mysqli_result $mysqliresult = null): ?array
     {
-        $result = $result ?: $this->lastQuery;
+        $mysqliresult = $mysqliresult ?: $this->mysqliresult;
 
-        return $result !== null ? $this->fetchAll($result, MYSQLI_ASSOC) : null;
+        return $mysqliresult !== null ? $this->fetchAll($mysqliresult, MYSQLI_ASSOC) : null;
     }
 
-    public function arow(?mysqli_result $result = null): ?array
+    public function arow(?mysqli_result $mysqliresult = null): ?array
     {
-        $result = $result ?: $this->lastQuery;
+        $mysqliresult = $mysqliresult ?: $this->mysqliresult;
 
-        return $result !== null ? mysqli_fetch_assoc($result) : null;
+        return $mysqliresult !== null ? mysqli_fetch_assoc($mysqliresult) : null;
     }
 
-    public function numRows(?mysqli_result $result = null): int|string
+    public function numRows(?mysqli_result $mysqliresult = null): int|string
     {
-        $result = $result ?: $this->lastQuery;
+        $mysqliresult = $mysqliresult ?: $this->mysqliresult;
 
-        return $result?->num_rows ?? 0;
+        return $mysqliresult?->num_rows ?? 0;
     }
 
-    public function disposeresult(mysqli_result $result): void
+    public function disposeresult(mysqli_result $mysqliresult): void
     {
-        $result->free();
+        $mysqliresult->free();
     }
 
     // Warning: nested arrays are *not* supported.
@@ -359,7 +359,7 @@ final class Database
             $typeString .= $type;
         }
 
-        $stmt = $this->connection->prepare($compiledQueryString);
+        $stmt = $this->mySQLi->prepare($compiledQueryString);
 
         $this->debugLog->log($compiledQueryString, 'Queries');
 
@@ -416,7 +416,7 @@ final class Database
 
     public function escape(string $a): string
     {
-        return $this->connection->real_escape_string($a);
+        return $this->mySQLi->real_escape_string($a);
     }
 
     public function datetime(?int $timestamp = null): string
@@ -565,16 +565,16 @@ final class Database
      * A function to deal with the `mysqli_fetch_all` function only exiting
      * for the `mysqlnd` driver. Fetches all rows from a MySQLi query result.
      *
-     * @param mysqli_result $result     the result you wish to fetch all rows from
+     * @param mysqli_result $mysqliresult the result you wish to fetch all rows from
      * @param int           $resultType The result type for each row. Should be either
      *                                  `MYSQLI_ASSOC`, `MYSQLI_NUM`, or `MYSQLI_BOTH`
      *
      * @return array an array of MySQLi result rows
      */
     private function fetchAll(
-        mysqli_result $result,
+        mysqli_result $mysqliresult,
         int $resultType = MYSQLI_ASSOC,
     ): array {
-        return $result->fetch_all($resultType);
+        return $mysqliresult->fetch_all($resultType);
     }
 }

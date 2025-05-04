@@ -133,10 +133,10 @@ final class Members
             $this->pageNumber + 1,
             $this->perpage,
         );
-        foreach ($pagesArray as $pageNumber) {
+        foreach ($pagesArray as $pageArray) {
             $pages .= "<a href='?act=members&amp;sortby="
-                . "{$sortby}&amp;how={$sorthow}&amp;page={$pageNumber}'"
-                . ($pageNumber - 1 === $this->pageNumber ? ' class="active"' : '') . ">{$pageNumber}</a> ";
+                . "{$sortby}&amp;how={$sorthow}&amp;page={$pageArray}'"
+                . ($pageArray - 1 === $this->pageNumber ? ' class="active"' : '') . ">{$pageArray}</a> ";
         }
 
         $url = '?act=members'
