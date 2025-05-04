@@ -108,7 +108,7 @@ final readonly class Themes
     private function getWrappers(): array
     {
         return array_map(
-            static fn($path): string => pathinfo($path, PATHINFO_FILENAME),
+            static fn($path): string => pathinfo((string) $path, PATHINFO_FILENAME),
             glob($this->wrappersPath . '/*'),
         );
     }
@@ -542,7 +542,9 @@ final readonly class Themes
                 $this->page->location('?act=Themes');
             }
 
-            $page = $this->page->error($error);
+            if ($error !== null) {
+                $page = $this->page->error($error);
+            }
         }
 
         $wrapperOptions = '';

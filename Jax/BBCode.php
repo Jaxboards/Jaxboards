@@ -253,7 +253,7 @@ final class BBCode
         $html = $tag === 'ol' ? '<ol>' : '<ul>';
         $html .= implode('', array_map(
             static fn($item): string => "<li>{$item}</li>",
-            array_filter($items, static fn($line): bool => (bool) trim($line)),
+            array_filter($items, static fn($line): bool => (bool) trim((string) $line)),
         ));
 
         return $html . ($tag === 'ol' ? '</ol>' : '</ul>');
