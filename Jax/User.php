@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use Carbon\Carbon;
+
 use function array_merge;
 use function password_hash;
 use function password_needs_rehash;

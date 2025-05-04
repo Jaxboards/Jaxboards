@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use Carbon\Carbon;
+
 use function base64_encode;
 use function ini_set;
 use function is_numeric;

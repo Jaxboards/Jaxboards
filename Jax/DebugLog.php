@@ -39,7 +39,9 @@ final class DebugLog
         sort($categories);
 
         return array_reduce($categories, function ($lines, $category) {
-            $heading = $category !== '' && $category !== '0' ? ["---- {$category} ----"] : [];
+            $heading = $category !== '' && $category !== '0'
+                ? ["---- {$category} ----"]
+                : [];
 
             return array_merge($lines, $heading, $this->lines[$category], ['']);
         }, []);

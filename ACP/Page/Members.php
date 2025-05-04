@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
-use Carbon\Carbon;
 use ACP\Page;
+use Carbon\Carbon;
 use Jax\Config;
 use Jax\Database;
 use Jax\DomainDefinitions;
