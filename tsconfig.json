@@ -11,5 +11,5 @@
         "strict": true,
         "esModuleInterop": false
     },
-    "include": ["./Script/**/*.ts", "Script/earthbound.js"]
+    "include": ["./Script/**/*.ts"]
 }
