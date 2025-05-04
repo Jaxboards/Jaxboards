@@ -180,7 +180,25 @@
     background-repeat: repeat;
     background-color: #02027f;
     background-size: 4px 4px;
-    background-image: linear-gradient(45deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0) 44.9%, rgba(255, 255, 255, 1) 45%, rgba(255, 255, 255, 1) 55%, rgba(255, 255, 255, 0) 55.1%, rgba(255, 255, 255, 0)), linear-gradient(-45deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0) 44.9%, rgba(255, 255, 255, 1) 45%, rgba(255, 255, 255, 1) 55%, rgba(255, 255, 255, 0) 55.1%, rgba(255, 255, 255, 0));
+    background-image:
+        linear-gradient(
+            45deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0) 44.9%,
+            rgba(255, 255, 255, 1) 45%,
+            rgba(255, 255, 255, 1) 55%,
+            rgba(255, 255, 255, 0) 55.1%,
+            rgba(255, 255, 255, 0)
+        ),
+        linear-gradient(
+            -45deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0) 44.9%,
+            rgba(255, 255, 255, 1) 45%,
+            rgba(255, 255, 255, 1) 55%,
+            rgba(255, 255, 255, 0) 55.1%,
+            rgba(255, 255, 255, 0)
+        );
 }
 .card--front {
     cursor: pointer;
@@ -203,7 +221,13 @@
     border: 1px dotted;
     border-radius: 4px;
     cursor: pointer;
-    background-image: radial-gradient(green 30%, white 30.1%, white 40%, green 40.1%, green 100%);
+    background-image: radial-gradient(
+        green 30%,
+        white 30.1%,
+        white 40%,
+        green 40.1%,
+        green 100%
+    );
     background-size: 90px 90px;
     background-position: center;
     background-repeat: no-repeat;
@@ -248,7 +272,8 @@
 .board-deck .card--front > .card--front {
     top: 15px;
 }
-.board-deck .card--back > .card--front, .board-deck .card--back > .card--back {
+.board-deck .card--back > .card--front,
+.board-deck .card--back > .card--back {
     top: 5px;
 }
 /* seven deck */
@@ -271,7 +296,25 @@
     border-radius: 4px;
     float: left;
     background-size: 4px 4px;
-    background-image: linear-gradient(45deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 44.9%, rgba(0, 0, 0, 1) 45%, rgba(0, 0, 0, 1) 55%, rgba(0, 0, 0, 0) 55.1%, rgba(0, 0, 0, 0)), linear-gradient(-45deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 44.9%, rgba(0, 0, 0, 1) 45%, rgba(0, 0, 0, 1) 55%, rgba(0, 0, 0, 0) 55.1%, rgba(0, 0, 0, 0));
+    background-image:
+        linear-gradient(
+            45deg,
+            rgba(0, 0, 0, 0) 0%,
+            rgba(0, 0, 0, 0) 44.9%,
+            rgba(0, 0, 0, 1) 45%,
+            rgba(0, 0, 0, 1) 55%,
+            rgba(0, 0, 0, 0) 55.1%,
+            rgba(0, 0, 0, 0)
+        ),
+        linear-gradient(
+            -45deg,
+            rgba(0, 0, 0, 0) 0%,
+            rgba(0, 0, 0, 0) 44.9%,
+            rgba(0, 0, 0, 1) 45%,
+            rgba(0, 0, 0, 1) 55%,
+            rgba(0, 0, 0, 0) 55.1%,
+            rgba(0, 0, 0, 0)
+        );
 }
 .new-game {
     background-color: transparent;
