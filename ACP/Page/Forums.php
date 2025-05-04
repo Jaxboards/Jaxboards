@@ -31,6 +31,7 @@ use function preg_replace;
 use function sscanf;
 use function str_starts_with;
 use function trim;
+use function var_dump;
 
 final readonly class Forums
 {
