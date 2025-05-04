@@ -23,7 +23,7 @@ use const FILTER_VALIDATE_URL;
 
 final class Groups
 {
-    private $updatePermissions = true;
+    private bool $updatePermissions = true;
 
     public function __construct(
         private readonly Database $database,

@@ -32,7 +32,7 @@ final class Forum
 
     private $forumReadTime = 0;
 
-    private $numperpage = 20;
+    private int $numperpage = 20;
 
     private float|int $pageNumber = 0;
 
@@ -518,7 +518,7 @@ final class Forum
         );
     }
 
-    private function isForumRead($forum): bool
+    private function isForumRead(array $forum): bool
     {
         if (!$this->forumsRead) {
             $this->forumsRead = $this->jax->parseReadMarkers($this->session->get('forumsread'));

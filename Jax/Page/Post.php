@@ -467,7 +467,7 @@ final class Post
         $this->page->command('attachfiles');
     }
 
-    private function canEdit($post): bool
+    private function canEdit(array $post): bool
     {
         if (
             $post['auth_id']

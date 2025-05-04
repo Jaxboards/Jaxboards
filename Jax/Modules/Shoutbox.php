@@ -105,7 +105,7 @@ final class Shoutbox
         return $candelete;
     }
 
-    public function formatshout($row): ?string
+    public function formatshout(array $row): ?string
     {
         $shout = $this->textFormatting->theWorksInline($row['shout']);
         $user = $row['uid'] ? $this->template->meta(

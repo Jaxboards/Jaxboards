@@ -14,7 +14,7 @@ use Jax\User;
 
 final class Ticker
 {
-    private $maxticks = 60;
+    private int $maxticks = 60;
 
     public function __construct(
         private readonly Database $database,
@@ -155,7 +155,7 @@ final class Ticker
         $this->session->addVar('tickid', $first);
     }
 
-    private function renderTick($t): ?string
+    private function renderTick(array $t): ?string
     {
         return $this->template->meta(
             'ticker-tick',

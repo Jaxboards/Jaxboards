@@ -833,7 +833,7 @@ final class Topic
         return $rows;
     }
 
-    private function canedit($post): bool
+    private function canedit(array $post): bool
     {
         if ($this->canModerate()) {
             return true;

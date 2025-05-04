@@ -19,7 +19,7 @@ final class Members
 {
     private float|int $pageNumber = 0;
 
-    private $perpage = 20;
+    private int $perpage = 20;
 
     public function __construct(
         private readonly ContactDetails $contactDetails,
