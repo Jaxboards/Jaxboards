@@ -39,38 +39,38 @@ class AppState {
         const values = [];
         const { submitButton } = form;
 
-        const inputFields = ['input','select','button','textarea'] as const;
+        const inputFields = ['input', 'select', 'button', 'textarea'] as const;
 
         inputFields
-        .flatMap(tagName => Array.from(form.querySelectorAll(tagName)))
-        .forEach((inputField) => {
-            if (!inputField.name || inputField.type === 'submit') {
-                return;
-            }
+            .flatMap((tagName) => Array.from(form.querySelectorAll(tagName)))
+            .forEach((inputField) => {
+                if (!inputField.name || inputField.type === 'submit') {
+                    return;
+                }
 
-            if (
-                inputField instanceof HTMLSelectElement &&
-                inputField.type === 'select-multiple'
-            ) {
-                Array.from(inputField.options)
-                    .filter((option) => option.selected)
-                    .forEach((option) => {
-                        names.push(`${inputField.name}[]`);
-                        values.push(option.value);
-                    });
-                return;
-            }
+                if (
+                    inputField instanceof HTMLSelectElement &&
+                    inputField.type === 'select-multiple'
+                ) {
+                    Array.from(inputField.options)
+                        .filter((option) => option.selected)
+                        .forEach((option) => {
+                            names.push(`${inputField.name}[]`);
+                            values.push(option.value);
+                        });
+                    return;
+                }
 
-            if (
-                inputField instanceof HTMLInputElement &&
-                ['checkbox', 'radio'].includes(inputField.type) &&
-                !inputField.checked
-            ) {
-                return;
-            }
-            names.push(inputField.name);
-            values.push(inputField.value);
-        });
+                if (
+                    inputField instanceof HTMLInputElement &&
+                    ['checkbox', 'radio'].includes(inputField.type) &&
+                    !inputField.checked
+                ) {
+                    return;
+                }
+                names.push(inputField.name);
+                values.push(inputField.value);
+            });
 
         if (submitButton) {
             names.push(submitButton.name);
