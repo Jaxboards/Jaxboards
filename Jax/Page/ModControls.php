@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
+use Carbon\Carbon;
 use Jax\Config;
 use Jax\Database;
 use Jax\DomainDefinitions;
@@ -30,8 +31,6 @@ use function header;
 use function implode;
 use function is_numeric;
 use function nl2br;
-use function strtotime;
-use function time;
 use function trim;
 
 use const FILTER_VALIDATE_IP;
@@ -109,7 +108,7 @@ final readonly class ModControls
 
         if (!$this->request->isJSAccess()) {
             header('Content-Type: application/javascript; charset=utf-8');
-            header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 2_592_000) . ' GMT');
+            header('Expires: ' . gmdate('D, d M Y H:i:s', Carbon::now()->getTimestamp() + 2_592_000) . ' GMT');
 
             echo $script;
 
@@ -386,7 +385,7 @@ final readonly class ModControls
                     onclick="this.form.submitButton=this" value="Ban" />
                 HTML;
 
-            $torDate = gmdate('Y-m-d', strtotime('-2 days'));
+            $torDate = gmdate('Y-m-d', Carbon::parse('-2 days')->getTimestamp());
             $page .= $this->box(
                 'Info',
                 <<<EOT

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ACP\Page;
 
+use Carbon\Carbon;
 use ACP\Page;
 use Jax\Config;
 use Jax\Database;
@@ -32,7 +33,6 @@ use function mb_strstr;
 use function mb_strtolower;
 use function mb_substr;
 use function password_hash;
-use function time;
 use function trim;
 
 use const FILTER_FLAG_IPV6;
@@ -866,7 +866,7 @@ final readonly class Members
                     ['id'],
                     'members',
                     'WHERE (?-UNIX_TIMESTAMP(`last_visit`))<?',
-                    time(),
+                    Carbon::now()->getTimestamp(),
                     60 * 60 * 24 * 31 * 6,
                 );
                 $num = 0;

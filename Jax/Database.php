@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use Carbon\Carbon;
 use Exception;
 use MySQLi;
 use mysqli_result;
@@ -27,7 +28,6 @@ use function mysqli_fetch_array;
 use function mysqli_fetch_assoc;
 use function str_repeat;
 use function str_replace;
-use function time;
 use function vsprintf;
 
 use const MYSQLI_ASSOC;
@@ -451,7 +451,7 @@ final class Database
             return $usersOnlineCache;
         }
 
-        $idletimeout = time() - ($this->serviceConfig->getSetting('timetoidle') ?? 300);
+        $idletimeout = Carbon::now()->getTimestamp() - ($this->serviceConfig->getSetting('timetoidle') ?? 300);
         $usersOnlineCache = [];
 
         $result = $this->safespecial(
@@ -476,7 +476,7 @@ final class Database
                 SQL
             ,
             ['session', 'members'],
-            $this->datetime(time() - $this->serviceConfig->getSetting('timetologout')),
+            $this->datetime(Carbon::now()->getTimestamp() - $this->serviceConfig->getSetting('timetologout')),
         );
         $today = gmdate('n j');
         while ($user = $this->arow($result)) {

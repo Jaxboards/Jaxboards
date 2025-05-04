@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
+use Carbon\Carbon;
 use Jax\Database;
 use Jax\FileUtils;
 use Jax\IPAddress;
@@ -23,7 +24,6 @@ use function mb_substr;
 use function password_hash;
 use function preg_match;
 use function str_replace;
-use function time;
 use function trim;
 
 use const FILTER_VALIDATE_EMAIL;
@@ -83,7 +83,7 @@ final readonly class ServiceSignup
                 'directory',
                 'WHERE `registrar_ip`=? AND `date`>?',
                 $this->ipAddress->asBinary(),
-                $this->database->datetime(time() - 7 * 24 * 60 * 60),
+                $this->database->datetime(Carbon::now()->subWeeks(1)->getTimestamp()),
             );
             if ($this->database->numRows($result) > 3) {
                 $errors[] = 'You may only register 3 boards per week.';

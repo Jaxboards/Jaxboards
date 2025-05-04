@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
+use Carbon\Carbon;
 use Jax\Config;
 use Jax\Database;
 use Jax\Date;
@@ -37,7 +38,6 @@ use function json_encode;
 use function max;
 use function preg_match;
 use function round;
-use function time;
 
 use const PHP_EOL;
 
@@ -1345,7 +1345,7 @@ final class Topic
     private function markread($tid): void
     {
         $topicsread = $this->jax->parseReadMarkers($this->session->get('topicsread'));
-        $topicsread[$tid] = time();
+        $topicsread[$tid] = Carbon::now()->getTimestamp();
         $this->session->set('topicsread', json_encode($topicsread));
     }
 

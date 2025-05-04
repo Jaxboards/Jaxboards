@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use Carbon\Carbon;
 use function gmdate;
 use function round;
-use function strtotime;
-use function time;
 
 final class Date
 {
@@ -51,14 +50,14 @@ final class Date
 
     public function relativeTime(int $date): string
     {
-        $delta = time() - $date;
+        $delta = Carbon::now()->getTimestamp() - $date;
         $hoursMinutes = gmdate('g:i a', $date);
 
         return match (true) {
             $delta < 90 => 'a minute ago',
             $delta < 3600 => round($delta / 60) . ' minutes ago',
             gmdate('m j Y') === gmdate('m j Y', $date) => "Today @ {$hoursMinutes}",
-            gmdate('m j Y', strtotime('yesterday')) === gmdate('m j Y', $date) => "Yesterday @ {$hoursMinutes}",
+            gmdate('m j Y', Carbon::parse('yesterday')->getTimestamp()) === gmdate('m j Y', $date) => "Yesterday @ {$hoursMinutes}",
             default => gmdate('M jS, Y @ g:i a', $date),
         };
     }

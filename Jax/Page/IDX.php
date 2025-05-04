@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
+use Carbon\Carbon;
 use Jax\Config;
 use Jax\Database;
 use Jax\Date;
@@ -29,7 +30,6 @@ use function nl2br;
 use function number_format;
 use function preg_match;
 use function sprintf;
-use function time;
 
 final class IDX
 {
@@ -62,7 +62,7 @@ final class IDX
             $this->page->command('softurl');
             $this->session->set('forumsread', '{}');
             $this->session->set('topicsread', '{}');
-            $this->session->set('read_date', time());
+            $this->session->set('read_date', Carbon::now()->getTimestamp());
         }
 
         if ($this->request->isJSUpdate()) {
