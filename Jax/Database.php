@@ -281,9 +281,9 @@ final class Database
         return $mysqliResult?->num_rows ?? 0;
     }
 
-    public function disposeresult(mysqli_result $mysqliResult): void
+    public function disposeresult(?mysqli_result $mysqliResult): void
     {
-        $mysqliResult->free();
+        $mysqliResult?->free();
     }
 
     // Warning: nested arrays are *not* supported.
