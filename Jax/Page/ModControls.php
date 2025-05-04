@@ -108,7 +108,7 @@ final readonly class ModControls
 
         if (!$this->request->isJSAccess()) {
             header('Content-Type: application/javascript; charset=utf-8');
-            header('Expires: ' . gmdate('D, d M Y H:i:s', Carbon::now()->getTimestamp() + 2_592_000) . ' GMT');
+            header('Expires: ' . gmdate('D, d M Y H:i:s', Carbon::now()->addMonth(1)->getTimestamp() ) . ' GMT');
 
             echo $script;
 
@@ -385,7 +385,7 @@ final readonly class ModControls
                     onclick="this.form.submitButton=this" value="Ban" />
                 HTML;
 
-            $torDate = gmdate('Y-m-d', Carbon::parse('-2 days')->getTimestamp());
+            $torDate = gmdate('Y-m-d', Carbon::now()->subDays(2)->getTimestamp());
             $page .= $this->box(
                 'Info',
                 <<<EOT
