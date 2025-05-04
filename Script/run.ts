@@ -39,12 +39,11 @@ class AppState {
         const values = [];
         const { submitButton } = form;
 
-        [
-            ...Array.from(form.querySelectorAll('input')),
-            ...Array.from(form.querySelectorAll('select')),
-            ...Array.from(form.querySelectorAll('button')),
-            ...Array.from(form.querySelectorAll('textarea')),
-        ].forEach((inputField) => {
+        const inputFields = ['input','select','button','textarea'] as const;
+
+        inputFields
+        .flatMap(tagName => Array.from(form.querySelectorAll(tagName)))
+        .forEach((inputField) => {
             if (!inputField.name || inputField.type === 'submit') {
                 return;
             }
