@@ -572,11 +572,13 @@ final readonly class Forums
             $modList = 'No forum-specific moderators added!';
         }
 
+        var_dump($forum['show_ledby']);
+
         $moderators = $this->page->parseTemplate(
             'forums/create-forum-moderators.html',
             [
                 'mod_list' => $modList,
-                'show_led_by' => isset($forum['show_ledby']) && $forum['show_ledby']
+                'show_ledby' => $forum['show_ledby']
                      ? 'checked="checked"' : '',
             ],
         );
@@ -719,15 +721,15 @@ final readonly class Forums
         return [
             'cat_id' => $forum['cat_id'] ?? null ?: array_pop($thisrow),
             'mods' => $forum['mods'] ?? null,
-            'nocount' => (int) $this->request->post('nocount'),
+            'nocount' => $this->request->post('nocount') ? 1 : 0,
             'orderby' => $orderby > 0 && $orderby <= 5 ? $orderby : 0,
             'perms' => $this->serializePermsFromInput(),
             'redirect' => $this->request->post('redirect'),
-            'show_ledby' => (int) $this->request->post('show_ledby'),
+            'show_ledby' => $this->request->post('show_ledby') ? 1 : 0,
             'show_sub' => $sub === 1 || $sub === 2 ? $sub : 0,
             'subtitle' => $this->request->post('description'),
             'title' => $this->request->post('title'),
-            'trashcan' => (int) $this->request->post('trashcan'),
+            'trashcan' => $this->request->post('trashcan') ? 1 : 0,
         ];
     }
 
