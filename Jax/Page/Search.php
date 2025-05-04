@@ -171,7 +171,7 @@ final class Search
             return false;
         }
 
-        $dayMonthYear = array_map(static fn($var) => (int) $var, $dayMonthYear);
+        $dayMonthYear = array_map(static fn($var): int => (int) $var, $dayMonthYear);
 
         return mktime(0, 0, 0, $dayMonthYear[0], $dayMonthYear[1], $dayMonthYear[2]);
     }

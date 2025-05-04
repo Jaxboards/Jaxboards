@@ -9,7 +9,7 @@ use function base64_decode;
 
 final class JaxTest
 {
-    private string $encodedForumFlags;
+    private readonly string $encodedForumFlags;
 
     /**
      * @var array<int,array<string,bool>>
@@ -23,8 +23,8 @@ final class JaxTest
     ];
 
     public function __construct(
-        private Assert $assert,
-        private Jax $jax,
+        private readonly Assert $assert,
+        private readonly Jax $jax,
     ) {
         $this->encodedForumFlags = base64_decode('AAEAPgADABgABAAYAAUAGAAGAD8=', true);
     }

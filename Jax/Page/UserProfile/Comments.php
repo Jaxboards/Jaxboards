@@ -21,14 +21,14 @@ final class Comments
     private ?array $profile = null;
 
     public function __construct(
-        private Database $database,
-        private Date $date,
-        private Jax $jax,
-        private Page $page,
-        private Request $request,
-        private Template $template,
-        private TextFormatting $textFormatting,
-        private User $user,
+        private readonly Database $database,
+        private readonly Date $date,
+        private readonly Jax $jax,
+        private readonly Page $page,
+        private readonly Request $request,
+        private readonly Template $template,
+        private readonly TextFormatting $textFormatting,
+        private readonly User $user,
     ) {}
 
     /**
@@ -172,7 +172,7 @@ final class Comments
     private function handleCommentDeletion(): void
     {
         $deleteComment = (int) $this->request->both('del');
-        if (!$deleteComment) {
+        if ($deleteComment === 0) {
             return;
         }
 

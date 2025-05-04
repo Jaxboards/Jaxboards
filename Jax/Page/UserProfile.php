@@ -13,7 +13,6 @@ use Jax\Page\UserProfile\ProfileTabs;
 use Jax\Request;
 use Jax\Session;
 use Jax\Template;
-use Jax\TextFormatting;
 use Jax\User;
 
 use function array_keys;
@@ -40,7 +39,6 @@ final class UserProfile
         private readonly ProfileTabs $profileTabs,
         private readonly Request $request,
         private readonly Session $session,
-        private readonly TextFormatting $textFormatting,
         private readonly Template $template,
         private readonly User $user,
     ) {
@@ -58,7 +56,7 @@ final class UserProfile
             return;
         }
 
-        $this->profile = $userId ? $this->fetchUser($userId) : null;
+        $this->profile = $userId !== 0 ? $this->fetchUser($userId) : null;
 
         match (true) {
             !$this->profile => $this->showProfileError(),
@@ -147,7 +145,7 @@ final class UserProfile
         return !$this->user->isGuest() && in_array(
             $userId,
             array_map(
-                static fn($userId) => (int) $userId,
+                static fn($userId): int => (int) $userId,
                 explode(',', (string) $this->user->get($listName)),
             ),
             true,
@@ -161,7 +159,7 @@ final class UserProfile
 
         $links = $this->contactDetails->getContactLinks($profile);
         $contactDetails = implode('', array_map(
-            static function ($service) use ($links) {
+            static function ($service) use ($links): string {
                 [$href, $value] = $links[$service];
 
                 return <<<HTML

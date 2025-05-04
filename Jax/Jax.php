@@ -58,6 +58,7 @@ final readonly class Jax
             foreach (self::FORUM_PERMS_ORDER as $index => $field) {
                 $flag += $groupPerms[$field] ?? 0 ? 1 << $index : 0;
             }
+
             $packed .= pack('n*', $groupId, $flag);
         }
 

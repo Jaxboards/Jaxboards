@@ -24,6 +24,7 @@ final class DebugLog
         if (!array_key_exists($category, $this->lines)) {
             $this->lines[$category] = [];
         }
+
         $this->lines[$category][] = $content;
     }
 
@@ -38,7 +39,7 @@ final class DebugLog
         sort($categories);
 
         return array_reduce($categories, function ($lines, $category) {
-            $heading = $category ? ["---- {$category} ----"] : [];
+            $heading = $category !== '' && $category !== '0' ? ["---- {$category} ----"] : [];
 
             return array_merge($lines, $heading, $this->lines[$category], ['']);
         }, []);

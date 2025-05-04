@@ -73,7 +73,7 @@ final readonly class Themes
             (bool) $editCSS => $this->editCSS($editCSS),
             (bool) $editWrapper => $this->editWrapper($editWrapper),
             $deleteSkin !== 0 => $this->deleteSkin($deleteSkin),
-            $do === 'create' => $this->createSkin(),
+            $do === 0 => $this->createSkin(),
             default => $this->showSkinIndex(),
         };
     }
@@ -108,7 +108,7 @@ final readonly class Themes
     private function getWrappers(): array
     {
         return array_map(
-            static fn($path) => pathinfo($path, PATHINFO_FILENAME),
+            static fn($path): string => pathinfo((string) $path, PATHINFO_FILENAME),
             glob($this->wrappersPath . '/*'),
         );
     }
@@ -142,7 +142,7 @@ final readonly class Themes
         return match (true) {
             !$this->isValidFilename($wrapper) => 'Wrapper name must consist of letters, '
                 . 'numbers, spaces, and underscore.',
-            mb_strlen((string) $wrapper) > 50 => 'Wrapper name must be less than 50 characters.',
+            mb_strlen($wrapper) > 50 => 'Wrapper name must be less than 50 characters.',
             file_exists($newWrapperPath) => 'That wrapper already exists.',
             !is_writable(dirname($newWrapperPath)) => 'Wrapper directory is not writable.',
 
@@ -159,7 +159,7 @@ final readonly class Themes
      *
      * @param mixed $wrappers
      */
-    private function updateWrappers($wrappers): ?string
+    private function updateWrappers(array $wrappers): ?string
     {
         foreach ($wrappers as $wrapperId => $wrapperName) {
             if ($wrapperName && !in_array($wrapperName, $wrappers)) {
@@ -231,7 +231,7 @@ final readonly class Themes
      *
      * @param array<string,string> $wrappers
      */
-    private function renameWrappers($wrappers): ?string
+    private function renameWrappers(array $wrappers): ?string
     {
         foreach ($wrappers as $wrapperName => $wrapperNewName) {
             if ($wrapperName === $wrapperNewName) {
@@ -275,7 +275,7 @@ final readonly class Themes
         return null;
     }
 
-    private function setDefaultSkin($skinID): void
+    private function setDefaultSkin(string|array $skinID): void
     {
         $this->database->safeupdate(
             'skins',

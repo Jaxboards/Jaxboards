@@ -7,7 +7,6 @@ namespace Jax\Page;
 use Jax\Database;
 use Jax\FileUtils;
 use Jax\IPAddress;
-use Jax\Jax;
 use Jax\Request;
 use Jax\ServiceConfig;
 use Service\Blueprint;
@@ -44,7 +43,6 @@ final readonly class ServiceSignup
         private Database $database,
         private FileUtils $fileUtils,
         private IPAddress $ipAddress,
-        private Jax $jax,
         private Request $request,
         private ServiceConfig $serviceConfig,
     ) {}
