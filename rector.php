@@ -220,7 +220,7 @@ return RectorConfig::configure()
         codingStyle: true,
         typeDeclarations: true,
         privatization: true,
-        naming: false,
+        naming: true,
         instanceOf: true,
         earlyReturn: true,
         strictBooleans: true,
