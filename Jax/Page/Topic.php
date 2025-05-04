@@ -480,7 +480,7 @@ final class Topic
         $this->session->set('users_online_cache', $newcache);
     }
 
-    private function qreplyform($tid): void
+    private function qreplyform(int $tid): void
     {
         $prefilled = '';
         $this->page->command('softurl');
@@ -1342,7 +1342,7 @@ final class Topic
         );
     }
 
-    private function markread($tid): void
+    private function markread(int $tid): void
     {
         $topicsread = $this->jax->parseReadMarkers($this->session->get('topicsread'));
         $topicsread[$tid] = time();

@@ -46,9 +46,11 @@ final class FileUtils
             if ($file === '.') {
                 continue;
             }
+
             if ($file === '..') {
                 continue;
             }
+
             $sourcePath = "{$src}/{$file}";
             $destPath = "{$dst}/{$file}";
 
