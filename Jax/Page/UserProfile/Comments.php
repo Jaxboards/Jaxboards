@@ -72,7 +72,7 @@ final class Comments
             $deleteLink = $this->user->getPerm('can_delete_comments')
                 && $comment['from'] === $this->user->get('id')
                 || $this->user->getPerm('can_moderate') ? <<<HTML
-                    <a href="?act={$act}&view=profile&page=comments&del={$comment['id']}" class="delete">[X]</a>
+                    <a href="?act={$act}&page=comments&del={$comment['id']}" class="delete">[X]</a>
                     HTML
                 : '';
 

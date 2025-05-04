@@ -74,7 +74,7 @@ final class ProfileTabs
                 $profileId = $this->profile['id'];
 
                 return <<<HTML
-                    <a href="?act=vu{$profileId}&view=profile&page={$tab}" {$active}>{$uppercase}</a>
+                    <a href="?act=vu{$profileId}&page={$tab}" {$active}>{$uppercase}</a>
                     HTML;
             },
             self::TABS,

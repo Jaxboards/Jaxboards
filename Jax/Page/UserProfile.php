@@ -72,7 +72,7 @@ final class UserProfile
     {
         return $this->request->isJSNewLocation()
             && !$this->request->isJSDirectLink()
-            && !$this->request->both('view');
+            && !$this->request->both('page');
     }
 
     private function fetchGroupTitle(int $groupId): ?string
@@ -241,7 +241,7 @@ final class UserProfile
 
         $this->page->setBreadCrumbs(
             [
-                "?act=vu{$profile['id']}&view=profile" => "{$profile['display_name']}'s profile",
+                "?act=vu{$profile['id']}&page=profile" => "{$profile['display_name']}'s profile",
             ],
         );
 

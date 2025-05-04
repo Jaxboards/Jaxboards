@@ -14,7 +14,7 @@ import { onImagesLoaded, updateDates } from './util';
 import Editor from '../components/editor';
 import MediaPlayer from '../components/media-player';
 
-export default function gracefulDegrade(container) {
+export default function gracefulDegrade(container: HTMLElement) {
     updateDates();
 
     // Special rules for all links
@@ -29,13 +29,13 @@ export default function gracefulDegrade(container) {
         if (link.href) {
             const href = link.getAttribute('href');
             const { host, pathname } = window.location;
-            const isLocalLink =
+            const isLocalLink = !link.target &&
                 link.host === host && link.pathname === pathname;
 
             if (isLocalLink) {
                 const oldclick = link.onclick;
-                link.onclick = undefined;
-                link.addEventListener('click', (event) => {
+                link.onclick = null;
+                link.addEventListener('click', (event: MouseEvent) => {
                     event.preventDefault();
                     // Some links have an onclick that returns true/false based on whether
                     // or not the link should execute.

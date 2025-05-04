@@ -166,8 +166,11 @@ final class Activity
 
         return !$tabHTML
             ? 'This user has yet to do anything noteworthy!'
-            : "<a href='./?act=vu{$this->profile['id']}&amp;page=activity&amp;fmt=RSS' class='social rss' "
-            . "style='float:right'>RSS</a>{$tabHTML}";
+            : <<<HTML
+                <a href="?act=vu{$this->profile['id']}&amp;page=activity&amp;fmt=RSS"
+                   target="_blank" class="social" style='float:right'
+                >RSS</a>{$tabHTML}
+                HTML;
     }
 
     /**
