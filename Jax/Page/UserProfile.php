@@ -175,7 +175,7 @@ final class UserProfile
         $contactDetails = '';
         $contactFields = array_filter(
             array_keys($profile),
-            static fn($field) => str_starts_with($field, 'contact') && $profile[$field]
+            static fn($field) => str_starts_with($field, 'contact') && $profile[$field],
         );
 
         $contactDetails = array_reduce($contactFields, static function ($html, $field) use ($profile) {
