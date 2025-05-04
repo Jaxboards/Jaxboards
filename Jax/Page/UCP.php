@@ -411,10 +411,11 @@ final class UCP
                 || !is_numeric($data['dob_year'])
                 || $data['dob_year'] < 1
                 || $data['dob_year'] > (int) gmdate('Y')
-             ? null : gmdate(
-                 'Y',
-                 Carbon::create($data['dob_year'], 1, 1)->getTimestamp()
-             );
+                 ? null
+                 : gmdate(
+                     'Y',
+                     Carbon::create($data['dob_year'], 1, 1)->getTimestamp(),
+                 );
 
             $data['dob_month']
                 = !$data['dob_month']

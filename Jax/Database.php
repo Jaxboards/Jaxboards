@@ -41,7 +41,7 @@ final class Database
 
     public const WHERE_ID_IN = 'WHERE `id` IN ?';
 
-    private ?mysqli_result $mysqliResult = null;
+    private ?mysqli_result $mysqliresult = null;
 
     private MySQLi $mySQLi;
 
@@ -248,7 +248,7 @@ final class Database
 
     public function row(?mysqli_result $mysqliResult = null): ?array
     {
-        $mysqliResult = $mysqliResult ?: $this->mysqliResult;
+        $mysqliResult = $mysqliResult ?: $this->mysqliresult;
 
         $row = mysqli_fetch_array($mysqliResult);
 
@@ -258,7 +258,7 @@ final class Database
     // Only new-style mysqli.
     public function arows(?mysqli_result $mysqliResult = null): ?array
     {
-        $mysqliResult = $mysqliResult ?: $this->mysqliResult;
+        $mysqliResult = $mysqliResult ?: $this->mysqliresult;
 
         return $mysqliResult !== null
             ? $this->fetchAll($mysqliResult, MYSQLI_ASSOC)
@@ -267,7 +267,7 @@ final class Database
 
     public function arow(?mysqli_result $mysqliResult = null): ?array
     {
-        $mysqliResult = $mysqliResult ?: $this->mysqliResult;
+        $mysqliResult = $mysqliResult ?: $this->mysqliresult;
 
         return $mysqliResult !== null
             ? mysqli_fetch_assoc($mysqliResult)
@@ -276,7 +276,7 @@ final class Database
 
     public function numRows(?mysqli_result $mysqliResult = null): int|string
     {
-        $mysqliResult = $mysqliResult ?: $this->mysqliResult;
+        $mysqliResult = $mysqliResult ?: $this->mysqliresult;
 
         return $mysqliResult?->num_rows ?? 0;
     }
