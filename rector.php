@@ -237,16 +237,6 @@ return RectorConfig::configure()
         ExplicitNullableParamTypeRector::class,
     ])
     ->withSkip([
-        // disable some type rules which are risky because our code is old
-        AddParamTypeFromPropertyTypeRector::class,
-        DeclareStrictTypesRector::class,
-        EmptyOnNullableObjectToInstanceOfRector::class,
-        ParamTypeByMethodCallTypeRector::class,
-        PropertyTypeFromStrictSetterGetterRector::class,
-        StrictArrayParamDimFetchRector::class,
-        StrictStringParamConcatRector::class,
-        TypedPropertyFromAssignsRector::class,
-        TypedPropertyFromStrictSetUpRector::class,
         // disable ! and empty rules which make the code noisy due to the
         // automated handling of it
         BooleanInBooleanNotRuleFixerRector::class,
