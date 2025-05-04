@@ -232,7 +232,7 @@ final class Search
             $topicParams = [];
             $topicValues = [];
 
-            if (!empty($fids)) {
+            if ($fids !== []) {
                 $postParams[] = 't.`fid` IN ?';
                 $postValues[] = $fids;
                 $topicParams[] = 't.`fid` IN ?';
