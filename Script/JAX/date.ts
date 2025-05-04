@@ -1,4 +1,4 @@
-function ordsuffix(a) {
+function ordsuffix(a: number) {
     return (
         a +
         (Math.round(a / 10) === 1
@@ -8,15 +8,24 @@ function ordsuffix(a) {
 }
 
 // returns 8:05pm
-function timeAsAMPM(timedate) {
+function timeAsAMPM(timedate: Date) {
     const hours = timedate.getHours() || 12;
     const minutesPadded = `${timedate.getMinutes()}`.padStart(2, '0');
     return `${hours % 12 || 12}:${minutesPadded}${hours > 12 ? 'pm' : 'am'}`;
 }
 
 // Returns month/day/year
-function asMDY(mdyDate) {
+function asMDY(mdyDate: Date) {
     return `${mdyDate.getMonth()}/${mdyDate.getDate()}/${mdyDate.getFullYear()}`;
+}
+
+/**
+ * Takes a Unix timestamp (from server) and produces a JS Date.
+ * @param timestamp Unix timestamp in seconds
+ * @returns {Date}
+ */
+function fromUnixTimestamp(timestamp: number) {
+    return new Date(timestamp * 1000);
 }
 
 export const monthsShort = [
@@ -50,15 +59,15 @@ export const months = [
     'December',
 ];
 
-export function date(gmtUnixTimestamp) {
+export function date(gmtUnixTimestamp: number) {
     const localTimeNow = new Date();
 
     const yday = new Date();
-    yday.setTime(yday - 1000 * 60 * 60 * 24);
+    yday.setTime(+yday - 1000 * 60 * 60 * 24);
 
-    const serverAsLocalDate = new Date(gmtUnixTimestamp * 1000);
+    const serverAsLocalDate = fromUnixTimestamp(gmtUnixTimestamp);
 
-    const deltaInSeconds = (localTimeNow - serverAsLocalDate) / 1000;
+    const deltaInSeconds = (+localTimeNow - +serverAsLocalDate) / 1000;
 
     if (deltaInSeconds < 90) {
         return 'a minute ago';
@@ -83,8 +92,8 @@ export function date(gmtUnixTimestamp) {
     )}, ${serverAsLocalDate.getFullYear()} @ ${timeAsAMPM(serverAsLocalDate)}`;
 }
 
-export function smalldate(gmtUnixTimestamp) {
-    const serverAsLocalDate = new Date(gmtUnixTimestamp * 1000);
+export function smalldate(gmtUnixTimestamp: number) {
+    const serverAsLocalDate = fromUnixTimestamp(gmtUnixTimestamp);
 
     let hours = serverAsLocalDate.getHours();
     const ampm = hours >= 12 ? 'pm' : 'am';
@@ -104,8 +113,8 @@ export function smalldate(gmtUnixTimestamp) {
  *
  * @return {string} The closest clock emoji character
  */
-export function emojiTime(unixTimestamp) {
-    const time = new Date(unixTimestamp);
+export function emojiTime(unixTimestamp: number) {
+    const time = fromUnixTimestamp(unixTimestamp);
 
     return String.fromCharCode(
         0xd83d,
@@ -122,7 +131,7 @@ export function emojiTime(unixTimestamp) {
  *
  * @param {HTMLAnchorElement} element Element to add the idle clock to
  */
-export function addIdleClock(element) {
+export function addIdleClock(element: HTMLAnchorElement) {
     const lastActionClass = Array.from(element.classList).find((classItem) =>
         classItem.startsWith('lastAction'),
     );
