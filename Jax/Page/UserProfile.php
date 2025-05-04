@@ -173,13 +173,17 @@ final class UserProfile
     {
         $profile = $this->profile;
         $contactDetails = '';
-        $contactFields = array_filter(array_keys($profile), static fn($field) => str_starts_with($field, 'contact'));
+        $contactFields = array_filter(
+            array_keys($profile),
+            static fn($field) => str_starts_with($field, 'contact') && $profile[$field]
+        );
 
         $contactDetails = array_reduce($contactFields, static function ($html, $field) use ($profile) {
             $type = mb_substr($field, 8);
-            $href = sprintf(self::CONTACT_URLS[$type], $profile[$field]);
+            $value = $profile[$field];
+            $href = sprintf(self::CONTACT_URLS[$type], $value);
             $html .= <<<HTML
-                <div class="contact {$type}"><a href="{$href}">{$field}</a></div>
+                <div class="contact {$type}"><a href="{$href}">{$value}</a></div>
                 HTML;
 
             return $html;
