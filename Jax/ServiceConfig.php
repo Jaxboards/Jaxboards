@@ -100,9 +100,9 @@ final class ServiceConfig
         return <<<EOT
             <?php
             \$CFG = json_decode(
-            <<<'EOD'
+            <<<'JSON'
             {$dataString}
-            EOD
+            JSON
                 ,
                 true
             );
