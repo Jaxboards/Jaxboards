@@ -573,10 +573,6 @@ final readonly class Themes
         $this->database->disposeresult($result);
         $skindir = $this->themesPath . $skin['title'];
         if (is_dir($skindir)) {
-            foreach (glob($skindir . '/*') as $v) {
-                unlink($v);
-            }
-
             $this->fileUtils->removeDirectory($skindir);
         }
 

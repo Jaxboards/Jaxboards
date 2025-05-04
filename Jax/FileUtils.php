@@ -78,17 +78,18 @@ final class FileUtils
             $dir .= '/';
         }
 
-        foreach (glob($dir . '*') as $v) {
-            if (is_dir($v)) {
-                self::removeDirectory($v);
+        foreach (glob($dir . '**') as $fileOrDir) {
+            var_dump($fileOrDir);
+            if (is_dir($fileOrDir)) {
+                self::removeDirectory($fileOrDir);
 
                 continue;
             }
 
-            unlink($v);
+            unlink($fileOrDir);
         }
 
-        self::removeDirectory($dir);
+        rmdir($dir);
 
         return true;
     }
