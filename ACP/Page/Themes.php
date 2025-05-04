@@ -13,6 +13,7 @@ use Jax\TextFormatting;
 
 use function array_key_exists;
 use function array_map;
+use function copy;
 use function dirname;
 use function fclose;
 use function file_exists;
