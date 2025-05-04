@@ -544,29 +544,29 @@ final class IDX
             $this->fetchIDXForums(),
             fn($forum): bool => !$this->isForumRead($forum),
         );
-        foreach ($unreadForums as $forum) {
-            $this->page->command('addclass', '#fid_' . $forum['id'], 'unread');
+        foreach ($unreadForums as $unreadForum) {
+            $this->page->command('addclass', '#fid_' . $unreadForum['id'], 'unread');
             $this->page->command(
                 'update',
-                '#fid_' . $forum['id'] . '_icon',
+                '#fid_' . $unreadForum['id'] . '_icon',
                 $this->template->meta('icon-unread')
                 ?: $this->template->meta('idx-icon-unread'),
             );
             $this->page->command(
                 'update',
-                '#fid_' . $forum['id'] . '_lastpost',
-                $this->formatlastpost($forum),
+                '#fid_' . $unreadForum['id'] . '_lastpost',
+                $this->formatlastpost($unreadForum),
                 '1',
             );
             $this->page->command(
                 'update',
-                '#fid_' . $forum['id'] . '_topics',
-                $this->template->meta('idx-topics-count', $forum['topics']),
+                '#fid_' . $unreadForum['id'] . '_topics',
+                $this->template->meta('idx-topics-count', $unreadForum['topics']),
             );
             $this->page->command(
                 'update',
-                '#fid_' . $forum['id'] . '_replies',
-                $this->template->meta('idx-replies-count', $forum['posts']),
+                '#fid_' . $unreadForum['id'] . '_replies',
+                $this->template->meta('idx-replies-count', $unreadForum['posts']),
             );
         }
     }

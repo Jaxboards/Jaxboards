@@ -998,8 +998,8 @@ final class Topic
             // correspond to a collection of user IDs that have voted for that
             // choice.
             $voted = false;
-            foreach ($results as $v) {
-                foreach ($v as $v2) {
+            foreach ($results as $result) {
+                foreach ($result as $v2) {
                     if ($v2 === $this->user->get('id')) {
                         $voted = true;
 
@@ -1425,7 +1425,7 @@ final class Topic
     private function viewrss(int $tid): void
     {
         $boardURL = $this->domainDefinitions->getBoardURL();
-        $feed = new RSSFeed(
+        $rssFeed = new RSSFeed(
             [
                 'description' => $this->topicdata['subtitle'],
                 'link' => "{$boardURL}?act=vt{$tid}",
@@ -1448,7 +1448,7 @@ final class Topic
             $this->database->basicvalue($tid),
         );
         while ($post = $this->database->arow($result)) {
-            $feed->additem(
+            $rssFeed->additem(
                 [
                     'description' => $this->textFormatting->blockhtml($this->textFormatting->theWorks($post['post'])),
                     'guid' => $post['id'],
@@ -1459,6 +1459,6 @@ final class Topic
             );
         }
 
-        $feed->publish();
+        $rssFeed->publish();
     }
 }
