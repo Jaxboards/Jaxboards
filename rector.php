@@ -43,7 +43,7 @@ return RectorConfig::configure()
         symfony: false,
     )
     ->withConfiguredRule(RemoveFuncCallRector::class, [
-        'var_dump'
+        'var_dump',
     ])
     ->withConfiguredRule(RenameFunctionRector::class, [
         'chop' => 'rtrim',
