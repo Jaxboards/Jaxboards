@@ -260,14 +260,18 @@ final class Database
     {
         $mysqliresult = $mysqliresult ?: $this->mysqliresult;
 
-        return $mysqliresult !== null ? $this->fetchAll($mysqliresult, MYSQLI_ASSOC) : null;
+        return $mysqliresult !== null
+            ? $this->fetchAll($mysqliresult, MYSQLI_ASSOC)
+            : null;
     }
 
     public function arow(?mysqli_result $mysqliresult = null): ?array
     {
         $mysqliresult = $mysqliresult ?: $this->mysqliresult;
 
-        return $mysqliresult !== null ? mysqli_fetch_assoc($mysqliresult) : null;
+        return $mysqliresult !== null
+            ? mysqli_fetch_assoc($mysqliresult)
+            : null;
     }
 
     public function numRows(?mysqli_result $mysqliresult = null): int|string
@@ -566,8 +570,8 @@ final class Database
      * for the `mysqlnd` driver. Fetches all rows from a MySQLi query result.
      *
      * @param mysqli_result $mysqliresult the result you wish to fetch all rows from
-     * @param int           $resultType The result type for each row. Should be either
-     *                                  `MYSQLI_ASSOC`, `MYSQLI_NUM`, or `MYSQLI_BOTH`
+     * @param int           $resultType   The result type for each row. Should be either
+     *                                    `MYSQLI_ASSOC`, `MYSQLI_NUM`, or `MYSQLI_BOTH`
      *
      * @return array an array of MySQLi result rows
      */

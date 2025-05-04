@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use Carbon\Carbon;
+
 use function gmdate;
 use function round;
 
