@@ -247,9 +247,10 @@ final readonly class Forums
             'categories',
             'ORDER BY `order`,`id` ASC',
         );
+        $categories = [];
         while ($category = $this->database->arow($result)) {
             $forums['c_' . $category['id']] = ['title' => $category['title']];
-            $cats[] = $category['id'];
+            $categories[] = $category['id'];
         }
 
         $this->database->disposeresult($result);
@@ -312,8 +313,8 @@ final readonly class Forums
             $intree[$forum['id']] = true;
         }
 
-        foreach ($cats as $cat) {
-            $sortedtree['c_' . $cat] = $tree['c_' . $cat] ?? null;
+        foreach ($categories as $category) {
+            $sortedtree['c_' . $category] = $tree['c_' . $category] ?? null;
         }
 
         $page .= $this->printtree(

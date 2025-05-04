@@ -67,13 +67,13 @@ final readonly class Themes
         $editCSS = (int) $this->request->get('editcss');
         $editWrapper = $this->request->get('editwrapper');
         $deleteSkin = (int) $this->request->get('deleteskin');
-        $do = (int) $this->request->get('do');
+        $do = $this->request->get('do');
 
         match (true) {
             (bool) $editCSS => $this->editCSS($editCSS),
             (bool) $editWrapper => $this->editWrapper($editWrapper),
             $deleteSkin !== 0 => $this->deleteSkin($deleteSkin),
-            $do === 0 => $this->createSkin(),
+            $do === 'create' => $this->createSkin(),
             default => $this->showSkinIndex(),
         };
     }

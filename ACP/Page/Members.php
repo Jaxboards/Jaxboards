@@ -853,7 +853,6 @@ final readonly class Members
 
     private function massMessage(): void
     {
-        $this->user->getUser();
         $page = '';
         if ($this->request->post('submit') !== null) {
             if (

@@ -41,7 +41,7 @@ final class Database
 
     public const WHERE_ID_IN = 'WHERE `id` IN ?';
 
-    private ?mysqli_result $mysqliresult = null;
+    private ?mysqli_result $mysqliResult = null;
 
     private MySQLi $mySQLi;
 
@@ -246,44 +246,44 @@ final class Database
         return $this->safequery($query, ...$vars);
     }
 
-    public function row(?mysqli_result $mysqliresult = null): ?array
+    public function row(?mysqli_result $mysqliResult = null): ?array
     {
-        $mysqliresult = $mysqliresult ?: $this->mysqliresult;
+        $mysqliResult = $mysqliResult ?: $this->mysqliResult;
 
-        $row = mysqli_fetch_array($mysqliresult);
+        $row = mysqli_fetch_array($mysqliResult);
 
         return $row ?: null;
     }
 
     // Only new-style mysqli.
-    public function arows(?mysqli_result $mysqliresult = null): ?array
+    public function arows(?mysqli_result $mysqliResult = null): ?array
     {
-        $mysqliresult = $mysqliresult ?: $this->mysqliresult;
+        $mysqliResult = $mysqliResult ?: $this->mysqliResult;
 
-        return $mysqliresult !== null
-            ? $this->fetchAll($mysqliresult, MYSQLI_ASSOC)
+        return $mysqliResult !== null
+            ? $this->fetchAll($mysqliResult, MYSQLI_ASSOC)
             : null;
     }
 
-    public function arow(?mysqli_result $mysqliresult = null): ?array
+    public function arow(?mysqli_result $mysqliResult = null): ?array
     {
-        $mysqliresult = $mysqliresult ?: $this->mysqliresult;
+        $mysqliResult = $mysqliResult ?: $this->mysqliResult;
 
-        return $mysqliresult !== null
-            ? mysqli_fetch_assoc($mysqliresult)
+        return $mysqliResult !== null
+            ? mysqli_fetch_assoc($mysqliResult)
             : null;
     }
 
-    public function numRows(?mysqli_result $mysqliresult = null): int|string
+    public function numRows(?mysqli_result $mysqliResult = null): int|string
     {
-        $mysqliresult = $mysqliresult ?: $this->mysqliresult;
+        $mysqliResult = $mysqliResult ?: $this->mysqliResult;
 
-        return $mysqliresult?->num_rows ?? 0;
+        return $mysqliResult?->num_rows ?? 0;
     }
 
-    public function disposeresult(mysqli_result $mysqliresult): void
+    public function disposeresult(mysqli_result $mysqliResult): void
     {
-        $mysqliresult->free();
+        $mysqliResult->free();
     }
 
     // Warning: nested arrays are *not* supported.
@@ -569,16 +569,16 @@ final class Database
      * A function to deal with the `mysqli_fetch_all` function only exiting
      * for the `mysqlnd` driver. Fetches all rows from a MySQLi query result.
      *
-     * @param mysqli_result $mysqliresult the result you wish to fetch all rows from
+     * @param mysqli_result $mysqliResult the result you wish to fetch all rows from
      * @param int           $resultType   The result type for each row. Should be either
      *                                    `MYSQLI_ASSOC`, `MYSQLI_NUM`, or `MYSQLI_BOTH`
      *
      * @return array an array of MySQLi result rows
      */
     private function fetchAll(
-        mysqli_result $mysqliresult,
+        mysqli_result $mysqliResult,
         int $resultType = MYSQLI_ASSOC,
     ): array {
-        return $mysqliresult->fetch_all($resultType);
+        return $mysqliResult->fetch_all($resultType);
     }
 }

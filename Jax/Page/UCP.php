@@ -413,7 +413,7 @@ final class UCP
                 || $data['dob_year'] > (int) gmdate('Y')
              ? null : gmdate(
                  'Y',
-                 Carbon::parse($data['dob_year'] . '/1/1')->getTimestamp(),
+                 Carbon::create($data['dob_year'], 1, 1)->getTimestamp()
              );
 
             $data['dob_month']
@@ -423,7 +423,7 @@ final class UCP
                 || $data['dob_month'] > 12
              ? null : gmdate(
                  'm',
-                 Carbon::parse('2000/' . $data['dob_month'] . '/1')->getTimestamp(),
+                 Carbon::create(2000, $data['dob_month'], 1)->getTimestamp(),
              );
 
             $data['dob_day']
@@ -432,7 +432,7 @@ final class UCP
                 || $data['dob_day'] < 1
              ? null : gmdate(
                  'd',
-                 Carbon::parse('2000/1/' . $data['dob_day'])->getTimestamp(),
+                 Carbon::create(2000, 1, $data['dob_day'])->getTimestamp(),
              );
 
             // Is the date provided valid?
@@ -441,7 +441,7 @@ final class UCP
                 if ((int) $data['dob_month'] === 2) {
                     if (
                         $data['dob_year'] > 0
-                        && gmdate('L', Carbon::parse($data['dob_year'])->getTimestamp())
+                        && gmdate('L', Carbon::create($data['dob_year'])->getTimestamp())
                     ) {
                         $daysInMonth = 29;
                     } elseif ($data['dob_year'] > 0) {
@@ -454,7 +454,7 @@ final class UCP
                 } else {
                     $daysInMonth = (int) gmdate(
                         't',
-                        Carbon::parse($data['dob_month'] . '/1')->getTimestamp(),
+                        Carbon::create($data['dob_month'], 1)->getTimestamp(),
                     );
                 }
 

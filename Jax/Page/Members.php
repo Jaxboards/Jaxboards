@@ -128,15 +128,15 @@ final class Members
         $thisrow = $this->database->arow($nummemberquery);
         $nummembers = $thisrow['num_members'];
 
-        $pagesArray = $this->jax->pages(
+        $pageNumbers = $this->jax->pages(
             (int) ceil($nummembers / $this->perpage),
             $this->pageNumber + 1,
             $this->perpage,
         );
-        foreach ($pagesArray as $pageArray) {
+        foreach ($pageNumbers as $pageNumber) {
             $pages .= "<a href='?act=members&amp;sortby="
-                . "{$sortby}&amp;how={$sorthow}&amp;page={$pageArray}'"
-                . ($pageArray - 1 === $this->pageNumber ? ' class="active"' : '') . ">{$pageArray}</a> ";
+                . "{$sortby}&amp;how={$sorthow}&amp;page={$pageNumber}'"
+                . ($pageNumber - 1 === $this->pageNumber ? ' class="active"' : '') . ">{$pageNumber}</a> ";
         }
 
         $url = '?act=members'
