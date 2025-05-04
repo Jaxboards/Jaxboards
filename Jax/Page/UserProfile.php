@@ -16,16 +16,12 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
-use function array_filter;
 use function array_keys;
 use function array_map;
-use function array_reduce;
 use function explode;
+use function implode;
 use function in_array;
-use function mb_substr;
 use function preg_match;
-use function sprintf;
-use function str_starts_with;
 use function ucfirst;
 
 final class UserProfile
@@ -165,13 +161,14 @@ final class UserProfile
 
         $links = $this->contactDetails->getContactLinks($profile);
         $contactDetails = implode('', array_map(
-            function($service) use ($links) {
+            static function ($service) use ($links) {
                 [$href, $value] = $links[$service];
+
                 return <<<HTML
                     <div class="contact {$service}"><a href="{$href}">{$value}</a></div>
                     HTML;
             },
-            array_keys($links)
+            array_keys($links),
         ));
 
         $contactDetails .= <<<HTML

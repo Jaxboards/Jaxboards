@@ -12,11 +12,9 @@ use Jax\Page;
 use Jax\Request;
 use Jax\Template;
 use Jax\TextFormatting;
-use PHP_CodeSniffer\Generators\HTML;
 
 use function ceil;
 use function is_numeric;
-use function sprintf;
 
 final class Members
 {
