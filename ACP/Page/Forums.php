@@ -31,7 +31,6 @@ use function preg_replace;
 use function sscanf;
 use function str_starts_with;
 use function trim;
-use function var_dump;
 
 final readonly class Forums
 {
@@ -572,8 +571,6 @@ final readonly class Forums
         } else {
             $modList = 'No forum-specific moderators added!';
         }
-
-        var_dump($forum['show_ledby']);
 
         $moderators = $this->page->parseTemplate(
             'forums/create-forum-moderators.html',

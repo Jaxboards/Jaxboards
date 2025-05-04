@@ -16,6 +16,7 @@ use Rector\CodingStyle\Rector\If_\NullableCompareToNullRector;
 use Rector\Config\RectorConfig;
 use Rector\Php70\Rector\FunctionLike\ExceptionHandlerTypehintRector;
 use Rector\Php84\Rector\Param\ExplicitNullableParamTypeRector;
+use Rector\Removing\Rector\FuncCall\RemoveFuncCallRector;
 use Rector\Renaming\Rector\FuncCall\RenameFunctionRector;
 use Rector\Strict\Rector\BooleanNot\BooleanInBooleanNotRuleFixerRector;
 use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
@@ -41,6 +42,9 @@ return RectorConfig::configure()
         phpunit: false,
         symfony: false,
     )
+    ->withConfiguredRule(RemoveFuncCallRector::class, [
+        'var_dump'
+    ])
     ->withConfiguredRule(RenameFunctionRector::class, [
         'chop' => 'rtrim',
         'chr' => 'mb_chr',
