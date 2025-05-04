@@ -34,15 +34,15 @@ final class ProfileTabs
     private ?array $profile = null;
 
     public function __construct(
-        private Activity $activity,
-        private Comments $comments,
-        private Database $database,
-        private Date $date,
-        private Page $page,
-        private Request $request,
-        private Template $template,
-        private TextFormatting $textFormatting,
-        private User $user,
+        private readonly Activity $activity,
+        private readonly Comments $comments,
+        private readonly Database $database,
+        private readonly Date $date,
+        private readonly Page $page,
+        private readonly Request $request,
+        private readonly Template $template,
+        private readonly TextFormatting $textFormatting,
+        private readonly User $user,
     ) {}
 
     /**
@@ -68,7 +68,7 @@ final class ProfileTabs
         };
 
         $tabs = array_map(
-            function ($tab) use ($selectedTab) {
+            function ($tab) use ($selectedTab): string {
                 $active = ($tab === $selectedTab ? ' class="active"' : '');
                 $uppercase = ucwords($tab);
                 $profileId = $this->profile['id'];
@@ -187,7 +187,7 @@ final class ProfileTabs
         }
 
         if ($tabHTML === '' || $tabHTML === '0') {
-            $tabHTML = 'No topics to show.';
+            return 'No topics to show.';
         }
 
         return $tabHTML;

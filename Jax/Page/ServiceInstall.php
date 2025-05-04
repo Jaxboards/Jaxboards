@@ -7,7 +7,6 @@ namespace Jax\Page;
 use Jax\Database;
 use Jax\FileUtils;
 use Jax\IPAddress;
-use Jax\Jax;
 use Jax\Request;
 use Jax\ServiceConfig;
 use Service\Blueprint;
@@ -82,13 +81,12 @@ final class ServiceInstall
     ];
 
     public function __construct(
-        private Blueprint $blueprint,
-        private Database $database,
-        private FileUtils $fileUtils,
-        private IPAddress $ipAddress,
-        private Jax $jax,
-        private Request $request,
-        private ServiceConfig $serviceConfig,
+        private readonly Blueprint $blueprint,
+        private readonly Database $database,
+        private readonly FileUtils $fileUtils,
+        private readonly IPAddress $ipAddress,
+        private readonly Request $request,
+        private readonly ServiceConfig $serviceConfig,
     ) {}
 
     public function render(): void
@@ -99,7 +97,7 @@ final class ServiceInstall
             $errors = $this->install();
         }
 
-        $errorsHTML = implode('', array_map(static fn($error) => "<div class='error'>{$error}</div>", $errors));
+        $errorsHTML = implode('', array_map(static fn($error): string => "<div class='error'>{$error}</div>", $errors));
         $formFields = '';
         foreach ($this->fields as $field => $attributes) {
             $placeholder = $attributes['placeholder'] ?? '';
@@ -115,6 +113,7 @@ final class ServiceInstall
                     <br>
                 HTML;
         }
+
         $currentYear = gmdate('Y');
 
         echo <<<HTML
@@ -209,6 +208,7 @@ final class ServiceInstall
 
             $errors[] = $attributes['name'] . ' must be filled in.';
         }
+
         $domain = $this->request->post('domain');
         if (
             $domain !== null
@@ -233,6 +233,7 @@ final class ServiceInstall
                 parse_url((string) $domain, PHP_URL_HOST),
             );
         }
+
         if ($this->request->post('admin_password') !== $this->request->post('admin_password_2')) {
             $errors[] = 'Admin passwords do not match';
         }
@@ -265,6 +266,7 @@ final class ServiceInstall
         if ($errors !== []) {
             return $errors;
         }
+
         // Update with our settings.
         $this->serviceConfig->writeServiceConfig(
             [
@@ -355,9 +357,11 @@ final class ServiceInstall
                 if (mb_substr($line, 0, 2) === '--') {
                     continue;
                 }
+
                 if ($line === '') {
                     continue;
                 }
+
                 // Replace blueprint_ with board name.
                 $line = str_replace('blueprint_', $boardPrefix, $line);
 

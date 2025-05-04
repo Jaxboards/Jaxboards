@@ -26,19 +26,19 @@ use function trim;
 
 use const PHP_EOL;
 
-final class Inbox
+final readonly class Inbox
 {
     public const MESSAGES_PER_PAGE = 10;
 
     public function __construct(
-        private readonly Database $database,
-        private readonly Date $date,
-        private readonly Jax $jax,
-        private readonly Page $page,
-        private readonly Request $request,
-        private readonly Template $template,
-        private readonly TextFormatting $textFormatting,
-        private readonly User $user,
+        private Database $database,
+        private Date $date,
+        private Jax $jax,
+        private Page $page,
+        private Request $request,
+        private Template $template,
+        private TextFormatting $textFormatting,
+        private User $user,
     ) {}
 
     public function render(): ?string
@@ -332,7 +332,7 @@ final class Inbox
         }
     }
 
-    private function fetchMessageCount(?string $view = null)
+    private function fetchMessageCount(?string $view = null): mixed
     {
         $criteria = match ($view) {
             'sent' => 'WHERE `from`=? AND !`del_sender`',
@@ -353,7 +353,7 @@ final class Inbox
         return array_pop($unread);
     }
 
-    private function fetchMessages(string $view, int $pageNumber = 0)
+    private function fetchMessages(string $view, int $pageNumber = 0): ?array
     {
         $criteria = match ($view) {
             'sent' => <<<'SQL'
@@ -494,7 +494,7 @@ final class Inbox
         $hasmessages = false;
 
         $requestPage = max(1, (int) $this->request->both('page'));
-        $numMessages = $this->fetchMessageCount($view, $requestPage);
+        $numMessages = $this->fetchMessageCount($view);
 
         $pages = 'Pages: ';
         $pageNumbers = $this->jax->pages(
@@ -503,7 +503,7 @@ final class Inbox
             10,
         );
 
-        $pages .= implode(' &middot; ', array_map(static function ($pageNumber) use ($requestPage, $view) {
+        $pages .= implode(' &middot; ', array_map(static function ($pageNumber) use ($requestPage, $view): string {
             $active = $pageNumber === $requestPage ? ' class="active"' : '';
 
             return <<<HTML

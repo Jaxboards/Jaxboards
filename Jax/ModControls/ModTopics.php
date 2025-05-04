@@ -22,15 +22,15 @@ use function implode;
 use function in_array;
 use function is_numeric;
 
-final class ModTopics
+final readonly class ModTopics
 {
     public function __construct(
-        private readonly Database $database,
-        private readonly Page $page,
-        private readonly Jax $jax,
-        private readonly Request $request,
-        private readonly Session $session,
-        private readonly User $user,
+        private Database $database,
+        private Page $page,
+        private Jax $jax,
+        private Request $request,
+        private Session $session,
+        private User $user,
     ) {}
 
     public function doTopics(string $do): void
@@ -52,7 +52,7 @@ final class ModTopics
     {
         $this->page->command('softurl');
 
-        if (!$tid) {
+        if ($tid === 0) {
             return;
         }
 
@@ -81,7 +81,7 @@ final class ModTopics
             }
 
             $mods = array_map(
-                static fn($modId) => (int) $modId,
+                static fn($modId): int => (int) $modId,
                 explode(',', (string) $mods['mods']),
             );
             if (!in_array($this->user->get('id'), $mods, true)) {
@@ -315,7 +315,7 @@ final class ModTopics
             $this->getModTids(),
         );
         $fids = array_unique(array_map(
-            static fn($topic) => (int) $topic['fid'],
+            static fn($topic): int => (int) $topic['fid'],
             $this->database->arows($result),
         ));
 
@@ -344,7 +344,7 @@ final class ModTopics
         $modtids = $this->session->getVar('modtids');
 
         return $modtids ? array_map(
-            static fn($tid) => (int) $tid,
+            static fn($tid): int => (int) $tid,
             explode(',', (string) $this->session->getVar('modtids')),
         ) : [];
     }

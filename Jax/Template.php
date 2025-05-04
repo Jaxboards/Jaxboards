@@ -150,7 +150,7 @@ final class Template
         $this->template = preg_replace_callback(
             '@<M name=([\'"])([^\'"]+)\1>(.*?)</M>@s',
             $this->userMetaParse(...),
-            (string) $this->template,
+            $this->template,
         );
     }
 
@@ -223,7 +223,7 @@ final class Template
 
         $html = $this->filtervars($html);
         if ($this->checkExtended($html, null)) {
-            $html = $this->metaExtended($html);
+            return $this->metaExtended($html);
         }
 
         return $html;
@@ -262,7 +262,7 @@ final class Template
     private function loadComponentTemplates($componentDir): array
     {
         return array_reduce(glob($componentDir . '/*.html'), function ($meta, $metaFile) {
-            $metaName = (string) pathinfo($metaFile, PATHINFO_FILENAME);
+            $metaName = pathinfo($metaFile, PATHINFO_FILENAME);
             $metaContent = file_get_contents($metaFile);
 
             if (!is_string($metaContent)) {

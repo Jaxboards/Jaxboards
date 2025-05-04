@@ -20,20 +20,20 @@ use function implode;
 use function in_array;
 use function sort;
 
-final class ModPosts
+final readonly class ModPosts
 {
     public function __construct(
-        private readonly Database $database,
-        private readonly ModTopics $modTopics,
-        private readonly Page $page,
-        private readonly Request $request,
-        private readonly Session $session,
-        private readonly User $user,
+        private Database $database,
+        private ModTopics $modTopics,
+        private Page $page,
+        private Request $request,
+        private Session $session,
+        private User $user,
     ) {}
 
     public function addPost(int $pid): void
     {
-        $post = $pid ? $this->fetchPost($pid) : null;
+        $post = $pid !== 0 ? $this->fetchPost($pid) : null;
         if (!$post) {
             return;
         }
@@ -134,7 +134,7 @@ final class ModPosts
 
         // Build list of topic ids that the posts were in.
         $tids = array_unique(array_map(
-            static fn($topic) => (int) $topic['tid'],
+            static fn($topic): int => (int) $topic['tid'],
             $this->database->arows($result) ?? [],
         ));
 
@@ -162,7 +162,7 @@ final class ModPosts
         $fids = array_unique(array_merge(
             $trashCanForum ? [$trashCanForum['id']] : [],
             array_map(
-                static fn($topic) => (int) $topic['fid'],
+                static fn($topic): int => (int) $topic['fid'],
                 $this->database->arows($result) ?? [],
             ),
         ));
@@ -185,7 +185,7 @@ final class ModPosts
     {
         $modPids = $this->session->getVar('modpids');
         $intPids = $modPids
-            ? array_map(static fn($pid) => (int) $pid, explode(',', $modPids))
+            ? array_map(static fn($pid): int => (int) $pid, explode(',', (string) $modPids))
             : [];
         sort($intPids);
 
@@ -232,7 +232,7 @@ final class ModPosts
         $this->database->disposeresult($result);
 
         return $mods
-            ? array_map(static fn($mid) => (int) $mid, explode(',', (string) $mods['mods']))
+            ? array_map(static fn($mid): int => (int) $mid, explode(',', (string) $mods['mods']))
             : [];
     }
 
@@ -259,7 +259,7 @@ final class ModPosts
      */
     private function movePostsTo(array $pids, int $tid): bool
     {
-        if ($tid) {
+        if ($tid !== 0) {
             $this->updatePosts($pids, ['tid' => $tid]);
             $this->page->location('?act=vt' . $tid);
         }

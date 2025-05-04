@@ -81,8 +81,8 @@ final class IPAddress
 
         return array_any(
             $this->ipBanCache,
-            static fn($bannedIp) => $bannedIp === $ipAddress
-                || in_array(mb_substr($bannedIp, -1), [':', '.'], true) && str_starts_with($ipAddress, $bannedIp),
+            static fn($bannedIp): bool => $bannedIp === $ipAddress
+                || in_array(mb_substr((string) $bannedIp, -1), [':', '.'], true) && str_starts_with($ipAddress, (string) $bannedIp),
         );
     }
 
@@ -106,7 +106,7 @@ final class IPAddress
         if (file_exists($bannedIPsPath)) {
             $this->ipBanCache = array_filter(
                 file($bannedIPsPath, FILE_IGNORE_NEW_LINES),
-                static fn($line) => $line !== '',
+                static fn($line): bool => $line !== '',
             );
         }
 

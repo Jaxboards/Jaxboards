@@ -11,7 +11,6 @@ use Jax\Jax;
 use Jax\Page;
 use Jax\Request;
 use Jax\Template;
-use Jax\TextFormatting;
 
 use function ceil;
 use function is_numeric;
@@ -30,7 +29,6 @@ final class Members
         private readonly Page $page,
         private readonly Template $template,
         private readonly Request $request,
-        private readonly TextFormatting $textFormatting,
     ) {
         $this->template->loadMeta('members');
     }
