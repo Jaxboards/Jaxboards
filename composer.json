@@ -43,7 +43,8 @@
         "php": "^8.2.12",
         "php-di/php-di": "^7.0",
         "symfony/polyfill-php83": "^1.32",
-        "symfony/polyfill-php84": "^1.32"
+        "symfony/polyfill-php84": "^1.32",
+        "nesbot/carbon": "^3.9"
     },
     "scripts": {
         "lint": [
