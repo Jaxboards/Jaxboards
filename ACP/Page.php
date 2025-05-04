@@ -126,7 +126,7 @@ final class Page
      *
      * @SuppressWarnings("ExitExpression")
      */
-    public function location(string $location): void
+    public function location(string $location): never
     {
         header("Location: {$location}");
 
