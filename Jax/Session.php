@@ -36,76 +36,48 @@ final class Session
         'Amazonbot' => 'Amazon',
         'Applebot' => 'Applebot',
         'archive.org_bot' => 'Internet Archive',
-        // Social media management company
         'AwarioBot' => 'Awario',
-        // Chinese search engine
         'Baiduspider' => 'Baidu',
-        // SEO graphing services
         'Barkrowler' => 'Babbar.tech',
         'Bingbot' => 'Bing',
-        // TikTok parent company
         'Bytespider' => 'Bytespider',
-        // Security scanner
         'CensysInspect' => 'CensysInspect',
-        // a.k.a. RightDao, a search engine
         'Centurybot' => 'Century',
-        // SEO crawler
         'ChatGLM-Spider' => 'ChatGLM',
-        // AI developer
         'ChatGPT-User' => 'ChatGPT',
-        // Anthropic AI bot
         'ClaudeBot' => 'ClaudeBot',
         'Discordbot' => 'Discord',
-        // Moz SEO crawler
         'DotBot' => 'DotBot',
         'DuckDuckBot' => 'DuckDuckGo',
-        // Palo Alto Networks security scanning service
         'Expanse' => 'Expanse',
         'facebookexternalhit' => 'Facebook',
-        // Machine learning researcher
         'Friendly_Crawler' => 'FriendlyCrawler',
         'Googlebot' => 'Google',
         'GoogleOther' => 'GoogleOther',
-        // AI developer
+	'Google-Read-Aloud' => 'Google-Read-Aloud',
         'GPTBot' => 'GPTBot',
         'ia_archiver' => 'Internet Archive Alexa',
-        // Hive image search; may be AI-related
         'ImagesiftBot' => 'Imagesift',
-        // SEO crawler
         'linkdexbot' => 'Linkdex',
-        // Russian mail service
         'Mail.RU_Bot' => 'Mail.RU',
-        // May be AI-related
         'meta-externalagent' => 'Meta',
-        // British SEO crawler
         'mj12bot' => 'Majestic',
-        // British search engine
         'MojeekBot' => 'Mojeek',
-        // AI developer
         'OAI-SearchBot' => 'OpenAI',
-        // AI answers site
         'PerplexityBot' => 'Perplexity',
-        // Chinese search crawler (Huawei)
         'PetalBot' => 'PetalBot',
-        // French search engine
         'Qwantbot' => 'Qwant',
-        // Backlink tracking company
         'SemrushBot' => 'Semrush',
-        // Czech search engine
         'SeznamBot' => 'Seznam',
-        // Chinese search engine
         'Sogou web spider' => 'Sogou',
         'Teoma' => 'Ask.com',
         'TikTokSpider' => 'TikTok',
-        // Plagiarism scanning software
         'Turnitin' => 'Turnitin',
         'Twitterbot' => 'Twitter',
-        // HTML syntax checker
         'W3C_Validator' => 'W3C Validator',
         'WhatsApp' => 'WhatsApp',
         'Y!J-WSC' => 'Yahoo Japan',
         'yahoo! slurp' => 'Yahoo',
-        // Russian search engine
         'YandexBot' => 'Yandex',
     ];
 
