@@ -20,15 +20,15 @@ export default {
             Object.assign(document.createElement('script'), { src }),
         );
     },
-    script(a: [string]) {
+    script([script]: [string]) {
         // eslint-disable-next-line
-        eval(a[0]);
+        eval(script);
     },
-    error(a: [string]) {
-        alert(a[0]);
+    error([message]: [string]) {
+        alert(message);
     },
-    alert(a: [string]) {
-        alert(a[0]);
+    alert([message]: [string]) {
+        alert([message]);
     },
     reload() {
         window.location.reload();
@@ -250,9 +250,10 @@ export default {
     },
     updateqreply(a) {
         const qreply = document.querySelector('#qreply');
-        if (qreply) {
-            qreply.querySelector('textarea')?.focus();
-            qreply.querySelector('textarea')?.value += a[0];
+        const textarea = qreply?.querySelector('textarea')
+        if (textarea) {
+            textarea.focus();
+            textarea.value += a[0];
         }
     },
     newmessage([message, fromMID]) {
