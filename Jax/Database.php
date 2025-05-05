@@ -33,7 +33,8 @@ use function vsprintf;
 use const MYSQLI_ASSOC;
 use const PHP_EOL;
 
-final class Database
+// phpcs:disable SlevomatCodingStandard.Classes.RequireAbstractOrFinal.ClassNeitherAbstractNorFinal
+class Database
 {
     // This is a bit silly, but these constants shows up so often in our codebase
     // that I'm defining them here to make our linters happy.
