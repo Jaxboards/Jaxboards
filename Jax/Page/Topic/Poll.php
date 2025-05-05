@@ -249,17 +249,17 @@ final class Poll
 
     /**
      * Poll results look like this: 1,2,3;4,5;6,7
-     * Choices are semi-colon separated and user IDs are comma separated.
+     * Choices are semicolon separated and user IDs are comma separated.
      *
      * @return array<array<int>>
      */
     private function parsePollResults(string $pollResults): array
     {
         return array_map(
-            static fn($voters): array => array_filter(
+            static fn(string $voters): array => array_filter(
                 array_map(
                     static fn($voterId): int => (int) $voterId,
-                    explode(',', (string) $voters),
+                    explode(',', $voters),
                 ),
                 static fn($userId): bool => $userId !== 0,
             ),
