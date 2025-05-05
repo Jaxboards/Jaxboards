@@ -1,14 +1,27 @@
 import { getComputedStyle } from './el';
 import Color from './color';
 
+/**
+ * This class was written before CSS animations existed.
+ * It should be replaced.
+ */
 class Animation {
-    constructor(el, steps, delay, loop) {
+    private el: HTMLElement;
+    private delay: number;
+    private steps: number;
+    private interval?: number;
+    private curLineup: number;
+    private stepCount: number;
+    private loop: number;
+    private lineup: any;
+
+    constructor(el: HTMLElement, steps = 30, delay = 20, loop = 0) {
         this.el = el;
-        this.steps = steps || 30;
-        this.delay = delay || 20;
+        this.steps = steps;
+        this.delay = delay;
         this.curLineup = 0;
         this.stepCount = 0;
-        this.loop = loop || 0;
+        this.loop = loop;
         this.lineup = [[]];
     }
 
@@ -59,14 +72,14 @@ class Animation {
         }
     }
 
-    add(what, from, to) {
+    add(what: string, from: string, to: string) {
         let t = ['', '', ''];
         let fromParsed;
         if (what.match(/color/i)) {
             fromParsed = new Color(from).toRGB();
             t[1] = new Color(to).toRGB();
         } else {
-            t = to.match(/(\D*)(-?\d+)(\D*)/);
+            t = to.match(/(\D*)(-?\d+)(\D*)/)!;
             t.shift();
             fromParsed = parseFloat(from.match(/-?\d+/));
         }
@@ -82,18 +95,21 @@ class Animation {
 
     dehighlight() {
         this.el.style.backgroundColor = '';
-        const bg = getComputedStyle(this.el).backgroundColor.toString();
-        let bg2;
+        const bg: string|undefined = getComputedStyle(this.el)?.backgroundColor;
         this.el.classList.add('highlight');
-        bg2 = getComputedStyle(this.el).backgroundColor.toString();
-        if (bg2 === bg) bg2 = 'FF0';
+        let bg2: string|undefined = getComputedStyle(this.el)?.backgroundColor;
+
+        if (bg2 === bg) bg2 = 'FF0'; // yellow
         this.el.classList.add('highlight');
+
+        if (!bg2 || !bg) return;
+
         return this.add('backgroundColor', bg2, bg).then(() => {
             this.el.style.backgroundColor = bg;
         });
     }
 
-    then(what, from, to, steps) {
+    then(what: HTMLElement | Function, from, to, steps) {
         this.lineup.push([]);
         if (steps) this.steps = steps;
         if (typeof what === 'function') {

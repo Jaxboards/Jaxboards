@@ -1,15 +1,14 @@
-export function getComputedStyle(a, b) {
-    if (!a) return false;
-    if (a.currentStyle) return a.currentStyle;
-    if (window.getComputedStyle) return window.getComputedStyle(a, b);
-    return false;
+export function getComputedStyle(element: HTMLElement) {
+    if (!element) return null;
+    if (window.getComputedStyle) return window.getComputedStyle(element);
+    return null;
 }
 
 /**
  * Returns an element's position on the page
  * @param {HTMLElement} el
  */
-export function getCoordinates(el) {
+export function getCoordinates(el: HTMLElement) {
     const { x: elX, y: elY, height, width } = el.getBoundingClientRect();
 
     const x = elX + window.scrollX;
@@ -25,27 +24,27 @@ export function getCoordinates(el) {
     };
 }
 
-export function isChildOf(a, b) {
+export function isChildOf(a: HTMLElement, b: HTMLElement) {
     return b.contains(a);
 }
 
-export function insertBefore(a, b) {
+export function insertBefore(a: HTMLElement, b: HTMLElement) {
     if (a.parentNode) a.parentNode.removeChild(a);
-    b.parentNode.insertBefore(a, b);
+    b.parentNode?.insertBefore(a, b);
 }
 
-export function insertAfter(a, b) {
+export function insertAfter(a: HTMLElement, b: HTMLElement) {
     if (a.parentNode) a.parentNode.removeChild(a);
-    b.parentNode.insertBefore(a, b.nextSibling);
+    b.parentNode?.insertBefore(a, b.nextSibling);
 }
 
-export function replace(a, b) {
+export function replace(a: HTMLElement, b: HTMLElement) {
     insertBefore(b, a);
     if (a.parentNode) a.parentNode.removeChild(a);
 }
 
 export function getHighestZIndex() {
-    const allElements = Array.from(document.getElementsByTagName('*'));
+    const allElements = Array.from(document.querySelectorAll<HTMLElement>('*'));
     const max = allElements.reduce((maxZ, element) => {
         if (element.style.zIndex && Number(element.style.zIndex) > maxZ) {
             return Number(element.style.zIndex);

@@ -15,19 +15,19 @@ import { messageReceived } from '../JAX/instant-messaging-window';
  * that the server can send to the client.
  */
 export default {
-    loadscript([src]) {
+    loadscript([src]: [string]) {
         document.body.appendChild(
             Object.assign(document.createElement('script'), { src }),
         );
     },
-    script(a) {
+    script(a: [string]) {
         // eslint-disable-next-line
         eval(a[0]);
     },
-    error(a) {
+    error(a: [string]) {
         alert(a[0]);
     },
-    alert(a) {
+    alert(a: [string]) {
         alert(a[0]);
     },
     reload() {
@@ -36,18 +36,18 @@ export default {
     refreshdata() {
         RUN.stream.pollData(true);
     },
-    addclass([selector, className]) {
+    addclass([selector, className]: [string, string]) {
         const el = document.querySelector(selector);
         if (el) {
             el.classList.add(className);
         }
     },
-    title(a) {
-        document.title = a;
+    title([title]: [string]) {
+        document.title = title;
     },
-    update([sel, html, shouldHighlight]) {
+    update([sel, html, shouldHighlight]: [string, string, string]) {
         let selector = sel;
-        const paths = Array.from(document.querySelectorAll('.path'));
+        const paths = Array.from(document.querySelectorAll<HTMLElement>('.path'));
         if (selector === 'path' && paths.length > 1) {
             paths.forEach((path) => {
                 path.innerHTML = html;
@@ -58,7 +58,7 @@ export default {
         if (!/^\W/.test(selector)) {
             selector = `#${selector}`;
         }
-        const el = document.querySelector(selector);
+        const el = document.querySelector<HTMLElement>(selector);
         if (!el) return;
         el.innerHTML = html;
         if (shouldHighlight) {
@@ -66,48 +66,49 @@ export default {
         }
         gracefulDegrade(el);
     },
-    removeel(a) {
-        const el = document.querySelector(a[0]);
-        if (el) el.parentNode.removeChild(el);
+    removeel([selector]: [string]) {
+        const el = document.querySelector(selector);
+        if (el) el.parentNode?.removeChild(el);
     },
     overlay: toggleOverlay,
     back() {
         window.history.back();
     },
-    setstatus([className]) {
+    setstatus([className]: [string]) {
         const status = document.querySelector('#status');
         if (status) {
             status.className = className;
         }
     },
-    appendrows(a) {
-        const table = document.querySelector(a[0]);
+    appendrows([selector, rowHTML]: [string, string]) {
+        const table = document.querySelector<HTMLTableElement>(selector);
+        if (!table) return;
         const span = document.createElement('span');
-        span.innerHTML = `<table>${a[1]}</table>`;
+        span.innerHTML = `<table>${rowHTML}</table>`;
         const vtbody = span.getElementsByTagName('tbody')[0];
         // table=table.getElementsByTagName('tbody')[0],
         gracefulDegrade(vtbody);
         table.appendChild(vtbody);
     },
-    location([path]) {
+    location([path]: [string]) {
         if (path.charAt(0) === '?') RUN.stream.location(path);
         else {
             document.location = path;
         }
     },
-    enable([selector]) {
-        const el = document.querySelector(`#${selector}`);
+    enable([selector]: [string]) {
+        const el = document.querySelector<HTMLButtonElement>(`#${selector}`);
         if (el) {
             el.disabled = false;
         }
     },
-    addshout([message]) {
-        const ss = Array.from(document.querySelectorAll('#shoutbox .shout'));
+    addshout([message]: [string]) {
+        const ss = Array.from(document.querySelectorAll<HTMLDivElement>('#shoutbox .shout'));
         let x;
         const span = document.createElement('span');
         span.innerHTML = message;
         const div = span.firstChild;
-        ss[0].parentNode.insertBefore(div, ss[0]);
+        ss[0].parentNode?.insertBefore(div, ss[0]);
         while (ss.length > globalsettings.shoutlimit - 1) {
             x = ss.pop();
             x.parentNode.removeChild(x);
@@ -116,33 +117,34 @@ export default {
         if (globalsettings.sound_shout) Sound.play('sbblip');
         gracefulDegrade(div);
     },
-    tick([html]) {
+    tick([html]: [string]) {
         const ticker = document.querySelector('#ticker');
+        if (!ticker) return;
         let tick = document.createElement('div');
         tick.className = 'tick';
         tick.innerHTML = html;
         tick.style.display = 'none';
         tick.style.overflow = 'hidden';
         ticker.insertBefore(tick, ticker.firstChild);
-        let h = getComputedStyle(tick);
-        h = h.height;
+        const tickStyle = getComputedStyle(tick);
         tick.style.height = '0px';
-        new Animation(tick).add('height', '0px', h).play();
-        const ticks = Array.from(ticker.querySelectorAll('.tick'));
+        new Animation(tick).add('height', '0px', tickStyle?.height).play();
+        const ticks = Array.from(ticker.querySelectorAll<HTMLDivElement>('.tick'));
         const l = ticks.length;
         tick.style.display = 'block';
+
         if (l > 100) {
             for (let x = 100; x < l; x += 100) {
                 tick = ticks[x];
-                if (!tick.bonked) {
+                if (!tick.dataset.removed) {
                     tick = ticks[x];
                     new Animation(tick, 30, 500)
                         .add('opacity', '1', '0')
-                        .then((el) => {
-                            el.parentNode.removeChild(el);
+                        .then((el: HTMLDivElement) => {
+                            el.parentNode?.removeChild(el);
                         })
                         .play();
-                    tick.bonked = true;
+                    tick.dataset.bonked = 'true';
                 }
             }
         }
@@ -249,8 +251,8 @@ export default {
     updateqreply(a) {
         const qreply = document.querySelector('#qreply');
         if (qreply) {
-            qreply.querySelector('textarea').focus();
-            qreply.querySelector('textarea').value += a[0];
+            qreply.querySelector('textarea')?.focus();
+            qreply.querySelector('textarea')?.value += a[0];
         }
     },
     newmessage([message, fromMID]) {
@@ -276,12 +278,12 @@ export default {
     },
     attachfiles() {
         const el = document.querySelector('#attachfiles');
-        el.addEventListener('click', () => {
+        el?.addEventListener('click', () => {
             alert('Attaching files is under construction');
         });
     },
-    listrating([postId, html]) {
-        let prdiv = document.querySelector(`#postrating_${postId}`);
+    listrating([postId, html]: [string, string]) {
+        let prdiv = document.querySelector<HTMLDivElement>(`#postrating_${postId}`);
         let c;
         if (prdiv) {
             if (prdiv.style.display !== 'none') {
@@ -303,7 +305,7 @@ export default {
             );
             prdiv.style.top = `${c.yh}px`;
             prdiv.style.left = `${c.x}px`;
-            document.querySelector('#page').appendChild(prdiv);
+            document.querySelector<HTMLDivElement>('#page')?.appendChild(prdiv);
         }
         prdiv.innerHTML = html;
         new Animation(prdiv).add('height', '0px', '200px').play();
