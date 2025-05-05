@@ -11,11 +11,15 @@ use PHPUnit\Framework\TestCase;
 
 use function base64_decode;
 
+/**
+ * @internal
+ */
 #[CoversClass(User::class)]
 #[Small]
 final class UserTest extends TestCase
 {
     private string $encodedForumFlags;
+
     private Container $container;
 
     /**
@@ -103,7 +107,9 @@ final class UserTest extends TestCase
                 'safeselect',
                 'safeupdate',
             ])
-            ->getMock();
+            ->getMock()
+        ;
+
         return new User(
             $database,
             $this->container->get(Jax::class),

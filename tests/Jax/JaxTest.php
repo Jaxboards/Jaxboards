@@ -12,11 +12,15 @@ use PHPUnit\Framework\TestCase;
 use function array_keys;
 use function base64_decode;
 
+/**
+ * @internal
+ */
 #[CoversClass(Jax::class)]
 #[Small]
 final class JaxTest extends TestCase
 {
     private string $encodedForumFlags;
+
     private Jax $jax;
 
     /**
