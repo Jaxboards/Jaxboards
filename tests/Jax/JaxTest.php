@@ -22,7 +22,7 @@ use function base64_decode;
 #[UsesClass(Config::class)]
 #[UsesClass(DomainDefinitions::class)]
 #[UsesClass(ServiceConfig::class)]
-#[UsesFunction('pathjoin')]
+#[UsesFunction('\Jax\pathjoin')]
 final class JaxTest extends TestCase
 {
     private string $encodedForumFlags;
