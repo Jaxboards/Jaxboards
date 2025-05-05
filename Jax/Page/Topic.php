@@ -12,6 +12,7 @@ use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
+use Jax\Page\Topic\Poll;
 use Jax\Request;
 use Jax\RSSFeed;
 use Jax\Session;
@@ -23,7 +24,6 @@ use function array_diff;
 use function array_filter;
 use function array_flip;
 use function array_key_exists;
-use function array_map;
 use function array_merge;
 use function ceil;
 use function count;
@@ -38,7 +38,6 @@ use function json_decode;
 use function json_encode;
 use function max;
 use function preg_match;
-use function round;
 
 use const PHP_EOL;
 
@@ -54,7 +53,7 @@ final class Topic
 
     private int $firstPostID = 0;
 
-    private ?array $topicdata = null;
+    private ?array $topicData = null;
 
     public function __construct(
         private readonly Config $config,
@@ -64,6 +63,7 @@ final class Topic
         private readonly Jax $jax,
         private readonly IPAddress $ipAddress,
         private readonly Page $page,
+        private readonly Poll $poll,
         private readonly Request $request,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
@@ -91,8 +91,9 @@ final class Topic
         $this->pageNumber = max((int) $this->request->both('page') - 1, 0);
 
 
-        $this->getTopicData($this->tid);
-        if (!$this->topicdata || !$this->topicdata['fperms']['read']) {
+        $this->topicData = $this->fetchTopicData($this->tid);
+
+        if (!$this->topicData || !$this->topicData['fperms']['read']) {
             $this->page->location('?');
 
             return;
@@ -106,7 +107,7 @@ final class Topic
                 $this->request->isJSAccess()
                 && !$this->request->isJSDirectLink()
             ) {
-                $this->qreplyform($this->tid);
+                $this->quickReplyForm($this->tid);
 
                 return;
             }
@@ -118,49 +119,49 @@ final class Topic
 
 
         if ($ratePost !== null) {
-            $this->ratepost($ratePost, $this->request->both('niblet'));
+            $this->ratePost($ratePost, $this->request->both('niblet'));
 
             return;
         }
 
         if ($this->request->both('votepoll') !== null) {
-            $this->votepoll();
+            $this->poll->vote($this->topicData);
 
             return;
         }
 
         if ($findPost !== null) {
-            $this->findpost((int) $findPost);
+            $this->findPost((int) $findPost);
 
             return;
         }
 
         if ($this->request->both('getlast') !== null) {
-            $this->getlastpost($this->tid);
+            $this->getLastPost($this->tid);
 
             return;
         }
 
         if ($edit !== null) {
-            $this->qeditpost($edit);
+            $this->quickEditPost($edit);
 
             return;
         }
 
         if ($this->request->both('quote') !== null) {
-            $this->multiquote($this->tid);
+            $this->multiQuote($this->tid);
 
             return;
         }
 
         if ($this->request->both('markread') !== null) {
-            $this->markread($this->tid);
+            $this->markRead($this->tid);
 
             return;
         }
 
         if ($listRating !== null) {
-            $this->listrating($listRating);
+            $this->listRating($listRating);
 
             return;
         }
@@ -172,19 +173,24 @@ final class Topic
         }
 
         if ($this->request->both('fmt') === 'RSS') {
-            $this->viewrss($this->tid);
+            $this->viewRSS($this->tid);
 
             return;
         }
 
-        $this->viewtopic($this->tid);
+        $this->viewTopic($this->tid);
     }
 
-    private function getTopicData(int $tid): void
+    /**
+     * @param array<string,mixed> $topicData - The Topic Record
+     */
+    private function fetchTopicData(int $tid): ?array
     {
         $result = $this->database->safespecial(
             <<<'SQL'
-                SELECT a.`title` AS `topic_title`
+                SELECT
+                    a.`id`
+                    , a.`title` AS `topic_title`
                     , a.`locked` AS `locked`
                     , UNIX_TIMESTAMP(a.`lp_date`) AS `lp_date`
                     , b.`title` AS `forum_title`
@@ -207,40 +213,42 @@ final class Topic
             ['topics', 'forums', 'categories'],
             $tid,
         );
-        $this->topicdata = $this->database->arow($result);
+        $topicData = $this->database->arow($result);
         $this->database->disposeresult($result);
 
-        if ($this->topicdata === null) {
-            return;
+        if ($topicData === null) {
+            return null;
         }
 
-        $this->topicdata['topic_title'] = $this->textFormatting->wordfilter($this->topicdata['topic_title']);
-        $this->topicdata['subtitle'] = $this->textFormatting->wordfilter($this->topicdata['subtitle']);
-        $this->topicdata['fperms'] = $this->user->getForumPerms($this->topicdata['fperms']);
+        $topicData['topic_title'] = $this->textFormatting->wordfilter($topicData['topic_title']);
+        $topicData['subtitle'] = $this->textFormatting->wordfilter($topicData['subtitle']);
+        $topicData['fperms'] = $this->user->getForumPerms($topicData['fperms']);
+
+        return $topicData;
     }
 
-    private function viewtopic(int $tid): void
+    private function viewTopic(int $tid): void
     {
-        if (!is_array($this->topicdata)) {
+        if (!is_array($this->topicData)) {
             return;
         }
 
         if (
             !$this->user->isGuest()
-            && $this->topicdata['lp_date'] > $this->user->get('last_visit')
+            && $this->topicData['lp_date'] > $this->user->get('last_visit')
         ) {
-            $this->markread($tid);
+            $this->markRead($tid);
         }
 
-        $this->page->setPageTitle($this->topicdata['topic_title']);
-        $this->session->set('location_verbose', "In topic '" . $this->topicdata['topic_title'] . "'");
+        $this->page->setPageTitle($this->topicData['topic_title']);
+        $this->session->set('location_verbose', "In topic '" . $this->topicData['topic_title'] . "'");
 
         // Fix this to work with subforums.
         $this->page->setBreadCrumbs(
             [
-                "?act=vc{$this->topicdata['cat_id']}" => $this->topicdata['cat_title'],
-                "?act=vf{$this->topicdata['fid']}" => $this->topicdata['forum_title'],
-                "?act=vt{$tid}" => $this->topicdata['topic_title'],
+                "?act=vc{$this->topicData['cat_id']}" => $this->topicData['cat_title'],
+                "?act=vf{$this->topicData['fid']}" => $this->topicData['forum_title'],
+                "?act=vt{$tid}" => $this->topicData['topic_title'],
             ],
         );
 
@@ -270,23 +278,14 @@ final class Topic
         $this->session->addVar('topic_lastpage', $this->pageNumber + 1 === $totalpages);
 
         // If it's a poll, put it in.
-        $poll = $this->topicdata['poll_type'] ? $this->template->meta(
-            'box',
-            " id='poll'",
-            $this->topicdata['poll_q'],
-            $this->generatepoll(
-                $this->topicdata['poll_type'],
-                json_decode((string) $this->topicdata['poll_choices']),
-                $this->topicdata['poll_results'],
-            ),
-        ) : '';
+        $poll = $this->topicData['poll_type'] ? $this->poll->render($this->topicData) : '';
 
         // Generate post listing.
         $page = $this->template->meta('topic-table', $this->postsintooutput());
         $page = $this->template->meta(
             'topic-wrapper',
-            $this->topicdata['topic_title']
-                . ($this->topicdata['subtitle'] ? ', ' . $this->topicdata['subtitle'] : ''),
+            $this->topicData['topic_title']
+                . ($this->topicData['subtitle'] ? ', ' . $this->topicData['subtitle'] : ''),
             $page,
             '<a href="./?act=vt' . $tid . '&amp;fmt=RSS" class="social rss" title="RSS Feed for this Topic">RSS</a>',
         );
@@ -298,8 +297,8 @@ final class Topic
             '',
         ];
 
-        if ($this->topicdata['fperms']['start']) {
-            $buttons[0] = "<a href='?act=post&fid=" . $this->topicdata['fid'] . "'>"
+        if ($this->topicData['fperms']['start']) {
+            $buttons[0] = "<a href='?act=post&fid=" . $this->topicData['fid'] . "'>"
                 . $this->template->meta(
                     $this->template->metaExists('button-newtopic')
                         ? 'button-newtopic'
@@ -309,9 +308,9 @@ final class Topic
         }
 
         if (
-            $this->topicdata['fperms']['reply']
+            $this->topicData['fperms']['reply']
             && (
-                !$this->topicdata['locked']
+                !$this->topicData['locked']
                 || $this->user->getPerm('can_override_locked_topics')
             )
         ) {
@@ -323,9 +322,9 @@ final class Topic
         }
 
         if (
-            $this->topicdata['fperms']['reply']
+            $this->topicData['fperms']['reply']
             && (
-                !$this->topicdata['locked']
+                !$this->topicData['locked']
                 || $this->user->getPerm('can_override_locked_topics')
             )
         ) {
@@ -481,7 +480,7 @@ final class Topic
         $this->session->set('users_online_cache', $newcache);
     }
 
-    private function qreplyform(int $tid): void
+    private function quickReplyForm(int $tid): void
     {
         $prefilled = '';
         $this->page->command('softurl');
@@ -743,7 +742,7 @@ final class Topic
                     . '</a>'
                     : '')
                 // Adds the Quote button
-                . ($this->topicdata['fperms']['reply']
+                . ($this->topicData['fperms']['reply']
                     ? " <a href='?act=vt" . $this->tid . '&amp;quote=' . $post['pid']
                     . "' onclick='RUN.handleQuoting(this);return false;' "
                     . "class='quotepost'>" . $this->template->meta('topic-quote-button') . '</a> '
@@ -882,215 +881,7 @@ final class Topic
         return $this->canMod = $canMod;
     }
 
-    private function generatepoll($type, $choices, string $results): string
-    {
-        if (!$choices) {
-            $choices = [];
-        }
-
-        $page = '';
-        $usersvoted = [];
-        $voted = false;
-
-        if (!$this->user->isGuest()) {
-            // Accomplish three things at once:
-            // * Determine if the user has voted.
-            // * Count up the number of votes.
-            // * Parse the result set.
-            $totalvotes = 0;
-            $numvotes = [];
-            foreach ($this->parsePollResults($results) as $optionIndex => $voters) {
-                $totalvotes += ($numvotes[$optionIndex] = count($voters));
-                if (in_array($this->user->get('id'), $voters, true)) {
-                    $voted = true;
-                }
-
-                foreach ($voters as $voter) {
-                    $usersvoted[$voter] = 1;
-                }
-            }
-        }
-
-        $usersvoted = count($usersvoted);
-
-        if ($voted) {
-            $page .= '<table>';
-            foreach ($choices as $k => $v) {
-                $page .= "<tr><td>{$v}</td><td class='numvotes'>"
-                    . $numvotes[$k] . ' votes ('
-                    . round($numvotes[$k] / $totalvotes * 100, 2)
-                    . "%)</td><td style='width:200px'><div class='bar' style='width:"
-                    . round($numvotes[$k] / $totalvotes * 100)
-                    . "%;'></div></td></tr>";
-            }
-
-            $page .= "<tr><td colspan='3' class='totalvotes'>Total Votes: "
-                . $usersvoted . '</td></tr>';
-
-            return $page . '</table>';
-        }
-
-        $hiddenFields = $this->jax->hiddenFormFields(
-            [
-                'act' => 'vt' . $this->tid,
-                'votepoll' => '1',
-            ],
-        );
-
-        $choicesHTML = '';
-        foreach ($choices as $index => $value) {
-            $input = $type === 'multi'
-                ? "<input type='checkbox' name='choice[]' value='{$index}' id='poll_{$index}' />"
-                : "<input type='radio' name='choice' value='{$index}' id='poll_{$index}' /> ";
-
-            $choicesHTML .= <<<HTML
-                <div class='choice'>
-                    {$input}
-                    <label for='poll_{$index}'>{$value}</label>
-                </div>
-                HTML;
-        }
-
-        return <<<HTML
-            <form method='post' action='?' data-ajax-form='true'>
-                {$hiddenFields}
-                {$choicesHTML}
-                <div class='buttons'>
-                    <input type='submit' value='Vote'>
-                </div>
-            </form>
-            HTML;
-    }
-
-    private function votepoll(): void
-    {
-        $error = null;
-        if ($this->user->isGuest()) {
-            $error = 'You must be logged in to vote!';
-        } else {
-            $result = $this->database->safeselect(
-                [
-                    'poll_q',
-                    'poll_results',
-                    'poll_choices',
-                    'poll_type',
-                ],
-                'topics',
-                Database::WHERE_ID_EQUALS,
-                $this->tid,
-            );
-            $row = $this->database->arow($result);
-            $this->database->disposeresult($result);
-
-            $choice = $this->request->both('choice');
-            $choices = json_decode((string) $row['poll_choices'], true);
-            $numchoices = count($choices);
-
-            $results = $this->parsePollResults((string) $row['poll_results']);
-
-            // Results is now an array of arrays, the keys of the parent array
-            // correspond to the choices while the arrays within the array
-            // correspond to a collection of user IDs that have voted for that
-            // choice.
-            $voted = false;
-            foreach ($results as $result) {
-                foreach ($result as $voterId) {
-                    if ($voterId === $this->user->get('id')) {
-                        $voted = true;
-
-                        break;
-                    }
-                }
-            }
-
-            if ($voted) {
-                $error = 'You have already voted on this poll!';
-            }
-
-            if ($row['poll_type'] === 'multi') {
-                if (is_array($choice)) {
-                    foreach ($choice as $c) {
-                        if (is_numeric($c) && $c < $numchoices && $c >= 0) {
-                            continue;
-                        }
-
-                        $error = 'Invalid choices';
-                    }
-                } else {
-                    $error = 'Invalid Choice';
-                }
-            } elseif (
-                !is_numeric($choice)
-                || $choice >= $numchoices
-                || $choice < 0
-            ) {
-                $error = 'Invalid choice';
-            }
-        }
-
-        if ($error !== null) {
-            $this->page->command('error', $error);
-
-            return;
-        }
-
-        if ($row['poll_type'] === 'multi') {
-            foreach ($choice as $c) {
-                $results[$c][] = $this->user->get('id');
-            }
-        } else {
-            $results[$choice][] = $this->user->get('id');
-        }
-
-        $presults = [];
-        for ($x = 0; $x < $numchoices; ++$x) {
-            $presults[$x] = isset($results[$x]) && $results[$x]
-                ? implode(',', $results[$x]) : '';
-        }
-
-        $presults = implode(';', $presults);
-        $this->page->command(
-            'update',
-            '#poll .content',
-            $this->generatePoll(
-                $row['poll_type'],
-                $choices,
-                $presults,
-            ),
-            '1',
-        );
-
-        $this->database->safeupdate(
-            'topics',
-            [
-                'poll_results' => $presults,
-            ],
-            Database::WHERE_ID_EQUALS,
-            $this->tid,
-        );
-    }
-
-    /**
-     * Poll results look like this: 1,2,3;4,5;6,7
-     * Choices are semi-colon separated and user IDs are comma separated.
-     *
-     * @return array<array<int>>
-     */
-    private function parsePollResults(string $pollResults): array
-    {
-        return array_map(
-            static fn($voters): array => array_filter(
-                array_map(
-                    static fn($voterId): int => (int) $voterId,
-                    explode(',', $voters),
-                ),
-                static fn($userId): bool => $userId !== 0,
-            ),
-            explode(';', $pollResults),
-        );
-    }
-
-    private function ratepost(
+    private function ratePost(
         array|string $postid,
         null|array|string $nibletid,
     ): void {
@@ -1153,7 +944,7 @@ final class Topic
         $this->page->command('alert', $unrate ? 'Unrated!' : 'Rated!');
     }
 
-    private function qeditpost(array|string $pid): void
+    private function quickEditPost(array|string $pid): void
     {
         if (!is_numeric($pid)) {
             return;
@@ -1239,7 +1030,7 @@ final class Topic
         $this->page->command('update', "#pid_{$pid} .post_content", $form);
     }
 
-    private function multiquote(int $tid): void
+    private function multiQuote(int $tid): void
     {
         $pid = $this->request->both('quote');
         $post = false;
@@ -1289,7 +1080,7 @@ final class Topic
             // This line toggles whether or not the qreply window should open
             // on quote.
             if ($this->request->isJSAccess()) {
-                $this->qreplyform($tid);
+                $this->quickReplyForm($tid);
             } else {
                 header('Location:?act=post&tid=' . $tid);
             }
@@ -1298,7 +1089,7 @@ final class Topic
         $this->page->command('softurl');
     }
 
-    private function getlastpost(int $tid): void
+    private function getLastPost(int $tid): void
     {
         $result = $this->database->safeselect(
             'MAX(`id`) AS `lastpid`,COUNT(`id`) AS `numposts`',
@@ -1316,7 +1107,7 @@ final class Topic
         );
     }
 
-    private function findpost(int $pid): void
+    private function findPost(int $pid): void
     {
         $postPosition = null;
         $result = $this->database->safespecial(
@@ -1357,14 +1148,14 @@ final class Topic
         );
     }
 
-    private function markread(int $tid): void
+    private function markRead(int $tid): void
     {
         $topicsread = $this->jax->parseReadMarkers($this->session->get('topicsread'));
         $topicsread[$tid] = Carbon::now()->getTimestamp();
         $this->session->set('topicsread', json_encode($topicsread));
     }
 
-    private function listrating(array|string $pid): void
+    private function listRating(array|string $pid): void
     {
         $ratingConfig = $this->config->getSetting('ratings') ?? 0;
         if (($ratingConfig & 2) !== 0) {
@@ -1437,14 +1228,14 @@ final class Topic
     /**
      * @SuppressWarnings("PHPMD.Superglobals")
      */
-    private function viewrss(int $tid): void
+    private function viewRSS(int $tid): void
     {
         $boardURL = $this->domainDefinitions->getBoardURL();
         $rssFeed = new RSSFeed(
             [
-                'description' => $this->topicdata['subtitle'],
+                'description' => $this->topicData['subtitle'],
                 'link' => "{$boardURL}?act=vt{$tid}",
-                'title' => $this->topicdata['topic_title'],
+                'title' => $this->topicData['topic_title'],
             ],
         );
         $result = $this->database->safespecial(
