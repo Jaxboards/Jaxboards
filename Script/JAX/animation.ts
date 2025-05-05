@@ -7,13 +7,22 @@ import Color from './color';
  */
 class Animation {
     private el: HTMLElement;
+
     private delay: number;
+
     private steps: number;
+
     private interval?: number;
+
     private curLineup: number;
+
     private stepCount: number;
+
     private loop: number;
-    private lineup: Array<Array<Function|[string, string|number, string|number]>>;
+
+    private lineup: Array<
+        Array<() => void | [string, string | number, string | number]>
+    >;
 
     constructor(el: HTMLElement, steps = 30, delay = 20, loop = 0) {
         this.el = el;
@@ -95,9 +104,13 @@ class Animation {
 
     dehighlight(): this {
         this.el.style.backgroundColor = '';
-        const bg: string|undefined = getComputedStyle(this.el)?.backgroundColor;
+        const bg: string | undefined = getComputedStyle(
+            this.el,
+        )?.backgroundColor;
         this.el.classList.add('highlight');
-        let bg2: string|undefined = getComputedStyle(this.el)?.backgroundColor;
+        let bg2: string | undefined = getComputedStyle(
+            this.el,
+        )?.backgroundColor;
 
         if (bg2 === bg) bg2 = 'FF0'; // yellow
         this.el.classList.add('highlight');
@@ -109,7 +122,7 @@ class Animation {
         });
     }
 
-    then(what: string | Function, from, to, steps) {
+    then(what: string | (() => void), from, to, steps) {
         this.lineup.push([]);
         if (steps) this.steps = steps;
         if (typeof what === 'function') {

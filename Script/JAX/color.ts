@@ -10,14 +10,16 @@ class Color {
         }
 
         if (typeof colorToParse === 'string') {
-            const rgbMatch = colorToParse.match(/^rgb\((\d+),\s?(\d+),\s?(\d+)\)/i);
+            const rgbMatch = colorToParse.match(
+                /^rgb\((\d+),\s?(\d+),\s?(\d+)\)/i,
+            );
             const hexMatch = colorToParse.match(/#?[^\da-fA-F]/);
             if (rgbMatch) {
                 rgbMatch.shift();
                 this.rgb = [
                     parseFloat(rgbMatch[1]),
                     parseFloat(rgbMatch[2]),
-                    parseFloat(rgbMatch[3])
+                    parseFloat(rgbMatch[3]),
                 ];
                 return;
             }
@@ -42,7 +44,10 @@ class Color {
 
                 this.rgb = [];
                 for (let x = 0; x < 3; x += 1) {
-                    this.rgb[x] = parseInt(colorToParse.slice(x * 2, (x+1) * 2), 16);
+                    this.rgb[x] = parseInt(
+                        colorToParse.slice(x * 2, (x + 1) * 2),
+                        16,
+                    );
                 }
             }
         }
@@ -61,7 +66,9 @@ class Color {
 
     toHex() {
         if (!this.rgb) return false;
-        return this.rgb.map(dec => dec.toString(16).padStart(2, '0')).join('');
+        return this.rgb
+            .map((dec) => dec.toString(16).padStart(2, '0'))
+            .join('');
     }
 }
 

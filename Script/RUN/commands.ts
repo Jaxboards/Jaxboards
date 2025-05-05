@@ -47,7 +47,9 @@ export default {
     },
     update([sel, html, shouldHighlight]: [string, string, string]) {
         let selector = sel;
-        const paths = Array.from(document.querySelectorAll<HTMLElement>('.path'));
+        const paths = Array.from(
+            document.querySelectorAll<HTMLElement>('.path'),
+        );
         if (selector === 'path' && paths.length > 1) {
             paths.forEach((path) => {
                 path.innerHTML = html;
@@ -103,7 +105,9 @@ export default {
         }
     },
     addshout([message]: [string]) {
-        const ss = Array.from(document.querySelectorAll<HTMLDivElement>('#shoutbox .shout'));
+        const ss = Array.from(
+            document.querySelectorAll<HTMLDivElement>('#shoutbox .shout'),
+        );
         let x;
         const span = document.createElement('span');
         span.innerHTML = message;
@@ -129,7 +133,9 @@ export default {
         const tickStyle = getComputedStyle(tick);
         tick.style.height = '0px';
         new Animation(tick).add('height', '0px', tickStyle?.height).play();
-        const ticks = Array.from(ticker.querySelectorAll<HTMLDivElement>('.tick'));
+        const ticks = Array.from(
+            ticker.querySelectorAll<HTMLDivElement>('.tick'),
+        );
         const l = ticks.length;
         tick.style.display = 'block';
 
@@ -250,7 +256,7 @@ export default {
     },
     updateqreply(a) {
         const qreply = document.querySelector('#qreply');
-        const textarea = qreply?.querySelector('textarea')
+        const textarea = qreply?.querySelector('textarea');
         if (textarea) {
             textarea.focus();
             textarea.value += a[0];
@@ -284,7 +290,9 @@ export default {
         });
     },
     listrating([postId, html]: [string, string]) {
-        let prdiv = document.querySelector<HTMLDivElement>(`#postrating_${postId}`);
+        let prdiv = document.querySelector<HTMLDivElement>(
+            `#postrating_${postId}`,
+        );
         let c;
         if (prdiv) {
             if (prdiv.style.display !== 'none') {
