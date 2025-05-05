@@ -1082,7 +1082,7 @@ final class Topic
             static fn($voters): array => array_filter(
                 array_map(
                     static fn($voterId): int => (int) $voterId,
-                    explode(',', (string) $voters),
+                    explode(',', $voters),
                 ),
                 static fn($userId): bool => $userId !== 0,
             ),
