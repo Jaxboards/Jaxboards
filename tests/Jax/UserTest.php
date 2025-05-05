@@ -19,7 +19,10 @@ use function base64_decode;
 #[CoversClass(User::class)]
 #[Small]
 #[UsesClass(Config::class)]
+#[UsesClass(Database::class)]
 #[UsesClass(DomainDefinitions::class)]
+#[UsesClass(IPAddress::class)]
+#[UsesClass(Jax::class)]
 #[UsesClass(ServiceConfig::class)]
 #[UsesFunction('\Jax\pathjoin')]
 final class UserTest extends TestCase
