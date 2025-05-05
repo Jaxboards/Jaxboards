@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax\Constants;
 
-enum Groups: int {
+enum Groups: int
+{
     case Member = 1;
     case Admin = 2;
     case Guest = 3;

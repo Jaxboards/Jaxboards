@@ -281,7 +281,10 @@ final readonly class Members
             }
 
             $member = array_pop($member);
-            if ($member['group_id'] === Groups::Admin && $this->user->get('id') !== 1) {
+            if (
+                $member['group_id'] === Groups::Admin
+                && $this->user->get('id') !== 1
+            ) {
                 $page = $this->page->error('You do not have permission to edit this profile. ');
             } else {
                 $page .= $this->jax->hiddenFormFields(['mid' => $member['id']]);

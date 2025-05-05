@@ -55,7 +55,10 @@ final class UCP
 
     public function render(): void
     {
-        if ($this->user->isGuest() || $this->user->get('group_id') === Groups::Banned) {
+        if (
+            $this->user->isGuest()
+            || $this->user->get('group_id') === Groups::Banned
+        ) {
             $this->page->location('?');
 
             return;
