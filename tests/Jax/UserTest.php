@@ -53,6 +53,7 @@ final class UserTest extends TestCase
             'poll' => false,
         ],
     ];
+
     // phpcs:enable
 
     protected function setUp(): void
