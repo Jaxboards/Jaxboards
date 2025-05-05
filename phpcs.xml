@@ -55,7 +55,11 @@
   <rule ref="SlevomatCodingStandard.Arrays.ArrayAccess"/>
   <rule ref="SlevomatCodingStandard.Arrays.DisallowImplicitArrayCreation"/>
   <rule ref="SlevomatCodingStandard.Arrays.DisallowPartiallyKeyed"/>
-  <rule ref="SlevomatCodingStandard.Attributes.AttributesOrder"/>
+  <rule ref="SlevomatCodingStandard.Attributes.AttributesOrder">
+      <properties>
+          <property name="orderAlphabetically" value="true"/>
+      </properties>
+  </rule>
   <rule ref="SlevomatCodingStandard.Attributes.DisallowAttributesJoining"/>
   <rule ref="SlevomatCodingStandard.Attributes.DisallowMultipleAttributesPerLine"/>
   <rule ref="SlevomatCodingStandard.Attributes.RequireAttributeAfterDocComment"/>
