@@ -1,7 +1,8 @@
 class Color {
     private rgb: number[];
 
-    constructor(colorToParse: string | number[]) {
+    constructor(_colorToParse: string | number[]) {
+        let colorToParse = _colorToParse;
         // RGB
         if (typeof colorToParse === 'object') {
             this.rgb = colorToParse;
@@ -23,7 +24,7 @@ class Color {
 
             if (hexMatch) {
                 if (colorToParse.charAt(0) === '#') {
-                    colorToParse = colorToParse.substr(1);
+                    colorToParse = colorToParse.slice(1);
                 }
                 if (colorToParse.length === 3) {
                     colorToParse =
