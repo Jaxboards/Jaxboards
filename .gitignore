@@ -16,7 +16,9 @@ boards
 *.log
 
 # Scan Results
+/clover.xml
 eslint-report.json
+/junit.xml
 parallel-lint-report-sonarqube.json
 parallel-lint-report.json
 phpcs-report-sonarqube.json
