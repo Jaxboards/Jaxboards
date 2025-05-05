@@ -13,7 +13,7 @@ class Animation {
     private curLineup: number;
     private stepCount: number;
     private loop: number;
-    private lineup: any;
+    private lineup: Array<Array<Function|[string, string|number, string|number]>>;
 
     constructor(el: HTMLElement, steps = 30, delay = 20, loop = 0) {
         this.el = el;
@@ -72,7 +72,7 @@ class Animation {
         }
     }
 
-    add(what: string, from: string, to: string) {
+    add(what: string, from: string, to: string): this {
         let t = ['', '', ''];
         let fromParsed;
         if (what.match(/color/i)) {
@@ -81,7 +81,7 @@ class Animation {
         } else {
             t = to.match(/(\D*)(-?\d+)(\D*)/)!;
             t.shift();
-            fromParsed = parseFloat(from.match(/-?\d+/));
+            fromParsed = parseFloat(from.match(/-?\d+/)?.[0] ?? '');
         }
         this.lineup[this.lineup.length - 1].push([
             what,
@@ -93,7 +93,7 @@ class Animation {
         return this;
     }
 
-    dehighlight() {
+    dehighlight(): this {
         this.el.style.backgroundColor = '';
         const bg: string|undefined = getComputedStyle(this.el)?.backgroundColor;
         this.el.classList.add('highlight');
@@ -102,14 +102,14 @@ class Animation {
         if (bg2 === bg) bg2 = 'FF0'; // yellow
         this.el.classList.add('highlight');
 
-        if (!bg2 || !bg) return;
+        if (!bg2 || !bg) return this;
 
         return this.add('backgroundColor', bg2, bg).then(() => {
             this.el.style.backgroundColor = bg;
         });
     }
 
-    then(what: HTMLElement | Function, from, to, steps) {
+    then(what: string | Function, from, to, steps) {
         this.lineup.push([]);
         if (steps) this.steps = steps;
         if (typeof what === 'function') {

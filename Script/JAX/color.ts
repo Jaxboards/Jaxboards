@@ -1,41 +1,52 @@
 class Color {
-    constructor(colorToParse) {
-        let a = colorToParse;
+    private rgb: number[];
+
+    constructor(colorToParse: string | number[]) {
         // RGB
-        if (typeof a === 'object') this.rgb = a;
-        else if (typeof a === 'string') {
-            const rgbMatch = a.match(/^rgb\((\d+),\s?(\d+),\s?(\d+)\)/i);
-            const hexMatch = a.match(/#?[^\da-fA-F]/);
+        if (typeof colorToParse === 'object') {
+            this.rgb = colorToParse;
+            return;
+        }
+
+        if (typeof colorToParse === 'string') {
+            const rgbMatch = colorToParse.match(/^rgb\((\d+),\s?(\d+),\s?(\d+)\)/i);
+            const hexMatch = colorToParse.match(/#?[^\da-fA-F]/);
             if (rgbMatch) {
-                rgbMatch[1] = parseFloat(rgbMatch[1]);
-                rgbMatch[2] = parseFloat(rgbMatch[2]);
-                rgbMatch[3] = parseFloat(rgbMatch[3]);
                 rgbMatch.shift();
-                this.rgb = rgbMatch;
-            } else if (hexMatch) {
-                if (a.charAt(0) === '#') {
-                    a = a.substr(1);
+                this.rgb = [
+                    parseFloat(rgbMatch[1]),
+                    parseFloat(rgbMatch[2]),
+                    parseFloat(rgbMatch[3])
+                ];
+                return;
+            }
+
+            if (hexMatch) {
+                if (colorToParse.charAt(0) === '#') {
+                    colorToParse = colorToParse.substr(1);
                 }
-                if (a.length === 3) {
-                    a =
-                        a.charAt(0) +
-                        a.charAt(0) +
-                        a.charAt(1) +
-                        a.charAt(1) +
-                        a.charAt(2) +
-                        a.charAt(2);
+                if (colorToParse.length === 3) {
+                    colorToParse =
+                        colorToParse.charAt(0) +
+                        colorToParse.charAt(0) +
+                        colorToParse.charAt(1) +
+                        colorToParse.charAt(1) +
+                        colorToParse.charAt(2) +
+                        colorToParse.charAt(2);
                 }
-                if (a.length !== 6) this.rgb = [0, 0, 0];
-                else {
-                    this.rgb = [];
-                    for (let x = 0; x < 3; x += 1) {
-                        this.rgb[x] = parseInt(a.substr(x * 2, 2), 16);
-                    }
+                if (colorToParse.length !== 6) {
+                    this.rgb = [0, 0, 0];
+                    return;
+                }
+
+                this.rgb = [];
+                for (let x = 0; x < 3; x += 1) {
+                    this.rgb[x] = parseInt(colorToParse.slice(x * 2, (x+1) * 2), 16);
                 }
             }
-        } else {
-            this.rgb = [0, 0, 0];
         }
+
+        this.rgb = [0, 0, 0];
     }
 
     invert() {
@@ -49,17 +60,7 @@ class Color {
 
     toHex() {
         if (!this.rgb) return false;
-        let tmp2;
-        let tmp = '';
-        let x;
-        const hex = '0123456789ABCDEF';
-        for (x = 0; x < 3; x += 1) {
-            tmp2 = this.rgb[x];
-            tmp +=
-                hex.charAt(Math.floor(tmp2 / 16)) +
-                hex.charAt(Math.floor(tmp2 % 16));
-        }
-        return tmp;
+        return this.rgb.map(dec => dec.toString(16).padStart(2, '0')).join('');
     }
 }
 
