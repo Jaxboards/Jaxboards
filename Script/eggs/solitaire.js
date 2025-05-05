@@ -748,7 +748,6 @@ function openWindow(solitaireGameId) {
                     </div>
                 </div>
             </div>`,
-            onclose: () => alert('close'),
         },
     ]);
 }
