@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit
+    bootstrap="Jax/autoload.php"
+    backupGlobals="true"
+    backupStaticProperties="true"
+    beStrictAboutChangesToGlobalState="true"
+    beStrictAboutOutputDuringTests="true"
+    beStrictAboutTestsThatDoNotTestAnything="true"
+    beStrictAboutCoverageMetadata="true"
+    colors="true"
+    columns="max"
+    defaultTestSuite="Jax"
+    displayDetailsOnAllIssues="true"
+    enforceTimeLimit="true"
+    failOnAllIssues="true"
+    processIsolation="true"
+    stderr="true"
+    >
+
+    <source>
+        <include>
+            <directory suffix="php">ACP</directory>
+            <directory suffix="php">Jax</directory>
+            <directory suffix="php">Service</directory>
+            <directory suffix="php">api</directory>
+            <directory suffix="php">boards</directory>
+            <directory suffix="php">boards</directory>
+            <directory suffix="php">tools</directory>
+            <file>index.php</file>
+        </include>
+    </source>
+
+    <testsuites>
+        <testsuite name="Jax">
+            <directory>tests/Jax</directory>
+        </testsuite>
+    </testsuites>
+
+    <php>
+        <env name="APP_ENV" value="testing"/>
+    </php>
+</phpunit>

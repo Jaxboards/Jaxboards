@@ -1,12 +1,14 @@
 # Cache files
 .DS_Store
-.php-cs-fixer.cache
+/.php-cs-fixer.cache
+/.phpunit.result.cache
 Thumbs.db
 
 # Config files
-Desktop.ini
 /config.php
+Desktop.ini
 crossdomain.xml
+/phpunit.xml
 # Boards data
 boards
 
