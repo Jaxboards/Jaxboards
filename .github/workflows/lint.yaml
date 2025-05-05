@@ -1,4 +1,4 @@
-name: Lint
+name: Lint & Test
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
@@ -6,7 +6,7 @@ concurrency:
 
 jobs:
     run-linters:
-        name: Lint
+        name: Lint & Test
         runs-on: ubuntu-latest
         permissions:
             # Give the default GITHUB_TOKEN write permission to commit and push the
