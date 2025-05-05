@@ -342,7 +342,7 @@ function solitaireGame() {
     const handleMove = (event) => {
         if (state.moving.capture) {
             const el = state.moving.element;
-            const { x, y } = getMousePosition(event);
+            let { x, y } = getMousePosition(event);
 
             el.style.left = `${x - state.moving.offset.x}px`;
             el.style.top = `${y - state.moving.offset.y}px`;
@@ -439,7 +439,16 @@ function solitaireGame() {
         clearTimeout(release);
         if (state.moving.capture) {
             release = setTimeout(() => {
-                const { x, y } = getMousePosition(event);
+                let { x, y } = getMousePosition(event);
+
+                // All other dropzone coordinate math is based on getClientBoundingRect
+                // Which is viewport coordinate based, not page coordinate based.
+                // So we're comparing apples to apples, change the mouse coordinates
+                // to be viewport based instead.
+
+                x -= window.scrollX;
+                y -= window.scrollY;
+
                 requestAnimationFrame(() => {
                     dropCard(x, y);
 
