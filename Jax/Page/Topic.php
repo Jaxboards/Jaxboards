@@ -20,6 +20,7 @@ use Jax\TextFormatting;
 use Jax\User;
 
 use function array_diff;
+use function array_filter;
 use function array_flip;
 use function array_key_exists;
 use function array_map;
@@ -881,7 +882,7 @@ final class Topic
         return $this->canMod = $canMod;
     }
 
-    private function generatepoll($type, $choices, $results): string
+    private function generatepoll($type, $choices, string $results): string
     {
         if (!$choices) {
             $choices = [];
@@ -896,7 +897,6 @@ final class Topic
             // * Determine if the user has voted.
             // * Count up the number of votes.
             // * Parse the result set.
-
             $totalvotes = 0;
             $numvotes = [];
             foreach ($this->parsePollResults($results) as $optionIndex => $voters) {
@@ -905,8 +905,8 @@ final class Topic
                     $voted = true;
                 }
 
-                foreach ($voters as $user) {
-                    $usersvoted[$user] = 1;
+                foreach ($voters as $voter) {
+                    $usersvoted[$voter] = 1;
                 }
             }
         }
@@ -1072,22 +1072,21 @@ final class Topic
 
     /**
      * Poll results look like this: 1,2,3;4,5;6,7
-     * Choices are semi-colon separated and user IDs are comma separated
+     * Choices are semi-colon separated and user IDs are comma separated.
      *
      * @return array<array<int>>
      */
     private function parsePollResults(string $pollResults): array
     {
         return array_map(
-            fn($voters) =>
-            array_filter(
+            static fn($voters): array => array_filter(
                 array_map(
                     static fn($voterId): int => (int) $voterId,
-                    explode(',', $voters)
+                    explode(',', (string) $voters),
                 ),
-                fn($userId) => $userId !== 0
+                static fn($userId): bool => $userId !== 0,
             ),
-            explode(';', $pollResults)
+            explode(';', $pollResults),
         );
     }
 
