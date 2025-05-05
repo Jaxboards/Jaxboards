@@ -17,6 +17,20 @@
     processIsolation="true"
     stderr="true"
     >
+    <coverage
+        includeUncoveredFiles="true"
+        pathCoverage="false"
+        ignoreDeprecatedCodeUnits="true"
+        disableCodeCoverageIgnore="true"
+        >
+        <report>
+            <clover outputFile="clover.xml"/>
+        </report>
+    </coverage>
+
+    <logging>
+        <junit outputFile="junit.xml"/>
+    </logging>
 
     <source>
         <include>
