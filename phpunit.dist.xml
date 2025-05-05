@@ -34,6 +34,10 @@
     </logging>
 
     <source>
+        <exclude>
+            <!-- tracking down weird coverage behavior -->
+            <file>Jax/autoload.php</file>
+        </exclude>
         <include>
             <directory suffix="php">ACP</directory>
             <directory suffix="php">Jax</directory>
