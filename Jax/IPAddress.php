@@ -153,6 +153,6 @@ final class IPAddress
      */
     private function getIp(): string
     {
-        return $_SERVER['REMOTE_ADDR'];
+        return $_SERVER['REMOTE_ADDR'] ?? '';
     }
 }

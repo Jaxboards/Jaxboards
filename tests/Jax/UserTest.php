@@ -37,7 +37,7 @@ final class UserTest extends TestCase
      * @var array<int,array<string,bool>>
      */
     private array $decoded = [
-        Groups::Guest => [
+        Groups::Guest->value => [
             'upload' => false,
             'reply' => false,
             'start' => false,
@@ -45,7 +45,7 @@ final class UserTest extends TestCase
             'view' => true,
             'poll' => false,
         ],
-        Groups::Banned => [
+        Groups::Banned->value => [
             'upload' => false,
             'reply' => false,
             'start' => false,
@@ -97,7 +97,7 @@ final class UserTest extends TestCase
             $database,
             $container->get(Jax::class),
             $container->get(IPAddress::class),
-            ['group_id' => Groups::Admin],
+            ['group_id' => Groups::Admin->value],
             [
                 'can_attach' => true,
                 'can_poll' => true,
@@ -152,12 +152,12 @@ final class UserTest extends TestCase
             $database,
             $container->get(Jax::class),
             $container->get(IPAddress::class),
-            ['group_id' => Groups::Guest],
+            ['group_id' => Groups::Guest->value],
             ['can_post' => true],
         );
 
         self::assertSame(
-            $this->decoded[Groups::Guest],
+            $this->decoded[Groups::Guest->value],
             $user->getForumPerms($this->encodedForumFlags),
         );
     }
@@ -195,10 +195,11 @@ final class UserTest extends TestCase
             $database,
             $container->get(Jax::class),
             $container->get(IPAddress::class),
+            ['group_id' => Groups::Banned->value],
             ['can_post' => true],
         );
 
-        $expected = $this->decoded[Groups::Banned];
+        $expected = $this->decoded[Groups::Banned->value];
         $result = $user->getForumPerms($this->encodedForumFlags);
         self::assertSame($expected, $result);
     }

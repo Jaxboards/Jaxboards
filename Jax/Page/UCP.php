@@ -57,7 +57,7 @@ final class UCP
     {
         if (
             $this->user->isGuest()
-            || $this->user->get('group_id') === Groups::Banned
+            || $this->user->get('group_id') === Groups::Banned->value
         ) {
             $this->page->location('?');
 

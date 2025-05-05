@@ -282,7 +282,7 @@ final readonly class Members
 
             $member = array_pop($member);
             if (
-                $member['group_id'] === Groups::Admin
+                $member['group_id'] === Groups::Admin->value
                 && $this->user->get('id') !== 1
             ) {
                 $page = $this->page->error('You do not have permission to edit this profile. ');
@@ -379,7 +379,7 @@ final readonly class Members
 
             // Make it so root admins can't get out of admin.
             if ($this->request->both('mid') === '1') {
-                $write['group_id'] = Groups::Admin;
+                $write['group_id'] = Groups::Admin->value;
             }
 
             $this->database->safeupdate(

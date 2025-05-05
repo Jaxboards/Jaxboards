@@ -33,7 +33,7 @@ final class User
     {
         if (!$this->userData) {
             return match ($property) {
-                'group_id' => Groups::Guest,
+                'group_id' => Groups::Guest->value,
                 default => null,
             };
         }
@@ -154,8 +154,8 @@ final class User
         }
 
         $groupId = match (true) {
-            $this->isBanned() => Groups::Banned,
-            $this->userData !== null => $this->userData['group_id'],
+            $this->isBanned() => Groups::Banned->value,
+            $this->userData !== null => $this->get('group_id'),
             default => null,
         };
 
@@ -237,12 +237,12 @@ final class User
 
     public function isAdmin(): bool
     {
-        return $this->get('group_id') === 2;
+        return $this->get('group_id') === Groups::Admin->value;
     }
 
     public function isBanned(): bool
     {
-        if ($this->get('group_id') === Groups::Banned) {
+        if ($this->get('group_id') === Groups::Banned->value) {
             return true;
         }
 

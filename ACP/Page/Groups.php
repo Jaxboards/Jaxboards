@@ -109,7 +109,7 @@ final class Groups
 
         foreach ($permsInput as $groupId => $groupPermissions) {
             // Ensure admins can't remove their own access to the ACP :D
-            if ($groupId === ConstantsGroups::Admin) {
+            if ($groupId === ConstantsGroups::Admin->value) {
                 $groupPermissions['can_access_acp'] = 1;
             }
 
