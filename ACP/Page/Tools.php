@@ -7,6 +7,7 @@ namespace ACP\Page;
 use ACP\Page;
 use ACP\Page\Tools\FileManager;
 use Jax\Database;
+use Jax\DomainDefinitions;
 use Jax\FileUtils;
 use Jax\Request;
 use ZipArchive;
@@ -33,6 +34,7 @@ final readonly class Tools
 {
     public function __construct(
         private readonly Database $database,
+        private readonly DomainDefinitions $domainDefinitions,
         private readonly FileUtils $fileUtils,
         private readonly Page $page,
         private readonly Request $request,
@@ -128,13 +130,19 @@ final readonly class Tools
         header('Content-type: application/zip');
         header(
             'Content-Disposition: attachment;filename="' . $this->database->getPrefix()
-            . gmdate('Y-m-d_His') . '.zip"',
+                . gmdate('Y-m-d_His') . '.zip"',
         );
 
         $tempFile = tempnam(sys_get_temp_dir(), $this->database->getPrefix());
 
+        $boardPath = $this->domainDefinitions->getBoardPath();
         $zipArchive = new ZipArchive();
         $zipArchive->open($tempFile, ZipArchive::OVERWRITE);
+        $zipArchive->addGlob($boardPath . '/*/*', 0, ['remove_path' => $boardPath]);
+        // Cannot use /* to add plain files from the board directory
+        // because if any subfolder is empty (ex: Themes) it will fail
+        $zipArchive->addGlob($boardPath . '/bannedips.txt', 0, ['remove_path' => $boardPath]);
+        $zipArchive->addGlob($boardPath . '/config.php', 0, ['remove_path' => $boardPath]);
         $zipArchive->addFromString('backup.sql', $fileContents);
         $zipArchive->close();
 
@@ -147,7 +155,7 @@ final readonly class Tools
         header('Content-type: text/plain');
         header(
             'Content-Disposition: attachment;filename="' . $this->database->getPrefix()
-            . gmdate('Y-m-d_His') . '.sql"',
+                . gmdate('Y-m-d_His') . '.sql"',
         );
 
         echo $fileContents;
