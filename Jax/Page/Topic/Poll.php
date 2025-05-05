@@ -1,23 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax\Page\Topic;
 
-use Jax\Page;
 use Jax\Database;
 use Jax\Jax;
+use Jax\Page;
 use Jax\Request;
 use Jax\Template;
 use Jax\User;
 
-class Poll
+use function array_filter;
+use function array_keys;
+use function array_map;
+use function count;
+use function explode;
+use function implode;
+use function in_array;
+use function is_array;
+use function is_numeric;
+use function json_decode;
+use function round;
+
+final class Poll
 {
     public function __construct(
-        private Database $database,
-        private Jax $jax,
-        private Page $page,
-        private Request $request,
-        private Template $template,
-        private User $user,
+        private readonly Database $database,
+        private readonly Jax $jax,
+        private readonly Page $page,
+        private readonly Request $request,
+        private readonly Template $template,
+        private readonly User $user,
     ) {}
 
     /**
@@ -29,108 +43,8 @@ class Poll
             'box',
             " id='poll'",
             $topicData['poll_q'],
-            $this->renderPollHTML($topicData)
+            $this->renderPollHTML($topicData),
         );
-    }
-
-    /**
-     * @param array<string,mixed> $topicData - The Topic Record
-     */
-    private function renderPollHTML(array $topicData): string
-    {
-        $type = $topicData['poll_type'];
-        $choices = json_decode((string) $topicData['poll_choices']);
-        $results = $topicData['poll_results'];
-
-
-        if (!$choices) {
-            $choices = [];
-        }
-
-        $usersvoted = [];
-        $voted = false;
-
-        if (!$this->user->isGuest()) {
-            // Accomplish three things at once:
-            // * Determine if the user has voted.
-            // * Count up the number of votes.
-            // * Parse the result set.
-
-            $totalvotes = 0;
-            $numvotes = [];
-            foreach ($this->parsePollResults($results) as $optionIndex => $voters) {
-                $totalvotes += ($numvotes[$optionIndex] = count($voters));
-                if (in_array($this->user->get('id'), $voters, true)) {
-                    $voted = true;
-                }
-
-                foreach ($voters as $user) {
-                    $usersvoted[$user] = 1;
-                }
-            }
-        }
-
-        $usersvoted = count($usersvoted);
-
-        if ($voted) {
-            $resultRows = implode('', array_map(
-                function ($index) use ($choices, $numvotes, $totalvotes) {
-                    $percentOfVotes = round($numvotes[$index] / $totalvotes * 100, 2);
-                    return <<<HTML
-                        <tr>
-                            <td>{$choices[$index]}</td>
-                            <td class='numvotes'>
-                                {$numvotes[$index]} votes ({$percentOfVotes}%)
-                            </td>
-                            <td style='width:200px'>
-                                <div class='bar' style='width:{$percentOfVotes}%;'></div>
-                            </td>
-                        </tr>
-                        HTML;
-                },
-                array_keys($choices)
-            ));
-
-            return <<<HTML
-                <table>
-                    {$resultRows}
-                    <tr>
-                        <td colspan='3' class='totalvotes'>Total Votes: {$usersvoted}</td>
-                    </tr>
-                </table>
-                HTML;
-        }
-
-        $hiddenFields = $this->jax->hiddenFormFields(
-            [
-                'act' => 'vt' . $topicData['id'],
-                'votepoll' => '1',
-            ],
-        );
-
-        $choicesHTML = '';
-        foreach ($choices as $index => $value) {
-            $input = $type === 'multi'
-                ? "<input type='checkbox' name='choice[]' value='{$index}' id='poll_{$index}' />"
-                : "<input type='radio' name='choice' value='{$index}' id='poll_{$index}' /> ";
-
-            $choicesHTML .= <<<HTML
-                <div class='choice'>
-                    {$input}
-                    <label for='poll_{$index}'>{$value}</label>
-                </div>
-                HTML;
-        }
-
-        return <<<HTML
-            <form method='post' action='?' data-ajax-form='true'>
-                {$hiddenFields}
-                {$choicesHTML}
-                <div class='buttons'>
-                    <input type='submit' value='Vote'>
-                </div>
-            </form>
-            HTML;
     }
 
     /**
@@ -141,6 +55,7 @@ class Poll
         $error = null;
         if ($this->user->isGuest()) {
             $this->page->command('error', 'You must be logged in to vote!');
+
             return;
         }
 
@@ -208,6 +123,7 @@ class Poll
             $presults[$x] = isset($results[$x]) && $results[$x]
                 ? implode(',', $results[$x]) : '';
         }
+
         $presults = implode(';', $presults);
 
         $this->database->safeupdate(
@@ -225,30 +141,129 @@ class Poll
             'update',
             '#poll .content',
             $this->renderPollHTML(
-                $topicData
+                $topicData,
             ),
             '1',
         );
     }
 
     /**
+     * @param array<string,mixed> $topicData - The Topic Record
+     */
+    private function renderPollHTML(array $topicData): string
+    {
+        $type = $topicData['poll_type'];
+        $choices = json_decode((string) $topicData['poll_choices']);
+        $results = $topicData['poll_results'];
+
+
+        if (!$choices) {
+            $choices = [];
+        }
+
+        $usersvoted = [];
+        $voted = false;
+
+        if (!$this->user->isGuest()) {
+            // Accomplish three things at once:
+            // * Determine if the user has voted.
+            // * Count up the number of votes.
+            // * Parse the result set.
+            $totalvotes = 0;
+            $numvotes = [];
+            foreach ($this->parsePollResults($results) as $optionIndex => $voters) {
+                $totalvotes += ($numvotes[$optionIndex] = count($voters));
+                if (in_array($this->user->get('id'), $voters, true)) {
+                    $voted = true;
+                }
+
+                foreach ($voters as $voter) {
+                    $usersvoted[$voter] = 1;
+                }
+            }
+        }
+
+        $usersvoted = count($usersvoted);
+
+        if ($voted) {
+            $resultRows = implode('', array_map(
+                static function ($index) use ($choices, $numvotes, $totalvotes): string {
+                    $percentOfVotes = round($numvotes[$index] / $totalvotes * 100, 2);
+
+                    return <<<HTML
+                        <tr>
+                            <td>{$choices[$index]}</td>
+                            <td class='numvotes'>
+                                {$numvotes[$index]} votes ({$percentOfVotes}%)
+                            </td>
+                            <td style='width:200px'>
+                                <div class='bar' style='width:{$percentOfVotes}%;'></div>
+                            </td>
+                        </tr>
+                        HTML;
+                },
+                array_keys($choices),
+            ));
+
+            return <<<HTML
+                <table>
+                    {$resultRows}
+                    <tr>
+                        <td colspan='3' class='totalvotes'>Total Votes: {$usersvoted}</td>
+                    </tr>
+                </table>
+                HTML;
+        }
+
+        $hiddenFields = $this->jax->hiddenFormFields(
+            [
+                'act' => 'vt' . $topicData['id'],
+                'votepoll' => '1',
+            ],
+        );
+
+        $choicesHTML = '';
+        foreach ($choices as $index => $value) {
+            $input = $type === 'multi'
+                ? "<input type='checkbox' name='choice[]' value='{$index}' id='poll_{$index}' />"
+                : "<input type='radio' name='choice' value='{$index}' id='poll_{$index}' /> ";
+
+            $choicesHTML .= <<<HTML
+                <div class='choice'>
+                    {$input}
+                    <label for='poll_{$index}'>{$value}</label>
+                </div>
+                HTML;
+        }
+
+        return <<<HTML
+            <form method='post' action='?' data-ajax-form='true'>
+                {$hiddenFields}
+                {$choicesHTML}
+                <div class='buttons'>
+                    <input type='submit' value='Vote'>
+                </div>
+            </form>
+            HTML;
+    }
+
+    /**
      * Poll results look like this: 1,2,3;4,5;6,7
-     * Choices are semi-colon separated and user IDs are comma separated
+     * Choices are semi-colon separated and user IDs are comma separated.
      *
      * @return array<array<int>>
      */
     private function parsePollResults(string $pollResults): array
     {
         return array_map(
-            fn($voters) =>
-            array_filter(
+            static fn($voters): array => array_filter(
                 array_map(
                     static fn($voterId): int => (int) $voterId,
-                    explode(',', $voters)
+                    explode(',', (string) $voters),
                 ),
-                fn($userId) => $userId !== 0
+                static fn($userId): bool => $userId !== 0,
             ),
-            explode(';', $pollResults)
+            explode(';', $pollResults),
         );
     }
 }

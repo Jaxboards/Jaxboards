@@ -21,7 +21,6 @@ use Jax\TextFormatting;
 use Jax\User;
 
 use function array_diff;
-use function array_filter;
 use function array_flip;
 use function array_key_exists;
 use function array_merge;
@@ -181,9 +180,6 @@ final class Topic
         $this->viewTopic($this->tid);
     }
 
-    /**
-     * @param array<string,mixed> $topicData - The Topic Record
-     */
     private function fetchTopicData(int $tid): ?array
     {
         $result = $this->database->safespecial(
@@ -278,7 +274,9 @@ final class Topic
         $this->session->addVar('topic_lastpage', $this->pageNumber + 1 === $totalpages);
 
         // If it's a poll, put it in.
-        $poll = $this->topicData['poll_type'] ? $this->poll->render($this->topicData) : '';
+        $poll = $this->topicData['poll_type']
+            ? $this->poll->render($this->topicData)
+            : '';
 
         // Generate post listing.
         $page = $this->template->meta('topic-table', $this->postsintooutput());
