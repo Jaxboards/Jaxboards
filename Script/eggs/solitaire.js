@@ -722,7 +722,6 @@ function solitaireGame(solitaireGameId) {
 }
 
 function openWindow(solitaireGameId) {
-
     RUN.stream.commands.window([
         {
             title: 'Solitaire',
@@ -752,7 +751,7 @@ function openWindow(solitaireGameId) {
     ]);
 }
 
-(function() {
+(function () {
     // Just don't click twice in the same ms and it'll be fine
     const solitaireGameId = Date.now();
     openWindow(solitaireGameId);
