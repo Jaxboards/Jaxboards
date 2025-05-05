@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <phpunit
-    bootstrap="Jax/autoload.php"
     backupGlobals="true"
     backupStaticProperties="true"
     beStrictAboutChangesToGlobalState="true"
+    beStrictAboutCoverageMetadata="true"
     beStrictAboutOutputDuringTests="true"
     beStrictAboutTestsThatDoNotTestAnything="true"
-    beStrictAboutCoverageMetadata="true"
+    bootstrap="Jax/autoload.php"
     colors="true"
     columns="max"
     defaultTestSuite="Jax"
@@ -15,6 +15,7 @@
     enforceTimeLimit="true"
     failOnAllIssues="true"
     processIsolation="true"
+    requireCoverageMetadata="true"
     stderr="true"
     >
     <coverage
