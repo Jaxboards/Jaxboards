@@ -34,6 +34,7 @@
         "eslint": "eslint \"Script/**/*.ts\"",
         "eslint-fix": "eslint \"Script/**/*.ts\" --fix",
         "eslint-report": "eslint \"Script/**/*.ts\" --format json --output-file eslint-report.json",
+        "lint": "npm run-script eslint && npm run-script stylelint && npm run-script parallel-lint && npm run-script phpcs && npm run-script phpstan && npm run-script psalm && npm run-script phpmd",
         "parallel-lint": "composer-runner -- run-script --no-interaction parallel-lint",
         "parallel-lint-report": "composer-runner -- run-script --no-interaction parallel-lint-report",
         "php-cs-fixer": "composer-runner -- run-script --no-interaction php-cs-fixer",
