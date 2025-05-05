@@ -19,7 +19,7 @@
     >
     <coverage
         includeUncoveredFiles="true"
-        pathCoverage="false"
+        pathCoverage="true"
         ignoreDeprecatedCodeUnits="true"
         disableCodeCoverageIgnore="true"
         >
