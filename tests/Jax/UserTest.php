@@ -73,16 +73,16 @@ final class UserTest extends TestCase
         ;
 
         $database->expects(self::never())
-                 ->method('safeselect')
-             ;
+            ->method('safeselect')
+        ;
 
         $database->expects(self::never())
-                 ->method('arow')
-             ;
+            ->method('arow')
+        ;
 
         $database->expects(self::never())
-                 ->method('disposeresult')
-             ;
+            ->method('disposeresult')
+        ;
 
         $container = new Container([
             Database::class => $database,
@@ -129,16 +129,16 @@ final class UserTest extends TestCase
         ;
 
         $database->expects(self::never())
-                 ->method('safeselect')
-             ;
+            ->method('safeselect')
+        ;
 
         $database->expects(self::never())
-                 ->method('arow')
-             ;
+            ->method('arow')
+        ;
 
         $database->expects(self::never())
-                 ->method('disposeresult')
-             ;
+            ->method('disposeresult')
+        ;
 
         $container = new Container([
             Database::class => $database,
@@ -173,16 +173,16 @@ final class UserTest extends TestCase
         ;
 
         $database->expects(self::never())
-                 ->method('safeselect')
-             ;
+            ->method('safeselect')
+        ;
 
         $database->expects(self::never())
-                 ->method('arow')
-             ;
+            ->method('arow')
+        ;
 
         $database->expects(self::never())
-                 ->method('disposeresult')
-             ;
+            ->method('disposeresult')
+        ;
 
         $container = new Container([
             Database::class => $database,
