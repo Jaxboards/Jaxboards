@@ -760,6 +760,5 @@ loadSolitaireCSS().then(() => {
     // Just don't click twice in the same ms and it'll be fine
     const solitaireGameId = Date.now();
     openWindow(solitaireGameId);
-    solitaireGame(solitaireGameId)
-})
-
+    solitaireGame(solitaireGameId);
+});
