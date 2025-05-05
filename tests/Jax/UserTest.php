@@ -62,7 +62,6 @@ final class UserTest extends TestCase
     {
         $groupID = 2;
         // admin? where are these defined? these should be constants or an enum
-
         $database = self::getMockBuilder(Database::class)
             ->disableOriginalConstructor()
             ->onlyMethods([
@@ -119,7 +118,6 @@ final class UserTest extends TestCase
     {
         $groupID = 3;
         // guest? where are these defined? these should be constants or an enum
-
         $database = self::getMockBuilder(Database::class)
             ->disableOriginalConstructor()
             ->onlyMethods([
@@ -164,7 +162,6 @@ final class UserTest extends TestCase
     {
         $groupID = 4;
         // banned? where are these defined? these should be constants or an enum
-
         $database = self::getMockBuilder(Database::class)
             ->disableOriginalConstructor()
             ->onlyMethods([
