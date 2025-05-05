@@ -717,16 +717,16 @@ function openWindow(solitaireGameId) {
     RUN.stream.commands.window([
         {
             title: 'Solitaire',
-            content: `<div class="window__inner" id="solitaire-${solitaireGameId}">
-                <div class="window__heading">
-                    <div class="window__heading-icon"></div>
+            content: `<div class="solitaire-window__inner" id="solitaire-${solitaireGameId}">
+                <div class="solitaire-window__heading">
+                    <div class="solitaire-window__heading-icon"></div>
                     Solitaire
                 </div>
-                <div class="window__actions">
+                <div class="solitaire-window__actions">
                     <button type="button" class="new-game">New game</button>
                 </div>
-                <div class="window__content">
-                    <div class="window__content-inner">
+                <div class="solitaire-window__content">
+                    <div class="solitaire-window__content-inner">
                         <div class="solitaire" >
                             <div class="finish-deck"></div>
                             <div class="board-deck"></div>
