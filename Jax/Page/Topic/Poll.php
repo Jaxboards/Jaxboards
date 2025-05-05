@@ -23,15 +23,15 @@ use function is_numeric;
 use function json_decode;
 use function round;
 
-final class Poll
+final readonly class Poll
 {
     public function __construct(
-        private readonly Database $database,
-        private readonly Jax $jax,
-        private readonly Page $page,
-        private readonly Request $request,
-        private readonly Template $template,
-        private readonly User $user,
+        private Database $database,
+        private Jax $jax,
+        private Page $page,
+        private Request $request,
+        private Template $template,
+        private User $user,
     ) {}
 
     /**
