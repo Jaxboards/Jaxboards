@@ -285,7 +285,7 @@ final class Topic
         $page = $this->template->meta(
             'topic-wrapper',
             $this->topicdata['topic_title']
-            . ($this->topicdata['subtitle'] ? ', ' . $this->topicdata['subtitle'] : ''),
+                . ($this->topicdata['subtitle'] ? ', ' . $this->topicdata['subtitle'] : ''),
             $page,
             '<a href="./?act=vt' . $tid . '&amp;fmt=RSS" class="social rss" title="RSS Feed for this Topic">RSS</a>',
         );
@@ -299,12 +299,12 @@ final class Topic
 
         if ($this->topicdata['fperms']['start']) {
             $buttons[0] = "<a href='?act=post&fid=" . $this->topicdata['fid'] . "'>"
-            . $this->template->meta(
-                $this->template->metaExists('button-newtopic')
-                    ? 'button-newtopic'
-                    : 'topic-button-newtopic',
-            )
-            . '</a>';
+                . $this->template->meta(
+                    $this->template->metaExists('button-newtopic')
+                        ? 'button-newtopic'
+                        : 'topic-button-newtopic',
+                )
+                . '</a>';
         }
 
         if (
@@ -316,8 +316,8 @@ final class Topic
         ) {
             $buttons[1] = "<a href='?act=vt{$tid}&qreply=1'>" . $this->template->meta(
                 $this->template->metaExists('button-qreply')
-                ? 'button-qreply'
-                : 'topic-button-qreply',
+                    ? 'button-qreply'
+                    : 'topic-button-qreply',
             ) . '</a>';
         }
 
@@ -330,8 +330,8 @@ final class Topic
         ) {
             $buttons[2] = "<a href='?act=post&tid={$tid}'>" . $this->template->meta(
                 $this->template->metaExists('button-reply')
-                ? 'button-reply'
-                : 'topic-button-reply',
+                    ? 'button-reply'
+                    : 'topic-button-reply',
             ) . '</a>';
         }
 
@@ -452,9 +452,9 @@ final class Topic
                     $user['uid'],
                     $user['group_id'],
                     $user['status'] !== 'active'
-                    ? $user['status']
-                    : ($user['birthday'] && ($this->config->getSetting('birthdays') & 1)
-                    ? ' birthday' : ''),
+                        ? $user['status']
+                        : ($user['birthday'] && ($this->config->getSetting('birthdays') & 1)
+                            ? ' birthday' : ''),
                     $user['name'],
                     // don't display location, since we know we're in the topic
                     false,
@@ -727,7 +727,7 @@ final class Topic
                         $postratingbuttons,
                         ($ratingConfig & 2) === 0
                             ? '<a href="?act=vt' . $this->tid
-                        . '&amp;listrating=' . $post['pid'] . '">(List)</a>'
+                            . '&amp;listrating=' . $post['pid'] . '">(List)</a>'
                             : '',
                         $showrating,
                     );
@@ -735,24 +735,24 @@ final class Topic
             }
 
             $postbuttons
-            // Adds the Edit button
-            = ($this->canedit($post)
-                ? "<a href='?act=vt" . $this->tid . '&amp;edit=' . $post['pid']
-            . "' class='edit'>" . $this->template->meta('topic-edit-button')
-            . '</a>'
-                : '')
-            // Adds the Quote button
-            . ($this->topicdata['fperms']['reply']
-                ? " <a href='?act=vt" . $this->tid . '&amp;quote=' . $post['pid']
-            . "' onclick='RUN.handleQuoting(this);return false;' "
-            . "class='quotepost'>" . $this->template->meta('topic-quote-button') . '</a> '
-                : '')
-            // Adds the Moderate options
-            . ($this->canModerate()
-                ? "<a href='?act=modcontrols&amp;do=modp&amp;pid=" . $post['pid']
-            . "' class='modpost' onclick='RUN.modcontrols.togbutton(this)'>"
-            . $this->template->meta('topic-mod-button') . '</a>'
-                : '');
+                // Adds the Edit button
+                = ($this->canedit($post)
+                    ? "<a href='?act=vt" . $this->tid . '&amp;edit=' . $post['pid']
+                    . "' class='edit'>" . $this->template->meta('topic-edit-button')
+                    . '</a>'
+                    : '')
+                // Adds the Quote button
+                . ($this->topicdata['fperms']['reply']
+                    ? " <a href='?act=vt" . $this->tid . '&amp;quote=' . $post['pid']
+                    . "' onclick='RUN.handleQuoting(this);return false;' "
+                    . "class='quotepost'>" . $this->template->meta('topic-quote-button') . '</a> '
+                    : '')
+                // Adds the Moderate options
+                . ($this->canModerate()
+                    ? "<a href='?act=modcontrols&amp;do=modp&amp;pid=" . $post['pid']
+                    . "' class='modpost' onclick='RUN.modcontrols.togbutton(this)'>"
+                    . $this->template->meta('topic-mod-button') . '</a>'
+                    : '');
 
             $rows .= $this->template->meta(
                 'topic-post-row',
@@ -769,8 +769,8 @@ final class Topic
                 $post['posts'],
                 $this->template->meta(
                     'topic-status-'
-                    . (isset($usersonline[$post['auth_id']])
-                    && $usersonline[$post['auth_id']] ? 'online' : 'offline'),
+                        . (isset($usersonline[$post['auth_id']])
+                            && $usersonline[$post['auth_id']] ? 'online' : 'offline'),
                 ),
                 $post['title'],
                 $post['auth_id'],
@@ -799,10 +799,10 @@ final class Topic
                 ) : '',
                 $this->user->getPerm('can_moderate')
                     ? '<a href="?act=modcontrols&amp;do=iptools&amp;ip='
-                . $this->ipAddress->asHumanReadable($post['ip']) . '">' . $this->template->meta(
-                    'topic-mod-ipbutton',
-                    $this->ipAddress->asHumanReadable($post['ip']),
-                ) . '</a>'
+                    . $this->ipAddress->asHumanReadable($post['ip']) . '">' . $this->template->meta(
+                        'topic-mod-ipbutton',
+                        $this->ipAddress->asHumanReadable($post['ip']),
+                    ) . '</a>'
                     : '',
                 $post['icon'] ? $this->template->meta(
                     'topic-icon-wrapper',
@@ -840,10 +840,10 @@ final class Topic
         }
 
         return $post['auth_id']
-        && ($post['newtopic']
-            ? $this->user->getPerm('can_edit_topics')
-            : $this->user->getPerm('can_edit_posts'))
-        && $post['auth_id'] === $this->user->get('id');
+            && ($post['newtopic']
+                ? $this->user->getPerm('can_edit_topics')
+                : $this->user->getPerm('can_edit_posts'))
+            && $post['auth_id'] === $this->user->get('id');
     }
 
     private function canModerate(): bool
@@ -896,18 +896,16 @@ final class Topic
             // * Determine if the user has voted.
             // * Count up the number of votes.
             // * Parse the result set.
-            $presults = [];
 
             $totalvotes = 0;
             $numvotes = [];
-            foreach (explode(';', (string) $results) as $optionIndex => $voters) {
-                $presults[$optionIndex] = array_map(static fn($voterId): int => (int) $voterId, explode(',', $voters));
-                $totalvotes += ($numvotes[$optionIndex] = count($presults[$optionIndex]));
-                if (in_array($this->user->get('id'), $presults[$optionIndex], true)) {
+            foreach ($this->parsePollResults($results) as $optionIndex => $voters) {
+                $totalvotes += ($numvotes[$optionIndex] = count($voters));
+                if (in_array($this->user->get('id'), $voters, true)) {
                     $voted = true;
                 }
 
-                foreach ($presults[$optionIndex] as $user) {
+                foreach ($voters as $user) {
                     $usersvoted[$user] = 1;
                 }
             }
@@ -932,30 +930,36 @@ final class Topic
             return $page . '</table>';
         }
 
-        $page = $this->jax->hiddenFormFields(
+        $hiddenFields = $this->jax->hiddenFormFields(
             [
                 'act' => 'vt' . $this->tid,
                 'votepoll' => '1',
             ],
         );
 
-        foreach ($choices as $k => $v) {
-            $page .= "<div class='choice'>"
-            . (
-                $type === 'multi'
-                ? "<input type='checkbox' name='choice[]' value='{$k}' id='poll_{$k}' />"
-                : "<input type='radio' name='choice' value='{$k}' id='poll_{$k}' /> "
-            )
-            . "<label for='poll_{$k}'>{$v}</label>"
-            . '</div>';
+        $choicesHTML = '';
+        foreach ($choices as $index => $value) {
+            $input = $type === 'multi'
+                ? "<input type='checkbox' name='choice[]' value='{$index}' id='poll_{$index}' />"
+                : "<input type='radio' name='choice' value='{$index}' id='poll_{$index}' /> ";
+
+            $choicesHTML .= <<<HTML
+                <div class='choice'>
+                    {$input}
+                    <label for='poll_{$index}'>{$value}</label>
+                </div>
+                HTML;
         }
 
-        return "<form method='post' action='?' data-ajax-form='true'>"
-            . $page
-            . "<div class='buttons'>"
-            . "<input type='submit' value='Vote'>"
-            . '</div>'
-            . '</form>';
+        return <<<HTML
+            <form method='post' action='?' data-ajax-form='true'>
+                {$hiddenFields}
+                {$choicesHTML}
+                <div class='buttons'>
+                    <input type='submit' value='Vote'>
+                </div>
+            </form>
+            HTML;
     }
 
     private function votepoll(): void
@@ -981,17 +985,8 @@ final class Topic
             $choice = $this->request->both('choice');
             $choices = json_decode((string) $row['poll_choices'], true);
             $numchoices = count($choices);
-            $results = $row['poll_results'];
-            if ($results) {
-                $results = explode(';', (string) $results);
-                foreach ($results as $k => $v) {
-                    $results[$k] = $v !== '' && $v !== '0'
-                        ? explode(',', $v)
-                        : [];
-                }
-            } else {
-                $results = [];
-            }
+
+            $results = $this->parsePollResults((string) $row['poll_results']);
 
             // Results is now an array of arrays, the keys of the parent array
             // correspond to the choices while the arrays within the array
@@ -999,8 +994,8 @@ final class Topic
             // choice.
             $voted = false;
             foreach ($results as $result) {
-                foreach ($result as $v2) {
-                    if ($v2 === $this->user->get('id')) {
+                foreach ($result as $voterId) {
+                    if ($voterId === $this->user->get('id')) {
                         $voted = true;
 
                         break;
@@ -1072,6 +1067,27 @@ final class Topic
             ],
             Database::WHERE_ID_EQUALS,
             $this->tid,
+        );
+    }
+
+    /**
+     * Poll results look like this: 1,2,3;4,5;6,7
+     * Choices are semi-colon separated and user IDs are comma separated
+     *
+     * @return array<array<int>>
+     */
+    private function parsePollResults(string $pollResults): array
+    {
+        return array_map(
+            fn($voters) =>
+            array_filter(
+                array_map(
+                    static fn($voterId): int => (int) $voterId,
+                    explode(',', $voters)
+                ),
+                fn($userId) => $userId !== 0
+            ),
+            explode(';', $pollResults)
         );
     }
 
@@ -1258,7 +1274,7 @@ final class Topic
             $this->page->command(
                 'updateqreply',
                 '[quote=' . $post['name'] . ']' . $post['post'] . '[/quote]'
-                . PHP_EOL . PHP_EOL,
+                    . PHP_EOL . PHP_EOL,
             );
         } else {
             $multiquote = (string) ($this->session->getVar('multiquote') ?: '');
@@ -1297,7 +1313,7 @@ final class Topic
         $this->page->command('softurl');
         $this->page->location(
             "?act=vt{$tid}&page=" . ceil($f['numposts'] / $this->numperpage)
-            . '&pid=' . $f['lastpid'] . '#pid_' . $f['lastpid'],
+                . '&pid=' . $f['lastpid'] . '#pid_' . $f['lastpid'],
         );
     }
 
