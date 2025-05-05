@@ -7,6 +7,8 @@ namespace Jax;
 use DI\Container;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
+use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\Attributes\UsesFunction;
 use PHPUnit\Framework\TestCase;
 
 use function array_keys;
@@ -17,6 +19,10 @@ use function base64_decode;
  */
 #[CoversClass(Jax::class)]
 #[Small]
+#[UsesClass(Config::class)]
+#[UsesClass(DomainDefinitions::class)]
+#[UsesClass(ServiceConfig::class)]
+#[UsesFunction('pathjoin')]
 final class JaxTest extends TestCase
 {
     private string $encodedForumFlags;
