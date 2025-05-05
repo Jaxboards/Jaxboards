@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use DI\Container;
+use Jax\Constants\Groups;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -36,7 +37,7 @@ final class UserTest extends TestCase
      * @var array<int,array<string,bool>>
      */
     private array $decoded = [
-        3 => [
+        Groups::Guest => [
             'upload' => false,
             'reply' => false,
             'start' => false,
@@ -44,7 +45,7 @@ final class UserTest extends TestCase
             'view' => true,
             'poll' => false,
         ],
-        4 => [
+        Groups::Banned => [
             'upload' => false,
             'reply' => false,
             'start' => false,
@@ -65,7 +66,6 @@ final class UserTest extends TestCase
 
     public function testGetForumPermissionAsAdmin(): void
     {
-        $groupID = 2;
         // admin? where are these defined? these should be constants or an enum
         $database = self::getMockBuilder(Database::class)
             ->disableOriginalConstructor()
@@ -97,7 +97,7 @@ final class UserTest extends TestCase
             $database,
             $container->get(Jax::class),
             $container->get(IPAddress::class),
-            ['group_id' => $groupID],
+            ['group_id' => Groups::Admin],
             [
                 'can_attach' => true,
                 'can_poll' => true,
@@ -121,7 +121,6 @@ final class UserTest extends TestCase
 
     public function testGetForumPermissionAsGuest(): void
     {
-        $groupID = 3;
         // guest? where are these defined? these should be constants or an enum
         $database = self::getMockBuilder(Database::class)
             ->disableOriginalConstructor()
@@ -153,19 +152,18 @@ final class UserTest extends TestCase
             $database,
             $container->get(Jax::class),
             $container->get(IPAddress::class),
-            ['group_id' => $groupID],
+            ['group_id' => Groups::Guest],
             ['can_post' => true],
         );
 
         self::assertSame(
-            $this->decoded[$groupID],
+            $this->decoded[Groups::Guest],
             $user->getForumPerms($this->encodedForumFlags),
         );
     }
 
     public function testGetForumPermissionAsBanned(): void
     {
-        $groupID = 4;
         // banned? where are these defined? these should be constants or an enum
         $database = self::getMockBuilder(Database::class)
             ->disableOriginalConstructor()
@@ -197,11 +195,10 @@ final class UserTest extends TestCase
             $database,
             $container->get(Jax::class),
             $container->get(IPAddress::class),
-            ['group_id' => $groupID],
             ['can_post' => true],
         );
 
-        $expected = $this->decoded[$groupID];
+        $expected = $this->decoded[Groups::Banned];
         $result = $user->getForumPerms($this->encodedForumFlags);
         self::assertSame($expected, $result);
     }

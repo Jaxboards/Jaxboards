@@ -6,6 +6,7 @@ namespace Jax\Page;
 
 use Carbon\Carbon;
 use Jax\Config;
+use Jax\Constants\Groups;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
@@ -54,7 +55,7 @@ final class UCP
 
     public function render(): void
     {
-        if ($this->user->isGuest() || $this->user->get('group_id') === 4) {
+        if ($this->user->isGuest() || $this->user->get('group_id') === Groups::Banned) {
             $this->page->location('?');
 
             return;

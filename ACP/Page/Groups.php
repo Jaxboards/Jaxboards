@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ACP\Page;
 
 use ACP\Page;
+use Jax\Constants\Groups as ConstantsGroups;
 use Jax\Database;
 use Jax\Request;
 use Jax\TextFormatting;
@@ -108,7 +109,7 @@ final class Groups
 
         foreach ($permsInput as $groupId => $groupPermissions) {
             // Ensure admins can't remove their own access to the ACP :D
-            if ($groupId === 2) {
+            if ($groupId === ConstantsGroups::Admin) {
                 $groupPermissions['can_access_acp'] = 1;
             }
 

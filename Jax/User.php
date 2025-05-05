@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use Carbon\Carbon;
+use Jax\Constants\Groups;
 
 use function array_merge;
 use function password_hash;
@@ -32,7 +33,7 @@ final class User
     {
         if (!$this->userData) {
             return match ($property) {
-                'group_id' => 3,
+                'group_id' => Groups::Guest,
                 default => null,
             };
         }
@@ -153,7 +154,7 @@ final class User
         }
 
         $groupId = match (true) {
-            $this->isBanned() => 4,
+            $this->isBanned() => Groups::Banned,
             $this->userData !== null => $this->userData['group_id'],
             default => null,
         };
@@ -194,7 +195,7 @@ final class User
             ],
             'member_groups',
             Database::WHERE_ID_EQUALS,
-            $groupId ?? 3,
+            $groupId ?? Groups::Guest,
         );
         $retval = $this->database->arow($result);
         $this->userPerms = $retval;
@@ -241,7 +242,7 @@ final class User
 
     public function isBanned(): bool
     {
-        if ($this->get('group_id') === 4) {
+        if ($this->get('group_id') === Groups::Banned) {
             return true;
         }
 

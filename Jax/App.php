@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use DI\Container;
+use Jax\Constants\Groups;
 
 use function array_pop;
 use function dirname;
@@ -350,7 +351,7 @@ final readonly class App
             return;
         }
 
-        $this->template->addVar('groupid', (string) $this->user->get('group_id') ?: '3');
+        $this->template->addVar('groupid', (string) $this->user->get('group_id'));
         $this->template->addVar('userposts', (string) $this->user->get('posts'));
         $this->template->addVar('grouptitle', $this->user->getPerm('title'));
         $this->template->addVar('avatar', $this->user->get('avatar') ?: $this->template->meta('default-avatar'));

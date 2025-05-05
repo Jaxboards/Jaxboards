@@ -7,6 +7,7 @@ namespace ACP\Page;
 use ACP\Page;
 use Carbon\Carbon;
 use Jax\Config;
+use Jax\Constants\Groups;
 use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\IPAddress;
@@ -280,7 +281,7 @@ final readonly class Members
             }
 
             $member = array_pop($member);
-            if ($member['group_id'] === 2 && $this->user->get('id') !== 1) {
+            if ($member['group_id'] === Groups::Admin && $this->user->get('id') !== 1) {
                 $page = $this->page->error('You do not have permission to edit this profile. ');
             } else {
                 $page .= $this->jax->hiddenFormFields(['mid' => $member['id']]);
@@ -375,7 +376,7 @@ final readonly class Members
 
             // Make it so root admins can't get out of admin.
             if ($this->request->both('mid') === '1') {
-                $write['group_id'] = 2;
+                $write['group_id'] = Groups::Admin;
             }
 
             $this->database->safeupdate(
