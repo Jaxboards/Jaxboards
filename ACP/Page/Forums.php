@@ -601,7 +601,7 @@ final readonly class Forums
     }
 
     /**
-     * @returns string Error on failure, null on success
+     * @return string Error on failure, null on success
      */
     private function upsertForum(?array $oldForumData, array $write): ?string
     {

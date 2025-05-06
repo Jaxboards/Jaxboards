@@ -32,7 +32,7 @@ final readonly class Reactions
     /**
      * Fetches Reactions from "ratingniblets" table.
      *
-     * @return array<int,{img:string,title:string}> Rating Records by ID
+     * @return array<int,array{img:string,title:string}> Rating Records by ID
      */
     public function fetchRatingNiblets(): array
     {
@@ -67,7 +67,7 @@ final readonly class Reactions
         $this->database->disposeresult($result);
         $ratings = $row ? json_decode((string) $row['rating'], true) : [];
 
-        if (empty($ratings)) {
+        if ($ratings === []) {
             return;
         }
 
@@ -123,15 +123,11 @@ final readonly class Reactions
             return '';
         }
 
-        $prating = [];
+        $prating = $post['rating'] ? json_decode((string) $post['rating'], true) : [];
         $postratingbuttons = '';
         $showrating = '';
-        if ($post['rating']) {
-            $prating = json_decode((string) $post['rating'], true);
-        }
 
-        $rniblets = $this->fetchRatingNiblets();
-        foreach ($rniblets as $nibletIndex => $niblet) {
+        foreach ($this->fetchRatingNiblets() as $nibletIndex => $niblet) {
             $nibletHTML = $this->template->meta(
                 'rating-niblet',
                 $niblet['img'],
@@ -143,11 +139,7 @@ final readonly class Reactions
                 </a>
                 HTML;
 
-            if (!isset($prating[$nibletIndex])) {
-                continue;
-            }
-
-            if (!$prating[$nibletIndex]) {
+            if (!isset($prating[$nibletIndex]) || !$prating[$nibletIndex]) {
                 continue;
             }
 
