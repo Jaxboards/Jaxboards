@@ -14,7 +14,6 @@ use function _\keyBy;
 use function array_diff;
 use function array_key_exists;
 use function array_merge;
-use function array_reduce;
 use function count;
 use function in_array;
 use function json_decode;
@@ -48,7 +47,7 @@ final readonly class Reactions
             'ratingniblets',
         );
 
-        return keyBy($this->database->arows($result), fn($niblet) => $niblet['id']);
+        return keyBy($this->database->arows($result), static fn($niblet) => $niblet['id']);
     }
 
     public function listReactions(int $pid): void
