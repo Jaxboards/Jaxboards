@@ -138,7 +138,7 @@ final readonly class Tools
         $boardPath = $this->domainDefinitions->getBoardPath();
         $zipArchive = new ZipArchive();
         $zipArchive->open($tempFile, ZipArchive::OVERWRITE);
-        $zipArchive->addGlob($boardPath . '/*/*', 0, ['remove_path' => $boardPath]);
+        $zipArchive->addGlob($boardPath . '/**/*', 0, ['remove_path' => $boardPath]);
         // Cannot use /* to add plain files from the board directory
         // because if any subfolder is empty (ex: Themes) it will fail
         $zipArchive->addGlob($boardPath . '/bannedips.txt', 0, ['remove_path' => $boardPath]);
