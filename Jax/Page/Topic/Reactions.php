@@ -55,6 +55,7 @@ final readonly class Reactions
 
                 return $ratingNiblets;
             },
+            []
         );
     }
 
