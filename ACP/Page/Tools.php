@@ -138,9 +138,11 @@ final readonly class Tools
         $boardPath = $this->domainDefinitions->getBoardPath();
         $zipArchive = new ZipArchive();
         $zipArchive->open($tempFile, ZipArchive::OVERWRITE);
-        $zipArchive->addGlob($boardPath . '/**/*', 0, ['remove_path' => $boardPath]);
-        // Cannot use /* to add plain files from the board directory
-        // because if any subfolder is empty (ex: Themes) it will fail
+        // I tried glob star star and it just doesn't work in some environments
+        // Being explicit does, so I'll just do that I guess?
+        $zipArchive->addGlob($boardPath . '/Themes/*/*', 0, ['remove_path' => $boardPath]);
+        $zipArchive->addGlob($boardPath . '/Uploads/*', 0, ['remove_path' => $boardPath]);
+        $zipArchive->addGlob($boardPath . '/Wrappers/*', 0, ['remove_path' => $boardPath]);
         $zipArchive->addGlob($boardPath . '/bannedips.txt', 0, ['remove_path' => $boardPath]);
         $zipArchive->addGlob($boardPath . '/config.php', 0, ['remove_path' => $boardPath]);
         $zipArchive->addFromString('backup.sql', $fileContents);
