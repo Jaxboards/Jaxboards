@@ -10,6 +10,7 @@ use Jax\Page;
 use Jax\Template;
 use Jax\User;
 
+use function _\keyBy;
 use function array_diff;
 use function array_key_exists;
 use function array_merge;
@@ -96,10 +97,7 @@ final readonly class Reactions
             Database::WHERE_ID_IN,
             $members,
         );
-        $mdata = [];
-        foreach ($this->database->arows($result) as $member) {
-            $mdata[$member['id']] = [$member['display_name'], $member['group_id']];
-        }
+        $mdata = keyBy($this->database->arows($result), fn($member) => $member['id']);
 
         unset($members);
         $niblets = $this->fetchRatingNiblets();
@@ -112,8 +110,8 @@ final readonly class Reactions
                 $page .= '<li>' . $this->template->meta(
                     'user-link',
                     $mid,
-                    $mdata[$mid][1],
-                    $mdata[$mid][0],
+                    $mdata[$mid]['group_id'],
+                    $mdata[$mid]['display_name'],
                 ) . '</li>';
             }
 
