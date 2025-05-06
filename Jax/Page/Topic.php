@@ -285,7 +285,7 @@ final class Topic
             $this->topicData['topic_title']
                 . ($this->topicData['subtitle'] ? ', ' . $this->topicData['subtitle'] : ''),
             $page,
-            '<a href="./?act=vt' . $tid . '&amp;fmt=RSS" class="social rss" title="RSS Feed for this Topic">RSS</a>',
+            '<a href="./?act=vt' . $tid . '&amp;fmt=RSS" class="social rss" title="RSS Feed for this Topic" target="_blank">RSS</a>',
         );
 
         // Add buttons.
