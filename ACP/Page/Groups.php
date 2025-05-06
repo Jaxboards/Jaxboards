@@ -268,7 +268,6 @@ final class Groups
             );
         }
 
-        $grouplist = mb_substr($grouplist, 0, -1);
         $widthPercent = 1 / $numgroups * 100;
         $groupHeadings = '';
         foreach ($perms as $groupId => $groupData) {
