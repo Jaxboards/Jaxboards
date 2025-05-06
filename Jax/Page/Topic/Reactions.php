@@ -29,6 +29,98 @@ final readonly class Reactions
     ) {}
 
     /**
+     * Fetches Reactions from "ratingniblets" table
+     * @return array<int,{img:string,title:string}> Rating Records by ID
+     */
+    public function fetchRatingNiblets(): array
+    {
+        static $ratingNiblets = null;
+
+        if ($ratingNiblets) {
+            return $ratingNiblets;
+        }
+
+        $result = $this->database->safeselect(
+            ['id', 'img', 'title'],
+            'ratingniblets',
+        );
+
+        return array_reduce(
+            $this->database->arows($result),
+            function ($ratingNiblets, $niblet) {
+                $ratingNiblets[$niblet['id']] = ['img' => $niblet['img'], 'title' => $niblet['title']];
+                return $ratingNiblets;
+            }
+        );
+    }
+
+    public function listReactions(int $pid): void
+    {
+        if ($this->isAnonymousReactionsEnabled()) {
+            return;
+        }
+
+        $this->page->command('softurl');
+        $result = $this->database->safeselect(
+            ['rating'],
+            'posts',
+            Database::WHERE_ID_EQUALS,
+            $this->database->basicvalue($pid),
+        );
+        $row = $this->database->arow($result);
+        $this->database->disposeresult($result);
+        $ratings = $row ? json_decode((string) $row['rating'], true) : [];
+
+        if (empty($ratings)) {
+            return;
+        }
+
+        $members = array_merge(...$ratings);
+
+        if ($members === []) {
+            $this->page->command('alert', 'This post has no ratings yet!');
+
+            return;
+        }
+
+        $result = $this->database->safeselect(
+            [
+                'id',
+                'display_name',
+                'group_id',
+            ],
+            'members',
+            Database::WHERE_ID_IN,
+            $members,
+        );
+        $mdata = [];
+        foreach ($this->database->arows($result) as $member) {
+            $mdata[$member['id']] = [$member['display_name'], $member['group_id']];
+        }
+
+        unset($members);
+        $niblets = $this->fetchRatingNiblets();
+        $page = '';
+        foreach ($ratings as $index => $rating) {
+            $page .= '<div class="column">';
+            $page .= '<img src="' . $niblets[$index]['img'] . '" /> '
+                . $niblets[$index]['title'] . '<ul>';
+            foreach ($rating as $mid) {
+                $page .= '<li>' . $this->template->meta(
+                    'user-link',
+                    $mid,
+                    $mdata[$mid][1],
+                    $mdata[$mid][0],
+                ) . '</li>';
+            }
+
+            $page .= '</ul></div>';
+        }
+
+        $this->page->command('listrating', $pid, $page);
+    }
+
+    /**
      * @param array $post - The Post record
      */
     public function render(array $post): string
@@ -45,7 +137,7 @@ final readonly class Reactions
             $prating = json_decode((string) $post['rating'], true);
         }
 
-        $rniblets = $this->getRatingNiblets();
+        $rniblets = $this->fetchRatingNiblets();
         foreach ($rniblets as $nibletIndex => $niblet) {
             $nibletHTML = $this->template->meta(
                 'rating-niblet',
@@ -98,7 +190,7 @@ final readonly class Reactions
         $post = $this->database->arow($result);
         $this->database->disposeresult($result);
 
-        $niblets = $this->getRatingNiblets();
+        $niblets = $this->fetchRatingNiblets();
         $ratings = [];
 
         $error = match (true) {
@@ -143,94 +235,6 @@ final readonly class Reactions
         $this->page->command('alert', $unrate ? 'Unrated!' : 'Rated!');
     }
 
-    public function getRatingNiblets(): array
-    {
-        static $ratingNiblets = null;
-
-        if ($ratingNiblets) {
-            return $ratingNiblets;
-        }
-
-        $result = $this->database->safeselect(
-            ['id', 'img', 'title'],
-            'ratingniblets',
-        );
-        $ratingNiblets = [];
-        while ($niblet = $this->database->arow($result)) {
-            $ratingNiblets[$niblet['id']] = ['img' => $niblet['img'], 'title' => $niblet['title']];
-        }
-
-        return $ratingNiblets;
-    }
-
-    public function listReactions(int $pid): void
-    {
-        if ($this->isAnonymousReactionsEnabled()) {
-            return;
-        }
-
-        $this->page->command('softurl');
-        $result = $this->database->safeselect(
-            ['rating'],
-            'posts',
-            Database::WHERE_ID_EQUALS,
-            $this->database->basicvalue($pid),
-        );
-        $row = $this->database->arow($result);
-        $this->database->disposeresult($result);
-        $ratings = $row ? json_decode((string) $row['rating'], true) : [];
-
-        if (empty($ratings)) {
-            return;
-        }
-
-        $members = [];
-        foreach ($ratings as $v) {
-            $members = array_merge($members, $v);
-        }
-
-        if ($members === []) {
-            $this->page->command('alert', 'This post has no ratings yet!');
-
-            return;
-        }
-
-        $result = $this->database->safeselect(
-            [
-                'id',
-                'display_name',
-                'group_id',
-            ],
-            'members',
-            Database::WHERE_ID_IN,
-            $members,
-        );
-        $mdata = [];
-        while ($member = $this->database->arow($result)) {
-            $mdata[$member['id']] = [$member['display_name'], $member['group_id']];
-        }
-
-        unset($members);
-        $niblets = $this->getRatingNiblets();
-        $page = '';
-        foreach ($ratings as $index => $rating) {
-            $page .= '<div class="column">';
-            $page .= '<img src="' . $niblets[$index]['img'] . '" /> '
-                . $niblets[$index]['title'] . '<ul>';
-            foreach ($rating as $mid) {
-                $page .= '<li>' . $this->template->meta(
-                    'user-link',
-                    $mid,
-                    $mdata[$mid][1],
-                    $mdata[$mid][0],
-                ) . '</li>';
-            }
-
-            $page .= '</ul></div>';
-        }
-
-        $this->page->command('listrating', $pid, $page);
-    }
 
     private function getRatingSetting(): int
     {
