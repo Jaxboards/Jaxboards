@@ -399,13 +399,19 @@ final class IDX
             $fGroupId = $user['group_id'];
             $birthdayCode = $user['birthday'] === $today
                 && $this->config->getSetting('birthdays') ? ' birthday' : '';
-            $lastOnlineCode = $this->date->relativeTime(
-                $user['hide'] ? $user['read_date'] : $user['last_update'],
-            );
+            $lastOnline = $user['hide']
+                ? $user['read_date']
+                : $user['last_update'];
+            $lastOnlineCode = $this->date->relativeTime($lastOnline);
             $userstoday
                 .= <<<EOT
-                    <a href="?act=vu{$fId}" class="user{$fId} mgroup{$fGroupId}{$birthdayCode}"
-                        title="Last online: {$lastOnlineCode}" data-use-tooltip="true">{$fName}</a>
+                    <a
+                        class="user{$fId} mgroup{$fGroupId}{$birthdayCode}"
+                        data-last-online="{$lastOnline}"
+                        data-use-tooltip="true"
+                        href="?act=vu{$fId}"
+                        >{$fName}</a>
+
                     EOT;
             $userstoday .= ', ';
             ++$nuserstoday;
