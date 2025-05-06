@@ -123,7 +123,9 @@ final readonly class Reactions
             return '';
         }
 
-        $prating = $post['rating'] ? json_decode((string) $post['rating'], true) : [];
+        $prating = $post['rating']
+            ? json_decode((string) $post['rating'], true)
+            : [];
         $postratingbuttons = '';
         $showrating = '';
 
@@ -138,8 +140,10 @@ final readonly class Reactions
                     {$nibletHTML}
                 </a>
                 HTML;
-
-            if (!isset($prating[$nibletIndex]) || !$prating[$nibletIndex]) {
+            if (!isset($prating[$nibletIndex])) {
+                continue;
+            }
+            if (!$prating[$nibletIndex]) {
                 continue;
             }
 
