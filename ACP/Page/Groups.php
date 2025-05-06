@@ -10,6 +10,7 @@ use Jax\Database;
 use Jax\Request;
 use Jax\TextFormatting;
 
+use function _\keyBy;
 use function array_flip;
 use function array_keys;
 use function explode;
@@ -254,13 +255,9 @@ final class Groups
                 'member_groups',
                 'ORDER BY id ASC',
             );
-        $numgroups = 0;
-        $grouplist = '';
-        while ($group = $this->database->arow($result)) {
-            ++$numgroups;
-            $perms[$group['id']] = $group;
-            $grouplist .= $group['id'] . ',';
-        }
+        $perms = keyBy($this->database->arows($result), fn($group) => $group['id']);
+        $numgroups = count($perms);
+        $grouplist = implode(',', array_keys($perms));
 
         if ($numgroups === 0) {
             $this->page->addContentBox(
@@ -354,7 +351,7 @@ final class Groups
                         'groups/show-permissions-permission-row-group-column.html',
                         [
                             'checked' => $groupData[$field]
-                            ? 'checked="checked" ' : '',
+                                ? 'checked="checked" ' : '',
                             'group_id' => $groupId,
                             'permission' => $field,
                         ],
@@ -506,7 +503,7 @@ final class Groups
         if (!$found) {
             $page .= $this->page->error(
                 "You haven't created any groups to delete. "
-                . "(Hint: default groups can't be deleted)",
+                    . "(Hint: default groups can't be deleted)",
             );
         }
 

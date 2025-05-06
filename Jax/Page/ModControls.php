@@ -242,10 +242,7 @@ final readonly class ModControls
                     'WHERE `display_name` LIKE ?',
                     $this->database->basicvalue($this->request->post('mname') . '%'),
                 );
-                $members = [];
-                while ($member = $this->database->arow($result)) {
-                    $members[] = $member;
-                }
+                $members = $this->database->arows($result);
 
                 if (count($members) > 1) {
                     $error = 'Many users found!';
@@ -264,7 +261,7 @@ final readonly class ModControls
                 $this->user->get('group_id') !== 2
                 || $member['group_id'] === 2
                 && ($this->user->get('id') !== 1
-                && $member['id'] !== $this->user->get('id'))
+                    && $member['id'] !== $this->user->get('id'))
             ) {
                 $error = 'You do not have permission to edit this profile.';
             }
@@ -277,9 +274,9 @@ final readonly class ModControls
                     return '<tr><td><label for="m_' . $name . '">' . $label
                         . '</label></td><td>'
                         . ($type === 'textarea' ? '<textarea name="' . $name
-                        . '" id="m_' . $name . '">' . $value . '</textarea>'
-                        : '<input type="text" id="m_' . $name . '" name="' . $name
-                        . '" value="' . $value . '" />') . '</td></tr>';
+                            . '" id="m_' . $name . '">' . $value . '</textarea>'
+                            : '<input type="text" id="m_' . $name . '" name="' . $name
+                            . '" value="' . $value . '" />') . '</td></tr>';
                 }
 
                 $page .= '<form method="post" '
@@ -448,8 +445,7 @@ final readonly class ModControls
                         WHERE s.`ip`=?
                         ORDER BY `id`
                         DESC LIMIT 5
-                        SQL
-                    ,
+                        SQL,
                     [
                         'shouts',
                         'members',

@@ -11,6 +11,7 @@ use Jax\Jax;
 use Jax\Request;
 use Jax\TextFormatting;
 
+use function _\keyBy;
 use function array_key_exists;
 use function array_keys;
 use function array_map;
@@ -237,24 +238,6 @@ final readonly class Forums
             $page .= $this->page->success('Data Saved');
         }
 
-        $forums = [];
-        $result = $this->database->safeselect(
-            [
-                'id',
-                'title',
-                '`order`',
-            ],
-            'categories',
-            'ORDER BY `order`,`id` ASC',
-        );
-        $categories = [];
-        while ($category = $this->database->arow($result)) {
-            $forums['c_' . $category['id']] = ['title' => $category['title']];
-            $categories[] = $category['id'];
-        }
-
-        $this->database->disposeresult($result);
-
         $result = $this->database->safeselect(
             [
                 'id',
@@ -277,8 +260,10 @@ final readonly class Forums
             'forums',
             'ORDER BY `order`,`title`',
         );
-        $tree = [$result];
-        while ($forum = $this->database->arow($result)) {
+        $tree = [];
+
+        $forums = keyBy($this->database->arows($result), fn($forum) => $forum['id']);
+        foreach ($forums as $forum) {
             $forums[$forum['id']] = [
                 'mods' => $forum['mods'],
                 'title' => $forum['title'],
@@ -312,6 +297,22 @@ final readonly class Forums
 
             $intree[$forum['id']] = true;
         }
+
+        $result = $this->database->safeselect(
+            [
+                'id',
+                'title',
+                '`order`',
+            ],
+            'categories',
+            'ORDER BY `order`,`id` ASC',
+        );
+        $categories = [];
+        while ($category = $this->database->arow($result)) {
+            $forums['c_' . $category['id']] = ['title' => $category['title']];
+            $categories[] = $category['id'];
+        }
+        $this->database->disposeresult($result);
 
         foreach ($categories as $category) {
             $sortedtree['c_' . $category] = $tree['c_' . $category] ?? null;
@@ -529,7 +530,7 @@ final readonly class Forums
                 [
                     'label' => $label,
                     'selected' => isset($forum['orderby']) && $value === $forum['orderby']
-                    ? 'selected="selected"' : '',
+                        ? 'selected="selected"' : '',
                     'value' => $value,
                 ],
             );
@@ -541,13 +542,13 @@ final readonly class Forums
             [
                 'description' => isset($forum['subtitle']) ? $this->textFormatting->blockhtml($forum['subtitle']) : '',
                 'no_count' => isset($forum['nocount']) && $forum['nocount']
-                ? '' : ' checked="checked"',
+                    ? '' : ' checked="checked"',
                 'order_by_options' => $orderByOptions,
                 'redirect_url' => isset($forum['redirect']) ? $this->textFormatting->blockhtml($forum['redirect']) : '',
                 'subforum_options' => $subforumOptions,
                 'title' => isset($forum['title']) ? $this->textFormatting->blockhtml($forum['title']) : '',
                 'trashcan' => isset($forum['trashcan']) && $forum['trashcan']
-                ? ' checked="checked"' : '',
+                    ? ' checked="checked"' : '',
             ],
         );
 
@@ -577,7 +578,7 @@ final readonly class Forums
             [
                 'mod_list' => $modList,
                 'show_ledby' => $forum['show_ledby']
-                     ? 'checked="checked"' : '',
+                    ? 'checked="checked"' : '',
             ],
         );
 
@@ -591,7 +592,7 @@ final readonly class Forums
 
         $this->page->addContentBox(
             ($fid !== 0 ? 'Edit' : 'Create') . ' Forum'
-            . ($fid !== 0 ? ' - ' . $this->textFormatting->blockhtml($forum['title']) : ''),
+                . ($fid !== 0 ? ' - ' . $this->textFormatting->blockhtml($forum['title']) : ''),
             $page,
         );
         $this->page->addContentBox('Moderators', $moderators);
@@ -767,8 +768,7 @@ final readonly class Forums
                             FROM %t
                             WHERE `fid`=?
                         )
-                        SQL
-                    ,
+                        SQL,
                     ['posts', 'topics'],
                     $this->database->basicvalue($forumId),
                 );
@@ -926,11 +926,7 @@ final readonly class Forums
             ['id', 'title'],
             'categories',
         );
-        $categories = [];
-        while ($category = $this->database->arow($result)) {
-            $categories[$category['id']] = $category['title'];
-        }
-
+        $categories = keyBy($this->database->arows($result), fn($category) => $category['id']);
         $this->database->disposeresult($result);
 
         if (!array_key_exists($catId, $categories)) {
@@ -969,11 +965,11 @@ final readonly class Forums
             $page .= $this->page->error($error);
         } else {
             $categoryOptions = '';
-            foreach ($categories as $categoryId => $categoryName) {
+            foreach ($categories as $categoryId => $category) {
                 $categoryOptions .= $this->page->parseTemplate(
                     'select-option.html',
                     [
-                        'label' => $categoryName,
+                        'label' => $category['title'],
                         'selected' => '',
                         'value' => '' . $categoryId,
                     ],

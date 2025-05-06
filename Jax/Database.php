@@ -540,9 +540,7 @@ class Database
     public function fixAllForumLastPosts(): void
     {
         $query = $this->safeselect(['id'], 'forums');
-        while ($forum = $this->arow($query)) {
-            $this->fixForumLastPost($forum['id']);
-        }
+        array_map(fn($forum) => $this->fixForumLastPost($forum['id']), $this->arows($query));
     }
 
     /**

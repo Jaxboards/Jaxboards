@@ -11,6 +11,7 @@ use Jax\Request;
 use Jax\Session;
 use Jax\User;
 
+use function _\keyBy;
 use function array_diff;
 use function array_keys;
 use function array_map;
@@ -66,8 +67,7 @@ final readonly class ModTopics
                         FROM %t
                         WHERE `id`=?
                     )
-                    SQL
-                ,
+                    SQL,
                 ['forums', 'topics'],
                 $this->database->basicvalue($tid),
             );
@@ -273,18 +273,15 @@ final readonly class ModTopics
                 Database::WHERE_ID_IN,
                 $this->getModTids(),
             );
-            $titles = [];
-            while ($topic = $this->database->arow($result)) {
-                $titles[$topic['id']] = $topic['title'];
-            }
+            $titles = keyBy($this->database->arows($result), fn($topic) => $topic['id']);
 
             foreach ($topicIds as $topicId) {
-                if (!isset($titles[$topicId])) {
+                if (!array_key_exists($topicId, $titles)) {
                     continue;
                 }
 
                 $page .= '<input type="radio" name="ot" value="' . $topicId . '" /> '
-                    . $titles[$topicId] . '<br>';
+                    . $titles[$topicId]['title'] . '<br>';
             }
         }
 

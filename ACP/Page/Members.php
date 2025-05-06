@@ -94,8 +94,7 @@ final readonly class Members
                 LEFT JOIN %t g
                     ON m.`group_id`=g.`id`
                 ORDER BY m.`display_name` ASC
-                SQL
-            ,
+                SQL,
             ['members', 'member_groups'],
         );
         $rows = '';
@@ -248,10 +247,7 @@ final readonly class Members
                 );
             }
 
-            $member = [];
-            while ($f = $this->database->arow($result)) {
-                $member[] = $f;
-            }
+            $member = $this->database->arows($result);
 
             $nummembers = count($member);
             if ($nummembers > 1) {
@@ -326,7 +322,7 @@ final readonly class Members
 
         $this->page->addContentBox(
             isset($member['name']) && $member['name']
-            ? 'Editing ' . $member['name'] . "'s details" : 'Edit Member',
+                ? 'Editing ' . $member['name'] . "'s details" : 'Edit Member',
             $page,
         );
     }
@@ -452,7 +448,7 @@ final readonly class Members
                 } else {
                     $page .= $this->page->error(
                         'An error occurred while processing your request. '
-                        . $error,
+                            . $error,
                     );
                 }
             }
@@ -643,8 +639,7 @@ final readonly class Members
                         UPDATE %t
                         SET `members` = `members` - 1,
                             `last_register` = (SELECT MAX(`id`) FROM %t)
-                        SQL
-                    ,
+                        SQL,
                     ['stats', 'members'],
                 );
                 $page .= $this->page->success('Successfully merged the two accounts.');
@@ -655,9 +650,9 @@ final readonly class Members
         $this->page->addContentBox(
             'Account Merge',
             $page
-            . $this->page->parseTemplate(
-                'members/merge.html',
-            ),
+                . $this->page->parseTemplate(
+                    'members/merge.html',
+                ),
         );
     }
 
@@ -718,13 +713,12 @@ final readonly class Members
                         UPDATE %t
                         SET `members` = `members` - 1,
                             `last_register` = (SELECT MAX(`id`) FROM %t)
-                        SQL
-                    ,
+                        SQL,
                     ['stats', 'members'],
                 );
                 $page .= $this->page->success(
                     'Successfully deleted the member account. '
-                    . 'Board Stat Recount suggested.',
+                        . 'Board Stat Recount suggested.',
                 );
             }
         }
@@ -732,9 +726,9 @@ final readonly class Members
         $this->page->addContentBox(
             'Delete Account',
             $page
-            . $this->page->parseTemplate(
-                'members/delete.html',
-            ),
+                . $this->page->parseTemplate(
+                    'members/delete.html',
+                ),
         );
     }
 
@@ -898,9 +892,9 @@ final readonly class Members
         $this->page->addContentBox(
             'Mass Message',
             $page
-            . $this->page->parseTemplate(
-                'members/mass-message.html',
-            ),
+                . $this->page->parseTemplate(
+                    'members/mass-message.html',
+                ),
         );
     }
 
@@ -910,7 +904,7 @@ final readonly class Members
             $this->config->write(
                 [
                     'membervalidation' => $this->request->post('v_enable') !== null
-                    && $this->request->post('v_enable') ? 1 : 0,
+                        && $this->request->post('v_enable') ? 1 : 0,
                 ],
             );
         }
@@ -919,7 +913,7 @@ final readonly class Members
             'members/validation.html',
             [
                 'checked' => $this->config->getSetting('membervalidation')
-                ? 'checked="checked"' : '',
+                    ? 'checked="checked"' : '',
             ],
         );
         $this->page->addContentBox('Enable Member Validation', $page);
