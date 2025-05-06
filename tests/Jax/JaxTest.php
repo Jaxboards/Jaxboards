@@ -41,7 +41,7 @@ final class JaxTest extends TestCase
             'start' => true,
             'read' => true,
             'view' => true,
-            'poll' => true
+            'poll' => true,
         ],
         Groups::Guest->value => [
             'upload' => false,
@@ -49,7 +49,7 @@ final class JaxTest extends TestCase
             'start' => false,
             'read' => true,
             'view' => true,
-            'poll' => false
+            'poll' => false,
         ],
         Groups::Banned->value => [
             'upload' => false,
@@ -57,7 +57,7 @@ final class JaxTest extends TestCase
             'start' => false,
             'read' => true,
             'view' => true,
-            'poll' => false
+            'poll' => false,
         ],
         Groups::Validating->value => [
             'upload' => false,
@@ -65,7 +65,7 @@ final class JaxTest extends TestCase
             'start' => false,
             'read' => true,
             'view' => true,
-            'poll' => false
+            'poll' => false,
         ],
         // Custom group
         6 => [
@@ -74,9 +74,10 @@ final class JaxTest extends TestCase
             'start' => true,
             'read' => true,
             'view' => true,
-            'poll' => true
+            'poll' => true,
         ],
     ];
+
     // phpcs:enable SlevomatCodingStandard.Arrays.AlphabeticallySortedByKeys.IncorrectKeyOrder
 
     protected function setUp(): void
