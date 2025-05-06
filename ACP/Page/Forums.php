@@ -262,7 +262,7 @@ final readonly class Forums
         );
         $tree = [];
 
-        $forums = keyBy($this->database->arows($result), fn($forum) => $forum['id']);
+        $forums = keyBy($this->database->arows($result), static fn($forum) => $forum['id']);
         foreach ($forums as $forum) {
             $forums[$forum['id']] = [
                 'mods' => $forum['mods'],
@@ -312,6 +312,7 @@ final readonly class Forums
             $forums['c_' . $category['id']] = ['title' => $category['title']];
             $categories[] = $category['id'];
         }
+
         $this->database->disposeresult($result);
 
         foreach ($categories as $category) {
@@ -926,7 +927,7 @@ final readonly class Forums
             ['id', 'title'],
             'categories',
         );
-        $categories = keyBy($this->database->arows($result), fn($category) => $category['id']);
+        $categories = keyBy($this->database->arows($result), static fn($category) => $category['id']);
         $this->database->disposeresult($result);
 
         if (!array_key_exists($catId, $categories)) {

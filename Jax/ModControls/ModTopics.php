@@ -13,6 +13,7 @@ use Jax\User;
 
 use function _\keyBy;
 use function array_diff;
+use function array_key_exists;
 use function array_keys;
 use function array_map;
 use function array_pop;
@@ -273,7 +274,7 @@ final readonly class ModTopics
                 Database::WHERE_ID_IN,
                 $this->getModTids(),
             );
-            $titles = keyBy($this->database->arows($result), fn($topic) => $topic['id']);
+            $titles = keyBy($this->database->arows($result), static fn($topic) => $topic['id']);
 
             foreach ($topicIds as $topicId) {
                 if (!array_key_exists($topicId, $titles)) {
