@@ -714,10 +714,9 @@ function solitaireGame(solitaireGameId) {
 }
 
 function openWindow(solitaireGameId) {
-    RUN.stream.commands.window([
-        {
-            title: 'Solitaire',
-            content: `<div class="solitaire-window__inner" id="solitaire-${solitaireGameId}">
+    RUN.stream.commands.window({
+        title: 'Solitaire',
+        content: `<div class="solitaire-window__inner" id="solitaire-${solitaireGameId}">
                 <div class="solitaire-window__heading">
                     <div class="solitaire-window__heading-icon"></div>
                     Solitaire
@@ -739,8 +738,7 @@ function openWindow(solitaireGameId) {
                     </div>
                 </div>
             </div>`,
-        },
-    ]);
+    });
 }
 
 function loadSolitaireCSS() {
