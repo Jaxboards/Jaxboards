@@ -18,14 +18,14 @@ use function in_array;
 use function json_decode;
 use function json_encode;
 
-final class Reactions
+final readonly class Reactions
 {
     public function __construct(
-        private readonly Config $config,
-        private readonly Page $page,
-        private readonly Database $database,
-        private readonly User $user,
-        private readonly Template $template,
+        private Config $config,
+        private Page $page,
+        private Database $database,
+        private User $user,
+        private Template $template,
     ) {}
 
     /**
