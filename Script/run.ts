@@ -1,4 +1,4 @@
-import { updateDates, onDOMReady } from './JAX/util';
+import { updateDates, onDOMReady, supportsEmoji } from './JAX/util';
 import gracefulDegrade from './JAX/graceful-degrade';
 import { stopTitleFlashing } from './JAX/flashing-title';
 import Stream from './RUN/stream';
@@ -107,6 +107,9 @@ onDOMReady(() => {
     window.addEventListener('focus', () => {
         RUN.setWindowActive();
     });
+    if (!supportsEmoji()) {
+        document.documentElement.classList.add('no-emoji');
+    }
 });
 
 export default RUN;

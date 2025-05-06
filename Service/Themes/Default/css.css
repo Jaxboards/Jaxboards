@@ -1844,6 +1844,10 @@ textarea {
     content: '🎂';
 }
 
+.no-emoji .calendar .birthdays::before {
+    content: 'Birthdays: ';
+}
+
 /* Boxes/Collapse Boxes (Global) */
 
 /* DISCLAIMER: the borders around the title are actually not borders,
