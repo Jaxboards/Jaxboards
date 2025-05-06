@@ -13,6 +13,7 @@ use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
 use Jax\Page\Topic\Poll;
+use Jax\Page\Topic\Reactions;
 use Jax\Request;
 use Jax\RSSFeed;
 use Jax\Session;
@@ -20,12 +21,8 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
-use function array_diff;
 use function array_flip;
-use function array_key_exists;
-use function array_merge;
 use function ceil;
-use function count;
 use function explode;
 use function gmdate;
 use function header;
@@ -33,7 +30,6 @@ use function implode;
 use function in_array;
 use function is_array;
 use function is_numeric;
-use function json_decode;
 use function json_encode;
 use function max;
 use function preg_match;
@@ -63,6 +59,7 @@ final class Topic
         private readonly IPAddress $ipAddress,
         private readonly Page $page,
         private readonly Poll $poll,
+        private readonly Reactions $reactions,
         private readonly Request $request,
         private readonly Session $session,
         private readonly TextFormatting $textFormatting,
@@ -88,7 +85,6 @@ final class Topic
         $listRating = $this->request->both('listrating');
         $ratePost = $this->request->both('ratepost');
         $this->pageNumber = max((int) $this->request->both('page') - 1, 0);
-
 
         $this->topicData = $this->fetchTopicData($this->tid);
 
@@ -118,7 +114,7 @@ final class Topic
 
 
         if ($ratePost !== null) {
-            $this->ratePost($ratePost, $this->request->both('niblet'));
+            $this->reactions->toggleReaction((int) $ratePost, (int) $this->request->both('niblet'));
 
             return;
         }
@@ -160,7 +156,7 @@ final class Topic
         }
 
         if ($listRating !== null) {
-            $this->listRating($listRating);
+            $this->reactions->listReactions((int) $listRating);
 
             return;
         }
@@ -534,7 +530,7 @@ final class Topic
     private function postsintooutput($lastpid = 0): string
     {
         $usersonline = $this->database->getUsersOnline();
-        $ratingConfig = $this->config->getSetting('ratings') ?? 0;
+        $this->config->getSetting('ratings') ?? 0;
 
         $topicPostCounter = 0;
 
@@ -684,53 +680,7 @@ final class Topic
             $postt = $this->textFormatting->theWorks($postt);
 
             // Post rating content goes here.
-            $postrating = '';
-            $showrating = '';
-            if (($ratingConfig & 1) !== 0) {
-                $prating = [];
-                $postratingbuttons = '';
-                if ($post['rating']) {
-                    $prating = json_decode((string) $post['rating'], true);
-                }
-
-                $rniblets = $this->database->getRatingNiblets();
-                if ($rniblets) {
-                    foreach ($rniblets as $nibletIndex => $niblet) {
-                        $postratingbuttons .= '<a href="?act=vt' . $this->tid . '&amp;ratepost='
-                            . $post['pid'] . '&amp;niblet=' . $nibletIndex . '">'
-                            . $this->template->meta(
-                                'rating-niblet',
-                                $niblet['img'],
-                                $niblet['title'],
-                            ) . '</a>';
-                        if (!isset($prating[$nibletIndex])) {
-                            continue;
-                        }
-
-                        if (!$prating[$nibletIndex]) {
-                            continue;
-                        }
-
-                        $num = 'x' . count($prating[$nibletIndex]);
-                        $postratingbuttons .= $num;
-                        $showrating .= $this->template->meta(
-                            'rating-niblet',
-                            $niblet['img'],
-                            $niblet['title'],
-                        ) . $num;
-                    }
-
-                    $postrating = $this->template->meta(
-                        'rating-wrapper',
-                        $postratingbuttons,
-                        ($ratingConfig & 2) === 0
-                            ? '<a href="?act=vt' . $this->tid
-                            . '&amp;listrating=' . $post['pid'] . '">(List)</a>'
-                            : '',
-                        $showrating,
-                    );
-                }
-            }
+            $postrating = $this->reactions->render($post);
 
             $postbuttons
                 // Adds the Edit button
@@ -877,69 +827,6 @@ final class Topic
         }
 
         return $this->canMod = $canMod;
-    }
-
-    private function ratePost(
-        array|string $postid,
-        null|array|string $nibletid,
-    ): void {
-        $this->page->command('softurl');
-        if (!is_numeric($postid) || !is_numeric($nibletid)) {
-            return;
-        }
-
-        $result = $this->database->safeselect(
-            ['rating'],
-            'posts',
-            Database::WHERE_ID_EQUALS,
-            $this->database->basicvalue($postid),
-        );
-        $post = $this->database->arow($result);
-        $this->database->disposeresult($result);
-
-        $niblets = $this->database->getRatingNiblets();
-        $ratings = [];
-
-        $error = match (true) {
-            $this->user->isGuest() => 'You must be logged in to rate posts.',
-            !$post => "That post doesn't exist.",
-            !$niblets[$nibletid] => 'Invalid rating',
-            default => null,
-        };
-
-        if ($error !== null) {
-            $this->page->command('error', $error);
-
-            return;
-        }
-
-        $ratings = json_decode((string) $post['rating'], true);
-        if (!$ratings) {
-            $ratings = [];
-        }
-
-        if (!array_key_exists((int) $nibletid, $ratings)) {
-            $ratings[(int) $nibletid] = [];
-        }
-
-        $unrate = in_array((int) $this->user->get('id'), $ratings[(int) $nibletid], true);
-        // Unrate
-        if ($unrate) {
-            $ratings[(int) $nibletid] = array_diff($ratings[(int) $nibletid], [(int) $this->user->get('id')]);
-        } else {
-            // Rate
-            $ratings[(int) $nibletid][] = (int) $this->user->get('id');
-        }
-
-        $this->database->safeupdate(
-            'posts',
-            [
-                'rating' => json_encode($ratings),
-            ],
-            Database::WHERE_ID_EQUALS,
-            $this->database->basicvalue($postid),
-        );
-        $this->page->command('alert', $unrate ? 'Unrated!' : 'Rated!');
     }
 
     private function quickEditPost(array|string $pid): void
@@ -1151,76 +1038,6 @@ final class Topic
         $topicsread = $this->jax->parseReadMarkers($this->session->get('topicsread'));
         $topicsread[$tid] = Carbon::now()->getTimestamp();
         $this->session->set('topicsread', json_encode($topicsread));
-    }
-
-    private function listRating(array|string $pid): void
-    {
-        $ratingConfig = $this->config->getSetting('ratings') ?? 0;
-        if (($ratingConfig & 2) !== 0) {
-            return;
-        }
-
-        $this->page->command('softurl');
-        $result = $this->database->safeselect(
-            ['rating'],
-            'posts',
-            Database::WHERE_ID_EQUALS,
-            $this->database->basicvalue($pid),
-        );
-        $row = $this->database->arow($result);
-        $this->database->disposeresult($result);
-        $ratings = $row ? json_decode((string) $row['rating'], true) : [];
-
-        if (empty($ratings)) {
-            return;
-        }
-
-        $members = [];
-        foreach ($ratings as $v) {
-            $members = array_merge($members, $v);
-        }
-
-        if ($members === []) {
-            $this->page->command('alert', 'This post has no ratings yet!');
-
-            return;
-        }
-
-        $result = $this->database->safeselect(
-            [
-                'id',
-                'display_name',
-                'group_id',
-            ],
-            'members',
-            Database::WHERE_ID_IN,
-            $members,
-        );
-        $mdata = [];
-        while ($member = $this->database->arow($result)) {
-            $mdata[$member['id']] = [$member['display_name'], $member['group_id']];
-        }
-
-        unset($members);
-        $niblets = $this->database->getRatingNiblets();
-        $page = '';
-        foreach ($ratings as $index => $rating) {
-            $page .= '<div class="column">';
-            $page .= '<img src="' . $niblets[$index]['img'] . '" /> '
-                . $niblets[$index]['title'] . '<ul>';
-            foreach ($rating as $mid) {
-                $page .= '<li>' . $this->template->meta(
-                    'user-link',
-                    $mid,
-                    $mdata[$mid][1],
-                    $mdata[$mid][0],
-                ) . '</li>';
-            }
-
-            $page .= '</ul></div>';
-        }
-
-        $this->page->command('listrating', $pid, $page);
     }
 
     /**

@@ -140,7 +140,7 @@ class Database
         if ($data !== [] && array_keys($data) !== []) {
             return $this->safequery(
                 'INSERT INTO ' . $this->ftable($table)
-                . ' (`' . implode('`, `', array_keys($data)) . '`) VALUES ?;',
+                    . ' (`' . implode('`, `', array_keys($data)) . '`) VALUES ?;',
                 array_values($data),
             );
         }
@@ -478,8 +478,7 @@ class Database
                 LEFT JOIN %t m ON s.`uid`=m.`id`
                 WHERE s.`last_update`>=?
                 ORDER BY s.`last_action` ASC
-                SQL
-            ,
+                SQL,
             ['session', 'members'],
             $this->datetime(Carbon::now()->getTimestamp() - $this->serviceConfig->getSetting('timetologout')),
         );
@@ -544,26 +543,6 @@ class Database
         while ($forum = $this->arow($query)) {
             $this->fixForumLastPost($forum['id']);
         }
-    }
-
-    public function getRatingNiblets()
-    {
-        static $ratingNiblets = null;
-
-        if ($ratingNiblets) {
-            return $ratingNiblets;
-        }
-
-        $result = $this->safeselect(
-            ['id', 'img', 'title'],
-            'ratingniblets',
-        );
-        $ratingNiblets = [];
-        while ($niblet = $this->arow($result)) {
-            $ratingNiblets[$niblet['id']] = ['img' => $niblet['img'], 'title' => $niblet['title']];
-        }
-
-        return $ratingNiblets;
     }
 
     /**
