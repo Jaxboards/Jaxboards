@@ -71,7 +71,7 @@ export default function IMWindow(uid, uname) {
         return;
     }
 
-    RUN.stream.commands.im([uid, uname, false]);
+    RUN.stream.commands.im(uid, uname, false);
 }
 
 export function messageReceived({

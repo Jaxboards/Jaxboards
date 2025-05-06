@@ -31,7 +31,7 @@ class Stream {
                 if (cmd === 'softurl') {
                     softurl = true;
                 } else if (this.commands[cmd]) {
-                    this.commands[cmd](args);
+                    this.commands[cmd](...args);
                 }
             });
         }

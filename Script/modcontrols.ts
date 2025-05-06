@@ -20,15 +20,10 @@ const threadIDs = function fetchTIDs(strTIDs: string) {
 class ModControls {
     constructor(commands) {
         assign(commands, {
-            modcontrols_createModControls: (html) => {
-                this.busy = true;
-                this.createModControls(html);
-            },
-
             /**
              * @param {[string,string]} param0
              */
-            modcontrols_postsync: ([postIds, threadIds]) => {
+            modcontrols_postsync: (postIds: string, threadIds: string) => {
                 const [pids, pl, pluralPosts, andPosts] = postIDs(postIds);
                 const [tids, tl, pluralThreads] = threadIDs(threadIds);
                 const html =
@@ -74,8 +69,8 @@ class ModControls {
                 else this.destroyModControls();
             },
 
-            modcontrols_move: (act) => {
-                const whichone = parseInt((act && act[0]) || this.whichone, 10);
+            modcontrols_move: (act: string) => {
+                const whichone = parseInt(act || this.whichone, 10);
                 this.whichone = whichone;
                 window.addEventListener('pushstate', this.boundCheckLocation);
                 this.createModControls(
@@ -107,7 +102,7 @@ class ModControls {
         }
     }
 
-    moveto(id) {
+    moveto(id: number) {
         const { whichone } = this;
         this.createModControls(
             `<form method="post" data-ajax-form="true">move ${
@@ -121,7 +116,7 @@ class ModControls {
         );
     }
 
-    createModControls(html) {
+    createModControls(html: string) {
         let modb = this.modb || document.querySelector('#modbox');
         if (!this.modb) {
             modb = document.createElement('div');
@@ -143,7 +138,7 @@ class ModControls {
     }
 
     // eslint-disable-next-line class-methods-use-this
-    togbutton(button) {
+    togbutton(button: HTMLButtonElement) {
         button.classList.toggle('selected');
     }
 }

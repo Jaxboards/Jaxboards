@@ -15,19 +15,19 @@ import { messageReceived } from '../JAX/instant-messaging-window';
  * that the server can send to the client.
  */
 export default {
-    loadscript([src]: [string]) {
+    loadscript(src: string) {
         document.body.appendChild(
             Object.assign(document.createElement('script'), { src }),
         );
     },
-    script([script]: [string]) {
+    script(script: string) {
         // eslint-disable-next-line
         eval(script);
     },
-    error([message]: [string]) {
+    error(message: string) {
         alert(message);
     },
-    alert([message]: [string]) {
+    alert(message: string) {
         alert([message]);
     },
     reload() {
@@ -36,16 +36,16 @@ export default {
     refreshdata() {
         RUN.stream.pollData(true);
     },
-    addclass([selector, className]: [string, string]) {
+    addclass(selector: string, className: string) {
         const el = document.querySelector(selector);
         if (el) {
             el.classList.add(className);
         }
     },
-    title([title]: [string]) {
+    title(title: string) {
         document.title = title;
     },
-    update([sel, html, shouldHighlight]: [string, string, string]) {
+    update(sel: string, html: string, shouldHighlight: string) {
         let selector = sel;
         const paths = Array.from(
             document.querySelectorAll<HTMLElement>('.path'),
@@ -68,7 +68,7 @@ export default {
         }
         gracefulDegrade(el);
     },
-    removeel([selector]: [string]) {
+    removeel(selector: string) {
         const el = document.querySelector(selector);
         if (el) el.parentNode?.removeChild(el);
     },
@@ -76,13 +76,13 @@ export default {
     back() {
         window.history.back();
     },
-    setstatus([className]: [string]) {
+    setstatus(className: string) {
         const status = document.querySelector('#status');
         if (status) {
             status.className = className;
         }
     },
-    appendrows([selector, rowHTML]: [string, string]) {
+    appendrows(selector: string, rowHTML: string) {
         const table = document.querySelector<HTMLTableElement>(selector);
         if (!table) return;
         const span = document.createElement('span');
@@ -92,19 +92,19 @@ export default {
         gracefulDegrade(vtbody);
         table.appendChild(vtbody);
     },
-    location([path]: [string]) {
+    location(path: string) {
         if (path.charAt(0) === '?') RUN.stream.location(path);
         else {
             document.location = path;
         }
     },
-    enable([selector]: [string]) {
+    enable(selector: string) {
         const el = document.querySelector<HTMLButtonElement>(`#${selector}`);
         if (el) {
             el.disabled = false;
         }
     },
-    addshout([message]: [string]) {
+    addshout(message: string) {
         const ss = Array.from(
             document.querySelectorAll<HTMLDivElement>('#shoutbox .shout'),
         );
@@ -121,7 +121,7 @@ export default {
         if (globalsettings.sound_shout) Sound.play('sbblip');
         gracefulDegrade(div);
     },
-    tick([html]: [string]) {
+    tick(html: string) {
         const ticker = document.querySelector('#ticker');
         if (!ticker) return;
         let tick = document.createElement('div');
@@ -155,13 +155,19 @@ export default {
             }
         }
     },
-    im([fromId, fromName, message, fromMe, timestamp]) {
+    im(
+        fromId: number,
+        fromName: string,
+        message: string,
+        fromMe: number,
+        timestamp: number,
+    ) {
         messageReceived({ fromId, fromName, message, fromMe, timestamp });
     },
-    imtoggleoffline(a) {
+    imtoggleoffline(a: string) {
         document.querySelector(`#im_${a}`).classList.add('offline');
     },
-    window([options]) {
+    window(options) {
         const existingWindow =
             options.id && document.getElementById(options.id);
         if (existingWindow) {
@@ -188,18 +194,18 @@ export default {
         winElement.id = options.id || '';
         gracefulDegrade(winElement);
     },
-    closewindow([windowSelector]) {
+    closewindow(windowSelector) {
         const el = document.querySelector(windowSelector);
         if (el) {
             Window.close(el);
         }
     },
-    onlinelist(a) {
+    onlinelist(users) {
         const statusers = document.querySelector('#statusers');
         if (!statusers) {
             return;
         }
-        a[0].forEach(
+        users.forEach(
             ([memberId, groupId, status, name, tooltip, lastAction]) => {
                 let link = document.querySelector(
                     `#statusers .user${memberId}`,
@@ -232,18 +238,18 @@ export default {
             },
         );
     },
-    setoffline(a) {
+    setoffline(userIds: string) {
         const statusers = document.querySelector('#statusers');
-        const ids = a[0].split(',');
+        const ids = userIds.split(',');
         ids.forEach((id) => {
             const link = document.querySelector(`#statusers .user${id}`);
-            if (link) {
+            if (link && statusers) {
                 statusers.removeChild(link);
             }
         });
     },
 
-    scrollToPost([postId]) {
+    scrollToPost(postId: number) {
         const el = document.getElementById(`pid_${postId}`);
         if (!el) {
             return false;
@@ -254,18 +260,18 @@ export default {
         });
         return true;
     },
-    updateqreply(a) {
+    updateqreply(content: string) {
         const qreply = document.querySelector('#qreply');
         const textarea = qreply?.querySelector('textarea');
         if (textarea) {
             textarea.focus();
-            textarea.value += a[0];
+            textarea.value += content;
         }
     },
-    newmessage([message, fromMID]) {
+    newmessage(message: string, fromMID: number) {
         let notification = document.querySelector('#notification');
-        const num = document.querySelector('#num-messages');
-        if (num) num.innerHTML = parseInt(num.innerHTML, 10) + 1;
+        const num = document.querySelector<HTMLAnchorElement>('#num-messages');
+        if (num) num.innerHTML = `${parseInt(num.innerHTML, 10) + 1}`;
         if (!notification) {
             notification = document.createElement('div');
             notification.id = 'notification';
@@ -280,8 +286,8 @@ export default {
         notification.innerHTML = message;
     },
 
-    playsound(a) {
-        Sound.loadAndPlay(a[0], a[1], !!a[2]);
+    playsound(name: string, url: string) {
+        Sound.loadAndPlay(name, url);
     },
     attachfiles() {
         const el = document.querySelector('#attachfiles');
@@ -289,7 +295,7 @@ export default {
             alert('Attaching files is under construction');
         });
     },
-    listrating([postId, html]: [string, string]) {
+    listrating(postId: number, html: string) {
         let prdiv = document.querySelector<HTMLDivElement>(
             `#postrating_${postId}`,
         );
