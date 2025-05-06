@@ -97,7 +97,7 @@ final readonly class Reactions
             Database::WHERE_ID_IN,
             $members,
         );
-        $mdata = keyBy($this->database->arows($result), fn($member) => $member['id']);
+        $mdata = keyBy($this->database->arows($result), static fn($member) => $member['id']);
 
         unset($members);
         $niblets = $this->fetchRatingNiblets();
