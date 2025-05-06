@@ -143,6 +143,7 @@ final readonly class Reactions
             if (!isset($prating[$nibletIndex])) {
                 continue;
             }
+
             if (!$prating[$nibletIndex]) {
                 continue;
             }
