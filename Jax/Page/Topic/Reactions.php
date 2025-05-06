@@ -48,15 +48,7 @@ final readonly class Reactions
             'ratingniblets',
         );
 
-        return array_reduce(
-            $this->database->arows($result),
-            static function (array $ratingNiblets, array $niblet) {
-                $ratingNiblets[$niblet['id']] = ['img' => $niblet['img'], 'title' => $niblet['title']];
-
-                return $ratingNiblets;
-            },
-            []
-        );
+        return keyBy($this->database->arows($result), fn($niblet) => $niblet['id']);
     }
 
     public function listReactions(int $pid): void
