@@ -2008,6 +2008,7 @@ textarea {
 /* stylelint-disable no-descending-specificity */
 #statusers a {
     margin-left: 5px;
+    white-space: nowrap;
 }
 /* stylelint-enable no-descending-specificity */
 
