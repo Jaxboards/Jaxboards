@@ -13,6 +13,7 @@ use Jax\User;
 use function array_diff;
 use function array_key_exists;
 use function array_merge;
+use function array_reduce;
 use function count;
 use function in_array;
 use function json_decode;
@@ -29,7 +30,8 @@ final readonly class Reactions
     ) {}
 
     /**
-     * Fetches Reactions from "ratingniblets" table
+     * Fetches Reactions from "ratingniblets" table.
+     *
      * @return array<int,{img:string,title:string}> Rating Records by ID
      */
     public function fetchRatingNiblets(): array
@@ -47,10 +49,11 @@ final readonly class Reactions
 
         return array_reduce(
             $this->database->arows($result),
-            function ($ratingNiblets, $niblet) {
+            static function (array $ratingNiblets, array $niblet) {
                 $ratingNiblets[$niblet['id']] = ['img' => $niblet['img'], 'title' => $niblet['title']];
+
                 return $ratingNiblets;
-            }
+            },
         );
     }
 
@@ -234,7 +237,6 @@ final readonly class Reactions
         );
         $this->page->command('alert', $unrate ? 'Unrated!' : 'Rated!');
     }
-
 
     private function getRatingSetting(): int
     {
