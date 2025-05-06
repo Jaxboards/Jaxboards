@@ -195,7 +195,7 @@ final class User
             ],
             'member_groups',
             Database::WHERE_ID_EQUALS,
-            $groupId ?? Groups::Guest,
+            $groupId ?? Groups::Guest->value,
         );
         $retval = $this->database->arow($result);
         $this->userPerms = $retval;
