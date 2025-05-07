@@ -513,7 +513,7 @@ textarea {
 }
 /* stylelint-enable no-descending-specificity */
 
-#shoutbox img {
+.shout img {
     max-height: 150px;
     max-width: 150px;
 }
@@ -527,7 +527,7 @@ textarea {
     display: inline;
 }
 
-#shoutbox .avatar {
+.shout .avatar {
     max-height: 20px;
     max-width: 20px;
 }
