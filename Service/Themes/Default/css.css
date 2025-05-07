@@ -455,12 +455,12 @@ textarea {
     background: none;
 }
 
-#shoutbox .shoutbox {
+.shoutbox {
     display: flex;
     flex-wrap: wrap;
 }
 
-#shoutbox .shouts {
+.shouts {
     padding: 3px;
     background: #eef;
     border-right: 1px solid #99c;
@@ -472,15 +472,15 @@ textarea {
     min-width: 200px;
 }
 
-#shoutbox .shout {
+.shout {
     background: #eef;
 }
 
-#shoutbox .shout.highlight {
+.shout.highlight {
     background: #ff0;
 }
 
-#shoutbox .shoutform {
+.shoutform {
     align-content: center;
     margin: 10px 20px;
 }
@@ -518,18 +518,19 @@ textarea {
     max-width: 150px;
 }
 
-#shoutbox .shout .delete {
+.shout .delete {
     margin-right: 10px;
     display: none;
 }
 
-#shoutbox .shout:hover .delete {
+.shout:hover .delete {
     display: inline;
 }
 
 .shout .avatar {
     max-height: 20px;
     max-width: 20px;
+    vertical-align: middle;
 }
 
 /* stylelint-disable no-descending-specificity */
