@@ -19,7 +19,9 @@ use Jax\User;
 use function array_filter;
 use function array_flip;
 use function array_keys;
+use function array_map;
 use function array_merge;
+use function count;
 use function explode;
 use function gmdate;
 use function implode;
@@ -329,7 +331,7 @@ final class IDX
         return $this->template->meta('idx-table', $table);
     }
 
-    private function fetchUsersOnlineToday()
+    private function fetchUsersOnlineToday(): ?array
     {
         $result = $this->database->safespecial(
             <<<'SQL'
@@ -350,6 +352,7 @@ final class IDX
                 SQL,
             ['session', 'members'],
         );
+
         return $this->database->arows($result);
     }
 
@@ -392,13 +395,14 @@ final class IDX
         $today = gmdate('n j');
         $birthdaysEnabled = $this->config->getSetting('birthdays');
 
-        $userstoday = implode(', ', array_map(function ($user)  use ($today, $birthdaysEnabled) {
+        $userstoday = implode(', ', array_map(function (array $user) use ($today, $birthdaysEnabled): string {
             $birthdayClass = $user['birthday'] === $today
                 && $birthdaysEnabled ? 'birthday' : '';
             $lastOnline = $user['hide']
                 ? $user['read_date']
                 : $user['last_update'];
             $lastOnlineDate = $this->date->relativeTime($lastOnline);
+
             return <<<HTML
                 <a href="?act=vu{$user['id']}"
                     class="user{$user['id']} mgroup{$user['group_id']} {$birthdayClass}"
