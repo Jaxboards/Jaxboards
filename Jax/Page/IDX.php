@@ -104,8 +104,7 @@ final class IDX
                 LEFT JOIN %t m
                     ON f.`lp_uid`=m.`id`
                 ORDER BY f.`order`, f.`title` ASC
-                SQL
-            ,
+                SQL,
             [
                 'forums',
                 'members',
@@ -278,7 +277,7 @@ final class IDX
                     nl2br((string) $forum['subtitle']),
                     'Redirects: ' . $forum['redirects'],
                     $this->template->meta('icon-redirect')
-                    ?: $this->template->meta('idx-icon-redirect'),
+                        ?: $this->template->meta('idx-icon-redirect'),
                 );
             } else {
                 $forumId = $forum['id'];
@@ -299,16 +298,16 @@ final class IDX
                     $this->textFormatting->wordfilter($forum['title']),
                     nl2br((string) $forum['subtitle']),
                     $sf
-                    ? $this->template->meta(
-                        'idx-subforum-wrapper',
-                        mb_substr(
-                            (string) $sf,
-                            0,
-                            -1 * mb_strlen(
-                                $this->template->meta('idx-subforum-splitter'),
+                        ? $this->template->meta(
+                            'idx-subforum-wrapper',
+                            mb_substr(
+                                (string) $sf,
+                                0,
+                                -1 * mb_strlen(
+                                    $this->template->meta('idx-subforum-splitter'),
+                                ),
                             ),
-                        ),
-                    ) : '',
+                        ) : '',
                     $this->formatlastpost($forum),
                     $this->template->meta('idx-topics-count', $forum['topics']),
                     $this->template->meta('idx-replies-count', $forum['posts']),
@@ -317,8 +316,7 @@ final class IDX
                         <a id="fid_{$forumId}_icon"{$hrefCode}>
                             {$linkText}
                         </a>
-                        HTML
-                    ,
+                        HTML,
                     $forum['show_ledby'] && $forum['mods']
                         ? $this->template->meta(
                             'idx-ledby-wrapper',
@@ -331,42 +329,8 @@ final class IDX
         return $this->template->meta('idx-table', $table);
     }
 
-    private function update(): void
+    private function fetchUsersOnlineToday()
     {
-        $this->updateStats();
-        $this->updateLastPosts();
-    }
-
-    private function getBoardStats(): string
-    {
-        if (!$this->user->getPerm('can_view_stats')) {
-            return '';
-        }
-
-        $legend = '';
-        $page = '';
-        $userstoday = '';
-        $result = $this->database->safespecial(
-            <<<'SQL'
-                SELECT
-                    s.`posts` AS `posts`,
-                    s.`topics` AS `topics`,
-                    s.`members` AS `members`,
-                    s.`most_members` AS `most_members`,
-                    s.`most_members_day` AS `most_members_day`,
-                    s.`last_register` AS `last_register`,
-                    m.`group_id` AS `group_id`,
-                    m.`display_name` AS `display_name`
-                FROM %t s
-                LEFT JOIN %t m
-                ON s.`last_register`=m.`id`
-                SQL
-            ,
-            ['stats', 'members'],
-        );
-        $stats = $this->database->arow($result);
-        $this->database->disposeresult($result);
-
         $result = $this->database->safespecial(
             <<<'SQL'
                 SELECT
@@ -383,41 +347,68 @@ final class IDX
                 WHERE s.`uid` AND s.`hide` = 0
                 GROUP BY m.`id`
                 ORDER BY `name`
-                SQL
-            ,
+                SQL,
             ['session', 'members'],
         );
-        $nuserstoday = 0;
-        $today = gmdate('n j');
-        while ($user = $this->database->arow($result)) {
-            if (!$user['id']) {
-                continue;
-            }
+        return $this->database->arows($result);
+    }
 
-            $fId = $user['id'];
-            $fName = $user['name'];
-            $fGroupId = $user['group_id'];
-            $birthdayCode = $user['birthday'] === $today
-                && $this->config->getSetting('birthdays') ? ' birthday' : '';
+    private function update(): void
+    {
+        $this->updateStats();
+        $this->updateLastPosts();
+    }
+
+    private function getBoardStats(): string
+    {
+        if (!$this->user->getPerm('can_view_stats')) {
+            return '';
+        }
+
+        $legend = '';
+        $page = '';
+        $result = $this->database->safespecial(
+            <<<'SQL'
+                SELECT
+                    s.`posts` AS `posts`,
+                    s.`topics` AS `topics`,
+                    s.`members` AS `members`,
+                    s.`most_members` AS `most_members`,
+                    s.`most_members_day` AS `most_members_day`,
+                    s.`last_register` AS `last_register`,
+                    m.`group_id` AS `group_id`,
+                    m.`display_name` AS `display_name`
+                FROM %t s
+                LEFT JOIN %t m
+                ON s.`last_register`=m.`id`
+                SQL,
+            ['stats', 'members'],
+        );
+        $stats = $this->database->arow($result);
+        $this->database->disposeresult($result);
+
+        $usersOnlineToday = $this->fetchUsersOnlineToday();
+
+        $today = gmdate('n j');
+        $birthdaysEnabled = $this->config->getSetting('birthdays');
+
+        $userstoday = implode(', ', array_map(function ($user)  use ($today, $birthdaysEnabled) {
+            $birthdayClass = $user['birthday'] === $today
+                && $birthdaysEnabled ? 'birthday' : '';
             $lastOnline = $user['hide']
                 ? $user['read_date']
                 : $user['last_update'];
-            $lastOnlineCode = $this->date->relativeTime($lastOnline);
-            $userstoday
-                .= <<<EOT
-                    <a
-                        class="user{$fId} mgroup{$fGroupId}{$birthdayCode}"
-                        data-last-online="{$lastOnline}"
-                        data-use-tooltip="true"
-                        href="?act=vu{$fId}"
-                        >{$fName}</a>
+            $lastOnlineDate = $this->date->relativeTime($lastOnline);
+            return <<<HTML
+                <a href="?act=vu{$user['id']}"
+                    class="user{$user['id']} mgroup{$user['group_id']} {$birthdayClass}"
+                    title="Last online: {$lastOnlineDate}"
+                    data-use-tooltip="true"
+                    data-last-online="{$lastOnline}"
+                    >{$user['name']}</a>
+                HTML;
+        }, $usersOnlineToday));
 
-                    EOT;
-            $userstoday .= ', ';
-            ++$nuserstoday;
-        }
-
-        $userstoday = mb_substr($userstoday, 0, -2);
         $usersonline = $this->getUsersOnlineList();
         $result = $this->database->safeselect(
             ['id', 'title'],
@@ -434,7 +425,7 @@ final class IDX
             $usersonline[1],
             $usersonline[0],
             $usersonline[2],
-            $nuserstoday,
+            count($usersOnlineToday),
             $userstoday,
             number_format($stats['members']),
             number_format($stats['topics']),
@@ -477,12 +468,12 @@ final class IDX
                         . '%3$s</a>',
                     $user['uid'],
                     $user['group_id']
-                    . (
-                        $user['status'] === 'idle'
-                        ? " idle lastAction{$user['last_action']}"
-                        : ''
-                    )
-                    . ($user['birthday'] && $this->config->getSetting('birthdays') ? ' birthday' : ''),
+                        . (
+                            $user['status'] === 'idle'
+                            ? " idle lastAction{$user['last_action']}"
+                            : ''
+                        )
+                        . ($user['birthday'] && $this->config->getSetting('birthdays') ? ' birthday' : ''),
                     $user['name'],
                     $title,
                 );
@@ -516,9 +507,9 @@ final class IDX
                     $user['group_id'],
 
                     $user['status'] !== 'active'
-                    ? $user['status']
-                    : ($user['birthday'] && ($this->config->getSetting('birthdays') & 1)
-                    ? ' birthday' : ''),
+                        ? $user['status']
+                        : ($user['birthday'] && ($this->config->getSetting('birthdays') & 1)
+                            ? ' birthday' : ''),
                     $user['name'],
                     $user['location_verbose'],
                     $user['last_action'],
@@ -556,7 +547,7 @@ final class IDX
                 'update',
                 '#fid_' . $unreadForum['id'] . '_icon',
                 $this->template->meta('icon-unread')
-                ?: $this->template->meta('idx-icon-unread'),
+                    ?: $this->template->meta('idx-icon-unread'),
             );
             $this->page->command(
                 'update',
