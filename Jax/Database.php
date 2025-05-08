@@ -257,7 +257,7 @@ class Database
     }
 
     // Only new-style mysqli.
-    public function arows(?mysqli_result $mysqliResult = null): ?array
+    public function arows(?mysqli_result $mysqliResult = null): array
     {
         $mysqliResult = $mysqliResult ?: $this->mysqliresult;
 
