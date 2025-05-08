@@ -12,10 +12,10 @@ use Jax\Request;
 use Jax\TextFormatting;
 
 use function _\keyBy;
+use function array_filter;
 use function array_key_exists;
 use function array_keys;
 use function array_map;
-use function array_pop;
 use function array_search;
 use function array_unshift;
 use function count;
@@ -68,12 +68,12 @@ final readonly class Forums
             'edit' => match (true) {
                 is_numeric($edit) => $this->createForum((int) $edit),
                 $categoryEdit !== null => $this->createCategory($categoryEdit),
-                default => null
+                default => null,
             },
             'delete' => match (true) {
                 is_numeric($delete) => $this->deleteForum((int) $delete),
                 $categoryDelete !== null => $this->deleteCategory($categoryDelete),
-                default => null
+                default => null,
             },
             'order' => $this->orderForums(),
             'create' => $this->createForum(),
@@ -135,7 +135,7 @@ final readonly class Forums
     }
 
     /**
-     * @param array<int,int|array<int>>
+     * @param array<int,array<int>|int>
      * @param array<int,array<string,mixed>> $forums
      */
     private function printtree(
@@ -225,14 +225,14 @@ final readonly class Forums
     private function orderForums(int $highlight = 0): void
     {
         $page = '';
-        if ($highlight) {
+        if ($highlight !== 0) {
             $page .= $this->page->success(
                 'Forum Created. Now, just place it wherever you like!',
             );
         }
 
         if (is_string($this->request->post('tree'))) {
-            self::mysqltree(json_decode((string) $this->request->post('tree'), true));
+            self::mysqltree(json_decode($this->request->post('tree'), true));
             if ($this->request->get('do') === 'create') {
                 return;
             }
@@ -273,7 +273,7 @@ final readonly class Forums
             ];
             $treeparts = array_filter(
                 explode(' ', (string) $forum['path']),
-                fn($part) => trim($part) !== ''
+                static fn($part): bool => trim((string) $part) !== '',
             );
             array_unshift($treeparts, 'c_' . $forum['cat_id']);
             $intree = &$tree;
@@ -593,6 +593,7 @@ final readonly class Forums
 
     /**
      * @param array<string,mixed> $oldForumData
+     *
      * @return string Error on failure, null on success
      */
     private function upsertForum(?array $oldForumData, array $write): ?string
@@ -608,7 +609,7 @@ final readonly class Forums
                 $this->database->basicvalue($this->request->post('modid')),
             );
             if ($this->database->arow($result)) {
-                if (!in_array($this->request->post('modid'), isset($oldForumData['mods']) ? explode(',', $oldForumData['mods']) : [])) {
+                if (!in_array($this->request->post('modid'), isset($oldForumData['mods']) ? explode(',', (string) $oldForumData['mods']) : [])) {
                     $write['mods'] = isset($oldForumData['mods'])
                         && $oldForumData['mods']
                         ? $oldForumData['mods'] . ',' . $this->request->post('modid')
@@ -1027,8 +1028,11 @@ final readonly class Forums
         );
     }
 
-    private function checkbox(int|string $checkId, string $name, bool|int $checked): string
-    {
+    private function checkbox(
+        int|string $checkId,
+        string $name,
+        bool|int $checked,
+    ): string {
         return $this->page->parseTemplate(
             'forums/create-forum-permissions-row-checkbox.html',
             [
