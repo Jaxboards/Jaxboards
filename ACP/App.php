@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ACP;
 
 use DI\Container;
-use Exception;
 use Jax\Config;
 use Jax\DebugLog;
 use Jax\IPAddress;
@@ -61,7 +60,7 @@ final class App
             $page = $this->container->get('ACP\Page\\' . $act);
             $page->render();
             // } catch (Exception $e) {
-            //     $this->page->addContentBox('Error', "Invalid action {$act} or error {$e->getMessage()}");
+            // $this->page->addContentBox('Error', "Invalid action {$act} or error {$e->getMessage()}");
             // }
         }
 

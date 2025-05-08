@@ -13,14 +13,14 @@ use Jax\TextFormatting;
 use function _\keyBy;
 use function array_flip;
 use function array_keys;
+use function array_map;
 use function count;
 use function explode;
 use function filter_var;
 use function implode;
 use function is_numeric;
+use function is_string;
 use function mb_strlen;
-use function mb_strpos;
-use function preg_match;
 
 use const FILTER_VALIDATE_URL;
 
@@ -154,9 +154,10 @@ final class Groups
 
     /**
      * @param null|list<int> $groupIds
+     *
      * @return array<array<string,mixed>>
      */
-    private function fetchGroups(?array $groupIds)
+    private function fetchGroups(?array $groupIds): array
     {
         $result = $this->database->safeselect(
             [
@@ -194,8 +195,9 @@ final class Groups
             ],
             'member_groups',
             ($groupIds ? 'WHERE `id` IN ? ' : '') . 'ORDER BY `id` ASC',
-            ...($groupIds ? [$groupIds] : [])
+            ...($groupIds ? [$groupIds] : []),
         );
+
         return $this->database->arows($result);
     }
 
@@ -206,7 +208,7 @@ final class Groups
         $permInput = $this->request->post('perm');
         $groupListInput = $this->request->post('grouplist');
         $groupList = is_string($groupListInput)
-            ? array_map(fn($gid) => (int) $gid, explode(',', $groupListInput))
+            ? array_map(static fn($gid): int => (int) $gid, explode(',', $groupListInput))
             : null;
 
         if (
