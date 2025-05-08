@@ -57,12 +57,12 @@ final class App
         $act = $this->request->get('act');
 
         if (is_string($act) && $act !== '') {
-            try {
-                $page = $this->container->get('ACP\Page\\' . $act);
-                $page->render();
-            } catch (Exception $e) {
-                $this->page->addContentBox('Error', "Invalid action {$act} or error {$e->getMessage()}");
-            }
+            // try {
+            $page = $this->container->get('ACP\Page\\' . $act);
+            $page->render();
+            // } catch (Exception $e) {
+            //     $this->page->addContentBox('Error', "Invalid action {$act} or error {$e->getMessage()}");
+            // }
         }
 
         if ($this->ipAddress->isLocalHost()) {

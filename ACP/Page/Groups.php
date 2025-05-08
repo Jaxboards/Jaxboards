@@ -43,11 +43,16 @@ final class Groups
             'perms' => 'Edit Permissions',
         ]);
 
+        $edit = $this->request->get('edit');
+        if (is_string($this->request->get('edit'))) {
+            $this->create((int) $edit);
 
-        match ($this->request->get('edit') ? 'edit' : $this->request->get('do')) {
+            return;
+        }
+
+        match ($this->request->get('do')) {
             'perms' => $this->showperms(),
             'create' => $this->create(),
-            'edit' => $this->create($this->request->get('edit')),
             'delete' => $this->delete(),
             default => $this->showperms(),
         };
@@ -147,16 +152,69 @@ final class Groups
         $this->showperms();
     }
 
+    /**
+     * @param null|list<int> $groupIds
+     * @return array<array<string,mixed>>
+     */
+    private function fetchGroups(?array $groupIds)
+    {
+        $result = $this->database->safeselect(
+            [
+                'can_access_acp',
+                'can_add_comments',
+                'can_attach',
+                'can_delete_comments',
+                'can_delete_own_posts',
+                'can_delete_own_shouts',
+                'can_delete_own_topics',
+                'can_delete_shouts',
+                'can_edit_posts',
+                'can_edit_topics',
+                'can_im',
+                'can_karma',
+                'can_lock_own_topics',
+                'can_moderate',
+                'can_override_locked_topics',
+                'can_pm',
+                'can_poll',
+                'can_post_topics',
+                'can_post',
+                'can_shout',
+                'can_use_sigs',
+                'can_view_board',
+                'can_view_fullprofile',
+                'can_view_offline_board',
+                'can_view_shoutbox',
+                'can_view_stats',
+                'flood_control',
+                'icon',
+                'id',
+                'legend',
+                'title',
+            ],
+            'member_groups',
+            ($groupIds ? 'WHERE `id` IN ? ' : '') . 'ORDER BY `id` ASC',
+            ...($groupIds ? [$groupIds] : [])
+        );
+        return $this->database->arows($result);
+    }
+
     private function showperms(): void
     {
         $page = '';
 
         $permInput = $this->request->post('perm');
+        $groupListInput = $this->request->post('grouplist');
+        $groupList = is_string($groupListInput)
+            ? array_map(fn($gid) => (int) $gid, explode(',', $groupListInput))
+            : null;
+
         if (
             $this->updatePermissions
             && $permInput !== null
+            && $groupList !== null
         ) {
-            foreach (explode(',', $this->request->post('grouplist') ?? '') as $groupId) {
+            foreach ($groupList as $groupId) {
                 if (
                     isset($permInput[$groupId])
                     && $permInput[$groupId]
@@ -172,93 +230,8 @@ final class Groups
             return;
         }
 
-        $groupList = $this->request->both('grouplist');
-        if (
-            !$groupList
-            || preg_match('@[^\d,]@', (string) $groupList)
-            || mb_strpos((string) $groupList, ',,') !== false
-        ) {
-        }
-
-        $result = $groupList
-            ? $this->database->safeselect(
-                [
-                    'id',
-                    'title',
-                    'can_post',
-                    'can_edit_posts',
-                    'can_post_topics',
-                    'can_edit_topics',
-                    'can_add_comments',
-                    'can_delete_comments',
-                    'can_view_board',
-                    'can_view_offline_board',
-                    'flood_control',
-                    'can_override_locked_topics',
-                    'icon',
-                    'can_shout',
-                    'can_moderate',
-                    'can_delete_shouts',
-                    'can_delete_own_shouts',
-                    'can_karma',
-                    'can_im',
-                    'can_pm',
-                    'can_lock_own_topics',
-                    'can_delete_own_topics',
-                    'can_use_sigs',
-                    'can_attach',
-                    'can_delete_own_posts',
-                    'can_poll',
-                    'can_access_acp',
-                    'can_view_shoutbox',
-                    'can_view_stats',
-                    'legend',
-                    'can_view_fullprofile',
-                ],
-                'member_groups',
-                'WHERE `id` IN ? ORDER BY `id` ASC',
-                explode(',', (string) $this->request->both('grouplist')),
-            )
-            : $this->database->safeselect(
-                [
-                    'can_access_acp',
-                    'can_add_comments',
-                    'can_attach',
-                    'can_delete_comments',
-                    'can_delete_own_posts',
-                    'can_delete_own_shouts',
-                    'can_delete_own_topics',
-                    'can_delete_shouts',
-                    'can_edit_posts',
-                    'can_edit_topics',
-                    'can_im',
-                    'can_karma',
-                    'can_lock_own_topics',
-                    'can_moderate',
-                    'can_override_locked_topics',
-                    'can_pm',
-                    'can_poll',
-                    'can_post_topics',
-                    'can_post',
-                    'can_shout',
-                    'can_use_sigs',
-                    'can_view_board',
-                    'can_view_fullprofile',
-                    'can_view_offline_board',
-                    'can_view_shoutbox',
-                    'can_view_stats',
-                    'flood_control',
-                    'icon',
-                    'id',
-                    'legend',
-                    'title',
-                ],
-                'member_groups',
-                'ORDER BY id ASC',
-            );
-        $perms = keyBy($this->database->arows($result), static fn($group) => $group['id']);
+        $perms = keyBy($this->fetchGroups($groupList), static fn($group) => $group['id']);
         $numgroups = count($perms);
-        $grouplist = implode(',', array_keys($perms));
 
         if ($numgroups === 0) {
             $this->page->addContentBox(
@@ -372,7 +345,7 @@ final class Groups
             'groups/show-permissions.html',
             [
                 'group_headings' => $groupHeadings,
-                'group_list' => $grouplist,
+                'group_list' => implode(',', array_keys($perms)),
                 'permissions_table' => $permissionsTable,
             ],
         );
@@ -380,12 +353,8 @@ final class Groups
         $this->page->addContentBox('Perms', $page);
     }
 
-    private function create($gid = false): void
+    private function create(?int $gid = null): void
     {
-        if ($gid && !is_numeric($gid)) {
-            $gid = false;
-        }
-
         $page = '';
         $error = null;
         if ($this->request->post('submit') !== null) {
