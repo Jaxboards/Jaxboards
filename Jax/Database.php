@@ -111,7 +111,7 @@ class Database
 
     /**
      * @param array<string>|string $fields list of fields to select, or SQL string
-     * @param array<mixed> $vars
+     * @param array<mixed>         $vars
      */
     public function safeselect(
         array|string $fields,
@@ -143,18 +143,20 @@ class Database
             return null;
         }
 
-        $keys = implode(',', array_map(fn($key) => "`{$key}`", array_keys($data)));
+        $keys = implode(',', array_map(static fn($key): string => "`{$key}`", array_keys($data)));
+
         return $this->safequery(
             <<<SQL
-            INSERT INTO {$this->ftable($table)} ({$keys}) VALUES ?;
-            SQL,
+                INSERT INTO {$this->ftable($table)} ({$keys}) VALUES ?;
+                SQL,
             array_values($data),
         );
     }
 
     /**
      * This function was designed to create aggregate INSERT queries of many rows
-     * but is currently only used to insert one row at a time
+     * but is currently only used to insert one row at a time.
+     *
      * @param array<array<mixed>> $tableData
      */
     public function buildInsertQuery(
@@ -193,7 +195,7 @@ class Database
 
     /**
      * @param array<int|string,int|string> $keyValuePairs
-     * @param array<string> $whereParams
+     * @param array<string>                $whereParams
      */
     public function safeupdate(
         string $table,
@@ -266,7 +268,8 @@ class Database
     }
 
     /**
-     * Returns a single record
+     * Returns a single record.
+     *
      * @return array<int|string,mixed>
      */
     public function row(?mysqli_result $mysqliResult = null): ?array
@@ -277,7 +280,8 @@ class Database
     }
 
     /**
-     * Returns multiple records
+     * Returns multiple records.
+     *
      * @return array<int|string,array<int|string,mixed>>
      */
     public function arows(?mysqli_result $mysqliResult = null): array
@@ -346,10 +350,9 @@ class Database
 
         $added_placeholders = 0;
         foreach ($args as $index => $value) {
-
             if (is_array($value)) {
                 $type = implode('', array_map(
-                    fn($subVal) => $this->safequery_typeforvalue($subVal),
+                    fn($subVal): string => $this->safequery_typeforvalue($subVal),
                     $value,
                 ));
 
@@ -402,6 +405,7 @@ class Database
 
     /**
      * Like evalue, but does not quote strings.  For use with safequery().
+     *
      * @param mixed $value
      */
     public function basicvalue($value): int|string
@@ -420,7 +424,7 @@ class Database
     /**
      * @param null|array<mixed>|float|int|string $value
      */
-    public function evalue(null|array|float|int|string $value): string|int
+    public function evalue(null|array|float|int|string $value): int|string
     {
         if (is_array($value)) {
             return $value[0];
@@ -447,7 +451,7 @@ class Database
 
     /**
      * @param array<int,string> $tablenames
-     * @param array<mixed> $args
+     * @param array<mixed>      $args
      */
     public function safespecial(
         string $format,
@@ -470,7 +474,8 @@ class Database
     }
 
     /**
-     * Returns a map of all users online with keys being user ID
+     * Returns a map of all users online with keys being user ID.
+     *
      * @return array<int,array<int|string,int|string>>
      */
     public function getUsersOnline(bool $canViewHiddenMembers = false): array
