@@ -135,6 +135,9 @@ class Database
         return $this->mysqli->insert_id;
     }
 
+    /**
+     * @param array<string,int|float|string> $data
+     */
     public function safeinsert(
         string $table,
         array $data,
@@ -184,18 +187,19 @@ class Database
             }
         }
 
-        foreach ($rows as $rowIndex => $rowData) {
-            $rows[$rowIndex] = implode(',', $rowData);
-        }
+        $values = implode(',', array_map(
+            fn($strRow) => "($strRow)",
+            array_map(fn(array $row) => implode(',', $row), $rows)
+        ));
 
         return "INSERT INTO {$tableName}"
             . ' (' . implode(',', $columnNames) . ')'
-            . ' VALUES (' . implode('),(', $rows) . ');';
+            . " VALUES {$values};";
     }
 
     /**
      * @param array<int|string,int|string> $keyValuePairs
-     * @param array<string>                $whereParams
+     * @param array<string|int>            $whereParams
      */
     public function safeupdate(
         string $table,
@@ -216,7 +220,7 @@ class Database
     }
 
     /**
-     * @param array<int|string,int|string> $keyValuePairs
+     * @param array<string,int|string> $keyValuePairs
      */
     public function safeBuildUpdate(array $keyValuePairs): string
     {
@@ -240,7 +244,7 @@ class Database
     }
 
     /**
-     * @param array<int|string,int|string> $keyValuePairs
+     * @param array<string,int|string> $keyValuePairs
      */
     public function buildUpdate(array $keyValuePairs): string
     {
@@ -268,20 +272,18 @@ class Database
     }
 
     /**
-     * Returns a single record.
-     *
+     * Returns a single record
      * @return array<int|string,mixed>
      */
-    public function row(?mysqli_result $mysqliResult = null): ?array
+    public function arow(?mysqli_result $mysqliResult = null): ?array
     {
-        $row = mysqli_fetch_array($mysqliResult);
-
-        return $row ?: null;
+        return $mysqliResult !== null
+            ? (mysqli_fetch_assoc($mysqliResult) ?: null)
+            : null;
     }
 
     /**
-     * Returns multiple records.
-     *
+     * Returns multiple records
      * @return array<int|string,array<int|string,mixed>>
      */
     public function arows(?mysqli_result $mysqliResult = null): array
@@ -291,16 +293,9 @@ class Database
             : [];
     }
 
-    public function arow(?mysqli_result $mysqliResult = null): ?array
-    {
-        return $mysqliResult !== null
-            ? (mysqli_fetch_assoc($mysqliResult) ?: null)
-            : null;
-    }
-
     public function numRows(?mysqli_result $mysqliResult = null): int|string
     {
-        return $mysqliResult?->num_rows ?? 0;
+        return $mysqliResult->num_rows ?? 0;
     }
 
     public function disposeresult(?mysqli_result $mysqliResult): void
@@ -335,7 +330,7 @@ class Database
     }
 
     /**
-     * @param array<int,mixed> $args
+     * @param array<int,int|string|float|null|array<int|string|float|null>> $args
      */
     public function safequery(
         string $queryString,
@@ -580,7 +575,7 @@ class Database
      * @param int           $resultType   The result type for each row. Should be either
      *                                    `MYSQLI_ASSOC` or `MYSQLI_NUM`
      *
-     * @return array an array of mysqli result rows
+     * @return array<array<int|string,mixed>> an array of mysqli result rows
      */
     private function fetchAll(
         mysqli_result $mysqliResult,

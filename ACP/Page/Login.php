@@ -47,7 +47,7 @@ final readonly class Login
                 'WHERE `name`=?',
                 $user,
             );
-            $member = $this->database->row($result);
+            $member = $this->database->arow($result);
             $user = $member
                 ? $this->user->getUser($member['id'], $password)
                 : null;
