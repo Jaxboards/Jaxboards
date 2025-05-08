@@ -43,8 +43,9 @@ final readonly class RecountStats
             ['id', 'nocount'],
             'forums',
         );
-        while ($f = $this->database->arow($result)) {
-            $pc[$f['id']] = $f['nocount'];
+        $countPostsInForum = [];
+        foreach ($this->database->arows($result) as $forum) {
+            $countPostsInForum[$forum['id']] = !$forum['nocount'];
         }
 
         $result = $this->database->safespecial(
@@ -56,8 +57,7 @@ final readonly class RecountStats
                     t.`fid` AS `fid`
                 FROM %t p
                 LEFT JOIN %t t ON p.`tid`=t.`id`
-                SQL
-            ,
+                SQL,
             ['posts', 'topics'],
         );
         $stat = [
@@ -68,44 +68,34 @@ final readonly class RecountStats
             'topics' => 0,
             'topic_posts' => [],
         ];
-        while ($f = $this->database->arow($result)) {
-            if (!isset($stat['topic_posts'][$f['tid']])) {
-                if (!isset($stat['forum_topics'][$f['fid']])) {
-                    $stat['forum_topics'][$f['fid']] = 0;
+        foreach ($this->database->arows($result) as $post) {
+            if (!isset($stat['topic_posts'][$post['tid']])) {
+                if (!isset($stat['forum_topics'][$post['fid']])) {
+                    $stat['forum_topics'][$post['fid']] = 0;
                 }
 
-                ++$stat['forum_topics'][$f['fid']];
-                if (!isset($stat['forum_posts'][$f['fid']])) {
-                    $stat['forum_posts'][$f['fid']] = 0;
-                }
-
-                if (!isset($stat['topics'])) {
-                    $stat['topics'] = 0;
+                ++$stat['forum_topics'][$post['fid']];
+                if (!isset($stat['forum_posts'][$post['fid']])) {
+                    $stat['forum_posts'][$post['fid']] = 0;
                 }
 
                 ++$stat['topics'];
-                $stat['topic_posts'][$f['tid']] = 0;
+                $stat['topic_posts'][$post['tid']] = 0;
             } else {
-                if (!isset($stat['topic_posts'][$f['tid']])) {
-                    $stat['topic_posts'][$f['tid']] = 0;
+                ++$stat['topic_posts'][$post['tid']];
+                if (!isset($stat['forum_posts'][$post['fid']])) {
+                    $stat['forum_posts'][$post['fid']] = 0;
                 }
 
-                ++$stat['topic_posts'][$f['tid']];
-                if (!isset($stat['forum_posts'][$f['fid']])) {
-                    $stat['forum_posts'][$f['fid']] = 0;
-                }
-
-                ++$stat['forum_posts'][$f['fid']];
+                ++$stat['forum_posts'][$post['fid']];
             }
 
-            if (!$pc[$f['fid']]) {
-                if (!isset($stat['member_posts'][$f['auth_id']])) {
-                    $stat['member_posts'][$f['auth_id']] = 0;
+            if ($countPostsInForum[$post['fid']]) {
+                if (!isset($stat['member_posts'][$post['auth_id']])) {
+                    $stat['member_posts'][$post['auth_id']] = 0;
                 }
 
-                ++$stat['member_posts'][$f['auth_id']];
-            } elseif ($stat['member_posts'][$f['auth_id']] === 0) {
-                $stat['member_posts'][$f['auth_id']] = 0;
+                ++$stat['member_posts'][$post['auth_id']];
             }
 
             if (!isset($stat['posts'])) {
@@ -121,14 +111,14 @@ final readonly class RecountStats
             ['id', 'path', 'cat_id'],
             'forums',
         );
-        while ($f = $this->database->arow($result)) {
-            if (!$f['path']) {
+        foreach ($this->database->arows($result) as $forum) {
+            if (!$forum['path']) {
                 continue;
             }
 
-            foreach (explode(' ', (string) $f['path']) as $fid) {
-                $stat['forum_topics'][$fid] += $stat['forum_topics'][$f['id']] ?? 0;
-                $stat['forum_posts'][$fid] += $stat['forum_posts'][$f['id']] ?? 0;
+            foreach (explode(' ', (string) $forum['path']) as $fid) {
+                $stat['forum_topics'][$fid] += $stat['forum_topics'][$forum['id']] ?? 0;
+                $stat['forum_posts'][$fid] += $stat['forum_posts'][$forum['id']] ?? 0;
             }
         }
 
