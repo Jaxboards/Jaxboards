@@ -263,7 +263,7 @@ class Database
 
         return $mysqliResult !== null
             ? $this->fetchAll($mysqliResult, MYSQLI_ASSOC)
-            : null;
+            : [];
     }
 
     public function arow(?mysqli_result $mysqliResult = null): ?array

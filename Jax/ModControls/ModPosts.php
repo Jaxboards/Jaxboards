@@ -135,7 +135,7 @@ final readonly class ModPosts
         // Build list of topic ids that the posts were in.
         $tids = array_unique(array_map(
             static fn($topic): int => (int) $topic['tid'],
-            $this->database->arows($result) ?? [],
+            $this->database->arows($result),
         ));
 
         if ($trashCanForum !== null) {
@@ -163,7 +163,7 @@ final readonly class ModPosts
             $trashCanForum ? [$trashCanForum['id']] : [],
             array_map(
                 static fn($topic): int => (int) $topic['fid'],
-                $this->database->arows($result) ?? [],
+                $this->database->arows($result),
             ),
         ));
         $this->database->disposeresult($result);
@@ -223,8 +223,7 @@ final readonly class ModPosts
                     FROM %t
                     WHERE `id`=?
                 )
-                SQL
-            ,
+                SQL,
             ['forums', 'topics'],
             $post['tid'],
         );

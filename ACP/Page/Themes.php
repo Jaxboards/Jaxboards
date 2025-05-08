@@ -100,7 +100,7 @@ final readonly class Themes
             'ORDER BY title ASC',
         );
 
-        return $this->database->arows($result) ?? [];
+        return $this->database->arows($result);
     }
 
     /**
@@ -330,7 +330,7 @@ final readonly class Themes
                     [
                         'label' => $wrapper,
                         'selected' => $wrapper === $f['wrapper']
-                        ? 'selected="selected"' : '',
+                            ? 'selected="selected"' : '',
                         'value' => $wrapper,
                     ],
                 );
@@ -383,12 +383,12 @@ final readonly class Themes
                 'themes/show-skin-index-wrapper-row.html',
                 [
                     'delete' => in_array($wrapper, $usedwrappers) ? 'In use'
-                    : $this->page->parseTemplate(
-                        'themes/show-skin-index-wrapper-row-delete.html',
-                        [
-                            'title' => $wrapper,
-                        ],
-                    ),
+                        : $this->page->parseTemplate(
+                            'themes/show-skin-index-wrapper-row-delete.html',
+                            [
+                                'title' => $wrapper,
+                            ],
+                        ),
                     'title' => $wrapper,
                 ],
             );

@@ -264,7 +264,7 @@ final readonly class Forums
         );
         $tree = [];
 
-        $forums = keyBy($this->database->arows($result) ?? [], static fn($forum) => $forum['id']);
+        $forums = keyBy($this->database->arows($result), static fn($forum) => $forum['id']);
         foreach ($forums as $forum) {
             $forums[$forum['id']] = [
                 'mods' => $forum['mods'],
@@ -927,7 +927,7 @@ final readonly class Forums
             ['id', 'title'],
             'categories',
         );
-        $categories = keyBy($this->database->arows($result) ?? [], static fn($category) => $category['id']);
+        $categories = keyBy($this->database->arows($result), static fn($category) => $category['id']);
 
         if (!array_key_exists($catId, $categories)) {
             $error = "The category you're trying to delete does not exist.";

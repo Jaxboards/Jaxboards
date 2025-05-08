@@ -98,10 +98,6 @@ final readonly class RecountStats
                 ++$stat['member_posts'][$post['auth_id']];
             }
 
-            if (!isset($stat['posts'])) {
-                $stat['posts'] = 0;
-            }
-
             ++$stat['posts'];
         }
 
@@ -164,8 +160,8 @@ final readonly class RecountStats
             'COUNT(`id`)',
             'members',
         );
-        $thisrow = $this->database->arow($result);
-        $stat['members'] = array_pop($thisrow);
+        $members = $this->database->arow($result);
+        $stat['members'] = $members ? array_pop($members) : 0;
         $this->database->disposeresult($result);
 
         // Update global board stats.
