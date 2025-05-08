@@ -273,7 +273,7 @@ final readonly class Forums
             ];
             $treeparts = array_filter(
                 explode(' ', (string) $forum['path']),
-                static fn($part): bool => trim((string) $part) !== '',
+                static fn($part): bool => trim($part) !== '',
             );
             array_unshift($treeparts, 'c_' . $forum['cat_id']);
             $intree = &$tree;
