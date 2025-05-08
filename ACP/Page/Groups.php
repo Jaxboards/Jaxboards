@@ -44,7 +44,7 @@ final class Groups
         ]);
 
         $edit = $this->request->get('edit');
-        if (is_string($this->request->get('edit'))) {
+        if (is_string($edit)) {
             $this->create((int) $edit);
 
             return;
