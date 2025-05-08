@@ -197,8 +197,8 @@ class Database
     }
 
     /**
-     * @param array<int|string,int|string> $keyValuePairs
-     * @param array<int|string>            $whereParams
+     * @param array<string,int|float|null|string> $keyValuePairs
+     * @param array<mixed>                        $whereParams
      */
     public function safeupdate(
         string $table,
@@ -219,7 +219,7 @@ class Database
     }
 
     /**
-     * @param array<string,int|string> $keyValuePairs
+     * @param array<string,int|float|null|string> $keyValuePairs
      */
     public function safeBuildUpdate(array $keyValuePairs): string
     {
@@ -243,7 +243,7 @@ class Database
     }
 
     /**
-     * @param array<string,int|string> $keyValuePairs
+     * @param array<string,int|float|null|string> $keyValuePairs
      */
     public function buildUpdate(array $keyValuePairs): string
     {

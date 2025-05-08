@@ -135,7 +135,7 @@ final readonly class Forums
     }
 
     /**
-     * @param array<int,array<int>|int>      $tree
+     * @param array<int|string,array<int>|int>      $tree
      * @param array<int,array<string,mixed>> $forums
      */
     private function printtree(
@@ -593,6 +593,7 @@ final readonly class Forums
 
     /**
      * @param array<string,mixed> $oldForumData
+     * @param array<string,mixed> $write
      *
      * @return string Error on failure, null on success
      */
