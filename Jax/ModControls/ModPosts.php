@@ -160,7 +160,7 @@ final readonly class ModPosts
         // Add trashcan here too.
         $result = $this->database->safeselect(['fid'], 'topics', Database::WHERE_ID_IN, $tids);
         $fids = array_unique(array_merge(
-            $trashCanForum ? [$trashCanForum['id']] : [],
+            $trashCanForum ? [(int) $trashCanForum['id']] : [],
             array_map(
                 static fn($topic): int => (int) $topic['fid'],
                 $this->database->arows($result),

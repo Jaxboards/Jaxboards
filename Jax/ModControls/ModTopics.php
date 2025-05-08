@@ -326,7 +326,7 @@ final readonly class ModTopics
             $this->getModTids(),
         );
         $this->cancel();
-        $fids[] = $this->request->post('id');
+        $fids[] = (int) $this->request->post('id');
         foreach ($fids as $fid) {
             $this->database->fixForumLastPost($fid);
         }

@@ -6,7 +6,7 @@ namespace Jax;
 
 use Carbon\Carbon;
 use Exception;
-use MySQLi;
+use mysqli;
 use mysqli_result;
 
 use function array_keys;
@@ -42,9 +42,7 @@ class Database
 
     public const WHERE_ID_IN = 'WHERE `id` IN ?';
 
-    private ?mysqli_result $mysqliresult = null;
-
-    private MySQLi $mySQLi;
+    private mysqli $mysqli;
 
     private string $prefix = '';
 
@@ -76,14 +74,14 @@ class Database
         string $database = '',
         string $prefix = '',
     ): bool {
-        $this->mySQLi = new MySQLi($host, $user, $password, $database);
+        $this->mysqli = new mysqli($host, $user, $password, $database);
 
         // All datetimes are GMT for jaxboards
-        $this->mySQLi->query("SET time_zone = '+0:00'");
+        $this->mysqli->query("SET time_zone = '+0:00'");
 
         $this->prefix = $prefix;
 
-        return !$this->mySQLi->connect_errno;
+        return !$this->mysqli->connect_errno;
     }
 
     public function setPrefix(string $prefix): void
@@ -103,14 +101,18 @@ class Database
 
     public function error(): string
     {
-        return $this->mySQLi->error;
+        return $this->mysqli->error;
     }
 
     public function affectedRows(): int|string
     {
-        return $this->mySQLi->affected_rows;
+        return $this->mysqli->affected_rows;
     }
 
+    /**
+     * @param array<string>|string $fields list of fields to select, or SQL string
+     * @param array<mixed> $vars
+     */
     public function safeselect(
         array|string $fields,
         string $table,
@@ -130,24 +132,31 @@ class Database
 
     public function insertId(): int|string
     {
-        return $this->mySQLi->insert_id;
+        return $this->mysqli->insert_id;
     }
 
     public function safeinsert(
         string $table,
         array $data,
     ): ?mysqli_result {
-        if ($data !== [] && array_keys($data) !== []) {
-            return $this->safequery(
-                'INSERT INTO ' . $this->ftable($table)
-                    . ' (`' . implode('`, `', array_keys($data)) . '`) VALUES ?;',
-                array_values($data),
-            );
+        if ($data === []) {
+            return null;
         }
 
-        return null;
+        $keys = implode(',', array_map(fn($key) => "`{$key}`", array_keys($data)));
+        return $this->safequery(
+            <<<SQL
+            INSERT INTO {$this->ftable($table)} ({$keys}) VALUES ?;
+            SQL,
+            array_values($data),
+        );
     }
 
+    /**
+     * This function was designed to create aggregate INSERT queries of many rows
+     * but is currently only used to insert one row at a time
+     * @param array<array<mixed>> $tableData
+     */
     public function buildInsertQuery(
         string $tableName,
         array $tableData,
@@ -155,16 +164,12 @@ class Database
         $columnNames = [];
         $rows = [[]];
 
-        if (!isset($tableData[0]) || !is_array($tableData[0])) {
-            $tableData = [$tableData];
-        }
-
         foreach ($tableData as $rowIndex => $row) {
             ksort($row);
             foreach ($row as $columnName => $value) {
                 if (
                     is_string($value)
-                    && mb_check_encoding($value) !== 'UTF-8'
+                    && !mb_check_encoding($value, 'UTF-8')
                 ) {
                     $value = mb_convert_encoding($value, 'UTF-8', 'ISO-8859-1');
                 }
@@ -186,27 +191,34 @@ class Database
             . ' VALUES (' . implode('),(', $rows) . ');';
     }
 
+    /**
+     * @param array<int|string,int|string> $keyValuePairs
+     * @param array<string> $whereParams
+     */
     public function safeupdate(
         string $table,
-        array $kvarray,
+        array $keyValuePairs,
         string $whereFormat = '',
         ...$whereParams,
     ): ?mysqli_result {
-        if ($kvarray === []) {
+        if ($keyValuePairs === []) {
             // Nothing to update.
             return null;
         }
 
-        $keysPrepared = $this->safeBuildUpdate($kvarray);
-        $values = array_values($kvarray);
+        $keysPrepared = $this->safeBuildUpdate($keyValuePairs);
+        $values = array_values($keyValuePairs);
         $query = 'UPDATE ' . $this->ftable($table) . ' SET ' . $keysPrepared . ' ' . $whereFormat;
 
         return $this->safequery($query, ...$values, ...$whereParams);
     }
 
-    public function safeBuildUpdate(array $kvarray): string
+    /**
+     * @param array<int|string,int|string> $keyValuePairs
+     */
+    public function safeBuildUpdate(array $keyValuePairs): string
     {
-        if ($kvarray === []) {
+        if ($keyValuePairs === []) {
             return '';
         }
 
@@ -221,10 +233,13 @@ class Database
 
                 return "`{$key}` = {$value}";
             },
-            array_keys($kvarray),
+            array_keys($keyValuePairs),
         ));
     }
 
+    /**
+     * @param array<int|string,int|string> $keyValuePairs
+     */
     public function buildUpdate(array $keyValuePairs): string
     {
         $updateString = '';
@@ -235,6 +250,9 @@ class Database
         return mb_substr($updateString, 0, -1);
     }
 
+    /**
+     * @param array<mixed> $vars
+     */
     public function safedelete(
         string $table,
         string $whereformat,
@@ -247,20 +265,23 @@ class Database
         return $this->safequery($query, ...$vars);
     }
 
+    /**
+     * Returns a single record
+     * @return array<int|string,mixed>
+     */
     public function row(?mysqli_result $mysqliResult = null): ?array
     {
-        $mysqliResult = $mysqliResult ?: $this->mysqliresult;
-
         $row = mysqli_fetch_array($mysqliResult);
 
         return $row ?: null;
     }
 
-    // Only new-style mysqli.
+    /**
+     * Returns multiple records
+     * @return array<int|string,array<int|string,mixed>>
+     */
     public function arows(?mysqli_result $mysqliResult = null): array
     {
-        $mysqliResult = $mysqliResult ?: $this->mysqliresult;
-
         return $mysqliResult !== null
             ? $this->fetchAll($mysqliResult, MYSQLI_ASSOC)
             : [];
@@ -268,17 +289,13 @@ class Database
 
     public function arow(?mysqli_result $mysqliResult = null): ?array
     {
-        $mysqliResult = $mysqliResult ?: $this->mysqliresult;
-
         return $mysqliResult !== null
-            ? mysqli_fetch_assoc($mysqliResult)
+            ? (mysqli_fetch_assoc($mysqliResult) ?: null)
             : null;
     }
 
     public function numRows(?mysqli_result $mysqliResult = null): int|string
     {
-        $mysqliResult = $mysqliResult ?: $this->mysqliresult;
-
         return $mysqliResult?->num_rows ?? 0;
     }
 
@@ -287,23 +304,8 @@ class Database
         $mysqliResult?->free();
     }
 
-    // Warning: nested arrays are *not* supported.
-    public function safequery_array_types($items): string
+    public function safequery_typeforvalue(int|string $value): string
     {
-        $ret = '';
-        foreach ($items as $item) {
-            $ret .= $this->safequery_typeforvalue($item);
-        }
-
-        return $ret;
-    }
-
-    public function safequery_typeforvalue($value): string
-    {
-        if (is_array($value)) {
-            return 'a';
-        }
-
         if (is_int($value)) {
             return 'i';
         }
@@ -313,11 +315,11 @@ class Database
 
     // Blah ?1 blah ?2 blah ?3 blah
     public function safequery_sub_array(
-        $queryString,
-        $placeholderNumber,
-        $arrlen,
+        string $queryString,
+        int $placeholderNumber,
+        int $arrlen,
     ): string {
-        $arr = explode('?', (string) $queryString, $placeholderNumber + 2);
+        $arr = explode('?', $queryString, $placeholderNumber + 2);
         $last = array_pop($arr);
         $replacement = '';
 
@@ -328,6 +330,9 @@ class Database
         return implode('?', $arr) . $replacement . $last;
     }
 
+    /**
+     * @param array<int,mixed> $args
+     */
     public function safequery(
         string $queryString,
         ...$args,
@@ -341,10 +346,14 @@ class Database
 
         $added_placeholders = 0;
         foreach ($args as $index => $value) {
-            $type = $this->safequery_typeforvalue($value);
 
-            if ($type === 'a') {
-                $type = $this->safequery_array_types($value);
+            if (is_array($value)) {
+                $type = implode('', array_map(
+                    fn($subVal) => $this->safequery_typeforvalue($subVal),
+                    $value,
+                ));
+
+                $typeString .= $type;
 
                 $compiledQueryString = $this->safequery_sub_array(
                     $compiledQueryString,
@@ -357,14 +366,15 @@ class Database
                 foreach ($value as $singleValue) {
                     $outArgs[] = $singleValue ?? '';
                 }
-            } else {
-                $outArgs[] = $value;
+
+                continue;
             }
 
-            $typeString .= $type;
+            $typeString .= $this->safequery_typeforvalue($value);
+            $outArgs[] = $value;
         }
 
-        $stmt = $this->mySQLi->prepare($compiledQueryString);
+        $stmt = $this->mysqli->prepare($compiledQueryString);
 
         $this->debugLog->log($compiledQueryString, 'Queries');
 
@@ -390,8 +400,11 @@ class Database
         return '`' . $this->escape($key) . '`';
     }
 
-    // Like evalue, but does not quote strings.  For use with safequery().
-    public function basicvalue($value)
+    /**
+     * Like evalue, but does not quote strings.  For use with safequery().
+     * @param mixed $value
+     */
+    public function basicvalue($value): int|string
     {
         if (is_array($value)) {
             return $value[0];
@@ -404,7 +417,10 @@ class Database
         return $value;
     }
 
-    public function evalue(null|array|float|int|string $value)
+    /**
+     * @param null|array<mixed>|float|int|string $value
+     */
+    public function evalue(null|array|float|int|string $value): string|int
     {
         if (is_array($value)) {
             return $value[0];
@@ -419,9 +435,9 @@ class Database
             : "'" . $this->escape((string) $value) . "'";
     }
 
-    public function escape(string $a): string
+    public function escape(string $string): string
     {
-        return $this->mySQLi->real_escape_string($a);
+        return $this->mysqli->real_escape_string($string);
     }
 
     public function datetime(?int $timestamp = null): string
@@ -429,6 +445,10 @@ class Database
         return gmdate('Y-m-d H:i:s', $timestamp);
     }
 
+    /**
+     * @param array<int,string> $tablenames
+     * @param array<mixed> $args
+     */
     public function safespecial(
         string $format,
         array $tablenames,
@@ -449,7 +469,11 @@ class Database
         return $this->safequery($newformat, ...$args);
     }
 
-    public function getUsersOnline(bool $canViewHiddenMembers = false)
+    /**
+     * Returns a map of all users online with keys being user ID
+     * @return array<int,array<int|string,int|string>>
+     */
+    public function getUsersOnline(bool $canViewHiddenMembers = false): array
     {
         static $usersOnlineCache = null;
         if ($usersOnlineCache) {
@@ -509,7 +533,7 @@ class Database
         return $usersOnlineCache;
     }
 
-    public function fixForumLastPost($forumId): void
+    public function fixForumLastPost(int $forumId): void
     {
         $result = $this->safeselect(
             [
@@ -540,18 +564,18 @@ class Database
     public function fixAllForumLastPosts(): void
     {
         $query = $this->safeselect(['id'], 'forums');
-        array_map(fn($forum) => $this->fixForumLastPost($forum['id']), $this->arows($query));
+        array_map(fn($forum) => $this->fixForumLastPost((int) $forum['id']), $this->arows($query));
     }
 
     /**
      * A function to deal with the `mysqli_fetch_all` function only exiting
-     * for the `mysqlnd` driver. Fetches all rows from a MySQLi query result.
+     * for the `mysqlnd` driver. Fetches all rows from a mysqli query result.
      *
      * @param mysqli_result $mysqliResult the result you wish to fetch all rows from
      * @param int           $resultType   The result type for each row. Should be either
-     *                                    `MYSQLI_ASSOC`, `MYSQLI_NUM`, or `MYSQLI_BOTH`
+     *                                    `MYSQLI_ASSOC` or `MYSQLI_NUM`
      *
-     * @return array an array of MySQLi result rows
+     * @return array an array of mysqli result rows
      */
     private function fetchAll(
         mysqli_result $mysqliResult,
