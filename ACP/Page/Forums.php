@@ -135,8 +135,8 @@ final readonly class Forums
     }
 
     /**
-     * @param array<int|string,array<int>|int>      $tree
-     * @param array<int,array<string,mixed>> $forums
+     * @param array<int|string,array<int>|int> $tree
+     * @param array<int,array<string,mixed>>   $forums
      */
     private function printtree(
         array $tree,
