@@ -24,7 +24,6 @@ use function mb_check_encoding;
 use function mb_convert_encoding;
 use function mb_strlen;
 use function mb_substr;
-use function mysqli_fetch_array;
 use function mysqli_fetch_assoc;
 use function str_repeat;
 use function str_replace;
@@ -136,7 +135,7 @@ class Database
     }
 
     /**
-     * @param array<string,int|float|string> $data
+     * @param array<string,float|int|string> $data
      */
     public function safeinsert(
         string $table,
@@ -188,8 +187,8 @@ class Database
         }
 
         $values = implode(',', array_map(
-            fn($strRow) => "($strRow)",
-            array_map(fn(array $row) => implode(',', $row), $rows)
+            static fn($strRow): string => "({$strRow})",
+            array_map(static fn(array $row): string => implode(',', $row), $rows),
         ));
 
         return "INSERT INTO {$tableName}"
@@ -199,7 +198,7 @@ class Database
 
     /**
      * @param array<int|string,int|string> $keyValuePairs
-     * @param array<string|int>            $whereParams
+     * @param array<int|string>            $whereParams
      */
     public function safeupdate(
         string $table,
@@ -272,7 +271,8 @@ class Database
     }
 
     /**
-     * Returns a single record
+     * Returns a single record.
+     *
      * @return array<int|string,mixed>
      */
     public function arow(?mysqli_result $mysqliResult = null): ?array
@@ -283,7 +283,8 @@ class Database
     }
 
     /**
-     * Returns multiple records
+     * Returns multiple records.
+     *
      * @return array<int|string,array<int|string,mixed>>
      */
     public function arows(?mysqli_result $mysqliResult = null): array
@@ -330,7 +331,7 @@ class Database
     }
 
     /**
-     * @param array<int,int|string|float|null|array<int|string|float|null>> $args
+     * @param array<int,null|array<null|float|int|string>|float|int|string> $args
      */
     public function safequery(
         string $queryString,
