@@ -68,10 +68,12 @@ final readonly class Forums
             'edit' => match (true) {
                 is_numeric($edit) => $this->createForum((int) $edit),
                 $categoryEdit !== null => $this->createCategory($categoryEdit),
+                default => null
             },
             'delete' => match (true) {
                 is_numeric($delete) => $this->deleteForum((int) $delete),
                 $categoryDelete !== null => $this->deleteCategory($categoryDelete),
+                default => null
             },
             'order' => $this->orderForums(),
             'create' => $this->createForum(),
@@ -89,14 +91,10 @@ final readonly class Forums
      * @param int    $order where the tree is place n the database
      */
     private function mysqltree(
-        $tree,
+        array $tree,
         string $path = '',
         float|int $order = 0,
     ): void {
-        if (!is_array($tree)) {
-            return;
-        }
-
         foreach ($tree as $key => $value) {
             $key = mb_substr($key, 1);
             ++$order;
@@ -136,91 +134,95 @@ final readonly class Forums
         }
     }
 
+    /**
+     * @param array<int,int|array<int>>
+     * @param array<int,array<string,mixed>> $forums
+     */
     private function printtree(
-        $tree,
-        $data,
-        $class = false,
-        $highlight = 0,
+        array $tree,
+        array $forums,
+        ?string $class = null,
+        int $highlight = 0,
     ): string {
         $html = '';
-        if (count($tree) > 0) {
-            foreach ($tree as $id => $children) {
-                if (!isset($data[$id])) {
-                    continue;
-                }
+        if (count($tree) <= 0) {
+            return '';
+        }
 
-                if (!is_array($data[$id])) {
-                    continue;
-                }
+        foreach ($tree as $id => $children) {
+            if (!isset($forums[$id])) {
+                continue;
+            }
 
-                $classes = [];
-                $classes[] = is_string($id) && $id[0] === 'c'
-                    ? 'parentlock'
-                    : 'nofirstlevel';
+            if (!is_array($forums[$id])) {
+                continue;
+            }
 
-                if ($highlight && $id === $highlight) {
-                    $classes[] = 'highlight';
-                }
+            $classes = [];
+            $classes[] = is_string($id) && $id[0] === 'c'
+                ? 'parentlock'
+                : 'nofirstlevel';
 
-                $classes = implode(' ', $classes);
-                $trashcan = isset($data[$id]['trashcan']) && $data[$id]['trashcan'] ? $this->page->parseTemplate(
-                    'forums/order-forums-tree-item-trashcan.html',
-                ) : '';
+            if ($highlight && $id === $highlight) {
+                $classes[] = 'highlight';
+            }
 
-                if (
-                    isset($data[$id]['mods'])
-                    && is_array($data[$id]['mods'])
-                    && !empty($data[$id]['mods'])
-                ) {
-                    $modCount = count(explode(',', $data[$id]['mods']));
-                    $mods = $this->page->parseTemplate(
-                        'forums/order-forums-tree-item-mods.html',
-                        [
-                            'content' => 'moderator' . ($modCount === 1 ? '' : 's'),
-                            'mod_count' => $modCount,
-                        ],
-                    );
-                } else {
-                    $mods = '';
-                }
+            $classes = implode(' ', $classes);
+            $trashcan = isset($forums[$id]['trashcan']) && $forums[$id]['trashcan'] ? $this->page->parseTemplate(
+                'forums/order-forums-tree-item-trashcan.html',
+            ) : '';
 
-                $content = '';
-                if (is_array($children)) {
-                    $content = '' . $this->printtree(
-                        $children,
-                        $data,
-                        '',
-                        $highlight,
-                    );
-                }
-
-                $title = $data[$id]['title'];
-                $html .= $this->page->parseTemplate(
-                    'forums/order-forums-tree-item.html',
+            if (
+                isset($forums[$id]['mods'])
+                && is_array($forums[$id]['mods'])
+                && !empty($forums[$id]['mods'])
+            ) {
+                $modCount = count(explode(',', $forums[$id]['mods']));
+                $mods = $this->page->parseTemplate(
+                    'forums/order-forums-tree-item-mods.html',
                     [
-                        'class' => $classes,
-                        'content' => $content,
-                        'id' => $id,
-                        'mods' => $mods,
-                        'title' => $title,
-                        'trashcan' => $trashcan,
+                        'content' => 'moderator' . ($modCount === 1 ? '' : 's'),
+                        'mod_count' => $modCount,
                     ],
+                );
+            } else {
+                $mods = '';
+            }
+
+            $content = '';
+            if (is_array($children)) {
+                $content = '' . $this->printtree(
+                    $children,
+                    $forums,
+                    '',
+                    $highlight,
                 );
             }
 
-            return $this->page->parseTemplate(
-                'forums/order-forums-tree.html',
+            $title = $forums[$id]['title'];
+            $html .= $this->page->parseTemplate(
+                'forums/order-forums-tree-item.html',
                 [
-                    'class' => $class ?: '',
-                    'content' => $html,
+                    'class' => $classes,
+                    'content' => $content,
+                    'id' => $id,
+                    'mods' => $mods,
+                    'title' => $title,
+                    'trashcan' => $trashcan,
                 ],
             );
         }
 
-        return '';
+        return $this->page->parseTemplate(
+            'forums/order-forums-tree.html',
+            [
+                'class' => $class ?: '',
+                'content' => $html,
+            ],
+        );
     }
 
-    private function orderForums(int|string $highlight = 0): void
+    private function orderForums(int $highlight = 0): void
     {
         $page = '';
         if ($highlight) {
@@ -229,7 +231,7 @@ final readonly class Forums
             );
         }
 
-        if ($this->request->post('tree') !== null) {
+        if (is_string($this->request->post('tree'))) {
             self::mysqltree(json_decode((string) $this->request->post('tree'), true));
             if ($this->request->get('do') === 'create') {
                 return;
@@ -262,27 +264,22 @@ final readonly class Forums
         );
         $tree = [];
 
-        $forums = keyBy($this->database->arows($result), static fn($forum) => $forum['id']);
+        $forums = keyBy($this->database->arows($result) ?? [], static fn($forum) => $forum['id']);
         foreach ($forums as $forum) {
             $forums[$forum['id']] = [
                 'mods' => $forum['mods'],
                 'title' => $forum['title'],
                 'trashcan' => $forum['trashcan'],
             ];
-            $treeparts = explode(' ', (string) $forum['path']);
+            $treeparts = array_filter(
+                explode(' ', (string) $forum['path']),
+                fn($part) => trim($part) !== ''
+            );
             array_unshift($treeparts, 'c_' . $forum['cat_id']);
             $intree = &$tree;
             foreach ($treeparts as $treePart) {
-                if (trim($treePart) === '') {
-                    continue;
-                }
-
-                if (trim($treePart) === '0') {
-                    continue;
-                }
-
                 if (
-                    !isset($intree[$treePart])
+                    !array_key_exists($treePart, $intree)
                     || !is_array($intree[$treePart])
                 ) {
                     $intree[$treePart] = [];
@@ -291,7 +288,7 @@ final readonly class Forums
                 $intree = &$intree[$treePart];
             }
 
-            if (isset($intree[$forum['id']]) && $intree[$forum['id']]) {
+            if (array_key_exists($forum['id'], $intree)) {
                 continue;
             }
 
@@ -307,16 +304,10 @@ final readonly class Forums
             'categories',
             'ORDER BY `order`,`id` ASC',
         );
-        $categories = [];
-        while ($category = $this->database->arow($result)) {
-            $forums['c_' . $category['id']] = ['title' => $category['title']];
-            $categories[] = $category['id'];
-        }
-
-        $this->database->disposeresult($result);
-
+        $categories = $this->database->arows($result);
         foreach ($categories as $category) {
-            $sortedtree['c_' . $category] = $tree['c_' . $category] ?? null;
+            $forums['c_' . $category['id']] = ['title' => $category['title']];
+            $sortedtree['c_' . $category['id']] = $tree['c_' . $category['id']] ?? null;
         }
 
         $page .= $this->printtree(
@@ -384,7 +375,7 @@ final readonly class Forums
         // Remove mod from forum.
         if (
             is_numeric($this->request->both('rmod'))
-            && $forum['mods']
+            && $forum && $forum['mods']
         ) {
             $exploded = explode(',', (string) $forum['mods']);
             unset($exploded[array_search($this->request->both('rmod'), $exploded, true)]);
@@ -578,7 +569,7 @@ final readonly class Forums
             'forums/create-forum-moderators.html',
             [
                 'mod_list' => $modList,
-                'show_ledby' => $forum['show_ledby']
+                'show_ledby' => $forum && $forum['show_ledby']
                     ? 'checked="checked"' : '',
             ],
         );
@@ -601,6 +592,7 @@ final readonly class Forums
     }
 
     /**
+     * @param array<string,mixed> $oldForumData
      * @return string Error on failure, null on success
      */
     private function upsertForum(?array $oldForumData, array $write): ?string
@@ -652,7 +644,7 @@ final readonly class Forums
                     $write,
                 );
 
-                $this->orderForums($this->database->insertId());
+                $this->orderForums((int) $this->database->insertId());
 
                 return null;
             }
@@ -708,18 +700,24 @@ final readonly class Forums
     private function getFormData(?array $forum): array
     {
         $sub = (int) $this->request->post('show_sub');
-        if (is_numeric($this->request->post('orderby'))) {
-            $orderby = (int) $this->request->post('orderby');
-        }
+        $orderby = (int) $this->request->post('orderby');
 
         $result = $this->database->safeselect(
             ['id'],
             'categories',
         );
-        $thisrow = $this->database->arow($result);
+        $firstCategory = $this->database->arow($result);
+        $this->database->disposeresult($result);
+
+        // This is a weird state where they're trying to add a forum
+        // with no categories defined. It needs better handling than this.
+        // But is clearly an edge case.
+        if (!$firstCategory) {
+            return [];
+        }
 
         return [
-            'cat_id' => $forum['cat_id'] ?? null ?: array_pop($thisrow),
+            'cat_id' => $forum['cat_id'] ?? null ?: $firstCategory['id'],
             'mods' => $forum['mods'] ?? null,
             'nocount' => $this->request->post('nocount') ? 1 : 0,
             'orderby' => $orderby > 0 && $orderby <= 5 ? $orderby : 0,
@@ -850,7 +848,7 @@ final readonly class Forums
         );
     }
 
-    private function createCategory($cid = false): void
+    private function createCategory(?int $cid = null): void
     {
         $page = '';
         $cdata = [];
@@ -869,13 +867,14 @@ final readonly class Forums
             $this->database->disposeresult($result);
         }
 
+        $categoryName = $this->request->post('cat_name');
         if ($this->request->post('submit') !== null) {
             if (
-                trim($this->request->post('cat_name') ?? '') === ''
+                !is_string($categoryName) || trim($categoryName ?? '') === ''
             ) {
                 $page .= $this->page->error('All fields required');
             } else {
-                $data = ['title' => $this->request->post('cat_name')];
+                $data = ['title' => $categoryName];
                 if (!empty($cdata)) {
                     $this->database->safeupdate(
                         'categories',
@@ -927,24 +926,24 @@ final readonly class Forums
             ['id', 'title'],
             'categories',
         );
-        $categories = keyBy($this->database->arows($result), static fn($category) => $category['id']);
-        $this->database->disposeresult($result);
+        $categories = keyBy($this->database->arows($result) ?? [], static fn($category) => $category['id']);
 
         if (!array_key_exists($catId, $categories)) {
             $error = "The category you're trying to delete does not exist.";
         }
 
+        $moveTo = (int) $this->request->post('moveto');
         if (
             $error === null
             && $this->request->post('submit') !== null
         ) {
-            if (!isset($categories[$this->request->post('moveto')])) {
+            if (!isset($categories[$moveTo])) {
                 $error = 'Invalid category to move forums to.';
             } else {
                 $this->database->safeupdate(
                     'forums',
                     [
-                        'cat_id' => $this->request->post('moveto'),
+                        'cat_id' => $moveTo,
                     ],
                     'WHERE `cat_id`=?',
                     $this->database->basicvalue($catId),
@@ -1028,7 +1027,7 @@ final readonly class Forums
         );
     }
 
-    private function checkbox($checkId, string $name, $checked): string
+    private function checkbox(int|string $checkId, string $name, bool|int $checked): string
     {
         return $this->page->parseTemplate(
             'forums/create-forum-permissions-row-checkbox.html',
