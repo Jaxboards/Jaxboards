@@ -18,6 +18,7 @@ use function count;
 use function explode;
 use function filter_var;
 use function implode;
+use function is_array;
 use function is_numeric;
 use function is_string;
 use function mb_strlen;
@@ -372,7 +373,7 @@ final class Groups
             $error = match (true) {
                 !$groupName => 'Group name required!',
                 mb_strlen($groupName) > 250 => 'Group name must not exceed 250 characters!',
-                mb_strlen($groupIcon) > 250 => 'Group icon must not exceed 250 characters!',
+                mb_strlen((string) $groupIcon) > 250 => 'Group icon must not exceed 250 characters!',
                 $groupIcon && !filter_var($groupIcon, FILTER_VALIDATE_URL) => 'Group icon must be a valid image url',
                 default => null,
             };

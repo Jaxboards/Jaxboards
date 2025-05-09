@@ -306,35 +306,6 @@ class Database
     }
 
     /**
-     * See: https://www.php.net/manual/en/mysqli-stmt.bind-param.php.
-     */
-    private function safeQueryTypeForValue(int|float|string|null $value): string
-    {
-        return match (true) {
-            is_int($value) => 'i',
-            is_float($value) => 'd',
-            default => 's',
-        };
-    }
-
-    // Blah ?1 blah ?2 blah ?3 blah
-    private function safeQuerySubArray(
-        string $queryString,
-        int $placeholderNumber,
-        int $arrlen,
-    ): string {
-        $arr = explode('?', $queryString, $placeholderNumber + 2);
-        $last = array_pop($arr);
-        $replacement = '';
-
-        if ($arrlen > 0) {
-            $replacement = '(' . str_repeat('?, ', $arrlen - 1) . ' ?)';
-        }
-
-        return implode('?', $arr) . $replacement . $last;
-    }
-
-    /**
      * @param null|array<null|float|int|string>|float|int|string $args
      */
     public function safequery(
@@ -570,6 +541,36 @@ class Database
     {
         $query = $this->safeselect(['id'], 'forums');
         array_map(fn($forum) => $this->fixForumLastPost((int) $forum['id']), $this->arows($query));
+    }
+
+    /**
+     * See: https://www.php.net/manual/en/mysqli-stmt.bind-param.php.
+     */
+    private function safeQueryTypeForValue(
+        null|float|int|string $value,
+    ): string {
+        return match (true) {
+            is_int($value) => 'i',
+            is_float($value) => 'd',
+            default => 's',
+        };
+    }
+
+    // Blah ?1 blah ?2 blah ?3 blah
+    private function safeQuerySubArray(
+        string $queryString,
+        int $placeholderNumber,
+        int $arrlen,
+    ): string {
+        $arr = explode('?', $queryString, $placeholderNumber + 2);
+        $last = array_pop($arr);
+        $replacement = '';
+
+        if ($arrlen > 0) {
+            $replacement = '(' . str_repeat('?, ', $arrlen - 1) . ' ?)';
+        }
+
+        return implode('?', $arr) . $replacement . $last;
     }
 
     /**
