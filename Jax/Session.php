@@ -131,11 +131,9 @@ final class Session
     }
 
     /**
-     * @param int|?string $sid
-     *
      * @return array<string,mixed>
      */
-    public function fetchSessionData($sid = null): array
+    public function fetchSessionData(int|string|null $sid = null): array
     {
         $session = null;
         $botName = $this->getBotName();
@@ -261,7 +259,7 @@ final class Session
         unset($this->changedData[$fieldName]);
     }
 
-    public function clean($uid): bool
+    public function clean(int|string|null $uid): bool
     {
         $timeago = Carbon::now()->getTimestamp() - $this->config->getSetting('timetologout');
         if (!is_numeric($uid) || $uid < 1) {
@@ -294,7 +292,7 @@ final class Session
             $this->set('read_date', $lastAction ?: 0);
         }
 
-        $yesterday = mktime(0, 0, 0);
+        $yesterday = mktime(0, 0, 0) ?: 0;
         $query = $this->database->safeselect(
             [
                 'uid',
@@ -324,8 +322,7 @@ final class Session
             <<<'SQL'
                 WHERE `last_update`<?
                     OR (`uid` IS NULL AND `last_update`<?)
-                SQL
-            ,
+                SQL,
             $this->database->datetime($yesterday),
             $this->database->datetime($timeago),
         );
@@ -396,6 +393,9 @@ final class Session
         );
     }
 
+    /**
+     * @param list<string> $match
+     */
     public function addSessIDCB(array $match): string
     {
         if ($match[1][0] === '?') {

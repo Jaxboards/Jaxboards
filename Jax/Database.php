@@ -136,7 +136,7 @@ class Database
     }
 
     /**
-     * @param array<string,float|int|string> $data
+     * @param array<string,float|int|string|null> $data
      */
     public function safeinsert(
         string $table,
@@ -274,7 +274,7 @@ class Database
     /**
      * Returns a single record.
      *
-     * @return array<int|string,mixed>
+     * @return array<string,mixed>
      */
     public function arow(?mysqli_result $mysqliResult = null): ?array
     {
