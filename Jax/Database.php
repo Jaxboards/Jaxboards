@@ -110,7 +110,7 @@ class Database
 
     /**
      * @param array<string>|string $fields list of fields to select, or SQL string
-     * @param array<mixed>         $vars
+     * @param mixed                $vars
      */
     public function safeselect(
         array|string $fields,
@@ -198,7 +198,7 @@ class Database
 
     /**
      * @param array<string,null|float|int|string> $keyValuePairs
-     * @param array<mixed>                        $whereParams
+     * @param mixed                               $whereParams
      */
     public function safeupdate(
         string $table,
@@ -256,7 +256,7 @@ class Database
     }
 
     /**
-     * @param array<mixed> $vars
+     * @param mixed $vars
      */
     public function safedelete(
         string $table,
@@ -304,13 +304,16 @@ class Database
         $mysqliResult?->free();
     }
 
-    public function safequery_typeforvalue(int|string $value): string
+    /**
+     * See: https://www.php.net/manual/en/mysqli-stmt.bind-param.php
+     */
+    public function safequery_typeforvalue(int|float|string|null $value): string
     {
-        if (is_int($value)) {
-            return 'i';
-        }
-
-        return 's';
+        return match (true) {
+            is_int($value) => 'i',
+            is_float($value) => 'd',
+            default => 's',
+        };
     }
 
     // Blah ?1 blah ?2 blah ?3 blah
@@ -331,7 +334,7 @@ class Database
     }
 
     /**
-     * @param array<int,null|array<null|float|int|string>|float|int|string> $args
+     * @param null|float|int|string|array<null|float|int|string> $args
      */
     public function safequery(
         string $queryString,
@@ -356,7 +359,7 @@ class Database
 
                 $compiledQueryString = $this->safequery_sub_array(
                     $compiledQueryString,
-                    $index + $added_placeholders,
+                    ((int) $index) + $added_placeholders,
                     mb_strlen($type),
                 );
 
@@ -447,7 +450,7 @@ class Database
 
     /**
      * @param array<int,string> $tablenames
-     * @param array<mixed>      $args
+     * @param mixed       $args
      */
     public function safespecial(
         string $format,
