@@ -136,7 +136,7 @@ class Database
     }
 
     /**
-     * @param array<string,float|int|string|null> $data
+     * @param array<string,null|float|int|string> $data
      */
     public function safeinsert(
         string $table,

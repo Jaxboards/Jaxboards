@@ -133,7 +133,7 @@ final class Session
     /**
      * @return array<string,mixed>
      */
-    public function fetchSessionData(int|string|null $sid = null): array
+    public function fetchSessionData(null|int|string $sid = null): array
     {
         $session = null;
         $botName = $this->getBotName();
@@ -259,7 +259,7 @@ final class Session
         unset($this->changedData[$fieldName]);
     }
 
-    public function clean(int|string|null $uid): bool
+    public function clean(null|int|string $uid): bool
     {
         $timeago = Carbon::now()->getTimestamp() - $this->config->getSetting('timetologout');
         if (!is_numeric($uid) || $uid < 1) {
