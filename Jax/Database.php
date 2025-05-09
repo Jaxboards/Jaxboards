@@ -17,6 +17,7 @@ use function explode;
 use function gmdate;
 use function implode;
 use function is_array;
+use function is_float;
 use function is_int;
 use function is_string;
 use function ksort;
@@ -305,10 +306,11 @@ class Database
     }
 
     /**
-     * See: https://www.php.net/manual/en/mysqli-stmt.bind-param.php
+     * See: https://www.php.net/manual/en/mysqli-stmt.bind-param.php.
      */
-    public function safequery_typeforvalue(int|float|string|null $value): string
-    {
+    public function safequery_typeforvalue(
+        null|float|int|string $value,
+    ): string {
         return match (true) {
             is_int($value) => 'i',
             is_float($value) => 'd',
@@ -334,7 +336,7 @@ class Database
     }
 
     /**
-     * @param null|float|int|string|array<null|float|int|string> $args
+     * @param null|array<null|float|int|string>|float|int|string $args
      */
     public function safequery(
         string $queryString,
@@ -450,7 +452,7 @@ class Database
 
     /**
      * @param array<int,string> $tablenames
-     * @param mixed       $args
+     * @param mixed             $args
      */
     public function safespecial(
         string $format,

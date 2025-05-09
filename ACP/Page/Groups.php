@@ -154,7 +154,8 @@ final class Groups
 
     /**
      * @param null|list<int> $groupIds
-     * @return array<array<string,string|int|null>>
+     *
+     * @return array<array<string,null|int|string>>
      */
     private function fetchGroups(?array $groupIds): array
     {
