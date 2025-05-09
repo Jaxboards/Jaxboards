@@ -36,7 +36,7 @@ final class IPAddress
         $this->getBannedIps();
     }
 
-    public function asBinary(?string $ipAddress = null): false|string
+    public function asBinary(?string $ipAddress = null): ?string
     {
         if (!$ipAddress) {
             $ipAddress = self::getIp();
@@ -44,10 +44,10 @@ final class IPAddress
 
         if (!filter_var($ipAddress, FILTER_VALIDATE_IP)) {
             // Not an IP, so don't need to send anything back.
-            return '';
+            return null;
         }
 
-        return inet_pton($ipAddress);
+        return inet_pton($ipAddress) ?: null;
     }
 
     // This comment suggests MySQL's aton is different from php's pton, so
@@ -137,8 +137,7 @@ final class IPAddress
                 SELECT COUNT(`ip`) as `banned`
                     FROM `banlist`
                     WHERE ip = ?
-                SQL
-            ,
+                SQL,
             [],
             $this->database->basicvalue(self::asBinary($ipAddress)),
         );

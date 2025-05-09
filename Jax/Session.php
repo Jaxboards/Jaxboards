@@ -394,7 +394,7 @@ final class Session
     }
 
     /**
-     * @param list<string> $match
+     * @param array<string> $match
      */
     public function addSessIDCB(array $match): string
     {
