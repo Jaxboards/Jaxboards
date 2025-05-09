@@ -399,8 +399,6 @@ final class ServiceInstall
                 ],
             );
 
-            echo $this->database->error();
-
             mkdir(dirname(__DIR__) . '/boards');
             $this->fileUtils->copyDirectory($this->blueprint->getDirectory(), dirname(__DIR__) . '/boards/' . $board);
         }

@@ -76,8 +76,6 @@ final readonly class ModTopics
             $this->database->disposeresult($result);
 
             if (!$mods) {
-                $this->page->command('error', $this->database->error());
-
                 return;
             }
 

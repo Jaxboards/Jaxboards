@@ -124,8 +124,7 @@ final class Forum
                 LEFT JOIN %t c
                     ON f.`cat_id`=c.`id`
                 WHERE f.`id`=? LIMIT 1
-                SQL
-            ,
+                SQL,
             ['forums', 'categories'],
             $fid,
         );
@@ -133,7 +132,6 @@ final class Forum
         $this->database->disposeresult($result);
 
         if (!$fdata) {
-            $this->page->command('alert', $this->database->error());
             $this->page->location('?');
 
             return;
@@ -146,8 +144,7 @@ final class Forum
                     UPDATE %t
                     SET `redirects` = `redirects` + 1
                     WHERE `id`=?
-                    SQL
-                ,
+                    SQL,
                 ['forums'],
                 $this->database->basicvalue($fid),
             );
@@ -206,8 +203,7 @@ final class Forum
                 WHERE f.`path`=?
                     OR f.`path` LIKE ?
                 ORDER BY f.`order`
-                SQL
-            ,
+                SQL,
             ['forums', 'members'],
             $fid,
             "% {$fid}",
@@ -278,10 +274,10 @@ final class Forum
         // Buttons.
         $forumbuttons = '&nbsp;'
             . ($fdata['perms']['start'] ? '<a href="?act=post&amp;fid=' . $fid . '">'
-            . $this->template->meta(
-                $this->template->metaExists('button-newtopic')
-                ? 'button-newtopic' : 'forum-button-newtopic',
-            ) . '</a>' : '');
+                . $this->template->meta(
+                    $this->template->metaExists('button-newtopic')
+                        ? 'button-newtopic' : 'forum-button-newtopic',
+                ) . '</a>' : '');
         $page .= $this->template->meta(
             'forum-pages-top',
             $forumpages,
@@ -337,8 +333,7 @@ final class Forum
                     ON t.`lp_uid` = m.`id`
                 LEFT JOIN %t m2
                 ON t.`auth_id` = m2.`id`
-                EOT
-            ,
+                EOT,
             ['topics', 'members', 'members'],
             $fid,
             $this->pageNumber * $this->numperpage,
@@ -381,7 +376,7 @@ final class Forum
                 $forum['summary'] ? $forum['summary'] . (mb_strlen((string) $forum['summary']) > 45 ? '...' : '') : '',
                 // 10
                 $this->user->getPerm('can_moderate') ? '<a href="?act=modcontrols&do=modt&tid='
-                . $forum['id'] . '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>' : '',
+                    . $forum['id'] . '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>' : '',
                 // 11
                 $pages,
                 // 12
@@ -391,10 +386,10 @@ final class Forum
                     $this->template->meta('topic-icon-read')
                     ?: $this->template->meta('icon-read')
                 )
-                : (
-                    $this->template->meta('topic-icon-unread')
-                    ?: $this->template->meta('icon-read')
-                ),
+                    : (
+                        $this->template->meta('topic-icon-unread')
+                        ?: $this->template->meta('icon-read')
+                    ),
                 // 14
             );
             if ($read) {
@@ -423,7 +418,7 @@ final class Forum
             if ($fdata['perms']['start']) {
                 $table = $this->page->error(
                     "This forum is empty! Don't like it? "
-                    . "<a href='?act=post&amp;fid=" . $fid . "'>Create a topic!</a>",
+                        . "<a href='?act=post&amp;fid=" . $fid . "'>Create a topic!</a>",
                 );
             }
         }
@@ -474,8 +469,7 @@ final class Forum
                 WHERE `tid`=?
                 GROUP BY p.`auth_id`
                 ORDER BY `replies` DESC
-                SQL
-            ,
+                SQL,
             ['posts', 'members'],
             $tid,
         );

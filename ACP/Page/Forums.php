@@ -750,7 +750,7 @@ final readonly class Forums
                 $this->database->basicvalue($forumId),
             );
             if ($this->request->post('moveto') !== null) {
-                $this->database->safeupdate(
+                $updateStatement = $this->database->safeupdate(
                     'topics',
                     [
                         'fid' => $this->request->post('moveto'),
@@ -758,7 +758,7 @@ final readonly class Forums
                     ' WHERE `fid`=?',
                     $this->database->basicvalue($forumId),
                 );
-                $topics = $this->database->affectedRows();
+                $topics = $this->database->affectedRows($updateStatement);
             } else {
                 $result = $this->database->safespecial(
                     <<<'SQL'
@@ -774,13 +774,13 @@ final readonly class Forums
                     $this->database->basicvalue($forumId),
                 );
 
-                $posts = $this->database->affectedRows();
-                $this->database->safedelete(
+                $posts = $this->database->affectedRows($result);
+                $deleteStatement = $this->database->safedelete(
                     'topics',
                     'WHERE `fid`=?',
                     $this->database->basicvalue($forumId),
                 );
-                $topics = $this->database->affectedRows();
+                $topics = $this->database->affectedRows($deleteStatement);
             }
 
             $page = match (true) {
