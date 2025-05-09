@@ -51,14 +51,17 @@ final class Groups
         }
 
         match ($this->request->get('do')) {
-            'perms' => $this->showperms(),
+            'perms' => $this->showPerms(),
             'create' => $this->create(),
             'delete' => $this->delete(),
-            default => $this->showperms(),
+            default => $this->showPerms(),
         };
     }
 
-    private function updateperms(array|string $permsInput): void
+    /**
+     * @param array<array<int|string>> $permsInput
+     */
+    private function updatePerms(array $permsInput): void
     {
         $columns = [
             'can_access_acp',
@@ -149,7 +152,7 @@ final class Groups
 
         $this->updatePermissions = false;
 
-        $this->showperms();
+        $this->showPerms();
     }
 
     /**
@@ -201,7 +204,7 @@ final class Groups
         return $this->database->arows($result);
     }
 
-    private function showperms(): void
+    private function showPerms(): void
     {
         $page = '';
 
@@ -213,8 +216,8 @@ final class Groups
 
         if (
             $this->updatePermissions
-            && $permInput !== null
-            && $groupList !== null
+            && is_array($permInput)
+            && is_array($groupList)
         ) {
             foreach ($groupList as $groupId) {
                 if (
@@ -227,7 +230,7 @@ final class Groups
                 $permInput[$groupId] = [];
             }
 
-            $this->updateperms($permInput);
+            $this->updatePerms($permInput);
 
             return;
         }
@@ -359,26 +362,27 @@ final class Groups
     {
         $page = '';
         $error = null;
+
+        $groupNameInput = $this->request->post('groupname');
+        $groupIconInput = $this->request->post('groupicon');
+        $groupName = is_string($groupNameInput) ? $groupNameInput : null;
+        $groupIcon = is_string($groupIconInput) ? $groupIconInput : null;
+
         if ($this->request->post('submit') !== null) {
-            if (!$this->request->post('groupname')) {
-                $error = 'Group name required!';
-            } elseif (mb_strlen((string) $this->request->post('groupname')) > 250) {
-                $error = 'Group name must not exceed 250 characters!';
-            } elseif (mb_strlen((string) $this->request->post('groupicon')) > 250) {
-                $error = 'Group icon must not exceed 250 characters!';
-            } elseif (
-                $this->request->post('groupicon')
-                && !filter_var($this->request->post('groupicon'), FILTER_VALIDATE_URL)
-            ) {
-                $error = 'Group icon must be a valid image url';
-            }
+            $error = match (true) {
+                !$groupName => 'Group name required!',
+                mb_strlen($groupName) > 250 => 'Group name must not exceed 250 characters!',
+                mb_strlen($groupIcon) > 250 => 'Group icon must not exceed 250 characters!',
+                $groupIcon && !filter_var($groupIcon, FILTER_VALIDATE_URL) => 'Group icon must be a valid image url',
+                default => null,
+            };
 
             if ($error !== null) {
                 $page .= $this->page->error($error);
             } else {
                 $write = [
-                    'icon' => $this->request->post('groupicon'),
-                    'title' => $this->request->post('groupname'),
+                    'icon' => $groupIcon,
+                    'title' => $groupName,
                 ];
                 if ($gid) {
                     $this->database->safeupdate(
@@ -401,7 +405,7 @@ final class Groups
                     ),
                 );
 
-                $this->showperms();
+                $this->showPerms();
 
                 return;
             }

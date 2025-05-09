@@ -308,9 +308,8 @@ class Database
     /**
      * See: https://www.php.net/manual/en/mysqli-stmt.bind-param.php.
      */
-    public function safequery_typeforvalue(
-        null|float|int|string $value,
-    ): string {
+    private function safeQueryTypeForValue(int|float|string|null $value): string
+    {
         return match (true) {
             is_int($value) => 'i',
             is_float($value) => 'd',
@@ -319,7 +318,7 @@ class Database
     }
 
     // Blah ?1 blah ?2 blah ?3 blah
-    public function safequery_sub_array(
+    private function safeQuerySubArray(
         string $queryString,
         int $placeholderNumber,
         int $arrlen,
@@ -353,13 +352,13 @@ class Database
         foreach ($args as $index => $value) {
             if (is_array($value)) {
                 $type = implode('', array_map(
-                    fn($subVal): string => $this->safequery_typeforvalue($subVal),
+                    fn($subVal): string => $this->safeQueryTypeForValue($subVal),
                     $value,
                 ));
 
                 $typeString .= $type;
 
-                $compiledQueryString = $this->safequery_sub_array(
+                $compiledQueryString = $this->safeQuerySubArray(
                     $compiledQueryString,
                     ((int) $index) + $added_placeholders,
                     mb_strlen($type),
@@ -374,7 +373,7 @@ class Database
                 continue;
             }
 
-            $typeString .= $this->safequery_typeforvalue($value);
+            $typeString .= $this->safeQueryTypeForValue($value);
             $outArgs[] = $value;
         }
 
