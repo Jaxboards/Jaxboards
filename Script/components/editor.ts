@@ -6,7 +6,6 @@ import Ajax from '../JAX/ajax';
 import Browser from '../JAX/browser';
 import { insertAfter, insertBefore, getComputedStyle } from '../JAX/el';
 import { bbcodeToHTML, htmlToBBCode } from '../JAX/bbcode-utils';
-import { assign } from '../JAX/util';
 import { replaceSelection } from '../JAX/selection';
 
 const URL_REGEX = /^(ht|f)tps?:\/\/[\w.\-%&?=/]+$/;
@@ -215,7 +214,7 @@ export default class Editor extends Component {
         const sq = Math.ceil(Math.sqrt(l));
 
         const colorwin = document.createElement('table');
-        assign(colorwin.style, {
+        Object.assign(colorwin.style, {
             borderCollapse: 'collapse',
             position: 'absolute',
             top: `${posy}px`,
@@ -237,7 +236,7 @@ export default class Editor extends Component {
                 a.href = 'javascript:void(0)';
                 a.onclick = () => this.colorHandler(cmd, color);
                 c.appendChild(a);
-                assign(a.style, {
+                Object.assign(a.style, {
                     display: 'block',
                     backgroundColor: color,
                     height: '20px',

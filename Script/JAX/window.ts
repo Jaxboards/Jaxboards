@@ -1,11 +1,11 @@
 import Animation from './animation';
 import Drag from './drag';
 import { getHighestZIndex } from './el';
-import { assign, toggleOverlay, onImagesLoaded } from './util';
+import { toggleOverlay, onImagesLoaded } from './util';
 
 class Window {
     constructor(options = {}) {
-        assign(this, {
+        Object.assign(this, {
             title: 'Title',
             wait: true,
             content: 'Content',

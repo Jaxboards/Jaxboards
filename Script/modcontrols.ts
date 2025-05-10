@@ -1,6 +1,6 @@
 /* global RUN */
 import gracefulDegrade from './JAX/graceful-degrade';
-import { assign, onDOMReady } from './JAX/util';
+import { onDOMReady } from './JAX/util';
 
 const postIDs = function fetchPIDs(strPIDs: string) {
     const pids = strPIDs ? strPIDs.split(',') : [];
@@ -19,7 +19,7 @@ const threadIDs = function fetchTIDs(strTIDs: string) {
 
 class ModControls {
     constructor(commands) {
-        assign(commands, {
+        Object.assign(commands, {
             /**
              * @param {[string,string]} param0
              */
@@ -59,7 +59,7 @@ class ModControls {
                     }<input type='submit' value='Go' /> ` +
                     "<input name='cancel' type='submit' " +
                     "onclick='this.form.submitButton=this;' value='Cancel' /></form>";
-                assign(this, {
+                Object.assign(this, {
                     tids,
                     tidl: tl,
                     pids,

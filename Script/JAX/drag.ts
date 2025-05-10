@@ -5,7 +5,7 @@ import {
     isChildOf,
 } from './el';
 import Event from './event';
-import { assign, tryInvoke } from './util';
+import { tryInvoke } from './util';
 
 class Drag {
     constructor() {
@@ -161,7 +161,7 @@ class Drag {
     }
 
     addListener(a) {
-        assign(this, a);
+        Object.assign(this, a);
         return this;
     }
 

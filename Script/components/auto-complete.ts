@@ -1,7 +1,6 @@
 import Ajax from '../JAX/ajax';
 import { getHighestZIndex, getCoordinates } from '../JAX/el';
 import Component from '../classes/component';
-import { assign } from '../JAX/util';
 
 const VALID_CLASS = 'valid';
 const INVALID_CLASS = 'invalid';
@@ -42,17 +41,17 @@ export default class AutoComplete extends Component {
         const coords = getCoordinates(this.element);
         let resultsContainer = document.querySelector('#autocomplete');
         if (!resultsContainer) {
-            resultsContainer = assign(document.createElement('div'), {
+            resultsContainer = Object.assign(document.createElement('div'), {
                 id: 'autocomplete',
             });
-            assign(resultsContainer.style, {
+            Object.assign(resultsContainer.style, {
                 zIndex: getHighestZIndex(),
             });
             document.body.appendChild(resultsContainer);
         }
 
         // Position and size the dropdown below the input field
-        assign(resultsContainer.style, {
+        Object.assign(resultsContainer.style, {
             top: `${coords.yh}px`,
             left: `${coords.x}px`,
             width: `${coords.w}px`,

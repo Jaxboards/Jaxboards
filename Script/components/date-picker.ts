@@ -1,6 +1,5 @@
 import Component from '../classes/component';
 import { getHighestZIndex, getCoordinates } from '../JAX/el';
-import { assign } from '../JAX/util';
 import { months, daysShort } from '../JAX/date';
 
 export default class DatePicker extends Component {
@@ -25,7 +24,7 @@ export default class DatePicker extends Component {
 
         let picker = document.querySelector('#datepicker');
         if (!picker) {
-            picker = assign(document.createElement('table'), {
+            picker = Object.assign(document.createElement('table'), {
                 id: 'datepicker',
             });
             document.body.appendChild(picker);
@@ -37,7 +36,7 @@ export default class DatePicker extends Component {
 
     openPicker() {
         const c = getCoordinates(this.element);
-        assign(this.picker.style, {
+        Object.assign(this.picker.style, {
             display: '',
             zIndex: getHighestZIndex(),
             position: 'absolute',

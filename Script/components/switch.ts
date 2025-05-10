@@ -1,6 +1,5 @@
 import Component from '../classes/component';
 import { insertAfter } from '../JAX/el';
-import { assign } from '../JAX/util';
 
 export default class Switch extends Component {
     static get selector() {
@@ -12,7 +11,7 @@ export default class Switch extends Component {
         // Hide original checkbox
         element.style.display = 'none';
 
-        const button = assign(document.createElement('button'), {
+        const button = Object.assign(document.createElement('button'), {
             type: 'button',
             title: element.className,
             className: element.className,

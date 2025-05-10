@@ -1,11 +1,6 @@
 import { getHighestZIndex } from './el';
 import { date, smalldate } from './date';
 
-// This file is just a dumping ground until I can find better homes for these
-export function assign(a, b) {
-    return Object.assign(a, b);
-}
-
 /**
  * Tries to call a function, if it exists.
  * @param  {Function} method
@@ -78,7 +73,7 @@ export function toggleOverlay(show) {
     const dE = document.documentElement;
     let ol = document.getElementById('overlay');
     if (ol) {
-        assign(ol.style, {
+        Object.assign(ol.style, {
             zIndex: getHighestZIndex(),
             top: 0,
             height: `${dE.clientHeight}px`,
@@ -89,7 +84,7 @@ export function toggleOverlay(show) {
         if (!show) return;
         ol = document.createElement('div');
         ol.id = 'overlay';
-        assign(ol.style, {
+        Object.assign(ol.style, {
             height: `${dE.clientHeight}0px`,
             width: `${dE.clientWidth}0px`,
         });
