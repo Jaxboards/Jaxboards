@@ -13,8 +13,8 @@ export function tryInvoke(method, ...args) {
     return null;
 }
 
-export function onImagesLoaded(imgs, timeout = 2000) {
-    return new Promise((resolve) => {
+export function onImagesLoaded(imgs: Array<HTMLImageElement>, timeout = 2000) {
+    return new Promise<void>((resolve) => {
         const images = new Set();
         const imagesToWaitOn = Array.from(imgs).filter((img) => !img.complete);
 
@@ -23,7 +23,7 @@ export function onImagesLoaded(imgs, timeout = 2000) {
             return;
         }
 
-        function markImageLoaded() {
+        function markImageLoaded(this: HTMLImageElement) {
             images.delete(this.src);
             if (images.size === 0) {
                 resolve();
@@ -46,14 +46,14 @@ export function onImagesLoaded(imgs, timeout = 2000) {
 
 export function updateDates() {
     const dates = document.querySelectorAll('.autodate');
-    const dateTitles = Array.from(
+    const dateTitles: HTMLElement[] = Array.from(
         document.querySelectorAll('[data-timestamp]'),
     );
     if (!dates) {
         return;
     }
     dates.forEach((el) => {
-        const timestamp = parseInt(el.title, 10);
+        const timestamp = parseInt(el.getAttribute('title') ?? '', 10);
         const parsed = el.classList.contains('smalldate')
             ? smalldate(timestamp)
             : date(timestamp);
@@ -63,7 +63,7 @@ export function updateDates() {
     });
     dateTitles.forEach((el) => {
         if (!el.title) {
-            el.title = smalldate(el.dataset.timestamp);
+            el.title = smalldate(parseInt(el.dataset.timestamp ?? ''));
         }
     });
 }
@@ -73,7 +73,7 @@ export function updateDates() {
  * or immediately if the document is already loaded.
  * @param {Function} callback
  */
-export function onDOMReady(callback) {
+export function onDOMReady(callback: () => void) {
     if (document.readyState === 'complete') {
         callback();
     } else {

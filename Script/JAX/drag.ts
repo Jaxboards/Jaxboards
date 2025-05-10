@@ -1,23 +1,37 @@
 import {
-    getCoordinates,
     getComputedStyle,
+    getCoordinates,
     getHighestZIndex,
     isChildOf,
 } from './el';
-import Event from './event';
-import { tryInvoke } from './util';
 
 class Drag {
+    onstart?: (data: object) => void;
+    sess: any;
+    boundEvents?: {
+        drag: (event2: any) => void;
+        drop: (event2: any) => boolean;
+    };
+    droppables: HTMLElement[];
+    noChild: boolean = false;
+    bounds?: number[];
+
+    ondragover?: (sess: object) => void;
+    ondrag?: (sess: object) => void;
+    ondragout?: (sess: object) => void;
+    ondrop?: (sess: object) => void;
+    autoZIndex: boolean = true;
+
     constructor() {
         this.droppables = [];
     }
 
-    start(event, t, handle) {
-        const e = new Event(event).cancel().stopBubbling();
-        const el = t || event.target;
-        const s = getComputedStyle(el);
+    start(event: MouseEvent, target?: HTMLElement, handle?: HTMLElement) {
+        event.stopPropagation();
+        const el = target || (event.target as HTMLElement);
+        const style = getComputedStyle(el);
         const highz = getHighestZIndex();
-        if (this.noChild && (e.srcElement || e.target) !== (handle || el)) {
+        if (this.noChild && event.target !== (handle || el)) {
             return;
         }
         if (el.getAttribute('draggable') === 'false') {
@@ -25,37 +39,37 @@ class Drag {
         }
         this.sess = {
             el,
-            mx: parseInt(e.pageX, 10),
-            my: parseInt(e.pageY, 10),
-            ex: parseInt(s.left, 10) || 0,
-            ey: parseInt(s.top, 10) || 0,
+            mx: event.pageX,
+            my: event.pageY,
+            ex: parseInt(style?.left ?? '', 10) || 0,
+            ey: parseInt(style?.top ?? '', 10) || 0,
             info: {},
             bc: getCoordinates(el),
             zIndex: el.style.zIndex,
         };
         if (!this.sess.zIndex || Number(this.sess.zIndex) < highz - 1) {
-            el.style.zIndex = highz;
+            el.style.zIndex = `${highz}`;
         }
-        tryInvoke(this.onstart, {
+        this.onstart?.({
             ...this.sess,
             droptarget: this.testDrops(this.sess.mx, this.sess.my),
         });
         this.boundEvents = {
-            drag: (event2) => this.drag(event2),
-            drop: (event2) => this.drop(event2),
+            drag: (event2: MouseEvent) => this.drag(event2),
+            drop: () => this.drop(),
         };
         document.addEventListener('mousemove', this.boundEvents.drag);
         document.addEventListener('mouseup', this.boundEvents.drop);
-        this.drag(e);
+        this.drag(event);
     }
 
-    drag(event) {
-        const e = new Event(event).cancel();
+    drag(event: MouseEvent) {
+        event.stopPropagation();
         const s = this.sess.el.style;
         let sess;
-        let tmp = false;
-        const tx = parseInt(e.pageX, 10);
-        const ty = parseInt(e.pageY, 10);
+        let tmp;
+        const tx = event.pageX;
+        const ty = event.pageY;
         let mx = tx;
         let my = ty;
         let tmp2;
@@ -78,7 +92,6 @@ class Drag {
         sess = {
             left,
             top,
-            e,
             el: this.sess.el,
             mx,
             my,
@@ -89,42 +102,43 @@ class Drag {
             sy: this.sess.ey,
         };
         this.sess.info = sess;
-        tryInvoke(this.ondrag, sess);
+        this.ondrag?.(sess);
         if (sess.droptarget && tmp !== sess.droptarget) {
-            tryInvoke(this.ondragover, sess);
+            this.ondragover?.(sess);
         }
         if (tmp && sess.droptarget !== tmp) {
             tmp2 = sess.droptarget;
             sess.droptarget = tmp;
-            tryInvoke(this.ondragout, sess);
+            this.ondragout?.(sess);
             sess.droptarget = tmp2;
         }
     }
 
-    boundingBox(x, y, w, h) {
+    boundingBox(x: number, y: number, w: number, h: number) {
         this.bounds = [x, y, w, h];
         return this;
     }
 
     drop() {
-        document.removeEventListener('mouseup', this.boundEvents.drop);
-        document.removeEventListener('mousemove', this.boundEvents.drag);
-        tryInvoke(this.ondrop, this.sess.info);
-        if (!this.autoZ) {
+        if (this.boundEvents) {
+            document.removeEventListener('mouseup', this.boundEvents.drop);
+            document.removeEventListener('mousemove', this.boundEvents.drag);
+        }
+        this.ondrop?.(this.sess.info);
+        if (this.autoZIndex) {
             this.sess.el.style.zIndex = this.sess.zIndex;
         }
         return true;
     }
 
-    testDrops(a, b) {
+    testDrops(mouseX: number, mouseY: number): HTMLElement | undefined {
         const { droppables } = this;
         let z;
-        let r = false;
         let max = [9999, 9999];
         if (!droppables.length) {
-            return r;
+            return;
         }
-        droppables.forEach((droppable) => {
+        return droppables.findLast((droppable) => {
             if (
                 droppable === this.sess.el ||
                 isChildOf(droppable, this.sess.el)
@@ -135,24 +149,23 @@ class Drag {
             if (
                 max[0] > z.w &&
                 max[1] > z.h &&
-                a >= z.x &&
-                b >= z.y &&
-                a <= z.xw &&
-                b <= z.yh
+                mouseX >= z.x &&
+                mouseY >= z.y &&
+                mouseX <= z.xw &&
+                mouseY <= z.yh
             ) {
                 max = [z.w, z.h];
-                r = droppable;
+                return droppable;
             }
         });
-        return r;
     }
 
-    drops(a) {
+    drops(a: HTMLElement[]) {
         this.droppables = a;
         return this;
     }
 
-    addDrops(a) {
+    addDrops(a: HTMLElement[]) {
         if (!this.droppables) {
             return this.drops(a);
         }
@@ -160,30 +173,30 @@ class Drag {
         return this;
     }
 
-    addListener(a) {
-        Object.assign(this, a);
+    addListener(listeners: object) {
+        Object.assign(this, listeners);
         return this;
     }
 
-    apply(el, t) {
+    apply(el: HTMLElement, target?: HTMLElement) {
         if (Array.isArray(el)) {
             el.forEach((el2) => this.apply(el2));
             return this;
         }
 
-        let pos = getComputedStyle(el, '');
-        pos = pos.position;
+        const style = getComputedStyle(el);
+        const pos = style?.position;
         if (!pos || pos === 'static') {
             el.style.position = 'relative';
         }
-        (t || el).onmousedown = t
-            ? (e) => this.start(e, el, t)
+        (target || el).onmousedown = target
+            ? (e) => this.start(e, el, target)
             : (e) => this.start(e, el);
         return this;
     }
 
     autoZ() {
-        this.autoZ = true;
+        this.autoZIndex = false;
         return this;
     }
 

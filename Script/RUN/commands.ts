@@ -1,14 +1,14 @@
 /* global RUN, globalsettings */
 /* eslint-disable no-alert */
-import { onImagesLoaded } from '../JAX/util';
 import Animation from '../JAX/animation';
 import { addIdleClock } from '../JAX/date';
-import { getCoordinates, getComputedStyle } from '../JAX/el';
+import { getComputedStyle, getCoordinates } from '../JAX/el';
 import gracefulDegrade from '../JAX/graceful-degrade';
+import { messageReceived } from '../JAX/instant-messaging-window';
 import openTooltip from '../JAX/tooltip';
+import { onImagesLoaded } from '../JAX/util';
 import Window from '../JAX/window';
 import Sound from '../sound';
-import { messageReceived } from '../JAX/instant-messaging-window';
 
 /**
  * These are all of the possible commands
@@ -252,10 +252,12 @@ export default {
         if (!el) {
             return false;
         }
-        onImagesLoaded(document.querySelectorAll('#page img')).then(() => {
-            const pos = getCoordinates(el);
-            window.scrollTo({ top: pos.y });
-        });
+        onImagesLoaded(Array.from(document.querySelectorAll('#page img'))).then(
+            () => {
+                const pos = getCoordinates(el);
+                window.scrollTo({ top: pos.y });
+            },
+        );
         return true;
     },
     updateqreply(content: string) {
