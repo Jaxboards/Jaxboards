@@ -274,7 +274,7 @@ class Database
     }
 
     /**
-     * @param null|array<null|bool|float|int|string>|bool|float|int|string $args
+     * @param null|array<null|bool|float|int|string>|bool|float|int|string ...$args
      */
     public function safequery(
         string $queryString,
