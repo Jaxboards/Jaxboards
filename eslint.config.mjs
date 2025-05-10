@@ -13,9 +13,10 @@ const compat = new FlatCompat({
     baseDirectory: __dirname,
 });
 
-export default [
-    ...compat.extends('airbnb-base'),
+export default tseslint.config(
+    compat.extends('airbnb-base'),
     eslintPluginPrettierRecommended,
+    tseslint.configs.recommended,
     {
         files: ['**/*.ts'],
         languageOptions: {
@@ -38,5 +39,4 @@ export default [
             },
         },
     },
-    ...tseslint.configs.recommended,
-];
+);
