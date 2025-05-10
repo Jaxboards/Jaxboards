@@ -136,19 +136,18 @@ final readonly class PrivateMessage
             return null;
         }
 
-        $this->database->safespecial(
+        $result = $this->database->safespecial(
             <<<'SQL'
                 UPDATE %t
                 SET `runonce`=CONCAT(`runonce`,?)
                 WHERE `uid`=? AND `last_update`> ?
-                SQL
-            ,
+                SQL,
             ['session'],
             $this->database->basicvalue(json_encode($cmd) . PHP_EOL),
             $uid,
             $this->database->datetime(Carbon::now()->subSeconds(5)->getTimestamp()),
         );
 
-        return $this->database->affectedRows() !== 0;
+        return $this->database->affectedRows($result) !== 0;
     }
 }

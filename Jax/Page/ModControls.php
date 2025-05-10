@@ -185,7 +185,7 @@ final readonly class ModControls
             ) {
                 $page .= $this->template->meta('error', 'Display name is invalid.');
             } else {
-                $this->database->safeupdate(
+                $updateResult = $this->database->safeupdate(
                     'members',
                     [
                         'about' => $this->request->post('about'),
@@ -198,7 +198,7 @@ final readonly class ModControls
                     $this->database->basicvalue($this->request->post('mid')),
                 );
 
-                if ($this->database->error() !== '') {
+                if ($updateResult === null) {
                     $page .= $this->template->meta(
                         'error',
                         'Error updating profile information.',

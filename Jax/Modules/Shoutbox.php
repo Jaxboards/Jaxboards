@@ -29,7 +29,7 @@ final class Shoutbox
 {
     public const TAG = true;
 
-    private $shoutlimit;
+    private int $shoutlimit;
 
     public function __construct(
         private readonly Config $config,
@@ -56,7 +56,7 @@ final class Shoutbox
             return;
         }
 
-        $this->shoutlimit = $this->config->getSetting('shoutbox_num');
+        $this->shoutlimit = (int) $this->config->getSetting('shoutbox_num');
         if (
             is_numeric($this->request->both('shoutbox_delete'))
         ) {
@@ -164,8 +164,7 @@ final class Shoutbox
                 LEFT JOIN %t m
                     ON s.`uid`=m.`id`
                 ORDER BY s.`id` DESC LIMIT ?
-                SQL
-            ,
+                SQL,
             ['shouts', 'members'],
             $this->shoutlimit,
         );
@@ -193,9 +192,9 @@ final class Shoutbox
                     $shouts,
                 ),
             ) . "<script type='text/javascript'>globalsettings.shoutlimit="
-            . $this->shoutlimit . ';globalsettings.sound_shout='
-            . ($this->user->get('sound_shout') ? 1 : 0)
-            . '</script>',
+                . $this->shoutlimit . ';globalsettings.sound_shout='
+                . ($this->user->get('sound_shout') ? 1 : 0)
+                . '</script>',
         );
     }
 
@@ -222,8 +221,7 @@ final class Shoutbox
                         ON s.`uid`=m.`id`
                     WHERE s.`id`>?
                     ORDER BY s.`id` ASC LIMIT ?
-                    SQL
-                ,
+                    SQL,
                 ['shouts', 'members'],
                 $this->session->getVar('sb_id') ?: 0,
                 $this->shoutlimit,
@@ -302,8 +300,7 @@ final class Shoutbox
                 LEFT JOIN %t m
                 ON s.`uid`=m.`id`
                 ORDER BY s.`id` DESC LIMIT ?,?
-                SQL
-            ,
+                SQL,
             ['shouts', 'members'],
             $pagen * $perpage,
             $perpage,

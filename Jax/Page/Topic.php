@@ -48,6 +48,9 @@ final class Topic
 
     private int $firstPostID = 0;
 
+    /**
+     * @var array<string,mixed>
+     */
     private ?array $topicData = null;
 
     public function __construct(
@@ -176,6 +179,9 @@ final class Topic
         $this->viewTopic($this->tid);
     }
 
+    /**
+     * @return ?array<string,mixed>
+     */
     private function fetchTopicData(int $tid): ?array
     {
         $result = $this->database->safespecial(

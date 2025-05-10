@@ -182,14 +182,9 @@ final readonly class ServiceSignup
                     ],
                 );
 
-                $dbError = $this->database->error();
-                if ($dbError !== '' && $dbError !== '0') {
-                    $errors[] = $dbError;
-                } else {
-                    $this->fileUtils->copyDirectory($this->blueprint->getDirectory(), dirname(__DIR__) . '/boards/' . $board);
+                $this->fileUtils->copyDirectory($this->blueprint->getDirectory(), dirname(__DIR__) . '/boards/' . $board);
 
-                    header('Location: https://' . $this->request->post('boardurl') . '.' . $this->serviceConfig->getSetting('domain'));
-                }
+                header('Location: https://' . $this->request->post('boardurl') . '.' . $this->serviceConfig->getSetting('domain'));
             }
         }
 

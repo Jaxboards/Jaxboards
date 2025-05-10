@@ -6,31 +6,28 @@ namespace Jax;
 
 use Carbon\Carbon;
 use Exception;
-use mysqli;
-use mysqli_result;
+use PDO;
+use PDOStatement;
 
 use function array_keys;
 use function array_map;
 use function array_pop;
 use function array_values;
+use function count;
 use function explode;
 use function gmdate;
 use function implode;
 use function is_array;
-use function is_float;
+use function is_bool;
 use function is_int;
 use function is_string;
 use function ksort;
 use function mb_check_encoding;
 use function mb_convert_encoding;
-use function mb_strlen;
-use function mb_substr;
-use function mysqli_fetch_assoc;
 use function str_repeat;
 use function str_replace;
 use function vsprintf;
 
-use const MYSQLI_ASSOC;
 use const PHP_EOL;
 
 // phpcs:disable SlevomatCodingStandard.Classes.RequireAbstractOrFinal.ClassNeitherAbstractNorFinal
@@ -42,7 +39,7 @@ class Database
 
     public const WHERE_ID_IN = 'WHERE `id` IN ?';
 
-    private mysqli $mysqli;
+    private PDO $pdo;
 
     private string $prefix = '';
 
@@ -73,15 +70,13 @@ class Database
         string $password,
         string $database = '',
         string $prefix = '',
-    ): bool {
-        $this->mysqli = new mysqli($host, $user, $password, $database);
+    ): void {
+        $this->pdo = new PDO("mysql:host={$host};dbname={$database};charset=utf8mb4", $user, $password, []);
 
         // All datetimes are GMT for jaxboards
-        $this->mysqli->query("SET time_zone = '+0:00'");
+        $this->pdo->query("SET time_zone = '+0:00'");
 
         $this->prefix = $prefix;
-
-        return !$this->mysqli->connect_errno;
     }
 
     public function setPrefix(string $prefix): void
@@ -99,14 +94,9 @@ class Database
         return '`' . $this->prefix . $tableName . '`';
     }
 
-    public function error(): string
+    public function affectedRows(PDOStatement $pdoStatement): int
     {
-        return $this->mysqli->error;
-    }
-
-    public function affectedRows(): int|string
-    {
-        return $this->mysqli->affected_rows;
+        return $pdoStatement->rowCount();
     }
 
     /**
@@ -118,7 +108,7 @@ class Database
         string $table,
         ?string $where = null,
         ...$vars,
-    ): ?mysqli_result {
+    ): ?PDOStatement {
         // set new variable to not impact debug_backtrace value for inspecting
         // input
         $fieldsString = is_array($fields) ? implode(', ', $fields) : $fields;
@@ -132,7 +122,7 @@ class Database
 
     public function insertId(): int|string
     {
-        return $this->mysqli->insert_id;
+        return $this->pdo->lastInsertId();
     }
 
     /**
@@ -141,7 +131,7 @@ class Database
     public function safeinsert(
         string $table,
         array $data,
-    ): ?mysqli_result {
+    ): ?PDOStatement {
         if ($data === []) {
             return null;
         }
@@ -180,7 +170,7 @@ class Database
                 }
 
                 if ($rowIndex === 0) {
-                    $columnNames[] = $this->ekey($columnName);
+                    $columnNames[] = "`{$columnName}`";
                 }
 
                 $rows[$rowIndex][] = $this->evalue($value);
@@ -206,7 +196,7 @@ class Database
         array $keyValuePairs,
         string $whereFormat = '',
         ...$whereParams,
-    ): ?mysqli_result {
+    ): ?PDOStatement {
         if ($keyValuePairs === []) {
             // Nothing to update.
             return null;
@@ -244,26 +234,13 @@ class Database
     }
 
     /**
-     * @param array<string,null|float|int|string> $keyValuePairs
-     */
-    public function buildUpdate(array $keyValuePairs): string
-    {
-        $updateString = '';
-        foreach ($keyValuePairs as $key => $value) {
-            $updateString .= $this->eKey($key) . '=' . $this->evalue($value) . ',';
-        }
-
-        return mb_substr($updateString, 0, -1);
-    }
-
-    /**
      * @param mixed $vars
      */
     public function safedelete(
         string $table,
         string $whereformat,
         ...$vars,
-    ): ?mysqli_result {
+    ): ?PDOStatement {
         $query = 'DELETE FROM ' . $this->ftable($table)
             . ($whereformat !== '' && $whereformat !== '0' ? ' ' . $whereformat : '');
 
@@ -274,13 +251,11 @@ class Database
     /**
      * Returns a single record.
      *
-     * @return array<string,mixed>
+     * @return ?array<string,mixed>
      */
-    public function arow(?mysqli_result $mysqliResult = null): ?array
+    public function arow(?PDOStatement $pdoStatement = null): ?array
     {
-        return $mysqliResult !== null
-            ? (mysqli_fetch_assoc($mysqliResult) ?: null)
-            : null;
+        return $pdoStatement?->fetch(PDO::FETCH_ASSOC) ?: null;
     }
 
     /**
@@ -288,21 +263,19 @@ class Database
      *
      * @return array<int|string,array<int|string,mixed>>
      */
-    public function arows(?mysqli_result $mysqliResult = null): array
+    public function arows(?PDOStatement $pdoStatement = null): array
     {
-        return $mysqliResult !== null
-            ? $this->fetchAll($mysqliResult, MYSQLI_ASSOC)
-            : [];
+        return $pdoStatement->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function numRows(?mysqli_result $mysqliResult = null): int|string
+    public function numRows(?PDOStatement $pdoStatement = null): int|string
     {
-        return $mysqliResult->num_rows ?? 0;
+        return $pdoStatement->num_rows ?? 0;
     }
 
-    public function disposeresult(?mysqli_result $mysqliResult): void
+    public function disposeresult(?PDOStatement $pdoStatement): void
     {
-        $mysqliResult?->free();
+        $pdoStatement->closeCursor();
     }
 
     /**
@@ -311,31 +284,24 @@ class Database
     public function safequery(
         string $queryString,
         ...$args,
-    ): ?mysqli_result {
+    ): ?PDOStatement {
         // set new variable to not impact debug_backtrace value for inspecting
         // input
         $compiledQueryString = $queryString;
 
-        $typeString = '';
         $outArgs = [];
 
         $added_placeholders = 0;
         foreach ($args as $index => $value) {
             if (is_array($value)) {
-                $type = implode('', array_map(
-                    fn($subVal): string => $this->safeQueryTypeForValue($subVal),
-                    $value,
-                ));
-
-                $typeString .= $type;
-
+                $valueCount = count($value);
                 $compiledQueryString = $this->safeQuerySubArray(
                     $compiledQueryString,
                     ((int) $index) + $added_placeholders,
-                    mb_strlen($type),
+                    $valueCount,
                 );
 
-                $added_placeholders += mb_strlen($type) - 1;
+                $added_placeholders += $valueCount - 1;
 
                 foreach ($value as $singleValue) {
                     $outArgs[] = $singleValue ?? '';
@@ -344,34 +310,22 @@ class Database
                 continue;
             }
 
-            $typeString .= $this->safeQueryTypeForValue($value);
             $outArgs[] = $value;
         }
 
-        $stmt = $this->mysqli->prepare($compiledQueryString);
+        $pdoStmt = $this->pdo->prepare($compiledQueryString);
 
         $this->debugLog->log($compiledQueryString, 'Queries');
 
-        if (!$stmt) {
-            return null;
-        }
-
         if ($args !== []) {
-            $stmt->bind_param($typeString, ...$outArgs);
+            foreach ($outArgs as $index => $value) {
+                $pdoStmt->bindValue($index + 1, $value, $this->safeQueryTypeForPDOValue($value));
+            }
         }
 
-        if (!$stmt->execute()) {
-            return null;
-        }
+        $pdoStmt->execute();
 
-        $result = $stmt->get_result();
-
-        return $result ?: null;
-    }
-
-    public function ekey(string $key): string
-    {
-        return '`' . $this->escape($key) . '`';
+        return $pdoStmt ?: null;
     }
 
     /**
@@ -407,12 +361,12 @@ class Database
 
         return is_int($value)
             ? $value
-            : "'" . $this->escape((string) $value) . "'";
+            : $this->escape((string) $value);
     }
 
     public function escape(string $string): string
     {
-        return $this->mysqli->real_escape_string($string);
+        return $this->pdo->quote($string);
     }
 
     public function datetime(?int $timestamp = null): string
@@ -543,16 +497,13 @@ class Database
         array_map(fn($forum) => $this->fixForumLastPost((int) $forum['id']), $this->arows($query));
     }
 
-    /**
-     * See: https://www.php.net/manual/en/mysqli-stmt.bind-param.php.
-     */
-    private function safeQueryTypeForValue(
+    private function safeQueryTypeForPDOValue(
         null|float|int|string $value,
-    ): string {
+    ): ?int {
         return match (true) {
-            is_int($value) => 'i',
-            is_float($value) => 'd',
-            default => 's',
+            is_int($value) => PDO::PARAM_INT,
+            is_bool($value) => PDO::PARAM_BOOL,
+            default => PDO::PARAM_STR,
         };
     }
 
@@ -571,22 +522,5 @@ class Database
         }
 
         return implode('?', $arr) . $replacement . $last;
-    }
-
-    /**
-     * A function to deal with the `mysqli_fetch_all` function only exiting
-     * for the `mysqlnd` driver. Fetches all rows from a mysqli query result.
-     *
-     * @param mysqli_result $mysqliResult the result you wish to fetch all rows from
-     * @param int           $resultType   The result type for each row. Should be either
-     *                                    `MYSQLI_ASSOC` or `MYSQLI_NUM`
-     *
-     * @return array<array<int|string,mixed>> an array of mysqli result rows
-     */
-    private function fetchAll(
-        mysqli_result $mysqliResult,
-        int $resultType = MYSQLI_ASSOC,
-    ): array {
-        return $mysqliResult->fetch_all($resultType);
     }
 }

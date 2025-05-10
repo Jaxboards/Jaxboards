@@ -30,11 +30,7 @@ use function preg_quote;
 use function preg_replace;
 use function preg_split;
 use function str_repeat;
-use function syslog;
 use function trim;
-
-use const LOG_EMERG;
-use const PHP_EOL;
 
 final class Search
 {
@@ -300,9 +296,6 @@ final class Search
                 ...$topicValues,
             );
 
-            if (!$result) {
-                syslog(LOG_EMERG, 'ERROR: ' . $this->database->error() . PHP_EOL);
-            }
 
             $ids = '';
             while ($id = $this->database->arow($result)) {
@@ -341,8 +334,7 @@ final class Search
                         ON p.`tid`=t.`id`
                     WHERE p.`id` IN ?
                     ORDER BY FIELD(p.`id`,{$ids})
-                    SQL
-                ,
+                    SQL,
                 ['posts', 'topics'],
                 $idarray,
             );
@@ -393,7 +385,7 @@ final class Search
 
         if ($numresults === 0) {
             $error = 'No results found. '
-                 . 'Try refining your search, or using longer terms.';
+                . 'Try refining your search, or using longer terms.';
 
             $omitted = [];
             foreach ($terms as $term) {
@@ -406,8 +398,8 @@ final class Search
 
             if ($omitted !== []) {
                 $error .= '<br /><br />'
-                     . 'The following terms were omitted due to length: '
-                     . implode(', ', $omitted);
+                    . 'The following terms were omitted due to length: '
+                    . implode(', ', $omitted);
             }
 
             $page = $this->page->error($error);

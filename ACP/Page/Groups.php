@@ -136,20 +136,12 @@ final class Groups
             );
         }
 
-        $error = $this->database->error();
-        if ($error !== '') {
-            $this->page->addContentBox(
-                'Error',
-                $this->page->error($error),
-            );
-        } else {
-            $this->page->addContentBox(
-                'Success!',
-                $this->page->success(
-                    'Changes Saved successfully.',
-                ),
-            );
-        }
+        $this->page->addContentBox(
+            'Success!',
+            $this->page->success(
+                'Changes Saved successfully.',
+            ),
+        );
 
         $this->updatePermissions = false;
 

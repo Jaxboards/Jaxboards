@@ -406,7 +406,7 @@ final readonly class Members
                 $error = 'All fields required.';
             } elseif (
                 mb_strlen((string) $this->request->post('username')) > 30
-                || $this->request->post('displayname') > 30
+                || mb_strlen($this->request->post('displayname')) > 30
             ) {
                 $error = 'Display name and username must be under 30 characters.';
             } else {
@@ -441,14 +441,12 @@ final readonly class Members
                     'posts' => 0,
                 ];
                 $result = $this->database->safeinsert('members', $member);
-                $error = $this->database->error();
                 $this->database->disposeresult($result);
-                if ($error === '' || $error === '0') {
+                if ($this->database->affectedRows($result) > 0) {
                     $page .= $this->page->success('Member registered.');
                 } else {
                     $page .= $this->page->error(
-                        'An error occurred while processing your request. '
-                            . $error,
+                        'An error occurred while processing your request. ',
                     );
                 }
             }
