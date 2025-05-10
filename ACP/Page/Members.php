@@ -406,7 +406,7 @@ final readonly class Members
                 $error = 'All fields required.';
             } elseif (
                 mb_strlen((string) $this->request->post('username')) > 30
-                || $this->request->post('displayname') > 30
+                || mb_strlen($this->request->post('displayname')) > 30
             ) {
                 $error = 'Display name and username must be under 30 characters.';
             } else {
