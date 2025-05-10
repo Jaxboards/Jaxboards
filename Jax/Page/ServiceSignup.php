@@ -85,7 +85,7 @@ final readonly class ServiceSignup
                 $this->ipAddress->asBinary(),
                 $this->database->datetime(Carbon::now()->subWeeks(1)->getTimestamp()),
             );
-            if ($this->database->numRows($result) > 3) {
+            if (count($this->database->arows($result)) > 3) {
                 $errors[] = 'You may only register 3 boards per week.';
             }
 

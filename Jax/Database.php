@@ -268,11 +268,6 @@ class Database
         return $pdoStatement->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function numRows(?PDOStatement $pdoStatement = null): int|string
-    {
-        return $pdoStatement->num_rows ?? 0;
-    }
-
     public function disposeresult(?PDOStatement $pdoStatement): void
     {
         $pdoStatement->closeCursor();
