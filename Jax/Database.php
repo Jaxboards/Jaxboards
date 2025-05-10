@@ -171,7 +171,7 @@ class Database
                 }
 
                 if ($rowIndex === 0) {
-                    $columnNames[] = $this->ekey($columnName);
+                    $columnNames[] = "`{$columnName}`";
                 }
 
                 $rows[$rowIndex][] = $this->evalue($value);
@@ -232,19 +232,6 @@ class Database
             },
             array_keys($keyValuePairs),
         ));
-    }
-
-    /**
-     * @param array<string,null|float|int|string> $keyValuePairs
-     */
-    public function buildUpdate(array $keyValuePairs): string
-    {
-        $updateString = '';
-        foreach ($keyValuePairs as $key => $value) {
-            $updateString .= $this->eKey($key) . '=' . $this->evalue($value) . ',';
-        }
-
-        return mb_substr($updateString, 0, -1);
     }
 
     /**
@@ -340,11 +327,6 @@ class Database
         $pdoStmt->execute();
 
         return $pdoStmt ?: null;
-    }
-
-    public function ekey(string $key): string
-    {
-        return "`{$key}`";
     }
 
     /**
