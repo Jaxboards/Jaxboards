@@ -265,16 +265,16 @@ class Database
      */
     public function arows(?PDOStatement $pdoStatement = null): array
     {
-        return $pdoStatement->fetchAll(PDO::FETCH_ASSOC);
+        return $pdoStatement?->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function disposeresult(?PDOStatement $pdoStatement): void
     {
-        $pdoStatement->closeCursor();
+        $pdoStatement?->closeCursor();
     }
 
     /**
-     * @param null|array<null|float|int|string>|float|int|string $args
+     * @param array<null|float|int|string>|float|int|string $args
      */
     public function safequery(
         string $queryString,
@@ -493,9 +493,10 @@ class Database
     }
 
     private function safeQueryTypeForPDOValue(
-        null|float|int|string $value,
-    ): ?int {
+        null|bool|float|int|string $value,
+    ): int {
         return match (true) {
+            is_null($value) => PDO::PARAM_NULL,
             is_int($value) => PDO::PARAM_INT,
             is_bool($value) => PDO::PARAM_BOOL,
             default => PDO::PARAM_STR,
