@@ -1,18 +1,5 @@
 import { date, smalldate } from './date';
 
-/**
- * Tries to call a function, if it exists.
- * @param  {Function} method
- * @param  {...any} args
- * @return {any}
- */
-export function tryInvoke(method, ...args) {
-    if (method && typeof method === 'function') {
-        return method(...args);
-    }
-    return null;
-}
-
 export function onImagesLoaded(imgs: Array<HTMLImageElement>, timeout = 2000) {
     return new Promise<void>((resolve) => {
         const images = new Set();
