@@ -15,6 +15,8 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
+use function array_map;
+use function array_reduce;
 use function ceil;
 use function explode;
 use function is_numeric;
@@ -432,7 +434,7 @@ final class Forum
 
         // Subforum breadcrumbs
         if ($fdata['path']) {
-            $path = array_map(fn($fid) => (int) $fid, explode(' ', (string) $fdata['path']));
+            $path = array_map(static fn($fid): int => (int) $fid, explode(' ', (string) $fdata['path']));
             $result = $this->database->safeselect(
                 ['id', 'title'],
                 'forums',
@@ -443,11 +445,12 @@ final class Forum
             // does not select records in the same order
             $forumTitles = array_reduce(
                 $this->database->arows($result),
-                function ($forumTitles, $forum) {
+                static function (array $forumTitles, array $forum) {
                     $forumTitles[$forum['id']] = $forum['title'];
+
                     return $forumTitles;
                 },
-                []
+                [],
             );
             foreach ($path as $pathId) {
                 $breadCrumbs["?act=vf{$pathId}"] = $forumTitles[$pathId];
