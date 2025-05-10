@@ -1,10 +1,11 @@
 export default class Component {
-    static get selector() {
+    element: HTMLElement;
+
+    static get selector(): string {
         throw new Error('No Selector defined');
     }
 
-    constructor(element) {
+    constructor(element: HTMLElement) {
         this.element = element;
-        element.hydrated = true;
     }
 }

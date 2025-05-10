@@ -3,28 +3,33 @@
 
 import Component from '../classes/component';
 import Ajax from '../JAX/ajax';
-import Browser from '../JAX/browser';
-import { insertAfter, insertBefore, getComputedStyle } from '../JAX/el';
 import { bbcodeToHTML, htmlToBBCode } from '../JAX/bbcode-utils';
+import Browser from '../JAX/browser';
+import { getComputedStyle, insertAfter, insertBefore } from '../JAX/el';
 import { replaceSelection } from '../JAX/selection';
 
 const URL_REGEX = /^(ht|f)tps?:\/\/[\w.\-%&?=/]+$/;
-const isURL = (text) => URL_REGEX.test(text);
+const isURL = (text: string) => URL_REGEX.test(text);
 
 export default class Editor extends Component {
+    iframe: HTMLIFrameElement;
+
+    element: HTMLTextAreaElement;
+
     static get selector() {
         return 'textarea.bbcode-editor';
     }
 
-    constructor(element) {
+    constructor(element: HTMLTextAreaElement) {
         super(element);
+        this.element = element;
 
         this.iframe = document.createElement('iframe');
         this.iframe.addEventListener('load', () => this.iframeLoaded());
         this.iframe.style.display = 'none';
         insertAfter(this.iframe, element);
 
-        element.closest('form').addEventListener('submit', () => {
+        element.closest('form')?.addEventListener('submit', () => {
             this.submit();
         });
     }
@@ -380,13 +385,7 @@ export default class Editor extends Component {
 
     getSelection() {
         if (this.mode) {
-            return Browser.ie
-                ? this.doc.selection.createRange().text
-                : this.window.getSelection();
-        }
-        if (Browser.ie) {
-            this.element.focus();
-            return document.selection.createRange().text;
+            return this.window.getSelection();
         }
         return this.element.value.substring(
             this.element.selectionStart,
