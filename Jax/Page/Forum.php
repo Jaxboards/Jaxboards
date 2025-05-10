@@ -428,27 +428,34 @@ final class Forum
         $page .= $this->template->meta('forum-buttons-bottom', $forumbuttons);
 
         // Start building the nav path.
-        $path = ["?act=vc{$fdata['cat_id']}" => $fdata['cat']];
+        $breadCrumbs = ["?act=vc{$fdata['cat_id']}" => $fdata['cat']];
+
+        // Subforum breadcrumbs
         if ($fdata['path']) {
-            $pathids = explode(' ', (string) $fdata['path']);
-            $forums = [];
+            $path = array_map(fn($fid) => (int) $fid, explode(' ', (string) $fdata['path']));
             $result = $this->database->safeselect(
                 ['id', 'title'],
                 'forums',
                 Database::WHERE_ID_IN,
-                $pathids,
+                $path,
             );
-            while ($forum = $this->database->arow($result)) {
-                $forums[$forum['id']] = [$forum['title'], '?act=vf' . $forum['id']];
-            }
-
-            foreach ($pathids as $pathId) {
-                $path[$forums[$pathId][0]] = $forums[$pathId][1];
+            // This has to be two steps because WHERE ID IN(1,2,3)
+            // does not select records in the same order
+            $forumTitles = array_reduce(
+                $this->database->arows($result),
+                function ($forumTitles, $forum) {
+                    $forumTitles[$forum['id']] = $forum['title'];
+                    return $forumTitles;
+                },
+                []
+            );
+            foreach ($path as $pathId) {
+                $breadCrumbs["?act=vf{$pathId}"] = $forumTitles[$pathId];
             }
         }
 
-        $path["?act=vf{$fid}"] = $title;
-        $this->page->setBreadCrumbs($path);
+        $breadCrumbs["?act=vf{$fid}"] = $title;
+        $this->page->setBreadCrumbs($breadCrumbs);
         if ($this->request->isJSAccess()) {
             $this->page->command('update', 'page', $page);
         } else {
