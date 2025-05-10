@@ -49,7 +49,7 @@ final class Topic
     private int $firstPostID = 0;
 
     /**
-     * @var array<string,mixed> $topicData
+     * @var array<string,mixed>
      */
     private ?array $topicData = null;
 

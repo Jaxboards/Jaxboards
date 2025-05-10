@@ -198,7 +198,7 @@ final readonly class ModControls
                     $this->database->basicvalue($this->request->post('mid')),
                 );
 
-                if (!$updateResult) {
+                if ($updateResult === null) {
                     $page .= $this->template->meta(
                         'error',
                         'Error updating profile information.',

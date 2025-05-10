@@ -446,7 +446,7 @@ final readonly class Members
                     $page .= $this->page->success('Member registered.');
                 } else {
                     $page .= $this->page->error(
-                        'An error occurred while processing your request. '
+                        'An error occurred while processing your request. ',
                     );
                 }
             }

@@ -30,11 +30,7 @@ use function preg_quote;
 use function preg_replace;
 use function preg_split;
 use function str_repeat;
-use function syslog;
 use function trim;
-
-use const LOG_EMERG;
-use const PHP_EOL;
 
 final class Search
 {

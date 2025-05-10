@@ -13,10 +13,12 @@ use function array_keys;
 use function array_map;
 use function array_pop;
 use function array_values;
+use function count;
 use function explode;
 use function gmdate;
 use function implode;
 use function is_array;
+use function is_bool;
 use function is_int;
 use function is_string;
 use function ksort;
@@ -70,7 +72,7 @@ class Database
         string $database = '',
         string $prefix = '',
     ): void {
-        $this->pdo = new PDO("mysql:host=$host;dbname=$database;charset=utf8mb4", $user, $password, []);
+        $this->pdo = new PDO("mysql:host={$host};dbname={$database};charset=utf8mb4", $user, $password, []);
 
         // All datetimes are GMT for jaxboards
         $this->pdo->query("SET time_zone = '+0:00'");
