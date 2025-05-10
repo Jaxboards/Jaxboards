@@ -496,7 +496,7 @@ class Database
         null|bool|float|int|string $value,
     ): int {
         return match (true) {
-            is_null($value) => PDO::PARAM_NULL,
+            $value === null => PDO::PARAM_NULL,
             is_int($value) => PDO::PARAM_INT,
             is_bool($value) => PDO::PARAM_BOOL,
             default => PDO::PARAM_STR,
