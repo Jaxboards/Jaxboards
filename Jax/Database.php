@@ -24,7 +24,6 @@ use function is_string;
 use function ksort;
 use function mb_check_encoding;
 use function mb_convert_encoding;
-use function mb_substr;
 use function str_repeat;
 use function str_replace;
 use function vsprintf;
