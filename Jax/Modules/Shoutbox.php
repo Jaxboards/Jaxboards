@@ -163,10 +163,10 @@ final class Shoutbox
                 FROM %t s
                 LEFT JOIN %t m
                     ON s.`uid`=m.`id`
-                ORDER BY s.`id` DESC LIMIT 10
+                ORDER BY s.`id` DESC LIMIT ?
                 SQL,
             ['shouts', 'members'],
-            // $this->shoutlimit,
+            $this->shoutlimit,
         );
         $shouts = '';
         $first = 0;
