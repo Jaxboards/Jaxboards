@@ -19,19 +19,28 @@ export type DragSession = {
 };
 class Drag {
     sess: DragSession;
+
     boundEvents: {
-        drag: (event2: MouseEvent) => void;
-        drop: (event2: MouseEvent) => boolean;
+        drag: (event: MouseEvent) => void;
+        drop: (event: MouseEvent) => boolean;
     };
+
     droppables: HTMLElement[];
+
     noChild: boolean = false;
+
     bounds?: number[];
 
     onstart?: (data: object) => void;
+
     ondragover?: (sess: object) => void;
+
     ondrag?: (sess: object) => void;
+
     ondragout?: (sess: object) => void;
+
     ondrop?: (sess: object) => void;
+
     autoZIndex: boolean = true;
 
     constructor() {
@@ -79,7 +88,6 @@ class Drag {
     drag(event: MouseEvent) {
         event.stopPropagation();
         const s = this.sess.el.style;
-        let tmp;
         const tx = event.pageX;
         const ty = event.pageY;
         let mx = tx;
@@ -101,7 +109,7 @@ class Drag {
         s.left = `${left}px`;
         s.top = `${top}px`;
         const sessInfo = this.sess.info;
-        tmp = sessInfo?.droptarget;
+        const dropTarget = sessInfo?.droptarget;
         const sess = {
             left,
             top,
@@ -112,12 +120,12 @@ class Drag {
         };
         this.sess.info = sess;
         this.ondrag?.(sess);
-        if (sess.droptarget && tmp !== sess.droptarget) {
+        if (sess.droptarget && dropTarget !== sess.droptarget) {
             this.ondragover?.(sess);
         }
-        if (tmp && sess.droptarget !== tmp) {
+        if (dropTarget && sess.droptarget !== dropTarget) {
             tmp2 = sess.droptarget;
-            sess.droptarget = tmp;
+            sess.droptarget = dropTarget;
             this.ondragout?.(sess);
             sess.droptarget = tmp2;
         }
@@ -145,14 +153,14 @@ class Drag {
         let z;
         let max = [9999, 9999];
         if (!droppables.length) {
-            return;
+            return undefined;
         }
-        return droppables.findLast((droppable) => {
+        return droppables.findLast((droppable): HTMLElement | undefined => {
             if (
                 droppable === this.sess.el ||
                 isChildOf(droppable, this.sess.el)
             ) {
-                return;
+                return undefined;
             }
             z = getCoordinates(droppable);
             if (
@@ -166,6 +174,7 @@ class Drag {
                 max = [z.w, z.h];
                 return droppable;
             }
+            return undefined;
         });
     }
 

@@ -1,7 +1,7 @@
+import { FlatCompat } from '@eslint/eslintrc';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import globals from 'globals';
 import path from 'path';
-import { FlatCompat } from '@eslint/eslintrc';
 import tseslint from 'typescript-eslint';
 import { fileURLToPath } from 'url';
 
@@ -14,7 +14,6 @@ const compat = new FlatCompat({
 });
 
 export default [
-    ...tseslint.configs.recommended,
     ...compat.extends('airbnb-base'),
     eslintPluginPrettierRecommended,
     {
@@ -39,4 +38,5 @@ export default [
             },
         },
     },
+    ...tseslint.configs.recommended,
 ];

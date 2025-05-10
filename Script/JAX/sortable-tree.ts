@@ -57,20 +57,23 @@ export default function sortableTree(
                     parentlock &&
                     sess.droptarget.parentNode !== sess.el.parentNode
                 ) {
-                    return drag.reset(sess.el);
+                    drag.reset(sess.el);
+                    return;
                 }
                 if (
                     nofirstlevel &&
                     (sess.droptarget.parentNode as HTMLElement)?.className ===
                         'tree'
                 ) {
-                    return drag.reset(sess.el);
+                    drag.reset(sess.el);
+                    return;
                 }
                 if (
                     isChildOf(sess.droptarget, sess.el) ||
                     sess.el === sess.droptarget.nextSibling
                 ) {
-                    return drag.reset(sess.el);
+                    drag.reset(sess.el);
+                    return;
                 }
                 const next = sess.droptarget.nextSibling as HTMLElement;
                 if (next.className === 'spacer') {
@@ -97,7 +100,6 @@ export default function sortableTree(
             if (formfield) {
                 formfield.value = JSON.stringify(parsetree(tree, prefix));
             }
-            return null;
         },
     });
 
