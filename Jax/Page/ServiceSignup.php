@@ -13,6 +13,7 @@ use Jax\ServiceConfig;
 use Service\Blueprint;
 
 use function array_map;
+use function count;
 use function dirname;
 use function filter_var;
 use function gmdate;
