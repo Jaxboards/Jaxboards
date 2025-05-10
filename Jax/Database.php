@@ -120,9 +120,9 @@ class Database
         return $this->safequery($query, ...$vars);
     }
 
-    public function insertId(): int|string
+    public function insertId(): ?string
     {
-        return $this->pdo->lastInsertId();
+        return $this->pdo->lastInsertId() ?: null;
     }
 
     /**
@@ -265,7 +265,7 @@ class Database
      */
     public function arows(?PDOStatement $pdoStatement = null): array
     {
-        return $pdoStatement?->fetchAll(PDO::FETCH_ASSOC);
+        return $pdoStatement?->fetchAll(PDO::FETCH_ASSOC) ?? [];
     }
 
     public function disposeresult(?PDOStatement $pdoStatement): void
