@@ -1,7 +1,7 @@
 import Animation from './animation';
 import Drag from './drag';
 import { getHighestZIndex } from './el';
-import { toggleOverlay, onImagesLoaded } from './util';
+import { onImagesLoaded } from './util';
 
 class Window {
     constructor(options = {}) {
@@ -10,7 +10,6 @@ class Window {
             wait: true,
             content: 'Content',
             open: false,
-            useoverlay: false,
             minimizable: true,
             resize: false,
             className: '',
@@ -39,9 +38,6 @@ class Window {
         }
         this.contentcontainer = contentContainer;
 
-        if (this.useOverlay) {
-            toggleOverlay(true, this.zIndex);
-        }
         windowContainer.className = `window${
             this.className ? ` ${this.className}` : ''
         }`;
@@ -139,7 +135,6 @@ class Window {
         document.body.removeChild(this.windowContainer);
         this.windowContainer = null;
         if (this.onclose) this.onclose();
-        if (this.useOverlay) toggleOverlay(false);
     }
 
     minimize() {

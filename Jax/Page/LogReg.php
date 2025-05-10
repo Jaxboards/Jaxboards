@@ -99,8 +99,8 @@ final class LogReg
         $badNameChars = $this->config->getSetting('badnamechars');
         $error = match (true) {
             $this->ipAddress->isServiceBanned() => 'You have been banned from registration on all boards. If'
-                    . ' you feel that this is in error, please contact the'
-                    . ' administrator.',
+                . ' you feel that this is in error, please contact the'
+                . ' administrator.',
             !$name || !$dispname => 'Name and display name required.',
             $pass1 !== $pass2 => 'The passwords do not match.',
             mb_strlen($dispname) > 30 || mb_strlen($name) > 30 => 'Display name and username must be under 30 characters.',
@@ -168,8 +168,7 @@ final class LogReg
             <<<'SQL'
                 UPDATE %t
                 SET `members` = `members` + 1, `last_register` = ?
-                SQL
-            ,
+                SQL,
             ['stats'],
             $this->database->insertId(),
         );
@@ -301,7 +300,6 @@ final class LogReg
                     HTML,
                 'id' => 'loginform',
                 'title' => 'Login',
-                'useoverlay' => 1,
             ],
         );
     }
@@ -455,15 +453,15 @@ final class LogReg
                         $page .= $this->template->meta(
                             'error',
                             'There was a problem sending the email. '
-                            . 'Please contact the administrator.',
+                                . 'Please contact the administrator.',
                         );
                     } else {
                         $page .= $this->template->meta(
                             'success',
                             'An email has been sent to the email associated '
-                            . 'with this account. Please check your email and '
-                            . 'follow the instructions in order to recover '
-                            . 'your password.',
+                                . 'with this account. Please check your email and '
+                                . 'follow the instructions in order to recover '
+                                . 'your password.',
                         );
                     }
                 }
@@ -472,11 +470,11 @@ final class LogReg
             $page .= $this->template->meta(
                 'forgot-password-form',
                 $this->request->isJSAccess()
-                ? $this->jax->hiddenFormFields(
-                    [
-                        'act' => 'logreg6',
-                    ],
-                ) : '',
+                    ? $this->jax->hiddenFormFields(
+                        [
+                            'act' => 'logreg6',
+                        ],
+                    ) : '',
             );
         }
 

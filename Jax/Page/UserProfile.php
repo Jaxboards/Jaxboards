@@ -227,7 +227,6 @@ final class UserProfile
                 ),
                 'minimizable' => false,
                 'title' => 'Contact Card',
-                'useoverlay' => 1,
             ],
         );
     }

@@ -1913,15 +1913,6 @@ textarea {
 }
 
 /* Function-Specific */
-#overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    background: #000;
-    opacity: 0.5;
-    filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=80)';
-}
-
 #notification,
 #modbox {
     background: #fff;

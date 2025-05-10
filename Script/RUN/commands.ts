@@ -1,6 +1,6 @@
 /* global RUN, globalsettings */
 /* eslint-disable no-alert */
-import { toggleOverlay, onImagesLoaded } from '../JAX/util';
+import { onImagesLoaded } from '../JAX/util';
 import Animation from '../JAX/animation';
 import { addIdleClock } from '../JAX/date';
 import { getCoordinates, getComputedStyle } from '../JAX/el';
@@ -72,7 +72,6 @@ export default {
         const el = document.querySelector(selector);
         if (el) el.parentNode?.removeChild(el);
     },
-    overlay: toggleOverlay,
     back() {
         window.history.back();
     },
@@ -180,7 +179,6 @@ export default {
         win.title = options.title;
         win.content = options.content;
         win.minimizable = options.minimizable || 0;
-        win.useoverlay = options.useoverlay || 0;
         win.animate = options.animate !== undefined ? options.animate : true;
         win.resize = options.resize || false;
         win.className = options.className || '';

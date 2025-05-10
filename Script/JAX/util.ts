@@ -69,29 +69,6 @@ export function updateDates() {
     });
 }
 
-export function toggleOverlay(show) {
-    const dE = document.documentElement;
-    let ol = document.getElementById('overlay');
-    if (ol) {
-        Object.assign(ol.style, {
-            zIndex: getHighestZIndex(),
-            top: 0,
-            height: `${dE.clientHeight}px`,
-            width: `${dE.clientWidth}px`,
-            display: show ? '' : 'none',
-        });
-    } else {
-        if (!show) return;
-        ol = document.createElement('div');
-        ol.id = 'overlay';
-        Object.assign(ol.style, {
-            height: `${dE.clientHeight}0px`,
-            width: `${dE.clientWidth}0px`,
-        });
-        dE.appendChild(ol);
-    }
-}
-
 /**
  * Run a callback function either when the DOM is loaded and ready,
  * or immediately if the document is already loaded.
