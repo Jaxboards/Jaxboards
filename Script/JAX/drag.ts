@@ -5,17 +5,29 @@ import {
     isChildOf,
 } from './el';
 
+export type DragSession = {
+    el: HTMLElement;
+    mx: number;
+    my: number;
+    ex?: number;
+    ey?: number;
+    info?: DragSession;
+    zIndex?: string;
+    left?: number;
+    top?: number;
+    droptarget?: HTMLElement;
+};
 class Drag {
-    onstart?: (data: object) => void;
-    sess: any;
-    boundEvents?: {
-        drag: (event2: any) => void;
-        drop: (event2: any) => boolean;
+    sess: DragSession;
+    boundEvents: {
+        drag: (event2: MouseEvent) => void;
+        drop: (event2: MouseEvent) => boolean;
     };
     droppables: HTMLElement[];
     noChild: boolean = false;
     bounds?: number[];
 
+    onstart?: (data: object) => void;
     ondragover?: (sess: object) => void;
     ondrag?: (sess: object) => void;
     ondragout?: (sess: object) => void;
@@ -24,6 +36,12 @@ class Drag {
 
     constructor() {
         this.droppables = [];
+        // This session line is only here to make typescript happy
+        this.sess = { el: document.body, mx: 0, my: 0 };
+        this.boundEvents = {
+            drag: (event2: MouseEvent) => this.drag(event2),
+            drop: () => this.drop(),
+        };
     }
 
     start(event: MouseEvent, target?: HTMLElement, handle?: HTMLElement) {
@@ -43,8 +61,7 @@ class Drag {
             my: event.pageY,
             ex: parseInt(style?.left ?? '', 10) || 0,
             ey: parseInt(style?.top ?? '', 10) || 0,
-            info: {},
-            bc: getCoordinates(el),
+            info: { el, mx: 0, my: 0 },
             zIndex: el.style.zIndex,
         };
         if (!this.sess.zIndex || Number(this.sess.zIndex) < highz - 1) {
@@ -54,10 +71,6 @@ class Drag {
             ...this.sess,
             droptarget: this.testDrops(this.sess.mx, this.sess.my),
         });
-        this.boundEvents = {
-            drag: (event2: MouseEvent) => this.drag(event2),
-            drop: () => this.drop(),
-        };
         document.addEventListener('mousemove', this.boundEvents.drag);
         document.addEventListener('mouseup', this.boundEvents.drop);
         this.drag(event);
@@ -66,15 +79,14 @@ class Drag {
     drag(event: MouseEvent) {
         event.stopPropagation();
         const s = this.sess.el.style;
-        let sess;
         let tmp;
         const tx = event.pageX;
         const ty = event.pageY;
         let mx = tx;
         let my = ty;
         let tmp2;
-        let left = this.sess.ex + mx - this.sess.mx;
-        let top = this.sess.ey + my - this.sess.my;
+        let left = (this.sess.ex ?? 0) + mx - this.sess.mx;
+        let top = (this.sess.ey ?? 0) + my - this.sess.my;
         const b = this.bounds;
         if (b) {
             if (left < b[0]) {
@@ -88,18 +100,15 @@ class Drag {
         }
         s.left = `${left}px`;
         s.top = `${top}px`;
-        tmp = (sess = this.sess.info).droptarget;
-        sess = {
+        const sessInfo = this.sess.info;
+        tmp = sessInfo?.droptarget;
+        const sess = {
             left,
             top,
             el: this.sess.el,
             mx,
             my,
             droptarget: this.testDrops(tx, ty),
-            dx: mx - (sess.mx || mx),
-            dy: my - (sess.my || my),
-            sx: this.sess.ex,
-            sy: this.sess.ey,
         };
         this.sess.info = sess;
         this.ondrag?.(sess);
@@ -124,9 +133,9 @@ class Drag {
             document.removeEventListener('mouseup', this.boundEvents.drop);
             document.removeEventListener('mousemove', this.boundEvents.drag);
         }
-        this.ondrop?.(this.sess.info);
+        this.ondrop?.(this.sess.info!);
         if (this.autoZIndex) {
-            this.sess.el.style.zIndex = this.sess.zIndex;
+            this.sess.el.style.zIndex = this.sess.zIndex ?? '';
         }
         return true;
     }
@@ -206,8 +215,8 @@ class Drag {
     }
 
     reset(el = this.sess.el) {
-        el.style.top = 0;
-        el.style.left = 0;
+        el.style.top = '0';
+        el.style.left = '0';
         return this;
     }
 }

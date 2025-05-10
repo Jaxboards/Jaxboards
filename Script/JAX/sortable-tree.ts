@@ -1,25 +1,29 @@
-import Drag from './drag';
-import { insertBefore, insertAfter, isChildOf } from './el';
+import Drag, { DragSession } from './drag';
+import { insertAfter, insertBefore, isChildOf } from './el';
 
-function parsetree(tree, prefix) {
+function parsetree(tree: HTMLElement, prefix: string) {
     const nodes = Array.from(tree.querySelectorAll('li'));
-    const order = {};
+    const order: Record<string, unknown> = {};
     let gotsomethin = 0;
     nodes.forEach((node) => {
         if (node.className !== 'seperator' && node.parentNode === tree) {
             gotsomethin = 1;
             const [sub] = node.getElementsByTagName('ul');
-            order[`_${node.id.substr(prefix.length)}`] =
+            order[`_${node.id.slice(prefix.length)}`] =
                 sub !== undefined ? parsetree(sub, prefix) : 1;
         }
     });
     return gotsomethin ? order : 1;
 }
 
-export default function sortableTree(tree, prefix, formfield) {
+export default function sortableTree(
+    tree: HTMLElement,
+    prefix: string,
+    formfield: HTMLInputElement,
+) {
     const listItems = Array.from(tree.querySelectorAll('li'));
     const items = [];
-    const seperators = [];
+    const seperators: HTMLLIElement[] = [];
 
     items.push(...listItems.filter((li) => li.className !== 'title'));
 
@@ -31,56 +35,65 @@ export default function sortableTree(tree, prefix, formfield) {
     });
 
     const drag = new Drag().noChildActivation();
-    drag.drops(seperators.concat(items)).addListener({
-        ondragover(a) {
-            a.droptarget.style.border = '1px solid #000';
+    drag.drops([...items, ...seperators]).addListener({
+        ondragover(sess: DragSession) {
+            if (sess.droptarget)
+                sess.droptarget.style.border = '1px solid #000';
         },
-        ondragout(a) {
-            a.droptarget.style.border = 'none';
+        ondragout(sess: DragSession) {
+            if (sess.droptarget) sess.droptarget.style.border = 'none';
         },
-        ondrop(a) {
-            const next = a.droptarget.nextSibling;
+        ondrop(sess: DragSession) {
             let tmp;
-            const parentlock = a.el.className === 'parentlock';
-            const nofirstlevel = a.el.className === 'nofirstlevel';
-            if (a.droptarget) {
-                a.droptarget.style.border = 'none';
+            const parentlock = sess.el.className === 'parentlock';
+            const nofirstlevel = sess.el.className === 'nofirstlevel';
+            drag.reset(sess.el);
+            if (!sess.droptarget) {
+                return;
             }
-            if (a.droptarget.className === 'seperator') {
-                if (parentlock && a.droptarget.parentNode !== a.el.parentNode) {
-                    return drag.reset(a.el);
+            sess.droptarget.style.border = 'none';
+            if (sess.droptarget.className === 'seperator') {
+                if (
+                    parentlock &&
+                    sess.droptarget.parentNode !== sess.el.parentNode
+                ) {
+                    return drag.reset(sess.el);
                 }
                 if (
                     nofirstlevel &&
-                    a.droptarget.parentNode.className === 'tree'
+                    (sess.droptarget.parentNode as HTMLElement)?.className ===
+                        'tree'
                 ) {
-                    return drag.reset(a.el);
+                    return drag.reset(sess.el);
                 }
-                if (isChildOf(a.droptarget, a.el) || a.el === next) {
-                    return drag.reset(a.el);
+                if (
+                    isChildOf(sess.droptarget, sess.el) ||
+                    sess.el === sess.droptarget.nextSibling
+                ) {
+                    return drag.reset(sess.el);
                 }
+                const next = sess.droptarget.nextSibling as HTMLElement;
                 if (next.className === 'spacer') {
-                    next.parentNode.removeChild(next);
+                    next.parentNode?.removeChild(next);
                 }
                 if (next.className !== 'spacer') {
-                    insertAfter(a.el.previousSibling, a.droptarget);
+                    insertAfter(sess.el.previousSibling!, sess.droptarget);
                 } else {
-                    a.el.previousSibling.parentNode.removeChild(
-                        a.el.previousSibling,
+                    sess.el.previousSibling?.parentNode?.removeChild(
+                        sess.el.previousSibling,
                     );
                 }
-                insertAfter(a.el, a.droptarget);
-            } else if (!parentlock && a.droptarget.tagName === 'LI') {
-                [tmp] = a.droptarget.getElementsByTagName('ul');
+                insertAfter(sess.el, sess.droptarget);
+            } else if (!parentlock && sess.droptarget.tagName === 'LI') {
+                [tmp] = sess.droptarget.getElementsByTagName('ul');
                 if (!tmp) {
                     tmp = document.createElement('ul');
-                    a.droptarget.appendChild(tmp);
+                    sess.droptarget.appendChild(tmp);
                 }
-                tmp.appendChild(a.el.previousSibling);
-                tmp.appendChild(a.el);
-                a.droptarget.appendChild(tmp);
+                tmp.appendChild(sess.el.previousSibling!);
+                tmp.appendChild(sess.el);
+                sess.droptarget.appendChild(tmp);
             }
-            drag.reset(a.el);
             if (formfield) {
                 formfield.value = JSON.stringify(parsetree(tree, prefix));
             }

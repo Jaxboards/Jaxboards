@@ -28,12 +28,12 @@ export function isChildOf(a: HTMLElement, b: HTMLElement) {
     return b.contains(a);
 }
 
-export function insertBefore(a: HTMLElement, b: HTMLElement) {
+export function insertBefore(a: Node, b: Node) {
     if (a.parentNode) a.parentNode.removeChild(a);
     b.parentNode?.insertBefore(a, b);
 }
 
-export function insertAfter(a: HTMLElement, b: HTMLElement) {
+export function insertAfter(a: Node, b: Node) {
     if (a.parentNode) a.parentNode.removeChild(a);
     b.parentNode?.insertBefore(a, b.nextSibling);
 }
