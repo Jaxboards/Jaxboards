@@ -258,9 +258,11 @@ final class Post
             $page .= $this->template->meta('error', $error);
         } else {
             if (!isset($topic)) {
+                $inputTopicTitle = $this->request->post('ttitle');
+                $inputTopicDescription = $this->request->post('tdesc');
                 $topic = [
-                    'subtitle' => '',
-                    'title' => '',
+                    'subtitle' => is_string($inputTopicDescription) ? $inputTopicDescription : '',
+                    'title' => is_string($inputTopicTitle) ? $inputTopicTitle : '',
                 ];
             }
 
@@ -669,79 +671,76 @@ final class Post
         $uid = $this->user->get('id');
         $error = null;
 
-        if ($this->postData !== null && trim((string) $postData) === '') {
-            $error = "You didn't supply a post!";
-        } elseif (mb_strlen((string) $postData) > 50000) {
-            $error = 'Post must not exceed 50,000 characters.';
-        }
-
         $inputTopicTitle = $this->request->post('ttitle');
+        $inputTopicDescription = $this->request->post('tdesc');
         $inputSubtitle = $this->request->post('subtitle');
         $inputPollChoices = $this->request->post('pollchoices');
         $inputPollQuestion = $this->request->post('pollq');
+        $inputPollType = $this->request->post('poll_type');
         $topicTitle = is_string($inputTopicTitle) ? $inputTopicTitle : null;
         $subTitle = is_string($inputSubtitle) ? $inputSubtitle : null;
         $pollChoices = is_string($inputPollChoices) ? $inputPollChoices : null;
-        $pollQuestion = is_string($inputPollQuestion)
-            ? $inputPollQuestion
-            : null;
+        $pollQuestion = is_string($inputPollQuestion) ? $inputPollQuestion : null;
+        $pollchoices = array_map(
+            function ($line) {
+                return $this->textFormatting->blockhtml($line);
+            },
+            array_filter(
+                preg_split("@[\r\n]+@", $pollChoices),
+                fn($line) => trim($line) !== ''
+            ),
+        );
+
+        // Post validation
+        $error = match (true) {
+            $postData === null || trim($postData) === '' => "You didn't supply a post!",
+            mb_strlen($postData) > 50000 => 'Post must not exceed 50,000 characters.',
+            default => null,
+        };
+
+        // New topic input validation
+        $error = match (true) {
+            !!$error || $this->how !== 'newtopic' => $error,
+            $fid === 0 => 'No forum specified exists.',
+            !$topicTitle || trim($topicTitle) === '' => "You didn't specify a topic title!",
+            mb_strlen($topicTitle) > 255 => 'Topic title must not exceed 255 characters',
+            mb_strlen($subTitle ?? '') > 255 => 'Subtitle must not exceed 255 characters',
+            default => null,
+        };
+
+        // Poll input validation
+        $error = match (true) {
+            !!$error || !$inputPollType => $error,
+            $pollQuestion === null || trim($pollQuestion) === '' => "You didn't specify a poll question!",
+            count($pollchoices) > 10 => 'Poll choices must not exceed 10.',
+            $pollchoices === [] => "You didn't provide any poll choices!",
+            default => null,
+        };
 
         if ($error === null && $this->how === 'newtopic') {
-            if ($fid === 0) {
-                $error = 'No forum specified exists.';
-            } elseif (
-                !$topicTitle || trim($topicTitle) === ''
-            ) {
-                $error = "You didn't specify a topic title!";
-            } elseif (
-                mb_strlen($topicTitle) > 255
-            ) {
-                $error = 'Topic title must not exceed 255 characters';
-            } elseif (
-                mb_strlen($subTitle ?? '') > 255
-            ) {
-                $error = 'Subtitle must not exceed 255 characters';
-            } elseif ($this->request->post('poll_type')) {
-                $pollchoices = array_map(
-                    fn($line): string => $this->textFormatting->blockhtml($line),
-                    array_filter(
-                        preg_split("@[\r\n]+@", (string) $pollChoices),
-                        static fn($line): bool => trim($line) !== '',
-                    ),
-                );
-
-                if ($pollQuestion === null || trim($pollQuestion) === '') {
-                    $error = "You didn't specify a poll question!";
-                } elseif (count($pollchoices) > 10) {
-                    $error = 'Poll choices must not exceed 10.';
-                } elseif ($pollchoices === []) {
-                    $error = "You didn't provide any poll choices!";
-                }
-            }
-
-            // Perms.
+            // Check perms.
             $result = $this->database->safeselect(
                 ['perms'],
                 'forums',
                 Database::WHERE_ID_EQUALS,
                 $fid,
             );
-            $fdata = $this->database->arow($result);
+            $forum = $this->database->arow($result);
             $this->database->disposeresult($result);
 
-            if (!$fdata) {
+            if (!$forum) {
                 $error = "The forum you're trying to post in does not exist.";
             } else {
-                $fdata['perms'] = $this->user->getForumPerms($fdata['perms']);
-                if (!$fdata['perms']['start']) {
+                $forum['perms'] = $this->user->getForumPerms($forum['perms']);
+                if (!$forum['perms']['start']) {
                     $error = "You don't have permission to post a new topic in that forum.";
                 }
 
                 if (
                     (
-                        $this->request->post('poll_type') !== null
-                        || $this->request->post('pollq') !== null
-                    ) && !$fdata['perms']['poll']
+                        $inputPollType !== null
+                        || $pollQuestion !== null
+                    ) && !$forum['perms']['poll']
                 ) {
                     $error = "You don't have permission to post a poll in that forum";
                 }
@@ -759,12 +758,12 @@ final class Post
                         'poll_choices' => isset($pollchoices) && $pollchoices
                             ? json_encode($pollchoices)
                             : '',
-                        'poll_q' => $this->request->post('pollq') !== null
-                            ? $this->textFormatting->blockhtml($this->request->post('pollq'))
+                        'poll_q' => $pollQuestion !== null
+                            ? $this->textFormatting->blockhtml($pollQuestion)
                             : '',
-                        'poll_type' => $this->request->post('poll_type') ?? '',
+                        'poll_type' => $inputPollType ?? '',
                         'replies' => 0,
-                        'subtitle' => $this->textFormatting->blockhtml($this->request->post('tdesc')),
+                        'subtitle' => $this->textFormatting->blockhtml($inputTopicDescription),
                         'summary' => mb_substr(
                             (string) preg_replace(
                                 '@\s+@',
@@ -778,7 +777,7 @@ final class Post
                             0,
                             50,
                         ),
-                        'title' => $this->textFormatting->blockhtml($this->request->post('ttitle')),
+                        'title' => $this->textFormatting->blockhtml($topicTitle),
                         'views' => 0,
                     ],
                 );
