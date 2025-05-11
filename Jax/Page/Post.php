@@ -47,7 +47,7 @@ final class Post
 
     private int $pid;
 
-    private string $how;
+    private ?string $how;
 
     public function __construct(
         private readonly Config $config,
@@ -66,11 +66,12 @@ final class Post
 
     public function render(): void
     {
+        $how = $this->request->both('how');
         $this->tid = (int) $this->request->both('tid');
         $this->fid = (int) $this->request->both('fid');
         $this->pid = (int) $this->request->both('pid');
-        $this->how = (string) $this->request->both('how');
-        $submit = (string) $this->request->post('submit');
+        $this->how = is_string($how) ? $how : null;
+        $submit = $this->request->post('submit');
         $fileData = $this->request->file('Filedata');
         $postData = $this->request->post('postdata');
 
@@ -79,12 +80,11 @@ final class Post
             return;
         }
 
-        if ($postData !== null) {
-            $this->postData = (string) $postData;
-
-            [$this->postData, $codes] = $this->textFormatting->startCodeTags($this->postData);
-            $this->postData = $this->textFormatting->linkify($this->postData);
-            $this->postData = $this->textFormatting->finishCodeTagsBB($this->postData, $codes);
+        if (is_string($postData)) {
+            [$postData, $codes] = $this->textFormatting->startCodeTags($postData);
+            $postData = $this->textFormatting->linkify($postData);
+            $postData = $this->textFormatting->finishCodeTagsBB($postData, $codes);
+            $this->postData = $postData;
         }
 
         if ($fileData !== null && $this->user->getPerm('can_attach')) {
@@ -107,17 +107,18 @@ final class Post
      * 2) If it's an image, keep the extension so we can show it. Otherwise remove it.
      * 3) If the file has already been uploaded (based on hash) then don't replace it.
      *
+     * @param array{tmp_name:string,name:string} $fileobj
      * @return int|string file ID from the files table, or string on failure
      */
     private function upload(array $fileobj): int|string
     {
         $uid = $this->user->get('id');
 
-        $size = filesize($fileobj['tmp_name']);
-        $hash = hash_file('sha512', $fileobj['tmp_name']);
+        $size = (int) filesize($fileobj['tmp_name']);
+        $hash = hash_file('sha512', $fileobj['tmp_name']) ?: 'hash_error';
         $uploadPath = $this->domainDefinitions->getBoardPath() . '/Uploads/';
 
-        $ext = pathinfo((string) $fileobj['name'], PATHINFO_EXTENSION);
+        $ext = (string) pathinfo($fileobj['name'], PATHINFO_EXTENSION);
 
         $imageExtension = in_array($ext, $this->config->getSetting('images') ?? [], true)
             ? ".{$ext}"
@@ -138,7 +139,10 @@ final class Post
                 ],
             );
 
-            return $this->database->insertId();
+            $attachmentId = $this->database->insertId();
+            if ($attachmentId) {
+                return $attachmentId;
+            }
         }
 
         $result = $this->database->safeselect(
@@ -148,7 +152,11 @@ final class Post
             $hash,
         );
         $fileRecord = $this->database->arow($result);
-        $id = $fileRecord['id'];
+        if (!$fileRecord) {
+            return '';
+        }
+
+        $id = (string) $fileRecord['id'];
         $this->database->disposeresult($result);
 
         return $id;
@@ -156,8 +164,8 @@ final class Post
 
     private function previewPost(): void
     {
-        $post = $this->postData;
-        if (trim((string) $post) !== '' && trim((string) $post) !== '0') {
+        $post = $this->postData ?? '';
+        if (trim($post) !== '') {
             $post = $this->textFormatting->theWorks($post);
             $post = $this->template->meta('post-preview', $post);
             $this->postpreview = $post;
@@ -224,7 +232,7 @@ final class Post
                 $this->database->disposeresult($result);
 
                 if ($postData) {
-                    $postData = $postData[0];
+                    $postData = $postData['post'];
                 }
             }
         }
@@ -238,9 +246,7 @@ final class Post
         $forum = $this->database->arow($result);
         $this->database->disposeresult($result);
 
-        $forum['perms'] = $this->user->getForumPerms($forum['perms']);
-
-        if ($forum === []) {
+        if ($forum === null) {
             $error = "This forum doesn't exist. Weird.";
         }
 
@@ -253,6 +259,7 @@ final class Post
                     'title' => '',
                 ];
             }
+            $forum['perms'] = $this->user->getForumPerms($forum['perms']);
 
             $pollForm = $forum['perms']['poll'] ? <<<'HTML'
                 <label class="addpoll" for="addpoll">
@@ -353,29 +360,27 @@ final class Post
             $this->page->command('closewindow', '#qreply');
         }
 
-        if ($tid !== 0) {
-            $result = $this->database->safespecial(
-                <<<'SQL'
-                    SELECT
-                        t.`title` AS `title`,
-                        f.`perms` AS `perms`
-                    FROM %t t
-                    LEFT JOIN %t f
-                        ON t.`fid`=f.`id`
-                    WHERE t.`id`=?
-                    SQL,
-                ['topics', 'forums'],
-                $this->database->basicvalue($tid),
+        $result = $this->database->safespecial(
+            <<<'SQL'
+                SELECT
+                    t.`title` AS `title`,
+                    f.`perms` AS `perms`
+                FROM %t t
+                LEFT JOIN %t f
+                    ON t.`fid`=f.`id`
+                WHERE t.`id`=?
+                SQL,
+            ['topics', 'forums'],
+            $this->database->basicvalue($tid),
+        );
+        $topic = $this->database->arow($result);
+        $this->database->disposeresult($result);
+        if (!$topic) {
+            $page .= $this->template->meta(
+                'error',
+                "The topic you're attempting to reply in no longer exists.",
             );
-            $topic = $this->database->arow($result);
-            $this->database->disposeresult($result);
-            if (!$topic) {
-                $page .= $this->template->meta(
-                    'error',
-                    "The topic you're attempting to reply in no longer exists.",
-                );
-            }
-
+        } else {
             $topic['title'] = $this->textFormatting->wordfilter($topic['title']);
             $topic['perms'] = $this->user->getForumPerms($topic['perms']);
         }
@@ -465,6 +470,9 @@ final class Post
         $this->page->command('attachfiles');
     }
 
+    /**
+     * @param array<string,mixed> $post
+     */
     private function canEdit(array $post): bool
     {
         if (
@@ -479,7 +487,7 @@ final class Post
         return $this->canModerate($post['tid']);
     }
 
-    private function canModerate($tid): bool
+    private function canModerate(int $tid): bool
     {
         if ($this->canmod) {
             return $this->canmod;
@@ -498,7 +506,7 @@ final class Post
             );
             $mods = $this->database->arow($result);
             $this->database->disposeresult($result);
-            if (in_array($this->user->get('id'), explode(',', (string) $mods['mods']))) {
+            if ($mods !== null && in_array($this->user->get('id'), explode(',', (string) $mods['mods']))) {
                 $canmod = true;
             }
         }
@@ -541,76 +549,73 @@ final class Post
                 default => null,
             };
 
-            if ($this->postData === null) {
+            if ($this->postData === null && $post) {
                 $editingPost = true;
                 $this->postData = $post['post'];
             }
         }
 
         if ($tid && $error === null) {
-            if ($tid === 0) {
-                $error = 'Invalid post to edit.';
+            $result = $this->database->safeselect(
+                [
+                    'auth_id',
+                    'cal_event',
+                    'fid',
+                    'id',
+                    'locked',
+                    'lp_uid',
+                    'op',
+                    'pinned',
+                    'poll_choices',
+                    'poll_q',
+                    'poll_results',
+                    'poll_type',
+                    'replies',
+                    'subtitle',
+                    'summary',
+                    'title',
+                    'views',
+                    'UNIX_TIMESTAMP(`date`) AS `date`',
+                    'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
+                ],
+                'topics',
+                Database::WHERE_ID_EQUALS,
+                $tid,
+            );
+            $topic = $this->database->arow($result);
+            $this->database->disposeresult($result);
+
+            $inputTopicTitle = $this->request->post('ttitle');
+            $topicTitle = is_string($inputTopicTitle) ? $inputTopicTitle : null;;
+            if (!$topic) {
+                $error = "The topic you are trying to edit doesn't exist.";
+            } elseif ($topicTitle === null || trim($topicTitle) === '') {
+                $error = 'You must supply a topic title!';
             } else {
-                $result = $this->database->safeselect(
-                    [
-                        'auth_id',
-                        'cal_event',
-                        'fid',
-                        'id',
-                        'locked',
-                        'lp_uid',
-                        'op',
-                        'pinned',
-                        'poll_choices',
-                        'poll_q',
-                        'poll_results',
-                        'poll_type',
-                        'replies',
-                        'subtitle',
-                        'summary',
-                        'title',
-                        'views',
-                        'UNIX_TIMESTAMP(`date`) AS `date`',
-                        'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
-                    ],
+                $this->database->safeupdate(
                     'topics',
-                    Database::WHERE_ID_EQUALS,
-                    $tid,
-                );
-                $tmp = $this->database->arow($result);
-
-                $this->database->disposeresult($result);
-
-                if (!$tmp) {
-                    $error = "The topic you are trying to edit doesn't exist.";
-                } elseif (trim((string) $this->request->post('ttitle')) === '') {
-                    $error = 'You must supply a topic title!';
-                } else {
-                    $this->database->safeupdate(
-                        'topics',
-                        [
-                            'subtitle' => $this->textFormatting->blockhtml($this->request->post('tdesc')),
-                            'summary' => mb_substr(
-                                (string) preg_replace(
-                                    '@\s+@',
-                                    ' ',
-                                    $this->textFormatting->wordfilter(
-                                        $this->textFormatting->blockhtml(
-                                            $this->textFormatting->textOnly(
-                                                $this->postData,
-                                            ),
+                    [
+                        'subtitle' => $this->textFormatting->blockhtml($this->request->post('tdesc')),
+                        'summary' => mb_substr(
+                            (string) preg_replace(
+                                '@\s+@',
+                                ' ',
+                                $this->textFormatting->wordfilter(
+                                    $this->textFormatting->blockhtml(
+                                        $this->textFormatting->textOnly(
+                                            $this->postData,
                                         ),
                                     ),
                                 ),
-                                0,
-                                50,
                             ),
-                            'title' => $this->textFormatting->blockhtml($this->request->post('ttitle')),
-                        ],
-                        Database::WHERE_ID_EQUALS,
-                        $tid,
-                    );
-                }
+                            0,
+                            50,
+                        ),
+                        'title' => $this->textFormatting->blockhtml($topicTitle),
+                    ],
+                    Database::WHERE_ID_EQUALS,
+                    $tid,
+                );
             }
         }
 
@@ -661,37 +666,42 @@ final class Post
             $error = 'Post must not exceed 50,000 characters.';
         }
 
+        $inputTopicTitle = $this->request->post('ttitle');
+        $inputSubtitle = $this->request->post('subtitle');
+        $inputPollChoices = $this->request->post('pollchoices');
+        $inputPollQuestion = $this->request->post('pollq');
+        $topicTitle = is_string($inputTopicTitle) ? $inputTopicTitle : null;
+        $subTitle = is_string($inputSubtitle) ? $inputSubtitle : null;
+        $pollChoices = is_string($inputPollChoices) ? $inputPollChoices : null;
+        $pollQuestion = is_string($inputPollQuestion) ? $inputPollQuestion : null;
+
         if ($error === null && $this->how === 'newtopic') {
             if ($fid === 0) {
                 $error = 'No forum specified exists.';
             } elseif (
-                trim($this->request->post('ttitle') ?? '') === ''
+                !$topicTitle || trim($topicTitle) === ''
             ) {
                 $error = "You didn't specify a topic title!";
             } elseif (
-                mb_strlen($this->request->post('ttitle') ?? '') > 255
+                mb_strlen($topicTitle) > 255
             ) {
                 $error = 'Topic title must not exceed 255 characters';
             } elseif (
-                mb_strlen($this->request->post('subtitle') ?? '') > 255
+                mb_strlen($subTitle ?? '') > 255
             ) {
                 $error = 'Subtitle must not exceed 255 characters';
             } elseif ($this->request->post('poll_type')) {
-                $pollchoices = [];
-                $pollChoice = preg_split("@[\r\n]+@", (string) $this->request->post('pollchoices'));
-                foreach ($pollChoice as $v) {
-                    if (trim($v) === '') {
-                        continue;
-                    }
+                $pollchoices = array_map(
+                    function ($line) {
+                        return $this->textFormatting->blockhtml($line);
+                    },
+                    array_filter(
+                        preg_split("@[\r\n]+@", $pollChoices),
+                        fn($line) => trim($line) !== ''
+                    ),
+                );
 
-                    if (trim($v) === '0') {
-                        continue;
-                    }
-
-                    $pollchoices[] = $this->textFormatting->blockhtml($v);
-                }
-
-                if (trim((string) $this->request->post('pollq')) === '') {
+                if ($pollQuestion === null || trim($pollQuestion) === '') {
                     $error = "You didn't specify a poll question!";
                 } elseif (count($pollchoices) > 10) {
                     $error = 'Poll choices must not exceed 10.';
