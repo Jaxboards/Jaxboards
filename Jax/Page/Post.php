@@ -680,14 +680,14 @@ final class Post
         $topicTitle = is_string($inputTopicTitle) ? $inputTopicTitle : null;
         $subTitle = is_string($inputSubtitle) ? $inputSubtitle : null;
         $pollChoices = is_string($inputPollChoices) ? $inputPollChoices : null;
-        $pollQuestion = is_string($inputPollQuestion) ? $inputPollQuestion : null;
+        $pollQuestion = is_string($inputPollQuestion)
+            ? $inputPollQuestion
+            : null;
         $pollchoices = array_map(
-            function ($line) {
-                return $this->textFormatting->blockhtml($line);
-            },
+            fn($line): string => $this->textFormatting->blockhtml($line),
             array_filter(
-                preg_split("@[\r\n]+@", $pollChoices),
-                fn($line) => trim($line) !== ''
+                preg_split("@[\r\n]+@", (string) $pollChoices),
+                static fn($line): bool => trim((string) $line) !== '',
             ),
         );
 
@@ -700,7 +700,7 @@ final class Post
 
         // New topic input validation
         $error = match (true) {
-            !!$error || $this->how !== 'newtopic' => $error,
+            (bool) $error || $this->how !== 'newtopic' => $error,
             $fid === 0 => 'No forum specified exists.',
             !$topicTitle || trim($topicTitle) === '' => "You didn't specify a topic title!",
             mb_strlen($topicTitle) > 255 => 'Topic title must not exceed 255 characters',
@@ -710,7 +710,7 @@ final class Post
 
         // Poll input validation
         $error = match (true) {
-            !!$error || !$inputPollType => $error,
+            (bool) $error || !$inputPollType => $error,
             $pollQuestion === null || trim($pollQuestion) === '' => "You didn't specify a poll question!",
             count($pollchoices) > 10 => 'Poll choices must not exceed 10.',
             $pollchoices === [] => "You didn't provide any poll choices!",
