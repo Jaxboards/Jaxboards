@@ -131,7 +131,7 @@ export default {
         ticker.insertBefore(tick, ticker.firstChild);
         const tickStyle = getComputedStyle(tick);
         tick.style.height = '0px';
-        new Animation(tick).add('height', '0px', tickStyle?.height).play();
+        new Animation(tick).add('height', '0px', tickStyle.height).play();
         const ticks = Array.from(
             ticker.querySelectorAll<HTMLDivElement>('.tick'),
         );
@@ -145,7 +145,7 @@ export default {
                     tick = ticks[x];
                     new Animation(tick, 30, 500)
                         .add('opacity', '1', '0')
-                        .then((el: HTMLDivElement) => {
+                        .then((el: HTMLElement) => {
                             el.parentNode?.removeChild(el);
                         })
                         .play();

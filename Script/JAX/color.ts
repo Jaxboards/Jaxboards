@@ -65,7 +65,6 @@ class Color {
     }
 
     toHex() {
-        if (!this.rgb) return false;
         return this.rgb
             .map((dec) => dec.toString(16).padStart(2, '0'))
             .join('');

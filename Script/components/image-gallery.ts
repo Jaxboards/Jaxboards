@@ -1,11 +1,15 @@
 import Component from '../classes/component';
 
 export default class ImageGallery extends Component {
+    index: number;
+    images: NodeListOf<HTMLImageElement>;
+    max: number;
+
     static get selector() {
         return '.image_gallery';
     }
 
-    constructor(element) {
+    constructor(element: HTMLDivElement) {
         super(element);
         const controls = document.createElement('div');
         const next = document.createElement('button');
@@ -47,12 +51,12 @@ export default class ImageGallery extends Component {
 
     update() {
         this.images.forEach((img, i) => {
-            let container;
-            if (img.madeResized) {
-                container = img.parentNode;
-            } else {
-                container = img;
-            }
+            const container = img.dataset.madeResized
+                ? (img.parentNode as HTMLElement)
+                : img;
+
+            if (!container) return;
+
             container.style.display = i !== this.index ? 'none' : 'block';
         });
     }

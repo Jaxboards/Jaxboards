@@ -1,5 +1,5 @@
-import { getComputedStyle } from './el';
 import Color from './color';
+import { getComputedStyle } from './el';
 
 /**
  * This class was written before CSS animations existed.
@@ -21,7 +21,11 @@ class Animation {
     private loop: number;
 
     private lineup: Array<
-        Array<() => void | [string, string | number, string | number]>
+        Array<
+            (
+                el: HTMLElement,
+            ) => void | [string, string | number, string | number]
+        >
     >;
 
     constructor(el: HTMLElement, steps = 30, delay = 20, loop = 0) {
@@ -104,13 +108,9 @@ class Animation {
 
     dehighlight(): this {
         this.el.style.backgroundColor = '';
-        const bg: string | undefined = getComputedStyle(
-            this.el,
-        )?.backgroundColor;
+        const bg = getComputedStyle(this.el).backgroundColor;
         this.el.classList.add('highlight');
-        let bg2: string | undefined = getComputedStyle(
-            this.el,
-        )?.backgroundColor;
+        let bg2 = getComputedStyle(this.el).backgroundColor;
 
         if (bg2 === bg) bg2 = 'FF0'; // yellow
         this.el.classList.add('highlight');
@@ -122,12 +122,17 @@ class Animation {
         });
     }
 
-    then(what: string | (() => void), from, to, steps) {
+    then(
+        what: string | ((el: HTMLElement) => void),
+        from = undefined,
+        to = undefined,
+        steps = undefined,
+    ) {
         this.lineup.push([]);
         if (steps) this.steps = steps;
         if (typeof what === 'function') {
             this.lineup[this.lineup.length - 1].push(what);
-        } else {
+        } else if (from !== undefined && to !== undefined) {
             this.add(what, from, to);
         }
         return this;

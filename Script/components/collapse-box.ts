@@ -6,39 +6,42 @@ export default class CollapseBox extends Component {
         return '.collapse-box';
     }
 
-    constructor(element) {
+    constructor(element: HTMLDivElement) {
         super(element);
 
         element
             .querySelector('.collapse-button')
-            .addEventListener('click', () => this.click());
+            ?.addEventListener('click', () => this.click());
     }
 
     click() {
-        const collapseContent = this.element.querySelector('.collapse-content');
+        const collapseContent =
+            this.element.querySelector<HTMLDivElement>('.collapse-content');
 
-        const s = collapseContent.style;
-        let fh = collapseContent.dataset.fullHeight;
-        const b = collapseContent.parentNode;
-        s.overflow = 'hidden';
-        if (s.height === '0px') {
+        if (!collapseContent) return;
+
+        const style = collapseContent.style;
+        let fullHeight = collapseContent.dataset.fullHeight;
+        const collapseBox = this.element;
+        style.overflow = 'hidden';
+        if (style.height === '0px' && fullHeight) {
             new Animation(collapseContent, 5, 10, 0)
-                .add('height', '0px', fh)
+                .add('height', '0px', fullHeight)
                 .then(() => {
-                    b.classList.remove('collapsed');
+                    collapseBox.classList.remove('collapsed');
                 })
                 .play();
         } else {
-            if (!fh) {
-                fh = `${
+            if (!fullHeight) {
+                fullHeight = `${
                     collapseContent.clientHeight || collapseContent.offsetHeight
                 }px`;
-                collapseContent.dataset.fullHeight = fh;
+                collapseContent.dataset.fullHeight = fullHeight;
             }
             new Animation(collapseContent, 5, 10, 0)
-                .add('height', fh, '0px')
+                .add('height', fullHeight, '0px')
                 .then(() => {
-                    b.classList.add('collapsed');
+                    collapseBox.classList.add('collapsed');
                 })
                 .play();
         }

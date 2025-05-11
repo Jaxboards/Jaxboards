@@ -1,14 +1,22 @@
 import Component from '../classes/component';
-import { getHighestZIndex, getCoordinates } from '../JAX/el';
-import { months, daysShort } from '../JAX/date';
+import { daysShort, months } from '../JAX/date';
+import { getCoordinates, getHighestZIndex } from '../JAX/el';
 
 export default class DatePicker extends Component {
+    picker: HTMLTableElement;
+
+    element: HTMLInputElement;
+    selectedDate?: number[];
+    lastDate?: number[];
+
     static get selector() {
         return 'input.date';
     }
 
-    constructor(element) {
+    constructor(element: HTMLInputElement) {
         super(element);
+
+        this.element = element;
         this.picker = this.getPicker();
 
         // Disable browser autocomplete
@@ -22,7 +30,7 @@ export default class DatePicker extends Component {
             return this.picker;
         }
 
-        let picker = document.querySelector('#datepicker');
+        let picker = document.querySelector<HTMLTableElement>('#datepicker');
         if (!picker) {
             picker = Object.assign(document.createElement('table'), {
                 id: 'datepicker',
@@ -59,9 +67,9 @@ export default class DatePicker extends Component {
     }
 
     // month should be 0 for jan, 11 for dec
-    generate(iyear, imonth, iday) {
+    generate(iyear: number, imonth: number, iday: number) {
         let date = new Date();
-        const dp = document.querySelector('#datepicker');
+        const dp = this.getPicker();
         let row;
         let cell;
         let [year, month, day] = [iyear, imonth, iday];
@@ -103,9 +111,9 @@ export default class DatePicker extends Component {
 
         // current year heading
         cell = row.insertCell(1);
-        cell.colSpan = '5';
+        cell.colSpan = 5;
         cell.className = 'year';
-        cell.innerHTML = year;
+        cell.innerHTML = `${year}`;
 
         // next year button
         cell = row.insertCell(2);
@@ -121,7 +129,7 @@ export default class DatePicker extends Component {
         cell.onclick = () => this.lastMonth();
 
         cell = row.insertCell(1);
-        cell.colSpan = '5';
+        cell.colSpan = 5;
         cell.innerHTML = months[month];
         cell.className = 'month';
         cell = row.insertCell(2);
@@ -151,37 +159,40 @@ export default class DatePicker extends Component {
             cell.onclick = this.insert.bind(this, cell);
 
             const isSelected =
+                !!this.selectedDate &&
                 year === this.selectedDate[0] &&
                 month === this.selectedDate[1] &&
                 x + 1 === this.selectedDate[2];
             cell.className = `day${isSelected ? ' selected' : ''}`;
-            cell.innerHTML = x + 1;
+            cell.innerHTML = `${x + 1}`;
         }
     }
 
     lastYear() {
         const l = this.lastDate;
-        this.generate(l[0] - 1, l[1], l[2]);
+        if (l) this.generate(l[0] - 1, l[1], l[2]);
     }
 
     nextYear() {
         const l = this.lastDate;
-        this.generate(l[0] + 1, l[1], l[2]);
+        if (l) this.generate(l[0] + 1, l[1], l[2]);
     }
 
     lastMonth() {
         const l = this.lastDate;
-        this.generate(l[0], l[1] - 1, l[2]);
+        if (l) this.generate(l[0], l[1] - 1, l[2]);
     }
 
     nextMonth() {
         const l = this.lastDate;
-        this.generate(l[0], l[1] + 1, l[2]);
+        if (l) this.generate(l[0], l[1] + 1, l[2]);
     }
 
-    insert(cell) {
+    insert(cell: HTMLTableCellElement) {
         const l = this.lastDate;
-        this.element.value = `${l[1] + 1}/${cell.innerHTML}/${l[0]}`;
+        if (l) {
+            this.element.value = `${l[1] + 1}/${cell.innerHTML}/${l[0]}`;
+        }
         this.closePicker();
     }
 }

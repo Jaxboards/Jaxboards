@@ -6,7 +6,7 @@ export default class Switch extends Component {
         return 'input.switch';
     }
 
-    constructor(element) {
+    constructor(element: HTMLInputElement) {
         super(element);
         // Hide original checkbox
         element.style.display = 'none';

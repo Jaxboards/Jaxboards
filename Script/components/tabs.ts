@@ -7,26 +7,33 @@ export default class Tabs extends Component {
         return '.tabs';
     }
 
-    constructor(element) {
+    constructor(element: HTMLDivElement) {
         super(element);
         element.addEventListener('click', (event) => this.click(event));
     }
 
-    click(event) {
+    click(event: MouseEvent) {
         const { tabSelector } = this.element.dataset;
 
         let { target } = event;
-        if (target.tagName.toLowerCase() !== 'a') {
+        if (
+            !target ||
+            !(target instanceof HTMLElement) ||
+            target.tagName.toLowerCase() !== 'a'
+        )
             return;
-        }
+
+        let container: HTMLElement = target;
+
         if (tabSelector) {
-            target = target.closest(tabSelector);
+            const parent = target.closest<HTMLElement>(tabSelector);
+            if (parent) container = parent;
         }
         const activeTab = this.element.querySelector(`.${ACTIVE_CLASS}`);
         if (activeTab) {
             activeTab.classList.remove(ACTIVE_CLASS);
         }
-        target.className = ACTIVE_CLASS;
-        target.blur();
+        container.className = ACTIVE_CLASS;
+        container.blur();
     }
 }

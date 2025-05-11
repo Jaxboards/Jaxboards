@@ -6,14 +6,16 @@ export default class MediaPlayer extends Component {
         return '.media';
     }
 
-    constructor(element) {
+    constructor(element: HTMLDivElement) {
         super(element);
 
-        const popoutLink = element.querySelector('a.popout');
-        const inlineLink = element.querySelector('a.inline');
-        const movie = element.querySelector('.movie');
+        const popoutLink = element.querySelector<HTMLAnchorElement>('a.popout');
+        const inlineLink = element.querySelector<HTMLAnchorElement>('a.inline');
+        const movie = element.querySelector<HTMLDivElement>('.movie');
 
-        popoutLink.addEventListener('click', (event) => {
+        if (!movie) return;
+
+        popoutLink?.addEventListener('click', (event) => {
             event.preventDefault();
             const win = new Window({
                 title: popoutLink.href,
@@ -22,7 +24,7 @@ export default class MediaPlayer extends Component {
             win.create();
         });
 
-        inlineLink.addEventListener('click', (event) => {
+        inlineLink?.addEventListener('click', (event) => {
             event.preventDefault();
             movie.style.display = 'block';
         });

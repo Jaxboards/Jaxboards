@@ -1,7 +1,5 @@
 export function getComputedStyle(element: HTMLElement) {
-    if (!element) return null;
-    if (window.getComputedStyle) return window.getComputedStyle(element);
-    return null;
+    return window.getComputedStyle(element);
 }
 
 /**
