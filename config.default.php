@@ -12,7 +12,7 @@ declare(strict_types=1);
  */
 // phpcs:disable SlevomatCodingStandard.Variables.UnusedVariable.UnusedVariable
 $CFG = json_decode(
-    <<<'EOD'
+    <<<'JSON'
         {
             "badnamechars": "@[^\\w' ?]@",
             "boardname": "Example Forums",
@@ -37,7 +37,7 @@ $CFG = json_decode(
             "sql_prefix": "jaxboards_",
             "timetologout": 900
         }
-        EOD,
+        JSON,
     true,
 );
 // phpcs:enable
