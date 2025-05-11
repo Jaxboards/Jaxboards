@@ -35,7 +35,7 @@ $CFG = json_decode(
             "sql_username": "SQLUSER",
             "sql_password": "SQLPASS",
             "sql_prefix": "jaxboards_",
-            "timetologout": 900,
+            "timetologout": 900
         }
         EOD,
     true,
