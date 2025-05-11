@@ -15,12 +15,15 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
+use function array_filter;
+use function array_map;
 use function count;
 use function explode;
 use function filesize;
 use function hash_file;
 use function in_array;
 use function is_file;
+use function is_string;
 use function json_encode;
 use function mb_strlen;
 use function mb_substr;
@@ -47,7 +50,7 @@ final class Post
 
     private int $pid;
 
-    private ?string $how;
+    private ?string $how = null;
 
     public function __construct(
         private readonly Config $config,
@@ -108,6 +111,7 @@ final class Post
      * 3) If the file has already been uploaded (based on hash) then don't replace it.
      *
      * @param array{tmp_name:string,name:string} $fileobj
+     *
      * @return int|string file ID from the files table, or string on failure
      */
     private function upload(array $fileobj): int|string
@@ -118,7 +122,7 @@ final class Post
         $hash = hash_file('sha512', $fileobj['tmp_name']) ?: 'hash_error';
         $uploadPath = $this->domainDefinitions->getBoardPath() . '/Uploads/';
 
-        $ext = (string) pathinfo($fileobj['name'], PATHINFO_EXTENSION);
+        $ext = pathinfo($fileobj['name'], PATHINFO_EXTENSION);
 
         $imageExtension = in_array($ext, $this->config->getSetting('images') ?? [], true)
             ? ".{$ext}"
@@ -259,6 +263,7 @@ final class Post
                     'title' => '',
                 ];
             }
+
             $forum['perms'] = $this->user->getForumPerms($forum['perms']);
 
             $pollForm = $forum['perms']['poll'] ? <<<'HTML'
@@ -506,7 +511,10 @@ final class Post
             );
             $mods = $this->database->arow($result);
             $this->database->disposeresult($result);
-            if ($mods !== null && in_array($this->user->get('id'), explode(',', (string) $mods['mods']))) {
+            if (
+                $mods !== null
+                && in_array($this->user->get('id'), explode(',', (string) $mods['mods']))
+            ) {
                 $canmod = true;
             }
         }
@@ -586,7 +594,8 @@ final class Post
             $this->database->disposeresult($result);
 
             $inputTopicTitle = $this->request->post('ttitle');
-            $topicTitle = is_string($inputTopicTitle) ? $inputTopicTitle : null;;
+            $topicTitle = is_string($inputTopicTitle) ? $inputTopicTitle : null;
+
             if (!$topic) {
                 $error = "The topic you are trying to edit doesn't exist.";
             } elseif ($topicTitle === null || trim($topicTitle) === '') {
@@ -673,7 +682,9 @@ final class Post
         $topicTitle = is_string($inputTopicTitle) ? $inputTopicTitle : null;
         $subTitle = is_string($inputSubtitle) ? $inputSubtitle : null;
         $pollChoices = is_string($inputPollChoices) ? $inputPollChoices : null;
-        $pollQuestion = is_string($inputPollQuestion) ? $inputPollQuestion : null;
+        $pollQuestion = is_string($inputPollQuestion)
+            ? $inputPollQuestion
+            : null;
 
         if ($error === null && $this->how === 'newtopic') {
             if ($fid === 0) {
@@ -692,12 +703,10 @@ final class Post
                 $error = 'Subtitle must not exceed 255 characters';
             } elseif ($this->request->post('poll_type')) {
                 $pollchoices = array_map(
-                    function ($line) {
-                        return $this->textFormatting->blockhtml($line);
-                    },
+                    fn($line): string => $this->textFormatting->blockhtml($line),
                     array_filter(
-                        preg_split("@[\r\n]+@", $pollChoices),
-                        fn($line) => trim($line) !== ''
+                        preg_split("@[\r\n]+@", (string) $pollChoices),
+                        static fn($line): bool => trim((string) $line) !== '',
                     ),
                 );
 
