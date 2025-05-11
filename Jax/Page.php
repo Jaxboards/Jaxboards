@@ -131,11 +131,11 @@ final class Page
         string $title,
         string $contents,
         ?string $boxId = null,
-    ): ?string {
+    ): string {
         return $this->template->meta('collapsebox', $boxId ? " id=\"{$boxId}\"" : '', $title, $contents);
     }
 
-    public function error(string $error): ?string
+    public function error(string $error): string
     {
         return $this->template->meta('error', $error);
     }
@@ -173,8 +173,8 @@ final class Page
         // Load Wrapper
         $this->template->load(
             $skin['wrapper']
-            ? $this->domainDefinitions->getBoardPath() . '/Wrappers/' . $skin['wrapper'] . '.html'
-            : $themePath . '/wrappers.html',
+                ? $this->domainDefinitions->getBoardPath() . '/Wrappers/' . $skin['wrapper'] . '.html'
+                : $themePath . '/wrappers.html',
         );
     }
 
@@ -267,7 +267,7 @@ final class Page
         foreach ($this->breadCrumbs as $link => $value) {
             $path .= $this->template->meta(
                 $first
-                && $this->template->metaExists('path-home') ? 'path-home' : 'path-part',
+                    && $this->template->metaExists('path-home') ? 'path-home' : 'path-part',
                 $link,
                 $value,
             );

@@ -115,7 +115,7 @@ final class Post
      *
      * @return int|string file ID from the files table, or string on failure
      */
-    private function upload(array $fileobj): int|string
+    private function upload(array $fileobj): string
     {
         $uid = $this->user->get('id');
 
@@ -125,7 +125,8 @@ final class Post
 
         $ext = pathinfo($fileobj['name'], PATHINFO_EXTENSION);
 
-        $imageExtension = in_array($ext, $this->config->getSetting('images') ?? [], true)
+        $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp'];
+        $imageExtension = in_array($ext, $this->config->getSetting('images') ?? $imageExtensions, true)
             ? ".{$ext}"
             : null;
 
@@ -388,10 +389,11 @@ final class Post
                 'error',
                 "The topic you're attempting to reply in no longer exists.",
             );
-        } else {
-            $topic['title'] = $this->textFormatting->wordfilter($topic['title']);
-            $topic['perms'] = $this->user->getForumPerms($topic['perms']);
+            return;
         }
+
+        $topic['title'] = $this->textFormatting->wordfilter($topic['title']);
+        $topic['perms'] = $this->user->getForumPerms($topic['perms']);
 
         $page .= '<div id="post-preview">' . $this->postpreview . '</div>';
         $postData = $this->textFormatting->blockhtml($this->postData ?? '');
@@ -597,7 +599,9 @@ final class Post
             $this->database->disposeresult($result);
 
             $inputTopicTitle = $this->request->post('ttitle');
+            $inputTopicDesc = $this->request->post('tdesc');
             $topicTitle = is_string($inputTopicTitle) ? $inputTopicTitle : null;
+            $topicDesc = is_string($inputTopicDesc) ? $inputTopicDesc : null;
 
             if (!$topic) {
                 $error = "The topic you are trying to edit doesn't exist.";
@@ -607,7 +611,7 @@ final class Post
                 $this->database->safeupdate(
                     'topics',
                     [
-                        'subtitle' => $this->textFormatting->blockhtml($this->request->post('tdesc')),
+                        'subtitle' => $this->textFormatting->blockhtml($topicDesc ?? ''),
                         'summary' => mb_substr(
                             (string) preg_replace(
                                 '@\s+@',
@@ -655,7 +659,7 @@ final class Post
         $this->page->command(
             'update',
             "#pid_{$pid} .post_content",
-            $this->textFormatting->theWorks($this->postData),
+            $this->textFormatting->theWorks($this->postData ?? ''),
         );
         $this->page->command('softurl');
     }
@@ -684,6 +688,7 @@ final class Post
                 static fn($line): bool => trim($line) !== '',
             ),
         ) : [];
+        $pollType = is_string($inputPollType) ? $inputPollType : null;
 
         // New topic input validation
         $error = match (true) {
@@ -696,7 +701,7 @@ final class Post
 
         // Poll input validation
         $error = match (true) {
-            (bool) $error || !$inputPollType => $error,
+            (bool) $error || !$pollType => $error,
             $pollQuestion === null || trim($pollQuestion) === '' => "You didn't specify a poll question!",
             count($pollChoices) > 10 => 'Poll choices must not exceed 10.',
             $pollChoices === [] => "You didn't provide any poll choices!",
@@ -723,7 +728,7 @@ final class Post
 
             if (
                 (
-                    $inputPollType !== null
+                    $pollType !== null
                     || $pollQuestion !== null
                 ) && !$forum['perms']['poll']
             ) {
@@ -749,44 +754,43 @@ final class Post
                 'fid' => $fid,
                 'lp_date' => $postDate,
                 'lp_uid' => $uid,
-                'poll_choices' => isset($pollchoices) && $pollchoices
-                    ? json_encode($pollchoices)
+                'poll_choices' => isset($pollChoices) && $pollChoices
+                    ? json_encode($pollChoices)
                     : '',
                 'poll_q' => $pollQuestion !== null
                     ? $this->textFormatting->blockhtml($pollQuestion)
                     : '',
-                'poll_type' => $inputPollType ?? '',
+                'poll_type' => $pollType ?? '',
                 'replies' => 0,
-                'subtitle' => $this->textFormatting->blockhtml($inputTopicDescription),
+                'subtitle' => $this->textFormatting->blockhtml($inputTopicDescription ?? ''),
                 'summary' => mb_substr(
                     (string) preg_replace(
                         '@\s+@',
                         ' ',
                         $this->textFormatting->blockhtml(
                             $this->textFormatting->textOnly(
-                                $this->postData,
+                                $this->postData ?? ''
                             ),
                         ),
                     ),
                     0,
                     50,
                 ),
-                'title' => $this->textFormatting->blockhtml($topicTitle),
+                'title' => $this->textFormatting->blockhtml($topicTitle ?? ''),
                 'views' => 0,
             ],
         );
-        $tid = $this->database->insertId();
+        $tid = (int) $this->database->insertId();
 
         $this->submitPost($tid, true);
     }
 
     private function submitPost(
-        null|int|string $tid,
+        int $tid,
         bool $newtopic = false,
     ): void {
         $this->session->act();
         $postData = $this->postData;
-        $fdata = false;
         $postDate = $this->database->datetime();
         $uid = $this->user->get('id');
 
@@ -806,27 +810,25 @@ final class Post
             return;
         }
 
-        if ($tid) {
-            $result = $this->database->safespecial(
-                <<<'SQL'
-                    SELECT
-                        t.`title` AS `topictitle`,
-                        f.`id` AS `id`,
-                        f.`path` AS `path`,
-                        f.`perms` AS `perms`,
-                        f.`nocount` AS `nocount`,
-                        t.`locked` AS `locked`
-                    FROM %t t
-                    LEFT JOIN %t f
-                        ON t.`fid`=f.`id`
-                        WHERE t.`id`=?
-                    SQL,
-                ['topics', 'forums'],
-                $tid,
-            );
-            $fdata = $this->database->arow($result);
-            $this->database->disposeresult($result);
-        }
+        $result = $this->database->safespecial(
+            <<<'SQL'
+                SELECT
+                    t.`title` AS `topictitle`,
+                    f.`id` AS `id`,
+                    f.`path` AS `path`,
+                    f.`perms` AS `perms`,
+                    f.`nocount` AS `nocount`,
+                    t.`locked` AS `locked`
+                FROM %t t
+                LEFT JOIN %t f
+                    ON t.`fid`=f.`id`
+                    WHERE t.`id`=?
+                SQL,
+            ['topics', 'forums'],
+            $tid,
+        );
+        $fdata = $this->database->arow($result);
+        $this->database->disposeresult($result);
 
         if (!$fdata) {
             $error = "The topic you're trying to reply to does not exist.";
@@ -954,7 +956,7 @@ final class Post
 
         // Update statistics.
         if (!$fdata['nocount']) {
-            $this->user->set('posts', $this->user->get('posts') + 1);
+            $this->user->set('posts', ((int) $this->user->get('posts')) + 1);
         }
 
         if ($newtopic) {

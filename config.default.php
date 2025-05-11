@@ -36,10 +36,8 @@ $CFG = json_decode(
             "sql_password": "SQLPASS",
             "sql_prefix": "jaxboards_",
             "timetologout": 900,
-            "updateinterval": 5
         }
-        EOD
-    ,
+        EOD,
     true,
 );
 // phpcs:enable

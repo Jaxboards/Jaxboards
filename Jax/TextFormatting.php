@@ -36,9 +36,9 @@ final readonly class TextFormatting
     /**
      * Replaces all URLs with bbcode [url]s so that they become actual links.
      */
-    public function linkify(string $text): ?string
+    public function linkify(string $text): string
     {
-        return preg_replace_callback(
+        return (string) preg_replace_callback(
             '@(^|\s)(https?://[^\s\)\(<>]+)@',
             $this->linkifyCallback(...),
             $text,
@@ -159,9 +159,9 @@ final readonly class TextFormatting
         return $text;
     }
 
-    public function textOnly(string $text): ?string
+    public function textOnly(string $text): string
     {
-        while (($cleaned = preg_replace('@\[(\w+)[^\]]*\](.*)\[/\1\]@Us', '$2', (string) $text)) !== $text) {
+        while (($cleaned = (string) preg_replace('@\[(\w+)[^\]]*\](.*)\[/\1\]@Us', '$2', $text)) !== $text) {
             $text = $cleaned;
         }
 
