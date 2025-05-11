@@ -21,7 +21,7 @@ final readonly class Earthbound
         $this->page->command(
             'playsound',
             'earthbound',
-            $this->domainDefinitions->getSoundsURL() . '/earthboundbattle.mp3'
+            $this->domainDefinitions->getSoundsURL() . '/earthboundbattle.mp3',
         );
     }
 }

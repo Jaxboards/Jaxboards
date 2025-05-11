@@ -12,6 +12,8 @@ use Jax\Session;
 use Jax\Template;
 use Jax\User;
 
+use function array_filter;
+
 final class Ticker
 {
     private int $maxticks = 60;
@@ -35,6 +37,7 @@ final class Ticker
             || !$this->request->isJSAccess()
         ) {
             $this->index();
+
             return;
         }
 
@@ -68,12 +71,14 @@ final class Ticker
     }
 
     /**
+     * @param null|mixed $lastTickId
+     *
      * @return array<int,array<string,mixed>>
      */
     private function fetchTicks($lastTickId = null): array
     {
         $result = $this->database->safespecial(
-            <<<"SQL"
+            <<<'SQL'
                 SELECT
                     f.`perms` AS `perms`,
                     f.`title` AS `ftitle`,
@@ -106,11 +111,11 @@ final class Ticker
             $lastTickId ?? 0,
             $this->maxticks,
         );
+
         return array_filter(
             $this->database->arows($result),
-
             // Filter out any ticks they don't have read access to
-            fn($tick) => (bool) $this->user->getForumPerms($tick['perms'])['read']
+            fn($tick): bool => (bool) $this->user->getForumPerms($tick['perms'])['read'],
         );
     }
 
