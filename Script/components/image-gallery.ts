@@ -2,7 +2,9 @@ import Component from '../classes/component';
 
 export default class ImageGallery extends Component {
     index: number;
+
     images: NodeListOf<HTMLImageElement>;
+
     max: number;
 
     static get selector() {

@@ -15,7 +15,7 @@ export default class Tabs extends Component {
     click(event: MouseEvent) {
         const { tabSelector } = this.element.dataset;
 
-        let { target } = event;
+        const { target } = event;
         if (
             !target ||
             !(target instanceof HTMLElement) ||

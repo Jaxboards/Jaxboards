@@ -20,8 +20,8 @@ export default class CollapseBox extends Component {
 
         if (!collapseContent) return;
 
-        const style = collapseContent.style;
-        let fullHeight = collapseContent.dataset.fullHeight;
+        const { style } = collapseContent;
+        let { fullHeight } = collapseContent.dataset;
         const collapseBox = this.element;
         style.overflow = 'hidden';
         if (style.height === '0px' && fullHeight) {

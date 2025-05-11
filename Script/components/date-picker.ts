@@ -6,7 +6,9 @@ export default class DatePicker extends Component {
     picker: HTMLTableElement;
 
     element: HTMLInputElement;
+
     selectedDate?: number[];
+
     lastDate?: number[];
 
     static get selector() {
