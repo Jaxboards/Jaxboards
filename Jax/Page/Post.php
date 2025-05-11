@@ -389,6 +389,7 @@ final class Post
                 'error',
                 "The topic you're attempting to reply in no longer exists.",
             );
+
             return;
         }
 
@@ -769,7 +770,7 @@ final class Post
                         ' ',
                         $this->textFormatting->blockhtml(
                             $this->textFormatting->textOnly(
-                                $this->postData ?? ''
+                                $this->postData ?? '',
                             ),
                         ),
                     ),
@@ -785,10 +786,8 @@ final class Post
         $this->submitPost($tid, true);
     }
 
-    private function submitPost(
-        int $tid,
-        bool $newtopic = false,
-    ): void {
+    private function submitPost(int $tid, bool $newtopic = false): void
+    {
         $this->session->act();
         $postData = $this->postData;
         $postDate = $this->database->datetime();
