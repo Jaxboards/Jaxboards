@@ -52,11 +52,6 @@ final class Ticker
         $ticks = '';
         $first = 0;
         foreach ($this->fetchTicks() as $tick) {
-            $perms = $this->user->getForumPerms($tick['perms']);
-            if (!$perms['read']) {
-                continue;
-            }
-
             if (!$first) {
                 $first = $tick['id'];
             }
