@@ -363,8 +363,7 @@ final class Post
                     LEFT JOIN %t f
                         ON t.`fid`=f.`id`
                     WHERE t.`id`=?
-                    SQL
-                ,
+                    SQL,
                 ['topics', 'forums'],
                 $this->database->basicvalue($tid),
             );
@@ -412,8 +411,7 @@ final class Post
                     LEFT JOIN %t m
                         ON p.`auth_id`=m.`id`
                     WHERE p.`id` IN (?)
-                    SQL
-                ,
+                    SQL,
                 ['posts', 'members'],
                 $this->session->getVar('multiquote'),
             );
@@ -472,7 +470,7 @@ final class Post
         if (
             $post['auth_id']
             && ($post['newtopic'] ? $this->user->getPerm('can_edit_topics')
-            : $this->user->getPerm('can_edit_posts'))
+                : $this->user->getPerm('can_edit_posts'))
             && $post['auth_id'] === $this->user->get('id')
         ) {
             return true;
@@ -798,8 +796,7 @@ final class Post
                     LEFT JOIN %t f
                         ON t.`fid`=f.`id`
                         WHERE t.`id`=?
-                    SQL
-                ,
+                    SQL,
                 ['topics', 'forums'],
                 $tid,
             );
@@ -819,7 +816,7 @@ final class Post
         if (
             ($this->how !== 'newtopic' && !$fdata['perms']['reply'])
             || ($fdata['locked']
-            && !$this->user->getPerm('can_override_locked_topics'))
+                && !$this->user->getPerm('can_override_locked_topics'))
         ) {
             $error = "You don't have permission to post here.";
             $this->page->append('PAGE', $this->page->error($error));
@@ -875,8 +872,7 @@ final class Post
                     UPDATE %t
                     SET `lp_uid` = ?, `lp_date` = ?, `replies` = `replies` + 1
                     WHERE `id`=?
-                    SQL
-                ,
+                    SQL,
                 ['topics'],
                 $uid,
                 $postDate,
@@ -903,8 +899,7 @@ final class Post
                         `lp_date`=?,
                         `topics`=`topics`+1
                     WHERE `id` IN ?
-                    SQL
-                ,
+                    SQL,
                 ['forums'],
                 $uid,
                 $tid,
@@ -922,9 +917,8 @@ final class Post
                         `lp_topic`=?,
                         `lp_date`=?,
                         `posts`=`posts`+1
-                    WHERE `id` IN (?)
-                    SQL
-                ,
+                    WHERE `id` IN ?
+                    SQL,
                 ['forums'],
                 $uid,
                 $tid,
@@ -946,8 +940,7 @@ final class Post
                     SET
                         `posts`=`posts` + 1,
                         `topics`=`topics` + 1
-                    SQL
-                ,
+                    SQL,
                 ['stats'],
             );
         } else {
