@@ -681,7 +681,7 @@ final class Post
             fn($line): string => $this->textFormatting->blockhtml($line),
             array_filter(
                 preg_split("@[\r\n]+@", $inputPollChoices),
-                static fn($line): bool => trim((string) $line) !== '',
+                static fn($line): bool => trim($line) !== '',
             ),
         ) : [];
 
@@ -780,14 +780,15 @@ final class Post
         $this->submitPost($tid, true);
     }
 
-    private function submitPost($tid, $newtopic = false): void
-    {
+    private function submitPost(
+        null|int|string $tid,
+        bool $newtopic = false,
+    ): void {
         $this->session->act();
         $postData = $this->postData;
         $fdata = false;
         $postDate = $this->database->datetime();
         $uid = $this->user->get('id');
-        $error = null;
 
         // Post validation
         $error = match (true) {
