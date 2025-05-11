@@ -706,7 +706,7 @@ final class Post
                     fn($line): string => $this->textFormatting->blockhtml($line),
                     array_filter(
                         preg_split("@[\r\n]+@", (string) $pollChoices),
-                        static fn($line): bool => trim((string) $line) !== '',
+                        static fn($line): bool => trim($line) !== '',
                     ),
                 );
 
