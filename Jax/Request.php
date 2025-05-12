@@ -98,10 +98,8 @@ final class Request
             $cookieName,
             $cookieValue ?? 'false',
             [
-                'domain' => null,
                 'expires' => $expires,
                 'httponly' => true,
-                'path' => null,
                 'samesite' => 'Strict',
                 'secure' => true,
             ],
