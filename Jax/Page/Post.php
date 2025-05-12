@@ -123,7 +123,7 @@ final class Post
         $hash = hash_file('sha512', $fileobj['tmp_name']) ?: 'hash_error';
         $uploadPath = $this->domainDefinitions->getBoardPath() . '/Uploads/';
 
-        $ext = pathinfo($fileobj['name'], PATHINFO_EXTENSION);
+        $ext = pathinfo((string) $fileobj['name'], PATHINFO_EXTENSION);
 
         $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp'];
         $imageExtension = in_array($ext, $this->config->getSetting('images') ?? $imageExtensions, true)
@@ -676,7 +676,9 @@ final class Post
         $inputPollQuestion = $this->request->post('pollq');
         $inputPollType = $this->request->post('poll_type');
         $topicTitle = is_string($inputTopicTitle) ? $inputTopicTitle : null;
-        $topicDescription = is_string($inputTopicDescription) ? $inputTopicDescription : null;
+        $topicDescription = is_string($inputTopicDescription)
+            ? $inputTopicDescription
+            : null;
         $subTitle = is_string($inputSubtitle) ? $inputSubtitle : null;
         $pollQuestion = is_string($inputPollQuestion)
             ? $inputPollQuestion
@@ -754,7 +756,7 @@ final class Post
                 'fid' => $fid,
                 'lp_date' => $postDate,
                 'lp_uid' => $uid,
-                'poll_choices' => $pollChoices
+                'poll_choices' => $pollChoices !== []
                     ? (json_encode($pollChoices) ?: '{}')
                     : '',
                 'poll_q' => $pollQuestion !== null
