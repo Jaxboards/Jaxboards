@@ -111,9 +111,9 @@ final class Post
      * 2) If it's an image, keep the extension so we can show it. Otherwise remove it.
      * 3) If the file has already been uploaded (based on hash) then don't replace it.
      *
-     * @param array{tmp_name:string,name:string} $fileobj
+     * @param array<string,mixed> $fileobj
      *
-     * @return int|string file ID from the files table, or string on failure
+     * @return string file ID
      */
     private function upload(array $fileobj): string
     {
@@ -253,95 +253,93 @@ final class Post
         $this->database->disposeresult($result);
 
         if ($forum === null) {
-            $error = "This forum doesn't exist. Weird.";
+            $this->page->location('?');
+
+            return;
         }
 
-        if ($error !== null) {
-            $page .= $this->template->meta('error', $error);
-        } else {
-            if (!isset($topic)) {
-                $inputTopicTitle = $this->request->post('ttitle');
-                $inputTopicDescription = $this->request->post('tdesc');
-                $topic = [
-                    'subtitle' => is_string($inputTopicDescription) ? $inputTopicDescription : '',
-                    'title' => is_string($inputTopicTitle) ? $inputTopicTitle : '',
-                ];
-            }
+        if (!isset($topic)) {
+            $inputTopicTitle = $this->request->post('ttitle');
+            $inputTopicDescription = $this->request->post('tdesc');
+            $topic = [
+                'subtitle' => is_string($inputTopicDescription) ? $inputTopicDescription : '',
+                'title' => is_string($inputTopicTitle) ? $inputTopicTitle : '',
+            ];
+        }
 
-            $forum['perms'] = $this->user->getForumPerms($forum['perms']);
+        $forum['perms'] = $this->user->getForumPerms($forum['perms']);
 
-            $pollForm = $forum['perms']['poll'] ? <<<'HTML'
-                <label class="addpoll" for="addpoll">
-                    Add a Poll
-                </label>
-                <select name="poll_type" title="Add a poll"
-                    onchange="document.querySelector('#polloptions').style.display=this.value?'block':'none'">
-                <option value="">No</option>
-                <option value="single">Yes, single-choice</option>
-                <option value="multi">Yes, multi-choice</option></select>
-                <br>
-                <div id="polloptions" style="display:none">
-                    <label for="pollq">Poll Question:</label>
-                    <input type="text" id="pollq" name="pollq" title="Poll Question"/><br>
-                    <label for="pollc">Poll Choices:</label> (one per line)
-                    <textarea id="pollc" name="pollchoices" title="Poll Choices"></textarea>
+        $pollForm = $forum['perms']['poll'] ? <<<'HTML'
+            <label class="addpoll" for="addpoll">
+                Add a Poll
+            </label>
+            <select name="poll_type" title="Add a poll"
+                onchange="document.querySelector('#polloptions').style.display=this.value?'block':'none'">
+            <option value="">No</option>
+            <option value="single">Yes, single-choice</option>
+            <option value="multi">Yes, multi-choice</option></select>
+            <br>
+            <div id="polloptions" style="display:none">
+                <label for="pollq">Poll Question:</label>
+                <input type="text" id="pollq" name="pollq" title="Poll Question"/><br>
+                <label for="pollc">Poll Choices:</label> (one per line)
+                <textarea id="pollc" name="pollchoices" title="Poll Choices"></textarea>
+            </div>
+            HTML : '';
+
+        $uploadButton = $forum['perms']['upload']
+            ? ''
+            : <<<'HTML'
+                <div id="attachfiles" class="addfile">
+                    Add Files <input type="file" name="Filedata" title="Browse for file" />
                 </div>
-                HTML : '';
-
-            $uploadButton = $forum['perms']['upload']
-                ? ''
-                : <<<'HTML'
-                    <div id="attachfiles" class="addfile">
-                        Add Files <input type="file" name="Filedata" title="Browse for file" />
-                    </div>
-                    HTML;
-
-            $form = <<<HTML
-                <form method="post" data-ajax-form="true"
-                                onsubmit="if(this.submitButton.value.match(/post/i)) this.submitButton.disabled=true;">
-                <div class="topicform">
-                    <input type="hidden" name="act" value="post" />
-                    <input type="hidden" name="how" value="newtopic" />
-                    <input type="hidden" name="fid" value="{$fid}" />
-                    <label for="ttitle">Topic title:</label>
-                    <input type="text" name="ttitle" id="ttitle" title="Topic Title" value="{$topic['title']}" />
-                    <br>
-                    <label for="tdesc">Description:</label>
-                    <input
-                        id="tdesc"
-                        name="tdesc"
-                        title="Topic Description (extra information about your topic)"
-                        type="text"
-                        value="{$topic['subtitle']}"
-                        />
-                    <br>
-                    <textarea
-                        name="postdata"
-                        id="postdata"
-                        title="Type your post here"
-                        class="bbcode-editor"
-                        >{$this->textFormatting->blockhtml($postData ?? '')}</textarea>
-                    <br><div class="postoptions">
-                        {$pollForm}
-                        {$uploadButton}
-                        <div class="buttons">
-                            <input type="submit" name="submit"
-                                value="Post New Topic"
-                                title="Submit your post"
-                                onclick="this.form.submitButton=this;"
-                                id="submitbutton">
-                            <input
-                                type="submit"
-                                name="submit"
-                                value="Preview"
-                                title="See a preview of your post"
-                                onclick="this.form.submitButton=this">
-                            </div>
-                    </div>
-                </form>
                 HTML;
-            $page .= $this->template->meta('box', '', $forum['title'] . ' > New Topic', $form);
-        }
+
+        $form = <<<HTML
+            <form method="post" data-ajax-form="true"
+                            onsubmit="if(this.submitButton.value.match(/post/i)) this.submitButton.disabled=true;">
+            <div class="topicform">
+                <input type="hidden" name="act" value="post" />
+                <input type="hidden" name="how" value="newtopic" />
+                <input type="hidden" name="fid" value="{$fid}" />
+                <label for="ttitle">Topic title:</label>
+                <input type="text" name="ttitle" id="ttitle" title="Topic Title" value="{$topic['title']}" />
+                <br>
+                <label for="tdesc">Description:</label>
+                <input
+                    id="tdesc"
+                    name="tdesc"
+                    title="Topic Description (extra information about your topic)"
+                    type="text"
+                    value="{$topic['subtitle']}"
+                    />
+                <br>
+                <textarea
+                    name="postdata"
+                    id="postdata"
+                    title="Type your post here"
+                    class="bbcode-editor"
+                    >{$this->textFormatting->blockhtml($postData ?? '')}</textarea>
+                <br><div class="postoptions">
+                    {$pollForm}
+                    {$uploadButton}
+                    <div class="buttons">
+                        <input type="submit" name="submit"
+                            value="Post New Topic"
+                            title="Submit your post"
+                            onclick="this.form.submitButton=this;"
+                            id="submitbutton">
+                        <input
+                            type="submit"
+                            name="submit"
+                            value="Preview"
+                            title="See a preview of your post"
+                            onclick="this.form.submitButton=this">
+                        </div>
+                </div>
+            </form>
+            HTML;
+        $page .= $this->template->meta('box', '', $forum['title'] . ' > New Topic', $form);
 
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
@@ -620,7 +618,7 @@ final class Post
                                 $this->textFormatting->wordfilter(
                                     $this->textFormatting->blockhtml(
                                         $this->textFormatting->textOnly(
-                                            $this->postData,
+                                            $this->postData ?? '',
                                         ),
                                     ),
                                 ),
@@ -678,6 +676,7 @@ final class Post
         $inputPollQuestion = $this->request->post('pollq');
         $inputPollType = $this->request->post('poll_type');
         $topicTitle = is_string($inputTopicTitle) ? $inputTopicTitle : null;
+        $topicDescription = is_string($inputTopicDescription) ? $inputTopicDescription : null;
         $subTitle = is_string($inputSubtitle) ? $inputSubtitle : null;
         $pollQuestion = is_string($inputPollQuestion)
             ? $inputPollQuestion
@@ -685,7 +684,7 @@ final class Post
         $pollChoices = is_string($inputPollChoices) ? array_map(
             fn($line): string => $this->textFormatting->blockhtml($line),
             array_filter(
-                preg_split("@[\r\n]+@", $inputPollChoices),
+                preg_split("@[\r\n]+@", $inputPollChoices) ?: [],
                 static fn($line): bool => trim($line) !== '',
             ),
         ) : [];
@@ -755,15 +754,15 @@ final class Post
                 'fid' => $fid,
                 'lp_date' => $postDate,
                 'lp_uid' => $uid,
-                'poll_choices' => isset($pollChoices) && $pollChoices
-                    ? json_encode($pollChoices)
+                'poll_choices' => $pollChoices
+                    ? (json_encode($pollChoices) ?: '{}')
                     : '',
                 'poll_q' => $pollQuestion !== null
                     ? $this->textFormatting->blockhtml($pollQuestion)
                     : '',
                 'poll_type' => $pollType ?? '',
                 'replies' => 0,
-                'subtitle' => $this->textFormatting->blockhtml($inputTopicDescription ?? ''),
+                'subtitle' => $this->textFormatting->blockhtml($topicDescription ?? ''),
                 'summary' => mb_substr(
                     (string) preg_replace(
                         '@\s+@',
