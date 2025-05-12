@@ -23,7 +23,6 @@ use function filesize;
 use function hash_file;
 use function in_array;
 use function is_file;
-use function is_string;
 use function json_encode;
 use function mb_strlen;
 use function mb_substr;
@@ -69,21 +68,20 @@ final class Post
 
     public function render(): void
     {
-        $how = $this->request->both('how');
         $this->tid = (int) $this->request->both('tid');
         $this->fid = (int) $this->request->both('fid');
         $this->pid = (int) $this->request->both('pid');
-        $this->how = is_string($how) ? $how : null;
+        $this->how = $this->request->asString->both('how');
         $submit = $this->request->post('submit');
         $fileData = $this->request->file('Filedata');
-        $postData = $this->request->post('postdata');
+        $postData = $this->request->asString->post('postdata');
 
         // Nothing updates on this page
         if ($this->request->isJSUpdate()) {
             return;
         }
 
-        if (is_string($postData)) {
+        if ($postData !== null) {
             [$postData, $codes] = $this->textFormatting->startCodeTags($postData);
             $postData = $this->textFormatting->linkify($postData);
             $postData = $this->textFormatting->finishCodeTagsBB($postData, $codes);
@@ -259,11 +257,9 @@ final class Post
         }
 
         if (!isset($topic)) {
-            $inputTopicTitle = $this->request->post('ttitle');
-            $inputTopicDescription = $this->request->post('tdesc');
             $topic = [
-                'subtitle' => is_string($inputTopicDescription) ? $inputTopicDescription : '',
-                'title' => is_string($inputTopicTitle) ? $inputTopicTitle : '',
+                'subtitle' => $this->request->asString->post('tdesc') ?? '',
+                'title' => $this->request->asString->post('ttitle') ?? '',
             ];
         }
 
@@ -597,10 +593,8 @@ final class Post
             $topic = $this->database->arow($result);
             $this->database->disposeresult($result);
 
-            $inputTopicTitle = $this->request->post('ttitle');
-            $inputTopicDesc = $this->request->post('tdesc');
-            $topicTitle = is_string($inputTopicTitle) ? $inputTopicTitle : null;
-            $topicDesc = is_string($inputTopicDesc) ? $inputTopicDesc : null;
+            $topicTitle = $this->request->asString->post('ttitle');
+            $topicDesc = $this->request->asString->post('tdesc');
 
             if (!$topic) {
                 $error = "The topic you are trying to edit doesn't exist.";
@@ -669,28 +663,19 @@ final class Post
         $uid = $this->user->get('id');
         $postDate = $this->database->datetime();
 
-        $inputTopicTitle = $this->request->post('ttitle');
-        $inputTopicDescription = $this->request->post('tdesc');
-        $inputSubtitle = $this->request->post('subtitle');
-        $inputPollChoices = $this->request->post('pollchoices');
-        $inputPollQuestion = $this->request->post('pollq');
-        $inputPollType = $this->request->post('poll_type');
-        $topicTitle = is_string($inputTopicTitle) ? $inputTopicTitle : null;
-        $topicDescription = is_string($inputTopicDescription)
-            ? $inputTopicDescription
-            : null;
-        $subTitle = is_string($inputSubtitle) ? $inputSubtitle : null;
-        $pollQuestion = is_string($inputPollQuestion)
-            ? $inputPollQuestion
-            : null;
-        $pollChoices = is_string($inputPollChoices) ? array_map(
+        $inputPollChoices = $this->request->asString->post('pollchoices');
+        $topicTitle = $this->request->asString->post('ttitle');
+        $topicDescription = $this->request->asString->post('tdesc');
+        $subTitle = $this->request->asString->post('subtitle');
+        $pollQuestion = $this->request->asString->post('pollq');
+        $pollChoices = $inputPollChoices !== null ? array_map(
             fn($line): string => $this->textFormatting->blockhtml($line),
             array_filter(
                 preg_split("@[\r\n]+@", $inputPollChoices) ?: [],
                 static fn($line): bool => trim($line) !== '',
             ),
         ) : [];
-        $pollType = is_string($inputPollType) ? $inputPollType : null;
+        $pollType = $this->request->asString->post('poll_type');
 
         // New topic input validation
         $error = match (true) {
@@ -757,7 +742,7 @@ final class Post
                 'lp_date' => $postDate,
                 'lp_uid' => $uid,
                 'poll_choices' => $pollChoices !== []
-                    ? (json_encode($pollChoices) ?: '{}')
+                    ? (json_encode($pollChoices) ?: '')
                     : '',
                 'poll_q' => $pollQuestion !== null
                     ? $this->textFormatting->blockhtml($pollQuestion)

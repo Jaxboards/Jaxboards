@@ -8,6 +8,13 @@ use function setcookie;
 
 final class Request
 {
+    public RequestStringGetter $asString;
+
+    public function __construct()
+    {
+        $this->asString = new RequestStringGetter();
+    }
+
     /**
      * Access $_GET and $_POST together. Prioritizes $_POST.
      *
@@ -150,5 +157,42 @@ final class Request
     private function jsAccess(): int
     {
         return (int) ($_SERVER['HTTP_X_JSACCESS'] ?? 0);
+    }
+}
+
+class RequestStringGetter
+{
+    /**
+     * Access $_GET and $_POST together. Prioritizes $_POST.
+     *
+     * @SuppressWarnings("PHPMD.Superglobals")
+     */
+    public function both(string $property): null|string
+    {
+        $post = $_POST[$property] ?? null;
+        $get = $_GET[$property] ?? null;
+        return is_string($post) ? $post : (is_string($get) ? $get : null);
+    }
+
+    /**
+     * Access $_GET.
+     *
+     * @SuppressWarnings("PHPMD.Superglobals")
+     */
+    public function get(string $property): null|string
+    {
+        $get = $_GET[$property] ?? null;
+        return is_string($get) ? $get : null;
+    }
+
+    /**
+     * Access $_POST.
+     *
+     * @SuppressWarnings("PHPMD.Superglobals")
+     */
+    public function post(string $property): null|string
+    {
+        $post = $_POST[$property] ?? null;
+        return is_string($post) ? $post : null;
     }
 }
