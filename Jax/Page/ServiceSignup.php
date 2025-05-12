@@ -66,7 +66,7 @@ final readonly class ServiceSignup
             $password = $this->request->asString->post('password');
             $email = $this->request->asString->post('email');
             $boardURL = $this->request->asString->both('boardurl');
-            $boardURLLowercase = mb_strtolower($boardURL);
+            $boardURLLowercase = mb_strtolower((string) $boardURL);
 
             if (
                 !$boardURL
@@ -101,9 +101,9 @@ final readonly class ServiceSignup
                 $errors[] = 'invalid email';
             }
 
-            if (mb_strlen($username) > 50) {
+            if (mb_strlen((string) $username) > 50) {
                 $errors[] = 'username too long';
-            } elseif (preg_match('@\W@', $username)) {
+            } elseif (preg_match('@\W@', (string) $username)) {
                 $errors[] = 'username needs to consist of letters, '
                     . 'numbers, and underscore only';
             }
@@ -181,7 +181,7 @@ final readonly class ServiceSignup
                         'join_date' => $this->database->datetime(),
                         'last_visit' => $this->database->datetime(),
                         'name' => $username,
-                        'pass' => password_hash($password, PASSWORD_DEFAULT),
+                        'pass' => password_hash((string) $password, PASSWORD_DEFAULT),
                         'posts' => 0,
                         'sig' => '',
                     ],

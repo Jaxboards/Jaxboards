@@ -31,7 +31,6 @@ use function header;
 use function implode;
 use function is_numeric;
 use function nl2br;
-use function trim;
 
 use const FILTER_VALIDATE_IP;
 use const PHP_EOL;

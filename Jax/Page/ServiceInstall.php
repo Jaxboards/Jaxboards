@@ -240,7 +240,7 @@ final class ServiceInstall
             $domain = preg_replace(
                 '/^www./',
                 '',
-                parse_url($domain, PHP_URL_HOST),
+                parse_url((string) $domain, PHP_URL_HOST),
             );
         }
 
@@ -252,9 +252,9 @@ final class ServiceInstall
             $errors[] = 'invalid email';
         }
 
-        if (mb_strlen($adminUsername) > 50) {
+        if (mb_strlen((string) $adminUsername) > 50) {
             $errors[] = 'Admin username is too long';
-        } elseif (preg_match('@\W@', $adminUsername)) {
+        } elseif (preg_match('@\W@', (string) $adminUsername)) {
             $errors[] = 'Admin username needs to consist of letters,'
                 . 'numbers, and underscore only';
         }
@@ -392,7 +392,7 @@ final class ServiceInstall
                     'last_visit' => $this->database->datetime(),
                     'name' => $adminUsername,
                     'pass' => password_hash(
-                        $adminPassword,
+                        (string) $adminPassword,
                         PASSWORD_DEFAULT,
                     ),
                     'posts' => 0,

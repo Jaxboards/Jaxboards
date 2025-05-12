@@ -873,7 +873,7 @@ final readonly class Forums
         $categoryName = $this->request->asString->post('cat_name');
         if ($this->request->post('submit') !== null) {
             if (
-                $categoryName == null || trim($categoryName) === ''
+                $categoryName === null || trim($categoryName) === ''
             ) {
                 $page .= $this->page->error('All fields required');
             } else {

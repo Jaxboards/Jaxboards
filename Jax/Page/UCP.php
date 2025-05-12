@@ -232,7 +232,7 @@ final class UCP
             }
 
             $verifiedPassword = password_verify(
-                $currentPassword,
+                (string) $currentPassword,
                 (string) $this->user->get('pass'),
             );
             if (!$verifiedPassword) {
@@ -240,7 +240,7 @@ final class UCP
             }
 
             if ($error === null) {
-                $hashpass = password_hash($newPass1, PASSWORD_DEFAULT);
+                $hashpass = password_hash((string) $newPass1, PASSWORD_DEFAULT);
                 $this->user->set('pass', $hashpass);
 
                 return <<<'HTML'
