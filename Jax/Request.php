@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use Carbon\Carbon;
-
 use function setcookie;
 
 final class Request
@@ -21,6 +19,7 @@ final class Request
      * Access $_GET and $_POST together. Prioritizes $_POST.
      *
      * @SuppressWarnings("PHPMD.Superglobals")
+     *
      * @return null|array<mixed>|string
      */
     public function both(string $property): null|array|string
@@ -32,6 +31,7 @@ final class Request
      * Access $_GET.
      *
      * @SuppressWarnings("PHPMD.Superglobals")
+     *
      * @return null|array<mixed>|string
      */
     public function get(string $property): null|array|string
@@ -43,6 +43,7 @@ final class Request
      * Access $_POST.
      *
      * @SuppressWarnings("PHPMD.Superglobals")
+     *
      * @return null|array<mixed>|string
      */
     public function post(string $property): null|array|string
@@ -86,7 +87,6 @@ final class Request
      * @SuppressWarnings("BooleanArgumentFlag")
      *
      * @param int $expires
-     * @param mixed $httponly
      */
     public function setCookie(
         string $cookieName,

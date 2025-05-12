@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax;
+
+use function is_string;
 
 final class RequestStringGetter
 {
