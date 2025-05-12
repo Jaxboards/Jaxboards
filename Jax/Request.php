@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use function is_string;
+use Carbon\Carbon;
+
 use function setcookie;
 
 final class Request
@@ -20,6 +21,7 @@ final class Request
      * Access $_GET and $_POST together. Prioritizes $_POST.
      *
      * @SuppressWarnings("PHPMD.Superglobals")
+     * @return null|array<mixed>|string
      */
     public function both(string $property): null|array|string
     {
@@ -30,6 +32,7 @@ final class Request
      * Access $_GET.
      *
      * @SuppressWarnings("PHPMD.Superglobals")
+     * @return null|array<mixed>|string
      */
     public function get(string $property): null|array|string
     {
@@ -40,6 +43,7 @@ final class Request
      * Access $_POST.
      *
      * @SuppressWarnings("PHPMD.Superglobals")
+     * @return null|array<mixed>|string
      */
     public function post(string $property): null|array|string
     {
@@ -81,14 +85,13 @@ final class Request
     /**
      * @SuppressWarnings("BooleanArgumentFlag")
      *
-     * @param mixed $expires
+     * @param int $expires
      * @param mixed $httponly
      */
     public function setCookie(
         string $cookieName,
         ?string $cookieValue,
-        $expires = false,
-        $httponly = true,
+        $expires = 0,
     ): void {
         setcookie(
             $cookieName,
@@ -96,7 +99,7 @@ final class Request
             [
                 'domain' => null,
                 'expires' => $expires,
-                'httponly' => $httponly,
+                'httponly' => true,
                 'path' => null,
                 'secure' => true,
             ],
@@ -158,45 +161,5 @@ final class Request
     private function jsAccess(): int
     {
         return (int) ($_SERVER['HTTP_X_JSACCESS'] ?? 0);
-    }
-}
-
-final class RequestStringGetter
-{
-    /**
-     * Access $_GET and $_POST together. Prioritizes $_POST.
-     *
-     * @SuppressWarnings("PHPMD.Superglobals")
-     */
-    public function both(string $property): ?string
-    {
-        $post = $_POST[$property] ?? null;
-        $get = $_GET[$property] ?? null;
-
-        return is_string($post) ? $post : (is_string($get) ? $get : null);
-    }
-
-    /**
-     * Access $_GET.
-     *
-     * @SuppressWarnings("PHPMD.Superglobals")
-     */
-    public function get(string $property): ?string
-    {
-        $get = $_GET[$property] ?? null;
-
-        return is_string($get) ? $get : null;
-    }
-
-    /**
-     * Access $_POST.
-     *
-     * @SuppressWarnings("PHPMD.Superglobals")
-     */
-    public function post(string $property): ?string
-    {
-        $post = $_POST[$property] ?? null;
-
-        return is_string($post) ? $post : null;
     }
 }

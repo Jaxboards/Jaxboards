@@ -204,7 +204,7 @@ final class LogReg
                 $this->database->safeinsert(
                     'tokens',
                     [
-                        'expires' => $this->database->datetime(Carbon::now()->getTimestamp() + 3600 * 24 * 30),
+                        'expires' => $this->database->datetime(Carbon::now()->addMonth(1)->getTimestamp()),
                         'token' => $loginToken,
                         'type' => 'login',
                         'uid' => $user['id'],
@@ -214,7 +214,7 @@ final class LogReg
                 $this->request->setCookie(
                     'utoken',
                     $loginToken,
-                    Carbon::now()->getTimestamp() + 3600 * 24 * 30,
+                    Carbon::now()->addMonth(1)->getTimestamp(),
                 );
                 $this->session->clean($user['id']);
                 $this->session->set('user', $username);
