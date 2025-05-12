@@ -107,14 +107,13 @@ final class UCP
             return null;
         }
 
-        if (
-            $this->request->post('ucpnotepad') !== null
-        ) {
-            if (mb_strlen((string) $this->request->post('ucpnotepad')) > 2_000) {
+        $ucpNotepad = $this->request->asString->post('ucpnotepad');
+        if ($ucpNotepad !== null) {
+            if (mb_strlen($ucpNotepad) > 2_000) {
                 $error = 'The UCP notepad cannot exceed 2000 characters.';
                 $this->page->command('error', $error);
             } else {
-                $this->user->set('ucpnotepad', $this->request->post('ucpnotepad'));
+                $this->user->set('ucpnotepad', $ucpNotepad);
             }
         }
 
@@ -126,7 +125,7 @@ final class UCP
             $this->user->get('display_name'),
             $this->user->get('avatar') ?: $this->template->meta('default-avatar'),
             trim((string) $ucpnotepad) !== '' && trim((string) $ucpnotepad) !== '0'
-            ? $this->textFormatting->blockhtml($ucpnotepad) : 'Personal notes go here.',
+                ? $this->textFormatting->blockhtml($ucpnotepad) : 'Personal notes go here.',
         );
     }
 
@@ -167,7 +166,7 @@ final class UCP
                 $this->page->command(
                     'script',
                     "window.globalsettings.{$field}="
-                    . ($this->request->post($field) !== null ? 1 : 0),
+                        . ($this->request->post($field) !== null ? 1 : 0),
                 );
             }
 
@@ -186,7 +185,7 @@ final class UCP
         }
 
         $this->runscript = "if(document.querySelector('#dtnotify')&&window.webkitNotifications) "
-        . "document.querySelector('#dtnotify').checked=(webkitNotifications.checkPermission()==0)";
+            . "document.querySelector('#dtnotify').checked=(webkitNotifications.checkPermission()==0)";
 
         return $this->template->meta('ucp-sound-settings', $checkboxes);
     }
@@ -194,8 +193,9 @@ final class UCP
     private function showSigSettings(): string
     {
         $sig = $this->user->get('sig');
-        if ($this->request->post('changesig') !== null) {
-            $sig = $this->textFormatting->linkify($this->request->post('changesig'));
+        $changeSig = $this->request->asString->post('changesig');
+        if ($changeSig !== null) {
+            $sig = $this->textFormatting->linkify($changeSig);
             $this->user->set('sig', $sig);
         }
 
@@ -203,7 +203,7 @@ final class UCP
             'ucp-sig-settings',
             $this->getlocationforform(),
             $sig !== ''
-            ? $this->textFormatting->theWorks($sig) : '( none )',
+                ? $this->textFormatting->theWorks($sig) : '( none )',
             $this->textFormatting->blockhtml($sig),
         );
     }
@@ -212,25 +212,27 @@ final class UCP
     {
         $error = null;
         $page = '';
+
+        $currentPassword = $this->request->asString->post('curpass');
+        $newPass1 = $this->request->asString->post('newpass1');
+        $newPass2 = $this->request->asString->post('newpass2');
+        $showPassword = (bool) $this->request->asString->post('showpass');
+
         if ($this->request->post('passchange') !== null) {
-            if (
-                !$this->request->post('showpass')
-                && $this->request->post('newpass1') !== $this->request->post('newpass2')
-            ) {
+            if (!$showPassword && $newPass1 !== $newPass2) {
                 $error = 'Those passwords do not match.';
             }
 
             if (
-                !$this->request->post('newpass1')
-                || !$this->request->post('showpass')
-                && !$this->request->post('newpass2')
-                || !$this->request->post('curpass')
+                !$newPass1
+                || (!$showPassword && !$newPass2)
+                || !$currentPassword
             ) {
                 $error = 'All form fields are required.';
             }
 
             $verifiedPassword = password_verify(
-                (string) $this->request->post('curpass'),
+                $currentPassword,
                 (string) $this->user->get('pass'),
             );
             if (!$verifiedPassword) {
@@ -238,7 +240,7 @@ final class UCP
             }
 
             if ($error === null) {
-                $hashpass = password_hash((string) $this->request->post('newpass1'), PASSWORD_DEFAULT);
+                $hashpass = password_hash($newPass1, PASSWORD_DEFAULT);
                 $this->user->set('pass', $hashpass);
 
                 return <<<'HTML'
@@ -255,18 +257,19 @@ final class UCP
         return $page . $this->template->meta(
             'ucp-pass-settings',
             $this->getlocationforform()
-            . $this->jax->hiddenFormFields(['passchange' => 'true']),
+                . $this->jax->hiddenFormFields(['passchange' => 'true']),
         );
     }
 
     private function showEmailSettings(): ?string
     {
         $error = null;
+        $email = $this->request->asString->post('email');
+        $notifications = (bool) $this->request->post('notifications');
+        $adminEmails = (bool) $this->request->post('adminemails');
+
         if ($this->request->post('submit') !== null) {
-            if (
-                $this->request->post('email')
-                && !filter_var($this->request->post('email'), FILTER_VALIDATE_EMAIL)
-            ) {
+            if ($email && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $error = 'Please enter a valid email!';
             }
 
@@ -277,9 +280,8 @@ final class UCP
             }
 
             $this->user->setBulk([
-                'email' => $this->request->post('email'),
-                'email_settings' => ($this->request->post('notifications') ?? false ? 2 : 0)
-                + ($this->request->post('adminemails') ?? false ? 1 : 0),
+                'email' => $this->request->asString->post('email'),
+                'email_settings' => ($notifications ? 2 : 0) + ($adminEmails ? 1 : 0),
             ]);
 
             return 'Email settings updated.'
@@ -326,15 +328,16 @@ final class UCP
     {
         $error = null;
         $avatar = $this->user->get('avatar');
-        if ($this->request->post('changedava') !== null) {
+        $changedAvatar = $this->request->asString->post('changedava');
+        if ($changedAvatar !== null) {
             if (
-                $this->request->post('changedava')
-                && !filter_var($this->request->post('changedava'), FILTER_VALIDATE_URL)
+                $changedAvatar
+                && !filter_var($changedAvatar, FILTER_VALIDATE_URL)
             ) {
                 $error = 'Please enter a valid image URL.';
             } else {
-                $this->user->set('avatar', $this->request->post('changedava'));
-                $avatar = $this->request->post('changedava');
+                $avatar = $changedAvatar;
+                $this->user->set('avatar', $avatar);
             }
         }
 
@@ -362,38 +365,38 @@ final class UCP
         if ($this->request->post('submit') !== null) {
             // Insert the profile info into the database.
             $data = [
-                'about' => $this->request->post('about'),
-                'contact_aim' => $this->request->post('con_aim'),
-                'contact_bluesky' => $this->request->post('con_bluesky'),
-                'contact_discord' => $this->request->post('con_discord'),
-                'contact_gtalk' => $this->request->post('con_gtalk'),
-                'contact_msn' => $this->request->post('con_msn'),
-                'contact_skype' => $this->request->post('con_skype'),
-                'contact_steam' => $this->request->post('con_steam'),
-                'contact_twitter' => $this->request->post('con_twitter'),
-                'contact_yim' => $this->request->post('con_yim'),
-                'contact_youtube' => $this->request->post('con_youtube'),
-                'display_name' => trim((string) $this->request->post('display_name')),
-                'dob_day' => $this->request->post('dob_day'),
-                'dob_month' => $this->request->post('dob_month'),
-                'dob_year' => $this->request->post('dob_year'),
-                'full_name' => $this->request->post('full_name'),
-                'gender' => in_array($this->request->post('gender'), $genderOptions, true)
-                ? $this->request->post('gender') : '',
-                'location' => $this->request->post('location'),
-                'usertitle' => $this->request->post('usertitle'),
-                'website' => $this->request->post('website'),
+                'about' => $this->request->asString->post('about'),
+                'contact_aim' => $this->request->asString->post('con_aim'),
+                'contact_bluesky' => $this->request->asString->post('con_bluesky'),
+                'contact_discord' => $this->request->asString->post('con_discord'),
+                'contact_gtalk' => $this->request->asString->post('con_gtalk'),
+                'contact_msn' => $this->request->asString->post('con_msn'),
+                'contact_skype' => $this->request->asString->post('con_skype'),
+                'contact_steam' => $this->request->asString->post('con_steam'),
+                'contact_twitter' => $this->request->asString->post('con_twitter'),
+                'contact_yim' => $this->request->asString->post('con_yim'),
+                'contact_youtube' => $this->request->asString->post('con_youtube'),
+                'display_name' => trim((string) $this->request->asString->post('display_name')),
+                'dob_day' => $this->request->asString->post('dob_day'),
+                'dob_month' => $this->request->asString->post('dob_month'),
+                'dob_year' => $this->request->asString->post('dob_year'),
+                'full_name' => $this->request->asString->post('full_name'),
+                'gender' => in_array($this->request->asString->post('gender'), $genderOptions, true)
+                    ? $this->request->asString->post('gender') : '',
+                'location' => $this->request->asString->post('location'),
+                'usertitle' => $this->request->asString->post('usertitle'),
+                'website' => $this->request->asString->post('website'),
             ];
 
             // Begin input checking.
             if ($data['display_name'] === '') {
-                $data['display_name'] = $this->user->get('name');
+                $data['display_name'] = (string) $this->user->get('name');
             }
 
             $badNameChars = $this->config->getSetting('badnamechars');
             if (
                 $badNameChars
-                && preg_match($badNameChars, (string) $data['display_name'])
+                && preg_match($badNameChars, $data['display_name'])
             ) {
                 $error = 'Invalid characters in display name!';
             } else {
@@ -415,30 +418,30 @@ final class UCP
                 || !is_numeric($data['dob_year'])
                 || $data['dob_year'] < 1
                 || $data['dob_year'] > (int) gmdate('Y')
-                 ? null
-                 : gmdate(
-                     'Y',
-                     Carbon::create($data['dob_year'], 1, 1)->getTimestamp(),
-                 );
+                ? null
+                : gmdate(
+                    'Y',
+                    Carbon::create($data['dob_year'], 1, 1)->getTimestamp(),
+                );
 
             $data['dob_month']
                 = !$data['dob_month']
                 || !is_numeric($data['dob_month'])
                 || $data['dob_month'] < 1
                 || $data['dob_month'] > 12
-             ? null : gmdate(
-                 'm',
-                 Carbon::create(2000, $data['dob_month'], 1)->getTimestamp(),
-             );
+                ? null : gmdate(
+                    'm',
+                    Carbon::create(2000, $data['dob_month'], 1)->getTimestamp(),
+                );
 
             $data['dob_day']
                 = !$data['dob_day']
                 || !is_numeric($data['dob_day'])
                 || $data['dob_day'] < 1
-             ? null : gmdate(
-                 'd',
-                 Carbon::create(2000, 1, $data['dob_day'])->getTimestamp(),
-             );
+                ? null : gmdate(
+                    'd',
+                    Carbon::create(2000, 1, $data['dob_day'])->getTimestamp(),
+                );
 
             // Is the date provided valid?
             if ($data['dob_month'] && $data['dob_day']) {
@@ -469,8 +472,8 @@ final class UCP
             }
 
             $data['birthdate'] = !$data['dob_year'] && !$data['dob_month']
-            ? null
-            : ($data['dob_year'] ?? '0000') . '-' . ($data['dob_month'] ?? '00') . '-' . ($data['dob_day'] ?? '00');
+                ? null
+                : ($data['dob_year'] ?? '0000') . '-' . ($data['dob_month'] ?? '00') . '-' . ($data['dob_day'] ?? '00');
 
             unset($data['dob_year'], $data['dob_month'], $data['dob_day']);
 
@@ -592,7 +595,7 @@ final class UCP
         return $this->template->meta(
             'ucp-profile-settings',
             $this->getlocationforform()
-            . $this->jax->hiddenFormFields(['submit' => 'true']),
+                . $this->jax->hiddenFormFields(['submit' => 'true']),
             $this->user->get('name'),
             $this->user->get('display_name'),
             $this->user->get('full_name'),
@@ -643,11 +646,11 @@ final class UCP
                 $skinId = $this->request->both('skin');
 
                 $this->database->disposeresult($result);
+
                 $this->user->setBulk([
-                    'nowordfilter' => $this->request->post('usewordfilter') !== null
-                    && $this->request->post('usewordfilter') ? 0 : 1,
+                    'nowordfilter' => $this->request->post('usewordfilter') ? 0 : 1,
                     'skin_id' => $skinId,
-                    'wysiwyg' => $this->request->post('wysiwyg') !== null ? 1 : 0,
+                    'wysiwyg' => $this->request->post('wysiwyg') ? 1 : 0,
                 ]);
             }
 
@@ -711,11 +714,11 @@ final class UCP
             $this->getlocationforform(),
             $select,
             '<input type="checkbox" name="usewordfilter" title="Use Word Filter"'
-            . ($this->user->get('nowordfilter') ? '' : ' checked="checked"')
-            . ' />',
+                . ($this->user->get('nowordfilter') ? '' : ' checked="checked"')
+                . ' />',
             '<input type="checkbox" name="wysiwyg" title="WYSIWYG Enabled"'
-            . ($this->user->get('wysiwyg') ? ' checked="checked"' : '')
-            . ' />',
+                . ($this->user->get('wysiwyg') ? ' checked="checked"' : '')
+                . ' />',
         );
     }
 }

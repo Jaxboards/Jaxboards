@@ -79,7 +79,7 @@ final readonly class Inbox
         $mname = '';
         $mtitle = '';
         if ($this->request->post('submit') !== null) {
-            $mid = $this->request->both('mid');
+            $mid = $this->request->asString->both('mid');
             if (!$mid && $this->request->both('to')) {
                 $result = $this->database->safeselect(
                     [
@@ -124,6 +124,7 @@ final readonly class Inbox
                 return null;
             }
 
+            $title = $this->request->asString->post('title');
             // Put it into the table.
             $this->database->safeinsert(
                 'messages',
@@ -132,9 +133,9 @@ final readonly class Inbox
                     'del_recipient' => 0,
                     'del_sender' => 0,
                     'from' => $this->user->get('id'),
-                    'message' => $this->request->post('message'),
+                    'message' => $this->request->asString->post('message'),
                     'read' => 0,
-                    'title' => $this->textFormatting->blockhtml($this->request->post('title')),
+                    'title' => $title ? $this->textFormatting->blockhtml($title) : '',
                     'to' => $udata['id'],
                 ],
             );
@@ -151,8 +152,7 @@ final readonly class Inbox
                     UPDATE %t
                     SET `runonce`=concat(`runonce`,?)
                     WHERE `uid`=?
-                    SQL
-                ,
+                    SQL,
                 ['session'],
                 $this->database->basicvalue($cmd),
                 $udata['id'],
@@ -163,12 +163,12 @@ final readonly class Inbox
                     $udata['email'],
                     'PM From ' . $this->user->get('display_name'),
                     "You are receiving this email because you've "
-                    . 'received a message from ' . $this->user->get('display_name')
-                    . ' on {BOARDLINK}.<br>'
-                    . '<br>Please go to '
-                    . "<a href='{BOARDURL}?act=ucp&what=inbox'>"
-                    . '{BOARDURL}?act=ucp&what=inbox</a>'
-                    . ' to view your message.',
+                        . 'received a message from ' . $this->user->get('display_name')
+                        . ' on {BOARDLINK}.<br>'
+                        . '<br>Please go to '
+                        . "<a href='{BOARDURL}?act=ucp&what=inbox'>"
+                        . '{BOARDURL}?act=ucp&what=inbox</a>'
+                        . ' to view your message.',
                 );
             }
 
@@ -320,8 +320,8 @@ final readonly class Inbox
 
         $this->page->location(
             '?act=ucp&what=inbox'
-            . ($this->request->both('prevpage') !== null
-            ? '&page=' . $this->request->both('prevpage') : ''),
+                . ($this->request->both('prevpage') !== null
+                    ? '&page=' . $this->request->both('prevpage') : ''),
         );
     }
 
@@ -436,8 +436,7 @@ final readonly class Inbox
                 LEFT JOIN %t m ON a.`from`=m.`id`
                 WHERE a.`id`=?
                 ORDER BY a.`date` DESC
-                SQL
-            ,
+                SQL,
             ['messages', 'members'],
             $this->database->basicvalue($messageid),
         );
@@ -525,10 +524,10 @@ final readonly class Inbox
                 'inbox-messages-row',
                 $message['read'] ? 'read' : 'unread',
                 '<input class="check" type="checkbox" title="PM Checkbox" name="dmessage[]" '
-                . 'value="' . $message['id'] . '" />',
+                    . 'value="' . $message['id'] . '" />',
                 '<input type="checkbox" '
-                . ($message['flag'] ? 'checked="checked" ' : '')
-                . 'class="switch flag" onchange="' . $dmessageOnchange . '" />',
+                    . ($message['flag'] ? 'checked="checked" ' : '')
+                    . 'class="switch flag" onchange="' . $dmessageOnchange . '" />',
                 $message['id'],
                 $message['title'],
                 $message['display_name'],

@@ -179,23 +179,21 @@ final readonly class ModControls
         if (
             $this->request->post('submit') === 'save'
         ) {
-            if (
-                trim((string) $this->request->post('display_name')) === ''
-                || trim((string) $this->request->post('display_name')) === '0'
-            ) {
+            $displayName = $this->request->asString->post('display_name');
+            if (!$displayName) {
                 $page .= $this->template->meta('error', 'Display name is invalid.');
             } else {
                 $updateResult = $this->database->safeupdate(
                     'members',
                     [
-                        'about' => $this->request->post('about'),
-                        'avatar' => $this->request->post('avatar'),
-                        'display_name' => $this->request->post('display_name'),
-                        'full_name' => $this->request->post('full_name'),
-                        'sig' => $this->request->post('signature'),
+                        'about' => $this->request->asString->post('about'),
+                        'avatar' => $this->request->asString->post('avatar'),
+                        'display_name' => $displayName,
+                        'full_name' => $this->request->asString->post('full_name'),
+                        'sig' => $this->request->asString->post('signature'),
                     ],
                     Database::WHERE_ID_EQUALS,
-                    $this->database->basicvalue($this->request->post('mid')),
+                    $this->database->basicvalue((int) $this->request->asString->post('mid')),
                 );
 
                 if ($updateResult === null) {
@@ -225,6 +223,8 @@ final readonly class ModControls
 
             $member = null;
 
+            $memberName = $this->request->asString->post('mname');
+
             // Get the member data.
             if (is_numeric($this->request->both('mid'))) {
                 $result = $this->database->safeselect(
@@ -235,12 +235,12 @@ final readonly class ModControls
                 );
                 $member = $this->database->arow($result);
                 $this->database->disposeresult($result);
-            } elseif ($this->request->post('mname')) {
+            } elseif ($memberName) {
                 $result = $this->database->safeselect(
                     $memberFields,
                     'members',
                     'WHERE `display_name` LIKE ?',
-                    $this->database->basicvalue($this->request->post('mname') . '%'),
+                    $this->database->basicvalue($memberName . '%'),
                 );
                 $members = $this->database->arows($result);
 

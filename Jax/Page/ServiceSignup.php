@@ -62,12 +62,17 @@ final readonly class ServiceSignup
                 header('Location: https://test.' . $this->serviceConfig->getSetting('domain'));
             }
 
-            $boardURL = mb_strtolower((string) $this->request->both('boardurl'));
+            $username = $this->request->asString->post('username');
+            $password = $this->request->asString->post('password');
+            $email = $this->request->asString->post('email');
+            $boardURL = $this->request->asString->both('boardurl');
+            $boardURLLowercase = mb_strtolower($boardURL);
+
             if (
                 !$boardURL
-                || !$this->request->post('username')
-                || !$this->request->post('password')
-                || !$this->request->post('email')
+                || !$username
+                || !$password
+                || !$email
             ) {
                 $errors[] = 'all fields required.';
             } elseif (mb_strlen($boardURL) > 30) {
@@ -92,13 +97,13 @@ final readonly class ServiceSignup
 
             $this->database->disposeresult($result);
 
-            if (!filter_var($this->request->post('email'), FILTER_VALIDATE_EMAIL)) {
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $errors[] = 'invalid email';
             }
 
-            if (mb_strlen((string) $this->request->post('username')) > 50) {
+            if (mb_strlen($username) > 50) {
                 $errors[] = 'username too long';
-            } elseif (preg_match('@\W@', (string) $this->request->post('username'))) {
+            } elseif (preg_match('@\W@', $username)) {
                 $errors[] = 'username needs to consist of letters, '
                     . 'numbers, and underscore only';
             }
@@ -107,7 +112,7 @@ final readonly class ServiceSignup
                 ['id'],
                 'directory',
                 'WHERE `boardname`=?',
-                $this->database->basicvalue($this->request->post('boardurl')),
+                $this->database->basicvalue($boardURL),
             );
             if ($this->database->arow($result)) {
                 $errors[] = 'that board already exists';
@@ -116,18 +121,17 @@ final readonly class ServiceSignup
             $this->database->disposeresult($result);
 
             if ($errors === []) {
-                $board = $this->request->post('boardurl');
-                $boardPrefix = $board . '_';
+                $boardPrefix = $boardURLLowercase . '_';
 
                 $this->database->setPrefix('');
                 // Add board to directory.
                 $this->database->safeinsert(
                     'directory',
                     [
-                        'boardname' => $board,
+                        'boardname' => $boardURL,
                         'date' => $this->database->datetime(),
-                        'referral' => $this->request->both('r') ?? '',
-                        'registrar_email' => $this->request->post('email'),
+                        'referral' => $this->request->asString->both('r'),
+                        'registrar_email' => $email,
                         'registrar_ip' => $this->ipAddress->asBinary(),
                     ],
                 );
@@ -171,13 +175,13 @@ final readonly class ServiceSignup
                 $this->database->safeinsert(
                     'members',
                     [
-                        'display_name' => $this->request->post('username'),
-                        'email' => $this->request->post('email'),
+                        'display_name' => $username,
+                        'email' => $email,
                         'group_id' => 2,
                         'join_date' => $this->database->datetime(),
                         'last_visit' => $this->database->datetime(),
-                        'name' => $this->request->post('username'),
-                        'pass' => password_hash((string) $this->request->post('password'), PASSWORD_DEFAULT),
+                        'name' => $username,
+                        'pass' => password_hash($password, PASSWORD_DEFAULT),
                         'posts' => 0,
                         'sig' => '',
                     ],
@@ -185,7 +189,7 @@ final readonly class ServiceSignup
 
                 $this->fileUtils->copyDirectory($this->blueprint->getDirectory(), dirname(__DIR__) . '/boards/' . $board);
 
-                header('Location: https://' . $this->request->post('boardurl') . '.' . $this->serviceConfig->getSetting('domain'));
+                header('Location: https://' . $this->request->asString->post('boardurl') . '.' . $this->serviceConfig->getSetting('domain'));
             }
         }
 

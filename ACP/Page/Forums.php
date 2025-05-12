@@ -231,8 +231,9 @@ final readonly class Forums
             );
         }
 
-        if (is_string($this->request->post('tree'))) {
-            self::mysqltree(json_decode($this->request->post('tree'), true));
+        $tree = $this->request->asString->post('tree');
+        if ($tree !== null) {
+            self::mysqltree(json_decode($tree, true));
             if ($this->request->get('do') === 'create') {
                 return;
             }
@@ -869,10 +870,10 @@ final readonly class Forums
             $this->database->disposeresult($result);
         }
 
-        $categoryName = $this->request->post('cat_name');
+        $categoryName = $this->request->asString->post('cat_name');
         if ($this->request->post('submit') !== null) {
             if (
-                !is_string($categoryName) || trim($categoryName ?? '') === ''
+                $categoryName == null || trim($categoryName) === ''
             ) {
                 $page .= $this->page->error('All fields required');
             } else {

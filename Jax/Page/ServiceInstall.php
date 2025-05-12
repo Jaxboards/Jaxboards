@@ -209,12 +209,22 @@ final class ServiceInstall
             $errors[] = $attributes['name'] . ' must be filled in.';
         }
 
-        $domain = $this->request->post('domain');
+        $adminEmail = $this->request->asString->post('admin_email');
+        $adminUsername = $this->request->asString->post('admin_username');
+        $adminPassword = $this->request->asString->post('admin_password');
+        $domain = $this->request->asString->post('domain');
+        // Are we installing this the service way.
+        $service = (bool) $this->request->post('service');
+        $sqlHost = $this->request->asString->post('sql_host');
+        $sqlUsername = $this->request->asString->post('sql_username');
+        $sqlPassword = $this->request->asString->post('sql_password');
+        $sqlDB = $this->request->asString->post('sql_db');
+
         if (
             $domain !== null
-            && !parse_url((string) $domain, PHP_URL_HOST)
+            && !parse_url($domain, PHP_URL_HOST)
         ) {
-            if (preg_match('@[^\w\-.]@', (string) $domain)) {
+            if (preg_match('@[^\w\-.]@', $domain)) {
                 $errors[] = 'Invalid domain';
             } else {
                 // Looks like we have a proper hostname,
@@ -222,7 +232,7 @@ final class ServiceInstall
                 $domain = preg_replace(
                     '/^www./',
                     '',
-                    (string) $domain,
+                    $domain,
                 );
             }
         } else {
@@ -230,34 +240,26 @@ final class ServiceInstall
             $domain = preg_replace(
                 '/^www./',
                 '',
-                parse_url((string) $domain, PHP_URL_HOST),
+                parse_url($domain, PHP_URL_HOST),
             );
         }
 
-        if ($this->request->post('admin_password') !== $this->request->post('admin_password_2')) {
+        if ($adminPassword !== $this->request->asString->post('admin_password_2')) {
             $errors[] = 'Admin passwords do not match';
         }
 
-        if (!filter_var($this->request->post('admin_email'), FILTER_VALIDATE_EMAIL)) {
+        if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
             $errors[] = 'invalid email';
         }
 
-        if (mb_strlen((string) $this->request->post('admin_username')) > 50) {
+        if (mb_strlen($adminUsername) > 50) {
             $errors[] = 'Admin username is too long';
-        } elseif (preg_match('@\W@', (string) $this->request->post('admin_username'))) {
+        } elseif (preg_match('@\W@', $adminUsername)) {
             $errors[] = 'Admin username needs to consist of letters,'
                 . 'numbers, and underscore only';
         }
 
-        // Are we installing this the service way.
-        $service = (bool) $this->request->post('service');
-
-        $connected = $this->database->connect(
-            $this->request->post('sql_host'),
-            $this->request->post('sql_username'),
-            $this->request->post('sql_password'),
-            $this->request->post('sql_db'),
-        );
+        $connected = $this->database->connect($sqlHost, $sqlUsername, $sqlPassword, $sqlDB);
 
         if (!$connected) {
             $errors[] = 'There was an error connecting to the MySQL database.';
@@ -272,12 +274,11 @@ final class ServiceInstall
             [
                 'boardname' => 'Jaxboards',
                 'domain' => $domain,
-                'mail_from' => $this->request->post('admin_username') . ' <'
-                    . $this->request->post('admin_email') . '>',
-                'sql_db' => $this->request->post('sql_db'),
-                'sql_host' => $this->request->post('sql_host'),
-                'sql_username' => $this->request->post('sql_username'),
-                'sql_password' => $this->request->post('sql_password'),
+                'mail_from' => "{$adminUsername} <{$adminEmail}>",
+                'sql_db' => $sqlDB,
+                'sql_host' => $sqlHost,
+                'sql_username' => $sqlUsername,
+                'sql_password' => $sqlPassword,
                 'service' => $service,
                 'prefix' => $service ? '' : 'jaxboards',
                 'sql_prefix' => $service ? '' : 'jaxboards_',
@@ -339,7 +340,7 @@ final class ServiceInstall
                         'boardname' => $board,
                         'date' => $this->database->datetime(),
                         'referral' => $this->request->both('r') ?? '',
-                        'registrar_email' => $this->request->post('admin_email'),
+                        'registrar_email' => $adminEmail,
                         'registrar_ip' => $this->ipAddress->asBinary(),
                     ],
                 );
@@ -384,14 +385,14 @@ final class ServiceInstall
             $this->database->safeinsert(
                 'members',
                 [
-                    'display_name' => $this->request->post('admin_username'),
-                    'email' => $this->request->post('admin_email'),
+                    'display_name' => $adminUsername,
+                    'email' => $adminEmail,
                     'group_id' => 2,
                     'join_date' => $this->database->datetime(),
                     'last_visit' => $this->database->datetime(),
-                    'name' => $this->request->post('admin_username'),
+                    'name' => $adminUsername,
                     'pass' => password_hash(
-                        (string) $this->request->post('admin_password'),
+                        $adminPassword,
                         PASSWORD_DEFAULT,
                     ),
                     'posts' => 0,

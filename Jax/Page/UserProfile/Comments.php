@@ -128,7 +128,7 @@ final class Comments
 
     private function handleCommentCreation(): string
     {
-        $comment = $this->request->post('comment');
+        $comment = $this->request->asString->post('comment');
         if (!$comment) {
             return '';
         }

@@ -68,11 +68,11 @@ final class Post
 
     public function render(): void
     {
-        $this->tid = (int) $this->request->both('tid');
-        $this->fid = (int) $this->request->both('fid');
-        $this->pid = (int) $this->request->both('pid');
+        $this->tid = (int) $this->request->asString->both('tid');
+        $this->fid = (int) $this->request->asString->both('fid');
+        $this->pid = (int) $this->request->asString->both('pid');
         $this->how = $this->request->asString->both('how');
-        $submit = $this->request->post('submit');
+        $submit = $this->request->asString->post('submit');
         $fileData = $this->request->file('Filedata');
         $postData = $this->request->asString->post('postdata');
 
