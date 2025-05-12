@@ -8,6 +8,7 @@ use function setcookie;
 
 final class Request
 {
+    //phpcs:ignore SlevomatCodingStandard.Classes.ForbiddenPublicProperty.ForbiddenPublicProperty
     public RequestStringGetter $asString;
 
     public function __construct()
