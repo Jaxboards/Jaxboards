@@ -102,6 +102,7 @@ final class Request
                 'expires' => $expires,
                 'httponly' => true,
                 'path' => null,
+                'samesite' => 'Strict',
                 'secure' => true,
             ],
         );
