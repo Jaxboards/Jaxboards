@@ -17,10 +17,11 @@ final class RequestStringGetter
     {
         $post = $_POST[$property] ?? null;
         $get = $_GET[$property] ?? null;
-
         if (is_string($post)) {
             return $post;
-        } else if (is_string($get)) {
+        }
+
+        if (is_string($get)) {
             return $get;
         }
 
