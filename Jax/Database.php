@@ -261,7 +261,7 @@ class Database
     /**
      * Returns multiple records.
      *
-     * @return array<int|string,array<int|string,mixed>>
+     * @return array<int,array<string,mixed>>
      */
     public function arows(?PDOStatement $pdoStatement = null): array
     {
