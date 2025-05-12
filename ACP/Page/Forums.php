@@ -674,7 +674,7 @@ final readonly class Forums
 
         // First fetch all group IDs
         $groupIds = array_map(
-            static fn(array $group) => $group['id'],
+            static fn(array $group): mixed => $group['id'],
             $this->database->arows($result),
         );
         $this->database->disposeresult($result);
