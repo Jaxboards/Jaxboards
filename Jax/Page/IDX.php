@@ -135,7 +135,7 @@ final class IDX
             ],
         );
 
-        return $this->database->arows($result) ?? [];
+        return $this->database->arows($result);
     }
 
     private function viewidx(): void
@@ -154,9 +154,10 @@ final class IDX
             // Store subforum details for later.
             if ($forum['path']) {
                 preg_match('@\d+$@', (string) $forum['path'], $match);
-                if (isset($this->subforums[$match[0]])) {
-                    $this->subforumids[(int) $match[0]][] = $forum['id'];
-                    $this->subforums[$match[0]] .= $this->template->meta(
+                $subForumId = $match ? (int) $match[0] : null;
+                if ($subForumId && array_key_exists($subForumId, $this->subforums)) {
+                    $this->subforumids[$subForumId][] = $forum['id'];
+                    $this->subforums[$subForumId] .= $this->template->meta(
                         'idx-subforum-link',
                         $forum['id'],
                         $forum['title'],
@@ -193,7 +194,7 @@ final class IDX
             'ORDER BY `order`,`title` ASC',
         );
         foreach ($this->database->arows($catq) as $category) {
-            if ($forumsByCatID[$category['id']] === []) {
+            if (!array_key_exists($category['id'], $forumsByCatID)) {
                 continue;
             }
 
@@ -355,6 +356,9 @@ final class IDX
         return $this->template->meta('idx-table', $table);
     }
 
+    /**
+     * @return array<array<string,mixed>>
+     */
     private function fetchUsersOnlineToday(): array
     {
         $result = $this->database->safespecial(
@@ -377,7 +381,7 @@ final class IDX
             ['session', 'members'],
         );
 
-        return $this->database->arows($result) ?? [];
+        return $this->database->arows($result);
     }
 
     private function update(): void
@@ -630,7 +634,7 @@ final class IDX
         }
 
         if (!isset($this->forumsread[$forum['id']])) {
-            $this->forumsread[$forum['id']] = null;
+            $this->forumsread[$forum['id']] = 0;
         }
 
         return $forum['lp_date'] < max(
