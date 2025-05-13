@@ -35,13 +35,27 @@ use function sprintf;
 
 final class IDX
 {
+    /**
+     * @var array<int,int> Map of forum IDs to their last read timestamp
+     */
     private array $forumsread = [];
 
-    private array $mods;
+    /**
+     * @var array<int> List of all moderator user IDs
+     */
+    private array $mods = [];
 
-    private array $subforumids;
+    /**
+     * A map of forum IDs to the subforums they contain
+     * @var array<int,array<int>> $subforumids
+     */
+    private array $subforumids = [];
 
-    private array $subforums;
+    /**
+     * Map of forum IDs to their compiled HTML link lists
+     * @var array<int,string>
+     */
+    private array $subforums = [];
 
     public function __construct(
         private readonly Config $config,
@@ -74,7 +88,11 @@ final class IDX
         }
     }
 
-    private function fetchIDXForums(): ?array
+    /**
+     * Returns top level forums
+     * @return array<array<string,mixed>>
+     */
+    private function fetchIDXForums(): array
     {
         $result = $this->database->safespecial(
             <<<'SQL'
@@ -113,17 +131,14 @@ final class IDX
             ],
         );
 
-        return $this->database->arows($result);
+        return $this->database->arows($result) ?? [];
     }
 
     private function viewidx(): void
     {
         $this->session->set('location_verbose', 'Viewing board index');
         $page = '';
-        $data = [];
-        $this->subforums = [];
-        $this->subforumids = [];
-        $this->mods = [];
+        $forumsByCatID = [];
 
         // This while loop just grabs all of the data, displaying is done below.
         foreach ($this->fetchIDXForums() as $forum) {
@@ -136,7 +151,7 @@ final class IDX
             if ($forum['path']) {
                 preg_match('@\d+$@', (string) $forum['path'], $match);
                 if (isset($this->subforums[$match[0]])) {
-                    $this->subforumids[$match[0]][] = $forum['id'];
+                    $this->subforumids[(int) $match[0]][] = $forum['id'];
                     $this->subforums[$match[0]] .= $this->template->meta(
                         'idx-subforum-link',
                         $forum['id'],
@@ -145,7 +160,7 @@ final class IDX
                     ) . $this->template->meta('idx-subforum-splitter');
                 }
             } else {
-                $data[$forum['cat_id']][] = $forum;
+                $forumsByCatID[$forum['cat_id']][] = $forum;
             }
 
             // Store mod details for later.
@@ -162,27 +177,28 @@ final class IDX
                     continue;
                 }
 
-                $this->mods[$modId] = 1;
+                $this->mods[] = (int) $modId;
             }
         }
 
-        $this->mods = array_keys($this->mods);
+        // Remove duplicates
+        $this->mods = array_unique($this->mods);
         $catq = $this->database->safeselect(
             ['id', 'title', '`order`'],
             'categories',
             'ORDER BY `order`,`title` ASC',
         );
-        while ($forum = $this->database->arow($catq)) {
-            if (empty($data[$forum['id']])) {
+        foreach ($this->database->arows($catq) as $category) {
+            if ($forumsByCatID[$category['id']] === []) {
                 continue;
             }
 
             $page .= $this->page->collapseBox(
-                $forum['title'],
+                $category['title'],
                 $this->buildTable(
-                    $data[$forum['id']],
+                    $forumsByCatID[$category['id']],
                 ),
-                'cat_' . $forum['id'],
+                'cat_' . $category['id'],
             );
         }
 
@@ -197,28 +213,30 @@ final class IDX
         }
     }
 
-    private function getsubs($forumId)
+    private function getsubs(int $forumId)
     {
         if (
-            !isset($this->subforumids[$forumId])
-            || !$this->subforumids[$forumId]
+            !array_key_exists($forumId, ($this->subforumids))
         ) {
             return [];
         }
 
         $forum = $this->subforumids[$forumId];
-        foreach ($forum as $modId) {
-            if (!$this->subforumids[$modId]) {
+        foreach ($forum as $forumId) {
+            if (!$this->subforumids[$forumId]) {
                 continue;
             }
 
-            $forum = array_merge($forum, $this->getsubs($modId));
+            $forum = array_merge($forum, $this->getsubs($forumId));
         }
 
         return $forum;
     }
 
-    private function getmods($modids): string
+    /**
+     * @param string $modids a comma separated list
+     */
+    private function getmods(string $modids): string
     {
         static $moderatorinfo = null;
 
@@ -241,19 +259,18 @@ final class IDX
         }
 
         $forum = '';
-        foreach (explode(',', (string) $modids) as $modId) {
+        foreach (explode(',', $modids) as $modId) {
             $forum .= $moderatorinfo[$modId] . $this->template->meta('idx-ledby-splitter');
         }
 
         return mb_substr($forum, 0, -mb_strlen($this->template->meta('idx-ledby-splitter')));
     }
 
-    private function buildTable($forums): ?string
+    /**
+     * @param array<array<string,mixed>> $forums
+     */
+    private function buildTable($forums): string
     {
-        if (!$forums) {
-            return null;
-        }
-
         $table = '';
         foreach ($forums as $forum) {
             $read = $this->isForumRead($forum);
@@ -310,7 +327,7 @@ final class IDX
                                 ),
                             ),
                         ) : '',
-                    $this->formatlastpost($forum),
+                    $this->formatLastPost($forum),
                     $this->template->meta('idx-topics-count', $forum['topics']),
                     $this->template->meta('idx-replies-count', $forum['posts']),
                     $read ? 'read' : 'unread',
@@ -331,7 +348,7 @@ final class IDX
         return $this->template->meta('idx-table', $table);
     }
 
-    private function fetchUsersOnlineToday(): ?array
+    private function fetchUsersOnlineToday(): array
     {
         $result = $this->database->safespecial(
             <<<'SQL'
@@ -353,7 +370,7 @@ final class IDX
             ['session', 'members'],
         );
 
-        return $this->database->arows($result);
+        return $this->database->arows($result) ?? [];
     }
 
     private function update(): void
@@ -387,7 +404,9 @@ final class IDX
                 SQL,
             ['stats', 'members'],
         );
-        $stats = $this->database->arow($result);
+        $stats = $this->database->arow($result)
+            ?? ['posts' => 0, 'topics' => 0, 'members' => 0, 'last_register' => 0, 'group_id' => 0, 'display_name' => ''];
+
         $this->database->disposeresult($result);
 
         $usersOnlineToday = $this->fetchUsersOnlineToday();
@@ -419,9 +438,9 @@ final class IDX
             'member_groups',
             'WHERE `legend`=1 ORDER BY `title`',
         );
-        while ($row = $this->database->arow($result)) {
-            $legend .= '<a href="?" class="mgroup' . $row['id'] . '">'
-                . $row['title'] . '</a> ';
+        foreach ($this->database->arows($result) as $group) {
+            $legend .= '<a href="?" class="mgroup' . $group['id'] . '">'
+                . $group['title'] . '</a> ';
         }
 
         return $page . $this->template->meta(
@@ -444,6 +463,9 @@ final class IDX
         );
     }
 
+    /**
+     * @return array{string,int,int}
+     */
     private function getUsersOnlineList(): array
     {
         $html = '';
@@ -458,7 +480,7 @@ final class IDX
             }
 
             $title = $this->textFormatting->blockhtml(
-                $user['location_verbose'] ?: 'Viewing the board.',
+                (string) $user['location_verbose'] ?: 'Viewing the board.',
             );
             if (isset($user['is_bot']) && $user['is_bot']) {
                 $html .= '<a class="user' . $user['uid'] . '" '
@@ -556,7 +578,7 @@ final class IDX
             $this->page->command(
                 'update',
                 '#fid_' . $unreadForum['id'] . '_lastpost',
-                $this->formatlastpost($unreadForum),
+                $this->formatLastPost($unreadForum),
                 '1',
             );
             $this->page->command(
@@ -572,7 +594,10 @@ final class IDX
         }
     }
 
-    private function formatlastpost(array $forum): ?string
+    /**
+     * @param array<string,mixed> $forum
+     */
+    private function formatLastPost(array $forum): string
     {
         return $this->template->meta(
             'idx-row-lastpost',
@@ -588,6 +613,9 @@ final class IDX
         );
     }
 
+    /**
+     * @param array<string,mixed> $forum
+     */
     private function isForumRead(array $forum): bool
     {
         if (!$this->forumsread) {
