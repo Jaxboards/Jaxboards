@@ -111,6 +111,9 @@ final class BBCode
         return $this->replaceWithRules($text, $this->inlineBBCodes);
     }
 
+    /**
+     * @param array<string,string> $rules
+     */
     private function replaceWithRules(string $text, array $rules): string
     {
         for ($nestLimit = 0; $nestLimit < 10; ++$nestLimit) {
@@ -142,6 +145,9 @@ final class BBCode
         return $text;
     }
 
+    /**
+     * @param array<string> $match
+     */
     private function attachmentCallback(array $match): string
     {
         $file = $this->getAttachmentData($match[1]);
@@ -201,9 +207,16 @@ final class BBCode
         $file = $this->database->arow($result);
         $this->database->disposeresult($result);
 
+        if (!$file) {
+            return null;
+        }
+
         return $this->attachmentData[$fileId] = $file;
     }
 
+    /**
+     * @param array<string> $match
+     */
     private function bbcodeQuoteCallback(array $match): string
     {
         $quotee = $match[1] !== ''
@@ -213,6 +226,9 @@ final class BBCode
         return "<div class='quote'>{$quotee}{$match[2]}</div>";
     }
 
+    /**
+     * @param array<string> $match
+     */
     private function bbcodeSizeCallback(array $match): string
     {
         $fontSize = $match[1] . ($match[2] ?: 'px');
@@ -220,6 +236,9 @@ final class BBCode
         return "<span style='font-size:{$fontSize}'>{$match[3]}</span>";
     }
 
+    /**
+     * @param array<string> $match
+     */
     private function bbcodeVideoCallback(array $match): string
     {
 
@@ -231,8 +250,8 @@ final class BBCode
         }
 
         if (str_contains((string) $match[1], 'youtu.be')) {
-            preg_match('@youtu.be/(?P<params>.+)$@', (string) $match[1], $youtubeMatches);
-            $embedUrl = "https://www.youtube.com/embed/{$youtubeMatches['params']}";
+            preg_match('@youtu.be/(.+)$@', (string) $match[1], $youtubeMatches);
+            $embedUrl = "https://www.youtube.com/embed/{$youtubeMatches[1]}";
 
             return $this->youtubeEmbedHTML($match[1], $embedUrl);
         }
@@ -246,7 +265,7 @@ final class BBCode
     private function bbcodeLICallback(array $match): string
     {
         $tag = $match[1];
-        $items = preg_split("@([\r\n]+|^)\\*@", (string) $match[2]);
+        $items = preg_split("@([\r\n]+|^)\\*@", (string) $match[2]) ?: [];
 
         // This HTML construction could be prettier, but
         // SonarQube requires the LI tags to be surrounded by OL and UL
