@@ -174,7 +174,7 @@ final class Template
     }
 
     /**
-     * @param array<bool|float|int|string|null> ...$args
+     * @param array<null|bool|float|int|string> ...$args
      */
     public function meta(string $meta, ...$args): string
     {
