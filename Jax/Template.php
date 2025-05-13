@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use InvalidArgumentException;
-
 use function array_key_exists;
 use function array_keys;
 use function array_merge;
@@ -16,7 +14,6 @@ use function explode;
 use function file_get_contents;
 use function glob;
 use function in_array;
-use function is_array;
 use function is_dir;
 use function is_string;
 use function mb_strtolower;
