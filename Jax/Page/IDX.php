@@ -154,8 +154,11 @@ final class IDX
             // Store subforum details for later.
             if ($forum['path']) {
                 preg_match('@\d+$@', (string) $forum['path'], $match);
-                $subForumId = $match ? (int) $match[0] : null;
-                if ($subForumId && array_key_exists($subForumId, $this->subforums)) {
+                $subForumId = $match !== [] ? (int) $match[0] : null;
+                if (
+                    $subForumId
+                    && array_key_exists($subForumId, $this->subforums)
+                ) {
                     $this->subforumids[$subForumId][] = $forum['id'];
                     $this->subforums[$subForumId] .= $this->template->meta(
                         'idx-subforum-link',
