@@ -500,11 +500,11 @@ final class Forum
 
     private function isTopicRead(array $topic, int $fid): bool
     {
-        if (empty($this->topicsRead)) {
+        if ($this->topicsRead === []) {
             $this->topicsRead = $this->jax->parseReadMarkers($this->session->get('topicsread'));
         }
 
-        if (empty($this->forumsRead)) {
+        if ($this->forumsRead === []) {
             $forumsRead = $this->jax->parseReadMarkers($this->session->get('forumsread'));
             if (isset($forumsRead[$fid])) {
                 $this->forumReadTime = $forumsRead[$fid];
