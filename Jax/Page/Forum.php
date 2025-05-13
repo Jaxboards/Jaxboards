@@ -28,9 +28,9 @@ use function preg_match;
 
 final class Forum
 {
-    private $topicsRead = [];
+    private array $topicsRead = [];
 
-    private $forumsRead = [];
+    private array $forumsRead = [];
 
     private $forumReadTime = 0;
 
