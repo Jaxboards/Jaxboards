@@ -50,7 +50,7 @@ final class Page
     public function sidebar(array $links): void
     {
         $content = '';
-        $act = (string) $this->request->get('act');
+        $act = $this->request->asString->get('act') ?? '';
         foreach ($links as $do => $title) {
             $content .= $this->parseTemplate(
                 'sidebar-list-link.html',

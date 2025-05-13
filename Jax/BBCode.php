@@ -65,7 +65,7 @@ final class BBCode
         private readonly Config $config,
     ) {}
 
-    public function toHTML(string $text): ?string
+    public function toHTML(string $text): string
     {
         $text = $this->toInlineHTML($text);
 
@@ -99,14 +99,14 @@ final class BBCode
             $this->attachmentCallback(...),
         );
 
-        return preg_replace_callback(
+        return (string) preg_replace_callback(
             '@\[video\](.*)\[/video\]@Ui',
             $this->bbcodeVideoCallback(...),
             $text,
         );
     }
 
-    public function toInlineHTML(string $text): ?string
+    public function toInlineHTML(string $text): string
     {
         return $this->replaceWithRules($text, $this->inlineBBCodes);
     }

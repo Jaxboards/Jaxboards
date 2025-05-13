@@ -199,17 +199,18 @@ final readonly class TextFormatting
     }
 
     /**
+     * @param array<string> $match
      * @SuppressWarnings("PHPMD.Superglobals")
      */
     private function linkifyCallback(array $match): string
     {
         [, $before, $stringURL] = $match;
 
-        $parts = parse_url((string) $stringURL);
+        $parts = parse_url($stringURL);
 
         $inner = null;
 
-        if ($parts['host'] === $_SERVER['HTTP_HOST']) {
+        if (is_array($parts) && $parts['host'] === $_SERVER['HTTP_HOST'] && array_key_exists('query', $parts)) {
             $inner = match (true) {
                 (bool) preg_match('@pid=(\d+)@', $parts['query'], $postMatch) => "Post #{$postMatch[1]}",
                 (bool) preg_match('@act=vt(\d+)@', $parts['query'], $topicMatch) => "Topic #{$topicMatch[1]}",
@@ -225,6 +226,9 @@ final readonly class TextFormatting
         return "{$before}[url={$stringURL}]{$inner}[/url]";
     }
 
+    /**
+     * @param array<string> $match
+     */
     private function emoteCallback(array $match): string
     {
         [, $space, $emoteText] = $match;
