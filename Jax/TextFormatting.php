@@ -6,12 +6,14 @@ namespace Jax;
 
 use Jax\Page\TextRules;
 
+use function array_key_exists;
 use function array_keys;
 use function array_map;
 use function array_values;
 use function highlight_string;
 use function htmlspecialchars;
 use function implode;
+use function is_array;
 use function mb_substr;
 use function nl2br;
 use function parse_url;
@@ -200,6 +202,7 @@ final readonly class TextFormatting
 
     /**
      * @param array<string> $match
+     *
      * @SuppressWarnings("PHPMD.Superglobals")
      */
     private function linkifyCallback(array $match): string
@@ -210,7 +213,11 @@ final readonly class TextFormatting
 
         $inner = null;
 
-        if (is_array($parts) && $parts['host'] === $_SERVER['HTTP_HOST'] && array_key_exists('query', $parts)) {
+        if (
+            is_array($parts)
+            && $parts['host'] === $_SERVER['HTTP_HOST']
+            && array_key_exists('query', $parts)
+        ) {
             $inner = match (true) {
                 (bool) preg_match('@pid=(\d+)@', $parts['query'], $postMatch) => "Post #{$postMatch[1]}",
                 (bool) preg_match('@act=vt(\d+)@', $parts['query'], $topicMatch) => "Topic #{$topicMatch[1]}",
