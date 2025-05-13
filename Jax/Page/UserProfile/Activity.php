@@ -15,23 +15,18 @@ use Jax\User;
 
 use function gmdate;
 
-final class Activity
+final readonly class Activity
 {
     private const ACTIVITY_LIMIT = 30;
 
-    /**
-     * @var array<string,null|float|int|string> the profile we are currently viewing
-     */
-    private ?array $profile = null;
-
     public function __construct(
-        private readonly Database $database,
-        private readonly Date $date,
-        private readonly DomainDefinitions $domainDefinitions,
-        private readonly Request $request,
-        private readonly TextFormatting $textFormatting,
-        private readonly Template $template,
-        private readonly User $user,
+        private Database $database,
+        private Date $date,
+        private DomainDefinitions $domainDefinitions,
+        private Request $request,
+        private TextFormatting $textFormatting,
+        private Template $template,
+        private User $user,
     ) {}
 
     /**
@@ -129,6 +124,7 @@ final class Activity
 
     /**
      * @param array<string,mixed> $activity
+     *
      * @return array{link:string,text:string}
      */
     private function parseActivityRSS(array $activity): array
@@ -154,7 +150,7 @@ final class Activity
                 'link' => $this->textFormatting->blockhtml('?act=vu' . $activity['uid']),
                 'text' => $activity['name'] . ' made friends with ' . $activity['aff_name'],
             ],
-            default => ['link'=>'', 'text'=>''],
+            default => ['link' => '', 'text' => ''],
         };
     }
 
@@ -171,7 +167,7 @@ final class Activity
             $tabHTML .= $this->parseActivity($activity);
         }
 
-        return $tabHTML
+        return $tabHTML !== '' && $tabHTML !== '0'
             ? <<<HTML
                 <a href="?act=vu{$profile['id']}&amp;page=activity&amp;fmt=RSS"
                    target="_blank" class="social" style='float:right'
