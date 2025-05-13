@@ -38,7 +38,10 @@ final readonly class Jax
         return $html;
     }
 
-    public function parseReadMarkers(?string $readMarkers)
+    /**
+     * @return array<int,int> Map of forum (or topic IDs) to time they were read
+     */
+    public function parseReadMarkers(?string $readMarkers): array
     {
         if ($readMarkers) {
             return json_decode($readMarkers, true) ?? [];
@@ -70,7 +73,7 @@ final readonly class Jax
      */
     public function parseForumPerms(string $forumPerms): array
     {
-        $unpack = unpack('n*', $forumPerms);
+        $unpack = unpack('n*', $forumPerms) ?: [];
         $counter = count($unpack);
         $parsedPerms = [];
         for ($index = 1; $index < $counter; $index += 2) {
@@ -125,10 +128,6 @@ final readonly class Jax
 
     /**
      * @SuppressWarnings("PHPMD.ErrorControlOperator")
-     *
-     * @param mixed $email
-     * @param mixed $topic
-     * @param mixed $message
      */
     public function mail(string $email, string $topic, string $message): bool
     {
