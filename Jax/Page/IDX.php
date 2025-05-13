@@ -18,9 +18,10 @@ use Jax\User;
 
 use function array_filter;
 use function array_flip;
-use function array_keys;
+use function array_key_exists;
 use function array_map;
 use function array_merge;
+use function array_unique;
 use function count;
 use function explode;
 use function gmdate;
@@ -46,13 +47,15 @@ final class IDX
     private array $mods = [];
 
     /**
-     * A map of forum IDs to the subforums they contain
-     * @var array<int,array<int>> $subforumids
+     * A map of forum IDs to the subforums they contain.
+     *
+     * @var array<int,array<int>>
      */
     private array $subforumids = [];
 
     /**
-     * Map of forum IDs to their compiled HTML link lists
+     * Map of forum IDs to their compiled HTML link lists.
+     *
      * @var array<int,string>
      */
     private array $subforums = [];
@@ -89,7 +92,8 @@ final class IDX
     }
 
     /**
-     * Returns top level forums
+     * Returns top level forums.
+     *
      * @return array<array<string,mixed>>
      */
     private function fetchIDXForums(): array
@@ -213,10 +217,13 @@ final class IDX
         }
     }
 
-    private function getsubs(int $forumId)
+    /**
+     * @return array<mixed>
+     */
+    private function getsubs(int $forumId): array
     {
         if (
-            !array_key_exists($forumId, ($this->subforumids))
+            !array_key_exists($forumId, $this->subforumids)
         ) {
             return [];
         }

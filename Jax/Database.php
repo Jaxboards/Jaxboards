@@ -396,7 +396,7 @@ class Database
     /**
      * Returns a map of all users online with keys being user ID.
      *
-     * @return array<int,array<int|string,int|string|null>>
+     * @return array<int,array<int|string,null|int|string>>
      */
     public function getUsersOnline(bool $canViewHiddenMembers = false): array
     {
