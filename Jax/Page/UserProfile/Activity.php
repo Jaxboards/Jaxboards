@@ -39,36 +39,38 @@ final class Activity
      */
     public function render(array $profile): string
     {
-        $this->profile = $profile;
 
         if ($this->request->both('fmt') === 'RSS') {
-            $this->renderRSSFeed();
+            $this->renderRSSFeed($profile);
 
             return '';
         }
 
-        return $this->renderActivitiesPage();
+        return $this->renderActivitiesPage($profile);
     }
 
-    public function renderRSSFeed(): void
+    /**
+     * @param array<string,mixed> $profile
+     */
+    public function renderRSSFeed(array $profile): void
     {
         $rssFeed = new RSSFeed(
             [
-                'description' => $this->profile['usertitle'],
-                'title' => $this->profile['display_name'] . "'s recent activity",
+                'description' => $profile['usertitle'],
+                'title' => $profile['display_name'] . "'s recent activity",
             ],
         );
-        foreach ($this->fetchActivities() as $activity) {
-            $activity['name'] = $this->profile['display_name'];
-            $activity['group_id'] = $this->profile['group_id'];
-            $data = $this->parseActivityRSS($activity);
+        foreach ($this->fetchActivities((int) $profile['id']) as $activity) {
+            $activity['name'] = $profile['display_name'];
+            $activity['group_id'] = $profile['group_id'];
+            $parsed = $this->parseActivityRSS($activity);
             $rssFeed->additem(
                 [
-                    'description' => $data['text'],
+                    'description' => $parsed['text'],
                     'guid' => $activity['id'],
-                    'link' => $this->domainDefinitions->getBoardUrl() . $data['link'],
+                    'link' => $this->domainDefinitions->getBoardUrl() . $parsed['link'],
                     'pubDate' => gmdate('r', $activity['date']),
-                    'title' => $data['text'],
+                    'title' => $parsed['text'],
                 ],
             );
         }
@@ -79,7 +81,7 @@ final class Activity
     /**
      * @param array<string,mixed> $activity
      */
-    private function parseActivity(array $activity): array|string
+    private function parseActivity(array $activity): string
     {
         $user = $this->template->meta(
             'user-link',
@@ -127,8 +129,9 @@ final class Activity
 
     /**
      * @param array<string,mixed> $activity
+     * @return array{link:string,text:string}
      */
-    private function parseActivityRSS(array $activity): array|string
+    private function parseActivityRSS(array $activity): array
     {
         return match ($activity['type']) {
             'profile_comment' => [
@@ -151,22 +154,26 @@ final class Activity
                 'link' => $this->textFormatting->blockhtml('?act=vu' . $activity['uid']),
                 'text' => $activity['name'] . ' made friends with ' . $activity['aff_name'],
             ],
+            default => ['link'=>'', 'text'=>''],
         };
     }
 
-    private function renderActivitiesPage(): string
+    /**
+     * @param array<string,mixed> $profile
+     */
+    private function renderActivitiesPage(array $profile): string
     {
         $tabHTML = '';
 
-        foreach ($this->fetchActivities() as $activity) {
-            $activity['name'] = $this->profile['display_name'];
-            $activity['group_id'] = $this->profile['group_id'];
+        foreach ($this->fetchActivities((int) $profile['id']) as $activity) {
+            $activity['name'] = $profile['display_name'];
+            $activity['group_id'] = $profile['group_id'];
             $tabHTML .= $this->parseActivity($activity);
         }
 
         return $tabHTML
             ? <<<HTML
-                <a href="?act=vu{$this->profile['id']}&amp;page=activity&amp;fmt=RSS"
+                <a href="?act=vu{$profile['id']}&amp;page=activity&amp;fmt=RSS"
                    target="_blank" class="social" style='float:right'
                 >RSS</a>{$tabHTML}
                 HTML
@@ -176,7 +183,7 @@ final class Activity
     /**
      * @return array<string,mixed>
      */
-    private function fetchActivities(): array
+    private function fetchActivities(int $profileId): array
     {
         $result = $this->database->safespecial(
             <<<'SQL'
@@ -201,7 +208,7 @@ final class Activity
                 LIMIT ?
                 SQL,
             ['activity', 'members'],
-            $this->profile['id'],
+            $profileId,
             self::ACTIVITY_LIMIT,
         );
         $rows = $this->database->arows($result);
