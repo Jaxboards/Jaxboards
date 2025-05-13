@@ -373,13 +373,13 @@ final class Topic
             $pagelist,
         ) . $this->template->meta(
             'topic-buttons-top',
-            $buttons,
+            ...$buttons,
         ) . $page . $this->template->meta(
             'topic-pages-bottom',
             $pagelist,
         ) . $this->template->meta(
             'topic-buttons-bottom',
-            $buttons,
+            ...$buttons,
         );
 
         // Update view count.

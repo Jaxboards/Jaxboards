@@ -102,7 +102,7 @@ final class Template
 
     private string $template;
 
-    private ?string $themePath = null;
+    private string $themePath;
 
     /**
      * These are custom meta definitions parsed from M tags in the board template.
@@ -121,7 +121,9 @@ final class Template
     public function __construct(
         private readonly DebugLog $debugLog,
         private readonly DomainDefinitions $domainDefinitions,
-    ) {}
+    ) {
+        $this->themePath = $this->domainDefinitions->getDefaultThemePath();
+    }
 
     public function addMeta(string $meta, string $content): void
     {
@@ -146,8 +148,8 @@ final class Template
 
     public function load(string $file): void
     {
-        $this->template = file_get_contents($file);
-        $this->template = preg_replace_callback(
+        $this->template = file_get_contents($file) ?: '';
+        $this->template = (string) preg_replace_callback(
             '@<M name=([\'"])([^\'"]+)\1>(.*?)</M>@s',
             $this->userMetaParse(...),
             $this->template,
@@ -174,6 +176,9 @@ final class Template
         $this->debugLog->log("Added {$component} to queue");
     }
 
+    /**
+     * @param array<mixed> ...$args
+     */
     public function meta(string $meta, ...$args): string
     {
         $this->processQueue($meta);
@@ -183,12 +188,8 @@ final class Template
                 ['<%%', '%%>'],
                 $this->userMetaDefs[$meta] ?? $this->metaDefs[$meta] ?? '',
             ),
-            isset($args[0]) && is_array($args[0]) ? $args[0] : $args,
+            $args,
         );
-
-        if ($formatted === false) {
-            throw new InvalidArgumentException($meta . ' has too many arguments');
-        }
 
         if (array_key_exists($meta, $this->moreFormatting)) {
             return $this->metaExtended($formatted);
@@ -255,13 +256,11 @@ final class Template
     /**
      * Given a component directory, loads all of the HTML views in it.
      *
-     * @param mixed $componentDir
-     *
      * @return array<string,string> Map of metaName => view HTML
      */
     private function loadComponentTemplates(string $componentDir): array
     {
-        return array_reduce(glob($componentDir . '/*.html'), function (array $meta, $metaFile) {
+        return array_reduce(glob($componentDir . '/*.html') ?: [], function (array $meta, $metaFile) {
             $metaName = pathinfo($metaFile, PATHINFO_FILENAME);
             $metaContent = file_get_contents($metaFile);
 
@@ -293,7 +292,7 @@ final class Template
      *
      * {if <%isguest%>!=true&&%1$s="Sean"}Hello Sean{/if}
      *
-     * @param list<string> $match 1 is the statement, 2 is the contents wrapped by the if
+     * @param array<string> $match 1 is the statement, 2 is the contents wrapped by the if
      */
     // phpcs:ignore SlevomatCodingStandard.Complexity.Cognitive.ComplexityTooHigh
     private function metaExtendedIfCB(array $match): string
@@ -363,6 +362,9 @@ final class Template
         }
     }
 
+    /**
+     * @param array<int,string> $match
+     */
     private function userMetaParse(array $match): string
     {
         $this->checkExtended($match[3], $match[2]);
