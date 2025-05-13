@@ -187,7 +187,7 @@ final readonly class ServiceSignup
                     ],
                 );
 
-                $this->fileUtils->copyDirectory($this->blueprint->getDirectory(), dirname(__DIR__) . '/boards/' . $board);
+                $this->fileUtils->copyDirectory($this->blueprint->getDirectory(), dirname(__DIR__) . '/boards/' . $boardURLLowercase);
 
                 header('Location: https://' . $this->request->asString->post('boardurl') . '.' . $this->serviceConfig->getSetting('domain'));
             }
