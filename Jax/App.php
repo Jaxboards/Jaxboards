@@ -128,7 +128,7 @@ final readonly class App
             return;
         }
 
-        $this->session->act($this->request->both('act'));
+        $this->session->act($this->request->asString->both('act'));
     }
 
     private function loadModules(): void
@@ -157,7 +157,7 @@ final readonly class App
 
     private function loadPageFromAction(): void
     {
-        $action = mb_strtolower($this->request->both('act') ?? '');
+        $action = mb_strtolower($this->request->asString->both('act') ?? '');
 
         if ($action === '' && $this->request->both('module') !== null) {
             return;
@@ -277,7 +277,7 @@ final readonly class App
         }
 
         $version = json_decode(
-            file_get_contents(dirname(__DIR__) . '/composer.json'),
+            file_get_contents(dirname(__DIR__) . '/composer.json') ?: '',
             null,
             512,
             JSON_OBJECT_AS_ARRAY | JSON_THROW_ON_ERROR,
@@ -304,7 +304,7 @@ final readonly class App
                     $this->user->get('display_name'),
                 ),
                 $this->date->smallDate(
-                    $this->user->get('last_visit'),
+                    (int) $this->user->get('last_visit'),
                 ),
                 $nummessages,
             ),
@@ -337,13 +337,21 @@ final readonly class App
 
     private function setPageVars(): void
     {
-        $this->template->addVar('modlink', $this->user->getPerm('can_moderate') ? $this->template->meta('modlink') : '');
-
         $this->template->addVar('ismod', $this->user->getPerm('can_moderate') ? 'true' : 'false');
         $this->template->addVar('isguest', $this->user->isGuest() ? 'true' : 'false');
         $this->template->addVar('isadmin', $this->user->getPerm('can_access_acp') ? 'true' : 'false');
 
-        $this->template->addVar('acplink', $this->user->getPerm('can_access_acp') ? $this->template->meta('acplink') : '');
+        $this->template->addVar('modlink',
+            $this->user->getPerm('can_moderate')
+                ? $this->template->meta('modlink')
+                : ''
+        );
+
+        $this->template->addVar('acplink',
+            $this->user->getPerm('can_access_acp')
+                ? $this->template->meta('acplink')
+                : ''
+        );
         $this->template->addVar('boardname', $this->config->getSetting('boardname'));
 
         if ($this->user->isGuest()) {
@@ -352,9 +360,9 @@ final readonly class App
 
         $this->template->addVar('groupid', (string) $this->user->get('group_id'));
         $this->template->addVar('userposts', (string) $this->user->get('posts'));
-        $this->template->addVar('grouptitle', $this->user->getPerm('title'));
-        $this->template->addVar('avatar', $this->user->get('avatar') ?: $this->template->meta('default-avatar'));
-        $this->template->addVar('username', $this->user->get('display_name'));
+        $this->template->addVar('grouptitle', (string) $this->user->getPerm('title'));
+        $this->template->addVar('avatar', (string) $this->user->get('avatar') ?: $this->template->meta('default-avatar'));
+        $this->template->addVar('username', (string) $this->user->get('display_name'));
         $this->template->addVar('userid', (string) $this->user->get('id') ?: '0');
 
         $this->page->append(
