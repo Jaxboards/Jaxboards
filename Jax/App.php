@@ -341,16 +341,18 @@ final readonly class App
         $this->template->addVar('isguest', $this->user->isGuest() ? 'true' : 'false');
         $this->template->addVar('isadmin', $this->user->getPerm('can_access_acp') ? 'true' : 'false');
 
-        $this->template->addVar('modlink',
+        $this->template->addVar(
+            'modlink',
             $this->user->getPerm('can_moderate')
                 ? $this->template->meta('modlink')
-                : ''
+                : '',
         );
 
-        $this->template->addVar('acplink',
+        $this->template->addVar(
+            'acplink',
             $this->user->getPerm('can_access_acp')
                 ? $this->template->meta('acplink')
-                : ''
+                : '',
         );
         $this->template->addVar('boardname', $this->config->getSetting('boardname'));
 
