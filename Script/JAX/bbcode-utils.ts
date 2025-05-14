@@ -22,7 +22,7 @@ export function htmlToBBCode(html: string) {
             const att: Record<string,string> = {};
             attributes.replace(
                 /(color|size|style|href|src)=(['"]?)(.*?)\2/gi,
-                (_: string, attr: string, q: string, value: string) => {
+                (__: string, attr: string, q: string, value: string) => {
                     att[attr] = value;
                     return '';
                 },
