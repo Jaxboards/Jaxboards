@@ -20,8 +20,6 @@ class Window {
 
     private oldpos?: string;
 
-    static close: (window: any) => void;
-
     constructor(options = {}) {
         this.title = 'Title';
         this.wait = true;
@@ -38,6 +36,24 @@ class Window {
 
         Object.assign(this, options)
     }
+
+    /**
+     * Given an element, attempt to find the window that the element is contained in and close it.
+     * @static
+     * @param  {Element} windowElementDescendant window element or child element of a window
+     * @return {Void}
+     */
+    static close = function close(window: HTMLElement) {
+        let element: HTMLElement | null = window;
+        do {
+            if ('close' in element) {
+                // @ts-ignore
+                element.close();
+                break;
+            }
+            element = element.parentElement;
+        } while (element);
+    };
 
     create() {
         if (this.windowContainer) {
@@ -132,7 +148,7 @@ class Window {
             });
         } else this.setPosition(pos);
 
-        let drag = new Drag()
+        new Drag()
             .autoZ()
             .noChildActivation()
             .boundingBox(
@@ -218,28 +234,11 @@ class Window {
         this.pos = pos;
     }
 
-    getPosition() {
-        if (!this.windowContainer) return;
+    getPosition(): string {
+        if (!this.windowContainer) return '';
         const s = this.windowContainer.style;
         return `tl ${parseFloat(s.left)} ${parseFloat(s.top)}`;
     }
 }
-
-/**
- * Given an element, attempt to find the window that the element is contained in and close it.
- * @static
- * @param  {Element} windowElementDescendant window element or child element of a window
- * @return {Void}
- */
-Window.close = function close(window) {
-    let element = window;
-    do {
-        if (element.close) {
-            element.close();
-            break;
-        }
-        element = element.offsetParent;
-    } while (element);
-};
 
 export default Window;
