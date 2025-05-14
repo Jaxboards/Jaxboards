@@ -14,9 +14,9 @@ class Window {
     pos: string;
     zIndex: number;
     windowContainer?: HTMLDivElement;
-    id: any;
-    onclose: any;
-    animate: any;
+    id?: string;
+    onclose?: () => void;
+    animate: boolean;
 
     private oldpos?: string;
 
@@ -34,6 +34,7 @@ class Window {
         this.className = '';
         this.pos = 'center';
         this.zIndex = getHighestZIndex();
+        this.animate = false;
 
         Object.assign(this, options)
     }
@@ -141,11 +142,10 @@ class Window {
                 document.documentElement.clientHeight - 50,
             )
             .apply(windowContainer, titleBar);
-        // @ts-ignore
-        windowContainer.close = () => this.close();
-        // @ts-ignore
-        windowContainer.minimize = this.minimize;
-        return windowContainer;
+        return Object.assign(windowContainer, {
+            close: () => this.close(),
+            minimize: this.minimize
+        })
     }
 
     close() {
