@@ -2,6 +2,16 @@ import Color from './color';
 
 const DISALLOWED_TAGS = ['SCRIPT', 'STYLE', 'HR'];
 
+
+const textAlignRegex = /text-align: ?(right|center|left)/i;
+const backgroundColorRegex = /background(-color)?:[^;]+(rgb\([^)]+\)|#\s+)/i;
+const italicRegex = /font-style: ?italic/i;
+const underlineRegex = /text-decoration:[^;]*underline/i;
+const lineThroughRegex = /text-decoration:[^;]*line-through/i;
+const fontSizeRegex = /font-size: ?([^;]+)/i;
+const fontColorRegex = /color: ?([^;]+)/i;
+const fontWeightRegex = /font-weight: ?bold/i;
+
 export function htmlToBBCode(html: string) {
     let bbcode = html;
     const nestedTagRegex = /<(\w+)([^>]*)>([^]*?)<\/\1>/gi;
@@ -34,22 +44,15 @@ export function htmlToBBCode(html: string) {
                 return '';
             }
 
-            const textAlignMatch = style.match(
-                /text-align: ?(right|center|left)/i,
-            );
-            const backgroundColorMatch = style.match(
-                /background(-color)?:[^;]+(rgb\([^)]+\)|#\s+)/i,
-            );
-            const italicMatch = style.match(/font-style: ?italic/i);
-            const underlineMatch = style.match(
-                /text-decoration:[^;]*underline/i,
-            );
-            const lineThroughMatch = style.match(
-                /text-decoration:[^;]*line-through/i,
-            );
-            const fontSizeMatch = style.match(/font-size: ?([^;]+)/i);
-            const fontColorMatch = style.match(/color: ?([^;]+)/i);
-            const fontWeightMatch = style.match(/font-weight: ?bold/i);
+            const textAlignMatch = textAlignRegex.exec(style);
+            const backgroundColorMatch = backgroundColorRegex.exec(style);
+            const italicMatch = italicRegex.exec(style);
+            const underlineMatch = underlineRegex.exec(style);
+            const lineThroughMatch = lineThroughRegex.exec(style);
+
+            const fontSizeMatch = fontSizeRegex.exec(style);
+            const fontColorMatch = fontColorRegex.exec(style);
+            const fontWeightMatch = fontWeightRegex.exec(style);
 
             if (backgroundColorMatch) {
                 innerhtml = `[bgcolor=#${new Color(
@@ -92,7 +95,7 @@ export function htmlToBBCode(html: string) {
             if (lcTag === 'ul') innerhtml = `[ul]${innerhtml}[/ul]`;
 
             // h1-h6
-            if (lcTag.match(/h\d/i)) {
+            if (/h\d/i.test(lcTag)) {
                 innerhtml = `[${lcTag}]${innerhtml}[/${lcTag}]`;
             }
 
