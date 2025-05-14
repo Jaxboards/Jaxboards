@@ -1,4 +1,4 @@
-let flashInterval;
+let flashInterval = -1;
 let originalTitle = '';
 let lastTitle = '';
 
@@ -10,7 +10,7 @@ export function stopTitleFlashing() {
     clearInterval(flashInterval);
 }
 
-export function flashTitle(title) {
+export function flashTitle(title: string) {
     if (document.hasFocus()) {
         return;
     }

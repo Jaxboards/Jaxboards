@@ -46,7 +46,7 @@ function buildQueryString(
 type AjaxSettings = {
     callback?: (req: XMLHttpRequest) => void;
     data?: Record<string, string> | [string[], string[]] | string;
-    method: string;
+    method?: string;
     requestType?: number;
     readyState?: number;
 };

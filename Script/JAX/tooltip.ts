@@ -1,12 +1,12 @@
 import { date, emojiTime } from './date';
 import { getCoordinates, getHighestZIndex } from './el';
 
-export default function toolTip(el) {
-    let tooltip = document.getElementById('tooltip_thingy');
+export default function toolTip(el: HTMLElement) {
+    let tooltip = document.querySelector<HTMLTableElement>('#tooltip_thingy');
     const pos = getCoordinates(el);
     let title = el.getAttribute('title');
-    if (el.hasAttribute('data-last-online')) {
-        const timestamp = el.getAttribute('data-last-online');
+    if (el.dataset.lastOnline) {
+        const timestamp = parseInt(el.dataset.lastOnline ?? '', 10);
         title = `Last Online: ${date(timestamp)} ${emojiTime(timestamp)}`;
     }
     if (!title) return;
@@ -40,16 +40,16 @@ export default function toolTip(el) {
         a.colSpan = 2;
         a = b.insertCell(1);
         a.className = 'right';
-        document.querySelector('#page').appendChild(tooltip);
+        document.querySelector('#page')?.appendChild(tooltip);
     }
 
     tooltip.rows[1].cells[1].innerText = title;
     tooltip.style.display = '';
     tooltip.style.top = `${pos.y - tooltip.clientHeight}px`;
     tooltip.style.left = `${pos.x}px`;
-    tooltip.style.zIndex = getHighestZIndex();
+    tooltip.style.zIndex = `${getHighestZIndex()}`;
     el.onmouseout = () => {
         el.title = title;
-        document.querySelector('#tooltip_thingy').style.display = 'none';
+        tooltip.style.display = 'none';
     };
 }

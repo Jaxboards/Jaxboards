@@ -2,7 +2,7 @@ import Color from './color';
 
 const DISALLOWED_TAGS = ['SCRIPT', 'STYLE', 'HR'];
 
-export function htmlToBBCode(html) {
+export function htmlToBBCode(html: string) {
     let bbcode = html;
     const nestedTagRegex = /<(\w+)([^>]*)>([^]*?)<\/\1>/gi;
     bbcode = bbcode.replace(/[\r\n]+/g, '');
@@ -10,20 +10,21 @@ export function htmlToBBCode(html) {
     // images and emojis
     bbcode = bbcode.replace(
         /<img.*?src=["']?([^'"]+)["'](?: alt=["']?([^"']+)["'])?[^>]*\/?>/g,
-        (whole, src, alt) => alt || `[img]${src}[/img]`,
+        (_: string, src: string, alt: string) => alt || `[img]${src}[/img]`,
     );
     bbcode = bbcode.replace(
         nestedTagRegex,
-        (whole, tag, attributes, innerHTML) => {
+        (_: string, tag: string, attributes: string, innerHTML: string) => {
             // Recursively handle nested tags
             let innerhtml = nestedTagRegex.test(innerHTML)
                 ? htmlToBBCode(innerHTML)
                 : innerHTML;
-            const att = {};
+            const att: Record<string,string> = {};
             attributes.replace(
                 /(color|size|style|href|src)=(['"]?)(.*?)\2/gi,
-                (_, attr, q, value) => {
+                (_: string, attr: string, q: string, value: string) => {
                     att[attr] = value;
+                    return '';
                 },
             );
             const { style = '' } = att;
@@ -76,11 +77,11 @@ export function htmlToBBCode(html) {
             }
 
             if (att.size || fontSizeMatch) {
-                innerhtml = `[size=${att.size || fontSizeMatch[1]}]${innerhtml}[/size]`;
+                innerhtml = `[size=${att.size || fontSizeMatch?.[1]}]${innerhtml}[/size]`;
             }
 
             if (att.color || fontColorMatch) {
-                innerhtml = `[color=${att.color || fontColorMatch[1]}]${innerhtml}[/color]`;
+                innerhtml = `[color=${att.color || fontColorMatch?.[1]}]${innerhtml}[/color]`;
             }
 
             if (lcTag === 'a' && att.href) {
@@ -117,7 +118,7 @@ export function htmlToBBCode(html) {
         .replace(/&nbsp;/g, ' ');
 }
 
-export function bbcodeToHTML(bbcode) {
+export function bbcodeToHTML(bbcode: string) {
     let html = bbcode
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
@@ -151,8 +152,8 @@ export function bbcodeToHTML(bbcode) {
     html = html.replace(/\[(ul|ol)\]([^]*?)\[\/\1\]/gi, (_, tag, contents) => {
         const listItems = contents.split(/(^|[\r\n]+)\*/);
         const lis = listItems
-            .filter((text) => text.trim())
-            .map((text) => `<li>${text}</li>`)
+            .filter((text: string) => text.trim())
+            .map((text: string) => `<li>${text}</li>`)
             .join('');
         return `<${tag}>${lis}</${tag}>`;
     });
