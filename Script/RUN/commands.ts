@@ -164,7 +164,7 @@ export default {
         messageReceived({ fromId, fromName, message, fromMe, timestamp });
     },
     imtoggleoffline(a: string) {
-        document.querySelector(`#im_${a}`).classList.add('offline');
+        document.querySelector(`#im_${a}`)?.classList.add('offline');
     },
     window(options) {
         const existingWindow =
@@ -192,7 +192,7 @@ export default {
         winElement.id = options.id || '';
         gracefulDegrade(winElement);
     },
-    closewindow(windowSelector) {
+    closewindow(windowSelector: string) {
         const el = document.querySelector(windowSelector);
         if (el) {
             Window.close(el);

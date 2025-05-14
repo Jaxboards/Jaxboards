@@ -169,10 +169,10 @@ final class UserProfile
             array_keys($links),
         ));
 
-        $contactDetails .= <<<HTML
+        $contactDetails .= <<<"HTML"
             <div class="contact im">
                 <a href="javascript:void(0)"
-                    onclick="new IMWindow('{$profile['id']}','{$profile['display_name']}')"
+                    onclick="new IMWindow({$profile['id']},'{$profile['display_name']}')"
                     >IM</a>
             </div>
             <div class="contact pm">

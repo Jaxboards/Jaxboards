@@ -5,7 +5,7 @@ import { flashTitle } from './flashing-title';
 import gracefulDegrade from './graceful-degrade';
 import Window from './window';
 
-function notification(fromName, message) {
+function notification(fromName: string, message: string) {
     flashTitle(`New message from ${fromName}!`);
 
     if (
@@ -23,8 +23,8 @@ function notification(fromName, message) {
     }
 }
 
-function createMessagingWindow({ fromId, fromName, message }) {
-    let messagesContainer = document.querySelector(`#im_${fromId} .ims`);
+function createMessagingWindow({ fromId, fromName, message }: { fromId: number, fromName: string, message: string }) {
+    let messagesContainer: HTMLDivElement | null = document.querySelector(`#im_${fromId} .ims`);
 
     if (messagesContainer) {
         return messagesContainer;
@@ -42,20 +42,22 @@ function createMessagingWindow({ fromId, fromName, message }) {
                     <input type='hidden' name='act' value='blank' />
                 </form>
             </div>
-        `.replace(/%s/g, fromId),
+        `.replace(/%s/g, `${fromId}`),
         className: 'im',
         resize: '.ims',
         animate: true,
+        id: `im_${fromId}`,
     });
 
     const win = imWindow.create();
     gracefulDegrade(win);
-    win.id = `im_${fromId}`;
-    win.onclick = () => {
-        win.querySelector('form').im_im.focus();
+    const focus = () => {
+        win.querySelector('form')?.im_im.focus();
     };
-    win.onclick();
-    messagesContainer = document.querySelector(`#im_${fromId} .ims`);
+    win.onclick = focus;
+    focus();
+    messagesContainer = document.querySelector(`#im_${fromId} .ims`)!;
+
     const test = getComputedStyle(messagesContainer);
     messagesContainer.style.width = test.width;
     messagesContainer.style.height = test.height;
@@ -64,14 +66,14 @@ function createMessagingWindow({ fromId, fromName, message }) {
     return messagesContainer;
 }
 
-export default function IMWindow(uid, uname) {
+export default function IMWindow(uid: number, uname: string) {
     if (!globalsettings.can_im) {
         // eslint-disable-next-line no-alert
         alert('You do not have permission to use this feature.');
         return;
     }
 
-    RUN.stream.commands.im(uid, uname, false);
+    RUN.stream.commands.im(uid, uname, '');
 }
 
 export function messageReceived({
@@ -80,7 +82,7 @@ export function messageReceived({
     message,
     fromMe,
     timestamp,
-}) {
+}: { fromId: number, fromName: string, message: string, fromMe: number, timestamp: number }) {
     notification(fromName, message);
 
     const messagesContainer = createMessagingWindow({
@@ -104,12 +106,12 @@ export function messageReceived({
     }
     div.classList.add(fromMe ? 'you' : 'them');
     if (!fromMe) {
-        document.querySelector(`#im_${fromId}`).classList.remove('offline');
+        document.querySelector(`#im_${fromId}`)?.classList.remove('offline');
     }
     div.innerHTML = `<a href='?act=vu${
-        fromMe || parseInt(fromId, 10)
+        fromMe || fromId
     }' class='name'>${fromName}</a> ${!isAction ? ': ' : ''}${message}`;
-    div.dataset.timestamp = timestamp;
+    div.dataset.timestamp = `${timestamp}`;
     const test =
         messagesContainer.scrollTop >
         messagesContainer.scrollHeight - messagesContainer.clientHeight - 50;

@@ -1,28 +1,47 @@
 import Animation from './animation';
-import Drag from './drag';
+import Drag, { DragSession } from './drag';
 import { getHighestZIndex } from './el';
 import { onImagesLoaded } from './util';
 
 class Window {
+    title: string;
+    wait: boolean;
+    content: string;
+    open: boolean;
+    minimizable: boolean;
+    resize?: string;
+    className: string;
+    pos: string;
+    zIndex: number;
+    windowContainer?: HTMLDivElement;
+    id: any;
+    onclose: any;
+    animate: any;
+
+    private oldpos?: string;
+
+    static close: (window: any) => void;
+
     constructor(options = {}) {
-        Object.assign(this, {
-            title: 'Title',
-            wait: true,
-            content: 'Content',
-            open: false,
-            minimizable: true,
-            resize: false,
-            className: '',
-            pos: 'center',
-            zIndex: getHighestZIndex(),
-            ...options,
-        });
+        this.title = 'Title';
+        this.wait = true;
+        this.title = 'Title';
+        this.wait = true;
+        this.content = 'Content';
+        this.open = false;
+        this.minimizable = true;
+        this.resize = undefined;
+        this.className = '';
+        this.pos = 'center';
+        this.zIndex = getHighestZIndex();
+
+        Object.assign(this, options)
     }
 
     create() {
         if (this.windowContainer) {
             // DOM already created
-            return null;
+            return this.windowContainer;
         }
         const windowContainer = document.createElement('div');
         const titleBar = document.createElement('div');
@@ -36,7 +55,6 @@ class Window {
         if (this.id) {
             windowContainer.id = this.id;
         }
-        this.contentcontainer = contentContainer;
 
         windowContainer.className = `window${
             this.className ? ` ${this.className}` : ''
@@ -70,7 +88,7 @@ class Window {
         document.body.appendChild(windowContainer);
 
         if (this.resize) {
-            const targ = windowContainer.querySelector(this.resize);
+            const targ: HTMLElement | null = windowContainer.querySelector(this.resize);
             if (!targ) {
                 throw new Error('Resize target not found');
             }
@@ -84,9 +102,9 @@ class Window {
             new Drag()
                 .boundingBox(100, 100, Infinity, Infinity)
                 .addListener({
-                    ondrag(a) {
-                        const w = parseFloat(targ.style.width) + a.dx;
-                        const h = parseFloat(targ.style.height) + a.dy;
+                    ondrag(a: DragSession) {
+                        const w = parseFloat(targ.style.width);
+                        const h = parseFloat(targ.style.height);
                         targ.style.width = `${w}px`;
                         if (w < windowContainer.clientWidth - 20) {
                             targ.style.width = `${windowContainer.clientWidth}px`;
@@ -105,15 +123,15 @@ class Window {
         }
 
         const s = windowContainer.style;
-        s.zIndex = this.zIndex + 5;
+        s.zIndex = `${this.zIndex + 5}`;
 
         if (this.wait) {
-            onImagesLoaded(windowContainer.querySelectorAll('img')).then(() => {
+            onImagesLoaded(Array.from(windowContainer.querySelectorAll('img'))).then(() => {
                 this.setPosition(pos);
             });
         } else this.setPosition(pos);
 
-        this.drag = new Drag()
+        let drag = new Drag()
             .autoZ()
             .noChildActivation()
             .boundingBox(
@@ -123,7 +141,9 @@ class Window {
                 document.documentElement.clientHeight - 50,
             )
             .apply(windowContainer, titleBar);
+        // @ts-ignore
         windowContainer.close = () => this.close();
+        // @ts-ignore
         windowContainer.minimize = this.minimize;
         return windowContainer;
     }
@@ -133,17 +153,18 @@ class Window {
             return;
         }
         document.body.removeChild(this.windowContainer);
-        this.windowContainer = null;
+        this.windowContainer = undefined;
         if (this.onclose) this.onclose();
     }
 
     minimize() {
         const c = this.windowContainer;
+        if (!c) return;
         const isMinimized = c.classList.contains('minimized');
         c.classList.toggle('minimized');
         if (isMinimized) {
             c.removeAttribute('draggable');
-            this.setPosition(this.oldpos, 0);
+            this.setPosition(this.oldpos ?? '');
         } else {
             c.setAttribute('draggable', 'false');
             const wins = Array.from(document.querySelectorAll('.window'));
@@ -158,8 +179,9 @@ class Window {
         }
     }
 
-    setPosition(pos, animate) {
-        const d1 = this.windowContainer;
+    setPosition(pos: string, animate = false) {
+        const container = this.windowContainer;
+        if (!container) return;
         let x = 0;
         let y = 0;
         const cH = document.documentElement.clientHeight;
@@ -172,15 +194,15 @@ class Window {
         x = Math.floor(x);
         y = Math.floor(y);
         if (pos.charAt(1) === 'r') {
-            x = cW - x - d1.clientWidth;
+            x = cW - x - container.clientWidth;
         }
         switch (pos.charAt(0)) {
             case 'b':
-                y = cH - y - d1.clientHeight;
+                y = cH - y - container.clientHeight;
                 break;
             case 'c':
-                y = (cH - d1.clientHeight) / 2;
-                x = (cW - d1.clientWidth) / 2;
+                y = (cH - container.clientHeight) / 2;
+                x = (cW - container.clientWidth) / 2;
                 break;
             default:
         }
@@ -189,14 +211,15 @@ class Window {
 
         if (x < 0) x = 0;
         if (y < 0) y = 0;
-        d1.style.left = `${x}px`;
+        container.style.left = `${x}px`;
         if (this.animate || animate) {
-            new Animation(d1, 10).add('top', `${y - 100}px`, `${y}px`).play();
-        } else d1.style.top = `${y}px`;
+            new Animation(container, 10).add('top', `${y - 100}px`, `${y}px`).play();
+        } else container.style.top = `${y}px`;
         this.pos = pos;
     }
 
     getPosition() {
+        if (!this.windowContainer) return;
         const s = this.windowContainer.style;
         return `tl ${parseFloat(s.left)} ${parseFloat(s.top)}`;
     }
