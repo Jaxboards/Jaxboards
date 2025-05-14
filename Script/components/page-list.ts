@@ -1,12 +1,13 @@
-import Component from '../classes/component';
 
-export default class PageList extends Component {
-    static get selector() {
-        return '.pages';
+export default class PageList {
+    element: HTMLDivElement;
+
+    static selector(container: HTMLElement) {
+        return container.querySelectorAll<HTMLDivElement>('.pages').forEach(el => new this(el));
     }
 
     constructor(element: HTMLDivElement) {
-        super(element);
+        this.element = element;
         element.addEventListener('wheel', (event) => this.wheel(event));
     }
 

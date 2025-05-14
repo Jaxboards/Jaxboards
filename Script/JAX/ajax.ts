@@ -12,11 +12,14 @@
  *
  * @return {String}
  */
-function buildQueryString(keys, values) {
+function buildQueryString(keys: Record<string,string> | string[], values?: string[]): string {
     if (!keys) {
         return '';
     }
-    if (values) {
+    if (Array.isArray(keys)) {
+        if (!values) {
+            throw new Error('Invalid arguments for buildQueryString. Received array and undefined')
+        }
         return keys
             .map(
                 (key, index) =>
@@ -26,6 +29,7 @@ function buildQueryString(keys, values) {
             )
             .join('&');
     }
+
     return Object.keys(keys)
         .map(
             (key) =>
@@ -35,30 +39,38 @@ function buildQueryString(keys, values) {
 }
 
 class Ajax {
-    constructor(s) {
-        this.setup = {
-            readyState: 4,
-            callback() {},
-            method: 'POST',
-            ...s,
-        };
+    setup = {
+        readyState: 4,
+        callback(xml: XMLHttpRequest) {},
+        method: 'POST',
+    };
+    constructor(setup = {}) {
+        Object.assign(this.setup, setup);
     }
 
     load(
-        url,
-        { callback, data, method = this.setup.method, requestType = 1 } = {},
+        url: string,
+        {
+            callback,
+            data,
+            method = this.setup.method,
+            requestType = 1
+        }: {
+            callback?: (req: XMLHttpRequest) => void,
+            data?: Record<string,string> | [string[],string[]] | string,
+            method?: string
+            requestType?: number
+        } = {},
     ) {
         // requestType is an enum (1=update, 2=load new)
         let sendData = null;
 
         if (
             data &&
-            Array.isArray(data) &&
-            Array.isArray(data[0]) &&
-            data[0].length === data[1].length
+            Array.isArray(data)
         ) {
             sendData = buildQueryString(data[0], data[1]);
-        } else if (typeof data !== 'string') {
+        } else if (data && typeof data !== 'string') {
             sendData = buildQueryString(data);
         }
 
@@ -73,8 +85,7 @@ class Ajax {
         };
 
         request.open(method, url, true);
-        request.url = url;
-        request.type = requestType;
+        Object.assign(request, { url, requestType })
 
         if (method) {
             request.setRequestHeader(
@@ -83,7 +94,7 @@ class Ajax {
             );
         }
 
-        request.setRequestHeader('X-JSACCESS', requestType);
+        request.setRequestHeader('X-JSACCESS', `${requestType}`);
         request.send(sendData);
         return request;
     }

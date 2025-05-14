@@ -1,13 +1,14 @@
 import Animation from '../JAX/animation';
-import Component from '../classes/component';
 
-export default class CollapseBox extends Component {
-    static get selector() {
-        return '.collapse-box';
+export default class CollapseBox {
+    element: HTMLDivElement;
+
+    static selector(container: HTMLElement) {
+        return container.querySelectorAll<HTMLDivElement>('.collapse-box').forEach(el => new this(el));
     }
 
     constructor(element: HTMLDivElement) {
-        super(element);
+        this.element = element;
 
         element
             .querySelector('.collapse-button')

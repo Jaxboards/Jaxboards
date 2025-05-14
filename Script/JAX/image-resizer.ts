@@ -48,8 +48,8 @@ export function makeResizer(
     link.appendChild(img);
 }
 
-export function imageResizer(imgs: NodeListOf<HTMLImageElement>) {
-    if (!imgs || !imgs.length) {
+export function imageResizer(imgs: HTMLImageElement[]) {
+    if (!imgs.length) {
         return;
     }
     Array.from(imgs)

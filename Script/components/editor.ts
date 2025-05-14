@@ -1,7 +1,6 @@
 /* global globalsettings */
 /* eslint-disable no-script-url, no-alert */
 
-import Component from '../classes/component';
 import Ajax from '../JAX/ajax';
 import { bbcodeToHTML, htmlToBBCode } from '../JAX/bbcode-utils';
 import Browser from '../JAX/browser';
@@ -11,17 +10,16 @@ import { replaceSelection } from '../JAX/selection';
 const URL_REGEX = /^(ht|f)tps?:\/\/[\w.\-%&?=/]+$/;
 const isURL = (text: string) => URL_REGEX.test(text);
 
-export default class Editor extends Component {
+export default class Editor {
     iframe: HTMLIFrameElement;
 
     element: HTMLTextAreaElement;
 
-    static get selector() {
-        return 'textarea.bbcode-editor';
+    static selector(container: HTMLElement) {
+        return container.querySelectorAll<HTMLTextAreaElement>('textarea.bbcode-editor').forEach(el => new this(el));
     }
 
     constructor(element: HTMLTextAreaElement) {
-        super(element);
         this.element = element;
 
         this.iframe = document.createElement('iframe');

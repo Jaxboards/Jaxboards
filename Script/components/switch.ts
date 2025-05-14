@@ -1,13 +1,14 @@
-import Component from '../classes/component';
 import { insertAfter } from '../JAX/el';
 
-export default class Switch extends Component {
-    static get selector() {
-        return 'input.switch';
+export default class Switch {
+    element: HTMLInputElement;
+
+    static selector(container: HTMLElement) {
+        return container.querySelectorAll<HTMLInputElement>('input.switch').forEach(el => new this(el));
     }
 
     constructor(element: HTMLInputElement) {
-        super(element);
+        this.element = element;
         // Hide original checkbox
         element.style.display = 'none';
 

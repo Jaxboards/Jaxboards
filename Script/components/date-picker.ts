@@ -1,8 +1,7 @@
-import Component from '../classes/component';
 import { daysShort, months } from '../JAX/date';
 import { getCoordinates, getHighestZIndex } from '../JAX/el';
 
-export default class DatePicker extends Component {
+export default class DatePicker {
     picker: HTMLTableElement;
 
     element: HTMLInputElement;
@@ -11,13 +10,11 @@ export default class DatePicker extends Component {
 
     lastDate?: number[];
 
-    static get selector() {
-        return 'input.date';
+    static selector(container: HTMLElement) {
+        return container.querySelectorAll<HTMLInputElement>('input.date').forEach(el => new this(el));
     }
 
     constructor(element: HTMLInputElement) {
-        super(element);
-
         this.element = element;
         this.picker = this.getPicker();
 

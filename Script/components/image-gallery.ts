@@ -1,18 +1,20 @@
-import Component from '../classes/component';
 
-export default class ImageGallery extends Component {
+export default class ImageGallery {
+    element: HTMLDivElement;
+
     index: number;
 
     images: NodeListOf<HTMLImageElement>;
 
     max: number;
 
-    static get selector() {
-        return '.image_gallery';
+    static selector(container: HTMLElement) {
+        return container.querySelectorAll<HTMLDivElement>('.image_gallery').forEach(el => new this(el));
     }
 
     constructor(element: HTMLDivElement) {
-        super(element);
+        this.element = element;
+
         const controls = document.createElement('div');
         const next = document.createElement('button');
         const prev = document.createElement('button');

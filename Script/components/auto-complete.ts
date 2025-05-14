@@ -1,17 +1,24 @@
 import Ajax from '../JAX/ajax';
-import { getHighestZIndex, getCoordinates } from '../JAX/el';
-import Component from '../classes/component';
+import { getCoordinates, getHighestZIndex } from '../JAX/el';
 
 const VALID_CLASS = 'valid';
 const INVALID_CLASS = 'invalid';
 
-export default class AutoComplete extends Component {
-    static get selector() {
-        return 'input[data-autocomplete-action]';
+export default class AutoComplete {
+    element: HTMLInputElement;
+
+    action?: string;
+
+    outputElement: HTMLInputElement;
+
+    indicatorElement?: HTMLElement | null;
+
+    static selector(container: HTMLElement) {
+        return container.querySelectorAll<HTMLInputElement>('input[data-autocomplete-action]').forEach(el => new this(el));
     }
 
-    constructor(element) {
-        super(element);
+    constructor(element: HTMLInputElement) {
+        this.element = element;
 
         // Disable native autocomplete behavior
         element.autocomplete = 'off';
@@ -20,14 +27,17 @@ export default class AutoComplete extends Component {
         const output = element.dataset.autocompleteOutput;
         const indicator = element.dataset.autocompleteIndicator;
 
-        this.outputElement = output && document.querySelector(output);
-        this.indicatorElement = indicator && document.querySelector(indicator);
+        const outputElement = output ? document.querySelector<HTMLInputElement>(output) : undefined;
 
-        if (!this.outputElement) {
+        if (!outputElement) {
             throw new Error(
                 'Expected element to have data-autocomplete-output',
             );
         }
+
+        this.outputElement = outputElement || document.createElement('input');
+        this.indicatorElement = indicator ? document.querySelector(indicator) : undefined;
+
 
         element.addEventListener('keyup', (event) => this.keyUp(event));
         element.addEventListener('keydown', (event) => {
@@ -39,7 +49,7 @@ export default class AutoComplete extends Component {
 
     getResultsContainer() {
         const coords = getCoordinates(this.element);
-        let resultsContainer = document.querySelector('#autocomplete');
+        let resultsContainer = document.querySelector<HTMLElement>('#autocomplete');
         if (!resultsContainer) {
             resultsContainer = Object.assign(document.createElement('div'), {
                 id: 'autocomplete',
@@ -60,7 +70,7 @@ export default class AutoComplete extends Component {
         return resultsContainer;
     }
 
-    keyUp(event) {
+    keyUp(event: KeyboardEvent) {
         const resultsContainer = this.getResultsContainer();
         const results = Array.from(resultsContainer.querySelectorAll('div'));
         const selectedIndex = results.findIndex((el) =>
@@ -86,7 +96,7 @@ export default class AutoComplete extends Component {
                     return;
                 case 'Enter':
                     if (selectedIndex >= 0) {
-                        results[selectedIndex].onclick();
+                        results[selectedIndex].dispatchEvent(new Event('click'));
                     }
                     return;
                 default:
@@ -104,7 +114,7 @@ export default class AutoComplete extends Component {
         const searchTerm = encodeURIComponent(this.element.value);
         const queryParams = `act=${this.action}&term=${searchTerm}`;
         new Ajax().load(`${relativePath}api/?${queryParams}`, {
-            callback: (xml) => {
+            callback: (xml: XMLHttpRequest) => {
                 const data = JSON.parse(xml.responseText);
                 resultsContainer.innerHTML = '';
                 if (!data.length) {
@@ -112,7 +122,7 @@ export default class AutoComplete extends Component {
                 } else {
                     resultsContainer.style.display = '';
                     const [ids, values] = data;
-                    ids.forEach((key, i) => {
+                    ids.forEach((key: number, i: number) => {
                         const value = values[i];
                         const div = document.createElement('div');
                         div.innerHTML = value;
@@ -123,7 +133,7 @@ export default class AutoComplete extends Component {
                                     VALID_CLASS,
                                 );
                             }
-                            this.outputElement.value = key;
+                            this.outputElement.value = `${key}`;
                             this.outputElement.dispatchEvent(
                                 new Event('change'),
                             );

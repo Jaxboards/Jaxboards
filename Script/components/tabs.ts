@@ -1,14 +1,16 @@
-import Component from '../classes/component';
 
 const ACTIVE_CLASS = 'active';
 
-export default class Tabs extends Component {
-    static get selector() {
-        return '.tabs';
+export default class Tabs {
+    element: HTMLDivElement;
+
+    static selector(container: HTMLElement) {
+        return container.querySelectorAll<HTMLDivElement>('.tabs').forEach(el => new this(el));
     }
 
     constructor(element: HTMLDivElement) {
-        super(element);
+        this.element = element;
+
         element.addEventListener('click', (event) => this.click(event));
     }
 

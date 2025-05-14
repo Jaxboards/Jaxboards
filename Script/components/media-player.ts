@@ -1,13 +1,14 @@
-import Component from '../classes/component';
 import Window from '../JAX/window';
 
-export default class MediaPlayer extends Component {
-    static get selector() {
-        return '.media';
+export default class MediaPlayer {
+    element: HTMLDivElement;
+
+    static selector(container: HTMLElement) {
+        return container.querySelectorAll<HTMLDivElement>('.media').forEach(el => new this(el));
     }
 
     constructor(element: HTMLDivElement) {
-        super(element);
+        this.element = element;
 
         const popoutLink = element.querySelector<HTMLAnchorElement>('a.popout');
         const inlineLink = element.querySelector<HTMLAnchorElement>('a.inline');
