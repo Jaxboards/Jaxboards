@@ -23,8 +23,18 @@ function notification(fromName: string, message: string) {
     }
 }
 
-function createMessagingWindow({ fromId, fromName, message }: { fromId: number, fromName: string, message: string }) {
-    let messagesContainer: HTMLDivElement | null = document.querySelector(`#im_${fromId} .ims`);
+function createMessagingWindow({
+    fromId,
+    fromName,
+    message,
+}: {
+    fromId: number;
+    fromName: string;
+    message: string;
+}) {
+    let messagesContainer: HTMLDivElement | null = document.querySelector(
+        `#im_${fromId} .ims`,
+    );
 
     if (messagesContainer) {
         return messagesContainer;
@@ -82,7 +92,13 @@ export function messageReceived({
     message,
     fromMe,
     timestamp,
-}: { fromId: number, fromName: string, message: string, fromMe: number, timestamp: number }) {
+}: {
+    fromId: number;
+    fromName: string;
+    message: string;
+    fromMe: number;
+    timestamp: number;
+}) {
     notification(fromName, message);
 
     const messagesContainer = createMessagingWindow({

@@ -5,17 +5,29 @@ import { onImagesLoaded } from './util';
 
 class Window {
     title: string;
+
     wait: boolean;
+
     content: string;
+
     open: boolean;
+
     minimizable: boolean;
+
     resize?: string;
+
     className: string;
+
     pos: string;
+
     zIndex: number;
+
     windowContainer?: HTMLDivElement;
+
     id?: string;
+
     onclose?: () => void;
+
     animate: boolean;
 
     private oldpos?: string;
@@ -34,7 +46,7 @@ class Window {
         this.zIndex = getHighestZIndex();
         this.animate = false;
 
-        Object.assign(this, options)
+        Object.assign(this, options);
     }
 
     /**
@@ -104,7 +116,9 @@ class Window {
         document.body.appendChild(windowContainer);
 
         if (this.resize) {
-            const targ: HTMLElement | null = windowContainer.querySelector(this.resize);
+            const targ: HTMLElement | null = windowContainer.querySelector(
+                this.resize,
+            );
             if (!targ) {
                 throw new Error('Resize target not found');
             }
@@ -142,7 +156,9 @@ class Window {
         s.zIndex = `${this.zIndex + 5}`;
 
         if (this.wait) {
-            onImagesLoaded(Array.from(windowContainer.querySelectorAll('img'))).then(() => {
+            onImagesLoaded(
+                Array.from(windowContainer.querySelectorAll('img')),
+            ).then(() => {
                 this.setPosition(pos);
             });
         } else this.setPosition(pos);
@@ -159,8 +175,8 @@ class Window {
             .apply(windowContainer, titleBar);
         return Object.assign(windowContainer, {
             close: () => this.close(),
-            minimize: this.minimize
-        })
+            minimize: this.minimize,
+        });
     }
 
     close() {
@@ -228,7 +244,9 @@ class Window {
         if (y < 0) y = 0;
         container.style.left = `${x}px`;
         if (this.animate || animate) {
-            new Animation(container, 10).add('top', `${y - 100}px`, `${y}px`).play();
+            new Animation(container, 10)
+                .add('top', `${y - 100}px`, `${y}px`)
+                .play();
         } else container.style.top = `${y}px`;
         this.pos = pos;
     }
