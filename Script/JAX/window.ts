@@ -46,8 +46,7 @@ class Window {
     static close = function close(window: HTMLElement) {
         let element: HTMLElement | null = window;
         do {
-            if ('close' in element) {
-                // @ts-ignore
+            if ('close' in element && typeof element.close === 'function') {
                 element.close();
                 break;
             }
