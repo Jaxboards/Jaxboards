@@ -2,7 +2,6 @@ import Color from './color';
 
 const DISALLOWED_TAGS = ['SCRIPT', 'STYLE', 'HR'];
 
-
 const textAlignRegex = /text-align: ?(right|center|left)/i;
 const backgroundColorRegex = /background(-color)?:[^;]+(rgb\([^)]+\)|#\s+)/i;
 const italicRegex = /font-style: ?italic/i;
