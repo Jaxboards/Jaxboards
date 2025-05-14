@@ -11,6 +11,8 @@ export type DragSession = {
     my: number;
     ex?: number;
     ey?: number;
+    dx?: number;
+    dy?: number;
     info?: DragSession;
     zIndex?: string;
     left?: number;
@@ -116,6 +118,8 @@ class Drag {
             el: this.sess.el,
             mx,
             my,
+            dx: mx - (sessInfo?.mx || mx),
+            dy: my - (sessInfo?.my || my),
             droptarget: this.testDrops(tx, ty),
         };
         this.sess.info = sess;
