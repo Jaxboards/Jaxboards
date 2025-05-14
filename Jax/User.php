@@ -137,7 +137,7 @@ final class User
         return $this->userData = $user;
     }
 
-    public function getPerm(string $perm): null|int|string
+    public function getPerm(string $perm): null|int|string|bool
     {
         $perms = $this->getPerms();
 
@@ -145,7 +145,7 @@ final class User
     }
 
     /**
-     * @return null|array<string,int|string>
+     * @return null|array<string,int|string|bool>
      */
     public function getPerms(): ?array
     {
