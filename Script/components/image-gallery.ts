@@ -1,4 +1,3 @@
-
 export default class ImageGallery {
     element: HTMLDivElement;
 
@@ -9,7 +8,9 @@ export default class ImageGallery {
     max: number;
 
     static selector(container: HTMLElement) {
-        return container.querySelectorAll<HTMLDivElement>('.image_gallery').forEach(el => new this(el));
+        return container
+            .querySelectorAll<HTMLDivElement>('.image_gallery')
+            .forEach((el) => new this(el));
     }
 
     constructor(element: HTMLDivElement) {

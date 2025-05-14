@@ -54,7 +54,9 @@ export default function gracefulDegrade(container: HTMLElement) {
     });
 
     // Handle image hover magnification
-    const bbcodeimgs = Array.from(container.querySelectorAll<HTMLImageElement>('.bbcodeimg'));
+    const bbcodeimgs = Array.from(
+        container.querySelectorAll<HTMLImageElement>('.bbcodeimg'),
+    );
     if (bbcodeimgs.length) {
         onImagesLoaded(bbcodeimgs).then(() => {
             // resizer on large images
@@ -63,9 +65,11 @@ export default function gracefulDegrade(container: HTMLElement) {
     }
 
     // Make BBCode code blocks selectable when clicked
-    container.querySelectorAll<HTMLDivElement>('.bbcode.code').forEach((codeBlock) => {
-        codeBlock.addEventListener('click', () => selectAll(codeBlock));
-    });
+    container
+        .querySelectorAll<HTMLDivElement>('.bbcode.code')
+        .forEach((codeBlock) => {
+            codeBlock.addEventListener('click', () => selectAll(codeBlock));
+        });
 
     // Hydrate all components
     [
@@ -85,7 +89,9 @@ export default function gracefulDegrade(container: HTMLElement) {
     // Wire up AJAX forms
     // NOTE: This needs to come after editors, since they both hook into form onsubmit
     // and the editor hook needs to fire first
-    const ajaxForms = container.querySelectorAll<HTMLFormElement>('form[data-ajax-form]');
+    const ajaxForms = container.querySelectorAll<HTMLFormElement>(
+        'form[data-ajax-form]',
+    );
     ajaxForms.forEach((ajaxForm) => {
         const resetOnSubmit = ajaxForm.dataset.ajaxForm === 'resetOnSubmit';
         ajaxForm.addEventListener('submit', (event) => {
@@ -95,7 +101,7 @@ export default function gracefulDegrade(container: HTMLElement) {
     });
 
     // Add idle clocks to user lists
-    Array.from(document.querySelectorAll<HTMLAnchorElement>('.idle')).forEach((element) =>
-        addIdleClock(element),
+    Array.from(document.querySelectorAll<HTMLAnchorElement>('.idle')).forEach(
+        (element) => addIdleClock(element),
     );
 }

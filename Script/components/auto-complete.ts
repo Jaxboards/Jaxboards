@@ -14,7 +14,11 @@ export default class AutoComplete {
     indicatorElement?: HTMLElement | null;
 
     static selector(container: HTMLElement) {
-        return container.querySelectorAll<HTMLInputElement>('input[data-autocomplete-action]').forEach(el => new this(el));
+        return container
+            .querySelectorAll<HTMLInputElement>(
+                'input[data-autocomplete-action]',
+            )
+            .forEach((el) => new this(el));
     }
 
     constructor(element: HTMLInputElement) {
@@ -27,7 +31,9 @@ export default class AutoComplete {
         const output = element.dataset.autocompleteOutput;
         const indicator = element.dataset.autocompleteIndicator;
 
-        const outputElement = output ? document.querySelector<HTMLInputElement>(output) : undefined;
+        const outputElement = output
+            ? document.querySelector<HTMLInputElement>(output)
+            : undefined;
 
         if (!outputElement) {
             throw new Error(
@@ -36,8 +42,9 @@ export default class AutoComplete {
         }
 
         this.outputElement = outputElement || document.createElement('input');
-        this.indicatorElement = indicator ? document.querySelector(indicator) : undefined;
-
+        this.indicatorElement = indicator
+            ? document.querySelector(indicator)
+            : undefined;
 
         element.addEventListener('keyup', (event) => this.keyUp(event));
         element.addEventListener('keydown', (event) => {
@@ -49,7 +56,8 @@ export default class AutoComplete {
 
     getResultsContainer() {
         const coords = getCoordinates(this.element);
-        let resultsContainer = document.querySelector<HTMLElement>('#autocomplete');
+        let resultsContainer =
+            document.querySelector<HTMLElement>('#autocomplete');
         if (!resultsContainer) {
             resultsContainer = Object.assign(document.createElement('div'), {
                 id: 'autocomplete',
@@ -96,7 +104,9 @@ export default class AutoComplete {
                     return;
                 case 'Enter':
                     if (selectedIndex >= 0) {
-                        results[selectedIndex].dispatchEvent(new Event('click'));
+                        results[selectedIndex].dispatchEvent(
+                            new Event('click'),
+                        );
                     }
                     return;
                 default:

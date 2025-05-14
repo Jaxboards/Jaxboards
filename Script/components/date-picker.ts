@@ -11,7 +11,9 @@ export default class DatePicker {
     lastDate?: number[];
 
     static selector(container: HTMLElement) {
-        return container.querySelectorAll<HTMLInputElement>('input.date').forEach(el => new this(el));
+        return container
+            .querySelectorAll<HTMLInputElement>('input.date')
+            .forEach((el) => new this(el));
     }
 
     constructor(element: HTMLInputElement) {

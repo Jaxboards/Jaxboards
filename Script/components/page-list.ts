@@ -1,9 +1,10 @@
-
 export default class PageList {
     element: HTMLDivElement;
 
     static selector(container: HTMLElement) {
-        return container.querySelectorAll<HTMLDivElement>('.pages').forEach(el => new this(el));
+        return container
+            .querySelectorAll<HTMLDivElement>('.pages')
+            .forEach((el) => new this(el));
     }
 
     constructor(element: HTMLDivElement) {

@@ -4,7 +4,9 @@ export default class CollapseBox {
     element: HTMLDivElement;
 
     static selector(container: HTMLElement) {
-        return container.querySelectorAll<HTMLDivElement>('.collapse-box').forEach(el => new this(el));
+        return container
+            .querySelectorAll<HTMLDivElement>('.collapse-box')
+            .forEach((el) => new this(el));
     }
 
     constructor(element: HTMLDivElement) {

@@ -1,11 +1,12 @@
-
 const ACTIVE_CLASS = 'active';
 
 export default class Tabs {
     element: HTMLDivElement;
 
     static selector(container: HTMLElement) {
-        return container.querySelectorAll<HTMLDivElement>('.tabs').forEach(el => new this(el));
+        return container
+            .querySelectorAll<HTMLDivElement>('.tabs')
+            .forEach((el) => new this(el));
     }
 
     constructor(element: HTMLDivElement) {

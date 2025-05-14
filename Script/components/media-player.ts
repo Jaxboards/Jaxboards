@@ -4,7 +4,9 @@ export default class MediaPlayer {
     element: HTMLDivElement;
 
     static selector(container: HTMLElement) {
-        return container.querySelectorAll<HTMLDivElement>('.media').forEach(el => new this(el));
+        return container
+            .querySelectorAll<HTMLDivElement>('.media')
+            .forEach((el) => new this(el));
     }
 
     constructor(element: HTMLDivElement) {

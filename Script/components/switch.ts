@@ -4,7 +4,9 @@ export default class Switch {
     element: HTMLInputElement;
 
     static selector(container: HTMLElement) {
-        return container.querySelectorAll<HTMLInputElement>('input.switch').forEach(el => new this(el));
+        return container
+            .querySelectorAll<HTMLInputElement>('input.switch')
+            .forEach((el) => new this(el));
     }
 
     constructor(element: HTMLInputElement) {
