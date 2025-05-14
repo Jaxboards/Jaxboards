@@ -19,7 +19,7 @@ export function htmlToBBCode(html: string) {
             let innerhtml = nestedTagRegex.test(innerHTML)
                 ? htmlToBBCode(innerHTML)
                 : innerHTML;
-            const att: Record<string,string> = {};
+            const att: Record<string, string> = {};
             attributes.replace(
                 /(color|size|style|href|src)=(['"]?)(.*?)\2/gi,
                 (__: string, attr: string, q: string, value: string) => {
