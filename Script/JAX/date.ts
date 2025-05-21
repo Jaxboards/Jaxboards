@@ -62,34 +62,39 @@ export const months = [
 export function date(gmtUnixTimestamp: number) {
     const localTimeNow = new Date();
 
+    const relative = new Intl.RelativeTimeFormat('en-US', {
+        numeric: 'auto',
+        style: 'long'
+    })
+
     const yday = new Date();
     yday.setTime(+yday - 1000 * 60 * 60 * 24);
 
     const serverAsLocalDate = fromUnixTimestamp(gmtUnixTimestamp);
 
-    const deltaInSeconds = (+localTimeNow - +serverAsLocalDate) / 1000;
+    const deltaInSeconds = Math.round((+serverAsLocalDate - +localTimeNow) / 1000);
 
-    if (deltaInSeconds < 90) {
-        return 'a minute ago';
+    if (deltaInSeconds > -60) {
+        return relative.format(deltaInSeconds, 'second');
     }
 
-    if (deltaInSeconds < 3600) {
-        return `${Math.round(deltaInSeconds / 60)} minutes ago`;
+    if (deltaInSeconds > -3600) {
+        return relative.format(Math.round(deltaInSeconds / 60), 'minute');
     }
 
     // Today
-    if (asMDY(localTimeNow) === asMDY(serverAsLocalDate)) {
-        return `Today @ ${timeAsAMPM(serverAsLocalDate)}`;
+    if (serverAsLocalDate > yday) {
+        return relative.format(Math.round(deltaInSeconds / (3600 * 24)), 'day') + ` @ ${timeAsAMPM(serverAsLocalDate)}`;
     }
 
-    // Yesterday
-    if (asMDY(yday) === asMDY(serverAsLocalDate)) {
-        return `Yesterday @ ${timeAsAMPM(serverAsLocalDate)}`;
-    }
-
-    return `${monthsShort[serverAsLocalDate.getMonth()]} ${ordsuffix(
-        serverAsLocalDate.getDate(),
-    )}, ${serverAsLocalDate.getFullYear()} @ ${timeAsAMPM(serverAsLocalDate)}`;
+    return Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        year: 'numeric',
+        day: 'numeric',
+        hour: 'numeric',
+        hour12: true,
+        minute: 'numeric',
+    }).format(serverAsLocalDate);
 }
 
 export function smalldate(gmtUnixTimestamp: number) {
