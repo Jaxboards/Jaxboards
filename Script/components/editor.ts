@@ -15,8 +15,8 @@ export default class Editor {
 
     element: HTMLTextAreaElement;
 
-    static selector(container: HTMLElement) {
-        return container
+    static selector(container: HTMLElement): void {
+        container
             .querySelectorAll<HTMLTextAreaElement>('textarea.bbcode-editor')
             .forEach((el) => new this(el));
     }

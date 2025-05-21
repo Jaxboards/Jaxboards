@@ -3,8 +3,8 @@ import Window from '../JAX/window';
 export default class MediaPlayer {
     element: HTMLDivElement;
 
-    static selector(container: HTMLElement) {
-        return container
+    static selector(container: HTMLElement): void {
+        container
             .querySelectorAll<HTMLDivElement>('.media')
             .forEach((el) => new this(el));
     }

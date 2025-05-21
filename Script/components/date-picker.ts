@@ -11,11 +11,11 @@ export default class DatePicker {
 
     lastDate?: number[];
 
-    static selector(container: HTMLElement) {
+    static selector(container: HTMLElement): void {
         if (supportsDateInput()) {
             return;
         }
-        return container
+        container
             .querySelectorAll<HTMLInputElement>('input[type=date]')
             .forEach((el) => new this(el));
     }

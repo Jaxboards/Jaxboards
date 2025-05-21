@@ -13,8 +13,8 @@ export default class AutoComplete {
 
     indicatorElement?: HTMLElement | null;
 
-    static selector(container: HTMLElement) {
-        return container
+    static selector(container: HTMLElement): void {
+        container
             .querySelectorAll<HTMLInputElement>(
                 'input[data-autocomplete-action]',
             )
