@@ -59,6 +59,10 @@ export const months = [
     'December',
 ];
 
+function ucfirst(str: string) {
+    return str[0].toUpperCase() + str.slice(1);
+}
+
 export function date(gmtUnixTimestamp: number) {
     const localTimeNow = new Date();
 
@@ -67,8 +71,9 @@ export function date(gmtUnixTimestamp: number) {
         style: 'long'
     })
 
-    const yday = new Date();
-    yday.setTime(+yday - 1000 * 60 * 60 * 24);
+    const yesterday = new Date();
+    yesterday.setTime(+yesterday - 1000 * 60 * 60 * 24);
+    yesterday.setHours(0);yesterday.setMinutes(0);yesterday.setSeconds(0);
 
     const serverAsLocalDate = fromUnixTimestamp(gmtUnixTimestamp);
 
@@ -82,9 +87,12 @@ export function date(gmtUnixTimestamp: number) {
         return relative.format(Math.round(deltaInSeconds / 60), 'minute');
     }
 
-    // Today
-    if (serverAsLocalDate > yday) {
-        return relative.format(Math.round(deltaInSeconds / (3600 * 24)), 'day') + ` @ ${timeAsAMPM(serverAsLocalDate)}`;
+    // Yesterday + Today
+    if (serverAsLocalDate > yesterday) {
+        const today = new Date();
+        today.setHours(0);today.setMinutes(0);yesterday.setSeconds(0);
+
+        return ucfirst(relative.format(serverAsLocalDate > today ? 0 : -1, 'day')) + ` @ ${timeAsAMPM(serverAsLocalDate)}`;
     }
 
     return Intl.DateTimeFormat(undefined, {
