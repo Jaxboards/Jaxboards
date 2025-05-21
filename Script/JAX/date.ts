@@ -62,7 +62,7 @@ export const months = [
 export function date(gmtUnixTimestamp: number) {
     const localTimeNow = new Date();
 
-    const relative = new Intl.RelativeTimeFormat('en-US', {
+    const relative = new Intl.RelativeTimeFormat(undefined, {
         numeric: 'auto',
         style: 'long'
     })
@@ -87,7 +87,7 @@ export function date(gmtUnixTimestamp: number) {
         return relative.format(Math.round(deltaInSeconds / (3600 * 24)), 'day') + ` @ ${timeAsAMPM(serverAsLocalDate)}`;
     }
 
-    return Intl.DateTimeFormat('en-US', {
+    return Intl.DateTimeFormat(undefined, {
         month: 'short',
         year: 'numeric',
         day: 'numeric',

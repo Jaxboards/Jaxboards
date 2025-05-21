@@ -35,7 +35,8 @@ class Stream {
                 }
             });
         }
-        if (xmlobj.type === 2) {
+
+        if (xmlobj.requestType === 2) {
             const queryParams = xmlobj.url.substring(1);
             if (!softurl) {
                 window.history.pushState(
