@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
+use Carbon\Carbon;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
@@ -160,18 +161,6 @@ final class Search
         return $options;
     }
 
-    private function pdate(array|string $a): false|int
-    {
-        $dayMonthYear = explode('/', (string) $a);
-        if (count($dayMonthYear) !== 3) {
-            return false;
-        }
-
-        $dayMonthYear = array_map(static fn($var): int => (int) $var, $dayMonthYear);
-
-        return mktime(0, 0, 0, $dayMonthYear[0], $dayMonthYear[1], $dayMonthYear[2]);
-    }
-
     private function dosearch(): void
     {
 
@@ -206,12 +195,12 @@ final class Search
 
             $datestart = null;
             if ($this->request->both('datestart') !== null) {
-                $datestart = $this->pdate($this->request->both('datestart'));
+                $datestart = Carbon::parse($this->request->asString->both('datestart'))->getTimestamp();
             }
 
             $dateend = null;
             if ($this->request->both('dateend') !== null) {
-                $dateend = $this->pdate($this->request->both('dateend'));
+                $dateend = Carbon::parse($this->request->asString->both('dateend'))->getTimestamp();
             }
 
             $authorId = null;
