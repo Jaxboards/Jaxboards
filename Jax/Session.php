@@ -5,19 +5,18 @@ declare(strict_types=1);
 namespace Jax;
 
 use Carbon\Carbon;
+use Jaybizzle\CrawlerDetect\CrawlerDetect;
 
 use function base64_encode;
 use function ini_set;
 use function is_numeric;
 use function mb_strlen;
-use function mb_strtolower;
 use function mb_substr;
 use function mktime;
 use function openssl_random_pseudo_bytes;
 use function preg_replace_callback;
 use function serialize;
 use function session_start;
-use function str_contains;
 use function unserialize;
 
 final class Session
@@ -26,60 +25,6 @@ final class Session
      * @var array<mixed>
      */
     private array $data = ['vars' => []];
-
-    /**
-     * @var array<string,string>
-     */
-    private array $bots = [
-        // SEO crawler
-        'AhrefsBot' => 'Ahrefs',
-        'Amazonbot' => 'Amazon',
-        'Applebot' => 'Applebot',
-        'archive.org_bot' => 'Internet Archive',
-        'AwarioBot' => 'Awario',
-        'Baiduspider' => 'Baidu',
-        'Barkrowler' => 'Babbar.tech',
-        'Bingbot' => 'Bing',
-        'Bytespider' => 'Bytespider',
-        'CensysInspect' => 'CensysInspect',
-        'Centurybot' => 'Century',
-        'ChatGLM-Spider' => 'ChatGLM',
-        'ChatGPT-User' => 'ChatGPT',
-        'ClaudeBot' => 'ClaudeBot',
-        'Discordbot' => 'Discord',
-        'DotBot' => 'DotBot',
-        'DuckDuckBot' => 'DuckDuckGo',
-        'Expanse' => 'Expanse',
-        'facebookexternalhit' => 'Facebook',
-        'Friendly_Crawler' => 'FriendlyCrawler',
-        'Googlebot' => 'Google',
-        'GoogleOther' => 'GoogleOther',
-        'Google-Read-Aloud' => 'Google-Read-Aloud',
-        'GPTBot' => 'GPTBot',
-        'ia_archiver' => 'Internet Archive Alexa',
-        'ImagesiftBot' => 'Imagesift',
-        'linkdexbot' => 'Linkdex',
-        'Mail.RU_Bot' => 'Mail.RU',
-        'meta-externalagent' => 'Meta',
-        'mj12bot' => 'Majestic',
-        'MojeekBot' => 'Mojeek',
-        'OAI-SearchBot' => 'OpenAI',
-        'PerplexityBot' => 'Perplexity',
-        'PetalBot' => 'PetalBot',
-        'Qwantbot' => 'Qwant',
-        'SemrushBot' => 'Semrush',
-        'SeznamBot' => 'Seznam',
-        'Sogou web spider' => 'Sogou',
-        'Teoma' => 'Ask.com',
-        'TikTokSpider' => 'TikTok',
-        'Turnitin' => 'Turnitin',
-        'Twitterbot' => 'Twitter',
-        'W3C_Validator' => 'W3C Validator',
-        'WhatsApp' => 'WhatsApp',
-        'Y!J-WSC' => 'Yahoo Japan',
-        'yahoo! slurp' => 'Yahoo',
-        'YandexBot' => 'Yandex',
-    ];
 
     /**
      * @var array<string,mixed>
@@ -92,6 +37,7 @@ final class Session
         private readonly Database $database,
         private readonly Request $request,
         private readonly User $user,
+        private readonly CrawlerDetect $crawlerDetect,
     ) {
         ini_set('session.cookie_secure', '1');
         ini_set('session.cookie_httponly', '1');
@@ -443,13 +389,6 @@ final class Session
 
     private function getBotName(): ?string
     {
-        $userAgent = mb_strtolower((string) $this->request->getUserAgent());
-        foreach ($this->bots as $agentName => $friendlyName) {
-            if (str_contains($userAgent, mb_strtolower($agentName))) {
-                return $friendlyName;
-            }
-        }
-
-        return null;
+        return $this->crawlerDetect->getMatches();
     }
 }
