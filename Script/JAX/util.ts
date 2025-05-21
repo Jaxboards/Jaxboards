@@ -70,7 +70,7 @@ export function onDOMReady(callback: () => void) {
 
 export function supportsDateInput() {
     const input = document.createElement('input');
-    input.setAttribute('type','date');
+    input.setAttribute('type', 'date');
     return input.type === 'date';
 }
 

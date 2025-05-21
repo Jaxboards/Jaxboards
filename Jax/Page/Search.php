@@ -25,7 +25,6 @@ use function in_array;
 use function is_array;
 use function mb_strlen;
 use function mb_substr;
-use function mktime;
 use function nl2br;
 use function preg_quote;
 use function preg_replace;

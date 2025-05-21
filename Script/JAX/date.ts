@@ -40,16 +40,20 @@ export function date(gmtUnixTimestamp: number) {
 
     const relative = new Intl.RelativeTimeFormat(undefined, {
         numeric: 'auto',
-        style: 'long'
-    })
+        style: 'long',
+    });
 
     const yesterday = new Date();
     yesterday.setTime(+yesterday - 1000 * 60 * 60 * 24);
-    yesterday.setHours(0);yesterday.setMinutes(0);yesterday.setSeconds(0);
+    yesterday.setHours(0);
+    yesterday.setMinutes(0);
+    yesterday.setSeconds(0);
 
     const serverAsLocalDate = fromUnixTimestamp(gmtUnixTimestamp);
 
-    const deltaInSeconds = Math.round((+serverAsLocalDate - +localTimeNow) / 1000);
+    const deltaInSeconds = Math.round(
+        (+serverAsLocalDate - +localTimeNow) / 1000,
+    );
 
     if (deltaInSeconds > -60) {
         return relative.format(deltaInSeconds, 'second');
@@ -62,9 +66,13 @@ export function date(gmtUnixTimestamp: number) {
     // Yesterday + Today
     if (serverAsLocalDate > yesterday) {
         const today = new Date();
-        today.setHours(0);today.setMinutes(0);today.setSeconds(0);
+        today.setHours(0);
+        today.setMinutes(0);
+        today.setSeconds(0);
 
-        return ucfirst(relative.format(serverAsLocalDate > today ? 0 : -1, 'day')) + ` @ ${timeAsAMPM(serverAsLocalDate)}`;
+        return `${ucfirst(
+            relative.format(serverAsLocalDate > today ? 0 : -1, 'day'),
+        )} @ ${timeAsAMPM(serverAsLocalDate)}`;
     }
 
     return Intl.DateTimeFormat(undefined, {
