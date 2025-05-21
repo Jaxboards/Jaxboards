@@ -90,7 +90,7 @@ export function date(gmtUnixTimestamp: number) {
     // Yesterday + Today
     if (serverAsLocalDate > yesterday) {
         const today = new Date();
-        today.setHours(0);today.setMinutes(0);yesterday.setSeconds(0);
+        today.setHours(0);today.setMinutes(0);today.setSeconds(0);
 
         return ucfirst(relative.format(serverAsLocalDate > today ? 0 : -1, 'day')) + ` @ ${timeAsAMPM(serverAsLocalDate)}`;
     }
