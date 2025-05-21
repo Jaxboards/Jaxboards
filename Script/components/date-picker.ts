@@ -1,5 +1,6 @@
 import { daysShort, months } from '../JAX/date';
 import { getCoordinates, getHighestZIndex } from '../JAX/el';
+import { supportsDateInput } from '../JAX/util';
 
 export default class DatePicker {
     picker: HTMLTableElement;
@@ -11,8 +12,11 @@ export default class DatePicker {
     lastDate?: number[];
 
     static selector(container: HTMLElement) {
+        if (supportsDateInput()) {
+            return;
+        }
         return container
-            .querySelectorAll<HTMLInputElement>('input.date')
+            .querySelectorAll<HTMLInputElement>('input[type=date]')
             .forEach((el) => new this(el));
     }
 
