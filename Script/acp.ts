@@ -1,8 +1,8 @@
-import { onDOMReady } from './JAX/util';
-import { getCoordinates } from './JAX/el';
 import Ajax from './JAX/ajax';
+import { getCoordinates } from './JAX/el';
 import { replaceSelection } from './JAX/selection';
 import sortableTree from './JAX/sortable-tree';
+import { onDOMReady } from './JAX/util';
 import AutoComplete from './components/auto-complete';
 import Switch from './components/switch';
 
@@ -82,10 +82,9 @@ function gracefulDegrade() {
         },
     );
 
-    // Converts all switches (checkboxes) into graphics, to show "X" or "check"
-    document
-        .querySelectorAll(Switch.selector)
-        .forEach((toggleSwitch) => new Switch(toggleSwitch));
+    // Initialize components
+    AutoComplete.selector(document.body);
+    Switch.selector(document.body);
 
     // Makes editors capable of tabbing for indenting
     const editor = document.querySelector('.editor');
@@ -99,8 +98,6 @@ function gracefulDegrade() {
     }
 
     // Hook up autocomplete form fields
-    const autoCompleteFields = document.querySelectorAll(AutoComplete.selector);
-    autoCompleteFields.forEach((field) => new AutoComplete(field));
 
     // Orderable forums needs this
     const tree = document.querySelector('.tree');
