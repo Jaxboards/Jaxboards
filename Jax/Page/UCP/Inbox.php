@@ -16,6 +16,7 @@ use Jax\User;
 use function array_map;
 use function array_pop;
 use function ceil;
+use function count;
 use function htmlspecialchars;
 use function implode;
 use function is_array;
@@ -50,8 +51,8 @@ final readonly class Inbox
 
         if (is_array($dmessage)) {
             $this->deleteMessages(array_map(
-                fn($messageId) => (int) $messageId,
-                $dmessage
+                static fn($messageId): int => (int) $messageId,
+                $dmessage,
             ));
         }
 
@@ -115,8 +116,8 @@ final readonly class Inbox
             if (!$udata) {
                 $error = 'Invalid user!';
             } elseif (
-                trim($this->request->asString->both('title')) === ''
-                || trim($this->request->asString->both('title')) === '0'
+                trim((string) $this->request->asString->both('title')) === ''
+                || trim((string) $this->request->asString->both('title')) === '0'
             ) {
                 $error = 'You must enter a title.';
             }
@@ -449,8 +450,9 @@ final readonly class Inbox
         $message = $this->database->arow($result);
         $this->database->disposeresult($result);
         if (!$message) {
-            return "This message does not exist";
+            return 'This message does not exist';
         }
+
         if (
             $message['from'] !== $this->user->get('id')
             && $message['to'] !== $this->user->get('id')
