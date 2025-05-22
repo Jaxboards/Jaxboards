@@ -16,7 +16,6 @@ use Jax\User;
 use function array_map;
 use function array_pop;
 use function ceil;
-use function count;
 use function htmlspecialchars;
 use function implode;
 use function is_array;
@@ -547,7 +546,7 @@ final readonly class Inbox
             );
         }
 
-        if (count($messages) === 0) {
+        if ($messages === []) {
             $msg = match ($view) {
                 'sent' => 'No sent messages.',
                 'flagged' => 'No flagged messages.',
