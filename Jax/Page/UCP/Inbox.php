@@ -46,6 +46,7 @@ final readonly class Inbox
     {
         $messageId = (int) $this->request->asString->post('messageid');
         $view = $this->request->asString->both('view');
+        $page = $this->request->asString->both('page');
         $flag = (int) $this->request->asString->both('flag');
         $dmessage = $this->request->post('dmessage');
 
@@ -57,7 +58,7 @@ final readonly class Inbox
         }
 
         return match (true) {
-            $messageId !== 0 => match ($view) {
+            $messageId !== 0 => match ($page) {
                 'Delete' => $this->delete($messageId),
                 'Forward' => $this->compose($messageId, 'fwd'),
                 'Reply' => $this->compose($messageId),
@@ -203,23 +204,25 @@ final readonly class Inbox
             $message = $this->database->arow($result);
             $this->database->disposeresult($result);
 
-            $mid = $message['from'];
-            $result = $this->database->safeselect(
-                ['display_name'],
-                'members',
-                Database::WHERE_ID_EQUALS,
-                $mid,
-            );
-            $thisrow = $this->database->arow($result);
-            $mname = array_pop($thisrow);
-            $this->database->disposeresult($result);
+            if ($message) {
+                $mid = $message['from'];
+                $result = $this->database->safeselect(
+                    ['display_name'],
+                    'members',
+                    Database::WHERE_ID_EQUALS,
+                    $mid,
+                );
+                $thisrow = $this->database->arow($result);
+                $mname = array_pop($thisrow);
+                $this->database->disposeresult($result);
 
-            $msg = PHP_EOL . PHP_EOL . PHP_EOL
-                . '[quote=' . $mname . ']' . $message['message'] . '[/quote]';
-            $mtitle = ($todo === 'fwd' ? 'FWD:' : 'RE:') . $message['title'];
-            if ($todo === 'fwd') {
-                $mid = '';
-                $mname = '';
+                $msg = PHP_EOL . PHP_EOL . PHP_EOL
+                    . '[quote=' . $mname . ']' . $message['message'] . '[/quote]';
+                $mtitle = ($todo === 'fwd' ? 'FWD:' : 'RE:') . $message['title'];
+                if ($todo === 'fwd') {
+                    $mid = '';
+                    $mname = '';
+                }
             }
         }
 
@@ -231,8 +234,8 @@ final readonly class Inbox
                 Database::WHERE_ID_EQUALS,
                 $mid,
             );
-            $thisrow = $this->database->arow($result);
-            $mname = array_pop($thisrow);
+            $member = $this->database->arow($result);
+            $mname = $member['display_name'] ?? null;
             $this->database->disposeresult($result);
 
             if (!$mname) {
@@ -275,8 +278,8 @@ final readonly class Inbox
         $message = $this->database->arow($result);
         $this->database->disposeresult($result);
 
-        $is_recipient = $message['to'] === $this->user->get('id');
-        $is_sender = $message['from'] === $this->user->get('id');
+        $is_recipient = $message && $message['to'] === $this->user->get('id');
+        $is_sender = $message && $message['from'] === $this->user->get('id');
         if ($is_recipient) {
             $this->database->safeupdate(
                 'messages',
@@ -311,7 +314,7 @@ final readonly class Inbox
         $message = $this->database->arow($result);
         $this->database->disposeresult($result);
 
-        if ($message['del_recipient'] && $message['del_sender']) {
+        if ($message && $message['del_recipient'] && $message['del_sender']) {
             $this->database->safedelete(
                 'messages',
                 Database::WHERE_ID_EQUALS,
@@ -340,7 +343,7 @@ final readonly class Inbox
         }
     }
 
-    private function fetchMessageCount(?string $view = null): mixed
+    private function fetchMessageCount(?string $view = null): int
     {
         $criteria = match ($view) {
             'sent' => 'WHERE `from`=? AND !`del_sender`',
@@ -350,7 +353,7 @@ final readonly class Inbox
             default => 'WHERE `to`=? AND !`del_recipient`',
         };
         $result = $this->database->safeselect(
-            'COUNT(`id`)',
+            'COUNT(`id`) as `message_count`',
             'messages',
             $criteria,
             $this->user->get('id'),
@@ -358,10 +361,13 @@ final readonly class Inbox
         $unread = $this->database->arow($result);
         $this->database->disposeresult($result);
 
-        return array_pop($unread);
+        return $unread ? $unread['message_count'] : 0;
     }
 
-    private function fetchMessages(string $view, int $pageNumber = 0): ?array
+    /**
+     * @return array<array<string,mixed>>
+     */
+    private function fetchMessages(string $view, int $pageNumber = 0): array
     {
         $criteria = match ($view) {
             'sent' => <<<'SQL'

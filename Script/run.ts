@@ -1,6 +1,6 @@
-import { updateDates, onDOMReady, supportsEmoji } from './JAX/util';
-import gracefulDegrade from './JAX/graceful-degrade';
 import { stopTitleFlashing } from './JAX/flashing-title';
+import gracefulDegrade from './JAX/graceful-degrade';
+import { onDOMReady, supportsEmoji, updateDates } from './JAX/util';
 import Stream from './RUN/stream';
 import Sound from './sound';
 
@@ -76,7 +76,7 @@ class AppState {
             names.push(submitButton.name);
             values.push(submitButton.value);
         }
-        this.stream.load('?', { data: [names, values] });
+        this.stream.load(window.location.search, { data: [names, values] });
         if (resetOnSubmit) {
             form.reset();
         }
