@@ -46,8 +46,7 @@
         "symfony/polyfill-php83": "^1.32",
         "symfony/polyfill-php84": "^1.32",
         "nesbot/carbon": "^3.9",
-        "lodash-php/lodash-php": "^0.1.0",
-        "jaybizzle/crawler-detect": "^1.3"
+        "lodash-php/lodash-php": "^0.1.0"
     },
     "scripts": {
         "lint": [
