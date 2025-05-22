@@ -43,23 +43,27 @@ final readonly class Inbox
 
     public function render(): ?string
     {
-        $messageId = $this->request->post('messageid');
-        $view = $this->request->both('view');
-        $flag = $this->request->both('flag');
+        $messageId = (int) $this->request->asString->post('messageid');
+        $view = $this->request->asString->both('view');
+        $flag = (int) $this->request->asString->both('flag');
         $dmessage = $this->request->post('dmessage');
 
         if (is_array($dmessage)) {
-            $this->deleteMessages($dmessage);
+            $this->deleteMessages(array_map(
+                fn($messageId) => (int) $messageId,
+                $dmessage
+            ));
         }
 
         return match (true) {
-            is_numeric($messageId) => match ($view) {
+            $messageId !== 0 => match ($view) {
                 'Delete' => $this->delete($messageId),
                 'Forward' => $this->compose($messageId, 'fwd'),
                 'Reply' => $this->compose($messageId),
+                default => null,
             },
             is_numeric($view) => $this->viewMessage($view),
-            is_numeric($flag) => $this->flag(),
+            $flag !== 0 => $this->flag($flag),
 
             default => match ($view) {
                 'compose' => $this->compose(),
@@ -71,7 +75,7 @@ final readonly class Inbox
     }
 
     private function compose(
-        string $messageid = '',
+        ?int $messageid = null,
         string $todo = '',
     ): ?string {
         $error = null;
@@ -89,7 +93,7 @@ final readonly class Inbox
                     ],
                     'members',
                     'WHERE `display_name`=?',
-                    $this->database->basicvalue($this->request->both('to')),
+                    $this->database->basicvalue($this->request->asString->both('to')),
                 );
                 $udata = $this->database->arow($result);
                 $this->database->disposeresult($result);
@@ -111,8 +115,8 @@ final readonly class Inbox
             if (!$udata) {
                 $error = 'Invalid user!';
             } elseif (
-                trim((string) $this->request->both('title')) === ''
-                || trim((string) $this->request->both('title')) === '0'
+                trim($this->request->asString->both('title')) === ''
+                || trim($this->request->asString->both('title')) === '0'
             ) {
                 $error = 'You must enter a title.';
             }
@@ -181,7 +185,7 @@ final readonly class Inbox
         }
 
         $msg = '';
-        if ($messageid !== '' && $messageid !== '0') {
+        if ($messageid !== 0) {
             $result = $this->database->safeselect(
                 [
                     '`from`',
@@ -218,8 +222,8 @@ final readonly class Inbox
             }
         }
 
-        if (is_numeric($this->request->get('mid'))) {
-            $mid = $this->request->both('mid');
+        if (is_numeric($this->request->asString->get('mid'))) {
+            $mid = (int) $this->request->asString->both('mid');
             $result = $this->database->safeselect(
                 ['display_name'],
                 'members',
@@ -254,7 +258,7 @@ final readonly class Inbox
         );
     }
 
-    private function delete($messageId, bool $relocate = true): void
+    private function delete(int $messageId, bool $relocate = true): void
     {
         $result = $this->database->safeselect(
             [
@@ -321,10 +325,13 @@ final readonly class Inbox
         $this->page->location(
             '?act=ucp&what=inbox'
                 . ($this->request->both('prevpage') !== null
-                    ? '&page=' . $this->request->both('prevpage') : ''),
+                    ? '&page=' . $this->request->asString->both('prevpage') : ''),
         );
     }
 
+    /**
+     * @param array<int> $messageIds
+     */
     private function deleteMessages(array $messageIds): void
     {
         foreach ($messageIds as $messageId) {
@@ -398,7 +405,7 @@ final readonly class Inbox
         return $this->database->arows($result);
     }
 
-    private function flag(): null
+    private function flag(int $messageId): null
     {
         $this->page->command('softurl');
         $this->database->safeupdate(
@@ -407,7 +414,7 @@ final readonly class Inbox
                 'flag' => $this->request->both('tog') ? 1 : 0,
             ],
             'WHERE `id`=? AND `to`=?',
-            $this->database->basicvalue($this->request->both('flag')),
+            $this->database->basicvalue($messageId),
             $this->user->get('id'),
         );
 
@@ -423,7 +430,6 @@ final readonly class Inbox
             return null;
         }
 
-        $error = null;
         $result = $this->database->safespecial(
             <<<'SQL'
                 SELECT a.`id` AS `id`,a.`to` AS `to`,a.`from` AS `from`,a.`title` AS `title`,
@@ -442,15 +448,14 @@ final readonly class Inbox
         );
         $message = $this->database->arow($result);
         $this->database->disposeresult($result);
+        if (!$message) {
+            return "This message does not exist";
+        }
         if (
             $message['from'] !== $this->user->get('id')
             && $message['to'] !== $this->user->get('id')
         ) {
-            $error = "You don't have permission to view this message.";
-        }
-
-        if ($error !== null) {
-            return $error;
+            return "You don't have permission to view this message.";
         }
 
         if (!$message['read'] && $message['to'] === $this->user->get('id')) {
@@ -487,12 +492,11 @@ final readonly class Inbox
         );
     }
 
-    private function viewMessages(string $view = 'inbox'): ?string
+    private function viewMessages(string $view = 'inbox'): string
     {
         $html = '';
-        $hasmessages = false;
 
-        $requestPage = max(1, (int) $this->request->both('page'));
+        $requestPage = max(1, (int) $this->request->asString->both('page'));
         $numMessages = $this->fetchMessageCount($view);
 
         $pages = 'Pages: ';
@@ -511,8 +515,8 @@ final readonly class Inbox
         }, $pageNumbers));
 
         $unread = 0;
-        foreach ($this->fetchMessages($view, $requestPage - 1) as $message) {
-            $hasmessages = 1;
+        $messages = $this->fetchMessages($view, $requestPage - 1);
+        foreach ($messages as $message) {
             if (!$message['read']) {
                 ++$unread;
             }
@@ -535,7 +539,7 @@ final readonly class Inbox
             );
         }
 
-        if (!$hasmessages) {
+        if (count($messages) === 0) {
             $msg = match ($view) {
                 'sent' => 'No sent messages.',
                 'flagged' => 'No flagged messages.',
