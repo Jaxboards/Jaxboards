@@ -15,6 +15,7 @@ use Jax\Request;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
+use PHP_CodeSniffer\Tokenizers\JS;
 
 use function filter_var;
 use function gmdate;
@@ -35,10 +36,6 @@ use const PASSWORD_DEFAULT;
 
 final class UCP
 {
-    private string $what = '';
-
-    private ?string $runscript = null;
-
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
@@ -65,7 +62,7 @@ final class UCP
         }
 
         $this->page->setBreadCrumbs(['?act=ucp' => 'UCP']);
-        $this->what = $this->request->both('what') ?? '';
+        $what = $this->request->asString->both('what');
 
         // Not a single settings page needs update functionality except inbox
         if (
@@ -75,7 +72,7 @@ final class UCP
             return;
         }
 
-        $page = match ($this->what) {
+        $page = match ($what) {
             'sounds' => $this->showSoundSettings(),
             'signature' => $this->showSigSettings(),
             'pass' => $this->showPassSettings(),
@@ -96,7 +93,10 @@ final class UCP
 
     private function getlocationforform(): string
     {
-        return $this->jax->hiddenFormFields(['act' => 'ucp', 'what' => $this->what]);
+        return $this->jax->hiddenFormFields([
+            'act' => 'ucp',
+            'what' => $this->request->asString->both('what')
+        ]);
     }
 
     private function showMain(): ?string
@@ -117,7 +117,7 @@ final class UCP
             }
         }
 
-        $ucpnotepad = $this->user->get('ucpnotepad');
+        $ucpnotepad = (string) $this->user->get('ucpnotepad');
 
         return ($error !== null ? $this->template->meta('error', $error) : '') . $this->template->meta(
             'ucp-index',
@@ -129,19 +129,14 @@ final class UCP
         );
     }
 
-    private function showucp($page = false): void
+    private function showucp(string $page): void
     {
         $page = $this->template->meta('ucp-wrapper', $page);
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
-        if (!$this->runscript) {
-            return;
-        }
-
-        $this->page->command('script', $this->runscript);
     }
 
-    private function showSoundSettings(): ?string
+    private function showSoundSettings(): string
     {
         $fields = [
             'sound_shout',
@@ -184,15 +179,18 @@ final class UCP
                 . ($this->user->get($field) ? 'checked="checked"' : '') . '/>';
         }
 
-        $this->runscript = "if(document.querySelector('#dtnotify')&&window.webkitNotifications) "
-            . "document.querySelector('#dtnotify').checked=(webkitNotifications.checkPermission()==0)";
+        $this->page->command('script', <<<JS
+            if (document.querySelector('#dtnotify') && window.webkitNotifications) {
+                document.querySelector('#dtnotify').checked=(webkitNotifications.checkPermission()==0)
+            }
+        JS);
 
-        return $this->template->meta('ucp-sound-settings', $checkboxes);
+        return $this->template->meta('ucp-sound-settings', ...$checkboxes);
     }
 
     private function showSigSettings(): string
     {
-        $sig = $this->user->get('sig');
+        $sig = (string) $this->user->get('sig');
         $changeSig = $this->request->asString->post('changesig');
         if ($changeSig !== null) {
             $sig = $this->textFormatting->linkify($changeSig);
@@ -289,7 +287,7 @@ final class UCP
         }
 
         $email = $this->user->get('email');
-        $emailSettings = $this->user->get('email_settings');
+        $emailSettings = (int) $this->user->get('email_settings');
         $notificationsChecked = $emailSettings & 2 ? 'checked' : '';
         $adminEmailsChecked = $emailSettings & 1 ? 'checked' : '';
 
@@ -324,7 +322,7 @@ final class UCP
         );
     }
 
-    private function showAvatarSettings(): ?string
+    private function showAvatarSettings(): string
     {
         $error = null;
         $avatar = $this->user->get('avatar');
@@ -358,186 +356,184 @@ final class UCP
             HTML;
     }
 
-    private function showProfileSettings(): ?string
+    /**
+     * Returns string error or null for success
+     */
+    private function updateProfileSettings(): ?string
     {
-        $error = null;
         $genderOptions = ['', 'male', 'female', 'other'];
-        if ($this->request->post('submit') !== null) {
-            // Insert the profile info into the database.
-            $data = [
-                'about' => $this->request->asString->post('about'),
-                'contact_aim' => $this->request->asString->post('con_aim'),
-                'contact_bluesky' => $this->request->asString->post('con_bluesky'),
-                'contact_discord' => $this->request->asString->post('con_discord'),
-                'contact_gtalk' => $this->request->asString->post('con_gtalk'),
-                'contact_msn' => $this->request->asString->post('con_msn'),
-                'contact_skype' => $this->request->asString->post('con_skype'),
-                'contact_steam' => $this->request->asString->post('con_steam'),
-                'contact_twitter' => $this->request->asString->post('con_twitter'),
-                'contact_yim' => $this->request->asString->post('con_yim'),
-                'contact_youtube' => $this->request->asString->post('con_youtube'),
-                'display_name' => trim((string) $this->request->asString->post('display_name')),
-                'dob_day' => $this->request->asString->post('dob_day'),
-                'dob_month' => $this->request->asString->post('dob_month'),
-                'dob_year' => $this->request->asString->post('dob_year'),
-                'full_name' => $this->request->asString->post('full_name'),
-                'gender' => in_array($this->request->asString->post('gender'), $genderOptions, true)
-                    ? $this->request->asString->post('gender') : '',
-                'location' => $this->request->asString->post('location'),
-                'usertitle' => $this->request->asString->post('usertitle'),
-                'website' => $this->request->asString->post('website'),
-            ];
+        // Insert the profile info into the database.
+        $data = [
+            'about' => $this->request->asString->post('about'),
+            'contact_aim' => $this->request->asString->post('con_aim'),
+            'contact_bluesky' => $this->request->asString->post('con_bluesky'),
+            'contact_discord' => $this->request->asString->post('con_discord'),
+            'contact_gtalk' => $this->request->asString->post('con_gtalk'),
+            'contact_msn' => $this->request->asString->post('con_msn'),
+            'contact_skype' => $this->request->asString->post('con_skype'),
+            'contact_steam' => $this->request->asString->post('con_steam'),
+            'contact_twitter' => $this->request->asString->post('con_twitter'),
+            'contact_yim' => $this->request->asString->post('con_yim'),
+            'contact_youtube' => $this->request->asString->post('con_youtube'),
+            'display_name' => trim((string) $this->request->asString->post('display_name')),
+            'dob_day' => (int) $this->request->asString->post('dob_day'),
+            'dob_month' => (int) $this->request->asString->post('dob_month'),
+            'dob_year' => (int) $this->request->asString->post('dob_year'),
+            'full_name' => $this->request->asString->post('full_name'),
+            'gender' => in_array($this->request->asString->post('gender'), $genderOptions, true)
+                ? $this->request->asString->post('gender') : '',
+            'location' => $this->request->asString->post('location'),
+            'usertitle' => $this->request->asString->post('usertitle'),
+            'website' => $this->request->asString->post('website'),
+        ];
 
-            // Begin input checking.
-            if ($data['display_name'] === '') {
-                $data['display_name'] = (string) $this->user->get('name');
+        // Begin input checking.
+        if ($data['display_name'] === '') {
+            $data['display_name'] = (string) $this->user->get('name');
+        }
+
+        $badNameChars = $this->config->getSetting('badnamechars');
+        if (
+            $badNameChars
+            && preg_match($badNameChars, $data['display_name'])
+        ) {
+            return 'Invalid characters in display name!';
+        } else {
+            $result = $this->database->safeselect(
+                'COUNT(`id`) AS `same_display_name`',
+                'members',
+                'WHERE `display_name` = ? AND `id`!=? LIMIT 1',
+                $this->database->basicvalue($data['display_name']),
+                $this->user->get('id'),
+            );
+            $displayNameCheck = $this->database->arow($result);
+            if ($displayNameCheck && $displayNameCheck['same_display_name'] > 0) {
+                return 'That display name is already in use.';
             }
+        }
 
-            $badNameChars = $this->config->getSetting('badnamechars');
-            if (
-                $badNameChars
-                && preg_match($badNameChars, $data['display_name'])
-            ) {
-                $error = 'Invalid characters in display name!';
-            } else {
-                $result = $this->database->safeselect(
-                    'COUNT(`id`) AS `same_display_name`',
-                    'members',
-                    'WHERE `display_name` = ? AND `id`!=? LIMIT 1',
-                    $this->database->basicvalue($data['display_name']),
-                    $this->user->get('id'),
-                );
-                $displayNameCheck = $this->database->arow($result);
-                if ($displayNameCheck['same_display_name'] > 0) {
-                    $error = 'That display name is already in use.';
-                }
-            }
+        $data['dob_year']
+            = $data['dob_year'] < 1 || $data['dob_year'] > (int) gmdate('Y')
+            ? null
+            : gmdate(
+                'Y',
+                Carbon::create($data['dob_year'], 1, 1)?->getTimestamp(),
+            );
 
-            $data['dob_year']
-                = !$data['dob_year']
-                || !is_numeric($data['dob_year'])
-                || $data['dob_year'] < 1
-                || $data['dob_year'] > (int) gmdate('Y')
-                ? null
-                : gmdate(
-                    'Y',
-                    Carbon::create($data['dob_year'], 1, 1)->getTimestamp(),
-                );
+        $data['dob_month']
+            = $data['dob_month'] < 1 || $data['dob_month'] > 12
+            ? null : gmdate(
+                'm',
+                Carbon::create(2000, $data['dob_month'], 1)?->getTimestamp(),
+            );
 
-            $data['dob_month']
-                = !$data['dob_month']
-                || !is_numeric($data['dob_month'])
-                || $data['dob_month'] < 1
-                || $data['dob_month'] > 12
-                ? null : gmdate(
-                    'm',
-                    Carbon::create(2000, $data['dob_month'], 1)->getTimestamp(),
-                );
+        $data['dob_day']
+            = $data['dob_day'] < 1
+            ? null : gmdate(
+                'd',
+                Carbon::create(2000, 1, $data['dob_day'])?->getTimestamp(),
+            );
 
-            $data['dob_day']
-                = !$data['dob_day']
-                || !is_numeric($data['dob_day'])
-                || $data['dob_day'] < 1
-                ? null : gmdate(
-                    'd',
-                    Carbon::create(2000, 1, $data['dob_day'])->getTimestamp(),
-                );
-
-            // Is the date provided valid?
-            if ($data['dob_month'] && $data['dob_day']) {
-                // Feb 29th check for leap years
-                if ((int) $data['dob_month'] === 2) {
-                    if (
-                        $data['dob_year'] > 0
-                        && gmdate('L', Carbon::create($data['dob_year'])->getTimestamp())
-                    ) {
-                        $daysInMonth = 29;
-                    } elseif ($data['dob_year'] > 0) {
-                        $daysInMonth = 28;
-                    } else {
-                        // If we don't know the year, we can
-                        // let it be a leap year.
-                        $daysInMonth = 29;
-                    }
-                } else {
-                    $daysInMonth = (int) gmdate(
-                        't',
-                        Carbon::create($data['dob_month'], 1)->getTimestamp(),
-                    );
-                }
-
-                if ($data['dob_day'] > $daysInMonth) {
-                    $error = "That birth date doesn't exist!";
-                }
-            }
-
-            $data['birthdate'] = !$data['dob_year'] && !$data['dob_month']
-                ? null
-                : ($data['dob_year'] ?? '0000') . '-' . ($data['dob_month'] ?? '00') . '-' . ($data['dob_day'] ?? '00');
-
-            unset($data['dob_year'], $data['dob_month'], $data['dob_day']);
-
-            foreach (
-                [
-                    'contact_aim' => 'AIM username',
-                    'contact_bluesky' => 'Bluesky username',
-                    'contact_discord' => 'Discord username',
-                    'contact_gtalk' => 'Google Chat username',
-                    'contact_msn' => 'MSN username',
-                    'contact_skype' => 'Skype username',
-                    'contact_steam' => 'Steam username',
-                    'contact_twitter' => 'Twitter username',
-                    'contact_yim' => 'YIM username',
-                    'contact_youtube' => 'YouTube username',
-                    'display_name' => 'Display name',
-                    'full_name' => 'Full name',
-                    'location' => 'Location',
-                    'usertitle' => 'User Title',
-                    'website' => 'Website URL',
-                ] as $field => $fieldLabel
-            ) {
+        // Is the date provided valid?
+        if ($data['dob_month'] && $data['dob_day']) {
+            // Feb 29th check for leap years
+            if ((int) $data['dob_month'] === 2) {
                 if (
-                    mb_strstr($field, 'contact') !== false
-                    && preg_match('/[^\w.@]/', (string) $data[$field])
+                    $data['dob_year'] > 0
+                    && gmdate('L', Carbon::create($data['dob_year'])?->getTimestamp())
                 ) {
-                    $error = "Invalid characters in {$fieldLabel}";
+                    $daysInMonth = 29;
+                } elseif ($data['dob_year'] > 0) {
+                    $daysInMonth = 28;
+                } else {
+                    // If we don't know the year, we can
+                    // let it be a leap year.
+                    $daysInMonth = 29;
                 }
-
-                $data[$field] = $this->textFormatting->blockhtml($data[$field]);
-                $length = $field === 'display_name'
-                    ? 30
-                    : ($field === 'location' ? 100 : 50);
-                if (mb_strlen($data[$field]) <= $length) {
-                    continue;
-                }
-
-                $error = "{$fieldLabel} must be less than {$length} characters.";
+            } else {
+                $daysInMonth = (int) gmdate(
+                    't',
+                    Carbon::create($data['dob_month'], 1)?->getTimestamp(),
+                );
             }
 
-            // Handle errors/insert.
-            if ($error === null) {
-                if ($data['display_name'] !== $this->user->get('display_name')) {
-                    $this->database->safeinsert(
-                        'activity',
-                        [
-                            'arg1' => $this->user->get('display_name'),
-                            'arg2' => $data['display_name'],
-                            'date' => $this->database->datetime(),
-                            'type' => 'profile_name_change',
-                            'uid' => $this->user->get('id'),
-                        ],
-                    );
-                }
+            if ($data['dob_day'] > $daysInMonth) {
+                return "That birth date doesn't exist!";
+            }
+        }
 
-                $this->user->setBulk($data);
+        $data['birthdate'] = !$data['dob_year'] && !$data['dob_month']
+            ? null
+            : ($data['dob_year'] ?? '0000') . '-' . ($data['dob_month'] ?? '00') . '-' . ($data['dob_day'] ?? '00');
 
-                return 'Profile successfully updated.<br>'
-                    . '<br><a href="?act=ucp&what=profile">Back</a>';
+        unset($data['dob_year'], $data['dob_month'], $data['dob_day']);
+
+        foreach (
+            [
+                'contact_aim' => 'AIM username',
+                'contact_bluesky' => 'Bluesky username',
+                'contact_discord' => 'Discord username',
+                'contact_gtalk' => 'Google Chat username',
+                'contact_msn' => 'MSN username',
+                'contact_skype' => 'Skype username',
+                'contact_steam' => 'Steam username',
+                'contact_twitter' => 'Twitter username',
+                'contact_yim' => 'YIM username',
+                'contact_youtube' => 'YouTube username',
+                'display_name' => 'Display name',
+                'full_name' => 'Full name',
+                'location' => 'Location',
+                'usertitle' => 'User Title',
+                'website' => 'Website URL',
+            ] as $field => $fieldLabel
+        ) {
+            if (
+                mb_strstr($field, 'contact') !== false
+                && preg_match('/[^\w.@]/', (string) $data[$field])
+            ) {
+                return "Invalid characters in {$fieldLabel}";
             }
 
-            $this->page->command('error', $error);
+            $data[$field] = $this->textFormatting->blockhtml($data[$field] ?? '');
+            $length = $field === 'display_name'
+                ? 30
+                : ($field === 'location' ? 100 : 50);
+            if (mb_strlen($data[$field]) <= $length) {
+                continue;
+            }
 
-            return $this->template->meta('error', $error);
+            return "{$fieldLabel} must be less than {$length} characters.";
+        }
+
+        if ($data['display_name'] !== $this->user->get('display_name')) {
+            $this->database->safeinsert(
+                'activity',
+                [
+                    'arg1' => $this->user->get('display_name'),
+                    'arg2' => $data['display_name'],
+                    'date' => $this->database->datetime(),
+                    'type' => 'profile_name_change',
+                    'uid' => $this->user->get('id'),
+                ],
+            );
+        }
+
+        $this->user->setBulk($data);
+        return null;
+    }
+
+    private function showProfileSettings(): string
+    {
+        if ($this->request->post('submit') !== null) {
+            $updateResult = $this->updateProfileSettings();
+
+            if (is_string($updateResult)) {
+                $this->page->command('error', $updateResult);
+                return $this->template->meta('error', $updateResult);
+            }
+
+            return 'Profile successfully updated.<br>'
+                . '<br><a href="?act=ucp&what=profile">Back</a>';
         }
 
         $genderselect = '<select name="gender" title="Your gender" aria-label="Gender">';
@@ -697,15 +693,15 @@ final class UCP
                 'ORDER BY `title` ASC',
             );
         $select = '';
-        while ($skin = $this->database->arow($result)) {
+        $skins = $this->database->arows($result);
+        foreach ($skins as $skin) {
             $select .= "<option value='" . $skin['id'] . "' "
                 . ($skinId === $skin['id'] ? "selected='selected'" : '')
                 . '/>' . ($skin['hidden'] ? '*' : '') . $skin['title'] . '</option>';
-            $found = true;
         }
 
         $select = '<select name="skin" title="Board Skin">' . $select . '</select>';
-        if (!$found) {
+        if ($skins === []) {
             $select = '--No Skins--';
         }
 
