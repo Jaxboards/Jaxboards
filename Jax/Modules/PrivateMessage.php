@@ -76,25 +76,26 @@ final readonly class PrivateMessage
         $this->session->set('runonce', implode(PHP_EOL, $commands));
     }
 
-    public function message($uid, $instantMessage)
+    public function message($uid, $instantMessage): void
     {
         $this->session->act();
-        $error = null;
-        $fatal = false;
 
         if ($this->user->isGuest()) {
-            return $this->page->command('error', 'You must be logged in to instant message!');
+            $this->page->command('error', 'You must be logged in to instant message!');
+            return;
         }
 
         if (!$uid) {
-            return $this->page->command('error', 'You must have a recipient!');
+            $this->page->command('error', 'You must have a recipient!');
+            return;
         }
 
         if (!$this->user->getPerm('can_im')) {
-            return $this->page->command(
+            $this->page->command(
                 'error',
                 "You don't have permission to use this feature.",
             );
+            return;
         }
 
         $instantMessage = $this->textFormatting->linkify($instantMessage);
@@ -126,8 +127,6 @@ final readonly class PrivateMessage
         if (!$this->sendcmd($cmd, $uid)) {
             $this->page->command('imtoggleoffline', $uid);
         }
-
-        return !$error && !$fatal;
     }
 
     public function sendcmd($cmd, $uid): ?bool

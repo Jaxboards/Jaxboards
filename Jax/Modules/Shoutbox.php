@@ -80,9 +80,9 @@ final class Shoutbox
         }
     }
 
-    public function canDelete($id, $shoutrow = false): null|int|string|true
+    public function canDelete($id, $shoutrow = false): bool
     {
-        $candelete = $this->user->getPerm('can_delete_shouts');
+        $candelete = (bool) $this->user->getPerm('can_delete_shouts');
         if (!$candelete && $this->user->getPerm('can_delete_own_shouts')) {
             if (!$shoutrow) {
                 $result = $this->database->safeselect(
@@ -98,7 +98,7 @@ final class Shoutbox
                 isset($shoutrow['uid'])
                 && $shoutrow['uid'] === $this->user->get('id')
             ) {
-                $candelete = true;
+                return true;
             }
         }
 

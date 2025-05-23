@@ -197,16 +197,16 @@ final readonly class ModTopics
     {
         $page = '';
         $topicIds = $this->getModTids();
+        $otherTopic = (int) $this->request->asString->post('ot');
         if (
-            is_numeric($this->request->post('ot'))
-            && in_array($this->request->post('ot'), $topicIds)
+           in_array($otherTopic, $topicIds)
         ) {
             // Move the posts and set all posts to normal (newtopic=0).
             $this->database->safeupdate(
                 'posts',
                 [
                     'newtopic' => '0',
-                    'tid' => $this->request->post('ot'),
+                    'tid' => $otherTopic,
                 ],
                 'WHERE `tid` IN ?',
                 $this->getModTids(),
@@ -218,7 +218,7 @@ final readonly class ModTopics
                 'MIN(`id`)',
                 'posts',
                 'WHERE `tid`=?',
-                $this->database->basicvalue($this->request->post('ot')),
+                $this->database->basicvalue($otherTopic),
             );
             $thisrow = $this->database->arow($result);
             $op = array_pop($thisrow);
@@ -240,9 +240,9 @@ final readonly class ModTopics
                     'op' => $op,
                 ],
                 Database::WHERE_ID_EQUALS,
-                $this->database->basicvalue($this->request->post('ot')),
+                $this->database->basicvalue($otherTopic),
             );
-            unset($topicIds[array_search($this->request->post('ot'), $topicIds, true)]);
+            unset($topicIds[array_search($otherTopic, $topicIds, true)]);
             if ($topicIds !== []) {
                 $this->database->safedelete(
                     'topics',
@@ -252,7 +252,7 @@ final readonly class ModTopics
             }
 
             $this->cancel();
-            $this->page->location('?act=vt' . $this->request->post('ot'));
+            $this->page->location('?act=vt' . $otherTopic);
         }
 
         $page .= '<form method="post" data-ajax-form="true" '
@@ -292,15 +292,16 @@ final readonly class ModTopics
 
     private function moveTo(): void
     {
+        $forumId = (int) $this->request->asString->post('id');
         $result = $this->database->safeselect(
             ['id'],
             'forums',
             Database::WHERE_ID_EQUALS,
-            $this->database->basicvalue($this->request->post('id')),
+            $this->database->basicvalue($forumId),
         );
         $rowfound = $this->database->arow($result);
         $this->database->disposeresult($result);
-        if (!is_numeric($this->request->post('id')) || !$rowfound) {
+        if (!$rowfound) {
             return;
         }
 

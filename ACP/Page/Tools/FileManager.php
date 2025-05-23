@@ -111,7 +111,7 @@ final readonly class FileManager
                 $matches,
             );
             foreach ($matches[1] as $attachmentId) {
-                $linkedIn[$attachmentId][] = $this->page->parseTemplate(
+                $linkedIn[(int) $attachmentId][] = $this->page->parseTemplate(
                     'tools/attachment-link.html',
                     [
                         'post_id' => $post['id'],
@@ -157,7 +157,7 @@ final readonly class FileManager
                     'downloads' => $file['downloads'],
                     'filesize' => $this->fileUtils->fileSizeHumanReadable($file['size']),
                     'id' => $file['id'],
-                    'linked_in' => isset($linkedIn[$file['id']]) && $linkedIn[$file['id']]
+                    'linked_in' => array_key_exists($file['id'], $linkedIn)
                         ? implode(', ', $linkedIn[$file['id']]) : 'Not linked!',
                     'title' => $file['name'],
                     'username' => $file['uname'],

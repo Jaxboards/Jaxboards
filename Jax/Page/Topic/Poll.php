@@ -156,12 +156,10 @@ final readonly class Poll
     {
         $type = $topicData['poll_type'];
         $choices = json_decode((string) $topicData['poll_choices']);
-        $results = $topicData['poll_results'];
-
-
-        if (!$choices) {
+        if (!is_array($choices)) {
             $choices = [];
         }
+        $results = $topicData['poll_results'];
 
         $usersvoted = [];
         $voted = false;

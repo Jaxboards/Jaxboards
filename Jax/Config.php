@@ -56,10 +56,9 @@ final class Config
     /**
      * Write board config.
      *
-     * @param array<string,mixed>
-     * @param mixed $data
+     * @param array<string,mixed> $data
      */
-    public function write($data): void
+    public function write(array $data): void
     {
         $this->boardConfig = array_merge($this->boardConfig, $data);
 

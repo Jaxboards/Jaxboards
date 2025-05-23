@@ -41,14 +41,14 @@ final class User
         return $this->userData[$property] ?? null;
     }
 
-    public function set(string $property, $value): void
+    public function set(string $property, string|int|null $value): void
     {
         $this->setBulk([$property => $value]);
     }
 
     public function setBulk(array $fields): void
     {
-        $this->userData = array_merge($this->userData, $fields);
+        $this->userData = array_merge($this->userData ?? [], $fields);
         $this->database->safeupdate(
             'members',
             $fields,
@@ -224,12 +224,12 @@ final class User
         }
 
         return [
-            'poll' => $this->getPerm('can_poll'),
+            'poll' => (bool) $this->getPerm('can_poll'),
             'read' => true,
             // There is no global "forum read" permission so default to assuming the user can read it
-            'reply' => $this->getPerm('can_post'),
-            'start' => $this->getPerm('can_post_topics'),
-            'upload' => $this->getPerm('can_attach'),
+            'reply' => (bool) $this->getPerm('can_post'),
+            'start' => (bool) $this->getPerm('can_post_topics'),
+            'upload' => (bool) $this->getPerm('can_attach'),
             'view' => true,
             // There is no global "forum view" permission so default to assuming the user can see it
         ];

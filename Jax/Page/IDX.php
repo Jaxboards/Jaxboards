@@ -285,17 +285,17 @@ final class IDX
         $table = '';
         foreach ($forums as $forum) {
             $read = $this->isForumRead($forum);
-            $sf = '';
+            $subforumHTML = '';
             if (
                 $forum['show_sub'] >= 1
                 && isset($this->subforums[$forum['id']])
             ) {
-                $sf = $this->subforums[$forum['id']];
+                $subforumHTML = $this->subforums[$forum['id']];
             }
 
             if ($forum['show_sub'] === 2) {
                 foreach ($this->getsubs($forum['id']) as $i) {
-                    $sf .= $this->subforums[$i];
+                    $subforumHTML .= $this->subforums[$i];
                 }
             }
 
@@ -327,11 +327,11 @@ final class IDX
                     $forum['id'],
                     $this->textFormatting->wordfilter($forum['title']),
                     nl2br((string) $forum['subtitle']),
-                    $sf
+                    $subforumHTML
                         ? $this->template->meta(
                             'idx-subforum-wrapper',
                             mb_substr(
-                                (string) $sf,
+                                $subforumHTML,
                                 0,
                                 -1 * mb_strlen(
                                     $this->template->meta('idx-subforum-splitter'),

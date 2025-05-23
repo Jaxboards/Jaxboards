@@ -505,8 +505,8 @@ final readonly class Themes
                         'custom' => 1,
                         'default' => $this->request->post('default') ? 1 : 0,
                         'hidden' => $this->request->post('hidden') ? 1 : 0,
-                        'title' => $this->request->post('skinname'),
-                        'wrapper' => $this->request->post('wrapper'),
+                        'title' => $this->request->asString->post('skinname'),
+                        'wrapper' => $this->request->asString->post('wrapper'),
                     ],
                 );
                 if ($this->request->post('default')) {
