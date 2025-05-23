@@ -54,13 +54,19 @@ final class LogReg
 
     public function render(): void
     {
-        match ((int) mb_substr((string) $this->request->both('act'), 6)) {
+        $page = match ((int) mb_substr((string) $this->request->asString->both('act'), 6)) {
             1 => $this->register(),
             2 => $this->logout(),
             4 => $this->loginpopup(),
             5 => $this->toggleinvisible(),
-            6 => $this->forgotpassword($this->request->both('uid'), $this->request->both('id')),
-            default => $this->login($this->request->post('user'), $this->request->post('pass')),
+            6 => $this->forgotpassword(
+                $this->request->asString->both('uid'),
+                $this->request->asString->both('tokenId')
+            ),
+            default => $this->login(
+                $this->request->asString->post('user'),
+                $this->request->asString->post('pass')
+            ),
         };
     }
 
@@ -68,29 +74,22 @@ final class LogReg
     {
         $this->registering = true;
 
-        if ($this->request->post('username') !== null) {
-            $this->page->location('?');
-        }
-
-        $name = $this->request->post('name') !== null
-            ? trim((string) $this->request->post('name'))
-            : '';
-        $dispname = $this->request->post('display_name') !== null
-            ? trim((string) $this->request->post('display_name')) : '';
-        $pass1 = $this->request->post('pass1') ?? '';
-        $pass2 = $this->request->post('pass2') ?? '';
-        $email = $this->request->post('email') ?? '';
+        $name = trim($this->request->asString->post('name') ?? '');
+        $dispname = trim($this->request->asString->post('display_name') ?? '');
+        $pass1 = $this->request->asString->post('pass1') ?? '';
+        $pass2 = $this->request->asString->post('pass2') ?? '';
+        $email = $this->request->asString->post('email') ?? '';
 
 
-        $p = $this->template->meta('register-form');
+        $page = $this->template->meta('register-form');
 
         // Show registration form.
         if ($this->request->post('register') === null) {
             if (!$this->request->isJSUpdate()) {
-                $this->page->command('update', 'page', $p);
+                $this->page->command('update', 'page', $page);
             }
 
-            $this->page->append('PAGE', $p);
+            $this->page->append('PAGE', $page);
 
             return;
         }
@@ -157,7 +156,7 @@ final class LogReg
                 'last_visit' => $this->database->datetime(),
                 'name' => $name,
                 'pass' => password_hash(
-                    (string) $pass1,
+                    $pass1,
                     PASSWORD_DEFAULT,
                 ),
                 'posts' => 0,
@@ -315,8 +314,8 @@ final class LogReg
     }
 
     private function forgotpassword(
-        null|array|string $uid,
-        null|array|string $id,
+        ?string $uid,
+        ?string $tokenId,
     ): void {
         $page = '';
 
@@ -324,13 +323,16 @@ final class LogReg
             return;
         }
 
-        if ($id) {
+        $pass1 = $this->request->asString->post('pass1');
+        $pass2 = $this->request->asString->post('pass2');
+
+        if ($tokenId) {
             $result = $this->database->safeselect(
                 'uid AS id',
                 'tokens',
                 'WHERE `token`=?
                 AND `expires`>=NOW()',
-                $this->database->basicvalue($id),
+                $this->database->basicvalue($tokenId),
             );
             $udata = $this->database->arow($result);
 
@@ -339,15 +341,14 @@ final class LogReg
             if (!$udata) {
                 $page = $this->template->meta('error', 'This link has expired. Please try again.');
             } elseif (
-                $this->request->post('pass1')
-                && $this->request->post('pass2')
+                $pass1 && $pass2
             ) {
-                if ($this->request->post('pass1') === $this->request->post('pass2')) {
+                if ($pass1 === $pass2) {
                     $this->database->safeupdate(
                         'members',
                         [
                             'pass' => password_hash(
-                                (string) $this->request->post('pass1'),
+                                $pass1,
                                 PASSWORD_DEFAULT,
                             ),
                         ],
@@ -374,7 +375,9 @@ final class LogReg
                     // registration redirects to the index.
                     $this->registering = true;
 
-                    $this->login($udata['name'], $this->request->post('pass1'));
+                    if ($udata) {
+                        $this->login((string) $udata['name'], $pass1);
+                    }
 
                     return;
                 }
@@ -389,25 +392,24 @@ final class LogReg
                     $this->jax->hiddenFormFields(
                         [
                             'act' => 'logreg6',
-                            'id' => $id,
-                            'uid' => $uid,
+                            'id' => $tokenId,
+                            'uid' => $uid ?? '',
                         ],
                     ),
                 );
             }
         } else {
-            if ($this->request->post('user')) {
+            $user = $this->request->asString->post('user');
+            if ($user) {
                 $result = $this->database->safeselect(
                     ['id', 'email'],
                     'members',
                     'WHERE `name`=?',
-                    $this->database->basicvalue($this->request->post('user')),
+                    $this->database->basicvalue($user),
                 );
                 $error = null;
                 if (!($udata = $this->database->arow($result))) {
-                    $error = 'There is no user registered as <strong>'
-                        . $this->request->both('user')
-                        . '</strong>, sure this is correct?';
+                    $error = "There is no user registered as <strong>{$user}</strong>, sure this is correct?";
                 }
 
                 $this->database->disposeresult($result);
@@ -428,7 +430,7 @@ final class LogReg
                         ],
                     );
                     $link = $this->domainDefinitions->getBoardURL() . '?act=logreg6&uid='
-                        . $udata['id'] . '&id=' . rawurlencode($forgotpasswordtoken);
+                        . $udata['id'] . '&tokenId=' . rawurlencode($forgotpasswordtoken);
                     $mailResult = $this->jax->mail(
                         $udata['email'],
                         'Recover Your Password!',
