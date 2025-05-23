@@ -95,7 +95,7 @@ final readonly class UCP
     {
         return $this->jax->hiddenFormFields([
             'act' => 'ucp',
-            'what' => $this->request->asString->both('what'),
+            'what' => $this->request->asString->both('what') ?? '',
         ]);
     }
 
@@ -325,7 +325,7 @@ final readonly class UCP
     private function showAvatarSettings(): string
     {
         $error = null;
-        $avatar = $this->user->get('avatar');
+        $avatar = (string) $this->user->get('avatar');
         $changedAvatar = $this->request->asString->post('changedava');
         if ($changedAvatar !== null) {
             if (
