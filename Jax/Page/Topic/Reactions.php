@@ -47,7 +47,7 @@ final readonly class Reactions
             'ratingniblets',
         );
 
-        return keyBy($this->database->arows($result), static fn($niblet) => $niblet['id']);
+        return $ratingNiblets = keyBy($this->database->arows($result), static fn($niblet) => $niblet['id']);
     }
 
     public function listReactions(int $pid): void
@@ -114,7 +114,7 @@ final readonly class Reactions
     }
 
     /**
-     * @param array $post - The Post record
+     * @param array<string,mixed> $post - The Post record
      */
     public function render(array $post): string
     {
@@ -183,15 +183,8 @@ final readonly class Reactions
         $niblets = $this->fetchRatingNiblets();
         $ratings = [];
 
-        $error = match (true) {
-            $this->user->isGuest() => 'You must be logged in to rate posts.',
-            !$post => "That post doesn't exist.",
-            !$niblets[$nibletid] => 'Invalid rating',
-            default => null,
-        };
-
-        if ($error !== null) {
-            $this->page->command('error', $error);
+        if (!$post || !array_key_exists($nibletid, $niblets) || $this->user->isGuest()) {
+            $this->page->command('error', 'Invalid parameters');
 
             return;
         }
@@ -217,7 +210,7 @@ final readonly class Reactions
         $this->database->safeupdate(
             'posts',
             [
-                'rating' => json_encode($ratings),
+                'rating' => json_encode($ratings) ?: $post['rating'],
             ],
             Database::WHERE_ID_EQUALS,
             $this->database->basicvalue($postid),

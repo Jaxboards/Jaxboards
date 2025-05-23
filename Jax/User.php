@@ -62,7 +62,7 @@ final class User
      */
     public function getUser(?int $uid = null, ?string $pass = null): ?array
     {
-        if ($this->userData) {
+        if ($this->userData || !$uid) {
             return $this->userData;
         }
 

@@ -110,7 +110,7 @@ final readonly class Poll
             return;
         }
 
-        if ($topicData['poll_type'] === 'multi') {
+        if ($topicData['poll_type'] === 'multi' && is_array($choice)) {
             foreach ($choice as $c) {
                 $results[$c][] = $this->user->get('id');
             }
@@ -164,22 +164,21 @@ final readonly class Poll
         $usersvoted = [];
         $voted = false;
 
-        if (!$this->user->isGuest()) {
-            // Accomplish three things at once:
-            // * Determine if the user has voted.
-            // * Count up the number of votes.
-            // * Parse the result set.
-            $totalvotes = 0;
-            $numvotes = [];
-            foreach ($this->parsePollResults($results) as $optionIndex => $voters) {
-                $totalvotes += ($numvotes[$optionIndex] = count($voters));
-                if (in_array($this->user->get('id'), $voters, true)) {
-                    $voted = true;
-                }
+        $totalvotes = 0;
 
-                foreach ($voters as $voter) {
-                    $usersvoted[$voter] = 1;
-                }
+        // Accomplish three things at once:
+        // * Determine if the user has voted.
+        // * Count up the number of votes.
+        // * Parse the result set.
+        $numvotes = [];
+        foreach ($this->parsePollResults($results) as $optionIndex => $voters) {
+            $totalvotes += ($numvotes[$optionIndex] = count($voters));
+            if (!$this->user->isGuest() && in_array($this->user->get('id'), $voters, true)) {
+                $voted = true;
+            }
+
+            foreach ($voters as $voter) {
+                $usersvoted[$voter] = 1;
             }
         }
 
@@ -187,12 +186,12 @@ final readonly class Poll
 
         if ($voted) {
             $resultRows = implode('', array_map(
-                static function ($index) use ($choices, $numvotes, $totalvotes): string {
+                static function ($index, $choice) use ($numvotes, $totalvotes): string {
                     $percentOfVotes = round($numvotes[$index] / $totalvotes * 100, 2);
 
                     return <<<HTML
                         <tr>
-                            <td>{$choices[$index]}</td>
+                            <td>{$choice}</td>
                             <td class='numvotes'>
                                 {$numvotes[$index]} votes ({$percentOfVotes}%)
                             </td>
@@ -203,6 +202,7 @@ final readonly class Poll
                         HTML;
                 },
                 array_keys($choices),
+                $choices
             ));
 
             return <<<HTML

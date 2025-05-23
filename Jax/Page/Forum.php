@@ -216,7 +216,7 @@ final class Forum
             "% {$fid}",
         );
         $rows = '';
-        while ($forum = $this->database->arow($result)) {
+        foreach ($this->database->arows($result) as $forum) {
             $fdata['topics'] -= $forum['topics'];
             if ($this->pageNumber !== 0) {
                 continue;
@@ -349,7 +349,7 @@ final class Forum
 
         foreach ($this->database->arows($result) as $topic) {
             $pages = '';
-            if ($forum['replies'] > 9) {
+            if ($topic['replies'] > 9) {
                 foreach ($this->jax->pages((int) ceil(($topic['replies'] + 1) / 10), 1, 10) as $pageNumber) {
                     $pages .= "<a href='?act=vt" . $topic['id']
                         . "&amp;page={$pageNumber}'>{$pageNumber}</a> ";
@@ -489,7 +489,7 @@ final class Forum
             $tid,
         );
         $page = '';
-        while ($summary = $this->database->arow($result)) {
+        foreach($this->database->arows($result) as $summary) {
             $page .= '<tr><td>' . $summary['name'] . '</td><td>' . $summary['replies'] . '</td></tr>';
         }
 
