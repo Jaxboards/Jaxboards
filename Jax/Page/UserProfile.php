@@ -23,19 +23,19 @@ use function in_array;
 use function preg_match;
 use function ucfirst;
 
-final class UserProfile
+final readonly class UserProfile
 {
     public function __construct(
-        private readonly ContactDetails $contactDetails,
-        private readonly Database $database,
-        private readonly Date $date,
-        private readonly IPAddress $ipAddress,
-        private readonly Page $page,
-        private readonly ProfileTabs $profileTabs,
-        private readonly Request $request,
-        private readonly Session $session,
-        private readonly Template $template,
-        private readonly User $user,
+        private ContactDetails $contactDetails,
+        private Database $database,
+        private Date $date,
+        private IPAddress $ipAddress,
+        private Page $page,
+        private ProfileTabs $profileTabs,
+        private Request $request,
+        private Session $session,
+        private Template $template,
+        private User $user,
     ) {
         $this->template->loadMeta('userprofile');
     }

@@ -13,17 +13,17 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
-final class Comments
+final readonly class Comments
 {
     public function __construct(
-        private readonly Database $database,
-        private readonly Date $date,
-        private readonly Jax $jax,
-        private readonly Page $page,
-        private readonly Request $request,
-        private readonly Template $template,
-        private readonly TextFormatting $textFormatting,
-        private readonly User $user,
+        private Database $database,
+        private Date $date,
+        private Jax $jax,
+        private Page $page,
+        private Request $request,
+        private Template $template,
+        private TextFormatting $textFormatting,
+        private User $user,
     ) {}
 
     /**
@@ -56,7 +56,7 @@ final class Comments
 
         $comments = $this->fetchComments($profile);
 
-        if (!$comments) {
+        if ($comments === []) {
             return $tabHTML . 'No comments to display!';
         }
 
@@ -89,6 +89,7 @@ final class Comments
 
     /**
      * @param array<string,null|float|int|string> $profile
+     *
      * @return array<array<string,mixed>>
      */
     private function fetchComments(array $profile): array

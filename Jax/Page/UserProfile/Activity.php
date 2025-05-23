@@ -207,6 +207,7 @@ final readonly class Activity
             $profileId,
             self::ACTIVITY_LIMIT,
         );
+
         return $this->database->arows($result);
     }
 }

@@ -17,7 +17,7 @@ use function explode;
 use function in_array;
 use function ucwords;
 
-final class ProfileTabs
+final readonly class ProfileTabs
 {
     private const TABS = [
         'about',
@@ -29,15 +29,15 @@ final class ProfileTabs
     ];
 
     public function __construct(
-        private readonly Activity $activity,
-        private readonly Comments $comments,
-        private readonly Database $database,
-        private readonly Date $date,
-        private readonly Page $page,
-        private readonly Request $request,
-        private readonly Template $template,
-        private readonly TextFormatting $textFormatting,
-        private readonly User $user,
+        private Activity $activity,
+        private Comments $comments,
+        private Database $database,
+        private Date $date,
+        private Page $page,
+        private Request $request,
+        private Template $template,
+        private TextFormatting $textFormatting,
+        private User $user,
     ) {}
 
     /**
@@ -60,7 +60,7 @@ final class ProfileTabs
         };
 
         $tabs = array_map(
-            function ($tab) use ($selectedTab, $profile): string {
+            static function ($tab) use ($selectedTab, $profile): string {
                 $active = ($tab === $selectedTab ? ' class="active"' : '');
                 $uppercase = ucwords($tab);
                 $profileId = $profile['id'];
