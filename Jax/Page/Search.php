@@ -18,7 +18,6 @@ use function array_map;
 use function array_slice;
 use function ceil;
 use function count;
-use function ctype_digit;
 use function explode;
 use function implode;
 use function in_array;
@@ -36,6 +35,9 @@ final class Search
 {
     private int $pageNum = 0;
 
+    /**
+     * @var array<int> $fids
+     */
     private array $fids = [];
 
     private int $perpage;
@@ -55,7 +57,7 @@ final class Search
 
     public function render(): void
     {
-        $this->pageNum = (int) $this->request->both('page') - 1;
+        $this->pageNum = (int) $this->request->asString->both('page') - 1;
         if ($this->pageNum < 0) {
             $this->pageNum = 0;
         }
@@ -64,7 +66,7 @@ final class Search
 
         if (
             $this->request->both('searchterm') !== null
-            || $this->request->both('page') !== null
+            || $this->request->asString->both('page') !== null
         ) {
             $this->dosearch();
         } else {
@@ -107,24 +109,26 @@ final class Search
         $tree = [];
         $titles = [];
 
-        while ($forum = $this->database->arow($result)) {
+        foreach ($this->database->arows($result) as $forum) {
             $titles[$forum['id']] = $forum['title'];
-            $path = trim($forum['path'] ?? '') !== '' ? explode(' ', (string) $forum['path'])
-                : [];
+            $path = array_map(
+                fn($fid) => (int) $fid,
+                trim($forum['path'] ?? '') !== '' ? explode(' ', (string) $forum['path']) : []
+            );
             $t = &$tree;
             foreach ($path as $forumId) {
-                if (!isset($t[$forumId]) || !is_array($t[$forumId])) {
+                if (!array_key_exists($forumId, $t)) {
                     $t[$forumId] = [];
                 }
 
                 $t = &$t[$forumId];
             }
 
-            if (isset($t[$forum['id']])) {
+            if (array_key_exists((int) $forum['id'], $t)) {
                 continue;
             }
 
-            $t[$forum['id']] = true;
+            $t[$forum['id']] = [];
         }
 
         return $this->rtreeselect(
@@ -133,16 +137,20 @@ final class Search
         );
     }
 
+    /**
+     * @param array<int,mixed> $tree
+     * @param array<string> $titles
+     */
     private function rtreeselect(
         array $tree,
         $titles,
-        float|int $level = 0,
+        int $level = 0,
     ): string {
         $options = '';
         foreach ($tree as $k => $v) {
             if (isset($titles[$k])) {
                 $options .= '<option value="' . $k . '">'
-                    . str_repeat('+-', $level) . $titles[$k]
+                    . str_repeat('├─', $level) . $titles[$k]
                     . '</option>';
             }
 
@@ -167,11 +175,7 @@ final class Search
             return;
         }
 
-        $termraw = $this->request->both('searchterm') ?? '';
-
-        if (!$termraw && $this->pageNum) {
-            $termraw = $this->session->getVar('searcht');
-        }
+        $searchTerm = $this->request->both('searchterm') ?: $this->session->getVar('searcht');
 
         if (
             $this->request->both('searchterm') === null
@@ -179,36 +183,23 @@ final class Search
             $ids = $this->session->getVar('search');
         } else {
             $this->getSearchableForums();
-            if ($this->request->both('fids') !== null) {
-                $fids = [];
-                foreach ($this->request->both('fids') as $v) {
-                    if (!in_array($v, $this->fids)) {
-                        continue;
-                    }
-
-                    $fids[] = $v;
-                }
-            } else {
-                $fids = $this->fids;
-            }
+            $fidsInput = $this->request->both('fids');
+            $fids = is_array($fidsInput)
+                ? array_filter($fidsInput, fn($fid) => in_array((int) $fid, $this->fids, true))
+                : $this->fids;
 
             $datestart = null;
-            if ($this->request->both('datestart') !== null) {
+            if ($this->request->asString->both('datestart')) {
                 $datestart = Carbon::parse($this->request->asString->both('datestart'))->getTimestamp();
             }
 
+
             $dateend = null;
-            if ($this->request->both('dateend') !== null) {
+            if ($this->request->asString->both('dateend')) {
                 $dateend = Carbon::parse($this->request->asString->both('dateend'))->getTimestamp();
             }
 
-            $authorId = null;
-            if (
-                $this->request->both('mid') !== null
-                && ctype_digit((string) $this->request->both('mid'))
-            ) {
-                $authorId = (int) $this->request->both('mid');
-            }
+            $authorId = (int) $this->request->asString->both('mid');
 
             $postParams = [];
             $postValues = [];
@@ -247,7 +238,7 @@ final class Search
             $postWhere = implode(' ', array_map(static fn($q): string => "AND {$q}", $postParams));
             $topicWhere = implode(' ', array_map(static fn($q): string => "AND {$q}", $topicParams));
 
-            $sanitizedSearchTerm = $this->database->basicvalue($termraw);
+            $sanitizedSearchTerm = $this->database->basicvalue($searchTerm);
 
             $result = $this->database->safespecial(
                 <<<"SQL"
@@ -296,7 +287,7 @@ final class Search
 
             $ids = mb_substr($ids, 0, -1);
             $this->session->addVar('search', $ids);
-            $this->session->addVar('searcht', $termraw);
+            $this->session->addVar('searcht', $searchTerm);
             $this->pageNum = 0;
         }
 
@@ -335,7 +326,7 @@ final class Search
 
         $terms = [];
 
-        foreach (preg_split('@\W+@', (string) $termraw) as $v) {
+        foreach (preg_split('@\W+@', (string) $searchTerm) ?: [] as $v) {
             if (trim($v) === '') {
                 continue;
             }
@@ -414,7 +405,10 @@ final class Search
         }
     }
 
-    private function getSearchableForums()
+    /**
+     * @return array<int>
+     */
+    private function getSearchableForums(): array
     {
         if ($this->fids) {
             return $this->fids;
@@ -425,13 +419,13 @@ final class Search
             ['id', 'perms'],
             'forums',
         );
-        while ($f = $this->database->arow($result)) {
-            $perms = $this->user->getForumPerms($f['perms']);
+        foreach ($this->database->arows($result) as $forum) {
+            $perms = $this->user->getForumPerms($forum['perms']);
             if (!$perms['read']) {
                 continue;
             }
 
-            $this->fids[] = $f['id'];
+            $this->fids[] = $forum['id'];
         }
 
         return $this->fids;
