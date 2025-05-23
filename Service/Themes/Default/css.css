@@ -544,15 +544,15 @@ textarea {
 }
 
 /* Buddy/Contacts List */
-#buddylist .online {
+#buddylist .online .name {
     color: #1d71cf;
 }
 
-#buddylist .offline {
+#buddylist .offline .name {
     color: #ccc;
 }
 
-#buddylist .blocked {
+#buddylist .blocked .name {
     color: #f00;
 }
 
