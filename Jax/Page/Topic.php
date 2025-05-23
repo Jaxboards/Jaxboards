@@ -438,15 +438,6 @@ final class Topic
             $this->session->deleteVar('multiquote');
         }
 
-        $result = $this->database->safeselect(
-            'title',
-            'topics',
-            Database::WHERE_ID_EQUALS,
-            $tid,
-        );
-        $tdata = $this->database->arow($result);
-        $this->database->disposeresult($result);
-
         $this->page->command(
             'window',
             [
@@ -457,7 +448,7 @@ final class Topic
                 ),
                 'id' => 'qreply',
                 'resize' => 'textarea',
-                'title' => $this->textFormatting->wordfilter($tdata['title']),
+                'title' => $this->textFormatting->wordfilter($topic['title']),
             ],
         );
         $this->page->command('updateqreply', '');
