@@ -17,7 +17,6 @@ use Jax\TextFormatting;
 use Jax\User;
 
 use function ceil;
-use function is_numeric;
 use function mb_strlen;
 use function mb_substr;
 use function trim;
@@ -55,7 +54,7 @@ final class Shoutbox
 
         $this->shoutlimit = (int) $this->config->getSetting('shoutbox_num');
         $shoutboxDelete = (int) $this->request->both('shoutbox_delete');
-        if ($shoutboxDelete) {
+        if ($shoutboxDelete !== 0) {
             $this->deleteShout($shoutboxDelete);
         } elseif (
             $this->request->both('module') === 'shoutbox'
@@ -334,8 +333,6 @@ final class Shoutbox
             Database::WHERE_ID_EQUALS,
             $delete,
         );
-
-        return;
     }
 
     public function addShout(): void
