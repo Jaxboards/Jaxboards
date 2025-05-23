@@ -14,7 +14,6 @@ use function explode;
 use function file_exists;
 use function header;
 use function in_array;
-use function is_numeric;
 use function mb_strtolower;
 use function readfile;
 
