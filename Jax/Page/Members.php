@@ -160,7 +160,7 @@ final class Members
             }
 
             $contactdetails .= '<a title="PM this member" class="pm contact" '
-                . 'href="?act=ucp&amp;what=inbox&amp;page=compose&amp;mid='
+                . 'href="?act=ucp&amp;what=inbox&amp;view=compose&amp;mid='
                 . $member['id'] . '"></a>';
             $page .= $this->template->meta(
                 'members-row',
