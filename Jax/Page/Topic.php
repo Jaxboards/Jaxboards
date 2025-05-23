@@ -28,7 +28,6 @@ use function gmdate;
 use function header;
 use function implode;
 use function in_array;
-use function is_numeric;
 use function json_encode;
 use function max;
 use function preg_match;
@@ -64,7 +63,7 @@ final class Topic
 
     public function render(): void
     {
-        preg_match('@\d+$@', $this->request->asString->both('act'), $act);
+        preg_match('@\d+$@', (string) $this->request->asString->both('act'), $act);
         $tid = $act !== [] ? (int) $act[0] : 0;
 
         $edit = (int) $this->request->asString->both('edit');
@@ -769,7 +768,10 @@ final class Topic
             );
             $mods = $this->database->arow($result);
             $this->database->disposeresult($result);
-            if ($mods && in_array($this->user->get('id'), explode(',', (string) $mods['mods']), true)) {
+            if (
+                $mods
+                && in_array($this->user->get('id'), explode(',', (string) $mods['mods']), true)
+            ) {
                 $canMod = true;
             }
         }
@@ -857,7 +859,7 @@ final class Topic
     {
         $pid = (int) $this->request->asString->both('quote');
         $post = false;
-        if ($pid) {
+        if ($pid !== 0) {
             $result = $this->database->safespecial(
                 <<<'SQL'
                     SELECT p.`post` AS `post`
