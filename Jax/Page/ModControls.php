@@ -21,11 +21,9 @@ use Jax\User;
 
 use function array_shift;
 use function count;
-use function fclose;
 use function file_get_contents;
+use function file_put_contents;
 use function filter_var;
-use function fopen;
-use function fwrite;
 use function gmdate;
 use function header;
 use function implode;
@@ -340,7 +338,7 @@ final readonly class ModControls
         if ($changed) {
             file_put_contents(
                 $this->domainDefinitions->getBoardPath() . '/bannedips.txt',
-                implode(PHP_EOL, $this->ipAddress->getBannedIps())
+                implode(PHP_EOL, $this->ipAddress->getBannedIps()),
             );
         }
 
@@ -358,7 +356,7 @@ final readonly class ModControls
                 <input type='submit' value='Submit' title="Search for IP" />
             </form>
             EOT;
-        if ($ipAddress) {
+        if ($ipAddress !== '' && $ipAddress !== '0') {
             $page .= "<h3>Data for {$ipAddress}:</h3>";
 
             $hiddenFields = $this->jax->hiddenFormFields(
