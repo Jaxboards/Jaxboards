@@ -59,17 +59,13 @@ final class Members
 
         $page = '';
 
-        $sortby = 'm.`display_name`';
         $sorthow = $this->request->asString->both('how') === 'DESC'
             ? 'DESC' : 'ASC';
         $where = '';
         $sortByInput = $this->request->asString->both('sortby');
-        if (
-            $sortByInput !== null
-            && array_key_exists($sortByInput, $fields)
-        ) {
-            $sortby = $sortByInput;
-        }
+        $sortby = $sortByInput !== null && array_key_exists($sortByInput, $fields)
+            ? $sortByInput
+            : 'display_name';
 
         $filter = $this->request->asString->get('filter');
         if ($filter === 'staff') {
@@ -188,7 +184,7 @@ final class Members
             $links[4],
             $page,
         );
-        $page = "<div class='pages pages-top'>{$pages}</div>"
+        $page = "<div class='pages pages-top'>{$pages}</div><div class='forum-pages-top'>&nbsp;</div>"
             . $this->template->meta(
                 'box',
                 ' id="memberlist"',
