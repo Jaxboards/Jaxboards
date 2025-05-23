@@ -198,7 +198,7 @@ final readonly class BuddyList
         if (!$user) {
             $error = 'This user does not exist, and therefore could '
                 . 'not be added to your contacts list.';
-        } elseif (in_array($uid, $friends)) {
+        } elseif (in_array($uid, $friends, true)) {
             $error = 'This user is already in your contacts list.';
         }
 
