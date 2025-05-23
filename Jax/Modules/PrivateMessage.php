@@ -16,7 +16,6 @@ use Jax\User;
 use function explode;
 use function implode;
 use function in_array;
-use function is_numeric;
 use function json_decode;
 use function json_encode;
 use function trim;
@@ -86,7 +85,7 @@ final readonly class PrivateMessage
             return;
         }
 
-        if (!$uid) {
+        if ($uid === 0) {
             $this->page->command('error', 'You must have a recipient!');
 
             return;
