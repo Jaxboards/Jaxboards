@@ -17,32 +17,29 @@ use function is_numeric;
 use function mktime;
 use function sprintf;
 
-final class Calendar
+final readonly class Calendar
 {
-    private ?int $month = null;
-
     public function __construct(
-        private readonly Database $database,
-        private readonly Page $page,
-        private readonly Request $request,
-        private readonly Session $session,
-        private readonly Template $template,
+        private Database $database,
+        private Page $page,
+        private Request $request,
+        private Session $session,
+        private Template $template,
     ) {
         $this->template->loadMeta('calendar');
     }
 
     public function render(): void
     {
-        $this->month = is_numeric($this->request->both('month'))
+        $month = is_numeric($this->request->both('month'))
             ? (int) $this->request->both('month')
             : (int) gmdate('n');
 
-        $this->monthview();
+        $this->monthView($month);
     }
 
-    private function monthview(): void
+    private function monthView(int $monthOffset): void
     {
-        $monthoffset = $this->month;
         if ($this->request->isJSUpdate()) {
             return;
         }
@@ -51,17 +48,18 @@ final class Calendar
         $today = gmdate('n j Y');
         [
             $offset,
-            $daysinmonth,
-            $monthname,
+            $daysInMonth,
+            $monthName,
             $year,
             $month,
         ] = explode(
             ' ',
-            gmdate('w t F Y n', mktime(0, 0, 0, $monthoffset, 1)),
+            gmdate('w t F Y n', mktime(0, 0, 0, $monthOffset, 1) ?? 0),
         );
         $offset = (int) $offset;
+        $daysInMonth = (int) $daysInMonth;
 
-        $this->session->set('location_verbose', 'Checking out the calendar for ' . $monthname . ' ' . $year);
+        $this->session->set('location_verbose', 'Checking out the calendar for ' . $monthName . ' ' . $year);
         $result = $this->database->safeselect(
             [
                 'id',
@@ -91,14 +89,14 @@ final class Calendar
 
         $page .= $this->template->meta(
             'calendar-heading',
-            $monthname,
+            $monthName,
             $year,
-            $monthoffset - 1,
-            $monthoffset + 1,
+            $monthOffset - 1,
+            $monthOffset + 1,
         );
         $page .= $this->template->meta('calendar-daynames');
         $week = '';
-        for ($x = 1; $x <= $daysinmonth; ++$x) {
+        for ($x = 1; $x <= $daysInMonth; ++$x) {
             if ($x === 1 && $offset) {
                 $week .= $this->template->meta(
                     'calendar-padding',
@@ -115,7 +113,7 @@ final class Calendar
                     implode(',', $birthdays[$x]),
                 ),
             );
-            if (0 !== ($x + $offset) % 7 && !($x === $daysinmonth && $week)) {
+            if (0 !== ($x + $offset) % 7 && !($x === $daysInMonth && $week)) {
                 continue;
             }
 

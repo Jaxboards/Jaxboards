@@ -117,12 +117,11 @@ final readonly class Inbox
                 $error = 'Invalid user!';
             } elseif (
                 trim((string) $this->request->asString->both('title')) === ''
-                || trim((string) $this->request->asString->both('title')) === '0'
             ) {
                 $error = 'You must enter a title.';
             }
 
-            if ($error !== null) {
+            if ($error !== null || !$udata) {
                 $this->page->command('error', $error);
                 $this->page->append('PAGE', $this->page->error($error));
 
@@ -212,7 +211,7 @@ final readonly class Inbox
                     $mid,
                 );
                 $thisrow = $this->database->arow($result);
-                $mname = array_pop($thisrow);
+                $mname = (string) $thisrow['display_name'];
                 $this->database->disposeresult($result);
 
                 $msg = PHP_EOL . PHP_EOL . PHP_EOL
