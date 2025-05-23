@@ -37,13 +37,13 @@ final readonly class PrivateMessage
 
     public function init(): void
     {
-        $instantMessage = $this->request->post('im_im');
-        $uid = $this->request->post('im_uid');
+        $instantMessage = $this->request->asString->post('im_im');
+        $uid = (int) $this->request->asString->post('im_uid');
         if ($this->session->get('runonce')) {
             $this->filter();
         }
 
-        if (trim($instantMessage ?? '') === '' || !$uid) {
+        if (!$instantMessage || trim($instantMessage) === '' || !$uid) {
             return;
         }
 
@@ -76,7 +76,7 @@ final readonly class PrivateMessage
         $this->session->set('runonce', implode(PHP_EOL, $commands));
     }
 
-    public function message($uid, $instantMessage): void
+    public function message(int $uid, string $instantMessage): void
     {
         $this->session->act();
 
@@ -134,12 +134,11 @@ final readonly class PrivateMessage
         $this->page->command('imtoggleoffline', $uid);
     }
 
-    public function sendcmd($cmd, $uid): ?bool
+    /**
+     * @param array<mixed> $cmd
+     */
+    public function sendcmd(array $cmd, int $uid): ?bool
     {
-        if (!is_numeric($uid)) {
-            return null;
-        }
-
         $result = $this->database->safespecial(
             <<<'SQL'
                 UPDATE %t
