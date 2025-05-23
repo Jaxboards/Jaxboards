@@ -112,18 +112,20 @@ final readonly class Inbox
                 $this->database->disposeresult($result);
             }
 
-            if (!$udata) {
-                $error = 'Invalid user!';
-            } elseif (
-                trim((string) $this->request->asString->both('title')) === ''
-            ) {
-                $error = 'You must enter a title.';
-            }
+            $error = match(true) {
+                !$udata => 'Invalid user!',
+                trim((string) $this->request->asString->both('title')) === '' => 'You must enter a title.',
+                default => null,
+            };
 
-            if ($error !== null || !$udata) {
+            if ($error !== null) {
                 $this->page->command('error', $error);
                 $this->page->append('PAGE', $this->page->error($error));
 
+                return null;
+            }
+
+            if (!$udata) {
                 return null;
             }
 
@@ -210,7 +212,7 @@ final readonly class Inbox
                     $mid,
                 );
                 $thisrow = $this->database->arow($result);
-                $mname = (string) $thisrow['display_name'];
+                $mname = $thisrow ? (string) $thisrow['display_name'] : '';
                 $this->database->disposeresult($result);
 
                 $msg = PHP_EOL . PHP_EOL . PHP_EOL

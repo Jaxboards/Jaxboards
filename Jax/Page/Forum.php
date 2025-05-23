@@ -531,6 +531,9 @@ final class Forum
         );
     }
 
+    /**
+     * @param array<string,mixed> $forum
+     */
     private function isForumRead(array $forum): bool
     {
         if (!$this->forumsRead) {

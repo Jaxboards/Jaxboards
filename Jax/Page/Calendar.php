@@ -54,7 +54,7 @@ final readonly class Calendar
             $month,
         ] = explode(
             ' ',
-            gmdate('w t F Y n', mktime(0, 0, 0, $monthOffset, 1) ?? 0),
+            gmdate('w t F Y n', mktime(0, 0, 0, $monthOffset, 1) ?: 0),
         );
         $offset = (int) $offset;
         $daysInMonth = (int) $daysInMonth;
