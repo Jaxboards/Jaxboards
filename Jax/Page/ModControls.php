@@ -262,7 +262,7 @@ final readonly class ModControls
                                 <textarea name="{$name}" id="m_{$name}">{$value}</textarea>
                             HTML
                         : <<<HTML
-                                <input type="text" id="m_{$name}" name="{$name}" value="{$value}" />'
+                                <input type="text" id="m_{$name}" name="{$name}" value="{$value}" />
                             HTML;
 
                     return <<<HTML
