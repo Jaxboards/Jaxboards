@@ -64,8 +64,8 @@ final class Topic
 
     public function render(): void
     {
-        preg_match('@\d+$@', (string) $this->request->both('act'), $act);
-        $tid = (int) $act[0] ?: 0;
+        preg_match('@\d+$@', $this->request->asString->both('act'), $act);
+        $tid = $act !== [] ? (int) $act[0] : 0;
 
         $edit = (int) $this->request->asString->both('edit');
         $findPost = (int) $this->request->asString->both('findpost');
@@ -110,7 +110,7 @@ final class Topic
             <<<'SQL'
                 SELECT
                     a.`id`
-                    , a.`title` AS `topic_title`
+                    , a.`title` AS `title`
                     , a.`locked` AS `locked`
                     , UNIX_TIMESTAMP(a.`lp_date`) AS `lp_date`
                     , b.`title` AS `forum_title`
@@ -140,13 +140,16 @@ final class Topic
             return null;
         }
 
-        $topicData['topic_title'] = $this->textFormatting->wordfilter($topicData['topic_title']);
+        $topicData['title'] = $this->textFormatting->wordfilter($topicData['title']);
         $topicData['subtitle'] = $this->textFormatting->wordfilter($topicData['subtitle']);
         $topicData['fperms'] = $this->user->getForumPerms($topicData['fperms']);
 
         return $topicData;
     }
 
+    /**
+     * @param array<string,null|float|int|string> $topic
+     */
     private function viewTopic(array $topic): void
     {
         $tid = $topic['id'];
@@ -157,15 +160,15 @@ final class Topic
             $this->markRead($topic);
         }
 
-        $this->page->setPageTitle($topic['topic_title']);
-        $this->session->set('location_verbose', "In topic '" . $topic['topic_title'] . "'");
+        $this->page->setPageTitle($topic['title']);
+        $this->session->set('location_verbose', "In topic '" . $topic['title'] . "'");
 
         // Fix this to work with subforums.
         $this->page->setBreadCrumbs(
             [
                 "?act=vc{$topic['cat_id']}" => $topic['cat_title'],
                 "?act=vf{$topic['fid']}" => $topic['forum_title'],
-                "?act=vt{$tid}" => $topic['topic_title'],
+                "?act=vt{$tid}" => $topic['title'],
             ],
         );
 
@@ -176,7 +179,8 @@ final class Topic
             'WHERE `tid`=?',
             $tid,
         );
-        $postCount = $this->database->arow($result)['postcount'];
+        $postCountRow = $this->database->arow($result);
+        $postCount = $postCountRow ? $postCountRow['postcount'] : 0;
         $this->database->disposeresult($result);
 
         $totalpages = (int) ceil($postCount / $this->numperpage);
@@ -203,7 +207,7 @@ final class Topic
         $page = $this->template->meta('topic-table', $this->postsintooutput($topic));
         $page = $this->template->meta(
             'topic-wrapper',
-            $topic['topic_title']
+            $topic['title']
                 . ($topic['subtitle'] ? ', ' . $topic['subtitle'] : ''),
             $page,
             '<a href="./?act=vt' . $tid . '&amp;fmt=RSS" class="social rss" title="RSS Feed for this Topic" target="_blank">RSS</a>',
@@ -765,7 +769,7 @@ final class Topic
             );
             $mods = $this->database->arow($result);
             $this->database->disposeresult($result);
-            if (in_array($this->user->get('id'), explode(',', (string) $mods['mods']), true)) {
+            if ($mods && in_array($this->user->get('id'), explode(',', (string) $mods['mods']), true)) {
                 $canMod = true;
             }
         }
@@ -801,7 +805,7 @@ final class Topic
             [
                 'act' => 'post',
                 'how' => 'edit',
-                'pid' => $pid,
+                'pid' => (string) $pid,
             ],
         );
 
@@ -827,18 +831,6 @@ final class Topic
                     'tid' => $post['tid'],
                 ],
             );
-            $result = $this->database->safeselect(
-                [
-                    'subtitle',
-                    'title',
-                ],
-                'topics',
-                Database::WHERE_ID_EQUALS,
-                $post['tid'],
-            );
-            $topic = $this->database->arow($result);
-            $this->database->disposeresult($result);
-
             $form = $this->template->meta(
                 'topic-qedit-topic',
                 $hiddenfields,
@@ -863,9 +855,9 @@ final class Topic
      */
     private function multiQuote(array $topic): void
     {
-        $pid = $this->request->both('quote');
+        $pid = (int) $this->request->asString->both('quote');
         $post = false;
-        if ($pid && is_numeric($pid)) {
+        if ($pid) {
             $result = $this->database->safespecial(
                 <<<'SQL'
                     SELECT p.`post` AS `post`
@@ -923,18 +915,27 @@ final class Topic
     private function getLastPost(int $tid): void
     {
         $result = $this->database->safeselect(
-            'MAX(`id`) AS `lastpid`,COUNT(`id`) AS `numposts`',
+            [
+                'MAX(`id`) AS `lastpid`',
+                'COUNT(`id`) AS `numposts`',
+            ],
             'posts',
             'WHERE `tid`=?',
             $tid,
         );
-        $f = $this->database->arow($result);
+        $post = $this->database->arow($result);
         $this->database->disposeresult($result);
+
+        if (!$post) {
+            $this->page->location('?');
+
+            return;
+        }
 
         $this->page->command('softurl');
         $this->page->location(
-            "?act=vt{$tid}&page=" . ceil($f['numposts'] / $this->numperpage)
-                . '&pid=' . $f['lastpid'] . '#pid_' . $f['lastpid'],
+            "?act=vt{$tid}&page=" . ceil($post['numposts'] / $this->numperpage)
+                . '&pid=' . $post['lastpid'] . '#pid_' . $post['lastpid'],
         );
     }
 
@@ -1003,7 +1004,7 @@ final class Topic
             [
                 'description' => $topic['subtitle'],
                 'link' => "{$boardURL}?act=vt{$tid}",
-                'title' => $topic['topic_title'],
+                'title' => $topic['title'],
             ],
         );
         $result = $this->database->safespecial(
