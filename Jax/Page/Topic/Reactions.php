@@ -183,7 +183,11 @@ final readonly class Reactions
         $niblets = $this->fetchRatingNiblets();
         $ratings = [];
 
-        if (!$post || !array_key_exists($nibletid, $niblets) || $this->user->isGuest()) {
+        if (
+            !$post
+            || !array_key_exists($nibletid, $niblets)
+            || $this->user->isGuest()
+        ) {
             $this->page->command('error', 'Invalid parameters');
 
             return;

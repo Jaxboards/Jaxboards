@@ -173,7 +173,10 @@ final readonly class Poll
         $numvotes = [];
         foreach ($this->parsePollResults($results) as $optionIndex => $voters) {
             $totalvotes += ($numvotes[$optionIndex] = count($voters));
-            if (!$this->user->isGuest() && in_array($this->user->get('id'), $voters, true)) {
+            if (
+                !$this->user->isGuest()
+                && in_array($this->user->get('id'), $voters, true)
+            ) {
                 $voted = true;
             }
 
@@ -202,7 +205,7 @@ final readonly class Poll
                         HTML;
                 },
                 array_keys($choices),
-                $choices
+                $choices,
             ));
 
             return <<<HTML

@@ -489,7 +489,7 @@ final class Forum
             $tid,
         );
         $page = '';
-        foreach($this->database->arows($result) as $summary) {
+        foreach ($this->database->arows($result) as $summary) {
             $page .= '<tr><td>' . $summary['name'] . '</td><td>' . $summary['replies'] . '</td></tr>';
         }
 
