@@ -721,7 +721,7 @@ final class Topic
     }
 
     /**
-     * @param array<string,mixed> $topic
+     * @param array<string,mixed>                 $topic
      * @param array<string,null|float|int|string> $post
      */
     private function canedit(array $topic, array $post): bool
