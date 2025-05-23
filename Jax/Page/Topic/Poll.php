@@ -159,6 +159,7 @@ final readonly class Poll
         if (!is_array($choices)) {
             $choices = [];
         }
+
         $results = $topicData['poll_results'];
 
         $usersvoted = [];

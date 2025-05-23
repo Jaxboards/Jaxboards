@@ -41,7 +41,7 @@ final class User
         return $this->userData[$property] ?? null;
     }
 
-    public function set(string $property, string|int|null $value): void
+    public function set(string $property, null|int|string $value): void
     {
         $this->setBulk([$property => $value]);
     }

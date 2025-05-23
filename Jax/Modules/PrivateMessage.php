@@ -82,11 +82,13 @@ final readonly class PrivateMessage
 
         if ($this->user->isGuest()) {
             $this->page->command('error', 'You must be logged in to instant message!');
+
             return;
         }
 
         if (!$uid) {
             $this->page->command('error', 'You must have a recipient!');
+
             return;
         }
 
@@ -95,6 +97,7 @@ final readonly class PrivateMessage
                 'error',
                 "You don't have permission to use this feature.",
             );
+
             return;
         }
 
@@ -124,9 +127,11 @@ final readonly class PrivateMessage
             $this->page->command('imtoggleoffline', $uid);
         }
 
-        if (!$this->sendcmd($cmd, $uid)) {
-            $this->page->command('imtoggleoffline', $uid);
+        if ($this->sendcmd($cmd, $uid)) {
+            return;
         }
+
+        $this->page->command('imtoggleoffline', $uid);
     }
 
     public function sendcmd($cmd, $uid): ?bool

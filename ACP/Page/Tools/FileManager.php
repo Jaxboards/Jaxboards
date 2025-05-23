@@ -11,6 +11,7 @@ use Jax\DomainDefinitions;
 use Jax\FileUtils;
 use Jax\Request;
 
+use function array_key_exists;
 use function array_pop;
 use function count;
 use function ctype_digit;

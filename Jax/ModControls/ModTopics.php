@@ -22,7 +22,6 @@ use function array_unique;
 use function explode;
 use function implode;
 use function in_array;
-use function is_numeric;
 
 final readonly class ModTopics
 {
@@ -199,7 +198,7 @@ final readonly class ModTopics
         $topicIds = $this->getModTids();
         $otherTopic = (int) $this->request->asString->post('ot');
         if (
-           in_array($otherTopic, $topicIds)
+            in_array($otherTopic, $topicIds)
         ) {
             // Move the posts and set all posts to normal (newtopic=0).
             $this->database->safeupdate(
