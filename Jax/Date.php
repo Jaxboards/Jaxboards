@@ -19,7 +19,7 @@ final class Date
     {
         // Some old forums have nullable fields that are no longer nullable
         // This needs to stay for data backwards compatibility
-        if ($date === null) {
+        if (!$date) {
             return '';
         }
 

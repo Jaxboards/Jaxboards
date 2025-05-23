@@ -42,8 +42,8 @@ final readonly class UserProfile
 
     public function render(): void
     {
-        preg_match('@\d+@', (string) $this->request->both('act'), $match);
-        $userId = (int) $match[0];
+        preg_match('@\d+@', (string) $this->request->asString->both('act'), $match);
+        $userId = $match !== [] ? (int) $match[0] : 0;
 
 
         // Nothing is live updating on the profile page
@@ -178,7 +178,7 @@ final readonly class UserProfile
             HTML;
 
         if ($this->user->getPerm('can_moderate')) {
-            $ipReadable = $this->ipAddress->asHumanReadable($profile['ip']);
+            $ipReadable = is_string($profile['ip']) ? $this->ipAddress->asHumanReadable($profile['ip']) : '';
             $contactDetails .= <<<HTML
                     <div>IP: <a href="?act=modcontrols&do=iptools&ip={$ipReadable}">{$ipReadable}</a></div>
                 HTML;
@@ -200,11 +200,11 @@ final readonly class UserProfile
                 HTML;
         }
 
-        $addContactLink = $this->isUserInList($profile['id'], 'friends')
+        $addContactLink = $this->isUserInList((int) $profile['id'], 'friends')
             ? "<a href='?act=buddylist&remove={$profile['id']}'>Remove Contact</a>"
             : "<a href='?act=buddylist&add={$profile['id']}'>Add Contact</a>";
 
-        $blockLink = $this->isUserInList($profile['id'], 'enemies')
+        $blockLink = $this->isUserInList((int) $profile['id'], 'enemies')
             ? "<a href='?act=buddylist&unblock={$profile['id']}'>Unblock Contact</a>"
             : "<a href='?act=buddylist&block={$profile['id']}'>Block Contact</a>";
 
@@ -256,11 +256,11 @@ final readonly class UserProfile
             $profile['location'],
             $profile['dob_year'] ? "{$profile['dob_month']}/{$profile['dob_day']}/{$profile['dob_year']}" : 'N/A',
             $profile['website'] ? "<a href='{$profile['website']}'>{$profile['website']}</a>" : 'N/A',
-            $this->date->autoDate($profile['join_date']),
-            $this->date->autoDate($profile['last_visit']),
+            $this->date->autoDate((int) $profile['join_date']),
+            $this->date->autoDate((int) $profile['last_visit']),
             $profile['id'],
             $profile['posts'],
-            $this->fetchGroupTitle($profile['group_id']),
+            $this->fetchGroupTitle((int) $profile['group_id']),
             $tabs[0],
             $tabs[1],
             $tabs[2],

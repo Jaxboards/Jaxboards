@@ -174,7 +174,7 @@ final class Template
     }
 
     /**
-     * @param float|int|string ...$args
+     * @param float|int|string|null ...$args
      */
     public function meta(string $meta, ...$args): string
     {
@@ -185,7 +185,7 @@ final class Template
                 ['<%%', '%%>'],
                 $this->userMetaDefs[$meta] ?? $this->metaDefs[$meta] ?? '',
             ),
-            $args,
+            array_map(fn($arg) => (string) $arg, $args),
         );
 
         if (array_key_exists($meta, $this->moreFormatting)) {
