@@ -147,7 +147,7 @@ final class Topic
     }
 
     /**
-     * @param array<string,null|float|int|string> $topic
+     * @param array<string,mixed> $topic
      */
     private function viewTopic(array $topic): void
     {
@@ -159,15 +159,15 @@ final class Topic
             $this->markRead($topic);
         }
 
-        $this->page->setPageTitle($topic['title']);
+        $this->page->setPageTitle((string) $topic['title']);
         $this->session->set('location_verbose', "In topic '" . $topic['title'] . "'");
 
         // Fix this to work with subforums.
         $this->page->setBreadCrumbs(
             [
-                "?act=vc{$topic['cat_id']}" => $topic['cat_title'],
-                "?act=vf{$topic['fid']}" => $topic['forum_title'],
-                "?act=vt{$tid}" => $topic['title'],
+                "?act=vc{$topic['cat_id']}" => (string) $topic['cat_title'],
+                "?act=vf{$topic['fid']}" => (string) $topic['forum_title'],
+                "?act=vt{$tid}" => (string) $topic['title'],
             ],
         );
 
@@ -337,7 +337,7 @@ final class Topic
     }
 
     /**
-     * @param array<string,null|float|int|string> $topic
+     * @param array<string,mixed> $topic
      */
     private function update(array $topic): void
     {
@@ -407,7 +407,7 @@ final class Topic
     }
 
     /**
-     * @param array<string,null|float|int|string> $topic
+     * @param array<string,mixed> $topic
      */
     private function quickReplyForm(array $topic): void
     {
@@ -428,7 +428,7 @@ final class Topic
                         WHERE p.`id` IN ?
                     SQL,
                 ['posts', 'members'],
-                explode(',', $this->session->getVar('multiquote') ?? ''),
+                explode(',', (string) $this->session->getVar('multiquote')),
             );
 
             while ($post = $this->database->arow($result)) {
@@ -464,7 +464,7 @@ final class Topic
     }
 
     /**
-     * @param array<string,null|float|int|string> $topic
+     * @param array<string,mixed> $topic
      */
     private function postsintooutput(array $topic, int $lastpid = 0): string
     {
@@ -721,7 +721,7 @@ final class Topic
     }
 
     /**
-     * @param array<string,null|float|int|string> $topic
+     * @param array<string,mixed> $topic
      * @param array<string,null|float|int|string> $post
      */
     private function canedit(array $topic, array $post): bool
@@ -738,7 +738,7 @@ final class Topic
     }
 
     /**
-     * @param array<string,null|float|int|string> $topic
+     * @param array<string,mixed> $topic
      */
     private function canModerate(array $topic): bool
     {
@@ -780,7 +780,7 @@ final class Topic
     }
 
     /**
-     * @param array<string,null|float|int|string> $topic
+     * @param array<string,mixed> $topic
      */
     private function quickEditPost(array $topic, int $pid): void
     {
@@ -853,7 +853,7 @@ final class Topic
     }
 
     /**
-     * @param array<string,null|float|int|string> $topic
+     * @param array<string,mixed> $topic
      */
     private function multiQuote(array $topic): void
     {
@@ -942,7 +942,7 @@ final class Topic
     }
 
     /**
-     * @param array<string,null|float|int|string> $topic
+     * @param array<string,mixed> $topic
      */
     private function findPost(array $topic, int $postId): void
     {
@@ -986,7 +986,7 @@ final class Topic
     }
 
     /**
-     * @param array<string,null|float|int|string> $topic
+     * @param array<string,mixed> $topic
      */
     private function markRead(array $topic): void
     {
@@ -996,7 +996,7 @@ final class Topic
     }
 
     /**
-     * @param array<string,null|float|int|string> $topic
+     * @param array<string,mixed> $topic
      */
     private function viewRSS(array $topic): void
     {
