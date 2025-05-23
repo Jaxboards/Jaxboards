@@ -54,10 +54,9 @@ final class Shoutbox
         }
 
         $this->shoutlimit = (int) $this->config->getSetting('shoutbox_num');
-        if (
-            is_numeric($this->request->both('shoutbox_delete'))
-        ) {
-            $this->deleteShout();
+        $shoutboxDelete = (int) $this->request->both('shoutbox_delete');
+        if ($shoutboxDelete) {
+            $this->deleteShout($shoutboxDelete);
         } elseif (
             $this->request->both('module') === 'shoutbox'
         ) {
@@ -319,15 +318,14 @@ final class Shoutbox
         $this->page->append('PAGE', $page);
     }
 
-    public function deleteShout(): null
+    public function deleteShout(int $delete): void
     {
-        $delete = $this->request->both('shoutbox_delete') ?? 0;
         $candelete = !$this->user->isGuest() && $this->canDelete($delete);
 
         if (!$candelete) {
             $this->page->location('?');
 
-            return null;
+            return;
         }
 
         $this->page->command('softurl');
@@ -337,13 +335,13 @@ final class Shoutbox
             $delete,
         );
 
-        return null;
+        return;
     }
 
     public function addShout(): void
     {
         $this->session->act();
-        $shout = $this->request->asString->post('shoutbox_shout');
+        $shout = $this->request->asString->post('shoutbox_shout') ?? '';
         $shout = $this->textFormatting->linkify($shout);
 
         $perms = $this->user->getPerms();
