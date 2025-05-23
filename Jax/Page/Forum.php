@@ -60,7 +60,8 @@ final class Forum
 
     public function render(): void
     {
-        $page = (int ) $this->request->asString->both('page');;
+        $page = (int) $this->request->asString->both('page');
+
         if ($page > 0) {
             $this->pageNumber = $page - 1;
         }
@@ -217,7 +218,7 @@ final class Forum
         $rows = '';
         while ($forum = $this->database->arow($result)) {
             $fdata['topics'] -= $forum['topics'];
-            if ($this->pageNumber) {
+            if ($this->pageNumber !== 0) {
                 continue;
             }
 
@@ -530,9 +531,6 @@ final class Forum
         );
     }
 
-    /**
-     * @param array<string,mixed>
-     */
     private function isForumRead(array $forum): bool
     {
         if (!$this->forumsRead) {
