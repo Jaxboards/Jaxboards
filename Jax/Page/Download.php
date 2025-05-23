@@ -28,24 +28,22 @@ final readonly class Download
 
     public function render(): void
     {
-        $this->downloadFile($this->request->both('id'));
+        $this->downloadFile((int) $this->request->asString->both('id'));
     }
 
-    private function downloadFile(null|array|string $id): void
+    private function downloadFile(int $id): void
     {
-        if (is_numeric($id)) {
-            $result = $this->database->safeselect(
-                [
-                    'name',
-                    'hash',
-                ],
-                'files',
-                Database::WHERE_ID_EQUALS,
-                $id,
-            );
-            $data = $this->database->arow($result);
-            $this->database->disposeresult($result);
-        }
+        $result = $this->database->safeselect(
+            [
+                'name',
+                'hash',
+            ],
+            'files',
+            Database::WHERE_ID_EQUALS,
+            $id,
+        );
+        $data = $this->database->arow($result);
+        $this->database->disposeresult($result);
 
         if (!$data) {
             return;
