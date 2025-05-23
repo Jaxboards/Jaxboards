@@ -401,6 +401,9 @@ final class Topic
         $this->page->append('PAGE', $page);
     }
 
+    /**
+     * @param array<string,null|float|int|string> $topic
+     */
     private function update(array $topic): void
     {
         $tid = $topic['id'];
@@ -525,6 +528,9 @@ final class Topic
         $this->page->command('updateqreply', '');
     }
 
+    /**
+     * @param array<string,null|float|int|string> $topic
+     */
     private function postsintooutput(array $topic, $lastpid = 0): string
     {
         $usersonline = $this->database->getUsersOnline();
