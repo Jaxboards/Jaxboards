@@ -12,6 +12,7 @@ use Jax\Session;
 use Jax\Template;
 use Jax\User;
 
+use function array_filter;
 use function array_search;
 use function explode;
 use function implode;
@@ -172,7 +173,7 @@ final readonly class BuddyList
     {
         $friends = array_filter(
             explode(',', (string) $this->user->get('friends')),
-            fn($friend) => (bool) $friend,
+            static fn($friend): bool => (bool) $friend,
         );
         $error = null;
 
