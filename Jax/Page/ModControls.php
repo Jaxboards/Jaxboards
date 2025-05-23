@@ -27,7 +27,6 @@ use function filter_var;
 use function gmdate;
 use function header;
 use function implode;
-use function is_numeric;
 use function nl2br;
 
 use const FILTER_VALIDATE_IP;
@@ -78,12 +77,12 @@ final readonly class ModControls
             return;
         }
 
-        $dot = $this->request->post('dot');
+        $dot = $this->request->asString->post('dot');
         if ($dot !== null) {
             $this->modTopics->doTopics($dot);
         }
 
-        $dop = $this->request->post('dop');
+        $dop = $this->request->asString->post('dop');
         if ($dop !== null) {
             $this->modPosts->doPosts($dop);
         }
@@ -93,8 +92,12 @@ final readonly class ModControls
             'modt' => $this->modTopics->addTopic((int) $this->request->both('tid')),
             'load' => $this->load(),
             'cp' => $this->showModCP(),
-            'emem' => $this->editMembers(),
-            'iptools' => $this->ipTools(),
+            'emem' => $this->showModCP(match (true) {
+                $this->request->post('submit') === 'showform'
+                    || $this->request->both('mid') !== null => $this->editMember(),
+                default => $this->selectMemberToEdit(),
+            }),
+            'iptools' => $this->showModCP($this->ipTools()),
             default => null,
         };
     }
@@ -146,13 +149,154 @@ final readonly class ModControls
         $this->page->command('update', 'page', $page);
     }
 
-    private function editMembers(): void
+    private function updateMember(): string
     {
-        if (!$this->user->getPerm('can_moderate')) {
-            return;
+        $displayName = $this->request->asString->post('display_name');
+        if (!$displayName) {
+            return $this->template->meta('error', 'Display name is invalid.');
         }
 
-        $error = null;
+        $updateResult = $this->database->safeupdate(
+            'members',
+            [
+                'about' => $this->request->asString->post('about'),
+                'avatar' => $this->request->asString->post('avatar'),
+                'display_name' => $displayName,
+                'full_name' => $this->request->asString->post('full_name'),
+                'sig' => $this->request->asString->post('signature'),
+            ],
+            Database::WHERE_ID_EQUALS,
+            $this->database->basicvalue((int) $this->request->asString->post('mid')),
+        );
+
+        if ($updateResult === null) {
+            return $this->template->meta(
+                'error',
+                'Error updating profile information.',
+            );
+        }
+
+        return $this->template->meta('success', 'Profile information saved.');
+    }
+
+    private function editMember(): string
+    {
+        $page = '';
+        $memberFields = [
+            'group_id',
+            'id',
+            'display_name',
+            'avatar',
+            'full_name',
+            'about',
+            'sig',
+        ];
+
+        $member = null;
+
+        $memberId = (int) $this->request->asString->both('mid');
+        $memberName = $this->request->asString->post('mname');
+
+        if (
+            $this->request->post('submit') === 'save'
+        ) {
+            $page .= $this->updateMember();
+        }
+
+        // Get the member data.
+        if ($memberId !== 0) {
+            $result = $this->database->safeselect(
+                $memberFields,
+                'members',
+                Database::WHERE_ID_EQUALS,
+                $this->database->basicvalue($memberId),
+            );
+            $member = $this->database->arow($result);
+            $this->database->disposeresult($result);
+        } elseif (!$memberName) {
+            return $this->template->meta('error', 'Member name is a required field.');
+        } else {
+            $result = $this->database->safeselect(
+                $memberFields,
+                'members',
+                'WHERE `display_name` LIKE ?',
+                $this->database->basicvalue($memberName . '%'),
+            );
+            $members = $this->database->arows($result);
+            if (count($members) > 1) {
+                return $this->template->meta('error', 'Many users found!');
+            }
+            $member = array_shift($members);
+        }
+
+        if (!$member) {
+            return $this->template->meta('error', 'No members found that matched the criteria.');
+        }
+
+        if (
+            $this->user->get('group_id') !== 2
+            || $member['group_id'] === 2
+            && ($this->user->get('id') !== 1
+                && $member['id'] !== $this->user->get('id'))
+        ) {
+            return $this->template->meta('error', 'You do not have permission to edit this profile.');
+        }
+
+        function field(string $label, string $name, string $value, $type = 'input'): string
+        {
+            $input = $type === 'textarea'
+                ? <<<HTML
+                    <textarea name="{$name}" id="m_{$name}">{$value}</textarea>
+                HTML
+                : <<<HTML
+                    <input type="text" id="m_{$name}" name="{$name}" value="{$value}" />'
+                HTML;
+            return <<<HTML
+                <tr>
+                    <td><label for="m_{$name}">{$label}</label></td>
+                    <td>{$input}</td>
+                </tr>
+                HTML;
+        }
+
+        $hiddenFormFields = $this->jax->hiddenFormFields(
+            [
+                'act' => 'modcontrols',
+                'do' => 'emem',
+                'mid' => $member['id'],
+                'submit' => 'save',
+            ],
+        );
+        $fieldRows = implode('', [
+            field('Display Name', 'display_name', $member['display_name']),
+            field('Avatar', 'avatar', $member['avatar']),
+            field('Full Name', 'full_name', $member['full_name']),
+            field(
+                'About',
+                'about',
+                $this->textFormatting->blockhtml($member['about']),
+                'textarea',
+            ),
+            field(
+                'Signature',
+                'signature',
+                $this->textFormatting->blockhtml($member['sig']),
+                'textarea',
+            )
+        ]);
+        return $page . <<<HTML
+            <form method="post" data-ajax-form="true">
+                {$hiddenFormFields}
+                <table>
+                    {$fieldRows}
+                </table>
+                <input type="submit" value="Save" />
+            </form>
+            HTML;
+    }
+
+    private function selectMemberToEdit(): string
+    {
         $hiddenFormFields = $this->jax->hiddenFormFields(
             [
                 'act' => 'modcontrols',
@@ -160,7 +304,7 @@ final readonly class ModControls
                 'submit' => 'showform',
             ],
         );
-        $page = <<<HTML
+        return <<<HTML
             <form method="post" data-ajax-form="true">
                 {$hiddenFormFields}
                 Member name:
@@ -173,146 +317,9 @@ final readonly class ModControls
                 <input type="submit" type="View member details" value="Go" />
             </form>
             HTML;
-        if (
-            $this->request->post('submit') === 'save'
-        ) {
-            $displayName = $this->request->asString->post('display_name');
-            if (!$displayName) {
-                $page .= $this->template->meta('error', 'Display name is invalid.');
-            } else {
-                $updateResult = $this->database->safeupdate(
-                    'members',
-                    [
-                        'about' => $this->request->asString->post('about'),
-                        'avatar' => $this->request->asString->post('avatar'),
-                        'display_name' => $displayName,
-                        'full_name' => $this->request->asString->post('full_name'),
-                        'sig' => $this->request->asString->post('signature'),
-                    ],
-                    Database::WHERE_ID_EQUALS,
-                    $this->database->basicvalue((int) $this->request->asString->post('mid')),
-                );
-
-                if ($updateResult === null) {
-                    $page .= $this->template->meta(
-                        'error',
-                        'Error updating profile information.',
-                    );
-                } else {
-                    $page .= $this->template->meta('success', 'Profile information saved.');
-                }
-            }
-        }
-
-        if (
-            $this->request->post('submit') === 'showform'
-            || $this->request->both('mid') !== null
-        ) {
-            $memberFields = [
-                'group_id',
-                'id',
-                'display_name',
-                'avatar',
-                'full_name',
-                'about',
-                'sig',
-            ];
-
-            $member = null;
-
-            $memberName = $this->request->asString->post('mname');
-
-            // Get the member data.
-            if (is_numeric($this->request->both('mid'))) {
-                $result = $this->database->safeselect(
-                    $memberFields,
-                    'members',
-                    Database::WHERE_ID_EQUALS,
-                    $this->database->basicvalue($this->request->both('mid')),
-                );
-                $member = $this->database->arow($result);
-                $this->database->disposeresult($result);
-            } elseif ($memberName) {
-                $result = $this->database->safeselect(
-                    $memberFields,
-                    'members',
-                    'WHERE `display_name` LIKE ?',
-                    $this->database->basicvalue($memberName . '%'),
-                );
-                $members = $this->database->arows($result);
-
-                if (count($members) > 1) {
-                    $error = 'Many users found!';
-                } else {
-                    $member = array_shift($members);
-                }
-            } else {
-                $error = 'Member name is a required field.';
-            }
-
-            if (!$member) {
-                $error = 'No members found that matched the criteria.';
-            }
-
-            if (
-                $this->user->get('group_id') !== 2
-                || $member['group_id'] === 2
-                && ($this->user->get('id') !== 1
-                    && $member['id'] !== $this->user->get('id'))
-            ) {
-                $error = 'You do not have permission to edit this profile.';
-            }
-
-            if ($error !== null) {
-                $page .= $this->template->meta('error', $error);
-            } else {
-                function field(string $label, string $name, string $value, $type = 'input'): string
-                {
-                    return '<tr><td><label for="m_' . $name . '">' . $label
-                        . '</label></td><td>'
-                        . ($type === 'textarea' ? '<textarea name="' . $name
-                            . '" id="m_' . $name . '">' . $value . '</textarea>'
-                            : '<input type="text" id="m_' . $name . '" name="' . $name
-                            . '" value="' . $value . '" />') . '</td></tr>';
-                }
-
-                $page .= '<form method="post" '
-                    . 'data-ajax-form="true"><table>';
-                $page .= $this->jax->hiddenFormFields(
-                    [
-                        'act' => 'modcontrols',
-                        'do' => 'emem',
-                        'mid' => $member['id'],
-                        'submit' => 'save',
-                    ],
-                );
-                $page .= field(
-                    'Display Name',
-                    'display_name',
-                    $member['display_name'],
-                )
-                    . field('Avatar', 'avatar', $member['avatar'])
-                    . field('Full Name', 'full_name', $member['full_name'])
-                    . field(
-                        'About',
-                        'about',
-                        $this->textFormatting->blockhtml($member['about']),
-                        'textarea',
-                    )
-                    . field(
-                        'Signature',
-                        'signature',
-                        $this->textFormatting->blockhtml($member['sig']),
-                        'textarea',
-                    );
-                $page .= '</table><input type="submit" value="Save" /></form>';
-            }
-        }
-
-        $this->showModCP($page);
     }
 
-    private function ipTools(): void
+    private function ipTools(): string
     {
         $page = '';
 
@@ -479,7 +486,7 @@ final readonly class ModControls
             $page .= $this->box('Last 5 posts:', $content);
         }
 
-        $this->showModCP($form . $page);
+        return $form . $page;
     }
 
     private function box(string $title, string $content): string

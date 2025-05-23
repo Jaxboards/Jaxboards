@@ -68,7 +68,7 @@ final readonly class ModPosts
         $this->sync();
     }
 
-    public function doPosts(array|string $doAct): void
+    public function doPosts(string $doAct): void
     {
         $pids = $this->getModPids();
 
