@@ -14,6 +14,8 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
+use function array_filter;
+use function array_key_exists;
 use function array_map;
 use function array_slice;
 use function ceil;
@@ -36,7 +38,7 @@ final class Search
     private int $pageNum = 0;
 
     /**
-     * @var array<int> $fids
+     * @var array<int>
      */
     private array $fids = [];
 
@@ -112,8 +114,8 @@ final class Search
         foreach ($this->database->arows($result) as $forum) {
             $titles[$forum['id']] = $forum['title'];
             $path = array_map(
-                fn($fid) => (int) $fid,
-                trim($forum['path'] ?? '') !== '' ? explode(' ', (string) $forum['path']) : []
+                static fn($fid): int => (int) $fid,
+                trim($forum['path'] ?? '') !== '' ? explode(' ', (string) $forum['path']) : [],
             );
             $t = &$tree;
             foreach ($path as $forumId) {
@@ -139,7 +141,7 @@ final class Search
 
     /**
      * @param array<int,mixed> $tree
-     * @param array<string> $titles
+     * @param array<string>    $titles
      */
     private function rtreeselect(
         array $tree,
@@ -161,7 +163,7 @@ final class Search
             $options .= $this->rtreeselect($v, $titles, $level + 1);
         }
 
-        if (!$level) {
+        if ($level === 0) {
             return '<select size="15" title="List of forums" multiple="multiple" name="fids">' . $options . '</select>';
         }
 
@@ -185,7 +187,7 @@ final class Search
             $this->getSearchableForums();
             $fidsInput = $this->request->both('fids');
             $fids = is_array($fidsInput)
-                ? array_filter($fidsInput, fn($fid) => in_array((int) $fid, $this->fids, true))
+                ? array_filter($fidsInput, fn($fid): bool => in_array((int) $fid, $this->fids, true))
                 : $this->fids;
 
             $datestart = null;
@@ -214,7 +216,7 @@ final class Search
                 $topicValues[] = $fids;
             }
 
-            if ($authorId) {
+            if ($authorId !== 0) {
                 $postParams[] = 'p.`auth_id`=?';
                 $postValues[] = $authorId;
                 $topicParams[] = 't.`auth_id`=?';
