@@ -94,9 +94,9 @@ class Database
         return '`' . $this->prefix . $tableName . '`';
     }
 
-    public function affectedRows(PDOStatement $pdoStatement): int
+    public function affectedRows(?PDOStatement $pdoStatement): int
     {
-        return $pdoStatement->rowCount();
+        return $pdoStatement?->rowCount();
     }
 
     /**
