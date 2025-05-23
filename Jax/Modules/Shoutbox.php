@@ -16,14 +16,11 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
-use function array_pop;
 use function ceil;
 use function is_numeric;
 use function mb_strlen;
 use function mb_substr;
 use function trim;
-
-use const PHP_EOL;
 
 final class Shoutbox
 {
@@ -252,7 +249,7 @@ final class Shoutbox
         $pages = '';
         $page = '';
         if ($pagen > 0) {
-            $pagen--;
+            --$pagen;
         }
 
         $result = $this->database->safeselect(
@@ -322,14 +319,15 @@ final class Shoutbox
         $this->page->append('PAGE', $page);
     }
 
-    public function deleteShout()
+    public function deleteShout(): null
     {
         $delete = $this->request->both('shoutbox_delete') ?? 0;
         $candelete = !$this->user->isGuest() && $this->canDelete($delete);
 
         if (!$candelete) {
             $this->page->location('?');
-            return;
+
+            return null;
         }
 
         $this->page->command('softurl');
