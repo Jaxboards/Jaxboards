@@ -15,11 +15,6 @@ use Jax\User;
 
 final class Comments
 {
-    /**
-     * @var array<string,null|float|int|string>
-     */
-    private ?array $profile = null;
-
     public function __construct(
         private readonly Database $database,
         private readonly Date $date,
@@ -36,12 +31,10 @@ final class Comments
      */
     public function render(array $profile): string
     {
-        $this->profile = $profile;
-
         $tabHTML = '';
 
         $this->handleCommentDeletion();
-        $tabHTML .= $this->handleCommentCreation();
+        $tabHTML .= $this->handleCommentCreation($profile);
 
         if (
             !$this->user->isGuest()
@@ -53,7 +46,7 @@ final class Comments
                 $this->user->get('avatar') ?: $this->template->meta('default-avatar'),
                 $this->jax->hiddenFormFields(
                     [
-                        'act' => 'vu' . $this->profile['id'],
+                        'act' => 'vu' . $profile['id'],
                         'page' => 'comments',
                         'view' => 'profile',
                     ],
@@ -61,14 +54,14 @@ final class Comments
             );
         }
 
-        $comments = $this->fetchComments();
+        $comments = $this->fetchComments($profile);
 
         if (!$comments) {
             return $tabHTML . 'No comments to display!';
         }
 
         foreach ($comments as $comment) {
-            $act = $this->request->both('act');
+            $act = $this->request->asString->both('act');
             $deleteLink = $this->user->getPerm('can_delete_comments')
                 && $comment['from'] === $this->user->get('id')
                 || $this->user->getPerm('can_moderate') ? <<<HTML
@@ -95,9 +88,10 @@ final class Comments
     }
 
     /**
+     * @param array<string,null|float|int|string> $profile
      * @return array<array<string,mixed>>
      */
-    private function fetchComments(): ?array
+    private function fetchComments(array $profile): array
     {
         $result = $this->database->safespecial(
             <<<'SQL'
@@ -118,7 +112,7 @@ final class Comments
                 LIMIT 10
                 SQL,
             ['profile_comments', 'members'],
-            $this->profile['id'],
+            $profile['id'],
         );
         $comments = $this->database->arows($result);
         $this->database->disposeresult($result);
@@ -126,7 +120,10 @@ final class Comments
         return $comments;
     }
 
-    private function handleCommentCreation(): string
+    /**
+     * @param array<string,null|float|int|string> $profile
+     */
+    private function handleCommentCreation(array $profile): string
     {
         $comment = $this->request->asString->post('comment');
         if (!$comment) {
@@ -150,7 +147,7 @@ final class Comments
         $this->database->safeinsert(
             'activity',
             [
-                'affected_uid' => $this->profile['id'],
+                'affected_uid' => $profile['id'],
                 'date' => $this->database->datetime(),
                 'type' => 'profile_comment',
                 'uid' => $this->user->get('id'),
@@ -162,7 +159,7 @@ final class Comments
                 'comment' => $comment,
                 'date' => $this->database->datetime(),
                 'from' => $this->user->get('id'),
-                'to' => $this->profile['id'],
+                'to' => $profile['id'],
             ],
         );
 
@@ -171,7 +168,7 @@ final class Comments
 
     private function handleCommentDeletion(): void
     {
-        $deleteComment = (int) $this->request->both('del');
+        $deleteComment = (int) $this->request->asString->both('del');
         if ($deleteComment === 0) {
             return;
         }

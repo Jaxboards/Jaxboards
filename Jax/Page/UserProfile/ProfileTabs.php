@@ -28,11 +28,6 @@ final class ProfileTabs
         'friends',
     ];
 
-    /**
-     * @var array<string,null|float|int|string> the profile we are currently viewing
-     */
-    private ?array $profile = null;
-
     public function __construct(
         private readonly Activity $activity,
         private readonly Comments $comments,
@@ -46,32 +41,29 @@ final class ProfileTabs
     ) {}
 
     /**
-     * @param array<string,mixed> $profile
+     * @param array<string,null|float|int|string> $profile
      *
      * @return list{list<string>,string}
      */
-    public function render(?array $profile): array
+    public function render(array $profile): array
     {
-        $this->profile = $profile;
-
         $page = $this->request->both('page');
         $selectedTab = in_array($page, self::TABS, true) ? $page : 'activity';
 
-
         $tabHTML = match ($selectedTab) {
-            'posts' => $this->showTabPosts(),
-            'topics' => $this->showTabTopics(),
-            'about' => $this->showTabAbout(),
-            'friends' => $this->showTabFriends(),
-            'comments' => $this->comments->render($this->profile),
-            default => $this->activity->render($this->profile),
+            'posts' => $this->showTabPosts($profile),
+            'topics' => $this->showTabTopics($profile),
+            'about' => $this->showTabAbout($profile),
+            'friends' => $this->showTabFriends($profile),
+            'comments' => $this->comments->render($profile),
+            default => $this->activity->render($profile),
         };
 
         $tabs = array_map(
-            function ($tab) use ($selectedTab): string {
+            function ($tab) use ($selectedTab, $profile): string {
                 $active = ($tab === $selectedTab ? ' class="active"' : '');
                 $uppercase = ucwords($tab);
-                $profileId = $this->profile['id'];
+                $profileId = $profile['id'];
 
                 return <<<HTML
                     <a href="?act=vu{$profileId}&page={$tab}" {$active}>{$uppercase}</a>
@@ -85,21 +77,26 @@ final class ProfileTabs
         return [$tabs, $tabHTML];
     }
 
-    private function showTabAbout(): string
+    /**
+     * @param array<string,null|float|int|string> $profile
+     */
+    private function showTabAbout(array $profile): string
     {
         return $this->template->meta(
             'userprofile-about',
-            $this->textFormatting->theWorks($this->profile['about']),
-            $this->textFormatting->theWorks($this->profile['sig']),
+            $this->textFormatting->theWorks((string) $profile['about']),
+            $this->textFormatting->theWorks((string) $profile['sig']),
         );
     }
 
     /**
+     * @param array<string,null|float|int|string> $profile
+     *
      * @return null|array<array<string,int|string>>
      */
-    private function fetchFriends(): ?array
+    private function fetchFriends(array $profile): ?array
     {
-        if (!$this->profile['friends']) {
+        if (!$profile['friends']) {
             return null;
         }
 
@@ -113,7 +110,7 @@ final class ProfileTabs
             ],
             'members',
             Database::WHERE_ID_IN,
-            explode(',', (string) $this->profile['friends']),
+            explode(',', (string) $profile['friends']),
         );
         $friends = $this->database->arows($result);
         $this->database->disposeresult($result);
@@ -121,9 +118,12 @@ final class ProfileTabs
         return $friends;
     }
 
-    private function showTabFriends(): string
+    /**
+     * @param array<string,null|float|int|string> $profile
+     */
+    private function showTabFriends(array $profile): string
     {
-        $friends = $this->fetchFriends();
+        $friends = $this->fetchFriends($profile);
         if (!$friends) {
             return "I'm pretty lonely, I have no friends. :(";
         }
@@ -146,7 +146,10 @@ final class ProfileTabs
         return "<div class='contacts'>{$tabHTML}<br clear='all' /></div>";
     }
 
-    private function showTabTopics(): string
+    /**
+     * @param array<string,null|float|int|string> $profile
+     */
+    private function showTabTopics(array $profile): string
     {
         $tabHTML = '';
         $result = $this->database->safespecial(
@@ -169,7 +172,7 @@ final class ProfileTabs
                 LIMIT 10
                 SQL,
             ['posts', 'topics', 'forums'],
-            $this->profile['id'],
+            $profile['id'],
         );
         while ($post = $this->database->arow($result)) {
             $perms = $this->user->getForumPerms($post['perms']);
@@ -193,9 +196,11 @@ final class ProfileTabs
         return $tabHTML;
     }
 
-    private function showTabPosts(): string
+    /**
+     * @param array<string,null|float|int|string> $profile
+     */
+    private function showTabPosts(array $profile): string
     {
-        $profile = $this->profile;
         $tabHTML = '';
 
         $result = $this->database->safespecial(

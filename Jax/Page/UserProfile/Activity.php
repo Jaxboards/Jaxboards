@@ -177,7 +177,7 @@ final readonly class Activity
     }
 
     /**
-     * @return array<string,mixed>
+     * @return array<int,array<string,mixed>>
      */
     private function fetchActivities(int $profileId): array
     {
@@ -207,9 +207,6 @@ final readonly class Activity
             $profileId,
             self::ACTIVITY_LIMIT,
         );
-        $rows = $this->database->arows($result);
-        $this->database->disposeresult($result);
-
-        return $rows ?? [];
+        return $this->database->arows($result);
     }
 }

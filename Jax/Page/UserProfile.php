@@ -25,11 +25,6 @@ use function ucfirst;
 
 final class UserProfile
 {
-    /**
-     * @var array<string,null|float|int|string> the profile we are currently viewing
-     */
-    private ?array $profile = null;
-
     public function __construct(
         private readonly ContactDetails $contactDetails,
         private readonly Database $database,
@@ -56,12 +51,12 @@ final class UserProfile
             return;
         }
 
-        $this->profile = $userId !== 0 ? $this->fetchUser($userId) : null;
+        $profile = $userId !== 0 ? $this->fetchUser($userId) : null;
 
         match (true) {
-            !$this->profile => $this->showProfileError(),
-            $this->didComeFromForum() => $this->showContactCard(),
-            (bool) $this->user->getPerm('can_view_fullprofile') => $this->showFullProfile(),
+            !$profile => $this->showProfileError(),
+            $this->didComeFromForum() => $this->showContactCard($profile),
+            (bool) $this->user->getPerm('can_view_fullprofile') => $this->showFullProfile($profile),
             default => $this->page->location('?'),
         };
     }
@@ -152,9 +147,11 @@ final class UserProfile
         );
     }
 
-    private function renderContactDetails(): string
+    /**
+     * @param array<string,null|float|int|string> $profile
+     */
+    private function renderContactDetails(array $profile): string
     {
-        $profile = $this->profile;
         $contactDetails = '';
 
         $links = $this->contactDetails->getContactLinks($profile);
@@ -190,10 +187,12 @@ final class UserProfile
         return $contactDetails;
     }
 
-    private function showContactCard(): void
+    /**
+     * @param array<string,null|float|int|string> $profile
+     */
+    private function showContactCard(array $profile): void
     {
         $contactdetails = '';
-        $profile = $this->profile;
 
         foreach ($this->contactDetails->getContactLinks($profile) as $type => [$href]) {
             $contactdetails .= <<<"HTML"
@@ -231,10 +230,12 @@ final class UserProfile
         );
     }
 
-    private function showFullProfile(): void
+    /**
+     * @param array<string,null|float|int|string> $profile
+     */
+    private function showFullProfile(array $profile): void
     {
-        [$tabs, $tabHTML] = $this->profileTabs->render($this->profile);
-        $profile = $this->profile;
+        [$tabs, $tabHTML] = $this->profileTabs->render($profile);
 
         $this->page->setBreadCrumbs(
             [
@@ -242,7 +243,7 @@ final class UserProfile
             ],
         );
 
-        $contactdetails = $this->renderContactDetails();
+        $contactdetails = $this->renderContactDetails($profile);
 
         $page = $this->template->meta(
             'userprofile-full-profile',
