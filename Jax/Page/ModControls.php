@@ -318,7 +318,7 @@ final readonly class ModControls
     {
         $page = '';
 
-        $ipAddress = (string) $this->request->both('ip');
+        $ipAddress = (string) $this->request->asString->both('ip');
         if (!filter_var($ipAddress, FILTER_VALIDATE_IP)) {
             $ipAddress = '';
         }
@@ -338,9 +338,10 @@ final readonly class ModControls
         }
 
         if ($changed) {
-            $fileHandle = fopen($this->domainDefinitions->getBoardPath() . '/bannedips.txt', 'w');
-            fwrite($fileHandle, implode(PHP_EOL, $this->ipAddress->getBannedIps()));
-            fclose($fileHandle);
+            file_put_contents(
+                $this->domainDefinitions->getBoardPath() . '/bannedips.txt',
+                implode(PHP_EOL, $this->ipAddress->getBannedIps())
+            );
         }
 
         $hiddenFields = $this->jax->hiddenFormFields(
