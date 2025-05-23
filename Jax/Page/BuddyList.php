@@ -76,19 +76,20 @@ final readonly class BuddyList
             return;
         }
 
-        if ($this->request->both('add') !== null) {
-            $this->addbuddy($this->request->both('add'));
-        } elseif ($this->request->both('remove') !== null) {
-            $this->dropbuddy($this->request->both('remove'));
-        } elseif ($this->request->both('status') !== null) {
-            $this->setstatus($this->request->both('status'));
-        } elseif ($this->request->both('block') !== null) {
-            $this->block($this->request->both('block'));
-        } elseif ($this->request->both('unblock') !== null) {
-            $this->unblock($this->request->both('unblock'));
-        } else {
-            $this->displaybuddylist();
-        }
+        $add = $this->request->asString->both('add');
+        $remove = $this->request->asString->both('remove');
+        $status = $this->request->asString->both('status');
+        $block = $this->request->asString->both('block');
+        $unblock = $this->request->asString->both('unblock');
+
+        match (true) {
+            $add !== null => $this->addbuddy($add),
+            $remove !== null => $this->dropbuddy($remove),
+            $status !== null => $this->setstatus($status),
+            $block !== null => $this->block($block),
+            $unblock !== null => $this->unblock($unblock),
+            default => $this->displaybuddylist(),
+        };
     }
 
     private function displaybuddylist(): void
@@ -167,9 +168,12 @@ final readonly class BuddyList
         );
     }
 
-    private function addbuddy(array|string $uid): void
+    private function addbuddy(string $uid): void
     {
-        $friends = $this->user->get('friends');
+        $friends = array_filter(
+            explode(',', (string) $this->user->get('friends')),
+            fn($friend) => (bool) $friend,
+        );
         $error = null;
 
         if (
@@ -194,7 +198,7 @@ final readonly class BuddyList
         if (!$user) {
             $error = 'This user does not exist, and therefore could '
                 . 'not be added to your contacts list.';
-        } elseif (in_array($uid, explode(',', (string) $friends))) {
+        } elseif (in_array($uid, $friends)) {
             $error = 'This user is already in your contacts list.';
         }
 
@@ -202,26 +206,22 @@ final readonly class BuddyList
             $this->page->append('PAGE', $error);
             $this->page->command('error', $error);
         } else {
-            if ($friends) {
-                $friends .= ',' . $uid;
-            } else {
-                $friends = $uid;
-            }
+            $friends[] = $uid;
 
-            $this->user->set('friends', $friends);
+            $this->user->set('friends', implode(',', $friends));
             $this->database->safeinsert(
                 'activity',
                 [
                     'affected_uid' => $uid,
                     'type' => 'buddy_add',
-                    'uid' => $this->user->get('id'),
+                    'uid' => (int) $this->user->get('id'),
                 ],
             );
             $this->displaybuddylist();
         }
     }
 
-    private function block(array|string $uid): void
+    private function block(string $uid): void
     {
         if (!is_numeric($uid)) {
             return;
@@ -255,7 +255,7 @@ final readonly class BuddyList
         }
     }
 
-    private function unblock(array|string $uid): void
+    private function unblock(string $uid): void
     {
         if ($uid && is_numeric($uid)) {
             $enemies = explode(',', (string) $this->user->get('enemies'));
@@ -272,7 +272,7 @@ final readonly class BuddyList
         $this->displaybuddylist();
     }
 
-    private function dropbuddy(array|string $uid, int $shh = 0): void
+    private function dropbuddy(string $uid, int $shh = 0): void
     {
         if ($uid && is_numeric($uid)) {
             $friends = explode(',', (string) $this->user->get('friends'));
@@ -293,7 +293,7 @@ final readonly class BuddyList
         $this->displaybuddylist();
     }
 
-    private function setstatus(array|string $status): void
+    private function setstatus(string $status): void
     {
         if (
             $this->user->isGuest()
