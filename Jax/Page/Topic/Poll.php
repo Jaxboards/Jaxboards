@@ -110,9 +110,11 @@ final readonly class Poll
             return;
         }
 
-        if ($topicData['poll_type'] === 'multi' && is_array($choice)) {
-            foreach ($choice as $c) {
-                $results[$c][] = $this->user->get('id');
+        if (is_array($choice)) {
+            if ($topicData['poll_type'] === 'multi') {
+                foreach ($choice as $c) {
+                    $results[$c][] = $this->user->get('id');
+                }
             }
         } else {
             $results[$choice][] = $this->user->get('id');
@@ -189,7 +191,7 @@ final readonly class Poll
 
         if ($voted) {
             $resultRows = implode('', array_map(
-                static function ($index, $choice) use ($numvotes, $totalvotes): string {
+                static function (int $index, string $choice) use ($numvotes, $totalvotes): string {
                     $percentOfVotes = round($numvotes[$index] / $totalvotes * 100, 2);
 
                     return <<<HTML
