@@ -32,9 +32,9 @@ use const FILTER_VALIDATE_EMAIL;
 use const PASSWORD_DEFAULT;
 use const PHP_URL_HOST;
 
-final class ServiceInstall
+final readonly class ServiceInstall
 {
-    private array $fields = [
+    const FIELDS = [
         'admin_username' => [
             'name' => 'Admin Username',
             'placeholder' => 'admin',
@@ -99,7 +99,7 @@ final class ServiceInstall
 
         $errorsHTML = implode('', array_map(static fn($error): string => "<div class='error'>{$error}</div>", $errors));
         $formFields = '';
-        foreach ($this->fields as $field => $attributes) {
+        foreach (self::FIELDS as $field => $attributes) {
             $placeholder = $attributes['placeholder'] ?? '';
             $type = $attributes['type'];
             $value = $attributes['value'] ?? '';
@@ -201,7 +201,7 @@ final class ServiceInstall
         $errors = [];
 
         // Make sure each field is set.
-        foreach ($this->fields as $field => $attributes) {
+        foreach (self::FIELDS as $field => $attributes) {
             if ($this->request->post($field)) {
                 continue;
             }
@@ -229,7 +229,7 @@ final class ServiceInstall
             } else {
                 // Looks like we have a proper hostname,
                 // just remove the leading www. if it exists.
-                $domain = preg_replace(
+                $domain = (string) preg_replace(
                     '/^www./',
                     '',
                     $domain,
@@ -237,10 +237,10 @@ final class ServiceInstall
             }
         } else {
             // Remove www if it exists, also only grab host if url is entered.
-            $domain = preg_replace(
+            $domain = (string) preg_replace(
                 '/^www./',
                 '',
-                parse_url((string) $domain, PHP_URL_HOST),
+                (string) parse_url((string) $domain, PHP_URL_HOST),
             );
         }
 
@@ -259,10 +259,10 @@ final class ServiceInstall
                 . 'numbers, and underscore only';
         }
 
-        $connected = $this->database->connect($sqlHost, $sqlUsername, $sqlPassword, $sqlDB);
-
-        if (!$connected) {
-            $errors[] = 'There was an error connecting to the MySQL database.';
+        if (!$sqlHost || !$sqlUsername || !$sqlPassword) {
+            $errors[] = 'SQL host, username, and password fields required';
+        } else {
+            $this->database->connect($sqlHost, $sqlUsername, $sqlPassword, $sqlDB);
         }
 
         if ($errors !== []) {
@@ -339,7 +339,7 @@ final class ServiceInstall
                     [
                         'boardname' => $board,
                         'date' => $this->database->datetime(),
-                        'referral' => $this->request->both('r') ?? '',
+                        'referral' => $this->request->asString->both('r') ?? '',
                         'registrar_email' => $adminEmail,
                         'registrar_ip' => $this->ipAddress->asBinary(),
                     ],
