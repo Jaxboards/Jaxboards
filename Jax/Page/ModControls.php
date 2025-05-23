@@ -226,6 +226,7 @@ final readonly class ModControls
             if (count($members) > 1) {
                 return $this->template->meta('error', 'Many users found!');
             }
+
             $member = array_shift($members);
         }
 
@@ -246,11 +247,12 @@ final readonly class ModControls
         {
             $input = $type === 'textarea'
                 ? <<<HTML
-                    <textarea name="{$name}" id="m_{$name}">{$value}</textarea>
-                HTML
+                        <textarea name="{$name}" id="m_{$name}">{$value}</textarea>
+                    HTML
                 : <<<HTML
-                    <input type="text" id="m_{$name}" name="{$name}" value="{$value}" />'
-                HTML;
+                        <input type="text" id="m_{$name}" name="{$name}" value="{$value}" />'
+                    HTML;
+
             return <<<HTML
                 <tr>
                     <td><label for="m_{$name}">{$label}</label></td>
@@ -282,8 +284,9 @@ final readonly class ModControls
                 'signature',
                 $this->textFormatting->blockhtml($member['sig']),
                 'textarea',
-            )
+            ),
         ]);
+
         return $page . <<<HTML
             <form method="post" data-ajax-form="true">
                 {$hiddenFormFields}
@@ -304,6 +307,7 @@ final readonly class ModControls
                 'submit' => 'showform',
             ],
         );
+
         return <<<HTML
             <form method="post" data-ajax-form="true">
                 {$hiddenFormFields}
