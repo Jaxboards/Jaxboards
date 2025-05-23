@@ -349,7 +349,7 @@ final class Topic
             $this->session->getVar('topic_lastpid')
             && $this->session->getVar('topic_lastpage')
         ) {
-            $newposts = $this->postsintooutput($topic, $this->session->getVar('topic_lastpid'));
+            $newposts = $this->postsintooutput($topic, (int) $this->session->getVar('topic_lastpid'));
             if ($newposts !== '' && $newposts !== '0') {
                 $this->page->command('appendrows', '#intopic', $newposts);
             }
@@ -462,9 +462,8 @@ final class Topic
 
     /**
      * @param array<string,null|float|int|string> $topic
-     * @param mixed                               $lastpid
      */
-    private function postsintooutput(array $topic, $lastpid = 0): string
+    private function postsintooutput(array $topic, int $lastpid = 0): string
     {
         $usersonline = $this->database->getUsersOnline();
         $this->config->getSetting('ratings') ?? 0;
