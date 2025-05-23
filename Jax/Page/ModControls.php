@@ -243,24 +243,6 @@ final readonly class ModControls
             return $this->template->meta('error', 'You do not have permission to edit this profile.');
         }
 
-        function field(string $label, string $name, string $value, $type = 'input'): string
-        {
-            $input = $type === 'textarea'
-                ? <<<HTML
-                        <textarea name="{$name}" id="m_{$name}">{$value}</textarea>
-                    HTML
-                : <<<HTML
-                        <input type="text" id="m_{$name}" name="{$name}" value="{$value}" />'
-                    HTML;
-
-            return <<<HTML
-                <tr>
-                    <td><label for="m_{$name}">{$label}</label></td>
-                    <td>{$input}</td>
-                </tr>
-                HTML;
-        }
-
         $hiddenFormFields = $this->jax->hiddenFormFields(
             [
                 'act' => 'modcontrols',
@@ -269,24 +251,44 @@ final readonly class ModControls
                 'submit' => 'save',
             ],
         );
-        $fieldRows = implode('', [
-            field('Display Name', 'display_name', $member['display_name']),
-            field('Avatar', 'avatar', $member['avatar']),
-            field('Full Name', 'full_name', $member['full_name']),
-            field(
-                'About',
-                'about',
-                $this->textFormatting->blockhtml($member['about']),
-                'textarea',
-            ),
-            field(
-                'Signature',
-                'signature',
-                $this->textFormatting->blockhtml($member['sig']),
-                'textarea',
-            ),
-        ]);
-
+        $fieldRows = implode(
+            '',
+            array_map(
+                function ($field): string {
+                    [$label, $name, $value, $type] = $field;
+                    $input = $type === 'textarea'
+                        ? <<<HTML
+                            <textarea name="{$name}" id="m_{$name}">{$value}</textarea>
+                        HTML
+                        : <<<HTML
+                            <input type="text" id="m_{$name}" name="{$name}" value="{$value}" />'
+                        HTML;
+                    return <<<HTML
+                        <tr>
+                            <td><label for="m_{$name}">{$label}</label></td>
+                            <td>{$input}</td>
+                        </tr>
+                        HTML;
+                },
+                [
+                    ['Display Name', 'display_name', $member['display_name'], 'text'],
+                    ['Avatar', 'avatar', $member['avatar'], 'text'],
+                    ['Full Name', 'full_name', $member['full_name'], 'text'],
+                    [
+                        'About',
+                        'about',
+                        $this->textFormatting->blockhtml($member['about']),
+                        'textarea',
+                    ],
+                    [
+                        'Signature',
+                        'signature',
+                        $this->textFormatting->blockhtml($member['sig']),
+                        'textarea',
+                    ]
+                ]
+            )
+        );
         return $page . <<<HTML
             <form method="post" data-ajax-form="true">
                 {$hiddenFormFields}
