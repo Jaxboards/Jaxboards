@@ -67,17 +67,12 @@ final class Topic
         preg_match('@\d+$@', (string) $this->request->both('act'), $act);
         $tid = (int) $act[0] ?: 0;
 
-        if ($tid === 0) {
-            $this->page->location('?');
-
-            return;
-        }
-
         $edit = (int) $this->request->asString->both('edit');
         $findPost = (int) $this->request->asString->both('findpost');
-        $listRating = $this->request->both('listrating');
-        $ratePost = $this->request->both('ratepost');
+        $listRating = (int) $this->request->asString->both('listrating');
+        $ratePost = (int) $this->request->asString->both('ratepost');
         $this->pageNumber = max((int) $this->request->both('page') - 1, 0);
+        $quickReply = $this->request->both('qreply') !== null;
 
         $topic = $this->fetchTopicData($tid);
 
@@ -87,86 +82,23 @@ final class Topic
             return;
         }
 
-        if (
-            $this->request->both('qreply') !== null
-            && !$this->request->isJSUpdate()
-        ) {
-            if (
-                $this->request->isJSAccess()
-                && !$this->request->isJSDirectLink()
-            ) {
-                $this->quickReplyForm($topic);
-
-                return;
-            }
-
-            $this->page->location('?act=post&tid=' . $tid);
-
-            return;
-        }
-
-
-        if ($ratePost !== null) {
-            $this->reactions->toggleReaction((int) $ratePost, (int) $this->request->both('niblet'));
-
-            return;
-        }
-
-        if ($this->request->both('votepoll') !== null) {
-            $this->poll->vote($topic);
-
-            return;
-        }
-
-        if ($findPost !== 0) {
-            $this->findPost($topic, $findPost);
-
-            return;
-        }
-
-        if ($this->request->both('getlast') !== null) {
-            $this->getLastPost($tid);
-
-            return;
-        }
-
-        if ($edit !== 0) {
-            $this->quickEditPost($topic, $edit);
-
-            return;
-        }
-
-        if ($this->request->both('quote') !== null) {
-            $this->multiQuote($topic);
-
-            return;
-        }
-
-        if ($this->request->both('markread') !== null) {
-            $this->markRead($topic);
-
-            return;
-        }
-
-        if ($listRating !== null) {
-            $this->reactions->listReactions((int) $listRating);
-
-            return;
-        }
-
-        if ($this->request->isJSUpdate()) {
-            $this->update($topic);
-
-            return;
-        }
-
-        if ($this->request->both('fmt') === 'RSS') {
-            $this->viewRSS($topic);
-
-            return;
-        }
-
-        $this->viewTopic($topic);
+        match (true) {
+            $quickReply && !$this->request->isJSUpdate() => match(true) {
+                $this->request->isJSAccess() && !$this->request->isJSDirectLink() => $this->quickReplyForm($topic),
+                default => $this->page->location('?act=post&tid=' . $tid),
+            },
+            $ratePost !== 0 => $this->reactions->toggleReaction($ratePost, (int) $this->request->both('niblet')),
+            $this->request->both('votepoll') !== null => $this->poll->vote($topic),
+            $findPost !== 0 => $this->findPost($topic, $findPost),
+            $this->request->both('getlast') !== null => $this->getLastPost($tid),
+            $edit !== 0 => $this->quickEditPost($topic, $edit),
+            $this->request->both('quote') !== null => $this->multiQuote($topic),
+            $this->request->both('markread') !== null => $this->markRead($topic),
+            $listRating !== 0 => $this->reactions->listReactions($listRating),
+            $this->request->isJSUpdate() => $this->update($topic),
+            $this->request->both('fmt') === 'RSS' => $this->viewRSS($topic),
+            default => $this->viewTopic($topic),
+        };
     }
 
     /**
