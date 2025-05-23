@@ -15,13 +15,13 @@ use Jax\Request;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
-use PHP_CodeSniffer\Tokenizers\JS;
 
 use function filter_var;
 use function gmdate;
 use function header;
 use function in_array;
 use function is_numeric;
+use function is_string;
 use function mb_strlen;
 use function mb_strstr;
 use function password_hash;
@@ -34,18 +34,18 @@ use const FILTER_VALIDATE_EMAIL;
 use const FILTER_VALIDATE_URL;
 use const PASSWORD_DEFAULT;
 
-final class UCP
+final readonly class UCP
 {
     public function __construct(
-        private readonly Config $config,
-        private readonly Database $database,
-        private readonly Jax $jax,
-        private readonly Inbox $inbox,
-        private readonly Page $page,
-        private readonly Request $request,
-        private readonly TextFormatting $textFormatting,
-        private readonly Template $template,
-        private readonly User $user,
+        private Config $config,
+        private Database $database,
+        private Jax $jax,
+        private Inbox $inbox,
+        private Page $page,
+        private Request $request,
+        private TextFormatting $textFormatting,
+        private Template $template,
+        private User $user,
     ) {
         $this->template->loadMeta('ucp');
     }
@@ -95,7 +95,7 @@ final class UCP
     {
         return $this->jax->hiddenFormFields([
             'act' => 'ucp',
-            'what' => $this->request->asString->both('what')
+            'what' => $this->request->asString->both('what'),
         ]);
     }
 
@@ -124,7 +124,7 @@ final class UCP
             $this->jax->hiddenFormFields(['act' => 'ucp']),
             $this->user->get('display_name'),
             $this->user->get('avatar') ?: $this->template->meta('default-avatar'),
-            trim((string) $ucpnotepad) !== '' && trim((string) $ucpnotepad) !== '0'
+            trim($ucpnotepad) !== '' && trim($ucpnotepad) !== '0'
                 ? $this->textFormatting->blockhtml($ucpnotepad) : 'Personal notes go here.',
         );
     }
@@ -179,11 +179,11 @@ final class UCP
                 . ($this->user->get($field) ? 'checked="checked"' : '') . '/>';
         }
 
-        $this->page->command('script', <<<JS
-            if (document.querySelector('#dtnotify') && window.webkitNotifications) {
-                document.querySelector('#dtnotify').checked=(webkitNotifications.checkPermission()==0)
-            }
-        JS);
+        $this->page->command('script', <<<'JS'
+                if (document.querySelector('#dtnotify') && window.webkitNotifications) {
+                    document.querySelector('#dtnotify').checked=(webkitNotifications.checkPermission()==0)
+                }
+            JS);
 
         return $this->template->meta('ucp-sound-settings', ...$checkboxes);
     }
@@ -288,8 +288,8 @@ final class UCP
 
         $email = $this->user->get('email');
         $emailSettings = (int) $this->user->get('email_settings');
-        $notificationsChecked = $emailSettings & 2 ? 'checked' : '';
-        $adminEmailsChecked = $emailSettings & 1 ? 'checked' : '';
+        $notificationsChecked = ($emailSettings & 2) !== 0 ? 'checked' : '';
+        $adminEmailsChecked = ($emailSettings & 1) !== 0 ? 'checked' : '';
 
         return $this->template->meta(
             'ucp-email-settings',
@@ -357,7 +357,7 @@ final class UCP
     }
 
     /**
-     * Returns string error or null for success
+     * Returns string error or null for success.
      */
     private function updateProfileSettings(): ?string
     {
@@ -398,18 +398,17 @@ final class UCP
             && preg_match($badNameChars, $data['display_name'])
         ) {
             return 'Invalid characters in display name!';
-        } else {
-            $result = $this->database->safeselect(
-                'COUNT(`id`) AS `same_display_name`',
-                'members',
-                'WHERE `display_name` = ? AND `id`!=? LIMIT 1',
-                $this->database->basicvalue($data['display_name']),
-                $this->user->get('id'),
-            );
-            $displayNameCheck = $this->database->arow($result);
-            if ($displayNameCheck && $displayNameCheck['same_display_name'] > 0) {
-                return 'That display name is already in use.';
-            }
+        }
+        $result = $this->database->safeselect(
+            'COUNT(`id`) AS `same_display_name`',
+            'members',
+            'WHERE `display_name` = ? AND `id`!=? LIMIT 1',
+            $this->database->basicvalue($data['display_name']),
+            $this->user->get('id'),
+        );
+        $displayNameCheck = $this->database->arow($result);
+        if ($displayNameCheck && $displayNameCheck['same_display_name'] > 0) {
+            return 'That display name is already in use.';
         }
 
         $data['dob_year']
@@ -519,6 +518,7 @@ final class UCP
         }
 
         $this->user->setBulk($data);
+
         return null;
     }
 
@@ -529,6 +529,7 @@ final class UCP
 
             if (is_string($updateResult)) {
                 $this->page->command('error', $updateResult);
+
                 return $this->template->meta('error', $updateResult);
             }
 
