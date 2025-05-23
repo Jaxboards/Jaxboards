@@ -61,11 +61,11 @@ final class LogReg
             5 => $this->toggleinvisible(),
             6 => $this->forgotpassword(
                 $this->request->asString->both('uid'),
-                $this->request->asString->both('tokenId')
+                $this->request->asString->both('tokenId'),
             ),
             default => $this->login(
                 $this->request->asString->post('user'),
-                $this->request->asString->post('pass')
+                $this->request->asString->post('pass'),
             ),
         };
     }
