@@ -17,7 +17,7 @@ use function is_numeric;
 
 final class Members
 {
-    private float|int $pageNumber = 0;
+    private int $pageNumber = 0;
 
     private int $perpage = 20;
 
@@ -35,11 +35,9 @@ final class Members
 
     public function render(): void
     {
-        if (
-            is_numeric($this->request->both('page'))
-            && $this->request->both('page') > 0
-        ) {
-            $this->pageNumber = $this->request->both('page') - 1;
+        $page = (int) $this->request->asString->both('page');
+        if ($page > 0) {
+            $this->pageNumber = $page - 1;
         }
 
         if ($this->request->isJSUpdate()) {
@@ -62,18 +60,19 @@ final class Members
         $page = '';
 
         $sortby = 'm.`display_name`';
-        $sorthow = $this->request->both('how') === 'DESC'
+        $sorthow = $this->request->asString->both('how') === 'DESC'
             ? 'DESC' : 'ASC';
         $where = '';
+        $sortByInput = $this->request->asString->both('sortby');
         if (
-            $this->request->both('sortby') !== null
-            && isset($fields[$this->request->both('sortby')])
-            && $fields[$this->request->both('sortby')]
+            $sortByInput !== null
+            && array_key_exists($sortByInput, $fields, true)
         ) {
-            $sortby = $this->request->both('sortby');
+            $sortby = $sortByInput;
         }
 
-        if ($this->request->get('filter') === 'staff') {
+        $filter = $this->request->asString->get('filter');
+        if ($filter === 'staff') {
             $sortby = 'g.`can_access_acp` DESC ,' . $sortby;
             $where = 'WHERE g.`can_access_acp`=1 OR g.`can_moderate`=1';
         }
@@ -126,7 +125,7 @@ final class Members
             ['members', 'member_groups'],
         );
         $thisrow = $this->database->arow($nummemberquery);
-        $nummembers = $thisrow['num_members'];
+        $nummembers = $thisrow['num_members'] ?? 0;
 
         $pageNumbers = $this->jax->pages(
             (int) ceil($nummembers / $this->perpage),
@@ -141,7 +140,7 @@ final class Members
 
         $url = '?act=members'
             . ($this->pageNumber ? '&page=' . ($this->pageNumber + 1) : '')
-            . ($this->request->get('filter') ? '&filter=' . $this->request->get('filter') : '');
+            . ($filter ? '&filter=' . $filter : '');
 
         $links = [];
         foreach ($fields as $field => $fieldLabel) {
