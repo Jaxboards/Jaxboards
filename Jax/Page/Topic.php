@@ -530,6 +530,7 @@ final class Topic
 
     /**
      * @param array<string,null|float|int|string> $topic
+     * @param mixed                               $lastpid
      */
     private function postsintooutput(array $topic, $lastpid = 0): string
     {
