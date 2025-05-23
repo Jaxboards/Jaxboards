@@ -14,7 +14,6 @@ use Jax\TextFormatting;
 use Jax\User;
 
 use function array_map;
-use function array_pop;
 use function ceil;
 use function htmlspecialchars;
 use function implode;
