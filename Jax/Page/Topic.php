@@ -80,7 +80,6 @@ final class Topic
         $this->pageNumber = max((int) $this->request->both('page') - 1, 0);
 
         $topic = $this->fetchTopicData($tid);
-        $topic = $this->fetchTopicData($tid);
 
         if (!$topic || !$topic['fperms']['read']) {
             $this->page->location('?');
