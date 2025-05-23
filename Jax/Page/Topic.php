@@ -470,7 +470,7 @@ final class Topic
 
         $topicPostCounter = 0;
 
-        $query = $lastpid ? $this->database->safespecial(
+        $query = $lastpid !== 0 ? $this->database->safespecial(
             <<<'SQL'
                 SELECT m.`id` AS `id`
                     , m.`name` AS `name`
