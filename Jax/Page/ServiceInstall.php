@@ -259,8 +259,8 @@ final readonly class ServiceInstall
                 . 'numbers, and underscore only';
         }
 
-        if (!$sqlHost || !$sqlUsername || !$sqlPassword) {
-            $errors[] = 'SQL host, username, and password fields required';
+        if (!$sqlHost || !$sqlUsername || !$sqlPassword || !$sqlDB) {
+            $errors[] = 'SQL host, username, password, database fields required';
         } else {
             $this->database->connect($sqlHost, $sqlUsername, $sqlPassword, $sqlDB);
         }
