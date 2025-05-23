@@ -71,8 +71,9 @@ final readonly class Posting
 
         // Insert.
         if ($this->request->post('submit') !== null) {
-            $badword = $this->textFormatting->blockhtml($this->request->post('badword'));
-            if (!$badword || !$this->request->post('replacement')) {
+            $badword = $this->textFormatting->blockhtml($this->request->asString->post('badword'));
+            $replacement = $this->request->asString->post('replacement');
+            if (!$badword || !$replacement) {
                 $page .= $this->page->error('All fields required.');
             } elseif (
                 isset($wordfilter[$badword])
@@ -86,11 +87,11 @@ final readonly class Posting
                     'textrules',
                     [
                         'needle' => $badword,
-                        'replacement' => $this->request->post('replacement'),
+                        'replacement' => $replacement,
                         'type' => 'badword',
                     ],
                 );
-                $wordfilter[$badword] = $this->request->post('replacement');
+                $wordfilter[$badword] = $replacement;
             }
         }
 
@@ -168,32 +169,29 @@ final readonly class Posting
 
         // Insert emoticon.
         if ($this->request->post('submit') !== null) {
-            if (
-                !$this->request->post('emoticon')
-                || !$this->request->post('image')
-            ) {
+            $emoticonInput = $this->request->asString->post('emoticon');
+            $imageInput = $this->request->asString->post('image');
+            if (!$emoticonInput|| !$imageInput) {
                 $page .= $this->page->error('All fields required.');
-            } elseif (isset($emoticons[$this->textFormatting->blockhtml($this->request->post('emoticon'))])) {
+            } elseif (isset($emoticons[$this->textFormatting->blockhtml($emoticonInput)])) {
                 $page .= $this->page->error('That emoticon is already being used.');
             } else {
                 $this->database->safeinsert(
                     'textrules',
                     [
                         'enabled' => 1,
-                        'needle' => $this->textFormatting->blockhtml($this->request->post('emoticon')),
-                        'replacement' => $this->request->post('image'),
+                        'needle' => $this->textFormatting->blockhtml($emoticonInput),
+                        'replacement' => $imageInput,
                         'type' => 'emote',
                     ],
                 );
-                $emoticons[$this->textFormatting->blockhtml($this->request->post('emoticon'))] = $this->request->post('image');
+                $emoticons[$this->textFormatting->blockhtml($emoticonInput)] = $imageInput;
             }
         }
 
-        if (
-            $this->request->post('baseset') !== null
-            && $basesets[$this->request->post('baseset')]
-        ) {
-            $this->config->write(['emotepack' => $this->request->post('baseset')]);
+        $baseset = $this->request->asString->post('baseset');
+        if ($baseset !== null && array_key_exists($baseset, $basesets)) {
+            $this->config->write(['emotepack' => $baseset]);
         }
 
         if ($emoticons === []) {
@@ -298,22 +296,21 @@ final readonly class Posting
 
         // Insert.
         if ($this->request->post('submit') !== null) {
-            if (
-                !$this->request->post('img')
-                || !$this->request->post('title')
-            ) {
+            $img = $this->request->asString->post('img');
+            $title = $this->request->asString->post('title');
+            if (!$img || !$title) {
                 $page .= $this->page->error('All fields required.');
             } else {
                 $this->database->safeinsert(
                     'ratingniblets',
                     [
-                        'img' => $this->request->post('img'),
-                        'title' => $this->request->post('title'),
+                        'img' => $img,
+                        'title' => $title,
                     ],
                 );
                 $niblets[$this->database->insertId()] = [
-                    'img' => $this->request->post('img'),
-                    'title' => $this->request->post('title'),
+                    'img' => $img,
+                    'title' => $title,
                 ];
             }
         }

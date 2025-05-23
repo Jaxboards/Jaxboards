@@ -46,6 +46,9 @@ final class User
         $this->setBulk([$property => $value]);
     }
 
+    /**
+     * @param array<string,null|float|int|string> $fields
+     */
     public function setBulk(array $fields): void
     {
         $this->userData = array_merge($this->userData ?? [], $fields);

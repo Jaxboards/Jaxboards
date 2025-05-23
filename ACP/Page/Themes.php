@@ -204,7 +204,7 @@ final readonly class Themes
 
             if (
                 !$this->isValidFilename($newName)
-                || mb_strlen((string) $newName) > 50
+                || mb_strlen($newName) > 50
             ) {
                 return 'Skin name must consist of letters, numbers, spaces, and underscore, and be under 50 characters long.';
             }
@@ -249,7 +249,7 @@ final readonly class Themes
 
             if (
                 !$this->isValidFilename($wrapperNewName)
-                || mb_strlen((string) $wrapperNewName) > 50
+                || mb_strlen($wrapperNewName) > 50
             ) {
                 return 'Wrapper name must consist of letters, numbers, spaces, and underscore, and be
                     under 50 characters long.';
@@ -296,7 +296,6 @@ final readonly class Themes
 
     private function showSkinIndex(): void
     {
-        $skinError = null;
         $wrapperError = null;
 
         $deleteWrapper = $this->request->both('deletewrapper');
@@ -368,8 +367,7 @@ final readonly class Themes
             $usedwrappers[] = $f['wrapper'];
         }
 
-        $skins = ($skinError !== null ? $this->page->error($skinError) : '')
-            . $this->page->parseTemplate(
+        $skins = $this->page->parseTemplate(
                 'themes/show-skin-index-css.html',
                 [
                     'content' => $skins,

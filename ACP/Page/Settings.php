@@ -114,19 +114,20 @@ final readonly class Settings
             $this->pages_delete($this->request->both('delete'));
         }
 
-        if ($this->request->both('page') !== null) {
+        $pageAct = $this->request->asString->both('page');
+        if ($pageAct !== null) {
             $newact = preg_replace(
                 '@\W@',
                 '<span style="font-weight:bold;color:#F00;">$0</span>',
-                (string) $this->request->both('page'),
+                $pageAct,
             );
-            if ($newact !== $this->request->both('page')) {
+            if ($newact !== $pageAct) {
                 $error = 'The page URL must contain only letters and numbers. '
                     . "Invalid characters: {$newact}";
-            } elseif (mb_strlen((string) $newact) > 25) {
+            } elseif (mb_strlen($newact) > 25) {
                 $error = 'The page URL cannot exceed 25 characters.';
             } else {
-                $this->pages_edit($newact);
+                $this->pages_edit($pageAct);
 
                 return;
             }
@@ -181,7 +182,7 @@ final readonly class Settings
         );
     }
 
-    private function pages_edit(array|string $pageurl): void
+    private function pages_edit(string $pageurl): void
     {
         $page = '';
         $result = $this->database->safeselect(
@@ -192,14 +193,13 @@ final readonly class Settings
         );
         $pageinfo = $this->database->arow($result);
         $this->database->disposeresult($result);
-        if (
-            $this->request->post('pagecontents') !== null
-        ) {
+        $pagecontents = $this->request->asString->post('pagecontents');
+        if ($pagecontents !== null) {
             if ($pageinfo) {
                 $this->database->safeupdate(
                     'pages',
                     [
-                        'page' => $this->request->post('pagecontents'),
+                        'page' => $pagecontents,
                     ],
                     'WHERE `act`=?',
                     $this->database->basicvalue($pageurl),
@@ -209,12 +209,12 @@ final readonly class Settings
                     'pages',
                     [
                         'act' => $pageurl,
-                        'page' => $this->request->post('pagecontents'),
+                        'page' => $pagecontents,
                     ],
                 );
             }
 
-            $pageinfo['page'] = $this->request->post('pagecontents');
+            $pageinfo['page'] = $pagecontents;
             $page .= $this->page->success(
                 "Page saved. Preview <a href='/?act={$pageurl}'>here</a>",
             );

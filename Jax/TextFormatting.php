@@ -215,8 +215,9 @@ final readonly class TextFormatting
 
         if (
             is_array($parts)
-            && $parts['host'] === $_SERVER['HTTP_HOST']
+            && array_key_exists('host', $parts)
             && array_key_exists('query', $parts)
+            && $parts['host'] === $_SERVER['HTTP_HOST']
         ) {
             $inner = match (true) {
                 (bool) preg_match('@pid=(\d+)@', $parts['query'], $postMatch) => "Post #{$postMatch[1]}",

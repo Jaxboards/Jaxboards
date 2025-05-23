@@ -46,13 +46,10 @@ final class ServiceConfig
         $serviceConfigPath = dirname(__DIR__) . '/config.default.php';
         $this->installed = file_exists($configPath);
 
+        $CFG = [];
         require_once $this->installed ? $configPath : $serviceConfigPath;
 
-        if (isset($CFG)) {
-            return $serviceConfig = (array) $CFG;
-        }
-
-        return $serviceConfig;
+        return $serviceConfig = $CFG;
     }
 
     public function hasInstalled(): bool
@@ -93,6 +90,9 @@ final class ServiceConfig
         file_put_contents(dirname(__DIR__) . '/config.php', $this->configFileContents($data));
     }
 
+    /**
+     * @param array<string,mixed> $data
+     */
     public function configFileContents(array $data): string
     {
         $dataString = json_encode($data, JSON_PRETTY_PRINT);

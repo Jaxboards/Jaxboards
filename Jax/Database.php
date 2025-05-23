@@ -96,7 +96,7 @@ class Database
 
     public function affectedRows(?PDOStatement $pdoStatement): int
     {
-        return $pdoStatement?->rowCount();
+        return $pdoStatement?->rowCount() ?? 0;
     }
 
     /**

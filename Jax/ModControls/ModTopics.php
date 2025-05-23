@@ -318,18 +318,18 @@ final readonly class ModTopics
         $this->database->safeupdate(
             'topics',
             [
-                'fid' => $this->request->post('id'),
+                'fid' =>  $forumId,
             ],
             Database::WHERE_ID_IN,
             $this->getModTids(),
         );
         $this->cancel();
-        $fids[] = (int) $this->request->post('id');
+        $fids[] = $forumId;
         foreach ($fids as $fid) {
             $this->database->fixForumLastPost($fid);
         }
 
-        $this->page->location('?act=vf' . $this->request->post('id'));
+        $this->page->location('?act=vf' . $forumId);
     }
 
     /**

@@ -641,7 +641,7 @@ final readonly class UCP
             if (!$this->database->arow($result)) {
                 $error = 'The skin chosen no longer exists.';
             } else {
-                $skinId = $this->request->both('skin');
+                $skinId = $this->request->asString->both('skin');
 
                 $this->database->disposeresult($result);
 
