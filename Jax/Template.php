@@ -6,6 +6,7 @@ namespace Jax;
 
 use function array_key_exists;
 use function array_keys;
+use function array_map;
 use function array_merge;
 use function array_pop;
 use function array_reduce;
@@ -174,7 +175,7 @@ final class Template
     }
 
     /**
-     * @param float|int|string|null ...$args
+     * @param null|float|int|string ...$args
      */
     public function meta(string $meta, ...$args): string
     {
@@ -185,7 +186,7 @@ final class Template
                 ['<%%', '%%>'],
                 $this->userMetaDefs[$meta] ?? $this->metaDefs[$meta] ?? '',
             ),
-            array_map(fn($arg) => (string) $arg, $args),
+            array_map(static fn($arg): string => (string) $arg, $args),
         );
 
         if (array_key_exists($meta, $this->moreFormatting)) {
