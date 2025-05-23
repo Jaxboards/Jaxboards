@@ -47,6 +47,7 @@ final class ServiceConfig
         $this->installed = file_exists($configPath);
 
         $CFG = [];
+
         require_once $this->installed ? $configPath : $serviceConfigPath;
 
         return $serviceConfig = $CFG;

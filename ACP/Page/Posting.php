@@ -10,6 +10,7 @@ use Jax\Database;
 use Jax\Request;
 use Jax\TextFormatting;
 
+use function array_key_exists;
 use function array_reverse;
 use function krsort;
 use function rawurlencode;
@@ -171,7 +172,7 @@ final readonly class Posting
         if ($this->request->post('submit') !== null) {
             $emoticonInput = $this->request->asString->post('emoticon');
             $imageInput = $this->request->asString->post('image');
-            if (!$emoticonInput|| !$imageInput) {
+            if (!$emoticonInput || !$imageInput) {
                 $page .= $this->page->error('All fields required.');
             } elseif (isset($emoticons[$this->textFormatting->blockhtml($emoticonInput)])) {
                 $page .= $this->page->error('That emoticon is already being used.');

@@ -318,7 +318,7 @@ final readonly class ModTopics
         $this->database->safeupdate(
             'topics',
             [
-                'fid' =>  $forumId,
+                'fid' => $forumId,
             ],
             Database::WHERE_ID_IN,
             $this->getModTids(),

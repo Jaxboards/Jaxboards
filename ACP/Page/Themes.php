@@ -368,11 +368,11 @@ final readonly class Themes
         }
 
         $skins = $this->page->parseTemplate(
-                'themes/show-skin-index-css.html',
-                [
-                    'content' => $skins,
-                ],
-            );
+            'themes/show-skin-index-css.html',
+            [
+                'content' => $skins,
+            ],
+        );
         $this->page->addContentBox('Themes', $skins);
 
         $wrap = '';
