@@ -399,6 +399,7 @@ final readonly class UCP
         ) {
             return 'Invalid characters in display name!';
         }
+
         $result = $this->database->safeselect(
             'COUNT(`id`) AS `same_display_name`',
             'members',
