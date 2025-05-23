@@ -38,20 +38,11 @@ use const PHP_EOL;
 
 final class Topic
 {
-    private int $tid = 0;
-
     private int $pageNumber = 0;
 
     private int $numperpage = 10;
 
-    private bool $canMod = false;
-
     private int $firstPostID = 0;
-
-    /**
-     * @var array<string,mixed>
-     */
-    private ?array $topicData = null;
 
     public function __construct(
         private readonly Config $config,
@@ -75,23 +66,24 @@ final class Topic
     public function render(): void
     {
         preg_match('@\d+$@', (string) $this->request->both('act'), $act);
-        $this->tid = (int) $act[0] ?: 0;
+        $tid = (int) $act[0] ?: 0;
 
-        if ($this->tid === 0) {
+        if ($tid === 0) {
             $this->page->location('?');
 
             return;
         }
 
-        $edit = $this->request->both('edit');
-        $findPost = $this->request->both('findpost');
+        $edit = (int) $this->request->asString->both('edit');
+        $findPost = (int) $this->request->asString->both('findpost');
         $listRating = $this->request->both('listrating');
         $ratePost = $this->request->both('ratepost');
         $this->pageNumber = max((int) $this->request->both('page') - 1, 0);
 
-        $this->topicData = $this->fetchTopicData($this->tid);
+        $topic = $this->fetchTopicData($tid);
+        $topic = $this->fetchTopicData($tid);
 
-        if (!$this->topicData || !$this->topicData['fperms']['read']) {
+        if (!$topic || !$topic['fperms']['read']) {
             $this->page->location('?');
 
             return;
@@ -105,12 +97,12 @@ final class Topic
                 $this->request->isJSAccess()
                 && !$this->request->isJSDirectLink()
             ) {
-                $this->quickReplyForm($this->tid);
+                $this->quickReplyForm($topic);
 
                 return;
             }
 
-            $this->page->location('?act=post&tid=' . $this->tid);
+            $this->page->location('?act=post&tid=' . $tid);
 
             return;
         }
@@ -123,37 +115,37 @@ final class Topic
         }
 
         if ($this->request->both('votepoll') !== null) {
-            $this->poll->vote($this->topicData);
+            $this->poll->vote($topic);
 
             return;
         }
 
-        if ($findPost !== null) {
-            $this->findPost((int) $findPost);
+        if ($findPost !== 0) {
+            $this->findPost($topic, $findPost);
 
             return;
         }
 
         if ($this->request->both('getlast') !== null) {
-            $this->getLastPost($this->tid);
+            $this->getLastPost($tid);
 
             return;
         }
 
-        if ($edit !== null) {
-            $this->quickEditPost($edit);
+        if ($edit !== 0) {
+            $this->quickEditPost($topic, $edit);
 
             return;
         }
 
         if ($this->request->both('quote') !== null) {
-            $this->multiQuote($this->tid);
+            $this->multiQuote($topic);
 
             return;
         }
 
         if ($this->request->both('markread') !== null) {
-            $this->markRead($this->tid);
+            $this->markRead($topic);
 
             return;
         }
@@ -165,18 +157,18 @@ final class Topic
         }
 
         if ($this->request->isJSUpdate()) {
-            $this->update($this->tid);
+            $this->update($topic);
 
             return;
         }
 
         if ($this->request->both('fmt') === 'RSS') {
-            $this->viewRSS($this->tid);
+            $this->viewRSS($topic);
 
             return;
         }
 
-        $this->viewTopic($this->tid);
+        $this->viewTopic($topic);
     }
 
     /**
@@ -225,28 +217,25 @@ final class Topic
         return $topicData;
     }
 
-    private function viewTopic(int $tid): void
+    private function viewTopic(array $topic): void
     {
-        if (!is_array($this->topicData)) {
-            return;
-        }
-
+        $tid = $topic['id'];
         if (
             !$this->user->isGuest()
-            && $this->topicData['lp_date'] > $this->user->get('last_visit')
+            && $topic['lp_date'] > $this->user->get('last_visit')
         ) {
-            $this->markRead($tid);
+            $this->markRead($topic);
         }
 
-        $this->page->setPageTitle($this->topicData['topic_title']);
-        $this->session->set('location_verbose', "In topic '" . $this->topicData['topic_title'] . "'");
+        $this->page->setPageTitle($topic['topic_title']);
+        $this->session->set('location_verbose', "In topic '" . $topic['topic_title'] . "'");
 
         // Fix this to work with subforums.
         $this->page->setBreadCrumbs(
             [
-                "?act=vc{$this->topicData['cat_id']}" => $this->topicData['cat_title'],
-                "?act=vf{$this->topicData['fid']}" => $this->topicData['forum_title'],
-                "?act=vt{$tid}" => $this->topicData['topic_title'],
+                "?act=vc{$topic['cat_id']}" => $topic['cat_title'],
+                "?act=vf{$topic['fid']}" => $topic['forum_title'],
+                "?act=vt{$tid}" => $topic['topic_title'],
             ],
         );
 
@@ -276,16 +265,16 @@ final class Topic
         $this->session->addVar('topic_lastpage', $this->pageNumber + 1 === $totalpages);
 
         // If it's a poll, put it in.
-        $poll = $this->topicData['poll_type']
-            ? $this->poll->render($this->topicData)
+        $poll = $topic['poll_type']
+            ? $this->poll->render($topic)
             : '';
 
         // Generate post listing.
-        $page = $this->template->meta('topic-table', $this->postsintooutput());
+        $page = $this->template->meta('topic-table', $this->postsintooutput($topic));
         $page = $this->template->meta(
             'topic-wrapper',
-            $this->topicData['topic_title']
-                . ($this->topicData['subtitle'] ? ', ' . $this->topicData['subtitle'] : ''),
+            $topic['topic_title']
+                . ($topic['subtitle'] ? ', ' . $topic['subtitle'] : ''),
             $page,
             '<a href="./?act=vt' . $tid . '&amp;fmt=RSS" class="social rss" title="RSS Feed for this Topic" target="_blank">RSS</a>',
         );
@@ -297,8 +286,8 @@ final class Topic
             '',
         ];
 
-        if ($this->topicData['fperms']['start']) {
-            $buttons[0] = "<a href='?act=post&fid=" . $this->topicData['fid'] . "'>"
+        if ($topic['fperms']['start']) {
+            $buttons[0] = "<a href='?act=post&fid=" . $topic['fid'] . "'>"
                 . $this->template->meta(
                     $this->template->metaExists('button-newtopic')
                         ? 'button-newtopic'
@@ -308,9 +297,9 @@ final class Topic
         }
 
         if (
-            $this->topicData['fperms']['reply']
+            $topic['fperms']['reply']
             && (
-                !$this->topicData['locked']
+                !$topic['locked']
                 || $this->user->getPerm('can_override_locked_topics')
             )
         ) {
@@ -322,9 +311,9 @@ final class Topic
         }
 
         if (
-            $this->topicData['fperms']['reply']
+            $topic['fperms']['reply']
             && (
-                !$this->topicData['locked']
+                !$topic['locked']
                 || $this->user->getPerm('can_override_locked_topics')
             )
         ) {
@@ -414,8 +403,9 @@ final class Topic
         $this->page->append('PAGE', $page);
     }
 
-    private function update(int $tid): void
+    private function update($topic): void
     {
+        $tid = $topic['id'];
 
         // Check for new posts and append them.
         if ($this->session->get('location') !== "vt{$tid}") {
@@ -426,7 +416,7 @@ final class Topic
             $this->session->getVar('topic_lastpid')
             && $this->session->getVar('topic_lastpage')
         ) {
-            $newposts = $this->postsintooutput($this->session->getVar('topic_lastpid'));
+            $newposts = $this->postsintooutput($topic, $this->session->getVar('topic_lastpid'));
             if ($newposts !== '' && $newposts !== '0') {
                 $this->page->command('appendrows', '#intopic', $newposts);
             }
@@ -480,8 +470,12 @@ final class Topic
         $this->session->set('users_online_cache', $newcache);
     }
 
-    private function quickReplyForm(int $tid): void
+    /**
+     * @param array<string,null|int|float|string> $topic
+     */
+    private function quickReplyForm(array $topic): void
     {
+        $tid = $topic['id'];
         $prefilled = '';
         $this->page->command('softurl');
         if (
@@ -533,7 +527,7 @@ final class Topic
         $this->page->command('updateqreply', '');
     }
 
-    private function postsintooutput($lastpid = 0): string
+    private function postsintooutput($topic, $lastpid = 0): string
     {
         $usersonline = $this->database->getUsersOnline();
         $this->config->getSetting('ratings') ?? 0;
@@ -589,7 +583,7 @@ final class Topic
 
                 SQL,
             ['posts', 'members', 'member_groups', 'members'],
-            $this->tid,
+            $topic['id'],
             $lastpid,
         ) : $this->database->safespecial(
             <<<'SQL'
@@ -670,13 +664,13 @@ final class Topic
 
                 SQL,
             ['posts', 'members', 'member_groups', 'members'],
-            $this->tid,
+            $topic['id'],
             $topicPostCounter = $this->pageNumber * $this->numperpage,
             $this->numperpage,
         );
 
         $rows = '';
-        while ($post = $this->database->arow($query)) {
+        foreach($this->database->arows($query) as $post) {
             if ($this->firstPostID === 0) {
                 $this->firstPostID = $post['pid'];
             }
@@ -690,19 +684,19 @@ final class Topic
 
             $postbuttons
                 // Adds the Edit button
-                = ($this->canedit($post)
-                    ? "<a href='?act=vt" . $this->tid . '&amp;edit=' . $post['pid']
+                = ($this->canedit($topic, $post)
+                    ? "<a href='?act=vt" . $topic['id'] . '&amp;edit=' . $post['pid']
                     . "' class='edit'>" . $this->template->meta('topic-edit-button')
                     . '</a>'
                     : '')
                 // Adds the Quote button
-                . ($this->topicData['fperms']['reply']
-                    ? " <a href='?act=vt" . $this->tid . '&amp;quote=' . $post['pid']
+                . ($topic['fperms']['reply']
+                    ? " <a href='?act=vt" . $topic['id'] . '&amp;quote=' . $post['pid']
                     . "' onclick='RUN.handleQuoting(this);return false;' "
                     . "class='quotepost'>" . $this->template->meta('topic-quote-button') . '</a> '
                     : '')
                 // Adds the Moderate options
-                . ($this->canModerate()
+                . ($this->canModerate($topic)
                     ? "<a href='?act=modcontrols&amp;do=modp&amp;pid=" . $post['pid']
                     . "' class='modpost' onclick='RUN.modcontrols.togbutton(this)'>"
                     . $this->template->meta('topic-mod-button') . '</a>'
@@ -711,7 +705,7 @@ final class Topic
             $rows .= $this->template->meta(
                 'topic-post-row',
                 $post['pid'],
-                $this->tid,
+                $topic['id'],
                 $post['auth_id'] ? $this->template->meta(
                     'user-link',
                     $post['auth_id'],
@@ -732,7 +726,7 @@ final class Topic
                 // ^10
                 $this->date->autoDate($post['date']),
                 <<<HTML
-                    <a href="?act=vt{$this->tid}&amp;findpost={$post['pid']}&pid={$post['pid']}"
+                    <a href="?act=vt{$topic['id']}&amp;findpost={$post['pid']}&pid={$post['pid']}"
                         onclick="prompt('Link to this post:',this.href);return false"
                         >{$this->template->meta('topic-perma-button')}</a>
                     HTML,
@@ -787,9 +781,13 @@ final class Topic
         return $rows;
     }
 
-    private function canedit(array $post): bool
+    /**
+     * @param array<string,string|int|float|null> $topic
+     * @param array<string,string|int|float|null> $post
+     */
+    private function canedit(array $topic, array $post): bool
     {
-        if ($this->canModerate()) {
+        if ($this->canModerate($topic)) {
             return true;
         }
 
@@ -800,10 +798,14 @@ final class Topic
             && $post['auth_id'] === $this->user->get('id');
     }
 
-    private function canModerate(): bool
+    /**
+     * @param array<string,string|int|float|null> $topic
+     */
+    private function canModerate(array $topic): bool
     {
-        if ($this->canMod) {
-            return $this->canMod;
+        static $canMod;
+        if ($canMod !== null) {
+            return $canMod;
         }
 
         $canMod = false;
@@ -823,7 +825,7 @@ final class Topic
                     )
                     SQL,
                 ['forums', 'topics'],
-                $this->database->basicvalue($this->tid),
+                $this->database->basicvalue($topic['id']),
             );
             $mods = $this->database->arow($result);
             $this->database->disposeresult($result);
@@ -832,15 +834,14 @@ final class Topic
             }
         }
 
-        return $this->canMod = $canMod;
+        return $canMod;
     }
 
-    private function quickEditPost(array|string $pid): void
+    /**
+     * @param array<string,string|int|float|null> $topic
+     */
+    private function quickEditPost(array $topic, int $pid): void
     {
-        if (!is_numeric($pid)) {
-            return;
-        }
-
         if (!$this->request->isJSAccess()) {
             $this->page->location('?act=post&pid=' . $pid);
         }
@@ -878,7 +879,7 @@ final class Topic
             return;
         }
 
-        if (!$this->canedit($post)) {
+        if (!$this->canedit($topic, $post)) {
             $this->page->command('alert', "You don't have permission to edit this post.");
 
             return;
@@ -921,7 +922,10 @@ final class Topic
         $this->page->command('update', "#pid_{$pid} .post_content", $form);
     }
 
-    private function multiQuote(int $tid): void
+    /**
+     * @param array<string,string|int|float|null> $topic
+     */
+    private function multiQuote(array $topic): void
     {
         $pid = $this->request->both('quote');
         $post = false;
@@ -971,9 +975,9 @@ final class Topic
             // This line toggles whether or not the qreply window should open
             // on quote.
             if ($this->request->isJSAccess()) {
-                $this->quickReplyForm($tid);
+                $this->quickReplyForm($topic);
             } else {
-                header('Location:?act=post&tid=' . $tid);
+                header('Location:?act=post&tid=' . $topic['id']);
             }
         }
 
@@ -998,7 +1002,10 @@ final class Topic
         );
     }
 
-    private function findPost(int $pid): void
+    /**
+     * @param array<string,string|int|float|null> $topic
+     */
+    private function findPost(array $topic, int $postId): void
     {
         $postPosition = null;
         $result = $this->database->safespecial(
@@ -1015,11 +1022,11 @@ final class Topic
 
                 SQL,
             ['posts', 'posts'],
-            $pid,
+            $postId,
         );
         foreach ($this->database->arows($result) as $index => $post) {
-            if ($post['id'] === $pid) {
-                $pid = $post['id'];
+            if ($post['id'] === $postId) {
+                $postId = $post['id'];
                 $postPosition = (int) $index;
 
                 break;
@@ -1035,28 +1042,32 @@ final class Topic
 
         $pageNumber = (int) ceil($postPosition / $this->numperpage);
         $this->page->location(
-            "?act=vt{$this->tid}&page={$pageNumber}&pid={$pid}#pid_{$pid}",
+            "?act=vt{$topic['id']}&page={$pageNumber}&pid={$postId}#pid_{$postId}",
         );
     }
 
-    private function markRead(int $tid): void
+    /**
+     * @param array<string,string|int|float|null> $topic
+     */
+    private function markRead(array $topic): void
     {
         $topicsread = $this->jax->parseReadMarkers($this->session->get('topicsread'));
-        $topicsread[$tid] = Carbon::now()->getTimestamp();
+        $topicsread[$topic['id']] = Carbon::now()->getTimestamp();
         $this->session->set('topicsread', json_encode($topicsread));
     }
 
     /**
-     * @SuppressWarnings("PHPMD.Superglobals")
+     * @param array<string,string|int|float|null> $topic
      */
-    private function viewRSS(int $tid): void
+    private function viewRSS(array $topic): void
     {
+        $tid = $topic['id'];
         $boardURL = $this->domainDefinitions->getBoardURL();
         $rssFeed = new RSSFeed(
             [
-                'description' => $this->topicData['subtitle'],
+                'description' => $topic['subtitle'],
                 'link' => "{$boardURL}?act=vt{$tid}",
-                'title' => $this->topicData['topic_title'],
+                'title' => $topic['topic_title'],
             ],
         );
         $result = $this->database->safespecial(
@@ -1074,7 +1085,7 @@ final class Topic
             ['posts', 'members'],
             $this->database->basicvalue($tid),
         );
-        while ($post = $this->database->arow($result)) {
+        foreach ($this->database->arows($result) as $post) {
             $rssFeed->additem(
                 [
                     'description' => $this->textFormatting->blockhtml($this->textFormatting->theWorks($post['post'])),
