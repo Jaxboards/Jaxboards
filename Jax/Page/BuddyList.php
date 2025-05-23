@@ -178,7 +178,7 @@ final readonly class BuddyList
 
         if (
             $this->user->get('enemies')
-            && in_array($uid, explode(',', (string) $this->user->get('enemies')))
+            && in_array($uid, explode(',', (string) $this->user->get('enemies')), true)
         ) {
             $this->unblock($uid);
         }
