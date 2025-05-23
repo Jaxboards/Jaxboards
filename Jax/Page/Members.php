@@ -12,8 +12,8 @@ use Jax\Page;
 use Jax\Request;
 use Jax\Template;
 
+use function array_key_exists;
 use function ceil;
-use function is_numeric;
 
 final class Members
 {
@@ -66,7 +66,7 @@ final class Members
         $sortByInput = $this->request->asString->both('sortby');
         if (
             $sortByInput !== null
-            && array_key_exists($sortByInput, $fields, true)
+            && array_key_exists($sortByInput, $fields)
         ) {
             $sortby = $sortByInput;
         }
@@ -139,7 +139,7 @@ final class Members
         }
 
         $url = '?act=members'
-            . ($this->pageNumber ? '&page=' . ($this->pageNumber + 1) : '')
+            . ($this->pageNumber !== 0 ? '&page=' . ($this->pageNumber + 1) : '')
             . ($filter ? '&filter=' . $filter : '');
 
         $links = [];
