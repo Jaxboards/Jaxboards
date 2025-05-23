@@ -28,15 +28,21 @@ use function preg_match;
 
 final class Forum
 {
+    /**
+     * @var array<int,int> key: forumId, value: timestamp
+     */
     private array $topicsRead = [];
 
+    /**
+     * @var array<int,int> key: forumId, value: timestamp
+     */
     private array $forumsRead = [];
 
-    private $forumReadTime = 0;
+    private int $forumReadTime = 0;
 
     private int $numperpage = 20;
 
-    private float|int $pageNumber = 0;
+    private int $pageNumber = 0;
 
     public function __construct(
         private readonly Database $database,
@@ -54,15 +60,13 @@ final class Forum
 
     public function render(): void
     {
-        if (
-            is_numeric($this->request->both('page'))
-            && $this->request->both('page') > 0
-        ) {
-            $this->pageNumber = $this->request->both('page') - 1;
+        $page = (int ) $this->request->asString->both('page');;
+        if ($page > 0) {
+            $this->pageNumber = $page - 1;
         }
 
         // Guaranteed to match here because of the router
-        preg_match('@(\d+)$@', (string) $this->request->get('act'), $act);
+        preg_match('@(\d+)$@', (string) $this->request->asString->get('act'), $act);
         if ($this->request->both('markRead') !== null) {
             $this->markRead((int) $act[1]);
             $this->page->location('?');
@@ -342,11 +346,11 @@ final class Forum
             $this->numperpage,
         );
 
-        while ($forum = $this->database->arow($result)) {
+        foreach ($this->database->arows($result) as $topic) {
             $pages = '';
             if ($forum['replies'] > 9) {
-                foreach ($this->jax->pages((int) ceil(($forum['replies'] + 1) / 10), 1, 10) as $pageNumber) {
-                    $pages .= "<a href='?act=vt" . $forum['id']
+                foreach ($this->jax->pages((int) ceil(($topic['replies'] + 1) / 10), 1, 10) as $pageNumber) {
+                    $pages .= "<a href='?act=vt" . $topic['id']
                         . "&amp;page={$pageNumber}'>{$pageNumber}</a> ";
                 }
 
@@ -357,32 +361,32 @@ final class Forum
             $unread = false;
             $rows .= $this->template->meta(
                 'forum-row',
-                $forum['id'],
+                $topic['id'],
                 // 1
-                $this->textFormatting->wordfilter($forum['title']),
+                $this->textFormatting->wordfilter($topic['title']),
                 // 2
-                $this->textFormatting->wordfilter($forum['subtitle']),
+                $this->textFormatting->wordfilter($topic['subtitle']),
                 // 3
-                $this->template->meta('user-link', $forum['auth_id'], $forum['auth_gid'], $forum['auth_name']),
+                $this->template->meta('user-link', $topic['auth_id'], $topic['auth_gid'], $topic['auth_name']),
                 // 4
-                $forum['replies'],
+                $topic['replies'],
                 // 5
-                number_format($forum['views']),
+                number_format($topic['views']),
                 // 6
-                $this->date->autoDate($forum['lp_date']),
+                $this->date->autoDate($topic['lp_date']),
                 // 7
-                $this->template->meta('user-link', $forum['lp_uid'], $forum['lp_gid'], $forum['lp_name']),
+                $this->template->meta('user-link', $topic['lp_uid'], $topic['lp_gid'], $topic['lp_name']),
                 // 8
-                ($forum['pinned'] ? 'pinned' : '') . ' ' . ($forum['locked'] ? 'locked' : ''),
+                ($topic['pinned'] ? 'pinned' : '') . ' ' . ($topic['locked'] ? 'locked' : ''),
                 // 9
-                $forum['summary'] ? $forum['summary'] . (mb_strlen((string) $forum['summary']) > 45 ? '...' : '') : '',
+                $topic['summary'] ? $topic['summary'] . (mb_strlen((string) $topic['summary']) > 45 ? '...' : '') : '',
                 // 10
                 $this->user->getPerm('can_moderate') ? '<a href="?act=modcontrols&do=modt&tid='
-                    . $forum['id'] . '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>' : '',
+                    . $topic['id'] . '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>' : '',
                 // 11
                 $pages,
                 // 12
-                ($read = $this->isTopicRead($forum, $fid)) ? 'read' : 'unread',
+                ($read = $this->isTopicRead($topic, $fid)) ? 'read' : 'unread',
                 // 13
                 $read ? (
                     $this->template->meta('topic-icon-read')
@@ -498,8 +502,12 @@ final class Forum
         );
     }
 
+    /**
+     * @param array<string,mixed> $topic
+     */
     private function isTopicRead(array $topic, int $fid): bool
     {
+        $topicId = (int) $topic['id'];
         if ($this->topicsRead === []) {
             $this->topicsRead = $this->jax->parseReadMarkers($this->session->get('topicsread'));
         }
@@ -511,17 +519,20 @@ final class Forum
             }
         }
 
-        if (!isset($this->topicsRead[$topic['id']])) {
-            $this->topicsRead[$topic['id']] = 0;
+        if (!isset($this->topicsRead[$topicId])) {
+            $this->topicsRead[$topicId] = 0;
         }
 
         return $topic['lp_date'] <= (
-            max($this->topicsRead[$topic['id']], $this->forumReadTime)
+            max($this->topicsRead[$topicId], $this->forumReadTime)
             ?: $this->session->get('read_date')
             ?: $this->user->get('last_visit')
         );
     }
 
+    /**
+     * @param array<string,mixed>
+     */
     private function isForumRead(array $forum): bool
     {
         if (!$this->forumsRead) {
