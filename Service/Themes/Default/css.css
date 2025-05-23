@@ -543,6 +543,11 @@ textarea {
     padding: 10px;
 }
 
+#buddylist .name,
+#buddylist .status {
+    margin-left: 50px;
+}
+
 /* Buddy/Contacts List */
 #buddylist .online .name {
     color: #1d71cf;
@@ -585,11 +590,6 @@ textarea {
 
 #buddylist .avatar {
     position: absolute;
-}
-
-#buddylist .name,
-#buddylist .status {
-    margin-left: 50px;
 }
 
 #buddylist .status {
