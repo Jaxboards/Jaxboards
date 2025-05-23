@@ -19,6 +19,7 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
+use function array_map;
 use function array_shift;
 use function count;
 use function file_get_contents;
@@ -254,15 +255,16 @@ final readonly class ModControls
         $fieldRows = implode(
             '',
             array_map(
-                function ($field): string {
+                static function ($field): string {
                     [$label, $name, $value, $type] = $field;
                     $input = $type === 'textarea'
                         ? <<<HTML
-                            <textarea name="{$name}" id="m_{$name}">{$value}</textarea>
-                        HTML
+                                <textarea name="{$name}" id="m_{$name}">{$value}</textarea>
+                            HTML
                         : <<<HTML
-                            <input type="text" id="m_{$name}" name="{$name}" value="{$value}" />'
-                        HTML;
+                                <input type="text" id="m_{$name}" name="{$name}" value="{$value}" />'
+                            HTML;
+
                     return <<<HTML
                         <tr>
                             <td><label for="m_{$name}">{$label}</label></td>
@@ -285,10 +287,11 @@ final readonly class ModControls
                         'signature',
                         $this->textFormatting->blockhtml($member['sig']),
                         'textarea',
-                    ]
-                ]
-            )
+                    ],
+                ],
+            ),
         );
+
         return $page . <<<HTML
             <form method="post" data-ajax-form="true">
                 {$hiddenFormFields}
