@@ -83,7 +83,7 @@ final class Topic
         }
 
         match (true) {
-            $quickReply && !$this->request->isJSUpdate() => match(true) {
+            $quickReply && !$this->request->isJSUpdate() => match (true) {
                 $this->request->isJSAccess() && !$this->request->isJSDirectLink() => $this->quickReplyForm($topic),
                 default => $this->page->location('?act=post&tid=' . $tid),
             },
