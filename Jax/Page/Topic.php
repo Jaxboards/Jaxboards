@@ -28,7 +28,6 @@ use function gmdate;
 use function header;
 use function implode;
 use function in_array;
-use function is_array;
 use function is_numeric;
 use function json_encode;
 use function max;
@@ -403,7 +402,7 @@ final class Topic
         $this->page->append('PAGE', $page);
     }
 
-    private function update($topic): void
+    private function update(array $topic): void
     {
         $tid = $topic['id'];
 
@@ -471,7 +470,7 @@ final class Topic
     }
 
     /**
-     * @param array<string,null|int|float|string> $topic
+     * @param array<string,null|float|int|string> $topic
      */
     private function quickReplyForm(array $topic): void
     {
@@ -527,7 +526,7 @@ final class Topic
         $this->page->command('updateqreply', '');
     }
 
-    private function postsintooutput($topic, $lastpid = 0): string
+    private function postsintooutput(array $topic, $lastpid = 0): string
     {
         $usersonline = $this->database->getUsersOnline();
         $this->config->getSetting('ratings') ?? 0;
@@ -670,7 +669,7 @@ final class Topic
         );
 
         $rows = '';
-        foreach($this->database->arows($query) as $post) {
+        foreach ($this->database->arows($query) as $post) {
             if ($this->firstPostID === 0) {
                 $this->firstPostID = $post['pid'];
             }
@@ -782,8 +781,8 @@ final class Topic
     }
 
     /**
-     * @param array<string,string|int|float|null> $topic
-     * @param array<string,string|int|float|null> $post
+     * @param array<string,null|float|int|string> $topic
+     * @param array<string,null|float|int|string> $post
      */
     private function canedit(array $topic, array $post): bool
     {
@@ -799,7 +798,7 @@ final class Topic
     }
 
     /**
-     * @param array<string,string|int|float|null> $topic
+     * @param array<string,null|float|int|string> $topic
      */
     private function canModerate(array $topic): bool
     {
@@ -838,7 +837,7 @@ final class Topic
     }
 
     /**
-     * @param array<string,string|int|float|null> $topic
+     * @param array<string,null|float|int|string> $topic
      */
     private function quickEditPost(array $topic, int $pid): void
     {
@@ -923,7 +922,7 @@ final class Topic
     }
 
     /**
-     * @param array<string,string|int|float|null> $topic
+     * @param array<string,null|float|int|string> $topic
      */
     private function multiQuote(array $topic): void
     {
@@ -1003,7 +1002,7 @@ final class Topic
     }
 
     /**
-     * @param array<string,string|int|float|null> $topic
+     * @param array<string,null|float|int|string> $topic
      */
     private function findPost(array $topic, int $postId): void
     {
@@ -1047,7 +1046,7 @@ final class Topic
     }
 
     /**
-     * @param array<string,string|int|float|null> $topic
+     * @param array<string,null|float|int|string> $topic
      */
     private function markRead(array $topic): void
     {
@@ -1057,7 +1056,7 @@ final class Topic
     }
 
     /**
-     * @param array<string,string|int|float|null> $topic
+     * @param array<string,null|float|int|string> $topic
      */
     private function viewRSS(array $topic): void
     {
