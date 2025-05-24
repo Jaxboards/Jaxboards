@@ -15,12 +15,9 @@ use function array_key_exists;
 use function array_map;
 use function copy;
 use function dirname;
-use function fclose;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
-use function fopen;
-use function fwrite;
 use function glob;
 use function in_array;
 use function is_array;
@@ -437,7 +434,7 @@ final readonly class Themes
         if ($skin['custom'] && $newSkinData) {
             file_put_contents(
                 $this->themesPath . $skin['title'] . '/css.css',
-                $newSkinData
+                $newSkinData,
             );
         }
 
@@ -574,7 +571,7 @@ final readonly class Themes
                 'custom',
                 'wrapper',
                 '`default`',
-                'hidden'
+                'hidden',
             ],
             'skins',
             Database::WHERE_ID_EQUALS,

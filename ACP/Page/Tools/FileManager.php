@@ -12,10 +12,6 @@ use Jax\FileUtils;
 use Jax\Request;
 
 use function array_key_exists;
-use function array_pop;
-use function count;
-use function ctype_digit;
-use function explode;
 use function implode;
 use function in_array;
 use function is_array;
@@ -140,7 +136,7 @@ final readonly class FileManager
         );
         $table = '';
         foreach ($this->database->arows($result) as $file) {
-            $ext = (string) pathinfo((string) $file['name'], PATHINFO_EXTENSION);
+            $ext = pathinfo((string) $file['name'], PATHINFO_EXTENSION);
 
             $file['name'] = in_array($ext, $this->config->getSetting('images'), true) ? '<a href="'
                     . $this->domainDefinitions->getBoardPathUrl() . 'Uploads/' . $file['hash'] . '.' . $ext . '">'
