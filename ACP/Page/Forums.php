@@ -14,12 +14,10 @@ use Jax\TextFormatting;
 
 use function _\groupBy;
 use function _\keyBy;
-use function array_filter;
 use function array_key_exists;
 use function array_keys;
 use function array_map;
 use function array_search;
-use function array_unshift;
 use function count;
 use function explode;
 use function implode;
@@ -137,7 +135,7 @@ final readonly class Forums
     }
 
     /**
-     * @param array<int|string,array<int>|int> $tree
+     * @param array<int,array<int>|int> $tree
      * @param array<int,array<string,mixed>>   $categories
      * @param array<int,array<string,mixed>>   $forums
      */
@@ -150,6 +148,7 @@ final readonly class Forums
         $html = '';
 
         foreach ($tree as $id => $value) {
+
             $forumId = is_array($value) ? $id : $value;
             $forum = $forums[$forumId];
 

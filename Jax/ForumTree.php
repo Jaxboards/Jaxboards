@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use Generator;
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
 
@@ -41,9 +42,18 @@ final class ForumTree
         return $this->tree;
     }
 
-    public function getIterator(): RecursiveIteratorIterator
+    public function getIterator(): Generator
     {
-        return new RecursiveIteratorIterator(new RecursiveArrayIterator($this->tree));
+        return $this->recurseInto($this->tree);
+    }
+
+    private function recurseInto(array $forums, $depth = 0): Generator {
+        foreach($forums as $forumId => $subForums) {
+            yield $depth => $forumId;
+            if ($subForums !== []) {
+                yield from $this->recurseInto($subForums, $depth + 1);
+            }
+        }
     }
 
     /**
@@ -77,6 +87,6 @@ final class ForumTree
             $node = &$node[$pathId];
         }
 
-        $node[] = $forum['id'];
+        $node[$forum['id']] = [];
     }
 }
