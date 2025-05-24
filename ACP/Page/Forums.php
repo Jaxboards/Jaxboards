@@ -115,6 +115,7 @@ final readonly class Forums
                     Database::WHERE_ID_EQUALS,
                     $cat,
                 );
+
                 continue;
             }
 
@@ -206,6 +207,7 @@ final readonly class Forums
             if ($decoded) {
                 $this->mysqltree(json_decode($tree, true));
             }
+
             if ($this->request->asString->get('do') === 'create') {
                 return;
             }
@@ -753,7 +755,7 @@ final readonly class Forums
         }
 
         $forums = '';
-        foreach($this->fetchAllForums() as $forum) {
+        foreach ($this->fetchAllForums() as $forum) {
             $forums .= $this->page->parseTemplate(
                 'select-option.html',
                 [
@@ -952,6 +954,7 @@ final readonly class Forums
             'forums',
             'ORDER BY `order`,`title`',
         );
+
         return $this->database->arows($result);
     }
 
