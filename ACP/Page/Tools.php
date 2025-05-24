@@ -96,7 +96,8 @@ final readonly class Tools
                 'SHOW CREATE TABLE %t',
                 [$table],
             );
-            $createTable = $this->database->arow($result)['Create Table'];
+            $row = $this->database->arow($result);
+            $createTable = $row ? $row['Create Table'] : '';
             $this->database->disposeresult($result);
 
             $ftable = $this->database->ftable($table);

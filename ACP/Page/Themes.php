@@ -65,10 +65,10 @@ final readonly class Themes
             'manage' => 'Manage Skins',
         ]);
 
-        $editCSS = (int) $this->request->get('editcss');
-        $editWrapper = $this->request->get('editwrapper');
-        $deleteSkin = (int) $this->request->get('deleteskin');
-        $do = $this->request->get('do');
+        $editCSS = (int) $this->request->asString->get('editcss');
+        $editWrapper = $this->request->asString->get('editwrapper');
+        $deleteSkin = (int) $this->request->asString->get('deleteskin');
+        $do = $this->request->asString->get('do');
 
         match (true) {
             (bool) $editCSS => $this->editCSS($editCSS),
@@ -110,14 +110,14 @@ final readonly class Themes
     {
         return array_map(
             static fn($path): string => pathinfo($path, PATHINFO_FILENAME),
-            glob($this->wrappersPath . '/*'),
+            glob($this->wrappersPath . '/*') ?: [],
         );
     }
 
     /**
      * Delete a wrapper. Returns error string upon failure.
      */
-    private function deleteWrapper(string $wrapper): ?string
+    private function deleteWrapper(string $wrapper): string
     {
         $wrapperPath = $this->pathToWrapper($wrapper);
         if (
@@ -127,7 +127,7 @@ final readonly class Themes
             unlink($wrapperPath);
             $this->page->location('?act=Themes');
 
-            return null;
+            return '';
         }
 
         return 'The wrapper you are trying to delete does not exist.';
@@ -158,16 +158,20 @@ final readonly class Themes
     /**
      * Update wrapper properties. Returns error string upon failure.
      *
-     * @param mixed $wrappers
+     * @param array<string> $wrappers
      */
-    private function updateWrappers(array $wrappers): ?string
+    private function updateWrappers(array $wrappers): null
     {
         foreach ($wrappers as $wrapperId => $wrapperName) {
             if ($wrapperName && !in_array($wrapperName, $wrappers)) {
                 continue;
             }
 
-            $hidden = $this->request->post('hidden') ?? [];
+            $hidden = $this->request->post('hidden');
+            if (!is_array($hidden)) {
+                $hidden = [];
+            }
+
             $this->database->safeupdate(
                 'skins',
                 [
@@ -276,7 +280,7 @@ final readonly class Themes
         return null;
     }
 
-    private function setDefaultSkin(array|string $skinID): void
+    private function setDefaultSkin(int $skinID): void
     {
         $this->database->safeupdate(
             'skins',
@@ -313,8 +317,8 @@ final readonly class Themes
             default => null,
         };
 
-        $defaultSkin = $this->request->both('default');
-        if ($defaultSkin !== null) {
+        $defaultSkin = (int) $this->request->asString->both('default');
+        if ($defaultSkin !== 0) {
             $this->setDefaultSkin($defaultSkin);
         }
 
@@ -423,10 +427,18 @@ final readonly class Themes
         $skin = $this->database->arow($result);
         $this->database->disposeresult($result);
 
-        if ($skin && $skin['custom'] && $this->request->post('newskindata')) {
-            $o = fopen($this->themesPath . $skin['title'] . '/css.css', 'w');
-            fwrite($o, (string) $this->request->post('newskindata'));
-            fclose($o);
+        if (!$skin) {
+            $this->page->addContentBox('Error', "Skin id {$id} not found");
+
+            return;
+        }
+
+        $newSkinData = $this->request->asString->post('newskindata');
+        if ($skin['custom'] && $newSkinData) {
+            file_put_contents(
+                $this->themesPath . $skin['title'] . '/css.css',
+                $newSkinData
+            );
         }
 
         $this->page->addContentBox(
@@ -440,7 +452,7 @@ final readonly class Themes
                                 $skin['custom']
                                 ? $this->themesPath : $this->domainDefinitions->getServiceThemePath()
                             ) . "/{$skin['title']}/css.css",
-                        ),
+                        ) ?: '',
                     ),
                     'save' => $skin['custom'] ? $this->page->parseTemplate(
                         'save-changes.html',
@@ -476,7 +488,7 @@ final readonly class Themes
             $saved . $this->page->parseTemplate(
                 'themes/edit-wrapper.html',
                 [
-                    'content' => $this->textFormatting->blockhtml(file_get_contents($wrapperPath)),
+                    'content' => $this->textFormatting->blockhtml(file_get_contents($wrapperPath) ?: ''),
                 ],
             ),
         );
@@ -485,14 +497,15 @@ final readonly class Themes
     private function createSkin(): void
     {
         $page = '';
-        $skinName = $this->request->post('skinname');
+        $skinName = $this->request->asString->post('skinname');
+        $wrapperName = $this->request->asString->post('wrapper');
         if ($this->request->post('submit') !== null) {
             $error = match (true) {
-                !$this->request->post('skinname') => 'No skin name supplied!',
+                !$skinName => 'No skin name supplied!',
                 !$this->isValidFilename($skinName) => 'Skinname must only consist of letters, numbers, and spaces.',
                 mb_strlen($skinName) > 50 => 'Skin name must be less than 50 characters.',
                 is_dir($this->themesPath . $skinName) => 'A skin with that name already exists.',
-                !in_array($this->request->post('wrapper'), $this->getWrappers()) => 'Invalid wrapper.',
+                !in_array($wrapperName, $this->getWrappers()) => 'Invalid wrapper.',
                 default => null,
             };
 
@@ -503,8 +516,8 @@ final readonly class Themes
                         'custom' => 1,
                         'default' => $this->request->post('default') ? 1 : 0,
                         'hidden' => $this->request->post('hidden') ? 1 : 0,
-                        'title' => $this->request->asString->post('skinname'),
-                        'wrapper' => $this->request->asString->post('wrapper'),
+                        'title' => $skinName,
+                        'wrapper' => $wrapperName,
                     ],
                 );
                 if ($this->request->post('default')) {
@@ -518,10 +531,10 @@ final readonly class Themes
                     );
                 }
 
-                mkdir($this->themesPath . $this->request->post('skinname'), 0o777, true);
+                mkdir($this->themesPath . $skinName, 0o777, true);
                 copy(
                     $this->domainDefinitions->getDefaultThemePath() . '/css.css',
-                    $this->themesPath . $this->request->post('skinname') . '/css.css',
+                    $this->themesPath . $this->request->asString->post('skinname') . '/css.css',
                 );
 
                 $this->page->location('?act=Themes');
@@ -554,13 +567,28 @@ final readonly class Themes
     private function deleteSkin(int $id): void
     {
         $result = $this->database->safeselect(
-            '`id`,`using`,`title`,`custom`,`wrapper`,`default`,`hidden`',
+            [
+                'id',
+                '`using`',
+                'title',
+                'custom',
+                'wrapper',
+                '`default`',
+                'hidden'
+            ],
             'skins',
             Database::WHERE_ID_EQUALS,
             $id,
         );
         $skin = $this->database->arow($result);
         $this->database->disposeresult($result);
+
+        if (!$skin) {
+            $this->page->addContentBox('Error', "Skin id {$id} not found");
+
+            return;
+        }
+
         $skindir = $this->themesPath . $skin['title'];
         if (is_dir($skindir)) {
             $this->fileUtils->removeDirectory($skindir);

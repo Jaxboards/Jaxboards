@@ -80,18 +80,16 @@ final readonly class FileManager
         }
 
         if (is_array($this->request->post('dl'))) {
-            foreach ($this->request->post('dl') as $k => $v) {
-                if (!ctype_digit((string) $v)) {
-                    continue;
-                }
+            foreach ($this->request->post('dl') as $fileId => $downloads) {
+                $downloads = (int) $downloads;
 
                 $this->database->safeupdate(
                     'files',
                     [
-                        'downloads' => $v,
+                        'downloads' => $downloads,
                     ],
                     Database::WHERE_ID_EQUALS,
-                    $this->database->basicvalue($k),
+                    $this->database->basicvalue($fileId),
                 );
             }
 
@@ -141,11 +139,8 @@ final readonly class FileManager
             ['files', 'members'],
         );
         $table = '';
-        while ($file = $this->database->arow($result)) {
-            $filepieces = explode('.', (string) $file['name']);
-            if (count($filepieces) > 1) {
-                $ext = mb_strtolower(array_pop($filepieces));
-            }
+        foreach ($this->database->arows($result) as $file) {
+            $ext = (string) pathinfo((string) $file['name'], PATHINFO_EXTENSION);
 
             $file['name'] = in_array($ext, $this->config->getSetting('images'), true) ? '<a href="'
                     . $this->domainDefinitions->getBoardPathUrl() . 'Uploads/' . $file['hash'] . '.' . $ext . '">'

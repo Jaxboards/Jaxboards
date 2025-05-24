@@ -14,7 +14,7 @@ use function explode;
 final class ForumTree
 {
     /**
-     * @var array<array<int>|int>
+     * @var array<array<int,never>>
      */
     private array $tree = [];
 
@@ -44,7 +44,7 @@ final class ForumTree
     }
 
     /**
-     * @param array<array<string,mixed>> $forums
+     * @param array<mixed> $forums
      */
     private function recurseInto(
         array $forums,
