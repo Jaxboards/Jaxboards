@@ -10,7 +10,6 @@ use function array_filter;
 use function array_key_exists;
 use function array_map;
 use function explode;
-use function is_array;
 
 final class ForumTree
 {
@@ -21,7 +20,6 @@ final class ForumTree
 
     /**
      * Given all forum records, generates a full subforum tree (from forum paths)
-     * Leaf nodes are forum IDs.
      *
      * @param array<array<string,mixed>> $forums
      */
@@ -83,10 +81,6 @@ final class ForumTree
         foreach ($path as $pathId) {
             if (!array_key_exists($pathId, $node)) {
                 $node[$pathId] = [];
-            }
-
-            if (!is_array($node[$pathId])) {
-                $node[$pathId] = [$node[$pathId]];
             }
 
             // phpcs:ignore SlevomatCodingStandard.PHP.DisallowReference.DisallowedAssigningByReference
