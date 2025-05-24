@@ -30,6 +30,7 @@ final class ContactDetails
      * Given a user's profile, returns an associative array formatted as:
      * 'twitter' => ['https://twitter.com/jax', 'jax']
      *
+     * @param array<string,mixed> $profile
      * @return array<string,array{string,string}>
      */
     public function getContactLinks(array $profile): array

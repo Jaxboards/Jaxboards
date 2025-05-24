@@ -219,7 +219,7 @@ final readonly class ModTopics
                 $this->database->basicvalue($otherTopic),
             );
             $firstPost = $this->database->arow($result);
-            $op = (int) $firstPost['minId'];
+            $op = $firstPost ? (int) $firstPost['minId'] : 0;
             $this->database->disposeresult($result);
 
             if ($op !== 0) {

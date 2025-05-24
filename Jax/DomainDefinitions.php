@@ -18,9 +18,9 @@ use function str_replace;
  *
  * @see https://github.com/jaxboards/jaxboards Jaxboards Github Repo
  */
-function pathjoin(string ...$paths): ?string
+function pathjoin(string ...$paths): string
 {
-    return preg_replace('@\/+@', '/', implode('/', $paths));
+    return (string) preg_replace('@\/+@', '/', implode('/', $paths));
 }
 
 final class DomainDefinitions

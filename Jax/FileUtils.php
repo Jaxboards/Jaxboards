@@ -79,7 +79,7 @@ final class FileUtils
             $dir .= '/';
         }
 
-        foreach (glob($dir . '**') as $fileOrDir) {
+        foreach (glob($dir . '**') ?: [] as $fileOrDir) {
             if (is_dir($fileOrDir)) {
                 self::removeDirectory($fileOrDir);
 
@@ -118,7 +118,7 @@ final class FileUtils
      *
      * @return array<string>
      */
-    public function tail(bool|string $path, int $totalLines): array
+    public function tail(string $path, int $totalLines): array
     {
         $logFile = new SplFileObject($path, 'r');
         $logFile->fseek(0, SEEK_END);
@@ -153,15 +153,5 @@ final class FileUtils
         }
 
         return array_reverse($lines);
-    }
-
-    /**
-     * Given a file path, returns the corresponding class path.
-     *
-     * @return class-string
-     */
-    public function toClassPath(string $file): string
-    {
-        return str_replace([dirname(__DIR__), '.php', '/'], ['', '', '\\'], $file);
     }
 }

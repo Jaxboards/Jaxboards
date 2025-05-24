@@ -22,7 +22,7 @@ final class RSSFeed
     public function __construct(private array $feed) {}
 
     /**
-     * @param array<string,int|string> $item
+     * @param array<int|string> $item
      */
     public function additem(array $item): void
     {
@@ -52,7 +52,7 @@ final class RSSFeed
     }
 
     /**
-     * @param array<string,int|string> $feed
+     * @param array<int|string> $feed
      */
     public function makeXML(array $feed): string
     {

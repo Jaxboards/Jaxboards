@@ -165,7 +165,7 @@ final readonly class Tools
 
     private function viewErrorLog(): void
     {
-        $logPath = ini_get('error_log');
+        $logPath = ini_get('error_log') ?: '';
 
         $contents = "Sorry, Jaxboards does not have file permissions to read your PHP error log file. ({$logPath})";
 
