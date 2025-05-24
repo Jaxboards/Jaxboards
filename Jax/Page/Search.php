@@ -127,8 +127,8 @@ final class Search
         array $titles,
     ): string {
         $options = '';
-        $forumIterator = $forumTree->getIterator();
-        foreach ($forumIterator as $depth => $forumId) {
+        $generator = $forumTree->getIterator();
+        foreach ($generator as $depth => $forumId) {
             $text = str_repeat('├─', $depth) . $titles[$forumId];
             $options .= "<option value='{$forumId}'>{$text}</option>";
         }

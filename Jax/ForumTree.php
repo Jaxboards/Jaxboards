@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Jax;
 
 use Generator;
-use RecursiveArrayIterator;
-use RecursiveIteratorIterator;
 
 use function array_filter;
 use function array_key_exists;
@@ -35,7 +33,7 @@ final class ForumTree
     }
 
     /**
-     * @return array<int|array<int>>
+     * @return array<array<int>|int>
      */
     public function getTree(): array
     {
@@ -47,12 +45,17 @@ final class ForumTree
         return $this->recurseInto($this->tree);
     }
 
-    private function recurseInto(array $forums, $depth = 0): Generator {
-        foreach($forums as $forumId => $subForums) {
+    private function recurseInto(
+        array $forums,
+        float|int $depth = 0,
+    ): Generator {
+        foreach ($forums as $forumId => $subForums) {
             yield $depth => $forumId;
-            if ($subForums !== []) {
-                yield from $this->recurseInto($subForums, $depth + 1);
+            if ($subForums === []) {
+                continue;
             }
+
+            yield from $this->recurseInto($subForums, $depth + 1);
         }
     }
 

@@ -135,9 +135,9 @@ final readonly class Forums
     }
 
     /**
-     * @param array<int,array<int>|int> $tree
-     * @param array<int,array<string,mixed>>   $categories
-     * @param array<int,array<string,mixed>>   $forums
+     * @param array<int,array<int>|int>      $tree
+     * @param array<int,array<string,mixed>> $categories
+     * @param array<int,array<string,mixed>> $forums
      */
     private function printtree(
         array $tree,
@@ -148,7 +148,6 @@ final readonly class Forums
         $html = '';
 
         foreach ($tree as $id => $value) {
-
             $forumId = is_array($value) ? $id : $value;
             $forum = $forums[$forumId];
 
@@ -156,6 +155,7 @@ final readonly class Forums
             if ($highlight && $forumId === $highlight) {
                 $classes[] = 'highlight';
             }
+
             $classes = implode(' ', $classes);
 
             $trashcan = isset($forum['trashcan']) && $forum['trashcan'] ? $this->page->parseTemplate(
@@ -253,8 +253,8 @@ final readonly class Forums
 
         $forums = keyBy($forumRecords, static fn($forum) => $forum['id']);
         $forumsByCategory = array_map(
-            static fn($forums) => new ForumTree($forums),
-            groupBy($forumRecords, static fn($forum) => $forum['cat_id'])
+            static fn($forums): ForumTree => new ForumTree($forums),
+            groupBy($forumRecords, static fn($forum) => $forum['cat_id']),
         );
 
         $result = $this->database->safeselect(
@@ -293,7 +293,7 @@ final readonly class Forums
             [
                 'class' => 'tree',
                 'content' => $treeHTML,
-            ]
+            ],
         );
 
         $page .= $this->page->parseTemplate(
