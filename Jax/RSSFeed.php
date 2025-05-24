@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use function array_map;
 use function array_merge;
 use function gmdate;
 use function header;
-use function implode;
-use function is_array;
 
 final class RSSFeed
 {
@@ -19,6 +16,11 @@ final class RSSFeed
     private array $feed = [];
 
     /**
+     * @var array<array<string|int>>
+     */
+    private array $items = [];
+
+    /**
      * @param array<string,array<string,string>|string> $feed
      */
     public function __construct(array $feed)
@@ -26,20 +28,27 @@ final class RSSFeed
         $this->feed = array_merge($this->feed, $feed);
     }
 
+    /**
+     * @param array<string,mixed>
+     */
     public function additem(array $item): void
     {
-        $this->feed['item'][] = $item;
+        $this->items[] = $item;
     }
 
     public function publish(): never
     {
         $this->feed['pubDate'] = gmdate('r');
         $xmlFeed = $this->makeXML($this->feed);
+        foreach($this->items as $item) {
+            $xmlFeed .= "<item>{$this->makeXML($item)}</item>";
+        }
         header('Content-type: application/rss+xml');
         echo <<<EOT
             <?xml version="1.0" encoding="UTF-8" ?>
-            <rss version="2.0">
+            <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
                 <channel>
+                    <atom:link href="{$this->feed['link']}&fmt=RSS" rel="self" type="application/rss+xml" />
                     {$xmlFeed}
                 </channel>
             </rss>
@@ -49,24 +58,15 @@ final class RSSFeed
     }
 
     /**
-     * @param array<string,array<string,string>|string> $feed
+     * @param array<string,string> $feed
      */
     public function makeXML(array $feed): string
     {
         $xml = '';
 
         foreach ($feed as $property => $value) {
-            if (is_array($value)) {
-                $xml .= implode('', array_map(
-                    fn($content): string => "<{$property}>" . $this->makeXML($content) . "</{$property}>",
-                    $value,
-                ));
-
-                continue;
-            }
-
             $attributes = ($property === 'content' ? ' type="html"' : '');
-            $xml .= "<{$property}{$attributes}>{$value}</{$property}>";
+            $xml .= PHP_EOL . "<{$property}{$attributes}>{$value}</{$property}>";
         }
 
         return $xml;

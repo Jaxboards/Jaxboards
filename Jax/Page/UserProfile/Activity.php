@@ -49,9 +49,11 @@ final readonly class Activity
      */
     public function renderRSSFeed(array $profile): void
     {
+        $boardURL = $this->domainDefinitions->getBoardURL();
         $rssFeed = new RSSFeed(
             [
                 'description' => $profile['usertitle'],
+                'link' => "{$boardURL}?act=vu{$profile['id']}",
                 'title' => $profile['display_name'] . "'s recent activity",
             ],
         );
