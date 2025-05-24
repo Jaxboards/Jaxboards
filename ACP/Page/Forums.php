@@ -141,7 +141,6 @@ final readonly class Forums
      */
     private function printtree(
         array $tree,
-        array $categories,
         array $forums,
         int $highlight = 0,
     ): string {
@@ -151,14 +150,12 @@ final readonly class Forums
             $forumId = is_array($value) ? $id : $value;
             $forum = $forums[$forumId];
 
-            $classes = ['nofirstlevel'];
-            if ($highlight && $forumId === $highlight) {
-                $classes[] = 'highlight';
-            }
+            $classes = implode(' ', [
+                'nofirstlevel',
+                $highlight && $forumId === $highlight ? 'highlight' : ''
+            ]);
 
-            $classes = implode(' ', $classes);
-
-            $trashcan = isset($forum['trashcan']) && $forum['trashcan'] ? $this->page->parseTemplate(
+            $trashcan = $forum['trashcan'] ? $this->page->parseTemplate(
                 'forums/order-forums-tree-item-trashcan.html',
             ) : '';
 
@@ -177,12 +174,7 @@ final readonly class Forums
 
             $content = '';
             if (is_array($value)) {
-                $content = $this->printtree(
-                    $value,
-                    $categories,
-                    $forums,
-                    $highlight,
-                );
+                $content = $this->printtree($value, $forums, $highlight);
             }
 
             $html .= $this->page->parseTemplate(
@@ -276,7 +268,6 @@ final readonly class Forums
                     'class' => 'parentlock',
                     'content' => $this->printtree(
                         $forumTree->getTree(),
-                        $categories,
                         $forums,
                         $highlight,
                     ),
