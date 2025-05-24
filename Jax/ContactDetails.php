@@ -31,13 +31,14 @@ final class ContactDetails
      * 'twitter' => ['https://twitter.com/jax', 'jax']
      *
      * @param array<string,mixed> $profile
+     *
      * @return array<string,array{string,string}>
      */
     public function getContactLinks(array $profile): array
     {
         $contactFields = array_filter(
             array_keys($profile),
-            static fn($field): bool => str_starts_with((string) $field, 'contact') && $profile[$field],
+            static fn($field): bool => str_starts_with($field, 'contact') && $profile[$field],
         );
 
         return array_reduce($contactFields, static function (array $links, $field) use ($profile) {

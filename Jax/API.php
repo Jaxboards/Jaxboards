@@ -41,7 +41,7 @@ final readonly class API
             'WHERE `display_name` LIKE ? ORDER BY `display_name` LIMIT 10',
             $this->database->basicvalue(
                 htmlspecialchars(
-                    (string) str_replace('_', '\_', $this->request->asString->get('term') ?? ''),
+                    str_replace('_', '\_', $this->request->asString->get('term') ?? ''),
                     ENT_QUOTES,
                 ) . '%',
             ),

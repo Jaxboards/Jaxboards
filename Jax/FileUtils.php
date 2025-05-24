@@ -10,7 +10,6 @@ use function array_reverse;
 use function closedir;
 use function copy;
 use function count;
-use function dirname;
 use function glob;
 use function is_dir;
 use function mb_substr;
@@ -19,7 +18,6 @@ use function opendir;
 use function readdir;
 use function rmdir;
 use function round;
-use function str_replace;
 use function trim;
 use function unlink;
 
