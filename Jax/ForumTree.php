@@ -16,7 +16,7 @@ use function is_array;
 final class ForumTree
 {
     /**
-     * @var array<int|array<int>>
+     * @var array<array<int>|int>
      */
     private array $tree = [];
 
