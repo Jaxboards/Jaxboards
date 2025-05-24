@@ -321,7 +321,7 @@ final readonly class Forums
     {
         $page = '';
         $forumperms = '';
-        $forum = $fid ? $this->fetchAllForums()[$fid] : null;
+        $forum = $fid !== 0 ? $this->fetchAllForums()[$fid] : null;
         $error = null;
 
         if ($this->request->post('tree') !== null) {
