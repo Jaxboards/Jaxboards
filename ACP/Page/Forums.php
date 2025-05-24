@@ -137,6 +137,58 @@ final readonly class Forums
     }
 
     /**
+     * @param array<string,mixed> $forum
+     */
+    private function printForumPermsTable($forum): string
+    {
+        $perms = $forum ? $this->jax->parseForumPerms($forum['perms']) : null;
+
+        $permsTable = '';
+        foreach ($this->fetchAllGroups() as $group) {
+            $groupPerms = $perms[$group['id']] ?? null;
+
+            $permsTable .= $this->page->parseTemplate(
+                'forums/create-forum-permissions-row.html',
+                [
+                    'global' => $this->checkbox($group['id'], 'global', $groupPerms === null),
+                    'poll' => $this->checkbox(
+                        $group['id'],
+                        'poll',
+                        $groupPerms['poll'] ?? $group['can_poll'],
+                    ),
+                    'read' => $this->checkbox(
+                        $group['id'],
+                        'read',
+                        $groupPerms['read'] ?? 1,
+                    ),
+                    'reply' => $this->checkbox(
+                        $group['id'],
+                        'reply',
+                        $groupPerms['reply'] ?? $group['can_post'],
+                    ),
+                    'start' => $this->checkbox(
+                        $group['id'],
+                        'start',
+                        $groupPerms['start'] ?? $group['can_post_topics'],
+                    ),
+                    'title' => $group['title'],
+                    'upload' => $this->checkbox(
+                        $group['id'],
+                        'upload',
+                        $groupPerms['upload'] ?? $group['can_attach'],
+                    ),
+                    'view' => $this->checkbox(
+                        $group['id'],
+                        'view',
+                        $groupPerms['view'] ?? 1,
+                    ),
+                ],
+            );
+        }
+        return $permsTable;
+    }
+
+    /**
      * @param array<int,array<int>|int>      $tree
      * @param array<int,array<string,mixed>> $forums
      */
@@ -205,7 +257,7 @@ final readonly class Forums
         if ($tree !== null) {
             $decoded = json_decode($tree, true);
             if ($decoded) {
-                $this->mysqltree(json_decode($tree, true));
+                $this->mysqltree($decoded);
             }
 
             if ($this->request->asString->get('do') === 'create') {
@@ -215,22 +267,13 @@ final readonly class Forums
             $page .= $this->page->success('Data Saved');
         }
 
-        $forums = keyBy($this->fetchAllForums(), static fn($forum) => $forum['id']);
+        $forums = $this->fetchAllForums();
         $forumsByCategory = array_map(
             static fn($forums): ForumTree => new ForumTree($forums),
             groupBy($forums, static fn($forum) => $forum['cat_id']),
         );
 
-        $result = $this->database->safeselect(
-            [
-                'id',
-                'title',
-                '`order`',
-            ],
-            'categories',
-            'ORDER BY `order`,`id` ASC',
-        );
-        $categories = keyBy($this->database->arows($result), static fn($cat) => $cat['id']);
+        $categories = $this->fetchAllCategories();
 
         $treeHTML = '';
         foreach ($categories as $categoryId => $category) {
@@ -348,88 +391,6 @@ final readonly class Forums
             }
         }
 
-        $perms = $forum ? $this->jax->parseForumPerms($forum['perms']) : null;
-
-        $result = $this->database->safeselect(
-            [
-                'can_access_acp',
-                'can_add_comments',
-                'can_attach',
-                'can_delete_comments',
-                'can_delete_own_posts',
-                'can_delete_own_shouts',
-                'can_delete_own_topics',
-                'can_delete_shouts',
-                'can_edit_posts',
-                'can_edit_topics',
-                'can_im',
-                'can_karma',
-                'can_lock_own_topics',
-                'can_moderate',
-                'can_override_locked_topics',
-                'can_pm',
-                'can_poll',
-                'can_post_topics',
-                'can_post',
-                'can_shout',
-                'can_use_sigs',
-                'can_view_board',
-                'can_view_fullprofile',
-                'can_view_offline_board',
-                'can_view_shoutbox',
-                'can_view_stats',
-                'flood_control',
-                'icon',
-                'id',
-                'legend',
-                'title',
-            ],
-            'member_groups',
-        );
-
-        $permsTable = '';
-        while ($group = $this->database->arow($result)) {
-            $groupPerms = $perms[$group['id']] ?? null;
-
-            $permsTable .= $this->page->parseTemplate(
-                'forums/create-forum-permissions-row.html',
-                [
-                    'global' => $this->checkbox($group['id'], 'global', $groupPerms === null),
-                    'poll' => $this->checkbox(
-                        $group['id'],
-                        'poll',
-                        $groupPerms['poll'] ?? $group['can_poll'],
-                    ),
-                    'read' => $this->checkbox(
-                        $group['id'],
-                        'read',
-                        $groupPerms['read'] ?? 1,
-                    ),
-                    'reply' => $this->checkbox(
-                        $group['id'],
-                        'reply',
-                        $groupPerms['reply'] ?? $group['can_post'],
-                    ),
-                    'start' => $this->checkbox(
-                        $group['id'],
-                        'start',
-                        $groupPerms['start'] ?? $group['can_post_topics'],
-                    ),
-                    'title' => $group['title'],
-                    'upload' => $this->checkbox(
-                        $group['id'],
-                        'upload',
-                        $groupPerms['upload'] ?? $group['can_attach'],
-                    ),
-                    'view' => $this->checkbox(
-                        $group['id'],
-                        'view',
-                        $groupPerms['view'] ?? 1,
-                    ),
-                ],
-            );
-        }
-
         if ($error !== null) {
             $page .= $this->page->error($error);
         }
@@ -522,7 +483,7 @@ final readonly class Forums
         $forumperms = $this->page->parseTemplate(
             'forums/create-forum-permissions.html',
             [
-                'content' => $permsTable,
+                'content' => $this->printForumPermsTable($forum),
                 'submit' => $fid !== 0 ? 'Save' : 'Next',
             ],
         );
@@ -612,17 +573,8 @@ final readonly class Forums
 
     private function serializePermsFromInput(): string
     {
-        $result = $this->database->safeselect(
-            ['id'],
-            'member_groups',
-        );
-
         // First fetch all group IDs
-        $groupIds = array_map(
-            static fn(array $group): mixed => $group['id'],
-            $this->database->arows($result),
-        );
-        $this->database->disposeresult($result);
+        $groupIds = array_keys($this->fetchAllGroups());
 
         $groupPerms = [];
         $groupsInput = $this->request->post('groups');
@@ -649,22 +601,17 @@ final readonly class Forums
         $sub = (int) $this->request->post('show_sub');
         $orderby = (int) $this->request->post('orderby');
 
-        $result = $this->database->safeselect(
-            ['id'],
-            'categories',
-        );
-        $firstCategory = $this->database->arow($result);
-        $this->database->disposeresult($result);
+        $categories = $this->fetchAllCategories();
 
         // This is a weird state where they're trying to add a forum
         // with no categories defined. It needs better handling than this.
         // But is clearly an edge case.
-        if (!$firstCategory) {
+        if ($categories === []) {
             return [];
         }
 
         return [
-            'cat_id' => $forum['cat_id'] ?? null ?: $firstCategory['id'],
+            'cat_id' => $forum['cat_id'] ?? null ?: $categories[0]['id'],
             'mods' => $forum['mods'] ?? null,
             'nocount' => $this->request->post('nocount') ? 1 : 0,
             'orderby' => $orderby > 0 && $orderby <= 5 ? $orderby : 0,
@@ -754,9 +701,10 @@ final readonly class Forums
             return;
         }
 
-        $forums = '';
-        foreach ($this->fetchAllForums() as $forum) {
-            $forums .= $this->page->parseTemplate(
+        $forumOptions = '';
+        $forums = $this->fetchAllForums();
+        foreach ($forums as $forum) {
+            $forumOptions .= $this->page->parseTemplate(
                 'select-option.html',
                 [
                     'label' => $forum['title'],
@@ -766,7 +714,7 @@ final readonly class Forums
             );
         }
 
-        $forum = $this->fetchForum($forumId);
+        $forum = $forums[$forumId];
 
         if (!$forum) {
             $this->page->addContentBox(
@@ -782,7 +730,7 @@ final readonly class Forums
             $this->page->parseTemplate(
                 'forums/delete-forum.html',
                 [
-                    'forum_options' => $forums,
+                    'forum_options' => $forumOptions,
                 ],
             ),
         );
@@ -862,11 +810,8 @@ final readonly class Forums
     {
         $page = '';
         $error = null;
-        $result = $this->database->safeselect(
-            ['id', 'title'],
-            'categories',
-        );
-        $categories = keyBy($this->database->arows($result), static fn($category) => $category['id']);
+
+        $categories = $this->fetchAllCategories();
 
         if (!array_key_exists($catId, $categories)) {
             $error = "The category you're trying to delete does not exist.";
@@ -930,6 +875,23 @@ final readonly class Forums
     /**
      * @return array<array<string,mixed>>
      */
+    private function fetchAllCategories(): array
+    {
+        $result = $this->database->safeselect(
+            [
+                'id',
+                'title',
+                '`order`',
+            ],
+            'categories',
+            'ORDER BY `order`,`id` ASC',
+        );
+        return keyBy($this->database->arows($result), static fn($category) => $category['id']);
+    }
+
+    /**
+     * @return array<array<string,mixed>>
+     */
     private function fetchAllForums(): array
     {
         $result = $this->database->safeselect(
@@ -954,8 +916,51 @@ final readonly class Forums
             'forums',
             'ORDER BY `order`,`title`',
         );
+        return keyBy($this->database->arows($result), static fn($forum) => $forum['id']);
+    }
 
-        return $this->database->arows($result);
+    /**
+     * @return array<array<string,mixed>>
+     */
+    private function fetchAllGroups(): array
+    {
+        $result = $this->database->safeselect(
+            [
+                'can_access_acp',
+                'can_add_comments',
+                'can_attach',
+                'can_delete_comments',
+                'can_delete_own_posts',
+                'can_delete_own_shouts',
+                'can_delete_own_topics',
+                'can_delete_shouts',
+                'can_edit_posts',
+                'can_edit_topics',
+                'can_im',
+                'can_karma',
+                'can_lock_own_topics',
+                'can_moderate',
+                'can_override_locked_topics',
+                'can_pm',
+                'can_poll',
+                'can_post_topics',
+                'can_post',
+                'can_shout',
+                'can_use_sigs',
+                'can_view_board',
+                'can_view_fullprofile',
+                'can_view_offline_board',
+                'can_view_shoutbox',
+                'can_view_stats',
+                'flood_control',
+                'icon',
+                'id',
+                'legend',
+                'title',
+            ],
+            'member_groups',
+        );
+        return keyBy($this->database->arows($result), static fn($group) => $group['id']);
     }
 
     /*
@@ -971,13 +976,9 @@ final readonly class Forums
                 'mod' => 0,
             ],
         );
-        $result = $this->database->safeselect(
-            ['mods'],
-            'forums',
-        );
-        // Build an array of mods.
+
         $mods = [];
-        while ($forum = $this->database->arow($result)) {
+        foreach ($this->fetchAllForums() as $forum) {
             foreach (explode(',', (string) $forum['mods']) as $modId) {
                 if ($modId === '') {
                     continue;
@@ -987,7 +988,6 @@ final readonly class Forums
             }
         }
 
-        // Update.
         $this->database->safeupdate(
             'members',
             [
