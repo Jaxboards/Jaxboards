@@ -45,9 +45,12 @@ final class ForumTree
         return $this->recurseInto($this->tree);
     }
 
+    /**
+     * @param array<array<string,mixed>> $forums
+     */
     private function recurseInto(
         array $forums,
-        float|int $depth = 0,
+        int $depth = 0,
     ): Generator {
         foreach ($forums as $forumId => $subForums) {
             yield $depth => $forumId;

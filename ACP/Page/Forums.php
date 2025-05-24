@@ -240,12 +240,10 @@ final readonly class Forums
             'ORDER BY `order`,`title`',
         );
 
-        $forumRecords = $this->database->arows($result);
-
-        $forums = keyBy($forumRecords, static fn($forum) => $forum['id']);
+        $forums = keyBy($this->database->arows($result), static fn($forum) => $forum['id']);
         $forumsByCategory = array_map(
             static fn($forums): ForumTree => new ForumTree($forums),
-            groupBy($forumRecords, static fn($forum) => $forum['cat_id']),
+            groupBy($forums, static fn($forum) => $forum['cat_id']),
         );
 
         $result = $this->database->safeselect(
@@ -260,18 +258,20 @@ final readonly class Forums
         $categories = keyBy($this->database->arows($result), static fn($cat) => $cat['id']);
 
         $treeHTML = '';
-        foreach ($forumsByCategory as $categoryId => $forumTree) {
+        foreach ($categories as $categoryId => $category) {
             $treeHTML .= $this->page->parseTemplate(
                 'forums/order-forums-tree-item.html',
                 [
                     'class' => 'parentlock',
-                    'content' => $this->printtree(
-                        $forumTree->getTree(),
-                        $forums,
-                        $highlight,
-                    ),
+                    'content' => array_key_exists($categoryId, $forumsByCategory)
+                        ? $this->printtree(
+                            $forumsByCategory[$categoryId]->getTree(),
+                            $forums,
+                            $highlight,
+                        )
+                        : '',
                     'id' => "c_{$categoryId}",
-                    'title' => $categories[$categoryId]['title'],
+                    'title' => $category['title'],
                     'trashcan' => '',
                     'mods' => '',
                 ],
