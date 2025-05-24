@@ -15,7 +15,10 @@ use function is_array;
 
 final class ForumTree
 {
-    public array $graph = [];
+    /**
+     * @var array<int|array<int>>
+     */
+    private array $tree = [];
 
     /**
      * Given all forum records, generates a full subforum tree (from forum paths)
@@ -32,11 +35,13 @@ final class ForumTree
 
     public function getIterator(): RecursiveIteratorIterator
     {
-        return new RecursiveIteratorIterator(new RecursiveArrayIterator($this->graph));
+        return new RecursiveIteratorIterator(new RecursiveArrayIterator($this->tree));
     }
 
     /**
      * @param array<string,mixed> $forum
+     *
+     * @psalm-suppress UnsupportedPropertyReferenceUsage
      */
     private function addForum(array $forum): void
     {
@@ -48,7 +53,9 @@ final class ForumTree
             static fn($pathId): bool => (bool) $pathId,
         );
 
-        $node = &$this->graph;
+        // phpcs:ignore SlevomatCodingStandard.PHP.DisallowReference.DisallowedAssigningByReference
+        $node = &$this->tree;
+
         foreach ($path as $pathId) {
             if (!array_key_exists($pathId, $node)) {
                 $node[$pathId] = [];
@@ -58,6 +65,7 @@ final class ForumTree
                 $node[$pathId] = [$node[$pathId]];
             }
 
+            // phpcs:ignore SlevomatCodingStandard.PHP.DisallowReference.DisallowedAssigningByReference
             $node = &$node[$pathId];
         }
 

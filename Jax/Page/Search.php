@@ -113,7 +113,7 @@ final class Search
             $titles[$forum['id']] = $forum['title'];
 
             return $titles;
-        });
+        }, []);
         $forumTree = new ForumTree($forums);
 
         return $this->getForumSelect($forumTree, $titles);
