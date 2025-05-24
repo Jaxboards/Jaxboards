@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Carbon\Carbon;
+use Jax\ForumTree;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Page;
@@ -13,9 +14,9 @@ use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
+use PHP_CodeSniffer\Generators\HTML;
 
 use function array_filter;
-use function array_key_exists;
 use function array_map;
 use function array_slice;
 use function ceil;
@@ -96,8 +97,7 @@ final class Search
 
     private function getForumSelection(): string
     {
-        $this->getSearchableForums();
-        if (!$this->fids) {
+        if (!$this->getSearchableForums()) {
             return '--No forums--';
         }
 
@@ -108,64 +108,28 @@ final class Search
             $this->fids,
         );
 
-        $tree = [];
-        $titles = [];
-
-        foreach ($this->database->arows($result) as $forum) {
+        $forums = $this->database->arows($result);
+        $titles = array_reduce($forums, function($titles, $forum) {
             $titles[$forum['id']] = $forum['title'];
-            $path = array_map(
-                static fn($fid): int => (int) $fid,
-                trim($forum['path'] ?? '') !== '' ? explode(' ', (string) $forum['path']) : [],
-            );
-            $t = &$tree;
-            foreach ($path as $forumId) {
-                if (!array_key_exists($forumId, $t)) {
-                    $t[$forumId] = [];
-                }
+            return $titles;
+        });
+        $forumTree = new ForumTree($forums);
 
-                $t = &$t[$forumId];
-            }
-
-            if (array_key_exists((int) $forum['id'], $t)) {
-                continue;
-            }
-
-            $t[$forum['id']] = [];
-        }
-
-        return $this->rtreeselect(
-            $tree,
-            $titles,
-        );
+        return $this->getForumSelect($forumTree, $titles);
     }
 
     /**
-     * @param array<int,mixed> $tree
      * @param array<string>    $titles
      */
-    private function rtreeselect(
-        array $tree,
-        $titles,
-        int $level = 0,
-    ): string {
+    private function getForumSelect(ForumTree $forumTree, array $titles): string {
         $options = '';
-        foreach ($tree as $k => $v) {
-            if (isset($titles[$k])) {
-                $options .= '<option value="' . $k . '">'
-                    . str_repeat('├─', $level) . $titles[$k]
-                    . '</option>';
-            }
-
-            if (!is_array($v)) {
-                continue;
-            }
-
-            $options .= $this->rtreeselect($v, $titles, $level + 1);
+        $forumIterator = $forumTree->getIterator();
+        foreach ($forumIterator as $forumId) {
+            $text = str_repeat('├─', $forumIterator->getDepth()) . $titles[$forumId];
+            $options .= "<option value='{$forumId}'>{$text}</option>";
         }
 
-        if ($level === 0) {
-            return '<select size="15" title="List of forums" multiple="multiple" name="fids">' . $options . '</select>';
-        }
+        return '<select size="15" title="List of forums" multiple="multiple" name="fids">' . $options . '</select>';
 
         return $options;
     }
