@@ -136,7 +136,6 @@ final readonly class Forums
 
     /**
      * @param array<int,array<int>|int>      $tree
-     * @param array<int,array<string,mixed>> $categories
      * @param array<int,array<string,mixed>> $forums
      */
     private function printtree(
@@ -152,7 +151,7 @@ final readonly class Forums
 
             $classes = implode(' ', [
                 'nofirstlevel',
-                $highlight && $forumId === $highlight ? 'highlight' : ''
+                $highlight && $forumId === $highlight ? 'highlight' : '',
             ]);
 
             $trashcan = $forum['trashcan'] ? $this->page->parseTemplate(
