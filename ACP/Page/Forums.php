@@ -103,7 +103,7 @@ final readonly class Forums
             $children = mb_strstr($path, ' ');
             $formattedPath = $children ? trim($children) : '';
             if (is_array($value)) {
-                self::mysqltree($value, $childPath . ' ', $order);
+                $this->mysqltree($value, $childPath . ' ', $order);
             }
 
             if ($key[0] === 'c') {
@@ -115,22 +115,23 @@ final readonly class Forums
                     Database::WHERE_ID_EQUALS,
                     $cat,
                 );
-            } else {
-                $this->database->safeupdate(
-                    'forums',
-                    [
-                        'cat_id' => $cat,
-                        'order' => $order,
-                        'path' => preg_replace(
-                            '@\s+@',
-                            ' ',
-                            $formattedPath,
-                        ),
-                    ],
-                    Database::WHERE_ID_EQUALS,
-                    $key,
-                );
+                continue;
             }
+
+            $this->database->safeupdate(
+                'forums',
+                [
+                    'cat_id' => $cat,
+                    'order' => $order,
+                    'path' => preg_replace(
+                        '@\s+@',
+                        ' ',
+                        $formattedPath,
+                    ),
+                ],
+                Database::WHERE_ID_EQUALS,
+                $key,
+            );
         }
     }
 
@@ -138,25 +139,15 @@ final readonly class Forums
      * @param array<int,array<int>|int>      $tree
      * @param array<int,array<string,mixed>> $forums
      */
-    private function printtree(
+    private function printForumTree(
         array $tree,
         array $forums,
         int $highlight = 0,
     ): string {
         $html = '';
 
-        foreach ($tree as $id => $value) {
-            $forumId = is_array($value) ? $id : $value;
+        foreach ($tree as $forumId => $subforums) {
             $forum = $forums[$forumId];
-
-            $classes = implode(' ', [
-                'nofirstlevel',
-                $highlight && $forumId === $highlight ? 'highlight' : '',
-            ]);
-
-            $trashcan = $forum['trashcan'] ? $this->page->parseTemplate(
-                'forums/order-forums-tree-item-trashcan.html',
-            ) : '';
 
             if ($forum['mods']) {
                 $modCount = count(explode(',', (string) $forum['mods']));
@@ -171,20 +162,22 @@ final readonly class Forums
                 $mods = '';
             }
 
-            $content = '';
-            if (is_array($value)) {
-                $content = $this->printtree($value, $forums, $highlight);
-            }
-
             $html .= $this->page->parseTemplate(
                 'forums/order-forums-tree-item.html',
                 [
-                    'class' => $classes,
-                    'content' => $content,
+                    'class' => implode(' ', [
+                        'nofirstlevel',
+                        $highlight && $forumId === $highlight ? 'highlight' : '',
+                    ]),
+                    'content' => $subforums !== []
+                        ? $this->printForumTree($subforums, $forums, $highlight)
+                        : '',
                     'id' => $forumId,
                     'mods' => $mods,
                     'title' => $forum['title'],
-                    'trashcan' => $trashcan,
+                    'trashcan' => $forum['trashcan']
+                        ? $this->page->parseTemplate('forums/order-forums-tree-item-trashcan.html')
+                        : '',
                 ],
             );
         }
@@ -209,38 +202,18 @@ final readonly class Forums
 
         $tree = $this->request->asString->post('tree');
         if ($tree !== null) {
-            self::mysqltree(json_decode($tree, true));
-            if ($this->request->get('do') === 'create') {
+            $decoded = json_decode($tree, true);
+            if ($decoded) {
+                $this->mysqltree(json_decode($tree, true));
+            }
+            if ($this->request->asString->get('do') === 'create') {
                 return;
             }
 
             $page .= $this->page->success('Data Saved');
         }
 
-        $result = $this->database->safeselect(
-            [
-                'id',
-                'cat_id',
-                'title',
-                'subtitle',
-                'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
-                'path',
-                'show_sub',
-                'redirect',
-                '`order`',
-                'perms',
-                'orderby',
-                'nocount',
-                'redirects',
-                'trashcan',
-                'mods',
-                'show_ledby',
-            ],
-            'forums',
-            'ORDER BY `order`,`title`',
-        );
-
-        $forums = keyBy($this->database->arows($result), static fn($forum) => $forum['id']);
+        $forums = keyBy($this->fetchAllForums(), static fn($forum) => $forum['id']);
         $forumsByCategory = array_map(
             static fn($forums): ForumTree => new ForumTree($forums),
             groupBy($forums, static fn($forum) => $forum['cat_id']),
@@ -264,7 +237,7 @@ final readonly class Forums
                 [
                     'class' => 'parentlock',
                     'content' => array_key_exists($categoryId, $forumsByCategory)
-                        ? $this->printtree(
+                        ? $this->printForumTree(
                             $forumsByCategory[$categoryId]->getTree(),
                             $forums,
                             $highlight,
@@ -779,15 +752,8 @@ final readonly class Forums
             return;
         }
 
-        $result = $this->database->safeselect(
-            [
-                'id',
-                'title',
-            ],
-            'forums',
-        );
         $forums = '';
-        while ($forum = $this->database->arow($result)) {
+        foreach($this->fetchAllForums() as $forum) {
             $forums .= $this->page->parseTemplate(
                 'select-option.html',
                 [
@@ -957,6 +923,36 @@ final readonly class Forums
         }
 
         $this->page->addContentBox('Category Deletion', $page);
+    }
+
+    /**
+     * @return array<array<string,mixed>>
+     */
+    private function fetchAllForums(): array
+    {
+        $result = $this->database->safeselect(
+            [
+                'id',
+                'cat_id',
+                'title',
+                'subtitle',
+                'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
+                'path',
+                'show_sub',
+                'redirect',
+                '`order`',
+                'perms',
+                'orderby',
+                'nocount',
+                'redirects',
+                'trashcan',
+                'mods',
+                'show_ledby',
+            ],
+            'forums',
+            'ORDER BY `order`,`title`',
+        );
+        return $this->database->arows($result);
     }
 
     /*
