@@ -26,9 +26,6 @@ final class RSSFeed
         $this->feed = array_merge($this->feed, $feed);
     }
 
-    /**
-     * @param array<mixed>
-     */
     public function additem(array $item): void
     {
         $this->feed['item'][] = $item;
