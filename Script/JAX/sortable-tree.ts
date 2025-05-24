@@ -45,8 +45,8 @@ export default function sortableTree(
         },
         ondrop(sess: DragSession) {
             let tmp;
-            const parentlock = sess.el.className === 'parentlock';
-            const nofirstlevel = sess.el.className === 'nofirstlevel';
+            const parentlock = sess.el.classList.contains('parentlock');
+            const nofirstlevel = sess.el.classList.contains('nofirstlevel');
             drag.reset(sess.el);
             if (!sess.droptarget) {
                 return;
