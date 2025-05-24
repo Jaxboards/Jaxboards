@@ -14,13 +14,16 @@ use function is_array;
 final class RSSFeed
 {
     /**
-     * @var array<string, array|string>
+     * @var array<string,array<string,string>|string>
      */
     private array $feed = [];
 
-    public function __construct($settings)
+    /**
+     * @var array<string,array<string,string>|string>
+     */
+    public function __construct(array $feed)
     {
-        $this->feed = array_merge($this->feed, $settings);
+        $this->feed = array_merge($this->feed, $feed);
     }
 
     public function additem($settings): void
@@ -45,11 +48,15 @@ final class RSSFeed
         exit(0);
     }
 
-    public function makeXML(array $array): string
+
+    /**
+     * @var array<string,array<string,string>|string>
+     */
+    public function makeXML(array $feed): string
     {
         $xml = '';
 
-        foreach ($array as $property => $value) {
+        foreach ($feed as $property => $value) {
             if (is_array($value)) {
                 $xml .= implode('', array_map(
                     fn($content): string => "<{$property}>" . $this->makeXML($content) . "</{$property}>",

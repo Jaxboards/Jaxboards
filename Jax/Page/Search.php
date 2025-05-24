@@ -108,9 +108,6 @@ final class Search
             $this->fids,
         );
 
-        /**
-         * @var array<int,array>
-         */
         $tree = [];
         $titles = [];
 

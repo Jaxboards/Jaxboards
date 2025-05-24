@@ -210,6 +210,7 @@ final readonly class ModPosts
     }
 
     /**
+     * @param array<string,mixed> $post
      * @return list<int> list of mod user IDs assigned to a forum. Empty array when none.
      */
     private function fetchForumMods(array $post): array
@@ -280,7 +281,7 @@ final readonly class ModPosts
         array $trashCanForum,
         string $newTopicTitle,
     ): int {
-        $lastPost = $this->fetchPost(end($pids));
+        $lastPost = $this->fetchPost((int) end($pids));
 
         // Create a new topic.
         $this->database->safeinsert(
@@ -289,7 +290,7 @@ final readonly class ModPosts
                 'auth_id' => $this->user->get('id'),
                 'fid' => $trashCanForum['id'],
                 'lp_date' => $this->database->datetime(),
-                'lp_uid' => $lastPost['auth_id'],
+                'lp_uid' => $lastPost ? $lastPost['auth_id'] : null,
                 'op' => $pids[0],
                 'poll_q' => '',
                 'poll_choices' => '',
@@ -321,7 +322,7 @@ final readonly class ModPosts
     }
 
     /**
-     * @param list<int> $tids
+     * @param array<int> $tids
      */
     private function updateTopicStats(array $tids): void
     {

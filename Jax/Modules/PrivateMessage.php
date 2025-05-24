@@ -136,7 +136,7 @@ final readonly class PrivateMessage
     /**
      * @param array<mixed> $cmd
      */
-    public function sendcmd(array $cmd, int $uid): ?bool
+    public function sendcmd(array $cmd, int $uid): bool
     {
         $result = $this->database->safespecial(
             <<<'SQL'

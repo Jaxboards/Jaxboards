@@ -214,33 +214,36 @@ final readonly class ModTopics
             // Make the first post in the topic have newtopic=1.
             // Get the op.
             $result = $this->database->safeselect(
-                'MIN(`id`)',
+                'MIN(`id`) `minId`',
                 'posts',
                 'WHERE `tid`=?',
                 $this->database->basicvalue($otherTopic),
             );
-            $thisrow = $this->database->arow($result);
-            $op = array_pop($thisrow);
+            $firstPost = $this->database->arow($result);
+            $op = (int) $firstPost['minId'];
             $this->database->disposeresult($result);
 
-            $this->database->safeupdate(
-                'posts',
-                [
-                    'newtopic' => 1,
-                ],
-                Database::WHERE_ID_EQUALS,
-                $op,
-            );
+            if ($op !== 0) {
+                $this->database->safeupdate(
+                    'posts',
+                    [
+                        'newtopic' => 1,
+                    ],
+                    Database::WHERE_ID_EQUALS,
+                    $op,
+                );
 
-            // Also fix op.
-            $this->database->safeupdate(
-                'topics',
-                [
-                    'op' => $op,
-                ],
-                Database::WHERE_ID_EQUALS,
-                $this->database->basicvalue($otherTopic),
-            );
+                // Also fix op.
+                $this->database->safeupdate(
+                    'topics',
+                    [
+                        'op' => $op,
+                    ],
+                    Database::WHERE_ID_EQUALS,
+                    $this->database->basicvalue($otherTopic),
+                );
+            }
+
             unset($topicIds[array_search($otherTopic, $topicIds, true)]);
             if ($topicIds !== []) {
                 $this->database->safedelete(

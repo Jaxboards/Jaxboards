@@ -79,7 +79,7 @@ final class Router
 
     public function route(string $action): void
     {
-        $dynamicAction = preg_replace('@\d+$@', '', $action);
+        $dynamicAction = (string) preg_replace('@\d+$@', '', $action);
 
         $pageClassName = match (true) {
             // Board offline
