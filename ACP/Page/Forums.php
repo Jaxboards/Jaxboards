@@ -172,11 +172,7 @@ final readonly class Forums
                 'forums/order-forums-tree-item-trashcan.html',
             ) : '';
 
-            if (
-                isset($forums[$id]['mods'])
-                && is_array($forums[$id]['mods'])
-                && !empty($forums[$id]['mods'])
-            ) {
+            if ($forums[$id]['mods']) {
                 $modCount = count(explode(',', $forums[$id]['mods']));
                 $mods = $this->page->parseTemplate(
                     'forums/order-forums-tree-item-mods.html',
@@ -232,7 +228,7 @@ final readonly class Forums
         }
 
         $tree = $this->request->asString->post('tree');
-        if ($tree !== null) {
+        if ($tree) {
             self::mysqltree(json_decode($tree, true));
             if ($this->request->get('do') === 'create') {
                 return;
