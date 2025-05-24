@@ -19,7 +19,7 @@ final class ForumTree
     private array $tree = [];
 
     /**
-     * Given all forum records, generates a full subforum tree (from forum paths)
+     * Given all forum records, generates a full subforum tree (from forum paths).
      *
      * @param array<array<string,mixed>> $forums
      */
