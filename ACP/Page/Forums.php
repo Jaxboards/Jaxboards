@@ -311,37 +311,6 @@ final readonly class Forums
         $this->page->addContentBox('Forums', $page);
     }
 
-    private function fetchForum(int $forumId): ?array
-    {
-        $result = $this->database->safeselect(
-            [
-                'id',
-                'cat_id',
-                'title',
-                'subtitle',
-                'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
-                'path',
-                'show_sub',
-                'redirect',
-                '`order`',
-                'perms',
-                'orderby',
-                'nocount',
-                'redirects',
-                'trashcan',
-                'mods',
-                'show_ledby',
-            ],
-            'forums',
-            Database::WHERE_ID_EQUALS,
-            $this->database->basicvalue($forumId),
-        );
-        $forum = $this->database->arow($result);
-        $this->database->disposeresult($result);
-
-        return $forum;
-    }
-
     /**
      * Create & Edit forum.
      *
@@ -352,7 +321,7 @@ final readonly class Forums
     {
         $page = '';
         $forumperms = '';
-        $forum = $this->fetchForum($fid);
+        $forum = $fid ? $this->fetchAllForums()[$fid] : null;
         $error = null;
 
         if ($this->request->post('tree') !== null) {
@@ -408,7 +377,7 @@ final readonly class Forums
                 'select-option.html',
                 [
                     'label' => $label,
-                    'selected' => isset($forum['show_sub']) && $value === $forum['show_sub'] ? 'selected="selected"' : '',
+                    'selected' => $forum && $value === $forum['show_sub'] ? 'selected="selected"' : '',
                     'value' => $value,
                 ],
             );
@@ -428,7 +397,7 @@ final readonly class Forums
                 'select-option.html',
                 [
                     'label' => $label,
-                    'selected' => isset($forum['orderby']) && $value === $forum['orderby']
+                    'selected' => $forum && $value === $forum['orderby']
                         ? 'selected="selected"' : '',
                     'value' => $value,
                 ],
@@ -439,19 +408,19 @@ final readonly class Forums
         $page .= $this->page->parseTemplate(
             'forums/create-forum.html',
             [
-                'description' => isset($forum['subtitle']) ? $this->textFormatting->blockhtml($forum['subtitle']) : '',
-                'no_count' => isset($forum['nocount']) && $forum['nocount']
+                'description' => $forum ? $this->textFormatting->blockhtml($forum['subtitle']) : '',
+                'no_count' => $forum && $forum['nocount']
                     ? '' : ' checked="checked"',
                 'order_by_options' => $orderByOptions,
-                'redirect_url' => isset($forum['redirect']) ? $this->textFormatting->blockhtml($forum['redirect']) : '',
+                'redirect_url' => $forum ? $this->textFormatting->blockhtml($forum['redirect']) : '',
                 'subforum_options' => $subforumOptions,
-                'title' => isset($forum['title']) ? $this->textFormatting->blockhtml($forum['title']) : '',
-                'trashcan' => isset($forum['trashcan']) && $forum['trashcan']
+                'title' => $forum ? $this->textFormatting->blockhtml($forum['title']) : '',
+                'trashcan' => $forum && $forum['trashcan']
                     ? ' checked="checked"' : '',
             ],
         );
 
-        if (isset($forum['mods']) && $forum['mods']) {
+        if ($forum && $forum['mods']) {
             $result = $this->database->safeselect(
                 ['display_name', 'id'],
                 'members',
@@ -485,13 +454,13 @@ final readonly class Forums
             'forums/create-forum-permissions.html',
             [
                 'content' => $this->printForumPermsTable($forum),
-                'submit' => $fid !== 0 ? 'Save' : 'Next',
+                'submit' => $forum ? 'Save' : 'Next',
             ],
         );
 
         $this->page->addContentBox(
-            ($fid !== 0 ? 'Edit' : 'Create') . ' Forum'
-                . ($fid !== 0 ? ' - ' . $this->textFormatting->blockhtml($forum['title']) : ''),
+            ($forum ? 'Edit' : 'Create') . ' Forum'
+                . ($forum ? ' - ' . $this->textFormatting->blockhtml($forum['title']) : ''),
             $page,
         );
         $this->page->addContentBox('Moderators', $moderators);
