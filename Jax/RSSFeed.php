@@ -13,7 +13,7 @@ use const PHP_EOL;
 final class RSSFeed
 {
     /**
-     * @var array<string,array<string,string>|string>
+     * @var array<string,int|string>
      */
     private array $feed = [];
 
@@ -23,15 +23,15 @@ final class RSSFeed
     private array $items = [];
 
     /**
-     * @param array<string,array<string,string>|string> $feed
+     * @param array<string,int|string> $feed
      */
     public function __construct(array $feed)
     {
-        $this->feed = array_merge($this->feed, $feed);
+        $this->feed = $feed;
     }
 
     /**
-     * @param array<string,mixed> $item
+     * @param array<string,int|string> $item
      */
     public function additem(array $item): void
     {
@@ -61,7 +61,7 @@ final class RSSFeed
     }
 
     /**
-     * @param array<string,string> $feed
+     * @param array<string,int|string> $feed
      */
     public function makeXML(array $feed): string
     {
