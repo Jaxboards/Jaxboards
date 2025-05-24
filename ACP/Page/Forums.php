@@ -139,7 +139,7 @@ final readonly class Forums
     /**
      * @param array<string,mixed> $forum
      */
-    private function printForumPermsTable($forum): string
+    private function printForumPermsTable(?array $forum): string
     {
         $perms = $forum ? $this->jax->parseForumPerms($forum['perms']) : null;
 
@@ -185,6 +185,7 @@ final readonly class Forums
                 ],
             );
         }
+
         return $permsTable;
     }
 
@@ -886,6 +887,7 @@ final readonly class Forums
             'categories',
             'ORDER BY `order`,`id` ASC',
         );
+
         return keyBy($this->database->arows($result), static fn($category) => $category['id']);
     }
 
@@ -916,6 +918,7 @@ final readonly class Forums
             'forums',
             'ORDER BY `order`,`title`',
         );
+
         return keyBy($this->database->arows($result), static fn($forum) => $forum['id']);
     }
 
@@ -960,6 +963,7 @@ final readonly class Forums
             ],
             'member_groups',
         );
+
         return keyBy($this->database->arows($result), static fn($group) => $group['id']);
     }
 
