@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use function array_merge;
 use function gmdate;
 use function header;
 
@@ -13,11 +12,6 @@ use const PHP_EOL;
 final class RSSFeed
 {
     /**
-     * @var array<string,int|string>
-     */
-    private array $feed = [];
-
-    /**
      * @var array<array<int|string>>
      */
     private array $items = [];
@@ -25,10 +19,7 @@ final class RSSFeed
     /**
      * @param array<string,int|string> $feed
      */
-    public function __construct(array $feed)
-    {
-        $this->feed = $feed;
-    }
+    public function __construct(private array $feed) {}
 
     /**
      * @param array<string,int|string> $item
