@@ -211,6 +211,7 @@ final readonly class ModPosts
 
     /**
      * @param array<string,mixed> $post
+     *
      * @return list<int> list of mod user IDs assigned to a forum. Empty array when none.
      */
     private function fetchForumMods(array $post): array

@@ -16,7 +16,6 @@ use function array_diff;
 use function array_key_exists;
 use function array_keys;
 use function array_map;
-use function array_pop;
 use function array_search;
 use function array_unique;
 use function explode;

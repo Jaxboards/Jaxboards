@@ -48,7 +48,6 @@ final class RSSFeed
         exit(0);
     }
 
-
     /**
      * @var array<string,array<string,string>|string>
      */
