@@ -33,6 +33,14 @@ final class ForumTree
         }
     }
 
+    /**
+     * @return array<int|array<int>>
+     */
+    public function getTree(): array
+    {
+        return $this->tree;
+    }
+
     public function getIterator(): RecursiveIteratorIterator
     {
         return new RecursiveIteratorIterator(new RecursiveArrayIterator($this->tree));

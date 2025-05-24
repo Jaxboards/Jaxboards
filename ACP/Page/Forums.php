@@ -7,10 +7,12 @@ namespace ACP\Page;
 use ACP\Page;
 use ACP\Page\Forums\RecountStats;
 use Jax\Database;
+use Jax\ForumTree;
 use Jax\Jax;
 use Jax\Request;
 use Jax\TextFormatting;
 
+use function _\groupBy;
 use function _\keyBy;
 use function array_filter;
 use function array_key_exists;
@@ -93,7 +95,7 @@ final readonly class Forums
     private function mysqltree(
         array $tree,
         string $path = '',
-        float|int $order = 0,
+        int $order = 0,
     ): void {
         foreach ($tree as $key => $value) {
             $key = mb_substr($key, 1);
@@ -136,44 +138,33 @@ final readonly class Forums
 
     /**
      * @param array<int|string,array<int>|int> $tree
+     * @param array<int,array<string,mixed>>   $categories
      * @param array<int,array<string,mixed>>   $forums
      */
     private function printtree(
         array $tree,
+        array $categories,
         array $forums,
-        ?string $class = null,
         int $highlight = 0,
     ): string {
         $html = '';
-        if (count($tree) <= 0) {
-            return '';
-        }
 
-        foreach ($tree as $id => $children) {
-            if (!isset($forums[$id])) {
-                continue;
-            }
+        foreach ($tree as $id => $value) {
+            $forumId = is_array($value) ? $id : $value;
+            $forum = $forums[$forumId];
 
-            if (!is_array($forums[$id])) {
-                continue;
-            }
-
-            $classes = [];
-            $classes[] = is_string($id) && $id[0] === 'c'
-                ? 'parentlock'
-                : 'nofirstlevel';
-
-            if ($highlight && $id === $highlight) {
+            $classes = ['nofirstlevel'];
+            if ($highlight && $forumId === $highlight) {
                 $classes[] = 'highlight';
             }
-
             $classes = implode(' ', $classes);
-            $trashcan = isset($forums[$id]['trashcan']) && $forums[$id]['trashcan'] ? $this->page->parseTemplate(
+
+            $trashcan = isset($forum['trashcan']) && $forum['trashcan'] ? $this->page->parseTemplate(
                 'forums/order-forums-tree-item-trashcan.html',
             ) : '';
 
-            if ($forums[$id]['mods']) {
-                $modCount = count(explode(',', (string) $forums[$id]['mods']));
+            if ($forum['mods']) {
+                $modCount = count(explode(',', (string) $forum['mods']));
                 $mods = $this->page->parseTemplate(
                     'forums/order-forums-tree-item-mods.html',
                     [
@@ -186,24 +177,23 @@ final readonly class Forums
             }
 
             $content = '';
-            if (is_array($children)) {
-                $content = '' . $this->printtree(
-                    $children,
+            if (is_array($value)) {
+                $content = $this->printtree(
+                    $value,
+                    $categories,
                     $forums,
-                    '',
                     $highlight,
                 );
             }
 
-            $title = $forums[$id]['title'];
             $html .= $this->page->parseTemplate(
                 'forums/order-forums-tree-item.html',
                 [
                     'class' => $classes,
                     'content' => $content,
-                    'id' => $id,
+                    'id' => $forumId,
                     'mods' => $mods,
-                    'title' => $title,
+                    'title' => $forum['title'],
                     'trashcan' => $trashcan,
                 ],
             );
@@ -212,7 +202,7 @@ final readonly class Forums
         return $this->page->parseTemplate(
             'forums/order-forums-tree.html',
             [
-                'class' => $class ?: '',
+                'class' => '',
                 'content' => $html,
             ],
         );
@@ -228,7 +218,7 @@ final readonly class Forums
         }
 
         $tree = $this->request->asString->post('tree');
-        if ($tree) {
+        if ($tree !== null) {
             self::mysqltree(json_decode($tree, true));
             if ($this->request->get('do') === 'create') {
                 return;
@@ -259,38 +249,14 @@ final readonly class Forums
             'forums',
             'ORDER BY `order`,`title`',
         );
-        $tree = [];
 
-        $forums = keyBy($this->database->arows($result), static fn($forum) => $forum['id']);
-        foreach ($forums as $forum) {
-            $forums[$forum['id']] = [
-                'mods' => $forum['mods'],
-                'title' => $forum['title'],
-                'trashcan' => $forum['trashcan'],
-            ];
-            $treeparts = array_filter(
-                explode(' ', (string) $forum['path']),
-                static fn($part): bool => trim($part) !== '',
-            );
-            array_unshift($treeparts, 'c_' . $forum['cat_id']);
-            $intree = &$tree;
-            foreach ($treeparts as $treePart) {
-                if (
-                    !array_key_exists($treePart, $intree)
-                    || !is_array($intree[$treePart])
-                ) {
-                    $intree[$treePart] = [];
-                }
+        $forumRecords = $this->database->arows($result);
 
-                $intree = &$intree[$treePart];
-            }
-
-            if (array_key_exists($forum['id'], $intree)) {
-                continue;
-            }
-
-            $intree[$forum['id']] = true;
-        }
+        $forums = keyBy($forumRecords, static fn($forum) => $forum['id']);
+        $forumsByCategory = array_map(
+            static fn($forums) => new ForumTree($forums),
+            groupBy($forumRecords, static fn($forum) => $forum['cat_id'])
+        );
 
         $result = $this->database->safeselect(
             [
@@ -301,18 +267,36 @@ final readonly class Forums
             'categories',
             'ORDER BY `order`,`id` ASC',
         );
-        $categories = $this->database->arows($result);
-        foreach ($categories as $category) {
-            $forums['c_' . $category['id']] = ['title' => $category['title']];
-            $sortedtree['c_' . $category['id']] = $tree['c_' . $category['id']] ?? null;
+        $categories = keyBy($this->database->arows($result), static fn($cat) => $cat['id']);
+
+        $treeHTML = '';
+        foreach ($forumsByCategory as $categoryId => $forumTree) {
+            $treeHTML .= $this->page->parseTemplate(
+                'forums/order-forums-tree-item.html',
+                [
+                    'class' => 'parentlock',
+                    'content' => $this->printtree(
+                        $forumTree->getTree(),
+                        $categories,
+                        $forums,
+                        $highlight,
+                    ),
+                    'id' => "c_{$categoryId}",
+                    'title' => $categories[$categoryId]['title'],
+                    'trashcan' => '',
+                    'mods' => '',
+                ],
+            );
         }
 
-        $page .= $this->printtree(
-            $sortedtree,
-            $forums,
-            'tree',
-            $highlight,
+        $page .= $this->page->parseTemplate(
+            'forums/order-forums-tree.html',
+            [
+                'class' => 'tree',
+                'content' => $treeHTML,
+            ]
         );
+
         $page .= $this->page->parseTemplate(
             'forums/order-forums.html',
         );

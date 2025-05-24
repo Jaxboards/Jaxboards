@@ -100,9 +100,10 @@ function gracefulDegrade() {
     // Hook up autocomplete form fields
 
     // Orderable forums needs this
-    const tree = document.querySelector('.tree');
-    if (tree) {
-        sortableTree(tree, 'forum_', document.querySelector('#ordered'));
+    const tree = document.querySelector<HTMLUListElement>('.tree');
+    const ordered = document.querySelector<HTMLInputElement>('#ordered');
+    if (tree && ordered) {
+        sortableTree(tree, 'forum_', ordered);
     }
 }
 onDOMReady(gracefulDegrade);
