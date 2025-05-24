@@ -19,16 +19,19 @@ final class RSSFeed
     private array $feed = [];
 
     /**
-     * @var array<string,array<string,string>|string>
+     * @param array<string,array<string,string>|string> $feed
      */
     public function __construct(array $feed)
     {
         $this->feed = array_merge($this->feed, $feed);
     }
 
-    public function additem($settings): void
+    /**
+     * @param array<mixed>
+     */
+    public function additem(array $item): void
     {
-        $this->feed['item'][] = $settings;
+        $this->feed['item'][] = $item;
     }
 
     public function publish(): never
@@ -49,7 +52,7 @@ final class RSSFeed
     }
 
     /**
-     * @var array<string,array<string,string>|string>
+     * @param array<string,array<string,string>|string> $feed
      */
     public function makeXML(array $feed): string
     {
