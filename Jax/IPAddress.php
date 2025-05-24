@@ -94,21 +94,6 @@ final class IPAddress
     /**
      * @return array<string>
      */
-    private function loadBannedIps(): array
-    {
-        $bannedIPsPath = $this->domainDefinitions->getBoardPath() . '/bannedips.txt';
-        if (file_exists($bannedIPsPath)) {
-            return array_filter(
-                file($bannedIPsPath, FILE_IGNORE_NEW_LINES) ?: [],
-                static fn($line): bool => $line !== '',
-            );
-        }
-        return [];
-    }
-
-    /**
-     * @return array<string>
-     */
     public function getBannedIps(): array
     {
         return $this->ipBanCache;
@@ -146,6 +131,22 @@ final class IPAddress
         $this->database->disposeresult($result);
 
         return !isset($row['banned']) || $row['banned'] > 0;
+    }
+
+    /**
+     * @return array<string>
+     */
+    private function loadBannedIps(): array
+    {
+        $bannedIPsPath = $this->domainDefinitions->getBoardPath() . '/bannedips.txt';
+        if (file_exists($bannedIPsPath)) {
+            return array_filter(
+                file($bannedIPsPath, FILE_IGNORE_NEW_LINES) ?: [],
+                static fn($line): bool => $line !== '',
+            );
+        }
+
+        return [];
     }
 
     /**

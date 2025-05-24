@@ -8,6 +8,8 @@ use function array_merge;
 use function gmdate;
 use function header;
 
+use const PHP_EOL;
+
 final class RSSFeed
 {
     /**
@@ -16,7 +18,7 @@ final class RSSFeed
     private array $feed = [];
 
     /**
-     * @var array<array<string|int>>
+     * @var array<array<int|string>>
      */
     private array $items = [];
 
@@ -28,9 +30,6 @@ final class RSSFeed
         $this->feed = array_merge($this->feed, $feed);
     }
 
-    /**
-     * @param array<string,mixed>
-     */
     public function additem(array $item): void
     {
         $this->items[] = $item;
@@ -40,9 +39,10 @@ final class RSSFeed
     {
         $this->feed['pubDate'] = gmdate('r');
         $xmlFeed = $this->makeXML($this->feed);
-        foreach($this->items as $item) {
+        foreach ($this->items as $item) {
             $xmlFeed .= "<item>{$this->makeXML($item)}</item>";
         }
+
         header('Content-type: application/rss+xml');
         echo <<<EOT
             <?xml version="1.0" encoding="UTF-8" ?>
