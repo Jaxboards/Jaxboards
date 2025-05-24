@@ -77,6 +77,9 @@ final class Page
         exit;
     }
 
+    /**
+     * @param mixed $args
+     */
     public function command(...$args): void
     {
         if ($args[0] === 'softurl') {

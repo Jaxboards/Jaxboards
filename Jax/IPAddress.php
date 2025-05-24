@@ -24,16 +24,16 @@ use const FILTER_VALIDATE_IP;
 final class IPAddress
 {
     /**
-     * @var list<string> list of human readable IPs that are banned
+     * @var array<string> list of human readable IPs that are banned
      */
-    private ?array $ipBanCache = null;
+    private array $ipBanCache = [];
 
     public function __construct(
         private readonly Config $config,
         private readonly Database $database,
         private readonly DomainDefinitions $domainDefinitions,
     ) {
-        $this->getBannedIps();
+        $this->ipBanCache = $this->loadBannedIps();
     }
 
     public function asBinary(?string $ipAddress = null): ?string
@@ -94,22 +94,23 @@ final class IPAddress
     /**
      * @return array<string>
      */
-    public function getBannedIps(): array
+    private function loadBannedIps(): array
     {
-        if ($this->ipBanCache !== null) {
-            return $this->ipBanCache;
-        }
-
-        $this->ipBanCache = [];
-
         $bannedIPsPath = $this->domainDefinitions->getBoardPath() . '/bannedips.txt';
         if (file_exists($bannedIPsPath)) {
-            $this->ipBanCache = array_filter(
-                file($bannedIPsPath, FILE_IGNORE_NEW_LINES),
+            return array_filter(
+                file($bannedIPsPath, FILE_IGNORE_NEW_LINES) ?: [],
                 static fn($line): bool => $line !== '',
             );
         }
+        return [];
+    }
 
+    /**
+     * @return array<string>
+     */
+    public function getBannedIps(): array
+    {
         return $this->ipBanCache;
     }
 
