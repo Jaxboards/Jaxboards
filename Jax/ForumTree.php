@@ -1,12 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax;
 
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
 
-class ForumTree {
-    public array $graph;
+use function array_filter;
+use function array_key_exists;
+use function array_map;
+use function explode;
+use function is_array;
+
+final class ForumTree
+{
+    public array $graph = [];
 
     /**
      * Given all forum records, generates a full subforum tree (from forum paths)
@@ -14,25 +23,29 @@ class ForumTree {
      *
      * @param array<array<string,mixed>> $forums
      */
-    public function __construct($forums) {
-        $this->graph = [];
-
-        foreach($forums as $forum) {
+    public function __construct($forums)
+    {
+        foreach ($forums as $forum) {
             $this->addForum($forum);
         }
+    }
+
+    public function getIterator(): RecursiveIteratorIterator
+    {
+        return new RecursiveIteratorIterator(new RecursiveArrayIterator($this->graph));
     }
 
     /**
      * @param array<string,mixed> $forum
      */
-    private function addForum($forum)
+    private function addForum(array $forum): void
     {
         $path = array_filter(
             array_map(
-                fn($pathId) => (int) $pathId,
-                explode(' ', $forum['path'])
+                static fn($pathId): int => (int) $pathId,
+                explode(' ', (string) $forum['path']),
             ),
-            fn($pathId) => (bool) $pathId,
+            static fn($pathId): bool => (bool) $pathId,
         );
 
         $node = &$this->graph;
@@ -40,15 +53,14 @@ class ForumTree {
             if (!array_key_exists($pathId, $node)) {
                 $node[$pathId] = [];
             }
+
             if (!is_array($node[$pathId])) {
                 $node[$pathId] = [$node[$pathId]];
             }
+
             $node = &$node[$pathId];
         }
-        $node[] = $forum['id'];
-    }
 
-    public function getIterator(): RecursiveIteratorIterator {
-        return new RecursiveIteratorIterator(new RecursiveArrayIterator($this->graph));
+        $node[] = $forum['id'];
     }
 }

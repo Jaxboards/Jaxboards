@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Jax\Page;
 
 use Carbon\Carbon;
-use Jax\ForumTree;
 use Jax\Database;
+use Jax\ForumTree;
 use Jax\Jax;
 use Jax\Page;
 use Jax\Request;
@@ -14,10 +14,10 @@ use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
-use PHP_CodeSniffer\Generators\HTML;
 
 use function array_filter;
 use function array_map;
+use function array_reduce;
 use function array_slice;
 use function ceil;
 use function count;
@@ -109,8 +109,9 @@ final class Search
         );
 
         $forums = $this->database->arows($result);
-        $titles = array_reduce($forums, function($titles, $forum) {
+        $titles = array_reduce($forums, static function (array $titles, array $forum) {
             $titles[$forum['id']] = $forum['title'];
+
             return $titles;
         });
         $forumTree = new ForumTree($forums);
@@ -119,9 +120,12 @@ final class Search
     }
 
     /**
-     * @param array<string>    $titles
+     * @param array<string> $titles
      */
-    private function getForumSelect(ForumTree $forumTree, array $titles): string {
+    private function getForumSelect(
+        ForumTree $forumTree,
+        array $titles,
+    ): string {
         $options = '';
         $forumIterator = $forumTree->getIterator();
         foreach ($forumIterator as $forumId) {
@@ -130,8 +134,6 @@ final class Search
         }
 
         return '<select size="15" title="List of forums" multiple="multiple" name="fids">' . $options . '</select>';
-
-        return $options;
     }
 
     private function dosearch(): void
