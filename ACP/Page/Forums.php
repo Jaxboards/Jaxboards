@@ -173,7 +173,7 @@ final readonly class Forums
             ) : '';
 
             if ($forums[$id]['mods']) {
-                $modCount = count(explode(',', $forums[$id]['mods']));
+                $modCount = count(explode(',', (string) $forums[$id]['mods']));
                 $mods = $this->page->parseTemplate(
                     'forums/order-forums-tree-item-mods.html',
                     [
