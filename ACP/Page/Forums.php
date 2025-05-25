@@ -86,9 +86,9 @@ final readonly class Forums
     /**
      * Saves the posted tree to mysql.
      *
-     * @param array<int,array<int,array<int,int>|int>|int>  $tree  The tree to save
-     * @param string $path  The path in the tree
-     * @param int    $order where the tree is place n the database
+     * @param array<int,array<int,array<int,int>|int>|int> $tree  The tree to save
+     * @param string                                       $path  The path in the tree
+     * @param int                                          $order where the tree is place n the database
      */
     private function mysqltree(
         array $tree,
@@ -191,7 +191,7 @@ final readonly class Forums
 
     /**
      * @param array<int,array<int,array<int,int>|int>|int> $tree
-     * @param array<int,array<string,mixed>>       $forums
+     * @param array<int,array<string,mixed>>               $forums
      */
     private function printForumTree(
         array $tree,
@@ -577,7 +577,7 @@ final readonly class Forums
         $categories = $this->fetchAllCategories();
 
         // Defaults for new forum
-        $forum = $forum ?? [
+        $forum ??= [
             'cat_id' => $categories[0]['id'],
             'mods' => null,
         ];
@@ -657,7 +657,7 @@ final readonly class Forums
 
             $page = match (true) {
                 $topics > 0 => (
-                    $moveTo ? 'Moved' : 'Deleted'
+                    $moveTo !== 0 ? 'Moved' : 'Deleted'
                 )
                     . " {$topics} topics"
                     . (

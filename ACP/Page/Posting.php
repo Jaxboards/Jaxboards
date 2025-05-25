@@ -288,7 +288,7 @@ final readonly class Posting
 
         // Delete.
         $delete = (int) $this->request->asString->get('d');
-        if ($delete) {
+        if ($delete !== 0) {
             $this->database->safedelete(
                 'ratingniblets',
                 Database::WHERE_ID_EQUALS,
