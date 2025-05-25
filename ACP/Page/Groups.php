@@ -425,7 +425,7 @@ final class Groups
             ],
         );
         $this->page->addContentBox(
-            $gid ? 'Editing group: ' . $gdata['title'] : 'Create a group!',
+            $gdata ? 'Editing group: ' . $gdata['title'] : 'Create a group!',
             $page,
         );
     }

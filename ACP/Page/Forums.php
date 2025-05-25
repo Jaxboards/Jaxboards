@@ -86,9 +86,9 @@ final readonly class Forums
     /**
      * Saves the posted tree to mysql.
      *
-     * @param array<int,array<int,array<int,int>|int>|int> $tree  The tree to save
-     * @param string                                       $path  The path in the tree
-     * @param int                                          $order where the tree is place n the database
+     * @param array<string,array<string,array<string,int>|int>|int>  $tree  The tree to save
+     * @param string                                                 $path  The path in the tree
+     * @param int                                                    $order where the tree is place n the database
      */
     private function mysqltree(
         array $tree,
@@ -190,8 +190,11 @@ final readonly class Forums
     }
 
     /**
-     * @param array<int,array<int,array<int,int>|int>|int> $tree
-     * @param array<int,array<string,mixed>>               $forums
+     * The typing is getting ridiculous here
+     * but it's just a potentially infinitely nested tree with
+     * all of the keys being the forum ID
+     * @param array<int,array<int,array<int,int>|int>|int>|array<int,array<int,int>|int> $tree
+     * @param array<int,array<string,mixed>>                                             $forums
      */
     private function printForumTree(
         array $tree,
@@ -568,6 +571,7 @@ final readonly class Forums
 
     /**
      * @param array<string,mixed> $forum
+     * @return array<string,mixed>
      */
     private function getFormData(?array $forum): array
     {
@@ -797,7 +801,7 @@ final readonly class Forums
             $error = "The category you're trying to delete does not exist.";
         }
 
-        $moveTo = (int) $moveTo;
+        $moveTo = (int) $this->request->asString->post('moveto') ;
         if (
             $error === null
             && $this->request->post('submit') !== null

@@ -59,15 +59,16 @@ final readonly class Login
                 default => null,
             };
 
-            if ($error === null && $user) {
+            if ($error) {
+                $pageElements['content'] = $this->page->error($error);
+            }
+            if ($user) {
                 // Successful login, redirect
                 $this->session->setPHPSessionValue('auid', $user['id']);
                 header('Location: admin.php');
 
                 return;
             }
-
-            $pageElements['content'] = $this->page->error($error);
         }
 
         echo $this->page->parseTemplate(
