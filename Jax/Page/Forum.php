@@ -78,6 +78,8 @@ final class Forum
         if (is_numeric($this->request->both('replies'))) {
             if (!$this->request->isJSAccess()) {
                 $this->page->location('?');
+
+                return;
             }
 
             $this->getReplySummary($this->request->both('replies'));

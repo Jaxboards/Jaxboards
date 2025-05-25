@@ -777,6 +777,7 @@ final class Topic
     {
         if (!$this->request->isJSAccess()) {
             $this->page->location('?act=post&pid=' . $pid);
+            return;
         }
 
         $this->page->command('softurl');

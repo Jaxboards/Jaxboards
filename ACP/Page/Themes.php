@@ -123,6 +123,7 @@ final readonly class Themes
         ) {
             unlink($wrapperPath);
             $this->page->location('?act=Themes');
+            return '';
         }
 
         return 'The wrapper you are trying to delete does not exist.';
@@ -533,6 +534,7 @@ final readonly class Themes
                 );
 
                 $this->page->location('?act=Themes');
+                return;
             }
 
             $page = $this->page->error($error);

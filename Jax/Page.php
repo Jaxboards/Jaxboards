@@ -73,8 +73,6 @@ final class Page
         }
 
         header("Location: {$newLocation}");
-
-        exit;
     }
 
     /**

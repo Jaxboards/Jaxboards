@@ -254,6 +254,7 @@ final readonly class ModTopics
 
             $this->cancel();
             $this->page->location('?act=vt' . $otherTopic);
+            return;
         }
 
         $page .= '<form method="post" data-ajax-form="true" '
@@ -332,6 +333,7 @@ final readonly class ModTopics
         }
 
         $this->page->location('?act=vf' . $forumId);
+        return;
     }
 
     /**

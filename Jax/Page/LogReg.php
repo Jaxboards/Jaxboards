@@ -225,6 +225,8 @@ final class LogReg
                     $this->page->command('reload');
                 } else {
                     $this->page->location('?');
+
+                    return;
                 }
             } else {
                 $this->page->append(

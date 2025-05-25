@@ -46,7 +46,10 @@ final class App
 
     public function render(): void
     {
-        $this->ensureACPAccess();
+        if (!$this->hasACPAccess()) {
+            $this->page->location('./');
+            return;
+        }
 
         $this->page->append('username', (string) $this->user->get('display_name'));
         $this->page->append('title', $this->config->getSetting('boardname') . ' - ACP');
@@ -107,18 +110,14 @@ final class App
         );
     }
 
-    private function ensureACPAccess(): void
+    private function hasACPAccess(): bool
     {
         $adminUserId = $this->session->getPHPSessionValue('auid');
         if ($adminUserId) {
             $this->user->getUser($adminUserId);
         }
 
-        if ($this->user->getPerm('can_access_acp')) {
-            return;
-        }
-
-        $this->page->location('./');
+        return (bool) $this->user->getPerm('can_access_acp');
     }
 
     private function renderNav(): void
