@@ -31,7 +31,6 @@ final class Session
      * @var array<string,string>
      */
     private array $bots = [
-        // SEO crawler
         'AhrefsBot' => 'Ahrefs',
         'Amazonbot' => 'Amazon',
         'Applebot' => 'Applebot',
@@ -64,6 +63,7 @@ final class Session
         'mj12bot' => 'Majestic',
         'MojeekBot' => 'Mojeek',
         'OAI-SearchBot' => 'OpenAI',
+        'ows.eu' => 'Owler',
         'PerplexityBot' => 'Perplexity',
         'PetalBot' => 'PetalBot',
         'Qwantbot' => 'Qwant',
