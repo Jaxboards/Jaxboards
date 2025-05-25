@@ -58,7 +58,7 @@ final readonly class Members
 
     public function render(): void
     {
-        match ($this->request->both('do')) {
+        match ($this->request->asString->both('do')) {
             'merge' => $this->merge(),
             'edit' => $this->editMember(),
             'delete' => $this->deleteMember(),
@@ -124,22 +124,19 @@ final readonly class Members
     private function editMember(): void
     {
         $page = '';
-        if (
-            $this->request->both('mid')
-            || $this->request->post('submit')
-        ) {
-            if (is_numeric($this->request->both('mid'))) {
+        $memberId = (int) $this->request->asString->both('mid');
+        $name = $this->request->asString->post('name');
+        if ($memberId || $this->request->post('submit')) {
+            if ($memberId) {
                 $result = $this->database->safeselect(
                     ['group_id'],
                     'members',
                     Database::WHERE_ID_EQUALS,
-                    $this->database->basicvalue($this->request->both('mid')),
+                    $this->database->basicvalue($memberId),
                 );
                 $member = $this->database->arow($result);
                 $this->database->disposeresult($result);
-                if (
-                    $this->request->post('savedata')
-                ) {
+                if ($this->request->post('savedata') && $member) {
                     $page = $this->updateMember($member);
                 }
 
@@ -193,7 +190,7 @@ final readonly class Members
                     ],
                     'members',
                     Database::WHERE_ID_EQUALS,
-                    $this->database->basicvalue($this->request->both('mid')),
+                    $this->database->basicvalue($memberId),
                 );
             } else {
                 $result = $this->database->safeselect(
@@ -243,21 +240,21 @@ final readonly class Members
                     ],
                     'members',
                     'WHERE `display_name` LIKE ?',
-                    $this->database->basicvalue($this->request->post('name') . '%'),
+                    $this->database->basicvalue($name . '%'),
                 );
             }
 
-            $member = $this->database->arows($result);
+            $members = $this->database->arows($result);
 
-            $nummembers = count($member);
-            if ($nummembers > 1) {
-                foreach ($member as $v) {
+            $numMembers = count($members);
+            if ($numMembers > 1) {
+                foreach ($members as $member) {
                     $page .= $this->page->parseTemplate(
                         'members/edit-select-option.html',
                         [
-                            'avatar_url' => $v['avatar'] ?: self::DEFAULT_AVATAR,
-                            'id' => $v['id'],
-                            'title' => $v['display_name'],
+                            'avatar_url' => $member['avatar'] ?: self::DEFAULT_AVATAR,
+                            'id' => $member['id'],
+                            'title' => $member['display_name'],
                         ],
                     );
                 }
@@ -267,7 +264,7 @@ final readonly class Members
                 return;
             }
 
-            if ($nummembers === 0) {
+            if ($numMembers === 0) {
                 $this->page->addContentBox(
                     'Error',
                     $this->page->error('This member does not exist. '),
@@ -276,7 +273,7 @@ final readonly class Members
                 return;
             }
 
-            $member = array_pop($member);
+            $member = array_pop($members);
             if (
                 $member['group_id'] === Groups::Admin->value
                 && $this->user->get('id') !== 1
@@ -284,33 +281,33 @@ final readonly class Members
                 $page = $this->page->error('You do not have permission to edit this profile. ');
             } else {
                 $page .= $this->jax->hiddenFormFields(['mid' => $member['id']]);
-                $page .= $this->formfield('Display Name:', 'display_name', $member['display_name']);
-                $page .= $this->formfield('Username:', 'name', $member['name']);
-                $page .= $this->formfield('Real Name:', 'full_name', $member['full_name']);
-                $page .= $this->formfield('Password:', 'password', '');
+                $page .= $this->inputText('Display Name:', 'display_name', $member['display_name']);
+                $page .= $this->inputText('Username:', 'name', $member['name']);
+                $page .= $this->inputText('Real Name:', 'full_name', $member['full_name']);
+                $page .= $this->inputText('Password:', 'password', '');
                 $page .= $this->getGroups($member['group_id']);
                 $page .= $this->heading('Profile Fields');
-                $page .= $this->formfield('User Title:', 'usertitle', $member['usertitle']);
-                $page .= $this->formfield('Location:', 'location', $member['location']);
-                $page .= $this->formfield('Website:', 'website', $member['website']);
-                $page .= $this->formfield('Avatar:', 'avatar', $member['avatar']);
-                $page .= $this->formfield('About:', 'about', $member['about'], 'textarea');
-                $page .= $this->formfield('Signature:', 'sig', $member['sig'], 'textarea');
-                $page .= $this->formfield('Email:', 'email', $member['email']);
-                $page .= $this->formfield('UCP Notepad:', 'ucpnotepad', $member['ucpnotepad'], 'textarea');
+                $page .= $this->inputText('User Title:', 'usertitle', $member['usertitle']);
+                $page .= $this->inputText('Location:', 'location', $member['location']);
+                $page .= $this->inputText('Website:', 'website', $member['website']);
+                $page .= $this->inputText('Avatar:', 'avatar', $member['avatar']);
+                $page .= $this->textArea('About:', 'about', $member['about']);
+                $page .= $this->textArea('Signature:', 'sig', $member['sig']);
+                $page .= $this->inputText('Email:', 'email', $member['email']);
+                $page .= $this->textArea('UCP Notepad:', 'ucpnotepad', $member['ucpnotepad']);
                 $page .= $this->heading('Contact Details');
-                $page .= $this->formfield('AIM:', 'contact_aim', $member['contact_aim']);
-                $page .= $this->formfield('Bluesky:', 'contact_bluesky', $member['contact_bluesky']);
-                $page .= $this->formfield('Discord:', 'contact_discord', $member['contact_discord']);
-                $page .= $this->formfield('Google Chat:', 'contact_gtalk', $member['contact_gtalk']);
-                $page .= $this->formfield('MSN:', 'contact_msn', $member['contact_msn']);
-                $page .= $this->formfield('Skype:', 'contact_skype', $member['contact_skype']);
-                $page .= $this->formfield('Steam:', 'contact_steam', $member['contact_steam']);
-                $page .= $this->formfield('Twitter:', 'contact_twitter', $member['contact_twitter']);
-                $page .= $this->formfield('YIM:', 'contact_yim', $member['contact_yim']);
-                $page .= $this->formfield('YouTube:', 'contact_youtube', $member['contact_youtube']);
+                $page .= $this->inputText('AIM:', 'contact_aim', $member['contact_aim']);
+                $page .= $this->inputText('Bluesky:', 'contact_bluesky', $member['contact_bluesky']);
+                $page .= $this->inputText('Discord:', 'contact_discord', $member['contact_discord']);
+                $page .= $this->inputText('Google Chat:', 'contact_gtalk', $member['contact_gtalk']);
+                $page .= $this->inputText('MSN:', 'contact_msn', $member['contact_msn']);
+                $page .= $this->inputText('Skype:', 'contact_skype', $member['contact_skype']);
+                $page .= $this->inputText('Steam:', 'contact_steam', $member['contact_steam']);
+                $page .= $this->inputText('Twitter:', 'contact_twitter', $member['contact_twitter']);
+                $page .= $this->inputText('YIM:', 'contact_yim', $member['contact_yim']);
+                $page .= $this->inputText('YouTube:', 'contact_youtube', $member['contact_youtube']);
                 $page .= $this->heading('System-Generated Variables');
-                $page .= $this->formfield('Post Count:', 'posts', $member['posts']);
+                $page .= $this->inputText('Post Count:', 'posts', $member['posts']);
                 $page = $this->page->parseTemplate(
                     'members/edit-form.html',
                     ['content' => $page],
@@ -327,136 +324,141 @@ final readonly class Members
         );
     }
 
-    private function updateMember(?array $member): string
+    /**
+     * @param array<string,mixed> $member
+     */
+    private function updateMember(array $member): string
     {
-        if (
-            $member['group_id'] !== 2 || $this->user->get('id') === 1
-        ) {
-            $write = [];
-            if ($this->request->post('password')) {
-                $write['pass'] = password_hash(
-                    (string) $this->request->post('password'),
-                    PASSWORD_DEFAULT,
-                );
-            }
+        $memberId = (int) $this->request->asString->both('mid');
+        $password = $this->request->asString->post('password');
 
-            $fields = [
-                'display_name',
-                'name',
-                'full_name',
-                'usertitle',
-                'location',
-                'avatar',
-                'about',
-                'sig',
-                'email',
-                'ucpnotepad',
-                'contact_aim',
-                'contact_bluesky',
-                'contact_discord',
-                'contact_gtalk',
-                'contact_msn',
-                'contact_skype',
-                'contact_steam',
-                'contact_twitter',
-                'contact_yim',
-                'contact_youtube',
-                'website',
-                'posts',
-                'group_id',
-            ];
-            foreach ($fields as $field) {
-                if ($this->request->post($field) === null) {
-                    continue;
-                }
-
-                $write[$field] = $this->request->post($field);
-            }
-
-            // Make it so root admins can't get out of admin.
-            if ($this->request->both('mid') === '1') {
-                $write['group_id'] = Groups::Admin->value;
-            }
-
-            $this->database->safeupdate(
-                'members',
-                $write,
-                Database::WHERE_ID_EQUALS,
-                $this->database->basicvalue($this->request->both('mid')),
+        if ($member['group_id'] === 2 && $this->user->get('id') !== 1) {
+            return $this->page->error(
+                'You do not have permission to edit this profile.',
             );
-
-            return $this->page->success('Profile data saved');
         }
 
-        return $this->page->error(
-            'You do not have permission to edit this profile.',
+        $write = [];
+
+        if ($password) {
+            $write['pass'] = password_hash(
+                $password,
+                PASSWORD_DEFAULT,
+            );
+        }
+
+        $fields = [
+            'display_name',
+            'name',
+            'full_name',
+            'usertitle',
+            'location',
+            'avatar',
+            'about',
+            'sig',
+            'email',
+            'ucpnotepad',
+            'contact_aim',
+            'contact_bluesky',
+            'contact_discord',
+            'contact_gtalk',
+            'contact_msn',
+            'contact_skype',
+            'contact_steam',
+            'contact_twitter',
+            'contact_yim',
+            'contact_youtube',
+            'website',
+            'posts',
+            'group_id',
+        ];
+        foreach ($fields as $field) {
+            $value = $this->request->asString->post($field);
+            if ($value === null) {
+                continue;
+            }
+
+            $write[$field] = $value;
+        }
+
+        // Make it so root admins can't get out of admin.
+        if ($memberId === 1) {
+            $write['group_id'] = Groups::Admin->value;
+        }
+
+        $this->database->safeupdate(
+            'members',
+            $write,
+            Database::WHERE_ID_EQUALS,
+            $memberId,
         );
+
+        return $this->page->success('Profile data saved');
+    }
+
+    private function preRegisterSubmit(): ?string {
+        $username = $this->request->asString->post('username');
+        $displayName = $this->request->asString->post('displayname');
+        $password = $this->request->asString->post('pass');
+
+        if (!$username || !$displayName || !$password) {
+            return 'All fields required.';
+        }
+
+        if (mb_strlen($username) > 30 || mb_strlen($displayName) > 30) {
+            return 'Display name and username must be under 30 characters.';
+        }
+
+        $result = $this->database->safeselect(
+            ['name', 'display_name'],
+            'members',
+            'WHERE `name`=? OR `display_name`=?',
+            $this->database->basicvalue($username),
+            $this->database->basicvalue($displayName),
+        );
+        if ($member = $this->database->arow($result)) {
+            return 'That ' . ($member['name'] === $username
+                ? 'username' : 'display name') . ' is already taken';
+        }
+        $this->database->disposeresult($result);
+
+        $result = $this->database->safeinsert('members', [
+            'birthdate' => '0000-00-00',
+            'display_name' => $displayName,
+            'group_id' => 1,
+            'last_visit' => $this->database->datetime(),
+            'name' => $username,
+            'pass' => password_hash(
+                $password,
+                PASSWORD_DEFAULT,
+            ),
+            'posts' => 0,
+        ]);
+        $this->database->disposeresult($result);
+
+        if ($this->database->affectedRows($result) === 0) {
+            return 'An error occurred while processing your request. ';
+        }
+
+        return null;
     }
 
     private function preRegister(): void
     {
         $page = '';
-        $error = null;
+
         if ($this->request->post('submit') !== null) {
-            if (
-                !$this->request->post('username')
-                || !$this->request->post('displayname')
-                || !$this->request->post('pass')
-            ) {
-                $error = 'All fields required.';
-            } elseif (
-                mb_strlen((string) $this->request->post('username')) > 30
-                || mb_strlen($this->request->post('displayname')) > 30
-            ) {
-                $error = 'Display name and username must be under 30 characters.';
-            } else {
-                $result = $this->database->safeselect(
-                    ['name', 'display_name'],
-                    'members',
-                    'WHERE `name`=? OR `display_name`=?',
-                    $this->database->basicvalue($this->request->post('username')),
-                    $this->database->basicvalue($this->request->post('displayname')),
-                );
-                if ($f = $this->database->arow($result)) {
-                    $error = 'That ' . ($f['name'] === $this->request->post('username')
-                        ? 'username' : 'display name') . ' is already taken';
-                }
-
-                $this->database->disposeresult($result);
-            }
-
-            if ($error !== null) {
-                $page .= $this->page->error($error);
-            } else {
-                $member = [
-                    'birthdate' => '0000-00-00',
-                    'display_name' => $this->request->post('displayname'),
-                    'group_id' => 1,
-                    'last_visit' => $this->database->datetime(),
-                    'name' => $this->request->post('username'),
-                    'pass' => password_hash(
-                        (string) $this->request->post('pass'),
-                        PASSWORD_DEFAULT,
-                    ),
-                    'posts' => 0,
-                ];
-                $result = $this->database->safeinsert('members', $member);
-                $this->database->disposeresult($result);
-                if ($this->database->affectedRows($result) > 0) {
-                    $page .= $this->page->success('Member registered.');
-                } else {
-                    $page .= $this->page->error(
-                        'An error occurred while processing your request. ',
-                    );
-                }
-            }
+           $error = $this->preRegisterSubmit();
+           $page .= $error
+            ? $this->page->error($error)
+            : $this->page->success('Member registered.');
         }
 
         $page .= $this->page->parseTemplate('members/pre-register.html');
         $this->page->addContentBox('Pre-Register', $page);
     }
 
-    private function getGroups($group_id = 0): string
+    private function getGroups(int $groupId = 0): string
     {
         $page = '';
         $result = $this->database->safeselect(
@@ -464,13 +466,13 @@ final readonly class Members
             'member_groups',
             'ORDER BY `title` DESC',
         );
-        while ($f = $this->database->arow($result)) {
+        foreach ($this->database->arows($result) as $group) {
             $page .= $this->page->parseTemplate(
                 'select-option.html',
                 [
-                    'label' => $f['title'],
-                    'selected' => $group_id === $f['id'] ? ' selected="selected"' : '',
-                    'value' => $f['id'],
+                    'label' => $group['title'],
+                    'selected' => $groupId === $group['id'] ? ' selected="selected"' : '',
+                    'value' => $group['id'],
                 ],
             );
         }
@@ -483,174 +485,162 @@ final readonly class Members
         );
     }
 
+    private function mergeMembers(int $mid1, int $mid2): null
+    {
+        // Files.
+        $this->database->safeupdate(
+            'files',
+            [
+                'uid' => $mid2,
+            ],
+            'WHERE `uid`=?',
+            $mid1,
+        );
+        // PMs.
+        $this->database->safeupdate(
+            'messages',
+            [
+                'to' => $mid2,
+            ],
+            'WHERE `to`=?',
+            $mid1,
+        );
+        $this->database->safeupdate(
+            'messages',
+            [
+                'from' => $mid2,
+            ],
+            'WHERE `from`=?',
+            $mid1,
+        );
+        // Posts.
+        $this->database->safeupdate(
+            'posts',
+            [
+                'auth_id' => $mid2,
+            ],
+            'WHERE `auth_id`=?',
+            $mid1,
+        );
+        // Profile comments.
+        $this->database->safeupdate(
+            'profile_comments',
+            [
+                'to' => $mid2,
+            ],
+            'WHERE `to`=?',
+            $mid1,
+        );
+        $this->database->safeupdate(
+            'profile_comments',
+            [
+                'from' => $mid2,
+            ],
+            'WHERE `from`=?',
+            $mid1,
+        );
+        // Topics.
+        $this->database->safeupdate(
+            'topics',
+            [
+                'auth_id' => $mid2,
+            ],
+            'WHERE `auth_id`=?',
+            $mid1,
+        );
+        $this->database->safeupdate(
+            'topics',
+            [
+                'lp_uid' => $mid2,
+            ],
+            'WHERE `lp_uid`=?',
+            $mid1,
+        );
+
+        // Forums.
+        $this->database->safeupdate(
+            'forums',
+            [
+                'lp_uid' => $mid2,
+            ],
+            'WHERE `lp_uid`=?',
+            $mid1,
+        );
+
+        // Shouts.
+        $this->database->safeupdate(
+            'shouts',
+            [
+                'uid' => $mid2,
+            ],
+            'WHERE `uid`=?',
+            $mid1,
+        );
+
+        // Session.
+        $this->database->safeupdate(
+            'session',
+            [
+                'uid' => $mid2,
+            ],
+            'WHERE `uid`=?',
+            $mid1,
+        );
+
+        // Sum post count on account being merged into.
+        $result = $this->database->safeselect(
+            ['id', 'posts'],
+            'members',
+            Database::WHERE_ID_EQUALS,
+            $mid1,
+        );
+        $posts = $this->database->arow($result);
+        $this->database->disposeresult($result);
+        $posts = $posts ? $posts['posts'] : 0;
+
+        $this->database->safespecial(
+            'UPDATE %t SET `posts` = `posts` + ? WHERE `id`=?',
+            ['members'],
+            $posts,
+            $mid2,
+        );
+
+        // Delete the account.
+        $this->database->safedelete('members', Database::WHERE_ID_EQUALS, $mid1);
+
+        // Update stats.
+        $this->database->safespecial(
+            <<<'SQL'
+                UPDATE %t
+                SET `members` = `members` - 1,
+                    `last_register` = (SELECT MAX(`id`) FROM %t)
+                SQL,
+            ['stats', 'members'],
+        );
+
+        return null;
+    }
+
     private function merge(): void
     {
-        $page = '';
         $error = null;
 
         if ($this->request->post('submit') !== null) {
-            if (
-                !$this->request->post('mid1')
-                || !$this->request->post('mid2')
-            ) {
-                $error = 'All fields are required';
-            } elseif (
-                !is_numeric($this->request->post('mid1'))
-                || !is_numeric($this->request->post('mid2'))
-            ) {
-                $error = 'An error occurred in processing your request';
-            } elseif ($this->request->post('mid1') === $this->request->post('mid2')) {
-                $error = "Can't merge a member with her/himself";
-            }
-
-            if ($error !== null) {
-                $page .= $this->page->error($error);
-            } else {
-                $mid1 = $this->database->basicvalue($this->request->post('mid1'));
-                $mid1int = $this->request->post('mid1');
-                $mid2 = $this->request->post('mid2');
-
-                // Files.
-                $this->database->safeupdate(
-                    'files',
-                    [
-                        'uid' => $mid2,
-                    ],
-                    'WHERE `uid`=?',
-                    $mid1,
-                );
-                // PMs.
-                $this->database->safeupdate(
-                    'messages',
-                    [
-                        'to' => $mid2,
-                    ],
-                    'WHERE `to`=?',
-                    $mid1,
-                );
-                $this->database->safeupdate(
-                    'messages',
-                    [
-                        'from' => $mid2,
-                    ],
-                    'WHERE `from`=?',
-                    $mid1,
-                );
-                // Posts.
-                $this->database->safeupdate(
-                    'posts',
-                    [
-                        'auth_id' => $mid2,
-                    ],
-                    'WHERE `auth_id`=?',
-                    $mid1,
-                );
-                // Profile comments.
-                $this->database->safeupdate(
-                    'profile_comments',
-                    [
-                        'to' => $mid2,
-                    ],
-                    'WHERE `to`=?',
-                    $mid1,
-                );
-                $this->database->safeupdate(
-                    'profile_comments',
-                    [
-                        'from' => $mid2,
-                    ],
-                    'WHERE `from`=?',
-                    $mid1,
-                );
-                // Topics.
-                $this->database->safeupdate(
-                    'topics',
-                    [
-                        'auth_id' => $mid2,
-                    ],
-                    'WHERE `auth_id`=?',
-                    $mid1,
-                );
-                $this->database->safeupdate(
-                    'topics',
-                    [
-                        'lp_uid' => $mid2,
-                    ],
-                    'WHERE `lp_uid`=?',
-                    $mid1,
-                );
-
-                // Forums.
-                $this->database->safeupdate(
-                    'forums',
-                    [
-                        'lp_uid' => $mid2,
-                    ],
-                    'WHERE `lp_uid`=?',
-                    $mid1,
-                );
-
-                // Shouts.
-                $this->database->safeupdate(
-                    'shouts',
-                    [
-                        'uid' => $mid2,
-                    ],
-                    'WHERE `uid`=?',
-                    $mid1,
-                );
-
-                // Session.
-                $this->database->safeupdate(
-                    'session',
-                    [
-                        'uid' => $mid2,
-                    ],
-                    'WHERE `uid`=?',
-                    $mid1,
-                );
-
-                // Sum post count on account being merged into.
-                $result = $this->database->safeselect(
-                    ['id', 'posts'],
-                    'members',
-                    Database::WHERE_ID_EQUALS,
-                    $mid1,
-                );
-                $posts = $this->database->arow($result);
-                $this->database->disposeresult($result);
-                $posts = $posts ? $posts['posts'] : 0;
-
-                $this->database->safespecial(
-                    'UPDATE %t SET `posts` = `posts` + ? WHERE `id`=?',
-                    ['members'],
-                    $posts,
-                    $mid2,
-                );
-
-                // Delete the account.
-                $this->database->safedelete('members', Database::WHERE_ID_EQUALS, $mid1);
-
-                // Update stats.
-                $this->database->safespecial(
-                    <<<'SQL'
-                        UPDATE %t
-                        SET `members` = `members` - 1,
-                            `last_register` = (SELECT MAX(`id`) FROM %t)
-                        SQL,
-                    ['stats', 'members'],
-                );
-                $page .= $this->page->success('Successfully merged the two accounts.');
-            }
+            $mid1 = (int) $this->request->asString->post('mid1');
+            $mid2 = (int) $this->request->asString->post('mid2');
+            $error = match (true) {
+                !$mid1 || !$mid2 => 'All fields are required',
+                $mid1 === $mid2 => "Can't merge a member with her/himself",
+                default => $this->mergeMembers($mid1, $mid2),
+            };
         }
 
-        $page .= '';
         $this->page->addContentBox(
             'Account Merge',
-            $page
-                . $this->page->parseTemplate(
-                    'members/merge.html',
-                ),
+            ($error !== null ? $this->page->error($error) : '')
+            . $this->page->parseTemplate(
+                'members/merge.html',
+            ),
         );
     }
 
@@ -659,16 +649,15 @@ final readonly class Members
         $page = '';
         $error = null;
         if ($this->request->post('submit') !== null) {
-            if (!$this->request->post('mid')) {
+            $memberId = (int) $this->request->asString->post('mid');
+            if (!$memberId) {
                 $error = 'All fields are required';
-            } elseif (!is_numeric($this->request->post('mid'))) {
-                $error = 'An error occurred in processing your request';
             }
 
             if ($error !== null) {
                 $page .= $this->page->error($error);
             } else {
-                $mid = $this->database->basicvalue($this->request->post('mid'));
+                $mid = $this->database->basicvalue($memberId);
 
                 // PMs.
                 $this->database->safedelete('messages', 'WHERE `to`=?', $mid);
@@ -732,109 +721,15 @@ final readonly class Members
 
     private function ipBans(): void
     {
-        if ($this->request->post('ipbans') !== null) {
-            $data = explode(PHP_EOL, (string) $this->request->post('ipbans'));
-            foreach ($data as $k => $v) {
-                $iscomment = false;
-                // Check to see if each line is an ip, if it isn't,
-                // add a comment.
-                if ($v && $v[0] === '#') {
-                    $iscomment = true;
-                } elseif (!filter_var($v, FILTER_VALIDATE_IP)) {
-                    if (mb_strstr($v, '.')) {
-                        // IPv4 stuff.
-                        $d = explode('.', $v);
-                        if (trim($v) === '') {
-                            continue;
-                        }
-
-                        if (trim($v) === '0') {
-                            continue;
-                        }
-
-                        if (count($d) > 4) {
-                            $iscomment = true;
-                        } elseif (count($d) < 4 && mb_substr($v, -1) !== '.') {
-                            $iscomment = true;
-                        } else {
-                            foreach ($d as $v2) {
-                                if ($v2 === '') {
-                                    continue;
-                                }
-
-                                if ($v2 === '0') {
-                                    continue;
-                                }
-
-                                if (!is_numeric($v2)) {
-                                    continue;
-                                }
-
-                                if ($v2 <= 255) {
-                                    continue;
-                                }
-
-                                if (!is_numeric($v2)) {
-                                    continue;
-                                }
-
-                                if ($v2 <= 255) {
-                                    continue;
-                                }
-
-                                $iscomment = true;
-                            }
-                        }
-                    } elseif (mb_strstr($v, ':')) {
-                        // Must be IPv6.
-                        if (!filter_var($v, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-                            // Only need to run these checks if
-                            // it's not a valid IPv6 address.
-                            $d = explode(':', $v);
-                            if (trim($v) === '') {
-                                continue;
-                            }
-
-                            if (trim($v) === '0') {
-                                continue;
-                            }
-
-                            if (count($d) > 8) {
-                                $iscomment = true;
-                            } elseif (mb_substr($v, -1) !== ':') {
-                                $iscomment = true;
-                            } else {
-                                foreach ($d as $v2) {
-                                    if (
-                                        ctype_xdigit($v2)
-                                        && mb_strlen($v2) <= 4
-                                    ) {
-                                        continue;
-                                    }
-
-                                    $iscomment = true;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (!$iscomment) {
-                    continue;
-                }
-
-                $data[$k] = '#' . $v;
-            }
-
-            $data = implode(PHP_EOL, $data);
-            $o = fopen($this->domainDefinitions->getBoardPath() . '/bannedips.txt', 'w');
-            fwrite($o, $data);
-            fclose($o);
-        } elseif (file_exists($this->domainDefinitions->getBoardPath() . '/bannedips.txt')) {
-            $data = file_get_contents($this->domainDefinitions->getBoardPath() . '/bannedips.txt');
-        } else {
-            $data = '';
+        $ipBans = $this->request->asString->post('ipbans');
+        $bannedIpsPath = $this->domainDefinitions->getBoardPath() . '/bannedips.txt';
+        if ($ipBans !== null) {
+            file_put_contents(
+                $bannedIpsPath,
+                $ipBans
+            );
         }
+        $data = file_get_contents($bannedIpsPath) ?: '';
 
         $this->page->addContentBox(
             'IP Bans',
@@ -847,44 +742,48 @@ final readonly class Members
         );
     }
 
+    private function sendMassMessage() {
+        $title = $this->request->asString->post('title');
+        $message = $this->request->asString->post('message');
+        if (!$title || !$message) {
+            return $this->page->error('All fields required!');
+        }
+
+        $q = $this->database->safeselect(
+            ['id'],
+            'members',
+            'WHERE (?-UNIX_TIMESTAMP(`last_visit`))<?',
+            Carbon::now()->getTimestamp(),
+            60 * 60 * 24 * 31 * 6,
+        );
+        $num = 0;
+        while ($f = $this->database->arow($q)) {
+            $this->database->safeinsert(
+                'messages',
+                [
+                    'date' => $this->database->datetime(),
+                    'del_recipient' => 0,
+                    'del_sender' => 0,
+                    'flag' => 0,
+                    'from' => $this->user->get('id'),
+                    'message' => $message,
+                    'read' => 0,
+                    'title' => $title,
+                    'to' => $f['id'],
+                ],
+            );
+            ++$num;
+        }
+
+        return $this->page->success("Successfully delivered {$num} messages");
+    }
+
     private function massMessage(): void
     {
         $page = '';
-        if ($this->request->post('submit') !== null) {
-            if (
-                !trim((string) $this->request->post('title'))
-                || !trim((string) $this->request->post('message'))
-            ) {
-                $page .= $this->page->error('All fields required!');
-            } else {
-                $q = $this->database->safeselect(
-                    ['id'],
-                    'members',
-                    'WHERE (?-UNIX_TIMESTAMP(`last_visit`))<?',
-                    Carbon::now()->getTimestamp(),
-                    60 * 60 * 24 * 31 * 6,
-                );
-                $num = 0;
-                while ($f = $this->database->arow($q)) {
-                    $this->database->safeinsert(
-                        'messages',
-                        [
-                            'date' => $this->database->datetime(),
-                            'del_recipient' => 0,
-                            'del_sender' => 0,
-                            'flag' => 0,
-                            'from' => $this->user->get('id'),
-                            'message' => $this->request->post('message'),
-                            'read' => 0,
-                            'title' => $this->request->post('title'),
-                            'to' => $f['id'],
-                        ],
-                    );
-                    ++$num;
-                }
 
-                $page .= $this->page->success("Successfully delivered {$num} messages");
-            }
+        if ($this->request->post('submit') !== null) {
+            $page .= $this->sendMassMessage();
         }
 
         $this->page->addContentBox(
@@ -901,8 +800,7 @@ final readonly class Members
         if ($this->request->post('submit1') !== null) {
             $this->config->write(
                 [
-                    'membervalidation' => $this->request->post('v_enable') !== null
-                        && $this->request->post('v_enable') ? 1 : 0,
+                    'membervalidation' => $this->request->asString->post('v_enable') ? 1 : 0,
                 ],
             );
         }
@@ -916,17 +814,16 @@ final readonly class Members
         );
         $this->page->addContentBox('Enable Member Validation', $page);
 
-        if (
-            $this->request->post('mid') !== null
-            && $this->request->post('action') === 'Allow'
-        ) {
+        $memberId = (int) $this->request->post('mid');
+        $action = $this->request->asString->post('action');
+        if ($memberId !== null && $action === 'Allow') {
             $this->database->safeupdate(
                 'members',
                 [
                     'group_id' => 1,
                 ],
                 Database::WHERE_ID_EQUALS,
-                $this->database->basicvalue($this->request->post('mid')),
+                $this->database->basicvalue($memberId),
             );
         }
 
@@ -942,20 +839,20 @@ final readonly class Members
             'WHERE `group_id`=5',
         );
         $page = '';
-        while ($f = $this->database->arow($result)) {
+        foreach ($this->database->arows($result) as $member) {
             $page .= $this->page->parseTemplate(
                 'members/validation-list-row.html',
                 [
-                    'email_address' => $f['email'],
-                    'id' => $f['id'],
-                    'ip_address' => $this->ipAddress->asHumanReadable($f['ip']),
-                    'join_date' => gmdate('M jS, Y @ g:i A', $f['join_date']),
-                    'title' => $f['display_name'],
+                    'email_address' => $member['email'],
+                    'id' => $member['id'],
+                    'ip_address' => $this->ipAddress->asHumanReadable($member['ip']),
+                    'join_date' => gmdate('M jS, Y @ g:i A', $member['join_date']),
+                    'title' => $member['display_name'],
                 ],
             );
         }
 
-        $page = $page !== '' && $page !== '0' ? $this->page->parseTemplate(
+        $page = $page !== '' ? $this->page->parseTemplate(
             'members/validation-list.html',
             [
                 'content' => $page,
@@ -964,25 +861,28 @@ final readonly class Members
         $this->page->addContentBox('Members Awaiting Validation', $page);
     }
 
-    private function formfield(
+    private function inputText(
         string $label,
         string $name,
         $value,
-        $which = false,
     ): string {
-        if (mb_strtolower((string) $which) === 'textarea') {
-            return $this->page->parseTemplate(
-                'members/edit-form-field-textarea.html',
-                [
-                    'label' => $label,
-                    'title' => $name,
-                    'value' => $value,
-                ],
-            );
-        }
-
         return $this->page->parseTemplate(
             'members/edit-form-field-text.html',
+            [
+                'label' => $label,
+                'title' => $name,
+                'value' => $value,
+            ],
+        );
+    }
+
+    private function textArea(
+        string $label,
+        string $name,
+        $value,
+    ): string {
+        return $this->page->parseTemplate(
+            'members/edit-form-field-textarea.html',
             [
                 'label' => $label,
                 'title' => $name,
