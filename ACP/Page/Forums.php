@@ -194,7 +194,7 @@ final readonly class Forums
      * but it's just a potentially infinitely nested tree with
      * all of the keys being the forum ID.
      *
-     * @param array<int,array<int,array<int,int>|int>|int>|array<int,array<int,int>|int> $tree
+     * @param array<int,array<int,int>|int>|array<int,int> $tree
      * @param array<int,array<string,mixed>>                                             $forums
      */
     private function printForumTree(
