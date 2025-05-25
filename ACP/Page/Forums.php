@@ -194,7 +194,7 @@ final readonly class Forums
      * but it's just a potentially infinitely nested tree with
      * all of the keys being the forum ID.
      *
-     * @param array<int,array<int,int>|int>|array<int,int> $tree
+     * @param array<int,array<int,int>|int> $tree
      * @param array<int,array<string,mixed>>               $forums
      */
     private function printForumTree(
@@ -228,6 +228,8 @@ final readonly class Forums
                         $highlight && $forumId === $highlight ? 'highlight' : '',
                     ]),
                     'content' => $subforums !== []
+                        // phpstan hates recursion
+                        // @phpstan-ignore argument.type
                         ? $this->printForumTree($subforums, $forums, $highlight)
                         : '',
                     'id' => $forumId,
