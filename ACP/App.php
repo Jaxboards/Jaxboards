@@ -48,6 +48,7 @@ final class App
     {
         if (!$this->hasACPAccess()) {
             $this->page->location('./');
+
             return;
         }
 

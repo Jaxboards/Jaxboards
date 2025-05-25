@@ -123,6 +123,7 @@ final readonly class Themes
         ) {
             unlink($wrapperPath);
             $this->page->location('?act=Themes');
+
             return '';
         }
 
@@ -534,6 +535,7 @@ final readonly class Themes
                 );
 
                 $this->page->location('?act=Themes');
+
                 return;
             }
 

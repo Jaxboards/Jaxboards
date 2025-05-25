@@ -354,6 +354,7 @@ final readonly class Forums
             );
             $this->updatePerForumModFlag();
             $this->page->location('?act=Forums&edit=' . $fid);
+
             return;
         }
 
@@ -619,6 +620,7 @@ final readonly class Forums
             $this->request->post('submit') === 'Cancel'
         ) {
             $this->page->location('?act=Forums&do=order');
+
             return;
         }
 

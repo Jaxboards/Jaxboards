@@ -254,6 +254,7 @@ final readonly class ModTopics
 
             $this->cancel();
             $this->page->location('?act=vt' . $otherTopic);
+
             return;
         }
 
@@ -333,7 +334,6 @@ final readonly class ModTopics
         }
 
         $this->page->location('?act=vf' . $forumId);
-        return;
     }
 
     /**

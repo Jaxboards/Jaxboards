@@ -261,6 +261,7 @@ final readonly class ModPosts
         if ($tid !== 0) {
             $this->updatePosts($pids, ['tid' => $tid]);
             $this->page->location('?act=vt' . $tid);
+
             return;
         }
     }
