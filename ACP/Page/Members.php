@@ -611,6 +611,7 @@ final readonly class Members
     private function merge(): void
     {
         $error = null;
+        $mergeResult = '';
 
         if ($this->request->post('submit') !== null) {
             $mid1 = (int) $this->request->asString->post('mid1');
@@ -620,12 +621,14 @@ final readonly class Members
                 $mid1 === $mid2 => "Can't merge a member with her/himself",
                 default => $this->mergeMembers($mid1, $mid2),
             };
+            $mergeResult = $error
+                ? $this->page->error($error)
+                : $this->page->success('Accounts merged successfully');
         }
 
         $this->page->addContentBox(
             'Account Merge',
-            ($error !== null ? $this->page->error($error) : '')
-            . $this->page->parseTemplate(
+            $mergeResult . $this->page->parseTemplate(
                 'members/merge.html',
             ),
         );
