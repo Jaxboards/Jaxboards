@@ -195,7 +195,7 @@ final readonly class Forums
      * all of the keys being the forum ID.
      *
      * @param array<int,array<int,int>|int>|array<int,int> $tree
-     * @param array<int,array<string,mixed>>                                             $forums
+     * @param array<int,array<string,mixed>>               $forums
      */
     private function printForumTree(
         array $tree,
