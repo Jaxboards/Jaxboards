@@ -689,9 +689,23 @@ final class Post
         ) : [];
         $pollType = $this->request->asString->post('poll_type');
 
+        $result = $this->database->safeselect(
+            ['perms'],
+            'forums',
+            Database::WHERE_ID_EQUALS,
+            $fid,
+        );
+        $forum = $this->database->arow($result);
+        $this->database->disposeresult($result);
+
+        if ($forum) {
+            $forum['perms'] = $this->user->getForumPerms($forum['perms']);
+        }
+
         // New topic input validation
         $error = match (true) {
-            $fid === 0 => 'No forum specified exists.',
+            !$forum => "The forum you're trying to post in does not exist.",
+            !$forum['perms']['start'] => "You don't have permission to post a new topic in that forum.",
             !$topicTitle || trim($topicTitle) === '' => "You didn't specify a topic title!",
             mb_strlen($topicTitle) > 255 => 'Topic title must not exceed 255 characters',
             mb_strlen($subTitle ?? '') > 255 => 'Subtitle must not exceed 255 characters',
@@ -704,36 +718,9 @@ final class Post
             $pollQuestion === null || trim($pollQuestion) === '' => "You didn't specify a poll question!",
             count($pollChoices) > 10 => 'Poll choices must not exceed 10.',
             $pollChoices === [] => "You didn't provide any poll choices!",
+            $forum && !$forum['perms']['poll'] => "You don't have permission to post a poll in that forum",
             default => null,
         };
-
-        // Check perms.
-        $result = $this->database->safeselect(
-            ['perms'],
-            'forums',
-            Database::WHERE_ID_EQUALS,
-            $fid,
-        );
-        $forum = $this->database->arow($result);
-        $this->database->disposeresult($result);
-
-        if (!$forum) {
-            $error = "The forum you're trying to post in does not exist.";
-        } else {
-            $forum['perms'] = $this->user->getForumPerms($forum['perms']);
-            if (!$forum['perms']['start']) {
-                $error = "You don't have permission to post a new topic in that forum.";
-            }
-
-            if (
-                (
-                    $pollType !== null
-                    || $pollQuestion !== null
-                ) && !$forum['perms']['poll']
-            ) {
-                $error = "You don't have permission to post a poll in that forum";
-            }
-        }
 
         if ($error !== null) {
             $this->page->append('PAGE', $this->page->error($error));
