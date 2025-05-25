@@ -51,11 +51,11 @@ final readonly class Settings
         $error = null;
         $status = '';
         if ($this->request->post('submit') !== null) {
-            $boardName = $this->request->post('boardname');
-            $logoUrl = $this->request->post('logourl');
+            $boardName = $this->request->asString->post('boardname');
+            $logoUrl = $this->request->asString->post('logourl');
             $error = match (true) {
                 !is_string($boardName) || trim($boardName) === '' => 'Board name is required',
-                trim($logoUrl) !== '' && !filter_var($this->request->post('logourl'), FILTER_VALIDATE_URL) => 'Please enter a valid logo url.',
+                $logoUrl !== '' && !filter_var($logoUrl, FILTER_VALIDATE_URL) => 'Please enter a valid logo url.',
                 default => null,
             };
 
@@ -110,8 +110,9 @@ final readonly class Settings
     private function pages(): void
     {
         $page = '';
-        if ($this->request->both('delete') !== null) {
-            $this->pages_delete($this->request->both('delete'));
+        $delete = $this->request->asString->both('delete');
+        if ($delete !== null) {
+            $this->pages_delete($delete);
         }
 
         $pageAct = $this->request->asString->both('page');
@@ -173,7 +174,7 @@ final readonly class Settings
         $this->page->addContentBox('Custom Pages', $page);
     }
 
-    private function pages_delete(array|string $page): void
+    private function pages_delete(string $page): void
     {
         $this->database->safedelete(
             'pages',
@@ -196,6 +197,8 @@ final readonly class Settings
         $pagecontents = $this->request->asString->post('pagecontents');
         if ($pagecontents !== null) {
             if ($pageinfo) {
+                $pageinfo['page'] = $pagecontents;
+
                 $this->database->safeupdate(
                     'pages',
                     [
@@ -205,12 +208,13 @@ final readonly class Settings
                     $this->database->basicvalue($pageurl),
                 );
             } else {
+                $pageinfo = [
+                    'act' => $pageurl,
+                    'page' => $pagecontents,
+                ];
                 $this->database->safeinsert(
                     'pages',
-                    [
-                        'act' => $pageurl,
-                        'page' => $pagecontents,
-                    ],
+                    $pageinfo,
                 );
             }
 
@@ -223,7 +227,7 @@ final readonly class Settings
         $page .= $this->page->parseTemplate(
             'settings/pages-edit.html',
             [
-                'content' => $this->textFormatting->blockhtml($pageinfo['page']),
+                'content' => $this->textFormatting->blockhtml($pageinfo ? $pageinfo['page'] : ''),
             ],
         );
         $this->page->addContentBox("Editing Page: {$pageurl}", $page);

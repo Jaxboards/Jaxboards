@@ -151,7 +151,7 @@ final class Groups
     /**
      * @param null|list<int> $groupIds
      *
-     * @return array<array<string,null|int|string>>
+     * @return array<string,array<string,null|int|string>>
      */
     private function fetchGroups(?array $groupIds): array
     {
@@ -194,7 +194,7 @@ final class Groups
             ...($groupIds ? [$groupIds] : []),
         );
 
-        return $this->database->arows($result);
+        return keyBy($this->database->arows($result), static fn($group) => $group['id']);
     }
 
     private function showPerms(): void
@@ -228,7 +228,7 @@ final class Groups
             return;
         }
 
-        $perms = keyBy($this->fetchGroups($groupList), static fn($group) => $group['id']);
+        $perms = $this->fetchGroups($groupList);
         $numgroups = count($perms);
 
         if ($numgroups === 0) {
@@ -247,7 +247,7 @@ final class Groups
                 'groups/show-permissions-group-heading.html',
                 [
                     'id' => $groupId,
-                    'title' => $groupData['title'],
+                    'title' => (string) $groupData['title'],
                     'width_percent' => $widthPercent,
                 ],
             );
@@ -404,6 +404,7 @@ final class Groups
             }
         }
 
+        $gdata = [];
         if ($gid) {
             $result = $this->database->safeselect(
                 ['title', 'icon'],
@@ -418,9 +419,9 @@ final class Groups
         $page .= $this->page->parseTemplate(
             'groups/create.html',
             [
-                'icon_url' => $gid ? $this->textFormatting->blockhtml($gdata['icon']) : '',
-                'submit' => $gid ? 'Edit' : 'Create',
-                'title' => $gid ? $this->textFormatting->blockhtml($gdata['title']) : '',
+                'icon_url' => $gdata ? $this->textFormatting->blockhtml($gdata['icon']) : '',
+                'submit' => $gdata ? 'Edit' : 'Create',
+                'title' => $gdata ? $this->textFormatting->blockhtml($gdata['title']) : '',
             ],
         );
         $this->page->addContentBox(

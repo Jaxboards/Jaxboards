@@ -61,18 +61,19 @@ final readonly class Posting
         }
 
         // Delete.
-        if ($this->request->get('d')) {
+        $delete = $this->request->asString->get('d');
+        if ($delete) {
             $this->database->safedelete(
                 'textrules',
                 "WHERE `type`='badword' AND `needle`=?",
-                $this->database->basicvalue($this->request->get('d')),
+                $this->database->basicvalue($delete),
             );
-            unset($wordfilter[$this->request->get('d')]);
+            unset($wordfilter[$delete]);
         }
 
         // Insert.
         if ($this->request->post('submit') !== null) {
-            $badword = $this->textFormatting->blockhtml($this->request->asString->post('badword'));
+            $badword = $this->textFormatting->blockhtml($this->request->asString->post('badword') ?? '');
             $replacement = $this->request->asString->post('replacement');
             if (!$badword || !$replacement) {
                 $page .= $this->page->error('All fields required.');
@@ -286,13 +287,14 @@ final readonly class Posting
         }
 
         // Delete.
-        if ($this->request->get('d')) {
+        $delete = (int) $this->request->asString->get('d');
+        if ($delete) {
             $this->database->safedelete(
                 'ratingniblets',
                 Database::WHERE_ID_EQUALS,
-                $this->database->basicvalue($this->request->get('d')),
+                $this->database->basicvalue($delete),
             );
-            unset($niblets[$this->request->get('d')]);
+            unset($niblets[$delete]);
         }
 
         // Insert.

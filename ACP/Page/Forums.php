@@ -86,7 +86,7 @@ final readonly class Forums
     /**
      * Saves the posted tree to mysql.
      *
-     * @param array  $tree  The tree to save
+     * @param array<int,array<int,array<int,int>|int>|int>  $tree  The tree to save
      * @param string $path  The path in the tree
      * @param int    $order where the tree is place n the database
      */
@@ -190,7 +190,7 @@ final readonly class Forums
     }
 
     /**
-     * @param array<int,array<array<int>|int>|int> $tree
+     * @param array<int,array<int,array<int,int>|int>|int> $tree
      * @param array<int,array<string,mixed>>       $forums
      */
     private function printForumTree(
@@ -566,12 +566,21 @@ final readonly class Forums
         return $this->jax->serializeForumPerms($groupPerms);
     }
 
+    /**
+     * @param array<string,mixed> $forum
+     */
     private function getFormData(?array $forum): array
     {
         $sub = (int) $this->request->post('show_sub');
         $orderby = (int) $this->request->post('orderby');
 
         $categories = $this->fetchAllCategories();
+
+        // Defaults for new forum
+        $forum = $forum ?? [
+            'cat_id' => $categories[0]['id'],
+            'mods' => null,
+        ];
 
         // This is a weird state where they're trying to add a forum
         // with no categories defined. It needs better handling than this.
@@ -581,17 +590,17 @@ final readonly class Forums
         }
 
         return [
-            'cat_id' => $forum['cat_id'] ?? null ?: $categories[0]['id'],
-            'mods' => $forum['mods'] ?? null,
-            'nocount' => $this->request->post('nocount') ? 1 : 0,
+            'cat_id' => $forum['cat_id'],
+            'mods' => $forum['mods'],
+            'nocount' => $this->request->asString->post('nocount') ? 1 : 0,
             'orderby' => $orderby > 0 && $orderby <= 5 ? $orderby : 0,
             'perms' => $this->serializePermsFromInput(),
-            'redirect' => $this->request->post('redirect'),
-            'show_ledby' => $this->request->post('show_ledby') ? 1 : 0,
+            'redirect' => $this->request->asString->post('redirect'),
+            'show_ledby' => $this->request->asString->post('show_ledby') ? 1 : 0,
             'show_sub' => $sub === 1 || $sub === 2 ? $sub : 0,
-            'subtitle' => $this->request->post('description'),
-            'title' => $this->request->post('title'),
-            'trashcan' => $this->request->post('trashcan') ? 1 : 0,
+            'subtitle' => $this->request->asString->post('description'),
+            'title' => $this->request->asString->post('title'),
+            'trashcan' => $this->request->asString->post('trashcan') ? 1 : 0,
         ];
     }
 
@@ -606,16 +615,17 @@ final readonly class Forums
         }
 
         if ($this->request->post('submit') !== null) {
+            $moveTo = (int) $this->request->asString->post('moveto');
             $this->database->safedelete(
                 'forums',
                 Database::WHERE_ID_EQUALS,
                 $this->database->basicvalue($forumId),
             );
-            if ($this->request->post('moveto') !== null) {
+            if ($moveTo !== 0) {
                 $updateStatement = $this->database->safeupdate(
                     'topics',
                     [
-                        'fid' => $this->request->post('moveto'),
+                        'fid' => $moveTo,
                     ],
                     ' WHERE `fid`=?',
                     $this->database->basicvalue($forumId),
@@ -647,7 +657,7 @@ final readonly class Forums
 
             $page = match (true) {
                 $topics > 0 => (
-                    $this->request->post('moveto') ? 'Moved' : 'Deleted'
+                    $moveTo ? 'Moved' : 'Deleted'
                 )
                     . " {$topics} topics"
                     . (
@@ -787,7 +797,7 @@ final readonly class Forums
             $error = "The category you're trying to delete does not exist.";
         }
 
-        $moveTo = (int) $this->request->post('moveto');
+        $moveTo = (int) $moveTo;
         if (
             $error === null
             && $this->request->post('submit') !== null

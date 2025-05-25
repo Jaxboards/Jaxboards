@@ -38,8 +38,8 @@ final readonly class Login
         ];
 
         if ($this->request->post('submit') !== null) {
-            $user = $this->request->post('user');
-            $password = $this->request->post('pass');
+            $user = $this->request->asString->post('user');
+            $password = $this->request->asString->post('pass');
 
             $result = $this->database->safeselect(
                 ['id'],
@@ -59,7 +59,7 @@ final readonly class Login
                 default => null,
             };
 
-            if ($error === null) {
+            if ($error === null && $user) {
                 // Successful login, redirect
                 $this->session->setPHPSessionValue('auid', $user['id']);
                 header('Location: admin.php');
