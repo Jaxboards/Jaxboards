@@ -776,8 +776,7 @@ final class Topic
     private function quickEditPost(array $topic, int $pid): void
     {
         if (!$this->request->isJSAccess()) {
-            $this->page->location('?act=post&pid=' . $pid);
-
+            $this->page->location("?act=post&how=edit&tid={$topic['id']}&pid={$pid}");
             return;
         }
 

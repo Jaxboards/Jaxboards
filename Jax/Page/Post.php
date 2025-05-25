@@ -98,10 +98,69 @@ final class Post
             (bool) $this->pid && $this->how === 'edit' => $this->editPost(),
             $this->how === 'newtopic' => $this->createTopic(),
             $this->postData !== null => $this->submitPost($this->tid),
-            $this->fid || $this->tid && $this->how === 'edit' => $this->showTopicForm(),
+            $this->fid => $this->showTopicForm(),
             (bool) $this->tid => $this->showPostForm(),
             default => $this->page->location('?'),
         };
+    }
+
+    /**
+     * @return ?array<string,mixed>
+     */
+    private function fetchPost(int $pid): ?array
+    {
+        $result = $this->database->safeselect(
+            [
+                'id',
+                'auth_id',
+                'newtopic',
+                'post',
+                'tid',
+            ],
+            'posts',
+            Database::WHERE_ID_EQUALS,
+            $pid,
+        );
+        $post = $this->database->arow($result);
+        $this->database->disposeresult($result);
+        return $post;
+    }
+
+    /**
+     * @return ?array<string,mixed>
+     */
+    private function fetchTopic(int $tid): ?array
+    {
+        $result = $this->database->safeselect(
+            [
+                'auth_id',
+                'cal_event',
+                'fid',
+                'id',
+                'locked',
+                'lp_uid',
+                'op',
+                'pinned',
+                'poll_choices',
+                'poll_q',
+                'poll_results',
+                'poll_type',
+                'replies',
+                'subtitle',
+                'summary',
+                'title',
+                'views',
+                'UNIX_TIMESTAMP(`date`) AS `date`',
+                'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
+            ],
+            'topics',
+            Database::WHERE_ID_EQUALS,
+            $this->database->basicvalue($tid),
+        );
+        $topic = $this->database->arow($result);
+        $this->database->disposeresult($result);
+
+        return $topic;
     }
 
     /**
@@ -182,64 +241,16 @@ final class Post
         $this->page->command('update', 'post-preview', $post);
     }
 
-    private function showTopicForm(): void
+    /**
+     *
+     */
+    private function showTopicForm(?array $topic = null): void
     {
-        $error = null;
-        if ($this->request->isJSUpdate()) {
-            return;
-        }
-
         $postData = $this->postData;
         $page = '<div id="post-preview">' . $this->postpreview . '</div>';
-        $fid = $this->fid;
-
-        if ($this->how === 'edit') {
-            $result = $this->database->safeselect(
-                [
-                    'auth_id',
-                    'cal_event',
-                    'fid',
-                    'id',
-                    'locked',
-                    'lp_uid',
-                    'op',
-                    'pinned',
-                    'poll_choices',
-                    'poll_q',
-                    'poll_results',
-                    'poll_type',
-                    'replies',
-                    'subtitle',
-                    'summary',
-                    'title',
-                    'views',
-                    'UNIX_TIMESTAMP(`date`) AS `date`',
-                    'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
-                ],
-                'topics',
-                Database::WHERE_ID_EQUALS,
-                $this->database->basicvalue($this->tid),
-            );
-            $topic = $this->database->arow($result);
-            $this->database->disposeresult($result);
-
-            if (!$topic) {
-                $error = "The topic you're trying to edit does not exist.";
-            } else {
-                $result = $this->database->safeselect(
-                    ['post'],
-                    'posts',
-                    Database::WHERE_ID_EQUALS,
-                    $this->database->basicvalue($topic['op']),
-                );
-                $postData = $this->database->arow($result);
-                $this->database->disposeresult($result);
-
-                if ($postData) {
-                    $postData = $postData['post'];
-                }
-            }
-        }
+        $tid = $topic['id'] ?? '';
+        $fid = $this->fid ?: $topic['fid'];
+        $how = $this->how ?? 'newtopic';
 
         $result = $this->database->safeselect(
             ['title', 'perms'],
@@ -256,7 +267,7 @@ final class Post
             return;
         }
 
-        if (!isset($topic)) {
+        if (!$topic) {
             $topic = [
                 'subtitle' => $this->request->asString->post('tdesc') ?? '',
                 'title' => $this->request->asString->post('ttitle') ?? '',
@@ -291,13 +302,15 @@ final class Post
                 </div>
                 HTML;
 
+        $submitLabel= $topic ? 'Edit Topic' : 'Post New Topic';
         $form = <<<HTML
             <form method="post" data-ajax-form="true"
                             onsubmit="if(this.submitButton.value.match(/post/i)) this.submitButton.disabled=true;">
             <div class="topicform">
                 <input type="hidden" name="act" value="post" />
-                <input type="hidden" name="how" value="newtopic" />
+                <input type="hidden" name="how" value="{$how}" />
                 <input type="hidden" name="fid" value="{$fid}" />
+                <input type="hidden" name="tid" value="{$tid}" />
                 <label for="ttitle">Topic title:</label>
                 <input type="text" name="ttitle" id="ttitle" title="Topic Title" value="{$topic['title']}" />
                 <br>
@@ -321,7 +334,7 @@ final class Post
                     {$uploadButton}
                     <div class="buttons">
                         <input type="submit" name="submit"
-                            value="Post New Topic"
+                            value="$submitLabel"
                             title="Submit your post"
                             onclick="this.form.submitButton=this;"
                             id="submitbutton">
@@ -338,11 +351,6 @@ final class Post
         $page .= $this->template->meta('box', '', $forum['title'] . ' > New Topic', $form);
 
         $this->page->append('PAGE', $page);
-        $this->page->command('update', 'page', $page);
-
-        if ($error !== null) {
-            return;
-        }
 
         if ($forum['perms']['upload']) {
             $this->page->command('attachfiles');
@@ -355,7 +363,7 @@ final class Post
     {
         $page = '';
         $tid = $this->tid;
-        if ($this->request->isJSUpdate() && $this->how !== 'qreply') {
+        if ($this->request->isJSUpdate()) {
             return;
         }
 
@@ -379,10 +387,10 @@ final class Post
         $topic = $this->database->arow($result);
         $this->database->disposeresult($result);
         if (!$topic) {
-            $page .= $this->template->meta(
+            $this->page->append('PAGE', $this->template->meta(
                 'error',
                 "The topic you're attempting to reply in no longer exists.",
-            );
+            ));
 
             return;
         }
@@ -522,121 +530,20 @@ final class Post
         return $this->canmod = $canmod;
     }
 
-    private function editPost(): void
+    private function validatePost(?string $postData): ?string
     {
-        $pid = $this->pid;
-        $tid = $this->tid;
-        $error = null;
-        $editingPost = false;
-        $postData = $this->postData;
-        $error = match (true) {
-            !$pid => 'Invalid post to edit.',
+        return match (true) {
             $postData !== null && trim($postData) === '' => "You didn't supply a post!",
-            mb_strlen((string) $this->postData) > 65_535 => 'Post must not exceed 65,535 bytes.',
+            mb_strlen((string) $this->postData) > 65_535 => 'Post must not exceed 65,535 characters.',
             default => null,
         };
+    }
 
-        if ($error === null) {
-            $result = $this->database->safeselect(
-                [
-                    'auth_id',
-                    'newtopic',
-                    'post',
-                    'tid',
-                ],
-                'posts',
-                Database::WHERE_ID_EQUALS,
-                $pid,
-            );
-            $post = $this->database->arow($result);
-            $this->database->disposeresult($result);
-
-            $error = match (true) {
-                !$post => 'The post you are trying to edit does not exist.',
-                !$this->canEdit($post) => "You don't have permission to edit that post!",
-                default => null,
-            };
-
-            if ($this->postData === null && $post) {
-                $editingPost = true;
-                $this->postData = $post['post'];
-            }
-        }
-
-        if ($tid && $error === null) {
-            $result = $this->database->safeselect(
-                [
-                    'auth_id',
-                    'cal_event',
-                    'fid',
-                    'id',
-                    'locked',
-                    'lp_uid',
-                    'op',
-                    'pinned',
-                    'poll_choices',
-                    'poll_q',
-                    'poll_results',
-                    'poll_type',
-                    'replies',
-                    'subtitle',
-                    'summary',
-                    'title',
-                    'views',
-                    'UNIX_TIMESTAMP(`date`) AS `date`',
-                    'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
-                ],
-                'topics',
-                Database::WHERE_ID_EQUALS,
-                $tid,
-            );
-            $topic = $this->database->arow($result);
-            $this->database->disposeresult($result);
-
-            $topicTitle = $this->request->asString->post('ttitle');
-            $topicDesc = $this->request->asString->post('tdesc');
-
-            if (!$topic) {
-                $error = "The topic you are trying to edit doesn't exist.";
-            } elseif ($topicTitle === null || trim($topicTitle) === '') {
-                $error = 'You must supply a topic title!';
-            } else {
-                $this->database->safeupdate(
-                    'topics',
-                    [
-                        'subtitle' => $this->textFormatting->blockhtml($topicDesc ?? ''),
-                        'summary' => mb_substr(
-                            (string) preg_replace(
-                                '@\s+@',
-                                ' ',
-                                $this->textFormatting->wordfilter(
-                                    $this->textFormatting->blockhtml(
-                                        $this->textFormatting->textOnly(
-                                            $this->postData ?? '',
-                                        ),
-                                    ),
-                                ),
-                            ),
-                            0,
-                            50,
-                        ),
-                        'title' => $this->textFormatting->blockhtml($topicTitle),
-                    ],
-                    Database::WHERE_ID_EQUALS,
-                    $tid,
-                );
-            }
-        }
-
-        if ($error !== null) {
-            $this->page->command('error', $error);
-            $this->page->append('PAGE', $this->page->error($error));
-        }
-
-        if ($error || $editingPost) {
-            $this->showPostForm();
-
-            return;
+    private function updatePost(int $pid, ?string $postData): ?string
+    {
+        $error = $this->validatePost($postData);
+        if ($error) {
+            return $error;
         }
 
         $this->database->safeupdate(
@@ -655,6 +562,111 @@ final class Post
             $this->textFormatting->theWorks($this->postData ?? ''),
         );
         $this->page->command('softurl');
+        return null;
+    }
+
+    private function updateTopic(int $tid): ?string
+    {
+        $topic = $this->fetchTopic($tid);
+        $topicTitle = $this->request->asString->post('ttitle');
+        $topicDesc = $this->request->asString->post('tdesc');
+
+        $error = match(true) {
+            !$topic => "The topic you are trying to edit doesn't exist.",
+            $topicTitle === null || trim($topicTitle) === '' => 'You must supply a topic title!',
+            default => null,
+        };
+
+        if ($error) {
+            return $error;
+        }
+
+        $this->database->safeupdate(
+            'topics',
+            [
+                'subtitle' => $this->textFormatting->blockhtml($topicDesc ?? ''),
+                'summary' => mb_substr(
+                    (string) preg_replace(
+                        '@\s+@',
+                        ' ',
+                        $this->textFormatting->wordfilter(
+                            $this->textFormatting->blockhtml(
+                                $this->textFormatting->textOnly(
+                                    $this->postData ?? '',
+                                ),
+                            ),
+                        ),
+                    ),
+                    0,
+                    50,
+                ),
+                'title' => $this->textFormatting->blockhtml($topicTitle ?? ''),
+            ],
+            Database::WHERE_ID_EQUALS,
+            $tid,
+        );
+
+        return null;
+    }
+
+    private function editPost(): void
+    {
+        $pid = $this->pid;
+        $tid = $this->tid;
+        $error = null;
+        $postData = $this->postData;
+
+        if ($error !== null) {
+            $this->page->command('error', $error);
+            $this->page->append('PAGE', $this->page->error($error));
+            return;
+        }
+
+        $post = $this->fetchPost($pid);
+        $topic = $this->fetchTopic($tid);
+
+        $error = match (true) {
+            !$post => 'The post you are trying to edit does not exist.',
+            !$this->canEdit($post) => "You don't have permission to edit that post!",
+            default => null,
+        };
+
+        if ($error !== null) {
+            $this->page->command('error', $error);
+            $this->page->append('PAGE', $this->page->error($error));
+            return;
+        }
+
+        if ($this->request->post('submit') !== null) {
+            // Update topic when editing topic
+
+            $error = $this->updatePost($pid, $postData);
+            if (!$error && $topic['op'] === $post['id']) {
+                $error = $this->updateTopic($tid);
+            }
+
+            if (!$error) {
+                $this->page->location("?act=vt{$tid}&findpost={$pid}");
+
+                return;
+            }
+        }
+
+        if ($this->postData === null && $post) {
+            $this->postData = $post['post'];
+        }
+
+        if ($error !== null) {
+            $this->page->command('error', $error);
+            $this->page->append('PAGE', $this->page->error($error));
+        }
+
+        if ($post && $topic && $topic['op'] === $post['id']) {
+            $this->showTopicForm($topic);
+            return;
+        }
+
+        $this->showPostForm();
     }
 
     private function createTopic(): void
@@ -780,11 +792,7 @@ final class Post
         $uid = $this->user->get('id');
 
         // Post validation
-        $error = match (true) {
-            $postData === null || trim($postData) === '' => "You didn't supply a post!",
-            mb_strlen($postData) > 50000 => 'Post must not exceed 50,000 characters.',
-            default => null,
-        };
+        $error = $this->validatePost($postData);
 
         if ($error !== null) {
             $this->page->append('PAGE', $this->page->error($error));
