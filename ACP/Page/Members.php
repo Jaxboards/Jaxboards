@@ -17,29 +17,14 @@ use Jax\User;
 
 use function array_pop;
 use function count;
-use function ctype_xdigit;
-use function explode;
-use function fclose;
-use function file_exists;
 use function file_get_contents;
-use function filter_var;
-use function fopen;
-use function fwrite;
+use function file_put_contents;
 use function gmdate;
 use function htmlspecialchars;
-use function implode;
-use function is_numeric;
 use function mb_strlen;
-use function mb_strstr;
-use function mb_strtolower;
-use function mb_substr;
 use function password_hash;
-use function trim;
 
-use const FILTER_FLAG_IPV6;
-use const FILTER_VALIDATE_IP;
 use const PASSWORD_DEFAULT;
-use const PHP_EOL;
 
 final readonly class Members
 {
@@ -127,7 +112,7 @@ final readonly class Members
         $memberId = (int) $this->request->asString->both('mid');
         $name = $this->request->asString->post('name');
         if ($memberId || $this->request->post('submit')) {
-            if ($memberId) {
+            if ($memberId !== 0) {
                 $result = $this->database->safeselect(
                     ['group_id'],
                     'members',
@@ -396,7 +381,8 @@ final readonly class Members
         return $this->page->success('Profile data saved');
     }
 
-    private function preRegisterSubmit(): ?string {
+    private function preRegisterSubmit(): ?string
+    {
         $username = $this->request->asString->post('username');
         $displayName = $this->request->asString->post('displayname');
         $password = $this->request->asString->post('pass');
@@ -420,6 +406,7 @@ final readonly class Members
             return 'That ' . ($member['name'] === $username
                 ? 'username' : 'display name') . ' is already taken';
         }
+
         $this->database->disposeresult($result);
 
         $result = $this->database->safeinsert('members', [
@@ -448,10 +435,10 @@ final readonly class Members
         $page = '';
 
         if ($this->request->post('submit') !== null) {
-           $error = $this->preRegisterSubmit();
-           $page .= $error
-            ? $this->page->error($error)
-            : $this->page->success('Member registered.');
+            $error = $this->preRegisterSubmit();
+            $page .= $error
+             ? $this->page->error($error)
+             : $this->page->success('Member registered.');
         }
 
         $page .= $this->page->parseTemplate('members/pre-register.html');
@@ -650,7 +637,7 @@ final readonly class Members
         $error = null;
         if ($this->request->post('submit') !== null) {
             $memberId = (int) $this->request->asString->post('mid');
-            if (!$memberId) {
+            if ($memberId === 0) {
                 $error = 'All fields are required';
             }
 
@@ -726,9 +713,10 @@ final readonly class Members
         if ($ipBans !== null) {
             file_put_contents(
                 $bannedIpsPath,
-                $ipBans
+                $ipBans,
             );
         }
+
         $data = file_get_contents($bannedIpsPath) ?: '';
 
         $this->page->addContentBox(
@@ -742,7 +730,8 @@ final readonly class Members
         );
     }
 
-    private function sendMassMessage() {
+    private function sendMassMessage(): string
+    {
         $title = $this->request->asString->post('title');
         $message = $this->request->asString->post('message');
         if (!$title || !$message) {
@@ -816,7 +805,7 @@ final readonly class Members
 
         $memberId = (int) $this->request->post('mid');
         $action = $this->request->asString->post('action');
-        if ($memberId !== null && $action === 'Allow') {
+        if ($action === 'Allow') {
             $this->database->safeupdate(
                 'members',
                 [
