@@ -98,7 +98,7 @@ final class Post
             (bool) $this->pid && $this->how === 'edit' => $this->editPost(),
             $this->how === 'newtopic' => $this->createTopic(),
             $this->postData !== null => $this->submitPost($this->tid),
-            $this->fid => $this->showTopicForm(),
+            (bool) $this->fid => $this->showTopicForm(),
             (bool) $this->tid => $this->showPostForm(),
             default => $this->page->location('?'),
         };
@@ -349,6 +349,7 @@ final class Post
         $page .= $this->template->meta('box', '', $forum['title'] . ' > New Topic', $form);
 
         $this->page->append('PAGE', $page);
+        $this->page->command('update', 'page', $page);
 
         if ($forum['perms']['upload']) {
             $this->page->command('attachfiles');
