@@ -123,6 +123,7 @@ final class Post
         );
         $post = $this->database->arow($result);
         $this->database->disposeresult($result);
+
         return $post;
     }
 
@@ -241,9 +242,6 @@ final class Post
         $this->page->command('update', 'post-preview', $post);
     }
 
-    /**
-     *
-     */
     private function showTopicForm(?array $topic = null): void
     {
         $postData = $this->postData;
@@ -302,7 +300,7 @@ final class Post
                 </div>
                 HTML;
 
-        $submitLabel= $topic ? 'Edit Topic' : 'Post New Topic';
+        $submitLabel = $topic !== [] ? 'Edit Topic' : 'Post New Topic';
         $form = <<<HTML
             <form method="post" data-ajax-form="true"
                             onsubmit="if(this.submitButton.value.match(/post/i)) this.submitButton.disabled=true;">
@@ -334,7 +332,7 @@ final class Post
                     {$uploadButton}
                     <div class="buttons">
                         <input type="submit" name="submit"
-                            value="$submitLabel"
+                            value="{$submitLabel}"
                             title="Submit your post"
                             onclick="this.form.submitButton=this;"
                             id="submitbutton">
@@ -562,6 +560,7 @@ final class Post
             $this->textFormatting->theWorks($this->postData ?? ''),
         );
         $this->page->command('softurl');
+
         return null;
     }
 
@@ -571,7 +570,7 @@ final class Post
         $topicTitle = $this->request->asString->post('ttitle');
         $topicDesc = $this->request->asString->post('tdesc');
 
-        $error = match(true) {
+        $error = match (true) {
             !$topic => "The topic you are trying to edit doesn't exist.",
             $topicTitle === null || trim($topicTitle) === '' => 'You must supply a topic title!',
             default => null,
@@ -619,6 +618,7 @@ final class Post
         if ($error !== null) {
             $this->page->command('error', $error);
             $this->page->append('PAGE', $this->page->error($error));
+
             return;
         }
 
@@ -634,12 +634,12 @@ final class Post
         if ($error !== null) {
             $this->page->command('error', $error);
             $this->page->append('PAGE', $this->page->error($error));
+
             return;
         }
 
         if ($this->request->post('submit') !== null) {
             // Update topic when editing topic
-
             $error = $this->updatePost($pid, $postData);
             if (!$error && $topic['op'] === $post['id']) {
                 $error = $this->updateTopic($tid);
@@ -663,6 +663,7 @@ final class Post
 
         if ($post && $topic && $topic['op'] === $post['id']) {
             $this->showTopicForm($topic);
+
             return;
         }
 
