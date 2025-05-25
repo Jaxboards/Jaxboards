@@ -62,6 +62,7 @@ final readonly class Login
             if ($error) {
                 $pageElements['content'] = $this->page->error($error);
             }
+
             if ($user) {
                 // Successful login, redirect
                 $this->session->setPHPSessionValue('auid', $user['id']);
