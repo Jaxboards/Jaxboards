@@ -258,7 +258,7 @@ final readonly class Members
                 return;
             }
 
-            $member = array_pop($members);
+            $member = $members[0];
             if (
                 $member['group_id'] === Groups::Admin->value
                 && $this->user->get('id') !== 1
@@ -610,7 +610,6 @@ final readonly class Members
 
     private function merge(): void
     {
-        $error = null;
         $mergeResult = '';
 
         if ($this->request->post('submit') !== null) {
@@ -808,7 +807,7 @@ final readonly class Members
 
         $memberId = (int) $this->request->post('mid');
         $action = $this->request->asString->post('action');
-        if ($action === 'Allow') {
+        if ($memberId && $action === 'Allow') {
             $this->database->safeupdate(
                 'members',
                 [
@@ -853,11 +852,8 @@ final readonly class Members
         $this->page->addContentBox('Members Awaiting Validation', $page);
     }
 
-    private function inputText(
-        string $label,
-        string $name,
-        $value,
-    ): string {
+    private function inputText(string $label, string $name, string $value): string
+    {
         return $this->page->parseTemplate(
             'members/edit-form-field-text.html',
             [
@@ -868,11 +864,8 @@ final readonly class Members
         );
     }
 
-    private function textArea(
-        string $label,
-        string $name,
-        $value,
-    ): string {
+    private function textArea(string $label, string $name, string $value): string
+    {
         return $this->page->parseTemplate(
             'members/edit-form-field-textarea.html',
             [
