@@ -616,8 +616,6 @@ final readonly class Forums
             $this->request->post('submit') === 'Cancel'
         ) {
             $this->page->location('?act=Forums&do=order');
-
-            return;
         }
 
         if ($this->request->post('submit') !== null) {
