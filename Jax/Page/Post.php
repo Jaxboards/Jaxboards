@@ -242,13 +242,18 @@ final class Post
         $this->page->command('update', 'post-preview', $post);
     }
 
+    /**
+     * @param ?array<string,mixed> $topic
+     */
     private function showTopicForm(?array $topic = null): void
     {
         $postData = $this->postData;
         $page = '<div id="post-preview">' . $this->postpreview . '</div>';
         $tid = $topic['id'] ?? '';
-        $fid = $this->fid ?: $topic['fid'];
+        $fid = $topic ? $topic['fid'] : $this->fid;
         $how = $this->how ?? 'newtopic';
+
+        $isEditing = (bool) $topic;
 
         $result = $this->database->safeselect(
             ['title', 'perms'],
@@ -300,7 +305,7 @@ final class Post
                 </div>
                 HTML;
 
-        $submitLabel = $topic !== [] ? 'Edit Topic' : 'Post New Topic';
+        $submitLabel = $isEditing ? 'Edit Topic' : 'Post New Topic';
         $form = <<<HTML
             <form method="post" data-ajax-form="true"
                             onsubmit="if(this.submitButton.value.match(/post/i)) this.submitButton.disabled=true;">
@@ -613,18 +618,11 @@ final class Post
     {
         $pid = $this->pid;
         $tid = $this->tid;
-        $error = null;
         $postData = $this->postData;
-
-        if ($error !== null) {
-            $this->page->command('error', $error);
-            $this->page->append('PAGE', $this->page->error($error));
-
-            return;
-        }
 
         $post = $this->fetchPost($pid);
         $topic = $this->fetchTopic($tid);
+        $isTopicPost = $topic && $post && $topic['op'] === $post['id'];
 
         $error = match (true) {
             !$post => 'The post you are trying to edit does not exist.',
@@ -642,7 +640,7 @@ final class Post
         if ($this->request->post('submit') !== null) {
             // Update topic when editing topic
             $error = $this->updatePost($pid, $postData);
-            if (!$error && $topic['op'] === $post['id']) {
+            if (!$error && $isTopicPost) {
                 $error = $this->updateTopic($tid);
             }
 
@@ -662,7 +660,7 @@ final class Post
             $this->page->append('PAGE', $this->page->error($error));
         }
 
-        if ($post && $topic && $topic['op'] === $post['id']) {
+        if ($isTopicPost) {
             $this->showTopicForm($topic);
 
             return;
