@@ -7,6 +7,7 @@ namespace Jax\Page\UCP;
 use Jax\Database;
 use Jax\Date;
 use Jax\Jax;
+use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
 use Jax\Template;
@@ -86,31 +87,9 @@ final readonly class Inbox
             $mid = (int) $this->request->asString->both('mid');
             $to = $this->request->asString->both('to');
             if (!$mid && $to) {
-                $result = $this->database->select(
-                    [
-                        'id',
-                        'email',
-                        'email_settings',
-                    ],
-                    'members',
-                    'WHERE `display_name`=?',
-                    $to,
-                );
-                $udata = $this->database->arow($result);
-                $this->database->disposeresult($result);
+                $udata = Member::selectOne($this->database, 'WHERE `display_name`=?', $to);
             } else {
-                $result = $this->database->select(
-                    [
-                        'id',
-                        'email',
-                        'email_settings',
-                    ],
-                    'members',
-                    Database::WHERE_ID_EQUALS,
-                    $mid,
-                );
-                $udata = $this->database->arow($result);
-                $this->database->disposeresult($result);
+                $udata = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid);
             }
 
             $error = match (true) {
@@ -142,7 +121,7 @@ final readonly class Inbox
                     'message' => $this->request->asString->post('message'),
                     'read' => 0,
                     'title' => $title ? $this->textFormatting->blockhtml($title) : '',
-                    'to' => $udata['id'],
+                    'to' => $udata->id,
                 ],
             );
             // Give them a notification.
@@ -161,12 +140,12 @@ final readonly class Inbox
                     SQL,
                 ['session'],
                 $cmd,
-                $udata['id'],
+                $udata->id,
             );
             // Send em an email!
-            if (($udata['email_settings'] & 2) !== 0) {
+            if (($udata->email_settings & 2) !== 0) {
                 $this->jax->mail(
-                    $udata['email'],
+                    $udata->email,
                     'PM From ' . $this->user->get('display_name'),
                     "You are receiving this email because you've "
                         . 'received a message from ' . $this->user->get('display_name')
@@ -206,14 +185,8 @@ final readonly class Inbox
 
             if ($message) {
                 $mid = $message['from'];
-                $result = $this->database->select(
-                    ['display_name'],
-                    'members',
-                    Database::WHERE_ID_EQUALS,
-                    $mid,
-                );
-                $thisrow = $this->database->arow($result);
-                $mname = $thisrow ? (string) $thisrow['display_name'] : '';
+                $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid);
+                $mname = $member ? (string) $member->display_name : '';
                 $this->database->disposeresult($result);
 
                 $msg = PHP_EOL . PHP_EOL . PHP_EOL
@@ -228,15 +201,8 @@ final readonly class Inbox
 
         if (is_numeric($this->request->asString->get('mid'))) {
             $mid = (int) $this->request->asString->both('mid');
-            $result = $this->database->select(
-                ['display_name'],
-                'members',
-                Database::WHERE_ID_EQUALS,
-                $mid,
-            );
-            $member = $this->database->arow($result);
-            $mname = $member['display_name'] ?? null;
-            $this->database->disposeresult($result);
+            $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid);
+            $mname = $member?->display_name;
 
             if (!$mname) {
                 $mid = 0;

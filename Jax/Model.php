@@ -21,7 +21,10 @@ class Model {
             static::table,
             ...$args
         );
-        return $stmt?->fetchObject(static::class) ?: null;
+        $record = $stmt?->fetchObject(static::class) ?: null;
+        $database->disposeresult($stmt);
+
+        return $record;
     }
 
     /**
@@ -38,6 +41,7 @@ class Model {
             static::table,
             ...$args
         );
+
         return $stmt?->fetchAll(PDO::FETCH_CLASS, static::class) ?? [];
     }
 }

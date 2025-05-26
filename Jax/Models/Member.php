@@ -71,7 +71,7 @@ class Member extends Model {
     public string $contact_gtalk;
     public string $contact_aim;
     public string $website;
-    public string $birthdate;
+    public ?string $birthdate;
     public string $about;
     public string $display_name;
     public string $full_name;
@@ -89,7 +89,7 @@ class Member extends Model {
     public int $notify_postinmytopic;
     public int $notify_postinsubscribedtopic;
     public string $ucpnotepad;
-    public int $skin_id;
+    public ?int $skin_id;
     public string $contact_twitter;
     public string $contact_discord;
     public string $contact_youtube;
