@@ -63,6 +63,7 @@ final readonly class PrivateMessage
             if (!$command) {
                 continue;
             }
+
             if ($command[0] !== 'im') {
                 continue;
             }
