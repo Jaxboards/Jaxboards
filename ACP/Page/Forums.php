@@ -754,7 +754,7 @@ final readonly class Forums
                 $page .= $this->page->error('All fields required');
             } else {
                 $data = ['title' => $categoryName];
-                if ($cata && $cid) {
+                if ($cdata && $cid) {
                     $this->database->update(
                         'categories',
                         $data,
