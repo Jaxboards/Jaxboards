@@ -212,7 +212,7 @@ final readonly class ModControls
         } elseif (!$memberName) {
             return $this->template->meta('error', 'Member name is a required field.');
         } else {
-            $members = Member::selectAll(
+            $members = Member::selectMany(
                 $this->database,
                 'WHERE `display_name` LIKE ?',
                 $memberName . '%',

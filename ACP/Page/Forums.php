@@ -9,6 +9,7 @@ use ACP\Page\Forums\RecountStats;
 use Jax\Database;
 use Jax\ForumTree;
 use Jax\Jax;
+use Jax\Models\Category;
 use Jax\Models\Member;
 use Jax\Request;
 use Jax\TextFormatting;
@@ -297,7 +298,7 @@ final readonly class Forums
                         )
                         : '',
                     'id' => "c_{$categoryId}",
-                    'title' => $category['title'],
+                    'title' => $category->title,
                     'trashcan' => '',
                     'mods' => '',
                 ],
@@ -430,7 +431,7 @@ final readonly class Forums
         );
 
         if ($forum && $forum['mods']) {
-            $members = Member::selectAll(
+            $members = Member::selectMany(
                 $this->database,
                 Database::WHERE_ID_IN, explode(',', (string) $forum['mods']),
             );
@@ -581,7 +582,7 @@ final readonly class Forums
 
         // Defaults for new forum
         $forum ??= [
-            'cat_id' => $categories[0]['id'],
+            'cat_id' => $categories[0]->id,
             'mods' => null,
         ];
 
@@ -728,14 +729,7 @@ final readonly class Forums
         }
 
         if ($cid) {
-            $result = $this->database->select(
-                ['id', 'title'],
-                'categories',
-                Database::WHERE_ID_EQUALS,
-                $cid,
-            );
-            $cdata = $this->database->arow($result);
-            $this->database->disposeresult($result);
+            $cdata = Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $cid);
         }
 
         $categoryName = $this->request->asString->post('cat_name');
@@ -837,7 +831,7 @@ final readonly class Forums
                 $categoryOptions .= $this->page->parseTemplate(
                     'select-option.html',
                     [
-                        'label' => $category['title'],
+                        'label' => $category->title,
                         'selected' => '',
                         'value' => '' . $categoryId,
                     ],
@@ -856,21 +850,13 @@ final readonly class Forums
     }
 
     /**
-     * @return array<array<string,mixed>>
+     * @return array<Category>
      */
     private function fetchAllCategories(): array
     {
-        $result = $this->database->select(
-            [
-                'id',
-                'title',
-                '`order`',
-            ],
-            'categories',
-            'ORDER BY `order`,`id` ASC',
-        );
+        $categories = Category::selectMany($this->database, 'ORDER BY `order`,`id` ASC');
 
-        return keyBy($this->database->arows($result), static fn($category) => $category['id']);
+        return keyBy($categories, static fn($category) => $category->id);
     }
 
     /**

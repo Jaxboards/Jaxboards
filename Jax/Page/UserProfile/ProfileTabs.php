@@ -101,7 +101,7 @@ final readonly class ProfileTabs
             return [];
         }
 
-        return Member::selectAll(
+        return Member::selectMany(
             $this->database,
             Database::WHERE_ID_IN,
             explode(',', (string) $profile['friends']),

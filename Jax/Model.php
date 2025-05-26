@@ -33,7 +33,7 @@ abstract class Model {
      * @param mixed $args
      * @return Array<static>
      */
-    public static function selectAll(Database $database, ...$args): array
+    public static function selectMany(Database $database, ...$args): array
     {
         $stmt = $database->select(
             array_map(

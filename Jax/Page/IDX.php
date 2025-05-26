@@ -254,7 +254,7 @@ final class IDX
 
         if (!$moderatorinfo) {
             $moderatorinfo = [];
-            $members = Member::selectAll($this->database, Database::WHERE_ID_IN, $this->mods);
+            $members = Member::selectMany($this->database, Database::WHERE_ID_IN, $this->mods);
             foreach ($members as $member) {
                 $moderatorinfo[$member->id] = $this->template->meta(
                     'user-link',
