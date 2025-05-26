@@ -104,7 +104,7 @@ final class Forum
         $table = '';
         $unread = false;
 
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT
                     f.`id` AS `id`,
@@ -148,7 +148,7 @@ final class Forum
 
         if ($fdata['redirect']) {
             $this->page->command('softurl');
-            $this->database->safespecial(
+            $this->database->special(
                 <<<'SQL'
                     UPDATE %t
                     SET `redirects` = `redirects` + 1
@@ -180,7 +180,7 @@ final class Forum
         // parent forum - subforum topics = total topics
         // I'm fairly sure this is faster than doing
         // `SELECT count(*) FROM topics`... but I haven't benchmarked it.
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT
                     f.`id` AS `id`,
@@ -316,7 +316,7 @@ final class Forum
         }
 
         // Topics.
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<EOT
                 SELECT t.`id` AS `id`,t.`title` AS `title`,t.`subtitle` AS `subtitle`,
                     t.`lp_uid` AS `lp_uid`,UNIX_TIMESTAMP(t.`lp_date`) AS `lp_date`,
@@ -442,7 +442,7 @@ final class Forum
         // Subforum breadcrumbs
         if ($fdata['path']) {
             $path = array_map(static fn($fid): int => (int) $fid, explode(' ', (string) $fdata['path']));
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 ['id', 'title'],
                 'forums',
                 Database::WHERE_ID_IN,
@@ -475,7 +475,7 @@ final class Forum
 
     private function getReplySummary(string $tid): void
     {
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT
                     m.`display_name` AS `name`,

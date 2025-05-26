@@ -311,7 +311,7 @@ final readonly class ServiceInstall
                 'TRUNCATE `banlist`;',
             ];
             foreach ($queries as $query) {
-                $result = $this->database->safequery($query);
+                $result = $this->database->query($query);
                 $this->database->disposeresult($result);
             }
 
@@ -334,7 +334,7 @@ final readonly class ServiceInstall
             if ($service) {
                 $this->database->setPrefix('');
                 // Add board to directory.
-                $this->database->safeinsert(
+                $this->database->insert(
                     'directory',
                     [
                         'boardname' => $board,
@@ -375,14 +375,14 @@ final readonly class ServiceInstall
                 }
 
                 // Perform the query.
-                $result = $this->database->safequery($query);
+                $result = $this->database->query($query);
                 $this->database->disposeresult($result);
                 // Reset temp variable to empty.
                 $query = '';
             }
 
             // Don't forget to create the admin.
-            $this->database->safeinsert(
+            $this->database->insert(
                 'members',
                 [
                     'display_name' => $adminUsername,

@@ -41,7 +41,7 @@ final readonly class FileManager
         if (
             is_numeric($this->request->both('delete'))
         ) {
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 [
                     'hash',
                     'name',
@@ -67,7 +67,7 @@ final readonly class FileManager
                         );
                 }
 
-                $this->database->safedelete(
+                $this->database->delete(
                     'files',
                     Database::WHERE_ID_EQUALS,
                     $this->database->basicvalue($this->request->both('delete')),
@@ -79,7 +79,7 @@ final readonly class FileManager
             foreach ($this->request->post('dl') as $fileId => $downloads) {
                 $downloads = (int) $downloads;
 
-                $this->database->safeupdate(
+                $this->database->update(
                     'files',
                     [
                         'downloads' => $downloads,
@@ -92,7 +92,7 @@ final readonly class FileManager
             $page .= $this->page->success('Changes saved.');
         }
 
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             '`id`,`tid`,`post`',
             'posts',
             "WHERE MATCH (`post`) AGAINST ('attachment') "
@@ -116,7 +116,7 @@ final readonly class FileManager
             }
         }
 
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT
                     f.`id` AS `id`,

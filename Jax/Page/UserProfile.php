@@ -71,7 +71,7 @@ final readonly class UserProfile
 
     private function fetchGroupTitle(int $groupId): ?string
     {
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['title'],
             'member_groups',
             Database::WHERE_ID_EQUALS,
@@ -88,7 +88,7 @@ final readonly class UserProfile
      */
     private function fetchUser(int $userId): ?array
     {
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'ip',
                 'about',

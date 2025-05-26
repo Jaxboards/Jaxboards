@@ -57,7 +57,7 @@ final readonly class ModTopics
         }
 
         if (!$this->user->getPerm('can_moderate')) {
-            $result = $this->database->safespecial(
+            $result = $this->database->special(
                 <<<'SQL'
                     SELECT `mods`
                     FROM %t
@@ -123,7 +123,7 @@ final readonly class ModTopics
         $forumData = [];
 
         // Get trashcan id.
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['id'],
             'forums',
             'WHERE `trashcan`=1 LIMIT 1',
@@ -132,7 +132,7 @@ final readonly class ModTopics
         $this->database->disposeresult($result);
 
         $trashcan = $trashcan['id'] ?? false;
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['id', 'fid'],
             'topics',
             Database::WHERE_ID_IN,
@@ -157,7 +157,7 @@ final readonly class ModTopics
         }
 
         if ($trashcan) {
-            $this->database->safeupdate(
+            $this->database->update(
                 'topics',
                 [
                     'fid' => $trashcan,
@@ -171,12 +171,12 @@ final readonly class ModTopics
         }
 
         if ($delete !== []) {
-            $this->database->safedelete(
+            $this->database->delete(
                 'posts',
                 'WHERE `tid` IN ?',
                 $delete,
             );
-            $this->database->safedelete(
+            $this->database->delete(
                 'topics',
                 Database::WHERE_ID_IN,
                 $delete,
@@ -200,7 +200,7 @@ final readonly class ModTopics
             in_array($otherTopic, $topicIds)
         ) {
             // Move the posts and set all posts to normal (newtopic=0).
-            $this->database->safeupdate(
+            $this->database->update(
                 'posts',
                 [
                     'newtopic' => '0',
@@ -212,7 +212,7 @@ final readonly class ModTopics
 
             // Make the first post in the topic have newtopic=1.
             // Get the op.
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 'MIN(`id`) `minId`',
                 'posts',
                 'WHERE `tid`=?',
@@ -223,7 +223,7 @@ final readonly class ModTopics
             $this->database->disposeresult($result);
 
             if ($op !== 0) {
-                $this->database->safeupdate(
+                $this->database->update(
                     'posts',
                     [
                         'newtopic' => 1,
@@ -233,7 +233,7 @@ final readonly class ModTopics
                 );
 
                 // Also fix op.
-                $this->database->safeupdate(
+                $this->database->update(
                     'topics',
                     [
                         'op' => $op,
@@ -245,7 +245,7 @@ final readonly class ModTopics
 
             unset($topicIds[array_search($otherTopic, $topicIds, true)]);
             if ($topicIds !== []) {
-                $this->database->safedelete(
+                $this->database->delete(
                     'topics',
                     Database::WHERE_ID_IN,
                     $topicIds,
@@ -269,7 +269,7 @@ final readonly class ModTopics
         );
 
         if ($this->session->getVar('modtids')) {
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 ['id', 'title'],
                 'topics',
                 Database::WHERE_ID_IN,
@@ -296,7 +296,7 @@ final readonly class ModTopics
     private function moveTo(): void
     {
         $forumId = (int) $this->request->asString->post('id');
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['id'],
             'forums',
             Database::WHERE_ID_EQUALS,
@@ -308,7 +308,7 @@ final readonly class ModTopics
             return;
         }
 
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['fid'],
             'topics',
             Database::WHERE_ID_IN,
@@ -319,7 +319,7 @@ final readonly class ModTopics
             $this->database->arows($result),
         ));
 
-        $this->database->safeupdate(
+        $this->database->update(
             'topics',
             [
                 'fid' => $forumId,
@@ -351,7 +351,7 @@ final readonly class ModTopics
 
     private function lock(): void
     {
-        $this->database->safeupdate(
+        $this->database->update(
             'topics',
             [
                 'locked' => 1,
@@ -368,7 +368,7 @@ final readonly class ModTopics
 
     private function pin(): void
     {
-        $this->database->safeupdate(
+        $this->database->update(
             'topics',
             [
                 'pinned' => 1,
@@ -385,7 +385,7 @@ final readonly class ModTopics
 
     private function unlock(): void
     {
-        $this->database->safeupdate(
+        $this->database->update(
             'topics',
             [
                 'locked' => 0,
@@ -399,7 +399,7 @@ final readonly class ModTopics
 
     private function unpin(): void
     {
-        $this->database->safeupdate(
+        $this->database->update(
             'topics',
             [
                 'pinned' => 0,

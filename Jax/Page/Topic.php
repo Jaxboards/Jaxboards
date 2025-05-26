@@ -105,7 +105,7 @@ final class Topic
      */
     private function fetchTopicData(int $tid): ?array
     {
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT
                     a.`id`
@@ -172,7 +172,7 @@ final class Topic
         );
 
         // Generate pages.
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             'COUNT(`id`) as postcount',
             'posts',
             'WHERE `tid`=?',
@@ -305,7 +305,7 @@ final class Topic
         );
 
         // Update view count.
-        $this->database->safespecial(
+        $this->database->special(
             <<<'SQL'
                 UPDATE %t
                 SET `views` = `views` + 1
@@ -417,7 +417,7 @@ final class Topic
         if (
             $this->session->getVar('multiquote')
         ) {
-            $result = $this->database->safespecial(
+            $result = $this->database->special(
                 <<<'SQL'
                     SELECT
                         p.`post` AS `post`,
@@ -464,7 +464,7 @@ final class Topic
 
         $topicPostCounter = 0;
 
-        $query = $lastpid !== 0 ? $this->database->safespecial(
+        $query = $lastpid !== 0 ? $this->database->special(
             <<<'SQL'
                 SELECT m.`id` AS `id`
                     , m.`name` AS `name`
@@ -515,7 +515,7 @@ final class Topic
             ['posts', 'members', 'member_groups', 'members'],
             $topic['id'],
             $lastpid,
-        ) : $this->database->safespecial(
+        ) : $this->database->special(
             <<<'SQL'
                 SELECT m.`id` AS `id`
                     , m.`name` AS `name`
@@ -744,7 +744,7 @@ final class Topic
         }
 
         if ($this->user->get('mod')) {
-            $result = $this->database->safespecial(
+            $result = $this->database->special(
                 <<<'SQL'
                     SELECT `mods`
                     FROM %t
@@ -782,7 +782,7 @@ final class Topic
         }
 
         $this->page->command('softurl');
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'auth_id',
                 'newtopic',
@@ -853,7 +853,7 @@ final class Topic
         $pid = (int) $this->request->asString->both('quote');
         $post = false;
         if ($pid !== 0) {
-            $result = $this->database->safespecial(
+            $result = $this->database->special(
                 <<<'SQL'
                     SELECT p.`post` AS `post`
                         , m.`display_name` AS `name`
@@ -909,7 +909,7 @@ final class Topic
 
     private function getLastPost(int $tid): void
     {
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'MAX(`id`) AS `lastpid`',
                 'COUNT(`id`) AS `numposts`',
@@ -940,7 +940,7 @@ final class Topic
     private function findPost(array $topic, int $postId): void
     {
         $postPosition = null;
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT
                     `id`
@@ -1002,7 +1002,7 @@ final class Topic
                 'title' => $topic['title'],
             ],
         );
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT p.`id` AS `id`
                     , p.`post` AS `post`

@@ -91,7 +91,7 @@ final class TextRules
 
     private function fetchCustomRules(): void
     {
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'id',
                 'type',

@@ -204,7 +204,7 @@ final class Page
     {
         $skin = null;
         if ($skinId) {
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 ['title', 'custom', 'wrapper'],
                 'skins',
                 'WHERE id=? LIMIT 1',
@@ -216,7 +216,7 @@ final class Page
 
         // Couldn't find custom skin, get the default
         if ($skin === null) {
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 ['title', 'custom', 'wrapper'],
                 'skins',
                 'WHERE `default`=1 LIMIT 1',

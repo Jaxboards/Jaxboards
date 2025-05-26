@@ -247,7 +247,7 @@ final readonly class App
             ),
         );
         if ($this->user->get('id')) {
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 'COUNT(`id`)',
                 'messages',
                 'WHERE `read`=0 AND `to`=?',

@@ -45,7 +45,7 @@ final readonly class Posting
     {
         $page = '';
         $wordfilter = [];
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'id',
                 'enabled',
@@ -63,7 +63,7 @@ final readonly class Posting
         // Delete.
         $delete = $this->request->asString->get('d');
         if ($delete) {
-            $this->database->safedelete(
+            $this->database->delete(
                 'textrules',
                 "WHERE `type`='badword' AND `needle`=?",
                 $this->database->basicvalue($delete),
@@ -85,7 +85,7 @@ final readonly class Posting
                     "'" . $badword . "' is already used.",
                 );
             } else {
-                $this->database->safeinsert(
+                $this->database->insert(
                     'textrules',
                     [
                         'needle' => $badword,
@@ -146,7 +146,7 @@ final readonly class Posting
         $emoticons = [];
         // Delete emoticon.
         if ($this->request->get('d')) {
-            $this->database->safedelete(
+            $this->database->delete(
                 'textrules',
                 "WHERE `type`='emote' AND `needle`=?",
                 $this->database->basicvalue($this->request->get('d')),
@@ -154,7 +154,7 @@ final readonly class Posting
         }
 
         // Select emoticons.
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'id',
                 'type',
@@ -178,7 +178,7 @@ final readonly class Posting
             } elseif (isset($emoticons[$this->textFormatting->blockhtml($emoticonInput)])) {
                 $page .= $this->page->error('That emoticon is already being used.');
             } else {
-                $this->database->safeinsert(
+                $this->database->insert(
                     'textrules',
                     [
                         'enabled' => 1,
@@ -277,7 +277,7 @@ final readonly class Posting
         $page = '';
         $page2 = '';
         $niblets = [];
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['id', 'img', 'title'],
             'ratingniblets',
             'ORDER BY `id` DESC',
@@ -289,7 +289,7 @@ final readonly class Posting
         // Delete.
         $delete = (int) $this->request->asString->get('d');
         if ($delete !== 0) {
-            $this->database->safedelete(
+            $this->database->delete(
                 'ratingniblets',
                 Database::WHERE_ID_EQUALS,
                 $this->database->basicvalue($delete),
@@ -304,7 +304,7 @@ final readonly class Posting
             if (!$img || !$title) {
                 $page .= $this->page->error('All fields required.');
             } else {
-                $this->database->safeinsert(
+                $this->database->insert(
                     'ratingniblets',
                     [
                         'img' => $img,

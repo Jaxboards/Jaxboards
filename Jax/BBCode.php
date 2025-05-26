@@ -192,7 +192,7 @@ final class BBCode
             return $this->attachmentData[$fileId];
         }
 
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'id',
                 'name',

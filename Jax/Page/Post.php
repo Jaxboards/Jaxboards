@@ -111,7 +111,7 @@ final class Post
      */
     private function fetchPost(int $pid): ?array
     {
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'id',
                 'auth_id',
@@ -134,7 +134,7 @@ final class Post
      */
     private function fetchTopic(int $tid): ?array
     {
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'auth_id',
                 'cal_event',
@@ -194,7 +194,7 @@ final class Post
 
         if (!is_file($file)) {
             move_uploaded_file($fileobj['tmp_name'], $file);
-            $this->database->safeinsert(
+            $this->database->insert(
                 'files',
                 [
                     'hash' => $hash,
@@ -211,7 +211,7 @@ final class Post
             }
         }
 
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['id'],
             'files',
             'WHERE `hash`=?',
@@ -257,7 +257,7 @@ final class Post
 
         $isEditing = (bool) $topic;
 
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['title', 'perms'],
             'forums',
             Database::WHERE_ID_EQUALS,
@@ -377,7 +377,7 @@ final class Post
             $this->page->command('closewindow', '#qreply');
         }
 
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT
                     t.`title` AS `title`,
@@ -426,7 +426,7 @@ final class Post
         ) {
             $postData = '';
 
-            $result = $this->database->safespecial(
+            $result = $this->database->special(
                 <<<'SQL'
                     SELECT
                         m.`display_name` AS `name`,
@@ -518,7 +518,7 @@ final class Post
         }
 
         if ($this->user->get('mod')) {
-            $result = $this->database->safespecial(
+            $result = $this->database->special(
                 'SELECT mods FROM %t WHERE id=(SELECT fid FROM %t WHERE id=?)',
                 ['forums', 'topics'],
                 $this->database->basicvalue($tid),
@@ -552,7 +552,7 @@ final class Post
             return $error;
         }
 
-        $this->database->safeupdate(
+        $this->database->update(
             'posts',
             [
                 'editby' => $this->user->get('id'),
@@ -588,7 +588,7 @@ final class Post
             return $error;
         }
 
-        $this->database->safeupdate(
+        $this->database->update(
             'topics',
             [
                 'subtitle' => $this->textFormatting->blockhtml($topicDesc ?? ''),
@@ -691,7 +691,7 @@ final class Post
         ) : [];
         $pollType = $this->request->asString->post('poll_type');
 
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['perms'],
             'forums',
             Database::WHERE_ID_EQUALS,
@@ -734,7 +734,7 @@ final class Post
         }
 
         // Insert the new topic record
-        $this->database->safeinsert(
+        $this->database->insert(
             'topics',
             [
                 'auth_id' => $uid,
@@ -792,7 +792,7 @@ final class Post
             return;
         }
 
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT
                     t.`title` AS `topictitle`,
@@ -842,7 +842,7 @@ final class Post
             'post' => $postData,
             'tid' => $tid,
         ];
-        $this->database->safeinsert(
+        $this->database->insert(
             'posts',
             $postData,
         );
@@ -852,7 +852,7 @@ final class Post
         $pid = $this->database->insertId();
         // Set op.
         if ($newtopic) {
-            $this->database->safeupdate(
+            $this->database->update(
                 'topics',
                 [
                     'op' => $pid,
@@ -863,7 +863,7 @@ final class Post
         }
 
         // Update activity history.
-        $this->database->safeinsert(
+        $this->database->insert(
             'activity',
             [
                 'arg1' => $fdata['topictitle'],
@@ -878,7 +878,7 @@ final class Post
         // Update last post info
         // for the topic.
         if (!$newtopic) {
-            $this->database->safespecial(
+            $this->database->special(
                 <<<'SQL'
                     UPDATE %t
                     SET `lp_uid` = ?, `lp_date` = ?, `replies` = `replies` + 1
@@ -900,7 +900,7 @@ final class Post
         }
 
         if ($newtopic) {
-            $this->database->safespecial(
+            $this->database->special(
                 <<<'SQL'
                     UPDATE %t
                     SET
@@ -919,7 +919,7 @@ final class Post
                 $path,
             );
         } else {
-            $this->database->safespecial(
+            $this->database->special(
                 <<<'SQL'
                     UPDATE %t
                     SET
@@ -945,7 +945,7 @@ final class Post
         }
 
         if ($newtopic) {
-            $this->database->safespecial(
+            $this->database->special(
                 <<<'SQL'
                     UPDATE %t
                     SET
@@ -955,7 +955,7 @@ final class Post
                 ['stats'],
             );
         } else {
-            $this->database->safespecial(
+            $this->database->special(
                 'UPDATE %t SET `posts` = `posts` + 1',
                 ['stats'],
             );

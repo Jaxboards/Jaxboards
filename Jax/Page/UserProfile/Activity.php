@@ -183,7 +183,7 @@ final readonly class Activity
      */
     private function fetchActivities(int $profileId): array
     {
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT
                     a.`id` AS `id`,

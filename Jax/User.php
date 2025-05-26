@@ -52,7 +52,7 @@ final class User
     public function setBulk(array $fields): void
     {
         $this->userData = array_merge($this->userData ?? [], $fields);
-        $this->database->safeupdate(
+        $this->database->update(
             'members',
             $fields,
             ' WHERE `id`=?',
@@ -69,7 +69,7 @@ final class User
             return $this->userData;
         }
 
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'about',
                 'avatar',
@@ -162,7 +162,7 @@ final class User
             default => null,
         };
 
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'can_access_acp',
                 'can_add_comments',
@@ -271,7 +271,7 @@ final class User
         if (password_needs_rehash($user['pass'], PASSWORD_DEFAULT)) {
             $newHash = password_hash($pass, PASSWORD_DEFAULT);
             // Add the new hash.
-            $this->database->safeupdate(
+            $this->database->update(
                 'members',
                 [
                     'pass' => $newHash,

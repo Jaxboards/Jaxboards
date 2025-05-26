@@ -125,7 +125,7 @@ final readonly class ModPosts
     {
         $trashCanForum = $this->fetchTrashCanForum();
 
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['tid'],
             'posts',
             Database::WHERE_ID_IN,
@@ -147,7 +147,7 @@ final readonly class ModPosts
         }
 
         if ($trashCanForum === null) {
-            $this->database->safedelete(
+            $this->database->delete(
                 'posts',
                 Database::WHERE_ID_IN,
                 $pids,
@@ -158,7 +158,7 @@ final readonly class ModPosts
 
         // Fix forum last post for all forums topics were in.
         // Add trashcan here too.
-        $result = $this->database->safeselect(['fid'], 'topics', Database::WHERE_ID_IN, $tids);
+        $result = $this->database->select(['fid'], 'topics', Database::WHERE_ID_IN, $tids);
         $fids = array_unique(array_merge(
             $trashCanForum ? [(int) $trashCanForum['id']] : [],
             array_map(
@@ -197,7 +197,7 @@ final readonly class ModPosts
      */
     private function fetchPost(int $pid): ?array
     {
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['auth_id', 'newtopic', 'tid'],
             'posts',
             Database::WHERE_ID_EQUALS,
@@ -216,7 +216,7 @@ final readonly class ModPosts
      */
     private function fetchForumMods(array $post): array
     {
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT `mods`
                 FROM %t
@@ -242,7 +242,7 @@ final readonly class ModPosts
      */
     private function fetchTrashCanForum(): ?array
     {
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             '`id`',
             'forums',
             'WHERE `trashcan`=1 LIMIT 1',
@@ -283,7 +283,7 @@ final readonly class ModPosts
         $lastPost = $this->fetchPost((int) end($pids));
 
         // Create a new topic.
-        $this->database->safeinsert(
+        $this->database->insert(
             'topics',
             [
                 'auth_id' => $this->user->get('id'),
@@ -312,7 +312,7 @@ final readonly class ModPosts
      */
     private function updatePosts(array $pids, array $data): void
     {
-        $this->database->safeupdate(
+        $this->database->update(
             'posts',
             $data,
             Database::WHERE_ID_IN,
@@ -327,7 +327,7 @@ final readonly class ModPosts
     {
         foreach ($tids as $tid) {
             // Recount replies.
-            $this->database->safespecial(
+            $this->database->special(
                 <<<'SQL'
                     UPDATE %t
                     SET `replies`=(

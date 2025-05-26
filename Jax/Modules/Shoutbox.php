@@ -85,7 +85,7 @@ final class Shoutbox
         $candelete = (bool) $this->user->getPerm('can_delete_shouts');
         if (!$candelete && $this->user->getPerm('can_delete_own_shouts')) {
             if (!$shout) {
-                $result = $this->database->safeselect(
+                $result = $this->database->select(
                     '`uid`',
                     'shouts',
                     Database::WHERE_ID_EQUALS,
@@ -153,7 +153,7 @@ final class Shoutbox
 
     public function displayShoutbox(): void
     {
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT
                     m.`avatar` AS `avatar`,
@@ -208,7 +208,7 @@ final class Shoutbox
         $last = 0;
         $shoutboxId = $this->session->getVar('sb_id') ?: 0;
         if ($shoutboxId) {
-            $result = $this->database->safespecial(
+            $result = $this->database->special(
                 <<<'SQL'
                     SELECT
                         m.`avatar` AS `avatar`,
@@ -252,7 +252,7 @@ final class Shoutbox
             --$pagen;
         }
 
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             'COUNT(`id`) as `shoutcount`',
             'shouts',
         );
@@ -285,7 +285,7 @@ final class Shoutbox
             return;
         }
 
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT
                     s.`id` AS `id`,
@@ -330,7 +330,7 @@ final class Shoutbox
         }
 
         $this->page->command('softurl');
-        $this->database->safedelete(
+        $this->database->delete(
             'shouts',
             Database::WHERE_ID_EQUALS,
             $delete,
@@ -365,7 +365,7 @@ final class Shoutbox
             'shout' => $shout,
             'uid' => $this->user->get('id'),
         ];
-        $this->database->safeinsert(
+        $this->database->insert(
             'shouts',
             $shoutData,
         );

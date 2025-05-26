@@ -136,7 +136,7 @@ final readonly class Settings
             $page .= $this->page->error($error);
         }
 
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['act', 'page'],
             'pages',
         );
@@ -176,7 +176,7 @@ final readonly class Settings
 
     private function pages_delete(string $page): void
     {
-        $this->database->safedelete(
+        $this->database->delete(
             'pages',
             'WHERE `act`=?',
             $this->database->basicvalue($page),
@@ -186,7 +186,7 @@ final readonly class Settings
     private function pages_edit(string $pageurl): void
     {
         $page = '';
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['act', 'page'],
             'pages',
             'WHERE `act`=?',
@@ -199,7 +199,7 @@ final readonly class Settings
             if ($pageinfo) {
                 $pageinfo['page'] = $pagecontents;
 
-                $this->database->safeupdate(
+                $this->database->update(
                     'pages',
                     [
                         'page' => $pagecontents,
@@ -212,7 +212,7 @@ final readonly class Settings
                     'act' => $pageurl,
                     'page' => $pagecontents,
                 ];
-                $this->database->safeinsert(
+                $this->database->insert(
                     'pages',
                     $pageinfo,
                 );
@@ -239,7 +239,7 @@ final readonly class Settings
         $page = '';
         $error = null;
         if ($this->request->post('clearall') !== null) {
-            $result = $this->database->safespecial(
+            $result = $this->database->special(
                 'TRUNCATE TABLE %t',
                 ['shouts'],
             );

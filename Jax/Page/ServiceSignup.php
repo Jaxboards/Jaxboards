@@ -84,7 +84,7 @@ final readonly class ServiceSignup
                     . 'numbers, and underscore only';
             }
 
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 ['id'],
                 'directory',
                 'WHERE `registrar_ip`=? AND `date`>?',
@@ -108,7 +108,7 @@ final readonly class ServiceSignup
                     . 'numbers, and underscore only';
             }
 
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 ['id'],
                 'directory',
                 'WHERE `boardname`=?',
@@ -125,7 +125,7 @@ final readonly class ServiceSignup
 
                 $this->database->setPrefix('');
                 // Add board to directory.
-                $this->database->safeinsert(
+                $this->database->insert(
                     'directory',
                     [
                         'boardname' => $boardURL,
@@ -165,14 +165,14 @@ final readonly class ServiceSignup
                     }
 
                     // Perform the query.
-                    $result = $this->database->safequery($query);
+                    $result = $this->database->query($query);
                     $this->database->disposeresult($result);
                     // Reset temp variable to empty.
                     $query = '';
                 }
 
                 // Don't forget to create the admin.
-                $this->database->safeinsert(
+                $this->database->insert(
                     'members',
                     [
                         'display_name' => $username,

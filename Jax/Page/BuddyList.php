@@ -103,7 +103,7 @@ final readonly class BuddyList
         $contacts = '';
         if ($this->user->get('friends')) {
             $online = $this->database->getUsersOnline();
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 [
                     'id',
                     'avatar',
@@ -128,7 +128,7 @@ final readonly class BuddyList
         }
 
         if ($this->user->get('enemies')) {
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 '`id`,`avatar`,`display_name` AS `name`,`usertitle`',
                 'members',
                 'WHERE `id` IN ? ORDER BY `name` ASC',
@@ -186,7 +186,7 @@ final readonly class BuddyList
 
         $user = false;
         if ($uid && is_numeric($uid)) {
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 ['id'],
                 'members',
                 Database::WHERE_ID_EQUALS,
@@ -210,7 +210,7 @@ final readonly class BuddyList
             $friends[] = $uid;
 
             $this->user->set('friends', implode(',', $friends));
-            $this->database->safeinsert(
+            $this->database->insert(
                 'activity',
                 [
                     'affected_uid' => $uid,

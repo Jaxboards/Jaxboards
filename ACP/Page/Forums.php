@@ -107,7 +107,7 @@ final readonly class Forums
             }
 
             if ($key[0] === 'c') {
-                $this->database->safeupdate(
+                $this->database->update(
                     'categories',
                     [
                         'order' => $order,
@@ -119,7 +119,7 @@ final readonly class Forums
                 continue;
             }
 
-            $this->database->safeupdate(
+            $this->database->update(
                 'forums',
                 [
                     'cat_id' => $cat,
@@ -344,7 +344,7 @@ final readonly class Forums
             $exploded = explode(',', (string) $forum['mods']);
             unset($exploded[array_search($this->request->both('rmod'), $exploded, true)]);
             $forum['mods'] = implode(',', $exploded);
-            $this->database->safeupdate(
+            $this->database->update(
                 'forums',
                 [
                     'mods' => $forum['mods'],
@@ -429,7 +429,7 @@ final readonly class Forums
         );
 
         if ($forum && $forum['mods']) {
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 ['display_name', 'id'],
                 'members',
                 Database::WHERE_ID_IN,
@@ -487,7 +487,7 @@ final readonly class Forums
 
         // Add per-forum moderator.
         if (is_numeric($this->request->post('modid'))) {
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 ['id'],
                 'members',
                 Database::WHERE_ID_EQUALS,
@@ -516,7 +516,7 @@ final readonly class Forums
             if (
                 $write['trashcan']
             ) {
-                $this->database->safeupdate(
+                $this->database->update(
                     'forums',
                     [
                         'trashcan' => 0,
@@ -525,7 +525,7 @@ final readonly class Forums
             }
 
             if (!$oldForumData) {
-                $this->database->safeinsert(
+                $this->database->insert(
                     'forums',
                     $write,
                 );
@@ -535,7 +535,7 @@ final readonly class Forums
                 return null;
             }
 
-            $this->database->safeupdate(
+            $this->database->update(
                 'forums',
                 $write,
                 Database::WHERE_ID_EQUALS,
@@ -626,13 +626,13 @@ final readonly class Forums
 
         if ($this->request->post('submit') !== null) {
             $moveTo = (int) $this->request->asString->post('moveto');
-            $this->database->safedelete(
+            $this->database->delete(
                 'forums',
                 Database::WHERE_ID_EQUALS,
                 $this->database->basicvalue($forumId),
             );
             if ($moveTo !== 0) {
-                $updateStatement = $this->database->safeupdate(
+                $updateStatement = $this->database->update(
                     'topics',
                     [
                         'fid' => $moveTo,
@@ -642,7 +642,7 @@ final readonly class Forums
                 );
                 $topics = $this->database->affectedRows($updateStatement);
             } else {
-                $result = $this->database->safespecial(
+                $result = $this->database->special(
                     <<<'SQL'
                         DELETE
                         FROM %t
@@ -657,7 +657,7 @@ final readonly class Forums
                 );
 
                 $posts = $this->database->affectedRows($result);
-                $deleteStatement = $this->database->safedelete(
+                $deleteStatement = $this->database->delete(
                     'topics',
                     'WHERE `fid`=?',
                     $this->database->basicvalue($forumId),
@@ -735,7 +735,7 @@ final readonly class Forums
         }
 
         if ($cid) {
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 ['id', 'title'],
                 'categories',
                 Database::WHERE_ID_EQUALS,
@@ -754,7 +754,7 @@ final readonly class Forums
             } else {
                 $data = ['title' => $categoryName];
                 if (!empty($cdata)) {
-                    $this->database->safeupdate(
+                    $this->database->update(
                         'categories',
                         $data,
                         Database::WHERE_ID_EQUALS,
@@ -764,7 +764,7 @@ final readonly class Forums
                         'Category edited.',
                     );
                 } else {
-                    $this->database->safeinsert(
+                    $this->database->insert(
                         'categories',
                         $data,
                     );
@@ -815,7 +815,7 @@ final readonly class Forums
             if (!isset($categories[$moveTo])) {
                 $error = 'Invalid category to move forums to.';
             } else {
-                $this->database->safeupdate(
+                $this->database->update(
                     'forums',
                     [
                         'cat_id' => $moveTo,
@@ -823,7 +823,7 @@ final readonly class Forums
                     'WHERE `cat_id`=?',
                     $this->database->basicvalue($catId),
                 );
-                $this->database->safedelete(
+                $this->database->delete(
                     'categories',
                     Database::WHERE_ID_EQUALS,
                     $this->database->basicvalue($catId),
@@ -867,7 +867,7 @@ final readonly class Forums
      */
     private function fetchAllCategories(): array
     {
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'id',
                 'title',
@@ -885,7 +885,7 @@ final readonly class Forums
      */
     private function fetchAllForums(): array
     {
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'id',
                 'cat_id',
@@ -916,7 +916,7 @@ final readonly class Forums
      */
     private function fetchAllGroups(): array
     {
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'can_access_acp',
                 'can_add_comments',
@@ -963,7 +963,7 @@ final readonly class Forums
      */
     private function updatePerForumModFlag(): void
     {
-        $this->database->safeupdate(
+        $this->database->update(
             'members',
             [
                 'mod' => 0,
@@ -981,7 +981,7 @@ final readonly class Forums
             }
         }
 
-        $this->database->safeupdate(
+        $this->database->update(
             'members',
             [
                 'mod' => 1,

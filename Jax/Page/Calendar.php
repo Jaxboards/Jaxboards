@@ -60,7 +60,7 @@ final readonly class Calendar
         $daysInMonth = (int) $daysInMonth;
 
         $this->session->set('location_verbose', 'Checking out the calendar for ' . $monthName . ' ' . $year);
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'id',
                 '`display_name` AS `name`',

@@ -32,7 +32,7 @@ final readonly class Download
 
     private function downloadFile(int $id): void
     {
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'name',
                 'hash',
@@ -48,7 +48,7 @@ final readonly class Download
             return;
         }
 
-        $this->database->safespecial(
+        $this->database->special(
             <<<'SQL'
                 UPDATE %t
                 SET `downloads` = `downloads` + 1

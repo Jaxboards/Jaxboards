@@ -72,13 +72,13 @@ final class UserTest extends TestCase
             ->onlyMethods([
                 'arow',
                 'disposeresult',
-                'safeselect',
+                'select',
             ])
             ->getMock()
         ;
 
         $database->expects(self::never())
-            ->method('safeselect')
+            ->method('select')
         ;
 
         $database->expects(self::never())
@@ -127,13 +127,13 @@ final class UserTest extends TestCase
             ->onlyMethods([
                 'arow',
                 'disposeresult',
-                'safeselect',
+                'select',
             ])
             ->getMock()
         ;
 
         $database->expects(self::never())
-            ->method('safeselect')
+            ->method('select')
         ;
 
         $database->expects(self::never())
@@ -170,13 +170,13 @@ final class UserTest extends TestCase
             ->onlyMethods([
                 'arow',
                 'disposeresult',
-                'safeselect',
+                'select',
             ])
             ->getMock()
         ;
 
         $database->expects(self::never())
-            ->method('safeselect')
+            ->method('select')
         ;
 
         $database->expects(self::never())

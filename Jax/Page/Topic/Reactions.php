@@ -42,7 +42,7 @@ final readonly class Reactions
             return $ratingNiblets;
         }
 
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['id', 'img', 'title'],
             'ratingniblets',
         );
@@ -57,7 +57,7 @@ final readonly class Reactions
         }
 
         $this->page->command('softurl');
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['rating'],
             'posts',
             Database::WHERE_ID_EQUALS,
@@ -79,7 +79,7 @@ final readonly class Reactions
             return;
         }
 
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'id',
                 'display_name',
@@ -171,7 +171,7 @@ final readonly class Reactions
     {
         $this->page->command('softurl');
 
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['rating'],
             'posts',
             Database::WHERE_ID_EQUALS,
@@ -211,7 +211,7 @@ final readonly class Reactions
             $ratings[$nibletid][] = $this->user->get('id');
         }
 
-        $this->database->safeupdate(
+        $this->database->update(
             'posts',
             [
                 'rating' => json_encode($ratings) ?: $post['rating'],

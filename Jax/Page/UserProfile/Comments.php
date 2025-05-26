@@ -94,7 +94,7 @@ final readonly class Comments
      */
     private function fetchComments(array $profile): array
     {
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT
                     c.`id` AS `id`,
@@ -145,7 +145,7 @@ final readonly class Comments
             return $this->template->meta('error', $error);
         }
 
-        $this->database->safeinsert(
+        $this->database->insert(
             'activity',
             [
                 'affected_uid' => $profile['id'],
@@ -154,7 +154,7 @@ final readonly class Comments
                 'uid' => $this->user->get('id'),
             ],
         );
-        $this->database->safeinsert(
+        $this->database->insert(
             'profile_comments',
             [
                 'comment' => $comment,
@@ -176,7 +176,7 @@ final readonly class Comments
 
         // Moderators can delete any comment
         if ($this->user->getPerm('can_moderate')) {
-            $this->database->safedelete(
+            $this->database->delete(
                 'profile_comments',
                 Database::WHERE_ID_EQUALS,
                 $this->database->basicvalue($deleteComment),
@@ -190,7 +190,7 @@ final readonly class Comments
         }
 
         // Delete only own comments
-        $this->database->safedelete(
+        $this->database->delete(
             'profile_comments',
             'WHERE `id`=? AND `from`=?',
             $this->database->basicvalue($deleteComment),

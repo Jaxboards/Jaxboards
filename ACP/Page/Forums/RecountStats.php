@@ -39,7 +39,7 @@ final readonly class RecountStats
 
     public function recountStatistics(): void
     {
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['id', 'nocount'],
             'forums',
         );
@@ -48,7 +48,7 @@ final readonly class RecountStats
             $countPostsInForum[$forum['id']] = !$forum['nocount'];
         }
 
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT
                     p.`id` AS `id`,
@@ -103,7 +103,7 @@ final readonly class RecountStats
 
         // Go through and sum up category posts as well
         // as forums with subforums.
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['id', 'path', 'cat_id'],
             'forums',
         );
@@ -120,7 +120,7 @@ final readonly class RecountStats
 
         // Update Topic Replies.
         foreach ($stat['topic_posts'] as $k => $v) {
-            $this->database->safeupdate(
+            $this->database->update(
                 'topics',
                 [
                     'replies' => $v,
@@ -132,7 +132,7 @@ final readonly class RecountStats
 
         // Update member posts.
         foreach ($stat['member_posts'] as $k => $v) {
-            $this->database->safeupdate(
+            $this->database->update(
                 'members',
                 [
                     'posts' => $v,
@@ -144,7 +144,7 @@ final readonly class RecountStats
 
         // Update forum posts.
         foreach ($stat['forum_posts'] as $k => $v) {
-            $this->database->safeupdate(
+            $this->database->update(
                 'forums',
                 [
                     'posts' => $v,
@@ -156,7 +156,7 @@ final readonly class RecountStats
         }
 
         // Get # of members.
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             'COUNT(`id`)',
             'members',
         );
@@ -165,7 +165,7 @@ final readonly class RecountStats
         $this->database->disposeresult($result);
 
         // Update global board stats.
-        $this->database->safeupdate(
+        $this->database->update(
             'stats',
             [
                 'members' => $stat['members'],

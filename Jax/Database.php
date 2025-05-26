@@ -103,7 +103,7 @@ class Database
      * @param array<string>|string $fields list of fields to select, or SQL string
      * @param mixed                $vars
      */
-    public function safeselect(
+    public function select(
         array|string $fields,
         string $table,
         ?string $where = null,
@@ -117,7 +117,7 @@ class Database
         $query = "SELECT {$fieldsString} FROM "
             . $this->ftable($table) . ($where !== null ? ' ' . $where : '');
 
-        return $this->safequery($query, ...$vars);
+        return $this->query($query, ...$vars);
     }
 
     public function insertId(): ?string
@@ -128,7 +128,7 @@ class Database
     /**
      * @param array<string,null|float|int|string> $data
      */
-    public function safeinsert(
+    public function insert(
         string $table,
         array $data,
     ): ?PDOStatement {
@@ -138,7 +138,7 @@ class Database
 
         $keys = implode(',', array_map(static fn($key): string => "`{$key}`", array_keys($data)));
 
-        return $this->safequery(
+        return $this->query(
             <<<SQL
                 INSERT INTO {$this->ftable($table)} ({$keys}) VALUES ?;
                 SQL,
@@ -191,7 +191,7 @@ class Database
      * @param array<string,null|float|int|string> $keyValuePairs
      * @param mixed                               $whereParams
      */
-    public function safeupdate(
+    public function update(
         string $table,
         array $keyValuePairs,
         string $whereFormat = '',
@@ -202,17 +202,17 @@ class Database
             return null;
         }
 
-        $keysPrepared = $this->safeBuildUpdate($keyValuePairs);
+        $keysPrepared = $this->buildUpdate($keyValuePairs);
         $values = array_values($keyValuePairs);
         $query = 'UPDATE ' . $this->ftable($table) . ' SET ' . $keysPrepared . ' ' . $whereFormat;
 
-        return $this->safequery($query, ...$values, ...$whereParams);
+        return $this->query($query, ...$values, ...$whereParams);
     }
 
     /**
      * @param array<string,null|float|int|string> $keyValuePairs
      */
-    public function safeBuildUpdate(array $keyValuePairs): string
+    public function buildUpdate(array $keyValuePairs): string
     {
         if ($keyValuePairs === []) {
             return '';
@@ -236,7 +236,7 @@ class Database
     /**
      * @param mixed $vars
      */
-    public function safedelete(
+    public function delete(
         string $table,
         string $whereformat,
         ...$vars,
@@ -245,7 +245,7 @@ class Database
             . ($whereformat !== '' && $whereformat !== '0' ? ' ' . $whereformat : '');
 
         // Put the format string back.
-        return $this->safequery($query, ...$vars);
+        return $this->query($query, ...$vars);
     }
 
     /**
@@ -276,7 +276,7 @@ class Database
     /**
      * @param null|array<null|bool|float|int|string>|bool|float|int|string ...$args
      */
-    public function safequery(
+    public function query(
         string $queryString,
         ...$args,
     ): ?PDOStatement {
@@ -290,7 +290,7 @@ class Database
         foreach ($args as $index => $value) {
             if (is_array($value)) {
                 $valueCount = count($value);
-                $compiledQueryString = $this->safeQuerySubArray(
+                $compiledQueryString = $this->querySubArray(
                     $compiledQueryString,
                     ((int) $index) + $added_placeholders,
                     $valueCount,
@@ -314,7 +314,7 @@ class Database
 
         if ($args !== []) {
             foreach ($outArgs as $index => $value) {
-                $pdoStmt->bindValue($index + 1, $value, $this->safeQueryTypeForPDOValue($value));
+                $pdoStmt->bindValue($index + 1, $value, $this->queryTypeForPDOValue($value));
             }
         }
 
@@ -324,7 +324,7 @@ class Database
     }
 
     /**
-     * Like evalue, but does not quote strings.  For use with safequery().
+     * Like evalue, but does not quote strings.  For use with query().
      *
      * @param mixed $value
      */
@@ -373,7 +373,7 @@ class Database
      * @param array<int,string> $tablenames
      * @param mixed             $args
      */
-    public function safespecial(
+    public function special(
         string $format,
         array $tablenames,
         ...$args,
@@ -390,7 +390,7 @@ class Database
         );
 
         // Put the format string back.
-        return $this->safequery($newformat, ...$args);
+        return $this->query($newformat, ...$args);
     }
 
     /**
@@ -408,7 +408,7 @@ class Database
         $idletimeout = Carbon::now()->getTimestamp() - ($this->serviceConfig->getSetting('timetoidle') ?? 300);
         $usersOnlineCache = [];
 
-        $result = $this->safespecial(
+        $result = $this->special(
             <<<'SQL'
                 SELECT
                     s.`id` as `id`,
@@ -460,7 +460,7 @@ class Database
 
     public function fixForumLastPost(int $forumId): void
     {
-        $result = $this->safeselect(
+        $result = $this->select(
             [
                 'lp_uid',
                 'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
@@ -473,7 +473,7 @@ class Database
         );
         $topic = $this->arow($result);
         $this->disposeresult($result);
-        $this->safeupdate(
+        $this->update(
             'forums',
             [
                 'lp_date' => $this->datetime($topic['lp_date'] ?? 0),
@@ -488,11 +488,11 @@ class Database
 
     public function fixAllForumLastPosts(): void
     {
-        $query = $this->safeselect(['id'], 'forums');
+        $query = $this->select(['id'], 'forums');
         array_map(fn($forum) => $this->fixForumLastPost((int) $forum['id']), $this->arows($query));
     }
 
-    private function safeQueryTypeForPDOValue(
+    private function queryTypeForPDOValue(
         null|bool|float|int|string $value,
     ): int {
         return match (true) {
@@ -504,7 +504,7 @@ class Database
     }
 
     // Blah ?1 blah ?2 blah ?3 blah
-    private function safeQuerySubArray(
+    private function querySubArray(
         string $queryString,
         int $placeholderNumber,
         int $arrlen,

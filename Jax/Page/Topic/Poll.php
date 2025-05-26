@@ -128,7 +128,7 @@ final readonly class Poll
 
         $presults = implode(';', $presults);
 
-        $this->database->safeupdate(
+        $this->database->update(
             'topics',
             [
                 'poll_results' => $presults,

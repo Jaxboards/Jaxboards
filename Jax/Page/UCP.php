@@ -400,7 +400,7 @@ final readonly class UCP
             return 'Invalid characters in display name!';
         }
 
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             'COUNT(`id`) AS `same_display_name`',
             'members',
             'WHERE `display_name` = ? AND `id`!=? LIMIT 1',
@@ -506,7 +506,7 @@ final readonly class UCP
         }
 
         if ($data['display_name'] !== $this->user->get('display_name')) {
-            $this->database->safeinsert(
+            $this->database->insert(
                 'activity',
                 [
                     'arg1' => $this->user->get('display_name'),
@@ -624,7 +624,7 @@ final readonly class UCP
         if (
             is_numeric($this->request->both('skin'))
         ) {
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 [
                     'id',
                     '`using`',
@@ -668,7 +668,7 @@ final readonly class UCP
         }
 
         $result = $this->user->get('group_id') !== 2
-            ? $this->database->safeselect(
+            ? $this->database->select(
                 [
                     'id',
                     '`using`',
@@ -681,7 +681,7 @@ final readonly class UCP
                 'skins',
                 'WHERE `hidden`!=1 ORDER BY `title` ASC',
             )
-            : $this->database->safeselect(
+            : $this->database->select(
                 [
                     'id',
                     '`using`',

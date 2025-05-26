@@ -75,7 +75,7 @@ final class Members
 
         $pages = '';
 
-        $memberquery = $this->database->safespecial(
+        $memberquery = $this->database->special(
             <<<MySQL
                     SELECT
                         g.`title` AS `g_title`,
@@ -109,7 +109,7 @@ final class Members
 
         $memberarray = $this->database->arows($memberquery);
 
-        $nummemberquery = $this->database->safespecial(
+        $nummemberquery = $this->database->special(
             <<<EOT
                 SELECT COUNT(m.`id`) AS `num_members`
                 FROM %t m

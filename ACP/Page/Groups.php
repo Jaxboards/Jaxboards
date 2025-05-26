@@ -128,7 +128,7 @@ final class Groups
                 continue;
             }
 
-            $this->database->safeupdate(
+            $this->database->update(
                 'member_groups',
                 $groupPermissions,
                 Database::WHERE_ID_EQUALS,
@@ -155,7 +155,7 @@ final class Groups
      */
     private function fetchGroups(?array $groupIds): array
     {
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'can_access_acp',
                 'can_add_comments',
@@ -378,14 +378,14 @@ final class Groups
                     'title' => $groupName,
                 ];
                 if ($gid) {
-                    $this->database->safeupdate(
+                    $this->database->update(
                         'member_groups',
                         $write,
                         Database::WHERE_ID_EQUALS,
                         $this->database->basicvalue($gid),
                     );
                 } else {
-                    $this->database->safeinsert(
+                    $this->database->insert(
                         'member_groups',
                         $write,
                     );
@@ -406,7 +406,7 @@ final class Groups
 
         $gdata = [];
         if ($gid) {
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 ['title', 'icon'],
                 'member_groups',
                 Database::WHERE_ID_EQUALS,
@@ -437,12 +437,12 @@ final class Groups
             is_numeric($this->request->both('delete'))
             && $this->request->both('delete') > 5
         ) {
-            $this->database->safedelete(
+            $this->database->delete(
                 'member_groups',
                 Database::WHERE_ID_EQUALS,
                 $this->database->basicvalue($this->request->both('delete')),
             );
-            $this->database->safeupdate(
+            $this->database->update(
                 'members',
                 [
                     'group_id' => 1,
@@ -452,7 +452,7 @@ final class Groups
             );
         }
 
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['id', 'title'],
             'member_groups',
             'WHERE `id`>5',

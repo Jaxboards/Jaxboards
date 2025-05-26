@@ -72,7 +72,7 @@ final class Ticker
      */
     private function fetchTicks($lastTickId = null): array
     {
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT
                     f.`perms` AS `perms`,

@@ -121,7 +121,7 @@ final class LogReg
         // Are they attempting to use an existing username/display name?
         $dispname = $this->textFormatting->blockhtml($dispname);
         $name = $this->textFormatting->blockhtml($name);
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['name', 'display_name'],
             'members',
             'WHERE `name`=? OR `display_name`=?',
@@ -145,7 +145,7 @@ final class LogReg
         }
 
         // All clear!
-        $this->database->safeinsert(
+        $this->database->insert(
             'members',
             [
                 'display_name' => $dispname,
@@ -163,7 +163,7 @@ final class LogReg
                 'wysiwyg' => 1,
             ],
         );
-        $this->database->safespecial(
+        $this->database->special(
             <<<'SQL'
                 UPDATE %t
                 SET `members` = `members` + 1, `last_register` = ?
@@ -183,7 +183,7 @@ final class LogReg
                 return;
             }
 
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 ['id'],
                 'members',
                 'WHERE `name`=?',
@@ -200,7 +200,7 @@ final class LogReg
 
                 $this->session->setPHPSessionValue('uid', $user['id']);
                 $loginToken = base64_encode(openssl_random_pseudo_bytes(128));
-                $this->database->safeinsert(
+                $this->database->insert(
                     'tokens',
                     [
                         'expires' => $this->database->datetime(Carbon::now()->addMonth()->getTimestamp()),
@@ -247,7 +247,7 @@ final class LogReg
         // Just make a new session rather than fuss with the old one,
         // to maintain users online.
         if ($this->request->cookie('utoken') !== null) {
-            $this->database->safedelete(
+            $this->database->delete(
                 'tokens',
                 'WHERE `token`=?',
                 $this->database->basicvalue($this->request->cookie('utoken')),
@@ -329,7 +329,7 @@ final class LogReg
         $pass2 = $this->request->asString->post('pass2');
 
         if ($tokenId) {
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 'uid AS id',
                 'tokens',
                 'WHERE `token`=?
@@ -346,7 +346,7 @@ final class LogReg
                 $pass1 && $pass2
             ) {
                 if ($pass1 === $pass2) {
-                    $this->database->safeupdate(
+                    $this->database->update(
                         'members',
                         [
                             'pass' => password_hash(
@@ -358,14 +358,14 @@ final class LogReg
                         $this->database->basicvalue($udata['id']),
                     );
                     // Delete all forgotpassword tokens for this user.
-                    $this->database->safedelete(
+                    $this->database->delete(
                         'tokens',
                         "WHERE `uid`=? AND `type`='forgotpassword'",
                         $this->database->basicvalue($udata['id']),
                     );
 
                     // Get username.
-                    $result = $this->database->safeselect(
+                    $result = $this->database->select(
                         ['id', 'name'],
                         'members',
                         Database::WHERE_ID_EQUALS,
@@ -403,7 +403,7 @@ final class LogReg
         } else {
             $user = $this->request->asString->post('user');
             if ($user) {
-                $result = $this->database->safeselect(
+                $result = $this->database->select(
                     ['id', 'email'],
                     'members',
                     'WHERE `name`=?',
@@ -422,7 +422,7 @@ final class LogReg
                     // Generate token.
                     $forgotpasswordtoken
                         = base64_encode(openssl_random_pseudo_bytes(128));
-                    $this->database->safeinsert(
+                    $this->database->insert(
                         'tokens',
                         [
                             'expires' => $this->database->datetime(Carbon::now()->getTimestamp() + 3600 * 24),

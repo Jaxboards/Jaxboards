@@ -66,7 +66,7 @@ final readonly class Members
 
     private function showMain(): void
     {
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT
                     m.`id` AS `id`,
@@ -112,7 +112,7 @@ final readonly class Members
         $name = $this->request->asString->post('name');
         if ($memberId || $this->request->post('submit')) {
             if ($memberId !== 0) {
-                $result = $this->database->safeselect(
+                $result = $this->database->select(
                     ['group_id'],
                     'members',
                     Database::WHERE_ID_EQUALS,
@@ -124,7 +124,7 @@ final readonly class Members
                     $page = $this->updateMember($member);
                 }
 
-                $result = $this->database->safeselect(
+                $result = $this->database->select(
                     [
                         'about',
                         'avatar',
@@ -177,7 +177,7 @@ final readonly class Members
                     $this->database->basicvalue($memberId),
                 );
             } else {
-                $result = $this->database->safeselect(
+                $result = $this->database->select(
                     [
                         'about',
                         'avatar',
@@ -370,7 +370,7 @@ final readonly class Members
             $write['group_id'] = Groups::Admin->value;
         }
 
-        $this->database->safeupdate(
+        $this->database->update(
             'members',
             $write,
             Database::WHERE_ID_EQUALS,
@@ -394,7 +394,7 @@ final readonly class Members
             return 'Display name and username must be under 30 characters.';
         }
 
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['name', 'display_name'],
             'members',
             'WHERE `name`=? OR `display_name`=?',
@@ -408,7 +408,7 @@ final readonly class Members
 
         $this->database->disposeresult($result);
 
-        $result = $this->database->safeinsert('members', [
+        $result = $this->database->insert('members', [
             'birthdate' => '0000-00-00',
             'display_name' => $displayName,
             'group_id' => 1,
@@ -447,7 +447,7 @@ final readonly class Members
     private function getGroups(int $groupId = 0): string
     {
         $page = '';
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['id', 'title'],
             'member_groups',
             'ORDER BY `title` DESC',
@@ -474,7 +474,7 @@ final readonly class Members
     private function mergeMembers(int $mid1, int $mid2): null
     {
         // Files.
-        $this->database->safeupdate(
+        $this->database->update(
             'files',
             [
                 'uid' => $mid2,
@@ -483,7 +483,7 @@ final readonly class Members
             $mid1,
         );
         // PMs.
-        $this->database->safeupdate(
+        $this->database->update(
             'messages',
             [
                 'to' => $mid2,
@@ -491,7 +491,7 @@ final readonly class Members
             'WHERE `to`=?',
             $mid1,
         );
-        $this->database->safeupdate(
+        $this->database->update(
             'messages',
             [
                 'from' => $mid2,
@@ -500,7 +500,7 @@ final readonly class Members
             $mid1,
         );
         // Posts.
-        $this->database->safeupdate(
+        $this->database->update(
             'posts',
             [
                 'auth_id' => $mid2,
@@ -509,7 +509,7 @@ final readonly class Members
             $mid1,
         );
         // Profile comments.
-        $this->database->safeupdate(
+        $this->database->update(
             'profile_comments',
             [
                 'to' => $mid2,
@@ -517,7 +517,7 @@ final readonly class Members
             'WHERE `to`=?',
             $mid1,
         );
-        $this->database->safeupdate(
+        $this->database->update(
             'profile_comments',
             [
                 'from' => $mid2,
@@ -526,7 +526,7 @@ final readonly class Members
             $mid1,
         );
         // Topics.
-        $this->database->safeupdate(
+        $this->database->update(
             'topics',
             [
                 'auth_id' => $mid2,
@@ -534,7 +534,7 @@ final readonly class Members
             'WHERE `auth_id`=?',
             $mid1,
         );
-        $this->database->safeupdate(
+        $this->database->update(
             'topics',
             [
                 'lp_uid' => $mid2,
@@ -544,7 +544,7 @@ final readonly class Members
         );
 
         // Forums.
-        $this->database->safeupdate(
+        $this->database->update(
             'forums',
             [
                 'lp_uid' => $mid2,
@@ -554,7 +554,7 @@ final readonly class Members
         );
 
         // Shouts.
-        $this->database->safeupdate(
+        $this->database->update(
             'shouts',
             [
                 'uid' => $mid2,
@@ -564,7 +564,7 @@ final readonly class Members
         );
 
         // Session.
-        $this->database->safeupdate(
+        $this->database->update(
             'session',
             [
                 'uid' => $mid2,
@@ -574,7 +574,7 @@ final readonly class Members
         );
 
         // Sum post count on account being merged into.
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['id', 'posts'],
             'members',
             Database::WHERE_ID_EQUALS,
@@ -584,7 +584,7 @@ final readonly class Members
         $this->database->disposeresult($result);
         $posts = $posts ? $posts['posts'] : 0;
 
-        $this->database->safespecial(
+        $this->database->special(
             'UPDATE %t SET `posts` = `posts` + ? WHERE `id`=?',
             ['members'],
             $posts,
@@ -592,10 +592,10 @@ final readonly class Members
         );
 
         // Delete the account.
-        $this->database->safedelete('members', Database::WHERE_ID_EQUALS, $mid1);
+        $this->database->delete('members', Database::WHERE_ID_EQUALS, $mid1);
 
         // Update stats.
-        $this->database->safespecial(
+        $this->database->special(
             <<<'SQL'
                 UPDATE %t
                 SET `members` = `members` - 1,
@@ -648,18 +648,18 @@ final readonly class Members
                 $mid = $this->database->basicvalue($memberId);
 
                 // PMs.
-                $this->database->safedelete('messages', 'WHERE `to`=?', $mid);
-                $this->database->safedelete('messages', 'WHERE `from`=?', $mid);
+                $this->database->delete('messages', 'WHERE `to`=?', $mid);
+                $this->database->delete('messages', 'WHERE `from`=?', $mid);
                 // Posts.
-                $this->database->safedelete('posts', 'WHERE `auth_id`=?', $mid);
+                $this->database->delete('posts', 'WHERE `auth_id`=?', $mid);
                 // Profile comments.
-                $this->database->safedelete('profile_comments', 'WHERE `to`=?', $mid);
-                $this->database->safedelete('profile_comments', 'WHERE `from`=?', $mid);
+                $this->database->delete('profile_comments', 'WHERE `to`=?', $mid);
+                $this->database->delete('profile_comments', 'WHERE `from`=?', $mid);
                 // Topics.
-                $this->database->safedelete('topics', 'WHERE `auth_id`=?', $mid);
+                $this->database->delete('topics', 'WHERE `auth_id`=?', $mid);
 
                 // Forums.
-                $this->database->safeupdate(
+                $this->database->update(
                     'forums',
                     [
                         'lp_date' => '0000-00-00 00:00:00',
@@ -672,18 +672,18 @@ final readonly class Members
                 );
 
                 // Shouts.
-                $this->database->safedelete('shouts', 'WHERE `uid`=?', $mid);
+                $this->database->delete('shouts', 'WHERE `uid`=?', $mid);
 
                 // Session.
-                $this->database->safedelete('session', 'WHERE `uid`=?', $mid);
+                $this->database->delete('session', 'WHERE `uid`=?', $mid);
 
                 // Delete the account.
-                $this->database->safedelete('members', Database::WHERE_ID_EQUALS, $mid);
+                $this->database->delete('members', Database::WHERE_ID_EQUALS, $mid);
 
                 $this->database->fixAllForumLastPosts();
 
                 // Update stats.
-                $this->database->safespecial(
+                $this->database->special(
                     <<<'SQL'
                         UPDATE %t
                         SET `members` = `members` - 1,
@@ -739,7 +739,7 @@ final readonly class Members
             return $this->page->error('All fields required!');
         }
 
-        $q = $this->database->safeselect(
+        $q = $this->database->select(
             ['id'],
             'members',
             'WHERE (?-UNIX_TIMESTAMP(`last_visit`))<?',
@@ -748,7 +748,7 @@ final readonly class Members
         );
         $num = 0;
         while ($f = $this->database->arow($q)) {
-            $this->database->safeinsert(
+            $this->database->insert(
                 'messages',
                 [
                     'date' => $this->database->datetime(),
@@ -807,7 +807,7 @@ final readonly class Members
         $memberId = (int) $this->request->post('mid');
         $action = $this->request->asString->post('action');
         if ($memberId && $action === 'Allow') {
-            $this->database->safeupdate(
+            $this->database->update(
                 'members',
                 [
                     'group_id' => 1,
@@ -817,7 +817,7 @@ final readonly class Members
             );
         }
 
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'display_name',
                 'email',

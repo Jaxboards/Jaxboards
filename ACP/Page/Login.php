@@ -41,7 +41,7 @@ final readonly class Login
             $user = $this->request->asString->post('user');
             $password = $this->request->asString->post('pass');
 
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 ['id'],
                 'members',
                 'WHERE `name`=?',

@@ -100,7 +100,7 @@ final readonly class ProfileTabs
             return null;
         }
 
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'avatar',
                 'id',
@@ -152,7 +152,7 @@ final readonly class ProfileTabs
     private function showTabTopics(array $profile): string
     {
         $tabHTML = '';
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT
                     p.`post` AS `post`,
@@ -203,7 +203,7 @@ final readonly class ProfileTabs
     {
         $tabHTML = '';
 
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT p.`post` AS `post`,p.`id` AS `pid`,p.`tid` AS `tid`,
                     t.`title` AS `title`,UNIX_TIMESTAMP(p.`date`) AS `date`,f.`perms` AS `perms`

@@ -101,7 +101,7 @@ final class Search
             return '--No forums--';
         }
 
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['id', 'title', 'path'],
             'forums',
             'WHERE `id` IN ? ORDER BY `order` ASC,`title` DESC',
@@ -208,7 +208,7 @@ final class Search
 
             $sanitizedSearchTerm = $this->database->basicvalue($searchTerm);
 
-            $result = $this->database->safespecial(
+            $result = $this->database->special(
                 <<<"SQL"
                         SELECT
                             `id`,
@@ -269,7 +269,7 @@ final class Search
             );
             $ids = implode(',', $idarray);
 
-            $result = $this->database->safespecial(
+            $result = $this->database->special(
                 <<<SQL
                     SELECT
                         p.`id` AS `id`,
@@ -383,7 +383,7 @@ final class Search
         }
 
         $this->fids = [];
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['id', 'perms'],
             'forums',
         );

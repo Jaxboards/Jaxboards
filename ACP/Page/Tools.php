@@ -74,7 +74,7 @@ final readonly class Tools
     {
         $dbPrefix = $this->database->getPrefix();
 
-        $result = $this->database->safequery("SHOW TABLES LIKE '{$dbPrefix}%%'");
+        $result = $this->database->query("SHOW TABLES LIKE '{$dbPrefix}%%'");
         $tables = array_map(static fn(array $row): string => (string) array_values($row)[0], $this->database->arows($result));
 
         $sqlFileLines = [
@@ -92,7 +92,7 @@ final readonly class Tools
             $sqlFileLines[] = '-- ' . $table;
             $sqlFileLines[] = '';
 
-            $result = $this->database->safespecial(
+            $result = $this->database->special(
                 'SHOW CREATE TABLE %t',
                 [$table],
             );
@@ -105,7 +105,7 @@ final readonly class Tools
             $sqlFileLines[] = "{$createTable};";
 
             // Generate INSERTS with all row data
-            $select = $this->database->safeselect('*', $table);
+            $select = $this->database->select('*', $table);
             foreach ($this->database->arows($select) as $row) {
                 $sqlFileLines[] = $this->database->buildInsertQuery($ftable, [$row]);
             }

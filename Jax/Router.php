@@ -128,7 +128,7 @@ final class Router
      */
     private function loadCustomPage(string $action): bool
     {
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['page'],
             'pages',
             'WHERE `act`=?',

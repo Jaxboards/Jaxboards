@@ -113,7 +113,7 @@ final class Session
             $userId === null
             && $this->request->cookie('utoken') !== null
         ) {
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 ['uid'],
                 'tokens',
                 'WHERE `token`=?',
@@ -144,7 +144,7 @@ final class Session
                 ? [Database::WHERE_ID_EQUALS, $sid]
                 : ['WHERE `id`=? AND `ip`=?', $sid, $this->ipAddress->asBinary()];
 
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 [
                     'buddy_list_cache',
                     'forumsread',
@@ -265,7 +265,7 @@ final class Session
         if (!is_numeric($uid) || $uid < 1) {
             $uid = null;
         } else {
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 'UNIX_TIMESTAMP(MAX(`last_action`)) AS `last_action`',
                 'session',
                 'WHERE `uid`=? GROUP BY `uid`',
@@ -277,14 +277,14 @@ final class Session
                 $lastAction = (int) $lastAction['last_action'];
             }
 
-            $this->database->safedelete(
+            $this->database->delete(
                 'session',
                 'WHERE `uid`=? AND `last_update`<?',
                 $this->database->basicvalue($uid),
                 $this->database->datetime($timeago),
             );
             // Delete all expired tokens as well while we're here...
-            $this->database->safedelete(
+            $this->database->delete(
                 'tokens',
                 'WHERE `expires`<=?',
                 $this->database->basicvalue($this->database->datetime()),
@@ -293,7 +293,7 @@ final class Session
         }
 
         $yesterday = mktime(0, 0, 0) ?: 0;
-        $query = $this->database->safeselect(
+        $query = $this->database->select(
             [
                 'uid',
                 'UNIX_TIMESTAMP(MAX(`last_action`)) AS `last_action`',
@@ -307,7 +307,7 @@ final class Session
                 continue;
             }
 
-            $this->database->safeupdate(
+            $this->database->update(
                 'members',
                 [
                     'last_visit' => $this->database->datetime($session['last_action']),
@@ -317,7 +317,7 @@ final class Session
             );
         }
 
-        $this->database->safedelete(
+        $this->database->delete(
             'session',
             <<<'SQL'
                 WHERE `last_update`<?
@@ -367,7 +367,7 @@ final class Session
         }
 
         // Only update if there's data to update.
-        $this->database->safeupdate(
+        $this->database->update(
             'session',
             $session,
             Database::WHERE_ID_EQUALS,
@@ -436,7 +436,7 @@ final class Session
             $sessData['uid'] = $uid;
         }
 
-        $this->database->safeinsert('session', $sessData);
+        $this->database->insert('session', $sessData);
 
         return $sessData;
     }

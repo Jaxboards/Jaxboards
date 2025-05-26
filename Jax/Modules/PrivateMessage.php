@@ -138,7 +138,7 @@ final readonly class PrivateMessage
      */
     public function sendcmd(array $cmd, int $uid): bool
     {
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 UPDATE %t
                 SET `runonce`=CONCAT(`runonce`,?)

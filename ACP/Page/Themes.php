@@ -83,7 +83,7 @@ final readonly class Themes
      */
     private function getSkins(): array
     {
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'id',
                 '`using`',
@@ -169,7 +169,7 @@ final readonly class Themes
                 $hidden = [];
             }
 
-            $this->database->safeupdate(
+            $this->database->update(
                 'skins',
                 [
                     'hidden' => array_key_exists($wrapperId, $hidden) ? 1 : 0,
@@ -213,7 +213,7 @@ final readonly class Themes
                 return 'That skin name is already being used.';
             }
 
-            $this->database->safeupdate(
+            $this->database->update(
                 'skins',
                 [
                     'title' => $newName,
@@ -259,7 +259,7 @@ final readonly class Themes
                 return "That wrapper name ({$wrapperNewName}) is already being used.";
             }
 
-            $this->database->safeupdate(
+            $this->database->update(
                 'skins',
                 [
                     'wrapper' => $wrapperNewName,
@@ -278,13 +278,13 @@ final readonly class Themes
 
     private function setDefaultSkin(int $skinID): void
     {
-        $this->database->safeupdate(
+        $this->database->update(
             'skins',
             [
                 'default' => 0,
             ],
         );
-        $this->database->safeupdate(
+        $this->database->update(
             'skins',
             [
                 'default' => 1,
@@ -414,7 +414,7 @@ final readonly class Themes
 
     private function editCSS(int $id): void
     {
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'id',
                 '`using`',
@@ -514,7 +514,7 @@ final readonly class Themes
             };
 
             if ($error === null) {
-                $this->database->safeinsert(
+                $this->database->insert(
                     'skins',
                     [
                         'custom' => 1,
@@ -525,7 +525,7 @@ final readonly class Themes
                     ],
                 );
                 if ($this->request->post('default')) {
-                    $this->database->safeupdate(
+                    $this->database->update(
                         'skins',
                         [
                             'default' => 0,
@@ -572,7 +572,7 @@ final readonly class Themes
 
     private function deleteSkin(int $id): void
     {
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'id',
                 '`using`',
@@ -600,14 +600,14 @@ final readonly class Themes
             $this->fileUtils->removeDirectory($skindir);
         }
 
-        $this->database->safedelete(
+        $this->database->delete(
             'skins',
             Database::WHERE_ID_EQUALS,
             $id,
         );
         // Make a random skin default if it's the default.
         if ($skin['default']) {
-            $this->database->safeupdate(
+            $this->database->update(
                 'skins',
                 [
                     'default' => 1,

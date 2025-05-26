@@ -118,7 +118,7 @@ final class IPAddress
             $ipAddress = self::getIp();
         }
 
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT COUNT(`ip`) as `banned`
                     FROM `banlist`

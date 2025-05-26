@@ -85,7 +85,7 @@ final readonly class Inbox
         if ($this->request->post('submit') !== null) {
             $mid = $this->request->asString->both('mid');
             if (!$mid && $this->request->both('to')) {
-                $result = $this->database->safeselect(
+                $result = $this->database->select(
                     [
                         'id',
                         'email',
@@ -98,7 +98,7 @@ final readonly class Inbox
                 $udata = $this->database->arow($result);
                 $this->database->disposeresult($result);
             } else {
-                $result = $this->database->safeselect(
+                $result = $this->database->select(
                     [
                         'id',
                         'email',
@@ -131,7 +131,7 @@ final readonly class Inbox
 
             $title = $this->request->asString->post('title');
             // Put it into the table.
-            $this->database->safeinsert(
+            $this->database->insert(
                 'messages',
                 [
                     'date' => $this->database->datetime(),
@@ -152,7 +152,7 @@ final readonly class Inbox
                     $this->database->insertId(),
                 ],
             ) . PHP_EOL;
-            $result = $this->database->safespecial(
+            $result = $this->database->special(
                 <<<'SQL'
                     UPDATE %t
                     SET `runonce`=concat(`runonce`,?)
@@ -187,7 +187,7 @@ final readonly class Inbox
 
         $msg = '';
         if ($messageid !== 0) {
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 [
                     '`from`',
                     'message',
@@ -205,7 +205,7 @@ final readonly class Inbox
 
             if ($message) {
                 $mid = $message['from'];
-                $result = $this->database->safeselect(
+                $result = $this->database->select(
                     ['display_name'],
                     'members',
                     Database::WHERE_ID_EQUALS,
@@ -227,7 +227,7 @@ final readonly class Inbox
 
         if (is_numeric($this->request->asString->get('mid'))) {
             $mid = (int) $this->request->asString->both('mid');
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 ['display_name'],
                 'members',
                 Database::WHERE_ID_EQUALS,
@@ -263,7 +263,7 @@ final readonly class Inbox
 
     private function delete(int $messageId, bool $relocate = true): void
     {
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 '`to`',
                 '`from`',
@@ -280,7 +280,7 @@ final readonly class Inbox
         $is_recipient = $message && $message['to'] === $this->user->get('id');
         $is_sender = $message && $message['from'] === $this->user->get('id');
         if ($is_recipient) {
-            $this->database->safeupdate(
+            $this->database->update(
                 'messages',
                 [
                     'del_recipient' => 1,
@@ -291,7 +291,7 @@ final readonly class Inbox
         }
 
         if ($is_sender) {
-            $this->database->safeupdate(
+            $this->database->update(
                 'messages',
                 [
                     'del_sender' => 1,
@@ -301,7 +301,7 @@ final readonly class Inbox
             );
         }
 
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'del_recipient',
                 'del_sender',
@@ -314,7 +314,7 @@ final readonly class Inbox
         $this->database->disposeresult($result);
 
         if ($message && $message['del_recipient'] && $message['del_sender']) {
-            $this->database->safedelete(
+            $this->database->delete(
                 'messages',
                 Database::WHERE_ID_EQUALS,
                 $this->database->basicvalue($messageId),
@@ -351,7 +351,7 @@ final readonly class Inbox
             'read' => 'WHERE `to`=? AND `read`=1',
             default => 'WHERE `to`=? AND !`del_recipient`',
         };
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             'COUNT(`id`) as `message_count`',
             'messages',
             $criteria,
@@ -383,7 +383,7 @@ final readonly class Inbox
                 SQL,
         };
 
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<"SQL"
                 SELECT
                     a.`id` AS `id`,
@@ -414,7 +414,7 @@ final readonly class Inbox
     private function flag(int $messageId): null
     {
         $this->page->command('softurl');
-        $this->database->safeupdate(
+        $this->database->update(
             'messages',
             [
                 'flag' => $this->request->both('tog') ? 1 : 0,
@@ -436,7 +436,7 @@ final readonly class Inbox
             return null;
         }
 
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT a.`id` AS `id`,a.`to` AS `to`,a.`from` AS `from`,a.`title` AS `title`,
                     a.`message` AS `message`,a.`read` AS `read`,
@@ -466,7 +466,7 @@ final readonly class Inbox
         }
 
         if (!$message['read'] && $message['to'] === $this->user->get('id')) {
-            $this->database->safeupdate(
+            $this->database->update(
                 'messages',
                 ['read' => 1],
                 Database::WHERE_ID_EQUALS,

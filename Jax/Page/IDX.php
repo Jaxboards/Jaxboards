@@ -98,7 +98,7 @@ final class IDX
      */
     private function fetchIDXForums(): array
     {
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT
                     f.`id` AS `id`,
@@ -191,7 +191,7 @@ final class IDX
 
         // Remove duplicates
         $this->mods = array_unique($this->mods);
-        $catq = $this->database->safeselect(
+        $catq = $this->database->select(
             ['id', 'title', '`order`'],
             'categories',
             'ORDER BY `order`,`title` ASC',
@@ -253,7 +253,7 @@ final class IDX
 
         if (!$moderatorinfo) {
             $moderatorinfo = [];
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 ['id', 'display_name', 'group_id'],
                 'members',
                 Database::WHERE_ID_IN,
@@ -364,7 +364,7 @@ final class IDX
      */
     private function fetchUsersOnlineToday(): array
     {
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT
                     UNIX_TIMESTAMP(MAX(s.`last_update`)) AS `last_update`,
@@ -401,7 +401,7 @@ final class IDX
 
         $legend = '';
         $page = '';
-        $result = $this->database->safespecial(
+        $result = $this->database->special(
             <<<'SQL'
                 SELECT
                     s.`posts` AS `posts`,
@@ -447,7 +447,7 @@ final class IDX
         }, $usersOnlineToday));
 
         $usersonline = $this->getUsersOnlineList();
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             ['id', 'title'],
             'member_groups',
             'WHERE `legend`=1 ORDER BY `title`',

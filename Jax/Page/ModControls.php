@@ -157,7 +157,7 @@ final readonly class ModControls
             return $this->template->meta('error', 'Display name is invalid.');
         }
 
-        $updateResult = $this->database->safeupdate(
+        $updateResult = $this->database->update(
             'members',
             [
                 'about' => $this->request->asString->post('about'),
@@ -206,7 +206,7 @@ final readonly class ModControls
 
         // Get the member data.
         if ($memberId !== 0) {
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 $memberFields,
                 'members',
                 Database::WHERE_ID_EQUALS,
@@ -217,7 +217,7 @@ final readonly class ModControls
         } elseif (!$memberName) {
             return $this->template->meta('error', 'Member name is a required field.');
         } else {
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 $memberFields,
                 'members',
                 'WHERE `display_name` LIKE ?',
@@ -421,7 +421,7 @@ final readonly class ModControls
             );
 
             $content = [];
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 [
                     'display_name',
                     'group_id',
@@ -444,7 +444,7 @@ final readonly class ModControls
 
             if ($this->config->getSetting('shoutbox')) {
                 $content = '';
-                $result = $this->database->safespecial(
+                $result = $this->database->special(
                     <<<'SQL'
                         SELECT
                             m.`display_name` AS `display_name`,
@@ -480,7 +480,7 @@ final readonly class ModControls
             }
 
             $content = '';
-            $result = $this->database->safeselect(
+            $result = $this->database->select(
                 ['post'],
                 'posts',
                 'WHERE `ip`=? ORDER BY `id` DESC LIMIT 5',

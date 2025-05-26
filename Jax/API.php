@@ -32,7 +32,7 @@ final readonly class API
 
     private function searchmembers(): void
     {
-        $result = $this->database->safeselect(
+        $result = $this->database->select(
             [
                 'id',
                 'display_name',
