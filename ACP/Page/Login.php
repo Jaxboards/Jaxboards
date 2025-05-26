@@ -42,17 +42,10 @@ final readonly class Login
             $user = $this->request->asString->post('user');
             $password = $this->request->asString->post('pass');
 
-            $result = Member::selectOne($this->database->select(
-                ['id'],
-                'members',
-                'WHERE `name`=?',
-                $user,
-            );
-            $member = $this->database->arow($result);
+            $member = Member::selectOne($this->database, 'WHERE `name`=?', $user);
             $user = $member
-                ? $this->user->getUser($member['id'], $password)
+                ? $this->user->getUser($member->id, $password)
                 : null;
-            $this->database->disposeresult($result);
 
             $error = match (true) {
                 $user === null => 'The username/password supplied was incorrect',

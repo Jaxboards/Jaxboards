@@ -6,7 +6,7 @@ use PDO;
 
 use function array_map;
 
-final class Model {
+abstract class Model {
     public const FIELDS = [];
     public const TABLE = '';
 

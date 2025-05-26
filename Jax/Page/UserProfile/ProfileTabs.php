@@ -6,6 +6,7 @@ namespace Jax\Page\UserProfile;
 
 use Jax\Database;
 use Jax\Date;
+use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
 use Jax\Template;
@@ -92,30 +93,19 @@ final readonly class ProfileTabs
     /**
      * @param array<string,null|float|int|string> $profile
      *
-     * @return null|array<array<string,int|string>>
+     * @return array<Member>
      */
-    private function fetchFriends(array $profile): ?array
+    private function fetchFriends(array $profile): array
     {
         if (!$profile['friends']) {
-            return null;
+            return [];
         }
 
-        $result = $this->database->select(
-            [
-                'avatar',
-                'id',
-                'display_name',
-                'group_id',
-                'usertitle',
-            ],
-            'members',
+        return Member::selectAll(
+            $this->database,
             Database::WHERE_ID_IN,
             explode(',', (string) $profile['friends']),
         );
-        $friends = $this->database->arows($result);
-        $this->database->disposeresult($result);
-
-        return $friends;
     }
 
     /**
@@ -124,7 +114,7 @@ final readonly class ProfileTabs
     private function showTabFriends(array $profile): string
     {
         $friends = $this->fetchFriends($profile);
-        if (!$friends) {
+        if ($friends === []) {
             return "I'm pretty lonely, I have no friends. :(";
         }
 
@@ -132,13 +122,13 @@ final readonly class ProfileTabs
         foreach ($friends as $friend) {
             $tabHTML .= $this->template->meta(
                 'userprofile-friend',
-                $friend['id'],
-                $friend['avatar'] ?: $this->template->meta('default-avatar'),
+                $friend->id,
+                $friend->avatar ?: $this->template->meta('default-avatar'),
                 $this->template->meta(
                     'user-link',
-                    $friend['id'],
-                    $friend['group_id'],
-                    $friend['display_name'],
+                    $friend->id,
+                    $friend->group_id,
+                    $friend->display_name,
                 ),
             );
         }
