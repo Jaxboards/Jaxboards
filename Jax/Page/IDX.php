@@ -15,6 +15,7 @@ use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
+use Jax\Models\Member;
 
 use function array_filter;
 use function array_flip;
@@ -253,18 +254,13 @@ final class IDX
 
         if (!$moderatorinfo) {
             $moderatorinfo = [];
-            $result = $this->database->select(
-                ['id', 'display_name', 'group_id'],
-                'members',
-                Database::WHERE_ID_IN,
-                $this->mods,
-            );
-            while ($member = $this->database->arow($result)) {
-                $moderatorinfo[$member['id']] = $this->template->meta(
+            $members = Member::selectAll($this->database, Database::WHERE_ID_IN, $this->mods);
+            foreach ($members as $member) {
+                $moderatorinfo[$member->id] = $this->template->meta(
                     'user-link',
-                    $member['id'],
-                    $member['group_id'],
-                    $member['display_name'],
+                    $member->id,
+                    $member->group_id,
+                    $member->display_name,
                 );
             }
         }
