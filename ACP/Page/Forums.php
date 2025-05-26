@@ -495,11 +495,11 @@ final readonly class Forums
                 $modId,
             );
             if ($this->database->arow($result)) {
-                if (!in_array($this->request->post('modid'), isset($oldForumData['mods']) ? explode(',', (string) $oldForumData['mods']) : [])) {
+                if (!in_array($modId, isset($oldForumData['mods']) ? explode(',', (string) $oldForumData['mods']) : [])) {
                     $write['mods'] = isset($oldForumData['mods'])
                         && $oldForumData['mods']
-                        ? $oldForumData['mods'] . ',' . $this->request->post('modid')
-                        : $this->request->post('modid');
+                        ? $oldForumData['mods'] . ',' . $modId
+                        : $modId;
                 }
             } else {
                 $error = "You tried to add a moderator that doesn't exist!";

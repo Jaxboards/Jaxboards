@@ -81,6 +81,7 @@ final readonly class Inbox
         $error = null;
         $mname = '';
         $mtitle = '';
+        $mid = 0;
         if ($this->request->post('submit') !== null) {
             $mid = (int) $this->request->asString->both('mid');
             $to = $this->request->asString->both('to');
