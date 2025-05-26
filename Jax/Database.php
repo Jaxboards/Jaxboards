@@ -128,10 +128,8 @@ class Database
     /**
      * @param array<string,null|float|int|string> $data
      */
-    public function insert(
-        string $table,
-        array $data,
-    ): ?PDOStatement {
+    public function insert(string $table, array $data): ?PDOStatement
+    {
         if ($data === []) {
             return null;
         }
@@ -276,10 +274,8 @@ class Database
     /**
      * @param null|array<null|bool|float|int|string>|bool|float|int|string ...$args
      */
-    public function query(
-        string $queryString,
-        ...$args,
-    ): ?PDOStatement {
+    public function query(string $queryString, ...$args): ?PDOStatement
+    {
         // set new variable to not impact debug_backtrace value for inspecting
         // input
         $compiledQueryString = $queryString;
