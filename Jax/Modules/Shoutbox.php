@@ -367,7 +367,7 @@ final class Shoutbox
         ];
         $this->database->safeinsert(
             'shouts',
-            $shoutData
+            $shoutData,
         );
         $shoutData['id'] = $this->database->insertId();
 

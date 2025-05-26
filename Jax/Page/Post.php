@@ -835,12 +835,12 @@ final class Post
 
         // Actually PUT THE POST IN!
         $postData = [
-                'auth_id' => $uid,
-                'date' => $postDate,
-                'ip' => $this->ipAddress->asBinary(),
-                'newtopic' => $newtopic ? 1 : 0,
-                'post' => $postData,
-                'tid' => $tid,
+            'auth_id' => $uid,
+            'date' => $postDate,
+            'ip' => $this->ipAddress->asBinary(),
+            'newtopic' => $newtopic ? 1 : 0,
+            'post' => $postData,
+            'tid' => $tid,
         ];
         $this->database->safeinsert(
             'posts',

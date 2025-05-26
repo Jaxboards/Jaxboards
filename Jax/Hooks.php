@@ -1,12 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jax;
 
-class Hooks {
+use function array_key_exists;
+use function array_map;
+
+final class Hooks
+{
     /**
      * @var array<string,array<callable>>
      */
-    private $hooks = [];
+    private array $hooks = [];
 
     /**
      * Add a listener to any given hook.
@@ -16,6 +22,7 @@ class Hooks {
         if (!array_key_exists($hookName, $this->hooks)) {
             $this->hooks[$hookName] = [];
         }
+
         $this->hooks[$hookName][] = $callable;
     }
 
@@ -27,13 +34,12 @@ class Hooks {
         if (!array_key_exists($hookName, $this->hooks)) {
             return;
         }
+
         array_map(
-            function ($callable) use ($payload) {
+            static function ($callable) use ($payload): void {
                 $callable($payload);
             },
-            $this->hooks[$hookName]
+            $this->hooks[$hookName],
         );
     }
 }
-
-?>
