@@ -195,12 +195,8 @@ final readonly class Themes
                 continue;
             }
 
-            if (!$this->isValidFilename($oldName)) {
-                continue;
-            }
-
-            if (!is_dir($this->themesPath . $oldName)) {
-                continue;
+            if (!$this->isValidFilename($oldName)|| !is_dir($this->themesPath . $oldName)) {
+                return 'Invalid from skin name';
             }
 
             if (
@@ -309,10 +305,13 @@ final readonly class Themes
             is_string($deleteWrapper) => $this->deleteWrapper($deleteWrapper),
             is_string($newWrapper) && $newWrapper !== '' => $this->createWrapper($newWrapper),
             is_array($updateWrappers) => $this->updateWrappers($updateWrappers),
-            is_array($renameSkins) => $this->renameSkin($renameSkins),
             is_array($renameWrappers) => $this->renameWrappers($renameWrappers),
             default => null,
         };
+
+        $skinError = is_array($renameSkins)
+            ? $this->renameSkin($renameSkins)
+            : null;
 
         $defaultSkin = (int) $this->request->asString->both('default');
         if ($defaultSkin !== 0) {
@@ -322,6 +321,7 @@ final readonly class Themes
         $usedwrappers = [];
         $skins = '';
         $wrappers = $this->getWrappers();
+
         foreach ($this->getSkins() as $f) {
             $wrapperOptions = '';
             foreach ($wrappers as $wrapper) {
@@ -374,7 +374,9 @@ final readonly class Themes
                 'content' => $skins,
             ],
         );
-        $this->page->addContentBox('Themes', $skins);
+
+        $this->page->addContentBox('Themes',
+            ($skinError !== null ? $this->page->error($skinError) : '') . $skins);
 
         $wrap = '';
         foreach ($wrappers as $wrapper) {
