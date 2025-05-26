@@ -79,12 +79,12 @@ final readonly class Inbox
         string $todo = '',
     ): ?string {
         $error = null;
-        $mid = 0;
         $mname = '';
         $mtitle = '';
         if ($this->request->post('submit') !== null) {
-            $mid = $this->request->asString->both('mid');
-            if (!$mid && $this->request->both('to')) {
+            $mid = (int) $this->request->asString->both('mid');
+            $to = $this->request->asString->both('to');
+            if (!$mid && $to) {
                 $result = $this->database->select(
                     [
                         'id',
@@ -93,7 +93,7 @@ final readonly class Inbox
                     ],
                     'members',
                     'WHERE `display_name`=?',
-                    $this->database->basicvalue($this->request->asString->both('to')),
+                    $to,
                 );
                 $udata = $this->database->arow($result);
                 $this->database->disposeresult($result);
@@ -106,7 +106,7 @@ final readonly class Inbox
                     ],
                     'members',
                     Database::WHERE_ID_EQUALS,
-                    $this->database->basicvalue($mid),
+                    $mid,
                 );
                 $udata = $this->database->arow($result);
                 $this->database->disposeresult($result);
@@ -159,7 +159,7 @@ final readonly class Inbox
                     WHERE `uid`=?
                     SQL,
                 ['session'],
-                $this->database->basicvalue($cmd),
+                $cmd,
                 $udata['id'],
             );
             // Send em an email!
@@ -186,7 +186,7 @@ final readonly class Inbox
         }
 
         $msg = '';
-        if ($messageid !== 0) {
+        if ($messageid) {
             $result = $this->database->select(
                 [
                     '`from`',
@@ -197,7 +197,7 @@ final readonly class Inbox
                 'WHERE (`to`=? OR `from`=?) AND `id`=?',
                 $this->user->get('id'),
                 $this->user->get('id'),
-                $this->database->basicvalue($messageid),
+                $messageid,
             );
 
             $message = $this->database->arow($result);
@@ -272,7 +272,7 @@ final readonly class Inbox
             ],
             'messages',
             Database::WHERE_ID_EQUALS,
-            $this->database->basicvalue($messageId),
+            $messageId,
         );
         $message = $this->database->arow($result);
         $this->database->disposeresult($result);
@@ -286,7 +286,7 @@ final readonly class Inbox
                     'del_recipient' => 1,
                 ],
                 Database::WHERE_ID_EQUALS,
-                $this->database->basicvalue($messageId),
+                $messageId,
             );
         }
 
@@ -297,7 +297,7 @@ final readonly class Inbox
                     'del_sender' => 1,
                 ],
                 Database::WHERE_ID_EQUALS,
-                $this->database->basicvalue($messageId),
+                $messageId,
             );
         }
 
@@ -308,7 +308,7 @@ final readonly class Inbox
             ],
             'messages',
             Database::WHERE_ID_EQUALS,
-            $this->database->basicvalue($messageId),
+            $messageId,
         );
         $message = $this->database->arow($result);
         $this->database->disposeresult($result);
@@ -317,7 +317,7 @@ final readonly class Inbox
             $this->database->delete(
                 'messages',
                 Database::WHERE_ID_EQUALS,
-                $this->database->basicvalue($messageId),
+                $messageId,
             );
         }
 
@@ -420,7 +420,7 @@ final readonly class Inbox
                 'flag' => $this->request->both('tog') ? 1 : 0,
             ],
             'WHERE `id`=? AND `to`=?',
-            $this->database->basicvalue($messageId),
+            $messageId,
             $this->user->get('id'),
         );
 
@@ -450,7 +450,7 @@ final readonly class Inbox
                 ORDER BY a.`date` DESC
                 SQL,
             ['messages', 'members'],
-            $this->database->basicvalue($messageid),
+            $messageid,
         );
         $message = $this->database->arow($result);
         $this->database->disposeresult($result);

@@ -145,7 +145,7 @@ final readonly class PrivateMessage
                 WHERE `uid`=? AND `last_update`> ?
                 SQL,
             ['session'],
-            $this->database->basicvalue(json_encode($cmd) . PHP_EOL),
+            json_encode($cmd) . PHP_EOL,
             $uid,
             $this->database->datetime(Carbon::now()->subSeconds(5)->getTimestamp()),
         );

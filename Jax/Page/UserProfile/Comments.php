@@ -179,7 +179,7 @@ final readonly class Comments
             $this->database->delete(
                 'profile_comments',
                 Database::WHERE_ID_EQUALS,
-                $this->database->basicvalue($deleteComment),
+                $deleteComment,
             );
 
             return;
@@ -193,8 +193,8 @@ final readonly class Comments
         $this->database->delete(
             'profile_comments',
             'WHERE `id`=? AND `from`=?',
-            $this->database->basicvalue($deleteComment),
-            $this->database->basicvalue($this->user->get('id')),
+            $deleteComment,
+            (int) $this->user->get('id'),
         );
     }
 }

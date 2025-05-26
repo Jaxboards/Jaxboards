@@ -158,7 +158,7 @@ final class Post
             ],
             'topics',
             Database::WHERE_ID_EQUALS,
-            $this->database->basicvalue($tid),
+            $tid,
         );
         $topic = $this->database->arow($result);
         $this->database->disposeresult($result);
@@ -388,7 +388,7 @@ final class Post
                 WHERE t.`id`=?
                 SQL,
             ['topics', 'forums'],
-            $this->database->basicvalue($tid),
+            $tid,
         );
         $topic = $this->database->arow($result);
         $this->database->disposeresult($result);
@@ -521,7 +521,7 @@ final class Post
             $result = $this->database->special(
                 'SELECT mods FROM %t WHERE id=(SELECT fid FROM %t WHERE id=?)',
                 ['forums', 'topics'],
-                $this->database->basicvalue($tid),
+                $tid,
             );
             $mods = $this->database->arow($result);
             $this->database->disposeresult($result);
@@ -560,7 +560,7 @@ final class Post
                 'post' => $this->postData,
             ],
             Database::WHERE_ID_EQUALS,
-            $this->database->basicvalue($pid),
+            $pid,
         );
         $this->page->command(
             'update',

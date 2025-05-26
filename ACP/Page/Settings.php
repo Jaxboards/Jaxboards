@@ -179,7 +179,7 @@ final readonly class Settings
         $this->database->delete(
             'pages',
             'WHERE `act`=?',
-            $this->database->basicvalue($page),
+            $page,
         );
     }
 
@@ -190,7 +190,7 @@ final readonly class Settings
             ['act', 'page'],
             'pages',
             'WHERE `act`=?',
-            $this->database->basicvalue($pageurl),
+            $pageurl,
         );
         $pageinfo = $this->database->arow($result);
         $this->database->disposeresult($result);
@@ -205,7 +205,7 @@ final readonly class Settings
                         'page' => $pagecontents,
                     ],
                     'WHERE `act`=?',
-                    $this->database->basicvalue($pageurl),
+                    $pageurl,
                 );
             } else {
                 $pageinfo = [

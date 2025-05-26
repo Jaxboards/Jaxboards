@@ -108,14 +108,16 @@ final readonly class ServiceSignup
                     . 'numbers, and underscore only';
             }
 
-            $result = $this->database->select(
-                ['id'],
-                'directory',
-                'WHERE `boardname`=?',
-                $this->database->basicvalue($boardURL),
-            );
-            if ($this->database->arow($result)) {
-                $errors[] = 'that board already exists';
+            if ($boardURL) {
+                $result = $this->database->select(
+                    ['id'],
+                    'directory',
+                    'WHERE `boardname`=?',
+                    $boardURL,
+                );
+                if ($this->database->arow($result)) {
+                    $errors[] = 'that board already exists';
+                }
             }
 
             $this->database->disposeresult($result);

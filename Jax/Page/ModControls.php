@@ -153,6 +153,7 @@ final readonly class ModControls
     private function updateMember(): string
     {
         $displayName = $this->request->asString->post('display_name');
+        $mid = (int) $this->request->asString->post('mid');
         if (!$displayName) {
             return $this->template->meta('error', 'Display name is invalid.');
         }
@@ -167,7 +168,7 @@ final readonly class ModControls
                 'sig' => $this->request->asString->post('signature'),
             ],
             Database::WHERE_ID_EQUALS,
-            $this->database->basicvalue((int) $this->request->asString->post('mid')),
+            $mid,
         );
 
         if ($updateResult === null) {
@@ -210,7 +211,7 @@ final readonly class ModControls
                 $memberFields,
                 'members',
                 Database::WHERE_ID_EQUALS,
-                $this->database->basicvalue($memberId),
+                $memberId,
             );
             $member = $this->database->arow($result);
             $this->database->disposeresult($result);
@@ -221,7 +222,7 @@ final readonly class ModControls
                 $memberFields,
                 'members',
                 'WHERE `display_name` LIKE ?',
-                $this->database->basicvalue($memberName . '%'),
+                $memberName . '%',
             );
             $members = $this->database->arows($result);
             if (count($members) > 1) {
@@ -429,7 +430,7 @@ final readonly class ModControls
                 ],
                 'members',
                 'WHERE `ip`=?',
-                $this->database->basicvalue($this->ipAddress->asBinary($ipAddress)),
+                $this->ipAddress->asBinary($ipAddress),
             );
             while ($member = $this->database->arow($result)) {
                 $content[] = $this->template->meta(
@@ -464,7 +465,7 @@ final readonly class ModControls
                         'shouts',
                         'members',
                     ],
-                    $this->database->basicvalue($this->ipAddress->asBinary($ipAddress)),
+                    $this->ipAddress->asBinary($ipAddress),
                 );
                 while ($shout = $this->database->arow($result)) {
                     $content .= $this->template->meta(
@@ -484,7 +485,7 @@ final readonly class ModControls
                 ['post'],
                 'posts',
                 'WHERE `ip`=? ORDER BY `id` DESC LIMIT 5',
-                $this->database->basicvalue($this->ipAddress->asBinary($ipAddress)),
+                $this->ipAddress->asBinary($ipAddress),
             );
             while ($post = $this->database->arow($result)) {
                 $content .= "<div class='post'>"

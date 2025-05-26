@@ -61,7 +61,7 @@ final readonly class Reactions
             ['rating'],
             'posts',
             Database::WHERE_ID_EQUALS,
-            $this->database->basicvalue($pid),
+            $pid,
         );
         $row = $this->database->arow($result);
         $this->database->disposeresult($result);
@@ -175,7 +175,7 @@ final readonly class Reactions
             ['rating'],
             'posts',
             Database::WHERE_ID_EQUALS,
-            $this->database->basicvalue($postid),
+            $postid,
         );
         $post = $this->database->arow($result);
         $this->database->disposeresult($result);
@@ -217,7 +217,7 @@ final readonly class Reactions
                 'rating' => json_encode($ratings) ?: $post['rating'],
             ],
             Database::WHERE_ID_EQUALS,
-            $this->database->basicvalue($postid),
+            $postid,
         );
         $this->page->command('alert', $unrate ? 'Unrated!' : 'Rated!');
     }

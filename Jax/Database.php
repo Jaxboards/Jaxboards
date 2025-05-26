@@ -210,7 +210,7 @@ class Database
     /**
      * @param array<string,null|float|int|string> $keyValuePairs
      */
-    public function buildUpdate(array $keyValuePairs): string
+    private function buildUpdate(array $keyValuePairs): string
     {
         if ($keyValuePairs === []) {
             return '';
@@ -317,24 +317,6 @@ class Database
         $pdoStmt->execute();
 
         return $pdoStmt ?: null;
-    }
-
-    /**
-     * Like evalue, but does not quote strings.  For use with query().
-     *
-     * @param mixed $value
-     */
-    public function basicvalue($value): int|string
-    {
-        if (is_array($value)) {
-            return $value[0];
-        }
-
-        if ($value === null) {
-            return 'NULL';
-        }
-
-        return $value;
     }
 
     /**

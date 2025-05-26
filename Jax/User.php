@@ -123,7 +123,7 @@ final class User
             ],
             'members',
             Database::WHERE_ID_EQUALS,
-            $this->database->basicvalue($uid),
+            $uid,
         );
         $user = $this->database->arow($result);
         $this->database->disposeresult($result);

@@ -143,7 +143,7 @@ final class Search
             return;
         }
 
-        $searchTerm = $this->request->both('searchterm') ?: $this->session->getVar('searcht');
+        $searchTerm = $this->request->asString->both('searchterm') ?: (string) $this->session->getVar('searcht');
 
         if (
             $this->request->both('searchterm') === null
@@ -206,7 +206,7 @@ final class Search
             $postWhere = implode(' ', array_map(static fn($q): string => "AND {$q}", $postParams));
             $topicWhere = implode(' ', array_map(static fn($q): string => "AND {$q}", $topicParams));
 
-            $sanitizedSearchTerm = $this->database->basicvalue($searchTerm);
+            $sanitizedSearchTerm = $searchTerm;
 
             $result = $this->database->special(
                 <<<"SQL"

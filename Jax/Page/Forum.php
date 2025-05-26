@@ -155,7 +155,7 @@ final class Forum
                     WHERE `id`=?
                     SQL,
                 ['forums'],
-                $this->database->basicvalue($fid),
+                $fid,
             );
 
             $this->page->location($fdata['redirect']);

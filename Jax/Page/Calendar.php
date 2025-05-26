@@ -71,7 +71,7 @@ final readonly class Calendar
             ],
             'members',
             'WHERE MONTH(`birthdate`)=? AND YEAR(`birthdate`)<?',
-            $this->database->basicvalue($month),
+            $month,
             $year,
         );
         $birthdays = [];

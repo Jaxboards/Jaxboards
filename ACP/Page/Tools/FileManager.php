@@ -38,9 +38,8 @@ final readonly class FileManager
     public function render(): void
     {
         $page = '';
-        if (
-            is_numeric($this->request->both('delete'))
-        ) {
+        $delete = (int) $this->request->asString->both('delete');
+        if ($delete) {
             $result = $this->database->select(
                 [
                     'hash',
@@ -48,7 +47,7 @@ final readonly class FileManager
                 ],
                 'files',
                 Database::WHERE_ID_EQUALS,
-                $this->database->basicvalue($this->request->both('delete')),
+                $delete,
             );
             $file = $this->database->arow($result);
             $this->database->disposeresult($result);
@@ -70,14 +69,20 @@ final readonly class FileManager
                 $this->database->delete(
                     'files',
                     Database::WHERE_ID_EQUALS,
-                    $this->database->basicvalue($this->request->both('delete')),
+                    $delete,
                 );
             }
         }
 
-        if (is_array($this->request->post('dl'))) {
-            foreach ($this->request->post('dl') as $fileId => $downloads) {
+        $filesToUpdate = $this->request->post('dl');
+        if (is_array($filesToUpdate)) {
+            foreach ($filesToUpdate as $fileId => $downloads) {
                 $downloads = (int) $downloads;
+                $fileId = (int) $fileId;
+
+                if ($fileId === 0) {
+                    continue;
+                }
 
                 $this->database->update(
                     'files',
@@ -85,7 +90,7 @@ final readonly class FileManager
                         'downloads' => $downloads,
                     ],
                     Database::WHERE_ID_EQUALS,
-                    $this->database->basicvalue($fileId),
+                    $fileId,
                 );
             }
 

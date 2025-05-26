@@ -132,7 +132,7 @@ final class Router
             ['page'],
             'pages',
             'WHERE `act`=?',
-            $this->database->basicvalue($action),
+            $action,
         );
         $page = $this->database->arow($result);
         $this->database->disposeresult($result);

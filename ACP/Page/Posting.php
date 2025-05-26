@@ -66,7 +66,7 @@ final readonly class Posting
             $this->database->delete(
                 'textrules',
                 "WHERE `type`='badword' AND `needle`=?",
-                $this->database->basicvalue($delete),
+                $delete,
             );
             unset($wordfilter[$delete]);
         }
@@ -145,11 +145,12 @@ final readonly class Posting
         $page = '';
         $emoticons = [];
         // Delete emoticon.
-        if ($this->request->get('d')) {
+        $delete = $this->request->asString->get('d');
+        if ($delete) {
             $this->database->delete(
                 'textrules',
                 "WHERE `type`='emote' AND `needle`=?",
-                $this->database->basicvalue($this->request->get('d')),
+                $delete,
             );
         }
 
@@ -292,7 +293,7 @@ final readonly class Posting
             $this->database->delete(
                 'ratingniblets',
                 Database::WHERE_ID_EQUALS,
-                $this->database->basicvalue($delete),
+                $delete,
             );
             unset($niblets[$delete]);
         }

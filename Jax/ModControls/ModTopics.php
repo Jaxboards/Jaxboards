@@ -68,7 +68,7 @@ final readonly class ModTopics
                     )
                     SQL,
                 ['forums', 'topics'],
-                $this->database->basicvalue($tid),
+                $tid,
             );
             $mods = $this->database->arow($result);
             $this->database->disposeresult($result);
@@ -216,7 +216,7 @@ final readonly class ModTopics
                 'MIN(`id`) `minId`',
                 'posts',
                 'WHERE `tid`=?',
-                $this->database->basicvalue($otherTopic),
+                $otherTopic,
             );
             $firstPost = $this->database->arow($result);
             $op = $firstPost ? (int) $firstPost['minId'] : 0;
@@ -239,7 +239,7 @@ final readonly class ModTopics
                         'op' => $op,
                     ],
                     Database::WHERE_ID_EQUALS,
-                    $this->database->basicvalue($otherTopic),
+                    $otherTopic,
                 );
             }
 
@@ -300,7 +300,7 @@ final readonly class ModTopics
             ['id'],
             'forums',
             Database::WHERE_ID_EQUALS,
-            $this->database->basicvalue($forumId),
+            $forumId,
         );
         $rowfound = $this->database->arow($result);
         $this->database->disposeresult($result);

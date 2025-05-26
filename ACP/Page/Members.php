@@ -116,7 +116,7 @@ final readonly class Members
                     ['group_id'],
                     'members',
                     Database::WHERE_ID_EQUALS,
-                    $this->database->basicvalue($memberId),
+                    $memberId,
                 );
                 $member = $this->database->arow($result);
                 $this->database->disposeresult($result);
@@ -174,7 +174,7 @@ final readonly class Members
                     ],
                     'members',
                     Database::WHERE_ID_EQUALS,
-                    $this->database->basicvalue($memberId),
+                    $memberId,
                 );
             } else {
                 $result = $this->database->select(
@@ -224,7 +224,7 @@ final readonly class Members
                     ],
                     'members',
                     'WHERE `display_name` LIKE ?',
-                    $this->database->basicvalue($name . '%'),
+                    $name . '%',
                 );
             }
 
@@ -398,8 +398,8 @@ final readonly class Members
             ['name', 'display_name'],
             'members',
             'WHERE `name`=? OR `display_name`=?',
-            $this->database->basicvalue($username),
-            $this->database->basicvalue($displayName),
+            $username,
+            $displayName,
         );
         if ($member = $this->database->arow($result)) {
             return 'That ' . ($member['name'] === $username
@@ -645,18 +645,16 @@ final readonly class Members
             if ($error !== null) {
                 $page .= $this->page->error($error);
             } else {
-                $mid = $this->database->basicvalue($memberId);
-
                 // PMs.
-                $this->database->delete('messages', 'WHERE `to`=?', $mid);
-                $this->database->delete('messages', 'WHERE `from`=?', $mid);
+                $this->database->delete('messages', 'WHERE `to`=?', $memberId);
+                $this->database->delete('messages', 'WHERE `from`=?', $memberId);
                 // Posts.
-                $this->database->delete('posts', 'WHERE `auth_id`=?', $mid);
+                $this->database->delete('posts', 'WHERE `auth_id`=?', $memberId);
                 // Profile comments.
-                $this->database->delete('profile_comments', 'WHERE `to`=?', $mid);
-                $this->database->delete('profile_comments', 'WHERE `from`=?', $mid);
+                $this->database->delete('profile_comments', 'WHERE `to`=?', $memberId);
+                $this->database->delete('profile_comments', 'WHERE `from`=?', $memberId);
                 // Topics.
-                $this->database->delete('topics', 'WHERE `auth_id`=?', $mid);
+                $this->database->delete('topics', 'WHERE `auth_id`=?', $memberId);
 
                 // Forums.
                 $this->database->update(
@@ -668,17 +666,17 @@ final readonly class Members
                         'lp_uid' => null,
                     ],
                     'WHERE `lp_uid`=?',
-                    $mid,
+                    $memberId,
                 );
 
                 // Shouts.
-                $this->database->delete('shouts', 'WHERE `uid`=?', $mid);
+                $this->database->delete('shouts', 'WHERE `uid`=?', $memberId);
 
                 // Session.
-                $this->database->delete('session', 'WHERE `uid`=?', $mid);
+                $this->database->delete('session', 'WHERE `uid`=?', $memberId);
 
                 // Delete the account.
-                $this->database->delete('members', Database::WHERE_ID_EQUALS, $mid);
+                $this->database->delete('members', Database::WHERE_ID_EQUALS, $memberId);
 
                 $this->database->fixAllForumLastPosts();
 
@@ -813,7 +811,7 @@ final readonly class Members
                     'group_id' => 1,
                 ],
                 Database::WHERE_ID_EQUALS,
-                $this->database->basicvalue($memberId),
+                $memberId,
             );
         }
 

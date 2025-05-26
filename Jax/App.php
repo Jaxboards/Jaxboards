@@ -115,7 +115,7 @@ final readonly class App
             !$this->session->get('is_bot')
             && $this->user->get('id') !== $this->session->get('uid')
         ) {
-            $this->session->clean($this->user->get('id'));
+            $this->session->clean((int) $this->user->get('id'));
             $this->session->set('uid', $this->user->get('id'));
             $this->session->applychanges();
         }

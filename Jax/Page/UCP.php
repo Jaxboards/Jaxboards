@@ -404,7 +404,7 @@ final readonly class UCP
             'COUNT(`id`) AS `same_display_name`',
             'members',
             'WHERE `display_name` = ? AND `id`!=? LIMIT 1',
-            $this->database->basicvalue($data['display_name']),
+            $data['display_name'],
             $this->user->get('id'),
         );
         $displayNameCheck = $this->database->arow($result);

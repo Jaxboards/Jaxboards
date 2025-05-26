@@ -350,7 +350,7 @@ final readonly class Forums
                     'mods' => $forum['mods'],
                 ],
                 Database::WHERE_ID_EQUALS,
-                $this->database->basicvalue($fid),
+                $fid,
             );
             $this->updatePerForumModFlag();
             $this->page->location('?act=Forums&edit=' . $fid);
@@ -486,12 +486,13 @@ final readonly class Forums
         $error = null;
 
         // Add per-forum moderator.
-        if (is_numeric($this->request->post('modid'))) {
+        $modId = (int) $this->request->asString->post('modid');
+        if ($modId) {
             $result = $this->database->select(
                 ['id'],
                 'members',
                 Database::WHERE_ID_EQUALS,
-                $this->database->basicvalue($this->request->post('modid')),
+                $modId,
             );
             if ($this->database->arow($result)) {
                 if (!in_array($this->request->post('modid'), isset($oldForumData['mods']) ? explode(',', (string) $oldForumData['mods']) : [])) {
@@ -629,7 +630,7 @@ final readonly class Forums
             $this->database->delete(
                 'forums',
                 Database::WHERE_ID_EQUALS,
-                $this->database->basicvalue($forumId),
+                $forumId,
             );
             if ($moveTo !== 0) {
                 $updateStatement = $this->database->update(
@@ -638,7 +639,7 @@ final readonly class Forums
                         'fid' => $moveTo,
                     ],
                     ' WHERE `fid`=?',
-                    $this->database->basicvalue($forumId),
+                    $forumId,
                 );
                 $topics = $this->database->affectedRows($updateStatement);
             } else {
@@ -653,14 +654,14 @@ final readonly class Forums
                         )
                         SQL,
                     ['posts', 'topics'],
-                    $this->database->basicvalue($forumId),
+                    $forumId,
                 );
 
                 $posts = $this->database->affectedRows($result);
                 $deleteStatement = $this->database->delete(
                     'topics',
                     'WHERE `fid`=?',
-                    $this->database->basicvalue($forumId),
+                    $forumId,
                 );
                 $topics = $this->database->affectedRows($deleteStatement);
             }
@@ -729,7 +730,7 @@ final readonly class Forums
     private function createCategory(?int $cid = null): void
     {
         $page = '';
-        $cdata = [];
+        $cdata = null;
         if (!$cid && $this->request->post('cat_id')) {
             $cid = (int) $this->request->post('cat_id');
         }
@@ -739,7 +740,7 @@ final readonly class Forums
                 ['id', 'title'],
                 'categories',
                 Database::WHERE_ID_EQUALS,
-                $this->database->basicvalue($cid),
+                $cid,
             );
             $cdata = $this->database->arow($result);
             $this->database->disposeresult($result);
@@ -753,12 +754,12 @@ final readonly class Forums
                 $page .= $this->page->error('All fields required');
             } else {
                 $data = ['title' => $categoryName];
-                if (!empty($cdata)) {
+                if ($cata && $cid) {
                     $this->database->update(
                         'categories',
                         $data,
                         Database::WHERE_ID_EQUALS,
-                        $this->database->basicvalue($cid),
+                        $cid,
                     );
                     $page .= $this->page->success(
                         'Category edited.',
@@ -821,12 +822,12 @@ final readonly class Forums
                         'cat_id' => $moveTo,
                     ],
                     'WHERE `cat_id`=?',
-                    $this->database->basicvalue($catId),
+                    $catId,
                 );
                 $this->database->delete(
                     'categories',
                     Database::WHERE_ID_EQUALS,
-                    $this->database->basicvalue($catId),
+                    $catId,
                 );
                 $page .= $this->page->success('Category deleted!');
             }

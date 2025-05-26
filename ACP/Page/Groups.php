@@ -382,7 +382,7 @@ final class Groups
                         'member_groups',
                         $write,
                         Database::WHERE_ID_EQUALS,
-                        $this->database->basicvalue($gid),
+                        $gid,
                     );
                 } else {
                     $this->database->insert(
@@ -410,7 +410,7 @@ final class Groups
                 ['title', 'icon'],
                 'member_groups',
                 Database::WHERE_ID_EQUALS,
-                $this->database->basicvalue($gid),
+                $gid,
             );
             $gdata = $this->database->arow($result);
             $this->database->disposeresult($result);
@@ -433,14 +433,12 @@ final class Groups
     private function delete(): void
     {
         $page = '';
-        if (
-            is_numeric($this->request->both('delete'))
-            && $this->request->both('delete') > 5
-        ) {
+        $delete = (int) $this->request->asString->both('delete');
+        if ($delete > 5) {
             $this->database->delete(
                 'member_groups',
                 Database::WHERE_ID_EQUALS,
-                $this->database->basicvalue($this->request->both('delete')),
+                $delete,
             );
             $this->database->update(
                 'members',
@@ -448,7 +446,7 @@ final class Groups
                     'group_id' => 1,
                 ],
                 'WHERE `group_id`=?',
-                $this->database->basicvalue($this->request->both('delete')),
+                $delete,
             );
         }
 

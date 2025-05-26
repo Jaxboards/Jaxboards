@@ -201,7 +201,7 @@ final readonly class ModPosts
             ['auth_id', 'newtopic', 'tid'],
             'posts',
             Database::WHERE_ID_EQUALS,
-            $this->database->basicvalue($pid),
+            $pid,
         );
         $post = $this->database->arow($result);
         $this->database->disposeresult($result);

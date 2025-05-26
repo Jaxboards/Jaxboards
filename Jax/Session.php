@@ -259,7 +259,7 @@ final class Session
         unset($this->changedData[$fieldName]);
     }
 
-    public function clean(null|int|string $uid): bool
+    public function clean(?int $uid): bool
     {
         $timeago = Carbon::now()->getTimestamp() - $this->config->getSetting('timetologout');
         if (!is_numeric($uid) || $uid < 1) {
@@ -280,14 +280,14 @@ final class Session
             $this->database->delete(
                 'session',
                 'WHERE `uid`=? AND `last_update`<?',
-                $this->database->basicvalue($uid),
+                $uid,
                 $this->database->datetime($timeago),
             );
             // Delete all expired tokens as well while we're here...
             $this->database->delete(
                 'tokens',
                 'WHERE `expires`<=?',
-                $this->database->basicvalue($this->database->datetime()),
+                $this->database->datetime(),
             );
             $this->set('read_date', $lastAction ?: 0);
         }
@@ -371,7 +371,7 @@ final class Session
             'session',
             $session,
             Database::WHERE_ID_EQUALS,
-            $this->database->basicvalue($this->data['id']),
+            $this->data['id'],
         );
     }
 

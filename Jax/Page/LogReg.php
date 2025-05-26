@@ -125,8 +125,8 @@ final class LogReg
             ['name', 'display_name'],
             'members',
             'WHERE `name`=? OR `display_name`=?',
-            $this->database->basicvalue($name),
-            $this->database->basicvalue($dispname),
+            $name,
+            $dispname,
         );
         $member = $this->database->arow($result);
         $this->database->disposeresult($result);
@@ -187,7 +187,7 @@ final class LogReg
                 ['id'],
                 'members',
                 'WHERE `name`=?',
-                $this->database->basicvalue($username),
+                $username,
             );
             $member = $this->database->arow($result);
 
@@ -246,11 +246,12 @@ final class LogReg
     {
         // Just make a new session rather than fuss with the old one,
         // to maintain users online.
-        if ($this->request->cookie('utoken') !== null) {
+        $uToken = $this->request->cookie('utoken');
+        if ($uToken !== null) {
             $this->database->delete(
                 'tokens',
                 'WHERE `token`=?',
-                $this->database->basicvalue($this->request->cookie('utoken')),
+                $uToken,
             );
             $this->request->setCookie('utoken', null, -1);
         }
@@ -334,7 +335,7 @@ final class LogReg
                 'tokens',
                 'WHERE `token`=?
                 AND `expires`>=NOW()',
-                $this->database->basicvalue($tokenId),
+                $tokenId,
             );
             $udata = $this->database->arow($result);
 
@@ -355,13 +356,13 @@ final class LogReg
                             ),
                         ],
                         Database::WHERE_ID_EQUALS,
-                        $this->database->basicvalue($udata['id']),
+                        $udata['id'],
                     );
                     // Delete all forgotpassword tokens for this user.
                     $this->database->delete(
                         'tokens',
                         "WHERE `uid`=? AND `type`='forgotpassword'",
-                        $this->database->basicvalue($udata['id']),
+                        $udata['id'],
                     );
 
                     // Get username.
@@ -369,7 +370,7 @@ final class LogReg
                         ['id', 'name'],
                         'members',
                         Database::WHERE_ID_EQUALS,
-                        $this->database->basicvalue($udata['id']),
+                        $udata['id'],
                     );
                     $udata = $this->database->arow($result);
 
@@ -407,7 +408,7 @@ final class LogReg
                     ['id', 'email'],
                     'members',
                     'WHERE `name`=?',
-                    $this->database->basicvalue($user),
+                    $user,
                 );
                 $error = null;
                 if (!($udata = $this->database->arow($result))) {

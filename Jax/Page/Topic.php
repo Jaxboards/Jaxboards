@@ -755,7 +755,7 @@ final class Topic
                     )
                     SQL,
                 ['forums', 'topics'],
-                $this->database->basicvalue($topic['id']),
+                $topic['id'],
             );
             $mods = $this->database->arow($result);
             $this->database->disposeresult($result);
@@ -993,7 +993,7 @@ final class Topic
      */
     private function viewRSS(array $topic): void
     {
-        $tid = $topic['id'];
+        $tid = (int) $topic['id'];
         $boardURL = $this->domainDefinitions->getBoardURL();
         $rssFeed = new RSSFeed(
             [
@@ -1015,7 +1015,7 @@ final class Topic
 
                 SQL,
             ['posts', 'members'],
-            $this->database->basicvalue($tid),
+            $tid,
         );
         foreach ($this->database->arows($result) as $post) {
             $rssFeed->additem(

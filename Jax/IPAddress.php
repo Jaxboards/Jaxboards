@@ -118,6 +118,13 @@ final class IPAddress
             $ipAddress = self::getIp();
         }
 
+        $binaryIp = self::asBinary($ipAddress);
+
+        if (!$binaryIp) {
+            // IP is somehow invalid so just assume they aren't banned
+            return false;
+        }
+
         $result = $this->database->special(
             <<<'SQL'
                 SELECT COUNT(`ip`) as `banned`
@@ -125,7 +132,7 @@ final class IPAddress
                     WHERE ip = ?
                 SQL,
             [],
-            $this->database->basicvalue(self::asBinary($ipAddress)),
+            $binaryIp,
         );
         $row = $this->database->arow($result);
         $this->database->disposeresult($result);

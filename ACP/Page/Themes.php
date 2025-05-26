@@ -219,7 +219,7 @@ final readonly class Themes
                     'title' => $newName,
                 ],
                 'WHERE `title`=? AND `custom`=1',
-                $this->database->basicvalue($oldName),
+                $oldName,
             );
             rename($this->themesPath . $oldName, $this->themesPath . $newName);
         }
@@ -265,7 +265,7 @@ final readonly class Themes
                     'wrapper' => $wrapperNewName,
                 ],
                 'WHERE `wrapper`=? AND `custom`=1',
-                $this->database->basicvalue($wrapperName),
+                $wrapperName,
             );
             rename(
                 $this->pathToWrapper($wrapperName),
