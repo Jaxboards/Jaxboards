@@ -195,7 +195,10 @@ final readonly class Themes
                 continue;
             }
 
-            if (!$this->isValidFilename($oldName)|| !is_dir($this->themesPath . $oldName)) {
+            if (
+                !$this->isValidFilename($oldName)
+                || !is_dir($this->themesPath . $oldName)
+            ) {
                 return 'Invalid from skin name';
             }
 
@@ -375,8 +378,10 @@ final readonly class Themes
             ],
         );
 
-        $this->page->addContentBox('Themes',
-            ($skinError !== null ? $this->page->error($skinError) : '') . $skins);
+        $this->page->addContentBox(
+            'Themes',
+            ($skinError !== null ? $this->page->error($skinError) : '') . $skins,
+        );
 
         $wrap = '';
         foreach ($wrappers as $wrapper) {
