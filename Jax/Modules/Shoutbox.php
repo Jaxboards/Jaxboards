@@ -7,6 +7,7 @@ namespace Jax\Modules;
 use Jax\Config;
 use Jax\Database;
 use Jax\Date;
+use Jax\Hooks;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Page;
@@ -31,6 +32,7 @@ final class Shoutbox
         private readonly Config $config,
         private readonly Database $database,
         private readonly Date $date,
+        private readonly Hooks $hooks,
         private readonly IPAddress $ipAddress,
         private readonly Jax $jax,
         private readonly Page $page,
@@ -357,14 +359,18 @@ final class Shoutbox
             return;
         }
 
+        $shoutData = [
+            'date' => $this->database->datetime(),
+            'ip' => $this->ipAddress->asBinary(),
+            'shout' => $shout,
+            'uid' => $this->user->get('id'),
+        ];
         $this->database->safeinsert(
             'shouts',
-            [
-                'date' => $this->database->datetime(),
-                'ip' => $this->ipAddress->asBinary(),
-                'shout' => $shout,
-                'uid' => $this->user->get('id'),
-            ],
+            $shoutData
         );
+        $shoutData['id'] = $this->database->insertId();
+
+        $this->hooks->dispatch('shout', $shoutData);
     }
 }

@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Jax\Config;
 use Jax\Database;
 use Jax\DomainDefinitions;
+use Jax\Hooks;
 use Jax\IPAddress;
 use Jax\Page;
 use Jax\Request;
@@ -55,6 +56,7 @@ final class Post
         private readonly Config $config,
         private readonly Database $database,
         private readonly DomainDefinitions $domainDefinitions,
+        private readonly Hooks $hooks,
         private readonly Page $page,
         private readonly IPAddress $ipAddress,
         private readonly Request $request,
@@ -832,17 +834,20 @@ final class Post
         }
 
         // Actually PUT THE POST IN!
-        $this->database->safeinsert(
-            'posts',
-            [
+        $postData = [
                 'auth_id' => $uid,
                 'date' => $postDate,
                 'ip' => $this->ipAddress->asBinary(),
                 'newtopic' => $newtopic ? 1 : 0,
                 'post' => $postData,
                 'tid' => $tid,
-            ],
+        ];
+        $this->database->safeinsert(
+            'posts',
+            $postData,
         );
+        $postData['id'] = $this->database->insertId();
+        $this->hooks->dispatch('post', $postData);
 
         $pid = $this->database->insertId();
         // Set op.
