@@ -4,9 +4,9 @@ namespace Jax\Models;
 
 use Jax\Model;
 
-class Member extends Model {
-    const table = 'members';
-    const fields = [
+final class Member extends Model {
+    public const TABLE = 'members';
+    public const FIELDS = [
         'id',
         'name',
         'pass',

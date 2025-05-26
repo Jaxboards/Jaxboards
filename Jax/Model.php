@@ -4,22 +4,24 @@ namespace Jax;
 
 use PDO;
 
-class Model {
-    const fields = [];
-    const table = '';
+use function array_map;
+
+final class Model {
+    public const FIELDS = [];
+    public const TABLE = '';
 
     /**
      * @param mixed $args
      */
-    static function selectOne(Database $database, ...$args): ?static
+    public static function selectOne(Database $database, ...$args): ?static
     {
         $stmt = $database->select(
             array_map(
-                fn($field) => "`{$field}`",
-                static::fields,
+                static fn($field) => "`{$field}`",
+                static::FIELDS,
             ),
-            static::table,
-            ...$args
+            static::TABLE,
+            ...$args,
         );
         $record = $stmt?->fetchObject(static::class) ?: null;
         $database->disposeresult($stmt);
@@ -31,15 +33,15 @@ class Model {
      * @param mixed $args
      * @return Array<static>
      */
-    static function selectAll(Database $database, ...$args): array
+    public static function selectAll(Database $database, ...$args): array
     {
         $stmt = $database->select(
             array_map(
-                fn($field) => "`{$field}`",
-                static::fields,
+                static fn($field) => "`{$field}`",
+                static::FIELDS,
             ),
-            static::table,
-            ...$args
+            static::TABLE,
+            ...$args,
         );
 
         return $stmt?->fetchAll(PDO::FETCH_CLASS, static::class) ?? [];

@@ -9,6 +9,7 @@ use ACP\Page\Forums\RecountStats;
 use Jax\Database;
 use Jax\ForumTree;
 use Jax\Jax;
+use Jax\Models\Member;
 use Jax\Request;
 use Jax\TextFormatting;
 
@@ -429,19 +430,17 @@ final readonly class Forums
         );
 
         if ($forum && $forum['mods']) {
-            $result = $this->database->select(
-                ['display_name', 'id'],
-                'members',
-                Database::WHERE_ID_IN,
-                explode(',', (string) $forum['mods']),
+            $members = Member::selectAll(
+                $this->database,
+                Database::WHERE_ID_IN, explode(',', (string) $forum['mods']),
             );
             $modList = '';
-            while ($member = $this->database->arow($result)) {
+            foreach ($members as $member) {
                 $modList .= $this->page->parseTemplate(
                     'forums/create-forum-moderators-mod.html',
                     [
-                        'delete_link' => '?act=Forums&edit=' . $fid . '&rmod=' . $member['id'],
-                        'username' => $member['display_name'],
+                        'delete_link' => '?act=Forums&edit=' . $fid . '&rmod=' . $member->id,
+                        'username' => $member->display_name,
                     ],
                 );
             }
@@ -488,13 +487,8 @@ final readonly class Forums
         // Add per-forum moderator.
         $modId = (int) $this->request->asString->post('modid');
         if ($modId) {
-            $result = $this->database->select(
-                ['id'],
-                'members',
-                Database::WHERE_ID_EQUALS,
-                $modId,
-            );
-            if ($this->database->arow($result)) {
+            $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $modId);
+            if ($member) {
                 if (!in_array($modId, isset($oldForumData['mods']) ? explode(',', (string) $oldForumData['mods']) : [])) {
                     $write['mods'] = isset($oldForumData['mods'])
                         && $oldForumData['mods']
@@ -504,8 +498,6 @@ final readonly class Forums
             } else {
                 $error = "You tried to add a moderator that doesn't exist!";
             }
-
-            $this->database->disposeresult($result);
         }
 
         if (!$write['title']) {

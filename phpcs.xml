@@ -111,11 +111,12 @@
       </property>
     </properties>
   </rule>
-  <rule ref="SlevomatCodingStandard.Classes.DisallowLateStaticBindingForConstants"/>
   <rule ref="SlevomatCodingStandard.Classes.DisallowMultiConstantDefinition"/>
   <rule ref="SlevomatCodingStandard.Classes.DisallowMultiPropertyDefinition"/>
   <rule ref="SlevomatCodingStandard.Classes.DisallowStringExpressionPropertyFetch"/>
-  <rule ref="SlevomatCodingStandard.Classes.ForbiddenPublicProperty"/>
+  <rule ref="SlevomatCodingStandard.Classes.ForbiddenPublicProperty">
+        <exclude-pattern>./Jax/Models/</exclude-pattern>
+  </rule>
   <rule ref="SlevomatCodingStandard.Classes.ModernClassNameReference"/>
   <rule ref="SlevomatCodingStandard.Classes.RequireAbstractOrFinal"/>
   <rule ref="SlevomatCodingStandard.Classes.RequireConstructorPropertyPromotion"/>

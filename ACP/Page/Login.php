@@ -8,6 +8,7 @@ use ACP\Page;
 use Jax\Config;
 use Jax\Database;
 use Jax\DomainDefinitions;
+use Jax\Models\Member;
 use Jax\Request;
 use Jax\Session;
 use Jax\User;
@@ -41,7 +42,7 @@ final readonly class Login
             $user = $this->request->asString->post('user');
             $password = $this->request->asString->post('pass');
 
-            $result = $this->database->select(
+            $result = Member::selectOne($this->database->select(
                 ['id'],
                 'members',
                 'WHERE `name`=?',
