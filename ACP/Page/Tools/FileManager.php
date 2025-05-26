@@ -15,7 +15,6 @@ use function array_key_exists;
 use function implode;
 use function in_array;
 use function is_array;
-use function is_numeric;
 use function is_writable;
 use function mb_strtolower;
 use function pathinfo;
@@ -39,7 +38,7 @@ final readonly class FileManager
     {
         $page = '';
         $delete = (int) $this->request->asString->both('delete');
-        if ($delete) {
+        if ($delete !== 0) {
             $result = $this->database->select(
                 [
                     'hash',

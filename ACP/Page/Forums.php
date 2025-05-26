@@ -487,7 +487,7 @@ final readonly class Forums
 
         // Add per-forum moderator.
         $modId = (int) $this->request->asString->post('modid');
-        if ($modId) {
+        if ($modId !== 0) {
             $result = $this->database->select(
                 ['id'],
                 'members',
