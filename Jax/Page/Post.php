@@ -9,6 +9,7 @@ use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\Hooks;
 use Jax\IPAddress;
+use Jax\Models\Topic;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
@@ -736,44 +737,39 @@ final class Post
             return;
         }
 
-        // Insert the new topic record
-        $this->database->insert(
-            'topics',
-            [
-                'auth_id' => $uid,
-                'date' => $postDate,
-                'fid' => $fid,
-                'lp_date' => $postDate,
-                'lp_uid' => $uid,
-                'poll_choices' => $pollChoices !== []
+        $topic = new Topic();
+        $topic->auth_id = $uid;
+        $topic->date = $postDate;
+        $topic->fid = $fid;
+        $topic->lp_date = $postDate;
+        $topic->lp_uid = $uid;
+        $topic->poll_choices = $pollChoices !== []
                     ? (json_encode($pollChoices) ?: '')
-                    : '',
-                'poll_q' => $pollQuestion !== null
+                    : '';
+        $topic->poll_q = $pollQuestion !== null
                     ? $this->textFormatting->blockhtml($pollQuestion)
-                    : '',
-                'poll_type' => $pollType ?? '',
-                'replies' => 0,
-                'subtitle' => $this->textFormatting->blockhtml($topicDescription ?? ''),
-                'summary' => mb_substr(
-                    (string) preg_replace(
-                        '@\s+@',
-                        ' ',
-                        $this->textFormatting->blockhtml(
-                            $this->textFormatting->textOnly(
-                                $this->postData ?? '',
-                            ),
-                        ),
+                    : '';
+        $topic->poll_type = $pollType ?? '';
+        $topic->replies = 0;
+        $topic->subtitle = $this->textFormatting->blockhtml($topicDescription ?? '');
+        $topic->summary = mb_substr(
+            (string) preg_replace(
+                '@\s+@',
+                ' ',
+                $this->textFormatting->blockhtml(
+                    $this->textFormatting->textOnly(
+                        $this->postData ?? '',
                     ),
-                    0,
-                    50,
                 ),
-                'title' => $this->textFormatting->blockhtml($topicTitle ?? ''),
-                'views' => 0,
-            ],
+            ),
+            0,
+            50,
         );
-        $tid = (int) $this->database->insertId();
+        $topic->title = $this->textFormatting->blockhtml($topicTitle ?? '');
+        $topic->views = 0;
+        $topic->insert($this->database);
 
-        $this->submitPost($tid, true);
+        $this->submitPost($topic->id, true);
     }
 
     private function submitPost(int $tid, bool $newtopic = false): void
