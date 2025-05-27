@@ -231,12 +231,14 @@ final readonly class ModPosts
      */
     private function movePostsTo(array $pids, int $tid): bool
     {
-        if ($tid !== 0) {
-            $this->updatePosts($pids, ['tid' => $tid]);
-            $this->page->location('?act=vt' . $tid);
-
-            return true;
+        if ($tid === 0) {
+            return false;
         }
+
+        $this->updatePosts($pids, ['tid' => $tid]);
+        $this->page->location('?act=vt' . $tid);
+
+        return true;
     }
 
     /**

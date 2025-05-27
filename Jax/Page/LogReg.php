@@ -148,7 +148,7 @@ final class LogReg
         $newMember->group_id = $this->config->getSetting('membervalidation')
             ? 5
             : 1;
-        $newMember->ip = $this->ipAddress->asBinary();
+        $newMember->ip = $this->ipAddress->asBinary() ?? '';
         $newMember->join_date = $this->database->datetime();
         $newMember->last_visit = $this->database->datetime();
         $newMember->name = $name;

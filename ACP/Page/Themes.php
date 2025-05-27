@@ -470,53 +470,62 @@ final readonly class Themes
         );
     }
 
+    private function submitCreateSkin(): ?string
+    {
+        $skinName = $this->request->asString->post('skinname');
+        $wrapperName = $this->request->asString->post('wrapper');
+        $error = match (true) {
+            !$skinName => 'No skin name supplied!',
+            !$this->isValidFilename($skinName) => 'Skinname must only consist of letters, numbers, and spaces.',
+            mb_strlen($skinName) > 50 => 'Skin name must be less than 50 characters.',
+            is_dir($this->themesPath . $skinName) => 'A skin with that name already exists.',
+            !in_array($wrapperName, $this->getWrappers()) => 'Invalid wrapper.',
+            default => null,
+        };
+
+        if ($error) {
+            return $error;
+        }
+
+        $skin = new Skin();
+        $skin->custom = 1;
+        $skin->default = $this->request->post('default') ? 1 : 0;
+        $skin->hidden = $this->request->post('hidden') ? 1 : 0;
+        $skin->title = $skinName ?? '';
+        $skin->wrapper = $wrapperName ?? '';
+        $skin->insert($this->database);
+
+        if ($this->request->post('default')) {
+            $this->database->update(
+                'skins',
+                [
+                    'default' => 0,
+                ],
+                'WHERE `id`!=?',
+                $this->database->insertId(),
+            );
+        }
+
+        mkdir($this->themesPath . $skinName, 0o777, true);
+        copy(
+            $this->domainDefinitions->getDefaultThemePath() . '/css.css',
+            $this->themesPath . $this->request->asString->post('skinname') . '/css.css',
+        );
+
+        $this->page->location('?act=Themes');
+
+        return null;
+    }
+
     private function createSkin(): void
     {
         $page = '';
-        $skinName = $this->request->asString->post('skinname');
-        $wrapperName = $this->request->asString->post('wrapper');
+
         if ($this->request->post('submit') !== null) {
-            $error = match (true) {
-                !$skinName => 'No skin name supplied!',
-                !$this->isValidFilename($skinName) => 'Skinname must only consist of letters, numbers, and spaces.',
-                mb_strlen($skinName) > 50 => 'Skin name must be less than 50 characters.',
-                is_dir($this->themesPath . $skinName) => 'A skin with that name already exists.',
-                !in_array($wrapperName, $this->getWrappers()) => 'Invalid wrapper.',
-                default => null,
-            };
-
-            if ($error === null) {
-                $skin = new Skin();
-                $skin->custom = 1;
-                $skin->default = $this->request->post('default') ? 1 : 0;
-                $skin->hidden = $this->request->post('hidden') ? 1 : 0;
-                $skin->title = $skinName;
-                $skin->wrapper = $wrapperName;
-                $skin->insert($this->database);
-
-                if ($this->request->post('default')) {
-                    $this->database->update(
-                        'skins',
-                        [
-                            'default' => 0,
-                        ],
-                        'WHERE `id`!=?',
-                        $this->database->insertId(),
-                    );
-                }
-
-                mkdir($this->themesPath . $skinName, 0o777, true);
-                copy(
-                    $this->domainDefinitions->getDefaultThemePath() . '/css.css',
-                    $this->themesPath . $this->request->asString->post('skinname') . '/css.css',
-                );
-
-                $this->page->location('?act=Themes');
-
-                return;
+            $error = $this->submitCreateSkin();
+            if ($error) {
+                $page .= $this->page->error($error);
             }
-
-            $page = $this->page->error($error);
         }
 
         $wrapperOptions = '';

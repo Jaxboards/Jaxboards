@@ -407,7 +407,7 @@ final readonly class UCP
             $data['display_name'],
             $this->user->get('id'),
         );
-        if ($members && $members !== []) {
+        if ($members !== []) {
             return 'That display name is already in use.';
         }
 
@@ -646,7 +646,7 @@ final readonly class UCP
         return null;
     }
 
-    private function showBoardSettings(): ?string
+    private function showBoardSettings(): string
     {
         $error = null;
         $skinId = $this->user->get('skin_id');
