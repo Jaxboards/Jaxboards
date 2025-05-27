@@ -25,6 +25,7 @@ use function base64_decode;
 #[UsesClass(DomainDefinitions::class)]
 #[UsesClass(IPAddress::class)]
 #[UsesClass(Jax::class)]
+#[UsesClass(Model::class)]
 #[UsesClass(ServiceConfig::class)]
 #[UsesFunction('\Jax\pathjoin')]
 final class UserTest extends TestCase
