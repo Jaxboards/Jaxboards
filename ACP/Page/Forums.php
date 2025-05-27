@@ -372,7 +372,7 @@ final readonly class Forums
                         ? explode(',', $forum->mods)
                         : [];
                     if (!in_array($modId, $mods)) {
-                        $forum->mods = $forum->mods !== '' && $forum->mods !== '0'
+                        $forum->mods = $forum->mods !== ''
                             ? $forum->mods . ',' . $modId
                             : (string) $modId;
                     }
@@ -501,7 +501,7 @@ final readonly class Forums
      */
     private function upsertForum(Forum $forum): ?string
     {
-        if ($forum->title === '' || $forum->title === '0') {
+        if ($forum->title === '') {
             return 'Forum title is required';
         }
 

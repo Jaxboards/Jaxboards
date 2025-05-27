@@ -201,7 +201,7 @@ final readonly class UserProfile
             ucfirst($member->gender) ?: 'N/A',
             $member->location,
             $birthday,
-            $member->website !== '' && $member->website !== '0' ? "<a href='{$member->website}'>{$member->website}</a>" : 'N/A',
+            $member->website !== '' ? "<a href='{$member->website}'>{$member->website}</a>" : 'N/A',
             $member->join_date,
             $member->last_visit,
             $member->id,

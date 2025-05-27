@@ -161,7 +161,7 @@ final readonly class Activity
             $tabHTML .= $this->parseActivity($activity);
         }
 
-        return $tabHTML !== '' && $tabHTML !== '0'
+        return $tabHTML !== ''
             ? <<<HTML
                 <a href="?act=vu{$member->id}&amp;page=activity&amp;fmt=RSS"
                    target="_blank" class="social" style='float:right'

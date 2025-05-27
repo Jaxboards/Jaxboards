@@ -220,7 +220,7 @@ final readonly class Inbox
             ),
             $mid,
             $mname,
-            $mname !== '' && $mname !== '0' ? 'good' : '',
+            $mname !== '' ? 'good' : '',
             $mtitle,
             htmlspecialchars($msg),
         );
