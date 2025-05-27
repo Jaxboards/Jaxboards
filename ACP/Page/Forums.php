@@ -748,18 +748,14 @@ final readonly class Forums
                 : $this->page->success('Category saved');
         }
 
-        $categoryTitle = $category?->title !== '' && $category?->title !== '0'
-            ? $this->textFormatting->blockhtml($category->title)
-            : '';
-
         $this->page->addContentBox(
-            ($category !== null ? 'Edit' : 'Create') . ' Category',
+            ($category->id !== 0 ? 'Edit' : 'Create') . ' Category',
             $page . $this->page->parseTemplate(
                 'forums/create-category.html',
                 [
-                    'id' => (string) $category?->id,
-                    'submit' => $category !== null ? 'Edit' : 'Create',
-                    'title' => $categoryTitle,
+                    'id' => (string) $category->id,
+                    'submit' => $category->id !== 0 ? 'Edit' : 'Create',
+                    'title' => $this->textFormatting->blockhtml($category->title),
                 ],
             ),
         );
