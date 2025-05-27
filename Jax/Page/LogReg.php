@@ -10,6 +10,7 @@ use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
@@ -121,19 +122,16 @@ final class LogReg
         // Are they attempting to use an existing username/display name?
         $dispname = $this->textFormatting->blockhtml($dispname);
         $name = $this->textFormatting->blockhtml($name);
-        $result = $this->database->select(
-            ['name', 'display_name'],
-            'members',
+        $member = Member::selectOne(
+            $this->database,
             'WHERE `name`=? OR `display_name`=?',
             $name,
             $dispname,
         );
-        $member = $this->database->arow($result);
-        $this->database->disposeresult($result);
 
         $error = match (true) {
-            $member && $member['name'] === $name => 'That username is taken!',
-            $member && $member['display_name'] === $dispname => 'That display name is already used by another member.',
+            $member?->name === $name => 'That username is taken!',
+            $member?->display_name === $dispname => 'That display name is already used by another member.',
             default => null,
         };
 
@@ -144,25 +142,19 @@ final class LogReg
             return;
         }
 
-        // All clear!
-        $this->database->insert(
-            'members',
-            [
-                'display_name' => $dispname,
-                'email' => $email,
-                'group_id' => $this->config->getSetting('membervalidation') ? 5 : 1,
-                'ip' => $this->ipAddress->asBinary(),
-                'join_date' => $this->database->datetime(),
-                'last_visit' => $this->database->datetime(),
-                'name' => $name,
-                'pass' => password_hash(
-                    $pass1,
-                    PASSWORD_DEFAULT,
-                ),
-                'posts' => 0,
-                'wysiwyg' => 1,
-            ],
+        $newMember = new Member();
+        $newMember->display_name = $dispname;
+        $newMember->email = $email;
+        $newMember->group_id = $this->config->getSetting('membervalidation') ? 5 : 1;
+        $newMember->ip = $this->ipAddress->asBinary();
+        $newMember->join_date = $this->database->datetime();
+        $newMember->last_visit = $this->database->datetime();
+        $newMember->name = $name;
+        $newMember->pass = password_hash(
+            $pass1,
+            PASSWORD_DEFAULT,
         );
+        $newMember->insert($this->database);
         $this->database->special(
             <<<'SQL'
                 UPDATE %t
@@ -183,15 +175,13 @@ final class LogReg
                 return;
             }
 
-            $result = $this->database->select(
-                ['id'],
-                'members',
+            $member = Member::selectOne(
+                $this->database,
                 'WHERE `name`=?',
                 $username,
             );
-            $member = $this->database->arow($result);
 
-            $user = $this->user->getUser($member['id'] ?? null, $password);
+            $user = $this->user->getUser($member->id ?? null, $password);
 
             if ($user) {
                 if ($this->request->post('popup') !== null) {
@@ -337,11 +327,11 @@ final class LogReg
                 AND `expires`>=NOW()',
                 $tokenId,
             );
-            $udata = $this->database->arow($result);
+            $token = $this->database->arow($result);
 
             $this->database->disposeresult($result);
 
-            if (!$udata) {
+            if (!$token) {
                 $page = $this->template->meta('error', 'This link has expired. Please try again.');
             } elseif (
                 $pass1 && $pass2
@@ -356,30 +346,28 @@ final class LogReg
                             ),
                         ],
                         Database::WHERE_ID_EQUALS,
-                        $udata['id'],
+                        $token['id'],
                     );
                     // Delete all forgotpassword tokens for this user.
                     $this->database->delete(
                         'tokens',
                         "WHERE `uid`=? AND `type`='forgotpassword'",
-                        $udata['id'],
+                        $token['id'],
                     );
 
                     // Get username.
-                    $result = $this->database->select(
-                        ['id', 'name'],
-                        'members',
+                    $member = Member::selectOne(
+                        $this->database,
                         Database::WHERE_ID_EQUALS,
-                        $udata['id'],
+                        $token['id'],
                     );
-                    $udata = $this->database->arow($result);
 
                     // Just making use of the way
                     // registration redirects to the index.
                     $this->registering = true;
 
-                    if ($udata) {
-                        $this->login((string) $udata['name'], $pass1);
+                    if ($member) {
+                        $this->login($member->name, $pass1);
                     }
 
                     return;
@@ -404,20 +392,15 @@ final class LogReg
         } else {
             $user = $this->request->asString->post('user');
             if ($user) {
-                $result = $this->database->select(
-                    ['id', 'email'],
+                $member = Member::selectOne(
+                    $this->database,
                     'members',
                     'WHERE `name`=?',
                     $user,
                 );
-                $error = null;
-                if (!($udata = $this->database->arow($result))) {
+
+                if ($member === null) {
                     $error = "There is no user registered as <strong>{$user}</strong>, sure this is correct?";
-                }
-
-                $this->database->disposeresult($result);
-
-                if ($error !== null) {
                     $page .= $this->template->meta('error', $error);
                 } else {
                     // Generate token.
@@ -429,13 +412,13 @@ final class LogReg
                             'expires' => $this->database->datetime(Carbon::now()->getTimestamp() + 3600 * 24),
                             'token' => $forgotpasswordtoken,
                             'type' => 'forgotpassword',
-                            'uid' => $udata['id'],
+                            'uid' => $member->id,
                         ],
                     );
                     $link = $this->domainDefinitions->getBoardURL() . '?act=logreg6&uid='
-                        . $udata['id'] . '&tokenId=' . rawurlencode($forgotpasswordtoken);
+                        . $member->id . '&tokenId=' . rawurlencode($forgotpasswordtoken);
                     $mailResult = $this->jax->mail(
-                        $udata['email'],
+                        $member->email,
                         'Recover Your Password!',
                         <<<HTML
                             You have received this email because a password

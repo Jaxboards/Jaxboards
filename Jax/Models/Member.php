@@ -146,5 +146,5 @@ final class Member extends Model
 
     public int $mod = 0;
 
-    public int $wysiwyg = 0;
+    public int $wysiwyg = 1;
 }
