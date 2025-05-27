@@ -52,6 +52,7 @@ final readonly class UserProfile
 
         $profile = $userId !== 0 ? $this->fetchUser($userId) : null;
 
+
         match (true) {
             !$profile => $this->showProfileError(),
             $this->didComeFromForum() => $this->showContactCard($profile),

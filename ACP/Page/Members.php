@@ -12,6 +12,8 @@ use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Models\Group;
+use Jax\Models\Member;
 use Jax\Request;
 use Jax\User;
 
@@ -110,125 +112,18 @@ final readonly class Members
         $page = '';
         $memberId = (int) $this->request->asString->both('mid');
         $name = $this->request->asString->post('name');
+        $member = null;
         if ($memberId || $this->request->post('submit')) {
             if ($memberId !== 0) {
-                $result = $this->database->select(
-                    ['group_id'],
-                    'members',
-                    Database::WHERE_ID_EQUALS,
-                    $memberId,
-                );
-                $member = $this->database->arow($result);
-                $this->database->disposeresult($result);
+                $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $memberId);
                 if ($this->request->post('savedata') && $member) {
                     $page = $this->updateMember($member);
                 }
 
-                $result = $this->database->select(
-                    [
-                        'about',
-                        'avatar',
-                        'birthdate',
-                        'contact_aim',
-                        'contact_bluesky',
-                        'contact_discord',
-                        'contact_gtalk',
-                        'contact_msn',
-                        'contact_skype',
-                        'contact_steam',
-                        'contact_twitter',
-                        'contact_yim',
-                        'contact_youtube',
-                        'display_name',
-                        'email_settings',
-                        'email',
-                        'enemies',
-                        'friends',
-                        'full_name',
-                        'gender',
-                        'group_id',
-                        'id',
-                        'location',
-                        '`mod`',
-                        'name',
-                        'notify_pm',
-                        'notify_postinmytopic',
-                        'notify_postinsubscribedtopic',
-                        'nowordfilter',
-                        'pass',
-                        'posts',
-                        'sig',
-                        'skin_id',
-                        'sound_im',
-                        'sound_pm',
-                        'sound_postinmytopic',
-                        'sound_postinsubscribedtopic',
-                        'sound_shout',
-                        'ucpnotepad',
-                        'usertitle',
-                        'website',
-                        'wysiwyg',
-                        'DAY(`birthdate`) AS `dob_day`',
-                        'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
-                        'UNIX_TIMESTAMP(`last_visit`) AS `last_visit`',
-                    ],
-                    'members',
-                    Database::WHERE_ID_EQUALS,
-                    $memberId,
-                );
+                $members = Member::selectMany($this->database, Database::WHERE_ID_EQUALS, $memberId);
             } else {
-                $result = $this->database->select(
-                    [
-                        'about',
-                        'avatar',
-                        'birthdate',
-                        'contact_aim',
-                        'contact_bluesky',
-                        'contact_discord',
-                        'contact_gtalk',
-                        'contact_msn',
-                        'contact_skype',
-                        'contact_steam',
-                        'contact_twitter',
-                        'contact_yim',
-                        'contact_youtube',
-                        'display_name',
-                        'email_settings',
-                        'email',
-                        'enemies',
-                        'friends',
-                        'full_name',
-                        'gender',
-                        'group_id',
-                        'id',
-                        'location',
-                        '`mod`',
-                        'name',
-                        'notify_pm',
-                        'notify_postinmytopic',
-                        'notify_postinsubscribedtopic',
-                        'nowordfilter',
-                        'pass',
-                        'posts',
-                        'sig',
-                        'skin_id',
-                        'sound_im',
-                        'sound_pm',
-                        'sound_postinmytopic',
-                        'sound_postinsubscribedtopic',
-                        'sound_shout',
-                        'ucpnotepad',
-                        'usertitle',
-                        'website',
-                        'wysiwyg',
-                    ],
-                    'members',
-                    'WHERE `display_name` LIKE ?',
-                    $name . '%',
-                );
+                $members = Member::selectMany($this->database,  'WHERE `display_name` LIKE ?', $name . '%');
             }
-
-            $members = $this->database->arows($result);
 
             $numMembers = count($members);
             if ($numMembers > 1) {
@@ -236,9 +131,9 @@ final readonly class Members
                     $page .= $this->page->parseTemplate(
                         'members/edit-select-option.html',
                         [
-                            'avatar_url' => $member['avatar'] ?: self::DEFAULT_AVATAR,
-                            'id' => $member['id'],
-                            'title' => $member['display_name'],
+                            'avatar_url' => $member->avatar ?: self::DEFAULT_AVATAR,
+                            'id' => $member->id,
+                            'title' => $member->display_name,
                         ],
                     );
                 }
@@ -259,39 +154,40 @@ final readonly class Members
 
             $member = $members[0];
             if (
-                $member['group_id'] === Groups::Admin->value
+                $member->group_id === Groups::Admin->value
                 && $this->user->get('id') !== 1
+                && $this->user->get('id') !== $member->id
             ) {
                 $page = $this->page->error('You do not have permission to edit this profile. ');
             } else {
-                $page .= $this->jax->hiddenFormFields(['mid' => $member['id']]);
-                $page .= $this->inputText('Display Name:', 'display_name', $member['display_name']);
-                $page .= $this->inputText('Username:', 'name', $member['name']);
-                $page .= $this->inputText('Real Name:', 'full_name', $member['full_name']);
+                $page .= $this->jax->hiddenFormFields(['mid' => $member->id]);
+                $page .= $this->inputText('Display Name:', 'display_name', $member->display_name);
+                $page .= $this->inputText('Username:', 'name', $member->name);
+                $page .= $this->inputText('Real Name:', 'full_name', $member->full_name);
                 $page .= $this->inputText('Password:', 'password', '');
-                $page .= $this->getGroups($member['group_id']);
+                $page .= $this->getGroups($member->group_id);
                 $page .= $this->heading('Profile Fields');
-                $page .= $this->inputText('User Title:', 'usertitle', $member['usertitle']);
-                $page .= $this->inputText('Location:', 'location', $member['location']);
-                $page .= $this->inputText('Website:', 'website', $member['website']);
-                $page .= $this->inputText('Avatar:', 'avatar', $member['avatar']);
-                $page .= $this->textArea('About:', 'about', $member['about']);
-                $page .= $this->textArea('Signature:', 'sig', $member['sig']);
-                $page .= $this->inputText('Email:', 'email', $member['email']);
-                $page .= $this->textArea('UCP Notepad:', 'ucpnotepad', $member['ucpnotepad']);
+                $page .= $this->inputText('User Title:', 'usertitle', $member->usertitle);
+                $page .= $this->inputText('Location:', 'location', $member->location);
+                $page .= $this->inputText('Website:', 'website', $member->website);
+                $page .= $this->inputText('Avatar:', 'avatar', $member->avatar);
+                $page .= $this->textArea('About:', 'about', $member->about);
+                $page .= $this->textArea('Signature:', 'sig', $member->sig);
+                $page .= $this->inputText('Email:', 'email', $member->email);
+                $page .= $this->textArea('UCP Notepad:', 'ucpnotepad', $member->ucpnotepad);
                 $page .= $this->heading('Contact Details');
-                $page .= $this->inputText('AIM:', 'contact_aim', $member['contact_aim']);
-                $page .= $this->inputText('Bluesky:', 'contact_bluesky', $member['contact_bluesky']);
-                $page .= $this->inputText('Discord:', 'contact_discord', $member['contact_discord']);
-                $page .= $this->inputText('Google Chat:', 'contact_gtalk', $member['contact_gtalk']);
-                $page .= $this->inputText('MSN:', 'contact_msn', $member['contact_msn']);
-                $page .= $this->inputText('Skype:', 'contact_skype', $member['contact_skype']);
-                $page .= $this->inputText('Steam:', 'contact_steam', $member['contact_steam']);
-                $page .= $this->inputText('Twitter:', 'contact_twitter', $member['contact_twitter']);
-                $page .= $this->inputText('YIM:', 'contact_yim', $member['contact_yim']);
-                $page .= $this->inputText('YouTube:', 'contact_youtube', $member['contact_youtube']);
+                $page .= $this->inputText('AIM:', 'contact_aim', $member->contact_aim);
+                $page .= $this->inputText('Bluesky:', 'contact_bluesky', $member->contact_bluesky);
+                $page .= $this->inputText('Discord:', 'contact_discord', $member->contact_discord);
+                $page .= $this->inputText('Google Chat:', 'contact_gtalk', $member->contact_gtalk);
+                $page .= $this->inputText('MSN:', 'contact_msn', $member->contact_msn);
+                $page .= $this->inputText('Skype:', 'contact_skype', $member->contact_skype);
+                $page .= $this->inputText('Steam:', 'contact_steam', $member->contact_steam);
+                $page .= $this->inputText('Twitter:', 'contact_twitter', $member->contact_twitter);
+                $page .= $this->inputText('YIM:', 'contact_yim', $member->contact_yim);
+                $page .= $this->inputText('YouTube:', 'contact_youtube', $member->contact_youtube);
                 $page .= $this->heading('System-Generated Variables');
-                $page .= $this->inputText('Post Count:', 'posts', $member['posts']);
+                $page .= $this->inputText('Post Count:', 'posts', (string) $member->posts);
                 $page = $this->page->parseTemplate(
                     'members/edit-form.html',
                     ['content' => $page],
@@ -302,36 +198,31 @@ final readonly class Members
         }
 
         $this->page->addContentBox(
-            isset($member['name']) && $member['name']
-                ? 'Editing ' . $member['name'] . "'s details" : 'Edit Member',
+            $member?->name
+                ? 'Editing ' . $member->name . "'s details" : 'Edit Member',
             $page,
         );
     }
 
-    /**
-     * @param array<string,mixed> $member
-     */
-    private function updateMember(array $member): string
+    private function updateMember(Member $member): string
     {
         $memberId = (int) $this->request->asString->both('mid');
         $password = $this->request->asString->post('password');
 
-        if ($member['group_id'] === 2 && $this->user->get('id') !== 1) {
+        if ($member->group_id === 2 && $this->user->get('id') !== 1) {
             return $this->page->error(
                 'You do not have permission to edit this profile.',
             );
         }
 
-        $write = [];
-
         if ($password) {
-            $write['pass'] = password_hash(
+            $member->pass = password_hash(
                 $password,
                 PASSWORD_DEFAULT,
             );
         }
 
-        $fields = [
+        $stringFields = [
             'display_name',
             'name',
             'full_name',
@@ -353,28 +244,29 @@ final readonly class Members
             'contact_yim',
             'contact_youtube',
             'website',
-            'posts',
-            'group_id',
         ];
-        foreach ($fields as $field) {
+        foreach ($stringFields as $field) {
             $value = $this->request->asString->post($field);
             if ($value === null) {
                 continue;
             }
 
-            $write[$field] = $value;
+            $member->{$field} = $value;
         }
+        // Int fields
+        $member->posts = (int) $this->request->asString->post('posts');
+        $member->group_id = (int) $this->request->asString->post('group_id');
 
         // Make it so root admins can't get out of admin.
         if ($memberId === 1) {
-            $write['group_id'] = Groups::Admin->value;
+            $member->group_id = Groups::Admin->value;
         }
 
         $this->database->update(
             'members',
-            $write,
+            $member->asArray(),
             Database::WHERE_ID_EQUALS,
-            $memberId,
+            $member->id,
         );
 
         return $this->page->success('Profile data saved');
@@ -394,33 +286,27 @@ final readonly class Members
             return 'Display name and username must be under 30 characters.';
         }
 
-        $result = $this->database->select(
-            ['name', 'display_name'],
-            'members',
+        $member = Member::selectOne(
+            $this->database,
             'WHERE `name`=? OR `display_name`=?',
             $username,
             $displayName,
         );
-        if ($member = $this->database->arow($result)) {
-            return 'That ' . ($member['name'] === $username
+        if ($member) {
+            return 'That ' . ($member->name === $username
                 ? 'username' : 'display name') . ' is already taken';
         }
 
-        $this->database->disposeresult($result);
-
-        $result = $this->database->insert('members', [
-            'birthdate' => '0000-00-00',
-            'display_name' => $displayName,
-            'group_id' => 1,
-            'last_visit' => $this->database->datetime(),
-            'name' => $username,
-            'pass' => password_hash(
-                $password,
-                PASSWORD_DEFAULT,
-            ),
-            'posts' => 0,
-        ]);
-        $this->database->disposeresult($result);
+        $member = new Member();
+        $member->display_name = $displayName;
+        $member->group_id = 1;
+        $member->last_visit = $this->database->datetime();
+        $member->name = $username;
+        $member->pass = password_hash(
+            $password,
+            PASSWORD_DEFAULT,
+        );
+        $result = $this->database->insert('members', $member->asArray());
 
         if ($this->database->affectedRows($result) === 0) {
             return 'An error occurred while processing your request. ';
@@ -447,18 +333,14 @@ final readonly class Members
     private function getGroups(int $groupId = 0): string
     {
         $page = '';
-        $result = $this->database->select(
-            ['id', 'title'],
-            'member_groups',
-            'ORDER BY `title` DESC',
-        );
-        foreach ($this->database->arows($result) as $group) {
+        $groups = Group::selectMany($this->database, 'ORDER BY `title` DESC');
+        foreach ($groups as $group) {
             $page .= $this->page->parseTemplate(
                 'select-option.html',
                 [
-                    'label' => $group['title'],
-                    'selected' => $groupId === $group['id'] ? ' selected="selected"' : '',
-                    'value' => $group['id'],
+                    'label' => $group->title,
+                    'selected' => $groupId === $group->id ? ' selected="selected"' : '',
+                    'value' => $group->id,
                 ],
             );
         }
@@ -574,15 +456,8 @@ final readonly class Members
         );
 
         // Sum post count on account being merged into.
-        $result = $this->database->select(
-            ['id', 'posts'],
-            'members',
-            Database::WHERE_ID_EQUALS,
-            $mid1,
-        );
-        $posts = $this->database->arow($result);
-        $this->database->disposeresult($result);
-        $posts = $posts ? $posts['posts'] : 0;
+        $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid1);
+        $posts = $member ? $member->posts : 0;
 
         $this->database->special(
             'UPDATE %t SET `posts` = `posts` + ? WHERE `id`=?',
@@ -737,15 +612,14 @@ final readonly class Members
             return $this->page->error('All fields required!');
         }
 
-        $q = $this->database->select(
-            ['id'],
-            'members',
+        $members = Member::selectMany(
+            $this->database,
             'WHERE (?-UNIX_TIMESTAMP(`last_visit`))<?',
             Carbon::now()->getTimestamp(),
             60 * 60 * 24 * 31 * 6,
         );
         $num = 0;
-        while ($f = $this->database->arow($q)) {
+        foreach ($members as $member) {
             $this->database->insert(
                 'messages',
                 [
@@ -757,7 +631,7 @@ final readonly class Members
                     'message' => $message,
                     'read' => 0,
                     'title' => $title,
-                    'to' => $f['id'],
+                    'to' => $member['id'],
                 ],
             );
             ++$num;
@@ -815,27 +689,17 @@ final readonly class Members
             );
         }
 
-        $result = $this->database->select(
-            [
-                'display_name',
-                'email',
-                'id',
-                'ip',
-                'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
-            ],
-            'members',
-            'WHERE `group_id`=5',
-        );
+        $members = Member::selectMany($this->database, 'WHERE `group_id`=5');
         $page = '';
-        foreach ($this->database->arows($result) as $member) {
+        foreach ($members as $member) {
             $page .= $this->page->parseTemplate(
                 'members/validation-list-row.html',
                 [
-                    'email_address' => $member['email'],
-                    'id' => $member['id'],
-                    'ip_address' => $this->ipAddress->asHumanReadable($member['ip']),
-                    'join_date' => gmdate('M jS, Y @ g:i A', $member['join_date']),
-                    'title' => $member['display_name'],
+                    'email_address' => $member->email,
+                    'id' => $member->id,
+                    'ip_address' => $this->ipAddress->asHumanReadable($member->ip),
+                    'join_date' => $member->join_date,
+                    'title' => $member->display_name,
                 ],
             );
         }

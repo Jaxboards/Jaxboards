@@ -83,7 +83,7 @@ final class Members
                         m.`contact_aim` AS `contact_aim`,
                         m.`contact_bluesky` AS `contact_bluesky`,
                         m.`contact_discord` AS `contact_discord`,
-                        m.`contact_gtalk` AS `contact_googlechat`,
+                        m.`contact_gtalk` AS `contact_gtalk`,
                         m.`contact_msn` AS `contact_msn`,
                         m.`contact_skype` AS `contact_skype`,
                         m.`contact_steam` AS `contact_steam`,
