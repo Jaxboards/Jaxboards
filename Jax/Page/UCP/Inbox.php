@@ -184,7 +184,7 @@ final readonly class Inbox
             if ($message) {
                 $mid = $message['from'];
                 $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid);
-                $mname = $member?->display_name ?? '';
+                $mname = $member->display_name;
                 $this->database->disposeresult($result);
 
                 $msg = PHP_EOL . PHP_EOL . PHP_EOL

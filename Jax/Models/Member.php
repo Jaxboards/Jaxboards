@@ -58,93 +58,93 @@ final class Member extends Model
         'wysiwyg',
     ];
 
-    public int $id;
+    public int $id = 0;
 
-    public string $name;
+    public string $name = '';
 
-    public string $pass;
+    public string $pass = '';
 
-    public string $email;
+    public string $email = '';
 
-    public string $sig;
+    public string $sig = '';
 
-    public int $posts;
+    public int $posts = 0;
 
-    public int $group_id;
+    public int $group_id = 0;
 
-    public string $avatar;
+    public string $avatar = '';
 
-    public string $usertitle;
+    public string $usertitle = '';
 
-    public string $join_date;
+    public string $join_date = '';
 
-    public string $last_visit;
+    public string $last_visit = '';
 
-    public string $contact_skype;
+    public string $contact_skype = '';
 
-    public string $contact_yim;
+    public string $contact_yim = '';
 
-    public string $contact_msn;
+    public string $contact_msn = '';
 
-    public string $contact_gtalk;
+    public string $contact_gtalk = '';
 
-    public string $contact_aim;
+    public string $contact_aim = '';
 
-    public string $website;
+    public string $website = '';
 
     public ?string $birthdate = null;
 
-    public string $about;
+    public string $about = '';
 
-    public string $display_name;
+    public string $display_name = '';
 
-    public string $full_name;
+    public string $full_name = '';
 
-    public string $contact_steam;
+    public string $contact_steam = '';
 
-    public string $location;
+    public string $location = '';
 
-    public string $gender;
+    public string $gender = '';
 
-    public string $friends;
+    public string $friends = '';
 
-    public string $enemies;
+    public string $enemies = '';
 
-    public int $sound_shout;
+    public int $sound_shout = 0;
 
-    public int $sound_im;
+    public int $sound_im = 0;
 
-    public int $sound_pm;
+    public int $sound_pm = 0;
 
-    public int $sound_postinmytopic;
+    public int $sound_postinmytopic = 0;
 
-    public int $sound_postinsubscribedtopic;
+    public int $sound_postinsubscribedtopic = 0;
 
-    public int $notify_pm;
+    public int $notify_pm = 0;
 
-    public int $notify_postinmytopic;
+    public int $notify_postinmytopic = 0;
 
-    public int $notify_postinsubscribedtopic;
+    public int $notify_postinsubscribedtopic = 0;
 
-    public string $ucpnotepad;
+    public string $ucpnotepad = '';
 
     public ?int $skin_id = null;
 
-    public string $contact_twitter;
+    public string $contact_twitter = '';
 
-    public string $contact_discord;
+    public string $contact_discord = '';
 
-    public string $contact_youtube;
+    public string $contact_youtube = '';
 
-    public string $contact_bluesky;
+    public string $contact_bluesky = '';
 
-    public int $email_settings;
+    public int $email_settings = 0;
 
-    public int $nowordfilter;
+    public int $nowordfilter = 0;
 
-    public string $ip;
+    public string $ip = '';
 
-    public int $mod;
+    public int $mod = 0;
 
-    public int $wysiwyg;
+    public int $wysiwyg = 0;
 }

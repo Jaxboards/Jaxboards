@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Jax\Database;
 use Jax\ForumTree;
 use Jax\Jax;
+use Jax\Models\Forum;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
@@ -101,16 +102,14 @@ final class Search
             return '--No forums--';
         }
 
-        $result = $this->database->select(
-            ['id', 'title', 'path'],
-            'forums',
+        $forums = Forum::selectMany(
+            $this->database,
             'WHERE `id` IN ? ORDER BY `order` ASC,`title` DESC',
             $this->fids,
         );
 
-        $forums = $this->database->arows($result);
-        $titles = array_reduce($forums, static function (array $titles, array $forum) {
-            $titles[$forum['id']] = $forum['title'];
+        $titles = array_reduce($forums, static function (array $titles, Forum $forum) {
+            $titles[$forum->id] = $forum->title;
 
             return $titles;
         }, []);

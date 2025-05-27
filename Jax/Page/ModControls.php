@@ -231,7 +231,7 @@ final readonly class ModControls
             [
                 'act' => 'modcontrols',
                 'do' => 'emem',
-                'mid' => $member->id,
+                'mid' => (string) $member->id,
                 'submit' => 'save',
             ],
         );

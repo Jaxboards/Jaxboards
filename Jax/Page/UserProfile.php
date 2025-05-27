@@ -127,7 +127,7 @@ final readonly class UserProfile
             HTML;
 
         if ($this->user->getPerm('can_moderate')) {
-            $ipReadable = is_string($member->ip)
+            $ipReadable = $member->ip !== ''
                 ? $this->ipAddress->asHumanReadable($member->ip)
                 : '';
             $contactDetails .= <<<HTML
