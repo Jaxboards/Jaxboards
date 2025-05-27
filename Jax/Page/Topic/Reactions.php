@@ -122,26 +122,26 @@ final readonly class Reactions
         $postratingbuttons = '';
         $showrating = '';
 
-        foreach ($this->fetchRatingNiblets() as $nibletIndex => $ratingNiblet) {
+        foreach ($this->fetchRatingNiblets() as $ratingNiblet) {
             $nibletHTML = $this->template->meta(
                 'rating-niblet',
                 $ratingNiblet->img,
                 $ratingNiblet->title,
             );
             $postratingbuttons .= <<<HTML
-                <a href="?act=vt{$post['tid']}&amp;ratepost={$post['pid']}&amp;niblet={$nibletIndex}">
+                <a href="?act=vt{$post['tid']}&amp;ratepost={$post['pid']}&amp;niblet={$ratingNiblet->id}">
                     {$nibletHTML}
                 </a>
                 HTML;
-            if (!isset($prating[$nibletIndex])) {
+            if (!isset($prating[$ratingNiblet->id])) {
                 continue;
             }
 
-            if (!$prating[$nibletIndex]) {
+            if (!$prating[$ratingNiblet->id]) {
                 continue;
             }
 
-            $num = 'x' . count($prating[$nibletIndex]);
+            $num = 'x' . count($prating[$ratingNiblet->id]);
             $postratingbuttons .= $num;
             $showrating .= $this->template->meta(
                 'rating-niblet',
