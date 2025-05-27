@@ -145,7 +145,9 @@ final class LogReg
         $newMember = new Member();
         $newMember->display_name = $dispname;
         $newMember->email = $email;
-        $newMember->group_id = $this->config->getSetting('membervalidation') ? 5 : 1;
+        $newMember->group_id = $this->config->getSetting('membervalidation')
+            ? 5
+            : 1;
         $newMember->ip = $this->ipAddress->asBinary();
         $newMember->join_date = $this->database->datetime();
         $newMember->last_visit = $this->database->datetime();
@@ -155,6 +157,7 @@ final class LogReg
             PASSWORD_DEFAULT,
         );
         $newMember->insert($this->database);
+
         $this->database->special(
             <<<'SQL'
                 UPDATE %t
@@ -366,7 +369,7 @@ final class LogReg
                     // registration redirects to the index.
                     $this->registering = true;
 
-                    if ($member) {
+                    if ($member !== null) {
                         $this->login($member->name, $pass1);
                     }
 
