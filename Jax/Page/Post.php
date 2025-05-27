@@ -714,9 +714,12 @@ final class Post
             default => null,
         };
 
+        // Post validation
+        $error ??= $this->validatePost($this->postData);
+
         // Poll input validation
-        $error = match (true) {
-            (bool) $error || !$pollType => $error,
+        $error ??= match (true) {
+            !$pollType => null,
             $pollQuestion === null || trim($pollQuestion) === '' => "You didn't specify a poll question!",
             count($pollChoices) > 10 => 'Poll choices must not exceed 10.',
             $pollChoices === [] => "You didn't provide any poll choices!",
