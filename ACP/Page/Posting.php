@@ -281,7 +281,7 @@ final readonly class Posting
         $page2 = '';
         $niblets = keyBy(
             RatingNiblet::selectMany($this->database, 'ORDER BY `id` DESC'),
-            fn($niblet) => $niblet->id
+            static fn($niblet) => $niblet->id,
         );
 
         // Delete.
@@ -298,7 +298,7 @@ final readonly class Posting
             if (!$img || !$title) {
                 $page .= $this->page->error('All fields required.');
             } else {
-                $niblet = new RatingNiblet();
+                $ratingNiblet = new RatingNiblet();
                 $niblet->img = $img;
                 $niblet->title = $title;
                 $niblet->insert($this->database);
