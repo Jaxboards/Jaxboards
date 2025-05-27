@@ -403,7 +403,7 @@ final readonly class Themes
     {
         $skin = Skin::selectOne($this->database, Database::WHERE_ID_EQUALS, $id);
 
-        if (!$skin) {
+        if ($skin === null) {
             $this->page->addContentBox('Error', "Skin id {$id} not found");
 
             return;
@@ -418,19 +418,19 @@ final readonly class Themes
         }
 
         $this->page->addContentBox(
-            ($skin->custom ? 'Editing' : 'Viewing') . ' Skin: ' . $skin->title,
+            ($skin->custom !== 0 ? 'Editing' : 'Viewing') . ' Skin: ' . $skin->title,
             $this->page->parseTemplate(
                 'themes/edit-css.html',
                 [
                     'content' => $this->textFormatting->blockhtml(
                         file_get_contents(
                             (
-                                $skin->custom
+                                $skin->custom !== 0
                                 ? $this->themesPath : $this->domainDefinitions->getServiceThemePath()
                             ) . "/{$skin->title}/css.css",
                         ) ?: '',
                     ),
-                    'save' => $skin->custom ? $this->page->parseTemplate(
+                    'save' => $skin->custom !== 0 ? $this->page->parseTemplate(
                         'save-changes.html',
                     ) : '',
                 ],
@@ -544,7 +544,7 @@ final readonly class Themes
     {
         $skin = Skin::selectOne($this->database, Database::WHERE_ID_EQUALS, $id);
 
-        if (!$skin) {
+        if ($skin === null) {
             $this->page->addContentBox('Error', "Skin id {$id} not found");
 
             return;
@@ -558,7 +558,7 @@ final readonly class Themes
         $skin->delete($this->database);
 
         // Make a random skin default if it's the default.
-        if ($skin->default) {
+        if ($skin->default !== 0) {
             $this->database->update(
                 'skins',
                 [

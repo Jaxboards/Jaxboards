@@ -16,14 +16,20 @@ final class Skin extends Model
         'title',
         'custom',
         'default',
-        'hidden'
+        'hidden',
     ];
 
     public int $id = 0;
+
     public int $using = 0;
+
     public string $title = '';
+
     public int $custom = 1;
+
     public string $wrapper = '';
+
     public int $default = 0;
+
     public int $hidden = 0;
 }

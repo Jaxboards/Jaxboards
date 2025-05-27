@@ -147,8 +147,8 @@ final class Page
     {
         $skin = $this->getSelectedSkin($skinId);
 
-        $themePath = ($skin->custom ? $this->domainDefinitions->getBoardPath() : '') . '/Themes/' . $skin->title;
-        $themeUrl = ($skin->custom ? $this->domainDefinitions->getBoardPathUrl() : '') . '/Themes/' . $skin->title;
+        $themePath = ($skin->custom !== 0 ? $this->domainDefinitions->getBoardPath() : '') . '/Themes/' . $skin->title;
+        $themeUrl = ($skin->custom !== 0 ? $this->domainDefinitions->getBoardPathUrl() : '') . '/Themes/' . $skin->title;
 
         // Custom theme found but files not there, also fallback to default
         if (!is_dir($themePath)) {
@@ -175,7 +175,7 @@ final class Page
 
         // Load Wrapper
         $this->template->load(
-            $skin->wrapper
+            $skin->wrapper !== '' && $skin->wrapper !== '0'
                 ? $this->domainDefinitions->getBoardPath() . '/Wrappers/' . $skin->wrapper . '.html'
                 : $themePath . '/wrappers.html',
         );

@@ -22,7 +22,6 @@ use function filter_var;
 use function gmdate;
 use function header;
 use function in_array;
-use function is_numeric;
 use function is_string;
 use function mb_strlen;
 use function mb_strstr;
@@ -622,13 +621,13 @@ final readonly class UCP
         $skinId = $this->user->get('skin_id');
         $page = '';
         $skinId = (int) $this->request->asString->both('skin');
-        if ($skinId) {
+        if ($skinId !== 0) {
             $skin = Skin::selectOne(
                 $this->database,
                 Database::WHERE_ID_EQUALS,
                 $skinId,
             );
-            if (!$skin) {
+            if ($skin === null) {
                 $error = 'The skin chosen no longer exists.';
             } else {
                 $this->user->setBulk([
