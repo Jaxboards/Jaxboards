@@ -20,7 +20,6 @@ use Jax\User;
 use function count;
 use function file_get_contents;
 use function file_put_contents;
-use function gmdate;
 use function htmlspecialchars;
 use function mb_strlen;
 use function password_hash;
@@ -122,7 +121,7 @@ final readonly class Members
 
                 $members = Member::selectMany($this->database, Database::WHERE_ID_EQUALS, $memberId);
             } else {
-                $members = Member::selectMany($this->database,  'WHERE `display_name` LIKE ?', $name . '%');
+                $members = Member::selectMany($this->database, 'WHERE `display_name` LIKE ?', $name . '%');
             }
 
             $numMembers = count($members);
@@ -245,14 +244,15 @@ final readonly class Members
             'contact_youtube',
             'website',
         ];
-        foreach ($stringFields as $field) {
-            $value = $this->request->asString->post($field);
+        foreach ($stringFields as $stringField) {
+            $value = $this->request->asString->post($stringField);
             if ($value === null) {
                 continue;
             }
 
-            $member->{$field} = $value;
+            $member->{$stringField} = $value;
         }
+
         // Int fields
         $member->posts = (int) $this->request->asString->post('posts');
         $member->group_id = (int) $this->request->asString->post('group_id');
@@ -292,7 +292,7 @@ final readonly class Members
             $username,
             $displayName,
         );
-        if ($member) {
+        if ($member !== null) {
             return 'That ' . ($member->name === $username
                 ? 'username' : 'display name') . ' is already taken';
         }
@@ -457,7 +457,7 @@ final readonly class Members
 
         // Sum post count on account being merged into.
         $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid1);
-        $posts = $member ? $member->posts : 0;
+        $posts = $member?->posts ?? 0;
 
         $this->database->special(
             'UPDATE %t SET `posts` = `posts` + ? WHERE `id`=?',
