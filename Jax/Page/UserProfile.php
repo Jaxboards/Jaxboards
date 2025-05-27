@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Jax\ContactDetails;
 use Jax\Database;
 use Jax\IPAddress;
+use Jax\Models\Group;
 use Jax\Models\Member;
 use Jax\Page;
 use Jax\Page\UserProfile\ProfileTabs;
@@ -70,16 +71,9 @@ final readonly class UserProfile
 
     private function fetchGroupTitle(int $groupId): ?string
     {
-        $result = $this->database->select(
-            ['title'],
-            'member_groups',
-            Database::WHERE_ID_EQUALS,
-            $groupId,
-        );
-        $group = $this->database->arow($result);
-        $this->database->disposeresult($result);
+        $group = Group::selectOne($this->database, Database::WHERE_ID_EQUALS, $groupId);
 
-        return $group['title'] ?? null;
+        return $group?->title;
     }
 
     private function fetchUser(int $userId): ?Member

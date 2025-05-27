@@ -7,6 +7,7 @@ namespace Jax\Page;
 use DI\Container;
 use Jax\Config;
 use Jax\Database;
+use Jax\Models\TextRule;
 
 final class TextRules
 {
@@ -91,29 +92,19 @@ final class TextRules
 
     private function fetchCustomRules(): void
     {
-        $result = $this->database->select(
-            [
-                'id',
-                'type',
-                'needle',
-                'replacement',
-                'enabled',
-            ],
-            'textrules',
-            '',
-        );
-        while ($rule = $this->database->arow($result)) {
-            if ($rule['type'] === 'emote') {
-                $this->emotes[$rule['needle']] = $rule['replacement'];
+        $textRules = TextRule::selectMany($this->database);
+        foreach ($textRules as $textRule) {
+            if ($textRule->type === 'emote') {
+                $this->emotes[$textRule->needle] = $textRule->replacement;
 
                 continue;
             }
 
-            if ($rule['type'] !== 'badword') {
+            if ($textRule->type !== 'badword') {
                 continue;
             }
 
-            $this->badwords[$rule['needle']] = $rule['replacement'];
+            $this->badwords[$textRule->needle] = $textRule->replacement;
         }
     }
 }

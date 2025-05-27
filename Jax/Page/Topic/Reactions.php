@@ -7,6 +7,7 @@ namespace Jax\Page\Topic;
 use Jax\Config;
 use Jax\Database;
 use Jax\Models\Member;
+use Jax\Models\RatingNiblet;
 use Jax\Page;
 use Jax\Template;
 use Jax\User;
@@ -33,7 +34,7 @@ final readonly class Reactions
     /**
      * Fetches Reactions from "ratingniblets" table.
      *
-     * @return array<int,array{img:string,title:string}> Rating Records by ID
+     * @return array<RatingNiblet> Rating Records by ID
      */
     public function fetchRatingNiblets(): array
     {
@@ -43,12 +44,10 @@ final readonly class Reactions
             return $ratingNiblets;
         }
 
-        $result = $this->database->select(
-            ['id', 'img', 'title'],
-            'ratingniblets',
+        return $ratingNiblets = keyBy(
+            RatingNiblet::selectMany($this->database),
+            static fn($niblet) => $niblet->id
         );
-
-        return $ratingNiblets = keyBy($this->database->arows($result), static fn($niblet) => $niblet['id']);
     }
 
     public function listReactions(int $pid): void
@@ -90,8 +89,8 @@ final readonly class Reactions
         $page = '';
         foreach ($ratings as $index => $rating) {
             $page .= '<div class="column">';
-            $page .= '<img src="' . $niblets[$index]['img'] . '" /> '
-                . $niblets[$index]['title'] . '<ul>';
+            $page .= '<img src="' . $niblets[$index]->img . '" /> '
+                . $niblets[$index]->title . '<ul>';
             foreach ($rating as $mid) {
                 $page .= '<li>' . $this->template->meta(
                     'user-link',
@@ -126,8 +125,8 @@ final readonly class Reactions
         foreach ($this->fetchRatingNiblets() as $nibletIndex => $niblet) {
             $nibletHTML = $this->template->meta(
                 'rating-niblet',
-                $niblet['img'],
-                $niblet['title'],
+                $niblet->img,
+                $niblet->title,
             );
             $postratingbuttons .= <<<HTML
                 <a href="?act=vt{$post['tid']}&amp;ratepost={$post['pid']}&amp;niblet={$nibletIndex}">
@@ -146,8 +145,8 @@ final readonly class Reactions
             $postratingbuttons .= $num;
             $showrating .= $this->template->meta(
                 'rating-niblet',
-                $niblet['img'],
-                $niblet['title'],
+                $niblet->img,
+                $niblet->title,
             ) . $num;
         }
 

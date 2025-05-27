@@ -404,22 +404,17 @@ final readonly class ModControls
             );
 
             $content = [];
-            $result = $this->database->select(
-                [
-                    'display_name',
-                    'group_id',
-                    'id',
-                ],
-                'members',
+            $members = Member::selectMany(
+                $this->database,
                 'WHERE `ip`=?',
                 $this->ipAddress->asBinary($ipAddress),
             );
-            while ($member = $this->database->arow($result)) {
+            foreach ($members as $member) {
                 $content[] = $this->template->meta(
                     'user-link',
-                    $member['id'],
-                    $member['group_id'],
-                    $member['display_name'],
+                    $member->id,
+                    $member->group_id,
+                    $member->display_name,
                 );
             }
 

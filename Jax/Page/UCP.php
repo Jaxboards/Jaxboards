@@ -9,6 +9,7 @@ use Jax\Config;
 use Jax\Constants\Groups;
 use Jax\Database;
 use Jax\Jax;
+use Jax\Models\Member;
 use Jax\Page;
 use Jax\Page\UCP\Inbox;
 use Jax\Request;
@@ -400,15 +401,13 @@ final readonly class UCP
             return 'Invalid characters in display name!';
         }
 
-        $result = $this->database->select(
-            'COUNT(`id`) AS `same_display_name`',
-            'members',
+        $members = Member::selectMany(
+            $this->database,
             'WHERE `display_name` = ? AND `id`!=? LIMIT 1',
             $data['display_name'],
             $this->user->get('id'),
         );
-        $displayNameCheck = $this->database->arow($result);
-        if ($displayNameCheck && $displayNameCheck['same_display_name'] > 0) {
+        if ($members && count($members) > 0) {
             return 'That display name is already in use.';
         }
 
