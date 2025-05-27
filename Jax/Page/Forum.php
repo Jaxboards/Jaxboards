@@ -68,7 +68,7 @@ final class Forum
 
         // Guaranteed to match here because of the router
         preg_match('@(\d+)$@', (string) $this->request->asString->get('act'), $act);
-        if ($this->request->both('markRead') !== null) {
+        if ($this->request->both('markread') !== null) {
             $this->markRead((int) $act[1]);
             $this->page->location('?');
 
