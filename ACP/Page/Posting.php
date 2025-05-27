@@ -8,6 +8,7 @@ use ACP\Page;
 use Jax\Config;
 use Jax\Database;
 use Jax\Models\RatingNiblet;
+use Jax\Models\TextRule;
 use Jax\Request;
 use Jax\TextFormatting;
 
@@ -46,31 +47,16 @@ final readonly class Posting
     private function wordfilter(): void
     {
         $page = '';
-        $wordfilter = [];
-        $result = $this->database->select(
-            [
-                'id',
-                'enabled',
-                'needle',
-                'replacement',
-                'type',
-            ],
-            'textrules',
-            "WHERE `type`='badword'",
+        $badWords = keyBy(
+            TextRule::selectMany($this->database, "WHERE `type`='badword'"),
+            fn($textRule) => $textRule->needle
         );
-        while ($f = $this->database->arow($result)) {
-            $wordfilter[$f['needle']] = $f['replacement'];
-        }
 
         // Delete.
         $delete = $this->request->asString->get('d');
-        if ($delete) {
-            $this->database->delete(
-                'textrules',
-                "WHERE `type`='badword' AND `needle`=?",
-                $delete,
-            );
-            unset($wordfilter[$delete]);
+        if (array_key_exists($delete, $badWords)) {
+            $badWords[$delete]->delete($this->database);
+            unset($badWords[$delete]);
         }
 
         // Insert.
@@ -80,26 +66,24 @@ final readonly class Posting
             if (!$badword || !$replacement) {
                 $page .= $this->page->error('All fields required.');
             } elseif (
-                isset($wordfilter[$badword])
-                && $wordfilter[$badword]
+                isset($badWords[$badword])
+                && $badWords[$badword]
             ) {
                 $page .= $this->page->error(
                     "'" . $badword . "' is already used.",
                 );
             } else {
-                $this->database->insert(
-                    'textrules',
-                    [
-                        'needle' => $badword,
-                        'replacement' => $replacement,
-                        'type' => 'badword',
-                    ],
-                );
-                $wordfilter[$badword] = $replacement;
+                $textRule = new TextRule();
+                $textRule->needle = $badword;
+                $textRule->replacement = $replacement;
+                $textRule->type = 'badword';
+                $textRule->enabled = 1;
+                $textRule->insert($this->database);
+                $badWords[$badword] = $textRule;
             }
         }
 
-        if ($wordfilter === []) {
+        if ($badWords === []) {
             $table = $this->page->parseTemplate(
                 'posting/word-filter-empty.html',
             ) . $this->page->parseTemplate(
@@ -111,16 +95,13 @@ final readonly class Posting
             ) . $this->page->parseTemplate(
                 'posting/word-filter-submit-row.html',
             );
-            $currentFilters = array_reverse($wordfilter, true);
-            foreach ($currentFilters as $filter => $result) {
-                $resultCode = $this->textFormatting->blockhtml($result);
-                $filterUrlEncoded = rawurlencode($filter);
+            foreach (array_reverse($badWords, true) as $textRule) {
                 $table .= $this->page->parseTemplate(
                     'posting/word-filter-row.html',
                     [
-                        'filter' => $filter,
-                        'filter_url_encoded' => $filterUrlEncoded,
-                        'result_code' => $resultCode,
+                        'filter' => $textRule->needle,
+                        'filter_url_encoded' => rawurlencode($textRule->needle),
+                        'result_code' => $this->textFormatting->blockhtml($textRule->replacement),
                     ],
                 );
             }
@@ -157,40 +138,28 @@ final readonly class Posting
         }
 
         // Select emoticons.
-        $result = $this->database->select(
-            [
-                'id',
-                'type',
-                'needle',
-                'replacement',
-                'enabled',
-            ],
-            'textrules',
-            "WHERE `type`='emote'",
+        $emoticons = keyBy(
+            TextRule::selectMany($this->database, "WHERE `type`='emote'"),
+            fn($textRule) => $textRule->needle
         );
-        while ($f = $this->database->arow($result)) {
-            $emoticons[$f['needle']] = $f['replacement'];
-        }
 
         // Insert emoticon.
         if ($this->request->post('submit') !== null) {
             $emoticonInput = $this->request->asString->post('emoticon');
+            $emoticonNoHTML = $this->textFormatting->blockhtml($emoticonInput);
             $imageInput = $this->request->asString->post('image');
             if (!$emoticonInput || !$imageInput) {
                 $page .= $this->page->error('All fields required.');
-            } elseif (isset($emoticons[$this->textFormatting->blockhtml($emoticonInput)])) {
+            } elseif (array_key_exists($emoticonNoHTML, $emoticons)) {
                 $page .= $this->page->error('That emoticon is already being used.');
             } else {
-                $this->database->insert(
-                    'textrules',
-                    [
-                        'enabled' => 1,
-                        'needle' => $this->textFormatting->blockhtml($emoticonInput),
-                        'replacement' => $imageInput,
-                        'type' => 'emote',
-                    ],
-                );
-                $emoticons[$this->textFormatting->blockhtml($emoticonInput)] = $imageInput;
+                $textRule = new TextRule();
+                $textRule->enabled = 1;
+                $textRule->needle = $emoticonNoHTML;
+                $textRule->replacement = $imageInput;
+                $textRule->type = 'emote';
+                $textRule->insert($this->database);
+                $emoticons[$emoticonNoHTML] = $textRule;
             }
         }
 
@@ -215,15 +184,13 @@ final readonly class Posting
             );
             $emoticons = array_reverse($emoticons, true);
 
-            foreach ($emoticons as $emoticon => $smileyFile) {
-                $smileyFile = $this->textFormatting->blockhtml($smileyFile);
-                $emoticonUrlEncoded = rawurlencode($emoticon);
+            foreach ($emoticons as $emoticon) {
                 $table .= $this->page->parseTemplate(
                     'posting/emoticon-row.html',
                     [
-                        'emoticon' => $emoticon,
-                        'emoticon_url_encoded' => rawurlencode($emoticon),
-                        'smiley_url' => $smileyFile,
+                        'emoticon' => $emoticon->needle,
+                        'emoticon_url_encoded' => rawurlencode($emoticon->needle),
+                        'smiley_url' => $this->textFormatting->blockhtml($emoticon->replacement),
                     ],
                 );
             }
@@ -299,11 +266,11 @@ final readonly class Posting
                 $page .= $this->page->error('All fields required.');
             } else {
                 $ratingNiblet = new RatingNiblet();
-                $niblet->img = $img;
-                $niblet->title = $title;
-                $niblet->insert($this->database);
+                $ratingNiblet->img = $img;
+                $ratingNiblet->title = $title;
+                $ratingNiblet->insert($this->database);
 
-                $niblets[$niblet->id] = $niblet;
+                $niblets[$ratingNiblet->id] = $ratingNiblet;
             }
         }
 
