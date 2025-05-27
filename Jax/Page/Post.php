@@ -192,7 +192,7 @@ final class Post
         $postData = $this->postData;
         $page = '<div id="post-preview">' . $this->postpreview . '</div>';
         $tid = $topic->id ?? '';
-        $fid = $topic ? $topic->fid : $this->fid;
+        $fid = $topic?->fid ?? $this->fid;
         $how = $this->how ?? 'newtopic';
 
         $isEditing = (bool) $topic;
@@ -212,7 +212,7 @@ final class Post
             return;
         }
 
-        if (!$topic) {
+        if ($topic === null) {
             $topic = [
                 'subtitle' => $this->request->asString->post('tdesc') ?? '',
                 'title' => $this->request->asString->post('ttitle') ?? '',
@@ -316,8 +316,9 @@ final class Post
         if (!$this->user->isGuest() && $this->how === 'qreply') {
             $this->page->command('closewindow', '#qreply');
         }
+
         $topic = Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $tid);
-        if (!$topic) {
+        if ($topic === null) {
             $this->page->append('PAGE', $this->template->meta(
                 'error',
                 "The topic you're attempting to reply in no longer exists.",
@@ -416,18 +417,18 @@ final class Post
         $this->page->command('attachfiles');
     }
 
-    private function canEdit(ModelsPost $post): bool
+    private function canEdit(ModelsPost $modelsPost): bool
     {
         if (
-            $post->auth_id
-            && ($post->newtopic ? $this->user->getPerm('can_edit_topics')
+            $modelsPost->auth_id
+            && ($modelsPost->newtopic !== 0 ? $this->user->getPerm('can_edit_topics')
                 : $this->user->getPerm('can_edit_posts'))
-            && $post->auth_id === $this->user->get('id')
+            && $modelsPost->auth_id === $this->user->get('id')
         ) {
             return true;
         }
 
-        return $this->canModerate($post->tid);
+        return $this->canModerate($modelsPost->tid);
     }
 
     private function canModerate(int $tid): bool
@@ -498,7 +499,8 @@ final class Post
 
     private function updateTopic(int $tid): ?string
     {
-        $topic = Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $tid);;
+        $topic = Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $tid);
+
         $topicTitle = $this->request->asString->post('ttitle');
         $topicDesc = $this->request->asString->post('tdesc');
 
@@ -546,7 +548,8 @@ final class Post
         $tid = $this->tid;
         $postData = $this->postData;
 
-        $post = ModelsPost::selectOne($this->database, Database::WHERE_ID_EQUALS, $pid);;
+        $post = ModelsPost::selectOne($this->database, Database::WHERE_ID_EQUALS, $pid);
+
         $topic = Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $tid);
         $isTopicPost = $topic && $post && $topic->op === $post->id;
 
