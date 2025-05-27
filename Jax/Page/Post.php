@@ -9,6 +9,8 @@ use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\Hooks;
 use Jax\IPAddress;
+use Jax\Models\Forum;
+use Jax\Models\Post as ModelsPost;
 use Jax\Models\Topic;
 use Jax\Page;
 use Jax\Request;
@@ -108,66 +110,6 @@ final class Post
     }
 
     /**
-     * @return ?array<string,mixed>
-     */
-    private function fetchPost(int $pid): ?array
-    {
-        $result = $this->database->select(
-            [
-                'id',
-                'auth_id',
-                'newtopic',
-                'post',
-                'tid',
-            ],
-            'posts',
-            Database::WHERE_ID_EQUALS,
-            $pid,
-        );
-        $post = $this->database->arow($result);
-        $this->database->disposeresult($result);
-
-        return $post;
-    }
-
-    /**
-     * @return ?array<string,mixed>
-     */
-    private function fetchTopic(int $tid): ?array
-    {
-        $result = $this->database->select(
-            [
-                'auth_id',
-                'cal_event',
-                'fid',
-                'id',
-                'locked',
-                'lp_uid',
-                'op',
-                'pinned',
-                'poll_choices',
-                'poll_q',
-                'poll_results',
-                'poll_type',
-                'replies',
-                'subtitle',
-                'summary',
-                'title',
-                'views',
-                'UNIX_TIMESTAMP(`date`) AS `date`',
-                'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
-            ],
-            'topics',
-            Database::WHERE_ID_EQUALS,
-            $tid,
-        );
-        $topic = $this->database->arow($result);
-        $this->database->disposeresult($result);
-
-        return $topic;
-    }
-
-    /**
      * 1) Compute a hash of the file to use as the filename on the server
      * 2) If it's an image, keep the extension so we can show it. Otherwise remove it.
      * 3) If the file has already been uploaded (based on hash) then don't replace it.
@@ -245,15 +187,12 @@ final class Post
         $this->page->command('update', 'post-preview', $post);
     }
 
-    /**
-     * @param ?array<string,mixed> $topic
-     */
-    private function showTopicForm(?array $topic = null): void
+    private function showTopicForm(?Topic $topic = null): void
     {
         $postData = $this->postData;
         $page = '<div id="post-preview">' . $this->postpreview . '</div>';
-        $tid = $topic['id'] ?? '';
-        $fid = $topic ? $topic['fid'] : $this->fid;
+        $tid = $topic->id ?? '';
+        $fid = $topic ? $topic->fid : $this->fid;
         $how = $this->how ?? 'newtopic';
 
         $isEditing = (bool) $topic;
@@ -318,7 +257,7 @@ final class Post
                 <input type="hidden" name="fid" value="{$fid}" />
                 <input type="hidden" name="tid" value="{$tid}" />
                 <label for="ttitle">Topic title:</label>
-                <input type="text" name="ttitle" id="ttitle" title="Topic Title" value="{$topic['title']}" />
+                <input type="text" name="ttitle" id="ttitle" title="Topic Title" value="{$topic->title}" />
                 <br>
                 <label for="tdesc">Description:</label>
                 <input
@@ -326,7 +265,7 @@ final class Post
                     name="tdesc"
                     title="Topic Description (extra information about your topic)"
                     type="text"
-                    value="{$topic['subtitle']}"
+                    value="{$topic->subtitle}"
                     />
                 <br>
                 <textarea
@@ -377,22 +316,7 @@ final class Post
         if (!$this->user->isGuest() && $this->how === 'qreply') {
             $this->page->command('closewindow', '#qreply');
         }
-
-        $result = $this->database->special(
-            <<<'SQL'
-                SELECT
-                    t.`title` AS `title`,
-                    f.`perms` AS `perms`
-                FROM %t t
-                LEFT JOIN %t f
-                    ON t.`fid`=f.`id`
-                WHERE t.`id`=?
-                SQL,
-            ['topics', 'forums'],
-            $tid,
-        );
-        $topic = $this->database->arow($result);
-        $this->database->disposeresult($result);
+        $topic = Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $tid);
         if (!$topic) {
             $this->page->append('PAGE', $this->template->meta(
                 'error',
@@ -402,8 +326,10 @@ final class Post
             return;
         }
 
-        $topic['title'] = $this->textFormatting->wordfilter($topic['title']);
-        $topic['perms'] = $this->user->getForumPerms($topic['perms']);
+        $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $topic->fid);
+
+        $topic->title = $this->textFormatting->wordfilter($topic->title);
+        $topicPerms = $this->user->getForumPerms($forum->perms);
 
         $page .= '<div id="post-preview">' . $this->postpreview . '</div>';
         $postData = $this->textFormatting->blockhtml($this->postData ?? '');
@@ -448,7 +374,7 @@ final class Post
             $this->session->deleteVar('multiquote');
         }
 
-        $uploadForm = $topic['perms']['upload'] ? <<<'HTML'
+        $uploadForm = $topicPerms['upload'] ? <<<'HTML'
             <div id="attachfiles">
                 Add Files
                 <input type="file" name="Filedata" title="Browse for file" />
@@ -480,31 +406,28 @@ final class Post
             </div>
             HTML;
 
-        $page .= $this->template->meta('box', '', $topic['title'] . ' &gt; Reply', $form);
+        $page .= $this->template->meta('box', '', $topic->title . ' &gt; Reply', $form);
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
-        if (!$topic['perms']['upload']) {
+        if (!$topicPerms['upload']) {
             return;
         }
 
         $this->page->command('attachfiles');
     }
 
-    /**
-     * @param array<string,mixed> $post
-     */
-    private function canEdit(array $post): bool
+    private function canEdit(ModelsPost $post): bool
     {
         if (
-            $post['auth_id']
-            && ($post['newtopic'] ? $this->user->getPerm('can_edit_topics')
+            $post->auth_id
+            && ($post->newtopic ? $this->user->getPerm('can_edit_topics')
                 : $this->user->getPerm('can_edit_posts'))
-            && $post['auth_id'] === $this->user->get('id')
+            && $post->auth_id === $this->user->get('id')
         ) {
             return true;
         }
 
-        return $this->canModerate($post['tid']);
+        return $this->canModerate($post->tid);
     }
 
     private function canModerate(int $tid): bool
@@ -575,7 +498,7 @@ final class Post
 
     private function updateTopic(int $tid): ?string
     {
-        $topic = $this->fetchTopic($tid);
+        $topic = Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $tid);;
         $topicTitle = $this->request->asString->post('ttitle');
         $topicDesc = $this->request->asString->post('tdesc');
 
@@ -623,9 +546,9 @@ final class Post
         $tid = $this->tid;
         $postData = $this->postData;
 
-        $post = $this->fetchPost($pid);
-        $topic = $this->fetchTopic($tid);
-        $isTopicPost = $topic && $post && $topic['op'] === $post['id'];
+        $post = ModelsPost::selectOne($this->database, Database::WHERE_ID_EQUALS, $pid);;
+        $topic = Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $tid);
+        $isTopicPost = $topic && $post && $topic->op === $post->id;
 
         $error = match (true) {
             !$post => 'The post you are trying to edit does not exist.',
@@ -655,7 +578,7 @@ final class Post
         }
 
         if ($this->postData === null && $post) {
-            $this->postData = $post['post'];
+            $this->postData = $post->post;
         }
 
         if ($error !== null) {

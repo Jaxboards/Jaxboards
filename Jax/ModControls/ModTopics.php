@@ -7,6 +7,7 @@ namespace Jax\ModControls;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Models\Forum;
+use Jax\Models\Topic;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
@@ -127,28 +128,27 @@ final readonly class ModTopics
 
         $trashcan = $trashcan->id ?? false;
 
-        $result = $this->database->select(
-            ['id', 'fid'],
-            'topics',
+        $topics = Topic::selectMany(
+            $this->database,
             Database::WHERE_ID_IN,
             $this->getModTids(),
         );
         $delete = [];
-        while ($topic = $this->database->arow($result)) {
-            if (!isset($forumData[$topic['fid']])) {
-                $forumData[$topic['fid']] = 0;
+        foreach ($topics as $topic) {
+            if (!isset($forumData[$topic->fid])) {
+                $forumData[$topic->fid] = 0;
             }
 
-            ++$forumData[$topic['fid']];
+            ++$forumData[$topic->fid];
             if (!$trashcan) {
                 continue;
             }
 
-            if ($trashcan !== $topic['fid']) {
+            if ($trashcan !== $topic->fid) {
                 continue;
             }
 
-            $delete[] = (int) $topic['id'];
+            $delete[] = (int) $topic->id;
         }
 
         if ($trashcan) {
@@ -264,21 +264,20 @@ final readonly class ModTopics
         );
 
         if ($this->session->getVar('modtids')) {
-            $result = $this->database->select(
-                ['id', 'title'],
-                'topics',
+            $topics = Topic::selectMany(
+                $this->database,
                 Database::WHERE_ID_IN,
                 $this->getModTids(),
             );
-            $titles = keyBy($this->database->arows($result), static fn($topic) => $topic['id']);
+            $topics = keyBy($topics, static fn($topic) => $topic->id);
 
             foreach ($topicIds as $topicId) {
-                if (!array_key_exists($topicId, $titles)) {
+                if (!array_key_exists($topicId, $topics)) {
                     continue;
                 }
 
                 $page .= '<input type="radio" name="ot" value="' . $topicId . '" /> '
-                    . $titles[$topicId]['title'] . '<br>';
+                    . $topics[$topicId]->title . '<br>';
             }
         }
 
@@ -300,17 +299,17 @@ final readonly class ModTopics
             return;
         }
 
-        $result = $this->database->select(
-            ['fid'],
-            'topics',
+        $topics = Topic::selectMany(
+            $this->database,
             Database::WHERE_ID_IN,
             $this->getModTids(),
         );
         $fids = array_unique(array_map(
-            static fn($topic): int => (int) $topic['fid'],
-            $this->database->arows($result),
+            static fn($topic): int => (int) $topic->fid,
+            $topics,
         ));
 
+        // Move all topics at once
         $this->database->update(
             'topics',
             [
@@ -319,7 +318,9 @@ final readonly class ModTopics
             Database::WHERE_ID_IN,
             $this->getModTids(),
         );
+
         $this->cancel();
+
         $fids[] = $forumId;
         foreach ($fids as $fid) {
             $this->database->fixForumLastPost($fid);

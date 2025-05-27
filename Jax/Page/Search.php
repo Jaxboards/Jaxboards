@@ -382,17 +382,14 @@ final class Search
         }
 
         $this->fids = [];
-        $result = $this->database->select(
-            ['id', 'perms'],
-            'forums',
-        );
-        foreach ($this->database->arows($result) as $forum) {
-            $perms = $this->user->getForumPerms($forum['perms']);
+        $forums = Forum::selectMany($this->database);
+        foreach ($forums as $forum) {
+            $perms = $this->user->getForumPerms($forum->perms);
             if (!$perms['read']) {
                 continue;
             }
 
-            $this->fids[] = $forum['id'];
+            $this->fids[] = $forum->id;
         }
 
         return $this->fids;
