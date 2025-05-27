@@ -229,13 +229,13 @@ final readonly class ModPosts
     /**
      * @param list<int> $pids
      */
-    private function movePostsTo(array $pids, int $tid): void
+    private function movePostsTo(array $pids, int $tid): bool
     {
         if ($tid !== 0) {
             $this->updatePosts($pids, ['tid' => $tid]);
             $this->page->location('?act=vt' . $tid);
 
-            return;
+            return true;
         }
     }
 
