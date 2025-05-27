@@ -737,7 +737,8 @@ final readonly class Forums
 
         $category = $cid !== 0
             ? Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $cid)
-            : new Category();
+            : null;
+        $category ??= new Category();
 
         if ($this->request->post('submit') !== null) {
             $error = $this->upsertCategory($category);
@@ -755,7 +756,7 @@ final readonly class Forums
             $page . $this->page->parseTemplate(
                 'forums/create-category.html',
                 [
-                    'id' => $category?->id,
+                    'id' => (string) $category?->id,
                     'submit' => $category !== null ? 'Edit' : 'Create',
                     'title' => $categoryTitle,
                 ],
