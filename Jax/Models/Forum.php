@@ -41,7 +41,7 @@ final class Forum extends Model
 
     public string $title;
 
-    public string $subtitle;
+    public string $subtitle = '';
 
     public ?int $lp_uid = null;
 
@@ -49,31 +49,31 @@ final class Forum extends Model
 
     public ?int $lp_tid = null;
 
-    public string $lp_topic;
+    public string $lp_topic = '';
 
-    public string $path;
+    public string $path = '';
 
-    public int $show_sub;
+    public int $show_sub = 0;
 
-    public string $redirect;
+    public string $redirect = '';
 
-    public int $topics;
+    public int $topics = 0;
 
-    public int $posts;
+    public int $posts = 0;
 
-    public int $order;
+    public int $order = 0;
 
-    public string $perms;
+    public string $perms = '';
 
-    public int $orderby;
+    public int $orderby = 0;
 
-    public int $nocount;
+    public int $nocount = 0;
 
-    public int $redirects;
+    public int $redirects = 0;
 
-    public int $trashcan;
+    public int $trashcan = 0;
 
-    public string $mods;
+    public string $mods = '';
 
-    public int $show_ledby;
+    public int $show_ledby = 0;
 }
