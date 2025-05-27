@@ -569,7 +569,9 @@ final readonly class Forums
         $categories = $this->fetchAllCategories();
 
         if ($forum === null) {
-            $forum = Forum::create(['id' => 0, 'cat_id' => first($categories)->id]);
+            $forum = new Forum;
+            $forum->id = 0;
+            $forum->cat_id = first($categories)->id;
         }
 
         $forum->nocount = $this->request->asString->post('count') ? 0 : 1;

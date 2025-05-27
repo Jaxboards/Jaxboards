@@ -14,20 +14,6 @@ abstract class Model
 
     public const TABLE = '';
 
-    public function __construct(?array $properties = [])
-    {
-        foreach ($properties as $property => $value) {
-            $this->{$property} = $value;
-        }
-
-        return $this;
-    }
-
-    public static function create(?array $properties): static
-    {
-        return new static($properties);
-    }
-
     /**
      * @param mixed $args
      */
@@ -66,7 +52,10 @@ abstract class Model
         return $stmt?->fetchAll(PDO::FETCH_CLASS, static::class) ?? [];
     }
 
-    public function asArray()
+    /**
+     * @return array<string,mixed>
+     */
+    public function asArray(): array
     {
         $data = [];
         foreach ($this::FIELDS as $fieldName) {
