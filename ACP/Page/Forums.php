@@ -569,7 +569,7 @@ final readonly class Forums
         $categories = $this->fetchAllCategories();
 
         if ($forum === null) {
-            $forum = new Forum;
+            $forum = new Forum();
             $forum->id = 0;
             $forum->cat_id = first($categories)->id;
         }
