@@ -9,6 +9,7 @@ use Jax\Config;
 use Jax\Database;
 use Jax\Date;
 use Jax\Jax;
+use Jax\Models\Category;
 use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
@@ -192,22 +193,18 @@ final class IDX
 
         // Remove duplicates
         $this->mods = array_unique($this->mods);
-        $catq = $this->database->select(
-            ['id', 'title', '`order`'],
-            'categories',
-            'ORDER BY `order`,`title` ASC',
-        );
-        foreach ($this->database->arows($catq) as $category) {
-            if (!array_key_exists($category['id'], $forumsByCatID)) {
+        $categories = Category::selectMany($this->database, 'ORDER BY `order`,`title` ASC');
+        foreach ($categories as $category) {
+            if (!array_key_exists($category->id, $forumsByCatID)) {
                 continue;
             }
 
             $page .= $this->page->collapseBox(
-                $category['title'],
+                $category->title,
                 $this->buildTable(
-                    $forumsByCatID[$category['id']],
+                    $forumsByCatID[$category->id],
                 ),
-                'cat_' . $category['id'],
+                'cat_' . $category->id,
             );
         }
 

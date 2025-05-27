@@ -178,16 +178,9 @@ final readonly class BuddyList
             $this->unblock($uid);
         }
 
-        $user = false;
+        $user = null;
         if ($uid && is_numeric($uid)) {
-            $result = $this->database->select(
-                ['id'],
-                'members',
-                Database::WHERE_ID_EQUALS,
-                $uid,
-            );
-            $user = $this->database->arow($result);
-            $this->database->disposeresult($result);
+            $user = Member::selectMany($this->database, Database::WHERE_ID_EQUALS, $uid);
         }
 
         if (!$user) {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use DI\Container;
+use Jax\Models\Page as ModelsPage;
 use Jax\Page\Asteroids;
 use Jax\Page\BoardOffline;
 use Jax\Page\BuddyList;
@@ -128,18 +129,11 @@ final class Router
      */
     private function loadCustomPage(string $action): bool
     {
-        $result = $this->database->select(
-            ['page'],
-            'pages',
-            'WHERE `act`=?',
-            $action,
-        );
-        $page = $this->database->arow($result);
-        $this->database->disposeresult($result);
+        $page = ModelsPage::selectOne($this->database, 'WHERE `act`=?', $action);
 
         if ($page) {
             $bbCode = $this->container->get(BBCode::class);
-            $pageContents = $bbCode->toHTML($page['page']);
+            $pageContents = $bbCode->toHTML($page->page);
             $this->page->append('PAGE', $pageContents);
             if ($this->request->isJSNewLocation()) {
                 $this->page->command('update', 'page', $pageContents);

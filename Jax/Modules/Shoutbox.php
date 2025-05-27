@@ -10,6 +10,7 @@ use Jax\Date;
 use Jax\Hooks;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Models\Shout;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
@@ -80,20 +81,10 @@ final class Shoutbox
     /**
      * @param ?array<string,mixed> $shout
      */
-    public function canDelete(int $id, ?array $shout = null): bool
+    public function canDelete(?array $shout = null): bool
     {
         $candelete = (bool) $this->user->getPerm('can_delete_shouts');
         if (!$candelete && $this->user->getPerm('can_delete_own_shouts')) {
-            if (!$shout) {
-                $result = $this->database->select(
-                    '`uid`',
-                    'shouts',
-                    Database::WHERE_ID_EQUALS,
-                    $id,
-                );
-                $shout = $this->database->arow($result);
-            }
-
             if (
                 isset($shout['uid'])
                 && $shout['uid'] === $this->user->get('id')
@@ -120,7 +111,7 @@ final class Shoutbox
         $avatar = $this->config->getSetting('shoutboxava')
             ? "<img src='{$avatarUrl}' class='avatar' alt='avatar' />" : '';
         $deletelink = $this->template->meta('shout-delete', $shout['id']);
-        if (!$this->canDelete(0, $shout)) {
+        if (!$this->canDelete($shout)) {
             $deletelink = '';
         }
 
@@ -321,7 +312,8 @@ final class Shoutbox
 
     public function deleteShout(int $delete): void
     {
-        $candelete = !$this->user->isGuest() && $this->canDelete($delete);
+        $shout = Shout::selectOne($this->database, Database::WHERE_ID_EQUALS, $delete)?->asArray();
+        $candelete = !$this->user->isGuest() && $this->canDelete($shout);
 
         if (!$candelete) {
             $this->page->location('?');
