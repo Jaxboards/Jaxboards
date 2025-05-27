@@ -570,7 +570,6 @@ final readonly class Forums
 
         if ($forum === null) {
             $forum = new Forum();
-            $forum->id = 0;
             $forum->cat_id = first($categories)->id;
         }
 

@@ -35,7 +35,7 @@ final class Forum extends Model
     ];
 
 
-    public int $id;
+    public int $id = 0;
 
     public ?int $cat_id = null;
 
