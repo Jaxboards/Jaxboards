@@ -11,6 +11,7 @@ use Jax\ForumTree;
 use Jax\Jax;
 use Jax\Models\Category;
 use Jax\Models\Forum;
+use Jax\Models\Group;
 use Jax\Models\Member;
 use Jax\Request;
 use Jax\TextFormatting;
@@ -148,40 +149,40 @@ final readonly class Forums
 
         $permsTable = '';
         foreach ($this->fetchAllGroups() as $group) {
-            $groupPerms = $perms[$group['id']] ?? null;
+            $groupPerms = $perms[$group->id] ?? null;
 
             $permsTable .= $this->page->parseTemplate(
                 'forums/create-forum-permissions-row.html',
                 [
-                    'global' => $this->checkbox($group['id'], 'global', $groupPerms === null),
+                    'global' => $this->checkbox($group->id, 'global', $groupPerms === null),
                     'poll' => $this->checkbox(
-                        $group['id'],
+                        $group->id,
                         'poll',
-                        $groupPerms['poll'] ?? $group['can_poll'],
+                        $groupPerms['poll'] ?? $group->can_poll,
                     ),
                     'read' => $this->checkbox(
-                        $group['id'],
+                        $group->id,
                         'read',
                         $groupPerms['read'] ?? 1,
                     ),
                     'reply' => $this->checkbox(
-                        $group['id'],
+                        $group->id,
                         'reply',
-                        $groupPerms['reply'] ?? $group['can_post'],
+                        $groupPerms['reply'] ?? $group->can_post,
                     ),
                     'start' => $this->checkbox(
-                        $group['id'],
+                        $group->id,
                         'start',
-                        $groupPerms['start'] ?? $group['can_post_topics'],
+                        $groupPerms['start'] ?? $group->can_post_topics,
                     ),
-                    'title' => $group['title'],
+                    'title' => $group->title,
                     'upload' => $this->checkbox(
-                        $group['id'],
+                        $group->id,
                         'upload',
-                        $groupPerms['upload'] ?? $group['can_attach'],
+                        $groupPerms['upload'] ?? $group->can_attach,
                     ),
                     'view' => $this->checkbox(
-                        $group['id'],
+                        $group->id,
                         'view',
                         $groupPerms['view'] ?? 1,
                     ),
@@ -851,48 +852,11 @@ final readonly class Forums
     }
 
     /**
-     * @return array<array<string,mixed>>
+     * @return array<Group>
      */
     private function fetchAllGroups(): array
     {
-        $result = $this->database->select(
-            [
-                'can_access_acp',
-                'can_add_comments',
-                'can_attach',
-                'can_delete_comments',
-                'can_delete_own_posts',
-                'can_delete_own_shouts',
-                'can_delete_own_topics',
-                'can_delete_shouts',
-                'can_edit_posts',
-                'can_edit_topics',
-                'can_im',
-                'can_karma',
-                'can_lock_own_topics',
-                'can_moderate',
-                'can_override_locked_topics',
-                'can_pm',
-                'can_poll',
-                'can_post_topics',
-                'can_post',
-                'can_shout',
-                'can_use_sigs',
-                'can_view_board',
-                'can_view_fullprofile',
-                'can_view_offline_board',
-                'can_view_shoutbox',
-                'can_view_stats',
-                'flood_control',
-                'icon',
-                'id',
-                'legend',
-                'title',
-            ],
-            'member_groups',
-        );
-
-        return keyBy($this->database->arows($result), static fn($group) => $group['id']);
+        return keyBy(Group::selectMany($this->database), static fn($group) => $group->id);
     }
 
     /*

@@ -7,6 +7,7 @@ namespace ACP\Page;
 use ACP\Page;
 use Jax\Constants\Groups as ConstantsGroups;
 use Jax\Database;
+use Jax\Models\Group;
 use Jax\Request;
 use Jax\TextFormatting;
 
@@ -150,50 +151,16 @@ final class Groups
     /**
      * @param null|list<int> $groupIds
      *
-     * @return array<string,array<string,null|int|string>>
+     * @return array<Group>
      */
     private function fetchGroups(?array $groupIds): array
     {
-        $result = $this->database->select(
-            [
-                'can_access_acp',
-                'can_add_comments',
-                'can_attach',
-                'can_delete_comments',
-                'can_delete_own_posts',
-                'can_delete_own_shouts',
-                'can_delete_own_topics',
-                'can_delete_shouts',
-                'can_edit_posts',
-                'can_edit_topics',
-                'can_im',
-                'can_karma',
-                'can_lock_own_topics',
-                'can_moderate',
-                'can_override_locked_topics',
-                'can_pm',
-                'can_poll',
-                'can_post_topics',
-                'can_post',
-                'can_shout',
-                'can_use_sigs',
-                'can_view_board',
-                'can_view_fullprofile',
-                'can_view_offline_board',
-                'can_view_shoutbox',
-                'can_view_stats',
-                'flood_control',
-                'icon',
-                'id',
-                'legend',
-                'title',
-            ],
-            'member_groups',
+        $groups = Group::selectMany($this->database,
             ($groupIds ? 'WHERE `id` IN ? ' : '') . 'ORDER BY `id` ASC',
             ...($groupIds ? [$groupIds] : []),
         );
 
-        return keyBy($this->database->arows($result), static fn($group) => $group['id']);
+        return keyBy($groups, static fn($group) => $group->id);
     }
 
     private function showPerms(): void
@@ -227,8 +194,8 @@ final class Groups
             return;
         }
 
-        $perms = $this->fetchGroups($groupList);
-        $numgroups = count($perms);
+        $groups = $this->fetchGroups($groupList);
+        $numgroups = count($groups);
 
         if ($numgroups === 0) {
             $this->page->addContentBox(
@@ -241,12 +208,12 @@ final class Groups
 
         $widthPercent = 1 / $numgroups * 100;
         $groupHeadings = '';
-        foreach ($perms as $groupId => $groupData) {
+        foreach ($groups as $groupId => $group) {
             $groupHeadings .= $this->page->parseTemplate(
                 'groups/show-permissions-group-heading.html',
                 [
                     'id' => $groupId,
-                    'title' => (string) $groupData['title'],
+                    'title' => (string) $group->title,
                     'width_percent' => $widthPercent,
                 ],
             );
@@ -316,11 +283,11 @@ final class Groups
 
             foreach ($permissions as $field => $title) {
                 $groupColumns = '';
-                foreach ($perms as $groupId => $groupData) {
+                foreach ($groups as $groupId => $group) {
                     $groupColumns .= $this->page->parseTemplate(
                         'groups/show-permissions-permission-row-group-column.html',
                         [
-                            'checked' => $groupData[$field]
+                            'checked' => $group->{$field}
                                 ? 'checked="checked" ' : '',
                             'group_id' => $groupId,
                             'permission' => $field,
@@ -342,7 +309,7 @@ final class Groups
             'groups/show-permissions.html',
             [
                 'group_headings' => $groupHeadings,
-                'group_list' => implode(',', array_keys($perms)),
+                'group_list' => implode(',', array_keys($groups)),
                 'permissions_table' => $permissionsTable,
             ],
         );
@@ -403,28 +370,24 @@ final class Groups
             }
         }
 
-        $gdata = [];
+        $group = null;
         if ($gid) {
-            $result = $this->database->select(
-                ['title', 'icon'],
-                'member_groups',
+            $group = Group::selectOne($this->database,
                 Database::WHERE_ID_EQUALS,
                 $gid,
             );
-            $gdata = $this->database->arow($result);
-            $this->database->disposeresult($result);
         }
 
         $page .= $this->page->parseTemplate(
             'groups/create.html',
             [
-                'icon_url' => $gdata ? $this->textFormatting->blockhtml($gdata['icon']) : '',
-                'submit' => $gdata ? 'Edit' : 'Create',
-                'title' => $gdata ? $this->textFormatting->blockhtml($gdata['title']) : '',
+                'icon_url' => $group ? $this->textFormatting->blockhtml($group->icon) : '',
+                'submit' => $group ? 'Edit' : 'Create',
+                'title' => $group ? $this->textFormatting->blockhtml($group->title) : '',
             ],
         );
         $this->page->addContentBox(
-            $gdata ? 'Editing group: ' . $gdata['title'] : 'Create a group!',
+            $group ? 'Editing group: ' . $group->title : 'Create a group!',
             $page,
         );
     }
@@ -449,19 +412,15 @@ final class Groups
             );
         }
 
-        $result = $this->database->select(
-            ['id', 'title'],
-            'member_groups',
-            'WHERE `id`>5',
-        );
+        $groups = Group::selectMany($this->database, 'WHERE id>5');
         $found = false;
-        while ($group = $this->database->arow($result)) {
+        foreach ($groups as $group) {
             $found = true;
             $page .= $this->page->parseTemplate(
                 'groups/delete.html',
                 [
-                    'id' => $group['id'],
-                    'title' => $group['title'],
+                    'id' => $group->id,
+                    'title' => $group->title,
                 ],
             );
         }
