@@ -62,8 +62,6 @@ final class ForumTree
     }
 
     /**
-     * @param Forum $forum
-     *
      * @psalm-suppress UnsupportedPropertyReferenceUsage
      */
     private function addForum(Forum $forum): void
@@ -71,7 +69,7 @@ final class ForumTree
         $path = array_filter(
             array_map(
                 static fn($pathId): int => (int) $pathId,
-                explode(' ', (string) $forum->path),
+                explode(' ', $forum->path),
             ),
             static fn($pathId): bool => (bool) $pathId,
         );

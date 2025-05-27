@@ -86,11 +86,9 @@ final readonly class Inbox
         if ($this->request->post('submit') !== null) {
             $mid = (int) $this->request->asString->both('mid');
             $to = $this->request->asString->both('to');
-            if (!$mid && $to) {
-                $udata = Member::selectOne($this->database, 'WHERE `display_name`=?', $to);
-            } else {
-                $udata = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid);
-            }
+            $udata = !$mid && $to
+                ? Member::selectOne($this->database, 'WHERE `display_name`=?', $to)
+                : Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid);
 
             $error = match (true) {
                 !$udata => 'Invalid user!',
@@ -105,7 +103,7 @@ final readonly class Inbox
                 return null;
             }
 
-            if (!$udata) {
+            if ($udata === null) {
                 return null;
             }
 
@@ -186,7 +184,7 @@ final readonly class Inbox
             if ($message) {
                 $mid = $message['from'];
                 $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid);
-                $mname = $member ? (string) $member->display_name : '';
+                $mname = $member?->display_name ?? '';
                 $this->database->disposeresult($result);
 
                 $msg = PHP_EOL . PHP_EOL . PHP_EOL
@@ -222,7 +220,7 @@ final readonly class Inbox
             ),
             $mid,
             $mname,
-            $mname ? 'good' : '',
+            $mname !== '' && $mname !== '0' ? 'good' : '',
             $mtitle,
             htmlspecialchars($msg),
         );

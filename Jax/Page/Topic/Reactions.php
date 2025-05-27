@@ -82,7 +82,7 @@ final readonly class Reactions
 
         $mdata = keyBy(
             Member::selectMany($this->database, Database::WHERE_ID_IN, $members),
-            static fn($member) => $member->id
+            static fn($member) => $member->id,
         );
 
         unset($members);

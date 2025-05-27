@@ -7,7 +7,6 @@ namespace Jax;
 use Jax\Models\Member;
 
 use function array_filter;
-use function array_keys;
 use function array_reduce;
 use function mb_substr;
 use function sprintf;
@@ -33,13 +32,15 @@ final class ContactDetails
      * Given a user's profile, returns an associative array formatted as:
      * 'twitter' => ['https://twitter.com/jax', 'jax']
      *
-     * @param Member|array<string,mixed> $profile
+     * @param array<string,mixed>|Member $profile
      *
      * @return array<string,array{string,string}>
      */
-    public function getContactLinks(Member|array $profile): array
+    public function getContactLinks(array|Member $profile): array
     {
-        $profileData = $profile instanceof Member ? $profile->asArray() : $profile;
+        $profileData = $profile instanceof Member
+            ? $profile->asArray()
+            : $profile;
 
         $contactFields = array_filter(
             Member::FIELDS,

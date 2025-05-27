@@ -9,13 +9,13 @@ use Jax\Config;
 use Jax\Database;
 use Jax\Date;
 use Jax\Jax;
+use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
 use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
-use Jax\Models\Member;
 
 use function array_filter;
 use function array_flip;

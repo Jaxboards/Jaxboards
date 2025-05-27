@@ -21,7 +21,6 @@ use Jax\TextFormatting;
 use Jax\User;
 
 use function array_map;
-use function array_shift;
 use function count;
 use function file_get_contents;
 use function file_put_contents;
@@ -185,15 +184,6 @@ final readonly class ModControls
     private function editMember(): string
     {
         $page = '';
-        $memberFields = [
-            'group_id',
-            'id',
-            'display_name',
-            'avatar',
-            'full_name',
-            'about',
-            'sig',
-        ];
 
         $member = null;
 

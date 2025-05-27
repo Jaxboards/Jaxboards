@@ -27,12 +27,12 @@ final readonly class Comments
         private User $user,
     ) {}
 
-    public function render(Member $profile): string
+    public function render(Member $member): string
     {
         $tabHTML = '';
 
         $this->handleCommentDeletion();
-        $tabHTML .= $this->handleCommentCreation($profile);
+        $tabHTML .= $this->handleCommentCreation($member);
 
         if (
             !$this->user->isGuest()
@@ -44,7 +44,7 @@ final readonly class Comments
                 $this->user->get('avatar') ?: $this->template->meta('default-avatar'),
                 $this->jax->hiddenFormFields(
                     [
-                        'act' => 'vu' . $profile->id,
+                        'act' => 'vu' . $member->id,
                         'page' => 'comments',
                         'view' => 'profile',
                     ],
@@ -52,7 +52,7 @@ final readonly class Comments
             );
         }
 
-        $comments = $this->fetchComments($profile);
+        $comments = $this->fetchComments($member);
 
         if ($comments === []) {
             return $tabHTML . 'No comments to display!';
@@ -88,7 +88,7 @@ final readonly class Comments
     /**
      * @return array<array<string,mixed>>
      */
-    private function fetchComments(Member $profile): array
+    private function fetchComments(Member $member): array
     {
         $result = $this->database->special(
             <<<'SQL'
@@ -109,7 +109,7 @@ final readonly class Comments
                 LIMIT 10
                 SQL,
             ['profile_comments', 'members'],
-            $profile->id,
+            $member->id,
         );
         $comments = $this->database->arows($result);
         $this->database->disposeresult($result);
@@ -117,7 +117,7 @@ final readonly class Comments
         return $comments;
     }
 
-    private function handleCommentCreation(Member $profile): string
+    private function handleCommentCreation(Member $member): string
     {
         $comment = $this->request->asString->post('comment');
         if (!$comment) {
@@ -141,7 +141,7 @@ final readonly class Comments
         $this->database->insert(
             'activity',
             [
-                'affected_uid' => $profile->id,
+                'affected_uid' => $member->id,
                 'date' => $this->database->datetime(),
                 'type' => 'profile_comment',
                 'uid' => $this->user->get('id'),
@@ -153,7 +153,7 @@ final readonly class Comments
                 'comment' => $comment,
                 'date' => $this->database->datetime(),
                 'from' => $this->user->get('id'),
-                'to' => $profile->id,
+                'to' => $member->id,
             ],
         );
 

@@ -140,12 +140,11 @@ final readonly class Forums
         }
     }
 
-    /**
-     * @param Forum $forum
-     */
     private function printForumPermsTable(?Forum $forum): string
     {
-        $perms = $forum ? $this->jax->parseForumPerms($forum->perms) : null;
+        $perms = $forum !== null
+            ? $this->jax->parseForumPerms($forum->perms)
+            : null;
 
         $permsTable = '';
         foreach ($this->fetchAllGroups() as $group) {
@@ -198,8 +197,8 @@ final readonly class Forums
      * but it's just a potentially infinitely nested tree with
      * all of the keys being the forum ID.
      *
-     * @param array<int,array<int,int>|int>  $tree
-     * @param array<int,Forum> $forums
+     * @param array<int,array<int,int>|int> $tree
+     * @param array<int,Forum>              $forums
      */
     private function printForumTree(
         array $tree,
@@ -366,16 +365,19 @@ final readonly class Forums
 
             // Add per-forum moderator.
             $modId = (int) $this->request->asString->post('modid');
-            if ($modId) {
+            if ($modId !== 0) {
                 $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $modId);
-                if ($member) {
-                    $mods = $forum->mods !== '' ? explode(',', $forum->mods) : [];
+                if ($member !== null) {
+                    $mods = $forum->mods !== ''
+                        ? explode(',', $forum->mods)
+                        : [];
                     if (!in_array($modId, $mods)) {
-                        $forum->mods = $forum->mods
-                            ? $forum->mods . ',' . (string) $modId
+                        $forum->mods = $forum->mods !== '' && $forum->mods !== '0'
+                            ? $forum->mods . ',' . $modId
                             : (string) $modId;
                     }
-                $this->updatePerForumModFlag();
+
+                    $this->updatePerForumModFlag();
                 } else {
                     $error = "You tried to add a moderator that doesn't exist!";
                 }
@@ -451,7 +453,8 @@ final readonly class Forums
         if ($forum?->mods) {
             $members = Member::selectMany(
                 $this->database,
-                Database::WHERE_ID_IN, explode(',', (string) $forum->mods),
+                Database::WHERE_ID_IN,
+                explode(',', (string) $forum->mods),
             );
             $modList = '';
             foreach ($members as $member) {
@@ -494,18 +497,16 @@ final readonly class Forums
     }
 
     /**
-     * @param Forum $write
-     *
      * @return string Error on failure, null on success
      */
-    private function upsertForum(Forum $write): ?string
+    private function upsertForum(Forum $forum): ?string
     {
-        if (!$write->title) {
+        if ($forum->title === '' || $forum->title === '0') {
             return 'Forum title is required';
         }
 
         // Clear trashcan on other forums.
-        if ($write->trashcan) {
+        if ($forum->trashcan !== 0) {
             $this->database->update(
                 'forums',
                 [
@@ -514,10 +515,10 @@ final readonly class Forums
             );
         }
 
-        if (!$write->id) {
+        if ($forum->id === 0) {
             $this->database->insert(
                 'forums',
-                $write->asArray(),
+                $forum->asArray(),
             );
 
             $this->orderForums((int) $this->database->insertId());
@@ -527,9 +528,9 @@ final readonly class Forums
 
         $this->database->update(
             'forums',
-            $write->asArray(),
+            $forum->asArray(),
             Database::WHERE_ID_EQUALS,
-            $write->id,
+            $forum->id,
         );
 
         return null;
@@ -560,9 +561,6 @@ final readonly class Forums
         return $this->jax->serializeForumPerms($groupPerms);
     }
 
-    /**
-     * @return Forum
-     */
     private function applyFormData(?Forum $forum): Forum
     {
         $sub = (int) $this->request->post('show_sub');
@@ -576,7 +574,9 @@ final readonly class Forums
         $forum->orderby = $orderby > 0 && $orderby <= 5 ? $orderby : 0;
         $forum->perms = $this->serializePermsFromInput();
         $forum->redirect = $this->request->asString->post('redirect');
-        $forum->show_ledby = $this->request->asString->post('show_ledby') ? 1 : 0;
+        $forum->show_ledby = $this->request->asString->post('show_ledby')
+            ? 1
+            : 0;
         $forum->show_sub = $sub === 1 || $sub === 2 ? $sub : 0;
         $forum->subtitle = $this->request->asString->post('description');
         $forum->title = $this->request->asString->post('title');
