@@ -57,24 +57,27 @@ abstract class Model
 
     public function delete(Database $database): ?PDOStatement
     {
+        $primaryKey = static::PRIMARY_KEY;
         return $database->delete(
             static::TABLE,
             Database::WHERE_ID_EQUALS,
-            $this->{static::PRIMARY_KEY},
+            $this->{$primaryKey},
         );
     }
 
     public function insert(Database $database): ?PDOStatement
     {
+        $primaryKey = static::PRIMARY_KEY;
         $statement = $database->insert(static::TABLE, $this->asArray());
-        $this->{static::PRIMARY_KEY} = (int) $database->insertId();
+        $this->{$primaryKey} = (int) $database->insertId();
 
         return $statement;
     }
 
     public function upsert(Database $database): ?PDOStatement
     {
-        if ($this->{static::PRIMARY_KEY}) {
+        $primaryKey = static::PRIMARY_KEY;
+        if ($this->{$primaryKey}) {
             return $this->update($database);
         }
 
