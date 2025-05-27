@@ -8,6 +8,7 @@ use ACP\Page;
 use Jax\Config;
 use Jax\Database;
 use Jax\Jax;
+use Jax\Models\Page as ModelsPage;
 use Jax\Request;
 use Jax\TextFormatting;
 
@@ -136,21 +137,18 @@ final readonly class Settings
             $page .= $this->page->error($error);
         }
 
-        $result = $this->database->select(
-            ['act', 'page'],
-            'pages',
-        );
+        $pages = ModelsPage::selectMany($this->database);
         $table = '';
-        while ($f = $this->database->arow($result)) {
+        foreach ($pages as $pageRecord) {
             $table .= $this->page->parseTemplate(
                 'settings/pages-row.html',
                 [
-                    'act' => $f['act'],
+                    'act' => $pageRecord->act,
                 ],
             );
         }
 
-        if ($table !== '' && $table !== '0') {
+        if ($table !== '') {
             $page .= $this->page->parseTemplate(
                 'settings/pages.html',
                 [
@@ -186,39 +184,15 @@ final readonly class Settings
     private function pages_edit(string $pageurl): void
     {
         $page = '';
-        $result = $this->database->select(
-            ['act', 'page'],
-            'pages',
-            'WHERE `act`=?',
-            $pageurl,
-        );
-        $pageinfo = $this->database->arow($result);
-        $this->database->disposeresult($result);
-        $pagecontents = $this->request->asString->post('pagecontents');
-        if ($pagecontents !== null) {
-            if ($pageinfo) {
-                $pageinfo['page'] = $pagecontents;
+        $pageRecord = ModelsPage::selectOne($this->database, 'WHERE `act`=?', $pageurl);
+        $pageRecord ??= new ModelsPage();
 
-                $this->database->update(
-                    'pages',
-                    [
-                        'page' => $pagecontents,
-                    ],
-                    'WHERE `act`=?',
-                    $pageurl,
-                );
-            } else {
-                $pageinfo = [
-                    'act' => $pageurl,
-                    'page' => $pagecontents,
-                ];
-                $this->database->insert(
-                    'pages',
-                    $pageinfo,
-                );
-            }
+        $pageContents = $this->request->asString->post('pagecontents');
+        if ($pageContents !== null) {
+            $pageRecord->page = $pageContents;
+            $pageRecord->act = $pageurl;
+            $pageRecord->upsert($this->database);
 
-            $pageinfo['page'] = $pagecontents;
             $page .= $this->page->success(
                 "Page saved. Preview <a href='/?act={$pageurl}'>here</a>",
             );
@@ -227,7 +201,7 @@ final readonly class Settings
         $page .= $this->page->parseTemplate(
             'settings/pages-edit.html',
             [
-                'content' => $this->textFormatting->blockhtml($pageinfo ? $pageinfo['page'] : ''),
+                'content' => $this->textFormatting->blockhtml($pageRecord->page),
             ],
         );
         $this->page->addContentBox("Editing Page: {$pageurl}", $page);

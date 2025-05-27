@@ -61,7 +61,7 @@ abstract class Model
 
         return $database->delete(
             static::TABLE,
-            Database::WHERE_ID_EQUALS,
+            "WHERE {$primaryKey}=?",
             $this->{$primaryKey},
         );
     }
@@ -87,12 +87,13 @@ abstract class Model
 
     public function update(Database $database): ?PDOStatement
     {
+        $primaryKey = static::PRIMARY_KEY;
         $data = $this->asArray();
 
         return $database->update(
             static::TABLE,
             $this->asArray(),
-            Database::WHERE_ID_EQUALS,
+            "WHERE {$primaryKey}=?",
             $data[static::PRIMARY_KEY],
         );
     }
