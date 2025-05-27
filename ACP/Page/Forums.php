@@ -747,7 +747,7 @@ final readonly class Forums
                 : $this->page->success('Category saved');
         }
 
-        $categoryTitle = $category?->title
+        $categoryTitle = $category?->title !== '' && $category?->title !== '0'
             ? $this->textFormatting->blockhtml($category->title)
             : '';
 
