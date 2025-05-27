@@ -175,7 +175,7 @@ final class Page
 
         // Load Wrapper
         $this->template->load(
-            $skin->wrapper !== '' && $skin->wrapper !== '0'
+            $skin->wrapper !== ''
                 ? $this->domainDefinitions->getBoardPath() . '/Wrappers/' . $skin->wrapper . '.html'
                 : $themePath . '/wrappers.html',
         );
