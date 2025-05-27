@@ -6,6 +6,7 @@ namespace Jax\Page\Topic;
 
 use Jax\Config;
 use Jax\Database;
+use Jax\Models\Member;
 use Jax\Page;
 use Jax\Template;
 use Jax\User;
@@ -79,17 +80,10 @@ final readonly class Reactions
             return;
         }
 
-        $result = $this->database->select(
-            [
-                'id',
-                'display_name',
-                'group_id',
-            ],
-            'members',
-            Database::WHERE_ID_IN,
-            $members,
+        $mdata = keyBy(
+            Member::selectMany($this->database, Database::WHERE_ID_IN, $members),
+            static fn($member) => $member->id,
         );
-        $mdata = keyBy($this->database->arows($result), static fn($member) => $member['id']);
 
         unset($members);
         $niblets = $this->fetchRatingNiblets();
@@ -102,8 +96,8 @@ final readonly class Reactions
                 $page .= '<li>' . $this->template->meta(
                     'user-link',
                     $mid,
-                    $mdata[$mid]['group_id'],
-                    $mdata[$mid]['display_name'],
+                    $mdata[$mid]->group_id,
+                    $mdata[$mid]->display_name,
                 ) . '</li>';
             }
 

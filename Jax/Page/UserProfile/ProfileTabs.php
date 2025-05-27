@@ -6,6 +6,7 @@ namespace Jax\Page\UserProfile;
 
 use Jax\Database;
 use Jax\Date;
+use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
 use Jax\Template;
@@ -41,29 +42,27 @@ final readonly class ProfileTabs
     ) {}
 
     /**
-     * @param array<string,null|float|int|string> $profile
-     *
      * @return list{list<string>,string}
      */
-    public function render(array $profile): array
+    public function render(Member $member): array
     {
         $page = $this->request->both('page');
         $selectedTab = in_array($page, self::TABS, true) ? $page : 'activity';
 
         $tabHTML = match ($selectedTab) {
-            'posts' => $this->showTabPosts($profile),
-            'topics' => $this->showTabTopics($profile),
-            'about' => $this->showTabAbout($profile),
-            'friends' => $this->showTabFriends($profile),
-            'comments' => $this->comments->render($profile),
-            default => $this->activity->render($profile),
+            'posts' => $this->showTabPosts($member),
+            'topics' => $this->showTabTopics($member),
+            'about' => $this->showTabAbout($member),
+            'friends' => $this->showTabFriends($member),
+            'comments' => $this->comments->render($member),
+            default => $this->activity->render($member),
         };
 
         $tabs = array_map(
-            static function ($tab) use ($selectedTab, $profile): string {
+            static function ($tab) use ($selectedTab, $member): string {
                 $active = ($tab === $selectedTab ? ' class="active"' : '');
                 $uppercase = ucwords($tab);
-                $profileId = $profile['id'];
+                $profileId = $member->id;
 
                 return <<<HTML
                     <a href="?act=vu{$profileId}&page={$tab}" {$active}>{$uppercase}</a>
@@ -77,54 +76,35 @@ final readonly class ProfileTabs
         return [$tabs, $tabHTML];
     }
 
-    /**
-     * @param array<string,null|float|int|string> $profile
-     */
-    private function showTabAbout(array $profile): string
+    private function showTabAbout(Member $member): string
     {
         return $this->template->meta(
             'userprofile-about',
-            $this->textFormatting->theWorks((string) $profile['about']),
-            $this->textFormatting->theWorks((string) $profile['sig']),
+            $this->textFormatting->theWorks($member->about),
+            $this->textFormatting->theWorks($member->sig),
         );
     }
 
     /**
-     * @param array<string,null|float|int|string> $profile
-     *
-     * @return null|array<array<string,int|string>>
+     * @return array<Member>
      */
-    private function fetchFriends(array $profile): ?array
+    private function fetchFriends(Member $member): array
     {
-        if (!$profile['friends']) {
-            return null;
+        if ($member->friends === '' || $member->friends === '0') {
+            return [];
         }
 
-        $result = $this->database->select(
-            [
-                'avatar',
-                'id',
-                'display_name',
-                'group_id',
-                'usertitle',
-            ],
-            'members',
+        return Member::selectMany(
+            $this->database,
             Database::WHERE_ID_IN,
-            explode(',', (string) $profile['friends']),
+            explode(',', $member->friends),
         );
-        $friends = $this->database->arows($result);
-        $this->database->disposeresult($result);
-
-        return $friends;
     }
 
-    /**
-     * @param array<string,null|float|int|string> $profile
-     */
-    private function showTabFriends(array $profile): string
+    private function showTabFriends(Member $member): string
     {
-        $friends = $this->fetchFriends($profile);
-        if (!$friends) {
+        $friends = $this->fetchFriends($member);
+        if ($friends === []) {
             return "I'm pretty lonely, I have no friends. :(";
         }
 
@@ -132,13 +112,13 @@ final readonly class ProfileTabs
         foreach ($friends as $friend) {
             $tabHTML .= $this->template->meta(
                 'userprofile-friend',
-                $friend['id'],
-                $friend['avatar'] ?: $this->template->meta('default-avatar'),
+                $friend->id,
+                $friend->avatar ?: $this->template->meta('default-avatar'),
                 $this->template->meta(
                     'user-link',
-                    $friend['id'],
-                    $friend['group_id'],
-                    $friend['display_name'],
+                    $friend->id,
+                    $friend->group_id,
+                    $friend->display_name,
                 ),
             );
         }
@@ -146,10 +126,7 @@ final readonly class ProfileTabs
         return "<div class='contacts'>{$tabHTML}<br clear='all' /></div>";
     }
 
-    /**
-     * @param array<string,null|float|int|string> $profile
-     */
-    private function showTabTopics(array $profile): string
+    private function showTabTopics(Member $member): string
     {
         $tabHTML = '';
         $result = $this->database->special(
@@ -172,7 +149,7 @@ final readonly class ProfileTabs
                 LIMIT 10
                 SQL,
             ['posts', 'topics', 'forums'],
-            $profile['id'],
+            $member->id,
         );
         while ($post = $this->database->arow($result)) {
             $perms = $this->user->getForumPerms($post['perms']);
@@ -196,10 +173,7 @@ final readonly class ProfileTabs
         return $tabHTML;
     }
 
-    /**
-     * @param array<string,null|float|int|string> $profile
-     */
-    private function showTabPosts(array $profile): string
+    private function showTabPosts(Member $member): string
     {
         $tabHTML = '';
 
@@ -217,7 +191,7 @@ final readonly class ProfileTabs
                 LIMIT 10
                 SQL,
             ['posts', 'topics', 'forums'],
-            $profile['id'],
+            $member->id,
         );
         while ($post = $this->database->arow($result)) {
             $perms = $this->user->getForumPerms($post['perms']);

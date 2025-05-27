@@ -9,9 +9,13 @@ use ACP\Page\Forums\RecountStats;
 use Jax\Database;
 use Jax\ForumTree;
 use Jax\Jax;
+use Jax\Models\Category;
+use Jax\Models\Forum;
+use Jax\Models\Member;
 use Jax\Request;
 use Jax\TextFormatting;
 
+use function _\first;
 use function _\groupBy;
 use function _\keyBy;
 use function array_key_exists;
@@ -136,12 +140,11 @@ final readonly class Forums
         }
     }
 
-    /**
-     * @param array<string,mixed> $forum
-     */
-    private function printForumPermsTable(?array $forum): string
+    private function printForumPermsTable(?Forum $forum): string
     {
-        $perms = $forum ? $this->jax->parseForumPerms($forum['perms']) : null;
+        $perms = $forum !== null
+            ? $this->jax->parseForumPerms($forum->perms)
+            : null;
 
         $permsTable = '';
         foreach ($this->fetchAllGroups() as $group) {
@@ -194,8 +197,8 @@ final readonly class Forums
      * but it's just a potentially infinitely nested tree with
      * all of the keys being the forum ID.
      *
-     * @param array<int,array<int,int>|int>  $tree
-     * @param array<int,array<string,mixed>> $forums
+     * @param array<int,array<int,int>|int> $tree
+     * @param array<int,Forum>              $forums
      */
     private function printForumTree(
         array $tree,
@@ -207,8 +210,8 @@ final readonly class Forums
         foreach ($tree as $forumId => $subforums) {
             $forum = $forums[$forumId];
 
-            if ($forum['mods']) {
-                $modCount = count(explode(',', (string) $forum['mods']));
+            if ($forum->mods) {
+                $modCount = count(explode(',', (string) $forum->mods));
                 $mods = $this->page->parseTemplate(
                     'forums/order-forums-tree-item-mods.html',
                     [
@@ -234,8 +237,8 @@ final readonly class Forums
                         : '',
                     'id' => $forumId,
                     'mods' => $mods,
-                    'title' => $forum['title'],
-                    'trashcan' => $forum['trashcan']
+                    'title' => $forum->title,
+                    'trashcan' => $forum->trashcan
                         ? $this->page->parseTemplate('forums/order-forums-tree-item-trashcan.html')
                         : '',
                 ],
@@ -277,7 +280,7 @@ final readonly class Forums
         $forums = $this->fetchAllForums();
         $forumsByCategory = array_map(
             static fn($forums): ForumTree => new ForumTree($forums),
-            groupBy($forums, static fn($forum) => $forum['cat_id']),
+            groupBy($forums, static fn($forum) => $forum->cat_id),
         );
 
         $categories = $this->fetchAllCategories();
@@ -296,7 +299,7 @@ final readonly class Forums
                         )
                         : '',
                     'id' => "c_{$categoryId}",
-                    'title' => $category['title'],
+                    'title' => $category->title,
                     'trashcan' => '',
                     'mods' => '',
                 ],
@@ -328,6 +331,7 @@ final readonly class Forums
         $page = '';
         $forumperms = '';
         $forum = $fid !== 0 ? $this->fetchAllForums()[$fid] : null;
+
         $error = null;
 
         if ($this->request->post('tree') !== null) {
@@ -337,35 +341,53 @@ final readonly class Forums
         }
 
         // Remove mod from forum.
-        if (
-            is_numeric($this->request->both('rmod'))
-            && $forum && $forum['mods']
-        ) {
-            $exploded = explode(',', (string) $forum['mods']);
-            unset($exploded[array_search($this->request->both('rmod'), $exploded, true)]);
-            $forum['mods'] = implode(',', $exploded);
+        $rmod = (int) $this->request->asString->both('rmod');
+        if ($rmod && $forum) {
+            $exploded = explode(',', $forum->mods);
+            unset($exploded[array_search($rmod, $exploded, true)]);
+            $forum->mods = implode(',', $exploded);
             $this->database->update(
                 'forums',
                 [
-                    'mods' => $forum['mods'],
+                    'mods' => $forum->mods,
                 ],
                 Database::WHERE_ID_EQUALS,
                 $fid,
             );
             $this->updatePerForumModFlag();
-            $this->page->location('?act=Forums&edit=' . $fid);
+            $this->page->location('?act=Forums&do=edit&edit=' . $fid);
 
             return;
         }
 
         if ($this->request->post('submit') !== null) {
-            $write = $this->getFormData($forum);
-            $error = $this->upsertForum($forum, $write);
+            $forum = $this->applyFormData($forum);
+
+            // Add per-forum moderator.
+            $modId = (int) $this->request->asString->post('modid');
+            if ($modId !== 0) {
+                $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $modId);
+                if ($member !== null) {
+                    $mods = $forum->mods !== ''
+                        ? explode(',', $forum->mods)
+                        : [];
+                    if (!in_array($modId, $mods)) {
+                        $forum->mods = $forum->mods !== ''
+                            ? $forum->mods . ',' . $modId
+                            : (string) $modId;
+                    }
+
+                    $this->updatePerForumModFlag();
+                } else {
+                    $error = "You tried to add a moderator that doesn't exist!";
+                }
+            }
+
+            $error = $this->upsertForum($forum);
             if ($error !== null) {
                 $page .= $this->page->error($error);
             } else {
                 $page .= $this->page->success('Forum saved.');
-                $forum = $write;
             }
         }
 
@@ -385,7 +407,7 @@ final readonly class Forums
                 'select-option.html',
                 [
                     'label' => $label,
-                    'selected' => $forum && $value === $forum['show_sub'] ? 'selected="selected"' : '',
+                    'selected' => $value === $forum?->show_sub ? 'selected="selected"' : '',
                     'value' => $value,
                 ],
             );
@@ -405,7 +427,7 @@ final readonly class Forums
                 'select-option.html',
                 [
                     'label' => $label,
-                    'selected' => $forum && $value === $forum['orderby']
+                    'selected' => $forum && $value === $forum->orderby
                         ? 'selected="selected"' : '',
                     'value' => $value,
                 ],
@@ -416,32 +438,31 @@ final readonly class Forums
         $page .= $this->page->parseTemplate(
             'forums/create-forum.html',
             [
-                'description' => $forum ? $this->textFormatting->blockhtml($forum['subtitle']) : '',
-                'no_count' => $forum && $forum['nocount']
+                'description' => $forum ? $this->textFormatting->blockhtml($forum->subtitle) : '',
+                'count' => $forum?->nocount
                     ? '' : ' checked="checked"',
                 'order_by_options' => $orderByOptions,
-                'redirect_url' => $forum ? $this->textFormatting->blockhtml($forum['redirect']) : '',
+                'redirect_url' => $forum ? $this->textFormatting->blockhtml($forum->redirect) : '',
                 'subforum_options' => $subforumOptions,
-                'title' => $forum ? $this->textFormatting->blockhtml($forum['title']) : '',
-                'trashcan' => $forum && $forum['trashcan']
+                'title' => $forum ? $this->textFormatting->blockhtml($forum->title) : '',
+                'trashcan' => $forum?->trashcan
                     ? ' checked="checked"' : '',
             ],
         );
 
-        if ($forum && $forum['mods']) {
-            $result = $this->database->select(
-                ['display_name', 'id'],
-                'members',
+        if ($forum?->mods) {
+            $members = Member::selectMany(
+                $this->database,
                 Database::WHERE_ID_IN,
-                explode(',', (string) $forum['mods']),
+                explode(',', (string) $forum->mods),
             );
             $modList = '';
-            while ($member = $this->database->arow($result)) {
+            foreach ($members as $member) {
                 $modList .= $this->page->parseTemplate(
                     'forums/create-forum-moderators-mod.html',
                     [
-                        'delete_link' => '?act=Forums&edit=' . $fid . '&rmod=' . $member['id'],
-                        'username' => $member['display_name'],
+                        'delete_link' => '?act=Forums&do=edit&edit=' . $fid . '&rmod=' . $member->id,
+                        'username' => $member->display_name,
                     ],
                 );
             }
@@ -453,7 +474,7 @@ final readonly class Forums
             'forums/create-forum-moderators.html',
             [
                 'mod_list' => $modList,
-                'show_ledby' => $forum && $forum['show_ledby']
+                'show_ledby' => $forum?->show_ledby
                     ? 'checked="checked"' : '',
             ],
         );
@@ -468,7 +489,7 @@ final readonly class Forums
 
         $this->page->addContentBox(
             ($forum ? 'Edit' : 'Create') . ' Forum'
-                . ($forum ? ' - ' . $this->textFormatting->blockhtml($forum['title']) : ''),
+                . ($forum ? ' - ' . $this->textFormatting->blockhtml($forum->title) : ''),
             $page,
         );
         $this->page->addContentBox('Moderators', $moderators);
@@ -476,78 +497,43 @@ final readonly class Forums
     }
 
     /**
-     * @param array<string,mixed> $oldForumData
-     * @param array<string,mixed> $write
-     *
      * @return string Error on failure, null on success
      */
-    private function upsertForum(?array $oldForumData, array $write): ?string
+    private function upsertForum(Forum $forum): ?string
     {
-        $error = null;
-
-        // Add per-forum moderator.
-        $modId = (int) $this->request->asString->post('modid');
-        if ($modId !== 0) {
-            $result = $this->database->select(
-                ['id'],
-                'members',
-                Database::WHERE_ID_EQUALS,
-                $modId,
-            );
-            if ($this->database->arow($result)) {
-                if (!in_array($modId, isset($oldForumData['mods']) ? explode(',', (string) $oldForumData['mods']) : [])) {
-                    $write['mods'] = isset($oldForumData['mods'])
-                        && $oldForumData['mods']
-                        ? $oldForumData['mods'] . ',' . $modId
-                        : $modId;
-                }
-            } else {
-                $error = "You tried to add a moderator that doesn't exist!";
-            }
-
-            $this->database->disposeresult($result);
+        if ($forum->title === '') {
+            return 'Forum title is required';
         }
 
-        if (!$write['title']) {
-            $error = 'Forum title is required';
-        }
-
-        if ($error === null) {
-            // Clear trashcan on other forums.
-            if (
-                $write['trashcan']
-            ) {
-                $this->database->update(
-                    'forums',
-                    [
-                        'trashcan' => 0,
-                    ],
-                );
-            }
-
-            if (!$oldForumData) {
-                $this->database->insert(
-                    'forums',
-                    $write,
-                );
-
-                $this->orderForums((int) $this->database->insertId());
-
-                return null;
-            }
-
+        // Clear trashcan on other forums.
+        if ($forum->trashcan !== 0) {
             $this->database->update(
                 'forums',
-                $write,
-                Database::WHERE_ID_EQUALS,
-                $oldForumData['id'],
+                [
+                    'trashcan' => 0,
+                ],
             );
-            if ($this->request->post('modid')) {
-                $this->updatePerForumModFlag();
-            }
         }
 
-        return $error;
+        if ($forum->id === 0) {
+            $this->database->insert(
+                'forums',
+                $forum->asArray(),
+            );
+
+            $this->orderForums((int) $this->database->insertId());
+
+            return null;
+        }
+
+        $this->database->update(
+            'forums',
+            $forum->asArray(),
+            Database::WHERE_ID_EQUALS,
+            $forum->id,
+        );
+
+        return null;
     }
 
     private function serializePermsFromInput(): string
@@ -575,44 +561,28 @@ final readonly class Forums
         return $this->jax->serializeForumPerms($groupPerms);
     }
 
-    /**
-     * @param array<string,mixed> $forum
-     *
-     * @return array<string,mixed>
-     */
-    private function getFormData(?array $forum): array
+    private function applyFormData(?Forum $forum): Forum
     {
         $sub = (int) $this->request->post('show_sub');
         $orderby = (int) $this->request->post('orderby');
 
         $categories = $this->fetchAllCategories();
 
-        // Defaults for new forum
-        $forum ??= [
-            'cat_id' => $categories[0]['id'],
-            'mods' => null,
-        ];
+        $forum->cat_id = $forum?->cat_id ?? first($categories)->id;
+        $forum->mods = $forum?->mods ?? '';
+        $forum->nocount = $this->request->asString->post('count') ? 0 : 1;
+        $forum->orderby = $orderby > 0 && $orderby <= 5 ? $orderby : 0;
+        $forum->perms = $this->serializePermsFromInput();
+        $forum->redirect = $this->request->asString->post('redirect');
+        $forum->show_ledby = $this->request->asString->post('show_ledby')
+            ? 1
+            : 0;
+        $forum->show_sub = $sub === 1 || $sub === 2 ? $sub : 0;
+        $forum->subtitle = $this->request->asString->post('description');
+        $forum->title = $this->request->asString->post('title');
+        $forum->trashcan = $this->request->asString->post('trashcan') ? 1 : 0;
 
-        // This is a weird state where they're trying to add a forum
-        // with no categories defined. It needs better handling than this.
-        // But is clearly an edge case.
-        if ($categories === []) {
-            return [];
-        }
-
-        return [
-            'cat_id' => $forum['cat_id'],
-            'mods' => $forum['mods'],
-            'nocount' => $this->request->asString->post('nocount') ? 1 : 0,
-            'orderby' => $orderby > 0 && $orderby <= 5 ? $orderby : 0,
-            'perms' => $this->serializePermsFromInput(),
-            'redirect' => $this->request->asString->post('redirect'),
-            'show_ledby' => $this->request->asString->post('show_ledby') ? 1 : 0,
-            'show_sub' => $sub === 1 || $sub === 2 ? $sub : 0,
-            'subtitle' => $this->request->asString->post('description'),
-            'title' => $this->request->asString->post('title'),
-            'trashcan' => $this->request->asString->post('trashcan') ? 1 : 0,
-        ];
+        return $forum;
     }
 
     private function deleteForum(int $forumId): void
@@ -698,9 +668,9 @@ final readonly class Forums
             $forumOptions .= $this->page->parseTemplate(
                 'select-option.html',
                 [
-                    'label' => $forum['title'],
+                    'label' => $forum->title,
                     'selected' => '',
-                    'value' => $forum['id'],
+                    'value' => $forum->id,
                 ],
             );
         }
@@ -717,7 +687,7 @@ final readonly class Forums
         }
 
         $this->page->addContentBox(
-            'Deleting Forum: ' . $forum['title'],
+            'Deleting Forum: ' . $forum->title,
             $this->page->parseTemplate(
                 'forums/delete-forum.html',
                 [
@@ -736,14 +706,7 @@ final readonly class Forums
         }
 
         if ($cid) {
-            $result = $this->database->select(
-                ['id', 'title'],
-                'categories',
-                Database::WHERE_ID_EQUALS,
-                $cid,
-            );
-            $cdata = $this->database->arow($result);
-            $this->database->disposeresult($result);
+            $cdata = Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $cid);
         }
 
         $categoryName = $this->request->asString->post('cat_name');
@@ -845,7 +808,7 @@ final readonly class Forums
                 $categoryOptions .= $this->page->parseTemplate(
                     'select-option.html',
                     [
-                        'label' => $category['title'],
+                        'label' => $category->title,
                         'selected' => '',
                         'value' => '' . $categoryId,
                     ],
@@ -864,52 +827,23 @@ final readonly class Forums
     }
 
     /**
-     * @return array<array<string,mixed>>
+     * @return array<Category>
      */
     private function fetchAllCategories(): array
     {
-        $result = $this->database->select(
-            [
-                'id',
-                'title',
-                '`order`',
-            ],
-            'categories',
-            'ORDER BY `order`,`id` ASC',
-        );
+        $categories = Category::selectMany($this->database, 'ORDER BY `order`,`id` ASC');
 
-        return keyBy($this->database->arows($result), static fn($category) => $category['id']);
+        return keyBy($categories, static fn($category) => $category->id);
     }
 
     /**
-     * @return array<array<string,mixed>>
+     * @return array<Forum>
      */
     private function fetchAllForums(): array
     {
-        $result = $this->database->select(
-            [
-                'id',
-                'cat_id',
-                'title',
-                'subtitle',
-                'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
-                'path',
-                'show_sub',
-                'redirect',
-                '`order`',
-                'perms',
-                'orderby',
-                'nocount',
-                'redirects',
-                'trashcan',
-                'mods',
-                'show_ledby',
-            ],
-            'forums',
-            'ORDER BY `order`,`title`',
-        );
+        $forums = Forum::selectMany($this->database, 'ORDER BY `order`,`title`');
 
-        return keyBy($this->database->arows($result), static fn($forum) => $forum['id']);
+        return keyBy($forums, static fn($forum) => $forum->id);
     }
 
     /**
@@ -973,7 +907,7 @@ final readonly class Forums
 
         $mods = [];
         foreach ($this->fetchAllForums() as $forum) {
-            foreach (explode(',', (string) $forum['mods']) as $modId) {
+            foreach (explode(',', (string) $forum->mods) as $modId) {
                 if ($modId === '') {
                     continue;
                 }

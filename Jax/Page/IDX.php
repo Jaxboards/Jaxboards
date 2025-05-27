@@ -9,6 +9,7 @@ use Jax\Config;
 use Jax\Database;
 use Jax\Date;
 use Jax\Jax;
+use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
@@ -253,18 +254,13 @@ final class IDX
 
         if (!$moderatorinfo) {
             $moderatorinfo = [];
-            $result = $this->database->select(
-                ['id', 'display_name', 'group_id'],
-                'members',
-                Database::WHERE_ID_IN,
-                $this->mods,
-            );
-            while ($member = $this->database->arow($result)) {
-                $moderatorinfo[$member['id']] = $this->template->meta(
+            $members = Member::selectMany($this->database, Database::WHERE_ID_IN, $this->mods);
+            foreach ($members as $member) {
+                $moderatorinfo[$member->id] = $this->template->meta(
                     'user-link',
-                    $member['id'],
-                    $member['group_id'],
-                    $member['display_name'],
+                    $member->id,
+                    $member->group_id,
+                    $member->display_name,
                 );
             }
         }

@@ -12,6 +12,7 @@ use Jax\IPAddress;
 use Jax\Jax;
 use Jax\ModControls\ModPosts;
 use Jax\ModControls\ModTopics;
+use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
@@ -20,7 +21,6 @@ use Jax\TextFormatting;
 use Jax\User;
 
 use function array_map;
-use function array_shift;
 use function count;
 use function file_get_contents;
 use function file_put_contents;
@@ -184,15 +184,6 @@ final readonly class ModControls
     private function editMember(): string
     {
         $page = '';
-        $memberFields = [
-            'group_id',
-            'id',
-            'display_name',
-            'avatar',
-            'full_name',
-            'about',
-            'sig',
-        ];
 
         $member = null;
 
@@ -207,29 +198,20 @@ final readonly class ModControls
 
         // Get the member data.
         if ($memberId !== 0) {
-            $result = $this->database->select(
-                $memberFields,
-                'members',
-                Database::WHERE_ID_EQUALS,
-                $memberId,
-            );
-            $member = $this->database->arow($result);
-            $this->database->disposeresult($result);
+            $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $memberId);
         } elseif (!$memberName) {
             return $this->template->meta('error', 'Member name is a required field.');
         } else {
-            $result = $this->database->select(
-                $memberFields,
-                'members',
+            $members = Member::selectMany(
+                $this->database,
                 'WHERE `display_name` LIKE ?',
                 $memberName . '%',
             );
-            $members = $this->database->arows($result);
             if (count($members) > 1) {
                 return $this->template->meta('error', 'Many users found!');
             }
 
-            $member = array_shift($members);
+            $member = $members[0];
         }
 
         if (!$member) {
@@ -238,9 +220,9 @@ final readonly class ModControls
 
         if (
             $this->user->get('group_id') !== 2
-            || $member['group_id'] === 2
+            || $member->group_id === 2
             && ($this->user->get('id') !== 1
-                && $member['id'] !== $this->user->get('id'))
+                && $member->id !== $this->user->get('id'))
         ) {
             return $this->template->meta('error', 'You do not have permission to edit this profile.');
         }
@@ -249,7 +231,7 @@ final readonly class ModControls
             [
                 'act' => 'modcontrols',
                 'do' => 'emem',
-                'mid' => $member['id'],
+                'mid' => $member->id,
                 'submit' => 'save',
             ],
         );
@@ -274,19 +256,19 @@ final readonly class ModControls
                         HTML;
                 },
                 [
-                    ['Display Name', 'display_name', $member['display_name'], 'text'],
-                    ['Avatar', 'avatar', $member['avatar'], 'text'],
-                    ['Full Name', 'full_name', $member['full_name'], 'text'],
+                    ['Display Name', 'display_name', $member->display_name, 'text'],
+                    ['Avatar', 'avatar', $member->avatar, 'text'],
+                    ['Full Name', 'full_name', $member->full_name, 'text'],
                     [
                         'About',
                         'about',
-                        $this->textFormatting->blockhtml($member['about']),
+                        $this->textFormatting->blockhtml($member->about),
                         'textarea',
                     ],
                     [
                         'Signature',
                         'signature',
-                        $this->textFormatting->blockhtml($member['sig']),
+                        $this->textFormatting->blockhtml($member->sig),
                         'textarea',
                     ],
                 ],

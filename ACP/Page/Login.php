@@ -8,6 +8,7 @@ use ACP\Page;
 use Jax\Config;
 use Jax\Database;
 use Jax\DomainDefinitions;
+use Jax\Models\Member;
 use Jax\Request;
 use Jax\Session;
 use Jax\User;
@@ -41,17 +42,10 @@ final readonly class Login
             $user = $this->request->asString->post('user');
             $password = $this->request->asString->post('pass');
 
-            $result = $this->database->select(
-                ['id'],
-                'members',
-                'WHERE `name`=?',
-                $user,
-            );
-            $member = $this->database->arow($result);
-            $user = $member
-                ? $this->user->getUser($member['id'], $password)
+            $member = Member::selectOne($this->database, 'WHERE `name`=?', $user);
+            $user = $member !== null
+                ? $this->user->getUser($member->id, $password)
                 : null;
-            $this->database->disposeresult($result);
 
             $error = match (true) {
                 $user === null => 'The username/password supplied was incorrect',

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use Generator;
+use Jax\Models\Forum;
 
 use function array_filter;
 use function array_key_exists;
@@ -21,7 +22,7 @@ final class ForumTree
     /**
      * Given all forum records, generates a full subforum tree (from forum paths).
      *
-     * @param array<array<string,mixed>> $forums
+     * @param array<Forum> $forums
      */
     public function __construct($forums)
     {
@@ -61,16 +62,14 @@ final class ForumTree
     }
 
     /**
-     * @param array<string,mixed> $forum
-     *
      * @psalm-suppress UnsupportedPropertyReferenceUsage
      */
-    private function addForum(array $forum): void
+    private function addForum(Forum $forum): void
     {
         $path = array_filter(
             array_map(
                 static fn($pathId): int => (int) $pathId,
-                explode(' ', (string) $forum['path']),
+                explode(' ', $forum->path),
             ),
             static fn($pathId): bool => (bool) $pathId,
         );
@@ -87,6 +86,6 @@ final class ForumTree
             $node = &$node[$pathId];
         }
 
-        $node[$forum['id']] = [];
+        $node[$forum->id] = [];
     }
 }
