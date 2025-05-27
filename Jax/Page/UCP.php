@@ -615,41 +615,47 @@ final readonly class UCP
         );
     }
 
+    private function saveBoardSettings(): ?string
+    {
+        $skinId = (int) $this->request->asString->both('skin');
+
+        $skin = Skin::selectOne(
+            $this->database,
+            Database::WHERE_ID_EQUALS,
+            $skinId,
+        );
+
+        if ($skin === null) {
+            return 'The skin chosen no longer exists.';
+        }
+
+        $this->user->setBulk([
+            'nowordfilter' => $this->request->post('usewordfilter') ? 0 : 1,
+            'skin_id' => $skinId,
+            'wysiwyg' => $this->request->post('wysiwyg') ? 1 : 0,
+        ]);
+
+        if ($this->request->isJSAccess()) {
+            $this->page->command('reload');
+
+            return null;
+        }
+
+        header('Location: ?act=ucp&what=board');
+
+        return null;
+    }
+
     private function showBoardSettings(): ?string
     {
         $error = null;
         $skinId = $this->user->get('skin_id');
         $page = '';
-        $skinId = (int) $this->request->asString->both('skin');
-        if ($skinId !== 0) {
-            $skin = Skin::selectOne(
-                $this->database,
-                Database::WHERE_ID_EQUALS,
-                $skinId,
-            );
-            if ($skin === null) {
-                $error = 'The skin chosen no longer exists.';
-            } else {
-                $this->user->setBulk([
-                    'nowordfilter' => $this->request->post('usewordfilter') ? 0 : 1,
-                    'skin_id' => $skinId,
-                    'wysiwyg' => $this->request->post('wysiwyg') ? 1 : 0,
-                ]);
+        if ($this->request->both('skin') !== null) {
+            $error = $this->saveBoardSettings();
+            if ($error) {
+                $page .= $this->template->meta('error', $error);
             }
-
-            if ($error === null) {
-                if ($this->request->isJSAccess()) {
-                    $this->page->command('reload');
-
-                    return null;
-                }
-
-                header('Location: ?act=ucp&what=board');
-
-                return null;
-            }
-
-            $page .= $this->template->meta('error', $error);
         }
 
         $skins = $this->user->get('group_id') !== 2
