@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use PDO;
+use PDOStatement;
 
 use function array_map;
 
@@ -13,6 +14,8 @@ abstract class Model
     public const FIELDS = [];
 
     public const TABLE = '';
+
+    public const PRIMARY_KEY = 'id';
 
     /**
      * @param mixed $args
@@ -50,6 +53,33 @@ abstract class Model
         );
 
         return $stmt?->fetchAll(PDO::FETCH_CLASS, static::class) ?? [];
+    }
+
+    public function update(Database $database): ?PDOStatement
+    {
+        $data = $this->asArray();
+        return $database->update(
+            $this::TABLE,
+            $this->asArray(),
+            Database::WHERE_ID_EQUALS,
+            $data[$this::PRIMARY_KEY]
+        );
+    }
+
+    public function insert(Database $database): ?PDOStatement
+    {
+        $statement = $database->insert($this::TABLE, $this->asArray());
+        $this->{$this::PRIMARY_KEY} = (int) $database->insertId();
+        return $statement;
+    }
+
+    public function upsert(Database $database): ?PDOStatement
+    {
+        if ($this->{$this::PRIMARY_KEY}) {
+            return $this->update($database);
+        }
+
+        return $this->insert($database);
     }
 
     /**

@@ -516,23 +516,11 @@ final readonly class Forums
             );
         }
 
-        if ($forum->id === 0) {
-            $this->database->insert(
-                'forums',
-                $forum->asArray(),
-            );
-
-            $this->orderForums((int) $this->database->insertId());
-
-            return null;
+        $isNewForum = $forum->id === 0;
+        $forum->upsert($this->database);
+        if ($isNewForum) {
+            $this->orderForums($forum->id);
         }
-
-        $this->database->update(
-            'forums',
-            $forum->asArray(),
-            Database::WHERE_ID_EQUALS,
-            $forum->id,
-        );
 
         return null;
     }
@@ -712,12 +700,7 @@ final readonly class Forums
         $category->title = $categoryName;
 
         if ($category->id !== 0) {
-            $this->database->update(
-                'categories',
-                $category->asArray(),
-                Database::WHERE_ID_EQUALS,
-                $category->id,
-            );
+            $category->update($this->database);
 
             return null;
         }

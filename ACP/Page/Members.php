@@ -262,12 +262,7 @@ final readonly class Members
             $member->group_id = Groups::Admin->value;
         }
 
-        $this->database->update(
-            'members',
-            $member->asArray(),
-            Database::WHERE_ID_EQUALS,
-            $member->id,
-        );
+        $member->update($this->database);
 
         return $this->page->success('Profile data saved');
     }
@@ -306,7 +301,8 @@ final readonly class Members
             $password,
             PASSWORD_DEFAULT,
         );
-        $result = $this->database->insert('members', $member->asArray());
+
+        $result = $member->insert($this->database);
 
         if ($this->database->affectedRows($result) === 0) {
             return 'An error occurred while processing your request. ';
