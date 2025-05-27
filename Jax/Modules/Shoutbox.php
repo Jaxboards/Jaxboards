@@ -84,13 +84,17 @@ final class Shoutbox
     public function canDelete(?array $shout = null): bool
     {
         $candelete = (bool) $this->user->getPerm('can_delete_shouts');
-        if (!$candelete && $this->user->getPerm('can_delete_own_shouts')) {
-            if (
-                isset($shout['uid'])
-                && $shout['uid'] === $this->user->get('id')
-            ) {
-                return true;
-            }
+        if ($candelete) {
+            return $candelete;
+        }
+        if (!$this->user->getPerm('can_delete_own_shouts')) {
+            return $candelete;
+        }
+        if (
+            isset($shout['uid'])
+            && $shout['uid'] === $this->user->get('id')
+        ) {
+            return true;
         }
 
         return $candelete;

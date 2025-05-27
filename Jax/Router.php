@@ -131,7 +131,7 @@ final class Router
     {
         $page = ModelsPage::selectOne($this->database, 'WHERE `act`=?', $action);
 
-        if ($page) {
+        if ($page !== null) {
             $bbCode = $this->container->get(BBCode::class);
             $pageContents = $bbCode->toHTML($page->page);
             $this->page->append('PAGE', $pageContents);

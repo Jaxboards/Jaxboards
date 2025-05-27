@@ -19,8 +19,12 @@ final class Shout extends Model
     ];
 
     public int $id = 0;
+
     public int $uid = 0;
+
     public string $shout = '';
+
     public string $date = '';
+
     public string $ip = '';
 }
