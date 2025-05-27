@@ -19,7 +19,6 @@ final class User
 {
     /**
      * @param null|array<array-key,mixed> $userData
-     * @param null|Group $userPerms
      */
     public function __construct(
         private readonly Database $database,
@@ -163,7 +162,7 @@ final class User
         $group = Group::selectOne(
             $this->database,
             Database::WHERE_ID_EQUALS,
-            $groupId ?? Groups::Guest->value
+            $groupId ?? Groups::Guest->value,
         );
         $this->userPerms = $group;
 
