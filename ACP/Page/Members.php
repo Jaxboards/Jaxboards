@@ -159,7 +159,7 @@ final readonly class Members
             ) {
                 $page = $this->page->error('You do not have permission to edit this profile. ');
             } else {
-                $page .= $this->jax->hiddenFormFields(['mid' => $member->id]);
+                $page .= $this->jax->hiddenFormFields(['mid' => (string) $member->id]);
                 $page .= $this->inputText('Display Name:', 'display_name', $member->display_name);
                 $page .= $this->inputText('Username:', 'name', $member->name);
                 $page .= $this->inputText('Real Name:', 'full_name', $member->full_name);
@@ -457,7 +457,7 @@ final readonly class Members
 
         // Sum post count on account being merged into.
         $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid1);
-        $posts = $member?->posts ?? 0;
+        $posts = $member->posts ?? 0;
 
         $this->database->special(
             'UPDATE %t SET `posts` = `posts` + ? WHERE `id`=?',
@@ -631,7 +631,7 @@ final readonly class Members
                     'message' => $message,
                     'read' => 0,
                     'title' => $title,
-                    'to' => $member['id'],
+                    'to' => $member->id,
                 ],
             );
             ++$num;
