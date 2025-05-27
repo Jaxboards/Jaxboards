@@ -84,7 +84,7 @@ abstract class Model
     {
         $primaryKey = static::PRIMARY_KEY;
         $reflectionProperty = new ReflectionProperty(static::class, $primaryKey);
-        $type = $reflectionProperty->getType()?->getName();
+        $type = (string) $reflectionProperty->getType();
         $statement = $database->insert(static::TABLE, $this->asArray());
         $insertId = $database->insertId();
 
