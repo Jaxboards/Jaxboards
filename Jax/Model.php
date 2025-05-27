@@ -17,8 +17,6 @@ abstract class Model
 
     public const PRIMARY_KEY = 'id';
 
-    public $PRIMARY_KEY;
-
     /**
      * @param mixed $args
      */
