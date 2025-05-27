@@ -87,9 +87,11 @@ final class Shoutbox
         if ($candelete) {
             return $candelete;
         }
+
         if (!$this->user->getPerm('can_delete_own_shouts')) {
             return $candelete;
         }
+
         if (
             isset($shout['uid'])
             && $shout['uid'] === $this->user->get('id')
