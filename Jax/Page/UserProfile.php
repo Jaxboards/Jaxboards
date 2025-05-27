@@ -20,7 +20,6 @@ use function array_map;
 use function explode;
 use function implode;
 use function in_array;
-use function is_string;
 use function preg_match;
 use function ucfirst;
 

@@ -710,13 +710,14 @@ final readonly class Forums
 
         $category->title = $categoryName;
 
-        if ($category->id) {
+        if ($category->id !== 0) {
             $this->database->update(
                 'categories',
                 $category->asArray(),
                 Database::WHERE_ID_EQUALS,
                 $category->id,
             );
+
             return null;
         }
 
@@ -734,7 +735,7 @@ final readonly class Forums
         $page = '';
         $cid = $cid ?: (int) $this->request->asString->post('cat_id');
 
-        $category = $cid
+        $category = $cid !== 0
             ? Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $cid)
             : new Category();
 
@@ -750,12 +751,12 @@ final readonly class Forums
             : '';
 
         $this->page->addContentBox(
-            ($category ? 'Edit' : 'Create') . ' Category',
+            ($category !== null ? 'Edit' : 'Create') . ' Category',
             $page . $this->page->parseTemplate(
                 'forums/create-category.html',
                 [
                     'id' => $category?->id,
-                    'submit' => $category ? 'Edit' : 'Create',
+                    'submit' => $category !== null ? 'Edit' : 'Create',
                     'title' => $categoryTitle,
                 ],
             ),
