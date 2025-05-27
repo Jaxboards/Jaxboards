@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use Jax\Models\Skin;
+
 use function array_merge;
 use function explode;
 use function header;
@@ -145,8 +147,8 @@ final class Page
     {
         $skin = $this->getSelectedSkin($skinId);
 
-        $themePath = ($skin['custom'] ? $this->domainDefinitions->getBoardPath() : '') . '/Themes/' . $skin['title'];
-        $themeUrl = ($skin['custom'] ? $this->domainDefinitions->getBoardPathUrl() : '') . '/Themes/' . $skin['title'];
+        $themePath = ($skin->custom ? $this->domainDefinitions->getBoardPath() : '') . '/Themes/' . $skin->title;
+        $themeUrl = ($skin->custom ? $this->domainDefinitions->getBoardPathUrl() : '') . '/Themes/' . $skin->title;
 
         // Custom theme found but files not there, also fallback to default
         if (!is_dir($themePath)) {
@@ -173,8 +175,8 @@ final class Page
 
         // Load Wrapper
         $this->template->load(
-            $skin['wrapper']
-                ? $this->domainDefinitions->getBoardPath() . '/Wrappers/' . $skin['wrapper'] . '.html'
+            $skin->wrapper
+                ? $this->domainDefinitions->getBoardPath() . '/Wrappers/' . $skin->wrapper . '.html'
                 : $themePath . '/wrappers.html',
         );
     }
@@ -197,42 +199,22 @@ final class Page
      * Gets the user selected skin.
      * If not available, gets the board default.
      * If THAT isn't available, get jaxboards default skin.
-     *
-     * @return array<string,mixed>
      */
-    private function getSelectedSkin(?int $skinId): array
+    private function getSelectedSkin(?int $skinId): Skin
     {
-        $skin = null;
-        if ($skinId) {
-            $result = $this->database->select(
-                ['title', 'custom', 'wrapper'],
-                'skins',
-                'WHERE id=? LIMIT 1',
-                $skinId,
-            );
-            $skin = $this->database->arow($result);
-            $this->database->disposeresult($result);
-        }
+        $skin = $skinId
+            ? Skin::selectOne($this->database, Database::WHERE_ID_EQUALS, $skinId)
+            : null;
 
         // Couldn't find custom skin, get the default
-        if ($skin === null) {
-            $result = $this->database->select(
-                ['title', 'custom', 'wrapper'],
-                'skins',
-                'WHERE `default`=1 LIMIT 1',
-            );
-            $skin = $this->database->arow($result);
-            $this->database->disposeresult($result);
-        }
+        $skin ??= Skin::selectOne($this->database, 'WHERE `default`=1 LIMIT 1');
 
         // We've exhausted all other ways of finding the right skin
         // Fallback to default
         if ($skin === null) {
-            return [
-                'custom' => 0,
-                'title' => 'Default',
-                'wrapper' => false,
-            ];
+            $skin = new Skin();
+            $skin->title = 'Default';
+            $skin->wrapper = '';
         }
 
         return $skin;

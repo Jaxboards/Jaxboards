@@ -8,6 +8,7 @@ use ACP\Page;
 use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\FileUtils;
+use Jax\Models\Skin;
 use Jax\Request;
 use Jax\TextFormatting;
 
@@ -79,25 +80,11 @@ final readonly class Themes
     /**
      * Get skins from database.
      *
-     * @return array<array<string,mixed>>
+     * @return array<Skin>
      */
     private function getSkins(): array
     {
-        $result = $this->database->select(
-            [
-                'id',
-                '`using`',
-                'title',
-                'custom',
-                'wrapper',
-                '`default`',
-                'hidden',
-            ],
-            'skins',
-            'ORDER BY title ASC',
-        );
-
-        return $this->database->arows($result);
+        return Skin::selectMany($this->database, 'ORDER BY title ASC');
     }
 
     /**
@@ -325,14 +312,14 @@ final readonly class Themes
         $skins = '';
         $wrappers = $this->getWrappers();
 
-        foreach ($this->getSkins() as $f) {
+        foreach ($this->getSkins() as $skin) {
             $wrapperOptions = '';
             foreach ($wrappers as $wrapper) {
                 $wrapperOptions .= $this->page->parseTemplate(
                     'select-option.html',
                     [
                         'label' => $wrapper,
-                        'selected' => $wrapper === $f['wrapper']
+                        'selected' => $wrapper === $skin->wrapper
                             ? 'selected="selected"' : '',
                         'value' => $wrapper,
                     ],
@@ -342,12 +329,12 @@ final readonly class Themes
             $skins .= $this->page->parseTemplate(
                 'themes/show-skin-index-css-row.html',
                 [
-                    'custom' => $f['custom']
+                    'custom' => $skin->custom
                         ? $this->page->parseTemplate(
                             'themes/show-skin-index-css-row-custom.html',
                         ) : '',
-                    'default_checked' => $f['default'] ? "checked='checked'" : '',
-                    'default_option' => $f['custom'] ? '' : $this->page->parseTemplate(
+                    'default_checked' => $skin->default ? "checked='checked'" : '',
+                    'default_option' => $skin->custom ? '' : $this->page->parseTemplate(
                         'select-option.html',
                         [
                             'label' => 'Skin Default',
@@ -355,20 +342,20 @@ final readonly class Themes
                             'value' => '',
                         ],
                     ),
-                    'delete' => $f['custom'] ? $this->page->parseTemplate(
+                    'delete' => $skin->custom ? $this->page->parseTemplate(
                         'themes/show-skin-index-css-row-delete.html',
                         [
-                            'id' => $f['id'],
+                            'id' => $skin->id,
                         ],
                     ) : '',
-                    'hidden_checked' => $f['hidden'] ? 'checked="checked"' : '',
-                    'id' => $f['id'],
-                    'title' => $f['title'],
-                    'view_or_edit' => $f['custom'] ? 'Edit' : 'View',
+                    'hidden_checked' => $skin->hidden ? 'checked="checked"' : '',
+                    'id' => $skin->id,
+                    'title' => $skin->title,
+                    'view_or_edit' => $skin->custom ? 'Edit' : 'View',
                     'wrapper_options' => $wrapperOptions,
                 ],
             );
-            $usedwrappers[] = $f['wrapper'];
+            $usedwrappers[] = $skin->wrapper;
         }
 
         $skins = $this->page->parseTemplate(
@@ -414,22 +401,7 @@ final readonly class Themes
 
     private function editCSS(int $id): void
     {
-        $result = $this->database->select(
-            [
-                'id',
-                '`using`',
-                'title',
-                'custom',
-                'wrapper',
-                '`default`',
-                'hidden',
-            ],
-            'skins',
-            Database::WHERE_ID_EQUALS,
-            $id,
-        );
-        $skin = $this->database->arow($result);
-        $this->database->disposeresult($result);
+        $skin = Skin::selectOne($this->database, Database::WHERE_ID_EQUALS, $id);
 
         if (!$skin) {
             $this->page->addContentBox('Error', "Skin id {$id} not found");
@@ -438,27 +410,27 @@ final readonly class Themes
         }
 
         $newSkinData = $this->request->asString->post('newskindata');
-        if ($skin['custom'] && $newSkinData) {
+        if ($skin->custom && $newSkinData) {
             file_put_contents(
-                $this->themesPath . $skin['title'] . '/css.css',
+                $this->themesPath . $skin->title . '/css.css',
                 $newSkinData,
             );
         }
 
         $this->page->addContentBox(
-            ($skin['custom'] ? 'Editing' : 'Viewing') . ' Skin: ' . $skin['title'],
+            ($skin->custom ? 'Editing' : 'Viewing') . ' Skin: ' . $skin->title,
             $this->page->parseTemplate(
                 'themes/edit-css.html',
                 [
                     'content' => $this->textFormatting->blockhtml(
                         file_get_contents(
                             (
-                                $skin['custom']
+                                $skin->custom
                                 ? $this->themesPath : $this->domainDefinitions->getServiceThemePath()
-                            ) . "/{$skin['title']}/css.css",
+                            ) . "/{$skin->title}/css.css",
                         ) ?: '',
                     ),
-                    'save' => $skin['custom'] ? $this->page->parseTemplate(
+                    'save' => $skin->custom ? $this->page->parseTemplate(
                         'save-changes.html',
                     ) : '',
                 ],
@@ -514,16 +486,14 @@ final readonly class Themes
             };
 
             if ($error === null) {
-                $this->database->insert(
-                    'skins',
-                    [
-                        'custom' => 1,
-                        'default' => $this->request->post('default') ? 1 : 0,
-                        'hidden' => $this->request->post('hidden') ? 1 : 0,
-                        'title' => $skinName,
-                        'wrapper' => $wrapperName,
-                    ],
-                );
+                $skin = new Skin();
+                $skin->custom = 1;
+                $skin->default = $this->request->post('default') ? 1 : 0;
+                $skin->hidden = $this->request->post('hidden') ? 1 : 0;
+                $skin->title = $skinName;
+                $skin->wrapper = $wrapperName;
+                $skin->insert($this->database);
+
                 if ($this->request->post('default')) {
                     $this->database->update(
                         'skins',
@@ -572,22 +542,7 @@ final readonly class Themes
 
     private function deleteSkin(int $id): void
     {
-        $result = $this->database->select(
-            [
-                'id',
-                '`using`',
-                'title',
-                'custom',
-                'wrapper',
-                '`default`',
-                'hidden',
-            ],
-            'skins',
-            Database::WHERE_ID_EQUALS,
-            $id,
-        );
-        $skin = $this->database->arow($result);
-        $this->database->disposeresult($result);
+        $skin = Skin::selectOne($this->database, Database::WHERE_ID_EQUALS, $id);
 
         if (!$skin) {
             $this->page->addContentBox('Error', "Skin id {$id} not found");
@@ -595,18 +550,15 @@ final readonly class Themes
             return;
         }
 
-        $skindir = $this->themesPath . $skin['title'];
+        $skindir = $this->themesPath . $skin->title;
         if (is_dir($skindir)) {
             $this->fileUtils->removeDirectory($skindir);
         }
 
-        $this->database->delete(
-            'skins',
-            Database::WHERE_ID_EQUALS,
-            $id,
-        );
+        $skin->delete($this->database);
+
         // Make a random skin default if it's the default.
-        if ($skin['default']) {
+        if ($skin->default) {
             $this->database->update(
                 'skins',
                 [

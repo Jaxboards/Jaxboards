@@ -10,6 +10,7 @@ use Jax\Constants\Groups;
 use Jax\Database;
 use Jax\Jax;
 use Jax\Models\Member;
+use Jax\Models\Skin;
 use Jax\Page;
 use Jax\Page\UCP\Inbox;
 use Jax\Request;
@@ -620,30 +621,16 @@ final readonly class UCP
         $error = null;
         $skinId = $this->user->get('skin_id');
         $page = '';
-        if (
-            is_numeric($this->request->both('skin'))
-        ) {
-            $result = $this->database->select(
-                [
-                    'id',
-                    '`using`',
-                    'title',
-                    'custom',
-                    'wrapper',
-                    '`default`',
-                    'hidden',
-                ],
-                'skins',
+        $skinId = (int) $this->request->asString->both('skin');
+        if ($skinId) {
+            $skin = Skin::selectOne(
+                $this->database,
                 Database::WHERE_ID_EQUALS,
-                $this->request->both('skin'),
+                $skinId,
             );
-            if (!$this->database->arow($result)) {
+            if (!$skin) {
                 $error = 'The skin chosen no longer exists.';
             } else {
-                $skinId = $this->request->asString->both('skin');
-
-                $this->database->disposeresult($result);
-
                 $this->user->setBulk([
                     'nowordfilter' => $this->request->post('usewordfilter') ? 0 : 1,
                     'skin_id' => $skinId,
@@ -666,39 +653,14 @@ final readonly class UCP
             $page .= $this->template->meta('error', $error);
         }
 
-        $result = $this->user->get('group_id') !== 2
-            ? $this->database->select(
-                [
-                    'id',
-                    '`using`',
-                    'title',
-                    'custom',
-                    'wrapper',
-                    '`default`',
-                    'hidden',
-                ],
-                'skins',
-                'WHERE `hidden`!=1 ORDER BY `title` ASC',
-            )
-            : $this->database->select(
-                [
-                    'id',
-                    '`using`',
-                    'title',
-                    'custom',
-                    'wrapper',
-                    '`default`',
-                    'hidden',
-                ],
-                'skins',
-                'ORDER BY `title` ASC',
-            );
+        $skins = $this->user->get('group_id') !== 2
+            ? Skin::selectMany($this->database, 'WHERE `hidden`!=1 ORDER BY `title` ASC')
+            : Skin::selectMany($this->database, 'ORDER BY `title` ASC');
         $select = '';
-        $skins = $this->database->arows($result);
         foreach ($skins as $skin) {
-            $select .= "<option value='" . $skin['id'] . "' "
-                . ($skinId === $skin['id'] ? "selected='selected'" : '')
-                . '/>' . ($skin['hidden'] ? '*' : '') . $skin['title'] . '</option>';
+            $select .= "<option value='" . $skin->id . "' "
+                . ($skinId === $skin->id ? "selected='selected'" : '')
+                . '/>' . ($skin->hidden ? '*' : '') . $skin->title . '</option>';
         }
 
         $select = '<select name="skin" title="Board Skin">' . $select . '</select>';
