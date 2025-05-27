@@ -155,7 +155,8 @@ final class Groups
      */
     private function fetchGroups(?array $groupIds): array
     {
-        $groups = Group::selectMany($this->database,
+        $groups = Group::selectMany(
+            $this->database,
             ($groupIds ? 'WHERE `id` IN ? ' : '') . 'ORDER BY `id` ASC',
             ...($groupIds ? [$groupIds] : []),
         );
@@ -372,7 +373,8 @@ final class Groups
 
         $group = null;
         if ($gid) {
-            $group = Group::selectOne($this->database,
+            $group = Group::selectOne(
+                $this->database,
                 Database::WHERE_ID_EQUALS,
                 $gid,
             );
@@ -381,13 +383,13 @@ final class Groups
         $page .= $this->page->parseTemplate(
             'groups/create.html',
             [
-                'icon_url' => $group ? $this->textFormatting->blockhtml($group->icon) : '',
-                'submit' => $group ? 'Edit' : 'Create',
-                'title' => $group ? $this->textFormatting->blockhtml($group->title) : '',
+                'icon_url' => $group !== null ? $this->textFormatting->blockhtml($group->icon) : '',
+                'submit' => $group !== null ? 'Edit' : 'Create',
+                'title' => $group !== null ? $this->textFormatting->blockhtml($group->title) : '',
             ],
         );
         $this->page->addContentBox(
-            $group ? 'Editing group: ' . $group->title : 'Create a group!',
+            $group !== null ? 'Editing group: ' . $group->title : 'Create a group!',
             $page,
         );
     }
