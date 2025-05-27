@@ -20,12 +20,15 @@ abstract class Model
 
     private bool $fromDatabase = false;
 
-    public function __construct() {
+    public function __construct()
+    {
         $primaryKey = static::PRIMARY_KEY;
 
-        if ($this->{$primaryKey}) {
-            $this->fromDatabase = true;
+        if (!$this->{$primaryKey}) {
+            return;
         }
+
+        $this->fromDatabase = true;
     }
 
     /**
@@ -80,13 +83,15 @@ abstract class Model
     public function insert(Database $database): ?PDOStatement
     {
         $primaryKey = static::PRIMARY_KEY;
-        $primaryKeyReflection = new ReflectionProperty(static::class, $primaryKey);
-        $type = $primaryKeyReflection->gettype()->getName();
+        $reflectionProperty = new ReflectionProperty(static::class, $primaryKey);
+        $type = $reflectionProperty->gettype()->getName();
         $statement = $database->insert(static::TABLE, $this->asArray());
         $insertId = $database->insertId();
 
         if ($insertId) {
-            $this->{$primaryKey} = $type === 'string' ? (string) $insertId : (int) $insertId;
+            $this->{$primaryKey} = $type === 'string'
+                ? $insertId
+                : (int) $insertId;
         }
 
         return $statement;
