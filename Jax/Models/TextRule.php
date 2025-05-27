@@ -15,12 +15,16 @@ final class TextRule extends Model
         'type',
         'needle',
         'replacement',
-        'enabled'
+        'enabled',
     ];
 
     public int $id = 0;
+
     public string $type = '';
+
     public string $needle = '';
+
     public string $replacement = '';
+
     public int $enabled = 1;
 }

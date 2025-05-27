@@ -337,9 +337,7 @@ final class Groups
                 default => null,
             };
 
-            if ($error !== null) {
-                $page .= $this->page->error($error);
-            } else {
+            if ($error === null) {
                 $group = $gid
                     ? Group::selectOne($this->database, Database::WHERE_ID_EQUALS, $gid)
                     : null;
@@ -361,6 +359,8 @@ final class Groups
 
                 return;
             }
+
+            $page .= $this->page->error($error);
         }
 
         $group = null;

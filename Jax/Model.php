@@ -58,6 +58,7 @@ abstract class Model
     public function delete(Database $database): ?PDOStatement
     {
         $primaryKey = static::PRIMARY_KEY;
+
         return $database->delete(
             static::TABLE,
             Database::WHERE_ID_EQUALS,
