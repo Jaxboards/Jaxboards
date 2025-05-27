@@ -6,6 +6,7 @@ namespace Jax;
 
 use PDO;
 use PDOStatement;
+use ReflectionProperty;
 
 use function array_map;
 
@@ -16,6 +17,16 @@ abstract class Model
     public const TABLE = '';
 
     public const PRIMARY_KEY = 'id';
+
+    private bool $fromDatabase = false;
+
+    public function __construct() {
+        $primaryKey = static::PRIMARY_KEY;
+
+        if ($this->{$primaryKey}) {
+            $this->fromDatabase = true;
+        }
+    }
 
     /**
      * @param mixed $args
@@ -69,16 +80,21 @@ abstract class Model
     public function insert(Database $database): ?PDOStatement
     {
         $primaryKey = static::PRIMARY_KEY;
+        $primaryKeyReflection = new ReflectionProperty(static::class, $primaryKey);
+        $type = $primaryKeyReflection->gettype()->getName();
         $statement = $database->insert(static::TABLE, $this->asArray());
-        $this->{$primaryKey} = (int) $database->insertId();
+        $insertId = $database->insertId();
+
+        if ($insertId) {
+            $this->{$primaryKey} = $type === 'string' ? (string) $insertId : (int) $insertId;
+        }
 
         return $statement;
     }
 
     public function upsert(Database $database): ?PDOStatement
     {
-        $primaryKey = static::PRIMARY_KEY;
-        if ($this->{$primaryKey}) {
+        if ($this->fromDatabase) {
             return $this->update($database);
         }
 
