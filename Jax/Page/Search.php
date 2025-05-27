@@ -294,7 +294,7 @@ final class Search
 
         $terms = [];
 
-        foreach (preg_split('@\W+@', (string) $searchTerm) ?: [] as $v) {
+        foreach (preg_split('@\W+@', $searchTerm) ?: [] as $v) {
             if (trim($v) === '') {
                 continue;
             }

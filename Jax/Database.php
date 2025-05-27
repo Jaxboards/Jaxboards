@@ -208,30 +208,6 @@ class Database
     }
 
     /**
-     * @param array<string,null|float|int|string> $keyValuePairs
-     */
-    private function buildUpdate(array $keyValuePairs): string
-    {
-        if ($keyValuePairs === []) {
-            return '';
-        }
-
-        /*
-            E.G. if array is a => b; c => c; then result is a = ?, b = ?,
-            where the first " = ?," comes from the implode.
-         */
-
-        return implode(PHP_EOL . ', ', array_map(
-            static function (string $key): string {
-                $value = '?';
-
-                return "`{$key}` = {$value}";
-            },
-            array_keys($keyValuePairs),
-        ));
-    }
-
-    /**
      * @param mixed $vars
      */
     public function delete(
@@ -468,6 +444,30 @@ class Database
     {
         $query = $this->select(['id'], 'forums');
         array_map(fn($forum) => $this->fixForumLastPost((int) $forum['id']), $this->arows($query));
+    }
+
+    /**
+     * @param array<string,null|float|int|string> $keyValuePairs
+     */
+    private function buildUpdate(array $keyValuePairs): string
+    {
+        if ($keyValuePairs === []) {
+            return '';
+        }
+
+        /*
+            E.G. if array is a => b; c => c; then result is a = ?, b = ?,
+            where the first " = ?," comes from the implode.
+         */
+
+        return implode(PHP_EOL . ', ', array_map(
+            static function (string $key): string {
+                $value = '?';
+
+                return "`{$key}` = {$value}";
+            },
+            array_keys($keyValuePairs),
+        ));
     }
 
     private function queryTypeForPDOValue(

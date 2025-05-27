@@ -60,6 +60,10 @@ final readonly class PrivateMessage
         $commands = explode(PHP_EOL, (string) $this->session->get('runonce'));
         foreach ($commands as $index => $command) {
             $command = json_decode($command);
+            if (!$command) {
+                continue;
+            }
+
             if ($command[0] !== 'im') {
                 continue;
             }
