@@ -16,9 +16,9 @@ final class Category extends Model
         'order',
     ];
 
-    public int $id;
+    public int $id = 0;
 
-    public string $title;
+    public string $title = '';
 
-    public int $order;
+    public int $order = 0;
 }

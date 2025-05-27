@@ -576,13 +576,13 @@ final readonly class Forums
         $forum->nocount = $this->request->asString->post('count') ? 0 : 1;
         $forum->orderby = $orderby > 0 && $orderby <= 5 ? $orderby : 0;
         $forum->perms = $this->serializePermsFromInput();
-        $forum->redirect = $this->request->asString->post('redirect');
+        $forum->redirect = $this->request->asString->post('redirect') ?? '';
         $forum->show_ledby = $this->request->asString->post('show_ledby')
             ? 1
             : 0;
         $forum->show_sub = $sub === 1 || $sub === 2 ? $sub : 0;
-        $forum->subtitle = $this->request->asString->post('description');
-        $forum->title = $this->request->asString->post('title');
+        $forum->subtitle = $this->request->asString->post('description') ?? '';
+        $forum->title = $this->request->asString->post('title') ?? '';
         $forum->trashcan = $this->request->asString->post('trashcan') ? 1 : 0;
 
         return $forum;
@@ -678,9 +678,7 @@ final readonly class Forums
             );
         }
 
-        $forum = $forums[$forumId];
-
-        if (!$forum) {
+        if (!array_key_exists($forumId, $forums)) {
             $this->page->addContentBox(
                 'Deleting Forum: ' . $forumId,
                 $this->page->error("Forum doesn't exist."),
@@ -700,63 +698,64 @@ final readonly class Forums
         );
     }
 
+    private function upsertCategory(Category $category): ?string
+    {
+        $categoryName = $this->request->asString->post('cat_name');
+
+        if (
+            $categoryName === null || trim($categoryName) === ''
+        ) {
+            return 'All fields required';
+        }
+
+        $category->title = $categoryName;
+
+        if ($category->id) {
+            $this->database->update(
+                'categories',
+                $category->asArray(),
+                Database::WHERE_ID_EQUALS,
+                $category->id,
+            );
+            return null;
+        }
+
+        $this->database->insert(
+            'categories',
+            $category->asArray(),
+        );
+        $category->id = (int) $this->database->insertId();
+
+        return null;
+    }
+
     private function createCategory(?int $cid = null): void
     {
         $page = '';
-        $cdata = null;
-        if (!$cid && $this->request->post('cat_id')) {
-            $cid = (int) $this->request->post('cat_id');
-        }
+        $cid = $cid ?: (int) $this->request->asString->post('cat_id');
 
-        if ($cid) {
-            $cdata = Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $cid);
-        }
+        $category = $cid
+            ? Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $cid)
+            : new Category();
 
-        $categoryName = $this->request->asString->post('cat_name');
         if ($this->request->post('submit') !== null) {
-            if (
-                $categoryName === null || trim($categoryName) === ''
-            ) {
-                $page .= $this->page->error('All fields required');
-            } else {
-                $data = ['title' => $categoryName];
-                if ($cdata && $cid) {
-                    $this->database->update(
-                        'categories',
-                        $data,
-                        Database::WHERE_ID_EQUALS,
-                        $cid,
-                    );
-                    $page .= $this->page->success(
-                        'Category edited.',
-                    );
-                } else {
-                    $this->database->insert(
-                        'categories',
-                        $data,
-                    );
-                    $page .= $this->page->success(
-                        'Category created.',
-                    );
-                    $data['id'] = (int) $this->database->insertId();
-                }
-
-                $cdata = $data;
-            }
+            $error = $this->upsertCategory($category);
+            $page .= $error
+                ? $this->page->error($error)
+                : $this->page->success('Category saved');
         }
 
-        $categoryTitle = '';
-        if (isset($cdata['title'])) {
-            $categoryTitle = $this->textFormatting->blockhtml($cdata['title']);
-        }
+        $categoryTitle = $category?->title
+            ? $this->textFormatting->blockhtml($category->title)
+            : '';
 
         $this->page->addContentBox(
-            ($cdata ? 'Edit' : 'Create') . ' Category',
+            ($category ? 'Edit' : 'Create') . ' Category',
             $page . $this->page->parseTemplate(
                 'forums/create-category.html',
                 [
-                    'id' => $cdata && isset($cdata['id']) ? $cdata['id'] : 0,
-                    'submit' => isset($cdata) && $cdata ? 'Edit' : 'Create',
+                    'id' => $category?->id,
+                    'submit' => $category ? 'Edit' : 'Create',
                     'title' => $categoryTitle,
                 ],
             ),
