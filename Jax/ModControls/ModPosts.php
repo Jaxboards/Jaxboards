@@ -36,12 +36,12 @@ final readonly class ModPosts
     public function addPost(int $pid): void
     {
         $post = $pid !== 0 ? $this->fetchPost($pid) : null;
-        if (!$post) {
+        if ($post === null) {
             return;
         }
 
         // If the post is a topic post, handle it as a topic instead.
-        if ($post->newtopic) {
+        if ($post->newtopic !== 0) {
             $this->modTopics->addTopic($post->tid);
 
             return;
@@ -159,7 +159,7 @@ final readonly class ModPosts
         // Add trashcan here too.
         $result = $this->database->select(['fid'], 'topics', Database::WHERE_ID_IN, $tids);
         $fids = array_unique(array_merge(
-            $trashCanForum ? [(int) $trashCanForum->id] : [],
+            $trashCanForum !== null ? [$trashCanForum->id] : [],
             array_map(
                 static fn($topic): int => (int) $topic['fid'],
                 $this->database->arows($result),
@@ -243,7 +243,7 @@ final readonly class ModPosts
      * Move posts to trashcan by creating a new topic there,
      * then moving all posts to it.
      *
-     * @param list<int>           $pids
+     * @param list<int> $pids
      *
      * @return int The new topic's ID
      */
@@ -261,7 +261,7 @@ final readonly class ModPosts
                 'auth_id' => $this->user->get('id'),
                 'fid' => $trashCanForum->id,
                 'lp_date' => $this->database->datetime(),
-                'lp_uid' => $lastPost ? $lastPost->auth_id : null,
+                'lp_uid' => $lastPost?->auth_id,
                 'op' => $pids[0],
                 'poll_q' => '',
                 'poll_choices' => '',

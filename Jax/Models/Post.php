@@ -22,7 +22,7 @@ final class Post extends Model
         'ip',
         'edit_date',
         'editby',
-        'rating'
+        'rating',
     ];
 
     public int $id = 0;

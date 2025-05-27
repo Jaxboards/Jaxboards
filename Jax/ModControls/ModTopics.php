@@ -126,6 +126,7 @@ final readonly class ModTopics
         $trashcan = Forum::selectOne($this->database, 'WHERE `trashcan`=1 LIMIT 1');
 
         $trashcan = $trashcan->id ?? false;
+
         $result = $this->database->select(
             ['id', 'fid'],
             'topics',
@@ -295,7 +296,7 @@ final readonly class ModTopics
             Database::WHERE_ID_EQUALS,
             $forumId,
         );
-        if (!$forum) {
+        if ($forum === null) {
             return;
         }
 
