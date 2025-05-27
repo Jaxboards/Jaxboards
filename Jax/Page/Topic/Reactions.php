@@ -46,7 +46,7 @@ final readonly class Reactions
 
         return $ratingNiblets = keyBy(
             RatingNiblet::selectMany($this->database),
-            static fn($niblet) => $niblet->id
+            static fn($niblet) => $niblet->id,
         );
     }
 
@@ -122,11 +122,11 @@ final readonly class Reactions
         $postratingbuttons = '';
         $showrating = '';
 
-        foreach ($this->fetchRatingNiblets() as $nibletIndex => $niblet) {
+        foreach ($this->fetchRatingNiblets() as $nibletIndex => $ratingNiblet) {
             $nibletHTML = $this->template->meta(
                 'rating-niblet',
-                $niblet->img,
-                $niblet->title,
+                $ratingNiblet->img,
+                $ratingNiblet->title,
             );
             $postratingbuttons .= <<<HTML
                 <a href="?act=vt{$post['tid']}&amp;ratepost={$post['pid']}&amp;niblet={$nibletIndex}">
@@ -145,8 +145,8 @@ final readonly class Reactions
             $postratingbuttons .= $num;
             $showrating .= $this->template->meta(
                 'rating-niblet',
-                $niblet->img,
-                $niblet->title,
+                $ratingNiblet->img,
+                $ratingNiblet->title,
             ) . $num;
         }
 

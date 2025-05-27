@@ -407,7 +407,7 @@ final readonly class UCP
             $data['display_name'],
             $this->user->get('id'),
         );
-        if ($members && count($members) > 0) {
+        if ($members && $members !== []) {
             return 'That display name is already in use.';
         }
 
