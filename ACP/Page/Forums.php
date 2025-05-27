@@ -571,6 +571,7 @@ final readonly class Forums
         if ($forum === null) {
             $forum = Forum::create(['id' => 0, 'cat_id' => first($categories)->id]);
         }
+
         $forum->nocount = $this->request->asString->post('count') ? 0 : 1;
         $forum->orderby = $orderby > 0 && $orderby <= 5 ? $orderby : 0;
         $forum->perms = $this->serializePermsFromInput();
