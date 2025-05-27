@@ -6,6 +6,7 @@ namespace Jax\ModControls;
 
 use Jax\Database;
 use Jax\Jax;
+use Jax\Models\Forum;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
@@ -122,16 +123,9 @@ final readonly class ModTopics
 
         $forumData = [];
 
-        // Get trashcan id.
-        $result = $this->database->select(
-            ['id'],
-            'forums',
-            'WHERE `trashcan`=1 LIMIT 1',
-        );
-        $trashcan = $this->database->arow($result);
-        $this->database->disposeresult($result);
+        $trashcan = Forum::selectOne($this->database, 'WHERE `trashcan`=1 LIMIT 1');
 
-        $trashcan = $trashcan['id'] ?? false;
+        $trashcan = $trashcan->id ?? false;
         $result = $this->database->select(
             ['id', 'fid'],
             'topics',
@@ -296,15 +290,12 @@ final readonly class ModTopics
     private function moveTo(): void
     {
         $forumId = (int) $this->request->asString->post('id');
-        $result = $this->database->select(
-            ['id'],
-            'forums',
+        $forum = Forum::selectOne(
+            $this->database,
             Database::WHERE_ID_EQUALS,
             $forumId,
         );
-        $rowfound = $this->database->arow($result);
-        $this->database->disposeresult($result);
-        if (!$rowfound) {
+        if (!$forum) {
             return;
         }
 

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Jax\ModControls;
 
 use Jax\Database;
+use Jax\Models\Forum;
+use Jax\Models\Post;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
@@ -39,8 +41,8 @@ final readonly class ModPosts
         }
 
         // If the post is a topic post, handle it as a topic instead.
-        if ($post['newtopic']) {
-            $this->modTopics->addTopic($post['tid']);
+        if ($post->newtopic) {
+            $this->modTopics->addTopic($post->tid);
 
             return;
         }
@@ -97,10 +99,8 @@ final readonly class ModPosts
      * If they're a global mod, automatically yes.
      * If not, then we need to check the forum permissions to
      * see if they're an assigned moderator of the forum.
-     *
-     * @param array<string,mixed> $post
      */
-    private function canModPost(array $post): bool
+    private function canModPost(Post $post): bool
     {
         if ($this->user->getPerm('can_moderate')) {
             return true;
@@ -123,19 +123,18 @@ final readonly class ModPosts
      */
     private function deletePosts(array $pids): bool
     {
-        $trashCanForum = $this->fetchTrashCanForum();
+        $trashCanForum = Forum::selectOne($this->database, 'WHERE `trashcan`=1');
 
-        $result = $this->database->select(
-            ['tid'],
-            'posts',
+        $posts = Post::selectMany(
+            $this->database,
             Database::WHERE_ID_IN,
             $pids,
         );
 
         // Build list of topic ids that the posts were in.
         $tids = array_unique(array_map(
-            static fn($topic): int => (int) $topic['tid'],
-            $this->database->arows($result),
+            static fn($post): int => $post->id,
+            $posts,
         ));
 
         if ($trashCanForum !== null) {
@@ -160,7 +159,7 @@ final readonly class ModPosts
         // Add trashcan here too.
         $result = $this->database->select(['fid'], 'topics', Database::WHERE_ID_IN, $tids);
         $fids = array_unique(array_merge(
-            $trashCanForum ? [(int) $trashCanForum['id']] : [],
+            $trashCanForum ? [(int) $trashCanForum->id] : [],
             array_map(
                 static fn($topic): int => (int) $topic['fid'],
                 $this->database->arows($result),
@@ -192,29 +191,19 @@ final readonly class ModPosts
         return $intPids;
     }
 
-    /**
-     * @return null|array<string,mixed>
-     */
-    private function fetchPost(int $pid): ?array
+    private function fetchPost(int $pid): ?Post
     {
-        $result = $this->database->select(
-            ['auth_id', 'newtopic', 'tid'],
-            'posts',
+        return Post::selectOne(
+            $this->database,
             Database::WHERE_ID_EQUALS,
             $pid,
         );
-        $post = $this->database->arow($result);
-        $this->database->disposeresult($result);
-
-        return $post;
     }
 
     /**
-     * @param array<string,mixed> $post
-     *
      * @return list<int> list of mod user IDs assigned to a forum. Empty array when none.
      */
-    private function fetchForumMods(array $post): array
+    private function fetchForumMods(Post $post): array
     {
         $result = $this->database->special(
             <<<'SQL'
@@ -227,7 +216,7 @@ final readonly class ModPosts
                 )
                 SQL,
             ['forums', 'topics'],
-            $post['tid'],
+            $post->tid,
         );
         $mods = $this->database->arow($result);
         $this->database->disposeresult($result);
@@ -235,22 +224,6 @@ final readonly class ModPosts
         return $mods
             ? array_map(static fn($mid): int => (int) $mid, explode(',', (string) $mods['mods']))
             : [];
-    }
-
-    /**
-     * @return null|array<string,mixed>
-     */
-    private function fetchTrashCanForum(): ?array
-    {
-        $result = $this->database->select(
-            '`id`',
-            'forums',
-            'WHERE `trashcan`=1 LIMIT 1',
-        );
-        $trashcan = $this->database->arow($result);
-        $this->database->disposeresult($result);
-
-        return $trashcan;
     }
 
     /**
@@ -270,14 +243,13 @@ final readonly class ModPosts
      * Move posts to trashcan by creating a new topic there,
      * then moving all posts to it.
      *
-     * @param array<string,mixed> $trashCanForum
      * @param list<int>           $pids
      *
      * @return int The new topic's ID
      */
     private function movePostsToTrashcan(
         array $pids,
-        array $trashCanForum,
+        Forum $trashCanForum,
         string $newTopicTitle,
     ): int {
         $lastPost = $this->fetchPost((int) end($pids));
@@ -287,9 +259,9 @@ final readonly class ModPosts
             'topics',
             [
                 'auth_id' => $this->user->get('id'),
-                'fid' => $trashCanForum['id'],
+                'fid' => $trashCanForum->id,
                 'lp_date' => $this->database->datetime(),
-                'lp_uid' => $lastPost ? $lastPost['auth_id'] : null,
+                'lp_uid' => $lastPost ? $lastPost->auth_id : null,
                 'op' => $pids[0],
                 'poll_q' => '',
                 'poll_choices' => '',

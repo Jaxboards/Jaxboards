@@ -9,6 +9,7 @@ use Jax\Config;
 use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\FileUtils;
+use Jax\Models\Post;
 use Jax\Request;
 
 use function array_key_exists;
@@ -96,25 +97,25 @@ final readonly class FileManager
             $page .= $this->page->success('Changes saved.');
         }
 
-        $result = $this->database->select(
-            '`id`,`tid`,`post`',
-            'posts',
+        $posts = Post::selectMany(
+            $this->database,
             "WHERE MATCH (`post`) AGAINST ('attachment') "
             . "AND post LIKE '%[attachment]%'",
         );
         $linkedIn = [];
-        while ($post = $this->database->arow($result)) {
+
+        foreach ($posts as $post) {
             preg_match_all(
                 '@\[attachment\](\d+)\[/attachment\]@',
-                (string) $post['post'],
+                $post->post,
                 $matches,
             );
             foreach ($matches[1] as $attachmentId) {
                 $linkedIn[(int) $attachmentId][] = $this->page->parseTemplate(
                     'tools/attachment-link.html',
                     [
-                        'post_id' => $post['id'],
-                        'topic_id' => $post['tid'],
+                        'post_id' => $post->id,
+                        'topic_id' => $post->tid,
                     ],
                 );
             }
