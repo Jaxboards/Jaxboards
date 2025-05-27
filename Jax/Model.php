@@ -16,6 +16,7 @@ abstract class Model
     public const TABLE = '';
 
     public const PRIMARY_KEY = 'id';
+    public $PRIMARY_KEY;
 
     /**
      * @param mixed $args
@@ -58,11 +59,12 @@ abstract class Model
     public function update(Database $database): ?PDOStatement
     {
         $data = $this->asArray();
+
         return $database->update(
             $this::TABLE,
             $this->asArray(),
             Database::WHERE_ID_EQUALS,
-            $data[$this::PRIMARY_KEY]
+            $data[$this::PRIMARY_KEY],
         );
     }
 
@@ -70,6 +72,7 @@ abstract class Model
     {
         $statement = $database->insert($this::TABLE, $this->asArray());
         $this->{$this::PRIMARY_KEY} = (int) $database->insertId();
+
         return $statement;
     }
 
