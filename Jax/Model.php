@@ -10,6 +10,26 @@ abstract class Model {
     public const FIELDS = [];
     public const TABLE = '';
 
+    public function __construct(?array $properties = []) {
+        foreach ($properties as $property => $value) {
+            $this->{$property} = $value;
+        }
+        return $this;
+    }
+
+
+    public static function create(?array $properties): static {
+        return new static($properties);
+    }
+
+    public function asArray() {
+        $data = [];
+        foreach ($this::FIELDS as $fieldName) {
+            $data[$fieldName] = $this->{$fieldName};
+        }
+        return $data;
+    }
+
     /**
      * @param mixed $args
      */
