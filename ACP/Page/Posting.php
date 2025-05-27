@@ -54,7 +54,7 @@ final readonly class Posting
 
         // Delete.
         $delete = $this->request->asString->get('d');
-        if (array_key_exists($delete, $badWords)) {
+        if ($delete && array_key_exists($delete, $badWords)) {
             $badWords[$delete]->delete($this->database);
             unset($badWords[$delete]);
         }
@@ -146,7 +146,7 @@ final readonly class Posting
         // Insert emoticon.
         if ($this->request->post('submit') !== null) {
             $emoticonInput = $this->request->asString->post('emoticon');
-            $emoticonNoHTML = $this->textFormatting->blockhtml($emoticonInput);
+            $emoticonNoHTML = $this->textFormatting->blockhtml($emoticonInput ?? '');
             $imageInput = $this->request->asString->post('image');
             if (!$emoticonInput || !$imageInput) {
                 $page .= $this->page->error('All fields required.');

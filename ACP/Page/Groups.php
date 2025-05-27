@@ -318,46 +318,53 @@ final class Groups
         $this->page->addContentBox('Perms', $page);
     }
 
+    private function submitCreate(?int $gid): ?string
+    {
+        $groupName = $this->request->asString->post('groupname');
+        $groupIcon = $this->request->asString->post('groupicon');
+
+        $error = match (true) {
+            !$groupName => 'Group name required!',
+            mb_strlen($groupName) > 250 => 'Group name must not exceed 250 characters!',
+            mb_strlen((string) $groupIcon) > 250 => 'Group icon must not exceed 250 characters!',
+            $groupIcon && !filter_var($groupIcon, FILTER_VALIDATE_URL) => 'Group icon must be a valid image url',
+            default => null,
+        };
+
+        if ($error !== null) {
+            return $error;
+        }
+
+        $group = $gid
+            ? Group::selectOne($this->database, Database::WHERE_ID_EQUALS, $gid)
+            : null;
+        $group ??= new Group();
+
+        $group->icon = $groupIcon;
+        $group->title = $groupName;
+
+        $group->upsert($this->database);
+
+        $this->page->addContentBox(
+            $group->title . ' ' . ($gid ? 'edited' : 'created'),
+            $this->page->success(
+                'Data saved.',
+            ),
+        );
+
+        $this->showPerms();
+
+        return null;
+    }
+
     private function create(?int $gid = null): void
     {
         $page = '';
-        $error = null;
-
-        $groupNameInput = $this->request->post('groupname');
-        $groupIconInput = $this->request->post('groupicon');
-        $groupName = is_string($groupNameInput) ? $groupNameInput : null;
-        $groupIcon = is_string($groupIconInput) ? $groupIconInput : null;
 
         if ($this->request->post('submit') !== null) {
-            $error = match (true) {
-                !$groupName => 'Group name required!',
-                mb_strlen($groupName) > 250 => 'Group name must not exceed 250 characters!',
-                mb_strlen((string) $groupIcon) > 250 => 'Group icon must not exceed 250 characters!',
-                $groupIcon && !filter_var($groupIcon, FILTER_VALIDATE_URL) => 'Group icon must be a valid image url',
-                default => null,
-            };
-
-            if ($error === null) {
-                $group = $gid
-                    ? Group::selectOne($this->database, Database::WHERE_ID_EQUALS, $gid)
-                    : null;
-                $group ??= new Group();
-
-                $group->icon = $groupIcon;
-                $group->title = $groupName;
-
-                $group->upsert($this->database);
-
-                $this->page->addContentBox(
-                    $group->title . ' ' . ($gid ? 'edited' : 'created'),
-                    $this->page->success(
-                        'Data saved.',
-                    ),
-                );
-
-                $this->showPerms();
-
-                return;
+            $error = $this->submitCreate($gid);
+            if ($error) {
+                $page .= $this->page->error($error);
             }
 
             $page .= $this->page->error($error);
