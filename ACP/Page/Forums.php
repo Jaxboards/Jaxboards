@@ -688,7 +688,7 @@ final readonly class Forums
         }
 
         $this->page->addContentBox(
-            'Deleting Forum: ' . $forum->title,
+            'Deleting Forum: ' . $forums[$forumId]->title,
             $this->page->parseTemplate(
                 'forums/delete-forum.html',
                 [
