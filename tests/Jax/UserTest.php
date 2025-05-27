@@ -6,6 +6,7 @@ namespace Jax;
 
 use DI\Container;
 use Jax\Constants\Groups;
+use Jax\Models\Group;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -93,17 +94,18 @@ final class UserTest extends TestCase
             Database::class => $database,
         ]);
 
+        $group = new Group();
+        $group->can_attach = 1;
+        $group->can_poll = 1;
+        $group->can_post = 1;
+        $group->can_post_topics = 1;
+
         $user = new User(
             $database,
             $container->get(Jax::class),
             $container->get(IPAddress::class),
             ['group_id' => Groups::Admin->value],
-            [
-                'can_attach' => true,
-                'can_poll' => true,
-                'can_post' => true,
-                'can_post_topics' => true,
-            ],
+            $group,
         );
 
         self::assertSame(
@@ -148,12 +150,15 @@ final class UserTest extends TestCase
             Database::class => $database,
         ]);
 
+        $group = new Group();
+        $group->can_post = 1;
+
         $user = new User(
             $database,
             $container->get(Jax::class),
             $container->get(IPAddress::class),
             ['group_id' => Groups::Guest->value],
-            ['can_post' => true],
+            $group,
         );
 
         self::assertSame(
@@ -191,12 +196,15 @@ final class UserTest extends TestCase
             Database::class => $database,
         ]);
 
+        $group = new Group();
+        $group->can_post = 1;
+
         $user = new User(
             $database,
             $container->get(Jax::class),
             $container->get(IPAddress::class),
             ['group_id' => Groups::Banned->value],
-            ['can_post' => true],
+            $group,
         );
 
         $expected = $this->decoded[Groups::Banned->value];

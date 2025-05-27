@@ -229,13 +229,13 @@ final class Shoutbox
                 $this->shoutlimit,
             );
             foreach ($this->database->arows($result) as $shout) {
-                $this->page->command('addShout', $this->formatShout($shout));
+                $this->page->command('addshout', $this->formatShout($shout));
                 $last = (int) $shout['id'];
             }
         }
 
         // Update the sb_id variable if we selected shouts.
-        if ($last !== 0) {
+        if ($last === 0) {
             return;
         }
 
@@ -343,11 +343,9 @@ final class Shoutbox
         $shout = $this->request->asString->post('shoutbox_shout') ?? '';
         $shout = $this->textFormatting->linkify($shout);
 
-        $perms = $this->user->getPerms();
-
         $error = match (true) {
             $this->user->isGuest() => 'You must be logged in to shout!',
-            $perms && !$perms['can_shout'] => 'You do not have permission to shout!',
+            !$this->user->getPerm('can_shout') => 'You do not have permission to shout!',
             mb_strlen($shout) > 300 => 'Shout must be less than 300 characters.',
             default => null,
         };

@@ -225,6 +225,7 @@ final class Session
             return;
         }
 
+
         $this->data['vars'][$varName] = $value;
         $this->changedData['vars'] = serialize($this->data['vars']);
     }

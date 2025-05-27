@@ -6,6 +6,7 @@ namespace Jax;
 
 use Carbon\Carbon;
 use Jax\Constants\Groups;
+use Jax\Models\Group;
 
 use function array_merge;
 use function password_hash;
@@ -18,7 +19,7 @@ final class User
 {
     /**
      * @param null|array<array-key,mixed> $userData
-     * @param null|array<array-key,mixed> $userPerms
+     * @param null|Group $userPerms
      */
     public function __construct(
         private readonly Database $database,
@@ -26,7 +27,7 @@ final class User
         private readonly IPAddress $ipAddress,
         // Exposing these for testing
         private ?array $userData = null,
-        public ?array $userPerms = null,
+        public ?Group $userPerms = null,
     ) {}
 
     public function get(string $property): null|int|string
@@ -144,13 +145,10 @@ final class User
     {
         $perms = $this->getPerms();
 
-        return $perms[$perm] ?? null;
+        return $perms->{$perm} ?? null;
     }
 
-    /**
-     * @return null|array<string,bool|int|string>
-     */
-    public function getPerms(): ?array
+    public function getPerms(): ?Group
     {
         if ($this->userPerms !== null) {
             return $this->userPerms;
@@ -162,47 +160,12 @@ final class User
             default => null,
         };
 
-        $result = $this->database->select(
-            [
-                'can_access_acp',
-                'can_add_comments',
-                'can_attach',
-                'can_delete_comments',
-                'can_delete_own_posts',
-                'can_delete_own_shouts',
-                'can_delete_own_topics',
-                'can_delete_shouts',
-                'can_edit_posts',
-                'can_edit_topics',
-                'can_im',
-                'can_karma',
-                'can_lock_own_topics',
-                'can_moderate',
-                'can_override_locked_topics',
-                'can_pm',
-                'can_poll',
-                'can_post_topics',
-                'can_post',
-                'can_shout',
-                'can_use_sigs',
-                'can_view_board',
-                'can_view_fullprofile',
-                'can_view_offline_board',
-                'can_view_shoutbox',
-                'can_view_stats',
-                'flood_control',
-                'icon',
-                'id',
-                'legend',
-                'title',
-            ],
-            'member_groups',
+        $group = Group::selectOne(
+            $this->database,
             Database::WHERE_ID_EQUALS,
-            $groupId ?? Groups::Guest->value,
+            $groupId ?? Groups::Guest->value
         );
-        $retval = $this->database->arow($result);
-        $this->userPerms = $retval;
-        $this->database->disposeresult($result);
+        $this->userPerms = $group;
 
         return $this->userPerms;
     }
