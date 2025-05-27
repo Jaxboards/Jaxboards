@@ -6,6 +6,7 @@ namespace Jax\Page;
 
 use Jax\Database;
 use Jax\Jax;
+use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
@@ -103,45 +104,38 @@ final readonly class BuddyList
         $contacts = '';
         if ($this->user->get('friends')) {
             $online = $this->database->getUsersOnline();
-            $result = $this->database->select(
-                [
-                    'id',
-                    'avatar',
-                    '`display_name` AS `name`',
-                    'usertitle',
-                ],
-                'members',
+            $friends = Member::selectMany(
+                $this->database,
                 'WHERE `id` IN ? ORDER BY `name` ASC',
                 explode(',', (string) $this->user->get('friends')),
             );
-            while ($contact = $this->database->arow($result)) {
+            foreach ($friends as $friend) {
                 $contacts .= $this->template->meta(
                     'buddylist-contact',
-                    $contact['id'],
-                    $contact['name'],
-                    isset($online[$contact['id']]) && $online[$contact['id']]
+                    $friend->id,
+                    $friend->name,
+                    isset($online[$friend->id]) && $online[$friend->id]
                     ? 'online' : 'offline',
-                    $contact['avatar'] ?: $this->template->meta('default-avatar'),
-                    $contact['usertitle'],
+                    $friend->avatar ?: $this->template->meta('default-avatar'),
+                    $friend->usertitle,
                 );
             }
         }
 
         if ($this->user->get('enemies')) {
-            $result = $this->database->select(
-                '`id`,`avatar`,`display_name` AS `name`,`usertitle`',
-                'members',
+            $enemies = Member::selectMany(
+                $this->database,
                 'WHERE `id` IN ? ORDER BY `name` ASC',
                 explode(',', (string) $this->user->get('enemies')),
             );
-            while ($contact = $this->database->arow($result)) {
+            foreach ($enemies as $enemy) {
                 $contacts .= $this->template->meta(
                     'buddylist-contact',
-                    $contact['id'],
-                    $contact['name'],
+                    $enemy->id,
+                    $enemy->name,
                     'blocked',
-                    $contact['avatar'] ?: $this->template->meta('default-avatar'),
-                    $contact['usertitle'],
+                    $enemy->avatar ?: $this->template->meta('default-avatar'),
+                    $enemy->usertitle,
                 );
             }
         }
