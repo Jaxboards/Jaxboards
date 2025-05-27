@@ -57,15 +57,12 @@ abstract class Model
         return $stmt?->fetchAll(PDO::FETCH_CLASS, static::class) ?? [];
     }
 
-    public function update(Database $database): ?PDOStatement
+    public function delete(Database $database): ?PDOStatement
     {
-        $data = $this->asArray();
-
-        return $database->update(
+        return $database->delete(
             $this::TABLE,
-            $this->asArray(),
             Database::WHERE_ID_EQUALS,
-            $data[$this::PRIMARY_KEY],
+            $this->{$this::PRIMARY_KEY},
         );
     }
 
@@ -84,6 +81,18 @@ abstract class Model
         }
 
         return $this->insert($database);
+    }
+
+    public function update(Database $database): ?PDOStatement
+    {
+        $data = $this->asArray();
+
+        return $database->update(
+            $this::TABLE,
+            $this->asArray(),
+            Database::WHERE_ID_EQUALS,
+            $data[$this::PRIMARY_KEY],
+        );
     }
 
     /**

@@ -7,9 +7,11 @@ namespace ACP\Page;
 use ACP\Page;
 use Jax\Config;
 use Jax\Database;
+use Jax\Models\RatingNiblet;
 use Jax\Request;
 use Jax\TextFormatting;
 
+use function _\keyBy;
 use function array_key_exists;
 use function array_reverse;
 use function krsort;
@@ -29,13 +31,13 @@ final readonly class Posting
     {
         $this->page->sidebar([
             'emoticons' => 'Emoticons',
-            'postrating' => 'Post Rating',
+            'postRating' => 'Post Rating',
             'wordfilter' => 'Word Filter',
         ]);
 
         match ($this->request->both('do')) {
             'emoticons' => $this->emoticons(),
-            'postrating' => $this->postrating(),
+            'postRating' => $this->postRating(),
             'wordfilter' => $this->wordfilter(),
             default => $this->emoticons(),
         };
@@ -273,28 +275,19 @@ final readonly class Posting
         $this->page->addContentBox('Base Emoticon Set', $page);
     }
 
-    private function postrating(): void
+    private function postRating(): void
     {
         $page = '';
         $page2 = '';
-        $niblets = [];
-        $result = $this->database->select(
-            ['id', 'img', 'title'],
-            'ratingniblets',
-            'ORDER BY `id` DESC',
+        $niblets = keyBy(
+            RatingNiblet::selectMany($this->database, 'ORDER BY `id` DESC'),
+            fn($niblet) => $niblet->id
         );
-        while ($f = $this->database->arow($result)) {
-            $niblets[$f['id']] = ['img' => $f['img'], 'title' => $f['title']];
-        }
 
         // Delete.
         $delete = (int) $this->request->asString->get('d');
         if ($delete !== 0) {
-            $this->database->delete(
-                'ratingniblets',
-                Database::WHERE_ID_EQUALS,
-                $delete,
-            );
+            $niblets[$delete]->delete($this->database);
             unset($niblets[$delete]);
         }
 
@@ -305,17 +298,12 @@ final readonly class Posting
             if (!$img || !$title) {
                 $page .= $this->page->error('All fields required.');
             } else {
-                $this->database->insert(
-                    'ratingniblets',
-                    [
-                        'img' => $img,
-                        'title' => $title,
-                    ],
-                );
-                $niblets[$this->database->insertId()] = [
-                    'img' => $img,
-                    'title' => $title,
-                ];
+                $niblet = new RatingNiblet();
+                $niblet->img = $img;
+                $niblet->title = $title;
+                $niblet->insert($this->database);
+
+                $niblets[$niblet->id] = $niblet;
             }
         }
 
@@ -345,13 +333,13 @@ final readonly class Posting
             );
         } else {
             krsort($niblets);
-            foreach ($niblets as $ratingId => $rating) {
+            foreach ($niblets as $niblet) {
                 $table .= $this->page->parseTemplate(
                     'posting/post-rating-row.html',
                     [
-                        'id' => $ratingId,
-                        'image_url' => $this->textFormatting->blockhtml($rating['img']),
-                        'title' => $this->textFormatting->blockhtml($rating['title']),
+                        'id' => $niblet->id,
+                        'image_url' => $this->textFormatting->blockhtml($niblet->img),
+                        'title' => $this->textFormatting->blockhtml($niblet->title),
                     ],
                 );
             }

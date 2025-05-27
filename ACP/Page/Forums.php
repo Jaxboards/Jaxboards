@@ -698,18 +698,7 @@ final readonly class Forums
         }
 
         $category->title = $categoryName;
-
-        if ($category->id !== 0) {
-            $category->update($this->database);
-
-            return null;
-        }
-
-        $this->database->insert(
-            'categories',
-            $category->asArray(),
-        );
-        $category->id = (int) $this->database->insertId();
+        $category->upsert($this->database);
 
         return null;
     }
