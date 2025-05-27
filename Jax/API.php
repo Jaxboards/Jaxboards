@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use Jax\Models\Member;
+
 use function array_keys;
 use function array_values;
 use function header;
@@ -24,20 +26,16 @@ final readonly class API
     public function render(): void
     {
         match ($this->request->get('act')) {
-            'searchmembers' => $this->searchmembers(),
+            'searchmembers' => $this->searchMembers(),
             'emotes' => $this->emotes(),
             default => header('Location: /'),
         };
     }
 
-    private function searchmembers(): void
+    private function searchMembers(): void
     {
-        $result = $this->database->select(
-            [
-                'id',
-                'display_name',
-            ],
-            'members',
+        $members = Member::selectMany(
+            $this->database,
             'WHERE `display_name` LIKE ? ORDER BY `display_name` LIMIT 10',
             htmlspecialchars(
                 str_replace('_', '\_', $this->request->asString->get('term') ?? ''),
@@ -46,9 +44,9 @@ final readonly class API
         );
 
         $list = [[], []];
-        while ($member = $this->database->arow($result)) {
-            $list[0][] = $member['id'];
-            $list[1][] = $member['display_name'];
+        foreach ($members as $member) {
+            $list[0][] = $member->id;
+            $list[1][] = $member->display_name;
         }
 
         echo json_encode($list);
@@ -57,8 +55,8 @@ final readonly class API
     private function emotes(): void
     {
         $rules = $this->textFormatting->rules->getEmotes();
-        foreach ($rules as $k => $v) {
-            $rules[$k] = '<img src="' . $v . '" alt="' . $this->textFormatting->blockhtml($k) . '" />';
+        foreach ($rules as $text => $image) {
+            $rules[$text] = '<img src="' . $image . '" alt="' . $this->textFormatting->blockhtml($text) . '" />';
         }
 
         echo json_encode([array_keys($rules), array_values($rules)]);

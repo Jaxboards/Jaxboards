@@ -6,6 +6,7 @@ namespace ACP\Page\Forums;
 
 use ACP\Page;
 use Jax\Database;
+use Jax\Models\Forum;
 use Jax\Request;
 
 use function array_pop;
@@ -39,13 +40,10 @@ final readonly class RecountStats
 
     public function recountStatistics(): void
     {
-        $result = $this->database->select(
-            ['id', 'nocount'],
-            'forums',
-        );
+        $forums = Forum::selectMany($this->database);
         $countPostsInForum = [];
-        foreach ($this->database->arows($result) as $forum) {
-            $countPostsInForum[$forum['id']] = !$forum['nocount'];
+        foreach ($forums as $forum) {
+            $countPostsInForum[$forum->id] = !$forum->nocount;
         }
 
         $result = $this->database->special(
@@ -103,18 +101,14 @@ final readonly class RecountStats
 
         // Go through and sum up category posts as well
         // as forums with subforums.
-        $result = $this->database->select(
-            ['id', 'path', 'cat_id'],
-            'forums',
-        );
-        foreach ($this->database->arows($result) as $forum) {
-            if (!$forum['path']) {
+        foreach ($forums as $forum) {
+            if (!$forum->path) {
                 continue;
             }
 
-            foreach (explode(' ', (string) $forum['path']) as $fid) {
-                $stat['forum_topics'][$fid] += $stat['forum_topics'][$forum['id']] ?? 0;
-                $stat['forum_posts'][$fid] += $stat['forum_posts'][$forum['id']] ?? 0;
+            foreach (explode(' ', (string) $forum->path) as $fid) {
+                $stat['forum_topics'][$fid] += $stat['forum_topics'][$forum->id] ?? 0;
+                $stat['forum_posts'][$fid] += $stat['forum_posts'][$forum->id] ?? 0;
             }
         }
 
