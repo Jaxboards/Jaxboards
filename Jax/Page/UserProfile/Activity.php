@@ -7,6 +7,7 @@ namespace Jax\Page\UserProfile;
 use Jax\Database;
 use Jax\Date;
 use Jax\DomainDefinitions;
+use Jax\Models\Member;
 use Jax\Request;
 use Jax\RSSFeed;
 use Jax\Template;
@@ -29,10 +30,7 @@ final readonly class Activity
         private User $user,
     ) {}
 
-    /**
-     * @param array<string,mixed> $profile
-     */
-    public function render(array $profile): string
+    public function render(Member $profile): string
     {
 
         if ($this->request->both('fmt') === 'RSS') {
@@ -44,22 +42,19 @@ final readonly class Activity
         return $this->renderActivitiesPage($profile);
     }
 
-    /**
-     * @param array<string,mixed> $profile
-     */
-    public function renderRSSFeed(array $profile): void
+    public function renderRSSFeed(Member $profile): void
     {
         $boardURL = $this->domainDefinitions->getBoardURL();
         $rssFeed = new RSSFeed(
             [
-                'description' => $profile['usertitle'],
-                'link' => "{$boardURL}?act=vu{$profile['id']}",
-                'title' => $profile['display_name'] . "'s recent activity",
+                'description' => $profile->usertitle,
+                'link' => "{$boardURL}?act=vu{$profile->id}",
+                'title' => $profile->display_name . "'s recent activity",
             ],
         );
-        foreach ($this->fetchActivities((int) $profile['id']) as $activity) {
-            $activity['name'] = $profile['display_name'];
-            $activity['group_id'] = $profile['group_id'];
+        foreach ($this->fetchActivities((int) $profile->id) as $activity) {
+            $activity['name'] = $profile->display_name;
+            $activity['group_id'] = $profile->group_id;
             $parsed = $this->parseActivityRSS($activity);
             $rssFeed->additem(
                 [
@@ -156,22 +151,19 @@ final readonly class Activity
         };
     }
 
-    /**
-     * @param array<string,mixed> $profile
-     */
-    private function renderActivitiesPage(array $profile): string
+    private function renderActivitiesPage(Member $profile): string
     {
         $tabHTML = '';
 
-        foreach ($this->fetchActivities((int) $profile['id']) as $activity) {
-            $activity['name'] = $profile['display_name'];
-            $activity['group_id'] = $profile['group_id'];
+        foreach ($this->fetchActivities((int) $profile->id) as $activity) {
+            $activity['name'] = $profile->display_name;
+            $activity['group_id'] = $profile->group_id;
             $tabHTML .= $this->parseActivity($activity);
         }
 
         return $tabHTML !== '' && $tabHTML !== '0'
             ? <<<HTML
-                <a href="?act=vu{$profile['id']}&amp;page=activity&amp;fmt=RSS"
+                <a href="?act=vu{$profile->id}&amp;page=activity&amp;fmt=RSS"
                    target="_blank" class="social" style='float:right'
                 >RSS</a>{$tabHTML}
                 HTML

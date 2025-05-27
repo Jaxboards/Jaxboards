@@ -7,6 +7,7 @@ namespace Jax\Page\UserProfile;
 use Jax\Database;
 use Jax\Date;
 use Jax\Jax;
+use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
 use Jax\Template;
@@ -26,10 +27,7 @@ final readonly class Comments
         private User $user,
     ) {}
 
-    /**
-     * @param array<string,null|float|int|string> $profile
-     */
-    public function render(array $profile): string
+    public function render(Member $profile): string
     {
         $tabHTML = '';
 
@@ -46,7 +44,7 @@ final readonly class Comments
                 $this->user->get('avatar') ?: $this->template->meta('default-avatar'),
                 $this->jax->hiddenFormFields(
                     [
-                        'act' => 'vu' . $profile['id'],
+                        'act' => 'vu' . $profile->id,
                         'page' => 'comments',
                         'view' => 'profile',
                     ],
@@ -88,11 +86,9 @@ final readonly class Comments
     }
 
     /**
-     * @param array<string,null|float|int|string> $profile
-     *
      * @return array<array<string,mixed>>
      */
-    private function fetchComments(array $profile): array
+    private function fetchComments(Member $profile): array
     {
         $result = $this->database->special(
             <<<'SQL'
@@ -113,7 +109,7 @@ final readonly class Comments
                 LIMIT 10
                 SQL,
             ['profile_comments', 'members'],
-            $profile['id'],
+            $profile->id,
         );
         $comments = $this->database->arows($result);
         $this->database->disposeresult($result);
@@ -121,10 +117,7 @@ final readonly class Comments
         return $comments;
     }
 
-    /**
-     * @param array<string,null|float|int|string> $profile
-     */
-    private function handleCommentCreation(array $profile): string
+    private function handleCommentCreation(Member $profile): string
     {
         $comment = $this->request->asString->post('comment');
         if (!$comment) {
@@ -148,7 +141,7 @@ final readonly class Comments
         $this->database->insert(
             'activity',
             [
-                'affected_uid' => $profile['id'],
+                'affected_uid' => $profile->id,
                 'date' => $this->database->datetime(),
                 'type' => 'profile_comment',
                 'uid' => $this->user->get('id'),
@@ -160,7 +153,7 @@ final readonly class Comments
                 'comment' => $comment,
                 'date' => $this->database->datetime(),
                 'from' => $this->user->get('id'),
-                'to' => $profile['id'],
+                'to' => $profile->id,
             ],
         );
 

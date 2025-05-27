@@ -8,6 +8,7 @@ use Jax\ContactDetails;
 use Jax\Database;
 use Jax\Date;
 use Jax\IPAddress;
+use Jax\Models\Member;
 use Jax\Page;
 use Jax\Page\UserProfile\ProfileTabs;
 use Jax\Request;
@@ -83,57 +84,9 @@ final readonly class UserProfile
         return $group['title'] ?? null;
     }
 
-    /**
-     * @return array<string,mixed>
-     */
-    private function fetchUser(int $userId): ?array
+    private function fetchUser(int $userId): ?Member
     {
-        $result = $this->database->select(
-            [
-                'ip',
-                'about',
-                'avatar',
-                'birthdate',
-                'contact_aim',
-                'contact_bluesky',
-                'contact_discord',
-                'contact_gtalk AS contact_googlechat',
-                'contact_msn',
-                'contact_skype',
-                'contact_steam',
-                'contact_twitter',
-                'contact_yim',
-                'contact_youtube',
-                'display_name',
-                'email',
-                'enemies',
-                'friends',
-                'full_name',
-                'gender',
-                'group_id',
-                'id',
-                'location',
-                '`mod`',
-                'name',
-                'posts',
-                'sig',
-                'skin_id',
-                'usertitle',
-                'website',
-                'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
-                'UNIX_TIMESTAMP(`last_visit`) AS `last_visit`',
-                'DAY(`birthdate`) AS `dob_day`',
-                'MONTH(`birthdate`) AS `dob_month`',
-                'YEAR(`birthdate`) AS `dob_year`',
-            ],
-            'members',
-            Database::WHERE_ID_EQUALS,
-            $userId,
-        );
-        $user = $this->database->arow($result);
-        $this->database->disposeresult($result);
-
-        return $user;
+        return Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $userId);
     }
 
     private function isUserInList(int $userId, string $listName): bool
@@ -148,10 +101,7 @@ final readonly class UserProfile
         );
     }
 
-    /**
-     * @param array<string,null|float|int|string> $profile
-     */
-    private function renderContactDetails(array $profile): string
+    private function renderContactDetails(Member $profile): string
     {
         $contactDetails = '';
 
@@ -170,17 +120,17 @@ final readonly class UserProfile
         $contactDetails .= <<<"HTML"
             <div class="contact im">
                 <a href="javascript:void(0)"
-                    onclick="new IMWindow({$profile['id']},'{$profile['display_name']}')"
+                    onclick="new IMWindow({$profile->id},'{$profile->display_name}')"
                     >IM</a>
             </div>
             <div class="contact pm">
-                <a href="?act=ucp&what=inbox&view=compose&mid={$profile['id']}">PM</a>
+                <a href="?act=ucp&what=inbox&view=compose&mid={$profile->id}">PM</a>
             </div>
             HTML;
 
         if ($this->user->getPerm('can_moderate')) {
-            $ipReadable = is_string($profile['ip'])
-                ? $this->ipAddress->asHumanReadable($profile['ip'])
+            $ipReadable = is_string($profile->ip)
+                ? $this->ipAddress->asHumanReadable($profile->ip)
                 : '';
             $contactDetails .= <<<HTML
                     <div>IP: <a href="?act=modcontrols&do=iptools&ip={$ipReadable}">{$ipReadable}</a></div>
@@ -190,10 +140,7 @@ final readonly class UserProfile
         return $contactDetails;
     }
 
-    /**
-     * @param array<string,null|float|int|string> $profile
-     */
-    private function showContactCard(array $profile): void
+    private function showContactCard(Member $profile): void
     {
         $contactdetails = '';
 
@@ -203,13 +150,13 @@ final readonly class UserProfile
                 HTML;
         }
 
-        $addContactLink = $this->isUserInList((int) $profile['id'], 'friends')
-            ? "<a href='?act=buddylist&remove={$profile['id']}'>Remove Contact</a>"
-            : "<a href='?act=buddylist&add={$profile['id']}'>Add Contact</a>";
+        $addContactLink = $this->isUserInList((int) $profile->id, 'friends')
+            ? "<a href='?act=buddylist&remove={$profile->id}'>Remove Contact</a>"
+            : "<a href='?act=buddylist&add={$profile->id}'>Add Contact</a>";
 
-        $blockLink = $this->isUserInList((int) $profile['id'], 'enemies')
-            ? "<a href='?act=buddylist&unblock={$profile['id']}'>Unblock Contact</a>"
-            : "<a href='?act=buddylist&block={$profile['id']}'>Block Contact</a>";
+        $blockLink = $this->isUserInList((int) $profile->id, 'enemies')
+            ? "<a href='?act=buddylist&unblock={$profile->id}'>Unblock Contact</a>"
+            : "<a href='?act=buddylist&block={$profile->id}'>Block Contact</a>";
 
         $this->page->command('softurl');
         $this->page->command(
@@ -219,10 +166,10 @@ final readonly class UserProfile
                 'className' => 'contact-card',
                 'content' => $this->template->meta(
                     'userprofile-contact-card',
-                    $profile['display_name'],
-                    $profile['avatar'] ?: $this->template->meta('default-avatar'),
-                    $profile['usertitle'],
-                    $profile['id'],
+                    $profile->display_name,
+                    $profile->avatar ?: $this->template->meta('default-avatar'),
+                    $profile->usertitle,
+                    $profile->id,
                     $contactdetails,
                     $addContactLink,
                     $blockLink,
@@ -234,36 +181,37 @@ final readonly class UserProfile
     }
 
     /**
-     * @param array<string,null|float|int|string> $profile
+     * @param Member $profile
      */
-    private function showFullProfile(array $profile): void
+    private function showFullProfile(Member $profile): void
     {
         [$tabs, $tabHTML] = $this->profileTabs->render($profile);
 
         $this->page->setBreadCrumbs(
             [
-                "?act=vu{$profile['id']}&page=profile" => "{$profile['display_name']}'s profile",
+                "?act=vu{$profile->id}&page=profile" => "{$profile->display_name}'s profile",
             ],
         );
 
         $contactdetails = $this->renderContactDetails($profile);
 
+        $birthday = $profile->birthdate ?: 'N/A';
         $page = $this->template->meta(
             'userprofile-full-profile',
-            $profile['display_name'],
-            $profile['avatar'] ?: $this->template->meta('default-avatar'),
-            $profile['usertitle'],
+            $profile->display_name,
+            $profile->avatar ?: $this->template->meta('default-avatar'),
+            $profile->usertitle,
             $contactdetails,
-            $profile['full_name'] ?: 'N/A',
-            ucfirst((string) $profile['gender']) ?: 'N/A',
-            $profile['location'],
-            $profile['dob_year'] ? "{$profile['dob_month']}/{$profile['dob_day']}/{$profile['dob_year']}" : 'N/A',
-            $profile['website'] ? "<a href='{$profile['website']}'>{$profile['website']}</a>" : 'N/A',
-            $this->date->autoDate((int) $profile['join_date']),
-            $this->date->autoDate((int) $profile['last_visit']),
-            $profile['id'],
-            $profile['posts'],
-            $this->fetchGroupTitle((int) $profile['group_id']),
+            $profile->full_name ?: 'N/A',
+            ucfirst((string) $profile->gender) ?: 'N/A',
+            $profile->location,
+            $birthday,
+            $profile->website ? "<a href='{$profile->website}'>{$profile->website}</a>" : 'N/A',
+            $profile->join_date,
+            $profile->last_visit,
+            $profile->id,
+            $profile->posts,
+            $this->fetchGroupTitle((int) $profile->group_id),
             $tabs[0],
             $tabs[1],
             $tabs[2],
@@ -272,12 +220,12 @@ final readonly class UserProfile
             $tabs[5],
             $tabHTML,
             $this->user->getPerm('can_moderate')
-                ? "<a class='moderate' href='?act=modcontrols&do=emem&mid={$profile['id']}'>Edit</a>" : '',
+                ? "<a class='moderate' href='?act=modcontrols&do=emem&mid={$profile->id}'>Edit</a>" : '',
         );
         $this->page->command('update', 'page', $page);
         $this->page->append('PAGE', $page);
 
-        $this->session->set('location_verbose', "Viewing {$profile['display_name']}'s profile");
+        $this->session->set('location_verbose', "Viewing {$profile->display_name}'s profile");
     }
 
     private function showProfileError(): void

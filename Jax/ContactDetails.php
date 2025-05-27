@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use Jax\Models\Member;
+
 use function array_filter;
 use function array_keys;
 use function array_reduce;
@@ -18,6 +20,7 @@ final class ContactDetails
         'bluesky' => 'https://bsky.app/profile/%s.bsky.social',
         'discord' => 'discord:%s',
         'googlechat' => 'gchat:chat?jid=%s',
+        'gtalk' => 'gchat:chat?jid=%s',
         'msn' => 'msnim:chat?contact=%s',
         'skype' => 'skype:%s',
         'steam' => 'https://steamcommunity.com/id/%s',
@@ -30,20 +33,22 @@ final class ContactDetails
      * Given a user's profile, returns an associative array formatted as:
      * 'twitter' => ['https://twitter.com/jax', 'jax']
      *
-     * @param array<string,mixed> $profile
+     * @param Member|array<string,mixed> $profile
      *
      * @return array<string,array{string,string}>
      */
-    public function getContactLinks(array $profile): array
+    public function getContactLinks(Member|array $profile): array
     {
+        $profileData = $profile instanceof Member ? $profile->asArray() : $profile;
+
         $contactFields = array_filter(
-            array_keys($profile),
-            static fn($field): bool => str_starts_with($field, 'contact') && $profile[$field],
+            Member::FIELDS,
+            static fn($field): bool => str_starts_with($field, 'contact') && $profileData[$field],
         );
 
-        return array_reduce($contactFields, static function (array $links, $field) use ($profile) {
+        return array_reduce($contactFields, static function (array $links, $field) use ($profileData) {
             $type = mb_substr($field, 8);
-            $value = $profile[$field];
+            $value = $profileData[$field];
             $href = sprintf(self::CONTACT_URLS[$type], $value);
             $links[$type] = [$href, $value];
 
