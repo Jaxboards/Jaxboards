@@ -340,26 +340,18 @@ final class Groups
             if ($error !== null) {
                 $page .= $this->page->error($error);
             } else {
-                $write = [
-                    'icon' => $groupIcon,
-                    'title' => $groupName,
-                ];
-                if ($gid) {
-                    $this->database->update(
-                        'member_groups',
-                        $write,
-                        Database::WHERE_ID_EQUALS,
-                        $gid,
-                    );
-                } else {
-                    $this->database->insert(
-                        'member_groups',
-                        $write,
-                    );
-                }
+                $group = $gid
+                    ? Group::selectOne($this->database, Database::WHERE_ID_EQUALS, $gid)
+                    : null;
+                $group ??= new Group();
+
+                $group->icon = $groupIcon;
+                $group->title = $groupName;
+
+                $group->upsert($this->database);
 
                 $this->page->addContentBox(
-                    $write['title'] . ' ' . ($gid ? 'edited' : 'created'),
+                    $group->title . ' ' . ($gid ? 'edited' : 'created'),
                     $this->page->success(
                         'Data saved.',
                     ),

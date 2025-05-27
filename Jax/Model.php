@@ -17,8 +17,6 @@ abstract class Model
 
     public const PRIMARY_KEY = 'id';
 
-    public $PRIMARY_KEY;
-
     /**
      * @param mixed $args
      */
@@ -60,23 +58,23 @@ abstract class Model
     public function delete(Database $database): ?PDOStatement
     {
         return $database->delete(
-            $this::TABLE,
+            static::TABLE,
             Database::WHERE_ID_EQUALS,
-            $this->{$this::PRIMARY_KEY},
+            $this->{static::PRIMARY_KEY},
         );
     }
 
     public function insert(Database $database): ?PDOStatement
     {
-        $statement = $database->insert($this::TABLE, $this->asArray());
-        $this->{$this::PRIMARY_KEY} = (int) $database->insertId();
+        $statement = $database->insert(static::TABLE, $this->asArray());
+        $this->{static::PRIMARY_KEY} = (int) $database->insertId();
 
         return $statement;
     }
 
     public function upsert(Database $database): ?PDOStatement
     {
-        if ($this->{$this::PRIMARY_KEY}) {
+        if ($this->{static::PRIMARY_KEY}) {
             return $this->update($database);
         }
 
@@ -88,10 +86,10 @@ abstract class Model
         $data = $this->asArray();
 
         return $database->update(
-            $this::TABLE,
+            static::TABLE,
             $this->asArray(),
             Database::WHERE_ID_EQUALS,
-            $data[$this::PRIMARY_KEY],
+            $data[static::PRIMARY_KEY],
         );
     }
 
@@ -101,7 +99,7 @@ abstract class Model
     public function asArray(): array
     {
         $data = [];
-        foreach ($this::FIELDS as $fieldName) {
+        foreach (static::FIELDS as $fieldName) {
             $data[$fieldName] = $this->{$fieldName};
         }
 
