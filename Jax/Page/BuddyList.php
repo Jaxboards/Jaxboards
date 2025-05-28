@@ -87,7 +87,7 @@ final readonly class BuddyList
 
         $displayBuddyList = match (true) {
             $add !== 0 => $this->addBuddy($add),
-            $remove !== null => $this->dropBuddy($remove),
+            $remove !== 0 => $this->dropBuddy($remove),
             $status !== null => $this->setStatus($status),
             $block !== 0 => $this->block($block),
             $unblock !== 0 => $this->unBlock($unblock),
