@@ -8,6 +8,7 @@ use Jax\Database;
 use Jax\Date;
 use Jax\Jax;
 use Jax\Models\Member;
+use Jax\Models\Message;
 use Jax\Page;
 use Jax\Request;
 use Jax\Template;
@@ -165,31 +166,22 @@ final readonly class Inbox
 
         $msg = '';
         if ($messageid) {
-            $result = $this->database->select(
-                [
-                    '`from`',
-                    'message',
-                    'title',
-                ],
-                'messages',
+            $message = Message::selectOne(
+                $this->database,
                 'WHERE (`to`=? OR `from`=?) AND `id`=?',
                 $this->user->get('id'),
                 $this->user->get('id'),
                 $messageid,
             );
 
-            $message = $this->database->arow($result);
-            $this->database->disposeresult($result);
-
             if ($message) {
-                $mid = $message['from'];
+                $mid = $message->from;
                 $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid);
                 $mname = $member?->display_name;
-                $this->database->disposeresult($result);
 
                 $msg = PHP_EOL . PHP_EOL . PHP_EOL
-                    . '[quote=' . $mname . ']' . $message['message'] . '[/quote]';
-                $mtitle = ($todo === 'fwd' ? 'FWD:' : 'RE:') . $message['title'];
+                    . '[quote=' . $mname . ']' . $message->message . '[/quote]';
+                $mtitle = ($todo === 'fwd' ? 'FWD:' : 'RE:') . $message->title;
                 if ($todo === 'fwd') {
                     $mid = '';
                     $mname = '';
@@ -228,62 +220,31 @@ final readonly class Inbox
 
     private function delete(int $messageId, bool $relocate = true): void
     {
-        $result = $this->database->select(
-            [
-                '`to`',
-                '`from`',
-                'del_recipient',
-                'del_sender',
-            ],
-            'messages',
+        $message = Message::selectOne(
+            $this->database,
             Database::WHERE_ID_EQUALS,
             $messageId,
         );
-        $message = $this->database->arow($result);
-        $this->database->disposeresult($result);
 
-        $is_recipient = $message && $message['to'] === $this->user->get('id');
-        $is_sender = $message && $message['from'] === $this->user->get('id');
-        if ($is_recipient) {
-            $this->database->update(
-                'messages',
-                [
-                    'del_recipient' => 1,
-                ],
-                Database::WHERE_ID_EQUALS,
-                $messageId,
-            );
+        if (!$message) {
+            return;
         }
 
-        if ($is_sender) {
-            $this->database->update(
-                'messages',
-                [
-                    'del_sender' => 1,
-                ],
-                Database::WHERE_ID_EQUALS,
-                $messageId,
-            );
+        $isRecipient = $message->to === $this->user->get('id');
+        $isSender = $message->from === $this->user->get('id');
+
+        if ($isRecipient) {
+            $message->del_recipient = 1;
+            $message->update($this->database);
         }
 
-        $result = $this->database->select(
-            [
-                'del_recipient',
-                'del_sender',
-            ],
-            'messages',
-            Database::WHERE_ID_EQUALS,
-            $messageId,
-        );
-        $message = $this->database->arow($result);
-        $this->database->disposeresult($result);
+        if ($isSender) {
+            $message->del_sender = 1;
+            $message->update($this->database);
+        }
 
-        if ($message && $message['del_recipient'] && $message['del_sender']) {
-            $this->database->delete(
-                'messages',
-                Database::WHERE_ID_EQUALS,
-                $messageId,
-            );
+        if ($message->del_recipient && $message->del_sender) {
+            $message->delete($this->database);
         }
 
         if (!$relocate) {
@@ -316,16 +277,7 @@ final readonly class Inbox
             'read' => 'WHERE `to`=? AND `read`=1',
             default => 'WHERE `to`=? AND !`del_recipient`',
         };
-        $result = $this->database->select(
-            'COUNT(`id`) as `message_count`',
-            'messages',
-            $criteria,
-            $this->user->get('id'),
-        );
-        $unread = $this->database->arow($result);
-        $this->database->disposeresult($result);
-
-        return $unread ? $unread['message_count'] : 0;
+        return Message::count($this->database, $criteria, $this->user->get('id')) ?? 0;
     }
 
     /**
@@ -379,15 +331,18 @@ final readonly class Inbox
     private function flag(int $messageId): null
     {
         $this->page->command('softurl');
-        $this->database->update(
-            'messages',
-            [
-                'flag' => $this->request->both('tog') ? 1 : 0,
-            ],
+
+        $message = Message::selectOne(
+            $this->database,
             'WHERE `id`=? AND `to`=?',
             $messageId,
             $this->user->get('id'),
         );
+
+        if ($message) {
+            $message->flag = $this->request->both('tog') ? 1 : 0;
+            $message->update($this->database);
+        }
 
         return null;
     }
