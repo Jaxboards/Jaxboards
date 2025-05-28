@@ -94,9 +94,11 @@ final readonly class BuddyList
             default => true,
         };
 
-        if ($displayBuddyList) {
-            $this->displayBuddyList();
+        if (!$displayBuddyList) {
+            return;
         }
+
+        $this->displayBuddyList();
     }
 
     private function displayBuddyList(): void
@@ -198,6 +200,7 @@ final readonly class BuddyList
         if ($error !== null) {
             $this->page->append('PAGE', $error);
             $this->page->command('error', $error);
+
             return false;
         }
 
@@ -235,12 +238,14 @@ final readonly class BuddyList
 
         if ($error !== null) {
             $this->page->command('error', $error);
+
             return false;
         }
 
         $enemies[] = $uid;
         $enemies = implode(',', $enemies);
         $this->user->set('enemies', $enemies);
+
         return true;
     }
 
