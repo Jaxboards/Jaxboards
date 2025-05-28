@@ -7,6 +7,7 @@ namespace Jax\Page\UserProfile;
 use Jax\Database;
 use Jax\Date;
 use Jax\Jax;
+use Jax\Models\Activity;
 use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
@@ -138,15 +139,13 @@ final readonly class Comments
             return $this->template->meta('error', $error);
         }
 
-        $this->database->insert(
-            'activity',
-            [
-                'affected_uid' => $member->id,
-                'date' => $this->database->datetime(),
-                'type' => 'profile_comment',
-                'uid' => $this->user->get('id'),
-            ],
-        );
+        $activity =  new Activity();
+        $activity->affected_uid = $member->id;
+        $activity->date = $this->database->datetime();
+        $activity->type = 'profile_comment';
+        $activity->uid = $this->user->get('id');
+        $activity->insert($this->database);
+
         $this->database->insert(
             'profile_comments',
             [

@@ -502,7 +502,7 @@ final readonly class Themes
                     'default' => 0,
                 ],
                 'WHERE `id`!=?',
-                $this->database->insertId(),
+                $skin->id,
             );
         }
 

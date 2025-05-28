@@ -6,6 +6,7 @@ namespace Jax\Page;
 
 use Jax\Database;
 use Jax\Jax;
+use Jax\Models\Activity;
 use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
@@ -197,14 +198,12 @@ final readonly class BuddyList
             $friends[] = $uid;
 
             $this->user->set('friends', implode(',', $friends));
-            $this->database->insert(
-                'activity',
-                [
-                    'affected_uid' => $uid,
-                    'type' => 'buddy_add',
-                    'uid' => (int) $this->user->get('id'),
-                ],
-            );
+            $activity = new Activity();
+            $activity->affected_uid = $uid;
+            $activity->type = 'buddy_add';
+            $activity->uid = (int) $this->user->get('id');
+            $activity->insert($this->database);
+
             $this->displaybuddylist();
         }
     }

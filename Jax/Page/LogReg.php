@@ -165,7 +165,7 @@ final class LogReg
                 SET `members` = `members` + 1, `last_register` = ?
                 SQL,
             ['stats'],
-            $this->database->insertId(),
+            $newMember->id,
         );
         $this->login($name, $pass1);
     }

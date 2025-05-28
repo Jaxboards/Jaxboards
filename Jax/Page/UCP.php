@@ -9,6 +9,7 @@ use Jax\Config;
 use Jax\Constants\Groups;
 use Jax\Database;
 use Jax\Jax;
+use Jax\Models\Activity;
 use Jax\Models\Member;
 use Jax\Models\Skin;
 use Jax\Page;
@@ -505,16 +506,13 @@ final readonly class UCP
         }
 
         if ($data['display_name'] !== $this->user->get('display_name')) {
-            $this->database->insert(
-                'activity',
-                [
-                    'arg1' => $this->user->get('display_name'),
-                    'arg2' => $data['display_name'],
-                    'date' => $this->database->datetime(),
-                    'type' => 'profile_name_change',
-                    'uid' => $this->user->get('id'),
-                ],
-            );
+            $activity = new Activity();
+            $activity->arg1 = $this->user->get('display_name');
+            $activity->arg2 = $data['display_name'];
+            $activity->date = $this->database->datetime();
+            $activity->type = 'profile_name_change';
+            $activity->uid = $this->user->get('id');
+            $activity->insert($this->database);
         }
 
         $this->user->setBulk($data);

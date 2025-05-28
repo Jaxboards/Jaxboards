@@ -9,6 +9,7 @@ use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\Hooks;
 use Jax\IPAddress;
+use Jax\Models\Activity;
 use Jax\Models\File;
 use Jax\Models\Forum;
 use Jax\Models\Post as ModelsPost;
@@ -757,18 +758,14 @@ final class Post
             );
         }
 
-        // Update activity history.
-        $this->database->insert(
-            'activity',
-            [
-                'arg1' => $fdata['topictitle'],
-                'date' => $postDate,
-                'pid' => $post->id,
-                'tid' => $tid,
-                'type' => $newtopic ? 'new_topic' : 'new_post',
-                'uid' => $uid,
-            ],
-        );
+        $activity = new Activity();
+        $activity->arg1 = $fdata['topictitle'];
+        $activity->date = $postDate;
+        $activity->pid = $post->id;
+        $activity->tid = $tid;
+        $activity->type = $newtopic ? 'new_topic' : 'new_post';
+        $activity->uid = $uid;
+        $activity->insert($this->database);
 
         // Update last post info
         // for the topic.
