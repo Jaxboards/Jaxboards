@@ -213,6 +213,7 @@ final readonly class ServiceSignup
             return 'username needs to consist of letters, '
                 . 'numbers, and underscore only';
         }
+
         $result = $this->database->select(
             ['id'],
             'directory',
