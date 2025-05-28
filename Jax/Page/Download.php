@@ -35,7 +35,7 @@ final readonly class Download
     {
         $file = File::selectOne($this->database, Database::WHERE_ID_EQUALS, $id);
 
-        if (!$file) {
+        if ($file === null) {
             return;
         }
 
@@ -49,7 +49,7 @@ final readonly class Download
             ['files'],
             $id,
         );
-        $ext = explode('.', (string) $file->name);
+        $ext = explode('.', $file->name);
         $ext = count($ext) === 1 ? '' : mb_strtolower(array_pop($ext));
 
         if (in_array($ext, ['jpeg', 'jpg', 'png', 'gif', 'bmp'])) {
@@ -58,7 +58,7 @@ final readonly class Download
 
         $filePath = $this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash;
         if (file_exists($filePath)) {
-            if (!$file->name) {
+            if ($file->name === '' || $file->name === '0') {
                 $file->name = 'unknown';
             }
 

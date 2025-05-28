@@ -16,6 +16,7 @@ use Jax\Request;
 
 use function _\keyBy;
 use function array_key_exists;
+use function array_map;
 use function implode;
 use function in_array;
 use function is_array;
@@ -44,7 +45,7 @@ final readonly class FileManager
         $delete = (int) $this->request->asString->both('delete');
         if ($delete !== 0) {
             $file = File::selectOne($this->database, Database::WHERE_ID_EQUALS, $delete);
-            if ($file) {
+            if ($file !== null) {
                 $ext = mb_strtolower(pathinfo($file->name, PATHINFO_EXTENSION));
                 if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp'], true)) {
                     $file->hash .= '.' . $ext;
@@ -112,10 +113,10 @@ final readonly class FileManager
 
         $files = File::selectMany($this->database, 'ORDER BY size');
 
-        $memberIds = array_map(fn($file) => $file->uid, $files);
+        $memberIds = array_map(static fn($file): string => $file->uid, $files);
         $members = keyBy(
             Member::selectMany($this->database, Database::WHERE_ID_IN, $memberIds),
-            fn($member) => $member->id
+            static fn($member) => $member->id,
         );
 
         $table = '';

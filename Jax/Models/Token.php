@@ -14,7 +14,7 @@ final class Token extends Model
         'token',
         'type',
         'uid',
-        'expires'
+        'expires',
     ];
 
     public string $token = '';

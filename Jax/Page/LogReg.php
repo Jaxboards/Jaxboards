@@ -330,7 +330,7 @@ final class LogReg
                 $tokenId,
             );
 
-            if (!$token) {
+            if ($token === null) {
                 $page = $this->template->meta('error', 'This link has expired. Please try again.');
             } elseif (
                 $pass1 && $pass2

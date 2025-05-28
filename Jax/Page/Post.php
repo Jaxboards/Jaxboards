@@ -156,7 +156,7 @@ final class Post
         }
 
         $fileRecord = File::selectOne($this->database, 'WHERE `hash`=?', $hash);
-        if (!$fileRecord) {
+        if ($fileRecord === null) {
             return '';
         }
 

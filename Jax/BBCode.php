@@ -7,6 +7,7 @@ namespace Jax;
 use Jax\Models\File;
 
 use function array_filter;
+use function array_key_exists;
 use function array_keys;
 use function array_map;
 use function array_values;
@@ -154,11 +155,11 @@ final class BBCode
     {
         $file = $this->getAttachmentData($match[1]);
 
-        if (!$file) {
+        if ($file === null) {
             return "Attachment doesn't exist";
         }
 
-        $ext = pathinfo((string) $file->name, PATHINFO_EXTENSION);
+        $ext = pathinfo($file->name, PATHINFO_EXTENSION);
         $imageExtensions = $this->config->getSetting('images') ?? [];
 
         if (
@@ -178,15 +179,13 @@ final class BBCode
 
         return '<div class="attachment">'
             . '<a href="index.php?act=download&id='
-            . $file->id . '&name=' . urlencode((string) $file->name) . '" class="name">'
+            . $file->id . '&name=' . urlencode($file->name) . '" class="name">'
             . $file->name . '</a> Downloads: ' . $file->downloads . '</div>';
     }
 
     /**
      * Given an attachment ID, gets the file data associated with it
      * Returns null if file not found.
-     *
-     * @return null|File
      */
     private function getAttachmentData(string $fileId): ?File
     {
@@ -196,7 +195,7 @@ final class BBCode
 
         $file = File::selectOne($this->database, Database::WHERE_ID_EQUALS, $fileId);
 
-        if (!$file) {
+        if ($file === null) {
             return null;
         }
 

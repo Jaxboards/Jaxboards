@@ -114,7 +114,7 @@ final class Session
         if ($userId === null && $uToken !== null) {
             $token = Token::selectOne($this->database, 'WHERE `token`=?', $uToken);
 
-            if ($token) {
+            if ($token !== null) {
                 $this->setPHPSessionValue('uid', $token->uid);
 
                 return $token->uid;
