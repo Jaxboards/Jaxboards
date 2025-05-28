@@ -139,7 +139,7 @@ final readonly class Comments
             return $this->template->meta('error', $error);
         }
 
-        $activity =  new Activity();
+        $activity = new Activity();
         $activity->affected_uid = $member->id;
         $activity->date = $this->database->datetime();
         $activity->type = 'profile_comment';

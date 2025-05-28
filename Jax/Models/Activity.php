@@ -39,5 +39,4 @@ final class Activity extends Model
     public ?int $pid = 0;
 
     public string $arg2 = '';
-
 }
