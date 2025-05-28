@@ -422,7 +422,7 @@ class Database
             $forumId,
         );
 
-        $forum = Forum::selectOne($this, Database::WHERE_ID_EQUALS, $forumId);
+        $forum = Forum::selectOne($this, self::WHERE_ID_EQUALS, $forumId);
 
         $forum->lp_date = $topic->lp_date;
         $forum->lp_tid = $topic->id;

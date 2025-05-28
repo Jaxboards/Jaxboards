@@ -448,8 +448,8 @@ final class Forum
             // does not select records in the same order
             $forumTitles = array_reduce(
                 $forums,
-                static function (array $forumTitles, ModelsForum $forum) {
-                    $forumTitles[$forum->id] = $forum->title;
+                static function (array $forumTitles, ModelsForum $modelsForum) {
+                    $forumTitles[$modelsForum->id] = $modelsForum->title;
 
                     return $forumTitles;
                 },

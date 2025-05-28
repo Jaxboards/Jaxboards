@@ -19,6 +19,7 @@ use Jax\Models\Message;
 use Jax\Request;
 use Jax\User;
 
+use function array_map;
 use function count;
 use function file_get_contents;
 use function file_put_contents;
@@ -553,7 +554,7 @@ final readonly class Members
 
                 array_map(
                     fn($forum) => $this->database->fixForumLastPost($forum->id),
-                    Forum::selectMany($this->database)
+                    Forum::selectMany($this->database),
                 );
 
                 // Update stats.
