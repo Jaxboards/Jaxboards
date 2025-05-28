@@ -174,14 +174,16 @@ final readonly class ServiceSignup
         ) {
             return 'all fields required.';
         }
-        if (mb_strlen((string) $boardURL) > 30) {
+
+        if (mb_strlen($boardURL) > 30) {
             return 'board url too long';
         }
+
         if ($boardURL === 'www') {
             return 'WWW is reserved.';
         }
 
-        if (preg_match('@\W@', (string) $boardURL)) {
+        if (preg_match('@\W@', $boardURL)) {
             return 'board url needs to consist of letters, '
                 . 'numbers, and underscore only';
         }
@@ -202,6 +204,7 @@ final readonly class ServiceSignup
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return 'invalid email';
         }
+
         if (mb_strlen($username) > 50) {
             return 'username too long';
         }
@@ -210,17 +213,14 @@ final readonly class ServiceSignup
             return 'username needs to consist of letters, '
                 . 'numbers, and underscore only';
         }
-
-        if ($boardURL !== '0') {
-            $result = $this->database->select(
-                ['id'],
-                'directory',
-                'WHERE `boardname`=?',
-                $boardURL,
-            );
-            if ($this->database->arow($result)) {
-                return' that board already exists';
-            }
+        $result = $this->database->select(
+            ['id'],
+            'directory',
+            'WHERE `boardname`=?',
+            $boardURL,
+        );
+        if ($this->database->arow($result)) {
+            return' that board already exists';
         }
 
         $this->database->disposeresult($result);
