@@ -630,6 +630,7 @@ final readonly class Members
         }
 
         $messageCount = count($members);
+
         return $this->page->success("Successfully delivered {$messageCount} messages");
     }
 

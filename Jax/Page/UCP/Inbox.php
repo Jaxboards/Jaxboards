@@ -118,7 +118,9 @@ final readonly class Inbox
             $message->from = $this->user->get('id');
             $message->message = $this->request->asString->post('message');
             $message->read = 0;
-            $message->title = $title ? $this->textFormatting->blockhtml($title) : '';
+            $message->title = $title
+                ? $this->textFormatting->blockhtml($title)
+                : '';
             $message->to = $udata->id;
             $message->insert($this->database);
 

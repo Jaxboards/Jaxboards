@@ -7,14 +7,12 @@ namespace Jax;
 use DI\Container;
 use Jax\Models\Message;
 
-use function array_pop;
 use function dirname;
 use function file_get_contents;
 use function glob;
 use function gmdate;
 use function header;
 use function implode;
-use function is_array;
 use function json_decode;
 use function json_encode;
 use function mb_strtolower;
@@ -263,7 +261,6 @@ final readonly class App
                     . ' new message' . ($numMessages === 1 ? '' : 's') . '</div></a>',
                 );
             }
-
         }
 
         $this->template->addVar('inbox', (string) $numMessages);
