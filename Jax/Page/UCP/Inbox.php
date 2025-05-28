@@ -174,7 +174,7 @@ final readonly class Inbox
                 $messageid,
             );
 
-            if ($message) {
+            if ($message !== null) {
                 $mid = $message->from;
                 $member = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid);
                 $mname = $member?->display_name;
@@ -226,7 +226,7 @@ final readonly class Inbox
             $messageId,
         );
 
-        if (!$message) {
+        if ($message === null) {
             return;
         }
 
@@ -277,6 +277,7 @@ final readonly class Inbox
             'read' => 'WHERE `to`=? AND `read`=1',
             default => 'WHERE `to`=? AND !`del_recipient`',
         };
+
         return Message::count($this->database, $criteria, $this->user->get('id')) ?? 0;
     }
 
@@ -339,7 +340,7 @@ final readonly class Inbox
             $this->user->get('id'),
         );
 
-        if ($message) {
+        if ($message !== null) {
             $message->flag = $this->request->both('tog') ? 1 : 0;
             $message->update($this->database);
         }
