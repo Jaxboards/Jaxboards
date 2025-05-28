@@ -49,6 +49,138 @@ final readonly class ServiceSignup
         private ServiceConfig $serviceConfig,
     ) {}
 
+    private function signup(): ?string
+    {
+        if ($this->request->post('post') !== null) {
+            header('Location: https://test.' . $this->serviceConfig->getSetting('domain'));
+        }
+
+        $username = $this->request->asString->post('username');
+        $password = $this->request->asString->post('password');
+        $email = $this->request->asString->post('email');
+        $boardURL = $this->request->asString->both('boardurl');
+        $boardURLLowercase = mb_strtolower((string) $boardURL);
+
+        if (
+            !$boardURL
+            || !$username
+            || !$password
+            || !$email
+        ) {
+            return 'all fields required.';
+        } elseif (mb_strlen($boardURL) > 30) {
+            return 'board url too long';
+        } elseif ($boardURL === 'www') {
+            return 'WWW is reserved.';
+        } elseif (preg_match('@\W@', $boardURL)) {
+            return 'board url needs to consist of letters, '
+                . 'numbers, and underscore only';
+        }
+
+        $result = $this->database->select(
+            ['id'],
+            'directory',
+            'WHERE `registrar_ip`=? AND `date`>?',
+            $this->ipAddress->asBinary(),
+            $this->database->datetime(Carbon::now()->subWeeks(1)->getTimestamp()),
+        );
+        if (count($this->database->arows($result)) > 3) {
+            return 'You may only register 3 boards per week.';
+        }
+
+        $this->database->disposeresult($result);
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return 'invalid email';
+        }
+
+        if (mb_strlen((string) $username) > 50) {
+            return 'username too long';
+        } elseif (preg_match('@\W@', (string) $username)) {
+            return 'username needs to consist of letters, '
+                . 'numbers, and underscore only';
+        }
+
+        if ($boardURL) {
+            $result = $this->database->select(
+                ['id'],
+                'directory',
+                'WHERE `boardname`=?',
+                $boardURL,
+            );
+            if ($this->database->arow($result)) {
+                return' that board already exists';
+            }
+        }
+
+        $this->database->disposeresult($result);
+        $boardPrefix = $boardURLLowercase . '_';
+
+        $this->database->setPrefix('');
+        // Add board to directory.
+        $this->database->insert(
+            'directory',
+            [
+                'boardname' => $boardURL,
+                'date' => $this->database->datetime(),
+                'referral' => $this->request->asString->both('r'),
+                'registrar_email' => $email,
+                'registrar_ip' => $this->ipAddress->asBinary(),
+            ],
+        );
+        $this->database->setPrefix($boardPrefix);
+
+        // Create the directory and blueprint tables
+        // Import sql file and run it with php from this:
+        // https://stackoverflow.com/a/19752106
+        // It's not pretty or perfect but it'll work for our use case...
+        $query = '';
+        $lines = $this->blueprint->getSchema();
+        foreach ($lines as $line) {
+            // Skip comments.
+            if (mb_substr($line, 0, 2) === '--') {
+                continue;
+            }
+
+            if ($line === '') {
+                continue;
+            }
+
+            // Replace blueprint_ with board name.
+            $line = str_replace('blueprint_', $boardPrefix, $line);
+
+            // Add line to current query.
+            $query .= $line;
+
+            // If it has a semicolon at the end, it's the end of the query.
+            if (mb_substr(trim((string) $line), -1, 1) !== ';') {
+                continue;
+            }
+
+            // Perform the query.
+            $result = $this->database->query($query);
+            $this->database->disposeresult($result);
+            // Reset temp variable to empty.
+            $query = '';
+        }
+
+        // Don't forget to create the admin.
+        $member = new Member();
+        $member->display_name = $username;
+        $member->email = $email;
+        $member->group_id = 2;
+        $member->join_date = $this->database->datetime();
+        $member->last_visit = $this->database->datetime();
+        $member->name = $username;
+        $member->pass = password_hash($password, PASSWORD_DEFAULT);
+        $member->insert($this->database);
+
+        $this->fileUtils->copyDirectory($this->blueprint->getDirectory(), dirname(__DIR__) . '/boards/' . $boardURLLowercase);
+
+        header('Location: https://' . $this->request->asString->post('boardurl') . '.' . $this->serviceConfig->getSetting('domain'));
+        return null;
+    }
+
     public function render(): void
     {
         if (!$this->serviceConfig->getSetting('service')) {
@@ -57,142 +189,13 @@ final readonly class ServiceSignup
             return;
         }
 
-        $errors = [];
+        $error = null;
         if ($this->request->post('submit') !== null) {
-            if ($this->request->post('post') !== null) {
-                header('Location: https://test.' . $this->serviceConfig->getSetting('domain'));
-            }
-
-            $username = $this->request->asString->post('username');
-            $password = $this->request->asString->post('password');
-            $email = $this->request->asString->post('email');
-            $boardURL = $this->request->asString->both('boardurl');
-            $boardURLLowercase = mb_strtolower((string) $boardURL);
-
-            if (
-                !$boardURL
-                || !$username
-                || !$password
-                || !$email
-            ) {
-                $errors[] = 'all fields required.';
-            } elseif (mb_strlen($boardURL) > 30) {
-                $errors[] = 'board url too long';
-            } elseif ($boardURL === 'www') {
-                $errors[] = 'WWW is reserved.';
-            } elseif (preg_match('@\W@', $boardURL)) {
-                $errors[] = 'board url needs to consist of letters, '
-                    . 'numbers, and underscore only';
-            }
-
-            $result = $this->database->select(
-                ['id'],
-                'directory',
-                'WHERE `registrar_ip`=? AND `date`>?',
-                $this->ipAddress->asBinary(),
-                $this->database->datetime(Carbon::now()->subWeeks(1)->getTimestamp()),
-            );
-            if (count($this->database->arows($result)) > 3) {
-                $errors[] = 'You may only register 3 boards per week.';
-            }
-
-            $this->database->disposeresult($result);
-
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $errors[] = 'invalid email';
-            }
-
-            if (mb_strlen((string) $username) > 50) {
-                $errors[] = 'username too long';
-            } elseif (preg_match('@\W@', (string) $username)) {
-                $errors[] = 'username needs to consist of letters, '
-                    . 'numbers, and underscore only';
-            }
-
-            if ($boardURL) {
-                $result = $this->database->select(
-                    ['id'],
-                    'directory',
-                    'WHERE `boardname`=?',
-                    $boardURL,
-                );
-                if ($this->database->arow($result)) {
-                    $errors[] = 'that board already exists';
-                }
-            }
-
-            $this->database->disposeresult($result);
-
-            if ($errors === []) {
-                $boardPrefix = $boardURLLowercase . '_';
-
-                $this->database->setPrefix('');
-                // Add board to directory.
-                $this->database->insert(
-                    'directory',
-                    [
-                        'boardname' => $boardURL,
-                        'date' => $this->database->datetime(),
-                        'referral' => $this->request->asString->both('r'),
-                        'registrar_email' => $email,
-                        'registrar_ip' => $this->ipAddress->asBinary(),
-                    ],
-                );
-                $this->database->setPrefix($boardPrefix);
-
-                // Create the directory and blueprint tables
-                // Import sql file and run it with php from this:
-                // https://stackoverflow.com/a/19752106
-                // It's not pretty or perfect but it'll work for our use case...
-                $query = '';
-                $lines = $this->blueprint->getSchema();
-                foreach ($lines as $line) {
-                    // Skip comments.
-                    if (mb_substr($line, 0, 2) === '--') {
-                        continue;
-                    }
-
-                    if ($line === '') {
-                        continue;
-                    }
-
-                    // Replace blueprint_ with board name.
-                    $line = str_replace('blueprint_', $boardPrefix, $line);
-
-                    // Add line to current query.
-                    $query .= $line;
-
-                    // If it has a semicolon at the end, it's the end of the query.
-                    if (mb_substr(trim((string) $line), -1, 1) !== ';') {
-                        continue;
-                    }
-
-                    // Perform the query.
-                    $result = $this->database->query($query);
-                    $this->database->disposeresult($result);
-                    // Reset temp variable to empty.
-                    $query = '';
-                }
-
-                // Don't forget to create the admin.
-                $member = new Member();
-                $member->display_name = $username;
-                $member->email = $email;
-                $member->group_id = 2;
-                $member->join_date = $this->database->datetime();
-                $member->last_visit = $this->database->datetime();
-                $member->name = $username;
-                $member->pass = password_hash((string) $password, PASSWORD_DEFAULT);
-                $member->insert($this->database);
-
-                $this->fileUtils->copyDirectory($this->blueprint->getDirectory(), dirname(__DIR__) . '/boards/' . $boardURLLowercase);
-
-                header('Location: https://' . $this->request->asString->post('boardurl') . '.' . $this->serviceConfig->getSetting('domain'));
-            }
+            $error = $this->signup();
         }
 
         $currentYear = gmdate('Y');
-        $errorDisplay = implode('', array_map(static fn($error): string => "<div class='error'>{$error}</div>", $errors));
+        $errorDisplay = $error ? "<div class='error'>{$error}</div>" : '';
 
         echo <<<HTML
             <!doctype html>

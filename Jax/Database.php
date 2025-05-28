@@ -424,6 +424,10 @@ class Database
 
         $forum = Forum::selectOne($this, self::WHERE_ID_EQUALS, $forumId);
 
+        if ($topic === null || $forum === null) {
+            return;
+        }
+
         $forum->lp_date = $topic->lp_date;
         $forum->lp_tid = $topic->id;
         $forum->lp_topic = $topic->title;

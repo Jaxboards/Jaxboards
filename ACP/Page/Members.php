@@ -626,7 +626,7 @@ final readonly class Members
             $message->del_recipient = 0;
             $message->del_sender = 0;
             $message->flag = 0;
-            $message->from = $this->user->get('id');
+            $message->from = (int) $this->user->get('id');
             $message->message = $messageBody;
             $message->read = 0;
             $message->title = $title;

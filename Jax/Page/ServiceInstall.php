@@ -213,6 +213,7 @@ final readonly class ServiceInstall
         $adminEmail = $this->request->asString->post('admin_email');
         $adminUsername = $this->request->asString->post('admin_username');
         $adminPassword = $this->request->asString->post('admin_password');
+        $adminPassword2 = $this->request->asString->post('admin_password_2');
         $domain = $this->request->asString->post('domain');
         // Are we installing this the service way.
         $service = (bool) $this->request->post('service');
@@ -245,7 +246,7 @@ final readonly class ServiceInstall
             );
         }
 
-        if ($adminPassword !== $this->request->asString->post('admin_password_2')) {
+        if ($adminPassword !== $adminPassword2) {
             $errors[] = 'Admin passwords do not match';
         }
 
@@ -384,12 +385,12 @@ final readonly class ServiceInstall
 
             // Don't forget to create the admin.
             $member = new Member();
-            $member->display_name = $adminUsername;
-            $member->email = $adminEmail;
+            $member->display_name = $adminUsername ?? '';
+            $member->email = $adminEmail ?? '';
             $member->group_id = 2;
             $member->join_date = $this->database->datetime();
             $member->last_visit = $this->database->datetime();
-            $member->name = $adminUsername;
+            $member->name = $adminUsername ?? '';
             $member->pass = password_hash(
                 (string) $adminPassword,
                 PASSWORD_DEFAULT,

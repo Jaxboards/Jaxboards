@@ -115,8 +115,8 @@ final readonly class Inbox
             $message->date = $this->database->datetime();
             $message->del_recipient = 0;
             $message->del_sender = 0;
-            $message->from = $this->user->get('id');
-            $message->message = $this->request->asString->post('message');
+            $message->from = (int) $this->user->get('id');
+            $message->message = $this->request->asString->post('message') ?? '';
             $message->read = 0;
             $message->title = $title
                 ? $this->textFormatting->blockhtml($title)

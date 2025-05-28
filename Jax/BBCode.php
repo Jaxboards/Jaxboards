@@ -29,7 +29,7 @@ use const PATHINFO_EXTENSION;
 final class BBCode
 {
     /**
-     * @var array<string,File>
+     * @var array<int,File>
      */
     private array $attachmentData = [];
 
@@ -153,7 +153,7 @@ final class BBCode
      */
     private function attachmentCallback(array $match): string
     {
-        $file = $this->getAttachmentData($match[1]);
+        $file = $this->getAttachmentData((int) $match[1]);
 
         if ($file === null) {
             return "Attachment doesn't exist";
@@ -187,7 +187,7 @@ final class BBCode
      * Given an attachment ID, gets the file data associated with it
      * Returns null if file not found.
      */
-    private function getAttachmentData(string $fileId): ?File
+    private function getAttachmentData(int $fileId): ?File
     {
         if (array_key_exists($fileId, $this->attachmentData)) {
             return $this->attachmentData[$fileId];

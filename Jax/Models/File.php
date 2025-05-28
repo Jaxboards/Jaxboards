@@ -26,7 +26,7 @@ final class File extends Model
 
     public string $hash = '';
 
-    public string $uid = '';
+    public int $uid = 0;
 
     public int $size = 0;
 

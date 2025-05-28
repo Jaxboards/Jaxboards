@@ -31,6 +31,9 @@ abstract class Model
         $this->fromDatabase = true;
     }
 
+    /**
+     * @param mixed $args
+     */
     public static function count(Database $database, ...$args): ?int
     {
         $stmt = $database->select(

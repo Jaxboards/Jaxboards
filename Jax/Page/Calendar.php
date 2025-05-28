@@ -60,6 +60,7 @@ final readonly class Calendar
         );
         $offset = (int) $offset;
         $daysInMonth = (int) $daysInMonth;
+        $year = (int) $year;
 
         $this->session->set('location_verbose', 'Checking out the calendar for ' . $monthName . ' ' . $year);
         $members = Member::selectMany(
@@ -70,15 +71,18 @@ final readonly class Calendar
         );
         $birthdays = [];
         foreach ($members as $member) {
+            if (!$member->birthdate) {
+                continue;
+            }
             $birthday = Carbon::createFromFormat('Y-m-d', $member->birthdate, 'UTC');
-            $birthdays[$birthday->day][] = sprintf(
+            $birthdays[$birthday?->day][] = sprintf(
                 '<a href="?act=vu%1$s" class="user%1$s mgroup%2$s" '
                 . 'title="%4$s years old!" data-use-tooltip="true">'
                 . '%3$s</a>',
                 $member->id,
                 $member->group_id,
                 $member->name,
-                $year - $birthday->year,
+                $year - ($birthday?->year ?? 0),
             );
         }
 

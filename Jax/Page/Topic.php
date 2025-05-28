@@ -801,10 +801,10 @@ final class Topic
             return;
         }
 
-        if ($post['newtopic']) {
+        if ($post->newtopic) {
             $hiddenfields .= $this->jax->hiddenFormFields(
                 [
-                    'tid' => $post['tid'],
+                    'tid' => $post->tid,
                 ],
             );
             $form = $this->template->meta(
@@ -812,13 +812,13 @@ final class Topic
                 $hiddenfields,
                 $topic['title'],
                 $topic['subtitle'],
-                $this->textFormatting->blockhtml($post['post']),
+                $this->textFormatting->blockhtml($post->post),
             );
         } else {
             $form = $this->template->meta(
                 'topic-qedit-post',
                 $hiddenfields,
-                $this->textFormatting->blockhtml($post['post']),
+                $this->textFormatting->blockhtml($post->post),
                 $pid,
             );
         }

@@ -339,7 +339,7 @@ final class Shoutbox
         $error = match (true) {
             $this->user->isGuest() => 'You must be logged in to shout!',
             !$this->user->getPerm('can_shout') => 'You do not have permission to shout!',
-            mb_strlen($shout) > 300 => 'Shout must be less than 300 characters.',
+            mb_strlen($shoutBody) > 300 => 'Shout must be less than 300 characters.',
             default => null,
         };
 
@@ -352,9 +352,9 @@ final class Shoutbox
 
         $shout = new Shout();
         $shout->date = $this->database->datetime();
-        $shout->ip = $this->ipAddress->asBinary();
+        $shout->ip = $this->ipAddress->asBinary() ?? '';
         $shout->shout = $shoutBody;
-        $shout->uid = $this->user->get('id');
+        $shout->uid = (int) $this->user->get('id');
         $shout->insert($this->database);
 
         $this->hooks->dispatch('shout', $shout);

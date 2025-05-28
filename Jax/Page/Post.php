@@ -121,7 +121,7 @@ final class Post
      */
     private function upload(array $fileobj): string
     {
-        $uid = $this->user->get('id');
+        $uid = (int) $this->user->get('id');
 
         $size = (int) filesize($fileobj['tmp_name']);
         $hash = hash_file('sha512', $fileobj['tmp_name']) ?: 'hash_error';
@@ -141,7 +141,7 @@ final class Post
 
             $file = new File();
             $file->hash = $hash;
-            $file->ip = $this->ipAddress->asBinary();
+            $file->ip = $this->ipAddress->asBinary() ?? '';
             $file->name = $fileobj['name'];
             $file->size = $size;
             $file->uid = $uid;
@@ -179,7 +179,7 @@ final class Post
         $postData = $this->postData;
         $page = '<div id="post-preview">' . $this->postpreview . '</div>';
         $tid = $topic->id ?? '';
-        $fid = $topic?->fid ?? $this->fid;
+        $fid = $topic->fid ?? $this->fid;
         $how = $this->how ?? 'newtopic';
 
         $isEditing = (bool) $topic;
@@ -307,6 +307,9 @@ final class Post
         }
 
         $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $topic->fid);
+        if (!$forum) {
+            return;
+        }
 
         $topic->title = $this->textFormatting->wordfilter($topic->title);
         $topicPerms = $this->user->getForumPerms($forum->perms);
@@ -580,7 +583,7 @@ final class Post
     private function createTopic(): void
     {
         $fid = $this->fid;
-        $uid = $this->user->get('id');
+        $uid = (int) $this->user->get('id');
         $postDate = $this->database->datetime();
 
         $inputPollChoices = $this->request->asString->post('pollchoices');
@@ -734,9 +737,9 @@ final class Post
         $post = new ModelsPost();
         $post->auth_id = $uid;
         $post->date = $postDate;
-        $post->ip = $this->ipAddress->asBinary();
+        $post->ip = $this->ipAddress->asBinary() ?? '';
         $post->newtopic = $newtopic ? 1 : 0;
-        $post->post = $postData;
+        $post->post = $postData ?? '';
         $post->tid = $tid;
         $post->insert($this->database);
 

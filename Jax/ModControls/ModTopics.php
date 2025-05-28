@@ -122,7 +122,7 @@ final readonly class ModTopics
             return;
         }
 
-        $forumData = [];
+        $forumIds = [];
 
         $trashcan = Forum::selectOne($this->database, 'WHERE `trashcan`=1 LIMIT 1');
 
@@ -135,11 +135,10 @@ final readonly class ModTopics
         );
         $delete = [];
         foreach ($topics as $topic) {
-            if (!isset($forumData[$topic->fid])) {
-                $forumData[$topic->fid] = 0;
+            if ($topic->fid && !in_array($topic->fid, $forumIds)) {
+                $forumIds[] = $topic->fid;
             }
 
-            ++$forumData[$topic->fid];
             if (!$trashcan) {
                 continue;
             }
@@ -160,7 +159,7 @@ final readonly class ModTopics
                 Database::WHERE_ID_IN,
                 $this->getModTids(),
             );
-            $forumData[$trashcan] = 1;
+            $forumIds[] = $trashcan;
         } else {
             $delete = $this->getModTids();
         }
@@ -178,7 +177,7 @@ final readonly class ModTopics
             );
         }
 
-        foreach (array_keys($forumData) as $forumId) {
+        foreach ($forumIds as $forumId) {
             $this->database->fixForumLastPost($forumId);
         }
 
