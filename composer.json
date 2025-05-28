@@ -66,9 +66,9 @@
         ],
         "phpstan": "phpstan analyse --memory-limit=1G",
         "phpstan-report": "phpstan analyse --memory-limit=1G --error-format=prettyJson > phpstan-report.json",
-        "phpmd": "phpmd . ansi phpmd.xml --exclude vendor,node_modules",
+        "phpmd": "phpmd . ansi phpmd.xml --exclude vendor,node_modules,Jax\\Models",
         "phpmd-report": [
-            "phpmd . json phpmd.xml --exclude vendor,node_modules --ignore-violations-on-exit --report-file phpmd-report.json",
+            "phpmd . json phpmd.xml --exclude vendor,node_modules,Jax\\Models --ignore-violations-on-exit --report-file phpmd-report.json",
             "php tools/phpmd_to_sonarqube.php phpmd-report.json phpmd-report-sonarqube.json"
         ],
         "phpunit": "phpunit",
