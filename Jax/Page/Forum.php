@@ -9,6 +9,7 @@ use Jax\Database;
 use Jax\Date;
 use Jax\Jax;
 use Jax\Models\Forum as ModelsForum;
+use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
@@ -16,6 +17,7 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
+use function _\keyBy;
 use function array_map;
 use function array_reduce;
 use function ceil;
@@ -71,8 +73,13 @@ final class Forum
         preg_match('@(\d+)$@', (string) $this->request->asString->get('act'), $act);
         if ($this->request->both('markread') !== null) {
             $this->markRead((int) $act[1]);
-            $this->page->location('?');
 
+            if ($this->request->isJSAccess()) {
+                $this->page->command('softurl');
+                return;
+            }
+
+            $this->page->location('?');
             return;
         }
 
@@ -181,70 +188,73 @@ final class Forum
         // parent forum - subforum topics = total topics
         // I'm fairly sure this is faster than doing
         // `SELECT count(*) FROM topics`... but I haven't benchmarked it.
-        $result = $this->database->special(
-            <<<'SQL'
-                SELECT
-                    f.`id` AS `id`,
-                    f.`cat_id` AS `cat_id`,
-                    f.`title` AS `title`,
-                    f.`subtitle` AS `subtitle`,
-                    f.`lp_uid` AS `lp_uid`,
-                    UNIX_TIMESTAMP(f.`lp_date`) AS `lp_date`,
-                    f.`lp_tid` AS `lp_tid`,
-                    f.`lp_topic` AS `lp_topic`,
-                    f.`path` AS `path`,
-                    f.`show_sub` AS `show_sub`,
-                    f.`redirect` AS `redirect`,
-                    f.`topics` AS `topics`,
-                    f.`posts` AS `posts`,
-                    f.`order` AS `order`,
-                    f.`perms` AS `perms`,
-                    f.`orderby` AS `orderby`,
-                    f.`nocount` AS `nocount`,
-                    f.`redirects` AS `redirects`,
-                    f.`trashcan` AS `trashcan`,
-                    f.`mods` AS `mods`,
-                    f.`show_ledby` AS `show_ledby`,
-                    m.`display_name` AS `lp_name`,
-                    m.`group_id` AS `lp_gid`
-                FROM %t f
-                LEFT JOIN %t m
-                ON f.`lp_uid`=m.`id`
-                WHERE f.`path`=?
-                    OR f.`path` LIKE ?
-                ORDER BY f.`order`
-                SQL,
-            ['forums', 'members'],
-            $fid,
+
+        $subforums = ModelsForum::selectMany($this->database,
+            'WHERE path=? OR path LIKE ? '.
+            'ORDER BY `order`',
+            (string) $fid,
             "% {$fid}",
         );
+
+        $lastPostAuthorIds =  array_filter(
+            array_map(
+                static fn(ModelsForum $forum) => $forum->lp_uid,
+                $subforums,
+            ),
+            fn($lpuid) => (bool) $lpuid
+        );
+
+        $lastPostAuthors = $lastPostAuthorIds !== [] ? keyBy(
+            Member::selectMany(
+                $this->database,
+                Database::WHERE_ID_IN,
+                array_filter(
+                    array_map(static fn(ModelsForum $forum) => $forum->lp_uid, $subforums),
+                    fn($lpuid) => (bool) $lpuid
+                )
+            ),
+            fn(Member $user) => $user->id,
+        ) : [];
+
+        //lp_date needs timestamp
         $rows = '';
-        foreach ($this->database->arows($result) as $forum) {
-            $fdata['topics'] -= $forum['topics'];
+        foreach ($subforums as $subforum) {
+            $fdata['topics'] -= $subforum->topics;
             if ($this->pageNumber !== 0) {
                 continue;
             }
 
+            $lastPostAuthor = $subforum->lp_uid
+                ? $lastPostAuthors[$subforum->lp_uid]
+                : null;
+
+            $lastPostDate = $this->date->autoDate(
+                Carbon::createFromFormat(
+                    Database::DATE_TIME, $subforum->lp_date,
+                    'UTC'
+                )->getTimestamp()
+            ) ?: '- - - - -';
+
             $rows .= $this->template->meta(
                 'forum-subforum-row',
-                $forum['id'],
-                $forum['title'],
-                $forum['subtitle'],
+                $subforum->id,
+                $subforum->title,
+                $subforum->subtitle,
                 $this->template->meta(
                     'forum-subforum-lastpost',
-                    $forum['lp_tid'],
-                    $forum['lp_topic'] ?: '- - - - -',
-                    $forum['lp_name'] ? $this->template->meta(
+                    $subforum->lp_tid,
+                    $subforum->lp_topic ?: '- - - - -',
+                    $lastPostAuthor ? $this->template->meta(
                         'user-link',
-                        $forum['lp_uid'],
-                        $forum['lp_gid'],
-                        $forum['lp_name'],
+                        $subforum->lp_uid,
+                        $lastPostAuthor->group_id,
+                        $lastPostAuthor->display_name,
                     ) : 'None',
-                    $this->date->autoDate($forum['lp_date']) ?: '- - - - -',
+                    $lastPostDate
                 ),
-                $forum['topics'],
-                $forum['posts'],
-                ($read = $this->isForumRead($forum)) ? 'read' : 'unread',
+                $subforum->topics,
+                $subforum->posts,
+                ($read = $this->isForumRead($subforum)) ? 'read' : 'unread',
                 $read ? (
                     $this->template->meta('subforum-icon-read')
                     ?: $this->template->meta('icon-read')
@@ -529,17 +539,16 @@ final class Forum
         );
     }
 
-    /**
-     * @param array<string,mixed> $forum
-     */
-    private function isForumRead(array $forum): bool
+    private function isForumRead(ModelsForum $forum): bool
     {
         if (!$this->forumsRead) {
             $this->forumsRead = $this->jax->parseReadMarkers($this->session->get('forumsread'));
         }
 
-        return $forum['lp_date'] <= (
-            $this->forumsRead[$forum['id']] ?? null
+        $lastPostTimestamp = $this->database->datetimeAsTimestamp($forum->lp_date);
+
+        return $lastPostTimestamp <= (
+            $this->forumsRead[$forum->id] ?? null
             ?: $this->session->get('read_date')
             ?: $this->user->get('last_visit')
         );
@@ -549,6 +558,8 @@ final class Forum
     {
         $forumsread = $this->jax->parseReadMarkers($this->session->get('forumsread'));
         $forumsread[$id] = Carbon::now()->getTimestamp();
+
+        var_dump($forumsread);
         $this->session->set('forumsread', json_encode($forumsread));
     }
 }

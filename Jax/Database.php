@@ -41,6 +41,8 @@ class Database
 
     public const WHERE_ID_IN = 'WHERE `id` IN ?';
 
+    public const DATE_TIME = 'Y-m-d H:i:s';
+
     private PDO $pdo;
 
     private string $prefix = '';
@@ -136,13 +138,23 @@ class Database
             return null;
         }
 
-        $keys = implode(',', array_map(static fn($key): string => "`{$key}`", array_keys($data)));
+        $keys = [];
+        $values = [];
+        foreach ($data as $key => $value) {
+            if ($value === null) {
+                continue;
+            }
+            $keys[] = "`{$key}`";
+            $values[] = $value;
+        }
+
+        $keys = implode(',', $keys);
 
         return $this->query(
             <<<SQL
                 INSERT INTO {$this->ftable($table)} ({$keys}) VALUES ?;
                 SQL,
-            array_values($data),
+            $values,
         );
     }
 
@@ -322,7 +334,11 @@ class Database
 
     public function datetime(?int $timestamp = null): string
     {
-        return gmdate('Y-m-d H:i:s', $timestamp);
+        return gmdate(self::DATE_TIME, $timestamp);
+    }
+
+    public function datetimeAsTimestamp(string $datetime) {
+        return Carbon::createFromFormat(self::DATE_TIME, $datetime, 'UTC')->getTimestamp();
     }
 
     /**
