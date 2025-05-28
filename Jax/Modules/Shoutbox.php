@@ -333,8 +333,8 @@ final class Shoutbox
     public function addShout(): void
     {
         $this->session->act();
-        $shout = $this->request->asString->post('shoutbox_shout') ?? '';
-        $shout = $this->textFormatting->linkify($shout);
+        $shoutBody = $this->request->asString->post('shoutbox_shout') ?? '';
+        $shoutBody = $this->textFormatting->linkify($shoutBody);
 
         $error = match (true) {
             $this->user->isGuest() => 'You must be logged in to shout!',
@@ -350,18 +350,13 @@ final class Shoutbox
             return;
         }
 
-        $shoutData = [
-            'date' => $this->database->datetime(),
-            'ip' => $this->ipAddress->asBinary(),
-            'shout' => $shout,
-            'uid' => $this->user->get('id'),
-        ];
-        $this->database->insert(
-            'shouts',
-            $shoutData,
-        );
-        $shoutData['id'] = $this->database->insertId();
+        $shout = new Shout();
+        $shout->date = $this->database->datetime();
+        $shout->ip = $this->ipAddress->asBinary();
+        $shout->shout = $shoutBody;
+        $shout->uid = $this->user->get('id');
+        $shout->insert($this->database);
 
-        $this->hooks->dispatch('shout', $shoutData);
+        $this->hooks->dispatch('shout', $shout);
     }
 }

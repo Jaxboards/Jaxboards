@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Jax\Database;
 use Jax\FileUtils;
 use Jax\IPAddress;
+use Jax\Models\Member;
 use Jax\Request;
 use Jax\ServiceConfig;
 use Service\Blueprint;
@@ -174,20 +175,15 @@ final readonly class ServiceSignup
                 }
 
                 // Don't forget to create the admin.
-                $this->database->insert(
-                    'members',
-                    [
-                        'display_name' => $username,
-                        'email' => $email,
-                        'group_id' => 2,
-                        'join_date' => $this->database->datetime(),
-                        'last_visit' => $this->database->datetime(),
-                        'name' => $username,
-                        'pass' => password_hash((string) $password, PASSWORD_DEFAULT),
-                        'posts' => 0,
-                        'sig' => '',
-                    ],
-                );
+                $member = new Member();
+                $member->display_name = $username;
+                $member->email = $email;
+                $member->group_id = 2;
+                $member->join_date = $this->database->datetime();
+                $member->last_visit = $this->database->datetime();
+                $member->name = $username;
+                $member->pass = password_hash((string) $password, PASSWORD_DEFAULT);
+                $member->insert($this->database);
 
                 $this->fileUtils->copyDirectory($this->blueprint->getDirectory(), dirname(__DIR__) . '/boards/' . $boardURLLowercase);
 

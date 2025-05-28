@@ -17,6 +17,8 @@ final class Token extends Model
         'expires',
     ];
 
+    public const PRIMARY_KEY = 'token';
+
     public string $token = '';
 
     public string $type = 'login';

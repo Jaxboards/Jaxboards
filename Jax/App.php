@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use DI\Container;
+use Jax\Models\Message;
 
 use function array_pop;
 use function dirname;
@@ -246,35 +247,26 @@ final readonly class App
                 $this->config->getSetting('navlinks') ?? '',
             ),
         );
+        $numMessages = 0;
         if ($this->user->get('id')) {
-            $result = $this->database->select(
-                'COUNT(`id`)',
-                'messages',
+            $numMessages = Message::count(
+                $this->database,
                 'WHERE `read`=0 AND `to`=?',
                 $this->user->get('id'),
             );
-            $thisrow = $this->database->arow($result);
-            $nummessages = 0;
-            if (is_array($thisrow)) {
-                $nummessages = array_pop($thisrow);
+
+            if ($numMessages) {
+                $this->page->append(
+                    'FOOTER',
+                    '<a href="?act=ucp&what=inbox"><div id="notification" class="newmessage" '
+                    . 'onclick="this.style.display=\'none\'">You have ' . $numMessages
+                    . ' new message' . ($numMessages === 1 ? '' : 's') . '</div></a>',
+                );
             }
 
-            $this->database->disposeresult($result);
         }
 
-        if (!isset($nummessages)) {
-            $nummessages = 0;
-        }
-
-        $this->template->addVar('inbox', (string) $nummessages);
-        if ($nummessages) {
-            $this->page->append(
-                'FOOTER',
-                '<a href="?act=ucp&what=inbox"><div id="notification" class="newmessage" '
-                . 'onclick="this.style.display=\'none\'">You have ' . $nummessages
-                . ' new message' . ($nummessages === 1 ? '' : 's') . '</div></a>',
-            );
-        }
+        $this->template->addVar('inbox', (string) $numMessages);
 
         $version = json_decode(
             file_get_contents(dirname(__DIR__) . '/composer.json') ?: '',
@@ -306,7 +298,7 @@ final readonly class App
                 $this->date->smallDate(
                     (int) $this->user->get('last_visit'),
                 ),
-                $nummessages,
+                $numMessages,
             ),
         );
     }

@@ -14,6 +14,7 @@ use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Models\Group;
 use Jax\Models\Member;
+use Jax\Models\Message;
 use Jax\Request;
 use Jax\User;
 
@@ -603,8 +604,8 @@ final readonly class Members
     private function sendMassMessage(): string
     {
         $title = $this->request->asString->post('title');
-        $message = $this->request->asString->post('message');
-        if (!$title || !$message) {
+        $messageBody = $this->request->asString->post('message');
+        if (!$title || !$messageBody) {
             return $this->page->error('All fields required!');
         }
 
@@ -614,26 +615,22 @@ final readonly class Members
             Carbon::now()->getTimestamp(),
             60 * 60 * 24 * 31 * 6,
         );
-        $num = 0;
         foreach ($members as $member) {
-            $this->database->insert(
-                'messages',
-                [
-                    'date' => $this->database->datetime(),
-                    'del_recipient' => 0,
-                    'del_sender' => 0,
-                    'flag' => 0,
-                    'from' => $this->user->get('id'),
-                    'message' => $message,
-                    'read' => 0,
-                    'title' => $title,
-                    'to' => $member->id,
-                ],
-            );
-            ++$num;
+            $message = new Message();
+            $message->date = $this->database->datetime();
+            $message->del_recipient = 0;
+            $message->del_sender = 0;
+            $message->flag = 0;
+            $message->from = $this->user->get('id');
+            $message->message = $messageBody;
+            $message->read = 0;
+            $message->title = $title;
+            $message->to = $member->id;
+            $message->insert($this->database);
         }
 
-        return $this->page->success("Successfully delivered {$num} messages");
+        $messageCount = count($members);
+        return $this->page->success("Successfully delivered {$messageCount} messages");
     }
 
     private function massMessage(): void

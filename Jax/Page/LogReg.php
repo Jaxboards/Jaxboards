@@ -194,15 +194,13 @@ final class LogReg
 
                 $this->session->setPHPSessionValue('uid', $user['id']);
                 $loginToken = base64_encode(openssl_random_pseudo_bytes(128));
-                $this->database->insert(
-                    'tokens',
-                    [
-                        'expires' => $this->database->datetime(Carbon::now()->addMonth()->getTimestamp()),
-                        'token' => $loginToken,
-                        'type' => 'login',
-                        'uid' => $user['id'],
-                    ],
-                );
+
+                $token = new Token();
+                $token->expires = $this->database->datetime(Carbon::now()->addMonth()->getTimestamp());
+                $token->token = $loginToken;
+                $token->type = 'login';
+                $token->uid = $user['id'];
+                $token->insert($this->database);
 
                 $this->request->setCookie(
                     'utoken',
@@ -405,15 +403,14 @@ final class LogReg
                     // Generate token.
                     $forgotpasswordtoken
                         = base64_encode(openssl_random_pseudo_bytes(128));
-                    $this->database->insert(
-                        'tokens',
-                        [
-                            'expires' => $this->database->datetime(Carbon::now()->getTimestamp() + 3600 * 24),
-                            'token' => $forgotpasswordtoken,
-                            'type' => 'forgotpassword',
-                            'uid' => $member->id,
-                        ],
-                    );
+
+                    $token = new Token();
+                    $token->expires = $this->database->datetime(Carbon::now()->getTimestamp() + 3600 * 24);
+                    $token->token = $forgotpasswordtoken;
+                    $token->type = 'forgotpassword';
+                    $token->uid = $member->id;
+                    $token->insert($this->database);
+
                     $link = $this->domainDefinitions->getBoardURL() . '?act=logreg6&uid='
                         . $member->id . '&tokenId=' . rawurlencode($forgotpasswordtoken);
                     $mailResult = $this->jax->mail(

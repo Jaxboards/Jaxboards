@@ -256,28 +256,23 @@ final readonly class ModPosts
     ): int {
         $lastPost = $this->fetchPost((int) end($pids));
 
-        // Create a new topic.
-        $this->database->insert(
-            'topics',
-            [
-                'auth_id' => $this->user->get('id'),
-                'fid' => $trashCanForum->id,
-                'lp_date' => $this->database->datetime(),
-                'lp_uid' => $lastPost?->auth_id,
-                'op' => $pids[0],
-                'poll_q' => '',
-                'poll_choices' => '',
-                'replies' => 0,
-                'title' => $newTopicTitle,
-            ],
-        );
-        $newTopicId = (int) $this->database->insertId();
+        $topic = new Topic();
+        $topic->auth_id = $this->user->get('id');
+        $topic->fid = $trashCanForum->id;
+        $topic->lp_date = $this->database->datetime();
+        $topic->lp_uid = $lastPost?->auth_id;
+        $topic->op = $pids[0];
+        $topic->poll_q = '';
+        $topic->poll_choices = '';
+        $topic->replies = 0;
+        $topic->title = $newTopicTitle;
+        $topic->insert($this->database);
 
         // Set the OP and move posts into the new topic
         $this->updatePosts([$pids[0]], ['newtopic' => 1]);
-        $this->movePostsTo($pids, $newTopicId);
+        $this->movePostsTo($pids, $topic->id);
 
-        return $newTopicId;
+        return $topic->id;
     }
 
     /**

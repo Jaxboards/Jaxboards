@@ -109,29 +109,28 @@ final readonly class Inbox
             }
 
             $title = $this->request->asString->post('title');
+
             // Put it into the table.
-            $this->database->insert(
-                'messages',
-                [
-                    'date' => $this->database->datetime(),
-                    'del_recipient' => 0,
-                    'del_sender' => 0,
-                    'from' => $this->user->get('id'),
-                    'message' => $this->request->asString->post('message'),
-                    'read' => 0,
-                    'title' => $title ? $this->textFormatting->blockhtml($title) : '',
-                    'to' => $udata->id,
-                ],
-            );
+            $message = new Message();
+            $message->date = $this->database->datetime();
+            $message->del_recipient = 0;
+            $message->del_sender = 0;
+            $message->from = $this->user->get('id');
+            $message->message = $this->request->asString->post('message');
+            $message->read = 0;
+            $message->title = $title ? $this->textFormatting->blockhtml($title) : '';
+            $message->to = $udata->id;
+            $message->insert($this->database);
+
             // Give them a notification.
             $cmd = json_encode(
                 [
                     'newmessage',
                     'You have a new message from ' . $this->user->get('display_name'),
-                    $this->database->insertId(),
+                    $message->id,
                 ],
             ) . PHP_EOL;
-            $result = $this->database->special(
+            $this->database->special(
                 <<<'SQL'
                     UPDATE %t
                     SET `runonce`=concat(`runonce`,?)

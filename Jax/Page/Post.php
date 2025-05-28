@@ -134,25 +134,20 @@ final class Post
             ? ".{$ext}"
             : null;
 
-        $file = $uploadPath . $hash . $imageExtension;
+        $filePath = $uploadPath . $hash . $imageExtension;
 
-        if (!is_file($file)) {
-            move_uploaded_file($fileobj['tmp_name'], $file);
-            $this->database->insert(
-                'files',
-                [
-                    'hash' => $hash,
-                    'ip' => $this->ipAddress->asBinary(),
-                    'name' => $fileobj['name'],
-                    'size' => $size,
-                    'uid' => $uid,
-                ],
-            );
+        if (!is_file($filePath)) {
+            move_uploaded_file($fileobj['tmp_name'], $filePath);
 
-            $attachmentId = $this->database->insertId();
-            if ($attachmentId) {
-                return $attachmentId;
-            }
+            $file = new File();
+            $file->hash = $hash;
+            $file->ip = $this->ipAddress->asBinary();
+            $file->name = $fileobj['name'];
+            $file->size = $size;
+            $file->uid = $uid;
+            $file->insert($this->database);
+
+            return (string) $file->id;
         }
 
         $fileRecord = File::selectOne($this->database, 'WHERE `hash`=?', $hash);
@@ -736,28 +731,23 @@ final class Post
         }
 
         // Actually PUT THE POST IN!
-        $postData = [
-            'auth_id' => $uid,
-            'date' => $postDate,
-            'ip' => $this->ipAddress->asBinary(),
-            'newtopic' => $newtopic ? 1 : 0,
-            'post' => $postData,
-            'tid' => $tid,
-        ];
-        $this->database->insert(
-            'posts',
-            $postData,
-        );
-        $postData['id'] = $this->database->insertId();
-        $this->hooks->dispatch('post', $postData);
+        $post = new ModelsPost();
+        $post->auth_id = $uid;
+        $post->date = $postDate;
+        $post->ip = $this->ipAddress->asBinary();
+        $post->newtopic = $newtopic ? 1 : 0;
+        $post->post = $postData;
+        $post->tid = $tid;
+        $post->insert($this->database);
 
-        $pid = $this->database->insertId();
+        $this->hooks->dispatch('post', $post);
+
         // Set op.
         if ($newtopic) {
             $this->database->update(
                 'topics',
                 [
-                    'op' => $pid,
+                    'op' => $post->id,
                 ],
                 Database::WHERE_ID_EQUALS,
                 $tid,
@@ -770,7 +760,7 @@ final class Post
             [
                 'arg1' => $fdata['topictitle'],
                 'date' => $postDate,
-                'pid' => $pid,
+                'pid' => $post->id,
                 'tid' => $tid,
                 'type' => $newtopic ? 'new_topic' : 'new_post',
                 'uid' => $uid,

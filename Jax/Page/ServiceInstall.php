@@ -7,6 +7,7 @@ namespace Jax\Page;
 use Jax\Database;
 use Jax\FileUtils;
 use Jax\IPAddress;
+use Jax\Models\Member;
 use Jax\Request;
 use Jax\ServiceConfig;
 use Service\Blueprint;
@@ -382,23 +383,18 @@ final readonly class ServiceInstall
             }
 
             // Don't forget to create the admin.
-            $this->database->insert(
-                'members',
-                [
-                    'display_name' => $adminUsername,
-                    'email' => $adminEmail,
-                    'group_id' => 2,
-                    'join_date' => $this->database->datetime(),
-                    'last_visit' => $this->database->datetime(),
-                    'name' => $adminUsername,
-                    'pass' => password_hash(
-                        (string) $adminPassword,
-                        PASSWORD_DEFAULT,
-                    ),
-                    'posts' => 0,
-                    'sig' => '',
-                ],
+            $member = new Member();
+            $member->display_name = $adminUsername;
+            $member->email = $adminEmail;
+            $member->group_id = 2;
+            $member->join_date = $this->database->datetime();
+            $member->last_visit = $this->database->datetime();
+            $member->name = $adminUsername;
+            $member->pass = password_hash(
+                (string) $adminPassword,
+                PASSWORD_DEFAULT,
             );
+            $member->insert($this->database);
 
             mkdir(dirname(__DIR__) . '/boards');
             $this->fileUtils->copyDirectory($this->blueprint->getDirectory(), dirname(__DIR__) . '/boards/' . $board);
