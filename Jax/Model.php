@@ -31,6 +31,17 @@ abstract class Model
         $this->fromDatabase = true;
     }
 
+    public static function count(Database $database, ...$args): ?int
+    {
+        $stmt = $database->select(
+            "COUNT(*) as `count`",
+            static::TABLE,
+            ...$args
+        );
+        $result = $stmt->fetch(PDO::FETCH_OBJ);
+        return $result?->count;
+    }
+
     /**
      * @param mixed $args
      */

@@ -7,6 +7,7 @@ namespace ACP\Page\Forums;
 use ACP\Page;
 use Jax\Database;
 use Jax\Models\Forum;
+use Jax\Models\Member;
 use Jax\Request;
 
 use function array_pop;
@@ -150,12 +151,8 @@ final readonly class RecountStats
         }
 
         // Get # of members.
-        $result = $this->database->select(
-            'COUNT(`id`)',
-            'members',
-        );
-        $members = $this->database->arow($result);
-        $stat['members'] = $members ? array_pop($members) : 0;
+        $stat['members'] = Member::count($this->database) ?? 0;
+
         $this->database->disposeresult($result);
 
         // Update global board stats.

@@ -249,13 +249,8 @@ final class Shoutbox
             --$pagen;
         }
 
-        $result = $this->database->select(
-            'COUNT(`id`) as `shoutcount`',
-            'shouts',
-        );
-        $shoutCount = $this->database->arow($result);
-        $numShouts = $shoutCount ? (int) $shoutCount['shoutcount'] : 0;
-        $this->database->disposeresult($result);
+        $numShouts = Shout::count($this->database) ?? 0;
+
         if ($numShouts > 1000) {
             $numShouts = 1000;
         }

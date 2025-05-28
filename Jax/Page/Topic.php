@@ -173,15 +173,7 @@ final class Topic
         );
 
         // Generate pages.
-        $result = $this->database->select(
-            'COUNT(`id`) as postcount',
-            'posts',
-            'WHERE `tid`=?',
-            $tid,
-        );
-        $postCountRow = $this->database->arow($result);
-        $postCount = $postCountRow ? $postCountRow['postcount'] : 0;
-        $this->database->disposeresult($result);
+        $postCount = Post::count($this->database, 'WHERE `tid`=?', $tid) ?? 0;
 
         $totalpages = (int) ceil($postCount / $this->numperpage);
         $pagelist = '';
