@@ -144,6 +144,7 @@ class Database
             if ($value === null) {
                 continue;
             }
+
             $keys[] = "`{$key}`";
             $values[] = $value;
         }
@@ -337,7 +338,8 @@ class Database
         return gmdate(self::DATE_TIME, $timestamp);
     }
 
-    public function datetimeAsTimestamp(string $datetime) {
+    public function datetimeAsTimestamp(string $datetime)
+    {
         return Carbon::createFromFormat(self::DATE_TIME, $datetime, 'UTC')->getTimestamp();
     }
 
