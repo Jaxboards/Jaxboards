@@ -180,20 +180,20 @@ final readonly class BuddyList
 
         if (
             $this->user->get('enemies')
-            && in_array($uid, explode(',', (string) $this->user->get('enemies')), true)
+            && in_array((string) $uid, explode(',', (string) $this->user->get('enemies')), true)
         ) {
             $this->unBlock($uid);
         }
 
         $user = null;
-        if ($uid && is_numeric($uid)) {
+        if ($uid) {
             $user = Member::selectMany($this->database, Database::WHERE_ID_EQUALS, $uid);
         }
 
         if (!$user) {
             $error = 'This user does not exist, and therefore could '
                 . 'not be added to your contacts list.';
-        } elseif (in_array($uid, $friends, true)) {
+        } elseif (in_array((string) $uid, $friends, true)) {
             $error = 'This user is already in your contacts list.';
         }
 
@@ -226,8 +226,8 @@ final readonly class BuddyList
             ? explode(',', (string) $this->user->get('friends'))
             : [];
 
-        $isenemy = array_search($uid, $enemies, true);
-        $isfriend = array_search($uid, $friends, true);
+        $isenemy = array_search((string) $uid, $enemies, true);
+        $isfriend = array_search((string) $uid, $friends, true);
         if ($isfriend !== false) {
             $this->dropBuddy($uid);
         }
@@ -252,7 +252,7 @@ final readonly class BuddyList
     private function unBlock(int $uid): bool
     {
         $enemies = explode(',', (string) $this->user->get('enemies'));
-        $id = array_search($uid, $enemies, true);
+        $id = array_search((string) $uid, $enemies, true);
         if ($id === false) {
             return false;
         }
