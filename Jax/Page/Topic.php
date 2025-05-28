@@ -801,7 +801,7 @@ final class Topic
             return;
         }
 
-        if ($post->newtopic) {
+        if ($post->newtopic !== 0) {
             $hiddenfields .= $this->jax->hiddenFormFields(
                 [
                     'tid' => $post->tid,

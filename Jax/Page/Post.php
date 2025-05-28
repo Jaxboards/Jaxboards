@@ -307,7 +307,7 @@ final class Post
         }
 
         $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $topic->fid);
-        if (!$forum) {
+        if ($forum === null) {
             return;
         }
 

@@ -74,6 +74,7 @@ final readonly class Calendar
             if (!$member->birthdate) {
                 continue;
             }
+
             $birthday = Carbon::createFromFormat('Y-m-d', $member->birthdate, 'UTC');
             $birthdays[$birthday?->day][] = sprintf(
                 '<a href="?act=vu%1$s" class="user%1$s mgroup%2$s" '
