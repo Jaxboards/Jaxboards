@@ -12,6 +12,7 @@ use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Models\Forum;
 use Jax\Models\Group;
 use Jax\Models\Member;
 use Jax\Models\Message;
@@ -550,7 +551,10 @@ final readonly class Members
                 // Delete the account.
                 $this->database->delete('members', Database::WHERE_ID_EQUALS, $memberId);
 
-                $this->database->fixAllForumLastPosts();
+                array_map(
+                    fn($forum) => $this->database->fixForumLastPost($forum->id),
+                    Forum::selectMany($this->database)
+                );
 
                 // Update stats.
                 $this->database->special(

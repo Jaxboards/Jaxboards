@@ -6,6 +6,8 @@ namespace Jax;
 
 use Carbon\Carbon;
 use Exception;
+use Jax\Models\Forum;
+use Jax\Models\Topic;
 use PDO;
 use PDOStatement;
 
@@ -414,36 +416,19 @@ class Database
 
     public function fixForumLastPost(int $forumId): void
     {
-        $result = $this->select(
-            [
-                'lp_uid',
-                'UNIX_TIMESTAMP(`lp_date`) AS `lp_date`',
-                'id',
-                'title',
-            ],
-            'topics',
+        $topic = Topic::selectOne(
+            $this,
             'WHERE `fid`=? ORDER BY `lp_date` DESC LIMIT 1',
             $forumId,
         );
-        $topic = $this->arow($result);
-        $this->disposeresult($result);
-        $this->update(
-            'forums',
-            [
-                'lp_date' => $this->datetime($topic['lp_date'] ?? 0),
-                'lp_tid' => $topic['id'] ?? null,
-                'lp_topic' => $topic['title'] ?? '',
-                'lp_uid' => $topic['lp_uid'] ?? null,
-            ],
-            'WHERE id=?',
-            $forumId,
-        );
-    }
 
-    public function fixAllForumLastPosts(): void
-    {
-        $query = $this->select(['id'], 'forums');
-        array_map(fn($forum) => $this->fixForumLastPost((int) $forum['id']), $this->arows($query));
+        $forum = Forum::selectOne($this, Database::WHERE_ID_EQUALS, $forumId);
+
+        $forum->lp_date = $topic->lp_date;
+        $forum->lp_tid = $topic->id;
+        $forum->lp_topic = $topic->title;
+        $forum->lp_uid = $topic->lp_uid;
+        $forum->update($this);
     }
 
     /**

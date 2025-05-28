@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Jax\Database;
 use Jax\Date;
 use Jax\Jax;
+use Jax\Models\Forum as ModelsForum;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
@@ -442,18 +443,13 @@ final class Forum
         // Subforum breadcrumbs
         if ($fdata['path']) {
             $path = array_map(static fn($fid): int => (int) $fid, explode(' ', (string) $fdata['path']));
-            $result = $this->database->select(
-                ['id', 'title'],
-                'forums',
-                Database::WHERE_ID_IN,
-                $path,
-            );
+            $forums = ModelsForum::selectMany($this->database, Database::WHERE_ID_IN, $path);
             // This has to be two steps because WHERE ID IN(1,2,3)
             // does not select records in the same order
             $forumTitles = array_reduce(
-                $this->database->arows($result),
-                static function (array $forumTitles, array $forum) {
-                    $forumTitles[$forum['id']] = $forum['title'];
+                $forums,
+                static function (array $forumTitles, ModelsForum $forum) {
+                    $forumTitles[$forum->id] = $forum->title;
 
                     return $forumTitles;
                 },

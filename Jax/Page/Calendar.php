@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Jax\Page;
 
+use Carbon\Carbon;
 use Jax\Database;
+use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
@@ -60,30 +62,23 @@ final readonly class Calendar
         $daysInMonth = (int) $daysInMonth;
 
         $this->session->set('location_verbose', 'Checking out the calendar for ' . $monthName . ' ' . $year);
-        $result = $this->database->select(
-            [
-                'id',
-                '`display_name` AS `name`',
-                'group_id',
-                'DAY(`birthdate`) AS `dob_day`',
-                'MONTH(`birthdate`) AS `dob_month`',
-                'YEAR(`birthdate`) AS `dob_year`',
-            ],
-            'members',
+        $members = Member::selectMany(
+            $this->database,
             'WHERE MONTH(`birthdate`)=? AND YEAR(`birthdate`)<?',
             $month,
             $year,
         );
         $birthdays = [];
-        while ($member = $this->database->arow($result)) {
-            $birthdays[$member['dob_day']][] = sprintf(
+        foreach ($members as $member) {
+            $birthday = Carbon::createFromFormat('Y-m-d', $member->birthdate, 'UTC');
+            $birthdays[$birthday->day][] = sprintf(
                 '<a href="?act=vu%1$s" class="user%1$s mgroup%2$s" '
                 . 'title="%4$s years old!" data-use-tooltip="true">'
                 . '%3$s</a>',
-                $member['id'],
-                $member['group_id'],
-                $member['name'],
-                $year - $member['dob_year'],
+                $member->id,
+                $member->group_id,
+                $member->name,
+                $year - $birthday->year,
             );
         }
 
