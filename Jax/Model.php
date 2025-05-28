@@ -41,7 +41,7 @@ abstract class Model
             static::TABLE,
             ...$args,
         );
-        $result = $stmt->fetch(PDO::FETCH_OBJ);
+        $result = $stmt?->fetch(PDO::FETCH_OBJ);
 
         return $result?->count;
     }

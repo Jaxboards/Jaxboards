@@ -113,7 +113,7 @@ final readonly class FileManager
 
         $files = File::selectMany($this->database, 'ORDER BY size');
 
-        $memberIds = array_map(static fn($file): string => $file->uid, $files);
+        $memberIds = array_map(static fn($file): int => $file->uid, $files);
         $members = keyBy(
             Member::selectMany($this->database, Database::WHERE_ID_IN, $memberIds),
             static fn($member) => $member->id,

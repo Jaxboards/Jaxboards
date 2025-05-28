@@ -83,7 +83,7 @@ final readonly class Calendar
                 $member->id,
                 $member->group_id,
                 $member->name,
-                $year - ($birthday?->year ?? 0),
+                $year - ($birthday->year ?? 0),
             );
         }
 

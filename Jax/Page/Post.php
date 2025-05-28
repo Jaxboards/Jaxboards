@@ -678,7 +678,7 @@ final class Post
         $this->session->act();
         $postData = $this->postData;
         $postDate = $this->database->datetime();
-        $uid = $this->user->get('id');
+        $uid = (int) $this->user->get('id');
 
         // Post validation
         $error = $this->validatePost($postData);

@@ -804,7 +804,7 @@ final class Topic
         if ($post->newtopic !== 0) {
             $hiddenfields .= $this->jax->hiddenFormFields(
                 [
-                    'tid' => $post->tid,
+                    'tid' => (string) $post->tid,
                 ],
             );
             $form = $this->template->meta(
