@@ -11,6 +11,7 @@ use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Models\Member;
+use Jax\Models\Token;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
@@ -323,16 +324,11 @@ final class LogReg
         $pass2 = $this->request->asString->post('pass2');
 
         if ($tokenId) {
-            $result = $this->database->select(
-                'uid AS id',
-                'tokens',
-                'WHERE `token`=?
-                AND `expires`>=NOW()',
+            $token = Token::selectOne(
+                $this->database,
+                'WHERE `token`=? AND `expires`>=NOW()',
                 $tokenId,
             );
-            $token = $this->database->arow($result);
-
-            $this->database->disposeresult($result);
 
             if (!$token) {
                 $page = $this->template->meta('error', 'This link has expired. Please try again.');
@@ -349,20 +345,20 @@ final class LogReg
                             ),
                         ],
                         Database::WHERE_ID_EQUALS,
-                        $token['id'],
+                        $token->uid,
                     );
                     // Delete all forgotpassword tokens for this user.
                     $this->database->delete(
                         'tokens',
                         "WHERE `uid`=? AND `type`='forgotpassword'",
-                        $token['id'],
+                        $token->uid,
                     );
 
                     // Get username.
                     $member = Member::selectOne(
                         $this->database,
                         Database::WHERE_ID_EQUALS,
-                        $token['id'],
+                        $token->uid,
                     );
 
                     // Just making use of the way

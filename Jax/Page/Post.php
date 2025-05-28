@@ -9,6 +9,7 @@ use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\Hooks;
 use Jax\IPAddress;
+use Jax\Models\File;
 use Jax\Models\Forum;
 use Jax\Models\Post as ModelsPost;
 use Jax\Models\Topic;
@@ -154,21 +155,12 @@ final class Post
             }
         }
 
-        $result = $this->database->select(
-            ['id'],
-            'files',
-            'WHERE `hash`=?',
-            $hash,
-        );
-        $fileRecord = $this->database->arow($result);
+        $fileRecord = File::selectOne($this->database, 'WHERE `hash`=?', $hash);
         if (!$fileRecord) {
             return '';
         }
 
-        $id = (string) $fileRecord['id'];
-        $this->database->disposeresult($result);
-
-        return $id;
+        return (string) $fileRecord->id;
     }
 
     private function previewPost(): void

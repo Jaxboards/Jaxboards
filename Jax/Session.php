@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use Carbon\Carbon;
+use Jax\Models\Token;
 
 use function base64_encode;
 use function ini_set;
@@ -109,21 +110,14 @@ final class Session
         }
 
         $userId = $this->getPHPSessionValue('uid');
-        if (
-            $userId === null
-            && $this->request->cookie('utoken') !== null
-        ) {
-            $result = $this->database->select(
-                ['uid'],
-                'tokens',
-                'WHERE `token`=?',
-                $this->request->cookie('utoken'),
-            );
-            $token = $this->database->arow($result);
-            if ($token) {
-                $this->setPHPSessionValue('uid', $token['uid']);
+        $uToken = $this->request->cookie('utoken');
+        if ($userId === null && $uToken !== null) {
+            $token = Token::selectOne($this->database, 'WHERE `token`=?', $uToken);
 
-                return $token['uid'];
+            if ($token) {
+                $this->setPHPSessionValue('uid', $token->uid);
+
+                return $token->uid;
             }
         }
 

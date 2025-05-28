@@ -7,6 +7,7 @@ namespace Jax\ModControls;
 use Jax\Database;
 use Jax\Models\Forum;
 use Jax\Models\Post;
+use Jax\Models\Topic;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
@@ -157,15 +158,14 @@ final readonly class ModPosts
 
         // Fix forum last post for all forums topics were in.
         // Add trashcan here too.
-        $result = $this->database->select(['fid'], 'topics', Database::WHERE_ID_IN, $tids);
+        $topics = Topic::selectMany($this->database, Database::WHERE_ID_IN, $tids);
         $fids = array_unique(array_merge(
             $trashCanForum !== null ? [$trashCanForum->id] : [],
             array_map(
-                static fn($topic): int => (int) $topic['fid'],
-                $this->database->arows($result),
+                static fn($topic): int => (int) $topic->fid,
+                $topics,
             ),
         ));
-        $this->database->disposeresult($result);
 
         array_map(fn($fid) => $this->database->fixForumLastPost($fid), $fids);
 

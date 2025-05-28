@@ -10,6 +10,7 @@ use Jax\Database;
 use Jax\Date;
 use Jax\Jax;
 use Jax\Models\Category;
+use Jax\Models\Group;
 use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
@@ -440,14 +441,10 @@ final class IDX
         }, $usersOnlineToday));
 
         $usersonline = $this->getUsersOnlineList();
-        $result = $this->database->select(
-            ['id', 'title'],
-            'member_groups',
-            'WHERE `legend`=1 ORDER BY `title`',
-        );
-        foreach ($this->database->arows($result) as $group) {
-            $legend .= '<a href="?" class="mgroup' . $group['id'] . '">'
-                . $group['title'] . '</a> ';
+        $groups = Group::selectMany($this->database, 'WHERE `legend`=1 ORDER BY `title`');
+
+        foreach ($groups as $group) {
+            $legend .= "<a href='?' class='mgroup {$group->id}'>{$group->title}</a> ";
         }
 
         return $page . $this->template->meta(

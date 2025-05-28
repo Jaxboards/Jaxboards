@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Jax;
 
+use Jax\Models\File;
+
 use function array_filter;
 use function array_keys;
 use function array_map;
@@ -26,9 +28,9 @@ use const PATHINFO_EXTENSION;
 final class BBCode
 {
     /**
-     * @var array<string,array<string,mixed>>
+     * @var array<string,File>
      */
-    private array $attachmentData;
+    private array $attachmentData = [];
 
     /**
      * @var array<string,string>
@@ -156,7 +158,7 @@ final class BBCode
             return "Attachment doesn't exist";
         }
 
-        $ext = pathinfo((string) $file['name'], PATHINFO_EXTENSION);
+        $ext = pathinfo((string) $file->name, PATHINFO_EXTENSION);
         $imageExtensions = $this->config->getSetting('images') ?? [];
 
         if (
@@ -167,7 +169,7 @@ final class BBCode
         }
 
         if ($ext !== null) {
-            $attachmentURL = $this->domainDefinitions->getBoardPathUrl() . '/Uploads/' . $file['hash'] . '.' . $ext;
+            $attachmentURL = $this->domainDefinitions->getBoardPathUrl() . '/Uploads/' . $file->hash . '.' . $ext;
 
             return "<a href='{$attachmentURL}'>"
                 . "<img src='{$attachmentURL}' alt='attachment' class='bbcodeimg' />"
@@ -176,42 +178,29 @@ final class BBCode
 
         return '<div class="attachment">'
             . '<a href="index.php?act=download&id='
-            . $file['id'] . '&name=' . urlencode((string) $file['name']) . '" class="name">'
-            . $file['name'] . '</a> Downloads: ' . $file['downloads'] . '</div>';
+            . $file->id . '&name=' . urlencode((string) $file->name) . '" class="name">'
+            . $file->name . '</a> Downloads: ' . $file->downloads . '</div>';
     }
 
     /**
      * Given an attachment ID, gets the file data associated with it
      * Returns null if file not found.
      *
-     * @return null|array<string, mixed>
+     * @return null|File
      */
-    private function getAttachmentData(string $fileId): ?array
+    private function getAttachmentData(string $fileId): ?File
     {
-        if (isset($this->attachmentData[$fileId])) {
+        if (array_key_exists($fileId, $this->attachmentData)) {
             return $this->attachmentData[$fileId];
         }
 
-        $result = $this->database->select(
-            [
-                'id',
-                'name',
-                'hash',
-                'size',
-                'downloads',
-            ],
-            'files',
-            Database::WHERE_ID_EQUALS,
-            $fileId,
-        );
-        $file = $this->database->arow($result);
-        $this->database->disposeresult($result);
+        $file = File::selectOne($this->database, Database::WHERE_ID_EQUALS, $fileId);
 
         if (!$file) {
             return null;
         }
 
-        return $this->attachmentData[$fileId] = $file;
+        return $this->attachmentData[$file->id] = $file;
     }
 
     /**

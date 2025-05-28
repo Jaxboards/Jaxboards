@@ -9,9 +9,12 @@ use Jax\Config;
 use Jax\Database;
 use Jax\DomainDefinitions;
 use Jax\FileUtils;
+use Jax\Models\File;
+use Jax\Models\Member;
 use Jax\Models\Post;
 use Jax\Request;
 
+use function _\keyBy;
 use function array_key_exists;
 use function implode;
 use function in_array;
@@ -40,25 +43,15 @@ final readonly class FileManager
         $page = '';
         $delete = (int) $this->request->asString->both('delete');
         if ($delete !== 0) {
-            $result = $this->database->select(
-                [
-                    'hash',
-                    'name',
-                ],
-                'files',
-                Database::WHERE_ID_EQUALS,
-                $delete,
-            );
-            $file = $this->database->arow($result);
-            $this->database->disposeresult($result);
+            $file = File::selectOne($this->database, Database::WHERE_ID_EQUALS, $delete);
             if ($file) {
-                $ext = mb_strtolower(pathinfo((string) $file['name'], PATHINFO_EXTENSION));
+                $ext = mb_strtolower(pathinfo($file->name, PATHINFO_EXTENSION));
                 if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp'], true)) {
-                    $file['hash'] .= '.' . $ext;
+                    $file->hash .= '.' . $ext;
                 }
 
-                if (is_writable($this->domainDefinitions->getBoardPath() . '/Uploads/' . $file['hash'])) {
-                    $page .= unlink($this->domainDefinitions->getBoardPath() . '/Uploads/' . $file['hash'])
+                if (is_writable($this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash)) {
+                    $page .= unlink($this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash)
                         ? $this->page->success('File deleted')
                         : $this->page->error(
                             "Error deleting file, maybe it's already been "
@@ -66,11 +59,7 @@ final readonly class FileManager
                         );
                 }
 
-                $this->database->delete(
-                    'files',
-                    Database::WHERE_ID_EQUALS,
-                    $delete,
-                );
+                $file->delete($this->database);
             }
         }
 
@@ -121,44 +110,34 @@ final readonly class FileManager
             }
         }
 
-        $result = $this->database->special(
-            <<<'SQL'
-                SELECT
-                    f.`id` AS `id`,
-                    f.`name` AS `name`,
-                    f.`hash` AS `hash`,
-                    f.`uid` AS `uid`,
-                    f.`size` AS `size`,
-                    f.`downloads` AS `downloads`,
-                    m.`display_name` AS `uname`
-                FROM %t f
-                LEFT JOIN %t m
-                    ON f.`uid`=m.`id`
-                ORDER BY f.`size` DESC
-                SQL
-            ,
-            ['files', 'members'],
-        );
-        $table = '';
-        foreach ($this->database->arows($result) as $file) {
-            $ext = pathinfo((string) $file['name'], PATHINFO_EXTENSION);
+        $files = File::selectMany($this->database, 'ORDER BY size');
 
-            $file['name'] = in_array($ext, $this->config->getSetting('images'), true) ? '<a href="'
-                    . $this->domainDefinitions->getBoardPathUrl() . 'Uploads/' . $file['hash'] . '.' . $ext . '">'
-                    . $file['name'] . '</a>' : '<a href="../?act=download&id='
-                    . $file['id'] . '">' . $file['name'] . '</a>';
+        $memberIds = array_map(fn($file) => $file->uid, $files);
+        $members = keyBy(
+            Member::selectMany($this->database, Database::WHERE_ID_IN, $memberIds),
+            fn($member) => $member->id
+        );
+
+        $table = '';
+        foreach ($files as $file) {
+            $ext = pathinfo((string) $file->name, PATHINFO_EXTENSION);
+
+            $file->name = in_array($ext, $this->config->getSetting('images'), true) ? '<a href="'
+                    . $this->domainDefinitions->getBoardPathUrl() . 'Uploads/' . $file->hash . '.' . $ext . '">'
+                    . $file->name . '</a>' : '<a href="../?act=download&id='
+                    . $file->id . '">' . $file->name . '</a>';
 
             $table .= $this->page->parseTemplate(
                 'tools/file-manager-row.html',
                 [
-                    'downloads' => $file['downloads'],
-                    'filesize' => $this->fileUtils->fileSizeHumanReadable($file['size']),
-                    'id' => $file['id'],
-                    'linked_in' => array_key_exists($file['id'], $linkedIn)
-                        ? implode(', ', $linkedIn[$file['id']]) : 'Not linked!',
-                    'title' => $file['name'],
-                    'username' => $file['uname'],
-                    'user_id' => $file['uid'],
+                    'downloads' => $file->downloads,
+                    'filesize' => $this->fileUtils->fileSizeHumanReadable($file->size),
+                    'id' => $file->id,
+                    'linked_in' => array_key_exists($file->id, $linkedIn)
+                        ? implode(', ', $linkedIn[$file->id]) : 'Not linked!',
+                    'title' => $file->name,
+                    'username' => $members[$file->uid]->display_name,
+                    'user_id' => $file->uid,
                 ],
             );
         }

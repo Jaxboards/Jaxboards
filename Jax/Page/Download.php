@@ -6,6 +6,7 @@ namespace Jax\Page;
 
 use Jax\Database;
 use Jax\DomainDefinitions;
+use Jax\Models\File;
 use Jax\Request;
 
 use function array_pop;
@@ -32,19 +33,9 @@ final readonly class Download
 
     private function downloadFile(int $id): void
     {
-        $result = $this->database->select(
-            [
-                'name',
-                'hash',
-            ],
-            'files',
-            Database::WHERE_ID_EQUALS,
-            $id,
-        );
-        $data = $this->database->arow($result);
-        $this->database->disposeresult($result);
+        $file = File::selectOne($this->database, Database::WHERE_ID_EQUALS, $id);
 
-        if (!$data) {
+        if (!$file) {
             return;
         }
 
@@ -58,25 +49,25 @@ final readonly class Download
             ['files'],
             $id,
         );
-        $ext = explode('.', (string) $data['name']);
+        $ext = explode('.', (string) $file->name);
         $ext = count($ext) === 1 ? '' : mb_strtolower(array_pop($ext));
 
         if (in_array($ext, ['jpeg', 'jpg', 'png', 'gif', 'bmp'])) {
-            $data['hash'] .= '.' . $ext;
+            $file->hash .= '.' . $ext;
         }
 
-        $file = $this->domainDefinitions->getBoardPath() . '/Uploads/' . $data['hash'];
-        if (file_exists($file)) {
-            if (!$data['name']) {
-                $data['name'] = 'unknown';
+        $filePath = $this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash;
+        if (file_exists($filePath)) {
+            if (!$file->name) {
+                $file->name = 'unknown';
             }
 
             header('Content-type:application/idk');
             header(
                 'Content-disposition:attachment;filename="'
-                . $data['name'] . '"',
+                . $file->name . '"',
             );
-            readfile($file);
+            readfile($filePath);
         }
 
         exit;
