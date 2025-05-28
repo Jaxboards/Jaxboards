@@ -143,7 +143,7 @@ final readonly class Comments
         $activity->affected_uid = $member->id;
         $activity->date = $this->database->datetime();
         $activity->type = 'profile_comment';
-        $activity->uid = $this->user->get('id');
+        $activity->uid = (int) $this->user->get('id');
         $activity->insert($this->database);
 
         $this->database->insert(

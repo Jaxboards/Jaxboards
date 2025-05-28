@@ -507,11 +507,11 @@ final readonly class UCP
 
         if ($data['display_name'] !== $this->user->get('display_name')) {
             $activity = new Activity();
-            $activity->arg1 = $this->user->get('display_name');
+            $activity->arg1 = (string) $this->user->get('display_name');
             $activity->arg2 = $data['display_name'];
             $activity->date = $this->database->datetime();
             $activity->type = 'profile_name_change';
-            $activity->uid = $this->user->get('id');
+            $activity->uid = (int) $this->user->get('id');
             $activity->insert($this->database);
         }
 
