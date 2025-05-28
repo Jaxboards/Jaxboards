@@ -79,23 +79,27 @@ final readonly class BuddyList
             return;
         }
 
-        $add = $this->request->asString->both('add');
-        $remove = $this->request->asString->both('remove');
+        $add = (int) $this->request->asString->both('add');
+        $remove = (int) $this->request->asString->both('remove');
         $status = $this->request->asString->both('status');
-        $block = $this->request->asString->both('block');
-        $unblock = $this->request->asString->both('unblock');
+        $block = (int) $this->request->asString->both('block');
+        $unblock = (int) $this->request->asString->both('unblock');
 
-        match (true) {
-            $add !== null => $this->addbuddy($add),
-            $remove !== null => $this->dropbuddy($remove),
-            $status !== null => $this->setstatus($status),
-            $block !== null => $this->block($block),
-            $unblock !== null => $this->unblock($unblock),
-            default => $this->displaybuddylist(),
+        $displayBuddyList = match (true) {
+            $add !== 0 => $this->addBuddy($add),
+            $remove !== null => $this->dropBuddy($remove),
+            $status !== null => $this->setStatus($status),
+            $block !== 0 => $this->block($block),
+            $unblock !== 0 => $this->unBlock($unblock),
+            default => true,
         };
+
+        if ($displayBuddyList) {
+            $this->displayBuddyList();
+        }
     }
 
-    private function displaybuddylist(): void
+    private function displayBuddyList(): void
     {
         if ($this->user->isGuest()) {
             return;
@@ -164,7 +168,7 @@ final readonly class BuddyList
         );
     }
 
-    private function addbuddy(string $uid): void
+    private function addBuddy(int $uid): bool
     {
         $friends = array_filter(
             explode(',', (string) $this->user->get('friends')),
@@ -176,7 +180,7 @@ final readonly class BuddyList
             $this->user->get('enemies')
             && in_array($uid, explode(',', (string) $this->user->get('enemies')), true)
         ) {
-            $this->unblock($uid);
+            $this->unBlock($uid);
         }
 
         $user = null;
@@ -194,26 +198,23 @@ final readonly class BuddyList
         if ($error !== null) {
             $this->page->append('PAGE', $error);
             $this->page->command('error', $error);
-        } else {
-            $friends[] = $uid;
-
-            $this->user->set('friends', implode(',', $friends));
-            $activity = new Activity();
-            $activity->affected_uid = $uid;
-            $activity->type = 'buddy_add';
-            $activity->uid = (int) $this->user->get('id');
-            $activity->insert($this->database);
-
-            $this->displaybuddylist();
+            return false;
         }
+
+        $friends[] = $uid;
+
+        $this->user->set('friends', implode(',', $friends));
+        $activity = new Activity();
+        $activity->affected_uid = $uid;
+        $activity->type = 'buddy_add';
+        $activity->uid = (int) $this->user->get('id');
+        $activity->insert($this->database);
+
+        return true;
     }
 
-    private function block(string $uid): void
+    private function block(int $uid): bool
     {
-        if (!is_numeric($uid)) {
-            return;
-        }
-
         $error = null;
         $enemies = $this->user->get('enemies')
             ? explode(',', (string) $this->user->get('enemies'))
@@ -225,7 +226,7 @@ final readonly class BuddyList
         $isenemy = array_search($uid, $enemies, true);
         $isfriend = array_search($uid, $friends, true);
         if ($isfriend !== false) {
-            $this->dropbuddy($uid, 1);
+            $this->dropBuddy($uid);
         }
 
         if ($isenemy !== false) {
@@ -234,61 +235,56 @@ final readonly class BuddyList
 
         if ($error !== null) {
             $this->page->command('error', $error);
-        } else {
-            $enemies[] = $uid;
-            $enemies = implode(',', $enemies);
-            $this->user->set('enemies', $enemies);
-            $this->displaybuddylist();
+            return false;
         }
+
+        $enemies[] = $uid;
+        $enemies = implode(',', $enemies);
+        $this->user->set('enemies', $enemies);
+        return true;
     }
 
-    private function unblock(string $uid): void
+    private function unBlock(int $uid): bool
     {
-        if ($uid && is_numeric($uid)) {
-            $enemies = explode(',', (string) $this->user->get('enemies'));
-            $id = array_search($uid, $enemies, true);
-            if ($id === false) {
-                return;
-            }
-
-            unset($enemies[$id]);
-            $enemies = implode(',', $enemies);
-            $this->user->set('enemies', $enemies);
+        $enemies = explode(',', (string) $this->user->get('enemies'));
+        $id = array_search($uid, $enemies, true);
+        if ($id === false) {
+            return false;
         }
 
-        $this->displaybuddylist();
+        unset($enemies[$id]);
+        $enemies = implode(',', $enemies);
+        $this->user->set('enemies', $enemies);
+
+        return true;
     }
 
-    private function dropbuddy(string $uid, int $shh = 0): void
+    private function dropBuddy(int $uid): bool
     {
-        if ($uid && is_numeric($uid)) {
-            $friends = explode(',', (string) $this->user->get('friends'));
-            $id = array_search($uid, $friends, true);
-            if ($id === false) {
-                return;
-            }
-
-            unset($friends[$id]);
-            $friends = implode(',', $friends);
-            $this->user->set('friends', $friends);
+        $friends = explode(',', (string) $this->user->get('friends'));
+        $id = array_search((string) $uid, $friends, true);
+        if ($id === false) {
+            return false;
         }
 
-        if ($shh !== 0) {
-            return;
-        }
+        unset($friends[$id]);
+        $friends = implode(',', $friends);
+        $this->user->set('friends', $friends);
 
-        $this->displaybuddylist();
+        return true;
     }
 
-    private function setstatus(string $status): void
+    private function setStatus(string $status): bool
     {
         if (
             $this->user->isGuest()
             || $this->user->get('usertitle') === $status
         ) {
-            return;
+            return false;
         }
 
         $this->user->set('usertitle', $status);
+
+        return false;
     }
 }
