@@ -10,7 +10,6 @@ use Jax\Models\Forum;
 use Jax\Models\Member;
 use Jax\Request;
 
-use function array_pop;
 use function explode;
 
 final readonly class RecountStats

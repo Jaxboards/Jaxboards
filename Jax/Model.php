@@ -34,11 +34,12 @@ abstract class Model
     public static function count(Database $database, ...$args): ?int
     {
         $stmt = $database->select(
-            "COUNT(*) as `count`",
+            'COUNT(*) as `count`',
             static::TABLE,
-            ...$args
+            ...$args,
         );
         $result = $stmt->fetch(PDO::FETCH_OBJ);
+
         return $result?->count;
     }
 
