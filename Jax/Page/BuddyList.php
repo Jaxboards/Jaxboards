@@ -19,7 +19,6 @@ use function array_search;
 use function explode;
 use function implode;
 use function in_array;
-use function is_numeric;
 
 final readonly class BuddyList
 {
@@ -186,7 +185,7 @@ final readonly class BuddyList
         }
 
         $user = null;
-        if ($uid) {
+        if ($uid !== 0) {
             $user = Member::selectMany($this->database, Database::WHERE_ID_EQUALS, $uid);
         }
 
