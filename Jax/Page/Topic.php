@@ -797,7 +797,7 @@ final class Topic
             return;
         }
 
-        if (!$post) {
+        if ($post === null) {
             $this->page->command('alert', 'Post not found!');
 
             return;

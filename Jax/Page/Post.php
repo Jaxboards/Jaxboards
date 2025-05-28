@@ -604,7 +604,9 @@ final class Post
 
         $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $fid);
 
-        $forumPerms = $forum ? $this->user->getForumPerms($forum->perms) : [];
+        $forumPerms = $forum !== null
+            ? $this->user->getForumPerms($forum->perms)
+            : [];
 
         // New topic input validation
         $error = match (true) {
