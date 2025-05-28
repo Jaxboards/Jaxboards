@@ -189,14 +189,7 @@ final class Post
 
         $isEditing = (bool) $topic;
 
-        $result = $this->database->select(
-            ['title', 'perms'],
-            'forums',
-            Database::WHERE_ID_EQUALS,
-            $fid,
-        );
-        $forum = $this->database->arow($result);
-        $this->database->disposeresult($result);
+        $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $fid);
 
         if ($forum === null) {
             $this->page->location('?');
@@ -205,15 +198,14 @@ final class Post
         }
 
         if ($topic === null) {
-            $topic = [
-                'subtitle' => $this->request->asString->post('tdesc') ?? '',
-                'title' => $this->request->asString->post('ttitle') ?? '',
-            ];
+            $topic = new Topic();
+            $topic->subtitle = $this->request->asString->post('tdesc') ?? '';
+            $topic->title = $this->request->asString->post('ttitle') ?? '';
         }
 
-        $forum['perms'] = $this->user->getForumPerms($forum['perms']);
+        $forumPerms = $this->user->getForumPerms($forum->perms);
 
-        $pollForm = $forum['perms']['poll'] ? <<<'HTML'
+        $pollForm = $forumPerms['poll'] ? <<<'HTML'
             <label class="addpoll" for="addpoll">
                 Add a Poll
             </label>
@@ -231,7 +223,7 @@ final class Post
             </div>
             HTML : '';
 
-        $uploadButton = $forum['perms']['upload']
+        $uploadButton = $forumPerms['upload']
             ? ''
             : <<<'HTML'
                 <div id="attachfiles" class="addfile">
@@ -285,12 +277,12 @@ final class Post
                 </div>
             </form>
             HTML;
-        $page .= $this->template->meta('box', '', $forum['title'] . ' > New Topic', $form);
+        $page .= $this->template->meta('box', '', $forum->title . ' > New Topic', $form);
 
         $this->page->append('PAGE', $page);
         $this->page->command('update', 'page', $page);
 
-        if ($forum['perms']['upload']) {
+        if ($forumPerms['upload']) {
             $this->page->command('attachfiles');
         }
 
@@ -610,23 +602,14 @@ final class Post
         ) : [];
         $pollType = $this->request->asString->post('poll_type');
 
-        $result = $this->database->select(
-            ['perms'],
-            'forums',
-            Database::WHERE_ID_EQUALS,
-            $fid,
-        );
-        $forum = $this->database->arow($result);
-        $this->database->disposeresult($result);
+        $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $fid);
 
-        if ($forum) {
-            $forum['perms'] = $this->user->getForumPerms($forum['perms']);
-        }
+        $forumPerms = $forum ? $this->user->getForumPerms($forum->perms) : [];
 
         // New topic input validation
         $error = match (true) {
             !$forum => "The forum you're trying to post in does not exist.",
-            !$forum['perms']['start'] => "You don't have permission to post a new topic in that forum.",
+            !$forumPerms['start'] => "You don't have permission to post a new topic in that forum.",
             !$topicTitle || trim($topicTitle) === '' => "You didn't specify a topic title!",
             mb_strlen($topicTitle) > 255 => 'Topic title must not exceed 255 characters',
             mb_strlen($subTitle ?? '') > 255 => 'Subtitle must not exceed 255 characters',
@@ -642,7 +625,7 @@ final class Post
             $pollQuestion === null || trim($pollQuestion) === '' => "You didn't specify a poll question!",
             count($pollChoices) > 10 => 'Poll choices must not exceed 10.',
             $pollChoices === [] => "You didn't provide any poll choices!",
-            $forum && !$forum['perms']['poll'] => "You don't have permission to post a poll in that forum",
+            $forum && !$forumPerms['poll'] => "You don't have permission to post a poll in that forum",
             default => null,
         };
 

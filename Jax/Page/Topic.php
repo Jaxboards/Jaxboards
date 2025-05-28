@@ -11,6 +11,7 @@ use Jax\Date;
 use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Models\Post;
 use Jax\Page;
 use Jax\Page\Topic\Poll;
 use Jax\Page\Topic\Reactions;
@@ -614,7 +615,7 @@ final class Topic
 
             $postbuttons
                 // Adds the Edit button
-                = ($this->canedit($topic, $post)
+                = ($this->canEdit($topic, $post)
                     ? "<a href='?act=vt" . $topic['id'] . '&amp;edit=' . $post['pid']
                     . "' class='edit'>" . $this->template->meta('topic-edit-button')
                     . '</a>'
@@ -715,7 +716,7 @@ final class Topic
      * @param array<string,mixed>                 $topic
      * @param array<string,null|float|int|string> $post
      */
-    private function canedit(array $topic, array $post): bool
+    private function canEdit(array $topic, array $post): bool
     {
         if ($this->canModerate($topic)) {
             return true;
@@ -782,19 +783,7 @@ final class Topic
         }
 
         $this->page->command('softurl');
-        $result = $this->database->select(
-            [
-                'auth_id',
-                'newtopic',
-                'post',
-                'tid',
-            ],
-            'posts',
-            Database::WHERE_ID_EQUALS,
-            $pid,
-        );
-        $post = $this->database->arow($result);
-        $this->database->disposeresult($result);
+        $post = Post::selectOne($this->database, Database::WHERE_ID_EQUALS, $pid);
 
         $hiddenfields = $this->jax->hiddenFormFields(
             [
@@ -814,7 +803,7 @@ final class Topic
             return;
         }
 
-        if (!$this->canedit($topic, $post)) {
+        if (!$this->canEdit($topic, $post->asArray())) {
             $this->page->command('alert', "You don't have permission to edit this post.");
 
             return;

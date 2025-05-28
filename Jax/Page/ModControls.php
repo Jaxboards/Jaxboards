@@ -13,6 +13,7 @@ use Jax\Jax;
 use Jax\ModControls\ModPosts;
 use Jax\ModControls\ModTopics;
 use Jax\Models\Member;
+use Jax\Models\Post;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
@@ -458,15 +459,14 @@ final readonly class ModControls
             }
 
             $content = '';
-            $result = $this->database->select(
-                ['post'],
-                'posts',
+            $posts = Post::selectMany(
+                $this->database,
                 'WHERE `ip`=? ORDER BY `id` DESC LIMIT 5',
                 $this->ipAddress->asBinary($ipAddress),
             );
-            while ($post = $this->database->arow($result)) {
+            foreach ($posts as $post) {
                 $content .= "<div class='post'>"
-                    . nl2br($this->textFormatting->blockhtml($this->textFormatting->textOnly($post['post'])))
+                    . nl2br($this->textFormatting->blockhtml($this->textFormatting->textOnly($post->post)))
                     . '</div>';
             }
 

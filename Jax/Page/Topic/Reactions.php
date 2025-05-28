@@ -7,6 +7,7 @@ namespace Jax\Page\Topic;
 use Jax\Config;
 use Jax\Database;
 use Jax\Models\Member;
+use Jax\Models\Post;
 use Jax\Models\RatingNiblet;
 use Jax\Page;
 use Jax\Template;
@@ -57,15 +58,9 @@ final readonly class Reactions
         }
 
         $this->page->command('softurl');
-        $result = $this->database->select(
-            ['rating'],
-            'posts',
-            Database::WHERE_ID_EQUALS,
-            $pid,
-        );
-        $row = $this->database->arow($result);
-        $this->database->disposeresult($result);
-        $ratings = $row ? json_decode((string) $row['rating'], true) : [];
+        $post = Post::selectOne($this->database, Database::WHERE_ID_EQUALS, $pid);
+
+        $ratings = $post ? json_decode($post->rating, true) : [];
 
         if ($ratings === []) {
             return;
@@ -164,14 +159,7 @@ final readonly class Reactions
     {
         $this->page->command('softurl');
 
-        $result = $this->database->select(
-            ['rating'],
-            'posts',
-            Database::WHERE_ID_EQUALS,
-            $postid,
-        );
-        $post = $this->database->arow($result);
-        $this->database->disposeresult($result);
+        $post = Post::selectOne($this->database, Database::WHERE_ID_EQUALS, $postid);
 
         $niblets = $this->fetchRatingNiblets();
         $ratings = [];
@@ -186,7 +174,7 @@ final readonly class Reactions
             return;
         }
 
-        $ratings = json_decode((string) $post['rating'], true);
+        $ratings = json_decode($post->rating, true);
         if (!$ratings) {
             $ratings = [];
         }
@@ -207,7 +195,7 @@ final readonly class Reactions
         $this->database->update(
             'posts',
             [
-                'rating' => json_encode($ratings) ?: $post['rating'],
+                'rating' => json_encode($ratings) ?: $post->rating,
             ],
             Database::WHERE_ID_EQUALS,
             $postid,
