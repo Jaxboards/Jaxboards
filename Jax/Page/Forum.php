@@ -21,11 +21,13 @@ use Jax\User;
 
 use function _\keyBy;
 use function array_filter;
+use function array_key_exists;
 use function array_map;
 use function array_merge;
 use function array_reduce;
 use function ceil;
 use function explode;
+use function implode;
 use function is_numeric;
 use function json_encode;
 use function max;
@@ -170,11 +172,12 @@ final class Forum
         $forumpages = '';
         if ($numpages !== 0) {
             $forumpages = implode(' · ', array_map(
-                function($pageNumber) use ($fid) {
+                function ($pageNumber) use ($fid): string {
                     $activeClass = ($pageNumber - 1 === $this->pageNumber ? ' class="active"' : '');
+
                     return "<a href='?act=vf{$fid}&amp;page={$pageNumber}'{$activeClass}'>{$pageNumber}</a> ";
                 },
-                $this->jax->pages($numpages, $this->pageNumber + 1, 10)
+                $this->jax->pages($numpages, $this->pageNumber + 1, 10),
             ));
         }
 
@@ -192,9 +195,6 @@ final class Forum
             'forum-buttons-top',
             $forumbuttons,
         );
-
-        // Do order by.
-        $forum->orderby = (int) $forum->orderby;
 
         $orderby = match ($forum->orderby & ~1) {
             2 => 'id',
