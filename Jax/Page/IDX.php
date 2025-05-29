@@ -85,7 +85,7 @@ final class IDX
             $this->page->command('softurl');
             $this->session->set('forumsread', '{}');
             $this->session->set('topicsread', '{}');
-            $this->session->set('read_date', Carbon::now()->getTimestamp());
+            $this->session->set('read_date', Carbon::now('UTC')->getTimestamp());
         }
 
         if ($this->request->isJSUpdate()) {

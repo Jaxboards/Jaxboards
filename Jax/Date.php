@@ -51,7 +51,7 @@ final class Date
 
     public function relativeTime(int $date): string
     {
-        $delta = Carbon::now()->getTimestamp() - $date;
+        $delta = Carbon::now('UTC')->getTimestamp() - $date;
         $hoursMinutes = gmdate('g:i a', $date);
 
         return match (true) {
