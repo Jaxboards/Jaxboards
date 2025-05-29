@@ -304,7 +304,7 @@ final class Topic
         );
 
         // Update view count.
-        $modelsTopic->views++;
+        ++$modelsTopic->views;
         $modelsTopic->update($this->database);
 
         if ($this->request->isJSAccess()) {
