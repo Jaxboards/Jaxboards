@@ -80,12 +80,6 @@ final class Forum
         if ($this->request->both('markread') !== null) {
             $this->markRead((int) $act[1]);
 
-            if ($this->request->isJSAccess()) {
-                $this->page->command('softurl');
-
-                return;
-            }
-
             $this->page->location('?');
 
             return;
