@@ -291,7 +291,7 @@ final readonly class Inbox
         $criteria = match ($view) {
             'sent' => 'WHERE `from`=? AND !del_sender',
             'flagged' => 'WHERE `to`=? AND flag=1',
-            default => 'WHERE `to`=? AND !del_recipient'
+            default => 'WHERE `to`=? AND !del_recipient',
         };
 
         return Message::selectMany(
@@ -335,8 +335,8 @@ final readonly class Inbox
 
         $message = Message::selectOne(
             $this->database,
-            "WHERE `id`=?
-            ORDER BY `date` DESC",
+            'WHERE `id`=?
+            ORDER BY `date` DESC',
             $messageid,
         );
 
@@ -354,7 +354,7 @@ final readonly class Inbox
         $otherMember = Member::selectOne(
             $this->database,
             Database::WHERE_ID_EQUALS,
-            $userIsRecipient ? $message->to : $message->from
+            $userIsRecipient ? $message->to : $message->from,
         );
 
         if (!$message->read && $userIsRecipient) {
@@ -417,28 +417,29 @@ final readonly class Inbox
         $messages = $this->fetchMessages($view, $requestPage - 1);
 
         $getMessageMemberId = $view === 'sent'
-            ? fn(Message $message) => $message->to
-            : fn(Message $message) => $message->from;
+            ? static fn(Message $message): ?int => $message->to
+            : static fn(Message $message): ?int => $message->from;
 
         $memberIds = array_map(
             $view === 'sent'
-                ? fn($message) => $message->to
-                : fn($message) => $message->from,
-            $messages
+                ? static fn($message) => $message->to
+                : static fn($message) => $message->from,
+            $messages,
         );
         $membersById = keyBy(
             Member::selectMany(
                 $this->database,
                 Database::WHERE_ID_IN,
-                $memberIds
+                $memberIds,
             ),
-            fn(Member $member) => $member->id
+            static fn(Member $member): int => $member->id,
         );
 
         foreach ($messages as $message) {
             if (!$message->read) {
                 ++$unread;
             }
+
             $otherMember = $membersById[$getMessageMemberId($message)];
 
             $dmessageOnchange = "RUN.stream.location('"

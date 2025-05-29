@@ -88,7 +88,7 @@ final class Members
         );
         $groups = keyBy(
             Group::selectMany($this->database),
-            fn($group) => $group->id,
+            static fn($group) => $group->id,
         );
 
         $nummemberquery = $this->database->special(
