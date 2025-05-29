@@ -110,6 +110,7 @@ final class IDX
 
     /**
      * @param array<Forum> $forums
+     *
      * @return array<int,Forum>
      */
     private function fetchLastPostMembers(array $forums): array
