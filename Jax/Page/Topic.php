@@ -361,7 +361,7 @@ final class Topic
 
         // Update users online list.
         $list = [];
-        $oldcache = array_flip(explode(',', (string) $this->session->get()->users_online_cache));
+        $oldcache = array_flip(explode(',', $this->session->get()->users_online_cache));
         $newcache = [];
         foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $user) {
             if (!$user['uid']) {

@@ -108,7 +108,7 @@ final class Session
     {
         $this->fetchSessionData($this->getPHPSessionValue('sid') ?? null);
 
-        if ($this->modelsSession->is_bot) {
+        if ($this->modelsSession->is_bot !== 0) {
             return null;
         }
 
@@ -302,19 +302,22 @@ final class Session
         $session = $this->modelsSession;
         $this->set('last_update', $this->database->datetime());
 
-        if ($this->modelsSession->is_bot) {
+        if ($this->modelsSession->is_bot !== 0) {
             // Bots tend to read a lot of content.
             $session->forumsread = '{}';
             $session->topicsread = '{}';
         }
 
-        if (!$this->modelsSession->last_action) {
+        if (
+            $this->modelsSession->last_action === ''
+            || $this->modelsSession->last_action === '0'
+        ) {
             $session->last_action = $this->database->datetime();
         }
 
         if (mb_strlen($session->location_verbose ?? '') > 100) {
             $session->location_verbose = mb_substr(
-                (string) $session->location_verbose,
+                $session->location_verbose,
                 0,
                 100,
             );

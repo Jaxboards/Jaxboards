@@ -173,7 +173,7 @@ final class LogReg
         ?string $password = null,
     ): void {
         if ($username && $password) {
-            if ($this->session->get()->is_bot) {
+            if ($this->session->get()->is_bot !== 0) {
                 return;
             }
 
@@ -297,7 +297,7 @@ final class LogReg
 
     private function toggleinvisible(): void
     {
-        $this->session->set('hide', $this->session->get()->hide ? 0 : 1);
+        $this->session->set('hide', $this->session->get()->hide !== 0 ? 0 : 1);
 
         $this->session->applyChanges();
 
