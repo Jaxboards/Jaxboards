@@ -13,7 +13,6 @@ use Jax\Request;
 use Jax\TextFormatting;
 
 use function filter_var;
-use function is_numeric;
 use function is_string;
 use function mb_strlen;
 use function preg_replace;
@@ -224,6 +223,7 @@ final readonly class Settings
             'shoutboxava' => $this->request->post('sbava') ? 1 : 0,
             'shoutbox_num' => $shoutboxNum,
         ]);
+
         return $this->page->success('Data saved.');
     }
 
@@ -231,7 +231,6 @@ final readonly class Settings
     private function shoutbox(): void
     {
         $page = '';
-        $error = null;
         if ($this->request->post('clearall') !== null) {
             $this->database->special(
                 'TRUNCATE TABLE %t',
