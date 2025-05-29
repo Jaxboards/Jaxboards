@@ -84,7 +84,9 @@ final class Topic
         $quickReply = $this->request->both('qreply') !== null;
 
         $topic = $this->fetchTopicData($tid);
-        $forumPerms = $topic ? $this->fetchForumPermissions($topic) : [];
+        $forumPerms = $topic !== null
+            ? $this->fetchForumPermissions($topic)
+            : [];
 
         if (!$topic || !$forumPerms['read']) {
             $this->page->location('?');
@@ -125,8 +127,10 @@ final class Topic
     /**
      * @return array<string,bool>
      */
-    private function fetchForumPermissions(ModelsTopic $modelsTopic, ?Forum $forum = null): array
-    {
+    private function fetchForumPermissions(
+        ModelsTopic $modelsTopic,
+        ?Forum $forum = null,
+    ): array {
         static $forumPerms = [];
 
         if ($forumPerms !== []) {
@@ -140,6 +144,7 @@ final class Topic
 
     /**
      * @param array<int> $memberIds
+     *
      * @return array<int,Member>
      */
     private function fetchMembersById(array $memberIds): array
@@ -170,7 +175,9 @@ final class Topic
         $this->session->set('location_verbose', "In topic '" . $topicTitle . "'");
 
         $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $modelsTopic->fid);
-        $category = $forum ? Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $forum->cat_id) : null;
+        $category = $forum !== null
+            ? Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $forum->cat_id)
+            : null;
         // Fix this to work with subforums.
         $this->page->setBreadCrumbs(
             [
