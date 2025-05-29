@@ -146,9 +146,7 @@ final class Session
 
         if ($session !== null) {
             $this->modelsSession = $session;
-            $this->vars = $session->vars !== ''
-                ? unserialize($session->vars)
-                : [];
+            $this->vars = unserialize($session->vars) ?: [];
 
             return;
         }
@@ -194,9 +192,8 @@ final class Session
             return;
         }
 
-
         $this->vars[$varName] = $value;
-        $this->modelsSession->vars = serialize($this->vars);
+        $this->changedData['vars'] = $this->modelsSession->vars = serialize($this->vars);
     }
 
     public function deleteVar(string $varName): void
