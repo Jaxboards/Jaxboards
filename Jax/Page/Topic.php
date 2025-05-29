@@ -11,7 +11,12 @@ use Jax\Date;
 use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
+use Jax\Models\Category;
+use Jax\Models\Forum;
+use Jax\Models\Group;
+use Jax\Models\Member;
 use Jax\Models\Post;
+use Jax\Models\Topic as ModelsTopic;
 use Jax\Page;
 use Jax\Page\Topic\Poll;
 use Jax\Page\Topic\Reactions;
@@ -22,6 +27,7 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
+use function _\keyBy;
 use function array_flip;
 use function ceil;
 use function explode;
@@ -75,8 +81,9 @@ final class Topic
         $quickReply = $this->request->both('qreply') !== null;
 
         $topic = $this->fetchTopicData($tid);
+        $forumPerms = $this->fetchForumPermissions($topic);
 
-        if (!$topic || !$topic['fperms']['read']) {
+        if (!$topic || !$forumPerms['read']) {
             $this->page->location('?');
 
             return;
@@ -85,12 +92,12 @@ final class Topic
         match (true) {
             $quickReply && !$this->request->isJSUpdate() => match (true) {
                 $this->request->isJSAccess() && !$this->request->isJSDirectLink() => $this->quickReplyForm($topic),
-                default => $this->page->location('?act=post&tid=' . $tid),
+                default => $this->page->location('?act=post&tid=' . $topic->id),
             },
             $ratePost !== 0 => $this->reactions->toggleReaction($ratePost, (int) $this->request->both('niblet')),
             $this->request->both('votepoll') !== null => $this->poll->vote($topic),
             $findPost !== 0 => $this->findPost($topic, $findPost),
-            $this->request->both('getlast') !== null => $this->getLastPost($tid),
+            $this->request->both('getlast') !== null => $this->getLastPost($topic->id),
             $edit !== 0 => $this->quickEditPost($topic, $edit),
             $this->request->both('quote') !== null => $this->multiQuote($topic),
             $this->request->both('markread') !== null => $this->markRead($topic),
@@ -101,86 +108,80 @@ final class Topic
         };
     }
 
-    /**
-     * @return ?array<string,mixed>
-     */
-    private function fetchTopicData(int $tid): ?array
+    private function fetchTopicData(int $tid): ?ModelsTopic
     {
-        $result = $this->database->special(
-            <<<'SQL'
-                SELECT
-                    a.`id`
-                    , a.`title` AS `title`
-                    , a.`locked` AS `locked`
-                    , UNIX_TIMESTAMP(a.`lp_date`) AS `lp_date`
-                    , b.`title` AS `forum_title`
-                    , b.`perms` AS `fperms`
-                    , c.`id` AS `cat_id`
-                    , c.`title` AS `cat_title`
-                    , a.`fid` AS `fid`
-                    , a.`poll_q` AS `poll_q`
-                    , a.`poll_type` AS `poll_type`
-                    , a.`poll_choices` AS `poll_choices`
-                    , a.`poll_results` AS `poll_results`
-                    , a.`subtitle` AS `subtitle`
-                FROM %t a
-                LEFT JOIN %t b ON a.`fid` = b.`id`
-                LEFT JOIN %t AS c ON b.`cat_id` = c.`id`
-                WHERE a.`id` = ?
-                LIMIT 1
+        $topic = ModelsTopic::selectOne($this->database, Database::WHERE_ID_EQUALS, $tid);
 
-                SQL,
-            ['topics', 'forums', 'categories'],
-            $tid,
-        );
-        $topicData = $this->database->arow($result);
-        $this->database->disposeresult($result);
-
-        if ($topicData === null) {
+        if ($topic === null) {
             return null;
         }
 
-        $topicData['title'] = $this->textFormatting->wordfilter($topicData['title']);
-        $topicData['subtitle'] = $this->textFormatting->wordfilter($topicData['subtitle']);
-        $topicData['fperms'] = $this->user->getForumPerms($topicData['fperms']);
+        $topic->title = $this->textFormatting->wordfilter($topic->title);
+        $topic->subtitle = $this->textFormatting->wordfilter($topic->subtitle);
 
-        return $topicData;
+
+        return $topic;
+    }
+
+    private function fetchForumPermissions(ModelsTopic $topic) {
+        static $forumPerms = [];
+
+        if ($forumPerms !== []) {
+            return $forumPerms;
+        }
+
+        $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $topic->fid);
+
+        return $forumPerms = $this->user->getForumPerms($forum->perms);
     }
 
     /**
-     * @param array<string,mixed> $topic
+     * @return array<int,Member>
      */
-    private function viewTopic(array $topic): void
+    private function fetchMembersById(array $memberIds): array
     {
-        $tid = $topic['id'];
+        return keyBy(
+            Member::selectMany(
+                $this->database,
+                Database::WHERE_ID_IN,
+                array_unique($memberIds),
+            ),
+            fn(Member $member) => $member->id
+        );
+    }
+
+    private function viewTopic(ModelsTopic $topic): void
+    {
         if (
             !$this->user->isGuest()
-            && $topic['lp_date'] > $this->user->get('last_visit')
+            && $topic->lp_date > $this->user->get('last_visit')
         ) {
             $this->markRead($topic);
         }
 
-        $this->page->setPageTitle((string) $topic['title']);
-        $this->session->set('location_verbose', "In topic '" . $topic['title'] . "'");
+        $this->page->setPageTitle((string) $topic->title);
+        $this->session->set('location_verbose', "In topic '" . $topic->title . "'");
 
+        $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $topic->fid);
+        $category = Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $forum->cat_id);
         // Fix this to work with subforums.
         $this->page->setBreadCrumbs(
             [
-                "?act=vc{$topic['cat_id']}" => (string) $topic['cat_title'],
-                "?act=vf{$topic['fid']}" => (string) $topic['forum_title'],
-                "?act=vt{$tid}" => (string) $topic['title'],
+                "?act=vc{$category->id}" => (string) $category->title,
+                "?act=vf{$forum->id}" => (string) $forum->title,
+                "?act=vt{$topic->id}" => (string) $topic->title,
             ],
         );
 
         // Generate pages.
-        $postCount = Post::count($this->database, 'WHERE `tid`=?', $tid) ?? 0;
+        $postCount = Post::count($this->database, 'WHERE `tid`=?', $topic->id) ?? 0;
 
         $totalpages = (int) ceil($postCount / $this->numperpage);
         $pagelist = '';
         foreach ($this->jax->pages($totalpages, $this->pageNumber + 1, 10) as $pageNumber) {
             $pagelist .= $this->template->meta(
                 'topic-pages-part',
-                $tid,
+                $topic->id,
                 $pageNumber,
                 $pageNumber === $this->pageNumber + 1 ? ' class="active"' : '',
                 $pageNumber,
@@ -191,18 +192,18 @@ final class Topic
         $this->session->addVar('topic_lastpage', $this->pageNumber + 1 === $totalpages);
 
         // If it's a poll, put it in.
-        $poll = $topic['poll_type']
+        $poll = $topic->poll_type
             ? $this->poll->render($topic)
             : '';
 
         // Generate post listing.
-        $page = $this->template->meta('topic-table', $this->postsintooutput($topic));
+        $page = $this->template->meta('topic-table', $this->postsIntoOutput($topic));
         $page = $this->template->meta(
             'topic-wrapper',
-            $topic['title']
-                . ($topic['subtitle'] ? ', ' . $topic['subtitle'] : ''),
+            $topic->title
+                . ($topic->subtitle ? ', ' . $topic->subtitle : ''),
             $page,
-            '<a href="./?act=vt' . $tid . '&amp;fmt=RSS" class="social rss" title="RSS Feed for this Topic" target="_blank">RSS</a>',
+            '<a href="./?act=vt' . $topic->id . '&amp;fmt=RSS" class="social rss" title="RSS Feed for this Topic" target="_blank">RSS</a>',
         );
 
         // Add buttons.
@@ -212,8 +213,9 @@ final class Topic
             '',
         ];
 
-        if ($topic['fperms']['start']) {
-            $buttons[0] = "<a href='?act=post&fid=" . $topic['fid'] . "'>"
+        $forumPerms = $this->fetchForumPermissions($topic);
+        if ($forumPerms['start']) {
+            $buttons[0] = "<a href='?act=post&fid=" . $topic->fid . "'>"
                 . $this->template->meta(
                     $this->template->metaExists('button-newtopic')
                         ? 'button-newtopic'
@@ -223,13 +225,13 @@ final class Topic
         }
 
         if (
-            $topic['fperms']['reply']
+            $forumPerms['reply']
             && (
-                !$topic['locked']
+                !$topic->locked
                 || $this->user->getPerm('can_override_locked_topics')
             )
         ) {
-            $buttons[1] = "<a href='?act=vt{$tid}&qreply=1'>" . $this->template->meta(
+            $buttons[1] = "<a href='?act=vt{$topic->id}&qreply=1'>" . $this->template->meta(
                 $this->template->metaExists('button-qreply')
                     ? 'button-qreply'
                     : 'topic-button-qreply',
@@ -237,13 +239,13 @@ final class Topic
         }
 
         if (
-            $topic['fperms']['reply']
+            $forumPerms['reply']
             && (
-                !$topic['locked']
+                !$topic->locked
                 || $this->user->getPerm('can_override_locked_topics')
             )
         ) {
-            $buttons[2] = "<a href='?act=post&tid={$tid}'>" . $this->template->meta(
+            $buttons[2] = "<a href='?act=post&tid={$topic->id}'>" . $this->template->meta(
                 $this->template->metaExists('button-reply')
                     ? 'button-reply'
                     : 'topic-button-reply',
@@ -258,7 +260,7 @@ final class Topic
                 continue;
             }
 
-            if ($user['location'] !== "vt{$tid}") {
+            if ($user['location'] !== "vt{$topic->id}") {
                 continue;
             }
 
@@ -306,7 +308,7 @@ final class Topic
 
                 SQL,
             ['topics'],
-            $tid,
+            $topic->id,
         );
 
         if ($this->request->isJSAccess()) {
@@ -329,15 +331,11 @@ final class Topic
         $this->page->append('PAGE', $page);
     }
 
-    /**
-     * @param array<string,mixed> $topic
-     */
-    private function update(array $topic): void
+    private function update(ModelsTopic $topic): void
     {
-        $tid = $topic['id'];
 
         // Check for new posts and append them.
-        if ($this->session->get('location') !== "vt{$tid}") {
+        if ($this->session->get('location') !== "vt{$topic->id}") {
             $this->session->deleteVar('topic_lastpid');
         }
 
@@ -345,7 +343,7 @@ final class Topic
             $this->session->getVar('topic_lastpid')
             && $this->session->getVar('topic_lastpage')
         ) {
-            $newposts = $this->postsintooutput($topic, (int) $this->session->getVar('topic_lastpid'));
+            $newposts = $this->postsIntoOutput($topic, (int) $this->session->getVar('topic_lastpid'));
             if ($newposts !== '') {
                 $this->page->command('appendrows', '#intopic', $newposts);
             }
@@ -360,7 +358,7 @@ final class Topic
                 continue;
             }
 
-            if ($user['location'] !== "vt{$tid}") {
+            if ($user['location'] !== "vt{$topic->id}") {
                 continue;
             }
 
@@ -399,33 +397,34 @@ final class Topic
         $this->session->set('users_online_cache', $newcache);
     }
 
-    /**
-     * @param array<string,mixed> $topic
-     */
-    private function quickReplyForm(array $topic): void
+    private function quickReplyForm(ModelsTopic $topic): void
     {
-        $tid = $topic['id'];
         $prefilled = '';
         $this->page->command('softurl');
         if (
             $this->session->getVar('multiquote')
         ) {
-            $result = $this->database->special(
-                <<<'SQL'
-                    SELECT
-                        p.`post` AS `post`,
-                        m.`display_name` AS `name`
-                    FROM %t p
-                    LEFT JOIN %t m
-                        ON p.`auth_id` = m.`id`
-                        WHERE p.`id` IN ?
-                    SQL,
-                ['posts', 'members'],
+            $posts = Post::selectMany(
+                $this->database,
+                'WHERE `id` IN ?',
                 explode(',', (string) $this->session->getVar('multiquote')),
             );
 
-            while ($post = $this->database->arow($result)) {
-                $prefilled .= '[quote=' . $post['name'] . ']' . $post['post'] . '[/quote]' . PHP_EOL;
+            $members = keyBy(
+                Member::selectMany(
+                    $this->database,
+                    Database::WHERE_ID_IN,
+                    array_unique(array_map(fn($post) => $post->auth_id, $posts)),
+                ),
+                fn($member) => $member->id,
+            );
+
+
+            foreach ($posts as $post) {
+                $prefilled .= '[quote=' . $members[$post->auth_id]->display_name . ']'
+                    . $post->post
+                    . '[/quote]'
+                    . PHP_EOL;
             }
 
             $this->session->deleteVar('multiquote');
@@ -436,267 +435,152 @@ final class Topic
             [
                 'content' => $this->template->meta(
                     'topic-reply-form',
-                    $tid,
+                    $topic->id,
                     $this->textFormatting->blockhtml($prefilled),
                 ),
                 'id' => 'qreply',
                 'resize' => 'textarea',
-                'title' => $this->textFormatting->wordfilter($topic['title']),
+                'title' => $this->textFormatting->wordfilter($topic->title),
             ],
         );
         $this->page->command('updateqreply', '');
     }
 
-    /**
-     * @param array<string,mixed> $topic
-     */
-    private function postsintooutput(array $topic, int $lastpid = 0): string
+    private function postsIntoOutput(ModelsTopic $topic, int $lastpid = 0): string
     {
         $usersonline = $this->database->getUsersOnline();
         $this->config->getSetting('ratings') ?? 0;
 
-        $topicPostCounter = 0;
-
-        $query = $lastpid !== 0 ? $this->database->special(
-            <<<'SQL'
-                SELECT m.`id` AS `id`
-                    , m.`name` AS `name`
-                    , m.`group_id` AS `group_id`
-                    , m.`sound_im` AS `sound_im`
-                    , m.`sound_shout` AS `sound_shout`
-                    , UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`
-                    , m.`display_name` AS `display_name`
-                    , m.`friends` AS `friends`
-                    , m.`enemies` AS `enemies`
-                    , m.`skin_id` AS `skin_id`
-                    , m.`nowordfilter` AS `nowordfilter`
-                    , m.`wysiwyg` AS `wysiwyg`
-                    , m.`avatar` AS `avatar`
-                    , m.`usertitle` AS `usertitle`
-                    , CONCAT(MONTH(m.`birthdate`), ' ', MONTH(m.`birthdate`)) as `birthday`
-                    , m.`mod` AS `mod`
-                    , m.`posts` AS `posts`
-                    , p.`tid` AS `tid`
-                    , p.`id` AS `pid`
-                    , p.`ip` AS `ip`
-                    , p.`newtopic` AS `newtopic`
-                    , p.`post` AS `post`
-                    , p.`showsig` AS `showsig`
-                    , p.`showemotes` AS `showemotes`
-                    , p.`tid` AS `tid`
-                    , UNIX_TIMESTAMP(p.`date`) AS `date`
-                    , p.`auth_id` AS `auth_id`
-                    , p.`rating` AS `rating`
-                    , g.`title` AS `title`
-                    , g.`icon` AS `icon`
-                    , UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`
-                    , p.`editby` AS `editby`
-                    , e.`display_name` AS `ename`
-                    , e.`group_id` AS `egroup_id`
-                FROM %t AS p
-                LEFT JOIN %t m
-                    ON p.`auth_id` = m.`id`
-                LEFT JOIN %t g
-                    ON m.`group_id` = g.`id`
-                LEFT JOIN %t e
-                ON p.`editby` = e.`id`
-                WHERE p.`tid` = ?
-                  AND p.`id` > ?
-                ORDER BY `pid`
-
-                SQL,
-            ['posts', 'members', 'member_groups', 'members'],
-            $topic['id'],
+        $topicPostCounter = $this->pageNumber * $this->numperpage;
+        $posts = Post::selectMany(
+            $this->database,
+            'WHERE tid = ? AND id > ? '.
+            'ORDER BY `id` '.
+            'LIMIT ?,?',
+            $topic->id,
             $lastpid,
-        ) : $this->database->special(
-            <<<'SQL'
-                SELECT m.`id` AS `id`
-                    , m.`name` AS `name`
-                    , m.`email` AS `email`
-                    , m.`sig` AS `sig`
-                    , m.`posts` AS `posts`
-                    , m.`group_id` AS `group_id`
-                    , m.`avatar` AS `avatar`
-                    , m.`usertitle` AS `usertitle`
-                    , UNIX_TIMESTAMP(m.`join_date`) AS `join_date`
-                    , UNIX_TIMESTAMP(m.`last_visit`) AS `last_visit`
-                    , m.`contact_skype` AS `contact_skype`
-                    , m.`contact_yim` AS `contact_yim`
-                    , m.`contact_msn` AS `contact_msn`
-                    , m.`contact_gtalk` AS `contact_gtalk`
-                    , m.`contact_aim` AS `contact_aim`
-                    , m.`website` AS `website`
-                    , m.`birthdate` AS `birthdate`
-                    , DAY(m.`birthdate`) AS `dob_day`
-                    , MONTH(m.`birthdate`) AS `dob_month`
-                    , YEAR(m.`birthdate`) AS `dob_year`
-                    , m.`about` AS `about`
-                    , m.`display_name` AS `display_name`
-                    , m.`full_name` AS `full_name`
-                    , m.`contact_steam` AS `contact_steam`
-                    , m.`location` AS `location`
-                    , m.`gender` AS `gender`
-                    , m.`friends` AS `friends`
-                    , m.`enemies` AS `enemies`
-                    , m.`sound_shout` AS `sound_shout`
-                    , m.`sound_im` AS `sound_im`
-                    , m.`sound_pm` AS `sound_pm`
-                    , m.`sound_postinmytopic` AS `sound_postinmytopic`
-                    , m.`sound_postinsubscribedtopic` AS `sound_postinsubscribedtopic`
-                    , m.`notify_pm` AS `notify_pm`
-                    , m.`notify_postinmytopic` AS `notify_postinmytopic`
-                    , m.`notify_postinsubscribedtopic` AS `notify_postinsubscribedtopic`
-                    , m.`ucpnotepad` AS `ucpnotepad`
-                    , m.`skin_id` AS `skin_id`
-                    , m.`contact_twitter` AS `contact_twitter`
-                    , m.`contact_discord` AS `contact_discord`
-                    , m.`contact_youtube` AS `contact_youtube`
-                    , m.`contact_bluesky` AS `contact_bluesky`
-                    , m.`email_settings` AS `email_settings`
-                    , m.`nowordfilter` AS `nowordfilter`
-                    , COALESCE(p.`ip`, m.`ip`) AS `ip`
-                    , m.`mod` AS `mod`
-                    , m.`wysiwyg` AS `wysiwyg`
-                    , p.`tid` AS `tid`
-                    , p.`id` AS `pid`
-                    , p.`newtopic` AS `newtopic`
-                    , p.`post` AS `post`
-                    , p.`showsig` AS `showsig`
-                    , p.`showemotes` AS `showemotes`
-                    , p.`tid` AS `tid`
-                    , UNIX_TIMESTAMP(p.`date`) AS `date`
-                    , p.`auth_id` AS `auth_id`
-                    , p.`rating` AS `rating`
-                    , g.`title` AS `title`
-                    , g.`icon` AS `icon`
-                    , UNIX_TIMESTAMP(p.`edit_date`) AS `edit_date`
-                    , p.`editby` AS `editby`
-                    , e.`display_name` AS `ename`
-                    , e.`group_id` AS `egroup_id`
-                FROM %t p
-                LEFT JOIN %t m
-                    ON p.`auth_id`=m.`id`
-                LEFT JOIN %t g
-                    ON m.`group_id` = g.`id`
-                LEFT JOIN %t e
-                    ON p.`editby` = e.`id`
-                WHERE p.`tid` = ?
-                ORDER BY `newtopic` DESC
-                    , `pid` ASC
-                LIMIT ?, ?
-
-                SQL,
-            ['posts', 'members', 'member_groups', 'members'],
-            $topic['id'],
-            $topicPostCounter = $this->pageNumber * $this->numperpage,
+            $lastpid ? 0 : $topicPostCounter,
             $this->numperpage,
         );
 
+        $membersById = $this->fetchMembersById(
+            array_merge(
+                array_map(fn($post) => $post->auth_id, $posts),
+                array_map(fn($post) => $post->editby, $posts),
+            )
+        );
+
+        $forumPerms = $this->fetchForumPermissions($topic);
+
         $rows = '';
-        foreach ($this->database->arows($query) as $post) {
+        foreach ($posts as $post) {
             if ($this->firstPostID === 0) {
-                $this->firstPostID = $post['pid'];
+                $this->firstPostID = $post->id;
             }
 
-            $postt = $post['post'];
-
-            $postt = $this->textFormatting->theWorks($postt);
+            $postBody = $post->post;
+            $postBody = $this->textFormatting->theWorks($postBody);
 
             // Post rating content goes here.
             $postrating = $this->reactions->render($post);
 
+            $author = $post->auth_id ? $membersById[$post->auth_id] : null;
+            $editor = $post->editby ? $membersById[$post->editby] : null;
+            $authorGroup = $author
+                ? Group::selectOne($this->database, Database::WHERE_ID_EQUALS, $author->group_id)
+                : null;
             $postbuttons
                 // Adds the Edit button
                 = ($this->canEdit($topic, $post)
-                    ? "<a href='?act=vt" . $topic['id'] . '&amp;edit=' . $post['pid']
+                    ? "<a href='?act=vt" . $topic->id . '&amp;edit=' . $post->id
                     . "' class='edit'>" . $this->template->meta('topic-edit-button')
                     . '</a>'
                     : '')
                 // Adds the Quote button
-                . ($topic['fperms']['reply']
-                    ? " <a href='?act=vt" . $topic['id'] . '&amp;quote=' . $post['pid']
+                . ($forumPerms['reply']
+                    ? " <a href='?act=vt" . $topic->id . '&amp;quote=' . $post->id
                     . "' onclick='RUN.handleQuoting(this);return false;' "
                     . "class='quotepost'>" . $this->template->meta('topic-quote-button') . '</a> '
                     : '')
                 // Adds the Moderate options
                 . ($this->canModerate($topic)
-                    ? "<a href='?act=modcontrols&amp;do=modp&amp;pid=" . $post['pid']
+                    ? "<a href='?act=modcontrols&amp;do=modp&amp;pid=" . $post->id
                     . "' class='modpost' onclick='RUN.modcontrols.togbutton(this)'>"
                     . $this->template->meta('topic-mod-button') . '</a>'
                     : '');
 
             $rows .= $this->template->meta(
                 'topic-post-row',
-                $post['pid'],
-                $topic['id'],
-                $post['auth_id'] ? $this->template->meta(
+                $post->id,
+                $topic->id,
+                $author ? $this->template->meta(
                     'user-link',
-                    $post['auth_id'],
-                    $post['group_id'],
-                    $post['display_name'],
+                    $author->id,
+                    $author->group_id,
+                    $author->display_name,
                 ) : 'Guest',
-                $post['avatar'] ?: $this->template->meta('default-avatar'),
-                $post['usertitle'],
-                $post['posts'],
+                $author->avatar ?: $this->template->meta('default-avatar'),
+                $author->usertitle,
+                $author->posts,
                 $this->template->meta(
                     'topic-status-'
-                        . (isset($usersonline[$post['auth_id']])
-                            && $usersonline[$post['auth_id']] ? 'online' : 'offline'),
+                        . (isset($usersonline[$post->auth_id])
+                            && $usersonline[$post->auth_id] ? 'online' : 'offline'),
                 ),
-                $post['title'],
-                $post['auth_id'],
+                $authorGroup->title,
+                $post->auth_id,
                 $postbuttons,
                 // ^10
-                $this->date->autoDate($post['date']),
+                $this->date->autoDate($this->database->datetimeAsTimestamp($post->date)),
                 <<<HTML
-                    <a href="?act=vt{$topic['id']}&amp;findpost={$post['pid']}&pid={$post['pid']}"
+                    <a href="?act=vt{$topic->id}&amp;findpost={$post->id}&pid={$post->id}"
                         onclick="prompt('Link to this post:',this.href);return false"
                         >{$this->template->meta('topic-perma-button')}</a>
                     HTML,
-                $postt,
-                isset($post['sig']) && $post['sig']
-                    ? $this->textFormatting->theWorks($post['sig'])
+                $postBody,
+                isset($author->sig) && $author->sig
+                    ? $this->textFormatting->theWorks($author->sig)
                     : '',
-                $post['auth_id'],
-                $post['edit_date'] ? $this->template->meta(
+                $post->auth_id,
+                $editor ? $this->template->meta(
                     'topic-edit-by',
                     $this->template->meta(
                         'user-link',
-                        $post['editby'],
-                        $post['egroup_id'],
-                        $post['ename'],
+                        $editor->id,
+                        $editor->group_id,
+                        $editor->display_name,
                     ),
-                    $this->date->autoDate($post['edit_date']),
+                    $this->date->autoDate($this->database->datetimeAsTimestamp($post->edit_date)),
                 ) : '',
                 $this->user->getPerm('can_moderate')
                     ? '<a href="?act=modcontrols&amp;do=iptools&amp;ip='
-                    . $this->ipAddress->asHumanReadable($post['ip']) . '">' . $this->template->meta(
+                    . $this->ipAddress->asHumanReadable($post->ip) . '">' . $this->template->meta(
                         'topic-mod-ipbutton',
-                        $this->ipAddress->asHumanReadable($post['ip']),
+                        $this->ipAddress->asHumanReadable($post->ip),
                     ) . '</a>'
                     : '',
-                $post['icon'] ? $this->template->meta(
+                $authorGroup->icon ? $this->template->meta(
                     'topic-icon-wrapper',
-                    $post['icon'],
+                    $authorGroup->icon,
                 ) : '',
                 ++$topicPostCounter,
                 $postrating,
                 // 30 V
-                $post['contact_skype'] ?? '',
-                $post['contact_discord'] ?? '',
-                $post['contact_yim'] ?? '',
-                $post['contact_msn'] ?? '',
-                $post['contact_gtalk'] ?? '',
-                $post['contact_aim'] ?? '',
-                $post['contact_youtube'] ?? '',
-                $post['contact_steam'] ?? '',
-                $post['contact_twitter'] ?? '',
-                $post['contact_bluesky'] ?? '',
+                $author->contact_skype ?? '',
+                $author->contact_discord ?? '',
+                $author->contact_yim ?? '',
+                $author->contact_msn ?? '',
+                $author->contact_gtalk ?? '',
+                $author->contact_aim ?? '',
+                $author->contact_youtube ?? '',
+                $author->contact_steam ?? '',
+                $author->contact_twitter ?? '',
+                $author->contact_bluesky ?? '',
                 '',
                 '',
                 '',
             );
-            $lastpid = $post['pid'];
+            $lastpid = $post->id;
         }
 
         $this->session->addVar('topic_lastpid', $lastpid);
@@ -704,27 +588,20 @@ final class Topic
         return $rows;
     }
 
-    /**
-     * @param array<string,mixed>                 $topic
-     * @param array<string,null|float|int|string> $post
-     */
-    private function canEdit(array $topic, array $post): bool
+    private function canEdit(ModelsTopic $topic, Post $post): bool
     {
         if ($this->canModerate($topic)) {
             return true;
         }
 
-        return $post['auth_id']
-            && ($post['newtopic']
+        return $post->auth_id
+            && ($post->newtopic
                 ? $this->user->getPerm('can_edit_topics')
                 : $this->user->getPerm('can_edit_posts'))
-            && $post['auth_id'] === $this->user->get('id');
+            && $post->auth_id === $this->user->get('id');
     }
 
-    /**
-     * @param array<string,mixed> $topic
-     */
-    private function canModerate(array $topic): bool
+    private function canModerate(ModelsTopic $topic): bool
     {
         static $canMod;
         if ($canMod !== null) {
@@ -748,7 +625,7 @@ final class Topic
                     )
                     SQL,
                 ['forums', 'topics'],
-                $topic['id'],
+                $topic->id,
             );
             $mods = $this->database->arow($result);
             $this->database->disposeresult($result);
@@ -763,13 +640,10 @@ final class Topic
         return $canMod;
     }
 
-    /**
-     * @param array<string,mixed> $topic
-     */
-    private function quickEditPost(array $topic, int $pid): void
+    private function quickEditPost(ModelsTopic $topic, int $pid): void
     {
         if (!$this->request->isJSAccess()) {
-            $this->page->location("?act=post&how=edit&tid={$topic['id']}&pid={$pid}");
+            $this->page->location("?act=post&how=edit&tid={$topic->id}&pid={$pid}");
 
             return;
         }
@@ -795,7 +669,7 @@ final class Topic
             return;
         }
 
-        if (!$this->canEdit($topic, $post->asArray())) {
+        if (!$this->canEdit($topic, $post)) {
             $this->page->command('alert', "You don't have permission to edit this post.");
 
             return;
@@ -810,8 +684,8 @@ final class Topic
             $form = $this->template->meta(
                 'topic-qedit-topic',
                 $hiddenfields,
-                $topic['title'],
-                $topic['subtitle'],
+                $topic->title,
+                $topic->subtitle,
                 $this->textFormatting->blockhtml($post->post),
             );
         } else {
@@ -826,30 +700,18 @@ final class Topic
         $this->page->command('update', "#pid_{$pid} .post_content", $form);
     }
 
-    /**
-     * @param array<string,mixed> $topic
-     */
-    private function multiQuote(array $topic): void
+    private function multiQuote(ModelsTopic $topic): void
     {
         $pid = (int) $this->request->asString->both('quote');
-        $post = false;
-        if ($pid !== 0) {
-            $result = $this->database->special(
-                <<<'SQL'
-                    SELECT p.`post` AS `post`
-                        , m.`display_name` AS `name`
-                    FROM %t p
-                    LEFT JOIN %t m
-                      ON p.`auth_id` = m.`id`
-                    WHERE p.`id` = ?
-
-                    SQL,
-                ['posts', 'members'],
-                $pid,
-            );
-            $post = $this->database->arow($result);
-            $this->database->disposeresult($result);
+        if (!$pid) {
+            return;
         }
+
+        $post = Post::selectOne(
+            $this->database,
+            Database::WHERE_ID_EQUALS,
+            $pid,
+        );
 
         if (!$post) {
             $error = "That post doesn't exist!";
@@ -859,10 +721,16 @@ final class Topic
             return;
         }
 
+        $author = Member::selectOne(
+            $this->database,
+            Database::WHERE_ID_EQUALS,
+            $post->auth_id,
+        );
+
         if ($this->request->both('qreply')) {
             $this->page->command(
                 'updateqreply',
-                '[quote=' . $post['name'] . ']' . $post['post'] . '[/quote]'
+                '[quote=' . $author->name . ']' . $post->post . '[/quote]'
                     . PHP_EOL . PHP_EOL,
             );
         } else {
@@ -881,7 +749,7 @@ final class Topic
             if ($this->request->isJSAccess()) {
                 $this->quickReplyForm($topic);
             } else {
-                header('Location:?act=post&tid=' . $topic['id']);
+                header('Location:?act=post&tid=' . $topic->id);
             }
         }
 
@@ -915,32 +783,19 @@ final class Topic
         );
     }
 
-    /**
-     * @param array<string,mixed> $topic
-     */
-    private function findPost(array $topic, int $postId): void
+    private function findPost(ModelsTopic $topic, int $postId): void
     {
         $postPosition = null;
-        $result = $this->database->special(
-            <<<'SQL'
-                SELECT
-                    `id`
-                FROM %t
-                WHERE tid=(
-                    SELECT tid
-                    FROM %t
-                    WHERE `id` = ?
-                )
-                ORDER BY `id` ASC
+        $post = Post::selectOne($this->database, Database::WHERE_ID_EQUALS, $postId);
+        if (!$post) {
+            return;
+        }
 
-                SQL,
-            ['posts', 'posts'],
-            $postId,
-        );
-        foreach ($this->database->arows($result) as $index => $post) {
-            if ($post['id'] === $postId) {
-                $postId = $post['id'];
-                $postPosition = (int) $index;
+        $posts = Post::selectMany($this->database, 'WHERE tid=?', $post->tid);
+        foreach ($posts as $index => $post) {
+            if ($post->id === $postId) {
+                $postId = $post->id;
+                $postPosition = $index;
 
                 break;
             }
@@ -955,57 +810,42 @@ final class Topic
 
         $pageNumber = (int) ceil($postPosition / $this->numperpage);
         $this->page->location(
-            "?act=vt{$topic['id']}&page={$pageNumber}&pid={$postId}#pid_{$postId}",
+            "?act=vt{$topic->id}&page={$pageNumber}&pid={$postId}#pid_{$postId}",
         );
     }
 
-    /**
-     * @param array<string,mixed> $topic
-     */
-    private function markRead(array $topic): void
+    private function markRead(ModelsTopic $topic): void
     {
         $topicsread = $this->jax->parseReadMarkers($this->session->get('topicsread'));
-        $topicsread[$topic['id']] = Carbon::now()->getTimestamp();
+        $topicsread[$topic->id] = Carbon::now()->getTimestamp();
         $this->session->set('topicsread', json_encode($topicsread));
     }
 
-    /**
-     * @param array<string,mixed> $topic
-     */
-    private function viewRSS(array $topic): void
+    private function viewRSS(ModelsTopic $topic): void
     {
-        $tid = (int) $topic['id'];
         $boardURL = $this->domainDefinitions->getBoardURL();
         $rssFeed = new RSSFeed(
             [
-                'description' => $topic['subtitle'],
-                'link' => "{$boardURL}?act=vt{$tid}",
-                'title' => $topic['title'],
+                'description' => $topic->subtitle,
+                'link' => "{$boardURL}?act=vt{$topic->id}",
+                'title' => $topic->title,
             ],
         );
-        $result = $this->database->special(
-            <<<'SQL'
-                SELECT p.`id` AS `id`
-                    , p.`post` AS `post`
-                    , UNIX_TIMESTAMP(p.`date`) AS `date`
-                    , m.`display_name` AS `display_name`
-                FROM %t p
-                LEFT JOIN %t m
-                    ON p.`auth_id` = m.`id`
-                    WHERE p.`tid` = ?
-
-                SQL,
-            ['posts', 'members'],
-            $tid,
+        $posts = Post::selectMany(
+            $this->database,
+            Database::WHERE_ID_IN,
+            $topic->id,
         );
-        foreach ($this->database->arows($result) as $post) {
+        $authors = $this->fetchMembersById(array_map(fn($post) => $post->auth_id, $posts));
+
+        foreach ($posts as $post) {
             $rssFeed->additem(
                 [
-                    'description' => $this->textFormatting->blockhtml($this->textFormatting->theWorks($post['post'])),
-                    'guid' => $post['id'],
-                    'link' => "{$boardURL}?act=vt{$tid}&amp;findpost={$post['id']}",
-                    'pubDate' => gmdate('r', $post['date']),
-                    'title' => $post['display_name'] . ':',
+                    'description' => $this->textFormatting->blockhtml($this->textFormatting->theWorks($post->post)),
+                    'guid' => $post->id,
+                    'link' => "{$boardURL}?act=vt{$topic->id}&amp;findpost={$post->id}",
+                    'pubDate' => gmdate('r', $this->database->datetimeAsTimestamp($post->date)),
+                    'title' => $authors[$post->auth_id]->display_name . ':',
                 ],
             );
         }

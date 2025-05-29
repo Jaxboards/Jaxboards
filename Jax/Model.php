@@ -68,7 +68,7 @@ abstract class Model
     /**
      * @param mixed $args
      *
-     * @return array<static>
+     * @return array<int,static>
      */
     public static function selectMany(Database $database, ...$args): array
     {

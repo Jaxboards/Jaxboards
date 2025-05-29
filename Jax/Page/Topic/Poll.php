@@ -6,6 +6,7 @@ namespace Jax\Page\Topic;
 
 use Jax\Database;
 use Jax\Jax;
+use Jax\Models\Topic;
 use Jax\Page;
 use Jax\Request;
 use Jax\Template;
@@ -34,23 +35,17 @@ final readonly class Poll
         private User $user,
     ) {}
 
-    /**
-     * @param array<string,mixed> $topicData - The Topic Record
-     */
-    public function render(array $topicData): string
+    public function render(Topic $topic): string
     {
         return $this->template->meta(
             'box',
             " id='poll'",
-            $topicData['poll_q'],
-            $this->renderPollHTML($topicData),
+            $topic->poll_q,
+            $this->renderPollHTML($topic),
         );
     }
 
-    /**
-     * @param array<string,mixed> $topicData - The Topic Record
-     */
-    public function vote(array $topicData): void
+    public function vote(Topic $topic): void
     {
         $error = null;
         if ($this->user->isGuest()) {
@@ -60,10 +55,10 @@ final readonly class Poll
         }
 
         $choice = $this->request->both('choice');
-        $choices = json_decode((string) $topicData['poll_choices'], true);
+        $choices = json_decode((string) $topic->poll_choices, true);
         $numchoices = count($choices);
 
-        $results = $this->parsePollResults((string) $topicData['poll_results']);
+        $results = $this->parsePollResults((string) $topic->poll_results);
 
         // Results is now an array of arrays, the keys of the parent array
         // correspond to the choices while the arrays within the array
@@ -84,7 +79,7 @@ final readonly class Poll
             $error = 'You have already voted on this poll!';
         }
 
-        if ($topicData['poll_type'] === 'multi') {
+        if ($topic->poll_type === 'multi') {
             if (is_array($choice)) {
                 foreach ($choice as $c) {
                     if (is_numeric($c) && $c < $numchoices && $c >= 0) {
@@ -111,7 +106,7 @@ final readonly class Poll
         }
 
         if (is_array($choice)) {
-            if ($topicData['poll_type'] === 'multi') {
+            if ($topic->poll_type === 'multi') {
                 foreach ($choice as $c) {
                     $results[$c][] = $this->user->get('id');
                 }
@@ -134,33 +129,30 @@ final readonly class Poll
                 'poll_results' => $presults,
             ],
             Database::WHERE_ID_EQUALS,
-            $topicData['id'],
+            $topic->id,
         );
 
-        $topicData['poll_results'] = $presults;
+        $topic->poll_results = $presults;
 
         $this->page->command(
             'update',
             '#poll .content',
             $this->renderPollHTML(
-                $topicData,
+                $topic,
             ),
             '1',
         );
     }
 
-    /**
-     * @param array<string,mixed> $topicData - The Topic Record
-     */
-    private function renderPollHTML(array $topicData): string
+    private function renderPollHTML(Topic $topic): string
     {
-        $type = $topicData['poll_type'];
-        $choices = json_decode((string) $topicData['poll_choices']);
+        $type = $topic->poll_type;
+        $choices = json_decode((string) $topic->poll_choices);
         if (!is_array($choices)) {
             $choices = [];
         }
 
-        $results = $topicData['poll_results'];
+        $results = $topic->poll_results;
 
         $usersvoted = [];
         $voted = false;
@@ -221,7 +213,7 @@ final readonly class Poll
 
         $hiddenFields = $this->jax->hiddenFormFields(
             [
-                'act' => 'vt' . $topicData['id'],
+                'act' => 'vt' . $topic->id,
                 'votepoll' => '1',
             ],
         );

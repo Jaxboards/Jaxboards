@@ -101,18 +101,15 @@ final readonly class Reactions
         $this->page->command('listrating', $pid, $page);
     }
 
-    /**
-     * @param array<string,mixed> $post - The Post record
-     */
-    public function render(array $post): string
+    public function render(Post $post): string
     {
         // Reactions are turned off
         if (!$this->isReactionsEnabled()) {
             return '';
         }
 
-        $prating = $post['rating']
-            ? json_decode((string) $post['rating'], true)
+        $prating = $post->rating
+            ? json_decode((string) $post->rating, true)
             : [];
         $postratingbuttons = '';
         $showrating = '';
@@ -124,7 +121,7 @@ final readonly class Reactions
                 $ratingNiblet->title,
             );
             $postratingbuttons .= <<<HTML
-                <a href="?act=vt{$post['tid']}&amp;ratepost={$post['pid']}&amp;niblet={$ratingNiblet->id}">
+                <a href="?act=vt{$post->tid}&amp;ratepost={$post->id}&amp;niblet={$ratingNiblet->id}">
                     {$nibletHTML}
                 </a>
                 HTML;
@@ -150,7 +147,7 @@ final readonly class Reactions
             $postratingbuttons,
             $this->isAnonymousReactionsEnabled()
                 ? ''
-                : "<a href='?act=vt{$post['tid']}&amp;listrating={$post['pid']}'>(List)</a>",
+                : "<a href='?act=vt{$post->tid}&amp;listrating={$post->id}'>(List)</a>",
             $showrating,
         );
     }
