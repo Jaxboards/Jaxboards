@@ -390,7 +390,7 @@ final class Session
         $session->useragent = $this->request->getUserAgent() ?? '';
 
         $uid = (int) $this->user->get('id');
-        if ($uid) {
+        if ($uid !== 0) {
             $session->uid = $uid;
         }
 

@@ -843,6 +843,7 @@ final class Post
             if ($newtopic) {
                 ++$stats->topics;
             }
+
             $stats->update($this->database);
         }
 
