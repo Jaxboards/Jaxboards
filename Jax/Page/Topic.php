@@ -126,7 +126,7 @@ final class Topic
         return $topic;
     }
 
-    private function fetchForumPermissions(?ModelsTopic $topic)
+    private function fetchForumPermissions(?ModelsTopic $modelsTopic)
     {
         static $forumPerms = [];
 
@@ -134,7 +134,7 @@ final class Topic
             return $forumPerms;
         }
 
-        $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $topic->fid);
+        $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $modelsTopic->fid);
 
         return $forumPerms = $this->user->getForumPerms($forum->perms);
     }
