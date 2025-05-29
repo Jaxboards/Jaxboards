@@ -145,8 +145,6 @@ final class Forum
             return;
         }
 
-        $title = &$forum->title;
-
         $forumPerms = $this->user->getForumPerms($forum->perms);
         if (!$forumPerms['read']) {
             $this->page->command('alert', 'no permission');
@@ -271,7 +269,9 @@ final class Forum
                 // 5
                 number_format($topic->views),
                 // 6
-                $this->date->autoDate($this->database->datetimeAsTimestamp($topic->lp_date)),
+                $topic->lp_date
+                    ? $this->date->autoDate($this->database->datetimeAsTimestamp($topic->lp_date))
+                    : '',
                 // 7
                 $lastPostAuthor ? $this->template->meta(
                     'user-link',
@@ -332,13 +332,13 @@ final class Forum
             }
         }
 
-        $page .= $this->template->meta('box', ' id="fid_' . $fid . '_listing"', $title, $table);
+        $page .= $this->template->meta('box', ' id="fid_' . $fid . '_listing"', $forum->title, $table);
         $page .= $this->template->meta('forum-pages-bottom', $forumpages);
         $page .= $this->template->meta('forum-buttons-bottom', $forumbuttons);
 
         // Start building the nav path.
         $category = Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $forum->cat_id);
-        $breadCrumbs = ["?act=vc{$forum->cat_id}" => $category->title];
+        $breadCrumbs = $category ? ["?act=vc{$forum->cat_id}" => $category->title] : [];
 
         // Subforum breadcrumbs
         if ($forum->path !== '') {
@@ -360,7 +360,7 @@ final class Forum
             }
         }
 
-        $breadCrumbs["?act=vf{$fid}"] = $title;
+        $breadCrumbs["?act=vf{$fid}"] = $forum->title;
         $this->page->setBreadCrumbs($breadCrumbs);
         if ($this->request->isJSAccess()) {
             $this->page->command('update', 'page', $page);
@@ -411,11 +411,7 @@ final class Forum
                 : null;
 
             $lastPostDate = $this->date->autoDate(
-                Carbon::createFromFormat(
-                    Database::DATE_TIME,
-                    $subforum->lp_date,
-                    'UTC',
-                )->getTimestamp(),
+                $this->database->datetimeAsTimestamp($subforum->lp_date)
             ) ?: '- - - - -';
 
             $rows .= $this->template->meta(
@@ -488,6 +484,10 @@ final class Forum
 
     private function isTopicRead(Topic $topic, int $fid): bool
     {
+        if (!$topic->lp_date) {
+            return true;
+        }
+
         $topicId = $topic->id;
         if ($this->topicsRead === []) {
             $this->topicsRead = $this->jax->parseReadMarkers($this->session->get('topicsread'));
@@ -513,13 +513,15 @@ final class Forum
 
     private function isForumRead(ModelsForum $modelsForum): bool
     {
+        if (!$modelsForum->lp_date) {
+            return true;
+        }
+
         if (!$this->forumsRead) {
             $this->forumsRead = $this->jax->parseReadMarkers($this->session->get('forumsread'));
         }
 
-        $lastPostTimestamp = $this->database->datetimeAsTimestamp($modelsForum->lp_date);
-
-        return $lastPostTimestamp <= (
+        return $this->database->datetimeAsTimestamp($modelsForum->lp_date) <= (
             $this->forumsRead[$modelsForum->id] ?? null
             ?: $this->session->get('read_date')
             ?: $this->user->get('last_visit')
