@@ -112,7 +112,6 @@ final class Forum
         $page = '';
         $rows = '';
         $table = '';
-        $unread = false;
 
         $forum = ModelsForum::selectOne($this->database, Database::WHERE_ID_EQUALS, $fid);
 
@@ -228,6 +227,7 @@ final class Forum
             static fn(Member $member): int => $member->id,
         ) : [];
 
+        $unread = false;
         foreach ($topics as $topic) {
             $pages = '';
             if ($topic->replies > 9) {
@@ -242,8 +242,7 @@ final class Forum
             $author = $membersById[$topic->auth_id];
             $lastPostAuthor = $membersById[$topic->lp_uid] ?? null;
 
-            $read = false;
-            $unread = false;
+            $read = $this->isTopicRead($topic, $fid);
             $rows .= $this->template->meta(
                 'forum-row',
                 $topic->id,
@@ -283,7 +282,7 @@ final class Forum
                 // 11
                 $pages,
                 // 12
-                ($read = $this->isTopicRead($topic, $fid)) ? 'read' : 'unread',
+                $read ? 'read' : 'unread',
                 // 13
                 $read ? (
                     $this->template->meta('topic-icon-read')
@@ -298,14 +297,13 @@ final class Forum
             if ($read) {
                 continue;
             }
-
             $unread = true;
         }
 
         // If they're on the first page and no topics
         // were marked as unread, mark the whole forum as read
         // since we don't care about pages past the first one.
-        if (!$this->pageNumber && !$unread) {
+        if ($this->pageNumber === 0 && !$unread) {
             $this->markRead($fid);
         }
 
