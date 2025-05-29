@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Jax;
 
 use Carbon\Carbon;
+use Jax\Models\Session as ModelsSession;
 use Jax\Models\Token;
 
 use function base64_encode;
@@ -23,10 +24,7 @@ use function unserialize;
 
 final class Session
 {
-    /**
-     * @var array<mixed>
-     */
-    private array $data = ['vars' => []];
+    private array $vars = [];
 
     /**
      * @var array<string,string>
@@ -87,6 +85,8 @@ final class Session
      */
     private array $changedData = [];
 
+    private ?ModelsSession $session = null;
+
     public function __construct(
         private readonly Config $config,
         private readonly IPAddress $ipAddress,
@@ -103,7 +103,7 @@ final class Session
 
     public function loginWithToken(): ?int
     {
-        $this->data = $this->fetchSessionData($this->getPHPSessionValue('sid') ?? null);
+        $this->fetchSessionData($this->getPHPSessionValue('sid') ?? null);
 
         if ($this->get('is_bot')) {
             return null;
@@ -127,7 +127,7 @@ final class Session
     /**
      * @return array<string,mixed>
      */
-    public function fetchSessionData(null|int|string $sid = null): array
+    public function fetchSessionData(null|int|string $sid = null): void
     {
         $session = null;
         $botName = $this->getBotName();
@@ -138,48 +138,23 @@ final class Session
                 ? [Database::WHERE_ID_EQUALS, $sid]
                 : ['WHERE `id`=? AND `ip`=?', $sid, $this->ipAddress->asBinary()];
 
-            $result = $this->database->select(
-                [
-                    'buddy_list_cache',
-                    'forumsread',
-                    'hide',
-                    'id',
-                    'ip',
-                    'is_bot',
-                    'location_verbose',
-                    'location',
-                    'runonce',
-                    'topicsread',
-                    'uid',
-                    'useragent',
-                    'users_online_cache',
-                    'vars',
-                    'UNIX_TIMESTAMP(`last_action`) AS `last_action`',
-                    'UNIX_TIMESTAMP(`last_update`) AS `last_update`',
-                    'UNIX_TIMESTAMP(`read_date`) AS `read_date`',
-                ],
-                'session',
-                ...$params,
-            );
-            $session = $this->database->arow($result);
-            $this->database->disposeresult($result);
+            $session = ModelsSession::selectOne($this->database, ...$params);
         }
 
         if ($session !== null) {
-            $session['last_action'] = (int) $session['last_action'];
-            $session['last_update'] = (int) $session['last_update'];
-            $session['read_date'] = (int) $session['read_date'];
-            $session['vars'] = unserialize($session['vars']) ?? [];
-
-            return $session;
+            $this->session = $session;
+            $this->vars = $session->vars !== '' ? unserialize($session->vars) : [];
+            return;
         }
 
-        return $this->createSession();
+        $this->createSession();
     }
 
     public function get(string $field): mixed
     {
-        return $this->data[$field] ?? null;
+        $value = $this->session->{$field};
+
+        return $value ?? null;
     }
 
     /**
@@ -202,46 +177,45 @@ final class Session
 
     public function set(string $field, mixed $value): void
     {
-        if (isset($this->data[$field]) && $this->data[$field] === $value) {
+        if (!$this->session) {
             return;
         }
 
-        $this->changedData[$field] = $value;
-        $this->data[$field] = $value;
+        $this->session->{$field} = $value;
     }
 
     public function addVar(string $varName, mixed $value): void
     {
         if (
-            isset($this->data['vars'][$varName])
-            && $this->data['vars'][$varName] === $value
+            isset($this->vars[$varName])
+            && $this->vars[$varName] === $value
         ) {
             return;
         }
 
 
-        $this->data['vars'][$varName] = $value;
-        $this->changedData['vars'] = serialize($this->data['vars']);
+        $this->vars[$varName] = $value;
+        $this->session->vars = serialize($this->vars);
     }
 
     public function deleteVar(string $varName): void
     {
-        if (!isset($this->data['vars'][$varName])) {
+        if (!isset($this->vars[$varName])) {
             return;
         }
 
-        unset($this->data['vars'][$varName]);
-        $this->changedData['vars'] = serialize($this->data['vars']);
+        unset($this->vars[$varName]);
+        $this->session->vars = serialize($this->vars);
     }
 
     public function getVar(string $varName): mixed
     {
-        return $this->data['vars'][$varName] ?? null;
+        return $this->vars[$varName] ?? null;
     }
 
     public function act(?string $location = null): void
     {
-        $this->set('last_action', Carbon::now('UTC')->getTimestamp());
+        $this->set('last_action', $this->database->datetime(Carbon::now('UTC')->getTimestamp()));
         if (!$location) {
             return;
         }
@@ -268,9 +242,6 @@ final class Session
             );
             $lastAction = $this->database->arow($result);
             $this->database->disposeresult($result);
-            if ($lastAction) {
-                $lastAction = (int) $lastAction['last_action'];
-            }
 
             $this->database->delete(
                 'session',
@@ -284,31 +255,30 @@ final class Session
                 'WHERE `expires`<=?',
                 $this->database->datetime(),
             );
-            $this->set('read_date', $lastAction ?: 0);
+            if ($lastAction) {
+                $this->set('read_date', $lastAction['last_action']);
+            }
         }
 
         $yesterday = mktime(0, 0, 0) ?: 0;
-        $query = $this->database->select(
-            [
-                'uid',
-                'UNIX_TIMESTAMP(MAX(`last_action`)) AS `last_action`',
-            ],
-            'session',
+        $sessions = ModelsSession::selectMany(
+            $this->database,
             'WHERE `last_update`<? GROUP BY uid',
             $this->database->datetime($yesterday),
         );
-        while ($session = $this->database->arow($query)) {
-            if (!$session['uid']) {
+
+        foreach ($sessions as $session) {
+            if (!$session->uid) {
                 continue;
             }
 
             $this->database->update(
                 'members',
                 [
-                    'last_visit' => $this->database->datetime($session['last_action']),
+                    'last_visit' => $session->last_action,
                 ],
                 Database::WHERE_ID_EQUALS,
-                $session['uid'],
+                $session->uid,
             );
         }
 
@@ -327,47 +297,34 @@ final class Session
 
     public function applyChanges(): void
     {
-        $session = $this->changedData;
-        $session['last_update'] = $this->database->datetime();
-        $datetimes = ['last_action', 'read_date'];
-        foreach ($datetimes as $datetime) {
-            if (!isset($session[$datetime])) {
-                continue;
-            }
+        $session = $this->session;
+        $session->last_update = $this->database->datetime();
 
-            $session[$datetime] = $this->database->datetime($session[$datetime]);
-        }
-
-        if ($this->data['is_bot']) {
+        if ($this->session->is_bot) {
             // Bots tend to read a lot of content.
-            $session['forumsread'] = '{}';
-            $session['topicsread'] = '{}';
+            $session->forumsread = '{}';
+            $session->topicsread = '{}';
         }
 
-        if (!$this->data['last_action']) {
-            $session['last_action'] = $this->database->datetime();
+        if (!$this->session->last_action) {
+            $session->last_action = $this->database->datetime();
         }
 
-        if (isset($session['user'])) {
+        if (isset($session->user)) {
             // This doesn't exist.
-            unset($session['user']);
+            unset($session->user);
         }
 
-        if (mb_strlen($session['location_verbose'] ?? '') > 100) {
-            $session['location_verbose'] = mb_substr(
-                (string) $session['location_verbose'],
+        if (mb_strlen($session->location_verbose ?? '') > 100) {
+            $session->location_verbose = mb_substr(
+                (string) $session->location_verbose,
                 0,
                 100,
             );
         }
 
         // Only update if there's data to update.
-        $this->database->update(
-            'session',
-            $session,
-            Database::WHERE_ID_EQUALS,
-            $this->data['id'],
-        );
+        $this->session->update($this->database);
     }
 
     /**
@@ -394,16 +351,13 @@ final class Session
     public function addSessIDCB(array $match): string
     {
         if ($match[1][0] === '?') {
-            $match[1] .= '&amp;sessid=' . $this->data['id'];
+            $match[1] .= '&amp;sessid=' . $this->session->id;
         }
 
         return 'href="' . $match[1] . '"';
     }
 
-    /**
-     * @return array<string,mixed>
-     */
-    private function createSession(): array
+    private function createSession()
     {
         $botName = $this->getBotName();
         $sid = $botName;
@@ -414,26 +368,22 @@ final class Session
         }
 
         $actionTime = $this->database->datetime();
-        $sessData = [
-            'forumsread' => '{}',
-            'id' => $sid,
-            'ip' => $this->ipAddress->asBinary(),
-            'is_bot' => $botName !== null ? 1 : 0,
-            'last_action' => $actionTime,
-            'last_update' => $actionTime,
-            'runonce' => '',
-            'topicsread' => '{}',
-            'useragent' => $this->request->getUserAgent(),
-        ];
 
+        $session = new ModelsSession();
+        $session->id = $sid;
+        $session->ip = $this->ipAddress->asBinary();
+        $session->is_bot = $botName !== null ? 1 : 0;
+        $session->last_action = $actionTime;
+        $session->last_update = $actionTime;
+        $session->useragent = $this->request->getUserAgent();
+        $session->insert($this->database);
         $uid = $this->user->get('id');
         if ($uid) {
-            $sessData['uid'] = $uid;
+            $session->uid = $uid;
         }
+        $session->insert($this->database);
 
-        $this->database->insert('session', $sessData);
-
-        return $sessData;
+        $this->session = $session;
     }
 
     private function getBotName(): ?string

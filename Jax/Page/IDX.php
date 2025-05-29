@@ -85,7 +85,7 @@ final class IDX
             $this->page->command('softurl');
             $this->session->set('forumsread', '{}');
             $this->session->set('topicsread', '{}');
-            $this->session->set('read_date', Carbon::now('UTC')->getTimestamp());
+            $this->session->set('read_date', $this->database->datetime(Carbon::now('UTC')->getTimestamp()));
         }
 
         if ($this->request->isJSUpdate()) {
@@ -507,13 +507,16 @@ final class IDX
 
         $useronlinecache = '';
         foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $user) {
-            $lastActionIdle = (int) ($this->session->get('last_update') ?? 0) - ($this->config->getSetting('timetoidle') ?? 300) - 30;
+            $lastUpdateTS = $this->session->get('last_update')
+                ? $this->database->datetimeAsTimestamp($this->session->get('last_update'))
+                : 0;
+            $lastActionIdle = $lastUpdateTS - ($this->config->getSetting('timetoidle') ?? 300) - 30;
             if (!$user['uid'] && !$user['is_bot']) {
                 continue;
             }
 
             if (
-                $user['last_action'] >= (int) $this->session->get('last_update')
+                $user['last_action'] >= $lastUpdateTS
                 || $user['status'] === 'idle'
                 && $user['last_action'] > $lastActionIdle
             ) {
