@@ -126,7 +126,7 @@ final class Forum
             return;
         }
 
-        if ($forum->redirect !== '' && $forum->redirect !== '0') {
+        if ($forum->redirect !== '') {
             $this->page->command('softurl');
             $this->database->special(
                 <<<'SQL'
@@ -320,7 +320,7 @@ final class Forum
             $this->markRead($fid);
         }
 
-        if ($rows !== '' && $rows !== '0') {
+        if ($rows !== '') {
             $table = $this->template->meta('forum-table', $rows);
         } else {
             if ($this->pageNumber > 0) {
@@ -346,7 +346,7 @@ final class Forum
         $breadCrumbs = ["?act=vc{$forum->cat_id}" => $category->title];
 
         // Subforum breadcrumbs
-        if ($forum->path !== '' && $forum->path !== '0') {
+        if ($forum->path !== '') {
             $path = array_map(static fn($fid): int => (int) $fid, explode(' ', $forum->path));
             $forums = ModelsForum::selectMany($this->database, Database::WHERE_ID_IN, $path);
             // This has to be two steps because WHERE ID IN(1,2,3)
@@ -453,7 +453,7 @@ final class Forum
             );
         }
 
-        return $rows !== '' && $rows !== '0' ? $this->page->collapseBox(
+        return $rows !== '' ? $this->page->collapseBox(
             'Subforums',
             $this->template->meta('forum-subforum-table', $rows),
         ) : '';

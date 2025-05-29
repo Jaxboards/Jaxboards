@@ -218,7 +218,6 @@ final readonly class App
 
         if (
             $this->template->meta('favicon') !== ''
-            && $this->template->meta('favicon') !== '0'
         ) {
             $this->page->append(
                 'CSS',

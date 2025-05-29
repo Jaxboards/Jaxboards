@@ -346,7 +346,7 @@ final class Topic
             && $this->session->getVar('topic_lastpage')
         ) {
             $newposts = $this->postsintooutput($topic, (int) $this->session->getVar('topic_lastpid'));
-            if ($newposts !== '' && $newposts !== '0') {
+            if ($newposts !== '') {
                 $this->page->command('appendrows', '#intopic', $newposts);
             }
         }
@@ -392,7 +392,7 @@ final class Topic
 
         $oldcache = implode(',', array_flip($oldcache));
         $newcache = implode(',', $newcache);
-        if ($oldcache !== '' && $oldcache !== '0') {
+        if ($oldcache !== '') {
             $this->page->command('setoffline', $oldcache);
         }
 

@@ -231,7 +231,7 @@ class Database
         ...$vars,
     ): ?PDOStatement {
         $query = 'DELETE FROM ' . $this->ftable($table)
-            . ($whereformat !== '' && $whereformat !== '0' ? ' ' . $whereformat : '');
+            . ($whereformat !== '' ? ' ' . $whereformat : '');
 
         // Put the format string back.
         return $this->query($query, ...$vars);

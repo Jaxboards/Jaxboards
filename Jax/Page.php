@@ -225,7 +225,7 @@ final class Page
         return (
             ($this->template->meta('title') ?: $this->config->getSetting('boardname'))
             ?: 'JaxBoards'
-        ) . ($this->pageTitle !== '' && $this->pageTitle !== '0' ? ' -> ' . $this->pageTitle : '');
+        ) . ($this->pageTitle !== '' ? ' -> ' . $this->pageTitle : '');
     }
 
     private function outputJavascriptCommands(): void

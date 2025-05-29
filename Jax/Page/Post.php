@@ -784,7 +784,7 @@ final class Post
         }
 
         // Do some magic to update the tree all the way up (for subforums).
-        $path = trim((string) $fdata['path']) !== '' && trim((string) $fdata['path']) !== '0'
+        $path = trim((string) $fdata['path']) !== ''
             ? explode(' ', (string) $fdata['path'])
             : [];
         if (!in_array($fdata['id'], $path)) {

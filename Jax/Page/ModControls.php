@@ -356,7 +356,7 @@ final readonly class ModControls
                 <input type='submit' value='Submit' title="Search for IP" />
             </form>
             EOT;
-        if ($ipAddress !== '' && $ipAddress !== '0') {
+        if ($ipAddress !== '') {
             $page .= "<h3>Data for {$ipAddress}:</h3>";
 
             $hiddenFields = $this->jax->hiddenFormFields(

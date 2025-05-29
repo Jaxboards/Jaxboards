@@ -126,7 +126,7 @@ final readonly class UCP
             $this->jax->hiddenFormFields(['act' => 'ucp']),
             $this->user->get('display_name'),
             $this->user->get('avatar') ?: $this->template->meta('default-avatar'),
-            trim($ucpnotepad) !== '' && trim($ucpnotepad) !== '0'
+            trim($ucpnotepad) !== ''
                 ? $this->textFormatting->blockhtml($ucpnotepad) : 'Personal notes go here.',
         );
     }
