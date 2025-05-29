@@ -17,7 +17,6 @@ use function mb_substr;
 use function mktime;
 use function openssl_random_pseudo_bytes;
 use function preg_replace_callback;
-use function property_exists;
 use function serialize;
 use function session_start;
 use function str_contains;
@@ -321,14 +320,16 @@ final class Session
         }
 
         // Only update if there's data to update.
-        if ($this->changedData !== []) {
-            $this->database->update(
-                'session',
-                $this->changedData,
-                Database::WHERE_ID_EQUALS,
-                $session->id,
-            );
+        if ($this->changedData === []) {
+            return;
         }
+
+        $this->database->update(
+            'session',
+            $this->changedData,
+            Database::WHERE_ID_EQUALS,
+            $session->id,
+        );
     }
 
     /**
@@ -380,10 +381,12 @@ final class Session
         $session->last_action = $actionTime;
         $session->last_update = $actionTime;
         $session->useragent = $this->request->getUserAgent();
+
         $uid = $this->user->get('id');
         if ($uid) {
             $session->uid = $uid;
         }
+
         $session->insert($this->database);
 
         $this->modelsSession = $session;

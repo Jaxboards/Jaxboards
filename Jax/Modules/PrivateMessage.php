@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Jax\Modules;
 
 use Carbon\Carbon;
-use Jax\Config;
 use Jax\Database;
 use Jax\Page;
 use Jax\Request;
@@ -25,7 +24,6 @@ use const PHP_EOL;
 final readonly class PrivateMessage
 {
     public function __construct(
-        private Config $config,
         private Database $database,
         private Page $page,
         private Request $request,
