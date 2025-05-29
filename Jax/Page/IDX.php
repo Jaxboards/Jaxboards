@@ -117,9 +117,9 @@ final class IDX
             Member::selectMany(
                 $this->database,
                 Database::WHERE_ID_IN,
-                array_unique(array_map(fn(Forum $forum) => $forum->lp_uid, $forums)),
+                array_unique(array_map(static fn(Forum $forum): ?int => $forum->lp_uid, $forums)),
             ),
-            fn(Member $member) => $member->id,
+            static fn(Member $member): int => $member->id,
         );
     }
 
@@ -129,7 +129,7 @@ final class IDX
         $page = '';
 
         $forums = $this->fetchIDXForums();
-        $forumsByCatID = groupBy($forums, fn(Forum $forum) => $forum->cat_id);
+        $forumsByCatID = groupBy($forums, static fn(Forum $forum): ?int => $forum->cat_id);
 
         // This while loop just grabs all of the data, displaying is done below.
         foreach ($forums as $forum) {
@@ -252,7 +252,6 @@ final class IDX
 
         return mb_substr($forum, 0, -mb_strlen($this->template->meta('idx-ledby-splitter')));
     }
-
 
     /**
      * @param array<Forum> $forums
@@ -576,17 +575,17 @@ final class IDX
         }
     }
 
-    private function formatLastPost(Forum $forum, ?Member $lastPoster): string
+    private function formatLastPost(Forum $forum, ?Member $member): string
     {
         return $this->template->meta(
             'idx-row-lastpost',
             $forum->lp_tid,
             $this->textFormatting->wordfilter($forum->lp_topic) ?: '- - - - -',
-            $lastPoster ? $this->template->meta(
+            $member !== null ? $this->template->meta(
                 'user-link',
-                $lastPoster->id,
-                $lastPoster->group_id,
-                $lastPoster->display_name,
+                $member->id,
+                $member->group_id,
+                $member->display_name,
             ) : 'None',
             $this->date->autoDate($this->database->datetimeAsTimestamp($forum->lp_date)) ?: '- - - - -',
         );
