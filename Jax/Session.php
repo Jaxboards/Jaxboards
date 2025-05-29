@@ -181,10 +181,6 @@ final class Session
 
     public function set(string $field, mixed $value): void
     {
-        if ($this->modelsSession === null) {
-            return;
-        }
-
         $this->modelsSession->{$field} = $value;
         $this->changedData[$field] = $value;
     }
@@ -318,7 +314,7 @@ final class Session
             $session->last_action = $this->database->datetime();
         }
 
-        if (mb_strlen($session->location_verbose ?? '') > 100) {
+        if (mb_strlen($session->location_verbose) > 100) {
             $session->location_verbose = mb_substr(
                 $session->location_verbose,
                 0,
