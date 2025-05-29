@@ -47,7 +47,7 @@ final class User
      */
     public function setBulk(array $fields): void
     {
-        if ($this->member) {
+        if ($this->member !== null) {
             foreach ($fields as $key => $value) {
                 $this->member->{$key} = $value;
             }
