@@ -7,6 +7,7 @@ namespace Jax;
 use Carbon\Carbon;
 use Jax\Constants\Groups;
 use Jax\Models\Group;
+use Jax\Models\Member;
 
 use function array_merge;
 use function password_hash;
@@ -17,28 +18,26 @@ use const PASSWORD_DEFAULT;
 
 final class User
 {
-    /**
-     * @param null|array<array-key,mixed> $userData
-     */
     public function __construct(
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly IPAddress $ipAddress,
         // Exposing these for testing
-        private ?array $userData = null,
+        private ?Member $userData = null,
         public ?Group $userPerms = null,
-    ) {}
+    ) {
+    }
 
     public function get(string $property): null|int|string
     {
-        if (!$this->userData) {
+        if ($this->userData === null) {
             return match ($property) {
                 'group_id' => Groups::Guest->value,
                 default => null,
             };
         }
 
-        return $this->userData[$property] ?? null;
+        return $this->userData->{$property} ?? null;
     }
 
     public function set(string $property, null|int|string $value): void
@@ -51,7 +50,12 @@ final class User
      */
     public function setBulk(array $fields): void
     {
-        $this->userData = array_merge($this->userData ?? [], $fields);
+        if ($this->userData) {
+            foreach ($fields as $key=>$value) {
+                $this->userData->{$key} = $value;
+            }
+        }
+
         $this->database->update(
             'members',
             $fields,
@@ -60,77 +64,19 @@ final class User
         );
     }
 
-    /**
-     * @return array<string,mixed>
-     */
-    public function getUser(?int $uid = null, ?string $pass = null): ?array
+    public function getUser(?int $uid = null, ?string $pass = null): ?Member
     {
         if ($this->userData || !$uid) {
             return $this->userData;
         }
 
-        $result = $this->database->select(
-            [
-                'about',
-                'avatar',
-                'birthdate',
-                'contact_aim',
-                'contact_bluesky',
-                'contact_discord',
-                'contact_gtalk',
-                'contact_msn',
-                'contact_skype',
-                'contact_steam',
-                'contact_twitter',
-                'contact_yim',
-                'contact_youtube',
-                'display_name',
-                'email_settings',
-                'email',
-                'enemies',
-                'friends',
-                'full_name',
-                'gender',
-                'group_id',
-                'id',
-                'ip',
-                'location',
-                '`mod`',
-                'name',
-                'notify_pm',
-                'notify_postinmytopic',
-                'notify_postinsubscribedtopic',
-                'nowordfilter',
-                'pass',
-                'posts',
-                'sig',
-                'skin_id',
-                'sound_im',
-                'sound_pm',
-                'sound_postinmytopic',
-                'sound_postinsubscribedtopic',
-                'sound_shout',
-                'ucpnotepad',
-                'usertitle',
-                'website',
-                'wysiwyg',
-                "CONCAT(MONTH(`birthdate`),' ',DAY(`birthdate`)) as `birthday`",
-                'DAY(`birthdate`) AS `dob_day`',
-                'MONTH(`birthdate`) AS `dob_month`',
-                'UNIX_TIMESTAMP(`join_date`) AS `join_date`',
-                'UNIX_TIMESTAMP(`last_visit`) AS `last_visit`',
-                'YEAR(`birthdate`) AS `dob_year`',
-            ],
-            'members',
+        $user = Member::selectOne(
+            $this->database,
             Database::WHERE_ID_EQUALS,
             $uid,
         );
-        $user = $this->database->arow($result);
-        $this->database->disposeresult($result);
 
         if ($user) {
-            $user['birthday'] = Carbon::now('UTC')->format('n j') === $user['birthday'];
-
             // Password parsing.
             if ($pass && !$this->verifyPassword($user, $pass)) {
                 $user = null;
@@ -220,27 +166,18 @@ final class User
     }
 
     /**
-     * @param array<string,mixed> $user
-     *
      * @return bool if password is correct
      */
-    private function verifyPassword(array $user, string $pass): bool
+    private function verifyPassword(Member $user, string $pass): bool
     {
-        if (!password_verify($pass, (string) $user['pass'])) {
+        if (!password_verify($pass, (string) $user->pass)) {
             return false;
         }
 
-        if (password_needs_rehash($user['pass'], PASSWORD_DEFAULT)) {
-            $newHash = password_hash($pass, PASSWORD_DEFAULT);
+        if (password_needs_rehash($user->pass, PASSWORD_DEFAULT)) {
             // Add the new hash.
-            $this->database->update(
-                'members',
-                [
-                    'pass' => $newHash,
-                ],
-                'WHERE `id` = ?',
-                $user['id'],
-            );
+            $user->pass = password_hash($pass, PASSWORD_DEFAULT);
+            $user->update($this->database);
         }
 
         return true;

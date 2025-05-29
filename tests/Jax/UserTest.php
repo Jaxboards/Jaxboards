@@ -7,6 +7,7 @@ namespace Jax;
 use DI\Container;
 use Jax\Constants\Groups;
 use Jax\Models\Group;
+use Jax\Models\Member;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -101,11 +102,14 @@ final class UserTest extends TestCase
         $group->can_post = 1;
         $group->can_post_topics = 1;
 
+        $userMember = new Member();
+        $userMember->group_id = Groups::Admin->value;
+
         $user = new User(
             $database,
             $container->get(Jax::class),
             $container->get(IPAddress::class),
-            ['group_id' => Groups::Admin->value],
+            $userMember,
             $group,
         );
 
@@ -154,11 +158,14 @@ final class UserTest extends TestCase
         $group = new Group();
         $group->can_post = 1;
 
+        $userMember = new Member();
+        $userMember->group_id = Groups::Guest->value;
+
         $user = new User(
             $database,
             $container->get(Jax::class),
             $container->get(IPAddress::class),
-            ['group_id' => Groups::Guest->value],
+            $userMember,
             $group,
         );
 
@@ -200,11 +207,14 @@ final class UserTest extends TestCase
         $group = new Group();
         $group->can_post = 1;
 
+        $userMember = new Member();
+        $userMember->group_id = Groups::Banned->value;
+
         $user = new User(
             $database,
             $container->get(Jax::class),
             $container->get(IPAddress::class),
-            ['group_id' => Groups::Banned->value],
+            $userMember,
             $group,
         );
 
