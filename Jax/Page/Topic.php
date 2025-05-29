@@ -204,7 +204,7 @@ final class Topic
         $page = $this->template->meta(
             'topic-wrapper',
             $topicTitle
-                . ($topicSubtitle ? ', ' . $topicSubtitle : ''),
+                . ($topicSubtitle !== '' ? ', ' . $topicSubtitle : ''),
             $page,
             '<a href="./?act=vt' . $modelsTopic->id . '&amp;fmt=RSS" class="social rss" title="RSS Feed for this Topic" target="_blank">RSS</a>',
         );
