@@ -17,6 +17,7 @@ use function mb_substr;
 use function mktime;
 use function openssl_random_pseudo_bytes;
 use function preg_replace_callback;
+use function property_exists;
 use function serialize;
 use function session_start;
 use function str_contains;
@@ -177,7 +178,7 @@ final class Session
 
     public function set(string $field, mixed $value): void
     {
-        if (!$this->modelsSession) {
+        if ($this->modelsSession === null) {
             return;
         }
 
@@ -310,7 +311,7 @@ final class Session
             $session->last_action = $this->database->datetime();
         }
 
-        if (isset($session->user)) {
+        if (property_exists($session, 'user') && $session->user !== null) {
             // This doesn't exist.
             unset($session->user);
         }
