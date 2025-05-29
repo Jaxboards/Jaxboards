@@ -59,7 +59,7 @@ final readonly class Login
 
             if ($user !== null) {
                 // Successful login, redirect
-                $this->session->setPHPSessionValue('auid', $user['id']);
+                $this->session->setPHPSessionValue('auid', $user->id);
                 header('Location: admin.php');
 
                 return;

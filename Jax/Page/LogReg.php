@@ -192,14 +192,14 @@ final class LogReg
                     $this->page->command('closewindow', '#loginform');
                 }
 
-                $this->session->setPHPSessionValue('uid', $user['id']);
+                $this->session->setPHPSessionValue('uid', $user->id);
                 $loginToken = base64_encode(openssl_random_pseudo_bytes(128));
 
                 $token = new Token();
                 $token->expires = $this->database->datetime(Carbon::now('UTC')->addMonth()->getTimestamp());
                 $token->token = $loginToken;
                 $token->type = 'login';
-                $token->uid = $user['id'];
+                $token->uid = $user->id;
                 $token->insert($this->database);
 
                 $this->request->setCookie(
@@ -207,8 +207,8 @@ final class LogReg
                     $loginToken,
                     Carbon::now('UTC')->addMonth()->getTimestamp(),
                 );
-                $this->session->clean($user['id']);
-                $this->session->set('uid', $user['id']);
+                $this->session->clean($user->id);
+                $this->session->set('uid', $user->id);
                 $this->session->act();
                 if ($this->registering) {
                     $this->page->command('location', '/');

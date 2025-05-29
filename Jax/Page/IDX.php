@@ -110,6 +110,7 @@ final class IDX
 
     /**
      * @param array<Forum> $forums
+     * @return array<int,Forum>
      */
     private function fetchLastPostMembers(array $forums): array
     {
@@ -587,7 +588,9 @@ final class IDX
                 $member->group_id,
                 $member->display_name,
             ) : 'None',
-            $this->date->autoDate($this->database->datetimeAsTimestamp($forum->lp_date)) ?: '- - - - -',
+            $forum->lp_date !== null
+                ? $this->date->autoDate($this->database->datetimeAsTimestamp($forum->lp_date))
+                : '- - - - -',
         );
     }
 
