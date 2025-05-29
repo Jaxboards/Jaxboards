@@ -22,6 +22,7 @@ use Jax\User;
 use function _\keyBy;
 use function array_filter;
 use function array_map;
+use function array_merge;
 use function array_reduce;
 use function ceil;
 use function explode;
@@ -119,13 +120,13 @@ final class Forum
 
         $forum = ModelsForum::selectOne($this->database, Database::WHERE_ID_EQUALS, $fid);
 
-        if (!$forum) {
+        if ($forum === null) {
             $this->page->location('?');
 
             return;
         }
 
-        if ($forum->redirect) {
+        if ($forum->redirect !== '' && $forum->redirect !== '0') {
             $this->page->command('softurl');
             $this->database->special(
                 <<<'SQL'
@@ -192,7 +193,7 @@ final class Forum
 
         // Do order by.
         $orderby = '`lp_date` DESC';
-        if ($forum->orderby) {
+        if ($forum->orderby !== 0) {
             $forum->orderby = (int) $forum->orderby;
             if (($forum->orderby & 1) !== 0) {
                 $orderby = 'ASC';
@@ -212,12 +213,12 @@ final class Forum
 
         $topics = Topic::selectMany(
             $this->database,
-            'WHERE `fid`=? '.
-            "ORDER BY `pinned` DESC,{$orderby} ".
-            'LIMIT ?,? ',
+            'WHERE `fid`=? '
+            . "ORDER BY `pinned` DESC,{$orderby} "
+            . 'LIMIT ?,? ',
             $fid,
             $this->pageNumber * $this->numperpage,
-            $this->numperpage
+            $this->numperpage,
         );
 
         $memberIds = array_merge(
@@ -228,14 +229,14 @@ final class Forum
             array_map(
                 static fn(Topic $topic): ?int => $topic->lp_uid,
                 $topics,
-            )
+            ),
         );
 
         $membersById = $memberIds !== [] ? keyBy(
             Member::selectMany(
                 $this->database,
                 Database::WHERE_ID_IN,
-                $memberIds
+                $memberIds,
             ),
             static fn(Member $member): int => $member->id,
         ) : [];
@@ -268,7 +269,7 @@ final class Forum
                     'user-link',
                     $author->id,
                     $author->group_id,
-                    $author->display_name
+                    $author->display_name,
                 ),
                 // 4
                 $topic->replies,
@@ -277,10 +278,11 @@ final class Forum
                 // 6
                 $this->date->autoDate($this->database->datetimeAsTimestamp($topic->lp_date)),
                 // 7
-                $lastPostAuthor ? $this->template->meta('user-link',
+                $lastPostAuthor ? $this->template->meta(
+                    'user-link',
                     $lastPostAuthor->id,
                     $lastPostAuthor->group_id,
-                    $lastPostAuthor->display_name
+                    $lastPostAuthor->display_name,
                 ) : '',
                 // 8
                 ($topic->pinned ? 'pinned' : '') . ' ' . ($topic->locked ? 'locked' : ''),
@@ -344,8 +346,8 @@ final class Forum
         $breadCrumbs = ["?act=vc{$forum->cat_id}" => $category->title];
 
         // Subforum breadcrumbs
-        if ($forum->path) {
-            $path = array_map(static fn($fid): int => (int) $fid, explode(' ', (string) $forum->path));
+        if ($forum->path !== '' && $forum->path !== '0') {
+            $path = array_map(static fn($fid): int => (int) $fid, explode(' ', $forum->path));
             $forums = ModelsForum::selectMany($this->database, Database::WHERE_ID_IN, $path);
             // This has to be two steps because WHERE ID IN(1,2,3)
             // does not select records in the same order
@@ -372,7 +374,8 @@ final class Forum
         }
     }
 
-    private function printSubforums(ModelsForum $forum): string {
+    private function printSubforums(ModelsForum $forum): string
+    {
         $subforums = ModelsForum::selectMany(
             $this->database,
             'WHERE path=? OR path LIKE ? '
@@ -393,7 +396,7 @@ final class Forum
             Member::selectMany(
                 $this->database,
                 Database::WHERE_ID_IN,
-                $lastPostAuthorIds
+                $lastPostAuthorIds,
             ),
             static fn(Member $member): int => $member->id,
         ) : [];
@@ -450,7 +453,7 @@ final class Forum
             );
         }
 
-        return $rows ? $this->page->collapseBox(
+        return $rows !== '' && $rows !== '0' ? $this->page->collapseBox(
             'Subforums',
             $this->template->meta('forum-subforum-table', $rows),
         ) : '';
@@ -490,7 +493,7 @@ final class Forum
 
     private function isTopicRead(Topic $topic, int $fid): bool
     {
-        $topicId = (int) $topic->id;
+        $topicId = $topic->id;
         if ($this->topicsRead === []) {
             $this->topicsRead = $this->jax->parseReadMarkers($this->session->get('topicsread'));
         }
