@@ -297,6 +297,7 @@ final class Forum
             if ($read) {
                 continue;
             }
+
             $unread = true;
         }
 
