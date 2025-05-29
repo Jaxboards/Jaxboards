@@ -113,14 +113,14 @@ final readonly class PrivateMessage
             $this->user->get('display_name'),
             $instantMessage,
             $this->user->get('id'),
-            Carbon::now('UTC')->getTimestamp(),
+            Carbon::now()->getTimestamp(),
         ];
         $this->page->command(...$cmd);
         $cmd[1] = $this->user->get('id');
         $cmd[4] = 0;
         $onlineusers = $this->database->getUsersOnline();
-        $logoutTime = Carbon::now('UTC')->getTimestamp() - $this->config->getSetting('timetologout');
-        $updateTime = Carbon::now('UTC')->subSeconds(5)->getTimestamp();
+        $logoutTime = Carbon::now()->getTimestamp() - $this->config->getSetting('timetologout');
+        $updateTime = Carbon::now()->subSeconds(5)->getTimestamp();
         if (
             !isset($onlineusers[$uid])
             || !$onlineusers[$uid]
@@ -151,7 +151,7 @@ final readonly class PrivateMessage
             ['session'],
             json_encode($cmd) . PHP_EOL,
             $uid,
-            $this->database->datetime(Carbon::now('UTC')->subSeconds(5)->getTimestamp()),
+            $this->database->datetime(Carbon::now()->subSeconds(5)->getTimestamp()),
         );
 
         return $this->database->affectedRows($result) !== 0;

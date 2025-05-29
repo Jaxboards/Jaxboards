@@ -129,7 +129,7 @@ final class User
         $this->database->disposeresult($result);
 
         if ($user) {
-            $user['birthday'] = Carbon::now('UTC')->format('n j') === $user['birthday'];
+            $user['birthday'] = Carbon::now()->format('n j') === $user['birthday'];
 
             // Password parsing.
             if ($pass && !$this->verifyPassword($user, $pass)) {

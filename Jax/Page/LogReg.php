@@ -11,6 +11,7 @@ use Jax\DomainDefinitions;
 use Jax\IPAddress;
 use Jax\Jax;
 use Jax\Models\Member;
+use Jax\Models\Stats;
 use Jax\Models\Token;
 use Jax\Page;
 use Jax\Request;
@@ -159,14 +160,11 @@ final class LogReg
         );
         $newMember->insert($this->database);
 
-        $this->database->special(
-            <<<'SQL'
-                UPDATE %t
-                SET `members` = `members` + 1, `last_register` = ?
-                SQL,
-            ['stats'],
-            $newMember->id,
-        );
+        $stats = Stats::selectOne($this->database);
+        ++$stats->members;
+        $stats->last_register = $newMember->id;
+        $stats->update();
+
         $this->login($name, $pass1);
     }
 
@@ -196,7 +194,7 @@ final class LogReg
                 $loginToken = base64_encode(openssl_random_pseudo_bytes(128));
 
                 $token = new Token();
-                $token->expires = $this->database->datetime(Carbon::now('UTC')->addMonth()->getTimestamp());
+                $token->expires = $this->database->datetime(Carbon::now()->addMonth()->getTimestamp());
                 $token->token = $loginToken;
                 $token->type = 'login';
                 $token->uid = $user['id'];
@@ -205,7 +203,7 @@ final class LogReg
                 $this->request->setCookie(
                     'utoken',
                     $loginToken,
-                    Carbon::now('UTC')->addMonth()->getTimestamp(),
+                    Carbon::now()->addMonth()->getTimestamp(),
                 );
                 $this->session->clean($user['id']);
                 $this->session->set('user', $username);
@@ -405,7 +403,7 @@ final class LogReg
                         = base64_encode(openssl_random_pseudo_bytes(128));
 
                     $token = new Token();
-                    $token->expires = $this->database->datetime(Carbon::now('UTC')->getTimestamp() + 3600 * 24);
+                    $token->expires = $this->database->datetime(Carbon::now()->getTimestamp() + 3600 * 24);
                     $token->token = $forgotpasswordtoken;
                     $token->type = 'forgotpassword';
                     $token->uid = $member->id;

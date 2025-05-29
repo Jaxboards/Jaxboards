@@ -241,7 +241,7 @@ final class Session
 
     public function act(?string $location = null): void
     {
-        $this->set('last_action', Carbon::now('UTC')->getTimestamp());
+        $this->set('last_action', Carbon::now()->getTimestamp());
         if (!$location) {
             return;
         }
@@ -256,7 +256,7 @@ final class Session
 
     public function clean(?int $uid): bool
     {
-        $timeago = Carbon::now('UTC')->getTimestamp() - $this->config->getSetting('timetologout');
+        $timeago = Carbon::now()->getTimestamp() - $this->config->getSetting('timetologout');
         if (!is_numeric($uid) || $uid < 1) {
             $uid = null;
         } else {

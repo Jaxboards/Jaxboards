@@ -12,6 +12,7 @@ use Jax\Jax;
 use Jax\Models\Category;
 use Jax\Models\Group;
 use Jax\Models\Member;
+use Jax\Models\Stats;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
@@ -84,7 +85,7 @@ final class IDX
             $this->page->command('softurl');
             $this->session->set('forumsread', '{}');
             $this->session->set('topicsread', '{}');
-            $this->session->set('read_date', Carbon::now('UTC')->getTimestamp());
+            $this->session->set('read_date', Carbon::now()->getTimestamp());
         }
 
         if ($this->request->isJSUpdate()) {
@@ -395,27 +396,11 @@ final class IDX
 
         $legend = '';
         $page = '';
-        $result = $this->database->special(
-            <<<'SQL'
-                SELECT
-                    s.`posts` AS `posts`,
-                    s.`topics` AS `topics`,
-                    s.`members` AS `members`,
-                    s.`most_members` AS `most_members`,
-                    s.`most_members_day` AS `most_members_day`,
-                    s.`last_register` AS `last_register`,
-                    m.`group_id` AS `group_id`,
-                    m.`display_name` AS `display_name`
-                FROM %t s
-                LEFT JOIN %t m
-                ON s.`last_register`=m.`id`
-                SQL,
-            ['stats', 'members'],
-        );
-        $stats = $this->database->arow($result)
-            ?? ['posts' => 0, 'topics' => 0, 'members' => 0, 'last_register' => 0, 'group_id' => 0, 'display_name' => ''];
 
-        $this->database->disposeresult($result);
+        $stats = Stats::selectOne($this->database);
+        $lastRegisteredMember = $stats?->last_register !== null
+            ? Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $stats->last_register)
+            : null;
 
         $usersOnlineToday = $this->fetchUsersOnlineToday();
 
@@ -454,15 +439,15 @@ final class IDX
             $usersonline[2],
             count($usersOnlineToday),
             $userstoday,
-            number_format($stats['members']),
-            number_format($stats['topics']),
-            number_format($stats['posts']),
-            $this->template->meta(
+            number_format($stats->members ?? 0),
+            number_format($stats->topics ?? 0),
+            number_format($stats->posts ?? 0),
+            $lastRegisteredMember ? $this->template->meta(
                 'user-link',
-                $stats['last_register'],
-                $stats['group_id'],
-                $stats['display_name'],
-            ),
+                $lastRegisteredMember->id,
+                $lastRegisteredMember->group_id,
+                $lastRegisteredMember->display_name,
+            ) : '',
             $legend,
         );
     }

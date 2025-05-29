@@ -617,7 +617,7 @@ final readonly class Members
         $members = Member::selectMany(
             $this->database,
             'WHERE (?-UNIX_TIMESTAMP(`last_visit`))<?',
-            Carbon::now('UTC')->getTimestamp(),
+            Carbon::now()->getTimestamp(),
             60 * 60 * 24 * 31 * 6,
         );
         foreach ($members as $member) {
