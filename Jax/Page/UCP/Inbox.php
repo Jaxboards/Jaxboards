@@ -15,6 +15,7 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
+use function _\keyBy;
 use function array_map;
 use function ceil;
 use function htmlspecialchars;
@@ -283,51 +284,25 @@ final readonly class Inbox
     }
 
     /**
-     * @return array<array<string,mixed>>
+     * @return array<Message>
      */
     private function fetchMessages(string $view, int $pageNumber = 0): array
     {
         $criteria = match ($view) {
-            'sent' => <<<'SQL'
-                LEFT JOIN %t m ON a.`to`=m.`id`
-                WHERE a.`from`=? AND !a.`del_sender`
-                SQL,
-            'flagged' => <<<'SQL'
-                LEFT JOIN %t m ON a.`from`=m.`id`
-                WHERE a.`to`=? AND a.`flag`=1
-                SQL,
-            default => <<<'SQL'
-                LEFT JOIN %t m ON a.`from`=m.`id`
-                WHERE a.`to`=? AND !a.`del_recipient`
-                SQL,
+            'sent' => 'WHERE `from`=? AND !del_sender',
+            'flagged' => 'WHERE `to`=? AND flag=1',
+            default => 'WHERE `to`=? AND !del_recipient'
         };
 
-        $result = $this->database->special(
-            <<<"SQL"
-                SELECT
-                    a.`id` AS `id`,
-                    a.`to` AS `to`,
-                    a.`from` AS `from`,
-                    a.`title` AS `title`,
-                    a.`message` AS `message`,
-                    a.`read` AS `read`,
-                    UNIX_TIMESTAMP(a.`date`) AS `date`,
-                    a.`del_recipient` AS `del_recipient`,
-                    a.`del_sender` AS `del_sender`,
-                    a.`flag` AS `flag`,
-                    m.`display_name` AS `display_name`
-                FROM %t a
-                {$criteria}
-                ORDER BY a.`date` DESC
-                LIMIT ?, ?
-                SQL,
-            ['messages', 'members'],
+        return Message::selectMany(
+            $this->database,
+            "{$criteria}
+                ORDER BY date DESC
+                LIMIT ?, ?",
             $this->user->get('id'),
             $pageNumber * self::MESSAGES_PER_PAGE,
             self::MESSAGES_PER_PAGE,
         );
-
-        return $this->database->arows($result);
     }
 
     private function flag(int $messageId): null
@@ -358,63 +333,58 @@ final readonly class Inbox
             return null;
         }
 
-        $result = $this->database->special(
-            <<<'SQL'
-                SELECT a.`id` AS `id`,a.`to` AS `to`,a.`from` AS `from`,a.`title` AS `title`,
-                    a.`message` AS `message`,a.`read` AS `read`,
-                    UNIX_TIMESTAMP(a.`date`) AS `date`,a.`del_recipient` AS `del_recipient`,
-                    a.`del_sender` AS `del_sender`,a.`flag` AS `flag`,
-                    m.`group_id` AS `group_id`,m.`display_name` AS `name`,
-                    m.`avatar` AS `avatar`,m.`usertitle` AS `usertitle`
-                FROM %t a
-                LEFT JOIN %t m ON a.`from`=m.`id`
-                WHERE a.`id`=?
-                ORDER BY a.`date` DESC
-                SQL,
-            ['messages', 'members'],
+        $message = Message::selectOne(
+            $this->database,
+            "WHERE `id`=?
+            ORDER BY `date` DESC",
             $messageid,
         );
-        $message = $this->database->arow($result);
-        $this->database->disposeresult($result);
-        if (!$message) {
+
+        if ($message === null) {
             return 'This message does not exist';
         }
 
-        if (
-            $message['from'] !== $this->user->get('id')
-            && $message['to'] !== $this->user->get('id')
-        ) {
+        $userIsRecipient = $message->to === $this->user->get('id');
+        $userIsSender = $message->from === $this->user->get('id');
+
+        if (!$userIsRecipient && !$userIsSender) {
             return "You don't have permission to view this message.";
         }
 
-        if (!$message['read'] && $message['to'] === $this->user->get('id')) {
+        $otherMember = Member::selectOne(
+            $this->database,
+            Database::WHERE_ID_EQUALS,
+            $userIsRecipient ? $message->to : $message->from
+        );
+
+        if (!$message->read && $userIsRecipient) {
             $this->database->update(
                 'messages',
                 ['read' => 1],
                 Database::WHERE_ID_EQUALS,
-                $message['id'],
+                $message->id,
             );
             $this->page->command('update', 'num-messages', $this->fetchMessageCount('unread'));
         }
 
         return $this->template->meta(
             'inbox-messageview',
-            $message['title'],
+            $message->title,
             $this->template->meta(
                 'user-link',
-                $message['from'],
-                $message['group_id'],
-                $message['name'],
+                $otherMember->id,
+                $otherMember->group_id,
+                $otherMember->name,
             ),
-            $this->date->autoDate($message['date']),
-            $this->textFormatting->theWorks($message['message']),
-            $message['avatar'] ?: $this->template->meta('default-avatar'),
-            $message['usertitle'],
+            $this->date->autoDate($this->database->datetimeAsTimestamp($message->date)),
+            $this->textFormatting->theWorks($message->message),
+            $otherMember->avatar ?: $this->template->meta('default-avatar'),
+            $otherMember->usertitle,
             $this->jax->hiddenFormFields(
                 [
                     'act' => 'ucp',
-                    'messageid' => $message['id'],
-                    'sender' => $message['from'],
+                    'messageid' => $message->id,
+                    'sender' => $message->from,
                     'what' => 'inbox',
                 ],
             ),
@@ -445,26 +415,47 @@ final readonly class Inbox
 
         $unread = 0;
         $messages = $this->fetchMessages($view, $requestPage - 1);
+
+        $getMessageMemberId = $view === 'sent'
+            ? fn(Message $message) => $message->to
+            : fn(Message $message) => $message->from;
+
+        $memberIds = array_map(
+            $view === 'sent'
+                ? fn($message) => $message->to
+                : fn($message) => $message->from,
+            $messages
+        );
+        $membersById = keyBy(
+            Member::selectMany(
+                $this->database,
+                Database::WHERE_ID_IN,
+                $memberIds
+            ),
+            fn(Member $member) => $member->id
+        );
+
         foreach ($messages as $message) {
-            if (!$message['read']) {
+            if (!$message->read) {
                 ++$unread;
             }
+            $otherMember = $membersById[$getMessageMemberId($message)];
 
             $dmessageOnchange = "RUN.stream.location('"
-                . '?act=ucp&what=inbox&flag=' . $message['id'] . "&tog='+" . '
+                . '?act=ucp&what=inbox&flag=' . $message->id . "&tog='+" . '
                 (this.checked?1:0), 1)';
             $html .= $this->template->meta(
                 'inbox-messages-row',
-                $message['read'] ? 'read' : 'unread',
+                $message->read ? 'read' : 'unread',
                 '<input class="check" type="checkbox" title="PM Checkbox" name="dmessage[]" '
-                    . 'value="' . $message['id'] . '" />',
+                    . 'value="' . $message->id . '" />',
                 '<input type="checkbox" '
-                    . ($message['flag'] ? 'checked="checked" ' : '')
+                    . ($message->flag ? 'checked="checked" ' : '')
                     . 'class="switch flag" onchange="' . $dmessageOnchange . '" />',
-                $message['id'],
-                $message['title'],
-                $message['display_name'],
-                $this->date->autoDate($message['date']),
+                $message->id,
+                $message->title,
+                $otherMember->display_name,
+                $this->date->autoDate($this->database->datetimeAsTimestamp($message->date)),
             );
         }
 

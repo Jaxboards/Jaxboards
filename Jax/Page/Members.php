@@ -8,10 +8,13 @@ use Jax\ContactDetails;
 use Jax\Database;
 use Jax\Date;
 use Jax\Jax;
+use Jax\Models\Group;
+use Jax\Models\Member;
 use Jax\Page;
 use Jax\Request;
 use Jax\Template;
 
+use function _\keyBy;
 use function array_key_exists;
 use function ceil;
 
@@ -51,7 +54,7 @@ final class Members
     {
         $fields = [
             'display_name' => 'Name',
-            'g_title' => 'Group',
+            'group_id' => 'Group',
             'id' => 'ID',
             'posts' => 'Posts',
             'join_date' => 'Join Date',
@@ -75,39 +78,18 @@ final class Members
 
         $pages = '';
 
-        $memberquery = $this->database->special(
-            <<<MySQL
-                    SELECT
-                        g.`title` AS `g_title`,
-                        m.`avatar` AS `avatar`,
-                        m.`contact_aim` AS `contact_aim`,
-                        m.`contact_bluesky` AS `contact_bluesky`,
-                        m.`contact_discord` AS `contact_discord`,
-                        m.`contact_gtalk` AS `contact_gtalk`,
-                        m.`contact_msn` AS `contact_msn`,
-                        m.`contact_skype` AS `contact_skype`,
-                        m.`contact_steam` AS `contact_steam`,
-                        m.`contact_twitter` AS `contact_twitter`,
-                        m.`contact_yim` AS `contact_yim`,
-                        m.`contact_youtube` AS `contact_youtube`,
-                        m.`display_name` AS `display_name`,
-                        m.`group_id` AS `group_id`,
-                        m.`id` AS `id`,
-                        m.`posts` AS `posts`,
-                        UNIX_TIMESTAMP(m.`join_date`) AS `join_date`
-                    FROM %t m
-                    LEFT JOIN %t g
-                        ON g.id=m.group_id
-                    {$where}
-                    ORDER BY {$sortby} {$sorthow}
-                    LIMIT ?, ?
-                MySQL,
-            ['members', 'member_groups'],
+        $members = Member::selectMany(
+            $this->database,
+            "{$where}
+            ORDER BY {$sortby} {$sorthow}
+            LIMIT ?, ?",
             $this->pageNumber * $this->perpage,
             $this->perpage,
         );
-
-        $memberarray = $this->database->arows($memberquery);
+        $groups = keyBy(
+            Group::selectMany($this->database),
+            fn($group) => $group->id,
+        );
 
         $nummemberquery = $this->database->special(
             <<<EOT
@@ -146,7 +128,7 @@ final class Members
                 . "\">{$fieldLabel}</a>";
         }
 
-        foreach ($memberarray as $member) {
+        foreach ($members as $member) {
             $contactdetails = '';
             foreach ($this->contactDetails->getContactLinks($member) as $service => [$href]) {
                 $contactdetails .= <<<HTML
@@ -156,21 +138,21 @@ final class Members
 
             $contactdetails .= '<a title="PM this member" class="pm contact" '
                 . 'href="?act=ucp&amp;what=inbox&amp;view=compose&amp;mid='
-                . $member['id'] . '"></a>';
+                . $member->id . '"></a>';
             $page .= $this->template->meta(
                 'members-row',
-                $member['id'],
-                $member['avatar'] ?: $this->template->meta('default-avatar'),
+                $member->id,
+                $member->avatar ?: $this->template->meta('default-avatar'),
                 $this->template->meta(
                     'user-link',
-                    $member['id'],
-                    $member['group_id'],
-                    $member['display_name'],
+                    $member->id,
+                    $member->group_id,
+                    $member->display_name,
                 ),
-                $member['g_title'],
-                $member['id'],
-                $member['posts'],
-                $this->date->autoDate($member['join_date']),
+                $groups[$member->group_id]->title,
+                $member->id,
+                $member->posts,
+                $this->date->autoDate($this->database->datetimeAsTimestamp($member->join_date)),
                 $contactdetails,
             );
         }
