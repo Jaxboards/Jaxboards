@@ -461,6 +461,10 @@ final class Topic
             $this->numperpage,
         );
 
+        if ($posts === []) {
+            return '';
+        }
+
         $membersById = $this->fetchMembersById(
             array_merge(
                 array_map(static fn($post): ?int => $post->auth_id, $posts),
