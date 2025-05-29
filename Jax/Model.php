@@ -24,7 +24,7 @@ abstract class Model
     {
         $primaryKey = static::PRIMARY_KEY;
 
-        if ($primaryKey != '' && !$this->{$primaryKey}) {
+        if ($primaryKey !== '' && !$this->{$primaryKey}) {
             return;
         }
 
@@ -132,7 +132,7 @@ abstract class Model
             ...($primaryKey !== '' ? [
                 "WHERE {$primaryKey}=?",
                 $data[static::PRIMARY_KEY],
-            ] : [])
+            ] : []),
         );
     }
 

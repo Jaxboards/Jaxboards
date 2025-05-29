@@ -502,12 +502,9 @@ final class Forum
         }
 
         $timestamp = $this->database->datetimeAsTimestamp(
-            $topic->lp_date ?? $topic->date
+            $topic->lp_date ?? $topic->date,
         );
 
-        var_dump($timestamp - (
-            max($this->topicsRead[$topic->id], 0)
-        ));
         return $timestamp <= (
             max($this->topicsRead[$topic->id], $this->forumReadTime)
             ?: $this->session->get('read_date')

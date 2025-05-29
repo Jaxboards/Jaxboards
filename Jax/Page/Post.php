@@ -838,10 +838,11 @@ final class Post
         }
 
         $stats = Stats::selectOne($this->database);
-        $stats->posts++;
+        ++$stats->posts;
         if ($newtopic) {
-            $stats->topics++;
+            ++$stats->topics;
         }
+
         $stats->update($this->database);
 
         if ($this->how === 'qreply') {
