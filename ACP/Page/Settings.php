@@ -47,32 +47,36 @@ final readonly class Settings
         };
     }
 
+    private function submitGlobal(): string
+    {
+        $boardName = $this->request->asString->post('boardname');
+        $logoUrl = $this->request->asString->post('logourl');
+        $error = match (true) {
+            !is_string($boardName) || trim($boardName) === '' => 'Board name is required',
+            $logoUrl !== '' && !filter_var($logoUrl, FILTER_VALIDATE_URL) => 'Please enter a valid logo url.',
+            default => null,
+        };
+
+        if ($error === null) {
+            $this->config->write([
+                'boardname' => $this->request->post('boardname'),
+                'logourl' => $this->request->post('logourl'),
+                'boardoffline' => $this->request->post('boardoffline') !== null ? '0' : '1',
+                'offlinetext' => $this->request->post('offlinetext'),
+                'birthdays' => ($this->request->post('bicon') !== null ? 1 : 0),
+            ]);
+        }
+
+        return $error !== null
+            ? $this->page->error($error)
+            : $this->page->success('Settings saved!');
+    }
+
     private function global(): void
     {
-        $error = null;
         $status = '';
         if ($this->request->post('submit') !== null) {
-            $boardName = $this->request->asString->post('boardname');
-            $logoUrl = $this->request->asString->post('logourl');
-            $error = match (true) {
-                !is_string($boardName) || trim($boardName) === '' => 'Board name is required',
-                $logoUrl !== '' && !filter_var($logoUrl, FILTER_VALIDATE_URL) => 'Please enter a valid logo url.',
-                default => null,
-            };
-
-            if ($error === null) {
-                $this->config->write([
-                    'boardname' => $this->request->post('boardname'),
-                    'logourl' => $this->request->post('logourl'),
-                    'boardoffline' => $this->request->post('boardoffline') !== null ? '0' : '1',
-                    'offlinetext' => $this->request->post('offlinetext'),
-                    'birthdays' => ($this->request->post('bicon') !== null ? 1 : 0),
-                ]);
-            }
-
-            $status = $error !== null
-                ? $this->page->error($error)
-                : $this->page->success('Settings saved!');
+            $status = $this->submitGlobal();
         }
 
         // This is silly, but we need the whole page to be a form
@@ -129,7 +133,7 @@ final readonly class Settings
             } elseif (mb_strlen($newact) > 25) {
                 $error = 'The page URL cannot exceed 25 characters.';
             } else {
-                $this->pages_edit($pageAct);
+                $this->pagesEdit($pageAct);
 
                 return;
             }
@@ -181,7 +185,7 @@ final readonly class Settings
         );
     }
 
-    private function pages_edit(string $pageurl): void
+    private function pagesEdit(string $pageurl): void
     {
         $page = '';
         $pageRecord = ModelsPage::selectOne($this->database, 'WHERE `act`=?', $pageurl);
@@ -207,13 +211,29 @@ final readonly class Settings
         $this->page->addContentBox("Editing Page: {$pageurl}", $page);
     }
 
+    private function saveShoutboxSettings(): string
+    {
+        $shoutboxNum = (int) $this->request->asString->post('sbnum');
+
+        if ($shoutboxNum === 0) {
+            return $this->page->error('Shouts to show must be between 1 and 10');
+        }
+
+        $this->config->write([
+            'shoutbox' => $this->request->post('sbe') ? 1 : 0,
+            'shoutboxava' => $this->request->post('sbava') ? 1 : 0,
+            'shoutbox_num' => $shoutboxNum,
+        ]);
+        return $this->page->success('Data saved.');
+    }
+
     // Shoutbox.
     private function shoutbox(): void
     {
         $page = '';
         $error = null;
         if ($this->request->post('clearall') !== null) {
-            $result = $this->database->special(
+            $this->database->special(
                 'TRUNCATE TABLE %t',
                 ['shouts'],
             );
@@ -221,26 +241,7 @@ final readonly class Settings
         }
 
         if ($this->request->post('submit') !== null) {
-            $write = [
-                'shoutbox' => $this->request->post('sbe') ? 1 : 0,
-                'shoutboxava' => $this->request->post('sbava') ? 1 : 0,
-            ];
-            if (
-                is_numeric($this->request->post('sbnum'))
-                && $this->request->post('sbnum') <= 10
-                && $this->request->post('sbnum') > 0
-            ) {
-                $write['shoutbox_num'] = $this->request->post('sbnum');
-            } else {
-                $error = 'Shouts to show must be between 1 and 10';
-            }
-
-            $this->config->write($write);
-            if ($error !== null) {
-                $page .= $this->page->error($error);
-            } else {
-                $page .= $this->page->success('Data saved.');
-            }
+            $page .= $this->saveShoutboxSettings();
         }
 
         $page .= $this->page->parseTemplate(
