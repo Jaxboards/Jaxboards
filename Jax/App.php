@@ -75,8 +75,8 @@ final readonly class App
         $this->loadPageFromAction();
 
         // Process temporary commands.
-        if ($this->request->isJSAccess() && $this->session->get('runonce')) {
-            $this->page->commandsFromString($this->session->get('runonce'));
+        if ($this->request->isJSAccess() && $this->session->get()->runonce) {
+            $this->page->commandsFromString($this->session->get()->runonce);
             $this->session->set('runonce', '');
         }
 
@@ -100,8 +100,8 @@ final readonly class App
         // Fix ip if necessary.
         if (
             !$this->user->isGuest()
-            && $this->session->get('ip')
-            && $this->session->get('ip') !== $this->user->get('ip')
+            && $this->session->get()->ip
+            && $this->session->get()->ip !== $this->user->get('ip')
         ) {
             $this->user->set('ip', $this->ipAddress->asBinary());
         }
@@ -111,8 +111,8 @@ final readonly class App
         // but the session variable has changed/been removed/not updated for some reason
         // this fixes it.
         if (
-            !$this->session->get('is_bot')
-            && $this->user->get('id') !== $this->session->get('uid')
+            !$this->session->get()->is_bot
+            && $this->user->get('id') !== $this->session->get()->uid
         ) {
             $this->session->clean((int) $this->user->get('id'));
             $this->session->set('uid', $this->user->get('id'));

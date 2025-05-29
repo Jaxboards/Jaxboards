@@ -85,7 +85,7 @@ final class Session
      */
     private array $changedData = [];
 
-    private ?ModelsSession $modelsSession = null;
+    private ModelsSession $modelsSession;
 
     public function __construct(
         private readonly Config $config,
@@ -99,13 +99,16 @@ final class Session
         ini_set('session.use_cookies', '1');
         ini_set('session.use_only_cookies', '1');
         session_start();
+
+        // This is only here so that the field is never null
+        $this->modelsSession = new ModelsSession();
     }
 
     public function loginWithToken(): ?int
     {
         $this->fetchSessionData($this->getPHPSessionValue('sid') ?? null);
 
-        if ($this->get('is_bot')) {
+        if ($this->modelsSession->is_bot) {
             return null;
         }
 
@@ -150,11 +153,9 @@ final class Session
         $this->createSession();
     }
 
-    public function get(string $field): mixed
+    public function get(): ModelsSession
     {
-        $value = $this->modelsSession->{$field};
-
-        return $value ?? null;
+        return $this->modelsSession;
     }
 
     /**

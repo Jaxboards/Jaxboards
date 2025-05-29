@@ -501,14 +501,14 @@ final class IDX
     private function updateStats(): void
     {
         $list = [];
-        if ($this->session->get('users_online_cache')) {
-            $oldcache = array_flip(explode(',', (string) $this->session->get('users_online_cache')));
+        if ($this->session->get()->users_online_cache) {
+            $oldcache = array_flip(explode(',', (string) $this->session->get()->users_online_cache));
         }
 
         $useronlinecache = '';
         foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $user) {
-            $lastUpdateTS = $this->session->get('last_update')
-                ? $this->database->datetimeAsTimestamp($this->session->get('last_update'))
+            $lastUpdateTS = $this->session->get()->last_update
+                ? $this->database->datetimeAsTimestamp($this->session->get()->last_update)
                 : 0;
             $lastActionIdle = $lastUpdateTS - ($this->config->getSetting('timetoidle') ?? 300) - 30;
             if (!$user['uid'] && !$user['is_bot']) {
@@ -611,7 +611,7 @@ final class IDX
     private function isForumRead(array $forum): bool
     {
         if (!$this->forumsread) {
-            $this->forumsread = $this->jax->parseReadMarkers($this->session->get('forumsread'));
+            $this->forumsread = $this->jax->parseReadMarkers($this->session->get()->forumsread);
         }
 
         if (!isset($this->forumsread[$forum['id']])) {
@@ -620,7 +620,7 @@ final class IDX
 
         return $forum['lp_date'] < max(
             $this->forumsread[$forum['id']],
-            $this->session->get('read_date'),
+            $this->session->get()->read_date,
             $this->user->get('last_visit'),
         );
     }

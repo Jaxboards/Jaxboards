@@ -345,7 +345,7 @@ final class Topic
     {
 
         // Check for new posts and append them.
-        if ($this->session->get('location') !== "vt{$modelsTopic->id}") {
+        if ($this->session->get()->location !== "vt{$modelsTopic->id}") {
             $this->session->deleteVar('topic_lastpid');
         }
 
@@ -361,7 +361,7 @@ final class Topic
 
         // Update users online list.
         $list = [];
-        $oldcache = array_flip(explode(',', (string) $this->session->get('users_online_cache')));
+        $oldcache = array_flip(explode(',', (string) $this->session->get()->users_online_cache));
         $newcache = [];
         foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $user) {
             if (!$user['uid']) {
@@ -832,7 +832,7 @@ final class Topic
 
     private function markRead(ModelsTopic $modelsTopic): void
     {
-        $topicsread = $this->jax->parseReadMarkers($this->session->get('topicsread'));
+        $topicsread = $this->jax->parseReadMarkers($this->session->get()->topicsread);
         $topicsread[$modelsTopic->id] = Carbon::now('UTC')->getTimestamp();
         $this->session->set('topicsread', json_encode($topicsread));
     }
