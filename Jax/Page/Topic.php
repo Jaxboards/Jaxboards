@@ -84,7 +84,7 @@ final class Topic
         $quickReply = $this->request->both('qreply') !== null;
 
         $topic = $this->fetchTopicData($tid);
-        $forumPerms = $this->fetchForumPermissions($topic);
+        $forumPerms = $topic ? $this->fetchForumPermissions($topic) : [];
 
         if (!$topic || !$forumPerms['read']) {
             $this->page->location('?');
@@ -122,7 +122,10 @@ final class Topic
         return $topic;
     }
 
-    private function fetchForumPermissions(?ModelsTopic $modelsTopic)
+    /**
+     * @return array<string,bool>
+     */
+    private function fetchForumPermissions(ModelsTopic $modelsTopic, ?Forum $forum = null): array
     {
         static $forumPerms = [];
 
@@ -130,12 +133,13 @@ final class Topic
             return $forumPerms;
         }
 
-        $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $modelsTopic->fid);
+        $forum = $forum ?: Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $modelsTopic->fid);
 
         return $forumPerms = $this->user->getForumPerms($forum->perms);
     }
 
     /**
+     * @param array<int> $memberIds
      * @return array<int,Member>
      */
     private function fetchMembersById(array $memberIds): array
@@ -166,12 +170,12 @@ final class Topic
         $this->session->set('location_verbose', "In topic '" . $topicTitle . "'");
 
         $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $modelsTopic->fid);
-        $category = Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $forum->cat_id);
+        $category = $forum ? Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $forum->cat_id) : null;
         // Fix this to work with subforums.
         $this->page->setBreadCrumbs(
             [
-                "?act=vc{$category->id}" => (string) $category->title,
-                "?act=vf{$forum->id}" => (string) $forum->title,
+                "?act=vc{$category?->id}" => (string) $category?->title,
+                "?act=vf{$forum?->id}" => (string) $forum?->title,
                 "?act=vt{$modelsTopic->id}" => $topicTitle,
             ],
         );
@@ -216,7 +220,7 @@ final class Topic
             '',
         ];
 
-        $forumPerms = $this->fetchForumPermissions($modelsTopic);
+        $forumPerms = $this->fetchForumPermissions($modelsTopic, $forum);
         if ($forumPerms['start']) {
             $buttons[0] = "<a href='?act=post&fid=" . $modelsTopic->fid . "'>"
                 . $this->template->meta(
@@ -520,15 +524,15 @@ final class Topic
                     $author->group_id,
                     $author->display_name,
                 ) : 'Guest',
-                $author->avatar ?: $this->template->meta('default-avatar'),
-                $author->usertitle,
-                $author->posts,
+                $author?->avatar ?: $this->template->meta('default-avatar'),
+                $author?->usertitle,
+                $author?->posts,
                 $this->template->meta(
                     'topic-status-'
                         . (isset($usersonline[$post->auth_id])
                             && $usersonline[$post->auth_id] ? 'online' : 'offline'),
                 ),
-                $authorGroup->title,
+                $authorGroup?->title,
                 $post->auth_id,
                 $postbuttons,
                 // ^10
@@ -560,9 +564,9 @@ final class Topic
                         $this->ipAddress->asHumanReadable($post->ip),
                     ) . '</a>'
                     : '',
-                $authorGroup->icon ? $this->template->meta(
+                $authorGroup?->icon ? $this->template->meta(
                     'topic-icon-wrapper',
-                    $authorGroup->icon,
+                    $authorGroup?->icon,
                 ) : '',
                 ++$topicPostCounter,
                 $postrating,
@@ -731,7 +735,7 @@ final class Topic
         if ($this->request->both('qreply')) {
             $this->page->command(
                 'updateqreply',
-                '[quote=' . $author->name . ']' . $post->post . '[/quote]'
+                '[quote=' . $author?->name . ']' . $post->post . '[/quote]'
                     . PHP_EOL . PHP_EOL,
             );
         } else {
