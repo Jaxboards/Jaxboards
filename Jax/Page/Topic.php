@@ -139,6 +139,10 @@ final class Topic
 
         $forum = $forum ?: Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $modelsTopic->fid);
 
+        if (!$forum) {
+            return [];
+        }
+
         return $forumPerms = $this->user->getForumPerms($forum->perms);
     }
 
@@ -477,9 +481,9 @@ final class Topic
 
         $membersById = $this->fetchMembersById(
             array_merge(
-                array_map(static fn($post): ?int => $post->auth_id, $posts),
-                array_map(static fn($post): ?int => $post->editby, $posts),
-            ),
+                array_map(static fn($post): int => $post->auth_id ?? 0, $posts),
+                array_map(static fn($post): int => $post->editby ?? 0, $posts),
+            )
         );
 
         $forumPerms = $this->fetchForumPermissions($modelsTopic);
@@ -573,7 +577,7 @@ final class Topic
                     : '',
                 $authorGroup?->icon ? $this->template->meta(
                     'topic-icon-wrapper',
-                    $authorGroup?->icon,
+                    $authorGroup->icon,
                 ) : '',
                 ++$topicPostCounter,
                 $postrating,
@@ -848,7 +852,7 @@ final class Topic
             Database::WHERE_ID_IN,
             $modelsTopic->id,
         );
-        $authors = $this->fetchMembersById(array_map(static fn($post): ?int => $post->auth_id, $posts));
+        $authors = $this->fetchMembersById(array_map(static fn($post): int => $post->auth_id ?? 0, $posts));
 
         foreach ($posts as $post) {
             $rssFeed->additem(
