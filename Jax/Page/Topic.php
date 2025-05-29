@@ -139,7 +139,7 @@ final class Topic
 
         $forum = $forum ?: Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $modelsTopic->fid);
 
-        if (!$forum) {
+        if ($forum === null) {
             return [];
         }
 
@@ -483,7 +483,7 @@ final class Topic
             array_merge(
                 array_map(static fn($post): int => $post->auth_id ?? 0, $posts),
                 array_map(static fn($post): int => $post->editby ?? 0, $posts),
-            )
+            ),
         );
 
         $forumPerms = $this->fetchForumPermissions($modelsTopic);
