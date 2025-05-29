@@ -304,16 +304,8 @@ final class Topic
         );
 
         // Update view count.
-        $this->database->special(
-            <<<'SQL'
-                UPDATE %t
-                SET `views` = `views` + 1
-                WHERE `id` = ?
-
-                SQL,
-            ['topics'],
-            $modelsTopic->id,
-        );
+        $modelsTopic->views++;
+        $modelsTopic->update($this->database);
 
         if ($this->request->isJSAccess()) {
             $this->page->command('update', 'page', $page);

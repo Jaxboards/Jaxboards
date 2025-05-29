@@ -121,18 +121,8 @@ final readonly class Poll
                 ? implode(',', $results[$x]) : '';
         }
 
-        $presults = implode(';', $presults);
-
-        $this->database->update(
-            'topics',
-            [
-                'poll_results' => $presults,
-            ],
-            Database::WHERE_ID_EQUALS,
-            $topic->id,
-        );
-
-        $topic->poll_results = $presults;
+        $topic->poll_results = implode(';', $presults);
+        $topic->update($this->database);
 
         $this->page->command(
             'update',

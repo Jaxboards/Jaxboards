@@ -189,14 +189,8 @@ final readonly class Reactions
             $ratings[$nibletid][] = $this->user->get('id');
         }
 
-        $this->database->update(
-            'posts',
-            [
-                'rating' => json_encode($ratings) ?: $post->rating,
-            ],
-            Database::WHERE_ID_EQUALS,
-            $postid,
-        );
+        $post->rating = json_encode($ratings) ?: $post->rating;
+        $post->update($this->database);
         $this->page->command('alert', $unrate ? 'Unrated!' : 'Rated!');
     }
 
