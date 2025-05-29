@@ -442,7 +442,7 @@ final class IDX
             number_format($stats->members ?? 0),
             number_format($stats->topics ?? 0),
             number_format($stats->posts ?? 0),
-            $lastRegisteredMember ? $this->template->meta(
+            $lastRegisteredMember !== null ? $this->template->meta(
                 'user-link',
                 $lastRegisteredMember->id,
                 $lastRegisteredMember->group_id,

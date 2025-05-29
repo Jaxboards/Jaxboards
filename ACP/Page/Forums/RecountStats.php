@@ -8,7 +8,6 @@ use ACP\Page;
 use Jax\Database;
 use Jax\Models\Forum;
 use Jax\Models\Member;
-use Jax\Models\Stats;
 use Jax\Request;
 
 use function explode;
