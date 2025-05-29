@@ -412,9 +412,9 @@ final class Forum
                 ? $lastPostAuthors[$subforum->lp_uid]
                 : null;
 
-            $lastPostDate = $this->date->autoDate(
-                $this->database->datetimeAsTimestamp($subforum->lp_date),
-            ) ?: '- - - - -';
+            $lastPostDate = $subforum->lp_date
+                ? $this->date->autoDate($this->database->datetimeAsTimestamp($subforum->lp_date))
+                : '- - - - -';
 
             $rows .= $this->template->meta(
                 'forum-subforum-row',
