@@ -169,11 +169,13 @@ final class Forum
         $numpages = (int) ceil($forum->topics / $this->numperpage);
         $forumpages = '';
         if ($numpages !== 0) {
-            foreach ($this->jax->pages($numpages, $this->pageNumber + 1, 10) as $pageNumber) {
-                $forumpages .= '<a href="?act=vf' . $fid . '&amp;page='
-                    . $pageNumber . '"' . ($pageNumber - 1 === $this->pageNumber ? ' class="active"' : '')
-                    . '>' . $pageNumber . '</a> · ';
-            }
+            $forumpages = implode(' · ', array_map(
+                function($pageNumber) use ($fid) {
+                    $activeClass = ($pageNumber - 1 === $this->pageNumber ? ' class="active"' : '');
+                    return "<a href='?act=vf{$fid}&amp;page={$pageNumber}'{$activeClass}'>{$pageNumber}</a> ";
+                },
+                $this->jax->pages($numpages, $this->pageNumber + 1, 10)
+            ));
         }
 
         // Buttons.
@@ -192,24 +194,17 @@ final class Forum
         );
 
         // Do order by.
-        $orderby = '`lp_date` DESC';
-        if ($forum->orderby !== 0) {
-            $forum->orderby = (int) $forum->orderby;
-            if (($forum->orderby & 1) !== 0) {
-                $orderby = 'ASC';
-                --$forum->orderby;
-            } else {
-                $orderby = 'DESC';
-            }
+        $forum->orderby = (int) $forum->orderby;
 
-            if ($forum->orderby === 2) {
-                $orderby = '`id` ' . $orderby;
-            } elseif ($forum->orderby === 4) {
-                $orderby = '`title` ' . $orderby;
-            } else {
-                $orderby = '`lp_date` ' . $orderby;
-            }
-        }
+        $orderby = match ($forum->orderby & ~1) {
+            2 => 'id',
+            4 => 'title',
+            default => 'lp_date',
+        } . ' ' . (
+            ($forum->orderby & 1) !== 0
+                ? 'ASC'
+                : 'DESC'
+        );
 
         $topics = Topic::selectMany(
             $this->database,
@@ -500,12 +495,12 @@ final class Forum
 
         if ($this->forumsRead === []) {
             $forumsRead = $this->jax->parseReadMarkers($this->session->get('forumsread'));
-            if (isset($forumsRead[$fid])) {
+            if (array_key_exists($fid, $forumsRead)) {
                 $this->forumReadTime = $forumsRead[$fid];
             }
         }
 
-        if (!isset($this->topicsRead[$topicId])) {
+        if (!array_key_exists($topicId, $this->topicsRead)) {
             $this->topicsRead[$topicId] = 0;
         }
 
