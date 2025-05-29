@@ -486,11 +486,6 @@ final class Forum
 
     private function isTopicRead(Topic $topic, int $fid): bool
     {
-        if (!$topic->lp_date) {
-            return true;
-        }
-
-        $topicId = $topic->id;
         if ($this->topicsRead === []) {
             $this->topicsRead = $this->jax->parseReadMarkers($this->session->get('topicsread'));
         }
@@ -502,12 +497,19 @@ final class Forum
             }
         }
 
-        if (!array_key_exists($topicId, $this->topicsRead)) {
-            $this->topicsRead[$topicId] = 0;
+        if (!array_key_exists($topic->id, $this->topicsRead)) {
+            $this->topicsRead[$topic->id] = 0;
         }
 
-        return $this->database->datetimeAsTimestamp($topic->lp_date) <= (
-            max($this->topicsRead[$topicId], $this->forumReadTime)
+        $timestamp = $this->database->datetimeAsTimestamp(
+            $topic->lp_date ?? $topic->date
+        );
+
+        var_dump($timestamp - (
+            max($this->topicsRead[$topic->id], 0)
+        ));
+        return $timestamp <= (
+            max($this->topicsRead[$topic->id], $this->forumReadTime)
             ?: $this->session->get('read_date')
             ?: $this->user->get('last_visit')
         );
@@ -533,7 +535,7 @@ final class Forum
     private function markRead(int $id): void
     {
         $forumsread = $this->jax->parseReadMarkers($this->session->get('forumsread'));
-        $forumsread[$id] = Carbon::now()->getTimestamp();
+        $forumsread[$id] = Carbon::now('UTC')->getTimestamp();
         $this->session->set('forumsread', json_encode($forumsread));
     }
 }

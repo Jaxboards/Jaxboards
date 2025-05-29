@@ -24,7 +24,7 @@ abstract class Model
     {
         $primaryKey = static::PRIMARY_KEY;
 
-        if (!$this->{$primaryKey}) {
+        if ($primaryKey != '' && !$this->{$primaryKey}) {
             return;
         }
 
@@ -129,8 +129,10 @@ abstract class Model
         return $database->update(
             static::TABLE,
             $this->asArray(),
-            "WHERE {$primaryKey}=?",
-            $data[static::PRIMARY_KEY],
+            ...($primaryKey !== '' ? [
+                "WHERE {$primaryKey}=?",
+                $data[static::PRIMARY_KEY],
+            ] : [])
         );
     }
 

@@ -196,7 +196,7 @@ final class LogReg
                 $loginToken = base64_encode(openssl_random_pseudo_bytes(128));
 
                 $token = new Token();
-                $token->expires = $this->database->datetime(Carbon::now()->addMonth()->getTimestamp());
+                $token->expires = $this->database->datetime(Carbon::now('UTC')->addMonth()->getTimestamp());
                 $token->token = $loginToken;
                 $token->type = 'login';
                 $token->uid = $user['id'];
@@ -205,7 +205,7 @@ final class LogReg
                 $this->request->setCookie(
                     'utoken',
                     $loginToken,
-                    Carbon::now()->addMonth()->getTimestamp(),
+                    Carbon::now('UTC')->addMonth()->getTimestamp(),
                 );
                 $this->session->clean($user['id']);
                 $this->session->set('user', $username);
@@ -405,7 +405,7 @@ final class LogReg
                         = base64_encode(openssl_random_pseudo_bytes(128));
 
                     $token = new Token();
-                    $token->expires = $this->database->datetime(Carbon::now()->getTimestamp() + 3600 * 24);
+                    $token->expires = $this->database->datetime(Carbon::now('UTC')->getTimestamp() + 3600 * 24);
                     $token->token = $forgotpasswordtoken;
                     $token->type = 'forgotpassword';
                     $token->uid = $member->id;

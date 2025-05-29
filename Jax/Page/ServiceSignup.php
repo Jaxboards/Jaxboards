@@ -193,7 +193,7 @@ final readonly class ServiceSignup
             'directory',
             'WHERE `registrar_ip`=? AND `date`>?',
             $this->ipAddress->asBinary(),
-            $this->database->datetime(Carbon::now()->subWeeks(1)->getTimestamp()),
+            $this->database->datetime(Carbon::now('UTC')->subWeeks(1)->getTimestamp()),
         );
         if (count($this->database->arows($result)) > 3) {
             return 'You may only register 3 boards per week.';

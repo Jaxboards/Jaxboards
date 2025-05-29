@@ -379,7 +379,7 @@ class Database
             return $usersOnlineCache;
         }
 
-        $idletimeout = Carbon::now()->getTimestamp() - ($this->serviceConfig->getSetting('timetoidle') ?? 300);
+        $idletimeout = Carbon::now('UTC')->getTimestamp() - ($this->serviceConfig->getSetting('timetoidle') ?? 300);
         $usersOnlineCache = [];
 
         $result = $this->special(
@@ -403,7 +403,7 @@ class Database
                 ORDER BY s.`last_action` ASC
                 SQL,
             ['session', 'members'],
-            $this->datetime(Carbon::now()->getTimestamp() - $this->serviceConfig->getSetting('timetologout')),
+            $this->datetime(Carbon::now('UTC')->getTimestamp() - $this->serviceConfig->getSetting('timetologout')),
         );
         $today = gmdate('n j');
         while ($user = $this->arow($result)) {

@@ -13,6 +13,7 @@ use Jax\Models\Activity;
 use Jax\Models\File;
 use Jax\Models\Forum;
 use Jax\Models\Post as ModelsPost;
+use Jax\Models\Stats;
 use Jax\Models\Topic;
 use Jax\Page;
 use Jax\Request;
@@ -836,22 +837,12 @@ final class Post
             $this->user->set('posts', ((int) $this->user->get('posts')) + 1);
         }
 
+        $stats = Stats::selectOne($this->database);
+        $stats->posts++;
         if ($newtopic) {
-            $this->database->special(
-                <<<'SQL'
-                    UPDATE %t
-                    SET
-                        `posts`=`posts` + 1,
-                        `topics`=`topics` + 1
-                    SQL,
-                ['stats'],
-            );
-        } else {
-            $this->database->special(
-                'UPDATE %t SET `posts` = `posts` + 1',
-                ['stats'],
-            );
+            $stats->topics++;
         }
+        $stats->update($this->database);
 
         if ($this->how === 'qreply') {
             $this->page->command('closewindow', '#qreply');
