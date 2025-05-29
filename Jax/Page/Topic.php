@@ -119,10 +119,6 @@ final class Topic
             return null;
         }
 
-        $topic->title = $this->textFormatting->wordfilter($topic->title);
-        $topic->subtitle = $this->textFormatting->wordfilter($topic->subtitle);
-
-
         return $topic;
     }
 
@@ -163,8 +159,11 @@ final class Topic
             $this->markRead($modelsTopic);
         }
 
-        $this->page->setPageTitle($modelsTopic->title);
-        $this->session->set('location_verbose', "In topic '" . $modelsTopic->title . "'");
+        $topicTitle = $this->textFormatting->wordfilter($modelsTopic->title);
+        $topicSubtitle = $this->textFormatting->wordfilter($modelsTopic->subtitle);
+
+        $this->page->setPageTitle($topicTitle);
+        $this->session->set('location_verbose', "In topic '" . $topicTitle . "'");
 
         $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $modelsTopic->fid);
         $category = Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $forum->cat_id);
@@ -173,7 +172,7 @@ final class Topic
             [
                 "?act=vc{$category->id}" => (string) $category->title,
                 "?act=vf{$forum->id}" => (string) $forum->title,
-                "?act=vt{$modelsTopic->id}" => $modelsTopic->title,
+                "?act=vt{$modelsTopic->id}" => $topicTitle,
             ],
         );
 
@@ -204,8 +203,8 @@ final class Topic
         $page = $this->template->meta('topic-table', $this->postsIntoOutput($modelsTopic));
         $page = $this->template->meta(
             'topic-wrapper',
-            $modelsTopic->title
-                . ($modelsTopic->subtitle !== '' && $modelsTopic->subtitle !== '0' ? ', ' . $modelsTopic->subtitle : ''),
+            $topicTitle
+                . ($topicSubtitle ? ', ' . $topicSubtitle : ''),
             $page,
             '<a href="./?act=vt' . $modelsTopic->id . '&amp;fmt=RSS" class="social rss" title="RSS Feed for this Topic" target="_blank">RSS</a>',
         );
@@ -686,8 +685,8 @@ final class Topic
             $form = $this->template->meta(
                 'topic-qedit-topic',
                 $hiddenfields,
-                $modelsTopic->title,
-                $modelsTopic->subtitle,
+                $this->textFormatting->wordfilter($modelsTopic->title),
+                $this->textFormatting->wordfilter($modelsTopic->subtitle),
                 $this->textFormatting->blockhtml($post->post),
             );
         } else {
@@ -828,9 +827,9 @@ final class Topic
         $boardURL = $this->domainDefinitions->getBoardURL();
         $rssFeed = new RSSFeed(
             [
-                'description' => $modelsTopic->subtitle,
+                'description' => $this->textFormatting->wordfilter($modelsTopic->subtitle),
                 'link' => "{$boardURL}?act=vt{$modelsTopic->id}",
-                'title' => $modelsTopic->title,
+                'title' => $this->textFormatting->wordfilter($modelsTopic->title),
             ],
         );
         $posts = Post::selectMany(
