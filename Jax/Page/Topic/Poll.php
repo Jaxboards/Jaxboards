@@ -55,10 +55,10 @@ final readonly class Poll
         }
 
         $choice = $this->request->both('choice');
-        $choices = json_decode((string) $topic->poll_choices, true);
+        $choices = json_decode($topic->poll_choices, true);
         $numchoices = count($choices);
 
-        $results = $this->parsePollResults((string) $topic->poll_results);
+        $results = $this->parsePollResults($topic->poll_results);
 
         // Results is now an array of arrays, the keys of the parent array
         // correspond to the choices while the arrays within the array
@@ -147,7 +147,7 @@ final readonly class Poll
     private function renderPollHTML(Topic $topic): string
     {
         $type = $topic->poll_type;
-        $choices = json_decode((string) $topic->poll_choices);
+        $choices = json_decode($topic->poll_choices);
         if (!is_array($choices)) {
             $choices = [];
         }
