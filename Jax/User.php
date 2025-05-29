@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Jax;
 
-use Carbon\Carbon;
 use Jax\Constants\Groups;
 use Jax\Models\Group;
 use Jax\Models\Member;
 
-use function array_merge;
 use function password_hash;
 use function password_needs_rehash;
 use function password_verify;
@@ -23,21 +21,20 @@ final class User
         private readonly Jax $jax,
         private readonly IPAddress $ipAddress,
         // Exposing these for testing
-        private ?Member $userData = null,
+        private ?Member $member = null,
         public ?Group $userPerms = null,
-    ) {
-    }
+    ) {}
 
     public function get(string $property): null|int|string
     {
-        if ($this->userData === null) {
+        if ($this->member === null) {
             return match ($property) {
                 'group_id' => Groups::Guest->value,
                 default => null,
             };
         }
 
-        return $this->userData->{$property} ?? null;
+        return $this->member->{$property} ?? null;
     }
 
     public function set(string $property, null|int|string $value): void
@@ -50,9 +47,9 @@ final class User
      */
     public function setBulk(array $fields): void
     {
-        if ($this->userData) {
-            foreach ($fields as $key=>$value) {
-                $this->userData->{$key} = $value;
+        if ($this->member) {
+            foreach ($fields as $key => $value) {
+                $this->member->{$key} = $value;
             }
         }
 
@@ -66,8 +63,8 @@ final class User
 
     public function getUser(?int $uid = null, ?string $pass = null): ?Member
     {
-        if ($this->userData || !$uid) {
-            return $this->userData;
+        if ($this->member || !$uid) {
+            return $this->member;
         }
 
         $user = Member::selectOne(
@@ -76,14 +73,18 @@ final class User
             $uid,
         );
 
-        if ($user) {
-            // Password parsing.
-            if ($pass && !$this->verifyPassword($user, $pass)) {
-                $user = null;
-            }
+        // Password parsing.
+        if (
+            $user !== null
+            && (
+                $pass
+                && !$this->verifyPassword($user, $pass)
+            )
+        ) {
+            $user = null;
         }
 
-        return $this->userData = $user;
+        return $this->member = $user;
     }
 
     public function getPerm(string $perm): null|bool|int|string
@@ -101,7 +102,7 @@ final class User
 
         $groupId = match (true) {
             $this->isBanned() => Groups::Banned->value,
-            $this->userData !== null => $this->get('group_id'),
+            $this->member !== null => $this->get('group_id'),
             default => null,
         };
 
@@ -168,16 +169,16 @@ final class User
     /**
      * @return bool if password is correct
      */
-    private function verifyPassword(Member $user, string $pass): bool
+    private function verifyPassword(Member $member, string $pass): bool
     {
-        if (!password_verify($pass, (string) $user->pass)) {
+        if (!password_verify($pass, $member->pass)) {
             return false;
         }
 
-        if (password_needs_rehash($user->pass, PASSWORD_DEFAULT)) {
+        if (password_needs_rehash($member->pass, PASSWORD_DEFAULT)) {
             // Add the new hash.
-            $user->pass = password_hash($pass, PASSWORD_DEFAULT);
-            $user->update($this->database);
+            $member->pass = password_hash($pass, PASSWORD_DEFAULT);
+            $member->update($this->database);
         }
 
         return true;

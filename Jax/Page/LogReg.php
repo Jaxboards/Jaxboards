@@ -187,7 +187,7 @@ final class LogReg
 
             $user = $this->user->getUser($member->id ?? null, $password);
 
-            if ($user) {
+            if ($user !== null) {
                 if ($this->request->post('popup') !== null) {
                     $this->page->command('closewindow', '#loginform');
                 }
