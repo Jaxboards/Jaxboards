@@ -338,7 +338,9 @@ final class Forum
 
         // Start building the nav path.
         $category = Category::selectOne($this->database, Database::WHERE_ID_EQUALS, $forum->cat_id);
-        $breadCrumbs = $category ? ["?act=vc{$forum->cat_id}" => $category->title] : [];
+        $breadCrumbs = $category !== null
+            ? ["?act=vc{$forum->cat_id}" => $category->title]
+            : [];
 
         // Subforum breadcrumbs
         if ($forum->path !== '') {
@@ -411,7 +413,7 @@ final class Forum
                 : null;
 
             $lastPostDate = $this->date->autoDate(
-                $this->database->datetimeAsTimestamp($subforum->lp_date)
+                $this->database->datetimeAsTimestamp($subforum->lp_date),
             ) ?: '- - - - -';
 
             $rows .= $this->template->meta(
