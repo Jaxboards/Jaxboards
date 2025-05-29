@@ -85,7 +85,7 @@ final class Session
      */
     private array $changedData = [];
 
-    private ?ModelsSession $session = null;
+    private ?ModelsSession $modelsSession = null;
 
     public function __construct(
         private readonly Config $config,
@@ -124,9 +124,6 @@ final class Session
         return $userId ?? 0;
     }
 
-    /**
-     * @return array<string,mixed>
-     */
     public function fetchSessionData(null|int|string $sid = null): void
     {
         $session = null;
@@ -142,8 +139,11 @@ final class Session
         }
 
         if ($session !== null) {
-            $this->session = $session;
-            $this->vars = $session->vars !== '' ? unserialize($session->vars) : [];
+            $this->modelsSession = $session;
+            $this->vars = $session->vars !== ''
+                ? unserialize($session->vars)
+                : [];
+
             return;
         }
 
@@ -152,7 +152,7 @@ final class Session
 
     public function get(string $field): mixed
     {
-        $value = $this->session->{$field};
+        $value = $this->modelsSession->{$field};
 
         return $value ?? null;
     }
@@ -177,11 +177,11 @@ final class Session
 
     public function set(string $field, mixed $value): void
     {
-        if (!$this->session) {
+        if (!$this->modelsSession) {
             return;
         }
 
-        $this->session->{$field} = $value;
+        $this->modelsSession->{$field} = $value;
     }
 
     public function addVar(string $varName, mixed $value): void
@@ -195,7 +195,7 @@ final class Session
 
 
         $this->vars[$varName] = $value;
-        $this->session->vars = serialize($this->vars);
+        $this->modelsSession->vars = serialize($this->vars);
     }
 
     public function deleteVar(string $varName): void
@@ -205,7 +205,7 @@ final class Session
         }
 
         unset($this->vars[$varName]);
-        $this->session->vars = serialize($this->vars);
+        $this->modelsSession->vars = serialize($this->vars);
     }
 
     public function getVar(string $varName): mixed
@@ -297,16 +297,16 @@ final class Session
 
     public function applyChanges(): void
     {
-        $session = $this->session;
+        $session = $this->modelsSession;
         $session->last_update = $this->database->datetime();
 
-        if ($this->session->is_bot) {
+        if ($this->modelsSession->is_bot) {
             // Bots tend to read a lot of content.
             $session->forumsread = '{}';
             $session->topicsread = '{}';
         }
 
-        if (!$this->session->last_action) {
+        if (!$this->modelsSession->last_action) {
             $session->last_action = $this->database->datetime();
         }
 
@@ -324,7 +324,7 @@ final class Session
         }
 
         // Only update if there's data to update.
-        $this->session->update($this->database);
+        $this->modelsSession->update($this->database);
     }
 
     /**
@@ -351,13 +351,13 @@ final class Session
     public function addSessIDCB(array $match): string
     {
         if ($match[1][0] === '?') {
-            $match[1] .= '&amp;sessid=' . $this->session->id;
+            $match[1] .= '&amp;sessid=' . $this->modelsSession->id;
         }
 
         return 'href="' . $match[1] . '"';
     }
 
-    private function createSession()
+    private function createSession(): void
     {
         $botName = $this->getBotName();
         $sid = $botName;
@@ -377,13 +377,15 @@ final class Session
         $session->last_update = $actionTime;
         $session->useragent = $this->request->getUserAgent();
         $session->insert($this->database);
+
         $uid = $this->user->get('id');
         if ($uid) {
             $session->uid = $uid;
         }
+
         $session->insert($this->database);
 
-        $this->session = $session;
+        $this->modelsSession = $session;
     }
 
     private function getBotName(): ?string
