@@ -370,21 +370,21 @@ final readonly class Inbox
         return $this->template->meta(
             'inbox-messageview',
             $message->title,
-            $this->template->meta(
+            $otherMember !== null ? $this->template->meta(
                 'user-link',
                 $otherMember->id,
                 $otherMember->group_id,
                 $otherMember->name,
-            ),
+            ) : '',
             $this->date->autoDate($this->database->datetimeAsTimestamp($message->date)),
             $this->textFormatting->theWorks($message->message),
-            $otherMember->avatar ?: $this->template->meta('default-avatar'),
-            $otherMember->usertitle,
+            $otherMember?->avatar ?: $this->template->meta('default-avatar'),
+            $otherMember?->usertitle,
             $this->jax->hiddenFormFields(
                 [
                     'act' => 'ucp',
-                    'messageid' => $message->id,
-                    'sender' => $message->from,
+                    'messageid' => (string) $message->id,
+                    'sender' => (string) $message->from,
                     'what' => 'inbox',
                 ],
             ),

@@ -838,12 +838,13 @@ final class Post
         }
 
         $stats = Stats::selectOne($this->database);
-        ++$stats->posts;
-        if ($newtopic) {
-            ++$stats->topics;
+        if ($stats !== null) {
+            ++$stats->posts;
+            if ($newtopic) {
+                ++$stats->topics;
+            }
+            $stats->update($this->database);
         }
-
-        $stats->update($this->database);
 
         if ($this->how === 'qreply') {
             $this->page->command('closewindow', '#qreply');

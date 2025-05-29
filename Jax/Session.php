@@ -24,6 +24,9 @@ use function unserialize;
 
 final class Session
 {
+    /**
+     * @var array<string,mixed>
+     */
     private array $vars = [];
 
     /**
@@ -380,13 +383,13 @@ final class Session
 
         $session = new ModelsSession();
         $session->id = $sid;
-        $session->ip = $this->ipAddress->asBinary();
+        $session->ip = $this->ipAddress->asBinary() ?? '';
         $session->is_bot = $botName !== null ? 1 : 0;
         $session->last_action = $actionTime;
         $session->last_update = $actionTime;
-        $session->useragent = $this->request->getUserAgent();
+        $session->useragent = $this->request->getUserAgent() ?? '';
 
-        $uid = $this->user->get('id');
+        $uid = (int) $this->user->get('id');
         if ($uid) {
             $session->uid = $uid;
         }

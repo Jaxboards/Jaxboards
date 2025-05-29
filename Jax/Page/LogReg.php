@@ -161,9 +161,11 @@ final class LogReg
         $newMember->insert($this->database);
 
         $stats = Stats::selectOne($this->database);
-        ++$stats->members;
-        $stats->last_register = $newMember->id;
-        $stats->update($this->database);
+        if ($stats !== null) {
+            ++$stats->members;
+            $stats->last_register = $newMember->id;
+            $stats->update($this->database);
+        }
 
         $this->login($name, $pass1);
     }
