@@ -118,17 +118,6 @@ final readonly class PrivateMessage
         $this->page->command(...$cmd);
         $cmd[1] = $this->user->get('id');
         $cmd[4] = 0;
-        $onlineusers = $this->database->getUsersOnline();
-        $logoutTime = Carbon::now('UTC')->getTimestamp() - $this->config->getSetting('timetologout');
-        $updateTime = Carbon::now('UTC')->subSeconds(5)->getTimestamp();
-        if (
-            !isset($onlineusers[$uid])
-            || !$onlineusers[$uid]
-            || $onlineusers[$uid]['last_update'] < $logoutTime
-            || $onlineusers[$uid]['last_update'] < $updateTime
-        ) {
-            $this->page->command('imtoggleoffline', $uid);
-        }
 
         if ($this->sendcmd($cmd, $uid)) {
             return;
@@ -146,12 +135,12 @@ final readonly class PrivateMessage
             <<<'SQL'
                 UPDATE %t
                 SET `runonce`=CONCAT(`runonce`,?)
-                WHERE `uid`=? AND `last_update`> ?
+                WHERE `uid`=? AND `last_update`>?
                 SQL,
             ['session'],
             json_encode($cmd) . PHP_EOL,
             $uid,
-            $this->database->datetime(Carbon::now('UTC')->subSeconds(5)->getTimestamp()),
+            $this->database->datetime(Carbon::now()->subSeconds(10)->getTimestamp()),
         );
 
         return $this->database->affectedRows($result) !== 0;

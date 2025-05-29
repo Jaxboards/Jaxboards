@@ -206,7 +206,6 @@ final class LogReg
                     Carbon::now('UTC')->addMonth()->getTimestamp(),
                 );
                 $this->session->clean($user['id']);
-                $this->session->set('user', $username);
                 $this->session->set('uid', $user['id']);
                 $this->session->act();
                 if ($this->registering) {

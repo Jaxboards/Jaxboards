@@ -127,10 +127,10 @@ final class Session
 
     public function fetchSessionData(null|int|string $sid = null): void
     {
-        $session = null;
         $botName = $this->getBotName();
         $sid = $botName ?? $sid;
 
+        $session = null;
         if ($sid) {
             $params = $botName
                 ? [Database::WHERE_ID_EQUALS, $sid]
@@ -183,6 +183,7 @@ final class Session
         }
 
         $this->modelsSession->{$field} = $value;
+        $this->changedData[$field] = $value;
     }
 
     public function addVar(string $varName, mixed $value): void
@@ -236,7 +237,7 @@ final class Session
             $uid = null;
         } else {
             $result = $this->database->select(
-                'UNIX_TIMESTAMP(MAX(`last_action`)) AS `last_action`',
+                'MAX(`last_action`) AS `last_action`',
                 'session',
                 'WHERE `uid`=? GROUP BY `uid`',
                 $uid,
@@ -299,7 +300,7 @@ final class Session
     public function applyChanges(): void
     {
         $session = $this->modelsSession;
-        $session->last_update = $this->database->datetime();
+        $this->set('last_update', $this->database->datetime());
 
         if ($this->modelsSession->is_bot) {
             // Bots tend to read a lot of content.
@@ -311,11 +312,6 @@ final class Session
             $session->last_action = $this->database->datetime();
         }
 
-        if (property_exists($session, 'user') && $session->user !== null) {
-            // This doesn't exist.
-            unset($session->user);
-        }
-
         if (mb_strlen($session->location_verbose ?? '') > 100) {
             $session->location_verbose = mb_substr(
                 (string) $session->location_verbose,
@@ -325,7 +321,14 @@ final class Session
         }
 
         // Only update if there's data to update.
-        $this->modelsSession->update($this->database);
+        if ($this->changedData !== []) {
+            $this->database->update(
+                'session',
+                $this->changedData,
+                Database::WHERE_ID_EQUALS,
+                $session->id,
+            );
+        }
     }
 
     /**
@@ -377,13 +380,10 @@ final class Session
         $session->last_action = $actionTime;
         $session->last_update = $actionTime;
         $session->useragent = $this->request->getUserAgent();
-        $session->insert($this->database);
-
         $uid = $this->user->get('id');
         if ($uid) {
             $session->uid = $uid;
         }
-
         $session->insert($this->database);
 
         $this->modelsSession = $session;
