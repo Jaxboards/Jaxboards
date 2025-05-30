@@ -89,7 +89,7 @@ final class Members
         $groups = Group::joinedOn(
             $this->database,
             $members,
-            static fn(Member $group) => $group->group_id,
+            static fn(Member $member): int => $member->group_id,
         );
 
         $nummemberquery = $this->database->special(
