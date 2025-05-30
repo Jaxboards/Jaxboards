@@ -38,9 +38,9 @@ final class Session extends Model
 
     public string $vars = '';
 
-    public string $last_update = '0000-00-00 00:00:00';
+    public ?string $last_update = null;
 
-    public string $last_action = '0000-00-00 00:00:00';
+    public ?string $last_action = null;
 
     public string $runonce = '';
 
@@ -60,7 +60,7 @@ final class Session extends Model
 
     public string $topicsread = '{}';
 
-    public string $read_date = '0000-00-00 00:00:00';
+    public ?string $read_date = null;
 
     public int $hide = 0;
 }

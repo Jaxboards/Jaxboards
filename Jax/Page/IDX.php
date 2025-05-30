@@ -254,7 +254,7 @@ final class IDX
 
         $forum = '';
         foreach (explode(',', $modids) as $modId) {
-            $forum .= $moderatorinfo[$modId] . $this->template->meta('idx-ledby-splitter');
+            $forum .= $moderatorinfo[(int) $modId] . $this->template->meta('idx-ledby-splitter');
         }
 
         return mb_substr($forum, 0, -mb_strlen($this->template->meta('idx-ledby-splitter')));
