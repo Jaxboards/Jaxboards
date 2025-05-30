@@ -500,7 +500,7 @@ final class IDX
 
         $useronlinecache = '';
         foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $user) {
-            $lastUpdateTS = $this->session->get()->last_update !== '' && $this->session->get()->last_update !== '0'
+            $lastUpdateTS = $this->session->get()->last_update !== null
                 ? $this->database->datetimeAsTimestamp($this->session->get()->last_update)
                 : 0;
             $lastActionIdle = $lastUpdateTS - ($this->config->getSetting('timetoidle') ?? 300) - 30;

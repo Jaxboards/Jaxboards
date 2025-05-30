@@ -305,8 +305,7 @@ final class Session
         }
 
         if (
-            $this->modelsSession->last_action === ''
-            || $this->modelsSession->last_action === '0'
+            $this->modelsSession->last_action === null
         ) {
             $session->last_action = $this->database->datetime();
         }
