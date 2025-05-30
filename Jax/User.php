@@ -89,7 +89,7 @@ final class User
                 && !$this->verifyPassword($user, $pass)
             )
         ) {
-            $user = null;
+            return $this->member;
         }
 
         return $this->member = $user;
@@ -110,14 +110,13 @@ final class User
 
         $groupId = match (true) {
             $this->isBanned() => Groups::Banned->value,
-            $this->member !== null => $this->member->group_id,
-            default => null,
+            default => $this->member->group_id,
         };
 
         $group = Group::selectOne(
             $this->database,
             Database::WHERE_ID_EQUALS,
-            $groupId ?? Groups::Guest->value,
+            $groupId,
         );
         $this->userPerms = $group;
 

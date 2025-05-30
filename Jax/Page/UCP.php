@@ -178,7 +178,7 @@ final readonly class UCP
 
         foreach ($fields as $field) {
             $checkboxes[] = '<input type="checkbox" title="' . $field . '" name="' . $field . '" '
-                . ($this->user->get() ? 'checked="checked"' : '') . '/>';
+                . ($this->user->get()->{$field} ? 'checked="checked"' : '') . '/>';
         }
 
         $this->page->command('script', <<<'JS'
@@ -563,25 +563,30 @@ final readonly class UCP
             'November',
             'December',
         ];
+
+        $birthdate = $this->user->get()->birthdate;
+        $birthdate = $birthdate !== '' ? Carbon::createFromFormat('Y-m-d', $birthdate, 'UTC') : null;
+
         foreach ($fullMonthNames as $index => $monthName) {
             $dobselect .= '<option value="' . ($index + 1) . '"'
-                . ($index + 1 === $this->user->get()->dob_month ? ' selected="selected"' : '')
+                . ($index + 1 === $birthdate?->month ? ' selected="selected"' : '')
                 . '>' . $monthName . '</option>';
         }
 
         $dobselect .= '</select><select name="dob_day" title="Day"><option value="">--</option>';
         for ($day = 1; $day < 32; ++$day) {
             $dobselect .= '<option value="' . $day . '"'
-                . ($day === $this->user->get()->dob_day ? ' selected="selected"' : '')
+                . ($day === $birthdate?->day ? ' selected="selected"' : '')
                 . '>' . $day . '</option>';
         }
 
         $dobselect .= '</select><select name="dob_year" title="Year">'
             . '<option value="">--</option>';
+
         $thisyear = (int) gmdate('Y');
         for ($year = $thisyear; $year > $thisyear - 100; --$year) {
             $dobselect .= '<option value="' . $year . '"'
-                . ($year === $this->user->get()->dob_year ? ' selected="selected"' : '')
+                . ($year === $birthdate->year ? ' selected="selected"' : '')
                 . '>' . $year . '</option>';
         }
 

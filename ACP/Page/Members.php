@@ -696,7 +696,7 @@ final readonly class Members
                     'email_address' => $member->email,
                     'id' => $member->id,
                     'ip_address' => $this->ipAddress->asHumanReadable($member->ip),
-                    'join_date' => $member->join_date,
+                    'join_date' => $member->join_date ?? '',
                     'title' => $member->display_name,
                 ],
             );
