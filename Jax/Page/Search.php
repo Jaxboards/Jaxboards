@@ -298,10 +298,6 @@ final class Search
                 continue;
             }
 
-            if (trim($v) === '0') {
-                continue;
-            }
-
             $terms[] = preg_quote($v);
         }
 

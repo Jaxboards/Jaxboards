@@ -152,7 +152,7 @@ final readonly class BuddyList
             }
         }
 
-        if ($contacts === '' || $contacts === '0') {
+        if ($contacts === '') {
             $contacts = $this->template->meta(
                 'error',
                 "You don't have any contacts added to your buddy list!",

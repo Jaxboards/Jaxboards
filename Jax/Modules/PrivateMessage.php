@@ -52,7 +52,7 @@ final readonly class PrivateMessage
     public function filter(): void
     {
         $enemies = $this->user->get()->enemies;
-        if ($enemies === '' || $enemies === '0') {
+        if ($enemies === '') {
             return;
         }
 

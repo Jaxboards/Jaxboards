@@ -90,7 +90,7 @@ final readonly class ProfileTabs
      */
     private function fetchFriends(Member $member): array
     {
-        if ($member->friends === '' || $member->friends === '0') {
+        if ($member->friends === '') {
             return [];
         }
 
@@ -166,7 +166,7 @@ final readonly class ProfileTabs
             );
         }
 
-        if ($tabHTML === '' || $tabHTML === '0') {
+        if ($tabHTML === '') {
             return 'No topics to show.';
         }
 

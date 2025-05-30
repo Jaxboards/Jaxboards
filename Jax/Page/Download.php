@@ -58,7 +58,7 @@ final readonly class Download
 
         $filePath = $this->domainDefinitions->getBoardPath() . '/Uploads/' . $file->hash;
         if (file_exists($filePath)) {
-            if ($file->name === '' || $file->name === '0') {
+            if ($file->name === '') {
                 $file->name = 'unknown';
             }
 
