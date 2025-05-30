@@ -235,7 +235,7 @@ final class Session
             $result = $this->database->select(
                 'MAX(`last_action`) AS `last_action`',
                 'session',
-                'WHERE `uid`=? GROUP BY `uid`',
+                'WHERE `uid`=?',
                 $uid,
             );
             $lastAction = $this->database->arow($result);
