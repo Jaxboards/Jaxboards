@@ -300,7 +300,7 @@ final readonly class App
                     $this->user->get()->display_name,
                 ),
                 $this->date->smallDate(
-                    (int) $this->user->get()->last_visit,
+                    $this->user->get()->last_visit,
                 ),
                 $numMessages,
             ),
