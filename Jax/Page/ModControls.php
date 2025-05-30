@@ -427,16 +427,16 @@ final readonly class ModControls
 
                 $shouts = Shout::selectMany(
                     $this->database,
-                    "WHERE `ip`=?
+                    'WHERE `ip`=?
                     ORDER BY `id`
-                    DESC LIMIT 5",
-                    $this->ipAddress->asBinary($ipAddress)
+                    DESC LIMIT 5',
+                    $this->ipAddress->asBinary($ipAddress),
                 );
 
                 $members = Member::joinedOn(
                     $this->database,
                     $shouts,
-                    static fn(Shout $shout) => $shout->uid,
+                    static fn(Shout $shout): int => $shout->uid,
                 );
 
                 foreach ($shouts as $shout) {
