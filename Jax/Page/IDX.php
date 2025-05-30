@@ -107,8 +107,9 @@ final class IDX
     {
         return Forum::selectMany(
             $this->database,
-            'WHERE `path` = "" '.
-            'ORDER BY `order`, `title` ASC');
+            'WHERE `path` = "" '
+            . 'ORDER BY `order`, `title` ASC',
+        );
     }
 
     /**
