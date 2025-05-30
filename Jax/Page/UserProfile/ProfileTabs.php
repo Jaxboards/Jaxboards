@@ -6,7 +6,10 @@ namespace Jax\Page\UserProfile;
 
 use Jax\Database;
 use Jax\Date;
+use Jax\Models\Forum;
 use Jax\Models\Member;
+use Jax\Models\Post;
+use Jax\Models\Topic;
 use Jax\Page;
 use Jax\Request;
 use Jax\Template;
@@ -177,35 +180,42 @@ final readonly class ProfileTabs
     {
         $tabHTML = '';
 
-        $result = $this->database->special(
-            <<<'SQL'
-                SELECT p.`post` AS `post`,p.`id` AS `pid`,p.`tid` AS `tid`,
-                    t.`title` AS `title`,UNIX_TIMESTAMP(p.`date`) AS `date`,f.`perms` AS `perms`
-                FROM %t p
-                LEFT JOIN %t t
-                    ON p.`tid`=t.`id`
-                LEFT JOIN %t f
-                    ON f.`id`=t.`fid`
-                WHERE p.`auth_id`=?
-                ORDER BY p.`id` DESC
-                LIMIT 10
-                SQL,
-            ['posts', 'topics', 'forums'],
-            $member->id,
+        $posts = Post::selectMany(
+            $this->database,
+            "WHERE auth_id = ?
+            ORDER BY id DESC
+            LIMIT 10",
+            $member->id
         );
-        while ($post = $this->database->arow($result)) {
-            $perms = $this->user->getForumPerms($post['perms']);
+
+        $topics = Topic::joinedOn(
+            $this->database,
+            $posts,
+            fn(Post $post) => $post->tid
+        );
+
+        $forums = Forum::joinedOn(
+            $this->database,
+            $topics,
+            fn(Topic $topic) => $topic->fid,
+        );
+
+        foreach ($posts as $post) {
+            $topic = $topics[$post->tid];
+            $forum = $forums[$topic->fid];
+
+            $perms = $this->user->getForumPerms($forum->perms);
             if (!$perms['read']) {
                 continue;
             }
 
             $tabHTML .= $this->template->meta(
                 'userprofile-post',
-                $post['tid'],
-                $post['title'],
-                $post['pid'],
-                $this->date->autoDate($post['date']),
-                $this->textFormatting->theWorks($post['post']),
+                $post->tid,
+                $topic->title,
+                $post->id,
+                $this->date->autoDate($post->date),
+                $this->textFormatting->theWorks($post->post),
             );
         }
 
