@@ -14,6 +14,7 @@ use Jax\ModControls\ModPosts;
 use Jax\ModControls\ModTopics;
 use Jax\Models\Member;
 use Jax\Models\Post;
+use Jax\Models\Shout;
 use Jax\Page;
 use Jax\Request;
 use Jax\Session;
@@ -423,36 +424,30 @@ final readonly class ModControls
 
             if ($this->config->getSetting('shoutbox')) {
                 $content = '';
-                $result = $this->database->special(
-                    <<<'SQL'
-                        SELECT
-                            m.`display_name` AS `display_name`,
-                            m.`group_id` AS `group_id`,
-                            s.`id` AS `id`,
-                            s.`shout` AS `shout`,
-                            s.`uid` AS `uid`,
-                            UNIX_TIMESTAMP(s.`date`) AS `date`
-                        FROM %t s
-                        LEFT JOIN %t m
-                            ON m.`id`=s.`uid`
-                        WHERE s.`ip`=?
-                        ORDER BY `id`
-                        DESC LIMIT 5
-                        SQL,
-                    [
-                        'shouts',
-                        'members',
-                    ],
-                    $this->ipAddress->asBinary($ipAddress),
+
+                $shouts = Shout::selectMany(
+                    $this->database,
+                    "WHERE `ip`=?
+                    ORDER BY `id`
+                    DESC LIMIT 5",
+                    $this->ipAddress->asBinary($ipAddress)
                 );
-                while ($shout = $this->database->arow($result)) {
-                    $content .= $this->template->meta(
+
+                $members = Member::joinedOn(
+                    $this->database,
+                    $shouts,
+                    static fn(Shout $shout) => $shout->uid,
+                );
+
+                foreach ($shouts as $shout) {
+                    $member = $members[$shout->uid] ?? null;
+                    $content .= $member ? $this->template->meta(
                         'user-link',
-                        $shout['uid'],
-                        $shout['group_id'],
-                        $shout['display_name'],
-                    );
-                    $content .= ': ' . $shout['shout'] . '<br>';
+                        $member->id,
+                        $member->group_id,
+                        $member->display_name,
+                    ) : '';
+                    $content .= ': ' . $shout->shout . '<br>';
                 }
 
                 $page .= $this->box('Last 5 shouts:', $content);
