@@ -32,6 +32,7 @@ final class User
 
         $guestMember = new Member();
         $guestMember->group_id = Groups::Guest->value;
+
         $this->member = $guestMember;
     }
 
