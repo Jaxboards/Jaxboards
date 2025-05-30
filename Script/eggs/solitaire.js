@@ -179,8 +179,6 @@ function solitaireGame(solitaireGameId) {
 
         // append to destination
         state[dest][i].cards = state[dest][i].cards.concat(moving);
-
-        // console.log(state);
     };
 
     const canBePlacedOnCard = (child, parent) => {
@@ -395,8 +393,6 @@ function solitaireGame(solitaireGameId) {
                         height: height,
                     };
                 }
-
-                // console.log(state.moving.destinations);
             }, 200);
         }
     };
@@ -449,7 +445,6 @@ function solitaireGame(solitaireGameId) {
                     state.moving.element.style.top = '';
                     state.moving.element = null;
                     state.moving.capture = false;
-                    // console.log('release');
                 });
             }, 100);
         }

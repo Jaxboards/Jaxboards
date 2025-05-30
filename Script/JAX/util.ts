@@ -98,6 +98,5 @@ export function supportsEmoji(): boolean {
         return width;
     });
 
-    console.log(widths);
     return widths[0] === widths[1];
 }
