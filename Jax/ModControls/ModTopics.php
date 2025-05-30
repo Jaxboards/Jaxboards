@@ -53,35 +53,24 @@ final readonly class ModTopics
     {
         $this->page->command('softurl');
 
-        if ($tid === 0) {
+        $topic = $tid ? Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $tid) : null;
+
+        if (!$topic) {
             return;
         }
 
         if (!$this->user->getGroup()?->can_moderate) {
-            $result = $this->database->special(
-                <<<'SQL'
-                    SELECT `mods`
-                    FROM %t
-                    WHERE `id`=(
-                        SELECT `fid`
-                        FROM %t
-                        WHERE `id`=?
-                    )
-                    SQL,
-                ['forums', 'topics'],
-                $tid,
-            );
-            $mods = $this->database->arow($result);
-            $this->database->disposeresult($result);
+            $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $topic->fid);
 
-            if (!$mods) {
+            if (!$forum || $forum->mods === '') {
                 return;
             }
 
             $mods = array_map(
                 static fn($modId): int => (int) $modId,
-                explode(',', (string) $mods['mods']),
+                explode(',', $forum->mods),
             );
+
             if (!in_array($this->user->get()->id, $mods, true)) {
                 $this->page->command(
                     'error',
