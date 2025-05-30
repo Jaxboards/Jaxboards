@@ -210,7 +210,7 @@ final readonly class ModPosts
             ? Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $topic->fid)
             : null;
 
-        return $forum->mods
+        return $forum?->mods
             ? array_map(static fn($mid): int => (int) $mid, explode(',', $forum->mods))
             : [];
     }

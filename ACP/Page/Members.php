@@ -340,8 +340,15 @@ final readonly class Members
         );
     }
 
-    private function mergeMembers(int $mid1, int $mid2): null
+    private function mergeMembers(int $mid1, int $mid2): ?string
     {
+        $member1 = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid1);
+        $member2 = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid2);
+
+        if ($member1 === null || $member2 === null) {
+            return 'Invalid input, or the accounts may already be merged';
+        }
+
         // Files.
         $this->database->update(
             'files',
@@ -443,9 +450,6 @@ final readonly class Members
         );
 
         // Sum post count on account being merged into.
-        $member1 = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid1);
-        $member2 = Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $mid2);
-
         $member2->posts += $member1->posts ?? 0;
         $member2->update($this->database);
 

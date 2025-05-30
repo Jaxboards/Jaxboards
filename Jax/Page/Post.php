@@ -693,19 +693,16 @@ final class Post
         }
 
         $topic = Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $tid);
+        $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $topic->fid);
 
 
-        if ($topic === null) {
+        if ($topic === null || $forum === null) {
             $error = "The topic you're trying to reply to does not exist.";
             $this->page->append('PAGE', $this->page->error($error));
             $this->page->command('error', $error);
 
             return;
         }
-
-        $forum = $topic !== null
-            ? Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $topic->fid)
-            : null;
 
         $forumPerms = $this->user->getForumPerms($forum->perms);
 

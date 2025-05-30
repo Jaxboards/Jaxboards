@@ -109,7 +109,7 @@ final class Shoutbox
             $member->group_id,
             $member->display_name,
         ) : 'Guest';
-        $avatarUrl = $member->avatar ?: $this->template->meta('default-avatar');
+        $avatarUrl = $member?->avatar ?: $this->template->meta('default-avatar');
         $avatar = $this->config->getSetting('shoutboxava')
             ? "<img src='{$avatarUrl}' class='avatar' alt='avatar' />" : '';
         $deletelink = $this->template->meta('shout-delete', $shout->id);
@@ -121,10 +121,10 @@ final class Shoutbox
         if (mb_substr($message, 0, 4) === '/me ') {
             return $this->template->meta(
                 'shout-action',
-                $this->date->smallDate(
+                $shout->date ? $this->date->smallDate(
                     $shout->date,
                     ['seconds' => true],
-                ),
+                ) : '',
                 $user,
                 mb_substr(
                     $message,
@@ -288,8 +288,8 @@ final class Shoutbox
 
     public function deleteShout(int $delete): void
     {
-        $shout = Shout::selectOne($this->database, Database::WHERE_ID_EQUALS, $delete)?->asArray();
-        $candelete = !$this->user->isGuest() && $this->canDelete($shout);
+        $shout = Shout::selectOne($this->database, Database::WHERE_ID_EQUALS, $delete);
+        $candelete = !$this->user->isGuest() && $shout !== null && $this->canDelete($shout);
 
         if (!$candelete) {
             $this->page->location('?');
