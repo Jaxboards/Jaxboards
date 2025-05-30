@@ -78,16 +78,6 @@ final readonly class Themes
     }
 
     /**
-     * Get skins from database.
-     *
-     * @return array<Skin>
-     */
-    private function getSkins(): array
-    {
-        return Skin::selectMany($this->database, 'ORDER BY title ASC');
-    }
-
-    /**
      * @return array<string>
      */
     private function getWrappers(): array
@@ -317,7 +307,9 @@ final readonly class Themes
         $skins = '';
         $wrappers = $this->getWrappers();
 
-        foreach ($this->getSkins() as $skin) {
+        $skins = Skin::selectMany($this->database, 'ORDER BY title ASC');;
+
+        foreach ($skins as $skin) {
             $wrapperOptions = '';
             foreach ($wrappers as $wrapper) {
                 $wrapperOptions .= $this->page->parseTemplate(
