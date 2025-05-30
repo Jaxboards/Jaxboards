@@ -39,7 +39,7 @@ final readonly class Download
             return;
         }
 
-        $file->downloads++;
+        ++$file->downloads;
         $file->update($this->database);
 
         $ext = explode('.', $file->name);
