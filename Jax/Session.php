@@ -295,24 +295,24 @@ final class Session
 
     public function applyChanges(): void
     {
-        $session = $this->modelsSession;
+        $changedData = $this->changedData;
         $this->set('last_update', $this->database->datetime());
 
         if ($this->modelsSession->is_bot !== 0) {
             // Bots tend to read a lot of content.
-            $session->forumsread = '{}';
-            $session->topicsread = '{}';
+            $changedData['forumsread'] = '{}';
+            $changedData['topicsread'] = '{}';
         }
 
         if (
             $this->modelsSession->last_action === null
         ) {
-            $session->last_action = $this->database->datetime();
+            $changedData['last_action'] = $this->database->datetime();
         }
 
-        if (mb_strlen($session->location_verbose) > 100) {
-            $session->location_verbose = mb_substr(
-                $session->location_verbose,
+        if (mb_strlen($changedData['location_verbose']) > 100) {
+            $changedData['location_verbose'] = mb_substr(
+                $changedData['location_verbose'],
                 0,
                 100,
             );
@@ -327,7 +327,7 @@ final class Session
             'session',
             $this->changedData,
             Database::WHERE_ID_EQUALS,
-            $session->id,
+            $this->modelsSession->id,
         );
     }
 
