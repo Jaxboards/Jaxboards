@@ -120,15 +120,9 @@ final class Forum
 
         if ($forum->redirect !== '') {
             $this->page->command('softurl');
-            $this->database->special(
-                <<<'SQL'
-                    UPDATE %t
-                    SET `redirects` = `redirects` + 1
-                    WHERE `id`=?
-                    SQL,
-                ['forums'],
-                $fid,
-            );
+
+            $forum->redirects++;
+            $forum->update($this->database);
 
             $this->page->location($forum->redirect);
 
