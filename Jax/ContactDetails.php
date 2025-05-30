@@ -34,16 +34,16 @@ final class ContactDetails
      *
      * @return array<string,array{string,string}>
      */
-    public function getContactLinks(Member $profile): array
+    public function getContactLinks(Member $member): array
     {
         $contactFields = array_filter(
             Member::FIELDS,
-            static fn($field): bool => str_starts_with($field, 'contact') && $profile->{$field},
+            static fn($field): bool => str_starts_with($field, 'contact') && $member->{$field},
         );
 
-        return array_reduce($contactFields, static function (array $links, $field) use ($profile) {
+        return array_reduce($contactFields, static function (array $links, $field) use ($member) {
             $type = mb_substr($field, 8);
-            $value = $profile->{$field};
+            $value = $member->{$field};
             $href = sprintf(self::CONTACT_URLS[$type], $value);
             $links[$type] = [$href, $value];
 
