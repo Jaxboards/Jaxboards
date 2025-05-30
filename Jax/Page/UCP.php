@@ -565,7 +565,7 @@ final readonly class UCP
         ];
 
         $birthdate = $this->user->get()->birthdate;
-        $birthdate = $birthdate !== ''
+        $birthdate = $birthdate !== null
             ? Carbon::createFromFormat('Y-m-d', $birthdate, 'UTC')
             : null;
 
@@ -588,7 +588,7 @@ final readonly class UCP
         $thisyear = (int) gmdate('Y');
         for ($year = $thisyear; $year > $thisyear - 100; --$year) {
             $dobselect .= '<option value="' . $year . '"'
-                . ($year === $birthdate->year ? ' selected="selected"' : '')
+                . ($year === $birthdate?->year ? ' selected="selected"' : '')
                 . '>' . $year . '</option>';
         }
 

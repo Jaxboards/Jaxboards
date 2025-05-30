@@ -81,14 +81,11 @@ final class User
             $uid,
         );
 
-        // Password parsing.
-        if (
-            $user !== null
-            && (
-                $pass
-                && !$this->verifyPassword($user, $pass)
-            )
-        ) {
+        if ($user === null) {
+            return $this->member;
+        }
+
+        if ($pass && !$this->verifyPassword($user, $pass)) {
             return $this->member;
         }
 
