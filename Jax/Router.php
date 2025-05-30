@@ -119,7 +119,7 @@ final class Router
         }
 
         return $this->config->getSetting('boardoffline')
-        && !$this->user->getGroup()?->can_view_offline_board;
+        && !$this->user->getGroup()->can_view_offline_board;
     }
 
     /**
