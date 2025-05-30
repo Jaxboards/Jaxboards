@@ -153,7 +153,7 @@ final class Page
         // Custom theme found but files not there, also fallback to default
         if (!is_dir($themePath)) {
             $themePath = $this->domainDefinitions->getDefaultThemePath();
-            $themeUrl = $this->domainDefinitions->getBoardURL() . '/' . $this->config->getSetting('dthemepath');
+            $themeUrl = $this->domainDefinitions->getBoardURL() . '/Service/Themes/Default/';
         }
 
         $this->template->setThemePath($themePath);

@@ -55,6 +55,11 @@ final class Config
         return null;
     }
 
+    public function hasInstalled(): bool
+    {
+        return $this->serviceConfig->hasInstalled();
+    }
+
     /**
      * Write board config.
      *

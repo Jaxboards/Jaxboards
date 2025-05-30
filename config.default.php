@@ -17,7 +17,6 @@ $CFG = json_decode(
             "badnamechars": "@[^\\w' ?]@",
             "boardname": "Example Forums",
             "domain": "example.com",
-            "dthemepath": "Service\/Themes\/Default\/",
             "images": [
                 "jpg",
                 "jpeg",

@@ -134,7 +134,7 @@ final readonly class ServiceInstall
                                     <form id="signup" method="post">
                                         {$errorsHTML}
                                         <label for="service">Service Install</label>
-                                        <input type="checkbox" name="service" value="1" id="service" checked>
+                                        <input type="checkbox" name="service" value="1" id="service">
                                         <br>
                                         {$formFields}
                                         <div class="center">
@@ -216,7 +216,7 @@ final readonly class ServiceInstall
         $adminPassword2 = $this->request->asString->post('admin_password_2');
         $domain = $this->request->asString->post('domain');
         // Are we installing this the service way.
-        $service = (bool) $this->request->post('service');
+        $serviceMode = (bool) $this->request->post('service');
         $sqlHost = $this->request->asString->post('sql_host');
         $sqlUsername = $this->request->asString->post('sql_username');
         $sqlPassword = $this->request->asString->post('sql_password');
@@ -281,13 +281,13 @@ final readonly class ServiceInstall
                 'sql_host' => $sqlHost,
                 'sql_username' => $sqlUsername,
                 'sql_password' => $sqlPassword,
-                'service' => $service,
-                'prefix' => $service ? '' : 'jaxboards',
-                'sql_prefix' => $service ? '' : 'jaxboards_',
+                'service' => $serviceMode,
+                'prefix' => $serviceMode ? '' : 'jaxboards',
+                'sql_prefix' => $serviceMode ? '' : 'jaxboards_',
             ],
         );
 
-        if ($service) {
+        if ($serviceMode) {
             // Create directory table.
             $queries = [
                 'DROP TABLE IF EXISTS `directory`;',
@@ -333,7 +333,7 @@ final readonly class ServiceInstall
             $boardPrefix = $board . '_';
             $this->database->setPrefix($boardPrefix);
 
-            if ($service) {
+            if ($serviceMode) {
                 $this->database->setPrefix('');
                 // Add board to directory.
                 $this->database->insert(
@@ -385,6 +385,7 @@ final readonly class ServiceInstall
 
             // Don't forget to create the admin.
             $member = new Member();
+            $member->id = 1;
             $member->display_name = $adminUsername ?? '';
             $member->email = $adminEmail ?? '';
             $member->group_id = 2;
@@ -401,8 +402,11 @@ final readonly class ServiceInstall
             $this->fileUtils->copyDirectory($this->blueprint->getDirectory(), dirname(__DIR__) . '/boards/' . $board);
         }
 
-        // Send us to the service page.
-        header('Location: ./');
+        if ($serviceMode) {
+            header('Location: ./');
+        } else {
+            header('Location: ../');
+        }
 
         return [];
     }

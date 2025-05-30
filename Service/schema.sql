@@ -386,7 +386,7 @@ CREATE TABLE `blueprint_stats` (
 
 TRUNCATE `blueprint_stats`;
 INSERT INTO `blueprint_stats` (`posts`, `topics`, `members`, `most_members`, `most_members_day`, `last_register`) VALUES
-(4,	2,	1,	0,	0,	NULL);
+(4,	2,	1,	0,	0,	1);
 
 DROP TABLE IF EXISTS `blueprint_textrules`;
 CREATE TABLE `blueprint_textrules` (

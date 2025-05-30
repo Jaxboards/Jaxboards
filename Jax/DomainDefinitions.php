@@ -80,7 +80,7 @@ final class DomainDefinitions
             }
         }
 
-        $this->defaultThemePath = pathjoin(dirname(__DIR__), $this->serviceConfig->getSetting('dthemepath'));
+        $this->defaultThemePath = pathjoin(dirname(__DIR__), 'Service/Themes/Default/');
         $this->serviceThemePath = pathjoin(dirname(__DIR__), 'Service/Themes');
 
         if (!$prefix) {

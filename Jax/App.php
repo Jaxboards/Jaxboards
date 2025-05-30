@@ -51,6 +51,9 @@ final readonly class App
     {
         header('Cache-Control: no-cache, must-revalidate');
 
+        if (!$this->config->hasInstalled()) {
+            $this->page->location('./Service/install.php');
+        }
         if (!$this->domainDefinitions->isBoardFound()) {
             echo 'board not found';
 
