@@ -307,7 +307,8 @@ final readonly class Themes
         $skins = '';
         $wrappers = $this->getWrappers();
 
-        $skins = Skin::selectMany($this->database, 'ORDER BY title ASC');;
+        $skins = Skin::selectMany($this->database, 'ORDER BY title ASC');
+
 
         foreach ($skins as $skin) {
             $wrapperOptions = '';
