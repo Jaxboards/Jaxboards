@@ -167,7 +167,7 @@ final class Topic
     {
         if (
             !$this->user->isGuest()
-            && $modelsTopic->lp_date > $this->user->get('last_visit')
+            && $modelsTopic->lp_date > $this->user->get()->last_visit
         ) {
             $this->markRead($modelsTopic);
         }
@@ -614,7 +614,7 @@ final class Topic
             && ($post->newtopic !== 0
                 ? $this->user->getPerm('can_edit_topics')
                 : $this->user->getPerm('can_edit_posts'))
-            && $post->auth_id === $this->user->get('id');
+            && $post->auth_id === $this->user->get()->id;
     }
 
     private function canModerate(ModelsTopic $modelsTopic): bool
@@ -629,7 +629,7 @@ final class Topic
             $canMod = true;
         }
 
-        if ($this->user->get('mod')) {
+        if ($this->user->get()->mod) {
             $result = $this->database->special(
                 <<<'SQL'
                     SELECT `mods`
@@ -647,7 +647,7 @@ final class Topic
             $this->database->disposeresult($result);
             if (
                 $mods
-                && in_array($this->user->get('id'), explode(',', (string) $mods['mods']), true)
+                && in_array($this->user->get()->id, explode(',', (string) $mods['mods']), true)
             ) {
                 $canMod = true;
             }

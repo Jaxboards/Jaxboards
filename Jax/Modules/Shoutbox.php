@@ -94,7 +94,7 @@ final class Shoutbox
 
         if (
             isset($shout['uid'])
-            && $shout['uid'] === $this->user->get('id')
+            && $shout['uid'] === $this->user->get()->id
         ) {
             return true;
         }
@@ -193,7 +193,7 @@ final class Shoutbox
                 ),
             ) . "<script type='text/javascript'>globalsettings.shoutlimit="
                 . $this->shoutlimit . ';globalsettings.sound_shout='
-                . ($this->user->get('sound_shout') ? 1 : 0)
+                . ($this->user->get()->sound_shout ? 1 : 0)
                 . '</script>',
         );
     }
@@ -354,7 +354,7 @@ final class Shoutbox
         $shout->date = $this->database->datetime();
         $shout->ip = $this->ipAddress->asBinary() ?? '';
         $shout->shout = $shoutBody;
-        $shout->uid = (int) $this->user->get('id');
+        $shout->uid = (int) $this->user->get()->id;
         $shout->insert($this->database);
 
         $this->hooks->dispatch('shout', $shout);

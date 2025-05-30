@@ -16,25 +16,26 @@ use const PASSWORD_DEFAULT;
 
 final class User
 {
+    private Member $member;
+
     public function __construct(
         private readonly Database $database,
         private readonly Jax $jax,
         private readonly IPAddress $ipAddress,
         // Exposing these for testing
-        private ?Member $member = null,
+        ?Member $member = null,
         public ?Group $userPerms = null,
-    ) {}
-
-    public function get(string $property): null|int|string
-    {
-        if ($this->member === null) {
-            return match ($property) {
-                'group_id' => Groups::Guest->value,
-                default => null,
-            };
+    ) {
+        if ($member === null) {
+            $guestMember = new Member();
+            $guestMember->group_id = Groups::Guest->value;
+            $this->member = $guestMember;
         }
+    }
 
-        return $this->member->{$property} ?? null;
+    public function get(): Member
+    {
+        return $this->member;
     }
 
     public function set(string $property, null|int|string $value): void
@@ -47,23 +48,25 @@ final class User
      */
     public function setBulk(array $fields): void
     {
-        if ($this->member !== null) {
-            foreach ($fields as $key => $value) {
-                $this->member->{$key} = $value;
-            }
+        if ($this->isGuest()) {
+            return;
+        }
+
+        foreach ($fields as $key => $value) {
+            $this->member->{$key} = $value;
         }
 
         $this->database->update(
             'members',
             $fields,
             ' WHERE `id`=?',
-            $this->get('id'),
+            $this->member->id,
         );
     }
 
     public function getUser(?int $uid = null, ?string $pass = null): ?Member
     {
-        if ($this->member || !$uid) {
+        if ($this->member->id !== 0 || !$uid) {
             return $this->member;
         }
 
@@ -102,7 +105,7 @@ final class User
 
         $groupId = match (true) {
             $this->isBanned() => Groups::Banned->value,
-            $this->member !== null => $this->get('group_id'),
+            $this->member !== null => $this->member->group_id,
             default => null,
         };
 
@@ -128,7 +131,7 @@ final class User
         // the bitflag as determined by the user's group.
         $parsedPerms = $this->jax->parseForumPerms($forumPerms);
 
-        $permFlags = $parsedPerms[$this->get('group_id')] ?? null;
+        $permFlags = $parsedPerms[$this->member->group_id] ?? null;
 
         // Null $permFlags means to fall back to global permissions.
         if ($permFlags !== null) {
@@ -149,12 +152,12 @@ final class User
 
     public function isAdmin(): bool
     {
-        return $this->get('group_id') === Groups::Admin->value;
+        return $this->member->group_id === Groups::Admin->value;
     }
 
     public function isBanned(): bool
     {
-        if ($this->get('group_id') === Groups::Banned->value) {
+        if ($this->member->group_id === Groups::Banned->value) {
             return true;
         }
 
@@ -163,7 +166,7 @@ final class User
 
     public function isGuest(): bool
     {
-        return !$this->getUser();
+        return $this->member->group_id === Groups::Guest->value;
     }
 
     /**

@@ -42,8 +42,8 @@ final readonly class Comments
         ) {
             $tabHTML .= $this->template->meta(
                 'userprofile-comment-form',
-                $this->user->get('name') ?? '',
-                $this->user->get('avatar') ?: $this->template->meta('default-avatar'),
+                $this->user->get()->name ?? '',
+                $this->user->get()->avatar ?: $this->template->meta('default-avatar'),
                 $this->jax->hiddenFormFields(
                     [
                         'act' => 'vu' . $member->id,
@@ -63,7 +63,7 @@ final readonly class Comments
         foreach ($comments as $comment) {
             $act = $this->request->asString->both('act');
             $deleteLink = $this->user->getPerm('can_delete_comments')
-                && $comment['from'] === $this->user->get('id')
+                && $comment['from'] === $this->user->get()->id
                 || $this->user->getPerm('can_moderate') ? <<<HTML
                     <a href="?act={$act}&page=comments&del={$comment['id']}" class="delete">[X]</a>
                     HTML
@@ -144,13 +144,13 @@ final readonly class Comments
         $activity->affected_uid = $member->id;
         $activity->date = $this->database->datetime();
         $activity->type = 'profile_comment';
-        $activity->uid = (int) $this->user->get('id');
+        $activity->uid = (int) $this->user->get()->id;
         $activity->insert($this->database);
 
         $profileComment = new ProfileComment();
         $profileComment->comment = $comment;
         $profileComment->date = $this->database->datetime();
-        $profileComment->from = $this->user->get('id');
+        $profileComment->from = $this->user->get()->id;
         $profileComment->to = $member->id;
         $profileComment->insert($this->database);
 
@@ -184,7 +184,7 @@ final readonly class Comments
             'profile_comments',
             'WHERE `id`=? AND `from`=?',
             $deleteComment,
-            (int) $this->user->get('id'),
+            (int) $this->user->get()->id,
         );
     }
 }

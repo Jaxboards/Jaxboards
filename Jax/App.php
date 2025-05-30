@@ -105,7 +105,7 @@ final readonly class App
         if (
             !$this->user->isGuest()
             && $this->session->get()->ip
-            && $this->session->get()->ip !== $this->user->get('ip')
+            && $this->session->get()->ip !== $this->user->get()->ip
         ) {
             $this->user->set('ip', $this->ipAddress->asBinary());
         }
@@ -116,10 +116,11 @@ final readonly class App
         // this fixes it.
         if (
             !$this->session->get()->is_bot
-            && $this->user->get('id') !== $this->session->get()->uid
+            && $this->user->get()->id !== 0
+            && $this->user->get()->id !== $this->session->get()->uid
         ) {
-            $this->session->clean((int) $this->user->get('id'));
-            $this->session->set('uid', $this->user->get('id'));
+            $this->session->clean((int) $this->user->get()->id);
+            $this->session->set('uid', $this->user->get()->id);
             $this->session->applychanges();
         }
 
@@ -173,7 +174,7 @@ final readonly class App
     {
         $this->page->loadSkin(
             $this->session->getVar('skin_id')
-            ?: $this->user->get('skin_id'),
+            ?: $this->user->get()->skin_id,
         );
         $this->template->loadMeta('global');
 
@@ -213,7 +214,7 @@ final readonly class App
             '<script src="' . $this->domainDefinitions->getBoardURL() . '/dist/app.js" defer></script>',
         );
 
-        if ($this->user->getPerm('can_moderate') || $this->user->get('mod')) {
+        if ($this->user->getPerm('can_moderate') || $this->user->get()->mod) {
             $this->page->append(
                 'SCRIPT',
                 '<script type="text/javascript" src="?act=modcontrols&do=load" defer></script>',
@@ -249,11 +250,11 @@ final readonly class App
             ),
         );
         $numMessages = 0;
-        if ($this->user->get('id')) {
+        if ($this->user->get()->id) {
             $numMessages = Message::count(
                 $this->database,
                 'WHERE `read`=0 AND `to`=?',
-                $this->user->get('id'),
+                $this->user->get()->id,
             );
 
             if ($numMessages) {
@@ -291,12 +292,12 @@ final readonly class App
                 'userbox-logged-in',
                 $this->template->meta(
                     'user-link',
-                    $this->user->get('id'),
-                    $this->user->get('group_id'),
-                    $this->user->get('display_name'),
+                    $this->user->get()->id,
+                    $this->user->get()->group_id,
+                    $this->user->get()->display_name,
                 ),
                 $this->date->smallDate(
-                    (int) $this->user->get('last_visit'),
+                    (int) $this->user->get()->last_visit,
                 ),
                 $numMessages,
             ),
@@ -352,23 +353,23 @@ final readonly class App
             return;
         }
 
-        $this->template->addVar('groupid', (string) $this->user->get('group_id'));
-        $this->template->addVar('userposts', (string) $this->user->get('posts'));
+        $this->template->addVar('groupid', (string) $this->user->get()->group_id);
+        $this->template->addVar('userposts', (string) $this->user->get()->posts);
         $this->template->addVar('grouptitle', (string) $this->user->getPerm('title'));
-        $this->template->addVar('avatar', (string) $this->user->get('avatar') ?: $this->template->meta('default-avatar'));
-        $this->template->addVar('username', (string) $this->user->get('display_name'));
-        $this->template->addVar('userid', (string) $this->user->get('id') ?: '0');
+        $this->template->addVar('avatar', (string) $this->user->get()->avatar ?: $this->template->meta('default-avatar'));
+        $this->template->addVar('username', (string) $this->user->get()->display_name);
+        $this->template->addVar('userid', (string) $this->user->get()->id ?: '0');
 
         $this->page->append(
             'SCRIPT',
             '<script>window.globalsettings='
             . json_encode([
                 'can_im' => $this->user->getPerm('can_im'),
-                'groupid' => $this->user->get('group_id'),
-                'sound_im' => $this->user->get('sound_im'),
-                'userid' => $this->user->get('id'),
-                'username' => $this->user->get('display_name'),
-                'wysiwyg' => $this->user->get('wysiwyg'),
+                'groupid' => $this->user->get()->group_id,
+                'sound_im' => $this->user->get()->sound_im,
+                'userid' => $this->user->get()->id,
+                'username' => $this->user->get()->display_name,
+                'wysiwyg' => $this->user->get()->wysiwyg,
             ])
             . '</script>',
         );

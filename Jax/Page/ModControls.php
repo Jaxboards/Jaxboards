@@ -58,7 +58,7 @@ final readonly class ModControls
     {
         if (
             !$this->user->getPerm('can_moderate')
-            && !$this->user->get('mod')
+            && !$this->user->get()->mod
         ) {
             $this->page->command('softurl');
             $this->page->command(
@@ -220,10 +220,10 @@ final readonly class ModControls
         }
 
         if (
-            $this->user->get('group_id') !== 2
+            $this->user->get()->group_id !== 2
             || $member->group_id === 2
-            && ($this->user->get('id') !== 1
-                && $member->id !== $this->user->get('id'))
+            && ($this->user->get()->id !== 1
+                && $member->id !== $this->user->get()->id)
         ) {
             return $this->template->meta('error', 'You do not have permission to edit this profile.');
         }

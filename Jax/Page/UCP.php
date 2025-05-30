@@ -56,7 +56,7 @@ final readonly class UCP
     {
         if (
             $this->user->isGuest()
-            || $this->user->get('group_id') === Groups::Banned->value
+            || $this->user->get()->group_id === Groups::Banned->value
         ) {
             $this->page->location('?');
 
@@ -119,13 +119,13 @@ final readonly class UCP
             }
         }
 
-        $ucpnotepad = (string) $this->user->get('ucpnotepad');
+        $ucpnotepad = (string) $this->user->get()->ucpnotepad;
 
         return ($error !== null ? $this->template->meta('error', $error) : '') . $this->template->meta(
             'ucp-index',
             $this->jax->hiddenFormFields(['act' => 'ucp']),
-            $this->user->get('display_name'),
-            $this->user->get('avatar') ?: $this->template->meta('default-avatar'),
+            $this->user->get()->display_name,
+            $this->user->get()->avatar ?: $this->template->meta('default-avatar'),
             trim($ucpnotepad) !== ''
                 ? $this->textFormatting->blockhtml($ucpnotepad) : 'Personal notes go here.',
         );
@@ -192,7 +192,7 @@ final readonly class UCP
 
     private function showSigSettings(): string
     {
-        $sig = (string) $this->user->get('sig');
+        $sig = (string) $this->user->get()->sig;
         $changeSig = $this->request->asString->post('changesig');
         if ($changeSig !== null) {
             $sig = $this->textFormatting->linkify($changeSig);
@@ -233,7 +233,7 @@ final readonly class UCP
 
             $verifiedPassword = password_verify(
                 (string) $currentPassword,
-                (string) $this->user->get('pass'),
+                (string) $this->user->get()->pass,
             );
             if (!$verifiedPassword) {
                 $error = 'The password you entered is incorrect.';
@@ -288,8 +288,8 @@ final readonly class UCP
                 . '<br><br><a href="?act=ucp&what=email">Back</a>';
         }
 
-        $email = $this->user->get('email');
-        $emailSettings = (int) $this->user->get('email_settings');
+        $email = $this->user->get()->email;
+        $emailSettings = (int) $this->user->get()->email_settings;
         $notificationsChecked = ($emailSettings & 2) !== 0 ? 'checked' : '';
         $adminEmailsChecked = ($emailSettings & 1) !== 0 ? 'checked' : '';
 
@@ -305,7 +305,7 @@ final readonly class UCP
                         name="email"
                         aria-label="Email"
                         title="Enter your new email address"
-                        value="{$this->user->get('email')}" />
+                        value="{$this->user->get()->email}" />
                     HTML,
                 (bool) $email => <<<HTML
                     <strong>{$email}</strong>
@@ -327,7 +327,7 @@ final readonly class UCP
     private function showAvatarSettings(): string
     {
         $error = null;
-        $avatar = (string) $this->user->get('avatar');
+        $avatar = (string) $this->user->get()->avatar;
         $changedAvatar = $this->request->asString->post('changedava');
         if ($changedAvatar !== null) {
             if (
@@ -391,7 +391,7 @@ final readonly class UCP
 
         // Begin input checking.
         if ($data['display_name'] === '') {
-            $data['display_name'] = (string) $this->user->get('name');
+            $data['display_name'] = (string) $this->user->get()->name;
         }
 
         $badNameChars = $this->config->getSetting('badnamechars');
@@ -406,7 +406,7 @@ final readonly class UCP
             $this->database,
             'WHERE `display_name` = ? AND `id`!=? LIMIT 1',
             $data['display_name'],
-            $this->user->get('id'),
+            $this->user->get()->id,
         );
         if ($members !== []) {
             return 'That display name is already in use.';
@@ -505,13 +505,13 @@ final readonly class UCP
             return "{$fieldLabel} must be less than {$length} characters.";
         }
 
-        if ($data['display_name'] !== $this->user->get('display_name')) {
+        if ($data['display_name'] !== $this->user->get()->display_name) {
             $activity = new Activity();
-            $activity->arg1 = (string) $this->user->get('display_name');
+            $activity->arg1 = (string) $this->user->get()->display_name;
             $activity->arg2 = $data['display_name'];
             $activity->date = $this->database->datetime();
             $activity->type = 'profile_name_change';
-            $activity->uid = (int) $this->user->get('id');
+            $activity->uid = (int) $this->user->get()->id;
             $activity->insert($this->database);
         }
 
@@ -537,7 +537,7 @@ final readonly class UCP
 
         $genderselect = '<select name="gender" title="Your gender" aria-label="Gender">';
         foreach (['', 'male', 'female', 'other'] as $gender) {
-            $genderSelected = $this->user->get('gender') === $gender
+            $genderSelected = $this->user->get()->gender === $gender
                 ? 'selected'
                 : '';
             $genderDisplay = ucfirst($gender) ?: 'Not telling';
@@ -565,14 +565,14 @@ final readonly class UCP
         ];
         foreach ($fullMonthNames as $index => $monthName) {
             $dobselect .= '<option value="' . ($index + 1) . '"'
-                . ($index + 1 === $this->user->get('dob_month') ? ' selected="selected"' : '')
+                . ($index + 1 === $this->user->get()->dob_month ? ' selected="selected"' : '')
                 . '>' . $monthName . '</option>';
         }
 
         $dobselect .= '</select><select name="dob_day" title="Day"><option value="">--</option>';
         for ($day = 1; $day < 32; ++$day) {
             $dobselect .= '<option value="' . $day . '"'
-                . ($day === $this->user->get('dob_day') ? ' selected="selected"' : '')
+                . ($day === $this->user->get()->dob_day ? ' selected="selected"' : '')
                 . '>' . $day . '</option>';
         }
 
@@ -581,7 +581,7 @@ final readonly class UCP
         $thisyear = (int) gmdate('Y');
         for ($year = $thisyear; $year > $thisyear - 100; --$year) {
             $dobselect .= '<option value="' . $year . '"'
-                . ($year === $this->user->get('dob_year') ? ' selected="selected"' : '')
+                . ($year === $this->user->get()->dob_year ? ' selected="selected"' : '')
                 . '>' . $year . '</option>';
         }
 
@@ -591,25 +591,25 @@ final readonly class UCP
             'ucp-profile-settings',
             $this->getlocationforform()
                 . $this->jax->hiddenFormFields(['submit' => 'true']),
-            $this->user->get('name'),
-            $this->user->get('display_name'),
-            $this->user->get('full_name'),
-            $this->user->get('usertitle'),
-            $this->user->get('about'),
-            $this->user->get('location'),
+            $this->user->get()->name,
+            $this->user->get()->display_name,
+            $this->user->get()->full_name,
+            $this->user->get()->usertitle,
+            $this->user->get()->about,
+            $this->user->get()->location,
             $genderselect,
             $dobselect,
-            $this->user->get('contact_skype'),
-            $this->user->get('contact_discord'),
-            $this->user->get('contact_yim'),
-            $this->user->get('contact_msn'),
-            $this->user->get('contact_gtalk'),
-            $this->user->get('contact_aim'),
-            $this->user->get('contact_youtube'),
-            $this->user->get('contact_steam'),
-            $this->user->get('contact_twitter'),
-            $this->user->get('contact_bluesky'),
-            $this->user->get('website'),
+            $this->user->get()->contact_skype,
+            $this->user->get()->contact_discord,
+            $this->user->get()->contact_yim,
+            $this->user->get()->contact_msn,
+            $this->user->get()->contact_gtalk,
+            $this->user->get()->contact_aim,
+            $this->user->get()->contact_youtube,
+            $this->user->get()->contact_steam,
+            $this->user->get()->contact_twitter,
+            $this->user->get()->contact_bluesky,
+            $this->user->get()->website,
         );
     }
 
@@ -647,7 +647,7 @@ final readonly class UCP
     private function showBoardSettings(): string
     {
         $error = null;
-        $skinId = $this->user->get('skin_id');
+        $skinId = $this->user->get()->skin_id;
         $page = '';
         if ($this->request->both('skin') !== null) {
             $error = $this->saveBoardSettings();
@@ -656,7 +656,7 @@ final readonly class UCP
             }
         }
 
-        $skins = $this->user->get('group_id') !== 2
+        $skins = $this->user->get()->group_id !== 2
             ? Skin::selectMany($this->database, 'WHERE `hidden`!=1 ORDER BY `title` ASC')
             : Skin::selectMany($this->database, 'ORDER BY `title` ASC');
         $select = '';
@@ -676,10 +676,10 @@ final readonly class UCP
             $this->getlocationforform(),
             $select,
             '<input type="checkbox" name="usewordfilter" title="Use Word Filter"'
-                . ($this->user->get('nowordfilter') ? '' : ' checked="checked"')
+                . ($this->user->get()->nowordfilter ? '' : ' checked="checked"')
                 . ' />',
             '<input type="checkbox" name="wysiwyg" title="WYSIWYG Enabled"'
-                . ($this->user->get('wysiwyg') ? ' checked="checked"' : '')
+                . ($this->user->get()->wysiwyg ? ' checked="checked"' : '')
                 . ' />',
         );
     }

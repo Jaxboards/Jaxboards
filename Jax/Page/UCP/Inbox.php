@@ -116,7 +116,7 @@ final readonly class Inbox
             $message->date = $this->database->datetime();
             $message->del_recipient = 0;
             $message->del_sender = 0;
-            $message->from = (int) $this->user->get('id');
+            $message->from = (int) $this->user->get()->id;
             $message->message = $this->request->asString->post('message') ?? '';
             $message->read = 0;
             $message->title = $title
@@ -129,7 +129,7 @@ final readonly class Inbox
             $cmd = json_encode(
                 [
                     'newmessage',
-                    'You have a new message from ' . $this->user->get('display_name'),
+                    'You have a new message from ' . $this->user->get()->display_name,
                     $message->id,
                 ],
             ) . PHP_EOL;
@@ -147,9 +147,9 @@ final readonly class Inbox
             if (($udata->email_settings & 2) !== 0) {
                 $this->jax->mail(
                     $udata->email,
-                    'PM From ' . $this->user->get('display_name'),
+                    'PM From ' . $this->user->get()->display_name,
                     "You are receiving this email because you've "
-                        . 'received a message from ' . $this->user->get('display_name')
+                        . 'received a message from ' . $this->user->get()->display_name
                         . ' on {BOARDLINK}.<br>'
                         . '<br>Please go to '
                         . "<a href='{BOARDURL}?act=ucp&what=inbox'>"
@@ -171,8 +171,8 @@ final readonly class Inbox
             $message = Message::selectOne(
                 $this->database,
                 'WHERE (`to`=? OR `from`=?) AND `id`=?',
-                $this->user->get('id'),
-                $this->user->get('id'),
+                $this->user->get()->id,
+                $this->user->get()->id,
                 $messageid,
             );
 
@@ -232,8 +232,8 @@ final readonly class Inbox
             return;
         }
 
-        $isRecipient = $message->to === $this->user->get('id');
-        $isSender = $message->from === $this->user->get('id');
+        $isRecipient = $message->to === $this->user->get()->id;
+        $isSender = $message->from === $this->user->get()->id;
 
         if ($isRecipient) {
             $message->del_recipient = 1;
@@ -280,7 +280,7 @@ final readonly class Inbox
             default => 'WHERE `to`=? AND !`del_recipient`',
         };
 
-        return Message::count($this->database, $criteria, $this->user->get('id')) ?? 0;
+        return Message::count($this->database, $criteria, $this->user->get()->id) ?? 0;
     }
 
     /**
@@ -299,7 +299,7 @@ final readonly class Inbox
             "{$criteria}
                 ORDER BY date DESC
                 LIMIT ?, ?",
-            $this->user->get('id'),
+            $this->user->get()->id,
             $pageNumber * self::MESSAGES_PER_PAGE,
             self::MESSAGES_PER_PAGE,
         );
@@ -313,7 +313,7 @@ final readonly class Inbox
             $this->database,
             'WHERE `id`=? AND `to`=?',
             $messageId,
-            $this->user->get('id'),
+            $this->user->get()->id,
         );
 
         if ($message !== null) {
@@ -344,8 +344,8 @@ final readonly class Inbox
             return 'This message does not exist';
         }
 
-        $userIsRecipient = $message->to === $this->user->get('id');
-        $userIsSender = $message->from === $this->user->get('id');
+        $userIsRecipient = $message->to === $this->user->get()->id;
+        $userIsSender = $message->from === $this->user->get()->id;
 
         if (!$userIsRecipient && !$userIsSender) {
             return "You don't have permission to view this message.";

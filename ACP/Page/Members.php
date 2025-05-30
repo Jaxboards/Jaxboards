@@ -157,8 +157,8 @@ final readonly class Members
             $member = $members[0];
             if (
                 $member->group_id === Groups::Admin->value
-                && $this->user->get('id') !== 1
-                && $this->user->get('id') !== $member->id
+                && $this->user->get()->id !== 1
+                && $this->user->get()->id !== $member->id
             ) {
                 $page = $this->page->error('You do not have permission to edit this profile. ');
             } else {
@@ -211,7 +211,7 @@ final readonly class Members
         $memberId = (int) $this->request->asString->both('mid');
         $password = $this->request->asString->post('password');
 
-        if ($member->group_id === 2 && $this->user->get('id') !== 1) {
+        if ($member->group_id === 2 && $this->user->get()->id !== 1) {
             return $this->page->error(
                 'You do not have permission to edit this profile.',
             );
@@ -625,7 +625,7 @@ final readonly class Members
             $message->del_recipient = 0;
             $message->del_sender = 0;
             $message->flag = 0;
-            $message->from = (int) $this->user->get('id');
+            $message->from = (int) $this->user->get()->id;
             $message->message = $messageBody;
             $message->read = 0;
             $message->title = $title;

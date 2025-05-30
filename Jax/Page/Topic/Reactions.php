@@ -180,13 +180,13 @@ final readonly class Reactions
             $ratings[$nibletid] = [];
         }
 
-        $unrate = in_array($this->user->get('id'), $ratings[$nibletid], true);
+        $unrate = in_array($this->user->get()->id, $ratings[$nibletid], true);
         // Unrate
         if ($unrate) {
-            $ratings[$nibletid] = array_diff($ratings[$nibletid], [$this->user->get('id')]);
+            $ratings[$nibletid] = array_diff($ratings[$nibletid], [$this->user->get()->id]);
         } else {
             // Rate
-            $ratings[$nibletid][] = $this->user->get('id');
+            $ratings[$nibletid][] = $this->user->get()->id;
         }
 
         $post->rating = json_encode($ratings) ?: $post->rating;

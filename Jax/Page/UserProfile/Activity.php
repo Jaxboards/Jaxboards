@@ -79,7 +79,7 @@ final readonly class Activity
             'user-link',
             $activity['uid'],
             $activity['group_id'],
-            $this->user->get('id') === $activity['uid'] ? 'You' : $activity['name'],
+            $this->user->get()->id === $activity['uid'] ? 'You' : $activity['name'],
         );
         $otherguy = $this->template->meta(
             'user-link',

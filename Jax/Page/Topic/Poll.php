@@ -67,7 +67,7 @@ final readonly class Poll
         $voted = false;
         foreach ($results as $result) {
             foreach ($result as $voterId) {
-                if ($voterId === $this->user->get('id')) {
+                if ($voterId === $this->user->get()->id) {
                     $voted = true;
 
                     break;
@@ -108,11 +108,11 @@ final readonly class Poll
         if (is_array($choice)) {
             if ($topic->poll_type === 'multi') {
                 foreach ($choice as $c) {
-                    $results[$c][] = $this->user->get('id');
+                    $results[$c][] = $this->user->get()->id;
                 }
             }
         } else {
-            $results[$choice][] = $this->user->get('id');
+            $results[$choice][] = $this->user->get()->id;
         }
 
         $presults = [];
@@ -158,7 +158,7 @@ final readonly class Poll
             $totalvotes += ($numvotes[$optionIndex] = count($voters));
             if (
                 !$this->user->isGuest()
-                && in_array($this->user->get('id'), $voters, true)
+                && in_array($this->user->get()->id, $voters, true)
             ) {
                 $voted = true;
             }

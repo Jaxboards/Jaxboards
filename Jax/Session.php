@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Jax;
 
 use Carbon\Carbon;
+use Error;
 use Jax\Models\Session as ModelsSession;
 use Jax\Models\Token;
+use PhpParser\Node\Expr;
 
 use function base64_encode;
 use function ini_set;
@@ -179,6 +181,9 @@ final class Session
 
     public function set(string $field, mixed $value): void
     {
+        if ($field === 'uid') {
+            throw new Error();
+        }
         $this->modelsSession->{$field} = $value;
         $this->changedData[$field] = $value;
     }
@@ -381,7 +386,7 @@ final class Session
         $session->last_update = $actionTime;
         $session->useragent = $this->request->getUserAgent() ?? '';
 
-        $uid = (int) $this->user->get('id');
+        $uid = $this->user->get()->id;
         if ($uid !== 0) {
             $session->uid = $uid;
         }

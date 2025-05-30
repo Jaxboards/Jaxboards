@@ -82,7 +82,7 @@ final readonly class ModTopics
                 static fn($modId): int => (int) $modId,
                 explode(',', (string) $mods['mods']),
             );
-            if (!in_array($this->user->get('id'), $mods, true)) {
+            if (!in_array($this->user->get()->id, $mods, true)) {
                 $this->page->command(
                     'error',
                     "You don't have permission to be moderating in this forum",

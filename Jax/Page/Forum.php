@@ -500,7 +500,7 @@ final class Forum
         return $timestamp <= (
             max($this->topicsRead[$topic->id], $forumReadTime)
             ?: $this->session->get()->read_date
-            ?: $this->user->get('last_visit')
+            ?: $this->user->get()->last_visit
         );
     }
 
@@ -519,7 +519,7 @@ final class Forum
         return $this->database->datetimeAsTimestamp($modelsForum->lp_date) <= (
             $this->forumsRead[$modelsForum->id] ?? null
             ?: $this->database->datetimeAsTimestamp($this->session->get()->read_date)
-            ?: $this->database->datetimeAsTimestamp($this->user->get('last_visit'))
+            ?: $this->database->datetimeAsTimestamp($this->user->get()->last_visit)
         );
     }
 

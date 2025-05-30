@@ -52,7 +52,7 @@ final readonly class PrivateMessage
 
     public function filter(): void
     {
-        $enemies = $this->user->get('enemies');
+        $enemies = $this->user->get()->enemies;
         if (!$enemies) {
             return;
         }
@@ -111,13 +111,13 @@ final readonly class PrivateMessage
         $cmd = [
             'im',
             $uid,
-            $this->user->get('display_name'),
+            $this->user->get()->display_name,
             $instantMessage,
-            $this->user->get('id'),
+            $this->user->get()->id,
             Carbon::now('UTC')->getTimestamp(),
         ];
         $this->page->command(...$cmd);
-        $cmd[1] = $this->user->get('id');
+        $cmd[1] = $this->user->get()->id;
         $cmd[4] = 0;
 
         if ($this->sendcmd($cmd, $uid)) {

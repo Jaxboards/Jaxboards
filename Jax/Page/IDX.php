@@ -618,7 +618,7 @@ final class IDX
         return $this->database->datetimeAsTimestamp($forum->lp_date) < max(
             $this->forumsread[$forum->id],
             $this->database->datetimeAsTimestamp($this->session->get()->read_date),
-            $this->database->datetimeAsTimestamp($this->user->get('last_visit')),
+            $this->database->datetimeAsTimestamp($this->user->get()->last_visit),
         );
     }
 }
