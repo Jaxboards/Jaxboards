@@ -149,7 +149,10 @@ final readonly class Themes
         $validWrappers = $this->getWrappers();
 
         foreach ($wrappers as $skinId => $wrapperName) {
-            if ($wrapperName && !in_array($wrapperName, $validWrappers, true)) {
+            if (
+                $wrapperName
+                && !in_array($wrapperName, $validWrappers, true)
+            ) {
                 continue;
             }
 
