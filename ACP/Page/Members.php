@@ -70,8 +70,8 @@ final readonly class Members
 
     private function showMain(): void
     {
-        $members = Member::selectMany($this->database, "ORDER BY `display_name` ASC");
-        $groups = Group::joinedOn($this->database, $members, static fn(Member $member) => $member->group_id);
+        $members = Member::selectMany($this->database, 'ORDER BY `display_name` ASC');
+        $groups = Group::joinedOn($this->database, $members, static fn(Member $member): int => $member->group_id);
 
         $rows = '';
         foreach ($members as $member) {
