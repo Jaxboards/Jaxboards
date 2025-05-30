@@ -108,7 +108,7 @@ final readonly class Reactions
             return '';
         }
 
-        $prating = $post->rating !== '' && $post->rating !== '0'
+        $prating = $post->rating !== ''
             ? json_decode($post->rating, true)
             : [];
         $postratingbuttons = '';

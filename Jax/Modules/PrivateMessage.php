@@ -38,7 +38,6 @@ final readonly class PrivateMessage
         $uid = (int) $this->request->asString->post('im_uid');
         if (
             $this->session->get()->runonce !== ''
-            && $this->session->get()->runonce !== '0'
         ) {
             $this->filter();
         }

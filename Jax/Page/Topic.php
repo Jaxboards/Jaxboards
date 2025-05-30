@@ -210,7 +210,7 @@ final class Topic
         $this->session->addVar('topic_lastpage', $this->pageNumber + 1 === $totalpages);
 
         // If it's a poll, put it in.
-        $poll = $modelsTopic->poll_type !== '' && $modelsTopic->poll_type !== '0'
+        $poll = $modelsTopic->poll_type !== ''
             ? $this->poll->render($modelsTopic)
             : '';
 

@@ -498,7 +498,6 @@ final class IDX
         $list = [];
         if (
             $this->session->get()->users_online_cache !== ''
-            && $this->session->get()->users_online_cache !== '0'
         ) {
             $oldcache = array_flip(explode(',', $this->session->get()->users_online_cache));
         }
