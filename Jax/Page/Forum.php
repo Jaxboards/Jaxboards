@@ -520,8 +520,8 @@ final class Forum
 
         return $this->database->datetimeAsTimestamp($modelsForum->lp_date) <= (
             $this->forumsRead[$modelsForum->id] ?? null
-            ?: $this->session->get()->read_date
-            ?: $this->user->get('last_visit')
+            ?: $this->database->datetimeAsTimestamp($this->session->get()->read_date)
+            ?: $this->database->datetimeAsTimestamp($this->user->get('last_visit'))
         );
     }
 
@@ -529,6 +529,6 @@ final class Forum
     {
         $forumsread = $this->jax->parseReadMarkers($this->session->get()->forumsread);
         $forumsread[$id] = Carbon::now('UTC')->getTimestamp();
-        $this->session->set('forumsread', json_encode($forumsread, JSON_NUMERIC_CHECK));
+        $this->session->set('forumsread', json_encode($forumsread));
     }
 }

@@ -338,9 +338,9 @@ class Database
         return gmdate(self::DATE_TIME, $timestamp);
     }
 
-    public function datetimeAsTimestamp(string $datetime): int
+    public function datetimeAsTimestamp(?string $datetime): int
     {
-        return Carbon::createFromFormat(self::DATE_TIME, $datetime, 'UTC')?->getTimestamp() ?? 0;
+        return $datetime ? Carbon::createFromFormat(self::DATE_TIME, $datetime, 'UTC')?->getTimestamp() ?? 0 : 0;
     }
 
     /**
