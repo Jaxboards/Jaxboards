@@ -70,30 +70,18 @@ final readonly class Members
 
     private function showMain(): void
     {
-        $result = $this->database->special(
-            <<<'SQL'
-                SELECT
-                    m.`id` AS `id`,
-                    m.`avatar` AS `avatar`,
-                    m.`display_name` AS `display_name`,
-                    m.`group_id` AS `group_id`,
-                    g.`title` AS `group_title`
-                FROM %t m
-                LEFT JOIN %t g
-                    ON m.`group_id`=g.`id`
-                ORDER BY m.`display_name` ASC
-                SQL,
-            ['members', 'member_groups'],
-        );
+        $members = Member::selectMany($this->database, "ORDER BY `display_name` ASC");
+        $groups = Group::joinedOn($this->database, $members, static fn(Member $member) => $member->group_id);
+
         $rows = '';
-        while ($member = $this->database->arow($result)) {
+        foreach ($members as $member) {
             $rows .= $this->page->parseTemplate(
                 'members/show-main-row.html',
                 [
-                    'avatar_url' => $member['avatar'] ?: self::DEFAULT_AVATAR,
-                    'group_title' => $member['group_title'],
-                    'id' => $member['id'],
-                    'title' => $member['display_name'],
+                    'avatar_url' => $member->avatar ?: self::DEFAULT_AVATAR,
+                    'group_title' => $groups[$member->group_id]->title,
+                    'id' => $member->id,
+                    'title' => $member->display_name,
                 ],
             );
         }
