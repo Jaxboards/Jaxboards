@@ -182,22 +182,22 @@ final readonly class ProfileTabs
 
         $posts = Post::selectMany(
             $this->database,
-            "WHERE auth_id = ?
+            'WHERE auth_id = ?
             ORDER BY id DESC
-            LIMIT 10",
-            $member->id
+            LIMIT 10',
+            $member->id,
         );
 
         $topics = Topic::joinedOn(
             $this->database,
             $posts,
-            fn(Post $post) => $post->tid
+            static fn(Post $post): int => $post->tid,
         );
 
         $forums = Forum::joinedOn(
             $this->database,
             $topics,
-            fn(Topic $topic) => $topic->fid,
+            static fn(Topic $topic): ?int => $topic->fid,
         );
 
         foreach ($posts as $post) {
