@@ -849,7 +849,7 @@ final class Topic
         );
         $posts = Post::selectMany(
             $this->database,
-            Database::WHERE_ID_IN,
+            Database::WHERE_ID_EQUALS,
             $modelsTopic->id,
         );
         $authors = $this->fetchMembersById(array_map(static fn($post): int => $post->auth_id ?? 0, $posts));
