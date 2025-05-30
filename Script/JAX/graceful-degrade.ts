@@ -26,31 +26,40 @@ export default function gracefulDegrade(container: HTMLElement) {
         }
 
         // Make all links load through AJAX
-        if (link.href) {
-            const href = link.getAttribute('href');
-            const { host, pathname } = window.location;
-            const isLocalLink =
-                !link.target &&
-                link.host === host &&
-                link.pathname === pathname;
-
-            if (isLocalLink) {
-                const oldclick = link.onclick;
-                link.onclick = null;
-                link.addEventListener('click', (event: MouseEvent) => {
-                    event.preventDefault();
-                    // Some links have an onclick that returns true/false based on whether
-                    // or not the link should execute.
-                    if (!oldclick || oldclick.call(link, event) !== false) {
-                        RUN.stream.location(href);
-                    }
-                });
-
-                // Open external links in a new window
-            } else {
-                link.target = '_BLANK';
-            }
+        if (!link.href) {
+            return;
         }
+
+        const href = link.getAttribute('href');
+        const { host, pathname } = window.location;
+        const isLocalLink =
+            !link.target &&
+            link.host === host &&
+            link.pathname === pathname;
+
+        const isJavascriptLink = href?.startsWith('javascript:');
+
+        if (isJavascriptLink) {
+            return;
+        }
+
+        if (isLocalLink) {
+            const oldclick = link.onclick;
+            link.onclick = null;
+            link.addEventListener('click', (event: MouseEvent) => {
+                event.preventDefault();
+                // Some links have an onclick that returns true/false based on whether
+                // or not the link should execute.
+                if (!oldclick || oldclick.call(link, event) !== false) {
+                    RUN.stream.location(href);
+                }
+            });
+
+            return;
+            // Open external links in a new window
+        }
+
+        link.target = '_BLANK';
     });
 
     // Handle image hover magnification
