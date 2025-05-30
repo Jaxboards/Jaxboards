@@ -14,7 +14,6 @@ use Jax\Page;
 use Jax\Request;
 use Jax\Template;
 
-use function _\keyBy;
 use function array_key_exists;
 use function ceil;
 
@@ -90,7 +89,7 @@ final class Members
         $groups = Group::joinedOn(
             $this->database,
             $members,
-            static fn($group) => $group->id
+            static fn($group) => $group->id,
         );
 
         $nummemberquery = $this->database->special(
