@@ -27,6 +27,7 @@ final class User
         public ?Group $userPerms = null,
     ) {
         if ($member !== null) {
+            $this->member = $member;
             return;
         }
 
