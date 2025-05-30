@@ -81,9 +81,6 @@ final readonly class UserProfile
         return Member::selectOne($this->database, Database::WHERE_ID_EQUALS, $userId);
     }
 
-    /**
-     * param.
-     */
     private function isUserInList(int $userId, string $list): bool
     {
         return !$this->user->isGuest() && in_array(
