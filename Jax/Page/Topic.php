@@ -543,7 +543,7 @@ final class Topic
                 $post->auth_id,
                 $postbuttons,
                 // ^10
-                $this->date->autoDate($this->database->datetimeAsTimestamp($post->date)),
+                $this->date->autoDate($post->date),
                 <<<HTML
                     <a href="?act=vt{$modelsTopic->id}&amp;findpost={$post->id}&pid={$post->id}"
                         onclick="prompt('Link to this post:',this.href);return false"
@@ -562,7 +562,7 @@ final class Topic
                         $editor->group_id,
                         $editor->display_name,
                     ),
-                    $this->date->autoDate($this->database->datetimeAsTimestamp($post->edit_date)),
+                    $this->date->autoDate($post->edit_date),
                 ) : '',
                 $this->user->getGroup()?->can_moderate
                     ? '<a href="?act=modcontrols&amp;do=iptools&amp;ip='

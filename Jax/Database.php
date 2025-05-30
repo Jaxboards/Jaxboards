@@ -50,6 +50,7 @@ class Database
     public function __construct(
         private readonly ServiceConfig $serviceConfig,
         private readonly DebugLog $debugLog,
+        private readonly Date $date,
     ) {
         try {
             if ($serviceConfig->hasInstalled()) {
@@ -340,9 +341,7 @@ class Database
 
     public function datetimeAsTimestamp(?string $datetime): int
     {
-        return $datetime
-            ? Carbon::createFromFormat(self::DATE_TIME, $datetime, 'UTC')?->getTimestamp() ?? 0
-            : 0;
+        return $this->date->datetimeAsTimestamp($datetime);
     }
 
     /**

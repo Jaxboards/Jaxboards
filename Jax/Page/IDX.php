@@ -590,7 +590,7 @@ final class IDX
                 $member->display_name,
             ) : 'None',
             $forum->lp_date !== null
-                ? $this->date->autoDate($this->database->datetimeAsTimestamp($forum->lp_date))
+                ? $this->date->autoDate($forum->lp_date)
                 : '- - - - -',
         );
     }

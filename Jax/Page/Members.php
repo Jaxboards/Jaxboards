@@ -152,7 +152,7 @@ final class Members
                 $groups[$member->group_id]->title,
                 $member->id,
                 $member->posts,
-                $this->date->autoDate($this->database->datetimeAsTimestamp($member->join_date)),
+                $this->date->autoDate($member->join_date),
                 $contactdetails,
             );
         }

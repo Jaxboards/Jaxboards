@@ -375,7 +375,7 @@ final readonly class Inbox
                 $otherMember->group_id,
                 $otherMember->name,
             ) : '',
-            $this->date->autoDate($this->database->datetimeAsTimestamp($message->date)),
+            $this->date->autoDate($message->date),
             $this->textFormatting->theWorks($message->message),
             $otherMember?->avatar ?: $this->template->meta('default-avatar'),
             $otherMember?->usertitle,
@@ -446,7 +446,7 @@ final readonly class Inbox
                 $message->id,
                 $message->title,
                 $otherMember->display_name,
-                $this->date->autoDate($this->database->datetimeAsTimestamp($message->date)),
+                $this->date->autoDate($message->date),
             );
         }
 

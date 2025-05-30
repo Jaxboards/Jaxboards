@@ -89,6 +89,8 @@ abstract class Model
     /**
      * Given a list of $otherModels, fetches models with the ID given by $getId($otherModel).
      *
+     * @param array<Model> $otherModel
+     *
      * @return array<static> A map of models by ID (array key is ID)
      */
     public static function joinedOn(

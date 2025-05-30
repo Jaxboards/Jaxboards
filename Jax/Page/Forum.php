@@ -260,7 +260,7 @@ final class Forum
                 number_format($topic->views),
                 // 6
                 $topic->lp_date
-                    ? $this->date->autoDate($this->database->datetimeAsTimestamp($topic->lp_date))
+                    ? $this->date->autoDate($topic->lp_date)
                     : '',
                 // 7
                 $lastPostAuthor ? $this->template->meta(
@@ -391,7 +391,7 @@ final class Forum
                 : null;
 
             $lastPostDate = $subforum->lp_date
-                ? $this->date->autoDate($this->database->datetimeAsTimestamp($subforum->lp_date))
+                ? $this->date->autoDate($subforum->lp_date)
                 : '- - - - -';
 
             $rows .= $this->template->meta(

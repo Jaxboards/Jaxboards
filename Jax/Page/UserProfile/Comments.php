@@ -54,7 +54,19 @@ final readonly class Comments
             );
         }
 
-        $comments = $this->fetchComments($member);
+        $comments = ProfileComment::selectMany(
+            $this->database,
+            "WHERE `to`=?
+            ORDER BY id DESC
+            LIMIT 10",
+            $member->id
+        );
+
+        $membersById = Member::joinedOn(
+            $this->database,
+            $comments,
+            static fn(ProfileComment $comment) => $comment->from
+        );
 
         if ($comments === []) {
             return $tabHTML . 'No comments to display!';
@@ -63,60 +75,29 @@ final readonly class Comments
         foreach ($comments as $comment) {
             $act = $this->request->asString->both('act');
             $deleteLink = $this->user->getGroup()?->can_delete_comments
-                && $comment['from'] === $this->user->get()->id
+                && $comment->from === $this->user->get()->id
                 || $this->user->getGroup()?->can_moderate ? <<<HTML
-                    <a href="?act={$act}&page=comments&del={$comment['id']}" class="delete">[X]</a>
+                    <a href="?act={$act}&page=comments&del={$comment->id}" class="delete">[X]</a>
                     HTML
                 : '';
 
+            $fromMember = $membersById[$comment->from];
             $tabHTML .= $this->template->meta(
                 'userprofile-comment',
                 $this->template->meta(
                     'user-link',
-                    $comment['from'],
-                    $comment['group_id'],
-                    $comment['display_name'],
+                    $fromMember->id,
+                    $fromMember->group_id,
+                    $fromMember->display_name,
                 ),
-                $comment['avatar'] ?: $this->template->meta('default-avatar'),
-                $this->date->autoDate($comment['date']),
-                $this->textFormatting->theWorks($comment['comment']),
+                $fromMember->avatar ?: $this->template->meta('default-avatar'),
+                $this->date->autoDate($comment->date),
+                $this->textFormatting->theWorks($comment->comment),
                 $deleteLink,
             );
         }
 
         return $tabHTML;
-    }
-
-    /**
-     * @return array<array<string,mixed>>
-     */
-    private function fetchComments(Member $member): array
-    {
-        $result = $this->database->special(
-            <<<'SQL'
-                SELECT
-                    c.`id` AS `id`,
-                    c.`to` AS `to`,
-                    c.`from` AS `from`,
-                    c.`comment` AS `comment`,
-                    UNIX_TIMESTAMP(c.`date`) AS `date`,
-                    m.`display_name` AS `display_name`,
-                    m.`group_id` AS `group_id`,
-                    m.`avatar` AS `avatar`
-                FROM %t c
-                LEFT JOIN %t m
-                    ON c.`from`=m.`id`
-                WHERE c.`to`=?
-                ORDER BY c.`id` DESC
-                LIMIT 10
-                SQL,
-            ['profile_comments', 'members'],
-            $member->id,
-        );
-        $comments = $this->database->arows($result);
-        $this->database->disposeresult($result);
-
-        return $comments;
     }
 
     private function handleCommentCreation(Member $member): string

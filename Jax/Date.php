@@ -14,8 +14,9 @@ final class Date
     /**
      * Returns a span-wrapped date which is automatically converted to the user's timezone
      * on the client.
+     *
      */
-    public function autoDate(?int $date): string
+    public function autoDate(null|int|string $date): string
     {
         // Some old forums have nullable fields that are no longer nullable
         // This needs to stay for data backwards compatibility
@@ -23,9 +24,13 @@ final class Date
             return '';
         }
 
-        $relativeTime = $this->relativeTime($date);
+        $timestamp = is_string($date)
+            ? $this->datetimeAsTimestamp($date)
+            : $date;
 
-        return "<span class='autodate' title='{$date}'>{$relativeTime}</span>";
+        $relativeTime = $this->relativeTime($timestamp);
+
+        return "<span class='autodate' title='{$timestamp}'>{$relativeTime}</span>";
     }
 
     /**
@@ -47,6 +52,13 @@ final class Date
         return $autodate
             ? "<span class='autodate smalldate' title='{$timestamp}'>{$formattedDate}</span>"
             : $formattedDate;
+    }
+
+    public function datetimeAsTimestamp(?string $datetime): int
+    {
+        return $datetime
+            ? Carbon::createFromFormat('Y-m-d H:i:s', $datetime, 'UTC')?->getTimestamp() ?? 0
+            : 0;
     }
 
     public function relativeTime(int $date): string
