@@ -132,40 +132,42 @@ final readonly class ProfileTabs
     private function showTabTopics(Member $member): string
     {
         $tabHTML = '';
-        $result = $this->database->special(
-            <<<'SQL'
-                SELECT
-                    p.`post` AS `post`,
-                    p.`id` AS `pid`,
-                    p.`tid` AS `tid`,
-                    t.`title` AS `title`,
-                    UNIX_TIMESTAMP(p.`date`) AS `date`,
-                    f.`perms` AS `perms`
-                FROM %t p
-                LEFT JOIN %t t
-                    ON p.`tid`=t.`id`
-                LEFT JOIN %t f
-                    ON f.`id`=t.`fid`
-                WHERE p.`auth_id`=?
-                    AND p.`newtopic`=1
-                ORDER BY p.`id` DESC
-                LIMIT 10
-                SQL,
-            ['posts', 'topics', 'forums'],
-            $member->id,
+
+        $posts = Post::selectMany(
+            $this->database,
+            "WHERE `auth_id`=? AND `newtopic`=1
+            ORDER BY `id` DESC
+            LIMIT 10",
+            $member->id
         );
-        while ($post = $this->database->arow($result)) {
-            $perms = $this->user->getForumPerms($post['perms']);
+
+        $topics = Topic::joinedOn(
+            $this->database,
+            $posts,
+            fn(Post $post) => $post->tid,
+        );
+
+        $forums = Forum::joinedOn(
+            $this->database,
+            $topics,
+            fn(Topic $topic) => $topic->fid,
+        );
+
+        foreach ($posts as $post) {
+            $topic = $topics[$post->tid];
+            $forum = $forums[$topic->fid];
+
+            $perms = $this->user->getForumPerms($forum->perms);
             if (!$perms['read']) {
                 continue;
             }
 
             $tabHTML .= $this->template->meta(
                 'userprofile-topic',
-                $post['tid'],
-                $post['title'],
-                $this->date->autoDate($post['date']),
-                $this->textFormatting->theWorks($post['post']),
+                $post->tid,
+                $topic->title,
+                $this->date->autoDate($post->date),
+                $this->textFormatting->theWorks($post->post),
             );
         }
 
