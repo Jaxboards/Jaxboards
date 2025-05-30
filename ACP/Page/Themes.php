@@ -146,8 +146,10 @@ final readonly class Themes
      */
     private function updateWrappers(array $wrappers): null
     {
-        foreach ($wrappers as $wrapperId => $wrapperName) {
-            if ($wrapperName && !in_array($wrapperName, $wrappers)) {
+        $validWrappers = $this->getWrappers();
+
+        foreach ($wrappers as $skinId => $wrapperName) {
+            if ($wrapperName && !in_array($wrapperName, $validWrappers, true)) {
                 continue;
             }
 
@@ -159,11 +161,11 @@ final readonly class Themes
             $this->database->update(
                 'skins',
                 [
-                    'hidden' => array_key_exists($wrapperId, $hidden) ? 1 : 0,
+                    'hidden' => array_key_exists($skinId, $hidden) ? 1 : 0,
                     'wrapper' => $wrapperName,
                 ],
                 Database::WHERE_ID_EQUALS,
-                $wrapperId,
+                $skinId,
             );
         }
 

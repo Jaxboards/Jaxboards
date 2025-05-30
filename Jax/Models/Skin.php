@@ -15,6 +15,7 @@ final class Skin extends Model
         'using',
         'title',
         'custom',
+        'wrapper',
         'default',
         'hidden',
     ];
