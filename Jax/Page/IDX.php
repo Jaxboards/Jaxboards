@@ -117,8 +117,9 @@ final class IDX
     {
         $memberIds = array_filter(
             array_map(static fn(Forum $forum): ?int => $forum->lp_uid, $forums),
-            fn($memberId) => (bool) $memberId
+            static fn($memberId): bool => (bool) $memberId,
         );
+
         return $memberIds !== [] ? keyBy(
             Member::selectMany(
                 $this->database,
