@@ -53,9 +53,11 @@ final readonly class ModTopics
     {
         $this->page->command('softurl');
 
-        $topic = $tid ? Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $tid) : null;
+        $topic = $tid !== 0
+            ? Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $tid)
+            : null;
 
-        if (!$topic) {
+        if ($topic === null) {
             return;
         }
 
