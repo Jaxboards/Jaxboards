@@ -693,8 +693,7 @@ final class Post
         }
 
         $topic = Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $tid);
-        $forum = Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $topic->fid);
-
+        $forum = $topic ? Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $topic->fid) : null;
 
         if ($topic === null || $forum === null) {
             $error = "The topic you're trying to reply to does not exist.";

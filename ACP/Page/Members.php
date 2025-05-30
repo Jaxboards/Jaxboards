@@ -450,7 +450,7 @@ final readonly class Members
         );
 
         // Sum post count on account being merged into.
-        $member2->posts += $member1->posts ?? 0;
+        $member2->posts += $member1->posts;
         $member2->update($this->database);
 
         // Delete the account.

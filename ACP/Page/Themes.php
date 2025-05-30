@@ -304,11 +304,10 @@ final readonly class Themes
         }
 
         $usedwrappers = [];
-        $skins = '';
+        $skinsHTML = '';
         $wrappers = $this->getWrappers();
 
         $skins = Skin::selectMany($this->database, 'ORDER BY title ASC');
-
 
         foreach ($skins as $skin) {
             $wrapperOptions = '';
@@ -324,7 +323,7 @@ final readonly class Themes
                 );
             }
 
-            $skins .= $this->page->parseTemplate(
+            $skinsHTML .= $this->page->parseTemplate(
                 'themes/show-skin-index-css-row.html',
                 [
                     'custom' => $skin->custom
@@ -356,16 +355,16 @@ final readonly class Themes
             $usedwrappers[] = $skin->wrapper;
         }
 
-        $skins = $this->page->parseTemplate(
+        $skinsHTML = $this->page->parseTemplate(
             'themes/show-skin-index-css.html',
             [
-                'content' => $skins,
+                'content' => $skinsHTML,
             ],
         );
 
         $this->page->addContentBox(
             'Themes',
-            ($skinError !== null ? $this->page->error($skinError) : '') . $skins,
+            ($skinError !== null ? $this->page->error($skinError) : '') . $skinsHTML,
         );
 
         $wrap = '';
