@@ -82,6 +82,7 @@ final class Session
         'Y!J-WSC' => 'Yahoo Japan',
         'yahoo! slurp' => 'Yahoo',
         'YandexBot' => 'Yandex',
+	'YandexRenderResourcesBot' => 'YandexRenders',
     ];
 
     /**
