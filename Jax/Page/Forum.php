@@ -121,7 +121,7 @@ final class Forum
         if ($forum->redirect !== '') {
             $this->page->command('softurl');
 
-            $forum->redirects++;
+            ++$forum->redirects;
             $forum->update($this->database);
 
             $this->page->location($forum->redirect);
