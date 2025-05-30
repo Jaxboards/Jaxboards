@@ -768,7 +768,7 @@ final class Post
 
         // Do some magic to update the tree all the way up (for subforums).
         $path = trim($forum->path) !== ''
-            ? explode(' ', (string) $forum->path)
+            ? explode(' ', $forum->path)
             : [];
         if (!in_array($topic->id, $path)) {
             $path[] = $topic->id;
@@ -815,7 +815,7 @@ final class Post
         }
 
         // Update statistics.
-        if (!$forum->nocount) {
+        if ($forum->nocount === 0) {
             $this->user->set('posts', $this->user->get()->posts + 1);
         }
 
