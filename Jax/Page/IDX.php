@@ -115,14 +115,18 @@ final class IDX
      */
     private function fetchLastPostMembers(array $forums): array
     {
-        return keyBy(
+        $memberIds = array_filter(
+            array_map(static fn(Forum $forum): ?int => $forum->lp_uid, $forums),
+            fn($memberId) => (bool) $memberId
+        );
+        return $memberIds !== [] ? keyBy(
             Member::selectMany(
                 $this->database,
                 Database::WHERE_ID_IN,
-                array_unique(array_map(static fn(Forum $forum): ?int => $forum->lp_uid, $forums)),
+                array_unique($memberIds),
             ),
             static fn(Member $member): int => $member->id,
-        );
+        ) : [];
     }
 
     private function viewidx(): void
