@@ -113,7 +113,7 @@ final class IDX
 
         return array_filter(
             $forums,
-            fn($forum) => !$forum->perms || $this->user->getForumPerms($forum->perms)['view']
+            fn($forum): bool => !$forum->perms || $this->user->getForumPerms($forum->perms)['view'],
         );
     }
 
@@ -244,7 +244,9 @@ final class IDX
 
         if ($moderatorinfo === null) {
             $moderatorinfo = [];
-            $members = $this->mods !== [] ? Member::selectMany($this->database, Database::WHERE_ID_IN, $this->mods) : $this->mods;
+            $members = $this->mods !== []
+                ? Member::selectMany($this->database, Database::WHERE_ID_IN, $this->mods)
+                : $this->mods;
             foreach ($members as $member) {
                 $moderatorinfo[$member->id] = $this->template->meta(
                     'user-link',
