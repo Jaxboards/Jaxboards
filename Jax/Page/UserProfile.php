@@ -82,7 +82,7 @@ final readonly class UserProfile
     }
 
     /**
-     * param
+     * param.
      */
     private function isUserInList(int $userId, string $list): bool
     {
