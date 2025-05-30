@@ -433,7 +433,7 @@ final class Topic
                     . PHP_EOL;
             }
 
-            // $this->session->deleteVar('multiquote');
+            $this->session->deleteVar('multiquote');
         }
 
         $this->page->command(

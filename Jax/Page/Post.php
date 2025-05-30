@@ -354,7 +354,7 @@ final class Post
                 $postData .= "[quote={$authorName}]{$post->post}[/quote]" . PHP_EOL;
             }
 
-            // $this->session->deleteVar('multiquote');
+            $this->session->deleteVar('multiquote');
         }
 
         $uploadForm = $topicPerms['upload'] ? <<<'HTML'
