@@ -105,7 +105,10 @@ final class IDX
      */
     private function fetchIDXForums(): array
     {
-        return Forum::selectMany($this->database, 'ORDER BY `order`, `title` ASC');
+        return Forum::selectMany(
+            $this->database,
+            'WHERE `path` = "" '.
+            'ORDER BY `order`, `title` ASC');
     }
 
     /**
