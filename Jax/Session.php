@@ -296,8 +296,9 @@ final class Session
 
     public function applyChanges(): void
     {
-        $changedData = $this->changedData;
         $this->set('last_update', $this->database->datetime());
+
+        $changedData = $this->changedData;
 
         if ($this->modelsSession->is_bot !== 0) {
             // Bots tend to read a lot of content.
