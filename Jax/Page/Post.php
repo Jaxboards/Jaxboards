@@ -692,27 +692,10 @@ final class Post
             return;
         }
 
-        $result = $this->database->special(
-            <<<'SQL'
-                SELECT
-                    t.`title` AS `topictitle`,
-                    f.`id` AS `id`,
-                    f.`path` AS `path`,
-                    f.`perms` AS `perms`,
-                    f.`nocount` AS `nocount`,
-                    t.`locked` AS `locked`
-                FROM %t t
-                LEFT JOIN %t f
-                    ON t.`fid`=f.`id`
-                    WHERE t.`id`=?
-                SQL,
-            ['topics', 'forums'],
-            $tid,
-        );
-        $fdata = $this->database->arow($result);
-        $this->database->disposeresult($result);
+        $topic = Topic::selectOne($this->database, Database::WHERE_ID_EQUALS, $tid);
 
-        if (!$fdata) {
+
+        if (!$topic) {
             $error = "The topic you're trying to reply to does not exist.";
             $this->page->append('PAGE', $this->page->error($error));
             $this->page->command('error', $error);
@@ -720,11 +703,13 @@ final class Post
             return;
         }
 
-        $fdata['perms'] = $this->user->getForumPerms($fdata['perms']);
+        $forum = $topic !== null ? Forum::selectOne($this->database, Database::WHERE_ID_EQUALS, $topic->fid) : null;
+
+        $forumPerms = $this->user->getForumPerms($forum->perms);
+
         if (
-            ($this->how !== 'newtopic' && !$fdata['perms']['reply'])
-            || ($fdata['locked']
-                && !$this->user->getGroup()?->can_override_locked_topics)
+            ($this->how !== 'newtopic' && !$forumPerms['reply'])
+            || ($topic->locked && !$this->user->getGroup()?->can_override_locked_topics)
         ) {
             $error = "You don't have permission to post here.";
             $this->page->append('PAGE', $this->page->error($error));
@@ -758,7 +743,7 @@ final class Post
         }
 
         $activity = new Activity();
-        $activity->arg1 = $fdata['topictitle'];
+        $activity->arg1 = $topic->title;
         $activity->date = $postDate;
         $activity->pid = $post->id;
         $activity->tid = $tid;
@@ -783,11 +768,11 @@ final class Post
         }
 
         // Do some magic to update the tree all the way up (for subforums).
-        $path = trim((string) $fdata['path']) !== ''
-            ? explode(' ', (string) $fdata['path'])
+        $path = trim($forum->path) !== ''
+            ? explode(' ', (string) $forum->path)
             : [];
-        if (!in_array($fdata['id'], $path)) {
-            $path[] = $fdata['id'];
+        if (!in_array($topic->id, $path)) {
+            $path[] = $topic->id;
         }
 
         if ($newtopic) {
@@ -805,7 +790,7 @@ final class Post
                 ['forums'],
                 $uid,
                 $tid,
-                $fdata['topictitle'],
+                $topic->title,
                 $postDate,
                 $path,
             );
@@ -824,14 +809,14 @@ final class Post
                 ['forums'],
                 $uid,
                 $tid,
-                $fdata['topictitle'],
+                $topic->title,
                 $postDate,
                 $path,
             );
         }
 
         // Update statistics.
-        if (!$fdata['nocount']) {
+        if (!$forum->nocount) {
             $this->user->set('posts', $this->user->get()->posts + 1);
         }
 
