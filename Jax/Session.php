@@ -261,7 +261,7 @@ final class Session
         $yesterday = mktime(0, 0, 0) ?: 0;
         $sessions = ModelsSession::selectMany(
             $this->database,
-            'WHERE `last_update`<? GROUP BY uid',
+            'WHERE `last_update`<?',
             $this->database->datetime($yesterday),
         );
 
