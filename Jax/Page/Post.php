@@ -341,21 +341,21 @@ final class Post
             $posts = ModelsPost::selectMany(
                 $this->database,
                 Database::WHERE_ID_IN,
-                explode(',', $this->session->getVar('multiquote'))
+                explode(',', (string) $this->session->getVar('multiquote')),
             );
 
             $memberIds = array_filter(
-                array_map(fn(ModelsPost $post) => $post->auth_id, $posts),
-                fn($memberId) => $memberId !== null
+                array_map(static fn(ModelsPost $modelsPost): ?int => $modelsPost->auth_id, $posts),
+                static fn($memberId): bool => $memberId !== null,
             );
 
             $membersById = keyBy(
                 Member::selectMany(
                     $this->database,
                     Database::WHERE_ID_IN,
-                    $memberIds
+                    $memberIds,
                 ),
-                fn(Member $member) => $member->id
+                static fn(Member $member): int => $member->id,
             );
 
             foreach ($posts as $post) {

@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Jax\Models\Session as ModelsSession;
 use Jax\Models\Token;
 
+use function array_key_exists;
 use function base64_encode;
 use function ini_set;
 use function is_numeric;
