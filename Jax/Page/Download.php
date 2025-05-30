@@ -39,16 +39,9 @@ final readonly class Download
             return;
         }
 
-        $this->database->special(
-            <<<'SQL'
-                UPDATE %t
-                SET `downloads` = `downloads` + 1
-                WHERE `id`=?
-                SQL
-            ,
-            ['files'],
-            $id,
-        );
+        $file->downloads++;
+        $file->update($this->database);
+
         $ext = explode('.', $file->name);
         $ext = count($ext) === 1 ? '' : mb_strtolower(array_pop($ext));
 
