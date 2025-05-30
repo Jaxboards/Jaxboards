@@ -54,6 +54,7 @@ final readonly class App
         if (!$this->config->hasInstalled()) {
             $this->page->location('./Service/install.php');
         }
+
         if (!$this->domainDefinitions->isBoardFound()) {
             echo 'board not found';
 
