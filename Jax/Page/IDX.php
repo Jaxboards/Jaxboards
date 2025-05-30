@@ -123,13 +123,11 @@ final class IDX
      */
     private function fetchLastPostMembers(array $forums): array
     {
-        $members = Member::joinedOn(
+        return Member::joinedOn(
             $this->database,
             $forums,
-            static fn(Forum $forum): ?int => $forum->lp_uid
+            static fn(Forum $forum): ?int => $forum->lp_uid,
         );
-
-        return $members;
     }
 
     private function viewidx(): void

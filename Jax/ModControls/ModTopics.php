@@ -268,7 +268,7 @@ final readonly class ModTopics
                     Database::WHERE_ID_IN,
                     $this->getModTids(),
                 ),
-                static fn($topic) => $topic->id
+                static fn($topic) => $topic->id,
             );
 
             foreach ($topicIds as $topicId) {

@@ -343,8 +343,6 @@ final class Post
                 explode(',', (string) $this->session->getVar('multiquote')),
             );
 
-            var_dump($this->session->getVar('multiquote'));
-
             $membersById = Member::joinedOn(
                 $this->database,
                 $posts,

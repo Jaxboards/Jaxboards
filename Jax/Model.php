@@ -9,6 +9,7 @@ use PDOStatement;
 use ReflectionProperty;
 
 use function _\keyBy;
+use function array_filter;
 use function array_map;
 
 abstract class Model
@@ -86,12 +87,15 @@ abstract class Model
     }
 
     /**
-     * Given a list of $otherModels, fetches models with the ID given by $getId($otherModel)
+     * Given a list of $otherModels, fetches models with the ID given by $getId($otherModel).
      *
      * @return array<static> A map of models by ID (array key is ID)
      */
-    public static function joinedOn(Database $database, array $otherModel, callable $getId): array
-    {
+    public static function joinedOn(
+        Database $database,
+        array $otherModel,
+        callable $getId,
+    ): array {
         $primaryKey = static::PRIMARY_KEY;
         $otherIds = array_filter(
             array_map($getId, $otherModel),

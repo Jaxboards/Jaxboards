@@ -422,7 +422,7 @@ final readonly class Inbox
         $membersById = Member::joinedOn(
             $this->database,
             $messages,
-            $getMessageMemberId
+            $getMessageMemberId,
         );
 
         foreach ($messages as $message) {

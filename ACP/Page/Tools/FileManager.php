@@ -14,9 +14,7 @@ use Jax\Models\Member;
 use Jax\Models\Post;
 use Jax\Request;
 
-use function _\keyBy;
 use function array_key_exists;
-use function array_map;
 use function implode;
 use function in_array;
 use function is_array;
@@ -116,7 +114,7 @@ final readonly class FileManager
         $members = Member::joinedOn(
             $this->database,
             $files,
-            static fn($file): int => $file->uid
+            static fn($file): int => $file->uid,
         );
 
         $table = '';
