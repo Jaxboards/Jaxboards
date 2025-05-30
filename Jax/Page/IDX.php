@@ -44,9 +44,9 @@ use function sprintf;
 final class IDX
 {
     /**
-     * @var array<int,int> Map of forum IDs to their last read timestamp
+     * @var ?array<int,int> Map of forum IDs to their last read timestamp
      */
-    private array $forumsread = [];
+    private ?array $forumsread = null;
 
     /**
      * @var array<int> List of all moderator user IDs
@@ -607,15 +607,15 @@ final class IDX
 
     private function isForumRead(Forum $forum): bool
     {
-        if (!$this->forumsread) {
+        if ($this->forumsread === null) {
             $this->forumsread = $this->jax->parseReadMarkers($this->session->get()->forumsread);
         }
 
-        if (!isset($this->forumsread[$forum->id])) {
+        if (!array_key_exists($forum->id, $this->forumsread)) {
             $this->forumsread[$forum->id] = 0;
         }
 
-        return $forum->lp_date < max(
+        return $this->database->datetimeAsTimestamp($forum->lp_date) < max(
             $this->forumsread[$forum->id],
             $this->session->get()->read_date,
             $this->user->get('last_visit'),

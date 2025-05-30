@@ -319,13 +319,13 @@ final class Session
         }
 
         // Only update if there's data to update.
-        if ($this->changedData === []) {
+        if ($changedData === []) {
             return;
         }
 
         $this->database->update(
             'session',
-            $this->changedData,
+            $changedData,
             Database::WHERE_ID_EQUALS,
             $this->modelsSession->id,
         );

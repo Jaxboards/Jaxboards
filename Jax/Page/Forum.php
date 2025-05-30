@@ -43,11 +43,9 @@ final class Forum
     private array $topicsRead = [];
 
     /**
-     * @var array<int,int> key: forumId, value: timestamp
+     * @var ?array<int,int> key: forumId, value: timestamp
      */
-    private array $forumsRead = [];
-
-    private int $forumReadTime = 0;
+    private ?array $forumsRead = null;
 
     private int $numperpage = 20;
 
@@ -483,10 +481,11 @@ final class Forum
             $this->topicsRead = $this->jax->parseReadMarkers($this->session->get()->topicsread);
         }
 
-        if ($this->forumsRead === []) {
+        $forumReadTime = 0;
+        if ($this->forumsRead === null) {
             $forumsRead = $this->jax->parseReadMarkers($this->session->get()->forumsread);
             if (array_key_exists($fid, $forumsRead)) {
-                $this->forumReadTime = $forumsRead[$fid];
+                $forumReadTime = $forumsRead[$fid];
             }
         }
 
@@ -499,7 +498,7 @@ final class Forum
         );
 
         return $timestamp <= (
-            max($this->topicsRead[$topic->id], $this->forumReadTime)
+            max($this->topicsRead[$topic->id], $forumReadTime)
             ?: $this->session->get()->read_date
             ?: $this->user->get('last_visit')
         );
@@ -511,9 +510,11 @@ final class Forum
             return true;
         }
 
-        if (!$this->forumsRead) {
+
+        if ($this->forumsRead === null) {
             $this->forumsRead = $this->jax->parseReadMarkers($this->session->get()->forumsread);
         }
+
 
         return $this->database->datetimeAsTimestamp($modelsForum->lp_date) <= (
             $this->forumsRead[$modelsForum->id] ?? null
@@ -526,6 +527,6 @@ final class Forum
     {
         $forumsread = $this->jax->parseReadMarkers($this->session->get()->forumsread);
         $forumsread[$id] = Carbon::now('UTC')->getTimestamp();
-        $this->session->set('forumsread', json_encode($forumsread));
+        $this->session->set('forumsread', json_encode($forumsread, JSON_NUMERIC_CHECK));
     }
 }
