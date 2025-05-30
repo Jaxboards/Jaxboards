@@ -35,6 +35,8 @@ use function mb_strlen;
 use function number_format;
 use function preg_match;
 
+use const JSON_NUMERIC_CHECK;
+
 final class Forum
 {
     /**
