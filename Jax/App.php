@@ -99,7 +99,7 @@ final readonly class App
     {
         $userId = $this->session->loginWithToken();
         // Prefetch user data
-        $this->user->getUser($userId);
+        $this->user->login($userId);
 
         // Fix ip if necessary.
         if (

@@ -44,7 +44,7 @@ final readonly class Login
 
             $member = Member::selectOne($this->database, 'WHERE `name`=?', $user);
             $user = $member !== null
-                ? $this->user->getUser($member->id, $password)
+                ? $this->user->login($member->id, $password)
                 : null;
 
             $error = match (true) {

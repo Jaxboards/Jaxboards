@@ -115,7 +115,7 @@ final class App
     {
         $adminUserId = $this->session->getPHPSessionValue('auid');
         if ($adminUserId) {
-            $this->user->getUser($adminUserId);
+            $this->user->login($adminUserId);
         }
 
         return (bool) $this->user->getPerm('can_access_acp');

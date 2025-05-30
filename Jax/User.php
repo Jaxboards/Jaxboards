@@ -69,7 +69,7 @@ final class User
         );
     }
 
-    public function getUser(?int $uid = null, ?string $pass = null): Member
+    public function login(?int $uid = null, ?string $pass = null): Member
     {
         if ($this->member->id !== 0 || !$uid) {
             return $this->member;

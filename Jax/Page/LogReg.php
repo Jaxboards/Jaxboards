@@ -185,21 +185,21 @@ final class LogReg
                 $username,
             );
 
-            $user = $this->user->getUser($member->id ?? null, $password);
+            $this->user->login($member->id ?? null, $password);
 
-            if ($user !== null) {
+            if (!$this->user->isGuest()) {
                 if ($this->request->post('popup') !== null) {
                     $this->page->command('closewindow', '#loginform');
                 }
 
-                $this->session->setPHPSessionValue('uid', $user->id);
+                $this->session->setPHPSessionValue('uid', $this->user->get()->id);
                 $loginToken = base64_encode(openssl_random_pseudo_bytes(128));
 
                 $token = new Token();
                 $token->expires = $this->database->datetime(Carbon::now('UTC')->addMonth()->getTimestamp());
                 $token->token = $loginToken;
                 $token->type = 'login';
-                $token->uid = $user->id;
+                $token->uid = $this->user->get()->id;
                 $token->insert($this->database);
 
                 $this->request->setCookie(
@@ -207,8 +207,8 @@ final class LogReg
                     $loginToken,
                     Carbon::now('UTC')->addMonth()->getTimestamp(),
                 );
-                $this->session->clean($user->id);
-                $this->session->set('uid', $user->id);
+                $this->session->clean($this->user->get()->id);
+                $this->session->set('uid', $this->user->get()->id);
                 $this->session->act();
                 if ($this->registering) {
                     $this->page->command('location', '/');
