@@ -480,7 +480,7 @@ final class Forum
             $this->topicsRead[$topic->id] = 0;
         }
 
-        $timestamp = $this->database->datetimeAsTimestamp(
+        $timestamp = $this->date->datetimeAsTimestamp(
             $topic->lp_date ?? $topic->date,
         );
 
@@ -502,10 +502,10 @@ final class Forum
         }
 
 
-        return $this->database->datetimeAsTimestamp($modelsForum->lp_date) <= (
+        return $this->date->datetimeAsTimestamp($modelsForum->lp_date) <= (
             $this->forumsRead[$modelsForum->id] ?? null
-            ?: $this->database->datetimeAsTimestamp($this->session->get()->read_date)
-            ?: $this->database->datetimeAsTimestamp($this->user->get()->last_visit)
+            ?: $this->date->datetimeAsTimestamp($this->session->get()->read_date)
+            ?: $this->date->datetimeAsTimestamp($this->user->get()->last_visit)
         );
     }
 

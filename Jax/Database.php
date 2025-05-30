@@ -339,11 +339,6 @@ class Database
         return gmdate(self::DATE_TIME, $timestamp);
     }
 
-    public function datetimeAsTimestamp(?string $datetime): int
-    {
-        return $this->date->datetimeAsTimestamp($datetime);
-    }
-
     /**
      * @param array<int,string> $tablenames
      * @param mixed             $args

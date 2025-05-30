@@ -856,7 +856,7 @@ final class Topic
                     'description' => $this->textFormatting->blockhtml($this->textFormatting->theWorks($post->post)),
                     'guid' => $post->id,
                     'link' => "{$boardURL}?act=vt{$modelsTopic->id}&amp;findpost={$post->id}",
-                    'pubDate' => gmdate('r', $this->database->datetimeAsTimestamp($post->date)),
+                    'pubDate' => gmdate('r', $this->date->datetimeAsTimestamp($post->date)),
                     'title' => $authors[$post->auth_id]->display_name . ':',
                 ],
             );

@@ -496,7 +496,7 @@ final class IDX
         $useronlinecache = '';
         foreach ($this->database->getUsersOnline($this->user->isAdmin()) as $user) {
             $lastUpdateTS = $this->session->get()->last_update !== null
-                ? $this->database->datetimeAsTimestamp($this->session->get()->last_update)
+                ? $this->date->datetimeAsTimestamp($this->session->get()->last_update)
                 : 0;
             $lastActionIdle = $lastUpdateTS - ($this->config->getSetting('timetoidle') ?? 300) - 30;
             if (!$user['uid'] && !$user['is_bot']) {
@@ -605,10 +605,10 @@ final class IDX
             $this->forumsread[$forum->id] = 0;
         }
 
-        return $this->database->datetimeAsTimestamp($forum->lp_date) < max(
+        return $this->date->datetimeAsTimestamp($forum->lp_date) < max(
             $this->forumsread[$forum->id],
-            $this->database->datetimeAsTimestamp($this->session->get()->read_date),
-            $this->database->datetimeAsTimestamp($this->user->get()->last_visit),
+            $this->date->datetimeAsTimestamp($this->session->get()->read_date),
+            $this->date->datetimeAsTimestamp($this->user->get()->last_visit),
         );
     }
 }
