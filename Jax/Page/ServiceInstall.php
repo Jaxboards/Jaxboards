@@ -296,7 +296,7 @@ final readonly class ServiceInstall
                     `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
                     `registrar_email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
                     `registrar_ip` varbinary(16) NOT NULL DEFAULT '',
-                    `date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+                    `date` datetime DEFAULT NULL,
                     `boardname` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
                     `referral` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
                     PRIMARY KEY (`id`)

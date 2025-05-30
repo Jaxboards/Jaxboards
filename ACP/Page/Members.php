@@ -534,7 +534,6 @@ final readonly class Members
                 $this->database->update(
                     'forums',
                     [
-                        'lp_date' => '0000-00-00 00:00:00',
                         'lp_tid' => null,
                         'lp_topic' => '',
                         'lp_uid' => null,
