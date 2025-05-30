@@ -118,7 +118,7 @@ final class App
             $this->user->login($adminUserId);
         }
 
-        return (bool) $this->user->getPerm('can_access_acp');
+        return (bool) $this->user->getGroup()?->can_access_acp;
     }
 
     private function renderNav(): void

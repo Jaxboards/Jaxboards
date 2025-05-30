@@ -57,7 +57,7 @@ final readonly class ModTopics
             return;
         }
 
-        if (!$this->user->getPerm('can_moderate')) {
+        if (!$this->user->getGroup()?->can_moderate) {
             $result = $this->database->special(
                 <<<'SQL'
                     SELECT `mods`

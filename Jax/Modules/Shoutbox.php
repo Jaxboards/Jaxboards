@@ -50,7 +50,7 @@ final class Shoutbox
     {
         if (
             !$this->config->getSetting('shoutbox')
-            || !$this->user->getPerm('can_view_shoutbox')
+            || !$this->user->getGroup()?->can_view_shoutbox
         ) {
             return;
         }
@@ -83,12 +83,12 @@ final class Shoutbox
      */
     public function canDelete(?array $shout = null): bool
     {
-        $candelete = (bool) $this->user->getPerm('can_delete_shouts');
+        $candelete = (bool) $this->user->getGroup()?->can_delete_shouts;
         if ($candelete) {
             return $candelete;
         }
 
-        if (!$this->user->getPerm('can_delete_own_shouts')) {
+        if (!$this->user->getGroup()?->can_delete_own_shouts) {
             return $candelete;
         }
 
@@ -338,7 +338,7 @@ final class Shoutbox
 
         $error = match (true) {
             $this->user->isGuest() => 'You must be logged in to shout!',
-            !$this->user->getPerm('can_shout') => 'You do not have permission to shout!',
+            !$this->user->getGroup()?->can_shout => 'You do not have permission to shout!',
             mb_strlen($shoutBody) > 300 => 'Shout must be less than 300 characters.',
             default => null,
         };

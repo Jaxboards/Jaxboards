@@ -57,7 +57,7 @@ final readonly class ModControls
     public function render(): void
     {
         if (
-            !$this->user->getPerm('can_moderate')
+            !$this->user->getGroup()?->can_moderate
             && !$this->user->get()->mod
         ) {
             $this->page->command('softurl');
@@ -140,7 +140,7 @@ final readonly class ModControls
 
     private function showModCP(string $cppage = ''): void
     {
-        if (!$this->user->getPerm('can_moderate')) {
+        if (!$this->user->getGroup()?->can_moderate) {
             return;
         }
 

@@ -275,7 +275,7 @@ final class Forum
                 // 9
                 $topic->summary ? $topic->summary . (mb_strlen((string) $topic->summary) > 45 ? '...' : '') : '',
                 // 10
-                $this->user->getPerm('can_moderate') ? '<a href="?act=modcontrols&do=modt&tid='
+                $this->user->getGroup()?->can_moderate ? '<a href="?act=modcontrols&do=modt&tid='
                     . $topic->id . '" class="moderate" onclick="RUN.modcontrols.togbutton(this)"></a>' : '',
                 // 11
                 $pages,

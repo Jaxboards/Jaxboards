@@ -103,7 +103,7 @@ final readonly class ModPosts
      */
     private function canModPost(Post $post): bool
     {
-        if ($this->user->getPerm('can_moderate')) {
+        if ($this->user->getGroup()?->can_moderate) {
             return true;
         }
 

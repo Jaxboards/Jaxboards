@@ -214,7 +214,7 @@ final readonly class App
             '<script src="' . $this->domainDefinitions->getBoardURL() . '/dist/app.js" defer></script>',
         );
 
-        if ($this->user->getPerm('can_moderate') || $this->user->get()->mod) {
+        if ($this->user->getGroup()?->can_moderate || $this->user->get()->mod) {
             $this->page->append(
                 'SCRIPT',
                 '<script type="text/javascript" src="?act=modcontrols&do=load" defer></script>',
@@ -242,9 +242,9 @@ final readonly class App
             'NAVIGATION',
             $this->template->meta(
                 'navigation',
-                $this->user->getPerm('can_moderate')
+                $this->user->getGroup()?->can_moderate
                 ? '<li><a href="?act=modcontrols&do=cp">Mod CP</a></li>' : '',
-                $this->user->getPerm('can_access_acp')
+                $this->user->getGroup()?->can_access_acp
                 ? '<li><a href="./ACP/" target="_BLANK">ACP</a></li>' : '',
                 $this->config->getSetting('navlinks') ?? '',
             ),
@@ -330,20 +330,20 @@ final readonly class App
 
     private function setPageVars(): void
     {
-        $this->template->addVar('ismod', $this->user->getPerm('can_moderate') ? 'true' : 'false');
+        $this->template->addVar('ismod', $this->user->getGroup()?->can_moderate ? 'true' : 'false');
         $this->template->addVar('isguest', $this->user->isGuest() ? 'true' : 'false');
-        $this->template->addVar('isadmin', $this->user->getPerm('can_access_acp') ? 'true' : 'false');
+        $this->template->addVar('isadmin', $this->user->getGroup()?->can_access_acp ? 'true' : 'false');
 
         $this->template->addVar(
             'modlink',
-            $this->user->getPerm('can_moderate')
+            $this->user->getGroup()?->can_moderate
                 ? $this->template->meta('modlink')
                 : '',
         );
 
         $this->template->addVar(
             'acplink',
-            $this->user->getPerm('can_access_acp')
+            $this->user->getGroup()?->can_access_acp
                 ? $this->template->meta('acplink')
                 : '',
         );
@@ -355,7 +355,7 @@ final readonly class App
 
         $this->template->addVar('groupid', (string) $this->user->get()->group_id);
         $this->template->addVar('userposts', (string) $this->user->get()->posts);
-        $this->template->addVar('grouptitle', (string) $this->user->getPerm('title'));
+        $this->template->addVar('grouptitle', (string) $this->user->getGroup()?->title);
         $this->template->addVar('avatar', $this->user->get()->avatar ?: $this->template->meta('default-avatar'));
         $this->template->addVar('username', $this->user->get()->display_name);
         $this->template->addVar('userid', (string) $this->user->get()->id ?: '0');
@@ -364,7 +364,7 @@ final readonly class App
             'SCRIPT',
             '<script>window.globalsettings='
             . json_encode([
-                'can_im' => $this->user->getPerm('can_im'),
+                'can_im' => $this->user->getGroup()?->can_im,
                 'groupid' => $this->user->get()->group_id,
                 'sound_im' => $this->user->get()->sound_im,
                 'userid' => $this->user->get()->id,

@@ -385,7 +385,7 @@ final class IDX
 
     private function getBoardStats(): string
     {
-        if (!$this->user->getPerm('can_view_stats')) {
+        if (!$this->user->getGroup()?->can_view_stats) {
             return '';
         }
 

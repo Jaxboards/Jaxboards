@@ -246,7 +246,7 @@ final class Topic
             $forumPerms['reply']
             && (
                 !$modelsTopic->locked
-                || $this->user->getPerm('can_override_locked_topics')
+                || $this->user->getGroup()?->can_override_locked_topics
             )
         ) {
             $buttons[1] = "<a href='?act=vt{$modelsTopic->id}&qreply=1'>" . $this->template->meta(
@@ -260,7 +260,7 @@ final class Topic
             $forumPerms['reply']
             && (
                 !$modelsTopic->locked
-                || $this->user->getPerm('can_override_locked_topics')
+                || $this->user->getGroup()?->can_override_locked_topics
             )
         ) {
             $buttons[2] = "<a href='?act=post&tid={$modelsTopic->id}'>" . $this->template->meta(
@@ -568,7 +568,7 @@ final class Topic
                     ),
                     $this->date->autoDate($this->database->datetimeAsTimestamp($post->edit_date)),
                 ) : '',
-                $this->user->getPerm('can_moderate')
+                $this->user->getGroup()?->can_moderate
                     ? '<a href="?act=modcontrols&amp;do=iptools&amp;ip='
                     . $this->ipAddress->asHumanReadable($post->ip) . '">' . $this->template->meta(
                         'topic-mod-ipbutton',
@@ -612,8 +612,8 @@ final class Topic
 
         return $post->auth_id
             && ($post->newtopic !== 0
-                ? $this->user->getPerm('can_edit_topics')
-                : $this->user->getPerm('can_edit_posts'))
+                ? $this->user->getGroup()?->can_edit_topics
+                : $this->user->getGroup()?->can_edit_posts)
             && $post->auth_id === $this->user->get()->id;
     }
 
@@ -625,7 +625,7 @@ final class Topic
         }
 
         $canMod = false;
-        if ($this->user->getPerm('can_moderate')) {
+        if ($this->user->getGroup()?->can_moderate) {
             $canMod = true;
         }
 

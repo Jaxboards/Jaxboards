@@ -92,14 +92,7 @@ final class User
         return $this->member = $user;
     }
 
-    public function getPerm(string $perm): null|bool|int|string
-    {
-        $perms = $this->getPerms();
-
-        return $perms->{$perm} ?? null;
-    }
-
-    public function getPerms(): ?Group
+    public function getGroup(): ?Group
     {
         if ($this->userPerms !== null) {
             return $this->userPerms;
@@ -140,12 +133,12 @@ final class User
         }
 
         return [
-            'poll' => (bool) $this->getPerm('can_poll'),
+            'poll' => (bool) $this->getGroup()?->can_poll,
             'read' => true,
             // There is no global "forum read" permission so default to assuming the user can read it
-            'reply' => (bool) $this->getPerm('can_post'),
-            'start' => (bool) $this->getPerm('can_post_topics'),
-            'upload' => (bool) $this->getPerm('can_attach'),
+            'reply' => (bool) $this->getGroup()?->can_post,
+            'start' => (bool) $this->getGroup()?->can_post_topics,
+            'upload' => (bool) $this->getGroup()?->can_attach,
             'view' => true,
             // There is no global "forum view" permission so default to assuming the user can see it
         ];

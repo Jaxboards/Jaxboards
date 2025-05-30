@@ -38,7 +38,7 @@ final readonly class Comments
 
         if (
             !$this->user->isGuest()
-            && $this->user->getPerm('can_add_comments')
+            && $this->user->getGroup()?->can_add_comments
         ) {
             $tabHTML .= $this->template->meta(
                 'userprofile-comment-form',
@@ -62,9 +62,9 @@ final readonly class Comments
 
         foreach ($comments as $comment) {
             $act = $this->request->asString->both('act');
-            $deleteLink = $this->user->getPerm('can_delete_comments')
+            $deleteLink = $this->user->getGroup()?->can_delete_comments
                 && $comment['from'] === $this->user->get()->id
-                || $this->user->getPerm('can_moderate') ? <<<HTML
+                || $this->user->getGroup()?->can_moderate ? <<<HTML
                     <a href="?act={$act}&page=comments&del={$comment['id']}" class="delete">[X]</a>
                     HTML
                 : '';
@@ -129,7 +129,7 @@ final readonly class Comments
         $error = null;
         if (
             $this->user->isGuest()
-            || !$this->user->getPerm('can_add_comments')
+            || !$this->user->getGroup()?->can_add_comments
         ) {
             $error = 'No permission to add comments!';
         }
@@ -165,7 +165,7 @@ final readonly class Comments
         }
 
         // Moderators can delete any comment
-        if ($this->user->getPerm('can_moderate')) {
+        if ($this->user->getGroup()?->can_moderate) {
             $this->database->delete(
                 'profile_comments',
                 Database::WHERE_ID_EQUALS,
@@ -175,7 +175,7 @@ final readonly class Comments
             return;
         }
 
-        if (!$this->user->getPerm('can_delete_comments')) {
+        if (!$this->user->getGroup()?->can_delete_comments) {
             return;
         }
 

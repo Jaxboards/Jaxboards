@@ -114,12 +114,12 @@ final class Router
 
     private function isBoardOffline(): bool
     {
-        if (!$this->user->getPerm('can_view_board')) {
+        if (!$this->user->getGroup()?->can_view_board) {
             return true;
         }
 
         return $this->config->getSetting('boardoffline')
-        && !$this->user->getPerm('can_view_offline_board');
+        && !$this->user->getGroup()?->can_view_offline_board;
     }
 
     /**

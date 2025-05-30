@@ -98,7 +98,7 @@ final class Post
             $this->postData = $postData;
         }
 
-        if ($fileData !== null && $this->user->getPerm('can_attach')) {
+        if ($fileData !== null && $this->user->getGroup()?->can_attach) {
             $attachmentId = $this->upload($fileData);
             $this->postData .= "\n\n[attachment]{$attachmentId}[/attachment]";
         }
@@ -412,8 +412,8 @@ final class Post
     {
         if (
             $modelsPost->auth_id
-            && ($modelsPost->newtopic !== 0 ? $this->user->getPerm('can_edit_topics')
-                : $this->user->getPerm('can_edit_posts'))
+            && ($modelsPost->newtopic !== 0 ? $this->user->getGroup()?->can_edit_topics
+                : $this->user->getGroup()?->can_edit_posts)
             && $modelsPost->auth_id === $this->user->get()->id
         ) {
             return true;
@@ -429,7 +429,7 @@ final class Post
         }
 
         $canmod = false;
-        if ($this->user->getPerm('can_moderate')) {
+        if ($this->user->getGroup()?->can_moderate) {
             $canmod = true;
         }
 
@@ -733,7 +733,7 @@ final class Post
         if (
             ($this->how !== 'newtopic' && !$fdata['perms']['reply'])
             || ($fdata['locked']
-                && !$this->user->getPerm('can_override_locked_topics'))
+                && !$this->user->getGroup()?->can_override_locked_topics)
         ) {
             $error = "You don't have permission to post here.";
             $this->page->append('PAGE', $this->page->error($error));

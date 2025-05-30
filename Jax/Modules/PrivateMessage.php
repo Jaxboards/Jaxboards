@@ -95,7 +95,7 @@ final readonly class PrivateMessage
             return;
         }
 
-        if (!$this->user->getPerm('can_im')) {
+        if (!$this->user->getGroup()?->can_im) {
             $this->page->command(
                 'error',
                 "You don't have permission to use this feature.",

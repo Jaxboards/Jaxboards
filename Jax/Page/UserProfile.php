@@ -57,7 +57,7 @@ final readonly class UserProfile
         match (true) {
             !$profile => $this->showProfileError(),
             $this->didComeFromForum() => $this->showContactCard($profile),
-            (bool) $this->user->getPerm('can_view_fullprofile') => $this->showFullProfile($profile),
+            (bool) $this->user->getGroup()?->can_view_fullprofile => $this->showFullProfile($profile),
             default => $this->page->location('?'),
         };
     }
@@ -120,7 +120,7 @@ final readonly class UserProfile
             </div>
             HTML;
 
-        if ($this->user->getPerm('can_moderate')) {
+        if ($this->user->getGroup()?->can_moderate) {
             $ipReadable = $member->ip !== ''
                 ? $this->ipAddress->asHumanReadable($member->ip)
                 : '';
@@ -208,7 +208,7 @@ final readonly class UserProfile
             $tabs[4],
             $tabs[5],
             $tabHTML,
-            $this->user->getPerm('can_moderate')
+            $this->user->getGroup()?->can_moderate
                 ? "<a class='moderate' href='?act=modcontrols&do=emem&mid={$member->id}'>Edit</a>" : '',
         );
         $this->page->command('update', 'page', $page);
