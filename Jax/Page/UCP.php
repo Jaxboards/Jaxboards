@@ -178,7 +178,7 @@ final readonly class UCP
 
         foreach ($fields as $field) {
             $checkboxes[] = '<input type="checkbox" title="' . $field . '" name="' . $field . '" '
-                . ($this->user->get()->{$field} ? 'checked="checked"' : '') . '/>';
+                . ($this->user->get()->{$field} !== 0 ? 'checked="checked"' : '') . '/>';
         }
 
         $this->page->command('script', <<<'JS'
@@ -565,7 +565,9 @@ final readonly class UCP
         ];
 
         $birthdate = $this->user->get()->birthdate;
-        $birthdate = $birthdate !== '' ? Carbon::createFromFormat('Y-m-d', $birthdate, 'UTC') : null;
+        $birthdate = $birthdate !== ''
+            ? Carbon::createFromFormat('Y-m-d', $birthdate, 'UTC')
+            : null;
 
         foreach ($fullMonthNames as $index => $monthName) {
             $dobselect .= '<option value="' . ($index + 1) . '"'
