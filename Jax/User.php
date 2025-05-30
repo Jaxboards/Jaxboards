@@ -28,6 +28,7 @@ final class User
     ) {
         if ($member !== null) {
             $this->member = $member;
+
             return;
         }
 
