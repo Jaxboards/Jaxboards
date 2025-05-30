@@ -193,17 +193,17 @@ final class Session
         }
 
         $this->vars[$varName] = $value;
-        $this->changedData['vars'] = $this->modelsSession->vars = serialize($this->vars);
+        $this->set('vars', serialize($this->vars));
     }
 
     public function deleteVar(string $varName): void
     {
-        if (!isset($this->vars[$varName])) {
+        if (!array_key_exists($varName, $this->vars)) {
             return;
         }
 
         unset($this->vars[$varName]);
-        $this->modelsSession->vars = serialize($this->vars);
+        $this->set('vars', serialize($this->vars));
     }
 
     public function getVar(string $varName): mixed

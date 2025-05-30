@@ -12,6 +12,7 @@ use Jax\IPAddress;
 use Jax\Models\Activity;
 use Jax\Models\File;
 use Jax\Models\Forum;
+use Jax\Models\Member;
 use Jax\Models\Post as ModelsPost;
 use Jax\Models\Stats;
 use Jax\Models\Topic;
@@ -22,6 +23,7 @@ use Jax\Template;
 use Jax\TextFormatting;
 use Jax\User;
 
+use function _\keyBy;
 use function array_filter;
 use function array_map;
 use function count;
@@ -333,27 +335,32 @@ final class Post
             $vars .= '<input type="hidden" name="' . $k . '" value="' . $v . '" />';
         }
 
-        if (
-            $this->session->getVar('multiquote')
-        ) {
+        if ($this->session->getVar('multiquote')) {
             $postData = '';
 
-            $result = $this->database->special(
-                <<<'SQL'
-                    SELECT
-                        m.`display_name` AS `name`,
-                        p.`post` AS `post`
-                    FROM %t p
-                    LEFT JOIN %t m
-                        ON p.`auth_id`=m.`id`
-                    WHERE p.`id` IN (?)
-                    SQL,
-                ['posts', 'members'],
-                $this->session->getVar('multiquote'),
+            $posts = ModelsPost::selectMany(
+                $this->database,
+                Database::WHERE_ID_IN,
+                explode(',', $this->session->getVar('multiquote'))
             );
 
-            while ($postRow = $this->database->arow($result)) {
-                $postData .= '[quote=' . $postRow['name'] . ']' . $postRow['post'] . '[/quote]' . PHP_EOL;
+            $memberIds = array_filter(
+                array_map(fn(ModelsPost $post) => $post->auth_id, $posts),
+                fn($memberId) => $memberId !== null
+            );
+
+            $membersById = keyBy(
+                Member::selectMany(
+                    $this->database,
+                    Database::WHERE_ID_IN,
+                    $memberIds
+                ),
+                fn(Member $member) => $member->id
+            );
+
+            foreach ($posts as $post) {
+                $authorName = $membersById[$post->auth_id]->name ?? '';
+                $postData .= "[quote={$authorName}]{$post->post}[/quote]" . PHP_EOL;
             }
 
             $this->session->deleteVar('multiquote');
