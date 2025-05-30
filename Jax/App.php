@@ -214,7 +214,10 @@ final readonly class App
             '<script src="' . $this->domainDefinitions->getBoardURL() . '/dist/app.js" defer></script>',
         );
 
-        if ($this->user->getGroup()?->can_moderate || $this->user->get()->mod) {
+        if (
+            $this->user->getGroup()?->can_moderate
+            || $this->user->get()->mod
+        ) {
             $this->page->append(
                 'SCRIPT',
                 '<script type="text/javascript" src="?act=modcontrols&do=load" defer></script>',
