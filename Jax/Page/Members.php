@@ -86,9 +86,11 @@ final class Members
             $this->pageNumber * $this->perpage,
             $this->perpage,
         );
-        $groups = keyBy(
-            Group::selectMany($this->database),
-            static fn($group) => $group->id,
+
+        $groups = Group::joinedOn(
+            $this->database,
+            $members,
+            static fn($group) => $group->id
         );
 
         $nummemberquery = $this->database->special(
