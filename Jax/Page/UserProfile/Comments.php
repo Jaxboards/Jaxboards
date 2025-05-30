@@ -9,6 +9,7 @@ use Jax\Date;
 use Jax\Jax;
 use Jax\Models\Activity;
 use Jax\Models\Member;
+use Jax\Models\ProfileComment;
 use Jax\Page;
 use Jax\Request;
 use Jax\Template;
@@ -146,15 +147,12 @@ final readonly class Comments
         $activity->uid = (int) $this->user->get('id');
         $activity->insert($this->database);
 
-        $this->database->insert(
-            'profile_comments',
-            [
-                'comment' => $comment,
-                'date' => $this->database->datetime(),
-                'from' => $this->user->get('id'),
-                'to' => $member->id,
-            ],
-        );
+        $profileComment = new ProfileComment();
+        $profileComment->comment = $comment;
+        $profileComment->date = $this->database->datetime();
+        $profileComment->from = $this->user->get('id');
+        $profileComment->to = $member->id;
+        $profileComment->insert($this->database);
 
         return '';
     }
