@@ -76,7 +76,7 @@ final class Member extends Model
 
     public string $usertitle = '';
 
-    public string $join_date = '';
+    public ?string $join_date = null;
 
     public string $last_visit = '';
 

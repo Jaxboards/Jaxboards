@@ -35,7 +35,7 @@ final class Message extends Model
 
     public int $read = 0;
 
-    public string $date = '';
+    public ?string $date = null;
 
     public int $del_recipient = 0;
 

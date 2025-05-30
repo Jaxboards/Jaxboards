@@ -31,7 +31,7 @@ final class Post extends Model
 
     public string $post = '';
 
-    public string $date = '';
+    public ?string $date = null;
 
     public int $showsig = 1;
 
@@ -43,7 +43,7 @@ final class Post extends Model
 
     public string $ip = '';
 
-    public string $edit_date = '';
+    public ?string $edit_date = null;
 
     public ?int $editby = null;
 

@@ -24,7 +24,7 @@ final class Shout extends Model
 
     public string $shout = '';
 
-    public string $date = '';
+    public ?string $date = null;
 
     public string $ip = '';
 }

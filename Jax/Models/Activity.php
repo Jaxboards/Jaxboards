@@ -30,7 +30,7 @@ final class Activity extends Model
 
     public int $uid = 0;
 
-    public string $date = '';
+    public ?string $date = null;
 
     public ?int $affected_uid = null;
 
