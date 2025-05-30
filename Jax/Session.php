@@ -310,9 +310,9 @@ final class Session
             $changedData['last_action'] = $this->database->datetime();
         }
 
-        if (mb_strlen((string) $changedData['location_verbose']) > 100) {
+        if (mb_strlen($this->modelsSession->location_verbose) > 100) {
             $changedData['location_verbose'] = mb_substr(
-                (string) $changedData['location_verbose'],
+                $this->modelsSession->location_verbose,
                 0,
                 100,
             );
